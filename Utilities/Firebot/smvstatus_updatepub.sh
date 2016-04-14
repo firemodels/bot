@@ -3,10 +3,10 @@ FORCE=$1
 
 gitwebrepo=~/FDS-SMVgitweb
 firebotdir=~/FDS-SMVgitclean/Utilities/Firebot
-oldpage=~/.firebot/oldpage
-newpage=~/.firebot/newpage
-olddata=~/.firebot/old_data
-newdata=~/.firebot/fds_times.csv
+oldpage=~/.smokebot/oldpage
+newpage=~/.smokebot/newpage
+olddata=~/.smokebot/old_data
+newdata=~/.smokebot/smv_times.csv
 running=~/.fdssmvgit/bot_running
 curdir=`pwd`
 EXIT="yes"
@@ -21,7 +21,7 @@ fi
 
 # check if status web page has changed
 
-./make_pubpage.sh -b > $newpage
+./make_pubpage.sh -s -b  > $newpage
 if [ ! -e $oldpage ]; then
   cp $newpage $oldpage
 fi
@@ -33,7 +33,7 @@ fi
 
 # check if FDS benchmark times have changed
 
-./make_timelist.sh > $newdata
+./make_timelist.sh -s > $newdata
 if [ ! -e $olddata ]; then
   cp $newdata $olddata
 fi
@@ -50,14 +50,14 @@ if [ "$EXIT" == "yes" ]; then
   fi
 fi
 
-./make_pubpage.sh > $newpage
+./make_pubpage.sh -s > $newpage
 
 cd $gitwebrepo
 git remote update
 git merge origin/nist-pages
 
-cp $newpage firebot_status.html
-git add firebot_status.html
+cp $newpage smokebot_status.html
+git add smokebot_status.html
 
-git commit -m "firebot: update firebot status page `date`"
+git commit -m "smokebot: update smokebot status page `date`"
 git push
