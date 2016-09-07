@@ -2,17 +2,20 @@
 if [ ! -d ~/.fdssmvgit ] ; then
   mkdir ~/.fdssmvgit
 fi
-running=~/.fdssmvgit/bot_running
+firebot_pid=~/.fdssmvgit/firebot_pid
 
 CURDIR=`pwd`
 reponame=~/FDS-SMVgitclean
-if [ "$FDSSMV" != "" ] ; then
-  reponame=$FDSSMV
+if [ "$FIREMODELS" != "" ] ; then
+  reponame=$FIREMODELS
 fi
 if [ -e .fds_git ]; then
-  cd ../..
+  cd ../../..
   reponame=`pwd`
   cd $CURDIR
+else
+  echo "***error: firebot not running in the FDS repo"
+  exit
 fi
 
 # checking to see if a queing system is available
@@ -21,8 +24,6 @@ notfound=`qstat -a 2>&1 | tail -1 | grep "not found" | wc -l`
 if [ $notfound -eq 1 ] ; then
   QUEUE=none
 fi
-
-
 
 function usage {
 echo "Verification and validation testing script for FDS"
@@ -34,6 +35,7 @@ echo "-f - force firebot run"
 echo "-F - skip figure generation and build document stages"
 echo "-h - display this message"
 echo "-i - use installed version of smokeview"
+echo "-k - kill firebot if it is running"
 echo "-L - firebot lite,  run only stages that build a debug fds and run cases with it"
 echo "                    (no release fds, no release cases, no matlab, etc)"
 if [ "$EMAIL" != "" ]; then
@@ -44,15 +46,26 @@ fi
 echo "-q queue - specify queue [default: $QUEUE]"
 echo "-r - repository location [default: $reponame]"
 echo "-s - skip matlab and build document stages"
-echo "-S host - generate images on host"
 echo "-u - update repo"
 echo "-U - upload guides (only by user firebot)"
 echo "-v - show options used to run firebot"
 exit
 }
 
+LIST_DESCENDANTS ()
+{
+  local children=$(ps -o pid= --ppid "$1")
+
+  for pid in $children
+  do
+    LIST_DESCENDANTS "$pid"
+  done
+
+  echo "$children"
+}
+
 USEINSTALL=
-BRANCH=development
+BRANCH=master
 botscript=firebot.sh
 UPDATEREPO=
 CLEANREPO=0
@@ -60,12 +73,12 @@ UPDATE=
 CLEAN=
 RUNFIREBOT=1
 UPLOADGUIDES=
-SSH=
 FORCE=
 SKIPMATLAB=
 SKIPFIGURES=
 FIREBOT_LITE=
-while getopts 'b:cFfhiLm:q:nr:sS:uUv' OPTION
+KILL_FIREBOT=
+while getopts 'b:cFfhikLm:q:nr:suUv' OPTION
 do
 case $OPTION  in
   b)
@@ -86,6 +99,9 @@ case $OPTION  in
   i)
    USEINSTALL="-i"
    ;;
+  k)
+   KILL_FIREBOT="1"
+   ;;
   L)
    FIREBOT_LITE=-L
    ;;
@@ -104,9 +120,6 @@ case $OPTION  in
   s)
    SKIPMATLAB=-s
    ;;
-  S)
-   SSH="-S $OPTARG"
-   ;;
   u)
    UPDATEREPO=1
    ;;
@@ -120,7 +133,28 @@ esac
 done
 shift $(($OPTIND-1))
 
-if [ -e $running ] ; then
+if [ "$KILL_FIREBOT" == "1" ]; then
+  if [ -e $firebot_pid ] ; then
+    PID=`head -1 $firebot_pid`
+    echo killing process invoked by firebot
+    kill -9 $(LIST_DESCENDANTS $PID)
+    echo "killing firebot (PID=$PID)"
+    kill -9 $PID
+    JOBIDS=`qstat -a | grep FB_ | awk -v user="$USER" '{if($2==user){print $1}}'`
+    if [ "$JOBIDS" != "" ]; then
+      echo killing firebot jobs with Id:$JOBIDS
+      qdel $JOBIDS
+    fi
+    echo firebot process $PID killed
+    if [ -e $firebot_pid ]; then
+      rm $firebot_pid
+    fi
+  else
+    echo firebot is not running, cannot be killed.
+  fi
+  exit
+fi
+if [ -e $firebot_pid ] ; then
   if [ "$FORCE" == "" ] ; then
     echo Firebot or smokebot are already running. If this
     echo "is not the case re-run using the -f option."
@@ -132,15 +166,16 @@ if [[ "$EMAIL" != "" ]]; then
 fi
 if [[ "$UPDATEREPO" == "1" ]]; then
    UPDATE=-u
-   cd $reponame
+   cd $reponame/fds
    if [[ "$RUNFIREBOT" == "1" ]]; then
-     git remote update &> /dev/null
+     git fetch origin &> /dev/null
      git checkout $BRANCH &> /dev/null
      git merge origin/$BRANCH &> /dev/null
      cd Utilities/Firebot
      FIREBOTDIR=`pwd`
      if [[ "$CURDIR" != "$FIREBOTDIR" ]]; then
-       cp $botscript $CURDIR/.
+        echo "***error: firebot not running in the $FIREBOTDIR"
+        exit
      fi
      cd $CURDIR
   fi
@@ -148,13 +183,13 @@ fi
 if [[ "$CLEANREPO" == "1" ]]; then
   CLEAN=-c
 fi
-touch $running
 BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 reponame="-r $reponame"
 if [ "$RUNFIREBOT" == "1" ] ; then
-  ./$botscript $UPDATE $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $SSH $CLEAN $BRANCH $QUEUE $SKIPMATLAB $SKIPFIGURES $reponame $EMAIL "$@"
+  touch $firebot_pid
+  ./$botscript -p $firebot_pid $UPDATE $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $BRANCH $QUEUE $SKIPMATLAB $SKIPFIGURES $reponame $EMAIL "$@"
 else
-  echo ./$botscript $FIREBOT_LITE $UPDATE $USEINSTALL $UPLOADGUIDES $SSH $CLEAN $BRANCH $QUEUE $SKIPMATLAB $SKIPFIGURES $reponame $EMAIL "$@"
+  echo ./$botscript $FIREBOT_LITE $UPDATE $USEINSTALL $UPLOADGUIDES $CLEAN $BRANCH $QUEUE $SKIPMATLAB $SKIPFIGURES $reponame $EMAIL "$@"
 fi
-rm $running
+rm $firebot_pid
