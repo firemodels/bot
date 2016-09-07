@@ -582,20 +582,11 @@ clean_FDS_repo()
           exit
         fi
         echo Cleaning
-        echo "   smv/Manuals"
-        clean_repo $fdsrepo/smv/Manuals
+        echo "   smv"
+        clean_repo $fdsrepo/smv
 
-        echo "   smv/Source"
-        clean_repo $fdsrepo/smv/Source
-
-        echo "   smv/Verification"
-        clean_repo $fdsrepo/smv/Verification
-        
-        echo "   fds/Build"
-        clean_repo $fdsrepo/fds/Build
-
-        echo "   fds/Source"
-        clean_repo $fdsrepo/fds/Source
+        echo "   fds"
+        clean_repo $fdsrepo/fds
 
         updateclean="1"
       fi

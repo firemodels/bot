@@ -262,12 +262,10 @@ clean_git_repo()
       cd $fdsrepo/fds
       if [[ "$CLEANREPO" == "1" ]] ; then
          echo "   repo"
-         clean_repo $fdsrepo/fds/Verification
-         clean_repo $fdsrepo/fds/Validation
+         clean_repo $fdsrepo/fds
          clean_repo $fdsrepo/smv
-         clean_repo $fdsrepo/fds/Source
-         clean_repo $fdsrepo/fds/Build
-         clean_repo $fdsrepo/fds/Manuals
+         clean_repo $fdsrepo/exp
+         clean_repo $fdsrepo/out
       fi
    # If not, create FDS repository and checkout
    else
@@ -281,7 +279,7 @@ clean_git_repo()
 do_git_checkout()
 {
    cd $fdsrepo/fds
-   # If an GIT revision string is specified, then get that revision
+   # If a GIT revision string is specified, then get that revision
    echo "Checking out latest revision." >> $OUTPUT_DIR/stage1 2>&1
    CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
    if [[ "$BRANCH" != "" ]] ; then
@@ -323,26 +321,26 @@ do_git_checkout()
  
    if [[ "$UPDATEREPO" == "1" ]] ; then
       cd $fdsrepo/exp
-      echo "Updating latest revision of branch exp/$BRANCH." >> $OUTPUT_DIR/stage1 2>&1
-      echo Updating $fdsrepo/exp
-      git fetch origin >> $OUTPUT_DIR/stage1 2>&1
-      git merge origin/$BRANCH >> $OUTPUT_DIR/stage1 2>&1
-   
-      cd $fdsrepo/out
-      echo "Updating latest revision of branch out/$BRANCH." >> $OUTPUT_DIR/stage1 2>&1
-      echo Updating $fdsrepo/out
+      cd $fdsrepo/fds
+      echo Updating $BRANCH on repo $fdsrepo/fds >> $OUTPUT_DIR/stage1 2>&1
+      echo Updating $BRANCH on repo $fdsrepo/fds
       git fetch origin >> $OUTPUT_DIR/stage1 2>&1
       git merge origin/$BRANCH >> $OUTPUT_DIR/stage1 2>&1
 
       cd $fdsrepo/smv
-      echo "Pulling latest revision of branch $BRANCH." >> $OUTPUT_DIR/stage1 2>&1
-      echo Updating $fdsrepo/smv
+      echo Updating $BRANCH on repo $fdsrepo/smv >> $OUTPUT_DIR/stage1 2>&1
+      echo Updating $BRANCH on repo $fdsrepo/smv
       git fetch origin >> $OUTPUT_DIR/stage1 2>&1
       git merge origin/$BRANCH >> $OUTPUT_DIR/stage1 2>&1
 
-      cd $fdsrepo/fds
-      echo "Pulling latest revision of branch $BRANCH." >> $OUTPUT_DIR/stage1 2>&1
-      echo Updating $fdsrepo/fds
+      echo Updating $BRANCH on repo $fdsrepo/exp >> $OUTPUT_DIR/stage1 2>&1
+      echo Updating $BRANCH on repo $fdsrepo/exp
+      git fetch origin >> $OUTPUT_DIR/stage1 2>&1
+      git merge origin/$BRANCH >> $OUTPUT_DIR/stage1 2>&1
+   
+      cd $fdsrepo/out
+      echo Updating $BRANCH on repo $fdsrepo/out >> $OUTPUT_DIR/stage1 2>&1
+      echo Updating $BRANCH on repo $fdsrepo/out
       git fetch origin >> $OUTPUT_DIR/stage1 2>&1
       git merge origin/$BRANCH >> $OUTPUT_DIR/stage1 2>&1
    fi
@@ -381,13 +379,13 @@ check_inspect_fds_db()
    # Scan for errors in thread checking results
    cd $fdsrepo/fds/Utilities/Scripts
    # grep -v 'Warning: One or more threads in the application accessed ...' ignores a known compiler warning that displays even without errors
-      if [[ `grep -i -E 'warning|remark|problem|error' ${FIREBOT_RUNDIR}/output/stage2a | grep -v '0 new problem(s) found' | grep -v 'Warning: One or more threads in the application accessed the stack of another thread'` == "" ]]
+      if [[ `grep -i -E 'warning|remark|problem|error' $OUTPUT_DIR/stage2a | grep -v '0 new problem(s) found' | grep -v 'Warning: One or more threads in the application accessed the stack of another thread'` == "" ]]
    then
       # Continue along
       :
    else
       echo "Errors from Stage 2a - Compile and inspect FDS debug:" >> $ERROR_LOG
-      cat ${FIREBOT_RUNDIR}/output/stage2a >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage2a >> $ERROR_LOG
       echo "" >> $ERROR_LOG
       echo "For more details, view the inspector log in the fds/Utilities/Scripts folder" >> $ERROR_LOG
       echo "by using the fds/Utilities/Scripts/inspect_report.sh script." >> $ERROR_LOG
@@ -423,13 +421,13 @@ check_compile_fds_mpi_db()
 
    # Check for compiler warnings/remarks
    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-   if [[ `grep -A 5 -E 'warning|remark' ${FIREBOT_RUNDIR}/output/stage2b | grep -v atom | grep -v 'feupdateenv is not implemented'` == "" ]]
+   if [[ `grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage2b | grep -v atom | grep -v 'feupdateenv is not implemented'` == "" ]]
    then
       # Continue along
       :
    else
       echo "Warnings from Stage 2b - Compile FDS MPI debug:" >> $WARNING_LOG
-      grep -A 5 -E 'warning|remark' ${FIREBOT_RUNDIR}/output/stage2b | grep -v atom | grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
+      grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage2b | grep -v atom | grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
 }
@@ -512,7 +510,7 @@ check_cases_debug()
    # Scan for and report any errors in FDS cases
    cd $1
 
-   if [[ `grep -rI 'Run aborted' ${FIREBOT_RUNDIR}/output/stage4` == "" ]] && \
+   if [[ `grep -rI 'Run aborted' $OUTPUT_DIR/stage4` == "" ]] && \
       [[ `grep -rI Segmentation *` == "" ]] && \
       [[ `grep -rI ERROR: *` == "" ]] && \
       [[ `grep -rI 'STOP: Numerical' *` == "" ]] && \
@@ -567,13 +565,13 @@ check_compile_fds_mpi()
    # Check for compiler warnings/remarks
    # 'performing multi-file optimizations' and 'generating object file' are part of a normal compile
    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-   if [[ `grep -A 5 -E 'warning|remark' ${FIREBOT_RUNDIR}/output/stage2c | grep -v atom | grep -v 'feupdateenv is not implemented' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'` == "" ]]
+   if [[ `grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage2c | grep -v atom | grep -v 'feupdateenv is not implemented' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'` == "" ]]
    then
       # Continue along
       :
    else
       echo "Warnings from Stage 2c - Compile FDS MPI release:" >> $WARNING_LOG
-      grep -A 5 -E 'warning|remark' ${FIREBOT_RUNDIR}/output/stage2c | grep -v atom | grep -v 'feupdateenv is not implemented' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file' >> $WARNING_LOG
+      grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage2c | grep -v atom | grep -v 'feupdateenv is not implemented' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
 }
@@ -612,7 +610,7 @@ check_cases_release()
    # Scan for and report any errors in FDS cases
    cd $1
 
-   if [[ `grep -rI 'Run aborted' ${FIREBOT_RUNDIR}/output/stage5` == "" ]] && \
+   if [[ `grep -rI 'Run aborted' $OUTPUT_DIR/stage5` == "" ]] && \
       [[ `grep -rI Segmentation *` == "" ]] && \
       [[ `grep -rI ERROR: *` == "" ]] && \
       [[ `grep -rI 'STOP: Numerical' *` == "" ]] && \
@@ -700,13 +698,13 @@ check_compile_smv_db()
 
    # Check for compiler warnings/remarks
    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-   if [[ `grep -A 5 -E 'warning|remark' ${FIREBOT_RUNDIR}/output/stage3b | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]
+   if [[ `grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage3b | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]
    then
       # Continue along
       :
    else
       echo "Warnings from Stage 3b - Compile SMV debug:" >> $WARNING_LOG
-      grep -A 5 -E 'warning|remark' ${FIREBOT_RUNDIR}/output/stage3b | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
+      grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage3b | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
    else
@@ -744,13 +742,13 @@ check_compile_smv()
 
    # Check for compiler warnings/remarks
    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-   if [[ `grep -A 5 -E 'warning|remark' ${FIREBOT_RUNDIR}/output/stage3c | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]
+   if [[ `grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage3c | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]
    then
       # Continue along
       :
    else
       echo "Warnings from Stage 3c - Compile SMV release:" >> $WARNING_LOG
-      grep -A 5 -E 'warning|remark' ${FIREBOT_RUNDIR}/output/stage3c | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
+      grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage3c | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
    stage3c_success=true

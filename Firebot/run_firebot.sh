@@ -10,7 +10,7 @@ if [ "$FIREMODELS" != "" ] ; then
   reponame=$FIREMODELS
 fi
 if [ -e .fds_git ]; then
-  cd ../../..
+  cd ../..
   reponame=`pwd`
   cd $CURDIR
 else
@@ -166,15 +166,15 @@ if [[ "$EMAIL" != "" ]]; then
 fi
 if [[ "$UPDATEREPO" == "1" ]]; then
    UPDATE=-u
-   cd $reponame/fds
    if [[ "$RUNFIREBOT" == "1" ]]; then
+     cd $reponame/bot/Firebot
      git fetch origin &> /dev/null
      git checkout $BRANCH &> /dev/null
      git merge origin/$BRANCH &> /dev/null
-     cd Utilities/Firebot
      FIREBOTDIR=`pwd`
      if [[ "$CURDIR" != "$FIREBOTDIR" ]]; then
         echo "***error: firebot not running in the $FIREBOTDIR"
+        echo "          firebot run aborted"
         exit
      fi
      cd $CURDIR

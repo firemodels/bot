@@ -218,14 +218,15 @@ fi
 
 if [[ "$RUNSMOKEBOT" == "1" ]]; then
   if [[ "$UPDATEREPO" == "-u" ]]; then
-     cd $FDSREPO/bot
+     cd $FDSREPO/bot/Smokebot
      git fetch origin &> /dev/null
      git checkout $BRANCH &> /dev/null
      git merge origin/$BRANCH &> /dev/null
      cd Utilities/Smokebot
      FIREBOTDIR=`pwd`
      if [ "$FIREBOTDIR" != "$CURDIR" ]; then
-        echo "***error: smokebot not running in the $FIREBOTDIR"
+        echo "***error: smokebot not running in $FIREBOTDIR"
+        echo "          smokebot run aborted"
         exit
      fi
      cd $CURDIR
