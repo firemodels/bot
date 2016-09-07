@@ -16,9 +16,9 @@ if x%CFASTGIT% == x goto skip_cfastgit
   )
 :skip_cfastgit
 
-set fdsrepo=%userprofile%\FDS-SMVgitclean
+set fdsrepo=%userprofile%\FDS-SMVnew
 if exist .fds_git (
-  set fdsrepo=..\..
+  set fdsrepo=..\..\..
 )
 if x%FDSGIT% == x goto skip_fdsgit
   if EXIST %FDSGIT% (
@@ -53,7 +53,7 @@ if %stopscript% == 1 (
 call :normalise %CD% curdir
 set curdir=%temparg%
 
-call :normalise %fdsrepo%\Utilities\Firebot
+call :normalise %fdsrepo%\smv\Utilities\Smokebot
 set fdsbotdir=%temparg%
 
 call :normalise %cfastrepo% 
@@ -75,8 +75,8 @@ if exist %running% goto skip_running
     if %update% == 0 goto no_update
     echo getting latest smokebot
     cd %fdsrepo%
-    git fetch origin
-    git pull 1> Nul 2>&1
+    git remote update
+    git merge origin/master 1> Nul 2>&1
     if not %fdsbotdir% == %curdir% (
       copy %fdsbotdir%\smokebot.bat %curdir%
     )

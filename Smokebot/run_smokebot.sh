@@ -2,21 +2,24 @@
 if [ ! -d ~/.fdssmvgit ] ; then
   mkdir ~/.fdssmvgit
 fi
-running=~/.fdssmvgit/bot_running
+smokebot_pid=~/.fdssmvgit/smokebot_pid
 
 CURDIR=`pwd`
 FDSREPO=~/FDS-SMVgitclean
-if [ "$FDSSMV" != "" ] ; then
-  FDSREPO=$FDSSMV
+if [ "$FIREMODELS" != "" ] ; then
+  FDSREPO=$FIREMODELS
 fi
 if [ -e .fds_git ]; then
-  cd ../..
+  cd ../../..
   FDSREPO=`pwd`
   cd $CURDIR
+else
+  echo "***error: smokebot not running in the SMV repo"
+  exit
 fi
-CFASTREPO=~/cfastgitclean
 
-BRANCH=development
+KILL_SMOKEBOT=
+BRANCH=master
 botscript=smokebot.sh
 RUNAUTO=
 CLEANREPO=
@@ -54,11 +57,11 @@ echo "Options:"
 echo "-a - run automatically if FDS or smokeview source has changed"
 echo "-b - branch_name - run smokebot using the branch branch_name [default: $BRANCH]"
 echo "-c - clean repo"
-echo "-C - cfast repository location [default: $CFASTREPO]"
 echo "-f - force smokebot run"
 echo "-h - display this message"
 echo "-I compiler - intel or gnu [default: $COMPILER]"
 if [ "$EMAIL" != "" ]; then
+echo "-k - kill smokebot if it is running"
 echo "-m email_address - [default: $EMAIL]"
 else
 echo "-m email_address"
@@ -86,7 +89,20 @@ fi
 exit
 }
 
-while getopts 'aAb:C:cd:fhI:Lm:Mq:r:S:tuUvw:W:' OPTION
+LIST_DESCENDANTS ()
+{
+  local children=$(ps -o pid= --ppid "$1")
+
+  for pid in $children
+  do
+    LIST_DESCENDANTS "$pid"
+  done
+
+  echo "$children"
+}
+
+
+while getopts 'aAb:cd:fhI:kLm:Mq:r:S:tuUvw:W:' OPTION
 do
 case $OPTION  in
   a)
@@ -101,9 +117,6 @@ case $OPTION  in
   c)
    CLEANREPO=-c
    ;;
-  C)
-   CFASTREPO="$OPTARG"
-   ;;
   I)
    COMPILER="$OPTARG"
    ;;
@@ -113,6 +126,9 @@ case $OPTION  in
   h)
    usage
    exit
+   ;;
+  k)
+   KILL_SMOKEBOT=1
    ;;
   L)
    SMOKEBOT_LITE="-L"
@@ -163,9 +179,30 @@ fi
 
 COMPILER="-I $COMPILER"
 
+if [ "$KILL_SMOKEBOT" == "1" ]; then
+  if [ -e $smokebot_pid ]; then
+    PID=`head -1 $smokebot_pid`
+    echo killing processes invoked by smokebot
+    kill -9 $(LIST_DESCENDANTS $PID)
+    echo "killing smokebot (PID=$PID)"
+    kill -9 $PID
+    JOBIDS=`qstat -a | grep SB_ | awk -v user="$USER" '{if($2==user){print $1}}'`
+    if [ "$JOBIDS" != "" ]; then
+      echo killing smokebot jobs with Id: $JOBIDS
+      qdel $JOBIDS
+    fi
+    echo smokebot process $PID killed
+    if [ -e $smokebot_pid ]; then
+      rm $smokebot_pid
+    fi
+  else
+    echo smokebotbot is not running, cannot be killed.
+  fi
+  exit
+fi
 if [[ "$RUNSMOKEBOT" == "1" ]]; then
   if [ "$FORCE" == "" ]; then
-    if [ -e $running ] ; then
+    if [ -e $smokebot_pid ] ; then
       echo Smokebot or firebot are already running.
       echo "Re-run using the -f option if this is not the case."
       exit
@@ -181,27 +218,27 @@ fi
 
 if [[ "$RUNSMOKEBOT" == "1" ]]; then
   if [[ "$UPDATEREPO" == "-u" ]]; then
-     cd $FDSREPO
-     git remote update &> /dev/null
+     cd $FDSREPO/smv
+     git fetch origin &> /dev/null
      git checkout $BRANCH &> /dev/null
      git merge origin/$BRANCH &> /dev/null
-     cd Utilities/Firebot
+     cd Utilities/Smokebot
      FIREBOTDIR=`pwd`
      if [ "$FIREBOTDIR" != "$CURDIR" ]; then
-       cp $botscript $CURDIR/.
+        echo "***error: smokebot not running in the $FIREBOTDIR"
+        exit
      fi
      cd $CURDIR
   fi
 fi
 
-CFASTREPO="-C $CFASTREPO"
 FDSREPO="-r $FDSREPO"
 BRANCH="-b $BRANCH"
 
 if [[ "$RUNSMOKEBOT" == "1" ]]; then
-  touch $running
-  ./$botscript $TESTFLAG $RUNAUTO $COMPILER $SSH $SMOKEBOT_LITE $BRANCH $CFASTREPO $FDSREPO $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
-  rm $running
+  touch $smokebot_pid
+  ./$botscript $TESTFLAG $RUNAUTO $COMPILER $SSH $SMOKEBOT_LITE $BRANCH $FDSREPO $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+  rm $smokebot_pid
 else
-  echo ./$botscript $TESTFLAG $RUNAUTO $COMPILER $SMOKEBOT_LITE $SSH $BRANCH $CFASTREPO $FDSREPO $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+  echo ./$botscript $TESTFLAG $RUNAUTO $COMPILER $SMOKEBOT_LITE $SSH $BRANCH $FDSREPO $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 fi

@@ -1,8 +1,7 @@
 #!/bin/bash
 FORCE=$1
 
-gitwebrepo=~/FDS-SMVgitweb
-firebotdir=~/FDS-SMVgitclean/Utilities/Firebot
+gitwebrepo=~/FDS-SMVwebpages
 oldpage=~/.smokebot/oldpage
 newpage=~/.smokebot/newpage
 olddata=~/.smokebot/old_data
@@ -12,7 +11,6 @@ curdir=`pwd`
 EXIT="yes"
 
 # don't update status page if firebot is running
-cd $firebotdir
 if [ -e $running ] ; then
   if [ "$FORCE" == "" ]; then
     exit
@@ -52,12 +50,14 @@ fi
 
 ./make_pubpage.sh -s > $newpage
 
-cd $gitwebrepo
-git remote update
-git merge origin/nist-pages
+if [ "$USER" == "smokebot" ]; then
+  cd $gitwebrepo
+  git remote update
+  git merge origin/nist-pages
 
-cp $newpage smokebot_status.html
-git add smokebot_status.html
+  cp $newpage smokebot_status.html
+  git add smokebot_status.html
 
-git commit -m "smokebot: update smokebot status page `date`"
-git push
+  git commit -m "smokebot: update smokebot status page `date`"
+  git push origin nist-pages
+fi
