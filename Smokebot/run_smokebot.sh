@@ -10,7 +10,7 @@ if [ "$FIREMODELS" != "" ] ; then
   FDSREPO=$FIREMODELS
 fi
 if [ -e .fds_git ]; then
-  cd ../../..
+  cd ../..
   FDSREPO=`pwd`
   cd $CURDIR
 else
@@ -218,7 +218,7 @@ fi
 
 if [[ "$RUNSMOKEBOT" == "1" ]]; then
   if [[ "$UPDATEREPO" == "-u" ]]; then
-     cd $FDSREPO/smv
+     cd $FDSREPO/bot
      git fetch origin &> /dev/null
      git checkout $BRANCH &> /dev/null
      git merge origin/$BRANCH &> /dev/null
