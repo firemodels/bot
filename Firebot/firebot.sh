@@ -252,33 +252,25 @@ clean_firebot_metafiles()
 #  = Stage 1 - GIT operations =
 #  ============================
 
-clean_repos()
+clean_repo2()
 {
+   repo=$1
    # Check to see if FDS repository exists
-   if [ -e "$fdsrepo" ]
-   # If yes, clean FDS repository
-   then
-      # Revert and clean up temporary unversioned and modified versioned repository files
-      cd $fdsrepo/fds
-      if [[ "$CLEANREPO" == "1" ]] ; then
-         echo "   repo"
-         clean_repo $fdsrepo/fds
-         clean_repo $fdsrepo/smv
-         clean_repo $fdsrepo/exp
-         clean_repo $fdsrepo/out
-      fi
-   # If not, create FDS repository and checkout
+   if [ -e "$fdsrepo" ]; then
+      cd $fdsrepo/$repo
+      echo "   $repo"
+      clean_repo $fdsrepo/$repo
    else
       echo "firebot repo $fdsrepo does not exist" >> $OUTPUT_DIR/stage1 2>&1
       echo "firebot run aborted." >> $OUTPUT_DIR/stage1 2>&1
       exit
-      cd $FIREBOT_RUNDIR
    fi
 }
 
-update_repos()
+update_repo()
 {
-   cd $fdsrepo/fds
+   repo=$1
+   cd $fdsrepo/$repo
    # If a GIT revision string is specified, then get that revision
    echo "Checking out latest revision." >> $OUTPUT_DIR/stage1 2>&1
    CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
@@ -294,15 +286,6 @@ update_repos()
    else
       BRANCH=$CURRENT_BRANCH
    fi
-# turn off submodules for now - turn back on when all but submodules
-# in firebot is working
-#   if [[ "$UPDATEREPO" == "1" ]] ; then
-#     echo "Fetching origin." >> $OUTPUT_DIR/stage1 2>&1
-#     git fetch origin >> $OUTPUT_DIR/stage1 2>&1
-#     echo "Updating submodules." >> $OUTPUT_DIR/stage1 2>&1
-#     git submodule foreach git fetch origin >> $OUTPUT_DIR/stage1 2>&1
-#     git submodule foreach git merge origin/master >> $OUTPUT_DIR/stage1 2>&1
-#   fi
 
    echo "Re-checking out latest revision." >> $OUTPUT_DIR/stage1 2>&1
    CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
@@ -318,36 +301,28 @@ update_repos()
    else
       BRANCH=$CURRENT_BRANCH
    fi
- 
-   if [[ "$UPDATEREPO" == "1" ]] ; then
-      cd $fdsrepo/exp
-      cd $fdsrepo/fds
-      echo Updating $BRANCH on repo $fdsrepo/fds >> $OUTPUT_DIR/stage1 2>&1
-      echo Updating $BRANCH on repo $fdsrepo/fds
-      git fetch origin >> $OUTPUT_DIR/stage1 2>&1
-      git merge origin/$BRANCH >> $OUTPUT_DIR/stage1 2>&1
 
-      cd $fdsrepo/smv
-      echo Updating $BRANCH on repo $fdsrepo/smv >> $OUTPUT_DIR/stage1 2>&1
-      echo Updating $BRANCH on repo $fdsrepo/smv
-      git fetch origin >> $OUTPUT_DIR/stage1 2>&1
-      git merge origin/$BRANCH >> $OUTPUT_DIR/stage1 2>&1
+   echo "   $repo" 
+   cd $fdsrepo/$repo
+   echo Updating $BRANCH on repo $fdsrepo/$repo >> $OUTPUT_DIR/stage1 2>&1
+   echo Updating $BRANCH on repo $fdsrepo/$repo
+   git fetch origin >> $OUTPUT_DIR/stage1 2>&1
+   git merge origin/$BRANCH >> $OUTPUT_DIR/stage1 2>&1
 
-      echo Updating $BRANCH on repo $fdsrepo/exp >> $OUTPUT_DIR/stage1 2>&1
-      echo Updating $BRANCH on repo $fdsrepo/exp
+   if [[ "$repo" == "exp" ]]; then
+      echo "Fetching origin." >> $OUTPUT_DIR/stage1 2>&1
       git fetch origin >> $OUTPUT_DIR/stage1 2>&1
-      git merge origin/$BRANCH >> $OUTPUT_DIR/stage1 2>&1
-   
-      cd $fdsrepo/out
-      echo Updating $BRANCH on repo $fdsrepo/out >> $OUTPUT_DIR/stage1 2>&1
-      echo Updating $BRANCH on repo $fdsrepo/out
-      git fetch origin >> $OUTPUT_DIR/stage1 2>&1
-      git merge origin/$BRANCH >> $OUTPUT_DIR/stage1 2>&1
+      echo "Updating submodules." >> $OUTPUT_DIR/stage1 2>&1
+      git submodule foreach git fetch origin >> $OUTPUT_DIR/stage1 2>&1
+      git submodule foreach git merge origin/master >> $OUTPUT_DIR/stage1 2>&1
    fi
-   GIT_REVISION=`git describe --long --dirty`
-   GIT_SHORTHASH=`git rev-parse --short HEAD`
-   GIT_LONGHASH=`git rev-parse HEAD`
-   GIT_DATE=`git log -1 --format=%cd --date=local $GIT_SHORTHASH`
+
+   if [[ "$repo" == "fds" ]]; then
+      GIT_REVISION=`git describe --long --dirty`
+      GIT_SHORTHASH=`git rev-parse --short HEAD`
+      GIT_LONGHASH=`git rev-parse HEAD`
+      GIT_DATE=`git log -1 --format=%cd --date=local $GIT_SHORTHASH`
+   fi
 }
 
 check_git_checkout()
@@ -1180,8 +1155,26 @@ start_time=`date`
 clean_firebot_metafiles
 
 ### Stage 1 ###
-clean_repos
-update_repos
+if [[ "$CLEANREPO" == "1" ]] ; then
+  echo Cleaning
+  clean_repo2 exp
+  clean_repo2 fds
+  clean_repo2 out
+  clean_repo2 smv
+else
+   echo Repos not cleaned 
+fi
+
+if [[ "$UPDATEREPO" == "1" ]] ; then
+  echo Updating
+  update_repo exp
+  update_repo fds
+  update_repo out
+  update_repo smv
+else
+  echo Repos not updated
+fi
+
 check_git_checkout
 archive_compiler_version
 

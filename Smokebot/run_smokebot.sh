@@ -26,7 +26,6 @@ CLEANREPO=
 UPDATEREPO=
 RUNSMOKEBOT=1
 MOVIE=
-SSH=
 UPLOAD=
 FORCE=
 COMPILER=intel
@@ -71,7 +70,6 @@ echo "-L - smokebot lite,  run only stages that build a debug fds and run cases 
 echo "                    (no release fds, no release cases, no manuals, etc)"
 echo "-M  - make movies"
 echo "-r - FDS-SMV repository location [default: $FDSREPO]"
-echo "-S host - generate images on host"
 echo "-t - use test smokeview"
 echo "-u - update repo"
 echo "-U - upload guides"
@@ -102,7 +100,7 @@ LIST_DESCENDANTS ()
 }
 
 
-while getopts 'aAb:cd:fhI:kLm:Mq:r:S:tuUvw:W:' OPTION
+while getopts 'aAb:cd:fhI:kLm:Mq:r:tuUvw:W:' OPTION
 do
 case $OPTION  in
   a)
@@ -144,9 +142,6 @@ case $OPTION  in
    ;;
   r)
    FDSREPO="$OPTARG"
-   ;;
-  S)
-   SSH="-S $OPTARG"
    ;;
   t)
    TESTFLAG="-t"
@@ -237,8 +232,8 @@ BRANCH="-b $BRANCH"
 
 if [[ "$RUNSMOKEBOT" == "1" ]]; then
   touch $smokebot_pid
-  ./$botscript $TESTFLAG $RUNAUTO $COMPILER $SSH $SMOKEBOT_LITE $BRANCH $FDSREPO $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+  ./$botscript $TESTFLAG $RUNAUTO $COMPILER $SMOKEBOT_LITE $BRANCH $FDSREPO $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
   rm $smokebot_pid
 else
-  echo ./$botscript $TESTFLAG $RUNAUTO $COMPILER $SMOKEBOT_LITE $SSH $BRANCH $FDSREPO $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+  echo ./$botscript $TESTFLAG $RUNAUTO $COMPILER $SMOKEBOT_LITE $BRANCH $FDSREPO $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 fi

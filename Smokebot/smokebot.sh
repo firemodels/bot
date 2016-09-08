@@ -37,13 +37,12 @@ TESTFLAG=
 TEST=
 CLEANREPO=0
 UPDATEREPO=0
-SSH=
 MAILTO=
 UPLOADRESULTS=
 COMPILER=intel
 PID_FILE=~/.fdssmvgit/smokebot_pid
 
-while getopts 'aAb:cI:Lm:Mo:p:q:r:sS:tuUw:W:' OPTION
+while getopts 'aAb:cI:Lm:Mo:p:q:r:stuUw:W:' OPTION
 do
 case $OPTION in
   a)
@@ -86,9 +85,6 @@ case $OPTION in
    ;;
   s)
    RUNDEBUG="0"
-   ;;
-  S)
-   SSH="$OPTARG"
    ;;
   t)
    TESTFLAG="-t"
@@ -154,15 +150,6 @@ else
   USEINSTALL2=
 fi
 
-if [ "$SSH" != "" ]; then
-  sshok=$(ssh -o BatchMode=yes -o ConnectTimeout=5 $SSH echo ok 2>/dev/null)
-  if [ "$sshok" != "ok" ]; then
-    echo unable to make an ssh connection to $SSH
-    echo smokebot aborted
-    exit
-  fi
-  SSH="ssh $SSH "
-fi
 
 DB=_db
 IB=
@@ -540,8 +527,8 @@ clean_repo2()
         updateclean="1"
       fi
    else
-      echo "The repo directory $fdsrepo does not exist." >> $OUTPUT_DIR/stage0b 2>&1
-      echo "Aborting smokebot" >> $OUTPUT_DIR/stage0b 2>&1
+      echo "The repo directory $fdsrepo does not exist." >> $OUTPUT_DIR/stage0 2>&1
+      echo "Aborting smokebot" >> $OUTPUT_DIR/stage0 2>&1
       exit
    fi
 }
@@ -559,7 +546,7 @@ update_repo()
         exit
      fi
      if [[ "$BRANCH" != "$CURRENT_BRANCH" ]] ; then
-        echo "Checking out branch $BRANCH." >> $OUTPUT_DIR/stage0b 2>&1
+        echo "Checking out branch $BRANCH." >> $OUTPUT_DIR/stage0 2>&1
         git checkout $BRANCH
      fi
    else
@@ -582,16 +569,16 @@ update_repo()
      echo "smokebot without the -u (update) option"
      exit
    fi
-   echo "Updating branch $BRANCH." >> $OUTPUT_DIR/stage0b 2>&1
-   git fetch origin >> $OUTPUT_DIR/stage0b 2>&1
-   git merge origin/$BRANCH >> $OUTPUT_DIR/stage0b 2>&1
+   echo "Updating branch $BRANCH." >> $OUTPUT_DIR/stage0 2>&1
+   git fetch origin >> $OUTPUT_DIR/stage0 2>&1
+   git merge origin/$BRANCH >> $OUTPUT_DIR/stage0 2>&1
 }
 
 check_FDS_checkout()
 {
    cd $fdsrepo/smv
    # Check for GIT errors
-   stage0b_success=true
+   stage0_success=true
 }
 
 #  ==================================
@@ -778,69 +765,44 @@ compile_smv_utilities()
    echo "   smokeview utilities"
    echo "" > $OUTPUT_DIR/stage2a
    if [ "$haveCC" == "1" ] ; then
-   if [ "$SSH" == "" ] ; then 
    # smokeview libraries
-   echo "      libraries"
-   cd $fdsrepo/smv/Build/LIBS/${COMPILER}_${platform}${size}
-   echo 'Building Smokeview libraries:' >> $OUTPUT_DIR/stage2a 2>&1
-   ./makelibs.sh >> $OUTPUT_DIR/stage2a 2>&1
+     echo "      libraries"
+     cd $fdsrepo/smv/Build/LIBS/${COMPILER}_${platform}${size}
+     echo 'Building Smokeview libraries:' >> $OUTPUT_DIR/stage2a 2>&1
+     ./makelibs.sh >> $OUTPUT_DIR/stage2a 2>&1
 
    # smokezip:
-   echo "      smokezip"
-   cd $fdsrepo/smv/Build/smokezip/${COMPILER}_${platform}${size}
-   rm -f *.o smokezip_${platform}${size}
-   echo 'Compiling smokezip:' >> $OUTPUT_DIR/stage2a 2>&1
-   ./make_smokezip.sh >> $OUTPUT_DIR/stage2a 2>&1
-   echo "" >> $OUTPUT_DIR/stage2a 2>&1
+     echo "      smokezip"
+     cd $fdsrepo/smv/Build/smokezip/${COMPILER}_${platform}${size}
+     rm -f *.o smokezip_${platform}${size}
+     echo 'Compiling smokezip:' >> $OUTPUT_DIR/stage2a 2>&1
+     ./make_smokezip.sh >> $OUTPUT_DIR/stage2a 2>&1
+     echo "" >> $OUTPUT_DIR/stage2a 2>&1
    
    # smokediff:
-   echo "      smokediff"
-   cd $fdsrepo/smv/Build/smokediff/${COMPILER}_${platform}${size}
-   rm -f *.o smokediff_${platform}${size}
-   echo 'Compiling smokediff:' >> $OUTPUT_DIR/stage2a 2>&1
-   ./make_smokediff.sh >> $OUTPUT_DIR/stage2a 2>&1
-   echo "" >> $OUTPUT_DIR/stage2a 2>&1
+     echo "      smokediff"
+     cd $fdsrepo/smv/Build/smokediff/${COMPILER}_${platform}${size}
+     rm -f *.o smokediff_${platform}${size}
+     echo 'Compiling smokediff:' >> $OUTPUT_DIR/stage2a 2>&1
+     ./make_smokediff.sh >> $OUTPUT_DIR/stage2a 2>&1
+     echo "" >> $OUTPUT_DIR/stage2a 2>&1
    
    # background
-   echo "      background"
-   cd $fdsrepo/smv/Build/background/${COMPILER}_${platform}${size}
-   rm -f *.o background
-   echo 'Compiling background:' >> $OUTPUT_DIR/stage2a 2>&1
-   ./make_background.sh >> $OUTPUT_DIR/stage2a 2>&1
+     echo "      background"
+     cd $fdsrepo/smv/Build/background/${COMPILER}_${platform}${size}
+     rm -f *.o background
+     echo 'Compiling background:' >> $OUTPUT_DIR/stage2a 2>&1
+     ./make_background.sh >> $OUTPUT_DIR/stage2a 2>&1
    
   # wind2fds:
-   echo "      wind2fds"
-   cd $fdsrepo/smv/Build/wind2fds/${COMPILER}_${platform}${size}
-   rm -f *.o wind2fds_${platform}${size}
-   echo 'Compiling wind2fds:' >> $OUTPUT_DIR/stage2a 2>&1
-   ./make_wind2fds.sh >> $OUTPUT_DIR/stage2a 2>&1
-   echo "" >> $OUTPUT_DIR/stage2a 2>&1
+     echo "      wind2fds"
+     cd $fdsrepo/smv/Build/wind2fds/${COMPILER}_${platform}${size}
+     rm -f *.o wind2fds_${platform}${size}
+     echo 'Compiling wind2fds:' >> $OUTPUT_DIR/stage2a 2>&1
+     ./make_wind2fds.sh >> $OUTPUT_DIR/stage2a 2>&1
+    echo "" >> $OUTPUT_DIR/stage2a 2>&1
    else
-   $SSH \( \
-   cd $fdsrepo/smv/Build/LIBS/${COMPILER}${platform}${size} \; \
-   echo 'Building Smokeview libraries:' >> $OUTPUT_DIR/stage2a 2>&1 \; \
-   ./makelibs.sh >> $OUTPUT_DIR/stage2a 2>&1 \; \
-   cd $fdsrepo/smv/Build/smokezip/${COMPILER}_${platform}${size} \; \
-   rm -f *.o smokezip_${platform}${size} \; \
-   echo 'Compiling smokezip:' >> $OUTPUT_DIR/stage2a 2>&1 \; \
-   ./make_smokezip.sh >> $OUTPUT_DIR/stage2a 2>&1 \; \
-   echo "" >> $OUTPUT_DIR/stage2a 2>&1 \; \
-   cd $fdsrepo/smv/Build/smokediff/${COMPILER}_${platform}${size} \; \
-   rm -f *.o smokediff_${platform}${size} \; \
-   echo 'Compiling smokediff:' >> $OUTPUT_DIR/stage2a 2>&1 \; \
-   ./make_smokediff.sh >> $OUTPUT_DIR/stage2a 2>&1 \; \
-   echo "" >> $OUTPUT_DIR/stage2a 2>&1 \; \
-   cd $fdsrepo/smv/Build/background/${COMPILER}_${platform}${size} \; \
-   rm -f *.o background \; \
-   echo 'Compiling background:' >> $OUTPUT_DIR/stage2a 2>&1 \; \
-   ./make_background.sh >> $OUTPUT_DIR/stage2a 2>&1 \; \
-   cd $fdsrepo/smv/Build/wind2fds/${COMPILER}_${platform}${size} \; \
-   echo 'Compiling wind2fds:' >> $OUTPUT_DIR/stage2a 2>&1 \; \
-   ./make_wind2fds.sh >> $OUTPUT_DIR/stage2a 2>&1 \; \
-   echo "" >> $OUTPUT_DIR/stage2a 2>&1  \)
-   fi
-   else
-   echo "Warning: smokeview and utilities not built - C compiler not available" >> $OUTPUT_DIR/stage2a 2>&1
+     echo "Warning: smokeview and utilities not built - C compiler not available" >> $OUTPUT_DIR/stage2a 2>&1
    fi
 }
 
@@ -980,19 +942,12 @@ check_verification_cases_release()
 compile_smv_db()
 {
    if [ "$haveCC" == "1" ] ; then
-   if [ "$SSH" == "" ] ; then
    # Clean and compile SMV debug
-   echo "   smokeview"
-   echo "      debug"
-   cd $fdsrepo/smv/Build/smokeview/${COMPILER}_${platform}${size}
-   rm -f smokeview_${platform}${TEST}${size}_db
-   ./make_smv_db.sh $TESTFLAG &> $OUTPUT_DIR/stage2b
-   else
-   $SSH \(
-   cd $fdsrepo/smv/Build/smokeview/${COMPILER}_${platform}${size} \; \
-   rm -f smokeview_${platform}${TEST}${size}_db \; \
-   ./make_smv_db.sh $TESTFLAG &> $OUTPUT_DIR/stage2b \)
-   fi
+     echo "   smokeview"
+     echo "      debug"
+     cd $fdsrepo/smv/Build/smokeview/${COMPILER}_${platform}${size}
+     rm -f smokeview_${platform}${TEST}${size}_db
+     ./make_smv_db.sh $TESTFLAG &> $OUTPUT_DIR/stage2b
    fi
 }
 
@@ -1031,15 +986,10 @@ check_compile_smv_db()
 make_smv_pictures_db()
 {
    # Run Make SMV Pictures script (debug mode)
-   if [ "$SSH" == "" ]; then
    echo "making smokeview images"
    cd $fdsrepo/smv/Verification/scripts
    ./Make_SMV_Pictures.sh $USEINSTALL -d 2>&1 &> $OUTPUT_DIR/stage4a_orig
    grep -v FreeFontPath $OUTPUT_DIR/stage4a_orig > $OUTPUT_DIR/stage4a
-   else
-   $SSH \( cd $fdsrepo/smv/Verification/scripts \; \
-   ./Make_SMV_Pictures.sh $USEINSTALL -d 2>&1 \| grep -v FreeFontPath &> $OUTPUT_DIR/stage4a \)
-   fi
 }
 
 check_smv_pictures_db()
@@ -1078,18 +1028,11 @@ check_smv_pictures_db()
 compile_smv()
 {
    if [ "$haveCC" == "1" ] ; then
-   if [ "$SSH" == "" ] ; then
    # Clean and compile SMV
-   echo "      release"
-   cd $fdsrepo/smv/Build/smokeview/${COMPILER}_${platform}${size}
-   rm -f smokeview_${platform}${TEST}${size}
-   ./make_smv.sh $TESTFLAG &> $OUTPUT_DIR/stage2c
-   else
-   $SSH \( \
-   cd $fdsrepo/smv/Build/smokeview/${COMPILER}_${platform}${size} \; \
-   rm -f smokeview_${platform}${TEST}${size} \; \
-   ./make_smv.sh $TESTFLAG &> $OUTPUT_DIR/stage2c \)
-   fi
+     echo "      release"
+     cd $fdsrepo/smv/Build/smokeview/${COMPILER}_${platform}${size}
+     rm -f smokeview_${platform}${TEST}${size}
+     ./make_smv.sh $TESTFLAG &> $OUTPUT_DIR/stage2c
    fi
 }
 
@@ -1130,14 +1073,9 @@ make_smv_pictures()
 {
    # Run Make SMV Pictures script (release mode)
    echo Generating images 
-   if [ "$SSH" == "" ]; then
    cd $fdsrepo/smv/Verification/scripts
    ./Make_SMV_Pictures.sh $TESTFLAG $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4b_orig
    grep -v FreeFontPath $OUTPUT_DIR/stage4b_orig &> $OUTPUT_DIR/stage4b
-   else
-   $SSH \( cd $fdsrepo/smv/Verification/scripts \; \
-   ./Make_SMV_Pictures.sh $TESTFLAG $USEINSTALL 2>&1 \| grep -v FreeFontPath &> $OUTPUT_DIR/stage4b \)
-   fi
 }
 
 check_smv_pictures()
