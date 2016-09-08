@@ -256,47 +256,9 @@ run_auto()
   MKDIR $GIT_STATUSDIR
 # remove untracked files, revert repo files, update to latest revision
 
-  cd $fdsrepo/fds
-  CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
-  if [[ "$BRANCH" != "" ]] ; then
-    if [[ `git branch | grep $BRANCH` == "" ]] ; then 
-       echo "Error: the branch $BRANCH does not exist in repo $fdsrepo/fds. "
-       echo "       Terminating script."
-    fi
-    if [[ "$BRANCH" != "$CURRENT_BRANCH" ]] ; then
-       echo Checking out branch $BRANCH.
-       git checkout $BRANCH
-    fi
-  else
-     BRANCH=$CURRENT_BRANCH
-  fi
-  
-  cd $fdsrepo/smv
-  CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
-  if [[ "$BRANCH" != "" ]] ; then
-    if [[ `git branch | grep $BRANCH` == "" ]] ; then 
-       echo "Error: the branch $BRANCH does not exist in repo $fdsrepo/smv. "
-       echo "       Terminating script."
-       exit
-    fi
-    if [[ "$BRANCH" != "$CURRENT_BRANCH" ]] ; then
-       echo Checking out branch $BRANCH.
-       git checkout $BRANCH
-    fi
-  else
-     BRANCH=$CURRENT_BRANCH
-  fi
-
   if [[ "$UPDATE" == "1" ]] ; then
-    echo Update the branch $BRANCH in repo SMV.
-    cd $fdsrepo/smv
-    git fetch origin
-    git merge origin/$BRANCH
-    
-    echo Update the branch $BRANCH in repo FDS
-    cd $fdsrepo/fds
-    git fetch origin
-    git merge origin/$BRANCH
+    update_repo smv
+    update_repo fds
   fi
 
 # get info for smokeview
@@ -572,6 +534,11 @@ update_repo()
    echo "Updating branch $BRANCH." >> $OUTPUT_DIR/stage0 2>&1
    git fetch origin >> $OUTPUT_DIR/stage0 2>&1
    git merge origin/$BRANCH >> $OUTPUT_DIR/stage0 2>&1
+   have_remote=`git remote -v | grep firemodels | wc  -l`
+   if [ "$have_remote" -gt "0" ]; then
+      git fetch firemodels >> $OUTPUT_DIR/stage0 2>&1
+      git merge firemodels/$BRANCH >> $OUTPUT_DIR/stage0 2>&1
+   fi
 }
 
 check_FDS_checkout()
