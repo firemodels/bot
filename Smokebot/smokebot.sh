@@ -169,7 +169,7 @@ export platform
 echo ""
 echo "Summary"
 echo "-------"
-echo "running in: $SMOKEBOT_RUNDIR"
+echo "   Run dir: $SMOKEBOT_RUNDIR"
 echo "  Repo dir: $fdsrepo"
 if [ ! "$web_DIR" == "" ]; then
 echo "   web dir: $web_DIR"

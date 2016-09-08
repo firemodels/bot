@@ -156,9 +156,10 @@ export fdsrepo
 UploadGuides=$fdsrepo/fds/Utilities/Firebot/fds_guides2GD.sh
 
 echo ""
-echo "Preliminaries:"
-echo "     running in: $FIREBOT_RUNDIR"
-echo "   FDS-SMV repo: $fdsrepo"
+echo "Summary"
+echo "-------"
+echo "   Run dir: $FIREBOT_RUNDIR"
+echo "  Repo dir: $fdsrepo"
 echo ""
 
 
