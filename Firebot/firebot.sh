@@ -252,7 +252,7 @@ clean_firebot_metafiles()
 #  = Stage 1 - GIT operations =
 #  ============================
 
-clean_git_repo()
+clean_repos()
 {
    # Check to see if FDS repository exists
    if [ -e "$fdsrepo" ]
@@ -276,7 +276,7 @@ clean_git_repo()
    fi
 }
 
-do_git_checkout()
+update_repos()
 {
    cd $fdsrepo/fds
    # If a GIT revision string is specified, then get that revision
@@ -1180,8 +1180,8 @@ start_time=`date`
 clean_firebot_metafiles
 
 ### Stage 1 ###
-clean_git_repo
-do_git_checkout
+clean_repos
+update_repos
 check_git_checkout
 archive_compiler_version
 
