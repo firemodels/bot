@@ -44,7 +44,7 @@ esac
 done
 shift $(($OPTIND-1))
 
-echo "You are about to download the repos:"
+echo "You are about to clone the repos:"
 echo "$repos "
 echo "from git@github.com:$GITUSER"
 echo ""
