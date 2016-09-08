@@ -26,6 +26,7 @@ mailTo="gforney@gmail.com, rpeacoc@nist.gov"
 
 CFASTBOT_RUNDIR="`pwd`"
 
+PID_FILE=~/.cfastgit/cfastbot_pid
 OUTPUT_DIR=$CFASTBOT_RUNDIR/output
 HISTORY_DIR=$CFASTBOT_RUNDIR/history
 ERROR_LOG=$OUTPUT_DIR/errors
@@ -62,7 +63,7 @@ if [[ "$IFORT_COMPILER" != "" ]] ; then
   source $IFORT_COMPILER/bin/compilervars.sh intel64
 fi
 
-while getopts 'acC:F:hiI:m:Mq:suU' OPTION
+while getopts 'acC:F:hiI:m:Mp:q:suU' OPTION
 do
 case $OPTION in
    a)
@@ -93,6 +94,9 @@ case $OPTION in
   M)
    MATLABEXE=1
    ;;
+  p)
+   PID_FILE="$OPTARG"
+   ;;
   q)
    QUEUE="$OPTARG"
    ;;
@@ -108,6 +112,8 @@ case $OPTION in
 esac
 done
 shift $(($OPTIND-1))
+
+echo $$ > $PID_FILE
 
 if [ "$USEINSTALL" == "" ]; then
   CCnotfound=`icc -help 2>&1 | tail -1 | grep "not found" | wc -l`
