@@ -232,7 +232,6 @@ clean_repo()
 
 clean_firebot_metafiles()
 {
-   echo Cleaning 
    echo "   run directory"
    cd $FIREBOT_RUNDIR
    MKDIR guides &> /dev/null
@@ -305,7 +304,6 @@ update_repo()
    echo "   $repo" 
    cd $fdsrepo/$repo
    echo Updating $BRANCH on repo $fdsrepo/$repo >> $OUTPUT_DIR/stage1 2>&1
-   echo Updating $BRANCH on repo $fdsrepo/$repo
    git fetch origin >> $OUTPUT_DIR/stage1 2>&1
    git merge origin/$BRANCH >> $OUTPUT_DIR/stage1 2>&1
 
@@ -1151,18 +1149,14 @@ fi
 hostname=`hostname`
 start_time=`date`
 
-### Clean up on start ###
-clean_firebot_metafiles
-
 ### Stage 1 ###
-if [[ "$CLEANREPO" == "1" ]] ; then
   echo Cleaning
+  clean_firebot_metafiles
+if [[ "$CLEANREPO" == "1" ]] ; then
   clean_repo2 exp
   clean_repo2 fds
   clean_repo2 out
   clean_repo2 smv
-else
-   echo Repos not cleaned 
 fi
 
 if [[ "$UPDATEREPO" == "1" ]] ; then
