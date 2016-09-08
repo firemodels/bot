@@ -180,15 +180,15 @@ fi
 export platform
 
 echo ""
-echo "Preliminaries:"
-echo "  running in: $SMOKEBOT_RUNDIR"
-echo "FDS-SMV repo: $fdsrepo"
-echo "  cfast repo: $fdsrepo/cfast"
+echo "Summary"
+echo "-------"
+echo "running in: $SMOKEBOT_RUNDIR"
+echo "  Repo dir: $fdsrepo"
 if [ ! "$web_DIR" == "" ]; then
-echo "     web dir: $web_DIR"
+echo "   web dir: $web_DIR"
 fi
 if [ ! "$WEB_URL" == "" ]; then
-echo "         URL: $WEB_URL"
+echo "       URL: $WEB_URL"
 fi
 echo ""
 
@@ -488,54 +488,6 @@ clean_smokebot_history()
 #  = Stage 0 - External dependencies =
 #  ===================================
 
-update_cfast()
-{
-   cd $SMOKEBOT_HOME_DIR
-
-   # Check to see if CFAST repository exists
-   updateclean=
-   echo "cfast repo"
-   # If yes, then update the CFAST repository and compile CFAST
-   if [ -e "$cfastrepo" ] ; then
-      cd $cfastrepo
-      IS_DIRTY=`git describe --long --dirty | grep dirty | wc -l`
-      if [ "$CLEANREPO" == "1" ]; then
-        echo "   cleaning"
-        if [ "$IS_DIRTY" == "1" ]; then
-          echo "The repo $cfastrepo has uncommitted changes"
-          echo "Commit or revert these changes or re-run"
-          echo "smokebot without the -c (clean) option"
-          exit
-        fi
-        clean_repo $cfastrepo
-        updateclean="1"
-      fi
-
-      # Update to latest GIT revision
-      if [ "$UPDATEREPO" == "1" ]; then
-        echo "   updating"
-        if [ "$IS_DIRTY" == "1" ]; then
-          echo "The repo $cfastrepo has uncommitted changes."
-          echo "Commit or revert these changes or re-run"
-          echo "smokebot without the -u (update) option"
-          exit
-        fi
-        echo "Updating cfast repo:" >> $OUTPUT_DIR/stage0a
-        git fetch origin >> $OUTPUT_DIR/stage0a 2>&1
-        git merge origin/master >> $OUTPUT_DIR/stage0a 2>&1
-        updateclean="1"
-      fi
-      if [ "$updateclean" == "" ]; then
-         echo "   not cleaned or updated"
-      fi 
-   else
-      echo "The cfast repo $cfastrepo does not exist"
-      echo "Aborting  smokebot"
-      exit
-   fi
-
-}
-
 compile_cfast()
 {
    cd $SMOKEBOT_HOME_DIR
@@ -566,56 +518,39 @@ compile_cfast()
 #  = Stage 1 - GIT operations =
 #  ============================
 
-clean_FDS_repo()
+clean_repo2()
 {
+   repo=$1
    # Check to see if FDS repository exists
    updateclean=
    if [ -e "$fdsrepo" ]
    then
       if [ "$CLEANREPO" == "1" ]; then
-        cd $fdsrepo/smv
+        cd $fdsrepo/$repo
         IS_DIRTY=`git describe --long --dirty | grep dirty | wc -l`
         if [ "$IS_DIRTY" == "1" ]; then
-          echo "The repo $fdsrepo/smv has uncommitted changes."
+          echo "The repo $fdsrepo/$repo has uncommitted changes."
           echo "Commit or revert these changes or re-run"
           echo "smokebot without the -c (clean) option"
           exit
         fi
-        echo Cleaning
-        echo "   smv"
-        clean_repo $fdsrepo/smv
-
-        echo "   fds"
-        clean_repo $fdsrepo/fds
+        echo "   $repo"
+        clean_repo $fdsrepo/$repo
 
         updateclean="1"
       fi
    else
-      echo "The FDS repository $fdsrepo does not exist." >> $OUTPUT_DIR/stage0b 2>&1
+      echo "The repo directory $fdsrepo does not exist." >> $OUTPUT_DIR/stage0b 2>&1
       echo "Aborting smokebot" >> $OUTPUT_DIR/stage0b 2>&1
       exit
    fi
 }
 
-do_FDS_checkout()
+update_repo()
 {
-   cd $fdsrepo/fds
-   CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
-   if [[ "$BRANCH" != "" ]] ; then
-     if [[ `git branch | grep $BRANCH` == "" ]] ; then 
-        echo "Error: the branch $BRANCH does not exist."
-        echo "Aborting smokebot"
-        exit
-     fi
-     if [[ "$BRANCH" != "$CURRENT_BRANCH" ]] ; then
-        echo "Checking out branch $BRANCH." >> $OUTPUT_DIR/stage0b 2>&1
-        git checkout $BRANCH
-     fi
-   else
-      BRANCH=$CURRENT_BRANCH
-   fi
+   repo=$1
    
-   cd $fdsrepo/smv
+   cd $fdsrepo/$repo
    CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
    if [[ "$BRANCH" != "" ]] ; then
      if [[ `git branch | grep $BRANCH` == "" ]] ; then 
@@ -631,48 +566,25 @@ do_FDS_checkout()
       BRANCH=$CURRENT_BRANCH
    fi
 
-   cd $fdsrepo/smv
-   if [ "$UPDATEREPO" == "1" ]; then
-     IS_DIRTY=`git describe --long --dirty | grep dirty | wc -l`
-     if [ "$IS_DIRTY" == "1" ]; then
-       echo "The repo $fdsrepo has uncommitted changes."
-       echo "Commit or revert these changes or re-run"
-       echo "smokebot without the -u (update) option"
-       exit
-     fi
-     echo "Updating branch $BRANCH." >> $OUTPUT_DIR/stage0b 2>&1
-     echo Updating
-     echo "   smv repo"
-     git fetch origin >> $OUTPUT_DIR/stage0b 2>&1
-     git merge origin/$BRANCH >> $OUTPUT_DIR/stage0b 2>&1
-     updateclean="1"
+   if [[ "$repo" == "smv" ]]; then
+      GIT_REVISION=`git describe --long --dirty`
+      GIT_SHORTHASH=`git rev-parse --short HEAD`
+      GIT_LONGHASH=`git rev-parse HEAD`
+      GIT_DATE=`git log -1 --format=%cd --date=local $GIT_SHORTHASH`
    fi
-   if [ "$updateclean" == "" ]; then
-      echo "smv repo is not cleaned or updated"
-   fi 
-   GIT_REVISION=`git describe --long --dirty`
-   GIT_SHORTHASH=`git rev-parse --short HEAD`
-   GIT_LONGHASH=`git rev-parse HEAD`
-   GIT_DATE=`git log -1 --format=%cd --date=local $GIT_SHORTHASH`
 
-   cd $fdsrepo/fds
-   if [ "$UPDATEREPO" == "1" ]; then
-     echo "   fds repo"
-     IS_DIRTY=`git describe --long --dirty | grep dirty | wc -l`
-     if [ "$IS_DIRTY" == "1" ]; then
-       echo "The repo $fdsrepo/fds has uncommitted changes."
-       echo "Commit or revert these changes or re-run"
-       echo "smokebot without the -u (update) option"
-       exit
-     fi
-     echo "Updating branch $BRANCH." >> $OUTPUT_DIR/stage0b 2>&1
-     git fetch origin >> $OUTPUT_DIR/stage0b 2>&1
-     git merge origin/$BRANCH >> $OUTPUT_DIR/stage0b 2>&1
-     updateclean="1"
+   cd $fdsrepo/$repo
+   echo "   $repo"
+   IS_DIRTY=`git describe --long --dirty | grep dirty | wc -l`
+   if [ "$IS_DIRTY" == "1" ]; then
+     echo "The repo $fdsrepo/$repo has uncommitted changes."
+     echo "Commit or revert these changes or re-run"
+     echo "smokebot without the -u (update) option"
+     exit
    fi
-   if [ "$updateclean" == "" ]; then
-      echo "fds repo is not cleaned or updated"
-   fi 
+   echo "Updating branch $BRANCH." >> $OUTPUT_DIR/stage0b 2>&1
+   git fetch origin >> $OUTPUT_DIR/stage0b 2>&1
+   git merge origin/$BRANCH >> $OUTPUT_DIR/stage0b 2>&1
 }
 
 check_FDS_checkout()
@@ -1560,9 +1472,24 @@ clean_smokebot_history
 ### Stage 0 repo operatoins ###
 update_cfast
 
-clean_FDS_repo
-do_FDS_checkout
-check_FDS_checkout
+if [ "$CLEANREPO" == "1" ]; then
+  echo Cleaning
+  clean_repo2 cfast
+  clean_repo2 fds
+  clean_repo2 smv
+else
+  echo Repos not cleaned
+fi
+
+if [ "$UPDATEREPO" == "1" ]; then
+  echo Updating
+  update_repo cfast
+  update_repo fds
+  update_repo smv
+else
+  echo Repos not updated
+fi
+
 PRELIM_end=`GET_TIME`
 DIFF_PRELIM=`GET_DURATION $PRELIM_beg $PRELIM_end`
 echo "Preliminary: $DIFF_PRELIM" >> $STAGE_STATUS
