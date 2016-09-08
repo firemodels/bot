@@ -307,6 +307,11 @@ update_repo()
    echo Updating $BRANCH on repo $fdsrepo/$repo >> $OUTPUT_DIR/stage1 2>&1
    git fetch origin >> $OUTPUT_DIR/stage1 2>&1
    git merge origin/$BRANCH >> $OUTPUT_DIR/stage1 2>&1
+   have_remote=`git remote -v | grep firemodels | wc  -l`
+   if [ "$have_remote" -gt "0" ]; then
+      git fetch firemodels >> $OUTPUT_DIR/stage1 2>&1
+      git merge firemodels/$BRANCH >> $OUTPUT_DIR/stage1 2>&1
+   fi
 
    if [[ "$repo" == "exp" ]]; then
       echo "Fetching origin." >> $OUTPUT_DIR/stage1 2>&1
