@@ -222,7 +222,6 @@ if [[ "$RUNSMOKEBOT" == "1" ]]; then
      git fetch origin &> /dev/null
      git checkout $BRANCH &> /dev/null
      git merge origin/$BRANCH &> /dev/null
-     cd Utilities/Smokebot
      FIREBOTDIR=`pwd`
      if [ "$FIREBOTDIR" != "$CURDIR" ]; then
         echo "***error: smokebot not running in $FIREBOTDIR"
