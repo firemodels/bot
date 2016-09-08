@@ -1470,7 +1470,6 @@ start_time=`date`
 clean_smokebot_history
 
 ### Stage 0 repo operatoins ###
-update_cfast
 
 if [ "$CLEANREPO" == "1" ]; then
   echo Cleaning
