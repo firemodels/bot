@@ -44,7 +44,7 @@ esac
 done
 shift $(($OPTIND-1))
 
-echo "You are about to download the repos:"
+echo "You are about to clone the repos:"
 echo "$repos "
 echo "from git@github.com:$GITUSER"
 echo ""
@@ -61,11 +61,8 @@ do
   repodir=$FIREMODELS/$repo
   echo "-------------------------------"
   if [ -e $repodir ]; then
-     echo $repodir exists.
-     echo Skipping repo creation.
+     echo Skipping $repo.  The directory $repodir already exists.
   else
-     echo "cloning: $repo"
-     echo ""
      cd $FIREMODELS
      if [ "$repo" == "exp" ]; then
         git clone  --recursive git@github.com\:$GITUSER/$repo.git
@@ -75,7 +72,7 @@ do
      if [ "$GITUSER" != "firemodels" ]; then
         echo setting up remote tracking
         cd $repodir
-        git remote add firemodels git@github.com\:$GITUSER/$repo.git
+        git remote add firemodels git@github.com\:firemodels/$repo.git
         git remote update
      fi
   fi
