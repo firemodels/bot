@@ -1,10 +1,11 @@
 #!/bin/bash
 HEADER=`git remote -v | grep origin | head -1 | awk  '{print $2}' | awk -F ':' '{print $1}'`
 if [ "$HEADER" == "git@github.com" ]; then
-   HEADER="git@github.com:" ]; then
+   HEADER="git@github.com:" ]
    GITUSER=`git remote -v | grep origin | head -1 | awk -F ':' '{print $2}' | awk -F\/ '{print $1}'`
 else
    HEADER="https://github.com/"
+   GITUSER=`git remote -v | grep origin | head -1 | awk -F '.' '{print $2}' | awk -F\/ '{print $2}'`
 fi
 fdsrepos="exp fds out smv"
 smvrepos="cfast fds smv"
