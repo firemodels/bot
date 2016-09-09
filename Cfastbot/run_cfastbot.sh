@@ -3,7 +3,7 @@
 if [ ! -d ~/.cfastgit ] ; then
   mkdir ~/.cfastgit
 fi
-running=~/.cfastgit/cfastbot_running
+cfastbot_pid=~/.cfastgit/cfastbot_pid
 
 CURDIR=`pwd`
 
@@ -14,16 +14,13 @@ if [ $notfound -eq 1 ] ; then
   QUEUE=none
 fi
 
-cfastrepo=~/cfastgitclean
 if [ -e .cfast_git ]; then
   cd ../..
-  cfastrepo=`pwd`
+  reponame=`pwd`
   cd $CURDIR
-fi
-
-fdsrepo=~/FDS-SMVgitclean
-if [ "$FDSSMV" != "" ] ; then
-  fdsrepo=$FDSSMV
+else
+  echo "***error: cfastbot not running in the Firemodels repo"
+  exit
 fi
 
 function usage {
@@ -36,16 +33,27 @@ echo "-f - force cfastbot run"
 echo "-h - display this message"
 echo "-i - use installed smokeview and background (if using the 'none' queue)"
 echo "-I - compiler [ default: $compiler]"
+echo "-k - kill cfastbot"
 echo "-m email -  email_address "
 echo "-q queue_name - run cases using the queue queue_name"
 echo "     default: $QUEUE"
-echo "-C cfastrepo - cfast repository location [default: $cfastrepo]"
-echo "-F fdsrepo - FDS repository location [default: $fdsrepo]"
 echo "-s - skip matlab and guide generating stages"
 echo "-u - update cfast and FDS-SMV repos"
 echo "-U - upload guide (only by user: cfastbot)"
 echo "-v - show options used to run cfastbot"
 exit
+}
+
+LIST_DESCENDANTS ()
+{
+  local children=$(ps -o pid= --ppid "$1")
+
+  for pid in $children
+  do
+    LIST_DESCENDANTS "$pid"
+  done
+
+  echo "$children"
 }
 
 RUNAUTO=
@@ -62,8 +70,9 @@ havematlab=`which matlab 2> /dev/null | wc -l`
 
 UPLOAD=
 USEINSTALL=
+KILL_CFASTBOT=
 
-while getopts 'acC:fF:hiI:m:q:suUv' OPTION
+while getopts 'acfhiI:km:q:suUv' OPTION
 do
 case $OPTION  in
   a)
@@ -72,14 +81,8 @@ case $OPTION  in
   c)
    CLEANREPO=1
    ;;
-  C)
-   cfastrepo="$OPTARG"
-   ;;
   f)
    FORCE=1
-   ;;
-  F)
-   fdsrepo="$OPTARG"
    ;;
   h)
    usage;
@@ -89,6 +92,9 @@ case $OPTION  in
    ;;
   I)
    compiler="$OPTARG"
+   ;;
+  k)
+   KILL_CFASTBOT="1"
    ;;
   m)
    EMAIL="$OPTARG"
@@ -115,31 +121,47 @@ esac
 done
 shift $(($OPTIND-1))
 
-if [ -e $running ] ; then
+if [ "$KILL_CFASTBOT" == "1" ]; then
+  if [ -e $cfastbot_pid ] ; then
+    PID=`head -1 $cfastbot_pid`
+    echo killing process invoked by cfastbot
+    kill -9 $(LIST_DESCENDANTS $PID)
+    echo "killing cfastbot (PID=$PID)"
+    kill -9 $PID
+    JOBIDS=`qstat -a | grep CB_ | awk -v user="$USER" '{if($2==user){print $1}}'`
+    if [ "$JOBIDS" != "" ]; then
+      echo killing cfastbot jobs with Id:$JOBIDS
+      qdel $JOBIDS
+    fi
+    echo cfastbot process $PID killed
+    if [ -e $cfastbot_pid ]; then
+      rm $cfastbot_pid
+    fi
+  else
+    echo cfastbot is not running, cannot be killed.
+  fi
+  exit
+fi
+
+
+if [ -e $cfastbot_pid ] ; then
   if [ "$FORCE" == "" ]; then
-    echo cfastbot is already running.
-    echo Erase the file $running.  If this is
+    echo cfastbot is already running. If this is
     echo not the case rerun using the -f option.
     exit
   fi
 fi
-touch $running
+touch $cfastbot_pid
 if [[ "$EMAIL" != "" ]]; then
   EMAIL="-m $EMAIL"
 fi
 if [[ "$UPDATEREPO" == "1" ]]; then
    UPDATEREPO=-u
-   cd $cfastrepo
    if [ "$RUNCFASTBOT" == "1" ]; then
+     cd $reponame/bot
      git remote update
      git checkout master
      git merge origin/master
-     cd Utilities/cfastbot
-     CFASTBOTDIR=`pwd`
-     if [[ "$CURDIR" != "$CFASTBOTDIR" ]]; then
-       cp cfastbot.sh $CURDIR/.
-     fi
-     cd $CURDIR
   fi
 fi
 if [[ "$CLEANREPO" == "1" ]]; then
@@ -153,14 +175,14 @@ if [ "$SKIP" != "" ]; then
    MATLAB=
 fi
 
+REPO="-r $reponame"
 QUEUE="-q $QUEUE"
 compiler="-I $compiler"
-cfastrepo="-C $cfastrepo"
-fdsrepo="-F $fdsrepo"
+PID="-p $cfastbot_pid"
 cd $CURDIR
 if [ "$RUNCFASTBOT" == "1" ] ; then
-  ./cfastbot.sh $USEINSTALL $RUNAUTO $compiler $UPDATEREPO $CLEAN $QUEUE $fdsrepo $cfastrepo $SKIP $MATLABEXE $UPLOAD $EMAIL "$@"
+  ./cfastbot.sh $PID $REPO $USEINSTALL $RUNAUTO $compiler $UPDATEREPO $CLEAN $QUEUE $SKIP $MATLABEXE $UPLOAD $EMAIL "$@"
 else
-  echo ./$botscript $USEINSTALL $RUNAUTO $compiler $UPDATEREPO $CLEAN $QUEUE $fdsrepo $cfastrepo $SKIP $MATLABEXE $UPLOAD $EMAIL "$@"
+  echo ./$botscript $PID $REPO $USEINSTALL $RUNAUTO $compiler $UPDATEREPO $CLEAN $QUEUE $SKIP $MATLABEXE $UPLOAD $EMAIL "$@"
 fi
-rm $running
+rm $cfastbot_pid

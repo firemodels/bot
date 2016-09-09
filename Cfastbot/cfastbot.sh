@@ -1,9 +1,8 @@
 #!/bin/bash
 
 # CFASTbot
-# This script is a simplified version of Kris Overholt's Firebot script.
-# It runs the CFAST verification/validation suite on the latest
-# revision of the repository.
+# This script runs the CFAST verification/validation suite 
+# on the latest revision of the repository.
 
 size=_64
 
@@ -26,6 +25,7 @@ mailTo="gforney@gmail.com, rpeacoc@nist.gov"
 
 CFASTBOT_RUNDIR="`pwd`"
 
+PID_FILE=~/.cfastgit/cfastbot_pid
 OUTPUT_DIR=$CFASTBOT_RUNDIR/output
 HISTORY_DIR=$CFASTBOT_RUNDIR/history
 ERROR_LOG=$OUTPUT_DIR/errors
@@ -34,17 +34,24 @@ WARNING_LOG=$OUTPUT_DIR/warnings
 NEWGUIDE_DIR=$OUTPUT_DIR/NEW_GUIDES
 VALIDATION_STATS_LOG=$OUTPUT_DIR/statistics
 GITSTATUS_DIR=~/.cfastbot
+BRANCH=master
 
 echo ""
-echo "Preliminaries:"
-echo "   running in : $CFASTBOT_RUNDIR"
+echo "Summary"
+echo "-------"
+echo "    Run dir: $CFASTBOT_RUNDIR"
 MKDIR $OUTPUT_DIR
 MKDIR $HISTORY_DIR
 MKDIR $GITSTATUS_DIR
 
 # define repo names (default)
-export fdsrepo=~/FDS-SMVgitclean
-export cfastrepo=~/cfastgitclean
+
+cd ../..
+REPONAME=`pwd`
+fdsrepo=$REPONAME/fds
+cfastrepo=$REPONAME/cfast
+smvrepo=$REPONAME/smv
+cd $CFAST_RUNDIR
 
 COMPILER=intel
 QUEUE=smokebot
@@ -62,7 +69,7 @@ if [[ "$IFORT_COMPILER" != "" ]] ; then
   source $IFORT_COMPILER/bin/compilervars.sh intel64
 fi
 
-while getopts 'acC:F:hiI:m:Mq:suU' OPTION
+while getopts 'achiI:m:Mp:q:r:suU' OPTION
 do
 case $OPTION in
    a)
@@ -70,12 +77,6 @@ case $OPTION in
      ;;
   c)
    CLEANREPO=1
-   ;;
-  C)
-   cfastrepo="$OPTARG"
-   ;;
-  F)
-   fdsrepo="$OPTARG"
    ;;
   h)
    usage;
@@ -93,8 +94,17 @@ case $OPTION in
   M)
    MATLABEXE=1
    ;;
+  p)
+   PID_FILE="$OPTARG"
+   ;;
   q)
    QUEUE="$OPTARG"
+   ;;
+  r)
+   reponame="$OPTARG"
+   fdsrepo=$REPONAME/fds
+   cfastrepo=$REPONAME/cfast
+   smvrepo=$REPONAME/smv
    ;;
   s)
    SKIP=1
@@ -109,6 +119,8 @@ esac
 done
 shift $(($OPTIND-1))
 
+echo $$ > $PID_FILE
+
 if [ "$USEINSTALL" == "" ]; then
   CCnotfound=`icc -help 2>&1 | tail -1 | grep "not found" | wc -l`
 fi
@@ -121,8 +133,9 @@ else
   USEINSTALL2="-u"
 fi
 
-echo "   cfast repo: $cfastrepo"
-echo "   FDS-SMV repo: $fdsrepo"
+echo " cfast repo: $cfastrepo"
+echo "   FDS repo: $fdsrepo"
+echo "   SMV repo: $smvrepo"
 
 platform="linux"
 platform2="Linux"
@@ -142,22 +155,18 @@ fi
 
 if [ "$SKIP" == "1" ]; then
    MATLABEXE=
-   echo "   matlab: skipping matlab and document building stages"
+   echo "     matlab: skipping matlab and document building stages"
 else
    if [ "$MATLABEXE" != "" ]; then
-     echo "   matlab: using matlab script generated exe's"
+     echo "     matlab: using matlab script generated exe's"
    else
-     echo "   matlab: using matlab"
+     echo "     matlab: using matlab"
    fi
 fi
 
 if [ "$UPLOAD" == "1" ]; then
   MKDIR $NEWGUIDE_DIR
 fi
-
-echo ""
-echo "Status:"
-echo ""
 
 cd
 
@@ -284,12 +293,14 @@ set_files_world_readable()
    chmod -R go+r *
    cd $cfastrepo
    chmod -R go+r *
+   cd $smvrepo
+   chmod -R go+r *
 }
 
 clean_cfastbot_history()
 {
    # Clean cfastbot metafiles
-   echo "Cleaning:"
+   echo "Cleaning"
    echo "   cfastbot results directory"
    cd $CFASTBOT_RUNDIR
    rm -rf $OUTPUT_DIR/* &> /dev/null
@@ -305,75 +316,81 @@ clean_cfastbot_history()
 #  = Stage 1 - git operations =
 #  ============================
 
-clean_git_repo()
+clean_repo()
 {
-   # Check to see if FDS repository exists
-   if [ -e "$fdsrepo" ]; then
-      if [ "$CLEANREPO" == "1" ]; then
-        echo "   FDS-SMV repo"
-        echo "Cleaning FDS-SMV repo." >> $OUTPUT_DIR/stage1 2>&1
-        cd $fdsrepo
-        git clean -dxf &> /dev/null
-        git add . &> /dev/null
-        git reset --hard HEAD &> /dev/null
+  curdir=`pwd`
+  cd $1
+  git clean -dxf &> /dev/null
+  git add . &> /dev/null
+  git reset --hard HEAD &> /dev/null
+  cd $curdir
+}
+
+clean_repo2()
+{
+   repo=$1
+   # Check to see if repository exists
+   if [ -e "$REPONAME" ]; then
+      cd $REPONAME/$repo
+      IS_DIRTY=`git describe --long --dirty | grep dirty | wc -l`
+      if [ "$IS_DIRTY" == "1" ]; then
+        echo "The repo $REPONAME/$repo has uncommitted changes."
+        echo "Commit or revert these changes or re-run"
+        echo "cfast without the -c (clean) option"
+        exit
       fi
+      echo "   $repo"
+      clean_repo $REPONAME/$repo
    else
-      echo "The FDS repo $fdsrepo does not exist"
-      echo "Aborting cfastbot"
-      exit
-   fi
-   
-   # Check to see if CFAST repository exists
-   if [ -e "$cfastrepo" ]; then
-      if [ "$CLEANREPO" == "1" ]; then
-        echo "   cfast repo"
-        echo "Cleaning cfast repo." >> $OUTPUT_DIR/stage1 2>&1
-
-        cd $cfastrepo/Build
-        git clean -dxf &> /dev/null
-        git add . &> /dev/null
-        git reset --hard HEAD &> /dev/null
-
-        cd $cfastrepo/Verification
-        git clean -dxf &> /dev/null
-        git add . &> /dev/null
-        git reset --hard HEAD &> /dev/null
-
-        cd $cfastrepo/Validation
-        git clean -dxf &> /dev/null
-        git add . &> /dev/null
-        git reset --hard HEAD &> /dev/null
-
-        cd $cfastrepo/Manuals
-        git clean -dxf &> /dev/null
-        git add . &> /dev/null
-        git reset --hard HEAD &> /dev/null
-      fi
-   else
-      echo "The cfast repo $cfastrepo does not exist"
-      echo "Aborting cfastbot"
+      echo "The repo directory $REPONAME does not exist." >> $OUTPUT_DIR/stage0 2>&1
+      echo "Aborting cfastbot" >> $OUTPUT_DIR/stage0 2>&1
       exit
    fi
 }
 
-do_git_checkout()
+update_repo()
 {
-   if [ "$UPDATEREPO" == "1" ]; then
-     cd $fdsrepo
-     echo Checking out:
-     echo "   latest FDS-SMV revision"
-     echo "Checking out latest FDS-SMV revision." >> $OUTPUT_DIR/stage1 2>&1
-     git remote update &> /dev/null
-     git checkout development &> /dev/null
-     git pull >> $OUTPUT_DIR/stage1 2>&1
+   repo=$1
+   
+   cd $REPONAME/$repo
+   CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
+   if [[ "$BRANCH" != "" ]] ; then
+     if [[ `git branch | grep $BRANCH` == "" ]] ; then 
+        echo "Error: the branch $BRANCH does not exist."
+        echo "Aborting smokebot"
+        exit
+     fi
+     if [[ "$BRANCH" != "$CURRENT_BRANCH" ]] ; then
+        echo "Checking out branch $BRANCH." >> $OUTPUT_DIR/stage1 2>&1
+        git checkout $BRANCH
+     fi
+   else
+      BRANCH=$CURRENT_BRANCH
+   fi
 
-     cd $cfastrepo
-     echo "   latest cfast revision"
-     echo "Checking out latest cfast revision." >> $OUTPUT_DIR/stage1 2>&1
-     git remote update &> /dev/null
-     git checkout master &> /dev/null
-     git pull >> $OUTPUT_DIR/stage1 2>&1
-     GIT_REVISION=`git describe --long --dirty`
+   if [[ "$repo" == "cfast" ]]; then
+      GIT_REVISION=`git describe --long --dirty`
+      GIT_SHORTHASH=`git rev-parse --short HEAD`
+      GIT_LONGHASH=`git rev-parse HEAD`
+      GIT_DATE=`git log -1 --format=%cd --date=local $GIT_SHORTHASH`
+   fi
+
+   cd $REPONAME/$repo
+   echo "   $repo"
+   IS_DIRTY=`git describe --long --dirty | grep dirty | wc -l`
+   if [ "$IS_DIRTY" == "1" ]; then
+     echo "The repo $REPONAME/$repo has uncommitted changes."
+     echo "Commit or revert these changes or re-run"
+     echo "smokebot without the -u (update) option"
+     exit
+   fi
+   echo "Updating branch $BRANCH." >> $OUTPUT_DIR/stage1 2>&1
+   git fetch origin >> $OUTPUT_DIR/stage1 2>&1
+   git merge origin/$BRANCH >> $OUTPUT_DIR/stage1 2>&1
+   have_remote=`git remote -v | grep firemodels | wc  -l`
+   if [ "$have_remote" -gt "0" ]; then
+      git fetch firemodels >> $OUTPUT_DIR/stage1 2>&1
+      git merge firemodels/$BRANCH >> $OUTPUT_DIR/stage0 2>&1
    fi
 }
 
@@ -390,7 +407,7 @@ check_git_checkout()
 compile_cfast_db()
 {
    # Build debug CFAST
-   echo "Building:"
+   echo "Building"
    echo "   cfast"
    echo "      debug"
    cd $cfastrepo/Build/CFAST/${compiler}_${platform}${size}_db
@@ -465,16 +482,16 @@ compile_smv_utilities()
 {
    if [ "$USEINSTALL" == "" ]; then
    # smokeview libraries
-     cd $fdsrepo/SMV/Build/LIBS/lib_${platform}_${compiler}${size}
-     echo 'Building Smokeview libraries:' >> $OUTPUT_DIR/stage3a 2>&1
+     cd $smvrepo/Build/LIBS/${compiler}_${platform}${size}
+     echo 'Building Smokeview libraries' >> $OUTPUT_DIR/stage3a 2>&1
      echo "   smokeview libraries"
      ./makelibs.sh >> $OUTPUT_DIR/stage3a 2>&1
 
    # background
      if [ "$QUEUE" == "none" ]; then
-       cd $fdsrepo/SMV/Build/background/${compiler}_${platform}${size}
+       cd $smvrepo/Build/background/${compiler}_${platform}${size}
        echo '   background'
-       echo 'Compiling background:' >> $OUTPUT_DIR/stage3a 2>&1
+       echo 'Compiling background' >> $OUTPUT_DIR/stage3a 2>&1
        ./make_background.sh >> $OUTPUT_DIR/stage3a 2>&1
      fi
    else
@@ -493,7 +510,7 @@ check_smv_utilities()
      cd $fdsrepo
      stage3a_success="1"
      if [ "$QUEUE" == "none" ]; then
-       if [ ! -e "$fdsrepo/SMV/Build/background/${compiler}_${platform}${size}/background" ]; then
+       if [ ! -e "$smvrepo/Build/background/${compiler}_${platform}${size}/background" ]; then
          stage3a_success="0"
        fi
      fi
@@ -527,7 +544,7 @@ compile_smv_db()
    if [ "$USEINSTALL" == "" ]; then
      echo "   smokeview"
      echo "      debug"
-     cd $fdsrepo/SMV/Build/smokeview/${compiler}_${platform}${size}
+     cd $smvrepo/Build/smokeview/${compiler}_${platform}${size}
      ./make_smv_db.sh &> $OUTPUT_DIR/stage3b
    else
      echo "   smokeview"
@@ -539,7 +556,7 @@ check_compile_smv_db()
 {
    # Check for errors in SMV DB compilation
    if [ "$USEINSTALL" == "" ]; then
-     cd $fdsrepo/SMV/Build/smokeview/${compiler}_${platform}${size}
+     cd $smvrepo/Build/smokeview/${compiler}_${platform}${size}
      if [ -e "smokeview_${platform}${size}_db" ]
      then
         stage3b_success=true
@@ -572,7 +589,7 @@ compile_smv()
    # Clean and compile SMV
    if [ "$USEINSTALL" == "" ]; then
      echo "      release"
-     cd $fdsrepo/SMV/Build/smokeview/${compiler}_${platform}${size}
+     cd $smvrepo/Build/smokeview/${compiler}_${platform}${size}
      ./make_smv.sh &> $OUTPUT_DIR/stage3c
    else
      echo "      release - not built, using installed smokeview"
@@ -583,7 +600,7 @@ check_compile_smv()
 {
    # Check for errors in SMV release compilation
    if [ "$USEINSTALL" == "" ]; then
-     cd $fdsrepo/SMV/Build/smokeview/${compiler}_${platform}${size}
+     cd $smvrepo/Build/smokeview/${compiler}_${platform}${size}
      if [ -e "smokeview_${platform}${size}" ]
      then
         stage3c_success=true
@@ -664,9 +681,9 @@ run_vv_cases_debug()
    #  =======================
 
    # Submit CFAST V&V cases
-   echo 'Running CFAST V&V cases:'
+   echo 'Running CFAST V&V cases'
    echo '   debug'
-   echo 'Running CFAST V&V cases:' >> $OUTPUT_DIR/stage4 2>&1
+   echo 'Running CFAST V&V cases' >> $OUTPUT_DIR/stage4 2>&1
    ./Run_CFAST_Cases.sh -I $compiler -F $fdsrepo $USEINSTALL2 -m 2 -d -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
    if [ "$QUEUE" != "none" ]; then
      wait_vv_cases_debug_start
@@ -778,7 +795,7 @@ run_vv_cases_release()
    # Start running all CFAST V&V cases
    cd $cfastrepo/Validation/scripts
    echo '   release'
-   echo 'Running CFAST V&V cases:' >> $OUTPUT_DIR/stage5 2>&1
+   echo 'Running CFAST V&V cases' >> $OUTPUT_DIR/stage5 2>&1
    ./Run_CFAST_Cases.sh -I $compiler -F $fdsrepo $USEINSTALL2 -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
    if [ "$QUEUE" != "none" ]; then
      wait_vv_cases_release_start
@@ -1253,12 +1270,29 @@ fi
 hostname=`hostname`
 start_time=`date`
 
+echo ""
+echo "cfastbot progress"
+echo "-----------------"
 ### Clean up on start ###
 clean_cfastbot_history
 
 ### Stage 1 ###
-clean_git_repo
-do_git_checkout
+if [ "$CLEANREPO" == "1" ]; then
+  clean_repo2 cfast
+  clean_repo2 fds
+  clean_repo2 smv
+else
+  echo Repos not cleaned
+fi
+
+if [ "$UPDATEREPO" == "1" ]; then
+  echo Updating
+  update_repo cfast
+  update_repo fds
+  update_repo smv
+else
+  echo Repos not not updated
+fi
 check_git_checkout
 
 ### Stage 2a ###
