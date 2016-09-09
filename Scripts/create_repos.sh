@@ -1,7 +1,7 @@
 #!/bin/bash
 HEADER=`git remote -v | grep origin | head -1 | awk  '{print $2}' | awk -F ':' '{print $1}'`
 if [ "$HEADER" == "git@github.com" ]; then
-   HEADER="git@github.com:" ]
+   HEADER="git@github.com:" 
    GITUSER=`git remote -v | grep origin | head -1 | awk -F ':' '{print $2}' | awk -F\/ '{print $1}'`
 else
    HEADER="https://github.com/"
@@ -17,7 +17,7 @@ function usage {
 echo "Create repos used by cfast, fds and/or smokview"
 echo ""
 echo "Options:"
-echo "-a - setup all repos: "
+echo "-a - setup all available repos: "
 echo "    $allrepos"
 echo "-c - setup repos used by cfastbot: "
 echo "    $cfastrepos"
@@ -53,7 +53,7 @@ shift $(($OPTIND-1))
 
 echo "You are about to clone the repos:"
 echo "$repos "
-echo "from git@github.com:$GITUSER"
+echo "from $HEADERS$GITUSER"
 echo ""
 echo "Press any key to continue or <CTRL> c to abort."
 echo "Type $0 -h for other options"
@@ -84,5 +84,4 @@ do
      fi
   fi
 done
-echo repo creation complated
 cd $CURDIR

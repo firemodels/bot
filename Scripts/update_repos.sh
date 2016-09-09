@@ -8,7 +8,7 @@ echo "Update the repos $allrepos if they exist"
 echo ""
 echo "Options:"
 echo "-h - display this message"
-echo "-p - push update to remote origin"
+echo "-p - push updates to remote origin"
 exit
 }
 
