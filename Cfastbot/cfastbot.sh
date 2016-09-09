@@ -39,7 +39,7 @@ BRANCH=master
 echo ""
 echo "Summary"
 echo "-------"
-echo "   Run dir: $CFASTBOT_RUNDIR"
+echo "    Run dir: $CFASTBOT_RUNDIR"
 MKDIR $OUTPUT_DIR
 MKDIR $HISTORY_DIR
 MKDIR $GITSTATUS_DIR
@@ -133,9 +133,9 @@ else
   USEINSTALL2="-u"
 fi
 
-echo "   cfast repo: $cfastrepo"
-echo "     FDS repo: $fdsrepo"
-echo "     SMV repo: $smvrepo"
+echo " cfast repo: $cfastrepo"
+echo "   FDS repo: $fdsrepo"
+echo "   SMV repo: $smvrepo"
 
 platform="linux"
 platform2="Linux"
@@ -155,12 +155,12 @@ fi
 
 if [ "$SKIP" == "1" ]; then
    MATLABEXE=
-   echo "   matlab: skipping matlab and document building stages"
+   echo "     matlab: skipping matlab and document building stages"
 else
    if [ "$MATLABEXE" != "" ]; then
-     echo "   matlab: using matlab script generated exe's"
+     echo "     matlab: using matlab script generated exe's"
    else
-     echo "   matlab: using matlab"
+     echo "     matlab: using matlab"
    fi
 fi
 
@@ -407,7 +407,7 @@ check_git_checkout()
 compile_cfast_db()
 {
    # Build debug CFAST
-   echo "Building:"
+   echo "Building"
    echo "   cfast"
    echo "      debug"
    cd $cfastrepo/Build/CFAST/${compiler}_${platform}${size}_db
@@ -483,7 +483,7 @@ compile_smv_utilities()
    if [ "$USEINSTALL" == "" ]; then
    # smokeview libraries
      cd $smvrepo/Build/LIBS/${compiler}_${platform}${size}
-     echo 'Building Smokeview libraries:' >> $OUTPUT_DIR/stage3a 2>&1
+     echo 'Building Smokeview libraries' >> $OUTPUT_DIR/stage3a 2>&1
      echo "   smokeview libraries"
      ./makelibs.sh >> $OUTPUT_DIR/stage3a 2>&1
 
@@ -491,7 +491,7 @@ compile_smv_utilities()
      if [ "$QUEUE" == "none" ]; then
        cd $smvrepo/Build/background/${compiler}_${platform}${size}
        echo '   background'
-       echo 'Compiling background:' >> $OUTPUT_DIR/stage3a 2>&1
+       echo 'Compiling background' >> $OUTPUT_DIR/stage3a 2>&1
        ./make_background.sh >> $OUTPUT_DIR/stage3a 2>&1
      fi
    else
@@ -681,9 +681,9 @@ run_vv_cases_debug()
    #  =======================
 
    # Submit CFAST V&V cases
-   echo 'Running CFAST V&V cases:'
+   echo 'Running CFAST V&V cases'
    echo '   debug'
-   echo 'Running CFAST V&V cases:' >> $OUTPUT_DIR/stage4 2>&1
+   echo 'Running CFAST V&V cases' >> $OUTPUT_DIR/stage4 2>&1
    ./Run_CFAST_Cases.sh -I $compiler -F $fdsrepo $USEINSTALL2 -m 2 -d -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
    if [ "$QUEUE" != "none" ]; then
      wait_vv_cases_debug_start
@@ -795,7 +795,7 @@ run_vv_cases_release()
    # Start running all CFAST V&V cases
    cd $cfastrepo/Validation/scripts
    echo '   release'
-   echo 'Running CFAST V&V cases:' >> $OUTPUT_DIR/stage5 2>&1
+   echo 'Running CFAST V&V cases' >> $OUTPUT_DIR/stage5 2>&1
    ./Run_CFAST_Cases.sh -I $compiler -F $fdsrepo $USEINSTALL2 -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
    if [ "$QUEUE" != "none" ]; then
      wait_vv_cases_release_start
