@@ -28,7 +28,7 @@ shift $(($OPTIND-1))
 CURDIR=`pwd`
 cd ../..
 FIREMODELS=`pwd`
-for repo in $
+for repo in $allrepos
 do 
   echo
   repodir=$FIREMODELS/$repo
