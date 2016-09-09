@@ -5,6 +5,7 @@ smvrepos="cfast fds smv"
 cfastrepos="cfast exp smv"
 allrepos="cfast cor exp fds out radcal smv"
 repos=$fdsrepos
+HEADER="git@github.com\:"
 
 function usage {
 echo "Create repos used by cfast, fds and/or smokview"
@@ -18,11 +19,12 @@ echo "-f - setup repos used by firebot: "
 echo "    $fdsrepos"
 echo "-s - setup repos used by smokebot: "
 echo "    $smvrepos"
+echo "-S - use https protocol to communicate with github"
 echo "-h - display this message"
 exit
 }
 
-while getopts 'acfsh' OPTION
+while getopts 'acfshS' OPTION
 do
 case $OPTION  in
   a)
@@ -39,6 +41,9 @@ case $OPTION  in
    ;;
   s)
    repos=$smvrepos;
+   ;;
+  S)
+   HEADER="https\://github.com/"
    ;;
 esac
 done
