@@ -12,7 +12,6 @@ smvrepos="cfast fds smv"
 cfastrepos="cfast exp smv"
 allrepos="cfast cor exp fds out radcal smv"
 repos=$fdsrepos
-HEADER="git@github.com:"
 
 function usage {
 echo "Create repos used by cfast, fds and/or smokview"
