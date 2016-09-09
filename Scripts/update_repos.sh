@@ -19,7 +19,7 @@ case $OPTION  in
    usage;
    ;;
   p)
-   PUSH=1
+   PUSH="1"
    ;;
 esac
 done
@@ -59,5 +59,5 @@ do
      echo "$repo does not exist, not updating"
   fi
 done
-echo repo creation complated
+echo repo updating complete
 cd $CURDIR
