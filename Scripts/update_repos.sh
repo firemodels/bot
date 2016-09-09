@@ -1,5 +1,5 @@
 #!/bin/bash
-allrepos="cfast cor exp fds out radcal smv"
+allrepos="bot cfast cor exp fds out radcal smv"
 BRANCH=master
 PUSH=
 
