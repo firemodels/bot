@@ -70,14 +70,14 @@ do
   else
      cd $FIREMODELS
      if [ "$repo" == "exp" ]; then
-        git clone  --recursive git@github.com\:$GITUSER/$repo.git
+        git clone  --recursive $HEADER$GITUSER/$repo.git
      else
-        git clone git@github.com\:$GITUSER/$repo.git
+        git clone $HEADER$GITUSER/$repo.git
      fi
      if [ "$GITUSER" != "firemodels" ]; then
         echo setting up remote tracking
         cd $repodir
-        git remote add firemodels git@github.com\:firemodels/$repo.git
+        git remote add firemodels ${HEADER}firemodels/$repo.git
         git remote update
      fi
   fi
