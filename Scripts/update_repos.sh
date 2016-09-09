@@ -39,16 +39,12 @@ do
      if [ "$BRANCH" == "$CURRENT_BRANCH" ]; then
        echo "updating $repo from origin"
        git fetch origin
-       echo after fetch
        git merge origin/$BRANCH
-       echo after merge
        have_remote=`git remote -v | grep firemodels | wc  -l`
        if [ "$have_remote" -gt "0" ]; then
           echo "updating $repo from firemodels"
           git fetch firemodels
-          echo after fetch
           git merge firemodels/$BRANCH
-          echo after merge
           if [ "$PUSH" == "1" ]; then
              echo "pushing $repo updates to origin"
              git push origin $BRANCH
