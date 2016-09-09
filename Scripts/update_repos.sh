@@ -45,7 +45,6 @@ do
           echo "updating $repo from firemodels"
           git fetch firemodels
           git merge firemodels/$BRANCH
-       else
           if [ "$PUSH" == "1" ]; then
              echo "pushing $repo updates to origin"
              git push origin $BRANCH
@@ -59,5 +58,6 @@ do
      echo "$repo does not exist, not updating"
   fi
 done
+echo
 echo repo updating complete
 cd $CURDIR
