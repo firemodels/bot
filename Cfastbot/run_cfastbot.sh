@@ -175,13 +175,14 @@ if [ "$SKIP" != "" ]; then
    MATLAB=
 fi
 
+REPO="-r $reponame"
 QUEUE="-q $QUEUE"
 compiler="-I $compiler"
 PID="-p $cfastbot_pid"
 cd $CURDIR
 if [ "$RUNCFASTBOT" == "1" ] ; then
-  ./cfastbot.sh $PID $USEINSTALL $RUNAUTO $compiler $UPDATEREPO $CLEAN $QUEUE $SKIP $MATLABEXE $UPLOAD $EMAIL "$@"
+  ./cfastbot.sh $PID $REPO $USEINSTALL $RUNAUTO $compiler $UPDATEREPO $CLEAN $QUEUE $SKIP $MATLABEXE $UPLOAD $EMAIL "$@"
 else
-  echo ./$botscript $PID $USEINSTALL $RUNAUTO $compiler $UPDATEREPO $CLEAN $QUEUE $SKIP $MATLABEXE $UPLOAD $EMAIL "$@"
+  echo ./$botscript $PID $REPO $USEINSTALL $RUNAUTO $compiler $UPDATEREPO $CLEAN $QUEUE $SKIP $MATLABEXE $UPLOAD $EMAIL "$@"
 fi
 rm $cfastbot_pid
