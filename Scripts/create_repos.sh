@@ -1,11 +1,17 @@
 #!/bin/bash
-GITUSER=`git remote -v | head -1 | awk -F ':' '{print $2}' | awk -F\/ '{print $1}'`
+HEADER=`git remote -v | grep origin | head -1 | awk  '{print $2}' | awk -F ':' '{print $1}'`
+if [ "$HEADER" == "git@github.com" ]; then
+   HEADER="git@github.com:" ]
+   GITUSER=`git remote -v | grep origin | head -1 | awk -F ':' '{print $2}' | awk -F\/ '{print $1}'`
+else
+   HEADER="https://github.com/"
+   GITUSER=`git remote -v | grep origin | head -1 | awk -F '.' '{print $2}' | awk -F\/ '{print $2}'`
+fi
 fdsrepos="exp fds out smv"
 smvrepos="cfast fds smv"
 cfastrepos="cfast exp smv"
 allrepos="cfast cor exp fds out radcal smv"
 repos=$fdsrepos
-HEADER="git@github.com\:"
 
 function usage {
 echo "Create repos used by cfast, fds and/or smokview"
@@ -19,12 +25,11 @@ echo "-f - setup repos used by firebot: "
 echo "    $fdsrepos"
 echo "-s - setup repos used by smokebot: "
 echo "    $smvrepos"
-echo "-S - use https protocol to communicate with github"
 echo "-h - display this message"
 exit
 }
 
-while getopts 'acfshS' OPTION
+while getopts 'acfsh' OPTION
 do
 case $OPTION  in
   a)
@@ -41,9 +46,6 @@ case $OPTION  in
    ;;
   s)
    repos=$smvrepos;
-   ;;
-  S)
-   HEADER="https\://github.com/"
    ;;
 esac
 done
@@ -75,7 +77,7 @@ do
         git clone $HEADER$GITUSER/$repo.git
      fi
      if [ "$GITUSER" != "firemodels" ]; then
-        echo setting up remote tracking
+        echo setting up remote tracking with firemodels
         cd $repodir
         git remote add firemodels ${HEADER}firemodels/$repo.git
         git remote update
