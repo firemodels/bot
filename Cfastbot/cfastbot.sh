@@ -37,8 +37,9 @@ GITSTATUS_DIR=~/.cfastbot
 BRANCH=master
 
 echo ""
-echo "Preliminaries:"
-echo "   running in : $CFASTBOT_RUNDIR"
+echo "Summary"
+echo "-------"
+echo "   Run dir: $CFASTBOT_RUNDIR"
 MKDIR $OUTPUT_DIR
 MKDIR $HISTORY_DIR
 MKDIR $GITSTATUS_DIR
@@ -133,7 +134,8 @@ else
 fi
 
 echo "   cfast repo: $cfastrepo"
-echo "   FDS-SMV repo: $fdsrepo"
+echo "     FDS repo: $fdsrepo"
+echo "     SMV repo: $smvrepo"
 
 platform="linux"
 platform2="Linux"
@@ -165,10 +167,6 @@ fi
 if [ "$UPLOAD" == "1" ]; then
   MKDIR $NEWGUIDE_DIR
 fi
-
-echo ""
-echo "Status:"
-echo ""
 
 cd
 
@@ -484,7 +482,7 @@ compile_smv_utilities()
 {
    if [ "$USEINSTALL" == "" ]; then
    # smokeview libraries
-     cd $smvrepo/Build/LIBS/lib_${platform}_${compiler}${size}
+     cd $smvrepo/Build/LIBS/${compiler}_${platform}${size}
      echo 'Building Smokeview libraries:' >> $OUTPUT_DIR/stage3a 2>&1
      echo "   smokeview libraries"
      ./makelibs.sh >> $OUTPUT_DIR/stage3a 2>&1
