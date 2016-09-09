@@ -302,7 +302,7 @@ set_files_world_readable()
 clean_cfastbot_history()
 {
    # Clean cfastbot metafiles
-   echo "Cleaning:"
+   echo "Cleaning"
    echo "   cfastbot results directory"
    cd $CFASTBOT_RUNDIR
    rm -rf $OUTPUT_DIR/* &> /dev/null
@@ -1277,7 +1277,6 @@ clean_cfastbot_history
 
 ### Stage 1 ###
 if [ "$CLEANREPO" == "1" ]; then
-  echo Cleaning
   clean_repo2 cfast
   clean_repo2 fds
   clean_repo2 smv
@@ -1286,6 +1285,7 @@ else
 fi
 
 if [ "$UPDATEREPO" == "1" ]; then
+  echo Updating
   update_repo cfast
   update_repo fds
   update_repo smv
