@@ -74,8 +74,9 @@ do
      else
         git clone $HEADER$GITUSER/$repo.git
      fi
+     echo GITUSER=$GITUSER
      if [ "$GITUSER" != "firemodels" ]; then
-        echo setting up remote tracking
+        echo setting up remote tracking with firemodels
         cd $repodir
         git remote add firemodels ${HEADER}firemodels/$repo.git
         git remote update
