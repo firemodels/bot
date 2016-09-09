@@ -84,5 +84,4 @@ do
      fi
   fi
 done
-echo repo creation complated
 cd $CURDIR
