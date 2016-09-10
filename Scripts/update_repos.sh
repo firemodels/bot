@@ -40,8 +40,8 @@ do
        echo "updating $repo from origin"
        git fetch origin
        git merge origin/$BRANCH
-       have_remote=`git remote -v | grep firemodels | wc  -l`
-       if [ "$have_remote" -gt "0" ]; then
+       have_central=`git remote -v | awk '{print $1}' | grep firemodels | wc  -l`
+       if [ "$have_central" -gt "0" ]; then
           echo "updating $repo from firemodels"
           git fetch firemodels
           git merge firemodels/$BRANCH
