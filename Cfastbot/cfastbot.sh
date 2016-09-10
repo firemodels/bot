@@ -48,7 +48,6 @@ MKDIR $GITSTATUS_DIR
 
 cd ../..
 REPONAME=`pwd`
-fdsrepo=$REPONAME/fds
 cfastrepo=$REPONAME/cfast
 smvrepo=$REPONAME/smv
 cd $CFAST_RUNDIR
@@ -102,7 +101,6 @@ case $OPTION in
    ;;
   r)
    reponame="$OPTARG"
-   fdsrepo=$REPONAME/fds
    cfastrepo=$REPONAME/cfast
    smvrepo=$REPONAME/smv
    ;;
@@ -133,9 +131,16 @@ else
   USEINSTALL2="-u"
 fi
 
+if [ -e $cfastrepo ]; then
 echo " cfast repo: $cfastrepo"
-echo "   FDS repo: $fdsrepo"
+else
+echo " cfast repo: $cfastrepo ***error does not exist"
+fi
+if [ -e $smvrepo ]; then
 echo "   SMV repo: $smvrepo"
+else
+echo "   SMV repo: $smvrepo ***error does not exist"
+fi
 
 platform="linux"
 platform2="Linux"
@@ -289,8 +294,6 @@ check_time_limit()
 
 set_files_world_readable()
 {
-   cd $fdsrepo
-   chmod -R go+r *
    cd $cfastrepo
    chmod -R go+r *
    cd $smvrepo
@@ -507,7 +510,6 @@ check_smv_utilities()
 {
    if [ "$USEINSTALL" == "" ] ; then
      # Check for errors in SMV utilities compilation
-     cd $fdsrepo
      stage3a_success="1"
      if [ "$QUEUE" == "none" ]; then
        if [ ! -e "$smvrepo/Build/background/${compiler}_${platform}${size}/background" ]; then
@@ -684,7 +686,7 @@ run_vv_cases_debug()
    echo 'Running CFAST V&V cases'
    echo '   debug'
    echo 'Running CFAST V&V cases' >> $OUTPUT_DIR/stage4 2>&1
-   ./Run_CFAST_Cases.sh -I $compiler -F $fdsrepo $USEINSTALL2 -m 2 -d -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
+   ./Run_CFAST_Cases.sh -I $compiler -S $smvrepo $USEINSTALL2 -m 2 -d -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
    if [ "$QUEUE" != "none" ]; then
      wait_vv_cases_debug_start
    fi
@@ -796,7 +798,7 @@ run_vv_cases_release()
    cd $cfastrepo/Validation/scripts
    echo '   release'
    echo 'Running CFAST V&V cases' >> $OUTPUT_DIR/stage5 2>&1
-   ./Run_CFAST_Cases.sh -I $compiler -F $fdsrepo $USEINSTALL2 -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
+   ./Run_CFAST_Cases.sh -I $compiler -S $smvrepo $USEINSTALL2 -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
    if [ "$QUEUE" != "none" ]; then
      wait_vv_cases_release_start
    fi

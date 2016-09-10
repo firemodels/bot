@@ -44,6 +44,16 @@ echo "-v - show options used to run cfastbot"
 exit
 }
 
+is_file_installed()
+{
+  program=$1
+  prognotfound=`$program -help | tail -1 | grep "not found" | wc -l`
+  if [ "$prognotfound" == "1" ] ; then
+    echo "***error: the program $program is not installed" 
+    exit
+  fi
+}
+
 LIST_DESCENDANTS ()
 {
   local children=$(ps -o pid= --ppid "$1")
@@ -143,6 +153,14 @@ if [ "$KILL_CFASTBOT" == "1" ]; then
   exit
 fi
 
+if [ "$USEINSTALL" != "" ]; then
+  echo
+  echo looking for installed software
+  is_file_installed smokeview
+  is_file_installed background
+  echo "   found smokeview"
+  echo "   found background"
+fi
 
 if [ -e $cfastbot_pid ] ; then
   if [ "$FORCE" == "" ]; then
