@@ -1,21 +1,20 @@
 @echo off
-:: cfastbot_win.bat %cfastrepo% %fdsrepo% %usematlab% %clean% %update% %emailto%
+:: cfastbot_win.bat %repo% %usematlab% %clean% %update% %emailto%
 
 set arg1=%1
-set cfastroot=%~f1
-set cfastbasename=%~n1
+set repo=%~f1
 
-set arg2=%2
-set FDSroot=%2
-set fdsbasename=%2
+set cfastroot=%repo%\cfast
+set SMVroot=%repo%\smv
+set smvbasename=%repo%\smv
 
-set usematlab=%3
-set clean=%4
-set update=%5
-set installed=%6
-set skip_cases=%7
-set official=%8
-set emailto=%9
+set usematlab=%2
+set clean=%3
+set update=%4
+set installed=%5
+set skip_cases=%6
+set official=%7
+set emailto=%8
 
 set size=_64
 
@@ -23,7 +22,7 @@ set size=_64
 ::                         set repository names
 :: -------------------------------------------------------------
 
-:: check for cfast repo
+:: check for repos
 
 if NOT exist %cfastroot% (
   echo ***error: the repo %cfastroot% does not exist
@@ -31,18 +30,10 @@ if NOT exist %cfastroot% (
   exit /b
 )
 
-:: check for FDS repo (if specified)
-
-set havefdsrepo=1
-if %arg2% == none (
-  set havefdsrepo=0
-) else (
-  set FDSroot=%~f2
-  set fdsbasename=%~n2
-  if not exist %FDSroot% (
-    set havefdsrepo=0
-    echo ***warning: the repo %FDSroot% does not exist  
-  )
+if NOT exist %smvroot% (
+  echo ***error: the repo %smvroot% does not exist
+  echo cfastbot aborted
+  exit /b
 )
 
 :: -------------------------------------------------------------
@@ -109,7 +100,7 @@ if %official% == 1 (
 )
 
 echo cfast repo: %cfastroot%
-echo   FDS repo: %FDSroot%
+echo   SMV repo: %SMVroot%
 :: -------------------------------------------------------------
 ::                           stage 0 - preliminaries
 :: -------------------------------------------------------------
@@ -132,6 +123,7 @@ call :GET_TIME PRELIM_beg
 
 ::*** looking for fortran
 
+call ..\..\cfast\Build\scripts\setup_intel_compilers.bat
 ifort 1> %OUTDIR%\stage0a.txt 2>&1
 type %OUTDIR%\stage0a.txt | find /i /c "not recognized" > %OUTDIR%\stage_count0a.txt
 set /p nothaveFORTRAN=<%OUTDIR%\stage_count0a.txt
