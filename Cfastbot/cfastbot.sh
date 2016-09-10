@@ -140,7 +140,7 @@ if [ -e $smvrepo ]; then
 echo "   SMV repo: $smvrepo"
 else
 echo "   SMV repo: $smvrepo ***error does not exist"
-fi`
+fi
 
 platform="linux"
 platform2="Linux"
