@@ -14,29 +14,18 @@ set official=0
 
 set RUNDIR=%CD%
 
-set cfastrepo=%userprofile%\cfastgitclean
-
-if x%CFASTGIT% == x goto skip_cfastgit
-  if EXIST %CFASTGIT% (
-    set cfastrepo=%CFASTGIT%
-  )
-:skip_cfastgit
-
-if NOT exist .cfast_git goto skip_if1
-  set cfastrepo=%RUNDIR%\..\..
-  call :normalise %cfastrepo%
-  set cfastrepo=%temparg%
-:skip_if1
-
-set fdsrepo=none
-if exist %userprofile%\FDS-SMVgitclean (
-  set fdsrepo=%userprofile%\FDS-SMVgitclean
+if NOT exist .cfast_git (
+   echo "***error: not running in the bot\Cfastbot directory"
+   echo "          cfastbot aborted"
 )
-if x%FDSGIT% == x goto skip_fdsgit
-  if EXIST %FDSGIT% (
-    set fdsrepo=%FDSGIT%
-  )
-:skip_fdsgit
+
+ 
+set repo=%RUNDIR%\..\..
+call :normalise %repo%
+set repo=%temparg%
+
+set cfastrepo=%repo%\cfast
+set smvrepo=%repo%\smv
 
 set emailto=
 if not x%EMAILGIT% == x (
@@ -44,15 +33,6 @@ if not x%EMAILGIT% == x (
 )
 
 :: parse command line arguments
-
-call :normalise %cfastrepo% 
-set cfastrepo=%temparg%
-
-if %fdsrepo% == none goto skip_fdsrepo
-  call :normalise %fdsrepo%
-  set fdsrepo=%temparg%
-)
-:skip_fdsrepo
 
 set stopscript=0
 call :getopts %*
@@ -65,17 +45,6 @@ if %stopscript% == 1 (
 call :normalise %CD% curdir
 set curdir=%temparg%
 
-call :normalise %cfastrepo%\Utilities\cfastbot
-set cfastbotdir=%temparg%
-
-call :normalise %cfastrepo% 
-set cfastrepo=%temparg%
-
-if %fdsrepo% == none goto skip_fdsrepo2
-  call :normalise %fdsrepo%
-  set fdsrepo=%temparg%
-:skip_fdsrepo2
-
 set running=%curdir%\bot.running
 
 if %force% == 1 erase %running% 1> Nul 2>&1
@@ -87,17 +56,20 @@ if %update% == 0 goto no_update
   echo getting latest cfastbot
   cd %cfastrepo%
   git fetch origin
-  git pull 1> Nul 2>&1
-  if not %cfastbotdir% == %curdir% (
-    copy %cfastbotdir%\cfastbot.bat %curdir%
-  )
+  git merge origin/master 1> Nul 2>&1
+
+  echo getting latest cfastbot
+  cd %smvrepo%
+  git fetch origin
+  git merge origin/master 1> Nul 2>&1
+
   cd %curdir%
 :no_update
 
 :: run cfastbot
 
   echo 1 > %running%
-  call cfastbot.bat %cfastrepo% %fdsrepo% %usematlab% %clean% %update% %installed% %skip_cases% %official% %emailto%
+  call cfastbot.bat %repo% %usematlab% %clean% %update% %installed% %skip_cases% %official% %emailto%
   erase %running%
   goto end_running
 :skip_running
