@@ -256,7 +256,7 @@ run_auto()
   MKDIR $GIT_STATUSDIR
 # remove untracked files, revert repo files, update to latest revision
 
-  if [[ "$UPDATE" == "1" ]] ; then
+  if [[ "$UPDATEREPO" == "1" ]] ; then
     update_repo smv
     update_repo fds
   fi
