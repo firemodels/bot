@@ -7,7 +7,7 @@ set CURDIR=%CD%
 cd ..\..
 set FIREMODELS=%CD%
 
-for %%x in ( %repos% ) do ( call :update_repo %%x )
+for %%x in ( %allrepos% ) do ( call :update_repo %%x )
 
 cd %CURDIR%
 
