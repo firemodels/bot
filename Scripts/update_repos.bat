@@ -7,8 +7,8 @@ set CURDIR=%CD%
 cd ..\..
 set FIREMODELS=%CD%
 
-for %%x in ( %repos% ) do call :update_repo %%x
-         )
+
+for %%x in ( %repos% ) do ( call :update_repo %%x )
 
 :update_repo
   set repo=%1
@@ -20,8 +20,8 @@ for %%x in ( %repos% ) do call :update_repo %%x
      exit /b
   )   
   cd %repodir%
-  git rev-parse --abbrev-ref HEAD > gitbranch.out
-  set /p CURRENT_BRANCH<gitbranch.out
+  git rev-parse --abbrev-ref HEAD > %CURDIR%\gitbranch.out
+  set /p CURRENT_BRANCH=<%CURDIR%\gitbranch.out
   if "%CURRENT_BRANCH%" NEQ "%BRANCH" (
      echo %BRANCH% branch not checkout out in %repo%
      echo update skipped
@@ -30,8 +30,8 @@ for %%x in ( %repos% ) do call :update_repo %%x
   echo updating %repo%/%BRANCH% from origin
   git fetch origin
   git merge origin/%BRANCH%
-  git remote -v | gawk "{print $1}" | grep firemodels | wc  -l> have_central.out
-  set /p have_central=<have_central.out
+  git remote -v | gawk "{print $1}" | grep firemodels | wc  -l> %CURDIR%\have_central.out
+  set /p have_central=<%CURDIR%\have_central.out
 
   if %have_central% GTR 0 (
      echo updating %repo%/%BRANCH% from firemodels

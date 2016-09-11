@@ -1,12 +1,17 @@
 @echo off
-git remote -v | grep origin | head -1 | gawk -F ":" "{print $2}" | gawk -F\\/ "{print $1}" > gituser.out
-set /p GITUSER=<gituser.out
+set CURDIR=%CD%
+
+git remote -v | grep origin | head -1 | gawk -F ":" "{print $2}" | gawk -F\\/ "{print $1}" > %CURDIR%\gituser.out
+set /p GITUSER=<%CURDIR%\gituser.out
 
 set fdsrepos=exp fds out smv
 set smvrepos=cfast fds smv
 set cfastrepos=cfast exp smv
 set allrepos=cfast cor exp fds out radcal smv
 set repos=%fdsrepos%
+
+cd ..\..
+set FIREMODELS=%CD%
 
 call :getopts %*
 if %stopscript% == 1 (
@@ -21,11 +26,7 @@ echo create_repos -h for other options
 pause >Nul
 
 
-set CURDIR=%CD%
-cd ..\..
-set FIREMODELS=%CD%
-for %%x in ( %repos% ) do call :create_repo %%x
-         )
+for %%x in ( %repos% ) do ( call :create_repo %%x )
 echo repo creation completed
 cd %CURDIR%
 
