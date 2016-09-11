@@ -46,12 +46,12 @@ do
           git fetch firemodels
           git merge firemodels/$BRANCH
           if [ "$PUSH" == "1" ]; then
-             echo "pushing $repo updates to origin"
+             echo "pushing changes in $repo to origin"
              git push origin $BRANCH
           fi
        fi
      else
-       echo repo not in branch $BRANCH
+       echo $BRANCH branch not checkout out in $repo
        echo update skipped
      fi
   else

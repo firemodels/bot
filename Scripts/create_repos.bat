@@ -24,14 +24,14 @@ pause >Nul
 set CURDIR=%CD%
 cd ..\..
 set FIREMODELS=%CD%
-for %%x in ( %repos% ) do call :update_repo %%x
+for %%x in ( %repos% ) do call :create_repo %%x
          )
 echo repo creation completed
 cd %CURDIR%
 
 goto eof
 
-:update_repo
+:create_repo
   set repo=%1
   set repodir=%FIREMODELS%\%repo%
   echo "-----------------------------------------------------------"
