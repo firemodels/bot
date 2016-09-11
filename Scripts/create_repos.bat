@@ -1,4 +1,4 @@
-@echo off
+@echo on
 git remote -v | grep origin | head -1 | gawk -F ":" "{print $2}" | gawk -F\\/ "{print $1}" > gituser.out
 set /p GITUSER=<gituser.out
 
@@ -33,22 +33,22 @@ goto eof
 
 :update_repo
   set repo=%1
-  set repodir=%FIREMODELS%\%repo
+  set repodir=%FIREMODELS%\%repo%
   echo "-------------------------------"
   if exist %repodir% (
-     echo Skipping %repo.  The directory %repodir% already exists.
+     echo Skipping %repo%.  The directory %repodir% already exists.
   ) else (
      cd %FIREMODELS%
-     if "%repo" == "exp" (
-         git clone  --recursive git@github.com\:%GITUSER%/%repo.git
+     if "%repo%" == "exp" (
+         git clone  --recursive git@github.com\:%GITUSER%/%repo%.git
      )  else (
-        git clone git@github.com\:%GITUSER%/%repo.git
+        git clone git@github.com\:%GITUSER%/%repo%.git
      )
      if "%GITUSER%" == "firemodels"  (
      ) else (
         echo setting up remote tracking
         cd %repodir%
-        git remote add firemodels git@github.com\:firemodels/%repo.git
+        git remote add firemodels git@github.com\:firemodels/%repo%.git
         git remote update
      )
   )
@@ -66,19 +66,19 @@ goto eof
  )
  if /I "%1" EQU "-a" (
    set valid=1
-   set repos=%allrepos%;
+   set repos=%allrepos%
  )
  if /I "%1" EQU "-c" (
    set valid=1
-   set repos=%cfastrepos%;
+   set repos=%cfastrepos%
  )
  if /I "%1" EQU "-f" (
    set valid=1
-   set repos=%fdsrepos%;
+   set repos=%fdsrepos%
  )
  if /I "%1" EQU "-s" (
    set valid=1
-   set repos=%smvrepos%;
+   set repos=%smvrepos%
  )
  shift
  if %valid% == 0 (
