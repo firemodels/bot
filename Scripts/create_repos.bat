@@ -66,19 +66,19 @@ goto eof
  )
  if /I "%1" EQU "-a" (
    set valid=1
-   repos=%allrepos%;
+   set repos=%allrepos%;
  )
  if /I "%1" EQU "-c" (
    set valid=1
-   repos=%cfastrepos%;
+   set repos=%cfastrepos%;
  )
  if /I "%1" EQU "-f" (
    set valid=1
-   repos=%fdsrepos%;
+   set repos=%fdsrepos%;
  )
  if /I "%1" EQU "-s" (
    set valid=1
-   repos=%smvrepos%;
+   set repos=%smvrepos%;
  )
  shift
  if %valid% == 0 (
