@@ -1,5 +1,4 @@
 @echo off
-setlocal enableextensions enabledelayedexpansion
 git remote -v | grep origin | head -1 | gawk -F ":" "{print $2}" | gawk -F\\/ "{print $1}" > gituser.out
 set /p GITUSER=<gituser.out
 
@@ -17,7 +16,7 @@ if %stopscript% == 1 (
 echo You are about to clone the repos: %repos%
 echo from git@github.com:%GITUSER%
 echo.
-echo Press any key to continue or CTRL c to abort.
+echo Press any key to continue, CTRL c to abort or type 
 echo create_repos -h for other options
 pause >Nul
 
@@ -95,7 +94,8 @@ if not (%1)==() goto getopts
 exit /b
 
 :usage
-echo Create repos used by cfast, fds and/or smokview
+echo Setup repos ( default: %repos% ) 
+echo used by cfast, fds and/or smokeview
 echo.
 echo Options:
 echo -a - setup all repos: %allrepos%
