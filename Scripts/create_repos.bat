@@ -32,7 +32,7 @@ cd %CURDIR%
 goto eof
 
 :update_repo
-  repo=%1
+  set repo=%1
   set repodir=%FIREMODELS%\%repo
   echo "-------------------------------"
   if exist %repodir% (
