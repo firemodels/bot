@@ -1,4 +1,4 @@
-@echo on
+@echo off
 git remote -v | grep origin | head -1 | gawk -F ":" "{print $2}" | gawk -F\\/ "{print $1}" > gituser.out
 set /p GITUSER=<gituser.out
 
@@ -34,24 +34,24 @@ goto eof
 :update_repo
   set repo=%1
   set repodir=%FIREMODELS%\%repo%
-  echo "-------------------------------"
+  echo "-----------------------------------------------------------"
   if exist %repodir% (
      echo Skipping %repo%.  The directory %repodir% already exists.
-  ) else (
-     cd %FIREMODELS%
-     if "%repo%" == "exp" (
-         git clone  --recursive git@github.com\:%GITUSER%/%repo%.git
-     )  else (
-        git clone git@github.com\:%GITUSER%/%repo%.git
-     )
-     if "%GITUSER%" == "firemodels"  (
-     ) else (
-        echo setting up remote tracking
-        cd %repodir%
-        git remote add firemodels git@github.com\:firemodels/%repo%.git
-        git remote update
-     )
+     exit /b
   )
+  cd %FIREMODELS%
+  if "%repo%" == "exp" (
+     git clone --recursive git@github.com:%GITUSER%/%repo%.git
+  )  else (
+     git clone git@github.com:%GITUSER%/%repo%.git
+  )
+  if "%GITUSER%" == "firemodels"  (
+     exit /b
+  )
+  echo setting up remote tracking
+  cd %repodir%
+  git remote add firemodels git@github.com:firemodels/%repo%.git
+  git remote update
   exit /b
 
 :getopts
