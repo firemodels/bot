@@ -7,22 +7,25 @@ set CURDIR=%CD%
 cd ..\..
 set FIREMODELS=%CD%
 
-
 for %%x in ( %repos% ) do ( call :update_repo %%x )
+
+cd %CURDIR%
+
+goto eof
 
 :update_repo
   set repo=%1
   echo
   set repodir=%FIREMODELS%\%repo%
-  echo "-----------------------------------------------------------"
+  echo -----------------------------------------------------------
   if not exist %repodir% (
      echo %repo% does not exist, not updating
      exit /b
   )   
   cd %repodir%
-  git rev-parse --abbrev-ref HEAD > %CURDIR%\gitbranch.out
+  git rev-parse --abbrev-ref HEAD | head -1> %CURDIR%\gitbranch.out
   set /p CURRENT_BRANCH=<%CURDIR%\gitbranch.out
-  if "%CURRENT_BRANCH%" NEQ "%BRANCH" (
+  if NOT "%CURRENT_BRANCH%" == "%BRANCH%" (
      echo %BRANCH% branch not checkout out in %repo%
      echo update skipped
      exit /b
