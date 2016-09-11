@@ -1,4 +1,5 @@
 @echo off
+setlocal enableextensions enabledelayedexpansion
 git remote -v | grep origin | head -1 | gawk -F ":" "{print $2}" | gawk -F\\/ "{print $1}" > gituser.out
 set /p GITUSER=<gituser.out
 
@@ -9,7 +10,6 @@ set allrepos=cfast cor exp fds out radcal smv
 set repos=%fdsrepos%
 
 call :getopts %*
-pause
 if %stopscript% == 1 (
   exit /b
 )
@@ -18,42 +18,45 @@ echo You are about to clone the repos: %repos%
 echo from git@github.com:%GITUSER%
 echo.
 echo Press any key to continue or CTRL c to abort.
-echo create_repos -hfor other options
+echo create_repos -h for other options
 pause >Nul
 
 
 set CURDIR=%CD%
 cd ..\..
 set FIREMODELS=%CD%
-
-for %%repo in ("%repos%") do
-  echo
-  set repodir=%FIREMODELS%\%%repo
-  echo "-------------------------------"
-  if exit %repodir% (
-     echo Skipping %repo%.  The directory %repodir% already exists.
-  ) else (
-  else
-     cd %FIREMODELS%
-     if "%repo%" == "exp" (
-        git clone  --recursive git@github.com\:%GITUSER%/%%repo.git
-     )  else (
-        git clone git@github.com\:%GITUSER%/%%repo.git
-     )
-     if "%GITUSER% != "firemodels"  (
-        echo setting up remote tracking
-        cd %repodir%
-        git remote add firemodels git@github.com\:firemodels/%%repo.git
-        git remote update
-     fi
-  fi
-)
-echo repo creation complated
+for %%x in ( %repos% ) do call :update_repo %%x
+         )
+echo repo creation completed
 cd %CURDIR%
 
 goto eof
 
+:update_repo
+  repo=%1
+  set repodir=%FIREMODELS%\%repo
+  echo "-------------------------------"
+  if exist %repodir% (
+     echo Skipping %repo.  The directory %repodir% already exists.
+  ) else (
+     cd %FIREMODELS%
+     if "%repo" == "exp" (
+         git clone  --recursive git@github.com\:%GITUSER%/%repo.git
+     )  else (
+        git clone git@github.com\:%GITUSER%/%repo.git
+     )
+     if "%GITUSER%" == "firemodels"  (
+     ) else (
+        echo setting up remote tracking
+        cd %repodir%
+        git remote add firemodels git@github.com\:firemodels/%repo.git
+        git remote update
+     )
+  )
+  exit /b
+
 :getopts
+ set stopscript=0
  if (%1)==() exit /b
  set valid=0
  set arg=%1
