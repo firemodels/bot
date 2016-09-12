@@ -7,7 +7,7 @@ set /p GITUSER=<%CURDIR%\gituser.out
 set fdsrepos=exp fds out smv
 set smvrepos=cfast fds smv
 set cfastrepos=cfast exp smv
-set allrepos=cfast cor exp fds out radcal smv
+set allrepos= dummy cfast cor exp fds out radcal smv
 set repos=%fdsrepos%
 
 cd ..\..
@@ -36,10 +36,21 @@ goto eof
   set repo=%1
   set repodir=%FIREMODELS%\%repo%
   echo "-----------------------------------------------------------"
+
+:: check if repo is at github
+  call :at_github %repo%
+  
+  if %git_not_found% GTR 0 (
+     echo Skipping %repo%.  The repo git@github.com:%GITUSER%/%repo%.git was not found
+     exit /b
+  )
+
+:: check if repo has been cloned locally
   if exist %repodir% (
      echo Skipping %repo%.  The directory %repodir% already exists.
      exit /b
   )
+
   cd %FIREMODELS%
   if "%repo%" == "exp" (
      git clone --recursive git@github.com:%GITUSER%/%repo%.git
@@ -53,6 +64,14 @@ goto eof
   cd %repodir%
   git remote add firemodels git@github.com:firemodels/%repo%.git
   git remote update
+  exit /b
+
+:at_github
+  set repo=%1
+  git ls-remote git@github.com:%GITUSER%/%repo%.git 1> %CURDIR%\gitstatus.out 2>&1
+  type %CURDIR%\gitstatus.out | grep ERROR | wc -l > %CURDIR%\gitstatus2.out
+  set /p git_not_found=<%CURDIR%\gitstatus2.out
+  erase %CURDIR%\gitstatus.out %CURDIR%\gitstatus2.out
   exit /b
 
 :getopts
