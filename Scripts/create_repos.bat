@@ -3,10 +3,16 @@ set CURDIR=%CD%
 
 git remote -v | grep origin | head -1 | gawk  "{print $2}" | gawk -F ":" "{print $1}">%CURDIR%\githeader.out
 set /p GITHEADER=<%CURDIR%\githeader.out
-set GITHEADER=%GITHEADER%:
 
-git remote -v | grep origin | head -1 | gawk -F ":" "{print $2}" | gawk -F\\/ "{print $1}" > %CURDIR%\gituser.out
-set /p GITUSER=<%CURDIR%\gituser.out
+if "%GITHEADER%" == "git@github.com" (
+   set GITHEADER=%GITHEADER%:
+   git remote -v | grep origin | head -1 | gawk -F ":" "{print $2}" | gawk -F\\/ "{print $1}" > %CURDIR%\gituser.out
+   set /p GITUSER=<%CURDIR%\gituser.out
+) else (
+   set GITHEADER=https://github.com/
+   git remote -v | grep origin | head -1 | gawk -F "." "{print $2}" | gawk -F\\/ "{print $2}" > %CURDIR%\gituser.out
+   set /p GITUSER=<%CURDIR%\gituser.out
+)
 
 set fdsrepos=exp fds out smv
 set smvrepos=cfast fds smv
