@@ -1,11 +1,49 @@
 @echo off
+setlocal
+
+set CURDIR=%CD%
+
+:: 1. run in local directory (if bot/Scripts )
+:: 2. run using %FIREMODELS% variable (if not in bot/Scripts
+:: 3. run using directory defined by -r option
+
+if not exist ..\.gitbot goto skip1
+   cd ..\..
+   set FMROOT=%CD%
+   cd %CURDIR%
+:skip1
+
+if "%FMROOT%" == "" (
+   set FMROOT=%FIREMODELS%
+)
+
+call :getopts %*
+if %stopscript% == 1 (
+  exit /b
+)
+
+if "%FMROOT%" == "" (
+   echo ***Error: repo directory not defined.  
+   echo           Rerun in the bot\Scripts directory, or
+   echo           use the -r option or define the FIREMODELS
+   echo           environment variable to define a repo location
+   exit /b
+)
+
+if NOT exist %FMROOT% (
+   echo ***Error: The directory %FMROOT% does not exist
+   exit /b
+)
+
+if NOT exist %FMROOT%\bot (
+   echo ***Error: The directory %FMROOT%\bot does not exist
+   echo           You need to clone the bot directory under %FMROOT% from github
+   exit /b
+)
+
 set allrepos=bot cfast cor exp fds out radcal smv
 set BRANCH=master
 set PUSH=0
-
-set CURDIR=%CD%
-cd ..\..
-set FIREMODELS=%CD%
 
 for %%x in ( %allrepos% ) do ( call :update_repo %%x )
 
@@ -16,7 +54,7 @@ goto eof
 :update_repo
   set repo=%1
   echo
-  set repodir=%FIREMODELS%\%repo%
+  set repodir=%FMROOT%\%repo%
   echo -----------------------------------------------------------
   if not exist %repodir% (
      echo %repo% does not exist, not updating
@@ -63,6 +101,11 @@ goto eof
    set valid=1
    set PUSH=1
  )
+ if /I "%1" EQU "-r" (
+   set valid=1
+   set FMREPO=%2
+   shift
+ )
  shift
  if %valid% == 0 (
    echo.
@@ -82,6 +125,7 @@ echo.
 echo Options:
 echo -h - display this message
 echo -p - push updates to remote origin
+echo -r repodir - directory containing firemodels repos
 exit /b
 
 :eof
