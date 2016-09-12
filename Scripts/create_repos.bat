@@ -7,7 +7,7 @@ set /p GITUSER=<%CURDIR%\gituser.out
 set fdsrepos=exp fds out smv
 set smvrepos=cfast fds smv
 set cfastrepos=cfast exp smv
-set allrepos= dummy cfast cor exp fds out radcal smv
+set allrepos= cfast cor exp fds out radcal smv
 set repos=%fdsrepos%
 
 cd ..\..
@@ -35,13 +35,14 @@ goto eof
 :create_repo
   set repo=%1
   set repodir=%FIREMODELS%\%repo%
-  echo "-----------------------------------------------------------"
+  echo -----------------------------------------------------------
 
 :: check if repo is at github
   call :at_github %repo%
   
   if %git_not_found% GTR 0 (
-     echo Skipping %repo%.  The repo git@github.com:%GITUSER%/%repo%.git was not found
+     echo ***Error: The repo git@github.com:%GITUSER%/%repo%.git was not found.
+     echo           go to github.com and make sure you have forked this repo from firemodels
      exit /b
   )
 
