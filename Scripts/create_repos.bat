@@ -1,13 +1,23 @@
 @echo off
 set CURDIR=%CD%
 
-git remote -v | grep origin | head -1 | gawk -F ":" "{print $2}" | gawk -F\\/ "{print $1}" > %CURDIR%\gituser.out
-set /p GITUSER=<%CURDIR%\gituser.out
+git remote -v | grep origin | head -1 | gawk  "{print $2}" | gawk -F ":" "{print $1}">%CURDIR%\githeader.out
+set /p GITHEADER=<%CURDIR%\githeader.out
+
+if "%GITHEADER%" == "git@github.com" (
+   set GITHEADER=%GITHEADER%:
+   git remote -v | grep origin | head -1 | gawk -F ":" "{print $2}" | gawk -F\\/ "{print $1}" > %CURDIR%\gituser.out
+   set /p GITUSER=<%CURDIR%\gituser.out
+) else (
+   set GITHEADER=https://github.com/
+   git remote -v | grep origin | head -1 | gawk -F "." "{print $2}" | gawk -F\\/ "{print $2}" > %CURDIR%\gituser.out
+   set /p GITUSER=<%CURDIR%\gituser.out
+)
 
 set fdsrepos=exp fds out smv
 set smvrepos=cfast fds smv
 set cfastrepos=cfast exp smv
-set allrepos=cfast cor exp fds out radcal smv
+set allrepos= cfast cor exp fds out radcal smv
 set repos=%fdsrepos%
 
 cd ..\..
@@ -19,7 +29,7 @@ if %stopscript% == 1 (
 )
 
 echo You are about to clone the repos: %repos%
-echo from git@github.com:%GITUSER%
+echo from %GITHEADER%%GITUSER%
 echo.
 echo Press any key to continue, CTRL c to abort or type 
 echo create_repos -h for other options
@@ -35,24 +45,42 @@ goto eof
 :create_repo
   set repo=%1
   set repodir=%FIREMODELS%\%repo%
-  echo "-----------------------------------------------------------"
+  echo -----------------------------------------------------------
+
+:: check if repo is at github
+  call :at_github %repo%
+  
+  if %git_not_found% GTR 0 (
+     echo ***Error: The repo %GITHEADER%%GITUSER%/%repo%.git was not found.
+     exit /b
+  )
+
+:: check if repo has been cloned locally
   if exist %repodir% (
      echo Skipping %repo%.  The directory %repodir% already exists.
      exit /b
   )
+
   cd %FIREMODELS%
   if "%repo%" == "exp" (
-     git clone --recursive git@github.com:%GITUSER%/%repo%.git
+     git clone --recursive %GITHEADER%%GITUSER%/%repo%.git
   )  else (
-     git clone git@github.com:%GITUSER%/%repo%.git
+     git clone %GITHEADER%%GITUSER%/%repo%.git
   )
   if "%GITUSER%" == "firemodels"  (
      exit /b
   )
   echo setting up remote tracking
   cd %repodir%
-  git remote add firemodels git@github.com:firemodels/%repo%.git
+  git remote add firemodels %GITHEADER%firemodels/%repo%.git
   git remote update
+  exit /b
+
+:at_github
+  set repo=%1
+  git ls-remote %GITHEADER%%GITUSER%/%repo%.git 1> %CURDIR%\gitstatus.out 2>&1
+  type %CURDIR%\gitstatus.out | grep ERROR | wc -l > %CURDIR%\gitstatus2.out
+  set /p git_not_found=<%CURDIR%\gitstatus2.out
   exit /b
 
 :getopts
