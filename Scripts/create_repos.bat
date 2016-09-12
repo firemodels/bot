@@ -39,6 +39,7 @@ if NOT exist %FMROOT%\bot (
    echo           You need to clone the bot directory under %FMROOT% from github
    exit /b
 )
+cd %FMROOT%\bot
 
 git remote -v | grep origin | head -1 | gawk  "{print $2}" | gawk -F ":" "{print $1}">%CURDIR%\githeader.out
 set /p GITHEADER=<%CURDIR%\githeader.out

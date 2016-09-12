@@ -1,4 +1,5 @@
 #!/bin/bash
+CUR=`pwd`
 allrepos="bot cfast cor exp fds out radcal smv"
 BRANCH=master
 PUSH=
@@ -11,6 +12,15 @@ echo "-h - display this message"
 echo "-p - push updates to remote origin"
 exit
 }
+
+FMROOT=
+if [ -e ../.gitbot ]; then
+   cd ../..
+   FMROOT=`pwd`
+fi
+if [ x"$FMROOT" == "x" ]; then
+   FMROOT=$FMROOT
+fi
 
 while getopts 'hp' OPTION
 do
@@ -25,13 +35,25 @@ esac
 done
 shift $(($OPTIND-1))
 
-CURDIR=`pwd`
-cd ../..
-FIREMODELS=`pwd`
+if [ "x$FMROOT" == "x" ]; then
+   echo "***Error: repo directory not defined."
+   echo "          Rerun in the bot/Scripts directory, or:
+   echo "          use the -r option or define the FIREMODELS:
+   echo "          environment variable to define a repo location"
+   exit
+fi
+if [ ! -e $FMROOT ]; then
+   echo "***Error: The directory $FMROOT does not exist"
+   echo "          You need to cd to $FMROOT and clone the bot directory from github"
+   exit
+fi
+
+cd $FMROOT
+
 for repo in $allrepos
 do 
   echo
-  repodir=$FIREMODELS/$repo
+  repodir=$FMROOT/$repo
   echo "-------------------------------"
   if [ -e $repodir ]; then
      cd $repodir

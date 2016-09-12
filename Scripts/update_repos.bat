@@ -37,10 +37,11 @@ if NOT exist %FMROOT% (
 
 if NOT exist %FMROOT%\bot (
    echo ***Error: The directory %FMROOT%\bot does not exist
-   echo           You need to clone the bot directory under %FMROOT% from github
+   echo           You need to cd to %FMROOT% and clone the bot directory from github
    exit /b
 )
 
+cd %FMROOT\bot
 set allrepos=bot cfast cor exp fds out radcal smv
 set BRANCH=master
 set PUSH=0
