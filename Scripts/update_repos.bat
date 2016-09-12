@@ -85,3 +85,5 @@ echo -p - push updates to remote origin
 exit /b
 
 :eof
+erase %CURDIR%\gitbranch.out
+erase %CURDIR%\have_central.out

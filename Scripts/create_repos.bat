@@ -20,6 +20,9 @@ set cfastrepos=cfast exp smv
 set allrepos= cfast cor exp fds out radcal smv
 set repos=%fdsrepos%
 
+erase %CURDIR%\gituser.out
+erase %CURDIR%\githeader.out
+
 cd ..\..
 set FIREMODELS=%CD%
 
@@ -135,3 +138,5 @@ echo -h - display this message%
 exit /b
 
 :eof
+erase %CURDIR%\gitstatus.out
+erase %CURDIR%\gitstatus2.out
