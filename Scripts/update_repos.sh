@@ -48,8 +48,6 @@ if [ ! -e $FMROOT ]; then
    exit
 fi
 
-cd $FMROOT
-
 for repo in $allrepos
 do 
   echo

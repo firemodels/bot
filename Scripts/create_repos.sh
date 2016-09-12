@@ -70,7 +70,7 @@ if [ ! -e $FMROOT ]; then
    exit
 fi
 
-cd $FMROOT
+cd $FMROOT/bot
 HEADER=`git remote -v | grep origin | head -1 | awk  '{print $2}' | awk -F ':' '{print $1}'`
 if [ "$HEADER" == "git@github.com" ]; then
    HEADER="git@github.com:" 
@@ -97,11 +97,11 @@ do
      echo Skipping $repo.  The directory $repodir already exists.
   else
      cd $FMROOT
+     RECURSIVE=
      if [ "$repo" == "exp" ]; then
-        git clone  --recursive $HEADER$GITUSER/$repo.git
-     else
-        git clone $HEADER$GITUSER/$repo.git
+        RECURSIVE=--recursive
      fi
+     git clone $RECURSIVE $HEADER$GITUSER/$repo.git
      if [ "$GITUSER" != "firemodels" ]; then
         echo setting up remote tracking with firemodels
         cd $repodir
