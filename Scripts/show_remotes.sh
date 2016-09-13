@@ -43,6 +43,4 @@ do
   echo "$repo remotes:"
   git remote -v
 done
-echo
-echo repo updating complete
 cd $CURDIR
