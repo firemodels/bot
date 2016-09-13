@@ -27,12 +27,12 @@ FMROOT=
 if [ -e ../.gitbot ]; then
    cd ../..
    FMROOT=`pwd`
+else
+   echo "***Error: create_repos.sh must be run from the bot/Scripts directory"
+   exit
 fi
-if [ x"$FMROOT" == "x" ]; then
-   FMROOT=$FIREMODELS
-fi 
 
-while getopts 'acfr:sh' OPTION
+while getopts 'acfsh' OPTION
 do
 case $OPTION  in
   a)
@@ -47,28 +47,12 @@ case $OPTION  in
   h)
    usage;
    ;;
-  r)
-   FMROOT=$OPTARG;
-   ;;
   s)
    repos=$smvrepos;
    ;;
 esac
 done
 shift $(($OPTIND-1))
-
-if [ "x$FMROOT" == "x" ]; then
-   echo "***Error: repo directory not defined."
-   echo "          Rerun in the bot/Scripts directory, or:
-   echo "          use the -r option or define the FIREMODELS:
-   echo "          environment variable to define a repo location"
-   exit
-fi
-if [ ! -e $FMROOT ]; then
-   echo "***Error: The directory $FMROOT does not exist"
-   echo "          You need to cd to $FMROOT and clone the bot directory from github"
-   exit
-fi
 
 cd $FMROOT/bot
 GITHEADER=`git remote -v | grep origin | head -1 | awk  '{print $2}' | awk -F ':' '{print $1}'`
@@ -80,9 +64,8 @@ else
    GITUSER=`git remote -v | grep origin | head -1 | awk -F '.' '{print $2}' | awk -F\/ '{print $2}'`
 fi
 
-echo "You are about to clone the repos:"
-echo "$repos "
-echo "from $GITHEADER$GITUSER"
+echo "You are about to clone the repos: $repos"
+echo "from $GITHEADER$GITUSER into the directory: $FMROOT"
 echo ""
 echo "Press any key to continue or <CTRL> c to abort."
 echo "Type $0 -h for other options"
@@ -92,27 +75,27 @@ for repo in $repos
 do 
   echo
   repodir=$FMROOT/$repo
+  cd $FMROOT
   echo "----------------------------------------------"
   if [ -e $repodir ]; then
      echo Skipping $repo, the directory $repodir already exists.
-  else
-     AT_GITHUB=`git ls-remote $GITHEADER$GITUSER/$repo.git 2>&1 > /dev/null | grep ERROR | wc -l`
-     if [ $AT_GITHUB -gt 0 ]; then
-        echo "***Error: The repo $GITHEADER$GITUSER/$repo.git was not found."
-        continue;
-     fi 
-     cd $FMROOT
-     RECURSIVE=
-     if [ "$repo" == "exp" ]; then
-        RECURSIVE=--recursive
-     fi
-     git clone $RECURSIVE $GITHEADER$GITUSER/$repo.git
-     if [ "$GITUSER" != "firemodels" ]; then
-        echo setting up remote tracking with firemodels
-        cd $repodir
-        git remote add firemodels ${GITHEADER}firemodels/$repo.git
-        git remote update
-     fi
+     continue;
+  fi
+  AT_GITHUB=`git ls-remote $GITHEADER$GITUSER/$repo.git 2>&1 > /dev/null | grep ERROR | wc -l`
+  if [ $AT_GITHUB -gt 0 ]; then
+     echo "***Error: The repo $GITHEADER$GITUSER/$repo.git was not found."
+     continue;
+  fi 
+  RECURSIVE=
+  if [ "$repo" == "exp" ]; then
+     RECURSIVE=--recursive
+  fi
+  git clone $RECURSIVE $GITHEADER$GITUSER/$repo.git
+  if [ "$GITUSER" != "firemodels" ]; then
+     echo setting up remote tracking with firemodels
+     cd $repodir
+     git remote add firemodels ${GITHEADER}firemodels/$repo.git
+     git remote update
   fi
 done
 cd $CURDIR

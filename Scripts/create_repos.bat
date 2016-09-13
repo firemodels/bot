@@ -2,43 +2,21 @@
 setlocal
 set CURDIR=%CD%
 
-:: 1. run in local directory (if bot/Scripts )
-:: 2. run using %FIREMODELS% variable (if not in bot/Scripts
-:: 3. run using directory defined by -r option
-
 if not exist ..\.gitbot goto skip1
    cd ..\..
    set FMROOT=%CD%
    cd %CURDIR%
+   goto endif1
 :skip1
-
-if "%FMROOT%" == "" (
-   set FMROOT=%FIREMODELS%
-)
+   echo ***error: create_repos.bat must be run in the bot\Scripts directory
+   exit /b
+:endif1
 
 call :getopts %*
 if %stopscript% == 1 (
   exit /b
 )
 
-if "%FMROOT%" == "" (
-   echo ***Error: repo directory not defined.  
-   echo           Rerun create_repos script in the bot\Scripts directory,
-   echo           use the -r option or define the FIREMODELS
-   echo           environment variable to define a repo location
-   exit /b
-)
-
-if NOT exist %FMROOT% (
-   echo ***Error: The directory %FMROOT% does not exist
-   exit /b
-)
-
-if NOT exist %FMROOT%\bot (
-   echo ***Error: The directory %FMROOT%\bot does not exist
-   echo           You need to clone the bot directory under %FMROOT% from github
-   exit /b
-)
 cd %FMROOT%\bot
 
 git remote -v | grep origin | head -1 | gawk  "{print $2}" | gawk -F ":" "{print $1}">%CURDIR%\githeader.out
@@ -64,7 +42,7 @@ erase %CURDIR%\gituser.out
 erase %CURDIR%\githeader.out
 
 echo You are about to clone the repos: %repos%
-echo from %GITHEADER%%GITUSER%
+echo from %GITHEADER%%GITUSER% into the directory: %FMROOT%
 echo.
 echo Press any key to continue, CTRL c to abort or type 
 echo create_repos -h for other options
@@ -139,11 +117,6 @@ goto eof
    set valid=1
    set repos=%fdsrepos%
  )
- if /I "%1" EQU "-r" (
-   set valid=1
-   set FMROOT=%2
-   shift
- )
  if /I "%1" EQU "-s" (
    set valid=1
    set repos=%smvrepos%
@@ -169,7 +142,6 @@ echo Options:
 echo -a - setup all repos: %allrepos%
 echo -c - setup repos used by cfastbot: %cfastrepos%
 echo -f - setup repos used by firebot: %fdsrepos%
-echo -r repodir - directory containing firemodels repos
 echo -s - setup repos used by smokebot: %smvrepos%
 echo -h - display this message%
 exit /b
