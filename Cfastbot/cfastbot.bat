@@ -4,14 +4,15 @@
 set arg1=%1
 set repo=%~f1
 
-set cfastroot=%repo%\cfast
-set SMVroot=%repo%\smv
-set smvbasename=%repo%\smv
+set cfastrepo=%repo%\cfast
+set smvrepo=%repo%\smv
+set botrepo=%repo%\bot
+set cfastbotdir=%botrepo%\Cfastrepo
 
 set usematlab=%2
 set clean=%3
 set update=%4
-set installed=%5
+set use_installed=%5
 set skip_cases=%6
 set official=%7
 set emailto=%8
@@ -24,16 +25,18 @@ set size=_64
 
 :: check for repos
 
-if NOT exist %cfastroot% (
-  echo ***error: the repo %cfastroot% does not exist
+if NOT exist %cfastrepo% (
+  echo ***error: the repo %cfastrepo% does not exist
   echo cfastbot aborted
   exit /b
 )
 
-if NOT exist %smvroot% (
-  echo ***error: the repo %smvroot% does not exist
-  echo cfastbot aborted
-  exit /b
+if %use_installed% == 0 (
+   if NOT exist %smvrepo% (
+     echo ***error: the repo %smvrepo% does not exist
+     echo cfastbot aborted
+     exit /b
+   )
 )
 
 :: -------------------------------------------------------------
@@ -80,8 +83,8 @@ set /p startdate=<%OUTDIR%\starttime.txt
 time /t > %OUTDIR%\starttime.txt
 set /p starttime=<%OUTDIR%\starttime.txt
 
-call %cfastroot%\Build\scripts\setup_intel_compilers.bat 1> Nul 2>&1
-call %cfastroot%\Utilities\cfastbot\cfastbot_email_list.bat 1> Nul 2>&1
+call %cfastrepo%\Build\scripts\setup_intel_compilers.bat 1> Nul 2>&1
+call %cfastbotdir%\cfastbot_email_list.bat 1> Nul 2>&1
 
 set usematlab=%3
 if %usematlab% == 1 (
@@ -99,8 +102,10 @@ if %official% == 1 (
   set version=release
 )
 
-echo cfast repo: %cfastroot%
-echo   SMV repo: %SMVroot%
+echo cfast repo: %cfastrepo%
+if %use_installed% == 0 (
+   echo   SMV repo: %smvrepo%
+)
 :: -------------------------------------------------------------
 ::                           stage 0 - preliminaries
 :: -------------------------------------------------------------
@@ -138,28 +143,25 @@ echo             found Fortran
 
 ::*** looking for C
 
-if %installed% == 1 goto skip_icc
+if %use_installed% == 1 goto skip_icc
 icl 1> %OUTDIR%\stage0a.txt 2>&1
 type %OUTDIR%\stage0a.txt | find /i /c "not recognized" > %OUTDIR%\stage_count0a.txt
 set /p nothaveICC=<%OUTDIR%\stage_count0a.txt
 
 if %nothaveICC% == 0 (
   echo             found C
+) else (
+  echo ***error: C compiler not found
+  echo           re-run cfastbot using the -installed option
+  exit /b
 )
 :skip_icc
 
-if %havefdsrepo% == 0 goto skip1
 if %nothaveICC% == 0 goto skip1
   call :is_file_installed smokeview|| exit /b 1
   echo             found smokeview
   set smokeview=smokeview.exe
 :skip1
-
-if %havefdsrepo% == 1 goto skip2
-  call :is_file_installed smokeview|| exit /b 1
-  echo             found smokeview
-  set smokeview=smokeview.exe
-:skip2
 
 ::*** looking for email
 
@@ -243,27 +245,33 @@ if %usematlab% == 1 goto skip_matlabexe
 
 :: --------------------setting up repositories ------------------------------
 
-::*** revert cfast repository
+::*** clean repositories
 
 if %clean% == 0 goto skip_update0
-   echo             cleaning %cfastbasename% repository
-   call :git_clean %cfastroot%\Source\Build
-   call :git_clean %cfastroot%\Source\CFAST
-   call :git_clean %cfastroot%\Verification
-   call :git_clean %cfastroot%\Validation
-   call :git_clean %cfastroot%\Manuals
+   echo             cleaning 
+   echo                cfast
+   call :git_clean %cfastrepo%
+   if %use_installed% == 1 goto skip_update0
+   echo                smv
+   call :git_clean %smvrepo%\Build
+
 :skip_update0
 
-::*** update cfast repository
+::*** update repositories
 
 if %update% == 0 goto skip_update1
-  echo             updating %cfastbasename% repository
-  cd %cfastroot%
+  echo             updating cfast repository
+  cd %cfastrepo%
   git fetch origin
-  git pull  1> %OUTDIR%\stage0.txt 2>&1
+  git merge origin/master  1> %OUTDIR%\stage0.txt 2>&1
+
+  if %use_installed% == 1 goto skip_update1
+  cd %smvrepo%
+  git fetch origin
+  git merge origin/master  1> %OUTDIR%\stage0.txt 2>&1
 :skip_update1
 
-cd %cfastroot%
+cd %cfastrepo%
 git log --abbrev-commit . | head -1 | gawk "{print $2}" > %revisionfilestring%
 
 set /p revisionstring=<%revisionfilestring%
@@ -276,29 +284,6 @@ set warninglogpc=%HISTORYDIR%\warnings_%revisionnum%.txt
 
 set timingslogfile=%TIMINGSDIR%\timings_%revisionnum%.txt
 
-::*** revert FDS repository
-
-if %havefdsrepo% == 0 goto skip_fdsrepo
-  if %clean% == 0 goto skip_update2
-    echo             cleaning %FDSbasename% repository
-    call :git_clean %FDSroot%\Verification
-    call :git_clean %FDSroot%\SMV\source
-    call :git_clean %FDSroot%\SMV\Build
-    call :git_clean %FDSroot%\FDS_Source
-    call :git_clean %FDSroot%\FDS_Compilation
-    call :git_clean %FDSroot%\Manuals
-  :skip_update2
-
-::*** update FDS repository
-
-  if %update% == 0 goto skip_update3
-    echo             updating %FDSbasename% repository
-    cd %FDSroot%
-    git fetch origin
-    git pull  1> %OUTDIR%\stage0.txt 2>&1
-  :skip_update3
-:skip_fdsrepo
-
 :: -------------------------------------------------------------
 ::                           stage 1 - build cfast
 :: -------------------------------------------------------------
@@ -307,7 +292,7 @@ echo Stage 1 - Building CFAST and VandV_Calcs
 
 echo             debug cfast
 
-cd %cfastroot%\Build\CFAST\intel_win%size%_db
+cd %cfastrepo%\Build\CFAST\intel_win%size%_db
 erase *.obj *.mod *.exe *.pdb *.optrpt 1> %OUTDIR%\stage1a.txt 2>&1
 call make_cfast bot %version% 1>> %OUTDIR%\stage1a.txt 2>&1
 
@@ -318,7 +303,7 @@ call :find_cfast_warnings "warning" %OUTDIR%\stage1a.txt "Stage 1a"
 
 echo             release cfast
 
-cd %cfastroot%\Build\CFAST\intel_win%size%
+cd %cfastrepo%\Build\CFAST\intel_win%size%
 erase *.obj *.mod *.exe *.pdb *.optrpt 1> %OUTDIR%\stage1b.txt 2>&1
 call make_cfast bot %version% 1>> %OUTDIR%\stage1b.txt 2>&1
 
@@ -327,7 +312,7 @@ call :find_cfast_warnings "warning" %OUTDIR%\stage1b.txt "Stage 1b"
 
 echo             release VandV_Calcs
 
-cd %cfastroot%\Build\VandV_Calcs\intel_win%size%
+cd %cfastrepo%\Build\VandV_Calcs\intel_win%size%
 erase *.obj *.mod *.exe *.pdb *.optrpt 1> %OUTDIR%\stage1c.txt 2>&1
 call make_vv bot 1>> %OUTDIR%\stage1c.txt 2>&1
 
@@ -338,7 +323,7 @@ call :find_cfast_warnings "warning" %OUTDIR%\stage1c.txt "Stage 1c"
 ::                           stage 2 - build smokeview
 :: -------------------------------------------------------------
 
-if %installed% == 1 (
+if %use_installed% == 1 (
   echo Stage 2 - Skipping Smokeview build
   goto skip_stage2
 )
@@ -346,21 +331,17 @@ if %nothaveICC% == 1 (
   echo Stage 2 - Skipping Smokeview build - C/C++ not available
   goto skip_stage2
 )
-if %havefdsrepo% == 0 (
-  echo Stage 2 - Skipping Smokeview build - source not available
-  goto skip_stage2
-)
 
 echo Stage 2 - Building Smokeview
 
 echo             libs
 
-cd %FDSroot%\SMV\Build\LIBS\lib_win_intel%size%
+cd %smvrepo\Build\LIBS\lib_win_intel%size%
 call makelibs bot 1>> %OUTDIR%\stage2a.txt 2>&1
 
 echo             debug
 
-cd %FDSroot%\SMV\Build\intel_win%size%
+cd %smvrepo%\Build\intel_win%size%
 erase *.obj *.mod *.exe smokeview_win%size%_db.exe 1> %OUTDIR%\stage2a.txt 2>&1
 call make_smv_db -r bot 1>> %OUTDIR%\stage2a.txt 2>&1
 
@@ -369,7 +350,7 @@ call :find_smokeview_warnings "warning" %OUTDIR%\stage2a.txt "Stage 2a"
 
 echo             release
 
-cd %FDSroot%\SMV\Build\intel_win%size%
+cd %smvrepo%\Build\intel_win%size%
 erase *.obj *.mod smokeview_win%size%.exe 1> %OUTDIR%\stage2b.txt 2>&1
 call make_smv -r bot 1>> %OUTDIR%\stage2b.txt 2>&1
 set smokeview=%FDSroot%\SMV\Build\intel_win%size%\smokeview_win%size%.exe
@@ -391,28 +372,28 @@ call :GET_TIME RUNVV_beg
 echo Stage 3 - Running validation cases
 echo             debug
 
-cd %cfastroot%\Validation\scripts
+cd %cfastrepo%\Validation\scripts
 
 call Run_CFAST_cases 1 1> %OUTDIR%\stage3a.txt 2>&1
 
-call :find_runcases_warnings "***Warning" %cfastroot%\Validation   "Stage 3a-Validation"
-call :find_runcases_errors "error|forrtl: severe|DASSL|floating invalid" %cfastroot%\Validation   "Stage 3a-Validation"
-call :find_runcases_errors "error|forrtl: severe|DASSL|floating invalid" %cfastroot%\Verification "Stage 3a-Verification"
+call :find_runcases_warnings "***Warning" %cfastrepo%\Validation   "Stage 3a-Validation"
+call :find_runcases_errors "error|forrtl: severe|DASSL|floating invalid" %cfastrepo%\Validation   "Stage 3a-Validation"
+call :find_runcases_errors "error|forrtl: severe|DASSL|floating invalid" %cfastrepo%\Verification "Stage 3a-Verification"
 
 if %clean% == 1 (
    echo             removing debug output files
-   call :git_clean %cfastroot%\Validation
+   call :git_clean %cfastrepo%\Validation
 )
 
 echo             release
 
-cd %cfastroot%\Validation\scripts
+cd %cfastrepo%\Validation\scripts
 
 call Run_CFAST_cases 1> %OUTDIR%\stage3b.txt 2>&1
 
-call :find_runcases_warnings "***Warning" %cfastroot%\Validation   "Stage 3b-Validation"
-call :find_runcases_errors "error|forrtl: severe|DASSL|floating invalid" %cfastroot%\Validation   "Stage 3b-Validation"
-call :find_runcases_errors "error|forrtl: severe|DASSL|floating invalid" %cfastroot%\Verification "Stage 3b-Verification"
+call :find_runcases_warnings "***Warning" %cfastrepo%\Validation   "Stage 3b-Validation"
+call :find_runcases_errors "error|forrtl: severe|DASSL|floating invalid" %cfastrepo%\Validation   "Stage 3b-Validation"
+call :find_runcases_errors "error|forrtl: severe|DASSL|floating invalid" %cfastrepo%\Verification "Stage 3b-Verification"
 
 call :GET_DURATION RUNVV %RUNVV_beg%
 
@@ -425,13 +406,13 @@ call :GET_TIME MAKEPICS_beg
 
 echo Stage 4 - Making smokeview images
 
-cd %cfastroot%\Validation\scripts
+cd %cfastrepo%\Validation\scripts
 set SH2BAT=%userprofile%\FIRE-LOCAL\repo_exes\sh2bat.exe
 
 %SH2BAT% CFAST_Pictures.sh CFAST_Pictures.bat > %OUTDIR%\stage4.txt 2>&1
-set RUNSMV=call %cfastroot%\Validation\scripts\runsmv.bat
+set RUNSMV=call %cfastrepo%\Validation\scripts\runsmv.bat
 
-cd %cfastroot%\Validation
+cd %cfastrepo%\Validation
 set BASEDIR=%CD%
 
 call scripts\CFAST_Pictures.bat 1> %OUTDIR%\stage4.txt 2>&1
@@ -447,7 +428,7 @@ echo Stage 5 - Making matlab plots
 
 echo             Validation
 echo               VandV_Calcs
-cd %cfastroot%\Validation
+cd %cfastrepo%\Validation
 ..\Build\VandV_Calcs\intel_win%size%\VandV_Calcs_win%size%.exe CFAST_Pressure_Correction_Inputs.csv 1> Nul 2>&1
 copy pressures.csv LLNL_Enclosure\LLNL_pressures.csv /Y 1> Nul 2>&1
 ..\Build\VandV_Calcs\\intel_win%size%\VandV_Calcs_win%size%.exe CFAST_Temperature_Profile_inputs.csv 1> Nul 2>&1
@@ -458,10 +439,10 @@ copy flux_profiles.csv Fleury_Heat_Flux /Y 1> Nul 2>&1
 
 
 echo               Making plots
-cd %cfastroot%\Utilities\Matlab
+cd %cfastrepo%\Utilities\Matlab
 
 if %usematlab% == 0 goto matlab_else1
-  matlab -logfile %matlabvallog% -automation -wait -noFigureWindows -r "try; run('%cfastroot%\Utilities\Matlab\CFAST_validation_script.m'); catch; end; quit
+  matlab -logfile %matlabvallog% -automation -wait -noFigureWindows -r "try; run('%cfastrepo%\Utilities\Matlab\CFAST_validation_script.m'); catch; end; quit
   goto matlab_end1
 :matlab_else1
   Validation_Script
@@ -472,9 +453,9 @@ if %usematlab% == 0 goto matlab_else1
 
 echo             Verification
 echo               Making plots
-cd %cfastroot%\Utilities\Matlab
+cd %cfastrepo%\Utilities\Matlab
 if %usematlab% == 0 goto matlab_else2
-  matlab -logfile %matlabverlog% -automation -wait -noFigureWindows -r "try; run('%cfastroot%\Utilities\Matlab\CFAST_verification_script.m'); catch; end; quit
+  matlab -logfile %matlabverlog% -automation -wait -noFigureWindows -r "try; run('%cfastrepo%\Utilities\Matlab\CFAST_verification_script.m'); catch; end; quit
   goto matlab_end2
 :matlab_else2
   Verification_Script
@@ -494,18 +475,18 @@ call :GET_TIME MAKEGUIDES_beg
 echo Stage 6 - Building CFAST guides
 
 echo             Users Guide
-call :build_guide Users_Guide %cfastroot%\Manuals\Users_Guide 1>> %OUTDIR%\stage6.txt 2>&1
+call :build_guide Users_Guide %cfastrepo%\Manuals\Users_Guide 1>> %OUTDIR%\stage6.txt 2>&1
 
 echo             Technical Reference Guide
-call :build_guide Tech_Ref %cfastroot%\Manuals\Tech_Ref 1>> %OUTDIR%\stage6.txt 2>&1
+call :build_guide Tech_Ref %cfastrepo%\Manuals\Tech_Ref 1>> %OUTDIR%\stage6.txt 2>&1
 
 if %nothaveValidation% == 0 (
   echo             Validation Guide
-  call :build_guide Validation_Guide %cfastroot%\Manuals\Validation_Guide 1>> %OUTDIR%\stage6.txt 2>&1
+  call :build_guide Validation_Guide %cfastrepo%\Manuals\Validation_Guide 1>> %OUTDIR%\stage6.txt 2>&1
 )
 
 echo             Configuration Management Guide
-call :build_guide Configuration_Guide %cfastroot%\Manuals\Configuration_Guide 1>> %OUTDIR%\stage6.txt 2>&1
+call :build_guide Configuration_Guide %cfastrepo%\Manuals\Configuration_Guide 1>> %OUTDIR%\stage6.txt 2>&1
 
 call :GET_DURATION MAKEGUIDES %MAKEGUIDES_beg%
 call :GET_DURATION TOTALTIME %TIME_beg%

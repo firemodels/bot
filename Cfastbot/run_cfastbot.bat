@@ -88,16 +88,6 @@ goto eof
    set stopscript=1
    exit /b
  )
- if /I "%1" EQU "-cfastrepo" (
-   set cfastrepo=%2
-   set valid=1
-   shift
- )
- if /I "%1" EQU "-fdsrepo" (
-   set fdsrepo=%2
-   set valid=1
-   shift
- )
  if /I "%1" EQU "-email" (
    set emailto=%2
    set valid=1
@@ -153,10 +143,6 @@ exit /b
 echo run_cfastbot [options]
 echo. 
 echo -help           - display this message
-echo -cfastrepo name - specify the cfast repository
-echo       (default: %cfastrepo%) 
-echo -fdsrepo name   - specify the FDS-SMV repository
-echo       (default: %fdsrepo%) 
 echo -email address  - override "to" email addresses specified in repo 
 if "%emailto%" NEQ "" (
 echo       (default: %emailto%^)
