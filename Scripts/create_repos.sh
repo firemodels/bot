@@ -71,18 +71,18 @@ if [ ! -e $FMROOT ]; then
 fi
 
 cd $FMROOT/bot
-HEADER=`git remote -v | grep origin | head -1 | awk  '{print $2}' | awk -F ':' '{print $1}'`
-if [ "$HEADER" == "git@github.com" ]; then
-   HEADER="git@github.com:" 
+GITHEADER=`git remote -v | grep origin | head -1 | awk  '{print $2}' | awk -F ':' '{print $1}'`
+if [ "$GITHEADER" == "git@github.com" ]; then
+   GITHEADER="git@github.com:" 
    GITUSER=`git remote -v | grep origin | head -1 | awk -F ':' '{print $2}' | awk -F\/ '{print $1}'`
 else
-   HEADER="https://github.com/"
+   GITHEADER="https://github.com/"
    GITUSER=`git remote -v | grep origin | head -1 | awk -F '.' '{print $2}' | awk -F\/ '{print $2}'`
 fi
 
 echo "You are about to clone the repos:"
 echo "$repos "
-echo "from $HEADERS$GITUSER"
+echo "from $GITHEADER$GITUSER"
 echo ""
 echo "Press any key to continue or <CTRL> c to abort."
 echo "Type $0 -h for other options"
@@ -92,20 +92,25 @@ for repo in $repos
 do 
   echo
   repodir=$FMROOT/$repo
-  echo "-------------------------------"
+  echo "----------------------------------------------"
   if [ -e $repodir ]; then
-     echo Skipping $repo.  The directory $repodir already exists.
+     echo Skipping $repo, the directory $repodir already exists.
   else
+     AT_GITHUB=`git ls-remote $GITHEADER$GITUSER/$repo.git 2>&1 > /dev/null | grep ERROR | wc -l`
+     if [ $AT_GITHUB -gt 0 ]; then
+        echo "***Error: The repo $GITHEADER$GITUSER/$repo.git was not found."
+        continue;
+     fi 
      cd $FMROOT
      RECURSIVE=
      if [ "$repo" == "exp" ]; then
         RECURSIVE=--recursive
      fi
-     git clone $RECURSIVE $HEADER$GITUSER/$repo.git
+     git clone $RECURSIVE $GITHEADER$GITUSER/$repo.git
      if [ "$GITUSER" != "firemodels" ]; then
         echo setting up remote tracking with firemodels
         cd $repodir
-        git remote add firemodels ${HEADER}firemodels/$repo.git
+        git remote add firemodels ${GITHEADER}firemodels/$repo.git
         git remote update
      fi
   fi
