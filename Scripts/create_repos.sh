@@ -65,8 +65,7 @@ else
 fi
 
 echo "You are about to clone the repos: $repos"
-echo "from $GITHEADER$GITUSER into the directory:"
-echo "$FMROOT"
+echo "from $GITHEADER$GITUSER into the directory: $FMROOT"
 echo ""
 echo "Press any key to continue or <CTRL> c to abort."
 echo "Type $0 -h for other options"
@@ -78,7 +77,7 @@ do
   repodir=$FMROOT/$repo
   cd $FMROOT
   echo "----------------------------------------------"
-  if [ ! -e $repodir ]; then
+  if [ -e $repodir ]; then
      echo Skipping $repo, the directory $repodir already exists.
      continue;
   fi
