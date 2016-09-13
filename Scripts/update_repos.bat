@@ -18,7 +18,7 @@ if %stopscript% == 1 (
   exit /b
 )
 
-cd %FMROOT\bot
+cd %FMROOT%\bot
 set allrepos=bot cfast cor exp fds out radcal smv
 set BRANCH=master
 set PUSH=0
@@ -35,7 +35,7 @@ goto eof
 
 :update_repo
   set repo=%1
-  echo
+  echo.
   set repodir=%FMROOT%\%repo%
   echo -----------------------------------------------------------
   if not exist %repodir% (
