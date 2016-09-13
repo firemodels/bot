@@ -12,6 +12,14 @@ if not exist ..\.gitbot goto skip1
    exit /b
 :endif1
 
+set fdsrepos=exp fds out smv
+set smvrepos=cfast fds smv
+set cfastrepos=cfast exp smv
+set allrepos= cfast cor exp fds out radcal smv
+set wikiwebrepos= fds.wiki fds-smv
+set repos=%fdsrepos%
+set WIKIWEB=0
+
 call :getopts %*
 if %stopscript% == 1 (
   exit /b
@@ -19,37 +27,40 @@ if %stopscript% == 1 (
 
 cd %FMROOT%\bot
 
-git remote -v | grep origin | head -1 | gawk  "{print $2}" | gawk -F ":" "{print $1}">%CURDIR%\githeader.out
+set wc=%FMROOT%\bot\Scripts\wc
+set grep=%FMROOT%\bot\Scripts\grep
+set gawk=%FMROOT%\bot\Scripts\gawk
+set head=%FMROOT%\bot\Scripts\head
+
+git remote -v | %grep% origin | %head% -1 | %gawk%  "{print $2}" | %gawk% -F ":" "{print $1}">%CURDIR%\githeader.out
 set /p GITHEADER=<%CURDIR%\githeader.out
 
 if "%GITHEADER%" == "git@github.com" (
    set GITHEADER=%GITHEADER%:
-   git remote -v | grep origin | head -1 | gawk -F ":" "{print $2}" | gawk -F\\/ "{print $1}" > %CURDIR%\gituser.out
+   git remote -v | %grep% origin | %head% -1 | %gawk% -F ":" "{print $2}" | %gawk% -F\\/ "{print $1}" > %CURDIR%\gituser.out
    set /p GITUSER=<%CURDIR%\gituser.out
 ) else (
    set GITHEADER=https://github.com/
-   git remote -v | grep origin | head -1 | gawk -F "." "{print $2}" | gawk -F\\/ "{print $2}" > %CURDIR%\gituser.out
+   git remote -v | %grep% origin | %head% -1 | %gawk% -F "." "{print $2}" | %gawk% -F\\/ "{print $2}" > %CURDIR%\gituser.out
    set /p GITUSER=<%CURDIR%\gituser.out
 )
 
-set fdsrepos=exp fds out smv
-set smvrepos=cfast fds smv
-set cfastrepos=cfast exp smv
-set allrepos= cfast cor exp fds out radcal smv
-set repos=%fdsrepos%
-
-erase %CURDIR%\gituser.out
-erase %CURDIR%\githeader.out
+if exist %CURDIR%\gituser.out erase %CURDIR%\gituser.out
+if exist %CURDIR%\githeader.out erase %CURDIR%\githeader.out
 
 echo You are about to clone the repos: %repos%
-echo from %GITHEADER%%GITUSER% into the directory: %FMROOT%
+if "%WIKIWEB%" == "1" (
+   echo from git@github.com:firemodels into the directory: %FMROOT%
+) else (
+   echo from %GITHEADER%%GITUSER% into the directory: %FMROOT%
+)
 echo.
 echo Press any key to continue, CTRL c to abort or type 
 echo create_repos -h for other options
 pause >Nul
 
 for %%x in ( %repos% ) do ( call :create_repo %%x )
-echo repo creation completed
+
 cd %CURDIR%
 
 goto eof
@@ -59,6 +70,34 @@ goto eof
   set repodir=%FMROOT%\%repo%
   echo -----------------------------------------------------------
 
+  if "%WIKIWEB%" == "1" (
+     if "%repo%" == "fds.wiki" (
+        set repodir=%FMROOT%\wikis
+     )
+     if "%repo%" == "fds-smv" (
+        set repodir=%FMROOT%\webpages
+     )
+  )
+
+:: check if repo has been cloned locally
+  if exist %repodir% (
+     echo Skipping %repo%, the repo directory:
+     echo %repodir%
+     echo already exists
+     exit /b
+  )
+
+  if "%WIKIWEB%" == "1" (
+     cd %FMROOT%
+     if "%repo%" == "fds.wiki" (
+        git clone git@github.com:firemodels/%repo%.git wikis
+     )
+     if "%repo%" == "fds-smv" (
+        git clone git@github.com:firemodels/%repo%.git webpages
+     )
+     exit /b
+  )
+  
 :: check if repo is at github
   call :at_github %repo%
   
@@ -67,11 +106,6 @@ goto eof
      exit /b
   )
 
-:: check if repo has been cloned locally
-  if exist %repodir% (
-     echo Skipping %repo%, the repo directory %repodir% already exists
-     exit /b
-  )
 
   cd %FMROOT%
   if "%repo%" == "exp" (
@@ -91,7 +125,7 @@ goto eof
 :at_github
   set repo=%1
   git ls-remote %GITHEADER%%GITUSER%/%repo%.git 1> %CURDIR%\gitstatus.out 2>&1
-  type %CURDIR%\gitstatus.out | grep ERROR | wc -l > %CURDIR%\gitstatus2.out
+  type %CURDIR%\gitstatus.out | %grep% ERROR | %wc% -l > %CURDIR%\gitstatus2.out
   set /p git_not_found=<%CURDIR%\gitstatus2.out
   exit /b
 
@@ -121,6 +155,11 @@ goto eof
    set valid=1
    set repos=%smvrepos%
  )
+ if /I "%1" EQU "-w" (
+   set valid=1
+   set repos=%wikiwebrepos%
+   set WIKIWEB=1
+ )
  shift
  if %valid% == 0 (
    echo.
@@ -142,10 +181,11 @@ echo Options:
 echo -a - setup all repos: %allrepos%
 echo -c - setup repos used by cfastbot: %cfastrepos%
 echo -f - setup repos used by firebot: %fdsrepos%
-echo -s - setup repos used by smokebot: %smvrepos%
 echo -h - display this message%
+echo -s - setup repos used by smokebot: %smvrepos%
+echo -w - setup wiki and webpage repos cloned from firemodels
 exit /b
 
 :eof
-erase %CURDIR%\gitstatus.out
-erase %CURDIR%\gitstatus2.out
+if exist %CURDIR%\gitstatus.out erase %CURDIR%\gitstatus.out
+if exist %CURDIR%\gitstatus.out erase %CURDIR%\gitstatus2.out
