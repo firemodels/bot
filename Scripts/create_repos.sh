@@ -80,9 +80,9 @@ else
    GITUSER=`git remote -v | grep origin | head -1 | awk -F '.' '{print $2}' | awk -F\/ '{print $2}'`
 fi
 
-echo "You are about to clone the repos:"
-echo "$repos "
-echo "from $GITHEADER$GITUSER"
+echo "You are about to clone the repos: $repos"
+echo "from $GITHEADER$GITUSER into the directory:"
+echo "$FMROOT"
 echo ""
 echo "Press any key to continue or <CTRL> c to abort."
 echo "Type $0 -h for other options"
@@ -92,6 +92,7 @@ for repo in $repos
 do 
   echo
   repodir=$FMROOT/$repo
+  cd $FMROOT
   echo "----------------------------------------------"
   if [ -e $repodir ]; then
      echo Skipping $repo, the directory $repodir already exists.
@@ -101,7 +102,6 @@ do
         echo "***Error: The repo $GITHEADER$GITUSER/$repo.git was not found."
         continue;
      fi 
-     cd $FMROOT
      RECURSIVE=
      if [ "$repo" == "exp" ]; then
         RECURSIVE=--recursive

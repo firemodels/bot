@@ -19,24 +19,27 @@ if [ -e ../.gitbot ]; then
    FMROOT=`pwd`
 fi
 if [ x"$FMROOT" == "x" ]; then
-   FMROOT=$FMROOT
+   FMROOT=$FIREMODELS
 fi
 
-while getopts 'hp' OPTION
+while getopts 'hpr:' OPTION
 do
 case $OPTION  in
   h)
    usage;
    ;;
   p)
-   PUSH="1"
+   PUSH="1";
+   ;;
+  r)
+   FMROOT=$OPTARG;
    ;;
 esac
 done
 shift $(($OPTIND-1))
 
 if [ "x$FMROOT" == "x" ]; then
-   echo "***Error: repo directory not defined."
+   echo "***Error: repo location not defined."
    echo "          Rerun in the bot/Scripts directory, or:
    echo "          use the -r option or define the FIREMODELS:
    echo "          environment variable to define a repo location"
@@ -52,7 +55,7 @@ for repo in $allrepos
 do 
   echo
   repodir=$FMROOT/$repo
-  echo "-------------------------------"
+  echo "---------------------------------------------------------------"
   if [ -e $repodir ]; then
      cd $repodir
      CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
