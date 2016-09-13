@@ -27,16 +27,21 @@ if %stopscript% == 1 (
 
 cd %FMROOT%\bot
 
-git remote -v | grep origin | head -1 | gawk  "{print $2}" | gawk -F ":" "{print $1}">%CURDIR%\githeader.out
+set wc=%FMROOT%\bot\Scripts\wc
+set grep=%FMROOT%\bot\Scripts\grep
+set gawk=%FMROOT%\bot\Scripts\gawk
+set head=%FMROOT%\bot\Scripts\head
+
+git remote -v | %grep% origin | %head% -1 | %gawk%  "{print $2}" | %gawk% -F ":" "{print $1}">%CURDIR%\githeader.out
 set /p GITHEADER=<%CURDIR%\githeader.out
 
 if "%GITHEADER%" == "git@github.com" (
    set GITHEADER=%GITHEADER%:
-   git remote -v | grep origin | head -1 | gawk -F ":" "{print $2}" | gawk -F\\/ "{print $1}" > %CURDIR%\gituser.out
+   git remote -v | %grep% origin | %head% -1 | %gawk% -F ":" "{print $2}" | %gawk% -F\\/ "{print $1}" > %CURDIR%\gituser.out
    set /p GITUSER=<%CURDIR%\gituser.out
 ) else (
    set GITHEADER=https://github.com/
-   git remote -v | grep origin | head -1 | gawk -F "." "{print $2}" | gawk -F\\/ "{print $2}" > %CURDIR%\gituser.out
+   git remote -v | %grep% origin | %head% -1 | %gawk% -F "." "{print $2}" | %gawk% -F\\/ "{print $2}" > %CURDIR%\gituser.out
    set /p GITUSER=<%CURDIR%\gituser.out
 )
 
@@ -120,7 +125,7 @@ goto eof
 :at_github
   set repo=%1
   git ls-remote %GITHEADER%%GITUSER%/%repo%.git 1> %CURDIR%\gitstatus.out 2>&1
-  type %CURDIR%\gitstatus.out | grep ERROR | wc -l > %CURDIR%\gitstatus2.out
+  type %CURDIR%\gitstatus.out | %grep% ERROR | %wc% -l > %CURDIR%\gitstatus2.out
   set /p git_not_found=<%CURDIR%\gitstatus2.out
   exit /b
 

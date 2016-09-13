@@ -23,6 +23,10 @@ set allrepos=bot cfast cor exp fds out radcal smv
 set BRANCH=master
 set PUSH=0
 
+set wc=%FMROOT%\bot\Scripts\wc
+set grep=%FMROOT%\bot\Scripts\grep
+set gawk=%FMROOT%\bot\Scripts\gawk
+
 for %%x in ( %allrepos% ) do ( call :update_repo %%x )
 
 cd %CURDIR%
@@ -49,7 +53,7 @@ goto eof
   echo updating %repo%/%BRANCH% from origin
   git fetch origin
   git merge origin/%BRANCH%
-  git remote -v | gawk "{print $1}" | grep firemodels | wc  -l> %CURDIR%\have_central.out
+  git remote -v | %gawk% "{print $1}" | %grep% firemodels | %wc%  -l> %CURDIR%\have_central.out
   set /p have_central=<%CURDIR%\have_central.out
 
   if %have_central% GTR 0 (
