@@ -1,7 +1,7 @@
 #!/bin/bash
-FORCE=$1
+WEBREPO=$1
+WEBBRANCH=$2
 
-gitwebrepo=~/FDS-SMVwebpages
 oldpage=~/.smokebot/oldpage
 newpage=~/.smokebot/newpage
 olddata=~/.smokebot/old_data
@@ -10,11 +10,9 @@ running=~/.fdssmvgit/bot_running
 curdir=`pwd`
 EXIT="yes"
 
-# don't update status page if firebot is running
+# don't update status page if smokebot is running
 if [ -e $running ] ; then
-  if [ "$FORCE" == "" ]; then
-    exit
-  fi
+   exit
 fi
 
 # check if status web page has changed
@@ -43,21 +41,29 @@ fi
 
 # if nothing has changed then exit without committing any files
 if [ "$EXIT" == "yes" ]; then
-  if [ "$FORCE" == "" ]; then
-    exit
-  fi
+   exit
 fi
 
 ./make_pubpage.sh -s > $newpage
 
-if [ "$USER" == "smokebot" ]; then
-  cd $gitwebrepo
-  git remote update
-  git merge origin/nist-pages
-
-  cp $newpage smokebot_status.html
-  git add smokebot_status.html
-
-  git commit -m "smokebot: update smokebot status page `date`"
-  git push origin nist-pages
+if [ "$USER" != "smokebot" ]; then
+   exit
 fi
+if [ ! -e $WEBREPO ]; then
+   exit
+fi
+CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
+if [ "$CURRENT_BRANCH" != "$WEBBRANCH" ];  then
+   exit
+fi
+cd $WEBREPO
+
+git fetch origin
+git merge origin/$WEBBRANCH
+
+cp $newpage smokebot_status.html
+git add smokebot_status.html
+
+git commit -m "smokebot: update smokebot status page `date`"
+#disable pushing until we are sure it  is working
+#git push origin $WEBBRANCH

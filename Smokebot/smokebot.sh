@@ -22,6 +22,7 @@ NEWGUIDE_DIR=$OUTPUT_DIR/Newest_Guides
 web_DIR=
 WEB_URL=
 SMOKEBOT_LITE=
+WEBBRANCH=nist-pages
 
 # define repo names (default)
 fdsrepo=~/FDS-SMVgitclean
@@ -192,7 +193,7 @@ WEBFROMDIR="$fdsrepo/smv/Manuals/SMV_Summary"
 SMV_VG_GUIDE=$fdsrepo/smv/Manuals/SMV_Verification_Guide/SMV_Verification_Guide.pdf
 SMV_UG_GUIDE=$fdsrepo/smv/Manuals/SMV_User_Guide/SMV_User_Guide.pdf
 GEOM_NOTES=$fdsrepo/smv/Manuals/FDS_User_Guide/geom_notes.pdf
-UploadGuides=$fdsrepo/smv/Utilities/Smokebot/smv_guides2GD.sh
+UploadGuides=$fdsrepo/bot/Smokebot/smv_guides2GD.sh
 
 THIS_FDS_AUTHOR=
 THIS_FDS_FAILED=0
@@ -1157,12 +1158,12 @@ archive_timing_stats()
   TOTAL_SMV_TIMES=`tail -1 smv_benchmarktiming_stats.csv`
   if [ "$UPLOADRESULTS" == "1" ]; then
      if [ "$USER" == "smokebot" ]; then
-      cd $fdsrepo/smv/Utilities/Smokebot
-      ./smvstatus_updatepub.sh -F
+      cd $fdsrepo/bot/Smokebot
+      ./smvstatus_updatepub.sh $fdsrepo/web $WEBBRANCH
     fi
   fi
   if [ ! "$web_DIR" == "" ]; then
-    cd $fdsrepo/smv/Utilities/Smokebot
+    cd $fdsrepo/bot/Smokebot
     ./make_smv_summary.sh > $web_DIR/index.html
   fi
 }

@@ -87,7 +87,7 @@ set gettimeexe=%userprofile%\FIRE-LOCAL\repo_exes\get_time.exe
 call :get_datetime startdate starttime
 
 call "%fdsroot%\fds\Utilities\Scripts\setup_intel_compilers.bat" 1> Nul 2>&1
-call %fdsroot%\fds\Utilities\Firebot\firebot_email_list.bat
+call %fdsroot%\bot\Firebot\firebot_email_list.bat
 
 set mailToList=%mailToFDS%
 if NOT "%emailto%" == "" (

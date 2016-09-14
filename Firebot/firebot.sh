@@ -960,8 +960,10 @@ archive_timing_stats()
    cp fds_benchmarktiming_stats.csv "$HISTORY_DIR/${GIT_REVISION}_benchmarktiming.csv"
    TOTAL_FDS_TIMES=`tail -1 fds_benchmarktiming_stats.csv`
   if [ "$UPLOADGUIDES" == "1" ]; then
-    cd $fdsrepo/bot/Firebot
-    ./status_updatepub.sh $fdsrepo/web $WEBBRANCH
+     if [ "$USER" == "firebot" ]; then
+        cd $fdsrepo/bot/Firebot
+       ./status_updatepub.sh $fdsrepo/web $WEBBRANCH
+     fi
   fi
 }
 

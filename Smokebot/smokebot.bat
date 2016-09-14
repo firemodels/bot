@@ -81,7 +81,7 @@ time /t > %OUTDIR%\starttime.txt
 set /p starttime=<%OUTDIR%\starttime.txt
 
 call "%fdsroot%\smv\Utilities\Scripts\setup_intel_compilers.bat" 1> Nul 2>&1
-call %fdsroot%\smv\Utilities\Smokebot\firebot_email_list.bat
+call %fdsroot%\bot\Smokebot\firebot_email_list.bat
 if NOT "%emailto%" == "" (
   echo  email: %emailto%
   set mailToSMV=%emailto%
