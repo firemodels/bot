@@ -14,7 +14,7 @@ if [ -e .fds_git ]; then
   reponame=`pwd`
   cd $CURDIR
 else
-  echo "***error: firebot not running in the FDS repo"
+  echo "***error: firebot not running in the bot/Firebot directory"
   exit
 fi
 

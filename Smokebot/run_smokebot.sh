@@ -9,12 +9,12 @@ FDSREPO=~/FDS-SMVgitclean
 if [ "$FIREMODELS" != "" ] ; then
   FDSREPO=$FIREMODELS
 fi
-if [ -e .fds_git ]; then
+if [ -e .smv_git ]; then
   cd ../..
   FDSREPO=`pwd`
   cd $CURDIR
 else
-  echo "***error: smokebot not running in the SMV repo"
+  echo "***error: smokebot not running in the bot/Smokebot  directory"
   exit
 fi
 
