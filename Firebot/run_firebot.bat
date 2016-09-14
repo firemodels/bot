@@ -46,10 +46,10 @@ if %force% == 0 goto skip_force
 call :normalise %CD% curdir
 set curdir=%temparg%
 
-call :normalise %fdsrepo%\fds\Utilities\Firebot
+call :normalise %fdsrepo%\bot\Firebot
 set fdsbotdir=%temparg%
 if not %fdsbotdir% == %curdir% (
-   echo "***error: firebot not running in the fds\Utilities\Firebot"
+   echo "***error: firebot not running in the bot\Firebot"
    echo exiting firebot
    exit
 )
