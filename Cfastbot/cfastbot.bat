@@ -106,6 +106,8 @@ echo cfast repo: %cfastrepo%
 if %use_installed% == 0 (
    echo   SMV repo: %smvrepo%
 )
+echo.
+
 :: -------------------------------------------------------------
 ::                           stage 0 - preliminaries
 :: -------------------------------------------------------------
@@ -160,7 +162,7 @@ if %nothaveICC% == 0 (
 if %nothaveICC% == 0 goto skip1
   call :is_file_installed smokeview|| exit /b 1
   echo             found smokeview
-  set smokeview=smokeview.exe
+  set SMOKEVIEW=smokeview.exe
 :skip1
 
 ::*** looking for email
@@ -176,6 +178,11 @@ if NOT exist %emailexe% (
 
 call :is_file_installed pdflatex|| exit /b 1
 echo             found pdflatex
+
+::*** looking for sh2bat
+
+call :is_file_installed sh2bat|| exit /b 1
+echo             found sh2bat
 
 ::*** looking for grep
 
@@ -226,7 +233,8 @@ if %usematlab% == 1 goto skip_matlabexe
     echo             found Validation plot generator 
   )
   if %nothaveValidation% == 1 (
-    echo             Validation plot generator not found - Validation guide will not be built 
+    echo             Validation plot generator not found
+    echo                Validation guide will not be built 
   )
 
 ::*** looking for Verification
@@ -237,7 +245,8 @@ if %usematlab% == 1 goto skip_matlabexe
     echo             found Verification plot generator 
   )
   if %nothaveVerification% == 1 (
-    echo             Verification plot generator not found - Validation guide will not be built
+    echo             Verification plot generator not found - 
+    echo                Validation guide will not be built
     set nothaveValidation=1
   )
 
@@ -353,7 +362,7 @@ echo             release
 cd %smvrepo%\Build\intel_win%size%
 erase *.obj *.mod smokeview_win%size%.exe 1> %OUTDIR%\stage2b.txt 2>&1
 call make_smv -r bot 1>> %OUTDIR%\stage2b.txt 2>&1
-set smokeview=%FDSroot%\SMV\Build\intel_win%size%\smokeview_win%size%.exe
+set SMOKEVIEW=%smvrepo%\Build\intel_win%size%\smokeview_win%size%.exe
 
 call :does_file_exist smokeview_win%size%.exe %OUTDIR%\stage2b.txt|| exit /b 1
 call :find_smokeview_warnings "warning" %OUTDIR%\stage2b.txt "Stage 2b"
@@ -407,9 +416,8 @@ call :GET_TIME MAKEPICS_beg
 echo Stage 4 - Making smokeview images
 
 cd %cfastrepo%\Validation\scripts
-set SH2BAT=%userprofile%\FIRE-LOCAL\repo_exes\sh2bat.exe
 
-%SH2BAT% CFAST_Pictures.sh CFAST_Pictures.bat > %OUTDIR%\stage4.txt 2>&1
+sh2bat CFAST_Pictures.sh CFAST_Pictures.bat > %OUTDIR%\stage4.txt 2>&1
 set RUNSMV=call %cfastrepo%\Validation\scripts\runsmv.bat
 
 cd %cfastrepo%\Validation
@@ -546,7 +554,8 @@ if exist %emailexe% (
 )
 
 echo cfastbot %message% on %COMPUTERNAME%! %revisionstring%, runtime: %DIFF_TOTALTIME%
-echo Results summarized in %infofile%.
+echo Results summarized in:
+echo    %infofile%
 cd %CURDIR%
 goto eof
 
