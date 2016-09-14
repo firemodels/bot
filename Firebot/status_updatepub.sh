@@ -1,7 +1,7 @@
 #!/bin/bash
-FORCE=$1
+WEBREPO=$1
+WEBBRANCH=$2
 
-gitwebrepo=~/FDS-SMVwebpages
 oldpage=~/.firebot/oldpage
 newpage=~/.firebot/newpage
 olddata=~/.firebot/old_data
@@ -9,13 +9,6 @@ newdata=~/.firebot/fds_times.csv
 running=~/.fdssmvgit/bot_running
 curdir=`pwd`
 EXIT="yes"
-
-# don't update status page if firebot is running
-if [ -e $running ] ; then
-  if [ "$FORCE" == "" ]; then
-    exit
-  fi
-fi
 
 # check if status web page has changed
 
@@ -43,19 +36,27 @@ fi
 
 # if nothing has changed then exit without committing any files
 if [ "$EXIT" == "yes" ]; then
-  if [ "$FORCE" == "" ]; then
-    exit
-  fi
+   exit
 fi
 
 ./make_pubpage.sh > $newpage
 
-cd $gitwebrepo
-git remote update
-git merge origin/nist-pages
+if [ "$USER" != "firebot" ]; then
+   exit
+fi
+if [ ! -e $WEBREPO ]; then
+   exit
+fi
+CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
+if [ "$CURRENT_BRANCH" != "$WEBBRANCH" ];  then
+   exit
+fi
+cd $WEBREPO
+git fetch origin/$WEBBRANCH
+git merge origin/$WEBBRANCH
 
 cp $newpage firebot_status.html
 git add firebot_status.html
 
 git commit -m "firebot: update firebot status page `date`"
-git push
+git push origin $WEBBRANCH
