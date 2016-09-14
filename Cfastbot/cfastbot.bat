@@ -57,7 +57,7 @@ set timefile=%OUTDIR%\time.txt
 
 erase %OUTDIR%\*.txt 1> Nul 2>&1
 
-set email=%cfastroot%\Utilities\scripts\email.bat
+set email=%cfastrepo%\Utilities\scripts\email.bat
 set emailexe=%userprofile%\bin\mailsend.exe
 
 set errorlog=%OUTDIR%\stage_errors.txt
