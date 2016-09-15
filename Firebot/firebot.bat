@@ -1,4 +1,4 @@
-@echo on
+@echo off
 
 set repo=%~f1
 set smvrepo=%repo%\smv
