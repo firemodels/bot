@@ -49,7 +49,7 @@ set smvrepo=%repo%\smv
 call :normalise %smvrepo%
 set smvrepo=%temparg%
 
-call :normalise %fdsrepo%\bot\Smokebot
+call :normalise %repo%\bot\Smokebot
 set smvbotdir=%temparg%
 
 set running=%curdir%\smokebot.running
