@@ -38,10 +38,10 @@ echo Settings
 echo      fds repo: %fdsrepo%
 echo      smv repo: %smvrepo%
 echo run directory: %CURDIR%
-if %clean% == 1 echo cleaning repo: yes
-if %clean% == 0 echo cleaning repo: no
-if %update% == 1 echo updating repo: yes
-if %update% == 0 echo updating repo: no
+if %clean% == 1  echo    clean repo: yes
+if %clean% == 0  echo    clean repo: no
+if %update% == 1 echo   update repo: yes
+if %update% == 0 echo   update repo: no
 echo.
 
 :: -------------------------------------------------------------
