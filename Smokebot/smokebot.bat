@@ -178,9 +178,8 @@ echo             found git
 
 echo. 1> %OUTDIR%\stage0.txt 2>&1
 
-:: clean cfast repository
+:: cleaning repos
 
-cd %cfastrepo%
 if %clean% == 0 goto skip_clean1
    echo             cleaning
    echo                cfast
@@ -191,7 +190,7 @@ if %clean% == 0 goto skip_clean1
    call :git_clean %smvrepo%
 :skip_clean1
 
-:: update cfast repository
+:: updating  repos
 
 if %update% == 0 goto skip_update1
   echo             updating
