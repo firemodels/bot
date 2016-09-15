@@ -1,4 +1,4 @@
-@echo off
+@echo on
 :: usage: 
 ::  run_firebot -fdsrepo name -altemail -email address -nomatlab -update -clean  
 ::  (all command arguments are optional)

@@ -1,4 +1,4 @@
-@echo off
+@echo on
 
 set repo=%~f1
 set smvrepo=%repo%\smv
@@ -15,10 +15,20 @@ set emailto=%8
 
 set size=_64
 
-if NOT exist %fdsroot% (
-  echo ***Error: the repository %fdsroot% does not exist
-  echo smokebot aborted
-  exit /b 1
+set abort=0
+if NOT exist %smvrepo% (
+  echo ***Error: the repository %smvrepo% does not exist
+  set abort=1
+)
+
+if NOT exist %fdsrepo% (
+  echo ***Error: the repository %fdsrepo% does not exist
+  set abort=1
+)
+
+if %abort% == 1 (
+   echo firebot aborted
+   exit /b
 )
 
 set CURDIR=%CD%
