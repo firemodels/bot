@@ -120,11 +120,13 @@ CD_REPO ()
   CHK_REPO $repodir
 
   cd $repodir
-  CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
-  if [ "$CURRENT_BRANCH" != "$branch" ]; then
-    echo "***error: was expecting branch $branch in repo $repodir."
-    echo "Found branch $CURRENT_BRANCH. Aborting firebot."
-    exit
+  if [ "$branch" != "" ]; then
+     CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
+     if [ "$CURRENT_BRANCH" != "$branch" ]; then
+       echo "***error: was expecting branch $branch in repo $repodir."
+       echo "Found branch $CURRENT_BRANCH. Aborting firebot."
+       exit
+     fi
   fi
 }
 
@@ -449,8 +451,7 @@ clean_repo()
   curdir=`pwd`
   dir=$1
 
-  CHK_REPO $dir
-  cd $dir
+  CD_REPO $dir
   git clean -dxf &> /dev/null
   git add . &> /dev/null
   git reset --hard HEAD &> /dev/null
@@ -544,7 +545,7 @@ update_repo()
 {
    reponame=$1
    
-   CD_BRANCH $repo/$reponame $BRANCH
+   CD_REPO $repo/$reponame $BRANCH
    
    if [[ "$reponame" == "smv" ]]; then
       GIT_REVISION=`git describe --long --dirty`
