@@ -156,8 +156,8 @@ export fdsrepo
 UploadGuides=$fdsrepo/bot/Firebot/fds_guides2GD.sh
 
 echo ""
-echo "Summary"
-echo "-------"
+echo "Settings"
+echo "--------"
 echo "   Run dir: $FIREBOT_RUNDIR"
 echo "  Repo dir: $fdsrepo"
 echo ""
@@ -178,6 +178,31 @@ START_TIME=$(date +%s)
 # Set time limit (43,200 seconds = 12 hours)
 TIME_LIMIT=43200
 TIME_LIMIT_EMAIL_NOTIFICATION="unsent"
+
+CHKREPODIR ()
+{
+  repodir=$1
+  if [ ! -e $repodir ]; then
+     echo "***error: the repo directory $repodir does not exist."
+     echo "          Aborting firebot."
+     exit
+  fi
+}
+
+CHKBRANCH ()
+{
+  repodir=$1
+  branch=$2
+  CHKREPODIR $repodir
+
+  CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
+  cd $repodir
+  if [ "$CURRENT_BRANCH" != "$branch" ]; then
+    echo "***error: was expecting branch $branch in repo $repodir."
+    echo "Found branch $CURRENT_BRANCH. Aborting firebot."
+    exit
+  fi
+}
 
 MKDIR ()
 {
@@ -254,12 +279,12 @@ clean_firebot_metafiles()
 
 clean_repo2()
 {
-   repo=$1
+   reponame=$1
    # Check to see if FDS repository exists
    if [ -e "$fdsrepo" ]; then
-      cd $fdsrepo/$repo
-      echo "   $repo"
-      clean_repo $fdsrepo/$repo
+      cd $fdsrepo/$reponame
+      echo "   $reponame"
+      clean_repo $fdsrepo/$reponame
    else
       echo "firebot repo $fdsrepo does not exist" >> $OUTPUT_DIR/stage1 2>&1
       echo "firebot run aborted." >> $OUTPUT_DIR/stage1 2>&1
@@ -269,8 +294,8 @@ clean_repo2()
 
 update_repo()
 {
-   repo=$1
-   cd $fdsrepo/$repo
+   reponame=$1
+   cd $fdsrepo/$reponame
    # If a GIT revision string is specified, then get that revision
    echo "Checking out latest revision." >> $OUTPUT_DIR/stage1 2>&1
    CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
@@ -302,9 +327,9 @@ update_repo()
       BRANCH=$CURRENT_BRANCH
    fi
 
-   echo "   $repo" 
-   cd $fdsrepo/$repo
-   echo Updating $BRANCH on repo $fdsrepo/$repo >> $OUTPUT_DIR/stage1 2>&1
+   echo "   $reponame" 
+   cd $fdsrepo/$reponame
+   echo Updating $BRANCH on repo $fdsrepo/$reponame >> $OUTPUT_DIR/stage1 2>&1
    git fetch origin >> $OUTPUT_DIR/stage1 2>&1
    git merge origin/$BRANCH >> $OUTPUT_DIR/stage1 2>&1
    have_remote=`git remote -v | grep firemodels | wc  -l`
@@ -313,7 +338,7 @@ update_repo()
       git merge firemodels/$BRANCH >> $OUTPUT_DIR/stage1 2>&1
    fi
 
-   if [[ "$repo" == "exp" ]]; then
+   if [[ "$reponame" == "exp" ]]; then
       echo "Fetching origin." >> $OUTPUT_DIR/stage1 2>&1
       git fetch origin >> $OUTPUT_DIR/stage1 2>&1
       echo "Updating submodules." >> $OUTPUT_DIR/stage1 2>&1
@@ -321,7 +346,7 @@ update_repo()
       git submodule foreach git merge origin/master >> $OUTPUT_DIR/stage1 2>&1
    fi
 
-   if [[ "$repo" == "fds" ]]; then
+   if [[ "$reponame" == "fds" ]]; then
       GIT_REVISION=`git describe --long --dirty`
       GIT_SHORTHASH=`git rev-parse --short HEAD`
       GIT_LONGHASH=`git rev-parse HEAD`
@@ -1104,8 +1129,8 @@ if [ "$FIREBOT_LITE" != "" ]; then
    echo "Note: only VV cases with debug FDS were run" >> $TIME_LOG
    echo "" >> $TIME_LOG
 fi
-   echo "Host OS: Linux " >> $TIME_LOG
-   echo "Host Name: $hostname " >> $TIME_LOG
+   echo "Host: $hostname " >> $TIME_LOG
+   echo "OS: Linux " >> $TIME_LOG
    echo "Start Time: $start_time " >> $TIME_LOG
    echo "Stop Time: $stop_time " >> $TIME_LOG
    if [ "$UPLOADGUIDES" == "1" ]; then
