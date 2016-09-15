@@ -8,6 +8,8 @@ tempfile=/tmp/filelist.$$
 # found at:
 # http://www.unixtimestamp.com/
 BASETIMESTAMP=1451624400
+CURDIR=`pwd`
+cd ../../fds
 
 while getopts 's' OPTION
 do
@@ -30,3 +32,4 @@ echo $gitdate,$time>> $tempfile
 done
 sort -t ',' -n -k 1 $tempfile
 rm $tempfile
+cd $CURDIR
