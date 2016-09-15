@@ -9,22 +9,11 @@ set update=0
 set stopscript=0
 set force=0
 
-set cfastrepo=%userprofile%\cfastgitclean
-if x%CFASTGIT% == x goto skip_cfastgit
-  if EXIST %CFASTGIT% (
-    set cfastrepo=%CFASTGIT%
-  )
-:skip_cfastgit
-
-set fdsrepo=%userprofile%\FDS-SMVnew
-if exist .fds_git (
-  set fdsrepo=..\..
+if NOT exist .smv_git (
+   echo ***error: smokebot not running in the bot\Smokebot directory
+   echo           smokebot aborted
+   exit /b
 )
-if x%FDSGIT% == x goto skip_fdsgit
-  if EXIST %FDSGIT% (
-    set fdsrepo=%FDSGIT%
-  )
-:skip_fdsgit
 
 set emailto=
 if not x%EMAILGIT% == x (
@@ -32,15 +21,6 @@ if not x%EMAILGIT% == x (
 )
 
 :: parse command line arguments
-
-call :normalise %cfastrepo% 
-set cfastrepo=%temparg%
-
-if %fdsrepo% == none goto skip_fdsrepo
-  call :normalise %fdsrepo%
-  set fdsrepo=%temparg%
-)
-:skip_fdsrepo
 
 set stopscript=0
 call :getopts %*
@@ -50,19 +30,27 @@ if %stopscript% == 1 (
 
 :: normalize directory paths
 
-call :normalise %CD% curdir
+call :normalise %CD%
 set curdir=%temparg%
 
-call :normalise %fdsrepo%\bot\Smokebot
-set fdsbotdir=%temparg%
+set repo=..\..
+call :normalise %repo%
+set repo=%temparg%
 
+set cfastrepo=%repo%\cfast
 call :normalise %cfastrepo% 
 set cfastrepo=%temparg%
 
-if %fdsrepo% == none goto skip_fdsrepo2
-  call :normalise %fdsrepo%
-  set fdsrepo=%temparg%
-:skip_fdsrepo2
+set fdsrepo=%repo%\fds
+call :normalise %fdsrepo%
+set fdsrepo=%temparg%
+
+set smvrepo=%repo%\smv
+call :normalise %smvrepo%
+set smvrepo=%temparg%
+
+call :normalise %repo%\bot\Smokebot
+set smvbotdir=%temparg%
 
 set running=%curdir%\smokebot.running
 
@@ -72,23 +60,18 @@ if exist %running% goto skip_running
 
 :: get latest smokebot
 
-    if %update% == 0 goto no_update
-    echo getting latest smokebot
-    cd %fdsrepo%\bot\Smokebot
-    git fetch origin
-    git merge origin/master 1> Nul 2>&1
-    if not %fdsbotdir% == %curdir% (
-      echo not running in the Smokebot directory
-      echo smokebot run aborted
-      goto eof
-    )
-    cd %curdir%
-    :no_update
+if %update% == 0 goto no_update
+   echo getting latest smokebot
+   cd %smvbotdir%
+   git fetch origin
+   git merge origin/master 1> Nul 2>&1
+   cd %curdir%
+:no_update
 
 :: run smokebot
 
   echo 1 > %running%
-  call smokebot.bat %cfastrepo% %fdsrepo% %clean% %update% %altemail% %emailto%
+  call smokebot.bat %repo% %clean% %update% %altemail% %emailto%
   if exist %running% erase %running%
   goto end_running
 :skip_running
@@ -113,8 +96,8 @@ goto eof
    set clean=1
    set update=1
  )
- if /I "%1" EQU "-cfastrepo" (
-   set cfastrepo=%2
+ if /I "%1" EQU "-repo" (
+   set repo=%2
    set valid=1
    shift
  )
@@ -124,11 +107,6 @@ goto eof
  )
  if /I "%1" EQU "-email" (
    set emailto=%2
-   set valid=1
-   shift
- )
- if /I "%1" EQU "-fdsrepo" (
-   set fdsrepo=%2
    set valid=1
    shift
  )
@@ -162,10 +140,8 @@ exit /b
 echo run_smokebot [options]
 echo. 
 echo -help           - display this message
-echo -cfastrepo name - specify the cfast repository
-echo       (default: %cfastrepo%) 
-echo -fdsrepo name   - specify the FDS-SMV repository
-echo       (default: %fdsrepo%) 
+echo -repo name - specify the directory containing the smv and fds repos
+echo       (default: %repo%) 
 echo -altemail       - use an alternate email server
 echo -email address  - override "to" email addresses specified in repo 
 if "%emailto%" NEQ "" (

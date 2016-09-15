@@ -1,14 +1,14 @@
 @echo off
-set cfastroot=%~f1
-set cfastbasename=%~n1
+set repo=%~f1
 
-set fdsroot=%~f2
-set fdsbasename=%~n2
+set cfastrepo=%repo%\cfast
+set fdsrepo=%repo%\fds
+set smvrepo=%repo%\smv
 
-set clean=%3
-set update=%4
-set altemail=%5
-set emailto=%6
+set clean=%2
+set update=%3
+set altemail=%4
+set emailto=%5
 
 ::  set number of OpenMP threads
 
@@ -19,16 +19,26 @@ set size=_64
 ::                         set repository names
 :: -------------------------------------------------------------
 
-if NOT exist %fdsroot% (
-  echo ***Error: the repository %fdsroot% does not exist
-  echo smokebot aborted
+set abort=0
+if NOT exist %smvrepo% (
+  echo ***Error: the repository %smvrepo% does not exist
+  set abort=1
 )
 
-if NOT exist %cfastroot% (
-  echo ***Error: the repository %cfastroot% does not exist
-  echo smokebot aborted
+if NOT exist %fdsrepo% (
+  echo ***Error: the repository %fdsrepo% does not exist
+  set abort=1
 )
 
+if NOT exist %cfastrepo% (
+  echo ***Error: the repository %cfastrepo% does not exist
+  set abort=1
+)
+
+if %abort% == 1 (
+   echo smokebot aborted
+   exit /b
+)
 :: -------------------------------------------------------------
 ::                         setup environment
 :: -------------------------------------------------------------
@@ -46,7 +56,7 @@ set timefile=%OUTDIR%\time.txt
 
 erase %OUTDIR%\*.txt 1> Nul 2>&1
 
-set email=%fdsroot%\smv\scripts\email.bat
+set email=%smvrepo%\scripts\email.bat
 
 set emailaltsetup=%userprofile%\bin\setup_gmail.bat
 if "%altemail%" == "1" (
@@ -65,8 +75,7 @@ set revisionfilestring=%OUTDIR%\revision.txt
 set revisionfilenum=%OUTDIR%\revision_num.txt
 set stagestatus=%OUTDIR%\stage_status.log
 
-set fromsummarydir=%fdsroot%\Manuals\SMV_Summary
-set tosummarydir="%SMOKEBOT_SUMMARY_DIR%"
+set fromsummarydir=%smvrepo%\Manuals\SMV_Summary
 
 set haveerrors=0
 set havewarnings=0
@@ -80,20 +89,23 @@ set /p startdate=<%OUTDIR%\starttime.txt
 time /t > %OUTDIR%\starttime.txt
 set /p starttime=<%OUTDIR%\starttime.txt
 
-call "%fdsroot%\smv\Utilities\Scripts\setup_intel_compilers.bat" 1> Nul 2>&1
-call %fdsroot%\bot\Smokebot\firebot_email_list.bat
+call "%smvrepo%\Utilities\Scripts\setup_intel_compilers.bat" 1> Nul 2>&1
+call %repo%\bot\Smokebot\firebot_email_list.bat
+
+echo.
+echo Settings
 if NOT "%emailto%" == "" (
-  echo  email: %emailto%
+  echo          email: %emailto%
   set mailToSMV=%emailto%
 )
-echo.
-echo    cfast repo: %cfastroot%
-echo      FDS repo: %fdsroot%
-echo run directory: %CURDIR%
-if %update% == 1 echo updating repo: yes
-if %update% == 0 echo updating repo: no
-if %clean% == 1 echo cleaning repo: yes
-if %clean% == 0 echo cleaning repo: no
+echo     cfast repo: %cfastrepo%
+echo       FDS repo: %fdsrepo%
+echo Smokeview repo: %smvrepo%
+echo  run directory: %CURDIR%
+if %clean% == 1 echo    clean repo: yes
+if %clean% == 0 echo    clean repo: no
+if %update% == 1 echo  update repo: yes
+if %update% == 0 echo  update repo: no
 echo.
 
 :: -------------------------------------------------------------
@@ -166,51 +178,39 @@ echo             found git
 
 echo. 1> %OUTDIR%\stage0.txt 2>&1
 
-:: clean cfast repository
+:: cleaning repos
 
-cd %cfastroot%
 if %clean% == 0 goto skip_clean1
-   echo             cleaning %cfastbasename% repository
-   call :git_clean %cfastroot%
+   echo             cleaning
+   echo                cfast
+   call :git_clean %cfastrepo%
+   echo                fds
+   call :git_clean %fdsrepo%
+   echo                smokeview
+   call :git_clean %smvrepo%
 :skip_clean1
 
-:: update cfast repository
+:: updating  repos
 
 if %update% == 0 goto skip_update1
-  echo             updating %cfastbasename% repository
-  cd %cfastroot%
-  git remote update
+  echo             updating
+  echo                cfast
+  cd %cfastrepo%
+  git fetch origin master  1>> %OUTDIR%\stage0.txt 2>&1
   git merge origin/master  1>> %OUTDIR%\stage0.txt 2>&1
+
+  echo                fds
+  cd %fdsrepo%
+  git fetch origin master 1>> %OUTDIR%\stage0.txt 2>&1
+  git merge origin/master 1>> %OUTDIR%\stage0.txt 2>&1
+
+  echo                smv
+  cd %smvrepo%
+  git fetch origin master 1>> %OUTDIR%\stage0.txt 2>&1
+  git merge origin/master 1>> %OUTDIR%\stage0.txt 2>&1
 :skip_update1
 
-:: clean FDS/Smokeview repository
-
-if %clean% == 0 goto skip_clean2
-   echo             cleaning %fdsbasename% repository
-   call :git_clean %fdsroot%\smv\Verification
-   call :git_clean %fdsroot%\smv\Source
-   call :git_clean %fdsroot%\smv\Build
-   call :git_clean %fdsroot%\fds\Source
-   call :git_clean %fdsroot%\fds\Build
-   call :git_clean %fdsroot%\smv\Manuals
-
-:skip_clean2
-
-:: update FDS/Smokeview repository
-
-if %update% == 0 goto skip_update2
-  cd %fdsroot%\fds
-  echo             updating %fdsbasename%\fds repository
-  git remote update
-  git merge origin/master 1>> %OUTDIR%\stage0.txt 2>&1
-
-  cd %fdsroot%\smv
-  echo             updating %fdsbasename%\smv repository
-  git remote update
-  git merge origin/master 1>> %OUTDIR%\stage0.txt 2>&1
-:skip_update2
-
-cd %fdsroot%\smv
+cd %smvrepo%
 git describe --long --dirty > %revisionfilestring%
 set /p revisionstring=<%revisionfilestring%
 
@@ -225,7 +225,7 @@ set timingslogfile=%TIMINGSDIR%\timings_%revisionnum%.txt
 :: build cfast
 
 echo             building cfast
-cd %cfastroot%\Build\CFAST\intel_win%size%
+cd %cfastrepo%\Build\CFAST\intel_win%size%
 erase *.obj *.mod *.exe 1>> %OUTDIR%\stage0.txt 2>&1
 call make_cfast bot 1>> %OUTDIR%\stage0.txt 2>&1
 call :does_file_exist cfast7_win%size%.exe %OUTDIR%\stage0.txt|| exit /b 1
@@ -242,16 +242,16 @@ echo Stage 1 - Building FDS
 
 echo             parallel debug
 
-cd %fdsroot%\fds\Build\mpi_intel_win%size%_db
+cd %fdsrepo%\Build\mpi_intel_win%size%_db
 erase *.obj *.mod *.exe 1> %OUTDIR%\stage1b.txt 2>&1
-call make_fds bot ..\makefile mpi_intel_win%size%_db 1>> %OUTDIR%\stage1b.txt 2>&1
+call make_fds bot 1>> %OUTDIR%\stage1b.txt 2>&1
 
 call :does_file_exist fds_mpi_win%size%_db.exe %OUTDIR%\stage1b.txt|| exit /b 1
 call :find_fds_warnings "warning" %OUTDIR%\stage1b.txt "Stage 1b"
 
 echo             parallel release
 
-cd %fdsroot%\fds\Build\mpi_intel_win%size%
+cd %fdsrepo%\Build\mpi_intel_win%size%
 erase *.obj *.mod *.exe 1> %OUTDIR%\stage1d.txt 2>&1
 call make_fds bot  1>> %OUTDIR%\stage1d.txt 2>&1
 
@@ -270,12 +270,12 @@ echo Stage 2 - Building Smokeview
 
 echo             libs
 
-cd %fdsroot%\smv\Build\LIBS\intel_win%size%
+cd %smvrepo%\Build\LIBS\intel_win%size%
 call makelibs bot 1>> %OUTDIR%\stage2a.txt 2>&1
 
 echo             debug
 
-cd %fdsroot%\smv\Build\smokeview\intel_win%size%
+cd %smvrepo%\Build\smokeview\intel_win%size%
 erase *.obj *.mod *.exe smokeview_win%size%_db.exe 1> %OUTDIR%\stage2a.txt 2>&1
 call make_smv_db -r bot 1>> %OUTDIR%\stage2a.txt 2>&1
 
@@ -284,7 +284,7 @@ call :find_smokeview_warnings "warning" %OUTDIR%\stage2a.txt "Stage 2a"
 
 echo             release
 
-cd %fdsroot%\smv\Build\smokeview\intel_win%size%
+cd %smvrepo%\Build\smokeview\intel_win%size%
 erase *.obj *.mod smokeview_win%size%.exe 1> %OUTDIR%\stage2b.txt 2>&1
 call make_smv -r bot 1>> %OUTDIR%\stage2b.txt 2>&1
 
@@ -298,32 +298,32 @@ call :find_smokeview_warnings "warning" %OUTDIR%\stage2b.txt "Stage 2b"
 echo Stage 3 - Building FDS/Smokeview utilities
 
 echo             fds2ascii
-cd %fdsroot%\fds\Utilities\fds2ascii\intel_win%size%
+cd %fdsrepo%\Utilities\fds2ascii\intel_win%size%
 erase *.obj *.mod *.exe 1> %OUTDIR%\stage3c.txt 2>&1
 call make_fds2ascii bot 1>> %OUTDIR%\stage3.txt 2>&1
 call :does_file_exist fds2ascii_win%size%.exe %OUTDIR%\stage3.txt|| exit /b 1
 
 if %haveCC% == 1 (
   echo             background
-  cd %fdsroot%\smv\Build\background\intel_win%size%
+  cd %smvrepo%\Build\background\intel_win%size%
   erase *.obj *.mod *.exe 1>> %OUTDIR%\stage3.txt 2>&1
   call make_background bot 1>> %OUTDIR%\stage3.txt 2>&1
   call :does_file_exist background.exe %OUTDIR%\stage3.txt
 
   echo             smokediff
-  cd %fdsroot%\smv\Build\smokediff\intel_win%size%
+  cd %smvrepo%\Build\smokediff\intel_win%size%
   erase *.obj *.mod *.exe 1>> %OUTDIR%\stage3.txt 2>&1
   call make_smokediff bot 1>> %OUTDIR%\stage3.txt 2>&1
   call :does_file_exist smokediff_win%size%.exe %OUTDIR%\stage3.txt
 
   echo             smokezip
-  cd %fdsroot%\smv\Build\smokezip\intel_win%size%
+  cd %smvrepo%\Build\smokezip\intel_win%size%
   erase *.obj *.mod *.exe 1>> %OUTDIR%\stage3.txt 2>&1
   call make_smokezip bot 1>> %OUTDIR%\stage3.txt 2>&1
   call :does_file_exist smokezip_win%size%.exe %OUTDIR%\stage3.txt|| exit /b 1
 
   echo             wind2fds
-  cd %fdsroot%\smv\Build\wind2fds\intel_win%size%
+  cd %smvrepo%\Build\wind2fds\intel_win%size%
   erase *.obj *.mod *.exe 1>> %OUTDIR%\stage3.txt 2>&1
   call make_wind2fds bot 1>> %OUTDIR%\stage3.txt 2>&1
   call :does_file_exist wind2fds_win%size%.exe %OUTDIR%\stage3.txt|| exit /b 1
@@ -351,12 +351,12 @@ echo             debug mode
 
 :: run the cases
 
-cd %fdsroot%\smv\Verification\scripts
+cd %smvrepo%\Verification\scripts
 call Run_SMV_Cases -debug -smvwui 1> %OUTDIR%\stage4a.txt 2>&1
 
 :: check the cases
 
-cd %fdsroot%\smv\Verification\scripts
+cd %smvrepo%\Verification\scripts
 echo. > %OUTDIR%\stage_error.txt
 call Check_SMV_cases -smvwui
 
@@ -368,12 +368,12 @@ echo             release mode
 
 :: run the cases
 
-cd %fdsroot%\smv\Verification\scripts
+cd %smvrepo%\Verification\scripts
 call Run_SMV_Cases -smvwui 1> %OUTDIR%\stage4b.txt 2>&1
 
 :: check the cases
 
-cd %fdsroot%\smv\Verification\scripts
+cd %smvrepo%\Verification\scripts
 echo. > %OUTDIR%\stage_error.txt
 call Check_SMV_cases -smvwui
 
@@ -391,7 +391,7 @@ call :GET_TIME MAKEPICS_beg
 
 echo Stage 5 - Making Smokeview pictures
 
-cd %fdsroot%\smv\Verification\scripts
+cd %smvrepo%\Verification\scripts
 call Make_SMV_Pictures -smvwui 1> %OUTDIR%\stage5.txt 2>&1
 
 call :find_smokeview_warnings "error" %OUTDIR%\stage5.txt "Stage 5"
@@ -407,16 +407,16 @@ call :GET_TIME MAKEGUIDES_beg
 echo Stage 6 - Building Smokeview guides
 
 echo             Technical Reference
-call :build_guide SMV_Technical_Reference_Guide %fdsroot%\smv\Manuals\SMV_Technical_Reference_Guide 1>> %OUTDIR%\stage6.txt 2>&1
+call :build_guide SMV_Technical_Reference_Guide %smvrepo%\Manuals\SMV_Technical_Reference_Guide 1>> %OUTDIR%\stage6.txt 2>&1
 
 echo             Verification
-call :build_guide SMV_Verification_Guide %fdsroot%\smv\Manuals\SMV_Verification_Guide 1>> %OUTDIR%\stage6.txt 2>&1
+call :build_guide SMV_Verification_Guide %smvrepo%\Manuals\SMV_Verification_Guide 1>> %OUTDIR%\stage6.txt 2>&1
 
 echo             User
-call :build_guide SMV_User_Guide %fdsroot%\smv\Manuals\SMV_User_Guide 1>> %OUTDIR%\stage6.txt 2>&1
+call :build_guide SMV_User_Guide %smvrepo%\Manuals\SMV_User_Guide 1>> %OUTDIR%\stage6.txt 2>&1
 
 :: echo             Geom Notes
-:: call :build_guide geom_notes %fdsroot%\smv\Manuals\FDS_User_Guide 1>> %OUTDIR%\stage6.txt 2>&1
+:: call :build_guide geom_notes %smvrepo%\Manuals\FDS_User_Guide 1>> %OUTDIR%\stage6.txt 2>&1
 
 call :GET_DURATION MAKEGUIDES %MAKEGUIDES_beg%
 call :GET_DURATION TOTALTIME %TIME_beg%
@@ -444,14 +444,9 @@ echo . -----------------------------         >> %infofile%
 
 copy %infofile% %timingslogfile%
 
-if NOT exist %tosummarydir% goto skip_copyfiles
-  echo summary   (local): file://%userprofile%/FDS-SMV/Manuals/SMV_Summary/index.html >> %infofile%
-  echo summary (windows): https://googledrive.com/host/0B-W-dkXwdHWNUElBbWpYQTBUejQ/index.html >> %infofile%
-  echo summary   (linux): https://googledrive.com/host/0B-W-dkXwdHWNN3N2eG92X2taRFk/index.html >> %infofile%
-  copy %fromsummarydir%\index*.html %tosummarydir%  1> Nul 2>&1
-  copy %fromsummarydir%\images\*.png %tosummarydir%\images 1> Nul 2>&1
-  copy %fromsummarydir%\images2\*.png %tosummarydir%\images2 1> Nul 2>&1
-:skip_copyfiles
+echo summary   (local): file://%smvrepo%/Manuals/SMV_Summary/index.html >> %infofile%
+echo summary (windows): https://googledrive.com/host/0B-W-dkXwdHWNUElBbWpYQTBUejQ/index.html >> %infofile%
+echo summary   (linux): https://googledrive.com/host/0B-W-dkXwdHWNN3N2eG92X2taRFk/index.html >> %infofile%
   
 
 cd %CURDIR%
@@ -675,7 +670,6 @@ if %nwarnings% GTR 0 (
 )
 
 copy %guide%.pdf %fromsummarydir%\manuals
-copy %guide%.pdf %tosummarydir%\manuals
 
 exit /b
 

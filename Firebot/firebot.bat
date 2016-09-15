@@ -1,7 +1,9 @@
 @echo off
 
-set fdsroot=%~f1
-set fdsbasename=%~n1
+set repo=%~f1
+set smvrepo=%repo%\smv
+set fdsrepo=%repo%\fds
+set botrepo=%repo%\bot
 
 set clean=%2
 set update=%3
@@ -13,21 +15,33 @@ set emailto=%8
 
 set size=_64
 
-if NOT exist %fdsroot% (
-  echo ***Error: the repository %fdsroot% does not exist
-  echo smokebot aborted
-  exit /b 1
+set abort=0
+if NOT exist %smvrepo% (
+  echo ***Error: the repository %smvrepo% does not exist
+  set abort=1
+)
+
+if NOT exist %fdsrepo% (
+  echo ***Error: the repository %fdsrepo% does not exist
+  set abort=1
+)
+
+if %abort% == 1 (
+   echo firebot aborted
+   exit /b
 )
 
 set CURDIR=%CD%
 
 echo.
-echo      FDS repo: %fdsroot%
+echo Settings
+echo      fds repo: %fdsrepo%
+echo      smv repo: %smvrepo%
 echo run directory: %CURDIR%
-if %clean% == 1 echo cleaning repo: yes
-if %clean% == 0 echo cleaning repo: no
-if %update% == 1 echo updating repo: yes
-if %update% == 0 echo updating repo: no
+if %clean% == 1  echo    clean repo: yes
+if %clean% == 0  echo    clean repo: no
+if %update% == 1 echo   update repo: yes
+if %update% == 0 echo   update repo: no
 echo.
 
 :: -------------------------------------------------------------
@@ -52,7 +66,7 @@ set TIMINGSDIR=%CURDIR%\timings
 
 erase %OUTDIR%\*.txt %OUTDIR%\*.log 1> Nul 2>&1
 
-set email=%fdsroot%\smv\scripts\email.bat
+set email=%smvrepo%\scripts\email.bat
 
 set emailaltsetup=%userprofile%\bin\setup_gmail.bat
 if "%altemail%" == "1" (
@@ -75,7 +89,7 @@ set countb=%OUTDIR%\firebot_count0b.txt
 set scratchfile=%OUTDIR%\firebot_scratch.txt
 set have_matlab=0
 
-set fromsummarydir=%fdsroot%\smv\Manuals\SMV_Summary
+set fromsummarydir=%smvrepo%\Manuals\SMV_Summary
 
 set haveerrors=0
 set havewarnings=0
@@ -86,8 +100,8 @@ set gettimeexe=%userprofile%\FIRE-LOCAL\repo_exes\get_time.exe
 
 call :get_datetime startdate starttime
 
-call "%fdsroot%\fds\Utilities\Scripts\setup_intel_compilers.bat" 1> Nul 2>&1
-call %fdsroot%\bot\Firebot\firebot_email_list.bat
+call "%fdsrepo%\Utilities\Scripts\setup_intel_compilers.bat" 1> Nul 2>&1
+call %botrepo%\Firebot\firebot_email_list.bat
 
 set mailToList=%mailToFDS%
 if NOT "%emailto%" == "" (
@@ -192,35 +206,32 @@ echo             found sh2bat
 
 echo. 1>> %OUTDIR%\stage0.txt 2>&1
 
-:: revert FDS/Smokeview repository
+:: cleaning repos
 
 if %clean% == 0 goto skip_clean1
-   echo             cleaning %fdsbasename% repository
-   call :git_clean %fdsroot%\fds\Verification
-   call :git_clean %fdsroot%\smv\Source
-   call :git_clean %fdsroot%\smv\Build
-   call :git_clean %fdsroot%\fds\Source
-   call :git_clean %fdsroot%\fds\Build
-   call :git_clean %fdsroot%\fds\Manuals
+   echo             cleaning
+   echo                fds
+   call :git_clean %fdsrepo%
+   echo                smokeview
+   call :git_clean %smvrepo%
 :skip_clean1
 
-:: update FDS/Smokeview repository
+:: updating  repos
 
 if %update% == 0 goto skip_update1
-echo             updating FDS repository
+  echo             updating
+  echo                fds
+  cd %fdsrepo%
+  git fetch origin master 1>> %OUTDIR%\stage0.txt 2>&1
+  git merge origin/master 1>> %OUTDIR%\stage0.txt 2>&1
 
-cd %fdsroot%\fds
-git remote update
-git merge origin/master 1>> %OUTDIR%\stage0.txt 2>&1
-
-echo             updating SMV repository
-cd %fdsroot%\smv
-git remote update
-git merge origin/master 1>> %OUTDIR%\stage0.txt 2>&1
-
+  echo                smv
+  cd %smvrepo%
+  git fetch origin master 1>> %OUTDIR%\stage0.txt 2>&1
+  git merge origin/master 1>> %OUTDIR%\stage0.txt 2>&1
 :skip_update1
 
-cd %fdsroot%\fds
+cd %fdsrepo%
 git describe --long --dirty > %revisionfilestring%
 set /p revisionstring=<%revisionfilestring%
 
@@ -240,7 +251,7 @@ echo Stage 1 - Building FDS
 
 echo             parallel debug
 
-cd %fdsroot%\fds\Build\mpi_intel_win%size%_db
+cd %fdsrepo%\Build\mpi_intel_win%size%_db
 erase *.obj *.mod *.exe *.pdb 1> Nul 2>&1
 call make_fds bot 1> %OUTDIR%\makefdsd.log 2>&1
 call :does_file_exist fds_mpi_win%size%_db.exe %OUTDIR%\makefdsd.log|| exit /b 1
@@ -250,7 +261,7 @@ if %lite% == 1 goto skip_lite1
 
   echo             parallel release
 
-  cd %fdsroot%\fds\Build\mpi_intel_win%size%
+  cd %fdsrepo%\Build\mpi_intel_win%size%
   erase *.obj *.mod *.exe *.pdb 1> Nul 2>&1
   call make_fds bot 1> %OUTDIR%\makefdsr.log 2>&1
   call :does_file_exist fds_mpi_win%size%.exe %OUTDIR%\makefdsr.log|| exit /b 1
@@ -268,12 +279,12 @@ if %lite% == 1 goto skip_lite2
 
     echo             libs
 
-    cd %fdsroot%\smv\Build\LIBS\intel_win%size%
+    cd %smvrepo%\Build\LIBS\intel_win%size%
     call makelibs bot 1>> %OUTDIR%\stage2a.txt 2>&1
 
     echo             debug
 
-    cd %fdsroot%\smv\Build\smokeview\intel_win%size%
+    cd %smvrepo%\Build\smokeview\intel_win%size%
     erase *.obj *.mod *.exe smokeview_win%size%_db.exe 1> Nul 2>&1
     call make_smv_db -r bot 1> %OUTDIR%\makesmvd.log 2>&1
     call :does_file_exist smokeview_win%size%_db.exe %OUTDIR%\makesmvd.log|| exit /b 1
@@ -281,13 +292,13 @@ if %lite% == 1 goto skip_lite2
 
     echo             release
 
-    cd %fdsroot%\smv\Build\smokeview\intel_win%size%
+    cd %smvrepo%\Build\smokeview\intel_win%size%
     erase *.obj *.mod smokeview_win%size%.exe 1> Nul 2>&1
     call make_smv -r bot 1> %OUTDIR%\makesmvr.log 2>&1
 
     call :does_file_exist smokeview_win%size%.exe %OUTDIR%\makesmvr.log|| aexit /b 1
     call :find_warnings "warning" %OUTDIR%\makesmvr.log "Stage 2b, Smokeview release compilation"
-    set smokeview=%fdsroot%\smv\Build\smokeview\intel_win%size%\smokeview_win%size%.exe
+    set smokeview=%smvrepo%\Build\smokeview\intel_win%size%\smokeview_win%size%.exe
   :skip_build_cstuff
 
 :: -------------------------------------------------------------
@@ -297,7 +308,7 @@ if %lite% == 1 goto skip_lite2
   echo Stage 3 - Building Utilities
 
   echo             fds2ascii
-  cd %fdsroot%\fds\Utilities\fds2ascii\intel_win%size%
+  cd %fdsrepo%\Utilities\fds2ascii\intel_win%size%
   erase *.obj *.mod *.exe 1> Nul 2>&1
   call make_fds2ascii bot 1> %OUTDIR%\makefds2ascii.log 2>&1
   call :does_file_exist fds2ascii_win%size%.exe %OUTDIR%\makefds2ascii.log|| exit /b 1
@@ -305,7 +316,7 @@ if %lite% == 1 goto skip_lite2
 
   if %have_icc% == 1 (
     echo             background
-    cd %fdsroot%\smv\Build\background\intel_win%size%
+    cd %smvrepo%\Build\background\intel_win%size%
     erase *.obj *.mod *.exe 1> Nul 2>&1
     call make_background bot 1> %OUTDIR%\makebackground.log 2>&1
     call :does_file_exist background.exe %OUTDIR%\makebackground.log
@@ -329,14 +340,14 @@ echo             debug mode
 
 :: run cases
 
-cd %fdsroot%\fds\Verification\scripts
+cd %fdsrepo%\Verification\scripts
 call Run_FDS_cases -debug 1> %OUTDIR%\stage4a.txt 2>&1
 
 :: check cases
 
 set haveerrors_now=0
 echo. > %OUTDIR%\stage_error.txt
-cd %fdsroot%\fds\Verification\scripts
+cd %fdsrepo%\Verification\scripts
 call Check_FDS_cases 
 
 :: report errors
@@ -349,20 +360,20 @@ if %lite% == 1 goto skip_lite3
 
 :: run cases
 
-  cd %fdsroot%\fds\Verification\
+  cd %fdsrepo%\Verification\
   if %clean% == 0 goto skip_clean2
      echo             cleaning Verification directory
-     call :git_clean %fdsroot%\fds\Verification
+     call :git_clean %fdsrepo%\Verification
 :skip_clean2
 
-  cd %fdsroot%\fds\Verification\scripts
+  cd %fdsrepo%\Verification\scripts
   call Run_FDS_cases  1> %OUTDIR%\stage4b.txt 2>&1
 
 :: check cases
 
   set haveerrors_now=0
   echo. > %OUTDIR%\stage_error.txt
-  cd %fdsroot%\fds\Verification\scripts
+  cd %fdsrepo%\Verification\scripts
   call Check_FDS_cases
 
 :: report errors
@@ -391,19 +402,19 @@ if %lite% == 1 goto skip_lite4
   echo Stage 5 - Making pictures
   echo             FDS verification cases
 
-  cd %fdsroot%\fds\Verification\scripts
+  cd %fdsrepo%\Verification\scripts
   call MAKE_FDS_pictures %smokeview% 1> %OUTDIR%\stage5.txt 2>&1
 
   if %have_matlab%==0 goto skip_matlabplots
     echo             matlab verification plots
-    cd %fdsroot%\fds\Utilities\Matlab
-    matlab -automation -wait -noFigureWindows -r "try; run('%fdsroot%\fds\Utilities\Matlab\FDS_verification_script.m'); catch; end; quit
+    cd %fdsrepo%\Utilities\Matlab
+    matlab -automation -wait -noFigureWindows -r "try; run('%fdsrepo%\Utilities\Matlab\FDS_verification_script.m'); catch; end; quit
 
     echo             matlab validation plots
-    cd %fdsroot%\fds\Utilities\Matlab
-    matlab -automation -wait -noFigureWindows -r "try; run('%fdsroot%\fds\Utilities\Matlab\FDS_validation_script.m'); catch; end; quit
+    cd %fdsrepo%\Utilities\Matlab
+    matlab -automation -wait -noFigureWindows -r "try; run('%fdsrepo%\Utilities\Matlab\FDS_validation_script.m'); catch; end; quit
 
-    cd %fdsroot%\fds\Utilities\Scripts
+    cd %fdsrepo%\Utilities\Scripts
     validation_git_stats
 
   :skip_matlabplots
@@ -419,17 +430,17 @@ if %lite% == 1 goto skip_lite4
   echo Stage 6 - Building guides
 
   echo             FDS Technical Reference
-  call :build_guide FDS_Technical_Reference_Guide %fdsroot%\fds\Manuals\FDS_Technical_Reference_Guide 1> %OUTDIR%\stage6.txt 2>&1
+  call :build_guide FDS_Technical_Reference_Guide %fdsrepo%\Manuals\FDS_Technical_Reference_Guide 1> %OUTDIR%\stage6.txt 2>&1
 
   if have_matlab==0 goto skip_VV
     echo             FDS User
-    call :build_guide FDS_User_Guide %fdsroot%\fds\Manuals\FDS_User_Guide 1>> %OUTDIR%\stage6.txt 2>&1
+    call :build_guide FDS_User_Guide %fdsrepo%\Manuals\FDS_User_Guide 1>> %OUTDIR%\stage6.txt 2>&1
 
     echo             FDS Verification
-    call :build_guide FDS_Verification_Guide %fdsroot%\fds\Manuals\FDS_Verification_Guide 1>> %OUTDIR%\stage6.txt 2>&1
+    call :build_guide FDS_Verification_Guide %fdsrepo%\Manuals\FDS_Verification_Guide 1>> %OUTDIR%\stage6.txt 2>&1
 
     echo             FDS Validation
-    call :build_guide FDS_Validation_Guide %fdsroot%\fds\Manuals\FDS_Validation_Guide 1>> %OUTDIR%\stage6.txt 2>&1
+    call :build_guide FDS_Validation_Guide %fdsrepo%\Manuals\FDS_Validation_Guide 1>> %OUTDIR%\stage6.txt 2>&1
   :skip_VV  
 
   call :GET_DURATION MAKEGUIDES %MAKEGUIDES_beg%
@@ -659,10 +670,12 @@ exit /b
 :: -------------------------------------------------------------
 
 set gitcleandir=%1
-cd %gitcleandir%
-git clean -dxf 1>> Nul 2>&1
-git add . 1>> Nul 2>&1
-git reset --hard HEAD 1>> Nul 2>&1
+if exist %gitcleandir% (
+  cd %gitcleandir%
+  git clean -dxf 1>> Nul 2>&1
+  git add . 1>> Nul 2>&1
+  git reset --hard HEAD 1>> Nul 2>&1
+)
 exit /b
 
 :: -------------------------------------------------------------

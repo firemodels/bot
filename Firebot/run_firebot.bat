@@ -12,17 +12,11 @@ set force=0
 set installed=0
 set lite=0
 
-set fdsrepo=%userprofile%\FDS-SMVnew
-if exist .fds_git (
-  set fdsrepo=..\..\..
+if NOT exist .fds_git (
+   echo ***error: firebot not running in the bot\Firebot directory
+   echo           firebot aborted
+   exit /b
 )
-if x%FDSGIT% == x goto skip_fdsgit
-  if EXIST %FDSGITNEW% (
-    set fdsrepo=%FDSGITNEW%
-  )
-:skip_fdsgit
-call :normalise %fdsrepo%
-set fdsrepo=%temparg%
 
 set emailto=
 if not x%EMAILGIT% == x (
@@ -37,49 +31,42 @@ if %stopscript% == 1 (
   exit /b
 )
 
-if %force% == 0 goto skip_force
-  if exist %running% erase %running%
-:skip_force
-
 :: normalize directory paths
 
-call :normalise %CD% curdir
+call :normalise %CD%
 set curdir=%temparg%
 
-call :normalise %fdsrepo%\bot\Firebot
-set fdsbotdir=%temparg%
-if not %fdsbotdir% == %curdir% (
-   echo "***error: firebot not running in the bot\Firebot"
-   echo exiting firebot
-   exit
-)
+set repo=..\..
+call :normalise %repo%
+set repo=%temparg%
+
+set fdsrepo=%repo%\fds
+call :normalise %fdsrepo%
+set fdsrepo=%temparg%
+
+set smvrepo=%repo%\smv
+call :normalise %smvrepo%
+set smvrepo=%temparg%
+
+call :normalise %repo%\bot\Firebot
+set firebotdir=%temparg%
 
 set running=%curdir%\firebot.running
 
-if exist %running% goto skip_running
-
 :: get latest firebot
 
-    if %update% == 0 goto no_update
-       echo Updating FDS repo
-       cd %fdsrepo%\fds
-       git remote update
-       git merge origin/master 1> Nul 2>&1
-       git merge firemodels/master 1> Nul 2>&1
-       
-       echo Updating SMV repo
-       cd %fdsrepo%\smv
-       git remote update
-       git merge origin/master 1> Nul 2>&1
-       git merge firemodels/master 1> Nul 2>&1
-
-       cd %curdir%
-    :no_update
+if %update% == 0 goto no_update
+   echo getting latest firebot
+   cd %firebotdir%
+   git fetch origin
+   git merge origin/master 1> Nul 2>&1
+   cd %curdir%
+:no_update
 
 :: run firebot
 
   echo 1 > %running%
-  call firebot.bat %fdsrepo% %clean% %update% %altemail% %usematlab% %installed% %lite% %emailto%
+  call firebot.bat %repo% %clean% %update% %altemail% %usematlab% %installed% %lite% %emailto%
   if exist %running% erase %running%
   goto end_running
 :skip_running
@@ -97,11 +84,6 @@ goto eof
    call :usage
    set stopscript=1
    exit /b
- )
- if /I "%1" EQU "-fdsrepo" (
-   set fdsrepo=%2
-   set valid=1
-   shift
  )
  if /I "%1" EQU "-email" (
    set emailto=%2
@@ -158,8 +140,6 @@ exit /b
 echo run_firebot [options]
 echo. 
 echo -help           - display this message
-echo -fdsrepo name   - specify the FDS-SMV repository
-echo       (default: %fdsrepo%) 
 echo -altemail       - use an alternate email server
 echo -email address  - override "to" email addresses specified in repo 
 if "%emailto%" NEQ "" (
