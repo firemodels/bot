@@ -182,19 +182,17 @@ fi
 if [[ "$EMAIL" != "" ]]; then
   EMAIL="-m $EMAIL"
 fi
+
+# for now always assume the bot repo is always in the master branch
+# and that the -b branch option only apples to the fds and smv repos
+
 if [[ "$UPDATEREPO" == "1" ]]; then
    UPDATE=-u
    if [[ "$RUNFIREBOT" == "1" ]]; then
-     CD_REPO $repo/bot/Firebot $BRANCH
+     CD_REPO $repo/bot/Firebot master
      
      git fetch origin &> /dev/null
-     git merge origin/$BRANCH &> /dev/null
-     FIREBOTDIR=`pwd`
-     if [[ "$CURDIR" != "$FIREBOTDIR" ]]; then
-        echo "***error: firebot not running in the $FIREBOTDIR"
-        echo "          firebot run aborted"
-        exit
-     fi
+     git merge origin/master &> /dev/null
      cd $CURDIR
   fi
 fi

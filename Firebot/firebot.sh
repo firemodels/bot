@@ -122,9 +122,10 @@ shift $(($OPTIND-1))
 if [ -e .fds_git ]; then
   cd ../..
   repo=`pwd`
-  cd $CURDIR
+  cd $FIREBOT_RUNDIR
 else
   echo "***error: firebot not running in the bot/Firebot directory"
+  echo "          Aborting firebot"
   exit
 fi
 

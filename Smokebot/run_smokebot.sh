@@ -5,13 +5,9 @@ fi
 smokebot_pid=~/.fdssmvgit/smokebot_pid
 
 CURDIR=`pwd`
-FDSREPO=~/FDS-SMVgitclean
-if [ "$FIREMODELS" != "" ] ; then
-  FDSREPO=$FIREMODELS
-fi
 if [ -e .smv_git ]; then
   cd ../..
-  FDSREPO=`pwd`
+  repo=`pwd`
   cd $CURDIR
 else
   echo "***error: smokebot not running in the bot/Smokebot  directory"
@@ -69,7 +65,6 @@ echo "-q queue [default: $QUEUE]"
 echo "-L - smokebot lite,  run only stages that build a debug fds and run cases with it"
 echo "                    (no release fds, no release cases, no manuals, etc)"
 echo "-M  - make movies"
-echo "-r - FDS-SMV repository location [default: $FDSREPO]"
 echo "-t - use test smokeview"
 echo "-u - update repo"
 echo "-U - upload guides"
@@ -85,6 +80,31 @@ else
 echo "-W url - web url of summary pages [default: $WEB_URL]"
 fi
 exit
+}
+
+CHK_REPO ()
+{
+  repodir=$1
+  if [ ! -e $repodir ]; then
+     echo "***error: the repo directory $repodir does not exist."
+     echo "          Aborting firebot."
+     exit
+  fi
+}
+
+CD_REPO ()
+{
+  repodir=$1
+  branch=$2
+  CHK_REPO $repodir
+
+  cd $repodir
+  CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
+  if [ "$CURRENT_BRANCH" != "$branch" ]; then
+    echo "***error: was expecting branch $branch in repo $repodir."
+    echo "Found branch $CURRENT_BRANCH. Aborting firebot."
+    exit
+  fi
 }
 
 LIST_DESCENDANTS ()
@@ -139,9 +159,6 @@ case $OPTION  in
    ;;
   q)
    QUEUE="$OPTARG"
-   ;;
-  r)
-   FDSREPO="$OPTARG"
    ;;
   t)
    TESTFLAG="-t"
@@ -211,29 +228,24 @@ if [ "$EMAIL" != "" ]; then
   EMAIL="-m $EMAIL"
 fi
 
+# for now always assume the bot repo is always in the master branch
+# and that the -b branch option only apples to the fds and smv repos
+
 if [[ "$RUNSMOKEBOT" == "1" ]]; then
   if [[ "$UPDATEREPO" == "-u" ]]; then
-     cd $FDSREPO/bot/Smokebot
+     CD_BRANCH $repo/bot/Smokebot master
+     
      git fetch origin &> /dev/null
-     git checkout $BRANCH &> /dev/null
-     git merge origin/$BRANCH &> /dev/null
-     FIREBOTDIR=`pwd`
-     if [ "$FIREBOTDIR" != "$CURDIR" ]; then
-        echo "***error: smokebot not running in $FIREBOTDIR"
-        echo "          smokebot run aborted"
-        exit
-     fi
-     cd $CURDIR
+     git merge origin/master &> /dev/null
   fi
 fi
 
-FDSREPO="-r $FDSREPO"
 BRANCH="-b $BRANCH"
 
 if [[ "$RUNSMOKEBOT" == "1" ]]; then
   touch $smokebot_pid
-  ./$botscript $TESTFLAG $RUNAUTO $COMPILER $SMOKEBOT_LITE $BRANCH $FDSREPO $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+  ./$botscript $TESTFLAG $RUNAUTO $COMPILER $SMOKEBOT_LITE $BRANCH $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
   rm $smokebot_pid
 else
-  echo ./$botscript $TESTFLAG $RUNAUTO $COMPILER $SMOKEBOT_LITE $BRANCH $FDSREPO $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+  echo ./$botscript $TESTFLAG $RUNAUTO $COMPILER $SMOKEBOT_LITE $BRANCH $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 fi
