@@ -103,6 +103,31 @@ esac
 done
 shift $(($OPTIND-1))
 
+CHK_REPO ()
+{
+  repodir=$1
+  if [ ! -e $repodir ]; then
+     echo "***error: the repo directory $repodir does not exist."
+     echo "          Aborting firebot."
+     exit
+  fi
+}
+
+CD_REPO ()
+{
+  repodir=$1
+  branch=$2
+  CHK_REPO $repodir
+
+  cd $repodir
+  CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
+  if [ "$CURRENT_BRANCH" != "$branch" ]; then
+    echo "***error: was expecting branch $branch in repo $repodir."
+    echo "Found branch $CURRENT_BRANCH. Aborting firebot."
+    exit
+  fi
+}
+
 if [ -e .smv_git ]; then
   cd ../..
   repo=`pwd`
@@ -375,31 +400,6 @@ GET_DURATION(){
     else
       echo "${TIME_S}s"
     fi
-  fi
-}
-
-CHK_REPO ()
-{
-  repodir=$1
-  if [ ! -e $repodir ]; then
-     echo "***error: the repo directory $repodir does not exist."
-     echo "          Aborting firebot."
-     exit
-  fi
-}
-
-CD_REPO ()
-{
-  repodir=$1
-  branch=$2
-  CHK_REPO $repodir
-
-  cd $repodir
-  CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
-  if [ "$CURRENT_BRANCH" != "$branch" ]; then
-    echo "***error: was expecting branch $branch in repo $repodir."
-    echo "Found branch $CURRENT_BRANCH. Aborting firebot."
-    exit
   fi
 }
 

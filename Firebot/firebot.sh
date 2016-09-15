@@ -119,6 +119,31 @@ esac
 done
 shift $(($OPTIND-1))
 
+CHK_REPO ()
+{
+  repodir=$1
+  if [ ! -e $repodir ]; then
+     echo "***error: the repo directory $repodir does not exist."
+     echo "          Aborting firebot."
+     exit
+  fi
+}
+
+CD_REPO ()
+{
+  repodir=$1
+  branch=$2
+  CHK_REPO $repodir
+
+  cd $repodir
+  CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
+  if [ "$CURRENT_BRANCH" != "$branch" ]; then
+    echo "***error: was expecting branch $branch in repo $repodir."
+    echo "Found branch $CURRENT_BRANCH. Aborting firebot."
+    exit
+  fi
+}
+
 if [ -e .fds_git ]; then
   cd ../..
   repo=`pwd`
@@ -189,31 +214,6 @@ START_TIME=$(date +%s)
 # Set time limit (43,200 seconds = 12 hours)
 TIME_LIMIT=43200
 TIME_LIMIT_EMAIL_NOTIFICATION="unsent"
-
-CHK_REPO ()
-{
-  repodir=$1
-  if [ ! -e $repodir ]; then
-     echo "***error: the repo directory $repodir does not exist."
-     echo "          Aborting firebot."
-     exit
-  fi
-}
-
-CD_REPO ()
-{
-  repodir=$1
-  branch=$2
-  CHK_REPO $repodir
-
-  cd $repodir
-  CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
-  if [ "$CURRENT_BRANCH" != "$branch" ]; then
-    echo "***error: was expecting branch $branch in repo $repodir."
-    echo "Found branch $CURRENT_BRANCH. Aborting firebot."
-    exit
-  fi
-}
 
 MKDIR ()
 {
