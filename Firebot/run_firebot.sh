@@ -65,11 +65,13 @@ CD_REPO ()
   CHK_REPO $repodir
 
   cd $repodir
-  CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
-  if [ "$CURRENT_BRANCH" != "$branch" ]; then
-    echo "***error: was expecting branch $branch in repo $repodir."
-    echo "Found branch $CURRENT_BRANCH. Aborting firebot."
-    exit
+  if [ "$branch" != "" ]; then
+     CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
+     if [ "$CURRENT_BRANCH" != "$branch" ]; then
+       echo "***error: was expecting branch $branch in repo $repodir."
+       echo "Found branch $CURRENT_BRANCH. Aborting firebot."
+       exit
+     fi
   fi
 }
 
