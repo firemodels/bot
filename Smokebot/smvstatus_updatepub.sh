@@ -62,8 +62,9 @@ git fetch origin
 git merge origin/$WEBBRANCH
 
 cp $newpage smokebot_status.html
-git add smokebot_status.html
 
-git commit -m "smokebot: update smokebot status page `date`"
 #disable pushing until we are sure it  is working
+
+#git add smokebot_status.html
+#git commit -m "smokebot: update smokebot status page `date`"
 #git push origin $WEBBRANCH
