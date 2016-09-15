@@ -21,8 +21,10 @@ NEWGUIDE_DIR=$OUTPUT_DIR/Newest_Guides
 WEBBRANCH=nist-pages
 
 platform="linux"
+platform2="Linux"
 if [ "`uname`" == "Darwin" ] ; then
   platform="osx"
+  platform2="OSX"
 fi
 
 export platform
@@ -1113,11 +1115,11 @@ if [ "$FIREBOT_LITE" != "" ]; then
    echo "Note: only VV cases with debug FDS were run" >> $TIME_LOG
    echo "" >> $TIME_LOG
 fi
-   echo "Host: $hostname " >> $TIME_LOG
-   echo "OS: Linux " >> $TIME_LOG
-   echo "Repo dir: $repo " >> $TIME_LOG
-   echo "Start Time: $start_time " >> $TIME_LOG
-   echo "Stop Time: $stop_time " >> $TIME_LOG
+   echo "          host: $hostname " >> $TIME_LOG
+   echo "            OS: $platform2 " >> $TIME_LOG
+   echo "          Repo: $repo " >> $TIME_LOG
+   echo "    Start Time: $start_time " >> $TIME_LOG
+   echo "     Stop Time: $stop_time " >> $TIME_LOG
    if [ "$UPLOADGUIDES" == "1" ]; then
    echo "Firebot status:  https://pages.nist.gov/fds-smv/firebot_status.html" >> $TIME_LOG
    fi

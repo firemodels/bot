@@ -1317,8 +1317,10 @@ email_build_status()
    stop_time=`date`
    echo "----------------------------------------------" > $TIME_LOG
    echo "             host: $hostname " >> $TIME_LOG
-   echo "            start: $start_time " >> $TIME_LOG
-   echo "             stop: $stop_time " >> $TIME_LOG
+   echo "               OS: $platform2" >> $TIME_LOG
+   echo "             repo: $repo" >> $TIME_LOG
+   echo "       start time: $start_time " >> $TIME_LOG
+   echo "        stop time: $stop_time " >> $TIME_LOG
    echo "            setup: $DIFF_PRELIM" >> $TIME_LOG
    echo "   build software: $DIFF_BUILDSOFTWARE" >> $TIME_LOG
    echo "        run cases: $DIFF_RUNCASES" >> $TIME_LOG
