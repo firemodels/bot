@@ -33,7 +33,7 @@ if %stopscript% == 1 (
 call :normalise %CD%
 set curdir=%temparg%
 
-set repo=%RUNDIR%\..\..
+set repo=..\..
 call :normalise %repo%
 set repo=%temparg%
 

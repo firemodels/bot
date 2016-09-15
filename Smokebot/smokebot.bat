@@ -91,14 +91,16 @@ set /p starttime=<%OUTDIR%\starttime.txt
 
 call "%smvrepo%\Utilities\Scripts\setup_intel_compilers.bat" 1> Nul 2>&1
 call %repo%\bot\Smokebot\firebot_email_list.bat
+
+echo.
+echo Settings
 if NOT "%emailto%" == "" (
-  echo  email: %emailto%
+  echo          email: %emailto%
   set mailToSMV=%emailto%
 )
-echo.
 echo     cfast repo: %cfastrepo%
 echo       FDS repo: %fdsrepo%
-echo Smokeview repo: %fdsrepo%
+echo Smokeview repo: %smvrepo%
 echo  run directory: %CURDIR%
 if %clean% == 1 echo cleaning repo: yes
 if %clean% == 0 echo cleaning repo: no
