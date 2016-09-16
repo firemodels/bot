@@ -10,6 +10,10 @@ set update=%3
 set altemail=%4
 set emailto=%5
 
+set fdsbranch=master
+set smvbranch=master
+set cfastbranch=master
+
 ::  set number of OpenMP threads
 
 set OMP_NUM_THREADS=1
@@ -195,17 +199,17 @@ if %clean% == 0 goto skip_clean1
 if %update% == 0 goto skip_update1
   echo             updating
   echo                cfast
-  cd %cfastrepo%
+  call :cd_repo %cfastrepo% %cfastbranch% || exit /b 1
   git fetch origin master  1>> %OUTDIR%\stage0.txt 2>&1
   git merge origin/master  1>> %OUTDIR%\stage0.txt 2>&1
 
   echo                fds
-  cd %fdsrepo%
+  call :cd_repo %fdsrepo% %fdsbranch% || exit /b 1
   git fetch origin master 1>> %OUTDIR%\stage0.txt 2>&1
   git merge origin/master 1>> %OUTDIR%\stage0.txt 2>&1
 
   echo                smv
-  cd %smvrepo%
+  call :cd_repo %smvrepo% %smvbranch% || exit /b 1
   git fetch origin master 1>> %OUTDIR%\stage0.txt 2>&1
   git merge origin/master 1>> %OUTDIR%\stage0.txt 2>&1
 :skip_update1
@@ -560,6 +564,41 @@ exit /b 0
     exit /b 1
   )
   exit /b 0
+
+:: -------------------------------------------------------------
+:chk_repo
+:: -------------------------------------------------------------
+
+set repodir=%1
+
+if NOT exist %repodir% (
+  echo ***error: repo directory %repodir% does not exist
+  echo           smokebot aborted
+  exit /b 1
+)
+exit /b 0
+
+:: -------------------------------------------------------------
+:cd_repo
+:: -------------------------------------------------------------
+
+set repodir=%1
+set repobranch=%2
+
+call :chk_repo %repodir% || exit /b 1
+
+cd %repodir%
+git rev-parse --abbrev-ref HEAD>current_branch.txt
+set /p current_branch=<current_branch.txt
+erase current_branch.txt
+if "%repobranch%" != "%current_branch%" (
+  echo ***error: found branch %current_branch% was expecting branch %repobranch%
+  echo           smokebot aborted
+  cd %curdir_cdrepo%
+  exit /b 1
+)
+cd %curdir_cdrepo%
+exit /b 0
 
 :: -------------------------------------------------------------
   :does_file_exist
