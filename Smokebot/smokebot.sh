@@ -1189,7 +1189,7 @@ archive_timing_stats()
   if [ "$UPLOADRESULTS" == "1" ]; then
      if [ "$USER" == "smokebot" ]; then
       cd $botrepo/Smokebot
-      ./smvstatus_updatepub.sh $repo/web $WEBBRANCH
+      ./smvstatus_updatepub.sh $repo/webpages $WEBBRANCH
     fi
   fi
   if [ ! "$web_DIR" == "" ]; then

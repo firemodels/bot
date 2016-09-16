@@ -973,7 +973,7 @@ archive_timing_stats()
   if [ "$UPLOADGUIDES" == "1" ]; then
      if [ "$USER" == "firebot" ]; then
         cd $botrepo/Firebot
-       ./status_updatepub.sh $repo/web $WEBBRANCH
+       ./status_updatepub.sh $repo/webpages $WEBBRANCH
      fi
   fi
 }
