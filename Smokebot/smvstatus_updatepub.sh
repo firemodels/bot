@@ -7,7 +7,6 @@ CHK_REPO ()
   repodir=$1
   if [ ! -e $repodir ]; then
      echo "***error: the repo directory $repodir does not exist."
-     echo "          Aborting firebot."
      exit
   fi
 }
@@ -23,7 +22,7 @@ CD_REPO ()
      CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
      if [ "$CURRENT_BRANCH" != "$branch" ]; then
        echo "***error: was expecting branch $branch in repo $repodir."
-       echo "Found branch $CURRENT_BRANCH. Aborting firebot."
+       echo "Found branch $CURRENT_BRANCH."
        exit
      fi
   fi
@@ -80,12 +79,12 @@ fi
 
 CD_REPO $WEBREPO $WEBBRANCH
 
+git fetch origin
+git merge origin/$WEBBRANCH
+
+cp $newpage smokebot_status.html
+
 # disable status web page update we are sure it is working
-
-#git fetch origin
-#git merge origin/$WEBBRANCH
-
-#cp $newpage smokebot_status.html
 
 #git add smokebot_status.html
 #git commit -m "smokebot: update smokebot status page `date`"
