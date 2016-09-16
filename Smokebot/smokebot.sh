@@ -555,10 +555,9 @@ update_repo()
    fi
 
    cd $repo/$reponame
-   echo "   $reponame"
    IS_DIRTY=`git describe --long --dirty | grep dirty | wc -l`
    if [ "$IS_DIRTY" == "1" ]; then
-     echo "The repo $repo/$repo has uncommitted changes."
+     echo "The repo $repo/$reponame has uncommitted changes."
      echo "Commit or revert these changes or re-run"
      echo "smokebot without the -u (update) option"
      exit
@@ -566,8 +565,8 @@ update_repo()
    echo "Updating branch $BRANCH." >> $OUTPUT_DIR/stage0 2>&1
    git fetch origin >> $OUTPUT_DIR/stage0 2>&1
    git merge origin/$BRANCH >> $OUTPUT_DIR/stage0 2>&1
-   have_remote=`git remote -v | grep firemodels | wc  -l`
-   if [ "$have_remote" -gt "0" ]; then
+   have_remote=`git remote -v | awk '{print $1}' | grep firemodels | wc  -l`
+   if [ "$have_remote" != "0" ]; then
       git fetch firemodels >> $OUTPUT_DIR/stage0 2>&1
       git merge firemodels/$BRANCH >> $OUTPUT_DIR/stage0 2>&1
    fi
