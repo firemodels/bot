@@ -1,6 +1,32 @@
-#!/bin/bash
+ #!/bin/bash
 WEBREPO=$1
 WEBBRANCH=$2
+
+CHK_REPO ()
+{
+  repodir=$1
+  if [ ! -e $repodir ]; then
+     echo "***error: the repo directory $repodir does not exist."
+     exit
+  fi
+}
+
+CD_REPO ()
+{
+  repodir=$1
+  branch=$2
+  CHK_REPO $repodir
+
+  cd $repodir
+  if [ "$branch" != "" ]; then
+     CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
+     if [ "$CURRENT_BRANCH" != "$branch" ]; then
+       echo "***error: was expecting branch $branch in repo $repodir."
+       echo "Found branch $CURRENT_BRANCH."
+       exit
+     fi
+  fi
+}
 
 oldpage=~/.firebot/oldpage
 newpage=~/.firebot/newpage
@@ -44,21 +70,16 @@ fi
 if [ "$USER" != "firebot" ]; then
    exit
 fi
-if [ ! -e $WEBREPO ]; then
-   exit
-fi
-CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
-if [ "$CURRENT_BRANCH" != "$WEBBRANCH" ];  then
-   exit
-fi
-cd $WEBREPO
+
+CD_REPO $WEBREPO $WEBBRANCH
+
 git fetch origin
 git merge origin/$WEBBRANCH
 
 cp $newpage firebot_status.html
 
-# disable pushing  until we are sure it is working
+# disable status web page update we are sure it is working
+
 #git add firebot_status.html
 #git commit -m "firebot: update firebot status page `date`"
-
 #git push origin $WEBBRANCH
