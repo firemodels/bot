@@ -5,13 +5,10 @@ fi
 firebot_pid=~/.fdssmvgit/firebot_pid
 
 CURDIR=`pwd`
-reponame=~/FDS-SMVgitclean
-if [ "$FIREMODELS" != "" ] ; then
-  reponame=$FIREMODELS
-fi
+
 if [ -e .fds_git ]; then
   cd ../..
-  reponame=`pwd`
+  repo=`pwd`
   cd $CURDIR
 else
   echo "***error: firebot not running in the bot/Firebot directory"
@@ -44,12 +41,38 @@ else
 echo "-m email_address "
 fi
 echo "-q queue - specify queue [default: $QUEUE]"
-echo "-r - repository location [default: $reponame]"
 echo "-s - skip matlab and build document stages"
 echo "-u - update repo"
 echo "-U - upload guides (only by user firebot)"
 echo "-v - show options used to run firebot"
 exit
+}
+
+CHK_REPO ()
+{
+  repodir=$1
+  if [ ! -e $repodir ]; then
+     echo "***error: the repo directory $repodir does not exist."
+     echo "          Aborting firebot."
+     exit
+  fi
+}
+
+CD_REPO ()
+{
+  repodir=$1
+  branch=$2
+  CHK_REPO $repodir
+
+  cd $repodir
+  if [ "$branch" != "" ]; then
+     CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
+     if [ "$CURRENT_BRANCH" != "$branch" ]; then
+       echo "***error: was expecting branch $branch in repo $repodir."
+       echo "Found branch $CURRENT_BRANCH. Aborting firebot."
+       exit
+     fi
+  fi
 }
 
 LIST_DESCENDANTS ()
@@ -78,7 +101,7 @@ SKIPMATLAB=
 SKIPFIGURES=
 FIREBOT_LITE=
 KILL_FIREBOT=
-while getopts 'b:cFfhikLm:q:nr:suUv' OPTION
+while getopts 'b:cFfhikLm:q:nsuUv' OPTION
 do
 case $OPTION  in
   b)
@@ -113,9 +136,6 @@ case $OPTION  in
    ;;
   n)
    UPDATEREPO=0
-   ;;
-  r)
-   reponame="$OPTARG"
    ;;
   s)
    SKIPMATLAB=-s
@@ -164,19 +184,17 @@ fi
 if [[ "$EMAIL" != "" ]]; then
   EMAIL="-m $EMAIL"
 fi
+
+# for now always assume the bot repo is always in the master branch
+# and that the -b branch option only apples to the fds and smv repos
+
 if [[ "$UPDATEREPO" == "1" ]]; then
    UPDATE=-u
    if [[ "$RUNFIREBOT" == "1" ]]; then
-     cd $reponame/bot/Firebot
+     CD_REPO $repo/bot/Firebot master
+     
      git fetch origin &> /dev/null
-     git checkout $BRANCH &> /dev/null
-     git merge origin/$BRANCH &> /dev/null
-     FIREBOTDIR=`pwd`
-     if [[ "$CURDIR" != "$FIREBOTDIR" ]]; then
-        echo "***error: firebot not running in the $FIREBOTDIR"
-        echo "          firebot run aborted"
-        exit
-     fi
+     git merge origin/master &> /dev/null
      cd $CURDIR
   fi
 fi
@@ -185,11 +203,10 @@ if [[ "$CLEANREPO" == "1" ]]; then
 fi
 BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
-reponame="-r $reponame"
 if [ "$RUNFIREBOT" == "1" ] ; then
   touch $firebot_pid
-  ./$botscript -p $firebot_pid $UPDATE $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $BRANCH $QUEUE $SKIPMATLAB $SKIPFIGURES $reponame $EMAIL "$@"
+  ./$botscript -p $firebot_pid $UPDATE $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $BRANCH $QUEUE $SKIPMATLAB $SKIPFIGURES $EMAIL "$@"
 else
-  echo ./$botscript $FIREBOT_LITE $UPDATE $USEINSTALL $UPLOADGUIDES $CLEAN $BRANCH $QUEUE $SKIPMATLAB $SKIPFIGURES $reponame $EMAIL "$@"
+  echo ./$botscript $FIREBOT_LITE $UPDATE $USEINSTALL $UPLOADGUIDES $CLEAN $BRANCH $QUEUE $SKIPMATLAB $SKIPFIGURES $EMAIL "$@"
 fi
 rm $firebot_pid

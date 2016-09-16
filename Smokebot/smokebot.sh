@@ -25,7 +25,6 @@ SMOKEBOT_LITE=
 WEBBRANCH=nist-pages
 
 # define repo names (default)
-fdsrepo=~/FDS-SMVgitclean
 
 SMOKEBOT_QUEUE=smokebot
 MAKEMOVIES=
@@ -81,9 +80,6 @@ case $OPTION in
   q)
    SMOKEBOT_QUEUE="$OPTARG"
    ;;
-  r)
-   fdsrepo="$OPTARG"
-   ;;
   s)
    RUNDEBUG="0"
    ;;
@@ -106,6 +102,59 @@ case $OPTION in
 esac
 done
 shift $(($OPTIND-1))
+
+CHK_REPO ()
+{
+  repodir=$1
+  if [ ! -e $repodir ]; then
+     echo "***error: the repo directory $repodir does not exist."
+     echo "          Aborting firebot."
+     exit
+  fi
+}
+
+CD_REPO ()
+{
+  repodir=$1
+  branch=$2
+  CHK_REPO $repodir
+
+  cd $repodir
+  if [ "$branch" != "" ]; then
+     CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
+     if [ "$CURRENT_BRANCH" != "$branch" ]; then
+       echo "***error: was expecting branch $branch in repo $repodir."
+       echo "Found branch $CURRENT_BRANCH. Aborting firebot."
+       exit
+     fi
+  fi
+}
+
+if [ -e .smv_git ]; then
+  cd ../..
+  repo=`pwd`
+  cd $SMOKEBOT_RUNDIR
+else
+  echo "***error: smokebot not running in the bot/Smokebot directory"
+  echo "          Aborting smokebot"
+  exit
+fi
+
+# make sure repos needed by smokebot exist
+
+botrepo=$repo/bot
+CHK_REPO $botrepo
+
+cfastrepo=$repo/cfast
+CHK_REPO $cfastrepo
+
+fdsrepo=$repo/fds
+CHK_REPO $fdsrepo
+
+smvrepo=$repo/smv
+CHK_REPO $smvrepo
+
+# save pid if -k option (kill smokebot) is used lateer
 
 echo $$ > $PID_FILE
 
@@ -168,10 +217,10 @@ fi
 export platform
 
 echo ""
-echo "Summary"
-echo "-------"
+echo "Settings"
+echo "--------"
 echo "   Run dir: $SMOKEBOT_RUNDIR"
-echo "  Repo dir: $fdsrepo"
+echo "  Repo dir: $repo"
 if [ ! "$web_DIR" == "" ]; then
 echo "   web dir: $web_DIR"
 fi
@@ -182,23 +231,18 @@ echo ""
 
 cd
 
-export fdsrepo
+export SMV_SUMMARY="$smvrepo/Manuals/SMV_Summary"
+WEBFROMDIR="$smvrepo/Manuals/SMV_Summary"
 
-cfastrepo=$fdsrepo/cfast
-export cfastrepo
-
-export SMV_SUMMARY="$fdsrepo/smv/Manuals/SMV_Summary"
-WEBFROMDIR="$fdsrepo/smv/Manuals/SMV_Summary"
-
-SMV_VG_GUIDE=$fdsrepo/smv/Manuals/SMV_Verification_Guide/SMV_Verification_Guide.pdf
-SMV_UG_GUIDE=$fdsrepo/smv/Manuals/SMV_User_Guide/SMV_User_Guide.pdf
-GEOM_NOTES=$fdsrepo/smv/Manuals/FDS_User_Guide/geom_notes.pdf
-UploadGuides=$fdsrepo/bot/Smokebot/smv_guides2GD.sh
+SMV_VG_GUIDE=$smvrepo/Manuals/SMV_Verification_Guide/SMV_Verification_Guide.pdf
+SMV_UG_GUIDE=$smvrepo/Manuals/SMV_User_Guide/SMV_User_Guide.pdf
+GEOM_NOTES=$smvrepo/Manuals/FDS_User_Guide/geom_notes.pdf
+UploadGuides=$botrepo/Smokebot/smv_guides2GD.sh
 
 THIS_FDS_AUTHOR=
 THIS_FDS_FAILED=0
 THIS_CFAST_FAILED=0
-FDS_STATUS_FILE=$fdsrepo/smv/FDS_status
+FDS_STATUS_FILE=$smvrepo/FDS_status
 LAST_FDS_FAILED=0
 if [ -e $FDS_STATUS_FILE ] ; then
   LAST_FDS_FAILED=`cat $FDS_STATUS_FILE`
@@ -237,8 +281,8 @@ run_auto()
 {
   option=$1
   GIT_STATUSDIR=~/.smokebot
-  SMV_SOURCE=$fdsrepo/smv/Source
-  TRIGGER_DIR=$fdsrepo/smv/Source/scripts
+  SMV_SOURCE=$smvrepo/Source
+  TRIGGER_DIR=$smvrepo/Source/scripts
   GIT_SMV_FILE=$GIT_STATUSDIR/smv_revision
   GIT_SMV_LOG=$GIT_STATUSDIR/smv_log
   
@@ -248,7 +292,7 @@ run_auto()
   TRIGGER=$SMV_SOURCE/smokebot_trigger.txt
   GIT_T_FILE=$GIT_STATUSDIR/trigger_revision
 
-  FDS_SOURCE=$fdsrepo/fds/Source
+  FDS_SOURCE=$fdsrepo/Source
   GIT_FDS_FILE=$GIT_STATUSDIR/fds_revision
   GIT_FDS_LOG=$GIT_STATUSDIR/FDS_log
 
@@ -395,10 +439,10 @@ check_time_limit()
 
 set_files_world_readable()
 {
-   cd $fdsrepo/smv
+   CD_REPO $smvrepo
    chmod -R go+r *
 
-   cd $fdsrepo/fds
+   CD_REPO $fdsrepo
    chmod -R go+r *
 }
 
@@ -406,7 +450,8 @@ clean_repo()
 {
   curdir=`pwd`
   dir=$1
-  cd $dir
+
+  CD_REPO $dir
   git clean -dxf &> /dev/null
   git add . &> /dev/null
   git reset --hard HEAD &> /dev/null
@@ -470,27 +515,27 @@ compile_cfast()
 
 clean_repo2()
 {
-   repo=$1
+   repodir=$1
    # Check to see if FDS repository exists
    updateclean=
-   if [ -e "$fdsrepo" ]
+   if [ -e "$repo" ]
    then
       if [ "$CLEANREPO" == "1" ]; then
-        cd $fdsrepo/$repo
+        cd $repo/$repodir
         IS_DIRTY=`git describe --long --dirty | grep dirty | wc -l`
         if [ "$IS_DIRTY" == "1" ]; then
-          echo "The repo $fdsrepo/$repo has uncommitted changes."
+          echo "The repo $repo/$repodir has uncommitted changes."
           echo "Commit or revert these changes or re-run"
           echo "smokebot without the -c (clean) option"
           exit
         fi
-        echo "   $repo"
-        clean_repo $fdsrepo/$repo
+        echo "   $repodir"
+        clean_repo $repo/$repodir
 
         updateclean="1"
       fi
    else
-      echo "The repo directory $fdsrepo does not exist." >> $OUTPUT_DIR/stage0 2>&1
+      echo "The repo directory $repo does not exist." >> $OUTPUT_DIR/stage0 2>&1
       echo "Aborting smokebot" >> $OUTPUT_DIR/stage0 2>&1
       exit
    fi
@@ -498,36 +543,22 @@ clean_repo2()
 
 update_repo()
 {
-   repo=$1
+   reponame=$1
    
-   cd $fdsrepo/$repo
-   CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
-   if [[ "$BRANCH" != "" ]] ; then
-     if [[ `git branch | grep $BRANCH` == "" ]] ; then 
-        echo "Error: the branch $BRANCH does not exist."
-        echo "Aborting smokebot"
-        exit
-     fi
-     if [[ "$BRANCH" != "$CURRENT_BRANCH" ]] ; then
-        echo "Checking out branch $BRANCH." >> $OUTPUT_DIR/stage0 2>&1
-        git checkout $BRANCH
-     fi
-   else
-      BRANCH=$CURRENT_BRANCH
-   fi
-
-   if [[ "$repo" == "smv" ]]; then
+   CD_REPO $repo/$reponame $BRANCH
+   
+   if [[ "$reponame" == "smv" ]]; then
       GIT_REVISION=`git describe --long --dirty`
       GIT_SHORTHASH=`git rev-parse --short HEAD`
       GIT_LONGHASH=`git rev-parse HEAD`
       GIT_DATE=`git log -1 --format=%cd --date=local $GIT_SHORTHASH`
    fi
 
-   cd $fdsrepo/$repo
-   echo "   $repo"
+   cd $repo/$reponame
+   echo "   $reponame"
    IS_DIRTY=`git describe --long --dirty | grep dirty | wc -l`
    if [ "$IS_DIRTY" == "1" ]; then
-     echo "The repo $fdsrepo/$repo has uncommitted changes."
+     echo "The repo $repo/$repo has uncommitted changes."
      echo "Commit or revert these changes or re-run"
      echo "smokebot without the -u (update) option"
      exit
@@ -544,7 +575,7 @@ update_repo()
 
 check_FDS_checkout()
 {
-   cd $fdsrepo/smv
+   cd $smvrepo
    # Check for GIT errors
    stage0_success=true
 }
@@ -557,7 +588,7 @@ compile_fds_mpi_db()
 {
    # Clean and compile mpi FDS debug
    echo "   debug FDS"
-   cd $fdsrepo/fds/Build/mpi_${COMPILER}_${platform}${size}$IB$DB
+   cd $fdsrepo/Build/mpi_${COMPILER}_${platform}${size}$IB$DB
    rm -f fds_mpi_${COMPILER}_${platform}${size}$IB$DB
    make --makefile ../makefile clean &> /dev/null
    ./make_fds.sh &> $OUTPUT_DIR/stage1b
@@ -566,7 +597,7 @@ compile_fds_mpi_db()
 check_compile_fds_mpi_db()
 {
    # Check for errors in FDS debug compilation
-   cd $fdsrepo/fds/Build/mpi_${COMPILER}_${platform}${size}$IB$DB
+   cd $fdsrepo/Build/mpi_${COMPILER}_${platform}${size}$IB$DB
    if [ -e "fds_mpi_${COMPILER}_${platform}${size}$IB$DB" ]
    then
       stage1b_fdsdb_success=true
@@ -630,8 +661,8 @@ run_verification_cases_debug()
    if [ "$CLEANREPO" == "1" ]; then
      echo "Verification cases"
      echo "   cleaning"
-     cd $fdsrepo/smv/Verification
-     clean_repo $fdsrepo/smv/Verification
+     cd $smvrepo/Verification
+     clean_repo $smvrepo/Verification
    fi
 
    #  =====================
@@ -639,7 +670,7 @@ run_verification_cases_debug()
    #  =====================
 
    echo "   running (debug mode)"
-   cd $fdsrepo/smv/Verification/scripts
+   cd $smvrepo/Verification/scripts
 
    # Submit SMV verification cases and wait for them to start
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3a 2>&1
@@ -652,7 +683,7 @@ check_verification_cases_debug()
    wait_verification_cases_debug_end
 
    # Scan and report any errors in FDS verification cases
-   cd $fdsrepo/smv/Verification
+   cd $smvrepo/Verification
 
    if [[ `grep -rIi 'Run aborted' $OUTPUT_DIR/stage3a` == "" ]] && \
       [[ `grep -rIi 'Segmentation' Visualization/* WUI/* Immersed_Boundary_Method/*` == "" ]] && \
@@ -691,7 +722,7 @@ compile_fds_mpi()
 {
    # Clean and compile FDS
    echo "Building release FDS"
-   cd $fdsrepo/fds/Build/mpi_${COMPILER}_${platform}${size}$IB
+   cd $fdsrepo/Build/mpi_${COMPILER}_${platform}${size}$IB
    rm -f fds_mpi_${COMPILER}_${platform}${size}$IB
    make --makefile ../makefile clean &> /dev/null
    ./make_fds.sh &> $OUTPUT_DIR/stage1c
@@ -700,7 +731,7 @@ compile_fds_mpi()
 check_compile_fds_mpi()
 {
    # Check for errors in FDS compilation
-   cd $fdsrepo/fds/Build/mpi_${COMPILER}_${platform}${size}$IB
+   cd $fdsrepo/Build/mpi_${COMPILER}_${platform}${size}$IB
    if [ -e "fds_mpi_${COMPILER}_${platform}${size}$IB" ]
    then
       stage1c_fdsrel_success=true
@@ -735,13 +766,13 @@ compile_smv_utilities()
    if [ "$haveCC" == "1" ] ; then
    # smokeview libraries
      echo "      libraries"
-     cd $fdsrepo/smv/Build/LIBS/${COMPILER}_${platform}${size}
+     cd $smvrepo/Build/LIBS/${COMPILER}_${platform}${size}
      echo 'Building Smokeview libraries:' >> $OUTPUT_DIR/stage2a 2>&1
      ./makelibs.sh >> $OUTPUT_DIR/stage2a 2>&1
 
    # smokezip:
      echo "      smokezip"
-     cd $fdsrepo/smv/Build/smokezip/${COMPILER}_${platform}${size}
+     cd $smvrepo/Build/smokezip/${COMPILER}_${platform}${size}
      rm -f *.o smokezip_${platform}${size}
      echo 'Compiling smokezip:' >> $OUTPUT_DIR/stage2a 2>&1
      ./make_smokezip.sh >> $OUTPUT_DIR/stage2a 2>&1
@@ -749,7 +780,7 @@ compile_smv_utilities()
    
    # smokediff:
      echo "      smokediff"
-     cd $fdsrepo/smv/Build/smokediff/${COMPILER}_${platform}${size}
+     cd $smvrepo/Build/smokediff/${COMPILER}_${platform}${size}
      rm -f *.o smokediff_${platform}${size}
      echo 'Compiling smokediff:' >> $OUTPUT_DIR/stage2a 2>&1
      ./make_smokediff.sh >> $OUTPUT_DIR/stage2a 2>&1
@@ -757,14 +788,14 @@ compile_smv_utilities()
    
    # background
      echo "      background"
-     cd $fdsrepo/smv/Build/background/${COMPILER}_${platform}${size}
+     cd $smvrepo/Build/background/${COMPILER}_${platform}${size}
      rm -f *.o background
      echo 'Compiling background:' >> $OUTPUT_DIR/stage2a 2>&1
      ./make_background.sh >> $OUTPUT_DIR/stage2a 2>&1
    
   # wind2fds:
      echo "      wind2fds"
-     cd $fdsrepo/smv/Build/wind2fds/${COMPILER}_${platform}${size}
+     cd $smvrepo/Build/wind2fds/${COMPILER}_${platform}${size}
      rm -f *.o wind2fds_${platform}${size}
      echo 'Compiling wind2fds:' >> $OUTPUT_DIR/stage2a 2>&1
      ./make_wind2fds.sh >> $OUTPUT_DIR/stage2a 2>&1
@@ -788,11 +819,11 @@ check_smv_utilities()
 {
    if [ "$haveCC" == "1" ] ; then
      # Check for errors in SMV utilities compilation
-     cd $fdsrepo/smv
-     if [ -e "$fdsrepo/smv/Build/smokezip/${COMPILER}_${platform}${size}/smokezip_${platform}${size}" ]  && \
-        [ -e "$fdsrepo/smv/Build/smokediff/${COMPILER}_${platform}${size}/smokediff_${platform}${size}" ]  && \
-        [ -e "$fdsrepo/smv/Build/wind2fds/${COMPILER}_${platform}${size}/wind2fds_${platform}${size}" ]  && \
-        [ -e "$fdsrepo/smv/Build/background/${COMPILER}_${platform}${size}/background" ]
+     cd $smvrepo
+     if [ -e "$smvrepo/Build/smokezip/${COMPILER}_${platform}${size}/smokezip_${platform}${size}" ]  && \
+        [ -e "$smvrepo/Build/smokediff/${COMPILER}_${platform}${size}/smokediff_${platform}${size}" ]  && \
+        [ -e "$smvrepo/Build/wind2fds/${COMPILER}_${platform}${size}/wind2fds_${platform}${size}" ]  && \
+        [ -e "$smvrepo/Build/background/${COMPILER}_${platform}${size}/background" ]
      then
         stage2a_success="1"
      else
@@ -854,12 +885,12 @@ run_verification_cases_release()
    echo "Verification cases"
    if [ "$CLEANREPO" == "1" ]; then
      echo "   cleaning"
-     cd $fdsrepo/smv/Verification
-     clean_repo $fdsrepo/smv/Verification
+     cd $smvrepo/Verification
+     clean_repo $smvrepo/Verification
    fi
    echo "   running (release mode)"
    # Start running all SMV verification cases
-   cd $fdsrepo/smv/Verification/scripts
+   cd $smvrepo/Verification/scripts
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3b 2>&1
    ./Run_SMV_Cases.sh -c $cfastrepo -I $COMPILER $USEINSTALL2 $RUN_OPENMP -q $SMOKEBOT_QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage3b 2>&1
 }
@@ -870,7 +901,7 @@ check_verification_cases_release()
    wait_verification_cases_release_end
 
    # Scan and report any errors in FDS verification cases
-   cd $fdsrepo/smv/Verification
+   cd $smvrepo/Verification
 
    if [[ `grep -rIi 'Run aborted' $OUTPUT_DIR/stage3b` == "" ]] && \
       [[ `grep -rIi 'Segmentation' Visualization/* WUI/* Immersed_Boundary_Method/* ` == "" ]] && \
@@ -913,7 +944,7 @@ compile_smv_db()
    # Clean and compile SMV debug
      echo "   smokeview"
      echo "      debug"
-     cd $fdsrepo/smv/Build/smokeview/${COMPILER}_${platform}${size}
+     cd $smvrepo/Build/smokeview/${COMPILER}_${platform}${size}
      rm -f smokeview_${platform}${TEST}${size}_db
      ./make_smv_db.sh $TESTFLAG &> $OUTPUT_DIR/stage2b
    fi
@@ -923,7 +954,7 @@ check_compile_smv_db()
 {
    if [ "$haveCC" == "1" ] ; then
    # Check for errors in SMV debug compilation
-   cd $fdsrepo/smv/Build/smokeview/${COMPILER}_${platform}${size}
+   cd $smvrepo/Build/smokeview/${COMPILER}_${platform}${size}
    if [ -e "smokeview_${platform}${TEST}${size}_db" ]
    then
       stage2b_success=true
@@ -955,7 +986,7 @@ make_smv_pictures_db()
 {
    # Run Make SMV Pictures script (debug mode)
    echo "making smokeview images"
-   cd $fdsrepo/smv/Verification/scripts
+   cd $smvrepo/Verification/scripts
    ./Make_SMV_Pictures.sh $USEINSTALL -d 2>&1 &> $OUTPUT_DIR/stage4a_orig
    grep -v FreeFontPath $OUTPUT_DIR/stage4a_orig > $OUTPUT_DIR/stage4a
 }
@@ -998,7 +1029,7 @@ compile_smv()
    if [ "$haveCC" == "1" ] ; then
    # Clean and compile SMV
      echo "      release"
-     cd $fdsrepo/smv/Build/smokeview/${COMPILER}_${platform}${size}
+     cd $smvrepo/Build/smokeview/${COMPILER}_${platform}${size}
      rm -f smokeview_${platform}${TEST}${size}
      ./make_smv.sh $TESTFLAG &> $OUTPUT_DIR/stage2c
    fi
@@ -1008,7 +1039,7 @@ check_compile_smv()
 {
    if [ "$haveCC" == "1" ] ; then
    # Check for errors in SMV release compilation
-   cd $fdsrepo/smv/Build/smokeview/${COMPILER}_${platform}${size}
+   cd $smvrepo/Build/smokeview/${COMPILER}_${platform}${size}
    if [ -e "smokeview_${platform}${TEST}${size}" ]
    then
       stage2c_smv_success=true
@@ -1041,7 +1072,7 @@ make_smv_pictures()
 {
    # Run Make SMV Pictures script (release mode)
    echo Generating images 
-   cd $fdsrepo/smv/Verification/scripts
+   cd $smvrepo/Verification/scripts
    ./Make_SMV_Pictures.sh $TESTFLAG $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4b_orig
    grep -v FreeFontPath $OUTPUT_DIR/stage4b_orig &> $OUTPUT_DIR/stage4b
 }
@@ -1082,7 +1113,7 @@ check_smv_pictures()
 
 make_smv_movies()
 {
-   cd $fdsrepo/smv/Verification
+   cd $smvrepo/Verification
    scripts/Make_SMV_Movies.sh $TEST 2>&1  &> $OUTPUT_DIR/stage4c
 }
 
@@ -1133,18 +1164,18 @@ generate_timing_stats()
 {
    echo "Timing stats"
    echo "   generating"
-   cd $fdsrepo/smv/Verification/scripts/
-   export QFDS="$fdsrepo/smv/Verification/scripts/copyout.sh"
-   export RUNCFAST="$fdsrepo/smv/Verification/scripts/copyout.sh"
-   export RUNTFDS="$fdsrepo/smv/Verification/scripts/copyout.sh"
+   cd $smvrepo/Verification/scripts/
+   export QFDS="$smvrepo/Verification/scripts/copyout.sh"
+   export RUNCFAST="$smvrepo/Verification/scripts/copyout.sh"
+   export RUNTFDS="$smvrepo/Verification/scripts/copyout.sh"
 
-   cd $fdsrepo/smv/Verification
+   cd $smvrepo/Verification
    scripts/SMV_Cases.sh
    scripts/GEOM_Cases.sh
 
-   cd $fdsrepo/smv/Utilities/Scripts
+   cd $smvrepo/Utilities/Scripts
    ./fds_timing_stats.sh smokebot > smv_timing_stats.csv
-   cd $fdsrepo/smv/Utilities/Scripts
+   cd $smvrepo/Utilities/Scripts
    ./fds_timing_stats.sh smokebot 1 > smv_benchmarktiming_stats.csv
    TOTAL_SMV_TIMES=`tail -1 smv_benchmarktiming_stats.csv`
 }
@@ -1152,18 +1183,18 @@ generate_timing_stats()
 archive_timing_stats()
 {
   echo "   archiving"
-  cd $fdsrepo/smv/Utilities/Scripts
+  cd $smvrepo/Utilities/Scripts
   cp smv_timing_stats.csv "$HISTORY_DIR/${GIT_REVISION}_timing.csv"
   cp smv_benchmarktiming_stats.csv "$HISTORY_DIR/${GIT_REVISION}_benchmarktiming.csv"
   TOTAL_SMV_TIMES=`tail -1 smv_benchmarktiming_stats.csv`
   if [ "$UPLOADRESULTS" == "1" ]; then
      if [ "$USER" == "smokebot" ]; then
-      cd $fdsrepo/bot/Smokebot
-      ./smvstatus_updatepub.sh $fdsrepo/web $WEBBRANCH
+      cd $botrepo/Smokebot
+      ./smvstatus_updatepub.sh $repo/web $WEBBRANCH
     fi
   fi
   if [ ! "$web_DIR" == "" ]; then
-    cd $fdsrepo/bot/Smokebot
+    cd $botrepo/Smokebot
     ./make_smv_summary.sh > $web_DIR/index.html
   fi
 }
@@ -1286,8 +1317,10 @@ email_build_status()
    stop_time=`date`
    echo "----------------------------------------------" > $TIME_LOG
    echo "             host: $hostname " >> $TIME_LOG
-   echo "            start: $start_time " >> $TIME_LOG
-   echo "             stop: $stop_time " >> $TIME_LOG
+   echo "               OS: $platform2" >> $TIME_LOG
+   echo "             repo: $repo" >> $TIME_LOG
+   echo "       start time: $start_time " >> $TIME_LOG
+   echo "        stop time: $stop_time " >> $TIME_LOG
    echo "            setup: $DIFF_PRELIM" >> $TIME_LOG
    echo "   build software: $DIFF_BUILDSOFTWARE" >> $TIME_LOG
    echo "        run cases: $DIFF_RUNCASES" >> $TIME_LOG
@@ -1346,7 +1379,7 @@ fi
 # upload guides to a google drive directory
       if [ "$UPLOADRESULTS" == "1" ];then
         cd $SMOKEBOT_RUNDIR
-        $UploadGuides $NEWGUIDE_DIR $fdsrepo/smv/Manuals &> /dev/null
+        $UploadGuides $NEWGUIDE_DIR $smvrepo/Manuals &> /dev/null
       fi
 
       # Send success message with links to nightly manuals
@@ -1489,13 +1522,13 @@ if [ "$SMOKEBOT_LITE" == "" ]; then
   if [[ $stage1c_fdsrel_success && $stage4b_smvpics_success ]] ; then
      echo Making guides
 #   echo "   geometry notes"
-#  make_guide geom_notes $fdsrepo/Manuals/FDS_User_Guide 'geometry notes'
+#  make_guide geom_notes $repo/Manuals/FDS_User_Guide 'geometry notes'
      echo "   user"
-    make_guide SMV_User_Guide $fdsrepo/smv/Manuals/SMV_User_Guide 'SMV User Guide'
+    make_guide SMV_User_Guide $smvrepo/Manuals/SMV_User_Guide 'SMV User Guide'
      echo "   technical"
-    make_guide SMV_Technical_Reference_Guide $fdsrepo/smv/Manuals/SMV_Technical_Reference_Guide 'SMV Technical Reference Guide'
+    make_guide SMV_Technical_Reference_Guide $smvrepo/Manuals/SMV_Technical_Reference_Guide 'SMV Technical Reference Guide'
      echo "   verification"
-    make_guide SMV_Verification_Guide $fdsrepo/smv/Manuals/SMV_Verification_Guide 'SMV Verification Guide'
+    make_guide SMV_Verification_Guide $smvrepo/Manuals/SMV_Verification_Guide 'SMV Verification Guide'
   else
     echo Errors found, not building guides
   fi

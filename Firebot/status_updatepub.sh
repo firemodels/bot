@@ -56,8 +56,9 @@ git fetch origin
 git merge origin/$WEBBRANCH
 
 cp $newpage firebot_status.html
-git add firebot_status.html
 
-git commit -m "firebot: update firebot status page `date`"
-# disable pusing  until we are sure it is working
+# disable pushing  until we are sure it is working
+#git add firebot_status.html
+#git commit -m "firebot: update firebot status page `date`"
+
 #git push origin $WEBBRANCH

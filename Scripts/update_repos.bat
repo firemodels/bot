@@ -5,7 +5,7 @@ set CURDIR=%CD%
 
 if not exist ..\.gitbot goto skip1
    cd ..\..
-   set FMROOT=%CD%
+   set repo=%CD%
    cd %CURDIR%
    goto endif1
 :skip1
@@ -18,25 +18,28 @@ if %stopscript% == 1 (
   exit /b
 )
 
-cd %FMROOT%\bot
+cd %repo%\bot
 set allrepos=bot cfast cor exp fds out radcal smv
+set webrepos=webpages wikis
 set BRANCH=master
 set PUSH=0
 
-set wc=%FMROOT%\bot\Scripts\wc
-set grep=%FMROOT%\bot\Scripts\grep
-set gawk=%FMROOT%\bot\Scripts\gawk
+set wc=%repo%\bot\Scripts\wc
+set grep=%repo%\bot\Scripts\grep
+set gawk=%repo%\bot\Scripts\gawk
 
 for %%x in ( %allrepos% ) do ( call :update_repo %%x )
+
+for %%x in ( %webrepos% ) do ( call :update_repo2 %%x )
 
 cd %CURDIR%
 
 goto eof
 
 :update_repo
-  set repo=%1
+  set reponame=%1
   echo.
-  set repodir=%FMROOT%\%repo%
+  set repodir=%repo%\%reponame%
   echo -----------------------------------------------------------
   if not exist %repodir% (
      echo %repo% does not exist, not updating
@@ -50,14 +53,16 @@ goto eof
      echo update skipped
      exit /b
   )
-  echo updating %repo%/%BRANCH% from origin
+  echo updating repo:%repo%\%reponame%
+  echo          branch:%BRANCH% from origin
   git fetch origin
   git merge origin/%BRANCH%
   git remote -v | %gawk% "{print $1}" | %grep% firemodels | %wc%  -l> %CURDIR%\have_central.out
   set /p have_central=<%CURDIR%\have_central.out
 
   if %have_central% GTR 0 (
-     echo updating %repo%/%BRANCH% from firemodels
+     echo updating repo:%repo%\%reponame%
+     echo          branch:%BRANCH% from origin
      git fetch firemodels
      git merge firemodels/%BRANCH%
      if "%PUSH%" == "1" (
@@ -65,6 +70,24 @@ goto eof
         git push origin %BRANCH%
      )
   )
+  exit /b
+
+:update_repo2
+  set reponame=%1
+  echo.
+  set repodir=%repo%\%reponame%
+  if not exist %repodir% (
+     exit /b
+  )   
+  echo -----------------------------------------------------------
+  cd %repodir%
+  git rev-parse --abbrev-ref HEAD | head -1> %CURDIR%\gitbranch.out
+  set /p BRANCH=<%CURDIR%\gitbranch.out
+  
+  echo updating repo:%repo%\%reponame%
+  echo          branch:%BRANCH% from origin
+  git fetch origin
+  git merge origin/%BRANCH%
   exit /b
 
 goto eof

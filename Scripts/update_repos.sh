@@ -1,6 +1,7 @@
 #!/bin/bash
 CUR=`pwd`
 allrepos="bot cfast cor exp fds out radcal smv"
+otherrepos="webpages wikis"
 BRANCH=master
 PUSH=
 
@@ -40,21 +41,20 @@ echo ""
 echo "Press any key to continue or <CTRL> c to abort."
 read val
 
-for repo in $allrepos
-do 
-  echo
-  repodir=$FMROOT/$repo
+UPDATE_REPO ()
+{
+  repodir=$1
+
   echo "---------------------------------------------------------------"
   if [ ! -e $repodir ]; then
-     echo "$repo does not exist, not updating"
-     continue;
+     echo "Skipping, $repo does not exist"
+     exit
   fi
   cd $repodir
   CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
   if [ "$BRANCH" != "$CURRENT_BRANCH" ]; then
-    echo $BRANCH branch not checked out in $repo
-    echo update skipped
-    continue;
+    echo "Skipping, found branch $CURRENT_BRANCH, expecting branch $BRANCH"
+    exit
   fi
   echo "updating $repo from origin"
   git fetch origin
@@ -69,7 +69,35 @@ do
          git push origin $BRANCH
      fi
    fi
+}
+
+UPDATE_REPO2 ()
+{
+  repodir=$1
+
+  if [ ! -e $repodir ]; then
+     exit
+  fi
+  echo "---------------------------------------------------------------"
+  cd $repodir
+  BRANCH=`git rev-parse --abbrev-ref HEAD`
+  echo "updating $repo from origin"
+  git fetch origin
+  git merge origin/$BRANCH
+}
+
+for repo in $allrepos
+do 
+  echo
+  repodir=$FMROOT/$repo
+  UPDATE_REPO $repodir
 done
-echo
-echo repo updating complete
+
+for repo in $otherrepos
+do 
+  echo
+  repodir=$FMROOT/$repo
+  UPDATE_REPO2 $repodir
+done
+
 cd $CURDIR
