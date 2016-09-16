@@ -2,6 +2,33 @@
 WEBREPO=$1
 WEBBRANCH=$2
 
+CHK_REPO ()
+{
+  repodir=$1
+  if [ ! -e $repodir ]; then
+     echo "***error: the repo directory $repodir does not exist."
+     echo "          Aborting firebot."
+     exit
+  fi
+}
+
+CD_REPO ()
+{
+  repodir=$1
+  branch=$2
+  CHK_REPO $repodir
+
+  cd $repodir
+  if [ "$branch" != "" ]; then
+     CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
+     if [ "$CURRENT_BRANCH" != "$branch" ]; then
+       echo "***error: was expecting branch $branch in repo $repodir."
+       echo "Found branch $CURRENT_BRANCH. Aborting firebot."
+       exit
+     fi
+  fi
+}
+
 oldpage=~/.smokebot/oldpage
 newpage=~/.smokebot/newpage
 olddata=~/.smokebot/old_data
@@ -11,6 +38,7 @@ curdir=`pwd`
 EXIT="yes"
 
 # don't update status page if smokebot is running
+
 if [ -e $running ] ; then
    exit
 fi
@@ -49,21 +77,15 @@ fi
 if [ "$USER" != "smokebot" ]; then
    exit
 fi
-if [ ! -e $WEBREPO ]; then
-   exit
-fi
-CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
-if [ "$CURRENT_BRANCH" != "$WEBBRANCH" ];  then
-   exit
-fi
-cd $WEBREPO
 
-git fetch origin
-git merge origin/$WEBBRANCH
+CD_REPO $WEBREPO $WEBBRANCH
 
-cp $newpage smokebot_status.html
+# disable status web page update we are sure it is working
 
-#disable pushing until we are sure it  is working
+#git fetch origin
+#git merge origin/$WEBBRANCH
+
+#cp $newpage smokebot_status.html
 
 #git add smokebot_status.html
 #git commit -m "smokebot: update smokebot status page `date`"
