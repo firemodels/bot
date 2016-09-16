@@ -187,11 +187,11 @@ echo. 1> %OUTDIR%\stage0.txt 2>&1
 if %clean% == 0 goto skip_clean1
    echo             cleaning
    echo                cfast
-   call :git_clean %cfastrepo%|| exit /b 1
+   call :git_clean %cfastrepo%  || exit /b 1
    echo                fds
-   call :git_clean %fdsrepo%|| exit /b 1
+   call :git_clean %fdsrepo%  || exit /b 1
    echo                smokeview
-   call :git_clean %smvrepo%|| exit /b 1
+   call :git_clean %smvrepo% || exit /b 1
 :skip_clean1
 
 :: updating  repos
@@ -588,7 +588,7 @@ set repobranch=%2
 call :chk_repo %repodir% || exit /b 1
 
 cd %repodir%
-if %repobranch% == "" (
+if "%repobranch%" == "" (
   exit /b 0
 )
 git rev-parse --abbrev-ref HEAD>current_branch.txt
