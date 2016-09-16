@@ -591,7 +591,7 @@ cd %repodir%
 git rev-parse --abbrev-ref HEAD>current_branch.txt
 set /p current_branch=<current_branch.txt
 erase current_branch.txt
-if "%repobranch%" != "%current_branch%" (
+if "%repobranch%" NEQ "%current_branch%" (
   echo ***error: found branch %current_branch% was expecting branch %repobranch%
   echo           smokebot aborted
   cd %curdir_cdrepo%
