@@ -187,11 +187,11 @@ echo. 1> %OUTDIR%\stage0.txt 2>&1
 if %clean% == 0 goto skip_clean1
    echo             cleaning
    echo                cfast
-   call :git_clean %cfastrepo%
+   call :git_clean %cfastrepo%|| exit /b 1
    echo                fds
-   call :git_clean %fdsrepo%
+   call :git_clean %fdsrepo%|| exit /b 1
    echo                smokeview
-   call :git_clean %smvrepo%
+   call :git_clean %smvrepo%|| exit /b 1
 :skip_clean1
 
 :: updating  repos
@@ -588,16 +588,17 @@ set repobranch=%2
 call :chk_repo %repodir% || exit /b 1
 
 cd %repodir%
+if %repobranch% == "" (
+  exit /b 0
+)
 git rev-parse --abbrev-ref HEAD>current_branch.txt
 set /p current_branch=<current_branch.txt
 erase current_branch.txt
 if "%repobranch%" NEQ "%current_branch%" (
   echo ***error: found branch %current_branch% was expecting branch %repobranch%
   echo           smokebot aborted
-  cd %curdir_cdrepo%
   exit /b 1
 )
-cd %curdir_cdrepo%
 exit /b 0
 
 :: -------------------------------------------------------------
@@ -660,12 +661,11 @@ exit /b
 :: -------------------------------------------------------------
 
 set gitcleandir=%1
-cd %gitcleandir%
+call :cd_repo %gitcleandir% || exit /b 1
 git clean -dxf 1>> Nul 2>&1
 git add . 1>> Nul 2>&1
 git reset --hard HEAD 1>> Nul 2>&1
-exit /b
-
+exit /b 0
 
 :: -------------------------------------------------------------
  :build_guide
