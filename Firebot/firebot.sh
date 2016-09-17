@@ -305,22 +305,6 @@ check_compile_fds_mpi_db()
 }
 
 #---------------------------------------------
-#                   wait_cases_debug_start
-#---------------------------------------------
-
-wait_cases_debug_start()
-{
-   # Scans qstat and waits for cases to start
-   while [[ `qstat | awk '{print $3 $5}' | grep $(whoami) | grep Q` != '' ]]; do
-      JOBS_REMAINING=`qstat | awk '{print $3 $5}' | grep $(whoami) | grep Q | wc -l`
-      echo "Waiting for ${JOBS_REMAINING} ${1} cases to start." >> $OUTPUT_DIR/stage4
-      TIME_LIMIT_STAGE="3"
-      check_time_limit
-      sleep 30
-   done
-}
-
-#---------------------------------------------
 #                   wait_cases_debug_end
 #---------------------------------------------
 
@@ -344,25 +328,6 @@ wait_cases_debug_end()
         check_time_limit
         sleep 30
      done
-   fi
-}
-
-#---------------------------------------------
-#                   check_current_utilization
-#---------------------------------------------
-
-check_current_utilization()
-{
-   # This function is used to determine if the number of current processes currently in use is greater than the
-   # number of specified maximum processes. If so, then no more cases are launched (LAUNCH_MORE_CASES=0).
-
-   sleep 60
-
-   # Reports the number of nodes currently in use by current user
-   NUM_CURRENT_PROCESSES=`qstat -u $(whoami) | sed 1,5d | awk '{print $7}' | paste -sd+ | bc`
-
-   if [ "$NUM_CURRENT_PROCESSES" -gt "$MAX_VALIDATION_PROCESSES" ]; then
-      LAUNCH_MORE_CASES=0
    fi
 }
 

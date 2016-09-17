@@ -203,10 +203,12 @@ if [ "$KILL_SMOKEBOT" == "1" ]; then
     kill -9 $(LIST_DESCENDANTS $PID)
     echo "killing smokebot (PID=$PID)"
     kill -9 $PID
-    JOBIDS=`qstat -a | grep SB_ | awk -v user="$USER" '{if($2==user){print $1}}'`
-    if [ "$JOBIDS" != "" ]; then
-      echo killing smokebot jobs with Id: $JOBIDS
-      qdel $JOBIDS
+    if [ "$QUEUE" != "none" ]; then
+      JOBIDS=`qstat -a | grep SB_ | awk -v user="$USER" '{if($2==user){print $1}}'`
+      if [ "$JOBIDS" != "" ]; then
+        echo killing smokebot jobs with Id: $JOBIDS
+        qdel $JOBIDS
+      fi
     fi
     echo smokebot process $PID killed
     if [ -e $smokebot_pid ]; then
