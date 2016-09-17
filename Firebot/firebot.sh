@@ -131,15 +131,16 @@ CHK_REPO ()
   if [ ! -e $repodir ]; then
      echo "***error: the repo directory $repodir does not exist."
      echo "          Aborting firebot."
-     exit
+     return 1
   fi
+  return 0
 }
 
 CD_REPO ()
 {
   local repodir=$1
   local branch=$2
-  CHK_REPO $repodir
+  CHK_REPO $repodir || return 1
 
   cd $repodir
   if [ "$branch" != "" ]; then
@@ -147,9 +148,10 @@ CD_REPO ()
      if [ "$CURRENT_BRANCH" != "$branch" ]; then
        echo "***error: was expecting branch $branch in repo $repodir."
        echo "Found branch $CURRENT_BRANCH. Aborting firebot."
-       exit
+       return 1
      fi
   fi
+  return 0
 }
 
 if [ -e .fds_git ]; then
@@ -165,13 +167,13 @@ fi
 # make sure repos exist
 
 fdsrepo=$repo/fds
-CHK_REPO $fdsrepo
+CHK_REPO $fdsrepo || exit 1
 
 smvrepo=$repo/smv
-CHK_REPO $smvrepo
+CHK_REPO $smvrepo || exit 1
 
 botrepo=$repo/bot
-CHK_REPO $botrepo
+CHK_REPO $botrepo || exit 1
 
 echo $$ > $PID_FILE
 notfound=
@@ -279,12 +281,14 @@ clean_repo()
 {
   local curdir=`pwd`
   local dir=$1
+  local branch=$2
 
-  CD_REPO $dir
+  CD_REPO $dir $branch || return 1
   git clean -dxf &> /dev/null
   git add . &> /dev/null
   git reset --hard HEAD &> /dev/null
   cd $curdir
+  return 0
 }
 
 clean_firebot_metafiles()
@@ -315,14 +319,15 @@ clean_repo2()
    
    # Check to see if FDS repository exists
    if [ -e "$repo" ]; then
-      CD_REPO $repo/$reponame $branch
+      CD_REPO $repo/$reponame $branch || return 1
       echo "   $reponame"
-      clean_repo $repo/$reponame
+      clean_repo $repo/$reponame $branch || return 1
    else
       echo "firebot repo $repo does not exist" >> $OUTPUT_DIR/stage1 2>&1
       echo "firebot run aborted." >> $OUTPUT_DIR/stage1 2>&1
-      exit
+      return 1
    fi
+   return 0
 }
 
 update_repo()
@@ -330,7 +335,7 @@ update_repo()
    local reponame=$1
    local branch=$2
 
-   CD_REPO $repo/$reponame $branch
+   CD_REPO $repo/$reponame $branch || return 1
    
    echo "   $reponame" 
    echo Updating $branch on repo $repo/$reponame >> $OUTPUT_DIR/stage1 2>&1
@@ -356,6 +361,7 @@ update_repo()
       GIT_LONGHASH=`git rev-parse HEAD`
       GIT_DATE=`git log -1 --format=%cd --date=local $GIT_SHORTHASH`
    fi
+   return 0
 }
 
 check_git_checkout()
@@ -1190,18 +1196,18 @@ start_time=`date`
   echo Cleaning
   clean_firebot_metafiles
 if [[ "$CLEANREPO" == "1" ]] ; then
-  clean_repo2 exp master
-  clean_repo2 fds $FDSBRANCH
-  clean_repo2 out master
-  clean_repo2 smv $SMVBRANCH
+  clean_repo2 exp master || exit 1
+  clean_repo2 fds $FDSBRANCH || exit 1
+  clean_repo2 out master || exit 1
+  clean_repo2 smv $SMVBRANCH || exit 1
 fi
 
 if [[ "$UPDATEREPO" == "1" ]] ; then
   echo Updating
-  update_repo exp master
-  update_repo fds $FDSBRANCH
-  update_repo out master
-  update_repo smv $SMVBRANCH
+  update_repo exp master || exit 1
+  update_repo fds $FDSBRANCH || exit 1
+  update_repo out master || exit 1
+  update_repo smv $SMVBRANCH || exit 1
 else
   echo Repos not updated
 fi
@@ -1251,8 +1257,8 @@ if [ "$FIREBOT_LITE" == "" ]; then
 cd $fdsrepo
 if [[ "$CLEANREPO" == "1" ]] ; then
    echo "   cleaning repo"
-   clean_repo $fdsrepo/Verification
-   clean_repo $fdsrepo/Validation
+   clean_repo $fdsrepo/Verification $fdsbranch || exit 1
+   clean_repo $fdsrepo/Validation $fdsbranch || exit 1
 fi
 
 ### Stage 5 ###
