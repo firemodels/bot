@@ -270,6 +270,6 @@ compiler="-I $compiler"
 PID="-p $cfastbot_pid"
 cd $CURDIR
 $ECHO  ./cfastbot.sh $PID $REPO $USEINSTALL $RUNAUTO $compiler $UPDATEREPO $CLEAN $QUEUE $SKIP $MATLABEXE $UPLOAD $EMAIL "$@"
-if [ -e $cfastbot_pid]; then
-   rm $cfastbot_pid
+if [ -e $cfastbot_pid ]; then
+  rm $cfastbot_pid
 fi   
