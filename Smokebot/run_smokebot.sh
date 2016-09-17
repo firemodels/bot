@@ -1,49 +1,11 @@
 #!/bin/bash
-if [ ! -d ~/.fdssmvgit ] ; then
-  mkdir ~/.fdssmvgit
-fi
-smokebot_pid=~/.fdssmvgit/smokebot_pid
 
-CURDIR=`pwd`
-if [ -e .smv_git ]; then
-  cd ../..
-  repo=`pwd`
-  cd $CURDIR
-else
-  echo "***error: smokebot not running in the bot/Smokebot  directory"
-  exit
-fi
+# The Smokebot script is part of an automated continuous integration system.
+# Consult the FDS Config Management Plan for more information.
 
-KILL_SMOKEBOT=
-BRANCH=master
-botscript=smokebot.sh
-RUNAUTO=
-CLEANREPO=
-UPDATEREPO=
-RUNSMOKEBOT=1
-MOVIE=
-UPLOAD=
-FORCE=
-COMPILER=intel
-SMOKEBOT_LITE=
-TESTFLAG=
-
-WEB_URL=
-web_DIR=/var/www/html/`whoami`
-if [ -d $web_DIR ]; then
-  IP=`wget http://ipinfo.io/ip -qO -`
-  HOST=`host $IP | awk '{printf("%s\n",$5);}'`
-  WEB_URL=http://$HOST/`whoami`
-else
-  web_DIR=
-fi
-
-# checking to see if a queing system is available
-QUEUE=smokebot
-notfound=`qstat -a 2>&1 | tail -1 | grep "not found" | wc -l`
-if [ $notfound -eq 1 ] ; then
-  QUEUE=none
-fi
+#---------------------------------------------
+#                   usage
+#---------------------------------------------
 
 function usage {
 echo "Verification and validation testing script for smokeview"
@@ -82,6 +44,10 @@ fi
 exit
 }
 
+#---------------------------------------------
+#                   CHK_REPO
+#---------------------------------------------
+
 CHK_REPO ()
 {
   repodir=$1
@@ -92,6 +58,10 @@ CHK_REPO ()
   fi
   return 0
 }
+
+#---------------------------------------------
+#                   CD_REPO
+#---------------------------------------------
 
 CD_REPO ()
 {
@@ -111,6 +81,10 @@ CD_REPO ()
   return 0
 }
 
+#---------------------------------------------
+#                   LIST_DESCENDANTS
+#---------------------------------------------
+
 LIST_DESCENDANTS ()
 {
   local children=$(ps -o pid= --ppid "$1")
@@ -123,6 +97,56 @@ LIST_DESCENDANTS ()
   echo "$children"
 }
 
+#VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
+#                             Primary script execution =
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+if [ ! -d ~/.fdssmvgit ] ; then
+  mkdir ~/.fdssmvgit
+fi
+smokebot_pid=~/.fdssmvgit/smokebot_pid
+
+CURDIR=`pwd`
+if [ -e .smv_git ]; then
+  cd ../..
+  repo=`pwd`
+  cd $CURDIR
+else
+  echo "***error: smokebot not running in the bot/Smokebot  directory"
+  exit
+fi
+
+KILL_SMOKEBOT=
+BRANCH=master
+botscript=smokebot.sh
+RUNAUTO=
+CLEANREPO=
+UPDATEREPO=
+RUNSMOKEBOT=1
+MOVIE=
+UPLOAD=
+FORCE=
+COMPILER=intel
+SMOKEBOT_LITE=
+TESTFLAG=
+ECHO=
+
+WEB_URL=
+web_DIR=/var/www/html/`whoami`
+if [ -d $web_DIR ]; then
+  IP=`wget http://ipinfo.io/ip -qO -`
+  HOST=`host $IP | awk '{printf("%s\n",$5);}'`
+  WEB_URL=http://$HOST/`whoami`
+else
+  web_DIR=
+fi
+
+# checking to see if a queing system is available
+QUEUE=smokebot
+notfound=`qstat -a 2>&1 | tail -1 | grep "not found" | wc -l`
+if [ $notfound -eq 1 ] ; then
+  QUEUE=none
+fi
 
 while getopts 'aAb:cd:fhI:kLm:Mq:r:tuUvw:W:' OPTION
 do
@@ -176,6 +200,7 @@ case $OPTION  in
    ;;
   v)
    RUNSMOKEBOT=
+   ECHO=echo
    ;;
   w)
    web_DIR="$OPTARG"
@@ -249,12 +274,8 @@ fi
 
 BRANCH="-b $BRANCH"
 
-if [[ "$RUNSMOKEBOT" == "1" ]]; then
-  touch $smokebot_pid
-  ./$botscript $TESTFLAG $RUNAUTO $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
-else
-  echo ./$botscript $TESTFLAG $RUNAUTO $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
-fi
+touch $smokebot_pid
+$ECHO ./$botscript $TESTFLAG $RUNAUTO $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi
