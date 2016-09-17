@@ -77,7 +77,7 @@ is_file_installed()
   local program=$1
   
   prognotfound=`$program -help | tail -1 | grep "not found" | wc -l`
-  if [ "$prognotfound" == "1" ] ; then
+  if [ "$prognotfound" == "1" ]; then
     echo "***error: the program $program is not installed" 
     return 1
   fi
@@ -104,7 +104,7 @@ LIST_DESCENDANTS ()
 #                             Primary script execution =
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-if [ ! -d ~/.cfastgit ] ; then
+if [ ! -d ~/.cfastgit ]; then
   mkdir ~/.cfastgit
 fi
 cfastbot_pid=~/.cfastgit/cfastbot_pid
@@ -114,7 +114,7 @@ CURDIR=`pwd`
 # checking to see if a queing system is available
 QUEUE=smokebot
 notfound=`qstat -a 2>&1 | tail -1 | grep "not found" | wc -l`
-if [ $notfound -eq 1 ] ; then
+if [ $notfound -eq 1 ]; then
   QUEUE=none
 fi
 
@@ -227,7 +227,7 @@ if [ "$USEINSTALL" != "" ]; then
   echo "   found background"
 fi
 
-if [ -e $cfastbot_pid ] ; then
+if [ -e $cfastbot_pid ]; then
   if [ "$FORCE" == "" ]; then
     echo cfastbot is already running. If this is
     echo not the case rerun using the -f option.
@@ -241,7 +241,7 @@ fi
 if [[ "$UPDATEREPO" == "1" ]]; then
    UPDATEREPO=-u
    if [ "$RUNCFASTBOT" == "1" ]; then
-     CD_REPO $botrepo $botbranch
+     CD_REPO $botrepo $botbranch || exit 1
      git fetch origin
      git merge origin/$botbranch
 

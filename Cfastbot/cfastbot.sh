@@ -199,7 +199,7 @@ clean_repo()
   local branch=$2
   
   curdir=`pwd`
-  CD_REPO $REPO $BRANCH || return 1
+  CD_REPO $repo $branch || return 1
   git clean -dxf &> /dev/null
   git add . &> /dev/null
   git reset --hard HEAD &> /dev/null
@@ -216,17 +216,17 @@ clean_repo2()
    local repo=$1
    local branch=$2
 
-   CD_REPO $REPONAME/$REPO || return 1
+   CD_REPO $reponame/$repo || return 1
 
    IS_DIRTY=`git describe --long --dirty | grep dirty | wc -l`
    if [ "$IS_DIRTY" == "1" ]; then
-     echo "The repo $REPONAME/$repo has uncommitted changes."
+     echo "The repo $reponame/$repo has uncommitted changes."
      echo "Commit or revert these changes or re-run"
      echo "cfastbot without the -c (clean) option"
      return 1
    fi
    echo "   $repo"
-   clean_repo $REPONAME/$repo $branch || return 1
+   clean_repo $reponame/$repo $branch || return 1
    return 0
 }
 
@@ -240,7 +240,7 @@ update_repo()
    local branch=$2
    
    
-   CD_REPO $REPONAME/$repo $branch || return 1
+   CD_REPO $reponame/$repo $branch || return 1
 
    if [[ "$repo" == "cfast" ]]; then
       GIT_REVISION=`git describe --long --dirty`
@@ -366,7 +366,7 @@ compile_smv_utilities()
 {
    if [ "$USEINSTALL" == "" ]; then
    # smokeview libraries
-     CD_BRANCH $smvrepo/Build/LIBS/${compiler}_${platform}${size} $smvbranch || return 1
+     CD_REPO $smvrepo/Build/LIBS/${compiler}_${platform}${size} $smvbranch || return 1
      echo 'Building Smokeview libraries' >> $OUTPUT_DIR/stage3a 2>&1
      echo "   smokeview libraries"
      ./makelibs.sh >> $OUTPUT_DIR/stage3a 2>&1
@@ -394,7 +394,7 @@ compile_smv_utilities()
 
 check_smv_utilities()
 {
-   if [ "$USEINSTALL" == "" ] ; then
+   if [ "$USEINSTALL" == "" ]; then
      # Check for errors in SMV utilities compilation
      stage3a_success="1"
      CHK_REPO $smvrepo/Build/background/${compiler}_${platform}${size}/background || return 1
@@ -414,7 +414,7 @@ check_smv_utilities()
      if [ "$QUEUE" == "none" ]; then
        is_file_installed background stage3a
      fi
-     if [ "$stage3asuccess" == "0" ] ; then
+     if [ "$stage3asuccess" == "0" ]; then
         echo "background not installed"
         echo "Errors from Stage 2c - background not installed:" >> $ERROR_LOG
         cat $OUTPUT_DIR/stage3a >> $ERROR_LOG
@@ -1045,7 +1045,7 @@ check_validation_stats()
 
 archive_validation_stats()
 {
-   CD_REPO $cfastrepo/Utilities/Matlab $cfastbranch
+   CD_REPO $cfastrepo/Utilities/Matlab $cfastbranch || return 1
 
    if [ -e ${CURRENT_STATS_FILE} ] ; then
       # Copy to CFASTbot history
@@ -1294,9 +1294,9 @@ MKDIR $GITSTATUS_DIR
 # define repo names (default)
 
 cd ../..
-REPONAME=`pwd`
-cfastrepo=$REPONAME/cfast
-smvrepo=$REPONAME/smv
+reponame=`pwd`
+cfastrepo=$repoanme/cfast
+smvrepo=$reponame/smv
 cd $CFAST_RUNDIR
 
 COMPILER=intel
@@ -1348,8 +1348,8 @@ case $OPTION in
    ;;
   r)
    reponame="$OPTARG"
-   cfastrepo=$REPONAME/cfast
-   smvrepo=$REPONAME/smv
+   cfastrepo=$reponame/cfast
+   smvrepo=$reponame/smv
    ;;
   s)
    SKIP=1
