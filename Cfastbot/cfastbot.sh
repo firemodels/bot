@@ -801,7 +801,7 @@ is_file_installed()
 make_cfast_pictures()
 {
    echo "Generating smokeview images"
-   CD_REPO cd $cfastrepo/Validation/scripts $cfastbranch || return 1
+   CD_REPO $cfastrepo/Validation/scripts $cfastbranch || return 1
    ./Make_CFAST_Pictures.sh -I $COMPILER $USEINSTALL 2>&1 | grep -v FreeFontPath &> $OUTPUT_DIR/stage6
 
    return 0
