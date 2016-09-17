@@ -725,7 +725,7 @@ run_vv_cases_release()
 
    # Wait for all V&V cases to end
    wait_vv_cases_release_end
-   return 1
+   return 0
 }
 
 #---------------------------------------------
