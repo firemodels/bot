@@ -14,7 +14,7 @@ CHK_REPO ()
   
   if [ ! -e $repodir ]; then
      echo "***error: the repo directory $repodir does not exist."
-     echo "          Aborting smokebot."
+     echo "          Aborting cfastbot."
      return 1
   fi
   return 0
@@ -36,7 +36,7 @@ CD_REPO ()
      CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
      if [ "$CURRENT_BRANCH" != "$branch" ]; then
        echo "***error: was expecting branch $branch in repo $repodir."
-       echo "Found branch $CURRENT_BRANCH. Aborting smokebot."
+       echo "Found branch $CURRENT_BRANCH. Aborting cfastbot."
        return 1
      fi
   fi
