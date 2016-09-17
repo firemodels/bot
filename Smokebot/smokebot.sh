@@ -522,9 +522,6 @@ clean_repo2()
 {
    local repodir=$1
    local branch=$2
-   echo repo=$repo
-   echo repodir=$repodir
-   echo branch=$branch
    
    # Check to see if FDS repository exists
    updateclean=
