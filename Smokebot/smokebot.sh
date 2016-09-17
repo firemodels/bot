@@ -109,7 +109,7 @@ shift $(($OPTIND-1))
 
 CHK_REPO ()
 {
-  repodir=$1
+  local repodir=$1
   if [ ! -e $repodir ]; then
      echo "***error: the repo directory $repodir does not exist."
      echo "          Aborting smokebot."
@@ -119,8 +119,8 @@ CHK_REPO ()
 
 CD_REPO ()
 {
-  repodir=$1
-  branch=$2
+  local repodir=$1
+  local branch=$2
   CHK_REPO $repodir
 
   cd $repodir
@@ -283,7 +283,7 @@ TIME_LIMIT_EMAIL_NOTIFICATION="unsent"
 
 run_auto()
 {
-  option=$1
+  local option=$1
   GIT_STATUSDIR=~/.smokebot
   SMV_SOURCE=$smvrepo/Source
   TRIGGER_DIR=$smvrepo/Source/scripts
@@ -392,8 +392,8 @@ GET_TIME(){
 }
 
 GET_DURATION(){
-  time_before=$1
-  time_after=$2
+  local time_before=$1
+  local time_after=$2
   DIFF_TIME=`echo $(($time_after-$time_before))`
   TIME_H=`echo $(($DIFF_TIME / 3600 ))`
   TIME_M=`echo $((($DIFF_TIME % 3600 ) / 60))`
@@ -411,7 +411,7 @@ GET_DURATION(){
 
 MKDIR ()
 {
-  DIR=$1
+  local DIR=$1
   if [ ! -d $DIR ]
   then
     echo Creating directory $DIR
@@ -453,8 +453,8 @@ set_files_world_readable()
 clean_repo()
 {
   curdir=`pwd`
-  dir=$1
-  branch=$2
+  local dir=$1
+  local branch=$2
   
   CD_REPO $dir $branch
   git clean -dxf &> /dev/null
@@ -520,8 +520,8 @@ compile_cfast()
 
 clean_repo2()
 {
-   repodir=$1
-   branch=$2
+   local repodir=$1
+   local branch=$2
    echo repo=$repo
    echo repodir=$repodir
    echo branch=$branch
@@ -553,8 +553,8 @@ clean_repo2()
 
 update_repo()
 {
-   reponame=$1
-   branch=$2
+   local reponame=$1
+   local branch=$2
    
    CD_REPO $repo/$reponame $branch
    
