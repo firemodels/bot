@@ -22,14 +22,17 @@ NEWGUIDE_DIR=$OUTPUT_DIR/Newest_Guides
 web_DIR=
 WEB_URL=
 SMOKEBOT_LITE=
+
 WEBBRANCH=nist-pages
+FDSBRANCH=master
+SMVBRANCH=master
+BRANCH=master
 
 # define repo names (default)
 
 SMOKEBOT_QUEUE=smokebot
 MAKEMOVIES=
 RUNAUTO=
-BRANCH=
 RUNDEBUG="1"
 OPENMP=
 RUN_OPENMP=
@@ -52,7 +55,8 @@ case $OPTION in
    RUNAUTO="Y"
    ;;
   b)
-   BRANCH="$OPTARG"
+#   BRANCH="$OPTARG"
+    echo "***Warning: -b option for specifying a branch is not supported at this time"
    ;;
   c)
    CLEANREPO=1
@@ -108,7 +112,7 @@ CHK_REPO ()
   repodir=$1
   if [ ! -e $repodir ]; then
      echo "***error: the repo directory $repodir does not exist."
-     echo "          Aborting firebot."
+     echo "          Aborting smokebot."
      exit
   fi
 }
@@ -124,7 +128,7 @@ CD_REPO ()
      CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
      if [ "$CURRENT_BRANCH" != "$branch" ]; then
        echo "***error: was expecting branch $branch in repo $repodir."
-       echo "Found branch $CURRENT_BRANCH. Aborting firebot."
+       echo "Found branch $CURRENT_BRANCH. Aborting smokebot."
        exit
      fi
   fi
@@ -270,7 +274,7 @@ JOBPREFIX=SB_
 # This is a notification only and does not terminate Smokebot.
 # This check runs during Stages 3 and 5.
 
-# Start firebot timer
+# Start timer
 START_TIME=$(date +%s)
 
 # Set time limit (43,200 seconds = 12 hours)
@@ -302,8 +306,8 @@ run_auto()
 # remove untracked files, revert repo files, update to latest revision
 
   if [[ "$UPDATEREPO" == "1" ]] ; then
-    update_repo smv
-    update_repo fds
+    update_repo smv $SMVBRANCH
+    update_repo fds $FDSBRANCH
   fi
 
 # get info for smokeview
@@ -439,10 +443,10 @@ check_time_limit()
 
 set_files_world_readable()
 {
-   CD_REPO $smvrepo
+   CD_REPO $smvrepo $SMVBRANCH
    chmod -R go+r *
 
-   CD_REPO $fdsrepo
+   CD_REPO $fdsrepo $FDSBRANCH
    chmod -R go+r *
 }
 
@@ -450,8 +454,9 @@ clean_repo()
 {
   curdir=`pwd`
   dir=$1
-
-  CD_REPO $dir
+  branch=$2
+  
+  CD_REPO $dir $branch
   git clean -dxf &> /dev/null
   git add . &> /dev/null
   git reset --hard HEAD &> /dev/null
@@ -516,12 +521,14 @@ compile_cfast()
 clean_repo2()
 {
    repodir=$1
+   branch=$2
+   
    # Check to see if FDS repository exists
    updateclean=
    if [ -e "$repo" ]
    then
       if [ "$CLEANREPO" == "1" ]; then
-        cd $repo/$repodir
+        CD_REPO $repo/$repodir $branch
         IS_DIRTY=`git describe --long --dirty | grep dirty | wc -l`
         if [ "$IS_DIRTY" == "1" ]; then
           echo "The repo $repo/$repodir has uncommitted changes."
@@ -544,8 +551,9 @@ clean_repo2()
 update_repo()
 {
    reponame=$1
+   branch=$2
    
-   CD_REPO $repo/$reponame $BRANCH
+   CD_REPO $repo/$reponame $branch
    
    if [[ "$reponame" == "smv" ]]; then
       GIT_REVISION=`git describe --long --dirty`
@@ -562,19 +570,18 @@ update_repo()
      echo "smokebot without the -u (update) option"
      exit
    fi
-   echo "Updating branch $BRANCH." >> $OUTPUT_DIR/stage0 2>&1
+   echo "Updating branch $branch." >> $OUTPUT_DIR/stage0 2>&1
    git fetch origin >> $OUTPUT_DIR/stage0 2>&1
-   git merge origin/$BRANCH >> $OUTPUT_DIR/stage0 2>&1
+   git merge origin/$branch >> $OUTPUT_DIR/stage0 2>&1
    have_remote=`git remote -v | awk '{print $1}' | grep firemodels | wc  -l`
    if [ "$have_remote" != "0" ]; then
       git fetch firemodels >> $OUTPUT_DIR/stage0 2>&1
-      git merge firemodels/$BRANCH >> $OUTPUT_DIR/stage0 2>&1
+      git merge firemodels/$branch >> $OUTPUT_DIR/stage0 2>&1
    fi
 }
 
 check_FDS_checkout()
 {
-   cd $smvrepo
    # Check for GIT errors
    stage0_success=true
 }
@@ -1276,28 +1283,28 @@ save_build_status()
    then
      echo "***Warnings:" >> $ERROR_LOG
      cat $WARNING_LOG >> $ERROR_LOG
-     echo "   build failure and warnings for version: ${GIT_REVISION}, branch: $BRANCH."
-     echo "Build failure and warnings;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$BRANCH;$STOP_TIME_INT;3;$TOTAL_SMV_TIMES" > "$HISTORY_DIR/${GIT_REVISION}.txt"
+     echo "   build failure and warnings for version: ${GIT_REVISION}, branch: $SMVBRANCH."
+     echo "Build failure and warnings;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$SMVBRANCH;$STOP_TIME_INT;3;$TOTAL_SMV_TIMES" > "$HISTORY_DIR/${GIT_REVISION}.txt"
      cat $ERROR_LOG > "$HISTORY_DIR/${GIT_REVISION}_errors.txt"
 
    # Check for errors only
    elif [ -e $ERROR_LOG ]
    then
-      echo "   build failure for version: ${GIT_REVISION}, branch: $BRANCH."
-      echo "Build failure;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$BRANCH;$STOP_TIME_INT;3;$TOTAL_SMV_TIMES" > "$HISTORY_DIR/${GIT_REVISION}.txt"
+      echo "   build failure for version: ${GIT_REVISION}, branch: $SMVBRANCH."
+      echo "Build failure;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$SMVBRANCH;$STOP_TIME_INT;3;$TOTAL_SMV_TIMES" > "$HISTORY_DIR/${GIT_REVISION}.txt"
       cat $ERROR_LOG > "$HISTORY_DIR/${GIT_REVISION}_errors.txt"
 
    # Check for warnings only
    elif [ -e $WARNING_LOG ]
    then
-      echo "   build success with warnings for version: ${GIT_REVISION}, branch: $BRANCH."
-      echo "Build success with warnings;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$BRANCH;$STOP_TIME_INT;2;$TOTAL_SMV_TIMES" > "$HISTORY_DIR/${GIT_REVISION}.txt"
+      echo "   build success with warnings for version: ${GIT_REVISION}, branch: $SMVBRANCH."
+      echo "Build success with warnings;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$SMVBRANCH;$STOP_TIME_INT;2;$TOTAL_SMV_TIMES" > "$HISTORY_DIR/${GIT_REVISION}.txt"
       cat $WARNING_LOG > "$HISTORY_DIR/${GIT_REVISION}_warnings.txt"
 
    # No errors or warnings
    else
-      echo "   build success for version: ${GIT_REVISION}, branch: $BRANCH."
-      echo "Build success!;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$BRANCH;$STOP_TIME_INT;1;$TOTAL_SMV_TIMES" > "$HISTORY_DIR/${GIT_REVISION}.txt"
+      echo "   build success for version: ${GIT_REVISION}, branch: $SMVBRANCH."
+      echo "Build success!;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$SMVBRANCH;$STOP_TIME_INT;1;$TOTAL_SMV_TIMES" > "$HISTORY_DIR/${GIT_REVISION}.txt"
    fi
 }
 
@@ -1359,19 +1366,19 @@ fi
    if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]
    then
      # Send email with failure message and warnings, body of email contains appropriate log file
-     cat $ERROR_LOG $TIME_LOG | mail -s "smokebot build failure and warnings on ${hostname}. Version: ${GIT_REVISION}, Branch: $BRANCH." $mailTo > /dev/null
+     cat $ERROR_LOG $TIME_LOG | mail -s "smokebot build failure and warnings on ${hostname}. Version: ${GIT_REVISION}, Branch: $SMVBRANCH." $mailTo > /dev/null
 
    # Check for errors only
    elif [ -e $ERROR_LOG ]
    then
       # Send email with failure message, body of email contains error log file
-      cat $ERROR_LOG $TIME_LOG | mail -s "smokebot build failure on ${hostname}. Version: ${GIT_REVISION}, Branch: $BRANCH." $mailTo > /dev/null
+      cat $ERROR_LOG $TIME_LOG | mail -s "smokebot build failure on ${hostname}. Version: ${GIT_REVISION}, Branch: $SMVBRANCH." $mailTo > /dev/null
 
    # Check for warnings only
    elif [ -e $WARNING_LOG ]
    then
      # Send email with success message, include warnings
-     cat $WARNING_LOG $TIME_LOG | mail -s "smokebot build success with warnings on ${hostname}. Version: ${GIT_REVISION}, Branch: $BRANCH." $mailTo > /dev/null
+     cat $WARNING_LOG $TIME_LOG | mail -s "smokebot build success with warnings on ${hostname}. Version: ${GIT_REVISION}, Branch: $SMVBRANCH." $mailTo > /dev/null
 
    # No errors or warnings
    else
@@ -1382,7 +1389,7 @@ fi
       fi
 
       # Send success message with links to nightly manuals
-      cat $TIME_LOG | mail -s "smokebot build success on ${hostname}! Version: ${GIT_REVISION}, Branch: $BRANCH." $mailTo > /dev/null
+      cat $TIME_LOG | mail -s "smokebot build success on ${hostname}! Version: ${GIT_REVISION}, Branch: $SMVBRANCH." $mailTo > /dev/null
    fi
 }
 
@@ -1411,18 +1418,18 @@ clean_smokebot_history
 
 if [ "$CLEANREPO" == "1" ]; then
   echo Cleaning
-  clean_repo2 cfast
-  clean_repo2 fds
-  clean_repo2 smv
+  clean_repo2 cfast master
+  clean_repo2 fds $FDSBRANCH
+  clean_repo2 smv $SMVBRANCH
 else
   echo Repos not cleaned
 fi
 
 if [ "$UPDATEREPO" == "1" ]; then
   echo Updating
-  update_repo cfast
-  update_repo fds
-  update_repo smv
+  update_repo cfast master
+  update_repo fds $FDSBRANCH
+  update_repo smv $SMVBRANCH
 else
   echo Repos not updated
 fi

@@ -50,7 +50,7 @@ echo "Verification and validation testing script for smokeview"
 echo ""
 echo "Options:"
 echo "-a - run automatically if FDS or smokeview source has changed"
-echo "-b - branch_name - run smokebot using the branch branch_name [default: $BRANCH]"
+#echo "-b - branch_name - run smokebot using the branch branch_name [default: $BRANCH]"
 echo "-c - clean repo"
 echo "-f - force smokebot run"
 echo "-h - display this message"
@@ -87,7 +87,7 @@ CHK_REPO ()
   repodir=$1
   if [ ! -e $repodir ]; then
      echo "***error: the repo directory $repodir does not exist."
-     echo "          Aborting firebot."
+     echo "          Aborting smokebot."
      exit
   fi
 }
@@ -103,7 +103,7 @@ CD_REPO ()
      CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
      if [ "$CURRENT_BRANCH" != "$branch" ]; then
        echo "***error: was expecting branch $branch in repo $repodir."
-       echo "Found branch $CURRENT_BRANCH. Aborting firebot."
+       echo "Found branch $CURRENT_BRANCH. Aborting smokebot."
        exit
      fi
   fi
@@ -132,7 +132,8 @@ case $OPTION  in
    RUNAUTO=-A
    ;;
   b)
-   BRANCH="$OPTARG"
+#   BRANCH="$OPTARG"
+    echo "***Warning: -b option for specifying a branch is not supported at this time"
    ;;
   c)
    CLEANREPO=-c
@@ -246,8 +247,8 @@ BRANCH="-b $BRANCH"
 
 if [[ "$RUNSMOKEBOT" == "1" ]]; then
   touch $smokebot_pid
-  ./$botscript $TESTFLAG $RUNAUTO $COMPILER $SMOKEBOT_LITE $BRANCH $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+  ./$botscript $TESTFLAG $RUNAUTO $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
   rm $smokebot_pid
 else
-  echo ./$botscript $TESTFLAG $RUNAUTO $COMPILER $SMOKEBOT_LITE $BRANCH $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+  echo ./$botscript $TESTFLAG $RUNAUTO $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 fi

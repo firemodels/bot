@@ -26,7 +26,7 @@ function usage {
 echo "Verification and validation testing script for FDS"
 echo ""
 echo "Options:"
-echo "-b - branch_name - run firebot using branch_name [default: $BRANCH]"
+#echo "-b - branch_name - run firebot using branch_name [default: $BRANCH]"
 echo "-c - clean repo"
 echo "-f - force firebot run"
 echo "-F - skip figure generation and build document stages"
@@ -105,7 +105,8 @@ while getopts 'b:cFfhikLm:q:nsuUv' OPTION
 do
 case $OPTION  in
   b)
-   BRANCH="$OPTARG"
+#   BRANCH="$OPTARG"
+    echo "***Warning: -b option for specifying a branch is not supported at this time"
    ;;
   c)
    CLEANREPO=1
@@ -205,8 +206,8 @@ BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 if [ "$RUNFIREBOT" == "1" ] ; then
   touch $firebot_pid
-  ./$botscript -p $firebot_pid $UPDATE $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $BRANCH $QUEUE $SKIPMATLAB $SKIPFIGURES $EMAIL "$@"
+  ./$botscript -p $firebot_pid $UPDATE $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $EMAIL "$@"
 else
-  echo ./$botscript $FIREBOT_LITE $UPDATE $USEINSTALL $UPLOADGUIDES $CLEAN $BRANCH $QUEUE $SKIPMATLAB $SKIPFIGURES $EMAIL "$@"
+  echo ./$botscript $FIREBOT_LITE $UPDATE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $EMAIL "$@"
 fi
 rm $firebot_pid

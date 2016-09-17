@@ -13,6 +13,9 @@ set installed=%6
 set lite=%7
 set emailto=%8
 
+set smvbranch=master
+set fdsbranch=master
+
 set size=_64
 
 set abort=0
@@ -31,17 +34,24 @@ if %abort% == 1 (
    exit /b
 )
 
-set CURDIR=%CD%
+set FIREBOTRUNDIR=%CD%
 
 echo.
 echo Settings
-echo      fds repo: %fdsrepo%
-echo      smv repo: %smvrepo%
-echo run directory: %CURDIR%
-if %clean% == 1  echo    clean repo: yes
-if %clean% == 0  echo    clean repo: no
-if %update% == 1 echo   update repo: yes
-if %update% == 0 echo   update repo: no
+echo --------
+echo     fds repo: %fdsrepo%
+echo     smv repo: %smvrepo%
+echo      run dir: %FIREBOTRUNDIR%
+if %clean% == 1 (
+echo  clean repos: yes
+) else (
+echo  clean repos: no
+)
+if %update% == 1 (
+echo update repos: yes
+) else (
+echo update repos: no
+)
 echo.
 
 :: -------------------------------------------------------------
@@ -60,9 +70,9 @@ if not exist output mkdir output
 if not exist history mkdir history
 if not exist timings mkdir timings
 
-set OUTDIR=%CURDIR%\output
-set HISTORYDIR=%CURDIR%\history
-set TIMINGSDIR=%CURDIR%\timings
+set OUTDIR=%FIREBOTRUNDIR%\output
+set HISTORYDIR=%FIREBOTRUNDIR%\history
+set TIMINGSDIR=%FIREBOTRUNDIR%\timings
 
 erase %OUTDIR%\*.txt %OUTDIR%\*.log 1> Nul 2>&1
 
@@ -211,9 +221,9 @@ echo. 1>> %OUTDIR%\stage0.txt 2>&1
 if %clean% == 0 goto skip_clean1
    echo             cleaning
    echo                fds
-   call :git_clean %fdsrepo%
+   call :git_clean %fdsrepo% || exit /b 1
    echo                smokeview
-   call :git_clean %smvrepo%
+   call :git_clean %smvrepo% || exit /b 1
 :skip_clean1
 
 :: updating  repos
@@ -221,12 +231,12 @@ if %clean% == 0 goto skip_clean1
 if %update% == 0 goto skip_update1
   echo             updating
   echo                fds
-  cd %fdsrepo%
+  call :cd_repo %fdsrepo% %fdsbranch% || exit /b 1
   git fetch origin master 1>> %OUTDIR%\stage0.txt 2>&1
   git merge origin/master 1>> %OUTDIR%\stage0.txt 2>&1
 
   echo                smv
-  cd %smvrepo%
+  call :cd_repo %smvrepo% %smvbranch% || exit /b 1
   git fetch origin master 1>> %OUTDIR%\stage0.txt 2>&1
   git merge origin/master 1>> %OUTDIR%\stage0.txt 2>&1
 :skip_update1
@@ -471,7 +481,7 @@ echo . -----------------------------         >> %infofile%
 
 copy %infofile% %timingslogfile%
 
-cd %CURDIR%
+cd %FIREBOTRUNDIR%
 
 sed "s/$/\r/" < %warninglog% > %warninglogpc%
 sed "s/$/\r/" < %errorlog% > %errorlogpc%
@@ -590,6 +600,42 @@ set /p %arg1%=<%timefile%
 exit /b 0
 
 :: -------------------------------------------------------------
+:chk_repo
+:: -------------------------------------------------------------
+
+set repodir=%1
+
+if NOT exist %repodir% (
+  echo ***error: repo directory %repodir% does not exist
+  echo           firebot aborted
+  exit /b 1
+)
+exit /b 0
+
+:: -------------------------------------------------------------
+:cd_repo
+:: -------------------------------------------------------------
+
+set repodir=%1
+set repobranch=%2
+
+call :chk_repo %repodir% || exit /b 1
+
+cd %repodir%
+if "%repobranch%" == "" (
+  exit /b 0
+)
+git rev-parse --abbrev-ref HEAD>current_branch.txt
+set /p current_branch=<current_branch.txt
+erase current_branch.txt
+if "%repobranch%" NEQ "%current_branch%" (
+  echo ***error: found branch %current_branch% was expecting branch %repobranch%
+  echo           firebot aborted
+  exit /b 1
+)
+exit /b 0
+
+:: -------------------------------------------------------------
 :is_file_installed
 :: -------------------------------------------------------------
 
@@ -670,13 +716,11 @@ exit /b
 :: -------------------------------------------------------------
 
 set gitcleandir=%1
-if exist %gitcleandir% (
-  cd %gitcleandir%
-  git clean -dxf 1>> Nul 2>&1
-  git add . 1>> Nul 2>&1
-  git reset --hard HEAD 1>> Nul 2>&1
-)
-exit /b
+call :cd_repo %gitcleandir%  || exit /b 1
+git clean -dxf 1>> Nul 2>&1
+git add . 1>> Nul 2>&1
+git reset --hard HEAD 1>> Nul 2>&1
+exit /b /0
 
 :: -------------------------------------------------------------
 :build_guide
@@ -723,4 +767,4 @@ copy %guide%.pdf %fromsummarydir%\manuals
 exit /b
 
 :eof
-cd %CURDIR%
+cd %FIREBOTRUNDIR%

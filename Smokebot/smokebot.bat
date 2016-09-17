@@ -98,6 +98,7 @@ call %repo%\bot\Smokebot\firebot_email_list.bat
 
 echo.
 echo Settings
+echo --------
 if NOT "%emailto%" == "" (
   echo          email: %emailto%
   set mailToSMV=%emailto%
@@ -105,11 +106,17 @@ if NOT "%emailto%" == "" (
 echo     cfast repo: %cfastrepo%
 echo       FDS repo: %fdsrepo%
 echo Smokeview repo: %smvrepo%
-echo  run directory: %CURDIR%
-if %clean% == 1 echo    clean repo: yes
-if %clean% == 0 echo    clean repo: no
-if %update% == 1 echo  update repo: yes
-if %update% == 0 echo  update repo: no
+echo        run dir: %CURDIR%
+if %clean% == 1 (
+echo    clean repos: yes
+) else (
+echo    clean repos: no
+)
+if %update% == 1 (
+echo   update repos: yes
+) else (
+echo   update repos: no
+)
 echo.
 
 :: -------------------------------------------------------------
@@ -187,11 +194,11 @@ echo. 1> %OUTDIR%\stage0.txt 2>&1
 if %clean% == 0 goto skip_clean1
    echo             cleaning
    echo                cfast
-   call :git_clean %cfastrepo%  || exit /b 1
+   call :git_clean %cfastrepo% %cfastbranch% || exit /b 1
    echo                fds
-   call :git_clean %fdsrepo%  || exit /b 1
+   call :git_clean %fdsrepo% %fdsbranch% || exit /b 1
    echo                smokeview
-   call :git_clean %smvrepo% || exit /b 1
+   call :git_clean %smvrepo% %smvbranch% || exit /b 1
 :skip_clean1
 
 :: updating  repos
@@ -200,21 +207,21 @@ if %update% == 0 goto skip_update1
   echo             updating
   echo                cfast
   call :cd_repo %cfastrepo% %cfastbranch% || exit /b 1
-  git fetch origin master  1>> %OUTDIR%\stage0.txt 2>&1
-  git merge origin/master  1>> %OUTDIR%\stage0.txt 2>&1
+  git fetch origin %cfastbranch%  1>> %OUTDIR%\stage0.txt 2>&1
+  git merge origin/%cfastbranch%  1>> %OUTDIR%\stage0.txt 2>&1
 
   echo                fds
   call :cd_repo %fdsrepo% %fdsbranch% || exit /b 1
-  git fetch origin master 1>> %OUTDIR%\stage0.txt 2>&1
-  git merge origin/master 1>> %OUTDIR%\stage0.txt 2>&1
+  git fetch origin %fdsbranch% 1>> %OUTDIR%\stage0.txt 2>&1
+  git merge origin/%fdsbranch% 1>> %OUTDIR%\stage0.txt 2>&1
 
   echo                smv
   call :cd_repo %smvrepo% %smvbranch% || exit /b 1
-  git fetch origin master 1>> %OUTDIR%\stage0.txt 2>&1
-  git merge origin/master 1>> %OUTDIR%\stage0.txt 2>&1
+  git fetch origin %smvbranch% 1>> %OUTDIR%\stage0.txt 2>&1
+  git merge origin/%smvbranch% 1>> %OUTDIR%\stage0.txt 2>&1
 :skip_update1
 
-cd %smvrepo%
+call :cd_repo %smvrepo% %smvbranch%
 git describe --long --dirty > %revisionfilestring%
 set /p revisionstring=<%revisionfilestring%
 
@@ -661,7 +668,9 @@ exit /b
 :: -------------------------------------------------------------
 
 set gitcleandir=%1
-call :cd_repo %gitcleandir% || exit /b 1
+set gitbranch=%2
+
+call :cd_repo %gitcleandir% %gitbranch% || exit /b 1
 git clean -dxf 1>> Nul 2>&1
 git add . 1>> Nul 2>&1
 git reset --hard HEAD 1>> Nul 2>&1

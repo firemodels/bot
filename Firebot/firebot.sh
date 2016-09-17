@@ -18,7 +18,11 @@ TIME_LOG=$OUTPUT_DIR/timings
 ERROR_LOG=$OUTPUT_DIR/errors
 WARNING_LOG=$OUTPUT_DIR/warnings
 NEWGUIDE_DIR=$OUTPUT_DIR/Newest_Guides
+
 WEBBRANCH=nist-pages
+FDSBRANCH=master
+SMVBRANCH=master
+BRANCH=master
 
 platform="linux"
 platform2="Linux"
@@ -38,7 +42,6 @@ fi
 USEINSTALL=
 COMPILER=intel
 QUEUE=firebot
-BRANCH=master
 CLEANREPO=0
 UPDATEREPO=0
 JOBPREFIX=FB_
@@ -82,7 +85,8 @@ while getopts 'b:cFhiLm:p:q:suUv:' OPTION
 do
 case $OPTION in
   b)
-   BRANCH="$OPTARG"
+#   BRANCH="$OPTARG"
+    echo "***Warning: -b option for specifying a branch is not supported at this time"
    ;;
   c)
    CLEANREPO=1
@@ -295,9 +299,11 @@ clean_firebot_metafiles()
 clean_repo2()
 {
    reponame=$1
+   branch=$2
+   
    # Check to see if FDS repository exists
    if [ -e "$repo" ]; then
-      cd $repo/$reponame
+      CD_REPO $repo/$reponame $branch
       echo "   $reponame"
       clean_repo $repo/$reponame
    else
@@ -310,18 +316,18 @@ clean_repo2()
 update_repo()
 {
    reponame=$1
+   branch=$2
 
-   CD_REPO $repo/$reponame $BRANCH
+   CD_REPO $repo/$reponame $branch
    
    echo "   $reponame" 
-   cd $repo/$reponame
-   echo Updating $BRANCH on repo $repo/$reponame >> $OUTPUT_DIR/stage1 2>&1
+   echo Updating $branch on repo $repo/$reponame >> $OUTPUT_DIR/stage1 2>&1
    git fetch origin >> $OUTPUT_DIR/stage1 2>&1
-   git merge origin/$BRANCH >> $OUTPUT_DIR/stage1 2>&1
+   git merge origin/$branch >> $OUTPUT_DIR/stage1 2>&1
    have_remote=`git remote -v | grep firemodels | wc  -l`
    if [ "$have_remote" -gt "0" ]; then
       git fetch firemodels >> $OUTPUT_DIR/stage1 2>&1
-      git merge firemodels/$BRANCH >> $OUTPUT_DIR/stage1 2>&1
+      git merge firemodels/$branch >> $OUTPUT_DIR/stage1 2>&1
    fi
 
    if [[ "$reponame" == "exp" ]]; then
@@ -1079,24 +1085,24 @@ save_build_status()
    then
      echo "" >> $ERROR_LOG
      cat $WARNING_LOG >> $ERROR_LOG
-     echo "Build failure and warnings;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$BRANCH;$STOP_TIME_INT;3;$TOTAL_FDS_TIMES" > "$HISTORY_DIR/${GIT_REVISION}.txt"
+     echo "Build failure and warnings;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$FDSBRANCH;$STOP_TIME_INT;3;$TOTAL_FDS_TIMES" > "$HISTORY_DIR/${GIT_REVISION}.txt"
      cat $ERROR_LOG > "$HISTORY_DIR/${GIT_REVISION}_errors.txt"
 
    # Check for errors only
    elif [ -e $ERROR_LOG ]
    then
-      echo "Build failure;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$BRANCH;$STOP_TIME_INT;3;$TOTAL_FDS_TIMES" > "$HISTORY_DIR/${GIT_REVISION}.txt"
+      echo "Build failure;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$FDSBRANCH;$STOP_TIME_INT;3;$TOTAL_FDS_TIMES" > "$HISTORY_DIR/${GIT_REVISION}.txt"
       cat $ERROR_LOG > "$HISTORY_DIR/${GIT_REVISION}_errors.txt"
 
    # Check for warnings only
    elif [ -e $WARNING_LOG ]
    then
-      echo "Build success with warnings;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$BRANCH;$STOP_TIME_INT;2;$TOTAL_FDS_TIMES" > "$HISTORY_DIR/${GIT_REVISION}.txt"
+      echo "Build success with warnings;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$FDSBRANCH;$STOP_TIME_INT;2;$TOTAL_FDS_TIMES" > "$HISTORY_DIR/${GIT_REVISION}.txt"
       cat $WARNING_LOG > "$HISTORY_DIR/${GIT_REVISION}_warnings.txt"
 
    # No errors or warnings
    else
-      echo "Build success!;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$BRANCH;$STOP_TIME_INT;1;$TOTAL_FDS_TIMES" > "$HISTORY_DIR/${GIT_REVISION}.txt"
+      echo "Build success!;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$FDSBRANCH;$STOP_TIME_INT;1;$TOTAL_FDS_TIMES" > "$HISTORY_DIR/${GIT_REVISION}.txt"
    fi
 }
 
@@ -1131,13 +1137,13 @@ fi
       cd $FIREBOT_RUNDIR
 
      # Send email with failure message and warnings, body of email contains appropriate log file
-     cat $ERROR_LOG $TIME_LOG | mail -s "[$botuser] $bottype failure and warnings. Version: ${GIT_REVISION}, Branch: $BRANCH." $mailToFDS > /dev/null
+     cat $ERROR_LOG $TIME_LOG | mail -s "[$botuser] $bottype failure and warnings. Version: ${GIT_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
 
    # Check for errors only
    elif [ -e $ERROR_LOG ]
    then
       # Send email with failure message, body of email contains error log file
-      cat $ERROR_LOG $TIME_LOG | mail -s "[$botuser] $bottype failure. Version: ${GIT_REVISION}, Branch: $BRANCH." $mailToFDS > /dev/null
+      cat $ERROR_LOG $TIME_LOG | mail -s "[$botuser] $bottype failure. Version: ${GIT_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
 
    # Check for warnings only
    elif [ -e $WARNING_LOG ]
@@ -1145,7 +1151,7 @@ fi
       cd $FIREBOT_RUNDIR
 
       # Send email with success message, include warnings
-      cat $WARNING_LOG $TIME_LOG | mail -s "[$botuser] $bottype success, with warnings. Version: ${GIT_REVISION}, Branch: $BRANCH" $mailToFDS > /dev/null
+      cat $WARNING_LOG $TIME_LOG | mail -s "[$botuser] $bottype success, with warnings. Version: ${GIT_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
 
    # No errors or warnings
    else
@@ -1153,7 +1159,7 @@ fi
       cd $FIREBOT_RUNDIR
 
       # Send success message with links to nightly manuals
-      cat $TIME_LOG | mail -s "[$botuser] $bottype success! Version: ${GIT_REVISION}, Branch: $BRANCH" $mailToFDS > /dev/null
+      cat $TIME_LOG | mail -s "[$botuser] $bottype success! Version: ${GIT_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
    fi
 
 #  upload guides to a google drive directory
@@ -1173,18 +1179,18 @@ start_time=`date`
   echo Cleaning
   clean_firebot_metafiles
 if [[ "$CLEANREPO" == "1" ]] ; then
-  clean_repo2 exp
-  clean_repo2 fds
-  clean_repo2 out
-  clean_repo2 smv
+  clean_repo2 exp master
+  clean_repo2 fds $FDSBRANCH
+  clean_repo2 out master
+  clean_repo2 smv $SMVBRANCH
 fi
 
 if [[ "$UPDATEREPO" == "1" ]] ; then
   echo Updating
-  update_repo exp
-  update_repo fds
-  update_repo out
-  update_repo smv
+  update_repo exp master
+  update_repo fds $FDSBRANCH
+  update_repo out master
+  update_repo smv $SMVBRANCH
 else
   echo Repos not updated
 fi

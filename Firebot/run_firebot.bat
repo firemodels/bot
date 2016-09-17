@@ -57,7 +57,7 @@ set running=%curdir%\firebot.running
 
 if %update% == 0 goto no_update
    echo getting latest firebot
-   cd %firebotdir%
+   call :cd_repo %firebotdir% master
    git fetch origin
    git merge origin/master 1> Nul 2>&1
    cd %curdir%
@@ -135,6 +135,42 @@ goto eof
  )
 if not (%1)==() goto getopts
 exit /b
+
+:: -------------------------------------------------------------
+:chk_repo
+:: -------------------------------------------------------------
+
+set repodir=%1
+
+if NOT exist %repodir% (
+  echo ***error: repo directory %repodir% does not exist
+  echo           firebot aborted
+  exit /b 1
+)
+exit /b 0
+
+:: -------------------------------------------------------------
+:cd_repo
+:: -------------------------------------------------------------
+
+set repodir=%1
+set repobranch=%2
+
+call :chk_repo %repodir% || exit /b 1
+
+cd %repodir%
+if "%repobranch%" == "" (
+  exit /b 0
+)
+git rev-parse --abbrev-ref HEAD>current_branch.txt
+set /p current_branch=<current_branch.txt
+erase current_branch.txt
+if "%repobranch%" NEQ "%current_branch%" (
+  echo ***error: found branch %current_branch% was expecting branch %repobranch%
+  echo           firebot aborted
+  exit /b 1
+)
+exit /b 0
 
 :usage  
 echo run_firebot [options]
