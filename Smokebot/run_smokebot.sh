@@ -252,7 +252,10 @@ BRANCH="-b $BRANCH"
 if [[ "$RUNSMOKEBOT" == "1" ]]; then
   touch $smokebot_pid
   ./$botscript $TESTFLAG $RUNAUTO $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
-  rm $smokebot_pid
 else
   echo ./$botscript $TESTFLAG $RUNAUTO $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 fi
+if [ -e $smokebot_pid ]; then
+  rm $smokebot_pid
+fi
+

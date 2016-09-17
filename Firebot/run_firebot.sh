@@ -212,4 +212,6 @@ if [ "$RUNFIREBOT" == "1" ] ; then
 else
   echo ./$botscript $FIREBOT_LITE $UPDATE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $EMAIL "$@"
 fi
-rm $firebot_pid
+if [ -e $firebot_pid ]; then
+  rm $firebot_pid
+fi
