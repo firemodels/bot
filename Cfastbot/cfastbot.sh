@@ -396,7 +396,6 @@ check_smv_utilities()
    if [ "$USEINSTALL" == "" ]; then
      # Check for errors in SMV utilities compilation
      stage3a_success="1"
-     CHK_REPO $smvrepo/Build/background/${compiler}_${platform}${size}/background || return 1
      if [ "$QUEUE" == "none" ]; then
        if [ ! -e "$smvrepo/Build/background/${compiler}_${platform}${size}/background" ]; then
          stage3a_success="0"
