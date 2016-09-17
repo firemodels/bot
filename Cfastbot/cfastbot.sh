@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # CFASTbot
 # This script runs the CFAST verification/validation suite 
 # on the latest revision of the repository.
@@ -104,7 +103,7 @@ run_auto()
    have_remote=`git remote -v | awk '{print $1}' | grep firemodels | wc  -l`
    if [ "$have_remote" != "0" ]; then
       git fetch firemodels &> /dev/null
-      git merge firemodels/$branch &> /dev/null
+      git merge firemodels/$cfastbranch &> /dev/null
    fi
 
    is_changed $TRIGGER $git_TRIGGER
@@ -1000,8 +999,7 @@ check_matlab_validation()
 }
 
 #---------------------------------------------
-#                   check_validation_stats()
-{
+#                   check_validation_stats
 #---------------------------------------------
 
 check_validation_stats()
