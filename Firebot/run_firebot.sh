@@ -199,9 +199,6 @@ if [ "$KILL_FIREBOT" == "1" ]; then
       fi
     fi
     echo firebot process $PID killed
-    if [ -e $firebot_pid ]; then
-      rm $firebot_pid
-    fi
   else
     echo firebot is not running, cannot be killed.
   fi

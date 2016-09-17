@@ -236,9 +236,6 @@ if [ "$KILL_SMOKEBOT" == "1" ]; then
       fi
     fi
     echo smokebot process $PID killed
-    if [ -e $smokebot_pid ]; then
-      rm $smokebot_pid
-    fi
   else
     echo smokebotbot is not running, cannot be killed.
   fi
