@@ -127,7 +127,7 @@ shift $(($OPTIND-1))
 
 CHK_REPO ()
 {
-  repodir=$1
+  local repodir=$1
   if [ ! -e $repodir ]; then
      echo "***error: the repo directory $repodir does not exist."
      echo "          Aborting firebot."
@@ -137,8 +137,8 @@ CHK_REPO ()
 
 CD_REPO ()
 {
-  repodir=$1
-  branch=$2
+  local repodir=$1
+  local branch=$2
   CHK_REPO $repodir
 
   cd $repodir
@@ -225,7 +225,7 @@ TIME_LIMIT_EMAIL_NOTIFICATION="unsent"
 
 MKDIR ()
 {
-  DIR=$1
+  local DIR=$1
   if [ ! -d $DIR ]
   then
     echo Creating directory $DIR
@@ -266,8 +266,9 @@ set_files_world_readable()
 
 clean_repo()
 {
-  curdir=`pwd`
-  dir=$1
+  local curdir=`pwd`
+  local dir=$1
+
   CD_REPO $dir
   git clean -dxf &> /dev/null
   git add . &> /dev/null
@@ -298,8 +299,8 @@ clean_firebot_metafiles()
 
 clean_repo2()
 {
-   reponame=$1
-   branch=$2
+   local reponame=$1
+   local branch=$2
    
    # Check to see if FDS repository exists
    if [ -e "$repo" ]; then
@@ -315,8 +316,8 @@ clean_repo2()
 
 update_repo()
 {
-   reponame=$1
-   branch=$2
+   local reponame=$1
+   local branch=$2
 
    CD_REPO $repo/$reponame $branch
    
@@ -348,7 +349,6 @@ update_repo()
 
 check_git_checkout()
 {
-   cd $fdsrepo
    # Check for GIT errors
    stage1_success=true
 }
