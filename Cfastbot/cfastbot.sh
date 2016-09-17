@@ -1475,7 +1475,9 @@ fi
 
 if [ "$UPDATEREPO" == "1" ]; then
   echo Updating
+  echo "   cfast"
   update_repo cfast $cfastbranch || exit 1
+  echo "   smv"
   update_repo smv $smvbranch || exit 1
 else
   echo Repos not updated
