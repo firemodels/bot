@@ -88,15 +88,16 @@ CHK_REPO ()
   if [ ! -e $repodir ]; then
      echo "***error: the repo directory $repodir does not exist."
      echo "          Aborting smokebot."
-     exit
+     return 1
   fi
+  return 0
 }
 
 CD_REPO ()
 {
   repodir=$1
   branch=$2
-  CHK_REPO $repodir
+  CHK_REPO $repodir || return 1
 
   cd $repodir
   if [ "$branch" != "" ]; then
@@ -104,9 +105,10 @@ CD_REPO ()
      if [ "$CURRENT_BRANCH" != "$branch" ]; then
        echo "***error: was expecting branch $branch in repo $repodir."
        echo "Found branch $CURRENT_BRANCH. Aborting smokebot."
-       exit
+       return 1
      fi
   fi
+  return 0
 }
 
 LIST_DESCENDANTS ()
@@ -220,7 +222,7 @@ if [[ "$RUNSMOKEBOT" == "1" ]]; then
     if [ -e $smokebot_pid ] ; then
       echo Smokebot or firebot are already running.
       echo "Re-run using the -f option if this is not the case."
-      exit
+      exit 1
     fi
   fi
 fi
@@ -236,7 +238,7 @@ fi
 
 if [[ "$RUNSMOKEBOT" == "1" ]]; then
   if [[ "$UPDATEREPO" == "-u" ]]; then
-     CD_REPO $repo/bot/Smokebot master
+     CD_REPO $repo/bot/Smokebot master || exit 1
      
      git fetch origin &> /dev/null
      git merge origin/master &> /dev/null

@@ -113,15 +113,16 @@ CHK_REPO ()
   if [ ! -e $repodir ]; then
      echo "***error: the repo directory $repodir does not exist."
      echo "          Aborting smokebot."
-     exit
+     return 1
   fi
+  return 0
 }
 
 CD_REPO ()
 {
   local repodir=$1
   local branch=$2
-  CHK_REPO $repodir
+  CHK_REPO $repodir || return 1
 
   cd $repodir
   if [ "$branch" != "" ]; then
@@ -129,9 +130,10 @@ CD_REPO ()
      if [ "$CURRENT_BRANCH" != "$branch" ]; then
        echo "***error: was expecting branch $branch in repo $repodir."
        echo "Found branch $CURRENT_BRANCH. Aborting smokebot."
-       exit
+       return 1
      fi
   fi
+  return 0
 }
 
 if [ -e .smv_git ]; then
@@ -141,22 +143,22 @@ if [ -e .smv_git ]; then
 else
   echo "***error: smokebot not running in the bot/Smokebot directory"
   echo "          Aborting smokebot"
-  exit
+  exit 1
 fi
 
 # make sure repos needed by smokebot exist
 
 botrepo=$repo/bot
-CHK_REPO $botrepo
+CHK_REPO $botrepo || exit 1
 
 cfastrepo=$repo/cfast
-CHK_REPO $cfastrepo
+CHK_REPO $cfastrepo || exit 1
 
 fdsrepo=$repo/fds
-CHK_REPO $fdsrepo
+CHK_REPO $fdsrepo || exit 1
 
 smvrepo=$repo/smv
-CHK_REPO $smvrepo
+CHK_REPO $smvrepo ||  exit 1
 
 # save pid if -k option (kill smokebot) is used lateer
 
@@ -321,8 +323,8 @@ run_auto()
 # remove untracked files, revert repo files, update to latest revision
 
   if [[ "$UPDATEREPO" == "1" ]] ; then
-    update_repo smv $SMVBRANCH
-    update_repo fds $FDSBRANCH
+    update_repo smv $SMVBRANCH || return 1
+    update_repo fds $FDSBRANCH || return 1
   fi
 
 # get info for smokeview
@@ -360,11 +362,11 @@ run_auto()
 
   if [ "$option" == "" ]; then
     if [[ $THIS_SMV_REVISION == $LAST_SMV_REVISION && $THIS_FDS_REVISION == $LAST_FDS_REVISION ]] ; then
-      exit
+      return 1
     fi
   else
     if [[ $THIS_QT_REVISION == $LAST_QT_REVISION && $THIS_T_REVISION == $LAST_T_REVISION ]] ; then
-      exit
+      return 1
     fi
     if [[ $THIS_QT_REVISION != $LAST_QT_REVISION ]] ; then
       SMOKEBOT_LITE=1
@@ -400,6 +402,7 @@ run_auto()
   fi
   echo -e "Smokebot run initiated." >> $MESSAGE_FILE
   cat $MESSAGE_FILE | mail -s "smokebot run initiated" $mailTo > /dev/null
+  return 0
 }
 
 GET_TIME(){
@@ -458,11 +461,13 @@ check_time_limit()
 
 set_files_world_readable()
 {
-   CD_REPO $smvrepo $SMVBRANCH
+   CD_REPO $smvrepo $SMVBRANCH || return 1
    chmod -R go+r *
 
-   CD_REPO $fdsrepo $FDSBRANCH
+   CD_REPO $fdsrepo $FDSBRANCH || return 1
    chmod -R go+r *
+
+   return 0
 }
 
 clean_repo()
@@ -471,11 +476,12 @@ clean_repo()
   local dir=$1
   local branch=$2
   
-  CD_REPO $dir $branch
+  CD_REPO $dir $branch || return 1
   git clean -dxf &> /dev/null
   git add . &> /dev/null
   git reset --hard HEAD &> /dev/null
   cd $curdir
+  return 0
 }
 
 
@@ -543,24 +549,25 @@ clean_repo2()
    if [ -e "$repo" ]
    then
       if [ "$CLEANREPO" == "1" ]; then
-        CD_REPO $repo/$repodir $branch
+        CD_REPO $repo/$repodir $branch || return 1
         IS_DIRTY=`git describe --long --dirty | grep dirty | wc -l`
         if [ "$IS_DIRTY" == "1" ]; then
           echo "The repo $repo/$repodir has uncommitted changes."
           echo "Commit or revert these changes or re-run"
           echo "smokebot without the -c (clean) option"
-          exit
+          return 1
         fi
         echo "   $repodir"
-        clean_repo $repo/$repodir
+        clean_repo $repo/$repodir || return 1
 
         updateclean="1"
       fi
    else
       echo "The repo directory $repo does not exist." >> $OUTPUT_DIR/stage0 2>&1
       echo "Aborting smokebot" >> $OUTPUT_DIR/stage0 2>&1
-      exit
+      return 1
    fi
+   return 0
 }
 
 update_repo()
@@ -568,7 +575,7 @@ update_repo()
    local reponame=$1
    local branch=$2
    
-   CD_REPO $repo/$reponame $branch
+   CD_REPO $repo/$reponame $branch || return 1
    
    if [[ "$reponame" == "smv" ]]; then
       GIT_REVISION=`git describe --long --dirty`
@@ -583,7 +590,7 @@ update_repo()
      echo "The repo $repo/$reponame has uncommitted changes."
      echo "Commit or revert these changes or re-run"
      echo "smokebot without the -u (update) option"
-     exit
+     return 1
    fi
    echo "Updating branch $branch." >> $OUTPUT_DIR/stage0 2>&1
    git fetch origin >> $OUTPUT_DIR/stage0 2>&1
@@ -593,6 +600,7 @@ update_repo()
       git fetch firemodels >> $OUTPUT_DIR/stage0 2>&1
       git merge firemodels/$branch >> $OUTPUT_DIR/stage0 2>&1
    fi
+   return 0
 }
 
 check_FDS_checkout()
@@ -1412,7 +1420,7 @@ fi
 # smokeview or FDS source has changed
 
 if [[ $RUNAUTO == "y" ]] ; then
-  run_auto
+  run_auto || exit 1
 fi
 if [[ $RUNAUTO == "Y" ]] ; then
   run_auto trigger
@@ -1433,18 +1441,18 @@ clean_smokebot_history
 
 if [ "$CLEANREPO" == "1" ]; then
   echo Cleaning
-  clean_repo2 cfast master
-  clean_repo2 fds $FDSBRANCH
-  clean_repo2 smv $SMVBRANCH
+  clean_repo2 cfast master || exit 1
+  clean_repo2 fds $FDSBRANCH || exit 1
+  clean_repo2 smv $SMVBRANCH || exit 1
 else
   echo Repos not cleaned
 fi
 
 if [ "$UPDATEREPO" == "1" ]; then
   echo Updating
-  update_repo cfast master
-  update_repo fds $FDSBRANCH
-  update_repo smv $SMVBRANCH
+  update_repo cfast master || exit 1
+  update_repo fds $FDSBRANCH || exit 1
+  update_repo smv $SMVBRANCH || exit 1
 else
   echo Repos not updated
 fi
@@ -1564,7 +1572,7 @@ echo "Total time: $DIFF_SCRIPT_TIME" >> $STAGE_STATUS
 
 ### Report results ###
 echo Reporting results
-set_files_world_readable
+set_files_world_readable || exit 1
 save_build_status
  
 if [ "$SMOKEBOT_LITE" == "" ]; then
