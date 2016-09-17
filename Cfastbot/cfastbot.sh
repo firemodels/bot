@@ -1281,8 +1281,8 @@ GITSTATUS_DIR=~/.cfastbot
 BRANCH=master
 
 echo ""
-echo "Summary"
-echo "-------"
+echo "Settings"
+echo "--------"
 echo "    Run dir: $CFASTBOT_RUNDIR"
 MKDIR $OUTPUT_DIR
 MKDIR $HISTORY_DIR
