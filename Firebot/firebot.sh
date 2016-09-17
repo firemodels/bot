@@ -206,14 +206,14 @@ echo "    FDS repo: $fdsrepo"
 echo "    SMV repo: $smvrepo"
 echo "     Run dir: $FIREBOT_RUNDIR"
 if [ "$CLEANREPO" == "1" ]; then
-  echo " clean repos: yes
+  echo " clean repos: yes"
 else
-  echo " clean repos: no
+  echo " clean repos: no"
 fi
 if [ "$UPDATEREPO" == "1" ]; then
-  echo "update repos: yes
+  echo "update repos: yes"
 else
-  echo "update repos: no
+  echo "update repos: no"
 fi
 echo ""
 
