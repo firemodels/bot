@@ -40,7 +40,8 @@ exit
 
 CHK_REPO ()
 {
-  repodir=$1
+  local repodir=$1
+
   if [ ! -e $repodir ]; then
      echo "***error: the repo directory $repodir does not exist."
      echo "          Aborting firebot."
@@ -55,8 +56,9 @@ CHK_REPO ()
 
 CD_REPO ()
 {
-  repodir=$1
-  branch=$2
+  local repodir=$1
+  local branch=$2
+
   CHK_REPO $repodir || return 1
 
   cd $repodir
@@ -87,9 +89,9 @@ LIST_DESCENDANTS ()
   echo "$children"
 }
 
-#VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
+#VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
 #                             Primary script execution =
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 if [ ! -d ~/.fdssmvgit ] ; then
   mkdir ~/.fdssmvgit

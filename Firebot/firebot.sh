@@ -35,6 +35,7 @@ exit
 CHK_REPO ()
 {
   local repodir=$1
+
   if [ ! -e $repodir ]; then
      echo "***error: the repo directory $repodir does not exist."
      echo "          Aborting firebot."
@@ -51,6 +52,7 @@ CD_REPO ()
 {
   local repodir=$1
   local branch=$2
+
   CHK_REPO $repodir || return 1
 
   cd $repodir
@@ -72,6 +74,7 @@ CD_REPO ()
 MKDIR ()
 {
   local DIR=$1
+
   if [ ! -d $DIR ]
   then
     echo Creating directory $DIR
@@ -362,6 +365,7 @@ check_cases_debug()
 {
    local dir=$1
    local label=$2
+
    # Scan for and report any errors in FDS cases
    cd $dir
 
@@ -471,6 +475,7 @@ check_smv_utilities()
 check_cases_release()
 {
    local dir=$1
+
    # Scan for and report any errors in FDS cases
    cd $dir
 

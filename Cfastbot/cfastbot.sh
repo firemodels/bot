@@ -49,6 +49,7 @@ CD_REPO ()
 MKDIR ()
 {
   local DIR=$1
+
   if [ ! -d $DIR ]
   then
     echo Creating directory $DIR
@@ -237,7 +238,6 @@ update_repo()
 {
    local repo=$1
    local branch=$2
-   
    
    CD_REPO $reponame/$repo $branch || return 1
 
