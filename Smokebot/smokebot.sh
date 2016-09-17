@@ -223,8 +223,23 @@ export platform
 echo ""
 echo "Settings"
 echo "--------"
-echo "   Run dir: $SMOKEBOT_RUNDIR"
-echo "  Repo dir: $repo"
+echo "    FDS repo: $fdsrepo"
+echo "    SMV repo: $smvrepo"
+echo "  CFAST repo: $cfastrepo"
+echo "     Run dir: $SMOKEBOT_RUNDIR"
+if [ "$CLEANREPO" == "1" ]; then
+  echo " clean repos: yes
+else
+  echo " clean repos: no
+fi
+if [ "$UPDATEREPO" == "1" ]; then
+  echo "update repos: yes
+else
+  echo "update repos: no
+fi
+echo ""
+
+
 if [ ! "$web_DIR" == "" ]; then
 echo "   web dir: $web_DIR"
 fi

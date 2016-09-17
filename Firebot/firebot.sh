@@ -202,8 +202,19 @@ UploadGuides=$botrepo/Firebot/fds_guides2GD.sh
 echo ""
 echo "Settings"
 echo "--------"
-echo "   Run dir: $FIREBOT_RUNDIR"
-echo "  Repo dir: $repo"
+echo "    FDS repo: $fdsrepo"
+echo "    SMV repo: $smvrepo"
+echo "     Run dir: $FIREBOT_RUNDIR"
+if [ "$CLEANREPO" == "1" ]; then
+  echo " clean repos: yes
+else
+  echo " clean repos: no
+fi
+if [ "$UPDATEREPO" == "1" ]; then
+  echo "update repos: yes
+else
+  echo "update repos: no
+fi
 echo ""
 
 
