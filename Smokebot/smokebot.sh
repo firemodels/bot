@@ -366,7 +366,7 @@ update_repo()
    echo "Updating branch $branch." >> $OUTPUT_DIR/stage0 2>&1
    git fetch origin >> $OUTPUT_DIR/stage0 2>&1
    git merge origin/$branch >> $OUTPUT_DIR/stage0 2>&1
-   have_remote=`git remote -v | awk '{print $reponame}' | grep firemodels | wc  -l`
+   have_remote=`git remote -v | awk '{print $1}' | grep firemodels | wc  -l`
    if [ "$have_remote" != "0" ]; then
       git fetch firemodels >> $OUTPUT_DIR/stage0 2>&1
       git merge firemodels/$branch >> $OUTPUT_DIR/stage0 2>&1
