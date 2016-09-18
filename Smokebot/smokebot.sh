@@ -1472,14 +1472,11 @@ if [ "$UPDATEREPO" == "1" ]; then
 else
   echo "update repos: no"
 fi
-echo ""
-
-
 if [ ! "$web_DIR" == "" ]; then
-echo "   web dir: $web_DIR"
+  echo "     web dir: $web_DIR"
 fi
 if [ ! "$WEB_URL" == "" ]; then
-echo "       URL: $WEB_URL"
+  echo "         URL: $WEB_URL"
 fi
 echo ""
 
@@ -1540,7 +1537,8 @@ start_time=`date`
 clean_smokebot_history
 
 ### Stage 0 repo operatoins ###
-
+echo "Status"
+echo "-----"
 if [ "$CLEANREPO" == "1" ]; then
   echo Cleaning
   clean_repo2 cfast master || exit 1
@@ -1552,8 +1550,11 @@ fi
 
 if [ "$UPDATEREPO" == "1" ]; then
   echo Updating
+  echo   cfast
   update_repo cfast master || exit 1
+  echo   fds
   update_repo fds $FDSBRANCH || exit 1
+  echo   smv
   update_repo smv $SMVBRANCH || exit 1
 else
   echo Repos not updated
