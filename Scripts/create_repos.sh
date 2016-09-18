@@ -1,12 +1,4 @@
 #!/bin/bash
-CURDIR=`pwd`
-
-fdsrepos="exp fds out smv"
-smvrepos="cfast fds smv"
-cfastrepos="cfast exp smv"
-allrepos="cfast cor exp fds out radcal smv"
-wikiwebrepos="fds.wiki fds-smv"
-repos=$fdsrepos
 
 function usage {
 echo "Create repos used by cfast, fds and/or smokview"
@@ -24,6 +16,15 @@ echo "-w - setup wiki and webpage repos cloned from firemodels"
 echo "-h - display this message"
 exit
 }
+
+CURDIR=`pwd`
+
+fdsrepos="exp fds out smv"
+smvrepos="cfast fds smv"
+cfastrepos="cfast exp smv"
+allrepos="cfast cor exp fds out radcal smv"
+wikiwebrepos="fds.wiki fds-smv"
+repos=$fdsrepos
 
 FMROOT=
 WIKIWEB=
@@ -119,10 +120,11 @@ do
      git clone $RECURSIVE $GITHEADER$GITUSER/$repo.git
   fi
   cd $repodir
-  ndisable=`git remote -v | grep DISABLE | wc -l`
   if [ "$GITUSER" == "firemodels" ]; then
      echo disabling push access to firemodels
+     ndisable=`git remote -v | grep DISABLE | wc -l`
      if [ $ndisable -eq 0 ]; then
+        echo disabling push access to firemodels
         git remote set-url --push origin DISABLE
      fi
   else
@@ -130,6 +132,9 @@ do
      have_central=`git remote -v | awk '{print $1}' | grep firemodels | wc -l`
      if [ $have_central -eq 0 ]; then
         git remote add firemodels ${GITHEADER}firemodels/$repo.git
+     fi
+     ndisable=`git remote -v | grep DISABLE | wc -l`
+     if [ $ndisable -eq 0 ]; then
         echo disabling push access to firemodels
         git remote set-url --push firemodels DISABLE
      fi
