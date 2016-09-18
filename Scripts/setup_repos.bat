@@ -8,7 +8,7 @@ if not exist ..\.gitbot goto skip1
    cd %CURDIR%
    goto endif1
 :skip1
-   echo ***error: create_repos.bat must be run in the bot\Scripts directory
+   echo ***error: setup_repos.bat must be run in the bot\Scripts directory
    exit /b
 :endif1
 
@@ -56,7 +56,7 @@ if "%WIKIWEB%" == "1" (
 )
 echo.
 echo Press any key to continue, CTRL c to abort or type 
-echo create_repos -h for other options
+echo setup_repos -h for other options
 pause >Nul
 
 for %%x in ( %repos% ) do ( call :create_repo %%x )
