@@ -93,7 +93,7 @@ do
      echo repo: wikis
      repodir=$FMROOT/wikis
      if [ -e $repodir ]; then
-        echo "   already exists"
+        echo "   repo already exists"
      else
         git clone ${GITHEADER}firemodels/$repo.git wikis
      fi
@@ -103,7 +103,7 @@ do
      echo repo: webpages
      repodir=$FMROOT/webpages
      if [ -e $repodir ]; then
-        echo "   already exists"
+        echo "   repo already exists"
      else
         git clone ${GITHEADER}firemodels/$repo.git webpages
      fi
@@ -120,7 +120,7 @@ do
      RECURSIVE=--recursive
   fi
   if [ -e $repodir ]; then
-     echo "   already exists"
+     echo "   repo already exists"
   else
      git clone $RECURSIVE $GITHEADER$GITUSER/$repo.git
   fi
@@ -140,8 +140,10 @@ do
      fi
      ndisable=`git remote -v | grep DISABLE | wc -l`
      if [ $ndisable -eq 0 ]; then
-        echo disabling push access to firemodels
+        echo "   disabling push access to firemodels"
         git remote set-url --push firemodels DISABLE
+     else
+        echo "   remote access to firemodels is disabled"
      fi
   fi
 done
