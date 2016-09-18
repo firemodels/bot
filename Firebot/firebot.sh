@@ -1312,7 +1312,8 @@ start_time=`date`
 ### Stage 1 ###
 
 #*** clean repos
-
+echo "Status"
+echo "------"
   echo Cleaning
   clean_firebot_metafiles
 if [[ "$CLEANREPO" == "1" ]] ; then
