@@ -13,10 +13,10 @@ if not exist ..\.gitbot goto skip1
    exit /b
 :endif1
 
-set wc=%FMROOT%\bot\Scripts\wc
-set grep=%FMROOT%\bot\Scripts\grep
-set gawk=%FMROOT%\bot\Scripts\gawk
-set head=%FMROOT%\bot\Scripts\head
+set wc=%FMROOT%\bot\Scripts\bin\wc
+set grep=%FMROOT%\bot\Scripts\bin\grep
+set gawk=%FMROOT%\bot\Scripts\bin\gawk
+set head=%FMROOT%\bot\Scripts\bin\head
 set disable_push=0
 
 call :getopts %*

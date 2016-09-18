@@ -24,9 +24,9 @@ set webrepos=webpages wikis
 set BRANCH=master
 set PUSH=0
 
-set wc=%repo%\bot\Scripts\wc
-set grep=%repo%\bot\Scripts\grep
-set gawk=%repo%\bot\Scripts\gawk
+set wc=%repo%\bot\Scripts\bin\wc
+set grep=%repo%\bot\Scripts\bin\grep
+set gawk=%repo%\bot\Scripts\bin\gawk
 
 for %%x in ( %allrepos% ) do ( call :update_repo %%x )
 

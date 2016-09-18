@@ -27,10 +27,10 @@ if %stopscript% == 1 (
 
 cd %FMROOT%\bot
 
-set wc=%FMROOT%\bot\Scripts\wc
-set grep=%FMROOT%\bot\Scripts\grep
-set gawk=%FMROOT%\bot\Scripts\gawk
-set head=%FMROOT%\bot\Scripts\head
+set wc=%FMROOT%\bot\Scripts\bin\wc
+set grep=%FMROOT%\bot\Scripts\bin\grep
+set gawk=%FMROOT%\bot\Scripts\bin\gawk
+set head=%FMROOT%\bot\Scripts\bin\head
 
 git remote -v | %grep% origin | %head% -1 | %gawk%  "{print $2}" | %gawk% -F ":" "{print $1}">%CURDIR%\githeader.out
 set /p GITHEADER=<%CURDIR%\githeader.out
