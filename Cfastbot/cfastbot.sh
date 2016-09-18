@@ -1460,8 +1460,8 @@ hostname=`hostname`
 start_time=`date`
 
 echo ""
-echo "cfastbot progress"
-echo "-----------------"
+echo "Status"
+echo "------"
 ### Clean up on start ###
 clean_cfastbot_history
 
