@@ -58,18 +58,18 @@ UPDATE_REPO ()
     exit
   fi
   echo ""
-  echo "repo: $repo - updating from origin"
-  echo "  branch: $BRANCH"
-  echo "     dir: $repodir"
+  echo "  repo: $repo - updating from origin"
+  echo "branch: $BRANCH"
+  echo "   dir: $repodir"
 
   git fetch origin
   git merge origin/$BRANCH
   have_central=`git remote -v | awk '{print $1}' | grep firemodels | wc  -l`
   if [ "$have_central" -gt "0" ]; then
   echo ""
-  echo "repo: $repo - updating from firemodels"
-  echo "  branch: $BRANCH"
-  echo "     dir: $repodir"
+  echo "  repo: $repo - updating from firemodels"
+  echo "branch: $BRANCH"
+  echo "   dir: $repodir"
      git fetch firemodels
      git merge firemodels/$BRANCH
      if [ "$PUSH" == "1" ]; then
@@ -91,9 +91,9 @@ UPDATE_REPO2 ()
   cd $repodir
   BRANCH=`git rev-parse --abbrev-ref HEAD`
   echo ""
-  echo "repo: $repo - updating from firemodels"
-  echo "  branch: $BRANCH"
-  echo "     dir: $repodir"
+  echo "  repo: $repo - updating from firemodels"
+  echo "branch: $BRANCH"
+  echo "   dir: $repodir"
   git fetch origin
   git merge origin/$BRANCH
 }
