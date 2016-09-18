@@ -82,7 +82,7 @@ echo "Press any key to continue or <CTRL> c to abort."
 echo "Type $0 -h for other options"
 read val
 
-for repo in $repos
+for repo in $repos bot
 do 
   echo
   repodir=$FMROOT/$repo
@@ -97,8 +97,10 @@ do
      fi   
   fi
   if [ -e $repodir ]; then
-     echo Skipping $repo, the directory $repodir already exists.
-     continue;
+     if [ "$repo" != "bot" ]; then
+        echo Skipping $repo, the directory $repodir already exists.
+        continue;
+     fi
   fi
   if [ "$WIKIWEB" == "1" ]; then
      if [ "$repo" == "fds.wiki" ]; then
@@ -107,7 +109,9 @@ do
      if [ "$repo" == "fds-smv" ]; then
         git clone git@github.com:firemodels/$repo.git webpages
      fi   
-     continue
+     if [ "$repo" != "bot" ]; then
+        continue
+     fi
   fi
   AT_GITHUB=`git ls-remote $GITHEADER$GITUSER/$repo.git 2>&1 > /dev/null | grep ERROR | wc -l`
   if [ $AT_GITHUB -gt 0 ]; then
@@ -118,16 +122,24 @@ do
   if [ "$repo" == "exp" ]; then
      RECURSIVE=--recursive
   fi
-  git clone $RECURSIVE $GITHEADER$GITUSER/$repo.git
+  if [ "$repo" != "bot" ]; then
+     git clone $RECURSIVE $GITHEADER$GITUSER/$repo.git
+  fi
   cd $repodir
+  ndisable=`git remote -v | grep DISABLE | wc -l`
   if [ "$GITUSER" == "firemodels" ]; then
      echo disabling push access to firemodels
-     git remote set-url --push origin DISABLE
+     if [ $ndisable -eq 0 ]; then
+        git remote set-url --push origin DISABLE
+     fi
   else
      echo setting up remote tracking with firemodels
-     git remote add firemodels ${GITHEADER}firemodels/$repo.git
-     echo disabling push access to firemodels
-     git remote set-url --push firemodels DISABLE
+     have_central=`git remote -v | awk '{print $1}' | grep firemodels | wc -l`
+     if [ $have_central -eq 0 ]; then
+        git remote add firemodels ${GITHEADER}firemodels/$repo.git
+        echo disabling push access to firemodels
+        git remote set-url --push firemodels DISABLE
+     fi
      git remote update
   fi
 done
