@@ -32,12 +32,12 @@ shift $(($OPTIND-1))
 
 for repo in $allrepos
 do 
-  echo
   repodir=$FMROOT/$repo
-
   if [ ! -e $repodir ]; then
      continue;
   fi
+
+  echo
   echo "---------------------------------------------------------------"
   cd $repodir
   GITHEADER=`git remote -v | grep origin | head -1 | awk  '{print $2}' | awk -F ':' '{print $1}'`
