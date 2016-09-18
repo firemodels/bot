@@ -324,9 +324,7 @@ clean_repo2()
           echo "smokebot without the -c (clean) option"
           return 1
         fi
-        echo "   $repodir"
         clean_repo $repo/$repodir || return 1
-
         updateclean="1"
       fi
    else
