@@ -89,6 +89,7 @@ do
   repodir=$FMROOT/$repo
   cd $FMROOT
   echo "----------------------------------------------"
+  echo repo: $repo
   if [ "$WIKIWEB" == "1" ]; then
      if [ "$repo" == "fds.wiki" ]; then
         repodir=$FMROOT/wikis
@@ -100,9 +101,11 @@ do
         if [ ! -e $repodir ]; then
            if [ "$repo" == "fds.wiki" ]; then
               git clone git@github.com:firemodels/$repo.git wikis
+              continue
            fi   
            if [ "$repo" == "fds-smv" ]; then
               git clone git@github.com:firemodels/$repo.git webpages
+              continue
            fi
         fi
      fi
@@ -121,24 +124,23 @@ do
   fi
   cd $repodir
   if [ "$GITUSER" == "firemodels" ]; then
-     echo disabling push access to firemodels
      ndisable=`git remote -v | grep DISABLE | wc -l`
      if [ $ndisable -eq 0 ]; then
         echo disabling push access to firemodels
         git remote set-url --push origin DISABLE
      fi
   else
-     echo setting up remote tracking with firemodels
      have_central=`git remote -v | awk '{print $1}' | grep firemodels | wc -l`
      if [ $have_central -eq 0 ]; then
+        echo setting up remote tracking with firemodels
         git remote add firemodels ${GITHEADER}firemodels/$repo.git
+        git remote update
      fi
      ndisable=`git remote -v | grep DISABLE | wc -l`
      if [ $ndisable -eq 0 ]; then
         echo disabling push access to firemodels
         git remote set-url --push firemodels DISABLE
      fi
-     git remote update
   fi
 done
 cd $CURDIR
