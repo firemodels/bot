@@ -77,6 +77,7 @@ UPDATE_REPO ()
          git push origin $BRANCH
      fi
    fi
+  git status -uno
 }
 
 UPDATE_REPO2 ()
@@ -96,6 +97,7 @@ UPDATE_REPO2 ()
   echo "   dir: $repodir"
   git fetch origin
   git merge origin/$BRANCH
+  git status -uno
 }
 
 for repo in $allrepos
