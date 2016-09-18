@@ -122,7 +122,8 @@ if NOT "%emailto%" == "" (
 ::                           stage 0
 :: -------------------------------------------------------------
 
-echo  Preliminaries
+echo  Settings
+echo  --------
 
 echo. > %errorlog%
 echo. > %warninglog%
@@ -217,9 +218,11 @@ echo    found sh2bat
 echo. 1>> %OUTDIR%\stage0.txt 2>&1
 
 :: cleaning repos
-
+echo.
+echo Settings
+echo --------
 if %clean% == 0 goto skip_clean1
-   echo    cleaning
+   echo    Cleaning
    echo       fds
    call :git_clean %fdsrepo% || exit /b 1
    echo       smokeview
@@ -229,7 +232,7 @@ if %clean% == 0 goto skip_clean1
 :: updating  repos
 
 if %update% == 0 goto skip_update1
-  echo    updating
+  echo    Updating
   echo       fds
   call :cd_repo %fdsrepo% %fdsbranch% || exit /b 1
   git fetch origin master 1>> %OUTDIR%\stage0.txt 2>&1

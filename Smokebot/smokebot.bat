@@ -123,7 +123,8 @@ echo.
 ::                           stage 0
 :: -------------------------------------------------------------
 
-echo Preliminaries
+echo Settings
+echo --------
 
 :: check if compilers are present
 
@@ -190,9 +191,11 @@ echo    found git
 echo. 1> %OUTDIR%\stage0.txt 2>&1
 
 :: cleaning repos
-
+echo.
+echo Status
+echo ------
 if %clean% == 0 goto skip_clean1
-   echo    cleaning
+   echo    Cleaning
    echo       cfast
    call :git_clean %cfastrepo% %cfastbranch% || exit /b 1
    echo       fds
@@ -204,7 +207,7 @@ if %clean% == 0 goto skip_clean1
 :: updating  repos
 
 if %update% == 0 goto skip_update1
-  echo    updating
+  echo    Updating
   echo       cfast
   call :cd_repo %cfastrepo% %cfastbranch% || exit /b 1
   git fetch origin %cfastbranch%  1>> %OUTDIR%\stage0.txt 2>&1
