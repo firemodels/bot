@@ -1550,11 +1550,11 @@ fi
 
 if [ "$UPDATEREPO" == "1" ]; then
   echo "Updating"
-  echo "  cfast"
+  echo "   cfast"
   update_repo cfast master || exit 1
-  echo "  fds"
+  echo "   fds"
   update_repo fds $FDSBRANCH || exit 1
-  echo "  smv"
+  echo "   smv"
   update_repo smv $SMVBRANCH || exit 1
 else
   echo Repos not updated
