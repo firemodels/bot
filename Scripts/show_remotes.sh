@@ -34,12 +34,20 @@ for repo in $allrepos
 do 
   echo
   repodir=$FMROOT/$repo
+
   echo "---------------------------------------------------------------"
   if [ ! -e $repodir ]; then
-     echo "$repo does not exist, not skipping"
      continue;
   fi
   cd $repodir
+  GITHEADER=`git remote -v | grep origin | head -1 | awk  '{print $2}' | awk -F ':' '{print $1}'`
+  if [ "$GITHEADER" == "git@github.com" ]; then
+     GITHEADER="git@github.com:"
+     GITUSER=`git remote -v | grep origin | head -1 | awk -F ':' '{print $2}' | awk -F\/ '{print $1}'`
+  else
+     GITHEADER="https://github.com/"
+     GITUSER=`git remote -v | grep origin | head -1 | awk -F '.' '{print $2}' | awk -F\/ '{print $2}'`
+  fi
   echo "$repo remotes:"
   git remote -v
 done
