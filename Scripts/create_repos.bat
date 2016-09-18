@@ -119,6 +119,7 @@ goto eof
   echo setting up remote tracking
   cd %repodir%
   git remote add firemodels %GITHEADER%firemodels/%repo%.git
+  git remote set-url --push firemodels DISABLE
   git remote update
   exit /b
 

@@ -123,6 +123,7 @@ do
      echo setting up remote tracking with firemodels
      cd $repodir
      git remote add firemodels ${GITHEADER}firemodels/$repo.git
+     git remote set-url --push firemodels DISABLE
      git remote update
   fi
 done
