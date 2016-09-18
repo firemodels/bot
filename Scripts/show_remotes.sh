@@ -35,10 +35,10 @@ do
   echo
   repodir=$FMROOT/$repo
 
-  echo "---------------------------------------------------------------"
   if [ ! -e $repodir ]; then
      continue;
   fi
+  echo "---------------------------------------------------------------"
   cd $repodir
   GITHEADER=`git remote -v | grep origin | head -1 | awk  '{print $2}' | awk -F ':' '{print $1}'`
   if [ "$GITHEADER" == "git@github.com" ]; then
