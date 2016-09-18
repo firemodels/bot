@@ -262,8 +262,8 @@ clean_smokebot_history()
 {
    
    # Clean Smokebot metafiles
-   MKDIR $SMOKEBOT_RUNDIR > /dev/null
-   cd $SMOKEBOT_RUNDIR
+   MKDIR $smokebotdir > /dev/null
+   cd $smokebotdir
    MKDIR guides > /dev/null
    MKDIR $HISTORY_DIR > /dev/null
    MKDIR $OUTPUT_DIR > /dev/null
@@ -838,7 +838,7 @@ check_smv_pictures_db()
 {
    # Scan and report any errors in make SMV pictures process
    echo "   checking"
-   cd $SMOKEBOT_RUNDIR
+   cd $smokebotdir
    if [[ `grep -I -E "Segmentation|Error" $OUTPUT_DIR/stage4a` == "" ]]
    then
       stage4a_success=true
@@ -851,7 +851,7 @@ check_smv_pictures_db()
    fi
 
    # Scan for and report any warnings in make SMV pictures process
-   cd $SMOKEBOT_RUNDIR
+   cd $smokebotdir
    if [[ `grep -I -E "Warning" $OUTPUT_DIR/stage4a` == "" ]]
    then
       # Continue along
@@ -931,7 +931,7 @@ make_smv_pictures()
 check_smv_pictures()
 {
    # Scan and report any errors in make SMV pictures process
-   cd $SMOKEBOT_RUNDIR
+   cd $smokebotdir
    echo "   checking"
    if [[ `grep -I -E "Segmentation|Error" $OUTPUT_DIR/stage4b` == "" ]]
    then
@@ -974,7 +974,7 @@ make_smv_movies()
 
 check_smv_movies()
 {
-   cd $SMOKEBOT_RUNDIR
+   cd $smokebotdir
    echo make smokeview movies
    if [[ `grep -I -E "Segmentation|Error" $OUTPUT_DIR/stage4c` == "" ]]
    then
@@ -988,7 +988,7 @@ check_smv_movies()
    fi
 
    # Scan for and report any warnings in make SMV pictures process
-   cd $SMOKEBOT_RUNDIR
+   cd $smokebotdir
    if [[ `grep -I -E "Warning" $OUTPUT_DIR/stage4c` == "" ]]
    then
       # Continue along
@@ -1078,7 +1078,7 @@ check_guide()
      fi
    fi
 
-   cd $SMOKEBOT_RUNDIR
+   cd $smokebotdir
    if [[ `grep "! LaTeX Error:" -I $stage` == "" ]]; then
      if [ ! "$SMOKEBOT_MANDIR" == "" ]; then
        cp $directory/$document $SMOKEBOT_MANDIR/.
@@ -1134,7 +1134,7 @@ save_build_status()
 {
    STOP_TIME=$(date)
    STOP_TIME_INT=$(date +%s)
-   cd $SMOKEBOT_RUNDIR
+   cd $smokebotdir
    # Save status outcome of build to a text file
    if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]
    then
@@ -1215,7 +1215,7 @@ email_build_status()
   if [[ $THIS_FDS_REVISION != $LAST_FDS_REVISION ]] ; then
     cat $GIT_FDS_LOG >> $TIME_LOG
   fi
-   cd $SMOKEBOT_RUNDIR
+   cd $smokebotdir
    # Check for warnings and errors
    if [ ! "$WEB_URL" == "" ]; then
      echo "Smokebot summary: $WEB_URL" >> $TIME_LOG
@@ -1245,7 +1245,7 @@ email_build_status()
    else
 # upload guides to a google drive directory
       if [ "$UPLOADRESULTS" == "1" ];then
-        cd $SMOKEBOT_RUNDIR
+        cd $smokebotdir
         $UploadGuides $NEWGUIDE_DIR $smvrepo/Manuals &> /dev/null
       fi
 
@@ -1260,8 +1260,8 @@ email_build_status()
 
 size=_64
 # define run directories
-SMOKEBOT_RUNDIR=`pwd`
-OUTPUT_DIR="$SMOKEBOT_RUNDIR/output"
+smokebotdir=`pwd`
+OUTPUT_DIR="$smokebotdir/output"
 HISTORY_DIR="$HOME/.smokebot/history"
 TIME_LOG=$OUTPUT_DIR/timings
 ERROR_LOG=$OUTPUT_DIR/errors
@@ -1360,7 +1360,7 @@ shift $(($OPTIND-1))
 if [ -e .smv_git ]; then
   cd ../..
   repo=`pwd`
-  cd $SMOKEBOT_RUNDIR
+  cd $smokebotdir
 else
   echo "***error: smokebot not running in the bot/Smokebot directory"
   echo "          Aborting smokebot"
@@ -1370,16 +1370,17 @@ fi
 # make sure repos needed by smokebot exist
 
 botrepo=$repo/bot
-CHK_REPO $botrepo || exit 1
+CD_REPO $botrepo $botbranch || exit 1
 
 cfastrepo=$repo/cfast
-CHK_REPO $cfastrepo || exit 1
+CD_REPO $cfastrepo $cfastbranch || exit 1
 
 fdsrepo=$repo/fds
-CHK_REPO $fdsrepo || exit 1
+CD_REPO $fdsrepo $fdsbranch || exit 1
 
 smvrepo=$repo/smv
-CHK_REPO $smvrepo ||  exit 1
+CD_REPO $smvrepo $smvbranch ||  exit 1
+cd $smokebotrundir
 
 # save pid if -k option (kill smokebot) is used lateer
 
@@ -1459,7 +1460,7 @@ echo "--------"
 echo "    FDS repo: $fdsrepo"
 echo "    SMV repo: $smvrepo"
 echo "  CFAST repo: $cfastrepo"
-echo "     Run dir: $SMOKEBOT_RUNDIR"
+echo "     Run dir: $smokebotdir"
 if [ "$CLEANREPO" == "1" ]; then
   echo " clean repos: yes"
 else
@@ -1498,7 +1499,7 @@ if [ -e $FDS_STATUS_FILE ] ; then
 fi
 
 # Load mailing list for status report
-source $SMOKEBOT_RUNDIR/firebot_email_list.sh
+source $smokebotdir/firebot_email_list.sh
 
 mailTo=$mailToSMV
 if [[ "$LAST_FDS_FAILED" == "1" ]] ; then

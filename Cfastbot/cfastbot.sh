@@ -185,7 +185,7 @@ clean_cfastbot_history()
    # Clean cfastbot metafiles
    echo "Cleaning"
    echo "   cfastbot results directory"
-   cd $CFASTBOT_RUNDIR
+   cd $cfastbotdir
    rm -rf $OUTPUT_DIR/* &> /dev/null
 }
 
@@ -814,7 +814,7 @@ make_cfast_pictures()
 check_cfast_pictures()
 {
    # Scan and report any errors in make SMV pictures process
-   cd $CFASTBOT_RUNDIR
+   cd $cfastbotdir
    if [[ `grep -B 50 -A 50 "Segmentation" -I $OUTPUT_DIR/stage6` == "" && `grep -F "*** Error" -I $OUTPUT_DIR/stage6` == "" ]]
    then
       stage6_success=true
@@ -939,7 +939,7 @@ run_matlab_verification()
 check_matlab_verification()
 {
    # Scan and report any errors in Matlab scripts
-   cd $CFASTBOT_RUNDIR
+   cd $cfastbotdir
 
    if [[ `grep -A 50 "Error" $OUTPUT_DIR/stage7b_verification` == "" ]]
    then
@@ -984,7 +984,7 @@ run_matlab_validation()
 check_matlab_validation()
 {
    # Scan and report any errors in Matlab scripts
-   cd $CFASTBOT_RUNDIR
+   cd $cfastbotdir
    if [[ `grep -A 50 "Error" $OUTPUT_DIR/stage7d_validation` == "" ]]
    then
       stage7d_success=true
@@ -1069,7 +1069,7 @@ check_guide()
    local docname=$4
    
    # Scan and report any errors or warnings in build process for guides
-   cd $CFASTBOT_RUNDIR
+   cd $cfastbotdir
    if [[ `grep -I "succeeded" $logfile` != "" ]] && [[ -e $docdir/$docfile ]]; then
       # Guide built succeeded; there were no errors/warnings
       # Copy guide to CFASTbot's local website
@@ -1160,7 +1160,7 @@ make_cfast_config_guide()
 
 save_build_status()
 {
-   cd $CFASTBOT_RUNDIR
+   cd $cfastbotdir
    # Save status outcome of build to a text file
    if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]
    then
@@ -1217,7 +1217,7 @@ email_build_status()
    if [[ $THIS_REVISION != $LAST_CFASTSOUCEgit ]] ; then
      cat $git_CFASTSOURCELOG >> $TIME_LOG
    fi
-   cd $CFASTBOT_RUNDIR
+   cd $cfastbotdir
    # Check for warnings and errors
    if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]
    then
@@ -1258,6 +1258,10 @@ email_build_status()
    fi
 }
 
+#VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
+#                             Primary script execution =
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 size=_64
 
 
@@ -1267,34 +1271,39 @@ size=_64
 
 mailTo="gforney@gmail.com, rpeacoc@nist.gov"
 
-CFASTBOT_RUNDIR="`pwd`"
+cfastbotdir="`pwd`"
 
 PID_FILE=~/.cfastgit/cfastbot_pid
-OUTPUT_DIR=$CFASTBOT_RUNDIR/output
-HISTORY_DIR=$CFASTBOT_RUNDIR/history
+OUTPUT_DIR=$cfastbotdir/output
+HISTORY_DIR=$cfastbotdir/history
 ERROR_LOG=$OUTPUT_DIR/errors
 TIME_LOG=$OUTPUT_DIR/timings
 WARNING_LOG=$OUTPUT_DIR/warnings
 NEWGUIDE_DIR=$OUTPUT_DIR/NEW_GUIDES
 VALIDATION_STATS_LOG=$OUTPUT_DIR/statistics
 GITSTATUS_DIR=~/.cfastbot
-BRANCH=master
 
 echo ""
 echo "Settings"
 echo "--------"
-echo "    Run dir: $CFASTBOT_RUNDIR"
+echo "    Run dir: $cfastbotdir"
 MKDIR $OUTPUT_DIR
 MKDIR $HISTORY_DIR
 MKDIR $GITSTATUS_DIR
 
-# define repo names (default)
+#*** make sure cfastbot is running in the correct directory
 
-cd ../..
-reponame=`pwd`
-cfastrepo=$repoanme/cfast
-smvrepo=$reponame/smv
-cd $CFAST_RUNDIR
+if [ -e .cfast_git ]; then
+  cd ../..
+  reponame=`pwd`
+  cd $cfastbotdir
+else
+  echo "***error: firebot not running in the bot/Firebot directory"
+  echo "          Aborting firebot"
+  exit
+fi
+
+cd $cfastbotdir
 
 COMPILER=intel
 QUEUE=smokebot
@@ -1363,6 +1372,17 @@ shift $(($OPTIND-1))
 
 echo $$ > $PID_FILE
 
+# define repo names, make sure they exist
+
+cfastrepo=$reponame/cfast
+cfastbranch=master
+CD_BRANCH $cfastrepo $cfastbranch || exit 1
+
+smvrepo=$reponame/smv
+smvbranch=master
+CD_BRANCH $smvrepo $smvbranch || exit 1
+cd $cfastbotdir
+
 if [ "$USEINSTALL" == "" ]; then
   CCnotfound=`icc -help 2>&1 | tail -1 | grep "not found" | wc -l`
 fi
@@ -1376,14 +1396,14 @@ else
 fi
 
 if [ -e $cfastrepo ]; then
-echo " cfast repo: $cfastrepo"
+  echo " cfast repo: $cfastrepo"
 else
-echo " cfast repo: $cfastrepo ***error does not exist"
+  echo " cfast repo: $cfastrepo ***error does not exist"
 fi
 if [ -e $smvrepo ]; then
-echo "   SMV repo: $smvrepo"
+  echo "   SMV repo: $smvrepo"
 else
-echo "   SMV repo: $smvrepo ***error does not exist"
+  echo "   SMV repo: $smvrepo ***error does not exist"
 fi
 
 platform="linux"

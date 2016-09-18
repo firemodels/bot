@@ -1,5 +1,7 @@
 @echo off
 
+set FIREBOTRUNDIR=%CD%
+
 set repo=%~f1
 set smvrepo=%repo%\smv
 set fdsrepo=%repo%\fds
@@ -13,8 +15,9 @@ set installed=%6
 set lite=%7
 set emailto=%8
 
-set smvbranch=master
+set botbranch=master
 set fdsbranch=master
+set smvbranch=master
 
 set size=_64
 
@@ -34,7 +37,10 @@ if %abort% == 1 (
    exit /b
 )
 
-set FIREBOTRUNDIR=%CD%
+call :cd_repo %smvrepo% %botbranch%  || exit /b 1
+call :cd_repo %fdsrepo% %fdsbranch%  || exit /b 1
+call :cd_repo %botrepo% %smvbranch%  || exit /b 1
+cd %FIREBOTRUNDIR%
 
 echo.
 echo Settings
@@ -632,7 +638,8 @@ git rev-parse --abbrev-ref HEAD>current_branch.txt
 set /p current_branch=<current_branch.txt
 erase current_branch.txt
 if "%repobranch%" NEQ "%current_branch%" (
-  echo ***error: found branch %current_branch% was expecting branch %repobranch%
+  echo ***error: in repo %repodir% found branch %current_branch%
+  echo            was expecting branch %repobranch%
   echo  firebot aborted
   exit /b 1
 )

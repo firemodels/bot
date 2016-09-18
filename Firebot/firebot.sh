@@ -142,7 +142,7 @@ clean_repo()
 clean_firebot_metafiles()
 {
    echo "   run directory"
-   cd $FIREBOT_RUNDIR
+   cd $firebotdir
    MKDIR guides &> /dev/null
    MKDIR $HISTORY_DIR &> /dev/null
    MKDIR $OUTPUT_DIR &> /dev/null
@@ -659,7 +659,7 @@ make_fds_pictures()
 check_fds_pictures()
 {
    # Scan for and report any errors in make FDS pictures process
-   cd $FIREBOT_RUNDIR
+   cd $firebotdir
    if [[ `grep -I -E "Segmentation|Error" $OUTPUT_DIR/stage6` == "" ]]
    then
       stage6_success=true
@@ -672,7 +672,7 @@ check_fds_pictures()
    fi
 
    # Scan for and report any warnings in make FDS pictures process
-   cd $FIREBOT_RUNDIR
+   cd $firebotdir
    if [[ `grep -I -E "Warning" $OUTPUT_DIR/stage6` == "" ]]
    then
       # Continue along
@@ -752,7 +752,7 @@ run_matlab_verification()
 check_matlab_verification()
 {
    # Scan for and report any errors in Matlab scripts
-   cd $FIREBOT_RUNDIR
+   cd $firebotdir
    if [[ `grep -B 5 -A 50 "Error" $OUTPUT_DIR/stage7a_verification` == "" ]]
    then
       stage7a_success=true
@@ -797,7 +797,7 @@ check_verification_stats()
    fi
 
    # Scan for and report any case warnings in Matlab scripts
-   cd $FIREBOT_RUNDIR
+   cd $firebotdir
    if [[ `grep "Matlab Warning" $OUTPUT_DIR/stage7a_verification` == "" ]]
    then
       # Continue along
@@ -828,7 +828,7 @@ run_matlab_validation()
 check_matlab_validation()
 {
    # Scan for and report any errors in Matlab scripts
-   cd $FIREBOT_RUNDIR
+   cd $firebotdir
    if [[ `grep -B 5 -A 50 "Error" $OUTPUT_DIR/stage7b_validation` == "" ]]
    then
       stage7b_success=true
@@ -918,7 +918,7 @@ check_guide()
    local label=$3
    
    # Scan for and report any errors or warnings in build process for guides
-   cd $FIREBOT_RUNDIR
+   cd $firebotdir
    if [[ `grep -I "successfully" $guidelog` == "" ]]
    then
       # There were errors/warnings in the guide build process
@@ -1026,7 +1026,7 @@ save_build_status()
 {
    STOP_TIME=$(date)
    STOP_TIME_INT=$(date +%s)
-   cd $FIREBOT_RUNDIR
+   cd $firebotdir
    # Save status outcome of build to a text file
    if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]
    then
@@ -1059,7 +1059,7 @@ save_build_status()
 
 email_build_status()
 {
-   cd $FIREBOT_RUNDIR
+   cd $firebotdir
 
    bottype=${1}
    botuser=${1}@$hostname
@@ -1085,7 +1085,7 @@ email_build_status()
    # Check for warnings and errors
    if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]
    then
-      cd $FIREBOT_RUNDIR
+      cd $firebotdir
 
      # Send email with failure message and warnings, body of email contains appropriate log file
      cat $ERROR_LOG $TIME_LOG | mail -s "[$botuser] $bottype failure and warnings. Version: ${GIT_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
@@ -1099,7 +1099,7 @@ email_build_status()
    # Check for warnings only
    elif [ -e $WARNING_LOG ]
    then
-      cd $FIREBOT_RUNDIR
+      cd $firebotdir
 
       # Send email with success message, include warnings
       cat $WARNING_LOG $TIME_LOG | mail -s "[$botuser] $bottype success, with warnings. Version: ${GIT_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
@@ -1107,7 +1107,7 @@ email_build_status()
    # No errors or warnings
    else
 #  upload guides to a google drive directory
-      cd $FIREBOT_RUNDIR
+      cd $firebotdir
 
       # Send success message with links to nightly manuals
       cat $TIME_LOG | mail -s "[$botuser] $bottype success! Version: ${GIT_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
@@ -1131,8 +1131,8 @@ size=_64
 
 # define run directories
 PID_FILE=~/.fdssmvgit/firebot_pid
-FIREBOT_RUNDIR=`pwd`
-OUTPUT_DIR="$FIREBOT_RUNDIR/output"
+firebotdir=`pwd`
+OUTPUT_DIR="$firebotdir/output"
 HISTORY_DIR="$HOME/.firebot/history"
 TIME_LOG=$OUTPUT_DIR/timings
 ERROR_LOG=$OUTPUT_DIR/errors
@@ -1173,7 +1173,7 @@ IB=ib
 fi
 
 # Load mailing list for status report
-source $FIREBOT_RUNDIR/firebot_email_list.sh
+source $firebotdir/firebot_email_list.sh
 
 UPLOADGUIDES=0
 GIT_REVISION=
@@ -1232,23 +1232,24 @@ shift $(($OPTIND-1))
 if [ -e .fds_git ]; then
   cd ../..
   repo=`pwd`
-  cd $FIREBOT_RUNDIR
+  cd $firebotdir
 else
   echo "***error: firebot not running in the bot/Firebot directory"
   echo "          Aborting firebot"
   exit
 fi
 
-#*** make sure repos exist
+#*** make sure repos exist and have expected branches
 
 fdsrepo=$repo/fds
-CHK_REPO $fdsrepo || exit 1
+CD_REPO $fdsrepo $fdsbranch || exit 1
 
 smvrepo=$repo/smv
-CHK_REPO $smvrepo || exit 1
+CD_REPO $smvrepo $smvbranch || exit 1
 
 botrepo=$repo/bot
-CHK_REPO $botrepo || exit 1
+CD_REPO $botrepo $botbranch || exit 1
+cd $firebotdir
 
 #*** save pid in case we want to kill firebot later
 
@@ -1288,7 +1289,7 @@ echo "Settings"
 echo "--------"
 echo "    FDS repo: $fdsrepo"
 echo "    SMV repo: $smvrepo"
-echo "     Run dir: $FIREBOT_RUNDIR"
+echo "     Run dir: $firebotdir"
 if [ "$CLEANREPO" == "1" ]; then
   echo " clean repos: yes"
 else
