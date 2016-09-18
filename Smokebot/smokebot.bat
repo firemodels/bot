@@ -99,14 +99,14 @@ call %repo%\bot\Smokebot\firebot_email_list.bat
 echo.
 echo Settings
 echo --------
-if NOT "%emailto%" == "" (
-  echo email: %emailto%
-  set mailToSMV=%emailto%
-)
 echo     cfast repo: %cfastrepo%
 echo       FDS repo: %fdsrepo%
 echo Smokeview repo: %smvrepo%
 echo        run dir: %CURDIR%
+if NOT "%emailto%" == "" (
+  echo          email: %emailto%
+  set mailToSMV=%emailto%
+)
 if %clean% == 1 (
 echo    clean repos: yes
 ) else (
