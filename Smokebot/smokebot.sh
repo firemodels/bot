@@ -1538,11 +1538,14 @@ clean_smokebot_history
 
 ### Stage 0 repo operatoins ###
 echo "Status"
-echo "-----"
+echo "------"
 if [ "$CLEANREPO" == "1" ]; then
   echo Cleaning
+  echo "   cfast"
   clean_repo2 cfast master || exit 1
+  echo "   fds"
   clean_repo2 fds $FDSBRANCH || exit 1
+  echo "   smv"
   clean_repo2 smv $SMVBRANCH || exit 1
 else
   echo Repos not cleaned
