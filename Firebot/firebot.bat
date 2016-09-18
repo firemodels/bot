@@ -122,8 +122,8 @@ if NOT "%emailto%" == "" (
 ::                           stage 0
 :: -------------------------------------------------------------
 
-echo  Settings
-echo  --------
+echo  Status
+echo  ------
 
 echo. > %errorlog%
 echo. > %warninglog%
