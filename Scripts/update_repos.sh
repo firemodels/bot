@@ -43,7 +43,8 @@ read val
 
 UPDATE_REPO ()
 {
-  repodir=$1
+  local repo=$1
+  repodir=$FMROOT/$repo
 
   echo "---------------------------------------------------------------"
   if [ ! -e $repodir ]; then
@@ -56,12 +57,19 @@ UPDATE_REPO ()
     echo "Skipping, found branch $CURRENT_BRANCH, expecting branch $BRANCH"
     exit
   fi
-  echo "updating $repo from origin"
+  echo ""
+  echo "repo: $repo - updating from origin"
+  echo "  branch: $BRANCH"
+  echo "     dir: $repodir"
+
   git fetch origin
   git merge origin/$BRANCH
   have_central=`git remote -v | awk '{print $1}' | grep firemodels | wc  -l`
   if [ "$have_central" -gt "0" ]; then
-     echo "updating $repo from firemodels"
+  echo ""
+  echo "repo: $repo - updating from firemodels"
+  echo "  branch: $BRANCH"
+  echo "     dir: $repodir"
      git fetch firemodels
      git merge firemodels/$BRANCH
      if [ "$PUSH" == "1" ]; then
@@ -73,7 +81,8 @@ UPDATE_REPO ()
 
 UPDATE_REPO2 ()
 {
-  repodir=$1
+  local repo=$1
+  repodir=$FMROOT/$repo
 
   if [ ! -e $repodir ]; then
      exit
@@ -81,7 +90,10 @@ UPDATE_REPO2 ()
   echo "---------------------------------------------------------------"
   cd $repodir
   BRANCH=`git rev-parse --abbrev-ref HEAD`
-  echo "updating $repo from origin"
+  echo ""
+  echo "repo: $repo - updating from firemodels"
+  echo "  branch: $BRANCH"
+  echo "     dir: $repodir"
   git fetch origin
   git merge origin/$BRANCH
 }
@@ -89,15 +101,13 @@ UPDATE_REPO2 ()
 for repo in $allrepos
 do 
   echo
-  repodir=$FMROOT/$repo
-  UPDATE_REPO $repodir
+  UPDATE_REPO $repo
 done
 
 for repo in $otherrepos
 do 
   echo
-  repodir=$FMROOT/$repo
-  UPDATE_REPO2 $repodir
+  UPDATE_REPO2 $repo
 done
 
 cd $CURDIR
