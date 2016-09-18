@@ -119,10 +119,14 @@ do
      RECURSIVE=--recursive
   fi
   git clone $RECURSIVE $GITHEADER$GITUSER/$repo.git
-  if [ "$GITUSER" != "firemodels" ]; then
+  cd $repodir
+  if [ "$GITUSER" == "firemodels" ]; then
+     echo disabling push access to firemodels
+     git remote set-url --push origin DISABLE
+  else
      echo setting up remote tracking with firemodels
-     cd $repodir
      git remote add firemodels ${GITHEADER}firemodels/$repo.git
+     echo disabling push access to firemodels
      git remote set-url --push firemodels DISABLE
      git remote update
   fi
