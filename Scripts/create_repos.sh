@@ -73,9 +73,9 @@ fi
 
 echo "You are about to clone the repos: $repos"
 if [ "$WIKIWEB" == "1" ]; then
-echo "from git@github.com:firemodels into the directory: $FMROOT"
+   echo "from git@github.com:firemodels into the directory: $FMROOT"
 else
-echo "from $GITHEADER$GITUSER into the directory: $FMROOT"
+   echo "from $GITHEADER$GITUSER into the directory: $FMROOT"
 fi
 echo ""
 echo "Press any key to continue or <CTRL> c to abort."
@@ -95,22 +95,15 @@ do
      if [ "$repo" == "fds-smv" ]; then
         repodir=$FMROOT/webpages
      fi   
-  fi
-  if [ -e $repodir ]; then
      if [ "$repo" != "bot" ]; then
-        echo Skipping $repo, the directory $repodir already exists.
-        continue;
-     fi
-  fi
-  if [ "$WIKIWEB" == "1" ]; then
-     if [ "$repo" == "fds.wiki" ]; then
-        git clone git@github.com:firemodels/$repo.git wikis
-     fi   
-     if [ "$repo" == "fds-smv" ]; then
-        git clone git@github.com:firemodels/$repo.git webpages
-     fi   
-     if [ "$repo" != "bot" ]; then
-        continue
+        if [ ! -e $repodir ]; then
+           if [ "$repo" == "fds.wiki" ]; then
+              git clone git@github.com:firemodels/$repo.git wikis
+           fi   
+           if [ "$repo" == "fds-smv" ]; then
+              git clone git@github.com:firemodels/$repo.git webpages
+           fi
+        fi
      fi
   fi
   AT_GITHUB=`git ls-remote $GITHEADER$GITUSER/$repo.git 2>&1 > /dev/null | grep ERROR | wc -l`
@@ -122,7 +115,7 @@ do
   if [ "$repo" == "exp" ]; then
      RECURSIVE=--recursive
   fi
-  if [ "$repo" != "bot" ]; then
+  if [ ! -e $repodir ]; then
      git clone $RECURSIVE $GITHEADER$GITUSER/$repo.git
   fi
   cd $repodir
