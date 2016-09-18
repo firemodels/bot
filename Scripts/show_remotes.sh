@@ -1,6 +1,6 @@
 #!/bin/bash
 CUR=`pwd`
-allrepos="bot cfast cor exp fds out radcal smv"
+allrepos="bot cfast cor exp fds out radcal smv fds.wiki fds-smv"
 BRANCH=master
 
 function usage {
@@ -33,10 +33,18 @@ shift $(($OPTIND-1))
 for repo in $allrepos
 do 
   repodir=$FMROOT/$repo
+
+  if [ "$repo" == "fds.wiki" ]; then
+     repo=wikis
+     repodir=$FMROOT/wikis
+  fi
+  if [ "$repo" == "fds-smv" ]; then
+     repo=webpages
+     repodir=$FMROOT/webpages
+  fi
   if [ ! -e $repodir ]; then
      continue;
   fi
-
   echo
   echo "---------------------------------------------------------------"
   cd $repodir

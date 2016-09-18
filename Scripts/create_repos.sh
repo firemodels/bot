@@ -89,27 +89,27 @@ do
   repodir=$FMROOT/$repo
   cd $FMROOT
   echo "----------------------------------------------"
-  echo repo: $repo
-  if [ "$WIKIWEB" == "1" ]; then
-     if [ "$repo" == "fds.wiki" ]; then
-        repodir=$FMROOT/wikis
-     fi   
-     if [ "$repo" == "fds-smv" ]; then
-        repodir=$FMROOT/webpages
-     fi   
-     if [ "$repo" != "bot" ]; then
-        if [ ! -e $repodir ]; then
-           if [ "$repo" == "fds.wiki" ]; then
-              git clone git@github.com:firemodels/$repo.git wikis
-              continue
-           fi   
-           if [ "$repo" == "fds-smv" ]; then
-              git clone git@github.com:firemodels/$repo.git webpages
-              continue
-           fi
-        fi
+  if [ "$repo" == "fds.wiki" ]; then
+     echo repo: wikis
+     repodir=$FMROOT/wikis
+     if [ -e $repodir ]; then
+        echo "   already exists"
+     else
+        git clone ${GITHEADER}firemodels/$repo.git wikis
      fi
+     continue
+  fi   
+  if [ "$repo" == "fds-smv" ]; then
+     echo repo: webpages
+     repodir=$FMROOT/webpages
+     if [ -e $repodir ]; then
+        echo "   already exists"
+     else
+        git clone ${GITHEADER}firemodels/$repo.git webpages
+     fi
+     continue
   fi
+  echo repo: $repo
   AT_GITHUB=`git ls-remote $GITHEADER$GITUSER/$repo.git 2>&1 > /dev/null | grep ERROR | wc -l`
   if [ $AT_GITHUB -gt 0 ]; then
      echo "***Error: The repo $GITHEADER$GITUSER/$repo.git was not found."
@@ -119,7 +119,9 @@ do
   if [ "$repo" == "exp" ]; then
      RECURSIVE=--recursive
   fi
-  if [ ! -e $repodir ]; then
+  if [ -e $repodir ]; then
+     echo "   already exists"
+  else
      git clone $RECURSIVE $GITHEADER$GITUSER/$repo.git
   fi
   cd $repodir
