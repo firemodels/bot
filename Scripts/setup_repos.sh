@@ -143,7 +143,7 @@ do
         echo "   disabling push access to firemodels"
         git remote set-url --push firemodels DISABLE
      else
-        echo "   remote access to firemodels is disabled"
+        echo "   push access to firemodels already disabled"
      fi
   fi
 done
