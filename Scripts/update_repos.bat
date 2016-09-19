@@ -13,11 +13,6 @@ if not exist ..\.gitbot goto skip1
    exit /b
 :endif1
 
-call :getopts %*
-if %stopscript% == 1 (
-  exit /b
-)
-
 cd %repo%\bot
 set allrepos=bot cfast cor exp fds out radcal smv
 set webrepos=webpages wikis
@@ -27,6 +22,11 @@ set PUSH=0
 set wc=%repo%\bot\Scripts\bin\wc
 set grep=%repo%\bot\Scripts\bin\grep
 set gawk=%repo%\bot\Scripts\bin\gawk
+
+call :getopts %*
+if %stopscript% == 1 (
+  exit /b
+)
 
 for %%x in ( %allrepos% ) do ( call :update_repo %%x )
 
