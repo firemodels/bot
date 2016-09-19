@@ -1,6 +1,6 @@
 #!/bin/bash
 CUR=`pwd`
-allrepos="bot cfast cor exp fds out radcal smv"
+allrepos="bot cfast cor exp fds out radcal smv fds.wiki fds-smv"
 BRANCH=master
 
 function usage {
@@ -32,14 +32,30 @@ shift $(($OPTIND-1))
 
 for repo in $allrepos
 do 
-  echo
   repodir=$FMROOT/$repo
-  echo "---------------------------------------------------------------"
+
+  if [ "$repo" == "fds.wiki" ]; then
+     repo=wikis
+     repodir=$FMROOT/wikis
+  fi
+  if [ "$repo" == "fds-smv" ]; then
+     repo=webpages
+     repodir=$FMROOT/webpages
+  fi
   if [ ! -e $repodir ]; then
-     echo "$repo does not exist, not skipping"
      continue;
   fi
+  echo
+  echo "---------------------------------------------------------------"
   cd $repodir
+  GITHEADER=`git remote -v | grep origin | head -1 | awk  '{print $2}' | awk -F ':' '{print $1}'`
+  if [ "$GITHEADER" == "git@github.com" ]; then
+     GITHEADER="git@github.com:"
+     GITUSER=`git remote -v | grep origin | head -1 | awk -F ':' '{print $2}' | awk -F\/ '{print $1}'`
+  else
+     GITHEADER="https://github.com/"
+     GITUSER=`git remote -v | grep origin | head -1 | awk -F '.' '{print $2}' | awk -F\/ '{print $2}'`
+  fi
   echo "$repo remotes:"
   git remote -v
 done

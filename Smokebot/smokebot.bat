@@ -10,6 +10,10 @@ set update=%3
 set altemail=%4
 set emailto=%5
 
+set fdsbranch=master
+set smvbranch=master
+set cfastbranch=master
+
 ::  set number of OpenMP threads
 
 set OMP_NUM_THREADS=1
@@ -94,25 +98,33 @@ call %repo%\bot\Smokebot\firebot_email_list.bat
 
 echo.
 echo Settings
+echo --------
+echo     cfast repo: %cfastrepo%
+echo       FDS repo: %fdsrepo%
+echo Smokeview repo: %smvrepo%
+echo        run dir: %CURDIR%
 if NOT "%emailto%" == "" (
   echo          email: %emailto%
   set mailToSMV=%emailto%
 )
-echo     cfast repo: %cfastrepo%
-echo       FDS repo: %fdsrepo%
-echo Smokeview repo: %smvrepo%
-echo  run directory: %CURDIR%
-if %clean% == 1 echo    clean repo: yes
-if %clean% == 0 echo    clean repo: no
-if %update% == 1 echo  update repo: yes
-if %update% == 0 echo  update repo: no
+if %clean% == 1 (
+echo    clean repos: yes
+) else (
+echo    clean repos: no
+)
+if %update% == 1 (
+echo   update repos: yes
+) else (
+echo   update repos: no
+)
 echo.
 
 :: -------------------------------------------------------------
 ::                           stage 0
 :: -------------------------------------------------------------
 
-echo Stage 0 - Preliminaries
+echo Settings
+echo --------
 
 :: check if compilers are present
 
@@ -121,7 +133,7 @@ echo. > %warninglog%
 echo. > %stagestatus%
 
 call :is_file_installed %gettimeexe%|| exit /b 1
-echo             found get_time
+echo    found get_time
 
 call :GET_TIME TIME_beg
 call :GET_TIME PRELIM_beg
@@ -136,7 +148,7 @@ if %nothaveFORTRAN% == 1 (
   call :output_abort_message
   exit /b 1
 )
-echo             found Fortran
+echo    found Fortran
 
 icl 1> %OUTDIR%\stage0b.txt 2>&1
 type %OUTDIR%\stage0b.txt | find /i /c "not recognized" > %OUTDIR%\stage_count0b.txt
@@ -145,72 +157,74 @@ if %nothaveCC% == 1 (
   set haveCC=0
   echo "***Warning: C/C++ compiler not found - using installed Smokeview to generate images"
 ) else (
-  echo             found C/C++
+  echo    found C/C++
 )
 
 if NOT exist %emailexe% (
   echo ***warning: email client not found.   
-  echo             Smokebot messages will only be sent to the console.
+  echo    Smokebot messages will only be sent to the console.
 ) else (
-  echo             found mailsend
+  echo    found mailsend
 )
 
 call :is_file_installed pdflatex|| exit /b 1
-echo             found pdflatex
+echo    found pdflatex
 
 call :is_file_installed grep|| exit /b 1
-echo             found grep
+echo    found grep
 
 call :is_file_installed gawk|| exit /b 1
-echo             found gawk
+echo    found gawk
 
 call :is_file_installed sed|| exit /b 1
-echo             found sed
+echo    found sed
 
 call :is_file_installed wc|| exit /b 1
-echo             found wc
+echo    found wc
 
 call :is_file_installed cut|| exit /b 1
-echo             found cut
+echo    found cut
 
 call :is_file_installed git|| exit /b 1
-echo             found git
+echo    found git
 
 echo. 1> %OUTDIR%\stage0.txt 2>&1
 
 :: cleaning repos
-
+echo.
+echo Status
+echo ------
 if %clean% == 0 goto skip_clean1
-   echo             cleaning
-   echo                cfast
-   call :git_clean %cfastrepo%
-   echo                fds
-   call :git_clean %fdsrepo%
-   echo                smokeview
-   call :git_clean %smvrepo%
+   echo    Cleaning
+   echo       cfast
+   call :git_clean %cfastrepo% %cfastbranch% || exit /b 1
+   echo       fds
+   call :git_clean %fdsrepo% %fdsbranch% || exit /b 1
+   echo       smokeview
+   call :git_clean %smvrepo% %smvbranch% || exit /b 1
 :skip_clean1
 
 :: updating  repos
 
 if %update% == 0 goto skip_update1
-  echo             updating
-  echo                cfast
-  cd %cfastrepo%
-  git fetch origin master  1>> %OUTDIR%\stage0.txt 2>&1
-  git merge origin/master  1>> %OUTDIR%\stage0.txt 2>&1
+  echo    Updating
+  echo       cfast
+  call :cd_repo %cfastrepo% %cfastbranch% || exit /b 1
+  git fetch origin %cfastbranch%  1>> %OUTDIR%\stage0.txt 2>&1
+  git merge origin/%cfastbranch%  1>> %OUTDIR%\stage0.txt 2>&1
 
-  echo                fds
-  cd %fdsrepo%
-  git fetch origin master 1>> %OUTDIR%\stage0.txt 2>&1
-  git merge origin/master 1>> %OUTDIR%\stage0.txt 2>&1
+  echo       fds
+  call :cd_repo %fdsrepo% %fdsbranch% || exit /b 1
+  git fetch origin %fdsbranch% 1>> %OUTDIR%\stage0.txt 2>&1
+  git merge origin/%fdsbranch% 1>> %OUTDIR%\stage0.txt 2>&1
 
-  echo                smv
-  cd %smvrepo%
-  git fetch origin master 1>> %OUTDIR%\stage0.txt 2>&1
-  git merge origin/master 1>> %OUTDIR%\stage0.txt 2>&1
+  echo       smv
+  call :cd_repo %smvrepo% %smvbranch% || exit /b 1
+  git fetch origin %smvbranch% 1>> %OUTDIR%\stage0.txt 2>&1
+  git merge origin/%smvbranch% 1>> %OUTDIR%\stage0.txt 2>&1
 :skip_update1
 
-cd %smvrepo%
+call :cd_repo %smvrepo% %smvbranch%
 git describe --long --dirty > %revisionfilestring%
 set /p revisionstring=<%revisionfilestring%
 
@@ -224,7 +238,7 @@ set timingslogfile=%TIMINGSDIR%\timings_%revisionnum%.txt
 
 :: build cfast
 
-echo             building cfast
+echo    building cfast
 cd %cfastrepo%\Build\CFAST\intel_win%size%
 erase *.obj *.mod *.exe 1>> %OUTDIR%\stage0.txt 2>&1
 call make_cfast bot 1>> %OUTDIR%\stage0.txt 2>&1
@@ -238,9 +252,9 @@ call :GET_DURATION PRELIM %PRELIM_beg%
 
 call :GET_TIME BUILDFDS_beg
 
-echo Stage 1 - Building FDS
+echo  Building FDS
 
-echo             parallel debug
+echo    parallel debug
 
 cd %fdsrepo%\Build\mpi_intel_win%size%_db
 erase *.obj *.mod *.exe 1> %OUTDIR%\stage1b.txt 2>&1
@@ -249,7 +263,7 @@ call make_fds bot 1>> %OUTDIR%\stage1b.txt 2>&1
 call :does_file_exist fds_mpi_win%size%_db.exe %OUTDIR%\stage1b.txt|| exit /b 1
 call :find_fds_warnings "warning" %OUTDIR%\stage1b.txt "Stage 1b"
 
-echo             parallel release
+echo    parallel release
 
 cd %fdsrepo%\Build\mpi_intel_win%size%
 erase *.obj *.mod *.exe 1> %OUTDIR%\stage1d.txt 2>&1
@@ -266,14 +280,14 @@ call :GET_DURATION BUILDFDS %BUILDFDS_beg%
 
 call :GET_TIME BUILDSMVUTIL_beg
 
-echo Stage 2 - Building Smokeview
+echo  Building Smokeview
 
-echo             libs
+echo    libs
 
 cd %smvrepo%\Build\LIBS\intel_win%size%
 call makelibs bot 1>> %OUTDIR%\stage2a.txt 2>&1
 
-echo             debug
+echo    debug
 
 cd %smvrepo%\Build\smokeview\intel_win%size%
 erase *.obj *.mod *.exe smokeview_win%size%_db.exe 1> %OUTDIR%\stage2a.txt 2>&1
@@ -282,7 +296,7 @@ call make_smv_db -r bot 1>> %OUTDIR%\stage2a.txt 2>&1
 call :does_file_exist smokeview_win%size%_db.exe %OUTDIR%\stage2a.txt|| exit /b 1
 call :find_smokeview_warnings "warning" %OUTDIR%\stage2a.txt "Stage 2a"
 
-echo             release
+echo    release
 
 cd %smvrepo%\Build\smokeview\intel_win%size%
 erase *.obj *.mod smokeview_win%size%.exe 1> %OUTDIR%\stage2b.txt 2>&1
@@ -295,47 +309,47 @@ call :find_smokeview_warnings "warning" %OUTDIR%\stage2b.txt "Stage 2b"
 ::                           stage 3
 :: -------------------------------------------------------------
 
-echo Stage 3 - Building FDS/Smokeview utilities
+echo  Building FDS/Smokeview utilities
 
-echo             fds2ascii
+echo    fds2ascii
 cd %fdsrepo%\Utilities\fds2ascii\intel_win%size%
 erase *.obj *.mod *.exe 1> %OUTDIR%\stage3c.txt 2>&1
 call make_fds2ascii bot 1>> %OUTDIR%\stage3.txt 2>&1
 call :does_file_exist fds2ascii_win%size%.exe %OUTDIR%\stage3.txt|| exit /b 1
 
 if %haveCC% == 1 (
-  echo             background
+  echo    background
   cd %smvrepo%\Build\background\intel_win%size%
   erase *.obj *.mod *.exe 1>> %OUTDIR%\stage3.txt 2>&1
   call make_background bot 1>> %OUTDIR%\stage3.txt 2>&1
   call :does_file_exist background.exe %OUTDIR%\stage3.txt
 
-  echo             smokediff
+  echo    smokediff
   cd %smvrepo%\Build\smokediff\intel_win%size%
   erase *.obj *.mod *.exe 1>> %OUTDIR%\stage3.txt 2>&1
   call make_smokediff bot 1>> %OUTDIR%\stage3.txt 2>&1
   call :does_file_exist smokediff_win%size%.exe %OUTDIR%\stage3.txt
 
-  echo             smokezip
+  echo    smokezip
   cd %smvrepo%\Build\smokezip\intel_win%size%
   erase *.obj *.mod *.exe 1>> %OUTDIR%\stage3.txt 2>&1
   call make_smokezip bot 1>> %OUTDIR%\stage3.txt 2>&1
   call :does_file_exist smokezip_win%size%.exe %OUTDIR%\stage3.txt|| exit /b 1
 
-  echo             wind2fds
+  echo    wind2fds
   cd %smvrepo%\Build\wind2fds\intel_win%size%
   erase *.obj *.mod *.exe 1>> %OUTDIR%\stage3.txt 2>&1
   call make_wind2fds bot 1>> %OUTDIR%\stage3.txt 2>&1
   call :does_file_exist wind2fds_win%size%.exe %OUTDIR%\stage3.txt|| exit /b 1
 ) else (
   call :is_file_installed background|| exit /b 1
-  echo             background not built, using installed version
+  echo    background not built, using installed version
   call :is_file_installed smokediff|| exit /b 1
-  echo             smokediff not built, using installed version
+  echo    smokediff not built, using installed version
   call :is_file_installed smokezip|| exit /b 1
-  echo             smokezip not built, using installed version
+  echo    smokezip not built, using installed version
   call :is_file_installed wind2fds|| exit /b 1
-  echo             wind2fds not built, using installed version
+  echo    wind2fds not built, using installed version
 )
 
 call :GET_DURATION PRELIM %PRELIM_beg%
@@ -346,8 +360,8 @@ call :GET_DURATION PRELIM %PRELIM_beg%
 
 call :GET_TIME RUNVV_beg
 
-echo Stage 4 - Running verification cases
-echo             debug mode
+echo  Running verification cases
+echo    debug mode
 
 :: run the cases
 
@@ -364,7 +378,7 @@ call Check_SMV_cases -smvwui
 
 call :report_errors Stage 4a, "Debug FDS case errors"|| exit /b 1
 
-echo             release mode
+echo    release mode
 
 :: run the cases
 
@@ -389,7 +403,7 @@ call :GET_DURATION RUNVV %RUNVV_beg%
 
 call :GET_TIME MAKEPICS_beg
 
-echo Stage 5 - Making Smokeview pictures
+echo  Making Smokeview pictures
 
 cd %smvrepo%\Verification\scripts
 call Make_SMV_Pictures -smvwui 1> %OUTDIR%\stage5.txt 2>&1
@@ -404,18 +418,18 @@ call :GET_DURATION MAKEPICS %MAKEPICS_beg%
 
 call :GET_TIME MAKEGUIDES_beg
 
-echo Stage 6 - Building Smokeview guides
+echo  Building Smokeview guides
 
-echo             Technical Reference
+echo    Technical Reference
 call :build_guide SMV_Technical_Reference_Guide %smvrepo%\Manuals\SMV_Technical_Reference_Guide 1>> %OUTDIR%\stage6.txt 2>&1
 
-echo             Verification
+echo    Verification
 call :build_guide SMV_Verification_Guide %smvrepo%\Manuals\SMV_Verification_Guide 1>> %OUTDIR%\stage6.txt 2>&1
 
-echo             User
+echo    User
 call :build_guide SMV_User_Guide %smvrepo%\Manuals\SMV_User_Guide 1>> %OUTDIR%\stage6.txt 2>&1
 
-:: echo             Geom Notes
+:: echo    Geom Notes
 :: call :build_guide geom_notes %smvrepo%\Manuals\FDS_User_Guide 1>> %OUTDIR%\stage6.txt 2>&1
 
 call :GET_DURATION MAKEGUIDES %MAKEGUIDES_beg%
@@ -562,6 +576,42 @@ exit /b 0
   exit /b 0
 
 :: -------------------------------------------------------------
+:chk_repo
+:: -------------------------------------------------------------
+
+set repodir=%1
+
+if NOT exist %repodir% (
+  echo ***error: repo directory %repodir% does not exist
+  echo  smokebot aborted
+  exit /b 1
+)
+exit /b 0
+
+:: -------------------------------------------------------------
+:cd_repo
+:: -------------------------------------------------------------
+
+set repodir=%1
+set repobranch=%2
+
+call :chk_repo %repodir% || exit /b 1
+
+cd %repodir%
+if "%repobranch%" == "" (
+  exit /b 0
+)
+git rev-parse --abbrev-ref HEAD>current_branch.txt
+set /p current_branch=<current_branch.txt
+erase current_branch.txt
+if "%repobranch%" NEQ "%current_branch%" (
+  echo ***error: found branch %current_branch% was expecting branch %repobranch%
+  echo  smokebot aborted
+  exit /b 1
+)
+exit /b 0
+
+:: -------------------------------------------------------------
   :does_file_exist
 :: -------------------------------------------------------------
 
@@ -621,12 +671,13 @@ exit /b
 :: -------------------------------------------------------------
 
 set gitcleandir=%1
-cd %gitcleandir%
+set gitbranch=%2
+
+call :cd_repo %gitcleandir% %gitbranch% || exit /b 1
 git clean -dxf 1>> Nul 2>&1
 git add . 1>> Nul 2>&1
 git reset --hard HEAD 1>> Nul 2>&1
-exit /b
-
+exit /b 0
 
 :: -------------------------------------------------------------
  :build_guide

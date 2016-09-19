@@ -24,9 +24,9 @@ set webrepos=webpages wikis
 set BRANCH=master
 set PUSH=0
 
-set wc=%repo%\bot\Scripts\wc
-set grep=%repo%\bot\Scripts\grep
-set gawk=%repo%\bot\Scripts\gawk
+set wc=%repo%\bot\Scripts\bin\wc
+set grep=%repo%\bot\Scripts\bin\grep
+set gawk=%repo%\bot\Scripts\bin\gawk
 
 for %%x in ( %allrepos% ) do ( call :update_repo %%x )
 
@@ -53,16 +53,19 @@ goto eof
      echo update skipped
      exit /b
   )
-  echo updating repo:%repo%\%reponame%
-  echo          branch:%BRANCH% from origin
+  echo   repo: %reponame% - updating from origin
+  echo branch: %branch%
+  echo    dir: %repo%\%reponame%
   git fetch origin
   git merge origin/%BRANCH%
   git remote -v | %gawk% "{print $1}" | %grep% firemodels | %wc%  -l> %CURDIR%\have_central.out
   set /p have_central=<%CURDIR%\have_central.out
 
   if %have_central% GTR 0 (
-     echo updating repo:%repo%\%reponame%
-     echo          branch:%BRANCH% from origin
+     echo.
+     echo   repo: %reponame% - updating from firemodels
+     echo branch: %branch%
+     echo    dir: %repo%\%reponame%
      git fetch firemodels
      git merge firemodels/%BRANCH%
      if "%PUSH%" == "1" (
@@ -84,8 +87,9 @@ goto eof
   git rev-parse --abbrev-ref HEAD | head -1> %CURDIR%\gitbranch.out
   set /p BRANCH=<%CURDIR%\gitbranch.out
   
-  echo updating repo:%repo%\%reponame%
-  echo          branch:%BRANCH% from origin
+  echo   repo: %reponame% - updating from origin
+  echo branch: %branch%
+  echo    dir: %repo%\%reponame%
   git fetch origin
   git merge origin/%BRANCH%
   exit /b

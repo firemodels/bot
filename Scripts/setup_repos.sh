@@ -1,12 +1,4 @@
 #!/bin/bash
-CURDIR=`pwd`
-
-fdsrepos="exp fds out smv"
-smvrepos="cfast fds smv"
-cfastrepos="cfast exp smv"
-allrepos="cfast cor exp fds out radcal smv"
-wikiwebrepos="fds.wiki fds-smv"
-repos=$fdsrepos
 
 function usage {
 echo "Create repos used by cfast, fds and/or smokview"
@@ -25,13 +17,22 @@ echo "-h - display this message"
 exit
 }
 
+CURDIR=`pwd`
+
+fdsrepos="exp fds out smv"
+smvrepos="cfast fds smv"
+cfastrepos="cfast exp smv"
+allrepos="cfast cor exp fds out radcal smv"
+wikiwebrepos="fds.wiki fds-smv"
+repos=$fdsrepos
+
 FMROOT=
 WIKIWEB=
 if [ -e ../.gitbot ]; then
    cd ../..
    FMROOT=`pwd`
 else
-   echo "***Error: create_repos.sh must be run from the bot/Scripts directory"
+   echo "***Error: setup_repos.sh must be run from the bot/Scripts directory"
    exit
 fi
 
@@ -73,42 +74,42 @@ fi
 
 echo "You are about to clone the repos: $repos"
 if [ "$WIKIWEB" == "1" ]; then
-echo "from git@github.com:firemodels into the directory: $FMROOT"
+   echo "from git@github.com:firemodels into the directory: $FMROOT"
 else
-echo "from $GITHEADER$GITUSER into the directory: $FMROOT"
+   echo "from $GITHEADER$GITUSER into the directory: $FMROOT"
 fi
 echo ""
 echo "Press any key to continue or <CTRL> c to abort."
 echo "Type $0 -h for other options"
 read val
 
-for repo in $repos
+for repo in $repos bot
 do 
   echo
   repodir=$FMROOT/$repo
   cd $FMROOT
   echo "----------------------------------------------"
-  if [ "$WIKIWEB" == "1" ]; then
-     if [ "$repo" == "fds.wiki" ]; then
-        repodir=$FMROOT/wikis
-     fi   
-     if [ "$repo" == "fds-smv" ]; then
-        repodir=$FMROOT/webpages
-     fi   
-  fi
-  if [ -e $repodir ]; then
-     echo Skipping $repo, the directory $repodir already exists.
-     continue;
-  fi
-  if [ "$WIKIWEB" == "1" ]; then
-     if [ "$repo" == "fds.wiki" ]; then
-        git clone git@github.com:firemodels/$repo.git wikis
-     fi   
-     if [ "$repo" == "fds-smv" ]; then
-        git clone git@github.com:firemodels/$repo.git webpages
-     fi   
+  if [ "$repo" == "fds.wiki" ]; then
+     echo repo: wikis
+     repodir=$FMROOT/wikis
+     if [ -e $repodir ]; then
+        echo "   repo already exists"
+     else
+        git clone ${GITHEADER}firemodels/$repo.git wikis
+     fi
+     continue
+  fi   
+  if [ "$repo" == "fds-smv" ]; then
+     echo repo: webpages
+     repodir=$FMROOT/webpages
+     if [ -e $repodir ]; then
+        echo "   repo already exists"
+     else
+        git clone ${GITHEADER}firemodels/$repo.git webpages
+     fi
      continue
   fi
+  echo repo: $repo
   AT_GITHUB=`git ls-remote $GITHEADER$GITUSER/$repo.git 2>&1 > /dev/null | grep ERROR | wc -l`
   if [ $AT_GITHUB -gt 0 ]; then
      echo "***Error: The repo $GITHEADER$GITUSER/$repo.git was not found."
@@ -118,12 +119,32 @@ do
   if [ "$repo" == "exp" ]; then
      RECURSIVE=--recursive
   fi
-  git clone $RECURSIVE $GITHEADER$GITUSER/$repo.git
-  if [ "$GITUSER" != "firemodels" ]; then
-     echo setting up remote tracking with firemodels
-     cd $repodir
-     git remote add firemodels ${GITHEADER}firemodels/$repo.git
-     git remote update
+  if [ -e $repodir ]; then
+     echo "   repo already exists"
+  else
+     git clone $RECURSIVE $GITHEADER$GITUSER/$repo.git
+  fi
+  cd $repodir
+  if [ "$GITUSER" == "firemodels" ]; then
+     ndisable=`git remote -v | grep DISABLE | wc -l`
+     if [ $ndisable -eq 0 ]; then
+        echo disabling push access to firemodels
+        git remote set-url --push origin DISABLE
+     fi
+  else
+     have_central=`git remote -v | awk '{print $1}' | grep firemodels | wc -l`
+     if [ $have_central -eq 0 ]; then
+        echo setting up remote tracking with firemodels
+        git remote add firemodels ${GITHEADER}firemodels/$repo.git
+        git remote update
+     fi
+     ndisable=`git remote -v | grep DISABLE | wc -l`
+     if [ $ndisable -eq 0 ]; then
+        echo "   disabling push access to firemodels"
+        git remote set-url --push firemodels DISABLE
+     else
+        echo "   remote access to firemodels is disabled"
+     fi
   fi
 done
 cd $CURDIR

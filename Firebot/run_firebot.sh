@@ -1,4 +1,98 @@
 #!/bin/bash
+
+# The Firebot script is part of an automated continuous integration system.
+# Consult the FDS Config Management Plan for more information.
+
+
+#---------------------------------------------
+#                   usage
+#---------------------------------------------
+
+function usage {
+echo "Verification and validation testing script for FDS"
+echo ""
+echo "Options:"
+#echo "-b - branch_name - run firebot using branch_name [default: $BRANCH]"
+echo "-c - clean repo"
+echo "-f - force firebot run"
+echo "-F - skip figure generation and build document stages"
+echo "-h - display this message"
+echo "-i - use installed version of smokeview"
+echo "-k - kill firebot if it is running"
+echo "-L - firebot lite,  run only stages that build a debug fds and run cases with it"
+echo "                    (no release fds, no release cases, no matlab, etc)"
+if [ "$EMAIL" != "" ]; then
+  echo "-m email_address [default: $EMAIL]"
+else
+  echo "-m email_address "
+fi
+echo "-q queue - specify queue [default: $QUEUE]"
+echo "-s - skip matlab and build document stages"
+echo "-u - update repo"
+echo "-U - upload guides (only by user firebot)"
+echo "-v - show options used to run firebot"
+exit
+}
+
+#---------------------------------------------
+#                   CHK_REPO
+#---------------------------------------------
+
+CHK_REPO ()
+{
+  local repodir=$1
+
+  if [ ! -e $repodir ]; then
+     echo "***error: the repo directory $repodir does not exist."
+     echo "          Aborting firebot."
+     return 1
+  fi
+  return 0
+}
+
+#---------------------------------------------
+#                   CD_REPO
+#---------------------------------------------
+
+CD_REPO ()
+{
+  local repodir=$1
+  local branch=$2
+
+  CHK_REPO $repodir || return 1
+
+  cd $repodir
+  if [ "$branch" != "" ]; then
+     CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
+     if [ "$CURRENT_BRANCH" != "$branch" ]; then
+       echo "***error: was expecting branch $branch in repo $repodir."
+       echo "Found branch $CURRENT_BRANCH. Aborting firebot."
+       return 1
+     fi
+  fi
+  return 0
+}
+
+#---------------------------------------------
+#                   LIST_DESCENDANTS
+#---------------------------------------------
+
+LIST_DESCENDANTS ()
+{
+  local children=$(ps -o pid= --ppid "$1")
+
+  for pid in $children
+  do
+    LIST_DESCENDANTS "$pid"
+  done
+
+  echo "$children"
+}
+
+#VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
+#                             Primary script execution =
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 if [ ! -d ~/.fdssmvgit ] ; then
   mkdir ~/.fdssmvgit
 fi
@@ -22,71 +116,6 @@ if [ $notfound -eq 1 ] ; then
   QUEUE=none
 fi
 
-function usage {
-echo "Verification and validation testing script for FDS"
-echo ""
-echo "Options:"
-echo "-b - branch_name - run firebot using branch_name [default: $BRANCH]"
-echo "-c - clean repo"
-echo "-f - force firebot run"
-echo "-F - skip figure generation and build document stages"
-echo "-h - display this message"
-echo "-i - use installed version of smokeview"
-echo "-k - kill firebot if it is running"
-echo "-L - firebot lite,  run only stages that build a debug fds and run cases with it"
-echo "                    (no release fds, no release cases, no matlab, etc)"
-if [ "$EMAIL" != "" ]; then
-echo "-m email_address [default: $EMAIL]"
-else
-echo "-m email_address "
-fi
-echo "-q queue - specify queue [default: $QUEUE]"
-echo "-s - skip matlab and build document stages"
-echo "-u - update repo"
-echo "-U - upload guides (only by user firebot)"
-echo "-v - show options used to run firebot"
-exit
-}
-
-CHK_REPO ()
-{
-  repodir=$1
-  if [ ! -e $repodir ]; then
-     echo "***error: the repo directory $repodir does not exist."
-     echo "          Aborting firebot."
-     exit
-  fi
-}
-
-CD_REPO ()
-{
-  repodir=$1
-  branch=$2
-  CHK_REPO $repodir
-
-  cd $repodir
-  if [ "$branch" != "" ]; then
-     CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
-     if [ "$CURRENT_BRANCH" != "$branch" ]; then
-       echo "***error: was expecting branch $branch in repo $repodir."
-       echo "Found branch $CURRENT_BRANCH. Aborting firebot."
-       exit
-     fi
-  fi
-}
-
-LIST_DESCENDANTS ()
-{
-  local children=$(ps -o pid= --ppid "$1")
-
-  for pid in $children
-  do
-    LIST_DESCENDANTS "$pid"
-  done
-
-  echo "$children"
-}
-
 USEINSTALL=
 BRANCH=master
 botscript=firebot.sh
@@ -101,11 +130,14 @@ SKIPMATLAB=
 SKIPFIGURES=
 FIREBOT_LITE=
 KILL_FIREBOT=
+ECHO=
+
 while getopts 'b:cFfhikLm:q:nsuUv' OPTION
 do
 case $OPTION  in
   b)
-   BRANCH="$OPTARG"
+#   BRANCH="$OPTARG"
+    echo "***Warning: -b option for specifying a branch is not supported at this time"
    ;;
   c)
    CLEANREPO=1
@@ -148,6 +180,7 @@ case $OPTION  in
    ;;
   v)
    RUNFIREBOT=0
+   ECHO=echo
    ;;
 esac
 done
@@ -160,15 +193,14 @@ if [ "$KILL_FIREBOT" == "1" ]; then
     kill -9 $(LIST_DESCENDANTS $PID)
     echo "killing firebot (PID=$PID)"
     kill -9 $PID
-    JOBIDS=`qstat -a | grep FB_ | awk -v user="$USER" '{if($2==user){print $1}}'`
-    if [ "$JOBIDS" != "" ]; then
-      echo killing firebot jobs with Id:$JOBIDS
-      qdel $JOBIDS
+    if [ "$QUEUE" != "none" ]; then
+      JOBIDS=`qstat -a | grep FB_ | awk -v user="$USER" '{if($2==user){print $1}}'`
+      if [ "$JOBIDS" != "" ]; then
+        echo killing firebot jobs with Id:$JOBIDS
+        qdel $JOBIDS
+      fi
     fi
     echo firebot process $PID killed
-    if [ -e $firebot_pid ]; then
-      rm $firebot_pid
-    fi
   else
     echo firebot is not running, cannot be killed.
   fi
@@ -191,7 +223,7 @@ fi
 if [[ "$UPDATEREPO" == "1" ]]; then
    UPDATE=-u
    if [[ "$RUNFIREBOT" == "1" ]]; then
-     CD_REPO $repo/bot/Firebot master
+     CD_REPO $repo/bot/Firebot master || exit 1
      
      git fetch origin &> /dev/null
      git merge origin/master &> /dev/null
@@ -203,10 +235,8 @@ if [[ "$CLEANREPO" == "1" ]]; then
 fi
 BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
-if [ "$RUNFIREBOT" == "1" ] ; then
-  touch $firebot_pid
-  ./$botscript -p $firebot_pid $UPDATE $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $BRANCH $QUEUE $SKIPMATLAB $SKIPFIGURES $EMAIL "$@"
-else
-  echo ./$botscript $FIREBOT_LITE $UPDATE $USEINSTALL $UPLOADGUIDES $CLEAN $BRANCH $QUEUE $SKIPMATLAB $SKIPFIGURES $EMAIL "$@"
+touch $firebot_pid
+$ECHO  ./$botscript -p $firebot_pid $UPDATE $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $EMAIL "$@"
+if [ -e $firebot_pid ]; then
+  rm $firebot_pid
 fi
-rm $firebot_pid

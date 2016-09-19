@@ -8,7 +8,7 @@ if not exist ..\.gitbot goto skip1
    cd %CURDIR%
    goto endif1
 :skip1
-   echo ***error: create_repos.bat must be run in the bot\Scripts directory
+   echo ***error: setup_repos.bat must be run in the bot\Scripts directory
    exit /b
 :endif1
 
@@ -27,10 +27,10 @@ if %stopscript% == 1 (
 
 cd %FMROOT%\bot
 
-set wc=%FMROOT%\bot\Scripts\wc
-set grep=%FMROOT%\bot\Scripts\grep
-set gawk=%FMROOT%\bot\Scripts\gawk
-set head=%FMROOT%\bot\Scripts\head
+set wc=%FMROOT%\bot\Scripts\bin\wc
+set grep=%FMROOT%\bot\Scripts\bin\grep
+set gawk=%FMROOT%\bot\Scripts\bin\gawk
+set head=%FMROOT%\bot\Scripts\bin\head
 
 git remote -v | %grep% origin | %head% -1 | %gawk%  "{print $2}" | %gawk% -F ":" "{print $1}">%CURDIR%\githeader.out
 set /p GITHEADER=<%CURDIR%\githeader.out
@@ -56,7 +56,7 @@ if "%WIKIWEB%" == "1" (
 )
 echo.
 echo Press any key to continue, CTRL c to abort or type 
-echo create_repos -h for other options
+echo setup_repos -h for other options
 pause >Nul
 
 for %%x in ( %repos% ) do ( call :create_repo %%x )
@@ -119,6 +119,7 @@ goto eof
   echo setting up remote tracking
   cd %repodir%
   git remote add firemodels %GITHEADER%firemodels/%repo%.git
+  git remote set-url --push firemodels DISABLE
   git remote update
   exit /b
 

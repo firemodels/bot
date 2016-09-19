@@ -1,56 +1,18 @@
 #!/bin/bash
-if [ ! -d ~/.fdssmvgit ] ; then
-  mkdir ~/.fdssmvgit
-fi
-smokebot_pid=~/.fdssmvgit/smokebot_pid
 
-CURDIR=`pwd`
-if [ -e .smv_git ]; then
-  cd ../..
-  repo=`pwd`
-  cd $CURDIR
-else
-  echo "***error: smokebot not running in the bot/Smokebot  directory"
-  exit
-fi
+# The Smokebot script is part of an automated continuous integration system.
+# Consult the FDS Config Management Plan for more information.
 
-KILL_SMOKEBOT=
-BRANCH=master
-botscript=smokebot.sh
-RUNAUTO=
-CLEANREPO=
-UPDATEREPO=
-RUNSMOKEBOT=1
-MOVIE=
-UPLOAD=
-FORCE=
-COMPILER=intel
-SMOKEBOT_LITE=
-TESTFLAG=
-
-WEB_URL=
-web_DIR=/var/www/html/`whoami`
-if [ -d $web_DIR ]; then
-  IP=`wget http://ipinfo.io/ip -qO -`
-  HOST=`host $IP | awk '{printf("%s\n",$5);}'`
-  WEB_URL=http://$HOST/`whoami`
-else
-  web_DIR=
-fi
-
-# checking to see if a queing system is available
-QUEUE=smokebot
-notfound=`qstat -a 2>&1 | tail -1 | grep "not found" | wc -l`
-if [ $notfound -eq 1 ] ; then
-  QUEUE=none
-fi
+#---------------------------------------------
+#                   usage
+#---------------------------------------------
 
 function usage {
 echo "Verification and validation testing script for smokeview"
 echo ""
 echo "Options:"
 echo "-a - run automatically if FDS or smokeview source has changed"
-echo "-b - branch_name - run smokebot using the branch branch_name [default: $BRANCH]"
+#echo "-b - branch_name - run smokebot using the branch branch_name [default: $BRANCH]"
 echo "-c - clean repo"
 echo "-f - force smokebot run"
 echo "-h - display this message"
@@ -82,32 +44,48 @@ fi
 exit
 }
 
+#---------------------------------------------
+#                   CHK_REPO
+#---------------------------------------------
+
 CHK_REPO ()
 {
-  repodir=$1
+  local repodir=$1
+
   if [ ! -e $repodir ]; then
      echo "***error: the repo directory $repodir does not exist."
-     echo "          Aborting firebot."
-     exit
+     echo "          Aborting smokebot."
+     return 1
   fi
+  return 0
 }
+
+#---------------------------------------------
+#                   CD_REPO
+#---------------------------------------------
 
 CD_REPO ()
 {
-  repodir=$1
-  branch=$2
-  CHK_REPO $repodir
+  local repodir=$1
+  local branch=$2
+
+  CHK_REPO $repodir || return 1
 
   cd $repodir
   if [ "$branch" != "" ]; then
      CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
      if [ "$CURRENT_BRANCH" != "$branch" ]; then
        echo "***error: was expecting branch $branch in repo $repodir."
-       echo "Found branch $CURRENT_BRANCH. Aborting firebot."
-       exit
+       echo "Found branch $CURRENT_BRANCH. Aborting smokebot."
+       return 1
      fi
   fi
+  return 0
 }
+
+#---------------------------------------------
+#                   LIST_DESCENDANTS
+#---------------------------------------------
 
 LIST_DESCENDANTS ()
 {
@@ -121,6 +99,56 @@ LIST_DESCENDANTS ()
   echo "$children"
 }
 
+#VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
+#                             Primary script execution =
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+if [ ! -d ~/.fdssmvgit ] ; then
+  mkdir ~/.fdssmvgit
+fi
+smokebot_pid=~/.fdssmvgit/smokebot_pid
+
+CURDIR=`pwd`
+if [ -e .smv_git ]; then
+  cd ../..
+  repo=`pwd`
+  cd $CURDIR
+else
+  echo "***error: smokebot not running in the bot/Smokebot  directory"
+  exit
+fi
+
+KILL_SMOKEBOT=
+BRANCH=master
+botscript=smokebot.sh
+RUNAUTO=
+CLEANREPO=
+UPDATEREPO=
+RUNSMOKEBOT=1
+MOVIE=
+UPLOAD=
+FORCE=
+COMPILER=intel
+SMOKEBOT_LITE=
+TESTFLAG=
+ECHO=
+
+WEB_URL=
+web_DIR=/var/www/html/`whoami`
+if [ -d $web_DIR ]; then
+  IP=`wget http://ipinfo.io/ip -qO -`
+  HOST=`host $IP | awk '{printf("%s\n",$5);}'`
+  WEB_URL=http://$HOST/`whoami`
+else
+  web_DIR=
+fi
+
+# checking to see if a queing system is available
+QUEUE=smokebot
+notfound=`qstat -a 2>&1 | tail -1 | grep "not found" | wc -l`
+if [ $notfound -eq 1 ] ; then
+  QUEUE=none
+fi
 
 while getopts 'aAb:cd:fhI:kLm:Mq:r:tuUvw:W:' OPTION
 do
@@ -132,7 +160,8 @@ case $OPTION  in
    RUNAUTO=-A
    ;;
   b)
-   BRANCH="$OPTARG"
+#   BRANCH="$OPTARG"
+    echo "***Warning: -b option for specifying a branch is not supported at this time"
    ;;
   c)
    CLEANREPO=-c
@@ -173,6 +202,7 @@ case $OPTION  in
    ;;
   v)
    RUNSMOKEBOT=
+   ECHO=echo
    ;;
   w)
    web_DIR="$OPTARG"
@@ -200,15 +230,14 @@ if [ "$KILL_SMOKEBOT" == "1" ]; then
     kill -9 $(LIST_DESCENDANTS $PID)
     echo "killing smokebot (PID=$PID)"
     kill -9 $PID
-    JOBIDS=`qstat -a | grep SB_ | awk -v user="$USER" '{if($2==user){print $1}}'`
-    if [ "$JOBIDS" != "" ]; then
-      echo killing smokebot jobs with Id: $JOBIDS
-      qdel $JOBIDS
+    if [ "$QUEUE" != "none" ]; then
+      JOBIDS=`qstat -a | grep SB_ | awk -v user="$USER" '{if($2==user){print $1}}'`
+      if [ "$JOBIDS" != "" ]; then
+        echo killing smokebot jobs with Id: $JOBIDS
+        qdel $JOBIDS
+      fi
     fi
     echo smokebot process $PID killed
-    if [ -e $smokebot_pid ]; then
-      rm $smokebot_pid
-    fi
   else
     echo smokebotbot is not running, cannot be killed.
   fi
@@ -219,7 +248,7 @@ if [[ "$RUNSMOKEBOT" == "1" ]]; then
     if [ -e $smokebot_pid ] ; then
       echo Smokebot or firebot are already running.
       echo "Re-run using the -f option if this is not the case."
-      exit
+      exit 1
     fi
   fi
 fi
@@ -235,7 +264,7 @@ fi
 
 if [[ "$RUNSMOKEBOT" == "1" ]]; then
   if [[ "$UPDATEREPO" == "-u" ]]; then
-     CD_REPO $repo/bot/Smokebot master
+     CD_REPO $repo/bot/Smokebot master || exit 1
      
      git fetch origin &> /dev/null
      git merge origin/master &> /dev/null
@@ -244,10 +273,9 @@ fi
 
 BRANCH="-b $BRANCH"
 
-if [[ "$RUNSMOKEBOT" == "1" ]]; then
-  touch $smokebot_pid
-  ./$botscript $TESTFLAG $RUNAUTO $COMPILER $SMOKEBOT_LITE $BRANCH $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+touch $smokebot_pid
+$ECHO ./$botscript $TESTFLAG $RUNAUTO $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
-else
-  echo ./$botscript $TESTFLAG $RUNAUTO $COMPILER $SMOKEBOT_LITE $BRANCH $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 fi
+

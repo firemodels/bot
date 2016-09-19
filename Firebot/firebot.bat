@@ -1,5 +1,7 @@
 @echo off
 
+set FIREBOTRUNDIR=%CD%
+
 set repo=%~f1
 set smvrepo=%repo%\smv
 set fdsrepo=%repo%\fds
@@ -12,6 +14,10 @@ set usematlab=%5
 set installed=%6
 set lite=%7
 set emailto=%8
+
+set botbranch=master
+set fdsbranch=master
+set smvbranch=master
 
 set size=_64
 
@@ -31,17 +37,27 @@ if %abort% == 1 (
    exit /b
 )
 
-set CURDIR=%CD%
+call :cd_repo %smvrepo% %botbranch%  || exit /b 1
+call :cd_repo %fdsrepo% %fdsbranch%  || exit /b 1
+call :cd_repo %botrepo% %smvbranch%  || exit /b 1
+cd %FIREBOTRUNDIR%
 
 echo.
 echo Settings
-echo      fds repo: %fdsrepo%
-echo      smv repo: %smvrepo%
-echo run directory: %CURDIR%
-if %clean% == 1  echo    clean repo: yes
-if %clean% == 0  echo    clean repo: no
-if %update% == 1 echo   update repo: yes
-if %update% == 0 echo   update repo: no
+echo --------
+echo     fds repo: %fdsrepo%
+echo     smv repo: %smvrepo%
+echo      run dir: %FIREBOTRUNDIR%
+if %clean% == 1 (
+echo  clean repos: yes
+) else (
+echo  clean repos: no
+)
+if %update% == 1 (
+echo update repos: yes
+) else (
+echo update repos: no
+)
 echo.
 
 :: -------------------------------------------------------------
@@ -60,9 +76,9 @@ if not exist output mkdir output
 if not exist history mkdir history
 if not exist timings mkdir timings
 
-set OUTDIR=%CURDIR%\output
-set HISTORYDIR=%CURDIR%\history
-set TIMINGSDIR=%CURDIR%\timings
+set OUTDIR=%FIREBOTRUNDIR%\output
+set HISTORYDIR=%FIREBOTRUNDIR%\history
+set TIMINGSDIR=%FIREBOTRUNDIR%\timings
 
 erase %OUTDIR%\*.txt %OUTDIR%\*.log 1> Nul 2>&1
 
@@ -112,14 +128,15 @@ if NOT "%emailto%" == "" (
 ::                           stage 0
 :: -------------------------------------------------------------
 
-echo Stage 0 - Preliminaries
+echo  Status
+echo  ------
 
 echo. > %errorlog%
 echo. > %warninglog%
 echo. > %stagestatus%
 
 call :is_file_installed %gettimeexe%|| exit /b 1
-echo             found get_time
+echo    found get_time
 
 call :GET_TIME TIME_beg
 call :GET_TIME PRELIM_beg
@@ -130,13 +147,13 @@ type %scratchfile% | find /i /c "not recognized" > %counta%
 set /p nothave_ifort=<%counta%
 set have_ifort=1
 if %nothave_ifort% == 1 (
-  echo             Fortran not found
+  echo    Fortran not found
   echo "           firebot aborted"
   echo "***Fatal error: Fortran compiler not present" > %errorlog%
   call :output_abort_message
   exit /b 1
 )
-echo             found Fortran
+echo    found Fortran
 
 :: if -installed option is used use installed smokeview
 ::    otherwise look for C to build smokeview and
@@ -147,86 +164,88 @@ type %scratchfile% | find /i /c "not recognized" > %countb%
 set /p nothave_icc=<%countb%
 if %nothave_icc% == 1 (
   set have_icc=0
-  echo             C compiler not found - looking for Smokeview
+  echo    C compiler not found - looking for Smokeview
   call :is_file_installed smokeview|| exit /b 1
   set smokeview=smokeview
-  echo             found smokeview
+  echo    found smokeview
 ) else (
-  echo             found C
+  echo    found C
 )
 goto endif1
 :else1
   set have_icc=0
   call :is_file_installed smokeview|| exit /b 1
   set smokeview=smokeview
-  echo             found smokeview
+  echo    found smokeview
 :endif1
 
 :: looking  for email
 if NOT exist %emailexe% (
   echo ***Warning: email client not found.   
-  echo             firebot messages will only be sent to the console.
+  echo    firebot messages will only be sent to the console.
 ) else (
-  echo             found mailsend
+  echo    found mailsend
 )
 
 call :is_file_installed background|| exit /b 1
-echo             found background
+echo    found background
 
 call :is_file_installed cut|| exit /b 1
-echo             found cut
+echo    found cut
 
 call :is_file_installed git|| exit /b 1
-echo             found git
+echo    found git
 
 call :is_file_installed grep|| exit /b 1
-echo             found grep
+echo    found grep
 
 call :is_file_installed make|| exit /b 1
-echo             found make
+echo    found make
 
 where matlab 2>&1 | find /i /c "Could not find" > %OUTDIR%\stage_count0a.txt
 set /p nothavematlab=<%OUTDIR%\stage_count0a.txt
 if %nothavematlab% == 0 (
-  echo             found matlab
+  echo    found matlab
   set have_matlab=1
 )
 if %nothavematlab% == 1 (
-  echo             matlab not found - VV and User guides will not be built
+  echo    matlab not found - VV and User guides will not be built
 )
 
 call :is_file_installed pdflatex|| exit /b 1
-echo             found pdflatex
+echo    found pdflatex
 
 call :is_file_installed sed|| exit /b 1
-echo             found sed
+echo    found sed
 
 call :is_file_installed sh2bat||exit /b 1
-echo             found sh2bat
+echo    found sh2bat
 
 echo. 1>> %OUTDIR%\stage0.txt 2>&1
 
 :: cleaning repos
-
+echo.
+echo Settings
+echo --------
 if %clean% == 0 goto skip_clean1
-   echo             cleaning
-   echo                fds
-   call :git_clean %fdsrepo%
-   echo                smokeview
-   call :git_clean %smvrepo%
+   echo    Cleaning
+   echo       fds
+   call :git_clean %fdsrepo% || exit /b 1
+   echo       smokeview
+   call :git_clean %smvrepo% || exit /b 1
 :skip_clean1
 
 :: updating  repos
 
 if %update% == 0 goto skip_update1
-  echo             updating
-  echo                fds
-  cd %fdsrepo%
+  echo    Updating
+  echo       fds
+  call :cd_repo %fdsrepo% %fdsbranch% || exit /b 1
   git fetch origin master 1>> %OUTDIR%\stage0.txt 2>&1
   git merge origin/master 1>> %OUTDIR%\stage0.txt 2>&1
 
-  echo                smv
-  cd %smvrepo%
+  echo       smv
+  call :cd_repo %smvrepo% %smvbranch% || exit /b 1
   git fetch origin master 1>> %OUTDIR%\stage0.txt 2>&1
   git merge origin/master 1>> %OUTDIR%\stage0.txt 2>&1
 :skip_update1
@@ -247,9 +266,9 @@ set timingslogfile=%TIMINGSDIR%\timings_%revisionnum%.txt
 ::                           stage 1
 :: -------------------------------------------------------------
 
-echo Stage 1 - Building FDS
+echo  Building FDS
 
-echo             parallel debug
+echo    parallel debug
 
 cd %fdsrepo%\Build\mpi_intel_win%size%_db
 erase *.obj *.mod *.exe *.pdb 1> Nul 2>&1
@@ -259,7 +278,7 @@ call :find_warnings "warning" %OUTDIR%\makefdsd.log "Stage 1b, FDS parallel debu
 
 if %lite% == 1 goto skip_lite1
 
-  echo             parallel release
+  echo    parallel release
 
   cd %fdsrepo%\Build\mpi_intel_win%size%
   erase *.obj *.mod *.exe *.pdb 1> Nul 2>&1
@@ -275,14 +294,14 @@ if %lite% == 1 goto skip_lite1
 if %lite% == 1 goto skip_lite2
   if %installed% == 1 goto skip_build_cstuff
   if %have_icc% == 0 goto skip_build_cstuff
-    echo Stage 2 - Building Smokeview
+    echo  Building Smokeview
 
-    echo             libs
+    echo    libs
 
     cd %smvrepo%\Build\LIBS\intel_win%size%
     call makelibs bot 1>> %OUTDIR%\stage2a.txt 2>&1
 
-    echo             debug
+    echo    debug
 
     cd %smvrepo%\Build\smokeview\intel_win%size%
     erase *.obj *.mod *.exe smokeview_win%size%_db.exe 1> Nul 2>&1
@@ -290,7 +309,7 @@ if %lite% == 1 goto skip_lite2
     call :does_file_exist smokeview_win%size%_db.exe %OUTDIR%\makesmvd.log|| exit /b 1
     call :find_warnings "warning" %OUTDIR%\makesmvd.log "Stage 2a, Smokeview debug compilation"
 
-    echo             release
+    echo    release
 
     cd %smvrepo%\Build\smokeview\intel_win%size%
     erase *.obj *.mod smokeview_win%size%.exe 1> Nul 2>&1
@@ -305,9 +324,9 @@ if %lite% == 1 goto skip_lite2
 ::                           stage 3
 :: -------------------------------------------------------------
 
-  echo Stage 3 - Building Utilities
+  echo  Building Utilities
 
-  echo             fds2ascii
+  echo    fds2ascii
   cd %fdsrepo%\Utilities\fds2ascii\intel_win%size%
   erase *.obj *.mod *.exe 1> Nul 2>&1
   call make_fds2ascii bot 1> %OUTDIR%\makefds2ascii.log 2>&1
@@ -315,7 +334,7 @@ if %lite% == 1 goto skip_lite2
   call :find_warnings "warning" %OUTDIR%\makefds2ascii.log "Stage 3, Building FDS/Smokeview utilities"
 
   if %have_icc% == 1 (
-    echo             background
+    echo    background
     cd %smvrepo%\Build\background\intel_win%size%
     erase *.obj *.mod *.exe 1> Nul 2>&1
     call make_background bot 1> %OUTDIR%\makebackground.log 2>&1
@@ -323,7 +342,7 @@ if %lite% == 1 goto skip_lite2
     call :find_warnings "warning" %OUTDIR%\makebackground.log "Stage 3, Building FDS/Smokeview utilities"
   ) else (
     call :is_file_installed background|| exit /b 1
-    echo             background not built, using installed version
+    echo    background not built, using installed version
   )
 :skip_lite2
 
@@ -335,8 +354,8 @@ call :GET_DURATION PRELIM %PRELIM_beg%
 
 call :GET_TIME RUNVV_beg
 
-echo Stage 4 - Running verification cases
-echo             debug mode
+echo  Running verification cases
+echo    debug mode
 
 :: run cases
 
@@ -356,13 +375,13 @@ call :report_errors Stage 4a, "Debug FDS case errors"|| exit /b 1
 
 if %lite% == 1 goto skip_lite3
 
-  echo             release mode
+  echo    release mode
 
 :: run cases
 
   cd %fdsrepo%\Verification\
   if %clean% == 0 goto skip_clean2
-     echo             cleaning Verification directory
+     echo    cleaning Verification directory
      call :git_clean %fdsrepo%\Verification
 :skip_clean2
 
@@ -399,18 +418,18 @@ if %lite% == 1 goto skip_lite4
   )
   call :GET_TIME MAKEPICS_beg
 
-  echo Stage 5 - Making pictures
-  echo             FDS verification cases
+  echo  Making pictures
+  echo    FDS verification cases
 
   cd %fdsrepo%\Verification\scripts
   call MAKE_FDS_pictures %smokeview% 1> %OUTDIR%\stage5.txt 2>&1
 
   if %have_matlab%==0 goto skip_matlabplots
-    echo             matlab verification plots
+    echo    matlab verification plots
     cd %fdsrepo%\Utilities\Matlab
     matlab -automation -wait -noFigureWindows -r "try; run('%fdsrepo%\Utilities\Matlab\FDS_verification_script.m'); catch; end; quit
 
-    echo             matlab validation plots
+    echo    matlab validation plots
     cd %fdsrepo%\Utilities\Matlab
     matlab -automation -wait -noFigureWindows -r "try; run('%fdsrepo%\Utilities\Matlab\FDS_validation_script.m'); catch; end; quit
 
@@ -427,19 +446,19 @@ if %lite% == 1 goto skip_lite4
 
   call :GET_TIME MAKEGUIDES_beg
 
-  echo Stage 6 - Building guides
+  echo  Building guides
 
-  echo             FDS Technical Reference
+  echo    FDS Technical Reference
   call :build_guide FDS_Technical_Reference_Guide %fdsrepo%\Manuals\FDS_Technical_Reference_Guide 1> %OUTDIR%\stage6.txt 2>&1
 
   if have_matlab==0 goto skip_VV
-    echo             FDS User
+    echo    FDS User
     call :build_guide FDS_User_Guide %fdsrepo%\Manuals\FDS_User_Guide 1>> %OUTDIR%\stage6.txt 2>&1
 
-    echo             FDS Verification
+    echo    FDS Verification
     call :build_guide FDS_Verification_Guide %fdsrepo%\Manuals\FDS_Verification_Guide 1>> %OUTDIR%\stage6.txt 2>&1
 
-    echo             FDS Validation
+    echo    FDS Validation
     call :build_guide FDS_Validation_Guide %fdsrepo%\Manuals\FDS_Validation_Guide 1>> %OUTDIR%\stage6.txt 2>&1
   :skip_VV  
 
@@ -471,7 +490,7 @@ echo . -----------------------------         >> %infofile%
 
 copy %infofile% %timingslogfile%
 
-cd %CURDIR%
+cd %FIREBOTRUNDIR%
 
 sed "s/$/\r/" < %warninglog% > %warninglogpc%
 sed "s/$/\r/" < %errorlog% > %errorlogpc%
@@ -590,6 +609,43 @@ set /p %arg1%=<%timefile%
 exit /b 0
 
 :: -------------------------------------------------------------
+:chk_repo
+:: -------------------------------------------------------------
+
+set repodir=%1
+
+if NOT exist %repodir% (
+  echo ***error: repo directory %repodir% does not exist
+  echo  firebot aborted
+  exit /b 1
+)
+exit /b 0
+
+:: -------------------------------------------------------------
+:cd_repo
+:: -------------------------------------------------------------
+
+set repodir=%1
+set repobranch=%2
+
+call :chk_repo %repodir% || exit /b 1
+
+cd %repodir%
+if "%repobranch%" == "" (
+  exit /b 0
+)
+git rev-parse --abbrev-ref HEAD>current_branch.txt
+set /p current_branch=<current_branch.txt
+erase current_branch.txt
+if "%repobranch%" NEQ "%current_branch%" (
+  echo ***error: in repo %repodir% found branch %current_branch%
+  echo            was expecting branch %repobranch%
+  echo  firebot aborted
+  exit /b 1
+)
+exit /b 0
+
+:: -------------------------------------------------------------
 :is_file_installed
 :: -------------------------------------------------------------
 
@@ -670,13 +726,11 @@ exit /b
 :: -------------------------------------------------------------
 
 set gitcleandir=%1
-if exist %gitcleandir% (
-  cd %gitcleandir%
-  git clean -dxf 1>> Nul 2>&1
-  git add . 1>> Nul 2>&1
-  git reset --hard HEAD 1>> Nul 2>&1
-)
-exit /b
+call :cd_repo %gitcleandir%  || exit /b 1
+git clean -dxf 1>> Nul 2>&1
+git add . 1>> Nul 2>&1
+git reset --hard HEAD 1>> Nul 2>&1
+exit /b /0
 
 :: -------------------------------------------------------------
 :build_guide
@@ -723,4 +777,4 @@ copy %guide%.pdf %fromsummarydir%\manuals
 exit /b
 
 :eof
-cd %CURDIR%
+cd %FIREBOTRUNDIR%
