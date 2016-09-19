@@ -19,7 +19,8 @@ if [ -e ../.gitbot ]; then
    cd ../..
    FMROOT=`pwd`
 else
-   echo "***error: the update_repos.sh script must be run from the bot/Scripts directory"
+   echo "***error: the update_repos.sh script must be run from"
+   echo "          the bot/Scripts directory"
    exit
 fi
 
@@ -72,9 +73,12 @@ UPDATE_REPO ()
   echo "   dir: $repodir"
      git fetch firemodels
      git merge firemodels/$BRANCH
-     if [ "$PUSH" == "1" ]; then
-         echo "pushing changes in $repo to origin"
-         git push origin $BRANCH
+     ahead=`git status -uno | grep ahead | wc -l`
+     if [ $ahead -gtr 0 ]; then
+        if [ "$PUSH" == "1" ]; then
+            echo "pushing changes in $repo to origin"
+            git push origin $BRANCH
+        fi
      fi
    fi
   git status -uno
