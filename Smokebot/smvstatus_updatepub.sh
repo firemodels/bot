@@ -86,6 +86,6 @@ cp $newpage smokebot_status.html
 
 # disable status web page update we are sure it is working
 
-#git add smokebot_status.html
-#git commit -m "smokebot: update smokebot status page `date`"
-#git push origin $WEBBRANCH
+git add smokebot_status.html
+git commit -m "smokebot: update smokebot status page `date`"
+git push origin $WEBBRANCH
