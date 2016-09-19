@@ -80,6 +80,6 @@ cp $newpage firebot_status.html
 
 # disable status web page update we are sure it is working
 
-#git add firebot_status.html
-#git commit -m "firebot: update firebot status page `date`"
-#git push origin $WEBBRANCH
+git add firebot_status.html
+git commit -m "firebot: update firebot status page `date`"
+git push origin $WEBBRANCH
