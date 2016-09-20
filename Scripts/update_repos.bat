@@ -61,7 +61,7 @@ goto eof
   git remote -v | %gawk% "{print $1}" | %grep% firemodels | %wc%  -l> %CURDIR%\have_central.out
   set /p have_central=<%CURDIR%\have_central.out
 
-  if %have_central% GTR 0 (
+  if "%have_central%" == "0" goto skip1
      echo.
      echo   repo: %reponame% - updating from firemodels
      echo branch: %branch%
@@ -76,7 +76,7 @@ goto eof
            git push origin %BRANCH%
         )
     )
-  )
+  :skip1
   exit /b
 
 :update_repo2
