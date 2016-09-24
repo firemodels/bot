@@ -12,6 +12,8 @@ echo "-f - setup repos used by firebot: "
 echo "    $fdsrepos"
 echo "-s - setup repos used by smokebot: "
 echo "    $smvrepos"
+echo "-t - setup fds, smv and webpages repos that can be tagged"
+echo "     (have push access to firemodels)"
 echo "-w - setup wiki and webpage repos cloned from firemodels"
 echo "-h - display this message"
 exit
@@ -19,12 +21,14 @@ exit
 
 CURDIR=`pwd`
 
+tagrepos=fds smv fds-smv
 fdsrepos="exp fds out smv"
 smvrepos="cfast fds smv"
 cfastrepos="cfast exp smv"
 allrepos="cfast cor exp fds out radcal smv"
 wikiwebrepos="fds.wiki fds-smv"
 repos=$fdsrepos
+tagrepo=0
 
 FMROOT=
 WIKIWEB=
@@ -55,7 +59,6 @@ case $OPTION  in
    repos=$smvrepos;
    ;;
   w)
-   WIKIWEB=1;
    repos=$wikiwebrepos;
    ;;
 esac
@@ -86,45 +89,48 @@ read val
 for repo in $repos bot
 do 
   echo
-  repodir=$FMROOT/$repo
+  repo_out=$repo
+
   cd $FMROOT
+
   echo "----------------------------------------------"
   if [ "$repo" == "fds.wiki" ]; then
-     echo repo: wikis
-     repodir=$FMROOT/wikis
-     if [ -e $repodir ]; then
-        echo "   repo already exists"
-     else
-        git clone ${GITHEADER}firemodels/$repo.git wikis
-     fi
-     continue
-  fi   
-  if [ "$repo" == "fds-smv" ]; then
-     echo repo: webpages
-     repodir=$FMROOT/webpages
-     if [ -e $repodir ]; then
-        echo "   repo already exists"
-     else
-        git clone ${GITHEADER}firemodels/$repo.git webpages
-     fi
-     continue
+     repo_out=wikis
+     WIKIWEB=1
   fi
+  if [ "$repo" == "fds-smv" ]; then
+     repo_out=webpages
+     WIKIWEB=1
+  fi
+  if [ "$tagrepo" == "1" ]; then
+     repo_out=${repo_out}_tag
+  )
+  repo_dir=$FMROOT/$repo_out
+  if [ -e $repo_dir ]; then
+     echo "   repo already exists"
+     continue;
+  fi
+
   echo repo: $repo
   AT_GITHUB=`git ls-remote $GITHEADER$GITUSER/$repo.git 2>&1 > /dev/null | grep ERROR | wc -l`
   if [ $AT_GITHUB -gt 0 ]; then
      echo "***Error: The repo $GITHEADER$GITUSER/$repo.git was not found."
      continue;
   fi 
+  
+  if [ "$WIKIWEB" == "1" ]; then
+     cd $FMROOT
+     git clone ${GITHEADER}firemodels/$repo.git $repo_out
+     continue
+  fi
+
   RECURSIVE=
   if [ "$repo" == "exp" ]; then
      RECURSIVE=--recursive
   fi
-  if [ -e $repodir ]; then
-     echo "   repo already exists"
-  else
-     git clone $RECURSIVE $GITHEADER$GITUSER/$repo.git
-  fi
-  cd $repodir
+  git clone $RECURSIVE $GITHEADER$GITUSER/$repo.git $repo_out
+
+  cd $repo_dir
   if [ "$GITUSER" == "firemodels" ]; then
      ndisable=`git remote -v | grep DISABLE | wc -l`
      if [ $ndisable -eq 0 ]; then
