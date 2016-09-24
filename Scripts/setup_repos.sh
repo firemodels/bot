@@ -21,7 +21,7 @@ exit
 
 CURDIR=`pwd`
 
-tagrepos=fds smv fds-smv
+tagrepos="fds smv fds-smv"
 fdsrepos="exp fds out smv"
 smvrepos="cfast fds smv"
 cfastrepos="cfast exp smv"
@@ -40,7 +40,7 @@ else
    exit
 fi
 
-while getopts 'acfshw' OPTION
+while getopts 'acfhstw' OPTION
 do
 case $OPTION  in
   a)
@@ -57,6 +57,10 @@ case $OPTION  in
    ;;
   s)
    repos=$smvrepos;
+   ;;
+  t)
+   tagrepo=1
+   repos=$tagrepos;
    ;;
   w)
    repos=$wikiwebrepos;
@@ -86,7 +90,7 @@ echo "Press any key to continue or <CTRL> c to abort."
 echo "Type $0 -h for other options"
 read val
 
-for repo in $repos bot
+for repo in $repos
 do 
   echo
   repo_out=$repo
@@ -104,26 +108,26 @@ do
   fi
   if [ "$tagrepo" == "1" ]; then
      repo_out=${repo_out}_tag
-  )
+  fi
   repo_dir=$FMROOT/$repo_out
   if [ -e $repo_dir ]; then
-     echo "   repo already exists"
+     echo "   For repo $repo, the directory $repo_dir already exists"
      continue;
   fi
 
   echo repo: $repo
-  AT_GITHUB=`git ls-remote $GITHEADER$GITUSER/$repo.git 2>&1 > /dev/null | grep ERROR | wc -l`
-  if [ $AT_GITHUB -gt 0 ]; then
-     echo "***Error: The repo $GITHEADER$GITUSER/$repo.git was not found."
-     continue;
-  fi 
-  
   if [ "$WIKIWEB" == "1" ]; then
      cd $FMROOT
      git clone ${GITHEADER}firemodels/$repo.git $repo_out
      continue
   fi
 
+  AT_GITHUB=`git ls-remote $GITHEADER$GITUSER/$repo.git 2>&1 > /dev/null | grep ERROR | wc -l`
+  if [ $AT_GITHUB -gt 0 ]; then
+     echo "***Error: The repo $GITHEADER$GITUSER/$repo.git was not found."
+     continue;
+  fi 
+  
   RECURSIVE=
   if [ "$repo" == "exp" ]; then
      RECURSIVE=--recursive
@@ -133,9 +137,11 @@ do
   cd $repo_dir
   if [ "$GITUSER" == "firemodels" ]; then
      ndisable=`git remote -v | grep DISABLE | wc -l`
-     if [ $ndisable -eq 0 ]; then
-        echo disabling push access to firemodels
-        git remote set-url --push origin DISABLE
+     if [ "$tagrepo" == "0" ]; then
+        if [ $ndisable -eq 0 ]; then
+           echo disabling push access to firemodels
+           git remote set-url --push origin DISABLE
+        fi
      fi
   else
      have_central=`git remote -v | awk '{print $1}' | grep firemodels | wc -l`
@@ -144,12 +150,14 @@ do
         git remote add firemodels ${GITHEADER}firemodels/$repo.git
         git remote update
      fi
-     ndisable=`git remote -v | grep DISABLE | wc -l`
-     if [ $ndisable -eq 0 ]; then
-        echo "   disabling push access to firemodels"
-        git remote set-url --push firemodels DISABLE
-     else
-        echo "   push access to firemodels already disabled"
+     if [ "$tagrepo" == "0" ]; then
+        ndisable=`git remote -v | grep DISABLE | wc -l`
+        if [ $ndisable -eq 0 ]; then
+           echo "   disabling push access to firemodels"
+           git remote set-url --push firemodels DISABLE
+        else
+           echo "   push access to firemodels already disabled"
+        fi
      fi
   fi
 done
