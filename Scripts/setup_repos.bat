@@ -12,6 +12,7 @@ if not exist ..\.gitbot goto skip1
    exit /b
 :endif1
 
+set tagrepos=fds smv fds-smv
 set fdsrepos=exp fds out smv
 set smvrepos=cfast fds smv
 set cfastrepos=cfast exp smv
@@ -19,6 +20,7 @@ set allrepos= cfast cor exp fds out radcal smv
 set wikiwebrepos= fds.wiki fds-smv
 set repos=%fdsrepos%
 set WIKIWEB=0
+set tagrepo=0
 
 call :getopts %*
 if %stopscript% == 1 (
@@ -67,34 +69,35 @@ goto eof
 
 :create_repo
   set repo=%1
-  set repodir=%FMROOT%\%repo%
+  set repo_out=%repo%
+  set repo_dir=%FMROOT%\%repo%
+  
   echo -----------------------------------------------------------
 
-  if "%WIKIWEB%" == "1" (
-     if "%repo%" == "fds.wiki" (
-        set repodir=%FMROOT%\wikis
-     )
-     if "%repo%" == "fds-smv" (
-        set repodir=%FMROOT%\webpages
-     )
+  if "%repo%" == "fds.wiki" (
+     set repo_out=wikis
+     set WIKIWEB=1
+  )
+  if "%repo%" == "fds-smv" (
+     set repo_out=webpages
+     set WIKIWEB=1
   )
 
+  if "%tagrepo%" == "1" (
+     set repo_out=%repo_out%_tag
+  )
+  
 :: check if repo has been cloned locally
-  if exist %repodir% (
+  if exist %repo_dir% (
      echo Skipping %repo%, the repo directory:
-     echo %repodir%
+     echo %repo_dir%
      echo already exists
      exit /b
   )
 
   if "%WIKIWEB%" == "1" (
      cd %FMROOT%
-     if "%repo%" == "fds.wiki" (
-        git clone git@github.com:firemodels/%repo%.git wikis
-     )
-     if "%repo%" == "fds-smv" (
-        git clone git@github.com:firemodels/%repo%.git webpages
-     )
+     git clone %GITHEADER%firemodels/%repo%.git %repo_out%
      exit /b
   )
   
@@ -106,21 +109,22 @@ goto eof
      exit /b
   )
 
-
   cd %FMROOT%
   if "%repo%" == "exp" (
-     git clone --recursive %GITHEADER%%GITUSER%/%repo%.git
+     git clone --recursive %GITHEADER%%GITUSER%/%repo%.git %repo_out%
   )  else (
-     git clone %GITHEADER%%GITUSER%/%repo%.git
+     git clone %GITHEADER%%GITUSER%/%repo%.git %repo_out%
   )
   if "%GITUSER%" == "firemodels"  (
      exit /b
   )
   echo setting up remote tracking
-  cd %repodir%
+  cd %repo_dir%
   git remote add firemodels %GITHEADER%firemodels/%repo%.git
-  git remote set-url --push firemodels DISABLE
-  git remote update
+  if "%tagrepo%" == "1" goto skip_disable
+     git remote set-url --push firemodels DISABLE
+     git remote update
+  :skip_disable
   exit /b
 
 :at_github
@@ -156,10 +160,14 @@ goto eof
    set valid=1
    set repos=%smvrepos%
  )
+ if /I "%1" EQU "-t" (
+   set valid=1
+   set repos=%tagrepos%
+   set tagrepo=1
+ )
  if /I "%1" EQU "-w" (
    set valid=1
    set repos=%wikiwebrepos%
-   set WIKIWEB=1
  )
  shift
  if %valid% == 0 (
@@ -184,6 +192,8 @@ echo -c - setup repos used by cfastbot: %cfastrepos%
 echo -f - setup repos used by firebot: %fdsrepos%
 echo -h - display this message%
 echo -s - setup repos used by smokebot: %smvrepos%
+echo -t - setup fds, smv and webpages repos that can be tagged
+echo      (have push access to firemodels)
 echo -w - setup wiki and webpage repos cloned from firemodels
 exit /b
 
