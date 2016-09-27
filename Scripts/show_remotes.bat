@@ -24,7 +24,7 @@ if %stopscript% == 1 (
   exit /b
 )
 
-cd %FMROOT\bot
+cd %FMROOT%\bot
 set allrepos=bot cfast cor exp fds out radcal smv
 set BRANCH=master
 set PUSH=0
