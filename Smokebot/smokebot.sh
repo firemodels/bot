@@ -1090,8 +1090,8 @@ check_guide()
      chmod 664 $NEWGUIDE_DIR/$document
    else
       echo "Errors from Stage 5 - Build Smokeview Guides:" >> $ERROR_LOG
-      echo $document >> $ERROR_LOG
-      grep "! LaTeX Error:" -I $stage >> $ERROR_LOG
+      echo $label >> $ERROR_LOG
+      cat $stage >> $ERROR_LOG
       echo "" >> $ERROR_LOG
    fi
 
@@ -1103,7 +1103,7 @@ check_guide()
    else
       echo "Stage 5 warnings:" >> $WARNING_LOG
       echo $label >> $WARNING_LOG
-      grep -E "undefined|multiply defined|multiply-defined" -I $stage >> $WARNING_LOG
+      cat $stage >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
 }
