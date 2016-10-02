@@ -1079,7 +1079,7 @@ check_guide()
    fi
 
    cd $smokebotdir
-   if [[ `grep "! LaTeX Error:" -I $stage` == "" ]]; then
+   if [[ `grep -I "successfully" $stage` == "" ]]; then
      if [ ! "$SMOKEBOT_MANDIR" == "" ]; then
        cp $directory/$document $SMOKEBOT_MANDIR/.
      fi
@@ -1089,7 +1089,7 @@ check_guide()
      cp $directory/$document $NEWGUIDE_DIR/.
      chmod 664 $NEWGUIDE_DIR/$document
    else
-      echo "Errors from Stage 5 - Build FDS-SMV Guides:" >> $ERROR_LOG
+      echo "Errors from Stage 5 - Build Smokeview Guides:" >> $ERROR_LOG
       echo $document >> $ERROR_LOG
       grep "! LaTeX Error:" -I $stage >> $ERROR_LOG
       echo "" >> $ERROR_LOG
