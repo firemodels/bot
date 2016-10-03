@@ -1656,13 +1656,13 @@ if [ "$SMOKEBOT_LITE" == "" ]; then
   if [[ $stage1c_fdsrel_success && $stage4b_smvpics_success ]] ; then
      echo Making guides
 #   echo "   geometry notes"
-#  make_guide geom_notes $repo/Manuals/FDS_User_Guide 'geometry notes'
+#  make_guide geom_notes $repo/Manuals/FDS_User_Guide geometry_notes
      echo "   user"
-    make_guide SMV_User_Guide $smvrepo/Manuals/SMV_User_Guide 'SMV User Guide'
+    make_guide SMV_User_Guide $smvrepo/Manuals/SMV_User_Guide SMV_User_Guide
      echo "   technical"
-    make_guide SMV_Technical_Reference_Guide $smvrepo/Manuals/SMV_Technical_Reference_Guide 'SMV Technical Reference Guide'
+    make_guide SMV_Technical_Reference_Guide $smvrepo/Manuals/SMV_Technical_Reference_Guide SMV_Technical_Reference_Guide
      echo "   verification"
-    make_guide SMV_Verification_Guide $smvrepo/Manuals/SMV_Verification_Guide 'SMV Verification Guide'
+    make_guide SMV_Verification_Guide $smvrepo/Manuals/SMV_Verification_Guide SMV_Verification_Guide
   else
     echo Errors found, not building guides
   fi
