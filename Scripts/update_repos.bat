@@ -40,7 +40,7 @@ goto eof
   set reponame=%1
   echo.
   set repodir=%repo%\%reponame%
-  echo -----------------------------------------------------------
+  echo ------------------ %reponame% -----------------------------------------
   if not exist %repodir% (
      echo %repo% does not exist, not updating
      exit /b
@@ -53,8 +53,8 @@ goto eof
      echo update skipped
      exit /b
   )
-  echo   repo: %reponame% - updating from origin
-  echo branch: %branch%
+  echo *** updating from origin
+  echo    branch: %branch%
   echo    dir: %repo%\%reponame%
   git fetch origin
   git merge origin/%BRANCH%
@@ -63,8 +63,8 @@ goto eof
 
   if "%have_central%" == "0" goto skip1
      echo.
-     echo   repo: %reponame% - updating from firemodels
-     echo branch: %branch%
+     echo *** updating from firemodels
+     echo    branch: %branch%
      echo    dir: %repo%\%reponame%
      git fetch firemodels
      git merge firemodels/%BRANCH%
@@ -86,13 +86,13 @@ goto eof
   if not exist %repodir% (
      exit /b
   )   
-  echo -----------------------------------------------------------
+  echo ------------------ %reponame% -----------------------------------------
   cd %repodir%
   git rev-parse --abbrev-ref HEAD | head -1> %CURDIR%\gitbranch.out
   set /p BRANCH=<%CURDIR%\gitbranch.out
   
-  echo   repo: %reponame% - updating from origin
-  echo branch: %branch%
+  echo *** updating from origin
+  echo    branch: %branch%
   echo    dir: %repo%\%reponame%
   git fetch origin
   git merge origin/%BRANCH%
