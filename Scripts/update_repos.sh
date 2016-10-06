@@ -47,7 +47,7 @@ UPDATE_REPO ()
   local repo=$1
   repodir=$FMROOT/$repo
 
-  echo "---------------------------------------------------------------"
+  echo "------------- $repo -------------------------------------------"
   if [ ! -e $repodir ]; then
      echo "Skipping, $repo does not exist"
      exit
@@ -59,18 +59,18 @@ UPDATE_REPO ()
     exit
   fi
   echo ""
-  echo "  repo: $repo - updating from origin"
-  echo "branch: $BRANCH"
-  echo "   dir: $repodir"
+  echo "***  updating from origin"
+  echo "     branch: $BRANCH"
+  echo "     dir: $repodir"
 
   git fetch origin
   git merge origin/$BRANCH
   have_central=`git remote -v | awk '{print $1}' | grep firemodels | wc  -l`
   if [ "$have_central" -gt "0" ]; then
   echo ""
-  echo "  repo: $repo - updating from firemodels"
-  echo "branch: $BRANCH"
-  echo "   dir: $repodir"
+  echo "*** updating from firemodels"
+  echo "    branch: $BRANCH"
+  echo "    dir: $repodir"
      git fetch firemodels
      git merge firemodels/$BRANCH
      ahead=`git status -uno | grep ahead | wc -l`
@@ -92,13 +92,14 @@ UPDATE_REPO2 ()
   if [ ! -e $repodir ]; then
      exit
   fi
-  echo "---------------------------------------------------------------"
+  echo "------------- $repo -------------------------------------------"
   cd $repodir
   BRANCH=`git rev-parse --abbrev-ref HEAD`
   echo ""
-  echo "  repo: $repo - updating from firemodels"
-  echo "branch: $BRANCH"
-  echo "   dir: $repodir"
+  echo "***  updating from firemodels"
+  echo "     branch: $BRANCH"
+  echo "     dir: $repodir"
+  echo ""
   git fetch origin
   git merge origin/$BRANCH
   git status -uno
