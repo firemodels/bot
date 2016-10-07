@@ -26,7 +26,11 @@ sudo apt-get install xvfb
 5.  install OpenMPI
 
 sudo apt-get install openmpi-bin
+note: this does not install mpifort
 
+6. install  mpich
 
+sudo apt-get install libcr-dev mpich2 mpich2-doc
+note: this installs mpif90 
 
 
