@@ -33,4 +33,12 @@ note: this does not install mpifort
 sudo apt-get install libcr-dev mpich2 mpich2-doc
 note: this installs mpif90 
 
+7 add samba
+
+sudo apt-get install samba
+
+to add a user
+
+sudo smbpasswd -a username
+
 
