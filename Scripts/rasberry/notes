@@ -19,9 +19,13 @@ nameserver 208.67.222.222
  sudo apt-get update
  sudo apt-get install gfortran
 
-3. install Xvfb (for use by smokebot)
+4. install Xvfb (for use by smokebot)
 
 sudo apt-get install xvfb
+
+5.  install OpenMPI
+
+sudo apt-get install openmpi-bin
 
 
 
