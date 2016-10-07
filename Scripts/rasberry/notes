@@ -36,4 +36,12 @@ note: this installs mpif90
 to build an mpi fortran edit the mpi_gnu_linux_64 entry by removing -m64 and
 changing mpifort to mpif90
 
+7 add samba
+
+sudo apt-get install samba
+
+to add a user
+
+sudo smbpasswd -a username
+
 
