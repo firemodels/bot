@@ -18,6 +18,7 @@ set allrepos=bot cfast cor exp fds out radcal smv
 set webrepos=webpages wikis
 set BRANCH=master
 set PUSH=0
+set ahead=0
 
 set wc=%repo%\bot\Scripts\bin\wc
 set grep=%repo%\bot\Scripts\bin\grep
@@ -46,7 +47,7 @@ goto eof
      exit /b
   )   
   cd %repodir%
-  git rev-parse --abbrev-ref HEAD | head -1> %CURDIR%\gitbranch.out
+  git rev-parse --abbrev-ref HEAD | head -1 > %CURDIR%\gitbranch.out
   set /p CURRENT_BRANCH=<%CURDIR%\gitbranch.out
   if NOT "%CURRENT_BRANCH%" == "%BRANCH%" (
      echo %BRANCH% branch not checkout out in %repo%
@@ -58,7 +59,7 @@ goto eof
   echo    dir: %repo%\%reponame%
   git fetch origin
   git merge origin/%BRANCH%
-  git remote -v | %gawk% "{print $1}" | %grep% firemodels | %wc%  -l> %CURDIR%\have_central.out
+  git remote -v | %gawk% "{print $1}" | %grep% firemodels | %wc%  -l > %CURDIR%\have_central.out
   set /p have_central=<%CURDIR%\have_central.out
 
   if "%have_central%" == "0" goto skip1
@@ -68,14 +69,14 @@ goto eof
      echo    dir: %repo%\%reponame%
      git fetch firemodels
      git merge firemodels/%BRANCH%
-     git status -uno | %grep% ahead | %wc% -l > %CURDIR%\ahead.out
-     set /p ahead=<%CURDIR%\ahead.out
-     if %ahead% GTR 0 (
-        if "%PUSH%" == "1" (
+     if "%PUSH%" == "1" (
+        git status -uno | %grep% ahead | %wc% -l > %CURDIR%\ahead.out
+        set /p ahead=<%CURDIR%\ahead.out
+        if %ahead% GTR 0 (
            echo pushing changes in %repo% to origin"
            git push origin %BRANCH%
         )
-    )
+     )
   :skip1
   exit /b
 
@@ -88,7 +89,7 @@ goto eof
   )   
   echo ------------------ %reponame% -----------------------------------------
   cd %repodir%
-  git rev-parse --abbrev-ref HEAD | head -1> %CURDIR%\gitbranch.out
+  git rev-parse --abbrev-ref HEAD | head -1 > %CURDIR%\gitbranch.out
   set /p BRANCH=<%CURDIR%\gitbranch.out
   
   echo *** updating from origin
@@ -138,3 +139,4 @@ exit /b
 :eof
 erase %CURDIR%\gitbranch.out
 erase %CURDIR%\have_central.out
+erase %CURDIR%\ahead.out
