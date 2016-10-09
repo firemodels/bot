@@ -73,7 +73,7 @@ goto eof
         git status -uno | %grep% ahead | %wc% -l > %CURDIR%\ahead.out
         set /p ahead=<%CURDIR%\ahead.out
         if %ahead% GTR 0 (
-           echo pushing %ahead% changes to origin"
+           echo pushing %ahead% changes to origin
            git push origin %BRANCH%
         )
      )
