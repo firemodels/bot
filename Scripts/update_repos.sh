@@ -67,21 +67,20 @@ UPDATE_REPO ()
   git merge origin/$BRANCH
   have_central=`git remote -v | awk '{print $1}' | grep firemodels | wc  -l`
   if [ "$have_central" -gt "0" ]; then
-  echo ""
-  echo "*** updating from firemodels"
-  echo "    branch: $BRANCH"
-  echo "    dir: $repodir"
+     echo ""
+     echo "*** updating from firemodels"
+     echo "    branch: $BRANCH"
+     echo "    dir: $repodir"
      git fetch firemodels
      git merge firemodels/$BRANCH
-     ahead=`git status -uno | grep ahead | wc -l`
-     if [ "$ahead" -gt "0" ]; then
-        if [ "$PUSH" == "1" ]; then
+     if [ "$PUSH" == "1" ]; then
+        ahead=`git status -uno | grep ahead | wc -l`
+        if [ "$ahead" -gt "0" ]; then
             echo "pushing changes in $repo to origin"
             git push origin $BRANCH
         fi
      fi
-   fi
-  git status -uno
+  fi
 }
 
 UPDATE_REPO2 ()
