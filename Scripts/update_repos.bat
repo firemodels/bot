@@ -68,14 +68,14 @@ goto eof
      echo    dir: %repo%\%reponame%
      git fetch firemodels
      git merge firemodels/%BRANCH%
-     git status -uno | %grep% ahead | %wc% -l > %CURDIR%\ahead.out
-     set /p ahead=<%CURDIR%\ahead.out
-     if %ahead% GTR 0 (
-        if "%PUSH%" == "1" (
+     if "%PUSH%" == "1" (
+        git status -uno | %grep% ahead | %wc% -l > %CURDIR%\ahead.out
+        set /p ahead=<%CURDIR%\ahead.out
+        if %ahead% GTR 0 (
            echo pushing changes in %repo% to origin"
            git push origin %BRANCH%
         )
-    )
+     )
   :skip1
   exit /b
 
