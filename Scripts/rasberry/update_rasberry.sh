@@ -47,4 +47,8 @@
 
   sudo smbpasswd -a username
 
+# 8 add mesa (software OpenGL drivers)
+# https://www.raspberrypi.org/forums/viewtopic.php?f=91&t=128464
 
+  sudo apt-get install libgl1-mesa-dri
+  sudo apt-get install mesa-common-dev
