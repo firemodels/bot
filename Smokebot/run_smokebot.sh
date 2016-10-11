@@ -11,6 +11,7 @@ function usage {
 echo "Verification and validation testing script for smokeview"
 echo ""
 echo "Options:"
+echo "-3 - run in 32 bit mode (only for gnu compilers)"
 echo "-a - run automatically if FDS or smokeview source has changed"
 #echo "-b - branch_name - run smokebot using the branch branch_name [default: $BRANCH]"
 echo "-c - clean repo"
@@ -118,6 +119,7 @@ else
   exit
 fi
 
+SIZE=
 KILL_SMOKEBOT=
 BRANCH=master
 botscript=smokebot.sh
@@ -150,9 +152,12 @@ if [ $notfound -eq 1 ] ; then
   QUEUE=none
 fi
 
-while getopts 'aAb:cd:fhI:kLm:Mq:r:tuUvw:W:' OPTION
+while getopts '3aAb:cd:fhI:kLm:Mq:r:tuUvw:W:' OPTION
 do
 case $OPTION  in
+  3)
+   SIZE=-3
+   ;;
   a)
    RUNAUTO=-a
    ;;
@@ -274,7 +279,7 @@ fi
 BRANCH="-b $BRANCH"
 
 touch $smokebot_pid
-$ECHO ./$botscript $TESTFLAG $RUNAUTO $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $SIZE $TESTFLAG $RUNAUTO $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi

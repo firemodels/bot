@@ -1295,9 +1295,13 @@ UPLOADRESULTS=
 COMPILER=intel
 PID_FILE=~/.fdssmvgit/smokebot_pid
 
-while getopts 'aAb:cI:Lm:Mo:p:q:r:stuUw:W:' OPTION
+while getopts '3aAb:cI:Lm:Mo:p:q:r:stuUw:W:' OPTION
 do
 case $OPTION in
+  3)
+   size=_32 
+   COMPILER=gnu
+   ;;
   a)
    RUNAUTO="y"
    ;;
@@ -1313,6 +1317,12 @@ case $OPTION in
    ;;
   I)
    COMPILER="$OPTARG"
+   if [ "$COMPILER" == "intel" ]; then
+     SIZE=
+   fi
+   if [ "$COMPILER" == "gnu" ]; then
+     SIZE=-3
+   fi
    ;;
   L)
    SMOKEBOT_LITE=1
