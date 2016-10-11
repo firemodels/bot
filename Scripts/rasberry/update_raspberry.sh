@@ -16,9 +16,13 @@
 
 # nameserver 208.67.222.222
 
-# 3.  install gfortran
+# do the following before updating libraries
 
  sudo apt-get update
+ sudo apt-get dist-upgrade
+
+# 3.  install gfortran
+
  sudo apt-get install gfortran
 
 # 4. install Xvfb (for use by smokebot)
