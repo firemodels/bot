@@ -1295,9 +1295,13 @@ UPLOADRESULTS=
 COMPILER=intel
 PID_FILE=~/.fdssmvgit/smokebot_pid
 
-while getopts 'aAb:cI:Lm:Mo:p:q:r:stuUw:W:' OPTION
+while getopts '3aAb:cI:Lm:Mo:p:q:r:stuUw:W:' OPTION
 do
 case $OPTION in
+  3)
+   size=_32 
+   COMPILER=gnu
+   ;;
   a)
    RUNAUTO="y"
    ;;
@@ -1313,6 +1317,12 @@ case $OPTION in
    ;;
   I)
    COMPILER="$OPTARG"
+   if [ "$COMPILER" == "intel" ]; then
+     size=_64
+   fi
+   if [ "$COMPILER" == "gnu" ]; then
+     size=_32
+   fi
    ;;
   L)
    SMOKEBOT_LITE=1
@@ -1421,12 +1431,12 @@ else
 fi
 
 if [ "$COMPILER" == "intel" ]; then
-if [[ "$IFORT_COMPILER" != "" ]] ; then
-  source $IFORT_COMPILER/bin/compilervars.sh intel64
-fi 
-notfound=`icc -help 2>&1 | tail -1 | grep "not found" | wc -l`
+  if [[ "$IFORT_COMPILER" != "" ]] ; then
+    source $IFORT_COMPILER/bin/compilervars.sh intel64
+  fi 
+  notfound=`icc -help 2>&1 | tail -1 | grep "not found" | wc -l`
 else
-notfound=`gcc -help 2>&1 | tail -1 | grep "not found" | wc -l`
+  notfound=`gcc -help 2>&1 | tail -1 | grep "not found" | wc -l`
 fi
 if [ "$notfound" == "1" ] ; then
   export haveCC="0"
