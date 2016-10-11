@@ -47,8 +47,11 @@
 
   sudo smbpasswd -a username
 
-# 8 add mesa (software OpenGL drivers)
-# https://www.raspberrypi.org/forums/viewtopic.php?f=91&t=128464
-
+# 8 OpenGL libraries and headers
+#  think the following two are already installed
   sudo apt-get install libgl1-mesa-dri
   sudo apt-get install mesa-common-dev
+
+# freeglut provides the OpenGL headers
+  sudo apt-get install freeglut3-dev
+  sudo apt-get install libxmu-dev libxi-dev
