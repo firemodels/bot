@@ -59,3 +59,7 @@
 # freeglut provides the OpenGL headers
   sudo apt-get install freeglut3-dev
   sudo apt-get install libxmu-dev libxi-dev
+
+9.  mail
+
+  sudo apt-get install postfix

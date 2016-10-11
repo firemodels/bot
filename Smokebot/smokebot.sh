@@ -283,14 +283,14 @@ compile_cfast()
     # Build CFAST
     echo "Building"
     echo "   release cfast"
-    cd $cfastrepo/Build/CFAST/${COMPILER}_${platform}${size}
-    rm -f cfast7_${platform}${size}
+    cd $cfastrepo/Build/CFAST/${COMPILER}_${platform}_${size}
+    rm -f cfast7_${platform}_${size}
     make --makefile ../makefile clean &> /dev/null
     ./make_cfast.sh >> $OUTPUT_DIR/stage1a 2>&1
 
    # Check for errors in CFAST compilation
-   cd $cfastrepo/Build/CFAST/${COMPILER}_${platform}${size}
-   if [ -e "cfast7_${platform}${size}" ]
+   cd $cfastrepo/Build/CFAST/${COMPILER}_${platform}_${size}
+   if [ -e "cfast7_${platform}_${size}" ]
    then
       stage0_success=true
    else
@@ -390,8 +390,8 @@ compile_fds_mpi_db()
 {
    # Clean and compile mpi FDS debug
    echo "   debug FDS"
-   cd $fdsrepo/Build/mpi_${COMPILER}_${platform}${size}$IB$DB
-   rm -f fds_mpi_${COMPILER}_${platform}${size}$IB$DB
+   cd $fdsrepo/Build/mpi_${COMPILER}_${platform}_${size}$IB$DB
+   rm -f fds_mpi_${COMPILER}_${platform}_${size}$IB$DB
    make --makefile ../makefile clean &> /dev/null
    ./make_fds.sh &> $OUTPUT_DIR/stage1b
 }
@@ -403,8 +403,8 @@ compile_fds_mpi_db()
 check_compile_fds_mpi_db()
 {
    # Check for errors in FDS debug compilation
-   cd $fdsrepo/Build/mpi_${COMPILER}_${platform}${size}$IB$DB
-   if [ -e "fds_mpi_${COMPILER}_${platform}${size}$IB$DB" ]
+   cd $fdsrepo/Build/mpi_${COMPILER}_${platform}_${size}$IB$DB
+   if [ -e "fds_mpi_${COMPILER}_${platform}_${size}$IB$DB" ]
    then
       stage1b_fdsdb_success=true
    else
@@ -424,7 +424,7 @@ check_compile_fds_mpi_db()
       grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage1b | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'>> $WARNING_LOG
       echo "" >> $WARNING_LOG
    # if the executable does not exist then an email has already been sent
-      if [ -e "fds_mpi_${COMPILER}_${platform}${size}$IB$DB" ] ; then
+      if [ -e "fds_mpi_${COMPILER}_${platform}_${size}$IB$DB" ] ; then
         THIS_FDS_FAILED=1
       fi
    fi
@@ -484,7 +484,7 @@ run_verification_cases_debug()
 
    # Submit SMV verification cases and wait for them to start
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3a 2>&1
-   ./Run_SMV_Cases.sh -c $cfastrepo -I $COMPILER $USEINSTALL2 -m 2 -d -q $SMOKEBOT_QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage3a 2>&1
+   ./Run_SMV_Cases.sh -p $size -c $cfastrepo -I $COMPILER $USEINSTALL2 -m 2 -d -q $SMOKEBOT_QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage3a 2>&1
 }
 
 #---------------------------------------------
@@ -536,8 +536,8 @@ compile_fds_mpi()
 {
    # Clean and compile FDS
    echo "Building release FDS"
-   cd $fdsrepo/Build/mpi_${COMPILER}_${platform}${size}$IB
-   rm -f fds_mpi_${COMPILER}_${platform}${size}$IB
+   cd $fdsrepo/Build/mpi_${COMPILER}_${platform}_${size}$IB
+   rm -f fds_mpi_${COMPILER}_${platform}_${size}$IB
    make --makefile ../makefile clean &> /dev/null
    ./make_fds.sh &> $OUTPUT_DIR/stage1c
 }
@@ -549,8 +549,8 @@ compile_fds_mpi()
 check_compile_fds_mpi()
 {
    # Check for errors in FDS compilation
-   cd $fdsrepo/Build/mpi_${COMPILER}_${platform}${size}$IB
-   if [ -e "fds_mpi_${COMPILER}_${platform}${size}$IB" ]
+   cd $fdsrepo/Build/mpi_${COMPILER}_${platform}_${size}$IB
+   if [ -e "fds_mpi_${COMPILER}_${platform}_${size}$IB" ]
    then
       stage1c_fdsrel_success=true
    else
@@ -584,37 +584,38 @@ compile_smv_utilities()
    if [ "$haveCC" == "1" ] ; then
    # smokeview libraries
      echo "      libraries"
-     cd $smvrepo/Build/LIBS/${COMPILER}_${platform}${size}
+     cd $smvrepo/Build/LIBS/${COMPILER}_${platform}_${size}
      echo 'Building Smokeview libraries:' >> $OUTPUT_DIR/stage2a 2>&1
      ./makelibs.sh >> $OUTPUT_DIR/stage2a 2>&1
 
    # smokezip:
      echo "      smokezip"
-     cd $smvrepo/Build/smokezip/${COMPILER}_${platform}${size}
-     rm -f *.o smokezip_${platform}${size}
+     cd $smvrepo/Build/smokezip/${COMPILER}_${platform}_${size}
+     rm -f *.o smokezip_${platform}_${size}
+
      echo 'Compiling smokezip:' >> $OUTPUT_DIR/stage2a 2>&1
      ./make_smokezip.sh >> $OUTPUT_DIR/stage2a 2>&1
      echo "" >> $OUTPUT_DIR/stage2a 2>&1
    
    # smokediff:
      echo "      smokediff"
-     cd $smvrepo/Build/smokediff/${COMPILER}_${platform}${size}
-     rm -f *.o smokediff_${platform}${size}
+     cd $smvrepo/Build/smokediff/${COMPILER}_${platform}_${size}
+     rm -f *.o smokediff_${platform}_${size}
      echo 'Compiling smokediff:' >> $OUTPUT_DIR/stage2a 2>&1
      ./make_smokediff.sh >> $OUTPUT_DIR/stage2a 2>&1
      echo "" >> $OUTPUT_DIR/stage2a 2>&1
    
    # background
      echo "      background"
-     cd $smvrepo/Build/background/${COMPILER}_${platform}${size}
+     cd $smvrepo/Build/background/${COMPILER}_${platform}_${size}
      rm -f *.o background
      echo 'Compiling background:' >> $OUTPUT_DIR/stage2a 2>&1
      ./make_background.sh >> $OUTPUT_DIR/stage2a 2>&1
    
   # wind2fds:
      echo "      wind2fds"
-     cd $smvrepo/Build/wind2fds/${COMPILER}_${platform}${size}
-     rm -f *.o wind2fds_${platform}${size}
+     cd $smvrepo/Build/wind2fds/${COMPILER}_${platform}_${size}
+     rm -f *.o wind2fds_${platform}_${size}
      echo 'Compiling wind2fds:' >> $OUTPUT_DIR/stage2a 2>&1
      ./make_wind2fds.sh >> $OUTPUT_DIR/stage2a 2>&1
     echo "" >> $OUTPUT_DIR/stage2a 2>&1
@@ -647,10 +648,10 @@ check_smv_utilities()
    if [ "$haveCC" == "1" ] ; then
      # Check for errors in SMV utilities compilation
      cd $smvrepo
-     if [ -e "$smvrepo/Build/smokezip/${COMPILER}_${platform}${size}/smokezip_${platform}${size}" ]  && \
-        [ -e "$smvrepo/Build/smokediff/${COMPILER}_${platform}${size}/smokediff_${platform}${size}" ]  && \
-        [ -e "$smvrepo/Build/wind2fds/${COMPILER}_${platform}${size}/wind2fds_${platform}${size}" ]  && \
-        [ -e "$smvrepo/Build/background/${COMPILER}_${platform}${size}/background" ]
+     if [ -e "$smvrepo/Build/smokezip/${COMPILER}_${platform}_${size}/smokezip_${platform}_${size}" ]  && \
+        [ -e "$smvrepo/Build/smokediff/${COMPILER}_${platform}_${size}/smokediff_${platform}_${size}" ]  && \
+        [ -e "$smvrepo/Build/wind2fds/${COMPILER}_${platform}_${size}/wind2fds_${platform}_${size}" ]  && \
+        [ -e "$smvrepo/Build/background/${COMPILER}_${platform}_${size}/background" ]
      then
         stage2a_success="1"
      else
@@ -723,7 +724,7 @@ run_verification_cases_release()
    # Start running all SMV verification cases
    cd $smvrepo/Verification/scripts
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3b 2>&1
-   ./Run_SMV_Cases.sh -c $cfastrepo -I $COMPILER $USEINSTALL2 $RUN_OPENMP -q $SMOKEBOT_QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage3b 2>&1
+   ./Run_SMV_Cases.sh -p $size -c $cfastrepo -I $COMPILER $USEINSTALL2 $RUN_OPENMP -q $SMOKEBOT_QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage3b 2>&1
 }
 
 #---------------------------------------------
@@ -779,8 +780,8 @@ compile_smv_db()
    # Clean and compile SMV debug
      echo "   smokeview"
      echo "      debug"
-     cd $smvrepo/Build/smokeview/${COMPILER}_${platform}${size}
-     rm -f smokeview_${platform}${TEST}${size}_db
+     cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_${size}
+     rm -f smokeview_${platform}${TEST}_${size}_db
      ./make_smv_db.sh $TESTFLAG &> $OUTPUT_DIR/stage2b
    fi
 }
@@ -793,8 +794,8 @@ check_compile_smv_db()
 {
    if [ "$haveCC" == "1" ] ; then
    # Check for errors in SMV debug compilation
-   cd $smvrepo/Build/smokeview/${COMPILER}_${platform}${size}
-   if [ -e "smokeview_${platform}${TEST}${size}_db" ]
+   cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_${size}
+   if [ -e "smokeview_${platform}${TEST}_${size}_db" ]
    then
       stage2b_success=true
    else
@@ -826,7 +827,7 @@ make_smv_pictures_db()
    # Run Make SMV Pictures script (debug mode)
    echo "making smokeview images"
    cd $smvrepo/Verification/scripts
-   ./Make_SMV_Pictures.sh $USEINSTALL -d 2>&1 &> $OUTPUT_DIR/stage4a_orig
+   ./Make_SMV_Pictures.sh -s $size $USEINSTALL -d 2>&1 &> $OUTPUT_DIR/stage4a_orig
    grep -v FreeFontPath $OUTPUT_DIR/stage4a_orig > $OUTPUT_DIR/stage4a
 }
 
@@ -872,8 +873,8 @@ compile_smv()
    if [ "$haveCC" == "1" ] ; then
    # Clean and compile SMV
      echo "      release"
-     cd $smvrepo/Build/smokeview/${COMPILER}_${platform}${size}
-     rm -f smokeview_${platform}${TEST}${size}
+     cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_${size}
+     rm -f smokeview_${platform}${TEST}_${size}
      ./make_smv.sh $TESTFLAG &> $OUTPUT_DIR/stage2c
    fi
 }
@@ -886,13 +887,13 @@ check_compile_smv()
 {
    if [ "$haveCC" == "1" ] ; then
    # Check for errors in SMV release compilation
-   cd $smvrepo/Build/smokeview/${COMPILER}_${platform}${size}
-   if [ -e "smokeview_${platform}${TEST}${size}" ]
+   cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_${size}
+   if [ -e "smokeview_${platform}${TEST}_${size}" ]
    then
       stage2c_smv_success=true
    else
       echo "Errors from Stage 2c - Compile SMV release:" >> $ERROR_LOG
-      echo "The program smokeview_${platform}${TEST}${size} does not exist."
+      echo "The program smokeview_${platform}${TEST}_${size} does not exist."
       cat $OUTPUT_DIR/stage2c >> $ERROR_LOG
       echo "" >> $ERROR_LOG
    fi
@@ -920,7 +921,7 @@ make_smv_pictures()
    # Run Make SMV Pictures script (release mode)
    echo Generating images 
    cd $smvrepo/Verification/scripts
-   ./Make_SMV_Pictures.sh $TESTFLAG $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4b_orig
+   ./Make_SMV_Pictures.sh -s $size $TESTFLAG $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4b_orig
    grep -v FreeFontPath $OUTPUT_DIR/stage4b_orig &> $OUTPUT_DIR/stage4b
 }
 
@@ -1258,7 +1259,7 @@ email_build_status()
 #                             Primary script execution =
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-size=_64
+size=64
 # define run directories
 smokebotdir=`pwd`
 OUTPUT_DIR="$smokebotdir/output"
@@ -1299,7 +1300,7 @@ while getopts '3aAb:cI:Lm:Mo:p:q:r:stuUw:W:' OPTION
 do
 case $OPTION in
   3)
-   size=_32 
+   size=32 
    COMPILER=gnu
    ;;
   a)
@@ -1318,10 +1319,10 @@ case $OPTION in
   I)
    COMPILER="$OPTARG"
    if [ "$COMPILER" == "intel" ]; then
-     size=_64
+     size=64
    fi
    if [ "$COMPILER" == "gnu" ]; then
-     size=_32
+     size=32
    fi
    ;;
   L)
