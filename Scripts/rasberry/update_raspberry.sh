@@ -16,9 +16,13 @@
 
 # nameserver 208.67.222.222
 
-# 3.  install gfortran
+# do the following before updating libraries
 
  sudo apt-get update
+ sudo apt-get dist-upgrade
+
+# 3.  install gfortran
+
  sudo apt-get install gfortran
 
 # 4. install Xvfb (for use by smokebot)
@@ -47,4 +51,11 @@
 
   sudo smbpasswd -a username
 
+# 8 OpenGL libraries and headers
+#  think the following two are already installed
+  sudo apt-get install libgl1-mesa-dri
+  sudo apt-get install mesa-common-dev
 
+# freeglut provides the OpenGL headers
+  sudo apt-get install freeglut3-dev
+  sudo apt-get install libxmu-dev libxi-dev
