@@ -1449,7 +1449,6 @@ else
   USEINSTALL2=
 fi
 
-
 DB=_db
 IB=
 if [ "$FDSNETWORK" == "infiniband" ] ; then
@@ -1583,6 +1582,10 @@ compile_cfast
 compile_fds_mpi_db
 check_compile_fds_mpi_db
 
+### Stage 2 build smokeview ###
+compile_smv_utilities
+check_smv_utilities
+
 if [[ $stage1b_fdsdb_success && "$RUNDEBUG" == "1" ]] ; then
    run_verification_cases_debug
 fi
@@ -1604,9 +1607,6 @@ if [ "$SMOKEBOT_LITE" == "" ]; then
 fi
 
 ### Stage 2 build smokeview ###
-compile_smv_utilities
-check_smv_utilities
-
 compile_smv_db
 check_compile_smv_db
 
