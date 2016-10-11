@@ -157,6 +157,7 @@ do
 case $OPTION  in
   3)
    SIZE=-3
+   COMPILER=gnu
    ;;
   a)
    RUNAUTO=-a
