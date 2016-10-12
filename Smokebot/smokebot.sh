@@ -827,7 +827,7 @@ make_smv_pictures_db()
    # Run Make SMV Pictures script (debug mode)
    echo "making smokeview images"
    cd $smvrepo/Verification/scripts
-   ./Make_SMV_Pictures.sh -s $size $USEINSTALL -d 2>&1 &> $OUTPUT_DIR/stage4a_orig
+   ./Make_SMV_Pictures.sh -s $size -I $COMPILER $USEINSTALL -d 2>&1 &> $OUTPUT_DIR/stage4a_orig
    grep -v FreeFontPath $OUTPUT_DIR/stage4a_orig > $OUTPUT_DIR/stage4a
 }
 
@@ -921,7 +921,7 @@ make_smv_pictures()
    # Run Make SMV Pictures script (release mode)
    echo Generating images 
    cd $smvrepo/Verification/scripts
-   ./Make_SMV_Pictures.sh -s $size $TESTFLAG $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4b_orig
+   ./Make_SMV_Pictures.sh -s $size -I $COMPILER $TESTFLAG $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4b_orig
    grep -v FreeFontPath $OUTPUT_DIR/stage4b_orig &> $OUTPUT_DIR/stage4b
 }
 
