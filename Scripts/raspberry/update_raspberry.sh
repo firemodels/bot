@@ -67,3 +67,15 @@
 # 10.0 bc
 
   sudo apt-get install bc
+
+11: torque
+
+# https://help.ubuntu.com/community/TorquePbsHowto
+# https://jabriffa.wordpress.com/2015/02/11/installing-torquepbs-job-scheduler-on-ubuntu-14-04-lts/
+
+# server
+  sudo apt-get install torque-server torque-scheduler torque-client
+
+# client
+  sudo apt-get install torque-client torque-mom
+
