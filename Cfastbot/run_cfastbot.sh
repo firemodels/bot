@@ -51,6 +51,7 @@ function usage {
 echo "Verification and validation testing script for cfast"
 echo ""
 echo "Options:"
+echo "-3 - run in 32 bit mode (only for gnu compilers)"
 echo "-a - run automatically if cfast repo has changed"
 echo "-c - clean cfast and FDS-SMV repos"
 echo "-f - force cfastbot run"
@@ -137,6 +138,7 @@ RUNCFASTBOT=1
 EMAIL=
 FORCE=
 compiler=intel
+size=
 
 MATLABEXE=
 SKIP=
@@ -147,9 +149,13 @@ USEINSTALL=
 KILL_CFASTBOT=
 ECHO=
 
-while getopts 'acfhiI:km:q:suUv' OPTION
+while getopts '3acfhiI:km:q:suUv' OPTION
 do
 case $OPTION  in
+  3)
+   size=-3
+   compiler=gnu
+   ;;
   a)
    RUNAUTO=-a
    ;;
@@ -269,7 +275,7 @@ QUEUE="-q $QUEUE"
 compiler="-I $compiler"
 PID="-p $cfastbot_pid"
 cd $CURDIR
-$ECHO  ./cfastbot.sh $PID $REPO $USEINSTALL $RUNAUTO $compiler $UPDATEREPO $CLEAN $QUEUE $SKIP $MATLABEXE $UPLOAD $EMAIL "$@"
+$ECHO  ./cfastbot.sh $PID $REPO $USEINSTALL $RUNAUTO $size $compiler $UPDATEREPO $CLEAN $QUEUE $SKIP $MATLABEXE $UPLOAD $EMAIL "$@"
 if [ -e $cfastbot_pid ]; then
   rm $cfastbot_pid
 fi   
