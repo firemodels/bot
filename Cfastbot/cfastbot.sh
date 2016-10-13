@@ -1380,11 +1380,11 @@ echo $$ > $PID_FILE
 
 cfastrepo=$reponame/cfast
 cfastbranch=master
-CD_BRANCH $cfastrepo $cfastbranch || exit 1
+CD_REPO $cfastrepo $cfastbranch || exit 1
 
 smvrepo=$reponame/smv
 smvbranch=master
-CD_BRANCH $smvrepo $smvbranch || exit 1
+CD_REPO $smvrepo $smvbranch || exit 1
 cd $cfastbotdir
 
 if [ "$USEINSTALL" == "" ]; then
