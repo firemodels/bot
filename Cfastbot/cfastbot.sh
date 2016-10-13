@@ -802,7 +802,7 @@ make_cfast_pictures()
 {
    echo "Generating smokeview images"
    CD_REPO $cfastrepo/Validation/scripts $cfastbranch || return 1
-   ./Make_CFAST_Pictures.sh -I $COMPILER $USEINSTALL 2>&1 | grep -v FreeFontPath &> $OUTPUT_DIR/stage6
+   ./Make_CFAST_Pictures.sh -I $compiler $USEINSTALL 2>&1 | grep -v FreeFontPath &> $OUTPUT_DIR/stage6
 
    return 0
 }
@@ -1305,7 +1305,7 @@ fi
 
 cd $cfastbotdir
 
-COMPILER=intel
+compiler=intel
 QUEUE=smokebot
 RUNAUTO=
 UPDATEREPO=
@@ -1387,7 +1387,7 @@ smvbranch=master
 CD_REPO $smvrepo $smvbranch || exit 1
 cd $cfastbotdir
 
-if [ "$COMPILER" == "intel" ]; then
+if [ "$compiler" == "intel" ]; then
   if [[ "$IFORT_COMPILER" != "" ]] ; then
     source $IFORT_COMPILER/bin/compilervars.sh intel64
   fi
