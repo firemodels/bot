@@ -70,12 +70,12 @@
 
 11: torque
 
-# https://help.ubuntu.com/community/TorquePbsHowto
+# I used notes from this page to install and configure torque
 # https://jabriffa.wordpress.com/2015/02/11/installing-torquepbs-job-scheduler-on-ubuntu-14-04-lts/
 
-# server
-  sudo apt-get install torque-server torque-scheduler torque-client
+# server (for the first pi)
+  sudo apt-get install torque-server torque-scheduler torque-mom torque-client
 
-# client
+# client ( for the 2nd throught the nth pi)
   sudo apt-get install torque-client torque-mom
 
