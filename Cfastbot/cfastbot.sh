@@ -592,7 +592,7 @@ run_vv_cases_debug()
    echo 'Running CFAST V&V cases'
    echo '   debug'
    echo 'Running CFAST V&V cases' >> $OUTPUT_DIR/stage4 2>&1
-   ./Run_CFAST_Cases.sh -I $compiler -S $smvrepo $USEINSTALL2 -m 2 -d -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
+   ./Run_CFAST_Cases.sh -p $size -I $compiler -S $smvrepo $USEINSTALL2 -m 2 -d -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
    if [ "$QUEUE" != "none" ]; then
      wait_vv_cases_debug_start
    fi
@@ -718,7 +718,7 @@ run_vv_cases_release()
    CD_REPO $cfastrepo/Validation/scripts $cfastbranch || return 1
    echo '   release'
    echo 'Running CFAST V&V cases' >> $OUTPUT_DIR/stage5 2>&1
-   ./Run_CFAST_Cases.sh -I $compiler -S $smvrepo $USEINSTALL2 -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
+   ./Run_CFAST_Cases.sh -p $size -I $compiler -S $smvrepo $USEINSTALL2 -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
    if [ "$QUEUE" != "none" ]; then
      wait_vv_cases_release_start
    fi
@@ -802,7 +802,7 @@ make_cfast_pictures()
 {
    echo "Generating smokeview images"
    CD_REPO $cfastrepo/Validation/scripts $cfastbranch || return 1
-   ./Make_CFAST_Pictures.sh -I $compiler $USEINSTALL 2>&1 | grep -v FreeFontPath &> $OUTPUT_DIR/stage6
+   ./Make_CFAST_Pictures.sh $size2 -I $compiler $USEINSTALL 2>&1 | grep -v FreeFontPath &> $OUTPUT_DIR/stage6
 
    return 0
 }
@@ -1263,6 +1263,7 @@ email_build_status()
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 size=64
+size2=
 
 
 #  ===================
@@ -1326,6 +1327,7 @@ do
 case $OPTION in
    3)
     size=32
+    size2=-3
     compiler=gnu
      ;;
    a)
