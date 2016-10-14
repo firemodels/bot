@@ -63,6 +63,7 @@
 # 9.  mail
 
   sudo apt-get install postfix
+  sudo apt-get install mailutils
 
 # 10.0 bc
 
