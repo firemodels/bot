@@ -79,6 +79,8 @@
 # client ( for the 2nd throught the nth pi)
   sudo apt-get install torque-client torque-mom
 
+#  note: before configuring torque, edit /etc/hosts file to add entry for all hosts
+
 # 12: tex
 
   sudo apt-get install texlive-full
