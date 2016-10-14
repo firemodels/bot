@@ -68,7 +68,7 @@
 
   sudo apt-get install bc
 
-11: torque
+# 11: torque
 
 # I used notes from this page to install and configure torque
 # https://jabriffa.wordpress.com/2015/02/11/installing-torquepbs-job-scheduler-on-ubuntu-14-04-lts/
@@ -79,3 +79,6 @@
 # client ( for the 2nd throught the nth pi)
   sudo apt-get install torque-client torque-mom
 
+# 12: tex
+
+  sudo apt-get install texlive-full
