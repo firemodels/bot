@@ -11,8 +11,8 @@ killall pbs_server
 
 echo $SERVER > /etc/torque/server_name
 echo $SERVER > /var/spool/torque/server_priv/acl_svr/acl_hosts
-echo root@SERVER > /var/spool/torque/server_priv/acl_svr/operators
-echo root@SERVER > /var/spool/torque/server_priv/acl_svr/managers
+echo root@$SERVER > /var/spool/torque/server_priv/acl_svr/operators
+echo root@$SERVER > /var/spool/torque/server_priv/acl_svr/managers
 
 echo "$SERVER np=4" > /var/spool/torque/server_priv/nodes
 
