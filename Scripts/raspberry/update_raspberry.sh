@@ -27,7 +27,7 @@
 
 # 4. install Xvfb (for use by smokebot)
 
-# sudo apt-get install xvfb
+  sudo apt-get install xvfb
 
 # 5.  install OpenMPI
 
@@ -84,4 +84,5 @@
 
 # 12: tex
 
-  sudo apt-get install texlive-full
+  sudo apt-get install texlive
+  #sudo apt-get install texlive-full
