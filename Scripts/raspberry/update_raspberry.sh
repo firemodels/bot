@@ -1,88 +1,97 @@
 #!/bin/bash
+server=1
 
-# 0. add user
+# change above line to
+# server=
+# if setting up a raspberry pi which is a compute node
+
+# ----------------------------------------------
+#   preliminaries 
+
+#   *** add user and setup to use sudo
+
+#   run the adduser command and edit the /etc/sudoers
+#   file to setup a user
 
 #   adduser username  
+#   vi /etc/sudoers
 
-# 1. add username to sudo list
+#   then copy entry for root changing root to username
 
-#  sudo visudo
+# *** change dns server in /etc/resolv.conf
 
-# then copy entry for root changing root to username
+#   nameserver 208.67.222.222
 
-# 2.  change dns server in /etc/resolv.conf
+# *** after this script runs, run the following command
+#     to add a user to samba (username is name you use to login )
 
-# I changed dns server entry to the following number (google for opendns)
+#   sudo smbpasswd -a username
+# ----------------------------------------------
 
-# nameserver 208.67.222.222
+# *** update raspberry OS
 
-# do the following before updating libraries
+ sudo apt-get -y update
+ sudo apt-get -y dist-upgrade
 
- sudo apt-get update
- sudo apt-get dist-upgrade
+# ***  install gfortran
 
-# 3.  install gfortran
+ sudo apt-get -y install gfortran
 
- sudo apt-get install gfortran
+# *** install Xvfb (for use by smokebot)
 
-# 4. install Xvfb (for use by smokebot)
+  sudo apt-get -y install xvfb
 
-  sudo apt-get install xvfb
+# *** install  mpich
 
-# 5.  install OpenMPI
+# note: mpich uses mpif90 (not mpifort) when building fds
 
-# sudo apt-get install openmpi-bin
-# note: this does not install mpifort (so don't install this package)
+  sudo apt-get -y install libcr-dev mpich2 mpich2-doc
 
-# 6. install  mpich
-
-# note: the following installs mpif90 
-# to build an mpi fortran edit the mpi_gnu_linux_64 entry by removing -m64 and
-# changing mpifort to mpif90
-
-  sudo apt-get install libcr-dev mpich2 mpich2-doc
-
-
-# 7 add samba
-
-  sudo apt-get install samba
+# *** install samba
+  if [ "$server" != "" ]; then
+    sudo apt-get -y install samba
+  fi
 
 #  to add a user:
 
-  sudo smbpasswd -a username
+# sudo smbpasswd -a username
 
-# 8 OpenGL libraries and headers
-#  think the following two are already installed
-  sudo apt-get install libgl1-mesa-dri
-  sudo apt-get install mesa-common-dev
+# *** install OpenGL libraries and headers
+  
+  if [ "$server" != "" ]; then
+    sudo apt-get -y install libgl1-mesa-dri
+    sudo apt-get -y install mesa-common-dev
+    sudo apt-get -y install freeglut3-dev
+    sudo apt-get -y install libxmu-dev libxi-dev
+  fi
 
-# freeglut provides the OpenGL headers
-  sudo apt-get install freeglut3-dev
-  sudo apt-get install libxmu-dev libxi-dev
+# *** install mail
+  
+  if [ "$server" != "" ]; then
+    sudo apt-get -y install postfix
+    sudo apt-get -y  install mailutils
+  fi
 
-# 9.  mail
+# *** install bc
 
-  sudo apt-get install postfix
-  sudo apt-get install mailutils
+  sudo apt-get -y install bc
 
-# 10.0 bc
+# *** install torque
 
-  sudo apt-get install bc
-
-# 11: torque
-
-# I used notes from this page to install and configure torque
 # https://jabriffa.wordpress.com/2015/02/11/installing-torquepbs-job-scheduler-on-ubuntu-14-04-lts/
 
-# server (for the first pi)
-  sudo apt-get install torque-server torque-scheduler torque-mom torque-client
-
-# client ( for the 2nd throught the nth pi)
-  sudo apt-get install torque-client torque-mom
+  if [ "$server" != "" ]; then
+    # head nodes
+    sudo apt-get -y install torque-server torque-scheduler torque-mom torque-client
+  else
+    # compute nodes
+    sudo apt-get -y install torque-client torque-mom
+  fi
 
 #  note: before configuring torque, edit /etc/hosts file to add entry for all hosts
 
-# 12: tex
+# *** install tex
 
-  sudo apt-get install texlive
-  #sudo apt-get install texlive-full
+  if [ "$server" != "" ]; then
+    sudo apt-get -y install texlive
+  fi
