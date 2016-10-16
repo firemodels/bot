@@ -1,5 +1,7 @@
 #!/bin/bash
 
+SERVER=`hostname`
+
 # create batch and smokebot queues
 
 qmgr -c 'create queue batch'
@@ -19,6 +21,6 @@ qmgr -c 'set queue smokebot resources_default.nodes = 1'
 
 # configure submission pool 
 
-qmgr -c 'set server submit_hosts = raspberrypi'
+qmgr -c 'set server submit_hosts = $SERVER'
 qmgr -c 'set server allow_node_submit = true'
 

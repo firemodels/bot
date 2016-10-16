@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SERVER=raspberrypi
+SERVER=`hostname`
 
 /etc/init.d/torque-mom stop
 /etc/init.d/torque-scheduler stop
