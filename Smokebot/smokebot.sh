@@ -484,7 +484,7 @@ run_verification_cases_debug()
 
    # Submit SMV verification cases and wait for them to start
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3a 2>&1
-   ./Run_SMV_Cases.sh -Y -p $size -c $cfastrepo -I $COMPILER $USEINSTALL2 -m 2 -d -q $SMOKEBOT_QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage3a 2>&1
+   ./Run_SMV_Cases.sh $NOPT -Y -p $size -c $cfastrepo -I $COMPILER $USEINSTALL2 -m 2 -d -q $SMOKEBOT_QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage3a 2>&1
 }
 
 #---------------------------------------------
@@ -724,7 +724,7 @@ run_verification_cases_release()
    # Start running all SMV verification cases
    cd $smvrepo/Verification/scripts
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3b 2>&1
-   ./Run_SMV_Cases.sh -Y -p $size -c $cfastrepo -I $COMPILER $USEINSTALL2 $RUN_OPENMP -q $SMOKEBOT_QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage3b 2>&1
+   ./Run_SMV_Cases.sh $NOPT -Y -p $size -c $cfastrepo -I $COMPILER $USEINSTALL2 $RUN_OPENMP -q $SMOKEBOT_QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage3b 2>&1
 }
 
 #---------------------------------------------
@@ -1281,6 +1281,7 @@ BRANCH=master
 
 # define repo names (default)
 
+NOPT=
 SMOKEBOT_QUEUE=smokebot
 MAKEMOVIES=
 RUNAUTO=
@@ -1296,7 +1297,7 @@ UPLOADRESULTS=
 COMPILER=intel
 PID_FILE=~/.fdssmvgit/smokebot_pid
 
-while getopts '3aAb:cI:Lm:Mo:p:q:r:stuUw:W:' OPTION
+while getopts '3aAb:cI:Lm:MNo:p:q:r:stuUw:W:' OPTION
 do
 case $OPTION in
   3)
@@ -1333,6 +1334,9 @@ case $OPTION in
    ;;
   M)
    MAKEMOVIES="1"
+   ;;
+  N)
+   NOPT=-N
    ;;
   o)
    nthreads="$OPTARG"

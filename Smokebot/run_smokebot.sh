@@ -134,6 +134,7 @@ COMPILER=intel
 SMOKEBOT_LITE=
 TESTFLAG=
 ECHO=
+NOPT=
 
 WEB_URL=
 web_DIR=/var/www/html/`whoami`
@@ -152,7 +153,7 @@ if [ $notfound -eq 1 ] ; then
   QUEUE=none
 fi
 
-while getopts '3aAb:cd:fhI:kLm:Mq:r:tuUvw:W:' OPTION
+while getopts '3aAb:cd:fhI:kLm:NMq:r:tuUvw:W:' OPTION
 do
 case $OPTION  in
   3)
@@ -193,6 +194,9 @@ case $OPTION  in
    ;;
   M)
    MOVIE="-M"
+   ;;
+  N)
+   NOPT="-N"
    ;;
   q)
    QUEUE="$OPTARG"
@@ -280,7 +284,7 @@ fi
 BRANCH="-b $BRANCH"
 
 touch $smokebot_pid
-$ECHO ./$botscript $SIZE $TESTFLAG $RUNAUTO $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $NOPT $SIZE $TESTFLAG $RUNAUTO $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi
