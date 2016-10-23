@@ -50,13 +50,13 @@ UPDATE_REPO ()
   echo "------------- $repo -------------------------------------------"
   if [ ! -e $repodir ]; then
      echo "Skipping, $repo does not exist"
-     exit
+     return
   fi
   cd $repodir
   CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
   if [ "$BRANCH" != "$CURRENT_BRANCH" ]; then
     echo "Skipping, found branch $CURRENT_BRANCH, expecting branch $BRANCH"
-    exit
+    return
   fi
   echo ""
   echo "***  updating from origin"
@@ -89,7 +89,7 @@ UPDATE_REPO2 ()
   repodir=$FMROOT/$repo
 
   if [ ! -e $repodir ]; then
-     exit
+     return
   fi
   echo "------------- $repo -------------------------------------------"
   cd $repodir
