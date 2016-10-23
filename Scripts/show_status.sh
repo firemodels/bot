@@ -45,6 +45,7 @@ SHOW_STATUS ()
   fi
   cd $repodir
   git status -uno
+  git describe --dirty
 }
 
 SHOW_STATUS2 ()
@@ -58,6 +59,7 @@ SHOW_STATUS2 ()
   echo "------------- $repo -------------------------------------------"
   cd $repodir
   git status -uno
+  git describe --dirty
 }
 
 for repo in $allrepos
