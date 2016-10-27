@@ -380,7 +380,7 @@ compile_smv_utilities()
    else
      echo "   smokeview libraries - not built, using installed smokview"
      if [ "$QUEUE" == "none" ]; then
-       echo "   background - not built, using installed smokeview"
+       echo "   background - not built, using installed background"
        echo "Using installed smokeview, libraries not built" >> $OUTPUT_DIR/stage3a 2>&1
      fi
    fi
@@ -1389,22 +1389,25 @@ smvbranch=master
 CD_REPO $smvrepo $smvbranch || exit 1
 cd $cfastbotdir
 
-if [ "$compiler" == "intel" ]; then
-  if [[ "$IFORT_COMPILER" != "" ]] ; then
-    source $IFORT_COMPILER/bin/compilervars.sh intel64
+notfound=
+if [ "$USEINSTALL" == "" ]; then
+  if [ "$compiler" == "intel" ]; then
+    if [[ "$IFORT_COMPILER" != "" ]] ; then
+      source $IFORT_COMPILER/bin/compilervars.sh intel64
+    fi
+    notfound=`icc -help 2>&1 | tail -1 | grep "not found" | wc -l`
+  else
+    notfound=`gcc -help 2>&1 | tail -1 | grep "not found" | wc -l`
   fi
-  notfound=`icc -help 2>&1 | tail -1 | grep "not found" | wc -l`
-else
-  notfound=`gcc -help 2>&1 | tail -1 | grep "not found" | wc -l`
-fi
-if [ "$notfound" == "1" ] ; then
-  export haveCC="0"
-  USEINSTALL="-i"
-  USEINSTALL2="-u"
-else
-  export haveCC="1"
-  USEINSTALL=
-  USEINSTALL2=
+  if [ "$notfound" == "1" ] ; then
+    export haveCC="0"
+    USEINSTALL="-i"
+    USEINSTALL2="-u"
+  else
+    export haveCC="1"
+    USEINSTALL=
+    USEINSTALL2=
+  fi
 fi
 
 if [ -e $cfastrepo ]; then
