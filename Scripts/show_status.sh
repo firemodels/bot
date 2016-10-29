@@ -44,6 +44,7 @@ SHOW_STATUS ()
      return
   fi
   cd $repodir
+  git update-index --refresh
   git status -uno
   git describe --dirty
 }
@@ -58,6 +59,7 @@ SHOW_STATUS2 ()
   fi
   echo "------------- $repo -------------------------------------------"
   cd $repodir
+  git update-index --refresh
   git status -uno
   git describe --dirty
 }
