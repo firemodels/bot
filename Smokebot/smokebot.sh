@@ -317,6 +317,7 @@ clean_repo2()
    then
       if [ "$CLEANREPO" == "1" ]; then
         CD_REPO $repo/$repodir $branch || return 1
+        git update-index --refresh
         IS_DIRTY=`git describe --long --dirty | grep dirty | wc -l`
         if [ "$IS_DIRTY" == "1" ]; then
           echo "The repo $repo/$repodir has uncommitted changes."
@@ -347,6 +348,7 @@ update_repo()
    CD_REPO $repo/$reponame $branch || return 1
    
    if [[ "$reponame" == "smv" ]]; then
+      git update-index --refresh
       GIT_REVISION=`git describe --long --dirty`
       GIT_SHORTHASH=`git rev-parse --short HEAD`
       GIT_LONGHASH=`git rev-parse HEAD`
@@ -354,6 +356,7 @@ update_repo()
    fi
 
    cd $repo/$reponame
+   git update-index --refresh
    IS_DIRTY=`git describe --long --dirty | grep dirty | wc -l`
    if [ "$IS_DIRTY" == "1" ]; then
      echo "The repo $repo/$reponame has uncommitted changes."

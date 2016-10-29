@@ -202,6 +202,7 @@ update_repo()
    fi
 
    if [[ "$reponame" == "fds" ]]; then
+      git update-index --refresh
       GIT_REVISION=`git describe --long --dirty`
       GIT_SHORTHASH=`git rev-parse --short HEAD`
       GIT_LONGHASH=`git rev-parse HEAD`
