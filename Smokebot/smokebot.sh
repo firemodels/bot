@@ -317,6 +317,7 @@ clean_repo2()
    then
       if [ "$CLEANREPO" == "1" ]; then
         CD_REPO $repo/$repodir $branch || return 1
+        git update-index --refresh
         IS_DIRTY=`git describe --long --dirty | grep dirty | wc -l`
         if [ "$IS_DIRTY" == "1" ]; then
           echo "The repo $repo/$repodir has uncommitted changes."
@@ -347,6 +348,7 @@ update_repo()
    CD_REPO $repo/$reponame $branch || return 1
    
    if [[ "$reponame" == "smv" ]]; then
+      git update-index --refresh
       GIT_REVISION=`git describe --long --dirty`
       GIT_SHORTHASH=`git rev-parse --short HEAD`
       GIT_LONGHASH=`git rev-parse HEAD`
@@ -354,6 +356,7 @@ update_repo()
    fi
 
    cd $repo/$reponame
+   git update-index --refresh
    IS_DIRTY=`git describe --long --dirty | grep dirty | wc -l`
    if [ "$IS_DIRTY" == "1" ]; then
      echo "The repo $repo/$reponame has uncommitted changes."
@@ -415,13 +418,13 @@ check_compile_fds_mpi_db()
    fi
 
    # Check for compiler warnings/remarks
-   if [[ `grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage1b| grep -v 'find atom' | grep -v 'feupdateenv is not implemented'` == "" ]]
+   if [[ `grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage1b| grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'` == "" ]]
    then
       # Continue along
       :
    else
       echo "Stage 1b warnings:" >> $WARNING_LOG
-      grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage1b | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'>> $WARNING_LOG
+      grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage1b | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'>> $WARNING_LOG
       echo "" >> $WARNING_LOG
    # if the executable does not exist then an email has already been sent
       if [ -e "fds_mpi_${COMPILER}_${platform}_${size}$IB$DB" ] ; then
@@ -561,13 +564,13 @@ check_compile_fds_mpi()
 
    # Check for compiler warnings/remarks
    # 'performing multi-file optimizations' and 'generating object file' are part of a normal compile
-   if [[ `grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage1c | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented'` == "" ]]
+   if [[ `grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage1c | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented'` == "" ]]
    then
       # Continue along
       :
    else
       echo "Stage 1c warnings:" >> $WARNING_LOG
-      grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage1c | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
+      grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage1c | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
 }
