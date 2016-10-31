@@ -15,6 +15,8 @@ echo "-h - display this message"
 echo "-i - infiniband (default)"
 echo "-l - library name [default: $MPIOUT]"
 echo "-m - mpi distribution [default: $MPIIN]"
+echo "-r - build library"
+echo "-y - answer yes to all questions"
 exit
 }
 
@@ -40,7 +42,10 @@ MPILIB=
 
 MPIROOT=/shared
 
-while getopts 'c:d:ehil:m:' OPTION
+BUILDMPI=
+PAUSE=1
+
+while getopts 'c:d:ehil:m:ry' OPTION
 do
 case $OPTION  in
   c)
@@ -65,6 +70,12 @@ case $OPTION  in
   m)
    MPIIN="$OPTARG"
    ;;
+  r)
+   BUILDMPI=1
+   ;;
+  y)
+   PAUSE=
+   ;;
 esac
 done
 shift $(($OPTIND-1))
@@ -83,22 +94,24 @@ SUMMARY=/tmp/SUMMARY.$$
 SUMMARY2=$OPENMPI/$MPIOUT/SUMMARY
 
 echo
-cat << EOF | tee $SUMMARY
+cat << EOF > $SUMMARY
 Summary
         compiler: /opt/$compiler
 mpi distribution: $TAR
     mpi location: $MPIROOT/$MPIOUT
 EOF
 if [ "$IB" != "" ]; then
-echo "      infiniband: yes" | tee $SUMMARY
+echo "      infiniband: yes" >> $SUMMARY
 else
-echo "      infiniband: no" | tee $SUMMARY
+echo "      infiniband: no" >> $SUMMARY
 fi
 
-echo
-echo "Press any key to continue or <CTRL> c to abort."
-echo "Type $0 -h for other options"
-read val
+if [ "$PAUSE" == "" ]; then
+  echo
+  echo "Press any key to continue or <CTRL> c to abort."
+  echo "Type $0 -h for other options"
+  read val
+fi
 
 
 HAVE_IB=`echo $MPIOUT | grep 64ib | wc -l`
@@ -139,9 +152,9 @@ EOF
 fi
 
 cat << EOF >> $CONFIGURE
-  --enable-static --disable-shared | tee CONFIGURE.out
+  --enable-static --disable-shared | tee CONFIG_STATUS.out
 
-make | tee MAKE.out
+make | tee MAKE_STATUS.out
 EOF
 
 chmod +x $CONFIGURE
@@ -155,5 +168,11 @@ make install
 EOF
 chmod +x $MAKEINSTALL
 
-cd $MPIOUT
-./CONFIGURE_MAKE.sh
+if [ "$BUILDMPI" == "1" ]; then
+  cd $MPIOUT
+  ./CONFIGURE_MAKE.sh
+else
+  echo ""
+  echo "openmpi build and install scripts generated in "
+  echo $OPENMPI/$MPIOUT
+fi
