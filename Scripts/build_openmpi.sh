@@ -22,7 +22,7 @@ HAVE_IB=`echo $MPIOUT | grep 64ib | wc -l`
 
 MAKEINSTALL=$MPIOUT/MAKEINSTALL.sh
 SUMMARY=$MPIOUT/SUMMARY
-CONFIGURE=$MPIOUT/CONFIGURE.sh
+CONFIGURE=$MPIOUT/CONFIGURE_MAKE.sh
 
 cd $OPENMPI
 rm -rf $MPIOUT
@@ -40,7 +40,7 @@ mv $MPIIN_DIR $MPIOUT
 cat << EOF > $CONFIGURE
 #!/bin/bash
 
-source /opt/$compiler/compilervars.sh intel64
+source /opt/$compiler/bin/compilervars.sh intel64
 
 ./configure --prefix /shared/$MPIOUT \\
   CC=icc CXX=icpc F77=ifort FC=ifort CFLAGS="-m64 -O2" CXXFLAGS="-m64 -O2" \\
@@ -58,7 +58,7 @@ fi
 cat << EOF >> $CONFIGURE
   --enable-static --disable-shared | tee CONFIGURE.out
 
-make
+make | tell MAKE.out
 EOF
 
 chmod +x $CONFIGURE
@@ -77,3 +77,5 @@ cat << EOF > $SUMMARY
       MPIIN: $MPIIN
 mpi library: /shared/$MPIOUT
 EOF
+cd $MPIOUT
+./CONFIGURE_MAKE.sh
