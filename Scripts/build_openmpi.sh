@@ -8,6 +8,7 @@ function usage {
 echo "Create an openmpi library"
 echo ""
 echo "Options:"
+echo "-b - batch mode, run script without pausing"
 echo "-c - compiler [default: $compiler]"
 echo "-d - directory containing mpi [default: $MPIROOT]"
 echo "-e - ethernet"
@@ -16,7 +17,6 @@ echo "-i - infiniband (default)"
 echo "-l - library name [default: $MPIOUT]"
 echo "-m - mpi distribution [default: $MPIIN]"
 echo "-r - build library"
-echo "-y - answer yes to all questions"
 exit
 }
 
@@ -43,11 +43,14 @@ MPILIB=
 MPIROOT=/shared
 
 BUILDMPI=
-PAUSE=1
+BATCH=
 
-while getopts 'c:d:ehil:m:ry' OPTION
+while getopts 'bc:d:ehil:m:r' OPTION
 do
 case $OPTION  in
+  b)
+   BATCH=1
+   ;;
   c)
    compiler="$OPTARG"
    ;;
@@ -73,12 +76,13 @@ case $OPTION  in
   r)
    BUILDMPI=1
    ;;
-  y)
-   PAUSE=
-   ;;
 esac
 done
 shift $(($OPTIND-1))
+
+if [ "$BUILDMPI" == "" ]; then
+  BATCH=1
+fi
 
 TAR=openmpi-$MPIIN.tar.gz
 MPIINNODOT=`echo "${MPIIN//./}"`
@@ -106,7 +110,7 @@ else
 echo "      infiniband: no" >> $SUMMARY
 fi
 
-if [ "$PAUSE" == "" ]; then
+if [ "$BATCH" == "" ]; then
   echo
   echo "Press any key to continue or <CTRL> c to abort."
   echo "Type $0 -h for other options"
@@ -172,7 +176,6 @@ if [ "$BUILDMPI" == "1" ]; then
   cd $MPIOUT
   ./CONFIGURE_MAKE.sh
 else
-  echo ""
   echo "openmpi build and install scripts generated in "
   echo $OPENMPI/$MPIOUT
 fi
