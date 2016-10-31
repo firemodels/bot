@@ -79,16 +79,22 @@ if [ "$MPILIB" != "" ]; then
   MPIOUT=$MPILIB
 fi
 
-echo --------------------------------
-echo "Summary"
-echo "        compiler: /opt/$compiler"
-echo "mpi distribution: $TAR"
-echo "    mpi location: $MPIROOT/$MPIOUT"
+SUMMARY=/tmp/SUMMARY.$$
+SUMMARY2=$OPENMPI/$MPIOUT/SUMMARY
+
+echo
+cat << EOF | tee $SUMMARY
+Summary
+        compiler: /opt/$compiler
+mpi distribution: $TAR
+    mpi location: $MPIROOT/$MPIOUT
+EOF
 if [ "$IB" != "" ]; then
-echo "      infiniband: yes"
+echo "      infiniband: yes" | tee $SUMMARY
 else
-echo "      infiniband: no"
+echo "      infiniband: no" | tee $SUMMARY
 fi
+
 echo
 echo "Press any key to continue or <CTRL> c to abort."
 echo "Type $0 -h for other options"
@@ -98,7 +104,6 @@ read val
 HAVE_IB=`echo $MPIOUT | grep 64ib | wc -l`
 
 MAKEINSTALL=$MPIOUT/MAKEINSTALL.sh
-SUMMARY=$MPIOUT/SUMMARY
 CONFIGURE=$MPIOUT/CONFIGURE_MAKE.sh
 
 cd $OPENMPI
@@ -113,6 +118,7 @@ fi
 
 tar xvf $TAR > /dev/null
 mv $MPIIN_DIR $MPIOUT
+mv $SUMMARY $SUMMARY2
 
 cat << EOF > $CONFIGURE
 #!/bin/bash
@@ -149,10 +155,5 @@ make install
 EOF
 chmod +x $MAKEINSTALL
 
-cat << EOF > $SUMMARY
-   compiler: /opt/$compiler
-      MPIIN: $MPIIN
-mpi library: /$MPIROOT/$MPIOUT
-EOF
 cd $MPIOUT
 ./CONFIGURE_MAKE.sh
