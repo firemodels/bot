@@ -1,4 +1,23 @@
 #!/bin/bash
+
+#---------------------------------------------
+#                   usage
+#---------------------------------------------
+
+function usage {
+echo "Create an openmpi library"
+echo ""
+echo "Options:"
+echo "-c - compiler [default: $compiler]"
+echo "-d - directory containing mpi [default: $MPIROOT]"
+echo "-e - ethernet"
+echo "-h - display this message"
+echo "-i - infiniband (default)"
+echo "-l - library name [default: $MPIOUT]"
+echo "-m - mpi distribution [default: $MPIIN]"
+exit
+}
+
 CURDIR=`pwd`
 OPENMPI=~/OPENMPI
 if [ ! -e $OPENMPI ]; then
@@ -11,12 +30,70 @@ compiler=intel16
 
 MPIIN=1.8.4
 #MPIIN=2.0.1
+MPIINNODOT=`echo "${MPIIN//./}"`
+
+IB=
+IB=ib
+
+MPIOUT=openmpi${MPIINNODOT}_64$IB
+MPILIB=
+
+MPIROOT=/shared
+
+while getopts 'c:d:ehil:m:' OPTION
+do
+case $OPTION  in
+  c)
+   compiler="$OPTARG"
+   ;;
+  d)
+   MPIROOT="$OPTARG"
+   ;;
+  e)
+   IB=
+   ;;
+  h)
+   usage
+   exit
+   ;;
+  i)
+   IB=ib
+   ;;
+  l)
+   MPILIB="$OPTARG"
+   ;;
+  m)
+   MPIIN="$OPTARG"
+   ;;
+esac
+done
+shift $(($OPTIND-1))
+
 TAR=openmpi-$MPIIN.tar.gz
+MPIINNODOT=`echo "${MPIIN//./}"`
 MPIIN_DIR=openmpi-$MPIIN
 
-#MPIOUT=openmpi_64
-MPIOUT=openmpi_i16_64ib
-#MPIOUT=openmpi201_64ib
+MPIOUT=openmpi${MPIINNODOT}_64$IB
+#MPIOUT=openmpi_64$IB
+if [ "$MPILIB" != "" ]; then
+  MPIOUT=$MPILIB
+fi
+
+echo --------------------------------
+echo "Summary"
+echo "        compiler: /opt/$compiler"
+echo "mpi distribution: $TAR"
+echo "    mpi location: $MPIROOT/$MPIOUT"
+if [ "$IB" != "" ]; then
+echo "      infiniband: yes"
+else
+echo "      infiniband: no"
+fi
+echo
+echo "Press any key to continue or <CTRL> c to abort."
+echo "Type $0 -h for other options"
+read val
+
 
 HAVE_IB=`echo $MPIOUT | grep 64ib | wc -l`
 
@@ -27,14 +104,14 @@ CONFIGURE=$MPIOUT/CONFIGURE_MAKE.sh
 cd $OPENMPI
 rm -rf $MPIOUT
 
-if [ -e $TAR ]; then
-  tar xvf $TAR > /dev/null
-else
+if [ ! -e $TAR ]; then
   echo $TAR does not exist.
   echo script aborted
   cd $CURDIR
   exit
 fi
+
+tar xvf $TAR > /dev/null
 mv $MPIIN_DIR $MPIOUT
 
 cat << EOF > $CONFIGURE
@@ -42,7 +119,7 @@ cat << EOF > $CONFIGURE
 
 source /opt/$compiler/bin/compilervars.sh intel64
 
-./configure --prefix /shared/$MPIOUT \\
+./configure --prefix /$MPIROOT/$MPIOUT \\
   CC=icc CXX=icpc F77=ifort FC=ifort CFLAGS="-m64 -O2" CXXFLAGS="-m64 -O2" \\
   FFLAGS="-m64 -O2" FCFLAGS="-m64 -O2" LDFLAGS=-m64 \\
   --with-tm=/usr/local/torque \\
@@ -58,7 +135,7 @@ fi
 cat << EOF >> $CONFIGURE
   --enable-static --disable-shared | tee CONFIGURE.out
 
-make | tell MAKE.out
+make | tee MAKE.out
 EOF
 
 chmod +x $CONFIGURE
@@ -75,7 +152,7 @@ chmod +x $MAKEINSTALL
 cat << EOF > $SUMMARY
    compiler: /opt/$compiler
       MPIIN: $MPIIN
-mpi library: /shared/$MPIOUT
+mpi library: /$MPIROOT/$MPIOUT
 EOF
 cd $MPIOUT
 ./CONFIGURE_MAKE.sh
