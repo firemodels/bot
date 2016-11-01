@@ -190,6 +190,8 @@ chmod +x $MAKEINSTALL
 if [ "$BUILDMPI" == "1" ]; then
   cd $MPIOUT
   ./CONFIGURE_MAKE.sh
+  DATE=`date`
+  echo Finished: $DATE >> $SUMMARY2
 else
   echo "openmpi build and install scripts generated in "
   echo $OPENMPI/$MPIOUT
