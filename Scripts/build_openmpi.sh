@@ -84,7 +84,7 @@ if [ "$compiler" == "intel" ]; then
   compiler2=
 fi
 if [ "$compiler" == "intel15" ]; then
-  compiler=
+  compiler=intel
   compiler2=
 fi
 if [ "$compiler" == "intel16" ]; then
@@ -166,7 +166,7 @@ EOF
 
 if [ "$HAVE_IB" != "0" ]; then
 cat << EOF >> $CONFIGURE
-  --with-verbs=/user --with-verbs-libdir=/usr/lib64 \\
+  --with-verbs=/usr --with-verbs-libdir=/usr/lib64 \\
 EOF
 fi
 
