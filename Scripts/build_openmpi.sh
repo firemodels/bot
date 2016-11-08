@@ -26,15 +26,12 @@ if [ ! -e $OPENMPI ]; then
   mkdir $OPENMPI
 fi
 
-#compiler=intel
 compiler=intel16
-#compiler=intel17
+compiler2=_i16
 
 MPIIN=1.8.4
-#MPIIN=2.0.1
 MPIINNODOT=`echo "${MPIIN//./}"`
 
-IB=
 IB=ib
 
 MPIOUT=openmpi${MPIINNODOT}_64$IB
@@ -83,12 +80,25 @@ shift $(($OPTIND-1))
 if [ "$BUILDMPI" == "" ]; then
   BATCH=1
 fi
+if [ "$compiler" == "intel" ]; then
+  compiler2=
+fi
+if [ "$compiler" == "intel15" ]; then
+  compiler=intel
+  compiler2=
+fi
+if [ "$compiler" == "intel16" ]; then
+  compiler2=_i16
+fi
+if [ "$compiler" == "intel17" ]; then
+  compiler2=_i17
+fi
 
-TAR=openmpi-$MPIIN.tar.gz
-MPIINNODOT=`echo "${MPIIN//./}"`
 MPIIN_DIR=openmpi-$MPIIN
+TAR=$MPIIN_DIR.tar.gz
+MPIINNODOT=`echo "${MPIIN//./}"`
 
-MPIOUT=openmpi${MPIINNODOT}_64$IB
+MPIOUT=openmpi${MPIINNODOT}${compiler2}_64$IB
 #MPIOUT=openmpi_64$IB
 if [ "$MPILIB" != "" ]; then
   MPIOUT=$MPILIB
@@ -133,16 +143,21 @@ if [ ! -e $TAR ]; then
   exit
 fi
 
-tar xvf $TAR > /dev/null
-mv $MPIIN_DIR $MPIOUT
+TEMPDIR=TEMP.$$
+mkdir $TEMPDIR
+cd $TEMPDIR
+tar xvf ../$TAR > /dev/null
+mv $MPIIN_DIR ../$MPIOUT
 mv $SUMMARY $SUMMARY2
+cd ..
+rm -rf $TEMPDIR
 
 cat << EOF > $CONFIGURE
 #!/bin/bash
 
 source /opt/$compiler/bin/compilervars.sh intel64
 
-./configure --prefix /$MPIROOT/$MPIOUT \\
+./configure --prefix $MPIROOT/$MPIOUT \\
   CC=icc CXX=icpc F77=ifort FC=ifort CFLAGS="-m64 -O2" CXXFLAGS="-m64 -O2" \\
   FFLAGS="-m64 -O2" FCFLAGS="-m64 -O2" LDFLAGS=-m64 \\
   --with-tm=/usr/local/torque \\
@@ -151,7 +166,7 @@ EOF
 
 if [ "$HAVE_IB" != "0" ]; then
 cat << EOF >> $CONFIGURE
-  --with-verbs=/user --with-verbs-libdir=/usr/lib64 \\
+  --with-verbs=/usr --with-verbs-libdir=/usr/lib64 \\
 EOF
 fi
 
@@ -175,6 +190,8 @@ chmod +x $MAKEINSTALL
 if [ "$BUILDMPI" == "1" ]; then
   cd $MPIOUT
   ./CONFIGURE_MAKE.sh
+  DATE=`date`
+  echo Finished: $DATE >> $SUMMARY2
 else
   echo "openmpi build and install scripts generated in "
   echo $OPENMPI/$MPIOUT
