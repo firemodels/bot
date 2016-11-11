@@ -69,7 +69,7 @@ goto eof
      echo    dir: %repo%\%reponame%
      git fetch firemodels
      git merge firemodels/%BRANCH%
-     if "%PUSH%" == "1" (
+     if "%PUSH%" == "0" goto skip2
         git status -uno | %grep% ahead | %wc% -l > %CURDIR%\ahead.out
         set /p ahead=<%CURDIR%\ahead.out
         if %ahead% GTR 0 (
@@ -78,6 +78,7 @@ goto eof
         )
      )
   :skip1
+  :skip2
   exit /b
 
 :update_repo2
