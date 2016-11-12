@@ -1,4 +1,4 @@
-#!/bin/bash
+
 
 # The Smokebot script is part of an automated continuous integration system.
 # Consult the FDS Config Management Plan for more information.
@@ -1280,7 +1280,6 @@ SMOKEBOT_LITE=
 WEBBRANCH=nist-pages
 FDSBRANCH=master
 SMVBRANCH=master
-BRANCH=master
 
 # define repo names (default)
 
@@ -1314,8 +1313,7 @@ case $OPTION in
    RUNAUTO="Y"
    ;;
   b)
-#   BRANCH="$OPTARG"
-    echo "***Warning: -b option for specifying a branch is not supported at this time"
+   SMVBRANCH="$OPTARG"
    ;;
   c)
    CLEANREPO=1
@@ -1394,10 +1392,10 @@ cfastrepo=$repo/cfast
 CD_REPO $cfastrepo $cfastbranch || exit 1
 
 fdsrepo=$repo/fds
-CD_REPO $fdsrepo $fdsbranch || exit 1
+CD_REPO $fdsrepo $FDSBRANCH || exit 1
 
 smvrepo=$repo/smv
-CD_REPO $smvrepo $smvbranch ||  exit 1
+CD_REPO $smvrepo $SMVBRANCH ||  exit 1
 cd $smokebotrundir
 
 # save pid if -k option (kill smokebot) is used lateer
