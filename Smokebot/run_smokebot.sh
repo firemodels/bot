@@ -13,7 +13,7 @@ echo ""
 echo "Options:"
 echo "-3 - run in 32 bit mode (only for gnu compilers)"
 echo "-a - run automatically if FDS or smokeview source has changed"
-#echo "-b - branch_name - run smokebot using the branch branch_name [default: $BRANCH]"
+echo "-b - branch_name - run smokebot using the branch branch_name [default: $BRANCH]"
 echo "-c - clean repo"
 echo "-f - force smokebot run"
 echo "-h - display this message"
@@ -167,8 +167,7 @@ case $OPTION  in
    RUNAUTO=-A
    ;;
   b)
-#   BRANCH="$OPTARG"
-    echo "***Warning: -b option for specifying a branch is not supported at this time"
+   BRANCH="$OPTARG"
    ;;
   c)
    CLEANREPO=-c
@@ -274,7 +273,7 @@ fi
 
 if [[ "$RUNSMOKEBOT" == "1" ]]; then
   if [[ "$UPDATEREPO" == "-u" ]]; then
-     CD_REPO $repo/bot/Smokebot master || exit 1
+     CD_REPO $repo/bot/Smokebot $BRANCH || exit 1
      
      git fetch origin &> /dev/null
      git merge origin/master &> /dev/null
@@ -284,7 +283,7 @@ fi
 BRANCH="-b $BRANCH"
 
 touch $smokebot_pid
-$ECHO ./$botscript $NOPT $SIZE $TESTFLAG $RUNAUTO $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $NOPT $SIZE $BRANCH $TESTFLAG $RUNAUTO $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi
