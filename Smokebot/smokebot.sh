@@ -1470,8 +1470,8 @@ fi
 export platform
 
 echo ""
-echo "Settings"
-echo "--------"
+echo "Smokebot Settings"
+echo "-----------------"
 echo "    FDS repo: $fdsrepo"
 echo "    SMV repo: $smvrepo"
 echo "  CFAST repo: $cfastrepo"
@@ -1551,8 +1551,8 @@ start_time=`date`
 clean_smokebot_history
 
 ### Stage 0 repo operatoins ###
-echo "Status"
-echo "------"
+echo "Run Status"
+echo "----------"
 if [ "$CLEANREPO" == "1" ]; then
   echo Cleaning
   echo "   cfast"
