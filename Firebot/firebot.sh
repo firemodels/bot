@@ -538,11 +538,18 @@ run_verification_cases_release()
    echo "   release"
    cd $fdsrepo/Verification/scripts
    # Run FDS with 1 OpenMP thread
-   echo 'Running FDS verification cases:' >> $OUTPUT_DIR/stage5
-   ./Run_FDS_Cases.sh -o 1 -q $QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage5 2>&1
+   echo 'Running FDS benchmark verification cases:' >> $OUTPUT_DIR/stage5
+   ./Run_FDS_Cases.sh -b -o 1 -q $QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage5 2>&1
    echo "" >> $OUTPUT_DIR/stage5 2>&1
 
-   # Wait for all verification cases to end
+   # Wait for benchmark verification cases to end
+   wait_cases_release_end 'verification'
+
+   echo 'Running FDS non-benchmark verification cases:' >> $OUTPUT_DIR/stage5
+   ./Run_FDS_Cases.sh -R -o 1 -q $QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage5 2>&1
+   echo "" >> $OUTPUT_DIR/stage5 2>&1
+
+   # Wait for non-benchmark verification cases to end
    wait_cases_release_end 'verification'
 }
 
