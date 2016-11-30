@@ -1703,3 +1703,9 @@ if [ "$SMOKEBOT_LITE" == "" ]; then
 fi
 echo "   emailing results"
 email_build_status
+FILEDATE=`date +%H%M%S`
+HOST=`hostname -a`
+outfile=stage4b_orig_$HOST_$FILEDATE
+if [ -e $OUTPUT_DIR/stage4b_orig ]; then
+  cp $OUTPUT_DIR/stage4b_orig /tmp/$outfile
+fi
