@@ -771,6 +771,11 @@ check_verification_cases_release()
       grep 'Warning' -rI $OUTPUT_DIR/stage3b >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
+   thouse5log=$smvrepo/Verification/Visualization/thouse5.log
+   FILEDATE=`date +%H%M`
+   if [ -e $thouse5log ]; then
+     cp $thouse5log /tmp/$thouse5log$FILEDATE
+   fi
 }
 
 #---------------------------------------------
@@ -1703,9 +1708,3 @@ if [ "$SMOKEBOT_LITE" == "" ]; then
 fi
 echo "   emailing results"
 email_build_status
-FILEDATE=`date +%H%M%S`
-HOST=`hostname -a`
-outfile=stage4b_orig_$HOST_$FILEDATE
-if [ -e $OUTPUT_DIR/stage4b_orig ]; then
-  cp $OUTPUT_DIR/stage4b_orig /tmp/$outfile
-fi
