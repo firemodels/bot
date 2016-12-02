@@ -773,7 +773,7 @@ check_verification_cases_release()
    fi
    thouse5log=$smvrepo/Verification/Visualization/thouse5.log
    FILEDATE=`date +%H%M`
-   if [ -e $thouse5log ]; then
+   if [ -e "$thouse5log" ]; then
      cp $thouse5log /tmp/$thouse5log$FILEDATE
    fi
 }
