@@ -771,7 +771,7 @@ check_verification_cases_release()
       grep 'Warning' -rI $OUTPUT_DIR/stage3b >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
-   thouse5log=$smvrepo/Verification/Visualization/thouse5.log
+   thouse5log=Visualization/thouse5.log
    FILEDATE=`date +%H%M`
    if [ -e "$thouse5log" ]; then
      cp $thouse5log /tmp/$thouse5log$FILEDATE
