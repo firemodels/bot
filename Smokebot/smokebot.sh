@@ -1210,6 +1210,7 @@ email_build_status()
       echo "FDS revisions: $THIS_SMV_REVISION" >> $TIME_LOG
       echo "SMV revisions: $THIS_FDS_REVISION" >> $TIME_LOG
    fi
+   echo "          vis dir: $smvrepo/Verification/Visualization" >> $TIME_LOG
    thouse5host=`grep Host ../../smv/Verification/Visualization/thouse5.log`
    echo "     thouse5 host: $thouse5host" >> $TIME_LOG
    if [ "$RUNAUTO" == "" ]; then
