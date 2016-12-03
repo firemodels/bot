@@ -771,11 +771,6 @@ check_verification_cases_release()
       grep 'Warning' -rI $OUTPUT_DIR/stage3b >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
-   thouse5log=Visualization/thouse5.log
-   FILEDATE=`date +%H%M`
-   if [ -e "$thouse5log" ]; then
-     cp $thouse5log /tmp/$thouse5log$FILEDATE
-   fi
 }
 
 #---------------------------------------------
@@ -1215,6 +1210,8 @@ email_build_status()
       echo "FDS revisions: $THIS_SMV_REVISION" >> $TIME_LOG
       echo "SMV revisions: $THIS_FDS_REVISION" >> $TIME_LOG
    fi
+   thouse5host=`grep Host ../../smv/Verification/Visualization/thouse5.log`
+   echo "     thouse5 host: $thouse5host" >> $TIME_LOG
    if [ "$RUNAUTO" == "" ]; then
       echo "SMV revisions: $THIS_SMV_REVISION" >> $TIME_LOG
    fi
