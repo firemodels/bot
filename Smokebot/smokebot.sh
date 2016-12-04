@@ -354,6 +354,14 @@ update_repo()
       GIT_LONGHASH=`git rev-parse HEAD`
       GIT_DATE=`git log -1 --format=%cd --date=local $GIT_SHORTHASH`
    fi
+   if [[ "$reponame" == "fds" ]]; then
+      git update-index --refresh
+      FDS_REVISION=`git describe --long --dirty`
+   fi
+   if [[ "$reponame" == "cfast" ]]; then
+      git update-index --refresh
+      CFAST_REVISION=`git describe --long --dirty`
+   fi
 
    cd $repo/$reponame
    git update-index --refresh
@@ -1190,6 +1198,9 @@ email_build_status()
    echo "             host: $hostname " >> $TIME_LOG
    echo "               OS: $platform2" >> $TIME_LOG
    echo "             repo: $repo" >> $TIME_LOG
+   echo "     smv revision: $GIT_REVISION" >> $TIME_LOG
+   echo "     fds revision: $FDS_REVISION" >> $TIME_LOG
+   echo "   cfast revision: $CFAST_REVISION" >> $TIME_LOG
    echo "       start time: $start_time " >> $TIME_LOG
    echo "        stop time: $stop_time " >> $TIME_LOG
    echo "            setup: $DIFF_PRELIM" >> $TIME_LOG
