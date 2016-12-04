@@ -1270,7 +1270,7 @@ size2=
 #  = Input variables =
 #  ===================
 
-mailTo="gforney@gmail.com, rpeacoc@nist.gov"
+mailTo="gforney@gmail.com, rpeacoc@gmail.gov"
 
 cfastbotdir="`pwd`"
 

@@ -1,17 +1,17 @@
 #!/bin/bash
 
 # Mailing list for Smokebot status report
-mailToSMV="gforney@gmail.com, glenn.forney@nist.gov"
+mailToSMV="gforney@gmail.com"
 
 # Mailing list for Smokebot status report
-mailToCFAST="gforney@gmail.com, glenn.forney@nist.gov"
+mailToCFAST="gforney@gmail.com"
 
 # General mailing list for Firebot status report
-        mailToFDS="mcgratta@gmail.com, kevin.mcgrattan@nist.gov, randy.mcdermott@gmail.com, randall.mcdermott@nist.gov, drjfloyd@gmail.com, gforney@gmail.com, glenn.forney@nist.gov, CraigWeinschenk@gmail.com, marcos.vanella@nist.gov"
+        mailToFDS="mcgratta@gmail.com, kevin.mcgrattan@nist.gov, randy.mcdermott@gmail.com, randall.mcdermott@nist.gov, drjfloyd@gmail.com, gforney@gmail.com, CraigWeinschenk@gmail.com, marcos.vanella@nist.gov"
 
 # Verbose mailing list for Validationbot, Macbot, etc.
-mailToFDS_verbose="mcgratta@gmail.com, kevin.mcgrattan@nist.gov, randy.mcdermott@gmail.com, randall.mcdermott@nist.gov, drjfloyd@gmail.com, gforney@gmail.com, glenn.forney@nist.gov, CraigWeinschenk@gmail.com, marcos.vanella@nist.gov"
+mailToFDS_verbose="mcgratta@gmail.com, kevin.mcgrattan@nist.gov, randy.mcdermott@gmail.com, randall.mcdermott@nist.gov, drjfloyd@gmail.com, gforney@gmail.com, CraigWeinschenk@gmail.com, marcos.vanella@nist.gov"
 
 # mailing list when debugging firebot
-mailToFDS_debug="gforney@gmail.com, glenn.forney@nist.gov, randy.mcdermott@gmail.com, randall.mcdermott@nist.gov"
+mailToFDS_debug="gforney@gmail.com, randy.mcdermott@gmail.com, randall.mcdermott@nist.gov"
 
