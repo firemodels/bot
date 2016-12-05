@@ -233,8 +233,13 @@ fi
 COMPILER="-I $COMPILER"
 
 if [ "$KILL_SMOKEBOT" == "1" ]; then
+  pidrunning=0
   if [ -e $smokebot_pid ]; then
     PID=`head -1 $smokebot_pid`
+    pidrunning=`ps -el |  awk '{print $4}'  | grep $PID | wc -l`
+    rm -f $smokebot_pid
+  fi
+  if [ $pidrunning -gt 0 ]; then
     echo killing processes invoked by smokebot
     kill -9 $(LIST_DESCENDANTS $PID)
     echo "killing smokebot (PID=$PID)"
@@ -248,7 +253,7 @@ if [ "$KILL_SMOKEBOT" == "1" ]; then
     fi
     echo smokebot process $PID killed
   else
-    echo smokebotbot is not running, cannot be killed.
+    echo smokebot not running
   fi
   exit
 fi
