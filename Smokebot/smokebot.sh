@@ -1686,18 +1686,18 @@ MAKEGUIDES_beg=`GET_TIME`
 if [ "$SMOKEBOT_LITE" == "" ]; then
   if [[ $stage1c_fdsrel_success && $stage4b_smvpics_success ]] ; then
      echo Making guides
-    if [ "$YOPT" == "" ]; then
-     echo "   geometry notes"
-    make_guide geom_notes $repo/Manuals/FDS_User_Guide geometry_notes
-    fi
+     if [ "$YOPT" == "" ]; then
+       echo "   geometry notes"
+       make_guide geom_notes $fdsrepo/Manuals/FDS_User_Guide geometry_notes
+     fi
      echo "   user"
-    make_guide SMV_User_Guide $smvrepo/Manuals/SMV_User_Guide SMV_User_Guide
+     make_guide SMV_User_Guide $smvrepo/Manuals/SMV_User_Guide SMV_User_Guide
      echo "   technical"
-    make_guide SMV_Technical_Reference_Guide $smvrepo/Manuals/SMV_Technical_Reference_Guide SMV_Technical_Reference_Guide
+     make_guide SMV_Technical_Reference_Guide $smvrepo/Manuals/SMV_Technical_Reference_Guide SMV_Technical_Reference_Guide
      echo "   verification"
-    make_guide SMV_Verification_Guide $smvrepo/Manuals/SMV_Verification_Guide SMV_Verification_Guide
+     make_guide SMV_Verification_Guide $smvrepo/Manuals/SMV_Verification_Guide SMV_Verification_Guide
   else
-    echo Errors found, not building guides
+     echo Errors found, not building guides
   fi
 fi
 MAKEGUIDES_end=`GET_TIME`
