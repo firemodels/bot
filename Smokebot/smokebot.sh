@@ -1278,7 +1278,7 @@ email_build_status()
 
 size=64
 # define run directories
-YOPT=
+YOPT=-Y
 smokebotdir=`pwd`
 OUTPUT_DIR="$smokebotdir/output"
 HISTORY_DIR="$HOME/.smokebot/history"
