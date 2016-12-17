@@ -495,7 +495,7 @@ run_verification_cases_debug()
 
    # Submit SMV verification cases and wait for them to start
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3a 2>&1
-   ./Run_SMV_Cases.sh $NOPT -Y -p $size -c $cfastrepo -I $COMPILER $USEINSTALL2 -m 2 -d -q $SMOKEBOT_QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage3a 2>&1
+   ./Run_SMV_Cases.sh $NOPT $YOPT -p $size -c $cfastrepo -I $COMPILER $USEINSTALL2 -m 2 -d -q $SMOKEBOT_QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage3a 2>&1
 }
 
 #---------------------------------------------
@@ -735,7 +735,7 @@ run_verification_cases_release()
    # Start running all SMV verification cases
    cd $smvrepo/Verification/scripts
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3b 2>&1
-   ./Run_SMV_Cases.sh $NOPT -Y -p $size -c $cfastrepo -I $COMPILER $USEINSTALL2 $RUN_OPENMP -q $SMOKEBOT_QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage3b 2>&1
+   ./Run_SMV_Cases.sh $NOPT $YOPT -p $size -c $cfastrepo -I $COMPILER $USEINSTALL2 $RUN_OPENMP -q $SMOKEBOT_QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage3b 2>&1
 }
 
 #---------------------------------------------
@@ -838,7 +838,7 @@ make_smv_pictures_db()
    # Run Make SMV Pictures script (debug mode)
    echo "making smokeview images"
    cd $smvrepo/Verification/scripts
-   ./Make_SMV_Pictures.sh -Y -s $size -I $COMPILER $USEINSTALL -d 2>&1 &> $OUTPUT_DIR/stage4a_orig
+   ./Make_SMV_Pictures.sh $YOPT -s $size -I $COMPILER $USEINSTALL -d 2>&1 &> $OUTPUT_DIR/stage4a_orig
    grep -v FreeFontPath $OUTPUT_DIR/stage4a_orig > $OUTPUT_DIR/stage4a
 }
 
@@ -932,7 +932,7 @@ make_smv_pictures()
    # Run Make SMV Pictures script (release mode)
    echo Generating images 
    cd $smvrepo/Verification/scripts
-   ./Make_SMV_Pictures.sh -Y -s $size -I $COMPILER $TESTFLAG $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4b_orig
+   ./Make_SMV_Pictures.sh $YOPT -s $size -I $COMPILER $TESTFLAG $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4b_orig
    grep -v FreeFontPath $OUTPUT_DIR/stage4b_orig &> $OUTPUT_DIR/stage4b
 }
 
@@ -1222,8 +1222,10 @@ email_build_status()
       echo "SMV revisions: $THIS_FDS_REVISION" >> $TIME_LOG
    fi
    echo "          vis dir: $smvrepo/Verification/Visualization" >> $TIME_LOG
-   thouse5host=`grep Host ../../smv/Verification/Visualization/thouse5.log`
-   echo "     thouse5 host: $thouse5host" >> $TIME_LOG
+   if [ -e $smvrepo/Verification/Visualization/thouse5.log ]; then
+     thouse5host=`grep Host $smvrepo/Verification/Visualization/thouse5.log`
+     echo "     thouse5 host: $thouse5host" >> $TIME_LOG
+   fi
    if [ "$RUNAUTO" == "" ]; then
       echo "SMV revisions: $THIS_SMV_REVISION" >> $TIME_LOG
    fi
@@ -1278,6 +1280,7 @@ email_build_status()
 
 size=64
 # define run directories
+YOPT=-Y
 smokebotdir=`pwd`
 OUTPUT_DIR="$smokebotdir/output"
 HISTORY_DIR="$HOME/.smokebot/history"
@@ -1685,16 +1688,18 @@ MAKEGUIDES_beg=`GET_TIME`
 if [ "$SMOKEBOT_LITE" == "" ]; then
   if [[ $stage1c_fdsrel_success && $stage4b_smvpics_success ]] ; then
      echo Making guides
-#   echo "   geometry notes"
-#  make_guide geom_notes $repo/Manuals/FDS_User_Guide geometry_notes
+     if [ "$YOPT" == "" ]; then
+       echo "   geometry notes"
+       make_guide geom_notes $fdsrepo/Manuals/FDS_User_Guide geometry_notes
+     fi
      echo "   user"
-    make_guide SMV_User_Guide $smvrepo/Manuals/SMV_User_Guide SMV_User_Guide
+     make_guide SMV_User_Guide $smvrepo/Manuals/SMV_User_Guide SMV_User_Guide
      echo "   technical"
-    make_guide SMV_Technical_Reference_Guide $smvrepo/Manuals/SMV_Technical_Reference_Guide SMV_Technical_Reference_Guide
+     make_guide SMV_Technical_Reference_Guide $smvrepo/Manuals/SMV_Technical_Reference_Guide SMV_Technical_Reference_Guide
      echo "   verification"
-    make_guide SMV_Verification_Guide $smvrepo/Manuals/SMV_Verification_Guide SMV_Verification_Guide
+     make_guide SMV_Verification_Guide $smvrepo/Manuals/SMV_Verification_Guide SMV_Verification_Guide
   else
-    echo Errors found, not building guides
+     echo Errors found, not building guides
   fi
 fi
 MAKEGUIDES_end=`GET_TIME`
