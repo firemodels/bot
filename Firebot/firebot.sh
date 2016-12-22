@@ -25,6 +25,8 @@ echo "     default: $QUEUE"
 echo "-s - skip matlab and document building stages"
 echo "-u - update repo"
 echo "-U - upload guides"
+echo "-v n - run Firebot in validation mode with a specified number "
+echo "       of processes dedicated to validation. default: (none)"
 exit
 }
 
@@ -309,6 +311,23 @@ check_compile_fds_mpi_db()
 }
 
 #---------------------------------------------
+#                   generate_validation_set_list
+#---------------------------------------------
+
+generate_validation_set_list()
+{
+   valdir=`pwd`
+   cd $fdsrepo/Utilities/Scripts
+
+   # List and sort the oldest validation sets in the $FDSSMV/Validation/Process_All_Output.sh script
+   # based on the modification date of $VDIR/FDS_Output_Files. The result is an array of the validation
+   # sets ordered from oldest to newest.
+   VALIDATION_SETS=(` ./make_validation_caselist.sh | awk -F"!" '{print $1}'`)
+   cd $valdir
+}
+
+
+#---------------------------------------------
 #                   wait_cases_debug_end
 #---------------------------------------------
 
@@ -393,6 +412,13 @@ check_cases_debug()
       grep err $OUTPUT_DIR/stage4_errors | awk -F'[-:]' '{ print "cp " $dir " /tmp/."}'  | sort -u >> $OUTPUT_DIR/stage4_filelist
       cd $fdsrepo/Verification
       source $OUTPUT_DIR/stage4_filelist
+
+      # If errors encountered in validation mode, then email status and exit
+      if [ $FIREBOT_MODE == "validation" ] ; then
+         email_build_status 'Validationbot'
+         set_files_world_readable
+         exit
+      fi
    fi
 }
 
@@ -514,6 +540,10 @@ wait_cases_release_end()
         echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage5
         TIME_LIMIT_STAGE="5"
         check_time_limit
+        if [ $FIREBOT_MODE == "validation" ] ; then
+          check_cases_release $fdsrepo/Validation 'validation'
+          sleep 300
+        fi
         sleep 60
      done
    else
@@ -522,6 +552,10 @@ wait_cases_release_end()
         echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage5
         TIME_LIMIT_STAGE="5"
         check_time_limit
+        if [ $FIREBOT_MODE == "validation" ] ; then
+           check_cases_release $fdsrepo/Validation 'validation'
+           sleep 300
+        fi
         sleep 60
      done
    fi
@@ -1147,6 +1181,9 @@ ERROR_LOG=$OUTPUT_DIR/errors
 WARNING_LOG=$OUTPUT_DIR/warnings
 NEWGUIDE_DIR=$OUTPUT_DIR/Newest_Guides
 
+# Firebot mode (verification or validation)
+FIREBOT_MODE="verification"
+
 WEBBRANCH=nist-pages
 FDSBRANCH=master
 SMVBRANCH=master
@@ -1231,6 +1268,12 @@ case $OPTION in
   U)
    UPLOADGUIDES=1
    ;;
+  v)
+   FIREBOT_MODE="validation"
+   QUEUE=batch
+   MAX_VALIDATION_PROCESSES="$OPTARG"
+   LAUNCH_MORE_CASES=1
+   ;;
 esac
 done
 shift $(($OPTIND-1))
@@ -1314,6 +1357,11 @@ echo ""
 # Set time limit (43,200 seconds = 12 hours)
 TIME_LIMIT=43200
 TIME_LIMIT_EMAIL_NOTIFICATION="unsent"
+
+# Disable time limit email for validation bot
+if [ $FIREBOT_MODE == "validation" ] ; then
+   TIME_LIMIT_EMAIL_NOTIFICATION="sent"
+fi
 
 hostname=`hostname`
 start_time=`date`
