@@ -25,7 +25,7 @@ echo "     default: $QUEUE"
 echo "-s - skip matlab and document building stages"
 echo "-u - update repo"
 echo "-U - upload guides"
-echo "-v n - run Firebot in validation mode with a specified number "
+echo "-V n - run Firebot in validation mode with a specified number "
 echo "       of processes dedicated to validation. default: (none)"
 exit
 }
@@ -1344,7 +1344,7 @@ FIREBOT_LITE=
 
 #*** parse command line arguments
 
-while getopts 'b:cFhiLm:p:q:suUv:' OPTION
+while getopts 'b:cFhiLm:p:q:suUV:' OPTION
 do
 case $OPTION in
   b)
@@ -1384,7 +1384,7 @@ case $OPTION in
   U)
    UPLOADGUIDES=1
    ;;
-  v)
+  V)
    FIREBOT_MODE="validation"
    QUEUE=batch
    MAX_VALIDATION_PROCESSES="$OPTARG"

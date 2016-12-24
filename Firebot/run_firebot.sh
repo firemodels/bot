@@ -31,6 +31,8 @@ echo "-s - skip matlab and build document stages"
 echo "-u - update repo"
 echo "-U - upload guides (only by user firebot)"
 echo "-v - show options used to run firebot"
+echo "-V n - run Firebot in validation mode with a specified number "
+echo "       of processes dedicated to validation."
 exit
 }
 
@@ -131,8 +133,9 @@ SKIPFIGURES=
 FIREBOT_LITE=
 KILL_FIREBOT=
 ECHO=
+MAX_VALIDATION_PROCESSES=
 
-while getopts 'b:cFfhikLm:q:nsuUv' OPTION
+while getopts 'b:cFfhikLm:q:nsuUvV:' OPTION
 do
 case $OPTION  in
   b)
@@ -181,6 +184,9 @@ case $OPTION  in
   v)
    RUNFIREBOT=0
    ECHO=echo
+   ;;
+  V)
+   MAX_VALIDATION_PROCESSES="-V $OPTARG"
    ;;
 esac
 done
@@ -236,7 +242,7 @@ fi
 BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
-$ECHO  ./$botscript -p $firebot_pid $UPDATE $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $EMAIL "$@"
+$ECHO  ./$botscript -p $firebot_pid $UPDATE $MAX_VALIDATION_PROCESSES $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $EMAIL "$@"
 if [ -e $firebot_pid ]; then
   rm $firebot_pid
 fi
