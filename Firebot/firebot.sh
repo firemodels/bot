@@ -436,7 +436,7 @@ run_validation_cases_debug()
          break
       fi
 
-      cd $firerepo/fds/Validation/"$SET"
+      cd $fdsrepo/Validation/"$SET"
 
       # Submit FDS validation cases and wait for them to start
       echo "Running FDS validation cases for ${SET}:" >> $OUTPUT_DIR/stage4
@@ -684,7 +684,7 @@ run_validation_cases_release()
 
    for SET in ${CURRENT_VALIDATION_SETS[*]}
    do
-      cd $firerepo/fds/Validation/"$SET"
+      cd $fdsrepo/Validation/"$SET"
 
       # Start running FDS validation cases
       echo "Running FDS validation cases:" >> $OUTPUT_DIR/stage5
