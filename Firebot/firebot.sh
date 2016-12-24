@@ -220,7 +220,7 @@ update_repo()
 check_git_checkout()
 {
    # Check for GIT errors
-   stage1_success=true
+   git_checkout_success=true
 }
 
 #---------------------------------------------
@@ -290,7 +290,7 @@ check_compile_fds_mpi_db()
    cd $fdsrepo/Build/mpi_intel_${platform}${size}$IB$DB
    if [ -e "fds_mpi_intel_${platform}${size}$IB$DB" ]
    then
-      stage2b_success=true
+      FDS_debug_success=true
    else
       echo "Errors from Stage 2b - Compile FDS MPI debug:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage2b >> $ERROR_LOG
@@ -398,6 +398,25 @@ run_verification_cases_debug()
 }
 
 #---------------------------------------------
+#                   check_current_utilization
+#---------------------------------------------
+
+check_current_utilization()
+{
+   # This function is used to determine if the number of current processes currently in use is greater than the
+   # number of specified maximum processes. If so, then no more cases are launched (LAUNCH_MORE_CASES=0).
+
+   sleep 60
+
+   # Reports the number of nodes currently in use by current user
+   NUM_CURRENT_PROCESSES=`qstat -u $(whoami) | sed 1,5d | awk '{print $7}' | paste -sd+ | bc`
+
+   if [ "$NUM_CURRENT_PROCESSES" -gt "$MAX_VALIDATION_PROCESSES" ]; then
+      LAUNCH_MORE_CASES=0
+   fi
+}
+
+#---------------------------------------------
 #                   run_validation_cases_debug
 #---------------------------------------------
 
@@ -422,39 +441,15 @@ run_validation_cases_debug()
       # Submit FDS validation cases and wait for them to start
       echo "Running FDS validation cases for ${SET}:" >> $OUTPUT_DIR/stage4
       echo "" >> $OUTPUT_DIR/stage4 2>&1
-      ./Run_All.sh -b -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
+      ./Run_All.sh -b -m 1 -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
 
       CURRENT_VALIDATION_SETS+=($SET)
 
       check_current_utilization
    done
 
-   # Wait for validation cases to start
-   wait_cases_debug_start 'validation'
-   sleep 300
-
-   #  ==================
-   #  = Stop all cases =
-   #  ==================
-
-   for SET in ${CURRENT_VALIDATION_SETS[*]}
-   do
-      cd $firerepo/fds/Validation/"$SET"
-      ./Run_All.sh -b -s >> $OUTPUT_DIR/stage4 2>&1
-      echo "" >> $OUTPUT_DIR/stage4 2>&1
-   done
-
    # Wait for validation cases to end
    wait_cases_debug_end 'validation'
-   sleep 300
-
-   #  ======================
-   #  = Remove .stop files =
-   #  ======================
-
-   # Remove all .stop files from Validation directories (recursively)
-   cd $firerepo/fds/Validation
-   find . -name '*.stop' -exec rm -f {} \;
 }
 
 
@@ -476,7 +471,7 @@ check_cases_debug()
       [[ `grep -rI 'STOP: Numerical' *` == "" ]] && \
       [[ `grep -rI -A 20 forrtl *` == "" ]]
    then
-      stage4_success=true
+      cases_debug_success=true
    else
       grep -rI 'Run aborted' $OUTPUT_DIR/stage4 >> $OUTPUT_DIR/stage4_errors
       grep -rI Segmentation * >> $OUTPUT_DIR/stage4_errors
@@ -526,7 +521,7 @@ check_compile_fds_mpi()
    cd $fdsrepo/Build/mpi_intel_${platform}${size}$IB
    if [ -e "fds_mpi_intel_${platform}${size}$IB" ]
    then
-      stage2c_success=true
+      FDS_release_success=true
    else
       echo "Errors from Stage 2c - Compile FDS MPI release:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage2c >> $ERROR_LOG
@@ -573,7 +568,7 @@ compile_smv_utilities()
 check_smv_utilities()
 {
    # nothing to check
-   stage3a_success=true
+   smv_utilities_success=true
 }
 
 #---------------------------------------------
@@ -593,7 +588,7 @@ check_cases_release()
       [[ `grep -rI 'STOP: Numerical' *` == "" ]] && \
       [[ `grep -rI -A 20 forrtl *` == "" ]]
    then
-      stage5_success=true
+      cases_release_success=true
    else
       grep -rI 'Run aborted' $OUTPUT_DIR/stage5 >> $OUTPUT_DIR/stage5_errors
       grep -rI Segmentation * >> $OUTPUT_DIR/stage5_errors
@@ -729,7 +724,7 @@ check_compile_smv_db()
    cd $smvrepo/Build/smokeview/intel_${platform}${size}
    if [ -e "smokeview_${platform}${size}_db" ]
    then
-      stage3b_success=true
+      smv_debug_success=true
    else
       echo "Errors from Stage 3b - Compile SMV debug:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage3b >> $ERROR_LOG
@@ -748,7 +743,7 @@ check_compile_smv_db()
       echo "" >> $WARNING_LOG
    fi
    else
-      stage3b_success=true
+      smv_debug_success=true
    fi
 }
 
@@ -777,7 +772,7 @@ check_compile_smv()
    cd $smvrepo/Build/smokeview/intel_${platform}${size}
    if [ -e "smokeview_${platform}${size}" ]
    then
-      stage3c_success=true
+      smv_release_success=true
    else
       echo "Errors from Stage 3c - Compile SMV release:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage3c >> $ERROR_LOG
@@ -795,7 +790,7 @@ check_compile_smv()
       grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage3c | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
-   stage3c_success=true
+   smv_release_success=true
    fi
 }
 
@@ -821,7 +816,7 @@ check_fds_pictures()
    cd $firebotdir
    if [[ `grep -I -E "Segmentation|Error" $OUTPUT_DIR/stage6` == "" ]]
    then
-      stage6_success=true
+      fds_pictures_success=true
    else
       grep -I -E -A 5 -B 5 "Segmentation|Error" $OUTPUT_DIR/stage6 > $OUTPUT_DIR/stage6_errors
       
@@ -914,7 +909,7 @@ check_matlab_verification()
    cd $firebotdir
    if [[ `grep -B 5 -A 50 "Error" $OUTPUT_DIR/stage7a_verification` == "" ]]
    then
-      stage7a_success=true
+      matlab_verification_success=true
    else
       echo "Warnings from Stage 7a - Matlab plotting and statistics (verification):" >> $WARNING_LOG
       grep -B 5 -A 50 "Error" $OUTPUT_DIR/stage7a_verification >> $WARNING_LOG
@@ -990,7 +985,7 @@ check_matlab_validation()
    cd $firebotdir
    if [[ `grep -B 5 -A 50 "Error" $OUTPUT_DIR/stage7b_validation` == "" ]]
    then
-      stage7b_success=true
+      matlab_validation_succcess=true
    else
       echo "Warnings from Stage 7b - Matlab plotting and statistics (validation):" >> $WARNING_LOG
       grep -B 5 -A 50 "Error" $OUTPUT_DIR/stage7b_validation >> $WARNING_LOG
@@ -1549,13 +1544,13 @@ if [ "$FIREBOT_LITE" == "" ]; then
 fi
 
 ### Stage 4 ###
-# Only run if firebot is in "validation" mode
+
 if [ $FIREBOT_MODE == "validation" ] ; then
-   generate_validation_set_list
+    generate_validation_set_list
 fi
 
 # Depends on successful FDS debug compile
-if [[ $stage2b_success ]] ; then
+if [[ $FDS_debug_success ]] ; then
   if [[ $FIREBOT_MODE == "verification" ]] ; then
      run_verification_cases_debug
      check_cases_debug $fdsrepo/Verification 'verification'
@@ -1578,7 +1573,7 @@ if [ "$FIREBOT_LITE" == "" ]; then
 
 ### Stage 5 ###
 # Depends on successful FDS compile
-  if [[ $stage2c_success ]] ; then
+  if [[ $FDS_release_success ]] ; then
     if [[ $FIREBOT_MODE == "verification" ]] ; then
        run_verification_cases_release
        check_cases_release $fdsrepo/Verification 'verification'
@@ -1586,7 +1581,7 @@ if [ "$FIREBOT_LITE" == "" ]; then
     if [[ $FIREBOT_MODE == "validation" ]] ; then
        run_validation_cases_release
        check_cases_release $fdsrepo/Validation 'validation'
-       if [[ $stage4_success && $stage5_success ]] ; then
+       if [[ $cases_debug_success && $cases_release_success ]] ; then
          commit_validation_results
        fi
     fi
@@ -1596,7 +1591,7 @@ if [ "$FIREBOT_LITE" == "" ]; then
 # Depends on successful SMV compile
   if [ "$FIREBOT_MODE" == "verification" ]; then
     if [[ "$SKIPFIGURES" == "" ]] ; then
-      if [[ $stage3c_success ]] ; then
+      if [[ $smv_release_success ]] ; then
         make_fds_pictures
         check_fds_pictures
       fi
