@@ -336,7 +336,7 @@ commit_validation_results()
    do
       # Copy new FDS files from Current_Results to FDS_Output_Files using Process_Output.sh 
       # script for the validation set
-      cd $fdsrepo/fds/Validation/"$SET"/FDS_Output_Files
+      cd $fdsrepo/Validation/"$SET"/FDS_Output_Files
       ./Process_Output.sh
    done
 
