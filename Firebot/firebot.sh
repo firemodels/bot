@@ -51,7 +51,7 @@ PROCESS()
     status="***error: some $case cases did not run or are not complete"
   else
     if [ $nout -gt 0 ] && [ $nout -gt $nsuccess ]; then
-      status="some $case cases failed"
+      status="one or more $case cases failed"
     else
       if [ $nout -gt 0 ] ; then
         status="processing output"
@@ -235,7 +235,7 @@ update_repo()
    git fetch origin >> $OUTPUT_DIR/stage1 2>&1
    git merge origin/$branch >> $OUTPUT_DIR/stage1 2>&1
    have_remote=`git remote -v | grep firemodels | wc  -l`
-   if [ "$have_remote" -gt "0" ]; then
+   if [ $have_remote -gt 0 ]; then
       git fetch firemodels >> $OUTPUT_DIR/stage1 2>&1
       git merge firemodels/$branch >> $OUTPUT_DIR/stage1 2>&1
    fi
@@ -488,6 +488,7 @@ check_current_utilization()
    # Reports the number of nodes currently in use by current user
    NUM_CURRENT_PROCESSES=`qstat -u $(whoami) | sed 1,5d | awk '{print $7}' | paste -sd+ | bc`
 
+   echo "if [ $NUM_CURRENT_PROCESSES -gt $MAX_VALIDATION_PROCESSES ]; then"
    if [ $NUM_CURRENT_PROCESSES -gt $MAX_VALIDATION_PROCESSES ]; then
       LAUNCH_MORE_CASES=0
    fi
