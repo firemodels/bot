@@ -505,6 +505,8 @@ run_validation_cases_debug()
 
    # Initialize array of current validation sets to run
    CURRENT_VALIDATION_SETS=()
+   echo Running FDS Validation Cases
+   echo "   debug"
 
    for SET in ${VALIDATION_SETS[*]}
    do
@@ -761,6 +763,7 @@ run_validation_cases_release()
    #  ===================================
    #  = Run selected FDS validation set =
    #  ===================================
+   echo "   release"
 
    for SET in ${CURRENT_VALIDATION_SETS[*]}
    do
