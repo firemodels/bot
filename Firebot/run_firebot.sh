@@ -1,4 +1,4 @@
- #!/bin/bash
+#!/bin/bash
 
 # The Firebot script is part of an automated continuous integration system.
 # Consult the FDS Config Management Plan for more information.
@@ -15,6 +15,7 @@ echo "Options:"
 #echo "-b - branch_name - run firebot using branch_name [default: $BRANCH]"
 echo "-c - clean repo"
 echo "-C - commit validationbot output results"
+echo "-D - specify validation case list file"
 echo "-f - force firebot run"
 echo "-F - skip figure generation and build document stages"
 echo "-h - display this message"
@@ -30,6 +31,7 @@ else
 fi
 echo "-q queue - specify queue [default: $QUEUE]"
 echo "-s - skip matlab and build document stages"
+echo "-S - show validation case list"
 echo "-u - update repo"
 echo "-U - upload guides (only by user firebot)"
 echo "-v - show options used to run firebot"
@@ -138,8 +140,10 @@ ECHO=
 MAX_VALIDATION_PROCESSES=
 commit=
 push=
+caselistfile=""
+showcaselist=
 
-while getopts 'b:cCFfhikLm:Pq:nsuUvV:' OPTION
+while getopts 'b:cCD:FfhikLm:Pq:nsSuUvV:' OPTION
 do
 case $OPTION  in
   b)
@@ -151,6 +155,9 @@ case $OPTION  in
    ;;
   C)
    commit=-C
+   ;;
+  D)
+    caselistfile="-D $OPTARG"
    ;;
   f)
    FORCE=1
@@ -184,6 +191,9 @@ case $OPTION  in
    ;;
   s)
    SKIPMATLAB=-s
+   ;;
+  S)
+   showcaselist="-S"
    ;;
   u)
    UPDATEREPO=1
@@ -252,7 +262,7 @@ fi
 BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
-$ECHO  ./$botscript -p $firebot_pid $commit $push $UPDATE $MAX_VALIDATION_PROCESSES $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $EMAIL "$@"
+$ECHO  ./$botscript -p $firebot_pid $commit $push $UPDATE $showcaselist $caselistfile $MAX_VALIDATION_PROCESSES $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $EMAIL "$@"
 if [ -e $firebot_pid ]; then
   rm $firebot_pid
 fi

@@ -14,6 +14,7 @@ echo "Options"
 echo "-b - branch_name - run firebot using branch branch_name"
 echo "-c - clean repo"
 echo "-C - commit validationbot output results"
+echo "-D - specify validation case list file"
 echo "-F - skip figures and document building stages"
 echo "-h - display this message"
 echo "-i - use installed version of smokeview"
@@ -25,10 +26,11 @@ echo "-P - commit and push validationbot outut results (not implemented)"
 echo "-q - queue_name - run cases using the queue queue_name"
 echo "     default: $QUEUE"
 echo "-s - skip matlab and document building stages"
+echo "-S - show validation case list"
 echo "-u - update repo"
 echo "-U - upload guides"
 echo "-V n - run Firebot in validation mode with a specified number "
-echo "       of processes dedicated to validation. default: (none)"
+echo "       of processes dedicated to validation."
 exit
 }
 
@@ -354,10 +356,44 @@ check_compile_fds_mpi_db()
 }
 
 #---------------------------------------------
-#                   generate_validation_set_list
+#                   show_validation_list
 #---------------------------------------------
 
-generate_validation_set_list()
+show_validation_list()
+{
+   valdir=`pwd`
+   cd $fdsrepo/Utilities/Scripts
+
+   # List and sort validation sets in the fds/Validation/Process_All_Output.sh 
+   # script based on the modification date of the FDS_Output_Files. The result
+   # is an array of the validation sets ordered from oldest to newest.
+   ./make_validation_caselist.sh
+   cd $valdir
+}
+
+#---------------------------------------------
+#                   get_validation_set_list
+#---------------------------------------------
+
+get_validation_list()
+{
+   validation_list_file=$1
+   
+   valdir=`pwd`
+   cd $fdsrepo/Utilities/Scripts
+
+   # List and sort validation sets in the fds/Validation/Process_All_Output.sh 
+   # script based on the modification date of the FDS_Output_Files. The result
+   # is an array of the validation sets ordered from oldest to newest.
+   VALIDATION_SETS=(` cat $validation_list_file | awk -F"!" '{print $1}'`)
+   cd $valdir
+}
+
+#---------------------------------------------
+#                   generate_validation_list
+#---------------------------------------------
+
+generate_validation_list()
 {
    valdir=`pwd`
    cd $fdsrepo/Utilities/Scripts
@@ -1384,10 +1420,12 @@ GIT_REVISION=
 SKIPMATLAB=
 SKIPFIGURES=
 FIREBOT_LITE=
+caselistfile=""
+showcaselist=
 
 #*** parse command line arguments
 
-while getopts 'b:cCFhiLm:p:Pq:suUV:' OPTION
+while getopts 'b:cCD:FhiLm:p:Pq:suUV:' OPTION
 do
 case $OPTION in
   b)
@@ -1399,6 +1437,9 @@ case $OPTION in
    ;;
   C)
    commit=1
+   ;;
+  D)
+    caselistfile="$OPTARG"
    ;;
   F)
    SKIPFIGURES=1
@@ -1426,6 +1467,9 @@ case $OPTION in
    ;;
   s)
    SKIPMATLAB=1
+   ;;
+  S)
+   showcaselist="1"
    ;;
   u)
    UPDATEREPO=1
@@ -1478,6 +1522,11 @@ cd $firebotdir
 #*** save pid in case we want to kill firebot later
 
 echo $$ > $PID_FILE
+
+if [ "$showcaselist" == "1" ]; then
+  show_validation_list
+  exit
+fi
 
 #*** check for C/C++ compiler
 
@@ -1603,7 +1652,11 @@ fi
 ### Stage 4 ###
 
 if [ $FIREBOT_MODE == "validation" ] ; then
-    generate_validation_set_list
+  if [ "$caselistfile" != "" ]; then
+    generate_validation_list
+  else
+    get_validation_list $casecaselistfile
+  fi
 fi
 
 # Depends on successful FDS debug compile
