@@ -1635,7 +1635,7 @@ check_compile_fds_mpi_db
 
 if [ "$FIREBOT_LITE" == "" ]; then
 ### Stage 2c ###
-  if [ "$debug_mode" == "1" ]; then
+  if [ "$debug_mode" == "" ]; then
     compile_fds_mpi
   fi
   check_compile_fds_mpi
