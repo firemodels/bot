@@ -1659,7 +1659,7 @@ fi
 ### Stage 4 ###
 
 if [ $FIREBOT_MODE == "validation" ] ; then
-  if [ "$caselistfile" != "" ]; then
+  if [ "$caselistfile" == "" ]; then
     generate_validation_list
   else
     get_validation_list $casecaselistfile
