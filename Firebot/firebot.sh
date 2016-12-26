@@ -1425,7 +1425,7 @@ showcaselist=
 
 #*** parse command line arguments
 
-while getopts 'b:cCD:FhiLm:p:Pq:suUV:' OPTION
+while getopts 'b:cCD:FhiLm:p:Pq:sSuUV:' OPTION
 do
 case $OPTION in
   b)
