@@ -583,9 +583,12 @@ compile_fds_mpi()
 {
    # Clean and compile FDS MPI
    echo "      MPI release"
-   cd $fdsrepo/Build/mpi_intel_${platform}${size}$IB
-   make -f ../makefile clean &> /dev/null
-   ./make_fds.sh &> $OUTPUT_DIR/stage2c
+   echo "" > $OUTPUT_DIR/stage2c
+   if [ "$debug_mode" == "1" ]; then
+     cd $fdsrepo/Build/mpi_intel_${platform}${size}$IB
+     make -f ../makefile clean &> /dev/null
+     ./make_fds.sh &> $OUTPUT_DIR/stage2c
+   fi
 }
 
 #---------------------------------------------
@@ -1635,9 +1638,7 @@ check_compile_fds_mpi_db
 
 if [ "$FIREBOT_LITE" == "" ]; then
 ### Stage 2c ###
-  if [ "$debug_mode" == "" ]; then
-    compile_fds_mpi
-  fi
+  compile_fds_mpi
   check_compile_fds_mpi
 
 ### Stage 3a ###
