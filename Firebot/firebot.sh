@@ -584,7 +584,7 @@ compile_fds_mpi()
    # Clean and compile FDS MPI
    echo "      MPI release"
    echo "" > $OUTPUT_DIR/stage2c
-   if [ "$debug_mode" == "1" ]; then
+   if [ "$debug_mode" == "" ]; then
      cd $fdsrepo/Build/mpi_intel_${platform}${size}$IB
      make -f ../makefile clean &> /dev/null
      ./make_fds.sh &> $OUTPUT_DIR/stage2c
