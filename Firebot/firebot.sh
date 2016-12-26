@@ -13,6 +13,7 @@ echo ""
 echo "Options"
 echo "-b - branch_name - run firebot using branch branch_name"
 echo "-c - clean repo"
+echo "-C - commit validationbot output results"
 echo "-F - skip figures and document building stages"
 echo "-h - display this message"
 echo "-i - use installed version of smokeview"
@@ -20,6 +21,7 @@ echo "-L - firebot lite,  run only stages that build a debug fds and run cases w
 echo "                    (no release fds, no release cases, no matlab, etc)"
 echo "-m email_address "
 echo "-p pid_file - file containing process id of firebot process "
+echo "-P - commit and push validationbot outut results (not implemented)"
 echo "-q - queue_name - run cases using the queue queue_name"
 echo "     default: $QUEUE"
 echo "-s - skip matlab and document building stages"
@@ -28,6 +30,47 @@ echo "-U - upload guides"
 echo "-V n - run Firebot in validation mode with a specified number "
 echo "       of processes dedicated to validation. default: (none)"
 exit
+}
+
+#---------------------------------------------
+#                   PROCESS
+#---------------------------------------------
+
+PROCESS()
+{
+  case=$1
+  curdir=`pwd`
+  cd $case
+  nout=`ls -l Current_Results/*.out |& grep -v cannot | wc -l`
+  nfds=`ls -l Current_Results/*.fds |& grep -v cannot | wc -l`
+  nsuccess=`tail Current_Results/*.out |& grep successfully | wc -l`
+  status="***error: $case cases not run"
+  if [ $nfds -gt 0 ] && [ $nfds -gt $nout ]; then
+    status="***error: some $case cases did not run or are not complete"
+  else
+    if [ $nout -gt 0 ] && [ $nout -gt $nsuccess ]; then
+      status="some $case cases failed"
+    else
+      if [ $nout -gt 0 ] ; then
+        status="processing output"
+        ./Process_Output.sh
+
+        if [ "$commit" == "1" ]; then
+          cd $fdsrepo/out/$SET/FDS_Output_Files
+          git add *.csv *.txt
+          git commit -m "validationbot: commit $SET results"
+        fi
+        if [ "$push" == "1" ]; then
+          echo push $SET results
+          # git push origin master
+        fi
+      fi
+    fi
+  fi
+  if [ $nfds -gt 0 ]; then
+    echo "$case: cases=$nfds finished=$nout successful=$nsuccess status=$status"
+  fi
+  cd $curdir
 }
 
 #---------------------------------------------
@@ -336,15 +379,13 @@ commit_validation_results()
    do
       # Copy new FDS files from Current_Results to FDS_Output_Files using Process_Output.sh 
       # script for the validation set
-      cd $fdsrepo/Validation/"$SET"
-      ./Process_Output.sh
+     cd $fdsrepo/Validation
+
+     PROCESS "$SET"
    done
 
    # cd to GIT root
    cd $fdsrepo
-
-   # Commit new validation results
-#   svn commit -m "Validationbot: Update validation results for: ${CURRENT_VALIDATION_SETS[*]}" &> /dev/null
 }
 
 #---------------------------------------------
@@ -595,7 +636,7 @@ check_cases_release()
       grep -rI ERROR: * >> $OUTPUT_DIR/stage5_errors
       grep -rI 'STOP: Numerical' * >> $OUTPUT_DIR/stage5_errors
       grep -rI -A 20 forrtl * >> $OUTPUT_DIR/stage5_errors
-      
+
       echo "Errors from Stage 5 - Run ${2} cases - release mode:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage5_errors >> $ERROR_LOG
       echo "" >> $ERROR_LOG
@@ -1326,6 +1367,8 @@ QUEUE=firebot
 CLEANREPO=0
 UPDATEREPO=0
 JOBPREFIX=FB_
+commit=
+push=
 
 DB=_db
 IB=
@@ -1344,7 +1387,7 @@ FIREBOT_LITE=
 
 #*** parse command line arguments
 
-while getopts 'b:cFhiLm:p:q:suUV:' OPTION
+while getopts 'b:cCFhiLm:p:Pq:suUV:' OPTION
 do
 case $OPTION in
   b)
@@ -1353,6 +1396,9 @@ case $OPTION in
    ;;
   c)
    CLEANREPO=1
+   ;;
+  C)
+   commit=1
    ;;
   F)
    SKIPFIGURES=1
@@ -1371,6 +1417,9 @@ case $OPTION in
    ;;
   p)
    PID_FILE="$OPTARG"
+   ;;
+  P)
+   push=1
    ;;
   q)
    QUEUE="$OPTARG"
@@ -1406,6 +1455,13 @@ else
   echo "          Aborting firebot"
   exit
 fi
+
+if [ "$push" == "1" ]; then
+  commit=1
+fi
+
+# don't push yet
+push=
 
 #*** make sure repos exist and have expected branches
 

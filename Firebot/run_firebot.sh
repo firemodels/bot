@@ -1,4 +1,4 @@
-#!/bin/bash
+ #!/bin/bash
 
 # The Firebot script is part of an automated continuous integration system.
 # Consult the FDS Config Management Plan for more information.
@@ -14,6 +14,7 @@ echo ""
 echo "Options:"
 #echo "-b - branch_name - run firebot using branch_name [default: $BRANCH]"
 echo "-c - clean repo"
+echo "-C - commit validationbot output results"
 echo "-f - force firebot run"
 echo "-F - skip figure generation and build document stages"
 echo "-h - display this message"
@@ -21,6 +22,7 @@ echo "-i - use installed version of smokeview"
 echo "-k - kill firebot if it is running"
 echo "-L - firebot lite,  run only stages that build a debug fds and run cases with it"
 echo "                    (no release fds, no release cases, no matlab, etc)"
+echo "-P - commit and push validationbot output results (not implemented)"
 if [ "$EMAIL" != "" ]; then
   echo "-m email_address [default: $EMAIL]"
 else
@@ -134,8 +136,10 @@ FIREBOT_LITE=
 KILL_FIREBOT=
 ECHO=
 MAX_VALIDATION_PROCESSES=
+commit=
+push=
 
-while getopts 'b:cFfhikLm:q:nsuUvV:' OPTION
+while getopts 'b:cCFfhikLm:Pq:nsuUvV:' OPTION
 do
 case $OPTION  in
   b)
@@ -144,6 +148,9 @@ case $OPTION  in
    ;;
   c)
    CLEANREPO=1
+   ;;
+  C)
+   commit=-C
    ;;
   f)
    FORCE=1
@@ -171,6 +178,9 @@ case $OPTION  in
    ;;
   n)
    UPDATEREPO=0
+   ;;
+  P)
+   push=-P
    ;;
   s)
    SKIPMATLAB=-s
@@ -242,7 +252,7 @@ fi
 BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
-$ECHO  ./$botscript -p $firebot_pid $UPDATE $MAX_VALIDATION_PROCESSES $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $EMAIL "$@"
+$ECHO  ./$botscript -p $firebot_pid $commit $push $UPDATE $MAX_VALIDATION_PROCESSES $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $EMAIL "$@"
 if [ -e $firebot_pid ]; then
   rm $firebot_pid
 fi
