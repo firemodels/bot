@@ -1422,10 +1422,11 @@ SKIPFIGURES=
 FIREBOT_LITE=
 caselistfile=""
 showcaselist=
+debug_mode=
 
 #*** parse command line arguments
 
-while getopts 'b:cCD:FhiLm:p:Pq:sSuUV:' OPTION
+while getopts 'b:cCdD:FhiLm:p:Pq:sSuUV:' OPTION
 do
 case $OPTION in
   b)
@@ -1437,6 +1438,9 @@ case $OPTION in
    ;;
   C)
    commit=1
+   ;;
+  d)
+   debug_mode=1
    ;;
   D)
     caselistfile="$OPTARG"
@@ -1631,7 +1635,9 @@ check_compile_fds_mpi_db
 
 if [ "$FIREBOT_LITE" == "" ]; then
 ### Stage 2c ###
-  compile_fds_mpi
+  if [ "$debug_mode" == "1" ]; then
+    compile_fds_mpi
+  fi
   check_compile_fds_mpi
 
 ### Stage 3a ###

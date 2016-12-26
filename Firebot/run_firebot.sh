@@ -142,8 +142,9 @@ commit=
 push=
 caselistfile=""
 showcaselist=
+debug_mode=
 
-while getopts 'b:cCD:FfhikLm:Pq:nsSuUvV:' OPTION
+while getopts 'b:cdCD:FfhikLm:Pq:nsSuUvV:' OPTION
 do
 case $OPTION  in
   b)
@@ -155,6 +156,9 @@ case $OPTION  in
    ;;
   C)
    commit=-C
+   ;;
+  d)
+    debug_mode="-d "
    ;;
   D)
     caselistfile="-D $OPTARG"
@@ -262,7 +266,7 @@ fi
 BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
-$ECHO  ./$botscript -p $firebot_pid $commit $push $UPDATE $showcaselist $caselistfile $MAX_VALIDATION_PROCESSES $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $EMAIL "$@"
+$ECHO  ./$botscript -p $firebot_pid $commit $push $UPDATE $debug_mode $showcaselist $caselistfile $MAX_VALIDATION_PROCESSES $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $EMAIL "$@"
 if [ -e $firebot_pid ]; then
   rm $firebot_pid
 fi
