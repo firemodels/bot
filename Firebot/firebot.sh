@@ -486,7 +486,11 @@ check_current_utilization()
    sleep 60
 
    # Reports the number of nodes currently in use by current user
-   NUM_CURRENT_PROCESSES=`qstat -u $(whoami) | sed 1,5d | awk '{print $7}' | paste -sd+ | bc`
+   NJOBS=`qstat -u $(whoami) | wc -l`
+   NUM_CURRENT_PROCESSES=0
+   if [ $NJOBS -gt 0 ]; then
+     NUM_CURRENT_PROCESSES=`qstat -u $(whoami) | sed 1,5d | awk '{print $7}' | paste -sd+ | bc`
+   fi
 
    echo "if [ $NUM_CURRENT_PROCESSES -gt $MAX_VALIDATION_PROCESSES ]; then"
    if [ $NUM_CURRENT_PROCESSES -gt $MAX_VALIDATION_PROCESSES ]; then
