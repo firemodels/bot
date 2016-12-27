@@ -1670,7 +1670,7 @@ if [ $FIREBOT_MODE == "validation" ] ; then
   if [ "$caselistfile" == "" ]; then
     generate_validation_list
   else
-    get_validation_list $casecaselistfile
+    get_validation_list $caselistfile
   fi
 fi
 
