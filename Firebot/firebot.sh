@@ -491,8 +491,6 @@ check_current_utilization()
    if [ $NJOBS -gt 0 ]; then
      NUM_CURRENT_PROCESSES=`qstat -u $(whoami) | sed 1,5d | awk '{print $7}' | paste -sd+ | bc`
    fi
-
-   echo "if [ $NUM_CURRENT_PROCESSES -gt $MAX_VALIDATION_PROCESSES ]; then"
    if [ $NUM_CURRENT_PROCESSES -gt $MAX_VALIDATION_PROCESSES ]; then
       LAUNCH_MORE_CASES=0
    fi
