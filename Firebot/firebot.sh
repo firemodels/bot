@@ -48,10 +48,12 @@ PROCESS()
   nsuccess=`tail Current_Results/*.out |& grep successfully | wc -l`
   status="***error: $case cases not run"
   if [ $nfds -gt 0 ] && [ $nfds -gt $nout ]; then
-    status="***error: some $case cases did not run or are not complete"
+    status="***error: some $case cases did not run or dit not finish"
+    echo "$status" >> $ERROR_LOG
   else
     if [ $nout -gt 0 ] && [ $nout -gt $nsuccess ]; then
-      status="one or more $case cases failed"
+      status="***error: one or more $case cases failed"
+      echo "$status" >> $ERROR_LOG
     else
       if [ $nout -gt 0 ] ; then
         status="processing output"
