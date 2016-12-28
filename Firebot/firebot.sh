@@ -48,14 +48,14 @@ PROCESS()
   nsuccess=`tail Current_Results/*.out |& grep successfully | wc -l`
   if [ $nfds -gt 0 ] && [ $nfds -gt $nout ]; then
     if [ "$nout" == "0" ]; then
-      status="***error: $nfds $case cases were run in $curdir/$case but none finished"
+      status="***error: $nfds cases were run in $curdir/$case but none finished"
     else
-      status="***error: $nfds $case cases were run in $curdir/$case but only $nout finished"
+      status="***error: $nfds cases were run in $curdir/$case but only $nout finished"
     fi
     echo "$status" >> $ERROR_LOG
   else
     if [ $nout -gt 0 ] && [ $nout -gt $nsuccess ]; then
-      status="***error: $nfds $case cases were run in $curdir/$case but only $nsuccess finished successfully"
+      status="***error: $nfds cases were run in $curdir/$case but only $nsuccess finished successfully"
       echo "$status" >> $ERROR_LOG
     else
       if [ $nout -gt 0 ] ; then
