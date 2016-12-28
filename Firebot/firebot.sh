@@ -1590,8 +1590,8 @@ if [ "$UPDATEREPO" == "1" ]; then
 else
   echo " update repos: no"
 fi
-if [ "$FIREBOT_MODE"="validation" ]; then
-echo "validationbot: $MAX_VALIDATION_PROCESSES processes"
+if [ "$FIREBOT_MODE" == "validation" ]; then
+  echo "validationbot: $MAX_VALIDATION_PROCESSES processes"
 fi
 echo ""
 
