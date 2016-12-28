@@ -14,29 +14,31 @@ echo ""
 echo "Options:"
 #echo "-b - branch_name - run firebot using branch_name [default: $BRANCH]"
 echo "-c - clean repo"
+echo "-h - display this message"
+echo "-k - kill firebot if it is running"
+echo "-q queue - specify queue [default: $QUEUE]"
+echo "-u - update repo"
+echo "-v - show options used to run firebot"
+echo "Validationbot:"
 echo "-C - commit validationbot output results"
-echo "-D - specify validation case list file"
+echo "-D caselist - specify validationbot case list file"
+echo "-K - kill validationbot if it is running"
+echo "-P - commit and push validationbot output results (not implemented)"
+echo "-S - show list validationbot cases"
+echo "-V n - run Firebot in validationbot mode with specified number (n) of processes"
+echo "Misc:"
+echo "-i - use installed version of smokeview"
 echo "-f - force firebot run"
 echo "-F - skip figure generation and build document stages"
-echo "-h - display this message"
-echo "-i - use installed version of smokeview"
-echo "-k - kill firebot if it is running"
 echo "-L - firebot lite,  run only stages that build a debug fds and run cases with it"
 echo "                    (no release fds, no release cases, no matlab, etc)"
-echo "-P - commit and push validationbot output results (not implemented)"
 if [ "$EMAIL" != "" ]; then
   echo "-m email_address [default: $EMAIL]"
 else
   echo "-m email_address "
 fi
-echo "-q queue - specify queue [default: $QUEUE]"
 echo "-s - skip matlab and build document stages"
-echo "-S - show validation case list"
-echo "-u - update repo"
 echo "-U - upload guides (only by user firebot)"
-echo "-v - show options used to run firebot"
-echo "-V n - run Firebot in validation mode with a specified number "
-echo "       of processes dedicated to validation."
 exit
 }
 
@@ -229,7 +231,7 @@ if [ "$KILL_FIREBOT" == "1" ]; then
     echo "killing firebot (PID=$PID)"
     kill -9 $PID
     if [ "$QUEUE" != "none" ]; then
-      JOBIDS=`qstat -a | grep $PREFIX | awk -v user="$USER" '{if($2==user){print $1}}'`
+      JOBIDS=`qstat -a | grep $PREFIX | awk -v user="$USER" '{if($2==user){print $1}}' | awk -F'.' '{print $1}'`
       if [ "$JOBIDS" != "" ]; then
         echo killing firebot jobs with Id:$JOBIDS
         qdel $JOBIDS
