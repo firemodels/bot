@@ -42,10 +42,17 @@ PROCESS()
 {
   case=$1
   curdir=`pwd`
+  nout=-1
+  nfds=-1
+  nsuccess=-1
   cd $case
-     nout=`ls -l Current_Results/*.out |& grep -v cannot | wc -l`
-     nfds=`ls -l Current_Results/*.fds |& grep -v cannot | wc -l`
-  nsuccess=`tail Current_Results/*.out |& grep successfully | wc -l`
+  if [ -d Current_Results ]; then
+    cd Current_Results
+    nout=`ls -l *.out |& grep -v cannot | wc -l`
+    nfds=`ls -l *.fds |& grep -v cannot | wc -l`
+    nsuccess=`tail *.out |& grep successfully | wc -l`
+  fi
+  echo nfds=$nfds nout=$nout nsuccess=$nsuccess
   if [ $nfds -gt 0 ] && [ $nfds -gt $nout ]; then
     if [ "$nout" == "0" ]; then
       status="***error: $nfds cases were run in $curdir/$case but none finished"
