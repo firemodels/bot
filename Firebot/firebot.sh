@@ -1636,9 +1636,11 @@ archive_compiler_version
 ### Stage 2a ###
 echo Building
 echo "   FDS"
-if [ "$FIREBOT_LITE" == "" ]; then
-   inspect_fds_db
-   check_inspect_fds_db
+if [ $FIREBOT_MODE == "verification" ] ; then
+  if [ "$FIREBOT_LITE" == "" ]; then
+    inspect_fds_db
+    check_inspect_fds_db
+  fi
 fi
 
 ### Stage 2b ###
@@ -1692,7 +1694,7 @@ if [ "$FIREBOT_LITE" == "" ]; then
 # clean debug stage
   cd $fdsrepo
   if [[ "$CLEANREPO" == "1" ]] ; then
-     if [[ $FIREBOT_MODE == "validation" ]] ; then
+     if [[ $FIREBOT_MODE == "verification" ]] ; then
        echo "   cleaning Verification"
        clean_repo $fdsrepo/Verification $fdsbranch || exit 1
      fi
