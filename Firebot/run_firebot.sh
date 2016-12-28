@@ -136,6 +136,7 @@ SKIPMATLAB=
 SKIPFIGURES=
 FIREBOT_LITE=
 KILL_FIREBOT=
+PREFIX=FB_
 ECHO=
 MAX_VALIDATION_PROCESSES=
 commit=
@@ -144,7 +145,7 @@ caselistfile=""
 showcaselist=
 debug_mode=
 
-while getopts 'b:cdCD:FfhikLm:Pq:nsSuUvV:' OPTION
+while getopts 'b:cdCD:FfhiKkLm:Pq:nsSuUvV:' OPTION
 do
 case $OPTION  in
   b)
@@ -177,6 +178,10 @@ case $OPTION  in
    ;;
   k)
    KILL_FIREBOT="1"
+   ;;
+  K)
+   KILL_FIREBOT="1"
+   PREFIX=VB_
    ;;
   L)
    FIREBOT_LITE=-L
@@ -224,7 +229,7 @@ if [ "$KILL_FIREBOT" == "1" ]; then
     echo "killing firebot (PID=$PID)"
     kill -9 $PID
     if [ "$QUEUE" != "none" ]; then
-      JOBIDS=`qstat -a | grep FB_ | awk -v user="$USER" '{if($2==user){print $1}}'`
+      JOBIDS=`qstat -a | grep $PREFIX | awk -v user="$USER" '{if($2==user){print $1}}'`
       if [ "$JOBIDS" != "" ]; then
         echo killing firebot jobs with Id:$JOBIDS
         qdel $JOBIDS
