@@ -1587,7 +1587,7 @@ else
   echo " update repos: no"
 fi
 if [ "$FIREBOT_MODE"="validation" ]; then
-echo "validationbot: yes ($MAX_VALIDATION_PROCESSES processes)"
+echo "validationbot: $MAX_VALIDATION_PROCESSES processes"
 fi
 echo ""
 
