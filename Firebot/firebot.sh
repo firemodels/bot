@@ -46,9 +46,8 @@ PROCESS()
   nout=`ls -l Current_Results/*.out |& grep -v cannot | wc -l`
   nfds=`ls -l Current_Results/*.fds |& grep -v cannot | wc -l`
   nsuccess=`tail Current_Results/*.out |& grep successfully | wc -l`
-  status="***error: $case cases not run"
   if [ $nfds -gt 0 ] && [ $nfds -gt $nout ]; then
-    status="***error: some $case cases did not run or dit not finish"
+    status="***error: some $case cases did not run or did not finish"
     echo "$status" >> $ERROR_LOG
   else
     if [ $nout -gt 0 ] && [ $nout -gt $nsuccess ]; then
@@ -56,7 +55,6 @@ PROCESS()
       echo "$status" >> $ERROR_LOG
     else
       if [ $nout -gt 0 ] ; then
-        status="processing output"
         ./Process_Output.sh
 
         if [ "$commit" == "1" ]; then
@@ -65,14 +63,14 @@ PROCESS()
           git commit -m "validationbot: commit $SET results"
         fi
         if [ "$push" == "1" ]; then
-          echo push $SET results
+          echo pushing updated $SET results to github repo
           # git push origin master
         fi
       fi
     fi
   fi
   if [ $nfds -gt 0 ]; then
-    echo "$case: cases=$nfds finished=$nout successful=$nsuccess status=$status"
+    echo "Case summary: name:$case total=$nfds finished=$nout successful=$nsuccess"
   fi
   cd $curdir
 }
