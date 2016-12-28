@@ -43,15 +43,19 @@ PROCESS()
   case=$1
   curdir=`pwd`
   cd $case
-  nout=`ls -l Current_Results/*.out |& grep -v cannot | wc -l`
-  nfds=`ls -l Current_Results/*.fds |& grep -v cannot | wc -l`
+     nout=`ls -l Current_Results/*.out |& grep -v cannot | wc -l`
+     nfds=`ls -l Current_Results/*.fds |& grep -v cannot | wc -l`
   nsuccess=`tail Current_Results/*.out |& grep successfully | wc -l`
   if [ $nfds -gt 0 ] && [ $nfds -gt $nout ]; then
-    status="***error: some $case cases did not run or did not finish"
+    if [ "$nout" == "0" ]; then
+      status="***error: $nfds $case cases were run in $curdir/$case but none finished"
+    else
+      status="***error: $nfds $case cases were run in $curdir/$case but only $nout finished"
+    fi
     echo "$status" >> $ERROR_LOG
   else
     if [ $nout -gt 0 ] && [ $nout -gt $nsuccess ]; then
-      status="***error: one or more $case cases failed"
+      status="***error: $nfds $case cases were run in $curdir/$case but only $nsuccess finished successfully"
       echo "$status" >> $ERROR_LOG
     else
       if [ $nout -gt 0 ] ; then
@@ -70,7 +74,7 @@ PROCESS()
     fi
   fi
   if [ $nfds -gt 0 ]; then
-    echo "Case summary: name:$case total=$nfds finished=$nout successful=$nsuccess"
+    echo "Summary: name:$case cases=$nfds finished=$nout successful=$nsuccess"
   fi
   cd $curdir
 }
