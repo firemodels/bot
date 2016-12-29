@@ -48,10 +48,9 @@ PROCESS()
   cd $case
   sleep 60
   if [ -d Current_Results ]; then
-    cd Current_Results
-    nout=`ls -l *.out | wc -l`
-    nfds=`ls -l *.fds | wc -l`
-    nsuccess=`tail *.out |& grep successfully | wc -l`
+    nout=`ls -l Current_Results/*.out | wc -l`
+    nfds=`ls -l Current_Results/*.fds | wc -l`
+    nsuccess=`grep successfully Current_Results/*.out | wc -l`
     ls
     echo current_dir=`pwd`
   fi
