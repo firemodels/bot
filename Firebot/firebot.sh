@@ -86,7 +86,8 @@ PROCESS()
   if [ $nfds -gt 0 ]; then
     echo "   $case cases=$nfds finished=$nout successful=$nsuccess"
     if [ $nout -gt 0 ] && [ $nout -gt $nsuccess ]; then
-      grep STOP *.out | grep -v successfully | awk -F':' '{print $1 }' | awk -F'.' '{print "***error: " $1".fds did not complete succesfully." }'
+      cd $fdsrepo/Validation/$case
+      grep STOP Current_Results/*.out | grep -v successfully | awk -F':' '{print $1 }' | awk -F'.' '{print "***error: " $1".fds did not complete succesfully." }'
     fi
   fi
   cd $curdir
