@@ -42,53 +42,19 @@ PROCESS()
 {
   case=$1
   curdir=`pwd`
-  nout=-1
-  nfds=-1
-  nsuccess=-1
 
   cd $fdsrepo/Validation/$case
-  if [ -d Current_Results ]; then
-    nout=`ls -l Current_Results/*.out | wc -l`
-    nfds=`ls -l Current_Results/*.fds | wc -l`
-    nsuccess=`grep successfully Current_Results/*.out | wc -l`
-  fi
-  if [ $nfds -gt 0 ] && [ $nfds -gt $nout ]; then
-    if [ "$nout" == "0" ]; then
-      echo "***error: $nfds cases were run in $curdir/$case but none finished" >> $ERROR_LOG
-    else
-      echo "***error: $nfds cases were run in $curdir/$case but only $nout finished" >> $ERROR_LOG
-    fi
-  else
-    if [ $nout -gt 0 ] && [ $nout -gt $nsuccess ]; then
-      if [ $nsuccess -gt 0 ]; then
-        echo "***error: $nfds cases were run in $curdir/$case but only $nsuccess finished successfully" >> $ERROR_LOG
-      else
-        echo "***error: $nfds cases were run in $curdir/$case but none finished successfully" >> $ERROR_LOG
-      fi
-    else
-      if [ $nout -gt 0 ] ; then
-        cd $fdsrepo/Validation/$case
-        ./Process_Output.sh
+  ./Process_Output.sh
 
-        if [ "$commit" == "1" ]; then
-          cd $repo/out/$case/FDS_Output_Files
-          git add *.csv *.txt
-          git commit -m "validationbot: commit $case results"
-        fi
-        if [ "$push" == "1" ]; then
-          cd $repo/out/$case/FDS_Output_Files
-          echo pushing updated $case results to github repo
-          # git push origin master
-        fi
-      fi
-    fi
+  if [ "$commit" == "1" ]; then
+    cd $repo/out/$case/FDS_Output_Files
+    git add *.csv *.txt
+    git commit -m "validationbot: commit $case results"
   fi
-  if [ $nfds -gt 0 ]; then
-    echo "   $case cases=$nfds finished=$nout successful=$nsuccess"
-    if [ $nout -gt 0 ] && [ $nout -gt $nsuccess ]; then
-      cd $fdsrepo/Validation/$case/Current_Results
-      grep STOP *.out | grep -v successfully | awk -F':' '{print $1 }' | awk -F'.' '{print "***error: " $1".fds did not finish succesfully." }'
-    fi
+  if [ "$push" == "1" ]; then
+    cd $repo/out/$case/FDS_Output_Files
+    echo pushing updated $case results to github repo
+    # git push origin master
   fi
   cd $curdir
 }
@@ -677,6 +643,47 @@ check_smv_utilities()
 }
 
 #---------------------------------------------
+#                   check_validation_cases
+#---------------------------------------------
+
+check_validation_cases()
+{
+  case=$1
+
+  cd $fdsrepo/Validation/$case
+  if [ -d Current_Results ]; then
+    nout=`ls -l Current_Results/*.out | wc -l`
+    nfds=`ls -l Current_Results/*.fds | wc -l`
+    nsuccess=`grep successfully Current_Results/*.out | wc -l`
+  fi
+  echo "" > $VALIDATION_ERROR_LOG
+  if [ $nfds -gt 0 ] && [ $nfds -gt $nout ]; then
+    if [ "$nout" == "0" ]; then
+      echo "***error: $nfds cases were run in $curdir/$case but none finished" >> $VALIDATION_ERROR_LOG
+    else
+      echo "***error: $nfds cases were run in $curdir/$case but only $nout finished" >> $VALIDATION_ERROR_LOG
+    fi
+    validation_cases=false
+  else
+    if [ $nout -gt 0 ] && [ $nout -gt $nsuccess ]; then
+      if [ $nsuccess -gt 0 ]; then
+        echo "***error: $nfds cases were run in $curdir/$case but only $nsuccess finished successfully" >> $VALIDATION_ERROR_LOG
+      else
+        echo "***error: $nfds cases were run in $curdir/$case but none finished successfully" >> $VALIDATION_ERROR_LOG
+      fi
+      validation_cases=false
+    fi
+  fi
+  if [ $nfds -gt 0 ]; then
+    if [ $nout -gt 0 ] && [ $nout -gt $nsuccess ]; then
+      cd $fdsrepo/Validation/$case/Current_Results
+      grep STOP *.out | grep -v successfully | awk -F':' '{print $1 }' | awk -F'.' '{print "***error: " $1".fds did not finish succesfully." }' >> $VALIDATION_ERROR_LOG
+      validation_cases=false
+    fi
+  fi
+}
+
+#---------------------------------------------
 #                   check_cases_release
 #---------------------------------------------
 
@@ -687,11 +694,19 @@ check_cases_release()
    # Scan for and report any errors in FDS cases
    cd $dir
 
+   validation_cases=true
+   if [ $FIREBOT_MODE == "validation" ] ; then
+      for SET in ${CURRENT_VALIDATION_SETS[*]}
+      do
+         check_validation_cases $SET
+      done
+   fi
    if [[ `grep -rI 'Run aborted' $OUTPUT_DIR/stage5` == "" ]] && \
       [[ `grep -rI Segmentation *` == "" ]] && \
       [[ `grep -rI ERROR: *` == "" ]] && \
       [[ `grep -rI 'STOP: Numerical' *` == "" ]] && \
-      [[ `grep -rI -A 20 forrtl *` == "" ]]
+      [[ `grep -rI -A 20 forrtl *` == "" ]] && \
+      [[ validation_cases == true ]]
    then
       cases_release_success=true
    else
@@ -700,6 +715,9 @@ check_cases_release()
       grep -rI ERROR: * >> $OUTPUT_DIR/stage5_errors
       grep -rI 'STOP: Numerical' * >> $OUTPUT_DIR/stage5_errors
       grep -rI -A 20 forrtl * >> $OUTPUT_DIR/stage5_errors
+      if [ $FIREBOT_MODE == "validation" ] ; then
+         cat $VALIDATION_ERROR_LOG >> $OUTPUT_DIR/stage5_errors
+      fi
 
       echo "Errors from Stage 5 - Run ${2} cases - release mode:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage5_errors >> $ERROR_LOG
@@ -1400,6 +1418,7 @@ OUTPUT_DIR="$firebotdir/output"
 HISTORY_DIR="$HOME/.firebot/history"
 TIME_LOG=$OUTPUT_DIR/timings
 ERROR_LOG=$OUTPUT_DIR/errors
+VALIDATION_ERROR_LOG=$OUTPUT_DIR/validation_errors
 WARNING_LOG=$OUTPUT_DIR/warnings
 NEWGUIDE_DIR=$OUTPUT_DIR/Newest_Guides
 
