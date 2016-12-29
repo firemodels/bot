@@ -51,7 +51,6 @@ PROCESS()
     nout=`ls -l Current_Results/*.out | wc -l`
     nfds=`ls -l Current_Results/*.fds | wc -l`
     nsuccess=`grep successfully Current_Results/*.out | wc -l`
-    ls Current_Results
   fi
   if [ $nfds -gt 0 ] && [ $nfds -gt $nout ]; then
     if [ "$nout" == "0" ]; then
