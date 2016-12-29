@@ -48,9 +48,10 @@ PROCESS()
   cd $case
   if [ -d Current_Results ]; then
     cd Current_Results
-    nout=`ls -l *.out |& grep -v cannot | wc -l`
-    nfds=`ls -l *.fds |& grep -v cannot | wc -l`
+    nout=`ls -l *.out | wc -l`
+    nfds=`ls -l *.fds | wc -l`
     nsuccess=`tail *.out |& grep successfully | wc -l`
+    ls
   fi
   echo nfds=$nfds nout=$nout nsuccess=$nsuccess
   if [ $nfds -gt 0 ] && [ $nfds -gt $nout ]; then
