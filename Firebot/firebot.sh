@@ -53,18 +53,19 @@ PROCESS()
     nsuccess=`grep successfully Current_Results/*.out | wc -l`
     ls Current_Results
   fi
-  echo nfds=$nfds nout=$nout nsuccess=$nsuccess
   if [ $nfds -gt 0 ] && [ $nfds -gt $nout ]; then
     if [ "$nout" == "0" ]; then
-      status="***error: $nfds cases were run in $curdir/$case but none finished"
+      echo "***error: $nfds cases were run in $curdir/$case but none finished" >> $ERROR_LOG
     else
-      status="***error: $nfds cases were run in $curdir/$case but only $nout finished"
+      echo "***error: $nfds cases were run in $curdir/$case but only $nout finished" >> $ERROR_LOG
     fi
-    echo "$status" >> $ERROR_LOG
   else
     if [ $nout -gt 0 ] && [ $nout -gt $nsuccess ]; then
-      status="***error: $nfds cases were run in $curdir/$case but only $nsuccess finished successfully"
-      echo "$status" >> $ERROR_LOG
+      if [ $nsuccess -gt 0 ]; then
+        echo "***error: $nfds cases were run in $curdir/$case but only $nsuccess finished successfully" >> $ERROR_LOG
+      else
+        echo "***error: $nfds cases were run in $curdir/$case but none finished successfully" >> $ERROR_LOG
+      fi
     else
       if [ $nout -gt 0 ] ; then
         cd $fdsrepo/Validation/$case
