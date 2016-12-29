@@ -84,7 +84,7 @@ PROCESS()
     fi
   fi
   if [ $nfds -gt 0 ]; then
-    echo "Summary: name:$case cases=$nfds finished=$nout successful=$nsuccess"
+    echo "   name:$case cases=$nfds finished=$nout successful=$nsuccess"
   fi
   cd $curdir
 }
@@ -426,6 +426,8 @@ generate_validation_list()
 commit_validation_results()
 {
    sleep 300
+   echo "Summary"
+   echo "-------"
    for SET in ${CURRENT_VALIDATION_SETS[*]}
    do
       # Copy new FDS files from Current_Results to FDS_Output_Files using Process_Output.sh 
