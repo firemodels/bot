@@ -45,14 +45,13 @@ PROCESS()
   nout=-1
   nfds=-1
   nsuccess=-1
-  cd $case
-  sleep 60
+
+  cd $fdsrepo/Validation/$case
   if [ -d Current_Results ]; then
     nout=`ls -l Current_Results/*.out | wc -l`
     nfds=`ls -l Current_Results/*.fds | wc -l`
     nsuccess=`grep successfully Current_Results/*.out | wc -l`
-    ls
-    echo current_dir=`pwd`
+    ls Current_Results
   fi
   echo nfds=$nfds nout=$nout nsuccess=$nsuccess
   if [ $nfds -gt 0 ] && [ $nfds -gt $nout ]; then
@@ -68,15 +67,17 @@ PROCESS()
       echo "$status" >> $ERROR_LOG
     else
       if [ $nout -gt 0 ] ; then
+        cd $fdsrepo/Validation/$case
         ./Process_Output.sh
 
         if [ "$commit" == "1" ]; then
-          cd $fdsrepo/out/$SET/FDS_Output_Files
+          cd $repo/out/$case/FDS_Output_Files
           git add *.csv *.txt
-          git commit -m "validationbot: commit $SET results"
+          git commit -m "validationbot: commit $case results"
         fi
         if [ "$push" == "1" ]; then
-          echo pushing updated $SET results to github repo
+          cd $repo/out/$case/FDS_Output_Files
+          echo pushing updated $case results to github repo
           # git push origin master
         fi
       fi
@@ -424,11 +425,11 @@ generate_validation_list()
 
 commit_validation_results()
 {
+   sleep 300
    for SET in ${CURRENT_VALIDATION_SETS[*]}
    do
       # Copy new FDS files from Current_Results to FDS_Output_Files using Process_Output.sh 
       # script for the validation set
-     cd $fdsrepo/Validation
 
      PROCESS "$SET"
    done
