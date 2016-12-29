@@ -84,7 +84,7 @@ PROCESS()
     fi
   fi
   if [ $nfds -gt 0 ]; then
-    echo "   name:$case cases=$nfds finished=$nout successful=$nsuccess"
+    echo "   $case cases=$nfds finished=$nout successful=$nsuccess"
   fi
   cd $curdir
 }
