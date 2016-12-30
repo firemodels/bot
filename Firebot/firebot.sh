@@ -656,7 +656,6 @@ check_validation_cases()
     nfds=`ls -l Current_Results/*.fds | wc -l`
     nsuccess=`grep successfully Current_Results/*.out | wc -l`
   fi
-  echo "" > $VALIDATION_ERROR_LOG
   if [ $nfds -gt 0 ] && [ $nfds -gt $nout ]; then
     if [ "$nout" == "0" ]; then
       echo "***error: $nfds cases were run in $curdir/$case but none finished" >> $VALIDATION_ERROR_LOG
@@ -720,7 +719,9 @@ check_cases_release()
       grep -rI 'STOP: Numerical' * >> $OUTPUT_DIR/stage5_errors
       grep -rI -A 20 forrtl * >> $OUTPUT_DIR/stage5_errors
       if [ $FIREBOT_MODE == "validation" ] ; then
-         cat $VALIDATION_ERROR_LOG >> $OUTPUT_DIR/stage5_errors
+         if [ -e $VALIDATION_ERROR_LOG ]; then
+            cat $VALIDATION_ERROR_LOG >> $OUTPUT_DIR/stage5_errors
+         fi
       fi
 
       echo "Errors from Stage 5 - Run ${2} cases - release mode:" >> $ERROR_LOG
