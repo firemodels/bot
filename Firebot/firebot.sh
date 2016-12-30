@@ -558,7 +558,7 @@ check_cases_debug()
       source $OUTPUT_DIR/stage4_filelist
 
       # If errors encountered in validation mode, then email status and exit
-      if [ $FIREBOT_MODE == "validation" ] ; then
+      if [ "$FIREBOT_MODE" == "validation" ] ; then
          email_build_status 'Validationbot'
          set_files_world_readable
          exit
@@ -662,7 +662,7 @@ check_validation_cases()
     else
       echo "***error: $nfds cases were run in $curdir/$case but only $nout finished" >> $VALIDATION_ERROR_LOG
     fi
-    validation_cases=false
+    validation_cases="false"
   else
     if [ $nout -gt 0 ] && [ $nout -gt $nsuccess ]; then
       if [ $nsuccess -gt 0 ]; then
@@ -670,14 +670,14 @@ check_validation_cases()
       else
         echo "***error: $nfds cases were run in $curdir/$case but none finished successfully" >> $VALIDATION_ERROR_LOG
       fi
-      validation_cases=false
+      validation_cases="false"
     fi
   fi
   if [ $nfds -gt 0 ]; then
     if [ $nout -gt 0 ] && [ $nout -gt $nsuccess ]; then
       cd $fdsrepo/Validation/$case/Current_Results
       grep STOP *.out | grep -v successfully | awk -F':' '{print $1 }' | awk -F'.' '{print "***error: " $1".fds did not finish succesfully." }' >> $VALIDATION_ERROR_LOG
-      validation_cases=false
+      validation_cases="false"
     fi
   fi
 }
@@ -689,15 +689,16 @@ check_validation_cases()
 check_cases_release()
 {
    local dir=$1
-   local type=$2
-   local status=$3
+   local status=$2
 
    # Scan for and report any errors in FDS cases
    cd $dir
 
-   validation_cases=true
-   if [ $FIREBOT_MODE == "validation" ] ; then
+   validation_cases="true"
+   echo status=$status
+   if [ "$FIREBOT_MODE" == "validation" ] ; then
       if [ "$status" == "final" ]; then
+        echo before check_validation_cases
         for SET in ${CURRENT_VALIDATION_SETS[*]}
         do
            check_validation_cases $SET
@@ -709,7 +710,7 @@ check_cases_release()
       [[ `grep -rI ERROR: *` == "" ]] && \
       [[ `grep -rI 'STOP: Numerical' *` == "" ]] && \
       [[ `grep -rI -A 20 forrtl *` == "" ]] && \
-      [[ validation_cases == true ]]
+      [[ "$validation_cases" == "true" ]]
    then
       cases_release_success=true
    else
@@ -718,7 +719,7 @@ check_cases_release()
       grep -rI ERROR: * >> $OUTPUT_DIR/stage5_errors
       grep -rI 'STOP: Numerical' * >> $OUTPUT_DIR/stage5_errors
       grep -rI -A 20 forrtl * >> $OUTPUT_DIR/stage5_errors
-      if [ $FIREBOT_MODE == "validation" ] ; then
+      if [ "$FIREBOT_MODE" == "validation" ] ; then
          if [ -e $VALIDATION_ERROR_LOG ]; then
             cat $VALIDATION_ERROR_LOG >> $OUTPUT_DIR/stage5_errors
          fi
@@ -729,7 +730,7 @@ check_cases_release()
       echo "" >> $ERROR_LOG
 
       # If errors encountered in validation mode, then email status and exit
-      if [ $FIREBOT_MODE == "validation" ] ; then
+      if [ "$FIREBOT_MODE" == "validation" ] ; then
          email_build_status 'Validationbot'
          # Stop all Validationbot cases in queue system
          qdel all
@@ -753,8 +754,8 @@ wait_cases_release_end()
         echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage5
         TIME_LIMIT_STAGE="5"
         check_time_limit
-        if [ $FIREBOT_MODE == "validation" ] ; then
-          check_cases_release $fdsrepo/Validation 'validation' 'interim'
+        if [ "$FIREBOT_MODE" == "validation" ] ; then
+          check_cases_release $fdsrepo/Validation 'interim'
           sleep 300
         fi
         sleep 60
@@ -765,8 +766,8 @@ wait_cases_release_end()
         echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage5
         TIME_LIMIT_STAGE="5"
         check_time_limit
-        if [ $FIREBOT_MODE == "validation" ] ; then
-           check_cases_release $fdsrepo/Validation 'validation' 'interim'
+        if [ "$FIREBOT_MODE" == "validation" ] ; then
+           check_cases_release $fdsrepo/Validation 'interim'
            sleep 60
         fi
         sleep 60
@@ -1358,7 +1359,7 @@ email_build_status()
    echo "          host: $hostname " >> $TIME_LOG
    echo "            OS: $platform2 " >> $TIME_LOG
    echo "          Repo: $repo " >> $TIME_LOG
-   if [ $FIREBOT_MODE == "validation" ] ; then
+   if [ "$FIREBOT_MODE" == "validation" ] ; then
       echo "Validation Set(s): ${CURRENT_VALIDATION_SETS[*]} " >> $TIME_LOG
    fi
 
@@ -1641,7 +1642,7 @@ TIME_LIMIT=43200
 TIME_LIMIT_EMAIL_NOTIFICATION="unsent"
 
 # Disable time limit email for validation bot
-if [ $FIREBOT_MODE == "validation" ] ; then
+if [ "$FIREBOT_MODE" == "validation" ] ; then
    TIME_LIMIT_EMAIL_NOTIFICATION="sent"
 fi
 
@@ -1680,7 +1681,7 @@ archive_compiler_version
 ### Stage 2a ###
 echo Building
 echo "   FDS"
-if [ $FIREBOT_MODE == "verification" ] ; then
+if [ "$FIREBOT_MODE" == "verification" ] ; then
   if [ "$FIREBOT_LITE" == "" ]; then
     inspect_fds_db
     check_inspect_fds_db
@@ -1697,7 +1698,7 @@ if [ "$FIREBOT_LITE" == "" ]; then
   check_compile_fds_mpi
 
 ### Stage 3a ###
-  if [ $FIREBOT_MODE == "verification" ] ; then
+  if [ "$FIREBOT_MODE" == "verification" ] ; then
     compile_smv_utilities
     check_smv_utilities
 
@@ -1713,7 +1714,7 @@ fi
 
 ### Stage 4 ###
 
-if [ $FIREBOT_MODE == "validation" ] ; then
+if [ "$FIREBOT_MODE" == "validation" ] ; then
   if [ "$caselistfile" == "" ]; then
     generate_validation_list
   else
@@ -1723,12 +1724,12 @@ fi
 
 # Depends on successful FDS debug compile
 if [[ $FDS_debug_success ]] ; then
-  if [[ $FIREBOT_MODE == "verification" ]] ; then
+  if [[ "$FIREBOT_MODE" == "verification" ]] ; then
      run_verification_cases_debug
      check_cases_debug $fdsrepo/Verification 'verification'
   fi
 
-  if [[ $FIREBOT_MODE == "validation" ]] ; then
+  if [[ "$FIREBOT_MODE" == "validation" ]] ; then
      run_validation_cases_debug
      check_cases_debug $fdsrepo/Validation 'validation'
   fi
@@ -1738,12 +1739,12 @@ if [ "$FIREBOT_LITE" == "" ]; then
 # clean debug stage
   cd $fdsrepo
   if [[ "$CLEANREPO" == "1" ]] ; then
-     if [[ $FIREBOT_MODE == "verification" ]] ; then
+     if [[ "$FIREBOT_MODE" == "verification" ]] ; then
        echo "   cleaning Verification"
        clean_repo $fdsrepo/Verification $fdsbranch || exit 1
      fi
   fi
-  if [[ $FIREBOT_MODE == "validation" ]] ; then
+  if [[ "$FIREBOT_MODE" == "validation" ]] ; then
     echo "   cleaning Validation"
     clean_repo $fdsrepo/Validation $fdsbranch || exit 1
   fi
@@ -1751,13 +1752,13 @@ if [ "$FIREBOT_LITE" == "" ]; then
 ### Stage 5 ###
 # Depends on successful FDS compile
   if [[ $FDS_release_success ]] ; then
-    if [[ $FIREBOT_MODE == "verification" ]] ; then
+    if [[ "$FIREBOT_MODE" == "verification" ]] ; then
        run_verification_cases_release
-       check_cases_release $fdsrepo/Verification 'verification' 'final'
+       check_cases_release $fdsrepo/Verification 'final'
     fi
-    if [[ $FIREBOT_MODE == "validation" ]] ; then
+    if [[ "$FIREBOT_MODE" == "validation" ]] ; then
        run_validation_cases_release
-       check_cases_release $fdsrepo/Validation 'validation' 'final'
+       check_cases_release $fdsrepo/Validation 'final'
        if [[ $cases_debug_success && $cases_release_success ]] ; then
          commit_validation_results
        fi
