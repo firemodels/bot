@@ -690,16 +690,20 @@ check_validation_cases()
 check_cases_release()
 {
    local dir=$1
+   local type=$2
+   local status=$3
 
    # Scan for and report any errors in FDS cases
    cd $dir
 
    validation_cases=true
    if [ $FIREBOT_MODE == "validation" ] ; then
-      for SET in ${CURRENT_VALIDATION_SETS[*]}
-      do
-         check_validation_cases $SET
-      done
+      if [ "$status" == "final" ]; then
+        for SET in ${CURRENT_VALIDATION_SETS[*]}
+        do
+           check_validation_cases $SET
+        done
+      fi
    fi
    if [[ `grep -rI 'Run aborted' $OUTPUT_DIR/stage5` == "" ]] && \
       [[ `grep -rI Segmentation *` == "" ]] && \
@@ -749,7 +753,7 @@ wait_cases_release_end()
         TIME_LIMIT_STAGE="5"
         check_time_limit
         if [ $FIREBOT_MODE == "validation" ] ; then
-          check_cases_release $fdsrepo/Validation 'validation'
+          check_cases_release $fdsrepo/Validation 'validation' 'interim'
           sleep 300
         fi
         sleep 60
@@ -761,8 +765,8 @@ wait_cases_release_end()
         TIME_LIMIT_STAGE="5"
         check_time_limit
         if [ $FIREBOT_MODE == "validation" ] ; then
-           check_cases_release $fdsrepo/Validation 'validation'
-           sleep 300
+           check_cases_release $fdsrepo/Validation 'validation' 'interim'
+           sleep 60
         fi
         sleep 60
      done
@@ -1748,11 +1752,11 @@ if [ "$FIREBOT_LITE" == "" ]; then
   if [[ $FDS_release_success ]] ; then
     if [[ $FIREBOT_MODE == "verification" ]] ; then
        run_verification_cases_release
-       check_cases_release $fdsrepo/Verification 'verification'
+       check_cases_release $fdsrepo/Verification 'verification' 'final'
     fi
     if [[ $FIREBOT_MODE == "validation" ]] ; then
        run_validation_cases_release
-       check_cases_release $fdsrepo/Validation 'validation'
+       check_cases_release $fdsrepo/Validation 'validation' 'final'
        if [[ $cases_debug_success && $cases_release_success ]] ; then
          commit_validation_results
        fi
