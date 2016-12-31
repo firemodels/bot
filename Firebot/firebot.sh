@@ -701,6 +701,8 @@ check_cases_release()
    validation_cases="true"
    if [ "$FIREBOT_MODE" == "validation" ] ; then
       if [ "$status" == "final" ]; then
+        sleep 60
+        echo status="xxx$status" xxxfinal
         for SET in ${CURRENT_VALIDATION_SETS[*]}
         do
            check_validation_cases $SET
@@ -765,7 +767,6 @@ wait_cases_release_end()
    else
      while [[ `qstat -a | awk '{print $2 $4}' | grep $(whoami) | grep $JOBPREFIX` != '' ]]; do
         JOBS_REMAINING=`qstat -a | awk '{print $2 $4}' | grep $(whoami) | grep $JOBPREFIX | wc -l`
-        echo JOBS_REMAINING=$JOBS_REMAINING
         echo "Waiting for ${JOBS_REMAINING} validation cases to complete." >> $OUTPUT_DIR/stage5
         TIME_LIMIT_STAGE="5"
         check_time_limit
