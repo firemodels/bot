@@ -196,7 +196,7 @@ clean_repo2()
       echo "   $reponame"
       clean_repo $repo/$reponame $branch || return 1
    else
-      echo "firebot repo $repo does not exist" >> $OUTPUT_DIR/stage1 2>&1
+      echo "firebot repo $repo does not exist." >> $OUTPUT_DIR/stage1 2>&1
       echo "firebot run aborted." >> $OUTPUT_DIR/stage1 2>&1
       return 1
    fi
@@ -1560,7 +1560,7 @@ else
 fi
 if [ "$caselistfile" != "" ]; then
   if [ ! -e $caselistfile ]; then
-     echo "***error: $caselistfile does not exist)"
+     echo "***error: $caselistfile does not exist."
      echo "aborting firebot"
      exit
   fi
