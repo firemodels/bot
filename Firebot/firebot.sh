@@ -695,10 +695,8 @@ check_cases_release()
    cd $dir
 
    validation_cases="true"
-   echo status=$status
    if [ "$FIREBOT_MODE" == "validation" ] ; then
       if [ "$status" == "final" ]; then
-        echo before check_validation_cases
         for SET in ${CURRENT_VALIDATION_SETS[*]}
         do
            check_validation_cases $SET
@@ -733,7 +731,7 @@ check_cases_release()
       if [ "$FIREBOT_MODE" == "validation" ] ; then
          email_build_status 'Validationbot'
          # Stop all Validationbot cases in queue system
-         qdel all
+         qdel all >& /dev/null
          set_files_world_readable
          exit
       fi
