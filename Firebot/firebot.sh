@@ -40,19 +40,19 @@ exit
 
 PROCESS()
 {
-  case=$1
-  curdir=`pwd`
+  local case=$1
+  local curdir=`pwd`
 
   cd $fdsrepo/Validation/$case
   ./Process_Output.sh
 
   if [ "$commit" == "1" ]; then
-    cd $repo/out/$case/FDS_Output_Files
+    cd $outrepo/$case/FDS_Output_Files
     git add *.csv *.txt
     git commit -m "validationbot: commit $case results"
   fi
   if [ "$push" == "1" ]; then
-    cd $repo/out/$case/FDS_Output_Files
+    cd $outrepo/$case/FDS_Output_Files
     echo pushing updated $case results to github repo
     # git push origin master
   fi
@@ -395,7 +395,6 @@ generate_validation_list()
 
 commit_validation_results()
 {
-   sleep 300
    echo "Summary"
    echo "-------"
    for SET in ${CURRENT_VALIDATION_SETS[*]}
@@ -758,7 +757,7 @@ wait_cases_release_end()
         check_time_limit
         if [ "$FIREBOT_MODE" == "validation" ] ; then
           check_cases_release $fdsrepo/Validation 'interim'
-          sleep 300
+          sleep 240
         fi
         sleep 60
      done
@@ -770,7 +769,7 @@ wait_cases_release_end()
         check_time_limit
         if [ "$FIREBOT_MODE" == "validation" ] ; then
            check_cases_release $fdsrepo/Validation 'interim'
-           sleep 60
+           sleep 240
         fi
         sleep 60
      done
@@ -1591,6 +1590,12 @@ CD_REPO $smvrepo $smvbranch || exit 1
 
 botrepo=$repo/bot
 CD_REPO $botrepo $botbranch || exit 1
+
+if [ "$FIREBOT_MODE" == "validation" ]; then
+  outrepo=$repo/out
+  CD_REPO $outrepo master || exit 1
+fi
+
 cd $firebotdir
 
 #*** save pid in case we want to kill firebot later
