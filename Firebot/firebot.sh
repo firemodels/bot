@@ -661,17 +661,17 @@ check_validation_cases()
   fi
   if [ $nfds -gt 0 ] && [ $nfds -gt $nout ]; then
     if [ "$nout" == "0" ]; then
-      echo "***error: $nfds cases were run in $curdir/$case but none finished" >> $VALIDATION_ERROR_LOG
+      echo "***error: $nfds $case cases were run but none finished" >> $VALIDATION_ERROR_LOG
     else
-      echo "***error: $nfds cases were run in $curdir/$case but only $nout finished" >> $VALIDATION_ERROR_LOG
+      echo "***error: $nfds $case cases were run but only $nout finished" >> $VALIDATION_ERROR_LOG
     fi
     validation_cases="false"
   else
     if [ $nout -gt 0 ] && [ $nout -gt $nsuccess ]; then
       if [ $nsuccess -gt 0 ]; then
-        echo "***error: $nfds cases were run in $curdir/$case but only $nsuccess finished successfully" >> $VALIDATION_ERROR_LOG
+        echo "***error: $nfds $case cases were run but only $nsuccess finished successfully" >> $VALIDATION_ERROR_LOG
       else
-        echo "***error: $nfds cases were run in $curdir/$case but none finished successfully" >> $VALIDATION_ERROR_LOG
+        echo "***error: $nfds $case cases were run but none finished successfully" >> $VALIDATION_ERROR_LOG
       fi
       validation_cases="false"
     fi
@@ -764,14 +764,15 @@ wait_cases_release_end()
    else
      while [[ `qstat -a | awk '{print $2 $4}' | grep $(whoami) | grep $JOBPREFIX` != '' ]]; do
         JOBS_REMAINING=`qstat -a | awk '{print $2 $4}' | grep $(whoami) | grep $JOBPREFIX | wc -l`
-        echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage5
+        echo JOBS_REMAINING=$JOBS_REMAINING
+        echo "Waiting for ${JOBS_REMAINING} validation cases to complete." >> $OUTPUT_DIR/stage5
         TIME_LIMIT_STAGE="5"
         check_time_limit
         if [ "$FIREBOT_MODE" == "validation" ] ; then
            check_cases_release $fdsrepo/Validation 'interim'
-           sleep 240
+           sleep 30
         fi
-        sleep 60
+        sleep 30
      done
    fi
 }
