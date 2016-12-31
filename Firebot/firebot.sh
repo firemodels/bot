@@ -509,7 +509,7 @@ run_validation_cases_debug()
       # Submit FDS validation cases and wait for them to start
       echo "Running FDS validation cases for ${SET}:" >> $OUTPUT_DIR/stage4
       echo "" >> $OUTPUT_DIR/stage4 2>&1
-      ./Run_All.sh -j $JOBPREFIX -b -m 1 -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
+      ./Run_All.sh -y -j $JOBPREFIX -b -m 1 -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
 
       CURRENT_VALIDATION_SETS+=($SET)
 
@@ -701,8 +701,6 @@ check_cases_release()
    validation_cases="true"
    if [ "$FIREBOT_MODE" == "validation" ] ; then
       if [ "$status" == "final" ]; then
-        sleep 60
-        echo status="xxx$status" xxxfinal
         for SET in ${CURRENT_VALIDATION_SETS[*]}
         do
            check_validation_cases $SET
@@ -824,7 +822,7 @@ run_validation_cases_release()
       echo "Running FDS validation cases:" >> $OUTPUT_DIR/stage5
       echo "Validation Set: ${SET}" >> $OUTPUT_DIR/stage5
       echo "" >> $OUTPUT_DIR/stage5 2>&1
-      ./Run_All.sh $DV2 -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
+      ./Run_All.sh -y $DV2 -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
       echo "" >> $OUTPUT_DIR/stage5 2>&1
    done
 
@@ -1757,9 +1755,7 @@ if [[ $FDS_debug_success ]] ; then
   if [[ "$FIREBOT_MODE" == "verification" ]] ; then
      run_verification_cases_debug
      check_cases_debug $fdsrepo/Verification 'verification'
-  fi
-
-  if [[ "$FIREBOT_MODE" == "validation" ]] ; then
+  else
      run_validation_cases_debug
      check_cases_debug $fdsrepo/Validation 'validation'
   fi
@@ -1770,13 +1766,12 @@ if [ "$FIREBOT_LITE" == "" ]; then
   cd $fdsrepo
   if [[ "$CLEANREPO" == "1" ]] ; then
      if [[ "$FIREBOT_MODE" == "verification" ]] ; then
-       echo "   cleaning Verification"
-       clean_repo $fdsrepo/Verification $fdsbranch || exit 1
+        echo "   cleaning Verification"
+        clean_repo $fdsrepo/Verification $fdsbranch || exit 1
+     else
+        echo "   cleaning Validation"
+        clean_repo $fdsrepo/Validation $fdsbranch || exit 1
      fi
-  fi
-  if [[ "$FIREBOT_MODE" == "validation" ]] ; then
-    echo "   cleaning Validation"
-    clean_repo $fdsrepo/Validation $fdsbranch || exit 1
   fi
 
 ### Stage 5 ###
@@ -1785,8 +1780,7 @@ if [ "$FIREBOT_LITE" == "" ]; then
     if [[ "$FIREBOT_MODE" == "verification" ]] ; then
        run_verification_cases_release
        check_cases_release $fdsrepo/Verification 'final'
-    fi
-    if [[ "$FIREBOT_MODE" == "validation" ]] ; then
+    else
        run_validation_cases_release
        check_cases_release $fdsrepo/Validation 'final'
        if [[ $cases_debug_success && $cases_release_success ]] ; then
@@ -1848,6 +1842,6 @@ if [ "$FIREBOT_MODE" == "verification" ]; then
     archive_timing_stats
   fi
   email_build_status 'Firebot'
-elif [ "$FIREBOT_MODE" == "validation" ]; then
+else
   email_build_status 'Validationbot'
 fi
