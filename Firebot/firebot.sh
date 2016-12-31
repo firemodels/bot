@@ -1560,7 +1560,7 @@ else
 fi
 if [ "$caselistfile" != "" ]; then
   if [ ! -e $caselistfile ]; then
-     echo "***error: $caselistfile does not exit)"
+     echo "***error: $caselistfile does not exist)"
      echo "aborting firebot"
      exit
   fi
