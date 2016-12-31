@@ -1557,10 +1557,17 @@ else
 fi
 if [ "$caselistfile" != "" ]; then
   if [ ! -e $caselistfile ]; then
-     echo "***error: $caselistfile does not exit (must use full path name)"
-     echo "aborting validationbot"
+     echo "***error: $caselistfile does not exit)"
+     echo "aborting firebot"
      exit
   fi
+  casedir=$(dirname "${caselistfile}")
+  casename=$(basename "${caselistfile}")
+  ccurdir=`pwd`
+  cd $casedir
+  casedir=`pwd`
+  caselistfile=$casedir/$casename
+  cd $ccurdir
 fi
 
 if [ "$push" == "1" ]; then
