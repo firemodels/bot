@@ -676,7 +676,7 @@ check_validation_cases()
   if [ $nfds -gt 0 ]; then
     if [ $nout -gt 0 ] && [ $nout -gt $nsuccess ]; then
       cd $fdsrepo/Validation/$case/Current_Results
-      grep STOP *.out | grep -v successfully | awk -F':' '{print $1 }' | awk -F'.' '{print "***error: " $1".fds did not finish succesfully." }' >> $VALIDATION_ERROR_LOG
+      grep STOP *.out | grep -v successfully | awk -F':' '{print $1 }' | awk -F'.' '{print "***error: " $1".fds did not finish successfully." }' >> $VALIDATION_ERROR_LOG
       validation_cases="false"
     fi
   fi
