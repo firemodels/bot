@@ -1555,6 +1555,13 @@ else
   echo "          Aborting firebot"
   exit
 fi
+if [ "$caselistfile" != "" ]; then
+  if [ ! -e $caselistfile ]; then
+     echo "***error: $caselistfile does not exit (must use full path name)"
+     echo "aborting validationbot"
+     exit
+  fi
+fi
 
 if [ "$push" == "1" ]; then
   commit=1
