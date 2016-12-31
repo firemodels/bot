@@ -18,6 +18,7 @@ echo "-D - specify validation case list file"
 echo "-F - skip figures and document building stages"
 echo "-h - display this message"
 echo "-i - use installed version of smokeview"
+echo "-I - use development version of FDS"
 echo "-L - firebot lite,  run only stages that build a debug fds and run cases with it"
 echo "                    (no release fds, no release cases, no matlab, etc)"
 echo "-m email_address "
@@ -579,7 +580,7 @@ compile_fds_mpi()
    echo "      MPI release"
    echo "" > $OUTPUT_DIR/stage2c
    if [ "$debug_mode" == "" ]; then
-     cd $fdsrepo/Build/mpi_intel_${platform}${size}$IB
+     cd $fdsrepo/Build/mpi_intel_${platform}${size}$IB$DV
      make -f ../makefile clean &> /dev/null
      ./make_fds.sh &> $OUTPUT_DIR/stage2c
    fi
@@ -592,8 +593,8 @@ compile_fds_mpi()
 check_compile_fds_mpi()
 {
    # Check for errors in FDS MPI compilation
-   cd $fdsrepo/Build/mpi_intel_${platform}${size}$IB
-   if [ -e "fds_mpi_intel_${platform}${size}$IB" ]
+   cd $fdsrepo/Build/mpi_intel_${platform}${size}$IB$DV
+   if [ -e "fds_mpi_intel_${platform}${size}$IB$DV" ]
    then
       FDS_release_success=true
    else
@@ -789,14 +790,14 @@ run_verification_cases_release()
    cd $fdsrepo/Verification/scripts
    # Run FDS with 1 OpenMP thread
    echo 'Running FDS benchmark verification cases:' >> $OUTPUT_DIR/stage5
-   ./Run_FDS_Cases.sh -b -o 1 -q $QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage5 2>&1
+   ./Run_FDS_Cases.sh $DV2 -b -o 1 -q $QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage5 2>&1
    echo "" >> $OUTPUT_DIR/stage5 2>&1
 
    # Wait for benchmark verification cases to end
    wait_cases_release_end 'verification'
 
    echo 'Running FDS non-benchmark verification cases:' >> $OUTPUT_DIR/stage5
-   ./Run_FDS_Cases.sh -R -o 1 -q $QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage5 2>&1
+   ./Run_FDS_Cases.sh $DV2 -R -o 1 -q $QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage5 2>&1
    echo "" >> $OUTPUT_DIR/stage5 2>&1
 
    # Wait for non-benchmark verification cases to end
@@ -822,7 +823,7 @@ run_validation_cases_release()
       echo "Running FDS validation cases:" >> $OUTPUT_DIR/stage5
       echo "Validation Set: ${SET}" >> $OUTPUT_DIR/stage5
       echo "" >> $OUTPUT_DIR/stage5 2>&1
-      ./Run_All.sh -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
+      ./Run_All.sh $DV2 -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
       echo "" >> $OUTPUT_DIR/stage5 2>&1
    done
 
@@ -1479,10 +1480,12 @@ FIREBOT_LITE=
 caselistfile=""
 showcaselist=
 debug_mode=
+DV=
+DV2=
 
 #*** parse command line arguments
 
-while getopts 'b:cCdD:FhiLm:p:Pq:sSuUV:' OPTION
+while getopts 'b:cCdD:FhIiLm:p:Pq:sSuUV:' OPTION
 do
 case $OPTION in
   b)
@@ -1506,6 +1509,10 @@ case $OPTION in
    ;;
   h)
    usage;
+   ;;
+  I)
+   DV="_dv"
+   DV2="-u"
    ;;
   i)
    USEINSTALL="-r"
