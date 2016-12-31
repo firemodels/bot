@@ -14,11 +14,22 @@ echo ""
 echo "Options:"
 #echo "-b - branch_name - run firebot using branch_name [default: $BRANCH]"
 echo "-c - clean repo"
+echo "-h - display this message"
+echo "-k - kill firebot if it is running"
+echo "-q queue - specify queue [default: $QUEUE]"
+echo "-u - update repos"
+echo "-v - show options used to run firebot"
+echo "validationbot mode:"
+echo "-C - commit validationbot output results"
+echo "-D caselist - specify file containing list of validationbot cases"
+echo "-K - kill validationbot if it is running"
+echo "-P - commit and push (to github repo) validationbot output results (not implemented)"
+echo "-S - show list validationbot cases"
+echo "-V n - run firebot in validationbot mode with specified number (n) of processes"
+echo "Miscellaneous:"
+echo "-i - use installed version of smokeview"
 echo "-f - force firebot run"
 echo "-F - skip figure generation and build document stages"
-echo "-h - display this message"
-echo "-i - use installed version of smokeview"
-echo "-k - kill firebot if it is running"
 echo "-L - firebot lite,  run only stages that build a debug fds and run cases with it"
 echo "                    (no release fds, no release cases, no matlab, etc)"
 if [ "$EMAIL" != "" ]; then
@@ -26,11 +37,8 @@ if [ "$EMAIL" != "" ]; then
 else
   echo "-m email_address "
 fi
-echo "-q queue - specify queue [default: $QUEUE]"
 echo "-s - skip matlab and build document stages"
-echo "-u - update repo"
 echo "-U - upload guides (only by user firebot)"
-echo "-v - show options used to run firebot"
 exit
 }
 
@@ -130,9 +138,16 @@ SKIPMATLAB=
 SKIPFIGURES=
 FIREBOT_LITE=
 KILL_FIREBOT=
+PREFIX=FB_
 ECHO=
+MAX_VALIDATION_PROCESSES=
+commit=
+push=
+caselistfile=""
+showcaselist=
+debug_mode=
 
-while getopts 'b:cFfhikLm:q:nsuUv' OPTION
+while getopts 'b:cdCD:FfhiKkLm:Pq:nsSuUvV:' OPTION
 do
 case $OPTION  in
   b)
@@ -141,6 +156,15 @@ case $OPTION  in
    ;;
   c)
    CLEANREPO=1
+   ;;
+  C)
+   commit=-C
+   ;;
+  d)
+    debug_mode="-d "
+   ;;
+  D)
+    caselistfile="-D $OPTARG"
    ;;
   f)
    FORCE=1
@@ -157,6 +181,10 @@ case $OPTION  in
   k)
    KILL_FIREBOT="1"
    ;;
+  K)
+   KILL_FIREBOT="1"
+   PREFIX=VB_
+   ;;
   L)
    FIREBOT_LITE=-L
    ;;
@@ -169,8 +197,14 @@ case $OPTION  in
   n)
    UPDATEREPO=0
    ;;
+  P)
+   push=-P
+   ;;
   s)
    SKIPMATLAB=-s
+   ;;
+  S)
+   showcaselist="-S"
    ;;
   u)
    UPDATEREPO=1
@@ -181,6 +215,9 @@ case $OPTION  in
   v)
    RUNFIREBOT=0
    ECHO=echo
+   ;;
+  V)
+   MAX_VALIDATION_PROCESSES="-V $OPTARG"
    ;;
 esac
 done
@@ -194,7 +231,7 @@ if [ "$KILL_FIREBOT" == "1" ]; then
     echo "killing firebot (PID=$PID)"
     kill -9 $PID
     if [ "$QUEUE" != "none" ]; then
-      JOBIDS=`qstat -a | grep FB_ | awk -v user="$USER" '{if($2==user){print $1}}'`
+      JOBIDS=`qstat -a | grep $PREFIX | awk -v user="$USER" '{if($2==user){print $1}}' | awk -F'.' '{print $1}'`
       if [ "$JOBIDS" != "" ]; then
         echo killing firebot jobs with Id:$JOBIDS
         qdel $JOBIDS
@@ -236,7 +273,7 @@ fi
 BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
-$ECHO  ./$botscript -p $firebot_pid $UPDATE $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $EMAIL "$@"
+$ECHO  ./$botscript -p $firebot_pid $commit $push $UPDATE $debug_mode $showcaselist $caselistfile $MAX_VALIDATION_PROCESSES $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $EMAIL "$@"
 if [ -e $firebot_pid ]; then
   rm $firebot_pid
 fi
