@@ -71,10 +71,12 @@ goto eof
      git merge firemodels/%BRANCH%
      if "%PUSH%" == "0" goto skip2
         git status -uno | %grep% ahead | %wc% -l > %CURDIR%\ahead.out
-        set /p ahead=<%CURDIR%\ahead.out
-        if %ahead% GTR 0 (
-           echo pushing %ahead% changes to origin
-           git push origin %BRANCH%
+        if exist %CURDIR%\ahead.out (
+           set /p ahead=<%CURDIR%\ahead.out
+           if %ahead% GTR 0 (
+              echo pushing %ahead% changes to origin
+              git push origin %BRANCH%
+           )
         )
      )
   :skip1
@@ -138,6 +140,12 @@ echo -p - push updates to remote origin
 exit /b
 
 :eof
-erase %CURDIR%\gitbranch.out
-erase %CURDIR%\have_central.out
-erase %CURDIR%\ahead.out
+if exist %CURDIR%\gitbranch.out (
+  erase %CURDIR%\gitbranch.out
+)
+if exist %CURDIR%\have_central.out (
+  erase %CURDIR%\have_central.out
+)
+if %CURDIR%\ahead.out (
+  erase %CURDIR%\ahead.out
+)
