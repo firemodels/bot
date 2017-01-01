@@ -655,12 +655,16 @@ check_validation_cases()
   case=$1
 
   cd $fdsrepo/Validation/$case
+  nfds=0
   if [ -d Current_Results ]; then
-    nout=`ls -l Current_Results/*.out | wc -l`
-    nfds=`ls -l Current_Results/*.fds | wc -l`
-    nsuccess=`grep successfully Current_Results/*.out | wc -l`
+    nfds=`ls -l Current_Results/*.fds 2> /dev/null | wc -l`
   fi
-  if [ $nfds -gt 0 ] && [ $nfds -gt $nout ]; then
+  if [ $nfds -eq 0 ]; then
+     exit
+  fi
+  nout=`ls -l Current_Results/*.out 2> /dev/null | wc -l`
+  nsuccess=`grep successfully Current_Results/*.out 2> /dev/null | wc -l`
+  if [ $nfds -gt $nout ]; then
     if [ "$nout" == "0" ]; then
       echo "***error: $nfds $case cases were run but none finished" >> $VALIDATION_ERROR_LOG
     else
@@ -668,7 +672,7 @@ check_validation_cases()
     fi
     validation_cases="false"
   else
-    if [ $nout -gt 0 ] && [ $nout -gt $nsuccess ]; then
+    if [ $nout -gt $nsuccess ]; then
       if [ $nsuccess -gt 0 ]; then
         echo "***error: $nfds $case cases were run but only $nsuccess finished successfully" >> $VALIDATION_ERROR_LOG
       else
@@ -677,12 +681,10 @@ check_validation_cases()
       validation_cases="false"
     fi
   fi
-  if [ $nfds -gt 0 ]; then
-    if [ $nout -gt 0 ] && [ $nout -gt $nsuccess ]; then
-      cd $fdsrepo/Validation/$case/Current_Results
-      grep STOP *.out | grep -v successfully | awk -F':' '{print $1 }' | awk -F'.' '{print "***error: " $1".fds did not finish successfully." }' >> $VALIDATION_ERROR_LOG
-      validation_cases="false"
-    fi
+  if [ $nout -gt 0 ] && [ $nout -gt $nsuccess ]; then
+    cd $fdsrepo/Validation/$case/Current_Results
+    grep STOP *.out | grep -v successfully | awk -F':' '{print $1 }' | awk -F'.' '{print "***error: " $1".fds did not finish successfully." }' >> $VALIDATION_ERROR_LOG
+    validation_cases="false"
   fi
 }
 
