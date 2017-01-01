@@ -18,6 +18,7 @@ echo "-D - specify validation case list file"
 echo "-F - skip figures and document building stages"
 echo "-h - display this message"
 echo "-i - use installed version of smokeview"
+echo "-I - use development version of FDS"
 echo "-L - firebot lite,  run only stages that build a debug fds and run cases with it"
 echo "                    (no release fds, no release cases, no matlab, etc)"
 echo "-m email_address "
@@ -508,7 +509,7 @@ run_validation_cases_debug()
       # Submit FDS validation cases and wait for them to start
       echo "Running FDS validation cases for ${SET}:" >> $OUTPUT_DIR/stage4
       echo "" >> $OUTPUT_DIR/stage4 2>&1
-      ./Run_All.sh -j $JOBPREFIX -b -m 1 -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
+      ./Run_All.sh -y -j $JOBPREFIX -b -m 1 -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
 
       CURRENT_VALIDATION_SETS+=($SET)
 
@@ -579,7 +580,7 @@ compile_fds_mpi()
    echo "      MPI release"
    echo "" > $OUTPUT_DIR/stage2c
    if [ "$debug_mode" == "" ]; then
-     cd $fdsrepo/Build/mpi_intel_${platform}${size}$IB
+     cd $fdsrepo/Build/mpi_intel_${platform}${size}$IB$DV
      make -f ../makefile clean &> /dev/null
      ./make_fds.sh &> $OUTPUT_DIR/stage2c
    fi
@@ -592,8 +593,8 @@ compile_fds_mpi()
 check_compile_fds_mpi()
 {
    # Check for errors in FDS MPI compilation
-   cd $fdsrepo/Build/mpi_intel_${platform}${size}$IB
-   if [ -e "fds_mpi_intel_${platform}${size}$IB" ]
+   cd $fdsrepo/Build/mpi_intel_${platform}${size}$IB$DV
+   if [ -e "fds_mpi_intel_${platform}${size}$IB$DV" ]
    then
       FDS_release_success=true
    else
@@ -654,34 +655,36 @@ check_validation_cases()
   case=$1
 
   cd $fdsrepo/Validation/$case
+  nfds=0
   if [ -d Current_Results ]; then
-    nout=`ls -l Current_Results/*.out | wc -l`
-    nfds=`ls -l Current_Results/*.fds | wc -l`
-    nsuccess=`grep successfully Current_Results/*.out | wc -l`
+    nfds=`ls -l Current_Results/*.fds 2> /dev/null | wc -l`
   fi
-  if [ $nfds -gt 0 ] && [ $nfds -gt $nout ]; then
+  if [ $nfds -eq 0 ]; then
+     exit
+  fi
+  nout=`ls -l Current_Results/*.out 2> /dev/null | wc -l`
+  nsuccess=`grep successfully Current_Results/*.out 2> /dev/null | wc -l`
+  if [ $nfds -gt $nout ]; then
     if [ "$nout" == "0" ]; then
-      echo "***error: $nfds cases were run in $curdir/$case but none finished" >> $VALIDATION_ERROR_LOG
+      echo "***error: $nfds $case cases were run but none finished" >> $VALIDATION_ERROR_LOG
     else
-      echo "***error: $nfds cases were run in $curdir/$case but only $nout finished" >> $VALIDATION_ERROR_LOG
+      echo "***error: $nfds $case cases were run but only $nout finished" >> $VALIDATION_ERROR_LOG
     fi
     validation_cases="false"
   else
-    if [ $nout -gt 0 ] && [ $nout -gt $nsuccess ]; then
+    if [ $nout -gt $nsuccess ]; then
       if [ $nsuccess -gt 0 ]; then
-        echo "***error: $nfds cases were run in $curdir/$case but only $nsuccess finished successfully" >> $VALIDATION_ERROR_LOG
+        echo "***error: $nfds $case cases were run but only $nsuccess finished successfully" >> $VALIDATION_ERROR_LOG
       else
-        echo "***error: $nfds cases were run in $curdir/$case but none finished successfully" >> $VALIDATION_ERROR_LOG
+        echo "***error: $nfds $case cases were run but none finished successfully" >> $VALIDATION_ERROR_LOG
       fi
       validation_cases="false"
     fi
   fi
-  if [ $nfds -gt 0 ]; then
-    if [ $nout -gt 0 ] && [ $nout -gt $nsuccess ]; then
-      cd $fdsrepo/Validation/$case/Current_Results
-      grep STOP *.out | grep -v successfully | awk -F':' '{print $1 }' | awk -F'.' '{print "***error: " $1".fds did not finish successfully." }' >> $VALIDATION_ERROR_LOG
-      validation_cases="false"
-    fi
+  if [ $nout -gt 0 ] && [ $nout -gt $nsuccess ]; then
+    cd $fdsrepo/Validation/$case/Current_Results
+    grep STOP *.out | grep -v successfully | awk -F':' '{print $1 }' | awk -F'.' '{print "***error: " $1".fds did not finish successfully." }' >> $VALIDATION_ERROR_LOG
+    validation_cases="false"
   fi
 }
 
@@ -764,14 +767,14 @@ wait_cases_release_end()
    else
      while [[ `qstat -a | awk '{print $2 $4}' | grep $(whoami) | grep $JOBPREFIX` != '' ]]; do
         JOBS_REMAINING=`qstat -a | awk '{print $2 $4}' | grep $(whoami) | grep $JOBPREFIX | wc -l`
-        echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage5
+        echo "Waiting for ${JOBS_REMAINING} validation cases to complete." >> $OUTPUT_DIR/stage5
         TIME_LIMIT_STAGE="5"
         check_time_limit
         if [ "$FIREBOT_MODE" == "validation" ] ; then
            check_cases_release $fdsrepo/Validation 'interim'
-           sleep 240
+           sleep 30
         fi
-        sleep 60
+        sleep 30
      done
    fi
 }
@@ -788,14 +791,14 @@ run_verification_cases_release()
    cd $fdsrepo/Verification/scripts
    # Run FDS with 1 OpenMP thread
    echo 'Running FDS benchmark verification cases:' >> $OUTPUT_DIR/stage5
-   ./Run_FDS_Cases.sh -b -o 1 -q $QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage5 2>&1
+   ./Run_FDS_Cases.sh $DV2 -b -o 1 -q $QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage5 2>&1
    echo "" >> $OUTPUT_DIR/stage5 2>&1
 
    # Wait for benchmark verification cases to end
    wait_cases_release_end 'verification'
 
    echo 'Running FDS non-benchmark verification cases:' >> $OUTPUT_DIR/stage5
-   ./Run_FDS_Cases.sh -R -o 1 -q $QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage5 2>&1
+   ./Run_FDS_Cases.sh $DV2 -R -o 1 -q $QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage5 2>&1
    echo "" >> $OUTPUT_DIR/stage5 2>&1
 
    # Wait for non-benchmark verification cases to end
@@ -821,7 +824,7 @@ run_validation_cases_release()
       echo "Running FDS validation cases:" >> $OUTPUT_DIR/stage5
       echo "Validation Set: ${SET}" >> $OUTPUT_DIR/stage5
       echo "" >> $OUTPUT_DIR/stage5 2>&1
-      ./Run_All.sh -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
+      ./Run_All.sh -y $DV2 -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
       echo "" >> $OUTPUT_DIR/stage5 2>&1
    done
 
@@ -1478,10 +1481,12 @@ FIREBOT_LITE=
 caselistfile=""
 showcaselist=
 debug_mode=
+DV=
+DV2=
 
 #*** parse command line arguments
 
-while getopts 'b:cCdD:FhiLm:p:Pq:sSuUV:' OPTION
+while getopts 'b:cCdD:FhIiLm:p:Pq:sSuUV:' OPTION
 do
 case $OPTION in
   b)
@@ -1505,6 +1510,10 @@ case $OPTION in
    ;;
   h)
    usage;
+   ;;
+  I)
+   DV="_dv"
+   DV2="-u"
    ;;
   i)
    USEINSTALL="-r"
@@ -1748,9 +1757,7 @@ if [[ $FDS_debug_success ]] ; then
   if [[ "$FIREBOT_MODE" == "verification" ]] ; then
      run_verification_cases_debug
      check_cases_debug $fdsrepo/Verification 'verification'
-  fi
-
-  if [[ "$FIREBOT_MODE" == "validation" ]] ; then
+  else
      run_validation_cases_debug
      check_cases_debug $fdsrepo/Validation 'validation'
   fi
@@ -1761,13 +1768,12 @@ if [ "$FIREBOT_LITE" == "" ]; then
   cd $fdsrepo
   if [[ "$CLEANREPO" == "1" ]] ; then
      if [[ "$FIREBOT_MODE" == "verification" ]] ; then
-       echo "   cleaning Verification"
-       clean_repo $fdsrepo/Verification $fdsbranch || exit 1
+        echo "   cleaning Verification"
+        clean_repo $fdsrepo/Verification $fdsbranch || exit 1
+     else
+        echo "   cleaning Validation"
+        clean_repo $fdsrepo/Validation $fdsbranch || exit 1
      fi
-  fi
-  if [[ "$FIREBOT_MODE" == "validation" ]] ; then
-    echo "   cleaning Validation"
-    clean_repo $fdsrepo/Validation $fdsbranch || exit 1
   fi
 
 ### Stage 5 ###
@@ -1776,8 +1782,7 @@ if [ "$FIREBOT_LITE" == "" ]; then
     if [[ "$FIREBOT_MODE" == "verification" ]] ; then
        run_verification_cases_release
        check_cases_release $fdsrepo/Verification 'final'
-    fi
-    if [[ "$FIREBOT_MODE" == "validation" ]] ; then
+    else
        run_validation_cases_release
        check_cases_release $fdsrepo/Validation 'final'
        if [[ $cases_debug_success && $cases_release_success ]] ; then
@@ -1839,6 +1844,6 @@ if [ "$FIREBOT_MODE" == "verification" ]; then
     archive_timing_stats
   fi
   email_build_status 'Firebot'
-elif [ "$FIREBOT_MODE" == "validation" ]; then
+else
   email_build_status 'Validationbot'
 fi

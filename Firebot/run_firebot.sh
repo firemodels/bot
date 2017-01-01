@@ -28,6 +28,7 @@ echo "-S - show list validationbot cases"
 echo "-V n - run firebot in validationbot mode with specified number (n) of processes"
 echo "Miscellaneous:"
 echo "-i - use installed version of smokeview"
+echo "-I - use development version of fds"
 echo "-f - force firebot run"
 echo "-F - skip figure generation and build document stages"
 echo "-L - firebot lite,  run only stages that build a debug fds and run cases with it"
@@ -146,8 +147,9 @@ push=
 caselistfile=""
 showcaselist=
 debug_mode=
+DV=
 
-while getopts 'b:cdCD:FfhiKkLm:Pq:nsSuUvV:' OPTION
+while getopts 'b:cdCD:FfhIiKkLm:Pq:nsSuUvV:' OPTION
 do
 case $OPTION  in
   b)
@@ -177,6 +179,9 @@ case $OPTION  in
    ;;
   i)
    USEINSTALL="-i"
+   ;;
+  I)
+   DV="-I"
    ;;
   k)
    KILL_FIREBOT="1"
@@ -273,7 +278,7 @@ fi
 BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
-$ECHO  ./$botscript -p $firebot_pid $commit $push $UPDATE $debug_mode $showcaselist $caselistfile $MAX_VALIDATION_PROCESSES $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $EMAIL "$@"
+$ECHO  ./$botscript -p $firebot_pid $commit $push $UPDATE $DV $debug_mode $showcaselist $caselistfile $MAX_VALIDATION_PROCESSES $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $EMAIL "$@"
 if [ -e $firebot_pid ]; then
   rm $firebot_pid
 fi
