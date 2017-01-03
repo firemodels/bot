@@ -1,5 +1,6 @@
 # bot 
-Firebot and Smokebot
+Firebot, Smokebot and Cfastbot
 
-This repo contains the script firebot for testing FDS, the script smokebot for testing Smokeview
-and scripts for creating and updating firemodels repos such as fds, smv, exp etc.
+This repo contains the scripts firebot, smokebot and cfastbot for testing FDS, Smokeview
+and cfast respectively.  This repo also constains scripts for creating and updating
+various firemodels repos such as fds, smv, exp etc.
