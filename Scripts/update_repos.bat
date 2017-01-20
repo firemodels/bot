@@ -146,6 +146,6 @@ if exist %CURDIR%\gitbranch.out (
 if exist %CURDIR%\have_central.out (
   erase %CURDIR%\have_central.out
 )
-if %CURDIR%\ahead.out (
+if exist %CURDIR%\ahead.out (
   erase %CURDIR%\ahead.out
 )
