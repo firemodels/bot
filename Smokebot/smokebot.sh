@@ -1144,6 +1144,7 @@ make_guide()
 
 save_build_status()
 {
+   HOST=`hostname -s`
    STOP_TIME=$(date)
    STOP_TIME_INT=$(date +%s)
    cd $smokebotdir
@@ -1153,27 +1154,27 @@ save_build_status()
      echo "***Warnings:" >> $ERROR_LOG
      cat $WARNING_LOG >> $ERROR_LOG
      echo "   build failure and warnings for version: ${GIT_REVISION}, branch: $SMVBRANCH."
-     echo "Build failure and warnings;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$SMVBRANCH;$STOP_TIME_INT;3;$TOTAL_SMV_TIMES" > "$HISTORY_DIR/${GIT_REVISION}.txt"
+     echo "Build failure and warnings;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$SMVBRANCH;$STOP_TIME_INT;3;$TOTAL_SMV_TIMES;$HOST" > "$HISTORY_DIR/${GIT_REVISION}.txt"
      cat $ERROR_LOG > "$HISTORY_DIR/${GIT_REVISION}_errors.txt"
 
    # Check for errors only
    elif [ -e $ERROR_LOG ]
    then
       echo "   build failure for version: ${GIT_REVISION}, branch: $SMVBRANCH."
-      echo "Build failure;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$SMVBRANCH;$STOP_TIME_INT;3;$TOTAL_SMV_TIMES" > "$HISTORY_DIR/${GIT_REVISION}.txt"
+      echo "Build failure;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$SMVBRANCH;$STOP_TIME_INT;3;$TOTAL_SMV_TIMES;$HOST" > "$HISTORY_DIR/${GIT_REVISION}.txt"
       cat $ERROR_LOG > "$HISTORY_DIR/${GIT_REVISION}_errors.txt"
 
    # Check for warnings only
    elif [ -e $WARNING_LOG ]
    then
       echo "   build success with warnings for version: ${GIT_REVISION}, branch: $SMVBRANCH."
-      echo "Build success with warnings;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$SMVBRANCH;$STOP_TIME_INT;2;$TOTAL_SMV_TIMES" > "$HISTORY_DIR/${GIT_REVISION}.txt"
+      echo "Build success with warnings;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$SMVBRANCH;$STOP_TIME_INT;2;$TOTAL_SMV_TIMES;$HOST" > "$HISTORY_DIR/${GIT_REVISION}.txt"
       cat $WARNING_LOG > "$HISTORY_DIR/${GIT_REVISION}_warnings.txt"
 
    # No errors or warnings
    else
       echo "   build success for version: ${GIT_REVISION}, branch: $SMVBRANCH."
-      echo "Build success!;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$SMVBRANCH;$STOP_TIME_INT;1;$TOTAL_SMV_TIMES" > "$HISTORY_DIR/${GIT_REVISION}.txt"
+      echo "Build success!;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$SMVBRANCH;$STOP_TIME_INT;1;$TOTAL_SMV_TIMES;$HOST" > "$HISTORY_DIR/${GIT_REVISION}.txt"
    fi
 }
 
