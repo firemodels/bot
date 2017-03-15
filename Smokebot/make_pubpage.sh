@@ -122,7 +122,7 @@ cd $historydir
 if [ "$SOPT" == "" ]; then
   ls -tl *-????????.txt | awk '{system("head "  $9)}' | sort -t ';' -r -n -k 7 | head $NHIST | \
              awk -F ';' '{cputime="Benchmark time: "$9" s";\
-                          if($9=="")cputime="";\
+                          host="Host: "$10;\
                           font="<font color=\"#00FF00\">";\
                           if($8=="2")font="<font color=\"#FF00FF\">";\
                           if($8=="3")font="<font color=\"#FF0000\">";\
@@ -130,11 +130,12 @@ if [ "$SOPT" == "" ]; then
                           printf("<a href=\"https://github.com/firemodels/fds/commit/%s\">Revision: %s</a><br>\n",$4,$5);\
                           printf("Revision date: %s<br>\n",$2);\
                           if($9!="")printf("%s <br>\n",cputime);\
+                          if($10!="")printf("%s <br>\n",host);\
                           }' 
 else
   ls -tl *-????????.txt | awk '{system("head "  $9)}' | sort -t ';' -r -n -k 7 | head $NHIST | \
              awk -F ';' '{cputime="Benchmark time: "$9" s";\
-                          if($9=="")cputime="";\
+                          host="Host: "$10;\
                           font="<font color=\"#00FF00\">";\
                           if($8=="2")font="<font color=\"#FF00FF\">";\
                           if($8=="3")font="<font color=\"#FF0000\">";\
@@ -142,6 +143,7 @@ else
                           printf("<a href=\"https://github.com/firemodels/smv/commit/%s\">Revision: %s</a><br>\n",$4,$5);\
                           printf("Revision date: %s<br>\n",$2);\
                           if($9!="")printf("%s <br>\n",cputime);\
+                          if($10!="")printf("%s <br>\n",host);\
                           }' 
 fi
 cd $CURDIR
