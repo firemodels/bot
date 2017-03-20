@@ -81,6 +81,18 @@ UPDATE_REPO ()
         fi
      fi
   fi
+  if [[ "$repo" == "exp" ]]; then
+     if [ "$have_central" -gt "0" ]; then
+       echo "Fetching firemodels"
+       git submodule foreach git fetch firemodels
+       echo "Updating firemodels submodules"
+       git submodule foreach git merge firemodels/master
+     fi
+     echo "Fetching origin."
+     git submodule foreach git fetch origin
+     echo "Updating origin submodules."
+     git submodule foreach git merge origin/master
+  fi
 }
 
 UPDATE_REPO2 ()
