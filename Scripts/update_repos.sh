@@ -81,6 +81,12 @@ UPDATE_REPO ()
         fi
      fi
   fi
+  if [[ "$repo" == "exp" ]]; then
+     echo "Fetching origin."
+     git submodule foreach git fetch origin
+     echo "Updating origin submodules."
+     git submodule foreach git merge origin/master
+  fi
 }
 
 UPDATE_REPO2 ()
