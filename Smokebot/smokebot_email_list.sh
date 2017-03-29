@@ -7,7 +7,7 @@ mailToSMV="gforney@gmail.com"
 mailToCFAST="gforney@gmail.com"
 
 # General mailing list for Firebot status report
-        mailToFDS="mcgratta@gmail.com, kevin.mcgrattan@nist.gov, randy.mcdermott@gmail.com, randall.mcdermott@nist.gov, jfloyd@jensenhughes.com, gforney@gmail.com, marcos.vanella@nist.gov, miilac@uw.edu"
+        mailToFDS="mcgratta@gmail.com, kevin.mcgrattan@nist.gov, randy.mcdermott@gmail.com, randall.mcdermott@nist.gov, jfloyd@jensenhughes.com, gforney@gmail.com, marcos.vanella@nist.gov"
 
 # Verbose mailing list for Validationbot, Macbot, etc.
 mailToFDS_verbose="mcgratta@gmail.com, kevin.mcgrattan@nist.gov, randy.mcdermott@gmail.com, randall.mcdermott@nist.gov, jfloyd@jensenhughes.com, gforney@gmail.com, marcos.vanella@nist.gov"
