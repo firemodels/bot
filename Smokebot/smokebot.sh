@@ -1624,7 +1624,7 @@ check_compile_fds_mpi_db
 ### Stage 2 build smokeview ###
 compile_smv_utilities
 check_smv_utilities
-check_common_routines
+check_common_files
 
 if [[ $stage1b_fdsdb_success && "$RUNDEBUG" == "1" ]] ; then
    run_verification_cases_debug
@@ -1655,7 +1655,6 @@ if [ "$SMOKEBOT_LITE" == "" ]; then
   check_compile_smv
 
 fi
-check_common_files
 
 BUILDSOFTWARE_end=`GET_TIME`
 DIFF_BUILDSOFTWARE=`GET_DURATION $BUILDSOFTWARE_beg $BUILDSOFTWARE_end`
