@@ -1653,7 +1653,9 @@ check_compile_smv_db
 if [ "$SMOKEBOT_LITE" == "" ]; then
   compile_smv
   check_compile_smv
+
 fi
+check_common_files
 
 BUILDSOFTWARE_end=`GET_TIME`
 DIFF_BUILDSOFTWARE=`GET_DURATION $BUILDSOFTWARE_beg $BUILDSOFTWARE_end`
