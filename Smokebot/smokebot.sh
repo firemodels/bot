@@ -651,6 +651,22 @@ is_file_installed()
 }
 
 #---------------------------------------------
+#                   check_common_files
+#---------------------------------------------
+
+check_common_files()
+{
+   smv_gsmv=$smvrepo/Source/smokeview/gsmv.f90
+   fds_gsmv=$fdsrepo/Source/gsmv.f90
+   ndiffs=`diff $smv_gsmv $fds_gsmv | wc -l`
+   if [ $ndiffs -gt 0 ]; then
+     echo "" >> $WARNING_LOG
+     echo "Warnings Stage 2d" >> $WARNING_LOG
+     echo "***warning: The fds repo version of gsmv.f90 is out of synch with the smv repo version" >> $WARNING_LOG
+   fi
+}
+
+#---------------------------------------------
 #                   check_smv_utilities
 #---------------------------------------------
 
@@ -1608,6 +1624,7 @@ check_compile_fds_mpi_db
 ### Stage 2 build smokeview ###
 compile_smv_utilities
 check_smv_utilities
+check_common_routines
 
 if [[ $stage1b_fdsdb_success && "$RUNDEBUG" == "1" ]] ; then
    run_verification_cases_debug
