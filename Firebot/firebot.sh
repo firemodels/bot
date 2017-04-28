@@ -1010,15 +1010,20 @@ scan_matlab_license_test()
 
 check_matlab_license_server()
 {
-   for i in 1 2 3
+   SKIPMATLAB="1"
+   for i in 1 2 3 4
    do
       run_matlab_license_test
       scan_matlab_license_test
       if [ $matlab_success == true ]; then
+         SKIPMATLAB=
          break
       fi
       sleep 300
    done
+   if [ "$SKIPMATLAB" == "1" ]; then
+      echo "Error from Stage 7 - Matlab failed to be checked out" >> $ERROR_LOG
+   fi
 }
 
 #---------------------------------------------
