@@ -231,6 +231,7 @@ update_repo()
       echo "Updating submodules." >> $OUTPUT_DIR/stage1 2>&1
       git submodule foreach git fetch origin >> $OUTPUT_DIR/stage1 2>&1
       git submodule foreach git merge origin/master >> $OUTPUT_DIR/stage1 2>&1
+      git status -uno  >> $OUTPUT_DIR/stage1 2>&1
    fi
 
    if [[ "$reponame" == "fds" ]]; then
@@ -250,6 +251,16 @@ update_repo()
 check_git_checkout()
 {
    # Check for GIT errors
+      if [[ `grep -i -E 'modified' $OUTPUT_DIR/stage1` == "" ]]
+   then
+      # Continue along
+      :
+   else
+      echo "Warnings from Stage 1 - Update repos" >> $WARNING_LOG
+      echo "" >> $WARNING_LOG
+      grep -A 5 -B 5 -i -E 'modified' $OUTPUT_DIR/stage1 >> $WARNING_LOG
+      echo "" >> $WARNING_LOG
+   fi
    git_checkout_success=true
 }
 
