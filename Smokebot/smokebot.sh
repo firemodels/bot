@@ -679,6 +679,7 @@ check_common_files()
    compare_common_files Manuals/Bibliography Manuals/Bibliography FDS_general.bib
    compare_common_files Manuals/Bibliography Manuals/Bibliography FDS_mathcomp.bib
    compare_common_files Manuals/Bibliography Manuals/Bibliography FDS_refs.bib
+   compare_common_files Manuals/Bibliography Manuals/Bibliography authors.tex
 }
 
 #---------------------------------------------
