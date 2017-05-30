@@ -651,19 +651,35 @@ is_file_installed()
 }
 
 #---------------------------------------------
+#                   compare_common_files
+#---------------------------------------------
+
+compare_common_files()
+{
+   fdsdir=$1
+   smvdir=$2
+   file=$3
+   fds_file=$fdsrepo/$fdsdir/$file
+   smv_file=$smvrepo/$smvdir/$file
+   ndiffs=`diff $smv_file $fds_file | wc -l`
+   if [ $ndiffs -gt 0 ]; then
+     echo "" >> $WARNING_LOG
+     echo "Warnings Stage 2d" >> $WARNING_LOG
+     echo "***warning: The fds repo version of $file is out of synch with the smv repo version" >> $WARNING_LOG
+   fi
+}
+
+#---------------------------------------------
 #                   check_common_files
 #---------------------------------------------
 
 check_common_files()
 {
-   smv_gsmv=$smvrepo/Source/smokeview/gsmv.f90
-   fds_gsmv=$fdsrepo/Source/gsmv.f90
-   ndiffs=`diff $smv_gsmv $fds_gsmv | wc -l`
-   if [ $ndiffs -gt 0 ]; then
-     echo "" >> $WARNING_LOG
-     echo "Warnings Stage 2d" >> $WARNING_LOG
-     echo "***warning: The fds repo version of gsmv.f90 is out of synch with the smv repo version" >> $WARNING_LOG
-   fi
+   compare_common_files Source Source/smokeview gsmv.f90
+   compare_common_files Manuals/Bibliography Manuals/Bibliography FDS_general.bib
+   compare_common_files Manuals/Bibliography Manuals/Bibliography FDS_mathcomp.bib
+   compare_common_files Manuals/Bibliography Manuals/Bibliography FDS_refs.bib
+   compare_common_files Manuals/Bibliography Manuals/Bibliography authors.tex
 }
 
 #---------------------------------------------
