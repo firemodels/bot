@@ -234,6 +234,11 @@ update_repo()
       git status -uno  >> $OUTPUT_DIR/stage1 2>&1
    fi
 
+   if [[ "$reponame" == "smv" ]]; then
+      git update-index --refresh
+      SMV_REVISION=`git describe --long --dirty`
+   fi
+
    if [[ "$reponame" == "fds" ]]; then
       git update-index --refresh
       GIT_REVISION=`git describe --long --dirty`
@@ -1379,14 +1384,15 @@ email_build_status()
    fi
    echo "          host: $hostname " >> $TIME_LOG
    echo "            OS: $platform2 " >> $TIME_LOG
+   echo "          repo: $repo " >> $TIME_LOG
+   echo "  fds revision: $GIT_REVISION " >> $TIME_LOG
+   echo " smv rewvision: $SMV_REVISION " >> $TIME_LOG
    echo "         queue: $QUEUE " >> $TIME_LOG
-   echo "          Repo: $repo " >> $TIME_LOG
    if [ "$FIREBOT_MODE" == "validation" ] ; then
       echo "Validation Set(s): ${CURRENT_VALIDATION_SETS[*]} " >> $TIME_LOG
    fi
-
-   echo "    Start Time: $start_time " >> $TIME_LOG
-   echo "     Stop Time: $stop_time " >> $TIME_LOG
+   echo "    start time: $start_time " >> $TIME_LOG
+   echo "     stop time: $stop_time " >> $TIME_LOG
    if [ "$UPLOADGUIDES" == "1" ]; then
    echo "Firebot status:  https://pages.nist.gov/fds-smv/firebot_status.html" >> $TIME_LOG
    fi

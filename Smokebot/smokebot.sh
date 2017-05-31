@@ -1233,6 +1233,7 @@ email_build_status()
    echo "             repo: $repo" >> $TIME_LOG
    echo "     smv revision: $GIT_REVISION" >> $TIME_LOG
    echo "     fds revision: $FDS_REVISION" >> $TIME_LOG
+   echo "            queue: $SMOKEBOT_QUEUE" >> $TIME_LOG
    echo "   cfast revision: $CFAST_REVISION" >> $TIME_LOG
    echo "       start time: $start_time " >> $TIME_LOG
    echo "        stop time: $stop_time " >> $TIME_LOG
