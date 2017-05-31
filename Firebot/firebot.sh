@@ -1385,9 +1385,9 @@ email_build_status()
    echo "          host: $hostname " >> $TIME_LOG
    echo "            OS: $platform2 " >> $TIME_LOG
    echo "          repo: $repo " >> $TIME_LOG
+   echo "         queue: $QUEUE " >> $TIME_LOG
    echo "  fds revision: $GIT_REVISION " >> $TIME_LOG
    echo " smv rewvision: $SMV_REVISION " >> $TIME_LOG
-   echo "         queue: $QUEUE " >> $TIME_LOG
    if [ "$FIREBOT_MODE" == "validation" ] ; then
       echo "Validation Set(s): ${CURRENT_VALIDATION_SETS[*]} " >> $TIME_LOG
    fi
