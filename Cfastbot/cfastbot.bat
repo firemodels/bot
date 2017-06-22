@@ -345,7 +345,7 @@ echo Stage 2 - Building Smokeview
 
 echo             libs
 
-cd %smvrepo\Build\LIBS\intel_win_%size%
+cd %smvrepo\Build\LIBS\intel_win%size%
 call makelibs bot 1>> %OUTDIR%\stage2a.txt 2>&1
 
 echo             debug
