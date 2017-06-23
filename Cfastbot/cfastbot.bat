@@ -345,12 +345,12 @@ echo Stage 2 - Building Smokeview
 
 echo             libs
 
-cd %smvrepo\Build\LIBS\lib_win_intel%size%
+cd %smvrepo%\Build\LIBS\intel_win%size%
 call makelibs bot 1>> %OUTDIR%\stage2a.txt 2>&1
 
 echo             debug
 
-cd %smvrepo%\Build\intel_win%size%
+cd %smvrepo%\Build\smokeview\intel_win%size%
 erase *.obj *.mod *.exe smokeview_win%size%_db.exe 1> %OUTDIR%\stage2a.txt 2>&1
 call make_smv_db -r bot 1>> %OUTDIR%\stage2a.txt 2>&1
 
@@ -359,7 +359,7 @@ call :find_smokeview_warnings "warning" %OUTDIR%\stage2a.txt "Stage 2a"
 
 echo             release
 
-cd %smvrepo%\Build\intel_win%size%
+cd %smvrepo%\Build\smokeview\intel_win%size%
 erase *.obj *.mod smokeview_win%size%.exe 1> %OUTDIR%\stage2b.txt 2>&1
 call make_smv -r bot 1>> %OUTDIR%\stage2b.txt 2>&1
 set SMOKEVIEW=%smvrepo%\Build\intel_win%size%\smokeview_win%size%.exe
