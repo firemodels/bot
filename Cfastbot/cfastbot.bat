@@ -269,13 +269,15 @@ if %clean% == 0 goto skip_update0
 ::*** update repositories
 
 if %update% == 0 goto skip_update1
-  echo             updating cfast repository
+  echo             updating
+  echo                cfast
   cd %cfastrepo%
   git fetch origin
   git merge origin/master  1> %OUTDIR%\stage0.txt 2>&1
 
   if %use_installed% == 1 goto skip_update1
   cd %smvrepo%
+  echo                smv
   git fetch origin
   git merge origin/master  1> %OUTDIR%\stage0.txt 2>&1
 :skip_update1
@@ -346,7 +348,7 @@ echo Stage 2 - Building Smokeview
 echo             libs
 
 cd %smvrepo%\Build\LIBS\intel_win%size%
-call makelibs bot 1>> %OUTDIR%\stage2a.txt 2>&1
+call makelibs_bot 1>> %OUTDIR%\stage2a.txt 2>&1
 
 echo             debug
 

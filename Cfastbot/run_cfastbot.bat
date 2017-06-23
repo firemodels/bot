@@ -53,13 +53,7 @@ if exist %running% goto skip_running
 :: get latest cfastbot
 
 if %update% == 0 goto no_update
-  echo getting latest cfastbot
-  cd %cfastrepo%
-  git fetch origin
-  git merge origin/master 1> Nul 2>&1
-
-  echo getting latest cfastbot
-  cd %smvrepo%
+  echo updating bot repo
   git fetch origin
   git merge origin/master 1> Nul 2>&1
 
