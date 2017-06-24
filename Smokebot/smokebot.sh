@@ -984,8 +984,17 @@ check_smv_pictures()
       cp $OUTPUT_DIR/stage4b  $OUTPUT_DIR/stage4b_errors
 
       echo "Errors from Stage 4 - Make SMV pictures (release mode):" >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage4b >> $ERROR_LOG
+      grep -B 5 -A 5 -I -E "Segmentation|Error" $OUTPUT_DIR/stage4b >> $ERROR_LOG
       echo "" >> $ERROR_LOG
+   fi
+   if [[ `grep -I -E "Warning" $OUTPUT_DIR/stage4b` == "" ]]
+   then
+      # Continue along
+      :
+   else
+      echo "Warnings from Stage 4b - Make SMV pictures (release mode):" >> $WARNING_LOG
+      grep -A 2 -I -E "Warning" $OUTPUT_DIR/stage4b >> $WARNING_LOG
+      echo "" >> $WARNING_LOG
    fi
    if [ ! "$web_DIR" == "" ]; then
      if [ -d "$WEBFROMDIR" ]; then
