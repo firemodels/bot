@@ -693,7 +693,7 @@ check_common_files()
    compare_common_files Manuals/Bibliography Manuals/Bibliography FDS_mathcomp.bib
    compare_common_files Manuals/Bibliography Manuals/Bibliography FDS_refs.bib
    compare_common_files Manuals/Bibliography Manuals/Bibliography authors.tex
-   compare_common_files Verification/scripts Verification/scripts scripts_compare_csv.sh
+   compare_common_files Verification/scripts Verification/scripts compare_csv.sh
 }
 
 #---------------------------------------------
