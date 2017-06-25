@@ -661,11 +661,24 @@ compare_common_files()
    file=$3
    fds_file=$fdsrepo/$fdsdir/$file
    smv_file=$smvrepo/$smvdir/$file
-   ndiffs=`diff $smv_file $fds_file | wc -l`
-   if [ $ndiffs -gt 0 ]; then
-     echo "" >> $WARNING_LOG
+   notexist=
+   if ! [ -e $fds_file ]; then
      echo "Warnings Stage 2d" >> $WARNING_LOG
-     echo "***warning: The fds repo version of $file is out of synch with the smv repo version" >> $WARNING_LOG
+     echo "***warning: The fds repo file, $fds_file, does not exist" >> $WARNING_LOG
+     notexist=1
+   fi
+   if ! [ -e $smv_file ]; then
+     echo "Warnings Stage 2d" >> $WARNING_LOG
+     echo "***warning: The smv repo file, $smv_file, does not exist" >> $WARNING_LOG
+     notexist=1
+   fi
+   if [ "$notexist" == "" ]; then
+     ndiffs=`diff $smv_file $fds_file | wc -l`
+     if [ $ndiffs -gt 0 ]; then
+       echo "" >> $WARNING_LOG
+       echo "Warnings Stage 2d" >> $WARNING_LOG
+       echo "***warning: The fds repo version of $file is out of synch with the smv repo version" >> $WARNING_LOG
+     fi
    fi
 }
 
@@ -680,6 +693,7 @@ check_common_files()
    compare_common_files Manuals/Bibliography Manuals/Bibliography FDS_mathcomp.bib
    compare_common_files Manuals/Bibliography Manuals/Bibliography FDS_refs.bib
    compare_common_files Manuals/Bibliography Manuals/Bibliography authors.tex
+   compare_common_files Verification/scripts Verification/scripts scripts_compare_csv.sh
 }
 
 #---------------------------------------------
