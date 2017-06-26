@@ -76,6 +76,7 @@ set haveerrors=0
 set havewarnings=0
 
 set gettimeexe=get_time.exe
+set backgroundexe=background.exe
 set runbatchexe=runbatch.exe
 
 date /t > %OUTDIR%\starttime.txt
@@ -86,7 +87,6 @@ set /p starttime=<%OUTDIR%\starttime.txt
 call %cfastrepo%\Build\scripts\setup_intel_compilers.bat 1> Nul 2>&1
 call %cfastbotdir%\cfastbot_email_list.bat 1> Nul 2>&1
 
-set usematlab=%3
 if %usematlab% == 1 (
   echo matlab: using matlab scripts
 )
@@ -122,11 +122,17 @@ echo. > %stagestatus%
 
 ::*** looking for gettime
 
+if %use_installed% == 0 goto skip_get_time
 call :is_file_installed %gettimeexe%|| exit /b 1
 echo             found get_time
+:skip_get_time
 
-call :GET_TIME TIME_beg
-call :GET_TIME PRELIM_beg
+::*** looking for background
+
+if %use_installed% == 0 goto skip_background
+call :is_file_installed %backgroundexe%|| exit /b 1
+echo             found background
+:skip_background
 
 ::*** looking for fortran
 
@@ -158,6 +164,37 @@ if %nothaveICC% == 0 (
   exit /b
 )
 :skip_icc
+
+if %use_installed% == 1 goto skip_build_gettime
+if %nothaveICC% == 1 goto skip_build_gettime
+
+  :: building get_time
+  
+    cd %smvrepo%\Build\get_time\intel_win%size%
+    echo             building get_time
+    call make_gettime bot >Nul 2>&1
+    set gettimeexe=%OUTDIR%\get_time_64.exe
+    copy get_time_64.exe %gettimeexe% >Nul 2>&1
+    call :is_file_installed %gettimeexe%|| exit /b 1
+    echo             get_time built
+:skip_build_gettime
+
+call :GET_TIME TIME_beg
+call :GET_TIME PRELIM_beg
+
+if %use_installed% == 1 goto skip_build_background
+if %nothaveICC% == 1 goto skip_build_background
+
+  :: building background
+  
+    cd %smvrepo%\Build\background\intel_win%size%
+    echo             building background
+    call make_background bot >Nul 2>&1
+    set backgroundexe=%OUTDIR%\background.exe
+    copy background.exe %backgroundexe% >Nul 2>&1
+    call :is_file_installed %backgroundexe%|| exit /b 1
+    echo             background built
+:skip_build_background
 
 if %nothaveICC% == 0 goto skip1
   call :is_file_installed smokeview|| exit /b 1
@@ -385,7 +422,7 @@ echo             debug
 
 cd %cfastrepo%\Validation\scripts
 
-call Run_CFAST_cases 1 1> %OUTDIR%\stage3a.txt 2>&1
+call Run_CFAST_cases 0 %backgroundexe% 1> %OUTDIR%\stage3a.txt 2>&1
 
 call :find_runcases_warnings "***Warning" %cfastrepo%\Validation   "Stage 3a-Validation"
 call :find_runcases_errors "error|forrtl: severe|DASSL|floating invalid" %cfastrepo%\Validation   "Stage 3a-Validation"
@@ -400,7 +437,7 @@ echo             release
 
 cd %cfastrepo%\Validation\scripts
 
-call Run_CFAST_cases 1> %OUTDIR%\stage3b.txt 2>&1
+call Run_CFAST_cases 1 %backgroundexe% 1> %OUTDIR%\stage3b.txt 2>&1
 
 call :find_runcases_warnings "***Warning" %cfastrepo%\Validation   "Stage 3b-Validation"
 call :find_runcases_errors "error|forrtl: severe|DASSL|floating invalid" %cfastrepo%\Validation   "Stage 3b-Validation"
