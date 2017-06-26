@@ -75,6 +75,7 @@ set nothaveICC=1
 set haveerrors=0
 set havewarnings=0
 
+set sh2batexe=sh2bat.exe
 set gettimeexe=get_time.exe
 set backgroundexe=background.exe
 set runbatchexe=runbatch.exe
@@ -88,13 +89,13 @@ call %cfastrepo%\Build\scripts\setup_intel_compilers.bat 1> Nul 2>&1
 call %cfastbotdir%\cfastbot_email_list.bat 1> Nul 2>&1
 
 if %usematlab% == 1 (
-  echo matlab: using matlab scripts
+  echo     matlab: using matlab scripts
 )
 if %usematlab% == 0 (
   echo matlab: using prebuilt matlab executables
 )
 if NOT "%emailto%" == "" (
-  echo  email: %emailto%
+  echo      email: %emailto%
   set mailToCFAST=%emailto%
 )
 set version=test
@@ -119,20 +120,6 @@ echo Stage 0 - Preliminaries
 echo. > %errorlog%
 echo log > %warninglog%
 echo. > %stagestatus%
-
-::*** looking for gettime
-
-if %use_installed% == 0 goto skip_get_time
-call :is_file_installed %gettimeexe%|| exit /b 1
-echo             found get_time
-:skip_get_time
-
-::*** looking for background
-
-if %use_installed% == 0 goto skip_background
-call :is_file_installed %backgroundexe%|| exit /b 1
-echo             found background
-:skip_background
 
 ::*** looking for fortran
 
@@ -165,37 +152,54 @@ if %nothaveICC% == 0 (
 )
 :skip_icc
 
+  :: looking for/building get_time
+  
 if %use_installed% == 1 goto skip_build_gettime
 if %nothaveICC% == 1 goto skip_build_gettime
-
-  :: building get_time
-  
     cd %smvrepo%\Build\get_time\intel_win%size%
     echo             building get_time
     call make_gettime bot >Nul 2>&1
     set gettimeexe=%OUTDIR%\get_time_64.exe
     copy get_time_64.exe %gettimeexe% >Nul 2>&1
     call :is_file_installed %gettimeexe%|| exit /b 1
-    echo             get_time built
 :skip_build_gettime
+call :is_file_installed %gettimeexe%|| exit /b 1
+echo             found get_time
 
 call :GET_TIME TIME_beg
 call :GET_TIME PRELIM_beg
 
+  :: looking for/building background
+
 if %use_installed% == 1 goto skip_build_background
 if %nothaveICC% == 1 goto skip_build_background
-
-  :: building background
-  
     cd %smvrepo%\Build\background\intel_win%size%
     echo             building background
     call make_background bot >Nul 2>&1
     set backgroundexe=%OUTDIR%\background.exe
     copy background.exe %backgroundexe% >Nul 2>&1
-    call :is_file_installed %backgroundexe%|| exit /b 1
-    echo             background built
 :skip_build_background
+call :is_file_installed %backgroundexe%|| exit /b 1
+echo             found background
 
+::*** looking for/building sh2bat
+
+if %use_installed% == 1 goto skip_sh2bat
+if %nothaveICC% == 1 goto skip_sh2bat
+
+  :: building sh2bat
+  
+    cd %smvrepo%\Build\sh2bat\intel_win%size%
+    echo             building sh2bat
+    call make_sh2bat bot >Nul 2>&1
+    set sh2batexe=%OUTDIR%\sh2bat.exe
+    copy sh2bat.exe %sh2batexe% >Nul 2>&1
+:skip_sh2bat
+
+call :is_file_installed %sh2batexe% || exit /b 1
+echo             found sh2bat
+
+if %use_installed% == 0 goto skip1
 if %nothaveICC% == 0 goto skip1
   call :is_file_installed smokeview|| exit /b 1
   echo             found smokeview
@@ -211,40 +215,25 @@ if NOT exist %emailexe% (
   echo             found mailsend
 )
 
-::*** looking for pdflatex
+::*** looking for cut
 
-call :is_file_installed pdflatex|| exit /b 1
-echo             found pdflatex
+call :is_file_installed cut|| exit /b 1
+echo             found cut
 
-::*** looking for sh2bat
+::*** looking for gawk
 
-call :is_file_installed sh2bat|| exit /b 1
-echo             found sh2bat
+call :is_file_installed gawk|| exit /b 1
+echo             found gawk
 
 ::*** looking for grep
 
 call :is_file_installed grep|| exit /b 1
 echo             found grep
 
-::*** looking for cut
-
-call :is_file_installed cut|| exit /b 1
-echo             found cut
-
-::*** looking for sed
-
-call :is_file_installed sed|| exit /b 1
-echo             found sed
-
 ::*** looking for head
 
 call :is_file_installed head|| exit /b 1
 echo             found head
-
-::*** looking for gawk
-
-call :is_file_installed gawk|| exit /b 1
-echo             found gawk
 
 if %usematlab% == 0 goto skip_matlab
 
@@ -260,6 +249,16 @@ if %usematlab% == 0 goto skip_matlab
     set usematlab=0
   )
 :skip_matlab
+
+::*** looking for pdflatex
+
+call :is_file_installed pdflatex|| exit /b 1
+echo             found pdflatex
+
+::*** looking for sed
+
+call :is_file_installed sed|| exit /b 1
+echo             found sed
 
 if %usematlab% == 1 goto skip_matlabexe
 ::*** looking for Validation
