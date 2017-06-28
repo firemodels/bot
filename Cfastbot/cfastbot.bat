@@ -193,7 +193,7 @@ if %nothaveICC% == 1 goto skip_sh2bat
     echo             building sh2bat
     call make_sh2bat bot >Nul 2>&1
     set sh2batexe=%OUTDIR%\sh2bat.exe
-    copy sh2bat.exe %sh2batexe% >Nul 2>&1
+    copy sh2bat_win_64.exe %sh2batexe% >Nul 2>&1
 :skip_sh2bat
 
 call :is_file_installed %sh2batexe% || exit /b 1
@@ -421,7 +421,7 @@ echo             debug
 
 cd %cfastrepo%\Validation\scripts
 
-call Run_CFAST_cases 0 %backgroundexe% 1> %OUTDIR%\stage3a.txt 2>&1
+call Run_CFAST_cases 0 %backgroundexe% %sh2batexe% 1> %OUTDIR%\stage3a.txt 2>&1
 
 call :find_runcases_warnings "***Warning" %cfastrepo%\Validation   "Stage 3a-Validation"
 call :find_runcases_errors "error|forrtl: severe|DASSL|floating invalid" %cfastrepo%\Validation   "Stage 3a-Validation"
@@ -436,7 +436,7 @@ echo             release
 
 cd %cfastrepo%\Validation\scripts
 
-call Run_CFAST_cases 1 %backgroundexe% 1> %OUTDIR%\stage3b.txt 2>&1
+call Run_CFAST_cases 1 %backgroundexe% %sh2batexe% 1> %OUTDIR%\stage3b.txt 2>&1
 
 call :find_runcases_warnings "***Warning" %cfastrepo%\Validation   "Stage 3b-Validation"
 call :find_runcases_errors "error|forrtl: severe|DASSL|floating invalid" %cfastrepo%\Validation   "Stage 3b-Validation"
