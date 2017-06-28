@@ -193,7 +193,7 @@ if %nothaveICC% == 1 goto skip_sh2bat
     echo             building sh2bat
     call make_sh2bat bot >Nul 2>&1
     set sh2batexe=%OUTDIR%\sh2bat.exe
-    copy sh2bat.exe %sh2batexe% >Nul 2>&1
+    copy sh2bat_win_64.exe %sh2batexe% >Nul 2>&1
 :skip_sh2bat
 
 call :is_file_installed %sh2batexe% || exit /b 1
