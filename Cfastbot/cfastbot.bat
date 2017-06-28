@@ -421,7 +421,7 @@ echo             debug
 
 cd %cfastrepo%\Validation\scripts
 
-call Run_CFAST_cases 0 %backgroundexe% 1> %OUTDIR%\stage3a.txt 2>&1
+call Run_CFAST_cases 0 %backgroundexe% %sh2batexe% 1> %OUTDIR%\stage3a.txt 2>&1
 
 call :find_runcases_warnings "***Warning" %cfastrepo%\Validation   "Stage 3a-Validation"
 call :find_runcases_errors "error|forrtl: severe|DASSL|floating invalid" %cfastrepo%\Validation   "Stage 3a-Validation"
@@ -436,7 +436,7 @@ echo             release
 
 cd %cfastrepo%\Validation\scripts
 
-call Run_CFAST_cases 1 %backgroundexe% 1> %OUTDIR%\stage3b.txt 2>&1
+call Run_CFAST_cases 1 %backgroundexe% %sh2batexe% 1> %OUTDIR%\stage3b.txt 2>&1
 
 call :find_runcases_warnings "***Warning" %cfastrepo%\Validation   "Stage 3b-Validation"
 call :find_runcases_errors "error|forrtl: severe|DASSL|floating invalid" %cfastrepo%\Validation   "Stage 3b-Validation"
