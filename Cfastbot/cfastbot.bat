@@ -440,6 +440,8 @@ call :GET_DURATION PRELIM %PRELIM_beg%
 call :GET_TIME RUNVV_beg
 
 echo Stage 3 - Running validation cases
+
+if %use_installed_cfast% == 1 goto skip_run_debug
 echo             debug
 
 cd %cfastrepo%\Validation\scripts
@@ -457,6 +459,8 @@ if %clean% == 1 (
    call :git_clean %cfastrepo%\Validation
    call :git_clean %cfastrepo%\Verification
 )
+
+:skip_run_debug
 
 echo             release
 
