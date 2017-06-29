@@ -7,7 +7,8 @@ set usematlab=1
 set update=0
 set clean=0
 set stopscript=0
-set installed=0
+set cfast=0
+set smokeview=0
 set force=0
 set skip_cases=0
 set official=0
@@ -63,7 +64,7 @@ if %update% == 0 goto no_update
 :: run cfastbot
 
   echo 1 > %running%
-  call cfastbot.bat %repo% %usematlab% %clean% %update% %installed% %skip_cases% %official% %emailto%
+  call cfastbot.bat %repo% %usematlab% %clean% %update% %cfast% %smokeview% %skip_cases% %official% %emailto%
   erase %running%
   goto end_running
 :skip_running
@@ -101,7 +102,16 @@ goto eof
  )
  if /I "%1" EQU "-installed" (
    set valid=1
-   set installed=1
+   set cfast=1
+   set smokeview=1
+ )
+ if /I "%1" EQU "-cfast" (
+   set valid=1
+   set cfast=1
+ )
+ if /I "%1" EQU "-smokeview" (
+   set valid=1
+   set smokeview=1
  )
  if /I "%1" EQU "-bot" (
    set valid=1
@@ -142,13 +152,15 @@ if "%emailto%" NEQ "" (
 echo       (default: %emailto%^)
 )
 echo -bot            - update and clean repository
-echo -skip_cases     - skip over stage that runs cases
-echo -force          - force cfastbot run
-echo -installed      - use installed smokeview
+echo -cfast          - use installed cfast
 echo -clean          - clean repository
-echo -update         - update repository
+echo -force          - force cfastbot run
+echo -installed      - use installed cfast and smokeview
 echo -nomatlab       - do not use matlab
 echo -official       - build official version of cfast
+echo -skip_cases     - skip over stage that runs cases
+echo -smokeview      - use installed smokeview
+echo -update         - update repository
 exit /b
 
 :normalise
