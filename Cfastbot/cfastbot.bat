@@ -161,8 +161,7 @@ if %nothaveICC% == 1 goto skip_build_gettime
     cd %smvrepo%\Build\get_time\intel_win%size%
     echo             building get_time
     call make_gettime bot >Nul 2>&1
-    set gettimeexe=%OUTDIR%\get_time_64.exe
-    copy get_time_64.exe %gettimeexe% >Nul 2>&1
+    set gettimeexe=%smvrepo%\Build\get_time\intel_win%size%\get_time_64.exe
     call :is_file_installed %gettimeexe%|| exit /b 1
 :skip_build_gettime
 call :is_file_installed %gettimeexe%|| exit /b 1
@@ -178,8 +177,7 @@ if %nothaveICC% == 1 goto skip_build_background
     cd %smvrepo%\Build\background\intel_win%size%
     echo             building background
     call make_background bot >Nul 2>&1
-    set backgroundexe=%OUTDIR%\background.exe
-    copy background.exe %backgroundexe% >Nul 2>&1
+    set backgroundexe=%smvrepo%\Build\background\intel_win%size%\background.exe
 :skip_build_background
 call :is_file_installed %backgroundexe%|| exit /b 1
 echo             found background
@@ -209,8 +207,7 @@ if %nothaveICC% == 1 goto skip_sh2bat
     cd %smvrepo%\Build\sh2bat\intel_win%size%
     echo             building sh2bat
     call make_sh2bat bot >Nul 2>&1
-    set sh2batexe=%OUTDIR%\sh2bat.exe
-    copy sh2bat_win_64.exe %sh2batexe% >Nul 2>&1
+    set sh2batexe=%smvrepo%\Build\sh2bat\intel_win%size%\sh2bat.exe
 :skip_sh2bat
 
 call :is_file_installed %sh2batexe% || exit /b 1
@@ -446,7 +443,7 @@ echo             debug
 
 cd %cfastrepo%\Validation\scripts
 
-call Run_CFAST_cases 0 %CFDEBUGEXE% %backgroundexe% %sh2batexe% 1> %OUTDIR%\stage3a.txt 2>&1
+call Run_CFAST_cases -debug 1> %OUTDIR%\stage3a.txt 2>&1
 
 call :find_runcases_warnings "***Warning"                                  %cfastrepo%\Validation    "Stage 3a-Validation"
 call :find_runcases_errors   "error|forrtl: severe|DASSL|floating invalid" %cfastrepo%\Validation    "Stage 3a-Validation"
@@ -465,7 +462,7 @@ if %clean% == 1 (
 echo             release
 
 cd %cfastrepo%\Validation\scripts
-call Run_CFAST_cases 1 %CFEXE% %backgroundexe% %sh2batexe% 1> %OUTDIR%\stage3b.txt 2>&1
+call Run_CFAST_cases  1> %OUTDIR%\stage3b.txt 2>&1
 
 call :find_runcases_warnings "***Warning"                                  %cfastrepo%\Validation   "Stage 3b-Validation"
 call :find_runcases_errors   "error|forrtl: severe|DASSL|floating invalid" %cfastrepo%\Validation   "Stage 3b-Validation"
