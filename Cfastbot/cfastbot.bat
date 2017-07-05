@@ -20,6 +20,18 @@ set emailto=%9
 
 set size=_64
 
+:: pass smokeviewopt and cfastopt variable to the Run_Validation_CFAST.bat script
+
+set smokeviewopt=
+if %use_installed_smokeview% == 0 goto skip_smokeviewopt
+set smokeviewopt=-smokeview
+:skip_smokeviewopt
+
+set cfastopt=
+if %use_installed_cfast% == 0 goto skip_cfastopt
+set cfastopt=-cfast
+:skip_cfastopt
+
 :: -------------------------------------------------------------
 ::                         set repository names
 :: -------------------------------------------------------------
@@ -443,7 +455,7 @@ echo             debug
 
 cd %cfastrepo%\Validation\scripts
 
-call Run_CFAST_cases -debug 1> %OUTDIR%\stage3a.txt 2>&1
+call Run_CFAST_cases -debug %cfastopt% %smokeviewopt% 1> %OUTDIR%\stage3a.txt 2>&1
 
 call :find_runcases_warnings "***Warning"                                  %cfastrepo%\Validation    "Stage 3a-Validation"
 call :find_runcases_errors   "error|forrtl: severe|DASSL|floating invalid" %cfastrepo%\Validation    "Stage 3a-Validation"
@@ -462,7 +474,7 @@ if %clean% == 1 (
 echo             release
 
 cd %cfastrepo%\Validation\scripts
-call Run_CFAST_cases  1> %OUTDIR%\stage3b.txt 2>&1
+call Run_CFAST_cases %cfastopt% %smokeviewopt% 1> %OUTDIR%\stage3b.txt 2>&1
 
 call :find_runcases_warnings "***Warning"                                  %cfastrepo%\Validation   "Stage 3b-Validation"
 call :find_runcases_errors   "error|forrtl: severe|DASSL|floating invalid" %cfastrepo%\Validation   "Stage 3b-Validation"
@@ -503,11 +515,11 @@ echo Stage 5 - Making matlab plots
 echo             Validation
 echo               VandV_Calcs
 cd %cfastrepo%\Validation
-%VandV_Calcs% CFAST_Pressure_Correction_Inputs.csv 1> Nul 2>&1
+%VandVCalcs% CFAST_Pressure_Correction_Inputs.csv 1> Nul 2>&1
 copy pressures.csv LLNL_Enclosure\LLNL_pressures.csv /Y 1> Nul 2>&1
-%VandV_Calcs% CFAST_Temperature_Profile_inputs.csv 1> Nul 2>&1
+%VandVCalcs% CFAST_Temperature_Profile_inputs.csv 1> Nul 2>&1
 copy profiles.csv Steckler_Compartment /Y 1> Nul 2>&1
-%VandV_Calcs% CFAST_Heat_Flux_Profile_inputs.csv 1> Nul 2>&1
+%VandVCalcs% CFAST_Heat_Flux_Profile_inputs.csv 1> Nul 2>&1
 copy flux_profiles.csv Fleury_Heat_Flux /Y 1> Nul 2>&1
 
 
