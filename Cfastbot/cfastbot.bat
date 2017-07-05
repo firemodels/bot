@@ -20,6 +20,18 @@ set emailto=%9
 
 set size=_64
 
+:: pass smokeviewopt and cfastopt variable to the Run_Validation_CFAST.bat script
+
+set smokeviewopt=
+if %use_installed_smokeview% == 0 goto skip_smokeviewopt
+set smokeviewopt=-smokeview
+:skip_smokeviewopt
+
+set cfastopt=
+if %use_installed_cfast% == 0 goto skip_cfastopt
+set cfastopt=-cfast
+:skip_cfastopt
+
 :: -------------------------------------------------------------
 ::                         set repository names
 :: -------------------------------------------------------------
@@ -443,7 +455,7 @@ echo             debug
 
 cd %cfastrepo%\Validation\scripts
 
-call Run_CFAST_cases -debug 1> %OUTDIR%\stage3a.txt 2>&1
+call Run_CFAST_cases -debug %cfastopt% %smokeviewopt% 1> %OUTDIR%\stage3a.txt 2>&1
 
 call :find_runcases_warnings "***Warning"                                  %cfastrepo%\Validation    "Stage 3a-Validation"
 call :find_runcases_errors   "error|forrtl: severe|DASSL|floating invalid" %cfastrepo%\Validation    "Stage 3a-Validation"
@@ -462,7 +474,7 @@ if %clean% == 1 (
 echo             release
 
 cd %cfastrepo%\Validation\scripts
-call Run_CFAST_cases  1> %OUTDIR%\stage3b.txt 2>&1
+call Run_CFAST_cases %cfastopt% %smokeviewopt% 1> %OUTDIR%\stage3b.txt 2>&1
 
 call :find_runcases_warnings "***Warning"                                  %cfastrepo%\Validation   "Stage 3b-Validation"
 call :find_runcases_errors   "error|forrtl: severe|DASSL|floating invalid" %cfastrepo%\Validation   "Stage 3b-Validation"
