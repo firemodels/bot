@@ -503,11 +503,11 @@ echo Stage 5 - Making matlab plots
 echo             Validation
 echo               VandV_Calcs
 cd %cfastrepo%\Validation
-%VandV_Calcs% CFAST_Pressure_Correction_Inputs.csv 1> Nul 2>&1
+%VandVCalcs% CFAST_Pressure_Correction_Inputs.csv 1> Nul 2>&1
 copy pressures.csv LLNL_Enclosure\LLNL_pressures.csv /Y 1> Nul 2>&1
-%VandV_Calcs% CFAST_Temperature_Profile_inputs.csv 1> Nul 2>&1
+%VandVCalcs% CFAST_Temperature_Profile_inputs.csv 1> Nul 2>&1
 copy profiles.csv Steckler_Compartment /Y 1> Nul 2>&1
-%VandV_Calcs% CFAST_Heat_Flux_Profile_inputs.csv 1> Nul 2>&1
+%VandVCalcs% CFAST_Heat_Flux_Profile_inputs.csv 1> Nul 2>&1
 copy flux_profiles.csv Fleury_Heat_Flux /Y 1> Nul 2>&1
 
 
