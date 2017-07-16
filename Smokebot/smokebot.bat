@@ -254,7 +254,7 @@ call :GET_TIME BUILDFDS_beg
 
 echo  Building FDS
 
-echo    parallel debug
+echo    debug
 
 cd %fdsrepo%\Build\mpi_intel_win_64_db
 erase *.obj *.mod *.exe 1> %OUTDIR%\stage1b.txt 2>&1
@@ -263,7 +263,7 @@ call make_fds bot 1>> %OUTDIR%\stage1b.txt 2>&1
 call :does_file_exist fds_mpi_win_64_db.exe %OUTDIR%\stage1b.txt|| exit /b 1
 call :find_fds_warnings "warning" %OUTDIR%\stage1b.txt "Stage 1b"
 
-echo    parallel release
+echo    release
 
 cd %fdsrepo%\Build\mpi_intel_win_64
 erase *.obj *.mod *.exe 1> %OUTDIR%\stage1d.txt 2>&1
