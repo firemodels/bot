@@ -266,7 +266,7 @@ set timingslogfile=%TIMINGSDIR%\timings_%revisionnum%.txt
 
 echo  Building FDS
 
-echo    parallel debug
+echo    debug
 
 cd %fdsrepo%\Build\mpi_intel_win_64_db
 erase *.obj *.mod *.exe *.pdb 1> Nul 2>&1
@@ -276,7 +276,7 @@ call :find_warnings "warning" %OUTDIR%\makefdsd.log "Stage 1b, FDS parallel debu
 
 if %lite% == 1 goto skip_lite1
 
-  echo    parallel release
+  echo    release
 
   cd %fdsrepo%\Build\mpi_intel_win_64
   erase *.obj *.mod *.exe *.pdb 1> Nul 2>&1
