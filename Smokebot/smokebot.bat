@@ -4,6 +4,7 @@ set repo=%~f1
 set cfastrepo=%repo%\cfast
 set fdsrepo=%repo%\fds
 set smvrepo=%repo%\smv
+set botrepo=%repo%\bot
 
 set clean=%2
 set update=%3
@@ -60,7 +61,7 @@ set timefile=%OUTDIR%\time.txt
 
 erase %OUTDIR%\*.txt 1> Nul 2>&1
 
-set email=%smvrepo%\scripts\email.bat
+set email=%botrepo%\Scripts\email.bat
 
 set emailaltsetup=%userprofile%\bin\setup_gmail.bat
 if "%altemail%" == "1" (

@@ -82,7 +82,7 @@ set TIMINGSDIR=%FIREBOTRUNDIR%\timings
 
 erase %OUTDIR%\*.txt %OUTDIR%\*.log 1> Nul 2>&1
 
-set email=%smvrepo%\scripts\email.bat
+set email=%botrepo%\Scripts\email.bat
 
 set emailaltsetup=%userprofile%\bin\setup_gmail.bat
 if "%altemail%" == "1" (
