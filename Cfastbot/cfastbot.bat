@@ -18,8 +18,6 @@ set skip_cases=%7
 set official=%8
 set emailto=%9
 
-set size=_64
-
 :: pass smokeviewopt and cfastopt variable to the Run_Validation_CFAST.bat script
 
 set smokeviewopt=
@@ -170,10 +168,10 @@ if %nothaveICC% == 0 (
   
 if %use_installed_smokeview% == 1 goto skip_build_gettime
 if %nothaveICC% == 1 goto skip_build_gettime
-    cd %smvrepo%\Build\get_time\intel_win%size%
+    cd %smvrepo%\Build\get_time\intel_win_64
     echo             building get_time
     call make_gettime bot >Nul 2>&1
-    set gettimeexe=%smvrepo%\Build\get_time\intel_win%size%\get_time_64.exe
+    set gettimeexe=%smvrepo%\Build\get_time\intel_win_64\get_time_64.exe
     call :is_file_installed %gettimeexe%|| exit /b 1
 :skip_build_gettime
 call :is_file_installed %gettimeexe%|| exit /b 1
@@ -186,10 +184,10 @@ call :GET_TIME PRELIM_beg
 
 if %use_installed_smokeview% == 1 goto skip_build_background
 if %nothaveICC% == 1 goto skip_build_background
-    cd %smvrepo%\Build\background\intel_win%size%
+    cd %smvrepo%\Build\background\intel_win_64
     echo             building background
     call make_background bot >Nul 2>&1
-    set backgroundexe=%smvrepo%\Build\background\intel_win%size%\background.exe
+    set backgroundexe=%smvrepo%\Build\background\intel_win_64\background.exe
 :skip_build_background
 call :is_file_installed %backgroundexe%|| exit /b 1
 echo             found background
@@ -216,10 +214,10 @@ if %nothaveICC% == 1 goto skip_sh2bat
 
   :: building sh2bat
   
-    cd %smvrepo%\Build\sh2bat\intel_win%size%
+    cd %smvrepo%\Build\sh2bat\intel_win_64
     echo             building sh2bat
     call make_sh2bat bot >Nul 2>&1
-    set sh2batexe=%smvrepo%\Build\sh2bat\intel_win%size%\sh2bat.exe
+    set sh2batexe=%smvrepo%\Build\sh2bat\intel_win_64\sh2bat.exe
 :skip_sh2bat
 
 call :is_file_installed %sh2batexe% || exit /b 1
@@ -366,34 +364,34 @@ echo Stage 1 - Building CFAST and VandV_Calcs
 
 echo             debug cfast
 
-cd %cfastrepo%\Build\CFAST\intel_win%size%_db
+cd %cfastrepo%\Build\CFAST\intel_win_64_db
 erase *.obj *.mod *.exe *.pdb *.optrpt 1> %OUTDIR%\stage1a.txt 2>&1
 call make_cfast bot %version% 1>> %OUTDIR%\stage1a.txt 2>&1
 
 
-set CFDEBUGEXE=%cfastrepo%\Build\CFAST\intel_win%size%_db\cfast7_win%size%_db.exe
+set CFDEBUGEXE=%cfastrepo%\Build\CFAST\intel_win_64_db\cfast7_win_64_db.exe
 call :does_file_exist %CFDEBUGEXE% %OUTDIR%\stage1a.txt|| exit /b 1
 
 call :find_cfast_warnings "warning" %OUTDIR%\stage1a.txt "Stage 1a"
 
 echo             release cfast
 
-cd %cfastrepo%\Build\CFAST\intel_win%size%
+cd %cfastrepo%\Build\CFAST\intel_win_64
 erase *.obj *.mod *.exe *.pdb *.optrpt 1> %OUTDIR%\stage1b.txt 2>&1
 call make_cfast bot %version% 1>> %OUTDIR%\stage1b.txt 2>&1
 
-set CFEXE=%cfastrepo%\Build\CFAST\intel_win%size%\cfast7_win%size%.exe
+set CFEXE=%cfastrepo%\Build\CFAST\intel_win_64\cfast7_win_64.exe
 call :does_file_exist %CFEXE% %OUTDIR%\stage1b.txt|| exit /b 1
 call :find_cfast_warnings "warning" %OUTDIR%\stage1b.txt "Stage 1b"
 
 echo             release VandV_Calcs
 
-cd %cfastrepo%\Build\VandV_Calcs\intel_win%size%
+cd %cfastrepo%\Build\VandV_Calcs\intel_win_64
 erase *.obj *.mod *.exe *.pdb *.optrpt 1> %OUTDIR%\stage1c.txt 2>&1
 call make_vv bot 1>> %OUTDIR%\stage1c.txt 2>&1
 
-set VandVCalcs=%cfastrepo%\Build\VandV_Calcs\intel_win%size%\VandV_Calcs_win%size%.exe
-call :does_file_exist VandV_Calcs_win%size%.exe %OUTDIR%\stage1c.txt|| exit /b 1
+set VandVCalcs=%cfastrepo%\Build\VandV_Calcs\intel_win_64\VandV_Calcs_win_64.exe
+call :does_file_exist VandV_Calcs_win_64.exe %OUTDIR%\stage1c.txt|| exit /b 1
 call :find_cfast_warnings "warning" %OUTDIR%\stage1c.txt "Stage 1c"
 
 :skip_build_cfast
@@ -415,26 +413,26 @@ echo Stage 2 - Building Smokeview
 
 echo             libs
 
-cd %smvrepo%\Build\LIBS\intel_win%size%
+cd %smvrepo%\Build\LIBS\intel_win_64
 call makelibs_bot 1>> %OUTDIR%\stage2a.txt 2>&1
 
 echo             debug
 
-cd %smvrepo%\Build\smokeview\intel_win%size%
-erase *.obj *.mod *.exe smokeview_win%size%_db.exe 1> %OUTDIR%\stage2a.txt 2>&1
+cd %smvrepo%\Build\smokeview\intel_win_64
+erase *.obj *.mod *.exe smokeview_win_64_db.exe 1> %OUTDIR%\stage2a.txt 2>&1
 call make_smv_db -r bot 1>> %OUTDIR%\stage2a.txt 2>&1
 
-call :does_file_exist smokeview_win%size%_db.exe %OUTDIR%\stage2a.txt|| exit /b 1
+call :does_file_exist smokeview_win_64_db.exe %OUTDIR%\stage2a.txt|| exit /b 1
 call :find_smokeview_warnings "warning" %OUTDIR%\stage2a.txt "Stage 2a"
 
 echo             release
 
-cd %smvrepo%\Build\smokeview\intel_win%size%
-erase *.obj *.mod smokeview_win%size%.exe 1> %OUTDIR%\stage2b.txt 2>&1
+cd %smvrepo%\Build\smokeview\intel_win_64
+erase *.obj *.mod smokeview_win_64.exe 1> %OUTDIR%\stage2b.txt 2>&1
 call make_smv -r bot 1>> %OUTDIR%\stage2b.txt 2>&1
-set SMOKEVIEW=%smvrepo%\Build\intel_win%size%\smokeview_win%size%.exe
+set SMOKEVIEW=%smvrepo%\Build\intel_win_64\smokeview_win_64.exe
 
-call :does_file_exist smokeview_win%size%.exe %OUTDIR%\stage2b.txt|| exit /b 1
+call :does_file_exist smokeview_win_64.exe %OUTDIR%\stage2b.txt|| exit /b 1
 call :find_smokeview_warnings "warning" %OUTDIR%\stage2b.txt "Stage 2b"
 :skip_stage2
 

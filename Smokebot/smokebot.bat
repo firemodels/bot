@@ -18,7 +18,6 @@ set cfastbranch=master
 ::  set number of OpenMP threads
 
 set OMP_NUM_THREADS=1
-set size=_64
 
 :: -------------------------------------------------------------
 ::                         set repository names
@@ -240,10 +239,10 @@ set timingslogfile=%TIMINGSDIR%\timings_%revisionnum%.txt
 :: build cfast
 
 echo    building cfast
-cd %cfastrepo%\Build\CFAST\intel_win%size%
+cd %cfastrepo%\Build\CFAST\intel_win_64
 erase *.obj *.mod *.exe 1>> %OUTDIR%\stage0.txt 2>&1
 call make_cfast bot 1>> %OUTDIR%\stage0.txt 2>&1
-call :does_file_exist cfast7_win%size%.exe %OUTDIR%\stage0.txt|| exit /b 1
+call :does_file_exist cfast7_win_64.exe %OUTDIR%\stage0.txt|| exit /b 1
 
 call :GET_DURATION PRELIM %PRELIM_beg%
 
@@ -257,20 +256,20 @@ echo  Building FDS
 
 echo    parallel debug
 
-cd %fdsrepo%\Build\mpi_intel_win%size%_db
+cd %fdsrepo%\Build\mpi_intel_win_64_db
 erase *.obj *.mod *.exe 1> %OUTDIR%\stage1b.txt 2>&1
 call make_fds bot 1>> %OUTDIR%\stage1b.txt 2>&1
 
-call :does_file_exist fds_mpi_win%size%_db.exe %OUTDIR%\stage1b.txt|| exit /b 1
+call :does_file_exist fds_mpi_win_64_db.exe %OUTDIR%\stage1b.txt|| exit /b 1
 call :find_fds_warnings "warning" %OUTDIR%\stage1b.txt "Stage 1b"
 
 echo    parallel release
 
-cd %fdsrepo%\Build\mpi_intel_win%size%
+cd %fdsrepo%\Build\mpi_intel_win_64
 erase *.obj *.mod *.exe 1> %OUTDIR%\stage1d.txt 2>&1
 call make_fds bot  1>> %OUTDIR%\stage1d.txt 2>&1
 
-call :does_file_exist fds_mpi_win%size%.exe %OUTDIR%\stage1d.txt|| exit /b 1
+call :does_file_exist fds_mpi_win_64.exe %OUTDIR%\stage1d.txt|| exit /b 1
 call :find_fds_warnings "warning" %OUTDIR%\stage1d.txt "Stage 1d"
 
 call :GET_DURATION BUILDFDS %BUILDFDS_beg%
@@ -285,25 +284,25 @@ echo  Building Smokeview
 
 echo    libs
 
-cd %smvrepo%\Build\LIBS\intel_win%size%
+cd %smvrepo%\Build\LIBS\intel_win_64
 call makelibs bot 1>> %OUTDIR%\stage2a.txt 2>&1
 
 echo    debug
 
-cd %smvrepo%\Build\smokeview\intel_win%size%
-erase *.obj *.mod *.exe smokeview_win%size%_db.exe 1> %OUTDIR%\stage2a.txt 2>&1
+cd %smvrepo%\Build\smokeview\intel_win_64
+erase *.obj *.mod *.exe smokeview_win_64_db.exe 1> %OUTDIR%\stage2a.txt 2>&1
 call make_smv_db -r bot 1>> %OUTDIR%\stage2a.txt 2>&1
 
-call :does_file_exist smokeview_win%size%_db.exe %OUTDIR%\stage2a.txt|| exit /b 1
+call :does_file_exist smokeview_win_64_db.exe %OUTDIR%\stage2a.txt|| exit /b 1
 call :find_smokeview_warnings "warning" %OUTDIR%\stage2a.txt "Stage 2a"
 
 echo    release
 
-cd %smvrepo%\Build\smokeview\intel_win%size%
-erase *.obj *.mod smokeview_win%size%.exe 1> %OUTDIR%\stage2b.txt 2>&1
+cd %smvrepo%\Build\smokeview\intel_win_64
+erase *.obj *.mod smokeview_win_64.exe 1> %OUTDIR%\stage2b.txt 2>&1
 call make_smv -r bot 1>> %OUTDIR%\stage2b.txt 2>&1
 
-call :does_file_exist smokeview_win%size%.exe %OUTDIR%\stage2b.txt|| exit /b 1
+call :does_file_exist smokeview_win_64.exe %OUTDIR%\stage2b.txt|| exit /b 1
 call :find_smokeview_warnings "warning" %OUTDIR%\stage2b.txt "Stage 2b"
 
 :: -------------------------------------------------------------
@@ -313,35 +312,35 @@ call :find_smokeview_warnings "warning" %OUTDIR%\stage2b.txt "Stage 2b"
 echo  Building FDS/Smokeview utilities
 
 echo    fds2ascii
-cd %fdsrepo%\Utilities\fds2ascii\intel_win%size%
+cd %fdsrepo%\Utilities\fds2ascii\intel_win_64
 erase *.obj *.mod *.exe 1> %OUTDIR%\stage3c.txt 2>&1
 call make_fds2ascii bot 1>> %OUTDIR%\stage3.txt 2>&1
-call :does_file_exist fds2ascii_win%size%.exe %OUTDIR%\stage3.txt|| exit /b 1
+call :does_file_exist fds2ascii_win_64.exe %OUTDIR%\stage3.txt|| exit /b 1
 
 if %haveCC% == 1 (
   echo    background
-  cd %smvrepo%\Build\background\intel_win%size%
+  cd %smvrepo%\Build\background\intel_win_64
   erase *.obj *.mod *.exe 1>> %OUTDIR%\stage3.txt 2>&1
   call make_background bot 1>> %OUTDIR%\stage3.txt 2>&1
   call :does_file_exist background.exe %OUTDIR%\stage3.txt
 
   echo    smokediff
-  cd %smvrepo%\Build\smokediff\intel_win%size%
+  cd %smvrepo%\Build\smokediff\intel_win_64
   erase *.obj *.mod *.exe 1>> %OUTDIR%\stage3.txt 2>&1
   call make_smokediff bot 1>> %OUTDIR%\stage3.txt 2>&1
-  call :does_file_exist smokediff_win%size%.exe %OUTDIR%\stage3.txt
+  call :does_file_exist smokediff_win_64.exe %OUTDIR%\stage3.txt
 
   echo    smokezip
-  cd %smvrepo%\Build\smokezip\intel_win%size%
+  cd %smvrepo%\Build\smokezip\intel_win_64
   erase *.obj *.mod *.exe 1>> %OUTDIR%\stage3.txt 2>&1
   call make_smokezip bot 1>> %OUTDIR%\stage3.txt 2>&1
-  call :does_file_exist smokezip_win%size%.exe %OUTDIR%\stage3.txt|| exit /b 1
+  call :does_file_exist smokezip_win_64.exe %OUTDIR%\stage3.txt|| exit /b 1
 
   echo    wind2fds
-  cd %smvrepo%\Build\wind2fds\intel_win%size%
+  cd %smvrepo%\Build\wind2fds\intel_win_64
   erase *.obj *.mod *.exe 1>> %OUTDIR%\stage3.txt 2>&1
   call make_wind2fds bot 1>> %OUTDIR%\stage3.txt 2>&1
-  call :does_file_exist wind2fds_win%size%.exe %OUTDIR%\stage3.txt|| exit /b 1
+  call :does_file_exist wind2fds_win_64.exe %OUTDIR%\stage3.txt|| exit /b 1
 ) else (
   call :is_file_installed background|| exit /b 1
   echo    background not built, using installed version

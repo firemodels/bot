@@ -19,8 +19,6 @@ set botbranch=master
 set fdsbranch=master
 set smvbranch=master
 
-set size=_64
-
 set abort=0
 if NOT exist %smvrepo% (
   echo ***Error: the repository %smvrepo% does not exist
@@ -270,20 +268,20 @@ echo  Building FDS
 
 echo    parallel debug
 
-cd %fdsrepo%\Build\mpi_intel_win%size%_db
+cd %fdsrepo%\Build\mpi_intel_win_64_db
 erase *.obj *.mod *.exe *.pdb 1> Nul 2>&1
 call make_fds bot 1> %OUTDIR%\makefdsd.log 2>&1
-call :does_file_exist fds_mpi_win%size%_db.exe %OUTDIR%\makefdsd.log|| exit /b 1
+call :does_file_exist fds_mpi_win_64_db.exe %OUTDIR%\makefdsd.log|| exit /b 1
 call :find_warnings "warning" %OUTDIR%\makefdsd.log "Stage 1b, FDS parallel debug compilation"
 
 if %lite% == 1 goto skip_lite1
 
   echo    parallel release
 
-  cd %fdsrepo%\Build\mpi_intel_win%size%
+  cd %fdsrepo%\Build\mpi_intel_win_64
   erase *.obj *.mod *.exe *.pdb 1> Nul 2>&1
   call make_fds bot 1> %OUTDIR%\makefdsr.log 2>&1
-  call :does_file_exist fds_mpi_win%size%.exe %OUTDIR%\makefdsr.log|| exit /b 1
+  call :does_file_exist fds_mpi_win_64.exe %OUTDIR%\makefdsr.log|| exit /b 1
   call :find_warnings "warning" %OUTDIR%\makefdsr.log "Stage 1d, FDS parallel release compilation"
 :skip_lite1
 
@@ -298,26 +296,26 @@ if %lite% == 1 goto skip_lite2
 
     echo    libs
 
-    cd %smvrepo%\Build\LIBS\intel_win%size%
+    cd %smvrepo%\Build\LIBS\intel_win_64
     call makelibs bot 1>> %OUTDIR%\stage2a.txt 2>&1
 
     echo    debug
 
-    cd %smvrepo%\Build\smokeview\intel_win%size%
-    erase *.obj *.mod *.exe smokeview_win%size%_db.exe 1> Nul 2>&1
+    cd %smvrepo%\Build\smokeview\intel_win_64
+    erase *.obj *.mod *.exe smokeview_win_64_db.exe 1> Nul 2>&1
     call make_smv_db -r bot 1> %OUTDIR%\makesmvd.log 2>&1
-    call :does_file_exist smokeview_win%size%_db.exe %OUTDIR%\makesmvd.log|| exit /b 1
+    call :does_file_exist smokeview_win_64_db.exe %OUTDIR%\makesmvd.log|| exit /b 1
     call :find_warnings "warning" %OUTDIR%\makesmvd.log "Stage 2a, Smokeview debug compilation"
 
     echo    release
 
-    cd %smvrepo%\Build\smokeview\intel_win%size%
-    erase *.obj *.mod smokeview_win%size%.exe 1> Nul 2>&1
+    cd %smvrepo%\Build\smokeview\intel_win_64
+    erase *.obj *.mod smokeview_win_64.exe 1> Nul 2>&1
     call make_smv -r bot 1> %OUTDIR%\makesmvr.log 2>&1
 
-    call :does_file_exist smokeview_win%size%.exe %OUTDIR%\makesmvr.log|| aexit /b 1
+    call :does_file_exist smokeview_win_64.exe %OUTDIR%\makesmvr.log|| aexit /b 1
     call :find_warnings "warning" %OUTDIR%\makesmvr.log "Stage 2b, Smokeview release compilation"
-    set smokeview=%smvrepo%\Build\smokeview\intel_win%size%\smokeview_win%size%.exe
+    set smokeview=%smvrepo%\Build\smokeview\intel_win_64\smokeview_win_64.exe
   :skip_build_cstuff
 
 :: -------------------------------------------------------------
@@ -327,15 +325,15 @@ if %lite% == 1 goto skip_lite2
   echo  Building Utilities
 
   echo    fds2ascii
-  cd %fdsrepo%\Utilities\fds2ascii\intel_win%size%
+  cd %fdsrepo%\Utilities\fds2ascii\intel_win_64
   erase *.obj *.mod *.exe 1> Nul 2>&1
   call make_fds2ascii bot 1> %OUTDIR%\makefds2ascii.log 2>&1
-  call :does_file_exist fds2ascii_win%size%.exe %OUTDIR%\makefds2ascii.log|| exit /b 1
+  call :does_file_exist fds2ascii_win_64.exe %OUTDIR%\makefds2ascii.log|| exit /b 1
   call :find_warnings "warning" %OUTDIR%\makefds2ascii.log "Stage 3, Building FDS/Smokeview utilities"
 
   if %have_icc% == 1 (
     echo    background
-    cd %smvrepo%\Build\background\intel_win%size%
+    cd %smvrepo%\Build\background\intel_win_64
     erase *.obj *.mod *.exe 1> Nul 2>&1
     call make_background bot 1> %OUTDIR%\makebackground.log 2>&1
     call :does_file_exist background.exe %OUTDIR%\makebackground.log
