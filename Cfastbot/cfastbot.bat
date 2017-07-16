@@ -170,7 +170,7 @@ if %use_installed_smokeview% == 1 goto skip_build_gettime
 if %nothaveICC% == 1 goto skip_build_gettime
     cd %smvrepo%\Build\get_time\intel_win_64
     echo             building get_time
-    call make_gettime bot >Nul 2>&1
+    call make_get_time bot >Nul 2>&1
     set gettimeexe=%smvrepo%\Build\get_time\intel_win_64\get_time_64.exe
     call :is_file_installed %gettimeexe%|| exit /b 1
 :skip_build_gettime
