@@ -407,7 +407,7 @@ if %build_utilities% == 0 goto skip_build_cfast1
 echo Stage 1b - Building Utilities
 :skip_build_cfast1
 
-if %build_gittime% == 0 goto skip_build_gettime
+if %build_gettime% == 0 goto skip_build_gettime
   cd %smvrepo%\Build\get_time\intel_win_64
   echo             get_time
   call make_get_time bot >Nul 2>&1
