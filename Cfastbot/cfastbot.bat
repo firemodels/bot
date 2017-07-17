@@ -325,11 +325,11 @@ if %usematlab% == 1 goto skip_matlabexe
 ::*** clean repositories
 
 if %clean% == 0 goto skip_update0
-   echo             cleaning 
-   echo                cfast
+   echo             cleaning repos
+   echo               cfast
    call :git_clean %cfastrepo%
    if %use_installed_smokeview% == 1 goto skip_update0
-   echo                smv
+   echo               smv
    call :git_clean %smvrepo%\Build
 
 :skip_update0
@@ -337,15 +337,15 @@ if %clean% == 0 goto skip_update0
 ::*** update repositories
 
 if %update% == 0 goto skip_update1
-  echo             updating
-  echo                cfast
+  echo             updating repos
+  echo               cfast
   cd %cfastrepo%
   git fetch origin
   git merge origin/master  1> %OUTDIR%\stage0.txt 2>&1
 
   if %use_installed_smokeview% == 1 goto skip_update1
   cd %smvrepo%
-  echo                smv
+  echo               smv
   git fetch origin
   git merge origin/master  1> %OUTDIR%\stage0.txt 2>&1
 :skip_update1
