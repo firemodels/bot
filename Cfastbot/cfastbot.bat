@@ -224,10 +224,12 @@ if %nothaveICC% == 1 goto skip_sh2bat0
   set build_sh2bat=1
 :skip_sh2bat0
 
-if %build_sh2bat% == 0 goto skip_sh2bat1
+if %build_sh2bat% == 1 goto skip_sh2bat1
 call :is_file_installed %sh2batexe% || exit /b 1
 echo             found sh2bat
 :skip_sh2bat1
+
+::---------------- smokeview
 
 if %use_installed_smokeview% == 0 goto skip1
 if %nothaveICC% == 0 goto skip1
@@ -236,7 +238,7 @@ if %nothaveICC% == 0 goto skip1
   set SMOKEVIEW=smokeview.exe
 :skip1
 
-::*** looking for email
+::---------------- mailsend
 
 if NOT exist %emailexe% (
   echo ***warning: email client not found.   
