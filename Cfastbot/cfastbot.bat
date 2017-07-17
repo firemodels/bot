@@ -132,7 +132,7 @@ echo. > %errorlog%
 echo log > %warninglog%
 echo. > %stagestatus%
 
-::*** looking for fortran
+:: ---------------- Fortran
 
 if %use_installed_cfast% == 1 goto skip_ifort
 call ..\..\cfast\Build\scripts\setup_intel_compilers.bat
@@ -148,7 +148,7 @@ if %nothaveFORTRAN% == 0 (
 )
 :skip_ifort
 
-::*** looking for C
+:: ---------------- C/C++
 
 if %use_installed_smokeview% == 1 goto skip_icc
 icl 1> %OUTDIR%\stage0a.txt 2>&1
@@ -164,35 +164,41 @@ if %nothaveICC% == 0 (
 )
 :skip_icc
 
-  :: looking for/building get_time
-  
-if %use_installed_smokeview% == 1 goto skip_build_gettime
-if %nothaveICC% == 1 goto skip_build_gettime
+set build_utilities=0
+
+:: ---------------- get_time
+
+set build_gettime=0
+if %use_installed_smokeview% == 1 goto skip_build_gettime0
+if %nothaveICC% == 1 goto skip_build_gettime0
+    set build_utilities=1
+    set build_gettime=1
     cd %smvrepo%\Build\get_time\intel_win_64
     echo             building get_time
     call make_get_time bot >Nul 2>&1
     set gettimeexe=%smvrepo%\Build\get_time\intel_win_64\get_time_64.exe
-    call :is_file_installed %gettimeexe%|| exit /b 1
-:skip_build_gettime
+:skip_build_gettime0
 call :is_file_installed %gettimeexe%|| exit /b 1
 echo             found get_time
 
 call :GET_TIME TIME_beg
 call :GET_TIME PRELIM_beg
 
-  :: looking for/building background
+:: ---------------- background
 
-if %use_installed_smokeview% == 1 goto skip_build_background
-if %nothaveICC% == 1 goto skip_build_background
-    cd %smvrepo%\Build\background\intel_win_64
-    echo             building background
-    call make_background bot >Nul 2>&1
-    set backgroundexe=%smvrepo%\Build\background\intel_win_64\background.exe
-:skip_build_background
+set build_background=0
+if %use_installed_smokeview% == 1 goto skip_build_background0
+if %nothaveICC% == 1 goto skip_build_background0
+    set build_background=1
+    set build_utilities=1
+:skip_build_background0
+
+if %build_background% == 1 goto skip_build_background1
 call :is_file_installed %backgroundexe%|| exit /b 1
 echo             found background
+:skip_build_background1
 
-::*** looking for/building cfast
+::---------------- cfast
 
 if %use_installed_cfast% == 0 goto skip_cfast
 
@@ -201,27 +207,27 @@ if %use_installed_cfast% == 0 goto skip_cfast
    call :is_file_installed %CFEXE%|| exit /b 1
 echo             found cfast
 
+::---------------- VandV_Calcs
+
 set VandVCalcs=VandV_Calcs.exe
    call :is_file_installed %VandVCalcs%|| exit /b 1
 echo             found VandVCalcs
 
 :skip_cfast
 
-::*** looking for/building sh2bat
+::---------------- sh2bat
 
-if %use_installed_smokeview% == 1 goto skip_sh2bat
-if %nothaveICC% == 1 goto skip_sh2bat
+set build_sh2bat=0
+if %use_installed_smokeview% == 1 goto skip_sh2bat0
+if %nothaveICC% == 1 goto skip_sh2bat0
+  set build_utilities=1
+  set build_sh2bat=1
+:skip_sh2bat0
 
-  :: building sh2bat
-  
-    cd %smvrepo%\Build\sh2bat\intel_win_64
-    echo             building sh2bat
-    call make_sh2bat bot >Nul 2>&1
-    set sh2batexe=%smvrepo%\Build\sh2bat\intel_win_64\sh2bat.exe
-:skip_sh2bat
-
+if %build_sh2bat% == 0 goto skip_sh2bat1
 call :is_file_installed %sh2batexe% || exit /b 1
 echo             found sh2bat
+:skip_sh2bat1
 
 if %use_installed_smokeview% == 0 goto skip1
 if %nothaveICC% == 0 goto skip1
@@ -360,7 +366,7 @@ set timingslogfile=%TIMINGSDIR%\timings_%revisionnum%.txt
 :: -------------------------------------------------------------
 
 if %use_installed_cfast% == 1 goto skip_build_cfast
-echo Stage 1 - Building CFAST and VandV_Calcs
+echo Stage 1 - Building CFAST and Utilities
 
 echo             debug cfast
 
@@ -395,6 +401,35 @@ call :does_file_exist VandV_Calcs_win_64.exe %OUTDIR%\stage1c.txt|| exit /b 1
 call :find_cfast_warnings "warning" %OUTDIR%\stage1c.txt "Stage 1c"
 
 :skip_build_cfast
+
+if %use_installed_cfast% == 0 goto skip_build_cfast1
+if %build_utilities% == 0 goto skip_build_cfast1
+echo Stage 1b - Building Utilities
+:skip_build_cfast1
+
+if %build_gittime% == 0 goto skip_build_gettime
+  cd %smvrepo%\Build\get_time\intel_win_64
+  echo             get_time
+  call make_get_time bot >Nul 2>&1
+  set gettimeexe=%smvrepo%\Build\get_time\intel_win_64\get_time_64.exe
+  call :is_file_installed %gettimeexe%|| exit /b 1
+:skip_build_gettime
+
+if %build_background% == 0 goto skip_build_background
+  cd %smvrepo%\Build\background\intel_win_64
+  echo             background
+  call make_background bot >Nul 2>&1
+  set backgroundexe=%smvrepo%\Build\background\intel_win_64\background.exe
+:skip_build_background
+
+if %build_sh2bat% == 0 goto skip_sh2bat
+  cd %smvrepo%\Build\sh2bat\intel_win_64
+  echo             sh2bat
+  call make_sh2bat bot >Nul 2>&1
+  set sh2batexe=%smvrepo%\Build\sh2bat\intel_win_64\sh2bat.exe
+  call :is_file_installed %sh2batexe% || exit /b 1
+:skip_sh2bat
+
 
 :: -------------------------------------------------------------
 ::                           stage 2 - build smokeview
