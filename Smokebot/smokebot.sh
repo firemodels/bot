@@ -1573,9 +1573,10 @@ cd
 export SMV_SUMMARY="$smvrepo/Manuals/SMV_Summary"
 WEBFROMDIR="$smvrepo/Manuals/SMV_Summary"
 
-SMV_VG_GUIDE=$smvrepo/Manuals/SMV_Verification_Guide/SMV_Verification_Guide.pdf
-SMV_UG_GUIDE=$smvrepo/Manuals/SMV_User_Guide/SMV_User_Guide.pdf
-GEOM_NOTES=$smvrepo/Manuals/FDS_User_Guide/geom_notes.pdf
+#SMV_VG_GUIDE=$smvrepo/Manuals/SMV_Verification_Guide/SMV_Verification_Guide.pdf
+#SMV_UG_GUIDE=$smvrepo/Manuals/SMV_User_Guide/SMV_User_Guide.pdf
+#SMV_UTILG_GUIDE=$smvrepo/Manuals/SMV_Utilities_Guide/SMV_Utilities_Guide.pdf
+#GEOM_NOTES=$smvrepo/Manuals/FDS_User_Guide/geom_notes.pdf
 UploadGuides=$botrepo/Smokebot/smv_guides2GD.sh
 
 THIS_FDS_AUTHOR=
@@ -1757,6 +1758,8 @@ if [ "$SMOKEBOT_LITE" == "" ]; then
      make_guide SMV_Technical_Reference_Guide $smvrepo/Manuals/SMV_Technical_Reference_Guide SMV_Technical_Reference_Guide
      echo "   verification"
      make_guide SMV_Verification_Guide $smvrepo/Manuals/SMV_Verification_Guide SMV_Verification_Guide
+     echo "   utilities"
+     make_guide SMV_Utilities_Guide $smvrepo/Manuals/SMV_Utilities_Guide SMV_Utilities_Guide
   else
      echo Errors found, not building guides
   fi

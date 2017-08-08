@@ -429,6 +429,9 @@ call :build_guide SMV_Verification_Guide %smvrepo%\Manuals\SMV_Verification_Guid
 echo    User
 call :build_guide SMV_User_Guide %smvrepo%\Manuals\SMV_User_Guide 1>> %OUTDIR%\stage6.txt 2>&1
 
+echo    Utilities
+call :build_guide SMV_Utilities_Guide %smvrepo%\Manuals\SMV_Utilities_Guide 1>> %OUTDIR%\stage6.txt 2>&1
+
 :: echo    Geom Notes
 :: call :build_guide geom_notes %smvrepo%\Manuals\FDS_User_Guide 1>> %OUTDIR%\stage6.txt 2>&1
 
