@@ -1762,13 +1762,13 @@ if [ "$SMOKEBOT_LITE" == "" ]; then
        make_guide geom_notes $fdsrepo/Manuals/FDS_User_Guide geometry_notes
      fi
      echo "   user"
-     make_guide SMV_User_Guide $smvrepo/Manuals/SMV_User_Guide SMV_User_Guide
+     make_guide SMV_User_Guide                $smvrepo/Manuals/SMV_User_Guide                SMV_User_Guide
      echo "   technical"
      make_guide SMV_Technical_Reference_Guide $smvrepo/Manuals/SMV_Technical_Reference_Guide SMV_Technical_Reference_Guide
      echo "   verification"
-     make_guide SMV_Verification_Guide $smvrepo/Manuals/SMV_Verification_Guide SMV_Verification_Guide
+     make_guide SMV_Verification_Guide        $smvrepo/Manuals/SMV_Verification_Guide        SMV_Verification_Guide
      echo "   utilities"
-     make_guide SMV_Utilities_Guide $smvrepo/Manuals/SMV_Utilities_Guide SMV_Utilities_Guide
+     make_guide SMV_Utilities_Guide           $smvrepo/Manuals/SMV_Utilities_Guide           SMV_Utilities_Guide
   else
      echo Errors found, not building guides
   fi
