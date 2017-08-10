@@ -622,6 +622,13 @@ compile_smv_utilities()
      rm -f *.o background
      echo 'Compiling background:' >> $OUTPUT_DIR/stage2a 2>&1
      ./make_background.sh >> $OUTPUT_DIR/stage2a 2>&1
+
+   # dem2fds
+     echo "      dem2fds"
+     cd $smvrepo/Build/dem2fds/${COMPILER}_${platform}_${size}
+     rm -f *.o dem2fds
+     echo 'Compiling dem2fds:' >> $OUTPUT_DIR/stage2a 2>&1
+     ./make_dem2fds.sh >> $OUTPUT_DIR/stage2a 2>&1
    
   # wind2fds:
      echo "      wind2fds"
@@ -708,6 +715,7 @@ check_smv_utilities()
      if [ -e "$smvrepo/Build/smokezip/${COMPILER}_${platform}_${size}/smokezip_${platform}_${size}" ]  && \
         [ -e "$smvrepo/Build/smokediff/${COMPILER}_${platform}_${size}/smokediff_${platform}_${size}" ]  && \
         [ -e "$smvrepo/Build/wind2fds/${COMPILER}_${platform}_${size}/wind2fds_${platform}_${size}" ]  && \
+        [ -e "$smvrepo/Build/dem2fds/${COMPILER}_${platform}_${size}/dem2fds_${platform}_${size}" ]  && \
         [ -e "$smvrepo/Build/background/${COMPILER}_${platform}_${size}/background" ]
      then
         stage2a_success="1"
@@ -723,6 +731,7 @@ check_smv_utilities()
      is_file_installed smokezip
      is_file_installed smokediff
      is_file_installed wind2fds
+     is_file_installed dem2fds
      is_file_installed background
      if [ "$stage2a_success" == "0" ] ; then
         echo "Errors from Stage 2a - Smokeview and utilities:" >> $ERROR_LOG
@@ -1573,9 +1582,10 @@ cd
 export SMV_SUMMARY="$smvrepo/Manuals/SMV_Summary"
 WEBFROMDIR="$smvrepo/Manuals/SMV_Summary"
 
-SMV_VG_GUIDE=$smvrepo/Manuals/SMV_Verification_Guide/SMV_Verification_Guide.pdf
-SMV_UG_GUIDE=$smvrepo/Manuals/SMV_User_Guide/SMV_User_Guide.pdf
-GEOM_NOTES=$smvrepo/Manuals/FDS_User_Guide/geom_notes.pdf
+#SMV_VG_GUIDE=$smvrepo/Manuals/SMV_Verification_Guide/SMV_Verification_Guide.pdf
+#SMV_UG_GUIDE=$smvrepo/Manuals/SMV_User_Guide/SMV_User_Guide.pdf
+#SMV_UTILG_GUIDE=$smvrepo/Manuals/SMV_Utilities_Guide/SMV_Utilities_Guide.pdf
+#GEOM_NOTES=$smvrepo/Manuals/FDS_User_Guide/geom_notes.pdf
 UploadGuides=$botrepo/Smokebot/smv_guides2GD.sh
 
 THIS_FDS_AUTHOR=
@@ -1752,11 +1762,13 @@ if [ "$SMOKEBOT_LITE" == "" ]; then
        make_guide geom_notes $fdsrepo/Manuals/FDS_User_Guide geometry_notes
      fi
      echo "   user"
-     make_guide SMV_User_Guide $smvrepo/Manuals/SMV_User_Guide SMV_User_Guide
+     make_guide SMV_User_Guide                $smvrepo/Manuals/SMV_User_Guide                SMV_User_Guide
      echo "   technical"
      make_guide SMV_Technical_Reference_Guide $smvrepo/Manuals/SMV_Technical_Reference_Guide SMV_Technical_Reference_Guide
      echo "   verification"
-     make_guide SMV_Verification_Guide $smvrepo/Manuals/SMV_Verification_Guide SMV_Verification_Guide
+     make_guide SMV_Verification_Guide        $smvrepo/Manuals/SMV_Verification_Guide        SMV_Verification_Guide
+     echo "   utilities"
+     make_guide SMV_Utilities_Guide           $smvrepo/Manuals/SMV_Utilities_Guide           SMV_Utilities_Guide
   else
      echo Errors found, not building guides
   fi

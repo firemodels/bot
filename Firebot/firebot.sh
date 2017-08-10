@@ -983,7 +983,7 @@ check_fds_pictures()
       :
    else
       echo "Warnings from Stage 6 - Make FDS pictures:" >> $WARNING_LOG
-      grep -I -E "Warning" $OUTPUT_DIR/stage6 >> $WARNING_LOG
+      grep -A 1 -I -E "Warning" $OUTPUT_DIR/stage6 >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
 }
