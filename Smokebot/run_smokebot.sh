@@ -2,7 +2,6 @@
 
 # The Smokebot script is part of an automated continuous integration system.
 # Consult the FDS Config Management Plan for more information.
-
 #---------------------------------------------
 #                   usage
 #---------------------------------------------
@@ -11,12 +10,30 @@ function usage {
 echo "Verification and validation testing script for smokeview"
 echo ""
 echo "Options:"
+echo "-c - clean repo"
+echo "-h - display most commonly used options"
+echo "-H - display all options"
+echo "-u - update repo"
+echo "-v - show options used to run smokebot"
+exit
+}
+
+
+#---------------------------------------------
+#                   usage_all
+#---------------------------------------------
+
+function usage_all {
+echo "Verification and validation testing script for smokeview"
+echo ""
+echo "Options:"
 echo "-3 - run in 32 bit mode (only for gnu compilers)"
 echo "-a - run automatically if FDS or smokeview source has changed"
 echo "-b - branch_name - run smokebot using the branch branch_name [default: $BRANCH]"
 echo "-c - clean repo"
 echo "-f - force smokebot run"
-echo "-h - display this message"
+echo "-h - display most commonly used options"
+echo "-H - display all options"
 echo "-I compiler - intel or gnu [default: $COMPILER]"
 if [ "$EMAIL" != "" ]; then
 echo "-k - kill smokebot if it is running"
@@ -153,7 +170,7 @@ if [ $notfound -eq 1 ] ; then
   QUEUE=none
 fi
 
-while getopts '3aAb:cd:fhI:kLm:NMq:r:tuUvw:W:' OPTION
+while getopts '3aAb:cd:fhHI:kLm:NMq:r:tuUvw:W:' OPTION
 do
 case $OPTION  in
   3)
@@ -180,6 +197,10 @@ case $OPTION  in
    ;;
   h)
    usage
+   exit
+   ;;
+  H)
+   usage_all
    exit
    ;;
   k)

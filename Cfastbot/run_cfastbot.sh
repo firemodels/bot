@@ -51,11 +51,28 @@ function usage {
 echo "Verification and validation testing script for cfast"
 echo ""
 echo "Options:"
+echo "-c - clean repos"
+echo "-h - display most commonly used options"
+echo "-H - display all options"
+echo "-u - update repos"
+echo "-v - show options used to run cfastbot"
+exit
+}
+
+#---------------------------------------------
+#                   usage_all
+#---------------------------------------------
+
+function usage_all {
+echo "Verification and validation testing script for cfast"
+echo ""
+echo "Options:"
 echo "-3 - run in 32 bit mode (only for gnu compilers)"
 echo "-a - run automatically if cfast repo has changed"
-echo "-c - clean cfast and FDS-SMV repos"
+echo "-c - clean repos"
 echo "-f - force cfastbot run"
-echo "-h - display this message"
+echo "-h - display most commonly used options"
+echo "-H - display all options"
 echo "-i - use installed smokeview and background (if using the 'none' queue)"
 echo "-I - compiler [ default: $compiler]"
 echo "-k - kill cfastbot"
@@ -63,7 +80,7 @@ echo "-m email -  email_address "
 echo "-q queue_name - run cases using the queue queue_name"
 echo "     default: $QUEUE"
 echo "-s - skip matlab and guide generating stages"
-echo "-u - update cfast and FDS-SMV repos"
+echo "-u - update repos"
 echo "-U - upload guide (only by user: cfastbot)"
 echo "-v - show options used to run cfastbot"
 exit
@@ -149,7 +166,7 @@ USEINSTALL=
 KILL_CFASTBOT=
 ECHO=
 
-while getopts '3acfhiI:km:q:suUv' OPTION
+while getopts '3acfhHiI:km:q:suUv' OPTION
 do
 case $OPTION  in
   3)
@@ -167,6 +184,9 @@ case $OPTION  in
    ;;
   h)
    usage;
+   ;;
+  H)
+   usage_all;
    ;;
   i)
    USEINSTALL="-i"
