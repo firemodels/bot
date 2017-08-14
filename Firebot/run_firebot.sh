@@ -3,29 +3,29 @@
 # The Firebot script is part of an automated continuous integration system.
 # Consult the FDS Config Management Plan for more information.
 
-
 #---------------------------------------------
-#                   usage
+#                   usage_all
 #---------------------------------------------
 
-function usage {
+function usage_all {
 echo "Verification and validation testing script for FDS"
 echo ""
 echo "Options:"
 #echo "-b - branch_name - run firebot using branch_name [default: $BRANCH]"
 echo "-c - clean repo"
-echo "-h - display this message"
+echo "-h - display most commonly used options"
+echo "-H - display all options"
 echo "-k - kill firebot if it is running"
 echo "-q queue - specify queue [default: $QUEUE]"
 echo "-u - update repos"
 echo "-v - show options used to run firebot"
-echo "validationbot mode:"
-echo "-C - commit validationbot output results"
-echo "-D caselist - specify file containing list of validationbot cases"
-echo "-K - kill validationbot if it is running"
-echo "-P - commit and push (to github repo) validationbot output results (not implemented)"
-echo "-S - show list validationbot cases"
-echo "-V n - run firebot in validationbot mode with specified number (n) of processes"
+#echo "validationbot mode:"
+#echo "-C - commit validationbot output results"
+#echo "-D caselist - specify file containing list of validationbot cases"
+#echo "-K - kill validationbot if it is running"
+#echo "-P - commit and push (to github repo) validationbot output results (not implemented)"
+#echo "-S - show list validationbot cases"
+#echo "-V n - run firebot in validationbot mode with specified number (n) of processes"
 echo "Miscellaneous:"
 echo "-i - use installed version of smokeview"
 echo "-I - use development version of fds"
@@ -40,6 +40,24 @@ else
 fi
 echo "-s - skip matlab and build document stages"
 echo "-U - upload guides (only by user firebot)"
+exit
+}
+
+
+#---------------------------------------------
+#                   usage
+#---------------------------------------------
+
+function usage {
+echo "Verification and validation testing script for FDS"
+echo ""
+echo "Options:"
+echo "-c - clean repos"
+echo "-h - display most commonly used options"
+echo "-H - display all options"
+echo "-k - kill firebot if it is running"
+echo "-u - update repos"
+echo "-v - show options used to run firebot"
 exit
 }
 
@@ -149,7 +167,7 @@ showcaselist=
 debug_mode=
 DV=
 
-while getopts 'b:cdCD:FfhIiKkLm:Pq:nsSuUvV:' OPTION
+while getopts 'b:cdCD:FfHhIiKkLm:Pq:nsSuUvV:' OPTION
 do
 case $OPTION  in
   b)
@@ -176,6 +194,9 @@ case $OPTION  in
    ;;
   h)
    usage;
+   ;;
+  H)
+   usage_all;
    ;;
   i)
    USEINSTALL="-i"
