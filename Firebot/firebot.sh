@@ -1079,7 +1079,7 @@ check_matlab_verification()
 check_verification_stats()
 {
    # Check for existence of verification statistics output file
-   cd $fdsrepo/Utilities/Matlab
+   cd $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/Scatterplots
    if [ -e "FDS_verification_scatterplot_output.csv" ]
    then
       # Continue along
@@ -1087,7 +1087,7 @@ check_verification_stats()
    else
       echo "Warnings from Stage 7a - Matlab plotting and statistics (verification):" >> $WARNING_LOG
       echo "Error: The verification statistics output file does not exist." >> $WARNING_LOG
-      echo "Expected the file Utilities/Matlab/FDS_verification_scatterplot_output.csv" >> $WARNING_LOG
+      echo "Expected the file Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/Scatterplots/FDS_verification_scatterplot_output.csv" >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
 
@@ -1158,7 +1158,7 @@ archive_validation_stats()
 
    echo archiving validation stats
    STATS_FILE_BASENAME=FDS_validation_scatterplot_output
-   CURRENT_STATS_FILE=$fdsrepo/Utilities/Matlab/${STATS_FILE_BASENAME}.csv
+   CURRENT_STATS_FILE=$fdsrepo/Manuals/FDS_Validation_Guide/SCRIPT_FIGURES/Scatterplots/${STATS_FILE_BASENAME}.csv
 
    if [ -e ${CURRENT_STATS_FILE} ]
    then
@@ -1168,7 +1168,7 @@ archive_validation_stats()
    else
       echo "Warnings from Stage 7b - Matlab plotting and statistics (validation):" >> $WARNING_LOG
       echo "Warning: The validation statistics output file does not exist." >> $WARNING_LOG
-      echo "Expected the file Utilities/Matlab/FDS_validation_scatterplot_output.csv" >> $WARNING_LOG
+      echo "Expected the file Manuals/FDS_Validation_Guide/SCRIPT_FIGURES/Scatterplots/FDS_validation_scatterplot_output.csv" >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
 }
