@@ -1737,12 +1737,12 @@ echo Building
 echo "   FDS"
 # if something goes wrong with the openmp inspector
 # comment the following 6 lines (including 'if' and and 'fi'  lines
-if [ "$FIREBOT_MODE" == "verification" ] ; then
-  if [ "$FIREBOT_LITE" == "" ]; then
-    inspect_fds_db
-    check_inspect_fds_db
-  fi
-fi
+#if [ "$FIREBOT_MODE" == "verification" ] ; then
+#  if [ "$FIREBOT_LITE" == "" ]; then
+#    inspect_fds_db
+#    check_inspect_fds_db
+#  fi
+#fi
 
 ### Stage 2b ###
 compile_fds_mpi_db
