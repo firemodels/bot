@@ -1735,6 +1735,8 @@ archive_compiler_version
 ### Stage 2a ###
 echo Building
 echo "   FDS"
+# if something goes wrong with the openmp inspector
+# comment the following 6 lines (including 'if' and and 'fi'  lines
 if [ "$FIREBOT_MODE" == "verification" ] ; then
   if [ "$FIREBOT_LITE" == "" ]; then
     inspect_fds_db
