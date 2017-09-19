@@ -1,4 +1,4 @@
-# bot 
+#  bot 
 Firebot, Smokebot and Cfastbot
 
 This repository contains the scripts firebot, smokebot, and cfastbot for testing FDS, Smokeview
