@@ -279,22 +279,22 @@ archive_compiler_version()
 }
 
 #---------------------------------------------
-#                   inspect_fds_db
+#                   inspect_fds
 #---------------------------------------------
 
-inspect_fds_db()
+inspect_fds()
 {
    # Perform OpenMP thread checking (locate deadlocks and data races)
    echo "      inspection"
    cd $fdsrepo/Verification/Thread_Check/
-   $fdsrepo/Utilities/Scripts/inspect_openmp.sh  -r $repo thread_check.fds &> $OUTPUT_DIR/stage2a
+   ./inspect_openmp.sh  thread_check.fds &> $OUTPUT_DIR/stage2a
 }
 
 #---------------------------------------------
-#                   check_inspect_fds_db
+#                   check_inspect_fds
 #---------------------------------------------
 
-check_inspect_fds_db()
+check_inspect_fds()
 {
    # Scan for errors in thread checking results
    cd $fdsrepo/Utilities/Scripts
@@ -307,8 +307,8 @@ check_inspect_fds_db()
       echo "Errors from Stage 2a - Compile and inspect FDS debug:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage2a >> $ERROR_LOG
       echo "" >> $ERROR_LOG
-      echo "For more details, view the inspector log in the fds/Utilities/Scripts folder" >> $ERROR_LOG
-      echo "by using the fds/Utilities/Scripts/inspect_report.sh script." >> $ERROR_LOG
+      echo "For more details, cd to Verification/Thread_Check and view results in the " >> $ERROR_LOG
+      echo "inspect_results directory after running the inspect_report.sh script." >> $ERROR_LOG
       echo "" >> $ERROR_LOG
    fi
 }
@@ -1079,7 +1079,7 @@ check_matlab_verification()
 check_verification_stats()
 {
    # Check for existence of verification statistics output file
-   cd $fdsrepo/Utilities/Matlab
+   cd $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/Scatterplots
    if [ -e "FDS_verification_scatterplot_output.csv" ]
    then
       # Continue along
@@ -1087,7 +1087,7 @@ check_verification_stats()
    else
       echo "Warnings from Stage 7a - Matlab plotting and statistics (verification):" >> $WARNING_LOG
       echo "Error: The verification statistics output file does not exist." >> $WARNING_LOG
-      echo "Expected the file Utilities/Matlab/FDS_verification_scatterplot_output.csv" >> $WARNING_LOG
+      echo "Expected the file Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/Scatterplots/FDS_verification_scatterplot_output.csv" >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
 
@@ -1158,7 +1158,7 @@ archive_validation_stats()
 
    echo archiving validation stats
    STATS_FILE_BASENAME=FDS_validation_scatterplot_output
-   CURRENT_STATS_FILE=$fdsrepo/Utilities/Matlab/${STATS_FILE_BASENAME}.csv
+   CURRENT_STATS_FILE=$fdsrepo/Manuals/FDS_Validation_Guide/SCRIPT_FIGURES/ScatterPlots/${STATS_FILE_BASENAME}.csv
 
    if [ -e ${CURRENT_STATS_FILE} ]
    then
@@ -1168,7 +1168,7 @@ archive_validation_stats()
    else
       echo "Warnings from Stage 7b - Matlab plotting and statistics (validation):" >> $WARNING_LOG
       echo "Warning: The validation statistics output file does not exist." >> $WARNING_LOG
-      echo "Expected the file Utilities/Matlab/FDS_validation_scatterplot_output.csv" >> $WARNING_LOG
+      echo "Expected the file Manuals/FDS_Validation_Guide/SCRIPT_FIGURES/ScatterPlots/FDS_validation_scatterplot_output.csv" >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
 }
@@ -1735,12 +1735,14 @@ archive_compiler_version
 ### Stage 2a ###
 echo Building
 echo "   FDS"
-if [ "$FIREBOT_MODE" == "verification" ] ; then
-  if [ "$FIREBOT_LITE" == "" ]; then
-    inspect_fds_db
-    check_inspect_fds_db
-  fi
-fi
+# if something goes wrong with the openmp inspector
+# comment the following 6 lines (including 'if' and and 'fi'  lines
+#if [ "$FIREBOT_MODE" == "verification" ] ; then
+#  if [ "$FIREBOT_LITE" == "" ]; then
+#    inspect_fds
+#    check_inspect_fds
+#  fi
+#fi
 
 ### Stage 2b ###
 compile_fds_mpi_db
