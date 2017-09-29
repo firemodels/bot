@@ -217,7 +217,7 @@ clean_repo2()
    local branch=$2
 
    CD_REPO $reponame/$repo || return 1
-
+   git update-index --refresh
    IS_DIRTY=`git describe --long --dirty | grep dirty | wc -l`
    if [ "$IS_DIRTY" == "1" ]; then
      echo "The repo $reponame/$repo has uncommitted changes."
