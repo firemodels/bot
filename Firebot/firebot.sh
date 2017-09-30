@@ -321,7 +321,7 @@ compile_fds_mpi_db()
 {
    # Clean and compile FDS MPI debug
    echo "      MPI debug"
-   cd $fdsrepo/Build/mpi_intel_${platform}${size}$IB$DB
+   cd $fdsrepo/Build/mpi_intel_${platform}${size}$DB
    make -f ../makefile clean &> /dev/null
    ./make_fds.sh &> $OUTPUT_DIR/stage2b
 }
@@ -333,8 +333,8 @@ compile_fds_mpi_db()
 check_compile_fds_mpi_db()
 {
    # Check for errors in FDS MPI debug compilation
-   cd $fdsrepo/Build/mpi_intel_${platform}${size}$IB$DB
-   if [ -e "fds_mpi_intel_${platform}${size}$IB$DB" ]
+   cd $fdsrepo/Build/mpi_intel_${platform}${size}$DB
+   if [ -e "fds_mpi_intel_${platform}${size}$DB" ]
    then
       FDS_debug_success=true
    else
@@ -596,7 +596,7 @@ compile_fds_mpi()
    echo "      MPI release"
    echo "" > $OUTPUT_DIR/stage2c
    if [ "$debug_mode" == "" ]; then
-     cd $fdsrepo/Build/mpi_intel_${platform}${size}$IB$DV
+     cd $fdsrepo/Build/mpi_intel_${platform}${size}$DV
      make -f ../makefile clean &> /dev/null
      ./make_fds.sh &> $OUTPUT_DIR/stage2c
    fi
@@ -609,8 +609,8 @@ compile_fds_mpi()
 check_compile_fds_mpi()
 {
    # Check for errors in FDS MPI compilation
-   cd $fdsrepo/Build/mpi_intel_${platform}${size}$IB$DV
-   if [ -e "fds_mpi_intel_${platform}${size}$IB$DV" ]
+   cd $fdsrepo/Build/mpi_intel_${platform}${size}$DV
+   if [ -e "fds_mpi_intel_${platform}${size}$DV" ]
    then
       FDS_release_success=true
    else
@@ -1489,10 +1489,6 @@ commit=
 push=
 
 DB=_db
-IB=
-if [ "$FDSNETWORK" == "infiniband" ] ; then
-IB=ib
-fi
 
 # Load mailing list for status report
 source $firebotdir/firebot_email_list.sh
