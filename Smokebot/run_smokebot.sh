@@ -266,7 +266,7 @@ if [ "$KILL_SMOKEBOT" == "1" ]; then
     echo "killing smokebot (PID=$PID)"
     kill -9 $PID
     if [ "$QUEUE" != "none" ]; then
-      JOBIDS=`qstat -a | grep SB_ | awk -v user="$USER" '{if($2==user){print $1}}'`
+      JOBIDS=`qstat -a | grep SB_ | awk -v user="$USER" '{if($2==user){print $1}}' | awk -F. '{print $1}'`
       if [ "$JOBIDS" != "" ]; then
         echo killing smokebot jobs with Id: $JOBIDS
         qdel $JOBIDS
