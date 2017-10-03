@@ -31,19 +31,20 @@ echo "-3 - run in 32 bit mode (only for gnu compilers)"
 echo "-a - run automatically if FDS or smokeview source has changed"
 echo "-b - branch_name - run smokebot using the branch branch_name [default: $BRANCH]"
 echo "-c - clean repo"
+echo "-C -  add --mca plm_rsh_agent /usr/bin/ssh to mpirun command when running cases"
 echo "-f - force smokebot run"
 echo "-h - display most commonly used options"
 echo "-H - display all options"
 echo "-I compiler - intel or gnu [default: $COMPILER]"
-if [ "$EMAIL" != "" ]; then
 echo "-k - kill smokebot if it is running"
+echo "-q queue [default: $QUEUE]"
+echo "-L - smokebot lite,  run only stages that build a debug fds and run cases with it"
+echo "                    (no release fds, no release cases, no manuals, etc)"
+if [ "$EMAIL" != "" ]; then
 echo "-m email_address - [default: $EMAIL]"
 else
 echo "-m email_address"
 fi
-echo "-q queue [default: $QUEUE]"
-echo "-L - smokebot lite,  run only stages that build a debug fds and run cases with it"
-echo "                    (no release fds, no release cases, no manuals, etc)"
 echo "-M  - make movies"
 echo "-t - use test smokeview"
 echo "-u - update repo"
@@ -152,6 +153,7 @@ SMOKEBOT_LITE=
 TESTFLAG=
 ECHO=
 NOPT=
+export MPIRUN_MCA=
 
 WEB_URL=
 web_DIR=/var/www/html/`whoami`
@@ -170,7 +172,7 @@ if [ $notfound -eq 1 ] ; then
   QUEUE=none
 fi
 
-while getopts '3aAb:cd:fhHI:kLm:NMq:r:tuUvw:W:' OPTION
+while getopts '3aAb:cCd:fhHI:kLm:NMq:r:tuUvw:W:' OPTION
 do
 case $OPTION  in
   3)
@@ -188,6 +190,9 @@ case $OPTION  in
    ;;
   c)
    CLEANREPO=-c
+   ;;
+  C)
+   export MPIRUN_MCA="--mca plm_rsh_agent /usr/bin/ssh "
    ;;
   I)
    COMPILER="$OPTARG"
