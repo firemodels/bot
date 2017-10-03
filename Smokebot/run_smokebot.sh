@@ -30,6 +30,7 @@ echo "Options:"
 echo "-3 - run in 32 bit mode (only for gnu compilers)"
 echo "-a - run automatically if FDS or smokeview source has changed"
 echo "-b - branch_name - run smokebot using the branch branch_name [default: $BRANCH]"
+echo "-B  - use startup files to set the environment not modules"
 echo "-c - clean repo"
 echo "-C -  add --mca plm_rsh_agent /usr/bin/ssh to mpirun command when running cases"
 echo "-f - force smokebot run"
@@ -46,7 +47,6 @@ else
 echo "-m email_address"
 fi
 echo "-M  - make movies"
-echo "-S  - use startup files to set the environment not modules"
 echo "-t - use test smokeview"
 echo "-u - update repo"
 echo "-U - upload guides"
@@ -174,7 +174,7 @@ if [ $notfound -eq 1 ] ; then
   QUEUE=none
 fi
 
-while getopts '3aAb:cCd:fhHI:kLm:NMq:r:StuUvw:W:' OPTION
+while getopts '3aAb:BcCd:fhHI:kLm:NMq:r:tuUvw:W:' OPTION
 do
 case $OPTION  in
   3)
@@ -186,6 +186,9 @@ case $OPTION  in
    ;;
   A)
    RUNAUTO=-A
+   ;;
+  B)
+   export QFDS_STARTUP=1
    ;;
   b)
    BRANCH="$OPTARG"
@@ -227,9 +230,6 @@ case $OPTION  in
    ;;
   q)
    QUEUE="$OPTARG"
-   ;;
-  S)
-   export QFDS_STARTUP=1
    ;;
   t)
    TESTFLAG="-t"
