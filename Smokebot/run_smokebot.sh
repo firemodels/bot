@@ -46,6 +46,7 @@ else
 echo "-m email_address"
 fi
 echo "-M  - make movies"
+echo "-S  - use startup files to set the environment not modules"
 echo "-t - use test smokeview"
 echo "-u - update repo"
 echo "-U - upload guides"
@@ -154,6 +155,7 @@ TESTFLAG=
 ECHO=
 NOPT=
 export MPIRUN_MCA=
+export QFDS_STARTUP=
 
 WEB_URL=
 web_DIR=/var/www/html/`whoami`
@@ -172,7 +174,7 @@ if [ $notfound -eq 1 ] ; then
   QUEUE=none
 fi
 
-while getopts '3aAb:cCd:fhHI:kLm:NMq:r:tuUvw:W:' OPTION
+while getopts '3aAb:cCd:fhHI:kLm:NMq:r:StuUvw:W:' OPTION
 do
 case $OPTION  in
   3)
@@ -225,6 +227,9 @@ case $OPTION  in
    ;;
   q)
    QUEUE="$OPTARG"
+   ;;
+  S)
+   export QFDS_STARTUP=1
    ;;
   t)
    TESTFLAG="-t"
