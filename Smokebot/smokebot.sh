@@ -401,8 +401,8 @@ compile_fds_mpi_db()
 {
    # Clean and compile mpi FDS debug
    echo "   debug FDS"
-   cd $fdsrepo/Build/mpi_${COMPILER}_${platform}_${size}$IB$DB
-   rm -f fds_mpi_${COMPILER}_${platform}_${size}$IB$DB
+   cd $fdsrepo/Build/mpi_${COMPILER}_${platform}_${size}$DB
+   rm -f fds_mpi_${COMPILER}_${platform}_${size}$DB
    make --makefile ../makefile clean &> /dev/null
    ./make_fds.sh &> $OUTPUT_DIR/stage1b
 }
@@ -414,8 +414,8 @@ compile_fds_mpi_db()
 check_compile_fds_mpi_db()
 {
    # Check for errors in FDS debug compilation
-   cd $fdsrepo/Build/mpi_${COMPILER}_${platform}_${size}$IB$DB
-   if [ -e "fds_mpi_${COMPILER}_${platform}_${size}$IB$DB" ]
+   cd $fdsrepo/Build/mpi_${COMPILER}_${platform}_${size}$DB
+   if [ -e "fds_mpi_${COMPILER}_${platform}_${size}$DB" ]
    then
       stage1b_fdsdb_success=true
    else
@@ -435,7 +435,7 @@ check_compile_fds_mpi_db()
       grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage1b | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'>> $WARNING_LOG
       echo "" >> $WARNING_LOG
    # if the executable does not exist then an email has already been sent
-      if [ -e "fds_mpi_${COMPILER}_${platform}_${size}$IB$DB" ] ; then
+      if [ -e "fds_mpi_${COMPILER}_${platform}_${size}$DB" ] ; then
         THIS_FDS_FAILED=1
       fi
    fi
@@ -547,8 +547,8 @@ compile_fds_mpi()
 {
    # Clean and compile FDS
    echo "Building release FDS"
-   cd $fdsrepo/Build/mpi_${COMPILER}_${platform}_${size}$IB
-   rm -f fds_mpi_${COMPILER}_${platform}_${size}$IB
+   cd $fdsrepo/Build/mpi_${COMPILER}_${platform}_${size}
+   rm -f fds_mpi_${COMPILER}_${platform}_${size}
    make --makefile ../makefile clean &> /dev/null
    ./make_fds.sh &> $OUTPUT_DIR/stage1c
 }
@@ -560,8 +560,8 @@ compile_fds_mpi()
 check_compile_fds_mpi()
 {
    # Check for errors in FDS compilation
-   cd $fdsrepo/Build/mpi_${COMPILER}_${platform}_${size}$IB
-   if [ -e "fds_mpi_${COMPILER}_${platform}_${size}$IB" ]
+   cd $fdsrepo/Build/mpi_${COMPILER}_${platform}_${size}
+   if [ -e "fds_mpi_${COMPILER}_${platform}_${size}" ]
    then
       stage1c_fdsrel_success=true
    else
@@ -1288,10 +1288,6 @@ email_build_status()
       echo "SMV revisions: $THIS_FDS_REVISION" >> $TIME_LOG
    fi
    echo "          vis dir: $smvrepo/Verification/Visualization" >> $TIME_LOG
-   if [ -e $smvrepo/Verification/Visualization/thouse5.log ]; then
-     thouse5host=`grep Host $smvrepo/Verification/Visualization/thouse5.log`
-     echo "     thouse5 host: $thouse5host" >> $TIME_LOG
-   fi
    if [ "$RUNAUTO" == "" ]; then
       echo "SMV revisions: $THIS_SMV_REVISION" >> $TIME_LOG
    fi
@@ -1538,10 +1534,6 @@ else
 fi
 
 DB=_db
-IB=
-if [ "$FDSNETWORK" == "infiniband" ] ; then
-IB=ib
-fi
 
 platform="linux"
 platform2="Linux"

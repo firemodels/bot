@@ -12,6 +12,7 @@ echo "Verification and validation testing script for FDS"
 echo ""
 echo "Options:"
 #echo "-b - branch_name - run firebot using branch_name [default: $BRANCH]"
+echo "-B  - use startup files to set the environment, not modules"
 echo "-c - clean repo"
 echo "-h - display most commonly used options"
 echo "-H - display all options"
@@ -166,13 +167,17 @@ caselistfile=""
 showcaselist=
 debug_mode=
 DV=
+export QFDS_STARTUP=
 
-while getopts 'b:cdCD:FfHhIiKkLm:Pq:nsSuUvV:' OPTION
+while getopts 'b:BcdCD:FfHhIiKkLm:Pq:nsSuUvV:' OPTION
 do
 case $OPTION  in
   b)
 #   BRANCH="$OPTARG"
     echo "***Warning: -b option for specifying a branch is not supported at this time"
+   ;;
+  B)
+    export QFDS_STARTUP=1
    ;;
   c)
    CLEANREPO=1
