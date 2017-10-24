@@ -19,6 +19,7 @@ echo "-F - skip figures and document building stages"
 echo "-h - display this message"
 echo "-i - use installed version of smokeview"
 echo "-I - use development version of FDS"
+echo "-J - use Intel MPI version of FDS"
 echo "-L - firebot lite,  run only stages that build a debug fds and run cases with it"
 echo "                    (no release fds, no release cases, no matlab, etc)"
 echo "-m email_address "
@@ -321,7 +322,7 @@ compile_fds_mpi_db()
 {
    # Clean and compile FDS MPI debug
    echo "      MPI debug"
-   cd $fdsrepo/Build/mpi_intel_${platform}${size}$DB
+   cd $fdsrepo/Build/${INTEL}mpi_intel_${platform}${size}$DB
    make -f ../makefile clean &> /dev/null
    ./make_fds.sh &> $OUTPUT_DIR/stage2b
 }
@@ -333,7 +334,7 @@ compile_fds_mpi_db()
 check_compile_fds_mpi_db()
 {
    # Check for errors in FDS MPI debug compilation
-   cd $fdsrepo/Build/mpi_intel_${platform}${size}$DB
+   cd $fdsrepo/Build/${INTEL}mpi_intel_${platform}${size}$DB
    if [ -e "fds_mpi_intel_${platform}${size}$DB" ]
    then
       FDS_debug_success=true
@@ -465,7 +466,7 @@ run_verification_cases_debug()
    echo Running FDS Verification Cases
    echo "   debug"
    echo 'Running FDS verification cases:' >> $OUTPUT_DIR/stage4
-   ./Run_FDS_Cases.sh -o 1 -d -m 1 -q $QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage4 2>&1
+   ./Run_FDS_Cases.sh -o 1 -d -m 1 $INTEL2 -q $QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage4 2>&1
    echo "" >> $OUTPUT_DIR/stage4 2>&1
 
    # Wait for all verification cases to end
@@ -596,7 +597,7 @@ compile_fds_mpi()
    echo "      MPI release"
    echo "" > $OUTPUT_DIR/stage2c
    if [ "$debug_mode" == "" ]; then
-     cd $fdsrepo/Build/mpi_intel_${platform}${size}$DV
+     cd $fdsrepo/Build/${INTEL}mpi_intel_${platform}${size}$DV
      make -f ../makefile clean &> /dev/null
      ./make_fds.sh &> $OUTPUT_DIR/stage2c
    fi
@@ -609,7 +610,7 @@ compile_fds_mpi()
 check_compile_fds_mpi()
 {
    # Check for errors in FDS MPI compilation
-   cd $fdsrepo/Build/mpi_intel_${platform}${size}$DV
+   cd $fdsrepo/Build/${INTEL}mpi_intel_${platform}${size}$DV
    if [ -e "fds_mpi_intel_${platform}${size}$DV" ]
    then
       FDS_release_success=true
@@ -807,14 +808,14 @@ run_verification_cases_release()
    cd $fdsrepo/Verification/scripts
    # Run FDS with 1 OpenMP thread
    echo 'Running FDS benchmark verification cases:' >> $OUTPUT_DIR/stage5
-   ./Run_FDS_Cases.sh $DV2 -b -o 1 -q $QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage5 2>&1
+   ./Run_FDS_Cases.sh $INTEL2 $DV2 -b -o 1 -q $QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage5 2>&1
    echo "" >> $OUTPUT_DIR/stage5 2>&1
 
    # Wait for benchmark verification cases to end
    wait_cases_release_end 'verification'
 
    echo 'Running FDS non-benchmark verification cases:' >> $OUTPUT_DIR/stage5
-   ./Run_FDS_Cases.sh $DV2 -R -o 1 -q $QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage5 2>&1
+   ./Run_FDS_Cases.sh $INTEL2 $DV2 -R -o 1 -q $QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage5 2>&1
    echo "" >> $OUTPUT_DIR/stage5 2>&1
 
    # Wait for non-benchmark verification cases to end
@@ -1503,10 +1504,12 @@ showcaselist=
 debug_mode=
 DV=
 DV2=
+INTEL=
+INTEL2=
 
 #*** parse command line arguments
 
-while getopts 'b:cCdD:FhIiLm:p:Pq:sSuUV:' OPTION
+while getopts 'b:cCdD:FhIiJLm:p:Pq:sSuUV:' OPTION
 do
 case $OPTION in
   b)
@@ -1534,6 +1537,10 @@ case $OPTION in
   I)
    DV="_dv"
    DV2="-u"
+   ;;
+  J)
+   INTEL=i
+   INTEL2="-J"
    ;;
   i)
    USEINSTALL="-r"
