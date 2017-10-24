@@ -401,8 +401,8 @@ compile_fds_mpi_db()
 {
    # Clean and compile mpi FDS debug
    echo "   debug FDS"
-   cd $fdsrepo/Build/mpi_${COMPILER}_${platform}_${size}$DB
-   rm -f fds_mpi_${COMPILER}_${platform}_${size}$DB
+   cd $fdsrepo/Build/${INTEL}mpi_${COMPILER}_${platform}_${size}$DB
+   rm -f fds_${INTEL}mpi_${COMPILER}_${platform}_${size}$DB
    make --makefile ../makefile clean &> /dev/null
    ./make_fds.sh &> $OUTPUT_DIR/stage1b
 }
@@ -414,8 +414,8 @@ compile_fds_mpi_db()
 check_compile_fds_mpi_db()
 {
    # Check for errors in FDS debug compilation
-   cd $fdsrepo/Build/mpi_${COMPILER}_${platform}_${size}$DB
-   if [ -e "fds_mpi_${COMPILER}_${platform}_${size}$DB" ]
+   cd $fdsrepo/Build/${INTEL}mpi_${COMPILER}_${platform}_${size}$DB
+   if [ -e "fds_${INTEL}mpi_${COMPILER}_${platform}_${size}$DB" ]
    then
       stage1b_fdsdb_success=true
    else
@@ -435,7 +435,7 @@ check_compile_fds_mpi_db()
       grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage1b | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'>> $WARNING_LOG
       echo "" >> $WARNING_LOG
    # if the executable does not exist then an email has already been sent
-      if [ -e "fds_mpi_${COMPILER}_${platform}_${size}$DB" ] ; then
+      if [ -e "fds_${INTEL}mpi_${COMPILER}_${platform}_${size}$DB" ] ; then
         THIS_FDS_FAILED=1
       fi
    fi
@@ -495,7 +495,7 @@ run_verification_cases_debug()
 
    # Submit SMV verification cases and wait for them to start
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3a 2>&1
-   ./Run_SMV_Cases.sh $NOPT $YOPT -p $size -c $cfastrepo -I $COMPILER $USEINSTALL2 -m 2 -d -q $SMOKEBOT_QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage3a 2>&1
+   ./Run_SMV_Cases.sh $INTEL2 $NOPT $YOPT -p $size -c $cfastrepo -I $COMPILER $USEINSTALL2 -m 2 -d -q $SMOKEBOT_QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage3a 2>&1
 }
 
 #---------------------------------------------
@@ -547,8 +547,8 @@ compile_fds_mpi()
 {
    # Clean and compile FDS
    echo "Building release FDS"
-   cd $fdsrepo/Build/mpi_${COMPILER}_${platform}_${size}
-   rm -f fds_mpi_${COMPILER}_${platform}_${size}
+   cd $fdsrepo/Build/${INTEL}mpi_${COMPILER}_${platform}_${size}
+   rm -f fds_${INTEL}mpi_${COMPILER}_${platform}_${size}
    make --makefile ../makefile clean &> /dev/null
    ./make_fds.sh &> $OUTPUT_DIR/stage1c
 }
@@ -560,8 +560,8 @@ compile_fds_mpi()
 check_compile_fds_mpi()
 {
    # Check for errors in FDS compilation
-   cd $fdsrepo/Build/mpi_${COMPILER}_${platform}_${size}
-   if [ -e "fds_mpi_${COMPILER}_${platform}_${size}" ]
+   cd $fdsrepo/Build/${INTEL}mpi_${COMPILER}_${platform}_${size}
+   if [ -e "fds_${INTEL}mpi_${COMPILER}_${platform}_${size}" ]
    then
       stage1c_fdsrel_success=true
    else
@@ -790,7 +790,7 @@ run_verification_cases_release()
    # Start running all SMV verification cases
    cd $smvrepo/Verification/scripts
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3b 2>&1
-   ./Run_SMV_Cases.sh $NOPT $YOPT -p $size -c $cfastrepo -I $COMPILER $USEINSTALL2 $RUN_OPENMP -q $SMOKEBOT_QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage3b 2>&1
+   ./Run_SMV_Cases.sh $INTEL2 $NOPT $YOPT -p $size -c $cfastrepo -I $COMPILER $USEINSTALL2 $RUN_OPENMP -q $SMOKEBOT_QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage3b 2>&1
 }
 
 #---------------------------------------------
@@ -1377,8 +1377,9 @@ MAILTO=
 UPLOADRESULTS=
 COMPILER=intel
 PID_FILE=~/.fdssmvgit/smokebot_pid
+INTEL=
 
-while getopts '3aAb:cI:Lm:MNo:p:q:r:stuUw:W:' OPTION
+while getopts '3aAb:cI:JLm:MNo:p:q:r:stuUw:W:' OPTION
 do
 case $OPTION in
   3)
@@ -1405,6 +1406,10 @@ case $OPTION in
    if [ "$COMPILER" == "gnu" ]; then
      size=32
    fi
+   ;;
+  J)
+   INTEL=i
+   INTEL2="-J"
    ;;
   L)
    SMOKEBOT_LITE=1

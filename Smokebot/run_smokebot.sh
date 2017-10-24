@@ -37,6 +37,7 @@ echo "-f - force smokebot run"
 echo "-h - display most commonly used options"
 echo "-H - display all options"
 echo "-I compiler - intel or gnu [default: $COMPILER]"
+echo "-J use Intel MPI version of fds"
 echo "-k - kill smokebot if it is running"
 echo "-q queue [default: $QUEUE]"
 echo "-L - smokebot lite,  run only stages that build a debug fds and run cases with it"
@@ -154,6 +155,7 @@ SMOKEBOT_LITE=
 TESTFLAG=
 ECHO=
 NOPT=
+INTEL=
 export MPIRUN_MCA=
 export QFDS_STARTUP=
 
@@ -174,7 +176,7 @@ if [ $notfound -eq 1 ] ; then
   QUEUE=none
 fi
 
-while getopts '3aAb:BcCd:fhHI:kLm:NMq:r:tuUvw:W:' OPTION
+while getopts '3aAb:BcCd:fhHI:JkLm:NMq:r:tuUvw:W:' OPTION
 do
 case $OPTION  in
   3)
@@ -212,6 +214,9 @@ case $OPTION  in
   H)
    usage_all
    exit
+   ;;
+  J)
+   INTEL="-J"
    ;;
   k)
    KILL_SMOKEBOT=1
@@ -319,7 +324,7 @@ fi
 BRANCH="-b $BRANCH"
 
 touch $smokebot_pid
-$ECHO ./$botscript $NOPT $SIZE $BRANCH $TESTFLAG $RUNAUTO $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $NOPT $SIZE $BRANCH $TESTFLAG $RUNAUTO $INTEL $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi
