@@ -30,6 +30,7 @@ echo "-v - show options used to run firebot"
 echo "Miscellaneous:"
 echo "-i - use installed version of smokeview"
 echo "-I - use development version of fds"
+echo "-J - use Intel MPI version fds"
 echo "-f - force firebot run"
 echo "-F - skip figure generation and build document stages"
 echo "-L - firebot lite,  run only stages that build a debug fds and run cases with it"
@@ -167,9 +168,10 @@ caselistfile=""
 showcaselist=
 debug_mode=
 DV=
+INTEL=
 export QFDS_STARTUP=
 
-while getopts 'b:BcdCD:FfHhIiKkLm:Pq:nsSuUvV:' OPTION
+while getopts 'b:BcdCD:FfHhIiJKkLm:Pq:nsSuUvV:' OPTION
 do
 case $OPTION  in
   b)
@@ -208,6 +210,9 @@ case $OPTION  in
    ;;
   I)
    DV="-I"
+   ;;
+  J)
+   INTEL="-J"
    ;;
   k)
    KILL_FIREBOT="1"
@@ -304,7 +309,7 @@ fi
 BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
-$ECHO  ./$botscript -p $firebot_pid $commit $push $UPDATE $DV $debug_mode $showcaselist $caselistfile $MAX_VALIDATION_PROCESSES $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $EMAIL "$@"
+$ECHO  ./$botscript -p $firebot_pid $commit $push $UPDATE $DV $INTEL $debug_mode $showcaselist $caselistfile $MAX_VALIDATION_PROCESSES $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $EMAIL "$@"
 if [ -e $firebot_pid ]; then
   rm $firebot_pid
 fi
