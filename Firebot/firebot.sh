@@ -335,7 +335,7 @@ check_compile_fds_mpi_db()
 {
    # Check for errors in FDS MPI debug compilation
    cd $fdsrepo/Build/${INTEL}mpi_intel_${platform}${size}$DB
-   if [ -e "fds_mpi_intel_${platform}${size}$DB" ]
+   if [ -e "fds_${INTEL}mpi_intel_${platform}${size}$DB" ]
    then
       FDS_debug_success=true
    else
@@ -611,7 +611,7 @@ check_compile_fds_mpi()
 {
    # Check for errors in FDS MPI compilation
    cd $fdsrepo/Build/${INTEL}mpi_intel_${platform}${size}$DV
-   if [ -e "fds_mpi_intel_${platform}${size}$DV" ]
+   if [ -e "fds_${INTEL}mpi_intel_${platform}${size}$DV" ]
    then
       FDS_release_success=true
    else
