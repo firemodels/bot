@@ -269,7 +269,8 @@ if [ "$KILL_FIREBOT" == "1" ]; then
     PID=`head -1 $firebot_pid`
     if [ "$platform" == "linux" ]; then
       echo killing process invoked by firebot
-      kill -9 $(LIST_DESCENDANTS $PID)
+#      kill -9 $(LIST_DESCENDANTS $PID)
+      kill -9 $(pgrep -P $PID)
     fi
     echo "killing firebot (PID=$PID)"
     kill -9 $PID
