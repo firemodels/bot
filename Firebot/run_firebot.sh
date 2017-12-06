@@ -268,10 +268,9 @@ shift $(($OPTIND-1))
 if [ "$KILL_FIREBOT" == "1" ]; then
   if [ -e $firebot_pid ] ; then
     PID=`head -1 $firebot_pid`
-#    if [ "$platform" == "linux" ]; then
-      echo killing process invoked by firebot
-      kill -9 $(LIST_DESCENDANTS $PID)
-#    fi
+    JOBS=$(LIST_DESCENDANTS $PID)
+    echo killing processes invoked by firebot: $JOBS
+    kill -9 $(JOBS)
     echo "killing firebot (PID=$PID)"
     kill -9 $PID
     if [ "$QUEUE" != "none" ]; then
