@@ -268,20 +268,20 @@ echo  Building FDS
 
 echo    debug
 
-cd %fdsrepo%\Build\mpi_intel_win_64_db
+cd %fdsrepo%\Build\impi_intel_win_64_db
 erase *.obj *.mod *.exe *.pdb 1> Nul 2>&1
 call make_fds bot 1> %OUTDIR%\makefdsd.log 2>&1
-call :does_file_exist fds_mpi_win_64_db.exe %OUTDIR%\makefdsd.log|| exit /b 1
+call :does_file_exist fds_impi_win_64_db.exe %OUTDIR%\makefdsd.log|| exit /b 1
 call :find_warnings "warning" %OUTDIR%\makefdsd.log "Stage 1b, FDS parallel debug compilation"
 
 if %lite% == 1 goto skip_lite1
 
   echo    release
 
-  cd %fdsrepo%\Build\mpi_intel_win_64
+  cd %fdsrepo%\Build\impi_intel_win_64
   erase *.obj *.mod *.exe *.pdb 1> Nul 2>&1
   call make_fds bot 1> %OUTDIR%\makefdsr.log 2>&1
-  call :does_file_exist fds_mpi_win_64.exe %OUTDIR%\makefdsr.log|| exit /b 1
+  call :does_file_exist fds_impi_win_64.exe %OUTDIR%\makefdsr.log|| exit /b 1
   call :find_warnings "warning" %OUTDIR%\makefdsr.log "Stage 1d, FDS parallel release compilation"
 :skip_lite1
 
