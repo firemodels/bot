@@ -273,7 +273,11 @@ if [ "$KILL_FIREBOT" == "1" ]; then
     kill -9 $JOBS
     echo "killing firebot (PID=$PID)"
     kill -9 $PID
-    if [ "$QUEUE" != "none" ]; then
+    if [ "$QUEUE" == "none" ]; then
+      cd $CURDIR/../Scripts
+      ./killppids.sh ../Firebot/scriptlist
+      cd $CURDIR
+    else
       JOBIDS=`qstat -a | grep $PREFIX | awk -v user="$USER" '{if($2==user){print $1}}' | awk -F'.' '{print $1}'`
       if [ "$JOBIDS" != "" ]; then
         echo killing firebot jobs with Id:$JOBIDS
