@@ -109,11 +109,11 @@ CD_REPO ()
 LIST_DESCENDANTS ()
 {
 #  local children=$(ps -o pid= --ppid "$1")
-  local children=$(pgrep -P "$1")
+  local children=$(pgrep -P $1)
 
   for pid in $children
   do
-    LIST_DESCENDANTS "$pid"
+    LIST_DESCENDANTS $pid
   done
 
   echo "$children"
@@ -270,7 +270,7 @@ if [ "$KILL_FIREBOT" == "1" ]; then
     PID=`head -1 $firebot_pid`
     JOBS=$(LIST_DESCENDANTS $PID)
     echo killing processes invoked by firebot: $JOBS
-    kill -9 $(JOBS)
+    kill -9 $JOBS
     echo "killing firebot (PID=$PID)"
     kill -9 $PID
     if [ "$QUEUE" != "none" ]; then
