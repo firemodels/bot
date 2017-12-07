@@ -257,15 +257,17 @@ update_repo()
 check_git_checkout()
 {
    # Check for GIT errors
-      if [[ `grep -i -E 'modified' $OUTPUT_DIR/stage1` == "" ]]
-   then
-      # Continue along
-      :
-   else
-      echo "Warnings from Stage 1 - Update repos" >> $WARNING_LOG
-      echo "" >> $WARNING_LOG
-      grep -A 5 -B 5 -i -E 'modified' $OUTPUT_DIR/stage1 >> $WARNING_LOG
-      echo "" >> $WARNING_LOG
+   if [ -e $OUTPUT_DIR/stage1 ]; then
+     if [[ `grep -i -E 'modified' $OUTPUT_DIR/stage1` == "" ]]
+     then
+        # Continue along
+        :
+     else
+        echo "Warnings from Stage 1 - Update repos" >> $WARNING_LOG
+        echo "" >> $WARNING_LOG
+        grep -A 5 -B 5 -i -E 'modified' $OUTPUT_DIR/stage1 >> $WARNING_LOG
+        echo "" >> $WARNING_LOG
+     fi
    fi
    git_checkout_success=true
 }
