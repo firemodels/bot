@@ -1124,11 +1124,9 @@ archive_timing_stats()
   cp smv_timing_stats.csv "$HISTORY_DIR/${GIT_REVISION}_timing.csv"
   cp smv_benchmarktiming_stats.csv "$HISTORY_DIR/${GIT_REVISION}_benchmarktiming.csv"
   TOTAL_SMV_TIMES=`tail -1 smv_benchmarktiming_stats.csv`
-  if [ "$UPLOADRESULTS" == "1" ]; then
-     if [ "$USER" == "smokebot" ]; then
-      cd $botrepo/Smokebot
-      ./smvstatus_updatepub.sh $repo/webpages $WEBBRANCH
-    fi
+  if [[ "$UPLOADRESULTS" == "1" ]] && [[ "$USER" == "smokebot" ]]; then
+    cd $botrepo/Smokebot
+    ./smvstatus_updatepub.sh $repo/webpages $WEBBRANCH
   fi
   if [ ! "$web_DIR" == "" ]; then
     cd $botrepo/Smokebot
@@ -1718,7 +1716,6 @@ check_compile_smv_db
 if [ "$SMOKEBOT_LITE" == "" ]; then
   compile_smv
   check_compile_smv
-
 fi
 
 BUILDSOFTWARE_end=`GET_TIME`
@@ -1738,7 +1735,7 @@ echo "Run cases: $DIFF_RUNCASES" >> $STAGE_STATUS
 
 ### Stage 4 generate images ###
 MAKEPICTURES_beg=`GET_TIME`
-if [[ "$SMOKEBOT_LITE" == "" ]] [[ "$SKIP" == "" ]]; then
+if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]]; then
   if [[ $stage1c_fdsrel_success && $stage2c_smv_success ]] ; then
     make_smv_pictures
     check_smv_pictures
@@ -1748,7 +1745,7 @@ MAKEPICTURES_end=`GET_TIME`
 DIFF_MAKEPICTURES=`GET_DURATION $MAKEPICTURES_beg $MAKEPICTURES_end`
 echo "Make pictures: $DIFF_MAKEPICTURES" >> $STAGE_STATUS
 
-if [[ "$SMOKEBOT_LITE" == "" ]] [[ "$SKIP" == "" ]]; then
+if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]]; then
   if [ "$MAKEMOVIES" == "1" ]; then
     MAKEMOVIES_beg=`GET_TIME`
  
@@ -1758,10 +1755,10 @@ if [[ "$SMOKEBOT_LITE" == "" ]] [[ "$SKIP" == "" ]]; then
     MAKEMOVIES_end=`GET_TIME`
     DIFF_MAKEMOVIES=`GET_DURATION $MAKEMOVIES_beg $MAKEMOVIES_end`
     echo "Make movies: $DIFF_MAKEMOVIES" >> $STAGE_STATUS
-fi
+  fi
 fi
 
-if [[ "$SMOKEBOT_LITE" == "" ]] [[ "$SKIP" == "" ]]; then
+if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]]; then
   if [[ $stage1c_fdsrel_success ]] ; then
     generate_timing_stats
   fi
@@ -1769,7 +1766,7 @@ fi
 
 ### Stage 5 build documents ###
 MAKEGUIDES_beg=`GET_TIME`
-if [[ "$SMOKEBOT_LITE" == "" ]] [[ "$SKIP" == "" ]]; then
+if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]]; then
   if [[ $stage1c_fdsrel_success && $stage4b_smvpics_success ]] ; then
      echo Making guides
      if [ "$YOPT" == "" ]; then
@@ -1788,6 +1785,7 @@ if [[ "$SMOKEBOT_LITE" == "" ]] [[ "$SKIP" == "" ]]; then
      echo Errors found, not building guides
   fi
 fi
+
 MAKEGUIDES_end=`GET_TIME`
 DIFF_MAKEGUIDES=`GET_DURATION $MAKEGUIDES_beg $MAKEGUIDES_end`
 echo "Make guides: $DIFF_MAKEGUIDES" >> $STAGE_STATUS
