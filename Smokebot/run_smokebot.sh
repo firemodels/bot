@@ -49,7 +49,8 @@ echo "-m email_address - [default: $EMAIL]"
 else
 echo "-m email_address"
 fi
-echo "-M  - make movies"
+echo "-M - make movies"
+echo "-S - skip picture generating and build manual stages"
 echo "-t - use test smokeview"
 echo "-u - update repo"
 echo "-U - upload guides"
@@ -167,6 +168,7 @@ NOPT=
 INTEL=
 export MPIRUN_MCA=
 export QFDS_STARTUP=
+SKIP=
 
 WEB_URL=
 web_DIR=/var/www/html/`whoami`
@@ -188,7 +190,7 @@ fi
 
 #*** parse command line options
 
-while getopts '3aAb:BcCd:fhHI:JkLm:NMq:r:tuUvw:W:' OPTION
+while getopts '3aAb:BcCd:fhHI:JkLm:NMq:r:StuUvw:W:' OPTION
 do
 case $OPTION  in
   3)
@@ -247,6 +249,9 @@ case $OPTION  in
    ;;
   q)
    QUEUE="$OPTARG"
+   ;;
+  S)
+   SKIP="-S"
    ;;
   t)
    TESTFLAG="-t"
@@ -343,7 +348,7 @@ BRANCH="-b $BRANCH"
 #*** run smokebot
 
 touch $smokebot_pid
-$ECHO ./$botscript $NOPT $SIZE $BRANCH $TESTFLAG $RUNAUTO $INTEL $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $SKIP $NOPT $SIZE $BRANCH $TESTFLAG $RUNAUTO $INTEL $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi

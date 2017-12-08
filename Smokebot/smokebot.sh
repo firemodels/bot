@@ -1381,10 +1381,11 @@ UPLOADRESULTS=
 COMPILER=intel
 PID_FILE=~/.fdssmvgit/smokebot_pid
 INTEL=
+SKIP=
 
 #*** parse command line options
 
-while getopts '3aAb:cI:JLm:MNo:p:q:r:stuUw:W:' OPTION
+while getopts '3aAb:cI:JLm:MNo:p:q:r:SstuUw:W:' OPTION
 do
 case $OPTION in
   3)
@@ -1441,6 +1442,9 @@ case $OPTION in
    ;;
   s)
    RUNDEBUG="0"
+   ;;
+  S)
+   SKIP=1
    ;;
   t)
    TESTFLAG="-t"
@@ -1734,7 +1738,7 @@ echo "Run cases: $DIFF_RUNCASES" >> $STAGE_STATUS
 
 ### Stage 4 generate images ###
 MAKEPICTURES_beg=`GET_TIME`
-if [ "$SMOKEBOT_LITE" == "" ]; then
+if [[ "$SMOKEBOT_LITE" == "" ]] [[ "$SKIP" == "" ]]; then
   if [[ $stage1c_fdsrel_success && $stage2c_smv_success ]] ; then
     make_smv_pictures
     check_smv_pictures
@@ -1744,7 +1748,7 @@ MAKEPICTURES_end=`GET_TIME`
 DIFF_MAKEPICTURES=`GET_DURATION $MAKEPICTURES_beg $MAKEPICTURES_end`
 echo "Make pictures: $DIFF_MAKEPICTURES" >> $STAGE_STATUS
 
-if [ "$SMOKEBOT_LITE" == "" ]; then
+if [[ "$SMOKEBOT_LITE" == "" ]] [[ "$SKIP" == "" ]]; then
   if [ "$MAKEMOVIES" == "1" ]; then
     MAKEMOVIES_beg=`GET_TIME`
  
@@ -1757,7 +1761,7 @@ if [ "$SMOKEBOT_LITE" == "" ]; then
 fi
 fi
 
-if [ "$SMOKEBOT_LITE" == "" ]; then
+if [[ "$SMOKEBOT_LITE" == "" ]] [[ "$SKIP" == "" ]]; then
   if [[ $stage1c_fdsrel_success ]] ; then
     generate_timing_stats
   fi
@@ -1765,7 +1769,7 @@ fi
 
 ### Stage 5 build documents ###
 MAKEGUIDES_beg=`GET_TIME`
-if [ "$SMOKEBOT_LITE" == "" ]; then
+if [[ "$SMOKEBOT_LITE" == "" ]] [[ "$SKIP" == "" ]]; then
   if [[ $stage1c_fdsrel_success && $stage4b_smvpics_success ]] ; then
      echo Making guides
      if [ "$YOPT" == "" ]; then
