@@ -426,7 +426,7 @@ check_compile_fds_mpi_db()
    fi
 
    # Check for compiler warnings/remarks
-   if [[ `grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage1b| grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'` == "" ]]
+   if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage1b| grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'` == "" ]]
    then
       # Continue along
       :
@@ -573,7 +573,7 @@ check_compile_fds_mpi()
 
    # Check for compiler warnings/remarks
    # 'performing multi-file optimizations' and 'generating object file' are part of a normal compile
-   if [[ `grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage1c | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented'` == "" ]]
+   if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage1c | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented'` == "" ]]
    then
       # Continue along
       :
