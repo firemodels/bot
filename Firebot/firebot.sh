@@ -1440,7 +1440,7 @@ email_build_status()
 }
 
 #VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
-#                             Primary script execution =
+#                             beginning of firebot
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 #*** setup
@@ -1462,7 +1462,7 @@ VALIDATION_ERROR_LOG=$OUTPUT_DIR/validation_errors
 WARNING_LOG=$OUTPUT_DIR/warnings
 NEWGUIDE_DIR=$OUTPUT_DIR/Newest_Guides
 
-# Firebot mode (verification or validation)
+#*** Firebot mode (verification or validation)
 FIREBOT_MODE="verification"
 
 WEBBRANCH=nist-pages
@@ -1470,21 +1470,24 @@ FDSBRANCH=master
 SMVBRANCH=master
 BRANCH=master
 
+#*** determine platform
+
 platform="linux"
 platform2="Linux"
 if [ "`uname`" == "Darwin" ] ; then
   platform="osx"
   platform2="OSX"
 fi
-
 export platform
 
-# Set unlimited stack size
+#*** Set unlimited stack size
+
 if [ "$platform" == "linux" ] ; then
   ulimit -s unlimited
 fi
 
-# Additional definitions
+#*** set initial values
+
 USEINSTALL=
 COMPILER=intel
 QUEUE=firebot
@@ -1599,12 +1602,14 @@ else
   echo "          Aborting firebot"
   exit
 fi
+
 if [ "$QUEUE" == "none" ]; then
   SCRIPTLIST="-S $scriptlist"
   if [ -e $scriptlist ]; then
     rm -f $scriptlist
   fi
 fi
+
 if [ "$caselistfile" != "" ]; then
   if [ ! -e $caselistfile ]; then
      echo "***error: $caselistfile does not exist."

@@ -124,13 +124,17 @@ LIST_DESCENDANTS ()
 }
 
 #VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
-#                             Primary script execution =
+#                             beginning of run_smokebot.sh
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+#*** location of smokebot processor id
 
 if [ ! -d ~/.fdssmvgit ] ; then
   mkdir ~/.fdssmvgit
 fi
 smokebot_pid=~/.fdssmvgit/smokebot_pid
+
+#*** make sure smokebot is started in the right location
 
 CURDIR=`pwd`
 if [ -e .smv_git ]; then
@@ -141,6 +145,8 @@ else
   echo "***error: smokebot not running in the bot/Smokebot  directory"
   exit
 fi
+
+#*** define initial values
 
 SIZE=
 KILL_SMOKEBOT=
@@ -172,12 +178,15 @@ else
   web_DIR=
 fi
 
-# checking to see if a queing system is available
+#*** check to see if a queing system is available
+
 QUEUE=smokebot
 notfound=`qstat -a 2>&1 | tail -1 | grep "not found" | wc -l`
 if [ $notfound -eq 1 ] ; then
   QUEUE=none
 fi
+
+#*** parse command line options
 
 while getopts '3aAb:BcCd:fhHI:JkLm:NMq:r:tuUvw:W:' OPTION
 do
@@ -270,6 +279,9 @@ if [ ! "$WEB_URL" == "" ]; then
 fi
 
 COMPILER="-I $COMPILER"
+
+#*** kill smokebot
+
 if [ "$KILL_SMOKEBOT" == "1" ]; then
   if [ -e $smokebot_pid ]; then
     PID=`head -1 $smokebot_pid`
@@ -295,6 +307,9 @@ if [ "$KILL_SMOKEBOT" == "1" ]; then
   fi
   exit
 fi
+
+#*** make sure smokebot is not already running
+
 if [[ "$RUNSMOKEBOT" == "1" ]]; then
   if [ "$FORCE" == "" ]; then
     if [ -e $smokebot_pid ] ; then
@@ -311,8 +326,8 @@ if [ "$EMAIL" != "" ]; then
   EMAIL="-m $EMAIL"
 fi
 
-# for now always assume the bot repo is always in the master branch
-# and that the -b branch option only apples to the fds and smv repos
+#*** for now always assume the bot repo is always in the master branch
+#    and that the -b branch option only apples to the fds and smv repos
 
 if [[ "$RUNSMOKEBOT" == "1" ]]; then
   if [[ "$UPDATEREPO" == "-u" ]]; then
@@ -324,6 +339,8 @@ if [[ "$RUNSMOKEBOT" == "1" ]]; then
 fi
 
 BRANCH="-b $BRANCH"
+
+#*** run smokebot
 
 touch $smokebot_pid
 $ECHO ./$botscript $NOPT $SIZE $BRANCH $TESTFLAG $RUNAUTO $INTEL $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"

@@ -45,7 +45,6 @@ echo "-U - upload guides (only by user firebot)"
 exit
 }
 
-
 #---------------------------------------------
 #                   usage
 #---------------------------------------------
@@ -120,8 +119,10 @@ LIST_DESCENDANTS ()
 }
 
 #VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
-#                             Primary script execution =
+#                             beginning of run_firebot.sh
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+#*** location of firebot processor id
 
 if [ ! -d ~/.fdssmvgit ] ; then
   mkdir ~/.fdssmvgit
@@ -129,6 +130,8 @@ fi
 firebot_pid=~/.fdssmvgit/firebot_pid
 
 CURDIR=`pwd`
+
+#*** make sure firebot is started in the right location
 
 if [ -e .fds_git ]; then
   cd ../..
@@ -139,7 +142,8 @@ else
   exit
 fi
 
-# checking to see if a queing system is available
+#*** checking to see if a queing system is available
+
 QUEUE=firebot
 notfound=`qstat -a 2>&1 | tail -1 | grep "not found" | wc -l`
 if [ $notfound -eq 1 ] ; then
@@ -150,6 +154,8 @@ platform="linux"
 if [ "`uname`" == "Darwin" ] ; then
   platform="osx"
 fi
+
+#*** define initial values
 
 USEINSTALL=
 BRANCH=master
@@ -176,6 +182,8 @@ debug_mode=
 DV=
 INTEL=
 export QFDS_STARTUP=
+
+#*** parse command line options
 
 while getopts 'b:BcdCD:FfHhIiJKkLm:Pq:nsSuUvV:' OPTION
 do
@@ -265,6 +273,8 @@ esac
 done
 shift $(($OPTIND-1))
 
+#*** kill firebot
+
 if [ "$KILL_FIREBOT" == "1" ]; then
   if [ -e $firebot_pid ] ; then
     PID=`head -1 $firebot_pid`
@@ -290,6 +300,9 @@ if [ "$KILL_FIREBOT" == "1" ]; then
   fi
   exit
 fi
+
+#*** abort if firebot is already running
+
 if [ -e $firebot_pid ] ; then
   if [ "$FORCE" == "" ] ; then
     echo Firebot or smokebot are already running. If this
@@ -297,12 +310,13 @@ if [ -e $firebot_pid ] ; then
     exit
   fi
 fi
+
 if [[ "$EMAIL" != "" ]]; then
   EMAIL="-m $EMAIL"
 fi
 
-# for now always assume the bot repo is always in the master branch
-# and that the -b branch option only apples to the fds and smv repos
+#***  for now always assume the bot repo is always in the master branch
+#     and that the -b branch option only apples to the fds and smv repos
 
 if [[ "$UPDATEREPO" == "1" ]]; then
    UPDATE=-u

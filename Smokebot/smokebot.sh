@@ -1339,11 +1339,12 @@ email_build_status()
 }
 
 #VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
-#                             Primary script execution =
+#                             beginning of smokebot.sh
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+#*** define initial values
+
 size=64
-# define run directories
 YOPT=-Y
 smokebotdir=`pwd`
 OUTPUT_DIR="$smokebotdir/output"
@@ -1364,8 +1365,6 @@ WEBBRANCH=nist-pages
 FDSBRANCH=master
 SMVBRANCH=master
 
-# define repo names (default)
-
 NOPT=
 SMOKEBOT_QUEUE=smokebot
 MAKEMOVIES=
@@ -1382,6 +1381,8 @@ UPLOADRESULTS=
 COMPILER=intel
 PID_FILE=~/.fdssmvgit/smokebot_pid
 INTEL=
+
+#*** parse command line options
 
 while getopts '3aAb:cI:JLm:MNo:p:q:r:stuUw:W:' OPTION
 do
@@ -1461,6 +1462,8 @@ esac
 done
 shift $(($OPTIND-1))
 
+#*** make sure smokebot is running in the right directory
+
 if [ -e .smv_git ]; then
   cd ../..
   repo=`pwd`
@@ -1478,8 +1481,7 @@ if [ "$SMOKEBOT_QUEUE" == "none" ]; then
   fi
 fi
 
-
-# make sure repos needed by smokebot exist
+#*** make sure repos needed by smokebot exist
 
 botrepo=$repo/bot
 CD_REPO $botrepo $botbranch || exit 1
@@ -1494,7 +1496,7 @@ smvrepo=$repo/smv
 CD_REPO $smvrepo $SMVBRANCH ||  exit 1
 cd $smokebotrundir
 
-# save pid if -k option (kill smokebot) is used lateer
+#*** save pid if -k option (kill smokebot) is used lateer
 
 echo $$ > $PID_FILE
 
@@ -1508,8 +1510,8 @@ if [[ $RUNAUTO == "Y" ]] ; then
   run_auto trigger
 fi
 
-# if one of WEB_URL or web_DIR exist then both should exist
-# if web_DIR exists then it must be writable
+#*** if one of WEB_URL or web_DIR exist then both should exist
+#    if web_DIR exists then it must be writable
 
 if [ "$WEB_URL" == "" ]; then
   web_DIR=
