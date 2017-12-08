@@ -772,7 +772,7 @@ wait_cases_release_end()
    # Scans qstat and waits for cases to end
    if [[ "$QUEUE" == "none" ]]
    then
-     while [[ `ps -u $USER -f | fgrep .fds | grep -v grep` != '' ]]; do
+     while [[          `ps -u $USER -f | fgrep .fds | grep -v firebot | grep -v grep` != '' ]]; do
         JOBS_REMAINING=`ps -u $USER -f | fgrep .fds | grep -v firebot | grep -v grep | wc -l`
 
         echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage5
