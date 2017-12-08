@@ -29,10 +29,12 @@ echo ""
 echo "Options:"
 echo "-3 - run in 32 bit mode (only for gnu compilers)"
 echo "-a - run automatically if FDS or smokeview source has changed"
-echo "-b - branch_name - run smokebot using the branch branch_name [default: $BRANCH]"
-echo "-B  - use startup files to set the environment not modules"
+echo "-b - branch_name - run smokebot using the branch branch_name "
+echo "                   [default: $BRANCH]"
+echo "-B - use startup files to set the environment not modules"
 echo "-c - clean repo"
-echo "-C -  add --mca plm_rsh_agent /usr/bin/ssh to mpirun command when running cases"
+echo "-C - add --mca plm_rsh_agent /usr/bin/ssh to mpirun command "
+echo "           when running cases"
 echo "-f - force smokebot run"
 echo "-h - display most commonly used options"
 echo "-H - display all options"
@@ -40,8 +42,8 @@ echo "-I compiler - intel or gnu [default: $COMPILER]"
 echo "-J use Intel MPI version of fds"
 echo "-k - kill smokebot if it is running"
 echo "-q queue [default: $QUEUE]"
-echo "-L - smokebot lite,  run only stages that build a debug fds and run cases with it"
-echo "                    (no release fds, no release cases, no manuals, etc)"
+echo "-L - smokebot lite,  run only stages that build a debug fds and run"
+echo "     cases with it (no release fds, no release cases, no manuals, etc)"
 if [ "$EMAIL" != "" ]; then
 echo "-m email_address - [default: $EMAIL]"
 else
@@ -110,11 +112,12 @@ CD_REPO ()
 
 LIST_DESCENDANTS ()
 {
-  local children=$(ps -o pid= --ppid "$1")
+#  local children=$(ps -o pid= --ppid "$1")
+  local children=$(pgrep -P $1)
 
   for pid in $children
   do
-    LIST_DESCENDANTS "$pid"
+    LIST_DESCENDANTS $pid
   done
 
   echo "$children"
@@ -267,20 +270,19 @@ if [ ! "$WEB_URL" == "" ]; then
 fi
 
 COMPILER="-I $COMPILER"
-
 if [ "$KILL_SMOKEBOT" == "1" ]; then
-  pidrunning=0
   if [ -e $smokebot_pid ]; then
     PID=`head -1 $smokebot_pid`
-    pidrunning=`ps -el |  awk '{print $4}'  | grep $PID | wc -l`
-    rm -f $smokebot_pid
-  fi
-  if [ $pidrunning -gt 0 ]; then
-    echo killing processes invoked by smokebot
-    kill -9 $(LIST_DESCENDANTS $PID)
+    JOBS=$(LIST_DESCENDANTS $PID)
+    echo killing processes invoked by smokebot: $JOBS
+    kill -9 $JOBS
     echo "killing smokebot (PID=$PID)"
     kill -9 $PID
-    if [ "$QUEUE" != "none" ]; then
+    if [ "$QUEUE" == "none" ]; then
+      cd $CURDIR/../Scripts
+      ./killppids.sh ../Smokebot/scriptlist
+      cd $CURDIR
+    else
       JOBIDS=`qstat -a | grep SB_ | awk -v user="$USER" '{if($2==user){print $1}}' | awk -F'.' '{print $1}'`
       if [ "$JOBIDS" != "" ]; then
         echo killing smokebot jobs with Id: $JOBIDS

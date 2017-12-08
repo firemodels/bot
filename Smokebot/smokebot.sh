@@ -1,4 +1,4 @@
-
+#!/bin/bash
 
 # The Smokebot script is part of an automated continuous integration system.
 # Consult the FDS Config Management Plan for more information.
@@ -495,7 +495,7 @@ run_verification_cases_debug()
 
    # Submit SMV verification cases and wait for them to start
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3a 2>&1
-   ./Run_SMV_Cases.sh $INTEL2 $NOPT $YOPT -p $size -c $cfastrepo -I $COMPILER $USEINSTALL2 -m 2 -d -q $SMOKEBOT_QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage3a 2>&1
+   ./Run_SMV_Cases.sh $SCRIPTLIST $INTEL2 $NOPT $YOPT -p $size -c $cfastrepo -I $COMPILER $USEINSTALL2 -m 2 -d -q $SMOKEBOT_QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage3a 2>&1
 }
 
 #---------------------------------------------
@@ -790,7 +790,7 @@ run_verification_cases_release()
    # Start running all SMV verification cases
    cd $smvrepo/Verification/scripts
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3b 2>&1
-   ./Run_SMV_Cases.sh $INTEL2 $NOPT $YOPT -p $size -c $cfastrepo -I $COMPILER $USEINSTALL2 $RUN_OPENMP -q $SMOKEBOT_QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage3b 2>&1
+   ./Run_SMV_Cases.sh $SCRIPTLIST $INTEL2 $NOPT $YOPT -p $size -c $cfastrepo -I $COMPILER $USEINSTALL2 $RUN_OPENMP -q $SMOKEBOT_QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage3b 2>&1
 }
 
 #---------------------------------------------
@@ -1355,6 +1355,8 @@ NEWGUIDE_DIR=$OUTPUT_DIR/Newest_Guides
 web_DIR=
 WEB_URL=
 SMOKEBOT_LITE=
+SCRIPTLIST=
+scriptlist=$smokebotdir/scriptlist
 
 WEBBRANCH=nist-pages
 FDSBRANCH=master
@@ -1466,6 +1468,14 @@ else
   echo "          Aborting smokebot"
   exit 1
 fi
+
+if [ "$SMOKEBOT_QUEUE" == "none" ]; then
+  SCRIPTLIST="-S $scriptlist"
+  if [ -e $scriptlist ]; then
+    rm -f $scriptlist
+  fi
+fi
+
 
 # make sure repos needed by smokebot exist
 
