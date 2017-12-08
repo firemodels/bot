@@ -773,7 +773,8 @@ wait_cases_release_end()
    if [[ "$QUEUE" == "none" ]]
    then
      while [[ `ps -u $USER -f | fgrep .fds | grep -v grep` != '' ]]; do
-        JOBS_REMAINING=`ps -u $USER -f | fgrep .fds | grep -v grep | wc -l`
+        JOBS_REMAINING=`ps -u $USER -f | fgrep .fds | grep -v firebot | grep -v grep | wc -l`
+
         echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage5
         TIME_LIMIT_STAGE="5"
         check_time_limit
