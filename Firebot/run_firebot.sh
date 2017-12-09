@@ -278,11 +278,15 @@ shift $(($OPTIND-1))
 if [ "$KILL_FIREBOT" == "1" ]; then
   if [ -e $firebot_pid ] ; then
     PID=`head -1 $firebot_pid`
-    JOBS=$(LIST_DESCENDANTS $PID)
-    echo killing processes invoked by firebot: $JOBS
-    kill -9 $JOBS
     echo "killing firebot (PID=$PID)"
     kill -9 $PID
+
+    JOBS=$(LIST_DESCENDANTS $PID)
+    if [ "$JOBS" != "" ]; then
+      echo killing processes invoked by firebot: $JOBS
+      kill -9 $JOBS
+    fi
+
     if [ "$QUEUE" == "none" ]; then
       cd $CURDIR/../Scripts
       ./killppids.sh ../Firebot/scriptfiles
@@ -294,9 +298,11 @@ if [ "$KILL_FIREBOT" == "1" ]; then
         qdel $JOBIDS
       fi
     fi
+
     echo firebot process $PID killed
+    rm -f $firebot_pid
   else
-    echo firebot is not running, cannot be killed.
+    echo firebot is not running
   fi
   exit
 fi
