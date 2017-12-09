@@ -468,7 +468,7 @@ run_verification_cases_debug()
    echo Running FDS Verification Cases
    echo "   debug"
    echo 'Running FDS verification cases:' >> $OUTPUT_DIR/stage4
-   ./Run_FDS_Cases.sh -o 1 -d -m 1 $INTEL2 -q $QUEUE $SCRIPTLIST >> $OUTPUT_DIR/stage4 2>&1
+   ./Run_FDS_Cases.sh -o 1 -d -m 1 $INTEL2 -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
    echo "" >> $OUTPUT_DIR/stage4 2>&1
 
    # Wait for all verification cases to end
@@ -811,14 +811,14 @@ run_verification_cases_release()
    cd $fdsrepo/Verification/scripts
    # Run FDS with 1 OpenMP thread
    echo 'Running FDS benchmark verification cases:' >> $OUTPUT_DIR/stage5
-   ./Run_FDS_Cases.sh $INTEL2 $DV2 -b -o 1 -q $QUEUE $SCRIPTLIST >> $OUTPUT_DIR/stage5 2>&1
+   ./Run_FDS_Cases.sh $INTEL2 $DV2 -b -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
    echo "" >> $OUTPUT_DIR/stage5 2>&1
 
    # Wait for benchmark verification cases to end
    wait_cases_release_end 'verification'
 
    echo 'Running FDS non-benchmark verification cases:' >> $OUTPUT_DIR/stage5
-   ./Run_FDS_Cases.sh $INTEL2 $DV2 -R -o 1 -q $QUEUE $SCRIPTLIST >> $OUTPUT_DIR/stage5 2>&1
+   ./Run_FDS_Cases.sh $INTEL2 $DV2 -R -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
    echo "" >> $OUTPUT_DIR/stage5 2>&1
 
    # Wait for non-benchmark verification cases to end
@@ -1452,8 +1452,7 @@ size=_64
 # define run directories
 PID_FILE=~/.fdssmvgit/firebot_pid
 firebotdir=`pwd`
-scriptlist=$firebotdir/scriptlist
-SCRIPTLIST=
+export SCRIPTLIST=$firebotdir/scriptlist
 OUTPUT_DIR="$firebotdir/output"
 HISTORY_DIR="$HOME/.firebot/history"
 TIME_LOG=$OUTPUT_DIR/timings
@@ -1605,11 +1604,8 @@ else
   exit
 fi
 
-if [ "$QUEUE" == "none" ]; then
-  SCRIPTLIST="-S $scriptlist"
-  if [ -e $scriptlist ]; then
-    rm -f $scriptlist
-  fi
+if [[ "$QUEUE" == "none" ]] && [[ -e $SCRIPTLIST ]]; then
+  rm -f $SCRIPTLIST
 fi
 
 if [ "$caselistfile" != "" ]; then
