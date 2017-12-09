@@ -1356,7 +1356,7 @@ NEWGUIDE_DIR=$OUTPUT_DIR/Newest_Guides
 web_DIR=
 WEB_URL=
 SMOKEBOT_LITE=
-export SCRIPTLIST=$smokebotdir/scriptlist
+export SCRIPTFILES=$smokebotdir/scriptfiles
 
 WEBBRANCH=nist-pages
 FDSBRANCH=master
@@ -1475,8 +1475,8 @@ else
   exit 1
 fi
 
-if [[ "$SMOKEBOT_QUEUE" == "none" ]] && [[ -e $SCRIPTLIST ]]; then
-  rm -f $SCRIPTLIST
+if [[ "$SMOKEBOT_QUEUE" == "none" ]] && [[ -e $SCRIPTFILES ]]; then
+  rm -f $SCRIPTFILES
 fi
 
 #*** make sure repos needed by smokebot exist

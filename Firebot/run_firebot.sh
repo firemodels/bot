@@ -285,7 +285,7 @@ if [ "$KILL_FIREBOT" == "1" ]; then
     kill -9 $PID
     if [ "$QUEUE" == "none" ]; then
       cd $CURDIR/../Scripts
-      ./killppids.sh ../Firebot/scriptlist
+      ./killppids.sh ../Firebot/scriptfiles
       cd $CURDIR
     else
       JOBIDS=`qstat -a | grep $PREFIX | awk -v user="$USER" '{if($2==user){print $1}}' | awk -F'.' '{print $1}'`

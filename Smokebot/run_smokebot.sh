@@ -297,7 +297,7 @@ if [ "$KILL_SMOKEBOT" == "1" ]; then
     kill -9 $PID
     if [ "$QUEUE" == "none" ]; then
       cd $CURDIR/../Scripts
-      ./killppids.sh ../Smokebot/scriptlist
+      ./killppids.sh ../Smokebot/scriptfiles
       cd $CURDIR
     else
       JOBIDS=`qstat -a | grep SB_ | awk -v user="$USER" '{if($2==user){print $1}}' | awk -F'.' '{print $1}'`

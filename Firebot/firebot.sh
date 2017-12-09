@@ -1448,7 +1448,7 @@ size=_64
 # define run directories
 PID_FILE=~/.fdssmvgit/firebot_pid
 firebotdir=`pwd`
-export SCRIPTLIST=$firebotdir/scriptlist
+export SCRIPTFILES=$firebotdir/scriptfiles
 OUTPUT_DIR="$firebotdir/output"
 HISTORY_DIR="$HOME/.firebot/history"
 TIME_LOG=$OUTPUT_DIR/timings
@@ -1600,8 +1600,8 @@ else
   exit
 fi
 
-if [[ "$QUEUE" == "none" ]] && [[ -e $SCRIPTLIST ]]; then
-  rm -f $SCRIPTLIST
+if [[ "$QUEUE" == "none" ]] && [[ -e $SCRIPTFILES ]]; then
+  rm -f $SCRIPTFILES
 fi
 
 if [ "$caselistfile" != "" ]; then
