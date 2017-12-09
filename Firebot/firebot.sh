@@ -873,32 +873,30 @@ compile_smv_db()
 
 check_compile_smv_db()
 {
-   # Check for errors in SMV debug compilation
-   if [ "$USEINSTALL" == "" ]; then
-   cd $smvrepo/Build/smokeview/intel_${platform}${size}
-   if [ -e "smokeview_${platform}${size}_db" ]
-   then
+  # Check for errors in SMV debug compilation
+  if [ "$USEINSTALL" == "" ]; then
+    cd $smvrepo/Build/smokeview/intel_${platform}${size}
+    if [ -e "smokeview_${platform}${size}_db" ]; then
       smv_debug_success=true
-   else
+    else
       echo "Errors from Stage 3b - Compile SMV debug:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage3b >> $ERROR_LOG
       echo "" >> $ERROR_LOG
-   fi
+    fi
 
-   # Check for compiler warnings/remarks
-   # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-   if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage3b | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]
-   then
+    # Check for compiler warnings/remarks
+    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
+    if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage3b | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]; then
       # Continue along
       :
-   else
+    else
       echo "Warnings from Stage 3b - Compile SMV debug:" >> $WARNING_LOG
       grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage3b | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
-   fi
-   else
-      smv_debug_success=true
-   fi
+    fi
+  else
+    smv_debug_success=true
+  fi
 }
 
 #---------------------------------------------
@@ -921,31 +919,29 @@ compile_smv()
 
 check_compile_smv()
 {
-   # Check for errors in SMV release compilation
-   if [ "$USEINSTALL" == "" ]; then
-   cd $smvrepo/Build/smokeview/intel_${platform}${size}
-   if [ -e "smokeview_${platform}${size}" ]
-   then
+  # Check for errors in SMV release compilation
+  if [ "$USEINSTALL" == "" ]; then
+    cd $smvrepo/Build/smokeview/intel_${platform}${size}
+    if [ -e "smokeview_${platform}${size}" ]; then
       smv_release_success=true
-   else
+    else
       echo "Errors from Stage 3c - Compile SMV release:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage3c >> $ERROR_LOG
       echo "" >> $ERROR_LOG
-   fi
+    fi
 
-   # Check for compiler warnings/remarks
-   # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-   if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage3c | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]
-   then
+    # Check for compiler warnings/remarks
+    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
+    if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage3c | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]; then
       # Continue along
       :
-   else
+    else
       echo "Warnings from Stage 3c - Compile SMV release:" >> $WARNING_LOG
       grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage3c | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
-   fi
-   smv_release_success=true
-   fi
+    fi
+    smv_release_success=true
+  fi
 }
 
 #---------------------------------------------
@@ -1547,12 +1543,12 @@ case $OPTION in
    DV="_dv"
    DV2="-u"
    ;;
+  i)
+   USEINSTALL="-r"
+   ;;
   J)
    INTEL=i
    INTEL2="-J"
-   ;;
-  i)
-   USEINSTALL="-r"
    ;;
   L)
    FIREBOT_LITE=1
