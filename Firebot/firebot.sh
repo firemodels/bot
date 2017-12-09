@@ -468,7 +468,7 @@ run_verification_cases_debug()
    echo Running FDS Verification Cases
    echo "   debug"
    echo 'Running FDS verification cases:' >> $OUTPUT_DIR/stage4
-   ./Run_FDS_Cases.sh -o 1 -d -m 1 $INTEL2 -q $QUEUE -j $JOBPREFIX $SCRIPTLIST >> $OUTPUT_DIR/stage4 2>&1
+   ./Run_FDS_Cases.sh -o 1 -d -m 1 $INTEL2 -q $QUEUE $SCRIPTLIST >> $OUTPUT_DIR/stage4 2>&1
    echo "" >> $OUTPUT_DIR/stage4 2>&1
 
    # Wait for all verification cases to end
@@ -528,7 +528,7 @@ run_validation_cases_debug()
       # Submit FDS validation cases and wait for them to start
       echo "Running FDS validation cases for ${SET}:" >> $OUTPUT_DIR/stage4
       echo "" >> $OUTPUT_DIR/stage4 2>&1
-      ./Run_All.sh -y -j $JOBPREFIX -b -m 1 -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
+      ./Run_All.sh -y -b -m 1 -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
 
       CURRENT_VALIDATION_SETS+=($SET)
 
@@ -811,14 +811,14 @@ run_verification_cases_release()
    cd $fdsrepo/Verification/scripts
    # Run FDS with 1 OpenMP thread
    echo 'Running FDS benchmark verification cases:' >> $OUTPUT_DIR/stage5
-   ./Run_FDS_Cases.sh $INTEL2 $DV2 -b -o 1 -q $QUEUE -j $JOBPREFIX $SCRIPTLIST >> $OUTPUT_DIR/stage5 2>&1
+   ./Run_FDS_Cases.sh $INTEL2 $DV2 -b -o 1 -q $QUEUE $SCRIPTLIST >> $OUTPUT_DIR/stage5 2>&1
    echo "" >> $OUTPUT_DIR/stage5 2>&1
 
    # Wait for benchmark verification cases to end
    wait_cases_release_end 'verification'
 
    echo 'Running FDS non-benchmark verification cases:' >> $OUTPUT_DIR/stage5
-   ./Run_FDS_Cases.sh $INTEL2 $DV2 -R -o 1 -q $QUEUE -j $JOBPREFIX $SCRIPTLIST >> $OUTPUT_DIR/stage5 2>&1
+   ./Run_FDS_Cases.sh $INTEL2 $DV2 -R -o 1 -q $QUEUE $SCRIPTLIST >> $OUTPUT_DIR/stage5 2>&1
    echo "" >> $OUTPUT_DIR/stage5 2>&1
 
    # Wait for non-benchmark verification cases to end
@@ -844,7 +844,7 @@ run_validation_cases_release()
       echo "Running FDS validation cases:" >> $OUTPUT_DIR/stage5
       echo "Validation Set: ${SET}" >> $OUTPUT_DIR/stage5
       echo "" >> $OUTPUT_DIR/stage5 2>&1
-      ./Run_All.sh -y $DV2 -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
+      ./Run_All.sh -y $DV2 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
       echo "" >> $OUTPUT_DIR/stage5 2>&1
    done
 
@@ -1493,7 +1493,9 @@ COMPILER=intel
 QUEUE=firebot
 CLEANREPO=0
 UPDATEREPO=0
-JOBPREFIX=FB_
+if [ "$JOBPREFIX" == "" ]; then
+  export JOBPREFIX=FB_
+fi
 commit=
 push=
 
@@ -1585,7 +1587,7 @@ case $OPTION in
    QUEUE=batch
    MAX_VALIDATION_PROCESSES="$OPTARG"
    LAUNCH_MORE_CASES=1
-   JOBPREFIX=VB_
+   export JOBPREFIX=VB_
    ;;
 esac
 done
