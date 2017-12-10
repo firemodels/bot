@@ -1680,6 +1680,18 @@ if [ "$USEINSTALL" != "" ]; then
    fi
 fi
 
+notfound=
+if [ "QUEUE" == "none"]; then
+   notfound=`background -v 2>&1 | tail -1 | grep "not found" | wc -l`
+   if [ $notfound == 1 ]; then
+      echo "Error: The program background was not found.  firebot aborted"
+      echo "       Add the directory containing fds and smokeview to your path""
+      echo "       (same directory containing fds and smokeview)"
+      echo "Error: background not found. firebot aborted." >> $OUTPUT_DIR/stage1 2>&1
+      exit
+   fi
+fi
+
 UploadGuides=$botrepo/Firebot/fds_guides2GD.sh
 
 echo ""
