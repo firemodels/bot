@@ -1,4 +1,4 @@
-@echo off
+ @echo off
 
 set FIREBOTRUNDIR=%CD%
 
@@ -297,7 +297,7 @@ if %lite% == 1 goto skip_lite2
     echo    libs
 
     cd %smvrepo%\Build\LIBS\intel_win_64
-    call makelibs bot 1>> %OUTDIR%\stage2a.txt 2>&1
+    call makelibs_bot 1>> %OUTDIR%\stage2a.txt 2>&1
 
     echo    debug
 
