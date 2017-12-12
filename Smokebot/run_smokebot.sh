@@ -285,8 +285,6 @@ COMPILER="-I $COMPILER"
 if [ "$KILL_SMOKEBOT" == "1" ]; then
   if [ -e $smokebot_pid ]; then
     PID=`head -1 $smokebot_pid`
-    echo "killing smokebot (PID=$PID)"
-    kill -9 $PID
 
     JOBS=$(LIST_DESCENDANTS $PID)
     if [ "$JOBS" != "" ]; then
@@ -305,6 +303,9 @@ if [ "$KILL_SMOKEBOT" == "1" ]; then
         qdel $JOBIDS
       fi
     fi
+    
+    echo "killing smokebot (PID=$PID)"
+    kill -9 $PID
 
     echo smokebot process $PID killed
     rm -f $smokebot_pid
