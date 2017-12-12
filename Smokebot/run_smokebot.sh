@@ -27,7 +27,6 @@ function usage_all {
 echo "Verification and validation testing script for smokeview"
 echo ""
 echo "Options:"
-echo "-3 - run in 32 bit mode (only for gnu compilers)"
 echo "-a - run automatically if FDS or smokeview source has changed"
 echo "-b - branch_name - run smokebot using the branch branch_name "
 echo "                   [default: $BRANCH]"
@@ -190,13 +189,9 @@ fi
 
 #*** parse command line options
 
-while getopts '3aAb:BcCd:fhHI:JkLm:NMq:r:StuUvw:W:' OPTION
+while getopts 'aAb:BcCd:fhHI:JkLm:NMq:r:StuUvw:W:' OPTION
 do
 case $OPTION  in
-  3)
-   SIZE=-3
-   COMPILER=gnu
-   ;;
   a)
    RUNAUTO=-a
    ;;
