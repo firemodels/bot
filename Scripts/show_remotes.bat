@@ -9,7 +9,7 @@ if not exist ..\.gitbot goto skip1
    cd %CURDIR%
    goto endif1
 :skip1
-   echo ***error: update_repos.bat must be run in the bot\Scripts directory
+   echo ***error: this script must be run in the bot\Scripts directory
    exit /b
 :endif1
 

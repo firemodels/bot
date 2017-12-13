@@ -16,7 +16,7 @@ if [ -e ../.gitbot ]; then
    cd ../..
    FMROOT=`pwd`
 else
-   echo "***error: the update_repos.sh script must be run from the bot/Scripts directory"
+   echo "***error: this script must be run from the bot/Scripts directory"
    exit
 fi
 
