@@ -29,6 +29,7 @@ cd %CURDIR%
 goto eof
 
 :show_status
+  set repo=%1
   echo.
   set repodir=%FMROOT%\%repo%
   echo -------------------%repo%-------------------------------------
