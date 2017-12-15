@@ -36,7 +36,7 @@ if [ -e ../.gitbot ]; then
    cd ../..
    FMROOT=`pwd`
 else
-   echo "***Error: setup_repos.sh must be run from the bot/Scripts directory"
+   echo "***Error: this script must be run from the bot/Scripts directory"
    exit
 fi
 

@@ -27,7 +27,6 @@ function usage_all {
 echo "Verification and validation testing script for smokeview"
 echo ""
 echo "Options:"
-echo "-3 - run in 32 bit mode (only for gnu compilers)"
 echo "-a - run automatically if FDS or smokeview source has changed"
 echo "-b - branch_name - run smokebot using the branch branch_name "
 echo "                   [default: $BRANCH]"
@@ -190,13 +189,9 @@ fi
 
 #*** parse command line options
 
-while getopts '3aAb:BcCd:fhHI:JkLm:NMq:r:StuUvw:W:' OPTION
+while getopts 'aAb:BcCd:fhHI:JkLm:NMq:r:StuUvw:W:' OPTION
 do
 case $OPTION  in
-  3)
-   SIZE=-3
-   COMPILER=gnu
-   ;;
   a)
    RUNAUTO=-a
    ;;
@@ -290,8 +285,6 @@ COMPILER="-I $COMPILER"
 if [ "$KILL_SMOKEBOT" == "1" ]; then
   if [ -e $smokebot_pid ]; then
     PID=`head -1 $smokebot_pid`
-    echo "killing smokebot (PID=$PID)"
-    kill -9 $PID
 
     JOBS=$(LIST_DESCENDANTS $PID)
     if [ "$JOBS" != "" ]; then
@@ -310,6 +303,9 @@ if [ "$KILL_SMOKEBOT" == "1" ]; then
         qdel $JOBIDS
       fi
     fi
+    
+    echo "killing smokebot (PID=$PID)"
+    kill -9 $PID
 
     echo smokebot process $PID killed
     rm -f $smokebot_pid

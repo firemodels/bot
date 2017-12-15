@@ -278,8 +278,6 @@ shift $(($OPTIND-1))
 if [ "$KILL_FIREBOT" == "1" ]; then
   if [ -e $firebot_pid ] ; then
     PID=`head -1 $firebot_pid`
-    echo "killing firebot (PID=$PID)"
-    kill -9 $PID
 
     JOBS=$(LIST_DESCENDANTS $PID)
     if [ "$JOBS" != "" ]; then
@@ -299,6 +297,8 @@ if [ "$KILL_FIREBOT" == "1" ]; then
       fi
     fi
 
+    echo "killing firebot (PID=$PID)"
+    kill -9 $PID
     echo firebot process $PID killed
     rm -f $firebot_pid
   else

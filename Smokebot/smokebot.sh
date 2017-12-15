@@ -1481,7 +1481,6 @@ fi
 
 if [ "$SMOKEBOT_QUEUE" == "none" ]; then
   notfound=`background -v 2>&1 | tail -1 | grep "not found" | wc -l`
-  echo notfound=$notfound
   if [ $notfound -eq 1 ]; then
     echo "Error: The program background was not found.  smokebot aborted"
     echo "       Add the directory containing background to your path"
