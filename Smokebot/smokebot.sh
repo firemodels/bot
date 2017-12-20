@@ -1,4 +1,4 @@
-
+#!/bin/bash
 
 # The Smokebot script is part of an automated continuous integration system.
 # Consult the FDS Config Management Plan for more information.
@@ -426,7 +426,7 @@ check_compile_fds_mpi_db()
    fi
 
    # Check for compiler warnings/remarks
-   if [[ `grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage1b| grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'` == "" ]]
+   if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage1b| grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'` == "" ]]
    then
       # Continue along
       :
@@ -450,8 +450,9 @@ wait_verification_cases_debug_end()
    # Scans qstat and waits for verification cases to end
    if [[ "$SMOKEBOT_QUEUE" == "none" ]]
    then
-     while [[ `ps -u $USER -f | fgrep .fds | grep -v grep` != '' ]]; do
-        JOBS_REMAINING=`ps -u $USER -f | fgrep .fds | grep -v grep | wc -l`
+     while [[          `ps -u $USER -f | fgrep .fds | grep -v smokebot | grep -v grep` != '' ]]; do
+        JOBS_REMAINING=`ps -u $USER -f | fgrep .fds | grep -v smokebot | grep -v grep | wc -l`
+
         echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage3a
         TIME_LIMIT_STAGE="3"
         check_time_limit
@@ -495,7 +496,7 @@ run_verification_cases_debug()
 
    # Submit SMV verification cases and wait for them to start
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3a 2>&1
-   ./Run_SMV_Cases.sh $INTEL2 $NOPT $YOPT -p $size -c $cfastrepo -I $COMPILER $USEINSTALL2 -m 2 -d -q $SMOKEBOT_QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage3a 2>&1
+   ./Run_SMV_Cases.sh $INTEL2 $NOPT $YOPT -p $size -c $cfastrepo -I $COMPILER $USEINSTALL2 -m 2 -d -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3a 2>&1
 }
 
 #---------------------------------------------
@@ -514,7 +515,7 @@ check_verification_cases_debug()
       [[ `grep -rIi 'Segmentation' Visualization/* WUI/* Immersed_Boundary_Method/*` == "" ]] && \
       [[ `grep -rI 'ERROR:' Visualization/* WUI/* Immersed_Boundary_Method/*` == "" ]] && \
       [[ `grep -rIi 'STOP: Numerical' Visualization/* WUI/* Immersed_Boundary_Method/*` == "" ]] && \
-      [[ `grep -rIi -A 20 'forrtl' Visualization/* WUI/* Immersed_Boundary_Method/*` == "" ]]
+      [[ `grep -rIi 'forrtl' Visualization/* WUI/* Immersed_Boundary_Method/*` == "" ]]
    then
       stage3a_success=true
    else
@@ -572,7 +573,7 @@ check_compile_fds_mpi()
 
    # Check for compiler warnings/remarks
    # 'performing multi-file optimizations' and 'generating object file' are part of a normal compile
-   if [[ `grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage1c | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented'` == "" ]]
+   if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage1c | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented'` == "" ]]
    then
       # Continue along
       :
@@ -751,8 +752,9 @@ wait_verification_cases_release_end()
    # Scans qstat and waits for verification cases to end
    if [[ "$SMOKEBOT_QUEUE" == "none" ]]
    then
-     while [[ `ps -u $USER -f | fgrep .fds | grep -v grep` != '' ]]; do
-        JOBS_REMAINING=`ps -u $USER -f | fgrep .fds | grep -v grep | wc -l`
+     while [[          `ps -u $USER -f | fgrep .fds | grep -v smokebot | grep -v grep` != '' ]]; do
+        JOBS_REMAINING=`ps -u $USER -f | fgrep .fds | grep -v smokebot | grep -v grep | wc -l`
+
         echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage3b
         TIME_LIMIT_STAGE="5"
         check_time_limit
@@ -790,7 +792,7 @@ run_verification_cases_release()
    # Start running all SMV verification cases
    cd $smvrepo/Verification/scripts
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3b 2>&1
-   ./Run_SMV_Cases.sh $INTEL2 $NOPT $YOPT -p $size -c $cfastrepo -I $COMPILER $USEINSTALL2 $RUN_OPENMP -q $SMOKEBOT_QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage3b 2>&1
+   ./Run_SMV_Cases.sh $INTEL2 $NOPT $YOPT -p $size -c $cfastrepo -I $COMPILER $USEINSTALL2 $RUN_OPENMP -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3b 2>&1
 }
 
 #---------------------------------------------
@@ -809,7 +811,7 @@ check_verification_cases_release()
       [[ `grep -rIi 'Segmentation' Visualization/* WUI/* Immersed_Boundary_Method/* ` == "" ]] && \
       [[ `grep -rI 'ERROR:' Visualization/* WUI/* Immersed_Boundary_Method/* ` == "" ]] && \
       [[ `grep -rIi 'STOP: Numerical' Visualization/* WUI/* Immersed_Boundary_Method/* ` == "" ]] && \
-      [[ `grep -rIi  -A 20 'forrtl' Visualization/* WUI/* Immersed_Boundary_Method/* ` == "" ]]
+      [[ `grep -rIi  'forrtl' Visualization/* WUI/* Immersed_Boundary_Method/* ` == "" ]]
    then
       stage3b_success=true
    else
@@ -872,7 +874,7 @@ check_compile_smv_db()
 
    # Check for compiler warnings/remarks
    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-   if [[ `grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage2b | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]
+   if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage2b | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]
    then
       # Continue along
       :
@@ -966,7 +968,7 @@ check_compile_smv()
 
    # Check for compiler warnings/remarks
    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-   if [[ `grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage2c | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]
+   if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage2c | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]
    then
       # Continue along
       :
@@ -1122,11 +1124,9 @@ archive_timing_stats()
   cp smv_timing_stats.csv "$HISTORY_DIR/${GIT_REVISION}_timing.csv"
   cp smv_benchmarktiming_stats.csv "$HISTORY_DIR/${GIT_REVISION}_benchmarktiming.csv"
   TOTAL_SMV_TIMES=`tail -1 smv_benchmarktiming_stats.csv`
-  if [ "$UPLOADRESULTS" == "1" ]; then
-     if [ "$USER" == "smokebot" ]; then
-      cd $botrepo/Smokebot
-      ./smvstatus_updatepub.sh $repo/webpages $WEBBRANCH
-    fi
+  if [[ "$UPLOADRESULTS" == "1" ]] && [[ "$USER" == "smokebot" ]]; then
+    cd $botrepo/Smokebot
+    ./smvstatus_updatepub.sh $repo/webpages $WEBBRANCH
   fi
   if [ ! "$web_DIR" == "" ]; then
     cd $botrepo/Smokebot
@@ -1337,11 +1337,12 @@ email_build_status()
 }
 
 #VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
-#                             Primary script execution =
+#                             beginning of smokebot.sh
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+#*** define initial values
+
 size=64
-# define run directories
 YOPT=-Y
 smokebotdir=`pwd`
 OUTPUT_DIR="$smokebotdir/output"
@@ -1355,12 +1356,11 @@ NEWGUIDE_DIR=$OUTPUT_DIR/Newest_Guides
 web_DIR=
 WEB_URL=
 SMOKEBOT_LITE=
+export SCRIPTFILES=$smokebotdir/scriptfiles
 
 WEBBRANCH=nist-pages
 FDSBRANCH=master
 SMVBRANCH=master
-
-# define repo names (default)
 
 NOPT=
 SMOKEBOT_QUEUE=smokebot
@@ -1378,8 +1378,11 @@ UPLOADRESULTS=
 COMPILER=intel
 PID_FILE=~/.fdssmvgit/smokebot_pid
 INTEL=
+SKIP=
 
-while getopts '3aAb:cI:JLm:MNo:p:q:r:stuUw:W:' OPTION
+#*** parse command line options
+
+while getopts '3aAb:cI:JLm:MNo:p:q:r:SstuUw:W:' OPTION
 do
 case $OPTION in
   3)
@@ -1437,6 +1440,9 @@ case $OPTION in
   s)
    RUNDEBUG="0"
    ;;
+  S)
+   SKIP=1
+   ;;
   t)
    TESTFLAG="-t"
    TEST="_test"
@@ -1457,6 +1463,8 @@ esac
 done
 shift $(($OPTIND-1))
 
+#*** make sure smokebot is running in the right directory
+
 if [ -e .smv_git ]; then
   cd ../..
   repo=`pwd`
@@ -1467,7 +1475,21 @@ else
   exit 1
 fi
 
-# make sure repos needed by smokebot exist
+if [[ "$SMOKEBOT_QUEUE" == "none" ]] && [[ -e $SCRIPTFILES ]]; then
+  rm -f $SCRIPTFILES
+fi
+
+if [ "$SMOKEBOT_QUEUE" == "none" ]; then
+  notfound=`background -v 2>&1 | tail -1 | grep "not found" | wc -l`
+  if [ $notfound -eq 1 ]; then
+    echo "Error: The program background was not found.  smokebot aborted"
+    echo "       Add the directory containing background to your path"
+    echo "       (same directory containing fds and smokeview)"
+    exit
+  fi
+fi
+
+#*** make sure repos needed by smokebot exist
 
 botrepo=$repo/bot
 CD_REPO $botrepo $botbranch || exit 1
@@ -1482,7 +1504,7 @@ smvrepo=$repo/smv
 CD_REPO $smvrepo $SMVBRANCH ||  exit 1
 cd $smokebotrundir
 
-# save pid if -k option (kill smokebot) is used lateer
+#*** save pid if -k option (kill smokebot) is used lateer
 
 echo $$ > $PID_FILE
 
@@ -1496,8 +1518,8 @@ if [[ $RUNAUTO == "Y" ]] ; then
   run_auto trigger
 fi
 
-# if one of WEB_URL or web_DIR exist then both should exist
-# if web_DIR exists then it must be writable
+#*** if one of WEB_URL or web_DIR exist then both should exist
+#    if web_DIR exists then it must be writable
 
 if [ "$WEB_URL" == "" ]; then
   web_DIR=
@@ -1605,7 +1627,7 @@ if [[ "$MAILTO" != "" ]]; then
   mailTo=$MAILTO
 fi
 
-JOBPREFIX=SB_
+export JOBPREFIX=SB_
 
 #  =============================================
 #  = Smokebot timing and notification mechanism =
@@ -1700,7 +1722,6 @@ check_compile_smv_db
 if [ "$SMOKEBOT_LITE" == "" ]; then
   compile_smv
   check_compile_smv
-
 fi
 
 BUILDSOFTWARE_end=`GET_TIME`
@@ -1720,7 +1741,7 @@ echo "Run cases: $DIFF_RUNCASES" >> $STAGE_STATUS
 
 ### Stage 4 generate images ###
 MAKEPICTURES_beg=`GET_TIME`
-if [ "$SMOKEBOT_LITE" == "" ]; then
+if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]]; then
   if [[ $stage1c_fdsrel_success && $stage2c_smv_success ]] ; then
     make_smv_pictures
     check_smv_pictures
@@ -1730,7 +1751,7 @@ MAKEPICTURES_end=`GET_TIME`
 DIFF_MAKEPICTURES=`GET_DURATION $MAKEPICTURES_beg $MAKEPICTURES_end`
 echo "Make pictures: $DIFF_MAKEPICTURES" >> $STAGE_STATUS
 
-if [ "$SMOKEBOT_LITE" == "" ]; then
+if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]]; then
   if [ "$MAKEMOVIES" == "1" ]; then
     MAKEMOVIES_beg=`GET_TIME`
  
@@ -1740,10 +1761,10 @@ if [ "$SMOKEBOT_LITE" == "" ]; then
     MAKEMOVIES_end=`GET_TIME`
     DIFF_MAKEMOVIES=`GET_DURATION $MAKEMOVIES_beg $MAKEMOVIES_end`
     echo "Make movies: $DIFF_MAKEMOVIES" >> $STAGE_STATUS
-fi
+  fi
 fi
 
-if [ "$SMOKEBOT_LITE" == "" ]; then
+if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]]; then
   if [[ $stage1c_fdsrel_success ]] ; then
     generate_timing_stats
   fi
@@ -1751,7 +1772,7 @@ fi
 
 ### Stage 5 build documents ###
 MAKEGUIDES_beg=`GET_TIME`
-if [ "$SMOKEBOT_LITE" == "" ]; then
+if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]]; then
   if [[ $stage1c_fdsrel_success && $stage4b_smvpics_success ]] ; then
      echo Making guides
      if [ "$YOPT" == "" ]; then
@@ -1770,6 +1791,7 @@ if [ "$SMOKEBOT_LITE" == "" ]; then
      echo Errors found, not building guides
   fi
 fi
+
 MAKEGUIDES_end=`GET_TIME`
 DIFF_MAKEGUIDES=`GET_DURATION $MAKEGUIDES_beg $MAKEGUIDES_end`
 echo "Make guides: $DIFF_MAKEGUIDES" >> $STAGE_STATUS

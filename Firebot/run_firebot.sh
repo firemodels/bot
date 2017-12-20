@@ -45,7 +45,6 @@ echo "-U - upload guides (only by user firebot)"
 exit
 }
 
-
 #---------------------------------------------
 #                   usage
 #---------------------------------------------
@@ -108,19 +107,22 @@ CD_REPO ()
 
 LIST_DESCENDANTS ()
 {
-  local children=$(ps -o pid= --ppid "$1")
+#  local children=$(ps -o pid= --ppid "$1")
+  local children=$(pgrep -P $1)
 
   for pid in $children
   do
-    LIST_DESCENDANTS "$pid"
+    LIST_DESCENDANTS $pid
   done
 
   echo "$children"
 }
 
 #VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
-#                             Primary script execution =
+#                             beginning of run_firebot.sh
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+#*** location of firebot processor id
 
 if [ ! -d ~/.fdssmvgit ] ; then
   mkdir ~/.fdssmvgit
@@ -128,6 +130,8 @@ fi
 firebot_pid=~/.fdssmvgit/firebot_pid
 
 CURDIR=`pwd`
+
+#*** make sure firebot is started in the right location
 
 if [ -e .fds_git ]; then
   cd ../..
@@ -138,12 +142,20 @@ else
   exit
 fi
 
-# checking to see if a queing system is available
+#*** checking to see if a queing system is available
+
 QUEUE=firebot
 notfound=`qstat -a 2>&1 | tail -1 | grep "not found" | wc -l`
 if [ $notfound -eq 1 ] ; then
   QUEUE=none
 fi
+
+platform="linux"
+if [ "`uname`" == "Darwin" ] ; then
+  platform="osx"
+fi
+
+#*** define initial values
 
 USEINSTALL=
 BRANCH=master
@@ -159,7 +171,7 @@ SKIPMATLAB=
 SKIPFIGURES=
 FIREBOT_LITE=
 KILL_FIREBOT=
-PREFIX=FB_
+export PREFIX=FB_
 ECHO=
 MAX_VALIDATION_PROCESSES=
 commit=
@@ -170,6 +182,8 @@ debug_mode=
 DV=
 INTEL=
 export QFDS_STARTUP=
+
+#*** parse command line options
 
 while getopts 'b:BcdCD:FfHhIiJKkLm:Pq:nsSuUvV:' OPTION
 do
@@ -219,7 +233,7 @@ case $OPTION  in
    ;;
   K)
    KILL_FIREBOT="1"
-   PREFIX=VB_
+   export PREFIX=VB_
    ;;
   L)
    FIREBOT_LITE=-L
@@ -259,26 +273,42 @@ esac
 done
 shift $(($OPTIND-1))
 
+#*** kill firebot
+
 if [ "$KILL_FIREBOT" == "1" ]; then
   if [ -e $firebot_pid ] ; then
     PID=`head -1 $firebot_pid`
-    echo killing process invoked by firebot
-    kill -9 $(LIST_DESCENDANTS $PID)
-    echo "killing firebot (PID=$PID)"
-    kill -9 $PID
-    if [ "$QUEUE" != "none" ]; then
+
+    JOBS=$(LIST_DESCENDANTS $PID)
+    if [ "$JOBS" != "" ]; then
+      echo killing processes invoked by firebot: $JOBS
+      kill -9 $JOBS
+    fi
+
+    if [ "$QUEUE" == "none" ]; then
+      cd $CURDIR/../Scripts
+      ./killppids.sh ../Firebot/scriptfiles
+      cd $CURDIR
+    else
       JOBIDS=`qstat -a | grep $PREFIX | awk -v user="$USER" '{if($2==user){print $1}}' | awk -F'.' '{print $1}'`
       if [ "$JOBIDS" != "" ]; then
         echo killing firebot jobs with Id:$JOBIDS
         qdel $JOBIDS
       fi
     fi
+
+    echo "killing firebot (PID=$PID)"
+    kill -9 $PID
     echo firebot process $PID killed
+    rm -f $firebot_pid
   else
-    echo firebot is not running, cannot be killed.
+    echo firebot is not running
   fi
   exit
 fi
+
+#*** abort if firebot is already running
+
 if [ -e $firebot_pid ] ; then
   if [ "$FORCE" == "" ] ; then
     echo Firebot or smokebot are already running. If this
@@ -286,12 +316,13 @@ if [ -e $firebot_pid ] ; then
     exit
   fi
 fi
+
 if [[ "$EMAIL" != "" ]]; then
   EMAIL="-m $EMAIL"
 fi
 
-# for now always assume the bot repo is always in the master branch
-# and that the -b branch option only apples to the fds and smv repos
+#***  for now always assume the bot repo is always in the master branch
+#     and that the -b branch option only apples to the fds and smv repos
 
 if [[ "$UPDATEREPO" == "1" ]]; then
    UPDATE=-u

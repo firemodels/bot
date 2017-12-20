@@ -257,15 +257,17 @@ update_repo()
 check_git_checkout()
 {
    # Check for GIT errors
-      if [[ `grep -i -E 'modified' $OUTPUT_DIR/stage1` == "" ]]
-   then
-      # Continue along
-      :
-   else
-      echo "Warnings from Stage 1 - Update repos" >> $WARNING_LOG
-      echo "" >> $WARNING_LOG
-      grep -A 5 -B 5 -i -E 'modified' $OUTPUT_DIR/stage1 >> $WARNING_LOG
-      echo "" >> $WARNING_LOG
+   if [ -e $OUTPUT_DIR/stage1 ]; then
+     if [[ `grep -i -E 'modified' $OUTPUT_DIR/stage1` == "" ]]
+     then
+        # Continue along
+        :
+     else
+        echo "Warnings from Stage 1 - Update repos" >> $WARNING_LOG
+        echo "" >> $WARNING_LOG
+        grep -A 5 -B 5 -i -E 'modified' $OUTPUT_DIR/stage1 >> $WARNING_LOG
+        echo "" >> $WARNING_LOG
+     fi
    fi
    git_checkout_success=true
 }
@@ -346,13 +348,13 @@ check_compile_fds_mpi_db()
 
    # Check for compiler warnings/remarks
    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-   if [[ `grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage2b | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented'` == "" ]]
+   if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage2b | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented'` == "" ]]
    then
       # Continue along
       :
    else
       echo "Warnings from Stage 2b - Compile FDS MPI debug:" >> $WARNING_LOG
-      grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage2b | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
+      grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage2b | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
 }
@@ -436,8 +438,8 @@ wait_cases_debug_end()
    # Scans job queue and waits for cases to end
    if [[ "$QUEUE" == "none" ]]
    then
-     while [[ `ps -u $USER -f | fgrep .fds | grep -v grep` != '' ]]; do
-        JOBS_REMAINING=`ps -u $USER -f | fgrep .fds | grep -v grep | wc -l`
+     while [[          `ps -u $USER -f | fgrep .fds | grep -v firebot | grep -v grep` != '' ]]; do
+        JOBS_REMAINING=`ps -u $USER -f | fgrep .fds | grep -v firebot | grep -v grep | wc -l`
         echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage4
         TIME_LIMIT_STAGE="3"
         check_time_limit
@@ -466,7 +468,7 @@ run_verification_cases_debug()
    echo Running FDS Verification Cases
    echo "   debug"
    echo 'Running FDS verification cases:' >> $OUTPUT_DIR/stage4
-   ./Run_FDS_Cases.sh -o 1 -d -m 1 $INTEL2 -q $QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage4 2>&1
+   ./Run_FDS_Cases.sh -o 1 -d -m 1 $INTEL2 -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
    echo "" >> $OUTPUT_DIR/stage4 2>&1
 
    # Wait for all verification cases to end
@@ -526,7 +528,7 @@ run_validation_cases_debug()
       # Submit FDS validation cases and wait for them to start
       echo "Running FDS validation cases for ${SET}:" >> $OUTPUT_DIR/stage4
       echo "" >> $OUTPUT_DIR/stage4 2>&1
-      ./Run_All.sh -y -j $JOBPREFIX -b -m 1 -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
+      ./Run_All.sh -y -b -m 1 -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
 
       CURRENT_VALIDATION_SETS+=($SET)
 
@@ -554,7 +556,7 @@ check_cases_debug()
       [[ `grep -rI Segmentation *` == "" ]] && \
       [[ `grep -rI ERROR: *` == "" ]] && \
       [[ `grep -rI 'STOP: Numerical' *` == "" ]] && \
-      [[ `grep -rI -A 20 forrtl *` == "" ]]
+      [[ `grep -rI forrtl *` == "" ]]
    then
       cases_debug_success=true
    else
@@ -623,13 +625,13 @@ check_compile_fds_mpi()
    # Check for compiler warnings/remarks
    # 'performing multi-file optimizations' and 'generating object file' are part of a normal compile
    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-   if [[ `grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage2c | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'` == "" ]]
+   if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage2c | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'` == "" ]]
    then
       # Continue along
       :
    else
       echo "Warnings from Stage 2c - Compile FDS MPI release:" >> $WARNING_LOG
-      grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage2c | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file' >> $WARNING_LOG
+      grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage2c | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
 }
@@ -730,7 +732,7 @@ check_cases_release()
       [[ `grep -rI Segmentation *` == "" ]] && \
       [[ `grep -rI ERROR: *` == "" ]] && \
       [[ `grep -rI 'STOP: Numerical' *` == "" ]] && \
-      [[ `grep -rI -A 20 forrtl *` == "" ]] && \
+      [[ `grep -rI forrtl *` == "" ]] && \
       [[ "$validation_cases" == "true" ]]
    then
       cases_release_success=true
@@ -770,8 +772,9 @@ wait_cases_release_end()
    # Scans qstat and waits for cases to end
    if [[ "$QUEUE" == "none" ]]
    then
-     while [[ `ps -u $USER -f | fgrep .fds | grep -v grep` != '' ]]; do
-        JOBS_REMAINING=`ps -u $USER -f | fgrep .fds | grep -v grep | wc -l`
+     while [[          `ps -u $USER -f | fgrep .fds | grep -v firebot | grep -v grep` != '' ]]; do
+        JOBS_REMAINING=`ps -u $USER -f | fgrep .fds | grep -v firebot | grep -v grep | wc -l`
+
         echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage5
         TIME_LIMIT_STAGE="5"
         check_time_limit
@@ -808,14 +811,14 @@ run_verification_cases_release()
    cd $fdsrepo/Verification/scripts
    # Run FDS with 1 OpenMP thread
    echo 'Running FDS benchmark verification cases:' >> $OUTPUT_DIR/stage5
-   ./Run_FDS_Cases.sh $INTEL2 $DV2 -b -o 1 -q $QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage5 2>&1
+   ./Run_FDS_Cases.sh $INTEL2 $DV2 -b -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
    echo "" >> $OUTPUT_DIR/stage5 2>&1
 
    # Wait for benchmark verification cases to end
    wait_cases_release_end 'verification'
 
    echo 'Running FDS non-benchmark verification cases:' >> $OUTPUT_DIR/stage5
-   ./Run_FDS_Cases.sh $INTEL2 $DV2 -R -o 1 -q $QUEUE -j $JOBPREFIX >> $OUTPUT_DIR/stage5 2>&1
+   ./Run_FDS_Cases.sh $INTEL2 $DV2 -R -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
    echo "" >> $OUTPUT_DIR/stage5 2>&1
 
    # Wait for non-benchmark verification cases to end
@@ -841,7 +844,7 @@ run_validation_cases_release()
       echo "Running FDS validation cases:" >> $OUTPUT_DIR/stage5
       echo "Validation Set: ${SET}" >> $OUTPUT_DIR/stage5
       echo "" >> $OUTPUT_DIR/stage5 2>&1
-      ./Run_All.sh -y $DV2 -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
+      ./Run_All.sh -y $DV2 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
       echo "" >> $OUTPUT_DIR/stage5 2>&1
    done
 
@@ -870,32 +873,30 @@ compile_smv_db()
 
 check_compile_smv_db()
 {
-   # Check for errors in SMV debug compilation
-   if [ "$USEINSTALL" == "" ]; then
-   cd $smvrepo/Build/smokeview/intel_${platform}${size}
-   if [ -e "smokeview_${platform}${size}_db" ]
-   then
+  # Check for errors in SMV debug compilation
+  if [ "$USEINSTALL" == "" ]; then
+    cd $smvrepo/Build/smokeview/intel_${platform}${size}
+    if [ -e "smokeview_${platform}${size}_db" ]; then
       smv_debug_success=true
-   else
+    else
       echo "Errors from Stage 3b - Compile SMV debug:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage3b >> $ERROR_LOG
       echo "" >> $ERROR_LOG
-   fi
+    fi
 
-   # Check for compiler warnings/remarks
-   # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-   if [[ `grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage3b | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]
-   then
+    # Check for compiler warnings/remarks
+    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
+    if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage3b | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]; then
       # Continue along
       :
-   else
+    else
       echo "Warnings from Stage 3b - Compile SMV debug:" >> $WARNING_LOG
       grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage3b | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
-   fi
-   else
-      smv_debug_success=true
-   fi
+    fi
+  else
+    smv_debug_success=true
+  fi
 }
 
 #---------------------------------------------
@@ -918,31 +919,29 @@ compile_smv()
 
 check_compile_smv()
 {
-   # Check for errors in SMV release compilation
-   if [ "$USEINSTALL" == "" ]; then
-   cd $smvrepo/Build/smokeview/intel_${platform}${size}
-   if [ -e "smokeview_${platform}${size}" ]
-   then
+  # Check for errors in SMV release compilation
+  if [ "$USEINSTALL" == "" ]; then
+    cd $smvrepo/Build/smokeview/intel_${platform}${size}
+    if [ -e "smokeview_${platform}${size}" ]; then
       smv_release_success=true
-   else
+    else
       echo "Errors from Stage 3c - Compile SMV release:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage3c >> $ERROR_LOG
       echo "" >> $ERROR_LOG
-   fi
+    fi
 
-   # Check for compiler warnings/remarks
-   # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-   if [[ `grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage3c | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]
-   then
+    # Check for compiler warnings/remarks
+    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
+    if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage3c | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]; then
       # Continue along
       :
-   else
+    else
       echo "Warnings from Stage 3c - Compile SMV release:" >> $WARNING_LOG
       grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage3c | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
-   fi
-   smv_release_success=true
-   fi
+    fi
+    smv_release_success=true
+  fi
 }
 
 #---------------------------------------------
@@ -1063,7 +1062,7 @@ check_matlab_verification()
 {
    # Scan for and report any errors in Matlab scripts
    cd $firebotdir
-   if [[ `grep -B 5 -A 50 "Error" $OUTPUT_DIR/stage7a_verification` == "" ]]
+   if [[ `grep "Error" $OUTPUT_DIR/stage7a_verification` == "" ]]
    then
       matlab_verification_success=true
    else
@@ -1139,7 +1138,7 @@ check_matlab_validation()
 {
    # Scan for and report any errors in Matlab scripts
    cd $firebotdir
-   if [[ `grep -B 5 -A 50 "Error" $OUTPUT_DIR/stage7b_validation` == "" ]]
+   if [[ `grep "Error" $OUTPUT_DIR/stage7b_validation` == "" ]]
    then
       matlab_validation_succcess=true
    else
@@ -1437,7 +1436,7 @@ email_build_status()
 }
 
 #VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
-#                             Primary script execution =
+#                             beginning of firebot
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 #*** setup
@@ -1449,6 +1448,7 @@ size=_64
 # define run directories
 PID_FILE=~/.fdssmvgit/firebot_pid
 firebotdir=`pwd`
+export SCRIPTFILES=$firebotdir/scriptfiles
 OUTPUT_DIR="$firebotdir/output"
 HISTORY_DIR="$HOME/.firebot/history"
 TIME_LOG=$OUTPUT_DIR/timings
@@ -1457,7 +1457,7 @@ VALIDATION_ERROR_LOG=$OUTPUT_DIR/validation_errors
 WARNING_LOG=$OUTPUT_DIR/warnings
 NEWGUIDE_DIR=$OUTPUT_DIR/Newest_Guides
 
-# Firebot mode (verification or validation)
+#*** Firebot mode (verification or validation)
 FIREBOT_MODE="verification"
 
 WEBBRANCH=nist-pages
@@ -1465,27 +1465,32 @@ FDSBRANCH=master
 SMVBRANCH=master
 BRANCH=master
 
+#*** determine platform
+
 platform="linux"
 platform2="Linux"
 if [ "`uname`" == "Darwin" ] ; then
   platform="osx"
   platform2="OSX"
 fi
-
 export platform
 
-# Set unlimited stack size
+#*** Set unlimited stack size
+
 if [ "$platform" == "linux" ] ; then
   ulimit -s unlimited
 fi
 
-# Additional definitions
+#*** set initial values
+
 USEINSTALL=
 COMPILER=intel
 QUEUE=firebot
 CLEANREPO=0
 UPDATEREPO=0
-JOBPREFIX=FB_
+if [ "$JOBPREFIX" == "" ]; then
+  export JOBPREFIX=FB_
+fi
 commit=
 push=
 
@@ -1538,12 +1543,12 @@ case $OPTION in
    DV="_dv"
    DV2="-u"
    ;;
+  i)
+   USEINSTALL="-r"
+   ;;
   J)
    INTEL=i
    INTEL2="-J"
-   ;;
-  i)
-   USEINSTALL="-r"
    ;;
   L)
    FIREBOT_LITE=1
@@ -1577,7 +1582,7 @@ case $OPTION in
    QUEUE=batch
    MAX_VALIDATION_PROCESSES="$OPTARG"
    LAUNCH_MORE_CASES=1
-   JOBPREFIX=VB_
+   export JOBPREFIX=VB_
    ;;
 esac
 done
@@ -1594,6 +1599,11 @@ else
   echo "          Aborting firebot"
   exit
 fi
+
+if [[ "$QUEUE" == "none" ]] && [[ -e $SCRIPTFILES ]]; then
+  rm -f $SCRIPTFILES
+fi
+
 if [ "$caselistfile" != "" ]; then
   if [ ! -e $caselistfile ]; then
      echo "***error: $caselistfile does not exist."
@@ -1666,6 +1676,18 @@ if [ "$USEINSTALL" != "" ]; then
    if [ $notfound == 1 ]; then
       echo "Error: smokeview not found. firebot aborted."
       echo "Error: smokeview not found. firebot aborted." >> $OUTPUT_DIR/stage1 2>&1
+      exit
+   fi
+fi
+
+notfound=
+if [ "QUEUE" == "none"]; then
+   notfound=`background -v 2>&1 | tail -1 | grep "not found" | wc -l`
+   if [ $notfound == 1 ]; then
+      echo "Error: The program background was not found.  firebot aborted"
+      echo "       Add the directory containing fds and smokeview to your path"
+      echo "       (same directory containing fds and smokeview)"
+      echo "Error: background not found. firebot aborted." >> $OUTPUT_DIR/stage1 2>&1
       exit
    fi
 fi

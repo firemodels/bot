@@ -27,12 +27,13 @@ function usage_all {
 echo "Verification and validation testing script for smokeview"
 echo ""
 echo "Options:"
-echo "-3 - run in 32 bit mode (only for gnu compilers)"
 echo "-a - run automatically if FDS or smokeview source has changed"
-echo "-b - branch_name - run smokebot using the branch branch_name [default: $BRANCH]"
-echo "-B  - use startup files to set the environment not modules"
+echo "-b - branch_name - run smokebot using the branch branch_name "
+echo "                   [default: $BRANCH]"
+echo "-B - use startup files to set the environment not modules"
 echo "-c - clean repo"
-echo "-C -  add --mca plm_rsh_agent /usr/bin/ssh to mpirun command when running cases"
+echo "-C - add --mca plm_rsh_agent /usr/bin/ssh to mpirun command "
+echo "           when running cases"
 echo "-f - force smokebot run"
 echo "-h - display most commonly used options"
 echo "-H - display all options"
@@ -40,14 +41,15 @@ echo "-I compiler - intel or gnu [default: $COMPILER]"
 echo "-J use Intel MPI version of fds"
 echo "-k - kill smokebot if it is running"
 echo "-q queue [default: $QUEUE]"
-echo "-L - smokebot lite,  run only stages that build a debug fds and run cases with it"
-echo "                    (no release fds, no release cases, no manuals, etc)"
+echo "-L - smokebot lite,  run only stages that build a debug fds and run"
+echo "     cases with it (no release fds, no release cases, no manuals, etc)"
 if [ "$EMAIL" != "" ]; then
 echo "-m email_address - [default: $EMAIL]"
 else
 echo "-m email_address"
 fi
-echo "-M  - make movies"
+echo "-M - make movies"
+echo "-S - skip picture generating and build manual stages"
 echo "-t - use test smokeview"
 echo "-u - update repo"
 echo "-U - upload guides"
@@ -110,24 +112,29 @@ CD_REPO ()
 
 LIST_DESCENDANTS ()
 {
-  local children=$(ps -o pid= --ppid "$1")
+#  local children=$(ps -o pid= --ppid "$1")
+  local children=$(pgrep -P $1)
 
   for pid in $children
   do
-    LIST_DESCENDANTS "$pid"
+    LIST_DESCENDANTS $pid
   done
 
   echo "$children"
 }
 
 #VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
-#                             Primary script execution =
+#                             beginning of run_smokebot.sh
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+#*** location of smokebot processor id
 
 if [ ! -d ~/.fdssmvgit ] ; then
   mkdir ~/.fdssmvgit
 fi
 smokebot_pid=~/.fdssmvgit/smokebot_pid
+
+#*** make sure smokebot is started in the right location
 
 CURDIR=`pwd`
 if [ -e .smv_git ]; then
@@ -138,6 +145,8 @@ else
   echo "***error: smokebot not running in the bot/Smokebot  directory"
   exit
 fi
+
+#*** define initial values
 
 SIZE=
 KILL_SMOKEBOT=
@@ -158,6 +167,7 @@ NOPT=
 INTEL=
 export MPIRUN_MCA=
 export QFDS_STARTUP=
+SKIP=
 
 WEB_URL=
 web_DIR=/var/www/html/`whoami`
@@ -169,20 +179,19 @@ else
   web_DIR=
 fi
 
-# checking to see if a queing system is available
+#*** check to see if a queing system is available
+
 QUEUE=smokebot
 notfound=`qstat -a 2>&1 | tail -1 | grep "not found" | wc -l`
 if [ $notfound -eq 1 ] ; then
   QUEUE=none
 fi
 
-while getopts '3aAb:BcCd:fhHI:JkLm:NMq:r:tuUvw:W:' OPTION
+#*** parse command line options
+
+while getopts 'aAb:BcCd:fhHI:JkLm:NMq:r:StuUvw:W:' OPTION
 do
 case $OPTION  in
-  3)
-   SIZE=-3
-   COMPILER=gnu
-   ;;
   a)
    RUNAUTO=-a
    ;;
@@ -236,6 +245,9 @@ case $OPTION  in
   q)
    QUEUE="$OPTARG"
    ;;
+  S)
+   SKIP="-S"
+   ;;
   t)
    TESTFLAG="-t"
    ;;
@@ -268,31 +280,43 @@ fi
 
 COMPILER="-I $COMPILER"
 
+#*** kill smokebot
+
 if [ "$KILL_SMOKEBOT" == "1" ]; then
-  pidrunning=0
   if [ -e $smokebot_pid ]; then
     PID=`head -1 $smokebot_pid`
-    pidrunning=`ps -el |  awk '{print $4}'  | grep $PID | wc -l`
-    rm -f $smokebot_pid
-  fi
-  if [ $pidrunning -gt 0 ]; then
-    echo killing processes invoked by smokebot
-    kill -9 $(LIST_DESCENDANTS $PID)
-    echo "killing smokebot (PID=$PID)"
-    kill -9 $PID
-    if [ "$QUEUE" != "none" ]; then
+
+    JOBS=$(LIST_DESCENDANTS $PID)
+    if [ "$JOBS" != "" ]; then
+      echo killing processes invoked by smokebot: $JOBS
+      kill -9 $JOBS
+    fi
+
+    if [ "$QUEUE" == "none" ]; then
+      cd $CURDIR/../Scripts
+      ./killppids.sh ../Smokebot/scriptfiles
+      cd $CURDIR
+    else
       JOBIDS=`qstat -a | grep SB_ | awk -v user="$USER" '{if($2==user){print $1}}' | awk -F'.' '{print $1}'`
       if [ "$JOBIDS" != "" ]; then
         echo killing smokebot jobs with Id: $JOBIDS
         qdel $JOBIDS
       fi
     fi
+    
+    echo "killing smokebot (PID=$PID)"
+    kill -9 $PID
+
     echo smokebot process $PID killed
+    rm -f $smokebot_pid
   else
     echo smokebot not running
   fi
   exit
 fi
+
+#*** make sure smokebot is not already running
+
 if [[ "$RUNSMOKEBOT" == "1" ]]; then
   if [ "$FORCE" == "" ]; then
     if [ -e $smokebot_pid ] ; then
@@ -309,8 +333,8 @@ if [ "$EMAIL" != "" ]; then
   EMAIL="-m $EMAIL"
 fi
 
-# for now always assume the bot repo is always in the master branch
-# and that the -b branch option only apples to the fds and smv repos
+#*** for now always assume the bot repo is always in the master branch
+#    and that the -b branch option only apples to the fds and smv repos
 
 if [[ "$RUNSMOKEBOT" == "1" ]]; then
   if [[ "$UPDATEREPO" == "-u" ]]; then
@@ -323,8 +347,10 @@ fi
 
 BRANCH="-b $BRANCH"
 
+#*** run smokebot
+
 touch $smokebot_pid
-$ECHO ./$botscript $NOPT $SIZE $BRANCH $TESTFLAG $RUNAUTO $INTEL $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $SKIP $NOPT $SIZE $BRANCH $TESTFLAG $RUNAUTO $INTEL $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi
