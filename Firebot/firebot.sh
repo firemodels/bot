@@ -378,8 +378,6 @@ compile_fds_mpi_gnu_db()
 
 check_compile_fds_mpi_gnu_db()
 {
-   module unload openmpi
-   module load $OPENMPI_GNU
    # Check for errors in FDS MPI debug compilation
    cd $fdsrepo/Build/mpi_gnu_${platform}${size}$DB
    if [ -e "fds_mpi_gnu_${platform}${size}$DB" ]
