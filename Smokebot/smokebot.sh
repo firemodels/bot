@@ -442,6 +442,49 @@ check_compile_fds_mpi_db()
 }
 
 #---------------------------------------------
+#                   compile_fds_mpi_gnu_db
+#---------------------------------------------
+
+compile_fds_mpi_gnu_db()
+{
+   # Clean and compile FDS MPI debug
+   echo "      MPI gfortran debug"
+   cd $fdsrepo/Build/mpi_gnu_${platform}${size}$DB
+   make -f ../makefile clean &> /dev/null
+   ./make_fds.sh &> $OUTPUT_DIR/stage1d
+}
+
+#---------------------------------------------
+#                   check_compile_fds_mpi_gnu_db
+#---------------------------------------------
+
+check_compile_fds_mpi_gnu_db()
+{
+   # Check for errors in FDS MPI debug compilation
+   cd $fdsrepo/Build/mpi_gnu_${platform}${size}$DB
+   if [ -e "fds_mpi_gnu_${platform}${size}$DB" ]
+   then
+      FDS_debug_success=true
+   else
+      echo "Errors from Stage 1d - Compile gnu Fortran FDS MPI debug:" >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage1d >> $ERROR_LOG
+      echo "" >> $ERROR_LOG
+   fi
+
+   # Check for compiler warnings/remarks
+   if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage1d | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented'` == "" ]]
+   then
+      # Continue along
+      :
+   else
+      echo "Warnings from Stage 1d - Compile gnu Fortran FDS MPI debug:" >> $WARNING_LOG
+      grep -i -A 5 -E 'warning|remark' $OUTPUT_DIR/stage1d | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
+      echo "" >> $WARNING_LOG
+   fi
+}
+
+
+#---------------------------------------------
 #                   wait_verification_cases_debug_end
 #---------------------------------------------
 
@@ -1689,6 +1732,10 @@ BUILDSOFTWARE_beg=`GET_TIME`
 compile_cfast
 compile_fds_mpi_db
 check_compile_fds_mpi_db
+if [ "$OPENMPI_GNU" != "" ]; then
+  compile_fds_mpi_gnu_db
+  check_compile_fds_mpi_gnu_db
+fi
 
 ### Stage 2 build smokeview ###
 compile_smv_utilities
