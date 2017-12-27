@@ -49,6 +49,7 @@ else
 echo "-m email_address"
 fi
 echo "-M - make movies"
+echo "-R - remove run status file"
 echo "-S - skip picture generating and build manual stages"
 echo "-t - use test smokeview"
 echo "-u - update repo"
@@ -168,6 +169,7 @@ INTEL=
 export MPIRUN_MCA=
 export QFDS_STARTUP=
 SKIP=
+REMOVE_PID=
 
 WEB_URL=
 web_DIR=/var/www/html/`whoami`
@@ -189,7 +191,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'aAb:BcCd:fhHI:JkLm:NMq:r:StuUvw:W:' OPTION
+while getopts 'aAb:BcCd:fhHI:JkLm:NMq:Rr:StuUvw:W:' OPTION
 do
 case $OPTION  in
   a)
@@ -245,6 +247,9 @@ case $OPTION  in
   q)
    QUEUE="$OPTARG"
    ;;
+  R)
+   REMOVE_PID=1
+   ;;
   S)
    SKIP="-S"
    ;;
@@ -270,6 +275,12 @@ case $OPTION  in
 esac
 done
 shift $(($OPTIND-1))
+
+if [ "$REMOVE_PID" == "1" ]; then
+  rm -f $smokebot_pid
+  echo "$smokebot_pid status file removed"
+  exit
+fi
 
 if [ ! "$web_DIR" == "" ]; then
   web_DIR="-w $web_DIR"

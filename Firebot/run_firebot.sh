@@ -28,11 +28,11 @@ echo "-v - show options used to run firebot"
 #echo "-S - show list validationbot cases"
 #echo "-V n - run firebot in validationbot mode with specified number (n) of processes"
 echo "Miscellaneous:"
+echo "-f - force firebot run"
+echo "-F - skip figure generation and build document stages"
 echo "-i - use installed version of smokeview"
 echo "-I - use development version of fds"
 echo "-J - use Intel MPI version fds"
-echo "-f - force firebot run"
-echo "-F - skip figure generation and build document stages"
 echo "-L - firebot lite,  run only stages that build a debug fds and run cases with it"
 echo "                    (no release fds, no release cases, no matlab, etc)"
 if [ "$EMAIL" != "" ]; then
@@ -40,6 +40,7 @@ if [ "$EMAIL" != "" ]; then
 else
   echo "-m email_address "
 fi
+echo "-R - remove run status file"
 echo "-s - skip matlab and build document stages"
 echo "-U - upload guides (only by user firebot)"
 exit
@@ -181,11 +182,12 @@ showcaselist=
 debug_mode=
 DV=
 INTEL=
+REMOVE_PID=
 export QFDS_STARTUP=
 
 #*** parse command line options
 
-while getopts 'b:BcdCD:FfHhIiJKkLm:Pq:nsSuUvV:' OPTION
+while getopts 'b:BcdCD:FfHhIiJKkLm:Pq:nRsSuUvV:' OPTION
 do
 case $OPTION  in
   b)
@@ -250,6 +252,9 @@ case $OPTION  in
   P)
    push=-P
    ;;
+  R)
+   REMOVE_PID=1
+   ;;
   s)
    SKIPMATLAB=-s
    ;;
@@ -304,6 +309,12 @@ if [ "$KILL_FIREBOT" == "1" ]; then
   else
     echo firebot is not running
   fi
+  exit
+fi
+
+if [ "$REMOVE_PID" == "1" ]; then
+  rm -f $firebot_pid
+  echo "$firebot_pid status file removed"
   exit
 fi
 
