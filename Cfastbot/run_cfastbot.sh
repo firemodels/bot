@@ -79,6 +79,7 @@ echo "-k - kill cfastbot"
 echo "-m email -  email_address "
 echo "-q queue_name - run cases using the queue queue_name"
 echo "     default: $QUEUE"
+echo "-R - remove run status file"
 echo "-s - skip matlab and guide generating stages"
 echo "-u - update repos"
 echo "-U - upload guide (only by user: cfastbot)"
@@ -156,6 +157,7 @@ EMAIL=
 FORCE=
 compiler=intel
 size=
+REMOVE_PID=
 
 MATLABEXE=
 SKIP=
@@ -166,7 +168,7 @@ USEINSTALL=
 KILL_CFASTBOT=
 ECHO=
 
-while getopts '3acfhHiI:km:q:suUv' OPTION
+while getopts '3acfhHiI:km:q:RsuUv' OPTION
 do
 case $OPTION  in
   3)
@@ -206,6 +208,9 @@ case $OPTION  in
   q)
    QUEUE="$OPTARG"
    ;;
+  R)
+   REMOVE_PID=1
+   ;;
   s)
    SKIP="-s"
    ;;
@@ -222,6 +227,12 @@ case $OPTION  in
 esac
 done
 shift $(($OPTIND-1))
+
+if [ "$REMOVE_PID" == "1" ]; then
+  rm -f $cfastbot_pid
+  echo "$cfastbot_pid status file removed"
+  exit
+fi
 
 if [ "$KILL_CFASTBOT" == "1" ]; then
   if [ -e $cfastbot_pid ] ; then
