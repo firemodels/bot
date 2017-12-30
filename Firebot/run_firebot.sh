@@ -4,22 +4,6 @@
 # Consult the FDS Config Management Plan for more information.
 
 #---------------------------------------------
-#                   usage
-#---------------------------------------------
-
-function usage {
-echo "Verification and validation testing script for FDS"
-echo ""
-echo "Options:"
-echo "-c - clean repos"
-echo "-h - display most commonly used options"
-echo "-H - display all options"
-echo "-k - kill firebot if it is running"
-echo "-u - update repos"
-echo "-v - show options used to run firebot"
-}
-
-#---------------------------------------------
 #                   usage_all
 #---------------------------------------------
 
@@ -52,6 +36,27 @@ fi
 echo "-R - remove run status file"
 echo "-s - skip matlab and build document stages"
 echo "-U - upload guides (only by user firebot)"
+}
+
+#---------------------------------------------
+#                   usage
+#---------------------------------------------
+
+function usage {
+option=$1
+echo "Verification and validation testing script for FDS"
+echo ""
+echo "Options:"
+echo "-c - clean repos"
+echo "-h - display most commonly used options"
+echo "-H - display all options"
+echo "-k - kill firebot if it is running"
+echo "-u - update repos"
+echo "-v - show options used to run firebot"
+if [ "$option" == "-H" ]; then
+usage_all
+fi
+exit
 }
 
 #---------------------------------------------
@@ -208,11 +213,9 @@ case $OPTION  in
    ;;
   h)
    usage;
-   exit
    ;;
   H)
-   usage_all;
-   exit
+   usage -H;
    ;;
   i)
    USEINSTALL="-i"

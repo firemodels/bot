@@ -44,21 +44,6 @@ CD_REPO ()
 }
 
 #---------------------------------------------
-#                   usage
-#---------------------------------------------
-
-function usage {
-echo "Verification and validation testing script for cfast"
-echo ""
-echo "Options:"
-echo "-c - clean repos"
-echo "-h - display most commonly used options"
-echo "-H - display all options"
-echo "-u - update repos"
-echo "-v - show options used to run cfastbot"
-}
-
-#---------------------------------------------
 #                   usage_all
 #---------------------------------------------
 
@@ -78,6 +63,26 @@ echo "     default: $QUEUE"
 echo "-R - remove run status file"
 echo "-s - skip matlab and guide generating stages"
 echo "-U - upload guide (only by user: cfastbot)"
+}
+
+#---------------------------------------------
+#                   usage
+#---------------------------------------------
+
+function usage {
+option=$1
+echo "Verification and validation testing script for cfast"
+echo ""
+echo "Options:"
+echo "-c - clean repos"
+echo "-h - display most commonly used options"
+echo "-H - display all options"
+echo "-u - update repos"
+echo "-v - show options used to run cfastbot"
+if [ "$option" == "-H" ]; then
+usage_all
+fi
+exit
 }
 
 #---------------------------------------------
@@ -179,11 +184,9 @@ case $OPTION  in
    ;;
   h)
    usage;
-   exit;
    ;;
   H)
-   usage_all;
-   exit;
+   usage -H;
    ;;
   i)
    USEINSTALL="-i"

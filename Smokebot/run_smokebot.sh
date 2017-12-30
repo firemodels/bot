@@ -2,21 +2,6 @@
 
 # The Smokebot script is part of an automated continuous integration system.
 # Consult the FDS Config Management Plan for more information.
-#---------------------------------------------
-#                   usage
-#---------------------------------------------
-
-function usage {
-echo "Verification and validation testing script for smokeview"
-echo ""
-echo "Options:"
-echo "-c - clean repo"
-echo "-h - display most commonly used options"
-echo "-H - display all options"
-echo "-u - update repo"
-echo "-v - show options used to run smokebot"
-}
-
 
 #---------------------------------------------
 #                   usage_all
@@ -59,6 +44,26 @@ echo "-W url - web url of summary pages"
 else
 echo "-W url - web url of summary pages [default: $WEB_URL]"
 fi
+}
+
+#---------------------------------------------
+#                   usage
+#---------------------------------------------
+
+function usage {
+option=$1
+echo "Verification and validation testing script for smokeview"
+echo ""
+echo "Options:"
+echo "-c - clean repo"
+echo "-h - display most commonly used options"
+echo "-H - display all options"
+echo "-u - update repo"
+echo "-v - show options used to run smokebot"
+if [ "$option" == "-H"
+usage_all
+fi
+exit
 }
 
 #---------------------------------------------
@@ -213,11 +218,9 @@ case $OPTION  in
    ;;
   h)
    usage
-   exit
    ;;
   H)
-   usage_all
-   exit
+   usage -H
    ;;
   J)
    INTEL="-J"
