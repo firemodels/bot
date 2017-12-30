@@ -15,7 +15,6 @@ echo "-h - display most commonly used options"
 echo "-H - display all options"
 echo "-u - update repo"
 echo "-v - show options used to run smokebot"
-exit
 }
 
 
@@ -24,19 +23,16 @@ exit
 #---------------------------------------------
 
 function usage_all {
-echo "Verification and validation testing script for smokeview"
+usage
 echo ""
-echo "Options:"
+echo "Miscellaneous:"
 echo "-a - run automatically if FDS or smokeview source has changed"
 echo "-b - branch_name - run smokebot using the branch branch_name "
 echo "                   [default: $BRANCH]"
 echo "-B - use startup files to set the environment not modules"
-echo "-c - clean repo"
 echo "-C - add --mca plm_rsh_agent /usr/bin/ssh to mpirun command "
 echo "           when running cases"
 echo "-f - force smokebot run"
-echo "-h - display most commonly used options"
-echo "-H - display all options"
 echo "-I compiler - intel or gnu [default: $COMPILER]"
 echo "-J use Intel MPI version of fds"
 echo "-k - kill smokebot if it is running"
@@ -52,9 +48,7 @@ echo "-M - make movies"
 echo "-R - remove run status file"
 echo "-S - skip picture generating and build manual stages"
 echo "-t - use test smokeview"
-echo "-u - update repo"
 echo "-U - upload guides"
-echo "-v - show options used to run smokebot"
 if [ "$web_DIR" == "" ]; then
 echo "-w directory - web directory containing summary pages"
 else
@@ -65,7 +59,6 @@ echo "-W url - web url of summary pages"
 else
 echo "-W url - web url of summary pages [default: $WEB_URL]"
 fi
-exit
 }
 
 #---------------------------------------------

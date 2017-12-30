@@ -56,7 +56,6 @@ echo "-h - display most commonly used options"
 echo "-H - display all options"
 echo "-u - update repos"
 echo "-v - show options used to run cfastbot"
-exit
 }
 
 #---------------------------------------------
@@ -64,15 +63,12 @@ exit
 #---------------------------------------------
 
 function usage_all {
-echo "Verification and validation testing script for cfast"
+usage
 echo ""
-echo "Options:"
+echo "Miscellaneous:"
 echo "-3 - run in 32 bit mode (only for gnu compilers)"
 echo "-a - run automatically if cfast repo has changed"
-echo "-c - clean repos"
 echo "-f - force cfastbot run"
-echo "-h - display most commonly used options"
-echo "-H - display all options"
 echo "-i - use installed smokeview and background (if using the 'none' queue)"
 echo "-I - compiler [ default: $compiler]"
 echo "-k - kill cfastbot"
@@ -81,10 +77,7 @@ echo "-q queue_name - run cases using the queue queue_name"
 echo "     default: $QUEUE"
 echo "-R - remove run status file"
 echo "-s - skip matlab and guide generating stages"
-echo "-u - update repos"
 echo "-U - upload guide (only by user: cfastbot)"
-echo "-v - show options used to run cfastbot"
-exit
 }
 
 #---------------------------------------------
@@ -186,9 +179,11 @@ case $OPTION  in
    ;;
   h)
    usage;
+   exit;
    ;;
   H)
    usage_all;
+   exit;
    ;;
   i)
    USEINSTALL="-i"
