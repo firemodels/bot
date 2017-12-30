@@ -8,7 +8,6 @@
 #---------------------------------------------
 
 function usage_all {
-usage
 echo ""
 echo "Miscellaneous:"
 echo "-a - run automatically if FDS or smokeview source has changed"
@@ -52,6 +51,7 @@ fi
 
 function usage {
 option=$1
+echo option=$option
 echo "Verification and validation testing script for smokeview"
 echo ""
 echo "Options:"
@@ -60,7 +60,7 @@ echo "-h - display most commonly used options"
 echo "-H - display all options"
 echo "-u - update repo"
 echo "-v - show options used to run smokebot"
-if [ "$option" == "-H"
+if [ "$option" == "-H" ]; then
 usage_all
 fi
 exit
@@ -220,7 +220,7 @@ case $OPTION  in
    usage
    ;;
   H)
-   usage -H
+   usage "-H"
    ;;
   J)
    INTEL="-J"

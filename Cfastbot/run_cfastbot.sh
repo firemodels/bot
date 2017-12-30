@@ -48,7 +48,6 @@ CD_REPO ()
 #---------------------------------------------
 
 function usage_all {
-usage
 echo ""
 echo "Miscellaneous:"
 echo "-3 - run in 32 bit mode (only for gnu compilers)"

@@ -8,7 +8,6 @@
 #---------------------------------------------
 
 function usage_all {
-usage
 echo ""
 echo "Miscellaneous:"
 #echo "-b - branch_name - run firebot using branch_name [default: $BRANCH]"
