@@ -8,18 +8,11 @@
 #---------------------------------------------
 
 function usage_all {
-echo "Verification and validation testing script for FDS"
 echo ""
-echo "Options:"
+echo "Miscellaneous:"
 #echo "-b - branch_name - run firebot using branch_name [default: $BRANCH]"
 echo "-B  - use startup files to set the environment, not modules"
-echo "-c - clean repo"
-echo "-h - display most commonly used options"
-echo "-H - display all options"
-echo "-k - kill firebot if it is running"
 echo "-q queue - specify queue [default: $QUEUE]"
-echo "-u - update repos"
-echo "-v - show options used to run firebot"
 #echo "validationbot mode:"
 #echo "-C - commit validationbot output results"
 #echo "-D caselist - specify file containing list of validationbot cases"
@@ -27,7 +20,6 @@ echo "-v - show options used to run firebot"
 #echo "-P - commit and push (to github repo) validationbot output results (not implemented)"
 #echo "-S - show list validationbot cases"
 #echo "-V n - run firebot in validationbot mode with specified number (n) of processes"
-echo "Miscellaneous:"
 echo "-f - force firebot run"
 echo "-F - skip figure generation and build document stages"
 echo "-i - use installed version of smokeview"
@@ -43,7 +35,6 @@ fi
 echo "-R - remove run status file"
 echo "-s - skip matlab and build document stages"
 echo "-U - upload guides (only by user firebot)"
-exit
 }
 
 #---------------------------------------------
@@ -51,6 +42,7 @@ exit
 #---------------------------------------------
 
 function usage {
+option=$1
 echo "Verification and validation testing script for FDS"
 echo ""
 echo "Options:"
@@ -60,6 +52,9 @@ echo "-H - display all options"
 echo "-k - kill firebot if it is running"
 echo "-u - update repos"
 echo "-v - show options used to run firebot"
+if [ "$option" == "-H" ]; then
+usage_all
+fi
 exit
 }
 
@@ -219,7 +214,7 @@ case $OPTION  in
    usage;
    ;;
   H)
-   usage_all;
+   usage -H;
    ;;
   i)
    USEINSTALL="-i"
