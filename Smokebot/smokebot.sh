@@ -740,10 +740,6 @@ compare_common_files()
 check_common_files()
 {
    compare_common_files Source Source/smokeview gsmv.f90
-   compare_common_files Manuals/Bibliography Manuals/Bibliography FDS_general.bib
-   compare_common_files Manuals/Bibliography Manuals/Bibliography FDS_mathcomp.bib
-   compare_common_files Manuals/Bibliography Manuals/Bibliography FDS_refs.bib
-   compare_common_files Manuals/Bibliography Manuals/Bibliography authors.tex
    compare_common_files Verification/scripts Verification/scripts compare_csv.sh
 }
 
