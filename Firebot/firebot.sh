@@ -27,6 +27,7 @@ echo "-p pid_file - file containing process id of firebot process "
 echo "-P - commit and push validationbot outut results (not implemented)"
 echo "-q - queue_name - run cases using the queue queue_name"
 echo "     default: $QUEUE"
+echo "-Q - queue_name - run OpenMP cases using the queue queue_name"
 echo "-s - skip matlab and document building stages"
 echo "-S - show validation case list"
 echo "-u - update repo"
@@ -1556,10 +1557,11 @@ DV=
 DV2=
 INTEL=
 INTEL2=
+QUEUEBENCH=
 
 #*** parse command line arguments
 
-while getopts 'b:cCdD:FhIiJLm:p:Pq:sSuUV:' OPTION
+while getopts 'b:cCdD:FhIiJLm:p:Pq:Q:sSuUV:' OPTION
 do
 case $OPTION in
   b)
@@ -1610,6 +1612,9 @@ case $OPTION in
   q)
    QUEUE="$OPTARG"
    ;;
+  Q)
+   QUEUEBENCH="$OPTARG"
+   ;;
   s)
    SKIPMATLAB=1
    ;;
@@ -1649,9 +1654,7 @@ if [[ "$QUEUE" == "none" ]] && [[ -e $SCRIPTFILES ]]; then
   rm -f $SCRIPTFILES
 fi
 
-if [ "$QUEUE" == "firebot" ]; then
-  QUEUEBENCH=bench
-else
+if [ "$QUEUEBENCH" == "" ]; then
   QUEUEBENCH=$QUEUE
 fi
 
