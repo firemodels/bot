@@ -857,9 +857,7 @@ run_verification_cases_release()
    echo "" >> $OUTPUT_DIR/stage5 2>&1
 
    # Wait for benchmark verification cases to end
-   if [ "$TEST" == "" ]; then
-     wait_cases_release_end 'verification'
-   fi
+   wait_cases_release_end 'verification'
 
    echo 'Running FDS non-benchmark verification cases:' >> $OUTPUT_DIR/stage5
    ./Run_FDS_Cases.sh $INTEL2 $DV2 -R -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
@@ -1558,11 +1556,10 @@ DV=
 DV2=
 INTEL=
 INTEL2=
-TEST=
 
 #*** parse command line arguments
 
-while getopts 'b:cCdD:FhIiJLm:p:Pq:sSTuUV:' OPTION
+while getopts 'b:cCdD:FhIiJLm:p:Pq:sSuUV:' OPTION
 do
 case $OPTION in
   b)
@@ -1618,9 +1615,6 @@ case $OPTION in
    ;;
   S)
    showcaselist="1"
-   ;;
-  T)
-   TEST="1"
    ;;
   u)
    UPDATEREPO=1
