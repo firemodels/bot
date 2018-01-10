@@ -740,7 +740,6 @@ compare_common_files()
 check_common_files()
 {
    compare_common_files Source Source/smokeview gsmv.f90
-   compare_common_files Verification/scripts Verification/scripts compare_csv.sh
 }
 
 #---------------------------------------------
