@@ -27,6 +27,7 @@ echo "-p pid_file - file containing process id of firebot process "
 echo "-P - commit and push validationbot outut results (not implemented)"
 echo "-q - queue_name - run cases using the queue queue_name"
 echo "     default: $QUEUE"
+echo "-Q - queue_name - run OpenMP cases using the queue queue_name"
 echo "-s - skip matlab and document building stages"
 echo "-S - show validation case list"
 echo "-u - update repo"
@@ -853,7 +854,7 @@ run_verification_cases_release()
    cd $fdsrepo/Verification/scripts
    # Run FDS with 1 OpenMP thread
    echo 'Running FDS benchmark verification cases:' >> $OUTPUT_DIR/stage5
-   ./Run_FDS_Cases.sh $INTEL2 $DV2 -b -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
+   ./Run_FDS_Cases.sh $INTEL2 $DV2 -b -o 1 -q $QUEUEBENCH >> $OUTPUT_DIR/stage5 2>&1
    echo "" >> $OUTPUT_DIR/stage5 2>&1
 
    # Wait for benchmark verification cases to end
@@ -1424,19 +1425,22 @@ email_build_status()
       echo "Note: only VV cases with debug FDS were run" >> $TIME_LOG
       echo "" >> $TIME_LOG
    fi
-   echo "          host: $hostname " >> $TIME_LOG
-   echo "            OS: $platform2 " >> $TIME_LOG
-   echo "          repo: $repo " >> $TIME_LOG
-   echo "         queue: $QUEUE " >> $TIME_LOG
-   echo "  fds revision: $GIT_REVISION " >> $TIME_LOG
-   echo " smv rewvision: $SMV_REVISION " >> $TIME_LOG
+   echo "           host: $hostname " >> $TIME_LOG
+   echo "             OS: $platform2 " >> $TIME_LOG
+   echo "           repo: $repo " >> $TIME_LOG
+   echo "          queue: $QUEUE " >> $TIME_LOG
+if [ "$QUEUE" != "$QUEUEBENCH" ]; then
+   echo "benchmark queue: $QUEUEBENCH " >> $TIME_LOG
+fi
+   echo "   fds revision: $GIT_REVISION " >> $TIME_LOG
+   echo "  smv rewvision: $SMV_REVISION " >> $TIME_LOG
    if [ "$FIREBOT_MODE" == "validation" ] ; then
       echo "Validation Set(s): ${CURRENT_VALIDATION_SETS[*]} " >> $TIME_LOG
    fi
-   echo "    start time: $start_time " >> $TIME_LOG
-   echo "     stop time: $stop_time " >> $TIME_LOG
+   echo "     start time: $start_time " >> $TIME_LOG
+   echo "      stop time: $stop_time " >> $TIME_LOG
    if [ "$UPLOADGUIDES" == "1" ]; then
-   echo "Firebot status:  https://pages.nist.gov/fds-smv/firebot_status.html" >> $TIME_LOG
+   echo " Firebot status:  https://pages.nist.gov/fds-smv/firebot_status.html" >> $TIME_LOG
    fi
    echo "-------------------------------" >> $TIME_LOG
 
@@ -1553,10 +1557,11 @@ DV=
 DV2=
 INTEL=
 INTEL2=
+QUEUEBENCH=
 
 #*** parse command line arguments
 
-while getopts 'b:cCdD:FhIiJLm:p:Pq:sSuUV:' OPTION
+while getopts 'b:cCdD:FhIiJLm:p:Pq:Q:sSuUV:' OPTION
 do
 case $OPTION in
   b)
@@ -1607,6 +1612,9 @@ case $OPTION in
   q)
    QUEUE="$OPTARG"
    ;;
+  Q)
+   QUEUEBENCH="$OPTARG"
+   ;;
   s)
    SKIPMATLAB=1
    ;;
@@ -1644,6 +1652,10 @@ fi
 
 if [[ "$QUEUE" == "none" ]] && [[ -e $SCRIPTFILES ]]; then
   rm -f $SCRIPTFILES
+fi
+
+if [ "$QUEUEBENCH" == "" ]; then
+  QUEUEBENCH=$QUEUE
 fi
 
 if [ "$caselistfile" != "" ]; then

@@ -1827,8 +1827,6 @@ if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]]; then
      make_guide SMV_Technical_Reference_Guide $smvrepo/Manuals/SMV_Technical_Reference_Guide SMV_Technical_Reference_Guide
      echo "   verification"
      make_guide SMV_Verification_Guide        $smvrepo/Manuals/SMV_Verification_Guide        SMV_Verification_Guide
-     echo "   utilities"
-     make_guide SMV_Utilities_Guide           $smvrepo/Manuals/SMV_Utilities_Guide           SMV_Utilities_Guide
   else
      echo Errors found, not building guides
   fi

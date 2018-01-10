@@ -178,11 +178,12 @@ debug_mode=
 DV=
 INTEL=
 REMOVE_PID=
+QUEUEBENCH=
 export QFDS_STARTUP=
 
 #*** parse command line options
 
-while getopts 'b:BcdCD:FfHhIiJKkLm:Pq:nRsSuUvV:' OPTION
+while getopts 'b:BcdCD:FfHhIiJKkLm:Pq:Q:nRsSuUvV:' OPTION
 do
 case $OPTION  in
   b)
@@ -240,6 +241,9 @@ case $OPTION  in
    ;;
   q)
    QUEUE="$OPTARG"
+   ;;
+  Q)
+   QUEUEBENCH="-Q $OPTARG"
    ;;
   n)
    UPDATEREPO=0
@@ -346,7 +350,7 @@ fi
 BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
-$ECHO  ./$botscript -p $firebot_pid $commit $push $UPDATE $DV $INTEL $debug_mode $showcaselist $caselistfile $MAX_VALIDATION_PROCESSES $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $EMAIL "$@"
+$ECHO  ./$botscript -p $firebot_pid $commit $push $UPDATE $DV $INTEL $debug_mode $showcaselist $caselistfile $MAX_VALIDATION_PROCESSES $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUEBENCH $QUEUE $SKIPMATLAB $SKIPFIGURES $EMAIL "$@"
 if [ -e $firebot_pid ]; then
   rm $firebot_pid
 fi
