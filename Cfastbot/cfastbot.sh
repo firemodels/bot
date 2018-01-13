@@ -173,6 +173,9 @@ set_files_world_readable()
    CD_REPO $smvrepo $smvbranch || return 1
    chmod -R go+r *
 
+   CD_REPO $exprepo $expbranch || return 1
+   chmod -R go+r *
+
    return 0
 }
 
@@ -1362,6 +1365,7 @@ case $OPTION in
    reponame="$OPTARG"
    cfastrepo=$reponame/cfast
    smvrepo=$reponame/smv
+   exprepo=$reponame/exp
    ;;
   s)
    SKIP=1
@@ -1387,6 +1391,11 @@ CD_REPO $cfastrepo $cfastbranch || exit 1
 smvrepo=$reponame/smv
 smvbranch=master
 CD_REPO $smvrepo $smvbranch || exit 1
+
+exprepo=$reponame/exp
+expbranch=master
+CD_REPO $exprepo $expbranch || exit 1
+
 cd $cfastbotdir
 
 notfound=
@@ -1514,6 +1523,8 @@ if [ "$UPDATEREPO" == "1" ]; then
   update_repo cfast $cfastbranch || exit 1
   echo "   smv"
   update_repo smv $smvbranch || exit 1
+  echo "   exp"
+  update_repo exp $expbranch || exit 1
 else
   echo Repos not updated
 fi
