@@ -858,7 +858,8 @@ run_verification_cases_release()
    echo "" >> $OUTPUT_DIR/stage5 2>&1
 
    # Wait for benchmark verification cases to end
-   wait_cases_release_end 'verification'
+# let benchmark and regular cases run at the same time - for now
+#   wait_cases_release_end 'verification'
 
    echo 'Running FDS non-benchmark verification cases:' >> $OUTPUT_DIR/stage5
    ./Run_FDS_Cases.sh $INTEL2 $DV2 -R -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
