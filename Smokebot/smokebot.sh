@@ -448,7 +448,7 @@ check_compile_fds_mpi_db()
 compile_fds_mpi_gnu_db()
 {
    # Clean and compile FDS MPI debug
-   echo "      MPI gfortran debug"
+   echo "   MPI gfortran debug"
    cd $fdsrepo/Build/mpi_gnu_${platform}_${size}$DB
    make -f ../makefile clean &> /dev/null
    ./make_fds.sh &> $OUTPUT_DIR/stage1d
