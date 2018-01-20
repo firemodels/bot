@@ -46,13 +46,15 @@ for i in `seq 1 36`; do
   BURN1[$i]=`get_host burn $i`
 done
 
-COMPUTE_NODES=("${BLAZE1[@]}" "${BLAZE2[@]}" "${BLAZE3[@]}" "${BLAZE4[@]}" "${BURN1[@]}")
-
 OTHER_NODES=(burn firestore blaze-head smokevis firevis)
-  
-for host in "${COMPUTE_NODES[@]}"
+
+#ALL_NODES=("${BLAZE1[@]}" "${BLAZE2[@]}" "${BLAZE3[@]}" "${BLAZE4[@]}" "${BURN1[@]}" "${OTHER_NODES[@]}")
+ALL_NODES=("${BLAZE1[@]}" "${BURN1[@]}")
+
+for host in "${ALL_NODES[@]}"
 do
-echo $host
-#ipmihost=$host-ipmi
-#ipmitool -H $ipmihost -U ADMIN -P ADMIN power off
+ipmihost=$host-ipmi
+echo powering up host: $ipmihost
+#ipmitool -H $ipmihost -U ADMIN -P ADMIN power on
+#sleep 1
 done
