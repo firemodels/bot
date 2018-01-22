@@ -79,7 +79,7 @@ for host in "${ALL_NODES[@]}"
 do
 ipmihost=$host-ipmi
 echo powering down host: $ipmihost
-ipmitool -H $ipmihost -U ADMIN -P ADMIN power off
+ipmitool -H $ipmihost -U ADMIN -P ADMIN chassis power off
 done
 
 echo Power down of blaze and burn compute nodes and auxiliary nodes complete

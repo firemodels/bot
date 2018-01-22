@@ -75,7 +75,7 @@ for host in "${BLAZE_NODES[@]}"
 do
 ipmihost=$host-ipmi
 echo powering up host: $ipmihost
-ipmitool -H $ipmihost -U ADMIN -P ADMIN power on
+ipmitool -H $ipmihost -U ADMIN -P ADMIN chassis power on
 sleep 1
 done
 
