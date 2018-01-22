@@ -49,12 +49,56 @@ done
 OTHER_NODES=(burn firestore blaze-head smokevis firevis)
 
 #ALL_NODES=("${BLAZE1[@]}" "${BLAZE2[@]}" "${BLAZE3[@]}" "${BLAZE4[@]}" "${BURN1[@]}" "${OTHER_NODES[@]}")
+BLAZE_NODES=("${BLAZE1[@]}")
+BURN_NODES=("${BURN1[@]}")
 ALL_NODES=("${BLAZE1[@]}" "${BURN1[@]}")
 
-for host in "${ALL_NODES[@]}"
+for host in "${OTHER_NODES[@]}"
 do
 ipmihost=$host-ipmi
 echo powering up host: $ipmihost
-#ipmitool -H $ipmihost -U ADMIN -P ADMIN power on
-#sleep 1
+ipmitool -H $ipmihost -U ADMIN -P ADMIN power on
+sleep 1
 done
+
+echo sleep for 5 minutes to let ${OTHER_NODES[@] come up
+sleep 300
+mount -a
+for host in "${OTHER_NODES[@]}"
+do
+echo mount all file systems on $host
+ssh $host mount -a
+done
+
+for host in "${BLAZE_NODES[@]}"
+do
+ipmihost=$host-ipmi
+echo powering up host: $ipmihost
+ipmitool -H $ipmihost -U ADMIN -P ADMIN power on
+sleep 1
+done
+
+for host in "${BURN_NODES[@]}"
+do
+ipmihost=$host-ipmi
+echo powering up host: $ipmihost
+ipmitool -H $ipmihost -U ADMIN -P ADMIN power on
+sleep 1
+done
+
+echo sleep for 5 minutes to let blaze and burn compute nodes come up
+sleep 300
+
+for host in "${BLAZE_NODES[@]}"
+do
+echo mount all file systems on $host
+ssh $host mount -a
+done
+
+for host in "${BURN_NODES[@]}"
+do
+echo mount all file systems on $host
+ssh $host mount -a
+done
+
+echo power up complete

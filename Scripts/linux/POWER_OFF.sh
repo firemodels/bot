@@ -49,11 +49,18 @@ done
 OTHER_NODES=(burn firestore blaze-head smokevis firevis)
 
 #ALL_NODES=("${BLAZE1[@]}" "${BLAZE2[@]}" "${BLAZE3[@]}" "${BLAZE4[@]}" "${BURN1[@]}" "${OTHER_NODES[@]}")
-ALL_NODES=("${BLAZE1[@]}" "${OTHER_NODES[@]}")
+ALL_NODES=("${BLAZE1[@]}" "${BURN1[@]}" "${OTHER_NODES[@]}")
+
+for host in "${ALL_NODES[@]}"
+do
+echo clearing user jobs and unmounting file systems on $host
+scp -q clear_cluster.sh $host:/tmp/.
+ssh -q $host bash /tmp/clear_cluster.sh
+done
 
 for host in "${ALL_NODES[@]}"
 do
 ipmihost=$host-ipmi
 echo powering down host: $ipmihost
-#ipmitool -H $ipmihost -U ADMIN -P ADMIN power off
+ipmitool -H $ipmihost -U ADMIN -P ADMIN power off
 done
