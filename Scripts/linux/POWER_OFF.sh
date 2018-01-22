@@ -57,6 +57,8 @@ echo clearing user jobs and unmounting file systems on $host
 scp -q clear_cluster.sh $host:/tmp/.
 ssh -q $host bash /tmp/clear_cluster.sh
 done
+echo clearing user jobs and unmounting file systems on blaze
+./clear_cluster.sh
 
 for host in "${ALL_NODES[@]}"
 do
@@ -64,3 +66,8 @@ ipmihost=$host-ipmi
 echo powering down host: $ipmihost
 ipmitool -H $ipmihost -U ADMIN -P ADMIN power off
 done
+
+echo Power down of blaze and burn compute nodes and auxiliary nodes complete
+echo Now power down blaze by typing:
+echo poweroff
+
