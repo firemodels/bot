@@ -51,14 +51,29 @@ OTHER_NODES=(burn firestore blaze-head smokevis firevis)
 #ALL_NODES=("${BLAZE1[@]}" "${BLAZE2[@]}" "${BLAZE3[@]}" "${BLAZE4[@]}" "${BURN1[@]}" "${OTHER_NODES[@]}")
 ALL_NODES=("${BLAZE1[@]}" "${BURN1[@]}" "${OTHER_NODES[@]}")
 
+# clearing user jobs
+
 for host in "${ALL_NODES[@]}"
 do
-echo clearing user jobs and unmounting file systems on $host
+echo clearing user jobs on $host
 scp -q clear_cluster.sh $host:/tmp/.
 ssh -q $host bash /tmp/clear_cluster.sh
 done
-echo clearing user jobs and unmounting file systems on blaze
+echo clearing user jobs on blaze
 ./clear_cluster.sh
+
+# umounting file systems
+
+for host in "${ALL_NODES[@]}"
+do
+echo unmounting file systems on $host
+ssh -q $host umount -a -t nfs
+umount -a -t nfs
+done
+echo unmounting file systems on blaze
+umount -a -t nfs
+
+# powering down
 
 for host in "${ALL_NODES[@]}"
 do
