@@ -61,8 +61,9 @@ ipmitool -H $ipmihost -U ADMIN -P ADMIN power on
 sleep 1
 done
 
-echo sleep for 5 minutes to let ${OTHER_NODES[@] come up
+echo pause for 5 minutes to let ${OTHER_NODES[@]} come up
 sleep 300
+echo mount all file systems on blaze
 mount -a
 for host in "${OTHER_NODES[@]}"
 do
@@ -86,7 +87,7 @@ ipmitool -H $ipmihost -U ADMIN -P ADMIN power on
 sleep 1
 done
 
-echo sleep for 5 minutes to let blaze and burn compute nodes come up
+echo pause for 5 minutes to let blaze and burn compute nodes come up
 sleep 300
 
 for host in "${BLAZE_NODES[@]}"
