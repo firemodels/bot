@@ -12,25 +12,7 @@ read val
 
 # define host arrays
 
-source ./SETUP_NODES.sh
-
-# clearing user jobs
-
-for host in blaze $BLAZE_NODES $BURN_NODES $OTHER_NODES
-do
-echo clearing user jobs on $host
-scp -q clear_user_jobs.sh $host:/tmp/.
-ssh -q $host bash /tmp/clear_user_jobs.sh
-done
-
-# umounting file systems
-
-for host in blaze $BLAZE_NODES $BURN_NODES $OTHER_NODES
-do
-echo unmounting file systems on $host
-ssh -q $host umount -a -t nfs
-umount -a -t nfs
-done
+source CLUSTER_NODES/SETUP_NODES.sh
 
 # powering down
 
@@ -42,5 +24,3 @@ ipmitool -H $ipmihost -U ADMIN -P ADMIN chassis power off
 done
 
 echo Power down complete
-echo Now power down blaze by typing:
-echo poweroff
