@@ -1286,6 +1286,7 @@ check_guide()
         cp $doc /var/www/html/firebot/manuals/
         cp $doc $NEWGUIDE_DIR/.
       fi
+      cp $doc $SAVEGUIDE_DIR/.
    fi
 }
 
@@ -1503,6 +1504,10 @@ ERROR_LOG=$OUTPUT_DIR/errors
 VALIDATION_ERROR_LOG=$OUTPUT_DIR/validation_errors
 WARNING_LOG=$OUTPUT_DIR/warnings
 NEWGUIDE_DIR=$OUTPUT_DIR/Newest_Guides
+SAVEGUIDE_DIR=$HOME/.firebot/pubs
+
+MKDIR $HOME/.firebot
+MKDIR $HOME/.firebot/pubs
 
 #*** Firebot mode (verification or validation)
 FIREBOT_MODE="verification"
