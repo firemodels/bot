@@ -1206,7 +1206,9 @@ check_guide()
        cp $directory/$document $SMV_SUMMARY/manuals/.
      fi
      cp $directory/$document $NEWGUIDE_DIR/.
+     cp $directory/$document $SAVEGUIDE_DIR/.
      chmod 664 $NEWGUIDE_DIR/$document
+     chmod 664 $SAVEGUIDE_DIR/$document
    fi
 
    # Check for LaTeX warnings (undefined references or duplicate labels)
@@ -1417,6 +1419,7 @@ COMPILER=intel
 PID_FILE=~/.fdssmvgit/smokebot_pid
 INTEL=
 SKIP=
+SAVEGUIDE_DIR=$HOME/.smokebot/pubs
 
 #*** parse command line options
 
@@ -1526,6 +1529,11 @@ if [ "$SMOKEBOT_QUEUE" == "none" ]; then
     exit
   fi
 fi
+
+#*** create pub directory
+
+MKDIR $HOME/.smokebot
+MKDIR $HOME/.smokebot/pubs
 
 #*** make sure repos needed by smokebot exist
 
