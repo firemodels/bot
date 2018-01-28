@@ -641,7 +641,7 @@ compile_smv_utilities()
      echo "      libraries"
      cd $smvrepo/Build/LIBS/${COMPILER}_${platform}_${size}
      echo 'Building Smokeview libraries:' >> $OUTPUT_DIR/stage2a 2>&1
-     ./makelibs.sh >> $OUTPUT_DIR/stage2a 2>&1
+     ./make_LIBS.sh >> $OUTPUT_DIR/stage2a 2>&1
 
    # smokezip:
      echo "      smokezip"
@@ -888,7 +888,7 @@ compile_smv_db()
      echo "      debug"
      cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_${size}
      rm -f smokeview_${platform}${TEST}_${size}_db
-     ./make_smv_db.sh $TESTFLAG &> $OUTPUT_DIR/stage2b
+     ./make_smokeview_db.sh $TESTFLAG &> $OUTPUT_DIR/stage2b
    fi
 }
 
@@ -981,7 +981,7 @@ compile_smv()
      echo "      release"
      cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_${size}
      rm -f smokeview_${platform}${TEST}_${size}
-     ./make_smv.sh $TESTFLAG &> $OUTPUT_DIR/stage2c
+     ./make_smokeview.sh $TESTFLAG &> $OUTPUT_DIR/stage2c
    fi
 }
 

@@ -692,7 +692,7 @@ compile_smv_utilities()
      echo "      libraries"
      cd $smvrepo/Build/LIBS/intel_${platform}${size}
      echo 'Building Smokeview libraries:' >> $OUTPUT_DIR/stage3a 2>&1
-     ./makelibs.sh >> $OUTPUT_DIR/stage3a 2>&1
+     ./make_LIBS.sh >> $OUTPUT_DIR/stage3a 2>&1
      echo "" >> $OUTPUT_DIR/stage3a 2>&1
    else
      echo "   Smokeview - using installed smokeview"
@@ -908,7 +908,7 @@ compile_smv_db()
    if [ "$USEINSTALL" == "" ]; then
      echo "      debug"
      cd $smvrepo/Build/smokeview/intel_${platform}${size}
-     ./make_smv_db.sh &> $OUTPUT_DIR/stage3b
+     ./make_smokeview_db.sh &> $OUTPUT_DIR/stage3b
    fi
 }
 
@@ -954,7 +954,7 @@ compile_smv()
    if [ "$USEINSTALL" == "" ]; then
      echo "      release"
      cd $smvrepo/Build/smokeview/intel_${platform}${size}
-     ./make_smv.sh &> $OUTPUT_DIR/stage3c
+     ./make_smokeview.sh &> $OUTPUT_DIR/stage3c
    fi
 }
 
