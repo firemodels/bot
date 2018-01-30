@@ -325,7 +325,7 @@ check_inspect_fds()
 compile_fds_mpi_db()
 {
    # Clean and compile FDS MPI debug
-   echo "      MPI debug"
+   echo "      MPI Intel debug"
    cd $fdsrepo/Build/${INTEL}mpi_intel_${platform}${size}$DB
    make -f ../makefile clean &> /dev/null
    ./make_fds.sh &> $OUTPUT_DIR/stage2b
@@ -640,7 +640,7 @@ check_cases_debug()
 compile_fds_mpi()
 {
    # Clean and compile FDS MPI
-   echo "      MPI release"
+   echo "      MPI Intel release"
    echo "" > $OUTPUT_DIR/stage2c
    if [ "$debug_mode" == "" ]; then
      cd $fdsrepo/Build/${INTEL}mpi_intel_${platform}${size}$DV
@@ -1387,7 +1387,7 @@ make_bundle()
 
    echo " make bundle"
    # making a bundle
-   cd $fdsrepo/Build/Bundle/$platform
+   cd $fdsrepo/Build/Bundle
    export NOPAUSE=1
    ./make_bundle.sh &> $OUTPUT_DIR/stage9_make_bundle
 }
@@ -1883,11 +1883,6 @@ if [ "$FIREBOT_LITE" == "" ]; then
   fi
 fi
 
-### Stage 9 ###
-if [ "$BUILD_BUNDLE" == "1" ]; then
-  make_bundle
-fi
-
 ### Stage 4 ###
 
 if [ "$FIREBOT_MODE" == "validation" ] ; then
@@ -1980,6 +1975,11 @@ if [ "$FIREBOT_LITE" == "" ]; then
       fi
     fi
   fi
+fi
+
+### Stage 9 ###
+if [ "$BUILD_BUNDLE" == "1" ]; then
+  make_bundle
 fi
 
 ### Wrap up and report results ###
