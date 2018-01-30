@@ -1883,6 +1883,11 @@ if [ "$FIREBOT_LITE" == "" ]; then
   fi
 fi
 
+### Stage 9 ###
+if [ "$BUILD_BUNDLE" == "1" ]; then
+  make_bundle
+fi
+
 ### Stage 4 ###
 
 if [ "$FIREBOT_MODE" == "validation" ] ; then
@@ -1975,11 +1980,6 @@ if [ "$FIREBOT_LITE" == "" ]; then
       fi
     fi
   fi
-fi
-
-### Stage 9 ###
-if [ "$BUILD_BUNDLE" == "1" ]; then
-  make_bundle
 fi
 
 ### Wrap up and report results ###
