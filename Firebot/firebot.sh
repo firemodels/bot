@@ -30,6 +30,7 @@ echo "     default: $QUEUE"
 echo "-Q - queue_name - run OpenMP cases using the queue queue_name"
 echo "-s - skip matlab and document building stages"
 echo "-S - show validation case list"
+echo "-T - build bundle"
 echo "-u - update repo"
 echo "-U - upload guides"
 echo "-V n - run Firebot in validation mode with a specified number "
@@ -1373,6 +1374,24 @@ make_fds_Config_management_plan()
 }
 
 #---------------------------------------------
+#                   make_bundle
+#---------------------------------------------
+
+make_bundle()
+{
+   cd $fdsrepo/
+   export FDS_VERSION=`git describe --dirty`
+
+   cd $smvrepo/
+   export SMV_VERSION=`git describe --dirty`
+
+   echo " make bundle"
+   # making a bundle
+   cd $fdsrepo/Build/Bundle/$platform
+   ./make_bundle.sh &> $OUTPUT_DIR/stage9_make_bundle
+}
+
+#---------------------------------------------
 #                   save_build_status
 #---------------------------------------------
 
@@ -1564,10 +1583,11 @@ DV2=
 INTEL=
 INTEL2=
 QUEUEBENCH=
+BUILD_BUNDLE=
 
 #*** parse command line arguments
 
-while getopts 'b:cCdD:FhIiJLm:p:Pq:Q:sSuUV:' OPTION
+while getopts 'b:cCdD:FhIiJLm:p:Pq:Q:sSTuUV:' OPTION
 do
 case $OPTION in
   b)
@@ -1626,6 +1646,9 @@ case $OPTION in
    ;;
   S)
    showcaselist="1"
+   ;;
+  T)
+   BUILD_BUNDLE="1"
    ;;
   u)
    UPDATEREPO=1
@@ -1951,6 +1974,11 @@ if [ "$FIREBOT_LITE" == "" ]; then
       fi
     fi
   fi
+fi
+
+### Stage 9 ###
+if [ "$BUILD_BUNDLE" == "1" ]; then
+  make_bundle
 fi
 
 ### Wrap up and report results ###
