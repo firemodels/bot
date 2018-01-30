@@ -436,7 +436,7 @@ compile_smv_db()
      echo "   smokeview"
      echo "      debug"
      CD_REPO $smvrepo/Build/smokeview/${compiler}_${platform}_${size} || return 1
-     ./make_smv_db.sh &> $OUTPUT_DIR/stage3b
+     ./make_smokeview_db.sh &> $OUTPUT_DIR/stage3b
    else
      echo "   smokeview"
      echo "      debug - not built, using installed smokeview"
@@ -487,7 +487,7 @@ compile_smv()
    if [ "$USEINSTALL" == "" ]; then
      echo "      release"
      CD_REPO $smvrepo/Build/smokeview/${compiler}_${platform}_${size} $smvbranch || return 1
-     ./make_smv.sh &> $OUTPUT_DIR/stage3c
+     ./make_smokeview.sh &> $OUTPUT_DIR/stage3c
    else
      echo "      release - not built, using installed smokeview"
    fi
