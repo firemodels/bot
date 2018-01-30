@@ -1379,10 +1379,15 @@ make_fds_Config_management_plan()
 
 make_bundle()
 {
-   cd $fdsrepo/Build/Bundle/$platform
+   cd $fdsrepo/
+   export FDS_VERSION=`git describe --dirty`
+
+   cd $smvrepo/
+   export SMV_VERSION=`git describe --dirty`
 
    echo " make bundle"
    # making a bundle
+   cd $fdsrepo/Build/Bundle/$platform
    ./make_bundle.sh &> $OUTPUT_DIR/stage9_make_bundle
 }
 
