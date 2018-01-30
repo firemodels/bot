@@ -1388,6 +1388,7 @@ make_bundle()
    echo " make bundle"
    # making a bundle
    cd $fdsrepo/Build/Bundle/$platform
+   export NOPAUSE=1
    ./make_bundle.sh &> $OUTPUT_DIR/stage9_make_bundle
 }
 
