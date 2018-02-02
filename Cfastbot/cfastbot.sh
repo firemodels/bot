@@ -371,7 +371,7 @@ compile_smv_utilities()
      CD_REPO $smvrepo/Build/LIBS/${compiler}_${platform}_${size} $smvbranch || return 1
      echo 'Building Smokeview libraries' >> $OUTPUT_DIR/stage3a 2>&1
      echo "   smokeview libraries"
-     ./makelibs.sh >> $OUTPUT_DIR/stage3a 2>&1
+     ./make_LIBS.sh >> $OUTPUT_DIR/stage3a 2>&1
 
    # background
      if [ "$QUEUE" == "none" ]; then
@@ -1224,29 +1224,26 @@ email_build_status()
    # Check for warnings and errors
    if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]
    then
-     cat $TIME_LOG >> $ERROR_LOG
      cat $TIME_LOG >> $WARNING_LOG
      # Send email with failure message and warnings, body of email contains appropriate log file
-     mail -s "CFASTbot build failure and warnings on ${hostname}. Revision ${GIT_REVISION}." $mailTo < $ERROR_LOG &> /dev/null
+     cat $ERROR_LOG $TIME_LOG | mail -s "CFASTbot build failure and warnings on ${hostname}. Revision ${GIT_REVISION}." $mailTo &> /dev/null
 
    # Check for errors only
    elif [ -e $ERROR_LOG ]
    then
-     cat $TIME_LOG >> $ERROR_LOG
       # Send email with failure message, body of email contains error log file
-      mail -s "CFASTbot build failure on ${hostname}. Revision ${GIT_REVISION}." $mailTo < $ERROR_LOG &> /dev/null
+      cat $ERROR_LOG $TIME_LOG | mail -s "CFASTbot build failure on ${hostname}. Revision ${GIT_REVISION}." $mailTo &> /dev/null
 
    # Check for warnings only
    elif [ -e $WARNING_LOG ]
    then
-     cat $TIME_LOG >> $WARNING_LOG
       # Send email with success message, include warnings
-      mail -s "CFASTbot build success with warnings on ${hostname}. Revision ${GIT_REVISION}." $mailTo < $WARNING_LOG &> /dev/null
+      cat $WARNING_LOG $TIME_LOG mail -s "CFASTbot build success with warnings on ${hostname}. Revision ${GIT_REVISION}." $mailTo &> /dev/null
 
    # No errors or warnings
    else
       # Send empty email with success message
-      mail -s "CFASTbot build success on ${hostname}! Revision ${GIT_REVISION}." $mailTo < $TIME_LOG &> /dev/null
+      cat $TIME_LOG | mail -s "CFASTbot build success on ${hostname}! Revision ${GIT_REVISION}." $mailTo &> /dev/null
    fi
 
    # Send email notification if validation statistics have changed.
