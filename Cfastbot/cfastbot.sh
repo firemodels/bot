@@ -371,7 +371,7 @@ compile_smv_utilities()
      CD_REPO $smvrepo/Build/LIBS/${compiler}_${platform}_${size} $smvbranch || return 1
      echo 'Building Smokeview libraries' >> $OUTPUT_DIR/stage3a 2>&1
      echo "   smokeview libraries"
-     ./makelibs.sh >> $OUTPUT_DIR/stage3a 2>&1
+     ./make_LIBS.sh >> $OUTPUT_DIR/stage3a 2>&1
 
    # background
      if [ "$QUEUE" == "none" ]; then
