@@ -88,6 +88,10 @@ server=1
     sudo apt-get -y install torque-client torque-mom
   fi
 
+# install ssh
+
+sudo apt-get -y install openssh-server
+
 #  note: before configuring torque, edit /etc/hosts file to add entry for all hosts
 
 # *** install tex
