@@ -11,6 +11,7 @@ qmgr -c 'set queue batch enabled = true'
 qmgr -c 'set queue batch resources_default.walltime = 99:00:00'
 qmgr -c 'set queue batch resources_default.nodes = 1'
 qmgr -c 'set server default_queue = batch'
+qmgr -c 'set server scheduling = True'
 
 qmgr -c 'create queue smokebot'
 qmgr -c 'set queue smokebot queue_type = execution'

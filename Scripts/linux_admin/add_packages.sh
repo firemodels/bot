@@ -3,7 +3,7 @@ server=1
 
 # change above line to
 # server=
-# if setting up a raspberry pi which is a compute node
+# if setting up a a compute node
 
 # ----------------------------------------------
 #   preliminaries 
@@ -45,7 +45,7 @@ server=1
 
 # note: mpich uses mpif90 (not mpifort) when building fds
 
-  sudo apt-get -y install libcr-dev mpich2 mpich2-doc
+  sudo apt-get -y install libcr-dev mpich mpich-doc
 
 # *** install samba
   if [ "$server" != "" ]; then
