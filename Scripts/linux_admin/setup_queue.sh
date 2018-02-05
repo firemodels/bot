@@ -4,19 +4,25 @@ SERVER=`hostname`
 
 # create batch and smokebot queues
 
-qmgr -c 'create queue batch'
-qmgr -c 'set queue batch queue_type = execution'
-qmgr -c 'set queue batch started = true'
-qmgr -c 'set queue batch enabled = true'
-qmgr -c 'set queue batch resources_default.walltime = 99:00:00'
-qmgr -c 'set queue batch resources_default.nodes = 1'
+queue=batch
+need=compute
+qmgr -c "create queue $queue"
+qmgr -c "set queue $queue queue_type = Execution"
+qmgr -c "set queue $queue resources_default.neednodes = $need"
+qmgr -c "set queue $queue resources_default.nodes = 1"
+#qmgr -c 'set queue $queue resources_default.walltime = 99:00:00'
+qmgr -c "set queue $queue enabled = True"
+qmgr -c "set queue $queue started = True"
 
-qmgr -c 'create queue smokebot'
-qmgr -c 'set queue smokebot queue_type = execution'
-qmgr -c 'set queue smokebot started = true'
-qmgr -c 'set queue smokebot enabled = true'
-qmgr -c 'set queue smokebot resources_default.walltime = 99:00:00'
-qmgr -c 'set queue smokebot resources_default.nodes = 1'
+queue=smokebot
+need=compute
+qmgr -c "create queue $queue"
+qmgr -c "set queue $queue queue_type = Execution"
+qmgr -c "set queue $queue resources_default.neednodes = $need"
+qmgr -c "set queue $queue resources_default.nodes = 1"
+#qmgr -c 'set queue $queue resources_default.walltime = 99:00:00'
+qmgr -c "set queue $queue enabled = True"
+qmgr -c "set queue $queue started = True"
 
 # configure submission pool 
 
