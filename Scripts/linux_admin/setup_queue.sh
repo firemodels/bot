@@ -28,6 +28,6 @@ qmgr -c "set queue $queue started = True"
 
 qmgr -c 'set server default_queue = batch'
 qmgr -c 'set server scheduling = True'
-qmgr -c 'set server submit_hosts = $SERVER'
+qmgr -c 'set server submit_hosts = submission_mode'
 qmgr -c 'set server allow_node_submit = true'
 
