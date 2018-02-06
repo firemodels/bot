@@ -28,7 +28,7 @@ server=1
 #   sudo smbpasswd -a username
 # ----------------------------------------------
 
-# *** update raspberry OS
+# *** update OS
 
  sudo apt-get -y update
  sudo apt-get -y dist-upgrade
@@ -50,6 +50,16 @@ server=1
 # *** install samba
   if [ "$server" != "" ]; then
     sudo apt-get -y install samba
+  fi
+
+# *** install nfs
+  if [ "$server" == "" ]; then
+    sudo apt install nfs-common
+    sudo echo compute001:/home /home nfs rsize=8192,wsize=8192,timeo=14,intr
+#    mount -a
+  else
+    sudo apt install nfs-kernel-server
+    sudo echo /home > /etc/exports
   fi
 
 #  to add a user:
