@@ -3,7 +3,7 @@ server=1
 
 # change above line to
 # server=
-# if setting up a raspberry pi which is a compute node
+# if setting up a a compute node
 
 # ----------------------------------------------
 #   preliminaries 
@@ -28,7 +28,7 @@ server=1
 #   sudo smbpasswd -a username
 # ----------------------------------------------
 
-# *** update raspberry OS
+# *** update OS
 
  sudo apt-get -y update
  sudo apt-get -y dist-upgrade
@@ -45,11 +45,21 @@ server=1
 
 # note: mpich uses mpif90 (not mpifort) when building fds
 
-  sudo apt-get -y install libcr-dev mpich2 mpich2-doc
+  sudo apt-get -y install libcr-dev mpich mpich-doc
 
 # *** install samba
   if [ "$server" != "" ]; then
     sudo apt-get -y install samba
+  fi
+
+# *** install nfs
+  if [ "$server" == "" ]; then
+    sudo apt install nfs-common
+    sudo echo compute001:/home /home nfs rsize=8192,wsize=8192,timeo=14,intr
+#    mount -a
+  else
+    sudo apt install nfs-kernel-server
+    sudo echo /home > /etc/exports
   fi
 
 #  to add a user:
@@ -87,6 +97,10 @@ server=1
     # compute nodes
     sudo apt-get -y install torque-client torque-mom
   fi
+
+# install ssh
+
+sudo apt-get -y install openssh-server
 
 #  note: before configuring torque, edit /etc/hosts file to add entry for all hosts
 
