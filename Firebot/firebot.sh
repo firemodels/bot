@@ -1380,10 +1380,10 @@ make_fds_Config_management_plan()
 make_bundle()
 {
    cd $fdsrepo/
-   export FDS_VERSION=`git describe | awk -F'-' '{print $1"-"$2}'`
+   export FDS_VERSION=`git describe --long --dirty | awk -F'-' '{print $1"-"$2}'`
 
    cd $smvrepo/
-   export SMV_VERSION=`git describe | awk -F'-' '{print $1"-"$2}'`
+   export SMV_VERSION=`git describe --long --dirty | awk -F'-' '{print $1"-"$2}'`
 
    echo " make bundle"
    # making a bundle
