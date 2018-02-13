@@ -238,25 +238,14 @@ cat << EOF
 
 <p><table>
 
-<tr><td></td><th>all planes</th><th>every 2nd plane</th><th>every 3rd plane</th></tr>
 <tr>
 <th>0.1 m grid</th>
 <td><a href="images/smoke_test_all.png"><img width=300 src="images/smoke_test_all.png"></a></td>
-<td><a href="images/smoke_test_every2.png"><img width=300 src="images/smoke_test_every2.png"></a></td>
-<td><a href="images/smoke_test_every3.png"><img width=300 src="images/smoke_test_every3.png"></a></td>
 </tr>
 
 <tr>
 <th> 0.2 m grid</th>
 <td><a href="images/smoke_test2_all.png"><img width=300 src="images/smoke_test2_all.png"></a></td>
-<td><a href="images/smoke_test2_every2.png"><img width=300 src="images/smoke_test2_every2.png"></a></td>
-<td><a href="images/smoke_test2_every3.png"><img width=300 src="images/smoke_test2_every3.png"></a></td>
-</tr>
-<tr>
-<th>actual</th>
-<td><a href="images/graysquares.png"><img width=300 src="images/graysquares.png"></a></td>
-<td><a href="images/graysquares.png"><img width=300 src="images/graysquares.png"></a></td>
-<td><a href="images/graysquares.png"><img width=300 src="images/graysquares.png"></a></td>
 </tr>
 </table>
 
