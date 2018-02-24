@@ -33,7 +33,7 @@ rm -rf $nodefile
 
 logdir=$HOME/.cluster_status
 temp_webpage=summary.html
-currentdate=`date`
+currentdate=`date "+%b %d %Y %R:%S"`
 cluster_host=`hostname -s`
 updir=$logdir/up
 downdir=$logdir/down
@@ -163,10 +163,10 @@ EOF
 
 cat << EOF >> $temp_webpage
     </script>
-<title>$cluster_host Cluster Status Page - $currentdate</title>
+<title>$cluster_host Cluster Status - $currentdate</title>
 </head>
 <body>
-<h2>$cluster_host cluster status - `date "+%b %d %Y %R:%S"`</h2>
+<h2>$cluster_host cluster status - $currentdate</h2>
 EOF
 
 cat << EOF >> $temp_webpage
@@ -175,7 +175,7 @@ Load: $total_load<br>
 EOF
 if [ "$TEMP_IP" != "" ]; then
 cat << EOF >> $temp_webpage
-Temperature: $temp &deg;F<br>
+Temperature: $temp &deg;F
 EOF
 fi
 cat << EOF >> $temp_webpage
@@ -259,7 +259,7 @@ fi
 num_downhosts=`ls -l $downdir | wc -l`
 if [ $num_downhosts -gt 1 ]; then
 cat << EOF >> $temp_webpage
-<h3>Nodes down/offline</h3>
+<h3>Nodes down</h3>
 <table border=on>
 EOF
 
@@ -319,16 +319,13 @@ cat << EOF >> $temp_webpage
 </table>
 EOF
 
+cat << EOF >> $temp_webpage
+<h3>History</h3>
+<div id="load_plot" style="width: 750px; height: 200px"></div>
+EOF
 if [ "$TEMP_IP" != "" ]; then
 cat << EOF >> $temp_webpage
-<h3>Load/Temperature History</h3>
-<div id="load_plot" style="width: 750px; height: 200px"></div>
 <div id="temp_plot" style="width: 750px; height: 200px"></div><br>
-EOF
-else
-cat << EOF >> $temp_webpage
-<h3>Load History</h3>
-<div id="load_plot" style="width: 750px; height: 200px"></div>
 EOF
 fi
 
