@@ -36,6 +36,7 @@ temp_webpage=summary.html
 currentdate=`date`
 cluster_host=`hostname -s`
 updir=$logdir/up
+downdir=$logdir/down
 loadfile=$logdir/load_${cluster_host}.csv
 
 # ---------------------------- get_temp ----------------------------------
@@ -165,7 +166,20 @@ cat << EOF >> $temp_webpage
 <title>$cluster_host Cluster Status Page - $currentdate</title>
 </head>
 <body>
-<h2>`date "+%b %d %Y %R:%S"`</h2>
+<h2>$cluster_host cluster status - `date "+%b %d %Y %R:%S"`</h2>
+EOF
+
+cat << EOF >> $temp_webpage
+<h3>
+Load: $total_load<br>
+EOF
+if [ "$TEMP_IP" != "" ]; then
+cat << EOF >> $temp_webpage
+Temperature: $temp &deg;F<br>
+EOF
+fi
+cat << EOF >> $temp_webpage
+</h3>
 EOF
 
 # ---------------------------- host_down_entry ----------------------------------
@@ -242,10 +256,10 @@ if [ $newrow -eq 0 ]; then
 fi
 }
 
-num_downhosts=`ls -l logs/down | wc -l`
+num_downhosts=`ls -l $downdir | wc -l`
 if [ $num_downhosts -gt 1 ]; then
 cat << EOF >> $temp_webpage
-<h3>Offline</h3>
+<h3>Nodes down/offline</h3>
 <table border=on>
 EOF
 
@@ -273,15 +287,11 @@ done
 
 # output cluster load
 
-cat << EOF >> $temp_webpage
-<h2>$cluster_host cluster load: $total_load</h2>
-EOF
-
 if [ $count -gt 0 ]; then
 cat << EOF >> $temp_webpage
+<h3>Nodes up (load>1)</h3>
 <table border=on>
 <tr>
-<td bgcolor="#ffffff">hidden: load &lt; 1.0</td>
 <td bgcolor="#ffffff">1.0 &le; load &lt; 2.0</td>
 <td bgcolor="#ffff00">2.0 &le; load &lt; 6.0</td>
 <td bgcolor="#ff0000">load &ge; 6.0</td>
@@ -309,9 +319,20 @@ cat << EOF >> $temp_webpage
 </table>
 EOF
 
+if [ "$TEMP_IP" != "" ]; then
 cat << EOF >> $temp_webpage
+<h3>Load/Temperature History</h3>
 <div id="load_plot" style="width: 750px; height: 200px"></div>
 <div id="temp_plot" style="width: 750px; height: 200px"></div><br>
+EOF
+else
+cat << EOF >> $temp_webpage
+<h3>Load History</h3>
+<div id="load_plot" style="width: 750px; height: 200px"></div>
+EOF
+fi
+
+cat << EOF >> $temp_webpage
 </body>
 </html>
 EOF
