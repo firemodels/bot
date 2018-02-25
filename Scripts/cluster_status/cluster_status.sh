@@ -4,10 +4,16 @@
 #     dsh nodes file. chown this file to the user running this script.
 #     Note, this script puts host entries into this file using the pbsnodes
 #     command to determine the nodes in the cluster
+#     example: 
+#        export STATUS_CLUSTER_NODES=/usr/local/dsh/nodes_groups_CLUSTER_NODES
 # 2.  define the STATUS_WEBPAGE containing webpage for summary results
 #     produced by this script
+#     example: 
+#        export STATUS_WEBPAGE=/var/www/html/summary.html
 # 3.  define the STATUS_MAILTO environment variable containing an email
 #     address to email results too.
+#     example: 
+#        export STATUS_MAILTO=user@gmail.com
 # 4.  define the STATUS_TEMP_IP variable if you have a temperature sensor
 #     (this script will not generate temperature plots if STATUS_TEMP_IP
 #     is blank)
