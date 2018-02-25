@@ -1,12 +1,17 @@
 #!/bin/bash
 
-# 1.  create empty CLUSTER_NODES and webpage files owned by 
-#     user running this script.  Note, this script uses the pbsnodes
-#     command to determine nodes in the cluster to check
-# 2.  first time you run this script use -i option to initialize host status files
-# 3.  define mailTo variable if mail is set up
-# 4.  define TEMP_IP variable if you have a temperature sensor
-#     (script will skip over temperature plot generation if TEMP_IP is set to null)
+# 1.  define the STATUS_CLUSTER_NODES environment variable pointing to a 
+#     dsh nodes file. chown this file to the user running this script.
+#     Note, this script puts host entries into this file using the pbsnodes
+#     command to determine the nodes in the cluster
+# 2.  define the STATUS_WEBPAGE containing webpage for summary results
+#     produced by this script
+# 3.  define the STATUS_MAILTO environment variable containing an email
+#     address to email results too.
+# 4.  define the STATUS_TEMP_IP variable if you have a temperature sensor
+#     (this script will not generate temperature plots if STATUS_TEMP_IP
+#     is blank)
+
 logdir=$HOME/.cluster_status
 lockfile=$logdir/cluster_status_lock
 if [ -e $lockfile ]; then
