@@ -8,27 +8,62 @@
 # 4.  define TEMP_IP variable if you have a temperature sensor
 #     (script will skip over temperature plot generation if TEMP_IP is set to null)
 
-CLUSTER_NODES=/usr/local/dsh/node_groups/CLUSTER_NODES
-webpage=/var/www/html/summary.html
+if [ "$STATUS_CLUSTER_NODES" == "" ]; then
+  CLUSTER_NODES=/usr/local/dsh/node_groups/CLUSTER_NODES
+else
+  CLUSTER_NODES=$STATUS_CLUSTER_NODES
+fi
 
-mailTo="gforney@gmail.com 3018070456@vtext.com"
-# set mailTo to blank if mail is not set up
-# mailTo=
-
-TEMP_IP=129.6.159.193/temp
-# set TEMP_IP to null if you don't have a temperature sensor
-# TEMP_IP=null
+if [ "$STATUS_WEBPAGE" == "" ]; then
+  webpage=/var/www/html/summary.html
+else
+  webpage=$STATUS_WEBPAGE
+fi
+if [ "$STATUS_MAILTO" != "" ]; then
+  mailTo=$STATUS_MAILTO
+fi
+if [ "$STATUS_TEMP_IP" != "" ]; then
+  TEMP_IP=$STATUS_TEMP_IP
+fi
 
 # ---------------------------------------------------------------------
 # shouldn't have to modify any lines below
 
 # ---------------------------- usage ----------------------------------
+
+# error checking
+
+if [ "$CLUSTER_NODES" == "" ]; then
+  echo "***error: The dsh parameter file does not exist."
+  echo "   Define the environment variable STATUS_CLUSTER_NODES"
+  echo "   use chown to make it owned by the user `whoami`."
+  exit
+fi
+if [ ! -e $CLUSTER_NODES ]; then
+  echo "***error: The dsh parameter file "
+  echo "  $STATUS_CLUSTER_NODES"
+  echo "  does not exist. Define the environment variable STATUS_CLUSTER_NODES"
+  echo "  and use chown to make it owned by the user `whoami`."
+  exit
+fi
 function usage {
   echo " -h - show this message"
   echo " -i - initialize host status files"
   echo " -s - send out an email summarizing the cluster status"
   exit
 }
+if [ "$webpage" == "" ]; then
+  echo "***error: The summary web page location is not defined."
+  echo "   Define the environment variable STATUS_WEBPAGE"
+  echo "   use chown to make it owned by the user `whoami`"
+  exit
+fi
+if [ ! -e $webpage ]; then
+  echo "***error: The summary web page $webpage does not exist."
+  echo "   Define the environment variable STATUS_WEBPAGE"
+  echo "   and use chown to make it owned by the user `whoami`"
+  exit
+fi
 
 CLUSTER_NODES_BASE=$(basename "$CLUSTER_NODES")
 CLUSTER_NODES_DOWN=/tmp/cluster_nodes_down.$$

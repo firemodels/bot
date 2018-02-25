@@ -167,6 +167,7 @@ cat << EOF >> $temp_webpage
 </head>
 <body>
 <h2>$cluster_host cluster status - $currentdate</h2>
+<hr>
 EOF
 
 cat << EOF >> $temp_webpage
