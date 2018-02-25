@@ -7,6 +7,14 @@
 # 3.  define mailTo variable if mail is set up
 # 4.  define TEMP_IP variable if you have a temperature sensor
 #     (script will skip over temperature plot generation if TEMP_IP is set to null)
+logdir=$HOME/.cluster_status
+lockfile=$logdir/cluster_status_lock
+if [ -e $lockfile ]; then
+  echo "***error: cluster_status.sh script already running"
+  echo "  exiting"
+  exit
+fi
+touch $lockfile
 
 if [ "$STATUS_CLUSTER_NODES" == "" ]; then
   CLUSTER_NODES=/usr/local/dsh/node_groups/CLUSTER_NODES
@@ -37,6 +45,7 @@ if [ "$CLUSTER_NODES" == "" ]; then
   echo "***error: The dsh parameter file does not exist."
   echo "   Define the environment variable STATUS_CLUSTER_NODES"
   echo "   use chown to make it owned by the user `whoami`."
+  rm $lockfile
   exit
 fi
 if [ ! -e $CLUSTER_NODES ]; then
@@ -44,24 +53,28 @@ if [ ! -e $CLUSTER_NODES ]; then
   echo "  $STATUS_CLUSTER_NODES"
   echo "  does not exist. Define the environment variable STATUS_CLUSTER_NODES"
   echo "  and use chown to make it owned by the user `whoami`."
+  rm $lockfile
   exit
 fi
 function usage {
   echo " -h - show this message"
   echo " -i - initialize host status files"
   echo " -s - send out an email summarizing the cluster status"
+  rm $lockfile
   exit
 }
 if [ "$webpage" == "" ]; then
   echo "***error: The summary web page location is not defined."
   echo "   Define the environment variable STATUS_WEBPAGE"
   echo "   use chown to make it owned by the user `whoami`"
+  rm $lockfile
   exit
 fi
 if [ ! -e $webpage ]; then
   echo "***error: The summary web page $webpage does not exist."
   echo "   Define the environment variable STATUS_WEBPAGE"
   echo "   and use chown to make it owned by the user `whoami`"
+  rm $lockfile
   exit
 fi
 
@@ -221,3 +234,4 @@ if [[ "$SUMMARY" == "1" ]] && [[ "$mailTo" != "" ]]; then
 fi
 rm $summary $downnow $upnow $nodeup $nodedown
 ./make_summary.sh $webpage $TEMP_IP
+rm $lockfile

@@ -1,20 +1,27 @@
 #!/bin/bash
+logdir=$HOME/.cluster_status
+lockfile=$logdir/lockfile_make_summary
+if [ -e $lockfile ]; then
+  echo "***error: make_summary.sh script already running"
+  echo " exiting"
+  exit
+fi
+touch $lockfile
+
 TIMELENGTH=7.0
 
-if [ "$1" == "" ]; then
-  webpage=/var/www/html/summary.html
-else
-  webpage=$1
-fi
-# set TEMP_IP to blank if you don't have a temperature sensor
-if [ "$2" == "" ]; then
-  TEMP_IP=129.6.159.193/temp
-else
-  if [ "$2" == "null" ]; then
-    TEMP_IP=
+webpage=$1
+if [ "$webpage" == "" ]; then
+  if [ "$STATUS_WEBPAGE" == "" ]; then
+    webpage=/var/www/html/summary.html
   else
-    TEMP_IP=$2
+    webpage=$STATUS_WEBPAGE
   fi
+fi
+
+TEMP_IP=$2
+if [[ "$TEMP_IP" == "" ]] && [[ "$STATUS_TEMP_IP" != "" ]]; then
+  TEMP_IP=$STATUS_TEMP_IP
 fi
 
 # up nodes
@@ -31,7 +38,6 @@ pbsnodes -l | awk '{print $1}' >> $nodefile
 ALL_HOSTS=`sort -u $nodefile`
 rm -rf $nodefile
 
-logdir=$HOME/.cluster_status
 temp_webpage=summary.html
 currentdate=`date "+%b %d %Y %R:%S"`
 cluster_host=`hostname -s`
@@ -336,3 +342,4 @@ cat << EOF >> $temp_webpage
 EOF
 cp $temp_webpage $webpage
 rm $temp_webpage
+rm $lockfile
