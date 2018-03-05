@@ -189,6 +189,27 @@ Currently, FDS is developed by the NIST Engineering Laboratory, Fire Research Di
 \item Engineering departments at various universities with a particular emphasis on fire.
 \end{itemize}
 
+\subsection{Relevant Publications}
+
+
+
+The manuals for FDS consist of a Mathematical Model Guide~\cite{FDS_Math_Guide}, a User's Guide~\cite{FDS_Users_Guide}, a Verification Guide \cite{FDS_Verification_Guide}, a Validation Guide~\cite{CFAST_Valid_Guide_7}, and this Software Quality Assurance Guide~\cite{SQA_Guide}.  The Mathematical Model Guide describes the underlying physical principles. The User's Guide describes how to use the model. The Verification and Validation Guides document sensitivity analyses, model verification, model validation, and model limitations consistent with ASTM~E1355~\cite{ASTM:E1355}. This Software Quality Assurance Guide documents the processes used during the development and validation of the model.
+
+The U.S. Nuclear Regulatory Commission has published a verification and validation study of five selected fire models commonly used in support of risk-informed and performance-based fire protection at nuclear power plants~\cite{NRCNUREG1824}. In addition to an extensive study of the FDS model, the report also compares the output of several other models including simple hand calculations and zone models such as the CFAST model developed by NIST \cite{CFAST_Tech_Guide_7}.
+
+
+\subsection{Governing Equations, Assumptions and Numerics}
+
+The following is a brief description of the major components of FDS. Detailed information regarding the assumptions and governing equations associated with the model is provided in Volume~1 of the FDS Technical Reference Guide~\cite{FDS_Tech_Guide}.
+\begin{description}
+\item[Hydrodynamic Model] FDS solves numerically a form of the Navier-Stokes equations appropriate for low-speed, thermally-driven flow with an emphasis on smoke and heat transport from fires. The core algorithm is an explicit predictor-corrector scheme that is second order accurate in space and time. Turbulence is treated by means of Large Eddy Simulation (LES). It is possible to perform a Direct Numerical Simulation (DNS) if the underlying numerical grid is fine enough. LES is the default mode of operation.
+\item[Combustion Model] For most applications, FDS uses a combustion model based on the mixing limited, infinitely fast reaction of lumped species. Lumped species are reacting scalar quantities that represent a mixture of species such as air which is a mixture of nitrogen, oxygen, water vapor, and carbon dioxide. As with FDS 5, the reaction of fuel and oxygen is not necessarily instantaneous and complete, and there are several optional schemes that are designed to predict the extent of combustion in under-ventilated spaces. The mass fractions of all primitive species can be obtained from a linear combination of the lumped species.
+\item[Radiation Transport] Radiative heat transfer is included in the model via the solution of the radiation transport equation for a gray gas. In a limited number of cases, a wide band model can be used in place of the gray gas model to provide a better spectral accuracy. The radiation equation is solved using a technique similar to a finite volume method for convective transport, thus the name given to it is the Finite Volume Method (FVM). Using approximately 100 discrete angles, the finite volume solver requires about 20~\% of the total CPU time of a calculation, a modest cost given the complexity of radiation heat transfer.  Water droplets can absorb and scatter thermal radiation. This is important in cases involving mist sprinklers, but also plays a role in all sprinkler cases. The absorption and scattering coefficients are based on Mie theory. The scattering from the gaseous species and soot is not included in the model.
+\item[Geometry] FDS approximates the governing equations on one or more rectilinear grids. The user prescribes rectangular obstructions that are forced to conform with the underlying grid.
+\item[Boundary Conditions] All solid surfaces are assigned thermal boundary conditions, plus information about the burning behavior of the material. Heat and mass transfer to and from solid surfaces is usually handled with empirical correlations, although it is possible to compute directly the heat and mass transfer when performing a Direct Numerical Simulation (DNS).
+\item[Sprinklers and Detectors] The activation of sprinklers and heat and smoke detectors is modeled using fairly simple correlations of thermal inertia for sprinklers and heat detectors, and transport lag for smoke detectors. Sprinkler sprays are modeled by Lagrangian particles that represent a sampling of the water droplets ejected from the sprinkler.
+\end{description}
+
 
 \subsection{Intended Uses}
 
@@ -249,21 +270,6 @@ Global quantities recorded by the program include:
 Time histories of various quantities at a single point in space or global quantities like the fire's heat release rate (HRR) are saved in simple, comma-delimited text files that can be plotted using a spreadsheet program. However, most field or surface data are visualized with a program called Smokeview, a tool specifically designed to analyze data generated by FDS. FDS and Smokeview are used in concert to model and visualize fire phenomena. Smokeview performs this visualization by presenting animated tracer particle flow, animated contour slices of computed gas variables and animated surface data. Smokeview also presents contours and vector plots of static data anywhere within a scene at a fixed time. A complete list of FDS output quantities and formats is given in Ref.~\cite{FDS_Users_Guide}. Details on the use of Smokeview are found in Ref.~\cite{Smokeview_Users_Guide}.
 
 
-
-
-\subsection{Governing Equations, Assumptions and Numerics}
-
-The following is a brief description of the major components of FDS. Detailed information regarding the assumptions and governing equations associated with the model is provided in Volume~1 of the FDS Technical Reference Guide~\cite{FDS_Tech_Guide}.
-\begin{description}
-\item[Hydrodynamic Model] FDS solves numerically a form of the Navier-Stokes equations appropriate for low-speed, thermally-driven flow with an emphasis on smoke and heat transport from fires. The core algorithm is an explicit predictor-corrector scheme that is second order accurate in space and time. Turbulence is treated by means of Large Eddy Simulation (LES). It is possible to perform a Direct Numerical Simulation (DNS) if the underlying numerical grid is fine enough. LES is the default mode of operation.
-\item[Combustion Model] For most applications, FDS uses a combustion model based on the mixing limited, infinitely fast reaction of lumped species. Lumped species are reacting scalar quantities that represent a mixture of species such as air which is a mixture of nitrogen, oxygen, water vapor, and carbon dioxide. As with FDS 5, the reaction of fuel and oxygen is not necessarily instantaneous and complete, and there are several optional schemes that are designed to predict the extent of combustion in under-ventilated spaces. The mass fractions of all primitive species can be obtained from a linear combination of the lumped species.
-\item[Radiation Transport] Radiative heat transfer is included in the model via the solution of the radiation transport equation for a gray gas. In a limited number of cases, a wide band model can be used in place of the gray gas model to provide a better spectral accuracy. The radiation equation is solved using a technique similar to a finite volume method for convective transport, thus the name given to it is the Finite Volume Method (FVM). Using approximately 100 discrete angles, the finite volume solver requires about 20~\% of the total CPU time of a calculation, a modest cost given the complexity of radiation heat transfer.  Water droplets can absorb and scatter thermal radiation. This is important in cases involving mist sprinklers, but also plays a role in all sprinkler cases. The absorption and scattering coefficients are based on Mie theory. The scattering from the gaseous species and soot is not included in the model.
-\item[Geometry] FDS approximates the governing equations on one or more rectilinear grids. The user prescribes rectangular obstructions that are forced to conform with the underlying grid.
-\item[Boundary Conditions] All solid surfaces are assigned thermal boundary conditions, plus information about the burning behavior of the material. Heat and mass transfer to and from solid surfaces is usually handled with empirical correlations, although it is possible to compute directly the heat and mass transfer when performing a Direct Numerical Simulation (DNS).
-\item[Sprinklers and Detectors] The activation of sprinklers and heat and smoke detectors is modeled using fairly simple correlations of thermal inertia for sprinklers and heat detectors, and transport lag for smoke detectors. Sprinkler sprays are modeled by Lagrangian particles that represent a sampling of the water droplets ejected from the sprinkler.
-\end{description}
-
-
 \subsection{Limitations}
 
 Although FDS can address most fire scenarios, there are limitations in all of its various algorithms. Some of the more prominent limitations of the
@@ -299,7 +305,7 @@ CFAST was developed and is maintained by the Fire Research Division of the Natio
 
 \subsection{Relevant Publications}
 
-The manuals for CFAST consist of this Technical Reference Guide, a User's Guide~\cite{CFAST_Users_Guide_7}, a Verification and Validation Guide~\cite{CFAST_Valid_Guide_7}, and a Configuration Management Guide~\cite{CFAST_Config_Guide_7}.  The Technical Reference Guide describes the underlying physical principles. The User's Guide describes how to use the model. The Verification and Validation Guide documents sensitivity analyses, model verification, model validation, and model limitations consistent with ASTM~E1355~\cite{ASTM:E1355}. The Configuration Management Guide documents the processes used during the development and validation of the model.
+The manuals for CFAST consist of a Technical Reference Guide \cite{CFAST_Tech_Guide_7}, a User's Guide~\cite{CFAST_Users_Guide_7}, a Verification and Validation Guide~\cite{CFAST_Valid_Guide_7}, and this Software Quality Assurance Guide Guide~\cite{SQA_Guide}.  The Technical Reference Guide describes the underlying physical principles. The User's Guide describes how to use the model. The Verification and Validation Guide documents sensitivity analyses, model verification, model validation, and model limitations consistent with ASTM~E1355~\cite{ASTM:E1355}. The Configuration Management Guide documents the processes used during the development and validation of the model.
 
 The U.S. Nuclear Regulatory Commission has published a verification and validation study of five selected fire models commonly used in support of risk-informed and performance-based fire protection at nuclear power plants~\cite{NRCNUREG1824}. In addition to an extensive study of the CFAST model, the report compares the output of several other models ranging from simple hand calculations to more complex computational fluid dynamics codes such as the Fire Dynamics Simulator (FDS) developed by the National Institute of Standards and Technology (NIST) \cite{FDS_Tech_Guide_6}.
 
@@ -324,9 +330,16 @@ Besides formal internal and peer review, CFAST is subjected to continuous scruti
 For each major release of CFAST, NIST has maintained a history of the source code which goes back to March 1989.  While it is not practical to reconstruct the programs for each release for use with modern software tools and computer operating systems, the source code history allows the developers to examine what changes were made at each release point. This provides detailed documentation of the history of model development and is often useful to understand the impact of changes to sub-models as the model continues to evolve.
 
 
+\subsection{Intended Uses}
+
+While the governing transport equations are based on the fundamental conservation laws of mass and energy, the fire-specific algorithms within CFAST are based on empirical correlations. These correlations include fire plume and ceiling jet temperatures and velocities, vent flow rates, sprinkler activation, and so on. These sub-models were developed independently of each other under ideal conditions. CFAST combines these sub-models in such a way that there are no hard limits on when a particular sub-model is appropriate or not. The decision as to whether CFAST is appropriate for a given fire scenario is based primarily on the hundreds of experiments and thousands of point-to-point comparisons between CFAST and measured quantities that are included in the CFAST Validation Guide~\cite{CFAST_Valid_Guide_7}. This document includes a list of the experiments and their important physical attributes such as the nature of the fire, the aspect ratio of the compartment, the ventilation rate, and the relative location of targets. For each quantity of interest, such as upper layer temperature or target heat flux, there is a calculated bias factor and standard deviation that indicates the accuracy of the model for the particular quantity of interest which is based on measurement uncertainty. Thus, the CFAST Validation Guide indicates what fire scenarios are appropriate for CFAST, and the degree of accuracy that can be expected for a particular type of prediction.
+
+In addition to what is included in the CFAST Validation Guide, validation studies have been performed by NIST grantees, students at universities, and engineering firms using the model.  Because each organization has its  own reasons for  validating the model, the  referenced papers and reports do not follow any particular guidelines. Some of the works only provide  a qualitative assessment  of the model,  concluding that the  model  agreement with  a  particular  experiment  is ``good''  or ``reasonable.'' Sometimes, the conclusion is that the model works well in certain cases, not as well in others. These studies are included in the survey because the references  are useful to other model users who may have a similar application  and are interested in qualitative assessment. It is important to note  that some of the papers point out flaws in early releases of CFAST that have been corrected or improved in more recent  releases. Some of  the issues raised, however,  are still subjects of  active research. Continued updates for CFAST  are greatly influenced by the feedback provided by users, often through publication of validation efforts.
 
 
-\subsection{Input Data Required to Run the Model}
+
+
+\subsection{Input Parameters}
 
 All of the data required to run the CFAST model reside in a single input file that the user generates. The file consists of the following information:
 \begin{itemize}
@@ -346,7 +359,7 @@ A comprehensive assessment of the numerical parameters (such as default time ste
 
 
 
-\subsection{Model Results}
+\subsection{Output Quantities}
 
 The output of CFAST are the sensible variables that are needed for assessing the environment in a building subjected to a fire. Once the simulation is complete, CFAST produces an output file containing all of the solution variables.  Typical outputs include (but are not limited to) the following:
 \begin{itemize}
@@ -358,12 +371,17 @@ The output of CFAST are the sensible variables that are needed for assessing the
 \end{itemize}
 
 
-\subsection{Model Scenarios}
-
-While the governing transport equations are based on the fundamental conservation laws of mass and energy, the fire-specific algorithms within CFAST are based on empirical correlations. These correlations include fire plume and ceiling jet temperatures and velocities, vent flow rates, sprinkler activation, and so on. These sub-models were developed independently of each other under ideal conditions. CFAST combines these sub-models in such a way that there are no hard limits on when a particular sub-model is appropriate or not. The decision as to whether CFAST is appropriate for a given fire scenario is based primarily on the hundreds of experiments and thousands of point-to-point comparisons between CFAST and measured quantities that are included in the CFAST Validation Guide~\cite{CFAST_Valid_Guide_7}. This document includes a list of the experiments and their important physical attributes such as the nature of the fire, the aspect ratio of the compartment, the ventilation rate, and the relative location of targets. For each quantity of interest, such as upper layer temperature or target heat flux, there is a calculated bias factor and standard deviation that indicates the accuracy of the model for the particular quantity of interest which is based on measurement uncertainty. Thus, the CFAST Validation Guide indicates what fire scenarios are appropriate for CFAST, and the degree of accuracy that can be expected for a particular type of prediction.
-
-In addition to what is included in the CFAST Validation Guide, validation studies have been performed by NIST grantees, students at universities, and engineering firms using the model.  Because each organization has its  own reasons for  validating the model, the  referenced papers and reports do not follow any particular guidelines. Some of the works only provide  a qualitative assessment  of the model,  concluding that the  model  agreement with  a  particular  experiment  is ``good''  or ``reasonable.'' Sometimes, the conclusion is that the model works well in certain cases, not as well in others. These studies are included in the survey because the references  are useful to other model users who may have a similar application  and are interested in qualitative assessment. It is important to note  that some of the papers point out flaws in early releases of CFAST that have been corrected or improved in more recent  releases. Some of  the issues raised, however,  are still subjects of  active research. Continued updates for CFAST  are greatly influenced by the feedback provided by users, often through publication of validation efforts.
-
+\subsection{Limitations}
+Although CFAST can address many fire scenarios, there are limitations in all of its various algorithms. Some of the more prominent limitations of the model are listed here.
+\begin{description}
+\item[Zone Model Assumption] CFAST is a two-zone model.  As such, it represents a compartment by two control volumes, a hot, relatively gas-laden upper layer and a cooler, relatively clear lower layer.  Within each control volume, quantities are assumed to be uniform at a representative average value for the volume. Thus, it cannot provide detailed information on localized conditions within a compartment.
+\item[Rectilinear Geometry] Compartments in CFAST are assumed to be simple rectangular spaces. Complex geometries are necessarily simplified for simulation in the model.
+\item[Fire Growth and Spread] CFAST is designed for modeling the transport of smoke and heat from specified fires. It does not model the actual growth and spread of a fire either within a compartment or between compartments.
+\item[Combustion] CFAST uses a simple chemistry balance to describe combustion, all based on user inputs.
+\item[Radiation] Radiative heat transfer is included in the model as simplified exchange between fires, compartment surfaces, and objects within a compartment. Detailed localized heating of objects, radiation blocking by intervening objects or surfaces, and radiation exchange between compartments is not included in the model.
+\item{Suppression} Suppression of fires in CFAST is based on a simple empirical correlation for sprinkler suppression of fires in open spaces.  The effects of multiple sprinklers or where the fire may be shielded from the direct sprinkler spray are model modeled.
+\item{Empirical Correlations} The fire-specific algorithms within CFAST are based on empirical correlations. These correlations include fire plume and ceiling jet temperatures and velocities, vent flow rates, sprinkler activation, and so on. The overall validation of the model provides a quantification of the agreement of the model to a range of scenarios, but does not specifically validate each individual correlation for a specific application.
+\end{description}
 
 
 \chapter{Configuration Management}
