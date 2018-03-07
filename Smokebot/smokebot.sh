@@ -1303,9 +1303,9 @@ email_build_status()
    echo "               OS: $platform2" >> $TIME_LOG
    echo "             repo: $repo" >> $TIME_LOG
    echo "            queue: $SMOKEBOT_QUEUE" >> $TIME_LOG
-   echo "     fds revision: $FDS_REVISION" >> $TIME_LOG
-   echo "     smv revision: $GIT_REVISION" >> $TIME_LOG
-   echo "   cfast revision: $CFAST_REVISION" >> $TIME_LOG
+   echo "      fds version: $FDS_REVISION" >> $TIME_LOG
+   echo "      smv version: $GIT_REVISION" >> $TIME_LOG
+   echo "    cfast version: $CFAST_REVISION" >> $TIME_LOG
    echo "       start time: $start_time " >> $TIME_LOG
    echo "        stop time: $stop_time " >> $TIME_LOG
    echo "            setup: $DIFF_PRELIM" >> $TIME_LOG
@@ -1326,7 +1326,6 @@ email_build_status()
       echo "FDS revisions: $THIS_SMV_REVISION" >> $TIME_LOG
       echo "SMV revisions: $THIS_FDS_REVISION" >> $TIME_LOG
    fi
-   echo "          vis dir: $smvrepo/Verification/Visualization" >> $TIME_LOG
    if [ "$RUNAUTO" == "" ]; then
       echo "SMV revisions: $THIS_SMV_REVISION" >> $TIME_LOG
    fi
