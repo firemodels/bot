@@ -1344,33 +1344,30 @@ email_build_status()
      echo " Smokebot status: https://pages.nist.gov/fds-smv/smokebot_status.html" >> $TIME_LOG
    fi
    echo "-------------------------------" >> $TIME_LOG
-   if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]
-   then
+   if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]; then
      # Send email with failure message and warnings, body of email contains appropriate log file
-     cat $ERROR_LOG $TIME_LOG | mail -s "smokebot build failure and warnings on ${hostname}. Version: ${GIT_REVISION}, Branch: $SMVBRANCH." $mailTo > /dev/null
+     cat $ERROR_LOG $TIME_LOG | mail -s "smokebot failure and warnings on ${hostname}. ${GIT_REVISION}, $SMVBRANCH" $mailTo > /dev/null
 
    # Check for errors only
-   elif [ -e $ERROR_LOG ]
-   then
+   elif [ -e $ERROR_LOG ]; then
       # Send email with failure message, body of email contains error log file
-      cat $ERROR_LOG $TIME_LOG | mail -s "smokebot build failure on ${hostname}. Version: ${GIT_REVISION}, Branch: $SMVBRANCH." $mailTo > /dev/null
+      cat $ERROR_LOG $TIME_LOG | mail -s "smokebot failure on ${hostname}. ${GIT_REVISION}, $SMVBRANCH" $mailTo > /dev/null
 
    # Check for warnings only
-   elif [ -e $WARNING_LOG ]
-   then
+   elif [ -e $WARNING_LOG ]; then
      # Send email with success message, include warnings
-     cat $WARNING_LOG $TIME_LOG | mail -s "smokebot build success with warnings on ${hostname}. Version: ${GIT_REVISION}, Branch: $SMVBRANCH." $mailTo > /dev/null
+     cat $WARNING_LOG $TIME_LOG | mail -s "smokebot success with warnings on ${hostname}. ${GIT_REVISION}, $SMVBRANCH" $mailTo > /dev/null
 
    # No errors or warnings
    else
 # upload guides to a google drive directory
-      if [ "$UPLOADRESULTS" == "1" ];then
+      if [ "$UPLOADRESULTS" == "1" ]; then
         cd $smokebotdir
         $UploadGuides $NEWGUIDE_DIR $smvrepo/Manuals &> /dev/null
       fi
 
       # Send success message with links to nightly manuals
-      cat $TIME_LOG | mail -s "smokebot build success on ${hostname}! Version: ${GIT_REVISION}, Branch: $SMVBRANCH." $mailTo > /dev/null
+      cat $TIME_LOG | mail -s "smokebot success on ${hostname}. ${GIT_REVISION}, $SMVBRANCH" $mailTo > /dev/null
    fi
 }
 
