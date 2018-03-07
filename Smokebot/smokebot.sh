@@ -1142,7 +1142,6 @@ generate_timing_stats()
 
    cd $smvrepo/Verification
    scripts/SMV_Cases.sh
-   scripts/GEOM_Cases.sh
 
    cd $smvrepo/Utilities/Scripts
    ./fds_timing_stats.sh smokebot > smv_timing_stats.csv
