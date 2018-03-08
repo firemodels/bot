@@ -555,18 +555,18 @@ check_verification_cases_debug()
    cd $smvrepo/Verification
 
    if [[ `grep -rIi 'Run aborted' $OUTPUT_DIR/stage3a` == "" ]] && \
-      [[ `grep -rIi 'Segmentation' Visualization/* WUI/* Immersed_Boundary_Method/*` == "" ]] && \
-      [[ `grep -rI 'ERROR:' Visualization/* WUI/* Immersed_Boundary_Method/*` == "" ]] && \
-      [[ `grep -rIi 'STOP: Numerical' Visualization/* WUI/* Immersed_Boundary_Method/*` == "" ]] && \
-      [[ `grep -rIi 'forrtl' Visualization/* WUI/* Immersed_Boundary_Method/*` == "" ]]
+      [[ `grep -rIi 'Segmentation' Visualization/* WUI/* ` == "" ]] && \
+      [[ `grep -rI 'ERROR:' Visualization/* WUI/* ` == "" ]] && \
+      [[ `grep -rIi 'STOP: Numerical' Visualization/* WUI/* ` == "" ]] && \
+      [[ `grep -rIi 'forrtl' Visualization/* WUI/* ` == "" ]]
    then
       stage3a_success=true
    else
       grep -rIi 'Run aborted' $OUTPUT_DIR/stage3a > $OUTPUT_DIR/stage3a_errors
-      grep -rIi 'Segmentation' Visualization/* WUI/* Immersed_Boundary_Method/* >> $OUTPUT_DIR/stage3a_errors
-      grep -rI 'ERROR:' Visualization/* WUI/* Immersed_Boundary_Method/* >> $OUTPUT_DIR/stage3a_errors
-      grep -rIi 'STOP: Numerical' -rIi Visualization/* WUI/* Immersed_Boundary_Method/* >> $OUTPUT_DIR/stage3a_errors
-      grep -rIi -A 20 'forrtl' Visualization/* WUI/* Immersed_Boundary_Method/* >> $OUTPUT_DIR/stage3a_errors
+      grep -rIi 'Segmentation' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3a_errors
+      grep -rI 'ERROR:' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3a_errors
+      grep -rIi 'STOP: Numerical' -rIi Visualization/* WUI/* >> $OUTPUT_DIR/stage3a_errors
+      grep -rIi -A 20 'forrtl' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3a_errors
       
       echo "Errors from Stage 3a - Run verification cases (debug mode):" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage3a_errors >> $ERROR_LOG
@@ -846,18 +846,18 @@ check_verification_cases_release()
    cd $smvrepo/Verification
 
    if [[ `grep -rIi 'Run aborted' $OUTPUT_DIR/stage3b` == "" ]] && \
-      [[ `grep -rIi 'Segmentation' Visualization/* WUI/* Immersed_Boundary_Method/* ` == "" ]] && \
-      [[ `grep -rI 'ERROR:' Visualization/* WUI/* Immersed_Boundary_Method/* ` == "" ]] && \
-      [[ `grep -rIi 'STOP: Numerical' Visualization/* WUI/* Immersed_Boundary_Method/* ` == "" ]] && \
-      [[ `grep -rIi  'forrtl' Visualization/* WUI/* Immersed_Boundary_Method/* ` == "" ]]
+      [[ `grep -rIi 'Segmentation' Visualization/* WUI/* ` == "" ]] && \
+      [[ `grep -rI 'ERROR:' Visualization/* WUI/*  ` == "" ]] && \
+      [[ `grep -rIi 'STOP: Numerical' Visualization/* WUI/*  ` == "" ]] && \
+      [[ `grep -rIi  'forrtl' Visualization/* WUI/*  ` == "" ]]
    then
       stage3b_success=true
    else
       grep -rIi 'Run aborted' $OUTPUT_DIR/stage3b > $OUTPUT_DIR/stage3b_errors
-      grep -rIi 'Segmentation' Visualization/* WUI/* Immersed_Boundary_Method/* >> $OUTPUT_DIR/stage3b_errors
-      grep -rI 'ERROR:' Visualization/* WUI/* Immersed_Boundary_Method/* >> $OUTPUT_DIR/stage3b_errors
-      grep -rIi 'STOP: Numerical' Visualization/* WUI/* Immersed_Boundary_Method/* >> $OUTPUT_DIR/stage3b_errors
-      grep -rIi -A 20 'forrtl' Visualization/* WUI/* Immersed_Boundary_Method/* >> $OUTPUT_DIR/stage3b_errors
+      grep -rIi 'Segmentation' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3b_errors
+      grep -rI 'ERROR:' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3b_errors
+      grep -rIi 'STOP: Numerical' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3b_errors
+      grep -rIi -A 20 'forrtl' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3b_errors
 
       echo "Errors from Stage 3b - Run verification cases (release mode):" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage3b_errors >> $ERROR_LOG
@@ -1142,7 +1142,6 @@ generate_timing_stats()
 
    cd $smvrepo/Verification
    scripts/SMV_Cases.sh
-   scripts/GEOM_Cases.sh
 
    cd $smvrepo/Utilities/Scripts
    ./fds_timing_stats.sh smokebot > smv_timing_stats.csv
@@ -1304,9 +1303,9 @@ email_build_status()
    echo "               OS: $platform2" >> $TIME_LOG
    echo "             repo: $repo" >> $TIME_LOG
    echo "            queue: $SMOKEBOT_QUEUE" >> $TIME_LOG
-   echo "     fds revision: $FDS_REVISION" >> $TIME_LOG
-   echo "     smv revision: $GIT_REVISION" >> $TIME_LOG
-   echo "   cfast revision: $CFAST_REVISION" >> $TIME_LOG
+   echo "      fds version: $FDS_REVISION" >> $TIME_LOG
+   echo "      smv version: $GIT_REVISION" >> $TIME_LOG
+   echo "    cfast version: $CFAST_REVISION" >> $TIME_LOG
    echo "       start time: $start_time " >> $TIME_LOG
    echo "        stop time: $stop_time " >> $TIME_LOG
    echo "            setup: $DIFF_PRELIM" >> $TIME_LOG
@@ -1327,7 +1326,6 @@ email_build_status()
       echo "FDS revisions: $THIS_SMV_REVISION" >> $TIME_LOG
       echo "SMV revisions: $THIS_FDS_REVISION" >> $TIME_LOG
    fi
-   echo "          vis dir: $smvrepo/Verification/Visualization" >> $TIME_LOG
    if [ "$RUNAUTO" == "" ]; then
       echo "SMV revisions: $THIS_SMV_REVISION" >> $TIME_LOG
    fi
@@ -1346,33 +1344,30 @@ email_build_status()
      echo " Smokebot status: https://pages.nist.gov/fds-smv/smokebot_status.html" >> $TIME_LOG
    fi
    echo "-------------------------------" >> $TIME_LOG
-   if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]
-   then
+   if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]; then
      # Send email with failure message and warnings, body of email contains appropriate log file
-     cat $ERROR_LOG $TIME_LOG | mail -s "smokebot build failure and warnings on ${hostname}. Version: ${GIT_REVISION}, Branch: $SMVBRANCH." $mailTo > /dev/null
+     cat $ERROR_LOG $TIME_LOG | mail -s "smokebot failure and warnings on ${hostname}. ${GIT_REVISION}, $SMVBRANCH" $mailTo > /dev/null
 
    # Check for errors only
-   elif [ -e $ERROR_LOG ]
-   then
+   elif [ -e $ERROR_LOG ]; then
       # Send email with failure message, body of email contains error log file
-      cat $ERROR_LOG $TIME_LOG | mail -s "smokebot build failure on ${hostname}. Version: ${GIT_REVISION}, Branch: $SMVBRANCH." $mailTo > /dev/null
+      cat $ERROR_LOG $TIME_LOG | mail -s "smokebot failure on ${hostname}. ${GIT_REVISION}, $SMVBRANCH" $mailTo > /dev/null
 
    # Check for warnings only
-   elif [ -e $WARNING_LOG ]
-   then
+   elif [ -e $WARNING_LOG ]; then
      # Send email with success message, include warnings
-     cat $WARNING_LOG $TIME_LOG | mail -s "smokebot build success with warnings on ${hostname}. Version: ${GIT_REVISION}, Branch: $SMVBRANCH." $mailTo > /dev/null
+     cat $WARNING_LOG $TIME_LOG | mail -s "smokebot success with warnings on ${hostname}. ${GIT_REVISION}, $SMVBRANCH" $mailTo > /dev/null
 
    # No errors or warnings
    else
 # upload guides to a google drive directory
-      if [ "$UPLOADRESULTS" == "1" ];then
+      if [ "$UPLOADRESULTS" == "1" ]; then
         cd $smokebotdir
         $UploadGuides $NEWGUIDE_DIR $smvrepo/Manuals &> /dev/null
       fi
 
       # Send success message with links to nightly manuals
-      cat $TIME_LOG | mail -s "smokebot build success on ${hostname}! Version: ${GIT_REVISION}, Branch: $SMVBRANCH." $mailTo > /dev/null
+      cat $TIME_LOG | mail -s "smokebot success on ${hostname}. ${GIT_REVISION}, $SMVBRANCH" $mailTo > /dev/null
    fi
 }
 
