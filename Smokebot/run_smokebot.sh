@@ -11,6 +11,7 @@ function usage_all {
 echo ""
 echo "Miscellaneous:"
 echo "-a - run automatically if FDS or smokeview source has changed"
+echo "-A - run automatically if smokeview source has changed"
 echo "-b - branch_name - run smokebot using the branch branch_name "
 echo "                   [default: $BRANCH]"
 echo "-B - use startup files to set the environment not modules"

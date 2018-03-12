@@ -55,9 +55,6 @@ run_auto()
   TRIGGER_DIR=$smvrepo/Source/scripts
   GIT_SMV_FILE=$GIT_STATUSDIR/smv_revision
   GIT_SMV_LOG=$GIT_STATUSDIR/smv_log
-  
-  QUICKTRIGGER=$TRIGGER_DIR/smokebot_quicktrigger.txt
-  GIT_QT_FILE=$GIT_STATUSDIR/quicktrigger_revision
 
   TRIGGER=$SMV_SOURCE/smokebot_trigger.txt
   GIT_T_FILE=$GIT_STATUSDIR/trigger_revision
@@ -77,15 +74,9 @@ run_auto()
 
 # get info for smokeview
   cd $SMV_SOURCE
-  if [ ! -e $GIT_QT_FILE ]; then
-    touch $GIT_QT_FILE
-  fi
   if [ ! -e $GIT_T_FILE ]; then
     touch $GIT_T_FILE
   fi
-  THIS_QT_REVISION=`git log --abbrev-commit $QUICKTRIGGER | head -1 | awk '{print $2}'`
-  LAST_QT_REVISION=`cat $GIT_QT_FILE`
-
   THIS_T_REVISION=`git log --abbrev-commit $TRIGGER | head -1 | awk '{print $2}'`
   LAST_T_REVISION=`cat $GIT_T_FILE`
 
@@ -112,15 +103,10 @@ run_auto()
     if [[ $THIS_SMV_REVISION == $LAST_SMV_REVISION && $THIS_FDS_REVISION == $LAST_FDS_REVISION ]] ; then
       return 1
     fi
-  else
-    if [[ $THIS_QT_REVISION == $LAST_QT_REVISION && $THIS_T_REVISION == $LAST_T_REVISION ]] ; then
+  fi
+  if [ "$option" == "smv" ]; then
+    if [[ $THIS_SMV_REVISION == $LAST_SMV_REVISION ]] ; then
       return 1
-    fi
-    if [[ $THIS_QT_REVISION != $LAST_QT_REVISION ]] ; then
-      SMOKEBOT_LITE=1
-    fi
-    if [[ $THIS_T_REVISION != $LAST_T_REVISION ]] ; then
-      SMOKEBOT_LITE=
     fi
   fi
 
@@ -136,15 +122,11 @@ run_auto()
       echo -e "FDS source has changed. $LAST_FDS_REVISION->$THIS_FDS_REVISION($THIS_FDSAUTHOR)" >> $MESSAGE_FILE
       cat $GIT_FDS_LOG >> $MESSAGE_FILE
     fi
-  else
-    if [[ $THIS_QT_REVISION != $LAST_QT_REVISION ]] ; then
-      echo $THIS_QT_REVISION>$GIT_QT_FILE
-      echo -e "quick trigger file has changed. " >> $MESSAGE_FILE
-      cat $GIT_SMV_LOG >> $MESSAGE_FILE
-    fi
-    if [[ $THIS_T_REVISION != $LAST_T_REVISION ]] ; then
-      echo $THIS_T_REVISION>$GIT_T_FILE
-      echo -e "trigger file has changed. " >> $MESSAGE_FILE
+  fi
+  if [ "$option" == "smv" ]; then
+    if [[ $THIS_SMV_REVISION != $LAST_SMV_REVISION ]] ; then
+      echo $THIS_SMV_REVISION>$GIT_SMV_FILE
+      echo -e "smokeview source has changed. $LAST_SMV_REVISION->$THIS_SMV_REVISION($THIS_SMVAUTHOR)" >> $MESSAGE_FILE
       cat $GIT_SMV_LOG >> $MESSAGE_FILE
     fi
   fi
@@ -1318,17 +1300,8 @@ email_build_status()
    echo "      make guides: $DIFF_MAKEGUIDES" >> $TIME_LOG
    echo "            total: $DIFF_SCRIPT_TIME" >> $TIME_LOG
    echo "benchmark time(s): $TOTAL_SMV_TIMES" >> $TIME_LOG
-      if [ "$RUNAUTO" == "y" ]; then
-      echo "FDS revisions: old: $LAST_FDS_REVISION new: $THIS_FDS_REVISION" >> $TIME_LOG
-      echo "SMV revisions: old: $LAST_SMV_REVISION new: $THIS_SMV_REVISION" >> $TIME_LOG
-   fi
-   if [ "$RUNAUTO" == "Y" ]; then
-      echo "FDS revisions: $THIS_SMV_REVISION" >> $TIME_LOG
-      echo "SMV revisions: $THIS_FDS_REVISION" >> $TIME_LOG
-   fi
-   if [ "$RUNAUTO" == "" ]; then
-      echo "SMV revisions: $THIS_SMV_REVISION" >> $TIME_LOG
-   fi
+   echo "FDS revisions: old: $LAST_FDS_REVISION new: $THIS_FDS_REVISION" >> $TIME_LOG
+   echo "SMV revisions: old: $LAST_SMV_REVISION new: $THIS_SMV_REVISION" >> $TIME_LOG
   if [[ $THIS_SMV_REVISION != $LAST_SMV_REVISION ]] ; then
     cat $GIT_SMV_LOG >> $TIME_LOG
   fi
@@ -1556,7 +1529,7 @@ if [[ $RUNAUTO == "y" ]] ; then
   run_auto || exit 1
 fi
 if [[ $RUNAUTO == "Y" ]] ; then
-  run_auto trigger
+  run_auto smv || exit 1
 fi
 
 #*** if one of WEB_URL or web_DIR exist then both should exist
