@@ -95,15 +95,14 @@ Revision:~\gitrevision \\[.1in]
 
 \pagestyle{plain}
 
-\input{../Bibliography/authors}
+%\input{../Bibliography/authors}
 
 
 \chapter{Preface}
 
-This document describse the policies and procedures for developing and maintaining the models that are part of the firemodels repository including the Fire Dynamics Simulator (FDS), the Consolidated Model of Fire and Smoke Transport (CFAST), and the companion visualization program, Smokeview. Such a document is commonly referred to as a {\em Software Quality Assurance Plan}, known through the rest of this document as ``the Plan.'' This document will be updated as the necessity arises and will establish and provide the basis for a uniform and concise standard of practice for fire model development.
+This document describes the policies and procedures for developing and maintaining the fire modeling software developed at NIST including the Fire Dynamics Simulator (FDS), the Consolidated Model of Fire and Smoke Transport (CFAST), and the companion visualization program, Smokeview. Such a document is commonly referred to as a {\em Software Quality Assurance Guide}, known through the rest of this document as the ``SQA Guide.'' This document will be updated as the necessity arises and will provide the basis for a uniform and concise standard of practice for fire model development.
 
-This plan is based in part on IEEE Standard 828~\cite{IEEE-828} and ASTM~E1355~\cite{ASTM:E1355}. The volumes that make up the Technical Reference Guides for these models are based in part on ASTM E 1355, {\em Standard Guide for Evaluating the Predictive Capability of Deterministic Fire Models}~\cite{ASTM:E1355}. ASTM~E~1355 outlines the process of assessing the accuracy of a fire model. The Verification and Validation Guides for the models are the result of this evaluation process. As progress is made in fire science, the models are typically updated and improved, but still need to be shown to reliably predict the kinds of phenomena for which they were originally designed. The process to ensure this reliability includes
-
+This SQA Guide is based in part on IEEE Standard 828~\cite{IEEE-828} and ASTM~E1355~\cite{ASTM:E1355}. The volumes that make up the Technical Reference Guides for these models are based in part on ASTM E 1355, {\em Standard Guide for Evaluating the Predictive Capability of Deterministic Fire Models}~\cite{ASTM:E1355}. ASTM~E~1355 outlines the process of assessing the accuracy of a fire model. The Verification and Validation Guides for the models are the result of this evaluation process. As progress is made in fire science, the models are typically updated and improved, but still need to be shown to reliably predict the kinds of phenomena for which they were originally designed. The process to ensure this reliability includes
 \begin{itemize}
     \item Relevant documentation for the model.
 
@@ -116,19 +115,18 @@ This plan is based in part on IEEE Standard 828~\cite{IEEE-828} and ASTM~E1355~\
     \item Details of the review process used by the developers and NIST to ensure the quality of the model and related publications.
 
 \end{itemize}
-
-This document applies only to the program FDS, CFAST, the companion visualization program called Smokeview,  the related NIST and VTT publications and Internet sites, and the various utility programs that support these models. This document does not apply to third-party software developed by others not affiliated with NIST, VTT, or its software development collaborators.
+This SQA Guide applies only to the program FDS, CFAST, the companion visualization program called Smokeview,  the related NIST publications and Internet sites, and the various utility programs that support these models. This Guide does not apply to third-party software developed by others not affiliated with NIST or its software development collaborators.
 
 
 % \chapter{Disclaimer}
-\input{../Bibliography/disclaimer}
+%\input{../Bibliography/disclaimer}
 
 
 \chapter{Acknowledgments}
 
 \label{acksection}
 
-The idea for this Guide originated with Jason Floyd, a co-developer of FDS and practicing engineer at Jensen Hughes. He readily saw the need for a clear description of the process of developing and maintaining the fire models. Bryan Klein, currently with Thunderhead Engineering, Inc., and Craig Weinschenk, currently with the UL Firefighter Safety Research Institute created a number of the internet tools that are described in the Guide, including the source code repository, issue tracking system, and discussion group sites.
+The idea for the SQA Guide originated with Jason Floyd, a co-developer of FDS and practicing engineer at Jensen Hughes. He readily saw the need for a clear description of the process of developing and maintaining the fire models. Bryan Klein, currently with Thunderhead Engineering, Inc., and Craig Weinschenk, currently with the UL Firefighter Safety Research Institute created a number of the tools that are described in the SQA Guide, including the source code repository, issue tracking system, and discussion group sites.
 
 
 \newpage
