@@ -188,6 +188,7 @@ fi
 cat << EOF >> $temp_webpage
 </h3>
 EOF
+./get_user_usage.sh >> $temp_webpage
 
 # ---------------------------- host_down_entry ----------------------------------
 function host_down_entry {
