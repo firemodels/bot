@@ -69,6 +69,7 @@ run_auto()
 
   if [[ "$UPDATEREPO" == "1" ]] ; then
     update_repo smv $SMVBRANCH || return 1
+    update_repo fig master     || return 1
     update_repo fds $FDSBRANCH || return 1
   fi
 
@@ -1676,6 +1677,8 @@ if [ "$CLEANREPO" == "1" ]; then
   clean_repo2 cfast master || exit 1
   echo "   fds"
   clean_repo2 fds $FDSBRANCH || exit 1
+  echo "   fig"
+  clean_repo2 fig master || exit 1
   echo "   smv"
   clean_repo2 smv $SMVBRANCH || exit 1
 else
@@ -1685,9 +1688,11 @@ fi
 if [ "$UPDATEREPO" == "1" ]; then
   echo "Updating"
   echo "   cfast"
-  update_repo cfast master || exit 1
+  update_repo cfast master   || exit 1
   echo "   fds"
   update_repo fds $FDSBRANCH || exit 1
+  echo "   fig"
+  update_repo fig master     || exit 1
   echo "   smv"
   update_repo smv $SMVBRANCH || exit 1
 else

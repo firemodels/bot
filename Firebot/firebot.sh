@@ -1822,6 +1822,7 @@ echo "------"
 if [[ "$CLEANREPO" == "1" ]] ; then
   clean_repo2 exp master || exit 1
   clean_repo2 fds $FDSBRANCH || exit 1
+  clean_repo2 fig master || exit 1
   clean_repo2 out master || exit 1
   clean_repo2 smv $SMVBRANCH || exit 1
 fi
@@ -1832,6 +1833,7 @@ if [[ "$UPDATEREPO" == "1" ]] ; then
   echo Updating
   update_repo exp master || exit 1
   update_repo fds $FDSBRANCH || exit 1
+  update_repo fig master || exit 1
   update_repo out master || exit 1
   update_repo smv $SMVBRANCH || exit 1
 else
