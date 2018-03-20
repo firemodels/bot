@@ -1,6 +1,6 @@
 #!/bin/bash
 CUR=`pwd`
-allrepos="bot cfast cor exp fds out radcal smv"
+allrepos="bot cfast cor exp fds fig out radcal smv"
 otherrepos="webpages wikis"
 BRANCH=master
 PUSH=
