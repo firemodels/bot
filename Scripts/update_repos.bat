@@ -14,7 +14,7 @@ if not exist ..\.gitbot goto skip1
 :endif1
 
 cd %repo%\bot
-set allrepos=bot cfast cor exp fds out radcal smv
+set allrepos=bot cfast cor exp fds fig out radcal smv
 set webrepos=webpages wikis
 set BRANCH=master
 set PUSH=0
