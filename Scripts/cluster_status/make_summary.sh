@@ -176,6 +176,10 @@ cat << EOF >> $temp_webpage
 <hr>
 EOF
 
+if [ -e other_summary.html ]; then
+cat other_summary.html >> $temp_webpage
+fi
+
 cat << EOF >> $temp_webpage
 <h3>
 Load: $total_load<br>
