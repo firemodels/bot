@@ -219,7 +219,7 @@ if [ -e $updir/$host ]; then
   if [ "$load" == "" ]; then
     continue
   fi
-  if (( $(echo "$load <  1.00" | bc -l) )); then
+  if (( $(echo "$load < 0.00" | bc -l) )); then
     continue
   fi
 else
@@ -235,7 +235,7 @@ if [ -e $updir/$host ]; then
   if [ "$load" == "" ]; then
     continue
   fi
-  if (( $(echo "$load <  1.00" | bc -l) )); then
+  if (( $(echo "$load < 0.00" | bc -l) )); then
     continue
   fi
 else
@@ -255,7 +255,11 @@ else
   if (( $(echo "$load >  1.99" | bc -l) )); then
     bgcolor=#ffff00
   else
-    bgcolor=#ffffff
+    if (( $(echo "$load >  0.99" | bc -l) )); then
+      bgcolor=#33ffff
+    else
+      bgcolor=#ffffff
+    fi
   fi
 fi
 
@@ -301,10 +305,11 @@ done
 
 if [ $count -gt 0 ]; then
 cat << EOF >> $temp_webpage
-<h3>Nodes up (load>1)</h3>
+<h3>Node Usage</h3>
 <table border=on>
 <tr>
-<td bgcolor="#ffffff">1.0 &le; load &lt; 2.0</td>
+<td bgcolor="#ffffff">load &lt; 1.0</td>
+<td bgcolor="#33ffff">1.0 &le; load &lt; 2.0</td>
 <td bgcolor="#ffff00">2.0 &le; load &lt; 6.0</td>
 <td bgcolor="#ff0000">load &ge; 6.0</td>
 </tr>
