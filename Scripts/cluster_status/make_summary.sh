@@ -9,6 +9,7 @@ fi
 touch $lockfile
 
 TIMELENGTH=7.0
+HOSTS_PER_ROW=8
 
 webpage=$1
 if [ "$webpage" == "" ]; then
@@ -200,7 +201,7 @@ if [ -e $updir/$host ]; then
   continue
 fi
 count=$((count+1))
-newrow=$((count%6))
+newrow=$((count%$HOSTS_PER_ROW))
 if [ $newrow -eq 1 ]; then
   echo "<tr>" >> $temp_webpage
 fi
@@ -242,7 +243,7 @@ else
   continue
 fi
 count=$((count+1))
-newrow=$((count%6))
+newrow=$((count%$HOSTS_PER_ROW))
 if [ $newrow -eq 1 ]; then
   echo "<tr>" >> $temp_webpage
 fi
