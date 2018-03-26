@@ -156,7 +156,7 @@ cat << EOF >> $temp_webpage
           legend: { position: 'right' },
           colors: ['black'],
           hAxis:{ title: 'Day'},
-          vAxis:{ title: 'Load'}
+          vAxis:{ title: '`hostname` cluster load'}
         };
         options.legend = 'none';
 
