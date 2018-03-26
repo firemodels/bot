@@ -1417,7 +1417,7 @@ case $OPTION in
      size=64
    fi
    if [ "$COMPILER" == "gnu" ]; then
-     size=32
+     size=64
    fi
    ;;
   J)
