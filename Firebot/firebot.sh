@@ -1456,6 +1456,9 @@ if [ "$QUEUE" != "$QUEUEBENCH" ]; then
 fi
    echo "   fds revision: $GIT_REVISION " >> $TIME_LOG
    echo "  smv rewvision: $SMV_REVISION " >> $TIME_LOG
+if [ "$IFORT_VERSION" != "" ]; then
+   echo "        Fortran: $IFORT_VERSION " >> $TIME_LOG
+fi
    if [ "$FIREBOT_MODE" == "validation" ] ; then
       echo "Validation Set(s): ${CURRENT_VALIDATION_SETS[*]} " >> $TIME_LOG
    fi
@@ -1739,12 +1742,16 @@ fi
 
 #*** check for C/C++ compiler
 
+IFORT_VERSION=
 notfound=
 if [ "$COMPILER" == "intel" ]; then
    if [[ "$IFORT_COMPILER" != "" ]] ; then
       source $IFORT_COMPILER/bin/compilervars.sh intel64
    fi
-   notfound=`icc -help 2>&1 | tail -1 | grep "not found" | wc -l`
+   notfound=`ifort -help 2>&1 | tail -1 | grep "not found" | wc -l`
+   if [ $notfound -eq 0 ]; then
+     IFORT_VERSION=`ifort -v 2>&1`
+   fi
 else
    notfound=`gcc -help 2>&1 | tail -1 | grep "not found" | wc -l`
 fi
@@ -1765,7 +1772,7 @@ if [ "$USEINSTALL" != "" ]; then
 fi
 
 notfound=
-if [ "QUEUE" == "none"]; then
+if [ "QUEUE" == "none" ]; then
    notfound=`background -v 2>&1 | tail -1 | grep "not found" | wc -l`
    if [ $notfound == 1 ]; then
       echo "Error: The program background was not found.  firebot aborted"
@@ -1784,6 +1791,9 @@ echo "--------"
 echo "     FDS repo: $fdsrepo"
 echo "     SMV repo: $smvrepo"
 echo "      Run dir: $firebotdir"
+if [ "$IFORT_VERSION" != "" ]; then
+  echo "      Fortran: $IFORT_VERSION"
+fi
 if [ "$CLEANREPO" == "1" ]; then
   echo "  clean repos: yes"
 else

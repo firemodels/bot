@@ -9,7 +9,7 @@ fi
 touch $lockfile
 
 TIMELENGTH=7.0
-HOSTS_PER_ROW=8
+HOSTS_PER_ROW=6
 
 webpage=$1
 if [ "$webpage" == "" ]; then
@@ -244,8 +244,19 @@ else
 fi
 count=$((count+1))
 newrow=$((count%$HOSTS_PER_ROW))
+
+if [ -e ./newrow.sh ]; then
+  source ./newrow.sh $host $temp_webpage
+fi
+
 if [ $newrow -eq 1 ]; then
   echo "<tr>" >> $temp_webpage
+  if [ "$BEGIN" == "1" ]; then
+    if [ -e ./firstqueue.sh ]; then
+      source ./firstqueue.sh $temp_webpage
+      count=2
+    fi
+  fi
 fi
 
 load=`cat $updir/$host`
@@ -326,9 +337,11 @@ EOF
 
 count=0
 newrow=0
+BEGIN=1
 for host in $UP_HOSTS
 do
 host_entry
+BEGIN=0
 done
 if [ $newrow -ne 0 ]; then
   echo "</tr>" >> $temp_webpage
