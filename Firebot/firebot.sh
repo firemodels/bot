@@ -1107,12 +1107,20 @@ check_matlab_verification()
 {
    # Scan for and report any errors in Matlab scripts
    cd $firebotdir
-   if [[ `grep "Error" $OUTPUT_DIR/stage7a_verification` == "" ]]
+   if [[ `grep "Warning" $OUTPUT_DIR/stage7a_verification` == "" ]]
    then
       matlab_verification_success=true
    else
+      echo "Warnings from Stage 7a - Matlab plotting and statistics (verification):" >> $WARNING_LOG
+      grep -B 5 -A 50 "Warning" $OUTPUT_DIR/stage7a_verification >> $WARNING_LOG
+      echo "" >> $WARNING_LOG
+   fi
+   if [[ `grep "Error" $OUTPUT_DIR/stage7a_verification` == "" ]]
+   then
+      matlab_verification_success=false
+   else
       echo "Errors from Stage 7a - Matlab plotting and statistics (verification):" >> $ERROR_LOG
-      grep -B 5 -A 50 "Error" $OUTPUT_DIR/stage7a_verification | tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
+      grep -B 5 -A 50 "Error" $OUTPUT_DIR/stage7a_verification >> $ERROR_LOG
       echo "" >> $ERROR_LOG
    fi
 }
