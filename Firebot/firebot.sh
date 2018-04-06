@@ -1107,12 +1107,12 @@ check_matlab_verification()
 {
    # Scan for and report any errors in Matlab scripts
    cd $firebotdir
-   if [[ `grep "Warning" $OUTPUT_DIR/stage7a_verification` == "" ]]
+   if [[ `grep "Warning" $OUTPUT_DIR/stage7a_verification | grep -v disabled` == "" ]]
    then
       matlab_verification_success=true
    else
       echo "Warnings from Stage 7a - Matlab plotting and statistics (verification):" >> $WARNING_LOG
-      grep -B 5 -A 50 "Warning" $OUTPUT_DIR/stage7a_verification >> $WARNING_LOG
+      grep -B 5 -A 50 "Warning" $OUTPUT_DIR/stage7a_verification | grep -v disabled >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
    if [[ `grep "Error" $OUTPUT_DIR/stage7a_verification` == "" ]]
