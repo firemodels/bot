@@ -886,7 +886,7 @@ compile_vvcalc()
    echo "   build VandV_Calcs" 
    CD_REPO $cfastrepo/Build/VandV_Calcs/${compiler}_${platform}_${size} $cfastbranch || return 1
    make -f ../makefile clean &> /dev/null
-   ./make_vv.sh &> $OUTPUT_DIR/stage7c
+   ./make_vv.sh &> $OUTPUT_DIR/stage6b
 
    return 0
 }
@@ -900,21 +900,21 @@ check_compile_vvcalc()
    CD_REPO $cfastrepo/Build/VandV_Calcs/${compiler}_${platform}_${size} $cfastbranch || return 1
    if [[ -e "VandV_Calcs_${platform}_${size}" ]]
    then
-      stage7c_success=true
+      stage6b_success=true
    else
-      echo "Errors from Stage 7b - Compile VandV_Calcs:" >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage7c >> $ERROR_LOG
+      echo "Errors from Stage 6b - Compile VandV_Calcs:" >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage6b >> $ERROR_LOG
       echo "" >> $ERROR_LOG
    fi
 
    # Check for compiler warnings/remarks
-   if [[ `grep -A 5 -E 'warning|remark' ${OUTPUT_DIR}/stage7c` == "" ]]
+   if [[ `grep -A 5 -E 'warning|remark' ${OUTPUT_DIR}/stage6b` == "" ]]
    then
       # Continue along
       :
    else
-      echo "Warnings from Stage 7b - Compile VV calcs:" >> $WARNING_LOG
-      grep -A 5 -E 'warning|remark' ${OUTPUT_DIR}/stage7c >> $WARNING_LOG
+      echo "Warnings from Stage 6b - Compile VV calcs:" >> $WARNING_LOG
+      grep -A 5 -E 'warning|remark' ${OUTPUT_DIR}/stage6b >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
    return 0
@@ -931,7 +931,7 @@ run_matlab_verification()
    # Run Matlab plotting script
    CD_REPO $cfastrepo/Utilities/Matlab $cfastbranch || return 1
 
-   matlab -logfile vermat.log -nodesktop -noFigureWindows -r "try, disp('Running Matlab Verification script'), CFAST_verification_script, catch, disp('Error'), err = lasterror, err.message, err.stack, end, exit" &> $OUTPUT_DIR/stage7b_verification
+   matlab -logfile vermat.log -nodesktop -noFigureWindows -r "try, disp('Running Matlab Verification script'), CFAST_verification_script, catch, disp('Error'), err = lasterror, err.message, err.stack, end, exit" &> $OUTPUT_DIR/stage6a_verification
    return 0
 }
 
@@ -944,15 +944,15 @@ check_matlab_verification()
    # Scan and report any errors in Matlab scripts
    cd $cfastbotdir
 
-   if [[ `grep -A 50 "Error" $OUTPUT_DIR/stage7b_verification` == "" ]]
+   if [[ `grep -A 50 "Error" $OUTPUT_DIR/stage6a_verification` == "" ]]
    then
-      stage7b_success=true
+      stage6a_success=true
    else
-      grep -A 50 "Error" $OUTPUT_DIR/stage7b_verification >> $OUTPUT_DIR/stage7b_warnings
+      grep -A 50 "Error" $OUTPUT_DIR/stage6a_verification >> $OUTPUT_DIR/stage6a_verification_errors
 
-      echo "Warnings from Stage 7c - Matlab plotting (verification):" >> $WARNING_LOG
-      cat $OUTPUT_DIR/stage7b_warnings |  tr -cd '\11\12\15\40-\176' >> $WARNING_LOG
-      echo "" >> $WARNING_LOG
+      echo "Warnings from Stage 6a - Matlab plotting (verification):" >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage6a_verification_errors | tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
+      echo "" >> $ERROR_LOG
    fi
 }
 
@@ -976,7 +976,7 @@ run_matlab_validation()
    echo "      make plots"
    # Run Matlab plotting script
    cd $cfastrepo/Utilities/Matlab
-   matlab -logfile valmat.log -nodesktop -noFigureWindows -r "try, disp('Running Matlab Validation script'), CFAST_validation_script, catch, disp('Error'), err = lasterror, err.message, err.stack, end, exit" &> $OUTPUT_DIR/stage7d_validation
+   matlab -logfile valmat.log -nodesktop -noFigureWindows -r "try, disp('Running Matlab Validation script'), CFAST_validation_script, catch, disp('Error'), err = lasterror, err.message, err.stack, end, exit" &> $OUTPUT_DIR/stage6c_validation
    return 0
 }
 
@@ -988,15 +988,15 @@ check_matlab_validation()
 {
    # Scan and report any errors in Matlab scripts
    cd $cfastbotdir
-   if [[ `grep -A 50 "Error" $OUTPUT_DIR/stage7d_validation` == "" ]]
+   if [[ `grep -A 50 "Error" $OUTPUT_DIR/stage6c_validation` == "" ]]
    then
-      stage7d_success=true
+      stage6c_success=true
    else
-      grep -A 50 "Error" $OUTPUT_DIR/stage7d_validation >> $OUTPUT_DIR/stage7d_warnings
+      grep -A 50 "Error" $OUTPUT_DIR/stage6c_validation >> $OUTPUT_DIR/stage6c_validation_errors
 
-      echo "Warnings from Stage 7d - Matlab plotting and statistics (validation):" >> $WARNING_LOG
-      cat $OUTPUT_DIR/stage7d_warnings |  tr -cd '\11\12\15\40-\176' >> $WARNING_LOG
-      echo "" >> $WARNING_LOG
+      echo "Errors from Stage 6c - Matlab plotting and statistics (validation):" >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage6c_validation_errors |  tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
+      echo "" >> $ERROR_LOG
    fi
 }
 
@@ -1020,7 +1020,7 @@ check_validation_stats()
          # Continue along
          :
       else
-         echo "Warnings from Stage 7b - Matlab plotting and statistics (validation):" >> $VALIDATION_STATS_LOG
+         echo "Warnings from Stage 6c - Matlab plotting and statistics (validation):" >> $VALIDATION_STATS_LOG
          echo "-------------------------------" >> $VALIDATION_STATS_LOG
          echo "Validation statistics are different from baseline statistics." >> $VALIDATION_STATS_LOG
          echo "Baseline validation statistics vs. Revision ${GIT_REVISION}:" >> $VALIDATION_STATS_LOG
