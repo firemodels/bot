@@ -1109,10 +1109,10 @@ check_matlab_verification()
    cd $firebotdir
    if [[ `grep "Error" $OUTPUT_DIR/stage7a_verification` == "" ]]
    then
-      matlab_verification_success=false
+      matlab_verification_success=true
    else
       echo "Errors from Stage 7a - Matlab plotting and statistics (verification):" >> $ERROR_LOG
-      grep -B 5 -A 50 "Error" $OUTPUT_DIR/stage7a_verification |  tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
+      grep -B 5 -A 50 "Error" $OUTPUT_DIR/stage7a_verification | tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
       echo "" >> $ERROR_LOG
    fi
 }
