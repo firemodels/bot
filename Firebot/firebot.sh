@@ -1471,16 +1471,16 @@ fi
 
 #  upload guides to a google drive directory
    if [[ "$UPLOADGUIDES" == "1" ]]; then
+     cd $firebotdir
      $UploadGuides $NEWGUIDE_DIR $fdsrepo/Manuals &> $OUTPUT_DIR/stage10_upload_google
-     if [[ `grep -E 'warning' $OUTPUT_DIR/stage10_upload_google` == "" ]]
-   then
-      # Continue along
-      :
-   else
-      echo "Warnings from Stage 10 - Upload documents to google drive:" >> $WARNING_LOG
-      grep -E 'warning' $OUTPUT_DIR/stage10_upload_google >> $WARNING_LOG
-      echo "" >> $WARNING_LOG
-   fi
+     if [[ `grep -E 'warning' $OUTPUT_DIR/stage10_upload_google` == "" ]]; then
+       # Continue along
+       :
+      else
+        echo "Warnings from Stage 10 - Upload documents to google drive:" >> $WARNING_LOG
+        grep -E 'warning' $OUTPUT_DIR/stage10_upload_google >> $WARNING_LOG
+        echo "" >> $WARNING_LOG
+     fi
    fi
 
    # Check for warnings and errors

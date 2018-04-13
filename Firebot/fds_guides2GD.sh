@@ -34,6 +34,9 @@ UPLOADFIGURES ()
   tar cvf ../$tarfile . &> /dev/null
   cd ..
   gzip $tarfile
+  if [ -e $HOME/.firebot/pubs ]; then
+    cp $tarfile.gz $HOME/.firebot/pubs/.
+  fi
   $GDRIVE list  | grep $tarfile.gz | awk '{ system("~/bin/gdrive delete -i " $1)} '
   $GDRIVE upload -p $FIGURES_PARENT_ID -f $tarfile.gz
   npubs=`$GDRIVE list  | grep $tarfile.gz | wc -l`
