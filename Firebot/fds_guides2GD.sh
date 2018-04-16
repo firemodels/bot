@@ -15,6 +15,13 @@ UPLOADGUIDE ()
   FILEnew=${FILE}.pdf
   $GDRIVE list  | grep $FILEnew | awk '{ system("~/bin/gdrive delete -i " $1)} '
   $GDRIVE upload -p $MANUAL_PARENT_ID -f $FILEnew
+  npubs=`$GDRIVE list  | grep $FILEnew | wc -l`
+  if [ $npubs -eq 0 ]; then
+    echo "*** warning: The guide $FILEnew failed to upload to google drive"
+  fi
+  if [ $npubs -gt 1 ]; then
+    echo "*** warning: More than one copy of $FILEnew exists on google drive"
+  fi
 }
 UPLOADFIGURES ()
 {
@@ -27,8 +34,18 @@ UPLOADFIGURES ()
   tar cvf ../$tarfile . &> /dev/null
   cd ..
   gzip $tarfile
+  if [ -e $HOME/.firebot/pubs ]; then
+    cp $tarfile.gz $HOME/.firebot/pubs/.
+  fi
   $GDRIVE list  | grep $tarfile.gz | awk '{ system("~/bin/gdrive delete -i " $1)} '
   $GDRIVE upload -p $FIGURES_PARENT_ID -f $tarfile.gz
+  npubs=`$GDRIVE list  | grep $tarfile.gz | wc -l`
+  if [ $npubs -eq 0 ]; then
+    echo "*** warning: The $tarfile.gz failed to upload to google drive"
+  fi
+  if [ $npubs -gt 1 ]; then
+    echo "*** warning: More than one copy of $tarfile.gz exists on google drive"
+  fi
 }
 
 if [ -e $GDRIVE ] ; then

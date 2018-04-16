@@ -1469,6 +1469,20 @@ fi
    fi
    echo "-------------------------------" >> $TIME_LOG
 
+#  upload guides to a google drive directory
+   if [[ "$UPLOADGUIDES" == "1" ]]; then
+     cd $firebotdir
+     $UploadGuides $NEWGUIDE_DIR $fdsrepo/Manuals &> $OUTPUT_DIR/stage10_upload_google
+     if [[ `grep -E 'warning' $OUTPUT_DIR/stage10_upload_google` == "" ]]; then
+       # Continue along
+       :
+      else
+        echo "Warnings from Stage 10 - Upload documents to google drive:" >> $WARNING_LOG
+        grep -E 'warning' $OUTPUT_DIR/stage10_upload_google >> $WARNING_LOG
+        echo "" >> $WARNING_LOG
+     fi
+   fi
+
    # Check for warnings and errors
    if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]
    then
@@ -1500,10 +1514,6 @@ fi
       cat $TIME_LOG | mail -s "[$botuser] $bottype success! Version: ${GIT_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
    fi
 
-#  upload guides to a google drive directory
-   if [[ "$UPLOADGUIDES" == "1" ]]; then
-     $UploadGuides $NEWGUIDE_DIR $fdsrepo/Manuals &> /dev/null
-   fi
 }
 
 #VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
