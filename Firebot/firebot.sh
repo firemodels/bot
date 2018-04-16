@@ -1270,6 +1270,7 @@ check_guide()
    local guidelog=$1
    local doc=$2
    local label=$3
+   local upload=$4
    
    # Scan for and report any errors or warnings in build process for guides
    cd $firebotdir
@@ -1283,12 +1284,29 @@ check_guide()
    else
       # Guide built successfully; there were no errors/warnings
       # Copy guide to Firebot's local website
-      if [[ "$UPLOADGUIDES" == "1" ]]; then
+      if [[ "$UPLOADGUIDES" == "1" ]] && [[ "$upload" == "1" ]]; then
         cp $doc /var/www/html/firebot/manuals/
         cp $doc $NEWGUIDE_DIR/.
       fi
       cp $doc $SAVEGUIDE_DIR/.
    fi
+}
+
+#---------------------------------------------
+#                   make_geom_notes
+#---------------------------------------------
+
+make_geom_notes()
+{
+   cd $fdsrepo/Manuals/FDS_User_Guide
+
+   echo "  geom notes"
+   # Build FDS User Guide
+   ./make_geom_notes.sh &> $OUTPUT_DIR/stage8_geom_notes
+
+   # Check guide for completion - for now do note upload
+   # (change 0 to 1 in following line to upload)
+   check_guide $OUTPUT_DIR/stage8_geom_notes $fdsrepo/Manuals/FDS_User_Guide/geom_notes.pdf 'geom_notes' 0
 }
 
 #---------------------------------------------
@@ -1305,7 +1323,7 @@ make_fds_user_guide()
    ./make_guide.sh &> $OUTPUT_DIR/stage8_fds_user_guide
 
    # Check guide for completion and copy to website if successful
-   check_guide $OUTPUT_DIR/stage8_fds_user_guide $fdsrepo/Manuals/FDS_User_Guide/FDS_User_Guide.pdf 'FDS User Guide'
+   check_guide $OUTPUT_DIR/stage8_fds_user_guide $fdsrepo/Manuals/FDS_User_Guide/FDS_User_Guide.pdf 'FDS User Guide' 1
 }
 
 #---------------------------------------------
@@ -1321,7 +1339,7 @@ make_fds_technical_guide()
    ./make_guide.sh &> $OUTPUT_DIR/stage8_fds_technical_guide
 
    # Check guide for completion and copy to website if successful
-   check_guide $OUTPUT_DIR/stage8_fds_technical_guide $fdsrepo/Manuals/FDS_Technical_Reference_Guide/FDS_Technical_Reference_Guide.pdf 'FDS Technical Reference Guide'
+   check_guide $OUTPUT_DIR/stage8_fds_technical_guide $fdsrepo/Manuals/FDS_Technical_Reference_Guide/FDS_Technical_Reference_Guide.pdf 'FDS Technical Reference Guide' 1
 }
 
 #---------------------------------------------
@@ -1337,7 +1355,7 @@ make_fds_verification_guide()
    ./make_guide.sh &> $OUTPUT_DIR/stage8_fds_verification_guide
 
    # Check guide for completion and copy to website if successful
-   check_guide $OUTPUT_DIR/stage8_fds_verification_guide $fdsrepo/Manuals/FDS_Verification_Guide/FDS_Verification_Guide.pdf 'FDS Verification Guide'
+   check_guide $OUTPUT_DIR/stage8_fds_verification_guide $fdsrepo/Manuals/FDS_Verification_Guide/FDS_Verification_Guide.pdf 'FDS Verification Guide' 1
 }
 
 #---------------------------------------------
@@ -1353,7 +1371,7 @@ make_fds_validation_guide()
    ./make_guide.sh &> $OUTPUT_DIR/stage8_fds_validation_guide
 
    # Check guide for completion and copy to website if successful
-   check_guide $OUTPUT_DIR/stage8_fds_validation_guide $fdsrepo/Manuals/FDS_Validation_Guide/FDS_Validation_Guide.pdf 'FDS Validation Guide'
+   check_guide $OUTPUT_DIR/stage8_fds_validation_guide $fdsrepo/Manuals/FDS_Validation_Guide/FDS_Validation_Guide.pdf 'FDS Validation Guide' 1
 }
 
 #---------------------------------------------
@@ -1370,7 +1388,7 @@ make_fds_Config_management_plan()
 
    # Check guide for completion and copy to website if successful
    # note: script that uploads pdf to google doens't like the name so it has been shortened to FDS_Config_Management_Plan
-   check_guide $OUTPUT_DIR/stage8_fds_Config_management_plan $fdsrepo/Manuals/FDS_Config_Management_Plan/FDS_Config_Management_Plan.pdf 'FDS Config Management Plan'
+   check_guide $OUTPUT_DIR/stage8_fds_Config_management_plan $fdsrepo/Manuals/FDS_Config_Management_Plan/FDS_Config_Management_Plan.pdf 'FDS Config Management Plan' 1
 }
 
 #---------------------------------------------
@@ -1990,6 +2008,7 @@ if [ "$FIREBOT_LITE" == "" ]; then
     if [ "$SKIPMATLAB" == "" ] ; then
       if [ "$SKIPFIGURES" == "" ] ; then
         make_fds_user_guide
+        make_geom_notes
         make_fds_verification_guide
         make_fds_technical_guide
         make_fds_validation_guide
