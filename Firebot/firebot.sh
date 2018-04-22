@@ -855,7 +855,7 @@ run_verification_cases_release()
    cd $fdsrepo/Verification/scripts
    # Run FDS with 1 OpenMP thread
    echo 'Running FDS benchmark verification cases:' >> $OUTPUT_DIR/stage5
-   ./Run_FDS_Cases.sh $INTEL2 $DV2 -b -o 1 -q $QUEUEBENCH >> $OUTPUT_DIR/stage5 2>&1
+   ./Run_FDS_Cases.sh $INTEL2 $DV2 -b -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
    echo "" >> $OUTPUT_DIR/stage5 2>&1
 
    # Wait for benchmark verification cases to end
@@ -1469,9 +1469,6 @@ email_build_status()
    echo "             OS: $platform2 " >> $TIME_LOG
    echo "           repo: $repo " >> $TIME_LOG
    echo "          queue: $QUEUE " >> $TIME_LOG
-if [ "$QUEUE" != "$QUEUEBENCH" ]; then
-   echo "benchmark queue: $QUEUEBENCH " >> $TIME_LOG
-fi
    echo "   fds revision: $GIT_REVISION " >> $TIME_LOG
    echo "  smv rewvision: $SMV_REVISION " >> $TIME_LOG
 if [ "$IFORT_VERSION" != "" ]; then
@@ -1614,12 +1611,11 @@ DV=
 DV2=
 INTEL=
 INTEL2=
-QUEUEBENCH=
 BUILD_BUNDLE=
 
 #*** parse command line arguments
 
-while getopts 'b:cCdD:FhIiJLm:p:Pq:Q:sSTuUV:' OPTION
+while getopts 'b:cCdD:FhIiJLm:p:Pq:sSTuUV:' OPTION
 do
 case $OPTION in
   b)
@@ -1670,9 +1666,6 @@ case $OPTION in
   q)
    QUEUE="$OPTARG"
    ;;
-  Q)
-   QUEUEBENCH="$OPTARG"
-   ;;
   s)
    SKIPMATLAB=1
    ;;
@@ -1713,10 +1706,6 @@ fi
 
 if [[ "$QUEUE" == "none" ]] && [[ -e $SCRIPTFILES ]]; then
   rm -f $SCRIPTFILES
-fi
-
-if [ "$QUEUEBENCH" == "" ]; then
-  QUEUEBENCH=$QUEUE
 fi
 
 if [ "$caselistfile" != "" ]; then
