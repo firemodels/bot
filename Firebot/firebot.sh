@@ -1473,7 +1473,7 @@ if [ "$QUEUE" != "$QUEUEBENCH" ]; then
    echo "benchmark queue: $QUEUEBENCH " >> $TIME_LOG
 fi
    echo "   fds revision: $GIT_REVISION " >> $TIME_LOG
-   echo "  smv rewvision: $SMV_REVISION " >> $TIME_LOG
+   echo "   smv revision: $SMV_REVISION " >> $TIME_LOG
 if [ "$IFORT_VERSION" != "" ]; then
    echo "        Fortran: $IFORT_VERSION " >> $TIME_LOG
 fi
