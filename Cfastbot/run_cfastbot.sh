@@ -196,11 +196,11 @@ case $OPTION  in
   k)
    KILL_CFASTBOT="1"
    ;;
-  M)
-   MATLABEXE="-L"
-   ;;
   m)
    EMAIL="$OPTARG"
+   ;;
+  M)
+   MATLABEXE="-M"
    ;;
   q)
    QUEUE="$OPTARG"
