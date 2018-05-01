@@ -492,8 +492,7 @@ wait_cases_debug_end()
    else
      while [[ `qstat -a | awk '{print $2 $4}' | grep $(whoami) | grep $JOBPREFIX` != '' ]]; do
         JOBS_REMAINING=`qstat -a | awk '{print $2 $4}' | grep $(whoami) | grep $JOBPREFIX | wc -l`
-        CURRENT_DATE=`date`
-        echo "Waiting for ${JOBS_REMAINING} ${1} cases to complete. $CURRENT_DATE" >> $OUTPUT_DIR/stage4
+        echo "Waiting for ${JOBS_REMAINING} ${1} cases to complete." >> $OUTPUT_DIR/stage4
         TIME_LIMIT_STAGE="3"
         check_time_limit
         sleep 30
@@ -832,8 +831,7 @@ wait_cases_release_end()
    else
      while [[ `qstat -a | awk '{print $2 $4}' | grep $(whoami) | grep $JOBPREFIX` != '' ]]; do
         JOBS_REMAINING=`qstat -a | awk '{print $2 $4}' | grep $(whoami) | grep $JOBPREFIX | wc -l`
-        CURRENT_DATE=`date`
-        echo "Waiting for ${JOBS_REMAINING} verification cases to complete. $CURRENT_DATE" >> $OUTPUT_DIR/stage5
+        echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage5
         TIME_LIMIT_STAGE="5"
         check_time_limit
         if [ "$FIREBOT_MODE" == "validation" ] ; then
