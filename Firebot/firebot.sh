@@ -1617,7 +1617,7 @@ BUILD_BUNDLE=
 
 #*** parse command line arguments
 
-while getopts 'b:cCdD:FhIiJLm:Mp:Pq:Q:sSTuUV:' OPTION
+while getopts 'b:cCdD:FhIiJLm:p:Pq:Q:sSTuUV:' OPTION
 do
 case $OPTION in
   b)
@@ -1658,9 +1658,10 @@ case $OPTION in
    ;;
   m)
    mailToFDS="$OPTARG"
-   ;;
-  M)
-   REPOEMAIL="1"
+   if [ "$mailToFDS" == "firebot" ]; then
+     REPOEMAIL="1"
+     mailToFDS=
+   fi
    ;;
   p)
    PID_FILE="$OPTARG"
