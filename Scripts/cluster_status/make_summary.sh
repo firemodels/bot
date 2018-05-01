@@ -240,7 +240,8 @@ if [ -e $updir/$host ]; then
     continue
   fi
 else
-  continue
+   load=0.0
+#  continue
 fi
 count=$((count+1))
 newrow=$((count%$HOSTS_PER_ROW))
@@ -259,7 +260,11 @@ if [ $newrow -eq 1 ]; then
   fi
 fi
 
+if [ -e $updir/$host ]; then
 load=`cat $updir/$host`
+else
+load=0.0
+fi
 
 if (( $(echo "$load >  5.99" | bc -l) )); then
   bgcolor=#ff0000
@@ -275,36 +280,21 @@ else
   fi
 fi
 
+if [ -e $downdir/$host ]; then
+  bgcolor=#000000
+cat << EOF >> $temp_webpage
+<td bgcolor="$bgcolor"><font color="white">$host</font></td>
+EOF
+else
 cat << EOF >> $temp_webpage
 <td bgcolor="$bgcolor"><font color="black">$host $load</font></td>
 EOF
+fi
 
 if [ $newrow -eq 0 ]; then
   echo "</tr>" >> $temp_webpage
 fi
 }
-
-num_downhosts=`ls -l $downdir | wc -l`
-if [ $num_downhosts -gt 1 ]; then
-cat << EOF >> $temp_webpage
-<h3>Nodes down</h3>
-<table border=on>
-EOF
-
-count=0
-newrow=0
-for host in $ALL_HOSTS
-do
-host_down_entry
-done
-
-if [ $newrow -ne 0 ]; then
-  echo "</tr>" >> $temp_webpage
-fi
-cat << EOF >> $temp_webpage
-</table>
-EOF
-fi
 
 # count entries
 count=0
@@ -324,6 +314,7 @@ cat << EOF >> $temp_webpage
 <td bgcolor="#33ffff">1.0 &le; load &lt; 2.0</td>
 <td bgcolor="#ffff00">2.0 &le; load &lt; 6.0</td>
 <td bgcolor="#ff0000">load &ge; 6.0</td>
+<td bgcolor="#000000"><font color="white">Down</font></td>
 </tr>
 </table>
 EOF
@@ -338,7 +329,8 @@ EOF
 count=0
 newrow=0
 BEGIN=1
-for host in $UP_HOSTS
+#for host in $UP_HOSTS
+for host in $ALL_HOSTS
 do
 host_entry
 BEGIN=0
