@@ -1600,9 +1600,7 @@ push=
 
 DB=_db
 
-# Load mailing list for status report
-source $firebotdir/firebot_email_list.sh
-
+REPOEMAIL=
 UPLOADGUIDES=0
 GIT_REVISION=
 SKIPMATLAB=
@@ -1619,7 +1617,7 @@ BUILD_BUNDLE=
 
 #*** parse command line arguments
 
-while getopts 'b:cCdD:FhIiJLm:p:Pq:Q:sSTuUV:' OPTION
+while getopts 'b:cCdD:FhIiJLm:Mp:Pq:Q:sSTuUV:' OPTION
 do
 case $OPTION in
   b)
@@ -1661,6 +1659,9 @@ case $OPTION in
   m)
    mailToFDS="$OPTARG"
    ;;
+  M)
+   REPOEMAIL="1"
+   ;;
   p)
    PID_FILE="$OPTARG"
    ;;
@@ -1698,6 +1699,18 @@ case $OPTION in
 esac
 done
 shift $(($OPTIND-1))
+
+# Load mailing list for status report
+if [ "$REPOEMAIL" == "1" ]; then
+  source $firebotdir/firebot_email_list.sh
+else
+  if [ "$mailToFDS" == "" ]; then
+    mailToFDS=`git config user.email`
+  fi
+fi
+if [ "$mailToFDS" == "" ]; then
+  mailToFDS=`whoami`@`hostname`
+fi
 
 #*** make sure firebot is running in correct directory
 

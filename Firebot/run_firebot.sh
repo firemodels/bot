@@ -154,6 +154,7 @@ fi
 
 #*** define initial values
 
+REPOEMAIL=
 USEINSTALL=
 BRANCH=master
 botscript=firebot.sh
@@ -185,7 +186,7 @@ export QFDS_STARTUP=
 
 #*** parse command line options
 
-while getopts 'b:BcdCD:FfHhIiJKkLm:Pq:Q:nRsSuTUvV:' OPTION
+while getopts 'b:BcdCD:FfHhIiJKkLm:MPq:Q:nRsSuTUvV:' OPTION
 do
 case $OPTION  in
   b)
@@ -240,6 +241,9 @@ case $OPTION  in
    ;;
   m)
    EMAIL="$OPTARG"
+   ;;
+  M)
+   REPOEMAIL="-M"
    ;;
   q)
    QUEUE="$OPTARG"
@@ -355,7 +359,7 @@ fi
 BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
-$ECHO  ./$botscript -p $firebot_pid $commit $push $UPDATE $DV $INTEL $debug_mode $showcaselist $caselistfile $MAX_VALIDATION_PROCESSES $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUEBENCH $QUEUE $SKIPMATLAB $BUILD_BUNDLE $SKIPFIGURES $EMAIL "$@"
+$ECHO  ./$botscript -p $firebot_pid $commit $push $UPDATE $DV $INTEL $debug_mode $showcaselist $caselistfile $MAX_VALIDATION_PROCESSES $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUEBENCH $QUEUE $SKIPMATLAB $BUILD_BUNDLE $SKIPFIGURES $EMAIL $REPOEMAIL "$@"
 if [ -e $firebot_pid ]; then
   rm $firebot_pid
 fi
