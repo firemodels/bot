@@ -146,7 +146,6 @@ fi
 botrepo=$reponame/bot
 botbranch=master
 
-REPOEMAIL=
 RUNAUTO=
 UPDATEREPO=
 CLEANREPO=0
@@ -166,7 +165,7 @@ USEINSTALL=
 KILL_CFASTBOT=
 ECHO=
 
-while getopts '3acfhHiI:kLm:Mq:RsuUv' OPTION
+while getopts '3acfhHiI:km:Mq:RsuUv' OPTION
 do
 case $OPTION  in
   3)
@@ -197,14 +196,11 @@ case $OPTION  in
   k)
    KILL_CFASTBOT="1"
    ;;
-  L)
+  M)
    MATLABEXE="-L"
    ;;
   m)
    EMAIL="$OPTARG"
-   ;;
-  M)
-   REPOEMAIL="-M"
    ;;
   q)
    QUEUE="$OPTARG"
@@ -307,7 +303,7 @@ QUEUE="-q $QUEUE"
 compiler="-I $compiler"
 PID="-p $cfastbot_pid"
 cd $CURDIR
-$ECHO  ./cfastbot.sh $PID $REPO $USEINSTALL $RUNAUTO $size $compiler $UPDATEREPO $CLEAN $QUEUE $SKIP $MATLABEXE $UPLOAD $EMAIL $REPOEMAIL "$@"
+$ECHO  ./cfastbot.sh $PID $REPO $USEINSTALL $RUNAUTO $size $compiler $UPDATEREPO $CLEAN $QUEUE $SKIP $MATLABEXE $UPLOAD $EMAIL "$@"
 if [ -e $cfastbot_pid ]; then
   rm $cfastbot_pid
 fi   

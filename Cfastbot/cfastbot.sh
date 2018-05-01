@@ -1324,7 +1324,7 @@ if [[ "$IFORT_COMPILER" != "" ]] ; then
   source $IFORT_COMPILER/bin/compilervars.sh intel64
 fi
 
-while getopts '3achiI:m:MLp:q:r:suU' OPTION
+while getopts '3achiI:m:Mp:q:r:suU' OPTION
 do
 case $OPTION in
    3)
@@ -1348,14 +1348,15 @@ case $OPTION in
   I)
    compiler="$OPTARG"
    ;;
-  L)
+  M)
    MATLABEXE=1
    ;;
   m)
    mailTo="$OPTARG"
-   ;;
-  M)
-   REPOEMAIL="1"
+   if [ "$mailTo" == "cfastbot" ]; then
+     REPOEMAIL="1"
+     mailTo=
+   fi
    ;;
   p)
    PID_FILE="$OPTARG"
