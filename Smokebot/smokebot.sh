@@ -1366,6 +1366,7 @@ web_DIR=
 WEB_URL=
 SMOKEBOT_LITE=
 export SCRIPTFILES=$smokebotdir/scriptfiles
+EMAILREPO=
 
 WEBBRANCH=nist-pages
 FDSBRANCH=master
@@ -1429,6 +1430,10 @@ case $OPTION in
    ;;
   m)
    MAILTO="$OPTARG"
+   if [ "$MAILTO" == "smokebot" ]; then
+     MAILTO=
+     EMAILREPO="1"
+   fi
    ;;
   M)
    MAKEMOVIES="1"
@@ -1632,14 +1637,21 @@ if [ -e $FDS_STATUS_FILE ] ; then
 fi
 
 # Load mailing list for status report
-source $smokebotdir/smokebot_email_list.sh
-
-mailTo=$mailToSMV
-if [[ "$LAST_FDS_FAILED" == "1" ]] ; then
-  mailTo=$mailToFDS
+if [ "$EMAILREPO" == "1" ]; then
+  source $smokebotdir/smokebot_email_list.sh
+  mailTo=$mailToSMV
+  if [[ "$LAST_FDS_FAILED" == "1" ]] ; then
+    mailTo=$mailToFDS
+  fi
 fi
 if [[ "$MAILTO" != "" ]]; then
   mailTo=$MAILTO
+fi
+if [ "$mailTo" == "" ]; then
+  mailTo=`git config user.email`
+fi
+if [ "$mailTo" == "" ]; then
+  mailTo=`whoami`@`hostname`
 fi
 
 export JOBPREFIX=SB_
