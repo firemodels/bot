@@ -357,5 +357,5 @@ QUEUE="-q $QUEUE"
 touch $firebot_pid
 $ECHO  ./$botscript -p $firebot_pid $commit $push $UPDATE $DV $INTEL $debug_mode $showcaselist $caselistfile $MAX_VALIDATION_PROCESSES $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUEBENCH $QUEUE $SKIPMATLAB $BUILD_BUNDLE $SKIPFIGURES $EMAIL "$@"
 if [ -e $firebot_pid ]; then
-  rm $firebot_pid
+  rm -f $firebot_pid
 fi
