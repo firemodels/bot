@@ -518,6 +518,9 @@ run_verification_cases_debug()
    # Wait for all verification cases to end
    wait_cases_debug_end 'verification'
 
+#  check whether cases have run
+   ./Run_FDS_Cases.sh -C >> $OUTPUT_DIR/stage4 2>&1
+
    # Remove all .stop files from Verification directories (recursively)
    cd $fdsrepo/Verification
    find . -name '*.stop' -exec rm -f {} \;
@@ -868,6 +871,9 @@ run_verification_cases_release()
 
    # Wait for non-benchmark verification cases to end
    wait_cases_release_end 'verification'
+
+#  check whether cases have run 
+   ./Run_FDS_Cases.sh -C  >> $OUTPUT_DIR/stage5 2>&1
 }
 
 #---------------------------------------------
