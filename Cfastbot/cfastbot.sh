@@ -1273,8 +1273,6 @@ size2=
 #  = Input variables =
 #  ===================
 
-mailTo="gforney@gmail.com, rpeacoc@gmail.com, waicheong.tam@nist.gov, paul.reneke@nist.gov"
-
 cfastbotdir="`pwd`"
 
 PID_FILE=~/.cfastgit/cfastbot_pid
@@ -1309,6 +1307,7 @@ fi
 
 cd $cfastbotdir
 
+REPOEMAIL=
 compiler=intel
 QUEUE=smokebot
 RUNAUTO=
@@ -1349,11 +1348,15 @@ case $OPTION in
   I)
    compiler="$OPTARG"
    ;;
-  m)
-   mailTo="$OPTARG"
-   ;;
   M)
    MATLABEXE=1
+   ;;
+  m)
+   mailTo="$OPTARG"
+   if [ "$mailTo" == "cfastbot" ]; then
+     REPOEMAIL="1"
+     mailTo=
+   fi
    ;;
   p)
    PID_FILE="$OPTARG"
@@ -1381,6 +1384,18 @@ done
 shift $(($OPTIND-1))
 
 echo $$ > $PID_FILE
+
+if [ "$REPOEMAIL" == "1" ]; then
+  source $cfastbotdir/cfastbot_email_list.sh
+else
+  if [ "$mailTo" == "" ]; then
+    mailTo=`git config user.email`
+  fi
+fi
+if [ "$mailTo" == "" ]; then
+  mailTo=`whoami`@`hostname`
+fi
+
 
 # define repo names, make sure they exist
 

@@ -518,6 +518,9 @@ run_verification_cases_debug()
    # Wait for all verification cases to end
    wait_cases_debug_end 'verification'
 
+#  check whether cases have run
+   ./Run_FDS_Cases.sh -C >> $OUTPUT_DIR/stage4 2>&1
+
    # Remove all .stop files from Verification directories (recursively)
    cd $fdsrepo/Verification
    find . -name '*.stop' -exec rm -f {} \;
@@ -868,6 +871,9 @@ run_verification_cases_release()
 
    # Wait for non-benchmark verification cases to end
    wait_cases_release_end 'verification'
+
+#  check whether cases have run 
+   ./Run_FDS_Cases.sh -C  >> $OUTPUT_DIR/stage5 2>&1
 }
 
 #---------------------------------------------
@@ -1589,7 +1595,7 @@ fi
 USEINSTALL=
 COMPILER=intel
 QUEUE=firebot
-QUEUEBENCH=firebot
+QUEUEBENCH=
 CLEANREPO=0
 UPDATEREPO=0
 if [ "$JOBPREFIX" == "" ]; then
@@ -1600,9 +1606,7 @@ push=
 
 DB=_db
 
-# Load mailing list for status report
-source $firebotdir/firebot_email_list.sh
-
+REPOEMAIL=
 UPLOADGUIDES=0
 GIT_REVISION=
 SKIPMATLAB=
@@ -1660,6 +1664,10 @@ case $OPTION in
    ;;
   m)
    mailToFDS="$OPTARG"
+   if [ "$mailToFDS" == "firebot" ]; then
+     REPOEMAIL="1"
+     mailToFDS=
+   fi
    ;;
   p)
    PID_FILE="$OPTARG"
@@ -1698,6 +1706,18 @@ case $OPTION in
 esac
 done
 shift $(($OPTIND-1))
+
+# Load mailing list for status report
+if [ "$REPOEMAIL" == "1" ]; then
+  source $firebotdir/firebot_email_list.sh
+else
+  if [ "$mailToFDS" == "" ]; then
+    mailToFDS=`git config user.email`
+  fi
+fi
+if [ "$mailToFDS" == "" ]; then
+  mailToFDS=`whoami`@`hostname`
+fi
 
 #*** make sure firebot is running in correct directory
 

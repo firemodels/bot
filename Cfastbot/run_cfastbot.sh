@@ -165,7 +165,7 @@ USEINSTALL=
 KILL_CFASTBOT=
 ECHO=
 
-while getopts '3acfhHiI:km:q:RsuUv' OPTION
+while getopts '3acfhHiI:km:Mq:RsuUv' OPTION
 do
 case $OPTION  in
   3)
