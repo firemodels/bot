@@ -1,11 +1,11 @@
 @echo off
 
 :: Mailing list for Smokebot status report
-set mailToSMV="gforney@gmail.com"
+set mailToSMV=""
 
 :: Mailing lists for Firebot status report
-set    mailToFDS="mcgratta@gmail.com, randy.mcdermott@gmail.com, gforney@gmail.com, jfloyd@jensenhughes.com"
+set    mailToFDS=""
 
-set mailToFDSAll="mcgratta@gmail.com, randy.mcdermott@gmail.com, gforney@gmail.com, jfloyd@jensenhugues.com"
+set mailToFDSAll=""
 
-set mailToFDSDebug="gforney@gmail.com"
+set mailToFDSDebug=""
