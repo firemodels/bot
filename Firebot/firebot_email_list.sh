@@ -1,4 +1,4 @@
- #!/bin/bash
+#!/bin/bash
 
 # firebot by default sends emails to the email address set up for the
 # bot repo ( git config user.email ) .  If you wish to use a different
