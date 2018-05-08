@@ -1275,7 +1275,9 @@ size2=
 
 cfastbotdir="`pwd`"
 
-PID_FILE=~/.cfastgit/cfastbot_pid
+GITSTATUS_DIR=$HOME/.cfastbot
+EMAIL_LIST=$GITSTATUS_DIR/cfast_email_list.sh
+PID_FILE=$GITSTATUS_DIR/cfastbot_pid
 OUTPUT_DIR=$cfastbotdir/output
 HISTORY_DIR=$cfastbotdir/history
 ERROR_LOG=$OUTPUT_DIR/errors
@@ -1283,7 +1285,6 @@ TIME_LOG=$OUTPUT_DIR/timings
 WARNING_LOG=$OUTPUT_DIR/warnings
 NEWGUIDE_DIR=$OUTPUT_DIR/NEW_GUIDES
 VALIDATION_STATS_LOG=$OUTPUT_DIR/statistics
-GITSTATUS_DIR=~/.cfastbot
 
 echo ""
 echo "Settings"
@@ -1307,7 +1308,6 @@ fi
 
 cd $cfastbotdir
 
-REPOEMAIL=
 compiler=intel
 QUEUE=smokebot
 RUNAUTO=
@@ -1353,10 +1353,6 @@ case $OPTION in
    ;;
   m)
    mailTo="$OPTARG"
-   if [ "$mailTo" == "cfastbot" ]; then
-     REPOEMAIL="1"
-     mailTo=
-   fi
    ;;
   p)
    PID_FILE="$OPTARG"
@@ -1385,17 +1381,17 @@ shift $(($OPTIND-1))
 
 echo $$ > $PID_FILE
 
-if [ "$REPOEMAIL" == "1" ]; then
-  source $cfastbotdir/cfastbot_email_list.sh
-else
-  if [ "$mailTo" == "" ]; then
-    mailTo=`git config user.email`
+if [ $mailTo == "" ]; then
+  if [ -e $EMAIL_LIST ]; then
+    source $EMAIL_LIST
   fi
+fi
+if [ "$mailTo" == "" ]; then
+  mailTo=`git config user.email`
 fi
 if [ "$mailTo" == "" ]; then
   mailTo=`whoami`@`hostname`
 fi
-
 
 # define repo names, make sure they exist
 

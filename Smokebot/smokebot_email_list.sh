@@ -1,17 +1,14 @@
 #!/bin/bash
 
-# Mailing list for Smokebot status report
-mailToSMV="gforney@gmail.com"
+# smokebot by default sends emails to the email address set up for the
+# bot repo ( git config user.email ) .  If you wish to use a different
+# email address use the -m option when running run_smokebot.sh or copy
+# this file (smokebot_email_list.sh) to
+#    $HOME/.smokebot/smokebot_email_list.sh 
+# and change the following line to the list of email addresses you wish.
 
-# Mailing list for Smokebot status report
-mailToCFAST="gforney@gmail.com"
 
-# General mailing list for Firebot status report
-        mailToFDS="mcgratta@gmail.com, kevin.mcgrattan@nist.gov, randy.mcdermott@gmail.com, randall.mcdermott@nist.gov, jfloyd@jensenhughes.com, gforney@gmail.com, marcos.vanella@nist.gov"
+mailToSMV=""
 
-# Verbose mailing list for Validationbot, Macbot, etc.
-mailToFDS_verbose="mcgratta@gmail.com, kevin.mcgrattan@nist.gov, randy.mcdermott@gmail.com, randall.mcdermott@nist.gov, jfloyd@jensenhughes.com, gforney@gmail.com, marcos.vanella@nist.gov"
-
-# mailing list when debugging firebot
-mailToFDS_debug="gforney@gmail.com, randy.mcdermott@gmail.com, randall.mcdermott@nist.gov"
-
+# email list for fds errors
+mailToFDS=""

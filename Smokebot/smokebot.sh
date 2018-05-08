@@ -1276,9 +1276,6 @@ email_build_status()
    if [[ "$THIS_CFAST_FAILED" == "1" ]] ; then
      mailTo="$mailToCFAST"
    fi
-   if [[ "$MAILTO" != "" ]] ; then
-     mailTo="$MAILTO"
-   fi
    echo $THIS_FDS_FAILED>$FDS_STATUS_FILE
    stop_time=`date`
    echo "----------------------------------------------" > $TIME_LOG
@@ -1356,6 +1353,7 @@ YOPT=-Y
 smokebotdir=`pwd`
 OUTPUT_DIR="$smokebotdir/output"
 HISTORY_DIR="$HOME/.smokebot/history"
+EMAIL_LIST="$HOME/.smokebot/smokebot_email_list.sh"
 TIME_LOG=$OUTPUT_DIR/timings
 ERROR_LOG=$OUTPUT_DIR/errors
 WARNING_LOG=$OUTPUT_DIR/warnings
@@ -1366,7 +1364,6 @@ web_DIR=
 WEB_URL=
 SMOKEBOT_LITE=
 export SCRIPTFILES=$smokebotdir/scriptfiles
-EMAILREPO=
 
 WEBBRANCH=nist-pages
 FDSBRANCH=master
@@ -1383,7 +1380,7 @@ TESTFLAG=
 TEST=
 CLEANREPO=0
 UPDATEREPO=0
-MAILTO=
+mailTo=
 UPLOADRESULTS=
 COMPILER=intel
 PID_FILE=~/.fdssmvgit/smokebot_pid
@@ -1429,11 +1426,7 @@ case $OPTION in
    SMOKEBOT_LITE=1
    ;;
   m)
-   MAILTO="$OPTARG"
-   if [ "$MAILTO" == "smokebot" ]; then
-     MAILTO=
-     EMAILREPO="1"
-   fi
+   mailTo="$OPTARG"
    ;;
   M)
    MAKEMOVIES="1"
@@ -1637,21 +1630,29 @@ if [ -e $FDS_STATUS_FILE ] ; then
 fi
 
 # Load mailing list for status report
-if [ "$EMAILREPO" == "1" ]; then
-  source $smokebotdir/smokebot_email_list.sh
-  mailTo=$mailToSMV
-  if [[ "$LAST_FDS_FAILED" == "1" ]] ; then
-    mailTo=$mailToFDS
+if [ "$mailTo" == "" ]; then
+  if [ -e $EMAIL_LIST ]; then
+    source $EMAIL_LIST
+    mailTo=$mailToSMV
+    if [[ "$LAST_FDS_FAILED" == "1" ]] ; then
+      mailTo=$mailToFDS
+    fi
   fi
-fi
-if [[ "$MAILTO" != "" ]]; then
-  mailTo=$MAILTO
 fi
 if [ "$mailTo" == "" ]; then
   mailTo=`git config user.email`
 fi
 if [ "$mailTo" == "" ]; then
   mailTo=`whoami`@`hostname`
+fi
+if [ "$mailToSMV" == "" ]; then
+  mailToSMV=$mailTo
+fi
+if [ "$mailToFDS" == "" ]; then
+  mailToFDS=$mailTo
+fi
+if [ "$mailToCFAST" == "" ]; then
+  mailToCFAST=$mailTo
 fi
 
 export JOBPREFIX=SB_

@@ -1562,6 +1562,7 @@ VALIDATION_ERROR_LOG=$OUTPUT_DIR/validation_errors
 WARNING_LOG=$OUTPUT_DIR/warnings
 NEWGUIDE_DIR=$OUTPUT_DIR/Newest_Guides
 SAVEGUIDE_DIR=$HOME/.firebot/pubs
+EMAIL_LIST=$HOME/.firebot/firebot_email_list.sh
 
 MKDIR $HOME/.firebot
 MKDIR $HOME/.firebot/pubs
@@ -1664,10 +1665,6 @@ case $OPTION in
    ;;
   m)
    mailToFDS="$OPTARG"
-   if [ "$mailToFDS" == "firebot" ]; then
-     REPOEMAIL="1"
-     mailToFDS=
-   fi
    ;;
   p)
    PID_FILE="$OPTARG"
@@ -1708,12 +1705,13 @@ done
 shift $(($OPTIND-1))
 
 # Load mailing list for status report
-if [ "$REPOEMAIL" == "1" ]; then
-  source $firebotdir/firebot_email_list.sh
-else
-  if [ "$mailToFDS" == "" ]; then
-    mailToFDS=`git config user.email`
+if [ "$mailToFDS" == "" ]; then
+  if [ -e $EMAIL_LIST ]; then
+    source $EMAIL_LIST
   fi
+fi
+if [ "$mailToFDS" == "" ]; then
+  mailToFDS=`git config user.email`
 fi
 if [ "$mailToFDS" == "" ]; then
   mailToFDS=`whoami`@`hostname`
