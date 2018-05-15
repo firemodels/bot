@@ -1591,6 +1591,7 @@ echo "    FDS repo: $fdsrepo"
 echo "    SMV repo: $smvrepo"
 echo "  CFAST repo: $cfastrepo"
 echo "     Run dir: $smokebotdir"
+echo "      branch: $SMVBRANCH"
 if [ "$CLEANREPO" == "1" ]; then
   echo " clean repos: yes"
 else
