@@ -37,14 +37,13 @@ The following steps need only be done once on your cluster. The exact phrasing o
 
 ## Running firebot
 
-The script `firebot.sh` is run using the wrapper script `run_firebot.sh`. This script uses a semaphore file that ensures multiple instances of firebot do not run, which would cause file conflicts. This script should be called from `crontab` to start firebot.
+The script `firebot.sh` is run using the wrapper script `run_firebot.sh`. This script uses a semaphore file that ensures multiple instances of firebot do not run, which would cause file conflicts. 
 
-The following information is in the crontab:
+You can start firebot at some future time using `crontab` with an entry like the following:
 ```
 PATH=/bin:/usr/bin:/usr/local/bin:/home/<username>/firemodels/bot/Firebot:$PATH
 MAILTO=""
-
-# Update and run Firebot at 9:56 PM every night
-# If no SVN argument is specified, then the latest SVN revision is used
+# Run firebot at 9:56 PM every night
 56 21 * * * cd ~/<username>/firemodels/bot/Firebot ; bash -lc "./run_firebot.sh"
 ```
+The output from firebot is written into the directory called `output`. When firebot completes, email should be sent to the specified list of addresses.
