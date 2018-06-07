@@ -1,25 +1,11 @@
-=====================================
-= Firebot configuration information =
-=====================================
-
-=========
-= About =
-=========
+** Firebot configuration information
 
 Firebot is an automatic verification and validation test bot that is run at a regular interval (nightly).
 More details on the Firebot build stages can be found in the FDS Configuration Management Plan.
 
-============================
-= Running Firebot Manually =
-============================
+*** Set-Up
 
-
-
-======================
-= Installing Firebot =
-======================
-
-1. clone FDS-SMV repository
+1. clone firemodels/fds, smv, bot, out, exp repositories
 
 2. Ensure that the following software packages are installed on the system:
 
@@ -36,25 +22,16 @@ More details on the Firebot build stages can be found in the FDS Configuration M
 5. Add the following lines to firebot's ~/.bashrc file:
 
     . /usr/local/Modules/3.2.10/init/bash
-    module load null modules torque-maui mpi/openmpi-1.8.1-gnu-ib
+    module load null modules torque-maui
+    module load intel/18
 
-    export IFORT_COMPILER=/opt/intel/composerxe
-    export IFORT_COMPILER_LIB=/opt/intel/composerxe/lib
-
-    #FDS
-    source ~/.bashrc_fds intel64
-
-    # Set unlimited stack size
     ulimit -s unlimited
 
 6. Setup passwordless SSH on the firebot account. Generate SSH keys and ensure that the head node can SSH into all of the compute nodes. Also, make sure that firebot's account information is propagated across all compute nodes (e.g., with the passsync or authcopy command).
 
 7. Ensure that a queue named 'firebot' is created, enabled, and started in the torque queueing system and that nodes are defined for this queue. Test the 'qstat' command on firebot's account.
 
-
-=========================
-= Firebot files/scripts =
-=========================
+** Running firebot
 
 # firebot_linux_wrapper.sh or firebot_mac_wrapper.sh
 
