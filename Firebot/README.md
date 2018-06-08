@@ -6,14 +6,14 @@ Firebot is a verification test script that can be run at a regular intervals as 
 
 The following steps need only be done once. The exact phrasing of the commands are for the NIST linux cluster named blaze. You might need to modify the path and module names.
 
-1. Clone the GitHub repositories called `firemodels/fds`, `smv`, `bot`, `out`, and `exp`. Make sure that these repos are all in the same directory.
+1. Clone the repositories that are included in the GitHub organization called `firemodels`: `fds`, `smv`, `bot`, `out`, `exp`, and `fig`. Make sure that these repos are all in the same directory.
 
 2. Ensure that the following software packages are installed on the system:
 
     * Intel Fortran and C compilers and Intel Inspector
     * Gnu Fortran compiler
     * LaTeX (TeX Live distribution), be sure to make this the default LaTeX in the system-wide PATH
-    * Matlab (test the command 'matlab')
+    * Matlab (test the command `matlab`)
 
 3. Firebot uses email notifications for build status updates. Ensure that outbound emails can be sent using the `mail` command.
 
