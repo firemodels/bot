@@ -1,4 +1,4 @@
-# Firebot Configuration
+# Firebot: A Continuous Integration Tool for FDS
 
 Firebot is a verification test script that can be run at a regular intervals as part of a continuous integration program. At NIST, the script is run by a pseudo-user named `firebot` on a linux cluster each night. The pseudo-user `firebot` clones the various repositories in the GitHub project named `firemodels`, compiles FDS and Smokeview, runs the verification cases, checks the results for accuracy, and compiles all of the manuals. The entire process takes a few hours to complete.
 
@@ -30,6 +30,7 @@ The following steps need only be done once on your cluster. The exact phrasing o
     module load gfortran492
     ulimit -s unlimited
     ```
+    Note that these modules load the Intel Fortran and Gnu Fortran compilers, both of which are used to check FDS for syntax errors and consisistency with the Fortran 2008 standard.
     
 6. Setup passwordless SSH for the your account. Generate SSH keys and ensure that the head node can SSH into all of the compute nodes. Also, make sure that your account information is propagated across all compute nodes (e.g., with the passsync or authcopy command).
 
@@ -37,13 +38,17 @@ The following steps need only be done once on your cluster. The exact phrasing o
 
 ## Running firebot
 
-The script `firebot.sh` is run using the wrapper script `run_firebot.sh`. This script uses a semaphore file that ensures multiple instances of firebot do not run, which would cause file conflicts. 
+The script `firebot.sh` is run using the wrapper script `run_firebot.sh`. This script uses a semaphore file that ensures multiple instances of firebot do not run, which would cause file conflicts. To see the various options associated with running firebot, type
+```
+./run_firebot.sh -H
+```
+Important things to consider: do you want to test your own local changes, or update your repositories from the central repository? Do you want to use Intel MPI or Open MPI? Do you want to skip certain stages of the process?
 
 You can start firebot at some future time using `crontab` with an entry like the following:
 ```
 PATH=/bin:/usr/bin:/usr/local/bin:/home/<username>/firemodels/bot/Firebot:$PATH
 MAILTO=""
 # Run firebot at 9:56 PM every night
-56 21 * * * cd ~/<username>/firemodels/bot/Firebot ; bash -lc "./run_firebot.sh"
+56 21 * * * cd ~/<username>/firemodels/bot/Firebot ; bash -lc "./run_firebot.sh <options>"
 ```
 The output from firebot is written into the directory called `output`. When firebot completes, email should be sent to the specified list of addresses.
