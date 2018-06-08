@@ -292,7 +292,7 @@ inspect_fds()
    # Perform OpenMP thread checking (locate deadlocks and data races)
    echo "      inspection"
    cd $fdsrepo/Verification/Thread_Check/
-   ./inspect_openmp.sh  thread_check.fds &> $OUTPUT_DIR/stage2a
+   ./inspect_openmp.sh -I thread_check.fds &> $OUTPUT_DIR/stage2a
 }
 
 #---------------------------------------------
@@ -1904,12 +1904,12 @@ echo Building
 echo "   FDS"
 # if something goes wrong with the openmp inspector
 # comment the following 6 lines (including 'if' and and 'fi'  lines
-#if [ "$FIREBOT_MODE" == "verification" ] ; then
-#  if [ "$FIREBOT_LITE" == "" ]; then
-#    inspect_fds
-#    check_inspect_fds
-#  fi
-#fi
+if [ "$FIREBOT_MODE" == "verification" ] ; then
+  if [ "$FIREBOT_LITE" == "" ]; then
+    inspect_fds
+    check_inspect_fds
+  fi
+fi
 
 ### Stage 2b ###
 compile_fds_mpi_db
