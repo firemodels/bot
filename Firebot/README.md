@@ -4,9 +4,9 @@ Firebot is a verification test script that can be run at a regular intervals as 
 
 ## Set-Up
 
-The following steps need only be done once on your cluster. The exact phrasing of the commands are for the NIST cluster named blaze. You might need to modify the path and module names.
+The following steps need only be done once. The exact phrasing of the commands are for the NIST linux cluster named blaze. You might need to modify the path and module names.
 
-1. Clone the GitHub repositories called `firemodels/fds`, `smv`, `bot`, `out`, and `exp`.
+1. Clone the GitHub repositories called `firemodels/fds`, `smv`, `bot`, `out`, and `exp`. Make sure that these repos are all in the same directory.
 
 2. Ensure that the following software packages are installed on the system:
 
@@ -22,7 +22,7 @@ The following steps need only be done once on your cluster. The exact phrasing o
    yum install mesa-libGL-devel mesa-libGLU-devel libXmu-devel libXi-devel xorg-x11-server-Xvfb
    ```
 
-5. Add the following lines to firebot's `~/.bashrc` file:
+5. Add the following lines to your `~/.bashrc` file:
     ```
     . /usr/local/Modules/3.2.10/init/bash
     module load null modules torque-maui
@@ -51,4 +51,4 @@ MAILTO=""
 # Run firebot at 9:56 PM every night
 56 21 * * * cd ~/<username>/firemodels/bot/Firebot ; bash -lc "./run_firebot.sh <options>"
 ```
-The output from firebot is written into the directory called `output`. When firebot completes, email should be sent to the specified list of addresses.
+The output from firebot is written into the directory called `output` which is in the same directory as the `firebot.sh` script itself. When firebot completes, email should be sent to the specified list of addresses.
