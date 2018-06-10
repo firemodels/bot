@@ -50,7 +50,7 @@ goto eof
   git rev-parse --abbrev-ref HEAD | head -1 > %CURDIR%\gitbranch.out
   set /p CURRENT_BRANCH=<%CURDIR%\gitbranch.out
   if NOT "%CURRENT_BRANCH%" == "%BRANCH%" (
-     echo %BRANCH% branch not checkout out in %repo%
+     echo in repo %reponame% expecting branch %BRANCH%, found branch %CURRENT_BRANCH%
      echo update skipped
      exit /b
   )
