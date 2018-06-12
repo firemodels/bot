@@ -33,7 +33,7 @@ The following steps need only be done once. The exact phrasing of the commands a
     
 6. Setup passwordless SSH for the your account. Generate SSH keys and ensure that the head node can SSH into all of the compute nodes. Also, make sure that your account information is propagated across all compute nodes.
 
-7. Ensure that a queue named `smokebot` is created, enabled, and started in the torque queueing system and that nodes are defined for this queue. Test the `qstat` command.  If you use some other queue say batch then use `-q batch` when running firebot.
+7. Ensure that a queue named `smokebot` is created, enabled, and started in the torque queueing system and that nodes are defined for this queue. Test the `qstat` command.  If you use some other queue say batch then use `-q batch` when running smokebot.
 
 8. By default, smokebot sends email to the email address configured for your bot repo (output of command `git config user.email` ) .  If you wish email to go to different email addresses, create a file named $HOME/.smokebot/firebot_email_list.sh for some `user1` and `user2` (or more) that looks like:
 
@@ -71,4 +71,4 @@ Models_central/bot/Smokebot ; bash -lc  "./run_smokebot.sh -J -u -c -U -q smokeb
 */5 * * * * cd $HOME/FireModels_central/bot/Smokebot ; bash -lc "./run_smokebot.sh -J -u -c -U -q smokebot -a -W http://blaze.el.nist.gov/smokebot -w /var/www/html/smokebot > /dev/null"
 ```
 
-The output from firebot is written into the directory called `output` which is in the same directory as the `smokebot.sh` script itself. When smokebot completes, email should be sent to the specified list of addresses.
+The output from smokebot is written into the directory called `output` which is in the same directory as the `smokebot.sh` script itself. When smokebot completes, email should be sent to the specified list of addresses.
