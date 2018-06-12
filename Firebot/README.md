@@ -37,6 +37,15 @@ The following steps need only be done once. The exact phrasing of the commands a
 
 7. Ensure that a queue named `firebot` is created, enabled, and started in the torque queueing system and that nodes are defined for this queue. Test the `qstat` command.  If you use some other queue say batch then use `-q batch` when running firebot.
 
+8. By default, firebot sends email to the email address configured for your bot repo (output of command `git config user.email` ) .  If you wish email to go to different email addresses, create a file named $HOME/.firebot/firebot_email_list.sh that looks like:
+
+```
+#!/bin/bash
+
+# General mailing list for Firebot status report
+mailToFDS="user1@host1.com, user2@host2.com"
+```
+
 ## Running firebot
 
 The script `firebot.sh` is run using the wrapper script `run_firebot.sh`. This script uses a semaphore file that ensures multiple instances of firebot do not run, which would cause file conflicts. To see the various options associated with running firebot, type
