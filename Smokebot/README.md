@@ -64,8 +64,7 @@ MAILTO=""
 # |   |   |   |  |
 # *   *   *   *  *  command to be executed
 # generate movies at 4:01AM
-1 4 * * *    cd $HOME/
-Models_central/bot/Smokebot ; bash -lc  "./run_smokebot.sh -J -u -c -U -q smokebot -M -W http://blaze.el.nist.gov/smokebot -w /var/www/html/smokebot > /dev/null"
+1 4 * * *    cd $HOME/Models_central/bot/Smokebot ; bash -lc  "./run_smokebot.sh -J -u -c -U -q smokebot -M -W http://blaze.el.nist.gov/smokebot -w /var/www/html/smokebot > /dev/null"
 
 # run smokebot if FDS or Smokeview source has changed in last 5 minutes
 */5 * * * * cd $HOME/FireModels_central/bot/Smokebot ; bash -lc "./run_smokebot.sh -J -u -c -U -q smokebot -a -W http://blaze.el.nist.gov/smokebot -w /var/www/html/smokebot > /dev/null"
