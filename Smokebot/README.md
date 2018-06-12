@@ -1,6 +1,6 @@
 # Smokebot: A Continuous Integration Tool for Smokeview
 
-Smokebot is a verification test script that can be run at a regular intervals as part of a continuous integration program. At NIST, the script is run by a pseudo-user named `smokebot` on a linux cluster each night. The pseudo-user `firebot` clones the various repositories in the GitHub project named `firemodels`, compiles FDS and Smokeview, runs the verification cases, checks the results for accuracy, and compiles all of the manuals. The entire process takes an hour to complete.
+Smokebot is a verification test script that can be run at a regular intervals as part of a continuous integration program. At NIST, the script is run by a pseudo-user named `smokebot` on a linux cluster each night. The pseudo-user `smokebot` updates the various repositories in the GitHub project named `firemodels`, compiles FDS and Smokeview, runs the verification cases, generates smokeview images, and compiles all of the manuals. The entire process takes an hour to complete.
 
 ## Set-Up
 
@@ -35,18 +35,18 @@ The following steps need only be done once. The exact phrasing of the commands a
 
 7. Ensure that a queue named `smokebot` is created, enabled, and started in the torque queueing system and that nodes are defined for this queue. Test the `qstat` command.  If you use some other queue say batch then use `-q batch` when running firebot.
 
-8. By default, firebot sends email to the email address configured for your bot repo (output of command `git config user.email` ) .  If you wish email to go to different email addresses, create a file named $HOME/.firebot/firebot_email_list.sh for some `user1` and `user2` (or more) that looks like:
+8. By default, smokebot sends email to the email address configured for your bot repo (output of command `git config user.email` ) .  If you wish email to go to different email addresses, create a file named $HOME/.smokebot/firebot_email_list.sh for some `user1` and `user2` (or more) that looks like:
 
 ```
 #!/bin/bash
 
-# General mailing list for Firebot status report
+# General mailing list for smokebot status report
 mailToFDS="user1@host1.com, user2@host2.com"
 ```
 
 ## Running Smokebot
 
-The script `smokebot.sh` is run using the wrapper script `run_smokebot.sh`. This script uses a semaphore file that ensures multiple instances of firebot do not run, which would cause file conflicts. To see the various options associated with running firebot, type
+The script `smokebot.sh` is run using the wrapper script `run_smokebot.sh`. This script uses a semaphore file that ensures multiple instances of smokebot do not run, which would cause file conflicts. To see the various options associated with running smokebot, type
 ```
 ./run_smokebot.sh -H
 ```
@@ -64,10 +64,11 @@ MAILTO=""
 # |   |   |   |  |
 # *   *   *   *  *  command to be executed
 # generate movies at 4:01AM
-1 4 * * *    cd $HOME/FireModels_central/bot/Smokebot ; bash -lc  "./run_smokebot.sh -J -u -c -U -q smokebot -M -W http://blaze.el.nist.gov/smokebot -w /var/www/html/smokebot > /dev/null"
+1 4 * * *    cd $HOME/
+Models_central/bot/Smokebot ; bash -lc  "./run_smokebot.sh -J -u -c -U -q smokebot -M -W http://blaze.el.nist.gov/smokebot -w /var/www/html/smokebot > /dev/null"
 
 # run smokebot if FDS or Smokeview source has changed in last 5 minutes
 */5 * * * * cd $HOME/FireModels_central/bot/Smokebot ; bash -lc "./run_smokebot.sh -J -u -c -U -q smokebot -a -W http://blaze.el.nist.gov/smokebot -w /var/www/html/smokebot > /dev/null"
 ```
 
-The output from firebot is written into the directory called `output` which is in the same directory as the `smokebot.sh` script itself. When firebot completes, email should be sent to the specified list of addresses.
+The output from firebot is written into the directory called `output` which is in the same directory as the `smokebot.sh` script itself. When smokebot completes, email should be sent to the specified list of addresses.
