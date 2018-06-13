@@ -35,7 +35,7 @@ The following steps need only be done once. The exact phrasing of the commands a
     
 6. Setup passwordless SSH for the your account. Generate SSH keys and ensure that the head node can SSH into all of the compute nodes. Also, make sure that your account information is propagated across all compute nodes.
 
-7. Ensure that a queue named `smokebot` is created, enabled, and started in the torque queueing system and that nodes are defined for this queue. Test the `qstat` command.  If you use some other queue say batch then use `-q batch` when running cfastbot.
+7. If desired, ensure that a queue named `cfastbot` is created, enabled, and started in the torque queueing system and that nodes are defined for this queue. Test the `qstat` command.  If you use some other queue say batch then use `-q batch` when running cfastbot.  
 
 8. By default, cfastbot sends email to the email address configured for your bot repo (output of command `git config user.email` ) .  If you wish email to go to different email addresses, create a file named $HOME/.cfastbot/cfastbot_email_list.sh for some `user1` and `user2` (or more) that looks like:
 
