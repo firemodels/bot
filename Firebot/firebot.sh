@@ -625,7 +625,7 @@ check_cases_debug()
       else
         cd $fdsrepo/Validation
       fi
-      source $OUTPUT_DIR/stage4_filelist
+#      source $OUTPUT_DIR/stage4_filelist
 
       # If errors encountered in validation mode, then email status and exit
       if [ "$FIREBOT_MODE" == "validation" ] ; then
