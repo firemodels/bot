@@ -1,4 +1,4 @@
-# Firebot: A Continuous Integration Tool for CFAST
+# CFASTbot: A Continuous Integration Tool for CFAST
 
 CFASTbot is a verification test script that can be run at a regular intervals as part of a continuous integration program. At NIST, the script is run by a pseudo-user named `cfast` on a linux cluster each day. The pseudo-user `cfast` updates the various repositories in the GitHub project named `firemodels`, compiles CFAST and Smokeview, runs the validation and verification cases, checks the results for accuracy, and compiles all of the manuals. The entire process takes about an hour to complete.
 
