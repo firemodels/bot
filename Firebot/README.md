@@ -6,7 +6,7 @@ Firebot is a verification test script that can be run at a regular intervals as 
 
 The following steps need only be done once. The exact phrasing of the commands are for the NIST linux cluster named blaze. You might need to modify the path and module names.
 
-1. Clone the repositories that are included in the GitHub organization called `firemodels`: `fds`, `smv`, `bot`, `out`, `exp`, and `fig`. Clone `bot` first, then cd into `bot/Scripts` and type `./setup_repos.sh -a` . This will clone all the other repos needed in the same directory as `bot` (or you can clone each repo in the same way as you cloned `bot`).
+1. Clone the repositories that are included in the GitHub organization called `firemodels`: `fds`, `smv`, `bot`, `out`, `exp`, and `fig`. Clone `bot` first, then cd into `bot/Scripts` and type `./setup_repos.sh -a` . This will clone all the other repos needed in the same directory as `bot` (or you can clone each repo in the same way as you cloned `bot`, with the exception of `exp` which requires the `--recursive` option because it has submodules).
 
 
 2. Ensure that the following software packages are installed on the system:
@@ -39,12 +39,10 @@ The following steps need only be done once. The exact phrasing of the commands a
 
 8. By default, firebot sends email to the email address configured for your bot repo (output of command `git config user.email` ) .  If you wish email to go to different email addresses, create a file named $HOME/.firebot/firebot_email_list.sh for some `user1` and `user2` (or more) that looks like:
 
-```
-#!/bin/bash
-
-# General mailing list for Firebot status report
-mailToFDS="user1@host1.com, user2@host2.com"
-```
+   ```
+   #!/bin/bash
+   mailToFDS="user1@host1.com, user2@host2.com"
+   ```
 
 ## Running firebot
 
