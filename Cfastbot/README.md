@@ -58,7 +58,7 @@ You can start cfastbot at some future time using `crontab` with an entry like th
 ```
 PATH=/bin:/usr/bin:/usr/local/bin:/home/<username>/firemodels/bot/Cfastbot:$PATH
 MAILTO=""
-# Run firebot at 9:56 PM every night
+# Run cfastbot at 9:56 PM every night
 56 21 * * * cd ~/<username>/firemodels/bot/Cfastbot ; bash -lc "./run_cfastbot.sh <options>"
 ```
 The output from cfastbot is written into the directory called `output` which is in the same directory as the `cfastbot.sh` script itself. When cfastbot completes, email should be sent to the specified list of addresses.
