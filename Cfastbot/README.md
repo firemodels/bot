@@ -16,7 +16,7 @@ The following steps need only be done once. The exact phrasing of the commands a
     * LaTeX (TeX Live distribution), be sure to make this the default LaTeX in the system-wide PATH
     * Matlab (test the command `matlab`)
 
-3. Firebot uses email notifications for build status updates. Ensure that outbound emails can be sent using the `mail` command.
+3. CFASTbot uses email notifications for build status updates. Ensure that outbound emails can be sent using the `mail` command.
 
 4. Install libraries for Smokeview. On CentOS, you can use the following command:
    ```
@@ -31,22 +31,19 @@ The following steps need only be done once. The exact phrasing of the commands a
     module load gfortran492
     ulimit -s unlimited
     ```
-    Note that these modules load the Intel Fortran and Gnu Fortran compilers, both of which are used to check FDS for syntax errors and consisistency with the Fortran 2008 standard.
+    Note that these modules load the Intel Fortran and Gnu Fortran compilers, both of which are used to check CFAST for syntax errors and consisistency with the Fortran 2008 standard.
     
 6. Setup passwordless SSH for the your account. Generate SSH keys and ensure that the head node can SSH into all of the compute nodes. Also, make sure that your account information is propagated across all compute nodes.
 
-7. If desired, ensure that a queue named `cfastbot` is created, enabled, and started in the torque queueing system and that nodes are defined for this queue. Test the `qstat` command.  If you use some other queue say batch then use `-q batch` when running cfastbot.  
+7. If desired, ensure that a queue named `smokebot` is created, enabled, and started in the torque queueing system and that nodes are defined for this queue. Test the `qstat` command.  If you use some other queue say batch then use `-q batch` when running CFASTbot.  
 
-8. By default, cfastbot sends email to the email address configured for your bot repo (output of command `git config user.email` ) .  If you wish email to go to different email addresses, create a file named $HOME/.cfastbot/cfastbot_email_list.sh for some `user1` and `user2` (or more) that looks like:
+8. By default, CFASTbot sends email to the email address configured for your bot repo (output of command `git config user.email` ) .  If you wish email to go to different email addresses, create a file named $HOME/.cfastbot/cfastbot_email_list.sh for some `user1` and `user2` (or more) that looks like:
+   ```
+   #!/bin/bash
+   mailToFCFAST="user1@host1.com, user2@host2.com"
+   ```
 
-```
-#!/bin/bash
-
-# General mailing list for CFASTbot status report
-mailToFCFAST="user1@host1.com, user2@host2.com"
-```
-
-## Running cfastbot
+## Running CFASTbot
 
 The script `cfastbot.sh` is run using the wrapper script `run_cfastbot.sh`. This script uses a semaphore file that ensures multiple instances of firebot do not run, which would cause file conflicts. To see the various options associated with running cfastbot, type
 ```
@@ -61,4 +58,4 @@ MAILTO=""
 # Run cfastbot at 9:56 PM every night
 56 21 * * * cd ~/<username>/firemodels/bot/Cfastbot ; bash -lc "./run_cfastbot.sh <options>"
 ```
-The output from cfastbot is written into the directory called `output` which is in the same directory as the `cfastbot.sh` script itself. When cfastbot completes, email should be sent to the specified list of addresses.
+The output from CFASTbot is written into the directory called `output` which is in the same directory as the `cfastbot.sh` script itself. When cfastbot completes, email should be sent to the specified list of addresses.
