@@ -281,12 +281,55 @@ compile_cfast_db()
    # Build debug CFAST
    echo "Building"
    echo "   cfast"
-   echo "      debug"
+   echo "      Intel debug"
    CD_REPO $cfastrepo/Build/CFAST/${compiler}_${platform}_${size}_db $cfastbranch || return 1
    make -f ../makefile clean &> /dev/null
    ./make_cfast.sh &> $OUTPUT_DIR/stage2a
    return 0
  }
+
+#---------------------------------------------
+#                   compile_cfast_gnu_db
+#---------------------------------------------
+
+compile_cfast_gnu_db()
+{
+   # Build gnu debug CFAST
+   echo "      gnu debug"
+   CD_REPO $cfastrepo/Build/CFAST/gnu_${platform}_${size}_db $cfastbranch || return 1
+   make -f ../makefile clean &> /dev/null
+   ./make_cfast.sh &> $OUTPUT_DIR/stage2f
+   return 0
+ }
+
+#---------------------------------------------
+#                   check_compile_gnu_cfast_db
+#---------------------------------------------
+
+check_compile_cfast_gnu_db()
+{
+   # Check for errors in CFAST debug compilation
+   CD_REPO $cfastrepo/Build/CFAST/gnu_${platform}_${size}_db $cfastbranch || return 1
+   if [ -e "cfast7_gnu_${size}_db" ]
+   then
+      stage2f_success=true
+   else
+      echo "Errors from Stage 2f - Compile gnu CFAST debug:" >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage2f >> $ERROR_LOG
+      echo "" >> $ERROR_LOG
+   fi
+
+   # Check for compiler warnings/remarks
+   if [[ `grep -A 5 -E 'warning|remark' ${OUTPUT_DIR}/stage2f` == "" ]]
+   then
+      # Continue along
+      :
+   else
+      echo "Warnings from Stage 2f - Compile gnu CFAST debug:" >> $WARNING_LOG
+      grep -A 5 -E 'warning|remark' ${OUTPUT_DIR}/stage2f >> $WARNING_LOG
+      echo "" >> $WARNING_LOG
+   fi
+}
 
 #---------------------------------------------
 #                   check_compile_cfast_db
@@ -1544,6 +1587,12 @@ check_git_checkout
 ### Stage 2a ###
 compile_cfast_db || exit 1
 check_compile_cfast_db || exit 1
+
+### Stage 2f ###
+if [ "$compiler" != "gnu" ]; then
+  compile_cfast_gnu_db || exit 1
+  check_compile_cfast_gnu_db || exit 1
+fi
 
 ### Stage 2b ###
 compile_cfast || exit 1
