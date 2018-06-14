@@ -1424,7 +1424,7 @@ shift $(($OPTIND-1))
 
 echo $$ > $PID_FILE
 
-if [ $mailTo == "" ]; then
+if [ "$mailTo" == "" ]; then
   if [ -e $EMAIL_LIST ]; then
     source $EMAIL_LIST
   fi
