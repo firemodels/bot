@@ -156,8 +156,7 @@ equations for mass, momentum, and energy are approximated by finite differences,
 rectilinear grid. Thermal radiation is computed using a finite volume technique on the same grid as the flow solver. Lagrangian particles are used to
 simulate sprinkler droplets, fuel sprays, and unresolvable subgrid objects.
 
-Smokeview is a companion program to FDS that produces images and animations of the results. In recent years, its developer, Glenn Forney, has added
-to Smokeview the ability to visualize fire and smoke in a fairly realistic way. In a sense, Smokeview now is, via its three-dimensional renderings,
+Smokeview is a companion program to FDS that produces images and animations of the results. Smokeview has the ability to visualize fire and smoke in a fairly realistic way. In a sense, Smokeview now is, via its three-dimensional renderings,
 an integral part of the physical model, as it allows one to assess the visibility within a fire compartment in ways that ordinary scientific
 visualization software cannot.
 
@@ -202,7 +201,7 @@ FDS has two separate manuals -- the FDS Technical Reference Guide~\cite{FDS_Tech
 
 There are numerous sources that describe various parts of the model. The basic set of equations solved in FDS was formulated by Rehm and Baum in the {\em Journal of Research of the National Bureau of Standards}~\cite{Rehm:1}.  The basic hydrodynamic algorithm evolved at NIST through the 1980s and 1990s, incorporating fairly well-known numerical schemes that are documented in books by Anderson, Tannehill and Pletcher~\cite{Anderson:1}, Peyret and Taylor~\cite{Peyret:1}, and Ferziger and Peri\'{c}~\cite{Ferziger:1}. This last book provides a good description of the large-eddy simulation technique and provides references to many current publications on the subject.  Numerical techniques appropriate for combustion systems are described by Oran and Boris~\cite{Oran:1}.  The eddy dissipation concept (EDC) combustion model is described in Poinsot and Veynante~\cite{Poinsot:TNC}. Basic heat transfer theory is provided by Holman~\cite{Holman:1} and Incropera~\cite{Incropera:1}. Thermal radiation theory is described in Siegel and Howell~\cite{Siegel:1}.
 
-Much of the current knowledge of fire science and engineering is found in the {\em SFPE Handbook of Fire Protection Engineering}~\cite{SFPE}. Popular textbooks in fire protection engineering include those by Drysdale~\cite{Drysdale:1} and Quintiere~\cite{Quintiere:2}. On-going research in fire and combustion is documented in several periodicals and conference proceedings. The International Association of Fire Safety Science (IAFSS) organizes a conference every three years, the proceedings of which are frequently referenced by fire researchers. Interscience Communications, a London-based publisher of several fire-related journals, hosts a conference known as Interflam roughly every three years in the United Kingdom. The Combustion Institute hosts an international symposium on combustion every two years, and in addition to the proceedings of this symposium, the organization publishes its own journal, {\em Combustion and Flame}. The papers appearing in the IAFSS conference proceedings, the Combustion Symposium proceedings, and {\em Combustion and Flame} are all peer-reviewed, while those appearing in the Interflam proceedings are selected based on the submission of a short abstract. Both the Society for Fire Protection Engineers (SFPE) and the National Fire Protection Association (NFPA) publish peer-reviewed technical journals entitled the {\em Journal of Fire Protection Engineering} and {\em Fire Technology}, respectively. Other often-cited, peer-reviewed technical journals include the {\em Fire Safety Journal}, {\em Fire and Materials}, {\em Combustion Science and Technology}, {\em Combustion Theory and Modeling} and the {\em Journal of Heat Transfer}.
+Much of the current knowledge of fire science and engineering is found in handbooks such as the {\em SFPE Handbook of Fire Protection Engineering}~\cite{SFPE} and the {\em Fire Protection Handbook}~\cite{NFPA}. Popular textbooks in fire protection engineering include those by Drysdale~\cite{Drysdale:1} and Quintiere~\cite{Quintiere:2}. On-going research in fire and combustion is documented in several journals and conference proceedings. The International Association of Fire Safety Science (IAFSS) organizes a conference every three years, the proceedings of which are frequently referenced by fire researchers. Interscience Communications, a London-based publisher of several fire-related journals, hosts a conference known as Interflam roughly every three years in the United Kingdom. The Combustion Institute hosts an international symposium on combustion every two years, and in addition to the proceedings of this symposium, the organization publishes its own journal, {\em Combustion and Flame}. The papers appearing in the IAFSS conference proceedings, the Combustion Symposium proceedings, and {\em Combustion and Flame} are all peer-reviewed, while those appearing in the Interflam proceedings are selected based on the submission of a short abstract. Both the Society for Fire Protection Engineers (SFPE) and the National Fire Protection Association (NFPA) publish peer-reviewed technical journals entitled the {\em Journal of Fire Protection Engineering} and {\em Fire Technology}, respectively. Other often-cited, peer-reviewed technical journals include the {\em Fire Safety Journal}, {\em Fire and Materials}, {\em Combustion Science and Technology}, {\em Combustion Theory and Modeling} and the {\em Journal of Heat Transfer}.
 
 Research at NIST is documented in various ways beyond contributions made by staff to external journals and conferences. NIST publishes several forms of internal reports, technical notes, special publications, and its own journal called the {\em Journal of Research of NIST}. An internal report, referred to as a NISTIR (NIST Inter-agency Report), is a convenient means to disseminate information, especially when the quantity of data exceeds what could normally be accepted by a journal. Often parts of a NISTIR are published externally, with the NISTIR itself serving as the complete record of the work performed. Previous versions of the FDS Technical Reference Guide and User's Guide were published as NISTIRs. The current FDS and Smokeview manuals are being published as NIST Special Publications, distinguished from NISTIRs by the fact that they are permanently archived. Work performed by an outside person or organization working under a NIST grant or contract is published in the form of a NIST Grant/Contract Report (GCR). All work performed by the staff of the Fire Research Division at NIST beyond 1993 is permanently stored in electronic form and made freely available via the Internet.
 
@@ -411,7 +410,7 @@ Although CFAST can address many fire scenarios, there are limitations in all of 
 
 \section{Project Management}
 
-This Guide covers models developed by the NIST Engineering Laboratory, Fire Research Division, in cooperation with VTT Technical Research Centre of Finland and others. Like all projects at NIST, a designated project leader is responsible for directing and prioritizing model development, error correction, and preparation of documentation for the model development.
+This Guide covers models developed by the NIST Engineering Laboratory, Fire Research Division, in cooperation with VTT Technical Research Centre of Finland and others. A designated project leader is responsible for directing and prioritizing model development, error correction, and preparation of documentation for the model development.
 
 Members of the development team share in the development and maintenance responsibilities, which include:
 \begin{enumerate}
@@ -424,7 +423,7 @@ Members of the development team share in the development and maintenance respons
 \item Maintaining a suite of verification and validation cases to test model accuracy and reliability
 \item Developing and updating a ``Roadmap'' of future development
 \end{enumerate}
-Most decisions concerning these various tasks are made individually or by consensus of the team members. In the event of a disagreement over a technical issue, the resolution is facilitated by the principal developers at NIST and VTT. Non-technical issues are addressed by the chief of the Fire Research Division at NIST or the respective counterpart at VTT. All policies and procedures described in this document are subject to review by NIST in consultation with VTT.
+Most decisions concerning these various tasks are made individually or by consensus of the team members. In the event of a disagreement over a technical issue, the resolution is facilitated by the principal developers at NIST and VTT. Non-technical issues are addressed by the chief of the Fire Research Division at NIST or the respective counterpart at VTT. All policies and procedures described in this document are subject to review by NIST. VTT, SFPE, and other Federal agencies have an opportunity to provide input for consideration by NIST.
 
 Review and approval of software and documentation is part of the standard review process for any report or other product developed by NIST. A minimum of five reviews are required prior to release of reports or software, including two independent technical peer reviews, technical and management reviews at the technical workgroup and division level, and a policy review at the NIST-wide level.  This review is documented and recorded on the NIST standard form NIST 114 along with official approval notification provided to the primary author of the product.
 
@@ -437,7 +436,7 @@ Document identification and control consists of placing all project files in a c
 
 Starting in 2007 with FDS version 5 and CFAST version 6, the development team adopted GoogleCode, a free Internet service designed to assist open source software development by providing a repository for source code, revision control, program distribution, bug tracking, and various other very useful services. In 2015, Google terminated this service, and provided all of its projects a migration path to GitHub, a similar free service that uses Git, rather than Subversion, as its version control software.
 
-The manuals are typeset using \LaTeX, specifically, PDF \LaTeX. The \LaTeX\ files are essentially text files that are under version control. The figures are either in the form of PDF or png files, depending on whether they are vector or raster format. There are a variety of \LaTeX\ packages available, including MiKTeX. The developers edit the manuals as part of the day to day upkeep of the model. Different editions of the manuals are distinguished by a specific Git hash tag.
+The manuals are typeset using \LaTeX, specifically, PDF \LaTeX. The \LaTeX\ files are essentially text files that are under version control. The figures are either in the form of PDF or png files, depending on whether they are vector or raster format. There are a variety of \LaTeX\ packages available, including MiKTeX. The developers edit the manuals as part of the day to day upkeep of the model. Different editions of the manuals are distinguished by a specific Git hashtag (a unique identifying string assigned to every revision of a repository in Github).
 
 
 \subsection{Project Repository}
@@ -450,7 +449,7 @@ The models live within a GitHub \emph{organization} called ``Fire Models''.  The
 \begin{tabular}{ll}
 fds & FDS source code, verification and validation tests, wikis, and documentation \\
 smv & Smokeview source code, integration tests, and documentation \\
-exp & Experimental data repository for model validation \\
+exp & Repository of experimental data for model validation \\
 out & FDS output results for validation \\
 bot & Firebot (continuous integration system) source \\
 fds-smv & Web page html source \\
@@ -509,11 +508,11 @@ The software development process for the models is intentionally simple. The pro
 NIST has developed an automated reporting and resolution tracking website for use with the models to facilitate tracking and cataloging of inquires, problems, and model enhancements / revisions. This is included as part of the websites at \newline
 \href{https://github.com/firemodels/fds/issues}{\textct{https://github.com/firemodels/fds/issues}} \\
 \href{https://github.com/firemodels/smv/issues}{\textct{https://github.com/firemodels/smv/issues}} \\
-\href{https://github.com/firemodels/cfast/issues}{\textct{https://github.com/firemodels/smv/issues}}.
+\href{https://github.com/firemodels/cfast/issues}{\textct{https://github.com/firemodels/cfast/issues}}.
 
 \section{Software Change Implementation}
 
-Each developer works on various routines, and makes changes as warranted. Minor bugs are fixed without any communication (the developers are in different locations), but more significant changes are discussed via email or telephone calls. A suite of simple verification calculations (included in this document) are run each night to ensure that the daily bug fixes have not altered any of the important algorithms. A suite of validation calculations (also included here) are run routinely and always with each significant upgrade.
+Each developer works on various routines, and makes changes as warranted. Minor bugs are fixed without any communication (the developers are in different locations), but more significant changes are discussed via email or telephone calls. A suite of simple verification calculations (included in this document) are run each night to ensure that the daily bug fixes have not altered any of the important algorithms. A suite of validation calculations (also included here) are run routinely and always with each significant upgrade. Any change to verification or validation results are flagged and reported for further investigation to ensure changes in model outputs are expected with given changes to the model code.
 
 
 \subsection{Creating a Change Request}
@@ -530,7 +529,7 @@ Once a developer has addressed a change request, the modified files are committe
 \section{Software and Peer Reviews}
 
 
-As a general rule, all team members watch for unintentional commits of copyrighted material or algorithms, and also proprietary data or case studies collected from an end user. The model's themselves do not include copyrighted or proprietary data, but occasionally this kind of information is submitted by an end user who has submitted a bug report.
+As a general rule, all team members watch for unintentional commits of copyrighted material or algorithms, and also proprietary data or case studies collected from an end user. The models themselves do not include copyrighted or proprietary data, but occasionally this kind of information is submitted by an end user who has submitted a bug report.
 
 \subsection{Reviews Prior to Software Release}
 
@@ -549,7 +548,7 @@ Individual testing of model algorithms are made by the developers during any rev
 
 \item Examination of results of standard test cases included with the release version of the model. Any changes in the output from prior versions is explained (and documented in the software testing and validation results report) by modifications made to the model.
 
-\item For major new releases of the model, a complete suite of test cases should be compared to those from previous versions of the model.  At a minimum this includes the set of validation exercises described in U.S. Nuclear Regulatory Commission publication NUREG 1824 \cite{NUREG_1824, NUREG_1824_Sup_1}, but may include additional example cases or validation exercises as appropriate.
+\item For major new releases of the model, a complete suite of test cases should be compared to those from previous versions of the model.  At a minimum this includes the set of validation exercises described in U.S. Nuclear Regulatory Commission publication NUREG 1824 \cite{NUREG_1824, NUREG_1824_Sup_1}, but also include numerous additional example cases or validation exercises added as available.
 
 \item For all changes to the model, an automated testing process is used that provides automatic error checking and collecting performance and accuracy statistics between model revisions. Results of this process for release version of the model are included in the Verification and Validation Guides for FDS \cite{FDS_Validation_Guide, FDS_Verification_Guide}, Smokeview \cite{Smokeview_Verification_Guide}, and CFAST \cite{CFAST_Valid_Guide_7}.
 \end{itemize}
@@ -569,7 +568,7 @@ In the first stage, the newest version of the FDS, SMV, or CFAST source code is 
 
 \subsection*{Stage 2: Compilation of debug versions}
 
-the model is compiled with debugging flags enabled. This stage allows for errors in the source code to be identified and traced early in the build/test process. Any compiler warnings are logged at this time, and the build/test process continues after no major compilation errors are found.
+The model is compiled with debugging flags enabled. This stage allows for errors in the source code to be identified and traced early in the build/test process. Any compiler warnings are logged at this time, and the build/test process continues after no major compilation errors are found.
 
 \subsection*{Stage 3: Run verification suite (or validation set) in debug mode}
 
@@ -581,7 +580,7 @@ The release version of the model is compiled. Any compiler warnings are logged a
 
 \subsection*{Stage 5: Run verification suite (or validation set) in release mode}
 
-All of the cases in the verification suite (or validation set) are invoked using the moel release versions that were compiled in Stage~4. After all of the cases run to completion, the output logs are checked for Fortran errors, numerical instabilities, missing verification case files, or other model errors. If validation mode is active and the simulations are free of errors, then the updated results are committed back to the repository. For CFAST, the entire model validation suite is tested each time.
+All of the cases in the verification suite (or validation set) are invoked using the model release versions that were compiled in Stage~4. After all of the cases run to completion, the output logs are checked for Fortran errors, numerical instabilities, missing verification case files, or other model errors. If validation mode is active and the simulations are free of errors, then the updated results are committed back to the repository. For CFAST, the entire model validation suite is tested each time.
 
 \subsection*{Stage 6: Compilation of Smokeview and scripted generation of figures}
 
@@ -616,7 +615,7 @@ A major release of the model typically occurs every few years. As the name impli
 
 \subsection{Announcing a New Version}
 
-Following successful completion of the required baseline testing, a new version is released.  Prior to release, the version identification information within the model source code is updated.  Model documentation is updated to include the new version number.  The new version is compiled and new installation packages are uploaded to the model download site.  Prior versions are deprecated.
+Following successful completion of the required baseline testing, a new version is released.  Prior to release, the version identification information within the model source code is updated.  Model documentation is updated to include the new version number.  The new version is compiled and new installation packages are uploaded to the model download site.  Prior versions are archived and deprecated.
 
 
 
