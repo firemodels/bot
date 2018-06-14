@@ -619,12 +619,14 @@ check_cases_debug()
 
 # copy casename.err to casename.err_stage4 for any cases that had errors
       echo "#/bin/bash" > $OUTPUT_DIR/stage4_filelist
-      grep err $OUTPUT_DIR/stage4_errors | awk -F':' '{ print "cp " $1 " /tmp/."}'  | sort -u >> $OUTPUT_DIR/stage4_filelist
+# comment out following line until verified that it works
+#      grep err: $OUTPUT_DIR/stage4_errors | awk -F':' '{ print "cp " $1 " /tmp/."}'  | sort -u >> $OUTPUT_DIR/stage4_filelist
       if [ "$FIREBOT_MODE" == "verification" ] ; then
         cd $fdsrepo/Verification
       else
         cd $fdsrepo/Validation
       fi
+# comment out following line until verified that it works
 #      source $OUTPUT_DIR/stage4_filelist
 
       # If errors encountered in validation mode, then email status and exit
