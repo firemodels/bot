@@ -12,7 +12,7 @@ if not exist ..\.gitbot goto skip1
    exit /b
 :endif1
 
-set tagrepos=fds smv fds-smv
+set tagrepos=fds smv cfast fds-smv
 set fdsrepos=exp fds fig out smv
 set smvrepos=cfast fds smv fig
 set cfastrepos=cfast exp smv fig
@@ -70,7 +70,6 @@ goto eof
 :create_repo
   set repo=%1
   set repo_out=%repo%
-  set repo_dir=%FMROOT%\%repo%
   
   echo -----------------------------------------------------------
 
@@ -86,6 +85,7 @@ goto eof
   if "%tagrepo%" == "1" (
      set repo_out=%repo_out%_tag
   )
+  set repo_dir=%FMROOT%\%repo_out%
   
 :: check if repo has been cloned locally
   if exist %repo_dir% (
