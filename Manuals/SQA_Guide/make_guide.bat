@@ -1,5 +1,5 @@
 @echo off
-set paper=FDS_Config_Management_Plan
+set paper=Firemodels_SQA_Guide
 
 Title Building %paper%
 
