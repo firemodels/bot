@@ -12,7 +12,7 @@ echo "-f - setup repos used by firebot: "
 echo "    $fdsrepos"
 echo "-s - setup repos used by smokebot: "
 echo "    $smvrepos"
-echo "-t - setup fds, smv and webpages repos that can be tagged"
+echo "-t - setup fds, smv, cfast and webpages repos that can be tagged"
 echo "     (have push access to firemodels)"
 echo "-w - setup wiki and webpage repos cloned from firemodels"
 echo "-h - display this message"
@@ -21,7 +21,7 @@ exit
 
 CURDIR=`pwd`
 
-tagrepos="fds smv fds-smv"
+tagrepos="fds smv cfast fds-smv"
 fdsrepos="exp fds fig out smv"
 smvrepos="cfast fds fig smv"
 cfastrepos="cfast exp smv fig"
