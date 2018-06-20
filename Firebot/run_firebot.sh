@@ -10,8 +10,7 @@
 function usage_all {
 echo ""
 echo "Miscellaneous:"
-echo "-b - branch_name - run firebot using branch_name [default: $BRANCH]"
-echo "     use current to use existing branch"
+echo "-b - use the current branch (can be different than master)"
 echo "-B  - use startup files to set the environment, not modules"
 echo "-q queue - specify queue [default: $QUEUE]"
 #echo "validationbot mode:"
@@ -186,11 +185,11 @@ export QFDS_STARTUP=
 
 #*** parse command line options
 
-while getopts 'b:BcdCD:FfHhIiJKkLm:Pq:Q:nRsSuTUvV:' OPTION
+while getopts 'bBcdCD:FfHhIiJKkLm:Pq:Q:nRsSuTUvV:' OPTION
 do
 case $OPTION  in
   b)
-   BRANCH="$OPTARG"
+   BRANCH=current
    ;;
   B)
     export QFDS_STARTUP=1
