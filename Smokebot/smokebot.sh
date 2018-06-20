@@ -1408,7 +1408,7 @@ case $OPTION in
   b)
    SMVBRANCH="$OPTARG"
    if [ "$SMVBRANCH" == "current" ]; then
-     FDSBRANCH = "current"
+     FDSBRANCH="current"
    fi
    ;;
   c)
