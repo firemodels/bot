@@ -91,6 +91,7 @@ CD_REPO ()
   CHK_REPO $repodir || return 1
 
   cd $repodir
+  if [ "$branch" != "current" ]; then
   if [ "$branch" != "" ]; then
      CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
      if [ "$CURRENT_BRANCH" != "$branch" ]; then
@@ -98,6 +99,7 @@ CD_REPO ()
        echo "Found branch $CURRENT_BRANCH. Aborting firebot."
        return 1
      fi
+  fi
   fi
   return 0
 }
@@ -1575,6 +1577,7 @@ FIREBOT_MODE="verification"
 WEBBRANCH=nist-pages
 FDSBRANCH=master
 SMVBRANCH=master
+BOTBRANCH=master
 BRANCH=master
 
 #*** determine platform
@@ -1630,8 +1633,10 @@ while getopts 'b:cCdD:FhIiJLm:p:Pq:Q:sSTuUV:' OPTION
 do
 case $OPTION in
   b)
-#   BRANCH="$OPTARG"
-    echo "***Warning: -b option for specifying a branch is not supported at this time"
+   BRANCH="$OPTARG"
+   FDSBRANCH=$BRANCH
+   SMVBRANCH=$BRANCH
+   BOTBRANCH=$BRANCH
    ;;
   c)
    CLEANREPO=1
@@ -1764,13 +1769,13 @@ push=
 #*** make sure repos exist and have expected branches
 
 fdsrepo=$repo/fds
-CD_REPO $fdsrepo $fdsbranch || exit 1
+CD_REPO $fdsrepo $FDSBRANCH || exit 1
 
 smvrepo=$repo/smv
-CD_REPO $smvrepo $smvbranch || exit 1
+CD_REPO $smvrepo $SMVBRANCH || exit 1
 
 botrepo=$repo/bot
-CD_REPO $botrepo $botbranch || exit 1
+CD_REPO $botrepo $BOTBRANCH || exit 1
 
 if [ "$FIREBOT_MODE" == "validation" ]; then
   outrepo=$repo/out
@@ -1970,10 +1975,10 @@ if [ "$FIREBOT_LITE" == "" ]; then
   if [[ "$CLEANREPO" == "1" ]] ; then
      if [[ "$FIREBOT_MODE" == "verification" ]] ; then
         echo "   cleaning Verification"
-        clean_repo $fdsrepo/Verification $fdsbranch || exit 1
+        clean_repo $fdsrepo/Verification $FDSBRANCH || exit 1
      else
         echo "   cleaning Validation"
-        clean_repo $fdsrepo/Validation $fdsbranch || exit 1
+        clean_repo $fdsrepo/Validation $FDSBRANCH || exit 1
      fi
   fi
 

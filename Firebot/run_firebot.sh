@@ -10,7 +10,8 @@
 function usage_all {
 echo ""
 echo "Miscellaneous:"
-#echo "-b - branch_name - run firebot using branch_name [default: $BRANCH]"
+echo "-b - branch_name - run firebot using branch_name [default: $BRANCH]"
+echo "     use current to use existing branch"
 echo "-B  - use startup files to set the environment, not modules"
 echo "-q queue - specify queue [default: $QUEUE]"
 #echo "validationbot mode:"
@@ -189,8 +190,7 @@ while getopts 'b:BcdCD:FfHhIiJKkLm:Pq:Q:nRsSuTUvV:' OPTION
 do
 case $OPTION  in
   b)
-#   BRANCH="$OPTARG"
-    echo "***Warning: -b option for specifying a branch is not supported at this time"
+   BRANCH="$OPTARG"
    ;;
   B)
     export QFDS_STARTUP=1
@@ -355,7 +355,7 @@ fi
 BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
-$ECHO  ./$botscript -p $firebot_pid $commit $push $UPDATE $DV $INTEL $debug_mode $showcaselist $caselistfile $MAX_VALIDATION_PROCESSES $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUEBENCH $QUEUE $SKIPMATLAB $BUILD_BUNDLE $SKIPFIGURES $EMAIL "$@"
+$ECHO  ./$botscript -p $firebot_pid $commit $push $UPDATE $DV $INTEL $debug_mode $BRANCH $showcaselist $caselistfile $MAX_VALIDATION_PROCESSES $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUEBENCH $QUEUE $SKIPMATLAB $BUILD_BUNDLE $SKIPFIGURES $EMAIL "$@"
 if [ -e $firebot_pid ]; then
   rm -f $firebot_pid
 fi
