@@ -50,7 +50,16 @@ The script `firebot.sh` is run using the wrapper script `run_firebot.sh`. This s
 ```
 ./run_firebot.sh -H
 ```
-To kill firebot, cd to the directory containing firebot.sh and type: `./run_firebot.sh -k`
+
+A typical way to run firebot is to cd into the directory containing firbot.sh and type: 
+
+```./run_firebot.sh -c -u ```
+
+The `-c` and `-u` options clean and update the repos respectively.
+
+To kill firebot, cd to the directory containing firebot.sh and type:
+
+```./run_firebot.sh -k```
 
 Important things to consider: do you want to test your own local changes, or update your repositories from the central repository? Do you want to use Intel MPI or Open MPI? Do you want to skip certain stages of the process?
 
