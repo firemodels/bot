@@ -12,8 +12,7 @@ echo ""
 echo "Miscellaneous:"
 echo "-a - run automatically if FDS or smokeview source has changed"
 echo "-A - run automatically if smokeview source has changed"
-echo "-b - branch_name - run smokebot using the branch branch_name "
-echo "                   [default: $BRANCH]"
+echo "-b - use the current branch"
 echo "-B - use startup files to set the environment not modules"
 echo "-C - add --mca plm_rsh_agent /usr/bin/ssh to mpirun command "
 echo "           when running cases"
@@ -190,7 +189,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'aAb:BcCd:fhHI:JkLm:NMq:Rr:StuUvw:W:' OPTION
+while getopts 'aAbBcCd:fhHI:JkLm:NMq:Rr:StuUvw:W:' OPTION
 do
 case $OPTION  in
   a)
@@ -203,7 +202,7 @@ case $OPTION  in
    export QFDS_STARTUP=1
    ;;
   b)
-   BRANCH="$OPTARG"
+   BRANCH="current"
    ;;
   c)
    CLEANREPO=-c
