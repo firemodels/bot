@@ -451,7 +451,7 @@ echo Stage 2 - Building Smokeview
 echo             libs
 
 cd %smvrepo%\Build\LIBS\intel_win_64
-call makelibs_bot 1>> %OUTDIR%\stage2a.txt 2>&1
+call make_LIBS_bot 1>> %OUTDIR%\stage2a.txt 2>&1
 
 echo             debug
 
@@ -498,6 +498,11 @@ call :find_runcases_errors   "error|forrtl: severe|DASSL|floating invalid" %cfas
 call :find_runcases_warnings "***Warning"                                  %cfastrepo%\Verification "Stage 3a-Verification"
 call :find_runcases_errors   "error|forrtl: severe|DASSL|floating invalid" %cfastrepo%\Verification "Stage 3a-Verification"
 
+:: note: once we verify the that the -check option is working below we can incorporate the above checks into the -check option
+cd %cfastrepo%\Validation\scripts
+call Run_CFAST_cases -check %cfastopt% %smokeviewopt% 1> %OUTDIR%\stage3aa.txt 2>&1
+call :check_cfast_cases %OUTDIR%\stage3aa.txt stage3a
+
 if %clean% == 1 (
    echo             removing debug output files
    call :git_clean %cfastrepo%\Validation
@@ -516,6 +521,10 @@ call :find_runcases_errors   "error|forrtl: severe|DASSL|floating invalid" %cfas
 
 call :find_runcases_warnings "***Warning"                                  %cfastrepo%\Verification "Stage 3b-Verification"
 call :find_runcases_errors   "error|forrtl: severe|DASSL|floating invalid" %cfastrepo%\Verification "Stage 3b-Verification"
+
+cd %cfastrepo%\Validation\scripts
+call Run_CFAST_cases -check %cfastopt% %smokeviewopt% 1> %OUTDIR%\stage3bb.txt 2>&1
+call :check_cfast_cases %OUTDIR%\stage3bb.txt stage3b
 
 call :GET_DURATION RUNVV %RUNVV_beg%
 
@@ -816,6 +825,24 @@ if %nerrors% GTR 0 (
   echo %stage% errors >> %errorlog%
   echo. >> %errorlog%
   type %OUTDIR%\stage_error.txt >> %errorlog%
+  set haveerrors=1
+)
+exit /b
+
+:: -------------------------------------------------------------
+  :check_cfast_cases
+:: -------------------------------------------------------------
+
+set file=%1
+set stage=%2
+
+grep -RIiE Error %file% > %OUTDIR%\stage_error2.txt
+type %OUTDIR%\stage_error2.txt | find /v /c "kdkwokwdokwd"> %OUTDIR%\stage_nerror2.txt
+set /p nerrors=<%OUTDIR%\stage_nerror2.txt
+if %nerrors% GTR 0 (
+  echo %stage% errors >> %errorlog%
+  echo. >> %errorlog%
+  type %OUTDIR%\stage_error2.txt >> %errorlog%
   set haveerrors=1
 )
 exit /b
