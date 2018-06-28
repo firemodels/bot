@@ -511,7 +511,7 @@ run_verification_cases_debug()
    # Start running all FDS verification cases in delayed stop debug mode
    cd $fdsrepo/Verification/scripts
    # Run FDS with delayed stop files (with 1 OpenMP thread and 1 iteration)
-   echo Running FDS Verification Cases
+   echo "Running FDS Verification Cases"
    echo "   debug"
    echo 'Running FDS verification cases:' >> $OUTPUT_DIR/stage4
    ./Run_FDS_Cases.sh -o 1 -d -m 1 $INTEL2 -q $QUEUE -Q $QUEUEBENCH >> $OUTPUT_DIR/stage4 2>&1
