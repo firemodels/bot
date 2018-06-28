@@ -11,8 +11,8 @@ The following steps need only be done once. The exact phrasing of the commands a
 
 2. Ensure that the following software packages are installed on the system:
 
-    * Intel Fortran and C compilers and Intel Inspector
-    * Gnu Fortran compiler
+    * Intel Fortran and C compilers, Intel MPI, Intel Inspector
+    * Gnu Fortran compiler (Optional)
     * LaTeX (TeX Live distribution), be sure to make this the default LaTeX in the system-wide PATH
     * Matlab (test the command `matlab`)
 
@@ -28,10 +28,15 @@ The following steps need only be done once. The exact phrasing of the commands a
     . /usr/local/Modules/3.2.10/init/bash
     module load null modules torque-maui
     module load intel/18
-    module load gfortran492
     ulimit -s unlimited
     ```
-    Note that these modules load the Intel Fortran and Gnu Fortran compilers, both of which are used to check FDS for syntax errors and consisistency with the Fortran 2008 standard.
+    Note that these modules load the Intel Fortran compiler and other necessary Intel libraries. If you want to do a debug compile with the Gnu fortran compiler, add
+    ```
+    module load gfortran492
+    module load openmpi/300gnu_64ib
+    export OPENMPI_GNU=openmpi/300gnu_64ib
+    ```
+    Both the Intel and Gnu compilers are used to check FDS for syntax errors and consisistency with the Fortran 2008 standard.
     
 6. Setup passwordless SSH for the your account. Generate SSH keys and ensure that the head node can SSH into all of the compute nodes. Also, make sure that your account information is propagated across all compute nodes.
 
@@ -53,9 +58,9 @@ The script `firebot.sh` is run using the wrapper script `run_firebot.sh`. This s
 
 A typical way to run firebot is to cd into the directory containing firbot.sh and type: 
 
-```./run_firebot.sh -c -u ```
+```nohup ./run_firebot.sh -c -u -J -m user@gmail.com &```
 
-The `-c` and `-u` options clean and update the repos respectively.
+The `-c` and `-u` options clean and update the repos respectively. The `-J` option directs Firebot to use the Intel suite. The email addressee shall receive notice when Firebot is done. The `nohup` at the start and `&` at the end of the command run `firebot.sh` in the background and redirect screen output to the file called `nohup.out`.
 
 To kill firebot, cd to the directory containing firebot.sh and type:
 
