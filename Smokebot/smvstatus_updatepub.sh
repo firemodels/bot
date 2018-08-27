@@ -18,13 +18,15 @@ CD_REPO ()
   CHK_REPO $repodir
 
   cd $repodir
-  if [ "$branch" != "" ]; then
-     CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
-     if [ "$CURRENT_BRANCH" != "$branch" ]; then
-       echo "***error: was expecting branch $branch in repo $repodir."
-       echo "Found branch $CURRENT_BRANCH."
-       exit
-     fi
+  if [ "$branch" != "current" ]; then
+    if [ "$branch" != "" ]; then
+      CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
+      if [ "$CURRENT_BRANCH" != "$branch" ]; then
+        echo "***error: was expecting branch $branch in repo $repodir."
+        echo "Found branch $CURRENT_BRANCH."
+        exit
+      fi
+    fi
   fi
 }
 
