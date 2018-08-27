@@ -1517,9 +1517,19 @@ CD_REPO $cfastrepo $cfastbranch || exit 1
 
 fdsrepo=$repo/fds
 CD_REPO $fdsrepo $FDSBRANCH || exit 1
+if [ "$FDSBRANCH" == "current" ]; then
+  cd $fdsrepo
+  FDSBRANCH=`git rev-parse --abbrev-ref HEAD`
+fi
+
 
 smvrepo=$repo/smv
 CD_REPO $smvrepo $SMVBRANCH ||  exit 1
+if [ "$SMVBRANCH" == "current" ]; then
+  cd $smvrepo
+  SMVBRANCH=`git rev-parse --abbrev-ref HEAD`
+fi
+
 cd $smokebotrundir
 
 #*** save pid if -k option (kill smokebot) is used lateer
