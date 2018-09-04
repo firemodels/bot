@@ -32,14 +32,14 @@ CD_REPO ()
 
   cd $repodir
   if [ "$branch" != "current" ]; then
-  if [ "$branch" != "" ]; then
-     CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
-     if [ "$CURRENT_BRANCH" != "$branch" ]; then
-       echo "***error: was expecting branch $branch in repo $repodir."
-       echo "Found branch $CURRENT_BRANCH. Aborting smokebot."
-       return 1
-     fi
-  fi
+    if [ "$branch" != "" ]; then
+       CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
+       if [ "$CURRENT_BRANCH" != "$branch" ]; then
+         echo "***error: was expecting branch $branch in repo $repodir."
+         echo "Found branch $CURRENT_BRANCH. Aborting smokebot."
+         return 1
+       fi
+    fi
   fi
   return 0
 }
@@ -1517,9 +1517,19 @@ CD_REPO $cfastrepo $cfastbranch || exit 1
 
 fdsrepo=$repo/fds
 CD_REPO $fdsrepo $FDSBRANCH || exit 1
+if [ "$FDSBRANCH" == "current" ]; then
+  cd $fdsrepo
+  FDSBRANCH=`git rev-parse --abbrev-ref HEAD`
+fi
+
 
 smvrepo=$repo/smv
 CD_REPO $smvrepo $SMVBRANCH ||  exit 1
+if [ "$SMVBRANCH" == "current" ]; then
+  cd $smvrepo
+  SMVBRANCH=`git rev-parse --abbrev-ref HEAD`
+fi
+
 cd $smokebotrundir
 
 #*** save pid if -k option (kill smokebot) is used lateer
