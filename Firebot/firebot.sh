@@ -1862,8 +1862,6 @@ echo "     FDS repo: $fdsrepo"
 echo "   FDS branch: $FDSBRANCH"
 echo "     SMV repo: $smvrepo"
 echo "   SMV branch: $SMVBRANCH"
-echo "     BOT repo: $botrepo"
-echo "   BOT branch: $BOTBRANCH"
 echo "      Run dir: $firebotdir"
 if [ "$IFORT_VERSION" != "" ]; then
   echo "      Fortran: $IFORT_VERSION"
