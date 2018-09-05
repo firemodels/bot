@@ -1483,7 +1483,9 @@ if [ "$QUEUE" != "$QUEUEBENCH" ]; then
    echo "benchmark queue: $QUEUEBENCH " >> $TIME_LOG
 fi
    echo "   fds revision: $GIT_REVISION " >> $TIME_LOG
+   echo "     fds branch: $FDSBRANCH "    >> $TIME_LOG
    echo "   smv revision: $SMV_REVISION " >> $TIME_LOG
+   echo "     smv branch: $SMVBRANCH "    >> $TIME_LOG
 if [ "$IFORT_VERSION" != "" ]; then
    echo "        Fortran: $IFORT_VERSION " >> $TIME_LOG
 fi
@@ -1857,7 +1859,11 @@ echo ""
 echo "Settings"
 echo "--------"
 echo "     FDS repo: $fdsrepo"
+echo "   FDS branch: $FDSBRANCH"
 echo "     SMV repo: $smvrepo"
+echo "   SMV branch: $SMVBRANCH"
+echo "     BOT repo: $botrepo"
+echo "   BOT branch: $BOTBRANCH"
 echo "      Run dir: $firebotdir"
 if [ "$IFORT_VERSION" != "" ]; then
   echo "      Fortran: $IFORT_VERSION"
