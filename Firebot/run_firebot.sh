@@ -10,8 +10,8 @@
 function usage_all {
 echo ""
 echo "Miscellaneous:"
-echo "-b - use the current branch (can be different than master)"
-echo "-B  - use startup files to set the environment, not modules"
+echo "-b - use the current branch"
+echo "-B - use startup files to set the environment, not modules"
 echo "-q queue - specify queue [default: $QUEUE]"
 #echo "validationbot mode:"
 #echo "-C - commit validationbot output results"
