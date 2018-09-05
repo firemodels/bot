@@ -1770,12 +1770,27 @@ push=
 
 fdsrepo=$repo/fds
 CD_REPO $fdsrepo $FDSBRANCH || exit 1
+if [ "$FDSBRANCH" == "current" ]; then
+  cd $fdsrepo
+  FDSBRANCH=`git rev-parse --abbrev-ref HEAD`
+fi
+
 
 smvrepo=$repo/smv
 CD_REPO $smvrepo $SMVBRANCH || exit 1
+if [ "$SMVBRANCH" == "current" ]; then
+  cd $smvrepo
+  SMVBRANCH=`git rev-parse --abbrev-ref HEAD`
+fi
+
 
 botrepo=$repo/bot
 CD_REPO $botrepo $BOTBRANCH || exit 1
+if [ "$BOTBRANCH" == "current" ]; then
+  cd $botrepo
+  BOTBRANCH=`git rev-parse --abbrev-ref HEAD`
+fi
+
 
 if [ "$FIREBOT_MODE" == "validation" ]; then
   outrepo=$repo/out

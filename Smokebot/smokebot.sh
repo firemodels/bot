@@ -1733,7 +1733,7 @@ fi
 if [ "$UPDATEREPO" == "1" ]; then
   echo "Updating"
   echo "   cfast"
-  update_repo cfast master   || exit 1
+  update_repo cfast $CFASTBRANCH || exit 1
   echo "   fds"
   update_repo fds $FDSBRANCH || exit 1
   echo "   fig"
