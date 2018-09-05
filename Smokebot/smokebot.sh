@@ -1623,7 +1623,6 @@ echo "CFAST branch: $CFASTBRANCH"
 echo "    bot repo: $botrepo"
 echo "  bot branch: $BOTBRANCH"
 echo "     Run dir: $smokebotdir"
-echo "      branch: $SMVBRANCH"
 if [ "$CLEANREPO" == "1" ]; then
   echo " clean repos: yes"
 else
