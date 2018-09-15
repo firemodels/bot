@@ -1370,6 +1370,8 @@ export SCRIPTFILES=$smokebotdir/scriptfiles
 WEBBRANCH=nist-pages
 FDSBRANCH=master
 SMVBRANCH=master
+CFASTBRANCH=master
+BOTBRANCH=master
 
 NOPT=
 SMOKEBOT_QUEUE=smokebot
@@ -1409,6 +1411,8 @@ case $OPTION in
    SMVBRANCH="$OPTARG"
    if [ "$SMVBRANCH" == "current" ]; then
      FDSBRANCH="current"
+     CFASTBRANCH="current"
+     BOTBRANCH="current"
    fi
    ;;
   c)
@@ -1510,10 +1514,18 @@ MKDIR $HOME/.smokebot/pubs
 #*** make sure repos needed by smokebot exist
 
 botrepo=$repo/bot
-CD_REPO $botrepo $botbranch || exit 1
+CD_REPO $botrepo $BOTBRANCH || exit 1
+if [ "$BOTBRANCH" == "current" ]; then
+  cd $botrepo
+  BOTBRANCH=`git rev-parse --abbrev-ref HEAD`
+fi
 
 cfastrepo=$repo/cfast
-CD_REPO $cfastrepo $cfastbranch || exit 1
+CD_REPO $cfastrepo $CFASTBRANCH || exit 1
+if [ "$CFASTBRANCH" == "current" ]; then
+  cd $cfastrepo
+  CFASTBRANCH=`git rev-parse --abbrev-ref HEAD`
+fi
 
 fdsrepo=$repo/fds
 CD_REPO $fdsrepo $FDSBRANCH || exit 1
@@ -1603,10 +1615,14 @@ echo ""
 echo "Smokebot Settings"
 echo "-----------------"
 echo "    FDS repo: $fdsrepo"
+echo "  FDS branch: $FDSBRANCH"
 echo "    SMV repo: $smvrepo"
+echo "  SMV branch: $SMVBRANCH"
 echo "  CFAST repo: $cfastrepo"
+echo "CFAST branch: $CFASTBRANCH"
+echo "    bot repo: $botrepo"
+echo "  bot branch: $BOTBRANCH"
 echo "     Run dir: $smokebotdir"
-echo "      branch: $SMVBRANCH"
 if [ "$CLEANREPO" == "1" ]; then
   echo " clean repos: yes"
 else
@@ -1717,7 +1733,7 @@ fi
 if [ "$UPDATEREPO" == "1" ]; then
   echo "Updating"
   echo "   cfast"
-  update_repo cfast master   || exit 1
+  update_repo cfast $CFASTBRANCH || exit 1
   echo "   fds"
   update_repo fds $FDSBRANCH || exit 1
   echo "   fig"
