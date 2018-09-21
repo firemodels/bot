@@ -32,14 +32,14 @@ CD_REPO ()
 
   cd $repodir
   if [ "$branch" != "current" ]; then
-  if [ "$branch" != "" ]; then
-     CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
-     if [ "$CURRENT_BRANCH" != "$branch" ]; then
-       echo "***error: was expecting branch $branch in repo $repodir."
-       echo "Found branch $CURRENT_BRANCH. Aborting smokebot."
-       return 1
-     fi
-  fi
+    if [ "$branch" != "" ]; then
+       CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
+       if [ "$CURRENT_BRANCH" != "$branch" ]; then
+         echo "***error: was expecting branch $branch in repo $repodir."
+         echo "Found branch $CURRENT_BRANCH. Aborting smokebot."
+         return 1
+       fi
+    fi
   fi
   return 0
 }
@@ -1370,6 +1370,8 @@ export SCRIPTFILES=$smokebotdir/scriptfiles
 WEBBRANCH=nist-pages
 FDSBRANCH=master
 SMVBRANCH=master
+CFASTBRANCH=master
+BOTBRANCH=master
 
 NOPT=
 SMOKEBOT_QUEUE=smokebot
@@ -1409,6 +1411,8 @@ case $OPTION in
    SMVBRANCH="$OPTARG"
    if [ "$SMVBRANCH" == "current" ]; then
      FDSBRANCH="current"
+     CFASTBRANCH="current"
+     BOTBRANCH="current"
    fi
    ;;
   c)
@@ -1510,16 +1514,34 @@ MKDIR $HOME/.smokebot/pubs
 #*** make sure repos needed by smokebot exist
 
 botrepo=$repo/bot
-CD_REPO $botrepo $botbranch || exit 1
+CD_REPO $botrepo $BOTBRANCH || exit 1
+if [ "$BOTBRANCH" == "current" ]; then
+  cd $botrepo
+  BOTBRANCH=`git rev-parse --abbrev-ref HEAD`
+fi
 
 cfastrepo=$repo/cfast
-CD_REPO $cfastrepo $cfastbranch || exit 1
+CD_REPO $cfastrepo $CFASTBRANCH || exit 1
+if [ "$CFASTBRANCH" == "current" ]; then
+  cd $cfastrepo
+  CFASTBRANCH=`git rev-parse --abbrev-ref HEAD`
+fi
 
 fdsrepo=$repo/fds
 CD_REPO $fdsrepo $FDSBRANCH || exit 1
+if [ "$FDSBRANCH" == "current" ]; then
+  cd $fdsrepo
+  FDSBRANCH=`git rev-parse --abbrev-ref HEAD`
+fi
+
 
 smvrepo=$repo/smv
 CD_REPO $smvrepo $SMVBRANCH ||  exit 1
+if [ "$SMVBRANCH" == "current" ]; then
+  cd $smvrepo
+  SMVBRANCH=`git rev-parse --abbrev-ref HEAD`
+fi
+
 cd $smokebotrundir
 
 #*** save pid if -k option (kill smokebot) is used lateer
@@ -1593,10 +1615,14 @@ echo ""
 echo "Smokebot Settings"
 echo "-----------------"
 echo "    FDS repo: $fdsrepo"
+echo "  FDS branch: $FDSBRANCH"
 echo "    SMV repo: $smvrepo"
+echo "  SMV branch: $SMVBRANCH"
 echo "  CFAST repo: $cfastrepo"
+echo "CFAST branch: $CFASTBRANCH"
+echo "    bot repo: $botrepo"
+echo "  bot branch: $BOTBRANCH"
 echo "     Run dir: $smokebotdir"
-echo "      branch: $SMVBRANCH"
 if [ "$CLEANREPO" == "1" ]; then
   echo " clean repos: yes"
 else
@@ -1707,7 +1733,7 @@ fi
 if [ "$UPDATEREPO" == "1" ]; then
   echo "Updating"
   echo "   cfast"
-  update_repo cfast master   || exit 1
+  update_repo cfast $CFASTBRANCH || exit 1
   echo "   fds"
   update_repo fds $FDSBRANCH || exit 1
   echo "   fig"

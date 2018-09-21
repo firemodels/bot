@@ -310,7 +310,7 @@ check_compile_cfast_gnu_db()
 {
    # Check for errors in CFAST debug compilation
    CD_REPO $cfastrepo/Build/CFAST/gnu_${platform}_${size}_db $cfastbranch || return 1
-   if [ -e "cfast7_gnu_${size}_db" ]
+   if [ -e "cfast7_${platform}_${size}_db" ]
    then
       stage2f_success=true
    else
