@@ -1337,6 +1337,7 @@ email_build_status()
       if [ "$UPLOADRESULTS" == "1" ]; then
         cd $smokebotdir
         $UploadGuides $NEWGUIDE_DIR $smvrepo/Manuals &> /dev/null
+        $UploadWEB                  $smvrepo/Manuals &> /dev/null
       fi
 
       # Send success message with links to nightly manuals
@@ -1651,6 +1652,7 @@ WEBFROMDIR="$smvrepo/Manuals/SMV_Summary"
 #SMV_UTILG_GUIDE=$smvrepo/Manuals/SMV_Utilities_Guide/SMV_Utilities_Guide.pdf
 #GEOM_NOTES=$smvrepo/Manuals/FDS_User_Guide/geom_notes.pdf
 UploadGuides=$botrepo/Smokebot/smv_guides2GD.sh
+UploadWEB=$botrepo/Smokebot/smv_web2GD.sh
 
 THIS_FDS_AUTHOR=
 THIS_FDS_FAILED=0
