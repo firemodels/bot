@@ -10,7 +10,9 @@ UPLOADWEB ()
 {
   WEBDIR=$1
   WEBDIRtar=${WEBDIR}.tar
-  tar cvf $WEBDIRtar $WEBDIR >& /dev/null
+  cd $WEBDIR
+  tar cvf ../$WEBDIRtar .
+  cd ..
   if [ -e $WEBDIRtar ]; then
     $GDRIVE list  | grep $WEBDIRtar | awk '{ system("~/bin/gdrive delete -i " $1)} '
     $GDRIVE upload -p $MANUAL_PARENT_ID -f $WEBDIRtar
