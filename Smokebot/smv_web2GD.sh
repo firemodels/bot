@@ -21,6 +21,9 @@ UPLOADWEB ()
     if [ $npubs -gt 1 ]; then
       echo "*** warning: More than one copy of $WEBDIRtar exists on google drive"
     fi
+    if [ -e $HOME/.smokebot/pubs ]; then
+      cp $WEBDIRtar $HOME/.smokebot/pubs/.
+    fi
   fi
 }
 

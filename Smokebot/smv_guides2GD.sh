@@ -23,6 +23,9 @@ UPLOADGUIDE ()
     if [ $npubs -gt 1 ]; then
       echo "*** warning: More than one copy of $FILEnew exists on google drive"
     fi
+    if [ -e $HOME/.smokebot/pubs ]; then
+      cp $FILEnew $HOME/.smokebot/pubs/.
+    fi
   fi
 }
 UPLOADFIGURES ()
@@ -38,6 +41,9 @@ UPLOADFIGURES ()
   gzip $tarfile
   $GDRIVE list  | grep $tarfile.gz | awk '{ system("~/bin/gdrive delete -i " $1)} '
   $GDRIVE upload -p $FIGURES_PARENT_ID -f $tarfile.gz
+  if [ -e $HOME/.smokebot/pubs ]; then
+    cp $tarfile.gz $HOME/.smokebot/pubs/.
+  fi
 }
 
 if [ -e $GDRIVE ] ; then
