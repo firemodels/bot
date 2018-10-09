@@ -1,15 +1,21 @@
 #!/bin/bash
 MANDIR=$1
+MAKEMOVIES=$2
 
 GDRIVE=~/bin/gdrive
 CURDIR=`pwd`
 # directory containing guides on google drive : FDS-SMV Newest Manuals
 MANUAL_PARENT_ID=0B_wB1pJL2bFQUlJwMmNfaHlqME0
+EXT=
+
+if [ "$MAKEMOVIES" == "1" ]; then
+  EXT=m
+fi
 
 UPLOADWEB ()
 {
   WEBDIR=$1
-  WEBDIRtar=${WEBDIR}.tar
+  WEBDIRtar=${WEBDIR}$EXT.tar
   cd $WEBDIR
   tar cvf ../$WEBDIRtar .
   cd ..
@@ -23,7 +29,8 @@ UPLOADWEB ()
     if [ $npubs -gt 1 ]; then
       echo "*** warning: More than one copy of $WEBDIRtar exists on google drive"
     fi
-    if [ -e $HOME/.smokebot/pubs ]; then
+    if [ -d $HOME/.smokebot/pubs ]; then
+      echo copying $WEBDIRtar to $HOME/.smokebot/pubs
       cp $WEBDIRtar $HOME/.smokebot/pubs/.
     fi
   fi
