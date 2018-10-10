@@ -1337,7 +1337,7 @@ email_build_status()
       if [ "$UPLOADRESULTS" == "1" ]; then
         cd $smokebotdir
         $UploadGuides $NEWGUIDE_DIR $smvrepo/Manuals &> /dev/null
-        $UploadWEB                  $smvrepo/Manuals $MAKEMOVIE &> /dev/null
+        $UploadWEB                  $smvrepo/Manuals $MAKEMOVIES &> /dev/null
       fi
 
       # Send success message with links to nightly manuals
