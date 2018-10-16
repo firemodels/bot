@@ -1280,14 +1280,20 @@ email_build_status()
    fi
    echo $THIS_FDS_FAILED>$FDS_STATUS_FILE
    stop_time=`date`
+   IFORT_VERSION=`ifort -v 2>&1`
    echo "----------------------------------------------" > $TIME_LOG
    echo "             host: $hostname " >> $TIME_LOG
    echo "               OS: $platform2" >> $TIME_LOG
    echo "             repo: $repo" >> $TIME_LOG
    echo "            queue: $SMOKEBOT_QUEUE" >> $TIME_LOG
-   echo "      fds version: $FDS_REVISION" >> $TIME_LOG
-   echo "      smv version: $GIT_REVISION" >> $TIME_LOG
+   echo "     fds revision: $FDS_REVISION" >> $TIME_LOG
+   echo "       fds branch: $FDSBRANCH "    >> $TIME_LOG
+   echo "     smv revision: $GIT_REVISION" >> $TIME_LOG
+   echo "       smv branch: $SMVBRANCH "    >> $TIME_LOG
    echo "    cfast version: $CFAST_REVISION" >> $TIME_LOG
+if [ "$IFORT_VERSION" != "" ]; then
+   echo "          Fortran: $IFORT_VERSION " >> $TIME_LOG
+fi
    echo "       start time: $start_time " >> $TIME_LOG
    echo "        stop time: $stop_time " >> $TIME_LOG
    echo "            setup: $DIFF_PRELIM" >> $TIME_LOG
