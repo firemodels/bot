@@ -1282,32 +1282,30 @@ email_build_status()
    stop_time=`date`
    IFORT_VERSION=`ifort -v 2>&1`
    echo "----------------------------------------------" > $TIME_LOG
-   echo "             host: $hostname " >> $TIME_LOG
-   echo "               OS: $platform2" >> $TIME_LOG
-   echo "             repo: $repo" >> $TIME_LOG
-   echo "            queue: $SMOKEBOT_QUEUE" >> $TIME_LOG
-   echo "     fds revision: $FDS_REVISION" >> $TIME_LOG
-   echo "       fds branch: $FDSBRANCH "    >> $TIME_LOG
-   echo "     smv revision: $GIT_REVISION" >> $TIME_LOG
-   echo "       smv branch: $SMVBRANCH "    >> $TIME_LOG
-   echo "    cfast version: $CFAST_REVISION" >> $TIME_LOG
+   echo "                 host: $hostname " >> $TIME_LOG
+   echo "                   OS: $platform2" >> $TIME_LOG
+   echo "                 repo: $repo" >> $TIME_LOG
+   echo "                queue: $SMOKEBOT_QUEUE" >> $TIME_LOG
+   echo "  fds revision/branch: $FDS_REVISION/$FDSBRANCH" >> $TIME_LOG
+   echo "  smv revision/branch: $GIT_REVISION/$SMVBRANCH" >> $TIME_LOG
+   echo "cfast revision/branch: $CFAST_REVISION/$CFASTBRANCH" >> $TIME_LOG
 if [ "$IFORT_VERSION" != "" ]; then
-   echo "          Fortran: $IFORT_VERSION " >> $TIME_LOG
+   echo "              Fortran: $IFORT_VERSION " >> $TIME_LOG
 fi
-   echo "       start time: $start_time " >> $TIME_LOG
-   echo "        stop time: $stop_time " >> $TIME_LOG
-   echo "            setup: $DIFF_PRELIM" >> $TIME_LOG
-   echo "   build software: $DIFF_BUILDSOFTWARE" >> $TIME_LOG
-   echo "        run cases: $DIFF_RUNCASES" >> $TIME_LOG
-   echo "    make pictures: $DIFF_MAKEPICTURES" >> $TIME_LOG
+   echo "           start time: $start_time " >> $TIME_LOG
+   echo "            stop time: $stop_time " >> $TIME_LOG
+   echo "                setup: $DIFF_PRELIM" >> $TIME_LOG
+   echo "       build software: $DIFF_BUILDSOFTWARE" >> $TIME_LOG
+   echo "            run cases: $DIFF_RUNCASES" >> $TIME_LOG
+   echo "        make pictures: $DIFF_MAKEPICTURES" >> $TIME_LOG
    if [ "$MAKEMOVIES" == "1" ]; then
-      echo "      make movies: $DIFF_MAKEMOVIES" >> $TIME_LOG
+     echo "          make movies: $DIFF_MAKEMOVIES" >> $TIME_LOG
    fi
-   echo "      make guides: $DIFF_MAKEGUIDES" >> $TIME_LOG
-   echo "            total: $DIFF_SCRIPT_TIME" >> $TIME_LOG
-   echo "benchmark time(s): $TOTAL_SMV_TIMES" >> $TIME_LOG
-   echo "FDS revisions: old: $LAST_FDS_REVISION new: $THIS_FDS_REVISION" >> $TIME_LOG
-   echo "SMV revisions: old: $LAST_SMV_REVISION new: $THIS_SMV_REVISION" >> $TIME_LOG
+   echo "          make guides: $DIFF_MAKEGUIDES" >> $TIME_LOG
+   echo "                total: $DIFF_SCRIPT_TIME" >> $TIME_LOG
+   echo "    benchmark time(s): $TOTAL_SMV_TIMES" >> $TIME_LOG
+   echo "    FDS revisions: old: $LAST_FDS_REVISION new: $THIS_FDS_REVISION" >> $TIME_LOG
+   echo "    SMV revisions: old: $LAST_SMV_REVISION new: $THIS_SMV_REVISION" >> $TIME_LOG
   if [[ $THIS_SMV_REVISION != $LAST_SMV_REVISION ]] ; then
     cat $GIT_SMV_LOG >> $TIME_LOG
   fi
@@ -1317,10 +1315,10 @@ fi
    cd $smokebotdir
    # Check for warnings and errors
    if [ ! "$WEB_URL" == "" ]; then
-     echo "Smokebot summary: $WEB_URL" >> $TIME_LOG
+     echo "    Smokebot summary: $WEB_URL" >> $TIME_LOG
    fi
    if [ "$UPLOADRESULTS" == "1" ]; then
-     echo " Smokebot status: https://pages.nist.gov/fds-smv/smokebot_status.html" >> $TIME_LOG
+     echo "     Smokebot status: https://pages.nist.gov/fds-smv/smokebot_status.html" >> $TIME_LOG
    fi
    echo "-------------------------------" >> $TIME_LOG
    if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]; then
