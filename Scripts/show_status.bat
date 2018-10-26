@@ -38,6 +38,7 @@ goto eof
   )   
   cd %repodir%
   git describe --dirty
+  git status -uno
   exit /b
 
 goto eof
