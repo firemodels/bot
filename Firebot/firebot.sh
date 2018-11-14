@@ -605,6 +605,7 @@ check_cases_debug()
       [[ `grep -rI Segmentation *` == "" ]] && \
       [[ `grep -rI ERROR: *` == "" ]] && \
       [[ `grep -rI 'STOP: Numerical' *` == "" ]] && \
+      [[ `grep -rI 'BAD TERMINATION' *` == "" ]] && \
       [[ `grep -rI forrtl *` == "" ]]
    then
       cases_debug_success=true
@@ -613,6 +614,7 @@ check_cases_debug()
       grep -rI Segmentation * >> $OUTPUT_DIR/stage4_errors
       grep -rI ERROR: * >> $OUTPUT_DIR/stage4_errors
       grep -rI 'STOP: Numerical' * >> $OUTPUT_DIR/stage4_errors
+      grep -rI -A 2 'BAD TERMINATION' * >> $OUTPUT_DIR/stage4_errors
       grep -rI -A 20 forrtl * >> $OUTPUT_DIR/stage4_errors
       
       echo "Errors from Stage 4 - Run ${2} cases - debug mode:" >> $ERROR_LOG
@@ -784,6 +786,7 @@ check_cases_release()
       [[ `grep -rI ERROR: *` == "" ]] && \
       [[ `grep -rI 'STOP: Numerical' *` == "" ]] && \
       [[ `grep -rI forrtl *` == "" ]] && \
+      [[ `grep -rI 'BAD TERMINATION'  *` == "" ]] && \
       [[ "$validation_cases" == "true" ]]
    then
       cases_release_success=true
@@ -792,6 +795,7 @@ check_cases_release()
       grep -rI Segmentation * >> $OUTPUT_DIR/stage5_errors
       grep -rI ERROR: * >> $OUTPUT_DIR/stage5_errors
       grep -rI 'STOP: Numerical' * >> $OUTPUT_DIR/stage5_errors
+      grep -rI -A 2 'BAD TERMINATION' * >> $OUTPUT_DIR/stage5_errors
       grep -rI -A 20 forrtl * >> $OUTPUT_DIR/stage5_errors
       if [ "$FIREBOT_MODE" == "validation" ] ; then
          if [ -e $VALIDATION_ERROR_LOG ]; then
