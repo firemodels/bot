@@ -880,6 +880,13 @@ run_verification_cases_release()
    # Wait for non-benchmark verification cases to end
    wait_cases_release_end 'verification'
 
+   # rerun cases that failed with 'BAD TERMINATION' errors
+   ./Run_FDS_Cases.sh $INTEL2 $DV2 -F -o 1 -q $QUEUE -Q $QUEUEBENCH >> $OUTPUT_DIR/stage5 2>&1
+   echo "" >> $OUTPUT_DIR/stage5 2>&1
+
+   # Wait for non-benchmark verification cases to end
+   wait_cases_release_end 'verification'
+
 #  check whether cases have run 
    ./Run_FDS_Cases.sh -C  >> $OUTPUT_DIR/stage5 2>&1
 }
