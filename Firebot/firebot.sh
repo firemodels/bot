@@ -782,7 +782,7 @@ check_cases_release()
       fi
    fi
    if [[ `grep -rI 'Run aborted' $OUTPUT_DIR/stage5` == "" ]] && \
-      [[ `grep 'ERROR' $OUTPUT_DIR/stage5` == "" ]] && \
+      [[ `grep 'ERROR' $OUTPUT_DIR/stage5 | grep -v geom_bad` == "" ]] && \
       [[ `grep -rI Segmentation *` == "" ]] && \
       [[ `grep -rI ERROR: *` == "" ]] && \
       [[ `grep -rI 'STOP: Numerical' *` == "" ]] && \
@@ -793,7 +793,7 @@ check_cases_release()
       cases_release_success=true
    else
       grep -rI 'Run aborted' $OUTPUT_DIR/stage5 >> $OUTPUT_DIR/stage5_errors
-      grep 'ERROR' $OUTPUT_DIR/stage5 >> $OUTPUT_DIR/stage5_errors
+      grep 'ERROR' $OUTPUT_DIR/stage5 | grep -v geom_bad >> $OUTPUT_DIR/stage5_errors
       grep -rI Segmentation * >> $OUTPUT_DIR/stage5_errors
       grep -rI ERROR: * >> $OUTPUT_DIR/stage5_errors
       grep -rI 'STOP: Numerical' * >> $OUTPUT_DIR/stage5_errors
