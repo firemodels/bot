@@ -514,7 +514,7 @@ run_verification_cases_debug()
    echo "Running FDS Verification Cases"
    echo "   debug"
    echo 'Running FDS verification cases:' >> $OUTPUT_DIR/stage4
-   ./Run_FDS_Cases.sh -o 1 -d -m 1 $INTEL2 -q $QUEUE -Q $QUEUEBENCH >> $OUTPUT_DIR/stage4 2>&1
+   ./Run_FDS_Cases.sh -o 1 -d -m 1 $INTEL2 -D 2 -q $QUEUE -Q $QUEUEBENCH >> $OUTPUT_DIR/stage4 2>&1
    echo "" >> $OUTPUT_DIR/stage4 2>&1
 
    # Wait for all verification cases to end
@@ -605,7 +605,7 @@ check_cases_debug()
       [[ `grep -rI Segmentation *` == "" ]] && \
       [[ `grep -rI ERROR: *` == "" ]] && \
       [[ `grep -rI 'STOP: Numerical' *` == "" ]] && \
-      [[ `grep -rI 'BAD TERMINATION' *` == "" ]] && \
+      [[ `grep 'BAD TERMINATION' */*.log` == "" ]] && \
       [[ `grep -rI forrtl *` == "" ]]
    then
       cases_debug_success=true
@@ -614,7 +614,7 @@ check_cases_debug()
       grep -rI Segmentation * >> $OUTPUT_DIR/stage4_errors
       grep -rI ERROR: * >> $OUTPUT_DIR/stage4_errors
       grep -rI 'STOP: Numerical' * >> $OUTPUT_DIR/stage4_errors
-      grep -rI -A 2 'BAD TERMINATION' * >> $OUTPUT_DIR/stage4_errors
+      grep -A 2 'BAD TERMINATION' */*.log >> $OUTPUT_DIR/stage4_errors
       grep -rI -A 20 forrtl * >> $OUTPUT_DIR/stage4_errors
       
       echo "Errors from Stage 4 - Run ${2} cases - debug mode:" >> $ERROR_LOG
@@ -782,20 +782,22 @@ check_cases_release()
       fi
    fi
    if [[ `grep -rI 'Run aborted' $OUTPUT_DIR/stage5` == "" ]] && \
+      [[ `grep 'ERROR' $OUTPUT_DIR/stage5 | grep -v geom_bad` == "" ]] && \
       [[ `grep -rI Segmentation *` == "" ]] && \
       [[ `grep -rI ERROR: *` == "" ]] && \
       [[ `grep -rI 'STOP: Numerical' *` == "" ]] && \
       [[ `grep -rI forrtl *` == "" ]] && \
-      [[ `grep -rI 'BAD TERMINATION'  *` == "" ]] && \
+      [[ `grep 'BAD TERMINATION'  */*.log` == "" ]] && \
       [[ "$validation_cases" == "true" ]]
    then
       cases_release_success=true
    else
       grep -rI 'Run aborted' $OUTPUT_DIR/stage5 >> $OUTPUT_DIR/stage5_errors
+      grep 'ERROR' $OUTPUT_DIR/stage5 | grep -v geom_bad >> $OUTPUT_DIR/stage5_errors
       grep -rI Segmentation * >> $OUTPUT_DIR/stage5_errors
       grep -rI ERROR: * >> $OUTPUT_DIR/stage5_errors
       grep -rI 'STOP: Numerical' * >> $OUTPUT_DIR/stage5_errors
-      grep -rI -A 2 'BAD TERMINATION' * >> $OUTPUT_DIR/stage5_errors
+      grep -A 2 'BAD TERMINATION' */*.log >> $OUTPUT_DIR/stage5_errors
       grep -rI -A 20 forrtl * >> $OUTPUT_DIR/stage5_errors
       if [ "$FIREBOT_MODE" == "validation" ] ; then
          if [ -e $VALIDATION_ERROR_LOG ]; then
@@ -866,7 +868,7 @@ run_verification_cases_release()
    cd $fdsrepo/Verification/scripts
    # Run FDS with 1 OpenMP thread
    echo 'Running FDS benchmark verification cases:' >> $OUTPUT_DIR/stage5
-   ./Run_FDS_Cases.sh $INTEL2 $DV2 -b -o 1 -q $QUEUE -Q $QUEUEBENCH >> $OUTPUT_DIR/stage5 2>&1
+   ./Run_FDS_Cases.sh $INTEL2 $DV2 -b -o 1 -D 2 -q $QUEUE -Q $QUEUEBENCH >> $OUTPUT_DIR/stage5 2>&1
    echo "" >> $OUTPUT_DIR/stage5 2>&1
 
    # Wait for benchmark verification cases to end
@@ -874,18 +876,18 @@ run_verification_cases_release()
 #   wait_cases_release_end 'verification'
 
    echo 'Running FDS non-benchmark verification cases:' >> $OUTPUT_DIR/stage5
-   ./Run_FDS_Cases.sh $INTEL2 $DV2 -R -o 1 -q $QUEUE -Q $QUEUEBENCH >> $OUTPUT_DIR/stage5 2>&1
+   ./Run_FDS_Cases.sh $INTEL2 $DV2 -R -o 1 -D 2 -q $QUEUE -Q $QUEUEBENCH >> $OUTPUT_DIR/stage5 2>&1
    echo "" >> $OUTPUT_DIR/stage5 2>&1
 
    # Wait for non-benchmark verification cases to end
    wait_cases_release_end 'verification'
 
    # rerun cases that failed with 'BAD TERMINATION' errors
-   ./Run_FDS_Cases.sh $INTEL2 $DV2 -F -o 1 -q $QUEUE -Q $QUEUEBENCH >> $OUTPUT_DIR/stage5 2>&1
-   echo "" >> $OUTPUT_DIR/stage5 2>&1
+#   ./Run_FDS_Cases.sh $INTEL2 $DV2 -F -o 1 -q $QUEUE -Q $QUEUEBENCH >> $OUTPUT_DIR/stage5 2>&1
+#   echo "" >> $OUTPUT_DIR/stage5 2>&1
 
    # Wait for non-benchmark verification cases to end
-   wait_cases_release_end 'verification'
+#   wait_cases_release_end 'verification'
 
 #  check whether cases have run 
    ./Run_FDS_Cases.sh -C  >> $OUTPUT_DIR/stage5 2>&1
