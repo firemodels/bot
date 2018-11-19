@@ -1,4 +1,6 @@
 #!/bin/bash
+EMAIL_LIST="$HOME/.smokebot/smokebot_email_list.sh"
+
 
 # The Smokebot script is part of an automated continuous integration system.
 # Consult the FDS Config Management Plan for more information.
@@ -331,6 +333,12 @@ if [[ "$RUNSMOKEBOT" == "1" ]]; then
     if [ -e $smokebot_pid ] ; then
       echo Smokebot or firebot are already running.
       echo "Re-run using the -f option if this is not the case."
+      if [ "$RUNAUTO" == "" ]; then
+        if [ -e $EMAIL_LIST ]; then
+          source $EMAIL_LIST
+          echo "Smokebot is already run and cannot run again without using the -f option"  | mail -s "error: smokebot failed to run" $mailToSMV > /dev/null
+        fi
+      fi
       exit 1
     fi
   fi
