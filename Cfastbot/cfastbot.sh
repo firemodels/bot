@@ -1331,7 +1331,7 @@ size2=
 cfastbotdir="`pwd`"
 
 GITSTATUS_DIR=$HOME/.cfastbot
-EMAIL_LIST=$GITSTATUS_DIR/cfast_email_list.sh
+EMAIL_LIST=$GITSTATUS_DIR/cfastbot_email_list.sh
 PID_FILE=$GITSTATUS_DIR/cfastbot_pid
 OUTPUT_DIR=$cfastbotdir/output
 HISTORY_DIR=$cfastbotdir/history
