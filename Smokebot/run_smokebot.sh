@@ -336,7 +336,7 @@ if [[ "$RUNSMOKEBOT" == "1" ]]; then
       if [ "$RUNAUTO" == "" ]; then
         if [ -e $EMAIL_LIST ]; then
           source $EMAIL_LIST
-          echo "Smokebot was unable to start.  Another instance  was already running or it did not complete successfully"  | mail -s "error: smokebot failed to start" $mailToSMV > /dev/null
+          echo "Smokebot was unable to start.  Another instance was already running or it did not complete successfully"  | mail -s "error: smokebot failed to start" $mailToSMV > /dev/null
         fi
       fi
       exit 1
