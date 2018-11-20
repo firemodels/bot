@@ -1,4 +1,5 @@
 #!/bin/bash
+EMAIL_LIST="$HOME/.cfastbot/cfastbot_email_list.sh"
 
 # CFASTbot
 # This script runs the CFAST verification/validation suite 
@@ -265,6 +266,12 @@ if [ -e $cfastbot_pid ]; then
   if [ "$FORCE" == "" ]; then
     echo cfastbot is already running. If this is
     echo not the case rerun using the -f option.
+    if [ "$RUNAUTO" == "" ]; then
+      if [ -e $EMAIL_LIST ]; then
+        source $EMAIL_LIST
+        echo "Cfastbot was unable to start.  Another instance was already running or it did not complete successfully"  | mail -s "error: cfastbot failed to start" $mailTo > /dev/null
+      fi
+    fi
     exit
   fi
 fi

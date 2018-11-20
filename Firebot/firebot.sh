@@ -370,10 +370,20 @@ check_compile_fds_mpi_db()
 compile_fds_mpi_gnu_db()
 {
    # Clean and compile FDS MPI debug
-   echo "      MPI gfortran debug"
-   cd $fdsrepo/Build/mpi_gnu_${platform}${size}$DB
-   make -f ../makefile clean &> /dev/null
-   ./make_fds.sh &> $OUTPUT_DIR/stage2d
+   compile_gnu=
+   if [ "$OPENMPI_INTEL" != "" ]; then
+     if [ "$OPENMPI_GNU" != "" ]; then
+       module unload $OPENMPI_INTEL
+       module load $OPENMPI_GNU
+       echo "      MPI gfortran debug"
+       compile_gnu=1
+       cd $fdsrepo/Build/mpi_gnu_${platform}${size}$DB
+       make -f ../makefile clean &> /dev/null
+       ./make_fds.sh &> $OUTPUT_DIR/stage2d
+       module unload $OPENMPI_GNU
+       module load $OPENMPI_INTEL
+     fi
+   fi
 }
 
 #---------------------------------------------
@@ -383,25 +393,27 @@ compile_fds_mpi_gnu_db()
 check_compile_fds_mpi_gnu_db()
 {
    # Check for errors in FDS MPI debug compilation
-   cd $fdsrepo/Build/mpi_gnu_${platform}${size}$DB
-   if [ -e "fds_mpi_gnu_${platform}${size}$DB" ]
-   then
-      FDS_debug_success=true
-   else
-      echo "Errors from Stage 2d - Compile gnu Fortran FDS MPI debug:" >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage2d >> $ERROR_LOG
-      echo "" >> $ERROR_LOG
+   if [ "$compile_gnu" == "1" ]; then
+     cd $fdsrepo/Build/mpi_gnu_${platform}${size}$DB
+     if [ -e "fds_mpi_gnu_${platform}${size}$DB" ]
+     then
+        FDS_gnu_debug_success=true
+     else
+        echo "Errors from Stage 2d - Compile gnu Fortran FDS MPI debug:" >> $ERROR_LOG
+        cat $OUTPUT_DIR/stage2d >> $ERROR_LOG
+        echo "" >> $ERROR_LOG
+     fi
+  
+     # Check for compiler warnings/remarks
+     if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage2d | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented'` == "" ]]
+     then
+        # Continue along
+        :
+     else
+        echo "Warnings from Stage 2d - Compile gnu Fortran FDS MPI debug:" >> $WARNING_LOG
+        grep -i -A 5 -E 'warning|remark' $OUTPUT_DIR/stage2d | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
+        echo "" >> $WARNING_LOG
    fi
-
-   # Check for compiler warnings/remarks
-   if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage2d | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented'` == "" ]]
-   then
-      # Continue along
-      :
-   else
-      echo "Warnings from Stage 2d - Compile gnu Fortran FDS MPI debug:" >> $WARNING_LOG
-      grep -i -A 5 -E 'warning|remark' $OUTPUT_DIR/stage2d | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
-      echo "" >> $WARNING_LOG
    fi
 }
 
@@ -605,7 +617,7 @@ check_cases_debug()
       [[ `grep -rI Segmentation *` == "" ]] && \
       [[ `grep -rI ERROR: *` == "" ]] && \
       [[ `grep -rI 'STOP: Numerical' *` == "" ]] && \
-      [[ `grep -rI 'BAD TERMINATION' *` == "" ]] && \
+      [[ `grep 'BAD TERMINATION' */*.log` == "" ]] && \
       [[ `grep -rI forrtl *` == "" ]]
    then
       cases_debug_success=true
@@ -614,7 +626,7 @@ check_cases_debug()
       grep -rI Segmentation * >> $OUTPUT_DIR/stage4_errors
       grep -rI ERROR: * >> $OUTPUT_DIR/stage4_errors
       grep -rI 'STOP: Numerical' * >> $OUTPUT_DIR/stage4_errors
-      grep -rI -A 2 'BAD TERMINATION' * >> $OUTPUT_DIR/stage4_errors
+      grep -A 2 'BAD TERMINATION' */*.log >> $OUTPUT_DIR/stage4_errors
       grep -rI -A 20 forrtl * >> $OUTPUT_DIR/stage4_errors
       
       echo "Errors from Stage 4 - Run ${2} cases - debug mode:" >> $ERROR_LOG
@@ -782,20 +794,22 @@ check_cases_release()
       fi
    fi
    if [[ `grep -rI 'Run aborted' $OUTPUT_DIR/stage5` == "" ]] && \
+      [[ `grep 'ERROR' $OUTPUT_DIR/stage5 | grep -v geom_bad` == "" ]] && \
       [[ `grep -rI Segmentation *` == "" ]] && \
       [[ `grep -rI ERROR: *` == "" ]] && \
       [[ `grep -rI 'STOP: Numerical' *` == "" ]] && \
       [[ `grep -rI forrtl *` == "" ]] && \
-      [[ `grep -rI 'BAD TERMINATION'  *` == "" ]] && \
+      [[ `grep 'BAD TERMINATION'  */*.log` == "" ]] && \
       [[ "$validation_cases" == "true" ]]
    then
       cases_release_success=true
    else
       grep -rI 'Run aborted' $OUTPUT_DIR/stage5 >> $OUTPUT_DIR/stage5_errors
+      grep 'ERROR' $OUTPUT_DIR/stage5 | grep -v geom_bad >> $OUTPUT_DIR/stage5_errors
       grep -rI Segmentation * >> $OUTPUT_DIR/stage5_errors
       grep -rI ERROR: * >> $OUTPUT_DIR/stage5_errors
       grep -rI 'STOP: Numerical' * >> $OUTPUT_DIR/stage5_errors
-      grep -rI -A 2 'BAD TERMINATION' * >> $OUTPUT_DIR/stage5_errors
+      grep -A 2 'BAD TERMINATION' */*.log >> $OUTPUT_DIR/stage5_errors
       grep -rI -A 20 forrtl * >> $OUTPUT_DIR/stage5_errors
       if [ "$FIREBOT_MODE" == "validation" ] ; then
          if [ -e $VALIDATION_ERROR_LOG ]; then
@@ -879,6 +893,13 @@ run_verification_cases_release()
 
    # Wait for non-benchmark verification cases to end
    wait_cases_release_end 'verification'
+
+   # rerun cases that failed with 'BAD TERMINATION' errors
+#   ./Run_FDS_Cases.sh $INTEL2 $DV2 -F -o 1 -q $QUEUE -Q $QUEUEBENCH >> $OUTPUT_DIR/stage5 2>&1
+#   echo "" >> $OUTPUT_DIR/stage5 2>&1
+
+   # Wait for non-benchmark verification cases to end
+#   wait_cases_release_end 'verification'
 
 #  check whether cases have run 
    ./Run_FDS_Cases.sh -C  >> $OUTPUT_DIR/stage5 2>&1
