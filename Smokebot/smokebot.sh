@@ -433,10 +433,20 @@ check_compile_fds_mpi_db()
 compile_fds_mpi_gnu_db()
 {
    # Clean and compile FDS MPI debug
-   echo "   MPI gfortran debug"
-   cd $fdsrepo/Build/mpi_gnu_${platform}_${size}$DB
-   make -f ../makefile clean &> /dev/null
-   ./make_fds.sh &> $OUTPUT_DIR/stage1d
+   compile_gnu=
+   if [ "$OPENMPI_INTEL" != "" ]; then
+     if [ "$OPENMPI_GNU" != "" ]; then
+       compile_gnu=1
+       module unload $OPENMPI_INTEL
+       module load $OPENMPI_GNU
+       echo "   MPI gfortran debug"
+       cd $fdsrepo/Build/mpi_gnu_${platform}_${size}$DB
+       make -f ../makefile clean &> /dev/null
+       ./make_fds.sh &> $OUTPUT_DIR/stage1d
+       module unload $OPENMPI_GNU
+       module load $OPENMPI_INTEL
+     fi
+   fi
 }
 
 #---------------------------------------------
@@ -446,25 +456,27 @@ compile_fds_mpi_gnu_db()
 check_compile_fds_mpi_gnu_db()
 {
    # Check for errors in FDS MPI debug compilation
-   cd $fdsrepo/Build/mpi_gnu_${platform}_${size}$DB
-   if [ -e "fds_mpi_gnu_${platform}_${size}$DB" ]
-   then
-      FDS_debug_success=true
-   else
-      echo "Errors from Stage 1d - Compile gnu Fortran FDS MPI debug:" >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage1d >> $ERROR_LOG
-      echo "" >> $ERROR_LOG
-   fi
+   if [ "$compile_gnu" == "1" ]; then
+     cd $fdsrepo/Build/mpi_gnu_${platform}_${size}$DB
+     if [ -e "fds_mpi_gnu_${platform}_${size}$DB" ]
+     then
+        FDS_debug_success=true
+     else
+        echo "Errors from Stage 1d - Compile gnu Fortran FDS MPI debug:" >> $ERROR_LOG
+        cat $OUTPUT_DIR/stage1d >> $ERROR_LOG
+        echo "" >> $ERROR_LOG
+     fi
 
    # Check for compiler warnings/remarks
-   if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage1d | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented'` == "" ]]
-   then
+     if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage1d | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented'` == "" ]]
+     then
       # Continue along
       :
-   else
-      echo "Warnings from Stage 1d - Compile gnu Fortran FDS MPI debug:" >> $WARNING_LOG
-      grep -i -A 5 -E 'warning|remark' $OUTPUT_DIR/stage1d | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
-      echo "" >> $WARNING_LOG
+     else
+        echo "Warnings from Stage 1d - Compile gnu Fortran FDS MPI debug:" >> $WARNING_LOG
+        grep -i -A 5 -E 'warning|remark' $OUTPUT_DIR/stage1d | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
+        echo "" >> $WARNING_LOG
+     fi
    fi
 }
 
