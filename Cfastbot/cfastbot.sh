@@ -295,10 +295,20 @@ compile_cfast_db()
 compile_cfast_gnu_db()
 {
    # Build gnu debug CFAST
-   echo "      gnu debug"
-   CD_REPO $cfastrepo/Build/CFAST/gnu_${platform}_${size}_db $cfastbranch || return 1
-   make -f ../makefile clean &> /dev/null
-   ./make_cfast.sh &> $OUTPUT_DIR/stage2f
+   compile_gnu=
+   if [ "$OPENMPI_INTEL" != "" ]; then
+     if [ "$OPENMPI_GNU" != "" ]; then
+       module unload $OPENMPI_INTEL
+       module load $OPENMPI_GNU
+       compile_gnu=1
+       echo "      gnu debug"
+       CD_REPO $cfastrepo/Build/CFAST/gnu_${platform}_${size}_db $cfastbranch || return 1
+       make -f ../makefile clean &> /dev/null
+       ./make_cfast.sh &> $OUTPUT_DIR/stage2f
+       module unload $OPENMPI_GNU
+       module load $OPENMPI_INTEL
+     fi
+   fi
    return 0
  }
 
@@ -309,25 +319,27 @@ compile_cfast_gnu_db()
 check_compile_cfast_gnu_db()
 {
    # Check for errors in CFAST debug compilation
-   CD_REPO $cfastrepo/Build/CFAST/gnu_${platform}_${size}_db $cfastbranch || return 1
-   if [ -e "cfast7_${platform}_${size}_db" ]
-   then
-      stage2f_success=true
-   else
-      echo "Errors from Stage 2f - Compile gnu CFAST debug:" >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage2f >> $ERROR_LOG
-      echo "" >> $ERROR_LOG
-   fi
+   if [ "$compile_gnu" == "1" ]; then
+     CD_REPO $cfastrepo/Build/CFAST/gnu_${platform}_${size}_db $cfastbranch || return 1
+     if [ -e "cfast7_${platform}_${size}_db" ]
+     then
+        stage2f_success=true
+     else
+        echo "Errors from Stage 2f - Compile gnu CFAST debug:" >> $ERROR_LOG
+        cat $OUTPUT_DIR/stage2f >> $ERROR_LOG
+        echo "" >> $ERROR_LOG
+     fi
 
    # Check for compiler warnings/remarks
-   if [[ `grep -A 5 -E 'warning|remark' ${OUTPUT_DIR}/stage2f` == "" ]]
-   then
+     if [[ `grep -A 5 -E 'warning|remark' ${OUTPUT_DIR}/stage2f` == "" ]]
+     then
       # Continue along
       :
-   else
-      echo "Warnings from Stage 2f - Compile gnu CFAST debug:" >> $WARNING_LOG
-      grep -A 5 -E 'warning|remark' ${OUTPUT_DIR}/stage2f >> $WARNING_LOG
-      echo "" >> $WARNING_LOG
+     else
+        echo "Warnings from Stage 2f - Compile gnu CFAST debug:" >> $WARNING_LOG
+        grep -A 5 -E 'warning|remark' ${OUTPUT_DIR}/stage2f >> $WARNING_LOG
+        echo "" >> $WARNING_LOG
+     fi
    fi
 }
 
