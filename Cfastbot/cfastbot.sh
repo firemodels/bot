@@ -319,7 +319,7 @@ compile_cfast_gnu_db()
 check_compile_cfast_gnu_db()
 {
    # Check for errors in CFAST debug compilation
-   if [ "$compiler_gnu" == "1" ]; then
+   if [ "$compile_gnu" == "1" ]; then
      CD_REPO $cfastrepo/Build/CFAST/gnu_${platform}_${size}_db $cfastbranch || return 1
      if [ -e "cfast7_${platform}_${size}_db" ]
      then
