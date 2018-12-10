@@ -501,7 +501,7 @@ call :find_runcases_errors   "error|forrtl: severe|DASSL|floating invalid" %cfas
 :: note: once we verify the that the -check option is working below we can incorporate the above checks into the -check option
 cd %cfastrepo%\Validation\scripts
 call Run_CFAST_cases -check %cfastopt% %smokeviewopt% 1> %OUTDIR%\stage3aa.txt 2>&1
-::call :check_cfast_cases %OUTDIR%\stage3aa.txt stage3a
+call :check_cfast_cases %OUTDIR%\stage3aa.txt stage3a
 
 if %clean% == 1 (
    echo             removing debug output files
