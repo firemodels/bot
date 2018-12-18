@@ -5,6 +5,7 @@ set SMVEDITION=SMV6
 
 set fdsversion=%FDSEDITION%
 set smvversion=%SMVEDITION%
+set intelmsi=ww_ifort_redist_intel64_2019.1.144.msi
 
 if "%env_defined%" == "1" goto endif_env_defined
 set envfile="%userprofile%"\fds_smv_env.bat
@@ -70,7 +71,7 @@ set wui_casesbat=%svn_root%\smv\Verification\scripts\WUI_Cases.bat
 set copyFDScases=%svn_root%\fds\Utilities\Scripts\copyFDScases.bat
 set copyCFASTcases=%svn_root%\fds\Utilities\Scripts\copyCFASTcases.bat
 
-set bundleinfo=%svn_root%\fds\Build\Bundle\for_bundle
+set bundleinfo=%svn_root%\bot\Bundle\fds\for_bundle
 
 :: erase the temporary bundle directory if it already exists
 
@@ -142,8 +143,8 @@ CALL :COPY %in_intel_dll%\libiomp5md.dll     %out_bin%\libiomp5md.dll
 CALL :COPY %in_intel_dll%\libfabric.dll      %out_bin%\libfabric.dll
 
 CALL :COPY %in_impi%\impi.dll                %out_bin%\impi.dll
-CALL :COPY %in_impi%\mpiexec.hydra.exe       %out_bin%\mpiexec.exe
-CALL :COPY %in_impi%\pmi_proxy.exe           %out_bin%\pmi_proxy.exe 
+CALL :COPY %in_impi%\mpiexec.exe             %out_bin%\mpiexec.exe
+CALL :COPY %in_impi%\hydra_pmi_proxy.exe     %out_bin%\pmi_proxy.exe 
 CALL :COPY %in_impi%\hydra_service.exe       %out_bin%\hydra_service2.exe
 
 CALL :COPY  %svn_root%\smv\Build\sh2bat\intel_win_64\sh2bat.exe %out_bin%\sh2bat.exe
@@ -163,6 +164,7 @@ copy %in_for_bundle%\textures\*.png          %out_textures%\.>Nul
 echo.
 echo --- copying uninstaller ---
 echo.
+CALL :COPY   %in_intel_dll%\%intelmsi%         %out_uninstall%\ww_ifort_redist.msi
 CALL :COPY  "%bundleinfo%\uninstall_fds.bat"  "%out_uninstall%\uninstall_base.bat"
 CALL :COPY  "%bundleinfo%\uninstall_fds2.bat" "%out_uninstall%\uninstall_base2.bat"
 CALL :COPY  "%bundleinfo%\uninstall.bat"      "%out_uninstall%\uninstall.bat"

@@ -128,6 +128,18 @@ call %firewall_setup% "%CD%\bin"
 copy *.txt Uninstall > Nul
 erase /q *.txt
 
+:: ----------- installing Intel runtime libraries
+
+echo.
+echo *** Installing Intel runtime libraries
+echo echo.
+
+set CURDIR=%CD%
+cd Uninstall
+call ww_ifort_redist.msi
+
+cd %CURDIR%
+
 :: ----------- setting up uninstall file
 
 echo.
@@ -148,6 +160,10 @@ echo echo.                                                    >> Uninstall\unins
 echo echo Removing %CD%                                       >> Uninstall\uninstall_base.bat
 echo rmdir /s /q "%CD%"                                       >> Uninstall\Uninstall_base.bat
 echo pause                                                    >> Uninstall\Uninstall_base.bat
+
+:: remove Intel runtime libraries
+echo echo Removing Intel runtime libraries                    >> Uninstall\uninstall_base.bat
+echo call Uninstall\ww_ifort_redist.msi                       >> Uninstall\uninstall_base.bat
 
 echo echo *** Uninstall complete                              >> Uninstall\uninstall_base.bat
 echo pause>Nul                                                >> Uninstall\uninstall_base.bat
