@@ -11,4 +11,4 @@ export MPI_VERSION=$osx_mpi_version
 
 export INSTALLDIR=FDS/$FDSEDITION
 
-~/$fds_smvroot/fds/Build/Bundle/scripts/bundle_generic.sh
+~/$fds_smvroot/bot/Bundle/fds/scripts/bundle_generic.sh
