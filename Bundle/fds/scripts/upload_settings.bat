@@ -23,7 +23,7 @@ call %envfile%
 %svn_drive%
 cd %svn_root%\fds\Build\Bundle\scripts
 
-set bashscript=%svn_root%\fds\Build\Bundle\scripts\env_params.sh
+set bashscript=%svn_root%\bot\Bundle\fds\scripts\env_params.sh
 
 echo #!/bin/bash > %bashscript%
 
@@ -76,12 +76,12 @@ call :dos2bash osx_logon    $osx_username@$osx_hostname
 
 if "%platform%" == "linux" (
   pscp %bashscript% %linux_hostname%:.bundle/FDS_SMV_ENVpc.sh
-  plink %linux_logon% %linux_svn_root%/fds/Build/Bundle/scripts/dos2unix.sh .bundle FDS_SMV_ENVpc.sh
+  plink %linux_logon% %linux_svn_root%/bot/Bundle/fds/scripts/dos2unix.sh .bundle FDS_SMV_ENVpc.sh
 )
 
 if "%platform%" == "osx" (
   pscp %bashscript% %osx_hostname%:.bundle/FDS_SMV_ENVpc.sh
-  plink %osx_logon% %linux_svn_root%/fds/Build/Bundle/scripts/dos2unix.sh .bundle FDS_SMV_ENVpc.sh
+  plink %osx_logon% %linux_svn_root%/bot/Bundle/fds/scripts/dos2unix.sh .bundle FDS_SMV_ENVpc.sh
 )
 
 :: -------------------------------------------------------------

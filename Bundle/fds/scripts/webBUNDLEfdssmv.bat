@@ -47,18 +47,18 @@ if "%platform%" == "linux" (
 
   echo Downloading compressed archive to:
   echo   %svn_root%\bot\Bundle\fds\uploads\!bundledir!.sh
-  pscp %linux_logon%:%linux_svn_root%/bot/Bundle/fds/uploads/!bundledir!.sh   %svn_root%\fds\Build\Bundle\uploads\.
-  pscp %linux_logon%:%linux_svn_root%/bot/Bundle/fds/uploads/!bundledir!.sha1 %svn_root%\fds\Build\Bundle\uploads\.
+  pscp %linux_logon%:%linux_svn_root%/bot/Bundle/fds/uploads/!bundledir!.sh   %svn_root%\bot\Bundle\fds\uploads\.
+  pscp %linux_logon%:%linux_svn_root%/bot/Bundle/fds/uploads/!bundledir!.sha1 %svn_root%\bot\Bundle\fds\uploads\.
   goto eof
 )
 if "%platform%" == "osx" (
   set bundledir=%fds_version%-%smv_version%_osx64
-  plink %osx_logon% %linux_svn_root%/fds/Build/Bundle/osx/make_bundle_fromweb.sh
+  plink %osx_logon% %linux_svn_root%/bot/Bundle/osx/make_bundle_fromweb.sh
 
   echo Downloading compressed archive to:
   echo   %svn_root%\bot\Bundle\fds\uploads\!bundledir!.sh
-  pscp %osx_logon%:%linux_svn_root%/bot/Bundle/fds/uploads/!bundledir!.sh   %svn_root%\fds\Build\Bundle\uploads\.
-  pscp %osx_logon%:%linux_svn_root%/bot/Bundle/fds/uploads/!bundledir!.sha1 %svn_root%\fds\Build\Bundle\uploads\.
+  pscp %osx_logon%:%linux_svn_root%/bot/Bundle/fds/uploads/!bundledir!.sh   %svn_root%\bot\Bundle\fds\uploads\.
+  pscp %osx_logon%:%linux_svn_root%/bot/Bundle/fds/uploads/!bundledir!.sha1 %svn_root%\bot\Bundle\fds\uploads\.
   goto eof
 )
 
