@@ -42,7 +42,7 @@ set in_shortcut=%userprofile%\fire-notes\INSTALL\repoexes
 set in_for_bundle=%svn_root%\smv\Build\Bundle\for_bundle
 
 
-set uploads=%svn_root%\fds\Build\Bundle\uploads
+set uploads=%svn_root%\bot\Bundle\fds\uploads
 set basedir=%uploads%\%basename%
 
 set out_bundle=%basedir%\firemodels
