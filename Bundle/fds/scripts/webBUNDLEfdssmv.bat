@@ -43,7 +43,7 @@ if "%platform%" == "windows" (
 )
 if "%platform%" == "linux" (
   set bundledir=%fds_version%-%smv_version%_linux64
-  plink %linux_logon% %linux_svn_root%/fds/Build/Bundle/linux/make_bundle_fromweb.sh
+  plink %linux_logon% %linux_svn_root%/bot/Bundle/fds/linux/make_bundle_fromweb.sh
 
   echo Downloading compressed archive to:
   echo   %svn_root%\fds\Build\Bundle\uploads\!bundledir!.sh
