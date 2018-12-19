@@ -134,12 +134,6 @@ echo.
 echo *** Installing Intel runtime libraries
 echo echo.
 
-set CURDIR=%CD%
-cd Uninstall
-call ww_ifort_redist.msi
-
-cd %CURDIR%
-
 :: ----------- setting up uninstall file
 
 echo.
