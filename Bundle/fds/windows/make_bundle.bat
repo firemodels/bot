@@ -121,6 +121,11 @@ CALL :COPY  %svn_root%\smv\scripts\jp2conv.bat                                %o
 
 set curdir=%CD%
 cd %out_bin%
+
+:: copy run-time mpi files
+wzunzip -d %in_impi%\mpi.zip
+
+
 %hashfile% fds.exe        >  hash\fds_%fds_version%.exe.sha1
 %hashfile% fds2ascii.exe  >  hash\fds2ascii_%fds_version%.exe.sha1
 %hashfile% background.exe >  hash\background_%fds_version%.exe.sha1
@@ -146,6 +151,7 @@ CALL :COPY %in_impi%\impi.dll                %out_bin%\impi.dll
 CALL :COPY %in_impi%\mpiexec.exe             %out_bin%\mpiexec.exe
 CALL :COPY %in_impi%\hydra_pmi_proxy.exe     %out_bin%\pmi_proxy.exe 
 CALL :COPY %in_impi%\hydra_service.exe       %out_bin%\hydra_service2.exe
+CALL :COPY  "%bundleinfo%\fdsinit.bat"      "%out_bin%\fdsinit.bat"
 
 CALL :COPY  %svn_root%\smv\Build\sh2bat\intel_win_64\sh2bat.exe %out_bin%\sh2bat.exe
 
@@ -221,12 +227,9 @@ echo.
 echo --- copying installer wrapup scripts ---
 echo.
 
-CALL :COPY  "%bundleinfo%\wrapup_fds_install.bat" "%out_bundle%\%fdsversion%\wrapup_fds_install.bat"
-
-CALL :COPY  "%bundleinfo%\setup_fds_firewall.bat" "%out_bundle%\%fdsversion%\setup_fds_firewall.bat"
-
-CALL :COPY  "%in_shortcut%\shortcut.exe"           "%out_bundle%\%fdsversion%\shortcut.exe"
-
+CALL :COPY  "%bundleinfo%\wrapup_fds_install.bat"                                 "%out_bundle%\%fdsversion%\wrapup_fds_install.bat"
+CALL :COPY  "%bundleinfo%\setup_fds_firewall.bat"                                 "%out_bundle%\%fdsversion%\setup_fds_firewall.bat"
+CALL :COPY  "%in_shortcut%\shortcut.exe"                                          "%out_bundle%\%fdsversion%\shortcut.exe"
 CALL :COPY  "%svn_root%\smv\Build\set_path\intel_win_64\set_path64.exe"           "%out_bundle%\%fdsversion%\set_path.exe"
 
 echo.
