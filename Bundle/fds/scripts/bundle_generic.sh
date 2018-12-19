@@ -349,7 +349,9 @@ CP $fds_bundle README_repo.html $bundledir/Documentation README_repo.html
 CP $smv_bundle smokeview.ini    $bundledir/bin smokeview.ini
 CP $smv_bundle volrender.ssf    $bundledir/bin volrender.ssf
 CP $smv_bundle objects.svo      $bundledir/bin objects.svo
-if [ "$MPI_VERSION" != "INTEL" ]; then
+if [ "$MPI_VERSION" == "INTEL" ]; then
+  UNTAR $HOME/fire-notes/INSTALL/LIBS/RUNTIME/MPI_INTEL19U1 INTEL19u1linux.tar.gz $bundledir/bin INTEL
+else
   CP $OPENMPI_DIR $openmpifile  $bundledir/bin $openmpifile
 fi
 
