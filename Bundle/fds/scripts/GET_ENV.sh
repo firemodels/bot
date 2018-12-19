@@ -6,8 +6,8 @@ mkdir -p $BUNDLE_HOME/pubs
 mkdir -p $BUNDLE_HOME/BUNDLE
 mkdir -p $BUNDLE_HOME/OPENMPMI
 
-# this script is run from a script in Build/Bundle/linux or
-# Build/Bundle/osx
+# this script is run from a script in bot/Bundle/fds/linux or
+# bot/Bundle/fds/osx
 
 if [ -e $BUNDLE_HOME/FDS_SMV_ENVpc.sh ]; then
   source $BUNDLE_HOME/FDS_SMV_ENVpc.sh

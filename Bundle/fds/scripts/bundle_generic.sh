@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# this script is called by make_bundle.sh located in fds/Build/Bundle/linux or osx
+# this script is called by make_bundle.sh located in bot/Bundle/fds/linux or osx
 
 errlog=/tmp/errlog.$$
 
@@ -262,8 +262,8 @@ uploaddir=$fds_smvroot/bot/Bundle/fds/uploads
 bundledir=$bundlebase
 webpagesdir=$fds_smvroot/webpages
 smvbindir=$scp_fds_smvroot/smv/Build/smokeview/$smokeviewdir
-fds_bundle=$fds_smvroot/fds/Build/Bundle/for_bundle
-smv_bundle=$fds_smvroot/smv/Build/Bundle/for_bundle
+fds_bundle=$fds_smvroot/bot/Bundle/fds/for_bundle
+smv_bundle=$fds_smvroot/bot/Bundle/smv/for_bundle
 texturedir=$smv_bundle/textures
 fds2asciiroot=$scp_fds_smvroot/fds/Utilities/fds2ascii
 testmpiroot=$scp_fds_smvroot/fds/Utilities/test_mpi
