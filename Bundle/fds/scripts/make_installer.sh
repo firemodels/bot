@@ -459,7 +459,7 @@ export FI_PROVIDER_PATH=\\\$impihome/mpi/intel64/libfabric/lib/prov
 export I_MPI_ROOT=\\\$impihome/mpi
 export LD_LIBRARY_PATH=\\\$impihome/mpi/intel64/libfabric/lib:\\\$LD_LIBRARY_PATH
 export LD_LIBRARY_PATH=\\\$impihome/compiler/lib/intel64_lin:\\\$LD_LIBRARY_PATH
-export MKLROOT \\\$impihome/mkl
+export MKLROOT=\\\$impihome/mkl
 export PATH=\\\$impihome/mpi/intel64/bin:\\\$PATH
 export PATH=\\\$impihome/mpi/intel64/libfabric/bin:\\\$PATH
 BASH
