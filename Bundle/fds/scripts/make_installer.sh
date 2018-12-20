@@ -511,10 +511,10 @@ EOF
 cat << EOF >> $INSTALLER
 echo ""
 echo "-----------------------------------------------"
-echo "*** To complete the installation add the following lines to your startup file"
+echo "*** To complete the installation add the following line to your startup file"
 echo "   (usually \$HOME/.bashrc)."
 echo ""
-cat \$FDS_root/bin/$FDSVARS | grep -v bash
+echo "source \$FDS_root/bin/$FDSVARS "
 echo ""
 echo "or if you are using modules, add:"
 echo ""
