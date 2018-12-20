@@ -379,23 +379,30 @@ conflict FDS6
 conflict openmpi
 conflict intel
 
+# FDS paths
+
 prepend-path    PATH            \$FDS_root/bin
 prepend-path    LD_LIBRARY_PATH \$FDS_root/bin/LIB64
 MODULE
 if [ "$ostype" == "LINUX" ] ; then
 cat << MODULE >> \$FDSMODULEtmp
 prepend-path    LD_LIBRARY_PATH /usr/lib64
-if [ "$MPI_VERSION" == "INTEL" ] ; then
-   set impihome \$FDS_root/bin/INTEL
-   prepend-path FI_PROVIDER_PATH \\\$impihome/mpi/intel64/libfabric/lib/prov
-   setenv I_MPI_ROOT \\\$impihome/mpi
-   prepend-path LD_LIBRARY_PATH \\\$impihome/mpi/intel64/libfabric/lib
-   prepend-path LD_LIBRARY_PATH \\\$impihome/compiler/lib/intel64_lin
-   setenv MKLROOT \\\$impihome/mkl
-   prepend-path PATH \\\$impihome/mpi/intel64/bin
-   prepend-path PATH \\\$impihome/mpi/intel64/libfabric/bin
-fi
 MODULE
+if [ "$MPI_VERSION" == "INTEL" ] ; then
+cat << MODULE >> \$FDSMODULEtmp
+
+# Intel runtime environment
+
+set impihome \$FDS_root/bin/INTEL
+prepend-path FI_PROVIDER_PATH \\\$impihome/mpi/intel64/libfabric/lib/prov
+setenv I_MPI_ROOT \\\$impihome/mpi
+prepend-path LD_LIBRARY_PATH \\\$impihome/mpi/intel64/libfabric/lib
+prepend-path LD_LIBRARY_PATH \\\$impihome/compiler/lib/intel64_lin
+setenv MKLROOT \\\$impihome/mkl
+prepend-path PATH \\\$impihome/mpi/intel64/bin
+prepend-path PATH \\\$impihome/mpi/intel64/libfabric/bin
+MODULE
+fi
 fi
 if [ "$MPI_VERSION" != "INTEL" ] ; then
 cat << MODULE >> \$FDSMODULEtmp
