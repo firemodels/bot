@@ -271,7 +271,7 @@ smv_bundle=$fds_smvroot/bot/Bundle/smv/for_bundle
 texturedir=$smv_bundle/textures
 fds2asciiroot=$scp_fds_smvroot/fds/Utilities/fds2ascii
 testmpiroot=$scp_fds_smvroot/fds/Utilities/test_mpi
-makeinstaller=$fds_smvroot/fds/Utilities/Scripts/make_installer.sh
+makeinstaller=$fds_smvroot/bot/Bundle/fds/scripts/make_installer.sh
 
 fds_cases=$fds_smvroot/fds/Verification/FDS_Cases.sh
 fds_benchamrk_cases=$fds_smvroot/fds/Verification/FDS_Benchmark_Cases.sh
