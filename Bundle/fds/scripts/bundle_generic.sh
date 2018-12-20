@@ -13,7 +13,11 @@ SCP ()
   FROMFILE=$3
   TODIR=$4
   TOFILE=$5
-  scp $HOST\:$FROMDIR/$FROMFILE $TODIR/$TOFILE 2>/dev/null
+  if [ "`hostname`" == "$HOST" ]; then
+    CP $HOME/$FROMDIR $FROMFILE $TODIR $TOFILE
+  else
+    scp $HOST\:$FROMDIR/$FROMFILE $TODIR/$TOFILE 2>/dev/null
+  fi
   if [ -e $TODIR/$TOFILE ]; then
     echo "$FROMFILE copied from host:$HOST"
   else
