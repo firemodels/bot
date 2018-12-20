@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# this script is called by make_bundle.sh located in fds/Build/Bundle/linux or osx
+# this script is called by make_bundle.sh located in bot/Bundle/fds/linux or osx
 
 errlog=/tmp/errlog.$$
 
@@ -13,7 +13,11 @@ SCP ()
   FROMFILE=$3
   TODIR=$4
   TOFILE=$5
-  scp $HOST\:$FROMDIR/$FROMFILE $TODIR/$TOFILE 2>/dev/null
+  if [ "`hostname`" == "$HOST" ]; then
+    CP $HOME/$FROMDIR $FROMFILE $TODIR $TOFILE
+  else
+    scp $HOST\:$FROMDIR/$FROMFILE $TODIR/$TOFILE 2>/dev/null
+  fi
   if [ -e $TODIR/$TOFILE ]; then
     echo "$FROMFILE copied from host:$HOST"
   else
@@ -262,12 +266,12 @@ uploaddir=$fds_smvroot/bot/Bundle/fds/uploads
 bundledir=$bundlebase
 webpagesdir=$fds_smvroot/webpages
 smvbindir=$scp_fds_smvroot/smv/Build/smokeview/$smokeviewdir
-fds_bundle=$fds_smvroot/fds/Build/Bundle/for_bundle
-smv_bundle=$fds_smvroot/smv/Build/Bundle/for_bundle
+fds_bundle=$fds_smvroot/bot/Bundle/fds/for_bundle
+smv_bundle=$fds_smvroot/bot/Bundle/smv/for_bundle
 texturedir=$smv_bundle/textures
 fds2asciiroot=$scp_fds_smvroot/fds/Utilities/fds2ascii
 testmpiroot=$scp_fds_smvroot/fds/Utilities/test_mpi
-makeinstaller=$fds_smvroot/fds/Utilities/Scripts/make_installer.sh
+makeinstaller=$fds_smvroot/bot/Bundle/fds/scripts/make_installer.sh
 
 fds_cases=$fds_smvroot/fds/Verification/FDS_Cases.sh
 fds_benchamrk_cases=$fds_smvroot/fds/Verification/FDS_Benchmark_Cases.sh
@@ -349,7 +353,9 @@ CP $fds_bundle README_repo.html $bundledir/Documentation README_repo.html
 CP $smv_bundle smokeview.ini    $bundledir/bin smokeview.ini
 CP $smv_bundle volrender.ssf    $bundledir/bin volrender.ssf
 CP $smv_bundle objects.svo      $bundledir/bin objects.svo
-if [ "$MPI_VERSION" != "INTEL" ]; then
+if [ "$MPI_VERSION" == "INTEL" ]; then
+  UNTAR $HOME/fire-notes/INSTALL/LIBS/RUNTIME/MPI_INTEL19U1 INTEL19u1linux.tar.gz $bundledir/bin INTEL
+else
   CP $OPENMPI_DIR $openmpifile  $bundledir/bin $openmpifile
 fi
 

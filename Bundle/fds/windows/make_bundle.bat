@@ -39,7 +39,7 @@ if NOT exist %hashfile% (
 
 set in_pdf=%userprofile%\.bundle\pubs
 set in_shortcut=%userprofile%\fire-notes\INSTALL\repoexes
-set in_for_bundle=%svn_root%\smv\Build\Bundle\for_bundle
+set in_for_bundle=%svn_root%\bot\Bundle\smv\for_bundle
 
 
 set uploads=%svn_root%\bot\Bundle\fds\uploads

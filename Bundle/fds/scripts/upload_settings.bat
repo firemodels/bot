@@ -21,7 +21,7 @@ goto:eof
 call %envfile%
 
 %svn_drive%
-cd %svn_root%\fds\Build\Bundle\scripts
+cd %svn_root%\bot\Bundle\fds\scripts
 
 set bashscript=%svn_root%\bot\Bundle\fds\scripts\env_params.sh
 

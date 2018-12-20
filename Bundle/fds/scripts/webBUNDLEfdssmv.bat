@@ -53,7 +53,7 @@ if "%platform%" == "linux" (
 )
 if "%platform%" == "osx" (
   set bundledir=%fds_version%-%smv_version%_osx64
-  plink %osx_logon% %linux_svn_root%/bot/Bundle/osx/make_bundle_fromweb.sh
+  plink %osx_logon% %linux_svn_root%/bot/Bundle/fds/osx/make_bundle_fromweb.sh
 
   echo Downloading compressed archive to:
   echo   %svn_root%\bot\Bundle\fds\uploads\!bundledir!.sh
