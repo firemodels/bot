@@ -40,14 +40,14 @@ Title Bundling %type% Smokeview for %platform%
 :: windows
 
 if "%platform%" == "windows" (
-  call %svn_root%\smv\Build\Bundle\windows\make_%type%bundle 64
+  call %svn_root%\bot\Bundle\smv\windows\make_%type%bundle 64
   goto eof
 )
 
 cd %svn_root%\smv\scripts
 
-set scriptdir=%linux_svn_root%/smv/Build/Bundle/
-set bundledir=%linux_svn_root%/smv/Build/Bundle/uploads
+set scriptdir=%linux_svn_root%/bot/Bundle/smv
+set bundledir=%linux_svn_root%/bot/Bundle/smv/uploads
 
 :: linux
 
@@ -63,12 +63,12 @@ if "%platform%" == "linux" (
   echo.
 
   if "%buildtype%" == "release" (
-    pscp %linux_logon%:%bundledir%/%version%_linux64.sh   ..\Build\Bundle\uploads\.
-    pscp %linux_logon%:%bundledir%/%version%_linux64.sha1 ..\Build\Bundle\uploads\.
+    pscp %linux_logon%:%bundledir%/%version%_linux64.sh   ..\..\bot\Bundle\smv\uploads\.
+    pscp %linux_logon%:%bundledir%/%version%_linux64.sha1 ..\..\bot\Bundle\smv\uploads\.
   )
   if "%buildtype%" == "test" (
-    pscp %linux_logon%:%bundledir%/%version%_linux64.sh   ..\Build\Bundle\uploads\.
-    pscp %linux_logon%:%bundledir%/%version%_linux64.sha1 ..\Build\Bundle\uploads\.
+    pscp %linux_logon%:%bundledir%/%version%_linux64.sh   ..\..\bot\Bundle\smv\uploads\.
+    pscp %linux_logon%:%bundledir%/%version%_linux64.sha1 ..\..\bot\Bundle\smv\uploads\.
   )
   goto eof
 )
@@ -86,12 +86,12 @@ if "%platform%" == "osx" (
   echo.
 
   if "%buildtype%" == "release" (
-    pscp %osx_logon%:%bundledir%/%version%_osx64.sh   ..\Build\Bundle\uploads\.
-    pscp %osx_logon%:%bundledir%/%version%_osx64.sha1 ..\Build\Bundle\uploads\.
+    pscp %osx_logon%:%bundledir%/%version%_osx64.sh   ..\..\bot\Bundle\smv\uploads\.
+    pscp %osx_logon%:%bundledir%/%version%_osx64.sha1 ..\..\bot\Bundle\smv\uploads\.
   )
   if "%buildtype%" == "test" (
-    pscp %osx_logon%:%bundledir%/%version%_osx64.sh   ..\Build\Bundle\uploads\.
-    pscp %osx_logon%:%bundledir%/%version%_osx64.sha1 ..\Build\Bundle\uploads\.
+    pscp %osx_logon%:%bundledir%/%version%_osx64.sh   ..\..\bot\Bundle\smv\uploads\.
+    pscp %osx_logon%:%bundledir%/%version%_osx64.sha1 ..\..\bot\Bundle\smv\uploads\.
   )
   goto eof
 )
