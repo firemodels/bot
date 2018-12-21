@@ -398,6 +398,8 @@ prepend-path FI_PROVIDER_PATH \\\$impihome/mpi/intel64/libfabric/lib/prov
 setenv I_MPI_ROOT \\\$impihome/mpi
 prepend-path LD_LIBRARY_PATH \\\$impihome/mpi/intel64/libfabric/lib
 prepend-path LD_LIBRARY_PATH \\\$impihome/compiler/lib/intel64_lin
+prepend-path LD_LIBRARY_PATH \\\$impihome/mpi/intel64/lib
+prepend-path LD_LIBRARY_PATH \\\$impihome/mpi/intel64/lib/release
 setenv MKLROOT \\\$impihome/mkl
 prepend-path PATH \\\$impihome/mpi/intel64/bin
 prepend-path PATH \\\$impihome/mpi/intel64/libfabric/bin
@@ -459,6 +461,8 @@ export FI_PROVIDER_PATH=\\\$impihome/mpi/intel64/libfabric/lib/prov
 export I_MPI_ROOT=\\\$impihome/mpi
 export LD_LIBRARY_PATH=\\\$impihome/mpi/intel64/libfabric/lib:\\\$LD_LIBRARY_PATH
 export LD_LIBRARY_PATH=\\\$impihome/compiler/lib/intel64_lin:\\\$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=\\\$impihome/mpi/intel64/lib:\\\$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=\\\$impihome/mpi/intel64/lib/release:\\\$LD_LIBRARY_PATH
 export MKLROOT=\\\$impihome/mkl
 export PATH=\\\$impihome/mpi/intel64/bin:\\\$PATH
 export PATH=\\\$impihome/mpi/intel64/libfabric/bin:\\\$PATH
