@@ -76,18 +76,21 @@ mkdir "%FDSSTART%"
 copy "%CD%\Documentation\FDS_on_the_Web\Official_Web_Site.url"     "%FDSSTART%\FDS Home Page.url"         > Nul
 
 mkdir "%FDSSTART%\Guides and Release Notes"
-"%CD%\shortcut.exe" /F:"%FDSSTART%\Guides and Release Notes\FDS Config Management Plan.lnk"          /T:"%CD%\Documentation\Guides_and_Release_Notes\FDS_Config_Management_Plan.pdf" /A:C >NUL
-"%CD%\shortcut.exe" /F:"%FDSSTART%\Guides and Release Notes\FDS User Guide.lnk"                      /T:"%CD%\Documentation\Guides_and_Release_Notes\FDS_User_Guide.pdf" /A:C >NUL
+"%CD%\shortcut.exe" /F:"%FDSSTART%\Guides and Release Notes\FDS Config Management Plan.lnk"          /T:"%CD%\Documentation\Guides_and_Release_Notes\FDS_Config_Management_Plan.pdf"    /A:C >NUL
+"%CD%\shortcut.exe" /F:"%FDSSTART%\Guides and Release Notes\FDS User Guide.lnk"                      /T:"%CD%\Documentation\Guides_and_Release_Notes\FDS_User_Guide.pdf"                /A:C >NUL
 "%CD%\shortcut.exe" /F:"%FDSSTART%\Guides and Release Notes\FDS Technical Reference Guide.lnk"       /T:"%CD%\Documentation\Guides_and_Release_Notes\FDS_Technical_Reference_Guide.pdf" /A:C >NUL
-"%CD%\shortcut.exe" /F:"%FDSSTART%\Guides and Release Notes\FDS Validation Guide.lnk"                /T:"%CD%\Documentation\Guides_and_Release_Notes\FDS_Validation_Guide.pdf" /A:C >NUL
-"%CD%\shortcut.exe" /F:"%FDSSTART%\Guides and Release Notes\FDS Verification Guide.lnk"              /T:"%CD%\Documentation\Guides_and_Release_Notes\FDS_Verification_Guide.pdf" /A:C >NUL
-"%CD%\shortcut.exe" /F:"%FDSSTART%\Guides and Release Notes\FDS Release Notes.lnk"                   /T:"%CD%\Documentation\Guides_and_Release_Notes\FDS_Release_Notes.htm" /A:C >NUL
-"%CD%\shortcut.exe" /F:"%FDSSTART%\Guides and Release Notes\Smokeview User Guide.lnk"                /T:"%CD%\Documentation\Guides_and_Release_Notes\SMV_User_Guide.pdf" /A:C >NUL
+"%CD%\shortcut.exe" /F:"%FDSSTART%\Guides and Release Notes\FDS Validation Guide.lnk"                /T:"%CD%\Documentation\Guides_and_Release_Notes\FDS_Validation_Guide.pdf"          /A:C >NUL
+"%CD%\shortcut.exe" /F:"%FDSSTART%\Guides and Release Notes\FDS Verification Guide.lnk"              /T:"%CD%\Documentation\Guides_and_Release_Notes\FDS_Verification_Guide.pdf"        /A:C >NUL
+"%CD%\shortcut.exe" /F:"%FDSSTART%\Guides and Release Notes\FDS Release Notes.lnk"                   /T:"%CD%\Documentation\Guides_and_Release_Notes\FDS_Release_Notes.htm"             /A:C >NUL
+"%CD%\shortcut.exe" /F:"%FDSSTART%\Guides and Release Notes\Smokeview User Guide.lnk"                /T:"%CD%\Documentation\Guides_and_Release_Notes\SMV_User_Guide.pdf"                /A:C >NUL
 "%CD%\shortcut.exe" /F:"%FDSSTART%\Guides and Release Notes\Smokeview Technical Reference Guide.lnk" /T:"%CD%\Documentation\Guides_and_Release_Notes\SMV_Technical_Reference_Guide.pdf" /A:C >NUL
-"%CD%\shortcut.exe" /F:"%FDSSTART%\Guides and Release Notes\Smokeview Verification Guide.lnk"        /T:"%CD%\Documentation\Guides_and_Release_Notes\SMV_Verification_Guide.pdf" /A:C >NUL
-"%CD%\shortcut.exe" /F:"%FDSSTART%\Guides and Release Notes\Smokeview release notes.lnk"             /T:"%CD%\Documentation\Guides_and_Release_Notes\Smokeview_release_notes.html" /A:C >NUL
+"%CD%\shortcut.exe" /F:"%FDSSTART%\Guides and Release Notes\Smokeview Verification Guide.lnk"        /T:"%CD%\Documentation\Guides_and_Release_Notes\SMV_Verification_Guide.pdf"        /A:C >NUL
+"%CD%\shortcut.exe" /F:"%FDSSTART%\Guides and Release Notes\Smokeview release notes.lnk"             /T:"%CD%\Documentation\Guides_and_Release_Notes\Smokeview_release_notes.html"      /A:C >NUL
 
 "%CD%\shortcut.exe" /F:"%FDSSTART%\Uninstall.lnk"  /T:"%CD%\Uninstall\uninstall.bat" /A:C >NUL
+
+"%CD%\shortcut.exe" /F:"%FDSSTART%\CMDfds.lnk"             /T:"%COMSPEC%" /P:"/k fdsinit" /W:"%userprofile%" /A:C >NUL
+"%CD%\shortcut.exe" /F:"%userprofile%\Desktop\CMDfds.lnk"  /T:"%COMSPEC%" /P:"/k fdsinit" /W:"%userprofile%" /A:C >NUL
 
 erase "%CD%"\set_path.exe
 erase "%CD%"\shortcut.exe
@@ -148,6 +151,9 @@ echo echo.                                                    >> Uninstall\unins
 echo echo Removing %CD%                                       >> Uninstall\uninstall_base.bat
 echo rmdir /s /q "%CD%"                                       >> Uninstall\Uninstall_base.bat
 echo pause                                                    >> Uninstall\Uninstall_base.bat
+
+echo echo *** CMDfds desktop shortcut                         >> Uninstall\uninstall_base.bat
+echo "if exist %userprofile%\Desktop\CMDfds.lnk erase %userprofile%\Desktop\CMDfds.lnk"  >> Uninstall\Uninstall_base.bat
 
 echo echo *** Uninstall complete                              >> Uninstall\uninstall_base.bat
 echo pause>Nul                                                >> Uninstall\uninstall_base.bat
