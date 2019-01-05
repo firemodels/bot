@@ -142,18 +142,20 @@ echo if %%cfastinstalled%% == 1 goto skip2                    >> Uninstall\unins
 echo echo Removing directory, %SMV6%, from the System Path    >> Uninstall\uninstall_base.bat
 echo call "%CD%\Uninstall\set_path.exe" -s -b -r "%SMV6%"     >> Uninstall\uninstall_base.bat
 echo rmdir /s /q "%CD%\..\SMV6"                               >> Uninstall\Uninstall_base.bat
-echo :skip2 >> Uninstall\uninstall_base.bat
+echo :skip2                                                   >> Uninstall\uninstall_base.bat
+
+echo echo Removing CMDfds desktop shortcut                    >> Uninstall\uninstall_base.bat
+echo if exist %userprofile%\Desktop\CMDfds.lnk erase %userprofile%\Desktop\CMDfds.lnk  >> Uninstall\uninstall_base.bat
 
 :: remove FDS path and directory
 echo echo Removing directory, %CD%\bin , from the System Path >> Uninstall\uninstall_base.bat
 echo call "%CD%\Uninstall\set_path.exe" -s -b -r "%CD%\bin"   >> Uninstall\uninstall_base.bat
 echo echo.                                                    >> Uninstall\uninstall_base.bat
-echo echo Removing %CD%                                       >> Uninstall\uninstall_base.bat
-echo rmdir /s /q "%CD%"                                       >> Uninstall\Uninstall_base.bat
-echo pause                                                    >> Uninstall\Uninstall_base.bat
-
-echo echo *** CMDfds desktop shortcut                         >> Uninstall\uninstall_base.bat
-echo "if exist %userprofile%\Desktop\CMDfds.lnk erase %userprofile%\Desktop\CMDfds.lnk"  >> Uninstall\Uninstall_base.bat
+echo if exist "%CD%\cfast" echo Removing %CD%                 >> Uninstall\uninstall_base.bat
+echo if exist "%CD%\cfast" rmdir /s /q "%CD%"                 >> Uninstall\uninstall_base.bat
+echo if NOT exist "%CD%\cfast" echo Removing %CD%\..          >> Uninstall\uninstall_base.bat
+echo if NOT exist "%CD%\cfast" rmdir /s /q "%CD%\.."          >> Uninstall\uninstall_base.bat
+echo pause                                                    >> Uninstall\uninstall_base.bat
 
 echo echo *** Uninstall complete                              >> Uninstall\uninstall_base.bat
 echo pause>Nul                                                >> Uninstall\uninstall_base.bat
