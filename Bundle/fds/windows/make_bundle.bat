@@ -102,9 +102,9 @@ echo.
 copy %in_for_bundle%\*.po                                                     %out_bin%\.>Nul
 
 if "%fds_debug%" == "1" (
-  CALL :COPY  %fdsmpidirdb%\fds_impi_win_64_db.exe                            %out_bin%\fds_db.exe
+  CALL :COPY  %fdsmpidirdb%\fds_impi_win_64_db.exe                            %out_bin%\fdsmpi_db.exe
 )
-CALL :COPY  %fdsmpidir%\fds_impi_win_64.exe                                   %out_bin%\fds.exe
+CALL :COPY  %fdsmpidir%\fds_impi_win_64.exe                                   %out_bin%\fdsmpi.exe
 CALL :COPY  %svn_root%\fds\Utilities\fds2ascii\intel_win_64\fds2ascii_win_64.exe %out_bin%\fds2ascii.exe
 CALL :COPY  %svn_root%\smv\Build\background\intel_win_64\background.exe       %out_bin%\background.exe
 CALL :COPY  %svn_root%\fds\Utilities\test_mpi\impi_intel_win\test_mpi.exe     %out_bin%\test_mpi.exe
@@ -125,7 +125,7 @@ cd %out_bin%
 wzunzip -d %in_impi%\mpi.zip
 
 
-%hashfile% fds.exe        >  hash\fds_%fds_version%.exe.sha1
+%hashfile% fdsmpi.exe     >  hash\fdsmpi_%fds_version%.exe.sha1
 %hashfile% fds2ascii.exe  >  hash\fds2ascii_%fds_version%.exe.sha1
 %hashfile% background.exe >  hash\background_%fds_version%.exe.sha1
 %hashfile% test_mpi.exe   >  hash\test_mpi_%fds_version%.exe.sha1
