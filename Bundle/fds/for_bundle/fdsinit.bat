@@ -1,6 +1,7 @@
 @echo off
-set mpibindir="%~dp0\mpi"
-call %mpibindir%\mpivars
+SET I_MPI_ROOT="%~dp0\mpi"
+SET PATH=%I_MPI_ROOT%;%PATH%
 doskey fds=mpiexec -localonly -np 1 fdsmpi.exe $* 
 title FDS
+::echo OMP_NUM_THREADS=%OMP_NUM_THREADS% (set to 1 if using MPI)
 
