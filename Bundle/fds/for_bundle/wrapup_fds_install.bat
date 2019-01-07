@@ -118,13 +118,10 @@ setx -m OMP_NUM_THREADS %nthreads% > Nul
 smpd -remove 1>> Nul 2>&1
 hydra_service -remove 1>> Nul 2>&1
 
-copy "%CD%\bin"\hydra_service2.exe "%CD%\bin"\hydra_service.exe>Nul
-erase "%CD%\bin"\hydra_service2.exe >Nul
-
 set firewall_setup="%CD%\setup_fds_firewall.bat"
 echo.
 echo *** Setting up firewall exceptions.
-call %firewall_setup% "%CD%\bin"
+call %firewall_setup% "%CD%\bin\mpi"
 
 :: ----------- copy backup files to Uninstall directory
 

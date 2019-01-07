@@ -143,16 +143,8 @@ cd hash
 cat *.sha1              >>  %uploads%\%basename%.sha1
 
 cd %curdir%
-CALL :COPY %in_intel_dll%\libiomp5md.dll     %out_bin%\libiomp5md.dll
-CALL :COPY %in_intel_dll%\libfabric.dll      %out_bin%\libfabric.dll
-
-CALL :COPY %in_impi%\impi.dll                %out_bin%\impi.dll
-CALL :COPY %in_impi%\mpiexec.exe             %out_bin%\mpiexec.exe
-CALL :COPY %in_impi%\hydra_pmi_proxy.exe     %out_bin%\pmi_proxy.exe 
-CALL :COPY %in_impi%\hydra_service.exe       %out_bin%\hydra_service2.exe
-CALL :COPY "%bundleinfo%\fdsinit.bat"        "%out_bin%\fdsinit.bat"
-CALL :COPY "%bundleinfo%\fdstest.bat"        "%out_bin%\fdstest.bat"
-
+CALL :COPY %in_intel_dll%\libiomp5md.dll                        %out_bin%\libiomp5md.dll
+CALL :COPY "%bundleinfo%\fdsinit.bat"                           %out_bin%\fdsinit.bat
 CALL :COPY  %svn_root%\smv\Build\sh2bat\intel_win_64\sh2bat.exe %out_bin%\sh2bat.exe
 
 echo.
@@ -160,7 +152,6 @@ echo --- copying auxillary files ---
 echo.
 CALL :COPY  %in_for_bundle%\objects.svo            %out_smv%\.
 CALL :COPY  %in_for_bundle%\volrender.ssf          %out_smv%\.
-
 CALL :COPY  %in_for_bundle%\smokeview.ini          %out_smv%\.
 
 echo copying textures
