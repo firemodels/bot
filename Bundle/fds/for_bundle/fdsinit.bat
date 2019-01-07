@@ -1,5 +1,5 @@
 @echo off
-SET I_MPI_ROOT="%~dp0\mpi"
+SET I_MPI_ROOT=%~dp0\mpi
 SET PATH=%I_MPI_ROOT%;%PATH%
 doskey fds=mpiexec -localonly -np 1 fdsmpi.exe $* 
 title FDS
