@@ -12,5 +12,6 @@ netsh advfirewall firewall add rule dir=in action=allow name="Intel MPI Port for
 :: setx -m MPIEXEC_PORT_RANGE 8670:8690 > Nul
 :: setx -m MPICH_PORT_RANGE 8670:8690 > Nul
 
+::set I_MPI_PORT_RANGE=%PORT_VAL%
 %bindir%\hydra_service -install > Nul
 

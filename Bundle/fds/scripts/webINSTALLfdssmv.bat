@@ -21,19 +21,23 @@ goto:eof
 call %envfile%
 %svn_drive%
 echo.
-echo   Installing FDS-Smokeview bundle on %platform%
-Title  Installing FDS-Smokeview bundle on %platform%
 
 if "%platform%" == "windows" (
+  echo   Installing FDS and Smokeview
+  Title  Installing FDS and Smokeview
   cd %svn_root%\bot\Bundle\fds\uploads
   call %fds_version%-%smv_version%_win64.exe
   goto eof
 )
 if "%platform%" == "linux" (
+echo   Installing FDS and Smokeview on %platform%
+Title  Installing FDS and Smokeview on %platform%
   plink %linux_logon% %linux_svn_root%/smv/scripts/run_command.sh bot/Bundle/fds/uploads %fds_version%-%smv_version%_linux64.sh y
   goto eof
 )
 if "%platform%" == "osx" (
+echo   Installing FDS and Smokeview on %platform%
+Title  Installing FDS and Smokeview on %platform%
   plink %osx_logon% %linux_svn_root%/smv/scripts/run_command.sh bot/Bundle/fds/uploads %fds_version%-%smv_version%_osx64.sh y
   goto eof
 )

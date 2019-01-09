@@ -22,9 +22,21 @@ echo *** Removing FDS from the Start menu.
 rmdir /q /s "%ALLUSERSPROFILE%\Start Menu\Programs\FDS6"
 
 echo.
+echo *** Stopping smokeview
+taskkill /F /IM smokeview.exe >Nul 2>Nul
+
+echo.
+echo *** Stopping fds
+taskkill /F /IM fds.exe       >Nul 2>Nul
+
+echo.
+echo *** Stopping mpiexec
+taskkill /F /IM mpiexec.exe   >Nul 2>Nul
+
+echo.
 echo *** Removing hydra_service
-hydra_service -remove >Nul 2>Nul
+hydra_service -remove         >Nul 2>Nul
 
 echo.
 echo *** Removing smpd
-smpd -remove >Nul 2>Nul
+smpd -remove                  >Nul 2>Nul
