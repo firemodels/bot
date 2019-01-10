@@ -4,7 +4,7 @@ set FDSEDITION=FDS6
 set SMVEDITION=SMV6
 
 :: set to 1 to use new installer
-set new_install=0
+set new_install=1
 
 set fdsversion=%FDSEDITION%
 set smvversion=%SMVEDITION%
@@ -151,7 +151,7 @@ CALL :COPY "%fds_forbundle%\fdsinit.bat"                           %out_bin%\fds
 CALL :COPY  %svn_root%\smv\Build\sh2bat\intel_win_64\sh2bat.exe %out_bin%\sh2bat.exe
 
 :: setup program for new installer
-CALL :COPY "%fds_forbundle%\setup.bat"  %out_bundle%\FDS6\uninstall\setup.bat
+CALL :COPY "%fds_forbundle%\setup.bat"  %out_bundle%\setup.bat
 
 echo.
 echo --- copying auxillary files ---
@@ -198,8 +198,8 @@ echo --- copying startup shortcuts ---
 echo.
  
 CALL :COPY "%svn_root%\webpages\smv_readme.html"       "%out_guides%\Smokeview_release_notes.html"
-CALL :COPY "%fds_forbundle%\Overview.html"                "%out_doc%\Overview.html"
-CALL :COPY "%fds_forbundle%\FDS_Web_Site.url"             "%out_web%\Official_Web_Site.url"
+CALL :COPY "%fds_forbundle%\Overview.html"             "%out_doc%\Overview.html"
+CALL :COPY "%fds_forbundle%\FDS_Web_Site.url"          "%out_web%\Official_Web_Site.url"
 
 echo.
 echo --- copying example files ---
@@ -223,10 +223,9 @@ echo.
 echo --- copying installer wrapup scripts ---
 echo.
 
-CALL :COPY  "%fds_forbundle%\wrapup_fds_install.bat"                                 "%out_bundle%\%fdsversion%\wrapup_fds_install.bat"
-CALL :COPY  "%fds_forbundle%\setup_fds_firewall.bat"                                 "%out_bundle%\%fdsversion%\setup_fds_firewall.bat"
+CALL :COPY  "%fds_forbundle%\wrapup_fds_install.bat"                              "%out_bundle%\%fdsversion%\wrapup_fds_install.bat"
+CALL :COPY  "%fds_forbundle%\setup_fds_firewall.bat"                              "%out_bundle%\%fdsversion%\setup_fds_firewall.bat"
 CALL :COPY  "%in_shortcut%\shortcut.exe"                                          "%out_bundle%\%fdsversion%\shortcut.exe"
-CALL :COPY  "%svn_root%\smv\Build\set_path\intel_win_64\set_path64.exe"           "%out_bundle%\%fdsversion%\set_path.exe"
 
 echo.
 echo --- compressing distribution ---
@@ -254,20 +253,20 @@ echo.
 echo --- creating installer ---
 
 cd %uploads%
-echo Setup is about to install FDS %fds_version% and Smokeview %smv_version% > %fds_forbundle%\message.txt
+echo Install FDS %fds_version% and Smokeview %smv_version% > %fds_forbundle%\message.txt
 echo Press Setup to begin installation. > %fds_forbundle%\main.txt
 if exist %basename%.exe erase %basename%.exe
 
 :: old installer
 
 if x%new_install% == x1 goto skip_old_install2
-wzipse32 %basename%.zip -runasadmin -a %fds_forbundle%\about.txt -st"FDS %fds_version% Smokeview %smv_version% Setup" -d "c:\Program Files\firemodels\FDS6" -c wrapup_fds_install.bat
+wzipse32 %basename%.zip                                    -runasadmin -a %fds_forbundle%\about.txt -st"FDS %fds_version% Smokeview %smv_version% Setup" -d "c:\Program Files\firemodels\FDS6" -c wrapup_fds_install.bat
 goto skip_new_install2
 :skip_old_install2
 
 :: new installer
 
-wzipse32 %basename%.zip -setup -runasadmin -a %fds_forbundle%\about.txt -st"FDS %fds_version% Smokeview %smv_version% Setup" -o -c cmd /k firemodels\FDS6\uninstall\setup.bat
+wzipse32 %basename%.zip -setup -i %fds_forbundle%\icon.ico -t %fds_forbundle%\setup.txt -runasadmin -a %fds_forbundle%\about.txt -st"FDS %fds_version% Smokeview %smv_version% Setup" -o -c cmd /k firemodels\setup.bat
 :skip_new_install2
 
 %hashfile% %basename%.exe   >>  %uploads%\%basename%.sha1
