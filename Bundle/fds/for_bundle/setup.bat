@@ -1,82 +1,7 @@
 @echo off
 set script_dir=%~dp0
 
-:: check if fds and smokeview are running
-
-:begin
-set progs_running=0
-call :count fds.exe            fds_count
-call :count smokeview.exe      smv_count
-call :count mpiexec.exe        mpiexec_count
-call :count hydra_service.exe  hydra_count
-if NOT "%fds_count%"     == "0"   set progs_running=1
-if NOT "%smv_count%"     == "0"   set progs_running=1
-if NOT "%mpiexec_count%" == "0"   set progs_running=1
-
-if "%progs_running%" == "0" goto start
-  if NOT "%fds_count%" == "0"     echo number of fds instances running: %fds_count%
-  if NOT "%smv_count%" == "0"     echo number of smokeview instances running: %smv_count%
-  if NOT "%mpiexec_count%" == "0" echo number of mpiexec instances running: %mpiexec_count%
-  echo Options:
-  echo    Press 1 to let the installer stop fds, smokeview and/or mpiexec
-  echo    Press 2 after stopping fds, smokeview and/or mpiexec yourself
-  echo    Press any other key to quit installation
-  set /p  option="option:"
-  if "%option%" == "1" goto start
-  if "%option%" == "2" goto begin
-  goto abort
-
-:start
-call :menu
-set /p install_option="FDS install option:"
-
-if "%install_option%" == "1" (
-  set "INSTALLDIR=%ProgramFiles%\firemodels"
-  goto proceed
-)
-if "%install_option%" == "2" (
-  set "INSTALLDIR=%USERPROFILE%\firemodels"
-  goto proceed
-)
-goto abort
-
-:-------------------------------------------------------------------------
-:menu  
-:-------------------------------------------------------------------------
-echo Install options
-echo    Press 1 to install FDS in %ProgramFiles%\firemodels\FDS6
-echo    Press 2 to install FDS in %USERPROFILE%\firemodels\FDS6
-echo    Press any other key to quit
-exit /b
-
-:-------------------------------------------------------------------------
-:count
-:-------------------------------------------------------------------------
-set arg1=%1
-set var=%2
-tasklist | find /c "%arg1%" > count.txt
-set /p %var%=<count.txt
-erase count.txt
-exit /b
-:eof
-
-:proceed
-
-echo Installation location: %INSTALLDIR%\FDS6
-set /p proceed="Proceed? (y, n)"
-
-if "%proceed%" == "y" goto install
-if "%proceed%" == "Y" goto install
-if "%proceed%" == "n" goto begin
-if "%proceed%" == "N" goto begin
-goto proceed
-
-:install
-
-set DOCDIR=%INSTALLDIR%\FDS6\Documentation
-set UNINSTALLDIR=%INSTALLDIR%\FDS6\Uninstall
- 
-:: make sure this is a 64 bit PC
+:: before we do anything make sure this is a 64 bit PC
 
 if defined PROGRAMFILES(X86) (
   echo.
@@ -89,32 +14,53 @@ if defined PROGRAMFILES(X86) (
   goto abort
 )
 
-:: input install directory from user for now use %userprofile%\firemodels
+::*** check if fds and smokeview are running
 
-:: ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+:begin
+set progs_running=0
+call :count_programs
 
-:: remove old installation
+if "%progs_running%" == "0" goto start
+  echo Before the installation can begin the following programs need to be stopped:
+  echo %fds_string% %smokeview_string% %mpiexec_string% %hydra_service_string%
+  echo.
+  echo Options:
+  echo   Press 1 to let the installer stop these programs
+  echo   Press 2 after stopping the programs yourself
+  echo   Press any other key to quit installation
+  set /p  option="option:"
+  if "%option%" == "1" (
+    call :stop_programs
+    goto start
+  )
+  if "%option%" == "2" (
+    goto begin
+  )
+  goto abort
 
-if NOT "%hydra_count%" == "0" (
-  echo *** Removing hydra_service
-  hydra_service -remove         >Nul 2>Nul
+::*** determine install directory
+
+:start
+call :install_options
+set /p option="FDS install option:"
+
+if "%option%" == "1" (
+  set "INSTALLDIR=%ProgramFiles%\firemodels"
+  goto install
 )
-
-if NOT "%smv_count%" == "0" (
-  echo *** Stopping smokeview
-  taskkill /F /IM smokeview.exe >Nul 2>Nul
+if "%option%" == "2" (
+  set "INSTALLDIR=%USERPROFILE%\firemodels"
+  goto install
 )
+goto abort
 
-if NOT "%fds_count%" == "0" (
-  echo *** Stopping fds
-  taskkill /F /IM fds.exe       >Nul 2>Nul
-)
+::*** doit
 
-if NOT "%mpiexec_count%" == "0" (
-  echo *** Stopping mpiexec
-  taskkill /F /IM mpiexec.exe   >Nul 2>Nul
-)
+:install
 
+set DOCDIR=%INSTALLDIR%\FDS6\Documentation
+set UNINSTALLDIR=%INSTALLDIR%\FDS6\Uninstall
+ 
 if NOT exist %INSTALLDIR% goto skip_remove_firemodels
 echo *** Removing %INSTALLDIR%
 rmdir /S /Q %INSTALLDIR%
@@ -151,7 +97,7 @@ call "%UNINSTALLDIR%\set_path.exe" -s -m -f "%FDS6%\bin" > Nul
 call "%UNINSTALLDIR%\set_path.exe" -s -m -f "%SMV6%"     > Nul
 
 :: ------------- file association -------------
-echo *** Associate the .smv file extension with smokeview.exe
+echo *** Associating the .smv file extension with smokeview.exe
 
 ftype smvDoc="%SMV6%\smokeview.exe" "%%1" >Nul
 assoc .smv=smvDoc>Nul
@@ -159,7 +105,7 @@ assoc .smv=smvDoc>Nul
 set FDSSTART=%ALLUSERSPROFILE%\Start Menu\Programs\FDS6
 
 :: ------------- start menu shortcuts ---------------
-echo *** Add document shortcuts to the Start menu.
+echo *** Adding document shortcuts to the Start menu.
 if exist "%FDSSTART%" rmdir /q /s "%FDSSTART%"
 
 mkdir "%FDSSTART%"
@@ -216,7 +162,7 @@ echo *** Setting up the Uninstall script.
 
 :: remove smokeview path and directory
 echo if %%cfastinstalled%% == 1 goto skip2                    >> %UNINSTALLDIR%\uninstall_base.bat
-echo echo Removing directory, %SMV6%, from the System Path    >> %UNINSTALLDIR%\uninstall_base.bat
+echo echo Removing %SMV6% from the System Path                >> %UNINSTALLDIR%\uninstall_base.bat
 echo call "%UNINSTALLDIR%\set_path.exe" -s -b -r "%SMV6%"     >> %UNINSTALLDIR%\uninstall_base.bat
 echo rmdir /s /q "%SMV6%"                                     >> %UNINSTALLDIR%\uninstall_base.bat
 echo :skip2                                                   >> %UNINSTALLDIR%\uninstall_base.bat
@@ -225,8 +171,8 @@ echo echo Removing CMDfds desktop shortcut                    >> %UNINSTALLDIR%\
 echo if exist %userprofile%\Desktop\CMDfds.lnk erase %userprofile%\Desktop\CMDfds.lnk  >> %UNINSTALLDIR%\uninstall_base.bat
 
 :: remove FDS path and directory
-echo echo Removing directory, %CD%\bin , from the System Path >> %UNINSTALLDIR%\uninstall_base.bat
-echo call "%UNINSTALLDIR%\set_path.exe" -s -b -r "%CD%\bin"   >> %UNINSTALLDIR%\uninstall_base.bat
+echo echo Removing %FDS6%\bin from the System Path            >> %UNINSTALLDIR%\uninstall_base.bat
+echo call "%UNINSTALLDIR%\set_path.exe" -s -b -r "%FDS6%\bin" >> %UNINSTALLDIR%\uninstall_base.bat
 echo echo.                                                    >> %UNINSTALLDIR%\uninstall_base.bat
 echo if exist "%CFAST%" echo Removing %CFAST%                 >> %UNINSTALLDIR%\uninstall_base.bat
 echo if exist "%CFAST%" rmdir /s /q "%CFAST%"                 >> %UNINSTALLDIR%\uninstall_base.bat
@@ -250,10 +196,12 @@ echo Set objShell = CreateObject("Shell.Application")                       > %U
 echo Set objWshShell = WScript.CreateObject("WScript.Shell")               >> %UNINSTALLDIR%\uninstall.vbs
 echo Set objWshProcessEnv = objWshShell.Environment("PROCESS")             >> %UNINSTALLDIR%\uninstall.vbs
 echo objShell.ShellExecute "%ELEVATE_APP%", "%ELEVATE_PARMS%", "", "runas" >> %UNINSTALLDIR%\uninstall.vbs
+echo WScript.Sleep 10000                                                   >> %UNINSTALLDIR%\uninstall.vbs
 
-erase %firewall_setup%
-erase "%FDS6%\wrapup_fds_install.bat"
-erase "%FDS6%\shortcut.exe"
+erase %firewall_setup%                 > Nul
+erase "%FDS6%\wrapup_fds_install.bat"  > Nul
+erase "%FDS6%\shortcut.exe"            > Nul
+erase %INSTALLDIR%\setup.bat           > Nul
 
 echo.
 echo *** Press any key, then reboot to complete the installation.  ***
@@ -265,3 +213,74 @@ echo FDS and Smokeview installation aborted
 
 :eof
 exit
+
+:-------------------------------------------------------------------------
+:----------------------subroutines----------------------------------------
+:-------------------------------------------------------------------------
+
+
+:-------------------------------------------------------------------------
+:count_programs  
+:-------------------------------------------------------------------------
+call :count fds
+call :count smokeview
+call :count mpiexec
+call :count hydra_service
+exit /b
+
+:-------------------------------------------------------------------------
+:stop_programs  
+:-------------------------------------------------------------------------
+:: remove old installation
+
+if NOT "%hydra_count%" == "0" (
+  echo *** Removing hydra_service
+  hydra_service -remove         >Nul 2>Nul
+)
+
+if NOT "%smv_count%" == "0" (
+  echo *** Stopping smokeview
+  taskkill /F /IM smokeview.exe >Nul 2>Nul
+)
+
+if NOT "%fds_count%" == "0" (
+  echo *** Stopping fds
+  taskkill /F /IM fds.exe       >Nul 2>Nul
+)
+
+if NOT "%mpiexec_count%" == "0" (
+  echo *** Stopping mpiexec
+  taskkill /F /IM mpiexec.exe   >Nul 2>Nul
+)
+exit /b
+
+:-------------------------------------------------------------------------
+:install_options  
+:-------------------------------------------------------------------------
+echo Install options
+echo    Press 1 to install FDS in %ProgramFiles%\firemodels
+echo    Press 2 to install FDS in %USERPROFILE%\firemodels
+echo    Press any other to cancel installation
+exit /b
+
+:-------------------------------------------------------------------------
+:count
+:-------------------------------------------------------------------------
+set progbase=%1
+set prog=%progbase%.exe
+set countvar=%progbase%_count
+set stringvar=%progbase%_string
+
+tasklist | find /c "%prog%" > count.txt
+set /p count%=<count.txt
+erase count.txt
+
+set string=
+if NOT "%count%" == "0" set string=%progbase%
+if NOT "%count%" == "0" set progs_running=1
+
+set %countvar%=%count%
+set %stringvar%=%string%
+
+exit /b
+:eof
