@@ -42,29 +42,54 @@ if "%progs_running%" == "0" goto start
 
 :start
 call :install_options
-set /p option="FDS install option:"
+set /p option="Option:"
 
-if "%option%" == "1" (
-  set "INSTALLDIR=%ProgramFiles%\firemodels"
+set subdir=firemodels
+
+if NOT "%option%" == "1" goto skip_option1
+  set "BASEDIR=%ProgramFiles%"
+  set /p subdir="subdirectory of %ProgramFiles% (default: %subdir%):"
   goto install
-)
-if "%option%" == "2" (
-  set "INSTALLDIR=%USERPROFILE%\firemodels"
+:skip_option1
+
+if NOT "%option%" == "2" goto skip_option2
+  set "BASEDIR=%userprofile%"
+  set /p subdir="subdirectory of %userprofile% (default: %subdir%):"
   goto install
-)
+:skip_option2
+
 goto abort
 
-::*** doit
+::*** start installation of FDS and SMokeview
 
 :install
+set "INSTALLDIR=%BASEDIR%\%subdir%"
+
+echo Installation directory: %INSTALLDIR%
+set /p option="Proceed with installation? (y, n):"
+
+if "x%option%" == "xy" goto proceed
+if "x%option%" == "xY" goto proceed
+goto begin
+
+:proceed
 
 set "DOCDIR=%INSTALLDIR%\FDS6\Documentation"
 set "UNINSTALLDIR=%INSTALLDIR%\FDS6\Uninstall"
  
-if NOT exist "%INSTALLDIR%" goto skip_remove_firemodels
-echo *** Removing %INSTALLDIR%
-rmdir /S /Q "%INSTALLDIR%"
-:skip_remove_firemodels
+set "SMV6=%INSTALLDIR%\SMV6"
+set "FDS6=%INSTALLDIR%\FDS6"
+set "CFAST=%INSTALLDIR%\cfast"
+
+if NOT exist "%FDS6%" goto skip_remove_fds6
+echo *** Removing %FDS6%
+rmdir /S /Q "%FDS6%"
+:skip_remove_fds6
+
+if NOT exist "%SMV6%" goto skip_remove_smv6
+echo *** Removing %SMV6%
+rmdir /S /Q "%SMV6%"
+:skip_remove_smv6
 
 :: copy files to new installation
 
@@ -80,10 +105,6 @@ call "%UNINSTALLDIR%\set_path.exe" -u -m -b -r "FDS\FDS6" >Nul
 call "%UNINSTALLDIR%\set_path.exe" -s -m -b -r "FDS\FDS6" >Nul
 call "%UNINSTALLDIR%\set_path.exe" -s -m -b -r "firemodels\FDS6" >Nul
 call "%UNINSTALLDIR%\set_path.exe" -s -m -b -r "firemodels\SMV6" >Nul
-
-set "SMV6=%INSTALLDIR%\SMV6"
-set "FDS6=%INSTALLDIR%\FDS6"
-set "CFAST=%INSTALLDIR%\cfast"
 
 :: ------------ create aliases ----------------
 
@@ -208,16 +229,9 @@ echo *** Press any key, then reboot to complete the installation.  ***
 pause>NUL
 goto eof
 
-:abort
-echo FDS and Smokeview installation aborted
-
-:eof
-exit
-
 :-------------------------------------------------------------------------
 :----------------------subroutines----------------------------------------
 :-------------------------------------------------------------------------
-
 
 :-------------------------------------------------------------------------
 :count_programs  
@@ -257,9 +271,9 @@ exit /b
 :-------------------------------------------------------------------------
 :install_options  
 :-------------------------------------------------------------------------
-echo Install options
-echo    Press 1 to install FDS in %ProgramFiles%\firemodels
-echo    Press 2 to install FDS in %USERPROFILE%\firemodels
+echo Select the FDS and Smokeview installation directory:
+echo    Press 1 to enter subdirectory of %ProgramFiles%
+echo    Press 2 to enter subdirectory of %userprofile%
 echo    Press any other to cancel installation
 exit /b
 
@@ -283,4 +297,11 @@ set %countvar%=%count%
 set %stringvar%=%string%
 
 exit /b
+
+:abort
+echo FDS and Smokeview installation aborted.
+echo Press any key to continue
+pause > Nul
+
 :eof
+exit
