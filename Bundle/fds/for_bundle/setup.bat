@@ -58,18 +58,18 @@ goto abort
 
 :install
 
-set DOCDIR=%INSTALLDIR%\FDS6\Documentation
-set UNINSTALLDIR=%INSTALLDIR%\FDS6\Uninstall
+set "DOCDIR=%INSTALLDIR%\FDS6\Documentation"
+set "UNINSTALLDIR=%INSTALLDIR%\FDS6\Uninstall"
  
-if NOT exist %INSTALLDIR% goto skip_remove_firemodels
+if NOT exist "%INSTALLDIR%" goto skip_remove_firemodels
 echo *** Removing %INSTALLDIR%
-rmdir /S /Q %INSTALLDIR%
+rmdir /S /Q "%INSTALLDIR%"
 :skip_remove_firemodels
 
 :: copy files to new installation
 
 echo *** Copying installation files to %INSTALLDIR%
-xcopy /E /I /H /Q firemodels %INSTALLDIR% > Nul
+xcopy /E /I /H /Q firemodels "%INSTALLDIR%" > Nul
 echo        copy complete
 
 echo *** Removing previous FDS/Smokeview entries from the system and user path.
@@ -81,9 +81,9 @@ call "%UNINSTALLDIR%\set_path.exe" -s -m -b -r "FDS\FDS6" >Nul
 call "%UNINSTALLDIR%\set_path.exe" -s -m -b -r "firemodels\FDS6" >Nul
 call "%UNINSTALLDIR%\set_path.exe" -s -m -b -r "firemodels\SMV6" >Nul
 
-set SMV6=%INSTALLDIR%\SMV6
-set FDS6=%INSTALLDIR%\FDS6
-set CFAST=%INSTALLDIR%\cfast
+set "SMV6=%INSTALLDIR%\SMV6"
+set "FDS6=%INSTALLDIR%\FDS6"
+set "CFAST=%INSTALLDIR%\cfast"
 
 :: ------------ create aliases ----------------
 
@@ -152,56 +152,56 @@ setx -m OMP_NUM_THREADS %nthreads% > Nul
 smpd -remove 1>> Nul 2>&1
 hydra_service -remove 1>> Nul 2>&1
 
-set firewall_setup="%FDS6%\setup_fds_firewall.bat"
+set "firewall_setup=%FDS6%\setup_fds_firewall.bat"
 echo *** Setting up firewall exceptions.
-call %firewall_setup% "%FDS6%\bin\mpi"
+call "%firewall_setup%" "%FDS6%\bin\mpi"
 
 :: ----------- setting up uninstall file
 
 echo *** Setting up the Uninstall script.
 
 :: remove smokeview path and directory
-echo if %%cfastinstalled%% == 1 goto skip2                    >> %UNINSTALLDIR%\uninstall_base.bat
-echo echo Removing %SMV6% from the System Path                >> %UNINSTALLDIR%\uninstall_base.bat
-echo call "%UNINSTALLDIR%\set_path.exe" -s -b -r "%SMV6%"     >> %UNINSTALLDIR%\uninstall_base.bat
-echo rmdir /s /q "%SMV6%"                                     >> %UNINSTALLDIR%\uninstall_base.bat
-echo :skip2                                                   >> %UNINSTALLDIR%\uninstall_base.bat
+echo if "%%cfastinstalled%%" == "1" goto skip2                >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo echo Removing "%SMV6%" from the System Path              >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo call "%UNINSTALLDIR%\set_path.exe" -s -b -r %SMV6%       >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo rmdir /s /q "%SMV6%"                                     >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo :skip2                                                   >> "%UNINSTALLDIR%\uninstall_base.bat"
 
-echo echo Removing CMDfds desktop shortcut                    >> %UNINSTALLDIR%\uninstall_base.bat
-echo if exist %userprofile%\Desktop\CMDfds.lnk erase %userprofile%\Desktop\CMDfds.lnk  >> %UNINSTALLDIR%\uninstall_base.bat
+echo echo Removing CMDfds desktop shortcut                    >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo if exist %userprofile%\Desktop\CMDfds.lnk erase %userprofile%\Desktop\CMDfds.lnk  >> "%UNINSTALLDIR%\uninstall_base.bat"
 
 :: remove FDS path and directory
-echo echo Removing %FDS6%\bin from the System Path            >> %UNINSTALLDIR%\uninstall_base.bat
-echo call "%UNINSTALLDIR%\set_path.exe" -s -b -r "%FDS6%\bin" >> %UNINSTALLDIR%\uninstall_base.bat
-echo echo.                                                    >> %UNINSTALLDIR%\uninstall_base.bat
-echo if exist "%CFAST%" echo Removing %CFAST%                 >> %UNINSTALLDIR%\uninstall_base.bat
-echo if exist "%CFAST%" rmdir /s /q "%CFAST%"                 >> %UNINSTALLDIR%\uninstall_base.bat
-echo if NOT exist "%CFAST%" echo Removing %INSTALLDIR%        >> %UNINSTALLDIR%\uninstall_base.bat
-echo if NOT exist "%CFAST%" rmdir /s /q "%INSTALLDIR%"        >> %UNINSTALLDIR%\uninstall_base.bat
-echo pause                                                    >> %UNINSTALLDIR%\uninstall_base.bat
+echo echo Removing "%FDS6%\bin" from the System Path          >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo call "%UNINSTALLDIR%\set_path.exe" -s -b -r "%FDS6%\bin" >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo echo.                                                    >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo if exist "%CFAST%" echo Removing "%CFAST%"               >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo if exist "%CFAST%" rmdir /s /q  "%CFAST%"                >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo if NOT exist "%CFAST%" echo Removing "%INSTALLDIR%"      >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo if NOT exist "%CFAST%" rmdir /s /q "%INSTALLDIR%"        >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo pause                                                    >> "%UNINSTALLDIR%\uninstall_base.bat"
 
-echo echo *** Uninstall complete                              >> %UNINSTALLDIR%\uninstall_base.bat
-echo pause>Nul                                                >> %UNINSTALLDIR%\uninstall_base.bat
+echo echo *** Uninstall complete                              >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo pause>Nul                                                >> "%UNINSTALLDIR%\uninstall_base.bat"
 
-type %UNINSTALLDIR%\uninstall_base2.bat                       >> %UNINSTALLDIR%\uninstall_base.bat
-erase %UNINSTALLDIR%\uninstall_base2.bat
+type  "%UNINSTALLDIR%\uninstall_base2.bat"                    >> "%UNINSTALLDIR%\uninstall_base.bat"
+erase "%UNINSTALLDIR%\uninstall_base2.bat"
 
-echo "%UNINSTALLDIR%\uninstall.vbs"                           >> %UNINSTALLDIR%\uninstall.bat
-echo echo Uninstall complete                                  >> %UNINSTALLDIR%\uninstall.bat
-echo pause                                                    >> %UNINSTALLDIR%\uninstall.bat
+echo "%UNINSTALLDIR%\uninstall.vbs"                           >> "%UNINSTALLDIR%\uninstall.bat"
+echo echo Uninstall complete                                  >> "%UNINSTALLDIR%\uninstall.bat"
+echo pause                                                    >> "%UNINSTALLDIR%\uninstall.bat"
 
-set ELEVATE_APP=%UNINSTALLDIR%\uninstall_base.bat
+set "ELEVATE_APP=%UNINSTALLDIR%\uninstall_base.bat"
 set ELEVATE_PARMS=
-echo Set objShell = CreateObject("Shell.Application")                       > %UNINSTALLDIR%\uninstall.vbs
-echo Set objWshShell = WScript.CreateObject("WScript.Shell")               >> %UNINSTALLDIR%\uninstall.vbs
-echo Set objWshProcessEnv = objWshShell.Environment("PROCESS")             >> %UNINSTALLDIR%\uninstall.vbs
-echo objShell.ShellExecute "%ELEVATE_APP%", "%ELEVATE_PARMS%", "", "runas" >> %UNINSTALLDIR%\uninstall.vbs
-echo WScript.Sleep 10000                                                   >> %UNINSTALLDIR%\uninstall.vbs
+echo Set objShell = CreateObject("Shell.Application")                       > "%UNINSTALLDIR%\uninstall.vbs"
+echo Set objWshShell = WScript.CreateObject("WScript.Shell")               >> "%UNINSTALLDIR%\uninstall.vbs"
+echo Set objWshProcessEnv = objWshShell.Environment("PROCESS")             >> "%UNINSTALLDIR%\uninstall.vbs"
+echo objShell.ShellExecute "%ELEVATE_APP%", "%ELEVATE_PARMS%", "", "runas" >> "%UNINSTALLDIR%\uninstall.vbs"
+echo WScript.Sleep 10000                                                   >> "%UNINSTALLDIR%\uninstall.vbs"
 
-erase %firewall_setup%                 > Nul
+erase "%firewall_setup%"               > Nul
 erase "%FDS6%\wrapup_fds_install.bat"  > Nul
 erase "%FDS6%\shortcut.exe"            > Nul
-erase %INSTALLDIR%\setup.bat           > Nul
+erase "%INSTALLDIR%\setup.bat"         > Nul
 
 echo.
 echo *** Press any key, then reboot to complete the installation.  ***
@@ -233,12 +233,12 @@ exit /b
 :-------------------------------------------------------------------------
 :: remove old installation
 
-if NOT "%hydra_count%" == "0" (
-  echo *** Removing hydra_service
-  hydra_service -remove         >Nul 2>Nul
+if NOT "%hydra_service_count%" == "0" (
+  echo *** Stopping hydra_service
+  taskkill /F /IM hydra_service.exe >Nul 2>Nul
 )
 
-if NOT "%smv_count%" == "0" (
+if NOT "%smokeview_count%" == "0" (
   echo *** Stopping smokeview
   taskkill /F /IM smokeview.exe >Nul 2>Nul
 )

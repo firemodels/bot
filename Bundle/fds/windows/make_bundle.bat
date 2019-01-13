@@ -3,9 +3,6 @@ set FDSMAJORVERSION=6
 set FDSEDITION=FDS6
 set SMVEDITION=SMV6
 
-:: set to 1 to use new installer
-set new_install=1
-
 set fdsversion=%FDSEDITION%
 set smvversion=%SMVEDITION%
 
@@ -233,21 +230,10 @@ echo --- compressing distribution ---
 cd %uploads%
 if exist %basename%.zip erase %basename%.zip
 
-:: old installer
-
-if x%new_install% == x1 goto skip_old_install
-cd %out_bundle%\%fdsversion%
-wzzip -a -r -xExamples\*.csv -P ..\..\..\%basename%.zip * ..\%smvversion% > Nul
-goto skip_new_install
-:skip_old_install
-
-:: new installer
-
 cd %out_bundle%\..
 wzzip -a -r -xExamples\*.csv -P ..\%basename%.zip firemodels > Nul
-:skip_new_install
 
-:: create an installation file from the zipped bundle directory
+:: create a self extracting installation file from the zipped bundle directory
 
 echo.
 echo --- creating installer ---
@@ -257,17 +243,7 @@ echo Install FDS %fds_version% and Smokeview %smv_version% > %fds_forbundle%\mes
 echo Press Setup to begin installation. > %fds_forbundle%\main.txt
 if exist %basename%.exe erase %basename%.exe
 
-:: old installer
-
-if x%new_install% == x1 goto skip_old_install2
-wzipse32 %basename%.zip                                    -runasadmin -a %fds_forbundle%\about.txt -st"FDS %fds_version% Smokeview %smv_version% Setup" -d "c:\Program Files\firemodels\FDS6" -c wrapup_fds_install.bat
-goto skip_new_install2
-:skip_old_install2
-
-:: new installer
-
 wzipse32 %basename%.zip -setup -i %fds_forbundle%\icon.ico -t %fds_forbundle%\setup.txt -runasadmin -a %fds_forbundle%\about.txt -st"FDS %fds_version% Smokeview %smv_version% Setup" -o -c cmd /k firemodels\setup.bat
-:skip_new_install2
 
 %hashfile% %basename%.exe   >>  %uploads%\%basename%.sha1
 
