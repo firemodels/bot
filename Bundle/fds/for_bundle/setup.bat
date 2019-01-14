@@ -21,40 +21,47 @@ set progs_running=0
 call :count_programs
 
 if "%progs_running%" == "0" goto start
-  echo Before the installation can begin the following programs need to be stopped:
+  echo The following programs need to be stopped before proceeding:
   echo %fds_string% %smokeview_string% %mpiexec_string% %hydra_service_string%
   echo.
   echo Options:
-  echo   Press 1 to let the installer stop these programs
-  echo   Press 2 after stopping the programs yourself
+  echo   Press 1 to stop these programs (default) 
   echo   Press any other key to quit installation
-  set /p  option="option:"
+
+  set option=1
+  set /p  option="Option:"
   if "%option%" == "1" (
     call :stop_programs
     goto start
-  )
-  if "%option%" == "2" (
-    goto begin
   )
   goto abort
 
 ::*** determine install directory
 
 :start
-call :install_options
-set /p option="Option:"
 
-set subdir=firemodels
+echo Select the FDS and Smokeview installation directory:
+echo    Press 1 to select a directory below %ProgramFiles% (default)
+echo    Press 2 to select a directory below %userprofile%
+echo    Press any other key to cancel the installation
+set option=1
+
+set option=1
+set /p option="Option:"
 
 if NOT "%option%" == "1" goto skip_option1
   set "BASEDIR=%ProgramFiles%"
-  set /p subdir="subdirectory of %ProgramFiles% (default: %subdir%):"
+
+  set subdir=firemodels
+  set /p subdir="Enter subdirectory name (default: %subdir%):"
   goto install
 :skip_option1
 
 if NOT "%option%" == "2" goto skip_option2
   set "BASEDIR=%userprofile%"
-  set /p subdir="subdirectory of %userprofile% (default: %subdir%):"
+
+  set subdir=firemodels
+  set /p subdir="Enter subdirectory name (default: %subdir%):"
   goto install
 :skip_option2
 
@@ -65,9 +72,27 @@ goto abort
 :install
 set "INSTALLDIR=%BASEDIR%\%subdir%"
 
+echo.
 echo Installation directory: %INSTALLDIR%
-set /p option="Proceed with installation? (y, n):"
 
+set "SMV6=%INSTALLDIR%\SMV6"
+set "FDS6=%INSTALLDIR%\FDS6"
+set "CFAST=%INSTALLDIR%\cfast"
+
+set need_overwrite=0
+if EXIST "%FDS6%" set need_overwrite=1 
+if EXIST "%SMV6%" set need_overwrite=1
+
+if "%need_overwrite%" == "0" goto else1 
+  set option=n
+  set /p option="The subdirectory FDS6 and/or SMV6 exists. Do you wish to overwrite them? (yes, no (default)):"
+  goto endif1
+:else1
+  set option=y
+  set /p option="Do you wish to proceed? (yes (default), no):"
+:endif1
+
+set option=%option:~0,1%
 if "x%option%" == "xy" goto proceed
 if "x%option%" == "xY" goto proceed
 goto begin
@@ -77,10 +102,6 @@ goto begin
 set "DOCDIR=%INSTALLDIR%\FDS6\Documentation"
 set "UNINSTALLDIR=%INSTALLDIR%\FDS6\Uninstall"
  
-set "SMV6=%INSTALLDIR%\SMV6"
-set "FDS6=%INSTALLDIR%\FDS6"
-set "CFAST=%INSTALLDIR%\cfast"
-
 if NOT exist "%FDS6%" goto skip_remove_fds6
 echo *** Removing %FDS6%
 rmdir /S /Q "%FDS6%"
@@ -93,6 +114,7 @@ rmdir /S /Q "%SMV6%"
 
 :: copy files to new installation
 
+echo.
 echo *** Copying installation files to %INSTALLDIR%
 xcopy /E /I /H /Q firemodels "%INSTALLDIR%" > Nul
 echo        copy complete
@@ -112,7 +134,7 @@ set numcoresfile="%TEMP%\numcoresfile"
 
 :: ------------ setting up path ------------
 
-echo *** Setting up the PATH variable.
+echo *** Setting up PATH variable.
 
 call "%UNINSTALLDIR%\set_path.exe" -s -m -f "%FDS6%\bin" > Nul
 call "%UNINSTALLDIR%\set_path.exe" -s -m -f "%SMV6%"     > Nul
@@ -269,15 +291,6 @@ if NOT "%mpiexec_count%" == "0" (
 exit /b
 
 :-------------------------------------------------------------------------
-:install_options  
-:-------------------------------------------------------------------------
-echo Select the FDS and Smokeview installation directory:
-echo    Press 1 to enter subdirectory of %ProgramFiles%
-echo    Press 2 to enter subdirectory of %userprofile%
-echo    Press any other to cancel installation
-exit /b
-
-:-------------------------------------------------------------------------
 :count
 :-------------------------------------------------------------------------
 set progbase=%1
@@ -300,7 +313,7 @@ exit /b
 
 :abort
 echo FDS and Smokeview installation aborted.
-echo Press any key to continue
+echo Press any key to finish
 pause > Nul
 
 :eof
