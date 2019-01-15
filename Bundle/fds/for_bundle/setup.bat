@@ -60,7 +60,7 @@ if "%option%" == "1" set option_install=1
 if "%option%" == "2" set option_install=2
 if "%option_install%" == "0" goto abort
 
-set "BASEDIR=%ProgramFiles%"
+set "BASEDIR=%SystemDrive%\Program Files"
 if "%option_install%" == "2" set "BASEDIR=%userprofile%"
 
 set subdir=firemodels
