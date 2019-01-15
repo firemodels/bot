@@ -8,6 +8,7 @@ title FDS and Smokeview Installer
 if defined PROGRAMFILES(X86) (
   echo.
 ) else (
+  echo.
   echo *** Fatal error: 32 bit Windows detected.
   echo     FDS and Smokeview can only run on 64 bit systems.
   echo     Installation aborted.
@@ -23,11 +24,11 @@ set progs_running=0
 call :count_programs
 
 if "%progs_running%" == "0" goto start
-  echo The following programs need to be stopped before proceeding:
+  echo The following program(s) need to be stopped before proceeding with the installation:
   echo %fds_string% %smokeview_string% %mpiexec_string% %hydra_service_string%
   echo.
   echo Options:
-  echo   Press 1 to stop these programs (default) 
+  echo   Press 1 to stop these programs (default: 1) 
   echo   Press any other key to quit installation
 
   set option=1
@@ -46,7 +47,7 @@ echo.
 type firemodels\message.txt
 echo.
 echo Options:
-echo    Press 1 to install for all users (default)
+echo    Press 1 to install for all users (default: 1)
 echo    Press 2 to install for user %USERNAME%
 echo    Press any other key to cancel the installation
 set option=1
@@ -63,6 +64,7 @@ set "BASEDIR=%ProgramFiles%"
 if "%option_install%" == "2" set "BASEDIR=%userprofile%"
 
 set subdir=firemodels
+echo.
 set /p subdir="Enter directory to contain FDS and Smokeview (default: %subdir%):"
 
 ::*** start installation of FDS and SMokeview
@@ -72,6 +74,7 @@ set "INSTALLDIR=%BASEDIR%\%subdir%"
 
 echo.
 echo Installation directory: %INSTALLDIR%
+echo.
 
 set "SMV6=%INSTALLDIR%\SMV6"
 set "FDS6=%INSTALLDIR%\FDS6"
@@ -84,11 +87,11 @@ if EXIST "%SMV6%" set need_overwrite=1
 if "%need_overwrite%" == "0" goto else1 
   echo The directories %subdir%\FDS6 and/or %subdir%\SMV6 exist. 
   set option=n
-  set /p option="Do you wish to overwrite them? (yes, no (default)):"
+  set /p option="Do you wish to overwrite them? (yes, no (default: no)):"
   goto endif1
 :else1
   set option=y
-  set /p option="Do you wish to proceed? (yes (default), no):"
+  set /p option="Do you wish to proceed? (yes, no, (default: yes)):"
 :endif1
 
 set option=%option:~0,1%
@@ -97,6 +100,8 @@ if "x%option%" == "xY" goto proceed
 goto begin
 
 :proceed
+
+echo.
 
 set "DOCDIR=%INSTALLDIR%\FDS6\Documentation"
 set "UNINSTALLDIR=%INSTALLDIR%\FDS6\Uninstall"
