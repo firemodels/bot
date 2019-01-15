@@ -1,11 +1,14 @@
 @echo off
 set script_dir=%~dp0
 
+title FDS and Smokeview Installer
+
 :: before we do anything make sure this is a 64 bit PC
 
 if defined PROGRAMFILES(X86) (
   echo.
 ) else (
+  echo.
   echo *** Fatal error: 32 bit Windows detected.
   echo     FDS and Smokeview can only run on 64 bit systems.
   echo     Installation aborted.
@@ -21,55 +24,105 @@ set progs_running=0
 call :count_programs
 
 if "%progs_running%" == "0" goto start
-  echo Before the installation can begin the following programs need to be stopped:
+  echo The following program(s) need to be stopped before proceeding with the installation:
   echo %fds_string% %smokeview_string% %mpiexec_string% %hydra_service_string%
   echo.
   echo Options:
-  echo   Press 1 to let the installer stop these programs
-  echo   Press 2 after stopping the programs yourself
+  echo   Press 1 to stop these programs (default: 1) 
   echo   Press any other key to quit installation
-  set /p  option="option:"
+
+  set option=1
+  set /p  option="Option:"
   if "%option%" == "1" (
     call :stop_programs
     goto start
-  )
-  if "%option%" == "2" (
-    goto begin
   )
   goto abort
 
 ::*** determine install directory
 
 :start
-call :install_options
-set /p option="FDS install option:"
 
-if "%option%" == "1" (
-  set "INSTALLDIR=%ProgramFiles%\firemodels"
-  goto install
-)
-if "%option%" == "2" (
-  set "INSTALLDIR=%USERPROFILE%\firemodels"
-  goto install
-)
-goto abort
+echo.
+type firemodels\message.txt
+echo.
+echo Options:
+echo    Press 1 to install for all users (default: 1)
+echo    Press 2 to install for user %USERNAME%
+echo    Press any other key to cancel the installation
+set option=1
 
-::*** doit
+set option=1
+set /p option="Option:"
+
+set option_install=0
+if "%option%" == "1" set option_install=1
+if "%option%" == "2" set option_install=2
+if "%option_install%" == "0" goto abort
+
+set "BASEDIR=%SystemDrive%\Program Files"
+if "%option_install%" == "2" set "BASEDIR=%userprofile%"
+
+set subdir=firemodels
+echo.
+set /p subdir="Enter directory to contain FDS and Smokeview (default: %subdir%):"
+
+::*** start installation of FDS and SMokeview
 
 :install
+set "INSTALLDIR=%BASEDIR%\%subdir%"
+
+echo.
+echo Installation directory: %INSTALLDIR%
+echo.
+
+set "SMV6=%INSTALLDIR%\SMV6"
+set "FDS6=%INSTALLDIR%\FDS6"
+set "CFAST=%INSTALLDIR%\cfast"
+
+set need_overwrite=0
+if EXIST "%FDS6%" set need_overwrite=1 
+if EXIST "%SMV6%" set need_overwrite=1
+
+if "%need_overwrite%" == "0" goto else1 
+  echo The directories %subdir%\FDS6 and/or %subdir%\SMV6 exist. 
+  set option=n
+  set /p option="Do you wish to overwrite them? (yes, no (default: no)):"
+  goto endif1
+:else1
+  set option=y
+  set /p option="Do you wish to proceed? (yes, no, (default: yes)):"
+:endif1
+
+set option=%option:~0,1%
+if "x%option%" == "xy" goto proceed
+if "x%option%" == "xY" goto proceed
+goto begin
+
+:proceed
+
+echo.
 
 set "DOCDIR=%INSTALLDIR%\FDS6\Documentation"
 set "UNINSTALLDIR=%INSTALLDIR%\FDS6\Uninstall"
  
-if NOT exist "%INSTALLDIR%" goto skip_remove_firemodels
-echo *** Removing %INSTALLDIR%
-rmdir /S /Q "%INSTALLDIR%"
-:skip_remove_firemodels
+if NOT exist "%FDS6%" goto skip_remove_fds6
+echo *** Removing %FDS6%
+rmdir /S /Q "%FDS6%"
+:skip_remove_fds6
+
+if NOT exist "%SMV6%" goto skip_remove_smv6
+echo *** Removing %SMV6%
+rmdir /S /Q "%SMV6%"
+:skip_remove_smv6
 
 :: copy files to new installation
 
+echo.
 echo *** Copying installation files to %INSTALLDIR%
-xcopy /E /I /H /Q firemodels "%INSTALLDIR%" > Nul
+if NOT EXIST "%INSTALLDIR%" mkdir "%INSTALLDIR%" > Nul
+xcopy /E /I /H /Q firemodels\FDS6 "%FDS6%"     > Nul
+xcopy /E /I /H /Q firemodels\SMV6 "%SMV6%"     > Nul
 echo        copy complete
 
 echo *** Removing previous FDS/Smokeview entries from the system and user path.
@@ -80,10 +133,8 @@ call "%UNINSTALLDIR%\set_path.exe" -u -m -b -r "FDS\FDS6" >Nul
 call "%UNINSTALLDIR%\set_path.exe" -s -m -b -r "FDS\FDS6" >Nul
 call "%UNINSTALLDIR%\set_path.exe" -s -m -b -r "firemodels\FDS6" >Nul
 call "%UNINSTALLDIR%\set_path.exe" -s -m -b -r "firemodels\SMV6" >Nul
-
-set "SMV6=%INSTALLDIR%\SMV6"
-set "FDS6=%INSTALLDIR%\FDS6"
-set "CFAST=%INSTALLDIR%\cfast"
+call "%UNINSTALLDIR%\set_path.exe" -u -m -b -r "firemodels\FDS6" >Nul
+call "%UNINSTALLDIR%\set_path.exe" -u -m -b -r "firemodels\SMV6" >Nul
 
 :: ------------ create aliases ----------------
 
@@ -91,10 +142,18 @@ set numcoresfile="%TEMP%\numcoresfile"
 
 :: ------------ setting up path ------------
 
-echo *** Setting up the PATH variable.
+echo *** Setting up PATH variable.
 
-call "%UNINSTALLDIR%\set_path.exe" -s -m -f "%FDS6%\bin" > Nul
-call "%UNINSTALLDIR%\set_path.exe" -s -m -f "%SMV6%"     > Nul
+if NOT "%option_install%" == "1" goto skip_systempath
+  call "%UNINSTALLDIR%\set_path.exe" -s -m -f "%FDS6%\bin" > Nul
+  call "%UNINSTALLDIR%\set_path.exe" -s -m -f "%SMV6%"     > Nul
+  goto after_setpath
+:skip_systempath
+
+call "%UNINSTALLDIR%\set_path.exe" -u -m -f "%FDS6%\bin" > Nul
+call "%UNINSTALLDIR%\set_path.exe" -u -m -f "%SMV6%"     > Nul
+
+:after_setpath
 
 :: ------------- file association -------------
 echo *** Associating the .smv file extension with smokeview.exe
@@ -174,11 +233,16 @@ echo if exist %userprofile%\Desktop\CMDfds.lnk erase %userprofile%\Desktop\CMDfd
 echo echo Removing "%FDS6%\bin" from the System Path          >> "%UNINSTALLDIR%\uninstall_base.bat"
 echo call "%UNINSTALLDIR%\set_path.exe" -s -b -r "%FDS6%\bin" >> "%UNINSTALLDIR%\uninstall_base.bat"
 echo echo.                                                    >> "%UNINSTALLDIR%\uninstall_base.bat"
-echo if exist "%CFAST%" echo Removing "%CFAST%"               >> "%UNINSTALLDIR%\uninstall_base.bat"
-echo if exist "%CFAST%" rmdir /s /q  "%CFAST%"                >> "%UNINSTALLDIR%\uninstall_base.bat"
-echo if NOT exist "%CFAST%" echo Removing "%INSTALLDIR%"      >> "%UNINSTALLDIR%\uninstall_base.bat"
-echo if NOT exist "%CFAST%" rmdir /s /q "%INSTALLDIR%"        >> "%UNINSTALLDIR%\uninstall_base.bat"
-echo pause                                                    >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo echo Removing "%FDS6%"                                   >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo rmdir /s /q  "%FDS6%"                                    >> "%UNINSTALLDIR%\uninstall_base.bat"
+:: if cfast exists then only remove fds
+:: if cfast does not exist then remove everything
+echo if exist "%CFAST%" goto skip_remove                      >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo   echo Removing "%SMV6%"                                 >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo   rmdir /s /q  "%SMV6%"                                  >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo   echo Removing "%INSTALLDIR%"                           >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo   rmdir "%INSTALLDIR%"                                   >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo :skip_remove                                             >> "%UNINSTALLDIR%\uninstall_base.bat"
 
 echo echo *** Uninstall complete                              >> "%UNINSTALLDIR%\uninstall_base.bat"
 echo pause>Nul                                                >> "%UNINSTALLDIR%\uninstall_base.bat"
@@ -201,23 +265,15 @@ echo WScript.Sleep 10000                                                   >> "%
 erase "%firewall_setup%"               > Nul
 erase "%FDS6%\wrapup_fds_install.bat"  > Nul
 erase "%FDS6%\shortcut.exe"            > Nul
-erase "%INSTALLDIR%\setup.bat"         > Nul
 
 echo.
 echo *** Press any key, then reboot to complete the installation.  ***
 pause>NUL
 goto eof
 
-:abort
-echo FDS and Smokeview installation aborted
-
-:eof
-exit
-
 :-------------------------------------------------------------------------
 :----------------------subroutines----------------------------------------
 :-------------------------------------------------------------------------
-
 
 :-------------------------------------------------------------------------
 :count_programs  
@@ -255,15 +311,6 @@ if NOT "%mpiexec_count%" == "0" (
 exit /b
 
 :-------------------------------------------------------------------------
-:install_options  
-:-------------------------------------------------------------------------
-echo Install options
-echo    Press 1 to install FDS in %ProgramFiles%\firemodels
-echo    Press 2 to install FDS in %USERPROFILE%\firemodels
-echo    Press any other to cancel installation
-exit /b
-
-:-------------------------------------------------------------------------
 :count
 :-------------------------------------------------------------------------
 set progbase=%1
@@ -283,4 +330,11 @@ set %countvar%=%count%
 set %stringvar%=%string%
 
 exit /b
+
+:abort
+echo FDS and Smokeview installation aborted.
+echo Press any key to finish
+pause > Nul
+
 :eof
+exit

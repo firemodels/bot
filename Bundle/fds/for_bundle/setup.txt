@@ -1,2 +1,0 @@
-1. Click Setup to unpack the installation files
-2. Select the FDS and Smokeview installation directory
