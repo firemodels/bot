@@ -40,9 +40,10 @@ set timepbuild=%svn_root%\smv\Build\timep\%BUILDDIR%
 set windbuild=%svn_root%\smv\Build\wind2fds\%BUILDDIR%
 set sh2bat=%svn_root%\smv\Build\sh2bat\intel_win_64
 set gettime=%svn_root%\smv\Build\get_time\%BUILDDIR%
+set hashfileexe=%hashfilebuild%\hashfile_win_%platform%.exe
 
 set zipbase=%version%_win%platform%
-set smvdir=%zipbase%
+set smvdir=%zipbase%\%SMVEDITION%
 
 cd %svn_root%\bot\Bundle\smv\uploads
 set uploads=%CD%
@@ -77,16 +78,21 @@ CALL :COPY  %svzipbuild%\smokezip_win_%platform%.exe    %smvdir%\smokezip.exe
 CALL :COPY  %timepbuild%\timep_win_%platform%.exe       %smvdir%\timep.exe
 CALL :COPY  %windbuild%\wind2fds_win_%platform%.exe     %smvdir%\wind2fds.exe
 
+echo Unpacking Smokeview %smv_versionbase% installation files > %forbundle%\unpack.txt
+echo Install Smokeview %smv_versionbase%                      > %forbundle%\message.txt
+CALL :COPY  "%forbundle%\message.txt"                         %zipbase%\message.txt
+CALL :COPY  %forbundle%\setup.bat                             %zipbase%\setup.bat
+
 set curdir=%CD%
 cd %smvdir%
 
-hashfile smokeview.exe  >  hash\smokeview_%revision%.sha1
-hashfile smokezip.exe   >  hash\smokezip_%revision%.sha1
-hashfile smokediff.exe  >  hash\smokediff_%revision%.sha1
-hashfile dem2fds.exe    >  hash\dem2fds_%revision%.sha1
-hashfile background.exe >  hash\background_%revision%.sha1
-hashfile hashfile.exe   >  hash\hashfile_%revision%.sha1
-hashfile wind2fds.exe   >  hash\wind2fds_%revision%.sha1
+%hashfileexe% smokeview.exe  >  hash\smokeview_%revision%.sha1
+%hashfileexe% smokezip.exe   >  hash\smokezip_%revision%.sha1
+%hashfileexe% smokediff.exe  >  hash\smokediff_%revision%.sha1
+%hashfileexe% dem2fds.exe    >  hash\dem2fds_%revision%.sha1
+%hashfileexe% background.exe >  hash\background_%revision%.sha1
+%hashfileexe% hashfile.exe   >  hash\hashfile_%revision%.sha1
+%hashfileexe% wind2fds.exe   >  hash\wind2fds_%revision%.sha1
 cd hash
 cat *.sha1              >  %uploads%\%zipbase%.sha1
 cd %curdir%
@@ -99,38 +105,29 @@ copy %forbundle%\textures\*.jpg %smvdir%\textures>Nul
 copy %forbundle%\textures\*.png %smvdir%\textures>Nul
 
 CALL :COPY  %forbundle%\objects.svo %smvdir%\.
-
 CALL :COPY  %sh2bat%\sh2bat.exe %smvdir%\.
-
 CALL :COPY  %gettime%\get_time_64.exe %smvdir%\get_time.exe
-
 CALL :COPY  %svn_root%\webpages\smv_readme.html %smvdir%\release_notes.html
-
-CALL :COPY  %forbundle%\wrapup_smv_install_%platform%.bat %smvdir%\wrapup_smv_install.bat
 
 echo.
 echo --- compressing distribution directory ---
 echo.
-cd %smvdir%
-wzzip -a -r -P %zipbase%.zip * >Nul
-rename %zipbase%.zip smoke_update.zip
-copy smoke_update.zip ..
+cd %zipbase%
+wzzip -a -r -P ..\%zipbase%.zip * >Nul
+
+cd ..
+if exist %zipbase%.exe erase %zipbase%.exe
 
 echo.
 echo --- creating installer ---
 echo.
-cd ..
-if exist smoke_update.exe erase smoke_update.exe
-wzipse32 smoke_update.zip -runasadmin -d "c:\Program Files\firemodels\%SMVEDITION%" -c wrapup_smv_install.bat
-if exist %zipbase%.exe erase %zipbase%.exe
-rename smoke_update.exe %zipbase%.exe
+wzipse32 %zipbase%.zip -runasadmin -setup -auto -i %forbundle%\icon.ico -t %forbundle%\unpack.txt -a %forbundle%\about.txt -st"Smokeview %smv_version% Setup" -o -c cmd /k setup.bat
 
-hashfile %zipbase%.exe  >   %smvdir%\hash\%zipbase%.exe.sha1
+if not exist %zipbase%.exe echo ***warning: %zipbase%.exe was not created
+%hashfileexe% %zipbase%.exe  >   %smvdir%\hash\%zipbase%.exe.sha1
+
 cd %smvdir%\hash
 cat %zipbase%.exe.sha1 >> %uploads%\%zipbase%.sha1
-
-cd ..\..
-if not exist %zipbase%.exe echo ***warning: %zipbase%.exe was not created
 
 echo.
 echo --- Smokeview win%platform% installer built
