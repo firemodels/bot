@@ -4,7 +4,7 @@ echo Current number of OpenMP threads per MPI process:
 echo OMP_NUM_THREADS=%OMP_NUM_THREADS%
 echo.
 echo For jobs using this computer only:
-echo fds_local xx casename.fds
+echo fds_local -n xx casename.fds
 echo.
 echo For jobs using multiple computers:
 echo mpiexec -n xx -hostfile hostfile.txt -wdir WDIR -env OMP_NUM_THREADS yy fds casename.fds
