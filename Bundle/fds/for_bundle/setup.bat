@@ -17,6 +17,12 @@ if defined PROGRAMFILES(X86) (
   goto abort
 )
 
+set auto_install=y
+echo Automatically stop fds, smokeview, mpiexec, and hydra_service
+echo and install FDS and Smokeview in
+set /p  auto_install="%SystemDrive%\Program Files\firemodels ?: (yes, no (default: yes))"
+set auto_install=%auto_install:~0,1%
+
 ::*** check if fds and smokeview are running
 
 :begin
@@ -32,7 +38,7 @@ if "%progs_running%" == "0" goto start
   echo   Press any other key to quit installation
 
   set option=1
-  set /p  option="Option:"
+  if "%auto_install%" == "n" set /p  option="Option:"
   if "%option%" == "1" (
     call :stop_programs
     goto start
@@ -53,7 +59,7 @@ echo    Press any other key to cancel the installation
 set option=1
 
 set option=1
-set /p option="Option:"
+if "%auto_install%" == "n" set /p option="Option:"
 
 set option_install=0
 if "%option%" == "1" set option_install=1
@@ -65,7 +71,7 @@ if "%option_install%" == "2" set "BASEDIR=%userprofile%"
 
 set subdir=firemodels
 echo.
-set /p subdir="Enter directory to contain FDS and Smokeview (default: %subdir%):"
+if "%auto_install%" == "n" set /p subdir="Enter directory to contain FDS and Smokeview (default: %subdir%):"
 
 ::*** start installation of FDS and SMokeview
 
@@ -87,11 +93,12 @@ if EXIST "%SMV6%" set need_overwrite=1
 if "%need_overwrite%" == "0" goto else1 
   echo The directories %subdir%\FDS6 and/or %subdir%\SMV6 exist. 
   set option=n
-  set /p option="Do you wish to overwrite them? (yes, no (default: no)):"
+  if "%auto_install%" == "y" set option=y 
+  if "%auto_install%" == "n" set /p option="Do you wish to overwrite them? (yes, no (default: no)):"
   goto endif1
 :else1
   set option=y
-  set /p option="Do you wish to proceed? (yes, no, (default: yes)):"
+  if "%auto_install%" == "n" set /p option="Do you wish to proceed? (yes, no, (default: yes)):"
 :endif1
 
 set option=%option:~0,1%
