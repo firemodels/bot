@@ -17,10 +17,20 @@ if defined PROGRAMFILES(X86) (
   goto abort
 )
 
+:quest1
 set auto_install=y
-echo Automatically stop smokeview and install Smokeview in
-set /p  auto_install="%SystemDrive%\Program Files\firemodels ?:   echo. (yes, no (default: yes))"
-set auto_install=%auto_install:~0,1%
+type message.txt
+echo.
+echo Install in %SystemDrive%\Program Files\firemodels and stop any instances of smokeview?
+echo.
+echo  yes - standard installation (use default answer for all options that follow)
+echo   no - customize installation (install to a different location)
+echo quit - stop installation
+echo.
+set /p  auto_install="yes, no or quit?:"
+call :get_yesno %auto_install% auto_install quest1_repeat
+if "%quest1_repeat%" == "1" goto quest1
+if "%quest1_repeat%" == "2" goto abort
 
 ::*** check if smokeview is running
 
@@ -29,10 +39,12 @@ set progs_running=0
 call :count_programs
 
 if "%progs_running%" == "0" goto start
+  if "%auto_install%" == "y" goto stop_smokeview
   echo smokeview needs to be stopped before proceeding with the installation
   echo Options:
   echo   Press 1 to stop smokeview (default: 1) 
   echo   Press any other key to quit installation
+:stop_smokeview
 
   set option=1
   if "%auto_install%" == "n" set /p  option="Option:"
@@ -46,6 +58,7 @@ if "%progs_running%" == "0" goto start
 
 :start
 
+if "%auto_install%" == "y" goto install_location
 echo.
 type message.txt
 echo.
@@ -53,6 +66,7 @@ echo Options:
 echo    Press 1 to install for all users (default: 1)
 echo    Press 2 to install for user %USERNAME%
 echo    Press any other key to cancel the installation
+:install_location
 
 set option=1
 if "%auto_install%" == "n" set /p option="Option:"
@@ -145,6 +159,25 @@ goto eof
 :-------------------------------------------------------------------------
 :----------------------subroutines----------------------------------------
 :-------------------------------------------------------------------------
+
+:-------------------------------------------------------------------------
+:get_yesno  
+:-------------------------------------------------------------------------
+set answer=%1
+set answervar=%2
+set repeatvar=%3
+
+set answer=%answer:~0,1%
+if "%answer%" == "Y" set answer=y
+if "%answer%" == "N" set answer=n
+if "%answer%" == "S" set answer=s
+set %answervar%=%answer%
+set repeat=1
+if "%answer%" == "y" set repeat=0
+if "%answer%" == "n" set repeat=0
+if "%answer%" == "s" set repeat=2
+set %repeatvar%=%repeat%
+exit /b
 
 :-------------------------------------------------------------------------
 :count_programs  
