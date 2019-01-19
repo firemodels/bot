@@ -17,11 +17,21 @@ if defined PROGRAMFILES(X86) (
   goto abort
 )
 
+:quest1
 set auto_install=y
-echo Automatically stop fds, smokeview, mpiexec, and hydra_service
-echo and install FDS and Smokeview in
-set /p  auto_install="%SystemDrive%\Program Files\firemodels ?: (yes, no (default: yes))"
-set auto_install=%auto_install:~0,1%
+type firemodels\message.txt
+echo.
+echo Install in %SystemDrive%\Program Files\firemodels and stop any 
+echo instances of fds, smokeview, mpiexec, and/or hydra_service?
+echo.
+echo  yes - standard installation (use default answer for all options that follow)
+echo   no - customize installation (install to a different location)
+echo quit - stop installation
+echo.
+set /p  auto_install="yes, no or quit?:"
+call :get_yesno %auto_install% auto_install quest1_repeat
+if "%quest1_repeat%" == "1" goto quest1
+if "%quest1_repeat%" == "2" goto abort
 
 ::*** check if fds and smokeview are running
 
@@ -30,12 +40,14 @@ set progs_running=0
 call :count_programs
 
 if "%progs_running%" == "0" goto start
+  if "%auto_install%" == "y" goto skip_remove
   echo The following program(s) need to be stopped before proceeding with the installation:
   echo %fds_string% %smokeview_string% %mpiexec_string% %hydra_service_string%
   echo.
   echo Options:
   echo   Press 1 to stop these programs (default: 1) 
   echo   Press any other key to quit installation
+  :skip_remove
 
   set option=1
   if "%auto_install%" == "n" set /p  option="Option:"
@@ -49,6 +61,7 @@ if "%progs_running%" == "0" goto start
 
 :start
 
+if "%auto_install%" == "y" goto skip_loc
 echo.
 type firemodels\message.txt
 echo.
@@ -56,7 +69,7 @@ echo Options:
 echo    Press 1 to install for all users (default: 1)
 echo    Press 2 to install for user %USERNAME%
 echo    Press any other key to cancel the installation
-set option=1
+:skip_loc
 
 set option=1
 if "%auto_install%" == "n" set /p option="Option:"
@@ -90,8 +103,9 @@ set need_overwrite=0
 if EXIST "%FDS6%" set need_overwrite=1 
 if EXIST "%SMV6%" set need_overwrite=1
 
+:quest2
 if "%need_overwrite%" == "0" goto else1 
-  echo The directories %subdir%\FDS6 and/or %subdir%\SMV6 exist. 
+  if "%auto_install%" == "n" echo The directories %subdir%\FDS6 and/or %subdir%\SMV6 exist. 
   set option=n
   if "%auto_install%" == "y" set option=y 
   if "%auto_install%" == "n" set /p option="Do you wish to overwrite them? (yes, no (default: no)):"
@@ -102,13 +116,14 @@ if "%need_overwrite%" == "0" goto else1
 :endif1
 
 set option=%option:~0,1%
+call :get_yesno %option% option quest2_repeat
+if "%quest2_repeat%" == "1" goto quest2
+
 if "x%option%" == "xy" goto proceed
 if "x%option%" == "xY" goto proceed
 goto begin
 
 :proceed
-
-echo.
 
 set "DOCDIR=%INSTALLDIR%\FDS6\Documentation"
 set "UNINSTALLDIR=%INSTALLDIR%\FDS6\Uninstall"
@@ -270,7 +285,6 @@ echo objShell.ShellExecute "%ELEVATE_APP%", "%ELEVATE_PARMS%", "", "runas" >> "%
 echo WScript.Sleep 10000                                                   >> "%UNINSTALLDIR%\uninstall.vbs"
 
 erase "%firewall_setup%"               > Nul
-erase "%FDS6%\wrapup_fds_install.bat"  > Nul
 erase "%FDS6%\shortcut.exe"            > Nul
 
 echo.
@@ -281,6 +295,25 @@ goto eof
 :-------------------------------------------------------------------------
 :----------------------subroutines----------------------------------------
 :-------------------------------------------------------------------------
+
+:-------------------------------------------------------------------------
+:get_yesno  
+:-------------------------------------------------------------------------
+set answer=%1
+set answervar=%2
+set repeatvar=%3
+
+set answer=%answer:~0,1%
+if "%answer%" == "Y" set answer=y
+if "%answer%" == "N" set answer=n
+if "%answer%" == "S" set answer=s
+set %answervar%=%answer%
+set repeat=1
+if "%answer%" == "y" set repeat=0
+if "%answer%" == "n" set repeat=0
+if "%answer%" == "s" set repeat=2
+set %repeatvar%=%repeat%
+exit /b
 
 :-------------------------------------------------------------------------
 :count_programs  

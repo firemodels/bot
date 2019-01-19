@@ -146,6 +146,7 @@ cd %curdir%
 CALL :COPY %in_intel_dll%\libiomp5md.dll                        %out_bin%\libiomp5md.dll
 CALL :COPY "%fds_forbundle%\fdsinit.bat"                        %out_bin%\fdsinit.bat
 CALL :COPY "%fds_forbundle%\helpfds.bat"                        %out_bin%\helpfds.bat
+CALL :COPY "%fds_forbundle%\fds_local.bat"                      %out_bin%\fds_local.bat
 CALL :COPY  %svn_root%\smv\Build\sh2bat\intel_win_64\sh2bat.exe %out_bin%\sh2bat.exe
 
 :: setup program for new installer
@@ -222,10 +223,9 @@ call %smv_casesbat%>Nul
 call %wui_casesbat%>Nul
 
 echo.
-echo --- copying installer wrapup scripts ---
+echo --- copying scripts that finalize installation ---
 echo.
 
-CALL :COPY  "%fds_forbundle%\wrapup_fds_install.bat"                              "%out_bundle%\%fdsversion%\wrapup_fds_install.bat"
 CALL :COPY  "%fds_forbundle%\setup_fds_firewall.bat"                              "%out_bundle%\%fdsversion%\setup_fds_firewall.bat"
 CALL :COPY  "%in_shortcut%\shortcut.exe"                                          "%out_bundle%\%fdsversion%\shortcut.exe"
 
