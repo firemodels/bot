@@ -285,7 +285,6 @@ echo objShell.ShellExecute "%ELEVATE_APP%", "%ELEVATE_PARMS%", "", "runas" >> "%
 echo WScript.Sleep 10000                                                   >> "%UNINSTALLDIR%\uninstall.vbs"
 
 erase "%firewall_setup%"               > Nul
-erase "%FDS6%\wrapup_fds_install.bat"  > Nul
 erase "%FDS6%\shortcut.exe"            > Nul
 
 echo.
