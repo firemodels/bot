@@ -1,0 +1,20 @@
+@echo off
+set CURDIR=%CD%
+
+SET I_MPI_ROOT=%~dp0\mpi
+SET FDS_PATH=%~dp0
+SET SMV_PATH=%~dp0\..\..\SMV6
+
+cd %I_MPI_ROOT%
+SET I_MPI_ROOT=%CD%
+
+cd %FDS_PATH%
+SET FDS_PATH=%CD%
+
+cd %SMV_PATH%
+SET SMV_PATH=%CD%
+
+SET PATH=%SMV_PATH%;%FDS_PATH%;%I_MPI_ROOT%
+cd %CURDIR%
+
+
