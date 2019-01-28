@@ -9,7 +9,7 @@ MANUAL_PARENT_ID=0B_wB1pJL2bFQUlJwMmNfaHlqME0
 EXT=
 
 if [ "$MAKEMOVIES" == "1" ]; then
-  EXT=m
+  EXT=_movies
 fi
 
 UPLOADWEB ()
