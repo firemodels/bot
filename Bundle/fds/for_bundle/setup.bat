@@ -17,6 +17,13 @@ if defined PROGRAMFILES(X86) (
   goto abort
 )
 
+:: form extraction directory
+
+set /p basename=<firemodels\basename.txt
+set EXTRACTDIR=%userprofile%\%basename%
+for /f "tokens=* delims= " %%A in ('echo %EXTRACTDIR% ') do set EXTRACTDIR=%%A
+set EXTRACTDIR=%EXTRACTDIR:~0,-1%
+
 :quest1
 set auto_install=y
 type firemodels\message.txt
@@ -24,14 +31,17 @@ echo.
 echo Install in %SystemDrive%\Program Files\firemodels and stop any 
 echo instances of fds, smokeview, mpiexec, and/or hydra_service?
 echo.
-echo  yes - standard installation (use default answer for all options that follow)
+echo  yes - standard installation (use default answer for all questions)
 echo   no - customize installation (install to a different location)
+::echo extract - extract to: %EXTRACTDIR%
+::echo           and quit 
 echo quit - stop installation
 echo.
 set /p  auto_install="yes, no or quit?:"
-call :get_yesno %auto_install% auto_install quest1_repeat
+call :get_yesnoextract %auto_install% auto_install quest1_repeat
 if "%quest1_repeat%" == "1" goto quest1
 if "%quest1_repeat%" == "2" goto abort
+if "%quest1_repeat%" == "3" goto extract
 
 ::*** check if fds and smokeview are running
 
@@ -120,7 +130,6 @@ call :get_yesno %option% option quest2_repeat
 if "%quest2_repeat%" == "1" goto quest2
 
 if "x%option%" == "xy" goto proceed
-if "x%option%" == "xY" goto proceed
 goto begin
 
 :proceed
@@ -297,7 +306,7 @@ goto eof
 :-------------------------------------------------------------------------
 
 :-------------------------------------------------------------------------
-:get_yesno  
+:get_yesnoextract
 :-------------------------------------------------------------------------
 set answer=%1
 set answervar=%2
@@ -306,12 +315,31 @@ set repeatvar=%3
 set answer=%answer:~0,1%
 if "%answer%" == "Y" set answer=y
 if "%answer%" == "N" set answer=n
-if "%answer%" == "S" set answer=s
+if "%answer%" == "Q" set answer=q
+if "%answer%" == "E" set answer=e
 set %answervar%=%answer%
 set repeat=1
 if "%answer%" == "y" set repeat=0
 if "%answer%" == "n" set repeat=0
-if "%answer%" == "s" set repeat=2
+if "%answer%" == "q" set repeat=2
+if "%answer%" == "e" set repeat=3
+set %repeatvar%=%repeat%
+exit /b
+
+:-------------------------------------------------------------------------
+:get_yesno
+:-------------------------------------------------------------------------
+set answer=%1
+set answervar=%2
+set repeatvar=%3
+
+set answer=%answer:~0,1%
+if "%answer%" == "Y" set answer=y
+if "%answer%" == "N" set answer=n
+set %answervar%=%answer%
+set repeat=1
+if "%answer%" == "y" set repeat=0
+if "%answer%" == "n" set repeat=0
 set %repeatvar%=%repeat%
 exit /b
 
@@ -370,6 +398,23 @@ set %countvar%=%count%
 set %stringvar%=%string%
 
 exit /b
+
+:-------------------------------------------------------------------------
+:extract
+:-------------------------------------------------------------------------
+echo.
+set "INSTALLDIR=%EXTRACTDIR%"
+set "SMV6=%INSTALLDIR%\SMV6"
+set "FDS6=%INSTALLDIR%\FDS6"
+echo *** Copying installation files to %INSTALLDIR%
+if NOT EXIST "%INSTALLDIR%" mkdir "%INSTALLDIR%" > Nul
+xcopy /E /I /H /Q firemodels\FDS6 "%FDS6%"     > Nul
+xcopy /E /I /H /Q firemodels\SMV6 "%SMV6%"     > Nul
+
+echo Copy complete
+echo Press any key to finish
+pause > Nul
+goto eof
 
 :abort
 echo FDS and Smokeview installation aborted.
