@@ -151,7 +151,8 @@ CALL :COPY "%fds_forbundle%\fds_local.bat"                      %out_bin%\fds_lo
 CALL :COPY  %svn_root%\smv\Build\sh2bat\intel_win_64\sh2bat.exe %out_bin%\sh2bat.exe
 
 :: setup program for new installer
-CALL :COPY "%fds_forbundle%\setup.bat"                               %out_bundle%\setup.bat
+CALL :COPY "%fds_forbundle%\setup.bat"                          %out_bundle%\setup.bat
+echo %basename%                                               > %out_bundle%\basename.txt
 
 echo Install FDS %fds_versionbase% and Smokeview %smv_versionbase% > %fds_forbundle%\message.txt
 CALL :COPY  "%fds_forbundle%\message.txt"                            %out_bundle%\message.txt
