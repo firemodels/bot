@@ -9,6 +9,8 @@ set PATH=%FDS_SAVE_PATH%
 echo.
 echo PATH=%PATH%
 set FDS_SAVE_PATH=
+echo.
+echo original path restored
 
 goto eof
 
