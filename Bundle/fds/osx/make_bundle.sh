@@ -9,6 +9,6 @@ export smvhost=$osx_hostname
 export OSXBUNDLE=yes
 export MPI_VERSION=$osx_mpi_version
 
-export INSTALLDIR=FDS/$FDSEDITION
+export INSTALLDIR=FDS6
 
 ~/$fds_smvroot/bot/Bundle/fds/scripts/bundle_generic.sh
