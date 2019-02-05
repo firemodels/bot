@@ -32,6 +32,8 @@ do
 case $OPTION in
   d)
   INSTALLDIR="$OPTARG"
+# get rid of trailing slashes
+  INSTALLDIR=${INSTALLDIR%/}
   ;;
   i)
   FDS_TAR="$OPTARG"
