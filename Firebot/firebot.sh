@@ -1930,7 +1930,7 @@ echo "Status"
 echo "------"
   echo Cleaning
   clean_firebot_metafiles
-if [[ "$CLONE_REPOS" == "" ]]; t;hen
+if [[ "$CLONE_REPOS" == "" ]]; then
   if [[ "$CLEANREPO" == "1" ]] ; then
     clean_repo2 exp master || exit 1
     clean_repo2 fds $FDSBRANCH || exit 1
@@ -1942,7 +1942,7 @@ fi
 
 #*** clone repos
 
-if [[ "$CLONE_REPOS" == "1" ]]; t;hen
+if [[ "$CLONE_REPOS" == "1" ]]; then
   echo Cloning
   cd $botrepo/Scripts
   ./setup_repos.sh -F > $OUTPUT_DIR/stage1_clone 2>&1
@@ -1951,7 +1951,7 @@ fi
 
 #*** update repos
 
-if [[ "$CLONE_REPOS" == "" ]]; t;hen
+if [[ "$CLONE_REPOS" == "" ]]; then
   if [[ "$UPDATEREPO" == "1" ]] ; then
     echo Updating
     update_repo exp master || exit 1
