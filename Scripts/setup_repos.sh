@@ -10,6 +10,8 @@ echo "-c - setup repos used by cfastbot: "
 echo "    $cfastrepos"
 echo "-f - setup repos used by firebot: "
 echo "    $fdsrepos"
+echo "-F - setup repos used by firebot (erase each repo first): "
+echo "    $fdsrepos"
 echo "-s - setup repos used by smokebot: "
 echo "    $smvrepos"
 echo "-t - setup fds, smv, cfast and webpages repos that can be tagged"
@@ -28,6 +30,7 @@ cfastrepos="cfast exp smv fig"
 allrepos="cfast cor exp fds fig out radcal smv cad"
 wikiwebrepos="fds.wiki fds-smv"
 repos=$fdsrepos
+eraserepos=
 tagrepo=0
 
 FMROOT=
@@ -40,7 +43,7 @@ else
    exit
 fi
 
-while getopts 'acfhstw' OPTION
+while getopts 'acfFhstw' OPTION
 do
 case $OPTION  in
   a)
@@ -51,6 +54,10 @@ case $OPTION  in
    ;;
   f)
    repos=$fdsrepos;
+   ;;
+  F)
+   repos=$fdsrepos;
+   eraserepos=1
    ;;
   h)
    usage;
@@ -96,6 +103,13 @@ do
   repo_out=$repo
 
   cd $FMROOT
+
+  if [ "$eraserepo" == "1" ]; then
+    if [ -e $repo ]; then
+      echo removing $repo
+      rm -rf $repo
+    fi
+  fi
 
   echo "----------------------------------------------"
   if [ "$repo" == "fds.wiki" ]; then
@@ -153,10 +167,10 @@ do
      if [ "$tagrepo" == "0" ]; then
         ndisable=`git remote -v | grep DISABLE | wc -l`
         if [ $ndisable -eq 0 ]; then
-           echo "   disabling push access to firemodels"
-           git remote set-url --push firemodels DISABLE
+          echo "   disabling push access to firemodels"
+          git remote set-url --push firemodels DISABLE
         else
-           echo "   push access to firemodels already disabled"
+          echo "   push access to firemodels already disabled"
         fi
      fi
   fi
