@@ -86,16 +86,18 @@ else
    GITUSER=`git remote -v | grep origin | head -1 | awk -F '.' '{print $2}' | awk -F\/ '{print $2}'`
 fi
 
-echo "You are about to clone the repos: $repos"
-if [ "$WIKIWEB" == "1" ]; then
-   echo "from git@github.com:firemodels into the directory: $FMROOT"
-else
-   echo "from $GITHEADER$GITUSER into the directory: $FMROOT"
+if [ "$eraserepos" == "" ]; then
+  echo "You are about to clone the repos: $repos"
+  if [ "$WIKIWEB" == "1" ]; then
+     echo "from git@github.com:firemodels into the directory: $FMROOT"
+  else
+     echo "from $GITHEADER$GITUSER into the directory: $FMROOT"
+  fi
+  echo ""
+  echo "Press any key to continue or <CTRL> c to abort."
+  echo "Type $0 -h for other options"
+  read val
 fi
-echo ""
-echo "Press any key to continue or <CTRL> c to abort."
-echo "Type $0 -h for other options"
-read val
 
 for repo in $repos
 do 
@@ -103,13 +105,6 @@ do
   repo_out=$repo
 
   cd $FMROOT
-
-  if [ "$eraserepo" == "1" ]; then
-    if [ -e $repo ]; then
-      echo removing $repo
-      rm -rf $repo
-    fi
-  fi
 
   echo "----------------------------------------------"
   if [ "$repo" == "fds.wiki" ]; then
@@ -124,12 +119,20 @@ do
      repo_out=${repo_out}_tag
   fi
   repo_dir=$FMROOT/$repo_out
-  if [ -e $repo_dir ]; then
-     echo "   For repo $repo, the directory $repo_dir already exists"
-     continue;
+  if [ "$eraserepos" == "" ]; then
+    if [ -e $repo_dir ]; then
+       echo "   For repo $repo, the directory $repo_dir already exists"
+       continue;
+    fi
   fi
 
   echo repo: $repo
+  if [ "$eraserepos" == "1" ]; then
+    if [ -e $repo ]; then
+      echo removing $repo
+      rm -rf $repo
+    fi
+  fi
   if [ "$WIKIWEB" == "1" ]; then
      cd $FMROOT
      git clone ${GITHEADER}firemodels/$repo.git $repo_out
