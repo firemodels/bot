@@ -286,6 +286,16 @@ esac
 done
 shift $(($OPTIND-1))
 
+if [ `whoami` != firebot ]; then
+  if [ "$CLONE_REPOS" == "-W" ]; then
+    echo "You are about to erase (if they exist) and clone the "
+    echo "fds, exp, fig, out and smv repos."
+    echo "Press any key to continue or <CTRL> c to abort."
+    echo "Type $0 -h for other options"
+    read val
+  fi
+fi
+
 #*** kill firebot
 
 if [ "$KILL_FIREBOT" == "1" ]; then
