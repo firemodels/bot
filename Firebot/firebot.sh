@@ -1806,7 +1806,7 @@ outrepo=$repo/out
 #*** clone repos
 
 if [[ "$CLONE_REPOS" == "1" ]]; then
-  echo Cloning
+  echo Cloning repos
   cd $botrepo/Scripts
   ./setup_repos.sh -F > $OUTPUT_DIR/stage1_clone 2>&1
 fi
