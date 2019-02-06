@@ -36,6 +36,7 @@ echo "-R - remove run status file"
 echo "-s - skip matlab and build document stages"
 echo "-T - build a bundle"
 echo "-U - upload guides (only by user firebot)"
+echo "-W - clone fds, exp, fig, out and smv repos"
 }
 
 #---------------------------------------------
@@ -181,11 +182,12 @@ INTEL=
 REMOVE_PID=
 QUEUEBENCH=
 BUILD_BUNDLE=
+CLONE_REPOS=
 export QFDS_STARTUP=
 
 #*** parse command line options
 
-while getopts 'bBcdCD:FfHhIiJKkLm:Pq:Q:nRsSuTUvV:' OPTION
+while getopts 'bBcdCD:FfHhIiJKkLm:Pq:Q:nRsSuTUvV:W' OPTION
 do
 case $OPTION  in
   b)
@@ -277,9 +279,22 @@ case $OPTION  in
   V)
    MAX_VALIDATION_PROCESSES="-V $OPTARG"
    ;;
+  W)
+   CLONE_REPOS="-W"
+   ;;
 esac
 done
 shift $(($OPTIND-1))
+
+if [ `whoami` != firebot ]; then
+  if [ "$CLONE_REPOS" == "-W" ]; then
+    echo "You are about to erase (if they exist) and clone the "
+    echo "fds, exp, fig, out and smv repos."
+    echo "Press any key to continue or <CTRL> c to abort."
+    echo "Type $0 -h for other options"
+    read val
+  fi
+fi
 
 #*** kill firebot
 
@@ -354,7 +369,7 @@ fi
 BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
-$ECHO  ./$botscript -p $firebot_pid $commit $push $UPDATE $DV $INTEL $debug_mode $BRANCH $showcaselist $caselistfile $MAX_VALIDATION_PROCESSES $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUEBENCH $QUEUE $SKIPMATLAB $BUILD_BUNDLE $SKIPFIGURES $EMAIL "$@"
+$ECHO  ./$botscript -p $firebot_pid $commit $push $UPDATE $DV $INTEL $debug_mode $BRANCH $showcaselist $caselistfile $MAX_VALIDATION_PROCESSES $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUEBENCH $QUEUE $SKIPMATLAB $BUILD_BUNDLE $SKIPFIGURES $CLONE_REPOS $EMAIL "$@"
 if [ -e $firebot_pid ]; then
   rm -f $firebot_pid
 fi

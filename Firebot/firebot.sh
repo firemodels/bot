@@ -35,6 +35,7 @@ echo "-u - update repo"
 echo "-U - upload guides"
 echo "-V n - run Firebot in validation mode with a specified number "
 echo "       of processes dedicated to validation."
+echo "-W - clone fds, exp, fig, out and smv repos"
 exit
 }
 
@@ -1653,10 +1654,11 @@ DV2=
 INTEL=
 INTEL2=
 BUILD_BUNDLE=
+CLONE_REPOS=
 
 #*** parse command line arguments
 
-while getopts 'b:cCdD:FhIiJLm:p:Pq:Q:sSTuUV:' OPTION
+while getopts 'b:cCdD:FhIiJLm:p:Pq:Q:sSTuUV:W' OPTION
 do
 case $OPTION in
   b)
@@ -1733,6 +1735,9 @@ case $OPTION in
    MAX_VALIDATION_PROCESSES="$OPTARG"
    LAUNCH_MORE_CASES=1
    export JOBPREFIX=VB_
+   ;;
+  W)
+   CLONE_REPOS=1
    ;;
 esac
 done
@@ -1906,7 +1911,6 @@ if [ "$FIREBOT_MODE" == "validation" ]; then
 fi
 echo ""
 
-
 # Set time limit (43,200 seconds = 12 hours)
 TIME_LIMIT=43200
 TIME_LIMIT_EMAIL_NOTIFICATION="unsent"
@@ -1926,25 +1930,38 @@ echo "Status"
 echo "------"
   echo Cleaning
   clean_firebot_metafiles
-if [[ "$CLEANREPO" == "1" ]] ; then
-  clean_repo2 exp master || exit 1
-  clean_repo2 fds $FDSBRANCH || exit 1
-  clean_repo2 fig master || exit 1
-  clean_repo2 out master || exit 1
-  clean_repo2 smv $SMVBRANCH || exit 1
+if [[ "$CLONE_REPOS" == "" ]]; then
+  if [[ "$CLEANREPO" == "1" ]] ; then
+    clean_repo2 exp master || exit 1
+    clean_repo2 fds $FDSBRANCH || exit 1
+    clean_repo2 fig master || exit 1
+    clean_repo2 out master || exit 1
+    clean_repo2 smv $SMVBRANCH || exit 1
+  fi
 fi
+
+#*** clone repos
+
+if [[ "$CLONE_REPOS" == "1" ]]; then
+  echo Cloning
+  cd $botrepo/Scripts
+  ./setup_repos.sh -F > $OUTPUT_DIR/stage1_clone 2>&1
+fi
+
 
 #*** update repos
 
-if [[ "$UPDATEREPO" == "1" ]] ; then
-  echo Updating
-  update_repo exp master || exit 1
-  update_repo fds $FDSBRANCH || exit 1
-  update_repo fig master || exit 1
-  update_repo out master || exit 1
-  update_repo smv $SMVBRANCH || exit 1
-else
-  echo Repos not updated
+if [[ "$CLONE_REPOS" == "" ]]; then
+  if [[ "$UPDATEREPO" == "1" ]] ; then
+    echo Updating
+    update_repo exp master || exit 1
+    update_repo fds $FDSBRANCH || exit 1
+    update_repo fig master || exit 1
+    update_repo out master || exit 1
+    update_repo smv $SMVBRANCH || exit 1
+  else
+    echo Repos not updated
+  fi
 fi
 
 check_git_checkout

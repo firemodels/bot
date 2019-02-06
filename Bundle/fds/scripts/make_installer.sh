@@ -32,6 +32,8 @@ do
 case $OPTION in
   d)
   INSTALLDIR="$OPTARG"
+# get rid of trailing slashes
+  INSTALLDIR=${INSTALLDIR%/}
   ;;
   i)
   FDS_TAR="$OPTARG"
@@ -79,7 +81,7 @@ OVERRIDE=\$1
 INSTALL_LOG=/tmp/fds_install.log
 echo "" > \$INSTALL_LOG
 echo ""
-echo "Installing FDS $FDSVERSION and Smokeview $SMVVERSION for $ostype2"
+echo "Installing FDS $FDS_VERSIONBASE and Smokeview $SMV_VERSIONBASE for $ostype2"
 echo ""
 echo "Options:"
 echo "  1) Press <Enter> to begin installation [default]"

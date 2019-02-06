@@ -32,6 +32,8 @@ call :dos2bash fds_version %fds_version%
 call :dos2bash smv_version %smv_version%
 call :dos2bash fds_debug   %fds_debug%
 call :dos2bash FDSEDITION  %fds_edition%
+call :dos2bash FDS_VERSIONBASE  %fds_versionbase%
+call :dos2bash SMV_VERSIONBASE  %smv_versionbase%
 
 call :title2bash #  ---- MPI version ----
 call :dos2bash linux_mpi_version %linux_mpi_version%
