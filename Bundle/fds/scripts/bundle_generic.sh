@@ -1,5 +1,7 @@
 #!/bin/bash
 
+INSTALLDIR=FDS/FDS6
+
 # this script is called by make_bundle.sh located in bot/Bundle/fds/linux or osx
 
 errlog=/tmp/errlog.$$
