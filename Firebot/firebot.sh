@@ -1479,6 +1479,7 @@ save_build_status()
    # No errors or warnings
    else
       echo "Build success!;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$FDSBRANCH;$STOP_TIME_INT;1;$TOTAL_FDS_TIMES;$HOST" > "$HISTORY_DIR/${GIT_REVISION}.txt"
+      touch $FIREBOT_PASS
    fi
 }
 
@@ -1588,6 +1589,10 @@ firebotdir=`pwd`
 export SCRIPTFILES=$firebotdir/scriptfiles
 OUTPUT_DIR="$firebotdir/output"
 HISTORY_DIR="$HOME/.firebot/history"
+FIREBOT_PASS=$HISTORY_DIR/firebot_pass
+if [ -e $FIREBOT_PASS ]; then
+  rm -f $FIREBOT_PASS
+fi
 TIME_LOG=$OUTPUT_DIR/timings
 ERROR_LOG=$OUTPUT_DIR/errors
 VALIDATION_ERROR_LOG=$OUTPUT_DIR/validation_errors
