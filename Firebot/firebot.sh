@@ -1803,9 +1803,21 @@ fi
 # don't push yet
 push=
 
+fdsrepo=$repo/fds
+smvrepo=$repo/smv
+botrepo=$repo/bot
+outrepo=$repo/out
+
+#*** clone repos
+
+if [[ "$CLONE_REPOS" == "1" ]]; then
+  echo Cloning repos
+  cd $botrepo/Scripts
+  ./setup_repos.sh -F > $OUTPUT_DIR/stage1_clone 2>&1
+fi
+
 #*** make sure repos exist and have expected branches
 
-fdsrepo=$repo/fds
 CD_REPO $fdsrepo $FDSBRANCH || exit 1
 if [ "$FDSBRANCH" == "current" ]; then
   cd $fdsrepo
@@ -1813,7 +1825,6 @@ if [ "$FDSBRANCH" == "current" ]; then
 fi
 
 
-smvrepo=$repo/smv
 CD_REPO $smvrepo $SMVBRANCH || exit 1
 if [ "$SMVBRANCH" == "current" ]; then
   cd $smvrepo
@@ -1821,7 +1832,6 @@ if [ "$SMVBRANCH" == "current" ]; then
 fi
 
 
-botrepo=$repo/bot
 CD_REPO $botrepo $BOTBRANCH || exit 1
 if [ "$BOTBRANCH" == "current" ]; then
   cd $botrepo
@@ -1830,7 +1840,6 @@ fi
 
 
 if [ "$FIREBOT_MODE" == "validation" ]; then
-  outrepo=$repo/out
   CD_REPO $outrepo master || exit 1
 fi
 
@@ -1944,15 +1953,6 @@ if [[ "$CLONE_REPOS" == "" ]]; then
     clean_repo2 smv $SMVBRANCH || exit 1
   fi
 fi
-
-#*** clone repos
-
-if [[ "$CLONE_REPOS" == "1" ]]; then
-  echo Cloning
-  cd $botrepo/Scripts
-  ./setup_repos.sh -F > $OUTPUT_DIR/stage1_clone 2>&1
-fi
-
 
 #*** update repos
 
