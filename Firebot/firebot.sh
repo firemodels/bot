@@ -713,9 +713,43 @@ compile_smv_utilities()
      echo "   Smokeview"
      echo "      libraries"
      cd $smvrepo/Build/LIBS/intel_${platform}${size}
-     echo 'Building Smokeview libraries:' >> $OUTPUT_DIR/stage3a 2>&1
      ./make_LIBS.sh >> $OUTPUT_DIR/stage3a 2>&1
      echo "" >> $OUTPUT_DIR/stage3a 2>&1
+
+   # smokezip:
+     echo "      smokezip"
+     cd $smvrepo/Build/smokezip/${COMPILER}_${platform}_${size}
+     rm -f *.o smokezip_${platform}_${size}
+
+     ./make_smokezip.sh >> $OUTPUT_DIR/stage3a 2>&1
+     echo "" >> $OUTPUT_DIR/stage3a 2>&1
+
+   # smokediff:
+     echo "      smokediff"
+     cd $smvrepo/Build/smokediff/${COMPILER}_${platform}_${size}
+     rm -f *.o smokediff_${platform}_${size}
+     ./make_smokediff.sh >> $OUTPUT_DIR/stage3a 2>&1
+     echo "" >> $OUTPUT_DIR/stage3a 2>&1
+
+   # background
+     echo "      background"
+     cd $smvrepo/Build/background/${COMPILER}_${platform}_${size}
+     rm -f *.o background
+     ./make_background.sh >> $OUTPUT_DIR/stage3a 2>&1
+
+   # dem2fds
+     echo "      dem2fds"
+     cd $smvrepo/Build/dem2fds/${COMPILER}_${platform}_${size}
+     rm -f *.o dem2fds
+     ./make_dem2fds.sh >> $OUTPUT_DIR/stage3a 2>&1
+
+  # wind2fds:
+     echo "      wind2fds"
+     cd $smvrepo/Build/wind2fds/${COMPILER}_${platform}_${size}
+     rm -f *.o wind2fds_${platform}_${size}
+     ./make_wind2fds.sh >> $OUTPUT_DIR/stage3a 2>&1
+    echo "" >> $OUTPUT_DIR/stage3a 2>&1
+
    else
      echo "   Smokeview - using installed smokeview"
    fi
