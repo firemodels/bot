@@ -14,7 +14,7 @@ echo as an example.
 echo.
 echo Aborting now...
 pause>NUL
-goto:eof
+goto eof
 
 :endif_envexist
 
@@ -85,6 +85,7 @@ if "%platform%" == "osx" (
   pscp %bashscript% %osx_hostname%:.bundle/FDS_SMV_ENVpc.sh
   plink %osx_logon% %linux_svn_root%/bot/Bundle/fds/scripts/dos2unix.sh .bundle FDS_SMV_ENVpc.sh
 )
+goto eof
 
 :: -------------------------------------------------------------
  :title2bash
@@ -98,7 +99,7 @@ exit /b /0
 
 
 erase %bashscript%
-goto :eof
+goto eof
 
 :: -------------------------------------------------------------
  :dos2bash
@@ -111,7 +112,7 @@ exit /b /0
 
 
 erase %bashscript%
-goto :eof
+goto eof
 
 :eof
 
