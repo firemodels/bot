@@ -1479,6 +1479,7 @@ save_build_status()
    # No errors or warnings
    else
       echo "Build success!;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$FDSBRANCH;$STOP_TIME_INT;1;$TOTAL_FDS_TIMES;$HOST" > "$HISTORY_DIR/${GIT_REVISION}.txt"
+      touch $FIREBOT_PASS
    fi
 }
 
@@ -1588,6 +1589,10 @@ firebotdir=`pwd`
 export SCRIPTFILES=$firebotdir/scriptfiles
 OUTPUT_DIR="$firebotdir/output"
 HISTORY_DIR="$HOME/.firebot/history"
+FIREBOT_PASS=$HISTORY_DIR/firebot_pass
+if [ -e $FIREBOT_PASS ]; then
+  rm -f $FIREBOT_PASS
+fi
 TIME_LOG=$OUTPUT_DIR/timings
 ERROR_LOG=$OUTPUT_DIR/errors
 VALIDATION_ERROR_LOG=$OUTPUT_DIR/validation_errors
@@ -1798,9 +1803,21 @@ fi
 # don't push yet
 push=
 
+fdsrepo=$repo/fds
+smvrepo=$repo/smv
+botrepo=$repo/bot
+outrepo=$repo/out
+
+#*** clone repos
+
+if [[ "$CLONE_REPOS" == "1" ]]; then
+  echo Cloning repos
+  cd $botrepo/Scripts
+  ./setup_repos.sh -F > $OUTPUT_DIR/stage1_clone 2>&1
+fi
+
 #*** make sure repos exist and have expected branches
 
-fdsrepo=$repo/fds
 CD_REPO $fdsrepo $FDSBRANCH || exit 1
 if [ "$FDSBRANCH" == "current" ]; then
   cd $fdsrepo
@@ -1808,7 +1825,6 @@ if [ "$FDSBRANCH" == "current" ]; then
 fi
 
 
-smvrepo=$repo/smv
 CD_REPO $smvrepo $SMVBRANCH || exit 1
 if [ "$SMVBRANCH" == "current" ]; then
   cd $smvrepo
@@ -1816,7 +1832,6 @@ if [ "$SMVBRANCH" == "current" ]; then
 fi
 
 
-botrepo=$repo/bot
 CD_REPO $botrepo $BOTBRANCH || exit 1
 if [ "$BOTBRANCH" == "current" ]; then
   cd $botrepo
@@ -1825,7 +1840,6 @@ fi
 
 
 if [ "$FIREBOT_MODE" == "validation" ]; then
-  outrepo=$repo/out
   CD_REPO $outrepo master || exit 1
 fi
 
@@ -1939,15 +1953,6 @@ if [[ "$CLONE_REPOS" == "" ]]; then
     clean_repo2 smv $SMVBRANCH || exit 1
   fi
 fi
-
-#*** clone repos
-
-if [[ "$CLONE_REPOS" == "1" ]]; then
-  echo Cloning
-  cd $botrepo/Scripts
-  ./setup_repos.sh -F > $OUTPUT_DIR/stage1_clone 2>&1
-fi
-
 
 #*** update repos
 
