@@ -766,7 +766,7 @@ compile_smv_utilities()
   
   # test_mpi
      echo "      test_mpi"
-     cd $fdsrepo/Utilities/test_mpi/${COMPILER}_${platform}
+     cd $fdsrepo/Utilities/test_mpi/${INTEL}mpi_${platform}
      rm -f *.o test_mpi_${platform}
      ./make_test_mpi.sh >> $OUTPUT_DIR/stage3a 2>&1
     echo "" >> $OUTPUT_DIR/stage3a 2>&1
