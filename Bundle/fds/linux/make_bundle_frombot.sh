@@ -11,5 +11,7 @@ export fds_smvroot=$linux_svn_root
 export bundlebase=${fds_version}-${smv_version}_linux64
 export MPI_VERSION=$linux_mpi_version
 
+./get_fds_pubs.sh
+./get_smv_pubs.sh
 ../scripts/bundle_generic.sh
 
