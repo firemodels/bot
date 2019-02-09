@@ -229,8 +229,8 @@ else
 fi
 testmpi=test_mpi
 
-REPO_ROOT=$HOME/$fds_smvroot
 UPLOAD_ROOT=$HOME/$fds_smvroot
+
 fdsroot=$REPO_ROOT/fds/Build
 backgroundroot=$REPO_ROOT/smv/Build/background
 smokediffroot=$REPO_ROOT/smv/Build/smokediff
