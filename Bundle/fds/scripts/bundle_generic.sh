@@ -6,31 +6,6 @@ INSTALLDIR=FDS/FDS6
 
 errlog=/tmp/errlog.$$
 
-# -------------------- SCP -------------------
-
-SCP ()
-{
-  HOST=$1
-  FROMDIR=$2
-  FROMFILE=$3
-  TODIR=$4
-  TOFILE=$5
-  if [ "`hostname`" == "$HOST" ]; then
-    CP $HOME/$FROMDIR $FROMFILE $TODIR $TOFILE
-  else
-    scp $HOST\:$FROMDIR/$FROMFILE $TODIR/$TOFILE 2>/dev/null
-  fi
-  if [ -e $TODIR/$TOFILE ]; then
-    echo "$FROMFILE copied from host:$HOST"
-  else
-    echo "***error: $TOFILE not copied to bundle from $HOST at $FROMDIR/$FROMFILE " >> $errlog
-    echo "***error: $TOFILE not copied to bundle from $HOST at $FROMDIR/$FROMFILE "
-    if [ "$NOPAUSE" == "" ]; then
-      read val
-    fi
-  fi
-}
-
 # -------------------- CP -------------------
 
 CP ()
@@ -254,35 +229,35 @@ else
 fi
 testmpi=test_mpi
 
-scp_fds_smvroot=$fds_smvroot
-fds_smvroot=~/$fds_smvroot
-fdsroot=$scp_fds_smvroot/fds/Build
-backgroundroot=$scp_fds_smvroot/smv/Build/background
-smokediffroot=$scp_fds_smvroot/smv/Build/smokediff
-smokeziproot=$scp_fds_smvroot/smv/Build/smokezip
-dem2fdsroot=$scp_fds_smvroot/smv/Build/dem2fds
-smvscriptdir=$scp_fds_smvroot/smv/scripts
-wind2fdsroot=$scp_fds_smvroot/smv/Build/wind2fds
-hashfileroot=$scp_fds_smvroot/smv/Build/hashfile
-uploaddir=$fds_smvroot/bot/Bundle/fds/uploads
-bundledir=$bundlebase
-webpagesdir=$fds_smvroot/webpages
-smvbindir=$scp_fds_smvroot/smv/Build/smokeview/$smokeviewdir
-fds_bundle=$fds_smvroot/bot/Bundle/fds/for_bundle
-smv_bundle=$fds_smvroot/bot/Bundle/smv/for_bundle
-texturedir=$smv_bundle/textures
-fds2asciiroot=$scp_fds_smvroot/fds/Utilities/fds2ascii
-testmpiroot=$scp_fds_smvroot/fds/Utilities/test_mpi
-makeinstaller=$fds_smvroot/bot/Bundle/fds/scripts/make_installer.sh
+UPLOAD_ROOT=$HOME/$fds_smvroot
 
-fds_cases=$fds_smvroot/fds/Verification/FDS_Cases.sh
-fds_benchamrk_cases=$fds_smvroot/fds/Verification/FDS_Benchmark_Cases.sh
-smv_cases=$fds_smvroot/smv/Verification/scripts/SMV_Cases.sh
-wui_cases=$fds_smvroot/smv/Verification/scripts/WUI_Cases.sh
-copyfdscase=$fds_smvroot/fds/Utilities/Scripts/copyfdscase.sh
-copycfastcase=$fds_smvroot/fds/Utilities/Scripts/copycfastcase.sh
-FDSExamplesDirectory=$fds_smvroot/fds/Verification
-SMVExamplesDirectory=$fds_smvroot/smv/Verification
+fdsroot=$REPO_ROOT/fds/Build
+backgroundroot=$REPO_ROOT/smv/Build/background
+smokediffroot=$REPO_ROOT/smv/Build/smokediff
+smokeziproot=$REPO_ROOT/smv/Build/smokezip
+dem2fdsroot=$REPO_ROOT/smv/Build/dem2fds
+smvscriptdir=$REPO_ROOT/smv/scripts
+wind2fdsroot=$REPO_ROOT/smv/Build/wind2fds
+hashfileroot=$REPO_ROOT/smv/Build/hashfile
+uploaddir=$UPLOAD_ROOT/bot/Bundle/fds/uploads
+bundledir=$bundlebase
+webpagesdir=$REPO_ROOT/webpages
+smvbindir=$REPO_ROOT/smv/Build/smokeview/$smokeviewdir
+fds_bundle=$REPO_ROOT/bot/Bundle/fds/for_bundle
+smv_bundle=$REPO_ROOT/bot/Bundle/smv/for_bundle
+texturedir=$smv_bundle/textures
+fds2asciiroot=$REPO_ROOT/fds/Utilities/fds2ascii
+testmpiroot=$REPO_ROOT/fds/Utilities/test_mpi
+makeinstaller=$REPO_ROOT/bot/Bundle/fds/scripts/make_installer.sh
+
+fds_cases=$REPO_ROOT/fds/Verification/FDS_Cases.sh
+fds_benchamrk_cases=$REPO_ROOT/fds/Verification/FDS_Benchmark_Cases.sh
+smv_cases=$REPO_ROOT/smv/Verification/scripts/SMV_Cases.sh
+wui_cases=$REPO_ROOT/smv/Verification/scripts/WUI_Cases.sh
+copyfdscase=$REPO_ROOT/fds/Utilities/Scripts/copyfdscase.sh
+copycfastcase=$REPO_ROOT/fds/Utilities/Scripts/copycfastcase.sh
+FDSExamplesDirectory=$REPO_ROOT/fds/Verification
+SMVExamplesDirectory=$REPO_ROOT/smv/Verification
 
 cd $uploaddir
 rm -rf $bundlebase
@@ -300,13 +275,13 @@ echo ""
 
 # smokeview
 
-SCP $fdshost $backgroundroot/$backgrounddir $background $bundledir/bin background
-SCP $smvhost $smvbindir                     $smokeview  $bundledir/bin smokeview
-SCP $fdshost $smokediffroot/$smokediffdir   $smokediff  $bundledir/bin smokediff
-SCP $fdshost $smokeziproot/$smokezipdir     $smokezip   $bundledir/bin smokezip
-SCP $fdshost $dem2fdsroot/$dem2fdsdir       $dem2fds    $bundledir/bin dem2fds
-SCP $fdshost $wind2fdsroot/$wind2fdsdir     $wind2fds   $bundledir/bin wind2fds
-SCP $fdshost $hashfileroot/$hashfiledir     $hashfile   $bundledir/bin hashfile
+CP $backgroundroot/$backgrounddir $background $bundledir/bin background
+CP $smvbindir                     $smokeview  $bundledir/bin smokeview
+CP $smokediffroot/$smokediffdir   $smokediff  $bundledir/bin smokediff
+CP $smokeziproot/$smokezipdir     $smokezip   $bundledir/bin smokezip
+CP $dem2fdsroot/$dem2fdsdir       $dem2fds    $bundledir/bin dem2fds
+CP $wind2fdsroot/$wind2fdsdir     $wind2fds   $bundledir/bin wind2fds
+CP $hashfileroot/$hashfiledir     $hashfile   $bundledir/bin hashfile
 
 CURDIR=`pwd`
 cd $bundledir/bin
@@ -319,17 +294,17 @@ hashfile wind2fds   > hash/wind2fds.sha1
 hashfile hashfile   > hash/hashfile.sha1
 cd $CURDIR
 
-SCP $fdshost $smvscriptdir jp2conv.sh $bundledir/bin jp2conv.sh
+CP $smvscriptdir jp2conv.sh $bundledir/bin jp2conv.sh
 CPDIR $texturedir $bundledir/bin
 
 # FDS 
 
-SCP $fdshost $fdsroot/$fdsmpidir          $fdsmpi    $bundledir/bin fds
+CP $fdsroot/$fdsmpidir          $fdsmpi    $bundledir/bin fds
 if [ "$fds_debug" == "1" ]; then
-  SCP $fdshost $fdsroot/$fdsmpidirdb      $fdsmpidb  $bundledir/bin fds_db
+  CP $fdsroot/$fdsmpidirdb      $fdsmpidb  $bundledir/bin fds_db
 fi
-SCP $fdshost $fds2asciiroot/$fds2asciidir $fds2ascii $bundledir/bin fds2ascii
-SCP $fdshost $testmpiroot/$testmpidir $testmpi $bundledir/bin test_mpi
+CP $fds2asciiroot/$fds2asciidir $fds2ascii $bundledir/bin fds2ascii
+CP $testmpiroot/$testmpidir $testmpi $bundledir/bin test_mpi
 
 CURDIR=`pwd`
 cd $bundledir/bin

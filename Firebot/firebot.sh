@@ -713,9 +713,64 @@ compile_smv_utilities()
      echo "   Smokeview"
      echo "      libraries"
      cd $smvrepo/Build/LIBS/intel_${platform}${size}
-     echo 'Building Smokeview libraries:' >> $OUTPUT_DIR/stage3a 2>&1
      ./make_LIBS.sh >> $OUTPUT_DIR/stage3a 2>&1
      echo "" >> $OUTPUT_DIR/stage3a 2>&1
+
+   # smokezip:
+     echo "      smokezip"
+     cd $smvrepo/Build/smokezip/${COMPILER}_${platform}${size}
+     rm -f *.o smokezip_${platform}${size}
+
+     ./make_smokezip.sh >> $OUTPUT_DIR/stage3a 2>&1
+     echo "" >> $OUTPUT_DIR/stage3a 2>&1
+
+   # smokediff:
+     echo "      smokediff"
+     cd $smvrepo/Build/smokediff/${COMPILER}_${platform}${size}
+     rm -f *.o smokediff_${platform}${size}
+     ./make_smokediff.sh >> $OUTPUT_DIR/stage3a 2>&1
+     echo "" >> $OUTPUT_DIR/stage3a 2>&1
+
+   # background
+     echo "      background"
+     cd $smvrepo/Build/background/${COMPILER}_${platform}${size}
+     rm -f *.o background
+     ./make_background.sh >> $OUTPUT_DIR/stage3a 2>&1
+
+   # dem2fds
+     echo "      dem2fds"
+     cd $smvrepo/Build/dem2fds/${COMPILER}_${platform}${size}
+     rm -f *.o dem2fds
+     ./make_dem2fds.sh >> $OUTPUT_DIR/stage3a 2>&1
+
+  # wind2fds:
+     echo "      wind2fds"
+     cd $smvrepo/Build/wind2fds/${COMPILER}_${platform}${size}
+     rm -f *.o wind2fds_${platform}${size}
+     ./make_wind2fds.sh >> $OUTPUT_DIR/stage3a 2>&1
+    echo "" >> $OUTPUT_DIR/stage3a 2>&1
+  
+  # hashfile:
+     echo "      hashfile"
+     cd $smvrepo/Build/hashfile/${COMPILER}_${platform}${size}
+     rm -f *.o hashfile_${platform}${size}
+     ./make_hashfile.sh >> $OUTPUT_DIR/stage3a 2>&1
+    echo "" >> $OUTPUT_DIR/stage3a 2>&1
+  
+  # fds2asci
+     echo "      fds2ascii"
+     cd $fdsrepo/Utilities/fds2ascii/${COMPILER}_${platform}${size}
+     rm -f *.o fds2ascii_${platform}${size}
+     ./make_fds2ascii.sh >> $OUTPUT_DIR/stage3a 2>&1
+    echo "" >> $OUTPUT_DIR/stage3a 2>&1
+  
+  # test_mpi
+     echo "      test_mpi"
+     cd $fdsrepo/Utilities/test_mpi/${INTEL}mpi_${COMPILER}_${platform}
+     rm -f *.o test_mpi
+     ./make_test_mpi.sh >> $OUTPUT_DIR/stage3a 2>&1
+    echo "" >> $OUTPUT_DIR/stage3a 2>&1
+
    else
      echo "   Smokeview - using installed smokeview"
    fi
@@ -1479,6 +1534,7 @@ save_build_status()
    # No errors or warnings
    else
       echo "Build success!;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$FDSBRANCH;$STOP_TIME_INT;1;$TOTAL_FDS_TIMES;$HOST" > "$HISTORY_DIR/${GIT_REVISION}.txt"
+      touch $FIREBOT_PASS
    fi
 }
 
@@ -1588,6 +1644,10 @@ firebotdir=`pwd`
 export SCRIPTFILES=$firebotdir/scriptfiles
 OUTPUT_DIR="$firebotdir/output"
 HISTORY_DIR="$HOME/.firebot/history"
+FIREBOT_PASS=$HISTORY_DIR/firebot_pass
+if [ -e $FIREBOT_PASS ]; then
+  rm -f $FIREBOT_PASS
+fi
 TIME_LOG=$OUTPUT_DIR/timings
 ERROR_LOG=$OUTPUT_DIR/errors
 VALIDATION_ERROR_LOG=$OUTPUT_DIR/validation_errors
