@@ -1535,6 +1535,8 @@ save_build_status()
    else
       echo "Build success!;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$FDSBRANCH;$STOP_TIME_INT;1;$TOTAL_FDS_TIMES;$HOST" > "$HISTORY_DIR/${GIT_REVISION}.txt"
       touch $FIREBOT_PASS
+      echo $SMVREPO_HASH > $SMVREPO_HASHFILE
+      echo $FDSREPO_HASH > $FDSREPO_HASHFILE
    fi
 }
 
@@ -1644,10 +1646,22 @@ firebotdir=`pwd`
 export SCRIPTFILES=$firebotdir/scriptfiles
 OUTPUT_DIR="$firebotdir/output"
 HISTORY_DIR="$HOME/.firebot/history"
+
 FIREBOT_PASS=$HISTORY_DIR/firebot_pass
 if [ -e $FIREBOT_PASS ]; then
   rm -f $FIREBOT_PASS
 fi
+
+SMVREPO_HASHFILE=$HISTORY_DIR/smv_hash
+if [ -e $SMVREPO_HASHFILE ]; then
+  rm -f $SMVREPO_HASHFILE
+fi
+
+FDSREPO_HASHFILE=$HISTORY_DIR/fds_hash
+if [ -e $FDSREPO_HASHFILE ]; then
+  rm -f $FDSREPO_HASHFILE
+fi
+
 TIME_LOG=$OUTPUT_DIR/timings
 ERROR_LOG=$OUTPUT_DIR/errors
 VALIDATION_ERROR_LOG=$OUTPUT_DIR/validation_errors
@@ -1878,6 +1892,8 @@ if [ "$FDSBRANCH" == "current" ]; then
   cd $fdsrepo
   FDSBRANCH=`git rev-parse --abbrev-ref HEAD`
 fi
+cd $fdsrepo
+FDSREPO_HASH=`git rev-parse HEAD`
 
 
 CD_REPO $smvrepo $SMVBRANCH || exit 1
@@ -1885,6 +1901,8 @@ if [ "$SMVBRANCH" == "current" ]; then
   cd $smvrepo
   SMVBRANCH=`git rev-parse --abbrev-ref HEAD`
 fi
+cd $smvrepo
+SMVREPO_HASH=`git rev-parse HEAD`
 
 
 CD_REPO $botrepo $BOTBRANCH || exit 1
