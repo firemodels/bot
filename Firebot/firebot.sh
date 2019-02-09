@@ -749,6 +749,27 @@ compile_smv_utilities()
      rm -f *.o wind2fds_${platform}_${size}
      ./make_wind2fds.sh >> $OUTPUT_DIR/stage3a 2>&1
     echo "" >> $OUTPUT_DIR/stage3a 2>&1
+  
+  # hashfile:
+     echo "      hashfile"
+     cd $smvrepo/Build/hashfile/${COMPILER}_${platform}_${size}
+     rm -f *.o hashfile_${platform}_${size}
+     ./make_hashfile.sh >> $OUTPUT_DIR/stage3a 2>&1
+    echo "" >> $OUTPUT_DIR/stage3a 2>&1
+  
+  # fds2asci
+     echo "      fds2ascii"
+     cd $fdsrepo/Utilities/fds2ascii/${COMPILER}_${platform}_${size}
+     rm -f *.o fds2ascii_${platform}_${size}
+     ./make_fds2ascii.sh >> $OUTPUT_DIR/stage3a 2>&1
+    echo "" >> $OUTPUT_DIR/stage3a 2>&1
+  
+  # test_mpi
+     echo "      test_mpi"
+     cd $fdsrepo/Utilities/test_mpi/${COMPILER}_${platform}
+     rm -f *.o test_mpi_${platform}
+     ./make_test_mpi.sh >> $OUTPUT_DIR/stage3a 2>&1
+    echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
    else
      echo "   Smokeview - using installed smokeview"
