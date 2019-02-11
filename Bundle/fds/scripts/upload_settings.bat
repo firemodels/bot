@@ -60,6 +60,7 @@ call :title2bash #  ---- bundle location ----
 call :dos2bash BUNDLE_DIR $HOME/%BUNDLE_DIR%
 
 call :title2bash #  ---- bot locations ----
+call :dos2bash firebotroot %firebotroot%
 call :dos2bash firebotrepo %firebotrepo%
 call :dos2bash firebothome %firebothome%
 echo.  >> %bashscript%
