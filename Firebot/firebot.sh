@@ -13,8 +13,6 @@ echo ""
 echo "Options"
 echo "-b - branch_name - run firebot using branch branch_name"
 echo "-c - clean repo"
-echo "-C - commit validationbot output results"
-echo "-D - specify validation case list file"
 echo "-F - skip figures and document building stages"
 echo "-h - display this message"
 echo "-i - use installed version of smokeview"
@@ -24,44 +22,14 @@ echo "-L - firebot lite,  run only stages that build a debug fds and run cases w
 echo "                    (no release fds, no release cases, no matlab, etc)"
 echo "-m email_address "
 echo "-p pid_file - file containing process id of firebot process "
-echo "-P - commit and push validationbot outut results (not implemented)"
 echo "-q - queue_name - run cases using the queue queue_name"
 echo "     default: $QUEUE"
 echo "-Q - queue_name - run OpenMP cases using the queue queue_name"
 echo "-s - skip matlab and document building stages"
-echo "-S - show validation case list"
-echo "-T - build bundle"
 echo "-u - update repo"
 echo "-U - upload guides"
-echo "-V n - run Firebot in validation mode with a specified number "
-echo "       of processes dedicated to validation."
 echo "-W - clone fds, exp, fig, out and smv repos"
 exit
-}
-
-#---------------------------------------------
-#                   PROCESS
-#---------------------------------------------
-
-PROCESS()
-{
-  local case=$1
-  local curdir=`pwd`
-
-  cd $fdsrepo/Validation/$case
-  ./Process_Output.sh
-
-  if [ "$commit" == "1" ]; then
-    cd $outrepo/$case/FDS_Output_Files
-    git add *.csv *.txt
-    git commit -m "validationbot: commit $case results"
-  fi
-  if [ "$push" == "1" ]; then
-    cd $outrepo/$case/FDS_Output_Files
-    echo pushing updated $case results to github repo
-    # git push origin master
-  fi
-  cd $curdir
 }
 
 #---------------------------------------------
@@ -419,76 +387,6 @@ check_compile_fds_mpi_gnu_db()
 }
 
 #---------------------------------------------
-#                   show_validation_list
-#---------------------------------------------
-
-show_validation_list()
-{
-   valdir=`pwd`
-   cd $fdsrepo/Utilities/Scripts
-
-   # List and sort validation sets in the fds/Validation/Process_All_Output.sh 
-   # script based on the modification date of the FDS_Output_Files. The result
-   # is an array of the validation sets ordered from oldest to newest.
-   ./make_validation_caselist.sh
-   cd $valdir
-}
-
-#---------------------------------------------
-#                   get_validation_set_list
-#---------------------------------------------
-
-get_validation_list()
-{
-   validation_list_file=$1
-   
-   valdir=`pwd`
-   cd $fdsrepo/Utilities/Scripts
-
-   # List and sort validation sets in the fds/Validation/Process_All_Output.sh 
-   # script based on the modification date of the FDS_Output_Files. The result
-   # is an array of the validation sets ordered from oldest to newest.
-   VALIDATION_SETS=(` cat $validation_list_file | awk -F"!" '{print $1}'`)
-   cd $valdir
-}
-
-#---------------------------------------------
-#                   generate_validation_list
-#---------------------------------------------
-
-generate_validation_list()
-{
-   valdir=`pwd`
-   cd $fdsrepo/Utilities/Scripts
-
-   # List and sort validation sets in the fds/Validation/Process_All_Output.sh 
-   # script based on the modification date of the FDS_Output_Files. The result
-   # is an array of the validation sets ordered from oldest to newest.
-   VALIDATION_SETS=(` ./make_validation_caselist.sh | awk -F"!" '{print $1}'`)
-   cd $valdir
-}
-
-#---------------------------------------------
-#                   commit_validation_results
-#---------------------------------------------
-
-commit_validation_results()
-{
-   echo "Summary"
-   echo "-------"
-   for SET in ${CURRENT_VALIDATION_SETS[*]}
-   do
-      # Copy new FDS files from Current_Results to FDS_Output_Files using Process_Output.sh 
-      # script for the validation set
-
-     PROCESS "$SET"
-   done
-
-   # cd to GIT root
-   cd $fdsrepo
-}
-
-#---------------------------------------------
 #                   wait_cases_debug_end
 #---------------------------------------------
 
@@ -542,67 +440,6 @@ run_verification_cases_debug()
 }
 
 #---------------------------------------------
-#                   check_current_utilization
-#---------------------------------------------
-
-check_current_utilization()
-{
-   # This function is used to determine if the number of current processes currently in use is greater than the
-   # number of specified maximum processes. If so, then no more cases are launched (LAUNCH_MORE_CASES=0).
-
-   sleep 60
-
-   # Reports the number of nodes currently in use by current user
-   NJOBS=`qstat -u $(whoami) | wc -l`
-   NUM_CURRENT_PROCESSES=0
-   if [ $NJOBS -gt 0 ]; then
-     NUM_CURRENT_PROCESSES=`qstat -u $(whoami) | sed 1,5d | awk '{print $7}' | paste -sd+ | bc`
-   fi
-   if [ $NUM_CURRENT_PROCESSES -gt $MAX_VALIDATION_PROCESSES ]; then
-      LAUNCH_MORE_CASES=0
-   fi
-}
-
-#---------------------------------------------
-#                   run_validation_cases_debug
-#---------------------------------------------
-
-run_validation_cases_debug()
-{
-   #  =============================================
-   #  = Run FDS validation cases for current sets =
-   #  =============================================
-
-   # Initialize array of current validation sets to run
-   CURRENT_VALIDATION_SETS=()
-   echo Running FDS Validation Cases
-   echo "   debug"
-
-   for SET in ${VALIDATION_SETS[*]}
-   do
-      # Check to see if maximum number of validation processes are in use
-      if [ $LAUNCH_MORE_CASES -eq 0 ]; then
-         break
-      fi
-
-      cd $fdsrepo/Validation/"$SET"
-
-      # Submit FDS validation cases and wait for them to start
-      echo "Running FDS validation cases for ${SET}:" >> $OUTPUT_DIR/stage4
-      echo "" >> $OUTPUT_DIR/stage4 2>&1
-      ./Run_All.sh -y -b -m 1 -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
-
-      CURRENT_VALIDATION_SETS+=($SET)
-
-      check_current_utilization
-   done
-
-   # Wait for validation cases to end
-   wait_cases_debug_end 'validation'
-}
-
-
-#---------------------------------------------
 #                   check_cases_debug
 #---------------------------------------------
 
@@ -638,20 +475,7 @@ check_cases_debug()
       echo "#/bin/bash" > $OUTPUT_DIR/stage4_filelist
 # comment out following line until verified that it works
 #      grep err: $OUTPUT_DIR/stage4_errors | awk -F':' '{ print "cp " $1 " /tmp/."}'  | sort -u >> $OUTPUT_DIR/stage4_filelist
-      if [ "$FIREBOT_MODE" == "verification" ] ; then
-        cd $fdsrepo/Verification
-      else
-        cd $fdsrepo/Validation
-      fi
-# comment out following line until verified that it works
-#      source $OUTPUT_DIR/stage4_filelist
-
-      # If errors encountered in validation mode, then email status and exit
-      if [ "$FIREBOT_MODE" == "validation" ] ; then
-         email_build_status 'Validationbot'
-         set_files_world_readable
-         exit
-      fi
+      cd $fdsrepo/Verification
    fi
 }
 
@@ -787,48 +611,6 @@ check_smv_utilities()
 }
 
 #---------------------------------------------
-#                   check_validation_cases
-#---------------------------------------------
-
-check_validation_cases()
-{
-  case=$1
-
-  cd $fdsrepo/Validation/$case
-  nfds=0
-  if [ -d Current_Results ]; then
-    nfds=`ls -l Current_Results/*.fds 2> /dev/null | wc -l`
-  fi
-  if [ $nfds -eq 0 ]; then
-     exit
-  fi
-  nout=`ls -l Current_Results/*.out 2> /dev/null | wc -l`
-  nsuccess=`grep successfully Current_Results/*.out 2> /dev/null | wc -l`
-  if [ $nfds -gt $nout ]; then
-    if [ "$nout" == "0" ]; then
-      echo "***error: $nfds $case cases were run but none finished" >> $VALIDATION_ERROR_LOG
-    else
-      echo "***error: $nfds $case cases were run but only $nout finished" >> $VALIDATION_ERROR_LOG
-    fi
-    validation_cases="false"
-  else
-    if [ $nout -gt $nsuccess ]; then
-      if [ $nsuccess -gt 0 ]; then
-        echo "***error: $nfds $case cases were run but only $nsuccess finished successfully" >> $VALIDATION_ERROR_LOG
-      else
-        echo "***error: $nfds $case cases were run but none finished successfully" >> $VALIDATION_ERROR_LOG
-      fi
-      validation_cases="false"
-    fi
-  fi
-  if [ $nout -gt 0 ] && [ $nout -gt $nsuccess ]; then
-    cd $fdsrepo/Validation/$case/Current_Results
-    grep STOP *.out | grep -v successfully | awk -F':' '{print $1 }' | awk -F'.' '{print "***error: " $1".fds did not finish successfully." }' >> $VALIDATION_ERROR_LOG
-    validation_cases="false"
-  fi
-}
-
-#---------------------------------------------
 #                   check_cases_release
 #---------------------------------------------
 
@@ -840,23 +622,13 @@ check_cases_release()
    # Scan for and report any errors in FDS cases
    cd $dir
 
-   validation_cases="true"
-   if [ "$FIREBOT_MODE" == "validation" ] ; then
-      if [ "$status" == "final" ]; then
-        for SET in ${CURRENT_VALIDATION_SETS[*]}
-        do
-           check_validation_cases $SET
-        done
-      fi
-   fi
    if [[ `grep -rI 'Run aborted' $OUTPUT_DIR/stage5` == "" ]] && \
       [[ `grep 'ERROR' $OUTPUT_DIR/stage5 | grep -v geom_bad` == "" ]] && \
       [[ `grep -rI Segmentation *` == "" ]] && \
       [[ `grep -rI ERROR: *` == "" ]] && \
       [[ `grep -rI 'STOP: Numerical' *` == "" ]] && \
       [[ `grep -rI forrtl *` == "" ]] && \
-      [[ `grep 'BAD TERMINATION'  */*.log` == "" ]] && \
-      [[ "$validation_cases" == "true" ]]
+      [[ `grep 'BAD TERMINATION'  */*.log` == "" ]]
    then
       cases_release_success=true
    else
@@ -867,24 +639,10 @@ check_cases_release()
       grep -rI 'STOP: Numerical' * >> $OUTPUT_DIR/stage5_errors
       grep -A 2 'BAD TERMINATION' */*.log >> $OUTPUT_DIR/stage5_errors
       grep -rI -A 20 forrtl * >> $OUTPUT_DIR/stage5_errors
-      if [ "$FIREBOT_MODE" == "validation" ] ; then
-         if [ -e $VALIDATION_ERROR_LOG ]; then
-            cat $VALIDATION_ERROR_LOG >> $OUTPUT_DIR/stage5_errors
-         fi
-      fi
 
       echo "Errors from Stage 5 - Run ${2} cases - release mode:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage5_errors >> $ERROR_LOG
       echo "" >> $ERROR_LOG
-
-      # If errors encountered in validation mode, then email status and exit
-      if [ "$FIREBOT_MODE" == "validation" ] ; then
-         email_build_status 'Validationbot'
-         # Stop all Validationbot cases in queue system
-         qdel all >& /dev/null
-         set_files_world_readable
-         exit
-      fi
    fi
 }
 
@@ -903,10 +661,6 @@ wait_cases_release_end()
         echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage5
         TIME_LIMIT_STAGE="5"
         check_time_limit
-        if [ "$FIREBOT_MODE" == "validation" ] ; then
-          check_cases_release $fdsrepo/Validation 'interim'
-          sleep 240
-        fi
         sleep 60
      done
    else
@@ -915,10 +669,6 @@ wait_cases_release_end()
         echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage5
         TIME_LIMIT_STAGE="5"
         check_time_limit
-        if [ "$FIREBOT_MODE" == "validation" ] ; then
-           check_cases_release $fdsrepo/Validation 'interim'
-           sleep 30
-        fi
         sleep 30
      done
    fi
@@ -960,34 +710,6 @@ run_verification_cases_release()
 #  check whether cases have run 
    ./Run_FDS_Cases.sh -C  >> $OUTPUT_DIR/stage5 2>&1
 }
-
-#---------------------------------------------
-#                   run_validation_cases_release
-#---------------------------------------------
-
-run_validation_cases_release()
-{
-   #  ===================================
-   #  = Run selected FDS validation set =
-   #  ===================================
-   echo "   release"
-
-   for SET in ${CURRENT_VALIDATION_SETS[*]}
-   do
-      cd $fdsrepo/Validation/"$SET"
-
-      # Start running FDS validation cases
-      echo "Running FDS validation cases:" >> $OUTPUT_DIR/stage5
-      echo "Validation Set: ${SET}" >> $OUTPUT_DIR/stage5
-      echo "" >> $OUTPUT_DIR/stage5 2>&1
-      ./Run_All.sh -y $DV2 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
-      echo "" >> $OUTPUT_DIR/stage5 2>&1
-   done
-
-   # Wait for validation cases to end
-   wait_cases_release_end 'validation'
-}
-
 
 #---------------------------------------------
 #                   comple_smv_db
@@ -1285,7 +1007,7 @@ check_matlab_validation()
 }
 
 #---------------------------------------------
-#                   archive_validateion_stats
+#                   archive_validation_stats
 #---------------------------------------------
 
 archive_validation_stats()
@@ -1483,25 +1205,6 @@ make_fds_Config_management_plan()
 }
 
 #---------------------------------------------
-#                   make_bundle
-#---------------------------------------------
-
-make_bundle()
-{
-   cd $fdsrepo/
-   export FDS_VERSION=`git describe --long --dirty | awk -F'-' '{print $1"-"$2}'`
-
-   cd $smvrepo/
-   export SMV_VERSION=`git describe --long --dirty | awk -F'-' '{print $1"-"$2}'`
-
-   echo " make bundle"
-   # making a bundle
-   cd $fdsrepo/Build/Bundle
-   export NOPAUSE=1
-   ./make_bundle.sh &> $OUTPUT_DIR/stage9_make_bundle
-}
-
-#---------------------------------------------
 #                   save_build_status
 #---------------------------------------------
 
@@ -1573,9 +1276,6 @@ fi
 if [ "$IFORT_VERSION" != "" ]; then
    echo "        Fortran: $IFORT_VERSION " >> $TIME_LOG
 fi
-   if [ "$FIREBOT_MODE" == "validation" ] ; then
-      echo "Validation Set(s): ${CURRENT_VALIDATION_SETS[*]} " >> $TIME_LOG
-   fi
    echo "     start time: $start_time " >> $TIME_LOG
    echo "      stop time: $stop_time " >> $TIME_LOG
    if [ "$UPLOADGUIDES" == "1" ]; then
@@ -1673,9 +1373,6 @@ EMAIL_LIST=$HOME/.firebot/firebot_email_list.sh
 MKDIR $HOME/.firebot
 MKDIR $HOME/.firebot/pubs
 
-#*** Firebot mode (verification or validation)
-FIREBOT_MODE="verification"
-
 WEBBRANCH=nist-pages
 FDSBRANCH=master
 SMVBRANCH=master
@@ -1709,8 +1406,6 @@ UPDATEREPO=0
 if [ "$JOBPREFIX" == "" ]; then
   export JOBPREFIX=FB_
 fi
-commit=
-push=
 
 DB=_db
 
@@ -1720,19 +1415,16 @@ GIT_REVISION=
 SKIPMATLAB=
 SKIPFIGURES=
 FIREBOT_LITE=
-caselistfile=""
-showcaselist=
 debug_mode=
 DV=
 DV2=
 INTEL=
 INTEL2=
-BUILD_BUNDLE=
 CLONE_REPOS=
 
 #*** parse command line arguments
 
-while getopts 'b:cCdD:FhIiJLm:p:Pq:Q:sSTuUV:W' OPTION
+while getopts 'b:cdFhIiJLm:p:q:Q:suUW' OPTION
 do
 case $OPTION in
   b)
@@ -1744,14 +1436,8 @@ case $OPTION in
   c)
    CLEANREPO=1
    ;;
-  C)
-   commit=1
-   ;;
   d)
    debug_mode=1
-   ;;
-  D)
-    caselistfile="$OPTARG"
    ;;
   F)
    SKIPFIGURES=1
@@ -1779,9 +1465,6 @@ case $OPTION in
   p)
    PID_FILE="$OPTARG"
    ;;
-  P)
-   push=1
-   ;;
   q)
    QUEUE="$OPTARG"
    ;;
@@ -1791,24 +1474,11 @@ case $OPTION in
   s)
    SKIPMATLAB=1
    ;;
-  S)
-   showcaselist="1"
-   ;;
-  T)
-   BUILD_BUNDLE="1"
-   ;;
   u)
    UPDATEREPO=1
    ;;
   U)
    UPLOADGUIDES=1
-   ;;
-  V)
-   FIREBOT_MODE="validation"
-   QUEUE=batch
-   MAX_VALIDATION_PROCESSES="$OPTARG"
-   LAUNCH_MORE_CASES=1
-   export JOBPREFIX=VB_
    ;;
   W)
    CLONE_REPOS=1
@@ -1850,28 +1520,6 @@ if [ "$QUEUEBENCH" == "" ]; then
   QUEUEBENCH=$QUEUE
 fi
 
-if [ "$caselistfile" != "" ]; then
-  if [ ! -e $caselistfile ]; then
-     echo "***error: $caselistfile does not exist."
-     echo "aborting firebot"
-     exit
-  fi
-  casedir=$(dirname "${caselistfile}")
-  casename=$(basename "${caselistfile}")
-  ccurdir=`pwd`
-  cd $casedir
-  casedir=`pwd`
-  caselistfile=$casedir/$casename
-  cd $ccurdir
-fi
-
-if [ "$push" == "1" ]; then
-  commit=1
-fi
-
-# don't push yet
-push=
-
 fdsrepo=$repo/fds
 smvrepo=$repo/smv
 botrepo=$repo/bot
@@ -1912,20 +1560,11 @@ if [ "$BOTBRANCH" == "current" ]; then
 fi
 
 
-if [ "$FIREBOT_MODE" == "validation" ]; then
-  CD_REPO $outrepo master || exit 1
-fi
-
 cd $firebotdir
 
 #*** save pid in case we want to kill firebot later
 
 echo $$ > $PID_FILE
-
-if [ "$showcaselist" == "1" ]; then
-  show_validation_list
-  exit
-fi
 
 #*** check for C/C++ compiler
 
@@ -1993,19 +1632,11 @@ if [ "$UPDATEREPO" == "1" ]; then
 else
   echo " update repos: no"
 fi
-if [ "$FIREBOT_MODE" == "validation" ]; then
-  echo "validationbot: $MAX_VALIDATION_PROCESSES processes"
-fi
 echo ""
 
 # Set time limit (43,200 seconds = 12 hours)
 TIME_LIMIT=43200
 TIME_LIMIT_EMAIL_NOTIFICATION="unsent"
-
-# Disable time limit email for validation bot
-if [ "$FIREBOT_MODE" == "validation" ] ; then
-   TIME_LIMIT_EMAIL_NOTIFICATION="sent"
-fi
 
 hostname=`hostname`
 start_time=`date`
@@ -2050,11 +1681,9 @@ echo Building
 echo "   FDS"
 # if something goes wrong with the openmp inspector
 # comment the following 6 lines (including 'if' and and 'fi'  lines
-#if [ "$FIREBOT_MODE" == "verification" ] ; then
-#  if [ "$FIREBOT_LITE" == "" ]; then
-#    inspect_fds
-#    check_inspect_fds
-#  fi
+#if [ "$FIREBOT_LITE" == "" ]; then
+#  inspect_fds
+#  check_inspect_fds
 #fi
 
 ### Stage 2b ###
@@ -2073,128 +1702,89 @@ if [ "$FIREBOT_LITE" == "" ]; then
   check_compile_fds_mpi
 
 ### Stage 3a ###
-  if [ "$FIREBOT_MODE" == "verification" ] ; then
-    compile_smv_utilities
-    check_smv_utilities
+  compile_smv_utilities
+  check_smv_utilities
 
 ### Stage 3b ###
-    compile_smv_db
-    check_compile_smv_db
+  compile_smv_db
+  check_compile_smv_db
 
 ### Stage 3c ###
-    compile_smv
-    check_compile_smv
-  fi
+  compile_smv
+  check_compile_smv
 fi
 
 ### Stage 4 ###
 
-if [ "$FIREBOT_MODE" == "validation" ] ; then
-  if [ "$caselistfile" == "" ]; then
-    generate_validation_list
-  else
-    get_validation_list $caselistfile
-  fi
-fi
-
 # Depends on successful FDS debug compile
 if [[ $FDS_debug_success ]] ; then
-  if [[ "$FIREBOT_MODE" == "verification" ]] ; then
-     run_verification_cases_debug
-     check_cases_debug $fdsrepo/Verification 'verification'
-  else
-     run_validation_cases_debug
-     check_cases_debug $fdsrepo/Validation 'validation'
-  fi
+   run_verification_cases_debug
+   check_cases_debug $fdsrepo/Verification 'verification'
 fi
 
 if [ "$FIREBOT_LITE" == "" ]; then
 # clean debug stage
   cd $fdsrepo
   if [[ "$CLEANREPO" == "1" ]] ; then
-     if [[ "$FIREBOT_MODE" == "verification" ]] ; then
-        echo "   cleaning Verification"
-        clean_repo $fdsrepo/Verification $FDSBRANCH || exit 1
-     else
-        echo "   cleaning Validation"
-        clean_repo $fdsrepo/Validation $FDSBRANCH || exit 1
-     fi
+    echo "   cleaning Verification"
+    clean_repo $fdsrepo/Verification $FDSBRANCH || exit 1
   fi
 
 ### Stage 5 ###
 # Depends on successful FDS compile
   if [[ $FDS_release_success ]] ; then
-    if [[ "$FIREBOT_MODE" == "verification" ]] ; then
-       run_verification_cases_release
-       check_cases_release $fdsrepo/Verification 'final'
-    else
-       run_validation_cases_release
-       check_cases_release $fdsrepo/Validation 'final'
-       if [[ $cases_debug_success && $cases_release_success ]] ; then
-         commit_validation_results
-       fi
-    fi
+    run_verification_cases_release
+    check_cases_release $fdsrepo/Verification 'final'
   fi
 
 ### Stage 6 ###
 # Depends on successful SMV compile
-  if [ "$FIREBOT_MODE" == "verification" ]; then
-    if [[ "$SKIPFIGURES" == "" ]] ; then
-      if [[ $smv_release_success ]] ; then
-        make_fds_pictures
-        check_fds_pictures
-      fi
-    fi
-
-    if [ "$SKIPMATLAB" == "" ] ; then
-### Stage 7a ###
-      check_matlab_license_server
-      if [ $matlab_success == true ]; then
-        run_matlab_verification
-        check_matlab_verification
-        check_verification_stats
-      fi
-
-### Stage 7b ###
-      check_matlab_license_server
-      if [ $matlab_success == true ]; then
-        run_matlab_validation
-        check_matlab_validation
-        archive_validation_stats
-        make_validation_git_stats
-      fi
-    fi
-
-### Stage 7c ###
-    generate_timing_stats
-
-### Stage 8 ###
-    if [ "$SKIPMATLAB" == "" ] ; then
-      if [ "$SKIPFIGURES" == "" ] ; then
-        make_fds_user_guide
-        make_geom_notes
-        make_fds_verification_guide
-        make_fds_technical_guide
-        make_fds_validation_guide
-        make_fds_Config_management_plan
-      fi
+  if [[ "$SKIPFIGURES" == "" ]] ; then
+    if [[ $smv_release_success ]] ; then
+      make_fds_pictures
+      check_fds_pictures
     fi
   fi
-fi
 
-### Stage 9 ###
-if [ "$BUILD_BUNDLE" == "1" ]; then
-  make_bundle
+  if [ "$SKIPMATLAB" == "" ] ; then
+### Stage 7a ###
+    check_matlab_license_server
+    if [ $matlab_success == true ]; then
+      run_matlab_verification
+      check_matlab_verification
+      check_verification_stats
+    fi
+
+### Stage 7b ###
+    check_matlab_license_server
+    if [ $matlab_success == true ]; then
+      run_matlab_validation
+      check_matlab_validation
+      archive_validation_stats
+      make_validation_git_stats
+    fi
+  fi
+
+### Stage 7c ###
+  generate_timing_stats
+
+### Stage 8 ###
+  if [ "$SKIPMATLAB" == "" ] ; then
+    if [ "$SKIPFIGURES" == "" ] ; then
+      make_fds_user_guide
+      make_geom_notes
+      make_fds_verification_guide
+      make_fds_technical_guide
+      make_fds_validation_guide
+      make_fds_Config_management_plan
+    fi
+  fi
 fi
 
 ### Wrap up and report results ###
 set_files_world_readable
-if [ "$FIREBOT_MODE" == "verification" ]; then
-  save_build_status
-  if [ "$FIREBOT_LITE" == "" ]; then
-    archive_timing_stats
-  fi
-  email_build_status 'Firebot'
-else
-  email_build_status 'Validationbot'
+save_build_status
+if [ "$FIREBOT_LITE" == "" ]; then
+  archive_timing_stats
 fi
+email_build_status 'Firebot'

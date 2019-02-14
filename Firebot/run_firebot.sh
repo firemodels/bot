@@ -13,13 +13,6 @@ echo "Miscellaneous:"
 echo "-b - use the current branch"
 echo "-B - use startup files to set the environment, not modules"
 echo "-q queue - specify queue [default: $QUEUE]"
-#echo "validationbot mode:"
-#echo "-C - commit validationbot output results"
-#echo "-D caselist - specify file containing list of validationbot cases"
-#echo "-K - kill validationbot if it is running"
-#echo "-P - commit and push (to github repo) validationbot output results (not implemented)"
-#echo "-S - show list validationbot cases"
-#echo "-V n - run firebot in validationbot mode with specified number (n) of processes"
 echo "-f - force firebot run"
 echo "-F - skip figure generation and build document stages"
 echo "-i - use installed version of smokeview"
@@ -34,7 +27,6 @@ else
 fi
 echo "-R - remove run status file"
 echo "-s - skip matlab and build document stages"
-echo "-T - build a bundle"
 echo "-U - upload guides (only by user firebot)"
 echo "-W - clone fds, exp, fig, out and smv repos"
 }
@@ -45,7 +37,7 @@ echo "-W - clone fds, exp, fig, out and smv repos"
 
 function usage {
 option=$1
-echo "Verification and validation testing script for FDS"
+echo "Verification testing script for FDS"
 echo ""
 echo "Options:"
 echo "-c - clean repos"
@@ -171,23 +163,17 @@ FIREBOT_LITE=
 KILL_FIREBOT=
 export PREFIX=FB_
 ECHO=
-MAX_VALIDATION_PROCESSES=
-commit=
-push=
-caselistfile=""
-showcaselist=
 debug_mode=
 DV=
 INTEL=
 REMOVE_PID=
 QUEUEBENCH=
-BUILD_BUNDLE=
 CLONE_REPOS=
 export QFDS_STARTUP=
 
 #*** parse command line options
 
-while getopts 'bBcdCD:FfHhIiJKkLm:Pq:Q:nRsSuTUvV:W' OPTION
+while getopts 'bBcdFfHhIiJkLm:q:Q:nRsuUvW' OPTION
 do
 case $OPTION  in
   b)
@@ -199,14 +185,8 @@ case $OPTION  in
   c)
    CLEANREPO=1
    ;;
-  C)
-   commit=-C
-   ;;
   d)
     debug_mode="-d "
-   ;;
-  D)
-    caselistfile="-D $OPTARG"
    ;;
   f)
    FORCE=1
@@ -232,10 +212,6 @@ case $OPTION  in
   k)
    KILL_FIREBOT="1"
    ;;
-  K)
-   KILL_FIREBOT="1"
-   export PREFIX=VB_
-   ;;
   L)
    FIREBOT_LITE=-L
    ;;
@@ -251,20 +227,11 @@ case $OPTION  in
   n)
    UPDATEREPO=0
    ;;
-  P)
-   push=-P
-   ;;
   R)
    REMOVE_PID=1
    ;;
   s)
    SKIPMATLAB=-s
-   ;;
-  S)
-   showcaselist="-S"
-   ;;
-  T)
-   BUILD_BUNDLE="-T"
    ;;
   u)
    UPDATEREPO=1
@@ -275,9 +242,6 @@ case $OPTION  in
   v)
    RUNFIREBOT=0
    ECHO=echo
-   ;;
-  V)
-   MAX_VALIDATION_PROCESSES="-V $OPTARG"
    ;;
   W)
    CLONE_REPOS="-W"
@@ -356,7 +320,7 @@ fi
 if [[ "$UPDATEREPO" == "1" ]]; then
    UPDATE=-u
    if [[ "$RUNFIREBOT" == "1" ]]; then
-     CD_REPO $repo/bot/Firebot master || exit 1
+     CD_REPO $repo/bot/Firebot master  || exit 1
      
      git fetch origin &> /dev/null
      git merge origin/master &> /dev/null
@@ -369,7 +333,7 @@ fi
 BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
-$ECHO  ./$botscript -p $firebot_pid $commit $push $UPDATE $DV $INTEL $debug_mode $BRANCH $showcaselist $caselistfile $MAX_VALIDATION_PROCESSES $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUEBENCH $QUEUE $SKIPMATLAB $BUILD_BUNDLE $SKIPFIGURES $CLONE_REPOS $EMAIL "$@"
+$ECHO  ./$botscript -p $firebot_pid $UPDATE $DV $INTEL $debug_mode $BRANCH $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUEBENCH $QUEUE $SKIPMATLAB $SKIPFIGURES $CLONE_REPOS $EMAIL "$@"
 if [ -e $firebot_pid ]; then
   rm -f $firebot_pid
 fi
