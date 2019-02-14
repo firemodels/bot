@@ -221,7 +221,7 @@ mkdir "%FDSSTART%\Guides and Release Notes"
 
 :: ----------- setting up openmp threads environment variable
 
-WMIC CPU Get NumberofLogicalProcessors | more +1 > %numcoresfile%
+WMIC CPU Get NumberofLogicalProcessors | more /E +1 > %numcoresfile%
 set /p ncores=<%numcoresfile%
 
 if %ncores% GEQ 8 (
