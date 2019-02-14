@@ -320,11 +320,10 @@ fi
 if [[ "$UPDATEREPO" == "1" ]]; then
    UPDATE=-u
    if [[ "$RUNFIREBOT" == "1" ]]; then
-     CD_REPO $repo/bot/Firebot firebot  || exit 1
-#     CD_REPO $repo/bot/Firebot master  || exit 1
+     CD_REPO $repo/bot/Firebot master  || exit 1
      
-#     git fetch origin &> /dev/null
-#     git merge origin/master &> /dev/null
+     git fetch origin &> /dev/null
+     git merge origin/master &> /dev/null
      cd $CURDIR
   fi
 fi
