@@ -47,8 +47,8 @@ if "%platform%" == "linux" (
 
   echo Downloading compressed archive to:
   echo   %svn_root%\bot\Bundle\fds\uploads\!bundledir!.sh
-  pscp %linux_logon%:%linux_svn_root%/bot/Bundle/fds/uploads/!bundledir!.sh   %svn_root%\bot\Bundle\fds\uploads\.
-  pscp %linux_logon%:%linux_svn_root%/bot/Bundle/fds/uploads/!bundledir!.sha1 %svn_root%\bot\Bundle\fds\uploads\.
+  pscp %linux_logon%:.bundle/uploads/!bundledir!.sh   %svn_root%\bot\Bundle\fds\uploads\.
+  pscp %linux_logon%:.bundle/uploads/!bundledir!.sha1 %svn_root%\bot\Bundle\fds\uploads\.
   goto eof
 )
 if "%platform%" == "osx" (
@@ -57,8 +57,8 @@ if "%platform%" == "osx" (
 
   echo Downloading compressed archive to:
   echo   %svn_root%\bot\Bundle\fds\uploads\!bundledir!.sh
-  pscp %osx_logon%:%linux_svn_root%/bot/Bundle/fds/uploads/!bundledir!.sh   %svn_root%\bot\Bundle\fds\uploads\.
-  pscp %osx_logon%:%linux_svn_root%/bot/Bundle/fds/uploads/!bundledir!.sha1 %svn_root%\bot\Bundle\fds\uploads\.
+  pscp %osx_logon%:.bundle/uploads/!bundledir!.sh   %svn_root%\bot\Bundle\fds\uploads\.
+  pscp %osx_logon%:.bundle/uploads/!bundledir!.sha1 %svn_root%\bot\Bundle\fds\uploads\.
   goto eof
 )
 
