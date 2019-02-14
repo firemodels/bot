@@ -10,11 +10,11 @@ errlog=/tmp/errlog.$$
 
 CP ()
 {
-  FROMDIR=$1
-  FROMFILE=$2
-  TODIR=$3
-  TOFILE=$4
-  ERR=
+  local FROMDIR=$1
+  local FROMFILE=$2
+  local TODIR=$3
+  local TOFILE=$4
+  local ERR=
   if [ ! -e $FROMDIR/$FROMFILE ]; then
     echo "***error: the file $FROMFILE was not found in $FROMDIR" >> $errlog
     echo "***error: the file $FROMFILE was not found in $FROMDIR"
@@ -42,11 +42,11 @@ CP ()
 
 UNTAR ()
 {
-  FROMDIR=$1
-  FROMFILE=$2
-  TODIR=$3
-  TODIR2=$4
-  ERR=
+  local FROMDIR=$1
+  local FROMFILE=$2
+  local TODIR=$3
+  local TODIR2=$4
+  local ERR=
   if [ ! -e $FROMDIR/$FROMFILE ]; then
     echo "***error: the file $FROMFILE was not found in $FROMDIR" >> $errlog
     echo "***error: the file $FROMFILE was not found in $FROMDIR"
@@ -77,10 +77,10 @@ UNTAR ()
 
 CP2 ()
 {
-  FROMDIR=$1
-  FROMFILE=$2
-  TODIR=$3
-  TOFILE=$FROMFILE
+  local FROMDIR=$1
+  local FROMFILE=$2
+  local TODIR=$3
+  local TOFILE=$FROMFILE
   ERR=
   if [ ! -e $FROMDIR/$FROMFILE ]; then
     echo "***error: the file $FROMFILE was not found in $FROMDIR" >> $errlog
@@ -109,9 +109,9 @@ CP2 ()
 
 CPDIR ()
 {
-  FROMDIR=$1
-  TODIR=$2
-  ERR=
+  local FROMDIR=$1
+  local TODIR=$2
+  local ERR=
   if [ ! -e $FROMDIR ]; then
     echo "***error: the directory $FROMDIR does not exist" >> $errlog
     echo "***error: the directory $FROMDIR does not exist"
@@ -142,9 +142,9 @@ CPDIR ()
 
 CPDIRFILES ()
 {
-  FROMDIR=$1
-  TODIR=$2
-  ERR=
+  local FROMDIR=$1
+  local TODIR=$2
+  local ERR=
   if [ ! -d $FROMDIR ]; then
     echo "***error: the directory $FROMDIR does not exist" >> $errlog
     echo "***error: the directory $FROMDIR does not exist"
