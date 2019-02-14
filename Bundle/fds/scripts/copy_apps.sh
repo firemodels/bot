@@ -94,7 +94,7 @@ if [ "$copyfds" == "1" ]; then
   MKDIR $TODIR/fds
   rm -f $TODIR/fds/*
   CP $fdsrepo/Build/${MPI}_intel$OS               fds_${MPI}_intel$OS $TODIR/fds fds
+  CP $fdsrepo/Utilities/fds2ascii/intel$OS        fds2ascii$OS        $TODIR/fds fds2ascii
   CP $fdsrepo/Utilities/test_mpi/${MPI}_intel$OS2 test_mpi            $TODIR/fds test_mpi
-  CP $fdsrepo/Utilities/fds2ascii/intel$OS        fds2ascii$OS        $TODIR/fds test_mpi
 fi
   
