@@ -1,5 +1,18 @@
 #!/bin/bash
 
+GUIDE_DIR=$HOME/.bundle/pubs
+SMV_DIR=$HOME/.bundle/BUNDLE/smv
+FDS_DIR=$HOME/.bundle/BUNDLE/fds
+
+# determine directory repos reside under
+
+scriptdir=`dirname "$(readlink -f "$0")"`
+curdir=`pwd`
+cd $scriptdir/../../../..
+REPO_ROOT=`pwd`
+cd $curdir
+
+
 INSTALLDIR=FDS/FDS6
 
 # this script is called by make_bundle.sh located in bot/Bundle/fds/linux or osx
@@ -171,7 +184,8 @@ CPDIRFILES ()
   fi
 }
 
-# VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
+# determine OS
+
 if [ "`uname`" == "Darwin" ]; then
   FDSOS=_osx_64
   OS=_osx
@@ -183,71 +197,13 @@ else
 fi
 
 
-manifest=manifest$FDSOS.html
-
-smokeviewdir=intel$FDSOS
-smokeview=smokeview$FDSOS
-
-smokezipdir=intel$FDSOS
-smokezip=smokezip$FDSOS
-
-dem2fdsdir=intel$FDSOS
-dem2fds=dem2fds$FDSOS
-
-wind2fdsdir=intel$FDSOS
-wind2fds=wind2fds$FDSOS
-
-hashfiledir=intel$FDSOS
-hashfile=hashfile$FDSOS
-
-smokediffdir=intel$FDSOS
-smokediff=smokediff$FDSOS
-
-backgrounddir=intel$FDSOS
-background=background
-
-DB=_db
-if [ "$MPI_VERSION" == "INTEL" ]; then
-  fdsmpidir=impi_intel$FDSOS
-  fdsmpi=fds_impi_intel$FDSOS
-  fdsmpidirdb=impi_intel$FDSOS$DB
-  fdsmpidb=fds_impi_intel$FDSOS$DB
-else
-  fdsmpidir=mpi_intel$FDSOS
-  fdsmpi=fds_mpi_intel$FDSOS
-  fdsmpidirdb=mpi_intel$FDSOS$DB
-  fdsmpidb=fds_mpi_intel$FDSOS$DB
-fi
-
-fds2asciidir=intel$FDSOS
-fds2ascii=fds2ascii$FDSOS
-
-if [ "$MPI_VERSION" == "INTEL" ]; then
-  testmpidir=impi_intel$OS
-else
-  testmpidir=mpi_intel$OS
-fi
-testmpi=test_mpi
-
-UPLOAD_ROOT=$HOME/$fds_smvroot
-
-fdsroot=$REPO_ROOT/fds/Build
-backgroundroot=$REPO_ROOT/smv/Build/background
-smokediffroot=$REPO_ROOT/smv/Build/smokediff
-smokeziproot=$REPO_ROOT/smv/Build/smokezip
-dem2fdsroot=$REPO_ROOT/smv/Build/dem2fds
 smvscriptdir=$REPO_ROOT/smv/scripts
-wind2fdsroot=$REPO_ROOT/smv/Build/wind2fds
-hashfileroot=$REPO_ROOT/smv/Build/hashfile
-uploaddir=$UPLOAD_ROOT/bot/Bundle/fds/uploads
+uploaddir=$HOME/.bundle/uploads
 bundledir=$bundlebase
 webpagesdir=$REPO_ROOT/webpages
-smvbindir=$REPO_ROOT/smv/Build/smokeview/$smokeviewdir
 fds_bundle=$REPO_ROOT/bot/Bundle/fds/for_bundle
 smv_bundle=$REPO_ROOT/bot/Bundle/smv/for_bundle
 texturedir=$smv_bundle/textures
-fds2asciiroot=$REPO_ROOT/fds/Utilities/fds2ascii
-testmpiroot=$REPO_ROOT/fds/Utilities/test_mpi
 makeinstaller=$REPO_ROOT/bot/Bundle/fds/scripts/make_installer.sh
 
 fds_cases=$REPO_ROOT/fds/Verification/FDS_Cases.sh
@@ -274,13 +230,13 @@ echo ""
 
 # smokeview
 
-CP $backgroundroot/$backgrounddir $background $bundledir/bin background
-CP $smvbindir                     $smokeview  $bundledir/bin smokeview
-CP $smokediffroot/$smokediffdir   $smokediff  $bundledir/bin smokediff
-CP $smokeziproot/$smokezipdir     $smokezip   $bundledir/bin smokezip
-CP $dem2fdsroot/$dem2fdsdir       $dem2fds    $bundledir/bin dem2fds
-CP $wind2fdsroot/$wind2fdsdir     $wind2fds   $bundledir/bin wind2fds
-CP $hashfileroot/$hashfiledir     $hashfile   $bundledir/bin hashfile
+CP $SMV_DIR background $bundledir/bin background
+CP $SMV_DIR smokeview  $bundledir/bin smokeview
+CP $SMV_DIR smokediff  $bundledir/bin smokediff
+CP $SMV_DIR smokezip   $bundledir/bin smokezip
+CP $SMV_DIR dem2fds    $bundledir/bin dem2fds
+CP $SMV_DIR wind2fds   $bundledir/bin wind2fds
+CP $SMV_DIR hashfile   $bundledir/bin hashfile
 
 CURDIR=`pwd`
 cd $bundledir/bin
@@ -298,18 +254,15 @@ CPDIR $texturedir $bundledir/bin
 
 # FDS 
 
-CP $fdsroot/$fdsmpidir          $fdsmpi    $bundledir/bin fds
-if [ "$fds_debug" == "1" ]; then
-  CP $fdsroot/$fdsmpidirdb      $fdsmpidb  $bundledir/bin fds_db
-fi
-CP $fds2asciiroot/$fds2asciidir $fds2ascii $bundledir/bin fds2ascii
-CP $testmpiroot/$testmpidir $testmpi $bundledir/bin test_mpi
+CP $FDS_DIR fds       $bundledir/bin fds
+CP $FDS_DIR fds2ascii $bundledir/bin fds2ascii
+CP $FDS_DIR test_mpi  $bundledir/bin test_mpi
 
 CURDIR=`pwd`
 cd $bundledir/bin
 hashfile fds       > hash/fds.sha1
 hashfile fds2ascii > hash/fds2ascii.sha1
-hashfile test_mpi > hash/test_mpi.sha1
+hashfile test_mpi  > hash/test_mpi.sha1
 cd $CURDIR
 
 if [ "$MPI_VERSION" != "INTEL" ]; then
@@ -395,11 +348,6 @@ echo Creating installer
 cd ..
 bundlepath=`pwd`/$bundlebase.sh
 $makeinstaller -i $bundlebase.tar.gz -d $INSTALLDIR $bundlebase.sh
-
-mkdir -p $BUNDLE_DIR
-if [ -e $BUNDLE_DIR ]; then
-  cp $bundlebase.sh $BUNDLE_DIR/.
-fi
 
 cat $bundledir/bin/hash/*.sha1 >  $bundlebase.sha1
 hashfile $bundlebase.sh        >> $bundlebase.sha1

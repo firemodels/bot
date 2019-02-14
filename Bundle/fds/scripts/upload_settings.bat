@@ -56,9 +56,6 @@ call :dos2bash GUIDE_DIR $HOME/%GUIDE_DIR%
 call :title2bash #  ---- openmpi location ----
 call :dos2bash OPENMPI_DIR $HOME/%OPENMPI_DIR%
 
-call :title2bash #  ---- bundle location ----
-call :dos2bash BUNDLE_DIR $HOME/%BUNDLE_DIR%
-
 call :title2bash #  ---- bot locations ----
 call :dos2bash firebotroot %firebotroot%
 call :dos2bash firebotrepo %firebotrepo%
