@@ -60,7 +60,7 @@ fi
 if [ "$option" == "fds" ]; then
   copysmv=
 fi
-scriptdir=`dirname "$(readlink -f "$0")"`
+scriptdir=`dirname "$(readlink "$0")"`
 curdir=`pwd`
 cd $scriptdir/../../../..
 repo_root=`pwd`
