@@ -13,7 +13,7 @@ function get_fullpath(command,platform){
   return fullpath;
 }
 function run_script(script){
-  MyObject.Run(get_fullpath("../../fds/Utilities/Scripts/webRUN_script.bat ",script));
+  MyObject.Run(get_fullpath("../../bot/Bundle/fds/scripts/webRUN_script.bat ",script));
 }
 function bundle_fdssmv(platform){
   MyObject.Run(get_fullpath("../../bot/Bundle/fds/scripts/webBUNDLEfdssmv.bat ",platform));
@@ -23,6 +23,9 @@ function upload_settings(platform){
 }
 function install_fdssmv(platform){
   MyObject.Run(get_fullpath("../../bot/Bundle/fds/scripts/webINSTALLfdssmv.bat ",platform));
+}
+function copy_apps(platform,prog){
+  MyObject.Run(get_fullpath("../../bot/Bundle/fds/scripts/webCopyApps.bat ",platform));
 }
 </script>
 </HEAD>
@@ -35,7 +38,31 @@ function install_fdssmv(platform){
 
 
 <h3>Bundles</h3>
-<table border=on>
+<p><table border=on>
+<tr><th colspan=3>Copy Apps</th></tr>
+
+<tr><th>Windows</th><th>Linux</th><th>OSX</th>
+
+<tr>
+<td align=center>
+<button onclick="copy_apps('windows fds')">FDS</button><br>
+<button onclick="copy_apps('windows smv')">SMV</button>
+</td>
+<td align=center>
+<button onclick="copy_apps('linux fds')">FDS</button><br>
+<button onclick="copy_apps('linux smv')">SMV</button>
+</td>
+<td align=center>
+<button onclick="copy_apps('osx fds')">FDS</button><br>
+<button onclick="copy_apps('osx smv')">SMV</button>
+</td>
+</tr>
+
+</table>
+
+
+<p><table border=on>
+<tr><th colspan=3>Build Bundle</th></tr>
 <tr><th>Windows</th><th>Linux</th><th>OSX</th></tr>
 <tr>
 <td align=center><button onclick="bundle_fdssmv('windows')">Bundle</button></td>

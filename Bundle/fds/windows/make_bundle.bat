@@ -26,9 +26,6 @@ set      in_impi=%userprofile%\fire-notes\INSTALL\LIBS\RUNTIME\MPI_%INTELVERSION
 set in_intel_dll=%userprofile%\fire-notes\INSTALL\LIBS\WINDOWS\%INTELVERSION%
 
 set SVNROOT=%svn_root%
-set fdsdir=%svn_root%\fds\Build\intel_win_64
-set fdsmpidir=%svn_root%\fds\Build\impi_intel_win_64
-set fdsmpidirdb=%svn_root%\fds\Build\impi_intel_win_64_db
 set basename=%fds_version%-%smv_version%_win64
 set hashfile=%svn_root%\smv\Build\hashfile\intel_win_64\hashfile_win_64.exe
 if NOT exist %hashfile% (
@@ -101,21 +98,20 @@ echo.
 
 copy %smv_forbundle%\*.po                                                     %out_bin%\.>Nul
 
-if "%fds_debug%" == "1" (
-  CALL :COPY  %fdsmpidirdb%\fds_impi_win_64_db.exe                            %out_bin%\fds_db.exe
-)
-CALL :COPY  %fdsmpidir%\fds_impi_win_64.exe                                   %out_bin%\fds.exe
-CALL :COPY  %svn_root%\fds\Utilities\fds2ascii\intel_win_64\fds2ascii_win_64.exe %out_bin%\fds2ascii.exe
-CALL :COPY  %svn_root%\smv\Build\background\intel_win_64\background.exe       %out_bin%\background.exe
-CALL :COPY  %svn_root%\fds\Utilities\test_mpi\impi_intel_win\test_mpi.exe     %out_bin%\test_mpi.exe
+set bundle_dir=%userprofile%\.bundle
+CALL :COPY  %bundle_dir%\fds\fds.exe        %out_bin%\fds.exe
+CALL :COPY  %bundle_dir%\fds\fds2ascii.exe  %out_bin%\fds2ascii.exe
+CALL :COPY  %bundle_dir%\fds\test_mpi.exe   %out_bin%\test_mpi.exe
 
-CALL :COPY  %svn_root%\smv\Build\smokeview\intel_win_64\smokeview_win_64.exe  %out_smv%\smokeview.exe
-CALL :COPY  %svn_root%\smv\Build\smokediff\intel_win_64\smokediff_win_64.exe  %out_smv%\smokediff.exe
-CALL :COPY  %svn_root%\smv\Build\smokezip\intel_win_64\smokezip_win_64.exe    %out_smv%\smokezip.exe 
-CALL :COPY  %svn_root%\smv\Build\dem2fds\intel_win_64\dem2fds_win_64.exe      %out_smv%\dem2fds.exe 
-CALL :COPY  %svn_root%\smv\Build\hashfile\intel_win_64\hashfile_win_64.exe    %out_smv%\hashfile.exe 
-CALL :COPY  %svn_root%\smv\Build\wind2fds\intel_win_64\wind2fds_win_64.exe    %out_smv%\wind2fds.exe 
-CALL :COPY  %svn_root%\smv\Build\hashfile\intel_win_64\hashfile_win_64.exe    %out_smv%\hashfile.exe 
+CALL :COPY  %bundle_dir%\smv\background.exe %out_bin%\background.exe
+CALL :COPY  %bundle_dir%\smv\smokeview.exe  %out_smv%\smokeview.exe
+CALL :COPY  %bundle_dir%\smv\smokediff.exe  %out_smv%\smokediff.exe
+CALL :COPY  %bundle_dir%\smv\smokezip.exe   %out_smv%\smokezip.exe 
+CALL :COPY  %bundle_dir%\smv\dem2fds.exe    %out_smv%\dem2fds.exe 
+CALL :COPY  %bundle_dir%\smv\hashfile.exe   %out_smv%\hashfile.exe 
+CALL :COPY  %bundle_dir%\smv\wind2fds.exe   %out_smv%\wind2fds.exe 
+CALL :COPY  %bundle_dir%\smv\hashfile.exe   %out_smv%\hashfile.exe 
+
 CALL :COPY  %svn_root%\smv\scripts\jp2conv.bat                                %out_smv%\jp2conv.bat
 
 set curdir=%CD%

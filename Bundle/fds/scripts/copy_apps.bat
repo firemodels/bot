@@ -16,9 +16,6 @@ set fdsrepo=%repo_root%\fds
 set smvrepo=%repo_root%\smv
 cd %scriptdir%
 
-echo fdsrepo=%fdsrepo%
-echo smvrepo=%smvrepo%
-
 set BUNDLE_DIR=%userprofile%\.bundle
 
 :: copy smokeview files
@@ -26,6 +23,7 @@ set BUNDLE_DIR=%userprofile%\.bundle
 if "x%copysmv%" == "x" goto endif3
   if NOT exist %BUNDLE_DIR%\smv mkdir %BUNDLE_DIR%\smv
   echo erasing %BUNDLE_DIR%\smv
+  echo.
   erase /q %BUNDLE_DIR%\smv\*
   call :copyfile %smvrepo%\Build\background\intel_win_64 background.exe       %BUNDLE_DIR%\smv background.exe
   call :copyfile %smvrepo%\Build\dem2fds\intel_win_64    dem2fds_win_64.exe   %BUNDLE_DIR%\smv dem2fds.exe
@@ -41,10 +39,11 @@ if "x%copysmv%" == "x" goto endif3
 if "x%copyfds%" == "x" goto endif4
   if NOT exist %BUNDLE_DIR%\fds mkdir %BUNDLE_DIR%\fds
   echo erasing %BUNDLE_DIR%\fds
+  echo.
   erase /q %BUNDLE_DIR%\fds\*
-  call :copyfile %fdsrepo%\Build\impi_intel_win_64           fds_impi_intel_win_64.exe %BUNDLE_DIR%\fds fds.exe
-  call :copyfile %fdsrepo%\Utilities\fds2ascii\intel_win_64  fds2ascii_win_64.exe      %BUNDLE_DIR%\fds fds2ascii.exe
-  call :copyfile %fdsrepo%\Utilities\test_mpi\impi_intel_win test_mpi.exe              %BUNDLE_DIR%\fds test_mpi.exe
+  call :copyfile %fdsrepo%\Build\impi_intel_win_64           fds_impi_win_64.exe  %BUNDLE_DIR%\fds fds.exe
+  call :copyfile %fdsrepo%\Utilities\fds2ascii\intel_win_64  fds2ascii_win_64.exe %BUNDLE_DIR%\fds fds2ascii.exe
+  call :copyfile %fdsrepo%\Utilities\test_mpi\impi_intel_win test_mpi.exe         %BUNDLE_DIR%\fds test_mpi.exe
 :endif4
 
 goto eof
