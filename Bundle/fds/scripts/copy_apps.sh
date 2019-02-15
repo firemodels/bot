@@ -25,18 +25,14 @@ CP ()
   local FROMFILE=$2
   local TODIR=$3
   local TOFILE=$4
-  ERR=
   if [ ! -e $FROMDIR/$FROMFILE ]; then
     echo "***error: $FROMFILE was not found in $FROMDIR"
-    ERR="1"
-    read val
   else
     cp $FROMDIR/$FROMFILE $TODIR/$TOFILE
     if [ -e $TODIR/$TOFILE ]; then
       echo "$FROMFILE copied to $TODIR/$TOFILE"
     else
       echo "***error: $FROMFILE could not be copied to $TODIR"
-      read val
     fi
   fi
 }
