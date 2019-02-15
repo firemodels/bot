@@ -5,7 +5,7 @@ BUNDLE_HOME=$HOME/.bundle
 
 mkdir -p $BUNDLE_HOME/pubs
 mkdir -p $BUNDLE_HOME/BUNDLE
-mkdir -p $BUNDLE_HOME/OPENMPMI
+mkdir -p $BUNDLE_HOME/OPENMPI
 
 # this script is run from a script in bot/Bundle/fds/linux or
 # bot/Bundle/fds/osx
@@ -18,6 +18,7 @@ if [ "$option" == "web" ]; then
     echo "          does not exist"
   fi
 fi
+
 if [ "$option" == "bot" ]; then
   if [ -e $BUNDLE_HOME/FDS_SMV_ENV.sh ]; then
     source $BUNDLE_HOME/FDS_SMV_ENV.sh
@@ -25,15 +26,16 @@ if [ "$option" == "bot" ]; then
     echo "***error: parameter file $BUNDLE_HOME/FDS_SMV_ENV.sh"
     echo "          does not exist"
   fi
-fi
+  scriptdir=`dirname "$(readlink "$0")"`
+  curdir=`pwd`
+  cd $scriptdir/../../../..
+  repo_root=`pwd`
 
-if [ "$option" == "bot" ]; then
-  CURDIR=`pwd`
-  cd $firebotrepo/fds
+  cd $repo_root/fds
   export fds_version=`git describe --long --dirty`
-  cd $firebotrepo/smv
+  cd $repo_root/smv
   export smv_version=`git describe --long --dirty`
-  cd $CURDIR
+  cd $curdir
 fi
 
 ../scripts/CHECK_VARS.sh
