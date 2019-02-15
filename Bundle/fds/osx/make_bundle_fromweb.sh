@@ -6,5 +6,5 @@ cd $DIR
 
 source ../scripts/GET_ENV.sh web
 
-../scripts/bundle_generic.sh $fds_version $smv_version $linux_osx_version
+../scripts/bundle_generic.sh $fds_version $smv_version $osx_mpi_version
 
