@@ -25,7 +25,7 @@ echo.
 if "%platform%" == "windows" (
   echo   Installing FDS and Smokeview
   Title  Installing FDS and Smokeview
-  cd %svn_root%\bot\Bundle\fds\uploads
+  cd %userprofile%\.bundle\uploads
   call %fds_version%-%smv_version%_win64.exe
   goto eof
 )

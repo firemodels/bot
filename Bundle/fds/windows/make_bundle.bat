@@ -6,6 +6,23 @@ set SMVEDITION=SMV6
 set fdsversion=%FDSEDITION%
 set smvversion=%SMVEDITION%
 
+:: get git root directory
+
+set scriptdir=%~dp0
+echo scriptdir=%scriptdir%
+set curdir=%CD%
+cd %scriptdir%\..\..\..\..
+set repo_root=%CD%
+cd %scriptdir%
+set SVNROOT=%repo_root%
+
+:: setup .bundle and upload directories
+
+set bundle_dir=%userprofile%\.bundle
+if NOT exist %bundle_dir% mkdir %bundle_dir%
+set upload_dir=%userprofile%\.bundle\uploads
+if NOT exist %upload_dir% mkdir %upload_dir%
+
 if "%env_defined%" == "1" goto endif_env_defined
 set envfile="%userprofile%"\fds_smv_env.bat
 IF EXIST %envfile% GOTO endif_envexist2
@@ -25,9 +42,8 @@ call %envfile%
 set      in_impi=%userprofile%\fire-notes\INSTALL\LIBS\RUNTIME\MPI_%INTELVERSION%
 set in_intel_dll=%userprofile%\fire-notes\INSTALL\LIBS\WINDOWS\%INTELVERSION%
 
-set SVNROOT=%svn_root%
 set basename=%fds_version%-%smv_version%_win64
-set hashfile=%svn_root%\smv\Build\hashfile\intel_win_64\hashfile_win_64.exe
+set hashfile=%repo_root%\smv\Build\hashfile\intel_win_64\hashfile_win_64.exe
 if NOT exist %hashfile% (
   echo ***warning: %hashfile% does not exist
   echo Bundle will not contain hashes of application files
@@ -36,11 +52,10 @@ if NOT exist %hashfile% (
 
 set in_pdf=%userprofile%\.bundle\pubs
 set in_shortcut=%userprofile%\fire-notes\INSTALL\repoexes
-set smv_forbundle=%svn_root%\bot\Bundle\smv\for_bundle
+set smv_forbundle=%repo_root%\bot\Bundle\smv\for_bundle
 
 
-set uploads=%svn_root%\bot\Bundle\fds\uploads
-set basedir=%uploads%\%basename%
+set basedir=%upload_dir%\%basename%
 
 set out_bundle=%basedir%\firemodels
 set out_bin=%out_bundle%\%fdsversion%\bin
@@ -50,24 +65,24 @@ set out_doc=%out_bundle%\%fdsversion%\Documentation
 set out_guides="%out_doc%\Guides_and_Release_Notes"
 set out_web="%out_doc%\FDS_on_the_Web"
 set out_examples=%out_bundle%\%fdsversion%\Examples
-set fds_examples=%svn_root%\fds\Verification
-set smv_examples=%svn_root%\smv\Verification
+set fds_examples=%repo_root%\fds\Verification
+set smv_examples=%repo_root%\smv\Verification
 
 set out_smv=%out_bundle%\%smvversion%
 set out_textures=%out_smv%\textures
 set out_smvhash=%out_smv%\hash
 
-set fds_casessh=%svn_root%\fds\Verification\FDS_Cases.sh
-set fds_casesbat=%svn_root%\fds\Verification\FDS_Cases.bat
-set smv_casessh=%svn_root%\smv\Verification\scripts\SMV_Cases.sh
-set smv_casesbat=%svn_root%\smv\Verification\scripts\SMV_Cases.bat
-set wui_casessh=%svn_root%\smv\Verification\scripts\WUI_Cases.sh
-set wui_casesbat=%svn_root%\smv\Verification\scripts\WUI_Cases.bat
+set fds_casessh=%repo_root%\fds\Verification\FDS_Cases.sh
+set fds_casesbat=%repo_root%\fds\Verification\FDS_Cases.bat
+set smv_casessh=%repo_root%\smv\Verification\scripts\SMV_Cases.sh
+set smv_casesbat=%repo_root%\smv\Verification\scripts\SMV_Cases.bat
+set wui_casessh=%repo_root%\smv\Verification\scripts\WUI_Cases.sh
+set wui_casesbat=%repo_root%\smv\Verification\scripts\WUI_Cases.bat
 
-set copyFDScases=%svn_root%\fds\Utilities\Scripts\copyFDScases.bat
-set copyCFASTcases=%svn_root%\fds\Utilities\Scripts\copyCFASTcases.bat
+set copyFDScases=%repo_root%\fds\Utilities\Scripts\copyFDScases.bat
+set copyCFASTcases=%repo_root%\fds\Utilities\Scripts\copyCFASTcases.bat
 
-set fds_forbundle=%svn_root%\bot\Bundle\fds\for_bundle
+set fds_forbundle=%repo_root%\bot\Bundle\fds\for_bundle
 
 :: erase the temporary bundle directory if it already exists
 
@@ -98,7 +113,6 @@ echo.
 
 copy %smv_forbundle%\*.po                                                     %out_bin%\.>Nul
 
-set bundle_dir=%userprofile%\.bundle
 CALL :COPY  %bundle_dir%\fds\fds.exe        %out_bin%\fds.exe
 CALL :COPY  %bundle_dir%\fds\fds2ascii.exe  %out_bin%\fds2ascii.exe
 CALL :COPY  %bundle_dir%\fds\test_mpi.exe   %out_bin%\test_mpi.exe
@@ -112,7 +126,7 @@ CALL :COPY  %bundle_dir%\smv\hashfile.exe   %out_smv%\hashfile.exe
 CALL :COPY  %bundle_dir%\smv\wind2fds.exe   %out_smv%\wind2fds.exe 
 CALL :COPY  %bundle_dir%\smv\hashfile.exe   %out_smv%\hashfile.exe 
 
-CALL :COPY  %svn_root%\smv\scripts\jp2conv.bat                                %out_smv%\jp2conv.bat
+CALL :COPY  %repo_root%\smv\scripts\jp2conv.bat                                %out_smv%\jp2conv.bat
 
 set curdir=%CD%
 cd %out_bin%
@@ -126,7 +140,7 @@ wzunzip -d %in_impi%\mpi.zip
 %hashfile% background.exe >  hash\background_%fds_version%.exe.sha1
 %hashfile% test_mpi.exe   >  hash\test_mpi_%fds_version%.exe.sha1
 cd hash
-cat *.sha1              >  %uploads%\%basename%.sha1
+cat *.sha1              >  %upload_dir%\%basename%.sha1
 
 cd %out_smv%
 %hashfile% hashfile.exe   >  hash\hashfile_%smv_version%.exe.sha1
@@ -136,7 +150,7 @@ cd %out_smv%
 %hashfile% dem2fds.exe    >  hash\dem2fds_%smv_version%.exe.sha1
 %hashfile% wind2fds.exe   >  hash\wind2fds_%smv_version%.exe.sha1
 cd hash
-cat *.sha1              >>  %uploads%\%basename%.sha1
+cat *.sha1              >>  %upload_dir%\%basename%.sha1
 
 cd %curdir%
 CALL :COPY %in_intel_dll%\libiomp5md.dll                        %out_bin%\libiomp5md.dll
@@ -144,7 +158,7 @@ CALL :COPY "%fds_forbundle%\fdsinit.bat"                        %out_bin%\fdsini
 CALL :COPY "%fds_forbundle%\fdspath.bat"                        %out_bin%\fdspath.bat
 CALL :COPY "%fds_forbundle%\helpfds.bat"                        %out_bin%\helpfds.bat
 CALL :COPY "%fds_forbundle%\fds_local.bat"                      %out_bin%\fds_local.bat
-CALL :COPY  %svn_root%\smv\Build\sh2bat\intel_win_64\sh2bat.exe %out_bin%\sh2bat.exe
+CALL :COPY  %repo_root%\smv\Build\sh2bat\intel_win_64\sh2bat.exe %out_bin%\sh2bat.exe
 
 :: setup program for new installer
 CALL :COPY "%fds_forbundle%\setup.bat"                          %out_bundle%\setup.bat
@@ -173,13 +187,13 @@ CALL :COPY  "%fds_forbundle%\uninstall_fds2.bat" "%out_uninstall%\uninstall_base
 CALL :COPY  "%fds_forbundle%\uninstall.bat"      "%out_uninstall%\uninstall.bat"
 echo @echo off > "%out_uninstall%\uninstall.vbs"
 
-CALL :COPY  "%svn_root%\smv\Build\set_path\intel_win_64\set_path64.exe" "%out_uninstall%\set_path.exe"
+CALL :COPY  "%repo_root%\smv\Build\set_path\intel_win_64\set_path64.exe" "%out_uninstall%\set_path.exe"
 
 echo.
 echo --- copying FDS documentation ---
 echo.
 
-CALL :COPY  "%svn_root%\webpages\FDS_Release_Notes.htm"  %out_guides%\FDS_Release_Notes.htm
+CALL :COPY  "%repo_root%\webpages\FDS_Release_Notes.htm" %out_guides%\FDS_Release_Notes.htm
 CALL :COPY  %in_pdf%\FDS_Config_Management_Plan.pdf      %out_guides%\.
 CALL :COPY  %in_pdf%\FDS_User_Guide.pdf                  %out_guides%\.
 CALL :COPY  %in_pdf%\FDS_Technical_Reference_Guide.pdf   %out_guides%\.
@@ -198,7 +212,7 @@ echo.
 echo --- copying startup shortcuts ---
 echo.
  
-CALL :COPY "%svn_root%\webpages\smv_readme.html"       "%out_guides%\Smokeview_release_notes.html"
+CALL :COPY "%repo_root%\webpages\smv_readme.html"      "%out_guides%\Smokeview_release_notes.html"
 CALL :COPY "%fds_forbundle%\Overview.html"             "%out_doc%\Overview.html"
 CALL :COPY "%fds_forbundle%\FDS_Web_Site.url"          "%out_web%\Official_Web_Site.url"
 
@@ -211,26 +225,26 @@ set RUNTFDS=call %copyFDScases%
 set RUNCFAST=call %copyCFASTcases%
 
 cd %fds_examples%
-%svn_root%\smv\Build\sh2bat\intel_win_64\sh2bat %fds_casessh% %fds_casesbat%
+%repo_root%\smv\Build\sh2bat\intel_win_64\sh2bat %fds_casessh% %fds_casesbat%
 call %fds_casesbat%>Nul
 
 cd %smv_examples%
-%svn_root%\smv\Build\sh2bat\intel_win_64\sh2bat %smv_casessh% %smv_casesbat%
+%repo_root%\smv\Build\sh2bat\intel_win_64\sh2bat %smv_casessh% %smv_casesbat%
 call %smv_casesbat%>Nul
-%svn_root%\smv\Build\sh2bat\intel_win_64\sh2bat %wui_casessh% %wui_casesbat%
+%repo_root%\smv\Build\sh2bat\intel_win_64\sh2bat %wui_casessh% %wui_casesbat%
 call %wui_casesbat%>Nul
 
 echo.
 echo --- copying scripts that finalize installation ---
 echo.
 
-CALL :COPY  "%fds_forbundle%\setup_fds_firewall.bat"                              "%out_bundle%\%fdsversion%\setup_fds_firewall.bat"
-CALL :COPY  "%in_shortcut%\shortcut.exe"                                          "%out_bundle%\%fdsversion%\shortcut.exe"
+CALL :COPY  "%fds_forbundle%\setup_fds_firewall.bat" "%out_bundle%\%fdsversion%\setup_fds_firewall.bat"
+CALL :COPY  "%in_shortcut%\shortcut.exe"             "%out_bundle%\%fdsversion%\shortcut.exe"
 
 echo.
 echo --- compressing distribution ---
 
-cd %uploads%
+cd %upload_dir%
 if exist %basename%.zip erase %basename%.zip
 
 cd %out_bundle%\..
@@ -241,13 +255,13 @@ wzzip -a -r -xExamples\*.csv -P ..\%basename%.zip firemodels > Nul
 echo.
 echo --- creating installer ---
 
-cd %uploads%
+cd %upload_dir%
 echo Press Setup to begin installation. > %fds_forbundle%\main.txt
 if exist %basename%.exe erase %basename%.exe
 
 wzipse32 %basename%.zip -setup -auto -i %fds_forbundle%\icon.ico -t %fds_forbundle%\unpack.txt -runasadmin -a %fds_forbundle%\about.txt -st"FDS %fds_version% Smokeview %smv_version% Setup" -o -c cmd /k firemodels\setup.bat
 
-%hashfile% %basename%.exe   >>  %uploads%\%basename%.sha1
+%hashfile% %basename%.exe   >>  %upload_dir%\%basename%.sha1
 
 echo.
 echo --- installer built ---
