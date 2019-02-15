@@ -24,15 +24,21 @@ call %envfile%
 echo.
 
 if "%platform%" == "windows" (
+  echo.
+  echo *** windows
   cd %svn_root%\bot\Bundle\fds\scripts
   call copy_apps %program%
   goto eof
 )
 if "%platform%" == "linux" (
+  echo.
+  echo *** linux
   plink %linux_logon% %linux_svn_root%/smv/scripts/run_command.sh bot/Bundle/fds/scripts copy_apps.sh %program%
   goto eof
 )
 if "%platform%" == "osx" (
+  echo.
+  echo *** osx
   plink %osx_logon% %linux_svn_root%/smv/scripts/run_command.sh bot/Bundle/fds/scripts copy_apps.sh %program%
   goto eof
 )
