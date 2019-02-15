@@ -6,7 +6,7 @@ FDS_DIR=$HOME/.bundle/BUNDLE/fds
 
 # determine directory repos reside under
 
-scriptdir=`dirname "$(readlink -f "$0")"`
+scriptdir=`dirname "$(readlink "$0")"`
 curdir=`pwd`
 cd $scriptdir/../../../..
 REPO_ROOT=`pwd`
