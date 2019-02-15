@@ -1,8 +1,17 @@
 #!/bin/bash
+fds_version=$1
+smv_verion=$2
+MPI_VERSION=$3
 
 GUIDE_DIR=$HOME/.bundle/pubs
 SMV_DIR=$HOME/.bundle/BUNDLE/smv
 FDS_DIR=$HOME/.bundle/BUNDLE/fds
+
+if [ "`uname`" == "Darwin" ] ; then
+  bundlebase=${fds_version}-${smv_version}_osx64
+else
+  bundlebase=${fds_version}-${smv_version}_linux64
+fi
 
 # determine directory repos reside under
 
