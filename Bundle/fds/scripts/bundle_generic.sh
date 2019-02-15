@@ -12,6 +12,13 @@ cd $scriptdir/../../../..
 REPO_ROOT=`pwd`
 cd $curdir
 
+# upload directory
+
+upload_dir=$HOME/.bundle/uploads
+if [ ! -e $upload_dir ]; then
+  mkdir $upload_dir
+fi
+
 
 INSTALLDIR=FDS/FDS6
 
@@ -198,7 +205,6 @@ fi
 
 
 smvscriptdir=$REPO_ROOT/smv/scripts
-uploaddir=$HOME/.bundle/uploads
 bundledir=$bundlebase
 webpagesdir=$REPO_ROOT/webpages
 fds_bundle=$REPO_ROOT/bot/Bundle/fds/for_bundle
@@ -215,7 +221,7 @@ copycfastcase=$REPO_ROOT/fds/Utilities/Scripts/copycfastcase.sh
 FDSExamplesDirectory=$REPO_ROOT/fds/Verification
 SMVExamplesDirectory=$REPO_ROOT/smv/Verification
 
-cd $uploaddir
+cd $upload_dir
 rm -rf $bundlebase
 mkdir $bundledir
 mkdir $bundledir/bin
@@ -317,7 +323,7 @@ CP $webpagesdir smv_readme.html       $bundledir/Documentation SMV_Release_Notes
 
 # CP2 $fds_bundle readme_examples.html $bundledir/Examples
 
-export OUTDIR=$uploaddir/$bundledir/Examples
+export OUTDIR=$upload_dir/$bundledir/Examples
 export QFDS=$copyfdscase
 export RUNTFDS=$copyfdscase
 export RUNCFAST=$copycfastcase
@@ -338,9 +344,9 @@ cd $curdir
 echo ""
 echo "--- building archive ---"
 echo ""
-rm -rf $uploaddir/$bundlebase.tar
-rm -rf $uploaddir/$bundlebase.tar.gz
-cd $uploaddir/$bundlebase
+rm -rf $upload_dir/$bundlebase.tar
+rm -rf $upload_dir/$bundlebase.tar.gz
+cd $upload_dir/$bundlebase
 tar cf ../$bundlebase.tar --exclude='*.csv' .
 echo Compressing archive
 gzip    ../$bundlebase.tar
