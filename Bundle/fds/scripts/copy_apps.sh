@@ -1,5 +1,5 @@
 #!/bin/bash
-option=$1
+bot_type=$1
 
 #---------------------------------------------
 #                   MKDIR
@@ -54,10 +54,10 @@ fi
 copyfds=1
 copysmv=1
 
-if [ "$option" == "smv" ]; then
+if [ "$bot_type" == "smv" ]; then
   copyfds=
 fi
-if [ "$option" == "fds" ]; then
+if [ "$bot_type" == "fds" ]; then
   copysmv=
 fi
 scriptdir=`dirname "$(readlink "$0")"`

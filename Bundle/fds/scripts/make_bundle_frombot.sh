@@ -1,14 +1,16 @@
 #!/bin/bash
-option=$1
+export NOPAUSE=1
+args=$0
+DIR=$(dirname "${args}")
+cd $DIR
+
+source ./GET_ENV.sh bot
 
 BUNDLE_HOME=$HOME/.bundle
 
 mkdir -p $BUNDLE_HOME/pubs
 mkdir -p $BUNDLE_HOME/BUNDLE
 mkdir -p $BUNDLE_HOME/OPENMPI
-
-# this script is run from a script in bot/Bundle/fds/linux or
-# bot/Bundle/fds/osx
 
 if [ -e $BUNDLE_HOME/FDS_SMV_ENV.sh ]; then
   source $BUNDLE_HOME/FDS_SMV_ENV.sh
@@ -27,5 +29,14 @@ cd $repo_root/smv
 export smv_version=`git describe --long --dirty`
 cd $curdir
 
-../scripts/CHECK_VARS.sh
+# get apps
+
+# get pubs
+
+./get_pubs.sh firebot  $firebothome/.firebot/pubs   $linux_hostname
+./get_pubs.sh smokebot $smokebothome/.smokebot/pubs $linux_hostname
+
+# build bundle
+
+./bundle_generic.sh    $fds_version $smv_version $linux_mpi_version
 
