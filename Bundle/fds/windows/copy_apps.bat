@@ -5,8 +5,8 @@ set option=%1
 set copyfds=1
 set copysmv=1
 
-if "x%option%" == "xsmv" set copyfds=
-if "x%option%" == "xfds" set copysmv=
+if "x%option%" == "xsmokebot" set copyfds=
+if "x%option%" == "xfirebot" set copysmv=
 
 set scriptdir=%~dp0
 set curdir=%CD%
