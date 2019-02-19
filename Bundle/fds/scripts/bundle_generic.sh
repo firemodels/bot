@@ -299,6 +299,7 @@ CP $smv_bundle objects.svo      $bundledir/bin objects.svo
 if [ "$MPI_VERSION" == "INTEL" ]; then
   UNTAR $HOME/fire-notes/INSTALL/LIBS/RUNTIME/MPI_INTEL19U1 INTEL19u1linux.tar.gz $bundledir/bin INTEL
 else
+  OPENMPI_DIR=$HOME/.bundle/OPENMPI
   CP $OPENMPI_DIR $openmpifile  $bundledir/bin $openmpifile
 fi
 
