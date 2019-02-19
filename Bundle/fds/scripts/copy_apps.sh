@@ -54,12 +54,15 @@ fi
 copyfds=1
 copysmv=1
 
-if [ "$bot_type" == "smv" ]; then
+if [ "$bot_type" == "smokebot" ]; then
   copyfds=
 fi
-if [ "$bot_type" == "fds" ]; then
+if [ "$bot_type" == "firebot" ]; then
   copysmv=
 fi
+
+# get repo root name
+
 scriptdir=`dirname "$(readlink "$0")"`
 curdir=`pwd`
 cd $scriptdir/../../../..
@@ -75,6 +78,8 @@ TODIR=$HOME/.bundle/BUNDLE
 if [ "$copysmv" == "1" ]; then
   MKDIR $TODIR/smv
   rm -f $TODIR/smv/*
+  echo
+  echo ***copying smokeview  apps
   CP $smvrepo/Build/background/intel$OS background   $TODIR/smv background
   CP $smvrepo/Build/dem2fds/intel$OS    dem2fds$OS   $TODIR/smv dem2fds
   CP $smvrepo/Build/hashfile/intel$OS   hashfile$OS  $TODIR/smv hashfile
@@ -87,6 +92,8 @@ fi
 # copy fds files
 
 if [ "$copyfds" == "1" ]; then
+  echo
+  echo ***copying fds apps
   MKDIR $TODIR/fds
   rm -f $TODIR/fds/*
   CP $fdsrepo/Build/${MPI}_intel$OS               fds_${MPI}_intel$OS $TODIR/fds fds

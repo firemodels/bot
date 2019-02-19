@@ -3,27 +3,40 @@ bot_type=$1
 pdf_from=$2
 bot_host=$3
 
+#---------------------------------------------
+#                   CP
+#---------------------------------------------
+
+CP ()
+{
+  local FROMFILE=$1
+  if [[ "$bot_host" != "" ]] && [[ "$bot_host" != "`hostname`" ]]; then
+    scp $bot_host:$pdf_from/$FROMFILE $pdf_to/.
+    echo $FROMFILE copied to $pdf_to
+  else
+    cp $pdf_from/$FROMFILE $pdf_to/.
+  fi
+  echo $FROMFILE copied to $pdf_to
+}
+
 pdf_to=$HOME/.bundle/pubs
 
 mkdir -p $pdf_to
 
-COPY="cp "
-if [ "$bot_host" != "" ]; then
-  if [ "$bot_host" != "`uname`" ]; then
-    COPY="scp $bot_host:"
-  fi
-fi
-
 if [ "$bot_type" == "firebot" ]; then
-  ${COPY}$pdf_from/FDS_Config_Management_Plan.pdf    $pdf_to/.
-  ${COPY}$pdf_from/FDS_Technical_Reference_Guide.pdf $pdf_to/.
-  ${COPY}$pdf_from/FDS_User_Guide.pdf                $pdf_to/.
-  ${COPY}$pdf_from/FDS_Validation_Guide.pdf          $pdf_to/.
-  ${COPY}$pdf_from/FDS_Verification_Guide.pdf        $pdf_to/.
+  echo
+  echo ***copying fds pubs
+  CP FDS_Config_Management_Plan.pdf
+  CP FDS_Technical_Reference_Guide.pdf
+  CP FDS_User_Guide.pdf
+  CP FDS_Validation_Guide.pdf
+  CP FDS_Verification_Guide.pdf
 fi
 
 if [ "$bot_type" == "smokebot" ]; then
-  ${COPY}$pdf_from/SMV_Technical_Reference_Guide.pdf $pdf_to/.
-  ${COPY}$pdf_from/SMV_User_Guide.pdf                $pdf_to/.
-  ${COPY}$pdf_from/SMV_Verification_Guide.pdf        $pdf_to/.
+  echo
+  echo ***copying smokeview pubs
+  CP SMV_Technical_Reference_Guide.pdf
+  CP SMV_User_Guide.pdf
+  CP SMV_Verification_Guide.pdf
 fi
