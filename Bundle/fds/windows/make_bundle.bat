@@ -9,7 +9,6 @@ set smvversion=%SMVEDITION%
 :: get git root directory
 
 set scriptdir=%~dp0
-echo scriptdir=%scriptdir%
 set curdir=%CD%
 cd %scriptdir%\..\..\..\..
 set repo_root=%CD%
@@ -111,7 +110,7 @@ echo --- filling distribution directory ---
 echo.
 
 
-copy %smv_forbundle%\*.po                                                     %out_bin%\.>Nul
+copy %smv_forbundle%\*.po                   %out_bin%\.>Nul
 
 CALL :COPY  %bundle_dir%\fds\fds.exe        %out_bin%\fds.exe
 CALL :COPY  %bundle_dir%\fds\fds2ascii.exe  %out_bin%\fds2ascii.exe
@@ -268,7 +267,7 @@ echo --- installer built ---
 
 cd %CURDIR%>Nul
 
-GOTO :EOF
+GOTO EOF
 
 :COPY
 set label=%~n1%~x1
@@ -285,3 +284,5 @@ IF EXIST %infile% (
    pause
 )
 exit /b
+
+:EOF
