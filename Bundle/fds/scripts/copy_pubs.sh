@@ -10,13 +10,17 @@ bot_host=$3
 CP ()
 {
   local FROMFILE=$1
+  rm -f $pdf_to/$FROMFILE
   if [[ "$bot_host" != "" ]] && [[ "$bot_host" != "`hostname`" ]]; then
-    scp $bot_host:$pdf_from/$FROMFILE $pdf_to/.
-    echo $FROMFILE copied to $pdf_to
+    scp -q $bot_host:$pdf_from/$FROMFILE $pdf_to/.
   else
     cp $pdf_from/$FROMFILE $pdf_to/.
   fi
-  echo $FROMFILE copied to $pdf_to
+  if [ -e $pdf_to/$FROMFILE ]; then
+    echo $FROMFILE copied to $pdf_to
+  else
+    echo ***error: $FROMFILE failed to copy to $pdf_to
+  fi
 }
 
 pdf_to=$HOME/.bundle/pubs
