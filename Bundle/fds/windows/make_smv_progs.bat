@@ -26,7 +26,7 @@ echo "bundle complete"
 
 cd %CURDIR%
 
-goto :eof
+goto eof
 
 :: -------------------------------------------------------------
  :BUILDFDS
