@@ -18,6 +18,7 @@ echo "-F - skip figure generation and build document stages"
 echo "-i - use installed version of smokeview"
 echo "-I - use development version of fds"
 echo "-J - use Intel MPI version fds"
+echo "-O - use OpenMPI version fds"
 echo "-L - firebot lite,  run only stages that build a debug fds and run cases with it"
 echo "                    (no release fds, no release cases, no matlab, etc)"
 if [ "$EMAIL" != "" ]; then
@@ -141,9 +142,12 @@ if [ $notfound -eq 1 ] ; then
   QUEUE=none
 fi
 
+INTEL=
 platform="linux"
 if [ "`uname`" == "Darwin" ] ; then
   platform="osx"
+else
+  INTEL="-J"
 fi
 
 #*** define initial values
@@ -166,7 +170,6 @@ export PREFIX=FB_
 ECHO=
 debug_mode=
 DV=
-INTEL=
 REMOVE_PID=
 QUEUEBENCH=
 CLONE_REPOS=
@@ -219,6 +222,9 @@ case $OPTION  in
    ;;
   m)
    EMAIL="$OPTARG"
+   ;;
+  O)
+   INTEL=
    ;;
   q)
    QUEUE="$OPTARG"
