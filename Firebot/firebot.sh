@@ -1618,6 +1618,7 @@ if [ "QUEUE" == "none" ]; then
 fi
 
 UploadGuides=$botrepo/Firebot/fds_guides2GD.sh
+COPY_APPS=$botrepo/Firebot/copy_apps.sh
 
 echo ""
 echo "Settings"
@@ -1724,6 +1725,8 @@ fi
 ### Stage 3c ###
   compile_smv
   check_compile_smv
+
+  $COPY_APPS >& $OUTPUT_DIR/stage3d
 fi
 
 ### Stage 4 ###
