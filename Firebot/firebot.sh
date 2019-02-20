@@ -1254,6 +1254,7 @@ email_build_status()
 
    bottype=${1}
    botuser=${1}@$hostname
+   firebot_status=1
    
    stop_time=`date`
    echo "" > $TIME_LOG
@@ -1326,6 +1327,7 @@ fi
       cd $firebotdir
 
       # Send success message with links to nightly manuals
+      firebot_status=0
       cat $TIME_LOG | mail -s "[$botuser] $bottype success! Version: ${GIT_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
    fi
 
@@ -1794,7 +1796,8 @@ fi
 ### Wrap up and report results ###
 set_files_world_readable
 save_build_status
-if [ "$FIREBOT_LITE" == "" ]; then
+if [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
   archive_timing_stats
 fi
 email_build_status 'Firebot'
+exit $firebot_status

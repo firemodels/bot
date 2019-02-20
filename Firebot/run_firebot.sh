@@ -344,7 +344,10 @@ fi
 BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
+firebot_status=0
 $ECHO  ./$botscript -p $firebot_pid $UPDATE $DV $INTEL $debug_mode $BUILD_ONLY $BRANCH $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUEBENCH $QUEUE $SKIPMATLAB $SKIPFIGURES $CLONE_REPOS $EMAIL "$@"
+firebot_status=$?
 if [ -e $firebot_pid ]; then
   rm -f $firebot_pid
 fi
+exit $firebot_status
