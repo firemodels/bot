@@ -1,14 +1,9 @@
 #!/bin/bash
+FDSEDITION=FDS6
+
 platform="linux"
 if [ "`uname`" == "Darwin" ]; then
   platform="osx"
-fi
-
-if [ -e scripts/GET_ENV.sh ]; then
-  CURDIR=`pwd`
-  cd $platform
-  source ../scripts/GET_ENV.sh
-  cd $CURDIR
 fi
 
 if [ "$fds_version" == "" ]; then
@@ -16,9 +11,6 @@ if [ "$fds_version" == "" ]; then
 fi
 if [ "$smv_version" == "" ]; then
   smv_version=SMV6.x.y
-fi
-if [ "$FDSEDITION" == "" ]; then
-  FDSEDITION=FDS6
 fi
 
 #---------------------------------------------
@@ -59,6 +51,7 @@ case $OPTION in
   ;;
   h)
   usage;
+  exit
   ;;
   s)
   smv_version=$OPTION
@@ -68,7 +61,7 @@ done
 shift $(($OPTIND-1))
 
 CURDIR=`pwd`
-cd $platform
+cd $scripts
 
 echo making bundle for $platform
 
@@ -76,19 +69,21 @@ if [ "$MAKE_BUNDLE_PARTS" == "1" ]; then
   echo -------------------------------------------------
   echo -------------building fds------------------------
   echo -------------------------------------------------
-  ./make_fds.sh
+  ./make_fds_progs.sh
+  ./copy_apps.sh firebot
   echo -------------------------------------------------
   echo --- building smokeview and associated programs --
   echo -------------------------------------------------
-  ./make_smv.sh
+  ./make_smv_progs.sh
+  ./copy_apps.sh smokebot
   echo -------------------------------------------------
   echo -------getting fds pubs -------------------------
   echo -------------------------------------------------
-  ./get_fds_pubs.sh
+  ./copy_pubs.sh firebot /home2/smokevis2/firebot blaze.el.nist.gov
   echo -------------------------------------------------
   echo -------getting smokeview pubs -------------------
   echo -------------------------------------------------
-  ./get_smv_pubs.sh
+  ./copy_pubs.sh firebot /home2/smokevis2/smokebot blaze.el.nist.gov
 fi
 echo -------------------------------------------------
 echo ------- making the bundle script -----------------------
