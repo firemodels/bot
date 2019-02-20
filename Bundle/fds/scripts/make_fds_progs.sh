@@ -13,19 +13,19 @@ echo
 CURDIR=`pwd`
 
 cd ../../../../fds/Build/${MPI}_intel_${platform}_64
-git clean -dxf
+git clean -dxf >& /dev/null
 echo "*** building FDS" 
-./make_fds.sh
+#./make_fds.sh >& /dev/null
 
 echo "*** building fds2ascii"
 cd ../../Utilities/fds2ascii/intel_${platform}_64
-git clean -dxf
-./make_fds2ascii.sh
+git clean -dxf >& /dev/null
+./make_fds2ascii.sh >& /dev/null
 
-echo "***building test_mpi"
+echo "*** building test_mpi"
 cd ../../../Utilities/test_mpi/${MPI}_intel_${platform}
-git clean -dxf
-./make_test_mpi.sh
+git clean -dxf >& /dev/null
+./make_test_mpi.sh >& /dev/null
 
 echo "*** fds builds complete"
 
