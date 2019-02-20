@@ -1,4 +1,4 @@
-#!/bin/bash
+ #!/bin/bash
 
 # The Firebot script is part of an automated continuous integration system.
 # Consult the FDS Config Management Plan for more information.
@@ -11,7 +11,7 @@ function usage_all {
 echo ""
 echo "Miscellaneous:"
 echo "-b - use the current branch"
-echo "-B - use startup files to set the environment, not modules"
+echo "-B - only build apps"
 echo "-q queue - specify queue [default: $QUEUE]"
 echo "-f - force firebot run"
 echo "-F - skip figure generation and build document stages"
@@ -27,6 +27,7 @@ else
 fi
 echo "-R - remove run status file"
 echo "-s - skip matlab and build document stages"
+echo "-S - use startup files to set the environment, not modules"
 echo "-U - upload guides (only by user firebot)"
 echo "-W - clone fds, exp, fig, out and smv repos"
 }
@@ -169,18 +170,19 @@ INTEL=
 REMOVE_PID=
 QUEUEBENCH=
 CLONE_REPOS=
+BUILD_ONLY=
 export QFDS_STARTUP=
 
 #*** parse command line options
 
-while getopts 'bBcdFfHhIiJkLm:q:Q:nRsuUvW' OPTION
+while getopts 'bBcdFfHhIiJkLm:q:Q:nRSsuUvW' OPTION
 do
 case $OPTION  in
   b)
    BRANCH=current
    ;;
   B)
-    export QFDS_STARTUP=1
+   BUILD_ONLY="-B"
    ;;
   c)
    CLEANREPO=1
@@ -232,6 +234,9 @@ case $OPTION  in
    ;;
   s)
    SKIPMATLAB=-s
+   ;;
+  S)
+    export QFDS_STARTUP=1
    ;;
   u)
    UPDATEREPO=1
@@ -333,7 +338,7 @@ fi
 BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
-$ECHO  ./$botscript -p $firebot_pid $UPDATE $DV $INTEL $debug_mode $BRANCH $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUEBENCH $QUEUE $SKIPMATLAB $SKIPFIGURES $CLONE_REPOS $EMAIL "$@"
+$ECHO  ./$botscript -p $firebot_pid $UPDATE $DV $INTEL $debug_mode $BUILD_ONLY $BRANCH $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUEBENCH $QUEUE $SKIPMATLAB $SKIPFIGURES $CLONE_REPOS $EMAIL "$@"
 if [ -e $firebot_pid ]; then
   rm -f $firebot_pid
 fi

@@ -12,6 +12,7 @@ echo "Verification and validation testing script for FDS"
 echo ""
 echo "Options"
 echo "-b - branch_name - run firebot using branch branch_name"
+echo "-B - only build apps"
 echo "-c - clean repo"
 echo "-F - skip figures and document building stages"
 echo "-h - display this message"
@@ -1378,6 +1379,7 @@ FDSBRANCH=master
 SMVBRANCH=master
 BOTBRANCH=master
 BRANCH=master
+BUILD_ONLY=
 
 #*** determine platform
 
@@ -1424,7 +1426,7 @@ CLONE_REPOS=
 
 #*** parse command line arguments
 
-while getopts 'b:cdFhIiJLm:p:q:Q:suUW' OPTION
+while getopts 'b:BcdFhIiJLm:p:q:Q:suUW' OPTION
 do
 case $OPTION in
   b)
@@ -1432,6 +1434,10 @@ case $OPTION in
    FDSBRANCH=$BRANCH
    SMVBRANCH=$BRANCH
    BOTBRANCH=$BRANCH
+   ;;
+  B)
+   BUILD_ONLY=1
+   FIREBOT_LITE=
    ;;
   c)
    CLEANREPO=1
@@ -1687,11 +1693,13 @@ echo "   FDS"
 #fi
 
 ### Stage 2b ###
-compile_fds_mpi_db
-check_compile_fds_mpi_db
+if [ "$BUILD_ONLY" == "" ]; then
+  compile_fds_mpi_db
+  check_compile_fds_mpi_db
+fi
 
 ### Stage 2d ###
-if [ "$OPENMPI_GNU" != "" ]; then
+if [[ "$OPENMPI_GNU" != "" ]] && [[ "$BUILD_ONLY" == "" ]] ; then
   compile_fds_mpi_gnu_db
   check_compile_fds_mpi_gnu_db
 fi
@@ -1706,8 +1714,10 @@ if [ "$FIREBOT_LITE" == "" ]; then
   check_smv_utilities
 
 ### Stage 3b ###
+if [ "$BUILD_ONLY" == "" ]; then
   compile_smv_db
   check_compile_smv_db
+fi
 
 ### Stage 3c ###
   compile_smv
@@ -1717,12 +1727,12 @@ fi
 ### Stage 4 ###
 
 # Depends on successful FDS debug compile
-if [[ $FDS_debug_success ]] ; then
+if [[ $FDS_debug_success ]] && [[ "$BUILD_ONLY" == "" ]]; then
    run_verification_cases_debug
    check_cases_debug $fdsrepo/Verification 'verification'
 fi
 
-if [ "$FIREBOT_LITE" == "" ]; then
+if [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
 # clean debug stage
   cd $fdsrepo
   if [[ "$CLEANREPO" == "1" ]] ; then
