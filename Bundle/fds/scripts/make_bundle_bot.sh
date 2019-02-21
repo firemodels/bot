@@ -121,7 +121,7 @@ if [ "$build_apps" == "1" ]; then
 
 # build fds and smv apps
   cd $repo_root/bot/Firebot
-  ./run_firebot.sh -c -B
+  ./run_firebot.sh -c -b -B
   error_status=$?
 
   if [ "$GET_BOT_REVISION" == "1" ]; then
