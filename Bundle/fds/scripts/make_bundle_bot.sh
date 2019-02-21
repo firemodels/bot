@@ -1,8 +1,9 @@
 #!/bin/bash
-bot_host=$1
-firebot_home=$2
-smokebot_home=$3
-mpi_version=$4
+build_apps=$1
+bot_host=$2
+firebot_home=$3
+smokebot_home=$4
+mpi_version=$5
 
 #---------------------------------------------
 #                   SETENV
@@ -46,19 +47,25 @@ curdir=`pwd`
 cd $scriptdir/../../../..
 repo_root=`pwd`
 
+if [ "$build_apps" == "1" ]; then
+  cd $repo_root/bot/Firebot
+  ./run_firebot.sh -c -u -B
+fi
+
 cd $repo_root/fds
 export fds_version=`git describe --long --dirty`
 cd $repo_root/smv
 export smv_version=`git describe --long --dirty`
 cd $curdir
 
-# copy apps from fds/smv repo to $HOME/.bundle/apps
+# copy apps from fds/smv repo to $HOME/.bundle/fds and $HOME/.bundle/smv
 
-./copy_apps.sh firebot
-./copy_apps.sh smokebot
+cd $repo_root/bot/Firebot
+./copy_apps.sh
 
 # copy pubs from the firebot/smokebot account to $HOME/.bundle/pubs
 
+cd $curdir
 ./copy_pubs.sh firebot  $firebot_home/.firebot/pubs   $bot_host
 ./copy_pubs.sh smokebot $smokebot_home/.smokebot/pubs $bot_host
 
