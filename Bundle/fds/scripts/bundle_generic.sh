@@ -4,8 +4,8 @@ smv_verion=$2
 MPI_VERSION=$3
 
 GUIDE_DIR=$HOME/.bundle/pubs
-SMV_DIR=$HOME/.bundle/BUNDLE/smv
-FDS_DIR=$HOME/.bundle/BUNDLE/fds
+SMV_DIR=$HOME/.bundle/smv
+FDS_DIR=$HOME/.bundle/fds
 
 if [ "`uname`" == "Darwin" ] ; then
   bundlebase=${fds_version}-${smv_version}_osx64

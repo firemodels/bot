@@ -60,7 +60,7 @@ fdsrepo=$repo_root/fds
 smvrepo=$repo_root/smv
 cd $scriptdir
 
-TODIR=$HOME/.firebot
+TODIR=$HOME/.bundle
 
 # copy smokeview files
 
