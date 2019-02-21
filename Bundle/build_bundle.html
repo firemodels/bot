@@ -18,9 +18,6 @@ function run_script(script){
 function bundle_fdssmv(platform){
   MyObject.Run(get_fullpath("../../bot/Bundle/fds/scripts/webBUNDLEfdssmv.bat ",platform));
 }
-function upload_settings(platform){
-  MyObject.Run(get_fullpath("../../bot/Bundle/fds/scripts/upload_settings.bat ",platform));
-}
 function install_fdssmv(platform){
   MyObject.Run(get_fullpath("../../bot/Bundle/fds/scripts/webINSTALLfdssmv.bat ",platform));
 }
@@ -67,11 +64,9 @@ function clean_upload(platform,prog){
 <tr>
 <td align=center><button onclick="bundle_fdssmv('windows')">Bundle</button></td>
 <td align=center>
-<button onclick="upload_settings('linux')">Upload Settings</button><br>
 <button onclick="bundle_fdssmv('linux')">Bundle</button>
 </td>
 <td align=center>
-<button onclick="upload_settings('osx')">Upload Settings</button><br>
 <button onclick="bundle_fdssmv('osx')">Bundle</button>
 </td>
 </tr>
