@@ -1,9 +1,4 @@
 #!/bin/bash
-build_apps=$1
-bot_host=$2
-firebot_home=$3
-smokebot_home=$4
-mpi_version=$5
 
 #---------------------------------------------
 #                   SETENV
@@ -16,20 +11,89 @@ SETENV ()
 
   if [ "\$$bashvar" != "" ]; then
     eval $var=\$$bashvar
-  else
-    echo ***error: the environment variable $bashvar does not exist
-    echo "         it needs to be defined in your startup file"
   fi
 }
 
 # define variables in startup file if not passed into this script
 
-if [ "$bot_host" == "" ]; then
-  SETENV bot_host      BOT_HOST
-  SETENV firebot_home  FIREBOT_HOME
-  SETENV smokebot_home SMOKEBOT_HOME
-  SETENV mpi_version   MPI_VERSION
-fi
+build_apps=
+GET_BOT_REVISION=
+SETENV bot_host      BOT_HOST
+SETENV firebot_home  FIREBOT_HOME
+SETENV smokebot_home SMOKEBOT_HOME
+SETENV mpi_version   MPI_VERSION
+
+#---------------------------------------------
+#                   DEFAULT
+#---------------------------------------------
+
+function DEFAULT {
+  arg=$1
+  DEF=
+  if [ "$arg" != "" ]; then
+    DEF="[default: $arg]"
+  fi
+}
+
+
+#---------------------------------------------
+#                   usage
+#---------------------------------------------
+
+function usage {
+echo "make_bundle_bot.sh [options]"
+echo "   Build a bundle using documents built by firebot and smokebot"
+echo "   and applications built in the fds and smv repos"
+echo ""
+echo "Options:"
+echo "-B - build fds and smokeview apps"
+
+DEFAULT $bot_host
+echo "-b - host where firebot and smokebot are located $DEF"
+
+DEFAULT $firebot_home
+echo "-f - firebot home directory $DEF"
+
+echo "-h - display this message"
+
+DEFAULT $mpi_version
+echo "-m - mpi type (INTEL or openmpi version number) $DEF"
+
+echo "-r - build bundle using fds and smv revision of last firebot pass"
+DEFAULT $smokebot_home
+echo "-s - smokebot home directory $DEF"
+exit
+}
+
+#*** parse command line options
+
+while getopts 'b:Bf:hm:rs:' OPTION
+do
+case $OPTION  in
+  b)
+   bot_host=$OPTARG
+   ;;
+  B)
+   build_apps=1
+   ;;
+  f)
+   firebot_home=$OPTARG
+   ;;
+  h)
+   usage;
+   ;;
+  m)
+   mpi_version=$OPTARG
+   ;;
+  r)
+   GET_BOT_REVISION=1
+   ;;
+  s)
+   smokebot_home=$OPTARG
+   ;;
+esac
+done
+shift $(($OPTIND-1))
 
 export NOPAUSE=1
 args=$0
@@ -48,8 +112,23 @@ cd $scriptdir/../../../..
 repo_root=`pwd`
 
 if [ "$build_apps" == "1" ]; then
+
+# set revision in fds and smv repos to last one passed in firebot
+  if [ "$GET_BOT_REVISION" == "1" ]; then
+    cd $repo_root/bot/Bundle/fds/scripts
+    ./set_firebot_revisions -f $firebot_home -s
+  fi
+
+# build fds and smv apps
   cd $repo_root/bot/Firebot
-  ./run_firebot.sh -c -u -B
+  ./run_firebot.sh -c -B
+  error_status=$?
+
+  if [ "$GET_BOT_REVISION" == "1" ]; then
+# set revision in fds and smv repos back to master
+    cd $repo_root/bot/Bundle/fds/scripts
+    ./set_firebot_revisions
+  fi
 fi
 
 cd $repo_root/fds
