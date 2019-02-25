@@ -14,6 +14,39 @@ SETENV ()
   fi
 }
 
+#---------------------------------------------
+#                   DEFAULT
+#---------------------------------------------
+
+function DEFAULT {
+  arg=$1
+  DEF=
+  if [ "$arg" != "" ]; then
+    DEF="[default: $arg]"
+  fi
+}
+
+
+#---------------------------------------------
+#                   usage
+#---------------------------------------------
+
+usage ()
+{
+echo "set_firebot_revision.sh [options]"
+echo "   set fds and smv repo revisiokns"
+echo ""
+echo "Options:"
+DEFAULT $bot_host
+echo "-b - set hostname where firebot is run $DEF"
+DEFAULT $firebot_home
+echo "-f - set firebot home directory $DEF"
+echo "-h - displah this message"
+DEFAULT $smokebot_home
+echo "-s - set smokebot home directory $DEF"
+exit
+}
+
 # define variables in startup file if not passed into this script
 
 build_apps=
@@ -26,7 +59,7 @@ SETENV mpi_version   MPI_VERSION
 
 #*** parse command line options
 
-while getopts 'b:f:s' OPTION
+while getopts 'b:f:hs' OPTION
 do
 case $OPTION  in
   b)
@@ -34,6 +67,9 @@ case $OPTION  in
    ;;
   f)
    firebot_home=$OPTARG
+   ;;
+  h)
+   usage
    ;;
   s)
    set_branch=1
