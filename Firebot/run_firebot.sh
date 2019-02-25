@@ -1,4 +1,4 @@
- #!/bin/bash
+#!/bin/bash
 
 # The Firebot script is part of an automated continuous integration system.
 # Consult the FDS Config Management Plan for more information.
