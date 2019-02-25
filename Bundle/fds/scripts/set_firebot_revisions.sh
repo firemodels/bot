@@ -33,7 +33,7 @@ function DEFAULT {
 
 usage ()
 {
-echo "set_firebot_revision.sh [options]"
+echo "set_firebot_revisions.sh [options]"
 echo "   set fds and smv repo revisiokns"
 echo ""
 echo "Options:"
