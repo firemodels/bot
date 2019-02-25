@@ -43,7 +43,7 @@ DEFAULT $firebot_home
 echo "-f - set firebot home directory $DEF"
 echo "-h - displah this message"
 DEFAULT $smokebot_home
-echo "-s - set smokebot home directory $DEF"
+echo "-m - set fds and smv repo branches to master"
 exit
 }
 
@@ -51,7 +51,7 @@ exit
 
 build_apps=
 GET_BOT_REVISION=
-set_branch=
+set_master=
 SETENV bot_host      BOT_HOST
 SETENV firebot_home  FIREBOT_HOME
 SETENV smokebot_home SMOKEBOT_HOME
@@ -59,7 +59,7 @@ SETENV mpi_version   MPI_VERSION
 
 #*** parse command line options
 
-while getopts 'b:f:hs' OPTION
+while getopts 'b:f:hm' OPTION
 do
 case $OPTION  in
   b)
@@ -71,8 +71,8 @@ case $OPTION  in
   h)
    usage
    ;;
-  s)
-   set_branch=1
+  m)
+   set_master=1
    ;;
 esac
 done
@@ -82,7 +82,7 @@ curdir=`pwd`
 cd ../../../..
 repo_root=`pwd`
 
-if [ "$set_branch" == "" ]; then
+if [ "$set_master" == "1" ]; then
   echo setting branch in fds repo to master
   cd $repo_root/fds
   git checkout master

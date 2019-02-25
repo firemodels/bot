@@ -116,7 +116,7 @@ if [ "$build_apps" == "1" ]; then
 # set revision in fds and smv repos to last one passed in firebot
   if [ "$GET_BOT_REVISION" == "1" ]; then
     cd $repo_root/bot/Bundle/fds/scripts
-    ./set_firebot_revisions -f $firebot_home -s
+    ./set_firebot_revisions -b $bot_host -f $firebot_home 
   fi
 
 # build fds and smv apps
@@ -127,7 +127,7 @@ if [ "$build_apps" == "1" ]; then
   if [ "$GET_BOT_REVISION" == "1" ]; then
 # set revision in fds and smv repos back to master
     cd $repo_root/bot/Bundle/fds/scripts
-    ./set_firebot_revisions
+    ./set_firebot_revisions -m
   fi
 fi
 
