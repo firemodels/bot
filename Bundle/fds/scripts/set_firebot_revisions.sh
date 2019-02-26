@@ -99,23 +99,36 @@ SMV_REVISION=
 FDS_REVISION=
 
 if [ "$bot_host" == "" ]; then
+  echo "***error: bot_host is not defined:
   exit 1
 fi
 
 if [ "$firebot_home" == "" ]; then
+  echo "***error: firebot_home is not behind"
   exit 1
 fi
 
 if [ "$smokebot_home" == "" ]; then
+  echo "***error: smokebot_home is not defined"
   exit 1
 fi
 
 rm -f fds_hash
 scp -q $bot_host\:$firebot_home/.firebot/history/fds_hash fds_hash
+if [ ! -e fds_hash ]; then
+  echo "***error: fds_hash was not copied from"
+  echo "           $firebot_home/.firebot/history on $bot_host"
+  exit 1
+]
 fds_hash=`head -1 fds_hash`
 
 rm -f smv_hash
 scp -q $bot_host\:$firebot_home/.firebot/history/smv_hash smv_hash
+if [ ! -e smv_hash ]; then
+  echo "***error: smv_hash was not copied from"
+  echo "           $firebot_home/.firebot/history on $bot_host"
+  exit 1
+]
 smv_hash=`head -1 smv_hash`
 
 echo setting branch in fds repo to $fds_hash
