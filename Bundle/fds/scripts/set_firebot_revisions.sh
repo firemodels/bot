@@ -85,11 +85,11 @@ repo_root=`pwd`
 if [ "$set_master" == "1" ]; then
   echo "setting branch in fds repo to master"
   cd $repo_root/fds
-  git checkout master
+  git checkout master >& /dev/null
   
   echo "setting branch in smv repo to master"
   cd $repo_root/smv
-  git checkout master
+  git checkout master >& /dev/null
 
   cd $curdir
   exit 0
@@ -104,7 +104,7 @@ if [ "$bot_host" == "" ]; then
 fi
 
 if [ "$firebot_home" == "" ]; then
-  echo "***error: firebot_home is not behind"
+  echo "***error: firebot_home is not dehind"
   exit 1
 fi
 
@@ -133,13 +133,11 @@ smv_hash=`head -1 smv_hash`
 
 echo "setting branch in fds repo to $fds_hash"
 cd $repo_root/fds
-git checkout $fds_hash
-echo 888
+git checkout $fds_hash >& /dev/null
   
 echo "setting branch in smv repo to $smv_hash"
 cd $repo_root/smv
-git checkout $smv_hash
-echo 999
+git checkout $smv_hash >& /dev/null
 
 cd $curdir
 exit 0
