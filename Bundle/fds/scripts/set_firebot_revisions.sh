@@ -41,7 +41,7 @@ DEFAULT $bot_host
 echo "-b - set hostname where firebot is run $DEF"
 DEFAULT $firebot_home
 echo "-f - set firebot home directory $DEF"
-echo "-h - displah this message"
+echo "-h - display this message"
 DEFAULT $smokebot_home
 echo "-m - set fds and smv repo branches to master"
 exit
@@ -83,11 +83,11 @@ cd ../../../..
 repo_root=`pwd`
 
 if [ "$set_master" == "1" ]; then
-  echo setting branch in fds repo to master
+  echo "setting branch in fds repo to master"
   cd $repo_root/fds
   git checkout master
   
-  echo setting branch in smv repo to master
+  echo "setting branch in smv repo to master"
   cd $repo_root/smv
   git checkout master
 
@@ -117,27 +117,29 @@ rm -f fds_hash
 scp -q $bot_host\:$firebot_home/.firebot/history/fds_hash fds_hash
 if [ ! -e fds_hash ]; then
   echo "***error: fds_hash was not copied from"
-  echo "           $firebot_home/.firebot/history on $bot_host"
+  echo "          $firebot_home/.firebot/history on $bot_host"
   exit 1
-]
+fi
 fds_hash=`head -1 fds_hash`
 
 rm -f smv_hash
 scp -q $bot_host\:$firebot_home/.firebot/history/smv_hash smv_hash
 if [ ! -e smv_hash ]; then
   echo "***error: smv_hash was not copied from"
-  echo "           $firebot_home/.firebot/history on $bot_host"
+  echo "          $firebot_home/.firebot/history on $bot_host"
   exit 1
-]
+fi
 smv_hash=`head -1 smv_hash`
 
-echo setting branch in fds repo to $fds_hash
+echo "setting branch in fds repo to $fds_hash"
 cd $repo_root/fds
 git checkout $fds_hash
+echo 888
   
-echo setting branch in smv repo to $smv_hash
+echo "setting branch in smv repo to $smv_hash"
 cd $repo_root/smv
 git checkout $smv_hash
+echo 999
 
 cd $curdir
 exit 0
