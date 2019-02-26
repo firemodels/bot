@@ -99,7 +99,7 @@ SMV_REVISION=
 FDS_REVISION=
 
 if [ "$bot_host" == "" ]; then
-  echo "***error: bot_host is not defined:
+  echo "***error: bot_host is not defined:"
   exit 1
 fi
 
