@@ -12,6 +12,7 @@ echo "Verification and validation testing script for FDS"
 echo ""
 echo "Options"
 echo "-b - branch_name - run firebot using branch branch_name"
+echo "-B - only build apps"
 echo "-c - clean repo"
 echo "-F - skip figures and document building stages"
 echo "-h - display this message"
@@ -1238,6 +1239,8 @@ save_build_status()
    else
       echo "Build success!;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$FDSBRANCH;$STOP_TIME_INT;1;$TOTAL_FDS_TIMES;$HOST" > "$HISTORY_DIR/${GIT_REVISION}.txt"
       touch $FIREBOT_PASS
+      echo $SMVREPO_HASH > $SMVREPO_HASHFILE
+      echo $FDSREPO_HASH > $FDSREPO_HASHFILE
    fi
 }
 
@@ -1251,6 +1254,7 @@ email_build_status()
 
    bottype=${1}
    botuser=${1}@$hostname
+   firebot_status=1
    
    stop_time=`date`
    echo "" > $TIME_LOG
@@ -1323,6 +1327,7 @@ fi
       cd $firebotdir
 
       # Send success message with links to nightly manuals
+      firebot_status=0
       cat $TIME_LOG | mail -s "[$botuser] $bottype success! Version: ${GIT_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
    fi
 
@@ -1344,10 +1349,22 @@ firebotdir=`pwd`
 export SCRIPTFILES=$firebotdir/scriptfiles
 OUTPUT_DIR="$firebotdir/output"
 HISTORY_DIR="$HOME/.firebot/history"
+
 FIREBOT_PASS=$HISTORY_DIR/firebot_pass
 if [ -e $FIREBOT_PASS ]; then
   rm -f $FIREBOT_PASS
 fi
+
+SMVREPO_HASHFILE=$HISTORY_DIR/smv_hash
+if [ -e $SMVREPO_HASHFILE ]; then
+  rm -f $SMVREPO_HASHFILE
+fi
+
+FDSREPO_HASHFILE=$HISTORY_DIR/fds_hash
+if [ -e $FDSREPO_HASHFILE ]; then
+  rm -f $FDSREPO_HASHFILE
+fi
+
 TIME_LOG=$OUTPUT_DIR/timings
 ERROR_LOG=$OUTPUT_DIR/errors
 VALIDATION_ERROR_LOG=$OUTPUT_DIR/validation_errors
@@ -1364,6 +1381,7 @@ FDSBRANCH=master
 SMVBRANCH=master
 BOTBRANCH=master
 BRANCH=master
+BUILD_ONLY=
 
 #*** determine platform
 
@@ -1410,7 +1428,7 @@ CLONE_REPOS=
 
 #*** parse command line arguments
 
-while getopts 'b:cdFhIiJLm:p:q:Q:suUW' OPTION
+while getopts 'b:BcdFhIiJLm:p:q:Q:suUW' OPTION
 do
 case $OPTION in
   b)
@@ -1418,6 +1436,10 @@ case $OPTION in
    FDSBRANCH=$BRANCH
    SMVBRANCH=$BRANCH
    BOTBRANCH=$BRANCH
+   ;;
+  B)
+   BUILD_ONLY=1
+   FIREBOT_LITE=
    ;;
   c)
    CLEANREPO=1
@@ -1526,6 +1548,8 @@ if [ "$FDSBRANCH" == "current" ]; then
   cd $fdsrepo
   FDSBRANCH=`git rev-parse --abbrev-ref HEAD`
 fi
+cd $fdsrepo
+FDSREPO_HASH=`git rev-parse HEAD`
 
 
 CD_REPO $smvrepo $SMVBRANCH || exit 1
@@ -1533,6 +1557,8 @@ if [ "$SMVBRANCH" == "current" ]; then
   cd $smvrepo
   SMVBRANCH=`git rev-parse --abbrev-ref HEAD`
 fi
+cd $smvrepo
+SMVREPO_HASH=`git rev-parse HEAD`
 
 
 CD_REPO $botrepo $BOTBRANCH || exit 1
@@ -1592,6 +1618,7 @@ if [ "QUEUE" == "none" ]; then
 fi
 
 UploadGuides=$botrepo/Firebot/fds_guides2GD.sh
+COPY_APPS=$botrepo/Firebot/copy_apps.sh
 
 echo ""
 echo "Settings"
@@ -1632,10 +1659,14 @@ echo "------"
   clean_firebot_metafiles
 if [[ "$CLONE_REPOS" == "" ]]; then
   if [[ "$CLEANREPO" == "1" ]] ; then
-    clean_repo2 exp master || exit 1
+    if [ "$BUILD_ONLY" == "" ]; then
+      clean_repo2 exp master || exit 1
+    fi
     clean_repo2 fds $FDSBRANCH || exit 1
-    clean_repo2 fig master || exit 1
-    clean_repo2 out master || exit 1
+    if [ "$BUILD_ONLY" == "" ]; then
+      clean_repo2 fig master || exit 1
+      clean_repo2 out master || exit 1
+    fi 
     clean_repo2 smv $SMVBRANCH || exit 1
   fi
 fi
@@ -1669,11 +1700,13 @@ echo "   FDS"
 #fi
 
 ### Stage 2b ###
-compile_fds_mpi_db
-check_compile_fds_mpi_db
+if [ "$BUILD_ONLY" == "" ]; then
+  compile_fds_mpi_db
+  check_compile_fds_mpi_db
+fi
 
 ### Stage 2d ###
-if [ "$OPENMPI_GNU" != "" ]; then
+if [[ "$OPENMPI_GNU" != "" ]] && [[ "$BUILD_ONLY" == "" ]] ; then
   compile_fds_mpi_gnu_db
   check_compile_fds_mpi_gnu_db
 fi
@@ -1688,23 +1721,27 @@ if [ "$FIREBOT_LITE" == "" ]; then
   check_smv_utilities
 
 ### Stage 3b ###
+if [ "$BUILD_ONLY" == "" ]; then
   compile_smv_db
   check_compile_smv_db
+fi
 
 ### Stage 3c ###
   compile_smv
   check_compile_smv
+
+  $COPY_APPS >& $OUTPUT_DIR/stage3d
 fi
 
 ### Stage 4 ###
 
 # Depends on successful FDS debug compile
-if [[ $FDS_debug_success ]] ; then
+if [[ $FDS_debug_success ]] && [[ "$BUILD_ONLY" == "" ]]; then
    run_verification_cases_debug
    check_cases_debug $fdsrepo/Verification 'verification'
 fi
 
-if [ "$FIREBOT_LITE" == "" ]; then
+if [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
 # clean debug stage
   cd $fdsrepo
   if [[ "$CLEANREPO" == "1" ]] ; then
@@ -1766,7 +1803,8 @@ fi
 ### Wrap up and report results ###
 set_files_world_readable
 save_build_status
-if [ "$FIREBOT_LITE" == "" ]; then
+if [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
   archive_timing_stats
 fi
 email_build_status 'Firebot'
+exit $firebot_status

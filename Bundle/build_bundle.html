@@ -13,16 +13,19 @@ function get_fullpath(command,platform){
   return fullpath;
 }
 function run_script(script){
-  MyObject.Run(get_fullpath("../../fds/Utilities/Scripts/webRUN_script.bat ",script));
+  MyObject.Run(get_fullpath("../../bot/Bundle/fds/scripts/webRUN_script.bat ",script));
 }
 function bundle_fdssmv(platform){
   MyObject.Run(get_fullpath("../../bot/Bundle/fds/scripts/webBUNDLEfdssmv.bat ",platform));
 }
-function upload_settings(platform){
-  MyObject.Run(get_fullpath("../../bot/Bundle/fds/scripts/upload_settings.bat ",platform));
-}
 function install_fdssmv(platform){
   MyObject.Run(get_fullpath("../../bot/Bundle/fds/scripts/webINSTALLfdssmv.bat ",platform));
+}
+function copy_apps(platform,prog){
+  MyObject.Run(get_fullpath("../../bot/Bundle/fds/scripts/webCopyApps.bat ",platform));
+}
+function clean_upload(platform,prog){
+  MyObject.Run(get_fullpath("../../bot/Bundle/fds/scripts/webCleanUpload.bat ",platform));
 }
 </script>
 </HEAD>
@@ -35,16 +38,35 @@ function install_fdssmv(platform){
 
 
 <h3>Bundles</h3>
-<table border=on>
+<p><table border=on>
+<tr><th colspan=3>Copy Apps</th></tr>
+
+<tr><th>Windows</th><th>Linux</th><th>OSX</th>
+
+<tr>
+<td align=center>
+<button onclick="copy_apps('windows')">Copy</button><br>
+</td>
+<td align=center>
+<button onclick="copy_apps('linux')">Copy</button><br>
+</td>
+<td align=center>
+<button onclick="copy_apps('osx')">Copy</button><br>
+</td>
+</tr>
+
+</table>
+
+
+<p><table border=on>
+<tr><th colspan=3>Build Bundle</th></tr>
 <tr><th>Windows</th><th>Linux</th><th>OSX</th></tr>
 <tr>
 <td align=center><button onclick="bundle_fdssmv('windows')">Bundle</button></td>
 <td align=center>
-<button onclick="upload_settings('linux')">Upload Settings</button><br>
 <button onclick="bundle_fdssmv('linux')">Bundle</button>
 </td>
 <td align=center>
-<button onclick="upload_settings('osx')">Upload Settings</button><br>
 <button onclick="bundle_fdssmv('osx')">Bundle</button>
 </td>
 </tr>
@@ -55,17 +77,21 @@ function install_fdssmv(platform){
 <td align=center><button onclick="install_fdssmv('osx')">Install</button></td>
 </tr>
 <tr>
+<td align=center><button onclick="clean_upload('windows')">Clean</button></td>
+<td align=center><button onclick="clean_upload('linux')">Clean</button></td>
+<td align=center><button onclick="clean_upload('osx')">Clean</button></td>
+</tr>
+<tr>
 <td align=center colspan=3>
-<button onclick="run_script('\\bot\\Bundle\\fds\\scripts\\webCLEAN.bat')">Clean</button>
-<button onclick="run_script('\\bot\\Bundle\\fds\\windows\\webUPLOADbundles.bat')">Upload</button>
+<button onclick="run_script('\\bot\\Bundle\\fds\\scripts\\webUPLOADbundles.bat')">Upload</button>
 </td>
 </tr>
 </table>
 
 <h3>Other</h3>
 <ul>
-<li><button onclick="run_script('\\bot\\Bundle\\fds\\windows\\webEDIT_bundle.bat')">Edit this page</button>
-<li><button onclick="run_script('\\bot\\Bundle\\fds\\windows\\get_fds_release_notes.bat')">FDS wiki->html</button>
+<li><button onclick="run_script('\\bot\\Bundle\\fds\\scripts\\webEDIT_bundle.bat')">Edit this page</button>
+<li><button onclick="run_script('\\bot\\Bundle\\fds\\scripts\\get_fds_release_notes.bat')">FDS wiki->html</button>
 <li><a href="../../smv/Build/getting_started.html">FDS/Smokeview build page checklist</a>
 </ul>
 

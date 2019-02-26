@@ -1,6 +1,7 @@
 @echo off
 setlocal EnableDelayedExpansion
 set platform=%1
+set program=%2
 
 :: batch file to install the FDS-SMV bundle on Windows, Linux or OSX systems
 
@@ -23,26 +24,27 @@ call %envfile%
 echo.
 
 if "%platform%" == "windows" (
-  echo   Installing FDS and Smokeview
-  Title  Installing FDS and Smokeview
-  cd %userprofile%\.bundle\uploads
-  call %fds_version%-%smv_version%_win64.exe
+  echo.
+  echo *** windows
+  cd "%userprofile%\.bundle"
+  rmdir /q /s uploads
+  mkdir uploads
   goto eof
 )
 if "%platform%" == "linux" (
-echo   Installing FDS and Smokeview on %platform%
-Title  Installing FDS and Smokeview on %platform%
-  plink %linux_logon% %linux_svn_root%/smv/scripts/run_command2.sh .bundle/uploads %fds_version%-%smv_version%_linux64.sh y
+  echo.
+  echo *** linux
+  plink %linux_logon% %linux_svn_root%/smv/scripts/run_command.sh bot/Bundle/fds/scripts clean_upload.sh
   goto eof
 )
 if "%platform%" == "osx" (
-echo   Installing FDS and Smokeview on %platform%
-Title  Installing FDS and Smokeview on %platform%
-  plink %osx_logon% %linux_svn_root%/smv/scripts/run_command2.sh .bundle/uploads %fds_version%-%smv_version%_osx64.sh y
+  echo.
+  echo *** osx
+  plink %osx_logon% %linux_svn_root%/smv/scripts/run_command.sh bot/Bundle/fds/scripts clean_upload.sh
   goto eof
 )
 
 :eof
 echo.
-echo installation complete
+echo upload directory erased
 pause

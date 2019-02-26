@@ -12,6 +12,7 @@ if NOT "%valid%" == "1" (
 )
 
 set platform=%1
+set upload_dir=%userprofile%\.bundle\uploads
 
 :: batch file to generate Windows, Linux or OSX FDS-SMV bundles
 
@@ -38,27 +39,27 @@ Title  Building FDS-Smokeview bundle for %platform%
 %svn_drive%
 
 if "%platform%" == "windows" (
-  call "%svn_root%\bot\Bundle\fds\windows\make_bundle"
+  call "%svn_root%\bot\Bundle\fds\scripts\make_bundle"
   goto eof
 )
 if "%platform%" == "linux" (
   set bundledir=%fds_version%-%smv_version%_linux64
-  plink %linux_logon% %linux_svn_root%/bot/Bundle/fds/linux/make_bundle_fromweb.sh
+  plink %linux_logon% %linux_svn_root%/bot/Bundle/fds/scripts/make_bundle_fromweb.sh %fds_version% %smv_version% %linux_mpi_version%
 
   echo Downloading compressed archive to:
-  echo   %svn_root%\bot\Bundle\fds\uploads\!bundledir!.sh
-  pscp %linux_logon%:%linux_svn_root%/bot/Bundle/fds/uploads/!bundledir!.sh   %svn_root%\bot\Bundle\fds\uploads\.
-  pscp %linux_logon%:%linux_svn_root%/bot/Bundle/fds/uploads/!bundledir!.sha1 %svn_root%\bot\Bundle\fds\uploads\.
+  echo   %upload_dir%\!bundledir!.sh
+  pscp %linux_logon%:.bundle/uploads/!bundledir!.sh   %upload_dir%\.
+  pscp %linux_logon%:.bundle/uploads/!bundledir!.sha1 %upload_dir%\.
   goto eof
 )
 if "%platform%" == "osx" (
   set bundledir=%fds_version%-%smv_version%_osx64
-  plink %osx_logon% %linux_svn_root%/bot/Bundle/fds/osx/make_bundle_fromweb.sh
+  plink %osx_logon% %linux_svn_root%/bot/Bundle/fds/scripts/make_bundle_fromweb.sh  %fds_version% %smv_version% %osx_mpi_version%
 
   echo Downloading compressed archive to:
-  echo   %svn_root%\bot\Bundle\fds\uploads\!bundledir!.sh
-  pscp %osx_logon%:%linux_svn_root%/bot/Bundle/fds/uploads/!bundledir!.sh   %svn_root%\bot\Bundle\fds\uploads\.
-  pscp %osx_logon%:%linux_svn_root%/bot/Bundle/fds/uploads/!bundledir!.sha1 %svn_root%\bot\Bundle\fds\uploads\.
+  echo   %upload_dir%\!bundledir!.sh
+  pscp %osx_logon%:.bundle/uploads/!bundledir!.sh   %upload_dir%\.
+  pscp %osx_logon%:.bundle/uploads/!bundledir!.sha1 %upload_dir%\.
   goto eof
 )
 

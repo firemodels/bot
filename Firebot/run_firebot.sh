@@ -11,13 +11,14 @@ function usage_all {
 echo ""
 echo "Miscellaneous:"
 echo "-b - use the current branch"
-echo "-B - use startup files to set the environment, not modules"
+echo "-B - only build apps"
 echo "-q queue - specify queue [default: $QUEUE]"
 echo "-f - force firebot run"
 echo "-F - skip figure generation and build document stages"
 echo "-i - use installed version of smokeview"
 echo "-I - use development version of fds"
 echo "-J - use Intel MPI version fds"
+echo "-O - use OpenMPI version fds"
 echo "-L - firebot lite,  run only stages that build a debug fds and run cases with it"
 echo "                    (no release fds, no release cases, no matlab, etc)"
 if [ "$EMAIL" != "" ]; then
@@ -27,6 +28,7 @@ else
 fi
 echo "-R - remove run status file"
 echo "-s - skip matlab and build document stages"
+echo "-S - use startup files to set the environment, not modules"
 echo "-U - upload guides (only by user firebot)"
 echo "-W - clone fds, exp, fig, out and smv repos"
 }
@@ -140,9 +142,12 @@ if [ $notfound -eq 1 ] ; then
   QUEUE=none
 fi
 
+INTEL=
 platform="linux"
 if [ "`uname`" == "Darwin" ] ; then
   platform="osx"
+else
+  INTEL="-J"
 fi
 
 #*** define initial values
@@ -165,22 +170,22 @@ export PREFIX=FB_
 ECHO=
 debug_mode=
 DV=
-INTEL=
 REMOVE_PID=
 QUEUEBENCH=
 CLONE_REPOS=
+BUILD_ONLY=
 export QFDS_STARTUP=
 
 #*** parse command line options
 
-while getopts 'bBcdFfHhIiJkLm:q:Q:nRsuUvW' OPTION
+while getopts 'bBcdFfHhIiJkLm:q:Q:nRSsuUvW' OPTION
 do
 case $OPTION  in
   b)
    BRANCH=current
    ;;
   B)
-    export QFDS_STARTUP=1
+   BUILD_ONLY="-B"
    ;;
   c)
    CLEANREPO=1
@@ -218,6 +223,9 @@ case $OPTION  in
   m)
    EMAIL="$OPTARG"
    ;;
+  O)
+   INTEL=
+   ;;
   q)
    QUEUE="$OPTARG"
    ;;
@@ -232,6 +240,9 @@ case $OPTION  in
    ;;
   s)
    SKIPMATLAB=-s
+   ;;
+  S)
+    export QFDS_STARTUP=1
    ;;
   u)
    UPDATEREPO=1
@@ -333,7 +344,10 @@ fi
 BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
-$ECHO  ./$botscript -p $firebot_pid $UPDATE $DV $INTEL $debug_mode $BRANCH $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUEBENCH $QUEUE $SKIPMATLAB $SKIPFIGURES $CLONE_REPOS $EMAIL "$@"
+firebot_status=0
+$ECHO  ./$botscript -p $firebot_pid $UPDATE $DV $INTEL $debug_mode $BUILD_ONLY $BRANCH $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUEBENCH $QUEUE $SKIPMATLAB $SKIPFIGURES $CLONE_REPOS $EMAIL "$@"
+firebot_status=$?
 if [ -e $firebot_pid ]; then
   rm -f $firebot_pid
 fi
+exit $firebot_status
