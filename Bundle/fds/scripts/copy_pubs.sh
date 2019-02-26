@@ -20,8 +20,11 @@ CP ()
     echo $FROMFILE copied to $pdf_to
   else
     echo ***error: $FROMFILE failed to copy to $pdf_to
+    return_code=1
   fi
 }
+
+return_code=0
 
 pdf_to=$HOME/.bundle/pubs
 
@@ -44,3 +47,4 @@ if [ "$bot_type" == "smokebot" ]; then
   CP SMV_User_Guide.pdf
   CP SMV_Verification_Guide.pdf
 fi
+exit $return_code

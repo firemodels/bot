@@ -43,7 +43,7 @@ function DEFAULT {
 function usage {
 echo "make_bundle_bot.sh [options]"
 echo "   Build a bundle using documents built by firebot and smokebot"
-echo "   and applications built in the fds and smv repos"
+echo "   and applications built by firebot
 echo ""
 echo "Options:"
 echo "-B - build fds and smokeview apps"
@@ -59,7 +59,7 @@ echo "-h - display this message"
 DEFAULT $mpi_version
 echo "-m - mpi type (INTEL or openmpi version number) $DEF"
 
-echo "-r - build bundle using fds and smv revision of last firebot pass"
+echo "-r - build bundle using fds and smv revision from last firebot pass"
 DEFAULT $smokebot_home
 echo "-s - smokebot home directory $DEF"
 exit
@@ -145,8 +145,8 @@ cd $repo_root/bot/Firebot
 # copy pubs from the firebot/smokebot account to $HOME/.bundle/pubs
 
 cd $curdir
-./copy_pubs.sh firebot  $firebot_home/.firebot/pubs   $bot_host
-./copy_pubs.sh smokebot $smokebot_home/.smokebot/pubs $bot_host
+./copy_pubs.sh firebot  $firebot_home/.firebot/pubs   $bot_host || exit 1
+./copy_pubs.sh smokebot $smokebot_home/.smokebot/pubs $bot_host || exit 1
 
 # build bundle
 
