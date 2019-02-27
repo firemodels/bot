@@ -189,7 +189,7 @@ update_repo()
    local branch=$2
 
    CD_REPO $repo/$reponame $branch || return 1
-   
+
    echo "   $reponame" 
    echo Updating $branch on repo $repo/$reponame >> $OUTPUT_DIR/stage1 2>&1
    git fetch origin >> $OUTPUT_DIR/stage1 2>&1
@@ -208,19 +208,41 @@ update_repo()
       git submodule foreach git merge origin/master >> $OUTPUT_DIR/stage1 2>&1
       git status -uno  >> $OUTPUT_DIR/stage1 2>&1
    fi
+   return 0
+}
 
-   if [[ "$reponame" == "smv" ]]; then
-      git update-index --refresh
-      SMV_REVISION=`git describe --long --dirty`
-   fi
+#---------------------------------------------
+#                   get_smv_revision
+#---------------------------------------------
 
-   if [[ "$reponame" == "fds" ]]; then
-      git update-index --refresh
-      GIT_REVISION=`git describe --long --dirty`
-      GIT_SHORTHASH=`git rev-parse --short HEAD`
-      GIT_LONGHASH=`git rev-parse HEAD`
-      GIT_DATE=`git log -1 --format=%cd --date=local $GIT_SHORTHASH`
-   fi
+get_smv_revision()
+{
+   local branch=$1
+
+   CD_REPO $repo/smv $branch || return 1
+
+
+   git update-index --refresh
+   SMV_REVISION=`git describe --long --dirty`
+   return 0
+}
+
+#---------------------------------------------
+#                   get_fds_revision
+#---------------------------------------------
+
+get_fds_revision()
+{
+   local branch=$1
+
+   CD_REPO $repo/fds $branch || return 1
+
+
+   git update-index --refresh
+   FDS_REVISION=`git describe --long --dirty`
+   FDS_SHORTHASH=`git rev-parse --short HEAD`
+   FDS_LONGHASH=`git rev-parse HEAD`
+   FDS_DATE=`git log -1 --format=%cd --date=local $FDS_SHORTHASH`
    return 0
 }
 
@@ -252,7 +274,7 @@ check_git_checkout()
 
 archive_compiler_version()
 {
-   ifort -V &> "$HISTORY_DIR/${GIT_REVISION}_compiler_info.txt"
+   ifort -V &> "$HISTORY_DIR/${FDS_REVISION}_compiler_info.txt"
 }
 
 #---------------------------------------------
@@ -1022,7 +1044,7 @@ archive_validation_stats()
    if [ -e ${CURRENT_STATS_FILE} ]
    then
       # Archive stats to Firebot history
-      cp ${CURRENT_STATS_FILE} "$HISTORY_DIR/${GIT_REVISION}_${STATS_FILE_BASENAME}.csv"
+      cp ${CURRENT_STATS_FILE} "$HISTORY_DIR/${FDS_REVISION}_${STATS_FILE_BASENAME}.csv"
 
    else
       echo "Warnings from Stage 7b - Matlab plotting and statistics (validation):" >> $WARNING_LOG
@@ -1064,8 +1086,8 @@ archive_timing_stats()
 {
    echo archiving timing stats
    cd $fdsrepo/Utilities/Scripts
-   cp fds_timing_stats.csv "$HISTORY_DIR/${GIT_REVISION}_timing.csv"
-   cp fds_benchmarktiming_stats.csv "$HISTORY_DIR/${GIT_REVISION}_benchmarktiming.csv"
+   cp fds_timing_stats.csv "$HISTORY_DIR/${FDS_REVISION}_timing.csv"
+   cp fds_benchmarktiming_stats.csv "$HISTORY_DIR/${FDS_REVISION}_benchmarktiming.csv"
    TOTAL_FDS_TIMES=`tail -1 fds_benchmarktiming_stats.csv`
   if [ "$UPLOADGUIDES" == "1" ]; then
      if [ "$USER" == "firebot" ]; then
@@ -1220,24 +1242,24 @@ save_build_status()
    then
      echo "" >> $ERROR_LOG
      cat $WARNING_LOG >> $ERROR_LOG
-     echo "Build failure and warnings;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$FDSBRANCH;$STOP_TIME_INT;3;$TOTAL_FDS_TIMES;$HOST" > "$HISTORY_DIR/${GIT_REVISION}.txt"
-     cat $ERROR_LOG > "$HISTORY_DIR/${GIT_REVISION}_errors.txt"
+     echo "Build failure and warnings;$FDS_DATE;$FDS_SHORTHASH;$FDS_LONGHASH;${FDS_REVISION};$FDSBRANCH;$STOP_TIME_INT;3;$TOTAL_FDS_TIMES;$HOST" > "$HISTORY_DIR/${FDS_REVISION}.txt"
+     cat $ERROR_LOG > "$HISTORY_DIR/${FDS_REVISION}_errors.txt"
 
    # Check for errors only
    elif [ -e $ERROR_LOG ]
    then
-      echo "Build failure;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$FDSBRANCH;$STOP_TIME_INT;3;$TOTAL_FDS_TIMES;$HOST" > "$HISTORY_DIR/${GIT_REVISION}.txt"
-      cat $ERROR_LOG > "$HISTORY_DIR/${GIT_REVISION}_errors.txt"
+      echo "Build failure;$FDS_DATE;$FDS_SHORTHASH;$FDS_LONGHASH;${FDS_REVISION};$FDSBRANCH;$STOP_TIME_INT;3;$TOTAL_FDS_TIMES;$HOST" > "$HISTORY_DIR/${FDS_REVISION}.txt"
+      cat $ERROR_LOG > "$HISTORY_DIR/${FDS_REVISION}_errors.txt"
 
    # Check for warnings only
    elif [ -e $WARNING_LOG ]
    then
-      echo "Build success with warnings;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$FDSBRANCH;$STOP_TIME_INT;2;$TOTAL_FDS_TIMES;$HOST" > "$HISTORY_DIR/${GIT_REVISION}.txt"
-      cat $WARNING_LOG > "$HISTORY_DIR/${GIT_REVISION}_warnings.txt"
+      echo "Build success with warnings;$FDS_DATE;$FDS_SHORTHASH;$FDS_LONGHASH;${FDS_REVISION};$FDSBRANCH;$STOP_TIME_INT;2;$TOTAL_FDS_TIMES;$HOST" > "$HISTORY_DIR/${FDS_REVISION}.txt"
+      cat $WARNING_LOG > "$HISTORY_DIR/${FDS_REVISION}_warnings.txt"
 
    # No errors or warnings
    else
-      echo "Build success!;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$FDSBRANCH;$STOP_TIME_INT;1;$TOTAL_FDS_TIMES;$HOST" > "$HISTORY_DIR/${GIT_REVISION}.txt"
+      echo "Build success!;$FDS_DATE;$FDS_SHORTHASH;$FDS_LONGHASH;${FDS_REVISION};$FDSBRANCH;$STOP_TIME_INT;1;$TOTAL_FDS_TIMES;$HOST" > "$HISTORY_DIR/${FDS_REVISION}.txt"
       touch $FIREBOT_PASS
       echo $SMVREPO_HASH > $SMVREPO_HASHFILE
       echo $FDSREPO_HASH > $FDSREPO_HASHFILE
@@ -1271,7 +1293,7 @@ email_build_status()
 if [ "$QUEUE" != "$QUEUEBENCH" ]; then
    echo "benchmark queue: $QUEUEBENCH " >> $TIME_LOG
 fi
-   echo "   fds revision: $GIT_REVISION " >> $TIME_LOG
+   echo "   fds revision: $FDS_REVISION " >> $TIME_LOG
    echo "     fds branch: $FDSBRANCH "    >> $TIME_LOG
    echo "   smv revision: $SMV_REVISION " >> $TIME_LOG
    echo "     smv branch: $SMVBRANCH "    >> $TIME_LOG
@@ -1305,13 +1327,13 @@ fi
       cd $firebotdir
 
      # Send email with failure message and warnings, body of email contains appropriate log file
-     cat $ERROR_LOG $TIME_LOG | mail -s "[$botuser] $bottype failure and warnings. Version: ${GIT_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
+     cat $ERROR_LOG $TIME_LOG | mail -s "[$botuser] $bottype failure and warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
 
    # Check for errors only
    elif [ -e $ERROR_LOG ]
    then
       # Send email with failure message, body of email contains error log file
-      cat $ERROR_LOG $TIME_LOG | mail -s "[$botuser] $bottype failure. Version: ${GIT_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
+      cat $ERROR_LOG $TIME_LOG | mail -s "[$botuser] $bottype failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
 
    # Check for warnings only
    elif [ -e $WARNING_LOG ]
@@ -1319,7 +1341,7 @@ fi
       cd $firebotdir
 
       # Send email with success message, include warnings
-      cat $WARNING_LOG $TIME_LOG | mail -s "[$botuser] $bottype success, with warnings. Version: ${GIT_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
+      cat $WARNING_LOG $TIME_LOG | mail -s "[$botuser] $bottype success, with warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
 
    # No errors or warnings
    else
@@ -1328,7 +1350,7 @@ fi
 
       # Send success message with links to nightly manuals
       firebot_status=0
-      cat $TIME_LOG | mail -s "[$botuser] $bottype success! Version: ${GIT_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
+      cat $TIME_LOG | mail -s "[$botuser] $bottype success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
    fi
 
 }
@@ -1415,7 +1437,8 @@ DB=_db
 
 REPOEMAIL=
 UPLOADGUIDES=0
-GIT_REVISION=
+FDS_REVISION=
+SMV_REVISION=
 SKIPMATLAB=
 SKIPFIGURES=
 FIREBOT_LITE=
@@ -1685,6 +1708,9 @@ if [[ "$CLONE_REPOS" == "" ]]; then
     echo Repos not updated
   fi
 fi
+
+get_fds_revision $FDSBRANCH || exit 1
+get_smv_revision $SMVBRANCH || exit 1
 
 check_git_checkout
 archive_compiler_version
