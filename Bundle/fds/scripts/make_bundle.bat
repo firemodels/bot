@@ -173,6 +173,9 @@ echo.
 CALL :COPY  %smv_forbundle%\objects.svo            %out_smv%\.
 CALL :COPY  %smv_forbundle%\volrender.ssf          %out_smv%\.
 CALL :COPY  %smv_forbundle%\smokeview.ini          %out_smv%\.
+CALL :COPY  %smv_forbundle%\smokeview.ini          %out_smv%\.
+CALL :COPY  %smv_forbundle%\html_template.html     %out_smv%\.
+
 
 echo copying textures
 copy %smv_forbundle%\textures\*.jpg          %out_textures%\.>Nul
