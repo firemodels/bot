@@ -154,6 +154,16 @@ echo *** Copying installation files to %INSTALLDIR%
 if NOT EXIST "%INSTALLDIR%" mkdir "%INSTALLDIR%" > Nul
 xcopy /E /I /H /Q firemodels\FDS6 "%FDS6%"     > Nul
 xcopy /E /I /H /Q firemodels\SMV6 "%SMV6%"     > Nul
+
+set "filepath=%FDS6%\bin\fds.exe%"
+call :is_file_copied fds.exe
+
+set "filepath=%SMV6%\smokeview.exe"
+call :is_file_copied smokeview.exe
+
+set "filepath=%FDS6%\bin\mpi\mpiexec.exe"
+call :is_file_copied mpiexec.exe
+
 echo        copy complete
 
 echo *** Removing previous FDS/Smokeview entries from the system and user path.
@@ -251,6 +261,7 @@ call "%firewall_setup%" "%FDS6%\bin\mpi"
 echo *** Setting up the Uninstall script.
 
 :: remove smokeview path and directory
+
 echo if "%%cfastinstalled%%" == "1" goto skip2                >> "%UNINSTALLDIR%\uninstall_base.bat"
 echo echo Removing "%SMV6%" from the System Path              >> "%UNINSTALLDIR%\uninstall_base.bat"
 echo call "%UNINSTALLDIR%\set_path.exe" -s -b -r %SMV6%       >> "%UNINSTALLDIR%\uninstall_base.bat"
@@ -261,13 +272,16 @@ echo echo Removing CMDfds desktop shortcut                    >> "%UNINSTALLDIR%
 echo if exist %userprofile%\Desktop\CMDfds.lnk erase %userprofile%\Desktop\CMDfds.lnk  >> "%UNINSTALLDIR%\uninstall_base.bat"
 
 :: remove FDS path and directory
+
 echo echo Removing "%FDS6%\bin" from the System Path          >> "%UNINSTALLDIR%\uninstall_base.bat"
 echo call "%UNINSTALLDIR%\set_path.exe" -s -b -r "%FDS6%\bin" >> "%UNINSTALLDIR%\uninstall_base.bat"
 echo echo.                                                    >> "%UNINSTALLDIR%\uninstall_base.bat"
 echo echo Removing "%FDS6%"                                   >> "%UNINSTALLDIR%\uninstall_base.bat"
 echo rmdir /s /q  "%FDS6%"                                    >> "%UNINSTALLDIR%\uninstall_base.bat"
+
 :: if cfast exists then only remove fds
 :: if cfast does not exist then remove everything
+
 echo if exist "%CFAST%" goto skip_remove                      >> "%UNINSTALLDIR%\uninstall_base.bat"
 echo   echo Removing "%SMV6%"                                 >> "%UNINSTALLDIR%\uninstall_base.bat"
 echo   rmdir /s /q  "%SMV6%"                                  >> "%UNINSTALLDIR%\uninstall_base.bat"
@@ -296,6 +310,9 @@ echo WScript.Sleep 10000                                                   >> "%
 erase "%firewall_setup%"               > Nul
 erase "%FDS6%\shortcut.exe"            > Nul
 
+call :is_file_in_path fds
+call :is_file_in_path smokeview
+call :is_file_in_path mpiexec
 echo.
 echo *** Press any key, then reboot to complete the installation.  ***
 pause>NUL
@@ -304,6 +321,32 @@ goto eof
 :-------------------------------------------------------------------------
 :----------------------subroutines----------------------------------------
 :-------------------------------------------------------------------------
+
+:: -------------------------------------------------------------
+:is_file_copied
+:: -------------------------------------------------------------
+
+  set file=%1
+  if not exist "%filepath%" echo.
+  if not exist "%filepath%" echo ***error: %file% failed to copy to %filepath%
+  exit /b 0
+
+:: -------------------------------------------------------------
+:is_file_in_path
+:: -------------------------------------------------------------
+
+  set program=%1
+  where %program% 1> %TEMP%\in_path.txt 2>&1
+  type %TEMP%\in_path.txt | find /i /c "INFO" > %TEMP%\in_path_count.txt
+  set /p nothave=<%TEMP%\in_path_count.txt
+  if %nothave% == 1 (
+    echo "***Warning: %program% was not found in the PATH."
+    echo "   You will need to reboot your computer so that new path entries are defined"
+    exit /b 1
+  )
+  if exist %TEMP%\in_path.txt erase %TEMP%\in_path.txt
+  if exist %TEMP%\in_path_count.txt erase %TEMP%\in_path_count.txt
+  exit /b 0
 
 :-------------------------------------------------------------------------
 :get_yesnoextract
