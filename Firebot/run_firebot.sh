@@ -341,6 +341,13 @@ fi
 if [[ "$CLEANREPO" == "1" ]]; then
   CLEAN=-c
 fi
+
+# if cloning repos, only update and clean bot repo (which has already been done)
+
+if [[ "$CLONE_REPOS" != "" ]]; then
+  CLEAN=
+  UPDATE=
+fi
 BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
