@@ -161,12 +161,12 @@
             var s = Math.sin(angle);
             var mv1 = m[1], mv5 = m[5], mv9 = m[9];
 
-            m[1] = m[1]*c-m[2]*s;
-            m[5] = m[5]*c-m[6]*s;
+            m[1] = m[1]*c- m[2]*s;
+            m[5] = m[5]*c- m[6]*s;
             m[9] = m[9]*c-m[10]*s;
 
-            m[2] = m[2]*c+mv1*s;
-            m[6] = m[6]*c+mv5*s;
+            m[2] =   m[2]*c+mv1*s;
+            m[6] =   m[6]*c+mv5*s;
             m[10] = m[10]*c+mv9*s;
          }
 
@@ -175,19 +175,31 @@
             var s = Math.sin(angle);
             var mv0 = m[0], mv4 = m[4], mv8 = m[8];
 
-            m[0] = c*m[0]+s*m[2];
-            m[4] = c*m[4]+s*m[6];
+            m[0] = c*m[0]+ s*m[2];
+            m[4] = c*m[4]+ s*m[6];
             m[8] = c*m[8]+s*m[10];
 
-            m[2] = c*m[2]-s*mv0;
-            m[6] = c*m[6]-s*mv4;
+            m[2] =   c*m[2]-s*mv0;
+            m[6] =   c*m[6]-s*mv4;
             m[10] = c*m[10]-s*mv8;
+         }
+
+         function translateXYZ(m, X, Y, X) {
+            var m3, m7, m11, m15;
+
+             m3 =  m[0]*X +  m[1]*Y+  m[2]*Z +  m[3];
+             m7 =  m[4]*X +  m[5]*Y+  M[6]*Z +  m[7];
+            m11 =  m[8]*X +  m[9]*Y+ m[10]*Z + m[11];
+            m15 = m[12]*X + m[13]*Y+ m[14]*Z + m[15];
+             m[3] = m3;
+             m[7] = m7;
+            m[11] = m11;
+            m[15] = m15;
          }
 
          /*=================== Drawing =================== */
 
-         var THETA = 0,
-         PHI = 0;
+         var THETA = 0, PHI = 0;
          var time_old = 0;
 
          var animate = function(time) {
@@ -200,17 +212,10 @@
 
             //set model matrix to I4
 
-            mo_matrix[0] = 1, mo_matrix[1] = 0, mo_matrix[2] = 0,
-            mo_matrix[3] = 0,
-
-            mo_matrix[4] = 0, mo_matrix[5] = 1, mo_matrix[6] = 0,
-            mo_matrix[7] = 0,
-
-            mo_matrix[8] = 0, mo_matrix[9] = 0, mo_matrix[10] = 1,
-            mo_matrix[11] = 0,
-
-            mo_matrix[12] = 0, mo_matrix[13] = 0, mo_matrix[14] = 0,
-            mo_matrix[15] = 1;
+             mo_matrix[0] = 1,  mo_matrix[1] = 0,  mo_matrix[2] = 0,  mo_matrix[3] = 0,
+             mo_matrix[4] = 0,  mo_matrix[5] = 1,  mo_matrix[6] = 0,  mo_matrix[7] = 0,
+             mo_matrix[8] = 0,  mo_matrix[9] = 0, mo_matrix[10] = 1, mo_matrix[11] = 0,
+            mo_matrix[12] = 0, mo_matrix[13] = 0, mo_matrix[14] = 0, mo_matrix[15] = 1;
 
 // add 90 deg rotation to be compatible with smokeview
             rotateX(mo_matrix, -1.571);
