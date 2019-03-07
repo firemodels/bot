@@ -121,14 +121,26 @@
 
          view_matrix[14] = view_matrix[14]-6;
 
-         /*================= Mouse events ======================*/
+         /*================= Events ======================*/
 
          var AMORTIZATION = 0.95;
          var drag = false;
          var old_x, old_y;
          var dX = 0, dY = 0;
+         var dKEYx=0, dKEYy=0, dKEYz=0;
+         var ctrl_key=0, alt_key=0;
 
          var mouseDown = function(e) {
+            window.focus();
+            ctrl_key = 0;
+            alt_key = 0;
+            if (e.ctrlKey == true){
+               ctrl_key=1;
+            }
+            if (e.altKey == true){
+               alt_key=1;
+            }
+
             drag = true;
             old_x = e.pageX, old_y = e.pageY;
             e.preventDefault();
@@ -141,14 +153,27 @@
 
          var mouseMove = function(e) {
             if (!drag) return false;
-            dX = (e.pageX-old_x)*2*Math.PI/canvas.width,
-            dY = (e.pageY-old_y)*2*Math.PI/canvas.height;
-            THETA+= dX;
-            PHI+=dY;
+            if (alt_key == 0 && ctrl_key == 0){
+              dX = (e.pageX-old_x)*2*Math.PI/canvas.width,
+              dY = (e.pageY-old_y)*2*Math.PI/canvas.height;
+              THETA+= dX;
+              PHI+=dY;
+            }
+            else if(alt_key==1){
+              dY = (e.pageY-old_y)/canvas.height;
+              dKEYz += 3*dY;
+            }
+            else{
+              dX = (e.pageX-old_x)/canvas.width,
+              dY = (e.pageY-old_y)/canvas.height;
+              dKEYx -= 3*dX;
+              dKEYy += 3*dY;
+            }
             old_x = e.pageX, old_y = e.pageY;
             e.preventDefault();
          };
 
+//         canvas.addEventListener("keydown",   keyDown,   false);
          canvas.addEventListener("mousedown", mouseDown, false);
          canvas.addEventListener("mouseup", mouseUp, false);
          canvas.addEventListener("mouseout", mouseUp, false);
@@ -175,26 +200,20 @@
             var s = Math.sin(angle);
             var mv0 = m[0], mv4 = m[4], mv8 = m[8];
 
-            m[0] = c*m[0]+ s*m[2];
-            m[4] = c*m[4]+ s*m[6];
-            m[8] = c*m[8]+s*m[10];
+             m[0] =  c*m[0] + s*m[2];
+             m[4] =  c*m[4] + s*m[6];
+             m[8] =  c*m[8] + s*m[10];
 
-            m[2] =   c*m[2]-s*mv0;
-            m[6] =   c*m[6]-s*mv4;
-            m[10] = c*m[10]-s*mv8;
+             m[2] =  c*m[2] - s*mv0;
+             m[6] =  c*m[6] - s*mv4;
+            m[10] = c*m[10] - s*mv8;
          }
 
-         function translateXYZ(m, X, Y, X) {
-            var m3, m7, m11, m15;
-
-             m3 =  m[0]*X +  m[1]*Y+  m[2]*Z +  m[3];
-             m7 =  m[4]*X +  m[5]*Y+  M[6]*Z +  m[7];
-            m11 =  m[8]*X +  m[9]*Y+ m[10]*Z + m[11];
-            m15 = m[12]*X + m[13]*Y+ m[14]*Z + m[15];
-             m[3] = m3;
-             m[7] = m7;
-            m[11] = m11;
-            m[15] = m15;
+         function translateXYZ(m, X, Y, Z) {
+            m[12] =  m[0]*X +  m[4]*Y +  m[8]*Z + m[12];
+            m[13] =  m[1]*X +  m[5]*Y +  m[9]*Z + m[13];
+            m[14] =  m[2]*X +  m[6]*Y + m[10]*Z + m[14];
+            m[15] =  m[3]*X +  m[7]*Y + m[11]*Z + m[15];
          }
 
          /*=================== Drawing =================== */
@@ -220,6 +239,7 @@
 // add 90 deg rotation to be compatible with smokeview
             rotateX(mo_matrix, -1.571);
 
+            translateXYZ(mo_matrix, dKEYx, dKEYy, dKEYz)
             rotateY(mo_matrix, THETA);
             rotateX(mo_matrix, PHI);
 
