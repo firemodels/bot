@@ -293,9 +293,10 @@ echo ""
 echo "--- copying configuration files ---"
 echo ""
 
-CP $smv_bundle smokeview.ini    $bundledir/bin smokeview.ini
-CP $smv_bundle volrender.ssf    $bundledir/bin volrender.ssf
-CP $smv_bundle objects.svo      $bundledir/bin objects.svo
+CP $smv_bundle smokeview.ini  $bundledir/bin smokeview.ini
+CP $smv_bundle volrender.ssf  $bundledir/bin volrender.ssf
+CP $smv_bundle objects.svo    $bundledir/bin objects.svo
+CP $smv_bundle smokeview.html $bundledir/bin smokeview.html
 if [ "$MPI_VERSION" == "INTEL" ]; then
   UNTAR $HOME/fire-notes/INSTALL/LIBS/RUNTIME/MPI_INTEL19U1 INTEL19u1linux.tar.gz $bundledir/bin INTEL
 else
