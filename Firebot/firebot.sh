@@ -224,6 +224,7 @@ get_smv_revision()
 
    git update-index --refresh
    SMV_REVISION=`git describe --long --dirty`
+   SMV_MESSAGE=`git log . | head -5 | tail -1`
    return 0
 }
 
@@ -243,6 +244,7 @@ get_fds_revision()
    FDS_SHORTHASH=`git rev-parse --short HEAD`
    FDS_LONGHASH=`git rev-parse HEAD`
    FDS_DATE=`git log -1 --format=%cd --date=local $FDS_SHORTHASH`
+   FDS_MESSAGE=`git log . | head -5 | tail -1`
    return 0
 }
 
@@ -1300,6 +1302,8 @@ fi
 if [ "$IFORT_VERSION" != "" ]; then
    echo "        Fortran: $IFORT_VERSION " >> $TIME_LOG
 fi
+   echo $FDS_MESSAGE
+   echo $SMV_MESSAGE
    echo "     start time: $start_time " >> $TIME_LOG
    echo "      stop time: $stop_time " >> $TIME_LOG
    if [ "$UPLOADGUIDES" == "1" ]; then

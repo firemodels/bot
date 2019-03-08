@@ -1,6 +1,6 @@
 #!/bin/bash
 fds_version=$1
-smv_verion=$2
+smv_version=$2
 MPI_VERSION=$3
 
 GUIDE_DIR=$HOME/.bundle/pubs
