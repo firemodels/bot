@@ -40,7 +40,7 @@ Title Bundling %type% Smokeview for %platform%
 :: windows
 
 if "%platform%" == "windows" (
-  call %svn_root%\bot\Bundle\smv\windows\make_%type%bundle 64
+  call %svn_root%\bot\Bundle\smv\scripts\make_%type%bundle
   goto eof
 )
 

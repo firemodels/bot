@@ -1,5 +1,5 @@
 #!/bin/bash
-FDSEDITION=
+FDSEDITION=FDS6
 
 edition=$1
 revision=$2
@@ -110,9 +110,10 @@ CPDIR $FORBUNDLE/textures $PLATFORMDIR/bin/textures
 cp $FORBUNDLE/*.png $PLATFORMDIR/bin/.
 cp $FORBUNDLE/*.po $PLATFORMDIR/bin/.
 
-CP $FORBUNDLE objects.svo   $PLATFORMDIR/bin objects.svo
-CP $FORBUNDLE smokeview.ini $PLATFORMDIR/bin smokeview.ini
-CP $FORBUNDLE volrender.ssf $PLATFORMDIR/bin volrender.ssf
+CP $FORBUNDLE objects.svo        $PLATFORMDIR/bin objects.svo
+CP $FORBUNDLE smokeview.ini      $PLATFORMDIR/bin smokeview.ini
+CP $FORBUNDLE volrender.ssf      $PLATFORMDIR/bin volrender.ssf
+CP $FORBUNDLE html_template.html $PLATFORMDIR/bin html_template.html
 
 SCP $PLATFORMHOST $BACKGROUNDDIR background                      $PLATFORMDIR/bin background
 SCP $PLATFORMHOST $SMVDIR        smokeview_${platform}_${TEST}64 $PLATFORMDIR/bin smokeview
