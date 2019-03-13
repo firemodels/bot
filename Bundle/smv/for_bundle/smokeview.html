@@ -116,7 +116,8 @@
 			   ];
          }
 
-         var proj_matrix = get_projection(10, canvas.width/canvas.height, 1, 100);
+         var projection_angle=10;
+         var proj_matrix = get_projection(projection_angle, canvas.width/canvas.height, 1, 100);
          var mo_matrix = [ 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 ];
          var view_matrix = [ 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 ];
 
@@ -211,10 +212,10 @@
          }
 
          function translateXYZ(m, X, Y, Z) {
-            m[12] =  m[0]*X +  m[4]*Y +  m[8]*Z + m[12];
-            m[13] =  m[1]*X +  m[5]*Y +  m[9]*Z + m[13];
-            m[14] =  m[2]*X +  m[6]*Y + m[10]*Z + m[14];
-            m[15] =  m[3]*X +  m[7]*Y + m[11]*Z + m[15];
+            m[12] +=  m[0]*X +  m[4]*Y +  m[8]*Z;
+            m[13] +=  m[1]*X +  m[5]*Y +  m[9]*Z;
+            m[14] +=  m[2]*X +  m[6]*Y + m[10]*Z;
+            m[15] +=  m[3]*X +  m[7]*Y + m[11]*Z;
          }
 
          /*=================== Drawing =================== */
@@ -224,6 +225,7 @@
 
          var animate = function(time) {
             var dt = time-time_old;
+            var gray_color=1.0
 
             if (!drag) {
                dX *= AMORTIZATION, dY*=AMORTIZATION;
@@ -249,7 +251,7 @@
 
             // gl.depthFunc(gl.LEQUAL);
 
-            gl.clearColor(1.0, 1.0, 1.0, 0.9);
+            gl.clearColor(gray_color, gray_color, gray_color, 0.9);
             gl.clearDepth(1.0);
             gl.viewport(0.0, 0.0, canvas.width, canvas.height);
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
