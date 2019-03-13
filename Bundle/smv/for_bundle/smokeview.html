@@ -40,21 +40,48 @@
 //            16,17,18, 16,18,19, 20,21,22, 20,22,23 
 //         ];
 
+//         var vertices_line = [
+//           -1.5,-1.5,-1.5,-1.5,1.5,1.5,
+//           -1.5,-1.5,-1.5,1.5,-1.5,-1.5
+//         ];
 
-         // Create and store data into vertex buffer
+//         var colors_line = [
+//           1,0,0, 0,1,0,
+//           0,0,1, 1,1,0
+//         ];
+
+//         var indices_line = [
+//           0, 1, 2, 3
+//         ];
+
+
+// setup solid unlit triangle data
+
          var vertex_buffer_solid = gl.createBuffer ();
          gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer_solid);
          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices_solid), gl.STATIC_DRAW);
 
-         // Create and store data into color buffer
          var color_buffer_solid = gl.createBuffer ();
          gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer_solid);
          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors_solid), gl.STATIC_DRAW);
 
-         // Create and store data into index buffer
          var index_buffer_solid = gl.createBuffer ();
          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer_solid);
          gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_solid), gl.STATIC_DRAW);
+
+// setup outline data
+
+         var vertex_buffer_line = gl.createBuffer ();
+         gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer_line);
+         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices_line), gl.STATIC_DRAW);
+
+         var color_buffer_line = gl.createBuffer ();
+         gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer_line);
+         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors_line), gl.STATIC_DRAW);
+
+         var index_buffer_line = gl.createBuffer ();
+         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer_line);
+         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_line), gl.STATIC_DRAW);
 
          /*=================== SHADERS =================== */
 
@@ -92,17 +119,6 @@
          var _Pmatrix = gl.getUniformLocation(shaderprogram, "Pmatrix");
          var _Vmatrix = gl.getUniformLocation(shaderprogram, "Vmatrix");
          var _Mmatrix = gl.getUniformLocation(shaderprogram, "Mmatrix");
-
-         gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer_solid);
-         var _position = gl.getAttribLocation(shaderprogram, "position");
-         gl.vertexAttribPointer(_position, 3, gl.FLOAT, false,0,0);
-         gl.enableVertexAttribArray(_position);
-
-         gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer_solid);
-         var _color = gl.getAttribLocation(shaderprogram, "color");
-         gl.vertexAttribPointer(_color, 3, gl.FLOAT, false,0,0) ;
-         gl.enableVertexAttribArray(_color);
-         gl.useProgram(shaderprogram);
 
          /*==================== MATRIX ====================== */
 
@@ -260,8 +276,35 @@
             gl.uniformMatrix4fv(_Vmatrix, false, view_matrix);
             gl.uniformMatrix4fv(_Mmatrix, false, mo_matrix);
 
+// draw solid unlit triangles
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer_solid);
+            var _position = gl.getAttribLocation(shaderprogram, "position");
+            gl.vertexAttribPointer(_position, 3, gl.FLOAT, false,0,0);
+            gl.enableVertexAttribArray(_position);
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer_solid);
+            var _color = gl.getAttribLocation(shaderprogram, "color");
+            gl.vertexAttribPointer(_color, 3, gl.FLOAT, false,0,0) ;
+            gl.enableVertexAttribArray(_color);
+            gl.useProgram(shaderprogram);
+
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer_solid);
             gl.drawElements(gl.TRIANGLES, indices_solid.length, gl.UNSIGNED_SHORT, 0);
+
+// draw outlines
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer_line);
+            gl.vertexAttribPointer(_position, 3, gl.FLOAT, false,0,0);
+            gl.enableVertexAttribArray(_position);
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer_line);
+            gl.vertexAttribPointer(_color, 3, gl.FLOAT, false,0,0) ;
+            gl.enableVertexAttribArray(_color);
+            gl.useProgram(shaderprogram);
+
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer_line);
+            gl.drawElements(gl.LINES, indices_line.length, gl.UNSIGNED_SHORT, 0);
 
             window.requestAnimationFrame(animate);
          }
