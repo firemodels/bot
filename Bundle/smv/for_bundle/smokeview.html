@@ -114,52 +114,52 @@
 
 // setup solid lit triangle data
 
-         var vertex_buffer_solid_lit = gl.createBuffer ();
-         gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer_solid_lit);
+         var buffer_vertices_solid_lit = gl.createBuffer ();
+         gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_solid_lit);
          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices_solid_lit), gl.STATIC_DRAW);
 
-//         var normals_buffer_solid_lit = gl.createBuffer ();
-//         gl.bindBuffer(gl.ARRAY_BUFFER, normals_buffer_solid_lit);
+//         var buffer_normals_solid_lit = gl.createBuffer ();
+//         gl.bindBuffer(gl.ARRAY_BUFFER, buffer_normals_solid_lit);
 //         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals_solid_lit), gl.STATIC_DRAW);
 
-         var color_buffer_solid_lit = gl.createBuffer ();
-         gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer_solid_lit);
+         var buffer_colors_solid_lit = gl.createBuffer ();
+         gl.bindBuffer(gl.ARRAY_BUFFER, buffer_colors_solid_lit);
          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors_solid_lit), gl.STATIC_DRAW);
 
-         var index_buffer_solid_lit = gl.createBuffer ();
-         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer_solid_lit);
+         var buffer_indices_solid_lit = gl.createBuffer ();
+         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_solid_lit);
          gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_solid_lit), gl.STATIC_DRAW);
 
 // setup solid unlit triangle data
 
-         var vertex_buffer_solid_unlit = gl.createBuffer ();
-         gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer_solid_unlit);
+         var buffer_vertices_solid_unlit = gl.createBuffer ();
+         gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_solid_unlit);
          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices_solid_unlit), gl.STATIC_DRAW);
 
-         var color_buffer_solid_unlit = gl.createBuffer ();
-         gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer_solid_unlit);
+         var buffer__colors_solid_unlit = gl.createBuffer ();
+         gl.bindBuffer(gl.ARRAY_BUFFER, buffer__colors_solid_unlit);
          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors_solid_unlit), gl.STATIC_DRAW);
 
-         var texture_buffer_solid_unlit = gl.createBuffer ();
-         gl.bindBuffer(gl.ARRAY_BUFFER, texture_buffer_solid_unlit);
+         var buffer_textures_solid_unlit = gl.createBuffer ();
+         gl.bindBuffer(gl.ARRAY_BUFFER, buffer_textures_solid_unlit);
          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textures_solid_unlit), gl.STATIC_DRAW);
 
-         var index_buffer_solid_unlit = gl.createBuffer ();
-         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer_solid_unlit);
+         var buffer_indices_solid_unlit = gl.createBuffer ();
+         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_solid_unlit);
          gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_solid_unlit), gl.STATIC_DRAW);
 
 // setup outline data
 
-         var vertex_buffer_line = gl.createBuffer ();
-         gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer_line);
+         var buffer_vertices_line = gl.createBuffer ();
+         gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_line);
          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices_line), gl.STATIC_DRAW);
 
-         var color_buffer_line = gl.createBuffer ();
-         gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer_line);
+         var buffer_colors_line = gl.createBuffer ();
+         gl.bindBuffer(gl.ARRAY_BUFFER, buffer_colors_line);
          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors_line), gl.STATIC_DRAW);
 
-         var index_buffer_line = gl.createBuffer ();
-         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer_line);
+         var buffer_indices_line = gl.createBuffer ();
+         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_line);
          gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_line), gl.STATIC_DRAW);
 
          /*=================== lit SHADERS =================== */
@@ -410,17 +410,17 @@
             gl.uniformMatrix4fv(_Vmatrix_lit, false, view_matrix);
             gl.uniformMatrix4fv(_Mmatrix_lit, false, mo_matrix);
 
-            gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer_solid_lit);
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_solid_lit);
             var _position_lit = gl.getAttribLocation(shaderprogram_lit, "position");
             gl.vertexAttribPointer(_position_lit, 3, gl.FLOAT, false,0,0);
             gl.enableVertexAttribArray(_position_lit);
 
-            gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer_solid_lit);
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffer_colors_solid_lit);
             var _color_lit = gl.getAttribLocation(shaderprogram_lit, "color");
             gl.vertexAttribPointer(_color_lit, 3, gl.FLOAT, false,0,0) ;
             gl.enableVertexAttribArray(_color_lit);
 
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer_solid_lit);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_solid_lit);
             gl.drawElements(gl.TRIANGLES, indices_solid_lit.length, gl.UNSIGNED_SHORT, 0);
 
 // draw solid unlit triangles
@@ -430,33 +430,33 @@
             gl.uniformMatrix4fv(_Vmatrix_unlit, false, view_matrix);
             gl.uniformMatrix4fv(_Mmatrix_unlit, false, mo_matrix);
 
-            gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer_solid_unlit);
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_solid_unlit);
             var _position_unlit = gl.getAttribLocation(shaderprogram_unlit, "position");
             gl.vertexAttribPointer(_position_unlit, 3, gl.FLOAT, false,0,0);
             gl.enableVertexAttribArray(_position_unlit);
 
-            gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer_solid_unlit);
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffer__colors_solid_unlit);
             var _color_unlit = gl.getAttribLocation(shaderprogram_unlit, "color");
             gl.vertexAttribPointer(_color_unlit, 3, gl.FLOAT, false,0,0) ;
             gl.enableVertexAttribArray(_color_unlit);
 
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer_solid_unlit);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_solid_unlit);
             gl.drawElements(gl.TRIANGLES, indices_solid_unlit.length, gl.UNSIGNED_SHORT, 0);
 
 // draw outlines
 
             gl.useProgram(shaderprogram_unlit);
-            gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer_line);
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_line);
             var _position_unlit = gl.getAttribLocation(shaderprogram_unlit, "position");
             gl.vertexAttribPointer(_position_unlit, 3, gl.FLOAT, false,0,0);
             gl.enableVertexAttribArray(_position_unlit);
 
-            gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer_line);
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffer_colors_line);
             var _color_unlit = gl.getAttribLocation(shaderprogram_unlit, "color");
             gl.vertexAttribPointer(_color_unlit, 3, gl.FLOAT, false,0,0) ;
             gl.enableVertexAttribArray(_color_unlit);
 
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer_line);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_line);
             gl.drawElements(gl.LINES, indices_line.length, gl.UNSIGNED_SHORT, 0);
 
             window.requestAnimationFrame(animate);
