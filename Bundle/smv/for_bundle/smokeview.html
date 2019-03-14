@@ -64,6 +64,24 @@
             0,1,0, 0,1,0, 0,1,0, 0,1,0 
          ];
 
+         var textures_solid_unlit = [
+            0.00, 0.00, 0.00, 0.00,
+            0.15, 0.15, 0.15, 0.15,
+            0.30, 0.30, 0.30, 0.30,
+            0.45, 0.45, 0.45, 0.45,
+            0.60, 0.60, 0.60, 0.60,
+            0.75, 0.75, 0.75, 0.75
+         ];
+
+         var texture_colorbar = [
+            0.0, 0.0, 0.0,
+            0.2, 0.2, 0.2,
+            0.4, 0.4, 0.4,
+            0.6, 0.6, 0.6,
+            0.8, 0.8, 0.8,
+            1.0, 1.0, 1.0,
+         ];
+
          var indices_solid_unlit = [
             0,1,2, 0,2,3, 4,5,6, 4,6,7,
             8,9,10, 8,10,11, 12,13,14, 12,14,15,
@@ -84,7 +102,6 @@
            0, 1, 2, 3
          ];
 //HIDE_OFF
-
 
 // setup solid lit triangle data
 
@@ -109,6 +126,10 @@
          var color_buffer_solid_unlit = gl.createBuffer ();
          gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer_solid_unlit);
          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors_solid_unlit), gl.STATIC_DRAW);
+
+         var texture_buffer_solid_unlit = gl.createBuffer ();
+         gl.bindBuffer(gl.ARRAY_BUFFER, texture_buffer_solid_unlit);
+         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textures_solid_unlit), gl.STATIC_DRAW);
 
          var index_buffer_solid_unlit = gl.createBuffer ();
          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer_solid_unlit);
