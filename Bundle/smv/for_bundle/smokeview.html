@@ -31,6 +31,15 @@
             -1, 0,-1, -1, 0, 0, 0, 0, 0, 0, 0,-1, 
          ];
 
+ //        var normals_solid_lit = [
+ //           0,0,-1, 0,0,-1, 0,0,-1, 0,0,-1,
+ //           0,0, 1, 0,0, 1, 0,0, 1, 0,0, 1,
+ //           -1,0,0,-1,0,0,-1,0,0,-1,0,0,
+ //            1,0,0, 1,0,0, 1,0,0, 1,0,0,
+ //           0,-1,0, 0,-1,0,0,-1,0,0,-1,0,
+ //           0,1,0, 0,1,0,0,1,0,0,1,0 
+ //        ];
+
          var colors_solid_lit = [
             5,3,7, 5,3,7, 5,3,7, 5,3,7,
             1,1,3, 1,1,3, 1,1,3, 1,1,3,
@@ -91,6 +100,10 @@
          var vertex_buffer_solid_lit = gl.createBuffer ();
          gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer_solid_lit);
          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices_solid_lit), gl.STATIC_DRAW);
+
+//         var normals_buffer_solid_lit = gl.createBuffer ();
+//         gl.bindBuffer(gl.ARRAY_BUFFER, normals_buffer_solid_lit);
+//         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals_solid_lit), gl.STATIC_DRAW);
 
          var color_buffer_solid_lit = gl.createBuffer ();
          gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer_solid_lit);
