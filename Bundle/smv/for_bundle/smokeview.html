@@ -200,7 +200,7 @@
          var _Vmatrix_unlit = gl.getUniformLocation(shaderprogram_unlit, "Vmatrix");
          var _Mmatrix_unlit = gl.getUniformLocation(shaderprogram_unlit, "Mmatrix");
 
-         /*==================== MATRIX ====================== */
+         /*=================== get_projection =================== */
 
          function get_projection(angle, a, zMin, zMax) {
             var ang = Math.tan((angle*.5)*Math.PI/180);//angle*.5
@@ -228,6 +228,8 @@
          var dKEYx=0, dKEYy=0, dKEYz=0;
          var ctrl_key=0, alt_key=0;
 
+         /*=================== mouseDown =================== */
+
          var mouseDown = function(e) {
             window.focus();
             ctrl_key = 0;
@@ -245,9 +247,13 @@
             return false;
          };
 
+         /*=================== mouseUp =================== */
+
          var mouseUp = function(e){
             drag = false;
          };
+
+         /*=================== mouseMove =================== */
 
          var mouseMove = function(e) {
             if (!drag) return false;
@@ -271,13 +277,20 @@
             e.preventDefault();
          };
 
+         /*=================== register callbacks =================== */
+
 //         canvas.addEventListener("keydown",   keyDown,   false);
          canvas.addEventListener("mousedown", mouseDown, false);
          canvas.addEventListener("mouseup", mouseUp, false);
          canvas.addEventListener("mouseout", mouseUp, false);
          canvas.addEventListener("mousemove", mouseMove, false);
 
-         /*=========================rotation================*/
+   //      canvas.addEventListener("touchstart",  mouseDown, false);
+   //      canvas.addEventListener("touchmove",   mouseMove, false);
+   //      canvas.addEventListener("touchend",    mouseUp,   false);
+   //      canvas.addEventListener("touchcancel", mouseUp,  false);
+
+         /*=================== rotateX =================== */
 
          function rotateX(m, angle) {
             var c = Math.cos(angle);
@@ -293,6 +306,8 @@
             m[10] = m[10]*c+mv9*s;
          }
 
+         /*=================== rotateY =================== */
+
          function rotateY(m, angle) {
             var c = Math.cos(angle);
             var s = Math.sin(angle);
@@ -307,6 +322,8 @@
             m[10] = c*m[10] - s*mv8;
          }
 
+         /*=================== translateXYZ =================== */
+
          function translateXYZ(m, X, Y, Z) {
             m[12] +=  m[0]*X +  m[4]*Y +  m[8]*Z;
             m[13] +=  m[1]*X +  m[5]*Y +  m[9]*Z;
@@ -314,10 +331,10 @@
             m[15] +=  m[3]*X +  m[7]*Y + m[11]*Z;
          }
 
-         /*=================== Drawing =================== */
-
          var THETA = 0, PHI = 0;
          var time_old = 0;
+
+         /*=================== animate =================== */
 
          var animate = function(time) {
             var dt = time-time_old;
