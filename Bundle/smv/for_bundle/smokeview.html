@@ -136,8 +136,8 @@
          gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_solid_unlit);
          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices_solid_unlit), gl.STATIC_DRAW);
 
-         var buffer__colors_solid_unlit = gl.createBuffer ();
-         gl.bindBuffer(gl.ARRAY_BUFFER, buffer__colors_solid_unlit);
+         var buffer_colors_solid_unlit = gl.createBuffer ();
+         gl.bindBuffer(gl.ARRAY_BUFFER, buffer_colors_solid_unlit);
          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors_solid_unlit), gl.STATIC_DRAW);
 
          var buffer_textures_solid_unlit = gl.createBuffer ();
@@ -435,7 +435,7 @@
             gl.vertexAttribPointer(_position_unlit, 3, gl.FLOAT, false,0,0);
             gl.enableVertexAttribArray(_position_unlit);
 
-            gl.bindBuffer(gl.ARRAY_BUFFER, buffer__colors_solid_unlit);
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffer_colors_solid_unlit);
             var _color_unlit = gl.getAttribLocation(shaderprogram_unlit, "color");
             gl.vertexAttribPointer(_color_unlit, 3, gl.FLOAT, false,0,0) ;
             gl.enableVertexAttribArray(_color_unlit);
