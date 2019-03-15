@@ -82,14 +82,16 @@
             0.75, 0.75, 0.75, 0.75
          ];
 
-         var texture_colorbar = [
-            0.0, 0.0, 0.0,
-            0.2, 0.2, 0.2,
-            0.4, 0.4, 0.4,
-            0.6, 0.6, 0.6,
-            0.8, 0.8, 0.8,
-            1.0, 1.0, 1.0,
-         ];
+
+         const texture_colorbar = new Uint8Array([
+            0, 0, 0, ,
+            50, 50, 50,
+            100, 100, 100,
+            150, 150, 150,
+            200, 200, 200,
+            250, 250, 250,
+         ]);
+         const texture_colorbar_height = 6;
 
          var indices_solid_unlit = [
             0,1,2, 0,2,3, 4,5,6, 4,6,7,
@@ -143,6 +145,11 @@
          var buffer_textures_solid_unlit = gl.createBuffer ();
          gl.bindBuffer(gl.ARRAY_BUFFER, buffer_textures_solid_unlit);
          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textures_solid_unlit), gl.STATIC_DRAW);
+
+
+         var texture = gl.createTexture();
+         gl.bindTexture(gl.TEXTURE_2D, texture);
+         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, 1, texture_colorbar_height, 0, gl.RGB, gl.UNSIGNED_BYTE, texture_colorbar);
 
          var buffer_indices_solid_unlit = gl.createBuffer ();
          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_solid_unlit);
