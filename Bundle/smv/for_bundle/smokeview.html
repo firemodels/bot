@@ -82,15 +82,17 @@
             0.75, 0.75, 0.75, 0.75
          ];
 
-         const texture_colorbar = new Uint8Array([
-            0, 0, 0, ,
-            50, 50, 50,
-            100, 100, 100,
-            150, 150, 150,
-            200, 200, 200,
-            250, 250, 250,
+         const texture_colorbar_data = new Uint8Array([
+            255,   0,   0, 255,
+            160,  80,   0, 255,
+             80, 160,   0, 255,
+              0, 255,   0, 255,
+            255,   0,   0, 255,
+            255,   0,  80, 255,
+            255,   0, 160, 255,
+              0,   0, 255, 255
          ]);
-         const texture_colorbar_height = 6;
+         const texture_colorbar_data_height = 8;
 
          var indices_solid_unlit = [
             0,1,2, 0,2,3, 4,5,6, 4,6,7,
@@ -145,9 +147,14 @@
          gl.bindBuffer(gl.ARRAY_BUFFER, buffer_textures_solid_unlit);
          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textures_solid_unlit), gl.STATIC_DRAW);
 
-         var texture = gl.createTexture();
-         gl.bindTexture(gl.TEXTURE_2D, texture);
-         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, 1, texture_colorbar_height, 0, gl.RGB, gl.UNSIGNED_BYTE, texture_colorbar);
+         var texture_colorbar = gl.createTexture();
+         gl.activeTexture(gl.TEXTURE0);
+         gl.bindTexture(gl.TEXTURE_2D, texture_colorbar);
+         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, texture_colorbar_data_height, 0, gl.RGBA, gl.UNSIGNED_BYTE, texture_colorbar_data);
+         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
          var buffer_indices_solid_unlit = gl.createBuffer ();
          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_solid_unlit);
@@ -210,16 +217,21 @@
             'uniform mat4 Vmatrix;'+
             'uniform mat4 Mmatrix;'+
             'attribute vec3 color;'+//the color of the point
+            'attribute float texture_coordinate;'+//the color of the point
             'varying vec3 vColor;'+
+            'varying highp float vtexture_coordinate;'+
             'void main(void) { '+//pre-built function
                'gl_Position = Pmatrix*Vmatrix*Mmatrix*vec4(position, 1.);'+
                'vColor = color;'+
+               'vtexture_coordinate = texture_coordinate;'+
             '}';
 
          var fragCode_unlit = 'precision mediump float;'+
             'varying vec3 vColor;'+
+            'varying float vtexture_coordinate;'+
+            'uniform sampler2D texture_colorbar_sampler;' +
             'void main(void) {'+
-               'gl_FragColor = vec4(vColor, 1.);'+
+            'gl_FragColor = texture2D(texture_colorbar_sampler, vec2(0.5,vtexture_coordinate));'+
             '}';
 
          var vertShader_unlit = gl.createShader(gl.VERTEX_SHADER);
@@ -444,6 +456,16 @@
             var _color_unlit = gl.getAttribLocation(shaderprogram_unlit, "color");
             gl.vertexAttribPointer(_color_unlit, 3, gl.FLOAT, false,0,0) ;
             gl.enableVertexAttribArray(_color_unlit);
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffer_textures_solid_unlit);
+            var _texture_coordinate_unlit = gl.getAttribLocation(shaderprogram_unlit, "texture_coordinate");
+            gl.vertexAttribPointer(_texture_coordinate_unlit, 1, gl.FLOAT, false,0,0) ;
+            gl.enableVertexAttribArray(_texture_coordinate_unlit);
+
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, texture_colorbar);
+            var texture_location = gl.getUniformLocation(shaderprogram_unlit, "texture_colorbar_sampler");
+            gl.uniform1i(texture_location,0);
 
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_solid_unlit);
             gl.drawElements(gl.TRIANGLES, indices_solid_unlit.length, gl.UNSIGNED_SHORT, 0);
