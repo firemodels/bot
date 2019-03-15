@@ -82,7 +82,6 @@
             0.75, 0.75, 0.75, 0.75
          ];
 
-
          const texture_colorbar = new Uint8Array([
             0, 0, 0, ,
             50, 50, 50,
@@ -145,7 +144,6 @@
          var buffer_textures_solid_unlit = gl.createBuffer ();
          gl.bindBuffer(gl.ARRAY_BUFFER, buffer_textures_solid_unlit);
          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textures_solid_unlit), gl.STATIC_DRAW);
-
 
          var texture = gl.createTexture();
          gl.bindTexture(gl.TEXTURE_2D, texture);
