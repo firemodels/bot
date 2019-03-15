@@ -64,15 +64,6 @@
             0, 1,0, 0, 1, 1, 1, 1, 1, 1, 1,0, 
          ];
 
-         var colors_solid_unlit = [
-            5,3,7, 5,3,7, 5,3,7, 5,3,7,
-            1,1,3, 1,1,3, 1,1,3, 1,1,3,
-            0,0,1, 0,0,1, 0,0,1, 0,0,1,
-            1,0,0, 1,0,0, 1,0,0, 1,0,0,
-            1,1,0, 1,1,0, 1,1,0, 1,1,0,
-            0,1,0, 0,1,0, 0,1,0, 0,1,0 
-         ];
-
          var textures_solid_unlit = [
             0.00, 0.00, 0.00, 0.00,
             0.15, 0.15, 0.15, 0.15,
@@ -138,10 +129,6 @@
          var buffer_vertices_solid_unlit = gl.createBuffer ();
          gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_solid_unlit);
          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices_solid_unlit), gl.STATIC_DRAW);
-
-         var buffer_colors_solid_unlit = gl.createBuffer ();
-         gl.bindBuffer(gl.ARRAY_BUFFER, buffer_colors_solid_unlit);
-         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors_solid_unlit), gl.STATIC_DRAW);
 
          var buffer_textures_solid_unlit = gl.createBuffer ();
          gl.bindBuffer(gl.ARRAY_BUFFER, buffer_textures_solid_unlit);
@@ -216,18 +203,14 @@
             'uniform mat4 Pmatrix;'+
             'uniform mat4 Vmatrix;'+
             'uniform mat4 Mmatrix;'+
-            'attribute vec3 color;'+//the color of the point
             'attribute float texture_coordinate;'+//the color of the point
-            'varying vec3 vColor;'+
             'varying highp float vtexture_coordinate;'+
             'void main(void) { '+//pre-built function
                'gl_Position = Pmatrix*Vmatrix*Mmatrix*vec4(position, 1.);'+
-               'vColor = color;'+
                'vtexture_coordinate = texture_coordinate;'+
             '}';
 
          var fragCode_unlit = 'precision mediump float;'+
-            'varying vec3 vColor;'+
             'varying float vtexture_coordinate;'+
             'uniform sampler2D texture_colorbar_sampler;' +
             'void main(void) {'+
@@ -451,11 +434,6 @@
             var _position_unlit = gl.getAttribLocation(shaderprogram_unlit, "position");
             gl.vertexAttribPointer(_position_unlit, 3, gl.FLOAT, false,0,0);
             gl.enableVertexAttribArray(_position_unlit);
-
-            gl.bindBuffer(gl.ARRAY_BUFFER, buffer_colors_solid_unlit);
-            var _color_unlit = gl.getAttribLocation(shaderprogram_unlit, "color");
-            gl.vertexAttribPointer(_color_unlit, 3, gl.FLOAT, false,0,0) ;
-            gl.enableVertexAttribArray(_color_unlit);
 
             gl.bindBuffer(gl.ARRAY_BUFFER, buffer_textures_solid_unlit);
             var _texture_coordinate_unlit = gl.getAttribLocation(shaderprogram_unlit, "texture_coordinate");
