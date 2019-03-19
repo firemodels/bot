@@ -170,24 +170,24 @@
             'uniform mat4 normal_matrix;'+
             'attribute vec3 color;'+ //the color of the point
             'attribute vec3 normal;'+//the normal of the point
-            'varying vec3 vnormal;'+
-            'varying vec3 vcolor;'+
-            'varying vec3 vlighting;'+
+            'varying highp vec3 vnormal;'+
+            'varying highp vec3 vcolor;'+
+            'varying highp vec3 vlighting;'+
             'void main(void) { '+//pre-built function
                'gl_Position = Pmatrix*Vmatrix*Mmatrix*vec4(position, 1.);'+
-               'vec3 ambient = vec3(0.3, 0.3, 0.3);'+
-               'vec3 diffuse = vec3(1, 1, 1);'+
-               'vec3 light_direction = normalize(vec3(0.85, 0.8, 0.75));'+
+               'highp vec3 ambient_color = vec3(0.75, 0.75, 0.75);'+
+               'highp vec3 diffuse_color = vec3(0.6, 0.6, 0.6);'+
+               'highp vec3 diffuse_direction = normalize(vec3(0.85, 0.8, 0.75));'+
                'vcolor = color;'+
                'vec4 vnormal = normal_matrix * vec4(normal, 1.0);'+
-               'float directional = max(dot(vnormal.xyz, light_direction), 0.0);'+
-               'vlighting = ambient + (diffuse * directional);'+
+               'vnormal = normalize(vnormal);'+
+               'highp float directional = max(dot(vnormal.xyz, diffuse_direction), 0.0);'+
+               'vlighting = ambient_color + (diffuse_color * directional);'+
             '}';
 
          var fragCode_lit = 'precision mediump float;'+
-            'varying vec3 vcolor;'+
-            'varying vec3 vnormal;'+
-            'varying vec3 vlighting;'+
+            'varying highp vec3 vcolor;'+
+            'varying highp vec3 vlighting;'+
             'void main(void) {'+
                'gl_FragColor = vec4(vcolor*vlighting, 1.);'+
             '}';
@@ -429,6 +429,7 @@
            var b11 = a22 * a33 - a23 * a32;
 
           var det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
+          if(det==0.0)det=1.0;
           det = 1.0 / det;
           var out0 = (a11 * b11 - a12 * b10 + a13 * b09) * det;
           var out1 = (a02 * b10 - a01 * b11 - a03 * b09) * det;
@@ -482,8 +483,9 @@
             rotateY(mo_matrix, THETA);
             rotateX(mo_matrix, PHI);
 
-            normal_matrix = mat_mult(mo_matrix, view_matrix);
-            normal_matrix = mat_inverse(normal_matrix);
+         //   normal_matrix = mat_mult(mo_matrix, view_matrix);
+         //   normal_matrix = mat_inverse(normal_matrix);
+            normal_matrix = mat_inverse(mo_matrix);
             normal_matrix = mat_transpose(normal_matrix);
 
             time_old = time; 
