@@ -71,6 +71,8 @@
             0.5,0.5,0.5, 0.5,0.5, 1, 1,0.5, 1, 1,0.5,0.5,
             0.5, 1,0.5, 0.5, 1, 1, 1, 1, 1, 1, 1,0.5, 
          ];
+         var nframes=1;
+         var frame_size=24;
 
          var textures_solid_unlit = [
             0.00, 0.00, 0.00, 0.00,
@@ -575,7 +577,7 @@
             gl.viewport(0.0, 0.0, canvas.width, canvas.height);
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-// draw solid lit triangles
+// draw lit triangles
 
             gl.useProgram(shaderprogram_lit);
             gl.uniformMatrix4fv(_Pmatrix_lit, false, proj_matrix);
@@ -601,7 +603,7 @@
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_solid_lit);
             gl.drawElements(gl.TRIANGLES, indices_solid_lit.length, gl.UNSIGNED_SHORT, 0);
 
-// draw solid unlit triangles
+// draw unlit triangles
 
             gl.useProgram(shaderprogram_unlit);
             gl.uniformMatrix4fv(_Pmatrix_unlit, false, proj_matrix);
