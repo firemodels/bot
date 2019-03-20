@@ -22,13 +22,17 @@
 
 // smokeview replaces following ***VERTS line with vertices, colors and indices arrays
 
+         var xcen = 0.5;
+         var ycen = 0.5;
+         var zcen = 0.5;
+
          var vertices_solid_lit = [
-            -1,-1,-1,  0,-1,-1,  0, 0,-1, -1, 0,-1, // bottom
-            -1,-1, 0,  0,-1, 0,  0, 0, 0, -1, 0, 0, // top
-            -1,-1,-1, -1, 0,-1, -1, 0, 0, -1,-1, 0, // left
-             0,-1,-1,  0, 0,-1,  0, 0, 0,  0,-1, 0, // right
-            -1,-1,-1, -1,-1, 0,  0,-1, 0,  0,-1,-1, // back
-            -1, 0,-1, -1, 0, 0,  0, 0, 0,  0, 0,-1, // front
+            0.0,0.0,0.0,  0.5,0.0,0.0,  0.5, 0.5,0.0, 0.0, 0.5,0.0, // bottom
+            0.0,0.0, 0.5,  0.5,0.0, 0.5,  0.5, 0.5, 0.5, 0.0, 0.5, 0.5, // top
+            0.0,0.0,0.0, 0.0, 0.5,0.0, 0.0, 0.5, 0.5, 0.0,0.0, 0.5, // left
+             0.5,0.0,0.0,  0.5, 0.5,0.0,  0.5, 0.5, 0.5,  0.5,0.0, 0.5, // right
+            0.0,0.0,0.0, 0.0,0.0, 0.5,  0.5,0.0, 0.5,  0.5,0.0,0.0, // back
+            0.0, 0.5,0.0, 0.0, 0.5, 0.5,  0.5, 0.5, 0.5,  0.5, 0.5,0.0, // front
          ];
 
          var normals_solid_lit = [
@@ -56,12 +60,12 @@
          ];
 
          var vertices_solid_unlit = [
-            0,0,0, 1,0,0, 1, 1,0, 0, 1,0,
-            0,0, 1, 1,0, 1, 1, 1, 1, 0, 1, 1,
-            0,0,0, 0, 1,0, 0, 1, 1, 0,0, 1,
-            1,0,0, 1, 1,0, 1, 1, 1, 1,0, 1,
-            0,0,0, 0,0, 1, 1,0, 1, 1,0,0,
-            0, 1,0, 0, 1, 1, 1, 1, 1, 1, 1,0, 
+            0.5,0.5,0.5, 1,0.5,0.5, 1, 1,0.5, 0.5, 1,0.5,
+            0.5,0.5, 1, 1,0.5, 1, 1, 1, 1, 0.5, 1, 1,
+            0.5,0.5,0.5, 0.5, 1,0.5, 0.5, 1, 1, 0.5,0.5, 1,
+            1,0.5,0.5, 1, 1,0.5, 1, 1, 1, 1,0.5, 1,
+            0.5,0.5,0.5, 0.5,0.5, 1, 1,0.5, 1, 1,0.5,0.5,
+            0.5, 1,0.5, 0.5, 1, 1, 1, 1, 1, 1, 1,0.5, 
          ];
 
          var textures_solid_unlit = [
@@ -92,8 +96,8 @@
          ];
 
          var vertices_line = [
-           -1.5,-1.5,-1.5,-1.5,1.5,1.5,
-           -1.5,-1.5,-1.5,1.5,-1.5,-1.5
+           0,0,0,0,1,1,
+           0,0,0,1,0,0
          ];
 
          var colors_line = [
@@ -397,6 +401,14 @@
             m[15] +=  m[3]*X +  m[7]*Y + m[11]*Z;
          }
 
+         /*=================== scaleX =================== */
+
+         function scaleX(m, X) {
+            m[0]*=X, m[1]*=X, m[2]*=X, m[3]*=X;
+            m[4]*=X, m[5]*=X, m[6]*=X, m[7]*=X;
+            m[8]*=X, m[9]*=X, m[10]*=X, m[11]*=X;
+         }
+
          /*=================== mat_transpose =================== */
 
          function mat_transpose( m) {
@@ -497,9 +509,15 @@
 // add 90 deg rotation to be compatible with smokeview
             rotateX(mo_matrix, -1.571);
 
-            translateXYZ(mo_matrix, dKEYx, dKEYy, dKEYz)
+            translateXYZ(mo_matrix, -0.75, -0.75, -0.75);
+            scaleX(mo_matrix, 1.5) ;
+
+            translateXYZ(mo_matrix, dKEYx, dKEYy, dKEYz);
+
+            translateXYZ(mo_matrix, xcen, ycen, zcen);
             rotateY(mo_matrix, THETA);
             rotateX(mo_matrix, PHI);
+            translateXYZ(mo_matrix, -xcen, -ycen, -zcen);
 
          //   normal_matrix = mat_mult(mo_matrix, view_matrix);
          //   normal_matrix = mat_inverse(normal_matrix);
