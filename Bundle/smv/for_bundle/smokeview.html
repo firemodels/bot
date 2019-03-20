@@ -269,6 +269,42 @@
          var _Vmatrix_unlit = gl.getUniformLocation(shaderprogram_unlit, "Vmatrix");
          var _Mmatrix_unlit = gl.getUniformLocation(shaderprogram_unlit, "Mmatrix");
 
+         /*=================== line SHADERS =================== */
+
+         var vertCode_line = 'attribute vec3 position;'+
+            'uniform mat4 Pmatrix;'+
+            'uniform mat4 Vmatrix;'+
+            'uniform mat4 Mmatrix;'+
+            'attribute vec3 color;'+//the color of the point
+            'varying vec3 vColor;'+
+            'void main(void) { '+//pre-built function
+               'gl_Position = Pmatrix*Vmatrix*Mmatrix*vec4(position, 1.);'+
+               'vColor = color;'+
+            '}';
+
+         var fragCode_line = 'precision mediump float;'+
+            'varying vec3 vColor;'+
+            'void main(void) {'+
+               'gl_FragColor = vec4(vColor, 1.);'+
+            '}';
+
+         var vertShader_line = gl.createShader(gl.VERTEX_SHADER);
+         gl.shaderSource(vertShader_line, vertCode_line);
+         gl.compileShader(vertShader_line);
+
+         var fragShader_line = gl.createShader(gl.FRAGMENT_SHADER);
+         gl.shaderSource(fragShader_line, fragCode_line);
+         gl.compileShader(fragShader_line);
+
+         var shaderprogram_line = gl.createProgram();
+         gl.attachShader(shaderprogram_line, vertShader_line);
+         gl.attachShader(shaderprogram_line, fragShader_line);
+         gl.linkProgram(shaderprogram_line);
+
+         var _Pmatrix_line = gl.getUniformLocation(shaderprogram_line, "Pmatrix");
+         var _Vmatrix_line = gl.getUniformLocation(shaderprogram_line, "Vmatrix");
+         var _Mmatrix_line = gl.getUniformLocation(shaderprogram_line, "Mmatrix");
+
          /*=================== get_projection =================== */
 
          function get_projection(angle, a, zMin, zMax) {
@@ -587,16 +623,19 @@
 
 // draw outlines
 
-            gl.useProgram(shaderprogram_unlit);
+            gl.useProgram(shaderprogram_line);
+            gl.uniformMatrix4fv(_Pmatrix_line, false, proj_matrix);
+            gl.uniformMatrix4fv(_Vmatrix_line, false, view_matrix);
+            gl.uniformMatrix4fv(_Mmatrix_line, false, mo_matrix);
             gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_line);
-            var _position_unlit = gl.getAttribLocation(shaderprogram_unlit, "position");
-            gl.vertexAttribPointer(_position_unlit, 3, gl.FLOAT, false,0,0);
-            gl.enableVertexAttribArray(_position_unlit);
+            var _position_line = gl.getAttribLocation(shaderprogram_line, "position");
+            gl.vertexAttribPointer(_position_line, 3, gl.FLOAT, false,0,0);
+            gl.enableVertexAttribArray(_position_line);
 
             gl.bindBuffer(gl.ARRAY_BUFFER, buffer_colors_line);
-            var _color_unlit = gl.getAttribLocation(shaderprogram_unlit, "color");
-            gl.vertexAttribPointer(_color_unlit, 3, gl.FLOAT, false,0,0) ;
-            gl.enableVertexAttribArray(_color_unlit);
+            var _color_line = gl.getAttribLocation(shaderprogram_line, "color");
+            gl.vertexAttribPointer(_color_line, 3, gl.FLOAT, false,0,0) ;
+            gl.enableVertexAttribArray(_color_line);
 
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_line);
             gl.drawElements(gl.LINES, indices_line.length, gl.UNSIGNED_SHORT, 0);
