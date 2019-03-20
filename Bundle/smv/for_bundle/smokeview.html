@@ -26,13 +26,15 @@
          var ycen = 0.5;
          var zcen = 0.5;
 
+   // lit geometry
+
          var vertices_solid_lit = [
-            0.0,0.0,0.0,  0.5,0.0,0.0,  0.5, 0.5,0.0, 0.0, 0.5,0.0, // bottom
-            0.0,0.0, 0.5,  0.5,0.0, 0.5,  0.5, 0.5, 0.5, 0.0, 0.5, 0.5, // top
-            0.0,0.0,0.0, 0.0, 0.5,0.0, 0.0, 0.5, 0.5, 0.0,0.0, 0.5, // left
-             0.5,0.0,0.0,  0.5, 0.5,0.0,  0.5, 0.5, 0.5,  0.5,0.0, 0.5, // right
-            0.0,0.0,0.0, 0.0,0.0, 0.5,  0.5,0.0, 0.5,  0.5,0.0,0.0, // back
-            0.0, 0.5,0.0, 0.0, 0.5, 0.5,  0.5, 0.5, 0.5,  0.5, 0.5,0.0, // front
+            0.0,0.0,0.0, 0.5,0.0,0.0, 0.5,0.5,0.0, 0.0,0.5,0.0, // bottom
+            0.0,0.0,0.5, 0.5,0.0,0.5, 0.5,0.5,0.5, 0.0,0.5,0.5, // top
+            0.0,0.0,0.0, 0.0,0.5,0.0, 0.0,0.5,0.5, 0.0,0.0,0.5, // left
+            0.5,0.0,0.0, 0.5,0.5,0.0, 0.5,0.5,0.5, 0.5,0.0,0.5, // right
+            0.0,0.0,0.0, 0.0,0.0,0.5, 0.5,0.0,0.5, 0.5,0.0,0.0, // back
+            0.0,0.5,0.0, 0.0,0.5,0.5, 0.5,0.5,0.5, 0.5,0.5,0.0, // front
          ];
 
          var normals_solid_lit = [
@@ -54,10 +56,12 @@
          ];
 
          var indices_solid_lit = [
-            0,1,2, 0,2,3, 4,5,6, 4,6,7,
-            8,9,10, 8,10,11, 12,13,14, 12,14,15,
+            0,1,2,    0,2,3,    4,5,6,    4,6,7,
+            8,9,10,   8,10,11,  12,13,14, 12,14,15,
             16,17,18, 16,18,19, 20,21,22, 20,22,23 
          ];
+
+   // unlit geometry
 
          var vertices_solid_unlit = [
             0.5,0.5,0.5, 1,0.5,0.5, 1, 1,0.5, 0.5, 1,0.5,
@@ -95,6 +99,8 @@
             16,17,18, 16,18,19, 20,21,22, 20,22,23 
          ];
 
+   // line geometry
+
          var vertices_line = [
            0,0,0,0,1,1,
            0,0,0,1,0,0
@@ -110,7 +116,7 @@
          ];
 //HIDE_OFF
 
-// setup solid lit triangle data
+// setup lit triangle data
 
          var buffer_vertices_solid_lit = gl.createBuffer ();
          gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_solid_lit);
@@ -128,7 +134,7 @@
          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_solid_lit);
          gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_solid_lit), gl.STATIC_DRAW);
 
-// setup solid unlit triangle data
+// setup unlit triangle data
 
          var buffer_vertices_solid_unlit = gl.createBuffer ();
          gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_solid_unlit);
@@ -151,7 +157,7 @@
          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_solid_unlit);
          gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_solid_unlit), gl.STATIC_DRAW);
 
-// setup outline data
+// setup line data
 
          var buffer_vertices_line = gl.createBuffer ();
          gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_line);
@@ -403,13 +409,13 @@
             var s = Math.sin(angle);
             var mv1 = m[1], mv5 = m[5], mv9 = m[9];
 
-            m[1] = m[1]*c- m[2]*s;
-            m[5] = m[5]*c- m[6]*s;
-            m[9] = m[9]*c-m[10]*s;
+            m[1] = m[1]*c - m[2]*s;
+            m[5] = m[5]*c - m[6]*s;
+            m[9] = m[9]*c - m[10]*s;
 
-            m[2] =   m[2]*c+mv1*s;
-            m[6] =   m[6]*c+mv5*s;
-            m[10] = m[10]*c+mv9*s;
+            m[2] =   m[2]*c + mv1*s;
+            m[6] =   m[6]*c + mv5*s;
+            m[10] = m[10]*c + mv9*s;
          }
 
          /*=================== rotateY =================== */
@@ -535,7 +541,7 @@
                THETA+=dX, PHI+=dY;
             }
 
-            //set model matrix to I4
+            //set model matrix to the identiry
 
              mo_matrix[0] = 1,  mo_matrix[1] = 0,  mo_matrix[2] = 0,  mo_matrix[3] = 0,
              mo_matrix[4] = 0,  mo_matrix[5] = 1,  mo_matrix[6] = 0,  mo_matrix[7] = 0,
@@ -563,8 +569,6 @@
          //   THETA+=(time - time_old)/5000.0; 
             time_old = time;
             gl.enable(gl.DEPTH_TEST);
-
-            // gl.depthFunc(gl.LEQUAL);
 
             gl.clearColor(gray_color, gray_color, gray_color, 0.9);
             gl.clearDepth(1.0);
