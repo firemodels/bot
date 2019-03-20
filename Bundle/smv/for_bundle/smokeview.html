@@ -560,7 +560,8 @@
             normal_matrix = mat_inverse(mo_matrix);
             normal_matrix = mat_transpose(normal_matrix);
 
-            time_old = time; 
+         //   THETA+=(time - time_old)/5000.0; 
+            time_old = time;
             gl.enable(gl.DEPTH_TEST);
 
             // gl.depthFunc(gl.LEQUAL);
