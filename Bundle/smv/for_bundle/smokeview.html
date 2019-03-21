@@ -357,6 +357,22 @@
          var dKEYx=0, dKEYy=0, dKEYz=0;
          var ctrl_key=0, alt_key=0;
 
+         /*=================== touchDown =================== */
+
+         function touchDown(e) {
+           if(e.touches) {
+             mouseDown(e)
+           }
+         }
+
+         /*=================== touchMove =================== */
+
+         function touchMove(e) {
+           if(e.touches) {
+             mouseMove(e)
+           }
+         }
+
          /*=================== mouseDown =================== */
 
          var mouseDown = function(e) {
@@ -371,7 +387,8 @@
             }
 
             drag = true;
-            old_x = e.pageX, old_y = e.pageY;
+            old_x = e.pageX;
+            old_y = e.pageY;
             e.preventDefault();
             return false;
          };
@@ -410,13 +427,13 @@
 
 //         canvas.addEventListener("keydown",   keyDown,   false);
          canvas.addEventListener("mousedown", mouseDown, false);
-         canvas.addEventListener("mouseup", mouseUp, false);
-         canvas.addEventListener("mouseout", mouseUp, false);
+         canvas.addEventListener("mouseup",   mouseUp, false);
+         canvas.addEventListener("mouseout",  mouseUp, false);
          canvas.addEventListener("mousemove", mouseMove, false);
 
-   //      canvas.addEventListener("touchstart",  mouseDown, false);
-   //      canvas.addEventListener("touchmove",   mouseMove, false);
-   //      canvas.addEventListener("touchend",    mouseUp,   false);
+         canvas.addEventListener("touchstart",  touchDown, false);
+         canvas.addEventListener("touchmove",   touchMove, false);
+         canvas.addEventListener("touchend",    mouseUp,   false);
    //      canvas.addEventListener("touchcancel", mouseUp,  false);
 
          /*=================== rotateX =================== */
