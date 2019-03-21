@@ -71,16 +71,31 @@
             0.5,0.5,0.5, 0.5,0.5, 1, 1,0.5, 1, 1,0.5,0.5,
             0.5, 1,0.5, 0.5, 1, 1, 1, 1, 1, 1, 1,0.5, 
          ];
-         var nframes=1;
-         var frame_size=24;
 
-         var textures_unlit = [
+         var nframes=2;
+         var frame_size=24;
+         var textures_unlit_data = [
             0.00, 0.00, 0.00, 0.00,
             0.15, 0.15, 0.15, 0.15,
             0.30, 0.30, 0.30, 0.30,
             0.45, 0.45, 0.45, 0.45,
             0.60, 0.60, 0.60, 0.60,
-            0.75, 0.75, 0.75, 0.75
+            0.75, 0.75, 0.75, 0.75,
+            0.00, 1.00, 0.00, 0.00,
+            1.00, 1.00, 0.00, 0.00,
+            0.00, 1.00, 0.00, 0.00,
+            1.00, 1.00, 0.00, 0.00,
+            0.00, 1.00, 0.00, 0.00,
+            1.00, 1.00, 0.00, 0.00
+         ];
+
+         var textures_unlit = [
+            0.00, 0.00, 0.00, 0.00,
+            0.00, 0.00, 0.00, 0.00,
+            0.00, 0.00, 0.00, 0.00,
+            0.00, 0.00, 0.00, 0.00,
+            0.00, 0.00, 0.00, 0.00,
+            0.00, 0.00, 0.00, 0.00
          ];
 
          const texture_colorbar_data = new Uint8Array([
@@ -484,6 +499,8 @@
             ];
          }
 
+         /*=================== mat_inverse =================== */
+
          function mat_inverse(a) {
            var a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3];
            var a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7];
@@ -527,10 +544,22 @@
             out8,  out9, out10, out11,
            out12, out13, out14, out15
            ];
-}
+
+         }
+
+         /*=================== get_slice_frame =================== */
+
+         function get_slice_frame(frame) {
+           var i;
+
+           for (i=0; i<frame_size; i++){
+             textures_unlit[i] = textures_unlit_data[frame_size*frame+i];
+           }
+         }
 
          var THETA = 0, PHI = 0;
          var time_old = 0;
+         var iframe = 0;
 
          /*=================== animate =================== */
 
@@ -615,7 +644,12 @@
             gl.vertexAttribPointer(_position_unlit, 3, gl.FLOAT, false,0,0);
             gl.enableVertexAttribArray(_position_unlit);
 
+            get_slice_frame(iframe);
+            iframe++;
+            if(iframe+1>nframes)iframe=0;
+
             gl.bindBuffer(gl.ARRAY_BUFFER, buffer_textures_unlit);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textures_unlit), gl.STATIC_DRAW);
             var _texture_coordinate_unlit = gl.getAttribLocation(shaderprogram_unlit, "texture_coordinate");
             gl.vertexAttribPointer(_texture_coordinate_unlit, 1, gl.FLOAT, false,0,0) ;
             gl.enableVertexAttribArray(_texture_coordinate_unlit);
