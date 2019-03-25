@@ -74,6 +74,9 @@
 
          var nframes=2;
          var frame_size=24;
+         var slice_file="smokeview.htmld";
+         slice_file_ready=1;
+
          var textures_unlit_data = new Uint8Array([
               0,   0,   0,   0,
              38,  38,  38,  38,
@@ -89,14 +92,14 @@
             153, 153, 153, 153,
          ]);
 
-         var textures_unlit = [
+         var textures_unlit = new Float32Array([
             0.0, 0.0, 0.0, 0.0,
             0.0, 0.0, 0.0, 0.0,
             0.0, 0.0, 0.0, 0.0,
             0.0, 0.0, 0.0, 0.0,
             0.0, 0.0, 0.0, 0.0,
             0.0, 0.0, 0.0, 0.0
-         ];
+         ]);
 
          const texture_colorbar_data = new Uint8Array([
             255,   0,   0, 255,
@@ -132,6 +135,18 @@
            0, 1, 2, 3
          ];
 //HIDE_OFF
+
+// read slice file dat (unlit triangles)
+
+         var reader = new FileReader();
+         reader.onload = function(e) {
+           var textures_unlit_data = reader.result;
+         }
+         reader.onloadend = function(e) {
+           slice_file_ready=1;
+         }
+         file = new File(["foot"], slice_file, { type: 'application/octet-stream',  });
+       //  reader.readAsArrayBuffer(file);
 
 // setup lit triangle data
 
@@ -570,7 +585,12 @@
            var i;
 
            for (i=0; i<frame_size; i++){
-             textures_unlit[i] = textures_unlit_data[frame_size*frame+i]/255.0;
+             if(slice_file_ready == 1){
+               textures_unlit[i] = textures_unlit_data[frame_size*frame+i]/255.0;
+             }
+             else{
+               textures_unlit[i] = 128/255.0;
+             }
            }
          }
 
