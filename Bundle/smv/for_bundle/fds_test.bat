@@ -12,6 +12,11 @@ set stop_script=0
 set use_openmp=0
 set have_casename=0
 
+if "x%invoke_fdsinit%" == "x1" goto skip_invoke_fdsinit
+set invoke_fdsinit=1
+call fdsinit
+:skip_invoke_fdsinit
+
 call :getopts %*
 if "%stop_script%" == "1" exit /b
 call :set_openmp_defaults

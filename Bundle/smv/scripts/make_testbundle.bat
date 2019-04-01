@@ -54,6 +54,8 @@ echo copying .po files
 copy %forbundle%\*.po %smvdir%\.>Nul
 
 CALL :COPY %forbundle%\volrender.ssf %smvdir%\volrender.ssf
+CALL :COPY %forbundle%\fds_test.bat  %smvdir%\fds_test.bat
+CALL :COPY %forbundle%\fdsinit.bat   %smvdir%\fdsinit.bat
 
 CALL :COPY %smvbuild%\background\intel_win_64\background.exe                      %smvdir%\background.exe
 CALL :COPY %smvbuild%\dem2fds\intel_win_%platform%\dem2fds_win_%platform%.exe     %smvdir%\dem2fds.exe
