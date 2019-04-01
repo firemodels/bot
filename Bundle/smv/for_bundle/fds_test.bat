@@ -12,10 +12,15 @@ set stop_script=0
 set use_openmp=0
 set have_casename=0
 
+:: set up the environment for running fds the first time 
+:: this script is used in a command shell
+
 if "x%invoke_fdsinit%" == "x1" goto skip_invoke_fdsinit
-set invoke_fdsinit=1
-call fdsinit
+  set invoke_fdsinit=1
+  call fdsinit_test
 :skip_invoke_fdsinit
+
+:: parse command line options
 
 call :getopts %*
 if "%stop_script%" == "1" exit /b
