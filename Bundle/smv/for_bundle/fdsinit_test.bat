@@ -4,6 +4,7 @@ SET PATH=%I_MPI_ROOT%;%PATH%
 
 title FDS
 echo.
-echo Initializing environment for running fds
 echo Type helpfds for help on running fds
+echo Initializing environment for running fds
+echo.
 

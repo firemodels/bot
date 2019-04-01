@@ -10,7 +10,11 @@ echo.
 echo Wrapping up 64 bit Smokeview update
 echo.
 
-set SMVBINDIR=%CD%
+set "SMVBINDIR=%CD%"
+set "FDSBINDIR=%SMVBINDIR%\..\FDS6\bin"
+
+copy "%SMVBINDIR%\fds_test.txt"      "%FDSBINDIR%\fds_test.bat"     >Nul
+copy "%SMVBINDIR%\fdsinit_test.txt"  "%FDSBINDIR%\fdsinit_test.bat" >Nul
 
 echo.
 echo Associating the .smv file extension with smokeview.exe
@@ -22,7 +26,7 @@ assoc .smv=smvDoc>Nul
 
 echo.
 echo Adding %SMVBINDIR% to the system path
-call "%SMVBINDIR%\set_path.exe" -s -m -a "%SMVBINDIR%"
+call "%SMVBINDIR%\set_path.exe" -s -m -a "%SMVBINDIR%" >Nul
 
 erase "%SMVBINDIR%\set_path.exe"
 echo Press any key to complete update
