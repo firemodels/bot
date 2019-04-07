@@ -134,6 +134,20 @@
          var indices_line = [
            0, 1, 2, 3
          ];
+
+   // particles 
+
+         var vertices_part = [
+           0.0,1.0,0.75, 0.25,0.75,0.75, 0.5,0.5,0.75, 0.75,0.25,0.75,  1.0,0.0,0.75
+         ];
+
+         var colors_part = [
+           1,0,0, 0,1,0, 0,0,1, 1,1,0, 0,0,1
+         ];
+
+         var indices_part = [
+           0, 1, 2, 3, 4
+         ];
 //HIDE_OFF
 
 // read slice file dat (unlit triangles)
@@ -202,6 +216,20 @@
          var buffer_indices_line = gl.createBuffer ();
          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_line);
          gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_line), gl.STATIC_DRAW);
+
+// setup part data
+
+         var buffer_vertices_part = gl.createBuffer ();
+         gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_part);
+         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices_part), gl.STATIC_DRAW);
+
+         var buffer_colors_part = gl.createBuffer ();
+         gl.bindBuffer(gl.ARRAY_BUFFER, buffer_colors_part);
+         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors_part), gl.STATIC_DRAW);
+
+         var buffer_indices_part = gl.createBuffer ();
+         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_part);
+         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_part), gl.STATIC_DRAW);
 
          /*=================== lit SHADERS =================== */
 
@@ -342,6 +370,43 @@
          var _Pmatrix_line = gl.getUniformLocation(shaderprogram_line, "Pmatrix");
          var _Vmatrix_line = gl.getUniformLocation(shaderprogram_line, "Vmatrix");
          var _Mmatrix_line = gl.getUniformLocation(shaderprogram_line, "Mmatrix");
+
+         /*=================== part SHADERS =================== */
+
+         var vertCode_part = 'attribute vec3 position;'+
+            'uniform mat4 Pmatrix;'+
+            'uniform mat4 Vmatrix;'+
+            'uniform mat4 Mmatrix;'+
+            'attribute vec3 color;'+//the color of the point
+            'varying vec3 vColor;'+
+            'void main(void) { '+//pre-built function
+               'gl_Position = Pmatrix*Vmatrix*Mmatrix*vec4(position, 1.);'+
+               'vColor = color;'+
+               'gl_PointSize=10.0;'+
+            '}';
+
+         var fragCode_part = 'precision mediump float;'+
+            'varying vec3 vColor;'+
+            'void main(void) {'+
+               'gl_FragColor = vec4(vColor, 1.);'+
+            '}';
+
+         var vertShader_part = gl.createShader(gl.VERTEX_SHADER);
+         gl.shaderSource(vertShader_part, vertCode_part);
+         gl.compileShader(vertShader_part);
+
+         var fragShader_part = gl.createShader(gl.FRAGMENT_SHADER);
+         gl.shaderSource(fragShader_part, fragCode_part);
+         gl.compileShader(fragShader_part);
+
+         var shaderprogram_part = gl.createProgram();
+         gl.attachShader(shaderprogram_part, vertShader_part);
+         gl.attachShader(shaderprogram_part, fragShader_part);
+         gl.linkProgram(shaderprogram_part);
+
+         var _Pmatrix_part = gl.getUniformLocation(shaderprogram_part, "Pmatrix");
+         var _Vmatrix_part = gl.getUniformLocation(shaderprogram_part, "Vmatrix");
+         var _Mmatrix_part = gl.getUniformLocation(shaderprogram_part, "Mmatrix");
 
          /*=================== get_projection =================== */
 
@@ -722,6 +787,25 @@
 
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_line);
             gl.drawElements(gl.LINES, indices_line.length, gl.UNSIGNED_SHORT, 0);
+
+// draw particles
+
+            gl.useProgram(shaderprogram_part);
+            gl.uniformMatrix4fv(_Pmatrix_part, false, proj_matrix);
+            gl.uniformMatrix4fv(_Vmatrix_part, false, view_matrix);
+            gl.uniformMatrix4fv(_Mmatrix_part, false, mo_matrix);
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_part);
+            var _position_part = gl.getAttribLocation(shaderprogram_part, "position");
+            gl.vertexAttribPointer(_position_part, 3, gl.FLOAT, false,0,0);
+            gl.enableVertexAttribArray(_position_part);
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffer_colors_part);
+            var _color_part = gl.getAttribLocation(shaderprogram_part, "color");
+            gl.vertexAttribPointer(_color_part, 3, gl.FLOAT, false,0,0) ;
+            gl.enableVertexAttribArray(_color_part);
+
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_part);
+            gl.drawElements(gl.POINTS, indices_part.length, gl.UNSIGNED_SHORT, 0);
 
             window.requestAnimationFrame(animate);
          }
