@@ -135,7 +135,44 @@
            0, 1, 2, 3
          ];
 
-   // particles 
+   // particles
+         var npart_frames=2;
+
+         var vertices_part_data = [
+           0.0,1.0,0.75,
+           0.25,0.75,0.75,
+           0.5,0.5,0.75,
+           0.75,0.25,0.75,
+           1.0,0.0,0.75,
+           0.0,1.0,1.0,
+           0.25,0.75,1.0,
+           0.5,0.5,1.0,
+           0.75,0.25,1.0,
+           1.0,0.0,1.0
+         ];
+
+         var colors_part_data = [
+           1,0,0,
+           0,1,0,
+           0,0,1,
+           1,1,0,
+           0,0,1,
+           1,0,0,
+           0,1,0,
+           0,0,1,
+           1,1,0,
+           0,0,1
+         ];
+
+         // offsets for each particle frame
+         var part_offsets = [
+           0, 5
+         ];
+
+         // size of each particle frame
+         var part_sizes = [
+           5,5
+         ];
 
          var vertices_part = [
            0.0,1.0,0.75, 0.25,0.75,0.75, 0.5,0.5,0.75, 0.75,0.25,0.75,  1.0,0.0,0.75
@@ -145,6 +182,7 @@
            1,0,0, 0,1,0, 0,0,1, 1,1,0, 0,0,1
          ];
 
+         // must be at least as large as largest particle frame
          var indices_part = [
            0, 1, 2, 3, 4
          ];
@@ -659,6 +697,25 @@
            }
          }
 
+         /*=================== get_part_frame =================== */
+
+         function get_part_frame(frame) {
+           var i;
+
+           var partframe=frame;
+           if(partframe>npart_frames-1)partframe=npart_frames-1;
+           var part_frame_size=part_sizes[partframe];
+           var part_frame_offset=3*part_offsets[partframe];
+           for (i=0; i<part_frame_size; i++){
+             vertices_part[3*i+0]=vertices_part_data[part_frame_offset+3*i+0];
+             vertices_part[3*i+1]=vertices_part_data[part_frame_offset+3*i+1];
+             vertices_part[3*i+2]=vertices_part_data[part_frame_offset+3*i+2];
+             colors_part[3*i+0]  =colors_part_data[part_frame_offset+3*i+0];
+             colors_part[3*i+1]  =colors_part_data[part_frame_offset+3*i+1];
+             colors_part[3*i+2]  =colors_part_data[part_frame_offset+3*i+2];
+           }
+         }
+
          var THETA = 0, PHI = 0;
          var time_old = 0;
          var iframe = 0;
@@ -752,8 +809,6 @@
             gl.enableVertexAttribArray(_position_unlit);
 
             get_slice_frame(iframe);
-            iframe++;
-            if(iframe+1>nframes)iframe=0;
 
             gl.bindBuffer(gl.ARRAY_BUFFER, buffer_textures_unlit);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textures_unlit), gl.STATIC_DRAW);
@@ -799,6 +854,15 @@
             gl.vertexAttribPointer(_position_part, 3, gl.FLOAT, false,0,0);
             gl.enableVertexAttribArray(_position_part);
 
+            get_part_frame(iframe);
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_part);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices_part), gl.STATIC_DRAW);
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffer_colors_part);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors_part), gl.STATIC_DRAW);
+
+
             gl.bindBuffer(gl.ARRAY_BUFFER, buffer_colors_part);
             var _color_part = gl.getAttribLocation(shaderprogram_part, "color");
             gl.vertexAttribPointer(_color_part, 3, gl.FLOAT, false,0,0) ;
@@ -806,6 +870,9 @@
 
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_part);
             gl.drawElements(gl.POINTS, indices_part.length, gl.UNSIGNED_SHORT, 0);
+
+            iframe++;
+            if(iframe+1>nframes)iframe=0;
 
             window.requestAnimationFrame(animate);
          }
