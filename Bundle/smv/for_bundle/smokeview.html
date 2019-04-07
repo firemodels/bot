@@ -150,7 +150,7 @@
          ];
 //HIDE_OFF
 
-// read slice file dat (unlit triangles)
+// read slice file data (unlit triangles) note: not working
 
          var reader = new FileReader();
          reader.onload = function(e) {
@@ -162,7 +162,7 @@
          file = new File(["foot"], slice_file, { type: 'application/octet-stream',  });
        //  reader.readAsArrayBuffer(file);
 
-// setup lit triangle data
+// setup lit triangle data (blockages)
 
          var buffer_vertices_lit = gl.createBuffer ();
          gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_lit);
@@ -180,7 +180,7 @@
          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_lit);
          gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_lit), gl.STATIC_DRAW);
 
-// setup unlit triangle data
+// setup unlit triangle data (slice files)
 
          var buffer_vertices_unlit = gl.createBuffer ();
          gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_unlit);
@@ -203,7 +203,7 @@
          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_unlit);
          gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_unlit), gl.STATIC_DRAW);
 
-// setup line data
+// setup line data (outline of scene)
 
          var buffer_vertices_line = gl.createBuffer ();
          gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_line);
@@ -217,7 +217,7 @@
          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_line);
          gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_line), gl.STATIC_DRAW);
 
-// setup part data
+// setup part data (particle data - not fully implemented)
 
          var buffer_vertices_part = gl.createBuffer ();
          gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_part);
@@ -371,7 +371,7 @@
          var _Vmatrix_line = gl.getUniformLocation(shaderprogram_line, "Vmatrix");
          var _Mmatrix_line = gl.getUniformLocation(shaderprogram_line, "Mmatrix");
 
-         /*=================== part SHADERS =================== */
+         /*=================== point/part SHADERS =================== */
 
          var vertCode_part = 'attribute vec3 position;'+
             'uniform mat4 Pmatrix;'+
