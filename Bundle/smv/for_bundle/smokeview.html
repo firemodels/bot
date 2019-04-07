@@ -26,7 +26,7 @@
          var ycen = 0.5;
          var zcen = 0.5;
 
-   // lit geometry
+   // lit triangles
 
          var vertices_lit = [
             0.0,0.0,0.0, 0.5,0.0,0.0, 0.5,0.5,0.0, 0.0,0.5,0.0, // bottom
@@ -61,7 +61,7 @@
             16,17,18, 16,18,19, 20,21,22, 20,22,23 
          ];
 
-   // unlit geometry
+   // unlit triangles
 
          var vertices_unlit = [
             0.5,0.5,0.5, 1,0.5,0.5, 1, 1,0.5, 0.5, 1,0.5,
@@ -616,14 +616,19 @@
              mo_matrix[8] = 0,  mo_matrix[9] = 0, mo_matrix[10] = 1, mo_matrix[11] = 0,
             mo_matrix[12] = 0, mo_matrix[13] = 0, mo_matrix[14] = 0, mo_matrix[15] = 1;
 
-// add 90 deg rotation to be compatible with smokeview
+// add 90 deg rotation to be consistent with smokeview
             rotateX(mo_matrix, -1.571);
 
-            translateXYZ(mo_matrix, -0.75, -0.75, -0.75);
-            scaleX(mo_matrix, 1.5) ;
+// scale and translate to be consistent with smokeview
+            var scale=1.5;
+            var min_xz=2.0*Math.min(xcen,zcen);
+            translateXYZ(mo_matrix, -scale*xcen/min_xz, -scale*ycen, -scale*zcen/min_xz);
+            scaleX(mo_matrix, scale/min_xz) ;
 
+// translate using mouse
             translateXYZ(mo_matrix, dKEYx, dKEYy, dKEYz);
 
+// rotate by mouse (translate to origin first)
             translateXYZ(mo_matrix, xcen, ycen, zcen);
             rotateY(mo_matrix, THETA);
             rotateX(mo_matrix, PHI);
