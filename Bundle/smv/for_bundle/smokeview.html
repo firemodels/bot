@@ -76,6 +76,7 @@
          var frame_size=24;
          var slice_file="smokeview.htmld";
          slice_file_ready=1;
+         part_file_ready=1;
 
          var textures_unlit_data = new Uint8Array([
               0,   0,   0,   0,
@@ -257,17 +258,20 @@
 
 // setup part data (particle data - not fully implemented)
 
-         var buffer_vertices_part = gl.createBuffer ();
-         gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_part);
-         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices_part), gl.STATIC_DRAW);
+         if(part_file_ready==1){
 
-         var buffer_colors_part = gl.createBuffer ();
-         gl.bindBuffer(gl.ARRAY_BUFFER, buffer_colors_part);
-         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors_part), gl.STATIC_DRAW);
+           var buffer_vertices_part = gl.createBuffer ();
+           gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_part);
+           gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices_part), gl.STATIC_DRAW);
 
-         var buffer_indices_part = gl.createBuffer ();
-         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_part);
-         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_part), gl.STATIC_DRAW);
+           var buffer_colors_part = gl.createBuffer ();
+           gl.bindBuffer(gl.ARRAY_BUFFER, buffer_colors_part);
+           gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors_part), gl.STATIC_DRAW);
+
+           var buffer_indices_part = gl.createBuffer ();
+           gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_part);
+           gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_part), gl.STATIC_DRAW);
+         }
 
          /*=================== lit SHADERS =================== */
 
@@ -845,31 +849,33 @@
 
 // draw particles
 
-            gl.useProgram(shaderprogram_part);
-            gl.uniformMatrix4fv(_Pmatrix_part, false, proj_matrix);
-            gl.uniformMatrix4fv(_Vmatrix_part, false, view_matrix);
-            gl.uniformMatrix4fv(_Mmatrix_part, false, mo_matrix);
-            gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_part);
-            var _position_part = gl.getAttribLocation(shaderprogram_part, "position");
-            gl.vertexAttribPointer(_position_part, 3, gl.FLOAT, false,0,0);
-            gl.enableVertexAttribArray(_position_part);
+            if(part_file_ready==1){
+              gl.useProgram(shaderprogram_part);
+              gl.uniformMatrix4fv(_Pmatrix_part, false, proj_matrix);
+              gl.uniformMatrix4fv(_Vmatrix_part, false, view_matrix);
+              gl.uniformMatrix4fv(_Mmatrix_part, false, mo_matrix);
+              gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_part);
+              var _position_part = gl.getAttribLocation(shaderprogram_part, "position");
+              gl.vertexAttribPointer(_position_part, 3, gl.FLOAT, false,0,0);
+              gl.enableVertexAttribArray(_position_part);
 
-            get_part_frame(iframe);
+              get_part_frame(iframe);
 
-            gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_part);
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices_part), gl.STATIC_DRAW);
+              gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_part);
+              gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices_part), gl.STATIC_DRAW);
 
-            gl.bindBuffer(gl.ARRAY_BUFFER, buffer_colors_part);
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors_part), gl.STATIC_DRAW);
+              gl.bindBuffer(gl.ARRAY_BUFFER, buffer_colors_part);
+              gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors_part), gl.STATIC_DRAW);
 
 
-            gl.bindBuffer(gl.ARRAY_BUFFER, buffer_colors_part);
-            var _color_part = gl.getAttribLocation(shaderprogram_part, "color");
-            gl.vertexAttribPointer(_color_part, 3, gl.FLOAT, false,0,0) ;
-            gl.enableVertexAttribArray(_color_part);
+              gl.bindBuffer(gl.ARRAY_BUFFER, buffer_colors_part);
+              var _color_part = gl.getAttribLocation(shaderprogram_part, "color");
+              gl.vertexAttribPointer(_color_part, 3, gl.FLOAT, false,0,0) ;
+              gl.enableVertexAttribArray(_color_part);
 
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_part);
-            gl.drawElements(gl.POINTS, indices_part.length, gl.UNSIGNED_SHORT, 0);
+              gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_part);
+              gl.drawElements(gl.POINTS, indices_part.length, gl.UNSIGNED_SHORT, 0);
+            }
 
             iframe++;
             if(iframe+1>nframes)iframe=0;
