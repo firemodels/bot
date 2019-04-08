@@ -53,7 +53,9 @@ copy %forbundle%\*.png %smvdir%\.>Nul
 echo copying .po files
 copy %forbundle%\*.po %smvdir%\.>Nul
 
-CALL :COPY %forbundle%\volrender.ssf %smvdir%\volrender.ssf
+CALL :COPY %forbundle%\volrender.ssf    %smvdir%\volrender.ssf
+CALL :COPY %forbundle%\fds_test.bat     %smvdir%\fds_test.txt
+CALL :COPY %forbundle%\fdsinit_test.bat %smvdir%\fdsinit_test.txt
 
 CALL :COPY %smvbuild%\background\intel_win_64\background.exe                      %smvdir%\background.exe
 CALL :COPY %smvbuild%\dem2fds\intel_win_%platform%\dem2fds_win_%platform%.exe     %smvdir%\dem2fds.exe
@@ -86,7 +88,7 @@ CALL :COPY %sh2bat%\sh2bat_win_64.exe                    %smvdir%\sh2bat.exe
 CALL :COPY %gettime%\get_time_64.exe                     %smvdir%\get_time.exe
 CALL :COPY %forbundle%\wrapup_smv_install_%platform%.bat %smvdir%\wrapup_smv_install.bat
 CALL :COPY %forbundle%\smokeview.ini                     %smvdir%\smokeview.ini
-CALL :COPY %forbundle%\html_template.html                %smvdir%\html_template.html
+CALL :COPY %forbundle%\smokeview.html                    %smvdir%\smokeview.html
 
 echo copying textures
 mkdir %smvdir%\textures

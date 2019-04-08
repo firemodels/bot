@@ -170,11 +170,11 @@ echo Unpacking FDS %fds_versionbase% and Smokeview %smv_versionbase% installatio
 echo.
 echo --- copying auxillary files ---
 echo.
-CALL :COPY  %smv_forbundle%\objects.svo            %out_smv%\.
-CALL :COPY  %smv_forbundle%\volrender.ssf          %out_smv%\.
-CALL :COPY  %smv_forbundle%\smokeview.ini          %out_smv%\.
-CALL :COPY  %smv_forbundle%\smokeview.ini          %out_smv%\.
-CALL :COPY  %smv_forbundle%\html_template.html     %out_smv%\.
+CALL :COPY  %smv_forbundle%\objects.svo    %out_smv%\.
+CALL :COPY  %smv_forbundle%\volrender.ssf  %out_smv%\.
+CALL :COPY  %smv_forbundle%\smokeview.ini  %out_smv%\.
+CALL :COPY  %smv_forbundle%\smokeview.ini  %out_smv%\.
+CALL :COPY  %smv_forbundle%\smokeview.html %out_smv%\.
 
 
 echo copying textures
