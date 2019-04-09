@@ -701,6 +701,18 @@ slider_elev.oninput = function() {
             new_x = e.pageX;
             new_y = e.pageY;
             if(e.touches){
+              if(e.touches.length==2){
+                alt_key=1;
+                ctrl_key=0;
+              }
+              else if(e.touches.length==3){
+                alt_key=0;
+                ctrl_key=1;
+              }
+              else{
+                alt_key=0;
+                ctrl_key=0;
+              }
               new_x = e.touches[0].pageX;
               new_y = e.touches[0].pageY;
             }
