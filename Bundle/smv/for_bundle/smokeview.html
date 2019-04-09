@@ -1,7 +1,6 @@
 <!doctype html>
 <html>
 <body>
-
 <!--***CANVAS
 //HIDE_ON
 -->
@@ -9,7 +8,7 @@
 <!--
 //HIDE_OFF -->
 
-      <script>
+<script>
 
 // creating a canvas
 
@@ -579,28 +578,11 @@
 
          /*================= Events ======================*/
 
-         var AMORTIZATION = 0.0;
          var drag = false;
          var old_x, old_y;
          var dX = 0, dY = 0;
          var dKEYx=0, dKEYy=0, dKEYz=0;
          var ctrl_key=0, alt_key=0;
-
-         /*=================== touchDown =================== */
-
-         function touchDown(e) {
-           if(e.touches) {
-             mouseDown(e)
-           }
-         }
-
-         /*=================== touchMove =================== */
-
-         function touchMove(e) {
-           if(e.touches) {
-             mouseMove(e)
-           }
-         }
 
          /*=================== mouseDown =================== */
 
@@ -618,6 +600,10 @@
             drag = true;
             old_x = e.pageX;
             old_y = e.pageY;
+            if(e.touches){
+              old_x = e.touches[0].pageX;
+              old_y = e.touches[0].pageY;
+            }
             e.preventDefault();
             return false;
          };
@@ -632,38 +618,62 @@
 
          var mouseMove = function(e) {
             if (!drag) return false;
+            new_x = e.pageX;
+            new_y = e.pageY;
+
+            if(e.touches){
+
+// 1 finger : rotate
+// 2 fingers: move left/right, in/out
+// 3 fingers: move up/down
+
+              if(e.touches.length==2){
+                alt_key=0;
+                ctrl_key=1;
+              }
+              else if(e.touches.length==3){
+                alt_key=1;
+                ctrl_key=0;
+              }
+              else{
+                alt_key=0;
+                ctrl_key=0;
+              }
+              new_x = e.touches[0].pageX;
+              new_y = e.touches[0].pageY;
+            }
             if (alt_key == 0 && ctrl_key == 0){
-              dX = (e.pageX-old_x)*2*Math.PI/canvas.width,
-              dY = (e.pageY-old_y)*2*Math.PI/canvas.height;
+              dX = (new_x-old_x)*2*Math.PI/canvas.width,
+              dY = (new_y-old_y)*2*Math.PI/canvas.height;
               THETA+= dX;
               PHI+=dY;
             }
             else if(alt_key==1){
-              dY = (e.pageY-old_y)/canvas.height;
+              dY = (new_y-old_y)/canvas.height;
               dKEYz += 3*dY;
             }
             else{
-              dX = (e.pageX-old_x)/canvas.width,
-              dY = (e.pageY-old_y)/canvas.height;
+              dX = (new_x-old_x)/canvas.width,
+              dY = (new_y-old_y)/canvas.height;
               dKEYx -= 3*dX;
               dKEYy += 3*dY;
             }
-            old_x = e.pageX, old_y = e.pageY;
+            old_x = new_x;
+            old_y = new_y;
             e.preventDefault();
          };
 
          /*=================== register callbacks =================== */
 
-//         canvas.addEventListener("keydown",   keyDown,   false);
          canvas.addEventListener("mousedown", mouseDown, false);
          canvas.addEventListener("mouseup",   mouseUp, false);
          canvas.addEventListener("mouseout",  mouseUp, false);
          canvas.addEventListener("mousemove", mouseMove, false);
 
-         canvas.addEventListener("touchstart",  touchDown, false);
-         canvas.addEventListener("touchmove",   touchMove, false);
+         canvas.addEventListener("touchstart",  mouseDown, false);
+         canvas.addEventListener("touchmove",   mouseMove, false);
          canvas.addEventListener("touchend",    mouseUp,   false);
-   //      canvas.addEventListener("touchcancel", mouseUp,  false);
+         canvas.addEventListener("touchcancel", mouseUp,  false);
 
          /*=================== rotateX =================== */
 
@@ -852,12 +862,7 @@
             var dt = time-time_old;
             var background_color=0.85
 
-            if (!drag) {
-               dX *= AMORTIZATION, dY*=AMORTIZATION;
-               THETA+=dX, PHI+=dY;
-            }
-
-            //set model matrix to the identiry
+            //set model matrix to the identity
 
              mo_matrix[0] = 1,  mo_matrix[1] = 0,  mo_matrix[2] = 0,  mo_matrix[3] = 0,
              mo_matrix[4] = 0,  mo_matrix[5] = 1,  mo_matrix[6] = 0,  mo_matrix[7] = 0,
@@ -882,12 +887,9 @@
             rotateX(mo_matrix, PHI);
             translateXYZ(mo_matrix, -xcen, -ycen, -zcen);
 
-         //   normal_matrix = mat_mult(mo_matrix, view_matrix);
-         //   normal_matrix = mat_inverse(normal_matrix);
             normal_matrix = mat_inverse(mo_matrix);
             normal_matrix = mat_transpose(normal_matrix);
 
-         //   THETA+=(time - time_old)/5000.0; 
             time_old = time;
             gl.enable(gl.DEPTH_TEST);
 
@@ -896,7 +898,7 @@
             gl.viewport(0.0, 0.0, canvas.width, canvas.height);
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-// draw lit triangles
+// draw lit triangles (blockages)
 
             gl.useProgram(shaderprogram_lit);
             gl.uniformMatrix4fv(_Pmatrix_lit, false, proj_matrix);
