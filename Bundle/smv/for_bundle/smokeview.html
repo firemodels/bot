@@ -1,52 +1,6 @@
 <!doctype html>
 <html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-.slidecontainer {
-  width: 100%;
-}
-
-.slider {
-  -webkit-appearance: none;
-  width: 25%;
-  height: 25px;
-  background: #d3d3d3;
-  outline: none;
-  opacity: 0.7;
-  -webkit-transition: .2s;
-  transition: opacity .2s;
-}
-
-.slider:hover {
-  opacity: 1;
-}
-
-.slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 25px;
-  height: 25px;
-  background: #4CAF50;
-  cursor: pointer;
-}
-
-.slider::-moz-range-thumb {
-  width: 25px;
-  height: 25px;
-  background: #4CAF50;
-  cursor: pointer;
-}
-</style>
-</head>
-
 <body>
-
-<div class="slidecontainer">
-  azimuth (<span id="az_out"></span>): <input type="range" min="0" max="360" value="0" class="slider" id="az"><br>
-  elevation (<span id="elev_out"></span>): <input type="range" min="0" max="180" value="0" class="slider" id="elev">
-</div>
-
 <!--***CANVAS
 //HIDE_ON
 -->
@@ -54,25 +8,7 @@
 <!--
 //HIDE_OFF -->
 
-      <script>
-
-var slider_az = document.getElementById("az");
-var output_az = document.getElementById("az_out");
-output_az.innerHTML = slider_az.value;
-
-slider_az.oninput = function() {
-  output_az.innerHTML = this.value;
-  THETA=this.value*3.14/180.0;
-}
-
-var slider_elev = document.getElementById("elev");
-var output_elev = document.getElementById("elev_out");
-output_elev.innerHTML = slider_elev.value;
-
-slider_elev.oninput = function() {
-  output_elev.innerHTML = this.value;
-  PHI=this.value*3.14/180.0;
-}
+<script>
 
 // creating a canvas
 
@@ -642,28 +578,11 @@ slider_elev.oninput = function() {
 
          /*================= Events ======================*/
 
-         var AMORTIZATION = 0.0;
          var drag = false;
          var old_x, old_y;
          var dX = 0, dY = 0;
          var dKEYx=0, dKEYy=0, dKEYz=0;
          var ctrl_key=0, alt_key=0;
-
-         /*=================== touchDown =================== */
-
-         function touchDown(e) {
-           if(e.touches) {
-             mouseDown(e)
-           }
-         }
-
-         /*=================== touchMove =================== */
-
-         function touchMove(e) {
-           if(e.touches) {
-             mouseMove(e)
-           }
-         }
 
          /*=================== mouseDown =================== */
 
@@ -698,16 +617,23 @@ slider_elev.oninput = function() {
          /*=================== mouseMove =================== */
 
          var mouseMove = function(e) {
+            if (!drag) return false;
             new_x = e.pageX;
             new_y = e.pageY;
+
             if(e.touches){
+
+// 1 finger : rotate
+// 2 fingers: move left/right, in/out
+// 3 fingers: move up/down
+
               if(e.touches.length==2){
-                alt_key=1;
-                ctrl_key=0;
-              }
-              else if(e.touches.length==3){
                 alt_key=0;
                 ctrl_key=1;
+              }
+              else if(e.touches.length==3){
+                alt_key=1;
+                ctrl_key=0;
               }
               else{
                 alt_key=0;
@@ -716,7 +642,6 @@ slider_elev.oninput = function() {
               new_x = e.touches[0].pageX;
               new_y = e.touches[0].pageY;
             }
-            if (!drag) return false;
             if (alt_key == 0 && ctrl_key == 0){
               dX = (new_x-old_x)*2*Math.PI/canvas.width,
               dY = (new_y-old_y)*2*Math.PI/canvas.height;
@@ -740,7 +665,6 @@ slider_elev.oninput = function() {
 
          /*=================== register callbacks =================== */
 
-//         canvas.addEventListener("keydown",   keyDown,   false);
          canvas.addEventListener("mousedown", mouseDown, false);
          canvas.addEventListener("mouseup",   mouseUp, false);
          canvas.addEventListener("mouseout",  mouseUp, false);
@@ -938,12 +862,7 @@ slider_elev.oninput = function() {
             var dt = time-time_old;
             var background_color=0.85
 
-            if (!drag) {
-               dX *= AMORTIZATION, dY*=AMORTIZATION;
-               THETA+=dX, PHI+=dY;
-            }
-
-            //set model matrix to the identiry
+            //set model matrix to the identity
 
              mo_matrix[0] = 1,  mo_matrix[1] = 0,  mo_matrix[2] = 0,  mo_matrix[3] = 0,
              mo_matrix[4] = 0,  mo_matrix[5] = 1,  mo_matrix[6] = 0,  mo_matrix[7] = 0,
@@ -968,12 +887,9 @@ slider_elev.oninput = function() {
             rotateX(mo_matrix, PHI);
             translateXYZ(mo_matrix, -xcen, -ycen, -zcen);
 
-         //   normal_matrix = mat_mult(mo_matrix, view_matrix);
-         //   normal_matrix = mat_inverse(normal_matrix);
             normal_matrix = mat_inverse(mo_matrix);
             normal_matrix = mat_transpose(normal_matrix);
 
-         //   THETA+=(time - time_old)/5000.0; 
             time_old = time;
             gl.enable(gl.DEPTH_TEST);
 
@@ -982,7 +898,7 @@ slider_elev.oninput = function() {
             gl.viewport(0.0, 0.0, canvas.width, canvas.height);
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-// draw lit triangles
+// draw lit triangles (blockages)
 
             gl.useProgram(shaderprogram_lit);
             gl.uniformMatrix4fv(_Pmatrix_lit, false, proj_matrix);
