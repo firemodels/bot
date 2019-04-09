@@ -1,6 +1,51 @@
 <!doctype html>
 <html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+.slidecontainer {
+  width: 100%;
+}
+
+.slider {
+  -webkit-appearance: none;
+  width: 25%;
+  height: 25px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.slider:hover {
+  opacity: 1;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 25px;
+  height: 25px;
+  background: #4CAF50;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 25px;
+  height: 25px;
+  background: #4CAF50;
+  cursor: pointer;
+}
+</style>
+</head>
+
 <body>
+
+<div class="slidecontainer">
+  azimuth (<span id="az_out"></span>): <input type="range" min="0" max="360" value="0" class="slider" id="az"><br>
+  elevation (<span id="elev_out"></span>): <input type="range" min="0" max="180" value="0" class="slider" id="elev">
+</div>
 
 <!--***CANVAS
 //HIDE_ON
@@ -10,6 +55,24 @@
 //HIDE_OFF -->
 
       <script>
+
+var slider_az = document.getElementById("az");
+var output_az = document.getElementById("az_out");
+output_az.innerHTML = slider_az.value;
+
+slider_az.oninput = function() {
+  output_az.innerHTML = this.value;
+  THETA=this.value*3.14/180.0;
+}
+
+var slider_elev = document.getElementById("elev");
+var output_elev = document.getElementById("elev_out");
+output_elev.innerHTML = slider_elev.value;
+
+slider_elev.oninput = function() {
+  output_elev.innerHTML = this.value;
+  PHI=this.value*3.14/180.0;
+}
 
 // creating a canvas
 
@@ -618,6 +681,10 @@
             drag = true;
             old_x = e.pageX;
             old_y = e.pageY;
+            if(e.touches){
+              old_x = e.touches[0].pageX;
+              old_y = e.touches[0].pageY;
+            }
             e.preventDefault();
             return false;
          };
@@ -631,24 +698,31 @@
          /*=================== mouseMove =================== */
 
          var mouseMove = function(e) {
+            new_x = e.pageX;
+            new_y = e.pageY;
+            if(e.touches){
+              new_x = e.touches[0].pageX;
+              new_y = e.touches[0].pageY;
+            }
             if (!drag) return false;
             if (alt_key == 0 && ctrl_key == 0){
-              dX = (e.pageX-old_x)*2*Math.PI/canvas.width,
-              dY = (e.pageY-old_y)*2*Math.PI/canvas.height;
+              dX = (new_x-old_x)*2*Math.PI/canvas.width,
+              dY = (new_y-old_y)*2*Math.PI/canvas.height;
               THETA+= dX;
               PHI+=dY;
             }
             else if(alt_key==1){
-              dY = (e.pageY-old_y)/canvas.height;
+              dY = (new_y-old_y)/canvas.height;
               dKEYz += 3*dY;
             }
             else{
-              dX = (e.pageX-old_x)/canvas.width,
-              dY = (e.pageY-old_y)/canvas.height;
+              dX = (new_x-old_x)/canvas.width,
+              dY = (new_y-old_y)/canvas.height;
               dKEYx -= 3*dX;
               dKEYy += 3*dY;
             }
-            old_x = e.pageX, old_y = e.pageY;
+            old_x = new_x;
+            old_y = new_y;
             e.preventDefault();
          };
 
@@ -660,10 +734,10 @@
          canvas.addEventListener("mouseout",  mouseUp, false);
          canvas.addEventListener("mousemove", mouseMove, false);
 
-         canvas.addEventListener("touchstart",  touchDown, false);
-         canvas.addEventListener("touchmove",   touchMove, false);
+         canvas.addEventListener("touchstart",  mouseDown, false);
+         canvas.addEventListener("touchmove",   mouseMove, false);
          canvas.addEventListener("touchend",    mouseUp,   false);
-   //      canvas.addEventListener("touchcancel", mouseUp,  false);
+         canvas.addEventListener("touchcancel", mouseUp,  false);
 
          /*=================== rotateX =================== */
 
