@@ -663,6 +663,16 @@
             e.preventDefault();
          };
 
+         /*=================== handleOrientation=================== */
+
+         function handleOrientation(e) {
+           // alpha angle about z axis
+           // beta  angle about x axis
+           // gamma angle about y axis
+           PHI   = e.beta*Math.pi/180.0;
+           THETA = e.gamma*Math.pi/180.0;
+         }
+
          /*=================== register callbacks =================== */
 
          canvas.addEventListener("mousedown", mouseDown, false);
@@ -674,6 +684,8 @@
          canvas.addEventListener("touchmove",   mouseMove, false);
          canvas.addEventListener("touchend",    mouseUp,   false);
          canvas.addEventListener("touchcancel", mouseUp,  false);
+
+         canvas.addEventListener("deviceorientation", handleOrientation, false);
 
          /*=================== rotateX =================== */
 
