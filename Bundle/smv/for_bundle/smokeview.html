@@ -583,6 +583,9 @@
          var dX = 0, dY = 0;
          var dKEYx=0, dKEYy=0, dKEYz=0;
          var ctrl_key=0, alt_key=0;
+         var double_click=0;
+         var touch_mode=0;
+         var using_touch=0;
 
          /*=================== mouseDown =================== */
 
@@ -601,8 +604,25 @@
             old_x = e.pageX;
             old_y = e.pageY;
             if(e.touches){
+              if(e.touches.length==3){
+                PHI=0.0;
+                THETA=0.0;
+                dX = 0;
+                dY = 0;
+                dKEYx=0;
+                dKEYy=0;
+                dKEYz=0;
+                e.preventDefault();
+                return false;
+              }
               old_x = e.touches[0].pageX;
               old_y = e.touches[0].pageY;
+              if(double_click == 0){
+                double_click = 1;
+               setTimeout( function() { double_click = 0; }, 300 );
+               return false;
+              }
+              touch_mode=1-touch_mode;
             }
             e.preventDefault();
             return false;
@@ -623,21 +643,30 @@
 
             if(e.touches){
 
-// 1 finger : rotate
-// 2 fingers: move left/right, in/out
-// 3 fingers: move up/down
+// 1 finger, touch_mode==0 : rotate
+// 1 finger, touch_mode==1 : move left/right, up/down
+// 2 fingers               : move in/out
+// 3 fingers               : reset view
 
+              alt_key=0;
+              ctrl_key=0;
+              if(e.touches.length>2){
+                PHI=0.0;
+                THETA=0.0;
+                dX = 0;
+                dY = 0;
+                dKEYx=0;
+                dKEYy=0;
+                dKEYz=0;
+                e.preventDefault();
+                return false;
+              }
+              using_touch=1;
               if(e.touches.length==2){
-                alt_key=0;
                 ctrl_key=1;
               }
-              else if(e.touches.length==3){
-                alt_key=1;
-                ctrl_key=0;
-              }
               else{
-                alt_key=0;
-                ctrl_key=0;
+                if(touch_mode==1)alt_key=1;
               }
               new_x = e.touches[0].pageX;
               new_y = e.touches[0].pageY;
@@ -649,13 +678,19 @@
               PHI+=dY;
             }
             else if(alt_key==1){
+              if(touch_mode==1){
+                dX = (new_x-old_x)/canvas.width,
+                dKEYx -= 3*dX;
+              }
               dY = (new_y-old_y)/canvas.height;
               dKEYz += 3*dY;
             }
             else{
-              dX = (new_x-old_x)/canvas.width,
+              if(using_touch==0){
+                dX = (new_x-old_x)/canvas.width,
+                dKEYx -= 3*dX;
+              }
               dY = (new_y-old_y)/canvas.height;
-              dKEYx -= 3*dX;
               dKEYy += 3*dY;
             }
             old_x = new_x;
