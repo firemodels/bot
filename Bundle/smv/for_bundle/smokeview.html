@@ -586,6 +586,7 @@
          var double_click=0;
          var touch_mode=0;
          var using_touch=0;
+         var prev_dist=0;
 
          /*=================== mouseDown =================== */
 
@@ -603,6 +604,7 @@
             drag = true;
             old_x = e.pageX;
             old_y = e.pageY;
+            prev_dist=0;
             if(e.touches){
               if(e.touches.length==3){
                 PHI=0.0;
@@ -664,6 +666,9 @@
               using_touch=1;
               if(e.touches.length==2){
                 ctrl_key=1;
+                var dx_touch=e.touches[1].pageX-e.touches[0].pageX;
+                var dy_touch=e.touches[1].pageY-e.touches[0].pageY;
+                var cur_dist=Math.sqrt(dx_touch*dx_touch+dy_touch*dy_touch);
               }
               else{
                 if(touch_mode==1)alt_key=1;
@@ -685,13 +690,20 @@
               dY = (new_y-old_y)/canvas.height;
               dKEYz += 3*dY;
             }
-            else{
+            else{ // ctrl_key==1
               if(using_touch==0){
                 dX = (new_x-old_x)/canvas.width,
                 dKEYx -= 3*dX;
+                dY = (new_y-old_y)/canvas.height;
+                dKEYy += 3*dY;
               }
-              dY = (new_y-old_y)/canvas.height;
-              dKEYy += 3*dY;
+              else{
+                if(prev_dist>0){
+                  dY = 3*(cur_dist-prev_dist)/canvas.height;
+                  dKEYy -= dY;
+                }
+              }
+              prev_dist=cur_dist;
             }
             old_x = new_x;
             old_y = new_y;
