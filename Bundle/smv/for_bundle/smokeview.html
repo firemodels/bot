@@ -625,7 +625,7 @@
                setTimeout( function() { double_click = 0; }, 300 );
                return false;
               }
-              touch_mode=1-touch_mode;
+              if(e.touches.length==1)touch_mode=1-touch_mode;
             }
             e.preventDefault();
             return false;
