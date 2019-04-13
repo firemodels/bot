@@ -14,6 +14,7 @@
 
          var canvas = document.getElementById('webSmokeview');
          gl = canvas.getContext('experimental-webgl');
+         var ext_32bit = gl.getExtension('OES_element_index_uint');
 
 // defining and storing the geometry
 
@@ -46,14 +47,26 @@
             0, 1, 0,  0, 1, 0,  0, 1, 0,  0, 1, 0  // front
          ];
 
-         var colors_lit = [
-            5,3,7, 5,3,7, 5,3,7, 5,3,7,
-            1,1,3, 1,1,3, 1,1,3, 1,1,3,
-            0,0,1, 0,0,1, 0,0,1, 0,0,1,
-            1,0,0, 1,0,0, 1,0,0, 1,0,0,
-            1,1,0, 1,1,0, 1,1,0, 1,1,0,
-            0,1,0, 0,1,0, 0,1,0, 0,1,0 
-         ];
+        if(ext_32bit==null){
+           var colors_lit = [
+             1,1,1, 1,1,1, 1,1,1, 1,1,1,
+             0,0,0, 0,0,0, 0,0,0, 0,0,0,
+             1,1,0, 1,1,0, 1,1,0, 1,1,0,
+             1,0,1, 1,0,1, 1,0,1, 1,0,1,
+             1,0,0, 1,0,0, 1,0,0, 1,0,0,
+             0,1,0, 0,1,0, 0,1,0, 0,1,0 
+           ];
+        }
+        else{
+           var colors_lit = [
+             1,1,1, 1,1,1, 1,1,1, 1,1,1,
+             0,0,0, 0,0,0, 0,0,0, 0,0,0,
+             1,1,0, 1,1,0, 1,1,0, 1,1,0,
+             1,0,1, 1,0,1, 1,0,1, 1,0,1,
+             0,0,1, 0,0,1, 0,0,1, 0,0,1,
+             0,1,0, 0,1,0, 0,1,0, 0,1,0 
+           ];
+        }
 
          var indices_lit = [
             0,1,2,    0,2,3,    4,5,6,    4,6,7,
@@ -267,7 +280,12 @@
 
          var buffer_indices_lit = gl.createBuffer ();
          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_lit);
-         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_lit), gl.STATIC_DRAW);
+         if(ext_32bit==null){
+           gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_lit), gl.STATIC_DRAW);
+         }
+         else{
+           gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(indices_lit), gl.STATIC_DRAW);
+         }
 
 // setup colorbar
 
@@ -293,7 +311,12 @@
 
            var buffer_indices_slice = gl.createBuffer ();
            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_slice);
-           gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_slice), gl.STATIC_DRAW);
+           if(ext_32bit==null){
+             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_slice), gl.STATIC_DRAW);
+           }
+           else{
+             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(indices_slice), gl.STATIC_DRAW);
+           }
          }
 
 // setup boundary file data
@@ -309,7 +332,12 @@
 
            var buffer_indices_bndf = gl.createBuffer ();
            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_bndf);
-           gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_bndf), gl.STATIC_DRAW);
+           if(ext_32bit==null){
+             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_bndf), gl.STATIC_DRAW);
+           }
+           else{
+             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(indices_bndf), gl.STATIC_DRAW);
+           }
          }
 
 // setup line data (outline of scene)
@@ -324,7 +352,12 @@
 
          var buffer_indices_line = gl.createBuffer ();
          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_line);
-         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_line), gl.STATIC_DRAW);
+         if(ext_32bit==null){
+           gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_line), gl.STATIC_DRAW);
+         }
+         else{
+           gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(indices_line), gl.STATIC_DRAW);
+         }
 
 // setup part data (particle data - not fully implemented)
 
@@ -339,7 +372,12 @@
 
            var buffer_indices_part = gl.createBuffer ();
            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_part);
-           gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_part), gl.STATIC_DRAW);
+           if(ext_32bit==null){
+             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_part), gl.STATIC_DRAW);
+           }
+           else{
+             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(indices_part), gl.STATIC_DRAW);
+           }
          }
 
          /*=================== lit SHADERS =================== */
@@ -982,7 +1020,13 @@
             gl.enableVertexAttribArray(_normal_lit);
 
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_lit);
-            gl.drawElements(gl.TRIANGLES, indices_lit.length, gl.UNSIGNED_SHORT, 0);
+
+            if(ext_32bit==null){
+              gl.drawElements(gl.TRIANGLES, indices_lit.length, gl.UNSIGNED_SHORT, 0);
+            }
+            else{
+              gl.drawElements(gl.TRIANGLES, indices_lit.length, gl.UNSIGNED_INT, 0);
+            }
 
 // draw slice file triangles
 
@@ -1011,7 +1055,12 @@
               gl.uniform1i(texture_location,0);
 
               gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_slice);
-              gl.drawElements(gl.TRIANGLES, indices_slice.length, gl.UNSIGNED_SHORT, 0);
+              if(ext_32bit==null){
+                gl.drawElements(gl.TRIANGLES, indices_slice.length, gl.UNSIGNED_SHORT, 0);
+              }
+              else{
+                gl.drawElements(gl.TRIANGLES, indices_slice.length, gl.UNSIGNED_INT, 0);
+              }
             }
 
 // draw boundary file triangles
@@ -1041,7 +1090,12 @@
               gl.uniform1i(texture_location,0);
 
               gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_bndf);
-              gl.drawElements(gl.TRIANGLES, indices_bndf.length, gl.UNSIGNED_SHORT, 0);
+              if(ext_32bit==null){
+                gl.drawElements(gl.TRIANGLES, indices_bndf.length, gl.UNSIGNED_SHORT, 0);
+              }
+              else{
+                gl.drawElements(gl.TRIANGLES, indices_bndf.length, gl.UNSIGNED_INT, 0);
+              }
             }
 
 // draw outlines
@@ -1061,7 +1115,12 @@
             gl.enableVertexAttribArray(_color_line);
 
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_line);
-            gl.drawElements(gl.LINES, indices_line.length, gl.UNSIGNED_SHORT, 0);
+            if(ext_32bit==null){
+              gl.drawElements(gl.LINES, indices_line.length, gl.UNSIGNED_SHORT, 0);
+            }
+            else{
+              gl.drawElements(gl.LINES, indices_line.length, gl.UNSIGNED_INT, 0);
+            }
 
 // draw particles
 
@@ -1090,7 +1149,12 @@
               gl.enableVertexAttribArray(_color_part);
 
               gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_part);
-              gl.drawElements(gl.POINTS, indices_part.length, gl.UNSIGNED_SHORT, 0);
+              if(ext_32bit==null){
+                gl.drawElements(gl.POINTS, indices_part.length, gl.UNSIGNED_SHORT, 0);
+              }
+              else{
+                gl.drawElements(gl.POINTS, indices_part.length, gl.UNSIGNED_INT, 0);
+              }
             }
 
             iframe++;
