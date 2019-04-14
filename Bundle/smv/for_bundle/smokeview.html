@@ -4,7 +4,14 @@
 <!--***CANVAS
 //HIDE_ON
 -->
-<canvas width = "570" height = "570" id = "webSmokeview"></canvas>
+<p>
+<button onclick="show_slice_cell=ShowHide(show_slice_cell)">slice(cell centered)</button>
+<button onclick="show_slice_node=ShowHide(show_slice_node)">slice(node centered)</button>
+<button onclick="show_bndf=ShowHide(show_bndf)">boundary</button>
+<button onclick="show_part=ShowHide(show_part)">particles</button>
+<button onclick="show_blockages=ShowHide(show_blockages)">blockages</button>
+<button onclick="show_outlines=ShowHide(show_outlines)">outlines</button>
+<p><canvas width = "570" height = "570" id = "webSmokeview"></canvas>
 <!--
 //HIDE_OFF -->
 
@@ -1074,6 +1081,12 @@
              colors_part[3*i+1]  =colors_part_data[part_frame_offset+3*i+1];
              colors_part[3*i+2]  =colors_part_data[part_frame_offset+3*i+2];
            }
+         }
+
+         /*=================== ShowHide =================== */
+
+         function ShowHide(show_var) {
+           return 1 - show_var;
          }
 
          var THETA = 0, PHI = 0;
