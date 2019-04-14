@@ -82,12 +82,16 @@
          var slice_node_file="smokeview.htmld";
          slice_node_file_ready=1;
 
+         var frame_size_slice_cell=24;
+         var slice_cell_file="smokeview.htmld";
+         slice_cell_file_ready=1;
+
          part_file_ready=1;
 
          bndf_file_ready=1;
          var frame_size_bndf=24;
 
-   // slice file triangles
+   // slice node file triangles
 
          var vertices_slice_node = [
             0.5,0.5,0.5, 1.0,0.5,0.5, 1.0,1.0,0.5, 0.5,1.0,0.5,
@@ -123,6 +127,47 @@
          ]);
 
          var indices_slice_node = [
+            0,1,2, 0,2,3, 4,5,6, 4,6,7,
+            8,9,10, 8,10,11, 12,13,14, 12,14,15,
+            16,17,18, 16,18,19, 20,21,22, 20,22,23 
+         ];
+
+   // slice cell file triangles
+
+         var vertices_slice_cell = [
+            0.1,0.1,0.5, 0.4,0.1,0.5, 0.4,0.4,0.5, 0.1,0.4,0.5,
+            0.1,0.1,1.0, 0.4,0.1,1.0, 0.4,0.4,1.0, 0.1,0.4,1.0,
+            0.1,0.1,0.5, 0.1,0.4,0.5, 0.1,0.4,1.0, 0.1,0.1,1.0,
+            0.4,0.1,0.5, 0.4,0.4,0.5, 0.4,0.4,1.0, 0.4,0.1,1.0,
+            0.1,0.1,0.5, 0.1,0.1,1.0, 0.4,0.1,1.0, 0.4,0.1,0.5,
+            0.1,0.4,0.5, 0.1,0.4,1.0, 0.4,0.4,1.0, 0.4,0.4,0.5
+         ];
+
+         var textures_slice_cell_data = new Uint8Array([
+              0,   0,   0,   0,
+             38,  38,  38,  38,
+             76,  76,  76,  76,
+            115, 115, 115, 115,
+            153, 153, 153, 153,
+            191, 191, 191, 191,
+            191, 191, 191, 191,
+              0,   0,   0,   0,
+             38,  38,  38,  38,
+             76,  76,  76,  76,
+            115, 115, 115, 115,
+            153, 153, 153, 153,
+         ]);
+
+         var textures_slice_cell = new Float32Array([
+            0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0
+         ]);
+
+         var indices_slice_cell = [
             0,1,2, 0,2,3, 4,5,6, 4,6,7,
             8,9,10, 8,10,11, 12,13,14, 12,14,15,
             16,17,18, 16,18,19, 20,21,22, 20,22,23 
@@ -319,6 +364,27 @@
            }
          }
 
+// setup slice node file data
+
+         if(slice_cell_file_ready==1){
+           var buffer_vertices_slice_cell = gl.createBuffer ();
+           gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_slice_cell);
+           gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices_slice_cell), gl.STATIC_DRAW);
+
+           var buffer_textures_slice_cell = gl.createBuffer ();
+           gl.bindBuffer(gl.ARRAY_BUFFER, buffer_textures_slice_cell);
+           gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textures_slice_cell), gl.STATIC_DRAW);
+
+           var buffer_indices_slice_cell = gl.createBuffer ();
+           gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_slice_cell);
+           if(ext_32bit==null){
+             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_slice_cell), gl.STATIC_DRAW);
+           }
+           else{
+             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(indices_slice_cell), gl.STATIC_DRAW);
+           }
+         }
+
 // setup boundary file data
 
          if(bndf_file_ready==1){
@@ -483,6 +549,43 @@
          var _Pmatrix_slice_node = gl.getUniformLocation(shaderprogram_slice_node, "Pmatrix");
          var _Vmatrix_slice_node = gl.getUniformLocation(shaderprogram_slice_node, "Vmatrix");
          var _Mmatrix_slice_node = gl.getUniformLocation(shaderprogram_slice_node, "Mmatrix");
+
+         /*=================== slice node file shaders =================== */
+
+         var vertCode_slice_cell = 'attribute vec3 position;'+
+            'uniform mat4 Pmatrix;'+
+            'uniform mat4 Vmatrix;'+
+            'uniform mat4 Mmatrix;'+
+            'attribute float texture_coordinate;'+//the color of the point
+            'varying highp float vtexture_coordinate;'+
+            'void main(void) { '+//pre-built function
+               'gl_Position = Pmatrix*Vmatrix*Mmatrix*vec4(position, 1.);'+
+               'vtexture_coordinate = texture_coordinate;'+
+            '}';
+
+         var fragCode_slice_cell = 'precision mediump float;'+
+            'varying float vtexture_coordinate;'+
+            'uniform sampler2D texture_colorbar_sampler;' +
+            'void main(void) {'+
+            'gl_FragColor = texture2D(texture_colorbar_sampler, vec2(0.5,vtexture_coordinate));'+
+            '}';
+
+         var vertShader_slice_cell = gl.createShader(gl.VERTEX_SHADER);
+         gl.shaderSource(vertShader_slice_cell, vertCode_slice_cell);
+         gl.compileShader(vertShader_slice_cell);
+
+         var fragShader_slice_cell = gl.createShader(gl.FRAGMENT_SHADER);
+         gl.shaderSource(fragShader_slice_cell, fragCode_slice_cell);
+         gl.compileShader(fragShader_slice_cell);
+
+         var shaderprogram_slice_cell = gl.createProgram();
+         gl.attachShader(shaderprogram_slice_cell, vertShader_slice_cell);
+         gl.attachShader(shaderprogram_slice_cell, fragShader_slice_cell);
+         gl.linkProgram(shaderprogram_slice_cell);
+
+         var _Pmatrix_slice_cell = gl.getUniformLocation(shaderprogram_slice_cell, "Pmatrix");
+         var _Vmatrix_slice_cell = gl.getUniformLocation(shaderprogram_slice_cell, "Vmatrix");
+         var _Mmatrix_slice_cell = gl.getUniformLocation(shaderprogram_slice_cell, "Mmatrix");
 
 //  boundary file shaders
 
@@ -931,6 +1034,21 @@
            }
          }
 
+         /*=================== get_slice_cell_frame =================== */
+
+         function get_slice_cell_frame(frame) {
+           var i;
+
+           for (i=0; i<frame_size_slice_cell; i++){
+             if(slice_cell_file_ready == 1){
+               textures_slice_cell[i] = textures_slice_cell_data[frame_size_slice_cell*frame+i]/255.0;
+             }
+             else{
+               textures_slice_cell[i] = 128/255.0;
+             }
+           }
+         }
+
          /*=================== get_part_frame =================== */
 
          function get_part_frame(frame) {
@@ -1028,7 +1146,7 @@
               gl.drawElements(gl.TRIANGLES, indices_lit.length, gl.UNSIGNED_INT, 0);
             }
 
-// draw slice file triangles
+// draw slice node file triangles
 
             if(slice_node_file_ready==1){
               gl.useProgram(shaderprogram_slice_node);
@@ -1060,6 +1178,41 @@
               }
               else{
                 gl.drawElements(gl.TRIANGLES, indices_slice_node.length, gl.UNSIGNED_INT, 0);
+              }
+            }
+
+// draw slice node file triangles
+
+            if(slice_cell_file_ready==1){
+              gl.useProgram(shaderprogram_slice_cell);
+              gl.uniformMatrix4fv(_Pmatrix_slice_cell, false, proj_matrix);
+              gl.uniformMatrix4fv(_Vmatrix_slice_cell, false, view_matrix);
+              gl.uniformMatrix4fv(_Mmatrix_slice_cell, false, mo_matrix);
+
+              gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_slice_cell);
+              var _position_slice_cell = gl.getAttribLocation(shaderprogram_slice_cell, "position");
+              gl.vertexAttribPointer(_position_slice_cell, 3, gl.FLOAT, false,0,0);
+              gl.enableVertexAttribArray(_position_slice_cell);
+
+              get_slice_cell_frame(iframe);
+
+              gl.bindBuffer(gl.ARRAY_BUFFER, buffer_textures_slice_cell);
+              gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textures_slice_cell), gl.STATIC_DRAW);
+              var _texture_coordinate_slice_cell = gl.getAttribLocation(shaderprogram_slice_cell, "texture_coordinate");
+              gl.vertexAttribPointer(_texture_coordinate_slice_cell, 1, gl.FLOAT, false,0,0) ;
+              gl.enableVertexAttribArray(_texture_coordinate_slice_cell);
+
+              gl.activeTexture(gl.TEXTURE0);
+              gl.bindTexture(gl.TEXTURE_2D, texture_colorbar);
+              var texture_location = gl.getUniformLocation(shaderprogram_slice_cell, "texture_colorbar_sampler");
+              gl.uniform1i(texture_location,0);
+
+              gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_slice_cell);
+              if(ext_32bit==null){
+                gl.drawElements(gl.TRIANGLES, indices_slice_cell.length, gl.UNSIGNED_SHORT, 0);
+              }
+              else{
+                gl.drawElements(gl.TRIANGLES, indices_slice_cell.length, gl.UNSIGNED_INT, 0);
               }
             }
 
