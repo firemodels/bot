@@ -80,16 +80,24 @@
 
          var frame_size_slice_node=24;
          var slice_node_file="smokeview.htmld";
-         slice_node_file_ready=1;
+         var slice_node_file_ready=1;
+         var show_slice_node=1;
 
          var frame_size_slice_cell=24;
          var slice_cell_file="smokeview.htmld";
-         slice_cell_file_ready=1;
+         var slice_cell_file_ready=1;
+         var show_slice_cell=1;
 
-         part_file_ready=1;
+         var part_file_ready=1;
+         var show_part=1;
 
-         bndf_file_ready=1;
+
+         var bndf_file_ready=1;
          var frame_size_bndf=24;
+         var show_bndf=1;
+
+         var show_outlines=1;
+         var show_blockages=1;
 
    // slice node file triangles
 
@@ -1116,39 +1124,41 @@
 
 // draw lit triangles (blockages)
 
-            gl.useProgram(shaderprogram_lit);
-            gl.uniformMatrix4fv(_Pmatrix_lit, false, proj_matrix);
-            gl.uniformMatrix4fv(_Vmatrix_lit, false, view_matrix);
-            gl.uniformMatrix4fv(_Mmatrix_lit, false, mo_matrix);
-            gl.uniformMatrix4fv(_normal_matrix, false, normal_matrix);
+            if(show_blockages==1){
+              gl.useProgram(shaderprogram_lit);
+              gl.uniformMatrix4fv(_Pmatrix_lit, false, proj_matrix);
+              gl.uniformMatrix4fv(_Vmatrix_lit, false, view_matrix);
+              gl.uniformMatrix4fv(_Mmatrix_lit, false, mo_matrix);
+              gl.uniformMatrix4fv(_normal_matrix, false, normal_matrix);
 
-            gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_lit);
-            var _position_lit = gl.getAttribLocation(shaderprogram_lit, "position");
-            gl.vertexAttribPointer(_position_lit, 3, gl.FLOAT, false,0,0);
-            gl.enableVertexAttribArray(_position_lit);
+              gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_lit);
+              var _position_lit = gl.getAttribLocation(shaderprogram_lit, "position");
+              gl.vertexAttribPointer(_position_lit, 3, gl.FLOAT, false,0,0);
+              gl.enableVertexAttribArray(_position_lit);
 
-            gl.bindBuffer(gl.ARRAY_BUFFER, buffer_colors_lit);
-            var _color_lit = gl.getAttribLocation(shaderprogram_lit, "color");
-            gl.vertexAttribPointer(_color_lit, 3, gl.FLOAT, false,0,0) ;
-            gl.enableVertexAttribArray(_color_lit);
+              gl.bindBuffer(gl.ARRAY_BUFFER, buffer_colors_lit);
+              var _color_lit = gl.getAttribLocation(shaderprogram_lit, "color");
+              gl.vertexAttribPointer(_color_lit, 3, gl.FLOAT, false,0,0) ;
+              gl.enableVertexAttribArray(_color_lit);
 
-            gl.bindBuffer(gl.ARRAY_BUFFER, buffer_normals_lit);
-            var _normal_lit = gl.getAttribLocation(shaderprogram_lit, "normal");
-            gl.vertexAttribPointer(_normal_lit, 3, gl.FLOAT, false,0,0) ;
-            gl.enableVertexAttribArray(_normal_lit);
+              gl.bindBuffer(gl.ARRAY_BUFFER, buffer_normals_lit);
+              var _normal_lit = gl.getAttribLocation(shaderprogram_lit, "normal");
+              gl.vertexAttribPointer(_normal_lit, 3, gl.FLOAT, false,0,0) ;
+              gl.enableVertexAttribArray(_normal_lit);
 
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_lit);
+              gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_lit);
 
-            if(ext_32bit==null){
-              gl.drawElements(gl.TRIANGLES, indices_lit.length, gl.UNSIGNED_SHORT, 0);
-            }
-            else{
-              gl.drawElements(gl.TRIANGLES, indices_lit.length, gl.UNSIGNED_INT, 0);
+              if(ext_32bit==null){
+                gl.drawElements(gl.TRIANGLES, indices_lit.length, gl.UNSIGNED_SHORT, 0);
+              }
+              else{
+                gl.drawElements(gl.TRIANGLES, indices_lit.length, gl.UNSIGNED_INT, 0);
+              }
             }
 
 // draw slice node file triangles
 
-            if(slice_node_file_ready==1){
+            if(slice_node_file_ready==1&&show_slice_node==1){
               gl.useProgram(shaderprogram_slice_node);
               gl.uniformMatrix4fv(_Pmatrix_slice_node, false, proj_matrix);
               gl.uniformMatrix4fv(_Vmatrix_slice_node, false, view_matrix);
@@ -1183,7 +1193,7 @@
 
 // draw slice node file triangles
 
-            if(slice_cell_file_ready==1){
+            if(slice_cell_file_ready==1&&show_slice_cell==1){
               gl.useProgram(shaderprogram_slice_cell);
               gl.uniformMatrix4fv(_Pmatrix_slice_cell, false, proj_matrix);
               gl.uniformMatrix4fv(_Vmatrix_slice_cell, false, view_matrix);
@@ -1218,7 +1228,7 @@
 
 // draw boundary file triangles
 
-            if(bndf_file_ready==1){
+            if(bndf_file_ready==1&&show_bndf==1){
               gl.useProgram(shaderprogram_bndf);
               gl.uniformMatrix4fv(_Pmatrix_bndf, false, proj_matrix);
               gl.uniformMatrix4fv(_Vmatrix_bndf, false, view_matrix);
@@ -1253,31 +1263,33 @@
 
 // draw outlines
 
-            gl.useProgram(shaderprogram_line);
-            gl.uniformMatrix4fv(_Pmatrix_line, false, proj_matrix);
-            gl.uniformMatrix4fv(_Vmatrix_line, false, view_matrix);
-            gl.uniformMatrix4fv(_Mmatrix_line, false, mo_matrix);
-            gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_line);
-            var _position_line = gl.getAttribLocation(shaderprogram_line, "position");
-            gl.vertexAttribPointer(_position_line, 3, gl.FLOAT, false,0,0);
-            gl.enableVertexAttribArray(_position_line);
+            if(show_outlines==1){
+              gl.useProgram(shaderprogram_line);
+              gl.uniformMatrix4fv(_Pmatrix_line, false, proj_matrix);
+              gl.uniformMatrix4fv(_Vmatrix_line, false, view_matrix);
+              gl.uniformMatrix4fv(_Mmatrix_line, false, mo_matrix);
+              gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_line);
+              var _position_line = gl.getAttribLocation(shaderprogram_line, "position");
+              gl.vertexAttribPointer(_position_line, 3, gl.FLOAT, false,0,0);
+              gl.enableVertexAttribArray(_position_line);
 
-            gl.bindBuffer(gl.ARRAY_BUFFER, buffer_colors_line);
-            var _color_line = gl.getAttribLocation(shaderprogram_line, "color");
-            gl.vertexAttribPointer(_color_line, 3, gl.FLOAT, false,0,0) ;
-            gl.enableVertexAttribArray(_color_line);
+              gl.bindBuffer(gl.ARRAY_BUFFER, buffer_colors_line);
+              var _color_line = gl.getAttribLocation(shaderprogram_line, "color");
+              gl.vertexAttribPointer(_color_line, 3, gl.FLOAT, false,0,0) ;
+              gl.enableVertexAttribArray(_color_line);
 
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_line);
-            if(ext_32bit==null){
-              gl.drawElements(gl.LINES, indices_line.length, gl.UNSIGNED_SHORT, 0);
-            }
-            else{
-              gl.drawElements(gl.LINES, indices_line.length, gl.UNSIGNED_INT, 0);
+              gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_line);
+              if(ext_32bit==null){
+                gl.drawElements(gl.LINES, indices_line.length, gl.UNSIGNED_SHORT, 0);
+              }
+              else{
+                gl.drawElements(gl.LINES, indices_line.length, gl.UNSIGNED_INT, 0);
+              }
             }
 
 // draw particles
 
-            if(part_file_ready==1){
+            if(part_file_ready==1&&show_part==1){
               gl.useProgram(shaderprogram_part);
               gl.uniformMatrix4fv(_Pmatrix_part, false, proj_matrix);
               gl.uniformMatrix4fv(_Vmatrix_part, false, view_matrix);
