@@ -38,7 +38,7 @@
          var xcen = 0.5;
          var ycen = 0.5;
          var zcen = 0.5;
-         document.getElementById("buttonPauseResume").style.width = "75px";
+         document.getElementById("buttonPauseResume").style.width = "125px";
 
 // lit triangles (blockages)
 
@@ -1099,13 +1099,13 @@
            else if(option==0){
              if(time_option==2){
                time_option=0;
-               document.getElementById("buttonPauseResume").innerHTML= "Resume";
-               document.getElementById("buttonPauseResume").style.width = "75px";
+               document.getElementById("buttonPauseResume").innerHTML= "Resume "+iframe;
+               document.getElementById("buttonPauseResume").style.width = "125px";
              }
              else{
                time_option=2;
-               document.getElementById("buttonPauseResume").innerHTML= "Pause ";
-               document.getElementById("buttonPauseResume").style.width = "75px";
+               document.getElementById("buttonPauseResume").innerHTML= "Pause "+iframe;
+               document.getElementById("buttonPauseResume").style.width = "125px";
              }
            }
            else if(option==1){
@@ -1398,6 +1398,8 @@
             }
 
             if(iframe+1>nframes)iframe=0;
+            document.getElementById("buttonPauseResume").innerHTML= "Pause "+iframe;
+            document.getElementById("buttonPauseResume").style.width = "125px";
 
             window.requestAnimationFrame(animate);
          }
