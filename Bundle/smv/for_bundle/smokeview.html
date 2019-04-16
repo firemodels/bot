@@ -5,17 +5,18 @@
 //HIDE_ON
 -->
 <p>
-<button onclick="Reset(0)">Reset Time </button>
-<button onclick="Reset(1)">Reset View </button><br>
+<button onclick="Reset()">Reset View</button><br>
 <button onclick="show_slice_cell=ShowHide(show_slice_cell)">slice(cell centered)</button>
 <button onclick="show_slice_node=ShowHide(show_slice_node)">slice(node centered)</button>
 <button onclick="show_bndf=ShowHide(show_bndf)">boundary</button>
 <button onclick="show_part=ShowHide(show_part)">particles</button>
 <button onclick="show_blockages=ShowHide(show_blockages)">blockages</button>
 <button onclick="show_outlines=ShowHide(show_outlines)">outlines</button><br>
-<button onclick="SetTime(-1)"><< </button>
+<button onclick="SetTime(-2)"><< </button>
+<button onclick="SetTime(-1)">< </button>
 <button type="button" id="buttonPauseResume" onclick="SetTime(0)">Pause</button>
-<button onclick="SetTime(1)">>> </button>
+<button onclick="SetTime(1)">> </button>
+<button onclick="SetTime(2)">>> </button><br>
 <p><canvas width = "570" height = "570" id = "webSmokeview"></canvas>
 <!--
 //HIDE_OFF -->
@@ -1093,17 +1094,20 @@
          /*=================== SetTime =================== */
 
          function SetTime(option) {
-           if(option==-1){
+           if(option==-2){
+             time_option=option;
+           }
+           else if(option==-1){
              time_option=option;
            }
            else if(option==0){
-             if(time_option==2){
+             if(time_option==3){
                time_option=0;
                document.getElementById("buttonPauseResume").innerHTML= "Resume "+iframe;
                document.getElementById("buttonPauseResume").style.width = "125px";
              }
              else{
-               time_option=2;
+               time_option=3;
                document.getElementById("buttonPauseResume").innerHTML= "Pause "+iframe;
                document.getElementById("buttonPauseResume").style.width = "125px";
              }
@@ -1111,23 +1115,20 @@
            else if(option==1){
              time_option=option;
            }
+           else if(option==2){
+             time_option=option;
+           }
          }
          /*=================== Reset =================== */
 
          function Reset(option) {
-           if(option==0){
-             iframe=0;
-             time_option=0;
-           }
-           else if(option==1){
-             PHI=0.0;
-             THETA=0.0;
-             dX = 0;
-             dY = 0;
-             dKEYx=0;
-             dKEYy=0;
-             dKEYz=0;
-           }
+           PHI=0.0;
+           THETA=0.0;
+           dX = 0;
+           dY = 0;
+           dKEYx=0;
+           dKEYy=0;
+           dKEYz=0;
          }
 
          /*=================== ShowHide =================== */
@@ -1139,7 +1140,7 @@
          var THETA = 0, PHI = 0;
          var time_old = 0;
          var iframe = 0;
-         var time_option=2;
+         var time_option=3;
 
          /*=================== animate =================== */
 
@@ -1383,8 +1384,12 @@
               }
             }
 
-            if(time_option==2){
+            if(time_option==3){
               iframe++;
+            }
+            else if(time_option==-2){
+              iframe=0;
+              time_option=0;
             }
             else if(time_option==-1){
               iframe--;
@@ -1392,6 +1397,10 @@
             }
             else if(time_option==1){
               iframe++;
+              time_option=0;
+            }
+            else if(time_option==2){
+              iframe=nframes-1;
               time_option=0;
             }
 
