@@ -1388,17 +1388,21 @@
             }
             else if(time_option==-1){
               iframe--;
-              if(iframe<0)iframe=nframes-1;
               time_option=0;
             }
             else if(time_option==1){
               iframe++;
-              if(iframe>nframes-1)iframe=0;
               time_option=0;
             }
 
-            if(iframe+1>nframes)iframe=0;
-            document.getElementById("buttonPauseResume").innerHTML= "Pause "+iframe;
+            if(iframe<0)iframe=nframes-1;
+            if(iframe>nframes-1)iframe=0;
+            if(time_option==2){
+              document.getElementById("buttonPauseResume").innerHTML= "Pause "+iframe;
+            }
+            else{
+              document.getElementById("buttonPauseResume").innerHTML= "Resume "+iframe;
+            }
             document.getElementById("buttonPauseResume").style.width = "125px";
 
             window.requestAnimationFrame(animate);
