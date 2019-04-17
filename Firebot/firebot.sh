@@ -1397,6 +1397,7 @@ VALIDATION_ERROR_LOG=$OUTPUT_DIR/validation_errors
 WARNING_LOG=$OUTPUT_DIR/warnings
 NEWGUIDE_DIR=$OUTPUT_DIR/Newest_Guides
 SAVEGUIDE_DIR=$HOME/.firebot/pubs
+MANUAL_DIR=$SAVEGUIDE_DIR/Manuals
 EMAIL_LIST=$HOME/.firebot/firebot_email_list.sh
 
 MKDIR $HOME/.firebot
@@ -1826,6 +1827,10 @@ if [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
       make_fds_technical_guide
       make_fds_validation_guide
       make_fds_Config_management_plan
+      if [ -e $MANUAL_DIR ]; then
+        rm -rf $MANUAL_DIR
+      fi
+      cp -r $fdsrepo/Manuals $MANUAL_DIR
     fi
   fi
 fi
