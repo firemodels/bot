@@ -14,8 +14,6 @@ echo "-F - setup repos used by firebot (erase each repo first): "
 echo "    $fdsrepos"
 echo "-s - setup repos used by smokebot: "
 echo "    $smvrepos"
-echo "-t - setup fds, smv, cfast and webpages repos that can be tagged"
-echo "     (have push access to firemodels)"
 echo "-w - setup wiki and webpage repos cloned from firemodels"
 echo "-h - display this message"
 exit
@@ -23,7 +21,6 @@ exit
 
 CURDIR=`pwd`
 
-tagrepos="fds smv cfast fds-smv"
 fdsrepos="exp fds fig out smv"
 smvrepos="cfast fds fig smv"
 cfastrepos="cfast exp smv fig"
@@ -31,7 +28,6 @@ allrepos="cfast cor exp fds fig out radcal smv cad"
 wikiwebrepos="fds.wiki fds-smv"
 repos=$fdsrepos
 eraserepos=
-tagrepo=0
 
 FMROOT=
 WIKIWEB=
@@ -43,7 +39,7 @@ else
    exit
 fi
 
-while getopts 'acfFhstw' OPTION
+while getopts 'acfFhsw' OPTION
 do
 case $OPTION  in
   a)
@@ -64,10 +60,6 @@ case $OPTION  in
    ;;
   s)
    repos=$smvrepos;
-   ;;
-  t)
-   tagrepo=1
-   repos=$tagrepos;
    ;;
   w)
    repos=$wikiwebrepos;
@@ -115,9 +107,6 @@ do
      repo_out=webpages
      WIKIWEB=1
   fi
-  if [ "$tagrepo" == "1" ]; then
-     repo_out=${repo_out}_tag
-  fi
   repo_dir=$FMROOT/$repo_out
   if [ "$eraserepos" == "" ]; then
     if [ -e $repo_dir ]; then
@@ -154,12 +143,10 @@ do
   cd $repo_dir
   if [ "$GITUSER" == "firemodels" ]; then
      ndisable=`git remote -v | grep DISABLE | wc -l`
-     if [ "$tagrepo" == "0" ]; then
-        if [ $ndisable -eq 0 ]; then
-           echo disabling push access to firemodels
-           git remote set-url --push origin DISABLE
-        fi
-     fi
+      if [ $ndisable -eq 0 ]; then
+         echo disabling push access to firemodels
+         git remote set-url --push origin DISABLE
+      fi
   else
      have_central=`git remote -v | awk '{print $1}' | grep firemodels | wc -l`
      if [ $have_central -eq 0 ]; then
@@ -167,14 +154,12 @@ do
         git remote add firemodels ${GITHEADER}firemodels/$repo.git
         git remote update
      fi
-     if [ "$tagrepo" == "0" ]; then
-        ndisable=`git remote -v | grep DISABLE | wc -l`
-        if [ $ndisable -eq 0 ]; then
-          echo "   disabling push access to firemodels"
-          git remote set-url --push firemodels DISABLE
-        else
-          echo "   push access to firemodels already disabled"
-        fi
+     ndisable=`git remote -v | grep DISABLE | wc -l`
+     if [ $ndisable -eq 0 ]; then
+       echo "   disabling push access to firemodels"
+       git remote set-url --push firemodels DISABLE
+     else
+       echo "   push access to firemodels already disabled"
      fi
   fi
 done

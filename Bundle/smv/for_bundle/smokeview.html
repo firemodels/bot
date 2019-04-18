@@ -4,7 +4,21 @@
 <!--***CANVAS
 //HIDE_ON
 -->
-<canvas width = "570" height = "570" id = "webSmokeview"></canvas>
+<p>
+<button onclick="Reset()">Reset View</button><br>
+<button onclick="show_slice_cell=ShowHide(show_slice_cell)">slice(cell centered)</button>
+<button onclick="show_slice_node=ShowHide(show_slice_node)">slice(node centered)</button>
+<button onclick="show_slice_geom=ShowHide(show_slice_geom)">slice(geom)</button>
+<button onclick="show_bndf=ShowHide(show_bndf)">boundary</button>
+<button onclick="show_part=ShowHide(show_part)">particles</button>
+<button onclick="show_blockages=ShowHide(show_blockages)">blockages</button>
+<button onclick="show_outlines=ShowHide(show_outlines)">outlines</button><br>
+<button onclick="SetTime(-2)"><< </button>
+<button onclick="SetTime(-1)">< </button>
+<button type="button" id="buttonPauseResume" onclick="SetTime(0)">Pause</button>
+<button onclick="SetTime(1)">> </button>
+<button onclick="SetTime(2)">>> </button><br>
+<p><canvas width = "570" height = "570" id = "webSmokeview"></canvas>
 <!--
 //HIDE_OFF -->
 
@@ -14,6 +28,24 @@
 
          var canvas = document.getElementById('webSmokeview');
          gl = canvas.getContext('experimental-webgl');
+         var ext_32bit = gl.getExtension('OES_element_index_uint');
+
+         var show_slice_node=0;
+         var slice_node_file_ready=0;
+
+         var show_slice_cen=0;
+         var slice_cen_file_ready=0;
+
+         var show_slice_geom=0;
+         var slice_geom_file_ready=0;
+
+         var show_bndf=0;
+         var bndf_file_ready=0;
+
+         var part_file_ready=0;
+         var show_part=0;
+
+         var show_blockages=0;
 
 // defining and storing the geometry
 
@@ -25,6 +57,7 @@
          var xcen = 0.5;
          var ycen = 0.5;
          var zcen = 0.5;
+         document.getElementById("buttonPauseResume").style.width = "125px";
 
 // lit triangles (blockages)
 
@@ -46,14 +79,26 @@
             0, 1, 0,  0, 1, 0,  0, 1, 0,  0, 1, 0  // front
          ];
 
-         var colors_lit = [
-            5,3,7, 5,3,7, 5,3,7, 5,3,7,
-            1,1,3, 1,1,3, 1,1,3, 1,1,3,
-            0,0,1, 0,0,1, 0,0,1, 0,0,1,
-            1,0,0, 1,0,0, 1,0,0, 1,0,0,
-            1,1,0, 1,1,0, 1,1,0, 1,1,0,
-            0,1,0, 0,1,0, 0,1,0, 0,1,0 
-         ];
+        if(ext_32bit==null){
+           var colors_lit = [
+             1,1,1, 1,1,1, 1,1,1, 1,1,1,
+             0,0,0, 0,0,0, 0,0,0, 0,0,0,
+             1,1,0, 1,1,0, 1,1,0, 1,1,0,
+             1,0,1, 1,0,1, 1,0,1, 1,0,1,
+             1,0,0, 1,0,0, 1,0,0, 1,0,0,
+             0,1,0, 0,1,0, 0,1,0, 0,1,0 
+           ];
+        }
+        else{
+           var colors_lit = [
+             1,1,1, 1,1,1, 1,1,1, 1,1,1,
+             0,0,0, 0,0,0, 0,0,0, 0,0,0,
+             1,1,0, 1,1,0, 1,1,0, 1,1,0,
+             1,0,1, 1,0,1, 1,0,1, 1,0,1,
+             0,0,1, 0,0,1, 0,0,1, 0,0,1,
+             0,1,0, 0,1,0, 0,1,0, 0,1,0 
+           ];
+        }
 
          var indices_lit = [
             0,1,2,    0,2,3,    4,5,6,    4,6,7,
@@ -65,18 +110,35 @@
 
          var nframes=2;
 
-         var frame_size_slice=24;
-         var slice_file="smokeview.htmld";
-         slice_file_ready=1;
+         var frame_size_slice_node=24;
+         var slice_node_file="smokeview.htmld";
+         var slice_node_file_ready=1;
+         var show_slice_node=1;
 
-         part_file_ready=1;
+         var frame_size_slice_cell=24;
+         var slice_cell_file="smokeview.htmld";
+         var slice_cell_file_ready=1;
+         var show_slice_cell=1;
 
-         bndf_file_ready=1;
+         var frame_size_slice_geom=24;
+         var slice_geom_file="smokeview.htmld";
+         var slice_geom_file_ready=1;
+         var show_slice_geom=1;
+
+         var part_file_ready=1;
+         var show_part=1;
+
+
+         var bndf_file_ready=1;
          var frame_size_bndf=24;
+         var show_bndf=1;
 
-   // slice file triangles
+         var show_outlines=1;
+         var show_blockages=1;
 
-         var vertices_slice = [
+   // slice node file triangles
+
+         var vertices_slice_node = [
             0.5,0.5,0.5, 1.0,0.5,0.5, 1.0,1.0,0.5, 0.5,1.0,0.5,
             0.5,0.5,1.0, 1.0,0.5,1.0, 1.0,1.0,1.0, 0.5,1.0,1.0,
             0.5,0.5,0.5, 0.5,1.0,0.5, 0.5,1.0,1.0, 0.5,0.5,1.0,
@@ -85,7 +147,7 @@
             0.5,1.0,0.5, 0.5,1.0,1.0, 1.0,1.0,1.0, 1.0,1.0,0.5
          ];
 
-         var textures_slice_data = new Uint8Array([
+         var textures_slice_node_data = new Uint8Array([
               0,   0,   0,   0,
              38,  38,  38,  38,
              76,  76,  76,  76,
@@ -100,7 +162,7 @@
             153, 153, 153, 153,
          ]);
 
-         var textures_slice = new Float32Array([
+         var textures_slice_node = new Float32Array([
             0.0, 0.0, 0.0, 0.0,
             0.0, 0.0, 0.0, 0.0,
             0.0, 0.0, 0.0, 0.0,
@@ -109,7 +171,89 @@
             0.0, 0.0, 0.0, 0.0
          ]);
 
-         var indices_slice = [
+         var indices_slice_node = [
+            0,1,2, 0,2,3, 4,5,6, 4,6,7,
+            8,9,10, 8,10,11, 12,13,14, 12,14,15,
+            16,17,18, 16,18,19, 20,21,22, 20,22,23 
+         ];
+
+   // slice cell file triangles
+
+         var vertices_slice_cell = [
+            0.1,0.1,0.5, 0.4,0.1,0.5, 0.4,0.4,0.5, 0.1,0.4,0.5,
+            0.1,0.1,1.0, 0.4,0.1,1.0, 0.4,0.4,1.0, 0.1,0.4,1.0,
+            0.1,0.1,0.5, 0.1,0.4,0.5, 0.1,0.4,1.0, 0.1,0.1,1.0,
+            0.4,0.1,0.5, 0.4,0.4,0.5, 0.4,0.4,1.0, 0.4,0.1,1.0,
+            0.1,0.1,0.5, 0.1,0.1,1.0, 0.4,0.1,1.0, 0.4,0.1,0.5,
+            0.1,0.4,0.5, 0.1,0.4,1.0, 0.4,0.4,1.0, 0.4,0.4,0.5
+         ];
+
+         var textures_slice_cell_data = new Uint8Array([
+              0,   0,   0,   0,
+             38,  38,  38,  38,
+             76,  76,  76,  76,
+            115, 115, 115, 115,
+            153, 153, 153, 153,
+            191, 191, 191, 191,
+            191, 191, 191, 191,
+              0,   0,   0,   0,
+             38,  38,  38,  38,
+             76,  76,  76,  76,
+            115, 115, 115, 115,
+            153, 153, 153, 153,
+         ]);
+
+         var textures_slice_cell = new Float32Array([
+            0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0
+         ]);
+
+         var indices_slice_cell = [
+            0,1,2, 0,2,3, 4,5,6, 4,6,7,
+            8,9,10, 8,10,11, 12,13,14, 12,14,15,
+            16,17,18, 16,18,19, 20,21,22, 20,22,23 
+         ];
+
+   // slice geom file triangles
+
+         var vertices_slice_geom = [
+            0.75,0.125,0.30, 1.00,0.125,0.30, 1.00,0.375,0.30, 0.75,0.375,0.30,
+            0.75,0.125,0.65, 1.00,0.125,0.65, 1.00,0.375,0.65, 0.75,0.375,0.65,
+            0.75,0.125,0.30, 0.75,0.375,0.30, 0.75,0.375,0.65, 0.75,0.125,0.65,
+            1.00,0.125,0.30, 1.00,0.375,0.30, 1.00,0.375,0.65, 1.00,0.125,0.65,
+            0.75,0.125,0.30, 0.75,0.125,0.65, 1.00,0.125,0.65, 1.00,0.125,0.30,
+            0.75,0.375,0.30, 0.75,0.375,0.65, 1.00,0.375,0.65, 1.00,0.375,0.30
+         ];
+
+         var textures_slice_geom_data = new Uint8Array([
+              0,   0,   0,   0,
+             38,  38,  38,  38,
+             76,  76,  76,  76,
+            115, 115, 115, 115,
+            153, 153, 153, 153,
+            191, 191, 191, 191,
+            191, 191, 191, 191,
+              0,   0,   0,   0,
+             38,  38,  38,  38,
+             76,  76,  76,  76,
+            115, 115, 115, 115,
+            153, 153, 153, 153,
+         ]);
+
+         var textures_slice_geom = new Float32Array([
+            0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0
+         ]);
+
+         var indices_slice_geom = [
             0,1,2, 0,2,3, 4,5,6, 4,6,7,
             8,9,10, 8,10,11, 12,13,14, 12,14,15,
             16,17,18, 16,18,19, 20,21,22, 20,22,23 
@@ -118,12 +262,12 @@
    // boundary file triangles
 
          var vertices_bndf = [
-            0.75,0.125,0.0, 1.00,0.125,0.0, 1.00,0.375,0.0, 0.75,0.375,0.0,
-            0.75,0.125,0.5, 1.00,0.125,0.5, 1.00,0.375,0.5, 0.75,0.375,0.5,
-            0.75,0.125,0.0, 0.75,0.375,0.0, 0.75,0.375,0.5, 0.75,0.125,0.5,
-            1.00,0.125,0.0, 1.00,0.375,0.0, 1.00,0.375,0.5, 1.00,0.125,0.5,
-            0.75,0.125,0.0, 0.75,0.125,0.5, 1.00,0.125,0.5, 1.00,0.125,0.0,
-            0.75,0.375,0.0, 0.75,0.375,0.5, 1.00,0.375,0.5, 1.00,0.375,0.0
+            0.75,0.125,0.00, 1.00,0.125,0.00, 1.00,0.375,0.00, 0.75,0.375,0.00,
+            0.75,0.125,0.25, 1.00,0.125,0.25, 1.00,0.375,0.25, 0.75,0.375,0.25,
+            0.75,0.125,0.00, 0.75,0.375,0.00, 0.75,0.375,0.25, 0.75,0.125,0.25,
+            1.00,0.125,0.00, 1.00,0.375,0.00, 1.00,0.375,0.25, 1.00,0.125,0.25,
+            0.75,0.125,0.00, 0.75,0.125,0.25, 1.00,0.125,0.25, 1.00,0.125,0.00,
+            0.75,0.375,0.00, 0.75,0.375,0.25, 1.00,0.375,0.25, 1.00,0.375,0.00
          ];
 
          var textures_bndf_data = new Uint8Array([
@@ -243,12 +387,12 @@
 
          var reader = new FileReader();
          reader.onload = function(e) {
-           var textures_slice_data = reader.result;
+           var textures_slice_node_data = reader.result;
          }
          reader.onloadend = function(e) {
-           slice_file_ready=1;
+           slice_node_file_ready=1;
          }
-         file = new File(["foot"], slice_file, { type: 'application/octet-stream',  });
+         file = new File(["foot"], slice_node_file, { type: 'application/octet-stream',  });
        //  reader.readAsArrayBuffer(file);
 
 // setup lit triangle data (blockages)
@@ -267,7 +411,12 @@
 
          var buffer_indices_lit = gl.createBuffer ();
          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_lit);
-         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_lit), gl.STATIC_DRAW);
+         if(ext_32bit==null){
+           gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_lit), gl.STATIC_DRAW);
+         }
+         else{
+           gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(indices_lit), gl.STATIC_DRAW);
+         }
 
 // setup colorbar
 
@@ -280,20 +429,67 @@
          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
-// setup slice file data
+// setup slice node file data
 
-         if(slice_file_ready==1){
-           var buffer_vertices_slice = gl.createBuffer ();
-           gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_slice);
-           gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices_slice), gl.STATIC_DRAW);
+         if(slice_node_file_ready==1){
+           var buffer_vertices_slice_node = gl.createBuffer ();
+           gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_slice_node);
+           gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices_slice_node), gl.STATIC_DRAW);
 
-           var buffer_textures_slice = gl.createBuffer ();
-           gl.bindBuffer(gl.ARRAY_BUFFER, buffer_textures_slice);
-           gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textures_slice), gl.STATIC_DRAW);
+           var buffer_textures_slice_node = gl.createBuffer ();
+           gl.bindBuffer(gl.ARRAY_BUFFER, buffer_textures_slice_node);
+           gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textures_slice_node), gl.STATIC_DRAW);
 
-           var buffer_indices_slice = gl.createBuffer ();
-           gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_slice);
-           gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_slice), gl.STATIC_DRAW);
+           var buffer_indices_slice_node = gl.createBuffer ();
+           gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_slice_node);
+           if(ext_32bit==null){
+             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_slice_node), gl.STATIC_DRAW);
+           }
+           else{
+             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(indices_slice_node), gl.STATIC_DRAW);
+           }
+         }
+
+// setup slice cell file data
+
+         if(slice_cell_file_ready==1){
+           var buffer_vertices_slice_cell = gl.createBuffer ();
+           gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_slice_cell);
+           gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices_slice_cell), gl.STATIC_DRAW);
+
+           var buffer_textures_slice_cell = gl.createBuffer ();
+           gl.bindBuffer(gl.ARRAY_BUFFER, buffer_textures_slice_cell);
+           gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textures_slice_cell), gl.STATIC_DRAW);
+
+           var buffer_indices_slice_cell = gl.createBuffer ();
+           gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_slice_cell);
+           if(ext_32bit==null){
+             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_slice_cell), gl.STATIC_DRAW);
+           }
+           else{
+             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(indices_slice_cell), gl.STATIC_DRAW);
+           }
+         }
+
+// setup slice geom file data
+
+         if(slice_cell_file_ready==1){
+           var buffer_vertices_slice_geom = gl.createBuffer ();
+           gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_slice_geom);
+           gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices_slice_geom), gl.STATIC_DRAW);
+
+           var buffer_textures_slice_geom = gl.createBuffer ();
+           gl.bindBuffer(gl.ARRAY_BUFFER, buffer_textures_slice_geom);
+           gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textures_slice_geom), gl.STATIC_DRAW);
+
+           var buffer_indices_slice_geom = gl.createBuffer ();
+           gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_slice_geom);
+           if(ext_32bit==null){
+             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_slice_geom), gl.STATIC_DRAW);
+           }
+           else{
+             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(indices_slice_geom), gl.STATIC_DRAW);
+           }
          }
 
 // setup boundary file data
@@ -309,7 +505,12 @@
 
            var buffer_indices_bndf = gl.createBuffer ();
            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_bndf);
-           gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_bndf), gl.STATIC_DRAW);
+           if(ext_32bit==null){
+             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_bndf), gl.STATIC_DRAW);
+           }
+           else{
+             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(indices_bndf), gl.STATIC_DRAW);
+           }
          }
 
 // setup line data (outline of scene)
@@ -324,7 +525,12 @@
 
          var buffer_indices_line = gl.createBuffer ();
          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_line);
-         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_line), gl.STATIC_DRAW);
+         if(ext_32bit==null){
+           gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_line), gl.STATIC_DRAW);
+         }
+         else{
+           gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(indices_line), gl.STATIC_DRAW);
+         }
 
 // setup part data (particle data - not fully implemented)
 
@@ -339,7 +545,12 @@
 
            var buffer_indices_part = gl.createBuffer ();
            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_part);
-           gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_part), gl.STATIC_DRAW);
+           if(ext_32bit==null){
+             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_part), gl.STATIC_DRAW);
+           }
+           else{
+             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(indices_part), gl.STATIC_DRAW);
+           }
          }
 
          /*=================== lit SHADERS =================== */
@@ -409,9 +620,9 @@
          var _Mmatrix_lit   = gl.getUniformLocation(shaderprogram_lit, "Mmatrix");
          var _normal_matrix = gl.getUniformLocation(shaderprogram_lit, "normal_matrix");
 
-         /*=================== slice file shaders =================== */
+         /*=================== slice node file shaders =================== */
 
-         var vertCode_slice = 'attribute vec3 position;'+
+         var vertCode_slice_node = 'attribute vec3 position;'+
             'uniform mat4 Pmatrix;'+
             'uniform mat4 Vmatrix;'+
             'uniform mat4 Mmatrix;'+
@@ -422,29 +633,104 @@
                'vtexture_coordinate = texture_coordinate;'+
             '}';
 
-         var fragCode_slice = 'precision mediump float;'+
+         var fragCode_slice_node = 'precision mediump float;'+
             'varying float vtexture_coordinate;'+
             'uniform sampler2D texture_colorbar_sampler;' +
             'void main(void) {'+
             'gl_FragColor = texture2D(texture_colorbar_sampler, vec2(0.5,vtexture_coordinate));'+
             '}';
 
-         var vertShader_slice = gl.createShader(gl.VERTEX_SHADER);
-         gl.shaderSource(vertShader_slice, vertCode_slice);
-         gl.compileShader(vertShader_slice);
+         var vertShader_slice_node = gl.createShader(gl.VERTEX_SHADER);
+         gl.shaderSource(vertShader_slice_node, vertCode_slice_node);
+         gl.compileShader(vertShader_slice_node);
 
-         var fragShader_slice = gl.createShader(gl.FRAGMENT_SHADER);
-         gl.shaderSource(fragShader_slice, fragCode_slice);
-         gl.compileShader(fragShader_slice);
+         var fragShader_slice_node = gl.createShader(gl.FRAGMENT_SHADER);
+         gl.shaderSource(fragShader_slice_node, fragCode_slice_node);
+         gl.compileShader(fragShader_slice_node);
 
-         var shaderprogram_slice = gl.createProgram();
-         gl.attachShader(shaderprogram_slice, vertShader_slice);
-         gl.attachShader(shaderprogram_slice, fragShader_slice);
-         gl.linkProgram(shaderprogram_slice);
+         var shaderprogram_slice_node = gl.createProgram();
+         gl.attachShader(shaderprogram_slice_node, vertShader_slice_node);
+         gl.attachShader(shaderprogram_slice_node, fragShader_slice_node);
+         gl.linkProgram(shaderprogram_slice_node);
 
-         var _Pmatrix_slice = gl.getUniformLocation(shaderprogram_slice, "Pmatrix");
-         var _Vmatrix_slice = gl.getUniformLocation(shaderprogram_slice, "Vmatrix");
-         var _Mmatrix_slice = gl.getUniformLocation(shaderprogram_slice, "Mmatrix");
+         var _Pmatrix_slice_node = gl.getUniformLocation(shaderprogram_slice_node, "Pmatrix");
+         var _Vmatrix_slice_node = gl.getUniformLocation(shaderprogram_slice_node, "Vmatrix");
+         var _Mmatrix_slice_node = gl.getUniformLocation(shaderprogram_slice_node, "Mmatrix");
+
+         /*=================== slice cell file shaders =================== */
+
+         var vertCode_slice_cell = 'attribute vec3 position;'+
+            'uniform mat4 Pmatrix;'+
+            'uniform mat4 Vmatrix;'+
+            'uniform mat4 Mmatrix;'+
+            'attribute float texture_coordinate;'+//the color of the point
+            'varying highp float vtexture_coordinate;'+
+            'void main(void) { '+//pre-built function
+               'gl_Position = Pmatrix*Vmatrix*Mmatrix*vec4(position, 1.);'+
+               'vtexture_coordinate = texture_coordinate;'+
+            '}';
+
+         var fragCode_slice_cell = 'precision mediump float;'+
+            'varying float vtexture_coordinate;'+
+            'uniform sampler2D texture_colorbar_sampler;' +
+            'void main(void) {'+
+            'gl_FragColor = texture2D(texture_colorbar_sampler, vec2(0.5,vtexture_coordinate));'+
+            '}';
+
+         var vertShader_slice_cell = gl.createShader(gl.VERTEX_SHADER);
+         gl.shaderSource(vertShader_slice_cell, vertCode_slice_cell);
+         gl.compileShader(vertShader_slice_cell);
+
+         var fragShader_slice_cell = gl.createShader(gl.FRAGMENT_SHADER);
+         gl.shaderSource(fragShader_slice_cell, fragCode_slice_cell);
+         gl.compileShader(fragShader_slice_cell);
+
+         var shaderprogram_slice_cell = gl.createProgram();
+         gl.attachShader(shaderprogram_slice_cell, vertShader_slice_cell);
+         gl.attachShader(shaderprogram_slice_cell, fragShader_slice_cell);
+         gl.linkProgram(shaderprogram_slice_cell);
+
+         var _Pmatrix_slice_cell = gl.getUniformLocation(shaderprogram_slice_cell, "Pmatrix");
+         var _Vmatrix_slice_cell = gl.getUniformLocation(shaderprogram_slice_cell, "Vmatrix");
+         var _Mmatrix_slice_cell = gl.getUniformLocation(shaderprogram_slice_cell, "Mmatrix");
+
+         /*=================== slice geom file shaders =================== */
+
+         var vertCode_slice_geom = 'attribute vec3 position;'+
+            'uniform mat4 Pmatrix;'+
+            'uniform mat4 Vmatrix;'+
+            'uniform mat4 Mmatrix;'+
+            'attribute float texture_coordinate;'+//the color of the point
+            'varying highp float vtexture_coordinate;'+
+            'void main(void) { '+//pre-built function
+               'gl_Position = Pmatrix*Vmatrix*Mmatrix*vec4(position, 1.);'+
+               'vtexture_coordinate = texture_coordinate;'+
+            '}';
+
+         var fragCode_slice_geom = 'precision mediump float;'+
+            'varying float vtexture_coordinate;'+
+            'uniform sampler2D texture_colorbar_sampler;' +
+            'void main(void) {'+
+            'gl_FragColor = texture2D(texture_colorbar_sampler, vec2(0.5,vtexture_coordinate));'+
+            '}';
+
+         var vertShader_slice_geom = gl.createShader(gl.VERTEX_SHADER);
+         gl.shaderSource(vertShader_slice_geom, vertCode_slice_geom);
+         gl.compileShader(vertShader_slice_geom);
+
+         var fragShader_slice_geom = gl.createShader(gl.FRAGMENT_SHADER);
+         gl.shaderSource(fragShader_slice_geom, fragCode_slice_geom);
+         gl.compileShader(fragShader_slice_geom);
+
+         var shaderprogram_slice_geom = gl.createProgram();
+         gl.attachShader(shaderprogram_slice_geom, vertShader_slice_geom);
+         gl.attachShader(shaderprogram_slice_geom, fragShader_slice_geom);
+         gl.linkProgram(shaderprogram_slice_geom);
+
+         var _Pmatrix_slice_geom = gl.getUniformLocation(shaderprogram_slice_geom, "Pmatrix");
+         var _Vmatrix_slice_geom = gl.getUniformLocation(shaderprogram_slice_geom, "Vmatrix");
+         var _Mmatrix_slice_geom = gl.getUniformLocation(shaderprogram_slice_geom, "Mmatrix");
+
 
 //  boundary file shaders
 
@@ -583,6 +869,10 @@
          var dX = 0, dY = 0;
          var dKEYx=0, dKEYy=0, dKEYz=0;
          var ctrl_key=0, alt_key=0;
+         var double_click=0;
+         var touch_mode=0;
+         var using_touch=0;
+         var prev_dist=0;
 
          /*=================== mouseDown =================== */
 
@@ -600,9 +890,28 @@
             drag = true;
             old_x = e.pageX;
             old_y = e.pageY;
+            prev_dist=0;
             if(e.touches){
+              if(e.touches.length==3){
+                PHI=0.0;
+                THETA=0.0;
+                dX = 0;
+                dY = 0;
+                dKEYx=0;
+                dKEYy=0;
+                dKEYz=0;
+                touch_mode=0;
+                e.preventDefault();
+                return false;
+              }
               old_x = e.touches[0].pageX;
               old_y = e.touches[0].pageY;
+              if(double_click == 0){
+                double_click = 1;
+               setTimeout( function() { double_click = 0; }, 300 );
+               return false;
+              }
+              if(e.touches.length==1)touch_mode=1-touch_mode;
             }
             e.preventDefault();
             return false;
@@ -623,21 +932,33 @@
 
             if(e.touches){
 
-// 1 finger : rotate
-// 2 fingers: move left/right, in/out
-// 3 fingers: move up/down
+// 1 finger, touch_mode==0 : rotate
+// 1 finger, touch_mode==1 : move left/right, up/down
+// 2 fingers               : move in/out
+// 3 fingers               : reset view
 
-              if(e.touches.length==2){
-                alt_key=0;
-                ctrl_key=1;
+              alt_key=0;
+              ctrl_key=0;
+              if(e.touches.length>2){
+                PHI=0.0;
+                THETA=0.0;
+                dX = 0;
+                dY = 0;
+                dKEYx=0;
+                dKEYy=0;
+                dKEYz=0;
+                e.preventDefault();
+                return false;
               }
-              else if(e.touches.length==3){
-                alt_key=1;
-                ctrl_key=0;
+              using_touch=1;
+              if(e.touches.length==2){
+                ctrl_key=1;
+                var dx_touch=e.touches[1].pageX-e.touches[0].pageX;
+                var dy_touch=e.touches[1].pageY-e.touches[0].pageY;
+                var cur_dist=Math.sqrt(dx_touch*dx_touch+dy_touch*dy_touch);
               }
               else{
-                alt_key=0;
-                ctrl_key=0;
+                if(touch_mode==1)alt_key=1;
               }
               new_x = e.touches[0].pageX;
               new_y = e.touches[0].pageY;
@@ -649,19 +970,42 @@
               PHI+=dY;
             }
             else if(alt_key==1){
+              if(touch_mode==1){
+                dX = (new_x-old_x)/canvas.width,
+                dKEYx -= 3*dX;
+              }
               dY = (new_y-old_y)/canvas.height;
               dKEYz += 3*dY;
             }
-            else{
-              dX = (new_x-old_x)/canvas.width,
-              dY = (new_y-old_y)/canvas.height;
-              dKEYx -= 3*dX;
-              dKEYy += 3*dY;
+            else{ // ctrl_key==1
+              if(using_touch==0){
+                dX = (new_x-old_x)/canvas.width,
+                dKEYx -= 3*dX;
+                dY = (new_y-old_y)/canvas.height;
+                dKEYy += 3*dY;
+              }
+              else{
+                if(prev_dist>0){
+                  dY = 3*(cur_dist-prev_dist)/canvas.height;
+                  dKEYy -= dY;
+                }
+              }
+              prev_dist=cur_dist;
             }
             old_x = new_x;
             old_y = new_y;
             e.preventDefault();
          };
+
+         /*=================== handleOrientation=================== */
+
+         function handleOrientation(e) {
+           // alpha angle about z axis
+           // beta  angle about x axis
+           // gamma angle about y axis
+           PHI   = e.beta*Math.pi/180.0;
+           THETA = e.gamma*Math.pi/180.0;
+         }
 
          /*=================== register callbacks =================== */
 
@@ -674,6 +1018,8 @@
          canvas.addEventListener("touchmove",   mouseMove, false);
          canvas.addEventListener("touchend",    mouseUp,   false);
          canvas.addEventListener("touchcancel", mouseUp,  false);
+
+         canvas.addEventListener("deviceorientation", handleOrientation, false);
 
          /*=================== rotateX =================== */
 
@@ -818,17 +1164,47 @@
            }
          }
 
-         /*=================== get_slice_frame =================== */
+         /*=================== get_slice_node_frame =================== */
 
-         function get_slice_frame(frame) {
+         function get_slice_node_frame(frame) {
            var i;
 
-           for (i=0; i<frame_size_slice; i++){
-             if(slice_file_ready == 1){
-               textures_slice[i] = textures_slice_data[frame_size_slice*frame+i]/255.0;
+           for (i=0; i<frame_size_slice_node; i++){
+             if(slice_node_file_ready == 1){
+               textures_slice_node[i] = textures_slice_node_data[frame_size_slice_node*frame+i]/255.0;
              }
              else{
-               textures_slice[i] = 128/255.0;
+               textures_slice_node[i] = 128/255.0;
+             }
+           }
+         }
+
+         /*=================== get_slice_cell_frame =================== */
+
+         function get_slice_cell_frame(frame) {
+           var i;
+
+           for (i=0; i<frame_size_slice_cell; i++){
+             if(slice_cell_file_ready == 1){
+               textures_slice_cell[i] = textures_slice_cell_data[frame_size_slice_cell*frame+i]/255.0;
+             }
+             else{
+               textures_slice_cell[i] = 128/255.0;
+             }
+           }
+         }
+
+         /*=================== get_slice_geom_frame =================== */
+
+         function get_slice_geom_frame(frame) {
+           var i;
+
+           for (i=0; i<frame_size_slice_geom; i++){
+             if(slice_geom_file_ready == 1){
+               textures_slice_geom[i] = textures_slice_geom_data[frame_size_slice_geom*frame+i]/255.0;
+             }
+             else{
+               textures_slice_geom[i] = 128/255.0;
              }
            }
          }
@@ -852,9 +1228,57 @@
            }
          }
 
+
+         /*=================== SetTime =================== */
+
+         function SetTime(option) {
+           if(option==-2){
+             time_option=option;
+           }
+           else if(option==-1){
+             time_option=option;
+           }
+           else if(option==0){
+             if(time_option==3){
+               time_option=0;
+               document.getElementById("buttonPauseResume").innerHTML= "Resume "+iframe;
+               document.getElementById("buttonPauseResume").style.width = "125px";
+             }
+             else{
+               time_option=3;
+               document.getElementById("buttonPauseResume").innerHTML= "Pause "+iframe;
+               document.getElementById("buttonPauseResume").style.width = "125px";
+             }
+           }
+           else if(option==1){
+             time_option=option;
+           }
+           else if(option==2){
+             time_option=option;
+           }
+         }
+         /*=================== Reset =================== */
+
+         function Reset(option) {
+           PHI=0.0;
+           THETA=0.0;
+           dX = 0;
+           dY = 0;
+           dKEYx=0;
+           dKEYy=0;
+           dKEYz=0;
+         }
+
+         /*=================== ShowHide =================== */
+
+         function ShowHide(show_var) {
+           return 1 - show_var;
+         }
+
          var THETA = 0, PHI = 0;
          var time_old = 0;
          var iframe = 0;
+         var time_option=3;
 
          /*=================== animate =================== */
 
@@ -900,63 +1324,147 @@
 
 // draw lit triangles (blockages)
 
-            gl.useProgram(shaderprogram_lit);
-            gl.uniformMatrix4fv(_Pmatrix_lit, false, proj_matrix);
-            gl.uniformMatrix4fv(_Vmatrix_lit, false, view_matrix);
-            gl.uniformMatrix4fv(_Mmatrix_lit, false, mo_matrix);
-            gl.uniformMatrix4fv(_normal_matrix, false, normal_matrix);
+            if(show_blockages==1){
+              gl.useProgram(shaderprogram_lit);
+              gl.uniformMatrix4fv(_Pmatrix_lit, false, proj_matrix);
+              gl.uniformMatrix4fv(_Vmatrix_lit, false, view_matrix);
+              gl.uniformMatrix4fv(_Mmatrix_lit, false, mo_matrix);
+              gl.uniformMatrix4fv(_normal_matrix, false, normal_matrix);
 
-            gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_lit);
-            var _position_lit = gl.getAttribLocation(shaderprogram_lit, "position");
-            gl.vertexAttribPointer(_position_lit, 3, gl.FLOAT, false,0,0);
-            gl.enableVertexAttribArray(_position_lit);
+              gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_lit);
+              var _position_lit = gl.getAttribLocation(shaderprogram_lit, "position");
+              gl.vertexAttribPointer(_position_lit, 3, gl.FLOAT, false,0,0);
+              gl.enableVertexAttribArray(_position_lit);
 
-            gl.bindBuffer(gl.ARRAY_BUFFER, buffer_colors_lit);
-            var _color_lit = gl.getAttribLocation(shaderprogram_lit, "color");
-            gl.vertexAttribPointer(_color_lit, 3, gl.FLOAT, false,0,0) ;
-            gl.enableVertexAttribArray(_color_lit);
+              gl.bindBuffer(gl.ARRAY_BUFFER, buffer_colors_lit);
+              var _color_lit = gl.getAttribLocation(shaderprogram_lit, "color");
+              gl.vertexAttribPointer(_color_lit, 3, gl.FLOAT, false,0,0) ;
+              gl.enableVertexAttribArray(_color_lit);
 
-            gl.bindBuffer(gl.ARRAY_BUFFER, buffer_normals_lit);
-            var _normal_lit = gl.getAttribLocation(shaderprogram_lit, "normal");
-            gl.vertexAttribPointer(_normal_lit, 3, gl.FLOAT, false,0,0) ;
-            gl.enableVertexAttribArray(_normal_lit);
+              gl.bindBuffer(gl.ARRAY_BUFFER, buffer_normals_lit);
+              var _normal_lit = gl.getAttribLocation(shaderprogram_lit, "normal");
+              gl.vertexAttribPointer(_normal_lit, 3, gl.FLOAT, false,0,0) ;
+              gl.enableVertexAttribArray(_normal_lit);
 
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_lit);
-            gl.drawElements(gl.TRIANGLES, indices_lit.length, gl.UNSIGNED_SHORT, 0);
+              gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_lit);
 
-// draw slice file triangles
+              if(ext_32bit==null){
+                gl.drawElements(gl.TRIANGLES, indices_lit.length, gl.UNSIGNED_SHORT, 0);
+              }
+              else{
+                gl.drawElements(gl.TRIANGLES, indices_lit.length, gl.UNSIGNED_INT, 0);
+              }
+            }
 
-            if(slice_file_ready==1){
-              gl.useProgram(shaderprogram_slice);
-              gl.uniformMatrix4fv(_Pmatrix_slice, false, proj_matrix);
-              gl.uniformMatrix4fv(_Vmatrix_slice, false, view_matrix);
-              gl.uniformMatrix4fv(_Mmatrix_slice, false, mo_matrix);
+// draw slice node file triangles
 
-              gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_slice);
-              var _position_slice = gl.getAttribLocation(shaderprogram_slice, "position");
-              gl.vertexAttribPointer(_position_slice, 3, gl.FLOAT, false,0,0);
-              gl.enableVertexAttribArray(_position_slice);
+            if(slice_node_file_ready==1&&show_slice_node==1){
+              gl.useProgram(shaderprogram_slice_node);
+              gl.uniformMatrix4fv(_Pmatrix_slice_node, false, proj_matrix);
+              gl.uniformMatrix4fv(_Vmatrix_slice_node, false, view_matrix);
+              gl.uniformMatrix4fv(_Mmatrix_slice_node, false, mo_matrix);
 
-              get_slice_frame(iframe);
+              gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_slice_node);
+              var _position_slice_node = gl.getAttribLocation(shaderprogram_slice_node, "position");
+              gl.vertexAttribPointer(_position_slice_node, 3, gl.FLOAT, false,0,0);
+              gl.enableVertexAttribArray(_position_slice_node);
 
-              gl.bindBuffer(gl.ARRAY_BUFFER, buffer_textures_slice);
-              gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textures_slice), gl.STATIC_DRAW);
-              var _texture_coordinate_slice = gl.getAttribLocation(shaderprogram_slice, "texture_coordinate");
-              gl.vertexAttribPointer(_texture_coordinate_slice, 1, gl.FLOAT, false,0,0) ;
-              gl.enableVertexAttribArray(_texture_coordinate_slice);
+              get_slice_node_frame(iframe);
+
+              gl.bindBuffer(gl.ARRAY_BUFFER, buffer_textures_slice_node);
+              gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textures_slice_node), gl.STATIC_DRAW);
+              var _texture_coordinate_slice_node = gl.getAttribLocation(shaderprogram_slice_node, "texture_coordinate");
+              gl.vertexAttribPointer(_texture_coordinate_slice_node, 1, gl.FLOAT, false,0,0) ;
+              gl.enableVertexAttribArray(_texture_coordinate_slice_node);
 
               gl.activeTexture(gl.TEXTURE0);
               gl.bindTexture(gl.TEXTURE_2D, texture_colorbar);
-              var texture_location = gl.getUniformLocation(shaderprogram_slice, "texture_colorbar_sampler");
+              var texture_location = gl.getUniformLocation(shaderprogram_slice_node, "texture_colorbar_sampler");
               gl.uniform1i(texture_location,0);
 
-              gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_slice);
-              gl.drawElements(gl.TRIANGLES, indices_slice.length, gl.UNSIGNED_SHORT, 0);
+              gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_slice_node);
+              if(ext_32bit==null){
+                gl.drawElements(gl.TRIANGLES, indices_slice_node.length, gl.UNSIGNED_SHORT, 0);
+              }
+              else{
+                gl.drawElements(gl.TRIANGLES, indices_slice_node.length, gl.UNSIGNED_INT, 0);
+              }
             }
+
+// draw slice cell file triangles
+
+            if(slice_cell_file_ready==1&&show_slice_cell==1){
+              gl.useProgram(shaderprogram_slice_cell);
+              gl.uniformMatrix4fv(_Pmatrix_slice_cell, false, proj_matrix);
+              gl.uniformMatrix4fv(_Vmatrix_slice_cell, false, view_matrix);
+              gl.uniformMatrix4fv(_Mmatrix_slice_cell, false, mo_matrix);
+
+              gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_slice_cell);
+              var _position_slice_cell = gl.getAttribLocation(shaderprogram_slice_cell, "position");
+              gl.vertexAttribPointer(_position_slice_cell, 3, gl.FLOAT, false,0,0);
+              gl.enableVertexAttribArray(_position_slice_cell);
+
+              get_slice_cell_frame(iframe);
+
+              gl.bindBuffer(gl.ARRAY_BUFFER, buffer_textures_slice_cell);
+              gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textures_slice_cell), gl.STATIC_DRAW);
+              var _texture_coordinate_slice_cell = gl.getAttribLocation(shaderprogram_slice_cell, "texture_coordinate");
+              gl.vertexAttribPointer(_texture_coordinate_slice_cell, 1, gl.FLOAT, false,0,0) ;
+              gl.enableVertexAttribArray(_texture_coordinate_slice_cell);
+
+              gl.activeTexture(gl.TEXTURE0);
+              gl.bindTexture(gl.TEXTURE_2D, texture_colorbar);
+              var texture_location = gl.getUniformLocation(shaderprogram_slice_cell, "texture_colorbar_sampler");
+              gl.uniform1i(texture_location,0);
+
+              gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_slice_cell);
+              if(ext_32bit==null){
+                gl.drawElements(gl.TRIANGLES, indices_slice_cell.length, gl.UNSIGNED_SHORT, 0);
+              }
+              else{
+                gl.drawElements(gl.TRIANGLES, indices_slice_cell.length, gl.UNSIGNED_INT, 0);
+              }
+            }
+
+// draw slice geom file triangles
+
+            if(slice_geom_file_ready==1&&show_slice_geom==1){
+              gl.useProgram(shaderprogram_slice_geom);
+              gl.uniformMatrix4fv(_Pmatrix_slice_geom, false, proj_matrix);
+              gl.uniformMatrix4fv(_Vmatrix_slice_geom, false, view_matrix);
+              gl.uniformMatrix4fv(_Mmatrix_slice_geom, false, mo_matrix);
+
+              gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_slice_geom);
+              var _position_slice_geom = gl.getAttribLocation(shaderprogram_slice_geom, "position");
+              gl.vertexAttribPointer(_position_slice_geom, 3, gl.FLOAT, false,0,0);
+              gl.enableVertexAttribArray(_position_slice_geom);
+
+              get_slice_geom_frame(iframe);
+
+              gl.bindBuffer(gl.ARRAY_BUFFER, buffer_textures_slice_geom);
+              gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textures_slice_geom), gl.STATIC_DRAW);
+              var _texture_coordinate_slice_geom = gl.getAttribLocation(shaderprogram_slice_geom, "texture_coordinate");
+              gl.vertexAttribPointer(_texture_coordinate_slice_geom, 1, gl.FLOAT, false,0,0) ;
+              gl.enableVertexAttribArray(_texture_coordinate_slice_geom);
+
+              gl.activeTexture(gl.TEXTURE0);
+              gl.bindTexture(gl.TEXTURE_2D, texture_colorbar);
+              var texture_location = gl.getUniformLocation(shaderprogram_slice_geom, "texture_colorbar_sampler");
+              gl.uniform1i(texture_location,0);
+
+              gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_slice_geom);
+              if(ext_32bit==null){
+                gl.drawElements(gl.TRIANGLES, indices_slice_geom.length, gl.UNSIGNED_SHORT, 0);
+              }
+              else{
+                gl.drawElements(gl.TRIANGLES, indices_slice_geom.length, gl.UNSIGNED_INT, 0);
+              }
+            }
+
 
 // draw boundary file triangles
 
-            if(bndf_file_ready==1){
+            if(bndf_file_ready==1&&show_bndf==1){
               gl.useProgram(shaderprogram_bndf);
               gl.uniformMatrix4fv(_Pmatrix_bndf, false, proj_matrix);
               gl.uniformMatrix4fv(_Vmatrix_bndf, false, view_matrix);
@@ -981,31 +1489,43 @@
               gl.uniform1i(texture_location,0);
 
               gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_bndf);
-              gl.drawElements(gl.TRIANGLES, indices_bndf.length, gl.UNSIGNED_SHORT, 0);
+              if(ext_32bit==null){
+                gl.drawElements(gl.TRIANGLES, indices_bndf.length, gl.UNSIGNED_SHORT, 0);
+              }
+              else{
+                gl.drawElements(gl.TRIANGLES, indices_bndf.length, gl.UNSIGNED_INT, 0);
+              }
             }
 
 // draw outlines
 
-            gl.useProgram(shaderprogram_line);
-            gl.uniformMatrix4fv(_Pmatrix_line, false, proj_matrix);
-            gl.uniformMatrix4fv(_Vmatrix_line, false, view_matrix);
-            gl.uniformMatrix4fv(_Mmatrix_line, false, mo_matrix);
-            gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_line);
-            var _position_line = gl.getAttribLocation(shaderprogram_line, "position");
-            gl.vertexAttribPointer(_position_line, 3, gl.FLOAT, false,0,0);
-            gl.enableVertexAttribArray(_position_line);
+            if(show_outlines==1){
+              gl.useProgram(shaderprogram_line);
+              gl.uniformMatrix4fv(_Pmatrix_line, false, proj_matrix);
+              gl.uniformMatrix4fv(_Vmatrix_line, false, view_matrix);
+              gl.uniformMatrix4fv(_Mmatrix_line, false, mo_matrix);
+              gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_line);
+              var _position_line = gl.getAttribLocation(shaderprogram_line, "position");
+              gl.vertexAttribPointer(_position_line, 3, gl.FLOAT, false,0,0);
+              gl.enableVertexAttribArray(_position_line);
 
-            gl.bindBuffer(gl.ARRAY_BUFFER, buffer_colors_line);
-            var _color_line = gl.getAttribLocation(shaderprogram_line, "color");
-            gl.vertexAttribPointer(_color_line, 3, gl.FLOAT, false,0,0) ;
-            gl.enableVertexAttribArray(_color_line);
+              gl.bindBuffer(gl.ARRAY_BUFFER, buffer_colors_line);
+              var _color_line = gl.getAttribLocation(shaderprogram_line, "color");
+              gl.vertexAttribPointer(_color_line, 3, gl.FLOAT, false,0,0) ;
+              gl.enableVertexAttribArray(_color_line);
 
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_line);
-            gl.drawElements(gl.LINES, indices_line.length, gl.UNSIGNED_SHORT, 0);
+              gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_line);
+              if(ext_32bit==null){
+                gl.drawElements(gl.LINES, indices_line.length, gl.UNSIGNED_SHORT, 0);
+              }
+              else{
+                gl.drawElements(gl.LINES, indices_line.length, gl.UNSIGNED_INT, 0);
+              }
+            }
 
 // draw particles
 
-            if(part_file_ready==1){
+            if(part_file_ready==1&&show_part==1){
               gl.useProgram(shaderprogram_part);
               gl.uniformMatrix4fv(_Pmatrix_part, false, proj_matrix);
               gl.uniformMatrix4fv(_Vmatrix_part, false, view_matrix);
@@ -1030,11 +1550,43 @@
               gl.enableVertexAttribArray(_color_part);
 
               gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_part);
-              gl.drawElements(gl.POINTS, indices_part.length, gl.UNSIGNED_SHORT, 0);
+              if(ext_32bit==null){
+                gl.drawElements(gl.POINTS, indices_part.length, gl.UNSIGNED_SHORT, 0);
+              }
+              else{
+                gl.drawElements(gl.POINTS, indices_part.length, gl.UNSIGNED_INT, 0);
+              }
             }
 
-            iframe++;
-            if(iframe+1>nframes)iframe=0;
+            if(time_option==3){
+              iframe++;
+            }
+            else if(time_option==-2){
+              iframe=0;
+              time_option=0;
+            }
+            else if(time_option==-1){
+              iframe--;
+              time_option=0;
+            }
+            else if(time_option==1){
+              iframe++;
+              time_option=0;
+            }
+            else if(time_option==2){
+              iframe=nframes-1;
+              time_option=0;
+            }
+
+            if(iframe<0)iframe=nframes-1;
+            if(iframe>nframes-1)iframe=0;
+            if(time_option==2){
+              document.getElementById("buttonPauseResume").innerHTML= "Pause "+iframe;
+            }
+            else{
+              document.getElementById("buttonPauseResume").innerHTML= "Resume "+iframe;
+            }
+            document.getElementById("buttonPauseResume").style.width = "125px";
 
             window.requestAnimationFrame(animate);
          }
