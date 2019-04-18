@@ -18,6 +18,7 @@ echo "-F - skip figure generation and build document stages"
 echo "-i - use installed version of smokeview"
 echo "-I - use development version of fds"
 echo "-J - use Intel MPI version fds"
+echo "-N - don't copy Manuals directory to .firebot/Manuals"
 echo "-O - use OpenMPI version fds"
 echo "-L - firebot lite,  run only stages that build a debug fds and run cases with it"
 echo "                    (no release fds, no release cases, no matlab, etc)"
@@ -152,6 +153,7 @@ fi
 
 #*** define initial values
 
+COPY_MANUAL_DIR=
 USEINSTALL=
 BRANCH=master
 botscript=firebot.sh
@@ -178,7 +180,7 @@ export QFDS_STARTUP=
 
 #*** parse command line options
 
-while getopts 'bBcdFfHhIiJkLm:q:Q:nRSsuUvW' OPTION
+while getopts 'bBcdFfHhIiJkLm:q:Q:NnRSsuUvW' OPTION
 do
 case $OPTION  in
   b)
@@ -222,6 +224,9 @@ case $OPTION  in
    ;;
   m)
    EMAIL="$OPTARG"
+   ;;
+  N)
+   COPY_MANUAL_DIR=-N
    ;;
   O)
    INTEL=
@@ -352,7 +357,7 @@ BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
 firebot_status=0
-$ECHO  ./$botscript -p $firebot_pid $UPDATE $DV $INTEL $debug_mode $BUILD_ONLY $BRANCH $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUEBENCH $QUEUE $SKIPMATLAB $SKIPFIGURES $CLONE_REPOS $EMAIL "$@"
+$ECHO  ./$botscript -p $firebot_pid $UPDATE $DV $INTEL $debug_mode $BUILD_ONLY $BRANCH $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUEBENCH $QUEUE $SKIPMATLAB $SKIPFIGURES $CLONE_REPOS $EMAIL $COPY_MANUAL_DIR "$@"
 firebot_status=$?
 if [ -e $firebot_pid ]; then
   rm -f $firebot_pid
