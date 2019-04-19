@@ -6,13 +6,13 @@
 -->
 <p>
 <button onclick="Reset()">Reset View</button><br>
+<button onclick="show_blockages=ShowHide(show_blockages)">blockages</button>
+<button onclick="show_outlines=ShowHide(show_outlines)">outlines</button><br>
 <button onclick="show_slice_cell=ShowHide(show_slice_cell)">slice(cell centered)</button>
 <button onclick="show_slice_node=ShowHide(show_slice_node)">slice(node centered)</button>
 <button onclick="show_slice_geom=ShowHide(show_slice_geom)">slice(geom)</button>
 <button onclick="show_bndf=ShowHide(show_bndf)">boundary</button>
-<button onclick="show_part=ShowHide(show_part)">particles</button>
-<button onclick="show_blockages=ShowHide(show_blockages)">blockages</button>
-<button onclick="show_outlines=ShowHide(show_outlines)">outlines</button><br>
+<button onclick="show_part=ShowHide(show_part)">particles</button><br>
 <button onclick="SetTime(-2)"><< </button>
 <button onclick="SetTime(-1)">< </button>
 <button type="button" id="buttonPauseResume" onclick="SetTime(0)">Pause</button>
