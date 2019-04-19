@@ -111,7 +111,6 @@
          var nframes=2;
 
          var frame_size_slice_node=24;
-         var slice_node_file="smokeview.htmld";
          var slice_node_file_ready=1;
          var show_slice_node=1;
 
@@ -382,18 +381,6 @@
            0, 1, 2, 3, 4
          ];
 //HIDE_OFF
-
-// read slice file data (unlit triangles) note: not working
-
-         var reader = new FileReader();
-         reader.onload = function(e) {
-           var textures_slice_node_data = reader.result;
-         }
-         reader.onloadend = function(e) {
-           slice_node_file_ready=1;
-         }
-         file = new File(["foot"], slice_node_file, { type: 'application/octet-stream',  });
-       //  reader.readAsArrayBuffer(file);
 
 // setup lit triangle data (blockages)
 
