@@ -460,7 +460,7 @@
 
 // setup slice geom file data
 
-         if(slice_cell_file_ready==1){
+         if(slice_geom_file_ready==1){
            var buffer_vertices_slice_geom = gl.createBuffer ();
            gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_slice_geom);
            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices_slice_geom), gl.STATIC_DRAW);
