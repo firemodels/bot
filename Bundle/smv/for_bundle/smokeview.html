@@ -61,7 +61,7 @@
 
 // lit triangles (blockages)
 
-         var vertices_lit = [
+         var vertices_obst_lit = [
             0.0,0.0,0.0, 0.5,0.0,0.0, 0.5,0.5,0.0, 0.0,0.5,0.0, // bottom
             0.0,0.0,0.5, 0.5,0.0,0.5, 0.5,0.5,0.5, 0.0,0.5,0.5, // top
             0.0,0.0,0.0, 0.0,0.5,0.0, 0.0,0.5,0.5, 0.0,0.0,0.5, // left
@@ -70,7 +70,7 @@
             0.0,0.5,0.0, 0.0,0.5,0.5, 0.5,0.5,0.5, 0.5,0.5,0.0, // front
          ];
 
-         var normals_lit = [
+         var normals_obst_lit = [
             0, 0,-1,  0, 0,-1,  0, 0,-1,  0, 0,-1, // bottom
             0, 0, 1,  0, 0, 1,  0, 0, 1,  0, 0, 1, // top
            -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, // left
@@ -80,7 +80,7 @@
          ];
 
         if(ext_32bit==null){
-           var colors_lit = [
+           var colors_obst_lit = [
              1,1,1, 1,1,1, 1,1,1, 1,1,1,
              0,0,0, 0,0,0, 0,0,0, 0,0,0,
              1,1,0, 1,1,0, 1,1,0, 1,1,0,
@@ -90,7 +90,7 @@
            ];
         }
         else{
-           var colors_lit = [
+           var colors_obst_lit = [
              1,1,1, 1,1,1, 1,1,1, 1,1,1,
              0,0,0, 0,0,0, 0,0,0, 0,0,0,
              1,1,0, 1,1,0, 1,1,0, 1,1,0,
@@ -100,7 +100,7 @@
            ];
         }
 
-         var indices_lit = [
+         var indices_obst_lit = [
             0,1,2,    0,2,3,    4,5,6,    4,6,7,
             8,9,10,   8,10,11,  12,13,14, 12,14,15,
             16,17,18, 16,18,19, 20,21,22, 20,22,23 
@@ -384,25 +384,25 @@
 
 // setup lit triangle data (blockages)
 
-         var buffer_vertices_lit = gl.createBuffer ();
-         gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_lit);
-         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices_lit), gl.STATIC_DRAW);
+         var buffer_vertices_obst_lit = gl.createBuffer ();
+         gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_obst_lit);
+         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices_obst_lit), gl.STATIC_DRAW);
 
-         var buffer_normals_lit = gl.createBuffer ();
-         gl.bindBuffer(gl.ARRAY_BUFFER, buffer_normals_lit);
-         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals_lit), gl.STATIC_DRAW);
+         var buffer_normals_obst_lit = gl.createBuffer ();
+         gl.bindBuffer(gl.ARRAY_BUFFER, buffer_normals_obst_lit);
+         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals_obst_lit), gl.STATIC_DRAW);
 
-         var buffer_colors_lit = gl.createBuffer ();
-         gl.bindBuffer(gl.ARRAY_BUFFER, buffer_colors_lit);
-         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors_lit), gl.STATIC_DRAW);
+         var buffer_colors_obst_lit = gl.createBuffer ();
+         gl.bindBuffer(gl.ARRAY_BUFFER, buffer_colors_obst_lit);
+         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors_obst_lit), gl.STATIC_DRAW);
 
-         var buffer_indices_lit = gl.createBuffer ();
-         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_lit);
+         var buffer_indices_obst_lit = gl.createBuffer ();
+         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_obst_lit);
          if(ext_32bit==null){
-           gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_lit), gl.STATIC_DRAW);
+           gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_obst_lit), gl.STATIC_DRAW);
          }
          else{
-           gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(indices_lit), gl.STATIC_DRAW);
+           gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(indices_obst_lit), gl.STATIC_DRAW);
          }
 
 // setup colorbar
@@ -542,7 +542,7 @@
 
          /*=================== lit SHADERS =================== */
 
-   var vertCode_lit = 'attribute vec3 position;'+
+   var vertCode_obst_lit = 'attribute vec3 position;'+
             'uniform mat4 Pmatrix;'+
             'uniform mat4 Vmatrix;'+
             'uniform mat4 Mmatrix;'+
@@ -560,7 +560,7 @@
                 'gl_Position = Pmatrix * vertPos4;'+
             '}';
 
-         var fragCode_lit = 'precision mediump float;'+
+         var fragCode_obst_lit = 'precision mediump float;'+
             'varying highp vec3 vcolor;'+
             'precision mediump float;'+
             'varying highp vec3 normalInterp;'+                // Surface normal
@@ -589,23 +589,23 @@
             '                      Ks * specular * specularColor, 1.0);'+
             '}';
 
-         var vertShader_lit = gl.createShader(gl.VERTEX_SHADER);
-         gl.shaderSource(vertShader_lit, vertCode_lit);
-         gl.compileShader(vertShader_lit);
+         var vertShader_obst_lit = gl.createShader(gl.VERTEX_SHADER);
+         gl.shaderSource(vertShader_obst_lit, vertCode_obst_lit);
+         gl.compileShader(vertShader_obst_lit);
 
-         var fragShader_lit = gl.createShader(gl.FRAGMENT_SHADER);
-         gl.shaderSource(fragShader_lit, fragCode_lit);
-         gl.compileShader(fragShader_lit);
+         var fragShader_obst_lit = gl.createShader(gl.FRAGMENT_SHADER);
+         gl.shaderSource(fragShader_obst_lit, fragCode_obst_lit);
+         gl.compileShader(fragShader_obst_lit);
 
-         var shaderprogram_lit = gl.createProgram();
-         gl.attachShader(shaderprogram_lit, vertShader_lit);
-         gl.attachShader(shaderprogram_lit, fragShader_lit);
-         gl.linkProgram(shaderprogram_lit);
+         var shaderprogram_obst_lit = gl.createProgram();
+         gl.attachShader(shaderprogram_obst_lit, vertShader_obst_lit);
+         gl.attachShader(shaderprogram_obst_lit, fragShader_obst_lit);
+         gl.linkProgram(shaderprogram_obst_lit);
 
-         var _Pmatrix_lit   = gl.getUniformLocation(shaderprogram_lit, "Pmatrix");
-         var _Vmatrix_lit   = gl.getUniformLocation(shaderprogram_lit, "Vmatrix");
-         var _Mmatrix_lit   = gl.getUniformLocation(shaderprogram_lit, "Mmatrix");
-         var _normal_matrix = gl.getUniformLocation(shaderprogram_lit, "normal_matrix");
+         var _Pmatrix_obst_lit   = gl.getUniformLocation(shaderprogram_obst_lit, "Pmatrix");
+         var _Vmatrix_obst_lit   = gl.getUniformLocation(shaderprogram_obst_lit, "Vmatrix");
+         var _Mmatrix_obst_lit   = gl.getUniformLocation(shaderprogram_obst_lit, "Mmatrix");
+         var _normal_matrix = gl.getUniformLocation(shaderprogram_obst_lit, "normal_matrix");
 
          /*=================== slice node file shaders =================== */
 
@@ -1312,34 +1312,34 @@
 // draw lit triangles (blockages)
 
             if(show_blockages==1){
-              gl.useProgram(shaderprogram_lit);
-              gl.uniformMatrix4fv(_Pmatrix_lit, false, proj_matrix);
-              gl.uniformMatrix4fv(_Vmatrix_lit, false, view_matrix);
-              gl.uniformMatrix4fv(_Mmatrix_lit, false, mo_matrix);
+              gl.useProgram(shaderprogram_obst_lit);
+              gl.uniformMatrix4fv(_Pmatrix_obst_lit, false, proj_matrix);
+              gl.uniformMatrix4fv(_Vmatrix_obst_lit, false, view_matrix);
+              gl.uniformMatrix4fv(_Mmatrix_obst_lit, false, mo_matrix);
               gl.uniformMatrix4fv(_normal_matrix, false, normal_matrix);
 
-              gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_lit);
-              var _position_lit = gl.getAttribLocation(shaderprogram_lit, "position");
-              gl.vertexAttribPointer(_position_lit, 3, gl.FLOAT, false,0,0);
-              gl.enableVertexAttribArray(_position_lit);
+              gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_obst_lit);
+              var _position_obst_lit = gl.getAttribLocation(shaderprogram_obst_lit, "position");
+              gl.vertexAttribPointer(_position_obst_lit, 3, gl.FLOAT, false,0,0);
+              gl.enableVertexAttribArray(_position_obst_lit);
 
-              gl.bindBuffer(gl.ARRAY_BUFFER, buffer_colors_lit);
-              var _color_lit = gl.getAttribLocation(shaderprogram_lit, "color");
-              gl.vertexAttribPointer(_color_lit, 3, gl.FLOAT, false,0,0) ;
-              gl.enableVertexAttribArray(_color_lit);
+              gl.bindBuffer(gl.ARRAY_BUFFER, buffer_colors_obst_lit);
+              var _color_obst_lit = gl.getAttribLocation(shaderprogram_obst_lit, "color");
+              gl.vertexAttribPointer(_color_obst_lit, 3, gl.FLOAT, false,0,0) ;
+              gl.enableVertexAttribArray(_color_obst_lit);
 
-              gl.bindBuffer(gl.ARRAY_BUFFER, buffer_normals_lit);
-              var _normal_lit = gl.getAttribLocation(shaderprogram_lit, "normal");
-              gl.vertexAttribPointer(_normal_lit, 3, gl.FLOAT, false,0,0) ;
-              gl.enableVertexAttribArray(_normal_lit);
+              gl.bindBuffer(gl.ARRAY_BUFFER, buffer_normals_obst_lit);
+              var _normal_obst_lit = gl.getAttribLocation(shaderprogram_obst_lit, "normal");
+              gl.vertexAttribPointer(_normal_obst_lit, 3, gl.FLOAT, false,0,0) ;
+              gl.enableVertexAttribArray(_normal_obst_lit);
 
-              gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_lit);
+              gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_obst_lit);
 
               if(ext_32bit==null){
-                gl.drawElements(gl.TRIANGLES, indices_lit.length, gl.UNSIGNED_SHORT, 0);
+                gl.drawElements(gl.TRIANGLES, indices_obst_lit.length, gl.UNSIGNED_SHORT, 0);
               }
               else{
-                gl.drawElements(gl.TRIANGLES, indices_lit.length, gl.UNSIGNED_INT, 0);
+                gl.drawElements(gl.TRIANGLES, indices_obst_lit.length, gl.UNSIGNED_INT, 0);
               }
             }
 
