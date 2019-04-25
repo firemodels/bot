@@ -1851,8 +1851,10 @@ fi
 
 ### Wrap up and report results ###
 set_files_world_readable
-save_build_status
-if [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
+if [[ "$DEBUG_ONLY" == "" ]]; then
+  save_build_status
+fi 
+if [[ "$DEBUG_ONLY" == "" ]] && [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
   archive_timing_stats
 fi
 email_build_status 'Firebot'
