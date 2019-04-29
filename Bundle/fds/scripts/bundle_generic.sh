@@ -364,7 +364,7 @@ gzip    ../$bundlebase.tar
 echo Creating installer
 cd ..
 bundlepath=`pwd`/$bundlebase.sh
-$makeinstaller -i $bundlebase.tar.gz -d $INSTALLDIR $bundlebase.sh
+$makeinstaller -i $bundlebase.tar.gz -d $INSTALLDIR -m $MPI_VERSION $bundlebase.sh
 
 cat $bundledir/bin/hash/*.sha1 >  $bundlebase.sha1
 hashfile $bundlebase.sh        >> $bundlebase.sha1
