@@ -9,6 +9,7 @@ then
   echo "  -i FDS.tar.gz - compressed tar file containing FDS distribution"
   echo "  -d installdir - default install directory"
   echo "   INSTALLER.sh - bash shell script containing self-extracting Installer"
+  echo "  -m MPI_VERSION- mpi version (INTEL or tar'd openmpi distribution)"
   echo
   exit
 fi
@@ -27,7 +28,7 @@ if [ "`uname`" == "Darwin" ] ; then
   ostype2="OSX"
 fi
 
-while getopts 'd:i:' OPTION
+while getopts 'd:i:m:' OPTION
 do
 case $OPTION in
   d)
@@ -37,6 +38,9 @@ case $OPTION in
   ;;
   i)
   FDS_TAR="$OPTARG"
+  ;;
+  m)
+  MPI_VERSION="$OPTARG"
   ;;
 esac
 done 

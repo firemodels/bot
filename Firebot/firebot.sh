@@ -14,6 +14,7 @@ echo "Options"
 echo "-b - branch_name - run firebot using branch branch_name"
 echo "-B - only build apps"
 echo "-c - clean repo"
+echo "-D - debug only"
 echo "-F - skip figures and document building stages"
 echo "-h - display this message"
 echo "-i - use installed version of smokeview"
@@ -1455,10 +1456,11 @@ INTEL=
 INTEL2=
 CLONE_REPOS=
 COPY_MANUAL_DIR=1
+DEBUG_ONLY=
 
 #*** parse command line arguments
 
-while getopts 'b:BcdFhIiJLm:Np:q:Q:suUW' OPTION
+while getopts 'b:BcdDhIiJLm:Np:q:Q:suUW' OPTION
 do
 case $OPTION in
   b)
@@ -1476,6 +1478,9 @@ case $OPTION in
    ;;
   d)
    debug_mode=1
+   ;;
+  D)
+   DEBUG_ONLY=1
    ;;
   F)
    SKIPFIGURES=1
@@ -1748,25 +1753,27 @@ if [[ "$OPENMPI_GNU" != "" ]] && [[ "$BUILD_ONLY" == "" ]] ; then
 fi
 
 if [ "$FIREBOT_LITE" == "" ]; then
+  if [ "$DEBUG_ONLY" == "" ]; then
 ### Stage 2c ###
-  compile_fds_mpi
-  check_compile_fds_mpi
+    compile_fds_mpi
+    check_compile_fds_mpi
 
 ### Stage 3a ###
-  compile_smv_utilities
-  check_smv_utilities
+    compile_smv_utilities
+    check_smv_utilities
 
 ### Stage 3b ###
-if [ "$BUILD_ONLY" == "" ]; then
-  compile_smv_db
-  check_compile_smv_db
-fi
+  if [ "$BUILD_ONLY" == "" ]; then
+    compile_smv_db
+    check_compile_smv_db
+  fi
 
 ### Stage 3c ###
-  compile_smv
-  check_compile_smv
+    compile_smv
+    check_compile_smv
 
-  $COPY_APPS >& $OUTPUT_DIR/stage3d
+    $COPY_APPS >& $OUTPUT_DIR/stage3d
+  fi
 fi
 
 ### Stage 4 ###
@@ -1777,7 +1784,7 @@ if [[ $FDS_debug_success ]] && [[ "$BUILD_ONLY" == "" ]]; then
    check_cases_debug $fdsrepo/Verification 'verification'
 fi
 
-if [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
+if [[ "$DEBUG_ONLY" == "" ]] && [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
 # clean debug stage
   cd $fdsrepo
   if [[ "$CLEANREPO" == "1" ]] ; then
@@ -1844,8 +1851,10 @@ fi
 
 ### Wrap up and report results ###
 set_files_world_readable
-save_build_status
-if [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
+if [[ "$DEBUG_ONLY" == "" ]]; then
+  save_build_status
+fi 
+if [[ "$DEBUG_ONLY" == "" ]] && [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
   archive_timing_stats
 fi
 email_build_status 'Firebot'
