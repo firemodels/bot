@@ -39,20 +39,21 @@ function clean_upload(platform,prog){
 
 <h3>Bundles</h3>
 <p><table border=on>
-<tr><th colspan=3>Copy Apps</th></tr>
+<tr><th colspan=4>Copy Apps</th></tr>
 
-<tr><th>Windows</th><th>Linux</th><th>OSX</th>
+<tr><td></td><th>Windows</th><th>Linux</th><th>OSX</th>
 
 <tr>
-<td align=center>
-<button onclick="copy_apps('windows')">Copy</button><br>
-</td>
-<td align=center>
-<button onclick="copy_apps('linux')">Copy</button><br>
-</td>
-<td align=center>
-<button onclick="copy_apps('osx')">Copy</button><br>
-</td>
+<th>FDS</th>
+<td align=center><button onclick="copy_apps('windows','fds')">Copy</button></td>
+<td align=center><button onclick="copy_apps('linux','fds')">Copy</button></td>
+<td align=center><button onclick="copy_apps('osx','fds')">Copy</button></td>
+</tr>
+<tr>
+<th>Smokeview</th>
+<td align=center><button onclick="copy_apps('windows','smv')">Copy</button></td>
+<td align=center><button onclick="copy_apps('linux','smv')">Copy</button></td>
+<td align=center><button onclick="copy_apps('osx','smv')">Copy</button></td>
 </tr>
 
 </table>
