@@ -1,6 +1,7 @@
 @echo off
 setlocal EnableDelayedExpansion
 set platform=%1
+set type=%2
 
 :: batch file to install the FDS-SMV bundle on Windows, Linux or OSX systems
 
@@ -26,19 +27,19 @@ if "%platform%" == "windows" (
   echo.
   echo *** windows
   cd %svn_root%\bot\Bundle\fds\scripts
-  call copy_apps
+  call copy_apps %type%
   goto eof
 )
 if "%platform%" == "linux" (
   echo.
   echo *** linux
-  plink %linux_logon% %linux_svn_root%/smv/scripts/run_command.sh bot/Firebot copy_apps.sh
+  plink %linux_logon% %linux_svn_root%/smv/scripts/run_command.sh bot/Firebot copy_apps.sh %type%
   goto eof
 )
 if "%platform%" == "osx" (
   echo.
   echo *** osx
-  plink %osx_logon% %linux_svn_root%/smv/scripts/run_command.sh bot/Firebot copy_apps.sh
+  plink %osx_logon% %linux_svn_root%/smv/scripts/run_command.sh bot/Firebot copy_apps.sh %type%
   goto eof
 )
 
