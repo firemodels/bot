@@ -48,6 +48,7 @@
 
          var show_blockages=0;
          var show_geom=0;
+         var nframes=1;
 
 // defining and storing the geometry
 
@@ -1345,12 +1346,12 @@
            var local_frame_size_part=part_sizes[partframe];
            var part_frame_offset=3*part_offsets[partframe];
            for (i=0; i<local_frame_size_part; i++){
-             vertices_part[3*i+0]=vertices_part_data[part_frame_offset+3*i+0];
-             vertices_part[3*i+1]=vertices_part_data[part_frame_offset+3*i+1];
-             vertices_part[3*i+2]=vertices_part_data[part_frame_offset+3*i+2];
-             colors_part[3*i+0]  =colors_part_data[part_frame_offset+3*i+0];
-             colors_part[3*i+1]  =colors_part_data[part_frame_offset+3*i+1];
-             colors_part[3*i+2]  =colors_part_data[part_frame_offset+3*i+2];
+             vertices_part[3*i+0] = vertices_part_data[part_frame_offset+3*i+0];
+             vertices_part[3*i+1] = vertices_part_data[part_frame_offset+3*i+1];
+             vertices_part[3*i+2] = vertices_part_data[part_frame_offset+3*i+2];
+             colors_part[3*i+0]   = colors_part_data[part_frame_offset+3*i+0];
+             colors_part[3*i+1]   = colors_part_data[part_frame_offset+3*i+1];
+             colors_part[3*i+2]   = colors_part_data[part_frame_offset+3*i+2];
            }
          }
 

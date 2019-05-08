@@ -11,7 +11,7 @@ echo "    $cfastrepos"
 echo "-f - setup repos used by firebot: "
 echo "    $fdsrepos"
 echo "-F - setup repos used by firebot (erase each repo first): "
-echo "    $fdsrepos"
+echo "    $firebotrepos"
 echo "-s - setup repos used by smokebot: "
 echo "    $smvrepos"
 echo "-w - setup wiki and webpage repos cloned from firemodels"
@@ -22,6 +22,7 @@ exit
 CURDIR=`pwd`
 
 fdsrepos="exp fds fig out smv"
+firebotrepos="exp fds fig out smv fds-smv"
 smvrepos="cfast fds fig smv"
 cfastrepos="cfast exp smv fig"
 allrepos="cfast cor exp fds fig out radcal smv cad"
@@ -52,7 +53,7 @@ case $OPTION  in
    repos=$fdsrepos;
    ;;
   F)
-   repos=$fdsrepos;
+   repos=$firebotrepos;
    eraserepos=1
    ;;
   h)
