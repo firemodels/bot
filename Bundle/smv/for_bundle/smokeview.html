@@ -382,6 +382,7 @@
 
    // particles
          var npart_frames=2;
+         var part_frame_size=5;
 
          var vertices_part_data = [
            0.0,1.0,0.75,
@@ -943,7 +944,7 @@
             'void main(void) { '+//pre-built function
                'gl_Position = Pmatrix*Vmatrix*Mmatrix*vec4(position, 1.);'+
                'vColor = color;'+
-               'gl_PointSize=10.0;'+
+               'gl_PointSize=3.0;'+
             '}';
 
          var fragCode_part = 'precision mediump float;'+
@@ -1343,9 +1344,9 @@
 
            var partframe=frame;
            if(partframe>npart_frames-1)partframe=npart_frames-1;
-           var local_frame_size_part=part_sizes[partframe];
+           part_frame_size=part_sizes[partframe];
            var part_frame_offset=3*part_offsets[partframe];
-           for (i=0; i<local_frame_size_part; i++){
+           for (i=0; i<part_frame_size; i++){
              vertices_part[3*i+0] = vertices_part_data[part_frame_offset+3*i+0];
              vertices_part[3*i+1] = vertices_part_data[part_frame_offset+3*i+1];
              vertices_part[3*i+2] = vertices_part_data[part_frame_offset+3*i+2];
@@ -1712,10 +1713,10 @@
 
               gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer_indices_part);
               if(ext_32bit==null){
-                gl.drawElements(gl.POINTS, indices_part.length, gl.UNSIGNED_SHORT, 0);
+                gl.drawElements(gl.POINTS, part_frame_size, gl.UNSIGNED_SHORT, 0);
               }
               else{
-                gl.drawElements(gl.POINTS, indices_part.length, gl.UNSIGNED_INT, 0);
+                gl.drawElements(gl.POINTS, part_frame_size, gl.UNSIGNED_INT, 0);
               }
             }
 
