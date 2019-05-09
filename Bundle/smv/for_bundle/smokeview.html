@@ -1742,13 +1742,15 @@
 
             if(iframe<0)iframe=nframes-1;
             if(iframe>nframes-1)iframe=0;
-            if(time_option==2){
-              document.getElementById("buttonPauseResume").innerHTML= "Pause "+iframe;
+            if(nframes>1){
+              if(time_option==3){
+                document.getElementById("buttonPauseResume").innerHTML= "Pause "+iframe;
+              }
+              else{
+                document.getElementById("buttonPauseResume").innerHTML= "Resume "+iframe;
+              }
+              document.getElementById("buttonPauseResume").style.width = "125px";
             }
-            else{
-              document.getElementById("buttonPauseResume").innerHTML= "Resume "+iframe;
-            }
-            document.getElementById("buttonPauseResume").style.width = "125px";
 
             window.requestAnimationFrame(animate);
          }
