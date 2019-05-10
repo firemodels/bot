@@ -17,17 +17,17 @@ exit
 }
 
 
-directory=
+DIR=.
 hostname=
 showcommandline=
 
 #*** parse command line options
 
-while getopts 'd:hH:' OPTION
+while getopts 'd:hH:v' OPTION
 do
 case $OPTION  in
   d)
-   directory="$OPTARG"
+   DIR="$OPTARG"
    ;;
   h)
    usage
@@ -41,7 +41,9 @@ case $OPTION  in
 esac
 done
 shift $(($OPTIND-1))
-casename$1
+casename=$1
+
+DIR="cd $DIR"
 
 thishost=`hostname`
 SSH=
@@ -56,7 +58,7 @@ if [ "$showcommandline" == "1" ]; then
   ECHO="echo "
 fi
 
-$ECHO $SSH \( cd $dir \; smokeview -runscript $caseame \)
+$ECHO $SSH \( $DIR \; smokeview -runscript $casename \)
 
 
 
