@@ -5,8 +5,8 @@
 #---------------------------------------------
 
 function usage {
-echo "Usage:
-echo "$0 [options] casename
+echo "Usage:"
+echo "$0 [options] casename"
 echo ""
 echo "Options:"
 echo "-d dir      - directory containing case"
@@ -17,6 +17,7 @@ exit
 }
 
 
+source $HOME/smv_setup.sh
 DIR=.
 hostname=
 showcommandline=
@@ -43,12 +44,12 @@ done
 shift $(($OPTIND-1))
 casename=$1
 
-DIR="cd $DIR"
-
 thishost=`hostname`
-SSH=
 if [[ "$hostname" != "" ]] && [[ "$thishost" != "$hostname" ]]; then
   SSH="ssh -q $hostname "
+else
+  SSH=
+  scriptdir=$HOME/$scriptdir
 fi
 
 ECHO=
@@ -56,7 +57,7 @@ if [ "$showcommandline" == "1" ]; then
   ECHO="echo "
 fi
 
-$ECHO $SSH \( $DIR \; smokeview -runscript $casename \)
+$ECHO $SSH  $scriptdir/runsmv_ssh.sh smokeview $DIR $casename
 
 
 

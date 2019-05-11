@@ -16,7 +16,7 @@ if "%showcommand%" == "1" (
   set ECH=echo
 )
 
-set command=plink %hostname%:%scriptdir%/runsmv.sh %casedir% %casename%
+set command=plink %hostname%:%scriptdir%/smv2web.sh -d %casedir% %casename%
 %ECH% %command%
 
 
