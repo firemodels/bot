@@ -6,10 +6,10 @@
 
 function usage {
 echo "Usage:
-echo "smv_web.sh [options] casename
+echo "$0 [options] casename
 echo ""
 echo "Options:"
-echo "-d dir      - directory contain case"
+echo "-d dir      - directory containing case"
 echo "-h          - display this message"
 echo "-H hostname - host name"
 echo "-v          - show command that will be run"
@@ -47,10 +47,8 @@ DIR="cd $DIR"
 
 thishost=`hostname`
 SSH=
-if [ "$hostname" != "" ]; then
-  if [ "$thishost" != "$hostname" ]; then
-    SSH="ssh -q $hostname "
-  fi
+if [[ "$hostname" != "" ]] && [[ "$thishost" != "$hostname" ]]; then
+  SSH="ssh -q $hostname "
 fi
 
 ECHO=
