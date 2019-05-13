@@ -68,6 +68,8 @@ echo copying .png files
 copy %forbundle%\*.png %smvdir%\.>Nul
 
 CALL :COPY  %forbundle%\volrender.ssf %smvdir%\volrender.ssf
+CALL :COPY  %forbundle%\smv2html.bat  %smvdir%\smv2html.bat
+CALL :COPY  %forbundle%\smv_setup.bat %smvdir%\smv_setup.bat
 
 CALL :COPY  %bgbuild%\background.exe                    %smvdir%\background.exe
 CALL :COPY  %dem2fdsbuild%\dem2fds_win_%platform%.exe   %smvdir%\dem2fds.exe
@@ -80,6 +82,7 @@ CALL :COPY  %windbuild%\wind2fds_win_%platform%.exe     %smvdir%\wind2fds.exe
 
 echo Unpacking Smokeview %smv_versionbase% installation files > %forbundle%\unpack.txt
 echo Install Smokeview %smv_versionbase%                      > %forbundle%\message.txt
+
 CALL :COPY  "%forbundle%\message.txt"                         %zipbase%\message.txt
 CALL :COPY  %forbundle%\setup.bat                             %zipbase%\setup.bat
 

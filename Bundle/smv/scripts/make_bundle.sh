@@ -114,6 +114,8 @@ CP $FORBUNDLE objects.svo    $PLATFORMDIR/bin objects.svo
 CP $FORBUNDLE smokeview.ini  $PLATFORMDIR/bin smokeview.ini
 CP $FORBUNDLE volrender.ssf  $PLATFORMDIR/bin volrender.ssf
 CP $FORBUNDLE smokeview.html $PLATFORMDIR/bin smokeview.html
+CP $FORBUNDLE runsmv_ssh.sh  $PLATFORMDIR/bin runsmv_ssh.sh
+CP $FORBUNDLE smv2html.sh    $PLATFORMDIR/bin smv2html.sh
 
 SCP $PLATFORMHOST $BACKGROUNDDIR background                      $PLATFORMDIR/bin background
 SCP $PLATFORMHOST $SMVDIR        smokeview_${platform}_${TEST}64 $PLATFORMDIR/bin smokeview
