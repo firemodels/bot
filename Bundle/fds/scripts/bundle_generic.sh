@@ -218,6 +218,7 @@ bundledir=$bundlebase
 webpagesdir=$REPO_ROOT/webpages
 fds_bundle=$REPO_ROOT/bot/Bundle/fds/for_bundle
 smv_bundle=$REPO_ROOT/bot/Bundle/smv/for_bundle
+webgldir=$REPO_ROOT/bot/Bundle/smv/for_bundle/webgl
 texturedir=$smv_bundle/textures
 makeinstaller=$REPO_ROOT/bot/Bundle/fds/scripts/make_installer.sh
 
@@ -297,6 +298,12 @@ CP $smv_bundle smokeview.ini  $bundledir/bin smokeview.ini
 CP $smv_bundle volrender.ssf  $bundledir/bin volrender.ssf
 CP $smv_bundle objects.svo    $bundledir/bin objects.svo
 CP $smv_bundle smokeview.html $bundledir/bin smokeview.html
+
+# smokeview to html conversion scripts
+
+CP $webgldir runsmv_ssh.sh $bundledir/bin runsmv_ssh.sh
+CP $webgldir smv2html.sh   $bundledir/bin smv2html.sh
+
 if [ "$MPI_VERSION" == "INTEL" ]; then
   UNTAR $HOME/fire-notes/INSTALL/LIBS/RUNTIME/MPI_INTEL19U1 INTEL19u1linux.tar.gz $bundledir/bin INTEL
 else
