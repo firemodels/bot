@@ -4,19 +4,24 @@
 
 set stopscript=0
 set showcommand=0
+set exe=
+set exefile=
 
 call %userprofile%\web_setup
 call :getopts %*
 if %stopscript% == 1 (
   exit /b
 )
+if %exefile% == "" goto skip_exe
+  set exe="-e %exefile"
+:skip_exe
 
 set ECH=
 if "%showcommand%" == "1" (
   set ECH=echo
 )
 
-set command=plink %hostname%:%scriptdir%/smv2web.sh -d %casedir% %casename%
+set command=plink %hostname%:%scriptdir%/smv2html.sh %exe% -d %casedir% %casename%
 %ECH% %command%
 
 
@@ -36,6 +41,11 @@ goto eof
  )
  if /I "%1" EQU "-casedir" (
    set casedir=%2
+   set valid=1
+   shift
+ )
+ if /I "%1" EQU "-exe" (
+   set exefile=%2
    set valid=1
    shift
  )
@@ -70,13 +80,15 @@ if not (%1)==() goto getopts
 exit /b
 
 :usage  
-echo run_smokebot [options]
+echo smv2html [options]
 echo. 
 echo -help                - display this message
 echo -host hostname       - computer where smokeview will be run
 echo                        (default: %hostname%)
 echo -casedir directory   - directory where case is located
 echo                        (default: %casedir%)
+echo -exe executable      - smokeview used to convert data
+echo                        (default: smokeview)
 echo -scriptdir directory - directory where scripts located
 echo                        (default: %scriptdir%)
 echo -v                   - show command that will be run

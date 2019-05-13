@@ -21,14 +21,18 @@ source $HOME/smv_setup.sh
 DIR=.
 hostname=
 showcommandline=
+SMOKEVIEW=smokeview
 
 #*** parse command line options
 
-while getopts 'd:hH:v' OPTION
+while getopts 'd:e:hH:v' OPTION
 do
 case $OPTION  in
   d)
    DIR="$OPTARG"
+   ;;
+  e)
+   SMOKEVIEW="$OPTARG"
    ;;
   h)
    usage
@@ -57,9 +61,4 @@ if [ "$showcommandline" == "1" ]; then
   ECHO="echo "
 fi
 
-$ECHO $SSH  $scriptdir/runsmv_ssh.sh smokeview $DIR $casename
-
-
-
-
-
+$ECHO $SSH  $scriptdir/runsmv_ssh.sh $SMOKEVIEW $DIR $casename
