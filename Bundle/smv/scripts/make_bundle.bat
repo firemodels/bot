@@ -29,6 +29,7 @@ set BUILDDIR=intel_win_%platform%
 set version=%smv_version%
 set smvbuild=%svn_root%\smv\Build\smokeview\%BUILDDIR%
 set forbundle=%svn_root%\bot\Bundle\smv\for_bundle
+set webgldir=%svn_root%\bot\Bundle\smv\for_bundle\webgl
 set smvscripts=%svn_root%\smv\scripts
 set svzipbuild=%svn_root%\smv\Build\smokezip\%BUILDDIR%
 set dem2fdsbuild=%svn_root%\smv\Build\dem2fds\%BUILDDIR%
@@ -68,8 +69,8 @@ echo copying .png files
 copy %forbundle%\*.png %smvdir%\.>Nul
 
 CALL :COPY  %forbundle%\volrender.ssf %smvdir%\volrender.ssf
-CALL :COPY  %forbundle%\smv2html.bat  %smvdir%\smv2html.bat
-CALL :COPY  %forbundle%\smv_setup.bat %smvdir%\smv_setup.bat
+CALL :COPY  %webgldir%\smv2html.bat   %smvdir%\smv2html.bat
+CALL :COPY  %webgldir%\smv_setup.bat  %smvdir%\smv_setup.bat
 
 CALL :COPY  %bgbuild%\background.exe                    %smvdir%\background.exe
 CALL :COPY  %dem2fdsbuild%\dem2fds_win_%platform%.exe   %smvdir%\dem2fds.exe

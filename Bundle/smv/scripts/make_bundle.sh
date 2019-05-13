@@ -89,6 +89,7 @@ WIND2FDSDIR=$REMOTESVNROOT/smv/Build/wind2fds/intel_${platform}_64
 HASHFILEDIR=$REMOTESVNROOT/smv/Build/hashfile/intel_${platform}_64
 FLUSHFILEDIR=$REMOTESVNROOT/smv/Build/flush/intel_${platform}_64
 FORBUNDLE=$SVNROOT/bot/Bundle/smv/for_bundle
+WEBGLDIR=$SVNROOT/bot/Bundle/smv/for_bundle/webgl
 PLATFORMDIR=$RELEASE$revision\_${platform}64
 UPDATER=$SVNROOT/bot/Bundle/smv/scripts//make_updater.sh
 uploads=$SVNROOT/bot/Bundle/smv/uploads
@@ -114,8 +115,8 @@ CP $FORBUNDLE objects.svo    $PLATFORMDIR/bin objects.svo
 CP $FORBUNDLE smokeview.ini  $PLATFORMDIR/bin smokeview.ini
 CP $FORBUNDLE volrender.ssf  $PLATFORMDIR/bin volrender.ssf
 CP $FORBUNDLE smokeview.html $PLATFORMDIR/bin smokeview.html
-CP $FORBUNDLE runsmv_ssh.sh  $PLATFORMDIR/bin runsmv_ssh.sh
-CP $FORBUNDLE smv2html.sh    $PLATFORMDIR/bin smv2html.sh
+CP $WEBGLDIR  runsmv_ssh.sh  $PLATFORMDIR/bin runsmv_ssh.sh
+CP $WEBGLDIR  smv2html.sh    $PLATFORMDIR/bin smv2html.sh
 
 SCP $PLATFORMHOST $BACKGROUNDDIR background                      $PLATFORMDIR/bin background
 SCP $PLATFORMHOST $SMVDIR        smokeview_${platform}_${TEST}64 $PLATFORMDIR/bin smokeview
