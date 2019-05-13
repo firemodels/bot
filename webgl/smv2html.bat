@@ -4,24 +4,20 @@
 
 set stopscript=0
 set showcommand=0
-set exe=
-set exefile=
+set exe=smokeview
 
 call %userprofile%\web_setup
 call :getopts %*
 if %stopscript% == 1 (
   exit /b
 )
-if %exefile% == "" goto skip_exe
-  set exe="-e %exefile"
-:skip_exe
 
 set ECH=
 if "%showcommand%" == "1" (
   set ECH=echo
 )
 
-set command=plink %hostname%:%scriptdir%/smv2html.sh %exe% -d %casedir% %casename%
+set command=plink %hostname%:%scriptdir%/smv2html_com.sh %exe% %casedir% %casename%
 %ECH% %command%
 
 
@@ -45,7 +41,7 @@ goto eof
    shift
  )
  if /I "%1" EQU "-exe" (
-   set exefile=%2
+   set exe=%2
    set valid=1
    shift
  )
@@ -55,6 +51,11 @@ goto eof
    shift
  )
  if /I "%1" EQU "-help" (
+   call :usage
+   set stopscript=1
+   exit /b
+ )
+ if /I "%1" EQU "-h" (
    call :usage
    set stopscript=1
    exit /b
