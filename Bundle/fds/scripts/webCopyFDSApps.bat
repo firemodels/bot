@@ -1,7 +1,7 @@
 @echo off
 setlocal EnableDelayedExpansion
 set platform=%1
-set type=%2
+set type=fds
 
 :: batch file to install the FDS-SMV bundle on Windows, Linux or OSX systems
 
