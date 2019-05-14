@@ -6,7 +6,7 @@ MPI_VERSION=$3
 GUIDE_DIR=$HOME/.bundle/pubs
 SMV_DIR=$HOME/.bundle/smv
 FDS_DIR=$HOME/.bundle/fds
-smvbin=bin
+smvbin=smvbin
 
 if [ "`uname`" == "Darwin" ] ; then
   bundlebase=${fds_version}-${smv_version}_osx64
@@ -377,9 +377,9 @@ cd ..
 bundlepath=`pwd`/$bundlebase.sh
 $makeinstaller -i $bundlebase.tar.gz -d $INSTALLDIR -m $MPI_VERSION $bundlebase.sh
 
-cat $bundledir/bin/hash/*.sha1 >  $bundlebase.sha1
+cat $bundledir/bin/hash/*.sha1     >  $bundlebase.sha1
 cat $bundledir/$smvbin/hash/*.sha1 >  $bundlebase.sha1
-hashfile $bundlebase.sh        >> $bundlebase.sha1
+hashfile $bundlebase.sh            >> $bundlebase.sha1
 
 if [ -e $errlog ]; then
   numerrs=`cat $errlog | wc -l `

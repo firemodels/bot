@@ -7,8 +7,7 @@ REMOTESVNROOT=$3
 PLATFORMHOST=$4
 SVNROOT=~/$5
 
-smvbin=bin
-#smvbin=smvbin
+smvbin=smvbin
 
 errlog=/tmp/smv_errlog.$$
 

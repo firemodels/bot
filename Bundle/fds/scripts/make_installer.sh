@@ -426,7 +426,6 @@ fi
 cp \$FDSMODULEtmp \$FDS_root/bin/modules/$FDSMODULE
 rm \$FDSMODULEtmp
 
-####
 #--- create SMV module
 
 cat << MODULE > \$S<VMODULEtmp
