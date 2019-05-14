@@ -45,11 +45,12 @@ DIR=.
 hostname=
 showcommandline=
 SMOKEVIEW=smokeview
+renderdir=
 error="0"
 
 #*** parse command line options
 
-while getopts 'd:e:hH:v' OPTION
+while getopts 'd:e:hH:r:v' OPTION
 do
 case $OPTION  in
   d)
@@ -63,6 +64,9 @@ case $OPTION  in
    ;;
   H)
    hostname="$OPTARG"
+   ;;
+  r)
+   renderdir="$OPTARG"
    ;;
   v)
    showcommandline=1
@@ -94,4 +98,4 @@ if [ "$error" == "1" ]; then
 fi
 echo test
 
-$ECHO $SSH  runsmv_ssh.sh $SMOKEVIEW $DIR $casename
+$ECHO $SSH  runsmv_ssh.sh $SMOKEVIEW $DIR $casename $renderdir
