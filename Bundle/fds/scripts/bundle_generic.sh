@@ -215,7 +215,7 @@ fi
 
 
 smvscriptdir=$REPO_ROOT/smv/scripts
-bundledir=$bundlebase
+bundledir=$upload_dir/$bundlebase
 webpagesdir=$REPO_ROOT/webpages
 fds_bundle=$REPO_ROOT/bot/Bundle/fds/for_bundle
 smv_bundle=$REPO_ROOT/bot/Bundle/smv/for_bundle
@@ -236,9 +236,9 @@ cd $upload_dir
 rm -rf $bundlebase
 mkdir $bundledir
 mkdir $bundledir/bin
-mkdir $bundledir/$smvbin
 mkdir $bundledir/bin/hash
-mkdir $bundledir/$smvbin/hash
+mkdir -p $bundledir/$smvbin
+mkdir -p $bundledir/$smvbin/hash
 mkdir $bundledir/Documentation
 mkdir $bundledir/Examples
 mkdir $bundledir/$smvbin/textures
@@ -345,7 +345,7 @@ CP $webpagesdir smv_readme.html       $bundledir/Documentation SMV_Release_Notes
 
 # CP2 $fds_bundle readme_examples.html $bundledir/Examples
 
-export OUTDIR=$upload_dir/$bundledir/Examples
+export OUTDIR=$bundledir/Examples
 export QFDS=$copyfdscase
 export RUNTFDS=$copyfdscase
 export RUNCFAST=$copycfastcase
