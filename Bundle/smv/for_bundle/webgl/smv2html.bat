@@ -7,8 +7,12 @@ set showcommand=0
 set exe=smokeview
 set renderdir=.
 set hostname=
+set casedir=.
 
-call %userprofile%\web_setup
+if not exist %userprofile%\webx_setup.bat goto skip_setup
+  call %userprofile%\web_setup
+:skip_setup
+
 call :getopts %*
 if %stopscript% == 1 (
   exit /b
@@ -90,7 +94,9 @@ echo smv2html [options]
 echo. 
 echo -help                - display this message
 echo -host hostname       - computer where smokeview will be run
+if "x%hostname%" == "x" goto skip_hostname
 echo                        (default: %hostname%)
+:skip_hostname
 echo -casedir directory   - directory where case is located
 echo                        (default: %casedir%)
 echo -renderdir directory - directory where html files are placed
