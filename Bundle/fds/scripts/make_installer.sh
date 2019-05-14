@@ -428,7 +428,7 @@ rm \$FDSMODULEtmp
 
 #--- create SMV module
 
-cat << MODULE > \$S<VMODULEtmp
+cat << MODULE > \$SMVMODULEtmp
 #%Module1.0#####################################################################
 ###
 ### SMV6 modulefile
