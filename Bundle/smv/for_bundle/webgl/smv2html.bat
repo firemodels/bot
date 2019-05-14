@@ -28,7 +28,7 @@ if "x%hostname%" == "x" (
   exit /b
 )
 
-set command=plink %username%@%hostname%:runsmv_ssh.sh %exe% %casedir% %casename% %renderdir%
+set command=plink %username%@%hostname% runsmv_ssh.sh %exe% %casedir% %casename% %renderdir%
 %ECH% %command%
 
 goto eof
