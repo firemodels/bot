@@ -9,19 +9,43 @@ echo "Usage:"
 echo "$0 [options] casename"
 echo ""
 echo "Options:"
-echo "-d dir      - directory containing case"
-echo "-h          - display this message"
-echo "-H hostname - host name"
-echo "-v          - show command that will be run"
+echo "-d dir        - directory containing case"
+echo "-e executable - smokeview executable path"
+echo "-h            - display this message"
+echo "-H hostname   - host name"
+echo "-v            - show command that will be run"
 exit
 }
 
+#---------------------------------------------
+#                   is_file_installed
+#---------------------------------------------
 
-source $HOME/smv_setup.sh
+is_file_installed()
+{
+  local program=$1
+  local host=$2
+
+  if [ "$host" == "" ]; then
+    notfound=`$program -h |& tail -1 | grep "not found" | wc -l`
+  else
+    notfound=`ssh -q $host $program -h |& tail -1 | grep "not found" | wc -l`
+  fi
+  if [ "$notfound" == "1" ] ; then
+    error="1"
+    if [ "$host" == "" ]; then
+      echo "***error: $program not in path"
+    else
+      echo "***error: $program not in path on $host"
+    fi
+  fi
+}
+
 DIR=.
 hostname=
 showcommandline=
 SMOKEVIEW=smokeview
+error="0"
 
 #*** parse command line options
 
@@ -51,9 +75,10 @@ casename=$1
 thishost=`hostname`
 if [[ "$hostname" != "" ]] && [[ "$thishost" != "$hostname" ]]; then
   SSH="ssh -q $hostname "
+  HOST=$hostname
 else
   SSH=
-  scriptdir=$HOME/$scriptdir
+  HOST=
 fi
 
 ECHO=
@@ -61,4 +86,12 @@ if [ "$showcommandline" == "1" ]; then
   ECHO="echo "
 fi
 
-$ECHO $SSH  $scriptdir/runsmv_ssh.sh $SMOKEVIEW $DIR $casename
+is_file_installed runsmv_ssh.sh $HOST
+is_file_installed $SMOKEVIEW    $HOST
+
+if [ "$error" == "1" ]; then
+  exit
+fi
+echo test
+
+$ECHO $SSH  runsmv_ssh.sh $SMOKEVIEW $DIR $casename
