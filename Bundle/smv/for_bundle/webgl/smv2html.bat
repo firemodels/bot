@@ -9,8 +9,9 @@ set renderdir=.
 set hostname=
 set casedir=.
 
-if not exist %userprofile%\webx_setup.bat goto skip_setup
-  call %userprofile%\web_setup
+set websetup=%userprofile%\web_setup.bat
+if not exist %websetup% goto skip_setup
+  call %websetup%
 :skip_setup
 
 call :getopts %*

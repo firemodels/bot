@@ -1,4 +1,3 @@
 @echo off
-set TODIR=%userprofile%\bin
 
-copy smv2html.bat %TODIR%
+copy web_setup.bat %userprofile%\web_setup.bat
