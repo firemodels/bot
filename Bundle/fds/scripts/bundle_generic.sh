@@ -6,6 +6,7 @@ MPI_VERSION=$3
 GUIDE_DIR=$HOME/.bundle/pubs
 SMV_DIR=$HOME/.bundle/smv
 FDS_DIR=$HOME/.bundle/fds
+smvbin=bin
 
 if [ "`uname`" == "Darwin" ] ; then
   bundlebase=${fds_version}-${smv_version}_osx64
@@ -235,10 +236,12 @@ cd $upload_dir
 rm -rf $bundlebase
 mkdir $bundledir
 mkdir $bundledir/bin
+mkdir $bundledir/$smvbin
 mkdir $bundledir/bin/hash
+mkdir $bundledir/$smvbin/hash
 mkdir $bundledir/Documentation
 mkdir $bundledir/Examples
-mkdir $bundledir/bin/textures
+mkdir $bundledir/$smvbin/textures
 
 echo ""
 echo "--- copying programs ---"
@@ -246,16 +249,16 @@ echo ""
 
 # smokeview
 
-CP $SMV_DIR background $bundledir/bin background
-CP $SMV_DIR smokeview  $bundledir/bin smokeview
-CP $SMV_DIR smokediff  $bundledir/bin smokediff
-CP $SMV_DIR smokezip   $bundledir/bin smokezip
-CP $SMV_DIR dem2fds    $bundledir/bin dem2fds
-CP $SMV_DIR wind2fds   $bundledir/bin wind2fds
-CP $SMV_DIR hashfile   $bundledir/bin hashfile
+CP $SMV_DIR background $bundledir/$smvbin background
+CP $SMV_DIR smokeview  $bundledir/$smvbin smokeview
+CP $SMV_DIR smokediff  $bundledir/$smvbin smokediff
+CP $SMV_DIR smokezip   $bundledir/$smvbin smokezip
+CP $SMV_DIR dem2fds    $bundledir/$smvbin dem2fds
+CP $SMV_DIR wind2fds   $bundledir/$smvbin wind2fds
+CP $SMV_DIR hashfile   $bundledir/$smvbin hashfile
 
 CURDIR=`pwd`
-cd $bundledir/bin
+cd $bundledir/$smvbin
 hashfile background > hash/background.sha1
 hashfile smokeview  > hash/smokeview.sha1
 hashfile smokediff  > hash/smokediff.sha1
@@ -265,11 +268,12 @@ hashfile wind2fds   > hash/wind2fds.sha1
 hashfile hashfile   > hash/hashfile.sha1
 cd $CURDIR
 
-CP $smvscriptdir jp2conv.sh $bundledir/bin jp2conv.sh
-CPDIR $texturedir $bundledir/bin
+CP $smvscriptdir jp2conv.sh $bundledir/$smvbin jp2conv.sh
+CPDIR $texturedir $bundledir/$smvbin
 
 # FDS 
 
+cd $bundledir/bin
 CP $FDS_DIR fds       $bundledir/bin fds
 CP $FDS_DIR fds2ascii $bundledir/bin fds2ascii
 CP $FDS_DIR test_mpi  $bundledir/bin test_mpi
@@ -294,15 +298,15 @@ echo ""
 echo "--- copying configuration files ---"
 echo ""
 
-CP $smv_bundle smokeview.ini  $bundledir/bin smokeview.ini
-CP $smv_bundle volrender.ssf  $bundledir/bin volrender.ssf
-CP $smv_bundle objects.svo    $bundledir/bin objects.svo
-CP $smv_bundle smokeview.html $bundledir/bin smokeview.html
+CP $smv_bundle smokeview.ini  $bundledir/$smvbin smokeview.ini
+CP $smv_bundle volrender.ssf  $bundledir/$smvbin volrender.ssf
+CP $smv_bundle objects.svo    $bundledir/$smvbin objects.svo
+CP $smv_bundle smokeview.html $bundledir/$smvbin smokeview.html
 
 # smokeview to html conversion scripts
 
-CP $webgldir runsmv_ssh.sh $bundledir/bin runsmv_ssh.sh
-CP $webgldir smv2html.sh   $bundledir/bin smv2html.sh
+CP $webgldir runsmv_ssh.sh $bundledir/$smvbin runsmv_ssh.sh
+CP $webgldir smv2html.sh   $bundledir/$smvbin smv2html.sh
 
 if [ "$MPI_VERSION" == "INTEL" ]; then
   UNTAR $HOME/fire-notes/INSTALL/LIBS/RUNTIME/MPI_INTEL19U1 INTEL19u1linux.tar.gz $bundledir/bin INTEL
@@ -374,6 +378,7 @@ bundlepath=`pwd`/$bundlebase.sh
 $makeinstaller -i $bundlebase.tar.gz -d $INSTALLDIR -m $MPI_VERSION $bundlebase.sh
 
 cat $bundledir/bin/hash/*.sha1 >  $bundlebase.sha1
+cat $bundledir/$smvbin/hash/*.sha1 >  $bundlebase.sha1
 hashfile $bundlebase.sh        >> $bundlebase.sha1
 
 if [ -e $errlog ]; then
