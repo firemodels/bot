@@ -16,6 +16,7 @@ fi
 
 FDSEDITION=FDS6
 FDSMODULE=$FDSEDITION
+SMVMODULE=SMV6
 
 FDSVARS=${FDSEDITION}VARS.sh
 INSTALLDIR=
@@ -196,6 +197,7 @@ THISDIR=\`pwd\`
 
 BASHRCFDS=/tmp/bashrc_fds.\$\$
 FDSMODULEtmp=/tmp/fds_module.\$\$
+SMVMODULEtmp=/tmp/smv_module.\$\$
 STARTUPtmp=/tmp/readme.\$\$
 
 #--- Find the beginning of the included FDS tar file so that it 
@@ -365,9 +367,11 @@ cat << EOF >> $INSTALLER
 
 echo "Copy complete."
 
-#--- create fds module
+#--- create fds module directory
 
 MKDIR \$FDS_root/bin/modules
+
+#--- create FDS module
 
 cat << MODULE > \$FDSMODULEtmp
 #%Module1.0#####################################################################
@@ -421,6 +425,30 @@ fi
 
 cp \$FDSMODULEtmp \$FDS_root/bin/modules/$FDSMODULE
 rm \$FDSMODULEtmp
+
+####
+#--- create SMV module
+
+cat << MODULE > \$S<VMODULEtmp
+#%Module1.0#####################################################################
+###
+### SMV6 modulefile
+###
+
+proc ModulesHelp { } {
+        puts stderr "\tAdds smokeview bin location to your PATH environment variable"
+}
+
+module-whatis   "Loads smokeview path"
+
+# FDS paths
+
+prepend-path    PATH            \$FDS_root/smvbin
+MODULE
+####
+
+cp \$SMVMODULEtmp \$FDS_root/bin/modules/$SMVMODULE
+rm \$SMVMODULEtmp
 
 #--- create BASH startup file
 
@@ -530,6 +558,7 @@ echo "or if you are using modules, add:"
 echo ""
 echo "export MODULEPATH=\$FDS_root/bin/modules:\\\$MODULEPATH"
 echo "module load $FDSMODULE"
+echo "module load $SMVMODULE"
 echo ""
 echo "*** Log out and log back in so the changes will take effect."
 echo ""
