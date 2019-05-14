@@ -1,10 +1,12 @@
 @echo off
 :: usage: 
-::  smv_web -host hostname -scriptdir scriptdir -casedir casedir casename
+::  smv2html -host hostname -casedir casedir -renderdir renderdir casename
 
 set stopscript=0
 set showcommand=0
 set exe=smokeview
+set renderdir=.
+set hostname=
 
 call %userprofile%\web_setup
 call :getopts %*
@@ -16,10 +18,13 @@ set ECH=
 if "%showcommand%" == "1" (
   set ECH=echo
 )
+if "x%hostname%" == "x" (
+  echo "***error: host not specified.  Enter a host using -host "
+  exit /b
+)
 
-set command=plink %hostname%:%scriptdir%/smv2html_com.sh %exe% %casedir% %casename%
+set command=plink %username%@%hostname%:runsmv_ssh.sh %exe% %casedir% %casename% %renderdir%
 %ECH% %command%
-
 
 goto eof
 
@@ -40,13 +45,13 @@ goto eof
    set valid=1
    shift
  )
- if /I "%1" EQU "-exe" (
-   set exe=%2
+ if /I "%1" EQU "-renderdir" (
+   set renderdir=%2
    set valid=1
    shift
  )
- if /I "%1" EQU "-scriptdir" (
-   set scriptdir=%2
+ if /I "%1" EQU "-exe" (
+   set exe=%2
    set valid=1
    shift
  )
@@ -88,10 +93,10 @@ echo -host hostname       - computer where smokeview will be run
 echo                        (default: %hostname%)
 echo -casedir directory   - directory where case is located
 echo                        (default: %casedir%)
+echo -renderdir directory - directory where html files are placed
+echo                        (default: %renderdir%)
 echo -exe executable      - smokeview used to convert data
 echo                        (default: smokeview)
-echo -scriptdir directory - directory where scripts located
-echo                        (default: %scriptdir%)
 echo -v                   - show command that will be run
 exit /b
 

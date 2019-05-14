@@ -43,12 +43,16 @@ shift $(($OPTIND-1))
 smokeview=$1
 DIR=$2
 case=$3
+renderdir=$4
 
 if [ ! -e $DIR ]; then
   echo "***error: the directory $DIR does not exist"
   exit
 fi
+if [ "$renderdir" != "" ]; then
+  renderdir="-scriptrenderdir $renderdir"
+fi
 
 cd $DIR
 
-$smokeview -runhtmlscript $case
+$smokeview -runhtmlscript $renderdir $case
