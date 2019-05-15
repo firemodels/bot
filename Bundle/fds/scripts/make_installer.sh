@@ -16,9 +16,11 @@ fi
 
 FDSEDITION=FDS6
 FDSMODULE=$FDSEDITION
-SMVMODULE=SMV6
+SMVEDITION=SMV6
+SMVMODULE=$SMVEDITION
 
 FDSVARS=${FDSEDITION}VARS.sh
+SMVVARS=${SMVEDITION}VARS.sh
 INSTALLDIR=
 FDS_TAR=
 INSTALLER=
@@ -531,6 +533,7 @@ source \$FDS_root/bin/$FDSVARS
 <pre>
 export MODULEPATH=\$FDS_root/bin/modules:\\\$MODULEPATH
 module load $FDSMODULE
+module load $SMVMODULE
 </pre>
 
 <li>Log out and log back in so changes will take effect.
