@@ -22,6 +22,8 @@ INSTALLER=$4
 INSTALLDIR=$5
 
 SMVMODULE=SMV6
+SMVVARS_tmp=/tmp/SMVVARS.\$\$
+SMVVARS=SMV6VARS.sh
 
 ossize=64
 
@@ -146,6 +148,14 @@ cat << EOF >> $INSTALLER
 EOF
 fi
 cat << EOF >> $INSTALLER
+
+#--- create SMV6VARS.sh
+
+cat << BASH > \$SMVVARS_tmp
+#/bin/bash
+export PATH=\$SMV_root/smvbin:\\\$PATH
+BASH
+mv \$SMV6VARS_tmp \$SMV_root/bin/$SMVVARS
 
 #--- create SMV module
 

@@ -21,6 +21,8 @@ SMVMODULE=$SMVEDITION
 
 FDSVARS=${FDSEDITION}VARS.sh
 SMVVARS=${SMVEDITION}VARS.sh
+SMVVARS_tmp=/tmp/SMVVARS.\$\$
+
 INSTALLDIR=
 FDS_TAR=
 INSTALLER=
@@ -509,6 +511,16 @@ fi
 
 mv \$BASHRCFDS \$FDS_root/bin/$FDSVARS
 chmod +x \$FDS_root/bin/$FDSVARS
+
+#--- create SMV6VARS.sh
+
+cat << BASH > \$SMVVARS_tmp
+#/bin/bash
+export PATH=\$FDS_root/smvbin:\\\$PATH
+BASH
+
+mv \$SMV6VARS_tmp \$FDS_root/bin/$SMVVARS
+chmod +x \$FDS_root/bin/$SMVVARS
 
 #--- create startup readme file
 
