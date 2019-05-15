@@ -182,7 +182,7 @@ export QFDS_STARTUP=
 
 #*** parse command line options
 
-while getopts 'bBcdDFfHhIiJkLm:q:Q:NnRSsuUvW' OPTION
+while getopts 'bBcdDFfHhIiJkLm:NnOq:Q:RSsuUvW' OPTION
 do
 case $OPTION  in
   b)
@@ -233,6 +233,9 @@ case $OPTION  in
   N)
    COPY_MANUAL_DIR=-N
    ;;
+  n)
+   UPDATEREPO=0
+   ;;
   O)
    INTEL=
    ;;
@@ -241,9 +244,6 @@ case $OPTION  in
    ;;
   Q)
    QUEUEBENCH="-Q $OPTARG"
-   ;;
-  n)
-   UPDATEREPO=0
    ;;
   R)
    REMOVE_PID=1
@@ -342,7 +342,7 @@ if [[ "$UPDATEREPO" == "1" ]]; then
    UPDATE=-u
    if [[ "$RUNFIREBOT" == "1" ]]; then
      CD_REPO $repo/bot/Firebot master  || exit 1
-     
+
      git fetch origin &> /dev/null
      git merge origin/master &> /dev/null
      cd $CURDIR
