@@ -21,6 +21,8 @@ SMV_TAR=$3
 INSTALLER=$4
 INSTALLDIR=$5
 
+SMVMODULE=SMV6
+
 ossize=64
 
 cat << EOF > $INSTALLER
@@ -56,6 +58,7 @@ function ABSPATH() {
 
 THISSCRIPT=\`ABSPATH \$0\`
 THISDIR=\`pwd\`
+SMVMODULEtmp=/tmp/smv_module.\$\$
 
 #--- Find the beginning of the included SMV tar file so that it can be
 # subsequently un-tar'd
@@ -143,6 +146,29 @@ cat << EOF >> $INSTALLER
 EOF
 fi
 cat << EOF >> $INSTALLER
+
+#--- create SMV module
+
+cat << MODULE > \$SMVMODULEtmp
+#%Module1.0#####################################################################
+###
+### SMV6 modulefile
+###
+
+proc ModulesHelp { } {
+        puts stderr "\tAdds smokeview bin location to your PATH environment variable"
+}
+
+module-whatis   "Loads smokeview path"
+
+# FDS paths
+
+prepend-path    PATH            \$SMV_root/smvbin
+MODULE
+####
+
+cp \$SMVMODULEtmp \$SMV_root/bin/modules/$SMVMODULE
+rm \$SMVMODULEtmp
 
 if [ ! -d \$SMV_root ]
 then
