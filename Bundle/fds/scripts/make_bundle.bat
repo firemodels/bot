@@ -165,7 +165,7 @@ echo %basename%                                               > %out_bundle%\bas
 
 echo Install FDS %fds_versionbase% and Smokeview %smv_versionbase% > %fds_forbundle%\message.txt
 CALL :COPY  "%fds_forbundle%\message.txt"                            %out_bundle%\message.txt
-echo Unpacking FDS %fds_versionbase% and Smokeview %smv_versionbase% installation files > %fds_forbundle%\unpack.txt
+echo Unpacking installation files for FDS %fds_versionbase% and Smokeview %smv_versionbase% > %fds_forbundle%\unpack.txt
 
 echo.
 echo --- copying auxillary files ---
