@@ -314,6 +314,13 @@ call :is_file_in_path fds
 call :is_file_in_path smokeview
 call :is_file_in_path mpiexec
 echo.
+echo To run fds for cases using this computer only, open the
+echo command shell CMDfds (located on the desktop) and type:
+echo.
+echo fds_local casename.fds
+echo.
+echo where casename is the name of your case. For more information type: helpfds.
+echo. 
 echo *** Press any key, then reboot to complete the installation.  ***
 pause>NUL
 goto eof

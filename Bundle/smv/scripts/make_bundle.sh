@@ -7,6 +7,8 @@ REMOTESVNROOT=$3
 PLATFORMHOST=$4
 SVNROOT=~/$5
 
+smvbin=smvbin
+
 errlog=/tmp/smv_errlog.$$
 
 TEST=
@@ -89,6 +91,7 @@ WIND2FDSDIR=$REMOTESVNROOT/smv/Build/wind2fds/intel_${platform}_64
 HASHFILEDIR=$REMOTESVNROOT/smv/Build/hashfile/intel_${platform}_64
 FLUSHFILEDIR=$REMOTESVNROOT/smv/Build/flush/intel_${platform}_64
 FORBUNDLE=$SVNROOT/bot/Bundle/smv/for_bundle
+WEBGLDIR=$SVNROOT/bot/Bundle/smv/for_bundle/webgl
 PLATFORMDIR=$RELEASE$revision\_${platform}64
 UPDATER=$SVNROOT/bot/Bundle/smv/scripts//make_updater.sh
 uploads=$SVNROOT/bot/Bundle/smv/uploads
@@ -100,6 +103,8 @@ rm -rf $PLATFORMDIR
 mkdir -p $PLATFORMDIR
 mkdir -p $PLATFORMDIR/bin
 mkdir -p $PLATFORMDIR/bin/hash
+mkdir -p $PLATFORMDIR/$smvbin
+mkdir -p $PLATFORMDIR/$smvbin/hash
 mkdir -p $PLATFORMDIR/Documentation
 
 echo ""
@@ -107,25 +112,27 @@ echo "---- copying files ----"
 echo ""
 CPDIR $FORBUNDLE/textures $PLATFORMDIR/bin/textures
 
-cp $FORBUNDLE/*.png $PLATFORMDIR/bin/.
-cp $FORBUNDLE/*.po $PLATFORMDIR/bin/.
+cp $FORBUNDLE/*.png $PLATFORMDIR/$smvbin/.
+cp $FORBUNDLE/*.po $PLATFORMDIR/$smvbin/.
 
-CP $FORBUNDLE objects.svo    $PLATFORMDIR/bin objects.svo
-CP $FORBUNDLE smokeview.ini  $PLATFORMDIR/bin smokeview.ini
-CP $FORBUNDLE volrender.ssf  $PLATFORMDIR/bin volrender.ssf
-CP $FORBUNDLE smokeview.html $PLATFORMDIR/bin smokeview.html
+CP $FORBUNDLE objects.svo    $PLATFORMDIR/$smvbin objects.svo
+CP $FORBUNDLE smokeview.ini  $PLATFORMDIR/$smvbin smokeview.ini
+CP $FORBUNDLE volrender.ssf  $PLATFORMDIR/$smvbin volrender.ssf
+CP $FORBUNDLE smokeview.html $PLATFORMDIR/$smvbin smokeview.html
+CP $WEBGLDIR  runsmv_ssh.sh  $PLATFORMDIR/$smvbin runsmv_ssh.sh
+CP $WEBGLDIR  smv2html.sh    $PLATFORMDIR/$smvbin smv2html.sh
 
-SCP $PLATFORMHOST $BACKGROUNDDIR background                      $PLATFORMDIR/bin background
-SCP $PLATFORMHOST $SMVDIR        smokeview_${platform}_${TEST}64 $PLATFORMDIR/bin smokeview
-SCP $PLATFORMHOST $DEM2FDSDIR    dem2fds_${platform}_64          $PLATFORMDIR/bin dem2fds
-SCP $PLATFORMHOST $SMDDIR        smokediff_${platform}_64        $PLATFORMDIR/bin smokediff
-SCP $PLATFORMHOST $SMZDIR        smokezip_${platform}_64         $PLATFORMDIR/bin smokezip
-SCP $PLATFORMHOST $WIND2FDSDIR   wind2fds_${platform}_64         $PLATFORMDIR/bin wind2fds
-SCP $PLATFORMHOST $HASHFILEDIR   hashfile_${platform}_64         $PLATFORMDIR/bin hashfile
-SCP $PLATFORMHOST $FLUSHFILEDIR  flush_${platform}_64            $PLATFORMDIR/bin flush
+SCP $PLATFORMHOST $BACKGROUNDDIR background                      $PLATFORMDIR/$smvbin background
+SCP $PLATFORMHOST $SMVDIR        smokeview_${platform}_${TEST}64 $PLATFORMDIR/$smvbin smokeview
+SCP $PLATFORMHOST $DEM2FDSDIR    dem2fds_${platform}_64          $PLATFORMDIR/$smvbin dem2fds
+SCP $PLATFORMHOST $SMDDIR        smokediff_${platform}_64        $PLATFORMDIR/$smvbin smokediff
+SCP $PLATFORMHOST $SMZDIR        smokezip_${platform}_64         $PLATFORMDIR/$smvbin smokezip
+SCP $PLATFORMHOST $WIND2FDSDIR   wind2fds_${platform}_64         $PLATFORMDIR/$smvbin wind2fds
+SCP $PLATFORMHOST $HASHFILEDIR   hashfile_${platform}_64         $PLATFORMDIR/$smvbin hashfile
+SCP $PLATFORMHOST $FLUSHFILEDIR  flush_${platform}_64            $PLATFORMDIR/$smvbin flush
 
 CURDIR=`pwd`
-cd $PLATFORMDIR/bin
+cd $PLATFORMDIR/$smvbin
 hashfile background > background.sha1
 hashfile smokediff  > smokediff.sha1
 hashfile smokeview  > smokeview.sha1

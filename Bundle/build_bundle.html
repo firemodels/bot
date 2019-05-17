@@ -21,8 +21,11 @@ function bundle_fdssmv(platform){
 function install_fdssmv(platform){
   MyObject.Run(get_fullpath("../../bot/Bundle/fds/scripts/webINSTALLfdssmv.bat ",platform));
 }
-function copy_apps(platform,prog){
-  MyObject.Run(get_fullpath("../../bot/Bundle/fds/scripts/webCopyApps.bat ",platform));
+function copy_fdsapps(platform){
+  MyObject.Run(get_fullpath("../../bot/Bundle/fds/scripts/webCopyFDSApps.bat ",platform));
+}
+function copy_smvapps(platform){
+  MyObject.Run(get_fullpath("../../bot/Bundle/fds/scripts/webCopySMVApps.bat ",platform));
 }
 function clean_upload(platform,prog){
   MyObject.Run(get_fullpath("../../bot/Bundle/fds/scripts/webCleanUpload.bat ",platform));
@@ -45,15 +48,15 @@ function clean_upload(platform,prog){
 
 <tr>
 <th>FDS</th>
-<td align=center><button onclick="copy_apps('windows','fds')">Copy</button></td>
-<td align=center><button onclick="copy_apps('linux','fds')">Copy</button></td>
-<td align=center><button onclick="copy_apps('osx','fds')">Copy</button></td>
+<td align=center><button onclick="copy_fdsapps('windows')">Copy</button></td>
+<td align=center><button onclick="copy_fdsapps('linux')">Copy</button></td>
+<td align=center><button onclick="copy_fdsapps('osx')">Copy</button></td>
 </tr>
 <tr>
 <th>Smokeview</th>
-<td align=center><button onclick="copy_apps('windows','smv')">Copy</button></td>
-<td align=center><button onclick="copy_apps('linux','smv')">Copy</button></td>
-<td align=center><button onclick="copy_apps('osx','smv')">Copy</button></td>
+<td align=center><button onclick="copy_smvapps('windows')">Copy</button></td>
+<td align=center><button onclick="copy_smvapps('linux')">Copy</button></td>
+<td align=center><button onclick="copy_smvapps('osx')">Copy</button></td>
 </tr>
 
 </table>

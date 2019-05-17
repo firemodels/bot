@@ -30,6 +30,7 @@ set  smvdir=%svn_root%\bot\Bundle\smv\uploads\%zipbase%
 set uploads=%svn_root%\bot\Bundle\smv\uploads
 set smvscripts=%svn_root%\smv\scripts
 set forbundle=%svn_root%\bot\Bundle\smv\for_bundle
+set webgldir=%svn_root%\bot\Bundle\smv\for_bundle\webgl
 set sh2bat=%svn_root%\smv\Build\sh2bat\intel_win_64
 set gettime=%svn_root%\smv\Build\get_time\intel_win_64
 set smvbuild=%svn_root%\smv\Build
@@ -54,6 +55,7 @@ echo copying .po files
 copy %forbundle%\*.po %smvdir%\.>Nul
 
 CALL :COPY %forbundle%\volrender.ssf    %smvdir%\volrender.ssf
+CALL :COPY  %webgldir%\smv2html.bat     %smvdir%\smv2html.bat
 CALL :COPY %forbundle%\fds_test.bat     %smvdir%\fds_test.txt
 CALL :COPY %forbundle%\fdsinit_test.bat %smvdir%\fdsinit_test.txt
 
