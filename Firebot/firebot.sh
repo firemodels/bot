@@ -1111,7 +1111,7 @@ check_guide()
    local doc=$2
    local label=$3
    local upload=$4
-   
+
    # Scan for and report any errors or warnings in build process for guides
    cd $firebotdir
    if [[ `grep -I "successfully" $guidelog` == "" ]]
@@ -1121,14 +1121,22 @@ check_guide()
       echo $label >> $WARNING_LOG # Name of guide
       cat $guidelog >> $WARNING_LOG # Contents of log file
       echo "" >> $WARNING_LOG
-   else
-      # Guide built successfully; there were no errors/warnings
-      # Copy guide to Firebot's local website
-      if [[ "$UPLOADGUIDES" == "1" ]] && [[ "$upload" == "1" ]]; then
-        cp $doc /var/www/html/firebot/manuals/
-        cp $doc $NEWGUIDE_DIR/.
-      fi
-      cp $doc $SAVEGUIDE_DIR/.
+   fi
+}
+
+#---------------------------------------------
+#                   copy_guide
+#---------------------------------------------
+
+copy_guide()
+{
+   local doc=$1
+
+   cd $firebotdir
+   if [[ "$UPLOADGUIDES" == "1" ]]; then
+     cp $doc /var/www/html/firebot/manuals/
+     cp $doc $NEWGUIDE_DIR/.
+     cp $doc $SAVEGUIDE_DIR/.
    fi
 }
 
@@ -1167,6 +1175,16 @@ make_fds_user_guide()
 }
 
 #---------------------------------------------
+#                   copy_fds_user_guide
+#---------------------------------------------
+
+copy_fds_user_guide()
+{
+   cd $fdsrepo/Manuals/FDS_User_Guide
+   copy_guide $fdsrepo/Manuals/FDS_User_Guide/FDS_User_Guide.pdf
+}
+
+#---------------------------------------------
 #                   make_fds_technical_guide
 #---------------------------------------------
 
@@ -1180,6 +1198,16 @@ make_fds_technical_guide()
 
    # Check guide for completion and copy to website if successful
    check_guide $OUTPUT_DIR/stage8_fds_technical_guide $fdsrepo/Manuals/FDS_Technical_Reference_Guide/FDS_Technical_Reference_Guide.pdf 'FDS Technical Reference Guide' 1
+}
+
+#---------------------------------------------
+#                   copy_fds_technical_guide
+#---------------------------------------------
+
+copy_fds_technical_guide()
+{
+   cd $fdsrepo/Manuals/FDS_Technical_Reference_Guide
+   copy_guide $fdsrepo/Manuals/FDS_Technical_Reference_Guide/FDS_Technical_Reference_Guide.pdf
 }
 
 #---------------------------------------------
@@ -1199,6 +1227,16 @@ make_fds_verification_guide()
 }
 
 #---------------------------------------------
+#                   copy_fds_verification_guide
+#---------------------------------------------
+
+copy_fds_verification_guide()
+{
+   cd $fdsrepo/Manuals/FDS_Verification_Guide
+   copy_guide $fdsrepo/Manuals/FDS_Verification_Guide/FDS_Verification_Guide.pdf
+}
+
+#---------------------------------------------
 #                   make_fds_validation_guide
 #---------------------------------------------
 
@@ -1212,6 +1250,16 @@ make_fds_validation_guide()
 
    # Check guide for completion and copy to website if successful
    check_guide $OUTPUT_DIR/stage8_fds_validation_guide $fdsrepo/Manuals/FDS_Validation_Guide/FDS_Validation_Guide.pdf 'FDS Validation Guide' 1
+}
+
+#---------------------------------------------
+#                   copy_fds_validation_guide
+#---------------------------------------------
+
+copy_fds_validation_guide()
+{
+   cd $fdsrepo/Manuals/FDS_Validation_Guide
+   copy_guide $fdsrepo/Manuals/FDS_Validation_Guide/FDS_Validation_Guide.pdf
 }
 
 #---------------------------------------------
@@ -1229,6 +1277,16 @@ make_fds_Config_management_plan()
    # Check guide for completion and copy to website if successful
    # note: script that uploads pdf to google doens't like the name so it has been shortened to FDS_Config_Management_Plan
    check_guide $OUTPUT_DIR/stage8_fds_Config_management_plan $fdsrepo/Manuals/FDS_Config_Management_Plan/FDS_Config_Management_Plan.pdf 'FDS Config Management Plan' 1
+}
+
+#---------------------------------------------
+#                   copy_fds_Config_management_plan
+#---------------------------------------------
+
+copy_fds_Config_management_plan()
+{
+   cd $fdsrepo/Manuals/FDS_Config_Management_Plan
+   copy_guide $fdsrepo/Manuals/FDS_Config_Management_Plan/FDS_Config_Management_Plan.pdf
 }
 
 #---------------------------------------------
@@ -1271,6 +1329,21 @@ save_build_status()
 }
 
 #---------------------------------------------
+#                   get_firebot_success
+#---------------------------------------------
+
+get_firebot_success()
+{
+   firebot_sucess=1
+   if [[ -e $WARNING_LOG ]]; then
+     firebot_success=
+   fi
+   if [[ -e $ERROR_LOG ]]; then
+     firebot_success=
+   fi
+}
+
+#---------------------------------------------
 #                   email_build_status
 #---------------------------------------------
 
@@ -1281,7 +1354,7 @@ email_build_status()
    bottype=${1}
    botuser=${1}@$hostname
    firebot_status=1
-   
+
    stop_time=`date`
    echo "" > $TIME_LOG
    echo "-------------------------------" >> $TIME_LOG
@@ -1314,7 +1387,8 @@ fi
    echo "-------------------------------" >> $TIME_LOG
 
 #  upload guides to a google drive directory
-   if [[ "$UPLOADGUIDES" == "1" ]]; then
+   get_firebot_success
+   if [[ "$UPLOADGUIDES" == "1" ]] && [[ "$firebot_success" == "1" ]]; then
      cd $firebotdir
      $UploadGuides $NEWGUIDE_DIR $fdsrepo/Manuals &> $OUTPUT_DIR/stage10_upload_google
      if [[ `grep -E 'warning' $OUTPUT_DIR/stage10_upload_google` == "" ]]; then
@@ -1839,13 +1913,21 @@ if [[ "$DEBUG_ONLY" == "" ]] && [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" 
       make_fds_technical_guide
       make_fds_validation_guide
       make_fds_Config_management_plan
-      if [ "$COPY_MANUAL_DIR" == "1" ]; then
-        if [ -e $MANUAL_DIR ]; then
-          rm -rf $MANUAL_DIR
+      get_firebot_success
+      if [[ "$firebot_success" == "1" ]] ; then
+        if [[ "$COPY_MANUAL_DIR" == "1" ]] && [[ "$firebot_success" == "1" ]]; then
+          if [ -e $MANUAL_DIR ]; then
+            rm -rf $MANUAL_DIR
+          fi
+          cp -r $fdsrepo/Manuals $MANUAL_DIR
         fi
-        cp -r $fdsrepo/Manuals $MANUAL_DIR
-        fi
+        copy_fds_user_guide
+        copy_fds_verification_guide
+        copy_fds_technical_guide
+        copy_fds_validation_guide
+        copy_fds_Config_management_plan
       fi
+    fi
   fi
 fi
 
