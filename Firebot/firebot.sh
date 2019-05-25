@@ -1334,7 +1334,7 @@ save_build_status()
 
 get_firebot_success()
 {
-   firebot_sucess=1
+   firebot_success=1
    if [[ -e $WARNING_LOG ]]; then
      firebot_success=
    fi
