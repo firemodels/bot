@@ -1,4 +1,10 @@
-# Setting up Ubuntu
+# Installing Ubuntu as a sub-system on a Windows 10 PC
+
+### follow notes here:
+https://docs.microsoft.com/en-us/windows/wsl/install-win10
+
+
+## After Linux is installed, install/update the following packages
 
 ### update packages
 sudo apt-get update
@@ -21,5 +27,6 @@ sudo apt-get install libxmu-dev libxi-dev
 ### windowing stuff (run startx to be able to run smokeview)
 sudo apt-get install xinit
 
-### add following to .bashrc
+### add following to .bashrc 
+### on your Windows 10 PC you need to run Xming 
 export DISPLAY=:0
