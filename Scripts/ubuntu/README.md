@@ -20,3 +20,6 @@ sudo apt-get install libxmu-dev libxi-dev
 
 ### windowing stuff (run startx to be able to run smokeview)
 sudo apt-get install xinit
+
+### add following to .bashrc
+export DISPLAY=:0
