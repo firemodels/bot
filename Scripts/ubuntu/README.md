@@ -1,10 +1,10 @@
 # Setting up Ubuntu
 
-# install make, gnu compilers etc
+### install make, gnu compilers etc
 sudo apt-get -y install build-essential
 
-# install openmpi
+### install openmpi
 sudo apt-get -y install openmpi-bin openmpi-common openssh-client openssh-server libopenmpi-dbg libopenmpi-dev
 
-# install gfotran
+### install gfotran
 sudo apt-get -y install gfortran
