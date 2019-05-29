@@ -28,5 +28,8 @@ sudo apt-get install libxmu-dev libxi-dev
 sudo apt-get install xinit
 
 ### add following to .bashrc 
-### on your Windows 10 PC you need to run Xming 
+
 export DISPLAY=:0
+
+On your Windows 10 PC you need to run Xming.
+
