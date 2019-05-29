@@ -5,7 +5,9 @@
 //HIDE_ON
 -->
 <p>
-<button onclick="Reset()">Reset View</button><br>
+<button onclick="Reset()">Reset View</button>
+<button onclick="EnterVR()">Enter VR</button>
+<br>
 <button onclick="show_blockages=ShowHide(show_blockages)">blockages</button>
 <button onclick="show_geom=ShowHide(show_geom)">geometry</button>
 <button onclick="show_outlines=ShowHide(show_outlines)">outlines</button><br>
@@ -49,6 +51,8 @@
          var show_blockages=0;
          var show_geom=0;
          var nframes=1;
+
+         var scene_vr = 0;
 
 // defining and storing the geometry
 
@@ -1385,6 +1389,7 @@
              time_option=option;
            }
          }
+
          /*=================== Reset =================== */
 
          function Reset(option) {
@@ -1395,6 +1400,12 @@
            dKEYx=0;
            dKEYy=0;
            dKEYz=0;
+         }
+
+         /*=================== EnterVr =================== */
+
+         function EnterVR(option) {
+           scene_vr = 1 - scene_vr;
          }
 
          /*=================== ShowHide =================== */
@@ -1408,9 +1419,21 @@
          var iframe = 0;
          var time_option=3;
 
+         function render(time){
+           if(scene_vr == 1){
+             animate(time,-1);
+             animate(time,1);
+           }
+           else{
+             animate(time,0);
+           }
+           window.requestAnimationFrame(render);
+         }
+         render(0);
+
          /*=================== animate =================== */
 
-         var animate = function(time) {
+         function animate(time,port) {
             var dt = time-time_old;
             var background_color=0.85
 
@@ -1445,10 +1468,21 @@
             time_old = time;
             gl.enable(gl.DEPTH_TEST);
 
-            gl.clearColor(background_color, background_color, background_color, 1.0);
-            gl.clearDepth(1.0);
-            gl.viewport(0.0, 0.0, canvas.width, canvas.height);
-            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            if(port!=1){
+              gl.clearColor(background_color, background_color, background_color, 1.0);
+              gl.clearDepth(1.0);
+            }
+            if(port==-1){
+              gl.viewport(0.0, 0.0, canvas.width/2, canvas.height);
+              gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            }
+            else if(port==0){
+              gl.viewport(0.0, 0.0, canvas.width, canvas.height);
+              gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            }
+            else if(port==1){
+              gl.viewport(canvas.width/2, 0.0, canvas.width/2, canvas.height);
+            }
 
 // draw blockage triangles
 
@@ -1751,10 +1785,7 @@
               }
               document.getElementById("buttonPauseResume").style.width = "125px";
             }
-
-            window.requestAnimationFrame(animate);
          }
-         animate(0);
       </script>
 
    </body>
