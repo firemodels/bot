@@ -1,13 +1,12 @@
-# Installing Ubuntu as a sub-system on a Windows 10 PC
+# Install Ubuntu
 
-### follow notes here:
+follow notes here to install Ubuntu as a sub-system on a Windows 10 PC:
 https://docs.microsoft.com/en-us/windows/wsl/install-win10
 
-
-## After Linux is installed, install/update the following packages
-
-### update packages
+update packages:
 sudo apt-get update
+
+# Install packages for building FDS
 
 ### make, gnu compilers etc
 sudo apt-get install build-essential
@@ -18,13 +17,15 @@ sudo apt-get install openmpi-bin openmpi-common openssh-client openssh-server li
 ### gfortran
 sudo apt-get install gfortran
 
+# Install packages for building/running smokeview
+
 ### opengl, glut
 sudo apt-get install libglu1-mesa-dev freeglut3-dev mesa-common-dev
 
 ### x11 stuff for glut
 sudo apt-get install libxmu-dev libxi-dev
 
-### windowing stuff (run startx to be able to run smokeview)
+### windowing stuff
 sudo apt-get install xinit
 
 ### add following to .bashrc 
