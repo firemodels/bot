@@ -17,3 +17,6 @@ sudo apt-get install libglu1-mesa-dev freeglut3-dev mesa-common-dev
 
 ### x11 stuff for glut
 sudo apt-get install libxmu-dev libxi-dev
+
+### windowing stuff (run startx to be able to run smokeview)
+sudo apt-get install xinit
