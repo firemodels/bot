@@ -8,7 +8,7 @@ update packages:
 
 sudo apt-get update
 
-# Install packages for building FDS
+# Packages for building FDS
 
 ### make, gnu compilers etc
 sudo apt-get install build-essential
@@ -19,7 +19,7 @@ sudo apt-get install openmpi-bin openmpi-common openssh-client openssh-server li
 ### gfortran
 sudo apt-get install gfortran
 
-# Install packages for building/running smokeview
+# Packages for building/running smokeview
 
 ### opengl, glut
 sudo apt-get install libglu1-mesa-dev freeglut3-dev mesa-common-dev
@@ -34,5 +34,5 @@ sudo apt-get install xinit
 
 export DISPLAY=:0
 
-On your Windows 10 PC you need to run Xming.
+To run smokeview, you need to also run Xming on your PC.
 
