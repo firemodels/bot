@@ -1197,9 +1197,18 @@
          /*=================== scaleX =================== */
 
          function scaleX(m, X) {
-            m[0]*=X, m[1]*=X, m[2]*=X, m[3]*=X;
-            m[4]*=X, m[5]*=X, m[6]*=X, m[7]*=X;
+            m[0]*=X, m[1]*=X,  m[2]*=X,  m[3]*=X;
+            m[4]*=X, m[5]*=X,  m[6]*=X,  m[7]*=X;
             m[8]*=X, m[9]*=X, m[10]*=X, m[11]*=X;
+         }
+
+         /*=================== scaleZ =================== */
+
+         function scaleZ(m, Z) {
+             m[2] *= Z;
+             m[6] *= Z;
+            m[10] *= Z;
+            m[14] *= Z;
          }
 
          /*=================== mat_transpose =================== */
@@ -1444,6 +1453,10 @@
              mo_matrix[8] = 0,  mo_matrix[9] = 0, mo_matrix[10] = 1, mo_matrix[11] = 0,
             mo_matrix[12] = 0, mo_matrix[13] = 0, mo_matrix[14] = 0, mo_matrix[15] = 1;
 
+// scale scene by 1/2 if in VR mode
+            if(port != 0){
+              scaleZ(mo_matrix,0.5);
+            }
 // add 90 deg rotation to be consistent with smokeview
             rotateX(mo_matrix, -1.571);
 
