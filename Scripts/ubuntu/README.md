@@ -1,4 +1,4 @@
-#!/bin/bash
+# Setting up Ubuntu
 
 # install make, gnu compilers etc
 sudo apt-get -y install build-essential
