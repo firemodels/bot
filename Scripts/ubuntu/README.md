@@ -1,9 +1,11 @@
 # Install Ubuntu
 
 follow notes here to install Ubuntu as a sub-system on a Windows 10 PC:
+
 https://docs.microsoft.com/en-us/windows/wsl/install-win10
 
 update packages:
+
 sudo apt-get update
 
 # Install packages for building FDS
