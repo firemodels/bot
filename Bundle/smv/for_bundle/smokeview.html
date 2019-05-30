@@ -1486,6 +1486,8 @@
               gl.clearDepth(1.0);
             }
             if(port==-1){
+              //let frameData = new VRFrameData()
+              //let vrDisplay.getFrameData(frameData);
               gl.viewport(0.0, 0.0, canvas.width/2, canvas.height);
               gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
             }
@@ -1494,6 +1496,8 @@
               gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
             }
             else if(port==1){
+              //let frameData = new VRFrameData()
+             // let vrDisplay.getFrameData(frameData);
               gl.viewport(canvas.width/2, 0.0, canvas.width/2, canvas.height);
             }
 
