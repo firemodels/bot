@@ -1153,36 +1153,61 @@
 
          canvas.addEventListener("deviceorientation", handleOrientation, false);
 
+
+       //  M =   R  T  =  m0 m4  m8 m12  (R == orthoganl rotation matrix, T == translation vector)
+       //        0  1     m1 m5  m9 m13
+       //                 m2 m6 m10 m14
+       //                 m3 m7 m11 m15
+
+       // rotatate about x axis  1  0 0 0
+       //                        0  c s 0
+       //                        0 -s c 0
+       //                        0  0 0 1
+
+       // rotatate about z axis  c  s 0 0
+       //                        c -s 0 0
+       //                        0  0 1 0
+       //                        0  0 0 1
+
+       // translate by (x,y,z)   T = 1 0 0 x
+       //                            0 1 0 y
+       //                            0 0 1 z
+       //                            0 0 0 1
+
          /*=================== rotateX =================== */
 
          function rotateX(m, angle) {
             var c = Math.cos(angle);
             var s = Math.sin(angle);
-            var mv1 = m[1], mv5 = m[5], mv9 = m[9];
+            var mv4 = m[4], mv5 = m[5], mv6 = m[6], mv7 = m[7];
 
-            m[1] = m[1]*c - m[2]*s;
-            m[5] = m[5]*c - m[6]*s;
-            m[9] = m[9]*c - m[10]*s;
+            m[4] = m[4]*c + m[8]*s;
+            m[5] = m[5]*c + m[9]*s;
+            m[6] = m[6]*c + m[10]*s;
+            m[7] = m[7]*c + m[11]*s;
 
-            m[2] =   m[2]*c + mv1*s;
-            m[6] =   m[6]*c + mv5*s;
-            m[10] = m[10]*c + mv9*s;
+            m[8]  =  m[8]*c - mv4*s;
+            m[9]  =  m[9]*c - mv5*s;
+            m[10] = m[10]*c - mv6*s;
+            m[11] = m[11]*c - mv7*s;
          }
 
-         /*=================== rotateY =================== */
+/*=================== rotateZ =================== */
 
-         function rotateY(m, angle) {
+         function rotateZ(m, angle) {
             var c = Math.cos(angle);
             var s = Math.sin(angle);
-            var mv0 = m[0], mv4 = m[4], mv8 = m[8];
+            var mv0 = m[0], mv1 = m[1], mv2 = m[2], mv3 = m[3];
 
-             m[0] =  c*m[0] + s*m[2];
-             m[4] =  c*m[4] + s*m[6];
-             m[8] =  c*m[8] + s*m[10];
+            m[0] = m[0]*c + m[4]*s;
+            m[1] = m[1]*c + m[5]*s;
+            m[2] = m[2]*c + m[6]*s;
+            m[3] = m[3]*c + m[7]*s;
 
-             m[2] =  c*m[2] - s*mv0;
-             m[6] =  c*m[6] - s*mv4;
-            m[10] = c*m[10] - s*mv8;
+            m[4] = m[4]*c - mv0*s;
+            m[5] = m[5]*c - mv1*s;
+            m[6] = m[6]*c - mv2*s;
+            m[7] = m[7]*c - mv3*s;
          }
 
          /*=================== translateXYZ =================== */
@@ -1191,12 +1216,11 @@
             m[12] +=  m[0]*X +  m[4]*Y +  m[8]*Z;
             m[13] +=  m[1]*X +  m[5]*Y +  m[9]*Z;
             m[14] +=  m[2]*X +  m[6]*Y + m[10]*Z;
-            m[15] +=  m[3]*X +  m[7]*Y + m[11]*Z;
          }
 
-         /*=================== scaleX =================== */
+         /*=================== scaleAll =================== */
 
-         function scaleX(m, X) {
+         function scaleAll(m, X) {
             m[0]*=X, m[1]*=X,  m[2]*=X,  m[3]*=X;
             m[4]*=X, m[5]*=X,  m[6]*=X,  m[7]*=X;
             m[8]*=X, m[9]*=X, m[10]*=X, m[11]*=X;
@@ -1205,10 +1229,10 @@
          /*=================== scaleZ =================== */
 
          function scaleZ(m, Z) {
-             m[2] *= Z;
-             m[6] *= Z;
+             m[8] *= Z;
+             m[9] *= Z;
             m[10] *= Z;
-            m[14] *= Z;
+            m[11] *= Z;
          }
 
          /*=================== mat_transpose =================== */
@@ -1453,26 +1477,27 @@
              mo_matrix[8] = 0,  mo_matrix[9] = 0, mo_matrix[10] = 1, mo_matrix[11] = 0,
             mo_matrix[12] = 0, mo_matrix[13] = 0, mo_matrix[14] = 0, mo_matrix[15] = 1;
 
+// rotate 90 deg to be consistent with smokeview
+            rotateX(mo_matrix, -1.571);
+
 // scale scene by 1/2 if in VR mode
             if(port != 0){
               scaleZ(mo_matrix,0.5);
             }
-// add 90 deg rotation to be consistent with smokeview
-            rotateX(mo_matrix, -1.571);
 
 // scale and translate to be consistent with smokeview
             var scale=1.5;
             var min_xz=2.0*Math.min(xcen,zcen);
             translateXYZ(mo_matrix, -scale*xcen/min_xz, -scale*ycen, -scale*zcen/min_xz);
-            scaleX(mo_matrix, scale/min_xz) ;
+            scaleAll(mo_matrix, scale/min_xz) ;
 
 // translate using mouse
             translateXYZ(mo_matrix, dKEYx, dKEYy, dKEYz);
 
 // rotate by mouse (translate to origin first)
             translateXYZ(mo_matrix, xcen, ycen, zcen);
-            rotateY(mo_matrix, THETA);
             rotateX(mo_matrix, PHI);
+            rotateZ(mo_matrix, THETA);
             translateXYZ(mo_matrix, -xcen, -ycen, -zcen);
 
             normal_matrix = mat_inverse(mo_matrix);
