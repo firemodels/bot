@@ -56,7 +56,7 @@ if "%platform%" == "linux" (
   echo.
   echo --- making 64 bit Linux Smokeview installer ---
   echo.
-  plink %linux_logon% %scriptdir%/scripts/make_bundle.sh %buildtype% %version% %linux_svn_root% %linux_hostname% %linux_svn_root%
+  plink %plink_options%$ %linux_logon% %scriptdir%/scripts/make_bundle.sh %buildtype% %version% %linux_svn_root% %linux_hostname% %linux_svn_root%
 
   echo.
   echo --- downloading installer ---
@@ -79,7 +79,7 @@ if "%platform%" == "osx" (
   echo.
   echo --- making 64 bit OSX Smokeview installer ---
   echo.
-  plink %osx_logon% %scriptdir%/scripts/make_bundle.sh %buildtype% %version% %linux_svn_root% %osx_hostname% %linux_svn_root%
+  plink %plink_options%$ %osx_logon% %scriptdir%/scripts/make_bundle.sh %buildtype% %version% %linux_svn_root% %osx_hostname% %linux_svn_root%
 
   echo.
   echo --- downloading installer ---
