@@ -1159,6 +1159,9 @@
        //                 m2 m6 m10 m14
        //                 m3 m7 m11 m15
 
+       // post-multiply one of the following matrices to M
+       // when applying the corresponding transformation
+
        // rotatate about x axis  1  0 0 0
        //                        0  c s 0
        //                        0 -s c 0
@@ -1169,10 +1172,15 @@
        //                        0  0 1 0
        //                        0  0 0 1
 
-       // translate by (x,y,z)   T = 1 0 0 x
-       //                            0 1 0 y
-       //                            0 0 1 z
-       //                            0 0 0 1
+       // translate by (x,y,z)  1 0 0 x
+       //                       0 1 0 y
+       //                       0 0 1 z
+       //                       0 0 0 1
+
+       // scale by (x,y,z)   x 0 0 0
+       //                    0 y 0 0
+       //                    0 0 z 0
+       //                    0 0 0 1
 
          /*=================== rotateX =================== */
 
@@ -1218,12 +1226,22 @@
             m[14] +=  m[2]*X +  m[6]*Y + m[10]*Z;
          }
 
+         /*=================== scaleXYZ =================== */
+
+         function scaleXYZ(m, X, Y, Z) {
+            m[0]*=X, m[4]*=Y,  m[8]*=Z;
+            m[1]*=X, m[5]*=Y,  m[9]*=Z;
+            m[2]*=X, m[6]*=Y, m[10]*=Z;
+            m[3]*=X, m[7]*=Y, m[11]*=Z;
+         }
+
          /*=================== scaleAll =================== */
 
          function scaleAll(m, X) {
-            m[0]*=X, m[1]*=X,  m[2]*=X,  m[3]*=X;
-            m[4]*=X, m[5]*=X,  m[6]*=X,  m[7]*=X;
-            m[8]*=X, m[9]*=X, m[10]*=X, m[11]*=X;
+            m[0]*=X, m[4]*=X,  m[8]*=X;
+            m[1]*=X, m[5]*=X,  m[9]*=X;
+            m[2]*=X, m[6]*=X, m[10]*=X;
+            m[3]*=X, m[7]*=X, m[11]*=X;
          }
 
          /*=================== scaleZ =================== */
