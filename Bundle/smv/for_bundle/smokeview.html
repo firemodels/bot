@@ -1154,16 +1154,15 @@
          canvas.addEventListener("deviceorientation", handleOrientation, false);
 
 
-       //  M =   R  T  =  m0 m4  m8 m12  (R == orthoganl rotation matrix, T == translation vector)
+       //  M =   R  T  =  m0 m4  m8 m12  (R == orthogonal rotation matrix, T == translation vector)
        //        0  1     m1 m5  m9 m13
        //                 m2 m6 m10 m14
        //                 m3 m7 m11 m15
 
-       // post-multiply one of the following matrices to M
-       // when applying the corresponding transformation
+       // the following routines post-multiply M by one of the following transformation matrices
 
        // rotatate about x axis  1  0 0 0
-       //                        0  c s 0
+       //                        0  c s 0    c=cos(angle), s=sin(angle)
        //                        0 -s c 0
        //                        0  0 0 1
 
@@ -1200,7 +1199,7 @@
             m[11] = m[11]*c - mv7*s;
          }
 
-/*=================== rotateZ =================== */
+         /*=================== rotateZ =================== */
 
          function rotateZ(m, angle) {
             var c = Math.cos(angle);
@@ -1496,7 +1495,7 @@
             mo_matrix[12] = 0, mo_matrix[13] = 0, mo_matrix[14] = 0, mo_matrix[15] = 1;
 
 // rotate 90 deg to be consistent with smokeview
-            rotateX(mo_matrix, -1.571);
+            rotateX(mo_matrix, -1.57078);
 
 // scale scene by 1/2 if in VR mode
             if(port != 0){
@@ -1509,10 +1508,10 @@
             translateXYZ(mo_matrix, -scale*xcen/min_xz, -scale*ycen, -scale*zcen/min_xz);
             scaleAll(mo_matrix, scale/min_xz) ;
 
-// translate using mouse
+// translate
             translateXYZ(mo_matrix, dKEYx, dKEYy, dKEYz);
 
-// rotate by mouse (translate to origin first)
+// rotate (translate to origin first)
             translateXYZ(mo_matrix, xcen, ycen, zcen);
             rotateX(mo_matrix, PHI);
             rotateZ(mo_matrix, THETA);
