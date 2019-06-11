@@ -29,9 +29,16 @@
 
 // creating a canvas
 
-         var canvas = document.getElementById('webSmokeview');
-         gl = canvas.getContext('experimental-webgl');
-         var ext_32bit = gl.getExtension('OES_element_index_uint');
+         function initWebGL() {
+           canvas = document.getElementById('webSmokeview');
+           gl = canvas.getContext('experimental-webgl');
+           if (!gl) {
+             alert("Your browser does not support webgl");
+             return;
+           }
+           ext_32bit = gl.getExtension('OES_element_index_uint');
+         }
+         initWebGL();
 
          var show_slice_node=0;
          var slice_node_file_ready=0;
