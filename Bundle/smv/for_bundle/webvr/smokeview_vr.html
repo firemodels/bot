@@ -1,4 +1,3 @@
- 
 <!doctype html>
 <html>
 <body>
@@ -31,8 +30,8 @@
 // creating a canvas
 
          function initWebGL() {
-           canvas = document.getElementById('webSmokeview');
-           gl = canvas.getContext('experimental-webgl');
+           webglCanvas = document.getElementById('webSmokeview');
+           gl = webglCanvas.getContext('experimental-webgl');
            if (!gl) {
              alert("Your browser does not support webgl");
              return;
@@ -995,7 +994,7 @@
          }
 
          var projection_angle=10.0;
-         var proj_matrix = get_projection(projection_angle, canvas.width/canvas.height, 1, 100);
+         var proj_matrix = get_projection(projection_angle, webglCanvas.width/webglCanvas.height, 1, 100);
          var mo_matrix =     [ 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 ];
          var view_matrix =   [ 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 ];
          var normal_matrix = [ 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 ];
@@ -1104,29 +1103,29 @@
               new_y = e.touches[0].pageY;
             }
             if (alt_key == 0 && ctrl_key == 0){
-              dX = (new_x-old_x)*2*Math.PI/canvas.width,
-              dY = (new_y-old_y)*2*Math.PI/canvas.height;
+              dX = (new_x-old_x)*2*Math.PI/webglCanvas.width,
+              dY = (new_y-old_y)*2*Math.PI/webglCanvas.height;
               THETA+= dX;
               PHI+=dY;
             }
             else if(alt_key==1){
               if(touch_mode==1){
-                dX = (new_x-old_x)/canvas.width,
+                dX = (new_x-old_x)/webglCanvas.width,
                 dKEYx -= 3*dX;
               }
-              dY = (new_y-old_y)/canvas.height;
+              dY = (new_y-old_y)/webglCanvas.height;
               dKEYz += 3*dY;
             }
             else{ // ctrl_key==1
               if(using_touch==0){
-                dX = (new_x-old_x)/canvas.width,
+                dX = (new_x-old_x)/webglCanvas.width,
                 dKEYx -= 3*dX;
-                dY = (new_y-old_y)/canvas.height;
+                dY = (new_y-old_y)/webglCanvas.height;
                 dKEYy += 3*dY;
               }
               else{
                 if(prev_dist>0){
-                  dY = 3*(cur_dist-prev_dist)/canvas.height;
+                  dY = 3*(cur_dist-prev_dist)/webglCanvas.height;
                   dKEYy -= dY;
                 }
               }
@@ -1149,17 +1148,17 @@
 
          /*=================== register callbacks =================== */
 
-         canvas.addEventListener("mousedown", mouseDown, false);
-         canvas.addEventListener("mouseup",   mouseUp, false);
-         canvas.addEventListener("mouseout",  mouseUp, false);
-         canvas.addEventListener("mousemove", mouseMove, false);
+         webglCanvas.addEventListener("mousedown", mouseDown, false);
+         webglCanvas.addEventListener("mouseup",   mouseUp, false);
+         webglCanvas.addEventListener("mouseout",  mouseUp, false);
+         webglCanvas.addEventListener("mousemove", mouseMove, false);
 
-         canvas.addEventListener("touchstart",  mouseDown, false);
-         canvas.addEventListener("touchmove",   mouseMove, false);
-         canvas.addEventListener("touchend",    mouseUp,   false);
-         canvas.addEventListener("touchcancel", mouseUp,  false);
+         webglCanvas.addEventListener("touchstart",  mouseDown, false);
+         webglCanvas.addEventListener("touchmove",   mouseMove, false);
+         webglCanvas.addEventListener("touchend",    mouseUp,   false);
+         webglCanvas.addEventListener("touchcancel", mouseUp,  false);
 
-         canvas.addEventListener("deviceorientation", handleOrientation, false);
+         webglCanvas.addEventListener("deviceorientation", handleOrientation, false);
 
 
        //  M =   R  T  =  m0 m4  m8 m12  (R == orthogonal rotation matrix, T == translation vector)
@@ -1538,17 +1537,17 @@
             if(port==-1){
               //let frameData = new VRFrameData()
               //let vrDisplay.getFrameData(frameData);
-              gl.viewport(0.0, 0.0, canvas.width/2, canvas.height);
+              gl.viewport(0.0, 0.0, webglCanvas.width/2, webglCanvas.height);
               gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
             }
             else if(port==0){
-              gl.viewport(0.0, 0.0, canvas.width, canvas.height);
+              gl.viewport(0.0, 0.0, webglCanvas.width, webglCanvas.height);
               gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
             }
             else if(port==1){
               //let frameData = new VRFrameData()
              // let vrDisplay.getFrameData(frameData);
-              gl.viewport(canvas.width/2, 0.0, canvas.width/2, canvas.height);
+              gl.viewport(webglCanvas.width/2, 0.0, webglCanvas.width/2, webglCanvas.height);
             }
 
 // draw blockage triangles
