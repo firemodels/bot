@@ -2,6 +2,29 @@
 <html>
 <head>
 
+    <style>
+      #webgl-canvas, #presenting-message {
+        box-sizing: border-box;
+        height: 100%;
+        left: 0;
+        margin: 0;
+        position: absolute;
+        top: 0;
+        width: 100%;
+      }
+      #presenting-message {
+        color: white;
+        font-family: sans-serif;
+        font-size: 2em;
+        font-weight: bold;
+        z-index: 1;
+        text-align: center;
+        padding: 0.5em;
+        background-color: #444;
+        display: none;
+      }
+    </style>
+
 <script src="js/third-party/gl-matrix-min.js"></script>
 <script src="js/third-party/wglu/wglu-program.js"></script>
 <script src="js/third-party/wglu/wglu-stats.js"></script>
@@ -31,10 +54,21 @@
 <button onclick="SetTime(1)">> </button>
 <button onclick="SetTime(2)">>> </button><br>
 <p><canvas width = "570" height = "570" id = "webSmokeview"></canvas>
+<div id="presenting-message">Put on your headset now</div>
+
 <!--
 //HIDE_OFF -->
 
 <script>
+
+      var vrDisplay = null;
+      var frameData = null;
+      var vrPresentButton = null;
+      var presentingMessage = document.getElementById("presenting-message");
+
+      var projectionMat = mat4.create();
+      var viewMat = mat4.create();
+
 
 // creating a canvas
 
@@ -128,7 +162,6 @@
 
         navigator.getVRDisplays().then(function (displays) {
           if (displays.length > 0) {
-
             vrDisplay = displays[displays.length - 1];
             vrDisplay.depthNear = 0.1;
             vrDisplay.depthFar = 1024.0;
@@ -1683,7 +1716,7 @@
            }
            window.requestAnimationFrame(render);
          }
-         render(0);
+        // render(0);
 
       function onAnimationFrame (t) {
         // do not attempt to render if there is no available WebGL context
@@ -1710,10 +1743,12 @@
           if (vrDisplay.isPresenting) {
             // When presenting render a stereo view.
             gl.viewport(0, 0, webglCanvas.width * 0.5, webglCanvas.height);
-            cubeSea.render(frameData.leftProjectionMatrix, frameData.leftViewMatrix, stats, t);
+           // cubeSea.render(frameData.leftProjectionMatrix, frameData.leftViewMatrix, stats, t);
+            animate(t,-1, frameData.leftViewMatrix);
 
             gl.viewport(webglCanvas.width * 0.5, 0, webglCanvas.width * 0.5, webglCanvas.height);
-            cubeSea.render(frameData.rightProjectionMatrix, frameData.rightViewMatrix, stats, t);
+            //cubeSea.render(frameData.rightProjectionMatrix, frameData.rightViewMatrix, stats, t);
+            animate(t,1, frameData.rightViewMatrix);
 
             // If we're currently presenting to the VRDisplay we need to
             // explicitly indicate we're done rendering.
@@ -1733,13 +1768,14 @@
           gl.viewport(0, 0, webglCanvas.width, webglCanvas.height);
           mat4.perspective(projectionMat, Math.PI*0.4, webglCanvas.width / webglCanvas.height, 0.1, 1024.0);
           mat4.identity(viewMat);
-          cubeSea.render(projectionMat, viewMat, stats, t);
+          animate(t,0, viewMat);
         }
       }
+      onAnimationFrame(0);
 
          /*=================== animate =================== */
 
-         function animate(time,port) {
+         function animate(time,port,view_matrix) {
             var dt = time-time_old;
             var background_color=0.85
 
@@ -1749,6 +1785,13 @@
              mo_matrix[4] = 0,  mo_matrix[5] = 1,  mo_matrix[6] = 0,  mo_matrix[7] = 0,
              mo_matrix[8] = 0,  mo_matrix[9] = 0, mo_matrix[10] = 1, mo_matrix[11] = 0,
             mo_matrix[12] = 0, mo_matrix[13] = 0, mo_matrix[14] = 0, mo_matrix[15] = 1;
+
+            if(port!=0){
+              var i;
+              for(i=0; i<16; i++){
+                mo_matrix[i] = view_matrix[i];
+              }
+            }
 
 // rotate 90 deg to be consistent with smokeview
             rotateX(mo_matrix, -1.57078);
