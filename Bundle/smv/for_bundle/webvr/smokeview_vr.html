@@ -227,6 +227,7 @@
          /*=================== onResize =================== */
 
       function onResize () {
+        alert('in onResize');
         if (vrDisplay && vrDisplay.isPresenting) {
           // If we're presenting we want to use the drawing buffer size
           // recommended by the VRDevice, since that will ensure the best
@@ -1780,10 +1781,10 @@
             gl.viewport(0, 0, webglCanvas.width * 0.5, webglCanvas.height);
             gl.clearDepth(1.0);
             gl.clearColor(background_color, background_color, background_color, 1.0);
-            animate(t,-1, frameData.leftViewMatrix);
+            animate(t,-1, frameData.leftProjectionMatrix, frameData.leftViewMatrix);
 
             gl.viewport(webglCanvas.width * 0.5, 0, webglCanvas.width * 0.5, webglCanvas.height);
-            animate(t,1, frameData.rightViewMatrix);
+            animate(t,1, frameData.rightProjectionMatrix, frameData.rightViewMatrix);
 
             // If we're currently presenting to the VRDisplay we need to
             // explicitly indicate we're done rendering.
@@ -1811,7 +1812,7 @@
 
          /*=================== animate =================== */
 
-         function animate(time,port,view_matrix) {
+         function animate(time,port,proj_matrix, view_matrix) {
             var dt = time-time_old;
             background_color=0.85
 
@@ -1825,7 +1826,8 @@
             if(port!=0){
               var i;
               for(i=0; i<16; i++){
-                mo_matrix[i] = view_matrix[i];
+                vw_matrix[i] = view_matrix[i];
+                pr_matrix[i] = proj_matrix[i];
               }
             }
 
