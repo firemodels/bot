@@ -174,6 +174,69 @@
         VRSamplesUtil.addError("Your browser does not support WebVR. See <a href='http://webvr.info'>webvr.info</a> for assistance.");
       }
 
+      function onResize () {
+        if (vrDisplay && vrDisplay.isPresenting) {
+          // If we're presenting we want to use the drawing buffer size
+          // recommended by the VRDevice, since that will ensure the best
+          // results post-distortion.
+          var leftEye = vrDisplay.getEyeParameters("left");
+          var rightEye = vrDisplay.getEyeParameters("right");
+
+          // For simplicity we're going to render both eyes at the same size,
+          // even if one eye needs less resolution. You can render each eye at
+          // the exact size it needs, but you'll need to adjust the viewports to
+          // account for that.
+          webglCanvas.width = Math.max(leftEye.renderWidth, rightEye.renderWidth) * 2;
+          webglCanvas.height = Math.max(leftEye.renderHeight, rightEye.renderHeight);
+        } else {
+          // We only want to change the size of the canvas drawing buffer to
+          // match the window dimensions when we're not presenting.
+          webglCanvas.width = webglCanvas.offsetWidth * window.devicePixelRatio;
+          webglCanvas.height = webglCanvas.offsetHeight * window.devicePixelRatio;
+        }
+      }
+
+      // Listen for click events on the canvas, which may come from something
+      // like a Cardboard viewer or other VR controller, and make a small change
+      // to the scene in response (so that we know it's working.) This basic
+      // interaction mode is the baseline for all WebVR compatible devices, and
+      // should ideally always be minimally supported.
+      function onClick () {
+        // Reset the background color to a random value
+        if (gl) {
+          gl.clearColor(
+            Math.random() * 0.5,
+            Math.random() * 0.5,
+            Math.random() * 0.5, 1.0);
+        }
+      }
+
+      // Register for mouse restricted events while in VR
+      // (e.g. mouse no longer available on desktop 2D view)
+      function onDisplayPointerRestricted() {
+        if (webglCanvas && webglCanvas.requestPointerLock) {
+          webglCanvas.requestPointerLock();
+        }
+      }
+
+      // Register for mouse unrestricted events while in VR
+      // (e.g. mouse once again available on desktop 2D view)
+      function onDisplayPointerUnrestricted() {
+        var lock = document.pointerLockElement;
+        if (lock && lock === webglCanvas && document.exitPointerLock) {
+          document.exitPointerLock();
+        }
+      }
+
+      // This utility function monitors clicks from gamepads that are associated
+      // with a VRDisplay and fires the callback, providing "click" support for
+      // browsers that don't fire mouse click events on interaction.
+      VRSamplesUtil.addVRClickListener(onClick);
+
+      webglCanvas.addEventListener("click", onClick, false);
+      window.addEventListener('vrdisplaypointerrestricted', onDisplayPointerRestricted);
+      window.addEventListener('vrdisplaypointerunrestricted', onDisplayPointerUnrestricted);
+
          var show_slice_node=0;
          var slice_node_file_ready=0;
 
@@ -1621,6 +1684,58 @@
            window.requestAnimationFrame(render);
          }
          render(0);
+
+      function onAnimationFrame (t) {
+        // do not attempt to render if there is no available WebGL context
+        if (!gl) {
+          return;
+        }
+
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+        if (vrDisplay) {
+          // When presenting content to the VRDisplay we want to update at its
+          // refresh rate if it differs from the refresh rate of the main
+          // display. Calling VRDisplay.requestAnimationFrame ensures we render
+          // at the right speed for VR.
+          vrDisplay.requestAnimationFrame(onAnimationFrame);
+
+          // As a general rule you want to get the pose as late as possible
+          // and call VRDisplay.submitFrame as early as possible after
+          // retrieving the pose. Do any work for the frame that doesn't need
+          // to know the pose earlier to ensure the lowest latency possible.
+          //var pose = vrDisplay.getPose();
+          vrDisplay.getFrameData(frameData);
+
+          if (vrDisplay.isPresenting) {
+            // When presenting render a stereo view.
+            gl.viewport(0, 0, webglCanvas.width * 0.5, webglCanvas.height);
+            cubeSea.render(frameData.leftProjectionMatrix, frameData.leftViewMatrix, stats, t);
+
+            gl.viewport(webglCanvas.width * 0.5, 0, webglCanvas.width * 0.5, webglCanvas.height);
+            cubeSea.render(frameData.rightProjectionMatrix, frameData.rightViewMatrix, stats, t);
+
+            // If we're currently presenting to the VRDisplay we need to
+            // explicitly indicate we're done rendering.
+            vrDisplay.submitFrame();
+          } else {
+            // When not presenting render a mono view that still takes pose into
+            // account.
+            gl.viewport(0, 0, webglCanvas.width, webglCanvas.height);
+            // It's best to use our own projection matrix in this case, but we can use the left eye's view matrix
+            mat4.perspective(projectionMat, Math.PI*0.4, webglCanvas.width / webglCanvas.height, 0.1, 1024.0);
+            cubeSea.render(projectionMat, frameData.leftViewMatrix, stats, t);
+          }
+        } else {
+          window.requestAnimationFrame(onAnimationFrame);
+
+          // No VRDisplay found.
+          gl.viewport(0, 0, webglCanvas.width, webglCanvas.height);
+          mat4.perspective(projectionMat, Math.PI*0.4, webglCanvas.width / webglCanvas.height, 0.1, 1024.0);
+          mat4.identity(viewMat);
+          cubeSea.render(projectionMat, viewMat, stats, t);
+        }
+      }
 
          /*=================== animate =================== */
 
