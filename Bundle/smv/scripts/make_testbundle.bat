@@ -91,7 +91,7 @@ CALL :COPY %gettime%\get_time_64.exe                     %smvdir%\get_time.exe
 CALL :COPY %forbundle%\wrapup_smv_install_%platform%.bat %smvdir%\wrapup_smv_install.bat
 CALL :COPY %forbundle%\smokeview.ini                     %smvdir%\smokeview.ini
 CALL :COPY %forbundle%\smokeview.html                    %smvdir%\smokeview.html
-CALL :COPY %forbundle%\\webgl\smokeview_vr.html          %smvdir%\smokeview_vr.html
+CALL :COPY %forbundle%\\webvr\smokeview_vr.html          %smvdir%\smokeview_vr.html
 
 echo copying textures
 mkdir %smvdir%\textures

@@ -119,7 +119,7 @@ CP $FORBUNDLE       objects.svo       $PLATFORMDIR/$smvbin objects.svo
 CP $FORBUNDLE       smokeview.ini     $PLATFORMDIR/$smvbin smokeview.ini
 CP $FORBUNDLE       volrender.ssf     $PLATFORMDIR/$smvbin volrender.ssf
 CP $FORBUNDLE       smokeview.html    $PLATFORMDIR/$smvbin smokeview.html
-CP $FORBUNDLE/webgl smokeview_vr.html $PLATFORMDIR/$smvbin smokeview_vr.html
+CP $FORBUNDLE/webvr smokeview_vr.html $PLATFORMDIR/$smvbin smokeview_vr.html
 CP $WEBGLDIR        runsmv_ssh.sh     $PLATFORMDIR/$smvbin runsmv_ssh.sh
 CP $WEBGLDIR        smv2html.sh       $PLATFORMDIR/$smvbin smv2html.sh
 
