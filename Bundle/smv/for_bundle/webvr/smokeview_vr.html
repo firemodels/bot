@@ -34,7 +34,6 @@
 -->
 <p>
 <button onclick="Reset()">Reset View</button>
-<button onclick="EnterVR()">Enter VR</button>
 <br>
 <button onclick="show_blockages=ShowHide(show_blockages)">blockages</button>
 <button onclick="show_geom=ShowHide(show_geom)">geometry</button>
@@ -152,7 +151,7 @@
             // On devices with an external display the UA may not provide a way
             // to exit VR presentation mode, so we should provide one ourselves.
             VRSamplesUtil.removeButton(vrPresentButton);
-            vrPresentButton = VRSamplesUtil.addButton("Exit VR", "E", "media/icons/cardboard64.png", onVRExitPresent);
+            vrPresentButton = VRSamplesUtil.addButton("Exit VR", "E", "icons/cardboard64.png", onVRExitPresent);
           }
         }
         else {
@@ -163,7 +162,7 @@
             presentingMessage.style.display = "";
             alert('enter vr (onVRPresentChange)');
             VRSamplesUtil.removeButton(vrPresentButton);
-            vrPresentButton = VRSamplesUtil.addButton("Enter VR", "E", "media/icons/cardboard64.png", onVRRequestPresent);
+            vrPresentButton = VRSamplesUtil.addButton("Enter VR", "E", "icons/cardboard64.png", onVRRequestPresent);
           }
         }
       }
@@ -183,7 +182,7 @@
             // before adding UI that advertises VR features.
             if (vrDisplay.capabilities.canPresent)
               alert('enter vr (after frameData)');
-              vrPresentButton = VRSamplesUtil.addButton("Enter VR", "E", "media/icons/cardboard64.png", onVRRequestPresent);
+              vrPresentButton = VRSamplesUtil.addButton("Enter VR", "E", "icons/cardboard64.png", onVRRequestPresent);
 
             // For the benefit of automated testing. Safe to ignore.
             if (vrDisplay.capabilities.canPresent && WGLUUrl.getBool('canvasClickPresents', false))
@@ -317,8 +316,6 @@
          var show_blockages=0;
          var show_geom=0;
          var nframes=1;
-
-         var scene_vr = 0;
 
 // defining and storing the geometry
 
@@ -1718,12 +1715,6 @@
            dKEYz=0;
          }
 
-         /*=================== EnterVr =================== */
-
-         function EnterVR(option) {
-           scene_vr = 1 - scene_vr;
-         }
-
          /*=================== ShowHide =================== */
 
          function ShowHide(show_var) {
@@ -1734,18 +1725,6 @@
          var time_old = 0;
          var iframe = 0;
          var time_option=3;
-
-         function render(time){
-           if(scene_vr == 1){
-             animate(time,-1);
-             animate(time,1);
-           }
-           else{
-             animate(time,0);
-           }
-           window.requestAnimationFrame(render);
-         }
-        // render(0);
 
          /*=================== onAnimationFrame =================== */
 
