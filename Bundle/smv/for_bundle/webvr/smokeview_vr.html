@@ -2,28 +2,28 @@
 <html>
 <head>
 
-    <style>
-      #webgl-canvas, #presenting-message {
-        box-sizing: border-box;
-        height: 100%;
-        left: 0;
-        margin: 0;
-        position: absolute;
-        top: 0;
-        width: 100%;
-      }
-      #presenting-message {
-        color: white;
-        font-family: sans-serif;
-        font-size: 2em;
-        font-weight: bold;
-        z-index: 1;
-        text-align: center;
-        padding: 0.5em;
-        background-color: #444;
-        display: none;
-      }
-    </style>
+<style>
+  #webgl-canvas, #presenting-message {
+    box-sizing: border-box;
+    height: 100%;
+    left: 0;
+    margin: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+  }
+  #presenting-message {
+    color: white;
+    font-family: sans-serif;
+    font-size: 2em;
+    font-weight: bold;
+    z-index: 1;
+    text-align: center;
+    padding: 0.5em;
+    background-color: #444;
+    display: none;
+  }
+</style>
 
 <script src="js/gl-matrix-min.js"></script>
 <script src="js/vr-samples-util.js"></script>
@@ -87,7 +87,6 @@
            webglCanvas = document.getElementById('webSmokeview');
            gl = webglCanvas.getContext('experimental-webgl');
            if (!gl) {
-             alert("Your browser does not support webgl");
              return;
            }
            ext_32bit = gl.getExtension('OES_element_index_uint');
@@ -136,12 +135,9 @@
       function onVRPresentChange () {
         // When we begin or end presenting, the canvas should be resized to the
         // recommended dimensions for the display.
-        alert('in onVRPresentChange - before onResize');
         onResize();
-        alert('in onVRPresentChange - after onResize');
 
         if (vrDisplay.isPresenting) {
-          alert('isPresenting');
           if (vrDisplay.capabilities.hasExternalDisplay) {
             // Because we're not mirroring any images on an external screen will
             // freeze while presenting. It's better to replace it with a message
@@ -155,12 +151,10 @@
           }
         }
         else {
-          alert('not isPresenting');
           // If we have an external display take down the presenting message and
           // change the button back to "Enter VR".
           if (vrDisplay.capabilities.hasExternalDisplay) {
             presentingMessage.style.display = "";
-            alert('enter vr (onVRPresentChange)');
             VRSamplesUtil.removeButton(vrPresentButton);
             vrPresentButton = VRSamplesUtil.addButton("Enter VR", "E", "icons/cardboard64.png", onVRRequestPresent);
           }
@@ -181,7 +175,6 @@
             // you know the user has a VRDisplay capable of presenting connected
             // before adding UI that advertises VR features.
             if (vrDisplay.capabilities.canPresent)
-              alert('enter vr (after frameData)');
               vrPresentButton = VRSamplesUtil.addButton("Enter VR", "E", "icons/cardboard64.png", onVRRequestPresent);
 
             // For the benefit of automated testing. Safe to ignore.
@@ -222,7 +215,6 @@
          /*=================== onResize =================== */
 
       function onResize () {
-        alert('in onResize');
         if (vrDisplay && vrDisplay.isPresenting) {
           // If we're presenting we want to use the drawing buffer size
           // recommended by the VRDevice, since that will ensure the best
@@ -255,7 +247,6 @@
 
       function onClick () {
         // Reset the background color to a random value
-        alert('in onClick');
         if (gl) {
           gl.clearColor(
             Math.random() * 0.5,
@@ -270,7 +261,6 @@
          /*=================== onDisplayPointerRestricted =================== */
 
       function onDisplayPointerRestricted() {
-        alert('in onDisplayPointerRestricted');
         if (webglCanvas && webglCanvas.requestPointerLock) {
           webglCanvas.requestPointerLock();
         }
@@ -282,7 +272,6 @@
          /*=================== onDisplayPointerUnrestricted =================== */
 
       function onDisplayPointerUnrestricted() {
-        alert('in onDisplayPointerUnrestricted');
         var lock = document.pointerLockElement;
         if (lock && lock === webglCanvas && document.exitPointerLock) {
           document.exitPointerLock();
