@@ -101,8 +101,9 @@ cd hash
 cat *.sha1              >  %uploads%\%zipbase%.sha1
 cd %curdir%
 
-CALL :COPY  %forbundle%\smokeview.html %smvdir%\smokeview.html
-CALL :COPY  %forbundle%\smokeview.ini  %smvdir%\smokeview.ini
+CALL :COPY  %forbundle%\smokeview.html          %smvdir%\smokeview.html
+CALL :COPY  %forbundle%\webvr\smokeview_vr.html %smvdir%\smokeview_vr.html
+CALL :COPY  %forbundle%\smokeview.ini           %smvdir%\smokeview.ini
 
 echo copying textures
 mkdir %smvdir%\textures

@@ -1,12 +1,39 @@
 <!doctype html>
 <html>
+<head>
+
+<style>
+  #webgl-canvas, #presenting-message {
+    box-sizing: border-box;
+    height: 100%;
+    left: 0;
+    margin: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+  }
+  #presenting-message {
+    color: white;
+    font-family: sans-serif;
+    font-size: 2em;
+    font-weight: bold;
+    z-index: 1;
+    text-align: center;
+    padding: 0.5em;
+    background-color: #444;
+    display: none;
+  }
+</style>
+
+<script src="js/gl-matrix-min.js"></script>
+<script src="js/vr-samples-util.js"></script>
+</head>
 <body>
 <!--***CANVAS
 //HIDE_ON
 -->
 <p>
 <button onclick="Reset()">Reset View</button>
-<button onclick="EnterVR()">Enter VR</button>
 <br>
 <button onclick="show_blockages=ShowHide(show_blockages)">blockages</button>
 <button onclick="show_geom=ShowHide(show_geom)">geometry</button>
@@ -22,23 +49,243 @@
 <button onclick="SetTime(1)">> </button>
 <button onclick="SetTime(2)">>> </button><br>
 <p><canvas width = "570" height = "570" id = "webSmokeview"></canvas>
+<div id="presenting-message">Put on your headset now</div>
+
 <!--
 //HIDE_OFF -->
 
 <script>
 
-// creating a canvas
+      var vrDisplay = null;
+      var frameData = null;
+      var vrPresentButton = null;
+      var presentingMessage = document.getElementById("presenting-message");
+
+      var projectionMat = mat4.create();
+      var viewMat = mat4.create();
+
+         /*=================== onContextLost =================== */
+
+      function onContextLost( event ) {
+        event.preventDefault();
+        gl = null;
+      }
+
+         /*=================== onContextRestored =================== */
+
+      function onContextRestored( event ) {
+        initWebGL();
+      }
+
+      var webglCanvas = document.getElementById("webSmokeview");
+      webglCanvas.addEventListener( 'webglcontextlost', onContextLost, false );
+      webglCanvas.addEventListener( 'webglcontextrestored', onContextRestored, false );
+
+         /*=================== initWebGL =================== */
 
          function initWebGL() {
-           canvas = document.getElementById('webSmokeview');
-           gl = canvas.getContext('experimental-webgl');
+           webglCanvas = document.getElementById('webSmokeview');
+           gl = webglCanvas.getContext('experimental-webgl');
            if (!gl) {
-             alert("Your browser does not support webgl");
              return;
            }
            ext_32bit = gl.getExtension('OES_element_index_uint');
+          window.addEventListener("resize", onResize, false);
+          onResize();
          }
          initWebGL();
+
+         /*=================== onVRRequestPresent =================== */
+
+      function onVRRequestPresent () {
+        // This can only be called in response to a user gesture.
+        vrDisplay.requestPresent([{ source: webglCanvas }]).then(function () {
+          // Nothing to do because we're handling things in onVRPresentChange.
+        }, function (err) {
+          var errMsg = "requestPresent failed.";
+          if (err && err.message) {
+            errMsg += "<br/>" + err.message
+          }
+          VRSamplesUtil.addError(errMsg, 2000);
+        });
+      }
+
+         /*=================== onVRExitPresent =================== */
+
+      function onVRExitPresent () {
+        // No sense in exiting presentation if we're not actually presenting.
+        // (This may happen if we get an event like vrdisplaydeactivate when
+        // we weren't presenting.)
+        if (!vrDisplay.isPresenting)
+          return;
+
+        vrDisplay.exitPresent().then(function () {
+          // Nothing to do because we're handling things in onVRPresentChange.
+        }, function (err) {
+          var errMsg = "exitPresent failed.";
+          if (err && err.message) {
+            errMsg += "<br/>" + err.message
+          }
+          VRSamplesUtil.addError(errMsg, 2000);
+        });
+      }
+
+         /*=================== onVRPresentChange =================== */
+
+      function onVRPresentChange () {
+        // When we begin or end presenting, the canvas should be resized to the
+        // recommended dimensions for the display.
+        onResize();
+
+        if (vrDisplay.isPresenting) {
+          if (vrDisplay.capabilities.hasExternalDisplay) {
+            // Because we're not mirroring any images on an external screen will
+            // freeze while presenting. It's better to replace it with a message
+            // indicating that content is being shown on the VRDisplay.
+            presentingMessage.style.display = "block";
+
+            // On devices with an external display the UA may not provide a way
+            // to exit VR presentation mode, so we should provide one ourselves.
+            VRSamplesUtil.removeButton(vrPresentButton);
+            vrPresentButton = VRSamplesUtil.addButton("Exit VR", "E", "icons/cardboard64.png", onVRExitPresent);
+          }
+        }
+        else {
+          // If we have an external display take down the presenting message and
+          // change the button back to "Enter VR".
+          if (vrDisplay.capabilities.hasExternalDisplay) {
+            presentingMessage.style.display = "";
+            VRSamplesUtil.removeButton(vrPresentButton);
+            vrPresentButton = VRSamplesUtil.addButton("Enter VR", "E", "icons/cardboard64.png", onVRRequestPresent);
+          }
+        }
+      }
+
+      if (navigator.getVRDisplays) {
+
+        frameData = new VRFrameData();
+
+        navigator.getVRDisplays().then(function (displays) {
+          if (displays.length > 0) {
+            vrDisplay = displays[displays.length - 1];
+            vrDisplay.depthNear = 0.1;
+            vrDisplay.depthFar = 1024.0;
+
+            // Generally, you want to wait until VR support is confirmed and
+            // you know the user has a VRDisplay capable of presenting connected
+            // before adding UI that advertises VR features.
+            if (vrDisplay.capabilities.canPresent)
+              vrPresentButton = VRSamplesUtil.addButton("Enter VR", "E", "icons/cardboard64.png", onVRRequestPresent);
+
+            // For the benefit of automated testing. Safe to ignore.
+            if (vrDisplay.capabilities.canPresent && WGLUUrl.getBool('canvasClickPresents', false))
+              webglCanvas.addEventListener("click", onVRRequestPresent, false);
+
+            // The UA may kick us out of VR present mode for any reason, so to
+            // ensure we always know when we begin/end presenting we need to
+            // listen for vrdisplaypresentchange events.
+            window.addEventListener('vrdisplaypresentchange', onVRPresentChange, false);
+
+            // These events fire when the user agent has had some indication that
+            // it would be appropariate to enter or exit VR presentation mode, such
+            // as the user putting on a headset and triggering a proximity sensor.
+            // You can inspect the `reason` property of the event to learn why the
+            // event was fired, but in this case we're going to always trust the
+            // event and enter or exit VR presentation mode when asked.
+            window.addEventListener('vrdisplayactivate', onVRRequestPresent, false);
+            window.addEventListener('vrdisplaydeactivate', onVRExitPresent, false);
+          }
+          else{
+            VRSamplesUtil.addInfo("WebVR supported, but no VRDisplays found.", 3000);
+          }
+        },
+        function () {
+          VRSamplesUtil.addError("Your browser does not support WebVR. See <a href='http://webvr.info'>webvr.info</a> for assistance.");
+        });
+      }
+      else if (navigator.getVRDevices) {
+
+        VRSamplesUtil.addError("Your browser supports WebVR but not the latest version. See <a href='http://webvr.info'>webvr.info</a> for more info.");
+      }
+      else{
+
+        VRSamplesUtil.addError("Your browser does not support WebVR. See <a href='http://webvr.info'>webvr.info</a> for assistance.");
+      }
+
+         /*=================== onResize =================== */
+
+      function onResize () {
+        if (vrDisplay && vrDisplay.isPresenting) {
+          // If we're presenting we want to use the drawing buffer size
+          // recommended by the VRDevice, since that will ensure the best
+          // results post-distortion.
+          var leftEye = vrDisplay.getEyeParameters("left");
+          var rightEye = vrDisplay.getEyeParameters("right");
+
+          // For simplicity we're going to render both eyes at the same size,
+          // even if one eye needs less resolution. You can render each eye at
+          // the exact size it needs, but you'll need to adjust the viewports to
+          // account for that.
+          webglCanvas.width = Math.max(leftEye.renderWidth, rightEye.renderWidth) * 2;
+          webglCanvas.height = Math.max(leftEye.renderHeight, rightEye.renderHeight);
+        }
+        else {
+          // We only want to change the size of the canvas drawing buffer to
+          // match the window dimensions when we're not presenting.
+          webglCanvas.width = webglCanvas.offsetWidth * window.devicePixelRatio;
+          webglCanvas.height = webglCanvas.offsetHeight * window.devicePixelRatio;
+        }
+      }
+
+      // Listen for click events on the canvas, which may come from something
+      // like a Cardboard viewer or other VR controller, and make a small change
+      // to the scene in response (so that we know it's working.) This basic
+      // interaction mode is the baseline for all WebVR compatible devices, and
+      // should ideally always be minimally supported.
+
+         /*=================== onClick =================== */
+
+      function onClick () {
+        // Reset the background color to a random value
+        if (gl) {
+          gl.clearColor(
+            Math.random() * 0.5,
+            Math.random() * 0.5,
+            Math.random() * 0.5, 1.0);
+        }
+      }
+
+      // Register for mouse restricted events while in VR
+      // (e.g. mouse no longer available on desktop 2D view)
+
+         /*=================== onDisplayPointerRestricted =================== */
+
+      function onDisplayPointerRestricted() {
+        if (webglCanvas && webglCanvas.requestPointerLock) {
+          webglCanvas.requestPointerLock();
+        }
+      }
+
+      // Register for mouse unrestricted events while in VR
+      // (e.g. mouse once again available on desktop 2D view)
+
+         /*=================== onDisplayPointerUnrestricted =================== */
+
+      function onDisplayPointerUnrestricted() {
+        var lock = document.pointerLockElement;
+        if (lock && lock === webglCanvas && document.exitPointerLock) {
+          document.exitPointerLock();
+        }
+      }
+
+      // This utility function monitors clicks from gamepads that are associated
+      // with a VRDisplay and fires the callback, providing "click" support for
+      // browsers that don't fire mouse click events on interaction.
+      VRSamplesUtil.addVRClickListener(onClick);
+
+      webglCanvas.addEventListener("click", onClick, false);
+      window.addEventListener('vrdisplaypointerrestricted', onDisplayPointerRestricted);
+      window.addEventListener('vrdisplaypointerunrestricted', onDisplayPointerUnrestricted);
 
          var show_slice_node=0;
          var slice_node_file_ready=0;
@@ -58,8 +305,6 @@
          var show_blockages=0;
          var show_geom=0;
          var nframes=1;
-
-         var scene_vr = 0;
 
 // defining and storing the geometry
 
@@ -994,12 +1239,12 @@
          }
 
          var projection_angle=10.0;
-         var proj_matrix = get_projection(projection_angle, canvas.width/canvas.height, 1, 100);
+         var pr_matrix = get_projection(projection_angle, webglCanvas.width/webglCanvas.height, 1, 100);
          var mo_matrix =     [ 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 ];
-         var view_matrix =   [ 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 ];
+         var vw_matrix =     [ 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 ];
          var normal_matrix = [ 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 ];
 
-         view_matrix[14] -= 7.0;
+         vw_matrix[14] -= 7.0;
 
          /*================= Events ======================*/
 
@@ -1103,29 +1348,29 @@
               new_y = e.touches[0].pageY;
             }
             if (alt_key == 0 && ctrl_key == 0){
-              dX = (new_x-old_x)*2*Math.PI/canvas.width,
-              dY = (new_y-old_y)*2*Math.PI/canvas.height;
+              dX = (new_x-old_x)*2*Math.PI/webglCanvas.width,
+              dY = (new_y-old_y)*2*Math.PI/webglCanvas.height;
               THETA+= dX;
               PHI+=dY;
             }
             else if(alt_key==1){
               if(touch_mode==1){
-                dX = (new_x-old_x)/canvas.width,
+                dX = (new_x-old_x)/webglCanvas.width,
                 dKEYx -= 3*dX;
               }
-              dY = (new_y-old_y)/canvas.height;
+              dY = (new_y-old_y)/webglCanvas.height;
               dKEYz += 3*dY;
             }
             else{ // ctrl_key==1
               if(using_touch==0){
-                dX = (new_x-old_x)/canvas.width,
+                dX = (new_x-old_x)/webglCanvas.width,
                 dKEYx -= 3*dX;
-                dY = (new_y-old_y)/canvas.height;
+                dY = (new_y-old_y)/webglCanvas.height;
                 dKEYy += 3*dY;
               }
               else{
                 if(prev_dist>0){
-                  dY = 3*(cur_dist-prev_dist)/canvas.height;
+                  dY = 3*(cur_dist-prev_dist)/webglCanvas.height;
                   dKEYy -= dY;
                 }
               }
@@ -1148,17 +1393,17 @@
 
          /*=================== register callbacks =================== */
 
-         canvas.addEventListener("mousedown", mouseDown, false);
-         canvas.addEventListener("mouseup",   mouseUp, false);
-         canvas.addEventListener("mouseout",  mouseUp, false);
-         canvas.addEventListener("mousemove", mouseMove, false);
+         webglCanvas.addEventListener("mousedown", mouseDown, false);
+         webglCanvas.addEventListener("mouseup",   mouseUp, false);
+         webglCanvas.addEventListener("mouseout",  mouseUp, false);
+         webglCanvas.addEventListener("mousemove", mouseMove, false);
 
-         canvas.addEventListener("touchstart",  mouseDown, false);
-         canvas.addEventListener("touchmove",   mouseMove, false);
-         canvas.addEventListener("touchend",    mouseUp,   false);
-         canvas.addEventListener("touchcancel", mouseUp,  false);
+         webglCanvas.addEventListener("touchstart",  mouseDown, false);
+         webglCanvas.addEventListener("touchmove",   mouseMove, false);
+         webglCanvas.addEventListener("touchend",    mouseUp,   false);
+         webglCanvas.addEventListener("touchcancel", mouseUp,  false);
 
-         canvas.addEventListener("deviceorientation", handleOrientation, false);
+         webglCanvas.addEventListener("deviceorientation", handleOrientation, false);
 
 
        //  M =   R  T  =  m0 m4  m8 m12  (R == orthogonal rotation matrix, T == translation vector)
@@ -1459,12 +1704,6 @@
            dKEYz=0;
          }
 
-         /*=================== EnterVr =================== */
-
-         function EnterVR(option) {
-           scene_vr = 1 - scene_vr;
-         }
-
          /*=================== ShowHide =================== */
 
          function ShowHide(show_var) {
@@ -1476,23 +1715,70 @@
          var iframe = 0;
          var time_option=3;
 
-         function render(time){
-           if(scene_vr == 1){
-             animate(time,-1);
-             animate(time,1);
-           }
-           else{
-             animate(time,0);
-           }
-           window.requestAnimationFrame(render);
-         }
-         render(0);
+         /*=================== onAnimationFrame =================== */
+
+      function onAnimationFrame (t) {
+        // do not attempt to render if there is no available WebGL context
+        if (!gl) {
+          return;
+        }
+
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        gl.enable(gl.DEPTH_TEST);
+
+        if (vrDisplay) {
+          // When presenting content to the VRDisplay we want to update at its
+          // refresh rate if it differs from the refresh rate of the main
+          // display. Calling VRDisplay.requestAnimationFrame ensures we render
+          // at the right speed for VR.
+          vrDisplay.requestAnimationFrame(onAnimationFrame);
+
+          // As a general rule you want to get the pose as late as possible
+          // and call VRDisplay.submitFrame as early as possible after
+          // retrieving the pose. Do any work for the frame that doesn't need
+          // to know the pose earlier to ensure the lowest latency possible.
+          //var pose = vrDisplay.getPose();
+          vrDisplay.getFrameData(frameData);
+
+          if (vrDisplay.isPresenting) {
+            // When presenting render a stereo view.
+            gl.viewport(0, 0, webglCanvas.width * 0.5, webglCanvas.height);
+            gl.clearDepth(1.0);
+            gl.clearColor(background_color, background_color, background_color, 1.0);
+            animate(t,-1, frameData.leftProjectionMatrix, frameData.leftViewMatrix);
+
+            gl.viewport(webglCanvas.width * 0.5, 0, webglCanvas.width * 0.5, webglCanvas.height);
+            animate(t,1, frameData.rightProjectionMatrix, frameData.rightViewMatrix);
+
+            // If we're currently presenting to the VRDisplay we need to
+            // explicitly indicate we're done rendering.
+            vrDisplay.submitFrame();
+          }
+          else {
+            // When not presenting render a mono view that still takes pose into
+            // account.
+            gl.viewport(0, 0, webglCanvas.width, webglCanvas.height);
+            // It's best to use our own projection matrix in this case, but we can use the left eye's view matrix
+            mat4.perspective(projectionMat, Math.PI*0.4, webglCanvas.width / webglCanvas.height, 0.1, 1024.0);
+          }
+        }
+        else {
+          window.requestAnimationFrame(onAnimationFrame);
+
+          // No VRDisplay found.
+          gl.viewport(0, 0, webglCanvas.width, webglCanvas.height);
+          mat4.perspective(projectionMat, Math.PI*0.4, webglCanvas.width / webglCanvas.height, 0.1, 1024.0);
+          mat4.identity(viewMat);
+          animate(t,0, viewMat);
+        }
+      }
+      onAnimationFrame(0);
 
          /*=================== animate =================== */
 
-         function animate(time,port) {
+         function animate(time,port,proj_matrix, view_matrix) {
             var dt = time-time_old;
-            var background_color=0.85
+            background_color=0.85
 
             //set model matrix to the identity
 
@@ -1501,13 +1787,16 @@
              mo_matrix[8] = 0,  mo_matrix[9] = 0, mo_matrix[10] = 1, mo_matrix[11] = 0,
             mo_matrix[12] = 0, mo_matrix[13] = 0, mo_matrix[14] = 0, mo_matrix[15] = 1;
 
+            if(port!=0){
+              var i;
+              for(i=0; i<16; i++){
+                vw_matrix[i] = view_matrix[i];
+                pr_matrix[i] = proj_matrix[i];
+              }
+            }
+
 // rotate 90 deg to be consistent with smokeview
             rotateX(mo_matrix, -1.57078);
-
-// scale scene by 1/2 if in VR mode
-            if(port != 0){
-              scaleZ(mo_matrix,0.5);
-            }
 
 // scale and translate to be consistent with smokeview
             var scale=1.5;
@@ -1528,34 +1817,13 @@
             normal_matrix = mat_transpose(normal_matrix);
 
             time_old = time;
-            gl.enable(gl.DEPTH_TEST);
-
-            if(port!=1){
-              gl.clearColor(background_color, background_color, background_color, 1.0);
-              gl.clearDepth(1.0);
-            }
-            if(port==-1){
-              //let frameData = new VRFrameData()
-              //let vrDisplay.getFrameData(frameData);
-              gl.viewport(0.0, 0.0, canvas.width/2, canvas.height);
-              gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-            }
-            else if(port==0){
-              gl.viewport(0.0, 0.0, canvas.width, canvas.height);
-              gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-            }
-            else if(port==1){
-              //let frameData = new VRFrameData()
-             // let vrDisplay.getFrameData(frameData);
-              gl.viewport(canvas.width/2, 0.0, canvas.width/2, canvas.height);
-            }
 
 // draw blockage triangles
 
             if(show_blockages==1){
               gl.useProgram(shaderprogram_obst_lit);
-              gl.uniformMatrix4fv(_Pmatrix_obst_lit, false, proj_matrix);
-              gl.uniformMatrix4fv(_Vmatrix_obst_lit, false, view_matrix);
+              gl.uniformMatrix4fv(_Pmatrix_obst_lit, false, pr_matrix);
+              gl.uniformMatrix4fv(_Vmatrix_obst_lit, false, vw_matrix);
               gl.uniformMatrix4fv(_Mmatrix_obst_lit, false, mo_matrix);
               gl.uniformMatrix4fv(_normal_matrix_obst_lit, false, normal_matrix);
 
@@ -1588,8 +1856,8 @@
 
             if(show_geom==1){
               gl.useProgram(shaderprogram_geom_lit);
-              gl.uniformMatrix4fv(_Pmatrix_geom_lit, false, proj_matrix);
-              gl.uniformMatrix4fv(_Vmatrix_geom_lit, false, view_matrix);
+              gl.uniformMatrix4fv(_Pmatrix_geom_lit, false, pr_matrix);
+              gl.uniformMatrix4fv(_Vmatrix_geom_lit, false, vw_matrix);
               gl.uniformMatrix4fv(_Mmatrix_geom_lit, false, mo_matrix);
               gl.uniformMatrix4fv(_normal_matrix_geom_lit, false, normal_matrix);
 
@@ -1622,8 +1890,8 @@
 
             if(slice_node_file_ready==1&&show_slice_node==1){
               gl.useProgram(shaderprogram_slice_node);
-              gl.uniformMatrix4fv(_Pmatrix_slice_node, false, proj_matrix);
-              gl.uniformMatrix4fv(_Vmatrix_slice_node, false, view_matrix);
+              gl.uniformMatrix4fv(_Pmatrix_slice_node, false, pr_matrix);
+              gl.uniformMatrix4fv(_Vmatrix_slice_node, false, vw_matrix);
               gl.uniformMatrix4fv(_Mmatrix_slice_node, false, mo_matrix);
 
               gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_slice_node);
@@ -1657,8 +1925,8 @@
 
             if(slice_cell_file_ready==1&&show_slice_cell==1){
               gl.useProgram(shaderprogram_slice_cell);
-              gl.uniformMatrix4fv(_Pmatrix_slice_cell, false, proj_matrix);
-              gl.uniformMatrix4fv(_Vmatrix_slice_cell, false, view_matrix);
+              gl.uniformMatrix4fv(_Pmatrix_slice_cell, false, pr_matrix);
+              gl.uniformMatrix4fv(_Vmatrix_slice_cell, false, vw_matrix);
               gl.uniformMatrix4fv(_Mmatrix_slice_cell, false, mo_matrix);
 
               gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_slice_cell);
@@ -1692,8 +1960,8 @@
 
             if(slice_geom_file_ready==1&&show_slice_geom==1){
               gl.useProgram(shaderprogram_slice_geom);
-              gl.uniformMatrix4fv(_Pmatrix_slice_geom, false, proj_matrix);
-              gl.uniformMatrix4fv(_Vmatrix_slice_geom, false, view_matrix);
+              gl.uniformMatrix4fv(_Pmatrix_slice_geom, false, pr_matrix);
+              gl.uniformMatrix4fv(_Vmatrix_slice_geom, false, vw_matrix);
               gl.uniformMatrix4fv(_Mmatrix_slice_geom, false, mo_matrix);
 
               gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_slice_geom);
@@ -1728,8 +1996,8 @@
 
             if(bndf_node_file_ready==1&&show_bndf_node==1){
               gl.useProgram(shaderprogram_bndf_node);
-              gl.uniformMatrix4fv(_Pmatrix_bndf_node, false, proj_matrix);
-              gl.uniformMatrix4fv(_Vmatrix_bndf_node, false, view_matrix);
+              gl.uniformMatrix4fv(_Pmatrix_bndf_node, false, pr_matrix);
+              gl.uniformMatrix4fv(_Vmatrix_bndf_node, false, vw_matrix);
               gl.uniformMatrix4fv(_Mmatrix_bndf_node, false, mo_matrix);
 
               gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_bndf_node);
@@ -1763,8 +2031,8 @@
 
             if(show_outlines==1){
               gl.useProgram(shaderprogram_line);
-              gl.uniformMatrix4fv(_Pmatrix_line, false, proj_matrix);
-              gl.uniformMatrix4fv(_Vmatrix_line, false, view_matrix);
+              gl.uniformMatrix4fv(_Pmatrix_line, false, pr_matrix);
+              gl.uniformMatrix4fv(_Vmatrix_line, false, vw_matrix);
               gl.uniformMatrix4fv(_Mmatrix_line, false, mo_matrix);
               gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_line);
               var _position_line = gl.getAttribLocation(shaderprogram_line, "position");
@@ -1789,8 +2057,8 @@
 
             if(part_file_ready==1&&show_part==1){
               gl.useProgram(shaderprogram_part);
-              gl.uniformMatrix4fv(_Pmatrix_part, false, proj_matrix);
-              gl.uniformMatrix4fv(_Vmatrix_part, false, view_matrix);
+              gl.uniformMatrix4fv(_Pmatrix_part, false, pr_matrix);
+              gl.uniformMatrix4fv(_Vmatrix_part, false, vw_matrix);
               gl.uniformMatrix4fv(_Mmatrix_part, false, mo_matrix);
               gl.bindBuffer(gl.ARRAY_BUFFER, buffer_vertices_part);
               var _position_part = gl.getAttribLocation(shaderprogram_part, "position");

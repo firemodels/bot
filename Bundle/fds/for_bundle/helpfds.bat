@@ -1,5 +1,5 @@
 @echo off
-echo.
+fds -v
 echo Current number of OpenMP threads per MPI process:
 echo OMP_NUM_THREADS=%OMP_NUM_THREADS%
 echo.
