@@ -38,8 +38,8 @@ goto:eof
 call %envfile%
 :endif_env_defined
 
-set      in_impi=%userprofile%\fire-notes\INSTALL\LIBS\RUNTIME\MPI_%INTELVERSION%
-set in_intel_dll=%userprofile%\fire-notes\INSTALL\LIBS\WINDOWS\%INTELVERSION%
+set      in_impi=%userprofile%\fnotes\BUNDLE\WINDOWS\%INTELVERSION%
+set in_intel_dll=%userprofile%\fnotes\BUNDLE\WINDOWS\%INTELVERSION%
 
 set basename=%fds_version%-%smv_version%_win64
 set hashfile=%repo_root%\smv\Build\hashfile\intel_win_64\hashfile_win_64.exe
@@ -50,9 +50,8 @@ if NOT exist %hashfile% (
 )
 
 set in_pdf=%userprofile%\.bundle\pubs
-set in_shortcut=%userprofile%\fire-notes\INSTALL\repoexes
+set in_shortcut=%userprofile%\fnotes\BUNDLE\WINDOWS\repoexes
 set smv_forbundle=%repo_root%\bot\Bundle\smv\for_bundle
-
 
 set basedir=%upload_dir%\%basename%
 
