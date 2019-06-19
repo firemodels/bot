@@ -34,6 +34,7 @@ set webgldir=%svn_root%\bot\Bundle\smv\for_bundle\webgl
 set sh2bat=%svn_root%\smv\Build\sh2bat\intel_win_64
 set gettime=%svn_root%\smv\Build\get_time\intel_win_64
 set smvbuild=%svn_root%\smv\Build
+set repoexes=%userprofile%\fnotes\BUNDLE\WINDOWS\repoexes
 
 cd %forbundle%
 
@@ -68,6 +69,7 @@ CALL :COPY %smvbuild%\smokediff\intel_win_%platform%\smokediff_win_%platform%.ex
 CALL :COPY %smvbuild%\smokezip\intel_win_%platform%\smokezip_win_%platform%.exe   %smvdir%\smokezip.exe
 CALL :COPY %smvbuild%\timep\intel_win_%platform%\timep_win_%platform%.exe         %smvdir%\timep.exe
 CALL :COPY %smvbuild%\wind2fds\intel_win_%platform%\wind2fds_win_%platform%.exe   %smvdir%\wind2fds.exe
+CALL :COPY %repoexes%\openvr_api.dll                                              %smvdir%\openvr_api.dll
 
 set curdir=%CD%
 cd %smvdir%
