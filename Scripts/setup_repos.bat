@@ -12,7 +12,6 @@ if not exist ..\.gitbot goto skip1
    exit /b
 :endif1
 
-set tagrepos=fds smv cfast fds-smv
 set fdsrepos=exp fds fig out smv
 set smvrepos=cfast fds smv fig
 set cfastrepos=cfast exp smv fig
@@ -20,7 +19,6 @@ set allrepos= cfast cor exp fds fig out radcal smv cad
 set wikiwebrepos= fds.wiki fds-smv
 set repos=%fdsrepos%
 set WIKIWEB=0
-set tagrepo=0
 
 call :getopts %*
 if %stopscript% == 1 (
@@ -82,9 +80,6 @@ goto eof
      set WIKIWEB=1
   )
 
-  if "%tagrepo%" == "1" (
-     set repo_out=%repo_out%_tag
-  )
   set repo_dir=%FMROOT%\%repo_out%
   
 :: check if repo has been cloned locally
@@ -121,10 +116,8 @@ goto eof
   echo setting up remote tracking
   cd %repo_dir%
   git remote add firemodels %GITHEADER%firemodels/%repo%.git
-  if "%tagrepo%" == "1" goto skip_disable
-     git remote set-url --push firemodels DISABLE
-     git remote update
-  :skip_disable
+  git remote set-url --push firemodels DISABLE
+  git remote update
   exit /b
 
 :at_github
@@ -160,11 +153,6 @@ goto eof
    set valid=1
    set repos=%smvrepos%
  )
- if /I "%1" EQU "-t" (
-   set valid=1
-   set repos=%tagrepos%
-   set tagrepo=1
- )
  if /I "%1" EQU "-w" (
    set valid=1
    set repos=%wikiwebrepos%
@@ -192,8 +180,6 @@ echo -c - setup repos used by cfastbot: %cfastrepos%
 echo -f - setup repos used by firebot: %fdsrepos%
 echo -h - display this message%
 echo -s - setup repos used by smokebot: %smvrepos%
-echo -t - setup fds, smv and webpages repos that can be tagged
-echo      (have push access to firemodels)
 echo -w - setup wiki and webpage repos cloned from firemodels
 exit /b
 

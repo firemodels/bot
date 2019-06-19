@@ -12,9 +12,9 @@ echo "Verification and validation testing script for FDS"
 echo ""
 echo "Options"
 echo "-b - branch_name - run firebot using branch branch_name"
+echo "-B - only build apps"
 echo "-c - clean repo"
-echo "-C - commit validationbot output results"
-echo "-D - specify validation case list file"
+echo "-D - debug only"
 echo "-F - skip figures and document building stages"
 echo "-h - display this message"
 echo "-i - use installed version of smokeview"
@@ -23,44 +23,16 @@ echo "-J - use Intel MPI version of FDS"
 echo "-L - firebot lite,  run only stages that build a debug fds and run cases with it"
 echo "                    (no release fds, no release cases, no matlab, etc)"
 echo "-m email_address "
+echo "-N - don't copy Manuals directory to .firebot/Manuals"
 echo "-p pid_file - file containing process id of firebot process "
-echo "-P - commit and push validationbot outut results (not implemented)"
 echo "-q - queue_name - run cases using the queue queue_name"
 echo "     default: $QUEUE"
 echo "-Q - queue_name - run OpenMP cases using the queue queue_name"
 echo "-s - skip matlab and document building stages"
-echo "-S - show validation case list"
-echo "-T - build bundle"
 echo "-u - update repo"
 echo "-U - upload guides"
-echo "-V n - run Firebot in validation mode with a specified number "
-echo "       of processes dedicated to validation."
+echo "-W - clone fds, exp, fig, out and smv repos"
 exit
-}
-
-#---------------------------------------------
-#                   PROCESS
-#---------------------------------------------
-
-PROCESS()
-{
-  local case=$1
-  local curdir=`pwd`
-
-  cd $fdsrepo/Validation/$case
-  ./Process_Output.sh
-
-  if [ "$commit" == "1" ]; then
-    cd $outrepo/$case/FDS_Output_Files
-    git add *.csv *.txt
-    git commit -m "validationbot: commit $case results"
-  fi
-  if [ "$push" == "1" ]; then
-    cd $outrepo/$case/FDS_Output_Files
-    echo pushing updated $case results to github repo
-    # git push origin master
-  fi
-  cd $curdir
 }
 
 #---------------------------------------------
@@ -219,7 +191,7 @@ update_repo()
    local branch=$2
 
    CD_REPO $repo/$reponame $branch || return 1
-   
+
    echo "   $reponame" 
    echo Updating $branch on repo $repo/$reponame >> $OUTPUT_DIR/stage1 2>&1
    git fetch origin >> $OUTPUT_DIR/stage1 2>&1
@@ -238,19 +210,43 @@ update_repo()
       git submodule foreach git merge origin/master >> $OUTPUT_DIR/stage1 2>&1
       git status -uno  >> $OUTPUT_DIR/stage1 2>&1
    fi
+   return 0
+}
 
-   if [[ "$reponame" == "smv" ]]; then
-      git update-index --refresh
-      SMV_REVISION=`git describe --long --dirty`
-   fi
+#---------------------------------------------
+#                   get_smv_revision
+#---------------------------------------------
 
-   if [[ "$reponame" == "fds" ]]; then
-      git update-index --refresh
-      GIT_REVISION=`git describe --long --dirty`
-      GIT_SHORTHASH=`git rev-parse --short HEAD`
-      GIT_LONGHASH=`git rev-parse HEAD`
-      GIT_DATE=`git log -1 --format=%cd --date=local $GIT_SHORTHASH`
-   fi
+get_smv_revision()
+{
+   local branch=$1
+
+   CD_REPO $repo/smv $branch || return 1
+
+
+   git update-index --refresh
+   SMV_REVISION=`git describe --long --dirty`
+   SMV_MESSAGE=`git log . | head -5 | tail -1`
+   return 0
+}
+
+#---------------------------------------------
+#                   get_fds_revision
+#---------------------------------------------
+
+get_fds_revision()
+{
+   local branch=$1
+
+   CD_REPO $repo/fds $branch || return 1
+
+
+   git update-index --refresh
+   FDS_REVISION=`git describe --long --dirty`
+   FDS_SHORTHASH=`git rev-parse --short HEAD`
+   FDS_LONGHASH=`git rev-parse HEAD`
+   FDS_DATE=`git log -1 --format=%cd --date=local $FDS_SHORTHASH`
+   FDS_MESSAGE=`git log . | head -5 | tail -1`
    return 0
 }
 
@@ -282,7 +278,7 @@ check_git_checkout()
 
 archive_compiler_version()
 {
-   ifort -V &> "$HISTORY_DIR/${GIT_REVISION}_compiler_info.txt"
+   ifort -V &> "$HISTORY_DIR/${FDS_REVISION}_compiler_info.txt"
 }
 
 #---------------------------------------------
@@ -370,109 +366,57 @@ check_compile_fds_mpi_db()
 compile_fds_mpi_gnu_db()
 {
    # Clean and compile FDS MPI debug
-   echo "      MPI gfortran debug"
-   cd $fdsrepo/Build/mpi_gnu_${platform}${size}$DB
-   make -f ../makefile clean &> /dev/null
-   ./make_fds.sh &> $OUTPUT_DIR/stage2d
+   compile_gnu=
+   if [ "$OPENMPI_INTEL" != "" ]; then
+     if [ "$OPENMPI_GNU" != "" ]; then
+       module unload $OPENMPI_INTEL
+       module load $OPENMPI_GNU
+       echo "      MPI gfortran debug"
+       compile_gnu=1
+       cd $fdsrepo/Build/mpi_gnu_${platform}${size}$DB
+       make -f ../makefile clean &> /dev/null
+       ./make_fds.sh &> $OUTPUT_DIR/stage2d
+       module unload $OPENMPI_GNU
+       module load $OPENMPI_INTEL
+     fi
+   fi
 }
 
 #---------------------------------------------
 #                   check_compile_fds_mpi_gnu_db
 #---------------------------------------------
-
 check_compile_fds_mpi_gnu_db()
 {
+# force the gnu compile to pass until it can compile
+# fds with the findloc routine
+        FDS_gnu_debug_success=true
+}
+
+check_compile_fds_mpi_gnu_dbORIG()
+{
    # Check for errors in FDS MPI debug compilation
-   cd $fdsrepo/Build/mpi_gnu_${platform}${size}$DB
-   if [ -e "fds_mpi_gnu_${platform}${size}$DB" ]
-   then
-      FDS_debug_success=true
-   else
-      echo "Errors from Stage 2d - Compile gnu Fortran FDS MPI debug:" >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage2d >> $ERROR_LOG
-      echo "" >> $ERROR_LOG
+   if [ "$compile_gnu" == "1" ]; then
+     cd $fdsrepo/Build/mpi_gnu_${platform}${size}$DB
+     if [ -e "fds_mpi_gnu_${platform}${size}$DB" ]
+     then
+        FDS_gnu_debug_success=true
+     else
+        echo "Errors from Stage 2d - Compile gnu Fortran FDS MPI debug:" >> $ERROR_LOG
+        cat $OUTPUT_DIR/stage2d >> $ERROR_LOG
+        echo "" >> $ERROR_LOG
+     fi
+  
+     # Check for compiler warnings/remarks
+     if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage2d | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented'` == "" ]]
+     then
+        # Continue along
+        :
+     else
+        echo "Warnings from Stage 2d - Compile gnu Fortran FDS MPI debug:" >> $WARNING_LOG
+        grep -i -A 5 -E 'warning|remark' $OUTPUT_DIR/stage2d | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
+        echo "" >> $WARNING_LOG
    fi
-
-   # Check for compiler warnings/remarks
-   if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage2d | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented'` == "" ]]
-   then
-      # Continue along
-      :
-   else
-      echo "Warnings from Stage 2d - Compile gnu Fortran FDS MPI debug:" >> $WARNING_LOG
-      grep -i -A 5 -E 'warning|remark' $OUTPUT_DIR/stage2d | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
-      echo "" >> $WARNING_LOG
    fi
-}
-
-#---------------------------------------------
-#                   show_validation_list
-#---------------------------------------------
-
-show_validation_list()
-{
-   valdir=`pwd`
-   cd $fdsrepo/Utilities/Scripts
-
-   # List and sort validation sets in the fds/Validation/Process_All_Output.sh 
-   # script based on the modification date of the FDS_Output_Files. The result
-   # is an array of the validation sets ordered from oldest to newest.
-   ./make_validation_caselist.sh
-   cd $valdir
-}
-
-#---------------------------------------------
-#                   get_validation_set_list
-#---------------------------------------------
-
-get_validation_list()
-{
-   validation_list_file=$1
-   
-   valdir=`pwd`
-   cd $fdsrepo/Utilities/Scripts
-
-   # List and sort validation sets in the fds/Validation/Process_All_Output.sh 
-   # script based on the modification date of the FDS_Output_Files. The result
-   # is an array of the validation sets ordered from oldest to newest.
-   VALIDATION_SETS=(` cat $validation_list_file | awk -F"!" '{print $1}'`)
-   cd $valdir
-}
-
-#---------------------------------------------
-#                   generate_validation_list
-#---------------------------------------------
-
-generate_validation_list()
-{
-   valdir=`pwd`
-   cd $fdsrepo/Utilities/Scripts
-
-   # List and sort validation sets in the fds/Validation/Process_All_Output.sh 
-   # script based on the modification date of the FDS_Output_Files. The result
-   # is an array of the validation sets ordered from oldest to newest.
-   VALIDATION_SETS=(` ./make_validation_caselist.sh | awk -F"!" '{print $1}'`)
-   cd $valdir
-}
-
-#---------------------------------------------
-#                   commit_validation_results
-#---------------------------------------------
-
-commit_validation_results()
-{
-   echo "Summary"
-   echo "-------"
-   for SET in ${CURRENT_VALIDATION_SETS[*]}
-   do
-      # Copy new FDS files from Current_Results to FDS_Output_Files using Process_Output.sh 
-      # script for the validation set
-
-     PROCESS "$SET"
-   done
-
-   # cd to GIT root
-   cd $fdsrepo
 }
 
 #---------------------------------------------
@@ -529,67 +473,6 @@ run_verification_cases_debug()
 }
 
 #---------------------------------------------
-#                   check_current_utilization
-#---------------------------------------------
-
-check_current_utilization()
-{
-   # This function is used to determine if the number of current processes currently in use is greater than the
-   # number of specified maximum processes. If so, then no more cases are launched (LAUNCH_MORE_CASES=0).
-
-   sleep 60
-
-   # Reports the number of nodes currently in use by current user
-   NJOBS=`qstat -u $(whoami) | wc -l`
-   NUM_CURRENT_PROCESSES=0
-   if [ $NJOBS -gt 0 ]; then
-     NUM_CURRENT_PROCESSES=`qstat -u $(whoami) | sed 1,5d | awk '{print $7}' | paste -sd+ | bc`
-   fi
-   if [ $NUM_CURRENT_PROCESSES -gt $MAX_VALIDATION_PROCESSES ]; then
-      LAUNCH_MORE_CASES=0
-   fi
-}
-
-#---------------------------------------------
-#                   run_validation_cases_debug
-#---------------------------------------------
-
-run_validation_cases_debug()
-{
-   #  =============================================
-   #  = Run FDS validation cases for current sets =
-   #  =============================================
-
-   # Initialize array of current validation sets to run
-   CURRENT_VALIDATION_SETS=()
-   echo Running FDS Validation Cases
-   echo "   debug"
-
-   for SET in ${VALIDATION_SETS[*]}
-   do
-      # Check to see if maximum number of validation processes are in use
-      if [ $LAUNCH_MORE_CASES -eq 0 ]; then
-         break
-      fi
-
-      cd $fdsrepo/Validation/"$SET"
-
-      # Submit FDS validation cases and wait for them to start
-      echo "Running FDS validation cases for ${SET}:" >> $OUTPUT_DIR/stage4
-      echo "" >> $OUTPUT_DIR/stage4 2>&1
-      ./Run_All.sh -y -b -m 1 -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
-
-      CURRENT_VALIDATION_SETS+=($SET)
-
-      check_current_utilization
-   done
-
-   # Wait for validation cases to end
-   wait_cases_debug_end 'validation'
-}
-
-
-#---------------------------------------------
 #                   check_cases_debug
 #---------------------------------------------
 
@@ -605,6 +488,7 @@ check_cases_debug()
       [[ `grep -rI Segmentation *` == "" ]] && \
       [[ `grep -rI ERROR: *` == "" ]] && \
       [[ `grep -rI 'STOP: Numerical' *` == "" ]] && \
+      [[ `grep 'BAD TERMINATION' */*.log` == "" ]] && \
       [[ `grep -rI forrtl *` == "" ]]
    then
       cases_debug_success=true
@@ -613,6 +497,7 @@ check_cases_debug()
       grep -rI Segmentation * >> $OUTPUT_DIR/stage4_errors
       grep -rI ERROR: * >> $OUTPUT_DIR/stage4_errors
       grep -rI 'STOP: Numerical' * >> $OUTPUT_DIR/stage4_errors
+      grep -A 2 'BAD TERMINATION' */*.log >> $OUTPUT_DIR/stage4_errors
       grep -rI -A 20 forrtl * >> $OUTPUT_DIR/stage4_errors
       
       echo "Errors from Stage 4 - Run ${2} cases - debug mode:" >> $ERROR_LOG
@@ -623,20 +508,7 @@ check_cases_debug()
       echo "#/bin/bash" > $OUTPUT_DIR/stage4_filelist
 # comment out following line until verified that it works
 #      grep err: $OUTPUT_DIR/stage4_errors | awk -F':' '{ print "cp " $1 " /tmp/."}'  | sort -u >> $OUTPUT_DIR/stage4_filelist
-      if [ "$FIREBOT_MODE" == "verification" ] ; then
-        cd $fdsrepo/Verification
-      else
-        cd $fdsrepo/Validation
-      fi
-# comment out following line until verified that it works
-#      source $OUTPUT_DIR/stage4_filelist
-
-      # If errors encountered in validation mode, then email status and exit
-      if [ "$FIREBOT_MODE" == "validation" ] ; then
-         email_build_status 'Validationbot'
-         set_files_world_readable
-         exit
-      fi
+      cd $fdsrepo/Verification
    fi
 }
 
@@ -698,9 +570,64 @@ compile_smv_utilities()
      echo "   Smokeview"
      echo "      libraries"
      cd $smvrepo/Build/LIBS/intel_${platform}${size}
-     echo 'Building Smokeview libraries:' >> $OUTPUT_DIR/stage3a 2>&1
      ./make_LIBS.sh >> $OUTPUT_DIR/stage3a 2>&1
      echo "" >> $OUTPUT_DIR/stage3a 2>&1
+
+   # smokezip:
+     echo "      smokezip"
+     cd $smvrepo/Build/smokezip/${COMPILER}_${platform}${size}
+     rm -f *.o smokezip_${platform}${size}
+
+     ./make_smokezip.sh >> $OUTPUT_DIR/stage3a 2>&1
+     echo "" >> $OUTPUT_DIR/stage3a 2>&1
+
+   # smokediff:
+     echo "      smokediff"
+     cd $smvrepo/Build/smokediff/${COMPILER}_${platform}${size}
+     rm -f *.o smokediff_${platform}${size}
+     ./make_smokediff.sh >> $OUTPUT_DIR/stage3a 2>&1
+     echo "" >> $OUTPUT_DIR/stage3a 2>&1
+
+   # background
+     echo "      background"
+     cd $smvrepo/Build/background/${COMPILER}_${platform}${size}
+     rm -f *.o background
+     ./make_background.sh >> $OUTPUT_DIR/stage3a 2>&1
+
+   # dem2fds
+     echo "      dem2fds"
+     cd $smvrepo/Build/dem2fds/${COMPILER}_${platform}${size}
+     rm -f *.o dem2fds
+     ./make_dem2fds.sh >> $OUTPUT_DIR/stage3a 2>&1
+
+  # wind2fds:
+     echo "      wind2fds"
+     cd $smvrepo/Build/wind2fds/${COMPILER}_${platform}${size}
+     rm -f *.o wind2fds_${platform}${size}
+     ./make_wind2fds.sh >> $OUTPUT_DIR/stage3a 2>&1
+    echo "" >> $OUTPUT_DIR/stage3a 2>&1
+  
+  # hashfile:
+     echo "      hashfile"
+     cd $smvrepo/Build/hashfile/${COMPILER}_${platform}${size}
+     rm -f *.o hashfile_${platform}${size}
+     ./make_hashfile.sh >> $OUTPUT_DIR/stage3a 2>&1
+    echo "" >> $OUTPUT_DIR/stage3a 2>&1
+  
+  # fds2asci
+     echo "      fds2ascii"
+     cd $fdsrepo/Utilities/fds2ascii/${COMPILER}_${platform}${size}
+     rm -f *.o fds2ascii_${platform}${size}
+     ./make_fds2ascii.sh >> $OUTPUT_DIR/stage3a 2>&1
+    echo "" >> $OUTPUT_DIR/stage3a 2>&1
+  
+  # test_mpi
+     echo "      test_mpi"
+     cd $fdsrepo/Utilities/test_mpi/${INTEL}mpi_${COMPILER}_${platform}
+     rm -f *.o test_mpi
+     ./make_test_mpi.sh >> $OUTPUT_DIR/stage3a 2>&1
+    echo "" >> $OUTPUT_DIR/stage3a 2>&1
+
    else
      echo "   Smokeview - using installed smokeview"
    fi
@@ -717,48 +644,6 @@ check_smv_utilities()
 }
 
 #---------------------------------------------
-#                   check_validation_cases
-#---------------------------------------------
-
-check_validation_cases()
-{
-  case=$1
-
-  cd $fdsrepo/Validation/$case
-  nfds=0
-  if [ -d Current_Results ]; then
-    nfds=`ls -l Current_Results/*.fds 2> /dev/null | wc -l`
-  fi
-  if [ $nfds -eq 0 ]; then
-     exit
-  fi
-  nout=`ls -l Current_Results/*.out 2> /dev/null | wc -l`
-  nsuccess=`grep successfully Current_Results/*.out 2> /dev/null | wc -l`
-  if [ $nfds -gt $nout ]; then
-    if [ "$nout" == "0" ]; then
-      echo "***error: $nfds $case cases were run but none finished" >> $VALIDATION_ERROR_LOG
-    else
-      echo "***error: $nfds $case cases were run but only $nout finished" >> $VALIDATION_ERROR_LOG
-    fi
-    validation_cases="false"
-  else
-    if [ $nout -gt $nsuccess ]; then
-      if [ $nsuccess -gt 0 ]; then
-        echo "***error: $nfds $case cases were run but only $nsuccess finished successfully" >> $VALIDATION_ERROR_LOG
-      else
-        echo "***error: $nfds $case cases were run but none finished successfully" >> $VALIDATION_ERROR_LOG
-      fi
-      validation_cases="false"
-    fi
-  fi
-  if [ $nout -gt 0 ] && [ $nout -gt $nsuccess ]; then
-    cd $fdsrepo/Validation/$case/Current_Results
-    grep STOP *.out | grep -v successfully | awk -F':' '{print $1 }' | awk -F'.' '{print "***error: " $1".fds did not finish successfully." }' >> $VALIDATION_ERROR_LOG
-    validation_cases="false"
-  fi
-}
-
-#---------------------------------------------
 #                   check_cases_release
 #---------------------------------------------
 
@@ -770,47 +655,27 @@ check_cases_release()
    # Scan for and report any errors in FDS cases
    cd $dir
 
-   validation_cases="true"
-   if [ "$FIREBOT_MODE" == "validation" ] ; then
-      if [ "$status" == "final" ]; then
-        for SET in ${CURRENT_VALIDATION_SETS[*]}
-        do
-           check_validation_cases $SET
-        done
-      fi
-   fi
    if [[ `grep -rI 'Run aborted' $OUTPUT_DIR/stage5` == "" ]] && \
+      [[ `grep 'ERROR' $OUTPUT_DIR/stage5 | grep -v geom_bad` == "" ]] && \
       [[ `grep -rI Segmentation *` == "" ]] && \
       [[ `grep -rI ERROR: *` == "" ]] && \
       [[ `grep -rI 'STOP: Numerical' *` == "" ]] && \
       [[ `grep -rI forrtl *` == "" ]] && \
-      [[ "$validation_cases" == "true" ]]
+      [[ `grep 'BAD TERMINATION'  */*.log` == "" ]]
    then
       cases_release_success=true
    else
       grep -rI 'Run aborted' $OUTPUT_DIR/stage5 >> $OUTPUT_DIR/stage5_errors
+      grep 'ERROR' $OUTPUT_DIR/stage5 | grep -v geom_bad >> $OUTPUT_DIR/stage5_errors
       grep -rI Segmentation * >> $OUTPUT_DIR/stage5_errors
       grep -rI ERROR: * >> $OUTPUT_DIR/stage5_errors
       grep -rI 'STOP: Numerical' * >> $OUTPUT_DIR/stage5_errors
+      grep -A 2 'BAD TERMINATION' */*.log >> $OUTPUT_DIR/stage5_errors
       grep -rI -A 20 forrtl * >> $OUTPUT_DIR/stage5_errors
-      if [ "$FIREBOT_MODE" == "validation" ] ; then
-         if [ -e $VALIDATION_ERROR_LOG ]; then
-            cat $VALIDATION_ERROR_LOG >> $OUTPUT_DIR/stage5_errors
-         fi
-      fi
 
       echo "Errors from Stage 5 - Run ${2} cases - release mode:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage5_errors >> $ERROR_LOG
       echo "" >> $ERROR_LOG
-
-      # If errors encountered in validation mode, then email status and exit
-      if [ "$FIREBOT_MODE" == "validation" ] ; then
-         email_build_status 'Validationbot'
-         # Stop all Validationbot cases in queue system
-         qdel all >& /dev/null
-         set_files_world_readable
-         exit
-      fi
    fi
 }
 
@@ -829,10 +694,6 @@ wait_cases_release_end()
         echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage5
         TIME_LIMIT_STAGE="5"
         check_time_limit
-        if [ "$FIREBOT_MODE" == "validation" ] ; then
-          check_cases_release $fdsrepo/Validation 'interim'
-          sleep 240
-        fi
         sleep 60
      done
    else
@@ -841,10 +702,6 @@ wait_cases_release_end()
         echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage5
         TIME_LIMIT_STAGE="5"
         check_time_limit
-        if [ "$FIREBOT_MODE" == "validation" ] ; then
-           check_cases_release $fdsrepo/Validation 'interim'
-           sleep 30
-        fi
         sleep 30
      done
    fi
@@ -876,37 +733,16 @@ run_verification_cases_release()
    # Wait for non-benchmark verification cases to end
    wait_cases_release_end 'verification'
 
+   # rerun cases that failed with 'BAD TERMINATION' errors
+#   ./Run_FDS_Cases.sh $INTEL2 $DV2 -F -o 1 -q $QUEUE -Q $QUEUEBENCH >> $OUTPUT_DIR/stage5 2>&1
+#   echo "" >> $OUTPUT_DIR/stage5 2>&1
+
+   # Wait for non-benchmark verification cases to end
+#   wait_cases_release_end 'verification'
+
 #  check whether cases have run 
    ./Run_FDS_Cases.sh -C  >> $OUTPUT_DIR/stage5 2>&1
 }
-
-#---------------------------------------------
-#                   run_validation_cases_release
-#---------------------------------------------
-
-run_validation_cases_release()
-{
-   #  ===================================
-   #  = Run selected FDS validation set =
-   #  ===================================
-   echo "   release"
-
-   for SET in ${CURRENT_VALIDATION_SETS[*]}
-   do
-      cd $fdsrepo/Validation/"$SET"
-
-      # Start running FDS validation cases
-      echo "Running FDS validation cases:" >> $OUTPUT_DIR/stage5
-      echo "Validation Set: ${SET}" >> $OUTPUT_DIR/stage5
-      echo "" >> $OUTPUT_DIR/stage5 2>&1
-      ./Run_All.sh -y $DV2 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
-      echo "" >> $OUTPUT_DIR/stage5 2>&1
-   done
-
-   # Wait for validation cases to end
-   wait_cases_release_end 'validation'
-}
-
 
 #---------------------------------------------
 #                   comple_smv_db
@@ -1204,7 +1040,7 @@ check_matlab_validation()
 }
 
 #---------------------------------------------
-#                   archive_validateion_stats
+#                   archive_validation_stats
 #---------------------------------------------
 
 archive_validation_stats()
@@ -1218,7 +1054,7 @@ archive_validation_stats()
    if [ -e ${CURRENT_STATS_FILE} ]
    then
       # Archive stats to Firebot history
-      cp ${CURRENT_STATS_FILE} "$HISTORY_DIR/${GIT_REVISION}_${STATS_FILE_BASENAME}.csv"
+      cp ${CURRENT_STATS_FILE} "$HISTORY_DIR/${FDS_REVISION}_${STATS_FILE_BASENAME}.csv"
 
    else
       echo "Warnings from Stage 7b - Matlab plotting and statistics (validation):" >> $WARNING_LOG
@@ -1260,8 +1096,8 @@ archive_timing_stats()
 {
    echo archiving timing stats
    cd $fdsrepo/Utilities/Scripts
-   cp fds_timing_stats.csv "$HISTORY_DIR/${GIT_REVISION}_timing.csv"
-   cp fds_benchmarktiming_stats.csv "$HISTORY_DIR/${GIT_REVISION}_benchmarktiming.csv"
+   cp fds_timing_stats.csv "$HISTORY_DIR/${FDS_REVISION}_timing.csv"
+   cp fds_benchmarktiming_stats.csv "$HISTORY_DIR/${FDS_REVISION}_benchmarktiming.csv"
    TOTAL_FDS_TIMES=`tail -1 fds_benchmarktiming_stats.csv`
   if [ "$UPLOADGUIDES" == "1" ]; then
      if [ "$USER" == "firebot" ]; then
@@ -1281,7 +1117,7 @@ check_guide()
    local doc=$2
    local label=$3
    local upload=$4
-   
+
    # Scan for and report any errors or warnings in build process for guides
    cd $firebotdir
    if [[ `grep -I "successfully" $guidelog` == "" ]]
@@ -1291,14 +1127,22 @@ check_guide()
       echo $label >> $WARNING_LOG # Name of guide
       cat $guidelog >> $WARNING_LOG # Contents of log file
       echo "" >> $WARNING_LOG
-   else
-      # Guide built successfully; there were no errors/warnings
-      # Copy guide to Firebot's local website
-      if [[ "$UPLOADGUIDES" == "1" ]] && [[ "$upload" == "1" ]]; then
-        cp $doc /var/www/html/firebot/manuals/
-        cp $doc $NEWGUIDE_DIR/.
-      fi
-      cp $doc $SAVEGUIDE_DIR/.
+   fi
+}
+
+#---------------------------------------------
+#                   copy_guide
+#---------------------------------------------
+
+copy_guide()
+{
+   local doc=$1
+
+   cd $firebotdir
+   if [[ "$UPLOADGUIDES" == "1" ]]; then
+     cp $doc /var/www/html/firebot/manuals/
+     cp $doc $NEWGUIDE_DIR/.
+     cp $doc $SAVEGUIDE_DIR/.
    fi
 }
 
@@ -1337,6 +1181,16 @@ make_fds_user_guide()
 }
 
 #---------------------------------------------
+#                   copy_fds_user_guide
+#---------------------------------------------
+
+copy_fds_user_guide()
+{
+   cd $fdsrepo/Manuals/FDS_User_Guide
+   copy_guide $fdsrepo/Manuals/FDS_User_Guide/FDS_User_Guide.pdf
+}
+
+#---------------------------------------------
 #                   make_fds_technical_guide
 #---------------------------------------------
 
@@ -1350,6 +1204,16 @@ make_fds_technical_guide()
 
    # Check guide for completion and copy to website if successful
    check_guide $OUTPUT_DIR/stage8_fds_technical_guide $fdsrepo/Manuals/FDS_Technical_Reference_Guide/FDS_Technical_Reference_Guide.pdf 'FDS Technical Reference Guide' 1
+}
+
+#---------------------------------------------
+#                   copy_fds_technical_guide
+#---------------------------------------------
+
+copy_fds_technical_guide()
+{
+   cd $fdsrepo/Manuals/FDS_Technical_Reference_Guide
+   copy_guide $fdsrepo/Manuals/FDS_Technical_Reference_Guide/FDS_Technical_Reference_Guide.pdf
 }
 
 #---------------------------------------------
@@ -1369,6 +1233,16 @@ make_fds_verification_guide()
 }
 
 #---------------------------------------------
+#                   copy_fds_verification_guide
+#---------------------------------------------
+
+copy_fds_verification_guide()
+{
+   cd $fdsrepo/Manuals/FDS_Verification_Guide
+   copy_guide $fdsrepo/Manuals/FDS_Verification_Guide/FDS_Verification_Guide.pdf
+}
+
+#---------------------------------------------
 #                   make_fds_validation_guide
 #---------------------------------------------
 
@@ -1382,6 +1256,16 @@ make_fds_validation_guide()
 
    # Check guide for completion and copy to website if successful
    check_guide $OUTPUT_DIR/stage8_fds_validation_guide $fdsrepo/Manuals/FDS_Validation_Guide/FDS_Validation_Guide.pdf 'FDS Validation Guide' 1
+}
+
+#---------------------------------------------
+#                   copy_fds_validation_guide
+#---------------------------------------------
+
+copy_fds_validation_guide()
+{
+   cd $fdsrepo/Manuals/FDS_Validation_Guide
+   copy_guide $fdsrepo/Manuals/FDS_Validation_Guide/FDS_Validation_Guide.pdf
 }
 
 #---------------------------------------------
@@ -1402,22 +1286,13 @@ make_fds_Config_management_plan()
 }
 
 #---------------------------------------------
-#                   make_bundle
+#                   copy_fds_Config_management_plan
 #---------------------------------------------
 
-make_bundle()
+copy_fds_Config_management_plan()
 {
-   cd $fdsrepo/
-   export FDS_VERSION=`git describe --long --dirty | awk -F'-' '{print $1"-"$2}'`
-
-   cd $smvrepo/
-   export SMV_VERSION=`git describe --long --dirty | awk -F'-' '{print $1"-"$2}'`
-
-   echo " make bundle"
-   # making a bundle
-   cd $fdsrepo/Build/Bundle
-   export NOPAUSE=1
-   ./make_bundle.sh &> $OUTPUT_DIR/stage9_make_bundle
+   cd $fdsrepo/Manuals/FDS_Config_Management_Plan
+   copy_guide $fdsrepo/Manuals/FDS_Config_Management_Plan/FDS_Config_Management_Plan.pdf
 }
 
 #---------------------------------------------
@@ -1435,24 +1310,42 @@ save_build_status()
    then
      echo "" >> $ERROR_LOG
      cat $WARNING_LOG >> $ERROR_LOG
-     echo "Build failure and warnings;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$FDSBRANCH;$STOP_TIME_INT;3;$TOTAL_FDS_TIMES;$HOST" > "$HISTORY_DIR/${GIT_REVISION}.txt"
-     cat $ERROR_LOG > "$HISTORY_DIR/${GIT_REVISION}_errors.txt"
+     echo "Build failure and warnings;$FDS_DATE;$FDS_SHORTHASH;$FDS_LONGHASH;${FDS_REVISION};$FDSBRANCH;$STOP_TIME_INT;3;$TOTAL_FDS_TIMES;$HOST" > "$HISTORY_DIR/${FDS_REVISION}.txt"
+     cat $ERROR_LOG > "$HISTORY_DIR/${FDS_REVISION}_errors.txt"
 
    # Check for errors only
    elif [ -e $ERROR_LOG ]
    then
-      echo "Build failure;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$FDSBRANCH;$STOP_TIME_INT;3;$TOTAL_FDS_TIMES;$HOST" > "$HISTORY_DIR/${GIT_REVISION}.txt"
-      cat $ERROR_LOG > "$HISTORY_DIR/${GIT_REVISION}_errors.txt"
+      echo "Build failure;$FDS_DATE;$FDS_SHORTHASH;$FDS_LONGHASH;${FDS_REVISION};$FDSBRANCH;$STOP_TIME_INT;3;$TOTAL_FDS_TIMES;$HOST" > "$HISTORY_DIR/${FDS_REVISION}.txt"
+      cat $ERROR_LOG > "$HISTORY_DIR/${FDS_REVISION}_errors.txt"
 
    # Check for warnings only
    elif [ -e $WARNING_LOG ]
    then
-      echo "Build success with warnings;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$FDSBRANCH;$STOP_TIME_INT;2;$TOTAL_FDS_TIMES;$HOST" > "$HISTORY_DIR/${GIT_REVISION}.txt"
-      cat $WARNING_LOG > "$HISTORY_DIR/${GIT_REVISION}_warnings.txt"
+      echo "Build success with warnings;$FDS_DATE;$FDS_SHORTHASH;$FDS_LONGHASH;${FDS_REVISION};$FDSBRANCH;$STOP_TIME_INT;2;$TOTAL_FDS_TIMES;$HOST" > "$HISTORY_DIR/${FDS_REVISION}.txt"
+      cat $WARNING_LOG > "$HISTORY_DIR/${FDS_REVISION}_warnings.txt"
 
    # No errors or warnings
    else
-      echo "Build success!;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$FDSBRANCH;$STOP_TIME_INT;1;$TOTAL_FDS_TIMES;$HOST" > "$HISTORY_DIR/${GIT_REVISION}.txt"
+      echo "Build success!;$FDS_DATE;$FDS_SHORTHASH;$FDS_LONGHASH;${FDS_REVISION};$FDSBRANCH;$STOP_TIME_INT;1;$TOTAL_FDS_TIMES;$HOST" > "$HISTORY_DIR/${FDS_REVISION}.txt"
+      touch $FIREBOT_PASS
+      echo $SMVREPO_HASH > $SMVREPO_HASHFILE
+      echo $FDSREPO_HASH > $FDSREPO_HASHFILE
+   fi
+}
+
+#---------------------------------------------
+#                   get_firebot_success
+#---------------------------------------------
+
+get_firebot_success()
+{
+   firebot_success=1
+   if [[ -e $WARNING_LOG ]]; then
+     firebot_success=
+   fi
+   if [[ -e $ERROR_LOG ]]; then
+     firebot_success=
    fi
 }
 
@@ -1466,7 +1359,8 @@ email_build_status()
 
    bottype=${1}
    botuser=${1}@$hostname
-   
+   firebot_status=1
+
    stop_time=`date`
    echo "" > $TIME_LOG
    echo "-------------------------------" >> $TIME_LOG
@@ -1482,16 +1376,15 @@ email_build_status()
 if [ "$QUEUE" != "$QUEUEBENCH" ]; then
    echo "benchmark queue: $QUEUEBENCH " >> $TIME_LOG
 fi
-   echo "   fds revision: $GIT_REVISION " >> $TIME_LOG
+   echo "   fds revision: $FDS_REVISION " >> $TIME_LOG
    echo "     fds branch: $FDSBRANCH "    >> $TIME_LOG
    echo "   smv revision: $SMV_REVISION " >> $TIME_LOG
    echo "     smv branch: $SMVBRANCH "    >> $TIME_LOG
 if [ "$IFORT_VERSION" != "" ]; then
    echo "        Fortran: $IFORT_VERSION " >> $TIME_LOG
 fi
-   if [ "$FIREBOT_MODE" == "validation" ] ; then
-      echo "Validation Set(s): ${CURRENT_VALIDATION_SETS[*]} " >> $TIME_LOG
-   fi
+   echo $FDS_MESSAGE
+   echo $SMV_MESSAGE
    echo "     start time: $start_time " >> $TIME_LOG
    echo "      stop time: $stop_time " >> $TIME_LOG
    if [ "$UPLOADGUIDES" == "1" ]; then
@@ -1500,7 +1393,8 @@ fi
    echo "-------------------------------" >> $TIME_LOG
 
 #  upload guides to a google drive directory
-   if [[ "$UPLOADGUIDES" == "1" ]]; then
+   get_firebot_success
+   if [[ "$UPLOADGUIDES" == "1" ]] && [[ "$firebot_success" == "1" ]]; then
      cd $firebotdir
      $UploadGuides $NEWGUIDE_DIR $fdsrepo/Manuals &> $OUTPUT_DIR/stage10_upload_google
      if [[ `grep -E 'warning' $OUTPUT_DIR/stage10_upload_google` == "" ]]; then
@@ -1519,13 +1413,13 @@ fi
       cd $firebotdir
 
      # Send email with failure message and warnings, body of email contains appropriate log file
-     cat $ERROR_LOG $TIME_LOG | mail -s "[$botuser] $bottype failure and warnings. Version: ${GIT_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
+     cat $ERROR_LOG $TIME_LOG | mail -s "[$botuser] $bottype failure and warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
 
    # Check for errors only
    elif [ -e $ERROR_LOG ]
    then
       # Send email with failure message, body of email contains error log file
-      cat $ERROR_LOG $TIME_LOG | mail -s "[$botuser] $bottype failure. Version: ${GIT_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
+      cat $ERROR_LOG $TIME_LOG | mail -s "[$botuser] $bottype failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
 
    # Check for warnings only
    elif [ -e $WARNING_LOG ]
@@ -1533,7 +1427,7 @@ fi
       cd $firebotdir
 
       # Send email with success message, include warnings
-      cat $WARNING_LOG $TIME_LOG | mail -s "[$botuser] $bottype success, with warnings. Version: ${GIT_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
+      cat $WARNING_LOG $TIME_LOG | mail -s "[$botuser] $bottype success, with warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
 
    # No errors or warnings
    else
@@ -1541,7 +1435,8 @@ fi
       cd $firebotdir
 
       # Send success message with links to nightly manuals
-      cat $TIME_LOG | mail -s "[$botuser] $bottype success! Version: ${GIT_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
+      firebot_status=0
+      cat $TIME_LOG | mail -s "[$botuser] $bottype success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
    fi
 
 }
@@ -1562,25 +1457,40 @@ firebotdir=`pwd`
 export SCRIPTFILES=$firebotdir/scriptfiles
 OUTPUT_DIR="$firebotdir/output"
 HISTORY_DIR="$HOME/.firebot/history"
+
+FIREBOT_PASS=$HISTORY_DIR/firebot_pass
+if [ -e $FIREBOT_PASS ]; then
+  rm -f $FIREBOT_PASS
+fi
+
+SMVREPO_HASHFILE=$HISTORY_DIR/smv_hash
+if [ -e $SMVREPO_HASHFILE ]; then
+  rm -f $SMVREPO_HASHFILE
+fi
+
+FDSREPO_HASHFILE=$HISTORY_DIR/fds_hash
+if [ -e $FDSREPO_HASHFILE ]; then
+  rm -f $FDSREPO_HASHFILE
+fi
+
 TIME_LOG=$OUTPUT_DIR/timings
 ERROR_LOG=$OUTPUT_DIR/errors
 VALIDATION_ERROR_LOG=$OUTPUT_DIR/validation_errors
 WARNING_LOG=$OUTPUT_DIR/warnings
 NEWGUIDE_DIR=$OUTPUT_DIR/Newest_Guides
 SAVEGUIDE_DIR=$HOME/.firebot/pubs
+MANUAL_DIR=$HOME/.firebot/Manuals
 EMAIL_LIST=$HOME/.firebot/firebot_email_list.sh
 
 MKDIR $HOME/.firebot
 MKDIR $HOME/.firebot/pubs
-
-#*** Firebot mode (verification or validation)
-FIREBOT_MODE="verification"
 
 WEBBRANCH=nist-pages
 FDSBRANCH=master
 SMVBRANCH=master
 BOTBRANCH=master
 BRANCH=master
+BUILD_ONLY=
 
 #*** determine platform
 
@@ -1609,29 +1519,28 @@ UPDATEREPO=0
 if [ "$JOBPREFIX" == "" ]; then
   export JOBPREFIX=FB_
 fi
-commit=
-push=
 
 DB=_db
 
 REPOEMAIL=
 UPLOADGUIDES=0
-GIT_REVISION=
+FDS_REVISION=
+SMV_REVISION=
 SKIPMATLAB=
 SKIPFIGURES=
 FIREBOT_LITE=
-caselistfile=""
-showcaselist=
 debug_mode=
 DV=
 DV2=
 INTEL=
 INTEL2=
-BUILD_BUNDLE=
+CLONE_REPOS=
+COPY_MANUAL_DIR=1
+DEBUG_ONLY=
 
 #*** parse command line arguments
 
-while getopts 'b:cCdD:FhIiJLm:p:Pq:Q:sSTuUV:' OPTION
+while getopts 'b:BcdDhIiJLm:Np:q:Q:suUW' OPTION
 do
 case $OPTION in
   b)
@@ -1640,17 +1549,18 @@ case $OPTION in
    SMVBRANCH=$BRANCH
    BOTBRANCH=$BRANCH
    ;;
+  B)
+   BUILD_ONLY=1
+   FIREBOT_LITE=
+   ;;
   c)
    CLEANREPO=1
-   ;;
-  C)
-   commit=1
    ;;
   d)
    debug_mode=1
    ;;
   D)
-    caselistfile="$OPTARG"
+   DEBUG_ONLY=1
    ;;
   F)
    SKIPFIGURES=1
@@ -1675,11 +1585,11 @@ case $OPTION in
   m)
    mailToFDS="$OPTARG"
    ;;
+  N)
+   COPY_MANUAL_DIR=
+   ;;
   p)
    PID_FILE="$OPTARG"
-   ;;
-  P)
-   push=1
    ;;
   q)
    QUEUE="$OPTARG"
@@ -1690,24 +1600,14 @@ case $OPTION in
   s)
    SKIPMATLAB=1
    ;;
-  S)
-   showcaselist="1"
-   ;;
-  T)
-   BUILD_BUNDLE="1"
-   ;;
   u)
    UPDATEREPO=1
    ;;
   U)
    UPLOADGUIDES=1
    ;;
-  V)
-   FIREBOT_MODE="validation"
-   QUEUE=batch
-   MAX_VALIDATION_PROCESSES="$OPTARG"
-   LAUNCH_MORE_CASES=1
-   export JOBPREFIX=VB_
+  W)
+   CLONE_REPOS=1
    ;;
 esac
 done
@@ -1746,47 +1646,39 @@ if [ "$QUEUEBENCH" == "" ]; then
   QUEUEBENCH=$QUEUE
 fi
 
-if [ "$caselistfile" != "" ]; then
-  if [ ! -e $caselistfile ]; then
-     echo "***error: $caselistfile does not exist."
-     echo "aborting firebot"
-     exit
-  fi
-  casedir=$(dirname "${caselistfile}")
-  casename=$(basename "${caselistfile}")
-  ccurdir=`pwd`
-  cd $casedir
-  casedir=`pwd`
-  caselistfile=$casedir/$casename
-  cd $ccurdir
-fi
+fdsrepo=$repo/fds
+smvrepo=$repo/smv
+botrepo=$repo/bot
+outrepo=$repo/out
 
-if [ "$push" == "1" ]; then
-  commit=1
-fi
+#*** clone repos
 
-# don't push yet
-push=
+if [[ "$CLONE_REPOS" == "1" ]]; then
+  echo Cloning repos
+  cd $botrepo/Scripts
+  ./setup_repos.sh -F > $OUTPUT_DIR/stage1_clone 2>&1
+fi
 
 #*** make sure repos exist and have expected branches
 
-fdsrepo=$repo/fds
 CD_REPO $fdsrepo $FDSBRANCH || exit 1
 if [ "$FDSBRANCH" == "current" ]; then
   cd $fdsrepo
   FDSBRANCH=`git rev-parse --abbrev-ref HEAD`
 fi
+cd $fdsrepo
+FDSREPO_HASH=`git rev-parse HEAD`
 
 
-smvrepo=$repo/smv
 CD_REPO $smvrepo $SMVBRANCH || exit 1
 if [ "$SMVBRANCH" == "current" ]; then
   cd $smvrepo
   SMVBRANCH=`git rev-parse --abbrev-ref HEAD`
 fi
+cd $smvrepo
+SMVREPO_HASH=`git rev-parse HEAD`
 
 
-botrepo=$repo/bot
 CD_REPO $botrepo $BOTBRANCH || exit 1
 if [ "$BOTBRANCH" == "current" ]; then
   cd $botrepo
@@ -1794,21 +1686,11 @@ if [ "$BOTBRANCH" == "current" ]; then
 fi
 
 
-if [ "$FIREBOT_MODE" == "validation" ]; then
-  outrepo=$repo/out
-  CD_REPO $outrepo master || exit 1
-fi
-
 cd $firebotdir
 
 #*** save pid in case we want to kill firebot later
 
 echo $$ > $PID_FILE
-
-if [ "$showcaselist" == "1" ]; then
-  show_validation_list
-  exit
-fi
 
 #*** check for C/C++ compiler
 
@@ -1854,6 +1736,7 @@ if [ "QUEUE" == "none" ]; then
 fi
 
 UploadGuides=$botrepo/Firebot/fds_guides2GD.sh
+COPY_APPS=$botrepo/Firebot/copy_apps.sh
 
 echo ""
 echo "Settings"
@@ -1876,20 +1759,11 @@ if [ "$UPDATEREPO" == "1" ]; then
 else
   echo " update repos: no"
 fi
-if [ "$FIREBOT_MODE" == "validation" ]; then
-  echo "validationbot: $MAX_VALIDATION_PROCESSES processes"
-fi
 echo ""
-
 
 # Set time limit (43,200 seconds = 12 hours)
 TIME_LIMIT=43200
 TIME_LIMIT_EMAIL_NOTIFICATION="unsent"
-
-# Disable time limit email for validation bot
-if [ "$FIREBOT_MODE" == "validation" ] ; then
-   TIME_LIMIT_EMAIL_NOTIFICATION="sent"
-fi
 
 hostname=`hostname`
 start_time=`date`
@@ -1901,26 +1775,37 @@ echo "Status"
 echo "------"
   echo Cleaning
   clean_firebot_metafiles
-if [[ "$CLEANREPO" == "1" ]] ; then
-  clean_repo2 exp master || exit 1
-  clean_repo2 fds $FDSBRANCH || exit 1
-  clean_repo2 fig master || exit 1
-  clean_repo2 out master || exit 1
-  clean_repo2 smv $SMVBRANCH || exit 1
+if [[ "$CLONE_REPOS" == "" ]]; then
+  if [[ "$CLEANREPO" == "1" ]] ; then
+    if [ "$BUILD_ONLY" == "" ]; then
+      clean_repo2 exp master || exit 1
+    fi
+    clean_repo2 fds $FDSBRANCH || exit 1
+    if [ "$BUILD_ONLY" == "" ]; then
+      clean_repo2 fig master || exit 1
+      clean_repo2 out master || exit 1
+    fi 
+    clean_repo2 smv $SMVBRANCH || exit 1
+  fi
 fi
 
 #*** update repos
 
-if [[ "$UPDATEREPO" == "1" ]] ; then
-  echo Updating
-  update_repo exp master || exit 1
-  update_repo fds $FDSBRANCH || exit 1
-  update_repo fig master || exit 1
-  update_repo out master || exit 1
-  update_repo smv $SMVBRANCH || exit 1
-else
-  echo Repos not updated
+if [[ "$CLONE_REPOS" == "" ]]; then
+  if [[ "$UPDATEREPO" == "1" ]] ; then
+    echo Updating
+    update_repo exp master || exit 1
+    update_repo fds $FDSBRANCH || exit 1
+    update_repo fig master || exit 1
+    update_repo out master || exit 1
+    update_repo smv $SMVBRANCH || exit 1
+  else
+    echo Repos not updated
+  fi
 fi
+
+get_fds_revision $FDSBRANCH || exit 1
+get_smv_revision $SMVBRANCH || exit 1
 
 check_git_checkout
 archive_compiler_version
@@ -1930,151 +1815,135 @@ echo Building
 echo "   FDS"
 # if something goes wrong with the openmp inspector
 # comment the following 6 lines (including 'if' and and 'fi'  lines
-#if [ "$FIREBOT_MODE" == "verification" ] ; then
-#  if [ "$FIREBOT_LITE" == "" ]; then
-#    inspect_fds
-#    check_inspect_fds
-#  fi
+#if [ "$FIREBOT_LITE" == "" ]; then
+#  inspect_fds
+#  check_inspect_fds
 #fi
 
 ### Stage 2b ###
-compile_fds_mpi_db
-check_compile_fds_mpi_db
+if [ "$BUILD_ONLY" == "" ]; then
+  compile_fds_mpi_db
+  check_compile_fds_mpi_db
+fi
 
 ### Stage 2d ###
-if [ "$OPENMPI_GNU" != "" ]; then
+if [[ "$OPENMPI_GNU" != "" ]] && [[ "$BUILD_ONLY" == "" ]] ; then
   compile_fds_mpi_gnu_db
   check_compile_fds_mpi_gnu_db
 fi
 
 if [ "$FIREBOT_LITE" == "" ]; then
+  if [ "$DEBUG_ONLY" == "" ]; then
 ### Stage 2c ###
-  compile_fds_mpi
-  check_compile_fds_mpi
+    compile_fds_mpi
+    check_compile_fds_mpi
 
 ### Stage 3a ###
-  if [ "$FIREBOT_MODE" == "verification" ] ; then
     compile_smv_utilities
     check_smv_utilities
 
 ### Stage 3b ###
+  if [ "$BUILD_ONLY" == "" ]; then
     compile_smv_db
     check_compile_smv_db
+  fi
 
 ### Stage 3c ###
     compile_smv
     check_compile_smv
+
+    $COPY_APPS >& $OUTPUT_DIR/stage3d
   fi
 fi
 
 ### Stage 4 ###
 
-if [ "$FIREBOT_MODE" == "validation" ] ; then
-  if [ "$caselistfile" == "" ]; then
-    generate_validation_list
-  else
-    get_validation_list $caselistfile
-  fi
-fi
-
 # Depends on successful FDS debug compile
-if [[ $FDS_debug_success ]] ; then
-  if [[ "$FIREBOT_MODE" == "verification" ]] ; then
-     run_verification_cases_debug
-     check_cases_debug $fdsrepo/Verification 'verification'
-  else
-     run_validation_cases_debug
-     check_cases_debug $fdsrepo/Validation 'validation'
-  fi
+if [[ $FDS_debug_success ]] && [[ "$BUILD_ONLY" == "" ]]; then
+   run_verification_cases_debug
+   check_cases_debug $fdsrepo/Verification 'verification'
 fi
 
-if [ "$FIREBOT_LITE" == "" ]; then
+if [[ "$DEBUG_ONLY" == "" ]] && [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
 # clean debug stage
   cd $fdsrepo
   if [[ "$CLEANREPO" == "1" ]] ; then
-     if [[ "$FIREBOT_MODE" == "verification" ]] ; then
-        echo "   cleaning Verification"
-        clean_repo $fdsrepo/Verification $FDSBRANCH || exit 1
-     else
-        echo "   cleaning Validation"
-        clean_repo $fdsrepo/Validation $FDSBRANCH || exit 1
-     fi
+    echo "   cleaning Verification"
+    clean_repo $fdsrepo/Verification $FDSBRANCH || exit 1
   fi
 
 ### Stage 5 ###
 # Depends on successful FDS compile
   if [[ $FDS_release_success ]] ; then
-    if [[ "$FIREBOT_MODE" == "verification" ]] ; then
-       run_verification_cases_release
-       check_cases_release $fdsrepo/Verification 'final'
-    else
-       run_validation_cases_release
-       check_cases_release $fdsrepo/Validation 'final'
-       if [[ $cases_debug_success && $cases_release_success ]] ; then
-         commit_validation_results
-       fi
-    fi
+    run_verification_cases_release
+    check_cases_release $fdsrepo/Verification 'final'
   fi
 
 ### Stage 6 ###
 # Depends on successful SMV compile
-  if [ "$FIREBOT_MODE" == "verification" ]; then
-    if [[ "$SKIPFIGURES" == "" ]] ; then
-      if [[ $smv_release_success ]] ; then
-        make_fds_pictures
-        check_fds_pictures
-      fi
+  if [[ "$SKIPFIGURES" == "" ]] ; then
+    if [[ $smv_release_success ]] ; then
+      make_fds_pictures
+      check_fds_pictures
     fi
+  fi
 
-    if [ "$SKIPMATLAB" == "" ] ; then
+  if [ "$SKIPMATLAB" == "" ] ; then
 ### Stage 7a ###
-      check_matlab_license_server
-      if [ $matlab_success == true ]; then
-        run_matlab_verification
-        check_matlab_verification
-        check_verification_stats
-      fi
+    check_matlab_license_server
+    if [ $matlab_success == true ]; then
+      run_matlab_verification
+      check_matlab_verification
+      check_verification_stats
+    fi
 
 ### Stage 7b ###
-      check_matlab_license_server
-      if [ $matlab_success == true ]; then
-        run_matlab_validation
-        check_matlab_validation
-        archive_validation_stats
-        make_validation_git_stats
-      fi
+    check_matlab_license_server
+    if [ $matlab_success == true ]; then
+      run_matlab_validation
+      check_matlab_validation
+      archive_validation_stats
+      make_validation_git_stats
     fi
+  fi
 
 ### Stage 7c ###
-    generate_timing_stats
+  generate_timing_stats
 
 ### Stage 8 ###
-    if [ "$SKIPMATLAB" == "" ] ; then
-      if [ "$SKIPFIGURES" == "" ] ; then
-        make_fds_user_guide
-        make_geom_notes
-        make_fds_verification_guide
-        make_fds_technical_guide
-        make_fds_validation_guide
-        make_fds_Config_management_plan
+  if [ "$SKIPMATLAB" == "" ] ; then
+    if [ "$SKIPFIGURES" == "" ] ; then
+      make_fds_user_guide
+      make_geom_notes
+      make_fds_verification_guide
+      make_fds_technical_guide
+      make_fds_validation_guide
+      make_fds_Config_management_plan
+      get_firebot_success
+      if [[ "$firebot_success" == "1" ]] ; then
+        if [[ "$COPY_MANUAL_DIR" == "1" ]] && [[ "$firebot_success" == "1" ]]; then
+          if [ -e $MANUAL_DIR ]; then
+            rm -rf $MANUAL_DIR
+          fi
+          cp -r $fdsrepo/Manuals $MANUAL_DIR
+        fi
+        copy_fds_user_guide
+        copy_fds_verification_guide
+        copy_fds_technical_guide
+        copy_fds_validation_guide
+        copy_fds_Config_management_plan
       fi
     fi
   fi
-fi
-
-### Stage 9 ###
-if [ "$BUILD_BUNDLE" == "1" ]; then
-  make_bundle
 fi
 
 ### Wrap up and report results ###
 set_files_world_readable
-if [ "$FIREBOT_MODE" == "verification" ]; then
+if [[ "$DEBUG_ONLY" == "" ]]; then
   save_build_status
-  if [ "$FIREBOT_LITE" == "" ]; then
-    archive_timing_stats
-  fi
-  email_build_status 'Firebot'
-else
-  email_build_status 'Validationbot'
+fi 
+if [[ "$DEBUG_ONLY" == "" ]] && [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
+  archive_timing_stats
 fi
+email_build_status 'Firebot'
+exit $firebot_status
