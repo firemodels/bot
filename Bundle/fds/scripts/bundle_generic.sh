@@ -88,6 +88,9 @@ UNTAR ()
   else
     curdir=`pwd`
     cd $TODIR
+    echo "utarring: $FROMFILE"
+    echo "    from: $FROMDIR"
+    echo "      to: $TODIR"
     tar xvf $FROMDIR/$FROMFILE
     cd $curdir
   fi
@@ -311,7 +314,7 @@ CP $smv_bundle smokeview.html $bundledir/$smvbin smokeview.html
 CP $webgldir runsmv_ssh.sh $bundledir/$smvbin runsmv_ssh.sh
 CP $webgldir smv2html.sh   $bundledir/$smvbin smv2html.sh
 
-MPI_DIR=$HOME/.bundle/MPI
+MPI_DIR=$HOME/.bundle/BUNDLE/MPI
 if [ "$MPI_VERSION" == "INTEL" ]; then
   UNTAR $MPI_DIR $intelmpifile $bundledir/bin INTEL
 else
