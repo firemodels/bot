@@ -42,7 +42,7 @@ set windbuild=%svn_root%\smv\Build\wind2fds\%BUILDDIR%
 set sh2bat=%svn_root%\smv\Build\sh2bat\intel_win_64
 set gettime=%svn_root%\smv\Build\get_time\%BUILDDIR%
 set hashfileexe=%hashfilebuild%\hashfile_win_%platform%.exe
-set repoexes=%userprofile%\fnotes\BUNDLE\WINDOWS\repoexes
+set repoexes=%userprofile%\.bundle\BUNDLE\WINDOWS\repoexes
 
 set zipbase=%version%_win%platform%
 set smvdir=%zipbase%\%SMVEDITION%
