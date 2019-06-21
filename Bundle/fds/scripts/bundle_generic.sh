@@ -2,7 +2,7 @@
 fds_version=$1
 smv_version=$2
 MPI_VERSION=$3
-INTEL_MPI_VERSION=$4
+INTEL_COMP_VERSION=$4
 
 GUIDE_DIR=$HOME/.bundle/pubs
 SMV_DIR=$HOME/.bundle/smv
@@ -290,13 +290,13 @@ hashfile test_mpi  > hash/test_mpi.sha1
 cd $CURDIR
 
 if [ "$MPI_VERSION" == "INTEL" ]; then
-    intelmpifile=INTEL${INTEL_MPI_VERSION}linux_64.tar.gz
+    intelmpifile=INTEL${INTEL_COMP_VERSION}linux_64.tar.gz
 else
   if [ "$PLATFORM" == "LINUX64" ]; then
-    openmpifile=openmpi_${MPI_VERSION}_linux_64.tar.gz
+    openmpifile=openmpi_${MPI_VERSION}_linux_64_${INTEL_COMP_VERSION}.tar.gz
   fi
   if [ "$PLATFORM" == "OSX64" ]; then
-    openmpifile=openmpi_${MPI_VERSION}_osx_64.tar.gz
+    openmpifile=openmpi_${MPI_VERSION}_osx_64_${INTEL_COMP_VERSION}.tar.gz
   fi
 fi
 
