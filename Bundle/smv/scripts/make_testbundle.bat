@@ -34,7 +34,7 @@ set webgldir=%svn_root%\bot\Bundle\smv\for_bundle\webgl
 set sh2bat=%svn_root%\smv\Build\sh2bat\intel_win_64
 set gettime=%svn_root%\smv\Build\get_time\intel_win_64
 set smvbuild=%svn_root%\smv\Build
-set repoexes=%userprofile%\fnotes\BUNDLE\WINDOWS\repoexes
+set repoexes=%userprofile%\.bundle\BUNDLE\WINDOWS\repoexes
 
 cd %forbundle%
 
