@@ -27,7 +27,6 @@ echo "-N - don't copy Manuals directory to .firebot/Manuals"
 echo "-p pid_file - file containing process id of firebot process "
 echo "-q - queue_name - run cases using the queue queue_name"
 echo "     default: $QUEUE"
-echo "-Q - queue_name - run OpenMP cases using the queue queue_name"
 echo "-s - skip matlab and document building stages"
 echo "-u - update repo"
 echo "-U - upload guides"
@@ -470,7 +469,7 @@ run_verification_cases_debug()
    echo "Running FDS Verification Cases"
    echo "   debug"
    echo 'Running FDS verification cases:' >> $OUTPUT_DIR/stage4
-   ./Run_FDS_Cases.sh -o 1 -d -m 1 $INTEL2 -q $QUEUE -Q $QUEUEBENCH >> $OUTPUT_DIR/stage4 2>&1
+   ./Run_FDS_Cases.sh -o 1 -d -m 1 $INTEL2 -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
    echo "" >> $OUTPUT_DIR/stage4 2>&1
 
    # Wait for all verification cases to end
@@ -731,7 +730,7 @@ run_verification_cases_release()
    cd $fdsrepo/Verification/scripts
    # Run FDS with 1 OpenMP thread
    echo 'Running FDS benchmark verification cases:' >> $OUTPUT_DIR/stage5
-   ./Run_FDS_Cases.sh $INTEL2 $DV2 -b -o 1 -q $QUEUE -Q $QUEUEBENCH >> $OUTPUT_DIR/stage5 2>&1
+   ./Run_FDS_Cases.sh $INTEL2 $DV2 -b -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
    echo "" >> $OUTPUT_DIR/stage5 2>&1
 
    # Wait for benchmark verification cases to end
@@ -739,18 +738,18 @@ run_verification_cases_release()
 #   wait_cases_release_end 'verification'
 
    echo 'Running FDS non-benchmark verification cases:' >> $OUTPUT_DIR/stage5
-   ./Run_FDS_Cases.sh $INTEL2 $DV2 -R -o 1 -q $QUEUE -Q $QUEUEBENCH >> $OUTPUT_DIR/stage5 2>&1
+   ./Run_FDS_Cases.sh $INTEL2 $DV2 -R -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
    echo "" >> $OUTPUT_DIR/stage5 2>&1
    
    echo 'Running FDS thread checking verification cases:' >> $OUTPUT_DIR/stage5
-   ./Run_FDS_Cases.sh $INTEL2 -t -q $QUEUE -Q $QUEUEBENCH >> $OUTPUT_DIR/stage5 2>&1
+   ./Run_FDS_Cases.sh $INTEL2 -t -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
    echo "" >> $OUTPUT_DIR/stage5 2>&1
 
    # Wait for non-benchmark verification cases to end
    wait_cases_release_end 'verification'
 
    # rerun cases that failed with 'BAD TERMINATION' errors
-#   ./Run_FDS_Cases.sh $INTEL2 $DV2 -F -o 1 -q $QUEUE -Q $QUEUEBENCH >> $OUTPUT_DIR/stage5 2>&1
+#   ./Run_FDS_Cases.sh $INTEL2 $DV2 -F -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
 #   echo "" >> $OUTPUT_DIR/stage5 2>&1
 
    # Wait for non-benchmark verification cases to end
@@ -1389,9 +1388,6 @@ email_build_status()
    echo "             OS: $platform2 " >> $TIME_LOG
    echo "           repo: $repo " >> $TIME_LOG
    echo "          queue: $QUEUE " >> $TIME_LOG
-if [ "$QUEUE" != "$QUEUEBENCH" ]; then
-   echo "benchmark queue: $QUEUEBENCH " >> $TIME_LOG
-fi
    echo "   fds revision: $FDS_REVISION " >> $TIME_LOG
    echo "     fds branch: $FDSBRANCH "    >> $TIME_LOG
    echo "   smv revision: $SMV_REVISION " >> $TIME_LOG
@@ -1529,7 +1525,6 @@ fi
 USEINSTALL=
 COMPILER=intel
 QUEUE=firebot
-QUEUEBENCH=
 CLEANREPO=0
 UPDATEREPO=0
 if [ "$JOBPREFIX" == "" ]; then
@@ -1556,7 +1551,7 @@ DEBUG_ONLY=
 
 #*** parse command line arguments
 
-while getopts 'b:BcdDhIiJLm:Np:q:Q:suUW' OPTION
+while getopts 'b:BcdDhIiJLm:Np:q:suUW' OPTION
 do
 case $OPTION in
   b)
@@ -1610,9 +1605,6 @@ case $OPTION in
   q)
    QUEUE="$OPTARG"
    ;;
-  Q)
-   QUEUEBENCH="$OPTARG"
-   ;;
   s)
    SKIPMATLAB=1
    ;;
@@ -1656,10 +1648,6 @@ fi
 
 if [[ "$QUEUE" == "none" ]] && [[ -e $SCRIPTFILES ]]; then
   rm -f $SCRIPTFILES
-fi
-
-if [ "$QUEUEBENCH" == "" ]; then
-  QUEUEBENCH=$QUEUE
 fi
 
 fdsrepo=$repo/fds
