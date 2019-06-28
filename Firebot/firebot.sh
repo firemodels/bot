@@ -282,6 +282,18 @@ archive_compiler_version()
 }
 
 #---------------------------------------------
+#                   build_inspect_fds
+#---------------------------------------------
+
+build_inspect_fds()
+{
+   # build an openmp thread checker version of fds
+   echo "      inspection"
+   cd $fdsrepo/Verification/Thread_Check/
+   ./build_inspect_openmp.sh -I  &> $OUTPUT_DIR/stage2a
+}
+
+#---------------------------------------------
 #                   inspect_fds
 #---------------------------------------------
 
@@ -1819,10 +1831,11 @@ echo Building
 echo "   FDS"
 # if something goes wrong with the openmp inspector
 # comment the following 6 lines (including 'if' and and 'fi'  lines
-#if [ "$FIREBOT_LITE" == "" ]; then
+if [ "$FIREBOT_LITE" == "" ]; then
+   build_inspect_fds
 #  inspect_fds
 #  check_inspect_fds
-#fi
+fi
 
 ### Stage 2b ###
 if [ "$BUILD_ONLY" == "" ]; then
