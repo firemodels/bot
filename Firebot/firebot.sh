@@ -469,6 +469,7 @@ run_verification_cases_debug()
    echo "Running FDS Verification Cases"
    echo "   debug"
    echo 'Running FDS verification cases:' >> $OUTPUT_DIR/stage4
+   echo ./Run_FDS_Cases.sh -o 1 -d -m 1 $INTEL2 -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
    ./Run_FDS_Cases.sh -o 1 -d -m 1 $INTEL2 -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
    echo "" >> $OUTPUT_DIR/stage4 2>&1
 
@@ -730,6 +731,7 @@ run_verification_cases_release()
    cd $fdsrepo/Verification/scripts
    # Run FDS with 1 OpenMP thread
    echo 'Running FDS benchmark verification cases:' >> $OUTPUT_DIR/stage5
+   echo ./Run_FDS_Cases.sh $INTEL2 $DV2 -b -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
    ./Run_FDS_Cases.sh $INTEL2 $DV2 -b -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
    echo "" >> $OUTPUT_DIR/stage5 2>&1
 
@@ -738,11 +740,13 @@ run_verification_cases_release()
 #   wait_cases_release_end 'verification'
 
    echo 'Running FDS non-benchmark verification cases:' >> $OUTPUT_DIR/stage5
+   echo ./Run_FDS_Cases.sh $INTEL2 $DV2 -R -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
    ./Run_FDS_Cases.sh $INTEL2 $DV2 -R -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
    echo "" >> $OUTPUT_DIR/stage5 2>&1
 
 # comment out thread checking cases for now   
 #   echo 'Running FDS thread checking verification cases:' >> $OUTPUT_DIR/stage5
+#   echo ./Run_FDS_Cases.sh $INTEL2 -t -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
 #   ./Run_FDS_Cases.sh $INTEL2 -t -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
 #   echo "" >> $OUTPUT_DIR/stage5 2>&1
 
