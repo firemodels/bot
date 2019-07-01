@@ -1764,6 +1764,7 @@ if [ "$UPDATEREPO" == "1" ]; then
 else
   echo " update repos: no"
 fi
+  echo "        queue: $QUEUE"
 echo ""
 
 # Set time limit (43,200 seconds = 12 hours)
