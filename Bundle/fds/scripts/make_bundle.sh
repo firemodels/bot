@@ -18,10 +18,11 @@ SETENV ()
 
 build_apps=
 GET_BOT_REVISION=
-SETENV bot_host      BOT_HOST
-SETENV firebot_home  FIREBOT_HOME
-SETENV smokebot_home SMOKEBOT_HOME
-SETENV mpi_version   MPI_VERSION
+SETENV bot_host            BOT_HOST
+SETENV firebot_home        FIREBOT_HOME
+SETENV smokebot_home       SMOKEBOT_HOME
+SETENV mpi_version         MPI_VERSION
+SETENV intel_mpi_version   INTEL_MPI_VERSION
 
 #---------------------------------------------
 #                   DEFAULT

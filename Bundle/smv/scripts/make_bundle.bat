@@ -42,6 +42,7 @@ set windbuild=%svn_root%\smv\Build\wind2fds\%BUILDDIR%
 set sh2bat=%svn_root%\smv\Build\sh2bat\intel_win_64
 set gettime=%svn_root%\smv\Build\get_time\%BUILDDIR%
 set hashfileexe=%hashfilebuild%\hashfile_win_%platform%.exe
+set repoexes=%userprofile%\.bundle\BUNDLE\WINDOWS\repoexes
 
 set zipbase=%version%_win%platform%
 set smvdir=%zipbase%\%SMVEDITION%
@@ -80,6 +81,7 @@ CALL :COPY  %svdiffbuild%\smokediff_win_%platform%.exe  %smvdir%\smokediff.exe
 CALL :COPY  %svzipbuild%\smokezip_win_%platform%.exe    %smvdir%\smokezip.exe
 CALL :COPY  %timepbuild%\timep_win_%platform%.exe       %smvdir%\timep.exe
 CALL :COPY  %windbuild%\wind2fds_win_%platform%.exe     %smvdir%\wind2fds.exe
+CALL :COPY %repoexes%\openvr_api.dll                    %smvdir%\openvr_api.dll
 
 echo Unpacking Smokeview %smv_versionbase% installation files > %forbundle%\unpack.txt
 echo Install Smokeview %smv_versionbase%                      > %forbundle%\message.txt

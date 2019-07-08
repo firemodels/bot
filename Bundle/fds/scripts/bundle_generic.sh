@@ -2,6 +2,7 @@
 fds_version=$1
 smv_version=$2
 MPI_VERSION=$3
+INTEL_COMP_VERSION=$4
 
 GUIDE_DIR=$HOME/.bundle/pubs
 SMV_DIR=$HOME/.bundle/smv
@@ -87,6 +88,9 @@ UNTAR ()
   else
     curdir=`pwd`
     cd $TODIR
+    echo "utarring: $FROMFILE"
+    echo "    from: $FROMDIR"
+    echo "      to: $TODIR"
     tar xvf $FROMDIR/$FROMFILE
     cd $curdir
   fi
@@ -285,12 +289,14 @@ hashfile fds2ascii > hash/fds2ascii.sha1
 hashfile test_mpi  > hash/test_mpi.sha1
 cd $CURDIR
 
-if [ "$MPI_VERSION" != "INTEL" ]; then
+if [ "$MPI_VERSION" == "INTEL" ]; then
+    intelmpifile=INTEL${INTEL_COMP_VERSION}linux_64.tar.gz
+else
   if [ "$PLATFORM" == "LINUX64" ]; then
-    openmpifile=openmpi_${MPI_VERSION}_linux_64.tar.gz
+    openmpifile=openmpi_${MPI_VERSION}_linux_64_${INTEL_COMP_VERSION}.tar.gz
   fi
   if [ "$PLATFORM" == "OSX64" ]; then
-    openmpifile=openmpi_${MPI_VERSION}_osx_64.tar.gz
+    openmpifile=openmpi_${MPI_VERSION}_osx_64_${INTEL_COMP_VERSION}.tar.gz
   fi
 fi
 
@@ -308,11 +314,11 @@ CP $smv_bundle smokeview.html $bundledir/$smvbin smokeview.html
 CP $webgldir runsmv_ssh.sh $bundledir/$smvbin runsmv_ssh.sh
 CP $webgldir smv2html.sh   $bundledir/$smvbin smv2html.sh
 
+MPI_DIR=$HOME/.bundle/BUNDLE/MPI
 if [ "$MPI_VERSION" == "INTEL" ]; then
-  UNTAR $HOME/fire-notes/INSTALL/LIBS/RUNTIME/MPI_INTEL19U1 INTEL19u1linux.tar.gz $bundledir/bin INTEL
+  UNTAR $MPI_DIR $intelmpifile $bundledir/bin INTEL
 else
-  OPENMPI_DIR=$HOME/.bundle/OPENMPI
-  CP $OPENMPI_DIR $openmpifile  $bundledir/bin $openmpifile
+  CP $MPI_DIR $openmpifile  $bundledir/bin $openmpifile
 fi
 
 echo ""
