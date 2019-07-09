@@ -477,7 +477,7 @@ run_verification_cases_debug()
    wait_cases_debug_end 'verification'
 
 #  check whether cases have run
-#   ./Run_FDS_Cases.sh -C >> $OUTPUT_DIR/stage4 2>&1
+   ./Run_FDS_Cases.sh -C >> $OUTPUT_DIR/stage4 2>&1
 
    # Remove all .stop files from Verification directories (recursively)
    cd $fdsrepo/Verification
@@ -761,7 +761,7 @@ run_verification_cases_release()
 #   wait_cases_release_end 'verification'
 
 #  check whether cases have run 
-#   ./Run_FDS_Cases.sh -C  >> $OUTPUT_DIR/stage5 2>&1
+   ./Run_FDS_Cases.sh -C  >> $OUTPUT_DIR/stage5 2>&1
 }
 
 #---------------------------------------------
