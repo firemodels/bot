@@ -310,10 +310,9 @@ inspect_fds()
 
 check_inspect_fds()
 {
-   # Scan for errors in thread checking results
-   cd $fdsrepo/Utilities/Scripts
+
    # grep -v 'Warning: One or more threads in the application accessed ...' ignores a known compiler warning that displays even without errors
-      if [[ `grep -i -E 'warning|remark|problem|error' $OUTPUT_DIR/stage2a | grep -v '0 new problem(s) found' | grep -v 'Warning: One or more threads in the application accessed the stack of another thread'` == "" ]]
+      if [[ `grep -i -E 'warning|remark|problem|error' $fdsrepo/Verification/Thread_Check/race_test_4.err | grep -v '0 new problem(s) found' | grep -v 'Warning: One or more threads in the application accessed the stack of another thread'` == "" ]]
    then
       # Continue along
       :
@@ -357,7 +356,8 @@ check_compile_fds_mpi_db()
       echo "" >> $ERROR_LOG
    fi
 
-   # Check for compiler warnings/remarks
+ 
+  # Check for compiler warnings/remarks
    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
    if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage2b | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented'` == "" ]]
    then
@@ -752,6 +752,8 @@ run_verification_cases_release()
 
    # Wait for non-benchmark verification cases to end
    wait_cases_release_end 'verification'
+
+   check_inspect_fds
 
    # rerun cases that failed with 'BAD TERMINATION' errors
 #   ./Run_FDS_Cases.sh $INTEL2 $DV2 -F -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
