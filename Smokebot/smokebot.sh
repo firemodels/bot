@@ -54,7 +54,6 @@ run_auto()
   
   GIT_STATUSDIR=~/.smokebot
   SMV_SOURCE=$smvrepo/Source
-  TRIGGER_DIR=$smvrepo/Source/scripts
   GIT_SMV_FILE=$GIT_STATUSDIR/smv_revision
   GIT_SMV_LOG=$GIT_STATUSDIR/smv_log
 
