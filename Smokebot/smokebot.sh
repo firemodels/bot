@@ -62,7 +62,7 @@ run_auto()
   GIT_FDS_REVISION_FILE=$GIT_STATUS_DIR/fds_revision
   GIT_FDS_LOG_FILE=$GIT_STATUS_DIR/FDS_log
 
-  ROOT_DIR=$smvrepo
+  ROOT_DIR=$smvrepo/Verification
   GIT_ROOT_REVISION_FILE=$GIT_STATUS_DIR/root_revision
   GIT_ROOT_LOG_FILE=$GIT_STATUS_DIR/ROOT_log
 
