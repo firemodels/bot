@@ -52,22 +52,23 @@ run_auto()
 {
   local option=$1
   
-  GIT_STATUSDIR=~/.smokebot
-  SMV_SOURCE=$smvrepo/Source
-  TRIGGER_DIR=$smvrepo/Source/scripts
-  GIT_SMV_FILE=$GIT_STATUSDIR/smv_revision
-  GIT_SMV_LOG=$GIT_STATUSDIR/smv_log
+  GIT_STATUS_DIR=~/.smokebot
 
-  TRIGGER=$SMV_SOURCE/smokebot_trigger.txt
-  GIT_T_FILE=$GIT_STATUSDIR/trigger_revision
+  SMV_SOURCE_DIR=$smvrepo/Source
+  GIT_SMV_REVISION_FILE=$GIT_STATUS_DIR/smv_revision
+  GIT_SMV_LOG_FILE=$GIT_STATUS_DIR/smv_log
 
-  FDS_SOURCE=$fdsrepo/Source
-  GIT_FDS_FILE=$GIT_STATUSDIR/fds_revision
-  GIT_FDS_LOG=$GIT_STATUSDIR/FDS_log
+  FDS_SOURCE_DIR=$fdsrepo/Source
+  GIT_FDS_REVISION_FILE=$GIT_STATUS_DIR/fds_revision
+  GIT_FDS_LOG_FILE=$GIT_STATUS_DIR/FDS_log
 
-  MESSAGE_FILE=$GIT_STATUSDIR/message
+  ROOT_DIR=$smvrepo/Verification
+  GIT_ROOT_REVISION_FILE=$GIT_STATUS_DIR/root_revision
+  GIT_ROOT_LOG_FILE=$GIT_STATUS_DIR/ROOT_log
 
-  MKDIR $GIT_STATUSDIR
+  MESSAGE_FILE=$GIT_STATUS_DIR/message
+
+  MKDIR $GIT_STATUS_DIR
 
   if [[ "$UPDATEREPO" == "1" ]] ; then
     update_repo smv $SMVBRANCH || return 1
@@ -75,35 +76,35 @@ run_auto()
     update_repo fds $FDSBRANCH || return 1
   fi
 
-# get info for smokeview
-  cd $SMV_SOURCE
-  if [ ! -e $GIT_T_FILE ]; then
-    touch $GIT_T_FILE
-  fi
-  THIS_T_REVISION=`git log --abbrev-commit $TRIGGER | head -1 | awk '{print $2}'`
-  LAST_T_REVISION=`cat $GIT_T_FILE`
-
+# get info for smokeview source directory
+  cd $SMV_SOURCE_DIR
   THIS_SMVAUTHOR=`git log . | head -2 | tail -1 | awk '{print $2}'`
-  if [ ! -e $GIT_SMV_FILE ]; then
-    touch $GIT_SMV_FILE
+  if [ ! -e $GIT_SMV_REVISION_FILE ]; then
+    touch $GIT_SMV_REVISION_FILE
   fi
-  
   THIS_SMV_REVISION=`git log --abbrev-commit . | head -1 | awk '{print $2}'`
-  LAST_SMV_REVISION=`cat $GIT_SMV_FILE`
-  git log . | head -5 | tail -1 > $GIT_SMV_LOG
+  LAST_SMV_REVISION=`cat $GIT_SMV_REVISION_FILE`
+  git log . | head -5 | tail -1 > $GIT_SMV_LOG_FILE
 
-# get info for FDS
-  cd $FDS_SOURCE
+# get info for FDS source directory
+  cd $FDS_SOURCE_DIR
   THIS_FDSAUTHOR=`git log . | head -2 | tail -1 | awk '{print $2}'`
-  if [ ! -e $GIT_FDS_FILE ]; then
-    touch $GIT_FDS_FILE
+  if [ ! -e $GIT_FDS_REVISION_FILE ]; then
+    touch $GIT_FDS_REVISION_FILE
   fi
   THIS_FDS_REVISION=`git log --abbrev-commit . | head -1 | awk '{printf $2}'`
-  LAST_FDS_REVISION=`cat $GIT_FDS_FILE`
-  git log . | head -5 | tail -1 > $GIT_FDS_LOG
+  LAST_FDS_REVISION=`cat $GIT_FDS_REVISION_FILE`
+  git log . | head -5 | tail -1 > $GIT_FDS_LOG_FILE
+
+# get info for ROOT directory
+  cd $ROOT_DIR
+  THIS_ROOTAUTHOR=`git log . | head -2 | tail -1 | awk '{print $2}'`
+  THIS_ROOT_REVISION=`git log --abbrev-commit . | head -1 | awk '{printf $2}'`
+  LAST_ROOT_REVISION=`cat $GIT_ROOT_REVISION_FILE`
+  git log . | head -5 | tail -1 > $GIT_ROOT_LOG_FILE
 
   if [ "$option" == "" ]; then
-    if [[ $THIS_SMV_REVISION == $LAST_SMV_REVISION && $THIS_FDS_REVISION == $LAST_FDS_REVISION ]] ; then
+    if [[ $THIS_SMV_REVISION == $LAST_SMV_REVISION && $THIS_FDS_REVISION == $LAST_FDS_REVISION &&  $THIS_ROOT_REVISION == $LAST_ROOT_REVISION ]] ; then
       return 1
     fi
   fi
@@ -115,22 +116,32 @@ run_auto()
 
   rm -f $MESSAGE_FILE
   if [ "$option" == "" ]; then
+    SOURCE_CHANGED=
     if [[ $THIS_SMV_REVISION != $LAST_SMV_REVISION ]] ; then
-      echo $THIS_SMV_REVISION>$GIT_SMV_FILE
+      SOURCE_CHANGED=1
+      echo $THIS_SMV_REVISION>$GIT_SMV_REVISION_FILE
       echo -e "smokeview source has changed. $LAST_SMV_REVISION->$THIS_SMV_REVISION($THIS_SMVAUTHOR)" >> $MESSAGE_FILE
-      cat $GIT_SMV_LOG >> $MESSAGE_FILE
+      cat $GIT_SMV_LOG_FILE >> $MESSAGE_FILE
     fi
     if [[ $THIS_FDS_REVISION != $LAST_FDS_REVISION ]] ; then
-      echo $THIS_FDS_REVISION>$GIT_FDS_FILE
+      SOURCE_CHANGED=1
+      echo $THIS_FDS_REVISION>$GIT_FDS_REVISION_FILE
       echo -e "FDS source has changed. $LAST_FDS_REVISION->$THIS_FDS_REVISION($THIS_FDSAUTHOR)" >> $MESSAGE_FILE
-      cat $GIT_FDS_LOG >> $MESSAGE_FILE
+      cat $GIT_FDS_LOG_FILE >> $MESSAGE_FILE
+    fi
+    if [ "$SOURCE_CHANGED" == "" ]; then
+      if [[ $THIS_ROOT_REVISION != $LAST_ROOT_REVISION ]] ; then
+        echo $THIS_ROOT_REVISION>$GIT_ROOT_REVISION_FILE
+        echo -e "smv repo has changed. $LAST_ROOT_REVISION->$THIS_ROOT_REVISION($THIS_ROOTAUTHOR)" >> $MESSAGE_FILE
+        cat $GIT_ROOT_LOG_FILE >> $MESSAGE_FILE
+      fi
     fi
   fi
   if [ "$option" == "smv" ]; then
     if [[ $THIS_SMV_REVISION != $LAST_SMV_REVISION ]] ; then
-      echo $THIS_SMV_REVISION>$GIT_SMV_FILE
+      echo $THIS_SMV_REVISION>$GIT_SMV_REVISION_FILE
       echo -e "smokeview source has changed. $LAST_SMV_REVISION->$THIS_SMV_REVISION($THIS_SMVAUTHOR)" >> $MESSAGE_FILE
-      cat $GIT_SMV_LOG >> $MESSAGE_FILE
+      cat $GIT_SMV_LOG_FILE >> $MESSAGE_FILE
     fi
   fi
   echo -e "Smokebot run initiated." >> $MESSAGE_FILE
@@ -1062,13 +1073,13 @@ check_smv_pictures()
       echo "" >> $WARNING_LOG
    fi
    if [ ! "$web_DIR" == "" ]; then
-     if [ -d "$WEBFROMDIR" ]; then
+     if [ -d "$WEBFROM_DIR" ]; then
        CURDIR=`pwd`
        cd $web_DIR
        rm -rf images
        rm -rf manuals
        rm index.html
-       cd $WEBFROMDIR
+       cd $WEBFROM_DIR
        cp -r * $web_DIR/.
        cd $CURDIR
      fi
@@ -1117,11 +1128,11 @@ check_smv_movies()
       echo "" >> $WARNING_LOG
    fi
    if [ ! "$web_DIR" == "" ]; then
-     if [ -d "$WEBFROMDIR" ]; then 
+     if [ -d "$WEBFROM_DIR" ]; then 
        CURDIR=`pwd`
        cd $web_DIR
        rm -rf *
-       cd $WEBFROMDIR
+       cd $WEBFROM_DIR
        cp -r * $web_DIR/.
        cd $CURDIR
      fi
@@ -1186,10 +1197,10 @@ check_guide()
 
    # Scan and report any errors in build process for guides
 
-   SMOKEBOT_MANDIR=
+   SMOKEBOT_MAN_DIR=
    if [ ! "$web_DIR" == "" ]; then
      if [ -d $web_DIR/manuals ]; then
-       SMOKEBOT_MANDIR=$web_DIR/manuals
+       SMOKEBOT_MAN_DIR=$web_DIR/manuals
      fi
    fi
 
@@ -1200,8 +1211,8 @@ check_guide()
       cat $stage >> $ERROR_LOG
       echo "" >> $ERROR_LOG
    else
-     if [ ! "$SMOKEBOT_MANDIR" == "" ]; then
-       cp $directory/$document $SMOKEBOT_MANDIR/.
+     if [ ! "$SMOKEBOT_MAN_DIR" == "" ]; then
+       cp $directory/$document $SMOKEBOT_MAN_DIR/.
      fi
      if [ -d $SMV_SUMMARY/manuals ] ; then
        cp $directory/$document $SMV_SUMMARY/manuals/.
@@ -1323,11 +1334,19 @@ fi
    echo "   benchmark time(s): $TOTAL_SMV_TIMES" >> $TIME_LOG
    echo "   FDS revisions: old: $LAST_FDS_REVISION new: $THIS_FDS_REVISION" >> $TIME_LOG
    echo "   SMV revisions: old: $LAST_SMV_REVISION new: $THIS_SMV_REVISION" >> $TIME_LOG
+  SOURCE_CHANGED=
   if [[ $THIS_SMV_REVISION != $LAST_SMV_REVISION ]] ; then
-    cat $GIT_SMV_LOG >> $TIME_LOG
+    SOURCE_CHANGED=1
+    cat $GIT_SMV_LOG_FILE >> $TIME_LOG
   fi
   if [[ $THIS_FDS_REVISION != $LAST_FDS_REVISION ]] ; then
-    cat $GIT_FDS_LOG >> $TIME_LOG
+    SOURCE_CHANGED=1
+    cat $GIT_FDS_LOG_FILE >> $TIME_LOG
+  fi
+  if [ "$SOURCE_CHANGED" != "" ]; then
+    if [[ $THIS_ROOT_REVISION != $LAST_ROOT_REVISION ]] ; then
+      cat $GIT_ROOT_LOG_FILE >> $TIME_LOG
+    fi
   fi
    cd $smokebotdir
    # Check for warnings and errors
@@ -1666,12 +1685,8 @@ echo ""
 cd
 
 export SMV_SUMMARY="$smvrepo/Manuals/SMV_Summary"
-WEBFROMDIR="$smvrepo/Manuals/SMV_Summary"
+WEBFROM_DIR="$smvrepo/Manuals/SMV_Summary"
 
-#SMV_VG_GUIDE=$smvrepo/Manuals/SMV_Verification_Guide/SMV_Verification_Guide.pdf
-#SMV_UG_GUIDE=$smvrepo/Manuals/SMV_User_Guide/SMV_User_Guide.pdf
-#SMV_UTILG_GUIDE=$smvrepo/Manuals/SMV_Utilities_Guide/SMV_Utilities_Guide.pdf
-#GEOM_NOTES=$smvrepo/Manuals/FDS_User_Guide/geom_notes.pdf
 UploadGuides=$botrepo/Smokebot/smv_guides2GD.sh
 UploadWEB=$botrepo/Smokebot/smv_web2GD.sh
 

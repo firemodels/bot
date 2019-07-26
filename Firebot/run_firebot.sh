@@ -174,7 +174,6 @@ ECHO=
 debug_mode=
 DV=
 REMOVE_PID=
-QUEUEBENCH=
 CLONE_REPOS=
 BUILD_ONLY=
 DEBUG_ONLY=
@@ -182,7 +181,7 @@ export QFDS_STARTUP=
 
 #*** parse command line options
 
-while getopts 'bBcdDFfHhIiJkLm:NnOq:Q:RSsuUvW' OPTION
+while getopts 'bBcdDFfHhIiJkLm:NnOq:RSsuUvW' OPTION
 do
 case $OPTION  in
   b)
@@ -241,9 +240,6 @@ case $OPTION  in
    ;;
   q)
    QUEUE="$OPTARG"
-   ;;
-  Q)
-   QUEUEBENCH="-Q $OPTARG"
    ;;
   R)
    REMOVE_PID=1
@@ -362,7 +358,7 @@ BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
 firebot_status=0
-$ECHO  ./$botscript -p $firebot_pid $UPDATE $DV $INTEL $debug_mode $BUILD_ONLY $BRANCH $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUEBENCH $QUEUE $SKIPMATLAB $SKIPFIGURES $CLONE_REPOS $EMAIL $COPY_MANUAL_DIR $DEBUG_ONLY "$@"
+$ECHO  ./$botscript -p $firebot_pid $UPDATE $DV $INTEL $debug_mode $BUILD_ONLY $BRANCH $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $CLONE_REPOS $EMAIL $COPY_MANUAL_DIR $DEBUG_ONLY "$@"
 firebot_status=$?
 if [ -e $firebot_pid ]; then
   rm -f $firebot_pid

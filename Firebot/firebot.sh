@@ -27,7 +27,6 @@ echo "-N - don't copy Manuals directory to .firebot/Manuals"
 echo "-p pid_file - file containing process id of firebot process "
 echo "-q - queue_name - run cases using the queue queue_name"
 echo "     default: $QUEUE"
-echo "-Q - queue_name - run OpenMP cases using the queue queue_name"
 echo "-s - skip matlab and document building stages"
 echo "-u - update repo"
 echo "-U - upload guides"
@@ -282,6 +281,18 @@ archive_compiler_version()
 }
 
 #---------------------------------------------
+#                   build_inspect_fds
+#---------------------------------------------
+
+build_inspect_fds()
+{
+   # build an openmp thread checker version of fds
+   echo "      inspection"
+   cd $fdsrepo/Verification/Thread_Check/
+   ./build_inspect_openmp.sh -I  &> $OUTPUT_DIR/stage2a
+}
+
+#---------------------------------------------
 #                   inspect_fds
 #---------------------------------------------
 
@@ -299,10 +310,9 @@ inspect_fds()
 
 check_inspect_fds()
 {
-   # Scan for errors in thread checking results
-   cd $fdsrepo/Utilities/Scripts
+
    # grep -v 'Warning: One or more threads in the application accessed ...' ignores a known compiler warning that displays even without errors
-      if [[ `grep -i -E 'warning|remark|problem|error' $OUTPUT_DIR/stage2a | grep -v '0 new problem(s) found' | grep -v 'Warning: One or more threads in the application accessed the stack of another thread'` == "" ]]
+      if [[ `grep -i -E 'warning|remark|problem|error' $fdsrepo/Verification/Thread_Check/race_test_4.err | grep -v '0 new problem(s) found' | grep -v 'Warning: One or more threads in the application accessed the stack of another thread'` == "" ]]
    then
       # Continue along
       :
@@ -346,7 +356,8 @@ check_compile_fds_mpi_db()
       echo "" >> $ERROR_LOG
    fi
 
-   # Check for compiler warnings/remarks
+ 
+  # Check for compiler warnings/remarks
    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
    if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage2b | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented'` == "" ]]
    then
@@ -458,7 +469,8 @@ run_verification_cases_debug()
    echo "Running FDS Verification Cases"
    echo "   debug"
    echo 'Running FDS verification cases:' >> $OUTPUT_DIR/stage4
-   ./Run_FDS_Cases.sh -o 1 -d -m 1 $INTEL2 -q $QUEUE -Q $QUEUEBENCH >> $OUTPUT_DIR/stage4 2>&1
+   echo ./Run_FDS_Cases.sh -o 1 -d -m 1 $INTEL2 -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
+   ./Run_FDS_Cases.sh -o 1 -d -m 1 $INTEL2 -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
    echo "" >> $OUTPUT_DIR/stage4 2>&1
 
    # Wait for all verification cases to end
@@ -721,22 +733,36 @@ run_verification_cases_release()
    cd $fdsrepo/Verification/scripts
    # Run FDS with 1 OpenMP thread
    echo 'Running FDS benchmark verification cases:' >> $OUTPUT_DIR/stage5
-   ./Run_FDS_Cases.sh $INTEL2 $DV2 -b -o 1 -q $QUEUE -Q $QUEUEBENCH >> $OUTPUT_DIR/stage5 2>&1
+   echo ./Run_FDS_Cases.sh $INTEL2 $DV2 -b -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
+        ./Run_FDS_Cases.sh $INTEL2 $DV2 -b -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
    echo "" >> $OUTPUT_DIR/stage5 2>&1
 
    # Wait for benchmark verification cases to end
 # let benchmark and regular cases run at the same time - for now
 #   wait_cases_release_end 'verification'
 
+# comment out thread checking cases for now   
+#   echo 'Running FDS thread checking verification cases:' >> $OUTPUT_DIR/stage5
+   cd ../Thread_Check
+   echo ./inspection.sh -p 6 -q $QUEUE  inspector_test.fds >> $OUTPUT_DIR/stage5i 2>&1
+        ./inspection.sh -p 6 -q $QUEUE  inspector_test.fds >> $OUTPUT_DIR/stage5i 2>&1 &
+   echo "" >> $OUTPUT_DIR/stage5i 2>&1
+
+   cd ../scripts
    echo 'Running FDS non-benchmark verification cases:' >> $OUTPUT_DIR/stage5
-   ./Run_FDS_Cases.sh $INTEL2 $DV2 -R -o 1 -q $QUEUE -Q $QUEUEBENCH >> $OUTPUT_DIR/stage5 2>&1
+   echo ./Run_FDS_Cases.sh $INTEL2 $DV2 -R -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
+        ./Run_FDS_Cases.sh $INTEL2 $DV2 -R -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
    echo "" >> $OUTPUT_DIR/stage5 2>&1
+
+
 
    # Wait for non-benchmark verification cases to end
    wait_cases_release_end 'verification'
 
+
+
    # rerun cases that failed with 'BAD TERMINATION' errors
-#   ./Run_FDS_Cases.sh $INTEL2 $DV2 -F -o 1 -q $QUEUE -Q $QUEUEBENCH >> $OUTPUT_DIR/stage5 2>&1
+#   ./Run_FDS_Cases.sh $INTEL2 $DV2 -F -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
 #   echo "" >> $OUTPUT_DIR/stage5 2>&1
 
    # Wait for non-benchmark verification cases to end
@@ -1375,9 +1401,6 @@ email_build_status()
    echo "             OS: $platform2 " >> $TIME_LOG
    echo "           repo: $repo " >> $TIME_LOG
    echo "          queue: $QUEUE " >> $TIME_LOG
-if [ "$QUEUE" != "$QUEUEBENCH" ]; then
-   echo "benchmark queue: $QUEUEBENCH " >> $TIME_LOG
-fi
    echo "   fds revision: $FDS_REVISION " >> $TIME_LOG
    echo "     fds branch: $FDSBRANCH "    >> $TIME_LOG
    echo "   smv revision: $SMV_REVISION " >> $TIME_LOG
@@ -1515,7 +1538,6 @@ fi
 USEINSTALL=
 COMPILER=intel
 QUEUE=firebot
-QUEUEBENCH=
 CLEANREPO=0
 UPDATEREPO=0
 if [ "$JOBPREFIX" == "" ]; then
@@ -1542,7 +1564,7 @@ DEBUG_ONLY=
 
 #*** parse command line arguments
 
-while getopts 'b:BcdDhIiJLm:Np:q:Q:suUW' OPTION
+while getopts 'b:BcdDhIiJLm:Np:q:suUW' OPTION
 do
 case $OPTION in
   b)
@@ -1596,9 +1618,6 @@ case $OPTION in
   q)
    QUEUE="$OPTARG"
    ;;
-  Q)
-   QUEUEBENCH="$OPTARG"
-   ;;
   s)
    SKIPMATLAB=1
    ;;
@@ -1642,10 +1661,6 @@ fi
 
 if [[ "$QUEUE" == "none" ]] && [[ -e $SCRIPTFILES ]]; then
   rm -f $SCRIPTFILES
-fi
-
-if [ "$QUEUEBENCH" == "" ]; then
-  QUEUEBENCH=$QUEUE
 fi
 
 fdsrepo=$repo/fds
@@ -1761,6 +1776,7 @@ if [ "$UPDATEREPO" == "1" ]; then
 else
   echo " update repos: no"
 fi
+  echo "        queue: $QUEUE"
 echo ""
 
 # Set time limit (43,200 seconds = 12 hours)
@@ -1817,10 +1833,11 @@ echo Building
 echo "   FDS"
 # if something goes wrong with the openmp inspector
 # comment the following 6 lines (including 'if' and and 'fi'  lines
-#if [ "$FIREBOT_LITE" == "" ]; then
+if [ "$FIREBOT_LITE" == "" ]; then
+   build_inspect_fds
 #  inspect_fds
 #  check_inspect_fds
-#fi
+fi
 
 ### Stage 2b ###
 if [ "$BUILD_ONLY" == "" ]; then
