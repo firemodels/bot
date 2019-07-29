@@ -1094,7 +1094,7 @@ check_smv_pictures()
 make_smv_movies()
 {
    cd $smvrepo/Verification
-   scripts/Make_SMV_Movies.sh $TEST 2>&1  &> $OUTPUT_DIR/stage4c
+   scripts/Make_SMV_Movies.sh -q $SMOKEBOT_QUEUE $TEST 2>&1  &> $OUTPUT_DIR/stage4c
 }
 
 #---------------------------------------------
