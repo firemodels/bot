@@ -673,7 +673,8 @@ check_cases_release()
       [[ `grep -rI ERROR: *` == "" ]] && \
       [[ `grep -rI 'STOP: Numerical' *` == "" ]] && \
       [[ `grep -rI forrtl *` == "" ]] && \
-      [[ `grep 'BAD TERMINATION'  */*.log` == "" ]]
+      [[ `grep 'BAD TERMINATION'  */*.log` == "" ]] && \
+      [[ `grep 'Inspector Clean' $OUTPUT_DIR/stage5` != "" ]]
    then
       cases_release_success=true
    else
@@ -684,6 +685,7 @@ check_cases_release()
       grep -rI 'STOP: Numerical' * >> $OUTPUT_DIR/stage5_errors
       grep -A 2 'BAD TERMINATION' */*.log >> $OUTPUT_DIR/stage5_errors
       grep -rI -A 20 forrtl * >> $OUTPUT_DIR/stage5_errors
+      grep -rI "Inspector found errors" $OUTPUT_DIR/stage5i >> $OUTPUT_DIR/stage5_errors
 
       echo "Errors from Stage 5 - Run ${2} cases - release mode:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage5_errors >> $ERROR_LOG
