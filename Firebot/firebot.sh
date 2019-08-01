@@ -676,7 +676,7 @@ check_cases_release()
       [[ `grep -rI 'STOP: Numerical' *` == "" ]] && \
       [[ `grep -rI forrtl *` == "" ]] && \
       [[ `grep 'BAD TERMINATION'  */*.log` == "" ]] && \
-      [[ `grep 'Inspector Clean' $OUTPUT_DIR/stage5` != "" ]]
+      [[ `grep 'Inspector Clean' $OUTPUT_DIR/stage5i` != "" ]]
    then
       cases_release_success=true
    else
