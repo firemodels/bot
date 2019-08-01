@@ -193,12 +193,13 @@ update_repo()
 
    echo "   $reponame" 
    echo Updating $branch on repo $repo/$reponame >> $OUTPUT_DIR/stage1 2>&1
-   git fetch origin >> $OUTPUT_DIR/stage1 2>&1
+   git fetch origin         >> $OUTPUT_DIR/stage1 2>&1
    git merge origin/$branch >> $OUTPUT_DIR/stage1 2>&1
-   have_remote=`git remote -v | grep firemodels | wc  -l`
-   if [ $have_remote -gt 0 ]; then
-      git fetch firemodels >> $OUTPUT_DIR/stage1 2>&1
+   have_firemodels=`git remote -v | grep firemodels | wc  -l`
+   if [ $have_firemodels -gt 0 ]; then
+      git fetch firemodels         >> $OUTPUT_DIR/stage1 2>&1
       git merge firemodels/$branch >> $OUTPUT_DIR/stage1 2>&1
+      git push  origin $branch
    fi
 
    if [[ "$reponame" == "exp" ]]; then

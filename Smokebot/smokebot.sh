@@ -369,12 +369,13 @@ update_repo()
      return 1
    fi
    echo "Updating branch $branch." >> $OUTPUT_DIR/stage0 2>&1
-   git fetch origin >> $OUTPUT_DIR/stage0 2>&1
+   git fetch origin         >> $OUTPUT_DIR/stage0 2>&1
    git merge origin/$branch >> $OUTPUT_DIR/stage0 2>&1
-   have_remote=`git remote -v | awk '{print $1}' | grep firemodels | wc  -l`
-   if [ "$have_remote" != "0" ]; then
-      git fetch firemodels >> $OUTPUT_DIR/stage0 2>&1
+   have_firemodels=`git remote -v | awk '{print $1}' | grep firemodels | wc  -l`
+   if [ "$have_firemodels" != "0" ]; then
+      git fetch firemodels         >> $OUTPUT_DIR/stage0 2>&1
       git merge firemodels/$branch >> $OUTPUT_DIR/stage0 2>&1
+      git push origin $branch
    fi
    return 0
 }
