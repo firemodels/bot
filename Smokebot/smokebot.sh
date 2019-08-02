@@ -369,12 +369,13 @@ update_repo()
      return 1
    fi
    echo "Updating branch $branch." >> $OUTPUT_DIR/stage0 2>&1
-   git fetch origin >> $OUTPUT_DIR/stage0 2>&1
+   git fetch origin         >> $OUTPUT_DIR/stage0 2>&1
    git merge origin/$branch >> $OUTPUT_DIR/stage0 2>&1
-   have_remote=`git remote -v | awk '{print $1}' | grep firemodels | wc  -l`
-   if [ "$have_remote" != "0" ]; then
-      git fetch firemodels >> $OUTPUT_DIR/stage0 2>&1
+   have_firemodels=`git remote -v | awk '{print $1}' | grep firemodels | wc  -l`
+   if [ "$have_firemodels" != "0" ]; then
+      git fetch firemodels         >> $OUTPUT_DIR/stage0 2>&1
       git merge firemodels/$branch >> $OUTPUT_DIR/stage0 2>&1
+      git push origin $branch
    fi
    return 0
 }
@@ -946,7 +947,7 @@ make_smv_pictures_db()
    # Run Make SMV Pictures script (debug mode)
    echo "making smokeview images"
    cd $smvrepo/Verification/scripts
-   ./Make_SMV_Pictures.sh $YOPT -s $size -I $COMPILER $USEINSTALL -d 2>&1 &> $OUTPUT_DIR/stage4a_orig
+   ./Make_SMV_Pictures.sh $YOPT -s $size -q $SMOKEBOT_QUEUE -I $COMPILER $USEINSTALL -d 2>&1 &> $OUTPUT_DIR/stage4a_orig
    grep -v FreeFontPath $OUTPUT_DIR/stage4a_orig > $OUTPUT_DIR/stage4a
 }
 
@@ -1040,7 +1041,7 @@ make_smv_pictures()
    # Run Make SMV Pictures script (release mode)
    echo Generating images 
    cd $smvrepo/Verification/scripts
-   ./Make_SMV_Pictures.sh $YOPT -s $size -I $COMPILER $TESTFLAG $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4b_orig
+   ./Make_SMV_Pictures.sh $YOPT -s $size -q $SMOKEBOT_QUEUE -I $COMPILER $TESTFLAG $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4b_orig
    grep -v FreeFontPath $OUTPUT_DIR/stage4b_orig &> $OUTPUT_DIR/stage4b
 }
 
@@ -1094,7 +1095,7 @@ check_smv_pictures()
 make_smv_movies()
 {
    cd $smvrepo/Verification
-   scripts/Make_SMV_Movies.sh $TEST 2>&1  &> $OUTPUT_DIR/stage4c
+   scripts/Make_SMV_Movies.sh -q $SMOKEBOT_QUEUE $TEST 2>&1  &> $OUTPUT_DIR/stage4c
 }
 
 #---------------------------------------------

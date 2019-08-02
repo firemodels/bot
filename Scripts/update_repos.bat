@@ -17,7 +17,6 @@ cd %repo%\bot
 set allrepos=bot cfast cor exp fds fig out radcal smv cad
 set webrepos=webpages wikis
 set BRANCH=master
-set PUSH=0
 set ahead=0
 
 set wc=%repo%\bot\Scripts\bin\wc
@@ -69,18 +68,16 @@ goto eof
      echo    dir: %repo%\%reponame%
      git fetch firemodels
      git merge firemodels/%BRANCH%
-     if "%PUSH%" == "0" goto skip2
-        git status -uno | %grep% ahead | %wc% -l > %CURDIR%\ahead.out
-        if exist %CURDIR%\ahead.out (
-           set /p ahead=<%CURDIR%\ahead.out
-           if %ahead% GTR 0 (
-              echo pushing %ahead% changes to origin
-              git push origin %BRANCH%
-           )
+     git status -uno | %grep% ahead | %wc% -l > %CURDIR%\ahead.out
+     if exist %CURDIR%\ahead.out (
+        set /p ahead=<%CURDIR%\ahead.out
+        if %ahead% GTR 0 (
+           echo pushing %ahead% changes to origin
+           git push origin %BRANCH%
         )
      )
+  )
   :skip1
-  :skip2
   exit /b
 
 :update_repo2
@@ -114,10 +111,6 @@ goto eof
    set stopscript=1
    exit /b
  )
- if /I "%1" EQU "-p" (
-   set valid=1
-   set PUSH=1
- )
  shift
  if %valid% == 0 (
    echo.
@@ -136,7 +129,6 @@ echo Update the repos %allrepos% if they exist
 echo.
 echo Options:
 echo -h - display this message
-echo -p - push updates to remote origin
 exit /b
 
 :eof
