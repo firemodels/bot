@@ -3,14 +3,12 @@ CUR=`pwd`
 allrepos="bot cfast cor exp fds fig out radcal smv cad"
 otherrepos="webpages wikis"
 BRANCH=master
-PUSH=
 
 function usage {
 echo "Update the repos $allrepos if they exist"
 echo ""
 echo "Options:"
-echo "-h - display this message"
-echo "-p - push updates to remote origin"
+echo "-h - display this message"e origin"
 exit
 }
 
@@ -23,14 +21,11 @@ else
    exit
 fi
 
-while getopts 'hp' OPTION
+while getopts 'h' OPTION
 do
 case $OPTION  in
   h)
    usage;
-   ;;
-  p)
-   PUSH="1";
    ;;
 esac
 done
@@ -72,12 +67,10 @@ UPDATE_REPO ()
      echo "    dir: $repodir"
      git fetch firemodels
      git merge firemodels/$BRANCH
-     if [ "$PUSH" == "1" ]; then
-        ahead=`git status -uno | grep ahead | wc -l`
-        if [ "$ahead" -gt "0" ]; then
-            echo "pushing changes in $repo to origin"
-            git push origin $BRANCH
-        fi
+     ahead=`git status -uno | grep ahead | wc -l`
+     if [ "$ahead" -gt "0" ]; then
+         echo "pushing changes in $repo to origin"
+         git push origin $BRANCH
      fi
   fi
   if [[ "$repo" == "exp" ]]; then
