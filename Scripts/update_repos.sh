@@ -8,7 +8,7 @@ function usage {
 echo "Update the repos $allrepos if they exist"
 echo ""
 echo "Options:"
-echo "-h - display this message"e origin"
+echo "-h - display this message"
 exit
 }
 
@@ -69,8 +69,8 @@ UPDATE_REPO ()
      git merge firemodels/$BRANCH
      ahead=`git status -uno | grep ahead | wc -l`
      if [ "$ahead" -gt "0" ]; then
-         echo "pushing changes in $repo to origin"
-         git push origin $BRANCH
+        echo "    pushing $repo/firemodels changes to origin"
+        git push origin $BRANCH
      fi
   fi
   if [[ "$repo" == "exp" ]]; then

@@ -93,13 +93,13 @@ set "BASEDIR=%SystemDrive%\Program Files"
 if "%option_install%" == "2" set "BASEDIR=%userprofile%"
 
 set subdir=firemodels
+set "INSTALLDIR=%BASEDIR%\%subdir%"
 echo.
-if "%auto_install%" == "n" set /p subdir="Enter directory to contain FDS and Smokeview (default: %subdir%):"
+if "%auto_install%" == "n" set /p INSTALLDIR="Enter FDS/Smokeview root directory (default: %INSTALLDIR%):"
 
-::*** start installation of FDS and SMokeview
+::*** start installation of FDS and Smokeview
 
 :install
-set "INSTALLDIR=%BASEDIR%\%subdir%"
 
 echo.
 echo Installation directory: %INSTALLDIR%
