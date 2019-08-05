@@ -69,7 +69,7 @@ UPDATE_REPO ()
      git merge firemodels/$BRANCH
      ahead=`git status -uno | grep ahead | wc -l`
      if [ "$ahead" -gt "0" ]; then
-        echo "pushing changes in $repo to origin"
+        echo "    pushing $repo/firemodels changes to origin"
         git push origin $BRANCH
      fi
   fi

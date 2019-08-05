@@ -68,14 +68,8 @@ goto eof
      echo    dir: %repo%\%reponame%
      git fetch firemodels
      git merge firemodels/%BRANCH%
-     git status -uno | %grep% ahead | %wc% -l > %CURDIR%\ahead.out
-     if exist %CURDIR%\ahead.out (
-        set /p ahead=<%CURDIR%\ahead.out
-        if %ahead% GTR 0 (
-           echo pushing %ahead% changes to origin
-           git push origin %BRANCH%
-        )
-     )
+     echo    pushing firemodels changes to origin
+     git push origin %BRANCH%
   )
   :skip1
   exit /b
@@ -86,12 +80,12 @@ goto eof
   set repodir=%repo%\%reponame%
   if not exist %repodir% (
      exit /b
-  )   
+  )
   echo ------------------ %reponame% -----------------------------------------
   cd %repodir%
   git rev-parse --abbrev-ref HEAD | head -1 > %CURDIR%\gitbranch.out
   set /p BRANCH=<%CURDIR%\gitbranch.out
-  
+
   echo *** updating from origin
   echo    branch: %branch%
   echo    dir: %repo%\%reponame%
@@ -137,7 +131,4 @@ if exist %CURDIR%\gitbranch.out (
 )
 if exist %CURDIR%\have_central.out (
   erase %CURDIR%\have_central.out
-)
-if exist %CURDIR%\ahead.out (
-  erase %CURDIR%\ahead.out
 )
