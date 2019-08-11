@@ -289,6 +289,7 @@ hashfile fds2ascii > hash/fds2ascii.sha1
 hashfile test_mpi  > hash/test_mpi.sha1
 cd $CURDIR
 
+openmpifile=
 if [ "$MPI_VERSION" == "INTEL" ]; then
     intelmpifile=INTEL${INTEL_COMP_VERSION}linux_64.tar.gz
 else
@@ -381,7 +382,12 @@ gzip    ../$bundlebase.tar
 echo Creating installer
 cd ..
 bundlepath=`pwd`/$bundlebase.sh
-$makeinstaller -i $bundlebase.tar.gz -d $INSTALLDIR -m $MPI_VERSION $bundlebase.sh
+
+OPENMPIFILE=
+if [ "$openmpifile" != "" ]; then
+  OPENMPIFILE="-M $openmpifile"
+fi
+$makeinstaller -i $bundlebase.tar.gz -d $INSTALLDIR -m $MPI_VERSION $OPENMPIFILE $bundlebase.sh
 
 cat $bundledir/bin/hash/*.sha1     >  $bundlebase.sha1
 cat $bundledir/$smvbin/hash/*.sha1 >  $bundlebase.sha1
