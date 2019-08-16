@@ -8,7 +8,7 @@ function usage {
 echo "Update the repos $allrepos if they exist"
 echo ""
 echo "Options:"
-echo "-h - display this message"e origin"
+echo "-h - display this message"
 exit
 }
 
