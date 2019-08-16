@@ -42,29 +42,19 @@ function clean_upload(platform,prog){
 
 <h3>Bundles</h3>
 <p><table border=on>
-<tr><th colspan=4>Copy Apps</th></tr>
-
-<tr><td></td><th>Windows</th><th>Linux</th><th>OSX</th>
+<tr><th>Windows</th><th>Linux</th><th>OSX</th>
 
 <tr>
-<th>FDS</th>
-<td align=center><button onclick="copy_fdsapps('windows')">Copy</button></td>
-<td align=center><button onclick="copy_fdsapps('linux')">Copy</button></td>
-<td align=center><button onclick="copy_fdsapps('osx')">Copy</button></td>
+<td align=center><button onclick="copy_fdsapps('windows')">Copy FDS</button></td>
+<td align=center><button onclick="copy_fdsapps('linux')">Copy FDS</button></td>
+<td align=center><button onclick="copy_fdsapps('osx')">Copy FDS</button></td>
 </tr>
 <tr>
-<th>Smokeview</th>
-<td align=center><button onclick="copy_smvapps('windows')">Copy</button></td>
-<td align=center><button onclick="copy_smvapps('linux')">Copy</button></td>
-<td align=center><button onclick="copy_smvapps('osx')">Copy</button></td>
+<td align=center><button onclick="copy_smvapps('windows')">Copy Smokeview</button></td>
+<td align=center><button onclick="copy_smvapps('linux')">Copy Smokeview</button></td>
+<td align=center><button onclick="copy_smvapps('osx')">Copy Smokeview</button></td>
 </tr>
 
-</table>
-
-
-<p><table border=on>
-<tr><th colspan=3>Build Bundle</th></tr>
-<tr><th>Windows</th><th>Linux</th><th>OSX</th></tr>
 <tr>
 <td align=center><button onclick="bundle_fdssmv('windows')">Bundle</button></td>
 <td align=center>
