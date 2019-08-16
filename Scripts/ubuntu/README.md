@@ -8,10 +8,15 @@ update packages:
 
 sudo apt-get update
 
-# Packages for building FDS
+# Compiler/Module Packages
 
 ### make, gnu compilers etc
 sudo apt-get install build-essential
+
+### modules
+sudo apt-get install environment-modules
+
+# Packages for building FDS
 
 ### openmpi
 sudo apt-get install openmpi-bin openmpi-common openssh-client openssh-server libopenmpi-dbg libopenmpi-dev

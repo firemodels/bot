@@ -193,12 +193,13 @@ update_repo()
 
    echo "   $reponame" 
    echo Updating $branch on repo $repo/$reponame >> $OUTPUT_DIR/stage1 2>&1
-   git fetch origin >> $OUTPUT_DIR/stage1 2>&1
+   git fetch origin         >> $OUTPUT_DIR/stage1 2>&1
    git merge origin/$branch >> $OUTPUT_DIR/stage1 2>&1
-   have_remote=`git remote -v | grep firemodels | wc  -l`
-   if [ $have_remote -gt 0 ]; then
-      git fetch firemodels >> $OUTPUT_DIR/stage1 2>&1
+   have_firemodels=`git remote -v | grep firemodels | wc  -l`
+   if [ $have_firemodels -gt 0 ]; then
+      git fetch firemodels         >> $OUTPUT_DIR/stage1 2>&1
       git merge firemodels/$branch >> $OUTPUT_DIR/stage1 2>&1
+      git push  origin $branch
    fi
 
    if [[ "$reponame" == "exp" ]]; then
@@ -288,8 +289,9 @@ build_inspect_fds()
 {
    # build an openmp thread checker version of fds
    echo "      inspection"
-   cd $fdsrepo/Verification/Thread_Check/
-   ./build_inspect_openmp.sh -I  &> $OUTPUT_DIR/stage2a
+   cd $fdsrepo/Build/${INTEL}mpi_intel_linux_64_inspect
+   make -f ../makefile clean &> /dev/null
+   ./make_fds.sh &> $OUTPUT_DIR/stage2a
 }
 
 #---------------------------------------------
@@ -310,10 +312,9 @@ inspect_fds()
 
 check_inspect_fds()
 {
-   # Scan for errors in thread checking results
-   cd $fdsrepo/Utilities/Scripts
+
    # grep -v 'Warning: One or more threads in the application accessed ...' ignores a known compiler warning that displays even without errors
-      if [[ `grep -i -E 'warning|remark|problem|error' $OUTPUT_DIR/stage2a | grep -v '0 new problem(s) found' | grep -v 'Warning: One or more threads in the application accessed the stack of another thread'` == "" ]]
+      if [[ `grep -i -E 'warning|remark|problem|error' $fdsrepo/Verification/Thread_Check/race_test_4.err | grep -v '0 new problem(s) found' | grep -v 'Warning: One or more threads in the application accessed the stack of another thread'` == "" ]]
    then
       # Continue along
       :
@@ -357,7 +358,8 @@ check_compile_fds_mpi_db()
       echo "" >> $ERROR_LOG
    fi
 
-   # Check for compiler warnings/remarks
+ 
+  # Check for compiler warnings/remarks
    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
    if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage2b | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented'` == "" ]]
    then
@@ -477,7 +479,7 @@ run_verification_cases_debug()
    wait_cases_debug_end 'verification'
 
 #  check whether cases have run
-#   ./Run_FDS_Cases.sh -C >> $OUTPUT_DIR/stage4 2>&1
+   ./Run_FDS_Cases.sh -C >> $OUTPUT_DIR/stage4 2>&1
 
    # Remove all .stop files from Verification directories (recursively)
    cd $fdsrepo/Verification
@@ -673,7 +675,8 @@ check_cases_release()
       [[ `grep -rI ERROR: *` == "" ]] && \
       [[ `grep -rI 'STOP: Numerical' *` == "" ]] && \
       [[ `grep -rI forrtl *` == "" ]] && \
-      [[ `grep 'BAD TERMINATION'  */*.log` == "" ]]
+      [[ `grep 'BAD TERMINATION'  */*.log` == "" ]] && \
+      [[ `grep 'Inspector Clean' $OUTPUT_DIR/stage5i` != "" ]]
    then
       cases_release_success=true
    else
@@ -684,6 +687,7 @@ check_cases_release()
       grep -rI 'STOP: Numerical' * >> $OUTPUT_DIR/stage5_errors
       grep -A 2 'BAD TERMINATION' */*.log >> $OUTPUT_DIR/stage5_errors
       grep -rI -A 20 forrtl * >> $OUTPUT_DIR/stage5_errors
+      grep -rI "Inspector found errors" $OUTPUT_DIR/stage5i >> $OUTPUT_DIR/stage5_errors
 
       echo "Errors from Stage 5 - Run ${2} cases - release mode:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage5_errors >> $ERROR_LOG
@@ -732,26 +736,32 @@ run_verification_cases_release()
    # Run FDS with 1 OpenMP thread
    echo 'Running FDS benchmark verification cases:' >> $OUTPUT_DIR/stage5
    echo ./Run_FDS_Cases.sh $INTEL2 $DV2 -b -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
-   ./Run_FDS_Cases.sh $INTEL2 $DV2 -b -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
+        ./Run_FDS_Cases.sh $INTEL2 $DV2 -b -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
    echo "" >> $OUTPUT_DIR/stage5 2>&1
 
    # Wait for benchmark verification cases to end
 # let benchmark and regular cases run at the same time - for now
 #   wait_cases_release_end 'verification'
 
-   echo 'Running FDS non-benchmark verification cases:' >> $OUTPUT_DIR/stage5
-   echo ./Run_FDS_Cases.sh $INTEL2 $DV2 -R -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
-   ./Run_FDS_Cases.sh $INTEL2 $DV2 -R -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
-   echo "" >> $OUTPUT_DIR/stage5 2>&1
-
 # comment out thread checking cases for now   
 #   echo 'Running FDS thread checking verification cases:' >> $OUTPUT_DIR/stage5
-#   echo ./Run_FDS_Cases.sh $INTEL2 -t -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
-#   ./Run_FDS_Cases.sh $INTEL2 -t -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
-#   echo "" >> $OUTPUT_DIR/stage5 2>&1
+   cd ../Thread_Check
+   echo ./inspection.sh -p 6 -q $QUEUE  inspector_test.fds >> $OUTPUT_DIR/stage5i 2>&1
+        ./inspection.sh -p 6 -q $QUEUE  inspector_test.fds >> $OUTPUT_DIR/stage5i 2>&1 &
+   echo "" >> $OUTPUT_DIR/stage5i 2>&1
+
+   cd ../scripts
+   echo 'Running FDS non-benchmark verification cases:' >> $OUTPUT_DIR/stage5
+   echo ./Run_FDS_Cases.sh $INTEL2 $DV2 -R -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
+        ./Run_FDS_Cases.sh $INTEL2 $DV2 -R -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
+   echo "" >> $OUTPUT_DIR/stage5 2>&1
+
+
 
    # Wait for non-benchmark verification cases to end
    wait_cases_release_end 'verification'
+
+
 
    # rerun cases that failed with 'BAD TERMINATION' errors
 #   ./Run_FDS_Cases.sh $INTEL2 $DV2 -F -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
@@ -761,7 +771,7 @@ run_verification_cases_release()
 #   wait_cases_release_end 'verification'
 
 #  check whether cases have run 
-#   ./Run_FDS_Cases.sh -C  >> $OUTPUT_DIR/stage5 2>&1
+   ./Run_FDS_Cases.sh -C  >> $OUTPUT_DIR/stage5 2>&1
 }
 
 #---------------------------------------------
