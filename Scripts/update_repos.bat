@@ -67,7 +67,6 @@ goto eof
      echo    branch: %branch%
      echo    dir: %repo%\%reponame%
      git merge firemodels/%BRANCH%
-     echo    pushing firemodels changes to origin
      git push origin %BRANCH%
   :skip1
 
