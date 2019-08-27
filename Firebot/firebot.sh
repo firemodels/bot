@@ -192,23 +192,22 @@ update_repo()
    CD_REPO $repo/$reponame $branch || return 1
 
    echo "   $reponame" 
-   echo Updating $branch on repo $repo/$reponame >> $OUTPUT_DIR/stage1 2>&1
-   git fetch origin         >> $OUTPUT_DIR/stage1 2>&1
-   git merge origin/$branch >> $OUTPUT_DIR/stage1 2>&1
+   echo Updating $branch on repo $repo/$reponame     >> $OUTPUT_DIR/stage1 2>&1
+   git remote update                                 >> $OUTPUT_DIR/stage1 2>&1
+   git merge origin/$branch                          >> $OUTPUT_DIR/stage1 2>&1
    have_firemodels=`git remote -v | grep firemodels | wc  -l`
    if [ $have_firemodels -gt 0 ]; then
-      git fetch firemodels         >> $OUTPUT_DIR/stage1 2>&1
-      git merge firemodels/$branch >> $OUTPUT_DIR/stage1 2>&1
+      git merge firemodels/$branch                   >> $OUTPUT_DIR/stage1 2>&1
       git push  origin $branch
    fi
 
    if [[ "$reponame" == "exp" ]]; then
-      echo "Fetching origin." >> $OUTPUT_DIR/stage1 2>&1
-      git fetch origin >> $OUTPUT_DIR/stage1 2>&1
-      echo "Updating submodules." >> $OUTPUT_DIR/stage1 2>&1
-      git submodule foreach git fetch origin >> $OUTPUT_DIR/stage1 2>&1
+      echo "Updating submodules."                   >> $OUTPUT_DIR/stage1 2>&1
+      git submodule foreach git remote update       >> $OUTPUT_DIR/stage1 2>&1
+
+      echo "Merge submodules origin."               >> $OUTPUT_DIR/stage1 2>&1
       git submodule foreach git merge origin/master >> $OUTPUT_DIR/stage1 2>&1
-      git status -uno  >> $OUTPUT_DIR/stage1 2>&1
+      git status -uno                               >> $OUTPUT_DIR/stage1 2>&1
    fi
    return 0
 }
