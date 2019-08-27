@@ -56,7 +56,7 @@ goto eof
   echo *** updating from origin
   echo    branch: %branch%
   echo    dir: %repo%\%reponame%
-  git fetch origin
+  git remote update
   git merge origin/%BRANCH%
   git remote -v | %gawk% "{print $1}" | %grep% firemodels | %wc%  -l > %CURDIR%\have_central.out
   set /p have_central=<%CURDIR%\have_central.out
@@ -66,12 +66,16 @@ goto eof
      echo *** updating from firemodels
      echo    branch: %branch%
      echo    dir: %repo%\%reponame%
-     git fetch firemodels
      git merge firemodels/%BRANCH%
      echo    pushing firemodels changes to origin
      git push origin %BRANCH%
-  )
   :skip1
+
+  if "%repo%" == "exp" (
+     git submodule foreach git remote update
+     git submodule foreach git merge origin/master
+  )
+
   exit /b
 
 :update_repo2
