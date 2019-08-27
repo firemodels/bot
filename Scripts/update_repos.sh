@@ -74,6 +74,7 @@ UPDATE_REPO ()
   if [[ "$repo" == "exp" ]]; then
      git submodule foreach git remote update
      git submodule foreach git merge origin/master
+     git submodule update
   fi
 }
 
