@@ -1572,8 +1572,7 @@ DEBUG_ONLY=
 PUSH=
 
 #*** parse command line arguments
-
-while getopts 'b:BcdDhIiJLm:Npq:suUW' OPTION
+while getopts 'b:BcdDhIiJLm:Np:Pq:suUW' OPTION
 do
 case $OPTION in
   b)
@@ -1622,6 +1621,9 @@ case $OPTION in
    COPY_MANUAL_DIR=
    ;;
   p)
+   PID_FILE="$OPTARG"
+   ;;
+  P)
    PUSH=1
    ;;
   q)

@@ -28,7 +28,7 @@ if [ "$EMAIL" != "" ]; then
 else
   echo "-m email_address "
 fi
-echo "-p - push firemodels changes to origin"
+echo "-P - push firemodels changes to origin"
 echo "-R - remove run status file"
 echo "-s - skip matlab and build document stages"
 echo "-S - use startup files to set the environment, not modules"
@@ -183,7 +183,7 @@ PUSH=
 
 #*** parse command line options
 
-while getopts 'bBcdDFfHhIiJkLm:NnOpq:RSsuUvW' OPTION
+while getopts 'bBcdDFfHhIiJkLm:NnOPq:RSsuUvW' OPTION
 do
 case $OPTION  in
   b)
@@ -240,8 +240,8 @@ case $OPTION  in
   O)
    INTEL=
    ;;
-  p)
-   PUSH=-p
+  P)
+   PUSH=-P
    ;;
   q)
    QUEUE="$OPTARG"
@@ -363,6 +363,7 @@ BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
 firebot_status=0
+echo run_INTEL=$INTEL
 $ECHO  ./$botscript -p $firebot_pid $UPDATE $DV $INTEL $debug_mode $BUILD_ONLY $PUSH $BRANCH $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $CLONE_REPOS $EMAIL $COPY_MANUAL_DIR $DEBUG_ONLY "$@"
 firebot_status=$?
 if [ -e $firebot_pid ]; then
