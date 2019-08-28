@@ -201,6 +201,11 @@ update_repo()
       if [ "$PUSH" == "1" ]; then
         git push  origin $branch
       fi
+      need_push=`git status -uno | head -2 | grep -v nothing | wc -l`
+      if [ $need_push -gt 1 ]; then
+        echo "warning: firemodels commits to $reponame need to be pushed to origin" >> $OUTPUT_DIR/stage1 2>&1
+        git status -uno | head -2 | grep -v nothing                                 >> $OUTPUT_DIR/stage1 2>&1
+      fi
    fi
 
    if [[ "$reponame" == "exp" ]]; then
@@ -259,14 +264,14 @@ check_git_checkout()
 {
    # Check for GIT errors
    if [ -e $OUTPUT_DIR/stage1 ]; then
-     if [[ `grep -i -E 'modified' $OUTPUT_DIR/stage1` == "" ]]
+     if [[ `grep -i -E 'warning|modified' $OUTPUT_DIR/stage1` == "" ]]
      then
         # Continue along
         :
      else
         echo "Warnings from Stage 1 - Update repos" >> $WARNING_LOG
         echo "" >> $WARNING_LOG
-        grep -A 5 -B 5 -i -E 'modified' $OUTPUT_DIR/stage1 >> $WARNING_LOG
+        grep -A 5 -B 5 -i -E 'warning|modified' $OUTPUT_DIR/stage1 >> $WARNING_LOG
         echo "" >> $WARNING_LOG
      fi
    fi
