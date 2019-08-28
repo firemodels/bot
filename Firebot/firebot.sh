@@ -24,7 +24,6 @@ echo "-L - firebot lite,  run only stages that build a debug fds and run cases w
 echo "                    (no release fds, no release cases, no matlab, etc)"
 echo "-m email_address "
 echo "-N - don't copy Manuals directory to .firebot/Manuals"
-echo "-p - push firemodels changes to origin"
 echo "-q - queue_name - run cases using the queue queue_name"
 echo "     default: $QUEUE"
 echo "-s - skip matlab and document building stages"
@@ -198,13 +197,10 @@ update_repo()
    have_firemodels=`git remote -v | grep firemodels | wc  -l`
    if [ $have_firemodels -gt 0 ]; then
       git merge firemodels/$branch                   >> $OUTPUT_DIR/stage1 2>&1
-      if [ "$PUSH" == "1" ]; then
-        git push  origin $branch
-      fi
       need_push=`git status -uno | head -2 | grep -v nothing | wc -l`
       if [ $need_push -gt 1 ]; then
-        echo "warning: firemodels commits to $reponame need to be pushed to origin" >> $OUTPUT_DIR/stage1 2>&1
-        git status -uno | head -2 | grep -v nothing                                 >> $OUTPUT_DIR/stage1 2>&1
+        echo "warning: firemodels commits to $reponame repo need to be pushed to origin" >> $OUTPUT_DIR/stage1 2>&1
+        git status -uno | head -2 | grep -v nothing                                      >> $OUTPUT_DIR/stage1 2>&1
       fi
    fi
 
@@ -1569,10 +1565,9 @@ INTEL2=
 CLONE_REPOS=
 COPY_MANUAL_DIR=1
 DEBUG_ONLY=
-PUSH=
 
 #*** parse command line arguments
-while getopts 'b:BcdDhIiJLm:Np:Pq:suUW' OPTION
+while getopts 'b:BcdDhIiJLm:Np:q:suUW' OPTION
 do
 case $OPTION in
   b)
@@ -1622,9 +1617,6 @@ case $OPTION in
    ;;
   p)
    PID_FILE="$OPTARG"
-   ;;
-  P)
-   PUSH=1
    ;;
   q)
    QUEUE="$OPTARG"
