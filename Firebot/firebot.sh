@@ -207,7 +207,6 @@ update_repo()
 
       echo "Merge submodules origin."               >> $OUTPUT_DIR/stage1 2>&1
       git submodule foreach git merge origin/master >> $OUTPUT_DIR/stage1 2>&1
-      git submodule update                          >> $OUTPUT_DIR/stage1 2>&1
       git status -uno                               >> $OUTPUT_DIR/stage1 2>&1
    fi
    return 0

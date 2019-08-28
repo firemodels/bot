@@ -73,7 +73,6 @@ goto eof
   if "%repo%" == "exp" (
      git submodule foreach git remote update
      git submodule foreach git merge origin/master
-     git submodule update
   )
 
   exit /b
