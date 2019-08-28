@@ -22,9 +22,10 @@ echo "-f - force smokebot run"
 echo "-I compiler - intel or gnu [default: $COMPILER]"
 echo "-J use Intel MPI version of fds"
 echo "-k - kill smokebot if it is running"
-echo "-q queue [default: $QUEUE]"
 echo "-L - smokebot lite,  run only stages that build a debug fds and run"
 echo "     cases with it (no release fds, no release cases, no manuals, etc)"
+echo "-p - push firemodels changes to origin"
+echo "-q queue [default: $QUEUE]"
 if [ "$EMAIL" != "" ]; then
 echo "-m email_address - [default: $EMAIL]"
 else
@@ -172,6 +173,7 @@ export MPIRUN_MCA=
 export QFDS_STARTUP=
 SKIP=
 REMOVE_PID=
+PUSH=
 
 WEB_URL=
 web_DIR=/var/www/html/`whoami`
@@ -193,7 +195,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'aAbBcCd:fhHI:JkLm:NMq:Rr:StuUvw:W:' OPTION
+while getopts 'aAbBcCd:fhHI:JkLm:NMpq:Rr:StuUvw:W:' OPTION
 do
 case $OPTION  in
   a)
@@ -243,6 +245,9 @@ case $OPTION  in
    ;;
   N)
    NOPT="-N"
+   ;;
+  p)
+   PUSH="-p"
    ;;
   q)
    QUEUE="$OPTARG"
@@ -367,7 +372,7 @@ BRANCH="-b $BRANCH"
 #*** run smokebot
 
 touch $smokebot_pid
-$ECHO ./$botscript $SKIP $NOPT $SIZE $BRANCH $TESTFLAG $RUNAUTO $INTEL $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $SKIP $NOPT $SIZE $BRANCH $TESTFLAG $RUNAUTO $INTEL $COMPILER $PUSH $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi

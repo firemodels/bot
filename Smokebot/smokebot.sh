@@ -368,25 +368,44 @@ update_repo()
      echo "smokebot without the -u (update) option"
      return 1
    fi
-   echo "Updating branch $branch." >> $OUTPUT_DIR/stage0 2>&1
-   git remote update               >> $OUTPUT_DIR/stage0 2>&1
-   git merge origin/$branch        >> $OUTPUT_DIR/stage0 2>&1
+   echo "Updating branch $branch."   >> $OUTPUT_DIR/stage0 2>&1
+   git remote update                 >> $OUTPUT_DIR/stage0 2>&1
+   git merge origin/$branch          >> $OUTPUT_DIR/stage0 2>&1
    have_firemodels=`git remote -v | awk '{print $1}' | grep firemodels | wc  -l`
    if [ "$have_firemodels" != "0" ]; then
-      git merge firemodels/$branch >> $OUTPUT_DIR/stage0 2>&1
-      git push origin $branch      >> $OUTPUT_DIR/stage0 2>&1
+      git merge firemodels/$branch   >> $OUTPUT_DIR/stage0 2>&1
+      if [ "$PUSH" == "1" ]; then
+        git push origin $branch      >> $OUTPUT_DIR/stage0 2>&1
+      fi
+      need_push=`git status -uno | head -2 | grep -v nothing | wc -l`
+      if [ $need_push -gt 1 ]; then
+        echo "warning: firemodels commits to $reponame need to be pushed to origin" >> $OUTPUT_DIR/stage0 2>&1
+        git status -uno | head -2 | grep -v nothing                                 >> $OUTPUT_DIR/stage0 2>&1
+      fi
+
    fi
    return 0
 }
 
 #---------------------------------------------
-#                   check_FDS_checkout
+#                   check_update_repo
 #---------------------------------------------
 
-check_FDS_checkout()
+check_update_repo()
 {
    # Check for GIT errors
-   stage0_success=true
+   if [ -e $OUTPUT_DIR/stage0 ]; then
+     if [[ `grep -i -E 'warning|modified' $OUTPUT_DIR/stage0` == "" ]]
+     then
+        # Continue along
+        :
+     else
+        echo "warnings from Stage 0 - Update repos"                >> $WARNING_LOG
+        echo ""                                                    >> $WARNING_LOG
+        grep -A 5 -B 5 -i -E 'warning|modified' $OUTPUT_DIR/stage0 >> $WARNING_LOG
+        echo ""                                                    >> $WARNING_LOG
+     fi
+   fi
 }
 
 #---------------------------------------------
@@ -1432,10 +1451,11 @@ PID_FILE=~/.fdssmvgit/smokebot_pid
 INTEL=
 SKIP=
 SAVEGUIDE_DIR=$HOME/.smokebot/pubs
+PUSH=
 
 #*** parse command line options
 
-while getopts '3aAb:cI:JLm:MNo:p:q:r:SstuUw:W:' OPTION
+while getopts '3aAb:cI:JLm:MNo:pq:r:SstuUw:W:' OPTION
 do
 case $OPTION in
   3)
@@ -1490,7 +1510,7 @@ case $OPTION in
    RUN_OPENMP="-o $nthreads"
    ;;
   p)
-   PID_FILE="$OPTARG"
+   PUSH=1
    ;;
   q)
    SMOKEBOT_QUEUE="$OPTARG"
@@ -1781,6 +1801,8 @@ if [ "$UPDATEREPO" == "1" ]; then
 else
   echo Repos not updated
 fi
+
+check_update_repo
 
 PRELIM_end=`GET_TIME`
 DIFF_PRELIM=`GET_DURATION $PRELIM_beg $PRELIM_end`
