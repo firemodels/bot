@@ -19,15 +19,16 @@ echo "-F - skip figure generation and build document stages"
 echo "-i - use installed version of smokeview"
 echo "-I - use development version of fds"
 echo "-J - use Intel MPI version fds"
-echo "-N - don't copy Manuals directory to .firebot/Manuals"
-echo "-O - use OpenMPI version fds"
 echo "-L - firebot lite,  run only stages that build a debug fds and run cases with it"
 echo "                    (no release fds, no release cases, no matlab, etc)"
+echo "-N - don't copy Manuals directory to .firebot/Manuals"
+echo "-O - use OpenMPI version fds"
 if [ "$EMAIL" != "" ]; then
   echo "-m email_address [default: $EMAIL]"
 else
   echo "-m email_address "
 fi
+echo "-p - push firemodels changes to origin"
 echo "-R - remove run status file"
 echo "-s - skip matlab and build document stages"
 echo "-S - use startup files to set the environment, not modules"
@@ -178,10 +179,11 @@ CLONE_REPOS=
 BUILD_ONLY=
 DEBUG_ONLY=
 export QFDS_STARTUP=
+PUSH=
 
 #*** parse command line options
 
-while getopts 'bBcdDFfHhIiJkLm:NnOq:RSsuUvW' OPTION
+while getopts 'bBcdDFfHhIiJkLm:NnOpq:RSsuUvW' OPTION
 do
 case $OPTION  in
   b)
@@ -237,6 +239,9 @@ case $OPTION  in
    ;;
   O)
    INTEL=
+   ;;
+  p)
+   PUSH=-p
    ;;
   q)
    QUEUE="$OPTARG"
@@ -358,7 +363,7 @@ BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
 firebot_status=0
-$ECHO  ./$botscript -p $firebot_pid $UPDATE $DV $INTEL $debug_mode $BUILD_ONLY $BRANCH $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $CLONE_REPOS $EMAIL $COPY_MANUAL_DIR $DEBUG_ONLY "$@"
+$ECHO  ./$botscript -p $firebot_pid $UPDATE $DV $INTEL $debug_mode $BUILD_ONLY $PUSH $BRANCH $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $CLONE_REPOS $EMAIL $COPY_MANUAL_DIR $DEBUG_ONLY "$@"
 firebot_status=$?
 if [ -e $firebot_pid ]; then
   rm -f $firebot_pid

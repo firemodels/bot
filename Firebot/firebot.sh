@@ -24,7 +24,7 @@ echo "-L - firebot lite,  run only stages that build a debug fds and run cases w
 echo "                    (no release fds, no release cases, no matlab, etc)"
 echo "-m email_address "
 echo "-N - don't copy Manuals directory to .firebot/Manuals"
-echo "-p pid_file - file containing process id of firebot process "
+echo "-p - push firemodels changes to origin"
 echo "-q - queue_name - run cases using the queue queue_name"
 echo "     default: $QUEUE"
 echo "-s - skip matlab and document building stages"
@@ -198,7 +198,9 @@ update_repo()
    have_firemodels=`git remote -v | grep firemodels | wc  -l`
    if [ $have_firemodels -gt 0 ]; then
       git merge firemodels/$branch                   >> $OUTPUT_DIR/stage1 2>&1
-      git push  origin $branch
+      if [ "$PUSH" == "1" ]; then
+        git push  origin $branch
+      fi
    fi
 
    if [[ "$reponame" == "exp" ]]; then
@@ -1562,10 +1564,11 @@ INTEL2=
 CLONE_REPOS=
 COPY_MANUAL_DIR=1
 DEBUG_ONLY=
+PUSH=
 
 #*** parse command line arguments
 
-while getopts 'b:BcdDhIiJLm:Np:q:suUW' OPTION
+while getopts 'b:BcdDhIiJLm:Npq:suUW' OPTION
 do
 case $OPTION in
   b)
@@ -1614,7 +1617,7 @@ case $OPTION in
    COPY_MANUAL_DIR=
    ;;
   p)
-   PID_FILE="$OPTARG"
+   PUSH=1
    ;;
   q)
    QUEUE="$OPTARG"
