@@ -374,9 +374,6 @@ update_repo()
    have_firemodels=`git remote -v | awk '{print $1}' | grep firemodels | wc  -l`
    if [ "$have_firemodels" != "0" ]; then
       git merge firemodels/$branch   >> $OUTPUT_DIR/stage0 2>&1
-      if [ "$PUSH" == "1" ]; then
-        git push origin $branch      >> $OUTPUT_DIR/stage0 2>&1
-      fi
       need_push=`git status -uno | head -2 | grep -v nothing | wc -l`
       if [ $need_push -gt 1 ]; then
         echo "warning: firemodels commits to $reponame need to be pushed to origin" >> $OUTPUT_DIR/stage0 2>&1
@@ -1451,11 +1448,10 @@ PID_FILE=~/.fdssmvgit/smokebot_pid
 INTEL=
 SKIP=
 SAVEGUIDE_DIR=$HOME/.smokebot/pubs
-PUSH=
 
 #*** parse command line options
 
-while getopts '3aAb:cI:JLm:MNo:pq:r:SstuUw:W:' OPTION
+while getopts '3aAb:cI:JLm:MNo:q:r:SstuUw:W:' OPTION
 do
 case $OPTION in
   3)
@@ -1508,9 +1504,6 @@ case $OPTION in
    nthreads="$OPTARG"
    OPENMP=openmp_
    RUN_OPENMP="-o $nthreads"
-   ;;
-  p)
-   PUSH=1
    ;;
   q)
    SMOKEBOT_QUEUE="$OPTARG"
