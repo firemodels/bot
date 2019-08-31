@@ -1131,11 +1131,11 @@ archive_repo_sizes()
    cd $repo
    echo archiving repo_sizes
 
-   exp_size=`du -ks exp |  awk '{print $2 }' `
-   fds_size=`du -ks fds |  awk '{print $2 }' `
-   fig_size=`du -ks fig |  awk '{print $2 }' `
-   out_size=`du -ks out |  awk '{print $2 }' `
-   smv_size=`du -ks smv |  awk '{print $2 }' `
+   exp_size=`du -ks exp |  awk '{print $1 }' `
+   fds_size=`du -ks fds |  awk '{print $1 }' `
+   fig_size=`du -ks fig |  awk '{print $1 }' `
+   out_size=`du -ks out |  awk '{print $1 }' `
+   smv_size=`du -ks smv |  awk '{print $1 }' `
    echo $EXP_REVISION $exp_size  >  "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.txt"
    echo $FDS_REVISION $fds_size  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.txt"
    echo $FIG_REVISION $fig_size  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.txt"
