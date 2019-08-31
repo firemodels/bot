@@ -1136,11 +1136,11 @@ archive_repo_sizes()
    fig_size=`du -ks fig |  awk '{print $1 }' `
    out_size=`du -ks out |  awk '{print $1 }' `
    smv_size=`du -ks smv |  awk '{print $1 }' `
-   echo $EXP_REVISION $exp_size  >  "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.txt"
-   echo $FDS_REVISION $fds_size  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.txt"
-   echo $FIG_REVISION $fig_size  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.txt"
-   echo $OUT_REVISION $out_size  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.txt"
-   echo $SMV_REVISION $smv_size  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.txt"
+   echo $EXP_REVISION,$exp_size  >  "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.csv"
+   echo $FDS_REVISION,$fds_size  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.csv"
+   echo $FIG_REVISION,$fig_size  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.csv"
+   echo $OUT_REVISION,$out_size  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.csv"
+   echo $SMV_REVISION,$smv_size  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.csv"
 }
 
 #---------------------------------------------
