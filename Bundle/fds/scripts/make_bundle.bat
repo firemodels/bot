@@ -77,8 +77,8 @@ set smv_casesbat=%repo_root%\smv\Verification\scripts\SMV_Cases.bat
 set wui_casessh=%repo_root%\smv\Verification\scripts\WUI_Cases.sh
 set wui_casesbat=%repo_root%\smv\Verification\scripts\WUI_Cases.bat
 
-set copyFDScases=%repo_root%\fds\Utilities\Scripts\copyFDScases.bat
-set copyCFASTcases=%repo_root%\fds\Utilities\Scripts\copyCFASTcases.bat
+set copyFDScases=%repo_root%\bot\Bundle\fds\scripts\copyFDScases.bat
+set copyCFASTcases=%repo_root%\bot\Bundle\fds\scripts\copyCFASTcases.bat
 
 set fds_forbundle=%repo_root%\bot\Bundle\fds\for_bundle
 
@@ -188,7 +188,7 @@ CALL :COPY  "%fds_forbundle%\uninstall_fds2.bat" "%out_uninstall%\uninstall_base
 CALL :COPY  "%fds_forbundle%\uninstall.bat"      "%out_uninstall%\uninstall.bat"
 echo @echo off > "%out_uninstall%\uninstall.vbs"
 
-CALL :COPY  "%repo_root%\smv\Build\set_path\intel_win_64\set_path64.exe" "%out_uninstall%\set_path.exe"
+CALL :COPY  "%repo_root%\smv\Build\set_path\intel_win_64\set_path_win_64.exe" "%out_uninstall%\set_path.exe"
 
 echo.
 echo --- copying FDS documentation ---
