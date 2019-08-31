@@ -1072,6 +1072,22 @@ check_matlab_validation()
 }
 
 #---------------------------------------------
+#                   archive_repo_sizes
+#---------------------------------------------
+
+archive_repo_sizes()
+{
+   cd $fdsrepo
+   echo archiving repo_sizes
+
+   du -ks exp  > "$HISTORY_DIR/${FDS_REVISION}_exp_size.txt"
+   du -ks fds  > "$HISTORY_DIR/${FDS_REVISION}_fds_size.txt"
+   du -ks fig  > "$HISTORY_DIR/${FDS_REVISION}_fig_size.txt"
+   du -ks out  > "$HISTORY_DIR/${FDS_REVISION}_out_size.txt"
+   du -ks smv  > "$HISTORY_DIR/${FDS_REVISION}_smv_size.txt"
+}
+
+#---------------------------------------------
 #                   archive_validation_stats
 #---------------------------------------------
 
@@ -1550,6 +1566,7 @@ fi
 
 DB=_db
 
+ARCHIVE_REPO_SIZES=
 REPOEMAIL=
 UPLOADGUIDES=0
 FDS_REVISION=
@@ -1677,6 +1694,7 @@ if [[ "$CLONE_REPOS" == "1" ]]; then
   echo Cloning repos
   cd $botrepo/Scripts
   ./setup_repos.sh -F > $OUTPUT_DIR/stage1_clone 2>&1
+  ARCHIVE_REPO_SIZES=1
 fi
 
 #*** make sure repos exist and have expected branches
@@ -1808,6 +1826,7 @@ if [[ "$CLONE_REPOS" == "" ]]; then
     fi 
     clean_repo2 smv $SMVBRANCH || exit 1
   fi
+  ARCHIVE_REPO_SIZES=1
 fi
 
 #*** update repos
@@ -1823,6 +1842,13 @@ if [[ "$CLONE_REPOS" == "" ]]; then
   else
     echo Repos not updated
   fi
+fi
+
+# archive repo sizes
+# (only if the repos are cloned or cleaned)
+
+if [ "$ARCHIVE_REPO_SIZES" == "1" ]; then
+  archive_repo_sizes
 fi
 
 get_fds_revision $FDSBRANCH || exit 1
