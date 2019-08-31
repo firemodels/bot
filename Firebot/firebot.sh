@@ -1077,7 +1077,7 @@ check_matlab_validation()
 
 archive_repo_sizes()
 {
-   cd $fdsrepo
+   cd $repo
    echo archiving repo_sizes
 
    du -ks exp  > "$HISTORY_DIR/${FDS_REVISION}_exp_size.txt"
@@ -1844,15 +1844,15 @@ if [[ "$CLONE_REPOS" == "" ]]; then
   fi
 fi
 
+get_fds_revision $FDSBRANCH || exit 1
+get_smv_revision $SMVBRANCH || exit 1
+
 # archive repo sizes
 # (only if the repos are cloned or cleaned)
 
 if [ "$ARCHIVE_REPO_SIZES" == "1" ]; then
   archive_repo_sizes
 fi
-
-get_fds_revision $FDSBRANCH || exit 1
-get_smv_revision $SMVBRANCH || exit 1
 
 check_git_checkout
 archive_compiler_version
