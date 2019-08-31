@@ -253,6 +253,57 @@ get_fds_revision()
 }
 
 #---------------------------------------------
+#                   get_exp_revision
+#---------------------------------------------
+
+get_exp_revision()
+{
+   local branch=$1
+
+   CD_REPO $repo/exp $branch || return 1
+
+
+   git update-index --refresh
+   EXP_REVISION=`git describe --long --dirty`
+   return 0
+}
+
+#---------------------------------------------
+#                   get_out_revision
+#---------------------------------------------
+
+get_out_revision()
+{
+   local branch=$1
+
+   CD_REPO $repo/out $branch || return 1
+
+
+   git update-index --refresh
+   OUT_REVISION=`git describe --long --dirty`
+   return 0
+}
+
+#---------------------------------------------
+#                   get_fig_revision
+#---------------------------------------------
+
+get_fig_revision()
+{
+   local branch=$1
+
+   CD_REPO $repo/fig $branch || return 1
+
+
+   git update-index --refresh
+   FIG_REVISION=`git describe --long --dirty`
+   return 0
+}
+
+
+
+
+#---------------------------------------------
 #                   clean_git_checkout
 #---------------------------------------------
 
@@ -1080,11 +1131,16 @@ archive_repo_sizes()
    cd $repo
    echo archiving repo_sizes
 
-   du -ks exp  >  "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.txt"
-   du -ks fds  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.txt"
-   du -ks fig  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.txt"
-   du -ks out  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.txt"
-   du -ks smv  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.txt"
+   exp_size=`du -ks exp |  awk '{print $2 }' `
+   fds_size=`du -ks fds |  awk '{print $2 }' `
+   fig_size=`du -ks fig |  awk '{print $2 }' `
+   out_size=`du -ks out |  awk '{print $2 }' `
+   smv_size=`du -ks smv |  awk '{print $2 }' `
+   echo $EXP_REVISION $exp_size  >  "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.txt"
+   echo $FDS_REVISION $fds_size  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.txt"
+   echo $FIG_REVISION $fig_size  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.txt"
+   echo $OUT_REVISION $out_size  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.txt"
+   echo $SMV_REVISION $smv_size  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.txt"
 }
 
 #---------------------------------------------
@@ -1846,6 +1902,9 @@ fi
 
 get_fds_revision $FDSBRANCH || exit 1
 get_smv_revision $SMVBRANCH || exit 1
+get_exp_revision master || exit 1
+get_fig_revision master || exit 1
+get_out_revision master || exit 1
 
 # archive repo sizes
 # (only if the repos are cloned or cleaned)
