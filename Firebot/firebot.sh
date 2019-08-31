@@ -607,7 +607,7 @@ compile_smv_utilities()
    # background
      echo "      background"
      cd $smvrepo/Build/background/${COMPILER}_${platform}${size}
-     rm -f *.o background
+     rm -f *.o background_${platform}_${size}
      ./make_background.sh >> $OUTPUT_DIR/stage3a 2>&1
 
    # dem2fds

@@ -692,7 +692,7 @@ compile_smv_utilities()
    # background
      echo "      background"
      cd $smvrepo/Build/background/${COMPILER}_${platform}_${size}
-     rm -f *.o background
+     rm -f *.o background_${platform}_${size}
      echo 'Compiling background:' >> $OUTPUT_DIR/stage2a 2>&1
      ./make_background.sh >> $OUTPUT_DIR/stage2a 2>&1
 
@@ -784,7 +784,7 @@ check_smv_utilities()
         [ -e "$smvrepo/Build/smokediff/${COMPILER}_${platform}_${size}/smokediff_${platform}_${size}" ]  && \
         [ -e "$smvrepo/Build/wind2fds/${COMPILER}_${platform}_${size}/wind2fds_${platform}_${size}" ]  && \
         [ -e "$smvrepo/Build/dem2fds/${COMPILER}_${platform}_${size}/dem2fds_${platform}_${size}" ]  && \
-        [ -e "$smvrepo/Build/background/${COMPILER}_${platform}_${size}/background" ]
+        [ -e "$smvrepo/Build/background/${COMPILER}_${platform}_${size}/background_${platform}_${size}" ]
      then
         stage2a_success="1"
      else
