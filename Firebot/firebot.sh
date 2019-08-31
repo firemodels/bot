@@ -1080,11 +1080,11 @@ archive_repo_sizes()
    cd $repo
    echo archiving repo_sizes
 
-   du -ks exp  > "$HISTORY_DIR/${FDS_REVISION}_exp_size.txt"
-   du -ks fds  > "$HISTORY_DIR/${FDS_REVISION}_fds_size.txt"
-   du -ks fig  > "$HISTORY_DIR/${FDS_REVISION}_fig_size.txt"
-   du -ks out  > "$HISTORY_DIR/${FDS_REVISION}_out_size.txt"
-   du -ks smv  > "$HISTORY_DIR/${FDS_REVISION}_smv_size.txt"
+   du -ks exp  >  "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.txt"
+   du -ks fds  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.txt"
+   du -ks fig  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.txt"
+   du -ks out  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.txt"
+   du -ks smv  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.txt"
 }
 
 #---------------------------------------------
