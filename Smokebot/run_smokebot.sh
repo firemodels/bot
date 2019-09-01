@@ -135,7 +135,7 @@ LIST_DESCENDANTS ()
 if [ ! -d ~/.fdssmvgit ] ; then
   mkdir ~/.fdssmvgit
 fi
-smokebot_pid=~/.fdssmvgit/smokebot_pid
+smokebot_pid=~/.fdssmvgit/firesmokebot_pid
 
 #*** make sure smokebot is started in the right location
 

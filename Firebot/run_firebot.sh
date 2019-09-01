@@ -121,7 +121,7 @@ LIST_DESCENDANTS ()
 if [ ! -d ~/.fdssmvgit ] ; then
   mkdir ~/.fdssmvgit
 fi
-firebot_pid=~/.fdssmvgit/firebot_pid
+firebot_pid=~/.fdssmvgit/firesmokebot_pid
 
 CURDIR=`pwd`
 
