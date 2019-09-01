@@ -19,7 +19,7 @@ if "%type%" == "fds" goto skip_smokeview
 echo erasing %BUNDLE_DIR%\smv
 echo.
 erase /q %BUNDLE_DIR%\smv\*
-call :copyfile %smvrepo%\Build\background\intel_win_64 background.exe       %BUNDLE_DIR%\smv background.exe
+call :copyfile %smvrepo%\Build\background\intel_win_64 background_win_64.exe       %BUNDLE_DIR%\smv background.exe
 call :copyfile %smvrepo%\Build\dem2fds\intel_win_64    dem2fds_win_64.exe   %BUNDLE_DIR%\smv dem2fds.exe
 call :copyfile %smvrepo%\Build\hashfile\intel_win_64   hashfile_win_64.exe  %BUNDLE_DIR%\smv hashfile.exe
 call :copyfile %smvrepo%\Build\smokediff\intel_win_64  smokediff_win_64.exe %BUNDLE_DIR%\smv smokediff.exe

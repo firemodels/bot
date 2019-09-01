@@ -24,7 +24,6 @@ echo "-L - firebot lite,  run only stages that build a debug fds and run cases w
 echo "                    (no release fds, no release cases, no matlab, etc)"
 echo "-m email_address "
 echo "-N - don't copy Manuals directory to .firebot/Manuals"
-echo "-p pid_file - file containing process id of firebot process "
 echo "-q - queue_name - run cases using the queue queue_name"
 echo "     default: $QUEUE"
 echo "-s - skip matlab and document building stages"
@@ -192,23 +191,26 @@ update_repo()
    CD_REPO $repo/$reponame $branch || return 1
 
    echo "   $reponame" 
-   echo Updating $branch on repo $repo/$reponame >> $OUTPUT_DIR/stage1 2>&1
-   git fetch origin         >> $OUTPUT_DIR/stage1 2>&1
-   git merge origin/$branch >> $OUTPUT_DIR/stage1 2>&1
+   echo Updating $branch on repo $repo/$reponame     >> $OUTPUT_DIR/stage1 2>&1
+   git remote update                                 >> $OUTPUT_DIR/stage1 2>&1
+   git merge origin/$branch                          >> $OUTPUT_DIR/stage1 2>&1
    have_firemodels=`git remote -v | grep firemodels | wc  -l`
    if [ $have_firemodels -gt 0 ]; then
-      git fetch firemodels         >> $OUTPUT_DIR/stage1 2>&1
-      git merge firemodels/$branch >> $OUTPUT_DIR/stage1 2>&1
-      git push  origin $branch
+      git merge firemodels/$branch                   >> $OUTPUT_DIR/stage1 2>&1
+      need_push=`git status -uno | head -2 | grep -v nothing | wc -l`
+      if [ $need_push -gt 1 ]; then
+        echo "warning: firemodels commits to $reponame repo need to be pushed to origin" >> $OUTPUT_DIR/stage1 2>&1
+        git status -uno | head -2 | grep -v nothing                                      >> $OUTPUT_DIR/stage1 2>&1
+      fi
    fi
 
    if [[ "$reponame" == "exp" ]]; then
-      echo "Fetching origin." >> $OUTPUT_DIR/stage1 2>&1
-      git fetch origin >> $OUTPUT_DIR/stage1 2>&1
-      echo "Updating submodules." >> $OUTPUT_DIR/stage1 2>&1
-      git submodule foreach git fetch origin >> $OUTPUT_DIR/stage1 2>&1
+      echo "Updating submodules."                   >> $OUTPUT_DIR/stage1 2>&1
+      git submodule foreach git remote update       >> $OUTPUT_DIR/stage1 2>&1
+
+      echo "Merge submodules origin."               >> $OUTPUT_DIR/stage1 2>&1
       git submodule foreach git merge origin/master >> $OUTPUT_DIR/stage1 2>&1
-      git status -uno  >> $OUTPUT_DIR/stage1 2>&1
+      git status -uno                               >> $OUTPUT_DIR/stage1 2>&1
    fi
    return 0
 }
@@ -251,6 +253,57 @@ get_fds_revision()
 }
 
 #---------------------------------------------
+#                   get_exp_revision
+#---------------------------------------------
+
+get_exp_revision()
+{
+   local branch=$1
+
+   CD_REPO $repo/exp $branch || return 1
+
+
+   git update-index --refresh
+   EXP_REVISION=`git describe --long --dirty`
+   return 0
+}
+
+#---------------------------------------------
+#                   get_out_revision
+#---------------------------------------------
+
+get_out_revision()
+{
+   local branch=$1
+
+   CD_REPO $repo/out $branch || return 1
+
+
+   git update-index --refresh
+   OUT_REVISION=`git describe --long --dirty`
+   return 0
+}
+
+#---------------------------------------------
+#                   get_fig_revision
+#---------------------------------------------
+
+get_fig_revision()
+{
+   local branch=$1
+
+   CD_REPO $repo/fig $branch || return 1
+
+
+   git update-index --refresh
+   FIG_REVISION=`git describe --long --dirty`
+   return 0
+}
+
+
+
+
+#---------------------------------------------
 #                   clean_git_checkout
 #---------------------------------------------
 
@@ -258,14 +311,14 @@ check_git_checkout()
 {
    # Check for GIT errors
    if [ -e $OUTPUT_DIR/stage1 ]; then
-     if [[ `grep -i -E 'modified' $OUTPUT_DIR/stage1` == "" ]]
+     if [[ `grep -i -E 'warning|modified' $OUTPUT_DIR/stage1` == "" ]]
      then
         # Continue along
         :
      else
         echo "Warnings from Stage 1 - Update repos" >> $WARNING_LOG
         echo "" >> $WARNING_LOG
-        grep -A 5 -B 5 -i -E 'modified' $OUTPUT_DIR/stage1 >> $WARNING_LOG
+        grep -A 5 -B 5 -i -E 'warning|modified' $OUTPUT_DIR/stage1 >> $WARNING_LOG
         echo "" >> $WARNING_LOG
      fi
    fi
@@ -605,7 +658,7 @@ compile_smv_utilities()
    # background
      echo "      background"
      cd $smvrepo/Build/background/${COMPILER}_${platform}${size}
-     rm -f *.o background
+     rm -f *.o background_${platform}_${size}
      ./make_background.sh >> $OUTPUT_DIR/stage3a 2>&1
 
    # dem2fds
@@ -1067,6 +1120,27 @@ check_matlab_validation()
       grep -B 5 -A 50 "Error" $OUTPUT_DIR/stage7b_validation | tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
       echo "" >> $ERROR_LOG
    fi
+}
+
+#---------------------------------------------
+#                   archive_repo_sizes
+#---------------------------------------------
+
+archive_repo_sizes()
+{
+   cd $repo
+   echo archiving repo_sizes
+
+   exp_size=`du -ks exp |  awk '{print $1 }' `
+   fds_size=`du -ks fds |  awk '{print $1 }' `
+   fig_size=`du -ks fig |  awk '{print $1 }' `
+   out_size=`du -ks out |  awk '{print $1 }' `
+   smv_size=`du -ks smv |  awk '{print $1 }' `
+   echo $EXP_REVISION,$exp_size  >  "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.csv"
+   echo $FDS_REVISION,$fds_size  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.csv"
+   echo $FIG_REVISION,$fig_size  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.csv"
+   echo $OUT_REVISION,$out_size  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.csv"
+   echo $SMV_REVISION,$smv_size  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.csv"
 }
 
 #---------------------------------------------
@@ -1548,6 +1622,7 @@ fi
 
 DB=_db
 
+ARCHIVE_REPO_SIZES=
 REPOEMAIL=
 UPLOADGUIDES=0
 FDS_REVISION=
@@ -1565,7 +1640,6 @@ COPY_MANUAL_DIR=1
 DEBUG_ONLY=
 
 #*** parse command line arguments
-
 while getopts 'b:BcdDhIiJLm:Np:q:suUW' OPTION
 do
 case $OPTION in
@@ -1676,6 +1750,7 @@ if [[ "$CLONE_REPOS" == "1" ]]; then
   echo Cloning repos
   cd $botrepo/Scripts
   ./setup_repos.sh -F > $OUTPUT_DIR/stage1_clone 2>&1
+  ARCHIVE_REPO_SIZES=1
 fi
 
 #*** make sure repos exist and have expected branches
@@ -1807,6 +1882,7 @@ if [[ "$CLONE_REPOS" == "" ]]; then
     fi 
     clean_repo2 smv $SMVBRANCH || exit 1
   fi
+  ARCHIVE_REPO_SIZES=1
 fi
 
 #*** update repos
@@ -1826,6 +1902,16 @@ fi
 
 get_fds_revision $FDSBRANCH || exit 1
 get_smv_revision $SMVBRANCH || exit 1
+get_exp_revision master || exit 1
+get_fig_revision master || exit 1
+get_out_revision master || exit 1
+
+# archive repo sizes
+# (only if the repos are cloned or cleaned)
+
+if [ "$ARCHIVE_REPO_SIZES" == "1" ]; then
+  archive_repo_sizes
+fi
 
 check_git_checkout
 archive_compiler_version

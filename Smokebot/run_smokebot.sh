@@ -22,9 +22,9 @@ echo "-f - force smokebot run"
 echo "-I compiler - intel or gnu [default: $COMPILER]"
 echo "-J use Intel MPI version of fds"
 echo "-k - kill smokebot if it is running"
-echo "-q queue [default: $QUEUE]"
 echo "-L - smokebot lite,  run only stages that build a debug fds and run"
 echo "     cases with it (no release fds, no release cases, no manuals, etc)"
+echo "-q queue [default: $QUEUE]"
 if [ "$EMAIL" != "" ]; then
 echo "-m email_address - [default: $EMAIL]"
 else
@@ -135,7 +135,7 @@ LIST_DESCENDANTS ()
 if [ ! -d ~/.fdssmvgit ] ; then
   mkdir ~/.fdssmvgit
 fi
-smokebot_pid=~/.fdssmvgit/smokebot_pid
+smokebot_pid=~/.fdssmvgit/firesmokebot_pid
 
 #*** make sure smokebot is started in the right location
 
