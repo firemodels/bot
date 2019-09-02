@@ -1553,7 +1553,7 @@ START_TIME=$(date +%s)
 size=_64
 
 # define run directories
-PID_FILE=~/.fdssmvgit/firebot_pid
+PID_FILE=~/.fdssmvgit/firesmokebot_pid
 firebotdir=`pwd`
 export SCRIPTFILES=$firebotdir/scriptfiles
 OUTPUT_DIR="$firebotdir/output"
