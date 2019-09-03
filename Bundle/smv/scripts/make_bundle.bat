@@ -23,8 +23,7 @@ call %envfile%
 
 %svn_drive%
 
-set platform=64
-set BUILDDIR=intel_win_%platform%
+set BUILDDIR=intel_win_64
 
 set version=%smv_version%
 set smvbuild=%svn_root%\smv\Build\smokeview\%BUILDDIR%
@@ -41,10 +40,10 @@ set timepbuild=%svn_root%\smv\Build\timep\%BUILDDIR%
 set windbuild=%svn_root%\smv\Build\wind2fds\%BUILDDIR%
 set sh2bat=%svn_root%\smv\Build\sh2bat\intel_win_64
 set gettime=%svn_root%\smv\Build\get_time\%BUILDDIR%
-set hashfileexe=%hashfilebuild%\hashfile_win_%platform%.exe
+set hashfileexe=%hashfilebuild%\hashfile_win_64.exe
 set repoexes=%userprofile%\.bundle\BUNDLE\WINDOWS\repoexes
 
-set zipbase=%version%_win%platform%
+set zipbase=%version%_win64
 set smvdir=%zipbase%\%SMVEDITION%
 
 cd %svn_root%\bot\Bundle\smv\uploads
@@ -57,9 +56,9 @@ IF EXIST %smvdir% rmdir /S /Q %smvdir%
 mkdir %smvdir%
 mkdir %smvdir%\hash
 
-CALL :COPY  %svn_root%\smv\Build\set_path\intel_win_64\set_path64.exe "%smvdir%\set_path.exe"
+CALL :COPY  %svn_root%\smv\Build\set_path\intel_win_64\set_path_win_64.exe "%smvdir%\set_path.exe"
 
-CALL :COPY  %smvbuild%\smokeview_win_%platform%.exe %smvdir%\smokeview.exe
+CALL :COPY  %smvbuild%\smokeview_win_64.exe %smvdir%\smokeview.exe
 
 CALL :COPY  %smvscripts%\jp2conv.bat %smvdir%\jp2conv.bat
 
@@ -73,14 +72,14 @@ CALL :COPY  %forbundle%\volrender.ssf %smvdir%\volrender.ssf
 CALL :COPY  %webgldir%\smv2html.bat   %smvdir%\smv2html.bat
 ::CALL :COPY  %webgldir%\smv_setup.bat  %smvdir%\smv_setup.bat
 
-CALL :COPY  %bgbuild%\background.exe                    %smvdir%\background.exe
-CALL :COPY  %dem2fdsbuild%\dem2fds_win_%platform%.exe   %smvdir%\dem2fds.exe
-CALL :COPY  %flushfilebuild%\flush_win_%platform%.exe   %smvdir%\flush.exe
-CALL :COPY  %hashfilebuild%\hashfile_win_%platform%.exe %smvdir%\hashfile.exe
-CALL :COPY  %svdiffbuild%\smokediff_win_%platform%.exe  %smvdir%\smokediff.exe
-CALL :COPY  %svzipbuild%\smokezip_win_%platform%.exe    %smvdir%\smokezip.exe
-CALL :COPY  %timepbuild%\timep_win_%platform%.exe       %smvdir%\timep.exe
-CALL :COPY  %windbuild%\wind2fds_win_%platform%.exe     %smvdir%\wind2fds.exe
+CALL :COPY  %bgbuild%\background_win_64.exe     %smvdir%\background.exe
+CALL :COPY  %dem2fdsbuild%\dem2fds_win_64.exe   %smvdir%\dem2fds.exe
+CALL :COPY  %flushfilebuild%\flush_win_64.exe   %smvdir%\flush.exe
+CALL :COPY  %hashfilebuild%\hashfile_win_64.exe %smvdir%\hashfile.exe
+CALL :COPY  %svdiffbuild%\smokediff_win_64.exe  %smvdir%\smokediff.exe
+CALL :COPY  %svzipbuild%\smokezip_win_64.exe    %smvdir%\smokezip.exe
+CALL :COPY  %timepbuild%\timep_win_64.exe       %smvdir%\timep.exe
+CALL :COPY  %windbuild%\wind2fds_win_64.exe     %smvdir%\wind2fds.exe
 CALL :COPY %repoexes%\openvr_api.dll                    %smvdir%\openvr_api.dll
 
 echo Unpacking Smokeview %smv_versionbase% installation files > %forbundle%\unpack.txt
@@ -112,9 +111,9 @@ mkdir %smvdir%\textures
 copy %forbundle%\textures\*.jpg %smvdir%\textures>Nul
 copy %forbundle%\textures\*.png %smvdir%\textures>Nul
 
-CALL :COPY  %forbundle%\objects.svo %smvdir%\.
-CALL :COPY  %sh2bat%\sh2bat.exe %smvdir%\.
-CALL :COPY  %gettime%\get_time_64.exe %smvdir%\get_time.exe
+CALL :COPY  %forbundle%\objects.svo             %smvdir%\.
+CALL :COPY  %sh2bat%\sh2bat.exe                 %smvdir%\.
+CALL :COPY  %gettime%\get_time_win_64.exe       %smvdir%\get_time.exe
 CALL :COPY  %svn_root%\webpages\smv_readme.html %smvdir%\release_notes.html
 
 echo.
@@ -138,7 +137,7 @@ cd %smvdir%\hash
 cat %zipbase%.exe.sha1 >> %uploads%\%zipbase%.sha1
 
 echo.
-echo --- Smokeview win%platform% installer built
+echo --- Smokeview win64 installer built
 echo.
 
 cd %CURDIR%
