@@ -57,7 +57,7 @@ UPDATE_REPO ()
   echo "     branch: $BRANCH"
   echo "     dir: $repodir"
 
-  git fetch origin
+  git remote update
   git merge origin/$BRANCH
   have_central=`git remote -v | awk '{print $1}' | grep firemodels | wc  -l`
   if [ "$have_central" -gt "0" ]; then
@@ -65,18 +65,14 @@ UPDATE_REPO ()
      echo "*** updating from firemodels"
      echo "    branch: $BRANCH"
      echo "    dir: $repodir"
-     git fetch firemodels
      git merge firemodels/$BRANCH
      ahead=`git status -uno | grep ahead | wc -l`
      if [ "$ahead" -gt "0" ]; then
-        echo "    pushing $repo/firemodels changes to origin"
         git push origin $BRANCH
      fi
   fi
   if [[ "$repo" == "exp" ]]; then
-     echo "Fetching origin."
-     git submodule foreach git fetch origin
-     echo "Updating origin submodules."
+     git submodule foreach git remote update
      git submodule foreach git merge origin/master
   fi
 }
