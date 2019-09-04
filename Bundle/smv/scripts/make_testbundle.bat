@@ -22,10 +22,8 @@ call %envfile%
 
 %svn_drive%
 
-set platform=64
-
 set version=%smv_revision%
-set zipbase=%version%_win%platform%
+set zipbase=%version%_win64
 set  smvdir=%svn_root%\bot\Bundle\smv\uploads\%zipbase%
 set uploads=%svn_root%\bot\Bundle\smv\uploads
 set smvscripts=%svn_root%\smv\scripts
@@ -45,7 +43,7 @@ IF EXIST %smvdir% rmdir /S /Q %smvdir%
 mkdir %smvdir%
 mkdir %smvdir%\hash
 
-CALL :COPY %smvbuild%\smokeview\intel_win_%platform%\smokeview_win_test_%platform%.exe %smvdir%\smokeview.exe
+CALL :COPY %smvbuild%\smokeview\intel_win_64\smokeview_win_test_64.exe %smvdir%\smokeview.exe
 
 CALL :COPY  %smvscripts%\jp2conv.bat %smvdir%\jp2conv.bat
 
@@ -60,16 +58,16 @@ CALL :COPY  %webgldir%\smv2html.bat     %smvdir%\smv2html.bat
 CALL :COPY %forbundle%\fds_test.bat     %smvdir%\fds_test.txt
 CALL :COPY %forbundle%\fdsinit_test.bat %smvdir%\fdsinit_test.txt
 
-CALL :COPY %smvbuild%\background\intel_win_64\background.exe                      %smvdir%\background.exe
-CALL :COPY %smvbuild%\dem2fds\intel_win_%platform%\dem2fds_win_%platform%.exe     %smvdir%\dem2fds.exe
-CALL :COPY %smvbuild%\flush\intel_win_%platform%\flush_win_%platform%.exe         %smvdir%\flush.exe
-CALL :COPY %smvbuild%\hashfile\intel_win_%platform%\hashfile_win_%platform%.exe   %smvdir%\hashfile.exe
-CALL :COPY %smvbuild%\set_path\intel_win_64\set_path64.exe                        "%smvdir%\set_path.exe"
-CALL :COPY %smvbuild%\smokediff\intel_win_%platform%\smokediff_win_%platform%.exe %smvdir%\smokediff.exe
-CALL :COPY %smvbuild%\smokezip\intel_win_%platform%\smokezip_win_%platform%.exe   %smvdir%\smokezip.exe
-CALL :COPY %smvbuild%\timep\intel_win_%platform%\timep_win_%platform%.exe         %smvdir%\timep.exe
-CALL :COPY %smvbuild%\wind2fds\intel_win_%platform%\wind2fds_win_%platform%.exe   %smvdir%\wind2fds.exe
-CALL :COPY %repoexes%\openvr_api.dll                                              %smvdir%\openvr_api.dll
+CALL :COPY %smvbuild%\background\intel_win_64\background_win_64.exe %smvdir%\background.exe
+CALL :COPY %smvbuild%\dem2fds\intel_win_64\dem2fds_win_64.exe       %smvdir%\dem2fds.exe
+CALL :COPY %smvbuild%\flush\intel_win_64\flush_win_64.exe           %smvdir%\flush.exe
+CALL :COPY %smvbuild%\hashfile\intel_win_64\hashfile_win_64.exe     %smvdir%\hashfile.exe
+CALL :COPY %smvbuild%\set_path\intel_win_64\set_path_win_64.exe     %smvdir%\set_path.exe
+CALL :COPY %smvbuild%\smokediff\intel_win_64\smokediff_win_64.exe   %smvdir%\smokediff.exe
+CALL :COPY %smvbuild%\smokezip\intel_win_64\smokezip_win_64.exe     %smvdir%\smokezip.exe
+CALL :COPY %smvbuild%\timep\intel_win_64\timep_win_64.exe           %smvdir%\timep.exe
+CALL :COPY %smvbuild%\wind2fds\intel_win_64\wind2fds_win_64.exe     %smvdir%\wind2fds.exe
+CALL :COPY %repoexes%\openvr_api.dll                                %smvdir%\openvr_api.dll
 
 set curdir=%CD%
 cd %smvdir%
@@ -87,18 +85,18 @@ cat *.sha1              >  %uploads%\%zipbase%.sha1
 
 cd %curdir%
 
-CALL :COPY %forbundle%\objects.svo                       %smvdir%\.
-CALL :COPY %sh2bat%\sh2bat_win_64.exe                    %smvdir%\sh2bat.exe
-CALL :COPY %gettime%\get_time_64.exe                     %smvdir%\get_time.exe
-CALL :COPY %forbundle%\wrapup_smv_install_%platform%.bat %smvdir%\wrapup_smv_install.bat
-CALL :COPY %forbundle%\smokeview.ini                     %smvdir%\smokeview.ini
-CALL :COPY %forbundle%\smokeview.html                    %smvdir%\smokeview.html
-CALL :COPY %forbundle%\\webvr\smokeview_vr.html          %smvdir%\smokeview_vr.html
+CALL :COPY %forbundle%\objects.svo               %smvdir%\.
+CALL :COPY %sh2bat%\sh2bat_win_64.exe            %smvdir%\sh2bat.exe
+CALL :COPY %gettime%\get_time_win_64.exe         %smvdir%\get_time.exe
+CALL :COPY %forbundle%\wrapup_smv_install_64.bat %smvdir%\wrapup_smv_install.bat
+CALL :COPY %forbundle%\smokeview.ini             %smvdir%\smokeview.ini
+CALL :COPY %forbundle%\smokeview.html            %smvdir%\smokeview.html
+CALL :COPY %forbundle%\\webvr\smokeview_vr.html  %smvdir%\smokeview_vr.html
 
 echo copying textures
 mkdir %smvdir%\textures
-copy %forbundle%\textures\*.jpg                          %smvdir%\textures>Nul
-copy %forbundle%\textures\*.png                          %smvdir%\textures>Nul
+copy %forbundle%\textures\*.jpg                  %smvdir%\textures>Nul
+copy %forbundle%\textures\*.png                  %smvdir%\textures>Nul
 
 echo.
 echo --- compressing distribution directory ---
@@ -125,7 +123,7 @@ cd ..\..
 if not exist %zipbase%.exe echo ***warning: %zipbase%.exe was not created
 
 echo.
-echo --- Smokeview win%platform% test installer built ---
+echo --- Smokeview win64 test installer built ---
 echo.
 
 cd %CURDIR%
