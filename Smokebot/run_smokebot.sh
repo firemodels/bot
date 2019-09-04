@@ -166,7 +166,6 @@ COMPILER=intel
 SMOKEBOT_LITE=
 TESTFLAG=
 ECHO=
-NOPT=
 INTEL=
 export MPIRUN_MCA=
 export QFDS_STARTUP=
@@ -193,7 +192,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'aAbBcCd:fhHI:JkLm:NMq:Rr:StuUvw:W:' OPTION
+while getopts 'aAbBcCd:fhHI:JkLm:Mq:Rr:StuUvw:W:' OPTION
 do
 case $OPTION  in
   a)
@@ -240,9 +239,6 @@ case $OPTION  in
    ;;
   M)
    MOVIE="-M"
-   ;;
-  N)
-   NOPT="-N"
    ;;
   q)
    QUEUE="$OPTARG"
@@ -367,7 +363,7 @@ BRANCH="-b $BRANCH"
 #*** run smokebot
 
 touch $smokebot_pid
-$ECHO ./$botscript $SKIP $NOPT $SIZE $BRANCH $TESTFLAG $RUNAUTO $INTEL $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $SKIP $SIZE $BRANCH $TESTFLAG $RUNAUTO $INTEL $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi
