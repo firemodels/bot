@@ -140,11 +140,6 @@ do
      RECURSIVE=--recursive
   fi
   git clone $RECURSIVE $GITHEADER$GITUSER/$repo.git $repo_out
-  if [ "$repo" == "exp" ]; then
-    cd $repo_out
-    git submodule foreach git remote update
-    git submodule foreach git merge origin/master
-  fi
 
   cd $repo_dir
   if [ "$GITUSER" == "firemodels" ]; then

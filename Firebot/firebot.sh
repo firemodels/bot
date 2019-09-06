@@ -1744,6 +1744,11 @@ smvrepo=$repo/smv
 botrepo=$repo/bot
 outrepo=$repo/out
 
+#*** cleaning bot files
+  
+  echo Cleaning bot files
+  clean_firebot_metafiles
+
 #*** clone repos
 
 if [[ "$CLONE_REPOS" == "1" ]]; then
@@ -1868,8 +1873,6 @@ start_time=`date`
 #*** clean repos
 echo "Status"
 echo "------"
-  echo Cleaning
-  clean_firebot_metafiles
 if [[ "$CLONE_REPOS" == "" ]]; then
   if [[ "$CLEANREPO" == "1" ]] ; then
     if [ "$BUILD_ONLY" == "" ]; then
@@ -1890,7 +1893,6 @@ fi
 if [[ "$CLONE_REPOS" == "" ]]; then
   if [[ "$UPDATEREPO" == "1" ]] ; then
     echo Updating
-    update_repo exp master || exit 1
     update_repo fds $FDSBRANCH || exit 1
     update_repo fig master || exit 1
     update_repo out master || exit 1
@@ -1898,6 +1900,9 @@ if [[ "$CLONE_REPOS" == "" ]]; then
   else
     echo Repos not updated
   fi
+fi
+if [[ "$UPDATEREPO" == "1" ]] ; then
+  update_repo exp master || exit 1
 fi
 
 get_fds_revision $FDSBRANCH || exit 1
