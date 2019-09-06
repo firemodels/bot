@@ -1744,9 +1744,12 @@ smvrepo=$repo/smv
 botrepo=$repo/bot
 outrepo=$repo/out
 
-#*** cleaning bot files
-  
-  echo Cleaning bot files
+### Stage 1 ###
+
+#*** clean repos
+echo "Status"
+echo "------"
+  echo Cleaning bot repo
   clean_firebot_metafiles
 
 #*** clone repos
@@ -1870,7 +1873,6 @@ start_time=`date`
 
 ### Stage 1 ###
 
-#*** clean repos
 echo "Status"
 echo "------"
 if [[ "$CLONE_REPOS" == "" ]]; then
