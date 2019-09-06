@@ -1744,6 +1744,14 @@ smvrepo=$repo/smv
 botrepo=$repo/bot
 outrepo=$repo/out
 
+### Stage 1 ###
+
+#*** clean repos
+echo "Status"
+echo "------"
+  echo Cleaning bot repo
+  clean_firebot_metafiles
+
 #*** clone repos
 
 if [[ "$CLONE_REPOS" == "1" ]]; then
@@ -1863,13 +1871,6 @@ TIME_LIMIT_EMAIL_NOTIFICATION="unsent"
 hostname=`hostname`
 start_time=`date`
 
-### Stage 1 ###
-
-#*** clean repos
-echo "Status"
-echo "------"
-  echo Cleaning
-  clean_firebot_metafiles
 if [[ "$CLONE_REPOS" == "" ]]; then
   if [[ "$CLEANREPO" == "1" ]] ; then
     if [ "$BUILD_ONLY" == "" ]; then
