@@ -1744,8 +1744,6 @@ smvrepo=$repo/smv
 botrepo=$repo/bot
 outrepo=$repo/out
 
-### Stage 1 ###
-
 #*** clean repos
 echo "Status"
 echo "------"
