@@ -47,7 +47,7 @@ if "%platform%" == "windows" (
 cd %svn_root%\smv\scripts
 
 set scriptdir=%linux_svn_root%/bot/Bundle/smv
-set bundledir=%linux_svn_root%/bot/Bundle/smv/uploads
+set bundledir=.bundle/uploads
 set todir=%userprofile%\.bundle
 set uploaddir=%todir%\uploads
 
