@@ -48,6 +48,11 @@ cd %svn_root%\smv\scripts
 
 set scriptdir=%linux_svn_root%/bot/Bundle/smv
 set bundledir=%linux_svn_root%/bot/Bundle/smv/uploads
+set todir=%userprofile%\.bundle
+set uploaddir=%todir%\uploads
+
+if NOT exist %todir% mkdir     %todir%
+if NOT exist %uploaddir% mkdir %uploaddir%
 
 :: linux
 
@@ -63,12 +68,14 @@ if "%platform%" == "linux" (
   echo.
 
   if "%buildtype%" == "release" (
-    pscp %linux_logon%:%bundledir%/%version%_linux64.sh   ..\..\bot\Bundle\smv\uploads\.
-    pscp %linux_logon%:%bundledir%/%version%_linux64.sha1 ..\..\bot\Bundle\smv\uploads\.
+    cd %uploaddir%
+    pscp %linux_logon%:%bundledir%/%version%_linux64.sh   .
+    pscp %linux_logon%:%bundledir%/%version%_linux64.sha1 .
   )
   if "%buildtype%" == "test" (
-    pscp %linux_logon%:%bundledir%/%version%_linux64.sh   ..\..\bot\Bundle\smv\uploads\.
-    pscp %linux_logon%:%bundledir%/%version%_linux64.sha1 ..\..\bot\Bundle\smv\uploads\.
+    cd %uploaddir%
+    pscp %linux_logon%:%bundledir%/%version%_linux64.sh   .
+    pscp %linux_logon%:%bundledir%/%version%_linux64.sha1 .
   )
   goto eof
 )
@@ -86,12 +93,14 @@ if "%platform%" == "osx" (
   echo.
 
   if "%buildtype%" == "release" (
-    pscp %osx_logon%:%bundledir%/%version%_osx64.sh   ..\..\bot\Bundle\smv\uploads\.
-    pscp %osx_logon%:%bundledir%/%version%_osx64.sha1 ..\..\bot\Bundle\smv\uploads\.
+    cd %uploaddir%
+    pscp %osx_logon%:%bundledir%/%version%_osx64.sh   .
+    pscp %osx_logon%:%bundledir%/%version%_osx64.sha1 .
   )
   if "%buildtype%" == "test" (
-    pscp %osx_logon%:%bundledir%/%version%_osx64.sh   ..\..\bot\Bundle\smv\uploads\.
-    pscp %osx_logon%:%bundledir%/%version%_osx64.sha1 ..\..\bot\Bundle\smv\uploads\.
+    cd %uploaddir%
+    pscp %osx_logon%:%bundledir%/%version%_osx64.sh   .
+    pscp %osx_logon%:%bundledir%/%version%_osx64.sha1 .
   )
   goto eof
 )
