@@ -46,7 +46,11 @@ set repoexes=%userprofile%\.bundle\BUNDLE\WINDOWS\repoexes
 set zipbase=%version%_win64
 set smvdir=%zipbase%\%SMVEDITION%
 
-cd %svn_root%\bot\Bundle\smv\uploads
+cd %userprofile%
+if NOT exist .bundle mkdir .bundle
+cd .bundle
+if NOT exist uploads mkdir uploads
+cd uploads
 set uploads=%CD%
 
 echo.

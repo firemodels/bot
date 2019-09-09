@@ -22,10 +22,16 @@ call %envfile%
 
 %svn_drive%
 
+cd %userprofile%
+if NOT exist .bundle mkdir .bundle
+cd .bundle
+if NOT exist uploads mkdir uploads
+cd uploads
+set uploads=%CD%
+
 set version=%smv_revision%
 set zipbase=%version%_win64
-set  smvdir=%svn_root%\bot\Bundle\smv\uploads\%zipbase%
-set uploads=%svn_root%\bot\Bundle\smv\uploads
+set smvdir=%uploads%\%zipbase%
 set smvscripts=%svn_root%\smv\scripts
 set forbundle=%svn_root%\bot\Bundle\smv\for_bundle
 set webgldir=%svn_root%\bot\Bundle\smv\for_bundle\webgl
