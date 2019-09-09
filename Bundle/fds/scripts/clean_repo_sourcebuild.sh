@@ -12,9 +12,6 @@ git clean -dxf
 cd $GITROOT/fds/Build
 git clean -dxf
 
-cd $GITROOT/bot/Bundle/fds/uploads
-git clean -dxf
-
 cd $GITROOT/smv/Source
 git clean -dxf
 
