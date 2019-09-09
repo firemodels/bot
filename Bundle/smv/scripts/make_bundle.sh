@@ -94,7 +94,7 @@ FORBUNDLE=$SVNROOT/bot/Bundle/smv/for_bundle
 WEBGLDIR=$SVNROOT/bot/Bundle/smv/for_bundle/webgl
 PLATFORMDIR=$RELEASE$revision\_${platform}64
 UPDATER=$SVNROOT/bot/Bundle/smv/scripts//make_updater.sh
-uploads=$SVNROOT/bot/Bundle/smv/uploads
+uploads=$HOME/.bundle/uploads
 flushfile=$SVNROOT/smv/Build/flush/intel_${platform}_64/flush_${platform}_64
 
 cd $uploads

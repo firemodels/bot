@@ -27,9 +27,6 @@ function copy_fdsapps(platform){
 function copy_smvapps(platform){
   MyObject.Run(get_fullpath("../../bot/Bundle/fds/scripts/webCopySMVApps.bat ",platform));
 }
-function clean_upload(platform,prog){
-  MyObject.Run(get_fullpath("../../bot/Bundle/fds/scripts/webCleanUpload.bat ",platform));
-}
 </script>
 </HEAD>
 <BODY BGCOLOR="#FFFFFF" >
@@ -71,12 +68,8 @@ function clean_upload(platform,prog){
 <td align=center><button onclick="install_fdssmv('osx')">Install</button></td>
 </tr>
 <tr>
-<td align=center><button onclick="clean_upload('windows')">Clean</button></td>
-<td align=center><button onclick="clean_upload('linux')">Clean</button></td>
-<td align=center><button onclick="clean_upload('osx')">Clean</button></td>
-</tr>
-<tr>
 <td align=center colspan=3>
+<button onclick="run_script('\\bot\\Bundle\\fds\\scripts\\webCleanUpload.bat')">Clean</button>
 <button onclick="run_script('\\bot\\Bundle\\fds\\scripts\\webUPLOADbundles.bat')">Upload</button>
 </td>
 </tr>

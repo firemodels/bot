@@ -46,7 +46,11 @@ set repoexes=%userprofile%\.bundle\BUNDLE\WINDOWS\repoexes
 set zipbase=%version%_win64
 set smvdir=%zipbase%\%SMVEDITION%
 
-cd %svn_root%\bot\Bundle\smv\uploads
+cd %userprofile%
+if NOT exist .bundle mkdir .bundle
+cd .bundle
+if NOT exist uploads mkdir uploads
+cd uploads
 set uploads=%CD%
 
 echo.
@@ -137,7 +141,7 @@ cd %smvdir%\hash
 cat %zipbase%.exe.sha1 >> %uploads%\%zipbase%.sha1
 
 echo.
-echo --- Smokeview win64 installer built
+echo --- Smokeview win64 installer %zipbase%.exe built
 echo.
 
 cd %CURDIR%
