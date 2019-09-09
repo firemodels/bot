@@ -22,8 +22,11 @@ cd $GITROOT/smv/Build
 echo cleaning $GITROOT/smv/Build
 git clean -dxf
 
-cd $GITROOT/bot/Bundle/smv/uploads
-echo cleaning $GITROOT/bot/Bundle/smv/uploads
-git clean -dxf
+echo cleaning $HOME/.bundle/uploads
+cd $HOME/.bundle
+if [ -e uploads ]; then
+  rm -r uploads
+fi
+mkdir uploads
 
 cd $CURDIR
