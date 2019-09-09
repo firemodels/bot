@@ -129,7 +129,7 @@ cd ..\..
 if not exist %zipbase%.exe echo ***warning: %zipbase%.exe was not created
 
 echo.
-echo --- Smokeview win64 test installer built ---
+echo --- Smokeview win64 test installer %zipbase%.exe built ---
 echo.
 
 cd %CURDIR%

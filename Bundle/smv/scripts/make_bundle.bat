@@ -141,7 +141,7 @@ cd %smvdir%\hash
 cat %zipbase%.exe.sha1 >> %uploads%\%zipbase%.sha1
 
 echo.
-echo --- Smokeview win64 installer built
+echo --- Smokeview win64 installer %zipbase%.exe built
 echo.
 
 cd %CURDIR%
