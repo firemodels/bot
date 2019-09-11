@@ -1280,9 +1280,6 @@ save_smv_summary_images()
   then
     rm -rf $SMV_SUMMARY_HOME/images
     rm -rf $SMV_SUMMARY_HOME/images2
-    if [ ! -e $SMV_SUMMARY_HOME ]; then
-      mkdir $SMV_SUMMARY_HOME
-    fi
     cp -r $SMV_SUMMARY/images  $SMV_SUMMARY_HOME/.
     cp -r $SMV_SUMMARY/images2 $SMV_SUMMARY_HOME/.
   fi
@@ -1297,9 +1294,6 @@ save_smv_summary_movies()
   if [[ ! -e $WARNING_LOG && ! -e $ERROR_LOG && "$MAKEMOVIES" == "1" ]]
   then
     rm -rf $SMV_SUMMARY_HOME/movies
-    if [ ! -e $SMV_SUMMARY_HOME ]; then
-      mkdir $SMV_SUMMARY_HOME
-    fi
     cp -r $SMV_SUMMARY/movies  $SMV_SUMMARY_HOME/.
   fi
 }
@@ -1583,6 +1577,10 @@ fi
 
 MKDIR $HOME/.smokebot
 MKDIR $HOME/.smokebot/pubs
+
+#*** create SMV_SUMMARY directory
+
+MKDIR $HOME/.smokebot/SMV_SUMMARY
 
 #*** make sure repos needed by smokebot exist
 
