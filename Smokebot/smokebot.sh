@@ -1271,6 +1271,34 @@ make_guide()
 }
 
 #---------------------------------------------
+#                   save_smv_summary_images
+#---------------------------------------------
+
+save_smv_summary_images()
+{
+  if [[ ! -e $WARNING_LOG && ! -e $ERROR_LOG ]]
+  then
+    rm -rf $SMV_SUMMARY_HOME/images
+    rm -rf $SMV_SUMMARY_HOME/images2
+    cp -r $SMV_SUMMARY/images  $SMV_SUMMARY_HOME/.
+    cp -r $SMV_SUMMARY/images2 $SMV_SUMMARY_HOME/.
+  fi
+}
+
+#---------------------------------------------
+#                   save_smv_summary_movies
+#---------------------------------------------
+
+save_smv_summary_movies()
+{
+  if [[ ! -e $WARNING_LOG && ! -e $ERROR_LOG && "$MAKEMOVIES" == "1" ]]
+  then
+    rm -rf $SMV_SUMMARY_HOME/movies
+    cp -r $SMV_SUMMARY/movies  $SMV_SUMMARY_HOME/.
+  fi
+}
+
+#---------------------------------------------
 #                   save_build_status
 #---------------------------------------------
 
@@ -1550,6 +1578,10 @@ fi
 MKDIR $HOME/.smokebot
 MKDIR $HOME/.smokebot/pubs
 
+#*** create SMV_SUMMARY directory
+
+MKDIR $HOME/.smokebot/SMV_SUMMARY
+
 #*** make sure repos needed by smokebot exist
 
 botrepo=$repo/bot
@@ -1683,6 +1715,7 @@ echo ""
 cd
 
 export SMV_SUMMARY="$smvrepo/Manuals/SMV_Summary"
+SMV_SUMMARY_HOME=$HOME/.smokebot/SMV_SUMMARY
 WEBFROM_DIR="$smvrepo/Manuals/SMV_Summary"
 
 UploadGuides=$botrepo/Smokebot/smv_guides2GD.sh
@@ -1908,7 +1941,9 @@ echo "Total time: $DIFF_SCRIPT_TIME" >> $STAGE_STATUS
 echo Reporting results
 set_files_world_readable || exit 1
 save_build_status
- 
+save_smv_summary_images
+save_smv_summary_movies
+
 if [ "$SMOKEBOT_LITE" == "" ]; then
   if [[ $stage1c_fdsrel_success ]] ; then
     archive_timing_stats
