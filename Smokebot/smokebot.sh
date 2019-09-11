@@ -1271,6 +1271,34 @@ make_guide()
 }
 
 #---------------------------------------------
+#                   save_smv_summary_images
+#---------------------------------------------
+
+save_smv_summary_images()
+{
+  if [[ ! -e $WARNING_LOG && ! -e $ERROR_LOG ]]
+  then
+    rm -rf $HOME/.smokebot/SMV_SUMMARY/images
+    rm -rf $HOME/.smokebot/SMV_SUMMARY/images2
+    cp -r $SMV_SUMMARY/images  $HOME/.bundle/SMV_SUMMARY/.
+    cp -r $SMV_SUMMARY/images2 $HOME/.bundle/SMV_SUMMARY/.
+  fi
+}
+
+#---------------------------------------------
+#                   save_smv_summary_movies
+#---------------------------------------------
+
+save_smv_summary_movies()
+{
+  if [[ ! -e $WARNING_LOG && ! -e $ERROR_LOG && "$MAKEMOVIES" == "1" ]]
+  then
+    rm -rf $HOME/.smokebot/SMV_SUMMARY/movies
+    cp -r $SMV_SUMMARY/movies  $HOME/.bundle/SMV_SUMMARY/.
+  fi
+}
+
+#---------------------------------------------
 #                   save_build_status
 #---------------------------------------------
 
@@ -1908,7 +1936,9 @@ echo "Total time: $DIFF_SCRIPT_TIME" >> $STAGE_STATUS
 echo Reporting results
 set_files_world_readable || exit 1
 save_build_status
- 
+save_smv_summary_images
+save_smv_summary_movies
+
 if [ "$SMOKEBOT_LITE" == "" ]; then
   if [[ $stage1c_fdsrel_success ]] ; then
     archive_timing_stats
