@@ -1278,10 +1278,13 @@ save_smv_summary_images()
 {
   if [[ ! -e $WARNING_LOG && ! -e $ERROR_LOG ]]
   then
-    rm -rf $HOME/.smokebot/SMV_SUMMARY/images
-    rm -rf $HOME/.smokebot/SMV_SUMMARY/images2
-    cp -r $SMV_SUMMARY/images  $HOME/.bundle/SMV_SUMMARY/.
-    cp -r $SMV_SUMMARY/images2 $HOME/.bundle/SMV_SUMMARY/.
+    rm -rf $SMV_SUMMARY_HOME/images
+    rm -rf $SMV_SUMMARY_HOME/images2
+    if [ ! -e $SMV_SUMMARY_HOME ]; then
+      mkdir $SMV_SUMMARY_HOME
+    fi
+    cp -r $SMV_SUMMARY/images  $SMV_SUMMARY_HOME/.
+    cp -r $SMV_SUMMARY/images2 $SMV_SUMMARY_HOME/.
   fi
 }
 
@@ -1293,8 +1296,11 @@ save_smv_summary_movies()
 {
   if [[ ! -e $WARNING_LOG && ! -e $ERROR_LOG && "$MAKEMOVIES" == "1" ]]
   then
-    rm -rf $HOME/.smokebot/SMV_SUMMARY/movies
-    cp -r $SMV_SUMMARY/movies  $HOME/.bundle/SMV_SUMMARY/.
+    rm -rf $SMV_SUMMARY_HOME/movies
+    if [ ! -e $SMV_SUMMARY_HOME ]; then
+      mkdir $SMV_SUMMARY_HOME
+    fi
+    cp -r $SMV_SUMMARY/movies  $SMV_SUMMARY_HOME/.
   fi
 }
 
@@ -1711,6 +1717,7 @@ echo ""
 cd
 
 export SMV_SUMMARY="$smvrepo/Manuals/SMV_Summary"
+SMV_SUMMARY_HOME=$HOME/.smokebot/SMV_SUMMARY
 WEBFROM_DIR="$smvrepo/Manuals/SMV_Summary"
 
 UploadGuides=$botrepo/Smokebot/smv_guides2GD.sh
