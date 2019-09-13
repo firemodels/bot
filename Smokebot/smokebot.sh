@@ -1724,8 +1724,8 @@ export SMV_SUMMARY="$smvrepo/Manuals/SMV_Summary"
 SMV_SUMMARY_HOME=$HOME/.smokebot/SMV_SUMMARY
 SMV_UG_HOME=$HOME/.smokebot/SMV_User_Guide
 SMV_VG_HOME=$HOME/.smokebot/SMV_Verification_Guide
-SMV_VG=$HOME/$smvrepo/Manuals/SMV_Verification_Guide
-SMV_UG=$HOME/$smvrepo/Manuals/SMV_User_Guide
+SMV_VG=$smvrepo/Manuals/SMV_Verification_Guide
+SMV_UG=$smvrepo/Manuals/SMV_User_Guide
 WEBFROM_DIR="$smvrepo/Manuals/SMV_Summary"
 
 UploadGuides=$botrepo/Smokebot/smv_guides2GD.sh
