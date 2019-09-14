@@ -1280,8 +1280,12 @@ save_smv_summary_images()
   then
     rm -rf $SMV_SUMMARY_HOME/images
     rm -rf $SMV_SUMMARY_HOME/images2
+    rm -rf $SMV_UG_HOME/SCRIPT_FIGURES
+    rm -rf $SMV_VG_HOME/SCRIPT_FIGURES
     cp -r $SMV_SUMMARY/images  $SMV_SUMMARY_HOME/.
     cp -r $SMV_SUMMARY/images2 $SMV_SUMMARY_HOME/.
+    cp -r $SMV_UG/SCRIPT_FIGURES $SMV_UG_HOME/.
+    cp -r $SMV_VG/SCRIPT_FIGURES $SMV_VG_HOME/.
   fi
 }
 
@@ -1581,6 +1585,8 @@ MKDIR $HOME/.smokebot/pubs
 #*** create SMV_SUMMARY directory
 
 MKDIR $HOME/.smokebot/SMV_SUMMARY
+MKDIR $HOME/.smokebot/SMV_User_Guide
+MKDIR $HOME/.smokebot/SMV_Verificatation_Guide
 
 #*** make sure repos needed by smokebot exist
 
@@ -1716,6 +1722,10 @@ cd
 
 export SMV_SUMMARY="$smvrepo/Manuals/SMV_Summary"
 SMV_SUMMARY_HOME=$HOME/.smokebot/SMV_SUMMARY
+SMV_UG_HOME=$HOME/.smokebot/SMV_User_Guide
+SMV_VG_HOME=$HOME/.smokebot/SMV_Verification_Guide
+SMV_VG=$smvrepo/Manuals/SMV_Verification_Guide
+SMV_UG=$smvrepo/Manuals/SMV_User_Guide
 WEBFROM_DIR="$smvrepo/Manuals/SMV_Summary"
 
 UploadGuides=$botrepo/Smokebot/smv_guides2GD.sh
