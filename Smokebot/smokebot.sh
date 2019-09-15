@@ -1584,7 +1584,7 @@ MKDIR $HOME/.smokebot/pubs
 
 #*** create SMV_SUMMARY directory
 
-MKDIR $HOME/.smokebot/SMV_SUMMARY
+MKDIR $HOME/.smokebot/SMV_Summary
 MKDIR $HOME/.smokebot/images
 MKDIR $HOME/.smokebot/images/SMV_User_Guide
 MKDIR $HOME/.smokebot/images/SMV_Verification_Guide
@@ -1722,7 +1722,7 @@ echo ""
 cd
 
 export SMV_SUMMARY="$smvrepo/Manuals/SMV_Summary"
-SMV_SUMMARY_HOME=$HOME/.smokebot/SMV_SUMMARY
+SMV_SUMMARY_HOME=$HOME/.smokebot/SMV_Summary
 SMV_UG_HOME=$HOME/.smokebot/images/SMV_User_Guide
 SMV_VG_HOME=$HOME/.smokebot/images/SMV_Verification_Guide
 SMV_UG=$smvrepo/Manuals/SMV_User_Guide
