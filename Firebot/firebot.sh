@@ -2033,10 +2033,8 @@ if [[ "$DEBUG_ONLY" == "" ]] && [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" 
       make_fds_Config_management_plan
       get_firebot_success
       if [[ "$firebot_success" == "1" ]] ; then
-        if [[ "$COPY_MANUAL_DIR" == "1" ]] && [[ "$firebot_success" == "1" ]]; then
-          if [ -e $MANUAL_DIR ]; then
-            rm -rf $MANUAL_DIR
-          fi
+        if [[ "$COPY_MANUAL_DIR" == "1" ]]; then
+          rm -rf $MANUAL_DIR
           cp -r $fdsrepo/Manuals $MANUAL_DIR
         fi
         copy_fds_user_guide
