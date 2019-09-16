@@ -260,11 +260,11 @@ clean_smokebot_history()
    # Clean Smokebot metafiles
    MKDIR $smokebotdir > /dev/null
    cd $smokebotdir
-   MKDIR guides > /dev/null
-   MKDIR $HISTORY_DIR > /dev/null
-   MKDIR $OUTPUT_DIR > /dev/null
-   rm -rf $OUTPUT_DIR/* > /dev/null
-   MKDIR $NEWGUIDE_DIR > /dev/null
+   MKDIR guides               > /dev/null
+   MKDIR $HISTORY_DIR_ARCHIVE > /dev/null
+   MKDIR $OUTPUT_DIR          > /dev/null
+   rm -rf $OUTPUT_DIR/*       > /dev/null
+   MKDIR $NEWGUIDE_DIR        > /dev/null
    chmod 775 $NEWGUIDE_DIR
 }
 
@@ -1088,17 +1088,15 @@ check_smv_pictures()
       grep -A 2 -I -E "Warning" $OUTPUT_DIR/stage4b >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
-   if [ ! "$web_DIR" == "" ]; then
-     if [ -d "$WEBFROM_DIR" ]; then
-       CURDIR=`pwd`
-       cd $web_DIR
-       rm -rf images
-       rm -rf manuals
-       rm index.html
-       cd $WEBFROM_DIR
-       cp -r * $web_DIR/.
-       cd $CURDIR
-     fi
+   if [[ "$web_DIR" != "" ]] && [[ -d $SMV_SUMMARY_REPO ]]; then
+     CURDIR=`pwd`
+     cd $web_DIR
+     rm -rf images
+     rm -rf manuals
+     rm index.html
+     cd $SMV_SUMMARY_REPO
+     cp -r * $web_DIR/.
+     cd $CURDIR
    fi
 
 }
@@ -1143,15 +1141,13 @@ check_smv_movies()
       grep -I -E "Warning" $OUTPUT_DIR/stage4c >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
-   if [ ! "$web_DIR" == "" ]; then
-     if [ -d "$WEBFROM_DIR" ]; then 
-       CURDIR=`pwd`
-       cd $web_DIR
-       rm -rf *
-       cd $WEBFROM_DIR
-       cp -r * $web_DIR/.
-       cd $CURDIR
-     fi
+   if [[ "$web_DIR" != "" ]] && [[ -d $SMV_SUMMARY_REPO ]]; then 
+     CURDIR=`pwd`
+     cd $web_DIR
+     rm -rf *
+     cd $SMV_SUMMARY_REPO
+     cp -r * $web_DIR/.
+     cd $CURDIR
    fi
 
 }
@@ -1187,8 +1183,8 @@ archive_timing_stats()
 {
   echo "   archiving"
   cd $smvrepo/Utilities/Scripts
-  cp smv_timing_stats.csv "$HISTORY_DIR/${GIT_REVISION}_timing.csv"
-  cp smv_benchmarktiming_stats.csv "$HISTORY_DIR/${GIT_REVISION}_benchmarktiming.csv"
+  cp smv_timing_stats.csv          "$HISTORY_DIR_ARCHIVE/${GIT_REVISION}_timing.csv"
+  cp smv_benchmarktiming_stats.csv "$HISTORY_DIR_ARCHIVE/${GIT_REVISION}_benchmarktiming.csv"
   TOTAL_SMV_TIMES=`tail -1 smv_benchmarktiming_stats.csv`
   if [[ "$UPLOADRESULTS" == "1" ]] && [[ "$USER" == "smokebot" ]]; then
     cd $botrepo/Smokebot
@@ -1230,13 +1226,10 @@ check_guide()
      if [ ! "$SMOKEBOT_MAN_DIR" == "" ]; then
        cp $directory/$document $SMOKEBOT_MAN_DIR/.
      fi
-     if [ -d $SMV_SUMMARY/manuals ] ; then
-       cp $directory/$document $SMV_SUMMARY/manuals/.
-     fi
      cp $directory/$document $NEWGUIDE_DIR/.
-     cp $directory/$document $SAVEGUIDE_DIR/.
+     cp $directory/$document $GUIDE_DIR_ARCHIVE/.
      chmod 664 $NEWGUIDE_DIR/$document
-     chmod 664 $SAVEGUIDE_DIR/$document
+     chmod 664 $GUIDE_DIR_ARCHIVE/$document
    fi
 
    # Check for LaTeX warnings (undefined references or duplicate labels)
@@ -1271,34 +1264,15 @@ make_guide()
 }
 
 #---------------------------------------------
-#                   save_smv_summary_images
-#---------------------------------------------
-
-save_smv_summary_images()
-{
-  if [[ ! -e $WARNING_LOG && ! -e $ERROR_LOG ]]
-  then
-    rm -rf $SMV_SUMMARY_HOME/images
-    rm -rf $SMV_SUMMARY_HOME/images2
-    rm -rf $SMV_UG_HOME/SCRIPT_FIGURES
-    rm -rf $SMV_VG_HOME/SCRIPT_FIGURES
-    cp -r $SMV_SUMMARY/images  $SMV_SUMMARY_HOME/.
-    cp -r $SMV_SUMMARY/images2 $SMV_SUMMARY_HOME/.
-    cp -r $SMV_UG/SCRIPT_FIGURES $SMV_UG_HOME/.
-    cp -r $SMV_VG/SCRIPT_FIGURES $SMV_VG_HOME/.
-  fi
-}
-
-#---------------------------------------------
 #                   save_smv_summary_movies
 #---------------------------------------------
 
-save_smv_summary_movies()
+save_SMV_SUMMARY_REPO()
 {
   if [[ ! -e $WARNING_LOG && ! -e $ERROR_LOG && "$MAKEMOVIES" == "1" ]]
   then
-    rm -rf $SMV_SUMMARY_HOME/movies
-    cp -r $SMV_SUMMARY/movies  $SMV_SUMMARY_HOME/.
+    rm -rf $SMV_SUMMARY_ARCHIVE
+    cp -r $SMV_SUMMARY_REPO  $SMV_SUMMARY_ARCHIVE
   fi
 }
 
@@ -1318,28 +1292,42 @@ save_build_status()
      echo "***Warnings:" >> $ERROR_LOG
      cat $WARNING_LOG >> $ERROR_LOG
      echo "   build failure and warnings for version: ${GIT_REVISION}, branch: $SMVBRANCH."
-     echo "Build failure and warnings;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$SMVBRANCH;$STOP_TIME_INT;3;$TOTAL_SMV_TIMES;$HOST" > "$HISTORY_DIR/${GIT_REVISION}.txt"
-     cat $ERROR_LOG > "$HISTORY_DIR/${GIT_REVISION}_errors.txt"
+     echo "Build failure and warnings;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$SMVBRANCH;$STOP_TIME_INT;3;$TOTAL_SMV_TIMES;$HOST" > "$HISTORY_DIR_ARCHIVE/${GIT_REVISION}.txt"
+     cat $ERROR_LOG > "$HISTORY_DIR_ARCHIVE/${GIT_REVISION}_errors.txt"
 
    # Check for errors only
    elif [ -e $ERROR_LOG ]
    then
       echo "   build failure for version: ${GIT_REVISION}, branch: $SMVBRANCH."
-      echo "Build failure;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$SMVBRANCH;$STOP_TIME_INT;3;$TOTAL_SMV_TIMES;$HOST" > "$HISTORY_DIR/${GIT_REVISION}.txt"
-      cat $ERROR_LOG > "$HISTORY_DIR/${GIT_REVISION}_errors.txt"
+      echo "Build failure;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$SMVBRANCH;$STOP_TIME_INT;3;$TOTAL_SMV_TIMES;$HOST" > "$HISTORY_DIR_ARCHIVE/${GIT_REVISION}.txt"
+      cat $ERROR_LOG > "$HISTORY_DIR_ARCHIVE/${GIT_REVISION}_errors.txt"
 
    # Check for warnings only
    elif [ -e $WARNING_LOG ]
    then
       echo "   build success with warnings for version: ${GIT_REVISION}, branch: $SMVBRANCH."
-      echo "Build success with warnings;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$SMVBRANCH;$STOP_TIME_INT;2;$TOTAL_SMV_TIMES;$HOST" > "$HISTORY_DIR/${GIT_REVISION}.txt"
-      cat $WARNING_LOG > "$HISTORY_DIR/${GIT_REVISION}_warnings.txt"
+      echo "Build success with warnings;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$SMVBRANCH;$STOP_TIME_INT;2;$TOTAL_SMV_TIMES;$HOST" > "$HISTORY_DIR_ARCHIVE/${GIT_REVISION}.txt"
+      cat $WARNING_LOG > "$HISTORY_DIR_ARCHIVE/${GIT_REVISION}_warnings.txt"
 
    # No errors or warnings
    else
       echo "   build success for version: ${GIT_REVISION}, branch: $SMVBRANCH."
-      echo "Build success!;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$SMVBRANCH;$STOP_TIME_INT;1;$TOTAL_SMV_TIMES;$HOST" > "$HISTORY_DIR/${GIT_REVISION}.txt"
+      echo "Build success!;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$SMVBRANCH;$STOP_TIME_INT;1;$TOTAL_SMV_TIMES;$HOST" > "$HISTORY_DIR_ARCHIVE/${GIT_REVISION}.txt"
    fi
+}
+
+#---------------------------------------------
+#                   save_manuals_dir
+#---------------------------------------------
+
+save_manuals_dir()
+{
+  if [[ ! -e $WARNING_LOG && ! -e $ERROR_LOG ]]
+  then
+    echo "   copying Manuals directory"
+    rm -rf $MANUAL_DIR_ARCHIVE
+    cp -r $smvrepo/Manuals $MANUAL_DIR_ARCHIVE
+  fi
 }
 
 #---------------------------------------------
@@ -1442,7 +1430,10 @@ fi
 YOPT=-Y
 smokebotdir=`pwd`
 OUTPUT_DIR="$smokebotdir/output"
-HISTORY_DIR="$HOME/.smokebot/history"
+HISTORY_DIR_ARCHIVE="$HOME/.smokebot/history"
+MANUAL_DIR_ARCHIVE=$HOME/.smokebot/Manuals
+GUIDE_DIR_ARCHIVE=$HOME/.smokebot/pubs
+
 EMAIL_LIST="$HOME/.smokebot/smokebot_email_list.sh"
 TIME_LOG=$OUTPUT_DIR/timings
 ERROR_LOG=$OUTPUT_DIR/errors
@@ -1477,7 +1468,6 @@ COMPILER=intel
 PID_FILE=~/.fdssmvgit/firesmokebot_pid
 INTEL=
 SKIP=
-SAVEGUIDE_DIR=$HOME/.smokebot/pubs
 
 #*** parse command line options
 
@@ -1721,13 +1711,8 @@ echo ""
 
 cd
 
-export SMV_SUMMARY="$smvrepo/Manuals/SMV_Summary"
-SMV_SUMMARY_HOME=$HOME/.smokebot/SMV_Summary
-SMV_UG_HOME=$HOME/.smokebot/images/SMV_User_Guide
-SMV_VG_HOME=$HOME/.smokebot/images/SMV_Verification_Guide
-SMV_UG=$smvrepo/Manuals/SMV_User_Guide
-SMV_VG=$smvrepo/Manuals/SMV_Verification_Guide
-WEBFROM_DIR="$smvrepo/Manuals/SMV_Summary"
+SMV_SUMMARY_REPO=$smvrepo/Manuals/SMV_Summary
+SMV_SUMMARY_ARCHIVE=$HOME/.smokebot/SMV_Summary
 
 UploadGuides=$botrepo/Smokebot/smv_guides2GD.sh
 UploadWEB=$botrepo/Smokebot/smv_web2GD.sh
@@ -1952,8 +1937,8 @@ echo "Total time: $DIFF_SCRIPT_TIME" >> $STAGE_STATUS
 echo Reporting results
 set_files_world_readable || exit 1
 save_build_status
-save_smv_summary_images
-save_smv_summary_movies
+save_SMV_SUMMARY_REPO
+save_manuals_dir
 
 if [ "$SMOKEBOT_LITE" == "" ]; then
   if [[ $stage1c_fdsrel_success ]] ; then

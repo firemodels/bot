@@ -23,7 +23,6 @@ echo "-J - use Intel MPI version of FDS"
 echo "-L - firebot lite,  run only stages that build a debug fds and run cases with it"
 echo "                    (no release fds, no release cases, no matlab, etc)"
 echo "-m email_address "
-echo "-N - don't copy Manuals directory to .firebot/Manuals"
 echo "-q - queue_name - run cases using the queue queue_name"
 echo "     default: $QUEUE"
 echo "-s - skip matlab and document building stages"
@@ -1636,11 +1635,10 @@ DV2=
 INTEL=
 INTEL2=
 CLONE_REPOS=
-COPY_MANUAL_DIR=1
 DEBUG_ONLY=
 
 #*** parse command line arguments
-while getopts 'b:BcdDhIiJLm:Np:q:suUW' OPTION
+while getopts 'b:BcdDhIiJLm:p:q:suUW' OPTION
 do
 case $OPTION in
   b)
@@ -1684,9 +1682,6 @@ case $OPTION in
    ;;
   m)
    mailToFDS="$OPTARG"
-   ;;
-  N)
-   COPY_MANUAL_DIR=
    ;;
   p)
    PID_FILE="$OPTARG"
@@ -2033,12 +2028,8 @@ if [[ "$DEBUG_ONLY" == "" ]] && [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" 
       make_fds_Config_management_plan
       get_firebot_success
       if [[ "$firebot_success" == "1" ]] ; then
-        if [[ "$COPY_MANUAL_DIR" == "1" ]] && [[ "$firebot_success" == "1" ]]; then
-          if [ -e $MANUAL_DIR ]; then
-            rm -rf $MANUAL_DIR
-          fi
-          cp -r $fdsrepo/Manuals $MANUAL_DIR
-        fi
+        rm -rf $MANUAL_DIR
+        cp -r $fdsrepo/Manuals $MANUAL_DIR
         copy_fds_user_guide
         copy_fds_verification_guide
         copy_fds_technical_guide
