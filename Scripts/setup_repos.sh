@@ -22,10 +22,10 @@ exit
 CURDIR=`pwd`
 
 fdsrepos="exp fds fig out smv"
-firebotrepos="exp fds fig out smv fds-smv"
+firebotrepos="exp fds fds-smv fig out smv"
 smvrepos="cfast fds fig smv"
-cfastrepos="cfast exp smv fig"
-allrepos="cfast cor exp fds fig out radcal smv cad"
+cfastrepos="cfast exp fig smv"
+allrepos="cad cfast cor exp fds fig out radcal smv"
 wikiwebrepos="fds.wiki fds-smv"
 repos=$fdsrepos
 eraserepos=
