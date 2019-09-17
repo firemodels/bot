@@ -1122,6 +1122,24 @@ check_matlab_validation()
 }
 
 #---------------------------------------------
+#                   get_repo_size
+#---------------------------------------------
+
+get_repo_size()
+{
+  rrepo=$1
+  if [ "$CLONE_REPOS" == "1" ]; then
+    CCURDIR=`pwd`
+    cd $rrepo
+    git gc
+    git gc --aggressive
+    git prune
+    cd $CCURDIR
+  fi
+  du -ks $rrepo/.git |  awk '{print $1 }'
+}
+
+#---------------------------------------------
 #                   archive_repo_sizes
 #---------------------------------------------
 
@@ -1130,11 +1148,11 @@ archive_repo_sizes()
    cd $repo
    echo archiving repo_sizes
 
-   exp_size=`du -ks exp |  awk '{print $1 }' `
-   fds_size=`du -ks fds |  awk '{print $1 }' `
-   fig_size=`du -ks fig |  awk '{print $1 }' `
-   out_size=`du -ks out |  awk '{print $1 }' `
-   smv_size=`du -ks smv |  awk '{print $1 }' `
+   exp_size=`get_repo_size exp `
+   fds_size=`get_repo_size exp `
+   fig_size=`get_repo_size exp `
+   out_size=`get_repo_size exp `
+   smv_size=`get_repo_size exp `
    echo $EXP_REVISION,$exp_size  >  "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.csv"
    echo $FDS_REVISION,$fds_size  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.csv"
    echo $FIG_REVISION,$fig_size  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.csv"
