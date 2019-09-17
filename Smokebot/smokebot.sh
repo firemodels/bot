@@ -1190,7 +1190,7 @@ archive_timing_stats()
     cd $botrepo/Smokebot
     ./smvstatus_updatepub.sh $repo/webpages $WEBBRANCH
   fi
-  if [ ! "$web_DIR" == "" ]; then
+  if [ "$web_DIR" != "" ]; then
     cd $botrepo/Smokebot
     ./make_smv_summary.sh > $web_DIR/index.html
   fi
@@ -1210,7 +1210,7 @@ check_guide()
    # Scan and report any errors in build process for guides
 
    SMOKEBOT_MAN_DIR=
-   if [ ! "$web_DIR" == "" ]; then
+   if [ "$web_DIR" != "" ]; then
      if [ -d $web_DIR/manuals ]; then
        SMOKEBOT_MAN_DIR=$web_DIR/manuals
      fi
@@ -1223,7 +1223,7 @@ check_guide()
       cat $stage >> $ERROR_LOG
       echo "" >> $ERROR_LOG
    else
-     if [ ! "$SMOKEBOT_MAN_DIR" == "" ]; then
+     if [ "$SMOKEBOT_MAN_DIR" != "" ]; then
        cp $directory/$document $SMOKEBOT_MAN_DIR/.
      fi
      cp $directory/$document $NEWGUIDE_DIR/.
@@ -1261,19 +1261,6 @@ make_guide()
 
    # Check guide for completion and copy to website if successful
    check_guide $OUTPUT_DIR/stage5_$document $directory $document.pdf $label
-}
-
-#---------------------------------------------
-#                   save_smv_summary_movies
-#---------------------------------------------
-
-save_SMV_SUMMARY_REPO()
-{
-  if [[ ! -e $WARNING_LOG && ! -e $ERROR_LOG && "$MAKEMOVIES" == "1" ]]
-  then
-    rm -rf $SMV_SUMMARY_ARCHIVE
-    cp -r $SMV_SUMMARY_REPO  $SMV_SUMMARY_ARCHIVE
-  fi
 }
 
 #---------------------------------------------
@@ -1324,9 +1311,14 @@ save_manuals_dir()
 {
   if [[ ! -e $WARNING_LOG && ! -e $ERROR_LOG ]]
   then
-    echo "   copying Manuals directory"
+    echo "   archiving Manuals directory"
     rm -rf $MANUAL_DIR_ARCHIVE
     cp -r $smvrepo/Manuals $MANUAL_DIR_ARCHIVE
+    if [ "$MAKEMOVIES" == "1" ]; then
+      echo "   archiving Manuals directory (movies)"
+      rm -rf $MOVIEMANUAL_DIR_ARCHIVE
+      cp -r $smvrepo/Manuals $MOVIEMANUAL_DIR_ARCHIVE
+    fi
   fi
 }
 
@@ -1386,7 +1378,7 @@ fi
   fi
    cd $smokebotdir
    # Check for warnings and errors
-   if [ ! "$WEB_URL" == "" ]; then
+   if [ "$WEB_URL" != "" ]; then
      echo "     Smokebot summary: $WEB_URL" >> $TIME_LOG
    fi
    if [ "$UPLOADRESULTS" == "1" ]; then
@@ -1432,6 +1424,7 @@ smokebotdir=`pwd`
 OUTPUT_DIR="$smokebotdir/output"
 HISTORY_DIR_ARCHIVE="$HOME/.smokebot/history"
 MANUAL_DIR_ARCHIVE=$HOME/.smokebot/Manuals
+MOVIEMANUAL_DIR_ARCHIVE=$HOME/.smokebot/MovieManuals
 GUIDE_DIR_ARCHIVE=$HOME/.smokebot/pubs
 
 EMAIL_LIST="$HOME/.smokebot/smokebot_email_list.sh"
@@ -1572,13 +1565,6 @@ fi
 MKDIR $HOME/.smokebot
 MKDIR $HOME/.smokebot/pubs
 
-#*** create SMV_SUMMARY directory
-
-MKDIR $HOME/.smokebot/SMV_Summary
-MKDIR $HOME/.smokebot/images
-MKDIR $HOME/.smokebot/images/SMV_User_Guide
-MKDIR $HOME/.smokebot/images/SMV_Verification_Guide
-
 #*** make sure repos needed by smokebot exist
 
 botrepo=$repo/bot
@@ -1701,10 +1687,10 @@ if [ "$UPDATEREPO" == "1" ]; then
 else
   echo "update repos: no"
 fi
-if [ ! "$web_DIR" == "" ]; then
+if [ "$web_DIR" != "" ]; then
   echo "     web dir: $web_DIR"
 fi
-if [ ! "$WEB_URL" == "" ]; then
+if [ "$WEB_URL" != "" ]; then
   echo "         URL: $WEB_URL"
 fi
 echo ""
@@ -1712,7 +1698,6 @@ echo ""
 cd
 
 SMV_SUMMARY_REPO=$smvrepo/Manuals/SMV_Summary
-SMV_SUMMARY_ARCHIVE=$HOME/.smokebot/SMV_Summary
 
 UploadGuides=$botrepo/Smokebot/smv_guides2GD.sh
 UploadWEB=$botrepo/Smokebot/smv_web2GD.sh
@@ -1937,7 +1922,6 @@ echo "Total time: $DIFF_SCRIPT_TIME" >> $STAGE_STATUS
 echo Reporting results
 set_files_world_readable || exit 1
 save_build_status
-save_SMV_SUMMARY_REPO
 save_manuals_dir
 
 if [ "$SMOKEBOT_LITE" == "" ]; then
