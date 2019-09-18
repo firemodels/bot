@@ -1149,10 +1149,10 @@ archive_repo_sizes()
    echo archiving repo_sizes
 
    exp_size=`get_repo_size exp `
-   fds_size=`get_repo_size exp `
-   fig_size=`get_repo_size exp `
-   out_size=`get_repo_size exp `
-   smv_size=`get_repo_size exp `
+   fds_size=`get_repo_size fds `
+   fig_size=`get_repo_size fig `
+   out_size=`get_repo_size out `
+   smv_size=`get_repo_size smv `
    echo $EXP_REVISION,$exp_size  >  "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.csv"
    echo $FDS_REVISION,$fds_size  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.csv"
    echo $FIG_REVISION,$fig_size  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.csv"
