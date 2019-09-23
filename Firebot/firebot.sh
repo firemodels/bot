@@ -23,7 +23,6 @@ echo "-J - use Intel MPI version of FDS"
 echo "-L - firebot lite,  run only stages that build a debug fds and run cases with it"
 echo "                    (no release fds, no release cases, no matlab, etc)"
 echo "-m email_address "
-echo "-N - don't copy Manuals directory to .firebot/Manuals"
 echo "-q - queue_name - run cases using the queue queue_name"
 echo "     default: $QUEUE"
 echo "-s - skip matlab and document building stages"
@@ -1123,6 +1122,24 @@ check_matlab_validation()
 }
 
 #---------------------------------------------
+#                   get_repo_size
+#---------------------------------------------
+
+get_repo_size()
+{
+  rrepo=$1
+  if [ "$CLONE_REPOS" == "1" ]; then
+    CCURDIR=`pwd`
+    cd $rrepo
+    git gc
+    git gc --aggressive
+    git prune
+    cd $CCURDIR
+  fi
+  du -ks $rrepo/.git |  awk '{print $1 }'
+}
+
+#---------------------------------------------
 #                   archive_repo_sizes
 #---------------------------------------------
 
@@ -1131,11 +1148,11 @@ archive_repo_sizes()
    cd $repo
    echo archiving repo_sizes
 
-   exp_size=`du -ks exp |  awk '{print $1 }' `
-   fds_size=`du -ks fds |  awk '{print $1 }' `
-   fig_size=`du -ks fig |  awk '{print $1 }' `
-   out_size=`du -ks out |  awk '{print $1 }' `
-   smv_size=`du -ks smv |  awk '{print $1 }' `
+   exp_size=`get_repo_size exp `
+   fds_size=`get_repo_size fds `
+   fig_size=`get_repo_size fig `
+   out_size=`get_repo_size out `
+   smv_size=`get_repo_size smv `
    echo $EXP_REVISION,$exp_size  >  "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.csv"
    echo $FDS_REVISION,$fds_size  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.csv"
    echo $FIG_REVISION,$fig_size  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.csv"
@@ -1636,11 +1653,10 @@ DV2=
 INTEL=
 INTEL2=
 CLONE_REPOS=
-COPY_MANUAL_DIR=1
 DEBUG_ONLY=
 
 #*** parse command line arguments
-while getopts 'b:BcdDhIiJLm:Np:q:suUW' OPTION
+while getopts 'b:BcdDhIiJLm:p:q:suUW' OPTION
 do
 case $OPTION in
   b)
@@ -1684,9 +1700,6 @@ case $OPTION in
    ;;
   m)
    mailToFDS="$OPTARG"
-   ;;
-  N)
-   COPY_MANUAL_DIR=
    ;;
   p)
    PID_FILE="$OPTARG"
@@ -1743,6 +1756,12 @@ fdsrepo=$repo/fds
 smvrepo=$repo/smv
 botrepo=$repo/bot
 outrepo=$repo/out
+
+#*** clean repos
+echo "Status"
+echo "------"
+  echo Cleaning bot repo
+  clean_firebot_metafiles
 
 #*** clone repos
 
@@ -1865,11 +1884,8 @@ start_time=`date`
 
 ### Stage 1 ###
 
-#*** clean repos
 echo "Status"
 echo "------"
-  echo Cleaning
-  clean_firebot_metafiles
 if [[ "$CLONE_REPOS" == "" ]]; then
   if [[ "$CLEANREPO" == "1" ]] ; then
     if [ "$BUILD_ONLY" == "" ]; then
@@ -1890,7 +1906,6 @@ fi
 if [[ "$CLONE_REPOS" == "" ]]; then
   if [[ "$UPDATEREPO" == "1" ]] ; then
     echo Updating
-    update_repo exp master || exit 1
     update_repo fds $FDSBRANCH || exit 1
     update_repo fig master || exit 1
     update_repo out master || exit 1
@@ -1898,6 +1913,9 @@ if [[ "$CLONE_REPOS" == "" ]]; then
   else
     echo Repos not updated
   fi
+fi
+if [[ "$UPDATEREPO" == "1" ]] ; then
+  update_repo exp master || exit 1
 fi
 
 get_fds_revision $FDSBRANCH || exit 1
@@ -2028,12 +2046,8 @@ if [[ "$DEBUG_ONLY" == "" ]] && [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" 
       make_fds_Config_management_plan
       get_firebot_success
       if [[ "$firebot_success" == "1" ]] ; then
-        if [[ "$COPY_MANUAL_DIR" == "1" ]] && [[ "$firebot_success" == "1" ]]; then
-          if [ -e $MANUAL_DIR ]; then
-            rm -rf $MANUAL_DIR
-          fi
-          cp -r $fdsrepo/Manuals $MANUAL_DIR
-        fi
+        rm -rf $MANUAL_DIR
+        cp -r $fdsrepo/Manuals $MANUAL_DIR
         copy_fds_user_guide
         copy_fds_verification_guide
         copy_fds_technical_guide

@@ -94,7 +94,7 @@ FORBUNDLE=$SVNROOT/bot/Bundle/smv/for_bundle
 WEBGLDIR=$SVNROOT/bot/Bundle/smv/for_bundle/webgl
 PLATFORMDIR=$RELEASE$revision\_${platform}64
 UPDATER=$SVNROOT/bot/Bundle/smv/scripts//make_updater.sh
-uploads=$SVNROOT/bot/Bundle/smv/uploads
+uploads=$HOME/.bundle/uploads
 flushfile=$SVNROOT/smv/Build/flush/intel_${platform}_64/flush_${platform}_64
 
 cd $uploads
@@ -123,14 +123,14 @@ CP $FORBUNDLE/webvr smokeview_vr.html $PLATFORMDIR/$smvbin smokeview_vr.html
 CP $WEBGLDIR        runsmv_ssh.sh     $PLATFORMDIR/$smvbin runsmv_ssh.sh
 CP $WEBGLDIR        smv2html.sh       $PLATFORMDIR/$smvbin smv2html.sh
 
-SCP $PLATFORMHOST $BACKGROUNDDIR background                      $PLATFORMDIR/$smvbin background
-SCP $PLATFORMHOST $SMVDIR        smokeview_${platform}_${TEST}64 $PLATFORMDIR/$smvbin smokeview
-SCP $PLATFORMHOST $DEM2FDSDIR    dem2fds_${platform}_64          $PLATFORMDIR/$smvbin dem2fds
-SCP $PLATFORMHOST $SMDDIR        smokediff_${platform}_64        $PLATFORMDIR/$smvbin smokediff
-SCP $PLATFORMHOST $SMZDIR        smokezip_${platform}_64         $PLATFORMDIR/$smvbin smokezip
-SCP $PLATFORMHOST $WIND2FDSDIR   wind2fds_${platform}_64         $PLATFORMDIR/$smvbin wind2fds
-SCP $PLATFORMHOST $HASHFILEDIR   hashfile_${platform}_64         $PLATFORMDIR/$smvbin hashfile
-SCP $PLATFORMHOST $FLUSHFILEDIR  flush_${platform}_64            $PLATFORMDIR/$smvbin flush
+SCP $PLATFORMHOST $BACKGROUNDDIR background_${platform}_64 $PLATFORMDIR/$smvbin background
+SCP $PLATFORMHOST $SMVDIR        smokeview_${platform}_${TEST}64  $PLATFORMDIR/$smvbin smokeview
+SCP $PLATFORMHOST $DEM2FDSDIR    dem2fds_${platform}_64           $PLATFORMDIR/$smvbin dem2fds
+SCP $PLATFORMHOST $SMDDIR        smokediff_${platform}_64         $PLATFORMDIR/$smvbin smokediff
+SCP $PLATFORMHOST $SMZDIR        smokezip_${platform}_64          $PLATFORMDIR/$smvbin smokezip
+SCP $PLATFORMHOST $WIND2FDSDIR   wind2fds_${platform}_64          $PLATFORMDIR/$smvbin wind2fds
+SCP $PLATFORMHOST $HASHFILEDIR   hashfile_${platform}_64          $PLATFORMDIR/$smvbin hashfile
+SCP $PLATFORMHOST $FLUSHFILEDIR  flush_${platform}_64             $PLATFORMDIR/$smvbin flush
 
 CURDIR=`pwd`
 cd $PLATFORMDIR/$smvbin

@@ -23,28 +23,19 @@ call %envfile%
 %svn_drive%
 echo.
 
-if "%platform%" == "windows" (
-  echo.
-  echo *** windows
-  cd "%userprofile%\.bundle"
-  rmdir /q /s uploads
-  mkdir uploads
-  goto eof
-)
-if "%platform%" == "linux" (
-  echo.
-  echo *** linux
-  plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/run_command.sh bot/Bundle/fds/scripts clean_upload.sh
-  goto eof
-)
-if "%platform%" == "osx" (
-  echo.
-  echo *** osx
-  plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/run_command.sh bot/Bundle/fds/scripts clean_upload.sh
-  goto eof
-)
+echo *** windows
+echo cleaning "%userprofile%\.bundle\uploads"
+cd "%userprofile%\.bundle"
+rmdir /q /s uploads
+mkdir uploads
 
-:eof
 echo.
-echo upload directory erased
+echo *** linux
+plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/run_command.sh bot/Bundle/fds/scripts clean_upload.sh
+
+echo.
+echo *** osx
+plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/run_command.sh bot/Bundle/fds/scripts clean_upload.sh
+
+echo.
 pause

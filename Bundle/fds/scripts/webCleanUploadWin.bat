@@ -1,4 +1,11 @@
 @echo off
+setlocal EnableDelayedExpansion
+set platform=%1
+set program=%2
+
+:: batch file to install the FDS-SMV bundle on Windows, Linux or OSX systems
+
+:: setup environment variables (defining where repository resides etc) 
 
 set envfile="%userprofile%"\fds_smv_env.bat
 IF EXIST %envfile% GOTO endif_envexist
@@ -14,7 +21,13 @@ goto:eof
 
 call %envfile%
 %svn_drive%
-cd "%svn_root%\bot\Bundle\smv\uploads"
-git clean -dxf
-echo cleaning of fds-smv upload directory complete
+echo.
+
+echo *** windows
+echo cleaning "%userprofile%\.bundle\uploads"
+cd "%userprofile%\.bundle"
+rmdir /q /s uploads
+mkdir uploads
+
+echo.
 pause
