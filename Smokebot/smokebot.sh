@@ -1461,6 +1461,7 @@ COMPILER=intel
 PID_FILE=~/.fdssmvgit/firesmokebot_pid
 INTEL=
 SKIP=
+HTML2PDF=wkhtmltopdf
 
 #*** parse command line options
 
