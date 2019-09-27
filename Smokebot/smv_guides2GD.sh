@@ -51,6 +51,7 @@ if [ -e $GDRIVE ] ; then
   UPLOADGUIDE SMV_User_Guide
   UPLOADGUIDE SMV_Technical_Reference_Guide
   UPLOADGUIDE SMV_Verification_Guide
+  UPLOADGUIDE SMV_Summary
   UPLOADFIGURES SMV_User_Guide SMV_UG
   UPLOADFIGURES SMV_Verification_Guide SMV_VG
   cd $CURDIR
