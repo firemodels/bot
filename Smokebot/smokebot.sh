@@ -1409,6 +1409,7 @@ fi
       fi
 
       # Send success message with links to nightly manuals
+
       cat $TIME_LOG | mail -s "smokebot success on ${hostname}. ${GIT_REVISION}, $SMVBRANCH" $mailTo > /dev/null
    fi
 }
@@ -1461,6 +1462,7 @@ COMPILER=intel
 PID_FILE=~/.fdssmvgit/firesmokebot_pid
 INTEL=
 SKIP=
+HTML2PDF=wkhtmltopdf
 
 #*** parse command line options
 
@@ -1905,6 +1907,10 @@ if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]]; then
      make_guide SMV_Technical_Reference_Guide $smvrepo/Manuals/SMV_Technical_Reference_Guide SMV_Technical_Reference_Guide
      echo "   verification"
      make_guide SMV_Verification_Guide        $smvrepo/Manuals/SMV_Verification_Guide        SMV_Verification_Guide
+     notfound=`$HTML2PDF -V 2>&1 | tail -1 | grep "not found" | wc -l`
+     if [ $notfound -eq 0 ]; then
+       $HTML2PDF $smvrepo/Manuals/SMV_Summary/SMV_Summary.html $smvrepo/Manuals/SMV_Summary/SMV_Summary.pdf
+     fi
   else
      echo Errors found, not building guides
   fi
