@@ -1410,7 +1410,7 @@ fi
 
       # Send success message with links to nightly manuals
 
-      cat $TIME_LOG | mail -s "smokebot success on ${hostname}. ${GIT_REVISION}, $SMVBRANCH" $SUMMARYPDF $mailTo > /dev/null
+      cat $TIME_LOG | mail -s "smokebot success on ${hostname}. ${GIT_REVISION}, $SMVBRANCH" $mailTo > /dev/null
    fi
 }
 
@@ -1893,7 +1893,6 @@ if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]]; then
 fi
 
 ### Stage 5 build documents ###
-SUMMARYPDF=
 MAKEGUIDES_beg=`GET_TIME`
 if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]]; then
   if [[ $stage1c_fdsrel_success && $stage4b_smvpics_success ]] ; then
@@ -1910,8 +1909,7 @@ if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]]; then
      make_guide SMV_Verification_Guide        $smvrepo/Manuals/SMV_Verification_Guide        SMV_Verification_Guide
      notfound=`$HTML2PDF -V 2>&1 | tail -1 | grep "not found" | wc -l`
      if [ $notfound -eq 0 ]; then
-       SUMMARYPDF=-a $smvrepo/Manuals/SMV_Summary/smv_summary.pdf
-       $HTML2PDF $smvrepo/Manuals/SMV_Summary/smv_summary.html $smvrepo/Manuals/SMV_Summary/smv_summary.pdf
+       $HTML2PDF $smvrepo/Manuals/SMV_Summary/SMV_Summary.html $smvrepo/Manuals/SMV_Summary/SMV_Summary.pdf
        cp $smvrepo/Manuals/SMV_Summary/smv_summary.pdf $NEWGUIDE_DIR/.
      fi
   else
