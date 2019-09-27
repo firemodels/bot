@@ -1912,6 +1912,7 @@ if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]]; then
      if [ $notfound -eq 0 ]; then
        SUMMARYPDF=-a $smvrepo/Manuals/SMV_Summary/smv_summary.pdf
        $HTML2PDF $smvrepo/Manuals/SMV_Summary/smv_summary.html $smvrepo/Manuals/SMV_Summary/smv_summary.pdf
+       cp $smvrepo/Manuals/SMV_Summary/smv_summary.pdf $NEWGUIDE_DIR/.
      fi
   else
      echo Errors found, not building guides
