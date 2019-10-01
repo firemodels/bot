@@ -70,13 +70,13 @@ if [ "$type" == "smv" ]; then
   rm -f $TODIR/smv/*
   echo
   echo ***copying smokeview  apps
-  CP $smvrepo/Build/background/intel$OS background   $TODIR/smv background
-  CP $smvrepo/Build/dem2fds/intel$OS    dem2fds$OS   $TODIR/smv dem2fds
-  CP $smvrepo/Build/hashfile/intel$OS   hashfile$OS  $TODIR/smv hashfile
-  CP $smvrepo/Build/smokediff/intel$OS  smokediff$OS $TODIR/smv smokediff
-  CP $smvrepo/Build/smokeview/intel$OS  smokeview$OS $TODIR/smv smokeview
-  CP $smvrepo/Build/smokezip/intel$OS   smokezip$OS  $TODIR/smv smokezip
-  CP $smvrepo/Build/wind2fds/intel$OS   wind2fds$OS  $TODIR/smv wind2fds
+  CP $smvrepo/Build/background/intel$OS background$OS $TODIR/smv background
+  CP $smvrepo/Build/dem2fds/intel$OS    dem2fds$OS    $TODIR/smv dem2fds
+  CP $smvrepo/Build/hashfile/intel$OS   hashfile$OS   $TODIR/smv hashfile
+  CP $smvrepo/Build/smokediff/intel$OS  smokediff$OS  $TODIR/smv smokediff
+  CP $smvrepo/Build/smokeview/intel$OS  smokeview$OS  $TODIR/smv smokeview
+  CP $smvrepo/Build/smokezip/intel$OS   smokezip$OS   $TODIR/smv smokezip
+  CP $smvrepo/Build/wind2fds/intel$OS   wind2fds$OS   $TODIR/smv wind2fds
 fi
 
 # copy fds files

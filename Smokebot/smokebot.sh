@@ -1383,6 +1383,9 @@ fi
    fi
    if [ "$UPLOADRESULTS" == "1" ]; then
      echo "      Smokebot status: https://pages.nist.gov/fds-smv/smokebot_status.html" >> $TIME_LOG
+     if [ "$GUIDESURL" != "" ]; then
+       echo "        latest guides: $GUIDESURL" >> $TIME_LOG
+     fi
    fi
    echo "-------------------------------" >> $TIME_LOG
    if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]; then
