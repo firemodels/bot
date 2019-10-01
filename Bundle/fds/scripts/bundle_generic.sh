@@ -231,8 +231,8 @@ fds_cases=$REPO_ROOT/fds/Verification/FDS_Cases.sh
 fds_benchamrk_cases=$REPO_ROOT/fds/Verification/FDS_Benchmark_Cases.sh
 smv_cases=$REPO_ROOT/smv/Verification/scripts/SMV_Cases.sh
 wui_cases=$REPO_ROOT/smv/Verification/scripts/WUI_Cases.sh
-copyfdscase=$REPO_ROOT/fds/Utilities/Scripts/copyfdscase.sh
-copycfastcase=$REPO_ROOT/fds/Utilities/Scripts/copycfastcase.sh
+copyfdscase=$REPO_ROOT/bot/Bundle/fds/scripts/copyfdscase.sh
+copycfastcase=$REPO_ROOT/bot/Bundle/fds/scripts/copycfastcase.sh
 FDSExamplesDirectory=$REPO_ROOT/fds/Verification
 SMVExamplesDirectory=$REPO_ROOT/smv/Verification
 
