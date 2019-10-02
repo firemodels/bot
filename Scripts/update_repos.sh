@@ -31,11 +31,6 @@ esac
 done
 shift $(($OPTIND-1))
 
-echo "You are about update repos in the directory $FMROOT."
-echo ""
-echo "Press any key to continue or <CTRL> c to abort."
-read val
-
 UPDATE_REPO ()
 {
   local repo=$1
