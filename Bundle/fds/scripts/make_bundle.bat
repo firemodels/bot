@@ -130,8 +130,7 @@ set curdir=%CD%
 cd %out_bin%
 
 :: copy run-time mpi files
-wzunzip -d %in_impi%\mpi.zip
-
+CALL :COPYDIR %in_impi%\mpi mpi
 
 %hashfile% fds.exe        >  hash\fds_%fds_version%.exe.sha1
 %hashfile% fds2ascii.exe  >  hash\fds2ascii_%fds_version%.exe.sha1
@@ -282,6 +281,20 @@ IF EXIST %infile% (
 ) ELSE (
    echo.
    echo *** warning: %infile% does not exist
+   echo.
+   pause
+)
+exit /b
+
+:COPYDIR
+set fromdir=%1
+set todir=%2
+IF EXIST %fromdir% (
+   echo copying directory %fromdir%
+   copy %fromdir% %todir% >Nul
+) ELSE (
+   echo.
+   echo *** warning: directory %fromdir% does not exist
    echo.
    pause
 )
