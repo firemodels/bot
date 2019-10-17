@@ -130,6 +130,7 @@ set curdir=%CD%
 cd %out_bin%
 
 :: copy run-time mpi files
+mkdir mpi
 CALL :COPYDIR %in_impi%\mpi mpi
 
 %hashfile% fds.exe        >  hash\fds_%fds_version%.exe.sha1
