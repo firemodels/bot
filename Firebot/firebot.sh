@@ -1261,9 +1261,11 @@ copy_guide()
 
    cd $firebotdir
    if [[ "$UPLOADGUIDES" == "1" ]]; then
-     cp $doc /var/www/html/firebot/manuals/
-     cp $doc $NEWGUIDE_DIR/.
-     cp $doc $SAVEGUIDE_DIR/.
+     if [ -e $doc ]; then
+       cp $doc /var/www/html/firebot/manuals/
+       cp $doc $NEWGUIDE_DIR/.
+       cp $doc $SAVEGUIDE_DIR/.
+     fi
    fi
 }
 
@@ -1309,6 +1311,7 @@ copy_fds_user_guide()
 {
    cd $fdsrepo/Manuals/FDS_User_Guide
    copy_guide $fdsrepo/Manuals/FDS_User_Guide/FDS_User_Guide.pdf
+   copy_guide $fdsrepo/Manuals/FDS_User_Guide/geom_notes.pdf
 }
 
 #---------------------------------------------

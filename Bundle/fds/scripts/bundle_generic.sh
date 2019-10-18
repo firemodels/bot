@@ -4,10 +4,22 @@ smv_version=$2
 MPI_VERSION=$3
 INTEL_COMP_VERSION=$4
 
+# this script assumes that fds has been copied into FDS_DIR, smokeview apps have been copied into SMV_DIR and
+# manuals have been copied into GUIDE_DIR
+
 GUIDE_DIR=$HOME/.bundle/pubs
 SMV_DIR=$HOME/.bundle/smv
 FDS_DIR=$HOME/.bundle/fds
+
+# mpi files located into MPI_DIR
+MPI_DIR=$HOME/.bundle/BUNDLE/MPI
+
+# bundle copied into UPLOAD_DIR
+UPLOAD_DIR=$HOME/.bundle/uploads
+
 smvbin=smvbin
+INSTALLDIR=FDS/FDS6
+errlog=/tmp/errlog.$$
 
 if [ "`uname`" == "Darwin" ] ; then
   bundlebase=${fds_version}-${smv_version}_osx64
@@ -25,17 +37,11 @@ cd $curdir
 
 # upload directory
 
-upload_dir=$HOME/.bundle/uploads
-if [ ! -e $upload_dir ]; then
-  mkdir $upload_dir
+if [ ! -e $UPLOAD_DIR ]; then
+  mkdir $UPLOAD_DIR
 fi
 
-
-INSTALLDIR=FDS/FDS6
-
 # this script is called by make_bundle.sh located in bot/Bundle/fds/linux or osx
-
-errlog=/tmp/errlog.$$
 
 # -------------------- CP -------------------
 
@@ -217,9 +223,8 @@ else
   PLATFORM=LINUX64
 fi
 
-
 smvscriptdir=$REPO_ROOT/smv/scripts
-bundledir=$upload_dir/$bundlebase
+bundledir=$UPLOAD_DIR/$bundlebase
 webpagesdir=$REPO_ROOT/webpages
 fds_bundle=$REPO_ROOT/bot/Bundle/fds/for_bundle
 smv_bundle=$REPO_ROOT/bot/Bundle/smv/for_bundle
@@ -236,7 +241,7 @@ copycfastcase=$REPO_ROOT/bot/Bundle/fds/scripts/copycfastcase.sh
 FDSExamplesDirectory=$REPO_ROOT/fds/Verification
 SMVExamplesDirectory=$REPO_ROOT/smv/Verification
 
-cd $upload_dir
+cd $UPLOAD_DIR
 rm -rf $bundlebase
 mkdir $bundledir
 mkdir $bundledir/bin
@@ -315,7 +320,6 @@ CP $smv_bundle smokeview.html $bundledir/$smvbin smokeview.html
 CP $webgldir runsmv_ssh.sh $bundledir/$smvbin runsmv_ssh.sh
 CP $webgldir smv2html.sh   $bundledir/$smvbin smv2html.sh
 
-MPI_DIR=$HOME/.bundle/BUNDLE/MPI
 if [ "$MPI_VERSION" == "INTEL" ]; then
   UNTAR $MPI_DIR $intelmpifile $bundledir/bin INTEL
 else
@@ -349,7 +353,6 @@ echo ""
 CP $webpagesdir FDS_Release_Notes.htm $bundledir/Documentation FDS_Release_Notes.html
 CP $webpagesdir smv_readme.html       $bundledir/Documentation SMV_Release_Notes.html
 
-
 # CP2 $fds_bundle readme_examples.html $bundledir/Examples
 
 export OUTDIR=$bundledir/Examples
@@ -373,9 +376,9 @@ cd $curdir
 echo ""
 echo "--- building archive ---"
 echo ""
-rm -rf $upload_dir/$bundlebase.tar
-rm -rf $upload_dir/$bundlebase.tar.gz
-cd $upload_dir/$bundlebase
+rm -rf $UPLOAD_DIR/$bundlebase.tar
+rm -rf $UPLOAD_DIR/$bundlebase.tar.gz
+cd $UPLOAD_DIR/$bundlebase
 tar cf ../$bundlebase.tar --exclude='*.csv' .
 echo Compressing archive
 gzip    ../$bundlebase.tar
