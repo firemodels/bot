@@ -310,9 +310,6 @@ echo WScript.Sleep 10000                                                   >> "%
 erase "%firewall_setup%"               > Nul
 erase "%FDS6%\shortcut.exe"            > Nul
 
-call :is_file_in_path fds
-call :is_file_in_path smokeview
-call :is_file_in_path mpiexec
 echo.
 echo To run fds for cases using this computer only, open the
 echo command shell CMDfds (located on the desktop) and type:
@@ -336,23 +333,6 @@ goto eof
   set file=%1
   if not exist "%filepath%" echo.
   if not exist "%filepath%" echo ***error: %file% failed to copy to %filepath%
-  exit /b 0
-
-:: -------------------------------------------------------------
-:is_file_in_path
-:: -------------------------------------------------------------
-
-  set program=%1
-  where %program% 1> %TEMP%\in_path.txt 2>&1
-  type %TEMP%\in_path.txt | find /i /c "INFO" > %TEMP%\in_path_count.txt
-  set /p nothave=<%TEMP%\in_path_count.txt
-  if %nothave% == 1 (
-    echo "***Warning: %program% was not found in the PATH."
-    echo "   You will need to reboot your computer so that new path entries are defined"
-    exit /b 1
-  )
-  if exist %TEMP%\in_path.txt erase %TEMP%\in_path.txt
-  if exist %TEMP%\in_path_count.txt erase %TEMP%\in_path_count.txt
   exit /b 0
 
 :-------------------------------------------------------------------------
