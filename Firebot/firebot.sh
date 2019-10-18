@@ -1602,9 +1602,11 @@ NEWGUIDE_DIR=$OUTPUT_DIR/Newest_Guides
 SAVEGUIDE_DIR=$HOME/.firebot/pubs
 MANUAL_DIR=$HOME/.firebot/Manuals
 EMAIL_LIST=$HOME/.firebot/firebot_email_list.sh
+FDSAPP_DIR=$HOME/.firebot/fds
 
 MKDIR $HOME/.firebot
 MKDIR $HOME/.firebot/pubs
+MKDIR $HOME/.firebot/fds
 
 WEBBRANCH=nist-pages
 FDSBRANCH=master
