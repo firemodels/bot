@@ -3,6 +3,8 @@
 export NOPAUSE=1
 args=$0
 DIR=$(dirname "${args}")
+cd $DIR
+DIR=`pwd`
 
 # get fds repo revision
 cd $DIR
