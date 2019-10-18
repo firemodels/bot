@@ -346,6 +346,7 @@ update_repo()
    if [[ "$reponame" == "smv" ]]; then
       git update-index --refresh
       GIT_REVISION=`git describe --long --dirty`
+      git describe --abbrev | awk -F '-' '{print $1"-"$2}' > $SMV_LATESTAPPS_DIR/SMV_REVISION
       GIT_SHORTHASH=`git rev-parse --short HEAD`
       GIT_LONGHASH=`git rev-parse HEAD`
       GIT_DATE=`git log -1 --format=%cd --date=local $GIT_SHORTHASH`
@@ -680,7 +681,8 @@ compile_smv_utilities()
      echo 'Compiling smokezip:' >> $OUTPUT_DIR/stage2a 2>&1
      ./make_smokezip.sh >> $OUTPUT_DIR/stage2a 2>&1
      echo "" >> $OUTPUT_DIR/stage2a 2>&1
-   
+     cp smokezip_${platform}_64 $SMV_LATESTAPPS_DIR/smokezip
+
    # smokediff:
      echo "      smokediff"
      cd $smvrepo/Build/smokediff/${COMPILER}_${platform}_64
@@ -688,21 +690,24 @@ compile_smv_utilities()
      echo 'Compiling smokediff:' >> $OUTPUT_DIR/stage2a 2>&1
      ./make_smokediff.sh >> $OUTPUT_DIR/stage2a 2>&1
      echo "" >> $OUTPUT_DIR/stage2a 2>&1
-   
+     cp smokediff_${platform}_64 $SMV_LATESTAPPS_DIR/smokediff
+
    # background
      echo "      background"
      cd $smvrepo/Build/background/${COMPILER}_${platform}_64
      rm -f *.o background_${platform}_64
      echo 'Compiling background:' >> $OUTPUT_DIR/stage2a 2>&1
      ./make_background.sh >> $OUTPUT_DIR/stage2a 2>&1
+     cp background_${platform}_64 $SMV_LATESTAPPS_DIR/background
 
    # dem2fds
      echo "      dem2fds"
      cd $smvrepo/Build/dem2fds/${COMPILER}_${platform}_64
-     rm -f *.o dem2fds
+     rm -f *.o dem2fds_${platform}_64
      echo 'Compiling dem2fds:' >> $OUTPUT_DIR/stage2a 2>&1
      ./make_dem2fds.sh >> $OUTPUT_DIR/stage2a 2>&1
-   
+     cp dem2fds_${platform}_64 $SMV_LATESTAPPS_DIR/dem2fds
+
   # wind2fds:
      echo "      wind2fds"
      cd $smvrepo/Build/wind2fds/${COMPILER}_${platform}_64
@@ -710,6 +715,7 @@ compile_smv_utilities()
      echo 'Compiling wind2fds:' >> $OUTPUT_DIR/stage2a 2>&1
      ./make_wind2fds.sh >> $OUTPUT_DIR/stage2a 2>&1
     echo "" >> $OUTPUT_DIR/stage2a 2>&1
+     cp wind2fds_${platform}_64 $SMV_LATESTAPPS_DIR/wind2fds
    else
      echo "Warning: smokeview and utilities not built - C compiler not available" >> $OUTPUT_DIR/stage2a 2>&1
    fi
@@ -1024,6 +1030,7 @@ check_compile_smv()
    # Check for errors in SMV release compilation
    cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_64
    if [ -e "smokeview_${platform}${TEST}_64" ]
+     cp smokeview_${platform}${TEST}_64 $SMV_LATESTAPPS_DIR/smokeview
    then
       stage2c_smv_success=true
    else
@@ -1414,6 +1421,12 @@ fi
       # Send success message with links to nightly manuals
 
       cat $TIME_LOG | mail -s "smokebot success on ${hostname}. ${GIT_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+
+# save apps that were built for bundling
+
+      rm -f $SMV_APPS_DIR/*
+      cp $SMV_LATESTAPPS_DIR/* $SMV_APPS_DIR/.
+
    fi
 }
 
@@ -1569,6 +1582,13 @@ fi
 
 MKDIR $HOME/.smokebot
 MKDIR $HOME/.smokebot/pubs
+
+SMV_APPS_DIR=$HOME/.smokebot/smv
+SMV_LATESTAPPS_DIR=$HOME/.smokebot/smvlatest
+
+MKDIR $SMV_APPS_DIR
+rm -rf $SMV_LATESTAPPS_DIR
+MKDIR $SMV_LATESTAPPS_DIR
 
 #*** make sure repos needed by smokebot exist
 

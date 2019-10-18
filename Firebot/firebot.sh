@@ -244,7 +244,7 @@ get_fds_revision()
 
    git update-index --refresh
    FDS_REVISION=`git describe --long --dirty`
-   git describe --abbrev | awk -F '-' '{print $1"-"$2}' > $FDSAPPLATEST_DIR/FDS_REVISION
+   git describe --abbrev | awk -F '-' '{print $1"-"$2}' > $FDS_LATESTAPPS_DIR/FDS_REVISION
    FDS_SHORTHASH=`git rev-parse --short HEAD`
    FDS_LONGHASH=`git rev-parse HEAD`
    FDS_DATE=`git log -1 --format=%cd --date=local $FDS_SHORTHASH`
@@ -606,7 +606,7 @@ check_compile_fds_mpi()
    if [ -e "fds_${INTEL}mpi_intel_${platform}${size}$DV" ]
    then
       FDS_release_success=true
-      cp fds_${INTEL}mpi_intel_${platform}${size}$DV $FDSAPPLATEST_DIR/fds
+      cp fds_${INTEL}mpi_intel_${platform}${size}$DV $FDS_LATESTAPPS_DIR/fds
    else
       echo "Errors from Stage 2c - Compile FDS MPI release:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage2c >> $ERROR_LOG
@@ -687,7 +687,7 @@ compile_smv_utilities()
      cd $fdsrepo/Utilities/fds2ascii/${COMPILER}_${platform}${size}
      rm -f *.o fds2ascii_${platform}${size}
      ./make_fds2ascii.sh >> $OUTPUT_DIR/stage3a 2>&1
-     cp fds2ascii_${platform}${size} $FDSAPPLATEST_DIR/fds2ascii
+     cp fds2ascii_${platform}${size} $FDS_LATESTAPPS_DIR/fds2ascii
     echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
   # test_mpi
@@ -695,7 +695,7 @@ compile_smv_utilities()
      cd $fdsrepo/Utilities/test_mpi/${INTEL}mpi_${COMPILER}_${platform}
      rm -f *.o test_mpi
      ./make_test_mpi.sh >> $OUTPUT_DIR/stage3a 2>&1
-     cp test_mpi $FDSAPPLATEST_DIR/test_mpi
+     cp test_mpi $FDS_LATESTAPPS_DIR/test_mpi
     echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
    else
@@ -1606,14 +1606,14 @@ NEWGUIDE_DIR=$OUTPUT_DIR/Newest_Guides
 SAVEGUIDE_DIR=$HOME/.firebot/pubs
 MANUAL_DIR=$HOME/.firebot/Manuals
 EMAIL_LIST=$HOME/.firebot/firebot_email_list.sh
-FDSAPP_DIR=$HOME/.firebot/fds
-FDSAPPLATEST_DIR=$HOME/.firebot/fdslatest
+FDS_APPS_DIR=$HOME/.firebot/fds
+FDS_LATESTAPPS_DIR=$HOME/.firebot/fdslatest
 
 MKDIR $HOME/.firebot
 MKDIR $HOME/.firebot/pubs
-MKDIR $FDSAPP_DIR
-rm -rf $FDSAPPLATEST_DIR
-MKDIR $FDSAPPLATEST_DIR
+MKDIR $FDS_APPS_DIR
+rm -rf $FDS_LATESTAPPS_DIR
+MKDIR $FDS_LATESTAPPS_DIR
 
 WEBBRANCH=nist-pages
 FDSBRANCH=master
@@ -2065,8 +2065,8 @@ if [[ "$DEBUG_ONLY" == "" ]] && [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" 
         copy_fds_technical_guide
         copy_fds_validation_guide
         copy_fds_Config_management_plan
-        rm -f $FDSAPP_DIR/*
-        cp $FDSAPPLATEST_DIR/* $FDSAPP_DIR/.
+        rm -f $FDS_APPS_DIR/*
+        cp $FDS_LATESTAPPS_DIR/* $FDS_APPS_DIR/.
       fi
     fi
   fi
