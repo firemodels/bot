@@ -20,6 +20,12 @@ else
   mpi_version=$mpi_version_linux
 fi
 
+source ~/.bundle/bundle_setup.sh
+./copy_pubs.sh firebot  $firebot_home/.firebot/pubs   $firebot_host
+./copy_pubs.sh smokebot $smokebot_home/.smokebot/pubs $smokebot_host
+./copy_apps.sh firebot  $firebot_home/.firebot/fds    $firebot_host
+./copy_apps.sh smokebot $firebot_home/.smokebot/smv   $smokebot_host
+
 export NOPAUSE=1
 args=$0
 DIR=$(dirname "${args}")
