@@ -15,9 +15,10 @@ echo "Miscellaneous:"
 echo "-a - run automatically if FDS or smokeview source has changed"
 echo "-A - run automatically if smokeview source has changed"
 echo "-b - use the current branch"
-echo "-B - use startup files to set the environment not modules"
+echo "-B - only build apps"
 echo "-C - add --mca plm_rsh_agent /usr/bin/ssh to mpirun command "
 echo "           when running cases"
+echo "-D - use startup files to set the environment not modules"
 echo "-f - force smokebot run"
 echo "-I compiler - intel or gnu [default: $COMPILER]"
 echo "-J use Intel MPI version of fds"
@@ -171,6 +172,7 @@ export MPIRUN_MCA=
 export QFDS_STARTUP=
 SKIP=
 REMOVE_PID=
+BUILD_ONLY=
 
 WEB_URL=
 web_DIR=/var/www/html/`whoami`
@@ -192,7 +194,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'aAbBcCd:fhHI:JkLm:Mq:Rr:StuUvw:W:' OPTION
+while getopts 'aAbBcCd:DfhHI:JkLm:Mq:Rr:StuUvw:W:' OPTION
 do
 case $OPTION  in
   a)
@@ -202,7 +204,7 @@ case $OPTION  in
    RUNAUTO=-A
    ;;
   B)
-   export QFDS_STARTUP=1
+   BUILD_ONLY="-B"
    ;;
   b)
    BRANCH="current"
@@ -212,6 +214,9 @@ case $OPTION  in
    ;;
   C)
    export MPIRUN_MCA="--mca plm_rsh_agent /usr/bin/ssh "
+   ;;
+  D)
+   export QFDS_STARTUP=1
    ;;
   I)
    COMPILER="$OPTARG"
@@ -363,7 +368,7 @@ BRANCH="-b $BRANCH"
 #*** run smokebot
 
 touch $smokebot_pid
-$ECHO ./$botscript $SKIP $SIZE $BRANCH $TESTFLAG $RUNAUTO $INTEL $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $SKIP $SIZE $BRANCH $TESTFLAG $RUNAUTO $INTEL $BUILD_ONLY $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi

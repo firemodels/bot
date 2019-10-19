@@ -1479,10 +1479,11 @@ PID_FILE=~/.fdssmvgit/firesmokebot_pid
 INTEL=
 SKIP=
 HTML2PDF=wkhtmltopdf
+BUILD_ONLY=
 
 #*** parse command line options
 
-while getopts 'aAb:cI:JLm:Mo:q:r:SstuUw:W:' OPTION
+while getopts 'aAb:BcI:JLm:Mo:q:r:SstuUw:W:' OPTION
 do
 case $OPTION in
   a)
@@ -1490,6 +1491,9 @@ case $OPTION in
    ;;
   A)
    RUNAUTO="Y"
+   ;;
+  B)
+   BUILD_ONLY="1"
    ;;
   b)
    SMVBRANCH="$OPTARG"
@@ -1840,29 +1844,35 @@ compile_smv_utilities
 check_smv_utilities
 check_common_files
 
-if [[ $stage1b_fdsdb_success && "$RUNDEBUG" == "1" ]] ; then
+if [[ $stage1b_fdsdb_success && "$RUNDEBUG" == "1" && "$BUILD_ONLY" == "" ]] ; then
    run_verification_cases_debug
 fi
 
 if [ "$SMOKEBOT_LITE" == "" ]; then
 if [[ $stage1b_fdsdb_success ]] ; then
+if [ "$BUILD_ONLY" == "" ]; then
    compile_fds_mpi
    check_compile_fds_mpi
+fi
 fi
 fi
 if [[ $stage1b_fdsdb_success && "$RUNDEBUG" == "1" ]] ; then
    check_verification_cases_debug
 fi
 RUNCASES_beg=`GET_TIME`
+if [ "$BUILD_ONLY" == "" ]; then
 if [ "$SMOKEBOT_LITE" == "" ]; then
   if [[ $stage1c_fdsrel_success ]] ; then
      run_verification_cases_release
   fi
 fi
+fi
 
 ### Stage 2 build smokeview ###
+if [ "$BUILD_ONLY" == "" ]; then
 compile_smv_db
 check_compile_smv_db
+fi
 
 if [ "$SMOKEBOT_LITE" == "" ]; then
   compile_smv
@@ -1875,10 +1885,12 @@ echo "Build Software: $DIFF_BUILDSOFTWARE" >> $STAGE_STATUS
 
 ### Stage 3 run verification cases ###
 
+if [ "$BUILD_ONLY" == "" ]; then
 if [ "$SMOKEBOT_LITE" == "" ]; then
   if [[ $stage1c_fdsrel_success ]] ; then
      check_verification_cases_release
   fi
+fi
 fi
 RUNCASES_end=`GET_TIME`
 DIFF_RUNCASES=`GET_DURATION $RUNCASES_beg $RUNCASES_end`
@@ -1886,7 +1898,7 @@ echo "Run cases: $DIFF_RUNCASES" >> $STAGE_STATUS
 
 ### Stage 4 generate images ###
 MAKEPICTURES_beg=`GET_TIME`
-if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]]; then
+if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
   if [[ $stage1c_fdsrel_success && $stage2c_smv_success ]] ; then
     make_smv_pictures
     check_smv_pictures
@@ -1896,7 +1908,7 @@ MAKEPICTURES_end=`GET_TIME`
 DIFF_MAKEPICTURES=`GET_DURATION $MAKEPICTURES_beg $MAKEPICTURES_end`
 echo "Make pictures: $DIFF_MAKEPICTURES" >> $STAGE_STATUS
 
-if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]]; then
+if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
   if [ "$MAKEMOVIES" == "1" ]; then
     MAKEMOVIES_beg=`GET_TIME`
  
@@ -1909,7 +1921,7 @@ if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]]; then
   fi
 fi
 
-if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]]; then
+if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
   if [[ $stage1c_fdsrel_success ]] ; then
     generate_timing_stats
   fi
@@ -1917,7 +1929,7 @@ fi
 
 ### Stage 5 build documents ###
 MAKEGUIDES_beg=`GET_TIME`
-if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]]; then
+if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
   if [[ $stage1c_fdsrel_success && $stage4b_smvpics_success ]] ; then
      echo Making guides
      if [ "$YOPT" == "" ]; then
@@ -1954,9 +1966,11 @@ set_files_world_readable || exit 1
 save_build_status
 save_manuals_dir
 
-if [ "$SMOKEBOT_LITE" == "" ]; then
-  if [[ $stage1c_fdsrel_success ]] ; then
-    archive_timing_stats
+if [ "$BUILD_ONLY" == "" ]; then
+  if [ "$SMOKEBOT_LITE" == "" ]; then
+    if [[ $stage1c_fdsrel_success ]] ; then
+      archive_timing_stats
+    fi
   fi
 fi
 echo "   emailing results"
