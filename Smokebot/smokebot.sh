@@ -375,7 +375,7 @@ update_repo()
    have_firemodels=`git remote -v | awk '{print $1}' | grep firemodels | wc  -l`
    if [ "$have_firemodels" != "0" ]; then
       git merge firemodels/$branch   >> $OUTPUT_DIR/stage0 2>&1
-      need_push=`git status -uno | head -2 | grep -v nothing | wc -l`
+      need_push=`git status -uno | head -2 | grep -v nothing | grep -v 'Your branch' | grep -v '^$' | wc -l`
       if [ $need_push -gt 1 ]; then
         echo "warning: firemodels commits to $reponame repo need to be pushed to origin" >> $OUTPUT_DIR/stage0 2>&1
         git status -uno | head -2 | grep -v nothing                                 >> $OUTPUT_DIR/stage0 2>&1
