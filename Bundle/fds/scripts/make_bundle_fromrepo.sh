@@ -28,11 +28,11 @@ echo "-v - show parameters used to build bundle"
 exit
 }
 
-firebot_app_home=~firebot
-smokebot_app_home=~smokebot
+firebot_app_home=\~firebot
+smokebot_app_home=\~smokebot
 
-smokebot_pub_home=~smokebot
-firebot_pub_home=~firebot
+smokebot_pub_home=\~smokebot
+firebot_pub_home=\~firebot
 pub_host=`hostname`
 showparms=
 
