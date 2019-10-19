@@ -97,15 +97,13 @@ else
 fi
 
 if [ "$showparms" == "1" ]; then
-  echo firebot_app_home=$firebot_app_home
-  echo smokebot_app_home=$smokebot_app_home
-
-  echo smokebot_pub_home=$smokebot_pub_home
-  echo firebot_pub_home=$firebot_pub_home
-  echo pub_host=$pub_host`
-
-  echo intel_mpi_version=$intel_mpi_version
-  echo mpi_version=$mpi_version
+  echo "firebot_app_home=$firebot_app_home"
+  echo "smokebot_app_home=$smokebot_app_home"
+  echo "smokebot_pub_home=$smokebot_pub_home"
+  echo "firebot_pub_home=$firebot_pub_home"
+  echo "pub_host=$pub_host"
+  echo "intel_mpi_version=$intel_mpi_version"
+  echo "mpi_version=$mpi_version"
   exit
 fi
 
