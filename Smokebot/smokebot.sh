@@ -1831,12 +1831,14 @@ echo "Preliminary: $DIFF_PRELIM" >> $STAGE_STATUS
 
 ### Stage 1 build cfast and FDS ###
 BUILDSOFTWARE_beg=`GET_TIME`
-compile_cfast
-compile_fds_mpi_db
-check_compile_fds_mpi_db
-if [ "$OPENMPI_GNU" != "" ]; then
-  compile_fds_mpi_gnu_db
-  check_compile_fds_mpi_gnu_db
+if [ "$BUILD_ONLY" == "" ]; then
+  compile_cfast
+  compile_fds_mpi_db
+  check_compile_fds_mpi_db
+  if [ "$OPENMPI_GNU" != "" ]; then
+    compile_fds_mpi_gnu_db
+    check_compile_fds_mpi_gnu_db
+  fi
 fi
 
 ### Stage 2 build smokeview ###
