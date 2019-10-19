@@ -346,7 +346,6 @@ update_repo()
    if [[ "$reponame" == "smv" ]]; then
       git update-index --refresh
       GIT_REVISION=`git describe --long --dirty`
-      git describe --abbrev | awk -F '-' '{print $1"-"$2}' > $SMV_LATESTAPPS_DIR/SMV_REVISION
       GIT_SHORTHASH=`git rev-parse --short HEAD`
       GIT_LONGHASH=`git rev-parse HEAD`
       GIT_DATE=`git log -1 --format=%cd --date=local $GIT_SHORTHASH`
@@ -1824,6 +1823,9 @@ else
 fi
 
 check_update_repo
+
+cd $smvrepo
+git describe --abbrev | awk -F '-' '{print $1"-"$2}' > $SMV_LATESTAPPS_DIR/SMV_REVISION
 
 PRELIM_end=`GET_TIME`
 DIFF_PRELIM=`GET_DURATION $PRELIM_beg $PRELIM_end`
