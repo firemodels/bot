@@ -28,9 +28,6 @@ echo "-f - home directory containing fds and smokeview apps [default: $app_home]
 echo "-F - home directory containing fds and smokeview pubs [default: $pub_home]"
 echo "-h - display this message"
 echo "-p - host containing pubs"
-echo "-u - home directory containing apps and pubs is $HOME"
-echo "     host containing apps and pubs is `hostname`"
-echo "-U - home directory containing apps is $HOME"
 echo "-v - show parameters used to build bundle"
 exit
 }
@@ -54,11 +51,6 @@ case $OPTION  in
    ;;
   p)
    pub_host=$OPTARG
-   ;;
-  u)
-   app_home=$HOME
-   pub_home=$HOME
-   pub_host=`hostname`
    ;;
   v)
    showparms=1
