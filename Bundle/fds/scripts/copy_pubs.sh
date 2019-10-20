@@ -15,7 +15,7 @@ CP ()
 {
   local FROMFILE=$1
   rm -f $pdf_to/$FROMFILE
-  if [[ "$bot_host" != "" ]] && [[ "$bot_host" != "`hostname`" ]]; then
+  if [[ "$bot_host" != "" ]] ; then
     scp -q $bot_host:$pdf_from/$FROMFILE $pdf_to/.
   else
     cp $pdf_from/$FROMFILE $pdf_to/.
