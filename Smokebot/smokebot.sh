@@ -706,6 +706,14 @@ compile_smv_utilities()
      echo 'Compiling dem2fds:' >> $OUTPUT_DIR/stage2a 2>&1
      ./make_dem2fds.sh >> $OUTPUT_DIR/stage2a 2>&1
      cp dem2fds_${platform}_64 $SMV_LATESTAPPS_DIR/dem2fds
+   
+   # hashfile
+     echo "      hashfile"
+     cd $smvrepo/Build/hashfile/${COMPILER}_${platform}_64
+     rm -f *.o hashfile_${platform}_64
+     echo 'Compiling hashfile:' >> $OUTPUT_DIR/stage2a 2>&1
+     ./make_hashfile.sh >> $OUTPUT_DIR/stage2a 2>&1
+     cp hashfile_${platform}_64 $SMV_LATESTAPPS_DIR/hashfile
 
   # wind2fds:
      echo "      wind2fds"

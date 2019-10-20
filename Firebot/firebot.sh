@@ -701,6 +701,7 @@ compile_smv_utilities()
      cd $smvrepo/Build/hashfile/${COMPILER}_${platform}${size}
      rm -f *.o hashfile_${platform}${size}
      ./make_hashfile.sh >> $OUTPUT_DIR/stage3a 2>&1
+     CP hashfile_${platform}${size} $SMV_LATESTAPPS_DIR/hashfile
     echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
   # fds2asci
