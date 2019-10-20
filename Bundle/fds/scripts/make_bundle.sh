@@ -24,8 +24,10 @@ echo "2. on floga using user account for apps and blaze for pubs"
 echo "./make_bundle.sh -f $HOME -p blaze.el.nist.gov"
 echo ""
 echo "Options:"
+echo "-b - use bots (firebot and smokebot) for apps and pubs to build bundle"
 echo "-f - home directory containing fds and smokeview apps [default: $app_home]"
-echo "-F - home directory containing fds and smokeview pubs [default: $pub_home]"
+echo "-F - home directory containing fds pubs [default: $fds_pub_home]"
+echo "-S - home directory containing smokeview pubs [default: $smv_pub_home]"
 echo "-h - display this message"
 echo "-p - host containing pubs"
 echo "-v - show parameters used to build bundle"
@@ -33,18 +35,31 @@ exit
 }
 
 app_home=\~firebot
-pub_home=\~firebot
+fds_pub_home=\~firebot
+smv_pub_home=\~smokebot
 pub_host=`hostname`
 showparms=
+ECHO=
+bots=
 
-while getopts 'f:F:hp:uv' OPTION
+while getopts 'bf:F:hp:S:uv' OPTION
 do
 case $OPTION  in
+  b)
+   app_home=\~firebot
+   fds_pub_home=\~firebot
+   smv_pub_home=\~smokebot
+   bots=1
+   ;;
   f)
-   app_home=$OPTARG
+   if [ "$bots" == "" ]; then
+     app_home=$OPTARG
+   fi
    ;;
   F)
-   pub_home=$OPTARG
+   if [ "$bots" == "" ]; then
+     fds_pub_home=$OPTARG
+   fi
    ;;
   h)
    usage;
@@ -52,8 +67,14 @@ case $OPTION  in
   p)
    pub_host=$OPTARG
    ;;
+  S)
+   if [ "$bots" == "" ]; then
+     smv_pub_home=$OPTARG
+   fi
+   ;;
   v)
    showparms=1
+   ECHO=echo
    ;;
 esac
 done
@@ -71,18 +92,20 @@ fi
 
 if [ "$showparms" == "1" ]; then
   echo "app_home=$app_home"
-  echo "pub_home=$pub_home"
+  echo "fds_pub_home=$fds_pub_home"
+  echo "smv_pub_home=$smv_pub_home"
   echo "pub_host=$pub_host"
   echo "intel_mpi_version=$intel_mpi_version"
   echo "mpi_version=$mpi_version"
-  exit
 fi
 
-./copy_pubs.sh fds $pub_home/.firebot/pubs $pub_host
-./copy_pubs.sh smv $pub_home/.smokebot//pubs $pub_host
+if [ "$showparms" == "" ]; then
+  ./copy_pubs.sh fds $fds_pub_home/.firebot/pubs  $pub_host
+  ./copy_pubs.sh smv $smv_pub_home/.smokebot/pubs $pub_host
 
-./copy_apps.sh fds $app_home/.firebot/fds
-./copy_apps.sh smv $app_home/.firebot/smv 
+  ./copy_apps.sh fds $app_home/.firebot/fds
+  ./copy_apps.sh smv $app_home/.firebot/smv 
+fi
 
 export NOPAUSE=1
 args=$0
@@ -103,5 +126,4 @@ cd $smvrepo
 SMVREV=`git describe --abbrev | awk -F '-' '{print $1"-"$2}'`
 
 cd $DIR
-echo ./bundle_generic.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version
-./bundle_generic.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version
+$ECHO ./bundle_generic.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version
