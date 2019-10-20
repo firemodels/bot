@@ -1,155 +1,136 @@
 #!/bin/bash
 
 #---------------------------------------------
-#                   SETENV
-#---------------------------------------------
-
-SETENV ()
-{
-  local var=$1
-  local bashvar=$2
-
-  if [ "\$$bashvar" != "" ]; then
-    eval $var=\$$bashvar
-  fi
-}
-
-# define variables in startup file if not passed into this script
-
-build_apps=
-GET_BOT_REVISION=
-SETENV bot_host            BOT_HOST
-SETENV firebot_home        FIREBOT_HOME
-SETENV smokebot_home       SMOKEBOT_HOME
-SETENV mpi_version         MPI_VERSION
-SETENV intel_mpi_version   INTEL_MPI_VERSION
-
-#---------------------------------------------
-#                   DEFAULT
-#---------------------------------------------
-
-function DEFAULT {
-  arg=$1
-  DEF=
-  if [ "$arg" != "" ]; then
-    DEF="[default: $arg]"
-  fi
-}
-
-
-#---------------------------------------------
 #                   usage
 #---------------------------------------------
 
 function usage {
-echo "make_bundle_bot.sh [options]"
-echo "   Build a bundle using documents built by firebot and smokebot"
-echo "   and applications built by firebot
+option=$1
+echo "Script used to build a bundle from current revision of the fds and smv repos"
+echo "example usage:"
+echo "1.  on blaze using firebot and smokebot accounts"
+echo "./make_bundle_fromrepos.sh "
+echo ""
+echo "2. on floga using user account for apps and blaze for pubs"
+echo "./make_bundlefromrepos.sh -U -p blaze.el.nist.gov -F ~firebot -S ~smokebot"
 echo ""
 echo "Options:"
-echo "-B - build fds and smokeview apps"
-
-DEFAULT $bot_host
-echo "-b - host where firebot and smokebot are located $DEF"
-
-DEFAULT $firebot_home
-echo "-f - firebot home directory $DEF"
-
+echo "-f - home directory containing fds apps [default: $firebot_app_home]"
+echo "-F - home directory containing fds pubs [default: $firebot_pub_home]"
 echo "-h - display this message"
-
-DEFAULT $mpi_version
-echo "-m - mpi type (INTEL or openmpi version number) $DEF"
-
-echo "-r - build bundle using fds and smv revision from last firebot pass"
-DEFAULT $smokebot_home
-echo "-s - smokebot home directory $DEF"
+echo "-p - host containing pubs"
+echo "-s - home directory containing smv apps [default: $smokebot_app_home]"
+echo "-S - home directory containing smv pubs [default: $smokebot_pub_home]"
+echo "-u - home directory containing apps and pubs is $HOME"
+echo "     host containing apps and pubs is `hostname`"
+echo "-U - home directory containing apps is $HOME"
+echo "-v - show parameters used to build bundle"
 exit
 }
 
-#*** parse command line options
+firebot_app_home=\~firebot
+smokebot_app_home=\~smokebot
 
-while getopts 'b:Bf:hm:rs:' OPTION
+smokebot_pub_home=\~smokebot
+firebot_pub_home=\~firebot
+pub_host=`hostname`
+showparms=
+
+
+while getopts 'f:F:hp:s:S:uUv' OPTION
 do
 case $OPTION  in
-  b)
-   bot_host=$OPTARG
-   ;;
-  B)
-   build_apps=1
-   ;;
   f)
-   firebot_home=$OPTARG
+   firebot_app_home=$OPTARG
+   ;;
+  F)
+   firebot_pub_home=$OPTARG
    ;;
   h)
    usage;
    ;;
-  m)
-   mpi_version=$OPTARG
-   ;;
-  r)
-   GET_BOT_REVISION=1
+  p)
+   pub_host=$OPTARG
    ;;
   s)
-   smokebot_home=$OPTARG
+   smokebot_app_home=$OPTARG
+   ;;
+  S)
+   smokebot_pub_home=$OPTARG
+   ;;
+  u)
+   firebot_app_home=$HOME
+   smokebot_app_home=$HOME
+   firebot_pub_home=$HOME
+   smokebot_pub_home=$HOME
+   pub_host=`hostname`
+   ;;
+  U)
+   firebot_app_home=$HOME
+   smokebot_app_home=$HOME
+   ;;
+  v)
+   showparms=1
    ;;
 esac
 done
 shift $(($OPTIND-1))
 
+#*** Linux parameters
+
+intel_mpi_version_linux=19u4
+mpi_version_linux=INTEL
+
+#*** OSX parameters
+
+intel_mpi_version_osx=19u4
+mpi_version_osx=3.1.2
+
+# determine platform script is running on
+
+if [ "`uname`" == "Darwin" ]; then
+  intel_mpi_version=$intel_mpi_version_osx
+  mpi_version=$mpi_version_osx
+else
+  intel_mpi_version=$intel_mpi_version_linux
+  mpi_version=$mpi_version_linux
+fi
+
+if [ "$showparms" == "1" ]; then
+  echo "firebot_app_home=$firebot_app_home"
+  echo "smokebot_app_home=$smokebot_app_home"
+  echo "smokebot_pub_home=$smokebot_pub_home"
+  echo "firebot_pub_home=$firebot_pub_home"
+  echo "pub_host=$pub_host"
+  echo "intel_mpi_version=$intel_mpi_version"
+  echo "mpi_version=$mpi_version"
+  exit
+fi
+
+./copy_pubs.sh firebot  $firebot_pub_home/.firebot/pubs   $pub_host
+./copy_pubs.sh smokebot $smokebot_pub_home/.smokebot/pubs $pub_host
+
+./copy_apps.sh firebot  $firebot_app_home/.firebot/fds
+./copy_apps.sh smokebot $smokebot_app_home/.smokebot/smv 
+
 export NOPAUSE=1
 args=$0
 DIR=$(dirname "${args}")
 cd $DIR
+DIR=`pwd`
 
-BUNDLE_HOME=$HOME/.bundle
+# get fds repo revision
+cd $DIR
+fdsrepo=../../../../fds
+cd $fdsrepo
+FDSREV=`git describe --abbrev | awk -F '-' '{print $1"-"$2}'`
 
-mkdir -p $BUNDLE_HOME/pubs
-mkdir -p $BUNDLE_HOME/BUNDLE
-mkdir -p $BUNDLE_HOME/OPENMPI
+# get smv repo revision
+cd $DIR
+smvrepo=../../../../smv
+cd $smvrepo
+SMVREV=`git describe --abbrev | awk -F '-' '{print $1"-"$2}'`
 
-scriptdir=`dirname "$(readlink "$0")"`
-curdir=`pwd`
-cd $scriptdir/../../../..
-repo_root=`pwd`
-
-if [ "$build_apps" == "1" ]; then
-
-# set revision in fds and smv repos to last one passed in firebot
-  if [ "$GET_BOT_REVISION" == "1" ]; then
-    cd $repo_root/bot/Bundle/fds/scripts
-    ./set_firebot_revisions.sh -b $bot_host -f $firebot_home  || exit 1
-  fi
-
-# build fds and smv apps
-  cd $repo_root/bot/Firebot
-  ./run_firebot.sh -c -b -B
-  error_status=$?
-
-  if [ "$GET_BOT_REVISION" == "1" ]; then
-# set revision in fds and smv repos back to master
-    cd $repo_root/bot/Bundle/fds/scripts
-    ./set_firebot_revisions.sh -m
-  fi
-fi
-
-cd $repo_root/fds
-export fds_version=`git describe --long --dirty`
-cd $repo_root/smv
-export smv_version=`git describe --long --dirty`
-cd $curdir
-
-# copy apps from fds/smv repo to $HOME/.bundle/fds and $HOME/.bundle/smv
-
-cd $repo_root/bot/Firebot
-./copy_apps.sh
-
-# copy pubs from the firebot/smokebot account to $HOME/.bundle/pubs
-
-cd $curdir
-./copy_pubs.sh firebot  $firebot_home/.firebot/pubs   $bot_host || exit 1
-./copy_pubs.sh smokebot $smokebot_home/.smokebot/pubs $bot_host || exit 1
-
-# build bundle
-
-./bundle_generic.sh    $fds_version $smv_version $mpi_version
-
+cd $DIR
+echo ./bundle_generic.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version
+./bundle_generic.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version
