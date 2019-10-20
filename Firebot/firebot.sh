@@ -227,6 +227,7 @@ get_smv_revision()
 
    git update-index --refresh
    SMV_REVISION=`git describe --long --dirty`
+   git describe --abbrev | awk -F '-' '{print $1"-"$2}' > $SMV_LATESTAPPS_DIR/SMV_REVISION
    SMV_MESSAGE=`git log . | head -5 | tail -1`
    return 0
 }
@@ -647,6 +648,7 @@ compile_smv_utilities()
      rm -f *.o smokezip_${platform}${size}
 
      ./make_smokezip.sh >> $OUTPUT_DIR/stage3a 2>&1
+     cp smokezip_${platform}${size} $SMV_LATESTAPPS_DIR/smokezip
      echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
    # smokediff:
@@ -654,6 +656,7 @@ compile_smv_utilities()
      cd $smvrepo/Build/smokediff/${COMPILER}_${platform}${size}
      rm -f *.o smokediff_${platform}${size}
      ./make_smokediff.sh >> $OUTPUT_DIR/stage3a 2>&1
+     cp smokediff_${platform}${size} $SMV_LATESTAPPS_DIR/smokediff
      echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
    # background
@@ -661,18 +664,21 @@ compile_smv_utilities()
      cd $smvrepo/Build/background/${COMPILER}_${platform}${size}
      rm -f *.o background_${platform}_${size}
      ./make_background.sh >> $OUTPUT_DIR/stage3a 2>&1
+     cp background_${platform}_${size} $SMV_LATESTAPPS_DIR/background
 
    # dem2fds
      echo "      dem2fds"
      cd $smvrepo/Build/dem2fds/${COMPILER}_${platform}${size}
-     rm -f *.o dem2fds
+     rm -f *.o dem2fds_${platform}_${size}
      ./make_dem2fds.sh >> $OUTPUT_DIR/stage3a 2>&1
+     cp dem2fds_${platform}_${size} $SMV_LATESTAPPS_DIR/dem2fds
 
   # wind2fds:
      echo "      wind2fds"
      cd $smvrepo/Build/wind2fds/${COMPILER}_${platform}${size}
      rm -f *.o wind2fds_${platform}${size}
      ./make_wind2fds.sh >> $OUTPUT_DIR/stage3a 2>&1
+     cp wind2fds_${platform}${size} $SMV_LATESTAPPS_DIR/wind2fds
     echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
   # hashfile:
@@ -901,6 +907,7 @@ check_compile_smv()
     cd $smvrepo/Build/smokeview/intel_${platform}${size}
     if [ -e "smokeview_${platform}${size}" ]; then
       smv_release_success=true
+      cp smokeview_${platform}${size} $SMV_LATESTAPPS_DIR/smokeview
     else
       echo "Errors from Stage 3c - Compile SMV release:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage3c >> $ERROR_LOG
@@ -1606,14 +1613,23 @@ NEWGUIDE_DIR=$OUTPUT_DIR/Newest_Guides
 SAVEGUIDE_DIR=$HOME/.firebot/pubs
 MANUAL_DIR=$HOME/.firebot/Manuals
 EMAIL_LIST=$HOME/.firebot/firebot_email_list.sh
+
 FDS_APPS_DIR=$HOME/.firebot/fds
 FDS_LATESTAPPS_DIR=$HOME/.firebot/fdslatest
+
+SMV_APPS_DIR=$HOME/.firebot/smv
+SMV_LATESTAPPS_DIR=$HOME/.firebot/smvlatest
 
 MKDIR $HOME/.firebot
 MKDIR $HOME/.firebot/pubs
 MKDIR $FDS_APPS_DIR
+MKDIR $SMV_APPS_DIR
+
 rm -rf $FDS_LATESTAPPS_DIR
 MKDIR $FDS_LATESTAPPS_DIR
+
+rm -rf $SMV_LATESTAPPS_DIR
+MKDIR $SMV_LATESTAPPS_DIR
 
 WEBBRANCH=nist-pages
 FDSBRANCH=master
@@ -2060,13 +2076,18 @@ if [[ "$DEBUG_ONLY" == "" ]] && [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" 
       if [[ "$firebot_success" == "1" ]] ; then
         rm -rf $MANUAL_DIR
         cp -r $fdsrepo/Manuals $MANUAL_DIR
+
         copy_fds_user_guide
         copy_fds_verification_guide
         copy_fds_technical_guide
         copy_fds_validation_guide
         copy_fds_Config_management_plan
+
         rm -f $FDS_APPS_DIR/*
         cp $FDS_LATESTAPPS_DIR/* $FDS_APPS_DIR/.
+
+        rm -f $SMV_APPS_DIR/*
+        cp $SMV_LATESTAPPS_DIR/* $SMV_APPS_DIR/.
       fi
     fi
   fi
