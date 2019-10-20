@@ -2097,15 +2097,19 @@ if [[ "$DEBUG_ONLY" == "" ]] && [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" 
         copy_fds_technical_guide
         copy_fds_validation_guide
         copy_fds_Config_management_plan
-
-        rm -f $FDS_APPS_DIR/*
-        cp $FDS_LATESTAPPS_DIR/* $FDS_APPS_DIR/.
-
-        rm -f $SMV_APPS_DIR/*
-        cp $SMV_LATESTAPPS_DIR/* $SMV_APPS_DIR/.
       fi
     fi
   fi
+fi
+
+# archive apps
+get_firebot_success
+if [[ "$firebot_success" == "1" ]] ; then
+  rm -f $FDS_APPS_DIR/*
+  cp $FDS_LATESTAPPS_DIR/* $FDS_APPS_DIR/.
+
+  rm -f $SMV_APPS_DIR/*
+  cp $SMV_LATESTAPPS_DIR/* $SMV_APPS_DIR/.
 fi
 
 ### Wrap up and report results ###
