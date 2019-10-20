@@ -931,12 +931,12 @@ check_compile_smv()
 
     # Check for compiler warnings/remarks
     # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-    if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage3c | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]; then
+    if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage3c | grep -v 'was built for newer' | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]; then
       # Continue along
       :
     else
       echo "Warnings from Stage 3c - Compile SMV release:" >> $WARNING_LOG
-      grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage3c | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
+      grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage3c | grep -v 'was built for new' | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
     fi
     smv_release_success=true
