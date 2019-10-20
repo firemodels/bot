@@ -27,6 +27,7 @@ echo "Environment variables:"
 echo "PBS_HOME - host used to build pubs"
 echo ""
 echo "Options:"
+echo "-B - build apps (run firebot.sh from this repo with -B option)"
 echo "-f - home directory containing apps [default: $app_home]"
 echo "-F - home directory containing fds pubs [default: $fds_pub_home]"
 echo "-S - home directory containing smokeview pubs [default: $smv_pub_home]"
@@ -46,10 +47,14 @@ if [ "$PUB_HOST" != "" ]; then
 fi
 showparms=
 ECHO=
+BUILD_APPS=
 
-while getopts 'f:F:hp:S:uv' OPTION
+while getopts 'Bf:F:hp:S:uv' OPTION
 do
 case $OPTION  in
+  B)
+   BUILD_APPS=1
+   ;;
   f)
    app_home=$OPTARG
    ;;
@@ -87,12 +92,38 @@ else
 fi
 
 if [ "$showparms" == "1" ]; then
-  echo "app_home=$app_home"
-  echo "fds_pub_home=$fds_pub_home"
-  echo "smv_pub_home=$smv_pub_home"
-  echo "pub_host=$pub_host"
-  echo "intel_mpi_version=$intel_mpi_version"
-  echo "mpi_version=$mpi_version"
+  echo ""
+  echo " Parameters"
+  echo " ----------"
+  if [ "$BUILD_APPS" == "1" ]; then
+    echo "       build apps: yes"
+  else
+    echo "       build apps: no"
+  fi
+  echo "      MPI version: $mpi_version"
+  echo "    Intel version: $intel_mpi_version"
+  echo ""
+  echo " Home directories, Host"
+  echo " ----------------------"
+  echo " pub host: $pub_host"
+  echo "      app: $app_home"
+  echo " fds pubs: $fds_pub_home"
+  echo " smv pubs: $smv_pub_home"
+  echo ""
+fi
+
+export NOPAUSE=1
+args=$0
+DIR=$(dirname "${args}")
+cd $DIR
+DIR=`pwd`
+
+if [ "$showparms" == "" ]; then
+if [ "$BUILD_APPS" == "1" ]; then
+  cd ../../../Firebot
+  ./run_firebot.sh -B
+  cd $DIR
+fi
 fi
 
 if [ "$showparms" == "" ]; then
@@ -102,12 +133,6 @@ if [ "$showparms" == "" ]; then
   ./copy_apps.sh fds $app_home/.firebot/fds
   ./copy_apps.sh smv $app_home/.firebot/smv 
 fi
-
-export NOPAUSE=1
-args=$0
-DIR=$(dirname "${args}")
-cd $DIR
-DIR=`pwd`
 
 # get fds repo revision
 cd $DIR
