@@ -18,10 +18,10 @@ function usage {
 echo "Script used to build a bundle from current revision of the fds and smv repos"
 echo "example usage:"
 echo "1.  on blaze using firebot and smokebot accounts"
-echo "./make_bundle_fromrepos.sh "
+echo "./make_bundle.sh "
 echo ""
 echo "2. on floga using user account for apps and blaze for pubs"
-echo "./make_bundlefromrepos.sh -f $HOME -p blaze.el.nist.gov"
+echo "./make_bundle.sh -f $HOME -p blaze.el.nist.gov"
 echo ""
 echo "Options:"
 echo "-f - home directory containing fds and smokeview apps [default: $app_home]"
@@ -79,7 +79,7 @@ if [ "$showparms" == "1" ]; then
 fi
 
 ./copy_pubs.sh fds $pub_home/.firebot/pubs $pub_host
-./copy_pubs.sh smv $pub_home/.firebot/pubs $pub_host
+./copy_pubs.sh smv $pub_home/.smokebot//pubs $pub_host
 
 ./copy_apps.sh fds $app_home/.firebot/fds
 ./copy_apps.sh smv $app_home/.firebot/smv 

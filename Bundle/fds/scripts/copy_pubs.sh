@@ -4,7 +4,7 @@ pdf_from=$2
 bot_host=$3
 
 if [ "$pub_type" != "fds" ]; then
-  pub_type = smv
+  pub_type="smv"
 fi
 
 #---------------------------------------------

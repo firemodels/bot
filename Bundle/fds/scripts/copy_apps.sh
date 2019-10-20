@@ -3,8 +3,8 @@ app_type=$1
 dir_from=$2
 bot_host=$3
 
-if [ "$app_type" !- "fds" ]; then
-  app_type = smv
+if [ "$app_type" != "fds" ]; then
+  app_type="smv"
 fi
 
 #---------------------------------------------
@@ -47,7 +47,6 @@ if [ "$app_type" == "smv" ]; then
   echo ***copying smokeview apps
   CP background
   CP dem2fds
-  CP hashfile
   CP smokediff
   CP smokeview
   CP smokezip
