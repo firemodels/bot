@@ -1,7 +1,11 @@
 #!/bin/bash
-bot_type=$1
+app_type=$1
 dir_from=$2
 bot_host=$3
+
+if [ "$app_type" !- "fds" ]; then
+  app_type = smv
+fi
 
 #---------------------------------------------
 #                   CP
@@ -26,15 +30,11 @@ CP ()
 
 return_code=0
 
-if [ "$bot_type" == "firebot" ]; then
-  dir_to=$HOME/.bundle/fds
-else
-  dir_to=$HOME/.bundle/smv
-fi
+dir_to=$HOME/.bundle/$app_type
 
 mkdir -p $dir_to
 
-if [ "$bot_type" == "firebot" ]; then
+if [ "$app_type" == "fds" ]; then
   echo
   echo ***copying fds apps
   CP fds
@@ -42,7 +42,7 @@ if [ "$bot_type" == "firebot" ]; then
   CP test_mpi
 fi
 
-if [ "$bot_type" == "smokebot" ]; then
+if [ "$app_type" == "smv" ]; then
   echo
   echo ***copying smokeview apps
   CP background
