@@ -679,14 +679,14 @@ compile_smv_utilities()
      cd $smvrepo/Build/background/${COMPILER}_${platform}${size}
      rm -f *.o background_${platform}${size}
      ./make_background.sh >> $OUTPUT_DIR/stage3a 2>&1
-     CP background_${platform}_${size} $SMV_LATESTAPPS_DIR/background
+     CP background_${platform}${size} $SMV_LATESTAPPS_DIR/background
 
    # dem2fds
      echo "      dem2fds"
      cd $smvrepo/Build/dem2fds/${COMPILER}_${platform}${size}
      rm -f *.o dem2fds_${platform}${size}
      ./make_dem2fds.sh >> $OUTPUT_DIR/stage3a 2>&1
-     CP dem2fds_${platform}_${size} $SMV_LATESTAPPS_DIR/dem2fds
+     CP dem2fds_${platform}${size} $SMV_LATESTAPPS_DIR/dem2fds
 
   # wind2fds:
      echo "      wind2fds"
