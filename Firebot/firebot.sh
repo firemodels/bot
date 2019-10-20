@@ -628,6 +628,21 @@ check_compile_fds_mpi()
    fi
 }
 
+
+#---------------------------------------------
+#                   compile_smv_utilities
+#---------------------------------------------
+
+CP()
+{
+  fromfile=$1
+  tofile=$2
+
+  if [ -e $fromfile ]; then
+    cp $fromfile $tofile
+  fi
+}
+
 #---------------------------------------------
 #                   compile_smv_utilities
 #---------------------------------------------
@@ -648,7 +663,7 @@ compile_smv_utilities()
      rm -f *.o smokezip_${platform}${size}
 
      ./make_smokezip.sh >> $OUTPUT_DIR/stage3a 2>&1
-     cp smokezip_${platform}${size} $SMV_LATESTAPPS_DIR/smokezip
+     CP smokezip_${platform}${size} $SMV_LATESTAPPS_DIR/smokezip
      echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
    # smokediff:
@@ -656,29 +671,29 @@ compile_smv_utilities()
      cd $smvrepo/Build/smokediff/${COMPILER}_${platform}${size}
      rm -f *.o smokediff_${platform}${size}
      ./make_smokediff.sh >> $OUTPUT_DIR/stage3a 2>&1
-     cp smokediff_${platform}${size} $SMV_LATESTAPPS_DIR/smokediff
+     CP smokediff_${platform}${size} $SMV_LATESTAPPS_DIR/smokediff
      echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
    # background
      echo "      background"
      cd $smvrepo/Build/background/${COMPILER}_${platform}${size}
-     rm -f *.o background_${platform}_${size}
+     rm -f *.o background_${platform}${size}
      ./make_background.sh >> $OUTPUT_DIR/stage3a 2>&1
-     cp background_${platform}_${size} $SMV_LATESTAPPS_DIR/background
+     CP background_${platform}_${size} $SMV_LATESTAPPS_DIR/background
 
    # dem2fds
      echo "      dem2fds"
      cd $smvrepo/Build/dem2fds/${COMPILER}_${platform}${size}
-     rm -f *.o dem2fds_${platform}_${size}
+     rm -f *.o dem2fds_${platform}${size}
      ./make_dem2fds.sh >> $OUTPUT_DIR/stage3a 2>&1
-     cp dem2fds_${platform}_${size} $SMV_LATESTAPPS_DIR/dem2fds
+     CP dem2fds_${platform}_${size} $SMV_LATESTAPPS_DIR/dem2fds
 
   # wind2fds:
      echo "      wind2fds"
      cd $smvrepo/Build/wind2fds/${COMPILER}_${platform}${size}
      rm -f *.o wind2fds_${platform}${size}
      ./make_wind2fds.sh >> $OUTPUT_DIR/stage3a 2>&1
-     cp wind2fds_${platform}${size} $SMV_LATESTAPPS_DIR/wind2fds
+     CP wind2fds_${platform}${size} $SMV_LATESTAPPS_DIR/wind2fds
     echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
   # hashfile:
@@ -907,7 +922,7 @@ check_compile_smv()
     cd $smvrepo/Build/smokeview/intel_${platform}${size}
     if [ -e "smokeview_${platform}${size}" ]; then
       smv_release_success=true
-      cp smokeview_${platform}${size} $SMV_LATESTAPPS_DIR/smokeview
+      CP smokeview_${platform}${size} $SMV_LATESTAPPS_DIR/smokeview
     else
       echo "Errors from Stage 3c - Compile SMV release:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage3c >> $ERROR_LOG
