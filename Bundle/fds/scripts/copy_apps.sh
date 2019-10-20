@@ -46,6 +46,7 @@ if [ "$app_type" == "smv" ]; then
   echo
   echo ***copying smokeview apps
   CP background
+  CP hashfile
   CP dem2fds
   CP smokediff
   CP smokeview
