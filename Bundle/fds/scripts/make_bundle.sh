@@ -20,11 +20,11 @@ echo "smv repos. By default, this script uses apps built by the firebot account"
 echo "and pubs built by the firebot and smokebot accounts on this computer."
 echo ""
 echo "example usage:"
-echo "1. local firebot and smokebot accounts for pubs and firebot account for apps"
+echo "1. firebot and smokebot accounts on this computer for pubs and apps"
 echo "./make_bundle.sh "
 echo ""
 echo "2. remote firebot and smokebot accounts (say xxx.yyy.zzz) for pubs"
-echo "   and user account for apps"
+echo "   and user firebot account for apps"
 echo "./make_bundle.sh -u -p xxx.yyy.zzz"
 echo ""
 echo "Environment variable:"
@@ -40,7 +40,7 @@ echo "-p - host containing pubs [default: $pub_host]"
 echo "-u - use apps built by firebot in the `whoami` account"
 echo "-U - use apps built by firebot and pubs built by firebot"
 echo "     and smokebot in the `whoami` account"
-echo "-v - show parameters used bo build bundle (bundle not generated)"
+echo "-v - show parameters used to build bundle (bundle not generated)"
 exit
 }
 
@@ -114,17 +114,17 @@ if [ "$showparms" == "1" ]; then
   fi
   echo "   MPI version: $mpi_version"
   echo " Intel version: $intel_mpi_version"
-if [ "$pub_host" == `hostname` ]; then
-  echo "      pub host: this computer"
-else
-  echo "      pub host: $pub_host"
-fi
   echo ""
   echo " Home directories"
   echo " ----------------"
-  echo "      app: $app_home"
-  echo " fds pubs: $fds_pub_home"
-  echo " smv pubs: $smv_pub_home"
+  echo " fds/smv apps: $app_home"
+  if [ "$pub_host" != `hostname` ]; then
+    hostlabel="host: $pub_host"
+  else
+    hostlabel=
+  fi
+  echo "     fds pubs: $fds_pub_home $hostlabel"
+  echo "     smv pubs: $smv_pub_home $hostlabel"
   echo ""
 fi
 
