@@ -1,7 +1,11 @@
 #!/bin/bash
-bot_type=$1
+pub_type=$1
 pdf_from=$2
 bot_host=$3
+
+if [ "$pub_type" != "fds" ]; then
+  pub_type="smv"
+fi
 
 #---------------------------------------------
 #                   CP
@@ -11,7 +15,7 @@ CP ()
 {
   local FROMFILE=$1
   rm -f $pdf_to/$FROMFILE
-  if [[ "$bot_host" != "" ]] && [[ "$bot_host" != "`hostname`" ]]; then
+  if [[ "$bot_host" != "" ]] ; then
     scp -q $bot_host:$pdf_from/$FROMFILE $pdf_to/.
   else
     cp $pdf_from/$FROMFILE $pdf_to/.
@@ -30,7 +34,7 @@ pdf_to=$HOME/.bundle/pubs
 
 mkdir -p $pdf_to
 
-if [ "$bot_type" == "firebot" ]; then
+if [ "$pub_type" == "fds" ]; then
   echo
   echo ***copying fds pubs
   CP FDS_Config_Management_Plan.pdf
@@ -40,7 +44,7 @@ if [ "$bot_type" == "firebot" ]; then
   CP FDS_Verification_Guide.pdf
 fi
 
-if [ "$bot_type" == "smokebot" ]; then
+if [ "$pub_type" == "smv" ]; then
   echo
   echo ***copying smokeview pubs
   CP SMV_Technical_Reference_Guide.pdf

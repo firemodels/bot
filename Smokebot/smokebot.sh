@@ -374,7 +374,7 @@ update_repo()
    have_firemodels=`git remote -v | awk '{print $1}' | grep firemodels | wc  -l`
    if [ "$have_firemodels" != "0" ]; then
       git merge firemodels/$branch   >> $OUTPUT_DIR/stage0 2>&1
-      need_push=`git status -uno | head -2 | grep -v nothing | wc -l`
+      need_push=`git status -uno | head -2 | grep -v nothing | grep -v 'Your branch' | grep -v '^$' | wc -l`
       if [ $need_push -gt 1 ]; then
         echo "warning: firemodels commits to $reponame repo need to be pushed to origin" >> $OUTPUT_DIR/stage0 2>&1
         git status -uno | head -2 | grep -v nothing                                 >> $OUTPUT_DIR/stage0 2>&1
@@ -680,7 +680,8 @@ compile_smv_utilities()
      echo 'Compiling smokezip:' >> $OUTPUT_DIR/stage2a 2>&1
      ./make_smokezip.sh >> $OUTPUT_DIR/stage2a 2>&1
      echo "" >> $OUTPUT_DIR/stage2a 2>&1
-   
+     cp smokezip_${platform}_64 $SMV_LATESTAPPS_DIR/smokezip
+
    # smokediff:
      echo "      smokediff"
      cd $smvrepo/Build/smokediff/${COMPILER}_${platform}_64
@@ -688,21 +689,32 @@ compile_smv_utilities()
      echo 'Compiling smokediff:' >> $OUTPUT_DIR/stage2a 2>&1
      ./make_smokediff.sh >> $OUTPUT_DIR/stage2a 2>&1
      echo "" >> $OUTPUT_DIR/stage2a 2>&1
-   
+     cp smokediff_${platform}_64 $SMV_LATESTAPPS_DIR/smokediff
+
    # background
      echo "      background"
      cd $smvrepo/Build/background/${COMPILER}_${platform}_64
      rm -f *.o background_${platform}_64
      echo 'Compiling background:' >> $OUTPUT_DIR/stage2a 2>&1
      ./make_background.sh >> $OUTPUT_DIR/stage2a 2>&1
+     cp background_${platform}_64 $SMV_LATESTAPPS_DIR/background
 
    # dem2fds
      echo "      dem2fds"
      cd $smvrepo/Build/dem2fds/${COMPILER}_${platform}_64
-     rm -f *.o dem2fds
+     rm -f *.o dem2fds_${platform}_64
      echo 'Compiling dem2fds:' >> $OUTPUT_DIR/stage2a 2>&1
      ./make_dem2fds.sh >> $OUTPUT_DIR/stage2a 2>&1
+     cp dem2fds_${platform}_64 $SMV_LATESTAPPS_DIR/dem2fds
    
+   # hashfile
+     echo "      hashfile"
+     cd $smvrepo/Build/hashfile/${COMPILER}_${platform}_64
+     rm -f *.o hashfile_${platform}_64
+     echo 'Compiling hashfile:' >> $OUTPUT_DIR/stage2a 2>&1
+     ./make_hashfile.sh >> $OUTPUT_DIR/stage2a 2>&1
+     cp hashfile_${platform}_64 $SMV_LATESTAPPS_DIR/hashfile
+
   # wind2fds:
      echo "      wind2fds"
      cd $smvrepo/Build/wind2fds/${COMPILER}_${platform}_64
@@ -710,6 +722,7 @@ compile_smv_utilities()
      echo 'Compiling wind2fds:' >> $OUTPUT_DIR/stage2a 2>&1
      ./make_wind2fds.sh >> $OUTPUT_DIR/stage2a 2>&1
     echo "" >> $OUTPUT_DIR/stage2a 2>&1
+     cp wind2fds_${platform}_64 $SMV_LATESTAPPS_DIR/wind2fds
    else
      echo "Warning: smokeview and utilities not built - C compiler not available" >> $OUTPUT_DIR/stage2a 2>&1
    fi
@@ -1024,6 +1037,7 @@ check_compile_smv()
    # Check for errors in SMV release compilation
    cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_64
    if [ -e "smokeview_${platform}${TEST}_64" ]
+     cp smokeview_${platform}${TEST}_64 $SMV_LATESTAPPS_DIR/smokeview
    then
       stage2c_smv_success=true
    else
@@ -1035,13 +1049,13 @@ check_compile_smv()
 
    # Check for compiler warnings/remarks
    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-   if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage2c | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]
+   if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage2c | grep -v 'feupdateenv is not implemented' | grep -v 'was built for newer' | grep -v 'lcilkrts linked'` == "" ]]
    then
       # Continue along
       :
    else
-      echo "Stage 6c warnings:" >> $WARNING_LOG
-      grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage2c | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
+      echo "Stage 2c warnings:" >> $WARNING_LOG
+      grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage2c | grep -v 'feupdateenv is not implemented' | grep -v 'was built for newer' | grep -v 'lcilkrts linked' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
    fi
@@ -1414,6 +1428,12 @@ fi
       # Send success message with links to nightly manuals
 
       cat $TIME_LOG | mail -s "smokebot success on ${hostname}. ${GIT_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+
+# save apps that were built for bundling
+
+      rm -f $SMV_APPS_DIR/*
+      cp $SMV_LATESTAPPS_DIR/* $SMV_APPS_DIR/.
+
    fi
 }
 
@@ -1466,10 +1486,11 @@ PID_FILE=~/.fdssmvgit/firesmokebot_pid
 INTEL=
 SKIP=
 HTML2PDF=wkhtmltopdf
+BUILD_ONLY=
 
 #*** parse command line options
 
-while getopts 'aAb:cI:JLm:Mo:q:r:SstuUw:W:' OPTION
+while getopts 'aAb:BcI:JLm:Mo:q:r:SstuUw:W:' OPTION
 do
 case $OPTION in
   a)
@@ -1477,6 +1498,9 @@ case $OPTION in
    ;;
   A)
    RUNAUTO="Y"
+   ;;
+  B)
+   BUILD_ONLY="1"
    ;;
   b)
    SMVBRANCH="$OPTARG"
@@ -1569,6 +1593,13 @@ fi
 
 MKDIR $HOME/.smokebot
 MKDIR $HOME/.smokebot/pubs
+
+SMV_APPS_DIR=$HOME/.smokebot/smv
+SMV_LATESTAPPS_DIR=$HOME/.smokebot/smvlatest
+
+MKDIR $SMV_APPS_DIR
+rm -rf $SMV_LATESTAPPS_DIR
+MKDIR $SMV_LATESTAPPS_DIR
 
 #*** make sure repos needed by smokebot exist
 
@@ -1801,18 +1832,23 @@ fi
 
 check_update_repo
 
+cd $smvrepo
+git describe --abbrev | awk -F '-' '{print $1"-"$2}' > $SMV_LATESTAPPS_DIR/SMV_REVISION
+
 PRELIM_end=`GET_TIME`
 DIFF_PRELIM=`GET_DURATION $PRELIM_beg $PRELIM_end`
 echo "Preliminary: $DIFF_PRELIM" >> $STAGE_STATUS
 
 ### Stage 1 build cfast and FDS ###
 BUILDSOFTWARE_beg=`GET_TIME`
-compile_cfast
-compile_fds_mpi_db
-check_compile_fds_mpi_db
-if [ "$OPENMPI_GNU" != "" ]; then
-  compile_fds_mpi_gnu_db
-  check_compile_fds_mpi_gnu_db
+if [ "$BUILD_ONLY" == "" ]; then
+  compile_cfast
+  compile_fds_mpi_db
+  check_compile_fds_mpi_db
+  if [ "$OPENMPI_GNU" != "" ]; then
+    compile_fds_mpi_gnu_db
+    check_compile_fds_mpi_gnu_db
+  fi
 fi
 
 ### Stage 2 build smokeview ###
@@ -1820,29 +1856,35 @@ compile_smv_utilities
 check_smv_utilities
 check_common_files
 
-if [[ $stage1b_fdsdb_success && "$RUNDEBUG" == "1" ]] ; then
+if [[ $stage1b_fdsdb_success && "$RUNDEBUG" == "1" && "$BUILD_ONLY" == "" ]] ; then
    run_verification_cases_debug
 fi
 
 if [ "$SMOKEBOT_LITE" == "" ]; then
 if [[ $stage1b_fdsdb_success ]] ; then
+if [ "$BUILD_ONLY" == "" ]; then
    compile_fds_mpi
    check_compile_fds_mpi
+fi
 fi
 fi
 if [[ $stage1b_fdsdb_success && "$RUNDEBUG" == "1" ]] ; then
    check_verification_cases_debug
 fi
 RUNCASES_beg=`GET_TIME`
+if [ "$BUILD_ONLY" == "" ]; then
 if [ "$SMOKEBOT_LITE" == "" ]; then
   if [[ $stage1c_fdsrel_success ]] ; then
      run_verification_cases_release
   fi
 fi
+fi
 
 ### Stage 2 build smokeview ###
+if [ "$BUILD_ONLY" == "" ]; then
 compile_smv_db
 check_compile_smv_db
+fi
 
 if [ "$SMOKEBOT_LITE" == "" ]; then
   compile_smv
@@ -1855,10 +1897,12 @@ echo "Build Software: $DIFF_BUILDSOFTWARE" >> $STAGE_STATUS
 
 ### Stage 3 run verification cases ###
 
+if [ "$BUILD_ONLY" == "" ]; then
 if [ "$SMOKEBOT_LITE" == "" ]; then
   if [[ $stage1c_fdsrel_success ]] ; then
      check_verification_cases_release
   fi
+fi
 fi
 RUNCASES_end=`GET_TIME`
 DIFF_RUNCASES=`GET_DURATION $RUNCASES_beg $RUNCASES_end`
@@ -1866,7 +1910,7 @@ echo "Run cases: $DIFF_RUNCASES" >> $STAGE_STATUS
 
 ### Stage 4 generate images ###
 MAKEPICTURES_beg=`GET_TIME`
-if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]]; then
+if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
   if [[ $stage1c_fdsrel_success && $stage2c_smv_success ]] ; then
     make_smv_pictures
     check_smv_pictures
@@ -1876,7 +1920,7 @@ MAKEPICTURES_end=`GET_TIME`
 DIFF_MAKEPICTURES=`GET_DURATION $MAKEPICTURES_beg $MAKEPICTURES_end`
 echo "Make pictures: $DIFF_MAKEPICTURES" >> $STAGE_STATUS
 
-if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]]; then
+if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
   if [ "$MAKEMOVIES" == "1" ]; then
     MAKEMOVIES_beg=`GET_TIME`
  
@@ -1889,7 +1933,7 @@ if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]]; then
   fi
 fi
 
-if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]]; then
+if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
   if [[ $stage1c_fdsrel_success ]] ; then
     generate_timing_stats
   fi
@@ -1897,7 +1941,7 @@ fi
 
 ### Stage 5 build documents ###
 MAKEGUIDES_beg=`GET_TIME`
-if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]]; then
+if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
   if [[ $stage1c_fdsrel_success && $stage4b_smvpics_success ]] ; then
      echo Making guides
      if [ "$YOPT" == "" ]; then
@@ -1934,9 +1978,11 @@ set_files_world_readable || exit 1
 save_build_status
 save_manuals_dir
 
-if [ "$SMOKEBOT_LITE" == "" ]; then
-  if [[ $stage1c_fdsrel_success ]] ; then
-    archive_timing_stats
+if [ "$BUILD_ONLY" == "" ]; then
+  if [ "$SMOKEBOT_LITE" == "" ]; then
+    if [[ $stage1c_fdsrel_success ]] ; then
+      archive_timing_stats
+    fi
   fi
 fi
 echo "   emailing results"
