@@ -15,26 +15,27 @@ mpi_version_osx=3.1.2
 #---------------------------------------------
 
 function usage {
-echo "Script used to build a bundle from current revision of the fds and smv repos"
+echo "Script used to build a bundle from the current revision of"
+echo "the fds and smv repos."
+echo ""
 echo "example usage:"
 echo "1.  on blaze using firebot and smokebot accounts"
 echo "./make_bundle.sh "
 echo ""
-echo "2. on floga using user account for apps and blaze for pubs"
+echo "2. on floga using your own account for apps and blaze for pubs"
 echo "./make_bundle.sh -u -p blaze.el.nist.gov"
 echo ""
 echo "Environment variables:"
 echo "PBS_HOME - host used to build pubs"
 echo ""
 echo "Options:"
-echo "-B - build apps (run firebot.sh from this repo with -B option)"
+echo "-B - build apps (run firebot.sh with the -B option)"
 echo "-f - home directory containing apps [default: $app_home]"
 echo "-F - home directory containing fds pubs [default: $fds_pub_home]"
 echo "-S - home directory containing smokeview pubs [default: $smv_pub_home]"
 echo "-h - display this message"
 echo "-p - host containing pubs [default: $pub_host]"
 echo "-u - use apps built by firebot in `whoami` account"
-echo "-v - show parameters used to build bundle"
 exit
 }
 
@@ -96,16 +97,16 @@ if [ "$showparms" == "1" ]; then
   echo " Parameters"
   echo " ----------"
   if [ "$BUILD_APPS" == "1" ]; then
-    echo "       build apps: yes"
+    echo "    build apps: yes"
   else
-    echo "       build apps: no"
+    echo "    build apps: no"
   fi
-  echo "      MPI version: $mpi_version"
-  echo "    Intel version: $intel_mpi_version"
+  echo "   MPI version: $mpi_version"
+  echo " Intel version: $intel_mpi_version"
+  echo "      pub host: $pub_host"
   echo ""
-  echo " Home directories, Host"
-  echo " ----------------------"
-  echo " pub host: $pub_host"
+  echo " Home directories"
+  echo " ----------------"
   echo "      app: $app_home"
   echo " fds pubs: $fds_pub_home"
   echo " smv pubs: $smv_pub_home"
@@ -147,4 +148,8 @@ cd $smvrepo
 SMVREV=`git describe --abbrev | awk -F '-' '{print $1"-"$2}'`
 
 cd $DIR
+if [ "$ECHO" != "" ]; then
+  echo " Bundle command"
+  echo " --------------"
+fi
 $ECHO ./bundle_generic.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version
