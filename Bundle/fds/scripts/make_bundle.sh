@@ -15,27 +15,32 @@ mpi_version_osx=3.1.2
 #---------------------------------------------
 
 function usage {
-echo "Script used to build a bundle from the current revision of"
-echo "the fds and smv repos."
+echo "Script used to build a bundle from the current revision of the fds and"
+echo "smv repos. By default, this script uses apps built by the firebot account"
+echo "and pubs built by the firebot and smokebot accounts on this computer."
 echo ""
 echo "example usage:"
-echo "1.  on blaze using firebot and smokebot accounts"
+echo "1. local firebot and smokebot accounts for pubs and firebot account for apps"
 echo "./make_bundle.sh "
 echo ""
-echo "2. on floga using your own account for apps and blaze for pubs"
-echo "./make_bundle.sh -u -p blaze.el.nist.gov"
+echo "2. remote firebot and smokebot accounts (say xxx.yyy.zzz) for pubs"
+echo "   and user account for apps"
+echo "./make_bundle.sh -u -p xxx.yyy.zzz"
 echo ""
-echo "Environment variables:"
+echo "Environment variable:"
 echo "PBS_HOME - host used to build pubs"
 echo ""
 echo "Options:"
-echo "-B - build apps (run firebot.sh with the -B option)"
+echo "-B - build apps - this script runs firebot with the -B option"
 echo "-f - home directory containing apps [default: $app_home]"
 echo "-F - home directory containing fds pubs [default: $fds_pub_home]"
 echo "-S - home directory containing smokeview pubs [default: $smv_pub_home]"
 echo "-h - display this message"
 echo "-p - host containing pubs [default: $pub_host]"
-echo "-u - use apps built by firebot in `whoami` account"
+echo "-u - use apps built by firebot in the `whoami` account"
+echo "-U - use apps built by firebot and pubs built by firebot"
+echo "     and smokebot in the `whoami` account"
+echo "-v - show parameters used bo build bundle (bundle not generated)"
 exit
 }
 
@@ -50,11 +55,12 @@ showparms=
 ECHO=
 BUILD_APPS=
 
-while getopts 'Bf:F:hp:S:uv' OPTION
+while getopts 'Bf:F:hp:S:uUv' OPTION
 do
 case $OPTION  in
   B)
    BUILD_APPS=1
+   app_home=$HOME
    ;;
   f)
    app_home=$OPTARG
@@ -73,6 +79,11 @@ case $OPTION  in
    ;;
   u)
    app_home=$HOME
+   ;;
+  U)
+   app_home=$HOME
+   fds_pub_home=$HOME
+   smv_pub_home=$HOME
    ;;
   v)
    showparms=1
@@ -103,7 +114,11 @@ if [ "$showparms" == "1" ]; then
   fi
   echo "   MPI version: $mpi_version"
   echo " Intel version: $intel_mpi_version"
+if [ "$pub_host" == `hostname` ]; then
+  echo "      pub host: this computer"
+else
   echo "      pub host: $pub_host"
+fi
   echo ""
   echo " Home directories"
   echo " ----------------"
