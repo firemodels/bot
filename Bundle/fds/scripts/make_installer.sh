@@ -537,7 +537,7 @@ cat << STARTUP > \$STARTUPtmp
 <h3>Defining Environment Variables Used by FDS</h3>
 Options:
 <ul>
-<li>Add following lines to one of your startup files
+<li>Add the following lines to one of your startup files
 (usually \$HOME/.bashrc).<br>
 <pre>
 STARTUP
@@ -573,7 +573,7 @@ EOF
 cat << EOF >> $INSTALLER
 echo ""
 echo "-----------------------------------------------"
-echo "*** To complete the installation add the following line to your startup file"
+echo "*** To complete the installation add the following lines to your startup file"
 echo "   (usually \$HOME/.bashrc)."
 echo ""
 echo "source \$FDS_root/bin/$FDSVARS "
@@ -589,7 +589,7 @@ echo "*** Log out and log back in so the changes will take effect."
 echo ""
 echo "*** To uninstall fds, erase the directory: "
 echo "\$FDS_root"
-echo "and remove any changes made to your startup file."
+echo "and remove any changes you made to your startup file."
 echo ""
 echo "*** Installation complete."
 exit 0

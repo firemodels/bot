@@ -2,10 +2,10 @@
 
 uploads=$HOME/.bundle/uploads
 if [ -e $uploads ]; then
-  cd $uploads
-  rm -rf upload
+  rm -rf $uploads
   echo cleaning $uploads
-  mkdir upload
+  mkdir $uploads
 else
  echo ***error: upload directory does not exist
+ mkdir -p $uploads
 fi

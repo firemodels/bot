@@ -227,6 +227,7 @@ get_smv_revision()
 
    git update-index --refresh
    SMV_REVISION=`git describe --long --dirty`
+   git describe --abbrev | awk -F '-' '{print $1"-"$2}' > $SMV_LATESTAPPS_DIR/SMV_REVISION
    SMV_MESSAGE=`git log . | head -5 | tail -1`
    return 0
 }
@@ -244,6 +245,7 @@ get_fds_revision()
 
    git update-index --refresh
    FDS_REVISION=`git describe --long --dirty`
+   git describe --abbrev | awk -F '-' '{print $1"-"$2}' > $FDS_LATESTAPPS_DIR/FDS_REVISION
    FDS_SHORTHASH=`git rev-parse --short HEAD`
    FDS_LONGHASH=`git rev-parse HEAD`
    FDS_DATE=`git log -1 --format=%cd --date=local $FDS_SHORTHASH`
@@ -605,6 +607,7 @@ check_compile_fds_mpi()
    if [ -e "fds_${INTEL}mpi_intel_${platform}${size}$DV" ]
    then
       FDS_release_success=true
+      cp fds_${INTEL}mpi_intel_${platform}${size}$DV $FDS_LATESTAPPS_DIR/fds
    else
       echo "Errors from Stage 2c - Compile FDS MPI release:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage2c >> $ERROR_LOG
@@ -623,6 +626,21 @@ check_compile_fds_mpi()
       grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage2c | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
+}
+
+
+#---------------------------------------------
+#                   compile_smv_utilities
+#---------------------------------------------
+
+CP()
+{
+  fromfile=$1
+  tofile=$2
+
+  if [ -e $fromfile ]; then
+    cp $fromfile $tofile
+  fi
 }
 
 #---------------------------------------------
@@ -645,6 +663,7 @@ compile_smv_utilities()
      rm -f *.o smokezip_${platform}${size}
 
      ./make_smokezip.sh >> $OUTPUT_DIR/stage3a 2>&1
+     CP smokezip_${platform}${size} $SMV_LATESTAPPS_DIR/smokezip
      echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
    # smokediff:
@@ -652,46 +671,53 @@ compile_smv_utilities()
      cd $smvrepo/Build/smokediff/${COMPILER}_${platform}${size}
      rm -f *.o smokediff_${platform}${size}
      ./make_smokediff.sh >> $OUTPUT_DIR/stage3a 2>&1
+     CP smokediff_${platform}${size} $SMV_LATESTAPPS_DIR/smokediff
      echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
    # background
      echo "      background"
      cd $smvrepo/Build/background/${COMPILER}_${platform}${size}
-     rm -f *.o background_${platform}_${size}
+     rm -f *.o background_${platform}${size}
      ./make_background.sh >> $OUTPUT_DIR/stage3a 2>&1
+     CP background_${platform}${size} $SMV_LATESTAPPS_DIR/background
 
    # dem2fds
      echo "      dem2fds"
      cd $smvrepo/Build/dem2fds/${COMPILER}_${platform}${size}
-     rm -f *.o dem2fds
+     rm -f *.o dem2fds_${platform}${size}
      ./make_dem2fds.sh >> $OUTPUT_DIR/stage3a 2>&1
+     CP dem2fds_${platform}${size} $SMV_LATESTAPPS_DIR/dem2fds
 
   # wind2fds:
      echo "      wind2fds"
      cd $smvrepo/Build/wind2fds/${COMPILER}_${platform}${size}
      rm -f *.o wind2fds_${platform}${size}
      ./make_wind2fds.sh >> $OUTPUT_DIR/stage3a 2>&1
+     CP wind2fds_${platform}${size} $SMV_LATESTAPPS_DIR/wind2fds
     echo "" >> $OUTPUT_DIR/stage3a 2>&1
-  
+
   # hashfile:
      echo "      hashfile"
      cd $smvrepo/Build/hashfile/${COMPILER}_${platform}${size}
      rm -f *.o hashfile_${platform}${size}
      ./make_hashfile.sh >> $OUTPUT_DIR/stage3a 2>&1
+     CP hashfile_${platform}${size} $SMV_LATESTAPPS_DIR/hashfile
     echo "" >> $OUTPUT_DIR/stage3a 2>&1
-  
+
   # fds2asci
      echo "      fds2ascii"
      cd $fdsrepo/Utilities/fds2ascii/${COMPILER}_${platform}${size}
      rm -f *.o fds2ascii_${platform}${size}
      ./make_fds2ascii.sh >> $OUTPUT_DIR/stage3a 2>&1
+     cp fds2ascii_${platform}${size} $FDS_LATESTAPPS_DIR/fds2ascii
     echo "" >> $OUTPUT_DIR/stage3a 2>&1
-  
+
   # test_mpi
      echo "      test_mpi"
      cd $fdsrepo/Utilities/test_mpi/${INTEL}mpi_${COMPILER}_${platform}
      rm -f *.o test_mpi
      ./make_test_mpi.sh >> $OUTPUT_DIR/stage3a 2>&1
+     cp test_mpi $FDS_LATESTAPPS_DIR/test_mpi
     echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
    else
@@ -897,6 +923,7 @@ check_compile_smv()
     cd $smvrepo/Build/smokeview/intel_${platform}${size}
     if [ -e "smokeview_${platform}${size}" ]; then
       smv_release_success=true
+      CP smokeview_${platform}${size} $SMV_LATESTAPPS_DIR/smokeview
     else
       echo "Errors from Stage 3c - Compile SMV release:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage3c >> $ERROR_LOG
@@ -905,12 +932,12 @@ check_compile_smv()
 
     # Check for compiler warnings/remarks
     # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-    if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage3c | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]; then
+    if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage3c | grep -v 'was built for newer' | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]; then
       # Continue along
       :
     else
       echo "Warnings from Stage 3c - Compile SMV release:" >> $WARNING_LOG
-      grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage3c | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
+      grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage3c | grep -v 'was built for new' | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
     fi
     smv_release_success=true
@@ -1261,9 +1288,11 @@ copy_guide()
 
    cd $firebotdir
    if [[ "$UPLOADGUIDES" == "1" ]]; then
-     cp $doc /var/www/html/firebot/manuals/
-     cp $doc $NEWGUIDE_DIR/.
-     cp $doc $SAVEGUIDE_DIR/.
+     if [ -e $doc ]; then
+       cp $doc /var/www/html/firebot/manuals/
+       cp $doc $NEWGUIDE_DIR/.
+       cp $doc $SAVEGUIDE_DIR/.
+     fi
    fi
 }
 
@@ -1309,6 +1338,7 @@ copy_fds_user_guide()
 {
    cd $fdsrepo/Manuals/FDS_User_Guide
    copy_guide $fdsrepo/Manuals/FDS_User_Guide/FDS_User_Guide.pdf
+   copy_guide $fdsrepo/Manuals/FDS_User_Guide/geom_notes.pdf
 }
 
 #---------------------------------------------
@@ -1600,8 +1630,22 @@ SAVEGUIDE_DIR=$HOME/.firebot/pubs
 MANUAL_DIR=$HOME/.firebot/Manuals
 EMAIL_LIST=$HOME/.firebot/firebot_email_list.sh
 
+FDS_APPS_DIR=$HOME/.firebot/fds
+FDS_LATESTAPPS_DIR=$HOME/.firebot/fdslatest
+
+SMV_APPS_DIR=$HOME/.firebot/smv
+SMV_LATESTAPPS_DIR=$HOME/.firebot/smvlatest
+
 MKDIR $HOME/.firebot
 MKDIR $HOME/.firebot/pubs
+MKDIR $FDS_APPS_DIR
+MKDIR $SMV_APPS_DIR
+
+rm -rf $FDS_LATESTAPPS_DIR
+MKDIR $FDS_LATESTAPPS_DIR
+
+rm -rf $SMV_LATESTAPPS_DIR
+MKDIR $SMV_LATESTAPPS_DIR
 
 WEBBRANCH=nist-pages
 FDSBRANCH=master
@@ -1939,10 +1983,12 @@ echo Building
 echo "   FDS"
 # if something goes wrong with the openmp inspector
 # comment the following 6 lines (including 'if' and and 'fi'  lines
+if [ "$BUILD_ONLY" == "" ]; then
 if [ "$FIREBOT_LITE" == "" ]; then
    build_inspect_fds
 #  inspect_fds
 #  check_inspect_fds
+fi
 fi
 
 ### Stage 2b ###
@@ -2048,6 +2094,7 @@ if [[ "$DEBUG_ONLY" == "" ]] && [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" 
       if [[ "$firebot_success" == "1" ]] ; then
         rm -rf $MANUAL_DIR
         cp -r $fdsrepo/Manuals $MANUAL_DIR
+
         copy_fds_user_guide
         copy_fds_verification_guide
         copy_fds_technical_guide
@@ -2056,6 +2103,16 @@ if [[ "$DEBUG_ONLY" == "" ]] && [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" 
       fi
     fi
   fi
+fi
+
+# archive apps
+get_firebot_success
+if [[ "$firebot_success" == "1" ]] ; then
+  rm -f $FDS_APPS_DIR/*
+  cp $FDS_LATESTAPPS_DIR/* $FDS_APPS_DIR/.
+
+  rm -f $SMV_APPS_DIR/*
+  cp $SMV_LATESTAPPS_DIR/* $SMV_APPS_DIR/.
 fi
 
 ### Wrap up and report results ###

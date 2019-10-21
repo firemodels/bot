@@ -354,7 +354,6 @@ BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
 firebot_status=0
-echo run_INTEL=$INTEL
 $ECHO  ./$botscript -p $firebot_pid $UPDATE $DV $INTEL $debug_mode $BUILD_ONLY $BRANCH $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $CLONE_REPOS $EMAIL $COPY_MANUAL_DIR $DEBUG_ONLY "$@"
 firebot_status=$?
 if [ -e $firebot_pid ]; then
