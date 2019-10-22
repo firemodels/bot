@@ -154,13 +154,23 @@ fi
 cd $DIR
 fdsrepo=../../../../fds
 cd $fdsrepo
-FDSREV=`git describe --abbrev | awk -F '-' '{print $1"-"$2}'`
+SUBREV=`git describe --abbrev | awk -F '-' '{print $2}'`
+if [ "$SUBREV" == "" ]; then
+  FDSREV=`git describe --abbrev | awk -F '-' '{print $1"-0"}'`
+else
+  FDSREV=`git describe --abbrev | awk -F '-' '{print $1"-"$2}'`
+fi
 
 # get smv repo revision
 cd $DIR
 smvrepo=../../../../smv
 cd $smvrepo
-SMVREV=`git describe --abbrev | awk -F '-' '{print $1"-"$2}'`
+SUBREV=`git describe --abbrev | awk -F '-' '{print $2}'`
+if [ "$SUBREV" == "" ]; then
+  SMVREV=`git describe --abbrev | awk -F '-' '{print $1"-0"}'`
+else
+  SMVREV=`git describe --abbrev | awk -F '-' '{print $1"-"$2}'`
+fi
 
 cd $DIR
 if [ "$ECHO" != "" ]; then
