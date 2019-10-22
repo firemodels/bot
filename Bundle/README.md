@@ -1,6 +1,6 @@
 #  Bundling
 
-This directory contains scripts for buildlding FDS and Smokeview bundles.
+This directory contains scripts for building FDS and Smokeview bundles.
 
 Preliminary notes on building a bundle.
 
