@@ -18,7 +18,7 @@ if "%stop_script%" == "1" exit /b
 call :set_openmp_defaults
 
 if "%show_version%" == "0" goto skip_showversion
-  mpiexec -localonly fds
+  mpiexec -localonly -n 1 fds
 goto eof
 :skip_showversion
 
