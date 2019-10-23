@@ -2009,23 +2009,27 @@ fi
 
 #*** check fds and smv repos for text files with CRLF line endings
 
-echo Checking for DOS line endings
-echo "   bot repo"
-find_CRLF $repo/bot bot
+if [ "$CLEANREAPO" == "1" ]; then
+  echo Checking for DOS line endings
+  echo "   bot repo"
+  find_CRLF $repo/bot bot
 
-echo "   exp repo"
-find_CRLF $repo/exp exp
+  echo "   exp repo"
+  find_CRLF $repo/exp exp
 
-echo "   fds repo"
-find_CRLF $repo/fds fds
+  echo "   fds repo"
+  find_CRLF $repo/fds fds
 
-echo "   out repo"
-find_CRLF $repo/out out
+  echo "   out repo"
+  find_CRLF $repo/out out
 
-echo "   smv repo"
-find_CRLF $repo/smv smv
+  echo "   smv repo"
+  find_CRLF $repo/smv smv
 
-check_CRLF
+  check_CRLF
+else
+  echo DOS line endings only checked when repos are cleaned
+fi
 
 get_fds_revision $FDSBRANCH || exit 1
 get_smv_revision $SMVBRANCH || exit 1
