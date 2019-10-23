@@ -2012,10 +2012,9 @@ fi
 
 CHECK_LINES=1
 if [[ "$CLONE_REPOS" == "" ]]; then
-  if [[ "$CLEANREPO" == "" ]] ; then
+  if [[ "$CLEANREPO" == "" ]]; then
     CHECK_LINES=
   fi
-else
 fi
 
 if [ "$CHECK_LINES" == "1" ]; then
