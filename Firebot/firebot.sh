@@ -141,10 +141,12 @@ find_CRLF()
 check_CRLF()
 {
 
-  nwarnings=`wc -l $OUTPUT_DIR/stage1_CRLF_warnings`
+  nwarnings=`cat $OUTPUT_DIR/stage1_CRLF_warnings | wc -l`
   if [ $nwarnings -gt 0 ]; then
-    echo "Warnings from Stage 1 - line ending check:" >> $WARNING_LOG
+    echo ""
+    echo "Warnings from Stage 1 - dos line ending check:" >> $WARNING_LOG
     cat $OUTPUT_DIR/stage1_CRLF_warnings >> $WARNING_LOG
+    echo ""
   fi
 }
 
@@ -1989,7 +1991,10 @@ fi
 
 #*** check fds and smv repos for text files with CRLF line endings
 
+echo Checking for DOS line endings
+echo "   fds repo"
 find_CRLF $fdsrepo
+echo "   smv repo"
 find_CRLF $smvrepo
 check_CRLF
 
