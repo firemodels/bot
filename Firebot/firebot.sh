@@ -124,6 +124,31 @@ set_files_world_readable()
 }
 
 #---------------------------------------------
+#                   find_CRLF
+#---------------------------------------------
+
+find_CRLF()
+{
+  local repodir=$1
+
+  find $repodir -not -type d -exec file "{}" ";" | grep CRLF | awk '{ print "***Warning: " $0; }' >> $OUTPUT_DIR/stage1_CRLF_warnings
+}
+
+#---------------------------------------------
+#                   check_CRLF
+#---------------------------------------------
+
+check_CRLF()
+{
+
+  nwarnings=`wc -l $OUTPUT_DIR/stage1_CRLF_warnings`
+  if [ $nwarnings -gt 0 ]; then
+    echo "Warnings from Stage 1 - line ending check:" >> $WARNING_LOG
+    cat $OUTPUT_DIR/stage1_CRLF_warnings >> $WARNING_LOG
+  fi
+}
+
+#---------------------------------------------
 #                   clean_repo
 #---------------------------------------------
 
@@ -1961,6 +1986,12 @@ fi
 if [[ "$UPDATEREPO" == "1" ]] ; then
   update_repo exp master || exit 1
 fi
+
+#*** check fds and smv repos for text files with CRLF line endings
+
+find_CRLF $fdsrepo
+find_CRLF $smvrepo
+check_CRLF
 
 get_fds_revision $FDSBRANCH || exit 1
 get_smv_revision $SMVBRANCH || exit 1
