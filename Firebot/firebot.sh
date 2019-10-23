@@ -1720,8 +1720,8 @@ fi
 USEINSTALL=
 COMPILER=intel
 QUEUE=firebot
-CLEANREPO=0
-UPDATEREPO=0
+CLEANREPO=
+UPDATEREPO=
 if [ "$JOBPREFIX" == "" ]; then
   export JOBPREFIX=FB_
 fi
@@ -2008,8 +2008,17 @@ if [[ "$UPDATEREPO" == "1" ]] ; then
 fi
 
 #*** check fds and smv repos for text files with CRLF line endings
+#    don't check lines if not cloning and not cleaning repo - avoid false positives
 
-if [ "$CLEANREAPO" == "1" ]; then
+CHECK_LINES=1
+if [[ "$CLONE_REPOS" == "" ]]; then
+  if [[ "$CLEANREPO" == "" ]] ; then
+    CHECK_LINES=
+  fi
+else
+fi
+
+if [ "$CHECK_LINES" == "1" ]; then
   echo Checking for DOS line endings
   echo "   bot repo"
   find_CRLF $repo/bot bot
@@ -2028,7 +2037,7 @@ if [ "$CLEANREAPO" == "1" ]; then
 
   check_CRLF
 else
-  echo DOS line endings only checked when repos are cleaned
+  echo DOS line endings only checked when cloning or cleaning repos
 fi
 
 get_fds_revision $FDSBRANCH || exit 1
