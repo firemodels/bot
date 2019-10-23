@@ -129,9 +129,27 @@ set_files_world_readable()
 
 find_CRLF()
 {
+  local curdir=`pwd`
   local repodir=$1
+  local reponame=$2
 
-  find $repodir -not -type d -exec file "{}" ";" | grep CRLF | awk '{ print "***Warning: " $0; }' >> $OUTPUT_DIR/stage1_CRLF_warnings
+  cd $repodir
+  if [ "$reponame" == "bot" ]; then
+    find . -not -type d -exec file "{}" ";" | grep CRLF | awk '{ print "***Warning in bot repo:" $0; }' >> $OUTPUT_DIR/stage1_line_endings_warnings
+  fi
+  if [ "$reponame" == "fds" ]; then
+    find . -not -type d -exec file "{}" ";" | grep CRLF | awk '{ print "***Warning in fds repo:" $0; }' >> $OUTPUT_DIR/stage1_line_endings_warnings
+  fi
+  if [ "$reponame" == "exp" ]; then
+    find . -not -type d -exec file "{}" ";" | grep CRLF | awk '{ print "***Warning in exp repo:" $0; }' >> $OUTPUT_DIR/stage1_line_endings_warnings
+  fi
+  if [ "$reponame" == "out" ]; then
+    find . -not -type d -exec file "{}" ";" | grep CRLF | awk '{ print "***Warning in out repo:" $0; }' >> $OUTPUT_DIR/stage1_line_endings_warnings
+  fi
+  if [ "$reponame" == "smv" ]; then
+    find . -not -type d -exec file "{}" ";" | grep CRLF | awk '{ print "***Warning in smv repo:" $0; }' >> $OUTPUT_DIR/stage1_line_endings_warnings
+  fi
+  cd $curdir
 }
 
 #---------------------------------------------
@@ -141,11 +159,11 @@ find_CRLF()
 check_CRLF()
 {
 
-  nwarnings=`cat $OUTPUT_DIR/stage1_CRLF_warnings | wc -l`
+  nwarnings=`cat $OUTPUT_DIR/stage1_line_endings_warnings | wc -l`
   if [ $nwarnings -gt 0 ]; then
     echo ""
     echo "Warnings from Stage 1 - dos line ending check:" >> $WARNING_LOG
-    cat $OUTPUT_DIR/stage1_CRLF_warnings >> $WARNING_LOG
+    cat $OUTPUT_DIR/stage1_line_endings_warnings >> $WARNING_LOG
     echo ""
   fi
 }
@@ -1992,10 +2010,21 @@ fi
 #*** check fds and smv repos for text files with CRLF line endings
 
 echo Checking for DOS line endings
+echo "   bot repo"
+find_CRLF $repo/bot bot
+
+echo "   exp repo"
+find_CRLF $repo/exp exp
+
 echo "   fds repo"
-find_CRLF $fdsrepo
+find_CRLF $repo/fds fds
+
+echo "   out repo"
+find_CRLF $repo/out out
+
 echo "   smv repo"
-find_CRLF $smvrepo
+find_CRLF $repo/smv smv
+
 check_CRLF
 
 get_fds_revision $FDSBRANCH || exit 1
