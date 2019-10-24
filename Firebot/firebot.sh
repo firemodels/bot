@@ -135,19 +135,19 @@ find_CRLF()
 
   cd $repodir
   if [ "$reponame" == "bot" ]; then
-    find . -not -type d -exec file "{}" ";" | grep CRLF | awk '{ print "***Warning in bot repo:" $0; }' >> $OUTPUT_DIR/stage1_line_endings_warnings
+    find . -not -type d -exec file "{}" ";" | grep CRLF | awk '{ print "***Warning in bot repo:" $0; }' >> $CRLF_WARNINGS
   fi
   if [ "$reponame" == "fds" ]; then
-    find . -not -type d -exec file "{}" ";" | grep CRLF | awk '{ print "***Warning in fds repo:" $0; }' >> $OUTPUT_DIR/stage1_line_endings_warnings
+    find . -not -type d -exec file "{}" ";" | grep CRLF | awk '{ print "***Warning in fds repo:" $0; }' >> $CRLF_WARNINGS
   fi
   if [ "$reponame" == "exp" ]; then
-    find . -not -type d -exec file "{}" ";" | grep CRLF | awk '{ print "***Warning in exp repo:" $0; }' >> $OUTPUT_DIR/stage1_line_endings_warnings
+    find . -not -type d -exec file "{}" ";" | grep CRLF | awk '{ print "***Warning in exp repo:" $0; }' >> $CRLF_WARNINGS
   fi
   if [ "$reponame" == "out" ]; then
-    find . -not -type d -exec file "{}" ";" | grep CRLF | awk '{ print "***Warning in out repo:" $0; }' >> $OUTPUT_DIR/stage1_line_endings_warnings
+    find . -not -type d -exec file "{}" ";" | grep CRLF | awk '{ print "***Warning in out repo:" $0; }' >> $CRLF_WARNINGS
   fi
   if [ "$reponame" == "smv" ]; then
-    find . -not -type d -exec file "{}" ";" | grep CRLF | awk '{ print "***Warning in smv repo:" $0; }' >> $OUTPUT_DIR/stage1_line_endings_warnings
+    find . -not -type d -exec file "{}" ";" | grep CRLF | awk '{ print "***Warning in smv repo:" $0; }' >> $CRLF_WARNINGS
   fi
   cd $curdir
 }
@@ -159,11 +159,11 @@ find_CRLF()
 check_CRLF()
 {
 
-  nwarnings=`cat $OUTPUT_DIR/stage1_line_endings_warnings | wc -l`
+  nwarnings=`cat $CRLF_WARNINGS | wc -l`
   if [ $nwarnings -gt 0 ]; then
     echo ""
     echo "Warnings from Stage 1 - dos line ending check:" >> $WARNING_LOG
-    cat $OUTPUT_DIR/stage1_line_endings_warnings >> $WARNING_LOG
+    cat $CRLF_WARNINGS >> $WARNING_LOG
     echo ""
   fi
 }
@@ -1674,6 +1674,7 @@ NEWGUIDE_DIR=$OUTPUT_DIR/Newest_Guides
 SAVEGUIDE_DIR=$HOME/.firebot/pubs
 MANUAL_DIR=$HOME/.firebot/Manuals
 EMAIL_LIST=$HOME/.firebot/firebot_email_list.sh
+CRLF_WARNINGS=$OUTPUT_DIR/stage1_crlf_warnings
 
 FDS_APPS_DIR=$HOME/.firebot/fds
 FDS_LATESTAPPS_DIR=$HOME/.firebot/fdslatest
@@ -2018,6 +2019,7 @@ if [[ "$CLONE_REPOS" == "" ]]; then
 fi
 
 if [ "$CHECK_LINES" == "1" ]; then
+  rm -f $CRLF_WARNINGS
   echo Checking for DOS line endings
   echo "   bot repo"
   find_CRLF $repo/bot bot
