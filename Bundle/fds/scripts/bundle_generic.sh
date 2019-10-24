@@ -3,6 +3,7 @@ fds_version=$1
 smv_version=$2
 MPI_VERSION=$3
 INTEL_COMP_VERSION=$4
+UPLOAD_DIR_ARG=$5
 
 # this script assumes that fds has been copied into FDS_DIR, smokeview apps have been copied into SMV_DIR and
 # manuals have been copied into GUIDE_DIR
@@ -15,7 +16,11 @@ FDS_DIR=$HOME/.bundle/fds
 MPI_DIR=$HOME/.bundle/BUNDLE/MPI
 
 # bundle copied into UPLOAD_DIR
-UPLOAD_DIR=$HOME/.bundle/uploads
+if [ "$UPLOAD_DIR_ARG" == "" ]; then
+  UPLOAD_DIR=$HOME/.bundle/uploads
+else
+  UPLOAD_DIR=$UPLOAD_DIR_ARG
+fi
 
 smvbin=smvbin
 INSTALLDIR=FDS/FDS6

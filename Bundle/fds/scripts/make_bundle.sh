@@ -31,7 +31,9 @@ echo "Environment variable:"
 echo "PBS_HOME - host used to build pubs"
 echo ""
 echo "Options:"
+echo "-a - host containing apps [default: $app_host]"
 echo "-B - build apps - this script runs firebot with the -B option"
+echo "-d - directory containing bundle [default: $bundle_dir]"
 echo "-f - home directory containing apps [default: $app_home]"
 echo "-F - home directory containing fds pubs [default: $fds_pub_home]"
 echo "-S - home directory containing smokeview pubs [default: $smv_pub_home]"
@@ -44,23 +46,37 @@ echo "-v - show parameters used to build bundle (bundle not generated)"
 exit
 }
 
+#define default home directories for apps and pubs
 app_home=\~firebot
 fds_pub_home=\~firebot
 smv_pub_home=\~smokebot
+
+# define default host where pubs are found
 pub_host=`hostname`
 if [ "$PUB_HOST" != "" ]; then
   pub_host=$PUB_HOST
 fi
+
+# define default host where apps are found
+app_host=`hostname`
+if [ "$APP_HOST" != "" ]; then
+  app_host=$APP_HOST
+fi
+
 showparms=
 ECHO=
 BUILD_APPS=
+bundle_dir=$HOME/.bundle/bundles
 
-while getopts 'Bf:F:hp:S:uUv' OPTION
+while getopts 'Bd:f:F:hp:S:uUv' OPTION
 do
 case $OPTION  in
   B)
    BUILD_APPS=1
    app_home=$HOME
+   ;;
+  d)
+   bundle_dir=$HOME
    ;;
   f)
    app_home=$OPTARG
@@ -146,8 +162,8 @@ if [ "$showparms" == "" ]; then
   ./copy_pubs.sh fds $fds_pub_home/.firebot/pubs  $pub_host
   ./copy_pubs.sh smv $smv_pub_home/.smokebot/pubs $pub_host
 
-  ./copy_apps.sh fds $app_home/.firebot/fds
-  ./copy_apps.sh smv $app_home/.firebot/smv 
+  ./copy_apps.sh fds $app_home/.firebot/fds $app_host
+  ./copy_apps.sh smv $app_home/.firebot/smv $app_host
 fi
 
 # get fds repo revision
@@ -177,4 +193,4 @@ if [ "$ECHO" != "" ]; then
   echo " Bundle command"
   echo " --------------"
 fi
-$ECHO ./bundle_generic.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version
+$ECHO ./bundle_generic.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version $bundle_dir
