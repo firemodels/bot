@@ -36,7 +36,11 @@ mkdir -p $dir_to
 
 if [ "$app_type" == "fds" ]; then
   echo
-  echo ***copying fds apps
+  if [[ "$bot_host" != "" ]] && [[ "$bot_host" != "`hostname`" ]]; then
+    echo ***copying fds apps from $dir_from on $bot_host
+  else
+    echo ***copying fds apps from $dir_from
+  fi
   CP fds
   CP fds2ascii
   CP test_mpi
@@ -44,7 +48,11 @@ fi
 
 if [ "$app_type" == "smv" ]; then
   echo
-  echo ***copying smokeview apps
+  if [[ "$bot_host" != "" ]] && [[ "$bot_host" != "`hostname`" ]]; then
+    echo ***copying smokeview apps from $dir_from on $bot_host
+  else
+    echo ***copying smokeview apps from $dir_from
+  fi
   CP background
   CP hashfile
   CP dem2fds

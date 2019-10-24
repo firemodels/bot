@@ -36,7 +36,11 @@ mkdir -p $pdf_to
 
 if [ "$pub_type" == "fds" ]; then
   echo
-  echo ***copying fds pubs
+  if [[ "$bot_host" != "" ]] ; then
+    echo ***copying fds pubs from $pdf_from on $bot_host
+  else
+    echo ***copying fds pubs from $pdf_from
+  fi
   CP FDS_Config_Management_Plan.pdf
   CP FDS_Technical_Reference_Guide.pdf
   CP FDS_User_Guide.pdf
@@ -46,7 +50,11 @@ fi
 
 if [ "$pub_type" == "smv" ]; then
   echo
-  echo ***copying smokeview pubs
+  if [[ "$bot_host" != "" ]] ; then
+    echo ***copying smokeview pubs from $pdf_from on $bot_host
+  else
+    echo ***copying smokeview pubs from $pdf_from
+  fi
   CP SMV_Technical_Reference_Guide.pdf
   CP SMV_User_Guide.pdf
   CP SMV_Verification_Guide.pdf
