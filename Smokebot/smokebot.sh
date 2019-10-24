@@ -1241,9 +1241,9 @@ check_guide()
        cp $directory/$document $SMOKEBOT_MAN_DIR/.
      fi
      cp $directory/$document $NEWGUIDE_DIR/.
-     cp $directory/$document $GUIDE_DIR_ARCHIVE/.
+     cp $directory/$document $GUIDE_DIR_LATEST/$document
      chmod 664 $NEWGUIDE_DIR/$document
-     chmod 664 $GUIDE_DIR_ARCHIVE/$document
+     chmod 664 $GUIDE_DIR_LATEST/$document
    fi
 
    # Check for LaTeX warnings (undefined references or duplicate labels)
@@ -1333,6 +1333,8 @@ save_manuals_dir()
       rm -rf $MOVIEMANUAL_DIR_ARCHIVE
       cp -r $smvrepo/Manuals $MOVIEMANUAL_DIR_ARCHIVE
     fi
+    rm -rf $GUIDE_DIR
+    cp -r $GUIDE_DIR_LATEST $GUIDE_DIR
   fi
 }
 
@@ -1449,7 +1451,9 @@ OUTPUT_DIR="$smokebotdir/output"
 HISTORY_DIR_ARCHIVE="$HOME/.smokebot/history"
 MANUAL_DIR_ARCHIVE=$HOME/.smokebot/Manuals
 MOVIEMANUAL_DIR_ARCHIVE=$HOME/.smokebot/MovieManuals
-GUIDE_DIR_ARCHIVE=$HOME/.smokebot/pubs
+
+GUIDE_DIR_LATEST=$HOME/.smokebot/pubs_latest
+       GUIDE_DIR=$HOME/.smokebot/pubs
 
 EMAIL_LIST="$HOME/.smokebot/smokebot_email_list.sh"
 TIME_LOG=$OUTPUT_DIR/timings
@@ -1592,7 +1596,9 @@ fi
 #*** create pub directory
 
 MKDIR $HOME/.smokebot
-MKDIR $HOME/.smokebot/pubs
+MKDIR $GUIDE_DIR
+rm -rf $GUIDE_DIR_LATEST
+MKDIR $GUIDE_DIR_LATEST
 
 SMV_APPS_DIR=$HOME/.smokebot/smv
 SMV_LATESTAPPS_DIR=$HOME/.smokebot/smvlatest
@@ -1834,6 +1840,7 @@ check_update_repo
 
 cd $smvrepo
 git describe --abbrev | awk -F '-' '{print $1"-"$2}' > $SMV_LATESTAPPS_DIR/SMV_REVISION
+cp $SMV_LATESTAPPS_DIR/SMV_REVISION $GUIDE_DIR_LATEST/SMV_REVISION
 
 PRELIM_end=`GET_TIME`
 DIFF_PRELIM=`GET_DURATION $PRELIM_beg $PRELIM_end`

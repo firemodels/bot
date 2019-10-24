@@ -2174,6 +2174,7 @@ if [[ "$DEBUG_ONLY" == "" ]] && [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" 
         rm -rf $MANUAL_DIR
         cp -r $fdsrepo/Manuals $MANUAL_DIR
 
+        cp $FDS_LATESTAPPS_DIR/FDS_REVISION $SAVEGUIDE_DIR/FDS_REVISION
         copy_fds_user_guide
         copy_fds_verification_guide
         copy_fds_technical_guide
