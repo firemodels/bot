@@ -133,21 +133,16 @@ find_CRLF()
   local repodir=$1
   local reponame=$2
 
+  crlf_temp=/tmp/crlf.$$
+
   cd $repodir
-  if [ "$reponame" == "bot" ]; then
-    find . -not -type d -exec file "{}" ";" | grep CRLF | awk '{ print "***Warning in bot repo:" $0; }' >> $CRLF_WARNINGS
-  fi
-  if [ "$reponame" == "fds" ]; then
-    find . -not -type d -exec file "{}" ";" | grep CRLF | awk '{ print "***Warning in fds repo:" $0; }' >> $CRLF_WARNINGS
-  fi
-  if [ "$reponame" == "exp" ]; then
-    find . -not -type d -exec file "{}" ";" | grep CRLF | awk '{ print "***Warning in exp repo:" $0; }' >> $CRLF_WARNINGS
-  fi
-  if [ "$reponame" == "out" ]; then
-    find . -not -type d -exec file "{}" ";" | grep CRLF | awk '{ print "***Warning in out repo:" $0; }' >> $CRLF_WARNINGS
-  fi
-  if [ "$reponame" == "smv" ]; then
-    find . -not -type d -exec file "{}" ";" | grep CRLF | awk '{ print "***Warning in smv repo:" $0; }' >> $CRLF_WARNINGS
+  grep -IURl --color --exclude="*.pdf" --exclude-dir=".git" ""  | grep -v 'firebot.sh'  > $crlf_temp
+  nlines=`cat $crlf_temp | wc -l`
+  if [ $nlines -gt 0 ]; then
+    echo "" >> $CRLF_WARNINGS
+    echo "$reponame repo:" >> $CRLF_WARNINGS
+    cat $crlf_temp >> $CRLF_WARNINGS
+    rm $crlf_temp
   fi
   cd $curdir
 }
@@ -159,12 +154,14 @@ find_CRLF()
 check_CRLF()
 {
 
-  nwarnings=`cat $CRLF_WARNINGS | wc -l`
-  if [ $nwarnings -gt 0 ]; then
-    echo ""
-    echo "Warnings from Stage 1 - dos line ending check:" >> $WARNING_LOG
-    cat $CRLF_WARNINGS >> $WARNING_LOG
-    echo ""
+  if [ -e $CRLF_WARNINGS ]; then
+    nwarnings=`cat $CRLF_WARNINGS | wc -l`
+    if [ $nwarnings -gt 0 ]; then
+      echo ""
+      echo "Warnings from Stage 1 - dos line ending check:" >> $WARNING_LOG
+      cat $CRLF_WARNINGS >> $WARNING_LOG
+      echo ""
+    fi
   fi
 }
 
