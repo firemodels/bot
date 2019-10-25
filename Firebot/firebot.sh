@@ -270,6 +270,7 @@ get_smv_revision()
    git update-index --refresh
    SMV_REVISION=`git describe --long --dirty`
    git describe --abbrev | awk -F '-' '{print $1"-"$2}' > $SMV_LATESTAPPS_DIR/SMV_REVISION
+   git rev-parse  --short HEAD > $SMV_LATESTAPPS_DIR/SMV_HASH
    SMV_MESSAGE=`git log . | head -5 | tail -1`
    return 0
 }
