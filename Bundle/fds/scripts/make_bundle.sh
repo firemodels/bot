@@ -119,9 +119,11 @@ shift $(($OPTIND-1))
 if [ "`uname`" == "Darwin" ]; then
   intel_mpi_version=$intel_mpi_version_osx
   mpi_version=$mpi_version_osx
+  platform=osx64
 else
   intel_mpi_version=$intel_mpi_version_linux
   mpi_version=$mpi_version_linux
+  platform=linux64
 fi
 
 if [ "$showparms" == "1" ]; then
@@ -170,35 +172,31 @@ if [ "$showparms" == "" ]; then
   ./copy_pubs.sh fds $fds_pub_home/.firebot/pubs  $pub_host
   ./copy_pubs.sh smv $smv_pub_home/.smokebot/pubs $pub_host
 
-  ./copy_apps.sh fds $app_home/.firebot/fds $app_host
-  ./copy_apps.sh smv $app_home/.firebot/smv $app_host
+  ./copy_apps.sh fds $app_home/.firebot/fds       $app_host
+  ./copy_apps.sh smv $app_home/.firebot/smv       $app_host
 fi
 
-# get fds repo revision
-cd $DIR
-fdsrepo=../../../../fds
-cd $fdsrepo
-SUBREV=`git describe --abbrev | awk -F '-' '{print $2}'`
-if [ "$SUBREV" == "" ]; then
-  FDSREV=`git describe --abbrev | awk -F '-' '{print $1"-0"}'`
+# get fds and smv repo revision used to build apps
+
+if [ -e $HOME/.bundle/fds/FDS_REVISION ]; then
+  FDSREV=`cat $HOME/.bundle/fds/FDS_REVISION`
 else
-  FDSREV=`git describe --abbrev | awk -F '-' '{print $1"-"$2}'`
+  FDSREV=fdstest
 fi
-
-# get smv repo revision
-cd $DIR
-smvrepo=../../../../smv
-cd $smvrepo
-SUBREV=`git describe --abbrev | awk -F '-' '{print $2}'`
-if [ "$SUBREV" == "" ]; then
-  SMVREV=`git describe --abbrev | awk -F '-' '{print $1"-0"}'`
+if [ -e $$HOME/.bundle/smv/SMV_REVISION ]; then
+  SMVREV=`cat $HOME/.bundle/smv/SMV_REVISION`
 else
-  SMVREV=`git describe --abbrev | awk -F '-' '{print $1"-"$2}'`
+  SMVREV=smvtest
 fi
 
-cd $DIR
 if [ "$ECHO" != "" ]; then
   echo " Bundle command"
   echo " --------------"
 fi
+cd $DIR
 $ECHO ./bundle_generic.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version $bundle_dir
+if [ "$ECHO" == "" ]; then
+  installer_base=${FDSREV}-${SMVREV}_$platform
+  rm -f $bundle_dir/${installer_base}.tar.gz
+  rm -rf $bundle_dir/${installer_base}
+fi
