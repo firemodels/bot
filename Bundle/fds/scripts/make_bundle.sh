@@ -183,7 +183,7 @@ if [ -e $HOME/.bundle/fds/FDS_REVISION ]; then
 else
   FDSREV=fdstest
 fi
-if [ -e $$HOME/.bundle/smv/SMV_REVISION ]; then
+if [ -e $HOME/.bundle/smv/SMV_REVISION ]; then
   SMVREV=`cat $HOME/.bundle/smv/SMV_REVISION`
 else
   SMVREV=smvtest
