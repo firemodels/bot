@@ -44,6 +44,7 @@ if [ "$app_type" == "fds" ]; then
   CP fds
   CP fds2ascii
   CP test_mpi
+  CP FDS_REVISION
 fi
 
 if [ "$app_type" == "smv" ]; then
@@ -60,5 +61,6 @@ if [ "$app_type" == "smv" ]; then
   CP smokeview
   CP smokezip
   CP wind2fds
+  CP SMV_REVISION
 fi
 exit $return_code
