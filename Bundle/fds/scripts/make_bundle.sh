@@ -15,34 +15,39 @@ mpi_version_osx=3.1.2
 #---------------------------------------------
 
 function usage {
-echo "Script used to build a bundle from the current revision of the fds and"
-echo "smv repos. By default, this script uses apps built by the firebot account"
-echo "and pubs built by the firebot and smokebot accounts on this computer."
+echo "The script build a bundle using apps built by firebot, fds pubs built by"
+echo "firebot, smokeview pubs built by smokebot and other files found in the"
+echo "fds, smv and botrepos"
 echo ""
-echo "example usage:"
-echo "1. firebot and smokebot accounts on this computer for pubs and apps"
+echo "Example usage:"
+echo "1. apps built by firebot, pubs built by firebot/smokebot both on the computer `hostname`".
+echo "   Thhis is how NIST builds Linux bundles."
 echo "./make_bundle.sh "
 echo ""
-echo "2. remote firebot and smokebot accounts (say xxx.yyy.zzz) for pubs"
-echo "   and user firebot account for apps"
+echo "2. apps built by firebot on `hostname`, pubs built by firebot/smokebot on the computer xxx.yyy.zzz"
+echo "   This is how NIST builds OSX bundles."
 echo "./make_bundle.sh -u -p xxx.yyy.zzz"
 echo ""
-echo "Environment variable:"
-echo "PBS_HOME - host used to build pubs"
+echo "The -v option may be used to show the parameters to build the bundle"
+echo "The following environment variables may be used to set the host names used to build apps and pubs"
+echo ""
+echo "APP_HOST - host where apps are located"
+echo "PBS_HOST - host where pubs are located"
 echo ""
 echo "Options:"
 echo "-a - host containing apps [default: $app_host]"
-echo "-B - build apps - this script runs firebot with the -B option"
-echo "-d - directory containing bundle [default: $bundle_dir]"
+echo "-B - build apps - this script builds apps by running"
+echo "     firebot with the -B option"
+echo "-d - directory where created bundle is put [default: $bundle_dir]"
 echo "-f - home directory containing apps [default: $app_home]"
 echo "-F - home directory containing fds pubs [default: $fds_pub_home]"
 echo "-S - home directory containing smokeview pubs [default: $smv_pub_home]"
 echo "-h - display this message"
 echo "-p - host containing pubs [default: $pub_host]"
-echo "-u - use apps built by firebot in the `whoami` account"
-echo "-U - use apps built by firebot and pubs built by firebot"
-echo "     and smokebot in the `whoami` account"
-echo "-v - show parameters used to build bundle (bundle not generated)"
+echo "-u - use apps built by the `whoami` firebot account"
+echo "-U - use apps built by the `whoami` firebot account and pubs built "
+echo "     by the `whoami` firebot and smokebot accounts"
+echo "-v - show parameters used to build bundle (the bundle not generated)"
 exit
 }
 
@@ -124,23 +129,26 @@ if [ "$showparms" == "1" ]; then
   echo " Parameters"
   echo " ----------"
   if [ "$BUILD_APPS" == "1" ]; then
-    echo "    build apps: yes"
+    echo "        build apps: yes"
   else
-    echo "    build apps: no"
+    echo "        build apps: no"
   fi
-  echo "   MPI version: $mpi_version"
-  echo " Intel version: $intel_mpi_version"
-  echo ""
-  echo " Home directories"
-  echo " ----------------"
-  echo " fds/smv apps: $app_home"
+  echo "       MPI version: $mpi_version"
+  echo "     Intel version: $intel_mpi_version"
+  if [ "$app_host" != `hostname` ]; then
+    hostlabel="on $app_host"
+  else
+    hostlabel="on this computer"
+  fi
+  echo " fds app directory: $app_home/.firebot/fds $hostlabel"
+  echo " smv app directory: $app_home/.firebot/smv $hostlabel"
   if [ "$pub_host" != `hostname` ]; then
-    hostlabel="host: $pub_host"
+    hostlabel="on $pub_host"
   else
-    hostlabel=
+    hostlabel="on this computer"
   fi
-  echo "     fds pubs: $fds_pub_home $hostlabel"
-  echo "     smv pubs: $smv_pub_home $hostlabel"
+  echo " fds pub directory: $fds_pub_home/.firebot/pubs $hostlabel"
+  echo " smv pub directory: $smv_pub_home/.smokebot/pubs $hostlabel"
   echo ""
 fi
 
