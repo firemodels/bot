@@ -2014,6 +2014,9 @@ if [[ "$CLONE_REPOS" == "" ]]; then
     CHECK_LINES=
   fi
 fi
+if [ "$BUILD_ONLY" == "1" ]; then
+  CHECK_LINES=
+fi
 
 if [ "$CHECK_LINES" == "1" ]; then
   rm -f $CRLF_WARNINGS
@@ -2035,7 +2038,9 @@ if [ "$CHECK_LINES" == "1" ]; then
 
   check_CRLF
 else
-  echo DOS line endings only checked when cloning or cleaning repos
+  if [ "$BUILD_ONLY" == "" ]; then
+    echo "DOS line endings only checked when cloning or cleaning repos"
+  fi
 fi
 
 get_fds_revision $FDSBRANCH || exit 1
@@ -2047,8 +2052,10 @@ get_out_revision master || exit 1
 # archive repo sizes
 # (only if the repos are cloned or cleaned)
 
+if [ "$BUILD_ONLY" == "" ]; then
 if [ "$ARCHIVE_REPO_SIZES" == "1" ]; then
   archive_repo_sizes
+fi
 fi
 
 check_git_checkout
