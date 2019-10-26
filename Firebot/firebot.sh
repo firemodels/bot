@@ -2055,9 +2055,11 @@ fi
 
 get_fds_revision $FDSBRANCH || exit 1
 get_smv_revision $SMVBRANCH || exit 1
-get_exp_revision master || exit 1
-get_fig_revision master || exit 1
-get_out_revision master || exit 1
+if [ "$BUILD_ONLY" == "" ]; then
+  get_exp_revision master || exit 1
+  get_fig_revision master || exit 1
+  get_out_revision master || exit 1
+fi
 
 echo | mail >& /tmp/mailtest.$$
 notfound=`grep 'not found' /tmp/mailtest.$$ | wc -l`
@@ -2065,7 +2067,9 @@ HAVE_MAIL=1
 if [ $notfound -gt 0 ]; then
   HAVE_MAIL=
 fi
+echo HAVE_MAIL=$HAVE_MAIL
 rm /tmp/mailtest.$$
+exit
 
 # archive repo sizes
 # (only if the repos are cloned or cleaned)
