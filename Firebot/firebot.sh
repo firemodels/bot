@@ -2069,7 +2069,6 @@ if [ $notfound -gt 0 ]; then
 fi
 echo HAVE_MAIL=$HAVE_MAIL
 rm /tmp/mailtest.$$
-exit
 
 # archive repo sizes
 # (only if the repos are cloned or cleaned)
