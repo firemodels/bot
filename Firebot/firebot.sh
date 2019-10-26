@@ -136,7 +136,8 @@ find_CRLF()
   crlf_temp=/tmp/crlf.$$
 
   cd $repodir
-  grep -IURl --color --exclude="*.pdf" --exclude-dir=".git" ""  | grep -v 'firebot.sh'  > $crlf_temp
+  grep -IURl --color --exclude="*.pdf" --exclude-dir=".git" "
+"  | grep -v 'firebot.sh'  > $crlf_temp
   nlines=`cat $crlf_temp | wc -l`
   if [ $nlines -gt 0 ]; then
     echo "" >> $CRLF_WARNINGS
@@ -1604,13 +1605,17 @@ fi
       cd $firebotdir
 
      # Send email with failure message and warnings, body of email contains appropriate log file
-     cat $ERROR_LOG $TIME_LOG | mail -s "[$botuser] $bottype failure and warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
+     if [ "$HAVE_MAIL" == "1" ]; then
+       cat $ERROR_LOG $TIME_LOG | mail -s "[$botuser] $bottype failure and warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
+     fi
 
    # Check for errors only
    elif [ -e $ERROR_LOG ]
    then
       # Send email with failure message, body of email contains error log file
-      cat $ERROR_LOG $TIME_LOG | mail -s "[$botuser] $bottype failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
+      if [ "$HAVE_MAIL" == "1" ]; then
+        cat $ERROR_LOG $TIME_LOG | mail -s "[$botuser] $bottype failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
+      fi
 
    # Check for warnings only
    elif [ -e $WARNING_LOG ]
@@ -1618,7 +1623,9 @@ fi
       cd $firebotdir
 
       # Send email with success message, include warnings
-      cat $WARNING_LOG $TIME_LOG | mail -s "[$botuser] $bottype success, with warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
+      if [ "$HAVE_MAIL" == "1" ]; then
+        cat $WARNING_LOG $TIME_LOG | mail -s "[$botuser] $bottype success, with warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
+      fi
 
    # No errors or warnings
    else
@@ -1627,7 +1634,9 @@ fi
 
       # Send success message with links to nightly manuals
       firebot_status=0
-      cat $TIME_LOG | mail -s "[$botuser] $bottype success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
+      if [ "$HAVE_MAIL" == "1" ]; then
+        cat $TIME_LOG | mail -s "[$botuser] $bottype success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
+      fi
    fi
 
 }
@@ -2049,6 +2058,14 @@ get_smv_revision $SMVBRANCH || exit 1
 get_exp_revision master || exit 1
 get_fig_revision master || exit 1
 get_out_revision master || exit 1
+
+echo | mail >& /tmp/mailtest.$$
+notfound=`grep 'not found' /tmp/mailtest.$$ | wc -l`
+HAVE_MAIL=1
+if [ $notfound -gt 0 ]; then
+  HAVE_MAIL=
+fi
+rm /tmp/mailtest.$$
 
 # archive repo sizes
 # (only if the repos are cloned or cleaned)
