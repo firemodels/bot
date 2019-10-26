@@ -131,26 +131,25 @@ if [ "$showparms" == "1" ]; then
   echo " Parameters"
   echo " ----------"
   if [ "$BUILD_APPS" == "1" ]; then
-    echo "        build apps: yes"
+    echo "            build apps: yes"
   else
-    echo "        build apps: no"
+    echo "            build apps: no"
   fi
-  echo "       MPI version: $mpi_version"
-  echo "     Intel version: $intel_mpi_version"
+  echo "           MPI version: $mpi_version"
+  echo "         Intel version: $intel_mpi_version"
   if [ "$app_host" != `hostname` ]; then
     hostlabel="on $app_host"
   else
     hostlabel="on this computer"
   fi
-  echo " fds app directory: $app_home/.firebot/fds $hostlabel"
-  echo " smv app directory: $app_home/.firebot/smv $hostlabel"
+  echo " fds/smv app directory: $app_home/.firebot/fds $hostlabel"
   if [ "$pub_host" != `hostname` ]; then
     hostlabel="on $pub_host"
   else
     hostlabel="on this computer"
   fi
-  echo " fds pub directory: $fds_pub_home/.firebot/pubs $hostlabel"
-  echo " smv pub directory: $smv_pub_home/.smokebot/pubs $hostlabel"
+  echo "     fds pub directory: $fds_pub_home/.firebot/pubs $hostlabel"
+  echo "     smv pub directory: $smv_pub_home/.smokebot/pubs $hostlabel"
   echo ""
 fi
 
