@@ -271,7 +271,6 @@ get_smv_revision()
    git update-index --refresh
    SMV_REVISION=`git describe --long --dirty`
    git describe --abbrev | awk -F '-' '{print $1"-"$2}' > $LATESTAPPS_DIR/SMV_REVISION
-   git rev-parse  --short HEAD > $LATESTAPPS_DIR/SMV_HASH
    SMV_MESSAGE=`git log . | head -5 | tail -1`
    return 0
 }
@@ -292,6 +291,7 @@ get_fds_revision()
    git describe --abbrev | awk -F '-' '{print $1"-"$2}' > $LATESTAPPS_DIR/FDS_REVISION
    FDS_SHORTHASH=`git rev-parse --short HEAD`
    FDS_LONGHASH=`git rev-parse HEAD`
+   echo $FDS_LONGHASH > $LATESTAPPS_DIR/FDS_HASH
    FDS_DATE=`git log -1 --format=%cd --date=local $FDS_SHORTHASH`
    FDS_MESSAGE=`git log . | head -5 | tail -1`
    return 0
@@ -2190,6 +2190,7 @@ if [[ "$DEBUG_ONLY" == "" ]] && [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" 
         cp -r $fdsrepo/Manuals $MANUAL_DIR
 
         cp $LATESTAPPS_DIR/FDS_REVISION $SAVEGUIDE_DIR/FDS_REVISION
+        cp $LATESTAPPS_DIR/FDS_HASH $SAVEGUIDE_DIR/FDS_HASH
         copy_fds_user_guide
         copy_fds_verification_guide
         copy_fds_technical_guide
