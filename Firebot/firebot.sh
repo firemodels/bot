@@ -1572,11 +1572,9 @@ email_build_status()
    echo "     fds branch: $FDSBRANCH "    >> $TIME_LOG
    echo "   smv revision: $SMV_REVISION " >> $TIME_LOG
    echo "     smv branch: $SMVBRANCH "    >> $TIME_LOG
-if [ "$IFORT_VERSION" != "" ]; then
-   echo "        Fortran: $IFORT_VERSION " >> $TIME_LOG
-fi
-   echo $FDS_MESSAGE
-   echo $SMV_MESSAGE
+   if [ "$IFORT_VERSION" != "" ]; then
+      echo "        Fortran: $IFORT_VERSION " >> $TIME_LOG
+   fi
    echo "     start time: $start_time " >> $TIME_LOG
    echo "      stop time: $stop_time " >> $TIME_LOG
    if [ "$UPLOADGUIDES" == "1" ]; then
