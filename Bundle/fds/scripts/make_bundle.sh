@@ -142,7 +142,7 @@ if [ "$showparms" == "1" ]; then
   else
     hostlabel="on this computer"
   fi
-  echo " fds/smv app directory: $app_home/.firebot/fds $hostlabel"
+  echo " fds/smv app directory: $app_home/.firebot/apps $hostlabel"
   if [ "$pub_host" != `hostname` ]; then
     hostlabel="on $pub_host"
   else
@@ -167,13 +167,23 @@ if [ "$BUILD_APPS" == "1" ]; then
 fi
 fi
 
+return_code=0
 if [ "$showparms" == "" ]; then
-  ./copy_pubs.sh fds $fds_pub_home/.firebot/pubs  $pub_host
-  ./copy_pubs.sh smv $smv_pub_home/.smokebot/pubs $pub_host
+  error_log=/tmp/error_log.$$
+  ./copy_pubs.sh fds $fds_pub_home/.firebot/pubs  $pub_host $error_log || return_code=1
+  ./copy_pubs.sh smv $smv_pub_home/.smokebot/pubs $pub_host $error_log || return_code=1
 
   rm $HOME/.bundle/apps/*
-  ./copy_apps.sh fds $app_home/.firebot/fds       $app_host
-  ./copy_apps.sh smv $app_home/.firebot/smv       $app_host
+  ./copy_apps.sh fds $app_home/.firebot/apps      $app_host $error_log || return_code=1
+  ./copy_apps.sh smv $app_home/.firebot/apps      $app_host $error_log || return_code=1
+ 
+  if [ "$return_code" == "1" ]; then
+    cat $error_log
+    echo ""
+    echo "bundle generation aborted"
+    rm $error_log
+    exit 1
+  fi
 fi
 
 # get fds and smv repo revision used to build apps
