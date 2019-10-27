@@ -26,9 +26,9 @@ INSTALLDIR=FDS/FDS6
 errlog=/tmp/errlog.$$
 
 if [ "`uname`" == "Darwin" ] ; then
-  bundlebase=${fds_version}-${smv_version}_osx64
+  bundlebase=${fds_version}_${smv_version}_osx64
 else
-  bundlebase=${fds_version}-${smv_version}_linux64
+  bundlebase=${fds_version}_${smv_version}_linux64
 fi
 
 # determine directory repos reside under
