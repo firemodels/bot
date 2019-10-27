@@ -270,8 +270,8 @@ get_smv_revision()
 
    git update-index --refresh
    SMV_REVISION=`git describe --long --dirty`
-   git describe --abbrev | awk -F '-' '{print $1"-"$2}' > $SMV_LATESTAPPS_DIR/SMV_REVISION
-   git rev-parse  --short HEAD > $SMV_LATESTAPPS_DIR/SMV_HASH
+   git describe --abbrev | awk -F '-' '{print $1"-"$2}' > $LATESTAPPS_DIR/SMV_REVISION
+   git rev-parse  --short HEAD > $LATESTAPPS_DIR/SMV_HASH
    SMV_MESSAGE=`git log . | head -5 | tail -1`
    return 0
 }
@@ -289,7 +289,7 @@ get_fds_revision()
 
    git update-index --refresh
    FDS_REVISION=`git describe --long --dirty`
-   git describe --abbrev | awk -F '-' '{print $1"-"$2}' > $FDS_LATESTAPPS_DIR/FDS_REVISION
+   git describe --abbrev | awk -F '-' '{print $1"-"$2}' > $LATESTAPPS_DIR/FDS_REVISION
    FDS_SHORTHASH=`git rev-parse --short HEAD`
    FDS_LONGHASH=`git rev-parse HEAD`
    FDS_DATE=`git log -1 --format=%cd --date=local $FDS_SHORTHASH`
@@ -651,7 +651,7 @@ check_compile_fds_mpi()
    if [ -e "fds_${INTEL}mpi_intel_${platform}${size}$DV" ]
    then
       FDS_release_success=true
-      cp fds_${INTEL}mpi_intel_${platform}${size}$DV $FDS_LATESTAPPS_DIR/fds
+      cp fds_${INTEL}mpi_intel_${platform}${size}$DV $LATESTAPPS_DIR/fds
    else
       echo "Errors from Stage 2c - Compile FDS MPI release:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage2c >> $ERROR_LOG
@@ -707,7 +707,7 @@ compile_smv_utilities()
      rm -f *.o smokezip_${platform}${size}
 
      ./make_smokezip.sh >> $OUTPUT_DIR/stage3a 2>&1
-     CP smokezip_${platform}${size} $SMV_LATESTAPPS_DIR/smokezip
+     CP smokezip_${platform}${size} $LATESTAPPS_DIR/smokezip
      echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
    # smokediff:
@@ -715,7 +715,7 @@ compile_smv_utilities()
      cd $smvrepo/Build/smokediff/${COMPILER}_${platform}${size}
      rm -f *.o smokediff_${platform}${size}
      ./make_smokediff.sh >> $OUTPUT_DIR/stage3a 2>&1
-     CP smokediff_${platform}${size} $SMV_LATESTAPPS_DIR/smokediff
+     CP smokediff_${platform}${size} $LATESTAPPS_DIR/smokediff
      echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
    # background
@@ -723,21 +723,21 @@ compile_smv_utilities()
      cd $smvrepo/Build/background/${COMPILER}_${platform}${size}
      rm -f *.o background_${platform}${size}
      ./make_background.sh >> $OUTPUT_DIR/stage3a 2>&1
-     CP background_${platform}${size} $SMV_LATESTAPPS_DIR/background
+     CP background_${platform}${size} $LATESTAPPS_DIR/background
 
    # dem2fds
      echo "      dem2fds"
      cd $smvrepo/Build/dem2fds/${COMPILER}_${platform}${size}
      rm -f *.o dem2fds_${platform}${size}
      ./make_dem2fds.sh >> $OUTPUT_DIR/stage3a 2>&1
-     CP dem2fds_${platform}${size} $SMV_LATESTAPPS_DIR/dem2fds
+     CP dem2fds_${platform}${size} $LATESTAPPS_DIR/dem2fds
 
   # wind2fds:
      echo "      wind2fds"
      cd $smvrepo/Build/wind2fds/${COMPILER}_${platform}${size}
      rm -f *.o wind2fds_${platform}${size}
      ./make_wind2fds.sh >> $OUTPUT_DIR/stage3a 2>&1
-     CP wind2fds_${platform}${size} $SMV_LATESTAPPS_DIR/wind2fds
+     CP wind2fds_${platform}${size} $LATESTAPPS_DIR/wind2fds
     echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
   # hashfile:
@@ -745,7 +745,7 @@ compile_smv_utilities()
      cd $smvrepo/Build/hashfile/${COMPILER}_${platform}${size}
      rm -f *.o hashfile_${platform}${size}
      ./make_hashfile.sh >> $OUTPUT_DIR/stage3a 2>&1
-     CP hashfile_${platform}${size} $SMV_LATESTAPPS_DIR/hashfile
+     CP hashfile_${platform}${size} $LATESTAPPS_DIR/hashfile
     echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
   # fds2asci
@@ -753,7 +753,7 @@ compile_smv_utilities()
      cd $fdsrepo/Utilities/fds2ascii/${COMPILER}_${platform}${size}
      rm -f *.o fds2ascii_${platform}${size}
      ./make_fds2ascii.sh >> $OUTPUT_DIR/stage3a 2>&1
-     cp fds2ascii_${platform}${size} $FDS_LATESTAPPS_DIR/fds2ascii
+     cp fds2ascii_${platform}${size} $LATESTAPPS_DIR/fds2ascii
     echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
   # test_mpi
@@ -761,7 +761,7 @@ compile_smv_utilities()
      cd $fdsrepo/Utilities/test_mpi/${INTEL}mpi_${COMPILER}_${platform}
      rm -f *.o test_mpi
      ./make_test_mpi.sh >> $OUTPUT_DIR/stage3a 2>&1
-     cp test_mpi $FDS_LATESTAPPS_DIR/test_mpi
+     cp test_mpi $LATESTAPPS_DIR/test_mpi
     echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
    else
@@ -967,7 +967,7 @@ check_compile_smv()
     cd $smvrepo/Build/smokeview/intel_${platform}${size}
     if [ -e "smokeview_${platform}${size}" ]; then
       smv_release_success=true
-      CP smokeview_${platform}${size} $SMV_LATESTAPPS_DIR/smokeview
+      CP smokeview_${platform}${size} $LATESTAPPS_DIR/smokeview
     else
       echo "Errors from Stage 3c - Compile SMV release:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage3c >> $ERROR_LOG
@@ -1683,22 +1683,15 @@ MANUAL_DIR=$HOME/.firebot/Manuals
 EMAIL_LIST=$HOME/.firebot/firebot_email_list.sh
 CRLF_WARNINGS=$OUTPUT_DIR/stage1_crlf_warnings
 
-FDS_APPS_DIR=$HOME/.firebot/fds
-FDS_LATESTAPPS_DIR=$HOME/.firebot/fdslatest
-
-SMV_APPS_DIR=$HOME/.firebot/smv
-SMV_LATESTAPPS_DIR=$HOME/.firebot/smvlatest
+APPS_DIR=$HOME/.firebot/apps
+LATESTAPPS_DIR=$HOME/.firebot/appslatest
 
 MKDIR $HOME/.firebot
 MKDIR $HOME/.firebot/pubs
-MKDIR $FDS_APPS_DIR
-MKDIR $SMV_APPS_DIR
 
-rm -rf $FDS_LATESTAPPS_DIR
-MKDIR $FDS_LATESTAPPS_DIR
-
-rm -rf $SMV_LATESTAPPS_DIR
-MKDIR $SMV_LATESTAPPS_DIR
+MKDIR $APPS_DIR
+rm -rf $LATESTAPPS_DIR
+MKDIR $LATESTAPPS_DIR
 
 WEBBRANCH=nist-pages
 FDSBRANCH=master
@@ -2067,7 +2060,6 @@ HAVE_MAIL=1
 if [ $notfound -gt 0 ]; then
   HAVE_MAIL=
 fi
-echo HAVE_MAIL=$HAVE_MAIL
 rm /tmp/mailtest.$$
 
 # archive repo sizes
@@ -2199,7 +2191,7 @@ if [[ "$DEBUG_ONLY" == "" ]] && [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" 
         rm -rf $MANUAL_DIR
         cp -r $fdsrepo/Manuals $MANUAL_DIR
 
-        cp $FDS_LATESTAPPS_DIR/FDS_REVISION $SAVEGUIDE_DIR/FDS_REVISION
+        cp $LATESTAPPS_DIR/FDS_REVISION $SAVEGUIDE_DIR/FDS_REVISION
         copy_fds_user_guide
         copy_fds_verification_guide
         copy_fds_technical_guide
@@ -2213,11 +2205,8 @@ fi
 # archive apps
 get_firebot_success
 if [[ "$firebot_success" == "1" ]] ; then
-  rm -f $FDS_APPS_DIR/*
-  cp $FDS_LATESTAPPS_DIR/* $FDS_APPS_DIR/.
-
-  rm -f $SMV_APPS_DIR/*
-  cp $SMV_LATESTAPPS_DIR/* $SMV_APPS_DIR/.
+  rm -f $APPS_DIR/*
+  cp $LATESTAPPS_DIR/* $APPS_DIR/.
 fi
 
 ### Wrap up and report results ###

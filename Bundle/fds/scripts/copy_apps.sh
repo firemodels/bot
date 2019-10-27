@@ -30,7 +30,7 @@ CP ()
 
 return_code=0
 
-dir_to=$HOME/.bundle/$app_type
+dir_to=$HOME/.bundle/apps
 
 mkdir -p $dir_to
 

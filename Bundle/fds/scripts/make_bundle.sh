@@ -171,19 +171,20 @@ if [ "$showparms" == "" ]; then
   ./copy_pubs.sh fds $fds_pub_home/.firebot/pubs  $pub_host
   ./copy_pubs.sh smv $smv_pub_home/.smokebot/pubs $pub_host
 
+  rm $HOME/.bundle/apps/*
   ./copy_apps.sh fds $app_home/.firebot/fds       $app_host
   ./copy_apps.sh smv $app_home/.firebot/smv       $app_host
 fi
 
 # get fds and smv repo revision used to build apps
 
-if [ -e $HOME/.bundle/fds/FDS_REVISION ]; then
-  FDSREV=`cat $HOME/.bundle/fds/FDS_REVISION`
+if [ -e $HOME/.bundle/apps/FDS_REVISION ]; then
+  FDSREV=`cat $HOME/.bundle/apps/FDS_REVISION`
 else
   FDSREV=fdstest
 fi
-if [ -e $HOME/.bundle/smv/SMV_REVISION ]; then
-  SMVREV=`cat $HOME/.bundle/smv/SMV_REVISION`
+if [ -e $HOME/.bundle/apps/SMV_REVISION ]; then
+  SMVREV=`cat $HOME/.bundle/apps/SMV_REVISION`
 else
   SMVREV=smvtest
 fi
