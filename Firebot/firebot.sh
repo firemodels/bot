@@ -270,7 +270,12 @@ get_smv_revision()
 
    git update-index --refresh
    SMV_REVISION=`git describe --long --dirty`
-   echo $SMV_REVISION > $LATESTAPPS_DIR/SMV_REVISION
+   subrev=`git describe --abbrev | awk -F '-' '{print $2}'`
+   if [ "$subrev" == "" ]; then
+     git describe --abbrev | awk -F '-' '{print $1"-0"}' > $LATESTAPPS_DIR/SMV_REVISION
+   else
+     git describe --abbrev | awk -F '-' '{print $1"-"$2}' > $LATESTAPPS_DIR/SMV_REVISION
+   fi
    SMV_MESSAGE=`git log . | head -5 | tail -1`
    return 0
 }
@@ -288,7 +293,12 @@ get_fds_revision()
 
    git update-index --refresh
    FDS_REVISION=`git describe --long --dirty`
-   echo $FDS_REVISION > $LATESTAPPS_DIR/FDS_REVISION
+   subrev=`git describe --abbrev | awk -F '-' '{print $2}'`
+   if [ "$subrev" == "" ]; then
+     git describe --abbrev | awk -F '-' '{print $1"-0"}' > $LATESTAPPS_DIR/FDS_REVISION
+   else
+     git describe --abbrev | awk -F '-' '{print $1"-"$2}' > $LATESTAPPS_DIR/FDS_REVISION
+   fi
    FDS_SHORTHASH=`git rev-parse --short HEAD`
    FDS_LONGHASH=`git rev-parse HEAD`
    FDS_DATE=`git log -1 --format=%cd --date=local $FDS_SHORTHASH`
