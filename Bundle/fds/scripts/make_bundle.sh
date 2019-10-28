@@ -37,6 +37,7 @@ echo "Options:"
 echo "-a - host containing apps [default: $app_host]"
 echo "-B - build apps - this script builds apps by running"
 echo "     firebot with the -B option"
+echo "-c - use apps and pubs previously copied to $HOME/.bundle/apps and $HOME/.bundle/pubs"
 echo "-d - directory where created bundle is put [default: $bundle_dir]"
 echo "-f - home directory containing apps [default: $app_home]"
 echo "-F - home directory containing FDS pubs [default: $fds_pub_home]"
@@ -71,8 +72,10 @@ showparms=
 ECHO=
 BUILD_APPS=
 bundle_dir=$HOME/.bundle/bundles
+USE_CACHE=
+OVERWRITE=
 
-while getopts 'Bd:f:F:hp:S:uUv' OPTION
+while getopts 'Bcd:f:F:hp:S:uUvw' OPTION
 do
 case $OPTION  in
   B)
@@ -81,6 +84,14 @@ case $OPTION  in
    ;;
   d)
    bundle_dir=$HOME
+   ;;
+  c)
+   USE_CACHE=1
+   BUILD_APPS=
+   app_home=$HOME
+   pub_host=`hostname`
+   fds_pub_home=$HOME
+   smv_pub_home=$HOME
    ;;
   f)
    app_home=$OPTARG
@@ -108,6 +119,9 @@ case $OPTION  in
   v)
    showparms=1
    ECHO=echo
+   ;;
+  w)
+   OVERWRITE=1
    ;;
 esac
 done
@@ -141,14 +155,26 @@ if [ "$showparms" == "1" ]; then
   else
     hostlabel="on this computer"
   fi
-  echo " fds/smv app directory: $app_home/.firebot/apps $hostlabel"
+  if [ "$USE_CACHE" == "1" ]; then
+    APPDIR=.bundle
+    FDS_PUBDIR=.bundle
+    SMV_PUBDIR=.bundle
+  else
+    APPDIR=.firebot
+    FDS_PUBDIR=.firebot
+    SMV_PUBDIR=.smokebot
+  fi
+  echo " fds/smv app directory: $app_home/$APPDIR/apps $hostlabel"
+  hostlabel="on this computer"
   if [ "$pub_host" != `hostname` ]; then
     hostlabel="on $pub_host"
-  else
-    hostlabel="on this computer"
   fi
-  echo "     fds pub directory: $fds_pub_home/.firebot/pubs $hostlabel"
-  echo "     smv pub directory: $smv_pub_home/.smokebot/pubs $hostlabel"
+  if [ "$USE_CACHE" == "1" ]; then
+    echo " fds/smv pub directory: $fds_pub_home/$FDS_PUBDIR/pubs $hostlabel"
+  else
+    echo "     fds pub directory: $fds_pub_home/$FDS_PUBDIR/pubs $hostlabel"
+    echo "     smv pub directory: $smv_pub_home/$SMV_PUBDIR/pubs $hostlabel"
+  fi
   echo ""
 fi
 
@@ -167,8 +193,10 @@ fi
 fi
 
 return_code=0
+if [ "$USE_CACHE" == "" ]; then
 if [ "$showparms" == "" ]; then
   error_log=/tmp/error_log.$$
+  rm $HOME/.bundle/pubs/*
   ./copy_pubs.sh fds $fds_pub_home/.firebot/pubs  $pub_host $error_log || return_code=1
   ./copy_pubs.sh smv $smv_pub_home/.smokebot/pubs $pub_host $error_log || return_code=1
 
@@ -184,6 +212,7 @@ if [ "$showparms" == "" ]; then
     exit 1
   fi
 fi
+fi
 
 # get fds and smv repo revision used to build apps
 
@@ -197,6 +226,17 @@ if [ -e $HOME/.bundle/apps/SMV_REVISION ]; then
 else
   SMVREV=smvtest
 fi
+installer_base=${FDSREV}_${SMVREV}_$platform
+if [ "$showparms" == "" ]; then
+if [ "$OVERWRITE" == "" ]; then
+  installer_file=$bundle_dir/${installer_base}.sh
+  if [ -e $installer_file ]; then
+    echo "***error: the installer file $installer_file exists."
+    echo "          Use the -w option to overwrite it."
+    exit
+  fi
+fi
+fi
 
 if [ "$ECHO" != "" ]; then
   echo " Bundle command"
@@ -205,7 +245,6 @@ fi
 cd $DIR
 $ECHO ./bundle_generic.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version $bundle_dir
 if [ "$ECHO" == "" ]; then
-  installer_base=${FDSREV}-${SMVREV}_$platform
   rm -f $bundle_dir/${installer_base}.tar.gz
   rm -rf $bundle_dir/${installer_base}
 fi
