@@ -1840,7 +1840,7 @@ check_update_repo
 
 # copy smv revision and hash to the latest pubs and apps directory
 cd $smvrepo
-git describe --abbrev | awk -F '-' '{print $1"-"$2}' > $SMV_LATESTAPPS_DIR/SMV_REVISION
+git describe --dirty > $SMV_LATESTAPPS_DIR/SMV_REVISION
 cp $SMV_LATESTAPPS_DIR/SMV_REVISION $GUIDE_DIR_LATEST/SMV_REVISION
 
 PRELIM_end=`GET_TIME`
