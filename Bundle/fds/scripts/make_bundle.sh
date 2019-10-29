@@ -15,20 +15,29 @@ mpi_version_osx=3.1.2
 #---------------------------------------------
 
 function usage {
-echo "This script builds a bundle using apps built by firebot, FDS pubs built by firebot,"
-echo "Smokeview pubs built by smokebot and other files found in the fds, smv and bot repos."
+echo "This script builds a bundle using apps built by firebot,"
+echo "FDS pubs built by firebot, Smokeview pubs built by smokebot"
+echo "and other files found in the fds, smv and bot repos."
 echo ""
 echo "Example usage:"
-echo "1. apps built by firebot and pubs built by firebot/smokebot on the"
-echo "   computer running this script. This is how NIST builds Linux bundles"
+echo "1. apps built by firebot and FDS/Smokeview pubs built by"
+echo "   firebot/smokebot on the computer runneng this script."
+echo "   This is how NIST build Linux bundles"
+echo ""
 echo "./make_bundle.sh "
 echo ""
-echo "2. apps built by firebot on this computer, pubs built by firebot/smokebot on the computer xxx.yyy.zzz"
-echo "   This is how NIST builds OSX bundles."
+echo "2. apps built by firebot on this computer, pubs built by"
+echo "   firebot/smokebot on the computer xxx.yyy.zzz. This is how"
+echo "   NIST builds OSX bundles where 'this computer' is an OSX"
+echo "   computer and xxx.yyy.zzz is a Linux computer that ran firebot."
+echo ""
 echo "./make_bundle.sh -u -p xxx.yyy.zzz"
 echo ""
-echo "The -v option may be used to show the parameters used to build the bundle"
-echo "The following environment variables may be used to set the host names used to build apps and pubs"
+echo "The -v option may be used to show the parameters used to"
+echo "build the bundle."
+echo ""
+echo "The following environment variables may be used to set the"
+echo "host names used to build apps and pubs."
 echo ""
 echo "APP_HOST - host where apps are located"
 echo "PBS_HOST - host where pubs are located"
@@ -37,8 +46,9 @@ echo "Options:"
 echo "-a - host containing apps [default: $app_host]"
 echo "-B - build apps - this script builds apps by running"
 echo "     firebot with the -B option"
-echo "-c - use apps and pubs previously copied to $HOME/.bundle/apps and $HOME/.bundle/pubs"
-echo "-d - directory where created bundle is put [default: $bundle_dir]"
+echo "-c - use apps and pubs previously copied to $HOME/.bundle/apps"
+echo "     and $HOME/.bundle/pubs"
+echo "-d - bundle directory location: $bundle_dir]"
 echo "-f - home directory containing apps [default: $app_home]"
 echo "-F - home directory containing FDS pubs [default: $fds_pub_home]"
 echo "-S - home directory containing Smokeview pubs [default: $smv_pub_home]"
@@ -47,7 +57,7 @@ echo "-p - host containing pubs [default: $pub_host]"
 echo "-u - use apps built by firebot in the `whoami` account"
 echo "-U - use apps built by firebot and pubs built firebot and smokebot"
 echo "     both in the `whoami` account"
-echo "-v - show parameters used to build bundle (the bundle not generated)"
+echo "-v - show parameters used to build bundle (the bundle is not generated)"
 exit
 }
 
@@ -239,8 +249,8 @@ fi
 fi
 
 if [ "$ECHO" != "" ]; then
-  echo " Bundle command"
-  echo " --------------"
+  echo " Bundle generating command"
+  echo " -------------------------"
 fi
 cd $DIR
 $ECHO ./bundle_generic.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version $bundle_dir
