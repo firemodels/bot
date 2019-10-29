@@ -66,17 +66,15 @@ TODIR=$HOME/.bundle
 # copy smokeview files
 
 if [ "$type" == "smv" ]; then
-  MKDIR $TODIR/smv
-  rm -f $TODIR/smv/*
   echo
   echo ***copying smokeview  apps
-  CP $smvrepo/Build/background/intel$OS background$OS $TODIR/smv background
-  CP $smvrepo/Build/dem2fds/intel$OS    dem2fds$OS    $TODIR/smv dem2fds
-  CP $smvrepo/Build/hashfile/intel$OS   hashfile$OS   $TODIR/smv hashfile
-  CP $smvrepo/Build/smokediff/intel$OS  smokediff$OS  $TODIR/smv smokediff
-  CP $smvrepo/Build/smokeview/intel$OS  smokeview$OS  $TODIR/smv smokeview
-  CP $smvrepo/Build/smokezip/intel$OS   smokezip$OS   $TODIR/smv smokezip
-  CP $smvrepo/Build/wind2fds/intel$OS   wind2fds$OS   $TODIR/smv wind2fds
+  CP $smvrepo/Build/background/intel$OS background$OS $TODIR/apps background
+  CP $smvrepo/Build/dem2fds/intel$OS    dem2fds$OS    $TODIR/apps dem2fds
+  CP $smvrepo/Build/hashfile/intel$OS   hashfile$OS   $TODIR/apps hashfile
+  CP $smvrepo/Build/smokediff/intel$OS  smokediff$OS  $TODIR/apps smokediff
+  CP $smvrepo/Build/smokeview/intel$OS  smokeview$OS  $TODIR/apps smokeview
+  CP $smvrepo/Build/smokezip/intel$OS   smokezip$OS   $TODIR/apps smokezip
+  CP $smvrepo/Build/wind2fds/intel$OS   wind2fds$OS   $TODIR/apps wind2fds
 fi
 
 # copy fds files
@@ -84,9 +82,7 @@ fi
 if [ "$type" == "fds" ]; then
   echo
   echo ***copying fds apps
-  MKDIR $TODIR/fds
-  rm -f $TODIR/fds/*
-  CP $fdsrepo/Build/${MPI}_intel$OS               fds_${MPI}_intel$OS $TODIR/fds fds
-  CP $fdsrepo/Utilities/fds2ascii/intel$OS        fds2ascii$OS        $TODIR/fds fds2ascii
-  CP $fdsrepo/Utilities/test_mpi/${MPI}_intel$OS2 test_mpi            $TODIR/fds test_mpi
+  CP $fdsrepo/Build/${MPI}_intel$OS               fds_${MPI}_intel$OS $TODIR/apps fds
+  CP $fdsrepo/Utilities/fds2ascii/intel$OS        fds2ascii$OS        $TODIR/apps fds2ascii
+  CP $fdsrepo/Utilities/test_mpi/${MPI}_intel$OS2 test_mpi            $TODIR/apps test_mpi
 fi

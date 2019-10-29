@@ -37,7 +37,6 @@ if "x%bot_host%" == "x" goto else1
   echo copying %file% from %pdf_from% to %pdf_to%
   copy %pdf_from%\%file% %pdf_to%
 :endif1
-
 exit /b
 
 :eof

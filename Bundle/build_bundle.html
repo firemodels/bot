@@ -13,27 +13,27 @@ function get_fullpath(command,platform){
   return fullpath;
 }
 function run_script(script){
-  MyObject.Run(get_fullpath("../../bot/Bundle/fds/scripts/webRUN_script.bat ",script));
+  MyObject.Run(get_fullpath("fds/scripts/webRUN_script.bat ",script));
 }
 function bundle_fdssmv(platform){
-  MyObject.Run(get_fullpath("../../bot/Bundle/fds/scripts/webBUNDLEfdssmv.bat ",platform));
+  MyObject.Run(get_fullpath("fds/scripts/webBUNDLEfdssmv.bat ",platform));
 }
 function install_fdssmv(platform){
-  MyObject.Run(get_fullpath("../../bot/Bundle/fds/scripts/webINSTALLfdssmv.bat ",platform));
+  MyObject.Run(get_fullpath("fds/scripts/webINSTALLfdssmv.bat ",platform));
 }
 function copy_fdsapps(platform){
-  MyObject.Run(get_fullpath("../../bot/Bundle/fds/scripts/webCopyFDSApps.bat ",platform));
+  MyObject.Run(get_fullpath("fds/scripts/webCopyFDSApps.bat ",platform));
 }
 function copy_smvapps(platform){
-  MyObject.Run(get_fullpath("../../bot/Bundle/fds/scripts/webCopySMVApps.bat ",platform));
+  MyObject.Run(get_fullpath("fds/scripts/webCopySMVApps.bat ",platform));
 }
 </script>
 </HEAD>
 <BODY BGCOLOR="#FFFFFF" >
 <font size=5>Bundle</font> -
-<a href="../../fds/Build/build_fds.html"><font size=5>FDS</font></a> - 
-<a href="../../smv/Build/build_smokeview.html"><font size=5>Smokeview</font></a> - 
-<a href="../../smv/Build/build_guides.html"><font size=5>Guides</font></a>
+<a href="build_fds.html"><font size=5>FDS</font></a> - 
+<a href="build_smokeview.html"><font size=5>Smokeview</font></a> - 
+<a href="build_guides.html"><font size=5>Guides</font></a>
 <hr>
 
 
@@ -83,7 +83,7 @@ function copy_smvapps(platform){
 
 <h3>Other</h3>
 <ul>
-<li><button onclick="run_script('\\bot\\Bundle\\fds\\scripts\\webEDIT_bundle.bat')">Edit this page</button>
+<li><button onclick="run_script('\\bot\\Scripts\\webEDIT_bundle.bat')">Edit this page</button>
 <li><a href="../../smv/Build/getting_started.html">FDS/Smokeview build page checklist</a>
 </ul>
 

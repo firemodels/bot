@@ -15,52 +15,93 @@ mpi_version_osx=3.1.2
 #---------------------------------------------
 
 function usage {
-echo "Script used to build a bundle from the current revision of the fds and"
-echo "smv repos. By default, this script uses apps built by the firebot account"
-echo "and pubs built by the firebot and smokebot accounts on this computer."
+echo "This script builds a bundle using apps built by firebot,"
+echo "FDS pubs built by firebot, Smokeview pubs built by smokebot"
+echo "and other files found in the fds, smv and bot repos."
 echo ""
-echo "example usage:"
-echo "1. firebot and smokebot accounts on this computer for pubs and apps"
+echo "Example usage:"
+echo "1. apps built by firebot and FDS/Smokeview pubs built by"
+echo "   firebot/smokebot on the computer runneng this script."
+echo "   This is how NIST build Linux bundles"
+echo ""
 echo "./make_bundle.sh "
 echo ""
-echo "2. remote firebot and smokebot accounts (say xxx.yyy.zzz) for pubs"
-echo "   and user firebot account for apps"
+echo "2. apps built by firebot on this computer, pubs built by"
+echo "   firebot/smokebot on the computer xxx.yyy.zzz. This is how"
+echo "   NIST builds OSX bundles where 'this computer' is an OSX"
+echo "   computer and xxx.yyy.zzz is a Linux computer that ran firebot."
+echo ""
 echo "./make_bundle.sh -u -p xxx.yyy.zzz"
 echo ""
-echo "Environment variable:"
-echo "PBS_HOME - host used to build pubs"
+echo "The -v option may be used to show the parameters used to"
+echo "build the bundle."
+echo ""
+echo "The following environment variables may be used to set the"
+echo "host names used to build apps and pubs."
+echo ""
+echo "APP_HOST - host where apps are located"
+echo "PBS_HOST - host where pubs are located"
 echo ""
 echo "Options:"
-echo "-B - build apps - this script runs firebot with the -B option"
+echo "-a - host containing apps [default: $app_host]"
+echo "-B - build apps - this script builds apps by running"
+echo "     firebot with the -B option"
+echo "-c - use apps and pubs previously copied to $HOME/.bundle/apps"
+echo "     and $HOME/.bundle/pubs"
+echo "-d - bundle directory location: $bundle_dir]"
 echo "-f - home directory containing apps [default: $app_home]"
-echo "-F - home directory containing fds pubs [default: $fds_pub_home]"
-echo "-S - home directory containing smokeview pubs [default: $smv_pub_home]"
+echo "-F - home directory containing FDS pubs [default: $fds_pub_home]"
+echo "-S - home directory containing Smokeview pubs [default: $smv_pub_home]"
 echo "-h - display this message"
 echo "-p - host containing pubs [default: $pub_host]"
 echo "-u - use apps built by firebot in the `whoami` account"
-echo "-U - use apps built by firebot and pubs built by firebot"
-echo "     and smokebot in the `whoami` account"
-echo "-v - show parameters used to build bundle (bundle not generated)"
+echo "-U - use apps built by firebot and pubs built firebot and smokebot"
+echo "     both in the `whoami` account"
+echo "-v - show parameters used to build bundle (the bundle is not generated)"
 exit
 }
 
+#define default home directories for apps and pubs
 app_home=\~firebot
 fds_pub_home=\~firebot
 smv_pub_home=\~smokebot
+
+# define default host where pubs are found
 pub_host=`hostname`
 if [ "$PUB_HOST" != "" ]; then
   pub_host=$PUB_HOST
 fi
+
+# define default host where apps are found
+app_host=`hostname`
+if [ "$APP_HOST" != "" ]; then
+  app_host=$APP_HOST
+fi
+
 showparms=
 ECHO=
 BUILD_APPS=
+bundle_dir=$HOME/.bundle/bundles
+USE_CACHE=
+OVERWRITE=
 
-while getopts 'Bf:F:hp:S:uUv' OPTION
+while getopts 'Bcd:f:F:hp:S:uUvw' OPTION
 do
 case $OPTION  in
   B)
    BUILD_APPS=1
    app_home=$HOME
+   ;;
+  d)
+   bundle_dir=$HOME
+   ;;
+  c)
+   USE_CACHE=1
+   BUILD_APPS=
+   app_home=$HOME
+   pub_host=`hostname`
+   fds_pub_home=$HOME
+   smv_pub_home=$HOME
    ;;
   f)
    app_home=$OPTARG
@@ -89,6 +130,9 @@ case $OPTION  in
    showparms=1
    ECHO=echo
    ;;
+  w)
+   OVERWRITE=1
+   ;;
 esac
 done
 shift $(($OPTIND-1))
@@ -98,9 +142,11 @@ shift $(($OPTIND-1))
 if [ "`uname`" == "Darwin" ]; then
   intel_mpi_version=$intel_mpi_version_osx
   mpi_version=$mpi_version_osx
+  platform=osx64
 else
   intel_mpi_version=$intel_mpi_version_linux
   mpi_version=$mpi_version_linux
+  platform=linux64
 fi
 
 if [ "$showparms" == "1" ]; then
@@ -108,23 +154,37 @@ if [ "$showparms" == "1" ]; then
   echo " Parameters"
   echo " ----------"
   if [ "$BUILD_APPS" == "1" ]; then
-    echo "    build apps: yes"
+    echo "            build apps: yes"
   else
-    echo "    build apps: no"
+    echo "            build apps: no"
   fi
-  echo "   MPI version: $mpi_version"
-  echo " Intel version: $intel_mpi_version"
-  echo ""
-  echo " Home directories"
-  echo " ----------------"
-  echo " fds/smv apps: $app_home"
+  echo "           MPI version: $mpi_version"
+  echo "         Intel version: $intel_mpi_version"
+  if [ "$app_host" != `hostname` ]; then
+    hostlabel="on $app_host"
+  else
+    hostlabel="on this computer"
+  fi
+  if [ "$USE_CACHE" == "1" ]; then
+    APPDIR=.bundle
+    FDS_PUBDIR=.bundle
+    SMV_PUBDIR=.bundle
+  else
+    APPDIR=.firebot
+    FDS_PUBDIR=.firebot
+    SMV_PUBDIR=.smokebot
+  fi
+  echo " fds/smv app directory: $app_home/$APPDIR/apps $hostlabel"
+  hostlabel="on this computer"
   if [ "$pub_host" != `hostname` ]; then
-    hostlabel="host: $pub_host"
-  else
-    hostlabel=
+    hostlabel="on $pub_host"
   fi
-  echo "     fds pubs: $fds_pub_home $hostlabel"
-  echo "     smv pubs: $smv_pub_home $hostlabel"
+  if [ "$USE_CACHE" == "1" ]; then
+    echo " fds/smv pub directory: $fds_pub_home/$FDS_PUBDIR/pubs $hostlabel"
+  else
+    echo "     fds pub directory: $fds_pub_home/$FDS_PUBDIR/pubs $hostlabel"
+    echo "     smv pub directory: $smv_pub_home/$SMV_PUBDIR/pubs $hostlabel"
+  fi
   echo ""
 fi
 
@@ -142,39 +202,59 @@ if [ "$BUILD_APPS" == "1" ]; then
 fi
 fi
 
+return_code=0
+if [ "$USE_CACHE" == "" ]; then
 if [ "$showparms" == "" ]; then
-  ./copy_pubs.sh fds $fds_pub_home/.firebot/pubs  $pub_host
-  ./copy_pubs.sh smv $smv_pub_home/.smokebot/pubs $pub_host
+  error_log=/tmp/error_log.$$
+  rm $HOME/.bundle/pubs/*
+  ./copy_pubs.sh fds $fds_pub_home/.firebot/pubs  $pub_host $error_log || return_code=1
+  ./copy_pubs.sh smv $smv_pub_home/.smokebot/pubs $pub_host $error_log || return_code=1
 
-  ./copy_apps.sh fds $app_home/.firebot/fds
-  ./copy_apps.sh smv $app_home/.firebot/smv 
+  rm $HOME/.bundle/apps/*
+  ./copy_apps.sh fds $app_home/.firebot/apps      $app_host $error_log || return_code=1
+  ./copy_apps.sh smv $app_home/.firebot/apps      $app_host $error_log || return_code=1
+ 
+  if [ "$return_code" == "1" ]; then
+    cat $error_log
+    echo ""
+    echo "bundle generation aborted"
+    rm $error_log
+    exit 1
+  fi
+fi
 fi
 
-# get fds repo revision
-cd $DIR
-fdsrepo=../../../../fds
-cd $fdsrepo
-SUBREV=`git describe --abbrev | awk -F '-' '{print $2}'`
-if [ "$SUBREV" == "" ]; then
-  FDSREV=`git describe --abbrev | awk -F '-' '{print $1"-0"}'`
+# get fds and smv repo revision used to build apps
+
+if [ -e $HOME/.bundle/apps/FDS_REVISION ]; then
+  FDSREV=`cat $HOME/.bundle/apps/FDS_REVISION`
 else
-  FDSREV=`git describe --abbrev | awk -F '-' '{print $1"-"$2}'`
+  FDSREV=fdstest
 fi
-
-# get smv repo revision
-cd $DIR
-smvrepo=../../../../smv
-cd $smvrepo
-SUBREV=`git describe --abbrev | awk -F '-' '{print $2}'`
-if [ "$SUBREV" == "" ]; then
-  SMVREV=`git describe --abbrev | awk -F '-' '{print $1"-0"}'`
+if [ -e $HOME/.bundle/apps/SMV_REVISION ]; then
+  SMVREV=`cat $HOME/.bundle/apps/SMV_REVISION`
 else
-  SMVREV=`git describe --abbrev | awk -F '-' '{print $1"-"$2}'`
+  SMVREV=smvtest
+fi
+installer_base=${FDSREV}_${SMVREV}_$platform
+if [ "$showparms" == "" ]; then
+if [ "$OVERWRITE" == "" ]; then
+  installer_file=$bundle_dir/${installer_base}.sh
+  if [ -e $installer_file ]; then
+    echo "***error: the installer file $installer_file exists."
+    echo "          Use the -w option to overwrite it."
+    exit
+  fi
+fi
 fi
 
-cd $DIR
 if [ "$ECHO" != "" ]; then
-  echo " Bundle command"
-  echo " --------------"
+  echo " Bundle generating command"
+  echo " -------------------------"
 fi
-$ECHO ./bundle_generic.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version
+cd $DIR
+$ECHO ./bundle_generic.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version $bundle_dir
+if [ "$ECHO" == "" ]; then
+  rm -f $bundle_dir/${installer_base}.tar.gz
+  rm -rf $bundle_dir/${installer_base}
+fi
