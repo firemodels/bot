@@ -51,6 +51,7 @@ echo "     and $HOME/.bundle/pubs"
 echo "-d - bundle directory location: $bundle_dir]"
 echo "-f - home directory containing apps [default: $app_home]"
 echo "-F - home directory containing FDS pubs [default: $fds_pub_home]"
+echo "-g - upload installer file to google drive"
 echo "-S - home directory containing Smokeview pubs [default: $smv_pub_home]"
 echo "-h - display this message"
 echo "-p - host containing pubs [default: $pub_host]"
@@ -84,8 +85,9 @@ BUILD_APPS=
 bundle_dir=$HOME/.bundle/bundles
 USE_CACHE=
 OVERWRITE=
+UPLOAD_GOOGLE=
 
-while getopts 'Bcd:f:F:hp:S:uUvw' OPTION
+while getopts 'Bcd:f:F:ghp:S:uUvw' OPTION
 do
 case $OPTION  in
   B)
@@ -108,6 +110,9 @@ case $OPTION  in
    ;;
   F)
    fds_pub_home=$OPTARG
+   ;;
+  g)
+   UPLOAD_GOOGLE=1
    ;;
   h)
    usage;
@@ -248,12 +253,18 @@ if [ "$OVERWRITE" == "" ]; then
 fi
 fi
 
-if [ "$ECHO" != "" ]; then
-  echo " Bundle generating command"
-  echo " -------------------------"
-fi
 cd $DIR
-$ECHO ./bundle_generic.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version $bundle_dir
+if [ "$showparms" == "" ]; then
+  $ECHO ./bundle_generic.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version $bundle_dir
+  if [ "$UPLOAD_GOOGLE" == "1" ]; then
+    if [ -e $HOME/.bundle/$GOOGLE_DIR_ID ]; then
+      ./upload $bundle_dir $installer_base
+    else
+      echo "***warning: file $HOME/.bundle/GOOGLE_DIR_ID containing id of google drive"
+      echo "            upload directdory does not exist"
+    fi
+  fi
+fi
 if [ "$ECHO" == "" ]; then
   rm -f $bundle_dir/${installer_base}.tar.gz
   rm -rf $bundle_dir/${installer_base}
