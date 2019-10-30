@@ -7,6 +7,13 @@ GDRIVE=~/bin/gdrive
 #  the following string is gound at the end of the URL of the nightly_bundles
 #  directory on Google Drive
 BUNDLE_PARENT_ID=1X-gRYGPGtcewgnNiNBuho3U8zDFVqFsC
+if [ -e $HOME/.bundle/GOOGLE_DIR_ID ]; then
+  BUNDLE_PARENT_ID=`cat $HOME/.bundle/GOOGLE_DIR_ID`
+else
+  echo "***error: the file $HOME/.bundle/GOOGLE_DIR_ID containing"
+  echo "          the ID of the google drive upload directory does not exit"
+  exit
+fi
 
 UPLOAD_BUNDLE ()
 {
