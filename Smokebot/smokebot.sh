@@ -1840,13 +1840,17 @@ check_update_repo
 
 # copy smv revision and hash to the latest pubs and apps directory
 cd $smvrepo
+
 subrev=`git describe --abbrev | awk -F '-' '{print $2}'`
 if [ "$subrev" == "" ]; then
   git describe --abbrev | awk -F '-' '{print $1"-0"}' > $SMV_LATESTAPPS_DIR/SMV_REVISION
 else
   git describe --abbrev | awk -F '-' '{print $1"-"$2}' > $SMV_LATESTAPPS_DIR/SMV_REVISION
 fi
+git rev-parse --short HEAD > $SMV_LATESTAPPS_DIR/SMV_HASH
+
 cp $SMV_LATESTAPPS_DIR/SMV_REVISION $GUIDE_DIR_LATEST/SMV_REVISION
+cp $SMV_LATESTAPPS_DIR/SMV_HASH $GUIDE_DIR_LATEST/SMV_HASH
 
 PRELIM_end=`GET_TIME`
 DIFF_PRELIM=`GET_DURATION $PRELIM_beg $PRELIM_end`

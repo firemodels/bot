@@ -276,6 +276,8 @@ get_smv_revision()
    else
      git describe --abbrev | awk -F '-' '{print $1"-"$2}' > $LATESTAPPS_DIR/SMV_REVISION
    fi
+   SMV_SHORTHASH=`git rev-parse --short HEAD`
+   echo $SMV_SHORTHASH > $LATESTAPPS_DIR/SMV_HASH
    SMV_MESSAGE=`git log . | head -5 | tail -1`
    return 0
 }
@@ -300,6 +302,7 @@ get_fds_revision()
      git describe --abbrev | awk -F '-' '{print $1"-"$2}' > $LATESTAPPS_DIR/FDS_REVISION
    fi
    FDS_SHORTHASH=`git rev-parse --short HEAD`
+   echo $FDS_SHORTHASH > $LATESTAPPS_DIR/FDS_HASH
    FDS_LONGHASH=`git rev-parse HEAD`
    FDS_DATE=`git log -1 --format=%cd --date=local $FDS_SHORTHASH`
    FDS_MESSAGE=`git log . | head -5 | tail -1`
