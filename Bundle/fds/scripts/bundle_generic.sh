@@ -39,10 +39,16 @@ cd $scriptdir/../../../..
 REPO_ROOT=`pwd`
 cd $curdir
 
-# upload directory
+# create upload directory if it doesn't exist
 
 if [ ! -e $UPLOAD_DIR ]; then
   mkdir $UPLOAD_DIR
+fi
+
+# create apps directory if it doesn't exist
+
+if [ ! -e $APPS_DIR ]; then
+  mkdir $APPS_DIR
 fi
 
 # this script is called by make_bundle.sh located in bot/Bundle/fds/linux or osx
