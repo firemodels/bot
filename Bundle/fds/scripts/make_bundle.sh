@@ -60,6 +60,7 @@ echo "-u - use apps built by firebot in the `whoami` account"
 echo "-U - use apps built by firebot and pubs built firebot and smokebot"
 echo "     both in the `whoami` account"
 echo "-v - show parameters used to build bundle (the bundle is not generated)"
+echo "-w - overwrite bundle (it it already exists)"
 exit
 }
 
@@ -87,6 +88,7 @@ bundle_dir=$HOME/.bundle/bundles
 USE_CACHE=
 OVERWRITE=
 UPLOAD_GOOGLE=
+GOOGLE_DIR_ID_FILE=$HOME/.bundle/GOOGLE_DIR_ID
 
 while getopts 'Bcd:f:F:ghp:S:uUvw' OPTION
 do
@@ -160,12 +162,12 @@ if [ "$showparms" == "1" ]; then
   echo " Parameters"
   echo " ----------"
   if [ "$BUILD_APPS" == "1" ]; then
-    echo "            build apps: yes"
+    echo "               build apps: yes"
   else
-    echo "            build apps: no"
+    echo "               build apps: no"
   fi
-  echo "           MPI version: $mpi_version"
-  echo "         Intel version: $intel_mpi_version"
+  echo "              MPI version: $mpi_version"
+  echo "            Intel version: $intel_mpi_version"
   if [ "$app_host" != `hostname` ]; then
     hostlabel="on $app_host"
   else
@@ -180,19 +182,32 @@ if [ "$showparms" == "1" ]; then
     FDS_PUBDIR=.firebot
     SMV_PUBDIR=.smokebot
   fi
-  echo " fds/smv app directory: $app_home/$APPDIR/apps $hostlabel"
+  echo "    fds/smv app directory: $app_home/$APPDIR/apps $hostlabel"
   hostlabel="on this computer"
   if [ "$pub_host" != `hostname` ]; then
     hostlabel="on $pub_host"
   fi
   if [ "$USE_CACHE" == "1" ]; then
-    echo " fds/smv pub directory: $fds_pub_home/$FDS_PUBDIR/pubs $hostlabel"
+    echo "    fds/smv pub directory: $fds_pub_home/$FDS_PUBDIR/pubs $hostlabel"
   else
-    echo "     fds pub directory: $fds_pub_home/$FDS_PUBDIR/pubs $hostlabel"
-    echo "     smv pub directory: $smv_pub_home/$SMV_PUBDIR/pubs $hostlabel"
+    echo "        fds pub directory: $fds_pub_home/$FDS_PUBDIR/pubs $hostlabel"
+    echo "        smv pub directory: $smv_pub_home/$SMV_PUBDIR/pubs $hostlabel"
   fi
-    echo "      bundle directory: $bundle_dir"
+    echo "         bundle directory: $bundle_dir"
+  if [ "$UPLOAD_GOOGLE" == "1" ]; then
+    if [ -e $GOOGLE_DIR_ID_FILE ]; then
+    echo "Google Drive directory ID: `cat $GOOGLE_DIR_ID_FILE`"
+    else
+    echo "***warning: Google Drive directory ID file, $GOOGLE_DIR_ID_FILE, does not exist"
+    fi
+  fi
+    if [ "$OVERWRITE" == "1" ]; then
+      echo "         overwrite bundle: yes"
+    else
+      echo "         overwrite bundle: no"
+    fi
   echo ""
+GOOGLE_DIR_ID_FILE=$HOME/.bundle/GOOGLE_DIR_ID
 fi
 
 export NOPAUSE=1
@@ -243,10 +258,11 @@ if [ -e $HOME/.bundle/apps/SMV_REVISION ]; then
 else
   SMVREV=smvtest
 fi
-installer_base=${FDSREV}_${SMVREV}_$platform
+installer_base=${FDSREV}_${SMVREV}
+installer_base_platform=${FDSREV}_${SMVREV}_$platform
 if [ "$showparms" == "" ]; then
 if [ "$OVERWRITE" == "" ]; then
-  installer_file=$bundle_dir/${installer_base}.sh
+  installer_file=$bundle_dir/${installer_base_platform}.sh
   if [ -e $installer_file ]; then
     echo "***error: the installer file $installer_file exists."
     echo "          Use the -w option to overwrite it."
@@ -260,7 +276,7 @@ if [ "$showparms" == "" ]; then
   $ECHO ./bundle_generic.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version $bundle_dir
   if [ "$UPLOAD_GOOGLE" == "1" ]; then
     if [ -e $HOME/.bundle/$GOOGLE_DIR_ID ]; then
-      ./upload_bundle.sh $bundle_dir $installer_base $platform
+      ./upload_bundle.sh $bundle_dir $installer_base $platform 
     else
       echo "***warning: file $HOME/.bundle/GOOGLE_DIR_ID containing id of google drive"
       echo "            upload directdory does not exist"
@@ -268,6 +284,6 @@ if [ "$showparms" == "" ]; then
   fi
 fi
 if [ "$ECHO" == "" ]; then
-  rm -f $bundle_dir/${installer_base}.tar.gz
-  rm -rf $bundle_dir/${installer_base}
+  rm -f $bundle_dir/${installer_base_platform}.tar.gz
+  rm -rf $bundle_dir/${installer_base_platform}
 fi
