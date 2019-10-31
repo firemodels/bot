@@ -1,7 +1,7 @@
 #!/bin/bash
 app_type=$1
-dir_from=$2
-bot_host=$3
+eval dir_from=$2
+eval bot_host=$3
 error_log=$4
 
 if [ "$app_type" != "fds" ]; then

@@ -48,7 +48,7 @@ echo "-B - build apps - this script builds apps by running"
 echo "     firebot with the -B option"
 echo "-c - use apps and pubs previously copied to $HOME/.bundle/apps"
 echo "     and $HOME/.bundle/pubs"
-echo "-d - bundle directory location: $bundle_dir]"
+echo "-d - bundle directory location [default: $bundle_dir]"
 echo "-f - home directory containing apps [default: $app_home]"
 echo "-F - home directory containing FDS pubs [default: $fds_pub_home]"
 echo "-g - upload installer file to a google drive directory with id in the"
@@ -191,6 +191,7 @@ if [ "$showparms" == "1" ]; then
     echo "     fds pub directory: $fds_pub_home/$FDS_PUBDIR/pubs $hostlabel"
     echo "     smv pub directory: $smv_pub_home/$SMV_PUBDIR/pubs $hostlabel"
   fi
+    echo "      bundle directory: $bundle_dir"
   echo ""
 fi
 
@@ -212,11 +213,11 @@ return_code=0
 if [ "$USE_CACHE" == "" ]; then
 if [ "$showparms" == "" ]; then
   error_log=/tmp/error_log.$$
-  rm $HOME/.bundle/pubs/*
+  rm -f $HOME/.bundle/pubs/*
   ./copy_pubs.sh fds $fds_pub_home/.firebot/pubs  $pub_host $error_log || return_code=1
   ./copy_pubs.sh smv $smv_pub_home/.smokebot/pubs $pub_host $error_log || return_code=1
 
-  rm $HOME/.bundle/apps/*
+  rm -f $HOME/.bundle/apps/*
   ./copy_apps.sh fds $app_home/.firebot/apps      $app_host $error_log || return_code=1
   ./copy_apps.sh smv $app_home/.firebot/apps      $app_host $error_log || return_code=1
  

@@ -1,7 +1,7 @@
 #!/bin/bash
 pub_type=$1
-pdf_from=$2
-bot_host=$3
+eval pdf_from=$2
+eval bot_host=$3
 error_log=$4
 
 if [ "$pub_type" != "fds" ]; then
