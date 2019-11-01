@@ -34,7 +34,7 @@ echo "-S - use startup files to set the environment, not modules"
 echo "-U - upload guides (only by user firebot)"
 echo "-W release_type (master, release or test) - clone fds, exp, fig, out and smv repos"
 echo "     fds and smv repos will be checked out with a branch named"
-echo       master, release or test [default: master]"
+echo "     master, release or test [default: master]"
 }
 
 #---------------------------------------------
