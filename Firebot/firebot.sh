@@ -1877,14 +1877,14 @@ if [[ "$CLONE_REPOS" != "" ]]; then
   echo Cloning repos
   cd $botrepo/Scripts
   ./setup_repos.sh -F > $OUTPUT_DIR/stage1_clone 2>&1
-  if "$CLONE_REPOS" != "master" ]; then
+  if [ "$CLONE_REPOS" != "master" ]; then
     FDSBRANCH=$CLONE_REPOS
     cd $fdsrepo
-    git checkout -b $FDSBRANCH origin/master
+    git checkout -b $FDSBRANCH origin/master >> $OUTPUT_DIR/stage1_clone 2>&1
 
     SMVBRANCH=$CLONE_REPOS
     cd $smvrepo
-    git checkout -b $SMVBANCH origin/master
+    git checkout -b $SMVBRANCH origin/master >> $OUTPUT_DIR/stage1_clone 2>&1
   fi
   ARCHIVE_REPO_SIZES=1
 fi
