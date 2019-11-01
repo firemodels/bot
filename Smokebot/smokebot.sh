@@ -1619,6 +1619,11 @@ MKDIR $SMV_APPS_DIR
 rm -rf $SMV_LATESTAPPS_DIR
 MKDIR $SMV_LATESTAPPS_DIR
 
+botrepo=$repo/bot
+cfastrepo=$repo/cfast
+fdsrepo=$repo/fds
+smvrepo=$repo/smv
+
 if [[ "$CLONE_REPOS" != "" ]]; then
   echo Cloning repos
   cd $botrepo/Scripts
@@ -1637,29 +1642,24 @@ fi
 
 #*** make sure repos needed by smokebot exist
 
-botrepo=$repo/bot
 CD_REPO $botrepo $BOTBRANCH || exit 1
 if [ "$BOTBRANCH" == "current" ]; then
   cd $botrepo
   BOTBRANCH=`git rev-parse --abbrev-ref HEAD`
 fi
 
-cfastrepo=$repo/cfast
 CD_REPO $cfastrepo $CFASTBRANCH || exit 1
 if [ "$CFASTBRANCH" == "current" ]; then
   cd $cfastrepo
   CFASTBRANCH=`git rev-parse --abbrev-ref HEAD`
 fi
 
-fdsrepo=$repo/fds
 CD_REPO $fdsrepo $FDSBRANCH || exit 1
 if [ "$FDSBRANCH" == "current" ]; then
   cd $fdsrepo
   FDSBRANCH=`git rev-parse --abbrev-ref HEAD`
 fi
 
-
-smvrepo=$repo/smv
 CD_REPO $smvrepo $SMVBRANCH ||  exit 1
 if [ "$SMVBRANCH" == "current" ]; then
   cd $smvrepo
