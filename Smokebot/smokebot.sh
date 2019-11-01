@@ -1619,6 +1619,22 @@ MKDIR $SMV_APPS_DIR
 rm -rf $SMV_LATESTAPPS_DIR
 MKDIR $SMV_LATESTAPPS_DIR
 
+if [[ "$CLONE_REPOS" != "" ]]; then
+  echo Cloning repos
+  cd $botrepo/Scripts
+  ./setup_repos.sh -S > $OUTPUT_DIR/stage1_clone 2>&1
+  if [ "$CLONE_REPOS" != "master" ]; then
+    FDSBRANCH=$CLONE_REPOS
+    cd $fdsrepo
+    git checkout -b $FDSBRANCH origin/master >> $OUTPUT_DIR/stage1_clone 2>&1
+
+    SMVBRANCH=$CLONE_REPOS
+    cd $smvrepo
+    git checkout -b $SMVBRANCH origin/master >> $OUTPUT_DIR/stage1_clone 2>&1
+  fi
+fi
+
+
 #*** make sure repos needed by smokebot exist
 
 botrepo=$repo/bot
@@ -1820,21 +1836,6 @@ clean_smokebot_history
 ### Stage 0 repo operatoins ###
 echo "Run Status"
 echo "----------"
-
-if [[ "$CLONE_REPOS" != "" ]]; then
-  echo Cloning repos
-  cd $botrepo/Scripts
-  ./setup_repos.sh -S > $OUTPUT_DIR/stage1_clone 2>&1
-  if [ "$CLONE_REPOS" != "master" ]; then
-    FDSBRANCH=$CLONE_REPOS
-    cd $fdsrepo
-    git checkout -b $FDSBRANCH origin/master >> $OUTPUT_DIR/stage1_clone 2>&1
-
-    SMVBRANCH=$CLONE_REPOS
-    cd $smvrepo
-    git checkout -b $SMVBRANCH origin/master >> $OUTPUT_DIR/stage1_clone 2>&1
-  fi
-fi
 
 if [ "$CLONE_REPOS" == "" ]; then
   if [ "$CLEANREPO" == "1" ]; then
