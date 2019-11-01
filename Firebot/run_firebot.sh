@@ -32,7 +32,9 @@ echo "-R - remove run status file"
 echo "-s - skip matlab and build document stages"
 echo "-S - use startup files to set the environment, not modules"
 echo "-U - upload guides (only by user firebot)"
-echo "-W - clone fds, exp, fig, out and smv repos"
+echo "-W release_type (master, release or test) - clone fds, exp, fig, out and smv repos"
+echo "     fds and smv repos will be checked out with a branch named"
+echo       master, release or test [default: master]"
 }
 
 #---------------------------------------------
@@ -181,7 +183,7 @@ export QFDS_STARTUP=
 
 #*** parse command line options
 
-while getopts 'bBcdDFfHhIiJkLm:NnOq:RSsuUvW' OPTION
+while getopts 'bBcdDFfHhIiJkLm:NnOq:RSsuUvW:' OPTION
 do
 case $OPTION  in
   b)
@@ -261,20 +263,29 @@ case $OPTION  in
    ECHO=echo
    ;;
   W)
-   CLONE_REPOS="-W"
+   CLONE_REPOS="$OPTARG"
    ;;
 esac
 done
 shift $(($OPTIND-1))
 
 if [ `whoami` != firebot ]; then
-  if [ "$CLONE_REPOS" == "-W" ]; then
+  if [ "$CLONE_REPOS" != "" ]; then
     echo "You are about to erase (if they exist) and clone the "
     echo "fds, exp, fig, out and smv repos."
     echo "Press any key to continue or <CTRL> c to abort."
     echo "Type $0 -h for other options"
     read val
   fi
+fi
+
+if [ "$CLONE_REPOS" != "" ]; then
+  if [ "$CLONE_REPOS" != "release" ]; then
+    if [ "$CLONE_REPOS" != "test" ]; then
+      CLONE_REPO="master"
+    fi
+  fi
+  CLONE_REPOS="-W $CLONE_REPOS"
 fi
 
 #*** kill firebot
