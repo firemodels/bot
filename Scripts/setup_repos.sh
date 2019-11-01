@@ -42,7 +42,7 @@ else
    exit
 fi
 
-while getopts 'acfFhsw' OPTION
+while getopts 'acfFhsSw' OPTION
 do
 case $OPTION  in
   a)
