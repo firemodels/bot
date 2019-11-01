@@ -1824,7 +1824,7 @@ echo "----------"
 if [[ "$CLONE_REPOS" != "" ]]; then
   echo Cloning repos
   cd $botrepo/Scripts
-  ./setup_repos.sh -F > $OUTPUT_DIR/stage1_clone 2>&1
+  ./setup_repos.sh -S > $OUTPUT_DIR/stage1_clone 2>&1
   if [ "$CLONE_REPOS" != "master" ]; then
     FDSBRANCH=$CLONE_REPOS
     cd $fdsrepo
