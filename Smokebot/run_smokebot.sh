@@ -296,7 +296,7 @@ if [ `whoami` != smokebot ]; then
     echo "fds, exp, fig, out and smv repos."
     echo "Press any key to continue or <CTRL> c to abort."
     echo "Type $0 -h for other options"
-    read val
+#    read val
   fi
 fi
 
