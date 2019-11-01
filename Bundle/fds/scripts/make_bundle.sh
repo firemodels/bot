@@ -264,8 +264,8 @@ if [ "$showparms" == "" ]; then
 if [ "$OVERWRITE" == "" ]; then
   installer_file=$bundle_dir/${installer_base_platform}.sh
   if [ -e $installer_file ]; then
-    echo "***error: the installer file $installer_file exists."
-    echo "          Use the -w option to overwrite it."
+    echo "***warning: the installer file $installer_file exists."
+    echo "             Use the -w option to overwrite it."
     exit
   fi
 fi
@@ -278,8 +278,9 @@ if [ "$showparms" == "" ]; then
     if [ -e $HOME/.bundle/$GOOGLE_DIR_ID ]; then
       ./upload_bundle.sh $bundle_dir $installer_base $platform 
     else
-      echo "***warning: file $HOME/.bundle/GOOGLE_DIR_ID containing id of google drive"
-      echo "            upload directdory does not exist"
+      echo "***warning: the file $HOME/.bundle/GOOGLE_DIR_ID containing the"
+      echo "            google drive upload directory ID does not exist."
+      echo "            Upload to google drive aborted"
     fi
   fi
 fi
