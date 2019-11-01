@@ -3,8 +3,6 @@ acct=$1
 host=$2
 branch=$3
 
-eval acct=$acct
-
 #---------------------------------------------
 #                   CP
 #---------------------------------------------
@@ -19,6 +17,7 @@ CP ()
   if [[ "$host" != "" ]] && [[ "$host" != "`hostname`" ]]; then
     scp -q $host:$FROMDIR/$FROMFILE $TOFILE
   else
+    eval FROMDIR=$FROMDIR
     if [ -e $FROMDIR/$FROMFILE ]; then
       cp $FROMDIR/$FROMFILE $TOFILE 
       if [ -e $TOFILE ]; then
