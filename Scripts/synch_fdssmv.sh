@@ -54,9 +54,29 @@ eval CP \$acct/.firebot/apps SMV_HASH $SMV_HASH_FILE
 
 FDS_HASH=`cat $FDS_HASH_FILE`
 SMV_HASH=`cat $SMV_HASH_FILE`
-
-echo FDS_HASH=$FDS_HASH
-echo SMV_HASH=$SMV_HASH
-
 rm -f $FDS_HASH_FILE
 rm -f $SMV_HASH_FILE
+
+if [ "$FDS_HASH" != "" ]; then
+  cd $fdsrepo
+  git checkout master >& /dev/null
+  if [ "$branch" != "master" ]; then
+    git branch -d $branch >& /dev/null
+  fi
+  git checkout $FDS_HASH >& /dev/null
+  echo fds repo: checking $FDS_HASH and naming the branch $branch
+  git checkout -b $branch >& /dev/null
+fi
+
+if [ "$SMV_HASH" != "" ]; then
+  cd $smvrepo
+  git checkout master >& /dev/null
+  if [ "$branch" != "master" ]; then
+    git branch -d $branch >& /dev/null
+  fi
+  git checkout $SMV_HASH >& /dev/null
+  echo smv repo: checking $SMV_HASH and naming the branch $branch
+  git checkout -b $branch >& /dev/null
+fi
+
+cd $curdir
