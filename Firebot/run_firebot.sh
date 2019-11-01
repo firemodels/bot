@@ -271,7 +271,7 @@ shift $(($OPTIND-1))
 
 if [ `whoami` != firebot ]; then
   if [ "$CLONE_REPOS" != "" ]; then
-    echo "You are about to erase (if they exist) and clone the "
+    echo "You are about to erase and clone the "
     echo "fds, exp, fig, out and smv repos."
     echo "Press any key to continue or <CTRL> c to abort."
     echo "Type $0 -h for other options"
