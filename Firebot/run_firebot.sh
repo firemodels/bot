@@ -28,13 +28,13 @@ if [ "$EMAIL" != "" ]; then
 else
   echo "-m email_address "
 fi
-echo "-R - remove run status file"
+echo "-P - remove run status (PID) file"
+echo "-R release_type (master, release or test) - clone fds, exp, fig, out and smv repos"
+echo "     fds and smv repos will be checked out with a branch named"
+echo "     master, release or test [default: master]"
 echo "-s - skip matlab and build document stages"
 echo "-S - use startup files to set the environment, not modules"
 echo "-U - upload guides (only by user firebot)"
-echo "-W release_type (master, release or test) - clone fds, exp, fig, out and smv repos"
-echo "     fds and smv repos will be checked out with a branch named"
-echo "     master, release or test [default: master]"
 }
 
 #---------------------------------------------
@@ -183,7 +183,7 @@ export QFDS_STARTUP=
 
 #*** parse command line options
 
-while getopts 'bBcdDFfHhIiJkLm:NnOq:RSsuUvW:' OPTION
+while getopts 'bBcdDFfHhIiJkLm:NnOPq:R:SsuUv' OPTION
 do
 case $OPTION  in
   b)
@@ -240,11 +240,14 @@ case $OPTION  in
   O)
    INTEL=
    ;;
+  P)
+   REMOVE_PID=1
+   ;;
   q)
    QUEUE="$OPTARG"
    ;;
   R)
-   REMOVE_PID=1
+   CLONE_REPOS="$OPTARG"
    ;;
   s)
    SKIPMATLAB=-s
@@ -261,9 +264,6 @@ case $OPTION  in
   v)
    RUNFIREBOT=0
    ECHO=echo
-   ;;
-  W)
-   CLONE_REPOS="$OPTARG"
    ;;
 esac
 done
@@ -285,7 +285,7 @@ if [ "$CLONE_REPOS" != "" ]; then
       CLONE_REPO="master"
     fi
   fi
-  CLONE_REPOS="-W $CLONE_REPOS"
+  CLONE_REPOS="-R $CLONE_REPOS"
 fi
 
 #*** kill firebot

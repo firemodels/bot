@@ -1756,7 +1756,7 @@ CLONE_REPOS=
 DEBUG_ONLY=
 
 #*** parse command line arguments
-while getopts 'b:BcdDhIiJLm:p:q:suUW:' OPTION
+while getopts 'b:BcdDhIiJLm:p:q:R:suU' OPTION
 do
 case $OPTION in
   b)
@@ -1807,6 +1807,9 @@ case $OPTION in
   q)
    QUEUE="$OPTARG"
    ;;
+  R)
+   CLONE_REPOS="$OPTARG"
+   ;;
   s)
    SKIPMATLAB=1
    ;;
@@ -1815,9 +1818,6 @@ case $OPTION in
    ;;
   U)
    UPLOADGUIDES=1
-   ;;
-  W)
-   CLONE_REPOS="$OPTARG"
    ;;
 esac
 done

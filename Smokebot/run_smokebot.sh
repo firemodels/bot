@@ -32,7 +32,10 @@ else
 echo "-m email_address"
 fi
 echo "-M - make movies"
-echo "-R - remove run status file"
+echo "-P - remove run status (PID) file"
+echo "-R release_type (master, release or test) - clone fds, exp, fig, out and smv repos"
+echo "     fds and smv repos will be checked out with a branch named"
+echo "     master, release or test [default: master]"
 echo "-S - skip picture generating and build manual stages"
 echo "-t - use test smokeview"
 echo "-U - upload guides"
@@ -173,6 +176,7 @@ export QFDS_STARTUP=
 SKIP=
 REMOVE_PID=
 BUILD_ONLY=
+CLONE_REPOS=
 
 WEB_URL=
 web_DIR=/var/www/html/`whoami`
@@ -194,7 +198,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'aAbBcCd:DfhHI:JkLm:Mq:Rr:StuUvw:W:' OPTION
+while getopts 'aAbBcCd:DfhHI:JkLm:MPq:r:R:StuUvw:W:' OPTION
 do
 case $OPTION  in
   a)
@@ -245,11 +249,14 @@ case $OPTION  in
   M)
    MOVIE="-M"
    ;;
+  P)
+   REMOVE_PID=1
+   ;;
   q)
    QUEUE="$OPTARG"
    ;;
   R)
-   REMOVE_PID=1
+   CLONE_REPOS="$OPTARG"
    ;;
   S)
    SKIP="-S"
@@ -281,6 +288,25 @@ if [ "$REMOVE_PID" == "1" ]; then
   rm -f $smokebot_pid
   echo "$smokebot_pid status file removed"
   exit
+fi
+
+if [ `whoami` != smokebot ]; then
+  if [ "$CLONE_REPOS" != "" ]; then
+    echo "You are about to erase and clone the "
+    echo "fds, exp, fig, out and smv repos."
+    echo "Press any key to continue or <CTRL> c to abort."
+    echo "Type $0 -h for other options"
+    read val
+  fi
+fi
+
+if [ "$CLONE_REPOS" != "" ]; then
+  if [ "$CLONE_REPOS" != "release" ]; then
+    if [ "$CLONE_REPOS" != "test" ]; then
+      CLONE_REPO="master"
+    fi
+  fi
+  CLONE_REPOS="-R $CLONE_REPOS"
 fi
 
 if [ ! "$web_DIR" == "" ]; then
@@ -368,7 +394,7 @@ BRANCH="-b $BRANCH"
 #*** run smokebot
 
 touch $smokebot_pid
-$ECHO ./$botscript $SKIP $SIZE $BRANCH $TESTFLAG $RUNAUTO $INTEL $BUILD_ONLY $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $SKIP $SIZE $BRANCH $TESTFLAG $CLONE_REPOS $RUNAUTO $INTEL $BUILD_ONLY $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi

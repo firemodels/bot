@@ -1491,10 +1491,11 @@ INTEL=
 SKIP=
 HTML2PDF=wkhtmltopdf
 BUILD_ONLY=
+CLONE_REPOS=
 
 #*** parse command line options
 
-while getopts 'aAb:BcI:JLm:Mo:q:r:SstuUw:W:' OPTION
+while getopts 'aAb:BcI:JLm:Mo:q:r:R:SstuUw:W:' OPTION
 do
 case $OPTION in
   a)
@@ -1541,6 +1542,9 @@ case $OPTION in
   q)
    SMOKEBOT_QUEUE="$OPTARG"
    ;;
+  R)
+   CLONE_REPOS="$OPTARG"
+   ;;
   s)
    RUNDEBUG="0"
    ;;
@@ -1566,6 +1570,14 @@ case $OPTION in
 esac
 done
 shift $(($OPTIND-1))
+
+if [ "$CLONE_REPOS" != "" ]; then
+  if [ "$CLONE_REPOS" != "release" ]; then
+    if [ "$CLONE_REPOS" != "test" ]; then
+      CLONE_REPO="master"
+    fi
+  fi
+fi
 
 #*** make sure smokebot is running in the right directory
 
@@ -1808,30 +1820,52 @@ clean_smokebot_history
 ### Stage 0 repo operatoins ###
 echo "Run Status"
 echo "----------"
-if [ "$CLEANREPO" == "1" ]; then
-  echo Cleaning
-  echo "   cfast"
-  clean_repo2 cfast master || exit 1
-  echo "   fds"
-  clean_repo2 fds $FDSBRANCH || exit 1
-  echo "   fig"
-  clean_repo2 fig master || exit 1
-  echo "   smv"
-  clean_repo2 smv $SMVBRANCH || exit 1
-else
-  echo Repos not cleaned
+
+if [[ "$CLONE_REPOS" != "" ]]; then
+  echo Cloning repos
+  cd $botrepo/Scripts
+  ./setup_repos.sh -F > $OUTPUT_DIR/stage1_clone 2>&1
+  if [ "$CLONE_REPOS" != "master" ]; then
+    FDSBRANCH=$CLONE_REPOS
+    cd $fdsrepo
+    git checkout -b $FDSBRANCH origin/master >> $OUTPUT_DIR/stage1_clone 2>&1
+
+    SMVBRANCH=$CLONE_REPOS
+    cd $smvrepo
+    git checkout -b $SMVBRANCH origin/master >> $OUTPUT_DIR/stage1_clone 2>&1
+  fi
+fi
+
+if [ "$CLONE_REPOS" == "" ]; then
+  if [ "$CLEANREPO" == "1" ]; then
+    echo Cleaning
+    echo "   cfast"
+    clean_repo2 cfast master || exit 1
+    echo "   fds"
+    clean_repo2 fds $FDSBRANCH || exit 1
+    echo "   fig"
+    clean_repo2 fig master || exit 1
+    echo "   smv"
+    clean_repo2 smv $SMVBRANCH || exit 1
+  else
+    echo Repos not cleaned
+  fi
 fi
 
 if [ "$UPDATEREPO" == "1" ]; then
   echo "Updating"
   echo "   cfast"
   update_repo cfast $CFASTBRANCH || exit 1
-  echo "   fds"
-  update_repo fds $FDSBRANCH || exit 1
+  if [ "$CLONE_REPOS" == "" ]; then
+    echo "   fds"
+    update_repo fds $FDSBRANCH || exit 1
+  fi
   echo "   fig"
   update_repo fig master     || exit 1
-  echo "   smv"
-  update_repo smv $SMVBRANCH || exit 1
+  if [ "$CLONE_REPOS" == "" ]; then
+    echo "   smv"
+    update_repo smv $SMVBRANCH || exit 1
+  fi
 else
   echo Repos not updated
 fi
