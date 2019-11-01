@@ -3,7 +3,6 @@ acct=$1
 branch=$2
 host=$3
 
-
 #---------------------------------------------
 #                   CP
 #---------------------------------------------
@@ -21,22 +20,22 @@ CP ()
     eval FROMDIR=$FROMDIR
     if [ -e $FROMDIR/$FROMFILE ]; then
       cp $FROMDIR/$FROMFILE $TOFILE 
-      if [ -e $TOFILE ]; then
-        echo $FROMFILE copied to $TOFILE
-      else
-        echo "" 
-        echo ***error: $FROMFILE failed to copy to $TOFILE
-        return_code=1
-      fi
     else
-      echo ""
       echo "***error: $FROMDIR/$FROMFILE does not exist"
-      return_code=1
+      return 1
     fi
   fi
+  if [ ! -e $TOFILE ]; then
+    echo ***error: $FROMFILE failed to copy to $TOFILE
+    return 1
+  fi
+  return 0
 }
 
-return_code=0
+if [ "$branch" == "" ]; then
+  echo "***error: branch name not specified"
+  return 1
+fi
 
 curdir=`pwd`
 scriptdir=`dirname "$0"`
@@ -50,8 +49,8 @@ smvrepo=`pwd`
 FDS_HASH_FILE=/tmp/FDS_HASH.$$
 SMV_HASH_FILE=/tmp/SMV_HASH.$$
 
-eval CP \$acct/.firebot/apps FDS_HASH $FDS_HASH_FILE
-eval CP \$acct/.firebot/apps SMV_HASH $SMV_HASH_FILE
+eval CP \$acct/.firebot/apps FDS_HASH $FDS_HASH_FILE || exit 1
+eval CP \$acct/.firebot/apps SMV_HASH $SMV_HASH_FILE || exit 1
 
 FDS_HASH=`cat $FDS_HASH_FILE`
 SMV_HASH=`cat $SMV_HASH_FILE`
@@ -81,3 +80,4 @@ if [ "$SMV_HASH" != "" ]; then
 fi
 
 cd $curdir
+return 0
