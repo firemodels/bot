@@ -1,5 +1,13 @@
 #!/bin/bash
 
+if [ "`uname`" == "Darwin" ] ; then
+  LINUX=
+  OSX=1
+else
+  LINUX=1
+  OSX=
+fi
+
 #---------------------------------------------
 #                   usage
 #---------------------------------------------
@@ -13,32 +21,14 @@ echo "to define the Mac computer and repo root "
 echo ""
 echo "Options:"
 echo "-h - display this message"
-echo "-l - build only the Linux bundle"
-echo "-o - build only the OSX bundle"
 exit
 }
 
-#define default home directories for apps and pubs
-app_home=\~firebot
-fds_pub_home=\~firebot
-smv_pub_home=\~smokebot
-
-LINUX=1
-OSX=1
-
-while getopts 'hlo' OPTION
+while getopts 'h' OPTION
 do
 case $OPTION  in
   h)
    usage;
-   ;;
-  l)
-   LINUX=1
-   OSX=
-   ;;
-  o)
-   LINUX=
-   OSX=1
    ;;
 esac
 done
@@ -48,11 +38,6 @@ if [ "$LINUX" == "1" ]; then
   ./make_bundle.sh
 fi
 
-if [ "$OSX" == "o" ]; then
-  if [ "$OSX_BUILD_HOST" != "" ]; then
-    if [ "$OSX_BUILD_REPO" != "" ]; then
-      ./make_bundle.sh -B
-      ssh -q $$OSX_BUIILD_HOST \( cd \~/$$OSX_BUILD_REPO/bot/Bundle/fds/scripts \; ./make_bundle.sh -B  \)
-    fi
-  fi
+if [ "$OSX" == "1" ]; then
+  ./make_bundle.sh -u
 fi

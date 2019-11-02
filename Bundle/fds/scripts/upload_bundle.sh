@@ -2,7 +2,8 @@
 BUNDLE_DIR=$1
 BUNDLE_BASE=$2
 platform=$3
-erase=$4
+
+erase=1
 
 GDRIVE=~/bin/gdrive
 # directory containing nightly bundles on google drive : nightly_bundles

@@ -39,8 +39,9 @@ echo ""
 echo "The following environment variables may be used to set the"
 echo "host names used to build apps and pubs."
 echo ""
-echo "APP_HOST - host where apps are located"
-echo "PBS_HOST - host where pubs are located"
+echo "APP_HOST    - host where apps are located"
+echo "PBS_HOST    - host where pubs are located"
+echo "UPLOAD_HOST - host where installer is uploaded to Google Drive"
 echo ""
 echo "Options:"
 echo "-a - host containing apps [default: $app_host]"
@@ -276,7 +277,11 @@ if [ "$showparms" == "" ]; then
   $ECHO ./bundle_generic.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version $bundle_dir
   if [ "$UPLOAD_GOOGLE" == "1" ]; then
     if [ -e $HOME/.bundle/$GOOGLE_DIR_ID ]; then
-      ./upload_bundle.sh $bundle_dir $installer_base $platform 
+      if [ "$platform" == "linux64" ]; then
+        ./upload_bundle.sh $bundle_dir $installer_base $platform 
+      else
+        ./ssh_upload_bundle.sh $installer_base
+      fi
     else
       echo "***warning: the file $HOME/.bundle/GOOGLE_DIR_ID containing the"
       echo "            google drive upload directory ID does not exist."
