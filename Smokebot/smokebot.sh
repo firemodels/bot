@@ -1666,8 +1666,6 @@ if [ "$SMVBRANCH" == "current" ]; then
   SMVBRANCH=`git rev-parse --abbrev-ref HEAD`
 fi
 
-cd $smokebotrundir
-
 #*** save pid if -k option (kill smokebot) is used lateer
 
 echo $$ > $PID_FILE
