@@ -8,15 +8,11 @@
 
 run_auto()
 {
-  GIT_STATUS_DIR=~/.webbot
-
   WEB_DIR=$webrepo
   GIT_WEB_REVISION_FILE=$GIT_STATUS_DIR/web_revision
   GIT_WEB_LOG_FILE=$GIT_STATUS_DIR/web_log
 
   MESSAGE_FILE=$GIT_STATUS_DIR/message
-
-  MKDIR $GIT_STATUS_DIR
 
   update_repo web nist-pages || return 1
 
@@ -171,9 +167,9 @@ check_stage1()
    then
       stage1_success=true
    else
-      grep -rIi 'error:***' > $OUTPUT_DIR/stage1_errors
+      cp $OUTPUT_DIR/stage1 $OUTPUT_DIR/stage1_errors
 
-      echo "Broken link web link errors:" >> $ERROR_LOG
+      echo "Broken link errors:"          >> $ERROR_LOG
       cat $OUTPUT_DIR/stage1_errors       >> $ERROR_LOG
       echo ""                             >> $ERROR_LOG
    fi
@@ -218,6 +214,12 @@ email_build_status()
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 #*** define initial values
+
+GIT_STATUS_DIR=~/.webbot
+SAVED_WEB_PAGES=$GIT_STATUS_DIR/webpages
+
+MKDIR $GIT_STATUS_DIR
+MKDIR $SAVED_WEB_PAGES
 
 webbotdir=`pwd`
 OUTPUT_DIR="$webbotdir/output"
@@ -325,11 +327,24 @@ update_repo webpages $WEBBRANCH || exit 1
 check_update_repo
 
 echo "" > $OUTPUT_DIR/stage1
-echo "Checking download.html"
-$webbotdir/check_webpage.sh $webrepo downloads.html >> $OUTPUT_DIR/stage1
-
-echo "Checking manuals.html"
-$webbotdir/check_webpage.sh $webrepo manuals.html  >> $OUTPUT_DIR/stage1
+FILES=*.pdf
+for webpage in *.html; do
+  webpage_old=$SAVED_WEB_PAGES/$webpage
+  CHECK=
+  if [ -e $webpage_old ]; then
+    ndiffs=`diff $webpage_old $webpage | wc -l`
+    if [ "$ndiffs" != "0" ]; then
+      CHECK=1
+    fi
+  else
+    CHECK=1
+  fi
+  if [ "$CHECK" == "1" ]; then
+    echo "Checking $webpage"
+    $webbotdir/check_webpage.sh $webrepo $webpage >> $OUTPUT_DIR/stage1
+    cp $webpage $webpage_old
+  fi
+done
 
 check_stage1
 
