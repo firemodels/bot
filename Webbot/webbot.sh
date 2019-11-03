@@ -126,7 +126,7 @@ check_update_repo()
 
 check_stage1()
 {
-   if [[ `grep -rIi 'error:***` == "" ]]
+   if [[ `grep -rIi 'error:***' == "" ]]
    then
       stage1_success=true
    else
