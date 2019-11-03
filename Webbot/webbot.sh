@@ -3,14 +3,31 @@
 # The Webbot script is part of an automated continuous integration system.
 
 #---------------------------------------------
+#                   usage
+#---------------------------------------------
+
+function usage {
+echo option=$option
+echo "Check links in all web pages in the webpages repo"
+echo ""
+echo "Options:"
+echo "-a - run only if the repo has changed since the last time" 
+echo "     this script was run"
+echo "-c - clean the webpages repo"
+echo "-f - force check on all web pages"
+echo "-h - display this message"
+echo "-u - update the webpages repo"
+exit
+}
+
+
+#---------------------------------------------
 #                   run_auto
 #---------------------------------------------
 
 run_auto()
 {
   WEB_DIR=$webrepo
-  GIT_WEB_REVISION_FILE=$GIT_STATUS_DIR/web_revision
-  GIT_WEB_LOG_FILE=$GIT_STATUS_DIR/web_log
 
   MESSAGE_FILE=$GIT_STATUS_DIR/message
 
@@ -21,18 +38,13 @@ run_auto()
   if [ ! -e $GIT_WEB_REVISION_FILE ]; then
     touch $GIT_WEB_REVISION_FILE
   fi
-  THIS_WEBAUTHOR=`git log . | head -2 | tail -1 | awk '{print $2}'`
-  THIS_WEB_REVISION=`git log --abbrev-commit . | head -1 | awk '{print $2}'`
-  LAST_WEB_REVISION=`cat $GIT_WEB_REVISION_FILE`
-  git log . | head -5 | tail -1 > $GIT_WEB_LOG_FILE
 
   if [[ $THIS_WEB_REVISION == $LAST_WEB_REVISION ]] ; then
     return 1
   fi
 
   rm -f $MESSAGE_FILE
-  SOURCE_CHANGED=1
-  echo $THIS_WEB_REVISION>$GIT_WEB_REVISION_FILE
+  echo $THIS_WEB_REVISION > $GIT_WEB_REVISION_FILE
   echo -e "one or more web pages have changed. $LAST_WEB_REVISION->$THIS_WEB_REVISION($THIS_WEBAUTHOR)" >> $MESSAGE_FILE
   cat $GIT_WEB_LOG_FILE >> $MESSAGE_FILE
   echo -e "Webbot run initiated." >> $MESSAGE_FILE
@@ -110,6 +122,19 @@ clean_webbot_history()
    rm -rf $OUTPUT_DIR/*       > /dev/null
 }
 
+#---------------------------------------------
+#                   clean_repo
+#---------------------------------------------
+
+clean_repo()
+{
+   local reponame=$1
+
+   cd $repo/$reponame
+   git clean -dxf
+   return 0
+}
+
 
 #---------------------------------------------
 #                   update_repo
@@ -185,28 +210,18 @@ email_build_status()
   echo "                host: $hostname " >> $TIME_LOG
   echo "  web version/branch: $WEB_REVISION/$WEBBRANCH" >> $TIME_LOG
   echo "  WEB revisions: old: $LAST_WEB_REVISION new: $THIS_WEB_REVISION" >> $TIME_LOG
-  SOURCE_CHANGED=
 
-  if [[ $THIS_WEB_REVISION != $LAST_WEB_REVISION ]] ; then
-    SOURCE_CHANGED=1
-    cat $GIT_WEB_LOG_FILE >> $TIME_LOG
-  fi
   cd $webbotdir
+  cat output/stage1 >> $TIME_LOG
 
-  EMAIL_SUBJECT="web success"
-  if [ -e $WARNING_LOG ]; then
-    cat $WARNING_LOG >> $TIME_LOG
-    echo ""        >> $TIME_LOG
-    EMAIL_SUBJECT="webbot failure"
-  fi
   if [ -e $ERROR_LOG ]; then
-    cat $ERROR_LOG >> $TIME_LOG
-    echo ""        >> $TIME_LOG
     EMAIL_SUBJECT="webbot failure"
+  else
+    EMAIL_SUBJECT="webbot success"
   fi
 
-  EMAIL_SUBJECT="$EMAIL_SUBJECT on ${hostname}. ${GIT_REVISION}, $WEBBRANCH"
-  cat $TIME_LOG | mail -s $EMAIL_SUBJECT $mailTo > /dev/null
+  EMAIL_SUBJECT="$EMAIL_SUBJECT on ${hostname}, ${THIS_WEB_REVISION}"
+  cat $TIME_LOG | mail -s "$EMAIL_SUBJECT" $mailTo > /dev/null
 }
 
 #VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
@@ -228,6 +243,18 @@ EMAIL_LIST="$HOME/.webbot/webbot_email_list.sh"
 ERROR_LOG=$OUTPUT_DIR/errors
 WARNING_LOG=$OUTPUT_DIR/warnings
 TIME_LOG=$OUTPUT_DIR/time_log
+  
+GIT_WEB_REVISION_FILE=$GIT_STATUS_DIR/web_revision
+GIT_WEB_LOG_FILE=$GIT_STATUS_DIR/web_log
+
+THIS_WEBAUTHOR=`git log . | head -2 | tail -1 | awk '{print $2}'`
+THIS_WEB_REVISION=`git log --abbrev-commit . | head -1 | awk '{print $2}'`
+LAST_WEB_REVISION=`cat $GIT_WEB_REVISION_FILE`
+git log . | head -5 | tail -1 > $GIT_WEB_LOG_FILE
+
+CLEAN_REPO=
+UPDATE_REPO=
+FORCE=
 
 WEBBRANCH=nist-pages
 RUNAUTO=
@@ -235,11 +262,23 @@ mailTo=
 
 #*** parse command line options
 
-while getopts 'a' OPTION
+while getopts 'acfhu' OPTION
 do
 case $OPTION in
   a)
    RUNAUTO="y"
+   ;;
+  c)
+   CLEAN_REPO=1
+   ;;
+  f)
+   FORCE=1
+   ;;
+  h)
+   usage
+   ;;
+  u)
+   UPDATE_REPO=1
    ;;
 esac
 done
@@ -321,13 +360,19 @@ fi
 hostname=`hostname`
 clean_webbot_history
 
-echo "Updating web repo"
-update_repo webpages $WEBBRANCH || exit 1
+if [ "$CLEAN_REPO" == "1" ]; then
+  echo "Clean webpages repo"
+  clean_repo webpages
+fi
 
-check_update_repo
+if [ "$UPDATE_REPO" == "1" ]; then
+  echo "Updating web repo"
+  update_repo webpages $WEBBRANCH || exit 1
+  check_update_repo
+fi
 
 echo "" > $OUTPUT_DIR/stage1
-FILES=*.pdf
+cd $webrepo
 for webpage in *.html; do
   webpage_old=$SAVED_WEB_PAGES/$webpage
   CHECK=
@@ -337,6 +382,9 @@ for webpage in *.html; do
       CHECK=1
     fi
   else
+    CHECK=1
+  fi
+  if [ "$FORCE" == "1" ]; then
     CHECK=1
   fi
   if [ "$CHECK" == "1" ]; then
