@@ -260,7 +260,7 @@ fi
 MKDIR $HOME/.webbot
 
 botrepo=$repo/bot
-webrepo=$repo/web
+webrepo=$repo/webpages
 
 #*** make sure repos needed by smokebot exist
 
@@ -320,7 +320,7 @@ hostname=`hostname`
 clean_webbot_history
 
 echo "Updating web repo"
-update_repo web $WEBBRANCH || exit 1
+update_repo webpages $WEBBRANCH || exit 1
 
 check_update_repo
 
