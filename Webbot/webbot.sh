@@ -324,12 +324,12 @@ update_repo webpages $WEBBRANCH || exit 1
 
 check_update_repo
 
-echo "" > $OUTPUT_DIR>stage1
+echo "" > $OUTPUT_DIR/stage1
 echo "Checking download.html"
-$webbotdir/check_webpage.sh $webdir download.html >> $OUTPUT_DIR/stage1
+$webbotdir/check_webpage.sh $webrepo downloads.html >> $OUTPUT_DIR/stage1
 
 echo "Checking manuals.html"
-$webbotdir/check_webpage.sh $webdir manuals.html  >> $OUTPUT_DIR/stage1
+$webbotdir/check_webpage.sh $webrepo manuals.html  >> $OUTPUT_DIR/stage1
 
 check_stage1
 
