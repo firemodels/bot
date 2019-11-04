@@ -189,7 +189,7 @@ check_update_repo()
 
 check_stage1()
 {
-   if [[ `grep -rIi 'error:\*\*\*' $OUTPUT_DIR/stage1` = "" ]]
+   if [[ `grep -rIi '\*\*\*error:' $OUTPUT_DIR/stage1` = "" ]]
    then
       stage1_success=true
    else
