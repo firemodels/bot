@@ -207,7 +207,6 @@ check_stage1()
 
 email_build_status()
 {
-  echo "----------------------------------------------" > $TIME_LOG
   echo "              host: $hostname"         >> $TIME_LOG
   echo "  webpages version: $THIS_WEB_VERSION" >> $TIME_LOG
   echo ""                                      >> $TIME_LOG
@@ -216,8 +215,6 @@ email_build_status()
 
   nsummary=`cat output/stage1 | wc -l`
   if [ "$nsummary" != "0" ]; then
-    echo "Summary:"                              >> $TIME_LOG
-
     cd $webbotdir
     cat output/stage1 >> $TIME_LOG
   else
