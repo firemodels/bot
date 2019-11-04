@@ -208,6 +208,7 @@ check_stage1()
 email_build_status()
 {
   echo "              host: $hostname"         >> $TIME_LOG
+  echo "     webpages repo: $webrepo"         >> $TIME_LOG
   echo "  webpages version: $THIS_WEB_VERSION" >> $TIME_LOG
   echo ""                                      >> $TIME_LOG
 
