@@ -8,8 +8,8 @@ to be run only if the webpages repo has changed since the last time it was run. 
 
 ```
 Options:
--a - run only if the repo has changed since the last time
-     this script was run
+-a - run script only if the webpages repo has changed
+     since the last time this script was run
 -c - clean the webpages repo
 -f - force check on all web pages
 -h - display this message
