@@ -189,7 +189,7 @@ check_update_repo()
 
 check_stage1()
 {
-   if [[ `grep -rIi 'error:***' $OUTPUT_DIR/stage1` = "" ]]
+   if [[ `grep -rIi 'error:\*\*\*' $OUTPUT_DIR/stage1` = "" ]]
    then
       stage1_success=true
    else
@@ -214,7 +214,7 @@ email_build_status()
   cd $webbotdir
 
   nsummary=`cat output/stage1 | wc -l`
-  if [ "$nsummary" != "0" ]; then
+  if [ $nsummary -gt 0 ]; then
     cd $webbotdir
     cat output/stage1 >> $TIME_LOG
   else
@@ -379,7 +379,7 @@ for webpage in *.html; do
   CHECK=
   if [ -e $webpage_old ]; then
     ndiffs=`diff $webpage_old $webpage | wc -l`
-    if [ "$ndiffs" != "0" ]; then
+    if [ $ndiffs -gt 0 ]; then
       CHECK=1
     fi
   else

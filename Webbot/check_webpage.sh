@@ -17,11 +17,11 @@ cd $webdir
 sed -n 's/.*href="\([^"]*\).*/\1/p' $webpage  | grep http > $links
 $DIR/check_url.sh $links | grep -v 200 | grep -v 302 | grep -v '301 Moved Permanently' > $results
 nresults=`cat $results | wc -l`
-if [ "$nresults" == "0" ]; then
-  echo all links in $webpage are good
-else
+if [ $nresults -gt 0 ]; then
   echo "***error: $nresults broken links in $webpage:"
   cat $results
+else
+  echo all links in $webpage are good
 fi
 rm -f $links
 rm -f $results
