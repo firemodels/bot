@@ -1211,7 +1211,7 @@ check_matlab_validation()
 get_repo_size()
 {
   rrepo=$1
-  if [ "$CLONE_REPOS" == "1" ]; then
+  if [ "$CLONE_REPOS" != "" ]; then
     CCURDIR=`pwd`
     cd $rrepo
     git gc
@@ -1756,7 +1756,7 @@ CLONE_REPOS=
 DEBUG_ONLY=
 
 #*** parse command line arguments
-while getopts 'b:BcdDhIiJLm:p:q:suUW' OPTION
+while getopts 'b:BcdDhIiJLm:p:q:R:suU' OPTION
 do
 case $OPTION in
   b)
@@ -1807,6 +1807,9 @@ case $OPTION in
   q)
    QUEUE="$OPTARG"
    ;;
+  R)
+   CLONE_REPOS="$OPTARG"
+   ;;
   s)
    SKIPMATLAB=1
    ;;
@@ -1816,12 +1819,17 @@ case $OPTION in
   U)
    UPLOADGUIDES=1
    ;;
-  W)
-   CLONE_REPOS=1
-   ;;
 esac
 done
 shift $(($OPTIND-1))
+
+if [ "$CLONE_REPOS" != "" ]; then
+  if [ "$CLONE_REPOS" != "release" ]; then
+    if [ "$CLONE_REPOS" != "test" ]; then
+      CLONE_REPO="master"
+    fi
+  fi
+fi
 
 # Load mailing list for status report
 if [ "$mailToFDS" == "" ]; then
@@ -1865,10 +1873,19 @@ echo "------"
 
 #*** clone repos
 
-if [[ "$CLONE_REPOS" == "1" ]]; then
+if [[ "$CLONE_REPOS" != "" ]]; then
   echo Cloning repos
   cd $botrepo/Scripts
   ./setup_repos.sh -F > $OUTPUT_DIR/stage1_clone 2>&1
+  if [ "$CLONE_REPOS" != "master" ]; then
+    FDSBRANCH=$CLONE_REPOS
+    cd $fdsrepo
+    git checkout -b $FDSBRANCH origin/master >> $OUTPUT_DIR/stage1_clone 2>&1
+
+    SMVBRANCH=$CLONE_REPOS
+    cd $smvrepo
+    git checkout -b $SMVBRANCH origin/master >> $OUTPUT_DIR/stage1_clone 2>&1
+  fi
   ARCHIVE_REPO_SIZES=1
 fi
 
@@ -2003,20 +2020,18 @@ fi
 
 #*** update repos
 
-if [[ "$CLONE_REPOS" == "" ]]; then
   if [[ "$UPDATEREPO" == "1" ]] ; then
     echo Updating
-    update_repo fds $FDSBRANCH || exit 1
+    if [[ "$CLONE_REPOS" == "" ]]; then
+      update_repo fds $FDSBRANCH || exit 1
+      update_repo smv $SMVBRANCH || exit 1
+    fi
     update_repo fig master || exit 1
     update_repo out master || exit 1
-    update_repo smv $SMVBRANCH || exit 1
+    update_repo exp master || exit 1
   else
     echo Repos not updated
   fi
-fi
-if [[ "$UPDATEREPO" == "1" ]] ; then
-  update_repo exp master || exit 1
-fi
 
 #*** check fds and smv repos for text files with CRLF line endings
 #    don't check lines if not cloning and not cleaning repo - avoid false positives

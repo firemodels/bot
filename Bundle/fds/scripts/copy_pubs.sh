@@ -1,8 +1,14 @@
 #!/bin/bash
 pub_type=$1
-pdf_from=$2
 bot_host=$3
 error_log=$4
+
+if [[ "$bot_host" != "" ]] && [[ `hostname` != "$bot_host" ]]; then
+  pdf_from=$2
+else
+  eval pdf_from=$2
+fi
+
 
 if [ "$pub_type" != "fds" ]; then
   pub_type="smv"

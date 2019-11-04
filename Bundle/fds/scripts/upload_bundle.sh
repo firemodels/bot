@@ -3,6 +3,8 @@ BUNDLE_DIR=$1
 BUNDLE_BASE=$2
 platform=$3
 
+erase=1
+
 GDRIVE=~/bin/gdrive
 # directory containing nightly bundles on google drive : nightly_bundles
 #  the following string is gound at the end of the URL of the nightly_bundles
@@ -40,7 +42,9 @@ if [ ! -e $BUNDLE_DIR/$shafile ]; then
   upload=
 fi
 if [ "$upload" == "1" ]; then
-  $GDRIVE list  | grep $platform | awk '{ system("~/bin/gdrive delete -i " $1)} '
+  if [ "$erase" == "1" ]; then
+    $GDRIVE list  | grep $platform | awk '{ system("~/bin/gdrive delete -i " $1)} '
+  fi
   $GDRIVE upload -p $BUNDLE_PARENT_ID -f $BUNDLE_DIR/$file
   nfiles=`$GDRIVE list  | grep $file | wc -l`
   if [ $nfiles -eq 0 ]; then

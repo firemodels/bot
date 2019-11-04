@@ -14,6 +14,8 @@ echo "-F - setup repos used by firebot (erase each repo first): "
 echo "    $firebotrepos"
 echo "-s - setup repos used by smokebot: "
 echo "    $smvrepos"
+echo "-S - setup repos used by smokebot (erase each repo first): "
+echo "    $smvrepos"
 echo "-w - setup wiki and webpage repos cloned from firemodels"
 echo "-h - display this message"
 exit
@@ -40,7 +42,7 @@ else
    exit
 fi
 
-while getopts 'acfFhsw' OPTION
+while getopts 'acfFhsSw' OPTION
 do
 case $OPTION  in
   a)
@@ -61,6 +63,10 @@ case $OPTION  in
    ;;
   s)
    repos=$smvrepos;
+   ;;
+  S)
+   repos=$smvrepos;
+   eraserepos=1
    ;;
   w)
    repos=$wikiwebrepos;
