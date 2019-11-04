@@ -31,7 +31,7 @@ run_auto()
 
   MESSAGE_FILE=$GIT_STATUS_DIR/message
 
-  update_repo web nist-pages || return 1
+  update_repo webpages nist-pages || return 1
 
 # get info for smokeview source directory
   cd $WEB_DIR
@@ -189,7 +189,7 @@ check_update_repo()
 
 check_stage1()
 {
-   if [[ `grep -rIi 'error:\*\*\*' $OUTPUT_DIR/stage1` = "" ]]
+   if [[ `grep -rIi '\*\*\*error:' $OUTPUT_DIR/stage1` = "" ]]
    then
       stage1_success=true
    else
@@ -258,7 +258,11 @@ GIT_WEB_LOG_FILE=$GIT_STATUS_DIR/web_log
 THIS_WEBAUTHOR=`git log . | head -2 | tail -1 | awk '{print $2}'`
 THIS_WEB_REVISION=`git log --abbrev-commit . | head -1 | awk '{print $2}'`
 THIS_WEB_VERSION=`git describe --dirty`
-LAST_WEB_REVISION=`cat $GIT_WEB_REVISION_FILE`
+if [ -e $GIT_WEB_REVISION_FILE ]; then
+  LAST_WEB_REVISION=`cat $GIT_WEB_REVISION_FILE`
+else
+  LAST_WEB_REVISION=
+fi
 git log . | head -5 | tail -1 > $GIT_WEB_LOG_FILE
 
 CLEAN_REPO=
