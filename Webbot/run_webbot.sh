@@ -97,6 +97,7 @@ do
 case $OPTION in
   a)
    RUNAUTO="-a"
+   ;;
   A)
    CHECK_ALL="-A"
    ;;
