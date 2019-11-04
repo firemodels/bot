@@ -208,11 +208,21 @@ check_stage1()
 email_build_status()
 {
   echo "----------------------------------------------" > $TIME_LOG
-  echo "              host: $hostname"    >> $TIME_LOG
-  echo "  webpages version: $WEB_VERSION" >> $TIME_LOG
+  echo "              host: $hostname"         >> $TIME_LOG
+  echo "  webpages version: $THIS_WEB_VERSION" >> $TIME_LOG
+  echo ""                                      >> $TIME_LOG
 
   cd $webbotdir
-  cat output/stage1 >> $TIME_LOG
+
+  nsummary=`cat output/stage1 | wc -l`
+  if [ "$nsummary" != "0" ]; then
+    echo "Summary:"                              >> $TIME_LOG
+
+    cd $webbotdir
+    cat output/stage1 >> $TIME_LOG
+  else
+    echo "No web pages have changed"             >> $TIME_LOG
+  fi
 
   if [ -e $ERROR_LOG ]; then
     EMAIL_SUBJECT="webbot failure"
@@ -365,7 +375,7 @@ if [ "$UPDATE_REPO" == "1" ]; then
   check_update_repo
 fi
 
-echo "" > $OUTPUT_DIR/stage1
+touch $OUTPUT_DIR/stage1
 cd $webrepo
 for webpage in *.html; do
   webpage_old=$SAVED_WEB_PAGES/$webpage
