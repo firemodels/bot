@@ -246,6 +246,8 @@ MKDIR $SAVED_WEB_PAGES
 
 webbotdir=`pwd`
 OUTPUT_DIR="$webbotdir/output"
+MKDIR $OUTPUT_DIR
+touch $OUTPUT_DIR/stage1
 
 EMAIL_LIST="$HOME/.webbot/webbot_email_list.sh"
 ERROR_LOG=$OUTPUT_DIR/errors
