@@ -45,6 +45,7 @@ run_auto()
 
   rm -f $MESSAGE_FILE
   echo $THIS_WEB_REVISION > $GIT_WEB_REVISION_FILE
+  echo $THIS_WEB_VERSION > $GIT_WEB_VERSION_FILE
   echo -e "one or more web pages have changed. $LAST_WEB_REVISION->$THIS_WEB_REVISION($THIS_WEBAUTHOR)" >> $MESSAGE_FILE
   cat $GIT_WEB_LOG_FILE >> $MESSAGE_FILE
   echo -e "Webbot run initiated." >> $MESSAGE_FILE
@@ -207,9 +208,8 @@ check_stage1()
 email_build_status()
 {
   echo "----------------------------------------------" > $TIME_LOG
-  echo "                host: $hostname " >> $TIME_LOG
-  echo "  web version/branch: $WEB_REVISION/$WEBBRANCH" >> $TIME_LOG
-  echo "  WEB revisions: old: $LAST_WEB_REVISION new: $THIS_WEB_REVISION" >> $TIME_LOG
+  echo "              host: $hostname"    >> $TIME_LOG
+  echo "  webpages version: $WEB_VERSION" >> $TIME_LOG
 
   cd $webbotdir
   cat output/stage1 >> $TIME_LOG
@@ -220,7 +220,7 @@ email_build_status()
     EMAIL_SUBJECT="webbot success"
   fi
 
-  EMAIL_SUBJECT="$EMAIL_SUBJECT on ${hostname}, ${THIS_WEB_REVISION}"
+  EMAIL_SUBJECT="$EMAIL_SUBJECT on ${hostname}, ${THIS_WEB_VERSION}"
   cat $TIME_LOG | mail -s "$EMAIL_SUBJECT" $mailTo > /dev/null
 }
 
@@ -244,11 +244,13 @@ ERROR_LOG=$OUTPUT_DIR/errors
 WARNING_LOG=$OUTPUT_DIR/warnings
 TIME_LOG=$OUTPUT_DIR/time_log
   
+GIT_WEB_VERSION_FILE=$GIT_STATUS_DIR/web_version
 GIT_WEB_REVISION_FILE=$GIT_STATUS_DIR/web_revision
 GIT_WEB_LOG_FILE=$GIT_STATUS_DIR/web_log
 
 THIS_WEBAUTHOR=`git log . | head -2 | tail -1 | awk '{print $2}'`
 THIS_WEB_REVISION=`git log --abbrev-commit . | head -1 | awk '{print $2}'`
+THIS_WEB_VERSION=`git describe --dirty`
 LAST_WEB_REVISION=`cat $GIT_WEB_REVISION_FILE`
 git log . | head -5 | tail -1 > $GIT_WEB_LOG_FILE
 
@@ -313,7 +315,7 @@ fi
 
 CD_REPO $webrepo $WEBBRANCH || exit 1
 
-# if -a option is invoked, only proceed running webbot if the
+# if -a option is invoked, only proceed running webbot if
 # a page in the web repo has changed
 
 if [[ $RUNAUTO == "y" ]] ; then
@@ -331,14 +333,6 @@ echo "     Run dir: $webbotdir"
 echo ""
 
 cd
-
-THIS_WEB_AUTHOR=
-THIS_WEB_FAILED=0
-WEB_STATUS_FILE=$webrepo/WEB_status
-LAST_WEB_FAILED=0
-if [ -e $WEB_STATUS_FILE ] ; then
-  LAST_WEB_FAILED=`cat $WEB_STATUS_FILE`
-fi
 
 # Load mailing list for status report
 if [ "$mailTo" == "" ]; then
