@@ -6,10 +6,9 @@ echo ""
 echo "Options:"
 echo "-a - setup all available repos: "
 echo "    $allrepos"
-echo "-b - setup remotes on bot repo"
 echo "-c - setup repos used by cfastbot: "
 echo "    $cfastrepos"
-echo "-d - only clone fds and smv repos (erase each repo first)"
+echo "-d - only setup fds and smv repos (erase each repo first)"
 echo "-f - setup repos used by firebot: "
 echo "    $fdsrepos"
 echo "-F - setup repos used by firebot (erase each repo first): "
@@ -65,7 +64,6 @@ eraserepos=
 
 FMROOT=
 WIKIWEB=
-SETUP_BOT=
 if [ -e ../.gitbot ]; then
    cd ../..
    FMROOT=`pwd`
@@ -79,9 +77,6 @@ do
 case $OPTION  in
   a)
    repos=$allrepos;
-   ;;
-  b)
-   SETUP_BOT=1;
    ;;
   c)
    repos=$cfastrepos;
@@ -189,8 +184,4 @@ do
   SETUP_REPO $repo_dir
 
 done
-if [ "$SETUP_BOT" == "1" ]; then
-  echo setting up remotes in the bot repo
-  SETUP_REPO $FMROOT/bot
-fi
 cd $CURDIR

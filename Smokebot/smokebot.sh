@@ -1627,7 +1627,9 @@ smvrepo=$repo/smv
 if [[ "$CLONE_REPOS" != "" ]]; then
   echo Cloning repos
   cd $botrepo/Scripts
-  ./setup_repos.sh -S > $OUTPUT_DIR/stage1_clone 2>&1
+
+# only clone fds and smv repos
+  ./setup_repos.sh -d > $OUTPUT_DIR/stage1_clone 2>&1
   if [ "$CLONE_REPOS" != "master" ]; then
     FDSBRANCH=$CLONE_REPOS
     cd $fdsrepo
@@ -1666,7 +1668,7 @@ if [ "$SMVBRANCH" == "current" ]; then
   SMVBRANCH=`git rev-parse --abbrev-ref HEAD`
 fi
 
-#*** save pid if -k option (kill smokebot) is used lateer
+#*** save pid so -k option (kill smokebot) may be used lateer
 
 echo $$ > $PID_FILE
 
@@ -1835,20 +1837,18 @@ clean_smokebot_history
 echo "Run Status"
 echo "----------"
 
-if [ "$CLONE_REPOS" == "" ]; then
-  if [ "$CLEANREPO" == "1" ]; then
-    echo Cleaning
-    echo "   cfast"
-    clean_repo2 cfast master || exit 1
-    echo "   fds"
-    clean_repo2 fds $FDSBRANCH || exit 1
-    echo "   fig"
-    clean_repo2 fig master || exit 1
-    echo "   smv"
-    clean_repo2 smv $SMVBRANCH || exit 1
-  else
-    echo Repos not cleaned
-  fi
+if [ "$CLEANREPO" == "1" ]; then
+  echo Cleaning
+  echo "   cfast"
+  clean_repo2 cfast master || exit 1
+  echo "   fds"
+  clean_repo2 fds $FDSBRANCH || exit 1
+  echo "   fig"
+  clean_repo2 fig master || exit 1
+  echo "   smv"
+  clean_repo2 smv $SMVBRANCH || exit 1
+else
+  echo Repos not cleaned
 fi
 
 if [ "$UPDATEREPO" == "1" ]; then
