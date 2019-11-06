@@ -241,7 +241,7 @@ update_repo()
       git merge firemodels/$branch                   >> $OUTPUT_DIR/stage1 2>&1
       need_push=`git status -uno | head -2 | grep -v nothing | wc -l`
       if [ $need_push -gt 1 ]; then
-        echo "warning: firemodels commits to $reponame repo need to be pushed to origin" >> $OUTPUT_DIR/stage1 2>&1
+        echo "warning: firemodels commits to the $reponame repo need to be pushed to origin" >> $OUTPUT_DIR/stage1 2>&1
         git status -uno | head -2 | grep -v nothing                                      >> $OUTPUT_DIR/stage1 2>&1
       fi
    fi
