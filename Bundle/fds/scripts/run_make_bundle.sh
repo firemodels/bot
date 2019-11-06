@@ -68,19 +68,72 @@ UPDATE_REPO()
 }
 
 curdir=`pwd`
-args=$0
-DIR=$(dirname "${args}")
+commands=$0
+DIR=$(dirname "${commands}")
 cd $DIR
 DIR=`pwd`
 
 cd ../../../..
 repo=`pwd`
 
+while getopts 'A:Bcd:fF:ghp:S:uUvw' OPTION
+do
+case $OPTION  in
+  A)
+   AOPT="-A $OPTARG"
+   ;;
+  B)
+   BOPT="-B"
+   ;;
+  d)
+   dopt="-d $OPTARG"
+   ;;
+  c)
+   copt="-c"
+   ;;
+  f)
+   fopt="-f"
+   ;;
+  F)
+   FOPT="-F $OPTARG"
+   ;;
+  g)
+   gopt="-g"
+   ;;
+  h)
+   hopt="-h"
+   ;;
+  p)
+   popt="-p $OPTARG"
+   ;;
+  S)
+   SOPT="-S $OPTARG"
+   ;;
+  u)
+   uopt="-u"
+   ;;
+  U)
+   UOPT="-U"
+   ;;
+  v)
+   vopt="-v"
+   ;;
+  w)
+   wopt="=w"
+   ;;
+esac
+done
+shift $(($OPTIND-1))
+
+# update repo 
+if [ "$hopt" == "" ]; then
+if [ "$vopt" == "" ]; then
+  UPDATE_REPO bot master || exit 1
+fi
+fi
+
 cd $DIR
-
-UPDATE_REPO bot master || exit 1
-
-./make_bundle.sh "$@"
+./make_bundle.sh $AOPT $BOPT $dopt $copt $fopt $FOPT $gopt $hopt $popt $SOPT $uopt $UOPT $vopt $wopt
 
 cd $curdir
 
