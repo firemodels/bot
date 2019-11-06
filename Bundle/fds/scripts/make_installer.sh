@@ -566,7 +566,7 @@ module load $SMVMODULE
 
 STARTUP
 
-mv \$STARTUPtmp \$FDS_root/Documentation/README_startup.html
+mv \$STARTUPtmp \$FDS_root/README.html
 
 EOF
 
