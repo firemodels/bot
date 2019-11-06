@@ -803,7 +803,7 @@ check_cases_release()
    # Scan for and report any errors in FDS cases
    cd $dir
 
-   if [[ `grep -rI 'Run aborted' $OUTPUT_DIR/stage5 | grep -v grep` == ""          ]] && \
+   if [[ `grep 'Run aborted' $OUTPUT_DIR/stage5 | grep -v grep` == ""              ]] && \
       [[ `grep 'ERROR' $OUTPUT_DIR/stage5 | grep -v geom_bad | grep -v grep` == "" ]] && \
       [[ `grep -rI Segmentation * | grep -v grep` == ""                            ]] && \
       [[ `grep -rI ERROR: * | grep -v echo | grep -v grep` == ""                   ]] && \
@@ -814,7 +814,7 @@ check_cases_release()
    then
       cases_release_success=true
    else
-      grep -rI 'Run aborted' $OUTPUT_DIR/stage5 | grep -v grep                  >> $OUTPUT_DIR/stage5_errors
+      grep 'Run aborted' $OUTPUT_DIR/stage5 | grep -v grep                      >> $OUTPUT_DIR/stage5_errors
       grep 'ERROR' $OUTPUT_DIR/stage5 | grep -v geom_bad | grep -v grep         >> $OUTPUT_DIR/stage5_errors
       grep -rI Segmentation * | grep -v grep                                    >> $OUTPUT_DIR/stage5_errors
       grep -rI ERROR: * | grep -v echo | grep -v grep                           >> $OUTPUT_DIR/stage5_errors
