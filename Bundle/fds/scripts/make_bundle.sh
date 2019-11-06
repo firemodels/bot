@@ -62,7 +62,7 @@ echo "-U - use apps built by firebot and pubs built firebot and smokebot"
 echo "     both in the `whoami` account"
 echo "-v - show parameters used to build bundle (the bundle is not generated)"
 echo "-w - overwrite bundle (it it already exists)"
-exit
+exit 0
 }
 
 #define default home directories for apps and pubs
@@ -220,7 +220,7 @@ DIR=`pwd`
 if [ "$showparms" == "" ]; then
 if [ "$BUILD_APPS" == "1" ]; then
   cd ../../../Firebot
-  ./run_firebot.sh -B
+  ./run_firebot.sh -B || exit 1
   cd $DIR
 fi
 fi
@@ -267,7 +267,7 @@ if [ "$OVERWRITE" == "" ]; then
   if [ -e $installer_file ]; then
     echo "***warning: the installer file $installer_file exists."
     echo "             Use the -w option to overwrite it."
-    exit
+    exit 1
   fi
 fi
 fi
@@ -293,3 +293,4 @@ if [ "$ECHO" == "" ]; then
   rm -f $bundle_dir/${installer_base_platform}.tar.gz
   rm -rf $bundle_dir/${installer_base_platform}
 fi
+exit 0
