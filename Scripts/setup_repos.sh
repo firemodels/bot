@@ -6,6 +6,7 @@ echo ""
 echo "Options:"
 echo "-a - setup all available repos: "
 echo "    $allrepos"
+echo "-b - only clone fds and smv repos (erase each repo first)"
 echo "-c - setup repos used by cfastbot: "
 echo "    $cfastrepos"
 echo "-f - setup repos used by firebot: "
@@ -24,6 +25,7 @@ exit
 CURDIR=`pwd`
 
 fdsrepos="exp fds fig out smv"
+fdssmvrepos="fds smv"
 firebotrepos="exp fds fds-smv fig out smv"
 smvrepos="cfast fds fig smv"
 cfastrepos="cfast exp fig smv"
@@ -42,11 +44,15 @@ else
    exit
 fi
 
-while getopts 'acfFhsSw' OPTION
+while getopts 'abcfFhsSw' OPTION
 do
 case $OPTION  in
   a)
    repos=$allrepos;
+   ;;
+  b)
+   repos=$fdssmvrepos;
+   eraserepos=1
    ;;
   c)
    repos=$cfastrepos;
