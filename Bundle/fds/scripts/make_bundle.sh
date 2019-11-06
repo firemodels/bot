@@ -238,7 +238,7 @@ DIR=`pwd`
 if [ "$showparms" == "" ]; then
 if [ "$BUILD_APPS" == "1" ]; then
   cd ../../../Firebot
-  ./run_firebot.sh -B
+  ./run_firebot.sh -c -u -B
   return_status=$?
   if [ "$return_status" == "1" ]; then
     exit 1
