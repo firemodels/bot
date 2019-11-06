@@ -15,7 +15,7 @@ mpi_version_osx=3.1.2
 #---------------------------------------------
 
 function usage {
-echo "This script builds a bundle using apps built by firebot,"
+echo "This script builds a bundle using applications built by firebot,"
 echo "FDS pubs built by firebot, Smokeview pubs built by smokebot"
 echo "and other files found in the fds, smv and bot repos."
 echo ""
@@ -24,14 +24,14 @@ echo "1. apps built by firebot and FDS/Smokeview pubs built by"
 echo "   firebot/smokebot on the computer runneng this script."
 echo "   This is how NIST build Linux bundles"
 echo ""
-echo "./make_bundle.sh "
+echo "./run_bundler.sh "
 echo ""
 echo "2. apps built by firebot on this computer, pubs built by"
 echo "   firebot/smokebot on the computer xxx.yyy.zzz. This is how"
 echo "   NIST builds OSX bundles where 'this computer' is an OSX"
 echo "   computer and xxx.yyy.zzz is a Linux computer that ran firebot."
 echo ""
-echo "./make_bundle.sh -u -p xxx.yyy.zzz"
+echo "./run_bundler.sh -u -p xxx.yyy.zzz"
 echo ""
 echo "The -v option may be used to show the parameters used to"
 echo "build the bundle."
@@ -157,7 +157,7 @@ shift $(($OPTIND-1))
 LOCK_FILE=$HOME/.bundle/make_bundle_lock
 if [ "$FORCE" == "" ]; then
 if [ -e $LOCK_FILE ]; then
-  echo "***error: another instance of the make_bundle script is apparently running."
+  echo "***error: another instance of the bundler script is running."
   echo "          If this is not the case re-run using the -f option."
   exit 1
 fi

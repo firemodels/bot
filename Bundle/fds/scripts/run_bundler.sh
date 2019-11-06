@@ -133,7 +133,7 @@ fi
 fi
 
 cd $DIR
-./make_bundle.sh $AOPT $BOPT $dopt $copt $fopt $FOPT $gopt $hopt $popt $SOPT $uopt $UOPT $vopt $wopt
+./bundler.sh $AOPT $BOPT $dopt $copt $fopt $FOPT $gopt $hopt $popt $SOPT $uopt $UOPT $vopt $wopt
 
 cd $curdir
 
