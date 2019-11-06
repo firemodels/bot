@@ -55,7 +55,7 @@ echo "-v - show options used to run firebot"
 if [ "$option" == "-H" ]; then
 usage_all
 fi
-exit
+exit 0
 }
 
 #---------------------------------------------
@@ -135,7 +135,7 @@ if [ -e .fds_git ]; then
   cd $CURDIR
 else
   echo "***error: firebot not running in the bot/Firebot directory"
-  exit
+  exit 1
 fi
 
 #*** checking to see if a queing system is available
@@ -319,13 +319,13 @@ if [ "$KILL_FIREBOT" == "1" ]; then
   else
     echo firebot is not running
   fi
-  exit
+  exit 0
 fi
 
 if [ "$REMOVE_PID" == "1" ]; then
   rm -f $firebot_pid
   echo "$firebot_pid status file removed"
-  exit
+  exit 0
 fi
 
 #*** abort if firebot is already running
@@ -334,7 +334,7 @@ if [ -e $firebot_pid ] ; then
   if [ "$FORCE" == "" ] ; then
     echo Firebot or smokebot are already running. If this
     echo "is not the case re-run using the -f option."
-    exit
+    exit 1
   fi
 fi
 

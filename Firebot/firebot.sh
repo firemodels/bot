@@ -29,7 +29,7 @@ echo "-s - skip matlab and document building stages"
 echo "-u - update repo"
 echo "-U - upload guides"
 echo "-W - clone fds, exp, fig, out and smv repos"
-exit
+exit 0
 }
 
 #---------------------------------------------
@@ -1853,7 +1853,7 @@ if [ -e .fds_git ]; then
 else
   echo "***error: firebot not running in the bot/Firebot directory"
   echo "          Aborting firebot"
-  exit
+  exit 1
 fi
 
 if [[ "$QUEUE" == "none" ]] && [[ -e $SCRIPTFILES ]]; then
@@ -1949,7 +1949,7 @@ if [ "$USEINSTALL" != "" ]; then
    if [ $notfound == 1 ]; then
       echo "Error: smokeview not found. firebot aborted."
       echo "Error: smokeview not found. firebot aborted." >> $OUTPUT_DIR/stage1 2>&1
-      exit
+      exit 1
    fi
 fi
 
@@ -1961,7 +1961,7 @@ if [ "QUEUE" == "none" ]; then
       echo "       Add the directory containing fds and smokeview to your path"
       echo "       (same directory containing fds and smokeview)"
       echo "Error: background not found. firebot aborted." >> $OUTPUT_DIR/stage1 2>&1
-      exit
+      exit 1
    fi
 fi
 
