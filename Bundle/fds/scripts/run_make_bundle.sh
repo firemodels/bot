@@ -119,7 +119,7 @@ case $OPTION  in
    vopt="-v"
    ;;
   w)
-   wopt="=w"
+   wopt="-w"
    ;;
 esac
 done
