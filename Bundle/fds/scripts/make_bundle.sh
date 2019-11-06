@@ -45,13 +45,14 @@ echo "UPLOAD_HOST - host where installer is uploaded to Google Drive"
 echo ""
 echo "Options:"
 echo "-a - host containing apps [default: $app_host]"
+echo "-A - home directory containing FDS pubs [default: $fds_pub_home]"
 echo "-B - build apps - this script builds apps by running"
 echo "     firebot with the -B option"
 echo "-c - use apps and pubs previously copied to $HOME/.bundle/apps"
 echo "     and $HOME/.bundle/pubs"
 echo "-d - bundle directory location [default: $bundle_dir]"
-echo "-f - home directory containing apps [default: $app_home]"
-echo "-F - home directory containing FDS pubs [default: $fds_pub_home]"
+echo "-f - force this script to run"
+echo "-F - home directory containing apps [default: $app_home]"
 echo "-g - upload installer file to a google drive directory with id in the"
 echo "     file $HOME/.bundle/GOOGLE_DIR_ID"
 echo "-S - home directory containing Smokeview pubs [default: $smv_pub_home]"
@@ -89,11 +90,15 @@ bundle_dir=$HOME/.bundle/bundles
 USE_CACHE=
 OVERWRITE=
 UPLOAD_GOOGLE=
+FORCE=
 GOOGLE_DIR_ID_FILE=$HOME/.bundle/GOOGLE_DIR_ID
 
-while getopts 'Bcd:f:F:ghp:S:uUvw' OPTION
+while getopts 'A:Bcd:fF:ghp:S:uUvw' OPTION
 do
 case $OPTION  in
+  A)
+   app_home=$OPTARG
+   ;;
   B)
    BUILD_APPS=1
    app_home=$HOME
@@ -110,7 +115,7 @@ case $OPTION  in
    smv_pub_home=$HOME
    ;;
   f)
-   app_home=$OPTARG
+   FORCE="1"
    ;;
   F)
    fds_pub_home=$OPTARG
@@ -145,6 +150,19 @@ case $OPTION  in
 esac
 done
 shift $(($OPTIND-1))
+
+# prevent more than one instance of the make_bundle.sh script from running
+# at the same time
+
+LOCK_FILE=$HOME/.bundle/make_bundle_lock
+if [ "$FORCE" == "" ]; then
+if [ -e $LOCK_FILE ]; then
+  echo "***error: another instance of the make_bundle script is apparently running."
+  echo "          If this is not the case re-run using the -f option."
+  exit 1
+fi
+fi
+touch $LOCK_FILE
 
 # determine platform script is running on
 
@@ -220,7 +238,12 @@ DIR=`pwd`
 if [ "$showparms" == "" ]; then
 if [ "$BUILD_APPS" == "1" ]; then
   cd ../../../Firebot
-  ./run_firebot.sh -B || exit 1
+  ./run_firebot.sh -B
+  return_status=$?
+  if [ "$return_status" == "1" ]; then
+    exit 1
+    rm -f $LOCK_FILE
+  fi
   cd $DIR
 fi
 fi
@@ -242,6 +265,7 @@ if [ "$showparms" == "" ]; then
     echo ""
     echo "bundle generation aborted"
     rm $error_log
+    rm -f $LOCK_FILE
     exit 1
   fi
 fi
@@ -267,6 +291,7 @@ if [ "$OVERWRITE" == "" ]; then
   if [ -e $installer_file ]; then
     echo "***warning: the installer file $installer_file exists."
     echo "             Use the -w option to overwrite it."
+    rm -f $LOCK_FILE
     exit 1
   fi
 fi
@@ -293,4 +318,5 @@ if [ "$ECHO" == "" ]; then
   rm -f $bundle_dir/${installer_base_platform}.tar.gz
   rm -rf $bundle_dir/${installer_base_platform}
 fi
+rm -f $LOCK_FILE
 exit 0
