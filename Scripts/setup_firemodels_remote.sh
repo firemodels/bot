@@ -1,4 +1,9 @@
 #!/bin/bash
+repo=$1
+if [ "$repo" == "" ]; then
+  echo "***error: specify repo name"
+  exit
+fi
 
 GITHEADER=`git remote -v | grep origin | head -1 | awk  '{print $2}' | awk -F ':' '{print $1}'`
 if [ "$GITHEADER" == "git@github.com" ]; then
@@ -29,3 +34,6 @@ else
      echo "   push access to firemodels already disabled"
    fi
 fi
+echo ""
+echo "remotes for repo $repo:"
+git remote -v
