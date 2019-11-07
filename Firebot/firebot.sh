@@ -1617,6 +1617,7 @@ email_build_status()
       cd $firebotdir
 
      # Send email with failure message and warnings, body of email contains appropriate log file
+     echo "[$botuser] $bottype failure and warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH."
      if [ "$HAVE_MAIL" == "1" ]; then
        cat $ERROR_LOG $TIME_LOG | mail -s "[$botuser] $bottype failure and warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
      fi
@@ -1625,6 +1626,7 @@ email_build_status()
    elif [ -e $ERROR_LOG ]
    then
       # Send email with failure message, body of email contains error log file
+      echo "[$botuser] $bottype failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH."
       if [ "$HAVE_MAIL" == "1" ]; then
         cat $ERROR_LOG $TIME_LOG | mail -s "[$botuser] $bottype failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
       fi
@@ -1635,6 +1637,7 @@ email_build_status()
       cd $firebotdir
 
       # Send email with success message, include warnings
+      echo "[$botuser] $bottype success, with warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH"
       if [ "$HAVE_MAIL" == "1" ]; then
         cat $WARNING_LOG $TIME_LOG | mail -s "[$botuser] $bottype success, with warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
       fi
@@ -1646,6 +1649,7 @@ email_build_status()
 
       # Send success message with links to nightly manuals
       firebot_status=0
+      echo "[$botuser] $bottype success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH"
       if [ "$HAVE_MAIL" == "1" ]; then
         cat $TIME_LOG | mail -s "[$botuser] $bottype success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
       fi
@@ -2256,4 +2260,5 @@ if [[ "$DEBUG_ONLY" == "" ]] && [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" 
   archive_timing_stats
 fi
 email_build_status 'Firebot'
+echo firebot exit status: $firebot_status
 exit $firebot_status
