@@ -345,18 +345,12 @@ update_repo()
    
    if [[ "$reponame" == "smv" ]]; then
       git update-index --refresh
-      GIT_REVISION=`git describe --long --dirty`
-      GIT_SHORTHASH=`git rev-parse --short HEAD`
-      GIT_LONGHASH=`git rev-parse HEAD`
-      GIT_DATE=`git log -1 --format=%cd --date=local $GIT_SHORTHASH`
    fi
    if [[ "$reponame" == "fds" ]]; then
       git update-index --refresh
-      FDS_REVISION=`git describe --long --dirty`
    fi
    if [[ "$reponame" == "cfast" ]]; then
       git update-index --refresh
-      CFAST_REVISION=`git describe --long --dirty`
    fi
 
    cd $repo/$reponame
@@ -377,7 +371,7 @@ update_repo()
       need_push=`git status -uno | head -2 | grep -v nothing | grep -v 'Your branch' | grep -v '^$' | wc -l`
       if [ $need_push -gt 1 ]; then
         echo "warning: firemodels commits to $reponame repo need to be pushed to origin" >> $OUTPUT_DIR/stage0 2>&1
-        git status -uno | head -2 | grep -v nothing                                 >> $OUTPUT_DIR/stage0 2>&1
+        git status -uno | head -2 | grep -v nothing                                      >> $OUTPUT_DIR/stage0 2>&1
       fi
 
    fi
@@ -1197,8 +1191,8 @@ archive_timing_stats()
 {
   echo "   archiving"
   cd $smvrepo/Utilities/Scripts
-  cp smv_timing_stats.csv          "$HISTORY_DIR_ARCHIVE/${GIT_REVISION}_timing.csv"
-  cp smv_benchmarktiming_stats.csv "$HISTORY_DIR_ARCHIVE/${GIT_REVISION}_benchmarktiming.csv"
+  cp smv_timing_stats.csv          "$HISTORY_DIR_ARCHIVE/${SMV_REVISION}_timing.csv"
+  cp smv_benchmarktiming_stats.csv "$HISTORY_DIR_ARCHIVE/${SMV_REVISION}_benchmarktiming.csv"
   TOTAL_SMV_TIMES=`tail -1 smv_benchmarktiming_stats.csv`
   if [[ "$UPLOADRESULTS" == "1" ]] && [[ "$USER" == "smokebot" ]]; then
     cd $botrepo/Smokebot
@@ -1292,28 +1286,28 @@ save_build_status()
    then
      echo "***Warnings:" >> $ERROR_LOG
      cat $WARNING_LOG >> $ERROR_LOG
-     echo "   build failure and warnings for version: ${GIT_REVISION}, branch: $SMVBRANCH."
-     echo "Build failure and warnings;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$SMVBRANCH;$STOP_TIME_INT;3;$TOTAL_SMV_TIMES;$HOST" > "$HISTORY_DIR_ARCHIVE/${GIT_REVISION}.txt"
-     cat $ERROR_LOG > "$HISTORY_DIR_ARCHIVE/${GIT_REVISION}_errors.txt"
+     echo "   build failure and warnings for version: ${SMV_REVISION}, branch: $SMVBRANCH."
+     echo "Build failure and warnings;$SMV_DATE;$SMV_SHORTHASH;$SMV_LONGHASH;${SMV_REVISION};$SMVBRANCH;$STOP_TIME_INT;3;$TOTAL_SMV_TIMES;$HOST" > "$HISTORY_DIR_ARCHIVE/${SMV_REVISION}.txt"
+     cat $ERROR_LOG > "$HISTORY_DIR_ARCHIVE/${SMV_REVISION}_errors.txt"
 
    # Check for errors only
    elif [ -e $ERROR_LOG ]
    then
-      echo "   build failure for version: ${GIT_REVISION}, branch: $SMVBRANCH."
-      echo "Build failure;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$SMVBRANCH;$STOP_TIME_INT;3;$TOTAL_SMV_TIMES;$HOST" > "$HISTORY_DIR_ARCHIVE/${GIT_REVISION}.txt"
-      cat $ERROR_LOG > "$HISTORY_DIR_ARCHIVE/${GIT_REVISION}_errors.txt"
+      echo "   build failure for version: ${SMV_REVISION}, branch: $SMVBRANCH."
+      echo "Build failure;$SMV_DATE;$SMV_SHORTHASH;$SMV_LONGHASH;${SMV_REVISION};$SMVBRANCH;$STOP_TIME_INT;3;$TOTAL_SMV_TIMES;$HOST" > "$HISTORY_DIR_ARCHIVE/${SMV_REVISION}.txt"
+      cat $ERROR_LOG > "$HISTORY_DIR_ARCHIVE/${SMV_REVISION}_errors.txt"
 
    # Check for warnings only
    elif [ -e $WARNING_LOG ]
    then
-      echo "   build success with warnings for version: ${GIT_REVISION}, branch: $SMVBRANCH."
-      echo "Build success with warnings;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$SMVBRANCH;$STOP_TIME_INT;2;$TOTAL_SMV_TIMES;$HOST" > "$HISTORY_DIR_ARCHIVE/${GIT_REVISION}.txt"
-      cat $WARNING_LOG > "$HISTORY_DIR_ARCHIVE/${GIT_REVISION}_warnings.txt"
+      echo "   build success with warnings for version: ${SMV_REVISION}, branch: $SMVBRANCH."
+      echo "Build success with warnings;$SMV_DATE;$SMV_SHORTHASH;$SMV_LONGHASH;${SMV_REVISION};$SMVBRANCH;$STOP_TIME_INT;2;$TOTAL_SMV_TIMES;$HOST" > "$HISTORY_DIR_ARCHIVE/${SMV_REVISION}.txt"
+      cat $WARNING_LOG > "$HISTORY_DIR_ARCHIVE/${SMV_REVISION}_warnings.txt"
 
    # No errors or warnings
    else
-      echo "   build success for version: ${GIT_REVISION}, branch: $SMVBRANCH."
-      echo "Build success!;$GIT_DATE;$GIT_SHORTHASH;$GIT_LONGHASH;${GIT_REVISION};$SMVBRANCH;$STOP_TIME_INT;1;$TOTAL_SMV_TIMES;$HOST" > "$HISTORY_DIR_ARCHIVE/${GIT_REVISION}.txt"
+      echo "   build success for version: ${SMV_REVISION}, branch: $SMVBRANCH."
+      echo "Build success!;$SMV_DATE;$SMV_SHORTHASH;$SMV_LONGHASH;${SMV_REVISION};$SMVBRANCH;$STOP_TIME_INT;1;$TOTAL_SMV_TIMES;$HOST" > "$HISTORY_DIR_ARCHIVE/${SMV_REVISION}.txt"
    fi
 }
 
@@ -1359,7 +1353,7 @@ email_build_status()
    echo "                repo: $repo" >> $TIME_LOG
    echo "               queue: $SMOKEBOT_QUEUE" >> $TIME_LOG
    echo "  fds version/branch: $FDS_REVISION/$FDSBRANCH" >> $TIME_LOG
-   echo "  smv version/branch: $GIT_REVISION/$SMVBRANCH" >> $TIME_LOG
+   echo "  smv version/branch: $SMV_REVISION/$SMVBRANCH" >> $TIME_LOG
    echo "cfast version/branch: $CFAST_REVISION/$CFASTBRANCH" >> $TIME_LOG
 if [ "$IFORT_VERSION" != "" ]; then
    echo "              Fortran: $IFORT_VERSION " >> $TIME_LOG
@@ -1376,8 +1370,21 @@ fi
    echo "         make guides: $DIFF_MAKEGUIDES" >> $TIME_LOG
    echo "               total: $DIFF_SCRIPT_TIME" >> $TIME_LOG
    echo "   benchmark time(s): $TOTAL_SMV_TIMES" >> $TIME_LOG
-   echo "   FDS revisions: old: $LAST_FDS_REVISION new: $THIS_FDS_REVISION" >> $TIME_LOG
-   echo "   SMV revisions: old: $LAST_SMV_REVISION new: $THIS_SMV_REVISION" >> $TIME_LOG
+   DISPLAY_FDS_REVISION=
+   DISPLAY_SMV_REVISION=
+   if [ "$RUNAUTO" == "y" ]; then
+     DISPLAY_FDS_REVISION=1
+     DISPLAY_SMV_REVISION=1
+   fi
+   if [ "$RUNAUTO" == "Y" ]; then
+     DISPLAY_SMV_REVISION=1
+   fi
+   if [ "$DISPLAY_FDS_REVISION" == "1" ]; then
+     echo "   FDS revisions: old: $LAST_FDS_REVISION new: $THIS_FDS_REVISION" >> $TIME_LOG
+   fi
+   if [ "$DISPLAY_SMV_REVISION" == "1" ]; then
+     echo "   SMV revisions: old: $LAST_SMV_REVISION new: $THIS_SMV_REVISION" >> $TIME_LOG
+   fi
   SOURCE_CHANGED=
   if [[ $THIS_SMV_REVISION != $LAST_SMV_REVISION ]] ; then
     SOURCE_CHANGED=1
@@ -1406,17 +1413,17 @@ fi
    echo "-------------------------------" >> $TIME_LOG
    if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]; then
      # Send email with failure message and warnings, body of email contains appropriate log file
-     cat $ERROR_LOG $TIME_LOG | mail -s "smokebot failure and warnings on ${hostname}. ${GIT_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+     cat $ERROR_LOG $TIME_LOG | mail -s "smokebot failure and warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
 
    # Check for errors only
    elif [ -e $ERROR_LOG ]; then
       # Send email with failure message, body of email contains error log file
-      cat $ERROR_LOG $TIME_LOG | mail -s "smokebot failure on ${hostname}. ${GIT_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+      cat $ERROR_LOG $TIME_LOG | mail -s "smokebot failure on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
 
    # Check for warnings only
    elif [ -e $WARNING_LOG ]; then
      # Send email with success message, include warnings
-     cat $WARNING_LOG $TIME_LOG | mail -s "smokebot success with warnings on ${hostname}. ${GIT_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+     cat $WARNING_LOG $TIME_LOG | mail -s "smokebot success with warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
 
    # No errors or warnings
    else
@@ -1429,7 +1436,7 @@ fi
 
       # Send success message with links to nightly manuals
 
-      cat $TIME_LOG | mail -s "smokebot success on ${hostname}. ${GIT_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+      cat $TIME_LOG | mail -s "smokebot success on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
 
 # save apps that were built for bundling
 
@@ -1871,8 +1878,21 @@ fi
 
 check_update_repo
 
+#define repo revisions
+
+cd $cfastrepo
+CFAST_REVISION=`git describe --long --dirty`
+
+cd $fdsrepo
+FDS_REVISION=`git describe --long --dirty`
+
 # copy smv revision and hash to the latest pubs and apps directory
 cd $smvrepo
+
+SMV_REVISION=`git describe --long --dirty`
+SMV_SHORTHASH=`git rev-parse --short HEAD`
+SMV_LONGHASH=`git rev-parse HEAD`
+SMV_DATE=`git log -1 --format=%cd --date=local $SMV_SHORTHASH`
 
 subrev=`git describe --abbrev | awk -F '-' '{print $2}'`
 if [ "$subrev" == "" ]; then
