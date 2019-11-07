@@ -27,9 +27,9 @@ echo "-L - smokebot lite,  run only stages that build a debug fds and run"
 echo "     cases with it (no release fds, no release cases, no manuals, etc)"
 echo "-q queue [default: $QUEUE]"
 if [ "$EMAIL" != "" ]; then
-echo "-m email_address - [default: $EMAIL]"
+  echo "-m email_address - [default: $EMAIL]"
 else
-echo "-m email_address"
+  echo "-m email_address"
 fi
 echo "-M - make movies"
 echo "-P - remove run status (PID) file"
@@ -40,15 +40,19 @@ echo "-S - skip picture generating and build manual stages"
 echo "-t - use test smokeview"
 echo "-U - upload guides"
 if [ "$web_DIR" == "" ]; then
-echo "-w directory - web directory containing summary pages"
+  echo "-w directory - web directory containing summary pages"
 else
-echo "-w directory - web directory containing summary pages [default: $web_DIR]"
+  echo "-w directory - web directory containing summary pages [default: $web_DIR]"
 fi
 if [ "$WEB_URL" == "" ]; then
-echo "-W url - web url of summary pages"
+  echo "-W url - web url of summary pages"
 else
-echo "-W url - web url of summary pages [default: $WEB_URL]"
+  echo "-W url - web url of summary pages [default: $WEB_URL]"
 fi
+echo "-x fds_rev - run smokebot using the fds revision named fds_rev [default: origin/master]"
+echo "-y smv_rev - run smokebot using the smv revision named smv_rev [default: origin/master]"
+echo "   the -x and -y options are only used with the -R option i.e. when"
+echo "   the repos are being cloned"
 }
 
 #---------------------------------------------
@@ -177,6 +181,8 @@ SKIP=
 REMOVE_PID=
 BUILD_ONLY=
 CLONE_REPOS=
+FDS_REV=
+SMV_REV=
 
 WEB_URL=
 web_DIR=/var/www/html/`whoami`
@@ -198,7 +204,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'aAbBcCd:DfhHI:JkLm:MPq:r:R:StuUvw:W:' OPTION
+while getopts 'aAbBcCd:DfhHI:JkLm:MPq:r:R:StuUvw:W:x:y:' OPTION
 do
 case $OPTION  in
   a)
@@ -279,6 +285,12 @@ case $OPTION  in
    ;;
   W)
    WEB_URL="$OPTARG"
+   ;;
+  x)
+   FDS_REV="-x $OPTARG"
+   ;;
+  y)
+   SMV_REV="-y $OPTARG"
    ;;
 esac
 done
@@ -394,7 +406,7 @@ BRANCH="-b $BRANCH"
 #*** run smokebot
 
 touch $smokebot_pid
-$ECHO ./$botscript $SKIP $SIZE $BRANCH $TESTFLAG $CLONE_REPOS $RUNAUTO $INTEL $BUILD_ONLY $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $SKIP $SIZE $BRANCH $FDS_REV $SMV_REV $TESTFLAG $CLONE_REPOS $RUNAUTO $INTEL $BUILD_ONLY $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi
