@@ -247,7 +247,6 @@ update_repo()
         git status -uno | head -2 | grep -v nothing                                          >> $OUTPUT_DIR/stage1 2>&1
       fi
    fi
-
    if [[ "$reponame" == "exp" ]]; then
       echo "Updating submodules."                   >> $OUTPUT_DIR/stage1 2>&1
       git submodule foreach git remote update       >> $OUTPUT_DIR/stage1 2>&1
