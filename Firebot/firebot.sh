@@ -29,6 +29,8 @@ echo "-s - skip matlab and document building stages"
 echo "-u - update repo"
 echo "-U - upload guides"
 echo "-W - clone fds, exp, fig, out and smv repos"
+echo "-x fds_rev - run firebot using the fds revision named fds_rev [default: $FDS_REV]"
+echo "-y smv_rev - run firebot using the smv revision named smv_rev [default: $SMV_REV]"
 exit 0
 }
 
@@ -803,7 +805,7 @@ check_cases_release()
    # Scan for and report any errors in FDS cases
    cd $dir
 
-   if [[ `grep -rI 'Run aborted' $OUTPUT_DIR/stage5 | grep -v grep` == ""          ]] && \
+   if [[ `grep 'Run aborted' $OUTPUT_DIR/stage5 | grep -v grep` == ""              ]] && \
       [[ `grep 'ERROR' $OUTPUT_DIR/stage5 | grep -v geom_bad | grep -v grep` == "" ]] && \
       [[ `grep -rI Segmentation * | grep -v grep` == ""                            ]] && \
       [[ `grep -rI ERROR: * | grep -v echo | grep -v grep` == ""                   ]] && \
@@ -814,7 +816,7 @@ check_cases_release()
    then
       cases_release_success=true
    else
-      grep -rI 'Run aborted' $OUTPUT_DIR/stage5 | grep -v grep                  >> $OUTPUT_DIR/stage5_errors
+      grep 'Run aborted' $OUTPUT_DIR/stage5 | grep -v grep                      >> $OUTPUT_DIR/stage5_errors
       grep 'ERROR' $OUTPUT_DIR/stage5 | grep -v geom_bad | grep -v grep         >> $OUTPUT_DIR/stage5_errors
       grep -rI Segmentation * | grep -v grep                                    >> $OUTPUT_DIR/stage5_errors
       grep -rI ERROR: * | grep -v echo | grep -v grep                           >> $OUTPUT_DIR/stage5_errors
@@ -1615,6 +1617,7 @@ email_build_status()
       cd $firebotdir
 
      # Send email with failure message and warnings, body of email contains appropriate log file
+     echo "[$botuser] $bottype failure and warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH."
      if [ "$HAVE_MAIL" == "1" ]; then
        cat $ERROR_LOG $TIME_LOG | mail -s "[$botuser] $bottype failure and warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
      fi
@@ -1623,6 +1626,7 @@ email_build_status()
    elif [ -e $ERROR_LOG ]
    then
       # Send email with failure message, body of email contains error log file
+      echo "[$botuser] $bottype failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH."
       if [ "$HAVE_MAIL" == "1" ]; then
         cat $ERROR_LOG $TIME_LOG | mail -s "[$botuser] $bottype failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
       fi
@@ -1633,6 +1637,7 @@ email_build_status()
       cd $firebotdir
 
       # Send email with success message, include warnings
+      echo "[$botuser] $bottype success, with warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH"
       if [ "$HAVE_MAIL" == "1" ]; then
         cat $WARNING_LOG $TIME_LOG | mail -s "[$botuser] $bottype success, with warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
       fi
@@ -1644,6 +1649,7 @@ email_build_status()
 
       # Send success message with links to nightly manuals
       firebot_status=0
+      echo "[$botuser] $bottype success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH"
       if [ "$HAVE_MAIL" == "1" ]; then
         cat $TIME_LOG | mail -s "[$botuser] $bottype success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
       fi
@@ -1754,9 +1760,11 @@ INTEL=
 INTEL2=
 CLONE_REPOS=
 DEBUG_ONLY=
+FDS_REV=origin/master
+SMV_REV=origin/master
 
 #*** parse command line arguments
-while getopts 'b:BcdDhIiJLm:p:q:R:suU' OPTION
+while getopts 'b:BcdDhIiJLm:p:q:R:suUx:y:' OPTION
 do
 case $OPTION in
   b)
@@ -1819,6 +1827,12 @@ case $OPTION in
   U)
    UPLOADGUIDES=1
    ;;
+  x)
+   FDS_REV="$OPTARG"
+   ;;
+  y)
+   SMV_REV="$OPTARG"
+   ;;
 esac
 done
 shift $(($OPTIND-1))
@@ -1880,11 +1894,11 @@ if [[ "$CLONE_REPOS" != "" ]]; then
   if [ "$CLONE_REPOS" != "master" ]; then
     FDSBRANCH=$CLONE_REPOS
     cd $fdsrepo
-    git checkout -b $FDSBRANCH origin/master >> $OUTPUT_DIR/stage1_clone 2>&1
+    git checkout -b $FDSBRANCH $FDS_REV >> $OUTPUT_DIR/stage1_clone 2>&1
 
     SMVBRANCH=$CLONE_REPOS
     cd $smvrepo
-    git checkout -b $SMVBRANCH origin/master >> $OUTPUT_DIR/stage1_clone 2>&1
+    git checkout -b $SMVBRANCH $SMV_REV >> $OUTPUT_DIR/stage1_clone 2>&1
   fi
   ARCHIVE_REPO_SIZES=1
 fi
@@ -2246,4 +2260,5 @@ if [[ "$DEBUG_ONLY" == "" ]] && [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" 
   archive_timing_stats
 fi
 email_build_status 'Firebot'
+echo firebot exit status: $firebot_status
 exit $firebot_status
