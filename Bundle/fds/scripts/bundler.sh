@@ -62,7 +62,7 @@ echo "-u - use apps built by firebot in the `whoami` account"
 echo "-U - use apps built by firebot and pubs built firebot and smokebot"
 echo "     both in the `whoami` account"
 echo "-v - show parameters used to build bundle (the bundle is not generated)"
-echo "-w - overwrite bundle (it it already exists)"
+echo "-w - overwrite bundle (it it already exists) "
 exit 0
 }
 
