@@ -311,9 +311,9 @@ if [ "$showparms" == "" ]; then
     if [ -e $HOME/.bundle/$GOOGLE_DIR_ID ]; then
       echo "uploading installer"
       if [ "$platform" == "linux64" ]; then
-        ./upload_bundle.sh $bundle_dir $installer_base $platform 
+        ./upload_bundle.sh $bundle_dir $installer_base $platform                        > $OUTPUT_DIR/stage2
       else
-        ./ssh_upload_bundle.sh $installer_base
+        ./ssh_upload_bundle.sh $installer_base                                          > $OUTPUT_DIR/stage2
       fi
     else
       echo "***warning: the file $HOME/.bundle/GOOGLE_DIR_ID containing the"
