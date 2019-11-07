@@ -1499,10 +1499,12 @@ SKIP=
 HTML2PDF=wkhtmltopdf
 BUILD_ONLY=
 CLONE_REPOS=
+FDS_REV=origin/master
+SMV_REV=origin/master
 
 #*** parse command line options
 
-while getopts 'aAb:BcI:JLm:Mo:q:r:R:SstuUw:W:' OPTION
+while getopts 'aAb:BcI:JLm:Mo:q:r:R:SstuUw:W:x:y:' OPTION
 do
 case $OPTION in
   a)
@@ -1574,6 +1576,12 @@ case $OPTION in
   W)
    WEB_URL="$OPTARG"
    ;;
+  x)
+   FDS_REV="$OPTARG"
+   ;;
+  y)
+   SMV_REV="$OPTARG"
+   ;;
 esac
 done
 shift $(($OPTIND-1))
@@ -1640,11 +1648,11 @@ if [[ "$CLONE_REPOS" != "" ]]; then
   if [ "$CLONE_REPOS" != "master" ]; then
     FDSBRANCH=$CLONE_REPOS
     cd $fdsrepo
-    git checkout -b $FDSBRANCH origin/master >> $OUTPUT_DIR/stage1_clone 2>&1
+    git checkout -b $FDSBRANCH $FDS_REV >> $OUTPUT_DIR/stage1_clone 2>&1
 
     SMVBRANCH=$CLONE_REPOS
     cd $smvrepo
-    git checkout -b $SMVBRANCH origin/master >> $OUTPUT_DIR/stage1_clone 2>&1
+    git checkout -b $SMVBRANCH $SMV_REV >> $OUTPUT_DIR/stage1_clone 2>&1
   fi
 fi
 

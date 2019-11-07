@@ -48,6 +48,10 @@ if [ "$WEB_URL" == "" ]; then
 echo "-W url - web url of summary pages"
 else
 echo "-W url - web url of summary pages [default: $WEB_URL]"
+echo "-x fds_rev - run smokebot using the fds revision named fds_rev [default: origin/master]"
+echo "-y smv_rev - run smokebot using the smv revision named smv_rev [default: origin/master]"
+echo "   the -x and -y options are only used with the -R option i.e. when"
+"        the repos are being cloned"
 fi
 }
 
@@ -177,6 +181,8 @@ SKIP=
 REMOVE_PID=
 BUILD_ONLY=
 CLONE_REPOS=
+FDS_REV=
+SMV_REV=
 
 WEB_URL=
 web_DIR=/var/www/html/`whoami`
@@ -198,7 +204,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'aAbBcCd:DfhHI:JkLm:MPq:r:R:StuUvw:W:' OPTION
+while getopts 'aAbBcCd:DfhHI:JkLm:MPq:r:R:StuUvw:W:x:y:' OPTION
 do
 case $OPTION  in
   a)
@@ -279,6 +285,12 @@ case $OPTION  in
    ;;
   W)
    WEB_URL="$OPTARG"
+   ;;
+  x)
+   FDS_REV="-y $OPTARG"
+   ;;
+  y)
+   SMV_REV="-z $OPTARG"
    ;;
 esac
 done
@@ -394,7 +406,7 @@ BRANCH="-b $BRANCH"
 #*** run smokebot
 
 touch $smokebot_pid
-$ECHO ./$botscript $SKIP $SIZE $BRANCH $TESTFLAG $CLONE_REPOS $RUNAUTO $INTEL $BUILD_ONLY $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $SKIP $SIZE $BRANCH $FDS_REV $SMV_REV $TESTFLAG $CLONE_REPOS $RUNAUTO $INTEL $BUILD_ONLY $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi
