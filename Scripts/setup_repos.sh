@@ -181,7 +181,7 @@ do
   fi
   git clone $RECURSIVE $GITHEADER$GITUSER/$repo.git $repo_out
 
-  SETUP_REPO $repo_dir
+  SETUP_REMOTE $repo_dir
 
 done
 cd $CURDIR
