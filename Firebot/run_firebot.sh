@@ -21,6 +21,8 @@ echo "-I - use development version of fds"
 echo "-J - use Intel MPI version fds"
 echo "-L - firebot lite,  run only stages that build a debug fds and run cases with it"
 echo "                    (no release fds, no release cases, no matlab, etc)"
+echo "-M   clone fds, exp, fig, out and smv repos. fds and smv repos will be checked out"
+echo "     with a branch named master"
 echo "-N - don't copy Manuals directory to .firebot/Manuals"
 echo "-O - use OpenMPI version fds"
 if [ "$EMAIL" != "" ]; then
@@ -29,9 +31,8 @@ else
   echo "-m email_address "
 fi
 echo "-P - remove run status (PID) file"
-echo "-R release_type (master, release or test) - clone fds, exp, fig, out and smv repos"
-echo "     fds and smv repos will be checked out with a branch named"
-echo "     master, release or test [default: master]"
+echo "-R branch_name - clone fds, exp, fig, out and smv repos. fds and smv repos"
+echo "     will be checked out with a branch named 'branch_name'"
 echo "-s - skip matlab and build document stages"
 echo "-S - use startup files to set the environment, not modules"
 echo "-U - upload guides (only by user firebot)"
@@ -188,7 +189,7 @@ SMV_REV=
 
 #*** parse command line options
 
-while getopts 'bBcdDFfHhIiJkLm:NnOPq:R:SsuUvx:y:' OPTION
+while getopts 'bBcdDFfHhIiJkLm:MNnOPq:R:SsuUvx:y:' OPTION
 do
 case $OPTION  in
   b)
@@ -235,6 +236,9 @@ case $OPTION  in
    ;;
   m)
    EMAIL="$OPTARG"
+   ;;
+  M)
+   CLONE_REPOS="master"
    ;;
   N)
    COPY_MANUAL_DIR=-N
@@ -291,11 +295,6 @@ if [ `whoami` != firebot ]; then
 fi
 
 if [ "$CLONE_REPOS" != "" ]; then
-  if [ "$CLONE_REPOS" != "release" ]; then
-    if [ "$CLONE_REPOS" != "test" ]; then
-      CLONE_REPO="master"
-    fi
-  fi
   CLONE_REPOS="-R $CLONE_REPOS"
 fi
 

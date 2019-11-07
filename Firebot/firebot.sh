@@ -1833,14 +1833,6 @@ esac
 done
 shift $(($OPTIND-1))
 
-if [ "$CLONE_REPOS" != "" ]; then
-  if [ "$CLONE_REPOS" != "release" ]; then
-    if [ "$CLONE_REPOS" != "test" ]; then
-      CLONE_REPO="master"
-    fi
-  fi
-fi
-
 # Load mailing list for status report
 if [ "$mailToFDS" == "" ]; then
   if [ -e $EMAIL_LIST ]; then
