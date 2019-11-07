@@ -287,10 +287,10 @@ case $OPTION  in
    WEB_URL="$OPTARG"
    ;;
   x)
-   FDS_REV="-y $OPTARG"
+   FDS_REV="-x $OPTARG"
    ;;
   y)
-   SMV_REV="-z $OPTARG"
+   SMV_REV="-y $OPTARG"
    ;;
 esac
 done
