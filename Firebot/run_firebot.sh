@@ -271,10 +271,10 @@ case $OPTION  in
    ECHO=echo
    ;;
   x)
-   FDS_REV="-y $OPTARG"
+   FDS_REV="-x $OPTARG"
    ;;
   y)
-   SMV_REV="-z $OPTARG"
+   SMV_REV="-y $OPTARG"
    ;;
 esac
 done
