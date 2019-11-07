@@ -2057,9 +2057,9 @@ echo "Total time: $DIFF_SCRIPT_TIME" >> $STAGE_STATUS
 echo Reporting results
 set_files_world_readable || exit 1
 save_build_status
-save_manuals_dir
 
 if [ "$BUILD_ONLY" == "" ]; then
+  save_manuals_dir
   if [ "$SMOKEBOT_LITE" == "" ]; then
     if [[ $stage1c_fdsrel_success ]] ; then
       archive_timing_stats
