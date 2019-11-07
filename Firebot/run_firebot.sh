@@ -37,8 +37,7 @@ echo "-S - use startup files to set the environment, not modules"
 echo "-U - upload guides (only by user firebot)"
 echo "-x fds_rev - run firebot using the fds revision named fds_rev [default: origin/master]"
 echo "-y smv_rev - run firebot using the smv revision named smv_rev [default: origin/master]"
-echo "   the -x and -y options are only used with the -R option i.e. when"
-"        the repos are being cloned"
+echo "   The -x and -y options are only used with the -R cloning option"
 }
 
 #---------------------------------------------
