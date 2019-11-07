@@ -156,11 +156,11 @@ do
     fi
   fi
 
-  echo repo: $repo
+  echo repo: $repo_out
   if [ "$eraserepos" == "1" ]; then
-    if [ -e $repo ]; then
-      echo removing $repo
-      rm -rf $repo
+    if [ -e $repo_out ]; then
+      echo removing $repo_out
+      rm -rf $repo_out
     fi
   fi
   if [ "$WIKIWEB" == "1" ]; then
@@ -181,7 +181,7 @@ do
   fi
   git clone $RECURSIVE $GITHEADER$GITUSER/$repo.git $repo_out
 
-  SETUP_REPO $repo_dir
+  SETUP_REMOTE $repo_dir
 
 done
 cd $CURDIR
