@@ -46,8 +46,11 @@ echo ""
 echo "Options:"
 echo "-a - host containing apps [default: $app_host]"
 echo "-A - home directory containing FDS pubs [default: $fds_pub_home]"
-echo "-B - build apps - this script builds apps by running"
-echo "     firebot with the -B option"
+echo "-B - build apps by running firebot using the current fds and smv"
+echo "     repo revisions"
+echo "-C - build apps by running firebot using the latest fds and smv"
+echo "     repo revisions that passed firebot"
+echo "     ( on $app_host in directory $app_home )"
 echo "-c - use apps and pubs previously copied to $HOME/.bundle/apps"
 echo "     and $HOME/.bundle/pubs"
 echo "-d - bundle directory location [default: $bundle_dir]"
@@ -94,8 +97,9 @@ FORCE=
 GOOGLE_DIR_ID_FILE=$HOME/.bundle/GOOGLE_DIR_ID
 CURDIR=`pwd`
 OUTPUT_DIR=$CURDIR/output
+SYNC_REVS=
 
-while getopts 'A:Bcd:fF:ghp:S:uUvw' OPTION
+while getopts 'A:BCcd:fF:ghp:S:uUvw' OPTION
 do
 case $OPTION  in
   A)
@@ -104,6 +108,11 @@ case $OPTION  in
   B)
    BUILD_APPS=1
    app_home=$HOME
+   ;;
+  C)
+   BUILD_APPS=1
+   app_home=$HOME
+   SYNC_REVS=1
    ;;
   d)
    bundle_dir=$HOME
