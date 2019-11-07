@@ -92,6 +92,12 @@ OVERWRITE=
 UPLOAD_GOOGLE=
 FORCE=
 GOOGLE_DIR_ID_FILE=$HOME/.bundle/GOOGLE_DIR_ID
+CURDIR=`pwd`
+OUTPUT_DIR=$CURDIR/output
+if [ ! -d $OUTPUT_DIR ]; then
+  mkdir $OUTPUT_DIR
+fi
+rm $OUTPUT_DIR/*
 
 while getopts 'A:Bcd:fF:ghp:S:uUvw' OPTION
 do
@@ -299,9 +305,11 @@ fi
 
 cd $DIR
 if [ "$showparms" == "" ]; then
-  $ECHO ./bundle_generic.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version $bundle_dir
+  echo "building installer"
+  $ECHO ./bundle_generic.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version $bundle_dir > $OUTPUT_DIR/stage1
   if [ "$UPLOAD_GOOGLE" == "1" ]; then
     if [ -e $HOME/.bundle/$GOOGLE_DIR_ID ]; then
+      echo "uploading installer"
       if [ "$platform" == "linux64" ]; then
         ./upload_bundle.sh $bundle_dir $installer_base $platform 
       else
