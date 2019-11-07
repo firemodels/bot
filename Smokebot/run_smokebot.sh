@@ -27,9 +27,9 @@ echo "-L - smokebot lite,  run only stages that build a debug fds and run"
 echo "     cases with it (no release fds, no release cases, no manuals, etc)"
 echo "-q queue [default: $QUEUE]"
 if [ "$EMAIL" != "" ]; then
-echo "-m email_address - [default: $EMAIL]"
+  echo "-m email_address - [default: $EMAIL]"
 else
-echo "-m email_address"
+  echo "-m email_address"
 fi
 echo "-M - make movies"
 echo "-P - remove run status (PID) file"
@@ -40,19 +40,19 @@ echo "-S - skip picture generating and build manual stages"
 echo "-t - use test smokeview"
 echo "-U - upload guides"
 if [ "$web_DIR" == "" ]; then
-echo "-w directory - web directory containing summary pages"
+  echo "-w directory - web directory containing summary pages"
 else
-echo "-w directory - web directory containing summary pages [default: $web_DIR]"
+  echo "-w directory - web directory containing summary pages [default: $web_DIR]"
 fi
 if [ "$WEB_URL" == "" ]; then
-echo "-W url - web url of summary pages"
+  echo "-W url - web url of summary pages"
 else
-echo "-W url - web url of summary pages [default: $WEB_URL]"
+  echo "-W url - web url of summary pages [default: $WEB_URL]"
+fi
 echo "-x fds_rev - run smokebot using the fds revision named fds_rev [default: origin/master]"
 echo "-y smv_rev - run smokebot using the smv revision named smv_rev [default: origin/master]"
 echo "   the -x and -y options are only used with the -R option i.e. when"
-"        the repos are being cloned"
-fi
+echo "   the repos are being cloned"
 }
 
 #---------------------------------------------
