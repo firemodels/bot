@@ -158,7 +158,7 @@ do
 
   echo repo: $repo_out
   if [ "$eraserepos" == "1" ]; then
-    if [ -e $repo ]; then
+    if [ -e $repo_out ]; then
       echo removing $repo_out
       rm -rf $repo_out
     fi
