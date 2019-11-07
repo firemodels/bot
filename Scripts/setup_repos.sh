@@ -156,11 +156,11 @@ do
     fi
   fi
 
-  echo repo: $repo
+  echo repo: $repo_out
   if [ "$eraserepos" == "1" ]; then
     if [ -e $repo ]; then
-      echo removing $repo
-      rm -rf $repo
+      echo removing $repo_out
+      rm -rf $repo_out
     fi
   fi
   if [ "$WIKIWEB" == "1" ]; then
