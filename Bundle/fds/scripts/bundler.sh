@@ -94,10 +94,6 @@ FORCE=
 GOOGLE_DIR_ID_FILE=$HOME/.bundle/GOOGLE_DIR_ID
 CURDIR=`pwd`
 OUTPUT_DIR=$CURDIR/output
-if [ ! -d $OUTPUT_DIR ]; then
-  mkdir $OUTPUT_DIR
-fi
-rm $OUTPUT_DIR/*
 
 while getopts 'A:Bcd:fF:ghp:S:uUvw' OPTION
 do
@@ -169,6 +165,13 @@ if [ -e $LOCK_FILE ]; then
 fi
 fi
 touch $LOCK_FILE
+
+if [ "$shoparms" == "" ]; then
+  if [ ! -d $OUTPUT_DIR ]; then
+    mkdir $OUTPUT_DIR
+  fi
+  rm -f $OUTPUT_DIR/*
+fi
 
 # determine platform script is running on
 
