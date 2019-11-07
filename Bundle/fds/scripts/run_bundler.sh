@@ -121,6 +121,9 @@ case $OPTION  in
   w)
    wopt="-w"
    ;;
+  \?)
+  echo "***error: unknown option entered. aborting script"
+  exit
 esac
 done
 shift $(($OPTIND-1))
