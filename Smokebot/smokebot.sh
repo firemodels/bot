@@ -1639,6 +1639,10 @@ cfastrepo=$repo/cfast
 fdsrepo=$repo/fds
 smvrepo=$repo/smv
 
+# clean smokebot output files
+
+clean_smokebot_history
+
 if [[ "$CLONE_REPOS" != "" ]]; then
   echo Cloning repos
   cd $botrepo/Scripts
@@ -1846,7 +1850,6 @@ PRELIM_beg=`GET_TIME`
 echo "" > $STAGE_STATUS
 hostname=`hostname`
 start_time=`date`
-clean_smokebot_history
 
 ### Stage 0 repo operatoins ###
 echo "Run Status"
