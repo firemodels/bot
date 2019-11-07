@@ -1994,7 +1994,9 @@ if [ "$UPDATEREPO" == "1" ]; then
 else
   echo " update repos: no"
 fi
+if [ "$BUILD_ONLY" ]; then
   echo "        queue: $QUEUE"
+fi
 echo ""
 
 # Set time limit (43,200 seconds = 12 hours)
