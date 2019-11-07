@@ -35,6 +35,10 @@ echo "     master, release or test [default: master]"
 echo "-s - skip matlab and build document stages"
 echo "-S - use startup files to set the environment, not modules"
 echo "-U - upload guides (only by user firebot)"
+echo "-x fds_rev - run firebot using the fds revision named fds_rev [default: origin/master]"
+echo "-y smv_rev - run firebot using the smv revision named smv_rev [default: origin/master]"
+echo "   the -x and -y options are only used with the -R option i.e. when"
+"        the repos are being cloned"
 }
 
 #---------------------------------------------
@@ -180,10 +184,12 @@ CLONE_REPOS=
 BUILD_ONLY=
 DEBUG_ONLY=
 export QFDS_STARTUP=
+FDS_REV=
+SMV_REV=
 
 #*** parse command line options
 
-while getopts 'bBcdDFfHhIiJkLm:NnOPq:R:SsuUv' OPTION
+while getopts 'bBcdDFfHhIiJkLm:NnOPq:R:SsuUvx:y:' OPTION
 do
 case $OPTION  in
   b)
@@ -264,6 +270,12 @@ case $OPTION  in
   v)
    RUNFIREBOT=0
    ECHO=echo
+   ;;
+  x)
+   FDS_REV="-y $OPTARG"
+   ;;
+  y)
+   SMV_REV="-z $OPTARG"
    ;;
 esac
 done
@@ -365,7 +377,7 @@ BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
 firebot_status=0
-$ECHO  ./$botscript -p $firebot_pid $UPDATE $DV $INTEL $debug_mode $BUILD_ONLY $BRANCH $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $CLONE_REPOS $EMAIL $COPY_MANUAL_DIR $DEBUG_ONLY "$@"
+$ECHO  ./$botscript -p $firebot_pid $UPDATE $DV $INTEL $debug_mode $BUILD_ONLY $BRANCH $FDS_REV $SMV_REV $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $CLONE_REPOS $EMAIL $COPY_MANUAL_DIR $DEBUG_ONLY "$@"
 firebot_status=$?
 if [ -e $firebot_pid ]; then
   rm -f $firebot_pid

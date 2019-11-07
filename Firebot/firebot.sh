@@ -29,6 +29,8 @@ echo "-s - skip matlab and document building stages"
 echo "-u - update repo"
 echo "-U - upload guides"
 echo "-W - clone fds, exp, fig, out and smv repos"
+echo "-x fds_rev - run firebot using the fds revision named fds_rev [default: $FDS_REV]"
+echo "-y smv_rev - run firebot using the smv revision named smv_rev [default: $SMV_REV]"
 exit 0
 }
 
@@ -1754,9 +1756,11 @@ INTEL=
 INTEL2=
 CLONE_REPOS=
 DEBUG_ONLY=
+FDS_REV=origin/master
+SMV_REV=origin/master
 
 #*** parse command line arguments
-while getopts 'b:BcdDhIiJLm:p:q:R:suU' OPTION
+while getopts 'b:BcdDhIiJLm:p:q:R:suUx:y:' OPTION
 do
 case $OPTION in
   b)
@@ -1819,6 +1823,12 @@ case $OPTION in
   U)
    UPLOADGUIDES=1
    ;;
+  x)
+   FDS_REV="$OPTARG"
+   ;;
+  y)
+   SMV_REV="$OPTARG"
+   ;;
 esac
 done
 shift $(($OPTIND-1))
@@ -1880,11 +1890,11 @@ if [[ "$CLONE_REPOS" != "" ]]; then
   if [ "$CLONE_REPOS" != "master" ]; then
     FDSBRANCH=$CLONE_REPOS
     cd $fdsrepo
-    git checkout -b $FDSBRANCH origin/master >> $OUTPUT_DIR/stage1_clone 2>&1
+    git checkout -b $FDSBRANCH $FDS_REV >> $OUTPUT_DIR/stage1_clone 2>&1
 
     SMVBRANCH=$CLONE_REPOS
     cd $smvrepo
-    git checkout -b $SMVBRANCH origin/master >> $OUTPUT_DIR/stage1_clone 2>&1
+    git checkout -b $SMVBRANCH $SMV_REV >> $OUTPUT_DIR/stage1_clone 2>&1
   fi
   ARCHIVE_REPO_SIZES=1
 fi
