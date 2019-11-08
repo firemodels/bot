@@ -1,5 +1,7 @@
 #!/bin/bash
 
+NIGHTLY=ngt
+
 #*** Linux parameters
 
 intel_mpi_version_linux=19u4
@@ -330,7 +332,7 @@ else
   SMVREV=smvtest
 fi
 installer_base=${FDSREV}_${SMVREV}
-installer_base_platform=${FDSREV}_${SMVREV}_$platform
+installer_base_platform=${FDSREV}_${SMVREV}_${NIGHTLY}_$platform
 if [ "$showparms" == "" ]; then
 if [ "$OVERWRITE" == "" ]; then
   installer_file=$bundle_dir/${installer_base_platform}.sh
@@ -346,14 +348,14 @@ fi
 cd $DIR
 if [ "$showparms" == "" ]; then
   echo "building installer"
-  $ECHO ./bundle_generic.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version $bundle_dir > $OUTPUT_DIR/stage1
+  $ECHO ./bundle_generic.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version $bundle_dir $NIGHTLY > $OUTPUT_DIR/stage1
   if [ "$UPLOAD_GOOGLE" == "1" ]; then
     if [ -e $HOME/.bundle/$GOOGLE_DIR_ID ]; then
       echo "uploading installer"
       if [ "$platform" == "linux64" ]; then
-        ./upload_bundle.sh $bundle_dir $installer_base $platform                        > $OUTPUT_DIR/stage2
+        ./upload_bundle.sh $bundle_dir $installer_base_platform $NIGHTLY $platform               > $OUTPUT_DIR/stage2
       else
-        ./ssh_upload_bundle.sh $installer_base                                          > $OUTPUT_DIR/stage2
+        ./ssh_upload_bundle.sh         $installer_base_platform $NIGHTLY $platform               > $OUTPUT_DIR/stage2
       fi
     else
       echo "***warning: the file $HOME/.bundle/GOOGLE_DIR_ID containing the"

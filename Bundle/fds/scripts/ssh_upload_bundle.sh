@@ -1,5 +1,7 @@
 #!/bin/bash
 filebase=$1
+NIGHTLY=$2
+platform=$3
 
 fullfile=$HOME/.bundle/bundles/${filebase}_osx64.sh
 
@@ -14,9 +16,9 @@ if [ "$UPLOAD_HOST" != "" ]; then
     curdir=`pwd`
     scp -q upload_bundle.sh $UPLOAD_HOST\:.bundle/bundles/.
     cd $HOME/.bundle/bundles
-    scp -q ${filebase}_osx64.sh   $UPLOAD_HOST\:.bundle/bundles/.
-    scp -q ${filebase}_osx64.sha1 $UPLOAD_HOST\:.bundle/bundles/.
-    ssh -q $UPLOAD_HOST \( cd .bundle/bundles \; bash ./upload_bundle.sh \$HOME/.bundle/bundles $filebase osx64 \)
+    scp -q ${filebase}.sh   $UPLOAD_HOST\:.bundle/bundles/.
+    scp -q ${filebase}.sha1 $UPLOAD_HOST\:.bundle/bundles/.
+    ssh -q $UPLOAD_HOST \( cd .bundle/bundles \; bash ./upload_bundle.sh \$HOME/.bundle/bundles $filebase $NIGHTLY $platform \)
     ssh -q $UPLOAD_HOST rm .bundle/bundles/upload_bundle.sh
     cd $curdir
   fi

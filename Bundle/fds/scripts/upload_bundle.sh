@@ -1,7 +1,8 @@
 #!/bin/bash
 BUNDLE_DIR=$1
 BUNDLE_BASE=$2
-platform=$3
+NIGHTLY=$3
+platform=$4
 
 erase=1
 
@@ -29,8 +30,8 @@ else
   ext=.sh
 fi
 
-file=${BUNDLE_BASE}_$platform$ext
-shafile=${BUNDLE_BASE}_${platform}.sha1
+file=${BUNDLE_BASE}$ext
+shafile=${BUNDLE_BASE}.sha1
 
 upload=1
 if [ ! -e $BUNDLE_DIR/$file ]; then
@@ -43,7 +44,7 @@ if [ ! -e $BUNDLE_DIR/$shafile ]; then
 fi
 if [ "$upload" == "1" ]; then
   if [ "$erase" == "1" ]; then
-    $GDRIVE list  | grep $platform | awk '{ system("~/bin/gdrive delete -i " $1)} '
+    $GDRIVE list  | grep ${NIGHTLY}_$platform | awk '{ system("~/bin/gdrive delete -i " $1)} '
   fi
   $GDRIVE upload -p $BUNDLE_PARENT_ID -f $BUNDLE_DIR/$file
   nfiles=`$GDRIVE list  | grep $file | wc -l`

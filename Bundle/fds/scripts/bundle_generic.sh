@@ -4,6 +4,7 @@ smv_version=$2
 MPI_VERSION=$3
 INTEL_COMP_VERSION=$4
 UPLOAD_DIR_ARG=$5
+NIGHTLY=$6
 
 # this script assumes that fds and smokeview apps have been copied into APPS_DIR
 # manuals have been copied into GUIDE_DIR
@@ -26,9 +27,9 @@ INSTALLDIR=FDS/FDS6
 errlog=/tmp/errlog.$$
 
 if [ "`uname`" == "Darwin" ] ; then
-  bundlebase=${fds_version}_${smv_version}_osx64
+  bundlebase=${fds_version}_${smv_version}_${NIGHTLY}_osx64
 else
-  bundlebase=${fds_version}_${smv_version}_linux64
+  bundlebase=${fds_version}_${smv_version}_${NIGHTLY}_linux64
 fi
 
 # determine directory repos reside under
