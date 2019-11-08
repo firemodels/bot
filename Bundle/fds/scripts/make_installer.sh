@@ -415,7 +415,7 @@ cat << MODULE >> \$FDSMODULEtmp
 # Intel runtime environment
 
 set impihome \$FDS_root/bin/INTEL
-prepend-path FI_PROVIDER_PATH \\\$impihome/lib
+prepend-path FI_PROVIDER_PATH \\\$impihome/prov
 prepend-path LD_LIBRARY_PATH \\\$impihome/lib
 prepend-path PATH \\\$impihome/bin
 MODULE
@@ -495,7 +495,7 @@ cat << BASH >> \$BASHRCFDS
 # Intel runtime environment
 
 impihome=\$FDS_root/bin/INTEL
-export FI_PROVIDER_PATH=\\\$impihome/lib
+export FI_PROVIDER_PATH=\\\$impihome/prov
 export LD_LIBRARY_PATH=\\\$impihome/lib:\\\$LD_LIBRARY_PATH
 export PATH=\\\$impihome/bin:\\\$PATH
 BASH
