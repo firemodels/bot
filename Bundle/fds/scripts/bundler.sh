@@ -99,9 +99,12 @@ CURDIR=`pwd`
 OUTPUT_DIR=$CURDIR/output
 SYNC_REVS=
 
-while getopts 'A:BCcd:fF:ghp:S:uUvw' OPTION
+while getopts 'a:A:BCcd:fF:ghp:S:uUvw' OPTION
 do
 case $OPTION  in
+  a)
+   app_host=$OPTARG
+   ;;
   A)
    app_home=$OPTARG
    ;;
@@ -206,9 +209,9 @@ if [ "$showparms" == "1" ]; then
   echo "              MPI version: $mpi_version"
   echo "            Intel version: $intel_mpi_version"
   if [ "$app_host" != `hostname` ]; then
-    hostlabel="on $app_host"
+    app_hostlabel="on $app_host"
   else
-    hostlabel="on this computer"
+    app_hostlabel="on this computer"
   fi
   if [ "$USE_CACHE" == "1" ]; then
     APPDIR=.bundle
@@ -219,16 +222,16 @@ if [ "$showparms" == "1" ]; then
     FDS_PUBDIR=.firebot
     SMV_PUBDIR=.smokebot
   fi
-  echo "    fds/smv app directory: $app_home/$APPDIR/apps $hostlabel"
-  hostlabel="on this computer"
+  echo "    fds/smv app directory: $app_home/$APPDIR/apps $app_hostlabel"
+  pub_hostlabel="on this computer"
   if [ "$pub_host" != `hostname` ]; then
-    hostlabel="on $pub_host"
+    pub_hostlabel="on $pub_host"
   fi
   if [ "$USE_CACHE" == "1" ]; then
-    echo "    fds/smv pub directory: $fds_pub_home/$FDS_PUBDIR/pubs $hostlabel"
+    echo "    fds/smv pub directory: $fds_pub_home/$FDS_PUBDIR/pubs $pub_hostlabel"
   else
-    echo "        fds pub directory: $fds_pub_home/$FDS_PUBDIR/pubs $hostlabel"
-    echo "        smv pub directory: $smv_pub_home/$SMV_PUBDIR/pubs $hostlabel"
+    echo "        fds pub directory: $fds_pub_home/$FDS_PUBDIR/pubs $pub_hostlabel"
+    echo "        smv pub directory: $smv_pub_home/$SMV_PUBDIR/pubs $pub_hostlabel"
   fi
     echo "         bundle directory: $bundle_dir"
   if [ "$UPLOAD_GOOGLE" == "1" ]; then

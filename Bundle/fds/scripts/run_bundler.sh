@@ -76,9 +76,12 @@ DIR=`pwd`
 cd ../../../..
 repo=`pwd`
 
-while getopts 'A:Bcd:fF:ghp:S:uUvw' OPTION
+while getopts 'a:A:Bcd:fF:ghp:S:uUvw' OPTION
 do
 case $OPTION  in
+  a)
+   aOPT="-a $OPTARG"
+   ;;
   A)
    AOPT="-A $OPTARG"
    ;;
@@ -136,7 +139,7 @@ fi
 fi
 
 cd $DIR
-./bundler.sh $AOPT $BOPT $dopt $copt $fopt $FOPT $gopt $hopt $popt $SOPT $uopt $UOPT $vopt $wopt
+./bundler.sh $aOPT $AOPT $BOPT $dopt $copt $fopt $FOPT $gopt $hopt $popt $SOPT $uopt $UOPT $vopt $wopt
 
 cd $curdir
 
