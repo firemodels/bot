@@ -404,7 +404,6 @@ conflict intel
 # FDS paths
 
 prepend-path    PATH            \$FDS_root/bin
-prepend-path    LD_LIBRARY_PATH \$FDS_root/bin/LIB64
 MODULE
 if [ "$ostype" == "LINUX" ] ; then
 cat << MODULE >> \$FDSMODULEtmp
@@ -484,7 +483,7 @@ fi
 
 if [ "$ostype" == "LINUX" ] ; then
 cat << BASH >> \$BASHRCFDS
-export $LDLIBPATH=/usr/lib64:\\\$FDSBINDIR/LIB64:\\\$$LDLIBPATH
+export $LDLIBPATH=/usr/lib64:\\\$$LDLIBPATH
 BASH
 fi
 

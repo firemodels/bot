@@ -1499,10 +1499,12 @@ SKIP=
 HTML2PDF=wkhtmltopdf
 BUILD_ONLY=
 CLONE_REPOS=
+FDS_REV=origin/master
+SMV_REV=origin/master
 
 #*** parse command line options
 
-while getopts 'aAb:BcI:JLm:Mo:q:r:R:SstuUw:W:' OPTION
+while getopts 'aAb:BcI:JLm:Mo:q:r:R:SstuUw:W:x:y:' OPTION
 do
 case $OPTION in
   a)
@@ -1574,6 +1576,12 @@ case $OPTION in
   W)
    WEB_URL="$OPTARG"
    ;;
+  x)
+   FDS_REV="$OPTARG"
+   ;;
+  y)
+   SMV_REV="$OPTARG"
+   ;;
 esac
 done
 shift $(($OPTIND-1))
@@ -1631,6 +1639,10 @@ cfastrepo=$repo/cfast
 fdsrepo=$repo/fds
 smvrepo=$repo/smv
 
+# clean smokebot output files
+
+clean_smokebot_history
+
 if [[ "$CLONE_REPOS" != "" ]]; then
   echo Cloning repos
   cd $botrepo/Scripts
@@ -1640,11 +1652,11 @@ if [[ "$CLONE_REPOS" != "" ]]; then
   if [ "$CLONE_REPOS" != "master" ]; then
     FDSBRANCH=$CLONE_REPOS
     cd $fdsrepo
-    git checkout -b $FDSBRANCH origin/master >> $OUTPUT_DIR/stage1_clone 2>&1
+    git checkout -b $FDSBRANCH $FDS_REV >> $OUTPUT_DIR/stage1_clone 2>&1
 
     SMVBRANCH=$CLONE_REPOS
     cd $smvrepo
-    git checkout -b $SMVBRANCH origin/master >> $OUTPUT_DIR/stage1_clone 2>&1
+    git checkout -b $SMVBRANCH $SMV_REV >> $OUTPUT_DIR/stage1_clone 2>&1
   fi
 fi
 
@@ -1838,7 +1850,6 @@ PRELIM_beg=`GET_TIME`
 echo "" > $STAGE_STATUS
 hostname=`hostname`
 start_time=`date`
-clean_smokebot_history
 
 ### Stage 0 repo operatoins ###
 echo "Run Status"
@@ -2046,9 +2057,9 @@ echo "Total time: $DIFF_SCRIPT_TIME" >> $STAGE_STATUS
 echo Reporting results
 set_files_world_readable || exit 1
 save_build_status
-save_manuals_dir
 
 if [ "$BUILD_ONLY" == "" ]; then
+  save_manuals_dir
   if [ "$SMOKEBOT_LITE" == "" ]; then
     if [[ $stage1c_fdsrel_success ]] ; then
       archive_timing_stats

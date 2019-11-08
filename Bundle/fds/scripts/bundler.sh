@@ -46,8 +46,11 @@ echo ""
 echo "Options:"
 echo "-a - host containing apps [default: $app_host]"
 echo "-A - home directory containing FDS pubs [default: $fds_pub_home]"
-echo "-B - build apps - this script builds apps by running"
-echo "     firebot with the -B option"
+echo "-B - build apps by running firebot using the current fds and smv"
+echo "     repo revisions"
+echo "-C - build apps by running firebot using the latest fds and smv"
+echo "     repo revisions that passed firebot"
+echo "     ( on $app_host in directory $app_home )"
 echo "-c - use apps and pubs previously copied to $HOME/.bundle/apps"
 echo "     and $HOME/.bundle/pubs"
 echo "-d - bundle directory location [default: $bundle_dir]"
@@ -62,7 +65,7 @@ echo "-u - use apps built by firebot in the `whoami` account"
 echo "-U - use apps built by firebot and pubs built firebot and smokebot"
 echo "     both in the `whoami` account"
 echo "-v - show parameters used to build bundle (the bundle is not generated)"
-echo "-w - overwrite bundle (it it already exists)"
+echo "-w - overwrite bundle (it it already exists) "
 exit 0
 }
 
@@ -92,8 +95,11 @@ OVERWRITE=
 UPLOAD_GOOGLE=
 FORCE=
 GOOGLE_DIR_ID_FILE=$HOME/.bundle/GOOGLE_DIR_ID
+CURDIR=`pwd`
+OUTPUT_DIR=$CURDIR/output
+SYNC_REVS=
 
-while getopts 'A:Bcd:fF:ghp:S:uUvw' OPTION
+while getopts 'A:BCcd:fF:ghp:S:uUvw' OPTION
 do
 case $OPTION  in
   A)
@@ -102,6 +108,11 @@ case $OPTION  in
   B)
    BUILD_APPS=1
    app_home=$HOME
+   ;;
+  C)
+   BUILD_APPS=1
+   app_home=$HOME
+   SYNC_REVS=1
    ;;
   d)
    bundle_dir=$HOME
@@ -163,6 +174,13 @@ if [ -e $LOCK_FILE ]; then
 fi
 fi
 touch $LOCK_FILE
+
+if [ "$shoparms" == "" ]; then
+  if [ ! -d $OUTPUT_DIR ]; then
+    mkdir $OUTPUT_DIR
+  fi
+  rm -f $OUTPUT_DIR/*
+fi
 
 # determine platform script is running on
 
@@ -299,13 +317,15 @@ fi
 
 cd $DIR
 if [ "$showparms" == "" ]; then
-  $ECHO ./bundle_generic.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version $bundle_dir
+  echo "building installer"
+  $ECHO ./bundle_generic.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version $bundle_dir > $OUTPUT_DIR/stage1
   if [ "$UPLOAD_GOOGLE" == "1" ]; then
     if [ -e $HOME/.bundle/$GOOGLE_DIR_ID ]; then
+      echo "uploading installer"
       if [ "$platform" == "linux64" ]; then
-        ./upload_bundle.sh $bundle_dir $installer_base $platform 
+        ./upload_bundle.sh $bundle_dir $installer_base $platform                        > $OUTPUT_DIR/stage2
       else
-        ./ssh_upload_bundle.sh $installer_base
+        ./ssh_upload_bundle.sh $installer_base                                          > $OUTPUT_DIR/stage2
       fi
     else
       echo "***warning: the file $HOME/.bundle/GOOGLE_DIR_ID containing the"

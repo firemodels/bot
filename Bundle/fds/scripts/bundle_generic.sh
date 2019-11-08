@@ -348,14 +348,6 @@ CP2 $GUIDE_DIR SMV_User_Guide.pdf                $bundledir/Documentation
 CP2 $GUIDE_DIR SMV_Technical_Reference_Guide.pdf $bundledir/Documentation
 CP2 $GUIDE_DIR SMV_Verification_Guide.pdf        $bundledir/Documentation
 
-if [[ "$OS_LIB_DIR" != "" ]] && [[ -e $OS_LIB_DIR ]]; then
-  echo ""
-  echo "--- copying run time libraries ---"
-  echo ""
-  mkdir $bundledir/bin/LIB64
-  CPDIRFILES $OS_LIB_DIR $bundledir/bin/LIB64
-fi
-
 echo ""
 echo "--- copying release notes ---"
 echo ""
