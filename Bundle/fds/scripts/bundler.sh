@@ -98,8 +98,9 @@ GOOGLE_DIR_ID_FILE=$HOME/.bundle/GOOGLE_DIR_ID
 CURDIR=`pwd`
 OUTPUT_DIR=$CURDIR/output
 SYNC_REVS=
+VERBOSE=
 
-while getopts 'a:A:BCcd:fF:ghp:S:uUvw' OPTION
+while getopts 'a:A:BCcd:fF:ghp:S:uUvVw' OPTION
 do
 case $OPTION  in
   a)
@@ -157,6 +158,9 @@ case $OPTION  in
   v)
    showparms=1
    ECHO=echo
+   ;;
+  V)
+   VERBOSE=1
    ;;
   w)
    OVERWRITE=1
@@ -274,11 +278,32 @@ if [ "$USE_CACHE" == "" ]; then
 if [ "$showparms" == "" ]; then
   error_log=/tmp/error_log.$$
   rm -f $HOME/.bundle/pubs/*
+  if [ "$VERBOSE" == "1" ]; then
+    echo "********************"
+    echo ./copy_pubs.sh fds $fds_pub_home/.firebot/pubs  $pub_host $error_log
+    echo "********************"
+  fi 
   ./copy_pubs.sh fds $fds_pub_home/.firebot/pubs  $pub_host $error_log || return_code=1
+
+  if [ "$VERBOSE" == "1" ]; then
+    echo "********************"
+    echo ./copy_pubs.sh smv $smv_pub_home/.smokebot/pubs $pub_host $error_log
+    echo "********************"
+  fi
   ./copy_pubs.sh smv $smv_pub_home/.smokebot/pubs $pub_host $error_log || return_code=1
 
   rm -f $HOME/.bundle/apps/*
+  if [ "$VERBOSE" == "1" ]; then
+    echo "********************"
+    echo ./copy_apps.sh fds $app_home/.firebot/apps      $app_host $error_log 
+    echo "********************"
+  fi
   ./copy_apps.sh fds $app_home/.firebot/apps      $app_host $error_log || return_code=1
+  if [ "$VERBOSE" == "1" ]; then
+    echo "********************"
+    echo ./copy_apps.sh smv $app_home/.firebot/apps      $app_host $error_log
+    echo "********************"
+  fi
   ./copy_apps.sh smv $app_home/.firebot/apps      $app_host $error_log || return_code=1
  
   if [ "$return_code" == "1" ]; then
