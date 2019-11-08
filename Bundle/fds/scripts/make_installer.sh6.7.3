@@ -415,9 +415,15 @@ cat << MODULE >> \$FDSMODULEtmp
 # Intel runtime environment
 
 set impihome \$FDS_root/bin/INTEL
-prepend-path FI_PROVIDER_PATH \\\$impihome/lib
-prepend-path LD_LIBRARY_PATH \\\$impihome/lib
-prepend-path PATH \\\$impihome/bin
+prepend-path FI_PROVIDER_PATH \\\$impihome/mpi/intel64/libfabric/lib/prov
+setenv I_MPI_ROOT \\\$impihome/mpi
+prepend-path LD_LIBRARY_PATH \\\$impihome/mpi/intel64/libfabric/lib
+prepend-path LD_LIBRARY_PATH \\\$impihome/compiler/lib/intel64_lin
+prepend-path LD_LIBRARY_PATH \\\$impihome/mpi/intel64/lib
+prepend-path LD_LIBRARY_PATH \\\$impihome/mpi/intel64/lib/release
+setenv MKLROOT \\\$impihome/mkl
+prepend-path PATH \\\$impihome/mpi/intel64/bin
+prepend-path PATH \\\$impihome/mpi/intel64/libfabric/bin
 MODULE
 fi
 fi
@@ -495,9 +501,15 @@ cat << BASH >> \$BASHRCFDS
 # Intel runtime environment
 
 impihome=\$FDS_root/bin/INTEL
-export FI_PROVIDER_PATH=\\\$impihome/lib
-export LD_LIBRARY_PATH=\\\$impihome/lib:\\\$LD_LIBRARY_PATH
-export PATH=\\\$impihome/bin:\\\$PATH
+export FI_PROVIDER_PATH=\\\$impihome/mpi/intel64/libfabric/lib/prov
+export I_MPI_ROOT=\\\$impihome/mpi
+export LD_LIBRARY_PATH=\\\$impihome/mpi/intel64/libfabric/lib:\\\$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=\\\$impihome/compiler/lib/intel64_lin:\\\$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=\\\$impihome/mpi/intel64/lib:\\\$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=\\\$impihome/mpi/intel64/lib/release:\\\$LD_LIBRARY_PATH
+export MKLROOT=\\\$impihome/mkl
+export PATH=\\\$impihome/mpi/intel64/bin:\\\$PATH
+export PATH=\\\$impihome/mpi/intel64/libfabric/bin:\\\$PATH
 BASH
 fi
 fi
