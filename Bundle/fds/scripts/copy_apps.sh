@@ -1,8 +1,13 @@
 #!/bin/bash
 app_type=$1
-eval dir_from=$2
-eval bot_host=$3
+bot_host=$3
 error_log=$4
+
+if [[ "$bot_host" != "" ]] && [[ "$bot_host" != "`hostname`" ]]; then
+  dir_from=$2
+else
+  eval dir_from=$2
+fi
 
 if [ "$app_type" != "fds" ]; then
   app_type="smv"
