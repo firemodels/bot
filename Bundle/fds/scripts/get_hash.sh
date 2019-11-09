@@ -1,13 +1,17 @@
 #!/bin/bash
+# hashtype from_dir bot_host error_log
 
-bot_host=$2
-error_log=$3
-
-if [[ "$bot_host" != "" ]] && [[ "$bot_host" != "`hostname`" ]]; then
-  dir_from=$1
-else
-  eval dir_from=$1
+hashtype=$1
+if [ "$hashtype" != "fds" ]; then
+  hashtype="smv"
 fi
+if [[ "$bot_host" != "" ]] && [[ "$bot_host" != "`hostname`" ]]; then
+  dir_from=$2
+else
+  eval dir_from=$2
+fi
+bot_host=$3
+error_log=$4
 
 #---------------------------------------------
 #                   CP
@@ -48,18 +52,16 @@ return_code=0
 
 dir_to=/tmp
 
-CP FDS_HASH $dir_to/FDS_HASH.$$
-CP SMV_HASH $dir_to/SMV_HASH.$$
-
-if [ "$return_code" != "0" ]; then
-  exit $return_code
+if [ "$hashtype" == "fds" ]; then
+  CP FDS_HASH $dir_to/FDS_HASH.$$ || exit 1
+  cat $dir_to/FDS_HASH.$$
+  rm -f $dir_to/FDS_HASH.$$
 fi
 
-FDS_HASH=`cat $dir_to/FDS_HASH.$$`
-SMV_HASH=`cat $dir_to/SMV_HASH.$$`
-rm -f $dir_to/FDS_HASH.$$ $dir_to/SMV_HASH.$$
+if [ "$hashtype" == "smv" ]; then
+  CP SMV_HASH $dir_to/SMV_HASH.$$ || exit 1
+  cat $dir_to/SMV_HASH.$$
+  rm -f $dir_to/SMV_HASH.$$
+fi
 
-echo FDS_HASH=$FDS_HASH
-echo SMV_HASH=$SMV_HASH
-
-exit $return_code
+exit 0
