@@ -8,11 +8,11 @@ function usage {
 echo "This script outputs an fds or smv repo hash"
 echo ""
 echo "Options:"
-echo "-b - host where firebot was run" [default: $bot_host]"
+echo "-b - host where firebot was run [default: $bot_host]"
 echo "-e - error log [default: $error_log]"
 echo "-f - from directory [default: $from_dir]"
 echo "-h - display this message"
-echo "-r - repo type fds or  smv [default: $repotype]"
+echo "-r - repo type fds or  smv [default: $repo_type]"
 echo "-v - show parameters used to build bundle (the bundle is not generated)"
 exit 0
 }
@@ -27,24 +27,20 @@ CP ()
   local TOFILE=$2
   COPY=
   if [[ "$bot_host" != "" ]] && [[ "$bot_host" != "`hostname`" ]]; then
-    scp -q $bot_host:$dir_from/$FROMFILE $TOFILE
+    scp -q $bot_host:$from_dir/$FROMFILE $TOFILE
     COPY=1
   else
-    if [ -e $dir_from/$FROMFILE ]; then
-      cp $dir_from/$FROMFILE $TOFILE
+    if [ -e $from_dir/$FROMFILE ]; then
+      cp $from_dir/$FROMFILE $TOFILE
       COPY=1
     else
-      echo ""
-      echo "***error: $dir_from/$FROMFILE does not exist"
       echo ""                                             >> $error_log
-      echo "***error: $dir_from/$FROMFILE does not exist" >> $error_log
+      echo "***error: $from_dir/$FROMFILE does not exist" >> $error_log
       return_code=1
     fi
   fi
   if [ "$COPY" == "1" ]; then
     if [ ! -e $TOFILE ]; then
-      echo "" 
-      echo ***error: $FROMFILE failed to copy to $TOFILE
       echo ""  >> $error_log
       echo ***error: $FROMFILE failed to copy to $TOFILE >> $error_log
       return_code=1
@@ -52,10 +48,11 @@ CP ()
   fi
 }
 
-repotype=fds
+repo_type=fds
 from_dir=\~firebot
 bot_host=`hostname`
 error_log=/tmp/get_hash_error_$USER.log
+to_dir=/tmp
 SHOWPARMS=
 
 while getopts 'b:e:f:hr:v' OPTION
@@ -74,9 +71,9 @@ case $OPTION  in
    usage
    ;;
   r)
-   repotype="$OPTARG"
-   if [ "$repotype" != "fds" ]; then
-     repotype="smv"
+   repo_type="$OPTARG"
+   if [ "$repo_type" != "fds" ]; then
+     repo_type="smv"
    fi
    ;;
   v)
@@ -91,31 +88,31 @@ shift $(($OPTIND-1))
 
 if [ "$SHOWPARMS" == "1" ]; then
   echo bot_host="$bot_host"
-  echo error_log="$bot_host"
-  echo from_dir="$bot_host"
+  echo error_log="$error_log"
+  echo from_dir="$from_dir"
+  echo to_dir="$to_dir"
   echo repo_type="$repo_type"
   exit 0
 fi
 if [[ "$bot_host" != "" ]] && [[ "$bot_host" != "`hostname`" ]]; then
-  dir_from=$2
+  from_dir=$from_dir
 else
-  eval dir_from=$2
+  eval from_dir=$from_dir
 fi
+from_dir=$from_dir/.firebot/apps
 
 return_code=0
 
-dir_to=/tmp
-
-if [ "$repotype" == "fds" ]; then
-  CP FDS_HASH $dir_to/FDS_HASH.$$ || exit 1
-  cat $dir_to/FDS_HASH.$$
-  rm -f $dir_to/FDS_HASH.$$
+if [ "$repo_type" == "fds" ]; then
+  CP FDS_HASH $to_dir/FDS_HASH.$$ || exit 1
+  cat $to_dir/FDS_HASH.$$
+  rm -f $to_dir/FDS_HASH.$$
 fi
 
-if [ "$repotype" == "smv" ]; then
-  CP SMV_HASH $dir_to/SMV_HASH.$$ || exit 1
-  cat $dir_to/SMV_HASH.$$
-  rm -f $dir_to/SMV_HASH.$$
+if [ "$repo_type" == "smv" ]; then
+  CP SMV_HASH $to_dir/SMV_HASH.$$ || exit 1
+  cat $to_dir/SMV_HASH.$$
+  rm -f $to_dir/SMV_HASH.$$
 fi
 
 exit 0
