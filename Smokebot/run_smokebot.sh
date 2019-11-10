@@ -18,6 +18,11 @@ echo "-b - use the current branch"
 echo "-B - only build apps"
 echo "-C - add --mca plm_rsh_agent /usr/bin/ssh to mpirun command "
 echo "           when running cases"
+echo "-g firebot_host - host where firebot was run"
+echo "-G firebot_home - home directory where firebot was run"
+echo "   the -g and -G options are used to sync the fds and smv"
+echo "   repos of this smokebot run with the last successful "
+echo     firebot"
 echo "-D - use startup files to set the environment not modules"
 echo "-f - force smokebot run"
 echo "-I compiler - intel or gnu [default: $COMPILER]"
@@ -183,6 +188,8 @@ BUILD_ONLY=
 CLONE_REPOS=
 FDS_REV=
 SMV_REV=
+FIREBOT_HOST=
+FIREBOT_HOME=
 
 WEB_URL=
 web_DIR=/var/www/html/`whoami`
@@ -204,7 +211,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'aAbBcCd:DfhHI:JkLm:MPq:r:R:StuUvw:W:x:y:' OPTION
+while getopts 'aAbBcCd:Dfg:G:hHI:JkLm:MPq:r:R:StuUvw:W:x:y:' OPTION
 do
 case $OPTION  in
   a)
@@ -234,6 +241,11 @@ case $OPTION  in
   f)
    FORCE=1
    ;;
+  g)
+   FIREBOT_HOST="$OPTARG"
+   ;;
+  G)
+   FIREBOT_HOME="$OPTARG"
   h)
    usage
    ;;
@@ -300,6 +312,29 @@ if [ "$REMOVE_PID" == "1" ]; then
   rm -f $smokebot_pid
   echo "$smokebot_pid status file removed"
   exit
+fi
+
+GET_HASH=
+if [ "$FIREBOT_HOST" != "" ]; then
+  GET_HASH=1
+else
+  FIREBOT_HOST=`hostname`
+fi
+if [ "$FIREBOT_HOME" != "" ]; then
+  GET_HASH=1
+else
+  FIREBOT_HOME=\~firebot
+fi
+if [ "$GET_HASH" != "" ]; then
+  if [ "$CLONE_REPO" == "" ]; then
+    echo "***error: The -g and -G options for specifying firebot host/home directory can only be used"
+    echo "          when cloning the repos, when the -R option is used"
+    exit 1
+  fi
+  FDS_HASH=`../Bundle/fds/scripts/get_hash.sh fds -g $FIREBOT_HOST -G $FIREBOT_HOME`
+  SMV_HASH=`../Bundle/fds/scripts/get_hash.sh smv -g $FIREBOT_HOST -G $FIREBOT_HOME`
+  FDS_REV="-x $FDS_HASH"
+  SMV_REV="-y $SMV_HASH"
 fi
 
 if [ `whoami` != smokebot ]; then

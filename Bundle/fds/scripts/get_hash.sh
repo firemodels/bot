@@ -8,9 +8,9 @@ function usage {
 echo "This script outputs an fds or smv repo hash"
 echo ""
 echo "Options:"
-echo "-b - host where firebot was run [default: $bot_host]"
 echo "-e - error log [default: $error_log]"
-echo "-f - from directory [default: $from_dir]"
+echo "-g - host where firebot was run [default: $firebot_host]"
+echo "-G - home directory where firebot was run [default: $firebot_home]"
 echo "-h - display this message"
 echo "-r - repo type fds or  smv [default: $repo_type]"
 echo "-v - show parameters used to build bundle (the bundle is not generated)"
@@ -26,16 +26,16 @@ CP ()
   local FROMFILE=$1
   local TOFILE=$2
   COPY=
-  if [[ "$bot_host" != "" ]] && [[ "$bot_host" != "`hostname`" ]]; then
-    scp -q $bot_host:$from_dir/$FROMFILE $TOFILE
+  if [[ "$firebot_host" != "" ]] && [[ "$firebot_host" != "`hostname`" ]]; then
+    scp -q $firebot_host:$firebot_home/$FROMFILE $TOFILE
     COPY=1
   else
-    if [ -e $from_dir/$FROMFILE ]; then
-      cp $from_dir/$FROMFILE $TOFILE
+    if [ -e $firebot_home/$FROMFILE ]; then
+      cp $firebot_home/$FROMFILE $TOFILE
       COPY=1
     else
       echo ""                                             >> $error_log
-      echo "***error: $from_dir/$FROMFILE does not exist" >> $error_log
+      echo "***error: $firebot_home/$FROMFILE does not exist" >> $error_log
       return_code=1
     fi
   fi
@@ -49,23 +49,23 @@ CP ()
 }
 
 repo_type=fds
-from_dir=\~firebot
-bot_host=`hostname`
+firebot_home=\~firebot
+firebot_host=`hostname`
 error_log=/tmp/get_hash_error_$USER.log
 to_dir=/tmp
 SHOWPARMS=
 
-while getopts 'b:e:f:hr:v' OPTION
+while getopts 'e:g:G:hr:v' OPTION
 do
 case $OPTION  in
-  b)
-   bot_host="$OPTARG"
-   ;;
   e)
    error_log="$OPTARG"
    ;;
-  f)
-   from_dir="$OPTARG"
+  g)
+   firebot_host="$OPTARG"
+   ;;
+  G)
+   firebot_home="$OPTARG"
    ;;
   h)
    usage
@@ -87,19 +87,19 @@ done
 shift $(($OPTIND-1))
 
 if [ "$SHOWPARMS" == "1" ]; then
-  echo bot_host="$bot_host"
+  echo firebot_host="$firebot_host"
   echo error_log="$error_log"
-  echo from_dir="$from_dir"
+  echo firebot_home="$firebot_home"
   echo to_dir="$to_dir"
   echo repo_type="$repo_type"
   exit 0
 fi
-if [[ "$bot_host" != "" ]] && [[ "$bot_host" != "`hostname`" ]]; then
-  from_dir=$from_dir
+if [[ "$firebot_host" != "" ]] && [[ "$firebot_host" != "`hostname`" ]]; then
+  firebot_home=$firebot_home
 else
-  eval from_dir=$from_dir
+  eval firebot_home=$firebot_home
 fi
-from_dir=$from_dir/.firebot/apps
+firebot_home=$firebot_home/.firebot/apps
 
 return_code=0
 
