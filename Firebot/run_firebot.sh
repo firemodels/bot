@@ -198,7 +198,7 @@ FIREBOT_HOME=
 
 #*** parse command line options
 
-while getopts 'bBcdDFfgGHhIiJkLm:MNnOPq:R:SsTuUvx:y:' OPTION
+while getopts 'bBcdDFfg:G:HhIiJkLm:MNnOPq:R:SsTuUvx:y:' OPTION
 do
 case $OPTION  in
   b)
@@ -291,7 +291,7 @@ case $OPTION  in
    ;;
   v)
    RUNFIREBOT=
-   ECHO=echo
+   ECHO="echo"
    ;;
   x)
    FDS_REV="-x $OPTARG"
@@ -302,6 +302,7 @@ case $OPTION  in
   \?)
   echo "***error: unknown option entered. aborting firebot"
   exit 1
+  ;;
 esac
 done
 shift $(($OPTIND-1))
@@ -320,7 +321,7 @@ else
   FIREBOT_HOME=\~firebot
 fi
 if [ "$GET_HASH" != "" ]; then
-  if [ "$CLONE_REPO" == "" ]; then
+  if [ "$CLONE_REPOS" == "" ]; then
     echo "***error: The -g and -G options for specifying firebot host/home directory can only be used"
     echo "          when cloning the repos, when the -R option is used"
     exit 1
@@ -439,7 +440,7 @@ QUEUE="-q $QUEUE"
 touch $firebot_pid
 firebot_status=0
 echo $ECHO  ./$botscript -p $firebot_pid $UPDATE $DV $INTEL $debug_mode $BUILD_ONLY $BRANCH $FDS_REV $SMV_REV $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $CLONE_REPOS $CLONE_FDSSMV  $EMAIL $COPY_MANUAL_DIR $DEBUG_ONLY "$@"
-$ECHO  ./$botscript -p $firebot_pid $UPDATE $DV $INTEL $debug_mode $BUILD_ONLY $BRANCH $FDS_REV $SMV_REV $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $CLONE_REPOS $CLONE_FDSSMV  $EMAIL $COPY_MANUAL_DIR $DEBUG_ONLY "$@"
+#$ECHO  ./$botscript -p $firebot_pid $UPDATE $DV $INTEL $debug_mode $BUILD_ONLY $BRANCH $FDS_REV $SMV_REV $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $CLONE_REPOS $CLONE_FDSSMV  $EMAIL $COPY_MANUAL_DIR $DEBUG_ONLY "$@"
 firebot_status=$?
 if [ -e $firebot_pid ]; then
   rm -f $firebot_pid
