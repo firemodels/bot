@@ -336,8 +336,8 @@ if [ "$GET_HASH" != "" ]; then
     echo "          when cloning the repos, when the -R option is used"
     exit 1
   fi
-  FDS_HASH=`../Bundle/fds/scripts/get_hash.sh fds -g $FIREBOT_HOST -G $FIREBOT_HOME`
-  SMV_HASH=`../Bundle/fds/scripts/get_hash.sh smv -g $FIREBOT_HOST -G $FIREBOT_HOME`
+  FDS_HASH=`../Bundle/fds/scripts/get_hash.sh -r fds -g $FIREBOT_HOST -G $FIREBOT_HOME`
+  SMV_HASH=`../Bundle/fds/scripts/get_hash.sh -r smv -g $FIREBOT_HOST -G $FIREBOT_HOME`
   ABORT=
   if [ "$FDS_HASH" == "" ]; then
     ABORT=1

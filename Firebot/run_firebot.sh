@@ -326,8 +326,8 @@ if [ "$GET_HASH" != "" ]; then
     echo "          when cloning the repos, when the -R option is used"
     exit 1
   fi
-  FDS_HASH=`../Bundle/fds/scripts/get_hash.sh fds -g $FIREBOT_HOST -G $FIREBOT_HOME`
-  SMV_HASH=`../Bundle/fds/scripts/get_hash.sh smv -g $FIREBOT_HOST -G $FIREBOT_HOME`
+  FDS_HASH=`../Bundle/fds/scripts/get_hash.sh -r fds -g $FIREBOT_HOST -G $FIREBOT_HOME`
+  SMV_HASH=`../Bundle/fds/scripts/get_hash.sh -r smv -g $FIREBOT_HOST -G $FIREBOT_HOME`
   ABORT=
   if [ "$FDS_HASH" == "" ]; then
     ABORT=1
@@ -346,7 +346,7 @@ fi
 
 # warn user (if not the firebot user) if using the clone option
 
-if [ "$RUNFIREBOT" == "" ]; then
+if [ "$RUNFIREBOT" != "" ]; then
   if [ "`whoami`" != "firebot" ]; then
     if [ "$CLONE_REPOS" != "" ]; then
       echo "You are about to erase and clone the "
@@ -439,8 +439,7 @@ BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
 firebot_status=0
-echo $ECHO  ./$botscript -p $firebot_pid $UPDATE $DV $INTEL $debug_mode $BUILD_ONLY $BRANCH $FDS_REV $SMV_REV $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $CLONE_REPOS $CLONE_FDSSMV  $EMAIL $COPY_MANUAL_DIR $DEBUG_ONLY "$@"
-#$ECHO  ./$botscript -p $firebot_pid $UPDATE $DV $INTEL $debug_mode $BUILD_ONLY $BRANCH $FDS_REV $SMV_REV $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $CLONE_REPOS $CLONE_FDSSMV  $EMAIL $COPY_MANUAL_DIR $DEBUG_ONLY "$@"
+$ECHO  ./$botscript -p $firebot_pid $UPDATE $DV $INTEL $debug_mode $BUILD_ONLY $BRANCH $FDS_REV $SMV_REV $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $CLONE_REPOS $CLONE_FDSSMV  $EMAIL $COPY_MANUAL_DIR $DEBUG_ONLY "$@"
 firebot_status=$?
 if [ -e $firebot_pid ]; then
   rm -f $firebot_pid
