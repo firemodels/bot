@@ -290,7 +290,7 @@ case $OPTION  in
    UPLOADGUIDES=-U
    ;;
   v)
-   RUNFIREBOT=0
+   RUNFIREBOT=
    ECHO=echo
    ;;
   x)
@@ -345,13 +345,15 @@ fi
 
 # warn user (if not the firebot user) if using the clone option
 
-if [ `whoami` != firebot ]; then
-  if [ "$CLONE_REPOS" != "" ]; then
-    echo "You are about to erase and clone the "
-    echo "fds, exp, fig, out and smv repos."
-    echo "Press any key to continue or <CTRL> c to abort."
-    echo "Type $0 -h for other options"
-    read val
+if [ "$RUNFIREBOT" == "" ]; then
+  if [ "`whoami`" != "firebot" ]; then
+    if [ "$CLONE_REPOS" != "" ]; then
+      echo "You are about to erase and clone the "
+      echo "fds, exp, fig, out and smv repos."
+      echo "Press any key to continue or <CTRL> c to abort."
+      echo "Type $0 -h for other options"
+      read val
+    fi
   fi
 fi
 
@@ -417,13 +419,13 @@ fi
 #     and that the -b branch option only apples to the fds and smv repos
 
 if [[ "$UPDATEREPO" == "1" ]]; then
-   UPDATE=-u
-   if [[ "$RUNFIREBOT" == "1" ]]; then
-     CD_REPO $repo/bot/Firebot master  || exit 1
+  UPDATE=-u
+  if [[ "$RUNFIREBOT" == "1" ]]; then
+    CD_REPO $repo/bot/Firebot master  || exit 1
 
-     git fetch origin &> /dev/null
-     git merge origin/master &> /dev/null
-     cd $CURDIR
+    git fetch origin &> /dev/null
+    git merge origin/master &> /dev/null
+    cd $CURDIR
   fi
 fi
 if [[ "$CLEANREPO" == "1" ]]; then
@@ -436,6 +438,7 @@ BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
 firebot_status=0
+echo $ECHO  ./$botscript -p $firebot_pid $UPDATE $DV $INTEL $debug_mode $BUILD_ONLY $BRANCH $FDS_REV $SMV_REV $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $CLONE_REPOS $CLONE_FDSSMV  $EMAIL $COPY_MANUAL_DIR $DEBUG_ONLY "$@"
 $ECHO  ./$botscript -p $firebot_pid $UPDATE $DV $INTEL $debug_mode $BUILD_ONLY $BRANCH $FDS_REV $SMV_REV $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $CLONE_REPOS $CLONE_FDSSMV  $EMAIL $COPY_MANUAL_DIR $DEBUG_ONLY "$@"
 firebot_status=$?
 if [ -e $firebot_pid ]; then
