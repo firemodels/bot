@@ -1632,7 +1632,7 @@ email_build_status()
 
 #*** setup
 
-echo $0 $* >> output/command.firebot
+echo $0 $* >> command.firebot
 
 # Start firebot timer
 START_TIME=$(date +%s)
