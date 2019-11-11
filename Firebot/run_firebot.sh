@@ -272,6 +272,7 @@ case $OPTION  in
    ;;
   R)
    CLONE_REPOS="$OPTARG"
+   BRANCH=current
    ;;
   s)
    SKIPMATLAB=-s
