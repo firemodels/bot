@@ -298,6 +298,9 @@ case $OPTION  in
   y)
    SMV_REV="-y $OPTARG"
    ;;
+  \?)
+  echo "***error: unknown option entered. aborting firebot"
+  exit 1
 esac
 done
 shift $(($OPTIND-1))
