@@ -22,7 +22,7 @@ echo "-g firebot_host - host where firebot was run"
 echo "-G firebot_home - home directory where firebot was run"
 echo "   the -g and -G options are only used with the -R option and"
 echo "   are used to build apps using  the same repo revisions as last"
-echo     successful firebot run "
+echo "    successful firebot run "
 echo "-D - use startup files to set the environment not modules"
 echo "-f - force smokebot run"
 echo "-I compiler - intel or gnu [default: $COMPILER]"
@@ -304,6 +304,9 @@ case $OPTION  in
   y)
    SMV_REV="-y $OPTARG"
    ;;
+  \?)
+  echo "***error: unknown option entered. aborting smokebot"
+  exit 1
 esac
 done
 shift $(($OPTIND-1))
