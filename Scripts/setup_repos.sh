@@ -8,7 +8,6 @@ echo "-a - setup all available repos: "
 echo "    $allrepos"
 echo "-c - setup repos used by cfastbot: "
 echo "    $cfastrepos"
-echo "-d - only setup fds and smv repos (erase each repo first)"
 echo "-f - setup repos used by firebot: "
 echo "    $fdsrepos"
 echo "-F - setup repos used by firebot (erase each repo first): "
@@ -17,6 +16,7 @@ echo "-s - setup repos used by smokebot: "
 echo "    $smvrepos"
 echo "-S - setup repos used by smokebot (erase each repo first): "
 echo "    $smvrepos"
+echo "-T - only setup fds and smv repos (erase each repo first)"
 echo "-w - setup wiki and webpage repos cloned from firemodels"
 echo "-h - display this message"
 exit
@@ -72,7 +72,7 @@ else
    exit
 fi
 
-while getopts 'abcdfFhsSw' OPTION
+while getopts 'abcfFhsSTw' OPTION
 do
 case $OPTION  in
   a)
@@ -80,10 +80,6 @@ case $OPTION  in
    ;;
   c)
    repos=$cfastrepos;
-   ;;
-  d)
-   repos=$fdssmvrepos;
-   eraserepos=1
    ;;
   f)
    repos=$fdsrepos;
@@ -100,6 +96,10 @@ case $OPTION  in
    ;;
   S)
    repos=$smvrepos;
+   eraserepos=1
+   ;;
+  T)
+   repos=$fdssmvrepos;
    eraserepos=1
    ;;
   w)
