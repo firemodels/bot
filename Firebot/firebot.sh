@@ -4,37 +4,6 @@
 # Consult the FDS Config Management Plan for more information.
 
 #---------------------------------------------
-#                   usage
-#---------------------------------------------
-
-function usage {
-echo "Verification and validation testing script for FDS"
-echo ""
-echo "Options"
-echo "-b - branch_name - run firebot using branch branch_name"
-echo "-B - only build apps"
-echo "-c - clean repo"
-echo "-D - debug only"
-echo "-F - skip figures and document building stages"
-echo "-h - display this message"
-echo "-i - use installed version of smokeview"
-echo "-I - use development version of FDS"
-echo "-J - use Intel MPI version of FDS"
-echo "-L - firebot lite,  run only stages that build a debug fds and run cases with it"
-echo "                    (no release fds, no release cases, no matlab, etc)"
-echo "-m email_address "
-echo "-q - queue_name - run cases using the queue queue_name"
-echo "     default: $QUEUE"
-echo "-s - skip matlab and document building stages"
-echo "-u - update repo"
-echo "-U - upload guides"
-echo "-W - clone fds, exp, fig, out and smv repos"
-echo "-x fds_rev - run firebot using the fds revision named fds_rev [default: $FDS_REV]"
-echo "-y smv_rev - run firebot using the smv revision named smv_rev [default: $SMV_REV]"
-exit 0
-}
-
-#---------------------------------------------
 #                   CHK_REPO
 #---------------------------------------------
 
@@ -1758,12 +1727,13 @@ DV2=
 INTEL=
 INTEL2=
 CLONE_REPOS=
+CLONE_FDSSMV=
 DEBUG_ONLY=
 FDS_REV=origin/master
 SMV_REV=origin/master
 
 #*** parse command line arguments
-while getopts 'b:BcdDhIiJLm:p:q:R:suUx:y:' OPTION
+while getopts 'b:BcdDIiJLm:p:q:R:sTuUx:y:' OPTION
 do
 case $OPTION in
   b)
@@ -1787,9 +1757,6 @@ case $OPTION in
    ;;
   F)
    SKIPFIGURES=1
-   ;;
-  h)
-   usage;
    ;;
   I)
    DV="_dv"
@@ -1819,6 +1786,9 @@ case $OPTION in
    ;;
   s)
    SKIPMATLAB=1
+   ;;
+  T)
+   CLONE_FDSSMV=1
    ;;
   u)
    UPDATEREPO=1
@@ -1881,7 +1851,13 @@ echo "------"
 if [[ "$CLONE_REPOS" != "" ]]; then
   echo Cloning repos
   cd $botrepo/Scripts
-  ./setup_repos.sh -F > $OUTPUT_DIR/stage1_clone 2>&1
+  if [ "$CLONE_FDSSMV" != "" ]; then
+   # only clone the fds and smv repos - used when just compiling the fds and smv apps
+    ./setup_repos.sh -T > $OUTPUT_DIR/stage1_clone 2>&1
+  else
+   # clone all repos
+    ./setup_repos.sh -F > $OUTPUT_DIR/stage1_clone 2>&1
+  fi
   if [ "$CLONE_REPOS" != "master" ]; then
     FDSBRANCH=$CLONE_REPOS
     cd $fdsrepo

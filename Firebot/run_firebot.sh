@@ -16,6 +16,11 @@ echo "-D - run only debug stages "
 echo "-q queue - specify queue [default: $QUEUE]"
 echo "-f - force firebot run"
 echo "-F - skip figure generation and build document stages"
+echo "-g firebot_host - host where firebot was run"
+echo "-G firebot_home - home directory where firebot was run"
+echo "   the -g and -G options are only used with the -R option and"
+echo "   are used to build apps using  the same repo revisions as last"
+echo     successful firebot run "
 echo "-i - use installed version of smokeview"
 echo "-I - use development version of fds"
 echo "-J - use Intel MPI version fds"
@@ -35,6 +40,7 @@ echo "-R branch_name - clone fds, exp, fig, out and smv repos. fds and smv repos
 echo "     will be checked out with a branch named 'branch_name'"
 echo "-s - skip matlab and build document stages"
 echo "-S - use startup files to set the environment, not modules"
+echo "-T - only clone the fds and smv repos"
 echo "-U - upload guides (only by user firebot)"
 echo "-x fds_rev - run firebot using the fds revision named fds_rev [default: origin/master]"
 echo "-y smv_rev - run firebot using the smv revision named smv_rev [default: origin/master]"
@@ -181,15 +187,18 @@ debug_mode=
 DV=
 REMOVE_PID=
 CLONE_REPOS=
+CLONE_FDSSMV=
 BUILD_ONLY=
 DEBUG_ONLY=
 export QFDS_STARTUP=
 FDS_REV=
 SMV_REV=
+FIREBOT_HOST=
+FIREBOT_HOME=
 
 #*** parse command line options
 
-while getopts 'bBcdDFfHhIiJkLm:MNnOPq:R:SsuUvx:y:' OPTION
+while getopts 'bBcdDFfgGHhIiJkLm:MNnOPq:R:SsTuUvx:y:' OPTION
 do
 case $OPTION  in
   b)
@@ -212,6 +221,12 @@ case $OPTION  in
    ;;
   F)
    SKIPFIGURES=-F
+   ;;
+  g)
+   FIREBOT_HOST="$OPTARG"
+   ;;
+  G)
+   FIREBOT_HOME="$OPTARG"
    ;;
   h)
    usage;
@@ -264,6 +279,9 @@ case $OPTION  in
   S)
     export QFDS_STARTUP=1
    ;;
+  T)
+    CLONE_FDSSMV="-T"
+   ;;
   u)
    UPDATEREPO=1
    ;;
@@ -283,6 +301,45 @@ case $OPTION  in
 esac
 done
 shift $(($OPTIND-1))
+
+# sync fds and smv repos with the the repos used in the last successful firebot run
+
+GET_HASH=
+if [ "$FIREBOT_HOST" != "" ]; then
+  GET_HASH=1
+else
+  FIREBOT_HOST=`hostname`
+fi
+if [ "$FIREBOT_HOME" != "" ]; then
+  GET_HASH=1
+else
+  FIREBOT_HOME=\~firebot
+fi
+if [ "$GET_HASH" != "" ]; then
+  if [ "$CLONE_REPO" == "" ]; then
+    echo "***error: The -g and -G options for specifying firebot host/home directory can only be used"
+    echo "          when cloning the repos, when the -R option is used"
+    exit 1
+  fi
+  FDS_HASH=`../Bundle/fds/scripts/get_hash.sh fds -g $FIREBOT_HOST -G $FIREBOT_HOME`
+  SMV_HASH=`../Bundle/fds/scripts/get_hash.sh smv -g $FIREBOT_HOST -G $FIREBOT_HOME`
+  ABORT=
+  if [ "$FDS_HASH" == "" ]; then
+    ABORT=1
+  fi
+  if [ "$SMV_HASH" == "" ]; then
+    ABORT=1
+  fi
+  if [ "$ABORT" != "" ]; then
+    echo "***error: the fds and/or smv repo hash could not be found in the directory"
+    echo "          $FIREBOT_HOME/.firebot/apps at the host $FIREBOT_HOST"
+    exit 1
+  fi
+  FDS_REV="-x $FDS_HASH"
+  SMV_REV="-y $SMV_HASH"
+fi
+
+# warn user (if not the firebot user) if using the clone option
 
 if [ `whoami` != firebot ]; then
   if [ "$CLONE_REPOS" != "" ]; then
@@ -375,7 +432,7 @@ BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
 firebot_status=0
-$ECHO  ./$botscript -p $firebot_pid $UPDATE $DV $INTEL $debug_mode $BUILD_ONLY $BRANCH $FDS_REV $SMV_REV $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $CLONE_REPOS $EMAIL $COPY_MANUAL_DIR $DEBUG_ONLY "$@"
+$ECHO  ./$botscript -p $firebot_pid $UPDATE $DV $INTEL $debug_mode $BUILD_ONLY $BRANCH $FDS_REV $SMV_REV $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $CLONE_REPOS $CLONE_FDSSMV  $EMAIL $COPY_MANUAL_DIR $DEBUG_ONLY "$@"
 firebot_status=$?
 if [ -e $firebot_pid ]; then
   rm -f $firebot_pid
