@@ -42,7 +42,7 @@ echo "The following environment variables may be used to set the"
 echo "host names used to build apps and pubs."
 echo ""
 echo "APP_HOST    - host where apps are located"
-echo "PBS_HOST    - host where pubs are located"
+echo "PUB_HOST    - host where pubs are located"
 echo "UPLOAD_HOST - host where installer is uploaded to Google Drive"
 echo ""
 echo "Options:"
@@ -231,7 +231,7 @@ if [ "$showparms" == "1" ]; then
   echo "    fds/smv app directory: $app_home/$APPDIR/apps $app_hostlabel"
   pub_hostlabel="on this computer"
   if [ "$pub_host" != `hostname` ]; then
-    pub_hostlabel="on $pub_host"
+    eub_hostlabel="on $pub_host"
   fi
   if [ "$USE_CACHE" == "1" ]; then
     echo "    fds/smv pub directory: $fds_pub_home/$FDS_PUBDIR/pubs $pub_hostlabel"
