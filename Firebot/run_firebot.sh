@@ -349,11 +349,11 @@ fi
 if [ "$RUNFIREBOT" != "" ]; then
   if [ "`whoami`" != "firebot" ]; then
     if [ "$CLONE_REPOS" != "" ]; then
-      echo "You are about to erase and clone the "
       if [ "$CLONE_FDSSMV" == "" ]; then
-        echo "fds, exp, fig, out and smv repos."
+        echo "You are about to erase and clone the fds, exp, fig"
+        echo "out and smv repos."
       else
-        echo "fds and smv repos."
+        echo "You are about to erase and clone the fds and smv repos"
       fi
       echo "Press any key to continue or <CTRL> c to abort."
       echo "Type $0 -h for other options"
