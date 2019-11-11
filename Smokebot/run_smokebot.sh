@@ -20,9 +20,9 @@ echo "-C - add --mca plm_rsh_agent /usr/bin/ssh to mpirun command "
 echo "           when running cases"
 echo "-g firebot_host - host where firebot was run"
 echo "-G firebot_home - home directory where firebot was run"
-echo "   the -g and -G options are used to sync the fds and smv"
-echo "   repos of this smokebot run with the last successful "
-echo     firebot"
+echo "   the -g and -G options are only used with the -R option and"
+echo "   are used to build apps using  the same repo revisions as last"
+echo     successful firebot run "
 echo "-D - use startup files to set the environment not modules"
 echo "-f - force smokebot run"
 echo "-I compiler - intel or gnu [default: $COMPILER]"
@@ -314,6 +314,8 @@ if [ "$REMOVE_PID" == "1" ]; then
   exit
 fi
 
+# sync fds and smv repos with the the repos used in the last successful firebot run
+
 GET_HASH=
 if [ "$FIREBOT_HOST" != "" ]; then
   GET_HASH=1
@@ -333,9 +335,23 @@ if [ "$GET_HASH" != "" ]; then
   fi
   FDS_HASH=`../Bundle/fds/scripts/get_hash.sh fds -g $FIREBOT_HOST -G $FIREBOT_HOME`
   SMV_HASH=`../Bundle/fds/scripts/get_hash.sh smv -g $FIREBOT_HOST -G $FIREBOT_HOME`
+  ABORT=
+  if [ "$FDS_HASH" == "" ]; then
+    ABORT=1
+  fi
+  if [ "$SMV_HASH" == "" ]; then
+    ABORT=1
+  fi
+  if [ "$ABORT" != "" ]; then
+    echo "***error: the fds and/or smv repo hash could not be found in the directory"
+    echo "          $FIREBOT_HOME/.firebot/apps at the host $FIREBOT_HOST"
+    exit 1
+  fi
   FDS_REV="-x $FDS_HASH"
   SMV_REV="-y $SMV_HASH"
 fi
+
+# warn user (if not the smokebot user) if using the clone option
 
 if [ `whoami` != smokebot ]; then
   if [ "$CLONE_REPOS" != "" ]; then
