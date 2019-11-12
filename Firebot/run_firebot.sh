@@ -173,9 +173,7 @@ USEINSTALL=
 BRANCH=master
 botscript=firebot.sh
 UPDATEREPO=
-CLEANREPO=0
-UPDATE=
-CLEAN=
+CLEANREPO=
 RUNFIREBOT=1
 UPLOADGUIDES=
 FORCE=
@@ -213,7 +211,7 @@ case $OPTION  in
    BUILD_ONLY="-B"
    ;;
   c)
-   CLEANREPO=1
+   CLEANREPO="-c"
    ;;
   d)
     debug_mode="-d "
@@ -264,7 +262,7 @@ case $OPTION  in
    COPY_MANUAL_DIR=-N
    ;;
   n)
-   UPDATEREPO=0
+   UPDATEREPO=
    ;;
   O)
    INTEL=
@@ -289,7 +287,7 @@ case $OPTION  in
     CLONE_FDSSMV="-T"
    ;;
   u)
-   UPDATEREPO=1
+   UPDATEREPO="-u"
    ;;
   U)
    UPLOADGUIDES=-U
@@ -317,7 +315,7 @@ shift $(($OPTIND-1))
 CLONE_REPOS_ARG=$CLONE_REPOS
 
 if [ "$BUILD_ONLY" != "" ]; then
-  if [ "CLONE_REPOS" != "" ]; then
+  if [ "$CLONE_REPOS" != "" ]; then
     CLONE_FDSSMV="-T"
   fi
 fi
@@ -442,8 +440,7 @@ fi
 #***  for now always assume the bot repo is always in the master branch
 #     and that the -b branch option only apples to the fds and smv repos
 
-if [[ "$UPDATEREPO" == "1" ]]; then
-  UPDATE=-u
+if [[ "$UPDATEREPO" != "" ]]; then
   if [[ "$RUNFIREBOT" == "1" ]]; then
     CD_REPO $repo/bot/Firebot master  || exit 1
 
@@ -452,14 +449,21 @@ if [[ "$UPDATEREPO" == "1" ]]; then
     cd $CURDIR
   fi
 fi
-if [[ "$CLEANREPO" == "1" ]]; then
-  CLEAN=-c
-fi
 
 if [ "$RUNFIREBOT" == "" ]; then
     echo ""
     echo "Firebot Properties"
     echo "------------------"
+  if [ "$CLEANREPO" == "" ]; then
+    echo " clean repos: no"
+  else
+    echo " clean repos: yes"
+  fi
+  if [ "$UPDATEREPO" == "" ]; then
+    echo "update repos: no"
+  else
+    echo "update repos: yes"
+  fi
   if [ "$BUILD_ONLY" == "" ]; then
     echo "  Build only: no"
     echo "       Queue: $QUEUE"
@@ -478,7 +482,7 @@ if [ "$RUNFIREBOT" == "" ]; then
   if [ "$FDS_REVISION" != "" ]; then
     echo "fds revision: $FDS_REVISION"
   fi
-  if [ "$CLONE_REPOS" != "" ]; then
+  if [ "$CLONE_REPOS_ARG" != "" ]; then
       echo "  fds branch: $CLONE_REPOS_ARG"
   fi
   if [ "$SMV_HASH" != "" ]; then
@@ -487,7 +491,7 @@ if [ "$RUNFIREBOT" == "" ]; then
   if [ "$SMV_REVISION" != "" ]; then
     echo "smv revision: $SMV_REVISION"
   fi
-  if [ "$CLONE_REPOS" != "" ]; then
+  if [ "$CLONE_REPOS_ARG" != "" ]; then
       echo "  smv branch: $CLONE_REPOS_ARG"
   fi
   if [ "$CLONE_REPOS" != "" ]; then
@@ -505,7 +509,7 @@ BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
 firebot_status=0
-$ECHO  ./$botscript -p $firebot_pid $UPDATE $DV $INTEL $debug_mode $BUILD_ONLY $BRANCH $FDS_REV $SMV_REV $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEAN $QUEUE $SKIPMATLAB $SKIPFIGURES $CLONE_REPOS $CLONE_FDSSMV  $EMAIL $COPY_MANUAL_DIR $DEBUG_ONLY "$@"
+$ECHO  ./$botscript -p $firebot_pid $UPDATEREPO $DV $INTEL $debug_mode $BUILD_ONLY $BRANCH $FDS_REV $SMV_REV $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEANREPO $QUEUE $SKIPMATLAB $SKIPFIGURES $CLONE_REPOS $CLONE_FDSSMV  $EMAIL $COPY_MANUAL_DIR $DEBUG_ONLY "$@"
 firebot_status=$?
 if [ -e $firebot_pid ]; then
   rm -f $firebot_pid
