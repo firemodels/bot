@@ -148,6 +148,8 @@ else
   exit 1
 fi
 
+echo $0 $* > command.firebot
+
 #*** checking to see if a queing system is available
 
 QUEUE=firebot

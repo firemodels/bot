@@ -42,7 +42,7 @@ echo "The following environment variables may be used to set the"
 echo "host names used to build apps and pubs."
 echo ""
 echo "APP_HOST    - host where apps are located"
-echo "PBS_HOST    - host where pubs are located"
+echo "PUB_HOST    - host where pubs are located"
 echo "UPLOAD_HOST - host where installer is uploaded to Google Drive"
 echo ""
 echo "Options:"
@@ -214,7 +214,7 @@ if [ "$showparms" == "1" ]; then
   fi
   echo "              MPI version: $mpi_version"
   echo "            Intel version: $intel_mpi_version"
-  if [ "$app_host" != `hostname` ]; then
+  if [ "$app_host" != "`hostname`" ]; then
     app_hostlabel="on $app_host"
   else
     app_hostlabel="on this computer"
@@ -230,7 +230,7 @@ if [ "$showparms" == "1" ]; then
   fi
   echo "    fds/smv app directory: $app_home/$APPDIR/apps $app_hostlabel"
   pub_hostlabel="on this computer"
-  if [ "$pub_host" != `hostname` ]; then
+  if [ "$pub_host" != "`hostname`" ]; then
     pub_hostlabel="on $pub_host"
   fi
   if [ "$USE_CACHE" == "1" ]; then

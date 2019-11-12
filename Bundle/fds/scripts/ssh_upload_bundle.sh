@@ -3,7 +3,7 @@ filebase=$1
 NIGHTLY=$2
 platform=$3
 
-fullfile=$HOME/.bundle/bundles/${filebase}_osx64.sh
+fullfile=$HOME/.bundle/bundles/${filebase}.sh
 
 if [ "$UPLOAD_HOST" == "" ]; then
   echo "***warning: UPLOAD_HOST is not defined"
