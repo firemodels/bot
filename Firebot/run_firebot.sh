@@ -44,7 +44,7 @@ echo "    successful firebot run "
 echo "-R branch_name - clone fds, exp, fig, out and smv repos. fds and smv repos"
 echo "     will be checked out with a branch named 'branch_name'"
 echo "-T - only clone the fds and smv repos (this option is set by default when"
-echo "     only building apps (-B) and cloning repos (-R)
+echo "     only building apps (-B) and cloning repos (-R)"
 echo "-x fds_rev - run firebot using the fds revision named fds_rev [default: origin/master]"
 echo "-y smv_rev - run firebot using the smv revision named smv_rev [default: origin/master]"
 echo "   The -x and -y options are only used with the -R cloning option"
