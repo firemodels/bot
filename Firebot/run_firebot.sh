@@ -193,6 +193,8 @@ DEBUG_ONLY=
 export QFDS_STARTUP=
 FDS_REV=
 SMV_REV=
+FDS_REV_ARG=
+SMV_REV_ARG=
 FIREBOT_HOST=
 FIREBOT_HOME=
 
@@ -294,10 +296,12 @@ case $OPTION  in
    ECHO="echo"
    ;;
   x)
-   FDS_REV="-x $OPTARG"
+   FDS_REV_ARG="$OPTARG"
+   FDS_REV="-x $FDS_REV_ARG"
    ;;
   y)
-   SMV_REV="-y $OPTARG"
+   SMV_REV_ARG="$OPTARG"
+   SMV_REV="-y $SMV_REV_ARG"
    ;;
   \?)
   echo "***error: unknown option entered. aborting firebot"
@@ -306,6 +310,12 @@ case $OPTION  in
 esac
 done
 shift $(($OPTIND-1))
+
+if [ "$BUILD_ONLY" != "" ]; then
+  if [ "CLONE_REPOS" != "" ]; then
+    CLONE_FDSSMV="-T"
+  fi
+fi
 
 # sync fds and smv repos with the the repos used in the last successful firebot run
 
@@ -435,6 +445,31 @@ if [[ "$UPDATEREPO" == "1" ]]; then
 fi
 if [[ "$CLEANREPO" == "1" ]]; then
   CLEAN=-c
+fi
+
+if [ "$RUNFIREBOT" == "" ]; then
+    echo "Firebot Properties"
+    echo "------------------"
+  if [ "$BUILD_ONLY" == "" ]; then
+    echo "  Build only: no"
+    echo "       Queue: $QUEUE"
+  else
+    echo "  Build only: yes"
+  fi
+  if [ "$FDS_REV_ARG" != "" ]; then
+    echo "FDS revision: $FDS_REV_ARG"
+  fi
+  if [ "$SMV_REV_ARG" != "" ]; then
+    echo "SMV revision: $SMV_REV_ARG"
+  fi
+  echo "Branch: $BRANCH"
+  if [ "$CLONE_REPOS" != "" ]; then
+    if [ "$CLONE_FDSSMV" == "" ]; then
+      echo "       Clone: fds, exp, fig, out and smv repos."
+    else
+      echo "       Clone: fds and smv repos"
+    fi
+  fi
 fi
 
 # if cloning repos, only update and clean bot repo (which has already been done)
