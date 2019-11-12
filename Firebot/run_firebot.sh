@@ -189,6 +189,7 @@ debug_mode=
 DV=
 REMOVE_PID=
 CLONE_REPOS=
+CLONE_REPOS_ARG=
 CLONE_FDSSMV=
 BUILD_ONLY=
 DEBUG_ONLY=
@@ -313,6 +314,8 @@ esac
 done
 shift $(($OPTIND-1))
 
+CLONE_REPOS_ARG=$CLONE_REPOS
+
 if [ "$BUILD_ONLY" != "" ]; then
   if [ "CLONE_REPOS" != "" ]; then
     CLONE_FDSSMV="-T"
@@ -340,6 +343,10 @@ if [ "$GET_HASH" != "" ]; then
   fi
   FDS_HASH=`../Bundle/fds/scripts/get_hash.sh -r fds -g $FIREBOT_HOST -G $FIREBOT_HOME`
   SMV_HASH=`../Bundle/fds/scripts/get_hash.sh -r smv -g $FIREBOT_HOST -G $FIREBOT_HOME`
+  if [ "$RUNFIREBOT" == "" ]; then
+    FDS_REVISION=`../Bundle/fds/scripts/get_rev.sh -r fds -g $FIREBOT_HOST -G $FIREBOT_HOME`
+    SMV_REVISION=`../Bundle/fds/scripts/get_rev.sh -r smv -g $FIREBOT_HOST -G $FIREBOT_HOME`
+  fi
   ABORT=
   if [ "$FDS_HASH" == "" ]; then
     ABORT=1
@@ -450,6 +457,7 @@ if [[ "$CLEANREPO" == "1" ]]; then
 fi
 
 if [ "$RUNFIREBOT" == "" ]; then
+    echo ""
     echo "Firebot Properties"
     echo "------------------"
   if [ "$BUILD_ONLY" == "" ]; then
@@ -458,13 +466,30 @@ if [ "$RUNFIREBOT" == "" ]; then
   else
     echo "  Build only: yes"
   fi
-  if [ "$FDS_REV_ARG" != "" ]; then
-    echo "FDS revision: $FDS_REV_ARG"
+  if [ "$INTEL" == "" ]; then
+    echo "   INTEL mpi: no"
+  else
+    echo "   INTEL mpi: yes"
   fi
-  if [ "$SMV_REV_ARG" != "" ]; then
-    echo "SMV revision: $SMV_REV_ARG"
+  echo "      Branch: $BRANCH"
+  if [ "$FDS_HASH" != "" ]; then
+    echo "    fds hash: $FDS_HASH"
   fi
-  echo "Branch: $BRANCH"
+  if [ "$FDS_REVISION" != "" ]; then
+    echo "fds revision: $FDS_REVISION"
+  fi
+  if [ "$CLONE_REPOS" != "" ]; then
+      echo "  fds branch: $CLONE_REPOS_ARG"
+  fi
+  if [ "$SMV_HASH" != "" ]; then
+    echo "    smv hash: $SMV_HASH"
+  fi
+  if [ "$SMV_REVISION" != "" ]; then
+    echo "smv revision: $SMV_REVISION"
+  fi
+  if [ "$CLONE_REPOS" != "" ]; then
+      echo "  smv branch: $CLONE_REPOS_ARG"
+  fi
   if [ "$CLONE_REPOS" != "" ]; then
     if [ "$CLONE_FDSSMV" == "" ]; then
       echo "       Clone: fds, exp, fig, out and smv repos."
