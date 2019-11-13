@@ -13,6 +13,7 @@ if not exist ..\.gitbot goto skip1
 :endif1
 
 set fdsrepos=exp fds fig out smv
+set fdssmvrepos=fds smv
 set smvrepos=cfast fds fig smv
 set cfastrepos=cfast exp fig smv 
 set allrepos= cad cfast cor exp fds fig out radcal smv
@@ -157,6 +158,10 @@ goto eof
    set valid=1
    set repos=%wikiwebrepos%
  )
+ if /I "%1" EQU "-T" (
+   set valid=1
+   set repos=%fdssmvrepos%
+ )
  shift
  if %valid% == 0 (
    echo.
@@ -180,6 +185,7 @@ echo -c - setup repos used by cfastbot: %cfastrepos%
 echo -f - setup repos used by firebot: %fdsrepos%
 echo -h - display this message%
 echo -s - setup repos used by smokebot: %smvrepos%
+echo -T - setup only fds and smv repos
 echo -w - setup wiki and webpage repos cloned from firemodels
 exit /b
 
