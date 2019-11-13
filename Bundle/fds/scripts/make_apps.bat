@@ -8,12 +8,6 @@ set smvrepo=%CD%
 cd ..\fds
 set fdsrepo=%CD%
 
-cd %smvrepo%\Build\LIBS
-set libdir=%CD%
-
-cd %fdsrepo%\Utilities
-set utildir=%CD%
-
 cd %smvrepo%\Source
 echo ***cleaning %smvrepo%\Source
 git clean -dxf  1>> Nul 2>&1
