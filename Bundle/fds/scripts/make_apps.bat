@@ -44,7 +44,7 @@ call :BUILDSMV  smokeview
 
 call :BUILDUTIL fds2ascii intel_win_64
 call :BUILDUTIL test_mpi  impi_intel_win
-call :BUILDFDS  impi_intel_win_64
+call :BUILDFDS
 echo.
 echo ***build complete
 echo.
@@ -58,7 +58,7 @@ goto eof
 :: -------------------------------------------------------------
 
 echo ***building fds
-cd %fdsrepo%\Build\intel_win_64
+cd %fdsrepo%\Build\impi_intel_win_64
 call make_fds bot 1>> Nul 2>&1
 exit /b /0
 
@@ -93,7 +93,6 @@ echo ***building smokeview
 cd %smvrepo%\Build\smokeview\intel_win_64
 call make_smokeview -r bot 1>> Nul 2>&1
 exit /b /0
-
 
 :: -------------------------------------------------------------
  :BUILD
