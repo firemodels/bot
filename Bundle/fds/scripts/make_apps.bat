@@ -40,7 +40,7 @@ call :BUILD     wind2fds
 call :BUILD     set_path
 call :BUILD     sh2bat
 call :BUILD     get_time
-call :BUILDSMV  smokeview
+call :BUILDSMV
 
 call :BUILDUTIL fds2ascii intel_win_64 win_64
 call :BUILDUTIL test_mpi  impi_intel_win
@@ -55,7 +55,7 @@ call :CHECK_BUILD     wind2fds
 call :CHECK_BUILD     set_path
 call :CHECK_BUILD     sh2bat
 call :CHECK_BUILD     get_time
-call :CHECK_BUILDSMV  smokeview
+call :CHECK_BUILDSMV
 
 call :CHECK_BUILDUTIL fds2ascii intel_win_64 _win_64
 call :CHECK_BUILDUTIL test_mpi  impi_intel_win
@@ -97,7 +97,7 @@ set builddir=%2
 set script=make_%prog%
 
 echo ***building %prog%
-cd %fdsrepo%\Utilities\%prog%\%build_dir%
+cd %fdsrepo%\Utilities\%prog%\%builddir%
 call %script% bot 1>> Nul 2>&1
 exit /b /0
 
@@ -109,7 +109,7 @@ set prog=%1
 set builddir=%s
 set suffix=%3
 
-if NOT exist %fdsrepo%\Utilities\%prog%\%build_dir%\%prog%%suffix%.exe goto check_util
+if NOT exist %fdsrepo%\Utilities\%prog%\%builddir%\%prog%%suffix%.exe goto check_util
 exit /b /0
 :check_util
 echo ***error: The program %prog%%suffix%.exe failed to build
@@ -131,7 +131,7 @@ exit /b /0
 
 echo ***building smokeview
 cd %smvrepo%\Build\smokeview\intel_win_64
-call make_smokeview -r -bot 1>> Nul 2>&1
+call make_smokeview -release -bot 1>> Nul 2>&1
 exit /b /0
 
 :: -------------------------------------------------------------
