@@ -14,22 +14,23 @@ set libdir=%CD%
 cd %fdsrepo%\Utilities
 set utildir=%CD%
 
-echo cleaning smokeview build directories
 cd %smvrepo%\Source
-git clean -dxf
+echo ***cleaning %smvrepo%\Source
+git clean -dxf  1>> Nul 2>&1
 
 cd %smvrepo%\Build
-git clean -dxf
+echo ***cleaning %smvrepo%\Build
+git clean -dxf  1>> Nul 2>&1
 
-echo cleaning fds build directories
 cd %fdsrepo%\Build
-git clean -dxf
+echo ***cleaning %fdsrepo%\Build
+git clean -dxf  1>> Nul 2>&1
 
 cd %fdsrepo%\Utilities
-git clean -dxf
+echo ***cleaning %fdsrepo%\Utilities
+git clean -dxf  1>> Nul 2>&1
 
-echo building smokeview libraries, utilities, program
-call :BUILDLIB
+call :BUILDLIB              
 call :BUILD     background
 call :BUILD     dem2fds
 call :BUILD     hashfile
@@ -41,11 +42,12 @@ call :BUILD     sh2bat
 call :BUILD     get_time
 call :BUILDSMV  smokeview
 
-echo building fds utilities, program
 call :BUILDUTIL fds2ascii intel_win_64
 call :BUILDUTIL test_mpi  impi_intel_win
 call :BUILDFDS  impi_intel_win_64
-echo build complete"
+echo.
+echo ***build complete
+echo.
 
 cd %CURDIR%
 
@@ -55,11 +57,9 @@ goto eof
  :BUILDFDS
 :: -------------------------------------------------------------
 
-echo
-echo ********** building fds
-echo
+echo ***building fds
 cd %fdsrepo%\Build\intel_win_64
-call make_fds bot
+call make_fds bot 1>> Nul 2>&1
 exit /b /0
 
 :: -------------------------------------------------------------
@@ -70,34 +70,28 @@ set prog=%1
 set builddir=%s
 set script=make_%prog%
 
-echo
-echo ********** building %prog%
-echo
+echo ***building %prog%
 cd %fdsrepo%\Utilities\%prog%\%build_dir%
-call %script% bot
+call %script% bot 1>> Nul 2>&1
 exit /b /0
 
 :: -------------------------------------------------------------
  :BUILDLIB
 :: -------------------------------------------------------------
 
-echo
-echo ********** building smokeview libraries
-echo
+echo ***building smokeview libraries
 
 cd %smvrepo%\Build\LIBS\intel_win_64
-call make_LIBS_bot
+call make_LIBS_bot 1>> Nul 2>&1
 exit /b /0
 
 :: -------------------------------------------------------------
  :BUILDSMV
 :: -------------------------------------------------------------
 
-echo
-echo ********** building smokeview
-echo
+echo ***building smokeview
 cd %smvrepo%\Build\smokeview\intel_win_64
-call make_smokeview -r bot
+call make_smokeview -r bot 1>> Nul 2>&1
 exit /b /0
 
 
@@ -108,11 +102,9 @@ exit /b /0
 set prog=%1
 set script=make_%prog%
 
-echo
-echo ********** building %prog%
-echo
+echo ***building %prog%
 cd %smvrepo%\Build\%prog%\intel_win_64
-call %script% bot
+call %script% bot 1>> Nul 2>&1
 exit /b /0
 
 :eof
