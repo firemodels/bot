@@ -42,9 +42,25 @@ call :BUILD     sh2bat
 call :BUILD     get_time
 call :BUILDSMV  smokeview
 
-call :BUILDUTIL fds2ascii intel_win_64
+call :BUILDUTIL fds2ascii intel_win_64 _win_64
 call :BUILDUTIL test_mpi  impi_intel_win
 call :BUILDFDS
+
+call :CHECK_BUILD     background
+call :CHECK_BUILD     dem2fds
+call :CHECK_BUILD     hashfile
+call :CHECK_BUILD     smokediff
+call :CHECK_BUILD     smokezip
+call :CHECK_BUILD     wind2fds
+call :CHECK_BUILD     set_path
+call :CHECK_BUILD     sh2bat
+call :CHECK_BUILD     get_time
+call :CHECK_BUILDSMV  smokeview
+
+call :CHECK_BUILDUTIL fds2ascii intel_win_64 win_64
+call :CHECK_BUILDUTIL test_mpi  impi_intel_win
+call :CHECK_BUILDFDS
+
 echo.
 echo ***build complete
 echo.
@@ -63,17 +79,41 @@ call make_fds bot 1>> Nul 2>&1
 exit /b /0
 
 :: -------------------------------------------------------------
+ :CHECK_BUILDFDS
+:: -------------------------------------------------------------
+
+if NOT exist %fdsrepo%\Build\impi_intel_win_64\fds_impi_win_64.exe goto check_fds
+exit /b /0
+:check_fds
+echo ***error: The program fds_impi_win_64.exe failed to build
+exit /b /1
+
+:: -------------------------------------------------------------
  :BUILDUTIL
 :: -------------------------------------------------------------
 
 set prog=%1
-set builddir=%s
+set builddir=%2
 set script=make_%prog%
 
 echo ***building %prog%
 cd %fdsrepo%\Utilities\%prog%\%build_dir%
 call %script% bot 1>> Nul 2>&1
 exit /b /0
+
+:: -------------------------------------------------------------
+ :CHECK_BUILDUTIL
+:: -------------------------------------------------------------
+
+set prog=%1
+set builddir=%s
+set suffix=%3
+
+if NOT exist %fdsrepo%\Utilities\%prog%\%build_dir%\%prog%%suffix%.exe goto check_util
+exit /b /0
+:check_util
+echo ***error: The program %prog%%suffix%.exe failed to build
+exit /b /1
 
 :: -------------------------------------------------------------
  :BUILDLIB
@@ -95,6 +135,16 @@ call make_smokeview -r bot 1>> Nul 2>&1
 exit /b /0
 
 :: -------------------------------------------------------------
+ :CHECK_BUILDSMV
+:: -------------------------------------------------------------
+
+if NOT exist %smvrepo%\Build\smokeview\intel_win_64\smokeview_win_64.exe goto not_smokeview
+exit /b /0
+:notsmokeview
+echo ***error: The program smokeview_win_64.exe failed to build
+exit /b /1
+
+:: -------------------------------------------------------------
  :BUILD
 :: -------------------------------------------------------------
 
@@ -105,5 +155,17 @@ echo ***building %prog%
 cd %smvrepo%\Build\%prog%\intel_win_64
 call %script% bot 1>> Nul 2>&1
 exit /b /0
+
+:: -------------------------------------------------------------
+ :CHECK_BUILD
+:: -------------------------------------------------------------
+
+set prog=%1
+
+if NOT exist %smvrepo%\Build\%prog%\intel_win_64\%prog%_win_64.exe goto notexist
+exit /b /0
+:notexist
+echo ***error: The program %prog%_win_64.exe failed to build
+exit /b /1
 
 :eof
