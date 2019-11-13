@@ -42,7 +42,7 @@ call :BUILD     sh2bat
 call :BUILD     get_time
 call :BUILDSMV  smokeview
 
-call :BUILDUTIL fds2ascii intel_win_64 _win_64
+call :BUILDUTIL fds2ascii intel_win_64 win_64
 call :BUILDUTIL test_mpi  impi_intel_win
 call :BUILDFDS
 
@@ -57,7 +57,7 @@ call :CHECK_BUILD     sh2bat
 call :CHECK_BUILD     get_time
 call :CHECK_BUILDSMV  smokeview
 
-call :CHECK_BUILDUTIL fds2ascii intel_win_64 win_64
+call :CHECK_BUILDUTIL fds2ascii intel_win_64 _win_64
 call :CHECK_BUILDUTIL test_mpi  impi_intel_win
 call :CHECK_BUILDFDS
 
@@ -131,7 +131,7 @@ exit /b /0
 
 echo ***building smokeview
 cd %smvrepo%\Build\smokeview\intel_win_64
-call make_smokeview -r bot 1>> Nul 2>&1
+call make_smokeview -r -bot 1>> Nul 2>&1
 exit /b /0
 
 :: -------------------------------------------------------------
@@ -140,7 +140,7 @@ exit /b /0
 
 if NOT exist %smvrepo%\Build\smokeview\intel_win_64\smokeview_win_64.exe goto not_smokeview
 exit /b /0
-:notsmokeview
+:not_smokeview
 echo ***error: The program smokeview_win_64.exe failed to build
 exit /b /1
 
