@@ -94,11 +94,10 @@ exit /b /1
 
 set prog=%1
 set builddir=%2
-set script=make_%prog%
 
 echo ***building %prog%
 cd %fdsrepo%\Utilities\%prog%\%builddir%
-call %script% bot 1>> Nul 2>&1
+call make_%prog% bot 1>> Nul 2>&1
 exit /b /0
 
 :: -------------------------------------------------------------
@@ -106,7 +105,7 @@ exit /b /0
 :: -------------------------------------------------------------
 
 set prog=%1
-set builddir=%s
+set builddir=%2
 set suffix=%3
 
 if NOT exist %fdsrepo%\Utilities\%prog%\%builddir%\%prog%%suffix%.exe goto check_util
