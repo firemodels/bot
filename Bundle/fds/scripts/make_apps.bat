@@ -2,6 +2,15 @@
 
 set CURDIR=%CD%
 
+git clean -dxf  1>> Nul 2>&1
+
+set clean_log=%CURDIR%\output\clean.log
+set compile_log=%CURDIR%\output\compile.log
+set error_log=%CURDIR%\output\compile.log
+
+echo. > %clean_log%
+echo. > %compile_log%
+
 cd ..\..\..\..\smv\
 set smvrepo=%CD%
 
@@ -10,21 +19,21 @@ set fdsrepo=%CD%
 
 cd %smvrepo%\Source
 echo ***cleaning %smvrepo%\Source
-git clean -dxf  1>> Nul 2>&1
+git clean -dxf  1>> %clean_log% 2>&1
 
 cd %smvrepo%\Build
 echo ***cleaning %smvrepo%\Build
-git clean -dxf  1>> Nul 2>&1
+git clean -dxf  1>> %clean_log% 2>&1
 
 cd %fdsrepo%\Build
 echo ***cleaning %fdsrepo%\Build
-git clean -dxf  1>> Nul 2>&1
+git clean -dxf  1>> %clean_log% 2>&1
 
 cd %fdsrepo%\Utilities
 echo ***cleaning %fdsrepo%\Utilities
-git clean -dxf  1>> Nul 2>&1
+git clean -dxf  1>> %clean_log% 2>&1
 
-call :BUILDLIB              
+call :BUILDLIB
 call :BUILD     background
 call :BUILD     dem2fds
 call :BUILD     hashfile
@@ -69,7 +78,7 @@ goto eof
 
 echo ***building fds
 cd %fdsrepo%\Build\impi_intel_win_64
-call make_fds bot 1>> Nul 2>&1
+call make_fds bot 1>> %compile_log% 2>&1
 exit /b /0
 
 :: -------------------------------------------------------------
@@ -80,6 +89,7 @@ if NOT exist %fdsrepo%\Build\impi_intel_win_64\fds_impi_win_64.exe goto check_fd
 exit /b /0
 :check_fds
 echo ***error: The program fds_impi_win_64.exe failed to build
+echo ***error: The program fds_impi_win_64.exe failed to build  1>> %error_log% 2>&1
 exit /b /1
 
 :: -------------------------------------------------------------
@@ -91,7 +101,7 @@ set builddir=%2
 
 echo ***building %prog%
 cd %fdsrepo%\Utilities\%prog%\%builddir%
-call make_%prog% bot 1>> Nul 2>&1
+call make_%prog% bot 1>> %compile_log% 2>&1
 exit /b /0
 
 :: -------------------------------------------------------------
@@ -106,6 +116,7 @@ if NOT exist %fdsrepo%\Utilities\%prog%\%builddir%\%prog%%suffix%.exe goto check
 exit /b /0
 :check_util
 echo ***error: The program %prog%%suffix%.exe failed to build
+echo ***error: The program %prog%%suffix%.exe failed to build  1>> %error_log% 2>&1
 exit /b /1
 
 :: -------------------------------------------------------------
@@ -115,7 +126,7 @@ exit /b /1
 echo ***building smokeview libraries
 
 cd %smvrepo%\Build\LIBS\intel_win_64
-call make_LIBS_bot 1>> Nul 2>&1
+call make_LIBS_bot 1>> %compile_log% 2>&1
 exit /b /0
 
 :: -------------------------------------------------------------
@@ -124,7 +135,7 @@ exit /b /0
 
 echo ***building smokeview
 cd %smvrepo%\Build\smokeview\intel_win_64
-call make_smokeview -release -bot 1>> Nul 2>&1
+call make_smokeview -release -bot 1>> %compile_log% 2>&1
 exit /b /0
 
 :: -------------------------------------------------------------
@@ -135,6 +146,7 @@ if NOT exist %smvrepo%\Build\smokeview\intel_win_64\smokeview_win_64.exe goto no
 exit /b /0
 :not_smokeview
 echo ***error: The program smokeview_win_64.exe failed to build
+echo ***error: The program smokeview_win_64.exe failed to build  1>> %error_log% 2>&1
 exit /b /1
 
 :: -------------------------------------------------------------
@@ -146,7 +158,7 @@ set script=make_%prog%
 
 echo ***building %prog%
 cd %smvrepo%\Build\%prog%\intel_win_64
-call %script% bot 1>> Nul 2>&1
+call %script% bot 1>> %compile_log% 2>&1
 exit /b /0
 
 :: -------------------------------------------------------------
@@ -159,6 +171,7 @@ if NOT exist %smvrepo%\Build\%prog%\intel_win_64\%prog%_win_64.exe goto notexist
 exit /b /0
 :notexist
 echo ***error: The program %prog%_win_64.exe failed to build
+echo ***error: The program %prog%_win_64.exe failed to build  1>> %error_log% 2>&1
 exit /b /1
 
 :eof
