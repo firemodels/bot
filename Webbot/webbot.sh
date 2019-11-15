@@ -3,25 +3,6 @@
 # The Webbot script is part of an automated continuous integration system.
 
 #---------------------------------------------
-#                   usage
-#---------------------------------------------
-
-function usage {
-echo option=$option
-echo "Check links in all web pages in the webpages repo"
-echo ""
-echo "Options:"
-echo "-a - run only if the repo has changed since the last time" 
-echo "     this script was run"
-echo "-c - clean the webpages repo"
-echo "-f - force check on all web pages"
-echo "-h - display this message"
-echo "-u - update the webpages repo"
-exit
-}
-
-
-#---------------------------------------------
 #                   run_auto
 #---------------------------------------------
 
@@ -208,6 +189,7 @@ check_stage1()
 email_build_status()
 {
   echo "              host: $hostname"         >> $TIME_LOG
+  echo "     webpages repo: $webrepo"         >> $TIME_LOG
   echo "  webpages version: $THIS_WEB_VERSION" >> $TIME_LOG
   echo ""                                      >> $TIME_LOG
 
@@ -245,6 +227,8 @@ MKDIR $SAVED_WEB_PAGES
 
 webbotdir=`pwd`
 OUTPUT_DIR="$webbotdir/output"
+MKDIR $OUTPUT_DIR
+touch $OUTPUT_DIR/stage1
 
 EMAIL_LIST="$HOME/.webbot/webbot_email_list.sh"
 ERROR_LOG=$OUTPUT_DIR/errors
@@ -267,7 +251,7 @@ git log . | head -5 | tail -1 > $GIT_WEB_LOG_FILE
 
 CLEAN_REPO=
 UPDATE_REPO=
-FORCE=
+CHECK_ALL=
 
 WEBBRANCH=nist-pages
 RUNAUTO=
@@ -275,20 +259,17 @@ mailTo=
 
 #*** parse command line options
 
-while getopts 'acfhu' OPTION
+while getopts 'aAcu' OPTION
 do
 case $OPTION in
+  A)
+   CHECK_ALL=1
+   ;;
   a)
    RUNAUTO="y"
    ;;
   c)
    CLEAN_REPO=1
-   ;;
-  f)
-   FORCE=1
-   ;;
-  h)
-   usage
    ;;
   u)
    UPDATE_REPO=1
@@ -315,6 +296,9 @@ MKDIR $HOME/.webbot
 
 botrepo=$repo/bot
 webrepo=$repo/webpages
+
+WEBBOT_PID=~/.webbot/PID
+echo $$ > $WEBBOT_PID
 
 #*** make sure repos needed by smokebot exist
 
@@ -389,7 +373,7 @@ for webpage in *.html; do
   else
     CHECK=1
   fi
-  if [ "$FORCE" == "1" ]; then
+  if [ "$CHECK_ALL" == "1" ]; then
     CHECK=1
   fi
   if [ "$CHECK" == "1" ]; then

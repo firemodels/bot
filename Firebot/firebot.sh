@@ -4,35 +4,6 @@
 # Consult the FDS Config Management Plan for more information.
 
 #---------------------------------------------
-#                   usage
-#---------------------------------------------
-
-function usage {
-echo "Verification and validation testing script for FDS"
-echo ""
-echo "Options"
-echo "-b - branch_name - run firebot using branch branch_name"
-echo "-B - only build apps"
-echo "-c - clean repo"
-echo "-D - debug only"
-echo "-F - skip figures and document building stages"
-echo "-h - display this message"
-echo "-i - use installed version of smokeview"
-echo "-I - use development version of FDS"
-echo "-J - use Intel MPI version of FDS"
-echo "-L - firebot lite,  run only stages that build a debug fds and run cases with it"
-echo "                    (no release fds, no release cases, no matlab, etc)"
-echo "-m email_address "
-echo "-q - queue_name - run cases using the queue queue_name"
-echo "     default: $QUEUE"
-echo "-s - skip matlab and document building stages"
-echo "-u - update repo"
-echo "-U - upload guides"
-echo "-W - clone fds, exp, fig, out and smv repos"
-exit
-}
-
-#---------------------------------------------
 #                   CHK_REPO
 #---------------------------------------------
 
@@ -239,13 +210,12 @@ update_repo()
    have_firemodels=`git remote -v | grep firemodels | wc  -l`
    if [ $have_firemodels -gt 0 ]; then
       git merge firemodels/$branch                   >> $OUTPUT_DIR/stage1 2>&1
-      need_push=`git status -uno | head -2 | grep -v nothing | wc -l`
+      need_push=`git status -uno | grep 'is ahead' | wc -l`
       if [ $need_push -gt 1 ]; then
-        echo "warning: firemodels commits to $reponame repo need to be pushed to origin" >> $OUTPUT_DIR/stage1 2>&1
-        git status -uno | head -2 | grep -v nothing                                      >> $OUTPUT_DIR/stage1 2>&1
+        echo "warning: firemodels commits to the $reponame repo need to be pushed to origin" >> $OUTPUT_DIR/stage1 2>&1
+        git status -uno | head -2 | grep -v nothing                                          >> $OUTPUT_DIR/stage1 2>&1
       fi
    fi
-
    if [[ "$reponame" == "exp" ]]; then
       echo "Updating submodules."                   >> $OUTPUT_DIR/stage1 2>&1
       git submodule foreach git remote update       >> $OUTPUT_DIR/stage1 2>&1
@@ -277,6 +247,7 @@ get_smv_revision()
      git describe --abbrev | awk -F '-' '{print $1"-"$2}' > $LATESTAPPS_DIR/SMV_REVISION
    fi
    SMV_SHORTHASH=`git rev-parse --short HEAD`
+   SMV_LONGHASH=`git rev-parse HEAD`
    echo $SMV_SHORTHASH > $LATESTAPPS_DIR/SMV_HASH
    SMV_MESSAGE=`git log . | head -5 | tail -1`
    return 0
@@ -803,7 +774,7 @@ check_cases_release()
    # Scan for and report any errors in FDS cases
    cd $dir
 
-   if [[ `grep -rI 'Run aborted' $OUTPUT_DIR/stage5 | grep -v grep` == ""          ]] && \
+   if [[ `grep 'Run aborted' $OUTPUT_DIR/stage5 | grep -v grep` == ""              ]] && \
       [[ `grep 'ERROR' $OUTPUT_DIR/stage5 | grep -v geom_bad | grep -v grep` == "" ]] && \
       [[ `grep -rI Segmentation * | grep -v grep` == ""                            ]] && \
       [[ `grep -rI ERROR: * | grep -v echo | grep -v grep` == ""                   ]] && \
@@ -814,7 +785,7 @@ check_cases_release()
    then
       cases_release_success=true
    else
-      grep -rI 'Run aborted' $OUTPUT_DIR/stage5 | grep -v grep                  >> $OUTPUT_DIR/stage5_errors
+      grep 'Run aborted' $OUTPUT_DIR/stage5 | grep -v grep                      >> $OUTPUT_DIR/stage5_errors
       grep 'ERROR' $OUTPUT_DIR/stage5 | grep -v geom_bad | grep -v grep         >> $OUTPUT_DIR/stage5_errors
       grep -rI Segmentation * | grep -v grep                                    >> $OUTPUT_DIR/stage5_errors
       grep -rI ERROR: * | grep -v echo | grep -v grep                           >> $OUTPUT_DIR/stage5_errors
@@ -1517,24 +1488,24 @@ save_build_status()
    then
      echo "" >> $ERROR_LOG
      cat $WARNING_LOG >> $ERROR_LOG
-     echo "Build failure and warnings;$FDS_DATE;$FDS_SHORTHASH;$FDS_LONGHASH;${FDS_REVISION};$FDSBRANCH;$STOP_TIME_INT;3;$TOTAL_FDS_TIMES;$HOST" > "$HISTORY_DIR/${FDS_REVISION}.txt"
+     echo "Build failure and warnings;$FDS_DATE;$FDS_SHORTHASH;$FDS_LONGHASH;${FDS_REVISION};$FDSBRANCH;$STOP_TIME_INT;3;$TOTAL_FDS_TIMES;$HOST;$SMV_LONGHASH;${SMV_REVISION}" > "$HISTORY_DIR/${FDS_REVISION}.txt"
      cat $ERROR_LOG > "$HISTORY_DIR/${FDS_REVISION}_errors.txt"
 
    # Check for errors only
    elif [ -e $ERROR_LOG ]
    then
-      echo "Build failure;$FDS_DATE;$FDS_SHORTHASH;$FDS_LONGHASH;${FDS_REVISION};$FDSBRANCH;$STOP_TIME_INT;3;$TOTAL_FDS_TIMES;$HOST" > "$HISTORY_DIR/${FDS_REVISION}.txt"
+      echo "Build failure;$FDS_DATE;$FDS_SHORTHASH;$FDS_LONGHASH;${FDS_REVISION};$FDSBRANCH;$STOP_TIME_INT;3;$TOTAL_FDS_TIMES;$HOST;$SMV_LONGHASH;${SMV_REVISION}" > "$HISTORY_DIR/${FDS_REVISION}.txt"
       cat $ERROR_LOG > "$HISTORY_DIR/${FDS_REVISION}_errors.txt"
 
    # Check for warnings only
    elif [ -e $WARNING_LOG ]
    then
-      echo "Build success with warnings;$FDS_DATE;$FDS_SHORTHASH;$FDS_LONGHASH;${FDS_REVISION};$FDSBRANCH;$STOP_TIME_INT;2;$TOTAL_FDS_TIMES;$HOST" > "$HISTORY_DIR/${FDS_REVISION}.txt"
+      echo "Build success with warnings;$FDS_DATE;$FDS_SHORTHASH;$FDS_LONGHASH;${FDS_REVISION};$FDSBRANCH;$STOP_TIME_INT;2;$TOTAL_FDS_TIMES;$HOST;$SMV_LONGHASH;${SMV_REVISION}" > "$HISTORY_DIR/${FDS_REVISION}.txt"
       cat $WARNING_LOG > "$HISTORY_DIR/${FDS_REVISION}_warnings.txt"
 
    # No errors or warnings
    else
-      echo "Build success!;$FDS_DATE;$FDS_SHORTHASH;$FDS_LONGHASH;${FDS_REVISION};$FDSBRANCH;$STOP_TIME_INT;1;$TOTAL_FDS_TIMES;$HOST" > "$HISTORY_DIR/${FDS_REVISION}.txt"
+      echo "Build success!;$FDS_DATE;$FDS_SHORTHASH;$FDS_LONGHASH;${FDS_REVISION};$FDSBRANCH;$STOP_TIME_INT;1;$TOTAL_FDS_TIMES;$HOST;$SMV_LONGHASH;${SMV_REVISION}" > "$HISTORY_DIR/${FDS_REVISION}.txt"
       touch $FIREBOT_PASS
       echo $SMVREPO_HASH > $SMVREPO_HASHFILE
       echo $FDSREPO_HASH > $FDSREPO_HASHFILE
@@ -1615,6 +1586,7 @@ email_build_status()
       cd $firebotdir
 
      # Send email with failure message and warnings, body of email contains appropriate log file
+     echo "[$botuser] $bottype failure and warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH."
      if [ "$HAVE_MAIL" == "1" ]; then
        cat $ERROR_LOG $TIME_LOG | mail -s "[$botuser] $bottype failure and warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
      fi
@@ -1623,6 +1595,7 @@ email_build_status()
    elif [ -e $ERROR_LOG ]
    then
       # Send email with failure message, body of email contains error log file
+      echo "[$botuser] $bottype failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH."
       if [ "$HAVE_MAIL" == "1" ]; then
         cat $ERROR_LOG $TIME_LOG | mail -s "[$botuser] $bottype failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
       fi
@@ -1633,6 +1606,7 @@ email_build_status()
       cd $firebotdir
 
       # Send email with success message, include warnings
+      echo "[$botuser] $bottype success, with warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH"
       if [ "$HAVE_MAIL" == "1" ]; then
         cat $WARNING_LOG $TIME_LOG | mail -s "[$botuser] $bottype success, with warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
       fi
@@ -1644,6 +1618,7 @@ email_build_status()
 
       # Send success message with links to nightly manuals
       firebot_status=0
+      echo "[$botuser] $bottype success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH"
       if [ "$HAVE_MAIL" == "1" ]; then
         cat $TIME_LOG | mail -s "[$botuser] $bottype success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
       fi
@@ -1656,6 +1631,8 @@ email_build_status()
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 #*** setup
+
+echo $0 $* >> command.firebot
 
 # Start firebot timer
 START_TIME=$(date +%s)
@@ -1753,10 +1730,13 @@ DV2=
 INTEL=
 INTEL2=
 CLONE_REPOS=
+CLONE_FDSSMV=
 DEBUG_ONLY=
+FDS_REV=origin/master
+SMV_REV=origin/master
 
 #*** parse command line arguments
-while getopts 'b:BcdDhIiJLm:p:q:R:suU' OPTION
+while getopts 'b:BcdDIiJLm:p:q:R:sTuUx:y:' OPTION
 do
 case $OPTION in
   b)
@@ -1780,9 +1760,6 @@ case $OPTION in
    ;;
   F)
    SKIPFIGURES=1
-   ;;
-  h)
-   usage;
    ;;
   I)
    DV="_dv"
@@ -1813,23 +1790,24 @@ case $OPTION in
   s)
    SKIPMATLAB=1
    ;;
+  T)
+   CLONE_FDSSMV=1
+   ;;
   u)
    UPDATEREPO=1
    ;;
   U)
    UPLOADGUIDES=1
    ;;
+  x)
+   FDS_REV="$OPTARG"
+   ;;
+  y)
+   SMV_REV="$OPTARG"
+   ;;
 esac
 done
 shift $(($OPTIND-1))
-
-if [ "$CLONE_REPOS" != "" ]; then
-  if [ "$CLONE_REPOS" != "release" ]; then
-    if [ "$CLONE_REPOS" != "test" ]; then
-      CLONE_REPO="master"
-    fi
-  fi
-fi
 
 # Load mailing list for status report
 if [ "$mailToFDS" == "" ]; then
@@ -1853,7 +1831,7 @@ if [ -e .fds_git ]; then
 else
   echo "***error: firebot not running in the bot/Firebot directory"
   echo "          Aborting firebot"
-  exit
+  exit 1
 fi
 
 if [[ "$QUEUE" == "none" ]] && [[ -e $SCRIPTFILES ]]; then
@@ -1876,15 +1854,21 @@ echo "------"
 if [[ "$CLONE_REPOS" != "" ]]; then
   echo Cloning repos
   cd $botrepo/Scripts
-  ./setup_repos.sh -F > $OUTPUT_DIR/stage1_clone 2>&1
+  if [ "$CLONE_FDSSMV" != "" ]; then
+   # only clone the fds and smv repos - used when just compiling the fds and smv apps
+    ./setup_repos.sh -T > $OUTPUT_DIR/stage1_clone 2>&1
+  else
+   # clone all repos
+    ./setup_repos.sh -F > $OUTPUT_DIR/stage1_clone 2>&1
+  fi
   if [ "$CLONE_REPOS" != "master" ]; then
     FDSBRANCH=$CLONE_REPOS
     cd $fdsrepo
-    git checkout -b $FDSBRANCH origin/master >> $OUTPUT_DIR/stage1_clone 2>&1
+    git checkout -b $FDSBRANCH $FDS_REV >> $OUTPUT_DIR/stage1_clone 2>&1
 
     SMVBRANCH=$CLONE_REPOS
     cd $smvrepo
-    git checkout -b $SMVBRANCH origin/master >> $OUTPUT_DIR/stage1_clone 2>&1
+    git checkout -b $SMVBRANCH $SMV_REV >> $OUTPUT_DIR/stage1_clone 2>&1
   fi
   ARCHIVE_REPO_SIZES=1
 fi
@@ -1949,7 +1933,7 @@ if [ "$USEINSTALL" != "" ]; then
    if [ $notfound == 1 ]; then
       echo "Error: smokeview not found. firebot aborted."
       echo "Error: smokeview not found. firebot aborted." >> $OUTPUT_DIR/stage1 2>&1
-      exit
+      exit 1
    fi
 fi
 
@@ -1961,7 +1945,7 @@ if [ "QUEUE" == "none" ]; then
       echo "       Add the directory containing fds and smokeview to your path"
       echo "       (same directory containing fds and smokeview)"
       echo "Error: background not found. firebot aborted." >> $OUTPUT_DIR/stage1 2>&1
-      exit
+      exit 1
    fi
 fi
 
@@ -1989,7 +1973,9 @@ if [ "$UPDATEREPO" == "1" ]; then
 else
   echo " update repos: no"
 fi
+if [ "$BUILD_ONLY" ]; then
   echo "        queue: $QUEUE"
+fi
 echo ""
 
 # Set time limit (43,200 seconds = 12 hours)
@@ -2246,4 +2232,5 @@ if [[ "$DEBUG_ONLY" == "" ]] && [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" 
   archive_timing_stats
 fi
 email_build_status 'Firebot'
+echo firebot exit status: $firebot_status
 exit $firebot_status

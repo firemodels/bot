@@ -1,4 +1,4 @@
- @echo off
+@echo off
 
 set FIREBOTRUNDIR=%CD%
 
@@ -13,7 +13,8 @@ set altemail=%4
 set usematlab=%5
 set installed=%6
 set lite=%7
-set emailto=%8
+set build_only=%8
+set emailto=%9
 
 set botbranch=master
 set fdsbranch=master
@@ -110,12 +111,12 @@ set havewarnings=0
 set have_icc=1
 
 set emailexe=%userprofile%\bin\mailsend.exe
-set gettimeexe=%userprofile%\FIRE-LOCAL\repo_exes\get_time.exe
+set gettimeexe=%userprofile%\fnotes\repo_exes\get_time.exe
 
 call :get_datetime startdate starttime
 
-call "%fdsrepo%\Utilities\Scripts\setup_intel_compilers.bat" 1> Nul 2>&1
-call %botrepo%\Firebot\firebot_email_list.bat
+call "%fdsrepo%\Build\Scripts\setup_intel_compilers.bat" 1> Nul 2>&1
+call %userprofile%\.firebot\firebot_email_list.bat
 
 set mailToList=%mailToFDS%
 if NOT "%emailto%" == "" (
@@ -136,7 +137,9 @@ echo. > %stagestatus%
 call :is_file_installed %gettimeexe%|| exit /b 1
 echo    found get_time
 
+echo 111
 call :GET_TIME TIME_beg
+echo 222
 call :GET_TIME PRELIM_beg
 
 :: looking for Fortran
@@ -266,6 +269,8 @@ set timingslogfile=%TIMINGSDIR%\timings_%revisionnum%.txt
 
 echo  Building FDS
 
+echo build_only=%build_only%
+if %build_only% == 1 goto skip_build_debug_fds
 echo    debug
 
 cd %fdsrepo%\Build\impi_intel_win_64_db
@@ -273,16 +278,17 @@ erase *.obj *.mod *.exe *.pdb 1> Nul 2>&1
 call make_fds bot 1> %OUTDIR%\makefdsd.log 2>&1
 call :does_file_exist fds_impi_win_64_db.exe %OUTDIR%\makefdsd.log|| exit /b 1
 call :find_warnings "warning" %OUTDIR%\makefdsd.log "Stage 1b, FDS parallel debug compilation"
+:skip_build_debug_fds
 
 if %lite% == 1 goto skip_lite1
 
   echo    release
 
   cd %fdsrepo%\Build\impi_intel_win_64
-  erase *.obj *.mod *.exe *.pdb 1> Nul 2>&1
-  call make_fds bot 1> %OUTDIR%\makefdsr.log 2>&1
-  call :does_file_exist fds_impi_win_64.exe %OUTDIR%\makefdsr.log|| exit /b 1
-  call :find_warnings "warning" %OUTDIR%\makefdsr.log "Stage 1d, FDS parallel release compilation"
+ :: erase *.obj *.mod *.exe *.pdb 1> Nul 2>&1
+ :: call make_fds bot 1> %OUTDIR%\makefdsr.log 2>&1
+ :: call :does_file_exist fds_impi_win_64.exe %OUTDIR%\makefdsr.log|| exit /b 1
+ :: call :find_warnings "warning" %OUTDIR%\makefdsr.log "Stage 1d, FDS parallel release compilation"
 :skip_lite1
 
 :: -------------------------------------------------------------
@@ -299,6 +305,7 @@ if %lite% == 1 goto skip_lite2
     cd %smvrepo%\Build\LIBS\intel_win_64
     call makelibs_bot 1>> %OUTDIR%\stage2a.txt 2>&1
 
+    if %build_only% == 1 goto skip_build_debug_smv
     echo    debug
 
     cd %smvrepo%\Build\smokeview\intel_win_64
@@ -306,14 +313,15 @@ if %lite% == 1 goto skip_lite2
     call make_smv_db -r bot 1> %OUTDIR%\makesmvd.log 2>&1
     call :does_file_exist smokeview_win_64_db.exe %OUTDIR%\makesmvd.log|| exit /b 1
     call :find_warnings "warning" %OUTDIR%\makesmvd.log "Stage 2a, Smokeview debug compilation"
+:skip_build_debug_smv
 
     echo    release
 
     cd %smvrepo%\Build\smokeview\intel_win_64
     erase *.obj *.mod smokeview_win_64.exe 1> Nul 2>&1
-    call make_smv -r bot 1> %OUTDIR%\makesmvr.log 2>&1
+    call make_smokeview -r -bot 1> %OUTDIR%\makesmvr.log 2>&1
 
-    call :does_file_exist smokeview_win_64.exe %OUTDIR%\makesmvr.log|| aexit /b 1
+    call :does_file_exist smokeview_win_64.exe %OUTDIR%\makesmvr.log|| exit /b 1
     call :find_warnings "warning" %OUTDIR%\makesmvr.log "Stage 2b, Smokeview release compilation"
     set smokeview=%smvrepo%\Build\smokeview\intel_win_64\smokeview_win_64.exe
   :skip_build_cstuff
@@ -336,13 +344,15 @@ if %lite% == 1 goto skip_lite2
     cd %smvrepo%\Build\background\intel_win_64
     erase *.obj *.mod *.exe 1> Nul 2>&1
     call make_background bot 1> %OUTDIR%\makebackground.log 2>&1
-    call :does_file_exist background.exe %OUTDIR%\makebackground.log
+    call :does_file_exist background_win_64.exe %OUTDIR%\makebackground.log
     call :find_warnings "warning" %OUTDIR%\makebackground.log "Stage 3, Building FDS/Smokeview utilities"
   ) else (
     call :is_file_installed background|| exit /b 1
     echo    background not built, using installed version
   )
 :skip_lite2
+if %build_only% == 1 goto skip_run_cases
+
 
 call :GET_DURATION PRELIM %PRELIM_beg%
 
@@ -465,6 +475,7 @@ if %lite% == 1 goto skip_lite4
 :skip_lite4
 
 call :GET_DURATION TOTALTIME %TIME_beg%
+:goto skip_run_cases
 
 :: -------------------------------------------------------------
 ::                           wrap up

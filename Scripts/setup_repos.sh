@@ -16,14 +16,44 @@ echo "-s - setup repos used by smokebot: "
 echo "    $smvrepos"
 echo "-S - setup repos used by smokebot (erase each repo first): "
 echo "    $smvrepos"
+echo "-T - only setup fds and smv repos (erase each repo first)"
 echo "-w - setup wiki and webpage repos cloned from firemodels"
 echo "-h - display this message"
 exit
 }
 
+SETUP_REMOTE ()
+{
+  local repo_dir=$1
+
+  cd $repo_dir
+  if [ "$GITUSER" == "firemodels" ]; then
+     ndisable=`git remote -v | grep DISABLE | wc -l`
+      if [ $ndisable -eq 0 ]; then
+         echo disabling push access to firemodels
+         git remote set-url --push origin DISABLE
+      fi
+  else
+     have_central=`git remote -v | awk '{print $1}' | grep firemodels | wc -l`
+     if [ $have_central -eq 0 ]; then
+        echo setting up remote tracking with firemodels
+        git remote add firemodels ${GITHEADER}firemodels/$repo.git
+        git remote update
+     fi
+     ndisable=`git remote -v | grep DISABLE | wc -l`
+     if [ $ndisable -eq 0 ]; then
+       echo "   disabling push access to firemodels"
+       git remote set-url --push firemodels DISABLE
+     else
+       echo "   push access to firemodels already disabled"
+     fi
+  fi
+}
+
 CURDIR=`pwd`
 
 fdsrepos="exp fds fig out smv"
+fdssmvrepos="fds smv"
 firebotrepos="exp fds fds-smv fig out smv"
 smvrepos="cfast fds fig smv"
 cfastrepos="cfast exp fig smv"
@@ -42,7 +72,7 @@ else
    exit
 fi
 
-while getopts 'acfFhsSw' OPTION
+while getopts 'abcfFhsSTw' OPTION
 do
 case $OPTION  in
   a)
@@ -66,6 +96,10 @@ case $OPTION  in
    ;;
   S)
    repos=$smvrepos;
+   eraserepos=1
+   ;;
+  T)
+   repos=$fdssmvrepos;
    eraserepos=1
    ;;
   w)
@@ -122,11 +156,11 @@ do
     fi
   fi
 
-  echo repo: $repo
+  echo repo: $repo_out
   if [ "$eraserepos" == "1" ]; then
-    if [ -e $repo ]; then
-      echo removing $repo
-      rm -rf $repo
+    if [ -e $repo_out ]; then
+      echo removing $repo_out
+      rm -rf $repo_out
     fi
   fi
   if [ "$WIKIWEB" == "1" ]; then
@@ -147,27 +181,7 @@ do
   fi
   git clone $RECURSIVE $GITHEADER$GITUSER/$repo.git $repo_out
 
-  cd $repo_dir
-  if [ "$GITUSER" == "firemodels" ]; then
-     ndisable=`git remote -v | grep DISABLE | wc -l`
-      if [ $ndisable -eq 0 ]; then
-         echo disabling push access to firemodels
-         git remote set-url --push origin DISABLE
-      fi
-  else
-     have_central=`git remote -v | awk '{print $1}' | grep firemodels | wc -l`
-     if [ $have_central -eq 0 ]; then
-        echo setting up remote tracking with firemodels
-        git remote add firemodels ${GITHEADER}firemodels/$repo.git
-        git remote update
-     fi
-     ndisable=`git remote -v | grep DISABLE | wc -l`
-     if [ $ndisable -eq 0 ]; then
-       echo "   disabling push access to firemodels"
-       git remote set-url --push firemodels DISABLE
-     else
-       echo "   push access to firemodels already disabled"
-     fi
-  fi
+  SETUP_REMOTE $repo_dir
+
 done
 cd $CURDIR

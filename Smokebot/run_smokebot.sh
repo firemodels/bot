@@ -18,6 +18,11 @@ echo "-b - use the current branch"
 echo "-B - only build apps"
 echo "-C - add --mca plm_rsh_agent /usr/bin/ssh to mpirun command "
 echo "           when running cases"
+echo "-g firebot_host - host where firebot was run"
+echo "-G firebot_home - home directory where firebot was run"
+echo "   the -g and -G options are only used with the -R option and"
+echo "   are used to build apps using  the same repo revisions as last"
+echo "    successful firebot run "
 echo "-D - use startup files to set the environment not modules"
 echo "-f - force smokebot run"
 echo "-I compiler - intel or gnu [default: $COMPILER]"
@@ -27,9 +32,9 @@ echo "-L - smokebot lite,  run only stages that build a debug fds and run"
 echo "     cases with it (no release fds, no release cases, no manuals, etc)"
 echo "-q queue [default: $QUEUE]"
 if [ "$EMAIL" != "" ]; then
-echo "-m email_address - [default: $EMAIL]"
+  echo "-m email_address - [default: $EMAIL]"
 else
-echo "-m email_address"
+  echo "-m email_address"
 fi
 echo "-M - make movies"
 echo "-P - remove run status (PID) file"
@@ -40,15 +45,19 @@ echo "-S - skip picture generating and build manual stages"
 echo "-t - use test smokeview"
 echo "-U - upload guides"
 if [ "$web_DIR" == "" ]; then
-echo "-w directory - web directory containing summary pages"
+  echo "-w directory - web directory containing summary pages"
 else
-echo "-w directory - web directory containing summary pages [default: $web_DIR]"
+  echo "-w directory - web directory containing summary pages [default: $web_DIR]"
 fi
 if [ "$WEB_URL" == "" ]; then
-echo "-W url - web url of summary pages"
+  echo "-W url - web url of summary pages"
 else
-echo "-W url - web url of summary pages [default: $WEB_URL]"
+  echo "-W url - web url of summary pages [default: $WEB_URL]"
 fi
+echo "-x fds_rev - run smokebot using the fds revision named fds_rev [default: origin/master]"
+echo "-y smv_rev - run smokebot using the smv revision named smv_rev [default: origin/master]"
+echo "   the -x and -y options are only used with the -R option i.e. when"
+echo "   the repos are being cloned"
 }
 
 #---------------------------------------------
@@ -177,6 +186,10 @@ SKIP=
 REMOVE_PID=
 BUILD_ONLY=
 CLONE_REPOS=
+FDS_REV=
+SMV_REV=
+FIREBOT_HOST=
+FIREBOT_HOME=
 
 WEB_URL=
 web_DIR=/var/www/html/`whoami`
@@ -198,7 +211,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'aAbBcCd:DfhHI:JkLm:MPq:r:R:StuUvw:W:' OPTION
+while getopts 'aAbBcCd:Dfg:G:hHI:JkLm:MPq:r:R:StuUvw:W:x:y:' OPTION
 do
 case $OPTION  in
   a)
@@ -228,6 +241,11 @@ case $OPTION  in
   f)
    FORCE=1
    ;;
+  g)
+   FIREBOT_HOST="$OPTARG"
+   ;;
+  G)
+   FIREBOT_HOME="$OPTARG"
   h)
    usage
    ;;
@@ -280,6 +298,15 @@ case $OPTION  in
   W)
    WEB_URL="$OPTARG"
    ;;
+  x)
+   FDS_REV="-x $OPTARG"
+   ;;
+  y)
+   SMV_REV="-y $OPTARG"
+   ;;
+  \?)
+  echo "***error: unknown option entered. aborting smokebot"
+  exit 1
 esac
 done
 shift $(($OPTIND-1))
@@ -289,6 +316,45 @@ if [ "$REMOVE_PID" == "1" ]; then
   echo "$smokebot_pid status file removed"
   exit
 fi
+
+# sync fds and smv repos with the the repos used in the last successful firebot run
+
+GET_HASH=
+if [ "$FIREBOT_HOST" != "" ]; then
+  GET_HASH=1
+else
+  FIREBOT_HOST=`hostname`
+fi
+if [ "$FIREBOT_HOME" != "" ]; then
+  GET_HASH=1
+else
+  FIREBOT_HOME=\~firebot
+fi
+if [ "$GET_HASH" != "" ]; then
+  if [ "$CLONE_REPO" == "" ]; then
+    echo "***error: The -g and -G options for specifying firebot host/home directory can only be used"
+    echo "          when cloning the repos, when the -R option is used"
+    exit 1
+  fi
+  FDS_HASH=`../Bundle/fds/scripts/get_hash.sh -r fds -g $FIREBOT_HOST -G $FIREBOT_HOME`
+  SMV_HASH=`../Bundle/fds/scripts/get_hash.sh -r smv -g $FIREBOT_HOST -G $FIREBOT_HOME`
+  ABORT=
+  if [ "$FDS_HASH" == "" ]; then
+    ABORT=1
+  fi
+  if [ "$SMV_HASH" == "" ]; then
+    ABORT=1
+  fi
+  if [ "$ABORT" != "" ]; then
+    echo "***error: the fds and/or smv repo hash could not be found in the directory"
+    echo "          $FIREBOT_HOME/.firebot/apps at the host $FIREBOT_HOST"
+    exit 1
+  fi
+  FDS_REV="-x $FDS_HASH"
+  SMV_REV="-y $SMV_HASH"
+fi
+
+# warn user (if not the smokebot user) if using the clone option
 
 if [ `whoami` != smokebot ]; then
   if [ "$CLONE_REPOS" != "" ]; then
@@ -394,7 +460,7 @@ BRANCH="-b $BRANCH"
 #*** run smokebot
 
 touch $smokebot_pid
-$ECHO ./$botscript $SKIP $SIZE $BRANCH $TESTFLAG $CLONE_REPOS $RUNAUTO $INTEL $BUILD_ONLY $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $SKIP $SIZE $BRANCH $FDS_REV $SMV_REV $TESTFLAG $CLONE_REPOS $RUNAUTO $INTEL $BUILD_ONLY $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi
