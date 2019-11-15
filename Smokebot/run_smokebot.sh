@@ -246,6 +246,7 @@ case $OPTION  in
    ;;
   G)
    FIREBOT_HOME="$OPTARG"
+   ;;
   h)
    usage
    ;;
