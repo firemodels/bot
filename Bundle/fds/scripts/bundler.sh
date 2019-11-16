@@ -50,6 +50,7 @@ echo "-a - host containing apps [default: $app_host]"
 echo "-A - home directory containing FDS pubs [default: $fds_pub_home]"
 echo "-B - build apps by running firebot using the current fds and smv"
 echo "     repo revisions"
+echo "-b - branch name (usually test or release) [default: $BRANCH]"
 echo "-C - build apps by running firebot using the latest fds and smv"
 echo "     repo revisions that passed firebot"
 echo "     ( on $app_host in directory $app_home )"
@@ -60,7 +61,9 @@ echo "-f - force this script to run"
 echo "-F - home directory containing apps [default: $app_home]"
 echo "-g - upload installer file to a google drive directory with id in the"
 echo "     file $HOME/.bundle/GOOGLE_DIR_ID"
+echo "-r - use release branch to make bundle"
 echo "-S - home directory containing Smokeview pubs [default: $smv_pub_home]"
+echo "-t - use test branch to make bundle"
 echo "-h - display this message"
 echo "-p - host containing pubs [default: $pub_host]"
 echo "-u - use apps built by firebot in the `whoami` account"
@@ -101,8 +104,9 @@ CURDIR=`pwd`
 OUTPUT_DIR=$CURDIR/output
 SYNC_REVS=
 VERBOSE=
+BRANCH=release
 
-while getopts 'a:A:BCcd:fF:ghp:S:uUvVw' OPTION
+while getopts 'a:b:A:BCcd:fF:ghp:S:uUvVw' OPTION
 do
 case $OPTION  in
   a)
@@ -110,6 +114,9 @@ case $OPTION  in
    ;;
   A)
    app_home=$OPTARG
+   ;;
+  b)
+  BRANCH=$OPTARG
    ;;
   B)
    BUILD_APPS=1
@@ -225,19 +232,19 @@ if [ "$showparms" == "1" ]; then
     SMV_PUBDIR=.bundle
   else
     APPDIR=.firebot
-    FDS_PUBDIR=.firebot
+    FDS_PUBDIR=.firebot/
     SMV_PUBDIR=.smokebot
   fi
-  echo "    fds/smv app directory: $app_home/$APPDIR/apps $app_hostlabel"
+  echo "    fds/smv app directory: $app_home/$APPDIR/$BRANCH/apps $app_hostlabel"
   pub_hostlabel="on this computer"
   if [ "$pub_host" != "`hostname`" ]; then
     pub_hostlabel="on $pub_host"
   fi
   if [ "$USE_CACHE" == "1" ]; then
-    echo "    fds/smv pub directory: $fds_pub_home/$FDS_PUBDIR/pubs $pub_hostlabel"
+    echo "    fds/smv pub directory: $fds_pub_home/$FDS_PUBDIR/$BRANCH/pubs $pub_hostlabel"
   else
-    echo "        fds pub directory: $fds_pub_home/$FDS_PUBDIR/pubs $pub_hostlabel"
-    echo "        smv pub directory: $smv_pub_home/$SMV_PUBDIR/pubs $pub_hostlabel"
+    echo "        fds pub directory: $fds_pub_home/$FDS_PUBDIR/$BRANCH/pubs $pub_hostlabel"
+    echo "        smv pub directory: $smv_pub_home/$SMV_PUBDIR/$BRANCH/pubs $pub_hostlabel"
   fi
     echo "         bundle directory: $bundle_dir"
   if [ "$UPLOAD_GOOGLE" == "1" ]; then
@@ -282,31 +289,31 @@ if [ "$showparms" == "" ]; then
   rm -f $HOME/.bundle/pubs/*
   if [ "$VERBOSE" == "1" ]; then
     echo "********************"
-    echo ./copy_pubs.sh fds $fds_pub_home/.firebot/pubs  $pub_host $error_log
+    echo ./copy_pubs.sh fds $fds_pub_home/.firebot/$BRANCH/pubs  $pub_host $error_log
     echo "********************"
   fi 
-  ./copy_pubs.sh fds $fds_pub_home/.firebot/pubs  $pub_host $error_log || return_code=1
+  ./copy_pubs.sh fds $fds_pub_home/.firebot/$BRANCH/pubs  $pub_host $error_log || return_code=1
 
   if [ "$VERBOSE" == "1" ]; then
     echo "********************"
-    echo ./copy_pubs.sh smv $smv_pub_home/.smokebot/pubs $pub_host $error_log
+    echo ./copy_pubs.sh smv $smv_pub_home/.smokebot/$BRANCH/pubs $pub_host $error_log
     echo "********************"
   fi
-  ./copy_pubs.sh smv $smv_pub_home/.smokebot/pubs $pub_host $error_log || return_code=1
+  ./copy_pubs.sh smv $smv_pub_home/.smokebot/$BRANCH/pubs $pub_host $error_log || return_code=1
 
   rm -f $HOME/.bundle/apps/*
   if [ "$VERBOSE" == "1" ]; then
     echo "********************"
-    echo ./copy_apps.sh fds $app_home/.firebot/apps      $app_host $error_log 
+    echo ./copy_apps.sh fds $app_home/.firebot/$BRANCH/apps      $app_host $error_log 
     echo "********************"
   fi
-  ./copy_apps.sh fds $app_home/.firebot/apps      $app_host $error_log || return_code=1
+  ./copy_apps.sh fds $app_home/.firebot/$BRANCH/apps      $app_host $error_log || return_code=1
   if [ "$VERBOSE" == "1" ]; then
     echo "********************"
-    echo ./copy_apps.sh smv $app_home/.firebot/apps      $app_host $error_log
+    echo ./copy_apps.sh smv $app_home/.firebot/$BRANCH/apps      $app_host $error_log
     echo "********************"
   fi
-  ./copy_apps.sh smv $app_home/.firebot/apps      $app_host $error_log || return_code=1
+  ./copy_apps.sh smv $app_home/.firebot/$BRANCH/apps      $app_host $error_log || return_code=1
  
   if [ "$return_code" == "1" ]; then
     cat $error_log

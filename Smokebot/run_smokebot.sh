@@ -43,6 +43,8 @@ echo "     fds and smv repos will be checked out with a branch named"
 echo "     master, release or test [default: master]"
 echo "-S - skip picture generating and build manual stages"
 echo "-t - use test smokeview"
+echo "-T - only clone the fds and smv repos (this option is set by default when"
+echo "     only building apps (-B) and cloning repos (-R) options are used"
 echo "-U - upload guides"
 if [ "$web_DIR" == "" ]; then
   echo "-w directory - web directory containing summary pages"
@@ -190,6 +192,7 @@ FDS_REV=
 SMV_REV=
 FIREBOT_HOST=
 FIREBOT_HOME=
+CLONE_FDSSMV=
 
 WEB_URL=
 web_DIR=/var/www/html/`whoami`
@@ -211,7 +214,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'aAbBcCd:Dfg:G:hHI:JkLm:MPq:r:R:StuUvw:W:x:y:' OPTION
+while getopts 'aAbBcCd:Dfg:G:hHI:JkLm:MPq:r:R:StTuUvw:W:x:y:' OPTION
 do
 case $OPTION  in
   a)
@@ -282,6 +285,9 @@ case $OPTION  in
    ;;
   t)
    TESTFLAG="-t"
+   ;;
+  T)
+    CLONE_FDSSMV="-T"
    ;;
   u)
    UPDATEREPO=-u
@@ -461,7 +467,7 @@ BRANCH="-b $BRANCH"
 #*** run smokebot
 
 touch $smokebot_pid
-$ECHO ./$botscript $SKIP $SIZE $BRANCH $FDS_REV $SMV_REV $TESTFLAG $CLONE_REPOS $RUNAUTO $INTEL $BUILD_ONLY $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $SKIP $SIZE $BRANCH $FDS_REV $SMV_REV $TESTFLAG $CLONE_REPOS $CLONE_FDSSMV $RUNAUTO $INTEL $BUILD_ONLY $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi
