@@ -106,7 +106,7 @@ SYNC_REVS=
 VERBOSE=
 BRANCH=release
 
-while getopts 'a:b:A:BCcd:fF:ghp:S:uUvVw' OPTION
+while getopts 'a:A:b:BCcdfF:ghp:S:uUvVw' OPTION
 do
 case $OPTION  in
   a)
@@ -127,9 +127,6 @@ case $OPTION  in
    app_home=$HOME
    SYNC_REVS=1
    ;;
-  d)
-   bundle_dir=$HOME
-   ;;
   c)
    USE_CACHE=1
    BUILD_APPS=
@@ -137,6 +134,9 @@ case $OPTION  in
    pub_host=`hostname`
    fds_pub_home=$HOME
    smv_pub_home=$HOME
+   ;;
+  d)
+   bundle_dir=$HOME
    ;;
   f)
    FORCE="1"
