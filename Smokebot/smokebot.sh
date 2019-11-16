@@ -1602,14 +1602,6 @@ if [ "$CLONE_REPOS" != "" ]; then
   fi
 fi
 
-#save apps and pubs in directories under .firebot/$FDSBRANCH
-BRANCH_DIR=$HOME/.smokebot/$SMVBRANCH
-BRANCHPUBS_DIR=$BRANCH_DIR/pubs
-BRANCHAPPS_DIR=$BRANCH_DIR/apps
-MKDIR $BRANCH_DIR
-MKDIR $BRANCHPUBS_DIR
-MKDIR $BRANCHAPPS_DIR
-
 #*** make sure smokebot is running in the right directory
 
 if [ -e .smv_git ]; then
@@ -1682,14 +1674,6 @@ if [[ "$CLONE_REPOS" != "" ]]; then
   fi
 fi
 
-#save apps and pubs in directories under .firebot/$FDSBRANCH
-BRANCH_DIR=$HOME/.smokebot/$SMVBRANCH
-BRANCHPUBS_DIR=$BRANCH_DIR/pubs
-BRANCHAPPS_DIR=$BRANCH_DIR/apps
-MKDIR $BRANCH_DIR
-MKDIR $BRANCHPUBS_DIR
-MKDIR $BRANCHAPPS_DIR
-
 #*** make sure repos needed by smokebot exist
 
 CD_REPO $botrepo $BOTBRANCH || exit 1
@@ -1715,6 +1699,14 @@ if [ "$SMVBRANCH" == "current" ]; then
   cd $smvrepo
   SMVBRANCH=`git rev-parse --abbrev-ref HEAD`
 fi
+
+#save apps and pubs in directories under .smokebot/$SMVBRANCH
+BRANCH_DIR=$HOME/.smokebot/$SMVBRANCH
+BRANCHPUBS_DIR=$BRANCH_DIR/pubs
+BRANCHAPPS_DIR=$BRANCH_DIR/apps
+MKDIR $BRANCH_DIR
+MKDIR $BRANCHPUBS_DIR
+MKDIR $BRANCHAPPS_DIR
 
 #*** save pid so -k option (kill smokebot) may be used lateer
 

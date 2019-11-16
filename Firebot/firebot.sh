@@ -1810,14 +1810,6 @@ esac
 done
 shift $(($OPTIND-1))
 
-#save apps and pubs in directories under .firebot/$FDSBRANCH
-BRANCH_DIR=$HOME/.firebot/$FDSBRANCH
-BRANCHPUBS_DIR=$BRANCH_DIR/pubs
-BRANCHAPPS_DIR=$BRANCH_DIR/apps
-MKDIR $BRANCH_DIR
-MKDIR $BRANCHPUBS_DIR
-MKDIR $BRANCHAPPS_DIR
-
 # Load mailing list for status report
 if [ "$mailToFDS" == "" ]; then
   if [ -e $EMAIL_LIST ]; then
@@ -1908,6 +1900,14 @@ if [ "$BOTBRANCH" == "current" ]; then
   BOTBRANCH=`git rev-parse --abbrev-ref HEAD`
 fi
 
+#save apps and pubs in directories under .firebot/$FDSBRANCH
+
+BRANCH_DIR=$HOME/.firebot/$FDSBRANCH
+BRANCHPUBS_DIR=$BRANCH_DIR/pubs
+BRANCHAPPS_DIR=$BRANCH_DIR/apps
+MKDIR $BRANCH_DIR
+MKDIR $BRANCHPUBS_DIR
+MKDIR $BRANCHAPPS_DIR
 
 cd $firebotdir
 
