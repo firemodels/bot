@@ -674,7 +674,7 @@ compile_smv_utilities()
      echo 'Compiling smokezip:' >> $OUTPUT_DIR/stage2a 2>&1
      ./make_smokezip.sh >> $OUTPUT_DIR/stage2a 2>&1
      echo "" >> $OUTPUT_DIR/stage2a 2>&1
-     cp smokezip_${platform}_64 $SMV_LATESTAPPS_DIR/smokezip
+     cp smokezip_${platform}_64 $LATESTAPPS_DIR/smokezip
 
    # smokediff:
      echo "      smokediff"
@@ -683,7 +683,7 @@ compile_smv_utilities()
      echo 'Compiling smokediff:' >> $OUTPUT_DIR/stage2a 2>&1
      ./make_smokediff.sh >> $OUTPUT_DIR/stage2a 2>&1
      echo "" >> $OUTPUT_DIR/stage2a 2>&1
-     cp smokediff_${platform}_64 $SMV_LATESTAPPS_DIR/smokediff
+     cp smokediff_${platform}_64 $LATESTAPPS_DIR/smokediff
 
    # background
      echo "      background"
@@ -691,7 +691,7 @@ compile_smv_utilities()
      rm -f *.o background_${platform}_64
      echo 'Compiling background:' >> $OUTPUT_DIR/stage2a 2>&1
      ./make_background.sh >> $OUTPUT_DIR/stage2a 2>&1
-     cp background_${platform}_64 $SMV_LATESTAPPS_DIR/background
+     cp background_${platform}_64 $LATESTAPPS_DIR/background
 
    # dem2fds
      echo "      dem2fds"
@@ -699,7 +699,7 @@ compile_smv_utilities()
      rm -f *.o dem2fds_${platform}_64
      echo 'Compiling dem2fds:' >> $OUTPUT_DIR/stage2a 2>&1
      ./make_dem2fds.sh >> $OUTPUT_DIR/stage2a 2>&1
-     cp dem2fds_${platform}_64 $SMV_LATESTAPPS_DIR/dem2fds
+     cp dem2fds_${platform}_64 $LATESTAPPS_DIR/dem2fds
    
    # hashfile
      echo "      hashfile"
@@ -707,7 +707,7 @@ compile_smv_utilities()
      rm -f *.o hashfile_${platform}_64
      echo 'Compiling hashfile:' >> $OUTPUT_DIR/stage2a 2>&1
      ./make_hashfile.sh >> $OUTPUT_DIR/stage2a 2>&1
-     cp hashfile_${platform}_64 $SMV_LATESTAPPS_DIR/hashfile
+     cp hashfile_${platform}_64 $LATESTAPPS_DIR/hashfile
 
   # wind2fds:
      echo "      wind2fds"
@@ -716,7 +716,7 @@ compile_smv_utilities()
      echo 'Compiling wind2fds:' >> $OUTPUT_DIR/stage2a 2>&1
      ./make_wind2fds.sh >> $OUTPUT_DIR/stage2a 2>&1
     echo "" >> $OUTPUT_DIR/stage2a 2>&1
-     cp wind2fds_${platform}_64 $SMV_LATESTAPPS_DIR/wind2fds
+     cp wind2fds_${platform}_64 $LATESTAPPS_DIR/wind2fds
    else
      echo "Warning: smokeview and utilities not built - C compiler not available" >> $OUTPUT_DIR/stage2a 2>&1
    fi
@@ -1031,7 +1031,7 @@ check_compile_smv()
    # Check for errors in SMV release compilation
    cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_64
    if [ -e "smokeview_${platform}${TEST}_64" ]
-     cp smokeview_${platform}${TEST}_64 $SMV_LATESTAPPS_DIR/smokeview
+     cp smokeview_${platform}${TEST}_64 $LATESTAPPS_DIR/smokeview
    then
       stage2c_smv_success=true
    else
@@ -1235,9 +1235,9 @@ check_guide()
        cp $directory/$document $SMOKEBOT_MAN_DIR/.
      fi
      cp $directory/$document $NEWGUIDE_DIR/.
-     cp $directory/$document $GUIDE_DIR_LATEST/$document
+     cp $directory/$document $LATESTPUBS_DIR/$document
      chmod 664 $NEWGUIDE_DIR/$document
-     chmod 664 $GUIDE_DIR_LATEST/$document
+     chmod 664 $LATESTPUBS_DIR/$document
    fi
 
    # Check for LaTeX warnings (undefined references or duplicate labels)
@@ -1327,8 +1327,8 @@ save_manuals_dir()
       rm -rf $MOVIEMANUAL_DIR_ARCHIVE
       cp -r $smvrepo/Manuals $MOVIEMANUAL_DIR_ARCHIVE
     fi
-    rm -rf $GUIDE_DIR
-    cp -r $GUIDE_DIR_LATEST $GUIDE_DIR
+    rm -rf $PUBS_DIR
+    cp  -r $LATESTPUBS_DIR $PUBS_DIR
   fi
 }
 
@@ -1440,9 +1440,14 @@ fi
 
 # save apps that were built for bundling
 
-      rm -f $SMV_APPS_DIR/*
-      cp $SMV_LATESTAPPS_DIR/* $SMV_APPS_DIR/.
+      rm -f $APPS_DIR/*
+      cp $LATESTAPPS_DIR/* $APPS_DIR/.
 
+      rm -f $BRANCHAPPS_DIR/*
+      cp $LATESTAPPS_DIR/* $BRANCHAPPS_DIR/.
+
+      rm -f $BRANCHPUBS_DIR/*
+      cp $LATESTPUBS_DIR/* $BRANCHPUBS_DIR/.
    fi
 }
 
@@ -1459,14 +1464,13 @@ HISTORY_DIR_ARCHIVE="$HOME/.smokebot/history"
 MANUAL_DIR_ARCHIVE=$HOME/.smokebot/Manuals
 MOVIEMANUAL_DIR_ARCHIVE=$HOME/.smokebot/MovieManuals
 
-GUIDE_DIR_LATEST=$HOME/.smokebot/pubs_latest
-       GUIDE_DIR=$HOME/.smokebot/pubs
+LATESTPUBS_DIR=$HOME/.smokebot/pubs_latest
+PUBS_DIR=$HOME/.smokebot/pubs
 
 EMAIL_LIST="$HOME/.smokebot/smokebot_email_list.sh"
 TIME_LOG=$OUTPUT_DIR/timings
 ERROR_LOG=$OUTPUT_DIR/errors
 WARNING_LOG=$OUTPUT_DIR/warnings
-GUIDE_DIR=$OUTPUT_DIR/guides
 STAGE_STATUS=$OUTPUT_DIR/stage_status
 NEWGUIDE_DIR=$OUTPUT_DIR/Newest_Guides
 web_DIR=
@@ -1499,12 +1503,13 @@ SKIP=
 HTML2PDF=wkhtmltopdf
 BUILD_ONLY=
 CLONE_REPOS=
+CLONE_FDSSMV=
 FDS_REV=origin/master
 SMV_REV=origin/master
 
 #*** parse command line options
 
-while getopts 'aAb:BcI:JLm:Mo:q:r:R:SstuUw:W:x:y:' OPTION
+while getopts 'aAb:BcI:JLm:Mo:q:r:R:SstTuUw:W:x:y:' OPTION
 do
 case $OPTION in
   a)
@@ -1563,6 +1568,9 @@ case $OPTION in
   t)
    TESTFLAG="-t"
    TEST="_test"
+   ;;
+  T)
+   CLONE_FDSSMV=1
    ;;
   U)
    UPLOADRESULTS=1
@@ -1623,16 +1631,16 @@ fi
 #*** create pub directory
 
 MKDIR $HOME/.smokebot
-MKDIR $GUIDE_DIR
-rm -rf $GUIDE_DIR_LATEST
-MKDIR $GUIDE_DIR_LATEST
+MKDIR $PUBS_DIR
+rm -rf $LATESTPUBS_DIR
+MKDIR $LATESTPUBS_DIR
 
-SMV_APPS_DIR=$HOME/.smokebot/smv
-SMV_LATESTAPPS_DIR=$HOME/.smokebot/smv_latest
+APPS_DIR=$HOME/.smokebot/apps
+LATESTAPPS_DIR=$HOME/.smokebot/apps_latest
 
-MKDIR $SMV_APPS_DIR
-rm -rf $SMV_LATESTAPPS_DIR
-MKDIR $SMV_LATESTAPPS_DIR
+MKDIR $APPS_DIR
+rm -rf $LATESTAPPS_DIR
+MKDIR $LATESTAPPS_DIR
 
 botrepo=$repo/bot
 cfastrepo=$repo/cfast
@@ -1648,7 +1656,13 @@ if [[ "$CLONE_REPOS" != "" ]]; then
   cd $botrepo/Scripts
 
 # only clone fds and smv repos
-  ./setup_repos.sh -d > $OUTPUT_DIR/stage1_clone 2>&1
+  if [ "$CLONE_FDSSMV" != "" ]; then
+   # only clone the fds and smv repos - used when just compiling the fds and smv apps
+  ./setup_repos.sh -T > $OUTPUT_DIR/stage1_clone 2>&1
+  else
+   # clone all repos
+    ./setup_repos.sh -F > $OUTPUT_DIR/stage1_clone 2>&1
+  fi
   if [ "$CLONE_REPOS" != "master" ]; then
     FDSBRANCH=$CLONE_REPOS
     cd $fdsrepo
@@ -1659,7 +1673,6 @@ if [[ "$CLONE_REPOS" != "" ]]; then
     git checkout -b $SMVBRANCH $SMV_REV >> $OUTPUT_DIR/stage1_clone 2>&1
   fi
 fi
-
 
 #*** make sure repos needed by smokebot exist
 
@@ -1686,6 +1699,14 @@ if [ "$SMVBRANCH" == "current" ]; then
   cd $smvrepo
   SMVBRANCH=`git rev-parse --abbrev-ref HEAD`
 fi
+
+#save apps and pubs in directories under .smokebot/$SMVBRANCH
+BRANCH_DIR=$HOME/.smokebot/$SMVBRANCH
+BRANCHPUBS_DIR=$BRANCH_DIR/pubs
+BRANCHAPPS_DIR=$BRANCH_DIR/apps
+MKDIR $BRANCH_DIR
+MKDIR $BRANCHPUBS_DIR
+MKDIR $BRANCHAPPS_DIR
 
 #*** save pid so -k option (kill smokebot) may be used lateer
 
@@ -1907,14 +1928,14 @@ SMV_DATE=`git log -1 --format=%cd --date=local $SMV_SHORTHASH`
 
 subrev=`git describe --abbrev | awk -F '-' '{print $2}'`
 if [ "$subrev" == "" ]; then
-  git describe --abbrev | awk -F '-' '{print $1"-0"}' > $SMV_LATESTAPPS_DIR/SMV_REVISION
+  git describe --abbrev | awk -F '-' '{print $1"-0"}' > $LATESTAPPS_DIR/SMV_REVISION
 else
-  git describe --abbrev | awk -F '-' '{print $1"-"$2}' > $SMV_LATESTAPPS_DIR/SMV_REVISION
+  git describe --abbrev | awk -F '-' '{print $1"-"$2}' > $LATESTAPPS_DIR/SMV_REVISION
 fi
-git rev-parse --short HEAD > $SMV_LATESTAPPS_DIR/SMV_HASH
+git rev-parse --short HEAD > $LATESTAPPS_DIR/SMV_HASH
 
-cp $SMV_LATESTAPPS_DIR/SMV_REVISION $GUIDE_DIR_LATEST/SMV_REVISION
-cp $SMV_LATESTAPPS_DIR/SMV_HASH $GUIDE_DIR_LATEST/SMV_HASH
+cp $LATESTAPPS_DIR/SMV_REVISION $LATESTPUBS_DIR/SMV_REVISION
+cp $LATESTAPPS_DIR/SMV_HASH     $LATESTPUBS_DIR/SMV_HASH
 
 PRELIM_end=`GET_TIME`
 DIFF_PRELIM=`GET_DURATION $PRELIM_beg $PRELIM_end`

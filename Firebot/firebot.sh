@@ -1318,7 +1318,7 @@ copy_guide()
      if [ -e $doc ]; then
        cp $doc /var/www/html/firebot/manuals/
        cp $doc $NEWGUIDE_DIR/.
-       cp $doc $SAVEGUIDE_DIR/.
+       cp $doc $PUBS_DIR/.
      fi
    fi
 }
@@ -1665,16 +1665,17 @@ ERROR_LOG=$OUTPUT_DIR/errors
 VALIDATION_ERROR_LOG=$OUTPUT_DIR/validation_errors
 WARNING_LOG=$OUTPUT_DIR/warnings
 NEWGUIDE_DIR=$OUTPUT_DIR/Newest_Guides
-SAVEGUIDE_DIR=$HOME/.firebot/pubs
 MANUAL_DIR=$HOME/.firebot/Manuals
 EMAIL_LIST=$HOME/.firebot/firebot_email_list.sh
 CRLF_WARNINGS=$OUTPUT_DIR/stage1_crlf_warnings
 
-APPS_DIR=$HOME/.firebot/apps
 LATESTAPPS_DIR=$HOME/.firebot/appslatest
+APPS_DIR=$HOME/.firebot/apps
+
+PUBS_DIR=$HOME/.firebot/pubs
+MKDIR $PUBS_DIR
 
 MKDIR $HOME/.firebot
-MKDIR $HOME/.firebot/pubs
 
 MKDIR $APPS_DIR
 rm -rf $LATESTAPPS_DIR
@@ -1899,6 +1900,14 @@ if [ "$BOTBRANCH" == "current" ]; then
   BOTBRANCH=`git rev-parse --abbrev-ref HEAD`
 fi
 
+#save apps and pubs in directories under .firebot/$FDSBRANCH
+
+BRANCH_DIR=$HOME/.firebot/$FDSBRANCH
+BRANCHPUBS_DIR=$BRANCH_DIR/pubs
+BRANCHAPPS_DIR=$BRANCH_DIR/apps
+MKDIR $BRANCH_DIR
+MKDIR $BRANCHPUBS_DIR
+MKDIR $BRANCHAPPS_DIR
 
 cd $firebotdir
 
@@ -2205,7 +2214,7 @@ if [[ "$DEBUG_ONLY" == "" ]] && [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" 
         rm -rf $MANUAL_DIR
         cp -r $fdsrepo/Manuals $MANUAL_DIR
 
-        cp $LATESTAPPS_DIR/FDS_REVISION $SAVEGUIDE_DIR/FDS_REVISION
+        cp $LATESTAPPS_DIR/FDS_REVISION $PUBS_DIR/FDS_REVISION
         copy_fds_user_guide
         copy_fds_verification_guide
         copy_fds_technical_guide
@@ -2221,6 +2230,12 @@ get_firebot_success
 if [[ "$firebot_success" == "1" ]] ; then
   rm -f $APPS_DIR/*
   cp $LATESTAPPS_DIR/* $APPS_DIR/.
+
+  rm -f $BRANCHAPPS_DIR/*
+  cp $LATESTAPPS_DIR/* $BRANCHAPPS_DIR/.
+
+  rm -f $BRANCHPUBS_DIR/*
+  cp $PUBS_DIR/*       $BRANCHPUBS_DIR/.
 fi
 
 ### Wrap up and report results ###

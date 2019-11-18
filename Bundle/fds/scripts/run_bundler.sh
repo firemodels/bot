@@ -72,11 +72,12 @@ commands=$0
 DIR=$(dirname "${commands}")
 cd $DIR
 DIR=`pwd`
+BRANCH="-b release"
 
 cd ../../../..
 repo=`pwd`
 
-while getopts 'a:A:Bcd:fF:ghp:S:uUvVw' OPTION
+while getopts 'a:A:b:Bcd:fF:ghp:rS:tuUvVw' OPTION
 do
 case $OPTION  in
   a)
@@ -85,14 +86,17 @@ case $OPTION  in
   A)
    AOPT="-A $OPTARG"
    ;;
+  b)
+   BRANCH="-b $OPTARG"
+   ;;
   B)
    BOPT="-B"
    ;;
-  d)
-   dopt="-d $OPTARG"
-   ;;
   c)
    copt="-c"
+   ;;
+  d)
+   dopt="-d $OPTARG"
    ;;
   f)
    fopt="-f"
@@ -109,8 +113,14 @@ case $OPTION  in
   p)
    popt="-p $OPTARG"
    ;;
+  r)
+   BRANCH="-b release"
+   ;;
   S)
    SOPT="-S $OPTARG"
+   ;;
+  t)
+   BRANCH="-b test"
    ;;
   u)
    uopt="-u"
@@ -127,9 +137,6 @@ case $OPTION  in
   w)
    wopt="-w"
    ;;
-  \?)
-  echo "***error: unknown option entered. aborting script"
-  exit
 esac
 done
 shift $(($OPTIND-1))
@@ -140,9 +147,8 @@ if [ "$vopt" == "" ]; then
   UPDATE_REPO bot master || exit 1
 fi
 fi
-
 cd $DIR
-./bundler.sh $aopt $AOPT $BOPT $dopt $copt $fopt $FOPT $gopt $hopt $popt $SOPT $uopt $UOPT $vopt $VOPT $wopt
+./bundler.sh $aopt $AOPT $BOPT $BRANCH $copt $dopt $fopt $FOPT $gopt $hopt $popt $SOPT $uopt $UOPT $vopt $VOPT $wopt
 
 cd $curdir
 
