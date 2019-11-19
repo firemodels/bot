@@ -16,7 +16,25 @@ DUP_PARMS=" -e /TRNY/ -e /TRNZ/ "
 tex_dir=../../fds/Manuals/FDS_User_Guide/
 grep -v ^% $tex_dir/*.tex | \
 awk -F'}' 'BEGIN{inlongtable=0;}{if($1=="\\begin{longtable"&&$4=="|l|l|l|l|l|"){inlongtable=1};if($1=="\\end{longtable"){inlongtable=0};if(inlongtable==1){print $0}}' $tex_dir/*.tex | \
-awk -F' ' 'BEGIN{output=0;namelist="xxx";}{if($1=="\\multicolumn{5}{|c|}{{\\ct"){namelist=$2;};if($1=="{\\ct"){keyword=$2;if(keyword=="\\footnotesize"){keyword=$3;}output=1;}else{output=0;};if(output==1){print "/"namelist"/"keyword;}}' | \
+awk -F' ' 'BEGIN{output=0;namelist="xxx";}\
+           {\
+             if($1=="\\multicolumn{5}{|c|}{{\\ct"){\
+               namelist=$2;\
+             }\
+             if($1=="{\\ct"){\
+               keyword=$2;\
+               if(keyword=="\\footnotesize"){\
+               keyword=$3;\
+             }\
+             output=1;\
+             }\
+             else{\
+               output=0;\
+             };\
+             if(output==1){\
+               print "/"namelist"/"keyword;\
+             }\
+           }' | \
 tr -d '}' | \
 tr -d '\\' | \
 awk -F'(' '{print $1}' | \
