@@ -12,29 +12,51 @@ EXIT_PARMS=" -e /CORR/ -e /DOOR/ -e /EDEV/ -e /ENTR/ -e /EVAC/ -e /EVHO/ -e /EVS
 DUP_PARMS=" -e /TRNY/ -e /TRNZ/ " 
 
 # generate list of namelist keywords found in FDS_User_Guide tex files
-#awk -F' ' 'BEGIN{output=0;namelist="xxx";}{if($1=="\\multicolumn{5}{|c|}{{\\ct"){namelist=$2;};if($1=="{\\ct"){output=1;}else{output=0;};if(output==1){for(i=2; i<=NF; i++){ if($i=="\\footnotesize"){continue;};if($i ~ /*\}$/){print $i;break;}else{print $i} } } }'
+#awk -F' ' 'BEGIN{output=0;namelist="xxx";}\
+#           {\
+#             if($1=="\\multicolumn{5}{|c|}{{\\ct"){\
+#               namelist=$2;\
+#             }\
+#             if($1=="{\\ct"){\
+#               keyword=$2;\
+#               if(keyword=="\\footnotesize"){\
+#               keyword=$3;\
+#             }\
+#             output=1;\
+#             }\
+#             else{\
+#               output=0;\
+#             };\
+#             if(output==1){\
+#               print "/"namelist"/"keyword;\
+#             }\
+#           }' | \
 tex_dir=../../fds/Manuals/FDS_User_Guide/
 grep -v ^% $tex_dir/*.tex | \
 awk -F'}' 'BEGIN{inlongtable=0;}{if($1=="\\begin{longtable"&&$4=="|l|l|l|l|l|"){inlongtable=1};if($1=="\\end{longtable"){inlongtable=0};if(inlongtable==1){print $0}}' $tex_dir/*.tex | \
 awk -F' ' 'BEGIN{output=0;namelist="xxx";}\
            {\
              if($1=="\\multicolumn{5}{|c|}{{\\ct"){\
-               namelist=$2;\
+               namelist=$2; \
              }\
              if($1=="{\\ct"){\
-               keyword=$2;\
-               if(keyword=="\\footnotesize"){\
-               keyword=$3;\
-             }\
-             output=1;\
+               output=1;\
              }\
              else{\
                output=0;\
              };\
              if(output==1){\
-               print "/"namelist"/"keyword;\
+               for(i=2; i<=NF; i++){\
+                 if($i=="\\footnotesize"){\
+                   continue;\
+                 };\
+                 print $i;\
+                 if($i ~ /\}$/){\
+                   break;\
+                 }\
+               }\
              }\
-           }' | \
+           }'|\
 tr -d '}' | \
 tr -d '\\' | \
 awk -F'(' '{print $1}' | \
