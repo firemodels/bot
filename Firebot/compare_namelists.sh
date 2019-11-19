@@ -50,7 +50,7 @@ awk -F' ' 'BEGIN{output=0;namelist="xxx";}\
                  if($i=="\\footnotesize"){\
                    continue;\
                  };\
-                 print $i;\
+                 print "/"namelist"/"$i;\
                  if($i ~ /\}$/){\
                    break;\
                  }\
