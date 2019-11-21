@@ -36,7 +36,19 @@ IGNORE_NAMELISTKW=`grep ignorenamelistkw: $tex_dir/*.tex | \
         }' | \
        tr -d ','`
 
-IGNORE="$IGNORE_NAMELISTS $IGNORE_NAMELISTKW"
+#ignore namelist keywords found that occur on any namelist
+IGNORE_ALLKW=`grep ignoreallkw: $tex_dir/*.tex | \
+	awk -F' ' '\
+	{ \
+	  if(NF>2){ \
+            for(i=3; i<=NF; i++){\
+              print "-e /"$i"$ "\
+            }\
+          }\
+        }' | \
+       tr -d ','`
+
+IGNORE="$IGNORE_NAMELISTS $IGNORE_NAMELISTKW $IGNORE_ALLKW"
 
 # in case there are no '% ignorenamelists' or '% ignorenamelistkw' lines in the tex files
 if [ "$IGNORE" == "" ]; then
@@ -97,12 +109,22 @@ sort > output/namelists_f90.txt
 #compute difference between tex and f90 namelist/keywords
 git diff --no-index output/namelists_f90.txt output/namelists_tex.txt > output/namelists_diff.txt
 
-echo "namelist keywords in the FDS source not documented in the FDS users guide:" > output/namelists_nodoc.txt
+nlinesundoc=`grep ^- output/namelists_diff.txt | sed 's/^-//g' | grep -v Firebot | wc -l`
+echo "$nlinesundoc undocumented namelist keywords:" > output/namelists_nodoc.txt
 grep ^- output/namelists_diff.txt | sed 's/^-//g' | grep -v \\-\\-               >> output/namelists_nodoc.txt
 
-echo "namelist keywords documented in the FDS users guide but not found in the FDS source:" > output/namelists_nosource.txt
+nlinesunimp=`grep ^+ output/namelists_diff.txt | sed 's/^+//g' | grep -v \\+\\+ | wc -l`
+echo "$nlinesunimp unimplemented namelist keywords:" > output/namelists_nosource.txt
 grep ^+ output/namelists_diff.txt | sed 's/^+//g' | grep -v \\+\\+                         >> output/namelists_nosource.txt
 
-echo "    undocumented namelist keywords: output/namelists_nodoc.txt"
-echo "   unimplemented namelist keywords: output/namelists_nosource.txt"
+if [ "$nlinesundoc" == "0" ]; then
+  echo "$nlinesundoc undocumented namelist keywords"
+else
+  echo "$nlinesundoc undocumented namelist keywords: output/namelists_nodoc.txt"
+fi
+if [ "$nlinesunimp" == "0" ]; then
+  echo "$nlinesunimp unimplemented namelist keywords"
+else
+  echo "$nlinesunimp unimplemented namelist keywords: output/namelists_nosource.txt"
+fi
 
