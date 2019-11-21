@@ -1355,6 +1355,10 @@ make_fds_user_guide()
 
    # Check guide for completion and copy to website if successful
    check_guide $OUTPUT_DIR/stage8_fds_user_guide $fdsrepo/Manuals/FDS_User_Guide/FDS_User_Guide.pdf 'FDS User Guide' 1
+
+   cd $botrepo/Firebot
+   ./compare_namelists.sh stage8 > $OUTPUT_DIR/stage8_namelist_check
+   NAMELIST_STATUS=`cat $OUTPUT_DIR/stage8_namelist_check | head -1 | awk -F' ' '{print $1}'`
 }
 
 #---------------------------------------------
@@ -1532,6 +1536,7 @@ get_firebot_success()
 #---------------------------------------------
 
 email_build_status()
+
 {
    cd $firebotdir
 
@@ -1560,6 +1565,9 @@ email_build_status()
    fi
    echo "     start time: $start_time " >> $TIME_LOG
    echo "      stop time: $stop_time " >> $TIME_LOG
+   if [ "$NAMELIST_STATUS" != "" ]; then
+     echo "undoc namelists: $NAMELIST_STATUS " >> $TIME_LOG
+   fi
    if [ "$UPLOADGUIDES" == "1" ]; then
    echo " Firebot status:  https://pages.nist.gov/fds-smv/firebot_status.html" >> $TIME_LOG
    fi
@@ -1623,7 +1631,6 @@ email_build_status()
         cat $TIME_LOG | mail -s "[$botuser] $bottype success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
       fi
    fi
-
 }
 
 #VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV

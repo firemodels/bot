@@ -1,11 +1,17 @@
 #!/bin/bash
+NAME_PREFIX=$1
+
+if [ "$NAME_PREFIX" != "" ]; then
+  NAME_PREFIX=${NAME_PREFIX}_
+fi
+NAMELIST_F90=output/${NAME_PREFIX}namelist_f90.txt
+NAMELIST_TEX=output/${NAME_PREFIX}namelists_tex.txt
+NAMELIST_DIFF=output/${NAME_PREFIX}namelists_diff.txt
+NAMELIST_NODOC=output/${NAME_PREFIX}namelists_nodoc.txt
+NAMELIST_NOSOURCE=output/${NAME_PREFIX}namelists_nosource.txt
 
 #remove files from last comparison
-rm -f output/namelists_f90.txt
-rm -f output/namelists_tex.txt
-rm -f output/namelists_diff.txt
-rm -f output/namelists_nodoc.txt
-rm -f output/namelists_nosource.txt
+rm -f output/*namelists*txt
 
 # FDS UG directory
 tex_dir=../../fds/Manuals/FDS_User_Guide/
@@ -93,7 +99,7 @@ sed 's/,$//g' | \
 sed 's/,\//\//g' | \
 awk -F',' '{for(i=2; i<=NF; i++){print $1$i}}' | \
 grep -v $IGNORE |\
-sort > output/namelists_tex.txt
+sort > $NAMELIST_TEX
 
 # generate list of namelist keywords found in FDS Fortran 90 source  files
 cat $input_dir/*.f90 | \
@@ -104,27 +110,27 @@ grep ^NAMELIST | \
 awk -F'/' '{print "/"$2"/,"$3}'  | \
 awk -F',' '{for(i=2; i<=NF; i++){print $1$i}}' | \
 grep -v $IGNORE |\
-sort > output/namelists_f90.txt
+sort > $NAMELIST_F90
 
 #compute difference between tex and f90 namelist/keywords
-git diff --no-index output/namelists_f90.txt output/namelists_tex.txt > output/namelists_diff.txt
+git diff --no-index $NAMELIST_F90 $NAMELIST_TEX                                  > $NAMELIST_DIFF
 
-nlinesundoc=`grep ^- output/namelists_diff.txt | sed 's/^-//g' | grep -v Firebot | wc -l`
-echo "$nlinesundoc undocumented namelist keywords:" > output/namelists_nodoc.txt
-grep ^- output/namelists_diff.txt | sed 's/^-//g' | grep -v \\-\\-               >> output/namelists_nodoc.txt
+nlinesundoc=`grep ^- $NAMELIST_DIFF | sed 's/^-//g' | grep -v Firebot | wc -l`
+echo "$nlinesundoc undocumented namelist keywords:"                              > $NAMELIST_NODOC
+grep ^- $NAMELIST_DIFF | sed 's/^-//g' | grep -v \\-\\-                         >> $NAMELIST_NODOC
 
-nlinesunimp=`grep ^+ output/namelists_diff.txt | sed 's/^+//g' | grep -v \\+\\+ | wc -l`
-echo "$nlinesunimp unimplemented namelist keywords:" > output/namelists_nosource.txt
-grep ^+ output/namelists_diff.txt | sed 's/^+//g' | grep -v \\+\\+                         >> output/namelists_nosource.txt
+nlinesunimp=`grep ^+ $NAMELIST_DIFF | sed 's/^+//g' | grep -v \\+\\+ | wc -l`
+echo "$nlinesunimp unimplemented namelist keywords:"                             > $NAMELIST_NOSOURCE
+grep ^+ $NAMELIST_DIFF | sed 's/^+//g' | grep -v \\+\\+                         >> $NAMELIST_NOSOURCE
 
 if [ "$nlinesundoc" == "0" ]; then
   echo "$nlinesundoc undocumented namelist keywords"
 else
-  echo "$nlinesundoc undocumented namelist keywords: output/namelists_nodoc.txt"
+  echo "$nlinesundoc undocumented namelist keywords: $NAMELIST_NODOC"
 fi
 if [ "$nlinesunimp" == "0" ]; then
   echo "$nlinesunimp unimplemented namelist keywords"
 else
-  echo "$nlinesunimp unimplemented namelist keywords: output/namelists_nosource.txt"
+  echo "$nlinesunimp unimplemented namelist keywords: $NAMELIST_NOSOURCE"
 fi
 
