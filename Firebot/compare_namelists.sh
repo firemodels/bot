@@ -97,11 +97,11 @@ sort > output/namelists_f90.txt
 #compute difference between tex and f90 namelist/keywords
 git diff --no-index output/namelists_f90.txt output/namelists_tex.txt > output/namelists_diff.txt
 
-echo "namelist keywords in FDS source not documented in the FDS users guide" > output/namelists_nodoc.txt
-grep ^- output/namelists_diff.txt                                           >> output/namelists_nodoc.txt
+echo "namelist keywords in the FDS source not documented in the FDS users guide:" > output/namelists_nodoc.txt
+grep ^- output/namelists_diff.txt | sed 's/^-//g' | grep -v \\-\\-               >> output/namelists_nodoc.txt
 
-echo "namelist keywords documented in the FDS users guide but not found in the FDS source" > output/namelists_nosource.txt
-grep ^+ output/namelists_diff.txt  >> output/namelists_nosource.txt
+echo "namelist keywords documented in the FDS users guide but not found in the FDS source:" > output/namelists_nosource.txt
+grep ^+ output/namelists_diff.txt | sed 's/^+//g' | grep -v \\+\\+                         >> output/namelists_nosource.txt
 
 echo "    undocumented namelist keywords: output/namelists_nodoc.txt"
 echo "   unimplemented namelist keywords: output/namelists_nosource.txt"
