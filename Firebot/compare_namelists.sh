@@ -23,9 +23,24 @@ IGNORE_NAMELISTS=`grep ignorenamelists: $tex_dir/*.tex | \
           }\
         }' | \
        tr -d ','`
-# in case all ignorenamelists lines are removed from the .tex files
-if [ "$IGNORE_NAMELISTS" == "" ]; then
-  IGNORE_NAMELISTS="-e /dummy/"
+
+#ignore namelist keywords found on lines beginning with '% ignorenamelistkw' in .tex files in the fds/Manuals/FDS_User_Guide directory
+IGNORE_NAMELISTKW=`grep ignorenamelistkw: $tex_dir/*.tex | \
+	awk -F' ' '\
+	{ \
+	  if(NF>2){ \
+            for(i=3; i<=NF; i++){\
+              print "-e "$i" "\
+            }\
+          }\
+        }' | \
+       tr -d ','`
+
+IGNORE="$IGNORE_NAMELISTS $IGNORE_NAMELISTKW"
+
+# in case there are no '% ignorenamelists' or '% ignorenamelistkw' lines in the tex files
+if [ "$IGNORE" == "" ]; then
+  IGNORE="-e /dummy/"
 fi
 
 # generate list of namelist keywords found in FDS_User_Guide tex files
@@ -65,7 +80,7 @@ tr -d '&' | \
 sed 's/,$//g' | \
 sed 's/,\//\//g' | \
 awk -F',' '{for(i=2; i<=NF; i++){print $1$i}}' | \
-grep -v $IGNORE_NAMELISTS |\
+grep -v $IGNORE |\
 sort > output/namelists_tex.txt
 
 # generate list of namelist keywords found in FDS Fortran 90 source  files
@@ -76,7 +91,7 @@ tr -d ' ' | \
 grep ^NAMELIST | \
 awk -F'/' '{print "/"$2"/,"$3}'  | \
 awk -F',' '{for(i=2; i<=NF; i++){print $1$i}}' | \
-grep -v $IGNORE_NAMELISTS |\
+grep -v $IGNORE |\
 sort > output/namelists_f90.txt
 
 #compute difference between tex and f90 namelist/keywords
