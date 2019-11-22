@@ -1,4 +1,11 @@
 #!/bin/bash
+
+if [ ! -e .fds_git ]; then
+  echo "***error: the script $0 needs to run in the bot/Firebot directory"
+  echo "          $0 aborted"
+  exit 1
+fi
+
 OUTPUT=$1
 NAME_PREFIX=$2
 
