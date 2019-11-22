@@ -1359,7 +1359,9 @@ make_fds_user_guide()
    cd $botrepo/Firebot
    ./compare_namelists.sh $OUTPUT_DIR stage8 > $OUTPUT_DIR/stage8_namelist_check
    NAMELIST_STATUS=`cat $OUTPUT_DIR/stage8_namelist_check | head -1 | awk -F' ' '{print $1}'`
-   NAMELIST_LOG=$OUTPUT_DIR/stage8_namelists_nodocs.txt
+   if [ "$NAMELIST_STATUS" != "0" ]; then
+     NAMELIST_LOG=$OUTPUT_DIR/stage8_namelists_nodoc.txt
+   fi
 }
 
 #---------------------------------------------
@@ -1567,7 +1569,9 @@ email_build_status()
    echo "        start time: $start_time " >> $TIME_LOG
    echo "         stop time: $stop_time " >> $TIME_LOG
    if [ "$NAMELIST_STATUS" != "" ]; then
-     echo "undocumented namelist keywords: $NAMELIST_STATUS " >> $TIME_LOG
+     if [ "$NAMELIST_STATUS" != "0" ]; then
+       echo "undocumented namelist keywords: $NAMELIST_STATUS " >> $TIME_LOG
+     fi
    else
      NAMELIST_LOG=
    fi
