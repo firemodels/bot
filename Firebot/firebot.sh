@@ -1359,6 +1359,7 @@ make_fds_user_guide()
    cd $botrepo/Firebot
    ./compare_namelists.sh stage8 > $OUTPUT_DIR/stage8_namelist_check
    NAMELIST_STATUS=`cat $OUTPUT_DIR/stage8_namelist_check | head -1 | awk -F' ' '{print $1}'`
+   NAMELIST_LOG=$OUTPUT_DIR/stage8_namelists_nodocs.txt
 }
 
 #---------------------------------------------
@@ -1567,6 +1568,8 @@ email_build_status()
    echo "      stop time: $stop_time " >> $TIME_LOG
    if [ "$NAMELIST_STATUS" != "" ]; then
      echo "undoc namelists: $NAMELIST_STATUS " >> $TIME_LOG
+   else
+     NAMELIST_LOG=
    fi
    if [ "$UPLOADGUIDES" == "1" ]; then
    echo " Firebot status:  https://pages.nist.gov/fds-smv/firebot_status.html" >> $TIME_LOG
@@ -1596,7 +1599,7 @@ email_build_status()
      # Send email with failure message and warnings, body of email contains appropriate log file
      echo "[$botuser] $bottype failure and warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH."
      if [ "$HAVE_MAIL" == "1" ]; then
-       cat $ERROR_LOG $TIME_LOG | mail -s "[$botuser] $bottype failure and warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
+       cat $ERROR_LOG $TIME_LOG $NAMELIST_LOG | mail -s "[$botuser] $bottype failure and warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
      fi
 
    # Check for errors only
@@ -1605,7 +1608,7 @@ email_build_status()
       # Send email with failure message, body of email contains error log file
       echo "[$botuser] $bottype failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH."
       if [ "$HAVE_MAIL" == "1" ]; then
-        cat $ERROR_LOG $TIME_LOG | mail -s "[$botuser] $bottype failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
+        cat $ERROR_LOG $TIME_LOG $NAMELIST_LOG | mail -s "[$botuser] $bottype failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
       fi
 
    # Check for warnings only
@@ -1616,7 +1619,7 @@ email_build_status()
       # Send email with success message, include warnings
       echo "[$botuser] $bottype success, with warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH"
       if [ "$HAVE_MAIL" == "1" ]; then
-        cat $WARNING_LOG $TIME_LOG | mail -s "[$botuser] $bottype success, with warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
+        cat $WARNING_LOG $TIME_LOG $NAMELIST_LOG | mail -s "[$botuser] $bottype success, with warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
       fi
 
    # No errors or warnings
@@ -1628,7 +1631,7 @@ email_build_status()
       firebot_status=0
       echo "[$botuser] $bottype success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH"
       if [ "$HAVE_MAIL" == "1" ]; then
-        cat $TIME_LOG | mail -s "[$botuser] $bottype success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
+        cat $TIME_LOG $NAMELIST_LOG | mail -s "[$botuser] $bottype success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
       fi
    fi
 }
