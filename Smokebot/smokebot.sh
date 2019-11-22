@@ -1399,12 +1399,15 @@ email_build_status()
       cat $GIT_ROOT_LOG_FILE >> $TIME_LOG
     fi
   fi
-  if [ "$NAMELIST_STATUS" != "" ]; then
-    if [ "$NAMELIST_STATUS" != "0" ]; then
-     echo "undocumented namelist keywords: $NAMELIST_STATUS" >> $TIME_LOG
+  if [ "$NAMELIST_NODOC_STATUS" != "" ]; then
+    if [ "$NAMELIST_NODOC_STATUS" == "0" ]; then
+     echo "undocumented namelist keywords: $NAMELIST_NODOC_STATUS" >> $TIME_LOG
     fi
   else
-    NAMELIST_LOG=
+    NAMELIST_NODOC_LOG=
+  fi
+  if [ "$NAMELIST_NOSOURCE_STATUS" == "" ]; then
+    NAMELIST_NOSOURCE_LOG=
   fi
   cd $smokebotdir
   # Check for warnings and errors
@@ -1418,19 +1421,20 @@ email_build_status()
     fi
   fi
   echo "-------------------------------" >> $TIME_LOG
+  NAMELIST_LOGS="$NAMELIST_NODOC_LOG $NAMELIST_NOSOURCE_LOG"
   if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]; then
     # Send email with failure message and warnings, body of email contains appropriate log file
-    cat $ERROR_LOG $TIME_LOG $NAMELIST_LOG | mail -s "smokebot failure and warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+    cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "smokebot failure and warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
 
   # Check for errors only
   elif [ -e $ERROR_LOG ]; then
     # Send email with failure message, body of email contains error log file
-    cat $ERROR_LOG $TIME_LOG $NAMELIST_LOG | mail -s "smokebot failure on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+    cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "smokebot failure on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
 
   # Check for warnings only
   elif [ -e $WARNING_LOG ]; then
      # Send email with success message, include warnings
-    cat $WARNING_LOG $TIME_LOG $NAMELIST_LOG | mail -s "smokebot success with warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+    cat $WARNING_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "smokebot success with warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
 
   # No errors or warnings
   else
@@ -1443,7 +1447,7 @@ email_build_status()
 
       # Send success message with links to nightly manuals
 
-    cat $TIME_LOG $NAMELIST_LOG | mail -s "smokebot success on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+    cat $TIME_LOG $NAMELIST_LOGS | mail -s "smokebot success on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
 
 # save apps that were built for bundling
 
@@ -2074,9 +2078,13 @@ if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]] && [[ "$BUILD_ONLY" == ""
 
   cd $botrepo/Firebot
   ./compare_namelists.sh $OUTPUT_DIR stage4 > $OUTPUT_DIR/stage4_namelist_check
-  NAMELIST_STATUS=`cat $OUTPUT_DIR/stage4_namelist_check | head -1 | awk -F' ' '{print $1}'`
-  if [ "$NAMELIST_STATUS" != "0" ]; then
-    NAMELIST_LOG=$OUTPUT_DIR/stage4_namelists_nodoc.txt
+  NAMELIST_NODOC_STATUS=`cat $OUTPUT_DIR/stage4_namelist_check | head -1 | awk -F' ' '{print $1}'`
+  if [ "$NAMELIST_NODOC_STATUS" != "0" ]; then
+    NAMELIST_NODOC_LOG=$OUTPUT_DIR/stage4_namelists_nodoc.txt
+  fi
+  NAMELIST_NOSOURCE_STATUS=`cat $OUTPUT_DIR/stage4_namelist_check | tail -1 | awk -F' ' '{print $1}'`
+  if [ "$NAMELIST_NOSOURCE_STATUS" != "0" ]; then
+    NAMELIST_NOSOURCE_LOG=$OUTPUT_DIR/stage4_namelists_nosource.txt
   fi
 fi
 
