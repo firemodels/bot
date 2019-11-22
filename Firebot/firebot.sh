@@ -1357,7 +1357,7 @@ make_fds_user_guide()
    check_guide $OUTPUT_DIR/stage8_fds_user_guide $fdsrepo/Manuals/FDS_User_Guide/FDS_User_Guide.pdf 'FDS User Guide' 1
 
    cd $botrepo/Firebot
-   ./compare_namelists.sh stage8 > $OUTPUT_DIR/stage8_namelist_check
+   ./compare_namelists.sh $OUTPUT_DIR stage8 > $OUTPUT_DIR/stage8_namelist_check
    NAMELIST_STATUS=`cat $OUTPUT_DIR/stage8_namelist_check | head -1 | awk -F' ' '{print $1}'`
    NAMELIST_LOG=$OUTPUT_DIR/stage8_namelists_nodocs.txt
 }
