@@ -2071,7 +2071,7 @@ if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]] && [[ "$BUILD_ONLY" == ""
   fi
 
   cd $botrepo/Firebot
-  ./compare_namelists.sh stage4 > $OUTPUT_DIR/stage4_namelist_check
+  ./compare_namelists.sh $OUTPUT_DIR stage4 > $OUTPUT_DIR/stage4_namelist_check
   NAMELIST_STATUS=`cat $OUTPUT_DIR/stage4_namelist_check | head -1 | awk -F' ' '{print $1}'`
   NAMELIST_LOG=$OUTPUT_DIR/stage4_namelists_nodocs.txt
 fi

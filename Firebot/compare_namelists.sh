@@ -2,9 +2,14 @@
 OUTPUT=$1
 NAME_PREFIX=$2
 
+if [ "$OUTPUT" == "" ]; then
+  OUTPUT=output
+fi
+
 if [ "$NAME_PREFIX" != "" ]; then
   NAME_PREFIX=${NAME_PREFIX}_
 fi
+
 NAMELIST_F90=$OUTPUT/${NAME_PREFIX}namelists_f90.txt
 NAMELIST_TEX=$OUTPUT/${NAME_PREFIX}namelists_tex.txt
 NAMELIST_DIFF=$OUTPUT/${NAME_PREFIX}namelists_diff.txt
