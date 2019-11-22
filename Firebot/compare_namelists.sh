@@ -1,17 +1,18 @@
 #!/bin/bash
-NAME_PREFIX=$1
+OUTPUT=$1
+NAME_PREFIX=$2
 
 if [ "$NAME_PREFIX" != "" ]; then
   NAME_PREFIX=${NAME_PREFIX}_
 fi
-NAMELIST_F90=output/${NAME_PREFIX}namelists_f90.txt
-NAMELIST_TEX=output/${NAME_PREFIX}namelists_tex.txt
-NAMELIST_DIFF=output/${NAME_PREFIX}namelists_diff.txt
-NAMELIST_NODOC=output/${NAME_PREFIX}namelists_nodoc.txt
-NAMELIST_NOSOURCE=output/${NAME_PREFIX}namelists_nosource.txt
+NAMELIST_F90=$OUTPUT/${NAME_PREFIX}namelists_f90.txt
+NAMELIST_TEX=$OUTPUT/${NAME_PREFIX}namelists_tex.txt
+NAMELIST_DIFF=$OUTPUT/${NAME_PREFIX}namelists_diff.txt
+NAMELIST_NODOC=$OUTPUT/${NAME_PREFIX}namelists_nodoc.txt
+NAMELIST_NOSOURCE=$OUTPUT/${NAME_PREFIX}namelists_nosource.txt
 
 #remove files from last comparison
-rm -f output/*namelists*txt
+rm -f $OUTPUT/*namelists*txt
 
 # FDS UG directory
 tex_dir=../../fds/Manuals/FDS_User_Guide/
