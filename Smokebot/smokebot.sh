@@ -1400,7 +1400,7 @@ fi
     fi
   fi
   if [ "$NAMELIST_STATUS" != "" ]; then
-     echo "  undoc namelist kws: $NAMELIST_STATUS" >> $TIME_LOG
+     echo "undocumented namelist keywords: $NAMELIST_STATUS" >> $TIME_LOG
   else
     NAMELIST_LOG=
   fi

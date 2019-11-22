@@ -1567,7 +1567,7 @@ email_build_status()
    echo "        start time: $start_time " >> $TIME_LOG
    echo "         stop time: $stop_time " >> $TIME_LOG
    if [ "$NAMELIST_STATUS" != "" ]; then
-     echo "undoc namelist kws: $NAMELIST_STATUS " >> $TIME_LOG
+     echo "undocumented namelist keywords: $NAMELIST_STATUS " >> $TIME_LOG
    else
      NAMELIST_LOG=
    fi
