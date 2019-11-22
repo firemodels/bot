@@ -4,7 +4,7 @@ NAME_PREFIX=$1
 if [ "$NAME_PREFIX" != "" ]; then
   NAME_PREFIX=${NAME_PREFIX}_
 fi
-NAMELIST_F90=output/${NAME_PREFIX}namelist_f90.txt
+NAMELIST_F90=output/${NAME_PREFIX}namelists_f90.txt
 NAMELIST_TEX=output/${NAME_PREFIX}namelists_tex.txt
 NAMELIST_DIFF=output/${NAME_PREFIX}namelists_diff.txt
 NAMELIST_NODOC=output/${NAME_PREFIX}namelists_nodoc.txt
