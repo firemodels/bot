@@ -1553,26 +1553,26 @@ email_build_status()
       echo "Note: only VV cases with debug FDS were run" >> $TIME_LOG
       echo "" >> $TIME_LOG
    fi
-   echo "           host: $hostname " >> $TIME_LOG
-   echo "             OS: $platform2 " >> $TIME_LOG
-   echo "           repo: $repo " >> $TIME_LOG
-   echo "          queue: $QUEUE " >> $TIME_LOG
-   echo "   fds revision: $FDS_REVISION " >> $TIME_LOG
-   echo "     fds branch: $FDSBRANCH "    >> $TIME_LOG
-   echo "   smv revision: $SMV_REVISION " >> $TIME_LOG
-   echo "     smv branch: $SMVBRANCH "    >> $TIME_LOG
+   echo "              host: $hostname " >> $TIME_LOG
+   echo "                OS: $platform2 " >> $TIME_LOG
+   echo "              repo: $repo " >> $TIME_LOG
+   echo "             queue: $QUEUE " >> $TIME_LOG
+   echo "      fds revision: $FDS_REVISION " >> $TIME_LOG
+   echo "        fds branch: $FDSBRANCH "    >> $TIME_LOG
+   echo "      smv revision: $SMV_REVISION " >> $TIME_LOG
+   echo "        smv branch: $SMVBRANCH "    >> $TIME_LOG
    if [ "$IFORT_VERSION" != "" ]; then
-      echo "        Fortran: $IFORT_VERSION " >> $TIME_LOG
+      echo "           Fortran: $IFORT_VERSION " >> $TIME_LOG
    fi
-   echo "     start time: $start_time " >> $TIME_LOG
-   echo "      stop time: $stop_time " >> $TIME_LOG
+   echo "        start time: $start_time " >> $TIME_LOG
+   echo "         stop time: $stop_time " >> $TIME_LOG
    if [ "$NAMELIST_STATUS" != "" ]; then
-     echo "undoc namelists: $NAMELIST_STATUS " >> $TIME_LOG
+     echo "undoc namelist kws: $NAMELIST_STATUS " >> $TIME_LOG
    else
      NAMELIST_LOG=
    fi
    if [ "$UPLOADGUIDES" == "1" ]; then
-   echo " Firebot status:  https://pages.nist.gov/fds-smv/firebot_status.html" >> $TIME_LOG
+   echo "    Firebot status:  https://pages.nist.gov/fds-smv/firebot_status.html" >> $TIME_LOG
    fi
    echo "-------------------------------" >> $TIME_LOG
 

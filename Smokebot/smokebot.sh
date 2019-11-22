@@ -1399,6 +1399,11 @@ fi
       cat $GIT_ROOT_LOG_FILE >> $TIME_LOG
     fi
   fi
+  if [ "$NAMELIST_STATUS" != "" ]; then
+     echo "  undoc namelist kws: $NAMELIST_STATUS" >> $TIME_LOG
+  else
+    NAMELIST_LOG=
+  fi
    cd $smokebotdir
    # Check for warnings and errors
    if [ "$WEB_URL" != "" ]; then
@@ -1413,17 +1418,17 @@ fi
    echo "-------------------------------" >> $TIME_LOG
    if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]; then
      # Send email with failure message and warnings, body of email contains appropriate log file
-     cat $ERROR_LOG $TIME_LOG | mail -s "smokebot failure and warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+     cat $ERROR_LOG $TIME_LOG $NAMELIST_LOG | mail -s "smokebot failure and warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
 
    # Check for errors only
    elif [ -e $ERROR_LOG ]; then
       # Send email with failure message, body of email contains error log file
-      cat $ERROR_LOG $TIME_LOG | mail -s "smokebot failure on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+      cat $ERROR_LOG $TIME_LOG $NAMELIST_LOG | mail -s "smokebot failure on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
 
    # Check for warnings only
    elif [ -e $WARNING_LOG ]; then
      # Send email with success message, include warnings
-     cat $WARNING_LOG $TIME_LOG | mail -s "smokebot success with warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+     cat $WARNING_LOG $TIME_LOG $NAMELIST_LOG | mail -s "smokebot success with warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
 
    # No errors or warnings
    else
@@ -1436,7 +1441,7 @@ fi
 
       # Send success message with links to nightly manuals
 
-      cat $TIME_LOG | mail -s "smokebot success on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+      cat $TIME_LOG $NAMELIST_LOG | mail -s "smokebot success on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
 
 # save apps that were built for bundling
 
@@ -2064,6 +2069,11 @@ if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]] && [[ "$BUILD_ONLY" == ""
   else
      echo Errors found, not building guides
   fi
+
+  cd $botrepo/Firebot
+  ./compare_namelists.sh stage4 > $OUTPUT_DIR/stage4_namelist_check
+  NAMELIST_STATUS=`cat $OUTPUT_DIR/stage4_namelist_check | head -1 | awk -F' ' '{print $1}'`
+  NAMELIST_LOG=$OUTPUT_DIR/stage4_namelists_nodocs.txt
 fi
 
 MAKEGUIDES_end=`GET_TIME`
