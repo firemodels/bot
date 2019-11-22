@@ -128,22 +128,22 @@ sort > $NAMELIST_F90
 #compute difference between tex and f90 namelist/keywords
 git diff --no-index $NAMELIST_F90 $NAMELIST_TEX                                  > $NAMELIST_DIFF
 
-nlinesundoc=`grep ^- $NAMELIST_DIFF | sed 's/^-//g' | grep -v Firebot | wc -l`
-echo "$nlinesundoc undocumented namelist keywords:"                              > $NAMELIST_NODOC
+nlines_nodoc=`grep ^- $NAMELIST_DIFF | sed 's/^-//g' | grep -v Firebot | wc -l`
+echo "$nlines_nodoc undocumented namelist keywords:"                              > $NAMELIST_NODOC
 grep ^- $NAMELIST_DIFF | sed 's/^-//g' | grep -v \\-\\-                         >> $NAMELIST_NODOC
 
-nlinesunimp=`grep ^+ $NAMELIST_DIFF | sed 's/^+//g' | grep -v \\+\\+ | wc -l`
-echo "$nlinesunimp unimplemented namelist keywords:"                             > $NAMELIST_NOSOURCE
+nlines_nosource=`grep ^+ $NAMELIST_DIFF | sed 's/^+//g' | grep -v \\+\\+ | wc -l`
+echo "$nlines_nosource unimplemented namelist keywords:"                             > $NAMELIST_NOSOURCE
 grep ^+ $NAMELIST_DIFF | sed 's/^+//g' | grep -v \\+\\+                         >> $NAMELIST_NOSOURCE
 
-if [ "$nlinesundoc" == "0" ]; then
-  echo "$nlinesundoc undocumented namelist keywords"
+if [ "$nlines_nodoc" == "0" ]; then
+  echo "$nlines_nodoc undocumented namelist keywords"
 else
-  echo "$nlinesundoc undocumented namelist keywords: $NAMELIST_NODOC"
+  echo "$nlines_nodoc undocumented namelist keywords: $NAMELIST_NODOC"
 fi
-if [ "$nlinesunimp" == "0" ]; then
-  echo "$nlinesunimp unimplemented namelist keywords"
+if [ "$nlines_nosource" == "0" ]; then
+  echo "$nlines_nosource unimplemented namelist keywords"
 else
-  echo "$nlinesunimp unimplemented namelist keywords: $NAMELIST_NOSOURCE"
+  echo "$nlines_nosource unimplemented namelist keywords: $NAMELIST_NOSOURCE"
 fi
 
