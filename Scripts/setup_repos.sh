@@ -138,6 +138,7 @@ for repo in $repos
 do 
   echo
   repo_out=$repo
+  WIKIWEB=
 
   cd $FMROOT
 
