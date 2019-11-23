@@ -1338,53 +1338,53 @@ save_manuals_dir()
 
 email_build_status()
 {
-   if [[ "$THIS_FDS_FAILED" == "1" ]] ; then
-     mailTo="$mailToFDS"
-   fi
-   if [[ "$THIS_CFAST_FAILED" == "1" ]] ; then
-     mailTo="$mailToCFAST"
-   fi
-   echo $THIS_FDS_FAILED>$FDS_STATUS_FILE
-   stop_time=`date`
-   IFORT_VERSION=`ifort -v 2>&1`
-   echo "----------------------------------------------" > $TIME_LOG
-   echo "                host: $hostname " >> $TIME_LOG
-   echo "                  OS: $platform2" >> $TIME_LOG
-   echo "                repo: $repo" >> $TIME_LOG
-   echo "               queue: $SMOKEBOT_QUEUE" >> $TIME_LOG
-   echo "  fds version/branch: $FDS_REVISION/$FDSBRANCH" >> $TIME_LOG
-   echo "  smv version/branch: $SMV_REVISION/$SMVBRANCH" >> $TIME_LOG
-   echo "cfast version/branch: $CFAST_REVISION/$CFASTBRANCH" >> $TIME_LOG
-if [ "$IFORT_VERSION" != "" ]; then
-   echo "              Fortran: $IFORT_VERSION " >> $TIME_LOG
-fi
-   echo "          start time: $start_time " >> $TIME_LOG
-   echo "           stop time: $stop_time " >> $TIME_LOG
-   echo "               setup: $DIFF_PRELIM" >> $TIME_LOG
-   echo "      build software: $DIFF_BUILDSOFTWARE" >> $TIME_LOG
-   echo "           run cases: $DIFF_RUNCASES" >> $TIME_LOG
-   echo "       make pictures: $DIFF_MAKEPICTURES" >> $TIME_LOG
-   if [ "$MAKEMOVIES" == "1" ]; then
-     echo "         make movies: $DIFF_MAKEMOVIES" >> $TIME_LOG
-   fi
-   echo "         make guides: $DIFF_MAKEGUIDES" >> $TIME_LOG
-   echo "               total: $DIFF_SCRIPT_TIME" >> $TIME_LOG
-   echo "   benchmark time(s): $TOTAL_SMV_TIMES" >> $TIME_LOG
-   DISPLAY_FDS_REVISION=
-   DISPLAY_SMV_REVISION=
-   if [ "$RUNAUTO" == "y" ]; then
-     DISPLAY_FDS_REVISION=1
-     DISPLAY_SMV_REVISION=1
-   fi
-   if [ "$RUNAUTO" == "Y" ]; then
-     DISPLAY_SMV_REVISION=1
-   fi
-   if [ "$DISPLAY_FDS_REVISION" == "1" ]; then
-     echo "   FDS revisions: old: $LAST_FDS_REVISION new: $THIS_FDS_REVISION" >> $TIME_LOG
-   fi
-   if [ "$DISPLAY_SMV_REVISION" == "1" ]; then
-     echo "   SMV revisions: old: $LAST_SMV_REVISION new: $THIS_SMV_REVISION" >> $TIME_LOG
-   fi
+  if [[ "$THIS_FDS_FAILED" == "1" ]] ; then
+    mailTo="$mailToFDS"
+  fi
+  if [[ "$THIS_CFAST_FAILED" == "1" ]] ; then
+    mailTo="$mailToCFAST"
+  fi
+  echo $THIS_FDS_FAILED>$FDS_STATUS_FILE
+  stop_time=`date`
+  IFORT_VERSION=`ifort -v 2>&1`
+  echo "----------------------------------------------" > $TIME_LOG
+  echo "                host: $hostname " >> $TIME_LOG
+  echo "                  OS: $platform2" >> $TIME_LOG
+  echo "                repo: $repo" >> $TIME_LOG
+  echo "               queue: $SMOKEBOT_QUEUE" >> $TIME_LOG
+  echo "  fds version/branch: $FDS_REVISION/$FDSBRANCH" >> $TIME_LOG
+  echo "  smv version/branch: $SMV_REVISION/$SMVBRANCH" >> $TIME_LOG
+  echo "cfast version/branch: $CFAST_REVISION/$CFASTBRANCH" >> $TIME_LOG
+  if [ "$IFORT_VERSION" != "" ]; then
+    echo "              Fortran: $IFORT_VERSION " >> $TIME_LOG
+  fi
+  echo "          start time: $start_time " >> $TIME_LOG
+  echo "           stop time: $stop_time " >> $TIME_LOG
+  echo "               setup: $DIFF_PRELIM" >> $TIME_LOG
+  echo "      build software: $DIFF_BUILDSOFTWARE" >> $TIME_LOG
+  echo "           run cases: $DIFF_RUNCASES" >> $TIME_LOG
+  echo "       make pictures: $DIFF_MAKEPICTURES" >> $TIME_LOG
+  if [ "$MAKEMOVIES" == "1" ]; then
+    echo "         make movies: $DIFF_MAKEMOVIES" >> $TIME_LOG
+  fi
+  echo "         make guides: $DIFF_MAKEGUIDES" >> $TIME_LOG
+  echo "               total: $DIFF_SCRIPT_TIME" >> $TIME_LOG
+  echo "   benchmark time(s): $TOTAL_SMV_TIMES" >> $TIME_LOG
+  DISPLAY_FDS_REVISION=
+  DISPLAY_SMV_REVISION=
+  if [ "$RUNAUTO" == "y" ]; then
+    DISPLAY_FDS_REVISION=1
+    DISPLAY_SMV_REVISION=1
+  fi
+  if [ "$RUNAUTO" == "Y" ]; then
+    DISPLAY_SMV_REVISION=1
+  fi
+  if [ "$DISPLAY_FDS_REVISION" == "1" ]; then
+    echo "   FDS revisions: old: $LAST_FDS_REVISION new: $THIS_FDS_REVISION" >> $TIME_LOG
+  fi
+  if [ "$DISPLAY_SMV_REVISION" == "1" ]; then
+    echo "   SMV revisions: old: $LAST_SMV_REVISION new: $THIS_SMV_REVISION" >> $TIME_LOG
+  fi
   SOURCE_CHANGED=
   if [[ $THIS_SMV_REVISION != $LAST_SMV_REVISION ]] ; then
     SOURCE_CHANGED=1
@@ -1399,56 +1399,67 @@ fi
       cat $GIT_ROOT_LOG_FILE >> $TIME_LOG
     fi
   fi
-   cd $smokebotdir
-   # Check for warnings and errors
-   if [ "$WEB_URL" != "" ]; then
-     echo "     Smokebot summary: $WEB_URL" >> $TIME_LOG
-   fi
-   if [ "$UPLOADRESULTS" == "1" ]; then
-     echo "      Smokebot status: https://pages.nist.gov/fds-smv/smokebot_status.html" >> $TIME_LOG
-     if [ "$GUIDESURL" != "" ]; then
-       echo "        latest guides: $GUIDESURL" >> $TIME_LOG
-     fi
-   fi
-   echo "-------------------------------" >> $TIME_LOG
-   if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]; then
-     # Send email with failure message and warnings, body of email contains appropriate log file
-     cat $ERROR_LOG $TIME_LOG | mail -s "smokebot failure and warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+  if [ "$NAMELIST_NODOC_STATUS" != "" ]; then
+    if [ "$NAMELIST_NODOC_STATUS" == "0" ]; then
+     echo "undocumented namelist keywords: $NAMELIST_NODOC_STATUS" >> $TIME_LOG
+    fi
+  else
+    NAMELIST_NODOC_LOG=
+  fi
+  if [ "$NAMELIST_NOSOURCE_STATUS" == "" ]; then
+    NAMELIST_NOSOURCE_LOG=
+  fi
+  cd $smokebotdir
+  # Check for warnings and errors
+  if [ "$WEB_URL" != "" ]; then
+    echo "     Smokebot summary: $WEB_URL" >> $TIME_LOG
+  fi
+  if [ "$UPLOADRESULTS" == "1" ]; then
+    echo "      Smokebot status: https://pages.nist.gov/fds-smv/smokebot_status.html" >> $TIME_LOG
+    if [ "$GUIDESURL" != "" ]; then
+      echo "        latest guides: $GUIDESURL" >> $TIME_LOG
+    fi
+  fi
+  echo "-------------------------------" >> $TIME_LOG
+  NAMELIST_LOGS="$NAMELIST_NODOC_LOG $NAMELIST_NOSOURCE_LOG"
+  if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]; then
+    # Send email with failure message and warnings, body of email contains appropriate log file
+    cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "smokebot failure and warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
 
-   # Check for errors only
-   elif [ -e $ERROR_LOG ]; then
-      # Send email with failure message, body of email contains error log file
-      cat $ERROR_LOG $TIME_LOG | mail -s "smokebot failure on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+  # Check for errors only
+  elif [ -e $ERROR_LOG ]; then
+    # Send email with failure message, body of email contains error log file
+    cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "smokebot failure on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
 
-   # Check for warnings only
-   elif [ -e $WARNING_LOG ]; then
+  # Check for warnings only
+  elif [ -e $WARNING_LOG ]; then
      # Send email with success message, include warnings
-     cat $WARNING_LOG $TIME_LOG | mail -s "smokebot success with warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+    cat $WARNING_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "smokebot success with warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
 
-   # No errors or warnings
-   else
+  # No errors or warnings
+  else
 # upload guides to a google drive directory
-      if [ "$UPLOADRESULTS" == "1" ]; then
-        cd $smokebotdir
-        $UploadGuides $NEWGUIDE_DIR $smvrepo/Manuals &> /dev/null
-        $UploadWEB                  $smvrepo/Manuals $MAKEMOVIES &> /dev/null
-      fi
+    if [ "$UPLOADRESULTS" == "1" ]; then
+      cd $smokebotdir
+      $UploadGuides $NEWGUIDE_DIR $smvrepo/Manuals &> /dev/null
+      $UploadWEB                  $smvrepo/Manuals $MAKEMOVIES &> /dev/null
+    fi
 
       # Send success message with links to nightly manuals
 
-      cat $TIME_LOG | mail -s "smokebot success on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+    cat $TIME_LOG $NAMELIST_LOGS | mail -s "smokebot success on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
 
 # save apps that were built for bundling
 
-      rm -f $APPS_DIR/*
-      cp $LATESTAPPS_DIR/* $APPS_DIR/.
+    rm -f $APPS_DIR/*
+    cp $LATESTAPPS_DIR/* $APPS_DIR/.
 
-      rm -f $BRANCHAPPS_DIR/*
-      cp $LATESTAPPS_DIR/* $BRANCHAPPS_DIR/.
+    rm -f $BRANCHAPPS_DIR/*
+    cp $LATESTAPPS_DIR/* $BRANCHAPPS_DIR/.
 
-      rm -f $BRANCHPUBS_DIR/*
-      cp $LATESTPUBS_DIR/* $BRANCHPUBS_DIR/.
-   fi
+    rm -f $BRANCHPUBS_DIR/*
+    cp $LATESTPUBS_DIR/* $BRANCHPUBS_DIR/.
+  fi
 }
 
 #VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
@@ -2063,6 +2074,17 @@ if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]] && [[ "$BUILD_ONLY" == ""
      fi
   else
      echo Errors found, not building guides
+  fi
+
+  cd $botrepo/Firebot
+  ./compare_namelists.sh $OUTPUT_DIR stage4 > $OUTPUT_DIR/stage4_namelist_check
+  NAMELIST_NODOC_STATUS=`cat $OUTPUT_DIR/stage4_namelist_check | head -1 | awk -F' ' '{print $1}'`
+  if [ "$NAMELIST_NODOC_STATUS" != "0" ]; then
+    NAMELIST_NODOC_LOG=$OUTPUT_DIR/stage4_namelists_nodoc.txt
+  fi
+  NAMELIST_NOSOURCE_STATUS=`cat $OUTPUT_DIR/stage4_namelist_check | tail -1 | awk -F' ' '{print $1}'`
+  if [ "$NAMELIST_NOSOURCE_STATUS" != "0" ]; then
+    NAMELIST_NOSOURCE_LOG=$OUTPUT_DIR/stage4_namelists_nosource.txt
   fi
 fi
 

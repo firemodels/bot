@@ -70,11 +70,15 @@ cd %CURDIR%
 
 goto eof
 
+::-----------------------------------------------------------------------
 :create_repo
+::-----------------------------------------------------------------------
   set repo=%1
   set repo_out=%repo%
   
   echo -----------------------------------------------------------
+
+  set WIKIWEB=
 
   if "%repo%" == "fds.wiki" (
      set repo_out=wikis
@@ -129,14 +133,18 @@ goto eof
   git remote update
   exit /b
 
+::-----------------------------------------------------------------------
 :at_github
+::-----------------------------------------------------------------------
   set repo=%1
   git ls-remote %GITHEADER%%GITUSER%/%repo%.git 1> %CURDIR%\gitstatus.out 2>&1
   type %CURDIR%\gitstatus.out | %grep% ERROR | %wc% -l > %CURDIR%\gitstatus2.out
   set /p git_not_found=<%CURDIR%\gitstatus2.out
   exit /b
 
+::-----------------------------------------------------------------------
 :getopts
+::-----------------------------------------------------------------------
  set stopscript=0
  if (%1)==() exit /b
  set valid=0
@@ -188,7 +196,9 @@ goto eof
 if not (%1)==() goto getopts
 exit /b
 
+::-----------------------------------------------------------------------
 :usage
+::-----------------------------------------------------------------------
 echo Setup repos ( default: %repos% ) 
 echo used by cfast, fds and/or smokeview
 echo.
@@ -202,6 +212,8 @@ echo -T - setup only fds and smv repos - erase repos first
 echo -w - setup wiki and webpage repos cloned from firemodels
 exit /b
 
+::-----------------------------------------------------------------------
 :eof
+::-----------------------------------------------------------------------
 if exist %CURDIR%\gitstatus.out erase %CURDIR%\gitstatus.out
 if exist %CURDIR%\gitstatus.out erase %CURDIR%\gitstatus2.out

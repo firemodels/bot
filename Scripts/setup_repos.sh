@@ -118,6 +118,8 @@ else
    GITHEADER="https://github.com/"
    GITUSER=`git remote -v | grep origin | head -1 | awk -F '.' '{print $2}' | awk -F\/ '{print $2}'`
 fi
+echo GITHEADER=$GITHEADER
+echo GITUSER=$GITUSER
 
 if [ "$eraserepos" == "" ]; then
   echo "You are about to clone the repos: $repos"
@@ -136,6 +138,7 @@ for repo in $repos
 do 
   echo
   repo_out=$repo
+  WIKIWEB=
 
   cd $FMROOT
 
