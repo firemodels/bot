@@ -33,6 +33,7 @@ input_dir=../../fds/Source
 
 #ignore namelists found on lines beginning with '% ignorenamelists' in .tex files in the fds/Manuals/FDS_User_Guide directory
 IGNORE_NAMELISTS=`grep ignorenamelists: $tex_dir/*.tex | \
+sed 's/ *,/,/g' | \
 	awk -F' ' '\
 	{ \
 	  if(NF>2){ \
@@ -45,6 +46,7 @@ IGNORE_NAMELISTS=`grep ignorenamelists: $tex_dir/*.tex | \
 
 #ignore namelist keywords found on lines beginning with '% ignorenamelistkw' in .tex files in the fds/Manuals/FDS_User_Guide directory
 IGNORE_NAMELISTKW=`grep ignorenamelistkw: $tex_dir/*.tex | \
+sed 's/ *,/,/g' | \
 	awk -F' ' '\
 	{ \
 	  if(NF>2){ \
@@ -57,6 +59,7 @@ IGNORE_NAMELISTKW=`grep ignorenamelistkw: $tex_dir/*.tex | \
 
 #ignore namelist keywords found that occur on any namelist
 IGNORE_ALLKW=`grep ignoreallkw: $tex_dir/*.tex | \
+sed 's/ *,/,/g' | \
 	awk -F' ' '\
 	{ \
 	  if(NF>2){ \
