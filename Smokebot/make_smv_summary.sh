@@ -47,7 +47,7 @@ cat << EOF
 <a href="manuals.html"><font size=5>Manuals</font></a> 
 
 <p><table>
-<tr><td valign=middle>Version info:</td><td><img width=400 src="images/fds_smv_version.png"></td></tr>
+<tr><td><img width=400 src="images/fds_smv_version.png"></td></tr>
 </table>
 <div id="curve_chart" style="width: 500px; height: 300px"></div>
 
