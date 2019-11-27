@@ -318,6 +318,13 @@ cat << EOF
 </tr>
 
 <tr>
+<th>levelset2</th>
+<td><a href="images/levelset2_100.png"><img width=200 src="images/levelset2_100.png"></a></td>
+<td><a href="images/levelset2_200.png"><img width=200 src="images/levelset2_200.png"></a></td>
+<td><a href="images/levelset2_300.png"><img width=200 src="images/levelset2_300.png"></a></td>
+</tr>
+
+<tr>
 <th>levelset<br>terrain</th>
 <td><a href="images/BT10m_2x2km_LS_0000.png"><img width=200 src="images/BT10m_2x2km_LS_0000.png"></a></td>
 <td><a href="images/BT10m_2x2km_LS_0600.png"><img width=200 src="images/BT10m_2x2km_LS_0600.png"></a></td>
