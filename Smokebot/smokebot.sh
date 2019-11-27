@@ -1085,12 +1085,17 @@ check_smv_pictures()
    fi
    if [[ "$web_DIR" != "" ]] && [[ -d $SMV_SUMMARY_REPO ]]; then
      CURDIR=`pwd`
+     web_temp=/tmp/web_dir.$$
+     mkdir $web_temp
+     if [ -d $web_DIR/movies ]; then
+       cp -r $web_DIR/movies $web_temp/.
+     fi
      cd $web_DIR
-     rm -rf images
-     rm -rf manuals
-     rm index.html
+     rm -rf *
      cd $SMV_SUMMARY_REPO
-     cp -r * $web_DIR/.
+     cp -r * $web_temp/.
+     cp -r $web_temp/* $web_DIR/.
+     rm -r $web_temp
      cd $CURDIR
    fi
 
