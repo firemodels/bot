@@ -1158,7 +1158,6 @@ generate_timing_stats()
    cd $smvrepo/Verification/scripts/
    export QFDS="$smvrepo/Verification/scripts/copyout.sh"
    export RUNCFAST="$smvrepo/Verification/scripts/copyout.sh"
-   export RUNTFDS="$smvrepo/Verification/scripts/copyout.sh"
 
    cd $smvrepo/Verification
    scripts/SMV_Cases.sh
