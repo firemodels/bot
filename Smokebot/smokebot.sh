@@ -1083,7 +1083,7 @@ check_smv_pictures()
       grep -A 2 -I -E "Warning" $OUTPUT_DIR/stage4b >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
-   if [[ "$web_DIR" != "" ]] && [[ -d $SMV_SUMMARY_REPO ]]; then
+   if [[ "$web_DIR" != "" ]] && [[ -d $SMV_SUMMARY_DIR ]]; then
      CURDIR=`pwd`
      web_temp=/tmp/web_dir.$$
      mkdir $web_temp
@@ -1092,7 +1092,7 @@ check_smv_pictures()
      fi
      cd $web_DIR
      rm -rf *
-     cd $SMV_SUMMARY_REPO
+     cd $SMV_SUMMARY_DIR
      cp -r * $web_temp/.
      cp -r $web_temp/* $web_DIR/.
      rm -r $web_temp
@@ -1141,11 +1141,11 @@ check_smv_movies()
       grep -I -E "Warning" $OUTPUT_DIR/stage4c >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
-   if [[ "$web_DIR" != "" ]] && [[ -d $SMV_SUMMARY_REPO ]]; then 
+   if [[ "$web_DIR" != "" ]] && [[ -d $SMV_SUMMARY_DIR ]]; then 
      CURDIR=`pwd`
      cd $web_DIR
      rm -rf *
-     cd $SMV_SUMMARY_REPO
+     cd $SMV_SUMMARY_DIR
      cp -r * $web_DIR/.
      cd $CURDIR
    fi
@@ -1809,7 +1809,7 @@ echo ""
 
 cd
 
-SMV_SUMMARY_REPO=$smvrepo/Manuals/SMV_Summary
+SMV_SUMMARY_DIR=$smvrepo/Manuals/SMV_Summary
 
 UploadGuides=$botrepo/Smokebot/smv_guides2GD.sh
 UploadWEB=$botrepo/Smokebot/smv_web2GD.sh
