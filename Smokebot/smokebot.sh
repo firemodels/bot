@@ -1189,10 +1189,10 @@ archive_timing_stats()
     cd $botrepo/Smokebot
     ./smvstatus_updatepub.sh $repo/webpages $WEBBRANCH
   fi
-  if [ "$web_DIR" != "" ]; then
-    cd $botrepo/Smokebot
-    ./make_smv_summary.sh > $web_DIR/index.html
-  fi
+#  if [ "$web_DIR" != "" ]; then
+#    cd $botrepo/Smokebot
+#    ./make_smv_summary.sh > $web_DIR/index.html
+#  fi
 }
 
 #---------------------------------------------
