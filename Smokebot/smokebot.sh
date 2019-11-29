@@ -562,7 +562,7 @@ run_verification_cases_debug()
 
    # Submit SMV verification cases and wait for them to start
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3a 2>&1
-   ./Run_SMV_Cases.sh $INTEL2 $YOPT -c $cfastrepo -I $COMPILER $USEINSTALL2 -m 2 -d -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3a 2>&1
+   ./Run_SMV_Cases.sh $INTEL2 $YOPT -c $cfastrepo -I $COMPILER $USEINSTALL2 -j $JOBPREFIX -m 2 -d -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3a 2>&1
 }
 
 #---------------------------------------------
@@ -866,7 +866,7 @@ run_verification_cases_release()
    # Start running all SMV verification cases
    cd $smvrepo/Verification/scripts
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3b 2>&1
-   ./Run_SMV_Cases.sh $INTEL2 $YOPT -c $cfastrepo -I $COMPILER $USEINSTALL2 $RUN_OPENMP -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3b 2>&1
+   ./Run_SMV_Cases.sh $INTEL2 $YOPT -c $cfastrepo -I $COMPILER -j $JOBPREFIX $USEINSTALL2 $RUN_OPENMP -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3b 2>&1
 }
 
 #---------------------------------------------
@@ -961,19 +961,6 @@ check_compile_smv_db()
 }
 
 #---------------------------------------------
-#                   make_smv_pictures_db
-#---------------------------------------------
-
-make_smv_pictures_db()
-{
-   # Run Make SMV Pictures script (debug mode)
-   echo "making smokeview images"
-   cd $smvrepo/Verification/scripts
-   ./Make_SMV_Pictures.sh $YOPT -q $SMOKEBOT_QUEUE -I $COMPILER $USEINSTALL -d 2>&1 &> $OUTPUT_DIR/stage4a_orig
-   grep -v FreeFontPath $OUTPUT_DIR/stage4a_orig > $OUTPUT_DIR/stage4a
-}
-
-#---------------------------------------------
 #                   check_smv_pictures_db
 #---------------------------------------------
 
@@ -1064,7 +1051,7 @@ make_smv_pictures()
    # Run Make SMV Pictures script (release mode)
    echo Generating images 
    cd $smvrepo/Verification/scripts
-   ./Make_SMV_Pictures.sh $YOPT -q $SMOKEBOT_QUEUE -I $COMPILER $TESTFLAG $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4b_orig
+   ./Make_SMV_Pictures.sh $YOPT -q $SMOKEBOT_QUEUE -I $COMPILER -j SMV_ $TESTFLAG $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4b_orig
    grep -v FreeFontPath $OUTPUT_DIR/stage4b_orig &> $OUTPUT_DIR/stage4b
 }
 
@@ -1096,14 +1083,19 @@ check_smv_pictures()
       grep -A 2 -I -E "Warning" $OUTPUT_DIR/stage4b >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
-   if [[ "$web_DIR" != "" ]] && [[ -d $SMV_SUMMARY_REPO ]]; then
+   if [[ "$web_DIR" != "" ]] && [[ -d $SMV_SUMMARY_DIR ]]; then
      CURDIR=`pwd`
+     web_temp=/tmp/web_dir.$$
+     mkdir $web_temp
+     if [ -d $web_DIR/movies ]; then
+       cp -r $web_DIR/movies $web_temp/.
+     fi
      cd $web_DIR
-     rm -rf images
-     rm -rf manuals
-     rm index.html
-     cd $SMV_SUMMARY_REPO
-     cp -r * $web_DIR/.
+     rm -rf *
+     cd $SMV_SUMMARY_DIR
+     cp -r * $web_temp/.
+     cp -r $web_temp/* $web_DIR/.
+     rm -r $web_temp
      cd $CURDIR
    fi
 
@@ -1149,11 +1141,11 @@ check_smv_movies()
       grep -I -E "Warning" $OUTPUT_DIR/stage4c >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
-   if [[ "$web_DIR" != "" ]] && [[ -d $SMV_SUMMARY_REPO ]]; then 
+   if [[ "$web_DIR" != "" ]] && [[ -d $SMV_SUMMARY_DIR ]]; then 
      CURDIR=`pwd`
      cd $web_DIR
      rm -rf *
-     cd $SMV_SUMMARY_REPO
+     cd $SMV_SUMMARY_DIR
      cp -r * $web_DIR/.
      cd $CURDIR
    fi
@@ -1171,7 +1163,6 @@ generate_timing_stats()
    cd $smvrepo/Verification/scripts/
    export QFDS="$smvrepo/Verification/scripts/copyout.sh"
    export RUNCFAST="$smvrepo/Verification/scripts/copyout.sh"
-   export RUNTFDS="$smvrepo/Verification/scripts/copyout.sh"
 
    cd $smvrepo/Verification
    scripts/SMV_Cases.sh
@@ -1197,10 +1188,6 @@ archive_timing_stats()
   if [[ "$UPLOADRESULTS" == "1" ]] && [[ "$USER" == "smokebot" ]]; then
     cd $botrepo/Smokebot
     ./smvstatus_updatepub.sh $repo/webpages $WEBBRANCH
-  fi
-  if [ "$web_DIR" != "" ]; then
-    cd $botrepo/Smokebot
-    ./make_smv_summary.sh > $web_DIR/index.html
   fi
 }
 
@@ -1818,7 +1805,7 @@ echo ""
 
 cd
 
-SMV_SUMMARY_REPO=$smvrepo/Manuals/SMV_Summary
+SMV_SUMMARY_DIR=$smvrepo/Manuals/SMV_Summary
 
 UploadGuides=$botrepo/Smokebot/smv_guides2GD.sh
 UploadWEB=$botrepo/Smokebot/smv_web2GD.sh
@@ -1858,7 +1845,7 @@ if [ "$mailToCFAST" == "" ]; then
   mailToCFAST=$mailTo
 fi
 
-export JOBPREFIX=SB_
+JOBPREFIX=SB_
 
 #  =============================================
 #  = Smokebot timing and notification mechanism =
