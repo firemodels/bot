@@ -1320,6 +1320,10 @@ copy_guide()
        cp $doc $NEWGUIDE_DIR/.
        cp $doc $PUBS_DIR/.
      fi
+   if [ -e $doc ]; then
+     if [ -d $FDS_SUMMARY/manuals ]; then
+       cp $doc $FDS_SUMMARY/manuals/.
+     fi
    fi
 }
 
@@ -1866,6 +1870,8 @@ smvrepo=$repo/smv
 botrepo=$repo/bot
 outrepo=$repo/out
 
+FDS_SUMMARY=$fdsrepo/Manuals/FDS_Summary
+
 #*** clean repos
 echo "Status"
 echo "------"
@@ -2249,6 +2255,11 @@ if [[ "$DEBUG_ONLY" == "" ]] && [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" 
         copy_fds_technical_guide
         copy_fds_validation_guide
         copy_fds_Config_management_plan
+
+        if [ -d $FDS_SUMMARY/images ]; then
+          cp $fdsrepo/Manuals/FDS_User_Guide/SCRIPT_FIGURES/*.png         $FDS_SUMMARY/images/user/.
+          cp $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/*.png $FDS_SUMMARY/images/verification/.
+        fi
       fi
     fi
   fi
