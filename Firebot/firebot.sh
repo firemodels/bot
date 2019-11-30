@@ -2039,13 +2039,20 @@ fi
 
   if [[ "$UPDATEREPO" == "1" ]] ; then
     echo Updating
+# we are not cloning so update
     if [[ "$CLONE_REPOS" == "" ]]; then
       update_repo fds $FDSBRANCH || exit 1
       update_repo smv $SMVBRANCH || exit 1
+      update_repo fig master || exit 1
+      update_repo out master || exit 1
+      update_repo exp master || exit 1
     fi
-    update_repo fig master || exit 1
-    update_repo out master || exit 1
-    update_repo exp master || exit 1
+# we are not cloning fig, out and exp so update them
+    if [[ "$CLONE_REPOS" != "" ]] && [[ "$CLONE_FDSSMV" != "" ]]; then
+      update_repo fig master || exit 1
+      update_repo out master || exit 1
+      update_repo exp master || exit 1
+    fi
   else
     echo Repos not updated
   fi
