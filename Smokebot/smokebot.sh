@@ -1407,12 +1407,6 @@ email_build_status()
       echo "        latest guides: $GUIDESURL" >> $TIME_LOG
     fi
   fi
-  if [ "$WEB_DIR" != "" ]; then
-      echo "              web dir: $WEB_DIR" >> $TIME_LOG
-  fi  
-  if [ "$WEB_URL" != "" ]; then
-    echo "                    URL: $WEB_URL" >> $TIME_LOG
-  fi
   echo "-------------------------------" >> $TIME_LOG
   NAMELIST_LOGS="$NAMELIST_NODOC_LOG $NAMELIST_NOSOURCE_LOG"
   if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]; then
@@ -1736,7 +1730,8 @@ if [ "$WEB_DIR" != "" ]; then
   fi
 fi
 if [ "$WEB_DIR" != "" ]; then
-  WEB_URL=http://`hostname`/`basename $WEB_DIR`
+  WEB_HOST=`hostname -A | awk '{print $2}'`
+  WEB_URL=http://$WEB_HOST/`basename $WEB_DIR`
 else
   WEB_URL=
 fi
