@@ -1320,6 +1320,7 @@ copy_guide()
        cp $doc $NEWGUIDE_DIR/.
        cp $doc $PUBS_DIR/.
      fi
+   fi
    if [ -e $doc ]; then
      if [ -d $FDS_SUMMARY/manuals ]; then
        cp $doc $FDS_SUMMARY/manuals/.
