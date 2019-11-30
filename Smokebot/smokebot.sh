@@ -1895,12 +1895,16 @@ if [ "$UPDATEREPO" == "1" ]; then
   if [ "$CLONE_REPOS" == "" ]; then
     echo "   fds"
     update_repo fds $FDSBRANCH || exit 1
+  else
+    echo "   fds (cloned - not updating)"
   fi
   echo "   fig"
   update_repo fig master     || exit 1
   if [ "$CLONE_REPOS" == "" ]; then
     echo "   smv"
     update_repo smv $SMVBRANCH || exit 1
+  else
+    echo "   smv (cloned - not updating)"
   fi
 else
   echo Repos not updated
