@@ -441,7 +441,7 @@ if [[ "$EMAIL" != "" ]]; then
 fi
 
 #***  for now always assume the bot repo is always in the master branch
-#     and that the -b branch option only apples to the fds and smv repos
+#     and that the -b branch option only applies to the fds and smv repos
 
 if [[ "$UPDATEREPO" != "" ]]; then
   if [[ "$RUNFIREBOT" == "1" ]]; then
