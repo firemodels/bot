@@ -201,10 +201,11 @@ FDS_REV_ARG=
 SMV_REV_ARG=
 FIREBOT_HOST=
 FIREBOT_HOME=
+WEB_DIR=
 
 #*** parse command line options
 
-while getopts 'bBcdDFfg:G:HhIiJkLm:MNnOPq:R:SsTuUvx:y:' OPTION
+while getopts 'bBcdDFfg:G:HhIiJkLm:MNnOPq:R:SsTuUvx:y:w:' OPTION
 do
 case $OPTION  in
   b)
@@ -307,6 +308,9 @@ case $OPTION  in
    SMV_REV_ARG="$OPTARG"
    SMV_REV="-y $SMV_REV_ARG"
    ;;
+  w)
+   WEB_DIR="$OPTARG"
+   ;;
   \?)
   echo "***error: unknown option entered. aborting firebot"
   exit 1
@@ -321,6 +325,10 @@ if [ "$BUILD_ONLY" != "" ]; then
   if [ "$CLONE_REPOS" != "" ]; then
     CLONE_FDSSMV="-T"
   fi
+fi
+
+if [ "$WEB_DIR" != "" ]; then
+  WEB_DIR="-w $WEB_DIR"
 fi
 
 # sync fds and smv repos with the the repos used in the last successful firebot run
@@ -512,7 +520,7 @@ BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
 firebot_status=0
-$ECHO  ./$botscript -p $firebot_pid $UPDATEREPO $DV $INTEL $debug_mode $BUILD_ONLY $BRANCH $FDS_REV $SMV_REV $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEANREPO $QUEUE $SKIPMATLAB $SKIPFIGURES $CLONE_REPOS $CLONE_FDSSMV  $EMAIL $COPY_MANUAL_DIR $DEBUG_ONLY "$@"
+$ECHO  ./$botscript -p $firebot_pid $UPDATEREPO $DV $INTEL $debug_mode $BUILD_ONLY $BRANCH $FDS_REV $SMV_REV $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEANREPO $QUEUE $SKIPMATLAB $SKIPFIGURES $CLONE_REPOS $CLONE_FDSSMV  $EMAIL $COPY_MANUAL_DIR $WEB_DIR $DEBUG_ONLY "$@"
 firebot_status=$?
 if [ -e $firebot_pid ]; then
   rm -f $firebot_pid

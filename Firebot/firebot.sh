@@ -1587,7 +1587,13 @@ email_build_status()
      NAMELIST_NOSOURCE_LOG=
    fi
    if [ "$UPLOADGUIDES" == "1" ]; then
-   echo "    Firebot status:  https://pages.nist.gov/fds-smv/firebot_status.html" >> $TIME_LOG
+     echo "    Firebot status:  https://pages.nist.gov/fds-smv/firebot_status.html" >> $TIME_LOG
+   fi
+   if [ "$WEB_DIR" != "" ]; then
+     echo "       summary dir: $WEB_DIR"
+   fi
+   if [ "$WEB_URL" != "" ]; then
+     echo "       summary URL: $WEB_URL"
    fi
    echo "-------------------------------" >> $TIME_LOG
 
@@ -1761,9 +1767,10 @@ CLONE_FDSSMV=
 DEBUG_ONLY=
 FDS_REV=origin/master
 SMV_REV=origin/master
+WEB_DIR=
 
 #*** parse command line arguments
-while getopts 'b:BcdDIiJLm:p:q:R:sTuUx:y:' OPTION
+while getopts 'b:BcdDIiJLm:p:q:R:sTuUx:y:w:' OPTION
 do
 case $OPTION in
   b)
@@ -1832,9 +1839,31 @@ case $OPTION in
   y)
    SMV_REV="$OPTARG"
    ;;
+  w)
+   WEB_DIR="$OPTARG"
+   ;;
 esac
 done
 shift $(($OPTIND-1))
+
+if [ "$WEB_DIR" != "" ]; then
+  if [ -d $WEB_DIR ]; then
+    testfile=$WEB_DIR/test.$$
+    touch $testfile >& /dev/null
+    if [ -e $testfile ]; then
+      rm $testfile
+    else
+      WEB_DIR=
+    fi
+  else
+    WEB_DIR=
+  fi
+fi
+if [ "$WEB_DIR" != "" ]; then
+  WEB_URL=http://`hostname`/`basename $WEB_DIR`
+else
+  WEB_URL=
+fi
 
 # Load mailing list for status report
 if [ "$mailToFDS" == "" ]; then
@@ -2012,6 +2041,12 @@ else
 fi
 if [ "$BUILD_ONLY" ]; then
   echo "        queue: $QUEUE"
+fi
+if [ "$WEB_DIR" != "" ]; then
+  echo "      web dir: $WEB_DIR"
+fi
+if [ "$WEB_URL" != "" ]; then
+  echo "          URL: $WEB_URL"
 fi
 echo ""
 
@@ -2256,9 +2291,18 @@ if [[ "$DEBUG_ONLY" == "" ]] && [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" 
         copy_fds_validation_guide
         copy_fds_Config_management_plan
 
-        if [ -d $FDS_SUMMARY/images ]; then
+        if [ -d $FDS_SUMMARY ]; then
           cp $fdsrepo/Manuals/FDS_User_Guide/SCRIPT_FIGURES/*.png         $FDS_SUMMARY/images/user/.
           cp $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/*.png $FDS_SUMMARY/images/verification/.
+          if [ "$WEB_DIR" != "" ]; then
+            if [ -d $WEB_DIR ]; then
+              CUR_DIR=`pwd`
+              cd $WEB_DIR
+              rm -r images manuals *.html
+              cp -r $FDS_SUMMARY/* .
+              cd $CUR_DIR
+            fi
+          fi
         fi
       fi
     fi
