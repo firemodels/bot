@@ -1564,10 +1564,10 @@ email_build_status()
       echo "Note: only VV cases with debug FDS were run" >> $TIME_LOG
       echo "" >> $TIME_LOG
    fi
-   echo "              host: $hostname " >> $TIME_LOG
-   echo "                OS: $platform2 " >> $TIME_LOG
-   echo "              repo: $repo " >> $TIME_LOG
-   echo "             queue: $QUEUE " >> $TIME_LOG
+   echo "              host: $hostname "     >> $TIME_LOG
+   echo "                OS: $platform2 "    >> $TIME_LOG
+   echo "              repo: $repo "         >> $TIME_LOG
+   echo "             queue: $QUEUE "        >> $TIME_LOG
    echo "      fds revision: $FDS_REVISION " >> $TIME_LOG
    echo "        fds branch: $FDSBRANCH "    >> $TIME_LOG
    echo "      smv revision: $SMV_REVISION " >> $TIME_LOG
@@ -1575,8 +1575,8 @@ email_build_status()
    if [ "$IFORT_VERSION" != "" ]; then
       echo "           Fortran: $IFORT_VERSION " >> $TIME_LOG
    fi
-   echo "        start time: $start_time " >> $TIME_LOG
-   echo "         stop time: $stop_time " >> $TIME_LOG
+   echo "        start time: $start_time "   >> $TIME_LOG
+   echo "         stop time: $stop_time "    >> $TIME_LOG
    if [ "$NAMELIST_NODOC_STATUS" != "" ]; then
      if [ "$NAMELIST_NODOC_STATUS" == "0" ]; then
        echo "undocumented namelist keywords: $NAMELIST_NODOC_STATUS " >> $TIME_LOG
@@ -1591,10 +1591,10 @@ email_build_status()
      echo "    Firebot status:  https://pages.nist.gov/fds-smv/firebot_status.html" >> $TIME_LOG
    fi
    if [ "$WEB_DIR" != "" ]; then
-     echo "       summary dir: $WEB_DIR"
+     echo "       summary dir: $WEB_DIR"  >> $TIME_LOG
    fi
    if [ "$WEB_URL" != "" ]; then
-     echo "       summary URL: $WEB_URL"
+     echo "       summary URL: $WEB_URL"  >> $TIME_LOG
    fi
    echo "-------------------------------" >> $TIME_LOG
 
