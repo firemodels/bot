@@ -2292,22 +2292,19 @@ if [[ "$DEBUG_ONLY" == "" ]] && [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" 
         if [ -d $FDS_SUMMARY ]; then
           cp $fdsrepo/Manuals/FDS_User_Guide/SCRIPT_FIGURES/*.png         $FDS_SUMMARY/images/user/.
           cp $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/*.png $FDS_SUMMARY/images/verification/.
+          DATE=`date +"%b %d, %Y - %r"`
+
+          sed "s/&&DATE&&/$DATE/g"              $FDS_SUMMARY/index_template.html \
+          sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                  \
+          sed "s/&&SMV_BUILD&&/$SMV_REVISION/g" > $FDS_SUMMARY/index.html
+
           if [ "$WEB_DIR" != "" ]; then
             if [ -d $WEB_DIR ]; then
               CUR_DIR=`pwd`
               cd $WEB_DIR
               rm -r images manuals *.html
               cp -r $FDS_SUMMARY/* .
-              DATE=`date +"%b %d, %Y - %r"`
-
-              sed "s/&&DATE&&/$DATE/g"              $FDS_SUMMARY/index.html   > index.html
-              sed "s/&&FDS_BUILD&&/$FDS_REVISION/g" $FDS_SUMMARY/index.html   > index.html
-              sed "s/&&SMV_BUILD&&/$SMV_REVISION/g" $FDS_SUMMARY/index.html   > index.html
-
-              sed "s/&&DATE&&/$DATE/g"              $FDS_SUMMARY/manuals.html > manuals.html
-              sed "s/&&FDS_BUILD&&/$FDS_REVISION/g" $FDS_SUMMARY/manuals.html > manuals.html
-              sed "s/&&SMV_BUILD&&/$SMV_REVISION/g" $FDS_SUMMARY/manuals.html > manuals.html
-
+              rm index_template.html
               cd $CUR_DIR
             fi
           fi
