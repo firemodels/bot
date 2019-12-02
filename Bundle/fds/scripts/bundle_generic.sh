@@ -3,28 +3,33 @@ fds_version=$1
 smv_version=$2
 MPI_VERSION=$3
 INTEL_COMP_VERSION=$4
+UPLOAD_DIR_ARG=$5
+NIGHTLY=$6
 
-# this script assumes that fds has been copied into FDS_DIR, smokeview apps have been copied into SMV_DIR and
+# this script assumes that fds and smokeview apps have been copied into APPS_DIR
 # manuals have been copied into GUIDE_DIR
 
 GUIDE_DIR=$HOME/.bundle/pubs
-SMV_DIR=$HOME/.bundle/smv
-FDS_DIR=$HOME/.bundle/fds
+APPS_DIR=$HOME/.bundle/apps
 
 # mpi files located into MPI_DIR
 MPI_DIR=$HOME/.bundle/BUNDLE/MPI
 
 # bundle copied into UPLOAD_DIR
-UPLOAD_DIR=$HOME/.bundle/uploads
+if [ "$UPLOAD_DIR_ARG" == "" ]; then
+  UPLOAD_DIR=$HOME/.bundle/uploads
+else
+  UPLOAD_DIR=$UPLOAD_DIR_ARG
+fi
 
 smvbin=smvbin
 INSTALLDIR=FDS/FDS6
 errlog=/tmp/errlog.$$
 
 if [ "`uname`" == "Darwin" ] ; then
-  bundlebase=${fds_version}-${smv_version}_osx64
+  bundlebase=${fds_version}_${smv_version}_${NIGHTLY}_osx64
 else
-  bundlebase=${fds_version}-${smv_version}_linux64
+  bundlebase=${fds_version}_${smv_version}_${NIGHTLY}_linux64
 fi
 
 # determine directory repos reside under
@@ -35,10 +40,16 @@ cd $scriptdir/../../../..
 REPO_ROOT=`pwd`
 cd $curdir
 
-# upload directory
+# create upload directory if it doesn't exist
 
 if [ ! -e $UPLOAD_DIR ]; then
   mkdir $UPLOAD_DIR
+fi
+
+# create apps directory if it doesn't exist
+
+if [ ! -e $APPS_DIR ]; then
+  mkdir $APPS_DIR
 fi
 
 # this script is called by make_bundle.sh located in bot/Bundle/fds/linux or osx
@@ -258,13 +269,13 @@ echo ""
 
 # smokeview
 
-CP $SMV_DIR background $bundledir/$smvbin background
-CP $SMV_DIR smokeview  $bundledir/$smvbin smokeview
-CP $SMV_DIR smokediff  $bundledir/$smvbin smokediff
-CP $SMV_DIR smokezip   $bundledir/$smvbin smokezip
-CP $SMV_DIR dem2fds    $bundledir/$smvbin dem2fds
-CP $SMV_DIR wind2fds   $bundledir/$smvbin wind2fds
-CP $SMV_DIR hashfile   $bundledir/$smvbin hashfile
+CP $APPS_DIR background $bundledir/$smvbin background
+CP $APPS_DIR smokeview  $bundledir/$smvbin smokeview
+CP $APPS_DIR smokediff  $bundledir/$smvbin smokediff
+CP $APPS_DIR smokezip   $bundledir/$smvbin smokezip
+CP $APPS_DIR dem2fds    $bundledir/$smvbin dem2fds
+CP $APPS_DIR wind2fds   $bundledir/$smvbin wind2fds
+CP $APPS_DIR hashfile   $bundledir/$smvbin hashfile
 
 CURDIR=`pwd`
 cd $bundledir/$smvbin
@@ -283,9 +294,9 @@ CPDIR $texturedir $bundledir/$smvbin
 # FDS 
 
 cd $bundledir/bin
-CP $FDS_DIR fds       $bundledir/bin fds
-CP $FDS_DIR fds2ascii $bundledir/bin fds2ascii
-CP $FDS_DIR test_mpi  $bundledir/bin test_mpi
+CP $APPS_DIR fds       $bundledir/bin fds
+CP $APPS_DIR fds2ascii $bundledir/bin fds2ascii
+CP $APPS_DIR test_mpi  $bundledir/bin test_mpi
 
 CURDIR=`pwd`
 cd $bundledir/bin
@@ -337,14 +348,6 @@ CP2 $GUIDE_DIR FDS_Verification_Guide.pdf        $bundledir/Documentation
 CP2 $GUIDE_DIR SMV_User_Guide.pdf                $bundledir/Documentation
 CP2 $GUIDE_DIR SMV_Technical_Reference_Guide.pdf $bundledir/Documentation
 CP2 $GUIDE_DIR SMV_Verification_Guide.pdf        $bundledir/Documentation
-
-if [[ "$OS_LIB_DIR" != "" ]] && [[ -e $OS_LIB_DIR ]]; then
-  echo ""
-  echo "--- copying run time libraries ---"
-  echo ""
-  mkdir $bundledir/bin/LIB64
-  CPDIRFILES $OS_LIB_DIR $bundledir/bin/LIB64
-fi
 
 echo ""
 echo "--- copying release notes ---"

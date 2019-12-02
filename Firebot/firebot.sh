@@ -4,35 +4,6 @@
 # Consult the FDS Config Management Plan for more information.
 
 #---------------------------------------------
-#                   usage
-#---------------------------------------------
-
-function usage {
-echo "Verification and validation testing script for FDS"
-echo ""
-echo "Options"
-echo "-b - branch_name - run firebot using branch branch_name"
-echo "-B - only build apps"
-echo "-c - clean repo"
-echo "-D - debug only"
-echo "-F - skip figures and document building stages"
-echo "-h - display this message"
-echo "-i - use installed version of smokeview"
-echo "-I - use development version of FDS"
-echo "-J - use Intel MPI version of FDS"
-echo "-L - firebot lite,  run only stages that build a debug fds and run cases with it"
-echo "                    (no release fds, no release cases, no matlab, etc)"
-echo "-m email_address "
-echo "-q - queue_name - run cases using the queue queue_name"
-echo "     default: $QUEUE"
-echo "-s - skip matlab and document building stages"
-echo "-u - update repo"
-echo "-U - upload guides"
-echo "-W - clone fds, exp, fig, out and smv repos"
-exit
-}
-
-#---------------------------------------------
 #                   CHK_REPO
 #---------------------------------------------
 
@@ -124,6 +95,49 @@ set_files_world_readable()
 }
 
 #---------------------------------------------
+#                   find_CRLF
+#---------------------------------------------
+
+find_CRLF()
+{
+  local curdir=`pwd`
+  local repodir=$1
+  local reponame=$2
+
+  crlf_temp=/tmp/crlf.$$
+
+  cd $repodir
+  grep -IURl --color --exclude="*.pdf" --exclude-dir=".git" "
+"  | grep -v 'firebot.sh'  > $crlf_temp
+  nlines=`cat $crlf_temp | wc -l`
+  if [ $nlines -gt 0 ]; then
+    echo "" >> $CRLF_WARNINGS
+    echo "$reponame repo:" >> $CRLF_WARNINGS
+    cat $crlf_temp >> $CRLF_WARNINGS
+    rm $crlf_temp
+  fi
+  cd $curdir
+}
+
+#---------------------------------------------
+#                   check_CRLF
+#---------------------------------------------
+
+check_CRLF()
+{
+
+  if [ -e $CRLF_WARNINGS ]; then
+    nwarnings=`cat $CRLF_WARNINGS | wc -l`
+    if [ $nwarnings -gt 0 ]; then
+      echo ""
+      echo "Warnings from Stage 1 - dos line ending check:" >> $WARNING_LOG
+      cat $CRLF_WARNINGS >> $WARNING_LOG
+      echo ""
+    fi
+  fi
+}
+
+#---------------------------------------------
 #                   clean_repo
 #---------------------------------------------
 
@@ -196,13 +210,12 @@ update_repo()
    have_firemodels=`git remote -v | grep firemodels | wc  -l`
    if [ $have_firemodels -gt 0 ]; then
       git merge firemodels/$branch                   >> $OUTPUT_DIR/stage1 2>&1
-      need_push=`git status -uno | head -2 | grep -v nothing | wc -l`
+      need_push=`git status -uno | grep 'is ahead' | wc -l`
       if [ $need_push -gt 1 ]; then
-        echo "warning: firemodels commits to $reponame repo need to be pushed to origin" >> $OUTPUT_DIR/stage1 2>&1
-        git status -uno | head -2 | grep -v nothing                                      >> $OUTPUT_DIR/stage1 2>&1
+        echo "warning: firemodels commits to the $reponame repo need to be pushed to origin" >> $OUTPUT_DIR/stage1 2>&1
+        git status -uno | head -2 | grep -v nothing                                          >> $OUTPUT_DIR/stage1 2>&1
       fi
    fi
-
    if [[ "$reponame" == "exp" ]]; then
       echo "Updating submodules."                   >> $OUTPUT_DIR/stage1 2>&1
       git submodule foreach git remote update       >> $OUTPUT_DIR/stage1 2>&1
@@ -227,7 +240,15 @@ get_smv_revision()
 
    git update-index --refresh
    SMV_REVISION=`git describe --long --dirty`
-   git describe --abbrev | awk -F '-' '{print $1"-"$2}' > $SMV_LATESTAPPS_DIR/SMV_REVISION
+   subrev=`git describe --abbrev | awk -F '-' '{print $2}'`
+   if [ "$subrev" == "" ]; then
+     git describe --abbrev | awk -F '-' '{print $1"-0"}' > $LATESTAPPS_DIR/SMV_REVISION
+   else
+     git describe --abbrev | awk -F '-' '{print $1"-"$2}' > $LATESTAPPS_DIR/SMV_REVISION
+   fi
+   SMV_SHORTHASH=`git rev-parse --short HEAD`
+   SMV_LONGHASH=`git rev-parse HEAD`
+   echo $SMV_SHORTHASH > $LATESTAPPS_DIR/SMV_HASH
    SMV_MESSAGE=`git log . | head -5 | tail -1`
    return 0
 }
@@ -245,8 +266,14 @@ get_fds_revision()
 
    git update-index --refresh
    FDS_REVISION=`git describe --long --dirty`
-   git describe --abbrev | awk -F '-' '{print $1"-"$2}' > $FDS_LATESTAPPS_DIR/FDS_REVISION
+   subrev=`git describe --abbrev | awk -F '-' '{print $2}'`
+   if [ "$subrev" == "" ]; then
+     git describe --abbrev | awk -F '-' '{print $1"-0"}' > $LATESTAPPS_DIR/FDS_REVISION
+   else
+     git describe --abbrev | awk -F '-' '{print $1"-"$2}' > $LATESTAPPS_DIR/FDS_REVISION
+   fi
    FDS_SHORTHASH=`git rev-parse --short HEAD`
+   echo $FDS_SHORTHASH > $LATESTAPPS_DIR/FDS_HASH
    FDS_LONGHASH=`git rev-parse HEAD`
    FDS_DATE=`git log -1 --format=%cd --date=local $FDS_SHORTHASH`
    FDS_MESSAGE=`git log . | head -5 | tail -1`
@@ -607,7 +634,7 @@ check_compile_fds_mpi()
    if [ -e "fds_${INTEL}mpi_intel_${platform}${size}$DV" ]
    then
       FDS_release_success=true
-      cp fds_${INTEL}mpi_intel_${platform}${size}$DV $FDS_LATESTAPPS_DIR/fds
+      cp fds_${INTEL}mpi_intel_${platform}${size}$DV $LATESTAPPS_DIR/fds
    else
       echo "Errors from Stage 2c - Compile FDS MPI release:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage2c >> $ERROR_LOG
@@ -663,7 +690,7 @@ compile_smv_utilities()
      rm -f *.o smokezip_${platform}${size}
 
      ./make_smokezip.sh >> $OUTPUT_DIR/stage3a 2>&1
-     CP smokezip_${platform}${size} $SMV_LATESTAPPS_DIR/smokezip
+     CP smokezip_${platform}${size} $LATESTAPPS_DIR/smokezip
      echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
    # smokediff:
@@ -671,7 +698,7 @@ compile_smv_utilities()
      cd $smvrepo/Build/smokediff/${COMPILER}_${platform}${size}
      rm -f *.o smokediff_${platform}${size}
      ./make_smokediff.sh >> $OUTPUT_DIR/stage3a 2>&1
-     CP smokediff_${platform}${size} $SMV_LATESTAPPS_DIR/smokediff
+     CP smokediff_${platform}${size} $LATESTAPPS_DIR/smokediff
      echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
    # background
@@ -679,21 +706,21 @@ compile_smv_utilities()
      cd $smvrepo/Build/background/${COMPILER}_${platform}${size}
      rm -f *.o background_${platform}${size}
      ./make_background.sh >> $OUTPUT_DIR/stage3a 2>&1
-     CP background_${platform}${size} $SMV_LATESTAPPS_DIR/background
+     CP background_${platform}${size} $LATESTAPPS_DIR/background
 
    # dem2fds
      echo "      dem2fds"
      cd $smvrepo/Build/dem2fds/${COMPILER}_${platform}${size}
      rm -f *.o dem2fds_${platform}${size}
      ./make_dem2fds.sh >> $OUTPUT_DIR/stage3a 2>&1
-     CP dem2fds_${platform}${size} $SMV_LATESTAPPS_DIR/dem2fds
+     CP dem2fds_${platform}${size} $LATESTAPPS_DIR/dem2fds
 
   # wind2fds:
      echo "      wind2fds"
      cd $smvrepo/Build/wind2fds/${COMPILER}_${platform}${size}
      rm -f *.o wind2fds_${platform}${size}
      ./make_wind2fds.sh >> $OUTPUT_DIR/stage3a 2>&1
-     CP wind2fds_${platform}${size} $SMV_LATESTAPPS_DIR/wind2fds
+     CP wind2fds_${platform}${size} $LATESTAPPS_DIR/wind2fds
     echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
   # hashfile:
@@ -701,7 +728,7 @@ compile_smv_utilities()
      cd $smvrepo/Build/hashfile/${COMPILER}_${platform}${size}
      rm -f *.o hashfile_${platform}${size}
      ./make_hashfile.sh >> $OUTPUT_DIR/stage3a 2>&1
-     CP hashfile_${platform}${size} $SMV_LATESTAPPS_DIR/hashfile
+     CP hashfile_${platform}${size} $LATESTAPPS_DIR/hashfile
     echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
   # fds2asci
@@ -709,7 +736,7 @@ compile_smv_utilities()
      cd $fdsrepo/Utilities/fds2ascii/${COMPILER}_${platform}${size}
      rm -f *.o fds2ascii_${platform}${size}
      ./make_fds2ascii.sh >> $OUTPUT_DIR/stage3a 2>&1
-     cp fds2ascii_${platform}${size} $FDS_LATESTAPPS_DIR/fds2ascii
+     cp fds2ascii_${platform}${size} $LATESTAPPS_DIR/fds2ascii
     echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
   # test_mpi
@@ -717,7 +744,7 @@ compile_smv_utilities()
      cd $fdsrepo/Utilities/test_mpi/${INTEL}mpi_${COMPILER}_${platform}
      rm -f *.o test_mpi
      ./make_test_mpi.sh >> $OUTPUT_DIR/stage3a 2>&1
-     cp test_mpi $FDS_LATESTAPPS_DIR/test_mpi
+     cp test_mpi $LATESTAPPS_DIR/test_mpi
     echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
    else
@@ -747,7 +774,7 @@ check_cases_release()
    # Scan for and report any errors in FDS cases
    cd $dir
 
-   if [[ `grep -rI 'Run aborted' $OUTPUT_DIR/stage5 | grep -v grep` == ""          ]] && \
+   if [[ `grep 'Run aborted' $OUTPUT_DIR/stage5 | grep -v grep` == ""              ]] && \
       [[ `grep 'ERROR' $OUTPUT_DIR/stage5 | grep -v geom_bad | grep -v grep` == "" ]] && \
       [[ `grep -rI Segmentation * | grep -v grep` == ""                            ]] && \
       [[ `grep -rI ERROR: * | grep -v echo | grep -v grep` == ""                   ]] && \
@@ -758,7 +785,7 @@ check_cases_release()
    then
       cases_release_success=true
    else
-      grep -rI 'Run aborted' $OUTPUT_DIR/stage5 | grep -v grep                  >> $OUTPUT_DIR/stage5_errors
+      grep 'Run aborted' $OUTPUT_DIR/stage5 | grep -v grep                      >> $OUTPUT_DIR/stage5_errors
       grep 'ERROR' $OUTPUT_DIR/stage5 | grep -v geom_bad | grep -v grep         >> $OUTPUT_DIR/stage5_errors
       grep -rI Segmentation * | grep -v grep                                    >> $OUTPUT_DIR/stage5_errors
       grep -rI ERROR: * | grep -v echo | grep -v grep                           >> $OUTPUT_DIR/stage5_errors
@@ -923,7 +950,7 @@ check_compile_smv()
     cd $smvrepo/Build/smokeview/intel_${platform}${size}
     if [ -e "smokeview_${platform}${size}" ]; then
       smv_release_success=true
-      CP smokeview_${platform}${size} $SMV_LATESTAPPS_DIR/smokeview
+      CP smokeview_${platform}${size} $LATESTAPPS_DIR/smokeview
     else
       echo "Errors from Stage 3c - Compile SMV release:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage3c >> $ERROR_LOG
@@ -1155,7 +1182,7 @@ check_matlab_validation()
 get_repo_size()
 {
   rrepo=$1
-  if [ "$CLONE_REPOS" == "1" ]; then
+  if [ "$CLONE_REPOS" != "" ]; then
     CCURDIR=`pwd`
     cd $rrepo
     git gc
@@ -1291,7 +1318,7 @@ copy_guide()
      if [ -e $doc ]; then
        cp $doc /var/www/html/firebot/manuals/
        cp $doc $NEWGUIDE_DIR/.
-       cp $doc $SAVEGUIDE_DIR/.
+       cp $doc $PUBS_DIR/.
      fi
    fi
 }
@@ -1328,6 +1355,17 @@ make_fds_user_guide()
 
    # Check guide for completion and copy to website if successful
    check_guide $OUTPUT_DIR/stage8_fds_user_guide $fdsrepo/Manuals/FDS_User_Guide/FDS_User_Guide.pdf 'FDS User Guide' 1
+
+   cd $botrepo/Firebot
+   ./compare_namelists.sh $OUTPUT_DIR stage8 > $OUTPUT_DIR/stage8_namelist_check
+   NAMELIST_NODOC_STATUS=`cat $OUTPUT_DIR/stage8_namelist_check | head -1 | awk -F' ' '{print $1}'`
+   if [ "$NAMELIST_NODOC_STATUS" != "0" ]; then
+     NAMELIST_NODOC_LOG=$OUTPUT_DIR/stage8_namelists_nodoc.txt
+   fi
+   NAMELIST_NOSOURCE_STATUS=`cat $OUTPUT_DIR/stage8_namelist_check | tail -1 | awk -F' ' '{print $1}'`
+   if [ "$NAMELIST_NOSOURCE_STATUS" != "0" ]; then
+     NAMELIST_NOSOURCE_LOG=$OUTPUT_DIR/stage8_namelists_nosource.txt
+   fi
 }
 
 #---------------------------------------------
@@ -1461,24 +1499,24 @@ save_build_status()
    then
      echo "" >> $ERROR_LOG
      cat $WARNING_LOG >> $ERROR_LOG
-     echo "Build failure and warnings;$FDS_DATE;$FDS_SHORTHASH;$FDS_LONGHASH;${FDS_REVISION};$FDSBRANCH;$STOP_TIME_INT;3;$TOTAL_FDS_TIMES;$HOST" > "$HISTORY_DIR/${FDS_REVISION}.txt"
+     echo "Build failure and warnings;$FDS_DATE;$FDS_SHORTHASH;$FDS_LONGHASH;${FDS_REVISION};$FDSBRANCH;$STOP_TIME_INT;3;$TOTAL_FDS_TIMES;$HOST;$SMV_LONGHASH;${SMV_REVISION}" > "$HISTORY_DIR/${FDS_REVISION}.txt"
      cat $ERROR_LOG > "$HISTORY_DIR/${FDS_REVISION}_errors.txt"
 
    # Check for errors only
    elif [ -e $ERROR_LOG ]
    then
-      echo "Build failure;$FDS_DATE;$FDS_SHORTHASH;$FDS_LONGHASH;${FDS_REVISION};$FDSBRANCH;$STOP_TIME_INT;3;$TOTAL_FDS_TIMES;$HOST" > "$HISTORY_DIR/${FDS_REVISION}.txt"
+      echo "Build failure;$FDS_DATE;$FDS_SHORTHASH;$FDS_LONGHASH;${FDS_REVISION};$FDSBRANCH;$STOP_TIME_INT;3;$TOTAL_FDS_TIMES;$HOST;$SMV_LONGHASH;${SMV_REVISION}" > "$HISTORY_DIR/${FDS_REVISION}.txt"
       cat $ERROR_LOG > "$HISTORY_DIR/${FDS_REVISION}_errors.txt"
 
    # Check for warnings only
    elif [ -e $WARNING_LOG ]
    then
-      echo "Build success with warnings;$FDS_DATE;$FDS_SHORTHASH;$FDS_LONGHASH;${FDS_REVISION};$FDSBRANCH;$STOP_TIME_INT;2;$TOTAL_FDS_TIMES;$HOST" > "$HISTORY_DIR/${FDS_REVISION}.txt"
+      echo "Build success with warnings;$FDS_DATE;$FDS_SHORTHASH;$FDS_LONGHASH;${FDS_REVISION};$FDSBRANCH;$STOP_TIME_INT;2;$TOTAL_FDS_TIMES;$HOST;$SMV_LONGHASH;${SMV_REVISION}" > "$HISTORY_DIR/${FDS_REVISION}.txt"
       cat $WARNING_LOG > "$HISTORY_DIR/${FDS_REVISION}_warnings.txt"
 
    # No errors or warnings
    else
-      echo "Build success!;$FDS_DATE;$FDS_SHORTHASH;$FDS_LONGHASH;${FDS_REVISION};$FDSBRANCH;$STOP_TIME_INT;1;$TOTAL_FDS_TIMES;$HOST" > "$HISTORY_DIR/${FDS_REVISION}.txt"
+      echo "Build success!;$FDS_DATE;$FDS_SHORTHASH;$FDS_LONGHASH;${FDS_REVISION};$FDSBRANCH;$STOP_TIME_INT;1;$TOTAL_FDS_TIMES;$HOST;$SMV_LONGHASH;${SMV_REVISION}" > "$HISTORY_DIR/${FDS_REVISION}.txt"
       touch $FIREBOT_PASS
       echo $SMVREPO_HASH > $SMVREPO_HASHFILE
       echo $FDSREPO_HASH > $FDSREPO_HASHFILE
@@ -1505,6 +1543,7 @@ get_firebot_success()
 #---------------------------------------------
 
 email_build_status()
+
 {
    cd $firebotdir
 
@@ -1520,23 +1559,31 @@ email_build_status()
       echo "Note: only VV cases with debug FDS were run" >> $TIME_LOG
       echo "" >> $TIME_LOG
    fi
-   echo "           host: $hostname " >> $TIME_LOG
-   echo "             OS: $platform2 " >> $TIME_LOG
-   echo "           repo: $repo " >> $TIME_LOG
-   echo "          queue: $QUEUE " >> $TIME_LOG
-   echo "   fds revision: $FDS_REVISION " >> $TIME_LOG
-   echo "     fds branch: $FDSBRANCH "    >> $TIME_LOG
-   echo "   smv revision: $SMV_REVISION " >> $TIME_LOG
-   echo "     smv branch: $SMVBRANCH "    >> $TIME_LOG
-if [ "$IFORT_VERSION" != "" ]; then
-   echo "        Fortran: $IFORT_VERSION " >> $TIME_LOG
-fi
-   echo $FDS_MESSAGE
-   echo $SMV_MESSAGE
-   echo "     start time: $start_time " >> $TIME_LOG
-   echo "      stop time: $stop_time " >> $TIME_LOG
+   echo "              host: $hostname " >> $TIME_LOG
+   echo "                OS: $platform2 " >> $TIME_LOG
+   echo "              repo: $repo " >> $TIME_LOG
+   echo "             queue: $QUEUE " >> $TIME_LOG
+   echo "      fds revision: $FDS_REVISION " >> $TIME_LOG
+   echo "        fds branch: $FDSBRANCH "    >> $TIME_LOG
+   echo "      smv revision: $SMV_REVISION " >> $TIME_LOG
+   echo "        smv branch: $SMVBRANCH "    >> $TIME_LOG
+   if [ "$IFORT_VERSION" != "" ]; then
+      echo "           Fortran: $IFORT_VERSION " >> $TIME_LOG
+   fi
+   echo "        start time: $start_time " >> $TIME_LOG
+   echo "         stop time: $stop_time " >> $TIME_LOG
+   if [ "$NAMELIST_NODOC_STATUS" != "" ]; then
+     if [ "$NAMELIST_NODOC_STATUS" == "0" ]; then
+       echo "undocumented namelist keywords: $NAMELIST_NODOC_STATUS " >> $TIME_LOG
+     fi
+   else
+     NAMELIST_NODOC_LOG=
+   fi
+   if [ "$NAMELIST_NOSOURCE_STATUS" == "" ]; then
+     NAMELIST_NOSOURCE_LOG=
+   fi
    if [ "$UPLOADGUIDES" == "1" ]; then
-   echo " Firebot status:  https://pages.nist.gov/fds-smv/firebot_status.html" >> $TIME_LOG
+   echo "    Firebot status:  https://pages.nist.gov/fds-smv/firebot_status.html" >> $TIME_LOG
    fi
    echo "-------------------------------" >> $TIME_LOG
 
@@ -1556,18 +1603,25 @@ fi
    fi
 
    # Check for warnings and errors
+   NAMELIST_LOGS="$NAMELIST_NODOC_LOG $NAMELIST_NOSOURCE_LOG"
    if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]
    then
       cd $firebotdir
 
      # Send email with failure message and warnings, body of email contains appropriate log file
-     cat $ERROR_LOG $TIME_LOG | mail -s "[$botuser] $bottype failure and warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
+     echo "[$botuser] $bottype failure and warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH."
+     if [ "$HAVE_MAIL" == "1" ]; then
+       cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype failure and warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
+     fi
 
    # Check for errors only
    elif [ -e $ERROR_LOG ]
    then
       # Send email with failure message, body of email contains error log file
-      cat $ERROR_LOG $TIME_LOG | mail -s "[$botuser] $bottype failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
+      echo "[$botuser] $bottype failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH."
+      if [ "$HAVE_MAIL" == "1" ]; then
+        cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
+      fi
 
    # Check for warnings only
    elif [ -e $WARNING_LOG ]
@@ -1575,7 +1629,10 @@ fi
       cd $firebotdir
 
       # Send email with success message, include warnings
-      cat $WARNING_LOG $TIME_LOG | mail -s "[$botuser] $bottype success, with warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
+      echo "[$botuser] $bottype success, with warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH"
+      if [ "$HAVE_MAIL" == "1" ]; then
+        cat $WARNING_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype success, with warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
+      fi
 
    # No errors or warnings
    else
@@ -1584,9 +1641,11 @@ fi
 
       # Send success message with links to nightly manuals
       firebot_status=0
-      cat $TIME_LOG | mail -s "[$botuser] $bottype success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
+      echo "[$botuser] $bottype success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH"
+      if [ "$HAVE_MAIL" == "1" ]; then
+        cat $TIME_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
+      fi
    fi
-
 }
 
 #VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
@@ -1594,6 +1653,8 @@ fi
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 #*** setup
+
+echo $0 $* >> command.firebot
 
 # Start firebot timer
 START_TIME=$(date +%s)
@@ -1626,26 +1687,21 @@ ERROR_LOG=$OUTPUT_DIR/errors
 VALIDATION_ERROR_LOG=$OUTPUT_DIR/validation_errors
 WARNING_LOG=$OUTPUT_DIR/warnings
 NEWGUIDE_DIR=$OUTPUT_DIR/Newest_Guides
-SAVEGUIDE_DIR=$HOME/.firebot/pubs
 MANUAL_DIR=$HOME/.firebot/Manuals
 EMAIL_LIST=$HOME/.firebot/firebot_email_list.sh
+CRLF_WARNINGS=$OUTPUT_DIR/stage1_crlf_warnings
 
-FDS_APPS_DIR=$HOME/.firebot/fds
-FDS_LATESTAPPS_DIR=$HOME/.firebot/fdslatest
+LATESTAPPS_DIR=$HOME/.firebot/appslatest
+APPS_DIR=$HOME/.firebot/apps
 
-SMV_APPS_DIR=$HOME/.firebot/smv
-SMV_LATESTAPPS_DIR=$HOME/.firebot/smvlatest
+PUBS_DIR=$HOME/.firebot/pubs
+MKDIR $PUBS_DIR
 
 MKDIR $HOME/.firebot
-MKDIR $HOME/.firebot/pubs
-MKDIR $FDS_APPS_DIR
-MKDIR $SMV_APPS_DIR
 
-rm -rf $FDS_LATESTAPPS_DIR
-MKDIR $FDS_LATESTAPPS_DIR
-
-rm -rf $SMV_LATESTAPPS_DIR
-MKDIR $SMV_LATESTAPPS_DIR
+MKDIR $APPS_DIR
+rm -rf $LATESTAPPS_DIR
+MKDIR $LATESTAPPS_DIR
 
 WEBBRANCH=nist-pages
 FDSBRANCH=master
@@ -1675,8 +1731,8 @@ fi
 USEINSTALL=
 COMPILER=intel
 QUEUE=firebot
-CLEANREPO=0
-UPDATEREPO=0
+CLEANREPO=
+UPDATEREPO=
 if [ "$JOBPREFIX" == "" ]; then
   export JOBPREFIX=FB_
 fi
@@ -1697,10 +1753,13 @@ DV2=
 INTEL=
 INTEL2=
 CLONE_REPOS=
+CLONE_FDSSMV=
 DEBUG_ONLY=
+FDS_REV=origin/master
+SMV_REV=origin/master
 
 #*** parse command line arguments
-while getopts 'b:BcdDhIiJLm:p:q:suUW' OPTION
+while getopts 'b:BcdDIiJLm:p:q:R:sTuUx:y:' OPTION
 do
 case $OPTION in
   b)
@@ -1725,9 +1784,6 @@ case $OPTION in
   F)
    SKIPFIGURES=1
    ;;
-  h)
-   usage;
-   ;;
   I)
    DV="_dv"
    DV2="-u"
@@ -1751,8 +1807,14 @@ case $OPTION in
   q)
    QUEUE="$OPTARG"
    ;;
+  R)
+   CLONE_REPOS="$OPTARG"
+   ;;
   s)
    SKIPMATLAB=1
+   ;;
+  T)
+   CLONE_FDSSMV=1
    ;;
   u)
    UPDATEREPO=1
@@ -1760,8 +1822,11 @@ case $OPTION in
   U)
    UPLOADGUIDES=1
    ;;
-  W)
-   CLONE_REPOS=1
+  x)
+   FDS_REV="$OPTARG"
+   ;;
+  y)
+   SMV_REV="$OPTARG"
    ;;
 esac
 done
@@ -1789,7 +1854,7 @@ if [ -e .fds_git ]; then
 else
   echo "***error: firebot not running in the bot/Firebot directory"
   echo "          Aborting firebot"
-  exit
+  exit 1
 fi
 
 if [[ "$QUEUE" == "none" ]] && [[ -e $SCRIPTFILES ]]; then
@@ -1809,10 +1874,25 @@ echo "------"
 
 #*** clone repos
 
-if [[ "$CLONE_REPOS" == "1" ]]; then
+if [[ "$CLONE_REPOS" != "" ]]; then
   echo Cloning repos
   cd $botrepo/Scripts
-  ./setup_repos.sh -F > $OUTPUT_DIR/stage1_clone 2>&1
+  if [ "$CLONE_FDSSMV" != "" ]; then
+   # only clone the fds and smv repos - used when just compiling the fds and smv apps
+    ./setup_repos.sh -T > $OUTPUT_DIR/stage1_clone 2>&1
+  else
+   # clone all repos
+    ./setup_repos.sh -F > $OUTPUT_DIR/stage1_clone 2>&1
+  fi
+  if [ "$CLONE_REPOS" != "master" ]; then
+    FDSBRANCH=$CLONE_REPOS
+    cd $fdsrepo
+    git checkout -b $FDSBRANCH $FDS_REV >> $OUTPUT_DIR/stage1_clone 2>&1
+
+    SMVBRANCH=$CLONE_REPOS
+    cd $smvrepo
+    git checkout -b $SMVBRANCH $SMV_REV >> $OUTPUT_DIR/stage1_clone 2>&1
+  fi
   ARCHIVE_REPO_SIZES=1
 fi
 
@@ -1842,6 +1922,14 @@ if [ "$BOTBRANCH" == "current" ]; then
   BOTBRANCH=`git rev-parse --abbrev-ref HEAD`
 fi
 
+#save apps and pubs in directories under .firebot/$FDSBRANCH
+
+BRANCH_DIR=$HOME/.firebot/$FDSBRANCH
+BRANCHPUBS_DIR=$BRANCH_DIR/pubs
+BRANCHAPPS_DIR=$BRANCH_DIR/apps
+MKDIR $BRANCH_DIR
+MKDIR $BRANCHPUBS_DIR
+MKDIR $BRANCHAPPS_DIR
 
 cd $firebotdir
 
@@ -1876,7 +1964,7 @@ if [ "$USEINSTALL" != "" ]; then
    if [ $notfound == 1 ]; then
       echo "Error: smokeview not found. firebot aborted."
       echo "Error: smokeview not found. firebot aborted." >> $OUTPUT_DIR/stage1 2>&1
-      exit
+      exit 1
    fi
 fi
 
@@ -1888,7 +1976,7 @@ if [ "QUEUE" == "none" ]; then
       echo "       Add the directory containing fds and smokeview to your path"
       echo "       (same directory containing fds and smokeview)"
       echo "Error: background not found. firebot aborted." >> $OUTPUT_DIR/stage1 2>&1
-      exit
+      exit 1
    fi
 fi
 
@@ -1916,7 +2004,9 @@ if [ "$UPDATEREPO" == "1" ]; then
 else
   echo " update repos: no"
 fi
+if [ "$BUILD_ONLY" ]; then
   echo "        queue: $QUEUE"
+fi
 echo ""
 
 # Set time limit (43,200 seconds = 12 hours)
@@ -1947,32 +2037,83 @@ fi
 
 #*** update repos
 
-if [[ "$CLONE_REPOS" == "" ]]; then
   if [[ "$UPDATEREPO" == "1" ]] ; then
     echo Updating
-    update_repo fds $FDSBRANCH || exit 1
+    if [[ "$CLONE_REPOS" == "" ]]; then
+      update_repo fds $FDSBRANCH || exit 1
+      update_repo smv $SMVBRANCH || exit 1
+    fi
     update_repo fig master || exit 1
     update_repo out master || exit 1
-    update_repo smv $SMVBRANCH || exit 1
+    update_repo exp master || exit 1
   else
     echo Repos not updated
   fi
+
+#*** check fds and smv repos for text files with CRLF line endings
+#    don't check lines if not cloning and not cleaning repo - avoid false positives
+
+CHECK_LINES=1
+if [[ "$CLONE_REPOS" == "" ]]; then
+  if [[ "$CLEANREPO" == "" ]]; then
+    CHECK_LINES=
+  fi
 fi
-if [[ "$UPDATEREPO" == "1" ]] ; then
-  update_repo exp master || exit 1
+if [ "$BUILD_ONLY" == "1" ]; then
+  CHECK_LINES=
+fi
+
+# turn off line ending checking for now
+CHECK_LINES=
+
+if [ "$CHECK_LINES" == "1" ]; then
+  rm -f $CRLF_WARNINGS
+  echo Checking for DOS line endings
+  echo "   bot repo"
+  find_CRLF $repo/bot bot
+
+  echo "   exp repo"
+  find_CRLF $repo/exp exp
+
+  echo "   fds repo"
+  find_CRLF $repo/fds fds
+
+  echo "   out repo"
+  find_CRLF $repo/out out
+
+  echo "   smv repo"
+  find_CRLF $repo/smv smv
+
+  check_CRLF
+else
+  if [ "$BUILD_ONLY" == "" ]; then
+    echo "DOS line endings only checked when cloning or cleaning repos"
+  fi
 fi
 
 get_fds_revision $FDSBRANCH || exit 1
 get_smv_revision $SMVBRANCH || exit 1
-get_exp_revision master || exit 1
-get_fig_revision master || exit 1
-get_out_revision master || exit 1
+if [ "$BUILD_ONLY" == "" ]; then
+  get_exp_revision master || exit 1
+  get_fig_revision master || exit 1
+  get_out_revision master || exit 1
+fi
+
+echo | mail >& /tmp/mailtest.$$
+notfound=`grep 'not found' /tmp/mailtest.$$ | wc -l`
+HAVE_MAIL=1
+if [ $notfound -gt 0 ]; then
+  HAVE_MAIL=
+fi
+rm /tmp/mailtest.$$
 
 # archive repo sizes
 # (only if the repos are cloned or cleaned)
 
+if [ "$BUILD_ONLY" == "" ]; then
 if [ "$ARCHIVE_REPO_SIZES" == "1" ]; then
   archive_repo_sizes
+fi
 fi
 
 check_git_checkout
@@ -2095,6 +2236,7 @@ if [[ "$DEBUG_ONLY" == "" ]] && [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" 
         rm -rf $MANUAL_DIR
         cp -r $fdsrepo/Manuals $MANUAL_DIR
 
+        cp $LATESTAPPS_DIR/FDS_REVISION $PUBS_DIR/FDS_REVISION
         copy_fds_user_guide
         copy_fds_verification_guide
         copy_fds_technical_guide
@@ -2108,11 +2250,14 @@ fi
 # archive apps
 get_firebot_success
 if [[ "$firebot_success" == "1" ]] ; then
-  rm -f $FDS_APPS_DIR/*
-  cp $FDS_LATESTAPPS_DIR/* $FDS_APPS_DIR/.
+  rm -f $APPS_DIR/*
+  cp $LATESTAPPS_DIR/* $APPS_DIR/.
 
-  rm -f $SMV_APPS_DIR/*
-  cp $SMV_LATESTAPPS_DIR/* $SMV_APPS_DIR/.
+  rm -f $BRANCHAPPS_DIR/*
+  cp $LATESTAPPS_DIR/* $BRANCHAPPS_DIR/.
+
+  rm -f $BRANCHPUBS_DIR/*
+  cp $PUBS_DIR/*       $BRANCHPUBS_DIR/.
 fi
 
 ### Wrap up and report results ###
@@ -2124,4 +2269,5 @@ if [[ "$DEBUG_ONLY" == "" ]] && [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" 
   archive_timing_stats
 fi
 email_build_status 'Firebot'
+echo firebot exit status: $firebot_status
 exit $firebot_status

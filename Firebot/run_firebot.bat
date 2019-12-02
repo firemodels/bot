@@ -66,7 +66,7 @@ if %update% == 0 goto no_update
 :: run firebot
 
   echo 1 > %running%
-  call firebot.bat %repo% %clean% %update% %altemail% %usematlab% %installed% %lite% %emailto%
+  call firebot.bat %repo% %clean% %update% %altemail% %usematlab% %installed% %lite% %build_only% %emailto%
   if exist %running% erase %running%
   goto end_running
 :skip_running
@@ -98,6 +98,10 @@ goto eof
    set valid=1
    set clean=1
    set update=1
+ )
+ if /I "%1" EQU "-build" (
+   set valid=1
+   set build_only=1
  )
  if /I "%1" EQU "-clean" (
    set valid=1
@@ -181,13 +185,15 @@ echo -email address  - override "to" email addresses specified in repo
 if "%emailto%" NEQ "" (
 echo       (default: %emailto%^)
 )
-echo -force          - force firebot to run
-echo -nomatlab       - do not use matlab
 echo -bot            - clean and update repository
-echo -lite           - build and run only debug FDS
+echo -build          - only build fds and smv apps
 echo -clean          - clean repository
+echo -force          - force firebot to run
 echo -installed      - use installed smokeview
+echo -lite           - build and run only debug FDS
+echo -nomatlab       - do not use matlab
 echo -update         - update repository
+
 exit /b
 
 :normalise
