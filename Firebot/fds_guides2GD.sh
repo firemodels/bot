@@ -51,6 +51,7 @@ UPLOADFIGURES ()
 }
 
 if [ -e $GDRIVE ] ; then
+  UPLOADGUIDE geom_notes
   UPLOADGUIDE FDS_Config_Management_Plan
   UPLOADGUIDE FDS_Technical_Reference_Guide
   UPLOADGUIDE FDS_User_Guide
