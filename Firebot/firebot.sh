@@ -2303,7 +2303,9 @@ if [[ "$DEBUG_ONLY" == "" ]] && [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" 
               rm -r images manuals *.html
               cp -r $FDS_SUMMARY/* .
               DATE=`date +"%b %d, %Y - %r"`
-              sed "s/&&DATE&&/$DATE/g" $FDS_SUMMARY/index.html > index.html
+              sed "s/&&DATE&&/$DATE/g" $FDS_SUMMARY/index.html   > index.html
+              sed "s/&&DATE&&/$DATE/g" $FDS_SUMMARY/manuals.html > manuals.html
+              cd $CUR_DIR
               cd $CUR_DIR
             fi
           fi
