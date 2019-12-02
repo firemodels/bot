@@ -2294,8 +2294,8 @@ if [[ "$DEBUG_ONLY" == "" ]] && [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" 
           cp $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/*.png $FDS_SUMMARY/images/verification/.
           DATE=`date +"%b %d, %Y - %r"`
 
-          sed "s/&&DATE&&/$DATE/g"              $FDS_SUMMARY/index_template.html \
-          sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                  \
+          sed "s/&&DATE&&/$DATE/g"              $FDS_SUMMARY/index_template.html | \
+          sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                  | \
           sed "s/&&SMV_BUILD&&/$SMV_REVISION/g" > $FDS_SUMMARY/index.html
 
           if [ "$WEB_DIR" != "" ]; then
