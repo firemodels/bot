@@ -2321,7 +2321,7 @@ if [[ "$DEBUG_ONLY" == "" ]] && [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" 
             if [ -d $WEB_DIR ]; then
               CUR_DIR=`pwd`
               cd $WEB_DIR
-              rm -r images manuals *.html
+              rm -r images manuals diffs *.html
               cp -r $FDS_SUMMARY/* .
               rm index_template.html
               cd $CUR_DIR
