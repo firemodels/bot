@@ -1094,6 +1094,7 @@ check_smv_pictures()
      rm -rf images images2 manuals movies *.html
      cd $SMV_SUMMARY_DIR
      cp -r * $web_temp/.
+     rm -f $web_temp/*template.html
      cp -r $web_temp/* $WEB_DIR/.
      rm -r $web_temp
      cd $CURDIR
@@ -2050,6 +2051,22 @@ if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]] && [[ "$BUILD_ONLY" == ""
      make_guide SMV_Technical_Reference_Guide $smvrepo/Manuals/SMV_Technical_Reference_Guide SMV_Technical_Reference_Guide
      echo "   verification"
      make_guide SMV_Verification_Guide        $smvrepo/Manuals/SMV_Verification_Guide        SMV_Verification_Guide
+
+     DATE=`date +"%b %d, %Y - %r"`
+
+     sed "s/&&DATE&&/$DATE/g"                $SMV_SUMMARY_DIR/index_template.html   | \
+     sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                          | \
+     sed "s/&&SMV_BUILD&&/$SMV_REVISION/g" > $SMV_SUMMARY_DIR/index.html
+     
+     sed "s/&&DATE&&/$DATE/g"                $SMV_SUMMARY_DIR/manuals_template.html | \
+     sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                          | \
+     sed "s/&&SMV_BUILD&&/$SMV_REVISION/g" > $SMV_SUMMARY_DIR/manuals.html
+
+     sed "s/&&DATE&&/$DATE/g"                $SMV_SUMMARY_DIR/movies_template.html  | \
+     sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                          | \
+     sed "s/&&SMV_BUILD&&/$SMV_REVISION/g" > $SMV_SUMMARY_DIR/movies.html
+
+
      notfound=`$HTML2PDF -V 2>&1 | tail -1 | grep "not found" | wc -l`
      if [ $notfound -eq 0 ]; then
        $HTML2PDF $smvrepo/Manuals/SMV_Summary/index.html $smvrepo/Manuals/SMV_Summary/SMV_Summary.pdf
