@@ -1,0 +1,71 @@
+#!/bin/bash
+BASE_DIR=$1
+NEW_DIR=$2
+DIFF_DIR=$3
+
+CHECK_DIR ()
+{
+ local DIR=$1
+ local CHECKSUB=$2
+
+  if [ ! -d $DIR ]; then
+    echo "***error: directory $DIR does not exist"
+    ABORT=1
+  else
+    if [ "$CHECKSUB" != "" ]; then
+      if [ ! -d $DIR/user ]; then
+        echo "***error: directory $DIR/user does not exist"
+        ABORT=1
+      fi
+      if [ ! -d $DIR/verification ]; then
+        echo "***error: directory $DIR/verification does not exist"
+        ABORT=1
+      fi
+    fi
+  fi
+}
+
+ABORT=
+
+notfound=`compare --version 2>&1 | tail -1 | grep "not found" | wc -l`
+if [ $notfound -ne 0 ]; then
+  echo "Image comparison program, compare, not in path"
+  ABORT=1
+fi
+CHECK_DIR $BASE_DIR 1
+CHECK_DIR $NEW_DIR 1
+CHECK_DIR $DIFF_DIR
+if [ "$ABORT" != "" ]; then
+  exit
+fi
+
+SUBDIR=user
+echo comparing images in directories $BASE_DIR/$SUBDIR and $NEW_DIR/$SUBDIR
+for f in $BASE_DIR/$SUBDIR/*.png; do
+  base=`basename $f`
+  from_file=$BASE_DIR/$SUBDIR/$base
+  to_file=$NEW_DIR/$SUBDIR/$base
+  diff_file=$DIFF_DIR/$SUBDIR/$base
+  rm -f $diff_file
+  if [ -e $from_file ]; then
+    if [ -e $to_file ]; then
+      compare $from_file $to_file $diff_file
+    fi
+  fi
+done
+
+SUBDIR=verification
+echo comparing images in directories $BASE_DIR/$SUBDIR and $NEW_DIR/$SUBDIR
+for f in $BASE_DIR/$SUBDIR/*.png; do
+  base=`basename $f`
+  from_file=$BASE_DIR/$SUBDIR/$base
+  to_file=$NEW_DIR/$SUBDIR/$base
+  diff_file=$DIFF_DIR/$SUBDIR/$base
+  rm -f $diff_file
+  if [ -e $from_file ]; then
+    if [ -e $to_file ]; then
+      compare $from_file $to_file $diff_file
+    fi
+  fi
+done
+echo complete
