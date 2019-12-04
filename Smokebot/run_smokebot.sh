@@ -46,16 +46,7 @@ echo "-t - use test smokeview"
 echo "-T - only clone the fds and smv repos (this option is set by default when"
 echo "     only building apps (-B) and cloning repos (-R) options are used"
 echo "-U - upload guides"
-if [ "$web_DIR" == "" ]; then
-  echo "-w directory - web directory containing summary pages"
-else
-  echo "-w directory - web directory containing summary pages [default: $web_DIR]"
-fi
-if [ "$WEB_URL" == "" ]; then
-  echo "-W url - web url of summary pages"
-else
-  echo "-W url - web url of summary pages [default: $WEB_URL]"
-fi
+echo "-w directory - web directory containing summary pages"
 echo "-x fds_rev - run smokebot using the fds revision named fds_rev [default: origin/master]"
 echo "-y smv_rev - run smokebot using the smv revision named smv_rev [default: origin/master]"
 echo "   the -x and -y options are only used with the -R option i.e. when"
@@ -192,17 +183,7 @@ FDS_REV=
 SMV_REV=
 FIREBOT_HOST=
 FIREBOT_HOME=
-CLONE_FDSSMV=
-
-WEB_URL=
-web_DIR=/var/www/html/`whoami`
-if [ -d $web_DIR ]; then
-  IP=`wget http://ipinfo.io/ip -qO -`
-  HOST=`host $IP | awk '{printf("%s\n",$5);}'`
-  WEB_URL=http://$HOST/`whoami`
-else
-  web_DIR=
-fi
+WEB_DIR=
 
 #*** check to see if a queing system is available
 
@@ -214,7 +195,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'aAbBcCd:Dfg:G:hHI:JkLm:MPq:r:R:StTuUvw:W:x:y:' OPTION
+while getopts 'aAbBcCd:Dfg:G:hHI:JkLm:MPq:r:R:StTuUvw:x:y:' OPTION
 do
 case $OPTION  in
   a)
@@ -300,10 +281,7 @@ case $OPTION  in
    ECHO=echo
    ;;
   w)
-   web_DIR="$OPTARG"
-   ;;
-  W)
-   WEB_URL="$OPTARG"
+   WEB_DIR="$OPTARG"
    ;;
   x)
    FDS_REV="-x $OPTARG"
@@ -382,11 +360,8 @@ if [ "$CLONE_REPOS" != "" ]; then
   CLONE_REPOS="-R $CLONE_REPOS"
 fi
 
-if [ ! "$web_DIR" == "" ]; then
-  web_DIR="-w $web_DIR"
-fi
-if [ ! "$WEB_URL" == "" ]; then
-  WEB_URL="-W $WEB_URL"
+if [ "$WEB_DIR" != "" ]; then
+  WEB_DIR="-w $WEB_DIR"
 fi
 
 COMPILER="-I $COMPILER"
@@ -467,7 +442,7 @@ BRANCH="-b $BRANCH"
 #*** run smokebot
 
 touch $smokebot_pid
-$ECHO ./$botscript $SKIP $SIZE $BRANCH $FDS_REV $SMV_REV $TESTFLAG $CLONE_REPOS $CLONE_FDSSMV $RUNAUTO $INTEL $BUILD_ONLY $COMPILER $SMOKEBOT_LITE $CLEANREPO $web_DIR $WEB_URL $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $SKIP $SIZE $BRANCH $FDS_REV $SMV_REV $TESTFLAG $CLONE_REPOS $CLONE_FDSSMV $RUNAUTO $INTEL $BUILD_ONLY $COMPILER $SMOKEBOT_LITE $CLEANREPO $WEB_DIR $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi
