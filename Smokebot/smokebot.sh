@@ -1083,25 +1083,6 @@ check_smv_pictures()
       grep -A 2 -I -E "Warning" $OUTPUT_DIR/stage4b >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
-   if [ -d $SMV_SUMMARY_DIR ]; then
-     if [ "$WEB_DIR" != "" ]; then
-       CURDIR=`pwd`
-       web_temp=/tmp/web_dir.$$
-       mkdir $web_temp
-       if [ -d $WEB_DIR/movies ]; then
-         cp -r $WEB_DIR/movies $web_temp/.
-       fi
-       cd $WEB_DIR
-       rm -rf images images2 manuals movies *.html
-       cd $SMV_SUMMARY_DIR
-       cp -r * $web_temp/.
-       rm -f $web_temp/*template.html
-       cp -r $web_temp/* $WEB_DIR/.
-       rm -r $web_temp
-       cd $CURDIR
-     fi
-   fi
-
 }
 
 #---------------------------------------------
@@ -1143,16 +1124,6 @@ check_smv_movies()
       echo "Warnings from Stage 6e - Make SMV movies (release mode):" >> $WARNING_LOG
       grep -I -E "Warning" $OUTPUT_DIR/stage4c >> $WARNING_LOG
       echo "" >> $WARNING_LOG
-   fi
-   if [ -d $SMV_SUMMARY_DIR ]; then 
-     if [ "$WEB_DIR" != "" ]; then 
-       CURDIR=`pwd`
-       cd $WEB_DIR
-       rm -rf images images2 manuals movies *.html
-       cd $SMV_SUMMARY_DIR
-       cp -r * $WEB_DIR/.
-       cd $CURDIR
-     fi
    fi
 }
 
@@ -2055,20 +2026,30 @@ if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]] && [[ "$BUILD_ONLY" == ""
      echo "   verification"
      make_guide SMV_Verification_Guide        $smvrepo/Manuals/SMV_Verification_Guide        SMV_Verification_Guide
 
-     DATE=`date +"%b %d, %Y - %r"`
+     if [ -d $SMV_SUMMARY_DIR ]; then
+       DATE=`date +"%b %d, %Y - %r"`
 
-     sed "s/&&DATE&&/$DATE/g"                $SMV_SUMMARY_DIR/index_template.html   | \
-     sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                          | \
-     sed "s/&&SMV_BUILD&&/$SMV_REVISION/g" > $SMV_SUMMARY_DIR/index.html
+       sed "s/&&DATE&&/$DATE/g"                $SMV_SUMMARY_DIR/index_template.html   | \
+       sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                          | \
+       sed "s/&&SMV_BUILD&&/$SMV_REVISION/g" > $SMV_SUMMARY_DIR/index.html
 
-     sed "s/&&DATE&&/$DATE/g"                $SMV_SUMMARY_DIR/manuals_template.html | \
-     sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                          | \
-     sed "s/&&SMV_BUILD&&/$SMV_REVISION/g" > $SMV_SUMMARY_DIR/manuals.html
+       sed "s/&&DATE&&/$DATE/g"                $SMV_SUMMARY_DIR/manuals_template.html | \
+       sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                          | \
+       sed "s/&&SMV_BUILD&&/$SMV_REVISION/g" > $SMV_SUMMARY_DIR/manuals.html
 
-     sed "s/&&DATE&&/$DATE/g"                $SMV_SUMMARY_DIR/movies_template.html  | \
-     sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                          | \
-     sed "s/&&SMV_BUILD&&/$SMV_REVISION/g" > $SMV_SUMMARY_DIR/movies.html
+       sed "s/&&DATE&&/$DATE/g"                $SMV_SUMMARY_DIR/movies_template.html  | \
+       sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                          | \
+       sed "s/&&SMV_BUILD&&/$SMV_REVISION/g" > $SMV_SUMMARY_DIR/movies.html
 
+       if [ "$WEB_DIR" != "" ]; then
+         rm -rf $WEB_DIR/images $WEB_DIR/images2 $WEB_DIR/manuals $WEB_DIR/*.html
+         if [ "$MAKEMOVIES" != "" ]; then
+           rm -rf $WEB_DIR/movies
+         fi
+         cp -r $SMV_SUMMARY_DIR/* $WEB_DIR/.
+         rm -f $WEB_DIR/*template.html
+       fi
+     fi
 
      notfound=`$HTML2PDF -V 2>&1 | tail -1 | grep "not found" | wc -l`
      if [ $notfound -eq 0 ]; then
