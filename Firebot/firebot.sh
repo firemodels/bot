@@ -1320,8 +1320,8 @@ copy_guide()
      fi
    fi
    if [ -e $doc ]; then
-     if [ -d $FDS_SUMMARY/manuals ]; then
-       cp $doc $FDS_SUMMARY/manuals/.
+     if [ -d $FDS_SUMMARY_DIR/manuals ]; then
+       cp $doc $FDS_SUMMARY_DIR/manuals/.
      fi
    fi
 }
@@ -1899,7 +1899,7 @@ botrepo=$repo/bot
 figrepo=$repo/fig
 outrepo=$repo/out
 
-FDS_SUMMARY=$fdsrepo/Manuals/FDS_Summary
+FDS_SUMMARY_DIR=$fdsrepo/Manuals/FDS_Summary
 
 #*** clean repos
 echo "Status"
@@ -2291,39 +2291,39 @@ if [[ "$DEBUG_ONLY" == "" ]] && [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" 
         copy_fds_validation_guide
         copy_fds_Config_management_plan
 
-        if [ -d $FDS_SUMMARY ]; then
-          cp $fdsrepo/Manuals/FDS_User_Guide/SCRIPT_FIGURES/*.png         $FDS_SUMMARY/images/user/.
-          cp $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/*.png $FDS_SUMMARY/images/verification/.
+        if [ -d $FDS_SUMMARY_DIR ]; then
+          cp $fdsrepo/Manuals/FDS_User_Guide/SCRIPT_FIGURES/*.png         $FDS_SUMMARY_DIR/images/user/.
+          cp $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/*.png $FDS_SUMMARY_DIR/images/verification/.
           DATE=`date +"%b %d, %Y - %r"`
 
-          sed "s/&&DATE&&/$DATE/g"              $FDS_SUMMARY/index_template.html | \
-          sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                  | \
-          sed "s/&&LINK&&/original - <a href=\"diffs\/index.html\">differences<\/a>/g"      | \
-          sed "s/&&SMV_BUILD&&/$SMV_REVISION/g" > $FDS_SUMMARY/index.html
-          cat $FDS_SUMMARY/index_trailer.html >> $FDS_SUMMARY/index.html
+          sed "s/&&DATE&&/$DATE/g"                $FDS_SUMMARY_DIR/index_template.html | \
+          sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                        | \
+          sed "s/&&LINK&&/original - <a href=\"diffs\/index.html\">differences<\/a>/g" | \
+          sed "s/&&SMV_BUILD&&/$SMV_REVISION/g"    > $FDS_SUMMARY_DIR/index.html
+          cat $FDS_SUMMARY_DIR/index_trailer.html >> $FDS_SUMMARY_DIR/index.html
 
           notfound=`$HTML2PDF -V 2>&1 | tail -1 | grep "not found" | wc -l`
           if [ $notfound -eq 0 ]; then
-            $HTML2PDF $FDS_SUMMARY/index.html $FDS_SUMMARY/FDS_Summary.pdf
-            cp $FDS_SUMMARY/FDS_Summary.pdf   $NEWGUIDE_DIR/.
+            $HTML2PDF $FDS_SUMMARY_DIR/index.html $FDS_SUMMARY_DIR/FDS_Summary.pdf
+            cp $FDS_SUMMARY_DIR/FDS_Summary.pdf   $NEWGUIDE_DIR/.
           fi
 
           CURDIR=`pwd`
           cd $botrepo/Firebot
-          ./compare_images.sh $figrepo/compare/firebot/images $FDS_SUMMARY/images $FDS_SUMMARY/diffs/images
-          sed "s/&&DATE&&/$DATE/g"              $FDS_SUMMARY/index_template.html | \
-          sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                  | \
-          sed "s/&&LINK&&/<a href=\"..\/index.html\">original<\/a> - differences/g"      | \
-          sed "s/&&SMV_BUILD&&/$SMV_REVISION/g" > $FDS_SUMMARY/diffs/index.html
-          cat $FDS_SUMMARY/diff_trailer.html >> $FDS_SUMMARY/diffs/index.html
+          ./compare_images.sh $figrepo/compare/firebot/images $FDS_SUMMARY_DIR/images $FDS_SUMMARY_DIR/diffs/images >& $OUTPUT_DIR/stage8_image_compare
+          sed "s/&&DATE&&/$DATE/g"              $FDS_SUMMARY_DIR/index_template.html | \
+          sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                      | \
+          sed "s/&&LINK&&/<a href=\"..\/index.html\">original<\/a> - differences/g"  | \
+          sed "s/&&SMV_BUILD&&/$SMV_REVISION/g"   > $FDS_SUMMARY_DIR/diffs/index.html
+          cat $FDS_SUMMARY_DIR/diff_trailer.html >> $FDS_SUMMARY_DIR/diffs/index.html
 
           if [ "$WEB_DIR" != "" ]; then
             if [ -d $WEB_DIR ]; then
               CUR_DIR=`pwd`
               cd $WEB_DIR
               rm -r images manuals diffs *.html
-              cp -r $FDS_SUMMARY/* .
-              rm index_template.html
+              cp -r $FDS_SUMMARY_DIR/* .
+              rm *template.html
               cd $CUR_DIR
             fi
           fi
