@@ -77,7 +77,7 @@ BRANCH="-b release"
 cd ../../../..
 repo=`pwd`
 
-while getopts 'a:A:b:Bcd:fF:ghp:rS:tuUvVw' OPTION
+while getopts 'a:A:b:Bcd:fF:ghHp:rS:tuUvVw' OPTION
 do
 case $OPTION  in
   a)
@@ -108,6 +108,9 @@ case $OPTION  in
    gopt="-g"
    ;;
   h)
+   hopt="-h"
+   ;;
+  H)
    hopt="-h"
    ;;
   p)
