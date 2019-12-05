@@ -382,15 +382,21 @@ fi
 if [ "$RUNFIREBOT" != "" ]; then
   if [ "`whoami`" != "firebot" ]; then
     if [ "$CLONE_REPOS" != "" ]; then
-      if [ "$CLONE_FDSSMV" == "" ]; then
-        echo "You are about to erase and clone the fds, exp, fig"
-        echo "out and smv repos."
+      if [ "$FORCECLONE" == "" ]; then
+        YOUARE="You are about to erase and clone "
       else
-        echo "You are about to erase and clone the fds and smv repos"
+        YOUARE="You are erasing and cloning "
       fi
-      echo "Press any key to continue or <CTRL> c to abort."
-      echo "Type $0 -h for other options"
-      read val
+      if [ "$CLONE_FDSSMV" == "" ]; then
+        echo "$YOUARE the fds, exp, fig, out and smv repos."
+      else
+        echo "$YOUARE the fds and smv repos"
+      fi
+      if [ "$FORCECLONE" == "" ]; then
+        echo "Press any key to continue or <CTRL> c to abort."
+        echo "Type $0 -h for other options"
+        read val
+      fi
     fi
   fi
 fi
