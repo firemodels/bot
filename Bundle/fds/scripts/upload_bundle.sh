@@ -51,12 +51,18 @@ if [ "$upload" == "1" ]; then
   nfiles=`$GDRIVE list  | grep $file | wc -l`
   if [ $nfiles -eq 0 ]; then
     echo "*** warning: The bundle file $file failed to upload to google drive"
+  else
+    echo "$file uploaded.  Erasing from $BUNDLE_DIR"
+    rm -f $BUNDLE_DIR/$file
   fi
   echo uploading $BUNDLE_DIR/$shafile
   $GDRIVE upload -p $BUNDLE_PARENT_ID -f $BUNDLE_DIR/$shafile
   nfiles=`$GDRIVE list  | grep $shafile | wc -l`
   if [ $nfiles -eq 0 ]; then
     echo "*** warning: The sha1 file $sha1file failed to upload to google drive"
+  else
+    echo "$shafile uploaded.  Erasing from $BUNDLE_DIR"
+    rm -f $BUNDLE_DIR/$shafile
   fi
 else
   if [ ! -e $BUNDLE_DIR/$file ]; then
