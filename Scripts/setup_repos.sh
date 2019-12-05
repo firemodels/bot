@@ -61,6 +61,7 @@ allrepos="cad cfast cor exp fds fig out radcal smv"
 wikiwebrepos="fds.wiki fds-smv"
 repos=$fdsrepos
 eraserepos=
+FORCECLONE=
 
 FMROOT=
 WIKIWEB=
@@ -72,7 +73,7 @@ else
    exit
 fi
 
-while getopts 'abcfFhsSTw' OPTION
+while getopts 'abcCfFhsSTw' OPTION
 do
 case $OPTION  in
   a)
@@ -80,6 +81,9 @@ case $OPTION  in
    ;;
   c)
    repos=$cfastrepos;
+   ;;
+  C)
+   FORCECLONE=1
    ;;
   f)
    repos=$fdsrepos;
@@ -122,16 +126,22 @@ echo GITHEADER=$GITHEADER
 echo GITUSER=$GITUSER
 
 if [ "$eraserepos" == "" ]; then
-  echo "You are about to clone the repos: $repos"
+  if [ "$FORCECLONE" == "" ]; then
+    echo "You are about to clone the repos: $repos"
+  else
+    echo "You are cloning the repos: $repos"
+  fi
   if [ "$WIKIWEB" == "1" ]; then
      echo "from git@github.com:firemodels into the directory: $FMROOT"
   else
      echo "from $GITHEADER$GITUSER into the directory: $FMROOT"
   fi
-  echo ""
-  echo "Press any key to continue or <CTRL> c to abort."
-  echo "Type $0 -h for other options"
-  read val
+  if [ "$FORCECLONE" == "" ]; then
+    echo ""
+    echo "Press any key to continue or <CTRL> c to abort."
+    echo "Type $0 -h for other options"
+    read val
+  fi
 fi
 
 for repo in $repos

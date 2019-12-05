@@ -1763,9 +1763,10 @@ FDS_REV=origin/master
 SMV_REV=origin/master
 WEB_DIR=
 HTML2PDF=wkhtmltopdf
+FORCECLONE=
 
 #*** parse command line arguments
-while getopts 'b:BcdDIiJLm:p:q:R:sTuUx:y:w:' OPTION
+while getopts 'b:BcCdDIiJLm:p:q:R:sTuUx:y:w:' OPTION
 do
 case $OPTION in
   b)
@@ -1780,6 +1781,9 @@ case $OPTION in
    ;;
   c)
    CLEANREPO=1
+   ;;
+  C)
+   FORCECLONE="-C"
    ;;
   d)
    debug_mode=1
@@ -1911,10 +1915,10 @@ if [[ "$CLONE_REPOS" != "" ]]; then
   cd $botrepo/Scripts
   if [ "$CLONE_FDSSMV" != "" ]; then
    # only clone the fds and smv repos - used when just compiling the fds and smv apps
-    ./setup_repos.sh -T > $OUTPUT_DIR/stage1_clone 2>&1
+    ./setup_repos.sh $FORCECLONE -T > $OUTPUT_DIR/stage1_clone 2>&1
   else
    # clone all repos
-    ./setup_repos.sh -F > $OUTPUT_DIR/stage1_clone 2>&1
+    ./setup_repos.sh $FORCECLONE -F > $OUTPUT_DIR/stage1_clone 2>&1
   fi
   if [ "$CLONE_REPOS" != "master" ]; then
     FDSBRANCH=$CLONE_REPOS
