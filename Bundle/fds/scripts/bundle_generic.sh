@@ -279,13 +279,13 @@ CP $APPS_DIR hashfile   $bundledir/$smvbin hashfile
 
 CURDIR=`pwd`
 cd $bundledir/$smvbin
-hashfile background > hash/background.sha1
-hashfile smokeview  > hash/smokeview.sha1
-hashfile smokediff  > hash/smokediff.sha1
-hashfile smokezip   > hash/smokezip.sha1
-hashfile dem2fds    > hash/dem2fds.sha1
-hashfile wind2fds   > hash/wind2fds.sha1
-hashfile hashfile   > hash/hashfile.sha1
+$APPS_DIR/hashfile background > hash/background.sha1
+$APPS_DIR/hashfile smokeview  > hash/smokeview.sha1
+$APPS_DIR/hashfile smokediff  > hash/smokediff.sha1
+$APPS_DIR/hashfile smokezip   > hash/smokezip.sha1
+$APPS_DIR/hashfile dem2fds    > hash/dem2fds.sha1
+$APPS_DIR/hashfile wind2fds   > hash/wind2fds.sha1
+$APPS_DIR/hashfile hashfile   > hash/hashfile.sha1
 cd $CURDIR
 
 CP $smvscriptdir jp2conv.sh $bundledir/$smvbin jp2conv.sh
@@ -300,9 +300,9 @@ CP $APPS_DIR test_mpi  $bundledir/bin test_mpi
 
 CURDIR=`pwd`
 cd $bundledir/bin
-hashfile fds       > hash/fds.sha1
-hashfile fds2ascii > hash/fds2ascii.sha1
-hashfile test_mpi  > hash/test_mpi.sha1
+$APPS_DIR/hashfile fds       > hash/fds.sha1
+$APPS_DIR/hashfile fds2ascii > hash/fds2ascii.sha1
+$APPS_DIR/hashfile test_mpi  > hash/test_mpi.sha1
 cd $CURDIR
 
 openmpifile=
@@ -397,7 +397,7 @@ $makeinstaller -i $bundlebase.tar.gz -d $INSTALLDIR -m $MPI_VERSION $OPENMPIFILE
 
 cat $bundledir/bin/hash/*.sha1     >  $bundlebase.sha1
 cat $bundledir/$smvbin/hash/*.sha1 >  $bundlebase.sha1
-hashfile $bundlebase.sh            >> $bundlebase.sha1
+$APPS_DIR/hashfile $bundlebase.sh            >> $bundlebase.sha1
 
 if [ -e $errlog ]; then
   numerrs=`cat $errlog | wc -l `
