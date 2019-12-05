@@ -2148,7 +2148,7 @@ if [ "$BUILD_ONLY" == "" ]; then
 fi
 
 echo | mail >& /tmp/mailtest.$$
-notfound=`grep 'not found' /tmp/mailtest.$$ | wc -l`
+notfound=`grep 'command not found' /tmp/mailtest.$$ | wc -l`
 HAVE_MAIL=1
 if [ $notfound -gt 0 ]; then
   HAVE_MAIL=
