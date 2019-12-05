@@ -52,7 +52,7 @@ if [ "$upload" == "1" ]; then
   if [ $nfiles -eq 0 ]; then
     echo "*** warning: The bundle file $file failed to upload to google drive"
   fi
-  echo uplading $BUNDLE_DIR/$shafile
+  echo uploading $BUNDLE_DIR/$shafile
   $GDRIVE upload -p $BUNDLE_PARENT_ID -f $BUNDLE_DIR/$shafile
   nfiles=`$GDRIVE list  | grep $shafile | wc -l`
   if [ $nfiles -eq 0 ]; then

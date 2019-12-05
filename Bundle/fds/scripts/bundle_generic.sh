@@ -27,9 +27,9 @@ INSTALLDIR=FDS/FDS6
 errlog=/tmp/errlog.$$
 
 if [ "`uname`" == "Darwin" ] ; then
-  bundlebase=${fds_version}_${smv_version}_${NIGHTLY}_osx64
+  bundlebase=${fds_version}_${smv_version}_${NIGHTLY}_osx
 else
-  bundlebase=${fds_version}_${smv_version}_${NIGHTLY}_linux64
+  bundlebase=${fds_version}_${smv_version}_${NIGHTLY}_lnx
 fi
 
 # determine directory repos reside under
@@ -225,12 +225,12 @@ CPDIRFILES ()
 # determine OS
 
 if [ "`uname`" == "Darwin" ]; then
-  FDSOS=_osx_64
+  FDSOS=_osx
   OS=_osx
   PLATFORM=OSX64
 else
-  FDSOS=_linux_64
-  OS=_linux
+  FDSOS=_lnx
+  OS=_lnx
   PLATFORM=LINUX64
 fi
 
