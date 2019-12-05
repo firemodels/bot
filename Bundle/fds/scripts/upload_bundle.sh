@@ -46,11 +46,13 @@ if [ "$upload" == "1" ]; then
   if [ "$erase" == "1" ]; then
     $GDRIVE list  | grep ${NIGHTLY}_$platform | awk '{ system("~/bin/gdrive delete -i " $1)} '
   fi
+  echo uploading $BUNDLE_DIR/$file
   $GDRIVE upload -p $BUNDLE_PARENT_ID -f $BUNDLE_DIR/$file
   nfiles=`$GDRIVE list  | grep $file | wc -l`
   if [ $nfiles -eq 0 ]; then
     echo "*** warning: The bundle file $file failed to upload to google drive"
   fi
+  echo uplading $BUNDLE_DIR/$shafile
   $GDRIVE upload -p $BUNDLE_PARENT_ID -f $BUNDLE_DIR/$shafile
   nfiles=`$GDRIVE list  | grep $shafile | wc -l`
   if [ $nfiles -eq 0 ]; then
