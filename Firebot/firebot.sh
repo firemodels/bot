@@ -1586,11 +1586,8 @@ email_build_status()
    if [ "$UPLOADGUIDES" == "1" ]; then
      echo "    Firebot status:  https://pages.nist.gov/fds-smv/firebot_status.html" >> $TIME_LOG
    fi
-   if [ "$WEB_DIR" != "" ]; then
-     echo "       summary dir: $WEB_DIR"  >> $TIME_LOG
-   fi
    if [ "$WEB_URL" != "" ]; then
-     echo "       summary URL: $WEB_URL"  >> $TIME_LOG
+     echo "   Firebot summary: $WEB_URL"  >> $TIME_LOG
    fi
    echo "-------------------------------" >> $TIME_LOG
 
