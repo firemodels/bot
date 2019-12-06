@@ -12,10 +12,10 @@ if "%SHOWPARMS%" == "1" (
   exit /b
 )
 
-pscp  %firebot_host%:%firebot_home%/.firebot/apps/FDS_HASH    FDS_HASH > Nul
-pscp  %firebot_host%:%firebot_home%/.firebot/apps/SMV_HASH    SMV_HASH > Nul
-pscp  %firebot_host%:%firebot_home%/.firebot/apps/FDS_REVISION FDS_REVISION > Nul
-pscp  %firebot_host%:%firebot_home%/.firebot/apps/SMV_REVISION SMV_REVISION > Nul
+pscp  %firebot_host%:%firebot_home%/.firebot/apps/FDS_HASH    output\FDS_HASH > Nul
+pscp  %firebot_host%:%firebot_home%/.firebot/apps/SMV_HASH    output\SMV_HASH > Nul
+pscp  %firebot_host%:%firebot_home%/.firebot/apps/FDS_REVISION output\FDS_REVISION > Nul
+pscp  %firebot_host%:%firebot_home%/.firebot/apps/SMV_REVISION output\SMV_REVISION > Nul
 
 type FDS_REVISION
 type FDS_HASH
