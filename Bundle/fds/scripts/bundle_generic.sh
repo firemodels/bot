@@ -252,7 +252,9 @@ TOMANIFESTSMV ()
 
   echo "<p><hr><p>"                 >> $MANIFEST
   if [ -e $prog ]; then
+    echo "<pre>"                    >> $MANIFEST
     $prog -v                        >> $MANIFEST
+    echo "</pre>"                   >> $MANIFEST
   else
     echo "$desc is absent<br>"      >> $MANIFEST
     echo "$prog"                    >> $MANIFEST
@@ -269,7 +271,9 @@ TOMANIFESTFDS ()
 
   echo "<p><hr><p>"                 >> $MANIFEST
   if [ -e $prog ]; then
-    echo "" | $prog                 >> $MANIFEST
+    echo "<pre>"                    >> $MANIFEST
+    echo "" | $prog                 >> $MANIFEST 2>&1
+    echo "</pre>"                   >> $MANIFEST
   else
     echo "$desc is absent<br>"      >> $MANIFEST
     echo "$prog"                    >> $MANIFEST
