@@ -361,6 +361,8 @@ TOMANIFESTSMV  $APPS_DIR/dem2fds    dem2fds
 TOMANIFESTSMV  $APPS_DIR/wind2fds   wind2fds
 TOMANIFESTSMV  $APPS_DIR/hashfile   hashfile
 
+# qpdf --empty --pages FDS_User_Guide.pdf  3-3 -- out.pdf
+
 cat << EOF >> $MANIFEST
 </body>
 </html>
