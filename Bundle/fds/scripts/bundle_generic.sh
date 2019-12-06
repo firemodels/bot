@@ -226,6 +226,57 @@ CPDIRFILES ()
   fi
 }
 
+# -------------------- TOMANIFESTSMV -------------------
+
+TOMANIFESTLIST ()
+{
+  local prog=$1
+  local desc=$2
+
+  echo "<p><hr><p>"                 >> $MANIFEST
+  if [ -e $prog ]; then
+    echo "$desc"                    >> $MANIFEST
+  else
+    echo "$desc is absent<br>"      >> $MANIFEST
+    echo "$prog"                    >> $MANIFEST
+  fi
+  echo "<br>"                       >> $MANIFEST
+}
+
+# -------------------- TOMANIFESTSMV -------------------
+
+TOMANIFESTSMV ()
+{
+  local prog=$1
+  local desc=$2
+
+  echo "<p><hr><p>"                 >> $MANIFEST
+  if [ -e $prog ]; then
+    $prog -v                        >> $MANIFEST
+  else
+    echo "$desc is absent<br>"      >> $MANIFEST
+    echo "$prog"                    >> $MANIFEST
+  fi
+  echo "<br>"                       >> $MANIFEST
+}
+
+# -------------------- TOMANIFESTFDS -------------------
+
+TOMANIFESTFDS ()
+{
+  local prog=$1
+  local desc=$2
+
+  echo "<p><hr><p>"                 >> $MANIFEST
+  if [ -e $prog ]; then
+    echo "" | $prog                 >> $MANIFEST
+  else
+    echo "$desc is absent<br>"      >> $MANIFEST
+    echo "$prog"                    >> $MANIFEST
+  fi
+  echo "<br>"                       >> $MANIFEST
+}
+
 # determine OS
 
 if [ "`uname`" == "Darwin" ]; then
@@ -267,6 +318,19 @@ mkdir $bundledir/Documentation
 mkdir $bundledir/Examples
 mkdir $bundledir/$smvbin/textures
 
+#
+# initialize manifest file
+MANIFEST=$bundledir/Documentation/manifest.html
+cat << EOF > $MANIFEST
+<html>
+
+<head>
+<TITLE>Manifest - $bundlebase</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF" >
+<h2>Manifest - $bundlebase</h2>
+EOF
+
 echo ""
 echo "--- copying programs ---"
 echo ""
@@ -280,6 +344,23 @@ CP $APPS_DIR smokezip   $bundledir/$smvbin smokezip
 CP $APPS_DIR dem2fds    $bundledir/$smvbin dem2fds
 CP $APPS_DIR wind2fds   $bundledir/$smvbin wind2fds
 CP $APPS_DIR hashfile   $bundledir/$smvbin hashfile
+
+TOMANIFESTFDS  $APPS_DIR/fds       fds
+TOMANIFESTLIST $APPS_DIR/fds2ascii fds2ascii
+TOMANIFESTLIST $APPS_DIR/test_mpi  test_mpi
+
+TOMANIFESTSMV  $APPS_DIR/smokeview  smokeview
+TOMANIFESTSMV  $APPS_DIR/background background
+TOMANIFESTSMV  $APPS_DIR/smokediff  smokediff
+TOMANIFESTSMV  $APPS_DIR/smokezip   smokezip
+TOMANIFESTSMV  $APPS_DIR/dem2fds    dem2fds
+TOMANIFESTSMV  $APPS_DIR/wind2fds   wind2fds
+TOMANIFESTSMV  $APPS_DIR/hashfile   hashfile
+
+cat << EOF >> $MANIFEST
+</body>
+</html>
+EOF
 
 CURDIR=`pwd`
 cd $bundledir/$smvbin
@@ -391,6 +472,7 @@ echo Compressing archive
 gzip    ../$bundlebase.tar
 echo Creating installer
 cd ..
+bundlepathdir=`pwd`
 bundlepath=`pwd`/$bundlebase.sh
 
 OPENMPIFILE=
@@ -418,3 +500,4 @@ if [ -e $errlog ]; then
 fi
 echo installer located at:
 echo $bundlepath
+cp $MANIFEST $bundlepathdir/${bundlebase}_manifest.html
