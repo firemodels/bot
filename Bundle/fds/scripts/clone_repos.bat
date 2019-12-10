@@ -7,7 +7,7 @@ set /p SMV_HASH=<output\SMV_HASH
 set CURDIR=%CD%
 
 cd ..\..\..\Scripts
-::call setup_repos -T
+call setup_repos -T -n
 
 cd %CURDIR%
 

@@ -1,5 +1,6 @@
 @echo off
 set type=%1
+set bot=%2
 
 set scriptdir=%~dp0
 set curdir=%CD%
@@ -53,6 +54,7 @@ set TOFILE=%4
 
 if exist %FROMDIR%\%FROMFILE% goto else1
     echo "***error: %FROMFILE% was not found in %FROMDIR%"
+    if "x%bot%" == "xbot" goto endif1
     pause
     goto endif1
 :else1
@@ -62,6 +64,7 @@ if exist %FROMDIR%\%FROMFILE% goto else1
       goto endif2
 :else2
       echo ***error: %FROMFILE% could not be copied to %TODIR%
+      if "x%bot%" == "xbot" goto endif2
       pause
 :endif2
 :endif1

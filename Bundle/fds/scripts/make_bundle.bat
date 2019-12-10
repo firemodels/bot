@@ -1,4 +1,6 @@
-echo off
+@echo off
+set bot=%1
+
 set FDSMAJORVERSION=6
 set FDSEDITION=FDS6
 set SMVEDITION=SMV6
@@ -30,7 +32,9 @@ echo Create a file named %envfile% and use smv/scripts/fds_smv_env_template.bat
 echo as an example.
 echo.
 echo Aborting now...
-pause>NUL
+if "x%bot%" == "xbot" goto skip1
+  pause>Nul
+:skip1
 goto:eof
 
 :endif_envexist2
@@ -44,11 +48,13 @@ set  in_shortcut=%userprofile%\.bundle\BUNDLE\WINDOWS\repoexes
 
 set basename=%fds_version%-%smv_version%_win64
 set hashfile=%repo_root%\smv\Build\hashfile\intel_win_64\hashfile_win_64.exe
-if NOT exist %hashfile% (
+if exist %hashfile% goto endif0
   echo ***warning: %hashfile% does not exist
   echo Bundle will not contain hashes of application files
+if "x%bot%" == "xbot" goto skip2
   pause
-)
+:skip2
+:endif0
 
 set in_pdf=%userprofile%\.bundle\pubs
 set smv_forbundle=%repo_root%\bot\Bundle\smv\for_bundle
@@ -276,29 +282,34 @@ set label=%~n1%~x1
 set infile=%1
 set infiletime=%~t1
 set outfile=%2
-IF EXIST %infile% (
+IF NOT EXIST %infile% goto else1
    echo copying %label% %infiletime%
    copy %infile% %outfile% >Nul
-) ELSE (
+:else1
    echo.
    echo *** warning: %infile% does not exist
    echo.
-   pause
-)
+if "x%bot%" == "xbot" goto skip3
+  pause
+:skip3
+:endif1
+
 exit /b
 
 :COPYDIR
 set fromdir=%1
 set todir=%2
-IF EXIST %fromdir% (
+IF NOT EXIST %fromdir% goto else2
    echo copying directory %fromdir%
    copy %fromdir% %todir% >Nul
-) ELSE (
+:else2
    echo.
    echo *** warning: directory %fromdir% does not exist
    echo.
-   pause
-)
+if "x%bot%" == "xbot" goto skip4
+  pause
+:skip4
+:endif2
 exit /b
 
 :EOF

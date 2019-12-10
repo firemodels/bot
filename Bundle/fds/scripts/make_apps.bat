@@ -6,10 +6,11 @@ git clean -dxf  1>> Nul 2>&1
 
 set clean_log=%CURDIR%\output\clean.log
 set compile_log=%CURDIR%\output\compile.log
-set error_log=%CURDIR%\output\compile.log
+set error_log=%CURDIR%\output\error.log
 
 echo. > %clean_log%
 echo. > %compile_log%
+echo. > %error_log%
 
 cd ..\..\..\..\smv\
 set smvrepo=%CD%
@@ -31,8 +32,13 @@ git clean -dxf  1>> %clean_log% 2>&1
 
 cd %fdsrepo%\Utilities
 echo ***cleaning %fdsrepo%\Utilities
+echo.
 git clean -dxf  1>> %clean_log% 2>&1
 
+:: setup compiler
+call %smvrepo%\Utilities\Scripts\setup_intel_compilers.bat 1>> %compile_log% 2>&1cd 
+
+:: build smokeview libraries and apps
 call :BUILDLIB
 call :BUILD     background
 call :BUILD     dem2fds
@@ -45,10 +51,12 @@ call :BUILD     sh2bat
 call :BUILD     get_time
 call :BUILDSMV
 
+:: build fds apps
 call :BUILDUTIL fds2ascii intel_win_64 win_64
 call :BUILDUTIL test_mpi  impi_intel_win
 call :BUILDFDS
 
+:: verify smokeview apps were built
 call :CHECK_BUILD     background
 call :CHECK_BUILD     dem2fds
 call :CHECK_BUILD     hashfile
@@ -60,6 +68,7 @@ call :CHECK_BUILD     sh2bat
 call :CHECK_BUILD     get_time
 call :CHECK_BUILDSMV
 
+:: verify fds apps were built
 call :CHECK_BUILDUTIL fds2ascii intel_win_64 _win_64
 call :CHECK_BUILDUTIL test_mpi  impi_intel_win
 call :CHECK_BUILDFDS
@@ -77,6 +86,9 @@ goto eof
 :: -------------------------------------------------------------
 
 echo ***building fds
+echo.                1>> %compile_log% 2>&1
+echo *************** 1>> %compile_log% 2>&1
+echo ***building fds 1>> %compile_log% 2>&1
 cd %fdsrepo%\Build\impi_intel_win_64
 call make_fds bot 1>> %compile_log% 2>&1
 exit /b /0
@@ -100,6 +112,9 @@ set prog=%1
 set builddir=%2
 
 echo ***building %prog%
+echo.                1>> %compile_log% 2>&1
+echo *************** 1>> %compile_log% 2>&1
+echo ***building %prog% 1>> %compile_log% 2>&1
 cd %fdsrepo%\Utilities\%prog%\%builddir%
 call make_%prog% bot 1>> %compile_log% 2>&1
 exit /b /0
@@ -124,6 +139,9 @@ exit /b /1
 :: -------------------------------------------------------------
 
 echo ***building smokeview libraries
+echo.                1>> %compile_log% 2>&1
+echo *************** 1>> %compile_log% 2>&1
+echo ***building smokeview libraries 1>> %compile_log% 2>&1
 
 cd %smvrepo%\Build\LIBS\intel_win_64
 call make_LIBS_bot 1>> %compile_log% 2>&1
@@ -134,6 +152,9 @@ exit /b /0
 :: -------------------------------------------------------------
 
 echo ***building smokeview
+echo.                1>> %compile_log% 2>&1
+echo *************** 1>> %compile_log% 2>&1
+echo ***building smokeview  1>> %compile_log% 2>&1
 cd %smvrepo%\Build\smokeview\intel_win_64
 call make_smokeview -release -bot 1>> %compile_log% 2>&1
 exit /b /0
@@ -157,6 +178,9 @@ set prog=%1
 set script=make_%prog%
 
 echo ***building %prog%
+echo.                1>> %compile_log% 2>&1
+echo *************** 1>> %compile_log% 2>&1
+echo ***building %prog% 1>> %compile_log% 2>&1
 cd %smvrepo%\Build\%prog%\intel_win_64
 call %script% bot 1>> %compile_log% 2>&1
 exit /b /0
