@@ -16,11 +16,6 @@ pscp  %firebot_host%:%firebot_home%/.firebot/apps/FDS_HASH    output\FDS_HASH > 
 pscp  %firebot_host%:%firebot_home%/.firebot/apps/SMV_HASH    output\SMV_HASH > Nul
 pscp  %firebot_host%:%firebot_home%/.firebot/apps/FDS_REVISION output\FDS_REVISION > Nul
 pscp  %firebot_host%:%firebot_home%/.firebot/apps/SMV_REVISION output\SMV_REVISION > Nul
-
-type FDS_REVISION
-type FDS_HASH
-type SMV_REVISION
-type SMV_HASH
 goto eof
 
 
