@@ -285,6 +285,7 @@ set outfile=%2
 IF NOT EXIST %infile% goto else1
    echo copying %label% %infiletime%
    copy %infile% %outfile% >Nul
+   goto endif1
 :else1
    echo.
    echo *** warning: %infile% does not exist
@@ -293,7 +294,6 @@ if "x%bot%" == "xbot" goto skip3
   pause
 :skip3
 :endif1
-
 exit /b
 
 :COPYDIR
@@ -302,6 +302,7 @@ set todir=%2
 IF NOT EXIST %fromdir% goto else2
    echo copying directory %fromdir%
    copy %fromdir% %todir% >Nul
+   goto endif2
 :else2
    echo.
    echo *** warning: directory %fromdir% does not exist
