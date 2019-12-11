@@ -36,7 +36,7 @@ echo.
 git clean -dxf  1>> %clean_log% 2>&1
 
 :: setup compiler
-call %smvrepo%\Utilities\Scripts\setup_intel_compilers.bat 1>> %compile_log% 2>&1cd 
+call %fdsrepo%\Build\Scripts\setup_intel_compilers.bat 1>> %compile_log% 2>&1cd 
 
 :: build smokeview libraries and apps
 call :BUILDLIB
