@@ -27,10 +27,10 @@ cd %CURDIR%
 call copy_apps smv bot || exit /b 1
 
 cd %CURDIR%
-call copy_pubs firebot  %firebot_home%/.firebot/pubs   %hostname || exit /b 1
+call copy_pubs firebot  %firebot_home%/.firebot/pubs   %hostname% || exit /b 1
 
 cd %CURDIR%
-call copy_pubs smokebot %smokebot_home%/.smokebot/pubs %hostname || exit /b 1
+call copy_pubs smokebot %smokebot_home%/.smokebot/pubs %hostname% || exit /b 1
 
-cd %CURDIR
-call make_bundle
+cd %CURDIR%
+call make_bundle bot
