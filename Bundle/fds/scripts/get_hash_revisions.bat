@@ -1,4 +1,5 @@
 @echo off
+set error=0
 
 ::set firebot_home=~firebot
 set firebot_home=/home2/smokevis2/firebot
@@ -9,21 +10,29 @@ call :getopts %*
 if "%SHOWPARMS%" == "1" (
   echo firebot_host=%firebot_host%
   echo firebot_home=%firebot_home%
-  exit /b
+  exit /b 0
 )
 
-pscp  %firebot_host%:%firebot_home%/.firebot/apps/FDS_HASH    output\FDS_HASH > Nul
-pscp  %firebot_host%:%firebot_home%/.firebot/apps/SMV_HASH    output\SMV_HASH > Nul
-pscp  %firebot_host%:%firebot_home%/.firebot/apps/FDS_REVISION output\FDS_REVISION > Nul
-pscp  %firebot_host%:%firebot_home%/.firebot/apps/SMV_REVISION output\SMV_REVISION > Nul
+call :getfile FDS_HASH
+call :getfile SMV_HASH
+call :getfile FDS_REVISION
+call :getfile SMV_REVISION
 goto eof
 
 
 ::-----------------------------------------------------------------------
+:getfile
+::-----------------------------------------------------------------------
+set file=%1
+pscp  %firebot_host%:%firebot_home%/.firebot/apps/%file%     output\%file%     > Nul
+if exist output\%file% exit /b 0
+set error=1
+echo ***Error: unable to download %file% from %firebot_host%:%firebot_home%/.firebot/apps/%file%
+exit /b 1
+
+::-----------------------------------------------------------------------
 :getopts
 ::-----------------------------------------------------------------------
-
-:getopts
  set stopscript=0
  if (%1)==() exit /b
  set valid=0
@@ -55,10 +64,10 @@ goto eof
    echo Usage:
    call :usage
    set stopscript=1
-   exit /b
+   exit /b 1
  )
 if not (%1)==() goto getopts
-exit /b
+exit /b 0
 
 ::-----------------------------------------------------------------------
 :usage
@@ -72,8 +81,9 @@ echo -g - host where firebot was run
 echo -G - home directory where firebot was run
 echo -h - display this message
 echo -v - show parameters used to build bundle (the bundle is not generated)
-exit /b
+exit /b 0
 
 :eof
 
-exit /b
+if "%error%" == "1" exit /b 1
+exit /b 0

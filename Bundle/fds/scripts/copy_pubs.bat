@@ -1,4 +1,5 @@
 @echo off
+set error=0
 set bot_type=%1
 set pdf_from=%2
 set bot_host=%3
@@ -32,11 +33,20 @@ set file=%1
 if "x%bot_host%" == "x" goto else1
   echo copying %file% from %pdf_from% on %bot_host% to %pdf_to%
   pscp %bot_host%:%pdf_from%/%file% %pdf_to%\.
+  if EXIST %pdf_to%\%file% goto endif1
+  echo ***Error: unable to copy %file% from %bot_host%:%pdf_from%/%file%
+  set error=1
   goto endif1
 :else1
   echo copying %file% from %pdf_from% to %pdf_to%
   copy %pdf_from%\%file% %pdf_to%
+  if EXIST %pdf_to%\%file% goto endif1
+  echo ***Error: unable to copy %file% from %pdf_from%\%file%
+  set error=1
 :endif1
 exit /b
 
 :eof
+
+if "%error%" == "0" exit /b 0
+exit /b 1

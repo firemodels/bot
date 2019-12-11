@@ -1,4 +1,5 @@
 @echo off
+set error=0
 
 set CURDIR=%CD%
 
@@ -132,6 +133,7 @@ exit /b /0
 :check_util
 echo ***error: The program %prog%%suffix%.exe failed to build
 echo ***error: The program %prog%%suffix%.exe failed to build  1>> %error_log% 2>&1
+set error=1
 exit /b /1
 
 :: -------------------------------------------------------------
@@ -168,6 +170,7 @@ exit /b /0
 :not_smokeview
 echo ***error: The program smokeview_win_64.exe failed to build
 echo ***error: The program smokeview_win_64.exe failed to build  1>> %error_log% 2>&1
+set error=1
 exit /b /1
 
 :: -------------------------------------------------------------
@@ -196,6 +199,10 @@ exit /b /0
 :notexist
 echo ***error: The program %prog%_win_64.exe failed to build
 echo ***error: The program %prog%_win_64.exe failed to build  1>> %error_log% 2>&1
+set error=1
 exit /b /1
 
 :eof
+
+if "%error%" == "0" exit /b 0
+exit /b 1

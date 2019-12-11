@@ -1,6 +1,7 @@
 @echo off
 
-call get_hash_revisions.bat
+call get_hash_revisions.bat || exit /b 1
+
 set /p FDS_HASH=<output\FDS_HASH
 set /p SMV_HASH=<output\SMV_HASH
 

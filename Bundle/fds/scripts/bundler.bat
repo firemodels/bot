@@ -15,22 +15,22 @@ if "x%smokebot_home%" == "x" (
 
 set CURDIR=%CD%
 
-call clone_repos
+call clone_repos || exit /b 1
 
 cd %CURDIR%
-call make_apps
+call make_apps   || exit /b 1
 
 cd %CURDIR%
-call copy_apps fds bot
+call copy_apps fds bot || exit /b 1
 
 cd %CURDIR%
-call copy_apps smv bot
+call copy_apps smv bot || exit /b 1
 
 cd %CURDIR%
-call copy_pubs firebot  %firebot_home%/.firebot/pubs   %hostname
+call copy_pubs firebot  %firebot_home%/.firebot/pubs   %hostname || exit /b 1
 
 cd %CURDIR%
-call copy_pubs smokebot %smokebot_home%/.smokebot/pubs %hostname
+call copy_pubs smokebot %smokebot_home%/.smokebot/pubs %hostname || exit /b 1
 
 cd %CURDIR
 call make_bundle
