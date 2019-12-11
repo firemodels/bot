@@ -1,5 +1,7 @@
 @echo off
 set bot=%1
+set FDS_HASH=%2
+set SMV_HASH=%3
 
 set FDSMAJORVERSION=6
 set FDSEDITION=FDS6
@@ -41,6 +43,14 @@ goto:eof
 
 call %envfile%
 :endif_env_defined
+
+if "x%FDS_HASH%" == "x" goto skip_fds_version
+  set fds_version=%FDS_HASH%
+:skip_fds_version
+
+if "x%SMV_HASH%" == "x" goto skip_smv_version
+  set smv_version=%SMV_HASH%
+:skip_smv_version
 
 set      in_impi=%userprofile%\.bundle\BUNDLE\WINDOWS\%INTELVERSION%
 set in_intel_dll=%userprofile%\.bundle\BUNDLE\WINDOWS\%INTELVERSION%

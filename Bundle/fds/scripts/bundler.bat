@@ -15,7 +15,16 @@ if "x%smokebot_home%" == "x" (
 
 set CURDIR=%CD%
 
-call clone_repos || exit /b 1
+call get_hash_revisions.bat || exit /b 1
+
+set /p FDS_HASH=<output\FDS_HASH
+set /p SMV_HASH=<output\SMV_HASH
+
+erase output\FDS_HASH
+erase output\SMV_HASH
+
+cd %CURDIR%
+call clone_repos %FDS_HASH% %SMV_HASH% || exit /b 1
 
 cd %CURDIR%
 call make_apps   || exit /b 1
@@ -33,4 +42,4 @@ cd %CURDIR%
 call copy_pubs smokebot %smokebot_home%/.smokebot/pubs %hostname% || exit /b 1
 
 cd %CURDIR%
-call make_bundle bot
+call make_bundle bot %FDS_HASH% %SMV_HASH% 

@@ -1,9 +1,14 @@
 @echo off
+set fds_hash=%1
+set smv_hash=%2
 
-call get_hash_revisions.bat || exit /b 1
+if NOT "x%fds_hash%" == "x" goto skip_fds_hash
+  set FDS_HASH=%fds_hash%
+:skip_fds_hash
 
-set /p FDS_HASH=<output\FDS_HASH
-set /p SMV_HASH=<output\SMV_HASH
+if NOT "x%smv_hash%" == "x" goto skip_smv_hash
+  set SMV_HASH=%smv_hash%
+:skip_smv_hash
 
 set CURDIR=%CD%
 
