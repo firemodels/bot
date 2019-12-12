@@ -579,22 +579,20 @@ check_cases_debug()
    # Scan for and report any errors in FDS cases
    cd $dir
 
-   if [[ `grep -rI 'Run aborted' $OUTPUT_DIR/stage4 | grep -v grep` == "" ]] && \
-      [[ `grep -rI Segmentation * | grep -v grep` == ""                   ]] && \
-      [[ `grep -rI ERROR: * | grep -v echo | grep -v grep` == ""          ]] && \
-      [[ `grep -rI 'STOP: Numerical' * | grep -v grep` == ""              ]] && \
-      [[ `grep 'BAD TERMINATION' */*.log | grep -v grep` == ""            ]] && \
-      [[ `grep -rI forrtl * | grep -v grep` == ""                         ]]
+   if [[ `grep 'Run aborted'     $OUTPUT_DIR/stage4 | grep -v grep`                == "" ]] && \
+      [[ `grep Segmentation      */*.err            | grep -v grep`                == "" ]] && \
+      [[ `grep ERROR:            */*.out            | grep -v grep | grep -v echo` == "" ]] && \
+      [[ `grep 'BAD TERMINATION' */*.log            | grep -v grep`                == "" ]] && \
+      [[ `grep forrtl            */*.err            | grep -v grep`                == "" ]]
    then
       cases_debug_success=true
    else
-      grep -rI 'Run aborted' $OUTPUT_DIR/stage4 | grep -v grep >> $OUTPUT_DIR/stage4_errors
-      grep -rI Segmentation * | grep -v grep                   >> $OUTPUT_DIR/stage4_errors
-      grep -rI ERROR: * | grep -v echo | grep -v grep          >> $OUTPUT_DIR/stage4_errors
-      grep -rI 'STOP: Numerical' * | grep -v grep              >> $OUTPUT_DIR/stage4_errors
-      grep -A 2 'BAD TERMINATION' */*.log | grep -v grep       >> $OUTPUT_DIR/stage4_errors
-      grep -rI -A 20 forrtl * | grep -v grep                   >> $OUTPUT_DIR/stage4_errors
-      
+      grep 'Run aborted'          $OUTPUT_DIR/stage4 | grep -v grep                >> $OUTPUT_DIR/stage4_errors
+      grep Segmentation           */*.err            | grep -v grep                >> $OUTPUT_DIR/stage4_errors
+      grep ERROR:                 */*.out            | grep -v grep | grep -v echo >> $OUTPUT_DIR/stage4_errors
+      grep -A 2 'BAD TERMINATION' */*.log            | grep -v grep                >> $OUTPUT_DIR/stage4_errors
+      grep -A 20 forrtl           */*.err            | grep -v grep                >> $OUTPUT_DIR/stage4_errors
+
       echo "Errors from Stage 4 - Run ${2} cases - debug mode:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage4_errors >> $ERROR_LOG
       echo "" >> $ERROR_LOG
@@ -774,25 +772,23 @@ check_cases_release()
    # Scan for and report any errors in FDS cases
    cd $dir
 
-   if [[ `grep 'Run aborted' $OUTPUT_DIR/stage5 | grep -v grep` == ""              ]] && \
-      [[ `grep 'ERROR' $OUTPUT_DIR/stage5 | grep -v geom_bad | grep -v grep` == "" ]] && \
-      [[ `grep -rI Segmentation * | grep -v grep` == ""                            ]] && \
-      [[ `grep -rI ERROR: * | grep -v echo | grep -v grep` == ""                   ]] && \
-      [[ `grep -rI 'STOP: Numerical' * | grep -v grep` == ""                       ]] && \
-      [[ `grep -rI forrtl * | grep -v grep` == ""                                  ]] && \
-      [[ `grep 'BAD TERMINATION'  */*.log | grep -v grep` == ""                    ]] && \
-      [[ `grep 'Inspector Clean' $OUTPUT_DIR/stage5i | grep -v grep` != ""         ]]
+   if [[ `grep 'Run aborted'     $OUTPUT_DIR/stage5  | grep -v grep`                    == "" ]] && \
+      [[ `grep 'ERROR'           $OUTPUT_DIR/stage5  | grep -v geom_bad | grep -v grep` == "" ]] && \
+      [[ `grep Segmentation      */*.err             | grep -v grep`                    == "" ]] && \
+      [[ `grep ERROR:            */*.out             | grep -v grep | grep -v echo`     == "" ]] && \
+      [[ `grep 'BAD TERMINATION' */*.log             | grep -v grep`                    == "" ]] && \
+      [[ `grep forrtl            */*.err             | grep -v grep`                    == "" ]] && \
+      [[ `grep 'Inspector Clean' $OUTPUT_DIR/stage5i | grep -v grep`                    != "" ]]
    then
-      cases_release_success=true
+      cases_debug_success=true
    else
-      grep 'Run aborted' $OUTPUT_DIR/stage5 | grep -v grep                      >> $OUTPUT_DIR/stage5_errors
-      grep 'ERROR' $OUTPUT_DIR/stage5 | grep -v geom_bad | grep -v grep         >> $OUTPUT_DIR/stage5_errors
-      grep -rI Segmentation * | grep -v grep                                    >> $OUTPUT_DIR/stage5_errors
-      grep -rI ERROR: * | grep -v echo | grep -v grep                           >> $OUTPUT_DIR/stage5_errors
-      grep -rI 'STOP: Numerical' * | grep -v grep                               >> $OUTPUT_DIR/stage5_errors
-      grep -A 2 'BAD TERMINATION' */*.log | grep -v grep                        >> $OUTPUT_DIR/stage5_errors
-      grep -rI -A 20 forrtl * | grep -v grep                                    >> $OUTPUT_DIR/stage5_errors
-      grep -rI "Inspector found errors" $OUTPUT_DIR/stage5i | grep -v grep      >> $OUTPUT_DIR/stage5_errors
+      grep 'Run aborted'                $OUTPUT_DIR/stage5  | grep -v grep                    >> $OUTPUT_DIR/stage5_errors
+      grep 'ERROR'                      $OUTPUT_DIR/stage5  | grep -v grep | grep -v geom_bad >> $OUTPUT_DIR/stage5_errors
+      grep Segmentation                 */*.err             | grep -v grep                    >> $OUTPUT_DIR/stage5_errors
+      grep ERROR:                       */*.out             | grep -v grep | grep -v echo     >> $OUTPUT_DIR/stage5_errors
+      grep -A 2 'BAD TERMINATION'       */*.log             | grep -v grep                    >> $OUTPUT_DIR/stage5_errors
+      grep -A 20 forrtl                 */*.err             | grep -v grep                    >> $OUTPUT_DIR/stage5_errors
+      grep -rI "Inspector found errors" $OUTPUT_DIR/stage5i | grep -v grep                    >> $OUTPUT_DIR/stage5_errors
 
       echo "Errors from Stage 5 - Run ${2} cases - release mode:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage5_errors                               >> $ERROR_LOG
@@ -839,10 +835,10 @@ run_verification_cases_release()
    echo "   release"
    cd $fdsrepo/Verification/scripts
    # Run FDS with 1 OpenMP thread
-   echo 'Running FDS benchmark verification cases:' >> $OUTPUT_DIR/stage5
+   echo 'Running FDS benchmark verification cases:'       >> $OUTPUT_DIR/stage5 2>&1
    echo ./Run_FDS_Cases.sh $INTEL2 $DV2 -b -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
         ./Run_FDS_Cases.sh $INTEL2 $DV2 -b -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
-   echo "" >> $OUTPUT_DIR/stage5 2>&1
+   echo ""                                                >> $OUTPUT_DIR/stage5 2>&1
 
    # Wait for benchmark verification cases to end
 # let benchmark and regular cases run at the same time - for now
@@ -852,14 +848,14 @@ run_verification_cases_release()
 #   echo 'Running FDS thread checking verification cases:' >> $OUTPUT_DIR/stage5
    cd ../Thread_Check
    echo ./inspection.sh -p 6 -q $QUEUE  inspector_test.fds >> $OUTPUT_DIR/stage5i 2>&1
-        ./inspection.sh -p 6 -q $QUEUE  inspector_test.fds >> $OUTPUT_DIR/stage5i 2>&1 &
-   echo "" >> $OUTPUT_DIR/stage5i 2>&1
+        ./inspection.sh -p 6 -q $QUEUE  inspector_test.fds >> $OUTPUT_DIR/stage5i 2>&1
+   echo ""                                                 >> $OUTPUT_DIR/stage5i 2>&1
 
    cd ../scripts
-   echo 'Running FDS non-benchmark verification cases:' >> $OUTPUT_DIR/stage5
+   echo 'Running FDS non-benchmark verification cases:'   >> $OUTPUT_DIR/stage5
    echo ./Run_FDS_Cases.sh $INTEL2 $DV2 -R -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
         ./Run_FDS_Cases.sh $INTEL2 $DV2 -R -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
-   echo "" >> $OUTPUT_DIR/stage5 2>&1
+   echo ""                                                >> $OUTPUT_DIR/stage5 2>&1
 
 
 
