@@ -5,6 +5,7 @@ NIGHTLY=$3
 platform=$4
 
 erase=1
+erase_local=
 
 GDRIVE=~/bin/gdrive
 # directory containing nightly bundles on google drive : nightly_bundles
@@ -52,8 +53,12 @@ if [ "$upload" == "1" ]; then
   if [ $nfiles -eq 0 ]; then
     echo "*** warning: The bundle file $file failed to upload to google drive"
   else
-    echo "$file uploaded.  Erasing from $BUNDLE_DIR"
-    rm -f $BUNDLE_DIR/$file
+    if [ "$erase_local" == "1" ]; then
+      echo "$file uploaded.  Erasing from $BUNDLE_DIR"
+      rm -f $BUNDLE_DIR/$file
+    else
+      echo "$file uploaded."
+    fi
   fi
   echo uploading $BUNDLE_DIR/$shafile
   $GDRIVE upload -p $BUNDLE_PARENT_ID -f $BUNDLE_DIR/$shafile
@@ -61,8 +66,12 @@ if [ "$upload" == "1" ]; then
   if [ $nfiles -eq 0 ]; then
     echo "*** warning: The sha1 file $sha1file failed to upload to google drive"
   else
-    echo "$shafile uploaded.  Erasing from $BUNDLE_DIR"
-    rm -f $BUNDLE_DIR/$shafile
+    if [ "$erase_local" == "1" ]; then
+      echo "$shafile uploaded.  Erasing from $BUNDLE_DIR"
+      rm -f $BUNDLE_DIR/$shafile
+    else
+      echo "$shafile uploaded."
+    fi
   fi
 else
   if [ ! -e $BUNDLE_DIR/$file ]; then
