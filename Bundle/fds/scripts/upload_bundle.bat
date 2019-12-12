@@ -8,7 +8,7 @@ if NOT "x%upload_host%" == "x" goto endif1
 :endif1
 
 set bundle_dir=%userprofile%\.bundle\uploads
-set basename=%fds_version_arg%-%smv_version_arg%_win64
+set basename=%fds_version_arg%_%smv_version_arg%_win64
 set bundlefile=%bundle_dir%\%basename%.exe
 
 if EXIST %bundlefile% goto skip_upload

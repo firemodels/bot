@@ -56,7 +56,7 @@ set      in_impi=%userprofile%\.bundle\BUNDLE\WINDOWS\%INTELVERSION%
 set in_intel_dll=%userprofile%\.bundle\BUNDLE\WINDOWS\%INTELVERSION%
 set  in_shortcut=%userprofile%\.bundle\BUNDLE\WINDOWS\repoexes
 
-set basename=%fds_version%-%smv_version%_win64
+set basename=%fds_version%_%smv_version%_win64
 set hashfile=%repo_root%\smv\Build\hashfile\intel_win_64\hashfile_win_64.exe
 if exist %hashfile% goto endif0
   echo ***warning: %hashfile% does not exist
