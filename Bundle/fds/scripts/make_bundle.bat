@@ -1,7 +1,7 @@
 @echo off
 set bot=%1
-set FDS_HASH=%2
-set SMV_HASH=%3
+set FDS_REVISION_ARG=%2
+set SMV_REVISION_ARG=%3
 
 set FDSMAJORVERSION=6
 set FDSEDITION=FDS6
@@ -44,12 +44,12 @@ goto:eof
 call %envfile%
 :endif_env_defined
 
-if "x%FDS_HASH%" == "x" goto skip_fds_version
-  set fds_version=%FDS_HASH%
+if "x%FDS_REVISION_ARG%" == "x" goto skip_fds_version
+  set fds_version=%FDS_REVISION_ARG%
 :skip_fds_version
 
-if "x%SMV_HASH%" == "x" goto skip_smv_version
-  set smv_version=%SMV_HASH%
+if "x%SMV_REVISION_ARG%" == "x" goto skip_smv_version
+  set smv_version=%SMV_REVISION_ARG%
 :skip_smv_version
 
 set      in_impi=%userprofile%\.bundle\BUNDLE\WINDOWS\%INTELVERSION%

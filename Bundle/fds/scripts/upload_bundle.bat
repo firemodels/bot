@@ -1,14 +1,14 @@
 @echo off
-set fds_version=%1
-set smv_version=%2
+set fds_version_arg=%1
+set smv_version_arg=%2
 set upload_host=%3
 
 if NOT "x%upload_host%" == "x" goto endif1
-  set upload_host=blaze.nist.gov  
+  set upload_host=blaze.el.nist.gov
 :endif1
 
 set bundle_dir=%userprofile%\.bundle\uploads
-set basename=%fds_version%-%smv_version%_win64
+set basename=%fds_version_arg%-%smv_version_arg%_win64
 set bundlefile=%bundle_dir%\%basename%.exe
 
 if EXIST %bundlefile% goto skip_upload
