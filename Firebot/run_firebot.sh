@@ -36,6 +36,7 @@ echo "-U - upload guides (only by user firebot)"
 echo ""
 echo "Building apps, setting repo revisions"
 echo "-B - only build apps"
+echo "-C - when cloning repos proceed without giving a warning"
 echo "-g firebot_host - host where firebot was run"
 echo "-G firebot_home - home directory where firebot was run"
 echo "   the -g and -G options are only used with the -R option and"
@@ -202,10 +203,11 @@ SMV_REV_ARG=
 FIREBOT_HOST=
 FIREBOT_HOME=
 WEB_DIR=
+FORCECLONE=
 
 #*** parse command line options
 
-while getopts 'bBcdDFfg:G:HhIiJkLm:MNnOPq:R:SsTuUvx:y:w:' OPTION
+while getopts 'bBcCdDFfg:G:HhIiJkLm:MNnOPq:R:SsTuUvx:y:w:' OPTION
 do
 case $OPTION  in
   b)
@@ -216,6 +218,9 @@ case $OPTION  in
    ;;
   c)
    CLEANREPO="-c"
+   ;;
+  C)
+   FORCECLONE="-C"
    ;;
   d)
     debug_mode="-d "
@@ -377,15 +382,21 @@ fi
 if [ "$RUNFIREBOT" != "" ]; then
   if [ "`whoami`" != "firebot" ]; then
     if [ "$CLONE_REPOS" != "" ]; then
-      if [ "$CLONE_FDSSMV" == "" ]; then
-        echo "You are about to erase and clone the fds, exp, fig"
-        echo "out and smv repos."
+      if [ "$FORCECLONE" == "" ]; then
+        YOUARE="You are about to erase and clone "
       else
-        echo "You are about to erase and clone the fds and smv repos"
+        YOUARE="You are erasing and cloning "
       fi
-      echo "Press any key to continue or <CTRL> c to abort."
-      echo "Type $0 -h for other options"
-      read val
+      if [ "$CLONE_FDSSMV" == "" ]; then
+        echo "$YOUARE the fds, exp, fig, out and smv repos."
+      else
+        echo "$YOUARE the fds and smv repos"
+      fi
+      if [ "$FORCECLONE" == "" ]; then
+        echo "Press any key to continue or <CTRL> c to abort."
+        echo "Type $0 -h for other options"
+        read val
+      fi
     fi
   fi
 fi
@@ -520,7 +531,7 @@ BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
 firebot_status=0
-$ECHO  ./$botscript -p $firebot_pid $UPDATEREPO $DV $INTEL $debug_mode $BUILD_ONLY $BRANCH $FDS_REV $SMV_REV $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEANREPO $QUEUE $SKIPMATLAB $SKIPFIGURES $CLONE_REPOS $CLONE_FDSSMV  $EMAIL $COPY_MANUAL_DIR $WEB_DIR $DEBUG_ONLY "$@"
+$ECHO  ./$botscript -p $firebot_pid $UPDATEREPO $DV $INTEL $debug_mode $BUILD_ONLY $FORCECLONE $BRANCH $FDS_REV $SMV_REV $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEANREPO $QUEUE $SKIPMATLAB $SKIPFIGURES $CLONE_REPOS $CLONE_FDSSMV  $EMAIL $COPY_MANUAL_DIR $WEB_DIR $DEBUG_ONLY "$@"
 firebot_status=$?
 if [ -e $firebot_pid ]; then
   rm -f $firebot_pid

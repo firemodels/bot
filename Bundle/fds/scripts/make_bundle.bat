@@ -1,4 +1,10 @@
-echo off
+@echo off
+setlocal
+set bot=%1
+set FDS_REVISION_ARG=%2
+set SMV_REVISION_ARG=%3
+set nightly=%4
+
 set FDSMAJORVERSION=6
 set FDSEDITION=FDS6
 set SMVEDITION=SMV6
@@ -19,8 +25,12 @@ set SVNROOT=%repo_root%
 
 set bundle_dir=%userprofile%\.bundle
 if NOT exist %bundle_dir% mkdir %bundle_dir%
+
 set upload_dir=%userprofile%\.bundle\uploads
 if NOT exist %upload_dir% mkdir %upload_dir%
+
+set bundles_dir=%userprofile%\.bundle\bundles
+if NOT exist %bundles_dir% mkdir %bundles_dir%
 
 if "%env_defined%" == "1" goto endif_env_defined
 set envfile="%userprofile%"\fds_smv_env.bat
@@ -30,7 +40,9 @@ echo Create a file named %envfile% and use smv/scripts/fds_smv_env_template.bat
 echo as an example.
 echo.
 echo Aborting now...
-pause>NUL
+if "x%bot%" == "xbot" goto skip1
+  pause>Nul
+:skip1
 goto:eof
 
 :endif_envexist2
@@ -38,17 +50,31 @@ goto:eof
 call %envfile%
 :endif_env_defined
 
+if "x%FDS_REVISION_ARG%" == "x" goto skip_fds_version
+  set fds_version=%FDS_REVISION_ARG%
+:skip_fds_version
+
+if "x%SMV_REVISION_ARG%" == "x" goto skip_smv_version
+  set smv_version=%SMV_REVISION_ARG%
+:skip_smv_version
+
+if "x%nightly%" == "x" goto skip_nightly
+  set nightly=_%nightly%
+:skip_nightly
+
 set      in_impi=%userprofile%\.bundle\BUNDLE\WINDOWS\%INTELVERSION%
 set in_intel_dll=%userprofile%\.bundle\BUNDLE\WINDOWS\%INTELVERSION%
 set  in_shortcut=%userprofile%\.bundle\BUNDLE\WINDOWS\repoexes
 
-set basename=%fds_version%-%smv_version%_win64
+set basename=%fds_version%_%smv_version%%nightly%_win
 set hashfile=%repo_root%\smv\Build\hashfile\intel_win_64\hashfile_win_64.exe
-if NOT exist %hashfile% (
+if exist %hashfile% goto endif0
   echo ***warning: %hashfile% does not exist
   echo Bundle will not contain hashes of application files
+if "x%bot%" == "xbot" goto skip2
   pause
-)
+:skip2
+:endif0
 
 set in_pdf=%userprofile%\.bundle\pubs
 set smv_forbundle=%repo_root%\bot\Bundle\smv\for_bundle
@@ -264,6 +290,9 @@ wzipse32 %basename%.zip -setup -auto -i %fds_forbundle%\icon.ico -t %fds_forbund
 
 %hashfile% %basename%.exe   >>  %upload_dir%\%basename%.sha1
 
+CALL :COPY %upload_dir%\%basename%.exe  %bundles_dir%\%basename%.exe
+CALL :COPY %upload_dir%\%basename%.sha1 %bundles_dir%\%basename%.sha1
+
 echo.
 echo --- installer built ---
 
@@ -276,29 +305,35 @@ set label=%~n1%~x1
 set infile=%1
 set infiletime=%~t1
 set outfile=%2
-IF EXIST %infile% (
+IF NOT EXIST %infile% goto else1
    echo copying %label% %infiletime%
    copy %infile% %outfile% >Nul
-) ELSE (
+   goto endif1
+:else1
    echo.
    echo *** warning: %infile% does not exist
    echo.
-   pause
-)
+if "x%bot%" == "xbot" goto skip3
+  pause
+:skip3
+:endif1
 exit /b
 
 :COPYDIR
 set fromdir=%1
 set todir=%2
-IF EXIST %fromdir% (
+IF NOT EXIST %fromdir% goto else2
    echo copying directory %fromdir%
    copy %fromdir% %todir% >Nul
-) ELSE (
+   goto endif2
+:else2
    echo.
    echo *** warning: directory %fromdir% does not exist
    echo.
-   pause
-)
+if "x%bot%" == "xbot" goto skip4
+  pause
+:skip4
+:endif2
 exit /b
 
 :EOF

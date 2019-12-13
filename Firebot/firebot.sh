@@ -1582,11 +1582,8 @@ email_build_status()
    if [ "$UPLOADGUIDES" == "1" ]; then
      echo "    Firebot status:  https://pages.nist.gov/fds-smv/firebot_status.html" >> $TIME_LOG
    fi
-   if [ "$WEB_DIR" != "" ]; then
-     echo "       summary dir: $WEB_DIR"  >> $TIME_LOG
-   fi
    if [ "$WEB_URL" != "" ]; then
-     echo "       summary URL: $WEB_URL"  >> $TIME_LOG
+     echo "   Firebot summary: $WEB_URL"  >> $TIME_LOG
    fi
    echo "-------------------------------" >> $TIME_LOG
 
@@ -1762,9 +1759,10 @@ FDS_REV=origin/master
 SMV_REV=origin/master
 WEB_DIR=
 HTML2PDF=wkhtmltopdf
+FORCECLONE=
 
 #*** parse command line arguments
-while getopts 'b:BcdDIiJLm:p:q:R:sTuUx:y:w:' OPTION
+while getopts 'b:BcCdDIiJLm:p:q:R:sTuUx:y:w:' OPTION
 do
 case $OPTION in
   b)
@@ -1779,6 +1777,9 @@ case $OPTION in
    ;;
   c)
    CLEANREPO=1
+   ;;
+  C)
+   FORCECLONE="-C"
    ;;
   d)
    debug_mode=1
@@ -1910,10 +1911,10 @@ if [[ "$CLONE_REPOS" != "" ]]; then
   cd $botrepo/Scripts
   if [ "$CLONE_FDSSMV" != "" ]; then
    # only clone the fds and smv repos - used when just compiling the fds and smv apps
-    ./setup_repos.sh -T > $OUTPUT_DIR/stage1_clone 2>&1
+    ./setup_repos.sh $FORCECLONE -T > $OUTPUT_DIR/stage1_clone 2>&1
   else
    # clone all repos
-    ./setup_repos.sh -F > $OUTPUT_DIR/stage1_clone 2>&1
+    ./setup_repos.sh $FORCECLONE -F > $OUTPUT_DIR/stage1_clone 2>&1
   fi
   if [ "$CLONE_REPOS" != "master" ]; then
     FDSBRANCH=$CLONE_REPOS
@@ -2144,7 +2145,7 @@ if [ "$BUILD_ONLY" == "" ]; then
 fi
 
 echo | mail >& /tmp/mailtest.$$
-notfound=`grep 'not found' /tmp/mailtest.$$ | wc -l`
+notfound=`grep 'command not found' /tmp/mailtest.$$ | wc -l`
 HAVE_MAIL=1
 if [ $notfound -gt 0 ]; then
   HAVE_MAIL=

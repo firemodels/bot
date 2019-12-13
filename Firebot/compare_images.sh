@@ -3,6 +3,26 @@ BASE_DIR=$1
 NEW_DIR=$2
 DIFF_DIR=$3
 
+CURDIR=`pwd`
+if [ "$BASE_DIR" == "" ]; then
+  BASE_DIR=../../fig/compare//firebot/images/
+  cd $BASE_DIR
+  BASE_DIR=`pwd`
+  cd $CURDIR
+fi
+if [ "$NEW_DIR" == "" ]; then
+  NEW_DIR=../../fds/Manuals/FDS_Summary/images/
+  cd $NEW_DIR
+  NEW_DIR=`pwd`
+  cd $CURDIR
+fi
+if [ "$DIFF_DIR" == "" ]; then
+  DIFF_DIR=../../fds/Manuals/FDS_Summary/diffs/images/
+  cd $DIFF_DIR
+  DIFF_DIR=`pwd`
+  cd $CURDIR
+fi
+
 CHECK_DIR ()
 {
  local DIR=$1
@@ -49,6 +69,7 @@ for f in $BASE_DIR/$SUBDIR/*.png; do
   rm -f $diff_file
   if [ -e $from_file ]; then
     if [ -e $to_file ]; then
+#      compare -metric AE -fuzz 5% $from_file $to_file $diff_file >& /dev/null
       compare $from_file $to_file $diff_file
     fi
   fi
@@ -64,6 +85,7 @@ for f in $BASE_DIR/$SUBDIR/*.png; do
   rm -f $diff_file
   if [ -e $from_file ]; then
     if [ -e $to_file ]; then
+#      compare -metric AE -fuzz 5% $from_file $to_file $diff_file >& /dev/null
       compare $from_file $to_file $diff_file
     fi
   fi

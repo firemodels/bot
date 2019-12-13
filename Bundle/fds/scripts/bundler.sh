@@ -186,11 +186,11 @@ fi
 if [ "`uname`" == "Darwin" ]; then
   intel_mpi_version=$intel_mpi_version_osx
   mpi_version=$mpi_version_osx
-  platform=osx64
+  platform=osx
 else
   intel_mpi_version=$intel_mpi_version_linux
   mpi_version=$mpi_version_linux
-  platform=linux64
+  platform=lnx
 fi
 
 if [ "$BRANCH" == "release" ]; then
@@ -346,7 +346,7 @@ if [ "$showparms" == "" ]; then
   if [ "$UPLOAD_GOOGLE" == "1" ]; then
     if [ -e $HOME/.bundle/$GOOGLE_DIR_ID ]; then
       echo "uploading installer"
-      if [ "$platform" == "linux64" ]; then
+      if [ "$platform" == "lnx" ]; then
         ./upload_bundle.sh $bundle_dir $installer_base_platform $BUNDLE_PREFIX $platform               > $OUTPUT_DIR/stage2
       else
         ./ssh_upload_bundle.sh         $installer_base_platform $BUNDLE_PREFIX $platform               > $OUTPUT_DIR/stage2
