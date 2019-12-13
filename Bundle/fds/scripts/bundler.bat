@@ -12,6 +12,7 @@ if "x%firebot_home%" == "x" (
 if "x%smokebot_home%" == "x" (
   set smokebot_home=/home2/smokevis2/smokebot
 )
+set nightly=tst
 
 set CURDIR=%CD%
 
@@ -46,7 +47,7 @@ cd %CURDIR%
 call copy_pubs smokebot %smokebot_home%/.smokebot/pubs %hostname% || exit /b 1
 
 cd %CURDIR%
-call make_bundle bot %FDS_REVISION_BUNDLER% %SMV_REVISION_BUNDLER% 
+call make_bundle bot %FDS_REVISION_BUNDLER% %SMV_REVISION_BUNDLER% %nightly%
 
 cd %CURDIR%
-call upload_bundle %FDS_REVISION_BUNDLER% %SMV_REVISION_BUNDLER%
+call upload_bundle %FDS_REVISION_BUNDLER% %SMV_REVISION_BUNDLER% %nightly% %hostname%

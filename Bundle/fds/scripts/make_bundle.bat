@@ -1,7 +1,9 @@
 @echo off
+setlocal
 set bot=%1
 set FDS_REVISION_ARG=%2
 set SMV_REVISION_ARG=%3
+set nightly=%4
 
 set FDSMAJORVERSION=6
 set FDSEDITION=FDS6
@@ -23,8 +25,12 @@ set SVNROOT=%repo_root%
 
 set bundle_dir=%userprofile%\.bundle
 if NOT exist %bundle_dir% mkdir %bundle_dir%
+
 set upload_dir=%userprofile%\.bundle\uploads
 if NOT exist %upload_dir% mkdir %upload_dir%
+
+set bundles_dir=%userprofile%\.bundle\bundles
+if NOT exist %bundles_dir% mkdir %bundles_dir%
 
 if "%env_defined%" == "1" goto endif_env_defined
 set envfile="%userprofile%"\fds_smv_env.bat
@@ -52,11 +58,15 @@ if "x%SMV_REVISION_ARG%" == "x" goto skip_smv_version
   set smv_version=%SMV_REVISION_ARG%
 :skip_smv_version
 
+if "x%nightly%" == "x" goto skip_nightly
+  set nightly=_%nightly%
+:skip_nightly
+
 set      in_impi=%userprofile%\.bundle\BUNDLE\WINDOWS\%INTELVERSION%
 set in_intel_dll=%userprofile%\.bundle\BUNDLE\WINDOWS\%INTELVERSION%
 set  in_shortcut=%userprofile%\.bundle\BUNDLE\WINDOWS\repoexes
 
-set basename=%fds_version%_%smv_version%_win64
+set basename=%fds_version%_%smv_version%%nightly%_win
 set hashfile=%repo_root%\smv\Build\hashfile\intel_win_64\hashfile_win_64.exe
 if exist %hashfile% goto endif0
   echo ***warning: %hashfile% does not exist
@@ -279,6 +289,9 @@ if exist %basename%.exe erase %basename%.exe
 wzipse32 %basename%.zip -setup -auto -i %fds_forbundle%\icon.ico -t %fds_forbundle%\unpack.txt -runasadmin -a %fds_forbundle%\about.txt -st"FDS %fds_version% Smokeview %smv_version% Setup" -o -c cmd /k firemodels\setup.bat
 
 %hashfile% %basename%.exe   >>  %upload_dir%\%basename%.sha1
+
+CALL :COPY %upload_dir%\%basename%.exe  %bundles_dir%\%basename%.exe
+CALL :COPY %upload_dir%\%basename%.sha1 %bundles_dir%\%basename%.sha1
 
 echo.
 echo --- installer built ---
