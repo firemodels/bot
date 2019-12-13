@@ -579,22 +579,20 @@ check_cases_debug()
    # Scan for and report any errors in FDS cases
    cd $dir
 
-   if [[ `grep -rI 'Run aborted' $OUTPUT_DIR/stage4 | grep -v grep` == "" ]] && \
-      [[ `grep -rI Segmentation * | grep -v grep` == ""                   ]] && \
-      [[ `grep -rI ERROR: * | grep -v echo | grep -v grep` == ""          ]] && \
-      [[ `grep -rI 'STOP: Numerical' * | grep -v grep` == ""              ]] && \
-      [[ `grep 'BAD TERMINATION' */*.log | grep -v grep` == ""            ]] && \
-      [[ `grep -rI forrtl * | grep -v grep` == ""                         ]]
+   if [[ `grep 'Run aborted'     $OUTPUT_DIR/stage4 | grep -v grep`                == "" ]] && \
+      [[ `grep Segmentation      */*.err            | grep -v grep`                == "" ]] && \
+      [[ `grep ERROR:            */*.out            | grep -v grep | grep -v echo` == "" ]] && \
+      [[ `grep 'BAD TERMINATION' */*.log            | grep -v grep`                == "" ]] && \
+      [[ `grep forrtl            */*.err            | grep -v grep`                == "" ]]
    then
       cases_debug_success=true
    else
-      grep -rI 'Run aborted' $OUTPUT_DIR/stage4 | grep -v grep >> $OUTPUT_DIR/stage4_errors
-      grep -rI Segmentation * | grep -v grep                   >> $OUTPUT_DIR/stage4_errors
-      grep -rI ERROR: * | grep -v echo | grep -v grep          >> $OUTPUT_DIR/stage4_errors
-      grep -rI 'STOP: Numerical' * | grep -v grep              >> $OUTPUT_DIR/stage4_errors
-      grep -A 2 'BAD TERMINATION' */*.log | grep -v grep       >> $OUTPUT_DIR/stage4_errors
-      grep -rI -A 20 forrtl * | grep -v grep                   >> $OUTPUT_DIR/stage4_errors
-      
+      grep 'Run aborted'          $OUTPUT_DIR/stage4 | grep -v grep                >> $OUTPUT_DIR/stage4_errors
+      grep Segmentation           */*.err            | grep -v grep                >> $OUTPUT_DIR/stage4_errors
+      grep ERROR:                 */*.out            | grep -v grep | grep -v echo >> $OUTPUT_DIR/stage4_errors
+      grep -A 2 'BAD TERMINATION' */*.log            | grep -v grep                >> $OUTPUT_DIR/stage4_errors
+      grep -A 20 forrtl           */*.err            | grep -v grep                >> $OUTPUT_DIR/stage4_errors
+
       echo "Errors from Stage 4 - Run ${2} cases - debug mode:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage4_errors >> $ERROR_LOG
       echo "" >> $ERROR_LOG
@@ -774,25 +772,23 @@ check_cases_release()
    # Scan for and report any errors in FDS cases
    cd $dir
 
-   if [[ `grep 'Run aborted' $OUTPUT_DIR/stage5 | grep -v grep` == ""              ]] && \
-      [[ `grep 'ERROR' $OUTPUT_DIR/stage5 | grep -v geom_bad | grep -v grep` == "" ]] && \
-      [[ `grep -rI Segmentation * | grep -v grep` == ""                            ]] && \
-      [[ `grep -rI ERROR: * | grep -v echo | grep -v grep` == ""                   ]] && \
-      [[ `grep -rI 'STOP: Numerical' * | grep -v grep` == ""                       ]] && \
-      [[ `grep -rI forrtl * | grep -v grep` == ""                                  ]] && \
-      [[ `grep 'BAD TERMINATION'  */*.log | grep -v grep` == ""                    ]] && \
-      [[ `grep 'Inspector Clean' $OUTPUT_DIR/stage5i | grep -v grep` != ""         ]]
+   if [[ `grep 'Run aborted'     $OUTPUT_DIR/stage5  | grep -v grep`                    == "" ]] && \
+      [[ `grep 'ERROR'           $OUTPUT_DIR/stage5  | grep -v geom_bad | grep -v grep` == "" ]] && \
+      [[ `grep Segmentation      */*.err             | grep -v grep`                    == "" ]] && \
+      [[ `grep ERROR:            */*.out             | grep -v grep | grep -v echo`     == "" ]] && \
+      [[ `grep 'BAD TERMINATION' */*.log             | grep -v grep`                    == "" ]] && \
+      [[ `grep forrtl            */*.err             | grep -v grep`                    == "" ]] && \
+      [[ `grep 'Inspector Clean' $OUTPUT_DIR/stage5i | grep -v grep`                    != "" ]]
    then
-      cases_release_success=true
+      cases_debug_success=true
    else
-      grep 'Run aborted' $OUTPUT_DIR/stage5 | grep -v grep                      >> $OUTPUT_DIR/stage5_errors
-      grep 'ERROR' $OUTPUT_DIR/stage5 | grep -v geom_bad | grep -v grep         >> $OUTPUT_DIR/stage5_errors
-      grep -rI Segmentation * | grep -v grep                                    >> $OUTPUT_DIR/stage5_errors
-      grep -rI ERROR: * | grep -v echo | grep -v grep                           >> $OUTPUT_DIR/stage5_errors
-      grep -rI 'STOP: Numerical' * | grep -v grep                               >> $OUTPUT_DIR/stage5_errors
-      grep -A 2 'BAD TERMINATION' */*.log | grep -v grep                        >> $OUTPUT_DIR/stage5_errors
-      grep -rI -A 20 forrtl * | grep -v grep                                    >> $OUTPUT_DIR/stage5_errors
-      grep -rI "Inspector found errors" $OUTPUT_DIR/stage5i | grep -v grep      >> $OUTPUT_DIR/stage5_errors
+      grep 'Run aborted'                $OUTPUT_DIR/stage5  | grep -v grep                    >> $OUTPUT_DIR/stage5_errors
+      grep 'ERROR'                      $OUTPUT_DIR/stage5  | grep -v grep | grep -v geom_bad >> $OUTPUT_DIR/stage5_errors
+      grep Segmentation                 */*.err             | grep -v grep                    >> $OUTPUT_DIR/stage5_errors
+      grep ERROR:                       */*.out             | grep -v grep | grep -v echo     >> $OUTPUT_DIR/stage5_errors
+      grep -A 2 'BAD TERMINATION'       */*.log             | grep -v grep                    >> $OUTPUT_DIR/stage5_errors
+      grep -A 20 forrtl                 */*.err             | grep -v grep                    >> $OUTPUT_DIR/stage5_errors
+      grep -rI "Inspector found errors" $OUTPUT_DIR/stage5i | grep -v grep                    >> $OUTPUT_DIR/stage5_errors
 
       echo "Errors from Stage 5 - Run ${2} cases - release mode:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage5_errors                               >> $ERROR_LOG
@@ -839,10 +835,10 @@ run_verification_cases_release()
    echo "   release"
    cd $fdsrepo/Verification/scripts
    # Run FDS with 1 OpenMP thread
-   echo 'Running FDS benchmark verification cases:' >> $OUTPUT_DIR/stage5
+   echo 'Running FDS benchmark verification cases:'       >> $OUTPUT_DIR/stage5 2>&1
    echo ./Run_FDS_Cases.sh $INTEL2 $DV2 -b -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
         ./Run_FDS_Cases.sh $INTEL2 $DV2 -b -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
-   echo "" >> $OUTPUT_DIR/stage5 2>&1
+   echo ""                                                >> $OUTPUT_DIR/stage5 2>&1
 
    # Wait for benchmark verification cases to end
 # let benchmark and regular cases run at the same time - for now
@@ -852,14 +848,14 @@ run_verification_cases_release()
 #   echo 'Running FDS thread checking verification cases:' >> $OUTPUT_DIR/stage5
    cd ../Thread_Check
    echo ./inspection.sh -p 6 -q $QUEUE  inspector_test.fds >> $OUTPUT_DIR/stage5i 2>&1
-        ./inspection.sh -p 6 -q $QUEUE  inspector_test.fds >> $OUTPUT_DIR/stage5i 2>&1 &
-   echo "" >> $OUTPUT_DIR/stage5i 2>&1
+        ./inspection.sh -p 6 -q $QUEUE  inspector_test.fds >> $OUTPUT_DIR/stage5i 2>&1
+   echo ""                                                 >> $OUTPUT_DIR/stage5i 2>&1
 
    cd ../scripts
-   echo 'Running FDS non-benchmark verification cases:' >> $OUTPUT_DIR/stage5
+   echo 'Running FDS non-benchmark verification cases:'   >> $OUTPUT_DIR/stage5
    echo ./Run_FDS_Cases.sh $INTEL2 $DV2 -R -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
         ./Run_FDS_Cases.sh $INTEL2 $DV2 -R -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
-   echo "" >> $OUTPUT_DIR/stage5 2>&1
+   echo ""                                                >> $OUTPUT_DIR/stage5 2>&1
 
 
 
@@ -1289,9 +1285,7 @@ archive_timing_stats()
 check_guide()
 {
    local guidelog=$1
-   local doc=$2
-   local label=$3
-   local upload=$4
+   local label=$2
 
    # Scan for and report any errors or warnings in build process for guides
    cd $firebotdir
@@ -1321,6 +1315,11 @@ copy_guide()
        cp $doc $PUBS_DIR/.
      fi
    fi
+   if [ -e $doc ]; then
+     if [ -d $FDS_SUMMARY_DIR/manuals ]; then
+       cp $doc $FDS_SUMMARY_DIR/manuals/.
+     fi
+   fi
 }
 
 #---------------------------------------------
@@ -1335,9 +1334,8 @@ make_geom_notes()
    # Build FDS User Guide
    ./make_geom_notes.sh &> $OUTPUT_DIR/stage8_geom_notes
 
-   # Check guide for completion - for now do note upload
-   # (change 0 to 1 in following line to upload)
-   check_guide $OUTPUT_DIR/stage8_geom_notes $fdsrepo/Manuals/FDS_User_Guide/geom_notes.pdf 'geom_notes' 0
+   # Check guide for completion
+   check_guide $OUTPUT_DIR/stage8_geom_notes 'geom_notes'
 }
 
 #---------------------------------------------
@@ -1353,8 +1351,8 @@ make_fds_user_guide()
    # Build FDS User Guide
    ./make_guide.sh &> $OUTPUT_DIR/stage8_fds_user_guide
 
-   # Check guide for completion and copy to website if successful
-   check_guide $OUTPUT_DIR/stage8_fds_user_guide $fdsrepo/Manuals/FDS_User_Guide/FDS_User_Guide.pdf 'FDS User Guide' 1
+   # Check guide for completion
+   check_guide $OUTPUT_DIR/stage8_fds_user_guide 'FDS User Guide'
 
    cd $botrepo/Firebot
    ./compare_namelists.sh $OUTPUT_DIR stage8 > $OUTPUT_DIR/stage8_namelist_check
@@ -1391,8 +1389,8 @@ make_fds_technical_guide()
    # Build FDS Technical Guide
    ./make_guide.sh &> $OUTPUT_DIR/stage8_fds_technical_guide
 
-   # Check guide for completion and copy to website if successful
-   check_guide $OUTPUT_DIR/stage8_fds_technical_guide $fdsrepo/Manuals/FDS_Technical_Reference_Guide/FDS_Technical_Reference_Guide.pdf 'FDS Technical Reference Guide' 1
+   # Check guide for completion
+   check_guide $OUTPUT_DIR/stage8_fds_technical_guide 'FDS Technical Reference Guide'
 }
 
 #---------------------------------------------
@@ -1417,8 +1415,8 @@ make_fds_verification_guide()
    # Build FDS Verification Guide
    ./make_guide.sh &> $OUTPUT_DIR/stage8_fds_verification_guide
 
-   # Check guide for completion and copy to website if successful
-   check_guide $OUTPUT_DIR/stage8_fds_verification_guide $fdsrepo/Manuals/FDS_Verification_Guide/FDS_Verification_Guide.pdf 'FDS Verification Guide' 1
+   # Check guide for completion
+   check_guide $OUTPUT_DIR/stage8_fds_verification_guide 'FDS Verification Guide'
 }
 
 #---------------------------------------------
@@ -1443,8 +1441,8 @@ make_fds_validation_guide()
    # Build FDS Validation Guide
    ./make_guide.sh &> $OUTPUT_DIR/stage8_fds_validation_guide
 
-   # Check guide for completion and copy to website if successful
-   check_guide $OUTPUT_DIR/stage8_fds_validation_guide $fdsrepo/Manuals/FDS_Validation_Guide/FDS_Validation_Guide.pdf 'FDS Validation Guide' 1
+   # Check guide for completion
+   check_guide $OUTPUT_DIR/stage8_fds_validation_guide 'FDS Validation Guide'
 }
 
 #---------------------------------------------
@@ -1469,9 +1467,8 @@ make_fds_Config_management_plan()
    # Build FDS Config Management Plan
    ./make_guide.sh &> $OUTPUT_DIR/stage8_fds_Config_management_plan
 
-   # Check guide for completion and copy to website if successful
-   # note: script that uploads pdf to google doens't like the name so it has been shortened to FDS_Config_Management_Plan
-   check_guide $OUTPUT_DIR/stage8_fds_Config_management_plan $fdsrepo/Manuals/FDS_Config_Management_Plan/FDS_Config_Management_Plan.pdf 'FDS Config Management Plan' 1
+   # Check guide for completion
+   check_guide $OUTPUT_DIR/stage8_fds_Config_management_plan 'FDS Config Management Plan'
 }
 
 #---------------------------------------------
@@ -1559,10 +1556,10 @@ email_build_status()
       echo "Note: only VV cases with debug FDS were run" >> $TIME_LOG
       echo "" >> $TIME_LOG
    fi
-   echo "              host: $hostname " >> $TIME_LOG
-   echo "                OS: $platform2 " >> $TIME_LOG
-   echo "              repo: $repo " >> $TIME_LOG
-   echo "             queue: $QUEUE " >> $TIME_LOG
+   echo "              host: $hostname "     >> $TIME_LOG
+   echo "                OS: $platform2 "    >> $TIME_LOG
+   echo "              repo: $repo "         >> $TIME_LOG
+   echo "             queue: $QUEUE "        >> $TIME_LOG
    echo "      fds revision: $FDS_REVISION " >> $TIME_LOG
    echo "        fds branch: $FDSBRANCH "    >> $TIME_LOG
    echo "      smv revision: $SMV_REVISION " >> $TIME_LOG
@@ -1570,8 +1567,8 @@ email_build_status()
    if [ "$IFORT_VERSION" != "" ]; then
       echo "           Fortran: $IFORT_VERSION " >> $TIME_LOG
    fi
-   echo "        start time: $start_time " >> $TIME_LOG
-   echo "         stop time: $stop_time " >> $TIME_LOG
+   echo "        start time: $start_time "   >> $TIME_LOG
+   echo "         stop time: $stop_time "    >> $TIME_LOG
    if [ "$NAMELIST_NODOC_STATUS" != "" ]; then
      if [ "$NAMELIST_NODOC_STATUS" == "0" ]; then
        echo "undocumented namelist keywords: $NAMELIST_NODOC_STATUS " >> $TIME_LOG
@@ -1583,7 +1580,10 @@ email_build_status()
      NAMELIST_NOSOURCE_LOG=
    fi
    if [ "$UPLOADGUIDES" == "1" ]; then
-   echo "    Firebot status:  https://pages.nist.gov/fds-smv/firebot_status.html" >> $TIME_LOG
+     echo "    Firebot status:  https://pages.nist.gov/fds-smv/firebot_status.html" >> $TIME_LOG
+   fi
+   if [ "$WEB_URL" != "" ]; then
+     echo "   Firebot summary: $WEB_URL"  >> $TIME_LOG
    fi
    echo "-------------------------------" >> $TIME_LOG
 
@@ -1757,9 +1757,12 @@ CLONE_FDSSMV=
 DEBUG_ONLY=
 FDS_REV=origin/master
 SMV_REV=origin/master
+WEB_DIR=
+HTML2PDF=wkhtmltopdf
+FORCECLONE=
 
 #*** parse command line arguments
-while getopts 'b:BcdDIiJLm:p:q:R:sTuUx:y:' OPTION
+while getopts 'b:BcCdDIiJLm:p:q:R:sTuUx:y:w:' OPTION
 do
 case $OPTION in
   b)
@@ -1774,6 +1777,9 @@ case $OPTION in
    ;;
   c)
    CLEANREPO=1
+   ;;
+  C)
+   FORCECLONE="-C"
    ;;
   d)
    debug_mode=1
@@ -1828,9 +1834,32 @@ case $OPTION in
   y)
    SMV_REV="$OPTARG"
    ;;
+  w)
+   WEB_DIR="$OPTARG"
+   ;;
 esac
 done
 shift $(($OPTIND-1))
+
+if [ "$WEB_DIR" != "" ]; then
+  if [ -d $WEB_DIR ]; then
+    testfile=$WEB_DIR/test.$$
+    touch $testfile >& /dev/null
+    if [ -e $testfile ]; then
+      rm $testfile
+    else
+      WEB_DIR=
+    fi
+  else
+    WEB_DIR=
+  fi
+fi
+if [ "$WEB_DIR" != "" ]; then
+  WEB_HOST=`hostname -A | awk '{print $2}'`
+  WEB_URL=http://$WEB_HOST/`basename $WEB_DIR`
+else
+  WEB_URL=
+fi
 
 # Load mailing list for status report
 if [ "$mailToFDS" == "" ]; then
@@ -1864,7 +1893,10 @@ fi
 fdsrepo=$repo/fds
 smvrepo=$repo/smv
 botrepo=$repo/bot
+figrepo=$repo/fig
 outrepo=$repo/out
+
+FDS_SUMMARY_DIR=$fdsrepo/Manuals/FDS_Summary
 
 #*** clean repos
 echo "Status"
@@ -1879,10 +1911,10 @@ if [[ "$CLONE_REPOS" != "" ]]; then
   cd $botrepo/Scripts
   if [ "$CLONE_FDSSMV" != "" ]; then
    # only clone the fds and smv repos - used when just compiling the fds and smv apps
-    ./setup_repos.sh -T > $OUTPUT_DIR/stage1_clone 2>&1
+    ./setup_repos.sh $FORCECLONE -T > $OUTPUT_DIR/stage1_clone 2>&1
   else
    # clone all repos
-    ./setup_repos.sh -F > $OUTPUT_DIR/stage1_clone 2>&1
+    ./setup_repos.sh $FORCECLONE -F > $OUTPUT_DIR/stage1_clone 2>&1
   fi
   if [ "$CLONE_REPOS" != "master" ]; then
     FDSBRANCH=$CLONE_REPOS
@@ -2007,6 +2039,12 @@ fi
 if [ "$BUILD_ONLY" ]; then
   echo "        queue: $QUEUE"
 fi
+if [ "$WEB_DIR" != "" ]; then
+  echo "      web dir: $WEB_DIR"
+fi
+if [ "$WEB_URL" != "" ]; then
+  echo "          URL: $WEB_URL"
+fi
 echo ""
 
 # Set time limit (43,200 seconds = 12 hours)
@@ -2039,13 +2077,20 @@ fi
 
   if [[ "$UPDATEREPO" == "1" ]] ; then
     echo Updating
+# we are not cloning so update
     if [[ "$CLONE_REPOS" == "" ]]; then
       update_repo fds $FDSBRANCH || exit 1
       update_repo smv $SMVBRANCH || exit 1
+      update_repo fig master || exit 1
+      update_repo out master || exit 1
+      update_repo exp master || exit 1
     fi
-    update_repo fig master || exit 1
-    update_repo out master || exit 1
-    update_repo exp master || exit 1
+# we are not cloning fig, out and exp so update them
+    if [[ "$CLONE_REPOS" != "" ]] && [[ "$CLONE_FDSSMV" != "" ]]; then
+      update_repo fig master || exit 1
+      update_repo out master || exit 1
+      update_repo exp master || exit 1
+    fi
   else
     echo Repos not updated
   fi
@@ -2100,7 +2145,7 @@ if [ "$BUILD_ONLY" == "" ]; then
 fi
 
 echo | mail >& /tmp/mailtest.$$
-notfound=`grep 'not found' /tmp/mailtest.$$ | wc -l`
+notfound=`grep 'command not found' /tmp/mailtest.$$ | wc -l`
 HAVE_MAIL=1
 if [ $notfound -gt 0 ]; then
   HAVE_MAIL=
@@ -2242,6 +2287,44 @@ if [[ "$DEBUG_ONLY" == "" ]] && [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" 
         copy_fds_technical_guide
         copy_fds_validation_guide
         copy_fds_Config_management_plan
+
+        if [ -d $FDS_SUMMARY_DIR ]; then
+          cp $fdsrepo/Manuals/FDS_User_Guide/SCRIPT_FIGURES/*.png         $FDS_SUMMARY_DIR/images/user/.
+          cp $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/*.png $FDS_SUMMARY_DIR/images/verification/.
+          DATE=`date +"%b %d, %Y - %r"`
+
+          sed "s/&&DATE&&/$DATE/g"                $FDS_SUMMARY_DIR/index_template.html | \
+          sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                        | \
+          sed "s/&&LINK&&/original - <a href=\"diffs\/index.html\">differences<\/a>/g" | \
+          sed "s/&&SMV_BUILD&&/$SMV_REVISION/g"    > $FDS_SUMMARY_DIR/index.html
+          cat $FDS_SUMMARY_DIR/index_trailer.html >> $FDS_SUMMARY_DIR/index.html
+
+          notfound=`$HTML2PDF -V 2>&1 | tail -1 | grep "not found" | wc -l`
+          if [ $notfound -eq 0 ]; then
+            $HTML2PDF $FDS_SUMMARY_DIR/index.html $FDS_SUMMARY_DIR/FDS_Summary.pdf
+            cp $FDS_SUMMARY_DIR/FDS_Summary.pdf   $NEWGUIDE_DIR/.
+          fi
+
+          CURDIR=`pwd`
+          cd $botrepo/Firebot
+          ./compare_images.sh $figrepo/compare/firebot/images $FDS_SUMMARY_DIR/images $FDS_SUMMARY_DIR/diffs/images >& $OUTPUT_DIR/stage8_image_compare
+          sed "s/&&DATE&&/$DATE/g"              $FDS_SUMMARY_DIR/index_template.html | \
+          sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                      | \
+          sed "s/&&LINK&&/<a href=\"..\/index.html\">original<\/a> - differences/g"  | \
+          sed "s/&&SMV_BUILD&&/$SMV_REVISION/g"   > $FDS_SUMMARY_DIR/diffs/index.html
+          cat $FDS_SUMMARY_DIR/diff_trailer.html >> $FDS_SUMMARY_DIR/diffs/index.html
+
+          if [ "$WEB_DIR" != "" ]; then
+            if [ -d $WEB_DIR ]; then
+              CUR_DIR=`pwd`
+              cd $WEB_DIR
+              rm -r images manuals diffs *.html
+              cp -r $FDS_SUMMARY_DIR/* .
+              rm *template.html
+              cd $CUR_DIR
+            fi
+          fi
+        fi
       fi
     fi
   fi

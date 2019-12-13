@@ -26,19 +26,19 @@ if "%platform%" == "windows" (
   echo   Installing FDS and Smokeview
   Title  Installing FDS and Smokeview
   cd %userprofile%\.bundle\uploads
-  call %fds_version%_%smv_version%_win64.exe
+  call %fds_version%_%smv_version%_win.exe
   goto eof
 )
 if "%platform%" == "linux" (
 echo   Installing FDS and Smokeview on %platform%
 Title  Installing FDS and Smokeview on %platform%
-  plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/run_command2.sh .bundle/uploads %fds_version%_%smv_version%_linux64.sh y
+  plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/run_command2.sh .bundle/uploads %fds_version%_%smv_version%_lnx.sh y
   goto eof
 )
 if "%platform%" == "osx" (
 echo   Installing FDS and Smokeview on %platform%
 Title  Installing FDS and Smokeview on %platform%
-  plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/run_command2.sh .bundle/uploads %fds_version%_%smv_version%_osx64.sh y
+  plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/run_command2.sh .bundle/uploads %fds_version%_%smv_version%_osx.sh y
   goto eof
 )
 

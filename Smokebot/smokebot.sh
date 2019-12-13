@@ -1083,22 +1083,6 @@ check_smv_pictures()
       grep -A 2 -I -E "Warning" $OUTPUT_DIR/stage4b >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
-   if [[ "$web_DIR" != "" ]] && [[ -d $SMV_SUMMARY_DIR ]]; then
-     CURDIR=`pwd`
-     web_temp=/tmp/web_dir.$$
-     mkdir $web_temp
-     if [ -d $web_DIR/movies ]; then
-       cp -r $web_DIR/movies $web_temp/.
-     fi
-     cd $web_DIR
-     rm -rf *
-     cd $SMV_SUMMARY_DIR
-     cp -r * $web_temp/.
-     cp -r $web_temp/* $web_DIR/.
-     rm -r $web_temp
-     cd $CURDIR
-   fi
-
 }
 
 #---------------------------------------------
@@ -1141,15 +1125,6 @@ check_smv_movies()
       grep -I -E "Warning" $OUTPUT_DIR/stage4c >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
-   if [[ "$web_DIR" != "" ]] && [[ -d $SMV_SUMMARY_DIR ]]; then 
-     CURDIR=`pwd`
-     cd $web_DIR
-     rm -rf *
-     cd $SMV_SUMMARY_DIR
-     cp -r * $web_DIR/.
-     cd $CURDIR
-   fi
-
 }
 
 #---------------------------------------------
@@ -1205,9 +1180,9 @@ check_guide()
    # Scan and report any errors in build process for guides
 
    SMOKEBOT_MAN_DIR=
-   if [ "$web_DIR" != "" ]; then
-     if [ -d $web_DIR/manuals ]; then
-       SMOKEBOT_MAN_DIR=$web_DIR/manuals
+   if [ "$WEB_DIR" != "" ]; then
+     if [ -d $WEB_DIR/manuals ]; then
+       SMOKEBOT_MAN_DIR=$WEB_DIR/manuals
      fi
    fi
 
@@ -1471,8 +1446,7 @@ ERROR_LOG=$OUTPUT_DIR/errors
 WARNING_LOG=$OUTPUT_DIR/warnings
 STAGE_STATUS=$OUTPUT_DIR/stage_status
 NEWGUIDE_DIR=$OUTPUT_DIR/Newest_Guides
-web_DIR=
-WEB_URL=
+WEB_DIR=
 SMOKEBOT_LITE=
 export SCRIPTFILES=$smokebotdir/scriptfiles
 
@@ -1507,7 +1481,7 @@ SMV_REV=origin/master
 
 #*** parse command line options
 
-while getopts 'aAb:BcI:JLm:Mo:q:r:R:SstTuUw:W:x:y:' OPTION
+while getopts 'aAb:BcI:JLm:Mo:q:r:R:SstTuU:x:y:w:' OPTION
 do
 case $OPTION in
   a)
@@ -1577,10 +1551,7 @@ case $OPTION in
    UPDATEREPO=1
    ;;
   w)
-   web_DIR="$OPTARG"
-   ;;
-  W)
-   WEB_URL="$OPTARG"
+   WEB_DIR="$OPTARG"
    ;;
   x)
    FDS_REV="$OPTARG"
@@ -1720,28 +1691,24 @@ if [[ $RUNAUTO == "Y" ]] ; then
   run_auto smv || exit 1
 fi
 
-#*** if one of WEB_URL or web_DIR exist then both should exist
-#    if web_DIR exists then it must be writable
-
-if [ "$WEB_URL" == "" ]; then
-  web_DIR=
-fi
-if [ "$web_DIR" == "" ]; then
-  WEB_URL=
-else
-  if [ -d $web_DIR ]; then
-    testfile=$web_DIR/test.$$
+if [ "$WEB_DIR" != "" ]; then
+  if [ -d $WEB_DIR ]; then
+    testfile=$WEB_DIR/test.$$
     touch $testfile >& /dev/null
     if [ -e $testfile ]; then
       rm $testfile
     else
-      web_DIR=
-      WEB_URL=
+      WEB_DIR=
     fi
   else
-    web_DIR=
-    WEB_URL=
+    WEB_DIR=
   fi
+fi
+if [ "$WEB_DIR" != "" ]; then
+  WEB_HOST=`hostname -A | awk '{print $2}'`
+  WEB_URL=http://$WEB_HOST/`basename $WEB_DIR`
+else
+  WEB_URL=
 fi
 
 if [ "$COMPILER" == "intel" ]; then
@@ -1795,8 +1762,8 @@ if [ "$UPDATEREPO" == "1" ]; then
 else
   echo "update repos: no"
 fi
-if [ "$web_DIR" != "" ]; then
-  echo "     web dir: $web_DIR"
+if [ "$WEB_DIR" != "" ]; then
+  echo "     web dir: $WEB_DIR"
 fi
 if [ "$WEB_URL" != "" ]; then
   echo "         URL: $WEB_URL"
@@ -1895,12 +1862,16 @@ if [ "$UPDATEREPO" == "1" ]; then
   if [ "$CLONE_REPOS" == "" ]; then
     echo "   fds"
     update_repo fds $FDSBRANCH || exit 1
+  else
+    echo "   fds (cloned - not updating)"
   fi
   echo "   fig"
   update_repo fig master     || exit 1
   if [ "$CLONE_REPOS" == "" ]; then
     echo "   smv"
     update_repo smv $SMVBRANCH || exit 1
+  else
+    echo "   smv (cloned - not updating)"
   fi
 else
   echo Repos not updated
@@ -2054,6 +2025,32 @@ if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]] && [[ "$BUILD_ONLY" == ""
      make_guide SMV_Technical_Reference_Guide $smvrepo/Manuals/SMV_Technical_Reference_Guide SMV_Technical_Reference_Guide
      echo "   verification"
      make_guide SMV_Verification_Guide        $smvrepo/Manuals/SMV_Verification_Guide        SMV_Verification_Guide
+
+     if [ -d $SMV_SUMMARY_DIR ]; then
+       DATE=`date +"%b %d, %Y - %r"`
+
+       sed "s/&&DATE&&/$DATE/g"                $SMV_SUMMARY_DIR/index_template.html   | \
+       sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                          | \
+       sed "s/&&SMV_BUILD&&/$SMV_REVISION/g" > $SMV_SUMMARY_DIR/index.html
+
+       sed "s/&&DATE&&/$DATE/g"                $SMV_SUMMARY_DIR/manuals_template.html | \
+       sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                          | \
+       sed "s/&&SMV_BUILD&&/$SMV_REVISION/g" > $SMV_SUMMARY_DIR/manuals.html
+
+       sed "s/&&DATE&&/$DATE/g"                $SMV_SUMMARY_DIR/movies_template.html  | \
+       sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                          | \
+       sed "s/&&SMV_BUILD&&/$SMV_REVISION/g" > $SMV_SUMMARY_DIR/movies.html
+
+       if [ "$WEB_DIR" != "" ]; then
+         rm -rf $WEB_DIR/images $WEB_DIR/images2 $WEB_DIR/manuals $WEB_DIR/*.html
+         if [ "$MAKEMOVIES" != "" ]; then
+           rm -rf $WEB_DIR/movies
+         fi
+         cp -r $SMV_SUMMARY_DIR/* $WEB_DIR/.
+         rm -f $WEB_DIR/*template.html
+       fi
+     fi
+
      notfound=`$HTML2PDF -V 2>&1 | tail -1 | grep "not found" | wc -l`
      if [ $notfound -eq 0 ]; then
        $HTML2PDF $smvrepo/Manuals/SMV_Summary/index.html $smvrepo/Manuals/SMV_Summary/SMV_Summary.pdf

@@ -9,7 +9,7 @@ if not exist ..\.gitbot goto skip1
    goto endif1
 :skip1
    echo ***error: This script must be run in the bot\Scripts directory
-   exit /b
+   exit /b 1
 :endif1
 
 set fdsrepos=exp fds fig out smv
@@ -25,7 +25,7 @@ set pause_script=1
 
 call :getopts %*
 if %stopscript% == 1 (
-  exit /b
+  exit /b 0
 )
 
 cd %FMROOT%\bot
@@ -100,13 +100,13 @@ goto eof
      echo Skipping %repo%, the repo directory:
      echo %repo_dir%
      echo already exists
-     exit /b
+     exit /b 0
   )
 
   if "%WIKIWEB%" == "1" (
      cd %FMROOT%
      git clone %GITHEADER%firemodels/%repo%.git %repo_out%
-     exit /b
+     exit /b 0
   )
   
 :: check if repo is at github
@@ -114,7 +114,7 @@ goto eof
   
   if %git_not_found% GTR 0 (
      echo ***Error: The repo %GITHEADER%%GITUSER%/%repo%.git was not found.
-     exit /b
+     exit /b 1
   )
 
   cd %FMROOT%
@@ -124,14 +124,14 @@ goto eof
      git clone %GITHEADER%%GITUSER%/%repo%.git %repo_out%
   )
   if "%GITUSER%" == "firemodels"  (
-     exit /b
+     exit /b 0
   )
   echo setting up remote tracking
   cd %repo_dir%
   git remote add firemodels %GITHEADER%firemodels/%repo%.git
   git remote set-url --push firemodels DISABLE
   git remote update
-  exit /b
+  exit /b 0
 
 ::-----------------------------------------------------------------------
 :at_github
@@ -140,7 +140,7 @@ goto eof
   git ls-remote %GITHEADER%%GITUSER%/%repo%.git 1> %CURDIR%\gitstatus.out 2>&1
   type %CURDIR%\gitstatus.out | %grep% ERROR | %wc% -l > %CURDIR%\gitstatus2.out
   set /p git_not_found=<%CURDIR%\gitstatus2.out
-  exit /b
+  exit /b 0
 
 ::-----------------------------------------------------------------------
 :getopts
@@ -191,10 +191,10 @@ goto eof
    echo Usage:
    call :usage
    set stopscript=1
-   exit /b
+   exit /b 1
  )
 if not (%1)==() goto getopts
-exit /b
+exit /b 0
 
 ::-----------------------------------------------------------------------
 :usage
@@ -210,10 +210,14 @@ echo -h - display this message%
 echo -s - setup repos used by smokebot: %smvrepos%
 echo -T - setup only fds and smv repos - erase repos first
 echo -w - setup wiki and webpage repos cloned from firemodels
-exit /b
+exit /b 0
 
 ::-----------------------------------------------------------------------
 :eof
 ::-----------------------------------------------------------------------
 if exist %CURDIR%\gitstatus.out erase %CURDIR%\gitstatus.out
 if exist %CURDIR%\gitstatus.out erase %CURDIR%\gitstatus2.out
+
+exit /b 0
+
+

@@ -6,6 +6,10 @@ INTEL_COMP_VERSION=$4
 UPLOAD_DIR_ARG=$5
 NIGHTLY=$6
 
+if [ "$NIGHTLY" != "" ]; then
+  NIGHTLY="${NIGHTLY}_"
+fi
+
 # this script assumes that fds and smokeview apps have been copied into APPS_DIR
 # manuals have been copied into GUIDE_DIR
 
@@ -27,9 +31,9 @@ INSTALLDIR=FDS/FDS6
 errlog=/tmp/errlog.$$
 
 if [ "`uname`" == "Darwin" ] ; then
-  bundlebase=${fds_version}_${smv_version}_${NIGHTLY}_osx64
+  bundlebase=${fds_version}_${smv_version}_${NIGHTLY}osx
 else
-  bundlebase=${fds_version}_${smv_version}_${NIGHTLY}_linux64
+  bundlebase=${fds_version}_${smv_version}_${NIGHTLY}lnx
 fi
 
 # determine directory repos reside under
@@ -222,15 +226,70 @@ CPDIRFILES ()
   fi
 }
 
+# -------------------- TOMANIFESTSMV -------------------
+
+TOMANIFESTLIST ()
+{
+  local prog=$1
+  local desc=$2
+
+  echo "<p><hr><p>"                 >> $MANIFEST
+  if [ -e $prog ]; then
+    echo "$desc"                    >> $MANIFEST
+  else
+    echo "$desc is absent<br>"      >> $MANIFEST
+    echo "$prog"                    >> $MANIFEST
+  fi
+  echo "<br>"                       >> $MANIFEST
+}
+
+# -------------------- TOMANIFESTSMV -------------------
+
+TOMANIFESTSMV ()
+{
+  local prog=$1
+  local desc=$2
+
+  echo "<p><hr><p>"                 >> $MANIFEST
+  if [ -e $prog ]; then
+    echo "<pre>"                    >> $MANIFEST
+    $prog -v                        >> $MANIFEST
+    echo "</pre>"                   >> $MANIFEST
+  else
+    echo "$desc is absent<br>"      >> $MANIFEST
+    echo "$prog"                    >> $MANIFEST
+  fi
+  echo "<br>"                       >> $MANIFEST
+}
+
+# -------------------- TOMANIFESTFDS -------------------
+
+TOMANIFESTFDS ()
+{
+  local prog=$1
+  local desc=$2
+
+  echo "<p><hr><p>"                 >> $MANIFEST
+  if [ -e $prog ]; then
+    echo "<pre>"                    >> $MANIFEST
+    echo "" | $prog                 >> $MANIFEST 2>&1
+    echo "</pre>"                   >> $MANIFEST
+  else
+    echo "$desc is absent<br>"      >> $MANIFEST
+    echo "$prog"                    >> $MANIFEST
+  fi
+  echo "<br>"                       >> $MANIFEST
+}
+
 # determine OS
 
 if [ "`uname`" == "Darwin" ]; then
-  FDSOS=_osx_64
+  FDSOS=_osx
   OS=_osx
   PLATFORM=OSX64
 else
-  FDSOS=_linux_64
-  OS=_linux
+  FDSOS=_lnx
+  OS=_lnx
   PLATFORM=LINUX64
 fi
 
@@ -263,6 +322,19 @@ mkdir $bundledir/Documentation
 mkdir $bundledir/Examples
 mkdir $bundledir/$smvbin/textures
 
+#
+# initialize manifest file
+MANIFEST=$bundledir/Documentation/manifest.html
+cat << EOF > $MANIFEST
+<html>
+
+<head>
+<TITLE>Manifest - $bundlebase</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF" >
+<h2>Manifest - $bundlebase</h2>
+EOF
+
 echo ""
 echo "--- copying programs ---"
 echo ""
@@ -277,15 +349,34 @@ CP $APPS_DIR dem2fds    $bundledir/$smvbin dem2fds
 CP $APPS_DIR wind2fds   $bundledir/$smvbin wind2fds
 CP $APPS_DIR hashfile   $bundledir/$smvbin hashfile
 
+TOMANIFESTFDS  $APPS_DIR/fds       fds
+TOMANIFESTLIST $APPS_DIR/fds2ascii fds2ascii
+TOMANIFESTLIST $APPS_DIR/test_mpi  test_mpi
+
+TOMANIFESTSMV  $APPS_DIR/smokeview  smokeview
+TOMANIFESTSMV  $APPS_DIR/background background
+TOMANIFESTSMV  $APPS_DIR/smokediff  smokediff
+TOMANIFESTSMV  $APPS_DIR/smokezip   smokezip
+TOMANIFESTSMV  $APPS_DIR/dem2fds    dem2fds
+TOMANIFESTSMV  $APPS_DIR/wind2fds   wind2fds
+TOMANIFESTSMV  $APPS_DIR/hashfile   hashfile
+
+# qpdf --empty --pages FDS_User_Guide.pdf  3-3 -- out.pdf
+
+cat << EOF >> $MANIFEST
+</body>
+</html>
+EOF
+
 CURDIR=`pwd`
 cd $bundledir/$smvbin
-hashfile background > hash/background.sha1
-hashfile smokeview  > hash/smokeview.sha1
-hashfile smokediff  > hash/smokediff.sha1
-hashfile smokezip   > hash/smokezip.sha1
-hashfile dem2fds    > hash/dem2fds.sha1
-hashfile wind2fds   > hash/wind2fds.sha1
-hashfile hashfile   > hash/hashfile.sha1
+$APPS_DIR/hashfile background > hash/background.sha1
+$APPS_DIR/hashfile smokeview  > hash/smokeview.sha1
+$APPS_DIR/hashfile smokediff  > hash/smokediff.sha1
+$APPS_DIR/hashfile smokezip   > hash/smokezip.sha1
+$APPS_DIR/hashfile dem2fds    > hash/dem2fds.sha1
+$APPS_DIR/hashfile wind2fds   > hash/wind2fds.sha1
+$APPS_DIR/hashfile hashfile   > hash/hashfile.sha1
 cd $CURDIR
 
 CP $smvscriptdir jp2conv.sh $bundledir/$smvbin jp2conv.sh
@@ -300,9 +391,9 @@ CP $APPS_DIR test_mpi  $bundledir/bin test_mpi
 
 CURDIR=`pwd`
 cd $bundledir/bin
-hashfile fds       > hash/fds.sha1
-hashfile fds2ascii > hash/fds2ascii.sha1
-hashfile test_mpi  > hash/test_mpi.sha1
+$APPS_DIR/hashfile fds       > hash/fds.sha1
+$APPS_DIR/hashfile fds2ascii > hash/fds2ascii.sha1
+$APPS_DIR/hashfile test_mpi  > hash/test_mpi.sha1
 cd $CURDIR
 
 openmpifile=
@@ -387,6 +478,7 @@ echo Compressing archive
 gzip    ../$bundlebase.tar
 echo Creating installer
 cd ..
+bundlepathdir=`pwd`
 bundlepath=`pwd`/$bundlebase.sh
 
 OPENMPIFILE=
@@ -397,7 +489,7 @@ $makeinstaller -i $bundlebase.tar.gz -d $INSTALLDIR -m $MPI_VERSION $OPENMPIFILE
 
 cat $bundledir/bin/hash/*.sha1     >  $bundlebase.sha1
 cat $bundledir/$smvbin/hash/*.sha1 >  $bundlebase.sha1
-hashfile $bundlebase.sh            >> $bundlebase.sha1
+$APPS_DIR/hashfile $bundlebase.sh            >> $bundlebase.sha1
 
 if [ -e $errlog ]; then
   numerrs=`cat $errlog | wc -l `
@@ -414,3 +506,4 @@ if [ -e $errlog ]; then
 fi
 echo installer located at:
 echo $bundlepath
+cp $MANIFEST $bundlepathdir/${bundlebase}_manifest.html

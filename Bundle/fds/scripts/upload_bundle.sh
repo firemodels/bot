@@ -4,7 +4,11 @@ BUNDLE_BASE=$2
 NIGHTLY=$3
 platform=$4
 
+scriptdir=`dirname "$(readlink -f "$0")"`
+cd $scriptdir
+
 erase=1
+erase_local=
 
 GDRIVE=~/bin/gdrive
 # directory containing nightly bundles on google drive : nightly_bundles
@@ -24,7 +28,7 @@ if [ ! -e $GDRIVE ] ; then
   exit
 fi
 
-if [ "$platform" == "win64" ]; then
+if [ "$platform" == "win" ]; then
   ext=.exe
 else
   ext=.sh
@@ -35,26 +39,42 @@ shafile=${BUNDLE_BASE}.sha1
 
 upload=1
 if [ ! -e $BUNDLE_DIR/$file ]; then
-  echo "file doesn't exist"
+  echo "$BUNDLE_DIR/file doesn't exist"
   upload=
 fi
 if [ ! -e $BUNDLE_DIR/$shafile ]; then
-  echo "shafile doesn't exist"
+  echo "$BUNDLE_DIR/$shafile doesn't exist"
   upload=
 fi
 if [ "$upload" == "1" ]; then
   if [ "$erase" == "1" ]; then
     $GDRIVE list  | grep ${NIGHTLY}_$platform | awk '{ system("~/bin/gdrive delete -i " $1)} '
   fi
+  echo uploading $BUNDLE_DIR/$file
   $GDRIVE upload -p $BUNDLE_PARENT_ID -f $BUNDLE_DIR/$file
   nfiles=`$GDRIVE list  | grep $file | wc -l`
   if [ $nfiles -eq 0 ]; then
     echo "*** warning: The bundle file $file failed to upload to google drive"
+  else
+    if [ "$erase_local" == "1" ]; then
+      echo "$BUNDLE_DIR/$file uploaded.  Erasing from $BUNDLE_DIR"
+      rm -f $BUNDLE_DIR/$file
+    else
+      echo "$BUNDLE_DIR/$file uploaded."
+    fi
   fi
+  echo uploading $BUNDLE_DIR/$shafile
   $GDRIVE upload -p $BUNDLE_PARENT_ID -f $BUNDLE_DIR/$shafile
   nfiles=`$GDRIVE list  | grep $shafile | wc -l`
   if [ $nfiles -eq 0 ]; then
     echo "*** warning: The sha1 file $sha1file failed to upload to google drive"
+  else
+    if [ "$erase_local" == "1" ]; then
+      echo "$BUNDLE_DIR/$shafile uploaded.  Erasing from $BUNDLE_DIR"
+      rm -f $BUNDLE_DIR/$shafile
+    else
+      echo "$BUNDLE_DIR/$shafile uploaded."
+    fi
   fi
 else
   if [ ! -e $BUNDLE_DIR/$file ]; then
