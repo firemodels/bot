@@ -4,6 +4,9 @@ BUNDLE_BASE=$2
 NIGHTLY=$3
 platform=$4
 
+scriptdir=`dirname "$(readlink -f "$0")"`
+cd $scriptdir
+
 erase=1
 erase_local=
 
@@ -36,11 +39,11 @@ shafile=${BUNDLE_BASE}.sha1
 
 upload=1
 if [ ! -e $BUNDLE_DIR/$file ]; then
-  echo "file doesn't exist"
+  echo "$BUNDLE_DIR/file doesn't exist"
   upload=
 fi
 if [ ! -e $BUNDLE_DIR/$shafile ]; then
-  echo "shafile doesn't exist"
+  echo "$BUNDLE_DIR/$shafile doesn't exist"
   upload=
 fi
 if [ "$upload" == "1" ]; then
@@ -54,10 +57,10 @@ if [ "$upload" == "1" ]; then
     echo "*** warning: The bundle file $file failed to upload to google drive"
   else
     if [ "$erase_local" == "1" ]; then
-      echo "$file uploaded.  Erasing from $BUNDLE_DIR"
+      echo "$BUNDLE_DIR/$file uploaded.  Erasing from $BUNDLE_DIR"
       rm -f $BUNDLE_DIR/$file
     else
-      echo "$file uploaded."
+      echo "$BUNDLE_DIR/$file uploaded."
     fi
   fi
   echo uploading $BUNDLE_DIR/$shafile
@@ -67,10 +70,10 @@ if [ "$upload" == "1" ]; then
     echo "*** warning: The sha1 file $sha1file failed to upload to google drive"
   else
     if [ "$erase_local" == "1" ]; then
-      echo "$shafile uploaded.  Erasing from $BUNDLE_DIR"
+      echo "$BUNDLE_DIR/$shafile uploaded.  Erasing from $BUNDLE_DIR"
       rm -f $BUNDLE_DIR/$shafile
     else
-      echo "$shafile uploaded."
+      echo "$BUNDLE_DIR/$shafile uploaded."
     fi
   fi
 else
