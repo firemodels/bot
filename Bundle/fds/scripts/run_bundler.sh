@@ -77,7 +77,7 @@ BRANCH="-b release"
 cd ../../../..
 repo=`pwd`
 
-while getopts 'a:A:b:Bcd:fF:ghHp:rS:tuUvVw' OPTION
+while getopts 'a:A:b:cd:fF:ghHp:rS:tuUvVw' OPTION
 do
 case $OPTION  in
   a)
@@ -88,9 +88,6 @@ case $OPTION  in
    ;;
   b)
    BRANCH="-b $OPTARG"
-   ;;
-  B)
-   BOPT="-B"
    ;;
   c)
    copt="-c"
@@ -151,7 +148,7 @@ if [ "$vopt" == "" ]; then
 fi
 fi
 cd $DIR
-./bundler.sh $aopt $AOPT $BOPT $BRANCH $copt $dopt $fopt $FOPT $gopt $hopt $popt $SOPT $uopt $UOPT $vopt $VOPT $wopt
+./bundler.sh $aopt $AOPT $BRANCH $copt $dopt $fopt $FOPT $gopt $hopt $popt $SOPT $uopt $UOPT $vopt $VOPT $wopt
 
 cd $curdir
 
