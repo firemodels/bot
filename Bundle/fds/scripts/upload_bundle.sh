@@ -28,7 +28,7 @@ if [ ! -e $GDRIVE ] ; then
   exit
 fi
 
-if [ "$platform" == "win64" ]; then
+if [ "$platform" == "win" ]; then
   ext=.exe
 else
   ext=.sh
