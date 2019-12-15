@@ -18,7 +18,7 @@ if "x%clone%" == "xclone" goto endif2
 
 :: make sure we are running in the master branch
 set CURDIR=%CD%
-cd ..\..\..
+cd ..
 set botrepo=%CD%
 call :cd_repo %botrepo% master || exit /b 1
 
