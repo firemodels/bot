@@ -74,9 +74,6 @@ cd $DIR
 DIR=`pwd`
 BRANCH="-b release"
 
-cd ../../../..
-repo=`pwd`
-
 while getopts 'a:A:b:cd:fF:ghHp:rS:tuUvVw' OPTION
 do
 case $OPTION  in
@@ -147,6 +144,7 @@ if [ "$vopt" == "" ]; then
   UPDATE_REPO bot master || exit 1
 fi
 fi
+
 cd $DIR
 ./bundlebot.sh $aopt $AOPT $BRANCH $copt $dopt $fopt $FOPT $gopt $hopt $popt $SOPT $uopt $UOPT $vopt $VOPT $wopt
 
