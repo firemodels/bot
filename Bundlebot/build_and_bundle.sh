@@ -17,9 +17,9 @@ fi
 
 curdir=`pwd`
 
-cd ../../../Firebot
+cd ../Firebot
 echo "./run_firebot.sh -c -B -g $FIREBOT_HOST -G \~firebot $JOPT -R test -T -m $MAILTO"
 ./run_firebot.sh -c -C -B -g $FIREBOT_HOST -G \~firebot $JOPT -R test -T -m $MAILTO
 
 cd $curdir
-./run_bundler.sh -u -p $FIREBOT_HOST -w -t -g
+./run_bundlebot.sh -u -p $FIREBOT_HOST -w -t -g
