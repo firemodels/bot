@@ -29,7 +29,7 @@ git merge origin/master
 cd %CURDIR%
 
 :: create the bundle
-call bundler clone %hostname% %firebot_home% %smokebot_home% || exit /b 1
+call bundlebot clone %hostname% %firebot_home% %smokebot_home% || exit /b 1
 
 goto eof
 

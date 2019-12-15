@@ -148,7 +148,7 @@ if [ "$vopt" == "" ]; then
 fi
 fi
 cd $DIR
-./bundler.sh $aopt $AOPT $BRANCH $copt $dopt $fopt $FOPT $gopt $hopt $popt $SOPT $uopt $UOPT $vopt $VOPT $wopt
+./bundlebot.sh $aopt $AOPT $BRANCH $copt $dopt $fopt $FOPT $gopt $hopt $popt $SOPT $uopt $UOPT $vopt $VOPT $wopt
 
 cd $curdir
 
