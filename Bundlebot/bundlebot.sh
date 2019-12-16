@@ -151,7 +151,7 @@ shift $(($OPTIND-1))
 LOCK_FILE=$HOME/.bundle/make_bundle_lock
 if [ "$FORCE" == "" ]; then
 if [ -e $LOCK_FILE ]; then
-  echo "***error: another instance of the bundler script is running."
+  echo "***error: another instance of the bundlebot script is running."
   echo "          If this is not the case re-run using the -f option."
   exit 1
 fi
