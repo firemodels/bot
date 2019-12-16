@@ -4,8 +4,8 @@ set hostname=%2
 set firebot_home=%3
 set smokebot_home=%4
 
-if EXIST .bundler goto endif1
-  echo ***error: run_bundler.bat must be run in bot/Bundler/fds/scripts directory
+if EXIST .bundlebot goto endif1
+  echo ***error: run_bundlebot.bat must be run in bot/Bundlebot directory
   exit /b 1
 :endif1
 
