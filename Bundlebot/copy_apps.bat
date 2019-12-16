@@ -5,7 +5,7 @@ set bot=%2
 
 set scriptdir=%~dp0
 set curdir=%CD%
-cd %scriptdir%\..\..\..\..
+cd %scriptdir%\..\..
 set repo_root=%CD%
 set fdsrepo=%repo_root%\fds
 set smvrepo=%repo_root%\smv
