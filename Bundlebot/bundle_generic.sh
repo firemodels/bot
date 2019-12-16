@@ -40,7 +40,7 @@ fi
 
 scriptdir=`dirname "$(readlink "$0")"`
 curdir=`pwd`
-cd $scriptdir/../../../..
+cd $scriptdir/../..
 REPO_ROOT=`pwd`
 cd $curdir
 
@@ -300,7 +300,7 @@ fds_bundle=$REPO_ROOT/bot/Bundle/fds/for_bundle
 smv_bundle=$REPO_ROOT/bot/Bundle/smv/for_bundle
 webgldir=$REPO_ROOT/bot/Bundle/smv/for_bundle/webgl
 texturedir=$smv_bundle/textures
-makeinstaller=$REPO_ROOT/bot/Bundle/fds/scripts/make_installer.sh
+makeinstaller=$REPO_ROOT/bot/Bundlebot/make_installer.sh
 
 fds_cases=$REPO_ROOT/fds/Verification/FDS_Cases.sh
 fds_benchamrk_cases=$REPO_ROOT/fds/Verification/FDS_Benchmark_Cases.sh

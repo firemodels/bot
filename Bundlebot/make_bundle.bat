@@ -16,7 +16,7 @@ set smvversion=%SMVEDITION%
 
 set scriptdir=%~dp0
 set curdir=%CD%
-cd %scriptdir%\..\..\..\..
+cd %scriptdir%\..\..
 set repo_root=%CD%
 cd %scriptdir%
 set SVNROOT=%repo_root%

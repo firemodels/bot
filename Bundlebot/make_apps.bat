@@ -13,7 +13,7 @@ echo. > %clean_log%
 echo. > %compile_log%
 echo. > %error_log%
 
-cd ..\..\..\..\smv\
+cd ..\..\smv\
 set smvrepo=%CD%
 
 cd ..\fds
