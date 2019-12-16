@@ -12,12 +12,12 @@ if NOT "x%smv_hash%" == "x" goto skip_smv_hash
 
 set CURDIR=%CD%
 
-cd ..\..\..\Scripts
+cd ..\Scripts
 call setup_repos -T -n
 
 cd %CURDIR%
 
-cd ..\..\..\..\fds
+cd ..\..\fds
 set fdsrepo=%CD%
 
 cd ..\smv

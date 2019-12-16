@@ -1,7 +1,19 @@
 @echo off
-set hostname=%1
-set firebot_home=%2
-set smokebot_home=%3
+set clone=%1
+set hostname=%2
+set firebot_home=%3
+set smokebot_home=%4
+
+if EXIST .bundlebot goto endif1
+  echo ***error: run_bundlebot.bat must be run in bot/Bundlebot directory
+  exit /b 1
+:endif1
+
+if "x%clone%" == "xclone" goto endif2
+  echo ***error:  this script clones (ie erases) the fds and smv repos.  
+  echo            clone must be specified as the first argument to use this script
+  exit /b 1
+:endif2
 
 if "x%hostname%" == "x" (
   set hostname=blaze.el.nist.gov
@@ -50,4 +62,6 @@ cd %CURDIR%
 call make_bundle bot %FDS_REVISION_BUNDLER% %SMV_REVISION_BUNDLER% %nightly%
 
 cd %CURDIR%
-call upload_bundle %FDS_REVISION_BUNDLER% %SMV_REVISION_BUNDLER% %nightly% %hostname%
+call upload_bundle %FDS_REVISION_BUNDLER% %SMV_REVISION_BUNDLER% %nightly% %hostname% || exit /b 1
+
+exit /b 0

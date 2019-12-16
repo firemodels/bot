@@ -44,6 +44,6 @@ pscp %bundlefile%    %upload_host%:.bundle/bundles/.
 pscp %bundleshafile% %upload_host%:.bundle/bundles/.
 
 :: upload to google drive
-plink %plink_options% %linux_logon% %linux_svn_root%/bot/Bundle/fds/scripts/upload_bundle.sh /home/gforney/.bundle/bundles %basename% tst win
+plink %plink_options% %linux_logon% %linux_svn_root%/bot/Bundlebot/upload_bundle.sh /home/gforney/.bundle/bundles %basename% tst win
 
 exit /b 0

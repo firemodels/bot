@@ -72,12 +72,16 @@ commands=$0
 DIR=$(dirname "${commands}")
 cd $DIR
 DIR=`pwd`
-BRANCH="-b release"
+echo DIR=$DIR
 
-cd ../../../..
+cd ../..
 repo=`pwd`
 
-while getopts 'a:A:b:Bcd:fF:ghHp:rS:tuUvVw' OPTION
+cd $DIR
+
+BRANCH="-b release"
+
+while getopts 'a:A:b:cd:fF:ghHp:rS:tuUvVw' OPTION
 do
 case $OPTION  in
   a)
@@ -88,9 +92,6 @@ case $OPTION  in
    ;;
   b)
    BRANCH="-b $OPTARG"
-   ;;
-  B)
-   BOPT="-B"
    ;;
   c)
    copt="-c"
@@ -150,8 +151,9 @@ if [ "$vopt" == "" ]; then
   UPDATE_REPO bot master || exit 1
 fi
 fi
+
 cd $DIR
-./bundler.sh $aopt $AOPT $BOPT $BRANCH $copt $dopt $fopt $FOPT $gopt $hopt $popt $SOPT $uopt $UOPT $vopt $VOPT $wopt
+./bundlebot.sh $aopt $AOPT $BRANCH $copt $dopt $fopt $FOPT $gopt $hopt $popt $SOPT $uopt $UOPT $vopt $VOPT $wopt
 
 cd $curdir
 
