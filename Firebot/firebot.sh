@@ -1580,10 +1580,10 @@ email_build_status()
      NAMELIST_NOSOURCE_LOG=
    fi
    if [ "$UPLOADGUIDES" == "1" ]; then
-     echo "    Firebot status:  https://pages.nist.gov/fds-smv/firebot_status.html" >> $TIME_LOG
+     echo "            status:  https://pages.nist.gov/fds-smv/firebot_status.html" >> $TIME_LOG
    fi
    if [ "$WEB_URL" != "" ]; then
-     echo "   Firebot summary: $WEB_URL"  >> $TIME_LOG
+     echo "           summary: $WEB_URL"  >> $TIME_LOG
    fi
    echo "-------------------------------" >> $TIME_LOG
 
@@ -2018,6 +2018,9 @@ COPY_APPS=$botrepo/Firebot/copy_apps.sh
 echo ""
 echo "Settings"
 echo "--------"
+if [ "$BUILD_ONLY" == "1" ]; then
+  echo "Only build apps"
+fi
 echo "     FDS repo: $fdsrepo"
 echo "   FDS branch: $FDSBRANCH"
 echo "     SMV repo: $smvrepo"
@@ -2036,7 +2039,7 @@ if [ "$UPDATEREPO" == "1" ]; then
 else
   echo " update repos: no"
 fi
-if [ "$BUILD_ONLY" ]; then
+if [ "$BUILD_ONLY" == "" ]; then
   echo "        queue: $QUEUE"
 fi
 if [ "$WEB_DIR" != "" ]; then
