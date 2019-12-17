@@ -1556,6 +1556,9 @@ email_build_status()
       echo "Note: only VV cases with debug FDS were run" >> $TIME_LOG
       echo "" >> $TIME_LOG
    fi
+   if [ "$BUILD_ONLY" == "1" ]; then
+     echo " build only apps"                 >> $TIME_LOG
+   fi
    echo "              host: $hostname "     >> $TIME_LOG
    echo "                OS: $platform2 "    >> $TIME_LOG
    echo "              repo: $repo "         >> $TIME_LOG
