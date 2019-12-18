@@ -21,4 +21,4 @@ cd ../Firebot
 ./run_firebot.sh -c -C -B -g $FIREBOT_HOST -G \~firebot $JOPT -R test -T -m $MAILTO
 
 cd $curdir
-./run_bundlebot.sh -u -p $FIREBOT_HOST -w -t -g
+./run_bundlebot.sh -p $FIREBOT_HOST -w -g
