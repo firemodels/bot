@@ -338,7 +338,7 @@ set  desc=%2
 echo ^<p^>^<hr^>^<p^>             >> %MANIFEST%
 if NOT EXIST %prog% goto else_list
     echo ^<pre^>                  >> %MANIFEST%
-    echo %desc%                   >> %MANIFEST%
+    echo %desc% is present        >> %MANIFEST%
     echo ^</pre^>                 >> %MANIFEST%
     goto endif_list
 :else_smv
@@ -380,13 +380,12 @@ set  desc=%2
 echo ^<p^>^<hr^>^<p^>             >> %MANIFEST%
 if NOT EXIST %prog% goto else_fds
   echo ^<pre^>                    >> %MANIFEST%
-    echo. | %prog%                >> %MANIFEST%
-    echo ^</pre^>                 >> %MANIFEST%
-    goto endif_fds
+  echo. | %prog%                  >> %MANIFEST% 2>&1
+  echo ^</pre^>                   >> %MANIFEST%
+  goto endif_fds
 :else_fds
-    echo %desc% is absent^<br^>   >> %MANIFEST%
-    echo %prog"                   >> %MANIFEST%
-  fi
+  echo %desc% is absent^<br^>     >> %MANIFEST%
+  echo %prog"                     >> %MANIFEST%
   echo ^<br^>                     >> %MANIFEST%
 :endif_fds
 exit /b
