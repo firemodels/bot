@@ -137,9 +137,26 @@ echo.
 
 copy %smv_forbundle%\*.po                   %out_bin%\.>Nul
 
+:: initialize manifest file
+set MANIFEST=%out_doc%\manifest.html
+
+echo ^<html^>                                  > %MANIFEST%
+echo ^<head^>                                 >> %MANIFEST%
+echo ^<TITLE^>Manifest - %basename%^</TITLE^> >> %MANIFEST%
+echo ^</HEAD^>                                >> %MANIFEST%
+echo ^<BODY BGCOLOR="#FFFFFF" ^>              >> %MANIFEST%
+echo ^<h2^>Manifest - %basename%^</h2^>       >> %MANIFESTE%
+
+
 CALL :COPY  %bundle_dir%\fds\fds.exe        %out_bin%\fds.exe
 CALL :COPY  %bundle_dir%\fds\fds2ascii.exe  %out_bin%\fds2ascii.exe
 CALL :COPY  %bundle_dir%\fds\test_mpi.exe   %out_bin%\test_mpi.exe
+
+CALL :TOMANIFESTFDS   %bundle_dir%\fds\fds.exe        fds
+CALL :TOMANIFESTSMV   %bundle_dir%\smv\smokeview.exe  smokeview
+
+CALL :TOMANIFESTLIST  %bundle_dir%\fds\fds2ascii.exe  fds2ascii.exe
+CALL :TOMANIFESTLIST  %bundle_dir%\fds\test_mpi.exe   test_mpi.exe
 
 CALL :COPY  %bundle_dir%\smv\background.exe %out_bin%\background.exe
 CALL :COPY  %bundle_dir%\smv\smokeview.exe  %out_smv%\smokeview.exe
@@ -148,7 +165,18 @@ CALL :COPY  %bundle_dir%\smv\smokezip.exe   %out_smv%\smokezip.exe
 CALL :COPY  %bundle_dir%\smv\dem2fds.exe    %out_smv%\dem2fds.exe 
 CALL :COPY  %bundle_dir%\smv\hashfile.exe   %out_smv%\hashfile.exe 
 CALL :COPY  %bundle_dir%\smv\wind2fds.exe   %out_smv%\wind2fds.exe 
-CALL :COPY  %bundle_dir%\smv\hashfile.exe   %out_smv%\hashfile.exe 
+
+CALL :TOMANIFESTSMV %bundle_dir%\smv\background.exe background
+CALL :TOMANIFESTSMV %bundle_dir%\smv\dem2fds.exe    dem2fds
+CALL :TOMANIFESTSMV %bundle_dir%\smv\hashfile.exe   hashfile
+CALL :TOMANIFESTSMV %bundle_dir%\smv\smokediff.exe  smokediff
+CALL :TOMANIFESTSMV %bundle_dir%\smv\smokezip.exe   smokezip
+CALL :TOMANIFESTSMV %bundle_dir%\smv\wind2fds.exe   wind2fds
+
+:: wrap up manifest file
+
+echo ^</body^>                                  >> %MANIFEST%
+echo ^</html^>                                  >> %MANIFEST%
 
 CALL :COPY  %repo_root%\smv\scripts\jp2conv.bat                                %out_smv%\jp2conv.bat
 
@@ -300,7 +328,72 @@ cd %CURDIR%>Nul
 
 GOTO EOF
 
+::------------------------------------------------
+:TOMANIFESTLIST
+::------------------------------------------------
+
+set  local prog=%1
+set  local desc=%2
+
+echo ^<p^>^<hr^>^<p^>             >> %MANIFEST%
+if NOT EXIST %prog% goto else_list
+    echo ^<pre^>                  >> %MANIFEST%
+    echo %desc%                   >> %MANIFEST%
+    echo ^</pre^>                 >> %MANIFEST%
+    goto endif_list
+:else_smv
+    echo %desc% is absent^<br^>   >> %MANIFEST%
+    echo %prog"                   >> %MANIFEST%
+  fi
+  echo ^<br^>                     >> %MANIFEST%
+:endif_list
+exit /b
+
+::------------------------------------------------
+:TOMANIFESTSMV
+::------------------------------------------------
+
+set  local prog=%1
+set  local desc=%2
+
+echo ^<p^>^<hr^>^<p^>             >> %MANIFEST%
+if NOT EXIST %prog% goto else_smv
+  echo ^<pre^>                    >> %MANIFEST%
+    %prog% -v                     >> %MANIFEST%
+    echo ^</pre^>                 >> %MANIFEST%
+    goto endif_smv
+:else_smv
+    echo %desc% is absent^<br^>   >> %MANIFEST%
+    echo %prog"                   >> %MANIFEST%
+  fi
+  echo ^<br^>                     >> %MANIFEST%
+:endif_smv
+exit /b
+
+::------------------------------------------------
+:TOMANIFESTFDS
+::------------------------------------------------
+
+set  local prog=%1
+set  local desc=%2
+
+echo ^<p^>^<hr^>^<p^>             >> %MANIFEST%
+if NOT EXIST %prog% goto else_fds
+  echo ^<pre^>                    >> %MANIFEST%
+    echo. | %prog%                >> %MANIFEST%
+    echo ^</pre^>                 >> %MANIFEST%
+    goto endif_fds
+:else_fds
+    echo %desc% is absent^<br^>   >> %MANIFEST%
+    echo %prog"                   >> %MANIFEST%
+  fi
+  echo ^<br^>                     >> %MANIFEST%
+:endif_fds
+exit /b
+
+::------------------------------------------------
 :COPY
+::------------------------------------------------
 set label=%~n1%~x1
 set infile=%1
 set infiletime=%~t1
@@ -319,7 +412,9 @@ if "x%bot%" == "xbot" goto skip3
 :endif1
 exit /b
 
+::------------------------------------------------
 :COPYDIR
+::------------------------------------------------
 set fromdir=%1
 set todir=%2
 IF NOT EXIST %fromdir% goto else2
