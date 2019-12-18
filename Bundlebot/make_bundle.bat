@@ -320,7 +320,7 @@ wzipse32 %basename%.zip -setup -auto -i %fds_forbundle%\icon.ico -t %fds_forbund
 
 CALL :COPY %upload_dir%\%basename%.exe  %bundles_dir%\%basename%.exe
 CALL :COPY %upload_dir%\%basename%.sha1 %bundles_dir%\%basename%.sha1
-CALL :COPY %MANIFEST%                   %upload_dir%\%basename%.html
+CALL :COPY %MANIFEST%                   %upload_dir%\%basename%_manifest.html
 
 echo.
 echo --- installer built ---
