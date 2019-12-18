@@ -26,7 +26,6 @@ else
   UPLOAD_DIR=$UPLOAD_DIR_ARG
 fi
 
-smvbin=smvbin
 INSTALLDIR=FDS/FDS6
 errlog=/tmp/errlog.$$
 
@@ -294,11 +293,16 @@ else
 fi
 
 smvscriptdir=$REPO_ROOT/smv/scripts
+
 bundledir=$UPLOAD_DIR/$bundlebase
+smvbindir=$bundledir/smvbin
+fdsbindir=$bundledir/bin
+
 webpagesdir=$REPO_ROOT/webpages
 fds_bundle=$REPO_ROOT/bot/Bundle/fds/for_bundle
 smv_bundle=$REPO_ROOT/bot/Bundle/smv/for_bundle
 webgldir=$REPO_ROOT/bot/Bundle/smv/for_bundle/webgl
+
 texturedir=$smv_bundle/textures
 makeinstaller=$REPO_ROOT/bot/Bundlebot/make_installer.sh
 
@@ -313,14 +317,17 @@ SMVExamplesDirectory=$REPO_ROOT/smv/Verification
 
 cd $UPLOAD_DIR
 rm -rf $bundlebase
+
 mkdir $bundledir
-mkdir $bundledir/bin
-mkdir $bundledir/bin/hash
-mkdir -p $bundledir/$smvbin
-mkdir -p $bundledir/$smvbin/hash
 mkdir $bundledir/Documentation
 mkdir $bundledir/Examples
-mkdir $bundledir/$smvbin/textures
+
+mkdir $fdsbindir
+mkdir $fdsbindir/hash
+
+mkdir -p $smvbindir
+mkdir -p $smvbindir/hash
+mkdir $smvbindir/textures
 
 #
 # initialize manifest file
@@ -341,25 +348,13 @@ echo ""
 
 # smokeview
 
-CP $APPS_DIR background $bundledir/$smvbin background
-CP $APPS_DIR smokeview  $bundledir/$smvbin smokeview
-CP $APPS_DIR smokediff  $bundledir/$smvbin smokediff
-CP $APPS_DIR smokezip   $bundledir/$smvbin smokezip
-CP $APPS_DIR dem2fds    $bundledir/$smvbin dem2fds
-CP $APPS_DIR wind2fds   $bundledir/$smvbin wind2fds
-CP $APPS_DIR hashfile   $bundledir/$smvbin hashfile
-
-TOMANIFESTFDS  $APPS_DIR/fds       fds
-TOMANIFESTLIST $APPS_DIR/fds2ascii fds2ascii
-TOMANIFESTLIST $APPS_DIR/test_mpi  test_mpi
-
-TOMANIFESTSMV  $APPS_DIR/smokeview  smokeview
-TOMANIFESTSMV  $APPS_DIR/background background
-TOMANIFESTSMV  $APPS_DIR/smokediff  smokediff
-TOMANIFESTSMV  $APPS_DIR/smokezip   smokezip
-TOMANIFESTSMV  $APPS_DIR/dem2fds    dem2fds
-TOMANIFESTSMV  $APPS_DIR/wind2fds   wind2fds
-TOMANIFESTSMV  $APPS_DIR/hashfile   hashfile
+CP $APPS_DIR background $smvbindir background
+CP $APPS_DIR smokeview  $smvbindir smokeview
+CP $APPS_DIR smokediff  $smvbindir smokediff
+CP $APPS_DIR smokezip   $smvbindir smokezip
+CP $APPS_DIR dem2fds    $smvbindir dem2fds
+CP $APPS_DIR wind2fds   $smvbindir wind2fds
+CP $APPS_DIR hashfile   $smvbindir hashfile
 
 # qpdf --empty --pages FDS_User_Guide.pdf  3-3 -- out.pdf
 
@@ -369,7 +364,7 @@ cat << EOF >> $MANIFEST
 EOF
 
 CURDIR=`pwd`
-cd $bundledir/$smvbin
+cd $smvbindir
 $APPS_DIR/hashfile background > hash/background.sha1
 $APPS_DIR/hashfile smokeview  > hash/smokeview.sha1
 $APPS_DIR/hashfile smokediff  > hash/smokediff.sha1
@@ -379,18 +374,30 @@ $APPS_DIR/hashfile wind2fds   > hash/wind2fds.sha1
 $APPS_DIR/hashfile hashfile   > hash/hashfile.sha1
 cd $CURDIR
 
-CP $smvscriptdir jp2conv.sh $bundledir/$smvbin jp2conv.sh
-CPDIR $texturedir $bundledir/$smvbin
+CP $smvscriptdir jp2conv.sh $smvbindir jp2conv.sh
+CPDIR $texturedir $smvbindir
 
 # FDS 
 
-cd $bundledir/bin
-CP $APPS_DIR fds       $bundledir/bin fds
-CP $APPS_DIR fds2ascii $bundledir/bin fds2ascii
-CP $APPS_DIR test_mpi  $bundledir/bin test_mpi
+cd $fdsbindir
+CP $APPS_DIR fds       $fdsbindir fds
+CP $APPS_DIR fds2ascii $fdsbindir fds2ascii
+CP $APPS_DIR test_mpi  $fdsbindir test_mpi
+
+TOMANIFESTFDS  $fdsbindir/fds        fds
+TOMANIFESTSMV  $smvbindir/smokeview  smokeview
+
+TOMANIFESTSMV  $smvbindir/background background
+TOMANIFESTSMV  $smvbindir/dem2fds    dem2fds
+TOMANIFESTLIST $fdsbindir/fds2ascii  fds2ascii
+TOMANIFESTSMV  $smvbindir/hashfile   hashfile
+TOMANIFESTSMV  $smvbindir/smokediff  smokediff
+TOMANIFESTSMV  $smvbindir/smokezip   smokezip
+TOMANIFESTLIST $fdsbindir/test_mpi   test_mpi
+TOMANIFESTSMV  $smvbindir/wind2fds   wind2fds
 
 CURDIR=`pwd`
-cd $bundledir/bin
+cd $fdsbindir
 $APPS_DIR/hashfile fds       > hash/fds.sha1
 $APPS_DIR/hashfile fds2ascii > hash/fds2ascii.sha1
 $APPS_DIR/hashfile test_mpi  > hash/test_mpi.sha1
@@ -412,20 +419,20 @@ echo ""
 echo "--- copying configuration files ---"
 echo ""
 
-CP $smv_bundle smokeview.ini  $bundledir/$smvbin smokeview.ini
-CP $smv_bundle volrender.ssf  $bundledir/$smvbin volrender.ssf
-CP $smv_bundle objects.svo    $bundledir/$smvbin objects.svo
-CP $smv_bundle smokeview.html $bundledir/$smvbin smokeview.html
+CP $smv_bundle smokeview.ini  $smvbindir smokeview.ini
+CP $smv_bundle volrender.ssf  $smvbindir volrender.ssf
+CP $smv_bundle objects.svo    $smvbindir objects.svo
+CP $smv_bundle smokeview.html $smvbindir smokeview.html
 
 # smokeview to html conversion scripts
 
-CP $webgldir runsmv_ssh.sh $bundledir/$smvbin runsmv_ssh.sh
-CP $webgldir smv2html.sh   $bundledir/$smvbin smv2html.sh
+CP $webgldir runsmv_ssh.sh $smvbindir runsmv_ssh.sh
+CP $webgldir smv2html.sh   $smvbindir smv2html.sh
 
 if [ "$MPI_VERSION" == "INTEL" ]; then
-  UNTAR $MPI_DIR $intelmpifile $bundledir/bin INTEL
+  UNTAR $MPI_DIR $intelmpifile $fdsbindir INTEL
 else
-  CP $MPI_DIR $openmpifile  $bundledir/bin $openmpifile
+  CP $MPI_DIR $openmpifile  $fdsbindir $openmpifile
 fi
 
 echo ""
@@ -487,9 +494,9 @@ if [ "$openmpifile" != "" ]; then
 fi
 $makeinstaller -i $bundlebase.tar.gz -d $INSTALLDIR -m $MPI_VERSION $OPENMPIFILE $bundlebase.sh
 
-cat $bundledir/bin/hash/*.sha1     >  $bundlebase.sha1
-cat $bundledir/$smvbin/hash/*.sha1 >  $bundlebase.sha1
-$APPS_DIR/hashfile $bundlebase.sh            >> $bundlebase.sha1
+cat $fdsbindir/hash/*.sha1         > $bundlebase.sha1
+cat $smvbindir/hash/*.sha1         > $bundlebase.sha1
+$APPS_DIR/hashfile $bundlebase.sh >> $bundlebase.sha1
 
 if [ -e $errlog ]; then
   numerrs=`cat $errlog | wc -l `
