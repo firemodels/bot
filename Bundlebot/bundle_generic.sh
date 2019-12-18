@@ -235,7 +235,7 @@ TOMANIFESTLIST ()
 
   echo "<p><hr><p>"                 >> $MANIFEST
   if [ -e $prog ]; then
-    echo "$desc"                    >> $MANIFEST
+    echo "$desc is present"         >> $MANIFEST
   else
     echo "$desc is absent<br>"      >> $MANIFEST
     echo "$prog"                    >> $MANIFEST
