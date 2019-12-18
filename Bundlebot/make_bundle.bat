@@ -145,33 +145,33 @@ echo ^<head^>                                 >> %MANIFEST%
 echo ^<TITLE^>Manifest - %basename%^</TITLE^> >> %MANIFEST%
 echo ^</HEAD^>                                >> %MANIFEST%
 echo ^<BODY BGCOLOR="#FFFFFF" ^>              >> %MANIFEST%
-echo ^<h2^>Manifest - %basename%^</h2^>       >> %MANIFESTE%
+echo ^<h2^>Manifest - %basename%^</h2^>       >> %MANIFEST%
 
 
 CALL :COPY  %bundle_dir%\fds\fds.exe        %out_bin%\fds.exe
 CALL :COPY  %bundle_dir%\fds\fds2ascii.exe  %out_bin%\fds2ascii.exe
 CALL :COPY  %bundle_dir%\fds\test_mpi.exe   %out_bin%\test_mpi.exe
 
-CALL :TOMANIFESTFDS   %bundle_dir%\fds\fds.exe        fds
-CALL :TOMANIFESTSMV   %bundle_dir%\smv\smokeview.exe  smokeview
+CALL :COPY  %bundle_dir%\smv\smokeview.exe  %out_smv%\smokeview.exe
 
-CALL :TOMANIFESTLIST  %bundle_dir%\fds\fds2ascii.exe  fds2ascii.exe
-CALL :TOMANIFESTLIST  %bundle_dir%\fds\test_mpi.exe   test_mpi.exe
+CALL :TOMANIFESTFDS   %out_bin%\fds.exe        fds
+CALL :TOMANIFESTSMV   %out_smv%\smokeview.exe  smokeview
 
 CALL :COPY  %bundle_dir%\smv\background.exe %out_bin%\background.exe
-CALL :COPY  %bundle_dir%\smv\smokeview.exe  %out_smv%\smokeview.exe
-CALL :COPY  %bundle_dir%\smv\smokediff.exe  %out_smv%\smokediff.exe
-CALL :COPY  %bundle_dir%\smv\smokezip.exe   %out_smv%\smokezip.exe 
 CALL :COPY  %bundle_dir%\smv\dem2fds.exe    %out_smv%\dem2fds.exe 
 CALL :COPY  %bundle_dir%\smv\hashfile.exe   %out_smv%\hashfile.exe 
+CALL :COPY  %bundle_dir%\smv\smokediff.exe  %out_smv%\smokediff.exe
+CALL :COPY  %bundle_dir%\smv\smokezip.exe   %out_smv%\smokezip.exe 
 CALL :COPY  %bundle_dir%\smv\wind2fds.exe   %out_smv%\wind2fds.exe 
 
-CALL :TOMANIFESTSMV %bundle_dir%\smv\background.exe background
-CALL :TOMANIFESTSMV %bundle_dir%\smv\dem2fds.exe    dem2fds
-CALL :TOMANIFESTSMV %bundle_dir%\smv\hashfile.exe   hashfile
-CALL :TOMANIFESTSMV %bundle_dir%\smv\smokediff.exe  smokediff
-CALL :TOMANIFESTSMV %bundle_dir%\smv\smokezip.exe   smokezip
-CALL :TOMANIFESTSMV %bundle_dir%\smv\wind2fds.exe   wind2fds
+CALL :TOMANIFESTSMV   %out_bin%\background.exe background
+CALL :TOMANIFESTSMV   %out_smv%\dem2fds.exe    dem2fds
+CALL :TOMANIFESTLIST  %out_bin%\fds2ascii.exe  fds2ascii
+CALL :TOMANIFESTSMV   %out_smv%\hashfile.exe   hashfile
+CALL :TOMANIFESTSMV   %out_smv%\smokediff.exe  smokediff
+CALL :TOMANIFESTSMV   %out_smv%\smokezip.exe   smokezip
+CALL :TOMANIFESTLIST  %out_bin%\test_mpi.exe   test_mpi
+CALL :TOMANIFESTSMV   %out_smv%\wind2fds.exe   wind2fds
 
 :: wrap up manifest file
 
@@ -332,8 +332,8 @@ GOTO EOF
 :TOMANIFESTLIST
 ::------------------------------------------------
 
-set  local prog=%1
-set  local desc=%2
+set  prog=%1
+set  desc=%2
 
 echo ^<p^>^<hr^>^<p^>             >> %MANIFEST%
 if NOT EXIST %prog% goto else_list
@@ -353,8 +353,8 @@ exit /b
 :TOMANIFESTSMV
 ::------------------------------------------------
 
-set  local prog=%1
-set  local desc=%2
+set  prog=%1
+set  desc=%2
 
 echo ^<p^>^<hr^>^<p^>             >> %MANIFEST%
 if NOT EXIST %prog% goto else_smv
@@ -374,8 +374,8 @@ exit /b
 :TOMANIFESTFDS
 ::------------------------------------------------
 
-set  local prog=%1
-set  local desc=%2
+set  prog=%1
+set  desc=%2
 
 echo ^<p^>^<hr^>^<p^>             >> %MANIFEST%
 if NOT EXIST %prog% goto else_fds
