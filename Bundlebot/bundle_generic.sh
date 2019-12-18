@@ -332,14 +332,15 @@ mkdir $smvbindir/textures
 #
 # initialize manifest file
 MANIFEST=$bundledir/Documentation/manifest.html
+BUNDLE_DATE=`date +"%b %d, %Y - %r"`
 cat << EOF > $MANIFEST
 <html>
 
 <head>
-<TITLE>Manifest - $bundlebase</TITLE>
+<TITLE>Manifest - $bundlebase - $BUNDLE_DATE</TITLE>
 </HEAD>
 <BODY BGCOLOR="#FFFFFF" >
-<h2>Manifest - $bundlebase</h2>
+<h2>Manifest - $bundlebase - $BUNDLE_DATE</h2>
 EOF
 
 echo ""

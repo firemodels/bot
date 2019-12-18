@@ -142,10 +142,18 @@ set MANIFEST=%out_doc%\manifest.html
 
 echo ^<html^>                                  > %MANIFEST%
 echo ^<head^>                                 >> %MANIFEST%
-echo ^<TITLE^>Manifest - %basename%^</TITLE^> >> %MANIFEST%
+echo ^<TITLE^>                                >> %MANIFEST%
+echo Manifest - %basename%^ -                 >> %MANIFEST%
+date /t                                       >> %MANIFEST%
+time /t                                       >> %MANIFEST%
+echo ^</TITLE^>                               >> %MANIFEST%
 echo ^</HEAD^>                                >> %MANIFEST%
 echo ^<BODY BGCOLOR="#FFFFFF" ^>              >> %MANIFEST%
-echo ^<h2^>Manifest - %basename%^</h2^>       >> %MANIFEST%
+echo ^<h2^>                                   >> %MANIFEST%
+echo Manifest - %basename%^ -                 >> %MANIFEST%
+date /t                                       >> %MANIFEST%
+time /t                                       >> %MANIFEST%
+echo ^</h2^>                                  >> %MANIFEST%
 
 
 CALL :COPY  %bundle_dir%\fds\fds.exe        %out_bin%\fds.exe
