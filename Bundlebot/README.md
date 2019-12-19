@@ -1,9 +1,7 @@
 #  Building Bundles
 
 This directory contains scripts for building FDS and Smokeview bundles on Windows, Linux and OSX (Mac) computer platforms. 
-`run_bundlebot.sh` is used to build Linux and OSX bundles and `run_bundlebot.bat` is used to build a Windows bundle.  
-These scripts use applications (FDS, Smokeview and Smokeview utilities), 
-documents ( User, Verification/Validation and Technical guides) and other files to build the bundles.
+`run_bundlebot.sh` is used to build Linux and OSX bundles and `run_bundlebot.bat` is used to build a Windows bundle. These scripts use applications (FDS, Smokeview and Smokeview utilities), documents ( User, Verification/Validation and Technical guides) and other files to build the bundles.
 
 FDS and Smokeview applications for Linux and OSX bundles are built by firebot.  The script that builds a Windows bundle
 also builds the applications it requires. FDS and Smokeview manuals are generated
