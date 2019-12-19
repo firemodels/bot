@@ -72,7 +72,6 @@ commands=$0
 DIR=$(dirname "${commands}")
 cd $DIR
 DIR=`pwd`
-echo DIR=$DIR
 
 cd ../..
 repo=`pwd`
