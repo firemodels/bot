@@ -72,7 +72,6 @@ commands=$0
 DIR=$(dirname "${commands}")
 cd $DIR
 DIR=`pwd`
-echo DIR=$DIR
 
 cd ../..
 repo=`pwd`
@@ -81,17 +80,11 @@ cd $DIR
 
 BRANCH="-b release"
 
-while getopts 'a:A:b:cd:fF:ghHp:rS:tuUvVw' OPTION
+while getopts 'b:cd:fF:ghp:rS:tvVw' OPTION
 do
 case $OPTION  in
-  a)
-   aopt="-a $OPTARG"
-   ;;
-  A)
-   AOPT="-A $OPTARG"
-   ;;
   b)
-   BRANCH="-b $OPTARG"
+   bopt="-b $OPTARG"
    ;;
   c)
    copt="-c"
@@ -111,26 +104,17 @@ case $OPTION  in
   h)
    hopt="-h"
    ;;
-  H)
-   hopt="-h"
-   ;;
   p)
    popt="-p $OPTARG"
    ;;
   r)
-   BRANCH="-b release"
+   ropt="-r"
    ;;
   S)
    SOPT="-S $OPTARG"
    ;;
   t)
-   BRANCH="-b test"
-   ;;
-  u)
-   uopt="-u"
-   ;;
-  U)
-   UOPT="-U"
+   topt="-t"
    ;;
   v)
    vopt="-v"
@@ -153,7 +137,7 @@ fi
 fi
 
 cd $DIR
-./bundlebot.sh $aopt $AOPT $BRANCH $copt $dopt $fopt $FOPT $gopt $hopt $popt $SOPT $uopt $UOPT $vopt $VOPT $wopt
+./bundlebot.sh $bopt $copt $dopt $fopt $FOPT $gopt $hopt $popt $ropt $SOPT $topt $uopt $vopt $VOPT $wopt
 
 cd $curdir
 

@@ -12,6 +12,9 @@ function get_fullpath(command,platform){
   var fullpath = directoryPath.concat(command).concat(platform);
   return fullpath;
 }
+function view_manifest(platform){
+  MyObject.Run(get_fullpath("fds/scripts/webVIEWmanifest.bat ",platform));
+}
 function run_script(script){
   MyObject.Run(get_fullpath("fds/scripts/webRUN_script.bat ",script));
 }
@@ -68,10 +71,17 @@ function copy_smvapps(platform){
 </tr>
 
 <tr>
+<td align=center><button onclick="view_manifest('windows')">Manifest</button></td>
+<td align=center><button onclick="view_manifest('linux')">Manifest</button></td>
+<td align=center><button onclick="view_manifest('osx')">Manifest</button></td>
+</tr>
+
+<tr>
 <td align=center><button onclick="install_fdssmv('windows')">Install</button></td>
 <td align=center><button onclick="install_fdssmv('linux')">Install</button></td>
 <td align=center><button onclick="install_fdssmv('osx')">Install</button></td>
 </tr>
+
 <tr>
 <td align=center colspan=3>
 <button onclick="run_script('\\bot\\Bundle\\fds\\scripts\\webCleanUploadWin.bat')">Clean Windows</button>
@@ -79,6 +89,7 @@ function copy_smvapps(platform){
 <button onclick="run_script('\\bot\\Bundle\\fds\\scripts\\webUPLOADbundles.bat')">Upload</button>
 </td>
 </tr>
+
 </table>
 
 <h3>Other</h3>
