@@ -614,11 +614,9 @@ compile_fds_mpi()
    # Clean and compile FDS MPI
    echo "      MPI Intel release"
    echo "" > $OUTPUT_DIR/stage2c
-   if [ "$debug_mode" == "" ]; then
-     cd $fdsrepo/Build/${INTEL}mpi_intel_${platform}${size}$DV
-     make -f ../makefile clean &> /dev/null
-     ./make_fds.sh &> $OUTPUT_DIR/stage2c
-   fi
+   cd $fdsrepo/Build/${INTEL}mpi_intel_${platform}${size}
+   make -f ../makefile clean &> /dev/null
+   ./make_fds.sh &> $OUTPUT_DIR/stage2c
 }
 
 #---------------------------------------------
@@ -628,11 +626,11 @@ compile_fds_mpi()
 check_compile_fds_mpi()
 {
    # Check for errors in FDS MPI compilation
-   cd $fdsrepo/Build/${INTEL}mpi_intel_${platform}${size}$DV
-   if [ -e "fds_${INTEL}mpi_intel_${platform}${size}$DV" ]
+   cd $fdsrepo/Build/${INTEL}mpi_intel_${platform}${size}
+   if [ -e "fds_${INTEL}mpi_intel_${platform}${size}" ]
    then
       FDS_release_success=true
-      cp fds_${INTEL}mpi_intel_${platform}${size}$DV $LATESTAPPS_DIR/fds
+      cp fds_${INTEL}mpi_intel_${platform}${size} $LATESTAPPS_DIR/fds
    else
       echo "Errors from Stage 2c - Compile FDS MPI release:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage2c >> $ERROR_LOG
@@ -836,8 +834,8 @@ run_verification_cases_release()
    cd $fdsrepo/Verification/scripts
    # Run FDS with 1 OpenMP thread
    echo 'Running FDS benchmark verification cases:'       >> $OUTPUT_DIR/stage5 2>&1
-   echo ./Run_FDS_Cases.sh $INTEL2 $DV2 -b -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
-        ./Run_FDS_Cases.sh $INTEL2 $DV2 -b -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
+   echo ./Run_FDS_Cases.sh $INTEL2 -b -o 1 -q $QUEUE      >> $OUTPUT_DIR/stage5 2>&1
+        ./Run_FDS_Cases.sh $INTEL2 -b -o 1 -q $QUEUE      >> $OUTPUT_DIR/stage5 2>&1
    echo ""                                                >> $OUTPUT_DIR/stage5 2>&1
 
    # Wait for benchmark verification cases to end
@@ -853,23 +851,12 @@ run_verification_cases_release()
 
    cd ../scripts
    echo 'Running FDS non-benchmark verification cases:'   >> $OUTPUT_DIR/stage5
-   echo ./Run_FDS_Cases.sh $INTEL2 $DV2 -R -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
-        ./Run_FDS_Cases.sh $INTEL2 $DV2 -R -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
+   echo ./Run_FDS_Cases.sh $INTEL2 -R -o 1 -q $QUEUE      >> $OUTPUT_DIR/stage5 2>&1
+        ./Run_FDS_Cases.sh $INTEL2 -R -o 1 -q $QUEUE      >> $OUTPUT_DIR/stage5 2>&1
    echo ""                                                >> $OUTPUT_DIR/stage5 2>&1
-
-
 
    # Wait for non-benchmark verification cases to end
    wait_cases_release_end 'verification'
-
-
-
-   # rerun cases that failed with 'BAD TERMINATION' errors
-#   ./Run_FDS_Cases.sh $INTEL2 $DV2 -F -o 1 -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
-#   echo "" >> $OUTPUT_DIR/stage5 2>&1
-
-   # Wait for non-benchmark verification cases to end
-#   wait_cases_release_end 'verification'
 
 #  check whether cases have run 
    ./Run_FDS_Cases.sh -C  >> $OUTPUT_DIR/stage5 2>&1
@@ -1551,11 +1538,6 @@ email_build_status()
    stop_time=`date`
    echo "" > $TIME_LOG
    echo "-------------------------------" >> $TIME_LOG
-   if [ "$FIREBOT_LITE" != "" ]; then
-      echo "" >> $TIME_LOG
-      echo "Note: only VV cases with debug FDS were run" >> $TIME_LOG
-      echo "" >> $TIME_LOG
-   fi
    if [ "$BUILD_ONLY" == "1" ]; then
      echo " build only apps"                 >> $TIME_LOG
    fi
@@ -1748,16 +1730,10 @@ UPLOADGUIDES=0
 FDS_REVISION=
 SMV_REVISION=
 SKIPMATLAB=
-SKIPFIGURES=
-FIREBOT_LITE=
-debug_mode=
-DV=
-DV2=
 INTEL=
 INTEL2=
 CLONE_REPOS=
 CLONE_FDSSMV=
-DEBUG_ONLY=
 FDS_REV=origin/master
 SMV_REV=origin/master
 WEB_DIR=
@@ -1765,7 +1741,7 @@ HTML2PDF=wkhtmltopdf
 FORCECLONE=
 
 #*** parse command line arguments
-while getopts 'b:BcCdDIiJLm:p:q:R:sTuUx:y:w:' OPTION
+while getopts 'b:BcCiJm:p:q:R:sTuUx:y:w:' OPTION
 do
 case $OPTION in
   b)
@@ -1776,7 +1752,6 @@ case $OPTION in
    ;;
   B)
    BUILD_ONLY=1
-   FIREBOT_LITE=
    ;;
   c)
    CLEANREPO=1
@@ -1784,28 +1759,12 @@ case $OPTION in
   C)
    FORCECLONE="-C"
    ;;
-  d)
-   debug_mode=1
-   ;;
-  D)
-   DEBUG_ONLY=1
-   ;;
-  F)
-   SKIPFIGURES=1
-   ;;
-  I)
-   DV="_dv"
-   DV2="-u"
-   ;;
   i)
    USEINSTALL="-r"
    ;;
   J)
    INTEL=i
    INTEL2="-J"
-   ;;
-  L)
-   FIREBOT_LITE=1
    ;;
   m)
    mailToFDS="$OPTARG"
@@ -2176,11 +2135,9 @@ echo "   FDS"
 # if something goes wrong with the openmp inspector
 # comment the following 6 lines (including 'if' and and 'fi'  lines
 if [ "$BUILD_ONLY" == "" ]; then
-if [ "$FIREBOT_LITE" == "" ]; then
-   build_inspect_fds
+  build_inspect_fds
 #  inspect_fds
 #  check_inspect_fds
-fi
 fi
 
 ### Stage 2b ###
@@ -2195,29 +2152,25 @@ if [[ "$OPENMPI_GNU" != "" ]] && [[ "$BUILD_ONLY" == "" ]] ; then
   check_compile_fds_mpi_gnu_db
 fi
 
-if [ "$FIREBOT_LITE" == "" ]; then
-  if [ "$DEBUG_ONLY" == "" ]; then
 ### Stage 2c ###
-    compile_fds_mpi
-    check_compile_fds_mpi
+compile_fds_mpi
+check_compile_fds_mpi
 
 ### Stage 3a ###
-    compile_smv_utilities
-    check_smv_utilities
+compile_smv_utilities
+check_smv_utilities
 
 ### Stage 3b ###
-  if [ "$BUILD_ONLY" == "" ]; then
-    compile_smv_db
-    check_compile_smv_db
-  fi
+if [ "$BUILD_ONLY" == "" ]; then
+  compile_smv_db
+  check_compile_smv_db
+fi
 
 ### Stage 3c ###
-    compile_smv
-    check_compile_smv
+compile_smv
+check_compile_smv
 
-    $COPY_APPS >& $OUTPUT_DIR/stage3d
-  fi
-fi
+  $COPY_APPS >& $OUTPUT_DIR/stage3d
 
 ### Stage 4 ###
 
@@ -2227,7 +2180,7 @@ if [[ $FDS_debug_success ]] && [[ "$BUILD_ONLY" == "" ]]; then
    check_cases_debug $fdsrepo/Verification 'verification'
 fi
 
-if [[ "$DEBUG_ONLY" == "" ]] && [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
+if [[ "$BUILD_ONLY" == "" ]]; then
 # clean debug stage
   cd $fdsrepo
   if [[ "$CLEANREPO" == "1" ]] ; then
@@ -2244,11 +2197,9 @@ if [[ "$DEBUG_ONLY" == "" ]] && [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" 
 
 ### Stage 6 ###
 # Depends on successful SMV compile
-  if [[ "$SKIPFIGURES" == "" ]] ; then
-    if [[ $smv_release_success ]] ; then
-      make_fds_pictures
-      check_fds_pictures
-    fi
+  if [[ $smv_release_success ]] ; then
+    make_fds_pictures
+    check_fds_pictures
   fi
 
   if [ "$SKIPMATLAB" == "" ] ; then
@@ -2275,60 +2226,58 @@ if [[ "$DEBUG_ONLY" == "" ]] && [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" 
 
 ### Stage 8 ###
   if [ "$SKIPMATLAB" == "" ] ; then
-    if [ "$SKIPFIGURES" == "" ] ; then
-      make_fds_user_guide
-      make_geom_notes
-      make_fds_verification_guide
-      make_fds_technical_guide
-      make_fds_validation_guide
-      make_fds_Config_management_plan
-      get_firebot_success
-      if [[ "$firebot_success" == "1" ]] ; then
-        rm -rf $MANUAL_DIR
-        cp -r $fdsrepo/Manuals $MANUAL_DIR
+    make_fds_user_guide
+    make_geom_notes
+    make_fds_verification_guide
+    make_fds_technical_guide
+    make_fds_validation_guide
+    make_fds_Config_management_plan
+    get_firebot_success
+    if [[ "$firebot_success" == "1" ]] ; then
+      rm -rf $MANUAL_DIR
+      cp -r $fdsrepo/Manuals $MANUAL_DIR
 
-        cp $LATESTAPPS_DIR/FDS_REVISION $PUBS_DIR/FDS_REVISION
-        copy_fds_user_guide
-        copy_fds_verification_guide
-        copy_fds_technical_guide
-        copy_fds_validation_guide
-        copy_fds_Config_management_plan
+      cp $LATESTAPPS_DIR/FDS_REVISION $PUBS_DIR/FDS_REVISION
+      copy_fds_user_guide
+      copy_fds_verification_guide
+      copy_fds_technical_guide
+      copy_fds_validation_guide
+      copy_fds_Config_management_plan
 
-        if [ -d $FDS_SUMMARY_DIR ]; then
-          cp $fdsrepo/Manuals/FDS_User_Guide/SCRIPT_FIGURES/*.png         $FDS_SUMMARY_DIR/images/user/.
-          cp $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/*.png $FDS_SUMMARY_DIR/images/verification/.
-          DATE=`date +"%b %d, %Y - %r"`
+      if [ -d $FDS_SUMMARY_DIR ]; then
+        cp $fdsrepo/Manuals/FDS_User_Guide/SCRIPT_FIGURES/*.png         $FDS_SUMMARY_DIR/images/user/.
+        cp $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/*.png $FDS_SUMMARY_DIR/images/verification/.
+        DATE=`date +"%b %d, %Y - %r"`
 
-          sed "s/&&DATE&&/$DATE/g"                $FDS_SUMMARY_DIR/index_template.html | \
-          sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                        | \
-          sed "s/&&LINK&&/original - <a href=\"diffs\/index.html\">differences<\/a>/g" | \
-          sed "s/&&SMV_BUILD&&/$SMV_REVISION/g"    > $FDS_SUMMARY_DIR/index.html
-          cat $FDS_SUMMARY_DIR/index_trailer.html >> $FDS_SUMMARY_DIR/index.html
+        sed "s/&&DATE&&/$DATE/g"                $FDS_SUMMARY_DIR/index_template.html | \
+        sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                        | \
+        sed "s/&&LINK&&/original - <a href=\"diffs\/index.html\">differences<\/a>/g" | \
+        sed "s/&&SMV_BUILD&&/$SMV_REVISION/g"    > $FDS_SUMMARY_DIR/index.html
+        cat $FDS_SUMMARY_DIR/index_trailer.html >> $FDS_SUMMARY_DIR/index.html
 
-          notfound=`$HTML2PDF -V 2>&1 | tail -1 | grep "not found" | wc -l`
-          if [ $notfound -eq 0 ]; then
-            $HTML2PDF $FDS_SUMMARY_DIR/index.html $FDS_SUMMARY_DIR/FDS_Summary.pdf
-            cp $FDS_SUMMARY_DIR/FDS_Summary.pdf   $NEWGUIDE_DIR/.
-          fi
+        notfound=`$HTML2PDF -V 2>&1 | tail -1 | grep "not found" | wc -l`
+        if [ $notfound -eq 0 ]; then
+          $HTML2PDF $FDS_SUMMARY_DIR/index.html $FDS_SUMMARY_DIR/FDS_Summary.pdf
+          cp $FDS_SUMMARY_DIR/FDS_Summary.pdf   $NEWGUIDE_DIR/.
+        fi
 
-          CURDIR=`pwd`
-          cd $botrepo/Firebot
-          ./compare_images.sh $figrepo/compare/firebot/images $FDS_SUMMARY_DIR/images $FDS_SUMMARY_DIR/diffs/images >& $OUTPUT_DIR/stage8_image_compare
-          sed "s/&&DATE&&/$DATE/g"              $FDS_SUMMARY_DIR/index_template.html | \
-          sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                      | \
-          sed "s/&&LINK&&/<a href=\"..\/index.html\">original<\/a> - differences/g"  | \
-          sed "s/&&SMV_BUILD&&/$SMV_REVISION/g"   > $FDS_SUMMARY_DIR/diffs/index.html
-          cat $FDS_SUMMARY_DIR/diff_trailer.html >> $FDS_SUMMARY_DIR/diffs/index.html
+        CURDIR=`pwd`
+        cd $botrepo/Firebot
+        ./compare_images.sh $figrepo/compare/firebot/images $FDS_SUMMARY_DIR/images $FDS_SUMMARY_DIR/diffs/images >& $OUTPUT_DIR/stage8_image_compare
+        sed "s/&&DATE&&/$DATE/g"              $FDS_SUMMARY_DIR/index_template.html | \
+        sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                      | \
+        sed "s/&&LINK&&/<a href=\"..\/index.html\">original<\/a> - differences/g"  | \
+        sed "s/&&SMV_BUILD&&/$SMV_REVISION/g"   > $FDS_SUMMARY_DIR/diffs/index.html
+        cat $FDS_SUMMARY_DIR/diff_trailer.html >> $FDS_SUMMARY_DIR/diffs/index.html
 
-          if [ "$WEB_DIR" != "" ]; then
-            if [ -d $WEB_DIR ]; then
-              CUR_DIR=`pwd`
-              cd $WEB_DIR
-              rm -r images manuals diffs *.html
-              cp -r $FDS_SUMMARY_DIR/* .
-              rm *template.html
-              cd $CUR_DIR
-            fi
+        if [ "$WEB_DIR" != "" ]; then
+          if [ -d $WEB_DIR ]; then
+            CUR_DIR=`pwd`
+            cd $WEB_DIR
+            rm -r images manuals diffs *.html
+            cp -r $FDS_SUMMARY_DIR/* .
+            rm *template.html
+            cd $CUR_DIR
           fi
         fi
       fi
@@ -2351,10 +2300,8 @@ fi
 
 ### Wrap up and report results ###
 set_files_world_readable
-if [[ "$DEBUG_ONLY" == "" ]]; then
-  save_build_status
-fi 
-if [[ "$DEBUG_ONLY" == "" ]] && [[ "$FIREBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
+save_build_status
+if [[ "$BUILD_ONLY" == "" ]]; then
   archive_timing_stats
 fi
 email_build_status 'Firebot'
