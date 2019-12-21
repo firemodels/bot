@@ -1478,10 +1478,11 @@ CLONE_REPOS=
 CLONE_FDSSMV=
 FDS_REV=origin/master
 SMV_REV=origin/master
+USE_BOT_QFDS=
 
 #*** parse command line options
 
-while getopts 'aAb:BcI:JLm:Mo:q:r:R:SstTuU:x:y:w:' OPTION
+while getopts 'aAb:BcI:JLm:Mo:q:Qr:R:SstTuU:x:y:w:' OPTION
 do
 case $OPTION in
   a)
@@ -1528,6 +1529,9 @@ case $OPTION in
   q)
    SMOKEBOT_QUEUE="$OPTARG"
    ;;
+  Q)
+   USE_BOT_QFDS="1"
+   ;;
   R)
    CLONE_REPOS="$OPTARG"
    ;;
@@ -1563,7 +1567,13 @@ esac
 done
 shift $(($OPTIND-1))
 
-if [ "$CLONE_REPOS" != "" ]; then
+if [ "$CLONE_REPOS" == "" ]; then
+  if [ "$USE_BOT_REPO" != "" ]; then
+    echo "***error: you may only use the bot repo version of qfds.sh (-Q option) if you clone repos (-R option)"
+    echo "          using fds repo version of qfds.sh"
+    USE_BOT_QFDS=
+  fi
+else
   if [ "$CLONE_REPOS" != "release" ]; then
     if [ "$CLONE_REPOS" != "test" ]; then
       CLONE_REPO="master"
@@ -1640,6 +1650,9 @@ if [[ "$CLONE_REPOS" != "" ]]; then
     SMVBRANCH=$CLONE_REPOS
     cd $smvrepo
     git checkout -b $SMVBRANCH $SMV_REV >> $OUTPUT_DIR/stage1_clone 2>&1
+  fi
+  if [ "$USE_BOT_QFDS" != "" ]; then
+    cp $fdsrepo/Utilities/Scripts/qfds.sh $botrepo/scripts/.
   fi
 fi
 
