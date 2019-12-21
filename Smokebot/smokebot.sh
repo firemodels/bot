@@ -1652,7 +1652,7 @@ if [[ "$CLONE_REPOS" != "" ]]; then
     git checkout -b $SMVBRANCH $SMV_REV >> $OUTPUT_DIR/stage1_clone 2>&1
   fi
   if [ "$USE_BOT_QFDS" != "" ]; then
-    cp $fdsrepo/Utilities/Scripts/qfds.sh $botrepo/scripts/.
+    cp $botrepo/scripts/qfds.sh $fdsrepo/Utilities/Scripts/qfds.sh
   fi
 fi
 
