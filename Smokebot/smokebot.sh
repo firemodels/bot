@@ -1568,7 +1568,7 @@ done
 shift $(($OPTIND-1))
 
 if [ "$CLONE_REPOS" == "" ]; then
-  if [ "$USE_BOT_REPO" != "" ]; then
+  if [ "$USE_BOT_QFDS" != "" ]; then
     echo "***error: you may only use the bot repo version of qfds.sh (-Q option) if you clone repos (-R option)"
     echo "          using fds repo version of qfds.sh"
     USE_BOT_QFDS=
@@ -1652,7 +1652,7 @@ if [[ "$CLONE_REPOS" != "" ]]; then
     git checkout -b $SMVBRANCH $SMV_REV >> $OUTPUT_DIR/stage1_clone 2>&1
   fi
   if [ "$USE_BOT_QFDS" != "" ]; then
-    cp $botrepo/scripts/qfds.sh $fdsrepo/Utilities/Scripts/qfds.sh
+    cp $botrepo/Scripts/qfds.sh $fdsrepo/Utilities/Scripts/qfds.sh
   fi
 fi
 
