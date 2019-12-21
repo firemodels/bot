@@ -738,10 +738,42 @@ is_file_installed()
 }
 
 #---------------------------------------------
-#                   compare_common_files
+#                   compare_fds_bot_common_files
 #---------------------------------------------
 
-compare_common_files()
+compare_fds_bot_common_files()
+{
+   fdsdir=$1
+   botdir=$2
+   file=$3
+   fds_file=$fdsrepo/$fdsdir/$file
+   bot_file=$botrepo/$botdir/$file
+   notexist=
+   if ! [ -e $fds_file ]; then
+     echo "Warnings Stage 2d" >> $WARNING_LOG
+     echo "***warning: The fds repo file, $fds_file, does not exist" >> $WARNING_LOG
+     notexist=1
+   fi
+   if ! [ -e $bot_file ]; then
+     echo "Warnings Stage 2d" >> $WARNING_LOG
+     echo "***warning: The bot repo file, $bot_file, does not exist" >> $WARNING_LOG
+     notexist=1
+   fi
+   if [ "$notexist" == "" ]; then
+     ndiffs=`diff $fds_file $bot_file | wc -l`
+     if [ $ndiffs -gt 0 ]; then
+       echo "" >> $WARNING_LOG
+       echo "Warnings Stage 2d" >> $WARNING_LOG
+       echo "***warning: The fds and bot versions of $file are out of synch" >> $WARNING_LOG
+     fi
+   fi
+}
+
+#---------------------------------------------
+#                   compare_fds_smv_common_files
+#---------------------------------------------
+
+compare_fds_smv_common_files()
 {
    fdsdir=$1
    smvdir=$2
@@ -764,7 +796,7 @@ compare_common_files()
      if [ $ndiffs -gt 0 ]; then
        echo "" >> $WARNING_LOG
        echo "Warnings Stage 2d" >> $WARNING_LOG
-       echo "***warning: The fds repo version of $file is out of synch with the smv repo version" >> $WARNING_LOG
+       echo "***warning: The fds and smv versions of $file are out of synch" >> $WARNING_LOG
      fi
    fi
 }
@@ -775,7 +807,17 @@ compare_common_files()
 
 check_common_files()
 {
-   compare_common_files Source Source/smokeview gsmv.f90
+  // only compare files if latest repo revisions are checkout out
+  if [ "$CHECKOUT" == "" ]; then
+    compare_fds_smv_common_files Source               Source/smokeview     gsmv.f90
+    compare_fds_smv_common_files Utilities/Scripts    Utilities/Scripts    qfds.sh
+    compare_fds_smv_common_files Manuals/Bibliography Manuals/Bibliography BIBLIO_FDS_general.tex
+    compare_fds_smv_common_files Manuals/Bibliography Manuals/Bibliography BIBLIO_FDS_mathcomp.tex
+    compare_fds_smv_common_files Manuals/Bibliography Manuals/Bibliography BIBLIO_FDS_refs.tex
+    compare_fds_smv_common_files Manuals/Bibliography Manuals/Bibliography authors.tex
+    compare_fds_smv_common_files Manuals/Bibliography Manuals/Bibliography disclaimer.tex
+    compare_fds_bot_common_files Utilities/Scripts    Scripts              qfds.sh
+  fi
 }
 
 #---------------------------------------------
@@ -923,8 +965,8 @@ compile_smv_db()
      echo "   smokeview"
      echo "      debug"
      cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_64
-     rm -f smokeview_${platform}${TEST}_64_db
-     ./make_smokeview_db.sh $TESTFLAG &> $OUTPUT_DIR/stage2b
+     rm -f smokeview_${platform}_64_db
+     ./make_smokeview_db.sh &> $OUTPUT_DIR/stage2b
    fi
 }
 
@@ -937,7 +979,7 @@ check_compile_smv_db()
    if [ "$haveCC" == "1" ] ; then
    # Check for errors in SMV debug compilation
    cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_64
-   if [ -e "smokeview_${platform}${TEST}_64_db" ]
+   if [ -e "smokeview_${platform}_64_db" ]
    then
       stage2b_success=true
    else
@@ -1003,8 +1045,8 @@ compile_smv()
    # Clean and compile SMV
      echo "      release"
      cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_64
-     rm -f smokeview_${platform}${TEST}_64
-     ./make_smokeview.sh $TESTFLAG &> $OUTPUT_DIR/stage2c
+     rm -f smokeview_${platform}_64
+     ./make_smokeview.sh &> $OUTPUT_DIR/stage2c
    fi
 }
 
@@ -1017,13 +1059,13 @@ check_compile_smv()
    if [ "$haveCC" == "1" ] ; then
    # Check for errors in SMV release compilation
    cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_64
-   if [ -e "smokeview_${platform}${TEST}_64" ]
-     cp smokeview_${platform}${TEST}_64 $LATESTAPPS_DIR/smokeview
+   if [ -e "smokeview_${platform}_64" ]
+     cp smokeview_${platform}_64 $LATESTAPPS_DIR/smokeview
    then
       stage2c_smv_success=true
    else
       echo "Errors from Stage 2c - Compile SMV release:" >> $ERROR_LOG
-      echo "The program smokeview_${platform}${TEST}_64 does not exist."
+      echo "The program smokeview_${platform}_64 does not exist."
       cat $OUTPUT_DIR/stage2c >> $ERROR_LOG
       echo "" >> $ERROR_LOG
    fi
@@ -1051,7 +1093,7 @@ make_smv_pictures()
    # Run Make SMV Pictures script (release mode)
    echo Generating images 
    cd $smvrepo/Verification/scripts
-   ./Make_SMV_Pictures.sh $YOPT -q $SMOKEBOT_QUEUE -I $COMPILER -j SMV_ $TESTFLAG $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4b_orig
+   ./Make_SMV_Pictures.sh $YOPT -q $SMOKEBOT_QUEUE -I $COMPILER -j SMV_ $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4b_orig
    grep -v FreeFontPath $OUTPUT_DIR/stage4b_orig &> $OUTPUT_DIR/stage4b
 }
 
@@ -1092,7 +1134,7 @@ check_smv_pictures()
 make_smv_movies()
 {
    cd $smvrepo/Verification
-   scripts/Make_SMV_Movies.sh -q $SMOKEBOT_QUEUE $TEST 2>&1  &> $OUTPUT_DIR/stage4c
+   scripts/Make_SMV_Movies.sh -q $SMOKEBOT_QUEUE 2>&1  &> $OUTPUT_DIR/stage4c
 }
 
 #---------------------------------------------
@@ -1338,9 +1380,6 @@ email_build_status()
     DISPLAY_FDS_REVISION=1
     DISPLAY_SMV_REVISION=1
   fi
-  if [ "$RUNAUTO" == "Y" ]; then
-    DISPLAY_SMV_REVISION=1
-  fi
   if [ "$DISPLAY_FDS_REVISION" == "1" ]; then
     echo "   FDS revisions: old: $LAST_FDS_REVISION new: $THIS_FDS_REVISION" >> $TIME_LOG
   fi
@@ -1459,11 +1498,8 @@ BOTBRANCH=master
 SMOKEBOT_QUEUE=smokebot
 MAKEMOVIES=0
 RUNAUTO=
-RUNDEBUG="1"
 OPENMP=
 RUN_OPENMP=
-TESTFLAG=
-TEST=
 CLEANREPO=0
 UPDATEREPO=0
 mailTo=
@@ -1471,7 +1507,6 @@ UPLOADRESULTS=
 COMPILER=intel
 PID_FILE=~/.fdssmvgit/firesmokebot_pid
 INTEL=
-SKIP=
 HTML2PDF=wkhtmltopdf
 BUILD_ONLY=
 CLONE_REPOS=
@@ -1479,17 +1514,15 @@ CLONE_FDSSMV=
 FDS_REV=origin/master
 SMV_REV=origin/master
 USE_BOT_QFDS=
+CHECKOUT=
 
 #*** parse command line options
 
-while getopts 'aAb:BcI:JLm:Mo:q:Qr:R:SstTuU:x:y:w:' OPTION
+while getopts 'ab:BcI:JLm:Mo:q:Qr:R:TuU:x:y:w:' OPTION
 do
 case $OPTION in
   a)
    RUNAUTO="y"
-   ;;
-  A)
-   RUNAUTO="Y"
    ;;
   B)
    BUILD_ONLY="1"
@@ -1535,16 +1568,6 @@ case $OPTION in
   R)
    CLONE_REPOS="$OPTARG"
    ;;
-  s)
-   RUNDEBUG="0"
-   ;;
-  S)
-   SKIP=1
-   ;;
-  t)
-   TESTFLAG="-t"
-   TEST="_test"
-   ;;
   T)
    CLONE_FDSSMV=1
    ;;
@@ -1559,9 +1582,11 @@ case $OPTION in
    ;;
   x)
    FDS_REV="$OPTARG"
+   CHECKOUT=1
    ;;
   y)
    SMV_REV="$OPTARG"
+   CHECKOUT=1
    ;;
 esac
 done
@@ -1696,9 +1721,6 @@ echo $$ > $PID_FILE
 
 if [[ $RUNAUTO == "y" ]] ; then
   run_auto || exit 1
-fi
-if [[ $RUNAUTO == "Y" ]] ; then
-  run_auto smv || exit 1
 fi
 
 if [ "$WEB_DIR" != "" ]; then
@@ -1943,7 +1965,7 @@ compile_smv_utilities
 check_smv_utilities
 check_common_files
 
-if [[ $stage1b_fdsdb_success && "$RUNDEBUG" == "1" && "$BUILD_ONLY" == "" ]] ; then
+if [[ $stage1b_fdsdb_success && "$BUILD_ONLY" == "" ]] ; then
    run_verification_cases_debug
 fi
 
@@ -1955,7 +1977,7 @@ if [ "$BUILD_ONLY" == "" ]; then
 fi
 fi
 fi
-if [[ $stage1b_fdsdb_success && "$RUNDEBUG" == "1" ]] ; then
+if [[ $stage1b_fdsdb_success ]] ; then
    check_verification_cases_debug
 fi
 RUNCASES_beg=`GET_TIME`
@@ -1997,7 +2019,7 @@ echo "Run cases: $DIFF_RUNCASES" >> $STAGE_STATUS
 
 ### Stage 4 generate images ###
 MAKEPICTURES_beg=`GET_TIME`
-if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
+if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
   if [[ $stage1c_fdsrel_success && $stage2c_smv_success ]] ; then
     make_smv_pictures
     check_smv_pictures
@@ -2007,7 +2029,7 @@ MAKEPICTURES_end=`GET_TIME`
 DIFF_MAKEPICTURES=`GET_DURATION $MAKEPICTURES_beg $MAKEPICTURES_end`
 echo "Make pictures: $DIFF_MAKEPICTURES" >> $STAGE_STATUS
 
-if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
+if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
   if [ "$MAKEMOVIES" == "1" ]; then
     MAKEMOVIES_beg=`GET_TIME`
  
@@ -2020,7 +2042,7 @@ if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]] && [[ "$BUILD_ONLY" == ""
   fi
 fi
 
-if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
+if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
   if [[ $stage1c_fdsrel_success ]] ; then
     generate_timing_stats
   fi
@@ -2028,7 +2050,7 @@ fi
 
 ### Stage 5 build documents ###
 MAKEGUIDES_beg=`GET_TIME`
-if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
+if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
   if [[ $stage1c_fdsrel_success && $stage4b_smvpics_success ]] ; then
      echo Making guides
      if [ "$YOPT" == "" ]; then

@@ -13,11 +13,8 @@ function usage_all {
 echo ""
 echo "Miscellaneous:"
 echo "-a - run automatically if FDS or smokeview source has changed"
-echo "-A - run automatically if smokeview source has changed"
 echo "-b - use the current branch"
 echo "-B - only build apps"
-echo "-C - add --mca plm_rsh_agent /usr/bin/ssh to mpirun command "
-echo "           when running cases"
 echo "-g firebot_host - host where firebot was run"
 echo "-G firebot_home - home directory where firebot was run"
 echo "   the -g and -G options are only used with the -R option and"
@@ -38,13 +35,10 @@ else
 fi
 echo "-M - make movies"
 echo "-P - remove run status (PID) file"
-echo "-Q - use qfds.sh from bot repo"
-echo "     this option can only be used with the -R option"
+echo "-Q - use qfds.sh from bot repo. This option can only be used with the -R option."
 echo "-R release_type (master, release or test) - clone fds, exp, fig, out and smv repos"
 echo "     fds and smv repos will be checked out with a branch named"
 echo "     master, release or test [default: master]"
-echo "-S - skip picture generating and build manual stages"
-echo "-t - use test smokeview"
 echo "-T - only clone the fds and smv repos (this option is set by default when"
 echo "     only building apps (-B) and cloning repos (-R) options are used"
 echo "-U - upload guides"
@@ -172,12 +166,9 @@ UPLOAD=
 FORCE=
 COMPILER=intel
 SMOKEBOT_LITE=
-TESTFLAG=
 ECHO=
 INTEL=
-export MPIRUN_MCA=
 export QFDS_STARTUP=
-SKIP=
 REMOVE_PID=
 BUILD_ONLY=
 CLONE_REPOS=
@@ -198,14 +189,11 @@ fi
 
 #*** parse command line options
 
-while getopts 'aAbBcCd:Dfg:G:hHI:JkLm:MPq:Qr:R:StTuUvw:x:y:' OPTION
+while getopts 'abBcd:Dfg:G:hHI:JkLm:MPq:Qr:R:TuUvw:x:y:' OPTION
 do
 case $OPTION  in
   a)
    RUNAUTO=-a
-   ;;
-  A)
-   RUNAUTO=-A
    ;;
   B)
    BUILD_ONLY="-B"
@@ -215,9 +203,6 @@ case $OPTION  in
    ;;
   c)
    CLEANREPO=-c
-   ;;
-  C)
-   export MPIRUN_MCA="--mca plm_rsh_agent /usr/bin/ssh "
    ;;
   D)
    export QFDS_STARTUP=1
@@ -266,12 +251,6 @@ case $OPTION  in
    ;;
   R)
    CLONE_REPOS="$OPTARG"
-   ;;
-  S)
-   SKIP="-S"
-   ;;
-  t)
-   TESTFLAG="-t"
    ;;
   T)
     CLONE_FDSSMV="-T"
@@ -448,7 +427,7 @@ BRANCH="-b $BRANCH"
 #*** run smokebot
 
 touch $smokebot_pid
-$ECHO ./$botscript $SKIP $SIZE $BRANCH $FDS_REV $SMV_REV $TESTFLAG $CLONE_REPOS $CLONE_FDSSMV $USE_BOT_QFDS $RUNAUTO $INTEL $BUILD_ONLY $COMPILER $SMOKEBOT_LITE $CLEANREPO $WEB_DIR $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $SIZE $BRANCH $FDS_REV $SMV_REV $CLONE_REPOS $CLONE_FDSSMV $USE_BOT_QFDS $RUNAUTO $INTEL $BUILD_ONLY $COMPILER $SMOKEBOT_LITE $CLEANREPO $WEB_DIR $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi
