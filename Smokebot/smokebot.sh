@@ -1651,9 +1651,6 @@ if [[ "$CLONE_REPOS" != "" ]]; then
     cd $smvrepo
     git checkout -b $SMVBRANCH $SMV_REV >> $OUTPUT_DIR/stage1_clone 2>&1
   fi
-  if [ "$USE_BOT_QFDS" != "" ]; then
-    cp $botrepo/Scripts/qfds.sh $fdsrepo/Utilities/Scripts/qfds.sh
-  fi
 fi
 
 #*** make sure repos needed by smokebot exist
@@ -1918,6 +1915,12 @@ git rev-parse --short HEAD > $LATESTAPPS_DIR/SMV_HASH
 
 cp $LATESTAPPS_DIR/SMV_REVISION $LATESTPUBS_DIR/SMV_REVISION
 cp $LATESTAPPS_DIR/SMV_HASH     $LATESTPUBS_DIR/SMV_HASH
+
+if [[ "$CLONE_REPOS" != "" ]]; then
+  if [ "$USE_BOT_QFDS" != "" ]; then
+    cp $botrepo/Scripts/qfds.sh $fdsrepo/Utilities/Scripts/qfds.sh
+  fi
+fi
 
 PRELIM_end=`GET_TIME`
 DIFF_PRELIM=`GET_DURATION $PRELIM_beg $PRELIM_end`
