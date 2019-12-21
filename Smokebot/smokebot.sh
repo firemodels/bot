@@ -1352,8 +1352,8 @@ save_manuals_dir()
 #---------------------------------------------
 
 email_compile_errors()
+{
   SMOKEBOT_LOG=/tmp/smokebot_log.$$
-  
   if [[ -e $ERROR_LOG ]]; then
     echo "" > $SMOKEBOT_LOG
   fi
