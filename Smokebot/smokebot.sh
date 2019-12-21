@@ -421,14 +421,14 @@ check_compile_fds_mpi_db()
 {
    # Check for errors in FDS debug compilation
    cd $fdsrepo/Build/${INTEL}mpi_${COMPILER}_${platform}_64$DB
-   if [ -e "fds_${INTEL}mpi_${COMPILER}_${platform}_64$DB" ]
-   then
+   if [ -e "fds_${INTEL}mpi_${COMPILER}_${platform}_64$DB" ]; then
       stage1b_fdsdb_success=true
    else
       echo "Errors from Stage 1b - Compile FDS MPI debug:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage1b >> $ERROR_LOG
       echo "" >> $ERROR_LOG
       THIS_FDS_FAILED=1
+      compile_errors=1
    fi
 
    # Check for compiler warnings/remarks
@@ -444,6 +444,7 @@ check_compile_fds_mpi_db()
       if [ -e "fds_${INTEL}mpi_${COMPILER}_${platform}_64$DB" ] ; then
         THIS_FDS_FAILED=1
       fi
+      compile_errors=1
    fi
 }
 
@@ -491,6 +492,7 @@ check_compile_fds_mpi_gnu_dbORIG()
         echo "Errors from Stage 1d - Compile gnu Fortran FDS MPI debug:" >> $ERROR_LOG
         cat $OUTPUT_DIR/stage1d >> $ERROR_LOG
         echo "" >> $ERROR_LOG
+        compile_errors=1
      fi
 
    # Check for compiler warnings/remarks
@@ -502,6 +504,7 @@ check_compile_fds_mpi_gnu_dbORIG()
         echo "Warnings from Stage 1d - Compile gnu Fortran FDS MPI debug:" >> $WARNING_LOG
         grep -i -A 5 -E 'warning|remark' $OUTPUT_DIR/stage1d | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
         echo "" >> $WARNING_LOG
+        compile_errors=1
      fi
    fi
 }
@@ -635,6 +638,7 @@ check_compile_fds_mpi()
       echo "Errors from Stage 1c - Compile FDS release:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage1c >> $ERROR_LOG
       echo "" >> $ERROR_LOG
+      compile_errors=1
    fi
 
    # Check for compiler warnings/remarks
@@ -647,6 +651,7 @@ check_compile_fds_mpi()
       echo "Stage 1c warnings:" >> $WARNING_LOG
       grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage1c | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
+      compile_errors=1
    fi
 }
 
@@ -719,6 +724,7 @@ compile_smv_utilities()
      cp wind2fds_${platform}_64 $LATESTAPPS_DIR/wind2fds
    else
      echo "Warning: smokeview and utilities not built - C compiler not available" >> $OUTPUT_DIR/stage2a 2>&1
+     compile_errors=1
    fi
 }
 
@@ -841,6 +847,7 @@ check_smv_utilities()
         echo "Errors from Stage 2a - Compile SMV utilities:" >> $ERROR_LOG
         cat $OUTPUT_DIR/stage2a >> $ERROR_LOG
         echo "" >> $ERROR_LOG
+        compile_errors=1
      fi
    else
      stage2a_success="1"
@@ -855,6 +862,7 @@ check_smv_utilities()
         stage2a_success="1"
         cat $OUTPUT_DIR/stage2a >> $ERROR_LOG
         echo "" >> $ERROR_LOG
+        compile_errors=1
      fi
    fi
 }
@@ -976,30 +984,32 @@ compile_smv_db()
 
 check_compile_smv_db()
 {
-   if [ "$haveCC" == "1" ] ; then
+  if [ "$haveCC" == "1" ] ; then
    # Check for errors in SMV debug compilation
-   cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_64
-   if [ -e "smokeview_${platform}_64_db" ]
-   then
-      stage2b_success=true
-   else
+    cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_64
+    if [ -e "smokeview_${platform}_64_db" ]
+    then
+       stage2b_success=true
+    else
       echo "Errors from Stage 2b - Compile SMV debug:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage2b >> $ERROR_LOG
       echo "" >> $ERROR_LOG
-   fi
+      compile_errors=1
+    fi
 
    # Check for compiler warnings/remarks
    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-   if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage2b | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]
-   then
+    if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage2b | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]
+    then
       # Continue along
       :
-   else
+    else
       echo "Stage 6a warnings:" >> $WARNING_LOG
       grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage2b | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
-   fi
-   fi
+      compile_errors=1
+    fi
+  fi
 }
 
 #---------------------------------------------
@@ -1056,32 +1066,33 @@ compile_smv()
 
 check_compile_smv()
 {
-   if [ "$haveCC" == "1" ] ; then
+  if [ "$haveCC" == "1" ]; then
    # Check for errors in SMV release compilation
-   cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_64
-   if [ -e "smokeview_${platform}_64" ]
-     cp smokeview_${platform}_64 $LATESTAPPS_DIR/smokeview
-   then
+    cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_64
+    if [ -e "smokeview_${platform}_64" ]; then
+      cp smokeview_${platform}_64 $LATESTAPPS_DIR/smokeview
       stage2c_smv_success=true
-   else
+    else
       echo "Errors from Stage 2c - Compile SMV release:" >> $ERROR_LOG
       echo "The program smokeview_${platform}_64 does not exist."
       cat $OUTPUT_DIR/stage2c >> $ERROR_LOG
       echo "" >> $ERROR_LOG
-   fi
+      compile_errors=1
+    fi
 
    # Check for compiler warnings/remarks
    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-   if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage2c | grep -v 'feupdateenv is not implemented' | grep -v 'was built for newer' | grep -v 'lcilkrts linked'` == "" ]]
-   then
+    if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage2c | grep -v 'feupdateenv is not implemented' | grep -v 'was built for newer' | grep -v 'lcilkrts linked'` == "" ]]
+    then
       # Continue along
       :
-   else
+    else
       echo "Stage 2c warnings:" >> $WARNING_LOG
       grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage2c | grep -v 'feupdateenv is not implemented' | grep -v 'was built for newer' | grep -v 'lcilkrts linked' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
-   fi
-   fi
+      compile_errors=1
+    fi
+  fi
 }
 
 #---------------------------------------------
@@ -1337,6 +1348,39 @@ save_manuals_dir()
 }
 
 #---------------------------------------------
+#                   email_compile_errors
+#---------------------------------------------
+
+email_compile_errors()
+  SMOKEBOT_LOG=/tmp/smokebot_log.$$
+  
+  if [[ -e $ERROR_LOG ]]; then
+    echo "" > $SMOKEBOT_LOG
+  fi
+  if [[ -e $WARNING_LOG ]]; then
+    echo "" > $SMOKEBOT_LOG
+  fi
+
+  if [[ -e $ERROR_LOG ]]; then
+    echo "----------------------------------------------" >> $SMOKEBOT_LOG
+    echo "---------------- errors ----------------------" >> $SMOKEBOT_LOG
+    echo "----------------------------------------------" >> $SMOKEBOT_LOG
+    cat $ERROR_LOG >> $SMOKEBOT_LOG
+  fi 
+  if [[ -e $WARNING_LOG ]]; then
+    echo "----------------------------------------------" >> $SMOKEBOT_LOG
+    echo "---------------- warnings --------------------" >> $SMOKEBOT_LOG
+    echo "----------------------------------------------" >> $SMOKEBOT_LOG
+    cat $WARNING_LOG >> $SMOKEBOT_LOG
+  fi 
+
+  if [[ -e $SMOKEBOT_LOG ]]; then
+    cat $SMOKEBOT_LOG | mail -s "smokebot compile errors and/or warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailToSMV > /dev/null
+    rm -f $SMOKEBOT_LOG
+  fi
+}
+
+#---------------------------------------------
 #                   email_build_status
 #---------------------------------------------
 
@@ -1515,6 +1559,7 @@ FDS_REV=origin/master
 SMV_REV=origin/master
 USE_BOT_QFDS=
 CHECKOUT=
+compile_errors=
 
 #*** parse command line options
 
@@ -1964,6 +2009,12 @@ fi
 compile_smv_utilities
 check_smv_utilities
 check_common_files
+
+### report errors right away if they are found
+
+if [ "$compile_errors" == "1" ]; then
+  email_compile_errors
+fi
 
 if [[ $stage1b_fdsdb_success && "$BUILD_ONLY" == "" ]] ; then
    run_verification_cases_debug
