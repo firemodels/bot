@@ -52,7 +52,7 @@ echo "   The -x and -y options are only used with the -R cloning option"
 
 function usage {
 option=$1
-echo "Verification testing script for FDS"
+echo "Verification and validation testing script for FDS"
 echo ""
 echo "Options:"
 echo "-c - clean repos"

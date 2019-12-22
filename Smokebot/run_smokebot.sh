@@ -57,7 +57,7 @@ echo "   the repos are being cloned"
 
 function usage {
 option=$1
-echo "Verification and validation testing script for smokeview"
+echo "Verification testing script for smokeview"
 echo ""
 echo "Options:"
 echo "-c - clean repo"
