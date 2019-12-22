@@ -11,18 +11,14 @@ function usage_all {
 echo ""
 echo "Miscellaneous:"
 echo "-b - use the current branch"
-echo "-D - run only debug stages "
 echo "-q queue - specify queue [default: $QUEUE]"
 echo "-f - force firebot run"
-echo "-F - skip figure generation and build document stages"
 echo "-i - use installed version of smokeview"
-echo "-I - use development version of fds"
-echo "-J - use Intel MPI version fds"
-echo "-L - firebot lite,  run only stages that build a debug fds and run cases with it"
-echo "                    (no release fds, no release cases, no matlab, etc)"
-echo "-M   clone fds, exp, fig, out and smv repos. fds and smv repos will be checked out"
-echo "     with a branch named master"
-echo "-N - don't copy Manuals directory to .firebot/Manuals"
+if [ "$INTEL" != "" ]; then
+  echo "-J - use Intel MPI version fds [default]"
+else
+  echo "-J - use Intel MPI version fds"
+fi
 echo "-O - use OpenMPI version fds"
 if [ "$EMAIL" != "" ]; then
   echo "-m email_address [default: $EMAIL]"
@@ -30,7 +26,6 @@ else
   echo "-m email_address "
 fi
 echo "-P - remove run status (PID) file"
-echo "-s - skip matlab and build document stages"
 echo "-S - use startup files to set the environment, not modules"
 echo "-U - upload guides (only by user firebot)"
 echo ""
@@ -172,7 +167,6 @@ fi
 
 #*** define initial values
 
-COPY_MANUAL_DIR=
 USEINSTALL=
 BRANCH=master
 botscript=firebot.sh
@@ -182,19 +176,14 @@ RUNFIREBOT=1
 UPLOADGUIDES=
 FORCE=
 SKIPMATLAB=
-SKIPFIGURES=
-FIREBOT_LITE=
 KILL_FIREBOT=
 export PREFIX=FB_
 ECHO=
-debug_mode=
-DV=
 REMOVE_PID=
 CLONE_REPOS=
 CLONE_REPOS_ARG=
 CLONE_FDSSMV=
 BUILD_ONLY=
-DEBUG_ONLY=
 export QFDS_STARTUP=
 FDS_REV=
 SMV_REV=
@@ -207,7 +196,7 @@ FORCECLONE=
 
 #*** parse command line options
 
-while getopts 'bBcCdDFfg:G:HhIiJkLm:MNnOPq:R:SsTuUvx:y:w:' OPTION
+while getopts 'bBcCfg:G:HhiJkm:nOPq:R:STuUvx:y:w:' OPTION
 do
 case $OPTION  in
   b)
@@ -222,17 +211,8 @@ case $OPTION  in
   C)
    FORCECLONE="-C"
    ;;
-  d)
-    debug_mode="-d "
-   ;;
-  D)
-    DEBUG_ONLY="-D"
-   ;;
   f)
    FORCE=1
-   ;;
-  F)
-   SKIPFIGURES=-F
    ;;
   g)
    FIREBOT_HOST="$OPTARG"
@@ -249,26 +229,14 @@ case $OPTION  in
   i)
    USEINSTALL="-i"
    ;;
-  I)
-   DV="-I"
-   ;;
   J)
    INTEL="-J"
    ;;
   k)
    KILL_FIREBOT="1"
    ;;
-  L)
-   FIREBOT_LITE=-L
-   ;;
   m)
    EMAIL="$OPTARG"
-   ;;
-  M)
-   CLONE_REPOS="master"
-   ;;
-  N)
-   COPY_MANUAL_DIR=-N
    ;;
   n)
    UPDATEREPO=
@@ -285,9 +253,6 @@ case $OPTION  in
   R)
    CLONE_REPOS="$OPTARG"
    BRANCH=current
-   ;;
-  s)
-   SKIPMATLAB=-s
    ;;
   S)
     export QFDS_STARTUP=1
@@ -531,7 +496,7 @@ BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
 firebot_status=0
-$ECHO  ./$botscript -p $firebot_pid $UPDATEREPO $DV $INTEL $debug_mode $BUILD_ONLY $FORCECLONE $BRANCH $FDS_REV $SMV_REV $FIREBOT_LITE $USEINSTALL $UPLOADGUIDES $CLEANREPO $QUEUE $SKIPMATLAB $SKIPFIGURES $CLONE_REPOS $CLONE_FDSSMV  $EMAIL $COPY_MANUAL_DIR $WEB_DIR $DEBUG_ONLY "$@"
+$ECHO  ./$botscript -p $firebot_pid $UPDATEREPO $INTEL $BUILD_ONLY $FORCECLONE $BRANCH $FDS_REV $SMV_REV $USEINSTALL $UPLOADGUIDES $CLEANREPO $QUEUE $SKIPMATLAB $CLONE_REPOS $CLONE_FDSSMV  $EMAIL $WEB_DIR "$@"
 firebot_status=$?
 if [ -e $firebot_pid ]; then
   rm -f $firebot_pid
