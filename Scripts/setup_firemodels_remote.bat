@@ -1,4 +1,4 @@
-echo off
+@echo off
 set repo=%1
 
 if NOT "x%repo%" == "x" goto ENDIF1
@@ -26,13 +26,16 @@ if NOT "%GITHEADER%" == "git@github.com" goto ELSE2
 :ENDIF2
 
 if NOT "%GITUSER%" == "firemodels" goto ELSE3
-   echo if if
    git remote -v | grep DISABLE | wc -l > %ndisablefile%
    set /p  ndisable=<%ndisablefile%
-   if NOT %ndisable% == 0 goto ENDIF6
+   if NOT %ndisable% == 0 goto ELSE6
      echo disabling push access to firemodels
      git remote set-url --push origin DISABLE
+     goto ENDIF6
+   :ELSE6
+     echo push access to firemodels already disabled
    :ENDIF6
+   goto ENDIF3
 :ELSE3
    
    git remote -v | gawk "{print $1}" | grep firemodels | wc -l > %havecentralfile%
