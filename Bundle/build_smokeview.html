@@ -215,7 +215,9 @@ function install_smv(args){
 </tr>
 
 <tr>
-<td align=center><button onclick="build_libs('windows')">Build</button></td>
+<td align=center>
+<button onclick="build_libs('windows')">Build</button>
+</td>
 <td align=center><button onclick="build_libs('linux')">Build</button></td>
 <td align=center><button onclick="build_libs('osx')">Build</button></td>
 </tr>
@@ -229,11 +231,9 @@ function install_smv(args){
 <tr>
 <td align=center>
 <button onclick="build_smv('windows test')">Build</button><br>
-<button onclick="build_smv('windows testinc')">Inc</button>
 </td>
 <td align=center>
-<button onclick="build_smv('linux test')">Build</button><br>
-<button onclick="build_smv('gnulinux debug')">GNU dbg</button>
+<button onclick="build_smv('linux test')">Build</button>
 </td>
 <td align=center><button onclick="build_smv('osx test')">Build</button></td>
 </tr>
@@ -275,6 +275,21 @@ function install_smv(args){
 <td align=center><button onclick="install_smv('osx release')">Install</button></td>
 </tr>
 
+</table>
+
+<p><table border=on>
+<tr><th colspan=3>Build Test Smokeview - Other</th></tr>
+
+<tr><th>Windows</th><th>Linux</th></tr>
+
+<tr align=center>
+<td>
+<button onclick="build_libs('windowsgnu')">GNU Libraries</button><br>
+<button onclick="build_smv('windows testinc')">Intel Inc</button><br>
+<button onclick="build_smv('windows gnudbg')">GNU debug</button>
+</td>
+<td><button onclick="build_smv('gnulinux debug')">GNU debug</button></td>
+</tr>
 </table>
 
 <p><button onclick="run_script('\\smv\\scripts\\webUPLOADsmv2git.bat')">Upload</button>
