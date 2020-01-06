@@ -12,24 +12,15 @@ EMAIL_LIST="$HOME/.smokebot/smokebot_email_list.sh"
 function usage_all {
 echo ""
 echo "Miscellaneous:"
-echo "-a - run automatically if FDS or smokeview source has changed"
-echo "-A - run automatically if smokeview source has changed"
+echo "-a - only run if the FDS or smokeview source has changed"
 echo "-b - use the current branch"
-echo "-B - only build apps"
-echo "-C - add --mca plm_rsh_agent /usr/bin/ssh to mpirun command "
-echo "           when running cases"
-echo "-g firebot_host - host where firebot was run"
-echo "-G firebot_home - home directory where firebot was run"
-echo "   the -g and -G options are only used with the -R option and"
-echo "   are used to build apps using  the same repo revisions as last"
-echo "    successful firebot run "
 echo "-D - use startup files to set the environment not modules"
-echo "-f - force smokebot run"
+echo "-f - force smokebot to run"
 echo "-I compiler - intel or gnu [default: $COMPILER]"
 echo "-J use Intel MPI version of fds"
 echo "-k - kill smokebot if it is running"
-echo "-L - smokebot lite,  run only stages that build a debug fds and run"
-echo "     cases with it (no release fds, no release cases, no manuals, etc)"
+echo "-L - smokebot lite,  build debug apps and run cases using debug fds"
+echo "     (no release fds, no release cases, no manuals, etc)"
 echo "-q queue [default: $QUEUE]"
 if [ "$EMAIL" != "" ]; then
   echo "-m email_address - [default: $EMAIL]"
@@ -38,17 +29,24 @@ else
 fi
 echo "-M - make movies"
 echo "-P - remove run status (PID) file"
-echo "-R release_type (master, release or test) - clone fds, exp, fig, out and smv repos"
-echo "     fds and smv repos will be checked out with a branch named"
-echo "     master, release or test [default: master]"
-echo "-S - skip picture generating and build manual stages"
-echo "-t - use test smokeview"
-echo "-T - only clone the fds and smv repos (this option is set by default when"
-echo "     only building apps (-B) and cloning repos (-R) options are used"
+echo "-Q - use qfds.sh from the bot repo. This option can only be used with the -R option."
 echo "-U - upload guides"
 echo "-w directory - web directory containing summary pages"
-echo "-x fds_rev - run smokebot using the fds revision named fds_rev [default: origin/master]"
-echo "-y smv_rev - run smokebot using the smv revision named smv_rev [default: origin/master]"
+echo ""
+echo "Build apps, set repo revisions:"
+echo "-B - only build apps"
+echo "-g firebot_host - host where firebot was run"
+echo "-G firebot_home - home directory where firebot was run"
+echo "   The -g and -G options are used when clonging repos (-R option)"
+echo "   to build apps using the same repo revisions as used with the last"
+echo "   successful firebot run"
+echo "-R release_type (master, release or test) - clone fds, exp, fig, out and smv repos"
+echo "   fds and smv repos will be checked out with a branch named"
+echo "   master, release or test [default: master]"
+echo "-T - only clone the fds and smv repos (this option is set by default when"
+echo "     only building apps (-B) and cloning repos (-R) options are used"
+echo "-x fds_rev - checkout fds repo using fds_rev revision [default: origin/master]"
+echo "-y smv_rev - checkout smv repo using smv_rev revision [default: origin/master]"
 echo "   the -x and -y options are only used with the -R option i.e. when"
 echo "   the repos are being cloned"
 }
@@ -59,8 +57,7 @@ echo "   the repos are being cloned"
 
 function usage {
 option=$1
-echo option=$option
-echo "Verification and validation testing script for smokeview"
+echo "Verification testing script for smokeview"
 echo ""
 echo "Options:"
 echo "-c - clean repo"
@@ -170,12 +167,9 @@ UPLOAD=
 FORCE=
 COMPILER=intel
 SMOKEBOT_LITE=
-TESTFLAG=
 ECHO=
 INTEL=
-export MPIRUN_MCA=
 export QFDS_STARTUP=
-SKIP=
 REMOVE_PID=
 BUILD_ONLY=
 CLONE_REPOS=
@@ -184,6 +178,7 @@ SMV_REV=
 FIREBOT_HOST=
 FIREBOT_HOME=
 WEB_DIR=
+USE_BOT_QFDS=
 
 #*** check to see if a queing system is available
 
@@ -195,14 +190,11 @@ fi
 
 #*** parse command line options
 
-while getopts 'aAbBcCd:Dfg:G:hHI:JkLm:MPq:r:R:StTuUvw:x:y:' OPTION
+while getopts 'abBcd:Dfg:G:hHI:JkLm:MPq:Qr:R:TuUvw:x:y:' OPTION
 do
 case $OPTION  in
   a)
    RUNAUTO=-a
-   ;;
-  A)
-   RUNAUTO=-A
    ;;
   B)
    BUILD_ONLY="-B"
@@ -212,9 +204,6 @@ case $OPTION  in
    ;;
   c)
    CLEANREPO=-c
-   ;;
-  C)
-   export MPIRUN_MCA="--mca plm_rsh_agent /usr/bin/ssh "
    ;;
   D)
    export QFDS_STARTUP=1
@@ -258,14 +247,11 @@ case $OPTION  in
   q)
    QUEUE="$OPTARG"
    ;;
+  Q)
+   USE_BOT_QFDS="-Q"
+   ;;
   R)
    CLONE_REPOS="$OPTARG"
-   ;;
-  S)
-   SKIP="-S"
-   ;;
-  t)
-   TESTFLAG="-t"
    ;;
   T)
     CLONE_FDSSMV="-T"
@@ -442,7 +428,7 @@ BRANCH="-b $BRANCH"
 #*** run smokebot
 
 touch $smokebot_pid
-$ECHO ./$botscript $SKIP $SIZE $BRANCH $FDS_REV $SMV_REV $TESTFLAG $CLONE_REPOS $CLONE_FDSSMV $RUNAUTO $INTEL $BUILD_ONLY $COMPILER $SMOKEBOT_LITE $CLEANREPO $WEB_DIR $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $SIZE $BRANCH $FDS_REV $SMV_REV $CLONE_REPOS $CLONE_FDSSMV $USE_BOT_QFDS $RUNAUTO $INTEL $BUILD_ONLY $COMPILER $SMOKEBOT_LITE $CLEANREPO $WEB_DIR $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi

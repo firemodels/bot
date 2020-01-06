@@ -48,8 +48,9 @@ if "%platform%" == "linux" (
 
   echo Downloading compressed archive to:
   echo   %upload_dir%\!bundledir!.sh
-  pscp %linux_logon%:.bundle/uploads/!bundledir!.sh   %upload_dir%\.
-  pscp %linux_logon%:.bundle/uploads/!bundledir!.sha1 %upload_dir%\.
+  pscp %linux_logon%:.bundle/uploads/!bundledir!.sh            %upload_dir%\.
+  pscp %linux_logon%:.bundle/uploads/!bundledir!.sha1          %upload_dir%\.
+  pscp %linux_logon%:.bundle/uploads/!bundledir!_manifest.html %upload_dir%\.
   goto eof
 )
 if "%platform%" == "osx" (
@@ -58,8 +59,9 @@ if "%platform%" == "osx" (
 
   echo Downloading compressed archive to:
   echo   %upload_dir%\!bundledir!.sh
-  pscp %osx_logon%:.bundle/uploads/!bundledir!.sh   %upload_dir%\.
-  pscp %osx_logon%:.bundle/uploads/!bundledir!.sha1 %upload_dir%\.
+  pscp %osx_logon%:.bundle/uploads/!bundledir!.sh            %upload_dir%\.
+  pscp %osx_logon%:.bundle/uploads/!bundledir!.sha1          %upload_dir%\.
+  pscp %osx_logon%:.bundle/uploads/!bundledir!_manifest.html %upload_dir%\.
   goto eof
 )
 

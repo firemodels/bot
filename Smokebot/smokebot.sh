@@ -421,14 +421,14 @@ check_compile_fds_mpi_db()
 {
    # Check for errors in FDS debug compilation
    cd $fdsrepo/Build/${INTEL}mpi_${COMPILER}_${platform}_64$DB
-   if [ -e "fds_${INTEL}mpi_${COMPILER}_${platform}_64$DB" ]
-   then
+   if [ -e "fds_${INTEL}mpi_${COMPILER}_${platform}_64$DB" ]; then
       stage1b_fdsdb_success=true
    else
       echo "Errors from Stage 1b - Compile FDS MPI debug:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage1b >> $ERROR_LOG
       echo "" >> $ERROR_LOG
       THIS_FDS_FAILED=1
+      compile_errors=1
    fi
 
    # Check for compiler warnings/remarks
@@ -444,6 +444,7 @@ check_compile_fds_mpi_db()
       if [ -e "fds_${INTEL}mpi_${COMPILER}_${platform}_64$DB" ] ; then
         THIS_FDS_FAILED=1
       fi
+      compile_errors=1
    fi
 }
 
@@ -491,6 +492,7 @@ check_compile_fds_mpi_gnu_dbORIG()
         echo "Errors from Stage 1d - Compile gnu Fortran FDS MPI debug:" >> $ERROR_LOG
         cat $OUTPUT_DIR/stage1d >> $ERROR_LOG
         echo "" >> $ERROR_LOG
+        compile_errors=1
      fi
 
    # Check for compiler warnings/remarks
@@ -502,6 +504,7 @@ check_compile_fds_mpi_gnu_dbORIG()
         echo "Warnings from Stage 1d - Compile gnu Fortran FDS MPI debug:" >> $WARNING_LOG
         grep -i -A 5 -E 'warning|remark' $OUTPUT_DIR/stage1d | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
         echo "" >> $WARNING_LOG
+        compile_errors=1
      fi
    fi
 }
@@ -635,6 +638,7 @@ check_compile_fds_mpi()
       echo "Errors from Stage 1c - Compile FDS release:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage1c >> $ERROR_LOG
       echo "" >> $ERROR_LOG
+      compile_errors=1
    fi
 
    # Check for compiler warnings/remarks
@@ -647,6 +651,7 @@ check_compile_fds_mpi()
       echo "Stage 1c warnings:" >> $WARNING_LOG
       grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage1c | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
+      compile_errors=1
    fi
 }
 
@@ -719,6 +724,7 @@ compile_smv_utilities()
      cp wind2fds_${platform}_64 $LATESTAPPS_DIR/wind2fds
    else
      echo "Warning: smokeview and utilities not built - C compiler not available" >> $OUTPUT_DIR/stage2a 2>&1
+     compile_errors=1
    fi
 }
 
@@ -738,10 +744,42 @@ is_file_installed()
 }
 
 #---------------------------------------------
-#                   compare_common_files
+#                   compare_fds_bot_common_files
 #---------------------------------------------
 
-compare_common_files()
+compare_fds_bot_common_files()
+{
+   fdsdir=$1
+   botdir=$2
+   file=$3
+   fds_file=$fdsrepo/$fdsdir/$file
+   bot_file=$botrepo/$botdir/$file
+   notexist=
+   if ! [ -e $fds_file ]; then
+     echo "Warnings Stage 2d" >> $WARNING_LOG
+     echo "***warning: The fds repo file, $fds_file, does not exist" >> $WARNING_LOG
+     notexist=1
+   fi
+   if ! [ -e $bot_file ]; then
+     echo "Warnings Stage 2d" >> $WARNING_LOG
+     echo "***warning: The bot repo file, $bot_file, does not exist" >> $WARNING_LOG
+     notexist=1
+   fi
+   if [ "$notexist" == "" ]; then
+     ndiffs=`diff $fds_file $bot_file | wc -l`
+     if [ $ndiffs -gt 0 ]; then
+       echo "" >> $WARNING_LOG
+       echo "Warnings Stage 2d" >> $WARNING_LOG
+       echo "***warning: The fds and bot versions of $file are out of synch" >> $WARNING_LOG
+     fi
+   fi
+}
+
+#---------------------------------------------
+#                   compare_fds_smv_common_files
+#---------------------------------------------
+
+compare_fds_smv_common_files()
 {
    fdsdir=$1
    smvdir=$2
@@ -764,7 +802,7 @@ compare_common_files()
      if [ $ndiffs -gt 0 ]; then
        echo "" >> $WARNING_LOG
        echo "Warnings Stage 2d" >> $WARNING_LOG
-       echo "***warning: The fds repo version of $file is out of synch with the smv repo version" >> $WARNING_LOG
+       echo "***warning: The fds and smv versions of $file are out of synch" >> $WARNING_LOG
      fi
    fi
 }
@@ -775,7 +813,17 @@ compare_common_files()
 
 check_common_files()
 {
-   compare_common_files Source Source/smokeview gsmv.f90
+  // only compare files if latest repo revisions are checkout out
+  if [ "$CHECKOUT" == "" ]; then
+    compare_fds_smv_common_files Source               Source/smokeview     gsmv.f90
+    compare_fds_smv_common_files Utilities/Scripts    Utilities/Scripts    qfds.sh
+    compare_fds_smv_common_files Manuals/Bibliography Manuals/Bibliography BIBLIO_FDS_general.tex
+    compare_fds_smv_common_files Manuals/Bibliography Manuals/Bibliography BIBLIO_FDS_mathcomp.tex
+    compare_fds_smv_common_files Manuals/Bibliography Manuals/Bibliography BIBLIO_FDS_refs.tex
+    compare_fds_smv_common_files Manuals/Bibliography Manuals/Bibliography authors.tex
+    compare_fds_smv_common_files Manuals/Bibliography Manuals/Bibliography disclaimer.tex
+    compare_fds_bot_common_files Utilities/Scripts    Scripts              qfds.sh
+  fi
 }
 
 #---------------------------------------------
@@ -799,6 +847,7 @@ check_smv_utilities()
         echo "Errors from Stage 2a - Compile SMV utilities:" >> $ERROR_LOG
         cat $OUTPUT_DIR/stage2a >> $ERROR_LOG
         echo "" >> $ERROR_LOG
+        compile_errors=1
      fi
    else
      stage2a_success="1"
@@ -813,6 +862,7 @@ check_smv_utilities()
         stage2a_success="1"
         cat $OUTPUT_DIR/stage2a >> $ERROR_LOG
         echo "" >> $ERROR_LOG
+        compile_errors=1
      fi
    fi
 }
@@ -923,8 +973,8 @@ compile_smv_db()
      echo "   smokeview"
      echo "      debug"
      cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_64
-     rm -f smokeview_${platform}${TEST}_64_db
-     ./make_smokeview_db.sh $TESTFLAG &> $OUTPUT_DIR/stage2b
+     rm -f smokeview_${platform}_64_db
+     ./make_smokeview_db.sh &> $OUTPUT_DIR/stage2b
    fi
 }
 
@@ -934,30 +984,32 @@ compile_smv_db()
 
 check_compile_smv_db()
 {
-   if [ "$haveCC" == "1" ] ; then
+  if [ "$haveCC" == "1" ] ; then
    # Check for errors in SMV debug compilation
-   cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_64
-   if [ -e "smokeview_${platform}${TEST}_64_db" ]
-   then
-      stage2b_success=true
-   else
+    cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_64
+    if [ -e "smokeview_${platform}_64_db" ]
+    then
+       stage2b_success=true
+    else
       echo "Errors from Stage 2b - Compile SMV debug:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage2b >> $ERROR_LOG
       echo "" >> $ERROR_LOG
-   fi
+      compile_errors=1
+    fi
 
    # Check for compiler warnings/remarks
    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-   if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage2b | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]
-   then
+    if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage2b | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]
+    then
       # Continue along
       :
-   else
+    else
       echo "Stage 6a warnings:" >> $WARNING_LOG
       grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage2b | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
-   fi
-   fi
+      compile_errors=1
+    fi
+  fi
 }
 
 #---------------------------------------------
@@ -1003,8 +1055,8 @@ compile_smv()
    # Clean and compile SMV
      echo "      release"
      cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_64
-     rm -f smokeview_${platform}${TEST}_64
-     ./make_smokeview.sh $TESTFLAG &> $OUTPUT_DIR/stage2c
+     rm -f smokeview_${platform}_64
+     ./make_smokeview.sh &> $OUTPUT_DIR/stage2c
    fi
 }
 
@@ -1014,32 +1066,33 @@ compile_smv()
 
 check_compile_smv()
 {
-   if [ "$haveCC" == "1" ] ; then
+  if [ "$haveCC" == "1" ]; then
    # Check for errors in SMV release compilation
-   cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_64
-   if [ -e "smokeview_${platform}${TEST}_64" ]
-     cp smokeview_${platform}${TEST}_64 $LATESTAPPS_DIR/smokeview
-   then
+    cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_64
+    if [ -e "smokeview_${platform}_64" ]; then
+      cp smokeview_${platform}_64 $LATESTAPPS_DIR/smokeview
       stage2c_smv_success=true
-   else
+    else
       echo "Errors from Stage 2c - Compile SMV release:" >> $ERROR_LOG
-      echo "The program smokeview_${platform}${TEST}_64 does not exist."
+      echo "The program smokeview_${platform}_64 does not exist."
       cat $OUTPUT_DIR/stage2c >> $ERROR_LOG
       echo "" >> $ERROR_LOG
-   fi
+      compile_errors=1
+    fi
 
    # Check for compiler warnings/remarks
    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-   if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage2c | grep -v 'feupdateenv is not implemented' | grep -v 'was built for newer' | grep -v 'lcilkrts linked'` == "" ]]
-   then
+    if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage2c | grep -v 'feupdateenv is not implemented' | grep -v 'was built for newer' | grep -v 'lcilkrts linked'` == "" ]]
+    then
       # Continue along
       :
-   else
+    else
       echo "Stage 2c warnings:" >> $WARNING_LOG
       grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage2c | grep -v 'feupdateenv is not implemented' | grep -v 'was built for newer' | grep -v 'lcilkrts linked' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
-   fi
-   fi
+      compile_errors=1
+    fi
+  fi
 }
 
 #---------------------------------------------
@@ -1051,7 +1104,7 @@ make_smv_pictures()
    # Run Make SMV Pictures script (release mode)
    echo Generating images 
    cd $smvrepo/Verification/scripts
-   ./Make_SMV_Pictures.sh $YOPT -q $SMOKEBOT_QUEUE -I $COMPILER -j SMV_ $TESTFLAG $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4b_orig
+   ./Make_SMV_Pictures.sh $YOPT -q $SMOKEBOT_QUEUE -I $COMPILER -j SMV_ $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4b_orig
    grep -v FreeFontPath $OUTPUT_DIR/stage4b_orig &> $OUTPUT_DIR/stage4b
 }
 
@@ -1092,7 +1145,7 @@ check_smv_pictures()
 make_smv_movies()
 {
    cd $smvrepo/Verification
-   scripts/Make_SMV_Movies.sh -q $SMOKEBOT_QUEUE $TEST 2>&1  &> $OUTPUT_DIR/stage4c
+   scripts/Make_SMV_Movies.sh -q $SMOKEBOT_QUEUE 2>&1  &> $OUTPUT_DIR/stage4c
 }
 
 #---------------------------------------------
@@ -1295,6 +1348,39 @@ save_manuals_dir()
 }
 
 #---------------------------------------------
+#                   email_compile_errors
+#---------------------------------------------
+
+email_compile_errors()
+{
+  SMOKEBOT_LOG=/tmp/smokebot_log.$$
+  if [[ -e $ERROR_LOG ]]; then
+    echo "" > $SMOKEBOT_LOG
+  fi
+  if [[ -e $WARNING_LOG ]]; then
+    echo "" > $SMOKEBOT_LOG
+  fi
+
+  if [[ -e $ERROR_LOG ]]; then
+    echo "----------------------------------------------" >> $SMOKEBOT_LOG
+    echo "---------------- errors ----------------------" >> $SMOKEBOT_LOG
+    echo "----------------------------------------------" >> $SMOKEBOT_LOG
+    cat $ERROR_LOG >> $SMOKEBOT_LOG
+  fi 
+  if [[ -e $WARNING_LOG ]]; then
+    echo "----------------------------------------------" >> $SMOKEBOT_LOG
+    echo "---------------- warnings --------------------" >> $SMOKEBOT_LOG
+    echo "----------------------------------------------" >> $SMOKEBOT_LOG
+    cat $WARNING_LOG >> $SMOKEBOT_LOG
+  fi 
+
+  if [[ -e $SMOKEBOT_LOG ]]; then
+    cat $SMOKEBOT_LOG | mail -s "smokebot compile errors and/or warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailToSMV > /dev/null
+    rm -f $SMOKEBOT_LOG
+  fi
+}
+
+#---------------------------------------------
 #                   email_build_status
 #---------------------------------------------
 
@@ -1336,9 +1422,6 @@ email_build_status()
   DISPLAY_SMV_REVISION=
   if [ "$RUNAUTO" == "y" ]; then
     DISPLAY_FDS_REVISION=1
-    DISPLAY_SMV_REVISION=1
-  fi
-  if [ "$RUNAUTO" == "Y" ]; then
     DISPLAY_SMV_REVISION=1
   fi
   if [ "$DISPLAY_FDS_REVISION" == "1" ]; then
@@ -1459,11 +1542,8 @@ BOTBRANCH=master
 SMOKEBOT_QUEUE=smokebot
 MAKEMOVIES=0
 RUNAUTO=
-RUNDEBUG="1"
 OPENMP=
 RUN_OPENMP=
-TESTFLAG=
-TEST=
 CLEANREPO=0
 UPDATEREPO=0
 mailTo=
@@ -1471,24 +1551,23 @@ UPLOADRESULTS=
 COMPILER=intel
 PID_FILE=~/.fdssmvgit/firesmokebot_pid
 INTEL=
-SKIP=
 HTML2PDF=wkhtmltopdf
 BUILD_ONLY=
 CLONE_REPOS=
 CLONE_FDSSMV=
 FDS_REV=origin/master
 SMV_REV=origin/master
+USE_BOT_QFDS=
+CHECKOUT=
+compile_errors=
 
 #*** parse command line options
 
-while getopts 'aAb:BcI:JLm:Mo:q:r:R:SstTuU:x:y:w:' OPTION
+while getopts 'ab:BcI:JLm:Mo:q:Qr:R:TuU:x:y:w:' OPTION
 do
 case $OPTION in
   a)
    RUNAUTO="y"
-   ;;
-  A)
-   RUNAUTO="Y"
    ;;
   B)
    BUILD_ONLY="1"
@@ -1528,18 +1607,11 @@ case $OPTION in
   q)
    SMOKEBOT_QUEUE="$OPTARG"
    ;;
+  Q)
+   USE_BOT_QFDS="1"
+   ;;
   R)
    CLONE_REPOS="$OPTARG"
-   ;;
-  s)
-   RUNDEBUG="0"
-   ;;
-  S)
-   SKIP=1
-   ;;
-  t)
-   TESTFLAG="-t"
-   TEST="_test"
    ;;
   T)
    CLONE_FDSSMV=1
@@ -1555,15 +1627,23 @@ case $OPTION in
    ;;
   x)
    FDS_REV="$OPTARG"
+   CHECKOUT=1
    ;;
   y)
    SMV_REV="$OPTARG"
+   CHECKOUT=1
    ;;
 esac
 done
 shift $(($OPTIND-1))
 
-if [ "$CLONE_REPOS" != "" ]; then
+if [ "$CLONE_REPOS" == "" ]; then
+  if [ "$USE_BOT_QFDS" != "" ]; then
+    echo "***error: you may only use the bot repo version of qfds.sh (-Q option) if you clone repos (-R option)"
+    echo "          using fds repo version of qfds.sh"
+    USE_BOT_QFDS=
+  fi
+else
   if [ "$CLONE_REPOS" != "release" ]; then
     if [ "$CLONE_REPOS" != "test" ]; then
       CLONE_REPO="master"
@@ -1686,9 +1766,6 @@ echo $$ > $PID_FILE
 
 if [[ $RUNAUTO == "y" ]] ; then
   run_auto || exit 1
-fi
-if [[ $RUNAUTO == "Y" ]] ; then
-  run_auto smv || exit 1
 fi
 
 if [ "$WEB_DIR" != "" ]; then
@@ -1906,6 +1983,12 @@ git rev-parse --short HEAD > $LATESTAPPS_DIR/SMV_HASH
 cp $LATESTAPPS_DIR/SMV_REVISION $LATESTPUBS_DIR/SMV_REVISION
 cp $LATESTAPPS_DIR/SMV_HASH     $LATESTPUBS_DIR/SMV_HASH
 
+if [[ "$CLONE_REPOS" != "" ]]; then
+  if [ "$USE_BOT_QFDS" != "" ]; then
+    cp $botrepo/Scripts/qfds.sh $fdsrepo/Utilities/Scripts/qfds.sh
+  fi
+fi
+
 PRELIM_end=`GET_TIME`
 DIFF_PRELIM=`GET_DURATION $PRELIM_beg $PRELIM_end`
 echo "Preliminary: $DIFF_PRELIM" >> $STAGE_STATUS
@@ -1927,7 +2010,13 @@ compile_smv_utilities
 check_smv_utilities
 check_common_files
 
-if [[ $stage1b_fdsdb_success && "$RUNDEBUG" == "1" && "$BUILD_ONLY" == "" ]] ; then
+### report errors right away if they are found
+
+if [ "$compile_errors" == "1" ]; then
+  email_compile_errors
+fi
+
+if [[ $stage1b_fdsdb_success && "$BUILD_ONLY" == "" ]] ; then
    run_verification_cases_debug
 fi
 
@@ -1939,7 +2028,7 @@ if [ "$BUILD_ONLY" == "" ]; then
 fi
 fi
 fi
-if [[ $stage1b_fdsdb_success && "$RUNDEBUG" == "1" ]] ; then
+if [[ $stage1b_fdsdb_success ]] ; then
    check_verification_cases_debug
 fi
 RUNCASES_beg=`GET_TIME`
@@ -1981,7 +2070,7 @@ echo "Run cases: $DIFF_RUNCASES" >> $STAGE_STATUS
 
 ### Stage 4 generate images ###
 MAKEPICTURES_beg=`GET_TIME`
-if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
+if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
   if [[ $stage1c_fdsrel_success && $stage2c_smv_success ]] ; then
     make_smv_pictures
     check_smv_pictures
@@ -1991,7 +2080,7 @@ MAKEPICTURES_end=`GET_TIME`
 DIFF_MAKEPICTURES=`GET_DURATION $MAKEPICTURES_beg $MAKEPICTURES_end`
 echo "Make pictures: $DIFF_MAKEPICTURES" >> $STAGE_STATUS
 
-if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
+if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
   if [ "$MAKEMOVIES" == "1" ]; then
     MAKEMOVIES_beg=`GET_TIME`
  
@@ -2004,7 +2093,7 @@ if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]] && [[ "$BUILD_ONLY" == ""
   fi
 fi
 
-if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
+if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
   if [[ $stage1c_fdsrel_success ]] ; then
     generate_timing_stats
   fi
@@ -2012,7 +2101,7 @@ fi
 
 ### Stage 5 build documents ###
 MAKEGUIDES_beg=`GET_TIME`
-if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$SKIP" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
+if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
   if [[ $stage1c_fdsrel_success && $stage4b_smvpics_success ]] ; then
      echo Making guides
      if [ "$YOPT" == "" ]; then
