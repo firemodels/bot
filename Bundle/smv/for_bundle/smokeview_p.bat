@@ -1,7 +1,8 @@
 @echo off
+set scriptname=%0
 
 set repo=
-set verbose=0
+set option=run 
 
 call :getopts %*
 if %stopscript% == 1 (
@@ -21,19 +22,18 @@ if x%repo% == x goto else1
   call :is_file_installed %smokeview% || exit /b 1
   where %smokeview% | head -1 > %TEMP%\smokeview_path.txt
   set /p smv=<%TEMP%\smokeview_path.txt
+  if exist %TEMP%\smokeview_path.txt erase %TEMP%\smokeview_path.txt  
   set "smokeview=%smv%"
 :endif1
 
-if "%option%" == "profile" goto else2
-  if "%verbose%" == "1" echo "%smokeview%" %casename%
-  if "%verbose%" == "0" "%smokeview%" %casename%
-  goto eof
-:else2
-  call :is_file_installed gprof || exit /b 1
-  if "%verbose%" == "1" echo gprof "%smokeview% >" %casename%_profile.txt
-  if "%verbose%" == "0" gprof "%smokeview%" > %casename%_profile.txt
-  if "%verbose%" == "0" echo profile information outputted to %casename%_profile.txt
+call :is_file_installed gprof || exit /b 1
+
+if "%option%" == "profile" goto endif2
+  "%smokeview%" %casename%
 :endif2
+
+gprof "%smokeview%" > %casename%_profile.txt
+echo profile information outputted to %casename%_profile.txt
 goto eof
 
 :: -------------------------------------------------------------
@@ -65,6 +65,10 @@ goto eof
  set arg=%1
  set firstchar=%arg:~0,1%
  if NOT "%firstchar%" == "-" goto endloop
+ if /I "%1" EQU "-f" (
+   set repo=FireModels_fork
+   set valid=1
+ )
  if /I "%1" EQU "-h" (
    call :usage
    set stopscript=1
@@ -74,22 +78,10 @@ goto eof
    set option=profile
    set valid=1
  )
- if /I "%1" EQU "-repo" (
+ if /I "%1" EQU "-r" (
    set repo=%2
    set valid=1
    shift
- )
- if /I "%1" EQU "-f" (
-   set repo=FireModels_fork
-   set valid=1
- )
- if /I "%1" EQU "-r" (
-   set option=run
-   set valid=1
- )
- if /I "%1" EQU "-v" (
-   set verbose=1
-   set valid=1
  )
  shift
  if %valid% == 0 (
@@ -109,20 +101,17 @@ exit /b
 :: -------------------------------------------------------------
 :usage
 :: -------------------------------------------------------------
-echo profile [options] casename
+echo %scriptname% [options] casename
 echo. 
-echo This script runs the gnu version of smokeview when used with the -r option or the
-echo gprof profiler when used with the -p option.  The smokeview hot spots identified
-echo by gprof are output to casename_profile.txt .  Other options are detailed below.
+echo This script runs the gnu version of smokeview then profiles it using the
+echo gprof profiler.  The smokeview hot spots identified by gprof are output to 
+echo the file casename_profile.txt .  Other options are given below.
 echo. 
-echo -f         - same as -repo FireModels_fork
-echo -h         - display this message
-echo -i         - use installed version of smokeview_gnu [default]
-echo -p         - profile smokeview_gnu [default]
-echo -repo repo - use the version of smokeview_gnu found in %userprofile%\repo\smv\Build\smokeview\gnu_win_64,
-echo              otherwise use the installed version of smokeview_gnu
-echo -r         - run smokeview_gnu
-echo -v         - show command used to run smokeview or profiler
+echo -f      - same as -r FireModels_fork
+echo -h      - display this message
+echo -p      - only profile smokeview_gnu (assume that smokeview_gnu was already run)
+echo -r root - use the version of smokeview_gnu found in %userprofile%\root\smv\Build\smokeview\gnu_win_64,
+echo           otherwise use the installed version of smokeview_gnu
 exit /b
 
 :eof

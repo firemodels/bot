@@ -64,7 +64,7 @@ CALL :COPY %forbundle%\volrender.ssf    %smvdir%\volrender.ssf
 CALL :COPY  %webgldir%\smv2html.bat     %smvdir%\smv2html.bat
 CALL :COPY %forbundle%\fds_test.bat     %smvdir%\fds_test.txt
 CALL :COPY %forbundle%\fdsinit_test.bat %smvdir%\fdsinit_test.txt
-CALL :COPY %forbundle%\profile.bat      %smvdir%\profile.bat
+CALL :COPY %forbundle%\smokeview_p.bat  %smvdir%\smokeview_p.bat
 
 CALL :COPY %smvbuild%\background\intel_win_64\background_win_64.exe %smvdir%\background.exe
 CALL :COPY %smvbuild%\dem2fds\intel_win_64\dem2fds_win_64.exe       %smvdir%\dem2fds.exe
