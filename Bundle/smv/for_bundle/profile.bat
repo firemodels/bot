@@ -1,7 +1,6 @@
 @echo off
 
 set repo=
-set stopscript=0
 set verbose=0
 
 call :getopts %*
@@ -80,11 +79,11 @@ goto eof
    set valid=1
    shift
  )
- if /I "%1" EQU "-rep" (
+ if /I "%1" EQU "-f" (
    set repo=FireModels_fork
    set valid=1
  )
- if /I "%1" EQU "-run" (
+ if /I "%1" EQU "-r" (
    set option=run
    set valid=1
  )
@@ -112,11 +111,17 @@ exit /b
 :: -------------------------------------------------------------
 echo profile [options] casename
 echo. 
+echo This script runs the gnu version of smokeview when used with the -r option or the
+echo gprof profiler when used with the -p option.  The smokeview hot spots identified
+echo by gprof are output to casename_profile.txt .  Other options are detailed below.
+echo. 
+echo -f         - same as -repo FireModels_fork
 echo -h         - display this message
-echo -p         - profile smokeview_gnu run [default]
 echo -i         - use installed version of smokeview_gnu [default]
-echo -repo repo - use repo version of smokeview_gnu, otherwise use installed version
-echo -run       - run smokeview_gnu
+echo -p         - profile smokeview_gnu [default]
+echo -repo repo - use the version of smokeview_gnu found in %userprofile%\repo\smv\Build\smokeview\gnu_win_64,
+echo              otherwise use the installed version of smokeview_gnu
+echo -r         - run smokeview_gnu
 echo -v         - show command used to run smokeview or profiler
 exit /b
 
