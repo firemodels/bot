@@ -33,7 +33,7 @@ if "%option%" == "profile" goto endif2
 :endif2
 
 gprof "%smokeview%" > %casename%_profile.txt
-echo profile information outputted to %casename%_profile.txt
+if exist %casename%_profile.txt notepad %casename%_profile.txt
 goto eof
 
 :: -------------------------------------------------------------
