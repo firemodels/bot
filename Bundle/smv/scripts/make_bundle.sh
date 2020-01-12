@@ -128,6 +128,7 @@ SCP $PLATFORMHOST $BACKGROUNDDIR background_${platform}_64 $PLATFORMDIR/$smvbin 
 SCP $PLATFORMHOST $SMVDIR        smokeview_${platform}_${TEST}64  $PLATFORMDIR/$smvbin smokeview
 if [ "$edition" == "test" ]; then
   SCP $PLATFORMHOST $GNUSMVDIR     smokeview_${platform}_${TEST}64p $PLATFORMDIR/$smvbin smokeview_gnu
+  SCP $PLATFORMHOST $FORBUNDLE     smokeview_p                      $PLATFORMDIR/$smvbin smokeview_p
 fi
 SCP $PLATFORMHOST $DEM2FDSDIR    dem2fds_${platform}_64           $PLATFORMDIR/$smvbin dem2fds
 SCP $PLATFORMHOST $SMDDIR        smokediff_${platform}_64         $PLATFORMDIR/$smvbin smokediff
