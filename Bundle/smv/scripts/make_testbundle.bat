@@ -50,7 +50,7 @@ mkdir %smvdir%
 mkdir %smvdir%\hash
 
 CALL :COPY %smvbuild%\smokeview\intel_win_64\smokeview_win_test_64.exe  %smvdir%\smokeview.exe
-CALL :COPY %smvbuild%\smokeview\gnu_win_64\smokeview_win_test_64_db.exe %smvdir%\smokeview_gnu.exe
+CALL :COPY %smvbuild%\smokeview\gnu_win_64\smokeview_win_test_64p.exe   %smvdir%\smokeview_gnu.exe
 
 CALL :COPY  %smvscripts%\jp2conv.bat %smvdir%\jp2conv.bat
 

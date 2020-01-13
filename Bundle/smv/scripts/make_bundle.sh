@@ -84,6 +84,7 @@ CPDIR ()
 
 BACKGROUNDDIR=$REMOTESVNROOT/smv/Build/background/intel_${platform}_64
 SMVDIR=$REMOTESVNROOT/smv/Build/smokeview/intel_${platform}_64
+GNUSMVDIR=$REMOTESVNROOT/smv/Build/smokeview/gnu_${platform}_64
 SMZDIR=$REMOTESVNROOT/smv/Build/smokezip/intel_${platform}_64
 DEM2FDSDIR=$REMOTESVNROOT/smv/Build/dem2fds/intel_${platform}_64
 SMDDIR=$REMOTESVNROOT/smv/Build/smokediff/intel_${platform}_64
@@ -125,6 +126,10 @@ CP $WEBGLDIR        smv2html.sh       $PLATFORMDIR/$smvbin smv2html.sh
 
 SCP $PLATFORMHOST $BACKGROUNDDIR background_${platform}_64 $PLATFORMDIR/$smvbin background
 SCP $PLATFORMHOST $SMVDIR        smokeview_${platform}_${TEST}64  $PLATFORMDIR/$smvbin smokeview
+if [ "$edition" == "test" ]; then
+  SCP $PLATFORMHOST $GNUSMVDIR     smokeview_${platform}_${TEST}64p $PLATFORMDIR/$smvbin smokeview_gnu
+  SCP $PLATFORMHOST $FORBUNDLE     smokeview_p                      $PLATFORMDIR/$smvbin smokeview_p
+fi
 SCP $PLATFORMHOST $DEM2FDSDIR    dem2fds_${platform}_64           $PLATFORMDIR/$smvbin dem2fds
 SCP $PLATFORMHOST $SMDDIR        smokediff_${platform}_64         $PLATFORMDIR/$smvbin smokediff
 SCP $PLATFORMHOST $SMZDIR        smokezip_${platform}_64          $PLATFORMDIR/$smvbin smokezip
