@@ -289,16 +289,20 @@ function install_smv(args){
 <p><table border=on>
 <tr><th colspan=3>Smokeview Test - GNU</th></tr>
 
-<tr><th>Windows</th><th>Linux</th></tr>
+<tr><th>Windows</th><th>Linux</th><th>OSX</th></tr>
 
 <tr align=center>
 <td>
 <button onclick="build_libs('windowsgnu')">Libraries</button><br>
-<button onclick="build_smv('windows gnudbg')">debug</button>
+<button onclick="build_smv('windowsgnu')">Build</button>
 </td>
 <td>
 <button onclick="build_libs('linuxgnu')">Libraries</button><br>
-<button onclick="build_smv('gnulinux debug')">debug</button>
+<button onclick="build_smv('linuxgnu')">Build</button>
+</td>
+<td>
+<button onclick="build_libs('osxgnu')">Libraries</button><br>
+<button onclick="build_smv('osxgnu')">Build</button>
 </td>
 </tr>
 </table>
