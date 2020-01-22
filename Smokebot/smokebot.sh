@@ -813,7 +813,7 @@ compare_fds_smv_common_files()
 
 check_common_files()
 {
-  // only compare files if latest repo revisions are checkout out
+  # only compare files if latest repo revisions are checkout out
   if [ "$CHECKOUT" == "" ]; then
     compare_fds_smv_common_files Source               Source/smokeview     gsmv.f90
     compare_fds_smv_common_files Utilities/Scripts    Utilities/Scripts    qfds.sh
