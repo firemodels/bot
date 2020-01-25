@@ -2072,9 +2072,6 @@ if [ "$BUILD_ONLY" == "1" ]; then
   CHECK_LINES=
 fi
 
-# turn off line ending checking for now
-CHECK_LINES=
-
 if [ "$CHECK_LINES" == "1" ]; then
   rm -f $CRLF_WARNINGS
   echo Checking for DOS line endings
