@@ -845,7 +845,7 @@ run_verification_cases_release()
 #   echo 'Running FDS thread checking verification cases:' >> $OUTPUT_DIR/stage5
    cd ../Thread_Check
    echo ./inspection.sh -p 6 -q $QUEUE  inspector_test.fds >> $OUTPUT_DIR/stage5i 2>&1
-        ./inspection.sh -p 6 -q $QUEUE  inspector_test.fds >> $OUTPUT_DIR/stage5i 2>&1
+#        ./inspection.sh -p 6 -q $QUEUE  inspector_test.fds >> $OUTPUT_DIR/stage5i 2>&1
    echo ""                                                 >> $OUTPUT_DIR/stage5i 2>&1
 
    cd ../scripts
