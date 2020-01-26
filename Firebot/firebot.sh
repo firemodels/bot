@@ -129,8 +129,10 @@ check_CRLF()
     nwarnings=`cat $CRLF_WARNINGS | wc -l`
     if [ $nwarnings -gt 0 ]; then
       echo ""
-      echo "Warnings from Stage 1 - dos line ending check:" >> $WARNING_LOG
-      cat $CRLF_WARNINGS >> $WARNING_LOG
+      echo "Warnings from Stage 1 - dos line ending check"     >> $WARNING_LOG
+      echo "  The following text files have dos line endings:" >> $WARNING_LOG
+      cat $CRLF_WARNINGS                                       >> $WARNING_LOG
+      echo ""                                                  >> $WARNING_LOG
       echo ""
     fi
   fi
