@@ -107,7 +107,7 @@ find_CRLF()
   crlf_temp=/tmp/crlf.$$
 
   cd $repodir
-  grep -IURl --exclude="*.pdf" --exclude-dir=".git"  $'\r'  > $crlf_temp
+  grep -IURl --exclude="*.pdf" --exclude-dir=".git"  --exclude-dir="output" $'\r'  > $crlf_temp
   nlines=`cat $crlf_temp | wc -l`
   if [ $nlines -gt 0 ]; then
     echo ""                                                 >> $CRLF_WARNINGS
