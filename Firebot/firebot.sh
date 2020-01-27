@@ -110,9 +110,9 @@ find_CRLF()
   grep -IURl --exclude="*.pdf" --exclude-dir=".git"  $'\r'  > $crlf_temp
   nlines=`cat $crlf_temp | wc -l`
   if [ $nlines -gt 0 ]; then
-    echo "" >> $CRLF_WARNINGS
-    echo "$reponame repo:" >> $CRLF_WARNINGS
-    cat $crlf_temp >> $CRLF_WARNINGS
+    echo ""                                                 >> $CRLF_WARNINGS
+    echo "$reponame repo text files with dos line endings:" >> $CRLF_WARNINGS
+    cat $crlf_temp                                          >> $CRLF_WARNINGS
     rm $crlf_temp
   fi
   cd $curdir
@@ -129,10 +129,9 @@ check_CRLF()
     nwarnings=`cat $CRLF_WARNINGS | wc -l`
     if [ $nwarnings -gt 0 ]; then
       echo ""
-      echo "Warnings from Stage 1 - dos line ending check"     >> $WARNING_LOG
-      echo "  The following text files have dos line endings:" >> $WARNING_LOG
-      cat $CRLF_WARNINGS                                       >> $WARNING_LOG
-      echo ""                                                  >> $WARNING_LOG
+      echo "Warnings from Stage 1 - dos line ending check" >> $WARNING_LOG
+      cat $CRLF_WARNINGS                                   >> $WARNING_LOG
+      echo ""                                              >> $WARNING_LOG
       echo ""
     fi
   fi
