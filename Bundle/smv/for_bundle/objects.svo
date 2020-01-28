@@ -260,7 +260,6 @@ truck
  push
  255 26 0 setrgb
  0.25 0.25 0.25 scalexyz
- 180.0 rotatey
  0.0 0.0 -0.35 translate
  180.0 rotatez
  0.0   0.0 0.125 3.0 1.4 0.5     drawboxxyz 
@@ -282,7 +281,6 @@ car
  push
  0 144 255 setrgb
  0.25 0.25 0.25 scalexyz
- 180.0 rotatey
  0.0 0.0 -0.35 translate
  180.0 rotatez
 
