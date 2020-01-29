@@ -2132,7 +2132,7 @@ if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
 
        if [ "$WEB_DIR" != "" ]; then
          rm -rf $WEB_DIR/images $WEB_DIR/images2 $WEB_DIR/manuals $WEB_DIR/*.html
-         if [ "$MAKEMOVIES" != "" ]; then
+         if [ "$MAKEMOVIES" != "0" ]; then
            rm -rf $WEB_DIR/movies
          fi
          cp -r $SMV_SUMMARY_DIR/* $WEB_DIR/.
