@@ -107,13 +107,12 @@ find_CRLF()
   crlf_temp=/tmp/crlf.$$
 
   cd $repodir
-  grep -IURl --color --exclude="*.pdf" --exclude-dir=".git" "
-"  | grep -v 'firebot.sh'  > $crlf_temp
+  grep -IURl --exclude="*.pdf" --exclude-dir=".git"  --exclude-dir="output" $'\r'  > $crlf_temp
   nlines=`cat $crlf_temp | wc -l`
   if [ $nlines -gt 0 ]; then
-    echo "" >> $CRLF_WARNINGS
-    echo "$reponame repo:" >> $CRLF_WARNINGS
-    cat $crlf_temp >> $CRLF_WARNINGS
+    echo ""                                                 >> $CRLF_WARNINGS
+    echo "$reponame repo text files with dos line endings:" >> $CRLF_WARNINGS
+    cat $crlf_temp                                          >> $CRLF_WARNINGS
     rm $crlf_temp
   fi
   cd $curdir
@@ -130,8 +129,9 @@ check_CRLF()
     nwarnings=`cat $CRLF_WARNINGS | wc -l`
     if [ $nwarnings -gt 0 ]; then
       echo ""
-      echo "Warnings from Stage 1 - dos line ending check:" >> $WARNING_LOG
-      cat $CRLF_WARNINGS >> $WARNING_LOG
+      echo "Warnings from Stage 1 - dos line ending check" >> $WARNING_LOG
+      cat $CRLF_WARNINGS                                   >> $WARNING_LOG
+      echo ""                                              >> $WARNING_LOG
       echo ""
     fi
   fi
@@ -770,23 +770,23 @@ check_cases_release()
    # Scan for and report any errors in FDS cases
    cd $dir
 
-   if [[ `grep 'Run aborted'     $OUTPUT_DIR/stage5  | grep -v grep`                    == "" ]] && \
-      [[ `grep 'ERROR'           $OUTPUT_DIR/stage5  | grep -v geom_bad | grep -v grep` == "" ]] && \
-      [[ `grep Segmentation      */*.err             | grep -v grep`                    == "" ]] && \
-      [[ `grep ERROR:            */*.out             | grep -v grep | grep -v echo`     == "" ]] && \
-      [[ `grep 'BAD TERMINATION' */*.log             | grep -v grep`                    == "" ]] && \
-      [[ `grep forrtl            */*.err             | grep -v grep`                    == "" ]] && \
-      [[ `grep 'Inspector Clean' $OUTPUT_DIR/stage5i | grep -v grep`                    != "" ]]
+   if [[ `grep 'Run aborted'            $OUTPUT_DIR/stage5  | grep -v grep`                    == "" ]] && \
+      [[ `grep 'ERROR'                  $OUTPUT_DIR/stage5  | grep -v geom_bad | grep -v grep` == "" ]] && \
+      [[ `grep Segmentation             */*.err             | grep -v grep`                    == "" ]] && \
+      [[ `grep ERROR:                   */*.out             | grep -v grep | grep -v echo`     == "" ]] && \
+      [[ `grep 'BAD TERMINATION'        */*.log             | grep -v grep`                    == "" ]] && \
+      [[ `grep forrtl                   */*.err             | grep -v grep`                    == "" ]] && \
+      [[ `grep 'Inspector found errors' $OUTPUT_DIR/stage5i | grep -v grep`                    == "" ]]
    then
       cases_debug_success=true
    else
       grep 'Run aborted'                $OUTPUT_DIR/stage5  | grep -v grep                    >> $OUTPUT_DIR/stage5_errors
-      grep 'ERROR'                      $OUTPUT_DIR/stage5  | grep -v grep | grep -v geom_bad >> $OUTPUT_DIR/stage5_errors
+      grep 'ERROR'                      $OUTPUT_DIR/stage5  | grep -v geom_bad | grep -v grep >> $OUTPUT_DIR/stage5_errors
       grep Segmentation                 */*.err             | grep -v grep                    >> $OUTPUT_DIR/stage5_errors
       grep ERROR:                       */*.out             | grep -v grep | grep -v echo     >> $OUTPUT_DIR/stage5_errors
       grep -A 2 'BAD TERMINATION'       */*.log             | grep -v grep                    >> $OUTPUT_DIR/stage5_errors
       grep -A 20 forrtl                 */*.err             | grep -v grep                    >> $OUTPUT_DIR/stage5_errors
-      grep -rI "Inspector found errors" $OUTPUT_DIR/stage5i | grep -v grep                    >> $OUTPUT_DIR/stage5_errors
+      grep 'Inspector found errors'     $OUTPUT_DIR/stage5i | grep -v grep                    >> $OUTPUT_DIR/stage5_errors
 
       echo "Errors from Stage 5 - Run ${2} cases - release mode:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage5_errors                               >> $ERROR_LOG
@@ -846,7 +846,7 @@ run_verification_cases_release()
 #   echo 'Running FDS thread checking verification cases:' >> $OUTPUT_DIR/stage5
    cd ../Thread_Check
    echo ./inspection.sh -p 6 -q $QUEUE  inspector_test.fds >> $OUTPUT_DIR/stage5i 2>&1
-        ./inspection.sh -p 6 -q $QUEUE  inspector_test.fds >> $OUTPUT_DIR/stage5i 2>&1
+#        ./inspection.sh -p 6 -q $QUEUE  inspector_test.fds >> $OUTPUT_DIR/stage5i 2>&1
    echo ""                                                 >> $OUTPUT_DIR/stage5i 2>&1
 
    cd ../scripts
@@ -2039,11 +2039,12 @@ if [[ "$CLONE_REPOS" == "" ]]; then
 fi
 
 #*** update repos
-
+  UPDATING=
   if [[ "$UPDATEREPO" == "1" ]] ; then
-    echo Updating
 # we are not cloning so update
     if [[ "$CLONE_REPOS" == "" ]]; then
+      UPDATING=1
+      echo Updating
       update_repo fds $FDSBRANCH || exit 1
       update_repo smv $SMVBRANCH || exit 1
       update_repo fig master || exit 1
@@ -2052,11 +2053,14 @@ fi
     fi
 # we are not cloning fig, out and exp so update them
     if [[ "$CLONE_REPOS" != "" ]] && [[ "$CLONE_FDSSMV" != "" ]]; then
+      UPDATING=1
+      echo Updating
       update_repo fig master || exit 1
       update_repo out master || exit 1
       update_repo exp master || exit 1
     fi
-  else
+  fi
+  if [ "$UPDATING" == "" ]; then
     echo Repos not updated
   fi
 
@@ -2073,7 +2077,7 @@ if [ "$BUILD_ONLY" == "1" ]; then
   CHECK_LINES=
 fi
 
-# turn off line ending checking for now
+# turn off dos line checking temporarily
 CHECK_LINES=
 
 if [ "$CHECK_LINES" == "1" ]; then
