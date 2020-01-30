@@ -30,6 +30,11 @@ if "%have_casename%" == "1" goto skip_casename_test
   exit /b
 :skip_casename_test
 
+if NOT "x%IN_CMDFDS%" == "x" goto skip_NO_IN_CMDFDS
+  echo ***warning: not using the CMDfds command shell to run fds
+  pause
+:skip_NO_IN_CMDFDS
+
 set ECHO=
 if "%show_only%" == "1" set ECHO=echo
 %ECHO% mpiexec -localonly -n %n_mpi% -env OMP_NUM_THREADS %n_openmp% fds %casename%
