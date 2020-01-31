@@ -19,6 +19,9 @@ set smvrepo=%CD%
 cd ..\fds
 set fdsrepo=%CD%
 
+cd ..\bot
+set botrepo=%CD%
+
 cd %smvrepo%\Source
 echo ***cleaning %smvrepo%\Source
 git clean -dxf  1>> %clean_log% 2>&1
@@ -37,7 +40,8 @@ echo.
 git clean -dxf  1>> %clean_log% 2>&1
 
 :: setup compiler
-call %smvrepo%\Utilities\Scripts\setup_intel_compilers.bat 1>> %compile_log% 2>&1
+cd %CURDIR%
+call setup_intel_compilers.bat 1>> %compile_log% 2>&1
 timeout /t 30 > Nul
 
 :: build fds apps
