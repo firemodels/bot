@@ -14,6 +14,7 @@ IF "%SETUP_IFORT_COMPILER_64%"=="1" GOTO envexist
   IF NOT DEFINED IFORT_COMPILER (
     echo "*** Error: Intel IFORT_COMPILER environment variable not defined."
   )
+  set I_MPI_ROOT_SAVE=%I_MPI_ROOT%
   IF DEFINED IFORT_COMPILER (
     echo Setting up Fortran compiler environment
     call "%IFORT_COMPILER%\bin\ifortvars" intel64
@@ -31,6 +32,7 @@ IF "%SETUP_IFORT_COMPILER_64%"=="1" GOTO envexist
     call "%ICPP_COMPILER%\bin\iclvars" intel64
   )
 
+  set I_MPI_ROOT=%I_MPI_ROOT_SAVE%
   IF NOT DEFINED I_MPI_ROOT (
     echo "*** Error: Intel MPI environment variable, I_MPI_ROOT, not defined."
     echo "    Intel MPI development environment probably not installed."
