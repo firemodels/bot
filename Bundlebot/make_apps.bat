@@ -19,6 +19,9 @@ set smvrepo=%CD%
 cd ..\fds
 set fdsrepo=%CD%
 
+cd ..\bot
+set botrepo=%CD%
+
 cd %smvrepo%\Source
 echo ***cleaning %smvrepo%\Source
 git clean -dxf  1>> %clean_log% 2>&1
@@ -37,7 +40,14 @@ echo.
 git clean -dxf  1>> %clean_log% 2>&1
 
 :: setup compiler
-call %fdsrepo%\Build\Scripts\setup_intel_compilers.bat 1>> %compile_log% 2>&1cd 
+cd %CURDIR%
+call setup_intel_compilers.bat 1>> %compile_log% 2>&1
+timeout /t 30 > Nul
+
+:: build fds apps
+call :BUILDUTIL fds2ascii intel_win_64 win_64
+call :BUILDUTIL test_mpi  impi_intel_win
+call :BUILDFDS
 
 :: build smokeview libraries and apps
 call :BUILDLIB
@@ -52,10 +62,10 @@ call :BUILD     sh2bat
 call :BUILD     get_time
 call :BUILDSMV
 
-:: build fds apps
-call :BUILDUTIL fds2ascii intel_win_64 win_64
-call :BUILDUTIL test_mpi  impi_intel_win
-call :BUILDFDS
+:: verify fds apps were built
+call :CHECK_BUILDUTIL fds2ascii intel_win_64 _win_64
+call :CHECK_BUILDUTIL test_mpi  impi_intel_win
+call :CHECK_BUILDFDS
 
 :: verify smokeview apps were built
 call :CHECK_BUILD     background
@@ -68,11 +78,6 @@ call :CHECK_BUILD     set_path
 call :CHECK_BUILD     sh2bat
 call :CHECK_BUILD     get_time
 call :CHECK_BUILDSMV
-
-:: verify fds apps were built
-call :CHECK_BUILDUTIL fds2ascii intel_win_64 _win_64
-call :CHECK_BUILDUTIL test_mpi  impi_intel_win
-call :CHECK_BUILDFDS
 
 echo.
 echo ***build complete
