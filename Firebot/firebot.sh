@@ -1672,7 +1672,8 @@ ERROR_LOG=$OUTPUT_DIR/errors
 VALIDATION_ERROR_LOG=$OUTPUT_DIR/validation_errors
 WARNING_LOG=$OUTPUT_DIR/warnings
 NEWGUIDE_DIR=$OUTPUT_DIR/Newest_Guides
-MANUAL_DIR=$HOME/.firebot/Manuals
+MANUALS_DIR=$HOME/.firebot/Manuals
+MANUALS_LATEST_DIR=$HOME/.firebot/Manuals_latest
 EMAIL_LIST=$HOME/.firebot/firebot_email_list.sh
 CRLF_WARNINGS=$OUTPUT_DIR/stage1_crlf_warnings
 
@@ -2237,9 +2238,15 @@ if [[ "$BUILD_ONLY" == "" ]]; then
     make_fds_validation_guide
     make_fds_Config_management_plan
     get_firebot_success
+
+# copy repo manuals to Manualslatest directory whether firebot passes or fails
+    rm -rf $MANUALS_LATEST_DIR
+    cp -r $fdsrepo/Manuals $MANUALS_LATEST_DIR
     if [[ "$firebot_success" == "1" ]] ; then
-      rm -rf $MANUAL_DIR
-      cp -r $fdsrepo/Manuals $MANUAL_DIR
+
+# copy repo manuals to Manuals directory only if firebot
+      rm -rf $MANUALS_DIR
+      cp -r $fdsrepo/Manuals $MANUALS_DIR
 
       cp $LATESTAPPS_DIR/FDS_REVISION $PUBS_DIR/FDS_REVISION
       copy_fds_user_guide

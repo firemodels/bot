@@ -91,7 +91,7 @@ goto eof
 
   set repo_dir=%FMROOT%\%repo_out%
   if "%erase_repos%" == "1" (
-    if exist %repo_dir% echo erasing %repo_dir%
+    if exist %repo_dir% echo deleting %repo_dir%
     if exist %repo_dir% rmdir /S /Q %repo_dir%
   )
   
