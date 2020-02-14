@@ -29,7 +29,6 @@ else
 fi
 echo "-M - make movies"
 echo "-P - remove run status (PID) file"
-echo "-Q - use qfds.sh from the bot repo. This option can only be used with the -R option."
 echo "-U - upload guides"
 echo "-w directory - web directory containing summary pages"
 echo ""
@@ -190,7 +189,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'abBcd:Dfg:G:hHI:JkLm:MPq:Qr:R:TuUvw:x:y:' OPTION
+while getopts 'abBcd:Dfg:G:hHI:JkLm:MPq:r:R:TuUvw:x:y:' OPTION
 do
 case $OPTION  in
   a)
@@ -246,9 +245,6 @@ case $OPTION  in
    ;;
   q)
    QUEUE="$OPTARG"
-   ;;
-  Q)
-   USE_BOT_QFDS="-Q"
    ;;
   R)
    CLONE_REPOS="$OPTARG"
@@ -428,7 +424,7 @@ BRANCH="-b $BRANCH"
 #*** run smokebot
 
 touch $smokebot_pid
-$ECHO ./$botscript $SIZE $BRANCH $FDS_REV $SMV_REV $CLONE_REPOS $CLONE_FDSSMV $USE_BOT_QFDS $RUNAUTO $INTEL $BUILD_ONLY $COMPILER $SMOKEBOT_LITE $CLEANREPO $WEB_DIR $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $SIZE $BRANCH $FDS_REV $SMV_REV $CLONE_REPOS $CLONE_FDSSMV $RUNAUTO $INTEL $BUILD_ONLY $COMPILER $SMOKEBOT_LITE $CLEANREPO $WEB_DIR $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi

@@ -1524,13 +1524,12 @@ CLONE_REPOS=
 CLONE_FDSSMV=
 FDS_REV=origin/master
 SMV_REV=origin/master
-USE_BOT_QFDS=
 CHECKOUT=
 compile_errors=
 
 #*** parse command line options
 
-while getopts 'ab:BcI:JLm:Mo:q:Qr:R:TuU:x:y:w:' OPTION
+while getopts 'ab:BcI:JLm:Mo:q:r:R:TuU:x:y:w:' OPTION
 do
 case $OPTION in
   a)
@@ -1574,9 +1573,6 @@ case $OPTION in
   q)
    SMOKEBOT_QUEUE="$OPTARG"
    ;;
-  Q)
-   USE_BOT_QFDS="1"
-   ;;
   R)
    CLONE_REPOS="$OPTARG"
    ;;
@@ -1604,13 +1600,7 @@ esac
 done
 shift $(($OPTIND-1))
 
-if [ "$CLONE_REPOS" == "" ]; then
-  if [ "$USE_BOT_QFDS" != "" ]; then
-    echo "***error: you may only use the bot repo version of qfds.sh (-Q option) if you clone repos (-R option)"
-    echo "          using fds repo version of qfds.sh"
-    USE_BOT_QFDS=
-  fi
-else
+if [ "$CLONE_REPOS" != "" ]; then
   if [ "$CLONE_REPOS" != "release" ]; then
     if [ "$CLONE_REPOS" != "test" ]; then
       CLONE_REPO="master"
@@ -1949,12 +1939,6 @@ git rev-parse --short HEAD > $LATESTAPPS_DIR/SMV_HASH
 
 cp $LATESTAPPS_DIR/SMV_REVISION $LATESTPUBS_DIR/SMV_REVISION
 cp $LATESTAPPS_DIR/SMV_HASH     $LATESTPUBS_DIR/SMV_HASH
-
-if [[ "$CLONE_REPOS" != "" ]]; then
-  if [ "$USE_BOT_QFDS" != "" ]; then
-    cp $botrepo/Scripts/qfds.sh $fdsrepo/Utilities/Scripts/qfds.sh
-  fi
-fi
 
 PRELIM_end=`GET_TIME`
 DIFF_PRELIM=`GET_DURATION $PRELIM_beg $PRELIM_end`
