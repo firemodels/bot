@@ -528,8 +528,8 @@ wait_verification_cases_debug_end()
         sleep 30
      done
    else
-     while [[ `qstat -a | awk '{print $2 $4}' | grep $(whoami) | grep $JOBPREFIX` != '' ]]; do
-        JOBS_REMAINING=`qstat -a | awk '{print $2 $4}' | grep $(whoami) | grep $JOBPREFIX | wc -l`
+     while           [[`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$'` != '' ]]; do
+        JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$' | wc -l`
         echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage3a
         TIME_LIMIT_STAGE="3"
         check_time_limit
@@ -744,38 +744,6 @@ is_file_installed()
 }
 
 #---------------------------------------------
-#                   compare_fds_bot_common_files
-#---------------------------------------------
-
-compare_fds_bot_common_files()
-{
-   fdsdir=$1
-   botdir=$2
-   file=$3
-   fds_file=$fdsrepo/$fdsdir/$file
-   bot_file=$botrepo/$botdir/$file
-   notexist=
-   if ! [ -e $fds_file ]; then
-     echo "Warnings Stage 2d" >> $WARNING_LOG
-     echo "***warning: The fds repo file, $fds_file, does not exist" >> $WARNING_LOG
-     notexist=1
-   fi
-   if ! [ -e $bot_file ]; then
-     echo "Warnings Stage 2d" >> $WARNING_LOG
-     echo "***warning: The bot repo file, $bot_file, does not exist" >> $WARNING_LOG
-     notexist=1
-   fi
-   if [ "$notexist" == "" ]; then
-     ndiffs=`diff $fds_file $bot_file | wc -l`
-     if [ $ndiffs -gt 0 ]; then
-       echo "" >> $WARNING_LOG
-       echo "Warnings Stage 2d" >> $WARNING_LOG
-       echo "***warning: The fds and bot versions of $file are out of synch" >> $WARNING_LOG
-     fi
-   fi
-}
-
-#---------------------------------------------
 #                   compare_fds_smv_common_files
 #---------------------------------------------
 
@@ -822,7 +790,6 @@ check_common_files()
     compare_fds_smv_common_files Manuals/Bibliography Manuals/Bibliography BIBLIO_FDS_refs.tex
     compare_fds_smv_common_files Manuals/Bibliography Manuals/Bibliography authors.tex
     compare_fds_smv_common_files Manuals/Bibliography Manuals/Bibliography disclaimer.tex
-    compare_fds_bot_common_files Utilities/Scripts    Scripts              qfds.sh
   fi
 }
 
@@ -885,8 +852,8 @@ wait_verification_cases_release_end()
         sleep 60
      done
    else
-     while [[ `qstat -a | awk '{print $2 $4}' | grep $(whoami) | grep $JOBPREFIX` != '' ]]; do
-        JOBS_REMAINING=`qstat -a | awk '{print $2 $4}' | grep $(whoami) | grep $JOBPREFIX | wc -l`
+     while           [[`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$'` != '' ]]; do
+        JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$' | wc -l`
         echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage3b
         TIME_LIMIT_STAGE="5"
         check_time_limit
