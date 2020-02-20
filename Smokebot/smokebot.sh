@@ -1954,48 +1954,20 @@ if [ "$BUILD_ONLY" == "" ]; then
     compile_fds_mpi_gnu_db
     check_compile_fds_mpi_gnu_db
   fi
+  if [ "$SMOKEBOT_LITE" == "" ]; then
+     compile_fds_mpi
+     check_compile_fds_mpi
+  fi
+
+### Stage 2 build smokeview ###
+  compile_smv_db
+  check_compile_smv_db
 fi
 
 ### Stage 2 build smokeview ###
 compile_smv_utilities
 check_smv_utilities
 check_common_files
-
-### report errors right away if they are found
-
-if [ "$compile_errors" == "1" ]; then
-  email_compile_errors
-fi
-
-if [[ $stage1b_fdsdb_success && "$BUILD_ONLY" == "" ]] ; then
-   run_verification_cases_debug
-fi
-
-if [ "$SMOKEBOT_LITE" == "" ]; then
-if [[ $stage1b_fdsdb_success ]] ; then
-if [ "$BUILD_ONLY" == "" ]; then
-   compile_fds_mpi
-   check_compile_fds_mpi
-fi
-fi
-fi
-if [[ $stage1b_fdsdb_success ]] ; then
-   check_verification_cases_debug
-fi
-RUNCASES_beg=`GET_TIME`
-if [ "$BUILD_ONLY" == "" ]; then
-if [ "$SMOKEBOT_LITE" == "" ]; then
-  if [[ $stage1c_fdsrel_success ]] ; then
-     run_verification_cases_release
-  fi
-fi
-fi
-
-### Stage 2 build smokeview ###
-if [ "$BUILD_ONLY" == "" ]; then
-compile_smv_db
-check_compile_smv_db
-fi
 
 if [ "$SMOKEBOT_LITE" == "" ]; then
   compile_smv
@@ -2005,6 +1977,28 @@ fi
 BUILDSOFTWARE_end=`GET_TIME`
 DIFF_BUILDSOFTWARE=`GET_DURATION $BUILDSOFTWARE_beg $BUILDSOFTWARE_end`
 echo "Build Software: $DIFF_BUILDSOFTWARE" >> $STAGE_STATUS
+
+### report errors right away if they are found
+
+if [ "$compile_errors" == "1" ]; then
+  email_compile_errors
+fi
+
+RUNCASES_beg=`GET_TIME`
+if [[ $stage1b_fdsdb_success && "$BUILD_ONLY" == "" ]] ; then
+   run_verification_cases_debug
+fi
+if [[ $stage1b_fdsdb_success ]] ; then
+   check_verification_cases_debug
+fi
+if [ "$BUILD_ONLY" == "" ]; then
+if [ "$SMOKEBOT_LITE" == "" ]; then
+  if [[ $stage1c_fdsrel_success ]] ; then
+     run_verification_cases_release
+  fi
+fi
+fi
+
 
 ### Stage 3 run verification cases ###
 
