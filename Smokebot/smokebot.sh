@@ -516,35 +516,6 @@ check_compile_fds_mpi_gnu_dbORIG()
    fi
 }
 
-
-#---------------------------------------------
-#                   wait_verification_cases_debug_end
-#---------------------------------------------
-
-wait_verification_cases_debug_end()
-{
-   # Scans qstat and waits for verification cases to end
-   if [[ "$SMOKEBOT_QUEUE" == "none" ]]
-   then
-     while [[          `ps -u $USER -f | fgrep .fds | grep -v smokebot | grep -v grep` != '' ]]; do
-        JOBS_REMAINING=`ps -u $USER -f | fgrep .fds | grep -v smokebot | grep -v grep | wc -l`
-
-        echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage3a
-        TIME_LIMIT_STAGE="3"
-        check_time_limit
-        sleep 30
-     done
-   else
-     while           [[`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$'` != '' ]]; do
-        JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$' | wc -l`
-        echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage3a
-        TIME_LIMIT_STAGE="3"
-        check_time_limit
-        sleep 30
-     done
-   fi
-}
-
 #---------------------------------------------
 #                   run_verification_cases_debug
 #---------------------------------------------
@@ -582,7 +553,8 @@ run_verification_cases_debug()
 check_verification_cases_debug()
 {
    # Wait for SMV verification cases to end
-   wait_verification_cases_debug_end
+   echo "***waiting for debug verification cases" >> $HOME/smokebot.log
+   wait_verification_cases_end stage3a 3a
 
    # Scan and report any errors in FDS verification cases
    cd $smvrepo/Verification
@@ -842,27 +814,33 @@ check_smv_utilities()
 }
 
 #---------------------------------------------
-#                   wait_verification_cases_release_end
+#                   wait_verification_cases_end
 #---------------------------------------------
 
-wait_verification_cases_release_end()
+wait_verification_cases_end()
 {
+   stage=$1
+   stagelimit=$2
+   echo "wait stage=$stage" >> $HOME/smokebot.log
    # Scans qstat and waits for verification cases to end
    if [[ "$SMOKEBOT_QUEUE" == "none" ]]
    then
      while [[          `ps -u $USER -f | fgrep .fds | grep -v smokebot | grep -v grep` != '' ]]; do
         JOBS_REMAINING=`ps -u $USER -f | fgrep .fds | grep -v smokebot | grep -v grep | wc -l`
 
-        echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage3b
-        TIME_LIMIT_STAGE="5"
+        echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/$stage
+        TIME_LIMIT_STAGE=$stagelimit
         check_time_limit
         sleep 60
      done
    else
+     JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$' | wc -l`
+     echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $HOME/smokebot.log
      while           [[`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$'` != '' ]]; do
         JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$' | wc -l`
-        echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage3b
-        TIME_LIMIT_STAGE="5"
+        echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/$stage
+        echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $HOME/smokebot.log
+        TIME_LIMIT_STAGE=$stagelimit
         check_time_limit
         sleep 60
      done
@@ -900,7 +878,7 @@ run_verification_cases_release()
 check_verification_cases_release()
 {
    # Wait for all verification cases to end
-   wait_verification_cases_release_end
+   wait_verification_cases_end stage3b 3b
 
    # Scan and report any errors in FDS verification cases
    cd $smvrepo/Verification
@@ -1974,28 +1952,22 @@ fi
 #stage3a
 RUNCASES_beg=`GET_TIME`
 echo "RUNCASES_beg=$RUNCASES_beg" >> $HOME/smokebot.log
-if [[ $stage1b_fdsdb_success && "$BUILD_ONLY" == "" ]] ; then
-   run_verification_cases_debug
-fi
-if [[ $stage1b_fdsdb_success ]] ; then
-   check_verification_cases_debug
-fi
-#stage3b
 if [ "$BUILD_ONLY" == "" ]; then
-if [ "$SMOKEBOT_LITE" == "" ]; then
-  if [[ $stage1c_fdsrel_success ]] ; then
-     run_verification_cases_release
+  if [ $stage1b_fdsdb_success ]; then
+     run_verification_cases_debug
+     echo "*** checking debug cases" >> $HOME/smokebot.log
+     check_verification_cases_debug
   fi
-fi
+
+#stage3b
+  if [ "$SMOKEBOT_LITE" == "" ]; then
+    if [[ $stage1c_fdsrel_success ]] ; then
+      run_verification_cases_release
+      check_verification_cases_release
+    fi
+  fi
 fi
 
-if [ "$BUILD_ONLY" == "" ]; then
-if [ "$SMOKEBOT_LITE" == "" ]; then
-  if [[ $stage1c_fdsrel_success ]] ; then
-     check_verification_cases_release
-  fi
-fi
-fi
 RUNCASES_end=`GET_TIME`
 echo "RUNCASES_end=$RUNCASES_end" >> $HOME/smokebot.log
 DIFF_RUNCASES=`GET_DURATION $RUNCASES_beg $RUNCASES_end`
