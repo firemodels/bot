@@ -854,7 +854,6 @@ run_verification_cases_release()
    #  ======================
 
    # Remove all .stop and .err files from Verification directories (recursively)
-   echo "Verification cases"
    if [ "$CLEANREPO" == "1" ]; then
      echo "   cleaning"
      cd $smvrepo/Verification
