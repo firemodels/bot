@@ -413,7 +413,8 @@ check_update_repo()
 compile_fds_mpi_db()
 {
    # Clean and compile mpi FDS debug
-   echo "   debug FDS"
+   echo "   FDS"
+   echo "      debug"
    cd $fdsrepo/Build/${INTEL}mpi_${COMPILER}_${platform}_64$DB
    rm -f fds_${INTEL}mpi_${COMPILER}_${platform}_64$DB
    make --makefile ../makefile clean &> /dev/null
@@ -468,7 +469,7 @@ compile_fds_mpi_gnu_db()
        compile_gnu=1
        module unload $OPENMPI_INTEL
        module load $OPENMPI_GNU
-       echo "   MPI gfortran debug"
+       echo "      MPI gfortran debug"
        cd $fdsrepo/Build/mpi_gnu_${platform}_64$DB
        make -f ../makefile clean &> /dev/null
        ./make_fds.sh &> $OUTPUT_DIR/stage1d
@@ -553,7 +554,6 @@ run_verification_cases_debug()
 check_verification_cases_debug()
 {
    # Wait for SMV verification cases to end
-   echo "***waiting for debug verification cases" >> $HOME/smokebot.log
    wait_verification_cases_end stage3a 3a
 
    # Scan and report any errors in FDS verification cases
@@ -595,7 +595,7 @@ check_verification_cases_debug()
 compile_fds_mpi()
 {
    # Clean and compile FDS
-   echo "Building release FDS"
+   echo "      release"
    cd $fdsrepo/Build/${INTEL}mpi_${COMPILER}_${platform}_64
    rm -f fds_${INTEL}mpi_${COMPILER}_${platform}_64
    make --makefile ../makefile clean &> /dev/null
@@ -640,7 +640,6 @@ check_compile_fds_mpi()
 
 compile_smv_utilities()
 {
-   echo "Building"
    echo "   smokeview utilities"
    echo "" > $OUTPUT_DIR/stage2c
    if [ "$haveCC" == "1" ] ; then
@@ -821,7 +820,6 @@ wait_verification_cases_end()
 {
    stage=$1
    stagelimit=$2
-   echo "wait stage=$stage" >> $HOME/smokebot.log
    # Scans qstat and waits for verification cases to end
    if [[ "$SMOKEBOT_QUEUE" == "none" ]]
    then
@@ -835,11 +833,9 @@ wait_verification_cases_end()
      done
    else
      JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$' | wc -l`
-     echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $HOME/smokebot.log
      while           [[ `qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$'` != '' ]]; do
         JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$' | wc -l`
         echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/$stage
-        echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $HOME/smokebot.log
         TIME_LIMIT_STAGE=$stagelimit
         check_time_limit
         sleep 60
@@ -1951,11 +1947,9 @@ fi
 
 #stage3a
 RUNCASES_beg=`GET_TIME`
-echo "RUNCASES_beg=$RUNCASES_beg" >> $HOME/smokebot.log
 if [ "$BUILD_ONLY" == "" ]; then
   if [ $stage1b_fdsdb_success ]; then
      run_verification_cases_debug
-     echo "*** checking debug cases" >> $HOME/smokebot.log
      check_verification_cases_debug
   fi
 
@@ -1969,7 +1963,6 @@ if [ "$BUILD_ONLY" == "" ]; then
 fi
 
 RUNCASES_end=`GET_TIME`
-echo "RUNCASES_end=$RUNCASES_end" >> $HOME/smokebot.log
 DIFF_RUNCASES=`GET_DURATION $RUNCASES_beg $RUNCASES_end`
 echo "Run cases: $DIFF_RUNCASES" >> $STAGE_STATUS
 
@@ -1978,7 +1971,6 @@ echo "Run cases: $DIFF_RUNCASES" >> $STAGE_STATUS
 ### Stage 4a generate images
 
 MAKEPICTURES_beg=`GET_TIME`
-echo "MAKEPICTURES_beg=$MAKEPICTURES_beg" >> $HOME/smokebot.log
 if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
   if [[ $stage1c_fdsrel_success && $stage2b_smv_success ]] ; then
     make_smv_pictures
@@ -1986,7 +1978,6 @@ if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
   fi
 fi
 MAKEPICTURES_end=`GET_TIME`
-echo "MAKEPICTURES_end=$MAKEPICTURES_end" >> $HOME/smokebot.log
 DIFF_MAKEPICTURES=`GET_DURATION $MAKEPICTURES_beg $MAKEPICTURES_end`
 echo "Make pictures: $DIFF_MAKEPICTURES" >> $STAGE_STATUS
 

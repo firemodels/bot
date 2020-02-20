@@ -178,7 +178,6 @@ FIREBOT_HOST=
 FIREBOT_HOME=
 WEB_DIR=
 USE_BOT_QFDS=
-echo "" > $HOME/smokebot.log
 
 #*** check to see if a queing system is available
 
