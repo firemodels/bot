@@ -1973,6 +1973,7 @@ fi
 
 #stage3a
 RUNCASES_beg=`GET_TIME`
+echo "RUNCASES_beg=$RUNCASES_beg" >> $HOME/smokebot.log
 if [[ $stage1b_fdsdb_success && "$BUILD_ONLY" == "" ]] ; then
    run_verification_cases_debug
 fi
@@ -1996,6 +1997,7 @@ if [ "$SMOKEBOT_LITE" == "" ]; then
 fi
 fi
 RUNCASES_end=`GET_TIME`
+echo "RUNCASES_end=$RUNCASES_end" >> $HOME/smokebot.log
 DIFF_RUNCASES=`GET_DURATION $RUNCASES_beg $RUNCASES_end`
 echo "Run cases: $DIFF_RUNCASES" >> $STAGE_STATUS
 
@@ -2004,6 +2006,7 @@ echo "Run cases: $DIFF_RUNCASES" >> $STAGE_STATUS
 ### Stage 4a generate images
 
 MAKEPICTURES_beg=`GET_TIME`
+echo "MAKEPICTURES_beg=$MAKEPICTURES_beg" >> $HOME/smokebot.log
 if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
   if [[ $stage1c_fdsrel_success && $stage2b_smv_success ]] ; then
     make_smv_pictures
@@ -2011,6 +2014,7 @@ if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
   fi
 fi
 MAKEPICTURES_end=`GET_TIME`
+echo "MAKEPICTURES_end=$MAKEPICTURES_end" >> $HOME/smokebot.log
 DIFF_MAKEPICTURES=`GET_DURATION $MAKEPICTURES_beg $MAKEPICTURES_end`
 echo "Make pictures: $DIFF_MAKEPICTURES" >> $STAGE_STATUS
 
