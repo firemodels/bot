@@ -2004,9 +2004,9 @@ fi
 
 #----------------------------- Stage 5 generate manuals     --------------------------------------
 
-MAKEGUIDES_beg=`GET_TIME
+MAKEGUIDES_beg=`GET_TIME`
 if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
-  if [[ $stage1c_fdsrel_success && $stage4b_smvpics_success ]] ; then
+  if [[ $stage1c_fdsrel_success ]] ; then
      echo Making guides
      if [ "$YOPT" == "" ]; then
        echo "   geometry notes"
