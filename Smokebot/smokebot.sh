@@ -1309,29 +1309,30 @@ email_build_status()
   echo $THIS_FDS_FAILED>$FDS_STATUS_FILE
   stop_time=`date`
   IFORT_VERSION=`ifort -v 2>&1`
-  echo "----------------------------------------------" > $TIME_LOG
-  echo "                host: $hostname " >> $TIME_LOG
-  echo "                  OS: $platform2" >> $TIME_LOG
+  echo "----------------------------------------------"       > $TIME_LOG
+  echo "                host: $hostname "                    >> $TIME_LOG
+  echo "                  OS: $platform2"                    >> $TIME_LOG
   echo "                repo: $repo" >> $TIME_LOG
-  echo "               queue: $SMOKEBOT_QUEUE" >> $TIME_LOG
-  echo "  fds version/branch: $FDS_REVISION/$FDSBRANCH" >> $TIME_LOG
-  echo "  smv version/branch: $SMV_REVISION/$SMVBRANCH" >> $TIME_LOG
-  echo "cfast version/branch: $CFAST_REVISION/$CFASTBRANCH" >> $TIME_LOG
+  echo "               queue: $SMOKEBOT_QUEUE"               >> $TIME_LOG
+  echo "  fds version/branch: $FDS_REVISION/$FDSBRANCH"      >> $TIME_LOG
+  echo "  smv version/branch: $SMV_REVISION/$SMVBRANCH"      >> $TIME_LOG
+  echo "cfast version/branch: $CFAST_REVISION/$CFASTBRANCH"  >> $TIME_LOG
   if [ "$IFORT_VERSION" != "" ]; then
-    echo "              Fortran: $IFORT_VERSION " >> $TIME_LOG
+    echo "              Fortran: $IFORT_VERSION "            >> $TIME_LOG
   fi
-  echo "          start time: $start_time " >> $TIME_LOG
-  echo "           stop time: $stop_time " >> $TIME_LOG
-  echo "               setup: $DIFF_PRELIM" >> $TIME_LOG
-  echo "      build software: $DIFF_BUILDSOFTWARE" >> $TIME_LOG
-  echo "           run cases: $DIFF_RUNCASES" >> $TIME_LOG
-  echo "       make pictures: $DIFF_MAKEPICTURES" >> $TIME_LOG
+  echo "          start time: $start_time "                  >> $TIME_LOG
+  echo "           stop time: $stop_time "                   >> $TIME_LOG
+  echo "               setup: $DIFF_PRELIM"                  >> $TIME_LOG
+  echo "      build software: $DIFF_BUILDSOFTWARE"           >> $TIME_LOG
+  echo "    run cases(debug): $DIFF_RUN_DEBUG_CASES"         >> $TIME_LOG
+  echo "  run cases(release): $DIFF_RUN_RELEASE_CASES"       >> $TIME_LOG
+  echo "       make pictures: $DIFF_MAKEPICTURES"            >> $TIME_LOG
   if [ "$MAKEMOVIES" == "1" ]; then
-    echo "         make movies: $DIFF_MAKEMOVIES" >> $TIME_LOG
+    echo "         make movies: $DIFF_MAKEMOVIES"            >> $TIME_LOG
   fi
-  echo "         make guides: $DIFF_MAKEGUIDES" >> $TIME_LOG
-  echo "               total: $DIFF_SCRIPT_TIME" >> $TIME_LOG
-  echo "   benchmark time(s): $TOTAL_SMV_TIMES" >> $TIME_LOG
+  echo "         make guides: $DIFF_MAKEGUIDES"              >> $TIME_LOG
+  echo "               total: $DIFF_SCRIPT_TIME"             >> $TIME_LOG
+  echo "   benchmark time(s): $TOTAL_SMV_TIMES"              >> $TIME_LOG
   DISPLAY_FDS_REVISION=
   DISPLAY_SMV_REVISION=
   if [ "$RUNAUTO" == "y" ]; then
@@ -1955,7 +1956,7 @@ if [ "$BUILD_ONLY" == "" ]; then
   fi
   RUN_DEBUG_CASES_end=`GET_TIME`
   DIFF_RUN_DEBUG_CASES=`GET_DURATION $RUN_DEBUG_CASES_beg $RUN_DEBUG_CASES_end`
-  echo "Run cases: $DIFF_RUN_DEBUG_CASES" >> $STAGE_STATUS
+  echo "Run cases(debug): $DIFF_RUN_DEBUG_CASES" >> $STAGE_STATUS
 
   RUN_RELEASE_CASES_beg=`GET_TIME`
 #stage3b
@@ -1969,7 +1970,7 @@ fi
 
 RUN_RELEASE_CASES_end=`GET_TIME`
 DIFF_RUN_RELEASE_CASES=`GET_DURATION $RUN_RELEASE_CASES_beg $RUN_RELEASE_CASES_end`
-echo "Run cases: $DIFF_RUN_RELEASE_CASES" >> $STAGE_STATUS
+echo "Run cases(release): $DIFF_RUN_RELEASE_CASES" >> $STAGE_STATUS
 
 #----------------------------- Stage 4 generate images and movies     --------------------------------------
 
