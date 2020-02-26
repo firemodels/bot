@@ -1475,6 +1475,10 @@ SMV_REV=origin/master
 CHECKOUT=
 compile_errors=
 
+#*** save pid so -k option (kill smokebot) may be used lateer
+
+echo $$ > $PID_FILE
+
 #*** parse command line options
 
 while getopts 'ab:BcI:JLm:Mo:q:r:R:TuU:x:y:w:' OPTION
@@ -1661,10 +1665,6 @@ BRANCHAPPS_DIR=$BRANCH_DIR/apps
 MKDIR $BRANCH_DIR
 MKDIR $BRANCHPUBS_DIR
 MKDIR $BRANCHAPPS_DIR
-
-#*** save pid so -k option (kill smokebot) may be used lateer
-
-echo $$ > $PID_FILE
 
 # if -a option is invoked, only proceed running smokebot if the
 # smokeview or FDS source has changed
