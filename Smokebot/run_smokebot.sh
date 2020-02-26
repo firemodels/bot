@@ -117,15 +117,15 @@ CD_REPO ()
 
 LIST_DESCENDANTS ()
 {
-#  local children=$(ps -o pid= --ppid "$1")
-  local children=$(pgrep -P $1)
+  if [ "$1" != "" ]; then
+    local children=$(pgrep -P $1)
 
-  for pid in $children
-  do
-    LIST_DESCENDANTS $pid
-  done
-
-  echo "$children"
+    for pid in $children
+    do
+      LIST_DESCENDANTS $pid
+    done
+    echo "$children"
+  fi
 }
 
 #VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
@@ -354,6 +354,7 @@ if [ "$KILL_SMOKEBOT" == "1" ]; then
   if [ -e $smokebot_pid ]; then
     PID=`head -1 $smokebot_pid`
 
+    echo killing smokebot processes descended from: $PID
     JOBS=$(LIST_DESCENDANTS $PID)
     if [ "$JOBS" != "" ]; then
       echo killing processes invoked by smokebot: $JOBS
