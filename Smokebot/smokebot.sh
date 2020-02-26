@@ -832,7 +832,6 @@ wait_verification_cases_end()
         sleep 60
      done
    else
-     JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami)     | grep $JOBPREFIX | grep -v 'C$' | wc -l`
      while           [[ `qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$'` != '' ]]; do
         JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami)  | grep $JOBPREFIX | grep -v 'C$' | wc -l`
         echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/$stage
@@ -1059,7 +1058,7 @@ check_smv_pictures()
 make_smv_movies()
 {
    cd $smvrepo/Verification
-   scripts/Make_SMV_Movies.sh -q $SMOKEBOT_QUEUE 2>&1  &> $OUTPUT_DIR/stage4c
+   scripts/Make_SMV_Movies.sh -q $SMOKEBOT_QUEUE 2>&1  &> $OUTPUT_DIR/stage4b
 }
 
 #---------------------------------------------
@@ -1089,7 +1088,7 @@ check_smv_movies()
       :
    else
       echo "Warnings from Stage 4b - Make SMV movies (release mode):" >> $WARNING_LOG
-      grep -I -E "Warning" $OUTPUT_DIR/stage4c                        >> $WARNING_LOG
+      grep -I -E "Warning" $OUTPUT_DIR/stage4b                        >> $WARNING_LOG
       echo ""                                                         >> $WARNING_LOG
    fi
 }
@@ -1475,6 +1474,10 @@ SMV_REV=origin/master
 CHECKOUT=
 compile_errors=
 
+#*** save pid so -k option (kill smokebot) may be used lateer
+
+echo $$ > $PID_FILE
+
 #*** parse command line options
 
 while getopts 'ab:BcI:JLm:Mo:q:r:R:TuU:x:y:w:' OPTION
@@ -1661,10 +1664,6 @@ BRANCHAPPS_DIR=$BRANCH_DIR/apps
 MKDIR $BRANCH_DIR
 MKDIR $BRANCHPUBS_DIR
 MKDIR $BRANCHAPPS_DIR
-
-#*** save pid so -k option (kill smokebot) may be used lateer
-
-echo $$ > $PID_FILE
 
 # if -a option is invoked, only proceed running smokebot if the
 # smokeview or FDS source has changed

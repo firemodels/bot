@@ -6,11 +6,17 @@ profile=
 
 function usage {
 option=$1
-echo "run smokeview and generate profile information"
+if [ "$platform" == "linux" ]; then
+  echo "run smokeview built with gcc/gfortran and generate profile information"
+else
+  echo "run smokeview built with gcc/gfortran"
+fi
 echo ""
 echo "Options:"
 echo "-h - display this message"
-echo "-p - only generate and view profile information"
+if [ "$platform" == "linux" ]; then
+  echo "-p - only generate and view profile information"
+fi
 echo "-r repo_root - directory in $HOME containing smv repo"
 echo "-R - assume FireModels_fork is in $HOME containing the smv repo"
 exit 0
@@ -29,7 +35,9 @@ case $OPTION in
   usage
   ;;
   p)
-  profile=1
+  if [ "$platform" == "linux" ]; then
+    profile=1
+  fi
   ;;
   r)
   repo="$OPTARG"
@@ -62,17 +70,19 @@ else
   fi
 fi
 
-have_gprof=`which gprof | wc -l ` 
-if [ "$have_gprof" == "0" ]; then
-  echo "***error: gprof not found:"
-  exit /b
-fi
 
 if [ "$profile" == "" ]; then
   $smokeview $casename
 fi
 
-gprof $smokeview > ${casename}_profile.txt
-if [ -e ${casename}_profile.txt ]; then
-  vi ${casename}_profile.txt
+if [ "$platform" == "linux" ]; then
+  have_gprof=`which gprof | wc -l ` 
+  if [ "$have_gprof" == "0" ]; then
+    echo "***error: gprof not found:"
+    exit /b
+  fi
+  gprof $smokeview > ${casename}_profile.txt
+  if [ -e ${casename}_profile.txt ]; then
+    vi ${casename}_profile.txt
+  fi
 fi
