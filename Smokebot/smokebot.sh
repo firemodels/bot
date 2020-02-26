@@ -1059,7 +1059,7 @@ check_smv_pictures()
 make_smv_movies()
 {
    cd $smvrepo/Verification
-   scripts/Make_SMV_Movies.sh -q $SMOKEBOT_QUEUE 2>&1  &> $OUTPUT_DIR/stage4c
+   scripts/Make_SMV_Movies.sh -q $SMOKEBOT_QUEUE 2>&1  &> $OUTPUT_DIR/stage4b
 }
 
 #---------------------------------------------
@@ -1089,7 +1089,7 @@ check_smv_movies()
       :
    else
       echo "Warnings from Stage 4b - Make SMV movies (release mode):" >> $WARNING_LOG
-      grep -I -E "Warning" $OUTPUT_DIR/stage4c                        >> $WARNING_LOG
+      grep -I -E "Warning" $OUTPUT_DIR/stage4b                        >> $WARNING_LOG
       echo ""                                                         >> $WARNING_LOG
    fi
 }
