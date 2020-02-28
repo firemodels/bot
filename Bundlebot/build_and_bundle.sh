@@ -17,12 +17,12 @@ if [ "`uname`" == "Darwin" ] ; then
 fi
 
 # both or neither RELEASE options must be set
-branch="-R test"
+BRANCH="-R test"
 if [ "$FDS_RELEASE" != "" ]; then
   if [ "$SMV_RELEASE" != "" ]; then
     FDS_RELEASE="-x $FDS_RELEASE"
     SMV_RELEASE="-y $SMV_RELEASE"
-    branch="-R release"
+    BRANCH="-R release"
   fi
 fi
 if [ "$FDS_RELEASE" == "" ]; then
@@ -39,4 +39,4 @@ cd ../Firebot
 ./run_firebot.sh -c -C -B -g $FIREBOT_HOST -G \~firebot $JOPT $FDS_RELEASE $SMV_RELEASE $BRANCH -T -m $MAILTO
 
 cd $curdir
-./run_bundlebot.sh -p $FIREBOT_HOST -w -g
+#./run_bundlebot.sh -p $FIREBOT_HOST -w -g
