@@ -39,4 +39,4 @@ cd ../Firebot
 ./run_firebot.sh -c -C -B -g $FIREBOT_HOST -G \~firebot $JOPT $FDS_RELEASE $SMV_RELEASE $BRANCH -T -m $MAILTO
 
 cd $curdir
-#./run_bundlebot.sh -p $FIREBOT_HOST -w -g
+./run_bundlebot.sh -p $FIREBOT_HOST -w -g
