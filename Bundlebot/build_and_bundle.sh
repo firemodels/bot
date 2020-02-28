@@ -4,6 +4,9 @@ MAILTO=$2
 FDS_RELEASE=$3
 SMV_RELEASE=$4
 
+FORCE=
+#FORCE=-f
+
 if [ "$FIREBOT_HOST" == "" ]; then
   exit 1
 fi
@@ -36,7 +39,7 @@ fi
 curdir=`pwd`
 
 cd ../Firebot
-./run_firebot.sh -c -C -B -g $FIREBOT_HOST -G \~firebot $JOPT $FDS_RELEASE $SMV_RELEASE $BRANCH -T -m $MAILTO
+./run_firebot.sh $FORCE -c -C -B -g $FIREBOT_HOST -G \~firebot $JOPT $FDS_RELEASE $SMV_RELEASE $BRANCH -T -m $MAILTO
 
 cd $curdir
-./run_bundlebot.sh -p $FIREBOT_HOST -w -g
+./run_bundlebot.sh $FORCE -p $FIREBOT_HOST -w -g
