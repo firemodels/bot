@@ -316,9 +316,11 @@ else
 fi
 if [ "$GET_HASH" != "" ]; then
   if [ "$CLONE_REPOS" == "" ]; then
-    echo "***error: The -g and -G options for specifying firebot host/home directory can only be used"
-    echo "          when cloning the repos, when the -R option is used"
-    exit 1
+    if [ "$CLONE_FDSSMV" == "" ]; then
+      echo "***error: The -g and -G options for specifying firebot host/home directory can only be used"
+      echo "          when cloning the repos, when the -R option is used"
+      exit 1
+    fi 
   fi
   FDS_HASH=`../Bundle/fds/scripts/get_hash.sh -r fds -g $FIREBOT_HOST -G $FIREBOT_HOME`
   SMV_HASH=`../Bundle/fds/scripts/get_hash.sh -r smv -g $FIREBOT_HOST -G $FIREBOT_HOME`
