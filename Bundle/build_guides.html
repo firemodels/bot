@@ -49,7 +49,11 @@ function get_figs(guide){
 <tr>
 <td>SMV guides (smokebot)</td>
 <td><button onclick="copy_guides('from_smv_linux')">==></button></td>
-<td rowspan=2 align=center>Windows<br> ~\.bundle\pubs</td>
+<td rowspan=2 align=center>
+Windows<br>
+~\.bundle\pubs<br>
+<button onclick="run_script('\\bot\\Scripts\\openguidedir.bat')">Show</button>
+</td>
 <td><button onclick="copy_guides('to_linux')">==></button></td>
 <td>Linux ~/.bundle/pubs</td>
 </tr>
