@@ -162,8 +162,18 @@ CALL :COPY  %bundle_dir%\fds\test_mpi.exe   %out_bin%\test_mpi.exe
 
 CALL :COPY  %bundle_dir%\smv\smokeview.exe  %out_smv%\smokeview.exe
 
-CALL :TOMANIFESTFDS   %out_bin%\fds.exe        fds
-CALL :TOMANIFESTSMV   %out_smv%\smokeview.exe  smokeview
+CALL :TOMANIFESTFDS   %out_bin%\fds.exe          fds
+
+set curdir=%CD%
+cd %out_bin%
+
+:: copy run-time mpi files
+mkdir mpi
+CALL :COPYDIR %in_impi%\mpi mpi
+cd %CURDIR%
+CALL :TOMANIFESTMPI   %out_bin%\mpi\mpiexec.exe  mpiexec
+
+CALL :TOMANIFESTSMV   %out_smv%\smokeview.exe    smokeview
 
 CALL :COPY  %bundle_dir%\smv\background.exe %out_bin%\background.exe
 CALL :COPY  %bundle_dir%\smv\dem2fds.exe    %out_smv%\dem2fds.exe 
@@ -190,10 +200,6 @@ CALL :COPY  %repo_root%\smv\scripts\jp2conv.bat                                %
 
 set curdir=%CD%
 cd %out_bin%
-
-:: copy run-time mpi files
-mkdir mpi
-CALL :COPYDIR %in_impi%\mpi mpi
 
 %hashfile% fds.exe        >  hash\fds_%fds_version%.exe.sha1
 %hashfile% fds2ascii.exe  >  hash\fds2ascii_%fds_version%.exe.sha1
@@ -397,6 +403,28 @@ if NOT EXIST %prog% goto else_fds
   echo %prog"                     >> %MANIFEST%
   echo ^<br^>                     >> %MANIFEST%
 :endif_fds
+exit /b
+
+::------------------------------------------------
+:TOMANIFESTMPI
+::------------------------------------------------
+
+set  prog=%1
+set  desc=%2
+
+echo ^<p^>^<hr^>^<p^>             >> %MANIFEST%
+if NOT EXIST %prog% goto else_mpi
+  echo ^<pre^>                    >> %MANIFEST%
+  echo mpiexec                    >> %MANIFEST%
+  echo.                           >> %MANIFEST%
+  %prog% --version                >> %MANIFEST% 2>&1
+  echo ^</pre^>                   >> %MANIFEST%
+  goto endif_mpi
+:else_mpi
+  echo %desc% is absent^<br^>     >> %MANIFEST%
+  echo %prog"                     >> %MANIFEST%
+  echo ^<br^>                     >> %MANIFEST%
+:endif_mpi
 exit /b
 
 ::------------------------------------------------
