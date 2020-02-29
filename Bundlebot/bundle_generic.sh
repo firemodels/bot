@@ -424,8 +424,9 @@ else
   if [ "$PLATFORM" == "OSX64" ]; then
     openmpifile=openmpi_${MPI_VERSION}_osx_64_${INTEL_COMP_VERSION}.tar.gz
   fi
-  CP $MPI_DIR $openmpifile  $fdsbindir $openmpifile
-  MPIEXEC=$fdsbindir/$openmpifile/bin/mpiexec
+#  CP $MPI_DIR $openmpifile  $fdsbindir $openmpifile
+  UNTAR $MPI_DIR $openmpifile $fdsbindir openmpi_64
+  MPIEXEC=$fdsbindir/openmpi_64/bin/mpiexec
 fi
 
 TOMANIFESTFDS  $fdsbindir/fds        fds
