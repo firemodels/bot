@@ -1015,7 +1015,8 @@ check_compile_smv()
 make_smv_pictures()
 {
    # Run Make SMV Pictures script (release mode)
-   echo Generating images 
+   echo Generating
+   echo "   images"
    cd $smvrepo/Verification/scripts
    ./Make_SMV_Pictures.sh $YOPT -q $SMOKEBOT_QUEUE -I $COMPILER -j SMV_ $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4a_orig
    grep -v FreeFontPath $OUTPUT_DIR/stage4a_orig &> $OUTPUT_DIR/stage4a
@@ -1057,6 +1058,7 @@ check_smv_pictures()
 
 make_smv_movies()
 {
+   echo "   movies"
    cd $smvrepo/Verification
    scripts/Make_SMV_Movies.sh -q $SMOKEBOT_QUEUE 2>&1  &> $OUTPUT_DIR/stage4b
 }
@@ -1068,7 +1070,7 @@ make_smv_movies()
 check_smv_movies()
 {
    cd $smokebotdir
-   echo make smokeview movies
+   echo "   checking"
    if [[ `grep -I -E "Segmentation|Error" $OUTPUT_DIR/stage4b` == "" ]]
    then
       stage4b_success=true
