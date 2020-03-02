@@ -16,6 +16,10 @@ set lite=%7
 set build_only=%8
 set emailto=%9
 
+if NOT %build_only% == 0 (
+  set usematlab=0
+)
+
 set botbranch=master
 set fdsbranch=master
 set smvbranch=master
@@ -137,9 +141,7 @@ echo. > %stagestatus%
 call :is_file_installed %gettimeexe%|| exit /b 1
 echo    found get_time
 
-echo 111
 call :GET_TIME TIME_beg
-echo 222
 call :GET_TIME PRELIM_beg
 
 :: looking for Fortran
@@ -160,18 +162,20 @@ echo    found Fortran
 ::    otherwise look for C to build smokeview and
 ::    use installed smokeview if C not found
 if %installed% == 1 goto else1
-icl 1> %scratchfile% 2>&1
-type %scratchfile% | find /i /c "not recognized" > %countb%
-set /p nothave_icc=<%countb%
-if %nothave_icc% == 1 (
-  set have_icc=0
-  echo    C compiler not found - looking for Smokeview
-  call :is_file_installed smokeview|| exit /b 1
-  set smokeview=smokeview
-  echo    found smokeview
-) else (
-  echo    found C
-)
+if %build_only%  == 2 goto skip_c
+  icl 1> %scratchfile% 2>&1
+  type %scratchfile% | find /i /c "not recognized" > %countb%
+  set /p nothave_icc=<%countb%
+  if %nothave_icc% == 1 (
+    set have_icc=0
+    echo    C compiler not found - looking for Smokeview
+    call :is_file_installed smokeview|| exit /b 1
+    set smokeview=smokeview
+    echo    found smokeview
+  ) else (
+    echo    found C  
+  )
+:skip_c
 goto endif1
 :else1
   set have_icc=0
@@ -179,6 +183,10 @@ goto endif1
   set smokeview=smokeview
   echo    found smokeview
 :endif1
+
+if %build_only%  == 2 (
+  set have_icc=0
+)
 
 :: looking  for email
 if NOT exist %emailexe% (
@@ -191,9 +199,6 @@ if NOT exist %emailexe% (
 call :is_file_installed background|| exit /b 1
 echo    found background
 
-call :is_file_installed cut|| exit /b 1
-echo    found cut
-
 call :is_file_installed git|| exit /b 1
 echo    found git
 
@@ -203,18 +208,20 @@ echo    found grep
 call :is_file_installed make|| exit /b 1
 echo    found make
 
-where matlab 2>&1 | find /i /c "Could not find" > %OUTDIR%\stage_count0a.txt
-set /p nothavematlab=<%OUTDIR%\stage_count0a.txt
-if %nothavematlab% == 0 (
-  echo    found matlab
-  set have_matlab=1
-)
-if %nothavematlab% == 1 (
-  echo    matlab not found - VV and User guides will not be built
-)
 
-call :is_file_installed pdflatex|| exit /b 1
-echo    found pdflatex
+if %build_only% == "0" (
+  where matlab 2>&1 | find /i /c "Could not find" > %OUTDIR%\stage_count0a.txt
+  set /p nothavematlab=<%OUTDIR%\stage_count0a.txt
+  if %nothavematlab% == 0 (
+    echo    found matlab
+    set have_matlab=1    
+  )
+  if %nothavematlab% == 1 (
+    echo    matlab not found - VV and User guides will not be built  
+  )
+  call :is_file_installed pdflatex|| exit /b 1
+  echo    found pdflatex
+)
 
 call :is_file_installed sed|| exit /b 1
 echo    found sed
@@ -269,8 +276,6 @@ set timingslogfile=%TIMINGSDIR%\timings_%revisionnum%.txt
 
 echo  Building FDS
 
-echo build_only=%build_only%
-if %build_only% == 1 goto skip_build_debug_fds
 echo    debug
 
 cd %fdsrepo%\Build\impi_intel_win_64_db
@@ -278,7 +283,6 @@ erase *.obj *.mod *.exe *.pdb 1> Nul 2>&1
 call make_fds bot 1> %OUTDIR%\makefdsd.log 2>&1
 call :does_file_exist fds_impi_win_64_db.exe %OUTDIR%\makefdsd.log|| exit /b 1
 call :find_warnings "warning" %OUTDIR%\makefdsd.log "Stage 1b, FDS parallel debug compilation"
-:skip_build_debug_fds
 
 if %lite% == 1 goto skip_lite1
 
@@ -305,7 +309,6 @@ if %lite% == 1 goto skip_lite2
     cd %smvrepo%\Build\LIBS\intel_win_64
     call makelibs_bot 1>> %OUTDIR%\stage2a.txt 2>&1
 
-    if %build_only% == 1 goto skip_build_debug_smv
     echo    debug
 
     cd %smvrepo%\Build\smokeview\intel_win_64
@@ -313,7 +316,6 @@ if %lite% == 1 goto skip_lite2
     call make_smv_db -r bot 1> %OUTDIR%\makesmvd.log 2>&1
     call :does_file_exist smokeview_win_64_db.exe %OUTDIR%\makesmvd.log|| exit /b 1
     call :find_warnings "warning" %OUTDIR%\makesmvd.log "Stage 2a, Smokeview debug compilation"
-:skip_build_debug_smv
 
     echo    release
 
@@ -351,7 +353,7 @@ if %lite% == 1 goto skip_lite2
     echo    background not built, using installed version
   )
 :skip_lite2
-if %build_only% == 1 goto skip_run_cases
+if NOT %build_only% == 0 goto skip_run_cases
 
 
 call :GET_DURATION PRELIM %PRELIM_beg%
@@ -409,6 +411,7 @@ if %lite% == 1 goto skip_lite3
 :skip_lite3
 
 call :GET_DURATION RUNVV %RUNVV_beg%
+:skip_run_cases
 
 if %lite% == 1 goto skip_lite4
 
@@ -475,7 +478,6 @@ if %lite% == 1 goto skip_lite4
 :skip_lite4
 
 call :GET_DURATION TOTALTIME %TIME_beg%
-:goto skip_run_cases
 
 :: -------------------------------------------------------------
 ::                           wrap up
