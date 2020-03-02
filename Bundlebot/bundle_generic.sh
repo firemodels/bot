@@ -280,6 +280,27 @@ TOMANIFESTFDS ()
   echo "<br>"                       >> $MANIFEST
 }
 
+# -------------------- TOMANIFESTMPI -------------------
+
+TOMANIFESTMPI ()
+{
+  local prog=$1
+  local desc=$2
+
+  echo "<p><hr><p>"                 >> $MANIFEST
+  if [ -e $prog ]; then
+    echo "<pre>"                    >> $MANIFEST
+    echo ""                         >> $MANIFEST
+    echo $desc                      >> $MANIFEST
+    $prog --version                  >> $MANIFEST 2>&1
+    echo "</pre>"                   >> $MANIFEST
+  else
+    echo "$desc is absent<br>"      >> $MANIFEST
+    echo "$prog"                    >> $MANIFEST
+  fi
+  echo "<br>"                       >> $MANIFEST
+}
+
 # determine OS
 
 if [ "`uname`" == "Darwin" ]; then
@@ -344,7 +365,7 @@ cat << EOF > $MANIFEST
 EOF
 
 echo ""
-echo "--- copying programs ---"
+echo "--- smv apps ---"
 echo ""
 
 # smokeview
@@ -380,12 +401,36 @@ CPDIR $texturedir $smvbindir
 
 # FDS 
 
+echo ""
+echo "--- fds apps ---"
+echo ""
 cd $fdsbindir
 CP $APPS_DIR fds       $fdsbindir fds
 CP $APPS_DIR fds2ascii $fdsbindir fds2ascii
 CP $APPS_DIR test_mpi  $fdsbindir test_mpi
 
+echo ""
+echo "--- copying mpi ---"
+echo ""
+openmpifile=
+if [ "$MPI_VERSION" == "INTEL" ]; then
+  intelmpifile=INTEL${INTEL_COMP_VERSION}linux_64.tar.gz
+  UNTAR $MPI_DIR $intelmpifile $fdsbindir INTEL
+  MPIEXEC=$fdsbindir/INTEL/bin/mpiexec
+else
+  if [ "$PLATFORM" == "LINUX64" ]; then
+    openmpifile=openmpi_${MPI_VERSION}_linux_64_${INTEL_COMP_VERSION}.tar.gz
+  fi
+  if [ "$PLATFORM" == "OSX64" ]; then
+    openmpifile=openmpi_${MPI_VERSION}_osx_64_${INTEL_COMP_VERSION}.tar.gz
+  fi
+#  CP $MPI_DIR $openmpifile  $fdsbindir $openmpifile
+  UNTAR $MPI_DIR $openmpifile $fdsbindir openmpi_64
+  MPIEXEC=$fdsbindir/openmpi_64/bin/mpiexec
+fi
+
 TOMANIFESTFDS  $fdsbindir/fds        fds
+TOMANIFESTMPI  $MPIEXEC              mpiexec
 TOMANIFESTSMV  $smvbindir/smokeview  smokeview
 
 TOMANIFESTSMV  $smvbindir/background background
@@ -404,18 +449,6 @@ $APPS_DIR/hashfile fds2ascii > hash/fds2ascii.sha1
 $APPS_DIR/hashfile test_mpi  > hash/test_mpi.sha1
 cd $CURDIR
 
-openmpifile=
-if [ "$MPI_VERSION" == "INTEL" ]; then
-    intelmpifile=INTEL${INTEL_COMP_VERSION}linux_64.tar.gz
-else
-  if [ "$PLATFORM" == "LINUX64" ]; then
-    openmpifile=openmpi_${MPI_VERSION}_linux_64_${INTEL_COMP_VERSION}.tar.gz
-  fi
-  if [ "$PLATFORM" == "OSX64" ]; then
-    openmpifile=openmpi_${MPI_VERSION}_osx_64_${INTEL_COMP_VERSION}.tar.gz
-  fi
-fi
-
 echo ""
 echo "--- copying configuration files ---"
 echo ""
@@ -429,12 +462,6 @@ CP $smv_bundle smokeview.html $smvbindir smokeview.html
 
 CP $webgldir runsmv_ssh.sh $smvbindir runsmv_ssh.sh
 CP $webgldir smv2html.sh   $smvbindir smv2html.sh
-
-if [ "$MPI_VERSION" == "INTEL" ]; then
-  UNTAR $MPI_DIR $intelmpifile $fdsbindir INTEL
-else
-  CP $MPI_DIR $openmpifile  $fdsbindir $openmpifile
-fi
 
 echo ""
 echo "--- copying documentation ---"

@@ -189,26 +189,23 @@ fi
 
 #*** parse command line options
 
-while getopts 'abBcd:Dfg:G:hHI:JkLm:MPq:r:R:TuUvw:x:y:' OPTION
+while getopts 'abBcDfg:G:hHI:JkLm:MPq:R:TuUvw:x:y:' OPTION
 do
 case $OPTION  in
   a)
    RUNAUTO=-a
    ;;
-  B)
-   BUILD_ONLY="-B"
-   ;;
   b)
    BRANCH="current"
+   ;;
+  B)
+   BUILD_ONLY="-B"
    ;;
   c)
    CLEANREPO=-c
    ;;
   D)
    export QFDS_STARTUP=1
-   ;;
-  I)
-   COMPILER="$OPTARG"
    ;;
   f)
    FORCE=1
@@ -224,6 +221,9 @@ case $OPTION  in
    ;;
   H)
    usage "-H"
+   ;;
+  I)
+   COMPILER="$OPTARG"
    ;;
   J)
    INTEL="-J"
