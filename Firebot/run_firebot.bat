@@ -11,6 +11,7 @@ set stopscript=0
 set force=0
 set installed=0
 set lite=0
+set build_only=0
 
 if NOT exist .fds_git (
    echo ***error: firebot not running in the bot\Firebot directory
@@ -103,6 +104,10 @@ goto eof
    set valid=1
    set build_only=1
  )
+ if /I "%1" EQU "-buildfds" (
+   set valid=1
+   set build_only=2
+ )
  if /I "%1" EQU "-clean" (
    set valid=1
    set clean=1
@@ -187,6 +192,7 @@ echo       (default: %emailto%^)
 )
 echo -bot            - clean and update repository
 echo -build          - only build fds and smv apps
+echo -buildfds       - only build fds apps
 echo -clean          - clean repository
 echo -force          - force firebot to run
 echo -installed      - use installed smokeview

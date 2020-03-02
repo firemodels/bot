@@ -331,11 +331,6 @@ while true; do
    echo ""
    echo "Installation directory: \$FDS_root"
 EOF
-if [ "$OPENMPIFILE" != "" ]; then
-cat << EOF >> $INSTALLER
-   echo "     OpenMPI directory: \$mpiused"
-EOF
-fi
 cat << EOF >> $INSTALLER
    if [ "\$OVERRIDE" == "y" ] ; then
      yn="y"
@@ -364,16 +359,6 @@ echo "Copying FDS installation files to"  \$FDS_root
 cd \$FDS_root
 tail -n +\$SKIP \$THISSCRIPT | tar -xz
 EOF
-
-if [ "$OPENMPIFILE" != "" ]; then
-cat << EOF >> $INSTALLER
-if [ "\$MPIDIST_FDSROOT" != "" ]; then
-  echo unpacking OpenMPI distribution to \$MPIDIST_FDSROOT
-  cd \$MPIDIST_FDSROOT
-  tar xvf $OPENMPIFILE >& /dev/null
-fi
-EOF
-fi
 
 cat << EOF >> $INSTALLER
 
