@@ -1480,14 +1480,11 @@ echo $$ > $PID_FILE
 
 #*** parse command line options
 
-while getopts 'ab:BcI:JLm:Mo:q:r:R:TuU:x:y:w:' OPTION
+while getopts 'ab:BcI:JLm:Mo:q:R:TuUw:x:y:' OPTION
 do
 case $OPTION in
   a)
    RUNAUTO="y"
-   ;;
-  B)
-   BUILD_ONLY="1"
    ;;
   b)
    SMVBRANCH="$OPTARG"
@@ -1496,6 +1493,9 @@ case $OPTION in
      CFASTBRANCH="current"
      BOTBRANCH="current"
    fi
+   ;;
+  B)
+   BUILD_ONLY="1"
    ;;
   c)
    CLEANREPO=1
@@ -1530,11 +1530,11 @@ case $OPTION in
   T)
    CLONE_FDSSMV=1
    ;;
-  U)
-   UPLOADRESULTS=1
-   ;;
   u)
    UPDATEREPO=1
+   ;;
+  U)
+   UPLOADRESULTS=1
    ;;
   w)
    WEB_DIR="$OPTARG"
