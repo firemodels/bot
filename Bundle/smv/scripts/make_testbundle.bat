@@ -30,7 +30,7 @@ cd uploads
 set uploads=%CD%
 
 set version=%smv_revision%
-set zipbase=%version%_win64
+set zipbase=%version%_win
 set smvdir=%uploads%\%zipbase%
 set smvscripts=%svn_root%\smv\scripts
 set forbundle=%svn_root%\bot\Bundle\smv\for_bundle
@@ -131,7 +131,7 @@ cd ..\..
 if not exist %zipbase%.exe echo ***warning: %zipbase%.exe was not created
 
 echo.
-echo --- Smokeview win64 test installer %zipbase%.exe built ---
+echo --- Test Windows Smokeview installer, %zipbase%.exe, built ---
 echo.
 
 cd %CURDIR%

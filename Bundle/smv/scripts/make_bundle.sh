@@ -21,10 +21,12 @@ fi
 
 platform="linux"
 platform2="LINUX"
+platform3="lnx"
 if [ "`uname`" == "Darwin" ]
 then
   platform="osx"
   platform2="OSX"
+  platform3="osx"
 fi
 
 SCP ()
@@ -93,7 +95,7 @@ HASHFILEDIR=$REMOTESVNROOT/smv/Build/hashfile/intel_${platform}_64
 FLUSHFILEDIR=$REMOTESVNROOT/smv/Build/flush/intel_${platform}_64
 FORBUNDLE=$SVNROOT/bot/Bundle/smv/for_bundle
 WEBGLDIR=$SVNROOT/bot/Bundle/smv/for_bundle/webgl
-PLATFORMDIR=$RELEASE$revision\_${platform}64
+PLATFORMDIR=$RELEASE$revision\_${platform3}
 UPDATER=$SVNROOT/bot/Bundle/smv/scripts//make_updater.sh
 uploads=$HOME/.bundle/uploads
 flushfile=$SVNROOT/smv/Build/flush/intel_${platform}_64/flush_${platform}_64
