@@ -69,13 +69,13 @@ if "%platform%" == "linux" (
 
   if "%buildtype%" == "release" (
     cd %uploaddir%
-    pscp %linux_logon%:%bundledir%/%version%_linux64.sh   .
-    pscp %linux_logon%:%bundledir%/%version%_linux64.sha1 .
+    pscp %linux_logon%:%bundledir%/%version%_lnx.sh   .
+    pscp %linux_logon%:%bundledir%/%version%_lnx.sha1 .
   )
   if "%buildtype%" == "test" (
     cd %uploaddir%
-    pscp %linux_logon%:%bundledir%/%version%_linux64.sh   .
-    pscp %linux_logon%:%bundledir%/%version%_linux64.sha1 .
+    pscp %linux_logon%:%bundledir%/%version%_lnx.sh   .
+    pscp %linux_logon%:%bundledir%/%version%_lnx.sha1 .
   )
   goto eof
 )
@@ -94,13 +94,13 @@ if "%platform%" == "osx" (
 
   if "%buildtype%" == "release" (
     cd %uploaddir%
-    pscp %osx_logon%:%bundledir%/%version%_osx64.sh   .
-    pscp %osx_logon%:%bundledir%/%version%_osx64.sha1 .
+    pscp %osx_logon%:%bundledir%/%version%_osx.sh   .
+    pscp %osx_logon%:%bundledir%/%version%_osx.sha1 .
   )
   if "%buildtype%" == "test" (
     cd %uploaddir%
-    pscp %osx_logon%:%bundledir%/%version%_osx64.sh   .
-    pscp %osx_logon%:%bundledir%/%version%_osx64.sha1 .
+    pscp %osx_logon%:%bundledir%/%version%_osx.sh   .
+    pscp %osx_logon%:%bundledir%/%version%_osx.sha1 .
   )
   goto eof
 )
