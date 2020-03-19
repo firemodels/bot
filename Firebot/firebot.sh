@@ -1770,7 +1770,7 @@ case $OPTION in
    INTEL2="-J"
    ;;
   L)
-   FIREBOT_LITE="-L"
+   FIREBOT_LITE="-S"
    SKIPMATLAB=1
    SKIPPICTURES=1
    ;;
@@ -2146,10 +2146,12 @@ echo Building
 echo "   FDS"
 # if something goes wrong with the openmp inspector
 # comment the following 6 lines (including 'if' and and 'fi'  lines
+if [ "$platform" == "linux" ]; then
 if [ "$BUILD_ONLY" == "" ]; then
   build_inspect_fds
 #  inspect_fds
 #  check_inspect_fds
+fi
 fi
 
 ### Stage 2b ###
