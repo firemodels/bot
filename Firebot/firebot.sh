@@ -552,8 +552,8 @@ run_verification_cases_debug()
    echo "Running FDS Verification Cases"
    echo "   debug"
    echo 'Running FDS verification cases:' >> $OUTPUT_DIR/stage4
-   echo ./Run_FDS_Cases.sh -o 1 -d -m 1 $INTEL2 -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
-   ./Run_FDS_Cases.sh -o 1 -d -m 1 $INTEL2 -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
+   echo ./Run_FDS_Cases.sh -o 1 -d -m 1 $INTEL2 $FIREBOT_LITE -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
+        ./Run_FDS_Cases.sh -o 1 -d -m 1 $INTEL2 $FIREBOT_LITE -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
    echo "" >> $OUTPUT_DIR/stage4 2>&1
 
    # Wait for all verification cases to end
@@ -834,8 +834,8 @@ run_verification_cases_release()
    cd $fdsrepo/Verification/scripts
    # Run FDS with 1 OpenMP thread
    echo 'Running FDS benchmark verification cases:'       >> $OUTPUT_DIR/stage5 2>&1
-   echo ./Run_FDS_Cases.sh $INTEL2 -b -o 1 -q $QUEUE      >> $OUTPUT_DIR/stage5 2>&1
-        ./Run_FDS_Cases.sh $INTEL2 -b -o 1 -q $QUEUE      >> $OUTPUT_DIR/stage5 2>&1
+   echo ./Run_FDS_Cases.sh $INTEL2 -b -o 1 $FIREBOT_LITE -q $QUEUE      >> $OUTPUT_DIR/stage5 2>&1
+        ./Run_FDS_Cases.sh $INTEL2 -b -o 1 $FIREBOT_LITE -q $QUEUE      >> $OUTPUT_DIR/stage5 2>&1
    echo ""                                                >> $OUTPUT_DIR/stage5 2>&1
 
    # Wait for benchmark verification cases to end
@@ -1740,9 +1740,11 @@ SMV_REV=origin/master
 WEB_DIR=
 HTML2PDF=wkhtmltopdf
 FORCECLONE=
+FIREBOT_LITE=
+SKIPPICTURES=
 
 #*** parse command line arguments
-while getopts 'b:BcCiJm:p:q:R:sTuUx:y:w:' OPTION
+while getopts 'b:BcCiJLm:p:q:R:sTuUx:y:w:' OPTION
 do
 case $OPTION in
   b)
@@ -1766,6 +1768,11 @@ case $OPTION in
   J)
    INTEL=i
    INTEL2="-J"
+   ;;
+  L)
+   FIREBOT_LITE="-L"
+   SKIPMATLAB=1
+   SKIPPICTURES=1
    ;;
   m)
    mailToFDS="$OPTARG"
@@ -2161,21 +2168,29 @@ fi
 compile_fds_mpi
 check_compile_fds_mpi
 
+$COPY_APPS fds > $OUTPUT_DIR/stage3d
+
 ### Stage 3a ###
-compile_smv_utilities
-check_smv_utilities
+if [ "$SKIPPICTURES" == "" ]; then
+  compile_smv_utilities
+  check_smv_utilities
+fi
 
 ### Stage 3b ###
-if [ "$BUILD_ONLY" == "" ]; then
-  compile_smv_db
-  check_compile_smv_db
+if [ "$SKIPPICTURES" == "" ]; then
+  if [ "$BUILD_ONLY" == "" ]; then
+    compile_smv_db
+    check_compile_smv_db
+  fi
 fi
 
 ### Stage 3c ###
-compile_smv
-check_compile_smv
+if [ "$SKIPPICTURES" == "" ]; then
+  compile_smv
+  check_compile_smv
+  $COPY_APPS smv >> $OUTPUT_DIR/stage3d
+fi
 
-  $COPY_APPS >& $OUTPUT_DIR/stage3d
 
 ### Stage 4 ###
 
@@ -2202,9 +2217,11 @@ if [[ "$BUILD_ONLY" == "" ]]; then
 
 ### Stage 6 ###
 # Depends on successful SMV compile
-  if [[ $smv_release_success ]] ; then
-    make_fds_pictures
-    check_fds_pictures
+  if [ "$SKIPPICTURES" == "" ] ; then
+    if [[ $smv_release_success ]] ; then
+      make_fds_pictures
+      check_fds_pictures
+    fi
   fi
 
   if [ "$SKIPMATLAB" == "" ] ; then
