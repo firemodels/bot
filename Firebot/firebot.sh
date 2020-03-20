@@ -2150,11 +2150,13 @@ echo Building
 echo "   FDS"
 # if something goes wrong with the openmp inspector
 # comment the following 6 lines (including 'if' and and 'fi'  lines
+if [ "$FIREBOT_LITE" == "" ]; then
 if [ "$platform" == "linux" ]; then
 if [ "$BUILD_ONLY" == "" ]; then
   build_inspect_fds
 #  inspect_fds
 #  check_inspect_fds
+fi
 fi
 fi
 
