@@ -108,6 +108,11 @@ set countb=%OUTDIR%\firebot_count0b.txt
 set scratchfile=%OUTDIR%\firebot_scratch.txt
 set have_matlab=0
 
+set LITE_ARG=-lite
+if %lite% == 1 goto skip_litearg
+set LITE_ARG=
+:skip_litearg
+
 set fromsummarydir=%smvrepo%\Manuals\SMV_Summary
 
 set haveerrors=0
@@ -208,8 +213,7 @@ echo    found grep
 call :is_file_installed make|| exit /b 1
 echo    found make
 
-
-if %build_only% == "0" (
+if NOT "%build_only%" == "0" goto if1
   where matlab 2>&1 | find /i /c "Could not find" > %OUTDIR%\stage_count0a.txt
   set /p nothavematlab=<%OUTDIR%\stage_count0a.txt
   if %nothavematlab% == 0 (
@@ -221,7 +225,7 @@ if %build_only% == "0" (
   )
   call :is_file_installed pdflatex|| exit /b 1
   echo    found pdflatex
-)
+:if1
 
 call :is_file_installed sed|| exit /b 1
 echo    found sed
@@ -281,7 +285,7 @@ echo    debug
 cd %fdsrepo%\Build\impi_intel_win_64_db
 erase *.obj *.mod *.exe *.pdb 1> Nul 2>&1
 call make_fds bot 1> %OUTDIR%\makefdsd.log 2>&1
-call :does_file_exist fds_impi_win_64_db.exe %OUTDIR%\makefdsd.log|| exit /b 1
+call :does_file_exist fds_impi_win_64_db.exe %OUTDIR%\makefdsd.log || exit /b 1
 call :find_warnings "warning" %OUTDIR%\makefdsd.log "Stage 1b, FDS parallel debug compilation"
 
 if %lite% == 1 goto skip_lite1
@@ -370,7 +374,7 @@ echo    debug mode
 :: run cases
 
 cd %fdsrepo%\Verification\scripts
-call Run_FDS_cases -debug 1> %OUTDIR%\stage4a.txt 2>&1
+call Run_FDS_cases -debug %LITE_ARG% 1> %OUTDIR%\stage4a.txt 2>&1
 
 :: check cases
 
@@ -396,7 +400,7 @@ if %lite% == 1 goto skip_lite3
 :skip_clean2
 
   cd %fdsrepo%\Verification\scripts
-  call Run_FDS_cases  1> %OUTDIR%\stage4b.txt 2>&1
+  call Run_FDS_cases %LITE_ARG% 1> %OUTDIR%\stage4b.txt 2>&1
 
 :: check cases
 
