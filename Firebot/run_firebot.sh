@@ -37,6 +37,7 @@ echo "-G firebot_home - home directory where firebot was run"
 echo "   The -g and -G options are used when cloning repos (-R option)"
 echo "   to build apps using the same repo revisions as used with the last"
 echo "   successful firebot run"
+echo "-L - run a subset of cases, do not generate pictures, run matlab or generate manuals"
 echo "-R branch_name - clone fds, exp, fig, out and smv repos. fds and smv repos"
 echo "     will be checked out with a branch named 'branch_name'"
 echo "-T - only clone the fds and smv repos (this option is set by default when"
@@ -193,10 +194,11 @@ FIREBOT_HOST=
 FIREBOT_HOME=
 WEB_DIR=
 FORCECLONE=
+FIREBOT_LITE=
 
 #*** parse command line options
 
-while getopts 'bBcCfg:G:HhiJkm:nOPq:R:STuUvx:y:w:' OPTION
+while getopts 'bBcCfg:G:HhiJkLm:nOPq:R:STuUvx:y:w:' OPTION
 do
 case $OPTION  in
   b)
@@ -234,6 +236,9 @@ case $OPTION  in
    ;;
   k)
    KILL_FIREBOT="1"
+   ;;
+  L)
+   FIREBOT_LITE="-L"
    ;;
   m)
    EMAIL="$OPTARG"
@@ -496,7 +501,7 @@ BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
 firebot_status=0
-$ECHO  ./$botscript -p $firebot_pid $UPDATEREPO $INTEL $BUILD_ONLY $FORCECLONE $BRANCH $FDS_REV $SMV_REV $USEINSTALL $UPLOADGUIDES $CLEANREPO $QUEUE $SKIPMATLAB $CLONE_REPOS $CLONE_FDSSMV  $EMAIL $WEB_DIR "$@"
+$ECHO  ./$botscript -p $firebot_pid $UPDATEREPO $INTEL $BUILD_ONLY $FORCECLONE $BRANCH $FIREBOT_LITE $FDS_REV $SMV_REV $USEINSTALL $UPLOADGUIDES $CLEANREPO $QUEUE $SKIPMATLAB $CLONE_REPOS $CLONE_FDSSMV  $EMAIL $WEB_DIR "$@"
 firebot_status=$?
 if [ -e $firebot_pid ]; then
   rm -f $firebot_pid
