@@ -381,7 +381,7 @@ call Run_FDS_cases -debug %LITE_ARG% 1> %OUTDIR%\stage4a.txt 2>&1
 set haveerrors_now=0
 echo. > %OUTDIR%\stage_error.txt
 cd %fdsrepo%\Verification\scripts
-call Check_FDS_cases 
+call Check_FDS_cases %LITE_ARG%
 
 :: report errors
 
@@ -407,7 +407,7 @@ if %lite% == 1 goto skip_lite3
   set haveerrors_now=0
   echo. > %OUTDIR%\stage_error.txt
   cd %fdsrepo%\Verification\scripts
-  call Check_FDS_cases
+  call Check_FDS_cases %LITE_ARG%
 
 :: report errors
 
