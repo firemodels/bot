@@ -2018,19 +2018,19 @@ if [ "$IFORT_VERSION" != "" ]; then
 fi
 
 if [ "$SKIPINSPECT" != "" ]; then
-  echo "     Skipping thread checking stage"
+  echo "     Skipping: thread checking stage"
 fi
 if [ "$SUBSET_CASES" != "" ]; then
-  echo "     Running only a subset of cases"
+  echo "      Running: subset of cases"
 fi
 if [ "$SKIPRELEASE" != "" ]; then
-  echo "     Skipping run release cases stage"
+  echo "     Skipping: release cases stage"
 fi
 if [ "$SKIPPICTURES" != "" ]; then
-  echo "     Skipping picture generation stage"
+  echo "     Skipping: picture generation stage"
 fi
 if [ "$SKIPMATLAB" != "" ]; then
-  echo "     Skipping matlab stage"
+  echo "     Skipping: matlab stage"
 fi
 
 if [ "$CLEANREPO" == "1" ]; then
@@ -2199,8 +2199,10 @@ if [[ "$OPENMPI_GNU" != "" ]] && [[ "$BUILD_ONLY" == "" ]] ; then
 fi
 
 ### Stage 2c ###
-compile_fds_mpi
-check_compile_fds_mpi
+if [ "$SKIPRELEASE" == "" ]; then
+  compile_fds_mpi
+  check_compile_fds_mpi
+fi
 
 $COPY_APPS fds > $OUTPUT_DIR/stage3d
 
