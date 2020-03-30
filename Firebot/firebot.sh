@@ -1701,6 +1701,8 @@ BOTBRANCH=master
 BRANCH=master
 BUILD_ONLY=
 
+FDS_release_success=false
+
 #*** determine platform
 
 platform="linux"
@@ -2240,7 +2242,7 @@ if [[ "$BUILD_ONLY" == "" ]]; then
 
 ### Stage 5 ###
 # Depends on successful FDS compile
-  if [[ $FDS_release_success ]] && [[ "$SKIPRELEASE" ]]; then
+  if [[ $FDS_release_success ]] && [[ "$SKIPRELEASE" == "" ]]; then
     run_verification_cases_release
     check_cases_release $fdsrepo/Verification 'final'
   fi
