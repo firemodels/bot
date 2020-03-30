@@ -214,6 +214,7 @@ case $OPTION  in
    ;;
   C)
    FORCECLONE="-C"
+   ;;
   d)
    DEBUG_MODE="-d"
    ;;
