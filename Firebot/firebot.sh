@@ -2197,8 +2197,10 @@ if [[ "$OPENMPI_GNU" != "" ]] && [[ "$BUILD_ONLY" == "" ]] ; then
 fi
 
 ### Stage 2c ###
-compile_fds_mpi
-check_compile_fds_mpi
+if [ "$SKIPRELEASE" == "" ]; then
+  compile_fds_mpi
+  check_compile_fds_mpi
+fi
 
 $COPY_APPS fds > $OUTPUT_DIR/stage3d
 
