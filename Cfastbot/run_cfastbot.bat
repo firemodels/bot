@@ -41,14 +41,15 @@ if %stopscript% == 1 (
   exit /b
 )
 
-if %force% == 0 goto skip1
-if %clean% == 0 goto skip1
-echo ***warning: the -clean option will revert all changes to repo files
-echo             and erase all uncommitted files
-echo    Hit enter to proceed or <ctrl> C to abort
+if "%force%" == "1" goto skip1
+if "%clean%" == "0" goto skip1
+echo.
+echo Warning: the -clean option will revert all modified repo files and erase all uncommitted files.
+echo Hit Enter to proceed running cfastbot or CTRL C to abort.
+echo Use the -force option to prevent this warning (if running cfastbot in a batch file)
 pause > Nul
 :skip1
-
+pause
 :: normalize directory paths
 
 call :normalise %CD% curdir
