@@ -41,6 +41,14 @@ if %stopscript% == 1 (
   exit /b
 )
 
+if %force% == 0 goto skip1
+if %clean% == 0 goto skip1
+echo ***warning: the -clean option will revert all changes to repo files
+echo             and erase all uncommitted files
+echo    Hit enter to proceed or <ctrl> C to abort
+pause > Nul
+:skip1
+
 :: normalize directory paths
 
 call :normalise %CD% curdir
