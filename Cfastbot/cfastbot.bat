@@ -327,10 +327,10 @@ if %usematlab% == 1 goto skip_matlabexe
 if %clean% == 0 goto skip_update0
    echo             cleaning repos
    echo               cfast
-   call :git_clean -dxf %cfastrepo%
+   call :git_clean %cfastrepo%
    if %use_installed_smokeview% == 1 goto skip_update0
    echo               smv
-   call :git_clean -dxf %smvrepo%\Build
+   call :git_clean %smvrepo%\Build
 
 :skip_update0
 
