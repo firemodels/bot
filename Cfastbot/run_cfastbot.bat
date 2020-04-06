@@ -49,7 +49,7 @@ echo Hit Enter to proceed running cfastbot or CTRL C to abort.
 echo Use the -force option to prevent this warning (if running cfastbot in a batch file)
 pause > Nul
 :skip1
-pause
+
 :: normalize directory paths
 
 call :normalise %CD% curdir
