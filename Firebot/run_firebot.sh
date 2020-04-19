@@ -26,7 +26,9 @@ else
   echo "-m email_address "
 fi
 echo "-P - remove run status (PID) file"
-echo "-S - use startup files to set the environment, not modules"
+echo "-d - only run cases in debug mode"
+echo "-s - use startup files to set the environment, not modules"
+echo "-S - run subset cases, do not generate pictures, run matlab or generate manuals"
 echo "-U - upload guides (only by user firebot)"
 echo ""
 echo "Build apps, set repo revisions"
@@ -37,7 +39,6 @@ echo "-G firebot_home - home directory where firebot was run"
 echo "   The -g and -G options are used when cloning repos (-R option)"
 echo "   to build apps using the same repo revisions as used with the last"
 echo "   successful firebot run"
-echo "-L - run a subset of cases, do not generate pictures, run matlab or generate manuals"
 echo "-R branch_name - clone fds, exp, fig, out and smv repos. fds and smv repos"
 echo "     will be checked out with a branch named 'branch_name'"
 echo "-T - only clone the fds and smv repos (this option is set by default when"
@@ -194,11 +195,12 @@ FIREBOT_HOST=
 FIREBOT_HOME=
 WEB_DIR=
 FORCECLONE=
-FIREBOT_LITE=
+SUBSET_CASES=
+DEBUG_MODE=
 
 #*** parse command line options
 
-while getopts 'bBcCfg:G:HhiJkLm:nOPq:R:STuUvx:y:w:' OPTION
+while getopts 'bBcCdfg:G:hHiJkm:nOPq:R:sSTuUvw:x:y:' OPTION
 do
 case $OPTION  in
   b)
@@ -212,6 +214,9 @@ case $OPTION  in
    ;;
   C)
    FORCECLONE="-C"
+   ;;
+  d)
+   DEBUG_MODE="-d"
    ;;
   f)
    FORCE=1
@@ -237,9 +242,6 @@ case $OPTION  in
   k)
    KILL_FIREBOT="1"
    ;;
-  L)
-   FIREBOT_LITE="-L"
-   ;;
   m)
    EMAIL="$OPTARG"
    ;;
@@ -259,8 +261,11 @@ case $OPTION  in
    CLONE_REPOS="$OPTARG"
    BRANCH=current
    ;;
-  S)
+  s)
     export QFDS_STARTUP=1
+    ;;
+  S)
+    SUBSET_CASES="-S"
    ;;
   T)
     CLONE_FDSSMV="-T"
@@ -275,6 +280,9 @@ case $OPTION  in
    RUNFIREBOT=
    ECHO="echo"
    ;;
+  w)
+   WEB_DIR="$OPTARG"
+   ;;
   x)
    FDS_REV_ARG="$OPTARG"
    FDS_REV="-x $FDS_REV_ARG"
@@ -282,9 +290,6 @@ case $OPTION  in
   y)
    SMV_REV_ARG="$OPTARG"
    SMV_REV="-y $SMV_REV_ARG"
-   ;;
-  w)
-   WEB_DIR="$OPTARG"
    ;;
   \?)
   echo "***error: unknown option entered. aborting firebot"
@@ -501,7 +506,7 @@ BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
 firebot_status=0
-$ECHO  ./$botscript -p $firebot_pid $UPDATEREPO $INTEL $BUILD_ONLY $FORCECLONE $BRANCH $FIREBOT_LITE $FDS_REV $SMV_REV $USEINSTALL $UPLOADGUIDES $CLEANREPO $QUEUE $SKIPMATLAB $CLONE_REPOS $CLONE_FDSSMV  $EMAIL $WEB_DIR "$@"
+$ECHO  ./$botscript -p $firebot_pid $UPDATEREPO $INTEL $BUILD_ONLY $FORCECLONE $BRANCH $DEBUG_MODE $SUBSET_CASES $FDS_REV $SMV_REV $USEINSTALL $UPLOADGUIDES $CLEANREPO $QUEUE $SKIPMATLAB $CLONE_REPOS $CLONE_FDSSMV  $EMAIL $WEB_DIR "$@"
 firebot_status=$?
 if [ -e $firebot_pid ]; then
   rm -f $firebot_pid
