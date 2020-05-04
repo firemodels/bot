@@ -8,6 +8,24 @@ CURDIR=`pwd`
 MANUAL_PARENT_ID=0B_wB1pJL2bFQUlJwMmNfaHlqME0
 FIGURES_PARENT_ID=0B-W-dkXwdHWNOGVsZXNzTjdLek0
 
+UPLOADFILE ()
+{
+  DIR=$HOME/.firebot/pubs
+  FILE=$1
+  cd $DIR
+  if [ -e $FILE ]; then
+    $GDRIVE list  | grep $FILE | awk '{ system("~/bin/gdrive delete -i " $1)} '
+    $GDRIVE upload -p $MANUAL_PARENT_ID -f $FILE
+    npubs=`$GDRIVE list  | grep $FILE | wc -l`
+    if [ $npubs -eq 0 ]; then
+      echo "*** warning: The file $FILE failed to upload to google drive"
+    fi
+    if [ $npubs -gt 1 ]; then
+      echo "*** warning: More than one copy of $FILE exists on google drive"
+    fi
+  fi
+}
+
 UPLOADGUIDE ()
 {
   cd $FROMDIR
@@ -61,5 +79,7 @@ if [ -e $GDRIVE ] ; then
   UPLOADFIGURES FDS_User_Guide FDS_UG
   UPLOADFIGURES FDS_Validation_Guide FDS_VALG
   UPLOADFIGURES FDS_Verification_Guide FDS_VERG
+  UPLOADFILE FDS_REVISION
+  UPLOADFILE SMV_REVISION
   cd $CURDIR
 fi
