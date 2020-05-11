@@ -551,16 +551,16 @@ run_verification_cases_debug()
    # Run FDS with delayed stop files (with 1 OpenMP thread and 1 iteration)
    echo "Running FDS Verification Cases"
    echo "   debug"
-   echo 'Running FDS verification cases:' >> $OUTPUT_DIR/stage4
-   echo ./Run_FDS_Cases.sh -o 1 -d -m 1 $INTEL2 -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
-   ./Run_FDS_Cases.sh -o 1 -d -m 1 $INTEL2 -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
+   echo 'Running FDS verification cases:'                               >> $OUTPUT_DIR/stage4 2>&1
+   echo ./Run_FDS_Cases.sh -o 1 -d -m 1 $INTEL2 $SUBSET_CASES -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
+        ./Run_FDS_Cases.sh -o 1 -d -m 1 $INTEL2 $SUBSET_CASES -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
    echo "" >> $OUTPUT_DIR/stage4 2>&1
 
    # Wait for all verification cases to end
    wait_cases_debug_end 'verification'
 
 #  check whether cases have run
-   ./Run_FDS_Cases.sh -C >> $OUTPUT_DIR/stage4 2>&1
+   ./Run_FDS_Cases.sh $SUBSET_CASES -C                                  >> $OUTPUT_DIR/stage4 2>&1
 
    # Remove all .stop files from Verification directories (recursively)
    cd $fdsrepo/Verification
@@ -833,10 +833,12 @@ run_verification_cases_release()
    echo "   release"
    cd $fdsrepo/Verification/scripts
    # Run FDS with 1 OpenMP thread
-   echo 'Running FDS benchmark verification cases:'       >> $OUTPUT_DIR/stage5 2>&1
-   echo ./Run_FDS_Cases.sh $INTEL2 -b -o 1 -q $QUEUE      >> $OUTPUT_DIR/stage5 2>&1
-        ./Run_FDS_Cases.sh $INTEL2 -b -o 1 -q $QUEUE      >> $OUTPUT_DIR/stage5 2>&1
-   echo ""                                                >> $OUTPUT_DIR/stage5 2>&1
+   if [ "$SUBSET_CASES" == "" ]; then
+     echo 'Running FDS benchmark verification cases:'            >> $OUTPUT_DIR/stage5 2>&1
+     echo ./Run_FDS_Cases.sh $INTEL2 -b -o 1 -q $QUEUE           >> $OUTPUT_DIR/stage5 2>&1
+          ./Run_FDS_Cases.sh $INTEL2 -b -o 1 -q $QUEUE           >> $OUTPUT_DIR/stage5 2>&1
+     echo ""                                                     >> $OUTPUT_DIR/stage5 2>&1
+   fi
 
    # Wait for benchmark verification cases to end
 # let benchmark and regular cases run at the same time - for now
@@ -844,22 +846,25 @@ run_verification_cases_release()
 
 # comment out thread checking cases for now   
 #   echo 'Running FDS thread checking verification cases:' >> $OUTPUT_DIR/stage5
-   cd ../Thread_Check
-   echo ./inspection.sh -p 6 -q $QUEUE  inspector_test.fds >> $OUTPUT_DIR/stage5i 2>&1
-#        ./inspection.sh -p 6 -q $QUEUE  inspector_test.fds >> $OUTPUT_DIR/stage5i 2>&1
-   echo ""                                                 >> $OUTPUT_DIR/stage5i 2>&1
+   touch $OUTPUT_DIR/stage5i
+   if [ "$SKIPINSPECT" == "" ]; then
+     cd ../Thread_Check
+     echo ./inspection.sh -p 6 -q $QUEUE  inspector_test.fds     >> $OUTPUT_DIR/stage5i 2>&1
+#        ./inspection.sh -p 6 -q $QUEUE  inspector_test.fds      >> $OUTPUT_DIR/stage5i 2>&1
+     echo ""                                                     >> $OUTPUT_DIR/stage5i 2>&1
+   fi
 
    cd ../scripts
-   echo 'Running FDS non-benchmark verification cases:'   >> $OUTPUT_DIR/stage5
-   echo ./Run_FDS_Cases.sh $INTEL2 -R -o 1 -q $QUEUE      >> $OUTPUT_DIR/stage5 2>&1
-        ./Run_FDS_Cases.sh $INTEL2 -R -o 1 -q $QUEUE      >> $OUTPUT_DIR/stage5 2>&1
-   echo ""                                                >> $OUTPUT_DIR/stage5 2>&1
+   echo 'Running FDS non-benchmark verification cases:'             >> $OUTPUT_DIR/stage5 2>&1
+   echo ./Run_FDS_Cases.sh $INTEL2 $SUBSET_CASES -R -o 1 -q $QUEUE  >> $OUTPUT_DIR/stage5 2>&1
+        ./Run_FDS_Cases.sh $INTEL2 $SUBSET_CASES -R -o 1 -q $QUEUE  >> $OUTPUT_DIR/stage5 2>&1
+   echo ""                                                          >> $OUTPUT_DIR/stage5 2>&1
 
    # Wait for non-benchmark verification cases to end
    wait_cases_release_end 'verification'
 
 #  check whether cases have run 
-   ./Run_FDS_Cases.sh -C  >> $OUTPUT_DIR/stage5 2>&1
+   ./Run_FDS_Cases.sh $SUBSET_CASES -C  >> $OUTPUT_DIR/stage5 2>&1
 }
 
 #---------------------------------------------
@@ -1696,6 +1701,8 @@ BOTBRANCH=master
 BRANCH=master
 BUILD_ONLY=
 
+FDS_release_success=false
+
 #*** determine platform
 
 platform="linux"
@@ -1730,7 +1737,6 @@ REPOEMAIL=
 UPLOADGUIDES=0
 FDS_REVISION=
 SMV_REVISION=
-SKIPMATLAB=
 INTEL=
 INTEL2=
 CLONE_REPOS=
@@ -1741,8 +1747,14 @@ WEB_DIR=
 HTML2PDF=wkhtmltopdf
 FORCECLONE=
 
+SKIPMATLAB=
+SKIPPICTURES=
+SKIPINSPECT=
+SKIPRELEASE=
+SUBSET_CASES=
+
 #*** parse command line arguments
-while getopts 'b:BcCiJm:p:q:R:sTuUx:y:w:' OPTION
+while getopts 'b:BcCdiJm:p:q:R:sSTuUx:y:w:' OPTION
 do
 case $OPTION in
   b)
@@ -1759,6 +1771,12 @@ case $OPTION in
    ;;
   C)
    FORCECLONE="-C"
+   ;;
+  d)
+   SKIPRELEASE=1
+   SKIPINSPECT=1
+   SKIPMATLAB=1
+   SKIPPICTURES=1
    ;;
   i)
    USEINSTALL="-r"
@@ -1781,6 +1799,12 @@ case $OPTION in
    ;;
   s)
    SKIPMATLAB=1
+   ;;
+  S)
+   SUBSET_CASES="-S"
+   SKIPINSPECT=1
+   SKIPMATLAB=1
+   SKIPPICTURES=1
    ;;
   T)
    CLONE_FDSSMV=1
@@ -1992,6 +2016,23 @@ echo "      Run dir: $firebotdir"
 if [ "$IFORT_VERSION" != "" ]; then
   echo "      Fortran: $IFORT_VERSION"
 fi
+
+if [ "$SKIPINSPECT" != "" ]; then
+  echo "     Skipping: thread checking stage"
+fi
+if [ "$SUBSET_CASES" != "" ]; then
+  echo "      Running: subset of cases"
+fi
+if [ "$SKIPRELEASE" != "" ]; then
+  echo "     Skipping: release cases stage"
+fi
+if [ "$SKIPPICTURES" != "" ]; then
+  echo "     Skipping: picture generation stage"
+fi
+if [ "$SKIPMATLAB" != "" ]; then
+  echo "     Skipping: matlab stage"
+fi
+
 if [ "$CLEANREPO" == "1" ]; then
   echo "  clean repos: yes"
 else
@@ -2139,7 +2180,7 @@ echo Building
 echo "   FDS"
 # if something goes wrong with the openmp inspector
 # comment the following 6 lines (including 'if' and and 'fi'  lines
-if [ "$BUILD_ONLY" == "" ]; then
+if [[ "$SKIPINSPECT" == "" ]] && [[ "$platform" == "linux" ]] && [[ "$BUILD_ONLY" == "" ]]; then
   build_inspect_fds
 #  inspect_fds
 #  check_inspect_fds
@@ -2158,24 +2199,32 @@ if [[ "$OPENMPI_GNU" != "" ]] && [[ "$BUILD_ONLY" == "" ]] ; then
 fi
 
 ### Stage 2c ###
-compile_fds_mpi
-check_compile_fds_mpi
+if [ "$SKIPRELEASE" == "" ]; then
+  compile_fds_mpi
+  check_compile_fds_mpi
+fi
+
+$COPY_APPS fds > $OUTPUT_DIR/stage3d
 
 ### Stage 3a ###
-compile_smv_utilities
-check_smv_utilities
+if [ "$SKIPPICTURES" == "" ]; then
+  compile_smv_utilities
+  check_smv_utilities
+fi
 
 ### Stage 3b ###
-if [ "$BUILD_ONLY" == "" ]; then
+if [[ "$SKIPPICTURES" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
   compile_smv_db
   check_compile_smv_db
 fi
 
 ### Stage 3c ###
-compile_smv
-check_compile_smv
+if [ "$SKIPPICTURES" == "" ]; then
+  compile_smv
+  check_compile_smv
+  $COPY_APPS smv >> $OUTPUT_DIR/stage3d
+fi
 
-  $COPY_APPS >& $OUTPUT_DIR/stage3d
 
 ### Stage 4 ###
 
@@ -2195,16 +2244,18 @@ if [[ "$BUILD_ONLY" == "" ]]; then
 
 ### Stage 5 ###
 # Depends on successful FDS compile
-  if [[ $FDS_release_success ]] ; then
+  if [[ $FDS_release_success ]] && [[ "$SKIPRELEASE" == "" ]]; then
     run_verification_cases_release
     check_cases_release $fdsrepo/Verification 'final'
   fi
 
 ### Stage 6 ###
 # Depends on successful SMV compile
-  if [[ $smv_release_success ]] ; then
-    make_fds_pictures
-    check_fds_pictures
+  if [ "$SKIPPICTURES" == "" ] ; then
+    if [[ $smv_release_success ]] ; then
+      make_fds_pictures
+      check_fds_pictures
+    fi
   fi
 
   if [ "$SKIPMATLAB" == "" ] ; then

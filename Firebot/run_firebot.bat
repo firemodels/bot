@@ -10,7 +10,8 @@ set usematlab=1
 set stopscript=0
 set force=0
 set installed=0
-set lite=0
+set debug=0
+set subset=0
 set build_only=0
 
 if NOT exist .fds_git (
@@ -19,7 +20,7 @@ if NOT exist .fds_git (
    exit /b
 )
 
-set emailto=
+set emailto=null
 if not x%EMAILGIT% == x (
   set emailto=%EMAILGIT%
 )
@@ -67,7 +68,7 @@ if %update% == 0 goto no_update
 :: run firebot
 
   echo 1 > %running%
-  call firebot.bat %repo% %clean% %update% %altemail% %usematlab% %installed% %lite% %build_only% %emailto%
+  call firebot.bat %repo% %clean% %update% %altemail% %usematlab% %installed% %debug% %subset% %build_only% %emailto%
   if exist %running% erase %running%
   goto end_running
 :skip_running
@@ -124,9 +125,13 @@ goto eof
    set valid=1
    set force=1
  )
- if /I "%1" EQU "-lite" (
+ if /I "%1" EQU "-debug" (
    set valid=1
-   set lite=1
+   set debug=1
+ )
+ if /I "%1" EQU "-subset" (
+   set valid=1
+   set subset=1
  )
  if /I "%1" EQU "-nomatlab" (
    set valid=1
@@ -194,10 +199,11 @@ echo -bot            - clean and update repository
 echo -build          - only build fds and smv apps
 echo -buildfds       - only build fds apps
 echo -clean          - clean repository
+echo -debug          - run only debug FDS
 echo -force          - force firebot to run
 echo -installed      - use installed smokeview
-echo -lite           - build and run only debug FDS
 echo -nomatlab       - do not use matlab
+echo -subset         - run subset cases
 echo -update         - update repository
 
 exit /b

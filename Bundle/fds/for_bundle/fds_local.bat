@@ -12,6 +12,9 @@ set stop_script=0
 set use_openmp=0
 set have_casename=0
 set show_version=0
+set MPIEXEC_PORT_RANGE=
+set MPICH_PORT_RANGE=
+
 
 call :getopts %*
 if "%stop_script%" == "1" exit /b

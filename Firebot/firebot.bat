@@ -12,8 +12,10 @@ set update=%3
 set altemail=%4
 set usematlab=%5
 set installed=%6
-set lite=%7
-set build_only=%8
+set debug=%7
+set subset=%8
+set build_only=%9
+shift
 set emailto=%9
 
 if NOT %build_only% == 0 (
@@ -108,6 +110,11 @@ set countb=%OUTDIR%\firebot_count0b.txt
 set scratchfile=%OUTDIR%\firebot_scratch.txt
 set have_matlab=0
 
+set SUBSET_ARG=-subset
+if %subset% == 1 goto skip_nosubset
+set SUBSET_ARG=
+:skip_nosubset
+
 set fromsummarydir=%smvrepo%\Manuals\SMV_Summary
 
 set haveerrors=0
@@ -123,7 +130,7 @@ call "%fdsrepo%\Build\Scripts\setup_intel_compilers.bat" 1> Nul 2>&1
 call %userprofile%\.firebot\firebot_email_list.bat
 
 set mailToList=%mailToFDS%
-if NOT "%emailto%" == "" (
+if NOT "%emailto%" == "null" (
   set mailToList=%emailto%
 )
 
@@ -208,8 +215,7 @@ echo    found grep
 call :is_file_installed make|| exit /b 1
 echo    found make
 
-
-if %build_only% == "0" (
+if NOT "%build_only%" == "0" goto if1
   where matlab 2>&1 | find /i /c "Could not find" > %OUTDIR%\stage_count0a.txt
   set /p nothavematlab=<%OUTDIR%\stage_count0a.txt
   if %nothavematlab% == 0 (
@@ -221,7 +227,7 @@ if %build_only% == "0" (
   )
   call :is_file_installed pdflatex|| exit /b 1
   echo    found pdflatex
-)
+:if1
 
 call :is_file_installed sed|| exit /b 1
 echo    found sed
@@ -281,25 +287,25 @@ echo    debug
 cd %fdsrepo%\Build\impi_intel_win_64_db
 erase *.obj *.mod *.exe *.pdb 1> Nul 2>&1
 call make_fds bot 1> %OUTDIR%\makefdsd.log 2>&1
-call :does_file_exist fds_impi_win_64_db.exe %OUTDIR%\makefdsd.log|| exit /b 1
+call :does_file_exist fds_impi_win_64_db.exe %OUTDIR%\makefdsd.log || exit /b 1
 call :find_warnings "warning" %OUTDIR%\makefdsd.log "Stage 1b, FDS parallel debug compilation"
 
-if %lite% == 1 goto skip_lite1
+if %debug% == 1 goto skip_debug1
 
   echo    release
 
   cd %fdsrepo%\Build\impi_intel_win_64
- :: erase *.obj *.mod *.exe *.pdb 1> Nul 2>&1
- :: call make_fds bot 1> %OUTDIR%\makefdsr.log 2>&1
- :: call :does_file_exist fds_impi_win_64.exe %OUTDIR%\makefdsr.log|| exit /b 1
- :: call :find_warnings "warning" %OUTDIR%\makefdsr.log "Stage 1d, FDS parallel release compilation"
-:skip_lite1
+  erase *.obj *.mod *.exe *.pdb 1> Nul 2>&1
+  call make_fds bot 1> %OUTDIR%\makefdsr.log 2>&1
+  call :does_file_exist fds_impi_win_64.exe %OUTDIR%\makefdsr.log|| exit /b 1
+  call :find_warnings "warning" %OUTDIR%\makefdsr.log "Stage 1d, FDS parallel release compilation"
+:skip_debug1
 
 :: -------------------------------------------------------------
 ::                           stage 2
 :: -------------------------------------------------------------
 
-if %lite% == 1 goto skip_lite2
+if %debug% == 1 goto skip_debug2
   if %installed% == 1 goto skip_build_cstuff
   if %have_icc% == 0 goto skip_build_cstuff
     echo  Building Smokeview
@@ -352,7 +358,7 @@ if %lite% == 1 goto skip_lite2
     call :is_file_installed background|| exit /b 1
     echo    background not built, using installed version
   )
-:skip_lite2
+:skip_debug2
 if NOT %build_only% == 0 goto skip_run_cases
 
 
@@ -370,20 +376,20 @@ echo    debug mode
 :: run cases
 
 cd %fdsrepo%\Verification\scripts
-call Run_FDS_cases -debug 1> %OUTDIR%\stage4a.txt 2>&1
+call Run_FDS_cases -debug %SUBSET_ARG% 1> %OUTDIR%\stage4a.txt 2>&1
 
 :: check cases
 
 set haveerrors_now=0
 echo. > %OUTDIR%\stage_error.txt
 cd %fdsrepo%\Verification\scripts
-call Check_FDS_cases 
+call Check_FDS_cases %SUBSET_ARG%
 
 :: report errors
 
 call :report_errors Stage 4a, "Debug FDS case errors"|| exit /b 1
 
-if %lite% == 1 goto skip_lite3
+if %debug% == 1 goto skip_debug3
 
   echo    release mode
 
@@ -396,24 +402,24 @@ if %lite% == 1 goto skip_lite3
 :skip_clean2
 
   cd %fdsrepo%\Verification\scripts
-  call Run_FDS_cases  1> %OUTDIR%\stage4b.txt 2>&1
+  call Run_FDS_cases %SUBSET_ARG% 1> %OUTDIR%\stage4b.txt 2>&1
 
 :: check cases
 
   set haveerrors_now=0
   echo. > %OUTDIR%\stage_error.txt
   cd %fdsrepo%\Verification\scripts
-  call Check_FDS_cases
+  call Check_FDS_cases %SUBSET_ARG%
 
 :: report errors
 
   call :report_errors Stage 4b, "Release FDS case errors"|| exit /b 1
-:skip_lite3
+:skip_debug3
 
 call :GET_DURATION RUNVV %RUNVV_beg%
 :skip_run_cases
 
-if %lite% == 1 goto skip_lite4
+if %debug% == 1 goto skip_debug4
 
 :: -------------------------------------------------------------
 ::                           stage 5
@@ -475,7 +481,8 @@ if %lite% == 1 goto skip_lite4
 
   call :GET_DURATION MAKEGUIDES %MAKEGUIDES_beg%
 
-:skip_lite4
+:skip_debug4
+
 
 call :GET_DURATION TOTALTIME %TIME_beg%
 
@@ -492,10 +499,10 @@ echo .        start: %startdate% %starttime% >> %infofile%
 echo .         stop: %stopdate% %stoptime%   >> %infofile%
 echo .        setup: %DIFF_PRELIM%           >> %infofile%
 echo .    run cases: %DIFF_RUNVV%            >> %infofile%
-if %lite% == 1 goto skip_lite5
+if %debug% == 1 goto skip_debug5
 echo .make pictures: %DIFF_MAKEPICS%         >> %infofile%
 echo .  make guides: %DIFF_MAKEGUIDES%       >> %infofile%
-:skip_lite5
+:skip_debug5
 echo .        total: %DIFF_TOTALTIME%        >> %infofile%
 echo . -----------------------------         >> %infofile%
 

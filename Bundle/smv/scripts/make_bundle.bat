@@ -45,7 +45,7 @@ set gettime=%svn_root%\smv\Build\get_time\%BUILDDIR%
 set hashfileexe=%hashfilebuild%\hashfile_win_64.exe
 set repoexes=%userprofile%\.bundle\BUNDLE\WINDOWS\repoexes
 
-set zipbase=%version%_win64
+set zipbase=%version%_win
 set smvdir=%zipbase%\%SMVEDITION%
 
 cd %userprofile%
@@ -144,7 +144,7 @@ cd %smvdir%\hash
 cat %zipbase%.exe.sha1 >> %uploads%\%zipbase%.sha1
 
 echo.
-echo --- Smokeview win64 installer %zipbase%.exe built
+echo --- Windows Smokeview installer, %zipbase%.exe, built
 echo.
 
 cd %CURDIR%
