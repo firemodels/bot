@@ -176,14 +176,12 @@ CALL :TOMANIFESTMPI   %out_bin%\mpi\mpiexec.exe  mpiexec
 CALL :TOMANIFESTSMV   %out_smv%\smokeview.exe    smokeview
 
 CALL :COPY  %bundle_dir%\smv\background.exe %out_bin%\background.exe
-CALL :COPY  %bundle_dir%\smv\dem2fds.exe    %out_smv%\dem2fds.exe 
 CALL :COPY  %bundle_dir%\smv\hashfile.exe   %out_smv%\hashfile.exe 
 CALL :COPY  %bundle_dir%\smv\smokediff.exe  %out_smv%\smokediff.exe
 CALL :COPY  %bundle_dir%\smv\smokezip.exe   %out_smv%\smokezip.exe 
 CALL :COPY  %bundle_dir%\smv\wind2fds.exe   %out_smv%\wind2fds.exe 
 
 CALL :TOMANIFESTSMV   %out_bin%\background.exe background
-CALL :TOMANIFESTSMV   %out_smv%\dem2fds.exe    dem2fds
 CALL :TOMANIFESTLIST  %out_bin%\fds2ascii.exe  fds2ascii
 CALL :TOMANIFESTSMV   %out_smv%\hashfile.exe   hashfile
 CALL :TOMANIFESTSMV   %out_smv%\smokediff.exe  smokediff
@@ -213,7 +211,6 @@ cd %out_smv%
 %hashfile% smokeview.exe  >  hash\smokeview_%smv_version%.exe.sha1
 %hashfile% smokediff.exe  >  hash\smokediff_%smv_version%.exe.sha1
 %hashfile% smokezip.exe   >  hash\smokezip_%smv_version%.exe.sha1
-%hashfile% dem2fds.exe    >  hash\dem2fds_%smv_version%.exe.sha1
 %hashfile% wind2fds.exe   >  hash\wind2fds_%smv_version%.exe.sha1
 cd hash
 cat *.sha1              >>  %upload_dir%\%basename%.sha1

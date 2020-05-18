@@ -374,7 +374,6 @@ CP $APPS_DIR background $smvbindir background
 CP $APPS_DIR smokeview  $smvbindir smokeview
 CP $APPS_DIR smokediff  $smvbindir smokediff
 CP $APPS_DIR smokezip   $smvbindir smokezip
-CP $APPS_DIR dem2fds    $smvbindir dem2fds
 CP $APPS_DIR wind2fds   $smvbindir wind2fds
 CP $APPS_DIR hashfile   $smvbindir hashfile
 
@@ -391,7 +390,6 @@ $APPS_DIR/hashfile background > hash/background.sha1
 $APPS_DIR/hashfile smokeview  > hash/smokeview.sha1
 $APPS_DIR/hashfile smokediff  > hash/smokediff.sha1
 $APPS_DIR/hashfile smokezip   > hash/smokezip.sha1
-$APPS_DIR/hashfile dem2fds    > hash/dem2fds.sha1
 $APPS_DIR/hashfile wind2fds   > hash/wind2fds.sha1
 $APPS_DIR/hashfile hashfile   > hash/hashfile.sha1
 cd $CURDIR
@@ -434,7 +432,6 @@ TOMANIFESTMPI  $MPIEXEC              mpiexec
 TOMANIFESTSMV  $smvbindir/smokeview  smokeview
 
 TOMANIFESTSMV  $smvbindir/background background
-TOMANIFESTSMV  $smvbindir/dem2fds    dem2fds
 TOMANIFESTLIST $fdsbindir/fds2ascii  fds2ascii
 TOMANIFESTSMV  $smvbindir/hashfile   hashfile
 TOMANIFESTSMV  $smvbindir/smokediff  smokediff
