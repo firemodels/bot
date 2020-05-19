@@ -5,6 +5,11 @@ input=$1
 smvfile=$1.smv
 slcffile=$1.slcf
 
+HTMLDIR=/var/www/html/`whoami`
+if [ ! -e $HTMLDIR ]; then
+  HTMLDIR=.
+fi
+
 #---------------------------------------------
 #                   is_file_installed
 #---------------------------------------------
@@ -28,7 +33,6 @@ is_file_installed()
 OUTPUT_SLICES ()
 {
   cat $slcffile | awk -F"," '{ print $1": ",$2," ",$3," ",$4}'
-  nslices=`cat $slcffile | wc -l`
 }
 
 GENERATE_SCRIPT ()
@@ -37,9 +41,10 @@ GENERATE_SCRIPT ()
   scriptname=$2
   scriptname=${input}_slice_${ind}.ssf
   htmlbase=${input}_slice_${ind}
+  htmlfile=$HTMLDIR/${htmlbase}.html
   cat << EOF > $scriptname
 RENDERHTMLDIR
-  .
+  $HTMLDIR
 UNLOADALL
 LOADSLICE
 EOF
@@ -67,6 +72,12 @@ if [ ! -e $slcffile ]; then
   exit 1
 fi
 
+nslices=`cat $slcffile | wc -l`
+if [ "$nslices" == "0" ]; then
+  echo "*** No slice files exist in the smokeview file $smvfile"
+  exit
+fi
+
 while true; do
   OUTPUT_SLICES
   echo "x - exit script"
@@ -84,7 +95,13 @@ while true; do
     GENERATE_SCRIPT $ans $scriptname
     if [ -e $scriptname ]; then
       echo "***ceating html file"
+      rm -f $htmlfile
       smokeview -htmlscript $scriptname $input
+      if [ -e $htmlfile ]; then
+        echo "*** The html file $htmlfile has been created."
+      else
+        echo "*** The html file $htmlfile failed to be created."
+      fi
     fi
   else
     echo index $ans out of bounds
