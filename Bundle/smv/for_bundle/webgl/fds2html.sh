@@ -62,8 +62,7 @@ if [ ! -e $smvfile ]; then
 fi
 
 if [ ! -e $slcffile ]; then
-  echo "*** The file $slcffile does not exist (list of available slice files)"
-  echo "Creating $slcffile"
+  echo "Creating slice file menu file $slcffile"
   smokeview -slice_info $input >& /dev/null
 fi
 
@@ -98,7 +97,8 @@ while true; do
       rm -f $htmlfile
       smokeview -htmlscript $scriptname $input
       if [ -e $htmlfile ]; then
-        echo "*** The html file $htmlfile has been created."
+        filesize=`ls -lk $htmlfile | awk '{print $5}'`
+        echo "*** The html file, $htmlfile(${filesize}K), has been created."
       else
         echo "*** The html file $htmlfile failed to be created."
       fi
