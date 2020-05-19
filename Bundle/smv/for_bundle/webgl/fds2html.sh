@@ -32,7 +32,7 @@ is_file_installed()
 
 OUTPUT_SLICES ()
 {
-  cat $slcffile | awk -F"," '{ print $1": ",$2," ",$3," ",$4}'
+  cat $slcffile | awk -F"," '{ print $1" ",$2," ",$3," ",$4}'
 }
 
 GENERATE_SCRIPT ()
@@ -62,7 +62,6 @@ if [ ! -e $smvfile ]; then
 fi
 
 if [ ! -e $slcffile ]; then
-  echo "Creating slice file menu file $slcffile"
   smokeview -slice_info $input >& /dev/null
 fi
 
