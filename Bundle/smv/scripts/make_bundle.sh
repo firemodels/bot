@@ -94,7 +94,7 @@ HASHFILEDIR=$REMOTESVNROOT/smv/Build/hashfile/intel_${platform}_64
 FLUSHFILEDIR=$REMOTESVNROOT/smv/Build/flush/intel_${platform}_64
 FORBUNDLE=$SVNROOT/bot/Bundle/smv/for_bundle
 WEBGLDIR=$SVNROOT/bot/Bundle/smv/for_bundle/webgl
-SMVSCRIPTDIR=$SVNROOT/smv/scripts
+UTILSCRIPTDIR=$SVNROOT/smv/Utilities/Scripts
 PLATFORMDIR=$RELEASE$revision\_${platform3}
 UPDATER=$SVNROOT/bot/Bundle/smv/scripts//make_updater.sh
 uploads=$HOME/.bundle/uploads
@@ -125,8 +125,8 @@ CP $FORBUNDLE       smokeview.html    $PLATFORMDIR/$smvbin smokeview.html
 CP $FORBUNDLE/webvr smokeview_vr.html $PLATFORMDIR/$smvbin smokeview_vr.html
 CP $WEBGLDIR        runsmv_ssh.sh     $PLATFORMDIR/$smvbin runsmv_ssh.sh
 CP $WEBGLDIR        smv2html.sh       $PLATFORMDIR/$smvbin smv2html.sh
-CP $SMVSCRIPTDIR    fds2html.sh       $PLATFORMDIR/$smvbin fds2html.sh
-CP $SMVSCRIPTDIR    fds2mov.sh        $PLATFORMDIR/$smvbin fds2mov.sh
+CP $UTILSCRIPTDIR   fds2html.sh       $PLATFORMDIR/$smvbin fds2html.sh
+CP $UTILSCRIPTDIR   fds2mov.sh        $PLATFORMDIR/$smvbin fds2mov.sh
 
 SCP $PLATFORMHOST $BACKGROUNDDIR background_${platform}_64 $PLATFORMDIR/$smvbin background
 SCP $PLATFORMHOST $SMVDIR        smokeview_${platform}_${TEST}64  $PLATFORMDIR/$smvbin smokeview
