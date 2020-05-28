@@ -313,8 +313,6 @@ else
   PLATFORM=LINUX64
 fi
 
-smvscriptdir=$REPO_ROOT/smv/scripts
-
 bundledir=$UPLOAD_DIR/$bundlebase
 smvbindir=$bundledir/smvbin
 fdsbindir=$bundledir/bin
@@ -323,6 +321,8 @@ webpagesdir=$REPO_ROOT/webpages
 fds_bundle=$REPO_ROOT/bot/Bundle/fds/for_bundle
 smv_bundle=$REPO_ROOT/bot/Bundle/smv/for_bundle
 webgldir=$REPO_ROOT/bot/Bundle/smv/for_bundle/webgl
+smvscriptdir=$REPO_ROOT/smv/scripts
+utilscriptdir=$REPO_ROOT/smv/Utilities/Scripts
 
 texturedir=$smv_bundle/textures
 makeinstaller=$REPO_ROOT/bot/Bundlebot/make_installer.sh
@@ -457,9 +457,10 @@ CP $smv_bundle smokeview.html $smvbindir smokeview.html
 
 # smokeview to html conversion scripts
 
-CP $webgldir runsmv_ssh.sh $smvbindir runsmv_ssh.sh
-CP $webgldir smv2html.sh   $smvbindir smv2html.sh
-CP $webgldir fds2html.sh   $smvbindir fds2html.sh
+CP $webgldir      runsmv_ssh.sh $smvbindir runsmv_ssh.sh
+CP $webgldir      smv2html.sh   $smvbindir smv2html.sh
+CP $utilscriptdir fds2html.sh   $smvbindir fds2html.sh
+CP $utilscriptdir fds2mov.sh    $smvbindir fds2mov.sh
 
 echo ""
 echo "--- copying documentation ---"
