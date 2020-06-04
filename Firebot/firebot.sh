@@ -463,15 +463,19 @@ compile_fds_mpi_gnu_db()
    compile_gnu=
    if [ "$OPENMPI_INTEL" != "" ]; then
      if [ "$OPENMPI_GNU" != "" ]; then
-       module unload $OPENMPI_INTEL
-       module load $OPENMPI_GNU
-       echo "      MPI gfortran debug"
-       compile_gnu=1
-       cd $fdsrepo/Build/mpi_gnu_${platform}${size}$DB
-       make -f ../makefile clean &> /dev/null
-       ./make_fds.sh &> $OUTPUT_DIR/stage2d
-       module unload $OPENMPI_GNU
-       module load $OPENMPI_INTEL
+       if [ "$GFORTRAN" != "" ]; then
+         module unload $OPENMPI_INTEL
+         module load $OPENMPI_GNU
+         module load $GFORTRAN
+         echo "      MPI gfortran debug"
+         compile_gnu=1
+         cd $fdsrepo/Build/mpi_gnu_${platform}${size}$DB
+         make -f ../makefile clean &> /dev/null
+         ./make_fds.sh &> $OUTPUT_DIR/stage2d
+         module unload $OPENMPI_GNU
+         module unload $GFORTRAN
+         module load $OPENMPI_INTEL
+       fi
      fi
    fi
 }
