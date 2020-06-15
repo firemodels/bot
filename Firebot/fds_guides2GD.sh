@@ -10,8 +10,8 @@ FIGURES_PARENT_ID=0B-W-dkXwdHWNOGVsZXNzTjdLek0
 
 UPLOADFILE ()
 {
-  DIR=$HOME/.firebot/pubs
-  FILE=$1
+  DIR=$1
+  FILE=$2
   cd $DIR
   if [ -e $FILE ]; then
     $GDRIVE list  | grep $FILE | awk '{ system("~/bin/gdrive delete -i " $1)} '
@@ -79,7 +79,10 @@ if [ -e $GDRIVE ] ; then
   UPLOADFIGURES FDS_User_Guide FDS_UG
   UPLOADFIGURES FDS_Validation_Guide FDS_VALG
   UPLOADFIGURES FDS_Verification_Guide FDS_VERG
-  UPLOADFILE FDS_REVISION
+  UPLOADFILE $HOME/.firebot/appslatest FDS_HASH
+  UPLOADFILE $HOME/.firebot/appslatest FDS_REVISION
+  UPLOADFILE $HOME/.firebot/appslatest SMV_HASH
+  UPLOADFILE $HOME/.firebot/appslatest SMV_REVISION
   UPLOADFILE SMV_REVISION
   cd $CURDIR
 fi

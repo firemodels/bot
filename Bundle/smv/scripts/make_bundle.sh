@@ -126,7 +126,7 @@ CP $FORBUNDLE/webvr smokeview_vr.html $PLATFORMDIR/$smvbin smokeview_vr.html
 CP $WEBGLDIR        runsmv_ssh.sh     $PLATFORMDIR/$smvbin runsmv_ssh.sh
 CP $WEBGLDIR        smv2html.sh       $PLATFORMDIR/$smvbin smv2html.sh
 CP $UTILSCRIPTDIR   fds2html.sh       $PLATFORMDIR/$smvbin fds2html.sh
-CP $UTILSCRIPTDIR   fds2mov.sh        $PLATFORMDIR/$smvbin fds2mov.sh
+CP $UTILSCRIPTDIR   fds2mp4.sh        $PLATFORMDIR/$smvbin fds2mp4.sh
 
 SCP $PLATFORMHOST $BACKGROUNDDIR background_${platform}_64 $PLATFORMDIR/$smvbin background
 SCP $PLATFORMHOST $SMVDIR        smokeview_${platform}_${TEST}64  $PLATFORMDIR/$smvbin smokeview
