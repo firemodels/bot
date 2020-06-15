@@ -22,7 +22,7 @@ cd ..
 set botrepo=%CD%
 call :cd_repo %botrepo% master || exit /b 1
 
-:: bring the repo up to date
+:: bring the bot repo up to date
 git fetch origin master
 git merge origin/master
 
