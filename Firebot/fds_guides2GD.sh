@@ -4,19 +4,20 @@ MANDIR=$2
 
 GDRIVE=~/bin/gdrive
 CURDIR=`pwd`
-# directory containing guides on google drive : FDS-SMV Newest Manuals
+# directory id's containing guides, figures and hashes on google drive
 MANUAL_PARENT_ID=0B_wB1pJL2bFQUlJwMmNfaHlqME0
 FIGURES_PARENT_ID=0B-W-dkXwdHWNOGVsZXNzTjdLek0
+HASHES_PARENT_ID=1KLacD9Q-bR1LSGNB3OtTcN6BZJbro3-Z
 
-UPLOADFILE ()
+UPLOADHASH ()
 {
-  DIR=$1
+  DIR=$HOME/.firebot/appslatest
   FILE=$2
   cd $DIR
   if [ -e $FILE ]; then
     $GDRIVE list  | grep $FILE | awk '{ system("~/bin/gdrive delete -i " $1)} '
-    $GDRIVE upload -p $MANUAL_PARENT_ID -f $FILE
-    npubs=`$GDRIVE list  | grep $FILE | wc -l`
+    $GDRIVE upload -p $HASHES_PARENT_ID -f $FILE
+    npubs=`$GDRIVE list | grep $FILE | wc -l`
     if [ $npubs -eq 0 ]; then
       echo "*** warning: The file $FILE failed to upload to google drive"
     fi
@@ -79,9 +80,9 @@ if [ -e $GDRIVE ] ; then
   UPLOADFIGURES FDS_User_Guide FDS_UG
   UPLOADFIGURES FDS_Validation_Guide FDS_VALG
   UPLOADFIGURES FDS_Verification_Guide FDS_VERG
-  UPLOADFILE $HOME/.firebot/appslatest FDS_HASH
-  UPLOADFILE $HOME/.firebot/appslatest FDS_REVISION
-  UPLOADFILE $HOME/.firebot/appslatest SMV_HASH
-  UPLOADFILE $HOME/.firebot/appslatest SMV_REVISION
+  UPLOADHASH FDS_HASH
+  UPLOADHASH FDS_REVISION
+  UPLOADHASH SMV_HASH
+  UPLOADHASH SMV_REVISION
   cd $CURDIR
 fi
