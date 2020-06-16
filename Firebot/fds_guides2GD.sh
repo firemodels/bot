@@ -12,7 +12,7 @@ HASHES_PARENT_ID=1KLacD9Q-bR1LSGNB3OtTcN6BZJbro3-Z
 UPLOADHASH ()
 {
   DIR=$HOME/.firebot/appslatest
-  FILE=$2
+  FILE=$1
   cd $DIR
   if [ -e $FILE ]; then
     $GDRIVE list  | grep $FILE | awk '{ system("~/bin/gdrive delete -i " $1)} '
