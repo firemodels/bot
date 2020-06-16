@@ -676,14 +676,6 @@ compile_smv_utilities()
      ./make_background.sh >> $OUTPUT_DIR/stage2a 2>&1
      cp background_${platform}_64 $LATESTAPPS_DIR/background
 
-   # dem2fds
-     echo "      dem2fds"
-     cd $smvrepo/Build/dem2fds/${COMPILER}_${platform}_64
-     rm -f *.o dem2fds_${platform}_64
-     echo 'Compiling dem2fds:' >> $OUTPUT_DIR/stage2a 2>&1
-     ./make_dem2fds.sh >> $OUTPUT_DIR/stage2a 2>&1
-     cp dem2fds_${platform}_64 $LATESTAPPS_DIR/dem2fds
-   
    # hashfile
      echo "      hashfile"
      cd $smvrepo/Build/hashfile/${COMPILER}_${platform}_64
@@ -783,7 +775,6 @@ check_smv_utilities()
      if [ -e "$smvrepo/Build/smokezip/${COMPILER}_${platform}_64/smokezip_${platform}_64" ]    && \
         [ -e "$smvrepo/Build/smokediff/${COMPILER}_${platform}_64/smokediff_${platform}_64" ]  && \
         [ -e "$smvrepo/Build/wind2fds/${COMPILER}_${platform}_64/wind2fds_${platform}_64" ]    && \
-        [ -e "$smvrepo/Build/dem2fds/${COMPILER}_${platform}_64/dem2fds_${platform}_64" ]      && \
         [ -e "$smvrepo/Build/background/${COMPILER}_${platform}_64/background_${platform}_64" ]
      then
         stage_utilities_success="1"
@@ -800,7 +791,6 @@ check_smv_utilities()
      is_file_installed smokezip
      is_file_installed smokediff
      is_file_installed wind2fds
-     is_file_installed dem2fds
      is_file_installed background
      if [ "$stage_utilities_success" == "0" ] ; then
         echo "Errors from Stage 2c - Smokeview and utilities:" >> $ERROR_LOG

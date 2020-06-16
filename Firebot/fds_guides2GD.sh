@@ -83,6 +83,5 @@ if [ -e $GDRIVE ] ; then
   UPLOADFILE $HOME/.firebot/appslatest FDS_REVISION
   UPLOADFILE $HOME/.firebot/appslatest SMV_HASH
   UPLOADFILE $HOME/.firebot/appslatest SMV_REVISION
-  UPLOADFILE SMV_REVISION
   cd $CURDIR
 fi
