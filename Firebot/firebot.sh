@@ -1363,7 +1363,7 @@ copy_fds_user_guide()
 {
    cd $fdsrepo/Manuals/FDS_User_Guide
    copy_guide $fdsrepo/Manuals/FDS_User_Guide/FDS_User_Guide.pdf
-   copy_guide $fdsrepo/Manuals/FDS_User_Guide/geom_notes.pdf
+#   copy_guide $fdsrepo/Manuals/FDS_User_Guide/geom_notes.pdf
 }
 
 #---------------------------------------------
@@ -2280,7 +2280,7 @@ if [[ "$BUILD_ONLY" == "" ]]; then
 ### Stage 8 ###
   if [ "$SKIPMATLAB" == "" ] ; then
     make_fds_user_guide
-    make_geom_notes
+#    make_geom_notes
     make_fds_verification_guide
     make_fds_technical_guide
     make_fds_validation_guide
