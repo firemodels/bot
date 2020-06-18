@@ -769,18 +769,42 @@ check_common_files()
 
 check_smv_utilities()
 {
+   SMOKEZIP="$smvrepo/Build/smokezip/${COMPILER}_${platform}_64/smokezip_${platform}_64"
+   SMOKEDIFF="$smvrepo/Build/smokediff/${COMPILER}_${platform}_64/smokediff_${platform}_64"
+   WIND2FDS="$smvrepo/Build/wind2fds/${COMPILER}_${platform}_64/wind2fds_${platform}_64"
+   BACKGROUND="$smvrepo/Build/background/${COMPILER}_${platform}_64/background_${platform}_64"
    if [ "$haveCC" == "1" ] ; then
      # Check for errors in SMV utilities compilation
      cd $smvrepo
-     if [ -e "$smvrepo/Build/smokezip/${COMPILER}_${platform}_64/smokezip_${platform}_64" ]    && \
-        [ -e "$smvrepo/Build/smokediff/${COMPILER}_${platform}_64/smokediff_${platform}_64" ]  && \
-        [ -e "$smvrepo/Build/wind2fds/${COMPILER}_${platform}_64/wind2fds_${platform}_64" ]    && \
-        [ -e "$smvrepo/Build/background/${COMPILER}_${platform}_64/background_${platform}_64" ]
+     if [ -e "$SMOKEZIP" ]    && \
+        [ -e "$SMOKEDIFF" ]  && \
+        [ -e "$WIND2FDS" ]    && \
+        [ -e "$BACKGROUND" ]
      then
         stage_utilities_success="1"
      else
         stage_utilities_success="0"
         echo "Errors from Stage 2c - Compile SMV utilities:" >> $ERROR_LOG
+        if [ ! -e "$SMOKEZIP" ]; then
+          echo ""
+          echo "error: smokezip failed to compile"           >> $ERROR_LOG
+          echo "       $SMOKEZIP does not exist"             >> $ERROR_LOG
+        fi
+        if [ ! -e "$SMOKEDIFF" ]; then
+          echo ""
+          echo "error: smokediff failed to compile"          >> $ERROR_LOG
+          echo "       $SMOKEDIFF does not exist"            >> $ERROR_LOG
+        fi 
+        if [ ! -e "$WIND2FDS" ]; then
+          echo ""
+          echo "error: wind2fds failed to compile"           >> $ERROR_LOG
+          echo "       $WIND2FDS does not exist"             >> $ERROR_LOG
+        fi 
+        if [ ! -e "$BACKGROUND" ]; then
+          echo ""
+          echo "error: background failed to compile"         >> $ERROR_LOG
+          echo "       $BACKGROUND does not exist"           >> $ERROR_LOG
+        fi 
         cat $OUTPUT_DIR/stage2c                              >> $ERROR_LOG
         echo ""                                              >> $ERROR_LOG
         compile_errors=1
