@@ -336,12 +336,6 @@ if %haveCC% == 1 (
   call make_smokezip bot 1>> %OUTDIR%\stage3.txt 2>&1
   call :does_file_exist smokezip_win_64.exe %OUTDIR%\stage3.txt|| exit /b 1
 
-  echo    dem2fds
-  cd %smvrepo%\Build\dem2fds\intel_win_64
-  erase *.obj *.mod *.exe 1>> %OUTDIR%\stage3.txt 2>&1
-  call make_dem2fds bot 1>> %OUTDIR%\stage3.txt 2>&1
-  call :does_file_exist dem2fds_win_64.exe %OUTDIR%\stage3.txt|| exit /b 1
-
   echo    wind2fds
   cd %smvrepo%\Build\wind2fds\intel_win_64
   erase *.obj *.mod *.exe 1>> %OUTDIR%\stage3.txt 2>&1
@@ -354,8 +348,6 @@ if %haveCC% == 1 (
   echo    smokediff not built, using installed version
   call :is_file_installed smokezip|| exit /b 1
   echo    smokezip not built, using installed version
-  call :is_file_installed dem2fds|| exit /b 1
-  echo    dem2fds not built, using installed version
   call :is_file_installed wind2fds|| exit /b 1
   echo    wind2fds not built, using installed version
 )
