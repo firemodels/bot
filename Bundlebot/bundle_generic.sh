@@ -460,7 +460,7 @@ CP $smv_bundle smokeview.html $smvbindir smokeview.html
 CP $webgldir      runsmv_ssh.sh $smvbindir runsmv_ssh.sh
 CP $webgldir      smv2html.sh   $smvbindir smv2html.sh
 CP $utilscriptdir fds2html.sh   $smvbindir fds2html.sh
-CP $utilscriptdir fds2mov.sh    $smvbindir fds2mov.sh
+CP $utilscriptdir fds2mp4.sh    $smvbindir fds2mp4.sh
 
 echo ""
 echo "--- copying documentation ---"
