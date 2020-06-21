@@ -544,7 +544,7 @@ run_verification_cases_debug()
 
    # Submit SMV verification cases and wait for them to start
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3a 2>&1
-   ./Run_SMV_Cases.sh $INTEL2 $YOPT -c $cfastrepo -I $COMPILER $USEINSTALL2 -j $JOBPREFIX -m 2 -d -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3a 2>&1
+   ./Run_SMV_Cases.sh $INTEL2 -Y -c $cfastrepo -I $COMPILER $USEINSTALL2 -j $JOBPREFIX -m 2 -d -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3a 2>&1
 }
 
 #---------------------------------------------
@@ -676,14 +676,6 @@ compile_smv_utilities()
      ./make_background.sh >> $OUTPUT_DIR/stage2a 2>&1
      cp background_${platform}_64 $LATESTAPPS_DIR/background
 
-   # dem2fds
-     echo "      dem2fds"
-     cd $smvrepo/Build/dem2fds/${COMPILER}_${platform}_64
-     rm -f *.o dem2fds_${platform}_64
-     echo 'Compiling dem2fds:' >> $OUTPUT_DIR/stage2a 2>&1
-     ./make_dem2fds.sh >> $OUTPUT_DIR/stage2a 2>&1
-     cp dem2fds_${platform}_64 $LATESTAPPS_DIR/dem2fds
-   
    # hashfile
      echo "      hashfile"
      cd $smvrepo/Build/hashfile/${COMPILER}_${platform}_64
@@ -777,19 +769,42 @@ check_common_files()
 
 check_smv_utilities()
 {
+   SMOKEZIP="$smvrepo/Build/smokezip/${COMPILER}_${platform}_64/smokezip_${platform}_64"
+   SMOKEDIFF="$smvrepo/Build/smokediff/${COMPILER}_${platform}_64/smokediff_${platform}_64"
+   WIND2FDS="$smvrepo/Build/wind2fds/${COMPILER}_${platform}_64/wind2fds_${platform}_64"
+   BACKGROUND="$smvrepo/Build/background/${COMPILER}_${platform}_64/background_${platform}_64"
    if [ "$haveCC" == "1" ] ; then
      # Check for errors in SMV utilities compilation
      cd $smvrepo
-     if [ -e "$smvrepo/Build/smokezip/${COMPILER}_${platform}_64/smokezip_${platform}_64" ]    && \
-        [ -e "$smvrepo/Build/smokediff/${COMPILER}_${platform}_64/smokediff_${platform}_64" ]  && \
-        [ -e "$smvrepo/Build/wind2fds/${COMPILER}_${platform}_64/wind2fds_${platform}_64" ]    && \
-        [ -e "$smvrepo/Build/dem2fds/${COMPILER}_${platform}_64/dem2fds_${platform}_64" ]      && \
-        [ -e "$smvrepo/Build/background/${COMPILER}_${platform}_64/background_${platform}_64" ]
+     if [ -e "$SMOKEZIP" ]    && \
+        [ -e "$SMOKEDIFF" ]  && \
+        [ -e "$WIND2FDS" ]    && \
+        [ -e "$BACKGROUND" ]
      then
         stage_utilities_success="1"
      else
         stage_utilities_success="0"
         echo "Errors from Stage 2c - Compile SMV utilities:" >> $ERROR_LOG
+        if [ ! -e "$SMOKEZIP" ]; then
+          echo ""
+          echo "error: smokezip failed to compile"           >> $ERROR_LOG
+          echo "       $SMOKEZIP does not exist"             >> $ERROR_LOG
+        fi
+        if [ ! -e "$SMOKEDIFF" ]; then
+          echo ""
+          echo "error: smokediff failed to compile"          >> $ERROR_LOG
+          echo "       $SMOKEDIFF does not exist"            >> $ERROR_LOG
+        fi 
+        if [ ! -e "$WIND2FDS" ]; then
+          echo ""
+          echo "error: wind2fds failed to compile"           >> $ERROR_LOG
+          echo "       $WIND2FDS does not exist"             >> $ERROR_LOG
+        fi 
+        if [ ! -e "$BACKGROUND" ]; then
+          echo ""
+          echo "error: background failed to compile"         >> $ERROR_LOG
+          echo "       $BACKGROUND does not exist"           >> $ERROR_LOG
+        fi 
         cat $OUTPUT_DIR/stage2c                              >> $ERROR_LOG
         echo ""                                              >> $ERROR_LOG
         compile_errors=1
@@ -800,7 +815,6 @@ check_smv_utilities()
      is_file_installed smokezip
      is_file_installed smokediff
      is_file_installed wind2fds
-     is_file_installed dem2fds
      is_file_installed background
      if [ "$stage_utilities_success" == "0" ] ; then
         echo "Errors from Stage 2c - Smokeview and utilities:" >> $ERROR_LOG
@@ -862,7 +876,7 @@ run_verification_cases_release()
    # Start running all SMV verification cases
    cd $smvrepo/Verification/scripts
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3b 2>&1
-   ./Run_SMV_Cases.sh $INTEL2 $YOPT -c $cfastrepo -I $COMPILER -j $JOBPREFIX $USEINSTALL2 $RUN_OPENMP -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3b 2>&1
+   ./Run_SMV_Cases.sh $INTEL2 -Y -c $cfastrepo -I $COMPILER -j $JOBPREFIX $USEINSTALL2 $RUN_OPENMP -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3b 2>&1
 }
 
 #---------------------------------------------
@@ -1018,7 +1032,7 @@ make_smv_pictures()
    echo Generating
    echo "   images"
    cd $smvrepo/Verification/scripts
-   ./Make_SMV_Pictures.sh $YOPT -q $SMOKEBOT_QUEUE -I $COMPILER -j SMV_ $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4a_orig
+   ./Make_SMV_Pictures.sh -Y -q $SMOKEBOT_QUEUE -I $COMPILER -j SMV_ $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4a_orig
    grep -v FreeFontPath $OUTPUT_DIR/stage4a_orig &> $OUTPUT_DIR/stage4a
 }
 
@@ -1429,7 +1443,6 @@ email_build_status()
 
 #*** define initial values
 
-YOPT=-Y
 smokebotdir=`pwd`
 OUTPUT_DIR="$smokebotdir/output"
 HISTORY_DIR_ARCHIVE="$HOME/.smokebot/history"
@@ -2015,10 +2028,6 @@ MAKEGUIDES_beg=`GET_TIME`
 if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
   if [[ $stage_ver_release_success ]] ; then
      echo Making guides
-     if [ "$YOPT" == "" ]; then
-       echo "   geometry notes"
-       make_guide geom_notes $fdsrepo/Manuals/FDS_User_Guide geometry_notes
-     fi
      echo "   user"
      make_guide SMV_User_Guide                $smvrepo/Manuals/SMV_User_Guide                SMV_User_Guide
      echo "   technical"

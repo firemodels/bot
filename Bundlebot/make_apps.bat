@@ -52,7 +52,6 @@ call :BUILDFDS
 :: build smokeview libraries and apps
 call :BUILDLIB
 call :BUILD     background
-call :BUILD     dem2fds
 call :BUILD     hashfile
 call :BUILD     smokediff
 call :BUILD     smokezip
@@ -69,7 +68,6 @@ call :CHECK_BUILDFDS
 
 :: verify smokeview apps were built
 call :CHECK_BUILD     background
-call :CHECK_BUILD     dem2fds
 call :CHECK_BUILD     hashfile
 call :CHECK_BUILD     smokediff
 call :CHECK_BUILD     smokezip

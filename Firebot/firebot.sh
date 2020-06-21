@@ -463,15 +463,19 @@ compile_fds_mpi_gnu_db()
    compile_gnu=
    if [ "$OPENMPI_INTEL" != "" ]; then
      if [ "$OPENMPI_GNU" != "" ]; then
-       module unload $OPENMPI_INTEL
-       module load $OPENMPI_GNU
-       echo "      MPI gfortran debug"
-       compile_gnu=1
-       cd $fdsrepo/Build/mpi_gnu_${platform}${size}$DB
-       make -f ../makefile clean &> /dev/null
-       ./make_fds.sh &> $OUTPUT_DIR/stage2d
-       module unload $OPENMPI_GNU
-       module load $OPENMPI_INTEL
+       if [ "$GFORTRAN" != "" ]; then
+         module unload $OPENMPI_INTEL
+         module load $OPENMPI_GNU
+         module load $GFORTRAN
+         echo "      MPI gfortran debug"
+         compile_gnu=1
+         cd $fdsrepo/Build/mpi_gnu_${platform}${size}$DB
+         make -f ../makefile clean &> /dev/null
+         ./make_fds.sh &> $OUTPUT_DIR/stage2d
+         module unload $OPENMPI_GNU
+         module unload $GFORTRAN
+         module load $OPENMPI_INTEL
+       fi
      fi
    fi
 }
@@ -703,13 +707,6 @@ compile_smv_utilities()
      rm -f *.o background_${platform}${size}
      ./make_background.sh >> $OUTPUT_DIR/stage3a 2>&1
      CP background_${platform}${size} $LATESTAPPS_DIR/background
-
-   # dem2fds
-     echo "      dem2fds"
-     cd $smvrepo/Build/dem2fds/${COMPILER}_${platform}${size}
-     rm -f *.o dem2fds_${platform}${size}
-     ./make_dem2fds.sh >> $OUTPUT_DIR/stage3a 2>&1
-     CP dem2fds_${platform}${size} $LATESTAPPS_DIR/dem2fds
 
   # wind2fds:
      echo "      wind2fds"
@@ -1366,7 +1363,7 @@ copy_fds_user_guide()
 {
    cd $fdsrepo/Manuals/FDS_User_Guide
    copy_guide $fdsrepo/Manuals/FDS_User_Guide/FDS_User_Guide.pdf
-   copy_guide $fdsrepo/Manuals/FDS_User_Guide/geom_notes.pdf
+#   copy_guide $fdsrepo/Manuals/FDS_User_Guide/geom_notes.pdf
 }
 
 #---------------------------------------------
@@ -2283,7 +2280,7 @@ if [[ "$BUILD_ONLY" == "" ]]; then
 ### Stage 8 ###
   if [ "$SKIPMATLAB" == "" ] ; then
     make_fds_user_guide
-    make_geom_notes
+#    make_geom_notes
     make_fds_verification_guide
     make_fds_technical_guide
     make_fds_validation_guide
