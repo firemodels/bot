@@ -4,6 +4,8 @@ set bot_type=%1
 set pdf_from=%2
 set bot_host=%3
 
+set "PUBDIR=%userprofile%\Google Drive\FDS-SMV Newest Manuals\"
+
 set pdf_to=%userprofile%\.bundle\pubs
 
 if NOT exist %userprofile%\.bundle mkdir %userprofile%\.bundle
@@ -29,6 +31,13 @@ goto eof
 :copy_file
 :: -------------------------------------------------
 set file=%1
+
+set "fullfile=%PUBDIR%\%file%"
+if NOT exist "%fullfile%" goto getfile_if
+  echo copying %file% from %PUBDIR% to %pdf_to%
+  copy "%fullfile%" %pdf_to%\%file% > Nul
+  exit /b 0
+:getfile_if
 
 if "x%bot_host%" == "x" goto else1
   echo copying %file% from %pdf_from% on %bot_host% to %pdf_to%
