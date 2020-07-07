@@ -11,7 +11,7 @@ echo ""
 echo "Options:"
 echo "-f - force this script to run"
 echo "-F - fds repo release"
-echo "-S - smv repo release]"
+echo "-S - smv repo release"
 echo "-h - display this message"
 echo "-H host - firebot host or LOCAL if revisions and documents are found at"
 echo "          $HOME/.firebot/pass"
@@ -20,6 +20,7 @@ if [ "$MAILTO" != "" ]; then
 else
   echo "-m mailto - email address"
 fi
+echo "-v - show settings used to build bundle"
 exit 0
 }
 
@@ -28,14 +29,15 @@ exit 0
 FIREBOT_HOST="LOCAL"
 MAILTO=
 if [ "$EMAIL" != "" ]; then
-  MAILTO = $EMAIL
+  MAILTO=$EMAIL
 fi
 FDS_RELEASE=
 SMV_RELEASE=
+ECHO=
 
 FORCE=
 
-while getopts 'fF:hH:m:S:' OPTION
+while getopts 'fF:hH:m:S:v' OPTION
 do
 case $OPTION  in
   f)
@@ -55,6 +57,9 @@ case $OPTION  in
    ;;
   S)
    SMV_RELEASE="$OPTARG"
+   ;;
+  v)
+   ECHO=echo
    ;;
 esac
 done
@@ -101,8 +106,8 @@ curdir=`pwd`
 
 # get apps and documents
 cd ../Firebot
-./run_firebot.sh $FORCE -c -C -B -g $FIREBOT_HOST -G $FIREBOT_HOME $JOPT $FDS_RELEASE $SMV_RELEASE $FIREBOT_BRANCH -T $MAILTO
+$ECHO ./run_firebot.sh $FORCE -c -C -B -g $FIREBOT_HOST -G $FIREBOT_HOME $JOPT $FDS_RELEASE $SMV_RELEASE $FIREBOT_BRANCH -T $MAILTO
 
 # generate bundle
 cd $curdir
-./run_bundlebot.sh $FORCE $BUNDLE_BRANCH -p $FIREBOT_HOST -w -g
+$ECHO ./run_bundlebot.sh $FORCE $BUNDLE_BRANCH -p $FIREBOT_HOST -w -g

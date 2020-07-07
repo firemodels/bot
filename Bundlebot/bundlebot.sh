@@ -179,7 +179,7 @@ if [ "$showparms" == "1" ]; then
   fi
   echo "    fds/smv app directory: $app_home/$APPDIR/$BRANCH/apps on this computer"
   pub_hostlabel="on this computer"
-  if [ "$pub_host" != "`hostname`" ]; then
+  if [[ "$pub_host" != "`hostname`" ]] && [[ "$pub_host" != "LOCAL" ]]; then
     pub_hostlabel="on $pub_host"
   fi
   if [ "$USE_CACHE" == "1" ]; then
