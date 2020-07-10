@@ -197,6 +197,7 @@ WEB_DIR=
 FORCECLONE=
 SUBSET_CASES=
 DEBUG_MODE=
+LOCAL=
 
 #*** parse command line options
 
@@ -300,6 +301,12 @@ done
 shift $(($OPTIND-1))
 
 CLONE_REPOS_ARG=$CLONE_REPOS
+if [ "$FDS_REV" == "" ]; then
+  SMV_REV=
+fi
+if [ "$SMV_REV" == "" ]; then
+  FDS_REV=
+fi
 
 if [ "$BUILD_ONLY" != "" ]; then
   if [ "$CLONE_REPOS" != "" ]; then
@@ -323,6 +330,13 @@ if [ "$FIREBOT_HOME" != "" ]; then
   GET_HASH=1
 else
   FIREBOT_HOME=\~firebot
+fi
+if [ "$FIREBOT_HOST" == "LOCAL" ]; then
+  FIREBOT_HOME=\$HOME/.firebot/pass
+fi
+
+if [ "$FDS_REV" != "" ]; then
+  GET_HASH=
 fi
 if [ "$GET_HASH" != "" ]; then
   if [ "$CLONE_REPOS" == "" ]; then

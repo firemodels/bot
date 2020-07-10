@@ -1,6 +1,8 @@
 @echo off
 setlocal
 
+set "BUNDLEDIR=%userprofile%\Google Drive\nightly_bundles\"
+
 set fds_version_arg=%1
 set smv_version_arg=%2
 set nightly=%3
@@ -31,6 +33,7 @@ if "%nightly%" == "null" goto endif2
 
 set bundle_dir=%userprofile%\.bundle\bundles
 set basename=%fds_version_arg%_%smv_version_arg%%nightly%_win
+
 set bundlefile=%bundle_dir%\%basename%.exe
 set bundleshafile=%bundle_dir%\%basename%.sha1
 
@@ -39,11 +42,20 @@ if EXIST %bundlefile% goto skip_upload
   exit /b 1
 :skip_upload
 
+if NOT EXIST "%BUNDLEDIR%" goto if_bundledir
+  erase "%BUNDLEDIR%"\*tst_win.exe  1> Nul 2>&1
+  erase "%BUNDLEDIR%"\*tst_win.sha1 1> Nul 2>&1
+
+  copy %bundlefile%    "%BUNDLEDIR%\%basename%.exe"
+  copy %bundleshafile% "%BUNDLEDIR%\%basename%.sha1"
+  exit /b 0
+:if_bundledir
+
 :: upload to linux computer
 pscp %bundlefile%    %upload_host%:.bundle/bundles/.
 pscp %bundleshafile% %upload_host%:.bundle/bundles/.
 
 :: upload to google drive
-plink %plink_options% %linux_logon% %linux_svn_root%/bot/Bundlebot/upload_bundle.sh /home/gforney/.bundle/bundles %basename% tst win
+plink %plink_options% %linux_logon% %linux_svn_root%/bot/Bundlebot/upload_bundle.sh .bundle/bundles %basename% tst win
 
 exit /b 0

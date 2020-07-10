@@ -4,7 +4,9 @@ set error=0
 ::set firebot_home=~firebot
 set firebot_home=/home2/smokevis2/firebot
 set firebot_host=blaze.el.nist.gov
+set "HASHDIR=%userprofile%\Google Drive\FDS-SMV Newest Manuals\HASHES"
 set SHOWPARMS=0
+
 call :getopts %*
 
 if "%SHOWPARMS%" == "1" (
@@ -24,6 +26,10 @@ goto eof
 :getfile
 ::-----------------------------------------------------------------------
 set file=%1
+if NOT exist "%HASHDIR%\%file%" goto getfile_if
+  copy "%HASHDIR%\%file%" output\%file% > Nul
+  exit /b 0
+:getfile_if
 pscp  %firebot_host%:%firebot_home%/.firebot/apps/%file%     output\%file%     > Nul
 if exist output\%file% exit /b 0
 set error=1
