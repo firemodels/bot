@@ -87,6 +87,7 @@ fi
 if [ "$SMV_RELEASE" == "" ]; then
   FDS_RELEASE=""
 fi
+
 FIREBOT_BRANCH="-R $BRANCH"
 BUNDLE_BRANCH="-b $BRANCH"
 
