@@ -42,9 +42,10 @@ erase output\SMV_REVISION
 
 cd %CURDIR%
 
-echo cloning fds and smv repos using
-echo FDS HASH=%FDS_HASH_BUNDLER% FDS REVISION=%FDS_REVISION_BUNDLER%
-echo SMV HASH=%SMV_HASH_BUNDLER% SMV REVISION=%SMV_REVISION_BUNDLER%
+echo.
+echo cloning fds and smv repos using:
+echo FDS REVISION=%FDS_REVISION_BUNDLER%, FDS HASH=%FDS_HASH_BUNDLER% 
+echo SMV REVISION=%SMV_REVISION_BUNDLER%, SMV HASH=%SMV_HASH_BUNDLER% 
 echo.
 
 call clone_repos %FDS_HASH_BUNDLER% %SMV_HASH_BUNDLER% || exit /b 1
