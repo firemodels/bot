@@ -85,7 +85,6 @@ CALL :COPY  %svdiffbuild%\smokediff_win_64.exe  %smvdir%\smokediff.exe
 CALL :COPY  %svzipbuild%\smokezip_win_64.exe    %smvdir%\smokezip.exe
 CALL :COPY  %timepbuild%\timep_win_64.exe       %smvdir%\timep.exe
 CALL :COPY  %windbuild%\wind2fds_win_64.exe     %smvdir%\wind2fds.exe
-CALL :COPY %repoexes%\openvr_api.dll                    %smvdir%\openvr_api.dll
 
 echo Unpacking Smokeview %smv_versionbase% installation files > %forbundle%\unpack.txt
 echo Install Smokeview %smv_versionbase%                      > %forbundle%\message.txt
