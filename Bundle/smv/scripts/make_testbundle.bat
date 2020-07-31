@@ -74,7 +74,6 @@ CALL :COPY %smvbuild%\smokediff\intel_win_64\smokediff_win_64.exe   %smvdir%\smo
 CALL :COPY %smvbuild%\smokezip\intel_win_64\smokezip_win_64.exe     %smvdir%\smokezip.exe
 CALL :COPY %smvbuild%\timep\intel_win_64\timep_win_64.exe           %smvdir%\timep.exe
 CALL :COPY %smvbuild%\wind2fds\intel_win_64\wind2fds_win_64.exe     %smvdir%\wind2fds.exe
-CALL :COPY %repoexes%\openvr_api.dll                                %smvdir%\openvr_api.dll
 
 set curdir=%CD%
 cd %smvdir%

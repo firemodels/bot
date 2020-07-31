@@ -346,10 +346,8 @@ if [ "$GET_HASH" != "" ]; then
   fi
   FDS_HASH=`../Bundle/fds/scripts/get_hash.sh -r fds -g $FIREBOT_HOST -G $FIREBOT_HOME`
   SMV_HASH=`../Bundle/fds/scripts/get_hash.sh -r smv -g $FIREBOT_HOST -G $FIREBOT_HOME`
-  if [ "$RUNFIREBOT" == "" ]; then
-    FDS_REVISION=`../Bundle/fds/scripts/get_rev.sh -r fds -g $FIREBOT_HOST -G $FIREBOT_HOME`
-    SMV_REVISION=`../Bundle/fds/scripts/get_rev.sh -r smv -g $FIREBOT_HOST -G $FIREBOT_HOME`
-  fi
+  FDS_REVISION=`../Bundle/fds/scripts/get_rev.sh -r fds -g $FIREBOT_HOST -G $FIREBOT_HOME`
+  SMV_REVISION=`../Bundle/fds/scripts/get_rev.sh -r smv -g $FIREBOT_HOST -G $FIREBOT_HOME`
   ABORT=
   if [ "$FDS_HASH" == "" ]; then
     ABORT=1
@@ -461,56 +459,54 @@ if [[ "$UPDATEREPO" != "" ]]; then
   fi
 fi
 
-if [ "$RUNFIREBOT" == "" ]; then
-    echo ""
-    echo "Firebot Properties"
-    echo "------------------"
-  if [ "$CLEANREPO" == "" ]; then
-    echo " clean repos: no"
+echo ""
+echo "Firebot Properties"
+echo "------------------"
+if [ "$CLEANREPO" == "" ]; then
+  echo " clean repos: no"
+else
+  echo " clean repos: yes"
+fi
+if [ "$UPDATEREPO" == "" ]; then
+  echo "update repos: no"
+else
+  echo "update repos: yes"
+fi
+if [ "$BUILD_ONLY" == "" ]; then
+  echo "  Build only: no"
+  echo "       Queue: $QUEUE"
+else
+  echo "  Build only: yes"
+fi
+if [ "$INTEL" == "" ]; then
+  echo "   INTEL mpi: no"
+else
+  echo "   INTEL mpi: yes"
+fi
+echo "      Branch: $BRANCH"
+if [ "$FDS_HASH" != "" ]; then
+  echo "    fds hash: $FDS_HASH"
+fi
+if [ "$FDS_REVISION" != "" ]; then
+  echo "fds revision: $FDS_REVISION"
+fi
+if [ "$CLONE_REPOS_ARG" != "" ]; then
+    echo "  fds branch: $CLONE_REPOS_ARG"
+fi
+if [ "$SMV_HASH" != "" ]; then
+  echo "    smv hash: $SMV_HASH"
+fi
+if [ "$SMV_REVISION" != "" ]; then
+  echo "smv revision: $SMV_REVISION"
+fi
+if [ "$CLONE_REPOS_ARG" != "" ]; then
+    echo "  smv branch: $CLONE_REPOS_ARG"
+fi
+if [ "$CLONE_REPOS" != "" ]; then
+  if [ "$CLONE_FDSSMV" == "" ]; then
+    echo "       Clone: fds, exp, fig, out and smv repos."
   else
-    echo " clean repos: yes"
-  fi
-  if [ "$UPDATEREPO" == "" ]; then
-    echo "update repos: no"
-  else
-    echo "update repos: yes"
-  fi
-  if [ "$BUILD_ONLY" == "" ]; then
-    echo "  Build only: no"
-    echo "       Queue: $QUEUE"
-  else
-    echo "  Build only: yes"
-  fi
-  if [ "$INTEL" == "" ]; then
-    echo "   INTEL mpi: no"
-  else
-    echo "   INTEL mpi: yes"
-  fi
-  echo "      Branch: $BRANCH"
-  if [ "$FDS_HASH" != "" ]; then
-    echo "    fds hash: $FDS_HASH"
-  fi
-  if [ "$FDS_REVISION" != "" ]; then
-    echo "fds revision: $FDS_REVISION"
-  fi
-  if [ "$CLONE_REPOS_ARG" != "" ]; then
-      echo "  fds branch: $CLONE_REPOS_ARG"
-  fi
-  if [ "$SMV_HASH" != "" ]; then
-    echo "    smv hash: $SMV_HASH"
-  fi
-  if [ "$SMV_REVISION" != "" ]; then
-    echo "smv revision: $SMV_REVISION"
-  fi
-  if [ "$CLONE_REPOS_ARG" != "" ]; then
-      echo "  smv branch: $CLONE_REPOS_ARG"
-  fi
-  if [ "$CLONE_REPOS" != "" ]; then
-    if [ "$CLONE_FDSSMV" == "" ]; then
-      echo "       Clone: fds, exp, fig, out and smv repos."
-    else
-      echo "       Clone: fds and smv repos"
-    fi
+    echo "       Clone: fds and smv repos"
   fi
 fi
 
