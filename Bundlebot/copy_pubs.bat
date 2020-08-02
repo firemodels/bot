@@ -41,7 +41,7 @@ if NOT exist "%fullfile%" goto getfile_if
 
 if "x%bot_host%" == "x" goto else1
   echo copying %file% from %pdf_from% on %bot_host% to %pdf_to%
-  pscp %bot_host%:%pdf_from%/%file% %pdf_to%\.
+  pscp -P 22 %bot_host%:%pdf_from%/%file% %pdf_to%\.
   if EXIST %pdf_to%\%file% goto endif1
   echo ***Error: unable to copy %file% from %bot_host%:%pdf_from%/%file%
   set error=1
