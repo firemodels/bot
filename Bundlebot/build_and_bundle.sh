@@ -24,6 +24,66 @@ echo "-v - show settings used to build bundle"
 exit 0
 }
 
+#---------------------------------------------
+#                   CHK_REPO
+#---------------------------------------------
+
+CHK_REPO ()
+{
+  local repodir=$1
+
+  if [ ! -e $repodir ]; then
+     echo "***error: the repo directory $repodir does not exist."
+     echo "          Aborting the make_bundle script"
+     return 1
+  fi
+  return 0
+}
+
+
+#---------------------------------------------
+#                   CD_REPO
+#---------------------------------------------
+
+CD_REPO ()
+{
+  local repodir=$1
+  local branch=$2
+
+  CHK_REPO $repodir || return 1
+
+  cd $repodir
+  if [ "$branch" != "current" ]; then
+  if [ "$branch" != "" ]; then
+     CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
+     if [ "$CURRENT_BRANCH" != "$branch" ]; then
+       echo "***error: was expecting branch $branch in repo $repodir."
+       echo "Found branch $CURRENT_BRANCH. Aborting firebot."
+       return 1
+     fi
+  fi
+  fi
+  return 0
+}
+
+#---------------------------------------------
+#                   update_repo
+#---------------------------------------------
+
+UPDATE_REPO()
+{
+   local reponame=$1
+   local branch=$2
+
+   CD_REPO $repo/$reponame $branch || return 1
+
+   echo Updating $branch on repo $repo/$reponame
+   git fetch origin
+   git merge origin/$branch
+   return 0
+}
+
+
 #-------------------- start of script ---------------------------------
 
 FIREBOT_HOST="LOCAL"
@@ -106,8 +166,21 @@ if [ "$MAILTO" != "" ]; then
   MAILTO="-m $MAILTO"
 fi
 
-
 curdir=`pwd`
+
+commands=$0
+DIR=$(dirname "${commands}")
+cd $DIR
+DIR=`pwd`
+
+cd ../..
+repo=`pwd`
+
+cd $DIR
+
+# update bot and webpages repos
+UPDATE_REPO bot      master     || exit 1
+UPDATE_REPO webpages nist-pages || exit 1
 
 # get apps and documents
 cd ../Firebot
