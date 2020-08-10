@@ -34,10 +34,11 @@ fi
 FDS_RELEASE=
 SMV_RELEASE=
 ECHO=
+VERBOSE=
 
 FORCE=
 
-while getopts 'fF:hH:m:S:v' OPTION
+while getopts 'fF:hH:m:S:vV' OPTION
 do
 case $OPTION  in
   f)
@@ -61,6 +62,9 @@ case $OPTION  in
   v)
    ECHO=echo
    ;;
+  V)
+   VERBOSE="-V"
+   ;;
 esac
 done
 shift $(($OPTIND-1))
@@ -73,7 +77,7 @@ if [ "`uname`" == "Darwin" ] ; then
 fi
 
 # both or neither RELEASE options must be set
-BRANCH="test"
+BRANCH=master
 if [ "$FDS_RELEASE" != "" ]; then
   if [ "$SMV_RELEASE" != "" ]; then
     FDS_RELEASE="-x $FDS_RELEASE"
@@ -111,4 +115,4 @@ $ECHO ./run_firebot.sh $FORCE -c -C -B -g $FIREBOT_HOST -G $FIREBOT_HOME $JOPT $
 
 # generate bundle
 cd $curdir
-$ECHO ./run_bundlebot.sh $FORCE $BUNDLE_BRANCH -p $FIREBOT_HOST -w -g
+$ECHO ./run_bundlebot.sh $FORCE $BUNDLE_BRANCH -p $FIREBOT_HOST $VERBOSE -w -g
