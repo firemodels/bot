@@ -142,12 +142,13 @@ SCP $PLATFORMHOST $FLUSHFILEDIR  flush_${platform}_64             $PLATFORMDIR/$
 
 CURDIR=`pwd`
 cd $PLATFORMDIR/$smvbin
-hashfile background > background.sha1
-hashfile smokediff  > smokediff.sha1
-hashfile smokeview  > smokeview.sha1
-hashfile smokezip   > smokezip.sha1
-hashfile wind2fds   > wind2fds.sha1
-hashfile hashfile   > hashfile.sha1
+HASHFILE=$PLATFORMDIR/$smvbin/hashfile
+$HASHFILE background > background.sha1
+$HASHFILE smokediff  > smokediff.sha1
+$HASHFILE smokeview  > smokeview.sha1
+$HASHFILE smokezip   > smokezip.sha1
+$HASHFILE wind2fds   > wind2fds.sha1
+$HASHFILE hashfile   > hashfile.sha1
 cat *.sha1 > $uploads/$PLATFORMDIR.sha1
 cd $CURDIR
 
@@ -160,7 +161,7 @@ tar cvf ../$PLATFORMDIR.tar .
 cd ..
 gzip $PLATFORMDIR.tar
 $UPDATER ${platform2} $revision $PLATFORMDIR.tar.gz $PLATFORMDIR.sh FDS/$FDSEDITION
-hashfile $PLATFORMDIR.sh > $PLATFORMDIR.sh.sha1
+$HASHFILE $PLATFORMDIR.sh > $PLATFORMDIR.sh.sha1
 cat $PLATFORMDIR.sh.sha1 >> $uploads/$PLATFORMDIR.sha1
 rm $PLATFORMDIR.sh.sha1
 
