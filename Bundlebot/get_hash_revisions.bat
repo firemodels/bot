@@ -30,7 +30,7 @@ if NOT exist "%HASHDIR%\%file%" goto getfile_if
   copy "%HASHDIR%\%file%" output\%file% > Nul
   exit /b 0
 :getfile_if
-pscp  %firebot_host%:%firebot_home%/.firebot/apps/%file%     output\%file%     > Nul
+pscp  -P 22 %firebot_host%:%firebot_home%/.firebot/apps/%file%     output\%file%     > Nul
 if exist output\%file% exit /b 0
 set error=1
 echo ***Error: unable to download %file% from %firebot_host%:%firebot_home%/.firebot/apps/%file%

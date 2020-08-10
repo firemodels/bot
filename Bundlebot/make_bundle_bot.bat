@@ -15,7 +15,7 @@ cd %curdir%
 
 :: get fds hash of lastest successful firebot run
 
-pscp %bot_host%:%bot_home%/.firebot/apps/FDS_HASH fds_hash
+pscp -P 22 %bot_host%:%bot_home%/.firebot/apps/FDS_HASH fds_hash
 set /p fds_hash=<fds_hash
 cd ..\..\..\..\fds
 set fdsrepo=%CD%
@@ -26,7 +26,7 @@ cd %curdir%
 
 :: get smv hash of lastest successful firebot run
 
-pscp %bot_host%:%bot_home%/.firebot/apps/SMV_HASH smv_hash
+pscp -P 22 %bot_host%:%bot_home%/.firebot/apps/SMV_HASH smv_hash
 set /p smv_hash=<smv_hash
 cd ..\..\..\..\smv
 set smvrepo=%CD%
