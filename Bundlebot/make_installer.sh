@@ -506,8 +506,8 @@ chmod +x \$FDS_root/bin/$SMVVARS
 #--- create startup readme file
 
 cat << STARTUP > \$STARTUPtmp
-<h3>Defining Environment Variables Used by FDS</h3>
-Options:
+<h3>Installation Notes
+<h4>Defining Environment Variables Used by FDS</h4>
 <ul>
 <li>Add the following lines to one of your startup files
 (usually \$HOME/.bashrc).<br>
@@ -529,12 +529,27 @@ export MODULEPATH=\$FDS_root/bin/modules:\\\$MODULEPATH
 module load $FDSMODULE
 module load $SMVMODULE
 </pre>
+</ul>
+<h4>Wrapping Up the Installation</h4>
+<ul>
+STARTUP
 
+if [ "$ostype" == "OSX" ]; then
+cat << STARTUP >> \$STARTUPtmp
+<li> Install XQuartz which can be downloaded from https://xquartz.org .
+Smokeview 6.7.15 and later requires this library.
+STARTUP
+fi
+
+cat << STARTUP >> \$STARTUPtmp
 <li>Log out and log back in so changes will take effect.
-
-<li>To uninstall fds, erase the directory:<br>
+</ul>
+<h4>Uninstalling FDS and Smokeview</h4>
+<ul>
+<li>To uninstall fds and smokeview, erase the directory:<br>
 \$FDS_root 
 <p>and remove changes you made to your startup files.
+</ul>
 
 STARTUP
 
@@ -545,7 +560,9 @@ EOF
 cat << EOF >> $INSTALLER
 echo ""
 echo "-----------------------------------------------"
-echo "*** To complete the installation add the following lines to your startup file"
+echo "*** To complete the installation:"
+echo ""
+echo "1. Add the following lines to your startup file"
 echo "   (usually \$HOME/.bashrc)."
 echo ""
 echo "source \$FDS_root/bin/$FDSVARS "
@@ -557,9 +574,29 @@ echo "export MODULEPATH=\$FDS_root/bin/modules:\\\$MODULEPATH"
 echo "module load $FDSMODULE"
 echo "module load $SMVMODULE"
 echo ""
-echo "*** Log out and log back in so the changes will take effect."
+EOF
+
+if [ "$ostype" == "OSX" ]; then
+cat << EOF >> $INSTALLER
+echo "2. Install XQuartz which can be downloaded from https://xquartz.org"
+echo "   Smokeview 6.7.15 and later requires this library"
 echo ""
-echo "*** To uninstall fds, erase the directory: "
+EOF
+fi
+
+if [ "$ostype" == "OSX" ]; then
+cat << EOF >> $INSTALLER
+echo "3. Log out and log back in so the changes will take effect."
+EOF
+else
+cat << EOF >> $INSTALLER
+echo "2. Log out and log back in so the changes will take effect."
+EOF
+fi
+
+cat << EOF >> $INSTALLER
+echo ""
+echo "*** To uninstall fds and smokeview, erase the directory: "
 echo "\$FDS_root"
 echo "and remove any changes you made to your startup file."
 echo ""
