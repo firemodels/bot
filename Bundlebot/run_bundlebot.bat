@@ -37,8 +37,8 @@ git merge origin/master
 
 :: bring the webpages repo up to date
 call :cd_repo %webpagesrepo% nist-pages || exit /b 1
-git fetch origin master
-git merge origin/master
+git fetch origin nist-pages
+git merge origin/nist-pages
 
 cd %CURDIR%
 
