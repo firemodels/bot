@@ -20,9 +20,23 @@ if "x%clone%" == "xclone" goto endif2
 set CURDIR=%CD%
 cd ..
 set botrepo=%CD%
-call :cd_repo %botrepo% master || exit /b 1
+
+if exist ..\webpages goto endif1
+  echo ***error: the webpages repo does not exist
+  cd %CURDIR%
+  exit /b 1
+:endif1
+
+cd ..\webpages
+set webpagesrepo=%CD%
 
 :: bring the bot repo up to date
+call :cd_repo %botrepo% master || exit /b 1
+git fetch origin master
+git merge origin/master
+
+:: bring the webpages repo up to date
+call :cd_repo %webpagesrepo% nist-pages || exit /b 1
 git fetch origin master
 git merge origin/master
 
