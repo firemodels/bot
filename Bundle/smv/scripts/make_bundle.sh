@@ -142,7 +142,7 @@ SCP $PLATFORMHOST $FLUSHFILEDIR  flush_${platform}_64             $PLATFORMDIR/$
 
 CURDIR=`pwd`
 cd $PLATFORMDIR/$smvbin
-HASHFILE=$PLATFORMDIR/$smvbin/hashfile
+HASHFILE=$HOME/$HASHFILEDIR/hashfile_${platform}_64
 $HASHFILE background > background.sha1
 $HASHFILE smokediff  > smokediff.sha1
 $HASHFILE smokeview  > smokeview.sha1
