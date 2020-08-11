@@ -49,17 +49,18 @@ function install_smv(args){
 
 <p><table border=on>
 <tr>
-<th align=center>Update Repos</th>
+<th align=center>Update</th>
 <td align=center>
 <button onclick="run_script('\\smv\\scripts\\webUPDATEwindowsrepos.bat')">Windows</button>
 <button onclick="run_script('\\smv\\scripts\\webUPDATErepos.bat')">All</button>
 </td>
 </tr>
 <tr>
-<th align=center>Show Revision</th>
+<th align=center>Show</th>
 <td align=center>
 <button onclick="run_script('\\smv\\scripts\\webSET_bundle_revision.bat')">Bundles</button>
-<button onclick="run_script('\\smv\\scripts\\webSHOW_revisions.bat')">Repos</button>
+<button onclick="run_script('\\bot\\Scripts\\webSHOW_revisions.bat')">Repos</button>
+<button onclick="run_script('\\bot\\Scripts\\webSHOW_branches.bat')">Branch</button></td>
 </td>
 </tr>
 <tr>
@@ -77,14 +78,9 @@ function install_smv(args){
 </td>
 </tr>
 <tr>
-<th align=center>Branch</th><td align=center>
-<button onclick="run_script('\\bot\\Scripts\\webSET_branches.bat')">Set master</button>
-<button onclick="run_script('\\bot\\Scripts\\webSHOW_branches.bat')">Show</button></td>
-</tr>
-<tr>
-<th align=center>Tag</th><td align=center>
-<button onclick="run_script('\\bot\\Scripts\\webSET_tags.bat')">Set</button>
-<button onclick="run_script('\\bot\\Scripts\\webSHOW_tags.bat')">Show</button>
+<th align=center>Set Branch</th><td align=center>
+<button onclick="run_script('\\bot\\Scripts\\webSET_branches.bat')">Master</button>
+<button onclick="run_script('\\bot\\Scripts\\webSET_tags.bat')">Release</button>
 </tr>
 <tr>
 <th align=center>Notes</th>
