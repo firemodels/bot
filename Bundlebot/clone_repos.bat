@@ -24,12 +24,12 @@ cd ..\smv
 set smvrepo=%CD%
 
 cd %fdsrepo%
-git checkout %FDS_HASH%
+git checkout -b test %FDS_HASH%
 git describe --dirty --long
 git branch -a
 
 cd %smvrepo%
-git checkout %SMV_HASH%
+git checkout -b test %SMV_HASH%
 git describe --dirty --long
 git branch -a
 
