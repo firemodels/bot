@@ -2,6 +2,6 @@
 
 directory=$1
 
-cd ~/$directory
+#cd ~/$directory
 git describe --dirty 
-git branch --show-current
+git branch | grep \* | awk '{print $2}'
