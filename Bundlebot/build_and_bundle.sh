@@ -137,7 +137,7 @@ if [ "`uname`" == "Darwin" ] ; then
 fi
 
 # both or neither RELEASE options must be set
-BRANCH=master
+BRANCH=test
 if [ "$FDS_RELEASE" != "" ]; then
   if [ "$SMV_RELEASE" != "" ]; then
     FDS_RELEASE="-x $FDS_RELEASE"
@@ -183,6 +183,7 @@ UPDATE_REPO bot      master     || exit 1
 UPDATE_REPO webpages nist-pages || exit 1
 
 # get apps and documents
+cd $curdir
 cd ../Firebot
 $ECHO ./run_firebot.sh $FORCE -c -C -B -g $FIREBOT_HOST -G $FIREBOT_HOME $JOPT $FDS_RELEASE $SMV_RELEASE $FIREBOT_BRANCH -T $MAILTO
 
