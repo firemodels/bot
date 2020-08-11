@@ -3,5 +3,6 @@
 directory=$1
 
 cd ~/$directory
-git describe --dirty 
-git branch | grep \* | awk '{print $2}'
+rev=`git describe --dirty`
+branch=`git branch | grep \* | awk '{print $2}'`
+echo $rev/$branch
