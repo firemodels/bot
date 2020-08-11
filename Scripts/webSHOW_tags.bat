@@ -25,6 +25,7 @@ echo.
 cd %svn_root%\fds
 echo | set /p=Windows: 
 git describe --dirty
+git branch --show-current
 
 set scriptdir=%linux_svn_root%/bot/Scripts/
 set linux_fdsdir=%linux_svn_root%

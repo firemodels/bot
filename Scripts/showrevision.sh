@@ -4,3 +4,4 @@ directory=$1
 
 cd ~/$directory
 git describe --dirty 
+git branch --show-current
