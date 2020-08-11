@@ -162,7 +162,7 @@ if [ "$BRANCH" == "release" ]; then
   BUNDLE_PREFIX="rls"
 fi
 BRANCHDIR=$BRANCH
-if [ "$BRANCH" == "master" ]; then
+if [ "$BRANCH" != "release" ]; then
   BRANCHDIR=
 fi
 
