@@ -69,7 +69,7 @@ CURDIR=`pwd`
 OUTPUT_DIR=$CURDIR/output
 SYNC_REVS=
 VERBOSE=
-BRANCH=test
+BRANCH=master
 BUNDLE_PREFIX="tst"
 
 while getopts 'b:cd:fF:ghp:rS:tvVw' OPTION
@@ -161,6 +161,10 @@ fi
 if [ "$BRANCH" == "release" ]; then
   BUNDLE_PREFIX="rls"
 fi
+BRANCHDIR=$BRANCH
+if [ "$BRANCH" != "release" ]; then
+  BRANCHDIR=
+fi
 
 if [ "$showparms" == "1" ]; then
   echo ""
@@ -177,16 +181,16 @@ if [ "$showparms" == "1" ]; then
     FDS_PUBDIR=.firebot/
     SMV_PUBDIR=.smokebot
   fi
-  echo "    fds/smv app directory: $app_home/$APPDIR/$BRANCH/apps on this computer"
+  echo "    fds/smv app directory: $app_home/$APPDIR/$BRANCHDIR/apps on this computer"
   pub_hostlabel="on this computer"
   if [[ "$pub_host" != "`hostname`" ]] && [[ "$pub_host" != "LOCAL" ]]; then
     pub_hostlabel="on $pub_host"
   fi
   if [ "$USE_CACHE" == "1" ]; then
-    echo "    fds/smv pub directory: $fds_pub_home/$FDS_PUBDIR/$BRANCH/pubs $pub_hostlabel"
+    echo "    fds/smv pub directory: $fds_pub_home/$FDS_PUBDIR/$BRANCHDIR/pubs $pub_hostlabel"
   else
-    echo "        fds pub directory: $fds_pub_home/$FDS_PUBDIR/$BRANCH/pubs $pub_hostlabel"
-    echo "        smv pub directory: $smv_pub_home/$SMV_PUBDIR/$BRANCH/pubs $pub_hostlabel"
+    echo "        fds pub directory: $fds_pub_home/$FDS_PUBDIR/$BRANCHDIR/pubs $pub_hostlabel"
+    echo "        smv pub directory: $smv_pub_home/$SMV_PUBDIR/$BRANCHDIR/pubs $pub_hostlabel"
   fi
     echo "         bundle directory: $bundle_dir"
   if [ "$UPLOAD_GOOGLE" == "1" ]; then
@@ -218,31 +222,31 @@ if [ "$showparms" == "" ]; then
   rm -f $HOME/.bundle/pubs/*
   if [ "$VERBOSE" == "1" ]; then
     echo "********************"
-    echo ./copy_pubs.sh fds $fds_pub_home/.firebot/$BRANCH/pubs  $pub_host $error_log
+    echo ./copy_pubs.sh fds $fds_pub_home/.firebot/$BRANCHDIR/pubs  $pub_host $error_log
     echo "********************"
   fi 
-  ./copy_pubs.sh fds $fds_pub_home/.firebot/$BRANCH/pubs         $pub_host $error_log || return_code=1
+  ./copy_pubs.sh fds $fds_pub_home/.firebot/$BRANCHDIR/pubs         $pub_host $error_log || return_code=1
 
   if [ "$VERBOSE" == "1" ]; then
     echo "********************"
-    echo ./copy_pubs.sh smv $smv_pub_home/.smokebot/$BRANCH/pubs $pub_host $error_log
+    echo ./copy_pubs.sh smv $smv_pub_home/.smokebot/$BRANCHDIR/pubs $pub_host $error_log
     echo "********************"
   fi
-  ./copy_pubs.sh smv $smv_pub_home/.smokebot/$BRANCH/pubs        $pub_host $error_log || return_code=1
+  ./copy_pubs.sh smv $smv_pub_home/.smokebot/$BRANCHDIR/pubs        $pub_host $error_log || return_code=1
 
   rm -f $HOME/.bundle/apps/*
   if [ "$VERBOSE" == "1" ]; then
     echo "********************"
-    echo ./copy_apps.sh fds $app_home/.firebot/$BRANCH/apps      $error_log 
+    echo ./copy_apps.sh fds $app_home/.firebot/$BRANCHDIR/apps      $error_log 
     echo "********************"
   fi
-  ./copy_apps.sh fds $app_home/.firebot/$BRANCH/apps             $error_log || return_code=1
+  ./copy_apps.sh fds $app_home/.firebot/$BRANCHDIR/apps             $error_log || return_code=1
   if [ "$VERBOSE" == "1" ]; then
     echo "********************"
-    echo ./copy_apps.sh smv $app_home/.firebot/$BRANCH/apps      $error_log
+    echo ./copy_apps.sh smv $app_home/.firebot/$BRANCHDIR/apps      $error_log
     echo "********************"
   fi
-  ./copy_apps.sh smv $app_home/.firebot/$BRANCH/apps             $error_log || return_code=1
+  ./copy_apps.sh smv $app_home/.firebot/$BRANCHDIR/apps             $error_log || return_code=1
  
   if [ "$return_code" == "1" ]; then
     cat $error_log
