@@ -137,7 +137,7 @@ if [ "`uname`" == "Darwin" ] ; then
 fi
 
 # both or neither RELEASE options must be set
-BRANCH=test
+BRANCH=nightly
 if [ "$FDS_RELEASE" != "" ]; then
   if [ "$SMV_RELEASE" != "" ]; then
     FDS_RELEASE="-x $FDS_RELEASE"
