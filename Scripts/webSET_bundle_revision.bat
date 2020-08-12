@@ -26,13 +26,11 @@ if not exist %bundledir% (
 %svn_drive%
 cd %svn_root%\smv
 git describe --long --dirty > %bundledir%\smv_revision.txt
-echo.
-echo smv revision:
-type %bundledir%\smv_revision.txt
+set /p revision=<%bundledir%\smv_revision.txt
+echo smv revision: %revision%
 
 cd %svn_root%\fds
 git describe --long --dirty > %bundledir%\fds_revision.txt
-echo.
-echo fds revision:
-type %bundledir%\fds_revision.txt
+set /p revision=<%bundledir%\fds_revision.txt
+echo fds revision: %revision%
 pause
