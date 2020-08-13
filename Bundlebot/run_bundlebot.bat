@@ -32,15 +32,16 @@ if x"%bundle_smokebot_home%" == "x" goto def3
   set default_smokebot_home=[default: %bundle_smokebot_home%]
 :def3
 
-
 if EXIST .bundlebot goto endif1
   echo ***error: run_bundlebot.bat must be run in bot/Bundlebot directory
   exit /b 1
 :endif1
 
+::*** parse command line arguments
 call :getopts %*
 
 if "x%stopscript%" == "x" goto endif2
+  echo stopscript not blank
   exit /b 1
 :endif2
 
@@ -159,12 +160,12 @@ echo ------------------------------------------------------
 echo Building bundle using:
 echo.
 if "x%FDS_REVISION_BUNDLER%" == "x" goto skip_fdsrev
-  echo FDS revision=%FDS_REVISION_BUNDLER%
+  echo FDS revision: %FDS_REVISION_BUNDLER%
 :skip_fdsrev
 if "x%SMV_REVISION_BUNDLER%" == "x" goto skip_smvrev
-  echo smv revision=%SMV_REVISION_BUNDLER%
+  echo smv revision: %SMV_REVISION_BUNDLER%
 :skip_smvrev
-echo FDS hash=%FDS_HASH_BUNDLER%
+echo FDS hash: %FDS_HASH_BUNDLER%
 echo smv hash=%SMV_HASH_BUNDLER%
 echo firebot host: %bundle_hostname%
 echo firebot home directory: %bundle_firebot_home%
@@ -172,6 +173,7 @@ echo smokebot home directory: %bundle_smokebot_home%
 echo ------------------------------------------------------
 echo ------------------------------------------------------
 echo.
+pause
 
 call clone_repos %FDS_HASH_BUNDLER% %SMV_HASH_BUNDLER% %BRANCH_NAME% || exit /b 1
 
@@ -218,6 +220,9 @@ goto eof
 ::-----------------------------------------------------------------------
 
 :usage
+echo.
+echo run_firebot usage
+echo.
 echo This script builds a windows bundle using the specified fds and smv repo revisions
 echo or the revisions from the last firebot pass
 echo.
@@ -242,44 +247,44 @@ set bundle_smokebot_home=
  if (%1)==() exit /b
  set valid=0
  set arg=%1
- if /I "%1" EQU "-c" (
+ if "%1" EQU "-c" (
    set clone=clone
    set valid=1
  )
- if /I "%1" EQU "-h" (
+ if "%1" EQU "-h" (
    call :usage
    set stopscript=1
    exit /b
  )
- if /I "%1" EQU "-b" (
-   shift
-   set BRANCH_NAME=%1
+ if "%1" EQU "-b" (
+   set BRANCH_NAME=%2
    set valid=1
+   shift
  )
- if /I "%1" EQU "-H" (
-   shift
-   set firebot_host=%1
+ if "%1" EQU "-H" (
+   set bundle_hostname=%2
    set valid=1
+   shift
  )
- if /I "%1" EQU "-f" (
-   shift
-   set bundle_firebot_home=%1
+ if "%1" EQU "-f" (
+   set bundle_firebot_home=%2
    set valid=1
+   shift
  )
- if /I "%1" EQU "-F" (
-   shift
-   set fds_hash=%1
+ if "%1" EQU "-F" (
+   set fds_hash=%2
    set valid=1
+   shift
  )
- if /I "%1" EQU "-s" (
-   shift
-   set bundle_smokebot_home=%1
+ if "%1" EQU "-s" (
+   set bundle_smokebot_home=%2
    set valid=1
+   shift
  )
- if /I "%1" EQU "-S" (
-   shift
-   set smv_hash=%1
+ if "%1" EQU "-S" (
+   set smv_hash=%2
    set valid=1
+   shift
  )
  shift
  if %valid% == 0 (
