@@ -48,21 +48,35 @@ function install_smv(args){
 <hr size="1">
 
 <p><table border=on>
+
 <tr>
-<th align=center colspan=2>Update</th>
+<th align=center colspan=2>Update Repos</th>
 <td align=center>
 <button onclick="run_script('\\bot\\Scripts\\webUPDATEwindowsrepos.bat')">Windows</button>
 <button onclick="run_script('\\bot\\Scripts\\webUPDATErepos.bat')">All</button>
 </td>
 </tr>
+
 <tr>
 <th align=center  colspan=2>Show</th>
 <td align=center>
-<button onclick="run_script('\\bot\\Scripts\\webSET_bundle_revision.bat')">Bundles</button>
+<button onclick="run_script('\\bot\\Scripts\\webSHOW_branches.bat')">Branch</button>
 <button onclick="run_script('\\bot\\Scripts\\webSHOW_revisions.bat')">Repos</button>
-<button onclick="run_script('\\bot\\Scripts\\webSHOW_branches.bat')">Branch</button></td>
+</td>
 </td>
 </tr>
+
+<tr>
+<th align=center rowspan=2>Set</th><th>Revision</th><td align=center>
+<button onclick="run_script('\\bot\\Scripts\\webSET_bundle_revision.bat')">Test Bundles</button>
+</tr>
+
+<tr>
+<th>Branch</th><td align=center>
+<button onclick="run_script('\\bot\\Scripts\\webSET_branches.bat')">Master</button>
+<button onclick="run_script('\\bot\\Scripts\\webSET_tags.bat')">Release</button>
+</tr>
+
 <tr>
 <th align=center rowspan=2>Clean</th><th> Repos</th>
 <td align=center>
@@ -70,6 +84,7 @@ function install_smv(args){
 <button onclick="run_script('\\bot\\Scripts\\webclean_all.bat')">All</button>
 </td>
 </tr>
+
 <tr>
 <th align=center>Uploads</th>
 <td align=center>
@@ -77,19 +92,16 @@ function install_smv(args){
 <button onclick="run_script('\\bot\\Bundle\\fds\\scripts\\webCLEANuploadall.bat')">All</button>
 </td>
 </tr>
+
 <tr>
-<th align=center colspan=2>Set Branch</th><td align=center>
-<button onclick="run_script('\\bot\\Scripts\\webSET_branches.bat')">Master</button>
-<button onclick="run_script('\\bot\\Scripts\\webSET_tags.bat')">Release</button>
-</tr>
-<tr>
-<th align=center colspan=2>Notes</th>
+<th align=center colspan=2>SMV Notes</th>
 <td align=center>
 <button onclick="run_script('\\bot\\Scripts\\webGET_smvlog.bat')">Add</button>
 <button onclick="run_script('\\bot\\Scripts\\webEDIT_release_notes.bat')">Edit</button>
 <button onclick="run_script('\\bot\\Scripts\\webVIEW_release_notes.bat')">View</button>
 </td>
 </tr>
+
 <tr>
 <th colspan=2>Edit</th>
 <td align=center>

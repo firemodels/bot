@@ -18,36 +18,55 @@ goto:eof
 
 call %envfile%
 
-echo.
 echo ---------------------------*** fds ***--------------------------------
-echo.
 %svn_drive%
 cd %svn_root%\fds
-echo | set /p=Windows: 
-git describe --dirty > tmp1
-git branch --show-current > tmp2
-set /p revision=<tmp1
-set /p branch=<tmp2
-echo %revision%/%branch%
-erase tmp1 tmp2
+call :output_rev
 
 set scriptdir=%linux_svn_root%/bot/Scripts/
 set linux_fdsdir=%linux_svn_root%
 
-echo.
 echo | set /p=Linux:   
 plink %plink_options% %linux_logon% %scriptdir%/showrevision.sh  %linux_svn_root%/fds
-echo.
 
 echo | set /p=OSX:     
 plink %plink_options% %osx_logon% %scriptdir%/showrevision.sh  %linux_svn_root%/fds
-echo.
 
-
-echo.
 echo ---------------------------*** smv ***--------------------------------
-echo.
 cd %svn_root%\smv
+call :output_rev
+
+echo | set /p=Linux:   
+plink %plink_options% %linux_logon% %scriptdir%/showrevision.sh  %linux_svn_root%/smv
+
+echo | set /p=OSX:     
+plink %plink_options% %osx_logon% %scriptdir%/showrevision.sh  %linux_svn_root%/smv
+
+echo ---------------------------*** bot ***--------------------------------
+cd %svn_root%\bot
+call :output_rev
+
+echo | set /p=Linux:   
+plink %plink_options% %linux_logon% %scriptdir%/showrevision.sh  %linux_svn_root%/bot
+
+echo | set /p=OSX:     
+plink %plink_options% %osx_logon% %scriptdir%/showrevision.sh  %linux_svn_root%/bot
+
+echo ---------------------------*** web ***--------------------------------
+cd %svn_root%\webpages
+call :output_rev
+
+echo | set /p=Linux:   
+plink %plink_options% %linux_logon% %scriptdir%/showrevision.sh  %linux_svn_root%/webpages
+
+echo | set /p=OSX:     
+plink %plink_options% %osx_logon% %scriptdir%/showrevision.sh  %linux_svn_root%/webpages
+pause
+goto eof
+
+::---------------------------------------------------------
+:output_rev
+::---------------------------------------------------------
 echo | set /p=Windows: 
 git describe --dirty > tmp1
 git branch --show-current > tmp2
@@ -55,45 +74,6 @@ set /p revision=<tmp1
 set /p branch=<tmp2
 echo %revision%/%branch%
 erase tmp1 tmp2
+exit /b
 
-echo.
-echo | set /p=Linux:   
-plink %plink_options% %linux_logon% %scriptdir%/showrevision.sh  %linux_svn_root%/smv
-
-echo.
-echo | set /p=OSX:     
-plink %plink_options% %osx_logon% %scriptdir%/showrevision.sh  %linux_svn_root%/smv
-echo.
-
-echo.
-echo ---------------------------*** bot ***--------------------------------
-echo.
-cd %svn_root%\bot
-echo | set /p=Windows: 
-git describe --dirty
-
-echo.
-echo | set /p=Linux:   
-plink %plink_options% %linux_logon% %scriptdir%/showrevision.sh  %linux_svn_root%/bot
-
-echo.
-echo | set /p=OSX:     
-plink %plink_options% %osx_logon% %scriptdir%/showrevision.sh  %linux_svn_root%/bot
-echo.
-
-echo.
-echo ---------------------------*** web ***--------------------------------
-echo.
-cd %svn_root%\webpages
-echo | set /p=Windows: 
-git describe --dirty
-
-echo.
-echo | set /p=Linux:   
-plink %plink_options% %linux_logon% %scriptdir%/showrevision.sh  %linux_svn_root%/webpages
-echo.
-
-echo | set /p=OSX:     
-plink %plink_options% %osx_logon% %scriptdir%/showrevision.sh  %linux_svn_root%/webpages
-echo.
-pause
+:eof
