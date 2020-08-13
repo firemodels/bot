@@ -148,7 +148,7 @@ if NOT "x%fds_hash%" == "x" goto skip_elsehash
   goto endif_gethash
 
 :skip_elsehash
-  set FDS_HASH_BUNDLER=%fds_hash
+  set FDS_HASH_BUNDLER=%fds_hash%
   set SMV_HASH_BUNDLER=%smv_hash%
 :endif_gethash
 
@@ -166,7 +166,7 @@ if "x%SMV_REVISION_BUNDLER%" == "x" goto skip_smvrev
   echo smv revision: %SMV_REVISION_BUNDLER%
 :skip_smvrev
 echo FDS hash: %FDS_HASH_BUNDLER%
-echo smv hash=%SMV_HASH_BUNDLER%
+echo smv hash: %SMV_HASH_BUNDLER%
 echo firebot host: %bundle_hostname%
 echo firebot home directory: %bundle_firebot_home%
 echo smokebot home directory: %bundle_smokebot_home%
@@ -247,24 +247,14 @@ set bundle_smokebot_home=
  if (%1)==() exit /b
  set valid=0
  set arg=%1
- if "%1" EQU "-c" (
-   set clone=clone
-   set valid=1
- )
- if "%1" EQU "-h" (
-   call :usage
-   set stopscript=1
-   exit /b
- )
  if "%1" EQU "-b" (
    set BRANCH_NAME=%2
    set valid=1
    shift
  )
- if "%1" EQU "-H" (
-   set bundle_hostname=%2
+ if "%1" EQU "-c" (
+   set clone=clone
    set valid=1
-   shift
  )
  if "%1" EQU "-f" (
    set bundle_firebot_home=%2
@@ -273,6 +263,16 @@ set bundle_smokebot_home=
  )
  if "%1" EQU "-F" (
    set fds_hash=%2
+   set valid=1
+   shift
+ )
+ if "%1" EQU "-h" (
+   call :usage
+   set stopscript=1
+   exit /b
+ )
+ if "%1" EQU "-H" (
+   set bundle_hostname=%2
    set valid=1
    shift
  )
