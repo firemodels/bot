@@ -153,6 +153,26 @@ if NOT "x%fds_hash%" == "x" goto skip_elsehash
 
 cd %CURDIR%
 
+echo.
+echo ------------------------------------------------------
+echo ------------------------------------------------------
+echo Building bundle using:
+echo.
+if "x%FDS_REVISION_BUNDLER%" == "x" goto skip_fdsrev
+  echo FDS revision=%FDS_REVISION_BUNDLER%
+:skip_fdsrev
+if "x%SMV_REVISION_BUNDLER%" == "x" goto skip_smvrev
+  echo smv revision=%SMV_REVISION_BUNDLER%
+:skip_smvrev
+echo FDS hash=%FDS_HASH_BUNDLER%
+echo smv hash=%SMV_HASH_BUNDLER%
+echo firebot host: %bundle_hostname%
+echo firebot home directory: %bundle_firebot_home%
+echo smokebot home directory: %bundle_smokebot_home%
+echo ------------------------------------------------------
+echo ------------------------------------------------------
+echo.
+
 call clone_repos %FDS_HASH_BUNDLER% %SMV_HASH_BUNDLER% %BRANCH_NAME% || exit /b 1
 
 :: define revisions if hashes were specified on the command line
