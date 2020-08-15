@@ -58,14 +58,6 @@ echo ------------------------------------------------------
 echo uploading %bundlefile% to %upload_host%
 echo.
 
-call :cd_repo %botrepo% master || exit /b 1
-
-echo.
-echo ------------------------------------------------------
-echo ------------------------------------------------------
-echo uploading %bundlefile% to %upload_host%
-echo.
-
 pscp -P 22 %bundlefile%    %upload_host%:.bundle/bundles/.
 
 echo.
