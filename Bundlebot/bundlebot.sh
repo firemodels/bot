@@ -46,8 +46,14 @@ exit 0
 
 #define default home directories for apps and pubs
 app_home=$HOME
-fds_pub_home=\~firebot
-smv_pub_home=\~smokebot
+if [ -e $HOME/.bundle/bundle_config.sh ]; then
+  source $HOME/.bundle/bundle_config.sh
+else
+  echo ***error: configuration file $HOME/.bundle/bundle_config.sh is not defined
+  exit 1
+fi
+fds_pub_home=$bundle_firebot_home
+smv_pub_home=$bundle_smokebot_home
 
 # define default host where pubs are found
 pub_host=`hostname`
@@ -287,10 +293,12 @@ fi
 
 cd $DIR
 if [ "$showparms" == "" ]; then
+  echo ""
   echo "building installer"
   $ECHO ./bundle_generic.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version $bundle_dir $BUNDLE_PREFIX > $OUTPUT_DIR/stage1
   if [ "$UPLOAD_GOOGLE" == "1" ]; then
     if [ -e $HOME/.bundle/$GOOGLE_DIR_ID ]; then
+      echo ""
       echo "uploading installer"
       if [ "$platform" == "lnx" ]; then
         ./upload_bundle.sh $bundle_dir $installer_base_platform $BUNDLE_PREFIX $platform               > $OUTPUT_DIR/stage2

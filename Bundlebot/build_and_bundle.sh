@@ -87,7 +87,15 @@ UPDATE_REPO()
 
 #-------------------- start of script ---------------------------------
 
-FIREBOT_HOST="LOCAL"
+if [ -e $HOME/.bundle/bundle_config.sh ]; then
+  source $HOME/.bundle/bundle_config.sh
+else
+  echo ***error: configuration file $HOME/.bundle/bundle_config.sh is not defined
+  exit 1
+fi
+FIREBOT_HOST=$bundle_hostname
+FIREBOT_HOME=$bundle_firebot_home
+
 MAILTO=
 if [ "$EMAIL" != "" ]; then
   MAILTO=$EMAIL
@@ -158,12 +166,6 @@ fi
 
 FIREBOT_BRANCH="-R $BRANCH"
 BUNDLE_BRANCH="-b $BRANCH"
-
-# get location of firebot files
-FIREBOT_HOME=\~firebot
-if [ "$FIREBOT_HOST" == "LOCAL" ]; then
-  FIREBOT_HOME=\$HOME/.firebot/pass
-fi
 
 # email address
 if [ "$MAILTO" != "" ]; then
