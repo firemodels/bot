@@ -45,9 +45,15 @@ if "x%stopscript%" == "x" goto endif2
 :endif2
 
 set nightly=tst
-if "x%BRANCH_NAME%" == "release" goto skip_branch
+set pub_dir=
+if NOT "x%BRANCH_NAME%" == "xrelease" goto skip_branch
   set nightly=rls
+  set pub_dir=release
 :skip_branch
+
+:: set pubs directories
+set FDS_PUBS_DIR=%bundle_firebot_home%/.firebot/%pub_dir%/pubs
+set SMV_PUBS_DIR=%bundle_smokebot_home%/.smokebot/%pub_dir%/pubs
 
 ::*** error checking
 
@@ -179,11 +185,13 @@ if "x%FDS_REVISION_BUNDLER%" == "x" goto skip_fdsrev
 if "x%SMV_REVISION_BUNDLER%" == "x" goto skip_smvrev
   echo smv revision: %SMV_REVISION_BUNDLER%
 :skip_smvrev
-echo FDS hash: %FDS_HASH_BUNDLER%
-echo smv hash: %SMV_HASH_BUNDLER%
-echo firebot host: %bundle_hostname%
-echo firebot home directory: %bundle_firebot_home%
-echo smokebot home directory: %bundle_smokebot_home%
+echo                 FDS hash: %FDS_HASH_BUNDLER%
+echo                 smv hash: %SMV_HASH_BUNDLER%
+echo             firebot host: %bundle_hostname%
+echo   firebot home directory: %bundle_firebot_home%
+echo        FDS pub directory: %FDS_PUBS_DIR%
+echo  smokebot home directory: %bundle_smokebot_home%
+echo Smokeview pubs directory: %SMV_PUBS_DIR%
 echo.
 
 call clone_repos %FDS_HASH_BUNDLER% %SMV_HASH_BUNDLER% %BRANCH_NAME% || exit /b 1
@@ -235,7 +243,7 @@ echo Copying fds pubs
 echo.
 
 cd %CURDIR%
-call copy_pubs firebot  %bundle_firebot_home%/.firebot/pubs   %bundle_hostname% || exit /b 1
+call copy_pubs firebot  %FDS_PUBS_DIR%   %bundle_hostname% || exit /b 1
 
 echo.
 echo ------------------------------------------------------
@@ -244,7 +252,7 @@ echo Copying smv pubs
 echo.
 
 cd %CURDIR%
-call copy_pubs smokebot %bundle_smokebot_home%/.smokebot/pubs %bundle_hostname% || exit /b 1
+call copy_pubs smokebot %SMV_PUBS_DIR% %bundle_hostname% || exit /b 1
 
 echo.
 echo ------------------------------------------------------
