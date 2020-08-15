@@ -78,8 +78,6 @@ repo=`pwd`
 
 cd $DIR
 
-BRANCH="-b release"
-
 while getopts 'b:cd:fF:ghp:rS:tvVw' OPTION
 do
 case $OPTION  in

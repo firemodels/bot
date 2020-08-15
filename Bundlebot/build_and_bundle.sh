@@ -11,6 +11,7 @@ echo ""
 echo "Options:"
 echo "-f - force this script to run"
 echo "-F - fds repo release"
+echo "-r - create a release bundle"
 echo "-S - smv repo release"
 echo "-h - display this message"
 echo "-H host - firebot host or LOCAL if revisions and documents are found at"
@@ -97,8 +98,10 @@ ECHO=
 VERBOSE=
 
 FORCE=
+RELEASE=
+BRANCH=nightly
 
-while getopts 'fF:hH:m:S:vV' OPTION
+while getopts 'fF:hH:m:rS:vV' OPTION
 do
 case $OPTION  in
   f)
@@ -119,6 +122,9 @@ case $OPTION  in
   S)
    SMV_RELEASE="$OPTARG"
    ;;
+  r)
+   BRANCH=release
+   ;;
   v)
    ECHO=echo
    ;;
@@ -137,12 +143,10 @@ if [ "`uname`" == "Darwin" ] ; then
 fi
 
 # both or neither RELEASE options must be set
-BRANCH=nightly
 if [ "$FDS_RELEASE" != "" ]; then
   if [ "$SMV_RELEASE" != "" ]; then
     FDS_RELEASE="-x $FDS_RELEASE"
     SMV_RELEASE="-y $SMV_RELEASE"
-    BRANCH="release"
   fi
 fi
 if [ "$FDS_RELEASE" == "" ]; then
