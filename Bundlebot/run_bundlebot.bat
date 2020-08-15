@@ -41,7 +41,6 @@ if EXIST .bundlebot goto endif1
 call :getopts %*
 
 if "x%stopscript%" == "x" goto endif2
-  echo stopscript not blank
   exit /b 1
 :endif2
 
@@ -286,6 +285,7 @@ echo -h - display this message
 echo -H - hostname where firebot and smokebot were run %default_hostname%
 echo -f - firebot home directory %default_firebot_home%
 echo -F - fds repo hash
+echo -r - same as -b release
 echo -s - smokebot home directory %default_smokebot_home%
 echo -S - smv repo hash
 exit /b 0
@@ -328,6 +328,10 @@ set bundle_smokebot_home=
    set bundle_hostname=%2
    set valid=1
    shift
+ )
+ if "%1" EQU "-r" (
+   set BRANCH_NAME=release
+   set valid=1
  )
  if "%1" EQU "-s" (
    set bundle_smokebot_home=%2
