@@ -325,7 +325,7 @@ cd %upload_dir%
 echo Press Setup to begin installation. > %fds_forbundle%\main.txt
 if exist %basename%.exe erase %basename%.exe
 
-wzipse32 %basename%.zip -setup -auto -i %fds_forbundle%\icon.ico -t %fds_forbundle%\unpack.txt -runasadmin -a %fds_forbundle%\about.txt -st"FDS %fds_version% Smokeview %smv_version% Setup" -o -c cmd /k firemodels\setup.bat
+wzipse32 %basename%.zip -setup -auto -i %fds_forbundle%\icon.ico -t %fds_forbundle%\unpack.txt -runasadmin -a %fds_forbundle%\about.txt -st"%fds_version% %smv_version%" -o -c cmd /k firemodels\setup.bat
 
 %hashfile% %basename%.exe   >>  %upload_dir%\%basename%.sha1
 

@@ -45,6 +45,11 @@ if "x%stopscript%" == "x" goto endif2
   exit /b 1
 :endif2
 
+set nightly=tst
+if "x%BRANCH_NAME%" == "release" goto skip_branch
+  set nightly=rls
+:skip_branch
+
 ::*** error checking
 
 set abort=
@@ -114,20 +119,30 @@ cd ..
 set basedir=%CD%
 
 :: bring the bot repo up to date
+echo.
+echo ------------------------------------------------------
+echo ------------------------------------------------------
+echo updating bot repo
+echo.
+
 call :cd_repo %botrepo% master || exit /b 1
-git fetch origin master
-git merge origin/master
+git fetch origin master > Nul
+git merge origin/master > Nul
 
 :: bring the webpages repo up to date
+echo.
+echo ------------------------------------------------------
+echo ------------------------------------------------------
+echo updating web repo
+echo.
+
 call :cd_repo %webpagesrepo% nist-pages || exit /b 1
-git fetch origin nist-pages
-git merge origin/nist-pages
+git fetch origin nist-pages  > Nul
+git merge origin/nist-pages  > Nul
 
 cd %CURDIR%
 
 :: create the bundle
-
-set nightly=tst
 
 set CURDIR=%CD%
 
@@ -170,10 +185,7 @@ echo smv hash: %SMV_HASH_BUNDLER%
 echo firebot host: %bundle_hostname%
 echo firebot home directory: %bundle_firebot_home%
 echo smokebot home directory: %bundle_smokebot_home%
-echo ------------------------------------------------------
-echo ------------------------------------------------------
 echo.
-pause
 
 call clone_repos %FDS_HASH_BUNDLER% %SMV_HASH_BUNDLER% %BRANCH_NAME% || exit /b 1
 
@@ -181,33 +193,74 @@ call clone_repos %FDS_HASH_BUNDLER% %SMV_HASH_BUNDLER% %BRANCH_NAME% || exit /b 
 if "x%fds_hash%" == "x" goto skip_getrevision
 
   call :cd_repo %basedir%\fds %BRANCH_NAME% || exit /b 1
-  git describe --dirty --long > tmp1
+  git describe --dirty --long > temp1
   set /p FDS_REVISION_BUNDLER=<temp1
   erase temp1
 
   call :cd_repo %basedir%\smv %BRANCH_NAME% || exit /b 1
-  git describe --dirty --long > tmp1
-  set /p SMV_REVISION_BUNDLER=<tmp1
-  erase tmp1
+  git describe --dirty --long > temp1
+  set /p SMV_REVISION_BUNDLER=<temp1
+  erase temp1
 :skip_getrevision
+
+echo.
+echo ------------------------------------------------------
+echo ------------------------------------------------------
+echo Building apps
+echo.
 
 cd %CURDIR%
 call make_apps         || exit /b 1
 
+echo.
+echo ------------------------------------------------------
+echo ------------------------------------------------------
+echo Copying fds apps
+echo.
 cd %CURDIR%
 call copy_apps fds bot || exit /b 1
+
+echo.
+echo ------------------------------------------------------
+echo ------------------------------------------------------
+echo Copying smv apps
+echo.
 
 cd %CURDIR%
 call copy_apps smv bot || exit /b 1
 
+echo.
+echo ------------------------------------------------------
+echo ------------------------------------------------------
+echo Copying fds pubs
+echo.
+
 cd %CURDIR%
 call copy_pubs firebot  %bundle_firebot_home%/.firebot/pubs   %bundle_hostname% || exit /b 1
+
+echo.
+echo ------------------------------------------------------
+echo ------------------------------------------------------
+echo Copying smv pubs
+echo.
 
 cd %CURDIR%
 call copy_pubs smokebot %bundle_smokebot_home%/.smokebot/pubs %bundle_hostname% || exit /b 1
 
+echo.
+echo ------------------------------------------------------
+echo ------------------------------------------------------
+echo making bundle
+echo.
+
 cd %CURDIR%
 call make_bundle bot %FDS_REVISION_BUNDLER% %SMV_REVISION_BUNDLER% %nightly%
+
+echo.
+echo ------------------------------------------------------
+echo ------------------------------------------------------
+echo uploading bundle
+echo.
 
 cd %CURDIR%
 call upload_bundle %FDS_REVISION_BUNDLER% %SMV_REVISION_BUNDLER% %nightly% %bundle_hostname% || exit /b 1

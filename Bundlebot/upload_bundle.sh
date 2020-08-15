@@ -50,7 +50,11 @@ if [ "$upload" == "1" ]; then
   if [ "$erase" == "1" ]; then
     $GDRIVE list  | grep ${NIGHTLY}_$platform | awk '{ system("~/bin/gdrive delete -i " $1)} '
   fi
-  echo uploading $BUNDLE_DIR/$file
+  echo ""
+  echo "------------------------------------------------------"
+  echo "------------------------------------------------------"
+  echo "uploading $BUNDLE_DIR/$file"
+  echo ""
   $GDRIVE upload -p $BUNDLE_PARENT_ID -f $BUNDLE_DIR/$file
   nfiles=`$GDRIVE list  | grep $file | wc -l`
   if [ $nfiles -eq 0 ]; then
@@ -63,7 +67,11 @@ if [ "$upload" == "1" ]; then
       echo "$BUNDLE_DIR/$file uploaded."
     fi
   fi
+  echo ""
+  echo "------------------------------------------------------"
+  echo "------------------------------------------------------"
   echo uploading $BUNDLE_DIR/$shafile
+  echo ""
   $GDRIVE upload -p $BUNDLE_PARENT_ID -f $BUNDLE_DIR/$shafile
   nfiles=`$GDRIVE list  | grep $shafile | wc -l`
   if [ $nfiles -eq 0 ]; then
