@@ -170,6 +170,8 @@ if NOT "x%fds_hash%" == "x" goto skip_elsehash
 :skip_elsehash
   set FDS_HASH_BUNDLER=%fds_hash%
   set SMV_HASH_BUNDLER=%smv_hash%
+  set FDS_REVISION_BUNDLER=%fds_hash%
+  set SMV_REVISION_BUNDLER=%smv_hash%
 :endif_gethash
 
 cd %CURDIR%
