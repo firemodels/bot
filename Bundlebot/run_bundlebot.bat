@@ -189,7 +189,7 @@ if "x%SMV_REVISION_BUNDLER%" == "x" goto skip_smvrev
 :skip_smvrev
 echo   FDS repo revision/hash: %FDS_HASH_BUNDLER%
 echo   smv repo revision/hash: %SMV_HASH_BUNDLER%
-echo             firebot host: %bundle_hostname%
+echo    firebot/smokebot host: %bundle_hostname%
 echo   firebot home directory: %bundle_firebot_home%
 echo        FDS pub directory: %FDS_PUBS_DIR%
 echo  smokebot home directory: %bundle_smokebot_home%
