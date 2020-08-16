@@ -1,6 +1,31 @@
 #!/bin/bash
 
 #---------------------------------------------
+#                   usage
+#---------------------------------------------
+
+function usage {
+echo "This script builds FDS and Smokeview apps and genrates a bundle using"
+echo "specified fds and smv repo revisions or revisions from the latest firebot pass."
+echo ""
+echo "Options:"
+echo "-f - force this script to run"
+echo "-F - fds repo release"
+echo "-r - create a release bundle"
+echo "-S - smv repo release"
+echo "-h - display this message"
+echo "-H host - firebot host or LOCAL if revisions and documents are found at"
+echo "          $HOME/.firebot/pass"
+if [ "$MAILTO" != "" ]; then
+  echo "-m mailto - email address [default: $MAILTO]"
+else
+  echo "-m mailto - email address"
+fi
+echo "-v - show settings used to build bundle"
+exit 0
+}
+
+#---------------------------------------------
 #                   CHK_REPO
 #---------------------------------------------
 
@@ -53,21 +78,101 @@ UPDATE_REPO()
    CD_REPO $repo/$reponame $branch || return 1
 
    echo Updating $branch on repo $repo/$reponame
-   git remote update
+   git fetch origin
    git merge origin/$branch
-   have_firemodels=`git remote -v | grep firemodels | wc  -l`
-   if [ $have_firemodels -gt 0 ]; then
-      git merge firemodels/$branch
-      need_push=`git status -uno | head -2 | grep -v nothing | wc -l`
-      if [ $need_push -gt 1 ]; then
-        echo "***warning: firemodels commits to $reponame repo need to be pushed to origin"
-        git status -uno | head -2 | grep -v nothing
-      fi
-   fi
    return 0
 }
 
+
+#-------------------- start of script ---------------------------------
+
+if [ -e $HOME/.bundle/bundle_config.sh ]; then
+  source $HOME/.bundle/bundle_config.sh
+else
+  echo ***error: configuration file $HOME/.bundle/bundle_config.sh is not defined
+  exit 1
+fi
+FIREBOT_HOST=$bundle_hostname
+FIREBOT_HOME=$bundle_firebot_home
+
+MAILTO=
+if [ "$EMAIL" != "" ]; then
+  MAILTO=$EMAIL
+fi
+FDS_RELEASE=
+SMV_RELEASE=
+ECHO=
+VERBOSE=
+
+FORCE=
+RELEASE=
+BRANCH=nightly
+
+while getopts 'fF:hH:m:rS:vV' OPTION
+do
+case $OPTION  in
+  f)
+   FORCE="-f"
+   ;;
+  F)
+   FDS_RELEASE="$OPTARG"
+   ;;
+  h)
+   usage
+   ;;
+  H)
+   FIREBOT_HOST="$OPTARG"
+   ;;
+  m)
+   MAILTO="$OPTARG"
+   ;;
+  S)
+   SMV_RELEASE="$OPTARG"
+   ;;
+  r)
+   BRANCH=release
+   ;;
+  v)
+   ECHO=echo
+   ;;
+  V)
+   VERBOSE="-V"
+   ;;
+esac
+done
+shift $(($OPTIND-1))
+
+
+# Linux or OSX
+JOPT="-J"
+if [ "`uname`" == "Darwin" ] ; then
+  JOPT=
+fi
+
+# both or neither RELEASE options must be set
+if [ "$FDS_RELEASE" != "" ]; then
+  if [ "$SMV_RELEASE" != "" ]; then
+    FDS_RELEASE="-x $FDS_RELEASE"
+    SMV_RELEASE="-y $SMV_RELEASE"
+  fi
+fi
+if [ "$FDS_RELEASE" == "" ]; then
+  SMV_RELEASE=""
+fi
+if [ "$SMV_RELEASE" == "" ]; then
+  FDS_RELEASE=""
+fi
+
+FIREBOT_BRANCH="-R $BRANCH"
+BUNDLE_BRANCH="-b $BRANCH"
+
+# email address
+if [ "$MAILTO" != "" ]; then
+  MAILTO="-m $MAILTO"
+fi
+
 curdir=`pwd`
+
 commands=$0
 DIR=$(dirname "${commands}")
 cd $DIR
@@ -78,65 +183,15 @@ repo=`pwd`
 
 cd $DIR
 
-while getopts 'b:cd:fF:ghp:rS:tvVw' OPTION
-do
-case $OPTION  in
-  b)
-   bopt="-b $OPTARG"
-   ;;
-  c)
-   copt="-c"
-   ;;
-  d)
-   dopt="-d $OPTARG"
-   ;;
-  f)
-   fopt="-f"
-   ;;
-  F)
-   FOPT="-F $OPTARG"
-   ;;
-  g)
-   gopt="-g"
-   ;;
-  h)
-   hopt="-h"
-   ;;
-  p)
-   popt="-p $OPTARG"
-   ;;
-  r)
-   ropt="-r"
-   ;;
-  S)
-   SOPT="-S $OPTARG"
-   ;;
-  t)
-   topt="-t"
-   ;;
-  v)
-   vopt="-v"
-   ;;
-  V)
-   VOPT="-V"
-   ;;
-  w)
-   wopt="-w"
-   ;;
-esac
-done
-shift $(($OPTIND-1))
+# update bot and webpages repos
+UPDATE_REPO bot      master     || exit 1
+UPDATE_REPO webpages nist-pages || exit 1
 
-# update repo 
-if [ "$hopt" == "" ]; then
-if [ "$vopt" == "" ]; then
-  UPDATE_REPO bot master || exit 1
-fi
-fi
-
-cd $DIR
-./bundlebot.sh $bopt $copt $dopt $fopt $FOPT $gopt $hopt $popt $ropt $SOPT $topt $uopt $vopt $VOPT $wopt
-
+# get apps and documents
 cd $curdir
+cd ../Firebot
+$ECHO ./run_firebot.sh $FORCE -c -C -B -g $FIREBOT_HOST -G $FIREBOT_HOME $JOPT $FDS_RELEASE $SMV_RELEASE $FIREBOT_BRANCH -T $MAILTO
 
-exit 0
+# generate bundle
+cd $curdir
+$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH -p $FIREBOT_HOST $VERBOSE -w -g
