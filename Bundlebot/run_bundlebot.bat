@@ -182,13 +182,13 @@ echo ------------------------------------------------------
 echo Building bundle using:
 echo.
 if "x%FDS_REVISION_BUNDLER%" == "x" goto skip_fdsrev
-  echo FDS revision: %FDS_REVISION_BUNDLER%
+  echo             FDS revision: %FDS_REVISION_BUNDLER%
 :skip_fdsrev
 if "x%SMV_REVISION_BUNDLER%" == "x" goto skip_smvrev
-  echo smv revision: %SMV_REVISION_BUNDLER%
+  echo             smv revision: %SMV_REVISION_BUNDLER%
 :skip_smvrev
-echo                 FDS hash: %FDS_HASH_BUNDLER%
-echo                 smv hash: %SMV_HASH_BUNDLER%
+echo   FDS repo revision/hash: %FDS_HASH_BUNDLER%
+echo   smv repo revision/hash: %SMV_HASH_BUNDLER%
 echo             firebot host: %bundle_hostname%
 echo   firebot home directory: %bundle_firebot_home%
 echo        FDS pub directory: %FDS_PUBS_DIR%
@@ -199,7 +199,7 @@ echo.
 call clone_repos %FDS_HASH_BUNDLER% %SMV_HASH_BUNDLER% %BRANCH_NAME% || exit /b 1
 
 :: define revisions if hashes were specified on the command line
-if "x%fds_hash%" == "x" goto skip_getrevision
+if NOT "x%fds_hash%" == "x" goto skip_getrevision
 
   call :cd_repo %basedir%\fds %BRANCH_NAME% || exit /b 1
   git describe --dirty --long > temp1
