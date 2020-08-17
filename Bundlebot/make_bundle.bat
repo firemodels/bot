@@ -58,6 +58,10 @@ if "x%SMV_REVISION_ARG%" == "x" goto skip_smv_version
   set smv_version=%SMV_REVISION_ARG%
 :skip_smv_version
 
+if NOT "x%nightly%" == "xnull" goto skip_nightly_null
+  set nightly=
+:skip_nightly_null
+
 if "x%nightly%" == "x" goto skip_nightly
   set nightly=_%nightly%
 :skip_nightly

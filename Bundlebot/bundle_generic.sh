@@ -6,6 +6,9 @@ INTEL_COMP_VERSION=$4
 UPLOAD_DIR_ARG=$5
 NIGHTLY=$6
 
+if [ "$NIGHTLY" == "null" ]; then
+  NIGHTLY=
+fi
 if [ "$NIGHTLY" != "" ]; then
   NIGHTLY="${NIGHTLY}_"
 fi

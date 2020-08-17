@@ -164,8 +164,10 @@ else
   platform=lnx
 fi
 
+BUNDLE_PREFIX_FILE=${BUNDLE_PREFIX}_
 if [ "$BRANCH" == "release" ]; then
-  BUNDLE_PREFIX="rls"
+  BUNDLE_PREFIX=rls
+  BUNDLE_PREFIX_FILE=rls_
 fi
 BRANCHDIR=$BRANCH
 if [ "$BRANCH" != "release" ]; then
@@ -278,7 +280,7 @@ else
   SMVREV=smvtest
 fi
 installer_base=${FDSREV}_${SMVREV}
-installer_base_platform=${FDSREV}_${SMVREV}_${BUNDLE_PREFIX}_$platform
+installer_base_platform=${FDSREV}_${SMVREV}_${BUNDLE_PREFIX_FILE}$platform
 if [ "$showparms" == "" ]; then
 if [ "$OVERWRITE" == "" ]; then
   installer_file=$bundle_dir/${installer_base_platform}.sh
