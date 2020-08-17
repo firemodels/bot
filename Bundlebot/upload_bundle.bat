@@ -52,10 +52,23 @@ if NOT EXIST "%BUNDLEDIR%" goto if_bundledir
 :if_bundledir
 
 :: upload to linux computer
+echo.
+echo ------------------------------------------------------
+echo ------------------------------------------------------
+echo uploading %bundlefile% to %upload_host%
+echo.
+
 pscp -P 22 %bundlefile%    %upload_host%:.bundle/bundles/.
+
+echo.
+echo ------------------------------------------------------
+echo ------------------------------------------------------
+echo uploading %bundleshafile% to %upload_host%
+echo.
+
 pscp -P 22 %bundleshafile% %upload_host%:.bundle/bundles/.
 
 :: upload to google drive
-plink %plink_options% %linux_logon% %linux_svn_root%/bot/Bundlebot/upload_bundle.sh $HOME/.bundle/bundles %basename% tst win
+plink %plink_options% %linux_logon% %linux_svn_root%/bot/Bundlebot/upload_bundle.sh $HOME/.bundle/bundles %basename% %nightly% win
 
 exit /b 0
