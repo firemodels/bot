@@ -47,7 +47,7 @@ if "x%stopscript%" == "x" goto endif2
 set nightly=tst
 set pub_dir=
 if NOT "x%BRANCH_NAME%" == "xrelease" goto skip_branch
-  set nightly=
+  set nightly=rls
   set pub_dir=release
 :skip_branch
 
