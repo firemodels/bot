@@ -191,13 +191,15 @@ echo Smokeview pubs directory: %SMV_PUBS_DIR%
 echo.
 
 if "x%clone%" == "xclone" goto skip_warning
+  echo.
   echo ---------------------------------------------------------------
   echo ---------------------------------------------------------------
   echo You are about to erase and then clone the fds and smv repos.
-  echo Press any key to continue or CTRL c to quit.
+  echo Press any key to continue or CTRL c to abort.
   echo To avoid this warning, use the -c option on the command line
   echo ---------------------------------------------------------------
   echo ---------------------------------------------------------------
+  echo.
   pause >Nul
 :skip_warning
 

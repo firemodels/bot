@@ -9,6 +9,7 @@ echo "This script builds FDS and Smokeview apps and genrates a bundle using"
 echo "specified fds and smv repo revisions or revisions from the latest firebot pass."
 echo ""
 echo "Options:"
+echo "-c - proceed with bundling without warning message"
 echo "-f - force this script to run"
 echo "-F - fds repo release"
 echo "-r - create a release bundle"
@@ -103,14 +104,18 @@ FDS_RELEASE=
 SMV_RELEASE=
 ECHO=
 VERBOSE=
+PROCEED=
 
 FORCE=
 RELEASE=
 BRANCH=nightly
 
-while getopts 'fF:hH:m:rS:vV' OPTION
+while getopts 'cfF:hH:m:rS:vV' OPTION
 do
 case $OPTION  in
+  c)
+   PROCEED=1
+   ;;
   f)
    FORCE="-f"
    ;;
@@ -141,6 +146,18 @@ case $OPTION  in
 esac
 done
 shift $(($OPTIND-1))
+
+if [ "$PROCEED" == "" ]; then
+  echo ""
+  echo "------------------------------------------------------------"
+  echo "------------------------------------------------------------"
+  echo "You are about to erase and then clone the fds and smv repos."
+  echo "Press any key to continue or <CTRL> c to abort."
+  echo To avoid this warning, use the -c option on the command line
+  echo "------------------------------------------------------------"
+  echo "------------------------------------------------------------"
+  read val
+fi
 
 
 # Linux or OSX
@@ -183,15 +200,15 @@ repo=`pwd`
 
 cd $DIR
 
-# update bot and webpages repos
+#*** update bot and webpages repos
 UPDATE_REPO bot      master     || exit 1
 UPDATE_REPO webpages nist-pages || exit 1
 
-# get apps and documents
+#*** build apps
 cd $curdir
 cd ../Firebot
-$ECHO ./run_firebot.sh $FORCE -c -C -B -g $FIREBOT_HOST -G $FIREBOT_HOME $JOPT $FDS_RELEASE $SMV_RELEASE $FIREBOT_BRANCH -T $MAILTO
+$ECHO ./run_firebot.sh $FORCE -c -C -B -g $FIREBOT_HOST -G $FIREBOT_HOME $JOPT $FDS_RELEASE $SMV_RELEASE $FIREBOT_BRANCH -T $MAILTO || exit 1
 
-# generate bundle
+#*** generate and upload bundle
 cd $curdir
 $ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH -p $FIREBOT_HOST $VERBOSE $FDS_RELEASE $SMV_RELEASE -w -g
