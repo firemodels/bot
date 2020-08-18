@@ -5,7 +5,10 @@
 #---------------------------------------------
 
 function usage {
-echo "This script builds FDS and Smokeview apps and generates a bundle using either"
+echo ""
+echo "run_bundlebot.sh usage"
+echo ""
+echo "This script builds FDS and Smokeview apps and generates a bundle using either the"
 echo "specified fds and smv repo revisions or revisions from the latest firebot pass."
 echo ""
 echo "Options:"
