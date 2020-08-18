@@ -35,7 +35,7 @@ run_bundlebot -F FDS6.7.5 -S SMV6.7.15 -r
 
 A nightly bundle on a Linux or OSX computer is generated similarly using
 ```
-./run_bundlebot.sh -F FDS6.7.5 -S SMV6.7.15 -r
+./run_bundlebot.sh 
 ```
 The repo revisions are obtained from the last successful firebot runs.
 
