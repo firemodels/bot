@@ -78,12 +78,6 @@ if "x%bad_hash%" == "x" goto badhash
   set abort=1
 :badhash
 
-if "x%clone%" == "xclone" goto endif3
-  echo ***error:  this script clones (ie erases) the fds and smv repos.  
-  echo            -c must be specified on othe command line to use this script
-  set abort=1
-:endif3
-
 ::--- make sure hostname is defined
 
 if NOT x"%bundle_hostname%" == "x" goto error1
@@ -195,6 +189,17 @@ echo        FDS pub directory: %FDS_PUBS_DIR%
 echo  smokebot home directory: %bundle_smokebot_home%
 echo Smokeview pubs directory: %SMV_PUBS_DIR%
 echo.
+
+if "x%clone%" == "xclone" goto skip_warning
+  echo ---------------------------------------------------------------
+  echo ---------------------------------------------------------------
+  echo You are about to erase and then clone the fds and smv repos.
+  echo Press any key to continue or CTRL c to quit.
+  echo To avoid this warning, use the -c option on the command line
+  echo ---------------------------------------------------------------
+  echo ---------------------------------------------------------------
+  pause >Nul
+:skip_warning
 
 call clone_repos %FDS_HASH_BUNDLER% %SMV_HASH_BUNDLER% %BRANCH_NAME% || exit /b 1
 
