@@ -44,7 +44,6 @@ echo "-w - overwrite bundle (if it already exists) "
 echo "-x fds_revision - fds revision"
 echo "-y smv_revision - smv revision"
 echo "   The -x and -y options are only used with the -R cloning option"
-}
 exit 0
 }
 
