@@ -2389,8 +2389,10 @@ if [[ "$firebot_success" == "1" ]] ; then
   rm -f $BRANCHAPPS_DIR/*
   cp $LATESTAPPS_DIR/* $BRANCHAPPS_DIR/.
 
-  rm -f $BRANCHPUBS_DIR/*
-  cp $PUBS_DIR/*       $BRANCHPUBS_DIR/.
+  if [[ "$BUILD_ONLY" == "" ]]; then
+    rm -f $BRANCHPUBS_DIR/*
+    cp $PUBS_DIR/*       $BRANCHPUBS_DIR/.
+  fi
 fi
 
 ### Wrap up and report results ###
