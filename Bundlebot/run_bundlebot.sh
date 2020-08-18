@@ -5,18 +5,23 @@
 #---------------------------------------------
 
 function usage {
-echo "This script builds FDS and Smokeview apps and genrates a bundle using"
+echo "This script builds FDS and Smokeview apps and generates a bundle using either"
 echo "specified fds and smv repo revisions or revisions from the latest firebot pass."
 echo ""
 echo "Options:"
-echo "-c - proceed with bundling without warning message"
+echo "-c - bundle/clone without displaying warning messages"
 echo "-f - force this script to run"
-echo "-F - fds repo release"
+echo "-F - fds repo hash/release"
 echo "-r - create a release bundle"
-echo "-S - smv repo release"
+echo "-S - smv repo hash/release"
 echo "-h - display this message"
-echo "-H host - firebot host or LOCAL if revisions and documents are found at"
-echo "          $HOME/.firebot/pass"
+
+FIREBOT_HOST_MSSG=
+if [ "$FIREBOT_HOST" != "" ]; then
+  FIREBOT_HOST_MSSG="[default: $FIREBOT_HOST]"
+fi
+echo "-H host - firebot/smokebot host $FIREBOT_HOST_MSSG"
+
 if [ "$MAILTO" != "" ]; then
   echo "-m mailto - email address [default: $MAILTO]"
 else
