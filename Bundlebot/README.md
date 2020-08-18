@@ -23,7 +23,7 @@ At NIST this occurs whenever FDS and/or Smokeview source changes or at least onc
 3. Run the script `run_bundlebot.sh` on a Linux or OSX computer or `run_bundlebot.bat` on a Windows computer
 to build the applications and bundle.  
 
-To build a release bundle for fds repo tag FDS6.7.5 and smv repo tag SMV6.7.15 one would cd to the directdory bot/Bundlebot and
+To build a release bundle for fds repo tag FDS6.7.5 and smv repo tag SMV6.7.15 one would cd to the directory bot/Bundlebot and
 then run the command
 ```
 ./run_bundlebot.sh -F FDS6.7.5 -S SMV6.7.15 -r
@@ -32,4 +32,12 @@ and on a PC
 ```
 run_bundlebot -F FDS6.7.5 -S SMV6.7.15 -r
 ```
+
+A nightly bundle on a Linux or OSX computer is generated similarly using
+```
+./run_bundlebot.sh -F FDS6.7.5 -S SMV6.7.15 -r
+```
+The repo revisions are obtained from the last successful firebot runs.
+
+
 
