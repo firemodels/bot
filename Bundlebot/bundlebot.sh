@@ -166,8 +166,8 @@ fi
 
 BUNDLE_PREFIX_FILE=${BUNDLE_PREFIX}_
 if [ "$BRANCH" == "release" ]; then
-  BUNDLE_PREFIX=rls
-  BUNDLE_PREFIX_FILE=rls_
+  BUNDLE_PREFIX=null
+  BUNDLE_PREFIX_FILE=
 fi
 BRANCHDIR=$BRANCH
 if [ "$BRANCH" != "release" ]; then
