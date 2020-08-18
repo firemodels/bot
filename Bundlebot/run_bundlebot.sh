@@ -22,6 +22,9 @@ if [ "$MAILTO" != "" ]; then
 else
   echo "-m mailto - email address"
 fi
+echo "-U - do not upload bundle file.  By default the bundle is uploaded to a "
+echo "     Google drive directory with id found in the file"
+echo "     $HOME/.bundle/GOOGLE_DIR_ID"
 echo "-v - show settings used to build bundle"
 exit 0
 }
@@ -66,7 +69,6 @@ CD_REPO ()
   fi
   return 0
 }
-
 #---------------------------------------------
 #                   update_repo
 #---------------------------------------------
@@ -105,12 +107,13 @@ SMV_RELEASE=
 ECHO=
 VERBOSE=
 PROCEED=
+UPLOAD=-g
 
 FORCE=
 RELEASE=
 BRANCH=nightly
 
-while getopts 'cfF:hH:m:rS:vV' OPTION
+while getopts 'cfF:hH:m:rS:UvV' OPTION
 do
 case $OPTION  in
   c)
@@ -136,6 +139,9 @@ case $OPTION  in
    ;;
   r)
    BRANCH=release
+   ;;
+  U)
+   UPLOAD=
    ;;
   v)
    ECHO=echo
@@ -211,4 +217,4 @@ $ECHO ./run_firebot.sh $FORCE -c -C -B -g $FIREBOT_HOST -G $FIREBOT_HOME $JOPT $
 
 #*** generate and upload bundle
 cd $curdir
-$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH -p $FIREBOT_HOST $VERBOSE $FDS_RELEASE $SMV_RELEASE -w -g
+$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH -p $FIREBOT_HOST $VERBOSE $FDS_RELEASE $SMV_RELEASE -w $UPLOAD
