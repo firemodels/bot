@@ -5,23 +5,32 @@
 #---------------------------------------------
 
 function usage {
-echo "This script builds FDS and Smokeview apps and genrates a bundle using"
+echo ""
+echo "run_bundlebot.sh usage"
+echo ""
+echo "This script builds FDS and Smokeview apps and generates a bundle using either the"
 echo "specified fds and smv repo revisions or revisions from the latest firebot pass."
 echo ""
 echo "Options:"
-echo "-c - proceed with bundling without warning message"
+echo "-c - bundle/clone without displaying warning messages"
 echo "-f - force this script to run"
-echo "-F - fds repo release"
-echo "-r - create a release bundle"
-echo "-S - smv repo release"
+echo "-F - fds repo hash/release"
+
 echo "-h - display this message"
-echo "-H host - firebot host or LOCAL if revisions and documents are found at"
-echo "          $HOME/.firebot/pass"
+
+FIREBOT_HOST_MSSG=
+if [ "$FIREBOT_HOST" != "" ]; then
+  FIREBOT_HOST_MSSG="[default: $FIREBOT_HOST]"
+fi
+echo "-H host - firebot/smokebot host $FIREBOT_HOST_MSSG"
+
 if [ "$MAILTO" != "" ]; then
   echo "-m mailto - email address [default: $MAILTO]"
 else
   echo "-m mailto - email address"
 fi
+echo "-r - create a release bundle"
+echo "-S - smv repo hash/release"
 echo "-U - do not upload bundle file.  By default the bundle is uploaded to a "
 echo "     Google drive directory with id found in the file"
 echo "     $HOME/.bundle/GOOGLE_DIR_ID"
@@ -105,7 +114,6 @@ fi
 FDS_RELEASE=
 SMV_RELEASE=
 ECHO=
-VERBOSE=
 PROCEED=
 UPLOAD=-g
 
@@ -113,7 +121,7 @@ FORCE=
 RELEASE=
 BRANCH=nightly
 
-while getopts 'cfF:hH:m:rS:UvV' OPTION
+while getopts 'cfF:hH:m:rS:Uv' OPTION
 do
 case $OPTION  in
   c)
@@ -145,9 +153,6 @@ case $OPTION  in
    ;;
   v)
    ECHO=echo
-   ;;
-  V)
-   VERBOSE="-V"
    ;;
 esac
 done
@@ -217,4 +222,4 @@ $ECHO ./run_firebot.sh $FORCE -c -C -B -g $FIREBOT_HOST -G $FIREBOT_HOME $JOPT $
 
 #*** generate and upload bundle
 cd $curdir
-$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH -p $FIREBOT_HOST $VERBOSE $FDS_RELEASE $SMV_RELEASE -w $UPLOAD
+$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH -p $FIREBOT_HOST $FDS_RELEASE $SMV_RELEASE -w $UPLOAD

@@ -290,10 +290,10 @@ goto eof
 
 :usage
 echo.
-echo run_firebot usage
+echo run_bundlebot usage
 echo.
-echo This script builds a windows bundle using the specified fds and smv repo revisions
-echo or the revisions from the last firebot pass
+echo This script builds FDS and Smokeview apps and generates a bundle using either the
+echo specified fds and smv repo revisions or revisions from the latest firebot pass.
 echo.
 echo Options:
 echo -b - branch name [default: %BRANCH_NAME%]
