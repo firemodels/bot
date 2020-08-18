@@ -158,6 +158,57 @@ esac
 done
 shift $(($OPTIND-1))
 
+# Linux or OSX
+JOPT="-J"
+if [ "`uname`" == "Darwin" ] ; then
+  JOPT=
+fi
+
+# both or neither RELEASE options must be set
+FDS_RELEASE_ARG=$FDS_RELEASE
+SMV_RELEASE_ARG=$SMV_RELEASE
+if [ "$FDS_RELEASE" != "" ]; then
+  if [ "$SMV_RELEASE" != "" ]; then
+    FDS_RELEASE="-x $FDS_RELEASE"
+    SMV_RELEASE="-y $SMV_RELEASE"
+  fi
+fi
+if [ "$FDS_RELEASE" == "" ]; then
+  SMV_RELEASE=""
+  SMV_RELEASE_ARG=""
+fi
+if [ "$SMV_RELEASE" == "" ]; then
+  FDS_RELEASE=""
+  FDS_RELEASE_ARG=""
+fi
+
+FIREBOT_BRANCH_ARG=$BRANCH
+FIREBOT_BRANCH="-R $BRANCH"
+BUNDLE_BRANCH="-b $BRANCH"
+
+# email address
+MAILTO_ARG=$MAILTO
+if [ "$MAILTO" != "" ]; then
+  MAILTO="-m $MAILTO"
+fi
+
+echo ""
+echo "------------------------------------------------------------"
+echo "            Firebot host: $FIREBOT_HOST"
+echo "  Firebot home directory: $FIREBOT_HOME"
+if [ "$FDS_RELEASE_ARG" != "" ]; then
+  echo "            FDS TAG/HASH: $FDS_RELEASE_ARG"
+fi
+if [ "$SMV_RELEASE_ARG" != "" ]; then
+  echo "            SMV TAG/HASH: $SMV_RELEASE_ARG"
+fi
+echo "                   EMAIL: $MAILTO_ARG"
+echo "          Firebot branch: $FIREBOT_BRANCH_ARG"
+echo "------------------------------------------------------------"
+echo ""
+
+curdir=`pwd`
+
 if [ "$PROCEED" == "" ]; then
   echo ""
   echo "------------------------------------------------------------"
@@ -169,37 +220,6 @@ if [ "$PROCEED" == "" ]; then
   echo "------------------------------------------------------------"
   read val
 fi
-
-
-# Linux or OSX
-JOPT="-J"
-if [ "`uname`" == "Darwin" ] ; then
-  JOPT=
-fi
-
-# both or neither RELEASE options must be set
-if [ "$FDS_RELEASE" != "" ]; then
-  if [ "$SMV_RELEASE" != "" ]; then
-    FDS_RELEASE="-x $FDS_RELEASE"
-    SMV_RELEASE="-y $SMV_RELEASE"
-  fi
-fi
-if [ "$FDS_RELEASE" == "" ]; then
-  SMV_RELEASE=""
-fi
-if [ "$SMV_RELEASE" == "" ]; then
-  FDS_RELEASE=""
-fi
-
-FIREBOT_BRANCH="-R $BRANCH"
-BUNDLE_BRANCH="-b $BRANCH"
-
-# email address
-if [ "$MAILTO" != "" ]; then
-  MAILTO="-m $MAILTO"
-fi
-
-curdir=`pwd`
 
 commands=$0
 DIR=$(dirname "${commands}")
