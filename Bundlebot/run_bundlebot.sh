@@ -30,7 +30,6 @@ if [ "$MAILTO" != "" ]; then
 else
   echo "-m mailto - email address"
 fi
-echo "-v - show settings used to build bundle"
 exit 0
 }
 
@@ -111,14 +110,13 @@ fi
 FDS_RELEASE=
 SMV_RELEASE=
 ECHO=
-VERBOSE=
 PROCEED=
 
 FORCE=
 RELEASE=
 BRANCH=nightly
 
-while getopts 'cfF:hH:m:rS:vV' OPTION
+while getopts 'cfF:hH:m:rS:v' OPTION
 do
 case $OPTION  in
   c)
@@ -147,9 +145,6 @@ case $OPTION  in
    ;;
   v)
    ECHO=echo
-   ;;
-  V)
-   VERBOSE="-V"
    ;;
 esac
 done
@@ -219,4 +214,4 @@ $ECHO ./run_firebot.sh $FORCE -c -C -B -g $FIREBOT_HOST -G $FIREBOT_HOME $JOPT $
 
 #*** generate and upload bundle
 cd $curdir
-$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH -p $FIREBOT_HOST $VERBOSE $FDS_RELEASE $SMV_RELEASE -w -g
+$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH -p $FIREBOT_HOST $FDS_RELEASE $SMV_RELEASE -w -g
