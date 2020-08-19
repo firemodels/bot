@@ -12,11 +12,9 @@ echo "This script builds FDS and Smokeview apps and generates a bundle using eit
 echo "specified fds and smv repo revisions or revisions from the latest firebot pass."
 echo ""
 echo "Options:"
-echo "-c - bundle/clone without displaying warning messages"
+echo "-c - bundle without warning about cloning/erasing fds and smv repos"
 echo "-f - force this script to run"
-echo "-F - fds repo hash/release"
-echo "-r - create a release bundle"
-echo "-S - smv repo hash/release"
+echo "-F - fds repo hash/tag"
 echo "-h - display this message"
 
 FIREBOT_HOST_MSSG=
@@ -30,6 +28,9 @@ if [ "$MAILTO" != "" ]; then
 else
   echo "-m mailto - email address"
 fi
+
+echo "-r - create a release bundle"
+echo "-S - smv repo hash/tag"
 exit 0
 }
 
