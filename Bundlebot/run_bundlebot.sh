@@ -14,7 +14,8 @@ echo ""
 echo "Options:"
 echo "-c - bundle without warning about cloning/erasing fds and smv repos"
 echo "-f - force this script to run"
-echo "-F - fds repo hash/tag"
+echo "-F - fds repo hash/release"
+
 echo "-h - display this message"
 
 FIREBOT_HOST_MSSG=
@@ -30,7 +31,12 @@ else
 fi
 
 echo "-r - create a release bundle"
-echo "-S - smv repo hash/tag"
+echo "-S - smv repo hash/release"
+echo "-U - do not upload bundle file."
+echo "     By default the bundle is uploaded to a Google drive "
+echo "     directory with id found in the file:"
+echo "     $HOME/.bundle/GOOGLE_DIR_ID"
+echo "-v - show settings used to build bundle"
 exit 0
 }
 
@@ -74,7 +80,6 @@ CD_REPO ()
   fi
   return 0
 }
-
 #---------------------------------------------
 #                   update_repo
 #---------------------------------------------
@@ -112,12 +117,13 @@ FDS_RELEASE=
 SMV_RELEASE=
 ECHO=
 PROCEED=
+UPLOAD=-g
 
 FORCE=
 RELEASE=
 BRANCH=nightly
 
-while getopts 'cfF:hH:m:rS:v' OPTION
+while getopts 'cfF:hH:m:rS:Uv' OPTION
 do
 case $OPTION  in
   c)
@@ -144,12 +150,66 @@ case $OPTION  in
   r)
    BRANCH=release
    ;;
+  U)
+   UPLOAD=
+   ;;
   v)
    ECHO=echo
    ;;
 esac
 done
 shift $(($OPTIND-1))
+
+# Linux or OSX
+JOPT="-J"
+if [ "`uname`" == "Darwin" ] ; then
+  JOPT=
+fi
+
+# both or neither RELEASE options must be set
+FDS_RELEASE_ARG=$FDS_RELEASE
+SMV_RELEASE_ARG=$SMV_RELEASE
+if [ "$FDS_RELEASE" != "" ]; then
+  if [ "$SMV_RELEASE" != "" ]; then
+    FDS_RELEASE="-x $FDS_RELEASE"
+    SMV_RELEASE="-y $SMV_RELEASE"
+  fi
+fi
+if [ "$FDS_RELEASE" == "" ]; then
+  SMV_RELEASE=""
+  SMV_RELEASE_ARG=""
+fi
+if [ "$SMV_RELEASE" == "" ]; then
+  FDS_RELEASE=""
+  FDS_RELEASE_ARG=""
+fi
+
+FIREBOT_BRANCH_ARG=$BRANCH
+FIREBOT_BRANCH="-R $BRANCH"
+BUNDLE_BRANCH="-b $BRANCH"
+
+# email address
+MAILTO_ARG=$MAILTO
+if [ "$MAILTO" != "" ]; then
+  MAILTO="-m $MAILTO"
+fi
+
+echo ""
+echo "------------------------------------------------------------"
+echo "            Firebot host: $FIREBOT_HOST"
+echo "  Firebot home directory: $FIREBOT_HOME"
+if [ "$FDS_RELEASE_ARG" != "" ]; then
+  echo "            FDS TAG/HASH: $FDS_RELEASE_ARG"
+fi
+if [ "$SMV_RELEASE_ARG" != "" ]; then
+  echo "            SMV TAG/HASH: $SMV_RELEASE_ARG"
+fi
+echo "                   EMAIL: $MAILTO_ARG"
+echo "          Firebot branch: $FIREBOT_BRANCH_ARG"
+echo "------------------------------------------------------------"
+echo ""
+
+curdir=`pwd`
 
 if [ "$PROCEED" == "" ]; then
   echo ""
@@ -162,37 +222,6 @@ if [ "$PROCEED" == "" ]; then
   echo "------------------------------------------------------------"
   read val
 fi
-
-
-# Linux or OSX
-JOPT="-J"
-if [ "`uname`" == "Darwin" ] ; then
-  JOPT=
-fi
-
-# both or neither RELEASE options must be set
-if [ "$FDS_RELEASE" != "" ]; then
-  if [ "$SMV_RELEASE" != "" ]; then
-    FDS_RELEASE="-x $FDS_RELEASE"
-    SMV_RELEASE="-y $SMV_RELEASE"
-  fi
-fi
-if [ "$FDS_RELEASE" == "" ]; then
-  SMV_RELEASE=""
-fi
-if [ "$SMV_RELEASE" == "" ]; then
-  FDS_RELEASE=""
-fi
-
-FIREBOT_BRANCH="-R $BRANCH"
-BUNDLE_BRANCH="-b $BRANCH"
-
-# email address
-if [ "$MAILTO" != "" ]; then
-  MAILTO="-m $MAILTO"
-fi
-
-curdir=`pwd`
 
 commands=$0
 DIR=$(dirname "${commands}")
@@ -215,4 +244,4 @@ $ECHO ./run_firebot.sh $FORCE -c -C -B -g $FIREBOT_HOST -G $FIREBOT_HOME $JOPT $
 
 #*** generate and upload bundle
 cd $curdir
-$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH -p $FIREBOT_HOST $FDS_RELEASE $SMV_RELEASE -w -g
+$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH -p $FIREBOT_HOST $FDS_RELEASE $SMV_RELEASE -w $UPLOAD

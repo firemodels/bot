@@ -297,14 +297,14 @@ echo specified fds and smv repo revisions or revisions from the latest firebot p
 echo.
 echo Options:
 echo -b - branch name [default: %BRANCH_NAME%]
-echo -c - clone repos - required argument 
+echo -c - bundle without warning about cloning/erasing fds and smv repos 
 echo -h - display this message
-echo -H - hostname where firebot and smokebot were run %default_hostname%
+echo -H - host where firebot and smokebot were run %default_hostname%
 echo -f - firebot home directory %default_firebot_home%
-echo -F - fds repo hash
+echo -F - fds repo hash/tag
 echo -r - same as -b release
 echo -s - smokebot home directory %default_smokebot_home%
-echo -S - smv repo hash
+echo -S - smv repo hash/tag
 exit /b 0
 set bundle_hostname=
 set bundle_firebot_home=
