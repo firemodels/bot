@@ -2312,7 +2312,7 @@ if [[ "$BUILD_ONLY" == "" ]]; then
       check_matlab_validation
       archive_validation_stats
       make_validation_git_stats
-      check_validation_git_stats
+      check_validation_stats
     fi
   fi
 
