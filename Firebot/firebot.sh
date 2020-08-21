@@ -2242,7 +2242,9 @@ if [[ "$SKIPRELEASE" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
   check_compile_fds_mpi
 fi
 
+if [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
 $COPY_APPS fds > $OUTPUT_DIR/stage3d
+fi
 
 ### Stage 3a ###
 if [[ "$SKIPPICTURES" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
