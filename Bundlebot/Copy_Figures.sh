@@ -33,7 +33,7 @@ SHOW_SETTINGS=
 #HOST=burn.el.nist.gov
 #HOSTDIR=/home4/firebot/FireModels_clone/fds/
 
-while getopts 'dhH:svV:' OPTION
+while getopts 'd:hH:svV:' OPTION
 do
 case $OPTION  in
   d)

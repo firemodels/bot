@@ -2212,8 +2212,10 @@ check_git_checkout
 archive_compiler_version
 
 ### Stage 2a ###
-echo Building
-echo "   FDS"
+if [ "$MANUALS_MATLAB_ONLY" == "" ]; then
+  echo Building
+  echo "   FDS"
+fi
 # if something goes wrong with the openmp inspector
 # comment the following 6 lines (including 'if' and and 'fi'  lines
 if [[ "$SKIPINSPECT" == "" ]] && [[ "$platform" == "linux" ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
@@ -2270,10 +2272,10 @@ if [[ $FDS_debug_success ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_
    check_cases_debug $fdsrepo/Verification 'verification'
 fi
 
-if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
+if [[ "$BUILD_ONLY" == "" ]]; then
 # clean debug stage
   cd $fdsrepo
-  if [[ "$CLEANREPO" == "1" ]] ; then
+  if [[ "$CLEANREPO" == "1" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
     echo "   cleaning Verification"
     clean_repo $fdsrepo/Verification $FDSBRANCH || exit 1
   fi
@@ -2402,7 +2404,7 @@ fi
 ### Wrap up and report results ###
 set_files_world_readable
 save_build_status
-if [[ "$BUILD_ONLY" == "" ]]; then
+if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
   archive_timing_stats
 fi
 email_build_status 'Firebot'

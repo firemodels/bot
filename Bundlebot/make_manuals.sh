@@ -18,6 +18,11 @@ if [ "$FIREBOT_HOME" != "" ]; then
 fi
 echo "-d dir - firebot home directory $FIREBOT_HOME_MSSG"
 
+FIREBOT_REPOHOME_MSSG=
+if [ "$FIREBOT_REPOHOME" != "" ]; then
+  FIREBOT_REPOHOME_MSSG="[default: $FIREBOT_REPOHOME]"
+fi
+echo "-D dir - firebot repo home directory $FIREBOT_REPOHOME_MSSG"
 echo "-F - fds repo hash/release"
 echo "-h - display this message"
 
@@ -87,6 +92,7 @@ else
 fi
 FIREBOT_HOST=$bundle_hostname
 FIREBOT_HOME=$bundle_firebot_home
+FIREBOT_REPOHOME=$bundle_firebot_repohome
 
 MAILTO=
 if [ "$EMAIL" != "" ]; then
@@ -102,11 +108,14 @@ FORCE=
 RELEASE=
 BRANCH=nightly
 
-while getopts 'dF:hH:m:r' OPTION
+while getopts 'd:D:F:hH:m:r' OPTION
 do
 case $OPTION  in
   d)
    FIREBOT_HOME="$OPTARG"
+   ;;
+  D)
+   FIREBOT_REPOHOME="$OPTARG"
    ;;
   F)
    FDS_RELEASE="$OPTARG"
@@ -154,20 +163,26 @@ botrepo=$repo/bot
 
 #***clone fds repo
 echo cloning fds repo using tag/hash: $FDS_RELEASE
-cd $repo
+cd $botrepo/Scripts
+./setup_repos.sh -G
+
+cd $fdsrepo
+echo git checkout -b $BRANCH $FDS_RELEASE
 git checkout -b $BRANCH $FDS_RELEASE
 git describe --dirty --long
 git branch -a
 
+cd $curdir
+
 #***copy figures
 cd $curdir
-./Copy_Figures.sh -H $FIREBOT_HOST -d $FIREBOT_HOME
+echo "./Copy_Figures.sh -H $FIREBOT_HOST -d $FIREBOT_REPOHOME/fds -v"
+./Copy_Figures.sh -H $FIREBOT_HOST -d $FIREBOT_REPOHOME/fds -v
 
 
 #*** generate manuals
 
 cd $botrepo/Firebot
-./run_firebot.sh -M $MAILTO || exit 1
+./run_firebot.sh -f -M -b
 
-
-
+cd $CURDIR
