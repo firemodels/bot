@@ -150,6 +150,7 @@ DIR=`pwd`
 cd ../..
 repo=`pwd`
 fdsrepo=$repo/fds
+botrepo=$repo/bot
 
 #***clone fds repo
 echo cloning fds repo using tag/hash: $FDS_RELEASE
@@ -162,33 +163,11 @@ git branch -a
 cd $curdir
 ./Copy_Figures.sh -H $FIREBOT_HOST -d $FIREBOT_HOME
 
-#***generate matlab results
 
-cd $fdsrepo/Utilities/Matlab
-matlab -r "try, disp('Running Matlab Verification script'), FDS_verification_script, catch, disp('Error'), err = lasterror, err.message, err.stack, end, exit" &> $OUTPUT_DIR/stage7a_verification
+#*** generate manuals
 
-cd $fdsrepo/Utilities/Matlab
-matlab -r "try, disp('Running Matlab Validation script'), FDS_validation_script, catch, disp('Error'), err = lasterror, err.message, err.stack, end, exit" &> $OUTPUT_DIR/stage7b_validation
-
-#***generate manuals
-
-cd $fdsrepo/Manuals/FDS_Config_Management_Plan
-./make_guide.sh
-
-cd $fdsrepo/Manuals/FDS_Technical_Reference_Guide
-./make_guide.sh
-
-cd $fdsrepo/Manuals/FDS_User_Guide
-./make_guide.sh
-
-cd $fdsrepo/Manuals/FDS_Technical_Reference_Guide
-./make_guide.sh
-
-cd $fdsrepo/Manuals/FDS_Verification_Guide
-./make_guide.sh
-
-cd $fdsrepo/Manuals/FDS_Validaation_Guide
-./make_guide.sh
+cd $botrepo/Firebot
+./run_firebot.sh -M $MAILTO || exit 1
 
 
 

@@ -1732,6 +1732,7 @@ SMVBRANCH=master
 BOTBRANCH=master
 BRANCH=master
 BUILD_ONLY=
+MANUALS_MATLAB_ONLY=
 
 FDS_release_success=false
 
@@ -1786,7 +1787,7 @@ SKIPRELEASE=
 SUBSET_CASES=
 
 #*** parse command line arguments
-while getopts 'b:BcCdiJm:p:q:R:sSTuUx:y:w:' OPTION
+while getopts 'b:BcCdiJm:Mp:q:R:sSTuUx:y:w:' OPTION
 do
 case $OPTION in
   b)
@@ -1819,6 +1820,9 @@ case $OPTION in
    ;;
   m)
    mailToFDS="$OPTARG"
+   ;;
+  M)
+   MANUALS_MATLAB_ONLY=1
    ;;
   p)
    PID_FILE="$OPTARG"
@@ -2181,7 +2185,7 @@ fi
 
 get_fds_revision $FDSBRANCH || exit 1
 get_smv_revision $SMVBRANCH || exit 1
-if [ "$BUILD_ONLY" == "" ]; then
+if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
   get_exp_revision master || exit 1
   get_fig_revision master || exit 1
   get_out_revision master || exit 1
@@ -2198,7 +2202,7 @@ rm /tmp/mailtest.$$
 # archive repo sizes
 # (only if the repos are cloned or cleaned)
 
-if [ "$BUILD_ONLY" == "" ]; then
+if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
 if [ "$ARCHIVE_REPO_SIZES" == "1" ]; then
   archive_repo_sizes
 fi
@@ -2212,26 +2216,26 @@ echo Building
 echo "   FDS"
 # if something goes wrong with the openmp inspector
 # comment the following 6 lines (including 'if' and and 'fi'  lines
-if [[ "$SKIPINSPECT" == "" ]] && [[ "$platform" == "linux" ]] && [[ "$BUILD_ONLY" == "" ]]; then
+if [[ "$SKIPINSPECT" == "" ]] && [[ "$platform" == "linux" ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
   build_inspect_fds
 #  inspect_fds
 #  check_inspect_fds
 fi
 
 ### Stage 2b ###
-if [ "$BUILD_ONLY" == "" ]; then
+if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
   compile_fds_mpi_db
   check_compile_fds_mpi_db
 fi
 
 ### Stage 2d ###
-if [[ "$OPENMPI_GNU" != "" ]] && [[ "$BUILD_ONLY" == "" ]] ; then
+if [[ "$OPENMPI_GNU" != "" ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
   compile_fds_mpi_gnu_db
   check_compile_fds_mpi_gnu_db
 fi
 
 ### Stage 2c ###
-if [ "$SKIPRELEASE" == "" ]; then
+if [[ "$SKIPRELEASE" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
   compile_fds_mpi
   check_compile_fds_mpi
 fi
@@ -2239,19 +2243,19 @@ fi
 $COPY_APPS fds > $OUTPUT_DIR/stage3d
 
 ### Stage 3a ###
-if [ "$SKIPPICTURES" == "" ]; then
+if [[ "$SKIPPICTURES" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
   compile_smv_utilities
   check_smv_utilities
 fi
 
 ### Stage 3b ###
-if [[ "$SKIPPICTURES" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
+if [[ "$SKIPPICTURES" == "" ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
   compile_smv_db
   check_compile_smv_db
 fi
 
 ### Stage 3c ###
-if [ "$SKIPPICTURES" == "" ]; then
+if [[ "$SKIPPICTURES" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
   compile_smv
   check_compile_smv
   $COPY_APPS smv >> $OUTPUT_DIR/stage3d
@@ -2261,12 +2265,12 @@ fi
 ### Stage 4 ###
 
 # Depends on successful FDS debug compile
-if [[ $FDS_debug_success ]] && [[ "$BUILD_ONLY" == "" ]]; then
+if [[ $FDS_debug_success ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
    run_verification_cases_debug
    check_cases_debug $fdsrepo/Verification 'verification'
 fi
 
-if [[ "$BUILD_ONLY" == "" ]]; then
+if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
 # clean debug stage
   cd $fdsrepo
   if [[ "$CLEANREPO" == "1" ]] ; then
@@ -2276,7 +2280,7 @@ if [[ "$BUILD_ONLY" == "" ]]; then
 
 ### Stage 5 ###
 # Depends on successful FDS compile
-  if [[ $FDS_release_success ]] && [[ "$SKIPRELEASE" == "" ]]; then
+  if [[ $FDS_release_success ]] && [[ "$SKIPRELEASE" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
     run_verification_cases_release
     check_cases_release $fdsrepo/Verification 'final'
   fi
@@ -2284,7 +2288,7 @@ if [[ "$BUILD_ONLY" == "" ]]; then
 ### Stage 6 ###
 # Depends on successful SMV compile
   if [ "$SKIPPICTURES" == "" ] ; then
-    if [[ $smv_release_success ]] ; then
+    if [[ $smv_release_success ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] ; then
       make_fds_pictures
       check_fds_pictures
     fi
