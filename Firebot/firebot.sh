@@ -1266,7 +1266,7 @@ archive_validation_stats()
 make_validation_git_stats()
 {
    # Output a LaTeX file with a table of the FDS validation sets and their corresponding GIT information
-   cd $fdsrepo/Utilities/Scripts
+   cd $botrepo/Firebot/Scripts
    ./validation_git_stats.sh -r $repo
 }
 
