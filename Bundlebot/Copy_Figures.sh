@@ -18,6 +18,11 @@ echo "          the username on this host is different than the remote host"
 exit 0
 }
 
+CURDIR=`pwd`
+cd ../../fds
+fdsrepo=`pwd`
+cd $CURDIR
+
 HOST=blaze.el.nist.gov
 HOSTDIR=/home2/smokevis2/firebot/FireModels_clone/fds/
 COPY_VALVER_FIGS=
@@ -90,7 +95,7 @@ FBTG=$FIREBOTMANS/FDS_Technical_Reference_Guide/
 FBUG=$FIREBOTMANS/FDS_User_Guide/
 FBVG=$FIREBOTMANS/FDS_Verification_Guide/
 FBVAL=$FIREBOTMANS/FDS_Validation_Guide/
-BASEDIR=`pwd`
+BASEDIR=$fdsrepo/Manuals
 
 # Copy Tech Guide Figures
 $CP $FBTG/SCRIPT_FIGURES/* $BASEDIR/FDS_Technical_Reference_Guide/SCRIPT_FIGURES/
