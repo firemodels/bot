@@ -53,7 +53,7 @@ fi
 
 # get repo root name
 
-scriptdir=`dirname "$(readlink "$0")"`
+scriptdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 curdir=`pwd`
 cd $scriptdir/../..
 repo_root=`pwd`
