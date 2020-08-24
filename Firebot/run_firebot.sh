@@ -1,4 +1,4 @@
-#!/bin/bash
+ #!/bin/bash
 
 # The Firebot script is part of an automated continuous integration system.
 # Consult the FDS Config Management Plan for more information.
@@ -19,12 +19,13 @@ if [ "$INTEL" != "" ]; then
 else
   echo "-J - use Intel MPI version fds"
 fi
-echo "-O - use OpenMPI version fds"
 if [ "$EMAIL" != "" ]; then
   echo "-m email_address [default: $EMAIL]"
 else
   echo "-m email_address "
 fi
+echo "-M - only run matlab and build manuals stage"
+echo "-O - use OpenMPI version fds"
 echo "-P - remove run status (PID) file"
 echo "-d - only run cases in debug mode"
 echo "-s - use startup files to set the environment, not modules"
@@ -171,7 +172,6 @@ fi
 
 USEINSTALL=
 BRANCH=master
-botscript=firebot.sh
 UPDATEREPO=
 CLEANREPO=
 RUNFIREBOT=1
@@ -198,10 +198,11 @@ FORCECLONE=
 SUBSET_CASES=
 DEBUG_MODE=
 LOCAL=
+MANUALS_MATLAB_ONLY=
 
 #*** parse command line options
 
-while getopts 'bBcCdfg:G:hHiJkm:nOPq:R:sSTuUvw:x:y:' OPTION
+while getopts 'bBcCdfg:G:hHiJkm:MnOPq:R:sSTuUvw:x:y:' OPTION
 do
 case $OPTION  in
   b)
@@ -245,6 +246,9 @@ case $OPTION  in
    ;;
   m)
    EMAIL="$OPTARG"
+   ;;
+  M)
+   MANUALS_MATLAB_ONLY=-M
    ;;
   n)
    UPDATEREPO=
@@ -516,7 +520,7 @@ BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
 firebot_status=0
-$ECHO  ./$botscript -p $firebot_pid $UPDATEREPO $INTEL $BUILD_ONLY $FORCECLONE $BRANCH $DEBUG_MODE $SUBSET_CASES $FDS_REV $SMV_REV $USEINSTALL $UPLOADGUIDES $CLEANREPO $QUEUE $SKIPMATLAB $CLONE_REPOS $CLONE_FDSSMV  $EMAIL $WEB_DIR "$@"
+$ECHO  ./firebot.sh -p $firebot_pid $UPDATEREPO $INTEL $BUILD_ONLY $FORCECLONE $BRANCH $DEBUG_MODE $MANUALS_MATLAB_ONLY $SUBSET_CASES $FDS_REV $SMV_REV $USEINSTALL $UPLOADGUIDES $CLEANREPO $QUEUE $SKIPMATLAB $CLONE_REPOS $CLONE_FDSSMV  $EMAIL $WEB_DIR "$@"
 firebot_status=$?
 if [ -e $firebot_pid ]; then
   rm -f $firebot_pid

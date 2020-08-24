@@ -5,7 +5,7 @@ set "BUNDLEDIR=%userprofile%\Google Drive\nightly_bundles\"
 
 set fds_version_arg=%1
 set smv_version_arg=%2
-set nightly=%3
+set nightly_arg=%3
 set upload_host=%4
 
 set envfile="%userprofile%"\fds_smv_env.bat
@@ -27,8 +27,9 @@ if NOT "%upload_host%" == "null" goto endif1
   set upload_host=blaze.el.nist.gov
 :endif1
 
-if "%nightly%" == "null" goto endif2
-  set nightly=_%nightly%
+set nightly=
+if "%nightly_arg%" == "null" goto endif2
+  set nightly=_%nightly_arg%
 :endif2
 
 set bundle_dir=%userprofile%\.bundle\bundles
@@ -69,6 +70,6 @@ echo.
 pscp -P 22 %bundleshafile% %upload_host%:.bundle/bundles/.
 
 :: upload to google drive
-plink %plink_options% %linux_logon% %linux_svn_root%/bot/Bundlebot/upload_bundle.sh $HOME/.bundle/bundles %basename% %nightly% win
+plink %plink_options% %linux_logon% %linux_svn_root%/bot/Bundlebot/upload_bundle.sh $HOME/.bundle/bundles %basename% %nightly_arg% win
 
 exit /b 0

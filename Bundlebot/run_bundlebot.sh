@@ -5,22 +5,37 @@
 #---------------------------------------------
 
 function usage {
-echo "This script builds FDS and Smokeview apps and genrates a bundle using"
+echo ""
+echo "run_bundlebot.sh usage"
+echo ""
+echo "This script builds FDS and Smokeview apps and generates a bundle using either the"
 echo "specified fds and smv repo revisions or revisions from the latest firebot pass."
 echo ""
 echo "Options:"
+echo "-c - bundle without warning about cloning/erasing fds and smv repos"
 echo "-f - force this script to run"
-echo "-F - fds repo release"
-echo "-r - create a release bundle"
-echo "-S - smv repo release"
+echo "-F - fds repo hash/release"
+
 echo "-h - display this message"
-echo "-H host - firebot host or LOCAL if revisions and documents are found at"
-echo "          $HOME/.firebot/pass"
+
+FIREBOT_HOST_MSSG=
+if [ "$FIREBOT_HOST" != "" ]; then
+  FIREBOT_HOST_MSSG="[default: $FIREBOT_HOST]"
+fi
+echo "-H host - firebot/smokebot host $FIREBOT_HOST_MSSG"
+
 if [ "$MAILTO" != "" ]; then
   echo "-m mailto - email address [default: $MAILTO]"
 else
   echo "-m mailto - email address"
 fi
+
+echo "-r - create a release bundle"
+echo "-S - smv repo hash/release"
+echo "-U - do not upload bundle file."
+echo "     By default the bundle is uploaded to a Google drive "
+echo "     directory with id found in the file:"
+echo "     $HOME/.bundle/GOOGLE_DIR_ID"
 echo "-v - show settings used to build bundle"
 exit 0
 }
@@ -65,7 +80,6 @@ CD_REPO ()
   fi
   return 0
 }
-
 #---------------------------------------------
 #                   update_repo
 #---------------------------------------------
@@ -102,15 +116,19 @@ fi
 FDS_RELEASE=
 SMV_RELEASE=
 ECHO=
-VERBOSE=
+PROCEED=
+UPLOAD=-g
 
 FORCE=
 RELEASE=
 BRANCH=nightly
 
-while getopts 'fF:hH:m:rS:vV' OPTION
+while getopts 'cfF:hH:m:rS:Uv' OPTION
 do
 case $OPTION  in
+  c)
+   PROCEED=1
+   ;;
   f)
    FORCE="-f"
    ;;
@@ -132,16 +150,15 @@ case $OPTION  in
   r)
    BRANCH=release
    ;;
+  U)
+   UPLOAD=
+   ;;
   v)
    ECHO=echo
-   ;;
-  V)
-   VERBOSE="-V"
    ;;
 esac
 done
 shift $(($OPTIND-1))
-
 
 # Linux or OSX
 JOPT="-J"
@@ -150,6 +167,8 @@ if [ "`uname`" == "Darwin" ] ; then
 fi
 
 # both or neither RELEASE options must be set
+FDS_RELEASE_ARG=$FDS_RELEASE
+SMV_RELEASE_ARG=$SMV_RELEASE
 if [ "$FDS_RELEASE" != "" ]; then
   if [ "$SMV_RELEASE" != "" ]; then
     FDS_RELEASE="-x $FDS_RELEASE"
@@ -158,20 +177,51 @@ if [ "$FDS_RELEASE" != "" ]; then
 fi
 if [ "$FDS_RELEASE" == "" ]; then
   SMV_RELEASE=""
+  SMV_RELEASE_ARG=""
 fi
 if [ "$SMV_RELEASE" == "" ]; then
   FDS_RELEASE=""
+  FDS_RELEASE_ARG=""
 fi
 
+FIREBOT_BRANCH_ARG=$BRANCH
 FIREBOT_BRANCH="-R $BRANCH"
 BUNDLE_BRANCH="-b $BRANCH"
 
 # email address
+MAILTO_ARG=$MAILTO
 if [ "$MAILTO" != "" ]; then
   MAILTO="-m $MAILTO"
 fi
 
+echo ""
+echo "------------------------------------------------------------"
+echo "            Firebot host: $FIREBOT_HOST"
+echo "  Firebot home directory: $FIREBOT_HOME"
+if [ "$FDS_RELEASE_ARG" != "" ]; then
+  echo "            FDS TAG/HASH: $FDS_RELEASE_ARG"
+fi
+if [ "$SMV_RELEASE_ARG" != "" ]; then
+  echo "            SMV TAG/HASH: $SMV_RELEASE_ARG"
+fi
+echo "                   EMAIL: $MAILTO_ARG"
+echo "          Firebot branch: $FIREBOT_BRANCH_ARG"
+echo "------------------------------------------------------------"
+echo ""
+
 curdir=`pwd`
+
+if [ "$PROCEED" == "" ]; then
+  echo ""
+  echo "------------------------------------------------------------"
+  echo "------------------------------------------------------------"
+  echo "You are about to erase and then clone the fds and smv repos."
+  echo "Press any key to continue or <CTRL> c to abort."
+  echo To avoid this warning, use the -c option on the command line
+  echo "------------------------------------------------------------"
+  echo "------------------------------------------------------------"
+  read val
+fi
 
 commands=$0
 DIR=$(dirname "${commands}")
@@ -183,15 +233,15 @@ repo=`pwd`
 
 cd $DIR
 
-# update bot and webpages repos
+#*** update bot and webpages repos
 UPDATE_REPO bot      master     || exit 1
 UPDATE_REPO webpages nist-pages || exit 1
 
-# get apps and documents
+#*** build apps
 cd $curdir
 cd ../Firebot
-$ECHO ./run_firebot.sh $FORCE -c -C -B -g $FIREBOT_HOST -G $FIREBOT_HOME $JOPT $FDS_RELEASE $SMV_RELEASE $FIREBOT_BRANCH -T $MAILTO
+$ECHO ./run_firebot.sh $FORCE -c -C -B -g $FIREBOT_HOST -G $FIREBOT_HOME $JOPT $FDS_RELEASE $SMV_RELEASE $FIREBOT_BRANCH -T $MAILTO || exit 1
 
-# generate bundle
+#*** generate and upload bundle
 cd $curdir
-$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH -p $FIREBOT_HOST $VERBOSE -w -g
+$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH -p $FIREBOT_HOST $FDS_RELEASE $SMV_RELEASE -w $UPLOAD

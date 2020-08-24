@@ -47,7 +47,7 @@ if "x%stopscript%" == "x" goto endif2
 set nightly=tst
 set pub_dir=
 if NOT "x%BRANCH_NAME%" == "xrelease" goto skip_branch
-  set nightly=rls
+  set nightly=null
   set pub_dir=release
 :skip_branch
 
@@ -77,12 +77,6 @@ if "x%bad_hash%" == "x" goto badhash
   echo ***error: both or neither fds and smv hashes must be specified.  Only one was found
   set abort=1
 :badhash
-
-if "x%clone%" == "xclone" goto endif3
-  echo ***error:  this script clones (ie erases) the fds and smv repos.  
-  echo            -c must be specified on othe command line to use this script
-  set abort=1
-:endif3
 
 ::--- make sure hostname is defined
 
@@ -196,6 +190,19 @@ echo  smokebot home directory: %bundle_smokebot_home%
 echo Smokeview pubs directory: %SMV_PUBS_DIR%
 echo.
 
+if "x%clone%" == "xclone" goto skip_warning
+  echo.
+  echo ---------------------------------------------------------------
+  echo ---------------------------------------------------------------
+  echo You are about to erase and then clone the fds and smv repos.
+  echo Press any key to continue or CTRL c to abort.
+  echo To avoid this warning, use the -c option on the command line
+  echo ---------------------------------------------------------------
+  echo ---------------------------------------------------------------
+  echo.
+  pause >Nul
+:skip_warning
+
 call clone_repos %FDS_HASH_BUNDLER% %SMV_HASH_BUNDLER% %BRANCH_NAME% || exit /b 1
 
 :: define revisions if hashes were specified on the command line
@@ -283,21 +290,21 @@ goto eof
 
 :usage
 echo.
-echo run_firebot usage
+echo run_bundlebot usage
 echo.
-echo This script builds a windows bundle using the specified fds and smv repo revisions
-echo or the revisions from the last firebot pass
+echo This script builds FDS and Smokeview apps and generates a bundle using either the
+echo specified fds and smv repo revisions or revisions from the latest firebot pass.
 echo.
 echo Options:
 echo -b - branch name [default: %BRANCH_NAME%]
-echo -c - clone repos - required argument 
+echo -c - bundle without warning about cloning/erasing fds and smv repos 
 echo -h - display this message
-echo -H - hostname where firebot and smokebot were run %default_hostname%
+echo -H - host where firebot and smokebot were run %default_hostname%
 echo -f - firebot home directory %default_firebot_home%
-echo -F - fds repo hash
+echo -F - fds repo hash/tag
 echo -r - same as -b release
 echo -s - smokebot home directory %default_smokebot_home%
-echo -S - smv repo hash
+echo -S - smv repo hash/tag
 exit /b 0
 set bundle_hostname=
 set bundle_firebot_home=

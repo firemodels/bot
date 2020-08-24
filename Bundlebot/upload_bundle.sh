@@ -4,7 +4,14 @@ BUNDLE_BASE=$2
 NIGHTLY=$3
 platform=$4
 
-scriptdir=`dirname "$(readlink -f "$0")"`
+if [ "$NIGHTLY" == "null" ]; then
+  NIGHTLY=
+else
+  NIGHTLY=${NIGHTLY}_
+fi
+
+scriptdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
 cd $scriptdir
 
 erase=1
@@ -48,7 +55,7 @@ if [ ! -e $BUNDLE_DIR/$shafile ]; then
 fi
 if [ "$upload" == "1" ]; then
   if [ "$erase" == "1" ]; then
-    $GDRIVE list  | grep ${NIGHTLY}_$platform | awk '{ system("~/bin/gdrive delete -i " $1)} '
+    $GDRIVE list  | grep ${NIGHTLY}$platform$ext | grep FDS | grep SMV | awk '{ system("~/bin/gdrive delete -i " $1)} '
   fi
   echo ""
   echo "------------------------------------------------------"

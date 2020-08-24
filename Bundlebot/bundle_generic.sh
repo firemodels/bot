@@ -6,6 +6,9 @@ INTEL_COMP_VERSION=$4
 UPLOAD_DIR_ARG=$5
 NIGHTLY=$6
 
+if [ "$NIGHTLY" == "null" ]; then
+  NIGHTLY=
+fi
 if [ "$NIGHTLY" != "" ]; then
   NIGHTLY="${NIGHTLY}_"
 fi
@@ -37,7 +40,8 @@ fi
 
 # determine directory repos reside under
 
-scriptdir=`dirname "$(readlink "$0")"`
+scriptdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
 curdir=`pwd`
 cd $scriptdir/../..
 REPO_ROOT=`pwd`

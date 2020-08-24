@@ -41,6 +41,9 @@ echo "     file $HOME/.bundle/GOOGLE_DIR_ID"
 echo "-h - display this message"
 echo "-v - show parameters used to build bundle (the bundle is not generated)"
 echo "-w - overwrite bundle (if it already exists) "
+echo "-x fds_revision - fds revision"
+echo "-y smv_revision - smv revision"
+echo "   The -x and -y options are only used with the -R cloning option"
 exit 0
 }
 
@@ -74,11 +77,12 @@ GOOGLE_DIR_ID_FILE=$HOME/.bundle/GOOGLE_DIR_ID
 CURDIR=`pwd`
 OUTPUT_DIR=$CURDIR/output
 SYNC_REVS=
-VERBOSE=
 BRANCH=master
 BUNDLE_PREFIX="tst"
+FDS_REVISION=
+SMV_REVISION=
 
-while getopts 'b:cd:fF:ghp:rS:tvVw' OPTION
+while getopts 'b:cd:fF:ghp:rS:tvwx:y:' OPTION
 do
 case $OPTION  in
   b)
@@ -122,11 +126,14 @@ case $OPTION  in
    showparms=1
    ECHO=echo
    ;;
-  V)
-   VERBOSE=1
-   ;;
   w)
    OVERWRITE=1
+   ;;
+  x)
+   FDS_REVISION=$OPTARG
+   ;;
+  y)
+   SMV_REVISION=$OPTARG
    ;;
 esac
 done
@@ -164,8 +171,10 @@ else
   platform=lnx
 fi
 
+BUNDLE_PREFIX_FILE=${BUNDLE_PREFIX}_
 if [ "$BRANCH" == "release" ]; then
-  BUNDLE_PREFIX="rls"
+  BUNDLE_PREFIX=null
+  BUNDLE_PREFIX_FILE=
 fi
 BRANCHDIR=$BRANCH
 if [ "$BRANCH" != "release" ]; then
@@ -226,32 +235,11 @@ if [ "$USE_CACHE" == "" ]; then
 if [ "$showparms" == "" ]; then
   error_log=/tmp/error_log.$$
   rm -f $HOME/.bundle/pubs/*
-  if [ "$VERBOSE" == "1" ]; then
-    echo "********************"
-    echo ./copy_pubs.sh fds $fds_pub_home/.firebot/$BRANCHDIR/pubs  $pub_host $error_log
-    echo "********************"
-  fi 
   ./copy_pubs.sh fds $fds_pub_home/.firebot/$BRANCHDIR/pubs         $pub_host $error_log || return_code=1
-
-  if [ "$VERBOSE" == "1" ]; then
-    echo "********************"
-    echo ./copy_pubs.sh smv $smv_pub_home/.smokebot/$BRANCHDIR/pubs $pub_host $error_log
-    echo "********************"
-  fi
   ./copy_pubs.sh smv $smv_pub_home/.smokebot/$BRANCHDIR/pubs        $pub_host $error_log || return_code=1
 
   rm -f $HOME/.bundle/apps/*
-  if [ "$VERBOSE" == "1" ]; then
-    echo "********************"
-    echo ./copy_apps.sh fds $app_home/.firebot/$BRANCHDIR/apps      $error_log 
-    echo "********************"
-  fi
   ./copy_apps.sh fds $app_home/.firebot/$BRANCHDIR/apps             $error_log || return_code=1
-  if [ "$VERBOSE" == "1" ]; then
-    echo "********************"
-    echo ./copy_apps.sh smv $app_home/.firebot/$BRANCHDIR/apps      $error_log
-    echo "********************"
-  fi
   ./copy_apps.sh smv $app_home/.firebot/$BRANCHDIR/apps             $error_log || return_code=1
  
   if [ "$return_code" == "1" ]; then
@@ -267,18 +255,26 @@ fi
 
 # get fds and smv repo revision used to build apps
 
-if [ -e $HOME/.bundle/apps/FDS_REVISION ]; then
-  FDSREV=`cat $HOME/.bundle/apps/FDS_REVISION`
-else
-  FDSREV=fdstest
+FDSREV=$FDS_REVISION
+if [ "$FDS_REVISION" == "" ]; then
+  if [ -e $HOME/.bundle/apps/FDS_REVISION ]; then
+    FDSREV=`cat $HOME/.bundle/apps/FDS_REVISION`
+  else
+    FDSREV=fdstest
+  fi
 fi
-if [ -e $HOME/.bundle/apps/SMV_REVISION ]; then
-  SMVREV=`cat $HOME/.bundle/apps/SMV_REVISION`
-else
-  SMVREV=smvtest
+
+SMVREV=$SMV_REVISION
+if [ "$SMV_REVISION" == "" ]; then
+  if [ -e $HOME/.bundle/apps/SMV_REVISION ]; then
+    SMVREV=`cat $HOME/.bundle/apps/SMV_REVISION`
+  else
+    SMVREV=smvtest
+  fi
 fi
+
 installer_base=${FDSREV}_${SMVREV}
-installer_base_platform=${FDSREV}_${SMVREV}_${BUNDLE_PREFIX}_$platform
+installer_base_platform=${FDSREV}_${SMVREV}_${BUNDLE_PREFIX_FILE}$platform
 if [ "$showparms" == "" ]; then
 if [ "$OVERWRITE" == "" ]; then
   installer_file=$bundle_dir/${installer_base_platform}.sh

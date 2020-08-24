@@ -12,13 +12,14 @@ echo "-f - setup repos used by firebot: "
 echo "    $fdsrepos"
 echo "-F - setup repos used by firebot (erase each repo first): "
 echo "    $firebotrepos"
+echo "-G - only clone fds repo (erase first)"
+echo "-h - display this message"
 echo "-s - setup repos used by smokebot: "
 echo "    $smvrepos"
 echo "-S - setup repos used by smokebot (erase each repo first): "
 echo "    $smvrepos"
 echo "-T - only setup fds and smv repos (erase each repo first)"
 echo "-w - setup wiki and webpage repos cloned from firemodels"
-echo "-h - display this message"
 exit
 }
 
@@ -52,6 +53,7 @@ SETUP_REMOTE ()
 
 CURDIR=`pwd`
 
+fdsreposonly="fds"
 fdsrepos="exp fds fig out smv"
 fdssmvrepos="fds smv"
 firebotrepos="exp fds fds-smv fig out smv"
@@ -73,7 +75,7 @@ else
    exit
 fi
 
-while getopts 'abcCfFhsSTw' OPTION
+while getopts 'abcCfFGhsSTw' OPTION
 do
 case $OPTION  in
   a)
@@ -83,7 +85,7 @@ case $OPTION  in
    repos=$cfastrepos;
    ;;
   C)
-   FORCECLONE=1
+   FORCECLONE=1;
    ;;
   f)
    repos=$fdsrepos;
@@ -91,6 +93,10 @@ case $OPTION  in
   F)
    repos=$firebotrepos;
    eraserepos=1
+   ;;
+  G)
+   repos=$fdsreposonly;
+   eraserepos=1;
    ;;
   h)
    usage;
@@ -100,11 +106,11 @@ case $OPTION  in
    ;;
   S)
    repos=$smvrepos;
-   eraserepos=1
+   eraserepos=1;
    ;;
   T)
    repos=$fdssmvrepos;
-   eraserepos=1
+   eraserepos=1l
    ;;
   w)
    repos=$wikiwebrepos;
