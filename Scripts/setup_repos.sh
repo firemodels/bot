@@ -110,7 +110,7 @@ case $OPTION  in
    ;;
   T)
    repos=$fdssmvrepos;
-   eraserepos=1l
+   eraserepos=1
    ;;
   w)
    repos=$wikiwebrepos;
