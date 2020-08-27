@@ -21,8 +21,8 @@ directory $HOME/.firebot/pubs . At NIST this occurs nightly.
 documents are copied to $HOME/.smokebot/pubs. 
 At NIST this occurs whenever FDS and/or Smokeview source changes or at least once a day if the smokeview source has not changed.
 3. Run the script `run_bundlebot.sh` on a Linux or OSX computer or `run_bundlebot.bat` on a Windows computer
-to build the applications and bundle.  Upload the bundles to the nightly builds.
-[google drive directory)](https://drive.google.com/drive/folders/1X-gRYGPGtcewgnNiNBuho3U8zDFVqFsC?usp=sharing)
+to build the applications and bundle.  These scripts upload the bundles to the 
+[nightly builds google drive directory)](https://drive.google.com/drive/folders/1X-gRYGPGtcewgnNiNBuho3U8zDFVqFsC?usp=sharing)
 
 To build a release bundle for fds repo tag FDS6.7.5 and smv repo tag SMV6.7.15 one would cd to the directory bot/Bundlebot and
 then run the command
