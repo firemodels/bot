@@ -40,5 +40,7 @@ A nightly bundle on a Linux or OSX computer is generated similarly using
 ```
 The repo revisions are obtained from the last successful firebot runs.
 
+Note, need to add info on files in $HOME/.bundle the bundle scripts need to build bundles (run time libraries etc).
+
 
 
