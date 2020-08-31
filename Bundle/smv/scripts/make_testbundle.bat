@@ -49,8 +49,8 @@ IF EXIST %smvdir% rmdir /S /Q %smvdir%
 mkdir %smvdir%
 mkdir %smvdir%\hash
 
-CALL :COPY %smvbuild%\smokeview\intel_win_64\smokeview_win_test_64.exe  %smvdir%\smokeview.exe
-CALL :COPY %smvbuild%\smokeview\gnu_win_64\smokeview_win_test_64p.exe   %smvdir%\smokeview_gnu.exe
+CALL :COPY        %smvbuild%\smokeview\intel_win_64\smokeview_win_test_64.exe  %smvdir%\smokeview.exe
+CALL :COPY_NOWARN %smvbuild%\smokeview\gnu_win_64\smokeview_win_test_64p.exe   %smvdir%\smokeview_gnu.exe
 
 CALL :COPY  %smvscripts%\jp2conv.bat %smvdir%\jp2conv.bat
 
@@ -150,3 +150,17 @@ IF EXIST %infile% (
 )
 exit /b
 
+:COPY_NOWARN
+set label=%~n1%~x1
+set infile=%1
+set infiletime=%~t1
+set outfile=%2
+IF EXIST %infile% (
+   echo copying %label% %infiletime%
+   copy %infile% %outfile% >Nul
+) ELSE (
+   echo.
+   echo *** warning: %infile% does not exist
+   echo.
+)
+exit /b
