@@ -463,15 +463,19 @@ compile_fds_mpi_gnu_db()
    compile_gnu=
    if [ "$OPENMPI_INTEL" != "" ]; then
      if [ "$OPENMPI_GNU" != "" ]; then
-       module unload $OPENMPI_INTEL
-       module load $OPENMPI_GNU
-       echo "      MPI gfortran debug"
-       compile_gnu=1
-       cd $fdsrepo/Build/mpi_gnu_${platform}${size}$DB
-       make -f ../makefile clean &> /dev/null
-       ./make_fds.sh &> $OUTPUT_DIR/stage2d
-       module unload $OPENMPI_GNU
-       module load $OPENMPI_INTEL
+       if [ "$GFORTRAN" != "" ]; then
+         module unload $OPENMPI_INTEL
+         module load $OPENMPI_GNU
+         module load $GFORTRAN
+         echo "      MPI gfortran debug"
+         compile_gnu=1
+         cd $fdsrepo/Build/mpi_gnu_${platform}${size}$DB
+         make -f ../makefile clean &> /dev/null
+         ./make_fds.sh &> $OUTPUT_DIR/stage2d
+         module unload $OPENMPI_GNU
+         module unload $GFORTRAN
+         module load $OPENMPI_INTEL
+       fi
      fi
    fi
 }
@@ -703,13 +707,6 @@ compile_smv_utilities()
      rm -f *.o background_${platform}${size}
      ./make_background.sh >> $OUTPUT_DIR/stage3a 2>&1
      CP background_${platform}${size} $LATESTAPPS_DIR/background
-
-   # dem2fds
-     echo "      dem2fds"
-     cd $smvrepo/Build/dem2fds/${COMPILER}_${platform}${size}
-     rm -f *.o dem2fds_${platform}${size}
-     ./make_dem2fds.sh >> $OUTPUT_DIR/stage3a 2>&1
-     CP dem2fds_${platform}${size} $LATESTAPPS_DIR/dem2fds
 
   # wind2fds:
      echo "      wind2fds"
@@ -1134,6 +1131,41 @@ check_verification_stats()
 }
 
 #---------------------------------------------
+#                   check_validation_stats
+#---------------------------------------------
+
+check_validation_stats()
+{
+# fds/Manuals/FDS_Validation_Guide/SCRIPT_FIGURES/ScatterPlots/validation_git_stats.tex
+   # Check for existence of verification statistics output file
+   cd $fdsrepo/Manuals/FDS_Validation_Guide/SCRIPT_FIGURES/ScatterPlots
+   if [ -e "validation_git_stats.tex" ]
+   then
+      # Continue along
+      :
+   else
+      echo "Warnings from Stage 7b - Matlab plotting and statistics (validation):" >> $WARNING_LOG
+      echo "Error: The validation statistics output file does not exist." >> $WARNING_LOG
+      echo "Expected the file Manuals/FDS_Validation_Guide/SCRIPT_FIGURES/ScatterPlots/validation_git_stats.tex" >> $WARNING_LOG
+      echo "" >> $WARNING_LOG
+   fi
+
+   # Scan for the string dirty
+   cd $fdsrepo/Manuals/FDS_Validation_Guide/SCRIPT_FIGURES/ScatterPlots
+   if [[ `grep "dirty" validation_git_stats.tex` == "" ]]
+   then
+      # Continue along
+      :
+   else
+      echo "Warnings from Stage 7b - Matlab plotting and statistics (validation):" >> $WARNING_LOG
+      echo "The following table entries are dirty:" >> $WARNING_LOG
+      echo "" >> $WARNING_LOG
+      grep "dirty" validation_git_stats.tex >> $WARNING_LOG
+      echo "" >> $WARNING_LOG
+   fi
+}
+
+#---------------------------------------------
 #                   run_matlab_validation
 #---------------------------------------------
 
@@ -1234,7 +1266,7 @@ archive_validation_stats()
 make_validation_git_stats()
 {
    # Output a LaTeX file with a table of the FDS validation sets and their corresponding GIT information
-   cd $fdsrepo/Utilities/Scripts
+   cd $botrepo/Firebot/Scripts
    ./validation_git_stats.sh -r $repo
 }
 
@@ -1366,7 +1398,7 @@ copy_fds_user_guide()
 {
    cd $fdsrepo/Manuals/FDS_User_Guide
    copy_guide $fdsrepo/Manuals/FDS_User_Guide/FDS_User_Guide.pdf
-   copy_guide $fdsrepo/Manuals/FDS_User_Guide/geom_notes.pdf
+#   copy_guide $fdsrepo/Manuals/FDS_User_Guide/geom_notes.pdf
 }
 
 #---------------------------------------------
@@ -1700,6 +1732,7 @@ SMVBRANCH=master
 BOTBRANCH=master
 BRANCH=master
 BUILD_ONLY=
+MANUALS_MATLAB_ONLY=
 
 FDS_release_success=false
 
@@ -1754,7 +1787,7 @@ SKIPRELEASE=
 SUBSET_CASES=
 
 #*** parse command line arguments
-while getopts 'b:BcCdiJm:p:q:R:sSTuUx:y:w:' OPTION
+while getopts 'b:BcCdiJm:Mp:q:R:sSTuUx:y:w:' OPTION
 do
 case $OPTION in
   b)
@@ -1787,6 +1820,9 @@ case $OPTION in
    ;;
   m)
    mailToFDS="$OPTARG"
+   ;;
+  M)
+   MANUALS_MATLAB_ONLY=1
    ;;
   p)
    PID_FILE="$OPTARG"
@@ -2149,7 +2185,7 @@ fi
 
 get_fds_revision $FDSBRANCH || exit 1
 get_smv_revision $SMVBRANCH || exit 1
-if [ "$BUILD_ONLY" == "" ]; then
+if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
   get_exp_revision master || exit 1
   get_fig_revision master || exit 1
   get_out_revision master || exit 1
@@ -2166,7 +2202,7 @@ rm /tmp/mailtest.$$
 # archive repo sizes
 # (only if the repos are cloned or cleaned)
 
-if [ "$BUILD_ONLY" == "" ]; then
+if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
 if [ "$ARCHIVE_REPO_SIZES" == "1" ]; then
   archive_repo_sizes
 fi
@@ -2176,50 +2212,54 @@ check_git_checkout
 archive_compiler_version
 
 ### Stage 2a ###
-echo Building
-echo "   FDS"
+if [ "$MANUALS_MATLAB_ONLY" == "" ]; then
+  echo Building
+  echo "   FDS"
+fi
 # if something goes wrong with the openmp inspector
 # comment the following 6 lines (including 'if' and and 'fi'  lines
-if [[ "$SKIPINSPECT" == "" ]] && [[ "$platform" == "linux" ]] && [[ "$BUILD_ONLY" == "" ]]; then
+if [[ "$SKIPINSPECT" == "" ]] && [[ "$platform" == "linux" ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
   build_inspect_fds
 #  inspect_fds
 #  check_inspect_fds
 fi
 
 ### Stage 2b ###
-if [ "$BUILD_ONLY" == "" ]; then
+if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
   compile_fds_mpi_db
   check_compile_fds_mpi_db
 fi
 
 ### Stage 2d ###
-if [[ "$OPENMPI_GNU" != "" ]] && [[ "$BUILD_ONLY" == "" ]] ; then
+if [[ "$OPENMPI_GNU" != "" ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
   compile_fds_mpi_gnu_db
   check_compile_fds_mpi_gnu_db
 fi
 
 ### Stage 2c ###
-if [ "$SKIPRELEASE" == "" ]; then
+if [[ "$SKIPRELEASE" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
   compile_fds_mpi
   check_compile_fds_mpi
 fi
 
+if [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
 $COPY_APPS fds > $OUTPUT_DIR/stage3d
+fi
 
 ### Stage 3a ###
-if [ "$SKIPPICTURES" == "" ]; then
+if [[ "$SKIPPICTURES" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
   compile_smv_utilities
   check_smv_utilities
 fi
 
 ### Stage 3b ###
-if [[ "$SKIPPICTURES" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
+if [[ "$SKIPPICTURES" == "" ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
   compile_smv_db
   check_compile_smv_db
 fi
 
 ### Stage 3c ###
-if [ "$SKIPPICTURES" == "" ]; then
+if [[ "$SKIPPICTURES" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
   compile_smv
   check_compile_smv
   $COPY_APPS smv >> $OUTPUT_DIR/stage3d
@@ -2229,7 +2269,7 @@ fi
 ### Stage 4 ###
 
 # Depends on successful FDS debug compile
-if [[ $FDS_debug_success ]] && [[ "$BUILD_ONLY" == "" ]]; then
+if [[ $FDS_debug_success ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
    run_verification_cases_debug
    check_cases_debug $fdsrepo/Verification 'verification'
 fi
@@ -2237,14 +2277,14 @@ fi
 if [[ "$BUILD_ONLY" == "" ]]; then
 # clean debug stage
   cd $fdsrepo
-  if [[ "$CLEANREPO" == "1" ]] ; then
+  if [[ "$CLEANREPO" == "1" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
     echo "   cleaning Verification"
     clean_repo $fdsrepo/Verification $FDSBRANCH || exit 1
   fi
 
 ### Stage 5 ###
 # Depends on successful FDS compile
-  if [[ $FDS_release_success ]] && [[ "$SKIPRELEASE" == "" ]]; then
+  if [[ $FDS_release_success ]] && [[ "$SKIPRELEASE" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
     run_verification_cases_release
     check_cases_release $fdsrepo/Verification 'final'
   fi
@@ -2252,7 +2292,7 @@ if [[ "$BUILD_ONLY" == "" ]]; then
 ### Stage 6 ###
 # Depends on successful SMV compile
   if [ "$SKIPPICTURES" == "" ] ; then
-    if [[ $smv_release_success ]] ; then
+    if [[ $smv_release_success ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] ; then
       make_fds_pictures
       check_fds_pictures
     fi
@@ -2274,6 +2314,7 @@ if [[ "$BUILD_ONLY" == "" ]]; then
       check_matlab_validation
       archive_validation_stats
       make_validation_git_stats
+      check_validation_stats
     fi
   fi
 
@@ -2283,7 +2324,7 @@ if [[ "$BUILD_ONLY" == "" ]]; then
 ### Stage 8 ###
   if [ "$SKIPMATLAB" == "" ] ; then
     make_fds_user_guide
-    make_geom_notes
+#    make_geom_notes
     make_fds_verification_guide
     make_fds_technical_guide
     make_fds_validation_guide
@@ -2356,14 +2397,16 @@ if [[ "$firebot_success" == "1" ]] ; then
   rm -f $BRANCHAPPS_DIR/*
   cp $LATESTAPPS_DIR/* $BRANCHAPPS_DIR/.
 
-  rm -f $BRANCHPUBS_DIR/*
-  cp $PUBS_DIR/*       $BRANCHPUBS_DIR/.
+  if [[ "$BUILD_ONLY" == "" ]]; then
+    rm -f $BRANCHPUBS_DIR/*
+    cp $PUBS_DIR/*       $BRANCHPUBS_DIR/.
+  fi
 fi
 
 ### Wrap up and report results ###
 set_files_world_readable
 save_build_status
-if [[ "$BUILD_ONLY" == "" ]]; then
+if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
   archive_timing_stats
 fi
 email_build_status 'Firebot'

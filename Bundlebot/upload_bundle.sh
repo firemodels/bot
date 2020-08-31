@@ -4,7 +4,14 @@ BUNDLE_BASE=$2
 NIGHTLY=$3
 platform=$4
 
-scriptdir=`dirname "$(readlink -f "$0")"`
+if [ "$NIGHTLY" == "null" ]; then
+  NIGHTLY=
+else
+  NIGHTLY=${NIGHTLY}_
+fi
+
+scriptdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
 cd $scriptdir
 
 erase=1
@@ -48,9 +55,13 @@ if [ ! -e $BUNDLE_DIR/$shafile ]; then
 fi
 if [ "$upload" == "1" ]; then
   if [ "$erase" == "1" ]; then
-    $GDRIVE list  | grep ${NIGHTLY}_$platform | awk '{ system("~/bin/gdrive delete -i " $1)} '
+    $GDRIVE list  | grep ${NIGHTLY}$platform$ext | grep FDS | grep SMV | awk '{ system("~/bin/gdrive delete -i " $1)} '
   fi
-  echo uploading $BUNDLE_DIR/$file
+  echo ""
+  echo "------------------------------------------------------"
+  echo "------------------------------------------------------"
+  echo "uploading $BUNDLE_DIR/$file"
+  echo ""
   $GDRIVE upload -p $BUNDLE_PARENT_ID -f $BUNDLE_DIR/$file
   nfiles=`$GDRIVE list  | grep $file | wc -l`
   if [ $nfiles -eq 0 ]; then
@@ -63,7 +74,11 @@ if [ "$upload" == "1" ]; then
       echo "$BUNDLE_DIR/$file uploaded."
     fi
   fi
+  echo ""
+  echo "------------------------------------------------------"
+  echo "------------------------------------------------------"
   echo uploading $BUNDLE_DIR/$shafile
+  echo ""
   $GDRIVE upload -p $BUNDLE_PARENT_ID -f $BUNDLE_DIR/$shafile
   nfiles=`$GDRIVE list  | grep $shafile | wc -l`
   if [ $nfiles -eq 0 ]; then

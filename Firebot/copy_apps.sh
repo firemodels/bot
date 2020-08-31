@@ -53,7 +53,7 @@ fi
 
 # get repo root name
 
-scriptdir=`dirname "$(readlink "$0")"`
+scriptdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 curdir=`pwd`
 cd $scriptdir/../..
 repo_root=`pwd`
@@ -69,7 +69,6 @@ if [ "$type" == "smv" ]; then
   echo
   echo ***copying smokeview  apps
   CP $smvrepo/Build/background/intel$OS background$OS $TODIR/apps background
-  CP $smvrepo/Build/dem2fds/intel$OS    dem2fds$OS    $TODIR/apps dem2fds
   CP $smvrepo/Build/hashfile/intel$OS   hashfile$OS   $TODIR/apps hashfile
   CP $smvrepo/Build/smokediff/intel$OS  smokediff$OS  $TODIR/apps smokediff
   CP $smvrepo/Build/smokeview/intel$OS  smokeview$OS  $TODIR/apps smokeview

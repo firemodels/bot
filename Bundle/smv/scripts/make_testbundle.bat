@@ -67,7 +67,6 @@ CALL :COPY %forbundle%\fdsinit_test.bat %smvdir%\fdsinit_test.txt
 CALL :COPY %forbundle%\smokeview_p.bat  %smvdir%\smokeview_p.bat
 
 CALL :COPY %smvbuild%\background\intel_win_64\background_win_64.exe %smvdir%\background.exe
-CALL :COPY %smvbuild%\dem2fds\intel_win_64\dem2fds_win_64.exe       %smvdir%\dem2fds.exe
 CALL :COPY %smvbuild%\flush\intel_win_64\flush_win_64.exe           %smvdir%\flush.exe
 CALL :COPY %smvbuild%\hashfile\intel_win_64\hashfile_win_64.exe     %smvdir%\hashfile.exe
 CALL :COPY %smvbuild%\set_path\intel_win_64\set_path_win_64.exe     %smvdir%\set_path.exe
@@ -75,14 +74,12 @@ CALL :COPY %smvbuild%\smokediff\intel_win_64\smokediff_win_64.exe   %smvdir%\smo
 CALL :COPY %smvbuild%\smokezip\intel_win_64\smokezip_win_64.exe     %smvdir%\smokezip.exe
 CALL :COPY %smvbuild%\timep\intel_win_64\timep_win_64.exe           %smvdir%\timep.exe
 CALL :COPY %smvbuild%\wind2fds\intel_win_64\wind2fds_win_64.exe     %smvdir%\wind2fds.exe
-CALL :COPY %repoexes%\openvr_api.dll                                %smvdir%\openvr_api.dll
 
 set curdir=%CD%
 cd %smvdir%
 
 hashfile hashfile.exe   >  hash\hashfile_%smv_revision%.sha1
 hashfile background.exe >  hash\background_%smv_revision%.sha1
-hashfile dem2fds.exe    >  hash\dem2fds_%smv_revision%.sha1
 hashfile set_path.exe   >  hash\set_path_%smv_revision%.sha1
 hashfile smokediff.exe  >  hash\smokediff_%smv_revision%.sha1
 hashfile smokezip.exe   >  hash\smokezip_%smv_revision%.sha1

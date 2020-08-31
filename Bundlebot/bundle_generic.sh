@@ -6,6 +6,9 @@ INTEL_COMP_VERSION=$4
 UPLOAD_DIR_ARG=$5
 NIGHTLY=$6
 
+if [ "$NIGHTLY" == "null" ]; then
+  NIGHTLY=
+fi
 if [ "$NIGHTLY" != "" ]; then
   NIGHTLY="${NIGHTLY}_"
 fi
@@ -37,7 +40,8 @@ fi
 
 # determine directory repos reside under
 
-scriptdir=`dirname "$(readlink "$0")"`
+scriptdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
 curdir=`pwd`
 cd $scriptdir/../..
 REPO_ROOT=`pwd`
@@ -313,8 +317,6 @@ else
   PLATFORM=LINUX64
 fi
 
-smvscriptdir=$REPO_ROOT/smv/scripts
-
 bundledir=$UPLOAD_DIR/$bundlebase
 smvbindir=$bundledir/smvbin
 fdsbindir=$bundledir/bin
@@ -323,6 +325,8 @@ webpagesdir=$REPO_ROOT/webpages
 fds_bundle=$REPO_ROOT/bot/Bundle/fds/for_bundle
 smv_bundle=$REPO_ROOT/bot/Bundle/smv/for_bundle
 webgldir=$REPO_ROOT/bot/Bundle/smv/for_bundle/webgl
+smvscriptdir=$REPO_ROOT/smv/scripts
+utilscriptdir=$REPO_ROOT/smv/Utilities/Scripts
 
 texturedir=$smv_bundle/textures
 makeinstaller=$REPO_ROOT/bot/Bundlebot/make_installer.sh
@@ -374,7 +378,6 @@ CP $APPS_DIR background $smvbindir background
 CP $APPS_DIR smokeview  $smvbindir smokeview
 CP $APPS_DIR smokediff  $smvbindir smokediff
 CP $APPS_DIR smokezip   $smvbindir smokezip
-CP $APPS_DIR dem2fds    $smvbindir dem2fds
 CP $APPS_DIR wind2fds   $smvbindir wind2fds
 CP $APPS_DIR hashfile   $smvbindir hashfile
 
@@ -391,7 +394,6 @@ $APPS_DIR/hashfile background > hash/background.sha1
 $APPS_DIR/hashfile smokeview  > hash/smokeview.sha1
 $APPS_DIR/hashfile smokediff  > hash/smokediff.sha1
 $APPS_DIR/hashfile smokezip   > hash/smokezip.sha1
-$APPS_DIR/hashfile dem2fds    > hash/dem2fds.sha1
 $APPS_DIR/hashfile wind2fds   > hash/wind2fds.sha1
 $APPS_DIR/hashfile hashfile   > hash/hashfile.sha1
 cd $CURDIR
@@ -434,7 +436,6 @@ TOMANIFESTMPI  $MPIEXEC              mpiexec
 TOMANIFESTSMV  $smvbindir/smokeview  smokeview
 
 TOMANIFESTSMV  $smvbindir/background background
-TOMANIFESTSMV  $smvbindir/dem2fds    dem2fds
 TOMANIFESTLIST $fdsbindir/fds2ascii  fds2ascii
 TOMANIFESTSMV  $smvbindir/hashfile   hashfile
 TOMANIFESTSMV  $smvbindir/smokediff  smokediff
@@ -460,8 +461,10 @@ CP $smv_bundle smokeview.html $smvbindir smokeview.html
 
 # smokeview to html conversion scripts
 
-CP $webgldir runsmv_ssh.sh $smvbindir runsmv_ssh.sh
-CP $webgldir smv2html.sh   $smvbindir smv2html.sh
+CP $webgldir      runsmv_ssh.sh $smvbindir runsmv_ssh.sh
+CP $webgldir      smv2html.sh   $smvbindir smv2html.sh
+CP $utilscriptdir fds2html.sh   $smvbindir fds2html.sh
+CP $utilscriptdir fds2mp4.sh    $smvbindir fds2mp4.sh
 
 echo ""
 echo "--- copying documentation ---"

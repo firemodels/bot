@@ -26,7 +26,7 @@ CP ()
   local FROMFILE=$1
   local TOFILE=$2
   COPY=
-  if [[ "$firebot_host" != "" ]] && [[ "$firebot_host" != "`hostname`" ]]; then
+  if [[ "$firebot_host" != "" ]] && [[ "$firebot_host" != "LOCAL" ]] && [[ "$firebot_host" != "`hostname`" ]]; then
     scp -q $firebot_host:$firebot_home/$FROMFILE $TOFILE
     COPY=1
   else
@@ -86,6 +86,14 @@ esac
 done
 shift $(($OPTIND-1))
 
+if [[ "$firebot_host" != "" ]] && [[ "$firebot_host" != "`hostname`" ]]; then
+  firebot_home=$firebot_home
+else
+  eval firebot_home=$firebot_home
+fi
+if [ "$firebot_host" != "LOCAL" ]; then
+  firebot_home=$firebot_home/.firebot/apps
+fi
 if [ "$SHOWPARMS" == "1" ]; then
   echo firebot_host="$firebot_host"
   echo error_log="$error_log"
@@ -94,12 +102,6 @@ if [ "$SHOWPARMS" == "1" ]; then
   echo repo_type="$repo_type"
   exit 0
 fi
-if [[ "$firebot_host" != "" ]] && [[ "$firebot_host" != "`hostname`" ]]; then
-  firebot_home=$firebot_home
-else
-  eval firebot_home=$firebot_home
-fi
-firebot_home=$firebot_home/.firebot/apps
 
 return_code=0
 

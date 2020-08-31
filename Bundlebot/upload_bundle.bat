@@ -1,9 +1,11 @@
 @echo off
 setlocal
 
+set "BUNDLEDIR=%userprofile%\Google Drive\nightly_bundles\"
+
 set fds_version_arg=%1
 set smv_version_arg=%2
-set nightly=%3
+set nightly_arg=%3
 set upload_host=%4
 
 set envfile="%userprofile%"\fds_smv_env.bat
@@ -25,12 +27,14 @@ if NOT "%upload_host%" == "null" goto endif1
   set upload_host=blaze.el.nist.gov
 :endif1
 
-if "%nightly%" == "null" goto endif2
-  set nightly=_%nightly%
+set nightly=
+if "%nightly_arg%" == "null" goto endif2
+  set nightly=_%nightly_arg%
 :endif2
 
 set bundle_dir=%userprofile%\.bundle\bundles
 set basename=%fds_version_arg%_%smv_version_arg%%nightly%_win
+
 set bundlefile=%bundle_dir%\%basename%.exe
 set bundleshafile=%bundle_dir%\%basename%.sha1
 
@@ -39,11 +43,33 @@ if EXIST %bundlefile% goto skip_upload
   exit /b 1
 :skip_upload
 
+if NOT EXIST "%BUNDLEDIR%" goto if_bundledir
+  erase "%BUNDLEDIR%"\*tst_win.exe  1> Nul 2>&1
+  erase "%BUNDLEDIR%"\*tst_win.sha1 1> Nul 2>&1
+
+  copy %bundlefile%    "%BUNDLEDIR%\%basename%.exe"
+  copy %bundleshafile% "%BUNDLEDIR%\%basename%.sha1"
+  exit /b 0
+:if_bundledir
+
 :: upload to linux computer
-pscp %bundlefile%    %upload_host%:.bundle/bundles/.
-pscp %bundleshafile% %upload_host%:.bundle/bundles/.
+echo.
+echo ------------------------------------------------------
+echo ------------------------------------------------------
+echo uploading %bundlefile% to %upload_host%
+echo.
+
+pscp -P 22 %bundlefile%    %upload_host%:.bundle/bundles/.
+
+echo.
+echo ------------------------------------------------------
+echo ------------------------------------------------------
+echo uploading %bundleshafile% to %upload_host%
+echo.
+
+pscp -P 22 %bundleshafile% %upload_host%:.bundle/bundles/.
 
 :: upload to google drive
-plink %plink_options% %linux_logon% %linux_svn_root%/bot/Bundlebot/upload_bundle.sh /home/gforney/.bundle/bundles %basename% tst win
+plink %plink_options% %linux_logon% %linux_svn_root%/bot/Bundlebot/upload_bundle.sh $HOME/.bundle/bundles %basename% %nightly_arg% win
 
 exit /b 0

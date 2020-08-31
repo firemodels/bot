@@ -4,10 +4,20 @@ set bot_type=%1
 set pdf_from=%2
 set bot_host=%3
 
+set "PUBDIR=%userprofile%\Google Drive\FDS-SMV Newest Manuals\"
+
 set pdf_to=%userprofile%\.bundle\pubs
 
 if NOT exist %userprofile%\.bundle mkdir %userprofile%\.bundle
 if NOT exist %pdf_to% mkdir %pdf_to%
+
+echo.
+echo From directory: %pdf_from%
+echo   To directory: %pdf_to%
+
+if "x%bot_host%" == "x" goto endif0
+  echo           host: %bot_host% 
+:endif0
 
 if "%bot_type%" == "firebot" (
   call :copy_file FDS_Config_Management_Plan.pdf
@@ -30,15 +40,21 @@ goto eof
 :: -------------------------------------------------
 set file=%1
 
+set "fullfile=%PUBDIR%\%file%"
+if NOT exist "%fullfile%" goto getfile_if
+  echo        copying: %file%
+  copy "%fullfile%" %pdf_to%\%file% > Nul
+  exit /b 0
+:getfile_if
+
+echo        copying: %file%
 if "x%bot_host%" == "x" goto else1
-  echo copying %file% from %pdf_from% on %bot_host% to %pdf_to%
-  pscp %bot_host%:%pdf_from%/%file% %pdf_to%\.
+  pscp -P 22 %bot_host%:%pdf_from%/%file% %pdf_to%\.
   if EXIST %pdf_to%\%file% goto endif1
   echo ***Error: unable to copy %file% from %bot_host%:%pdf_from%/%file%
   set error=1
   goto endif1
 :else1
-  echo copying %file% from %pdf_from% to %pdf_to%
   copy %pdf_from%\%file% %pdf_to%
   if EXIST %pdf_to%\%file% goto endif1
   echo ***Error: unable to copy %file% from %pdf_from%\%file%

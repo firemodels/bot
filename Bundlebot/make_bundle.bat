@@ -58,6 +58,10 @@ if "x%SMV_REVISION_ARG%" == "x" goto skip_smv_version
   set smv_version=%SMV_REVISION_ARG%
 :skip_smv_version
 
+if NOT "x%nightly%" == "xnull" goto skip_nightly_null
+  set nightly=
+:skip_nightly_null
+
 if "x%nightly%" == "x" goto skip_nightly
   set nightly=_%nightly%
 :skip_nightly
@@ -176,14 +180,12 @@ CALL :TOMANIFESTMPI   %out_bin%\mpi\mpiexec.exe  mpiexec
 CALL :TOMANIFESTSMV   %out_smv%\smokeview.exe    smokeview
 
 CALL :COPY  %bundle_dir%\smv\background.exe %out_bin%\background.exe
-CALL :COPY  %bundle_dir%\smv\dem2fds.exe    %out_smv%\dem2fds.exe 
 CALL :COPY  %bundle_dir%\smv\hashfile.exe   %out_smv%\hashfile.exe 
 CALL :COPY  %bundle_dir%\smv\smokediff.exe  %out_smv%\smokediff.exe
 CALL :COPY  %bundle_dir%\smv\smokezip.exe   %out_smv%\smokezip.exe 
 CALL :COPY  %bundle_dir%\smv\wind2fds.exe   %out_smv%\wind2fds.exe 
 
 CALL :TOMANIFESTSMV   %out_bin%\background.exe background
-CALL :TOMANIFESTSMV   %out_smv%\dem2fds.exe    dem2fds
 CALL :TOMANIFESTLIST  %out_bin%\fds2ascii.exe  fds2ascii
 CALL :TOMANIFESTSMV   %out_smv%\hashfile.exe   hashfile
 CALL :TOMANIFESTSMV   %out_smv%\smokediff.exe  smokediff
@@ -213,7 +215,6 @@ cd %out_smv%
 %hashfile% smokeview.exe  >  hash\smokeview_%smv_version%.exe.sha1
 %hashfile% smokediff.exe  >  hash\smokediff_%smv_version%.exe.sha1
 %hashfile% smokezip.exe   >  hash\smokezip_%smv_version%.exe.sha1
-%hashfile% dem2fds.exe    >  hash\dem2fds_%smv_version%.exe.sha1
 %hashfile% wind2fds.exe   >  hash\wind2fds_%smv_version%.exe.sha1
 cd hash
 cat *.sha1              >>  %upload_dir%\%basename%.sha1
@@ -328,7 +329,7 @@ cd %upload_dir%
 echo Press Setup to begin installation. > %fds_forbundle%\main.txt
 if exist %basename%.exe erase %basename%.exe
 
-wzipse32 %basename%.zip -setup -auto -i %fds_forbundle%\icon.ico -t %fds_forbundle%\unpack.txt -runasadmin -a %fds_forbundle%\about.txt -st"FDS %fds_version% Smokeview %smv_version% Setup" -o -c cmd /k firemodels\setup.bat
+wzipse32 %basename%.zip -setup -auto -i %fds_forbundle%\icon.ico -t %fds_forbundle%\unpack.txt -runasadmin -a %fds_forbundle%\about.txt -st"%fds_version% %smv_version%" -o -c cmd /k firemodels\setup.bat
 
 %hashfile% %basename%.exe   >>  %upload_dir%\%basename%.sha1
 

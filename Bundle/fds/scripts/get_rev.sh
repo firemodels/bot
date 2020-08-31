@@ -10,9 +10,10 @@ echo ""
 echo "Options:"
 echo "-e - error log [default: $error_log]"
 echo "-g - host where firebot was run [default: $firebot_host]"
+echo "     if LOCAL then get files from $firebot_home on local host"
 echo "-G - home directory where firebot was run [default: $firebot_home]"
 echo "-h - display this message"
-echo "-r - repo type fds or  smv [default: $repo_type]"
+echo "-r - repo type fds or smv [default: $repo_type]"
 echo "-v - show parameters used to build bundle (the bundle is not generated)"
 exit 0
 }
@@ -26,7 +27,7 @@ CP ()
   local FROMFILE=$1
   local TOFILE=$2
   COPY=
-  if [[ "$firebot_host" != "" ]] && [[ "$firebot_host" != "`hostname`" ]]; then
+  if [[ "$firebot_host" != "" ]] && [[ "$firebot_host" != "LOCAL" ]] && [[ "$firebot_host" != "`hostname`" ]]; then
     scp -q $firebot_host:$firebot_home/$FROMFILE $TOFILE
     COPY=1
   else
@@ -86,6 +87,15 @@ esac
 done
 shift $(($OPTIND-1))
 
+if [[ "$firebot_host" != "" ]] && [[ "$firebot_host" != "`hostname`" ]]; then
+  firebot_home=$firebot_home
+else
+  eval firebot_home=$firebot_home
+fi
+if [ "$firebot_host" != "LOCAL" ]; then
+  firebot_home=$firebot_home/.firebot/apps
+fi
+
 if [ "$SHOWPARMS" == "1" ]; then
   echo firebot_host="$firebot_host"
   echo error_log="$error_log"
@@ -94,12 +104,6 @@ if [ "$SHOWPARMS" == "1" ]; then
   echo repo_type="$repo_type"
   exit 0
 fi
-if [[ "$firebot_host" != "" ]] && [[ "$firebot_host" != "`hostname`" ]]; then
-  firebot_home=$firebot_home
-else
-  eval firebot_home=$firebot_home
-fi
-firebot_home=$firebot_home/.firebot/apps
 
 return_code=0
 
