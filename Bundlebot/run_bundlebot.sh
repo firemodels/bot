@@ -13,6 +13,7 @@ echo "specified fds and smv repo revisions or revisions from the latest firebot 
 echo ""
 echo "Options:"
 echo "-c - bundle without warning about cloning/erasing fds and smv repos"
+echo "-C - use FDS and smokeview hash revisions found in $CONFIG_SCRIPT"
 echo "-f - force this script to run"
 echo "-F - fds repo hash/release"
 
@@ -122,12 +123,19 @@ UPLOAD=-g
 FORCE=
 RELEASE=
 BRANCH=nightly
+CONFIG_SCRIPT=fdssmv_config.sh
+USE_CONFIG=
+FDS_HASH=
+SMV_HASH=
 
-while getopts 'cfF:hH:m:rS:Uv' OPTION
+while getopts 'cCfF:hH:m:rS:Uv' OPTION
 do
 case $OPTION  in
   c)
    PROCEED=1
+   ;;
+  C)
+   USE_CONFIG=1
    ;;
   f)
    FORCE="-f"
@@ -166,6 +174,26 @@ if [ "`uname`" == "Darwin" ] ; then
   JOPT=
 fi
 
+if [[ "$USE_CONFIG" != "" ]]; then
+  if [ ! -e $CONFIG_SCRIPT ]; then
+    echo "***error: configure script $CONFIG_SCRIPT does not exist"
+    exit
+  fi
+  source $CONFIG_SCRIPT
+  ABORT=
+  if [ "$FDS_HASH" == "" ]; then
+    echo "***error: FDS_HASH not defined in $CONFIG_SCRIPT"
+    ABORT=1
+  fi
+  if [ "$SMV_HASH" == "" ]; then
+    echo "***error: SMV_HASH not defined in $CONFIG_SCRIPT"
+    ABORT=1
+  fi
+  if [ "$ABORT" != "" ]; then
+    exit
+  fi
+fi
+
 # both or neither RELEASE options must be set
 FDS_RELEASE_ARG=$FDS_RELEASE
 SMV_RELEASE_ARG=$SMV_RELEASE
@@ -184,6 +212,18 @@ if [ "$SMV_RELEASE" == "" ]; then
   FDS_RELEASE_ARG=""
 fi
 
+FDS_TAG=
+SMV_TAG=
+if [ "$FDS_HASH" != "" ]; then
+  FDS_RELEASE="-x $FDS_HASH"
+  FDS_TAG="-X $FDS_RELEASE_ARG"
+fi
+if [ "$SMV_HASH" != "" ]; then
+  SMV_RELEASE="-y $SMV_HASH"
+  SMV_TAG="-Y $SMV_RELEASE_ARG"
+fi
+  
+
 FIREBOT_BRANCH_ARG=$BRANCH
 FIREBOT_BRANCH="-R $BRANCH"
 BUNDLE_BRANCH="-b $BRANCH"
@@ -199,10 +239,16 @@ echo "------------------------------------------------------------"
 echo "            Firebot host: $FIREBOT_HOST"
 echo "  Firebot home directory: $FIREBOT_HOME"
 if [ "$FDS_RELEASE_ARG" != "" ]; then
-  echo "            FDS TAG/HASH: $FDS_RELEASE_ARG"
+  echo "                 FDS TAG: $FDS_RELEASE_ARG"
+fi
+if [ "$FDS_HASH" != "" ]; then
+  echo "                FDS HASH: $FDS_HASH"
 fi
 if [ "$SMV_RELEASE_ARG" != "" ]; then
-  echo "            SMV TAG/HASH: $SMV_RELEASE_ARG"
+  echo "                 SMV TAG: $SMV_RELEASE_ARG"
+fi
+if [ "$SMV_HASH" != "" ]; then
+  echo "                SMV HASH: $SMV_HASH"
 fi
 echo "                   EMAIL: $MAILTO_ARG"
 echo "          Firebot branch: $FIREBOT_BRANCH_ARG"
@@ -240,7 +286,7 @@ UPDATE_REPO webpages nist-pages || exit 1
 #*** build apps
 cd $curdir
 cd ../Firebot
-$ECHO ./run_firebot.sh $FORCE -c -C -B -g $FIREBOT_HOST -G $FIREBOT_HOME $JOPT $FDS_RELEASE $SMV_RELEASE $FIREBOT_BRANCH -T $MAILTO || exit 1
+$ECHO ./run_firebot.sh $FORCE -c -C -B -g $FIREBOT_HOST -G $FIREBOT_HOME $JOPT $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG $FIREBOT_BRANCH -T $MAILTO || exit 1
 
 #*** generate and upload bundle
 cd $curdir

@@ -1785,9 +1785,11 @@ SKIPPICTURES=
 SKIPINSPECT=
 SKIPRELEASE=
 SUBSET_CASES=
+FDS_TAG=
+SMV_TAG=
 
 #*** parse command line arguments
-while getopts 'b:BcCdiJm:Mp:q:R:sSTuUx:y:w:' OPTION
+while getopts 'b:BcCdiJm:Mp:q:R:sSTuUx:X:y:Y:w:' OPTION
 do
 case $OPTION in
   b)
@@ -1854,8 +1856,14 @@ case $OPTION in
   x)
    FDS_REV="$OPTARG"
    ;;
+  X)
+   FDS_TAG="$OPTARG"
+   ;;
   y)
    SMV_REV="$OPTARG"
+   ;;
+  Y)
+   SMV_TAG="$OPTARG"
    ;;
   w)
    WEB_DIR="$OPTARG"
@@ -1943,10 +1951,16 @@ if [[ "$CLONE_REPOS" != "" ]]; then
     FDSBRANCH=$CLONE_REPOS
     cd $fdsrepo
     git checkout -b $FDSBRANCH $FDS_REV >> $OUTPUT_DIR/stage1_clone 2>&1
+    if [ "$FDS_TAG" != "" ]; then
+      git tag -a $FDS_TAG -m "tag for $FDS_TAG"  >> $OUTPUT_DIR/stage1_clone 2&1
+    fi
 
     SMVBRANCH=$CLONE_REPOS
     cd $smvrepo
     git checkout -b $SMVBRANCH $SMV_REV >> $OUTPUT_DIR/stage1_clone 2>&1
+    if [ "$SMV_TAG" != "" ]; then
+      git tag -a $SMV_TAG -m "tag for $SMV_TAG"  >> $OUTPUT_DIR/stage1_clone 2&1
+    fi
   fi
   ARCHIVE_REPO_SIZES=1
 fi
