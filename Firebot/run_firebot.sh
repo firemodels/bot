@@ -45,7 +45,9 @@ echo "     will be checked out with a branch named 'branch_name'"
 echo "-T - only clone the fds and smv repos (this option is set by default when"
 echo "     only building apps (-B) and cloning repos (-R)"
 echo "-x fds_rev - run firebot using the fds revision named fds_rev [default: origin/master]"
+echo "-X fds_tag - when cloning, tag the fds repo using fds_tag"
 echo "-y smv_rev - run firebot using the smv revision named smv_rev [default: origin/master]"
+echo "-Y smv_tag - when cloning, tag the smv repo using smv_tag"
 echo "   The -x and -y options are only used with the -R cloning option"
 }
 
@@ -199,10 +201,12 @@ SUBSET_CASES=
 DEBUG_MODE=
 LOCAL=
 MANUALS_MATLAB_ONLY=
+FDS_TAG=
+SMV_TAG=
 
 #*** parse command line options
 
-while getopts 'bBcCdfg:G:hHiJkm:MnOPq:R:sSTuUvw:x:y:' OPTION
+while getopts 'bBcCdfg:G:hHiJkm:MnOPq:R:sSTuUvw:x:X:y:Y:' OPTION
 do
 case $OPTION  in
   b)
@@ -292,9 +296,15 @@ case $OPTION  in
    FDS_REV_ARG="$OPTARG"
    FDS_REV="-x $FDS_REV_ARG"
    ;;
+  X)
+   FDS_TAG="-X $OPTARG"
+   ;;
   y)
    SMV_REV_ARG="$OPTARG"
    SMV_REV="-y $SMV_REV_ARG"
+   ;;
+  Y)
+   SMV_TAG="-Y $OPTARG"
    ;;
   \?)
   echo "***error: unknown option entered. aborting firebot"
@@ -520,7 +530,7 @@ BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
 firebot_status=0
-$ECHO  ./firebot.sh -p $firebot_pid $UPDATEREPO $INTEL $BUILD_ONLY $FORCECLONE $BRANCH $DEBUG_MODE $MANUALS_MATLAB_ONLY $SUBSET_CASES $FDS_REV $SMV_REV $USEINSTALL $UPLOADGUIDES $CLEANREPO $QUEUE $SKIPMATLAB $CLONE_REPOS $CLONE_FDSSMV  $EMAIL $WEB_DIR "$@"
+$ECHO  ./firebot.sh -p $firebot_pid $UPDATEREPO $INTEL $BUILD_ONLY $FORCECLONE $BRANCH $DEBUG_MODE $MANUALS_MATLAB_ONLY $SUBSET_CASES $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $USEINSTALL $UPLOADGUIDES $CLEANREPO $QUEUE $SKIPMATLAB $CLONE_REPOS $CLONE_FDSSMV  $EMAIL $WEB_DIR "$@"
 firebot_status=$?
 if [ -e $firebot_pid ]; then
   rm -f $firebot_pid

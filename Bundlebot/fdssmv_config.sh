@@ -1,0 +1,5 @@
+#!/bin/bash
+# FDS6.7.5
+FDS_HASH=71f0256
+# SMV6.7.15
+SMV_HASH=4fa68dd
