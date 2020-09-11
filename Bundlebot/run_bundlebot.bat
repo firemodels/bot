@@ -4,10 +4,14 @@ set clone=
 set bundle_hostname=
 set bundle_firebot_home=
 set bundle_smokebot_home=
-set fds_hash=
-set smv_hash=
+set FDS_HASH=
+set SMV_HASH=
+set FDS_TAG=
+set SMV_TAG=
 set BRANCH_NAME=nightly
 set configscript=%userprofile%\.bundle\bundle_config.bat
+set use_config=
+set upload_bundle=1
 
 :: define defaults
 
@@ -44,6 +48,10 @@ if "x%stopscript%" == "x" goto endif2
   exit /b 1
 :endif2
 
+if "x%use_config%" == "x" goto skip_config
+  call fdssmv_config
+:skip_config
+
 set nightly=tst
 set pub_dir=
 if NOT "x%BRANCH_NAME%" == "xrelease" goto skip_branch
@@ -61,14 +69,14 @@ set abort=
 
 ::--- both or neither fds and smv hashes need to be defined
 set bad_hash=
-if NOT "x%fds_hash%" == "x" goto hash1a
-if "x%smv_hash%" == "x" goto hash1b
+if NOT "x%FDS_HASH%" == "x" goto hash1a
+if "x%SMV_HASH%" == "x" goto hash1b
 set bad_hash=1
 :hash1b
 :hash1a
 
-if "x%fds_hash%" == "x" goto hash2a
-if NOT "x%smv_hash%" == "x" goto hash2b
+if "x%FDS_HASH%" == "x" goto hash2a
+if NOT "x%SMV_HASH%" == "x" goto hash2b
 set bad_hash=1
 :hash2b
 :hash2a
@@ -146,7 +154,7 @@ cd %CURDIR%
 set CURDIR=%CD%
 
 
-if NOT "x%fds_hash%" == "x" goto skip_elsehash
+if NOT "x%FDS_HASH%" == "x" goto skip_elsehash
 
   call get_hash_revisions.bat || exit /b 1
 
@@ -162,10 +170,10 @@ if NOT "x%fds_hash%" == "x" goto skip_elsehash
   goto endif_gethash
 
 :skip_elsehash
-  set FDS_HASH_BUNDLER=%fds_hash%
-  set SMV_HASH_BUNDLER=%smv_hash%
-  set FDS_REVISION_BUNDLER=%fds_hash%
-  set SMV_REVISION_BUNDLER=%smv_hash%
+  set FDS_HASH_BUNDLER=%FDS_HASH%
+  set SMV_HASH_BUNDLER=%SMV_HASH%
+  set FDS_REVISION_BUNDLER=%FDS_HASH%
+  set SMV_REVISION_BUNDLER=%SMV_HASH%
 :endif_gethash
 
 cd %CURDIR%
@@ -178,11 +186,27 @@ echo.
 if "x%FDS_REVISION_BUNDLER%" == "x" goto skip_fdsrev
   echo             FDS revision: %FDS_REVISION_BUNDLER%
 :skip_fdsrev
+
+if "x%FDS_HASH_BUNDLER%" == "x" goto skip_fdshash
+echo            FDS repo hash: %FDS_HASH_BUNDLER%
+:skip_fdshash
+
+if "x%FDS_TAG%" == "x" goto skip_fdstag
+echo             FDS repo tag: %FDS_TAG%
+:skip_fdstag
+
 if "x%SMV_REVISION_BUNDLER%" == "x" goto skip_smvrev
   echo             smv revision: %SMV_REVISION_BUNDLER%
 :skip_smvrev
-echo   FDS repo revision/hash: %FDS_HASH_BUNDLER%
-echo   smv repo revision/hash: %SMV_HASH_BUNDLER%
+
+if "x%SMV_HASH_BUNDLER%" == "x" goto skip_smvhash
+echo            SMV repo hash: %SMV_HASH_BUNDLER%
+:skip_smvhash
+
+if "x%SMV_TAG%" == "x" goto skip_smvtag
+echo             SMV repo tag: %SMV_TAG%
+:skip_smvtag
+
 echo    firebot/smokebot host: %bundle_hostname%
 echo   firebot home directory: %bundle_firebot_home%
 echo        FDS pub directory: %FDS_PUBS_DIR%
@@ -203,10 +227,10 @@ if "x%clone%" == "xclone" goto skip_warning
   pause >Nul
 :skip_warning
 
-call clone_repos %FDS_HASH_BUNDLER% %SMV_HASH_BUNDLER% %BRANCH_NAME% || exit /b 1
+call clone_repos %FDS_HASH_BUNDLER% %SMV_HASH_BUNDLER% %BRANCH_NAME% %FDS_TAG% %SMV_TAG% || exit /b 1
 
 :: define revisions if hashes were specified on the command line
-if NOT "x%fds_hash%" == "x" goto skip_getrevision
+if NOT "x%FDS_HASH%" == "x" goto skip_getrevision
 
   call :cd_repo %basedir%\fds %BRANCH_NAME% || exit /b 1
   git describe --dirty --long > temp1
@@ -272,14 +296,16 @@ echo.
 cd %CURDIR%
 call make_bundle bot %FDS_REVISION_BUNDLER% %SMV_REVISION_BUNDLER% %nightly%
 
-echo.
-echo ------------------------------------------------------
-echo ------------------------------------------------------
-echo uploading bundle
-echo.
-
 cd %CURDIR%
-call upload_bundle %FDS_REVISION_BUNDLER% %SMV_REVISION_BUNDLER% %nightly% %bundle_hostname% || exit /b 1
+
+if "x%upload_bundle%" == "x" goto skip_upload
+  echo.
+  echo ------------------------------------------------------
+  echo ------------------------------------------------------
+  echo uploading bundle
+  echo.
+  call upload_bundle %FDS_REVISION_BUNDLER% %SMV_REVISION_BUNDLER% %nightly% %bundle_hostname% || exit /b 1
+:skip_uplood
 
 goto eof
 
@@ -298,13 +324,17 @@ echo.
 echo Options:
 echo -b - branch name [default: %BRANCH_NAME%]
 echo -c - bundle without warning about cloning/erasing fds and smv repos 
+echo -C - use FDS and smokeview hash revisions found in fdssmv_config.bat
 echo -h - display this message
 echo -H - host where firebot and smokebot were run %default_hostname%
 echo -f - firebot home directory %default_firebot_home%
-echo -F - fds repo hash/tag
+echo -F - fds repo hash
 echo -r - same as -b release
 echo -s - smokebot home directory %default_smokebot_home%
-echo -S - smv repo hash/tag
+echo -S - smv repo hash
+echo -U - do not upload bundle
+echo -X fdstag - tag the fds repo using fdstag
+echo -Y smvtag - tag the smv repo using smvtag
 exit /b 0
 set bundle_hostname=
 set bundle_firebot_home=
@@ -326,13 +356,17 @@ set bundle_smokebot_home=
    set clone=clone
    set valid=1
  )
+ if "%1" EQU "-C" (
+   set use_config=1
+   set valid=1
+ )
  if "%1" EQU "-f" (
    set bundle_firebot_home=%2
    set valid=1
    shift
  )
  if "%1" EQU "-F" (
-   set fds_hash=%2
+   set FDS_HASH=%2
    set valid=1
    shift
  )
@@ -356,7 +390,21 @@ set bundle_smokebot_home=
    shift
  )
  if "%1" EQU "-S" (
-   set smv_hash=%2
+   set SMV_HASH=%2
+   set valid=1
+   shift
+ )
+ if "%1" EQU "-U" (
+   set upload_bundle=
+   set valid=1
+ )
+ if "%1" EQU "-X" (
+   set FDS_TAG=%2
+   set valid=1
+   shift
+ )
+ if "%1" EQU "-Y" (
+   set SMV_TAG=%2
    set valid=1
    shift
  )
