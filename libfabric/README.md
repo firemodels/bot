@@ -1,6 +1,8 @@
-## Notes on building psm and libfabric libraries used by FDS on a Linux cluster using Truelogic Infiniband cards
+## Building psm and libfabric libraries
 
-### Commands for building the psm library
+These notes are for building psm and libfabric libraries on a Linux cluster which uses Truelogic Infiniband cards
+
+1. Build the psm library
 ```
 cd bot/libfabric
 git clone https://github.com/intel/psm.git
@@ -10,7 +12,7 @@ make
 sudo make DESTDIR=/usr/local/psm install
 ```
 
-### Commands for building the libfabric library using psm built in previous step
+2. Build the libfabric library using psm built in previous step
 
 ```
 cd bot/libfabric
@@ -22,7 +24,7 @@ make
 make install
 ```
 
-### commands for copying the psm and libabric modules to a location where the module command can find them
+3. Copy the psm and libabric modules to a location where the module command can find them
 
 ```
 cd bot/libfabric/modules
@@ -31,7 +33,7 @@ cp -r psm /usr/local/Modules/modulefiles/.
 
 ```
 
-### Entries in the .bashrc file
+4. Entries in the .bashrc file
 
 module load psm
 module load libfabric/1.10.1
