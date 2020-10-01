@@ -1,6 +1,6 @@
 ## Using psm and libfabric libraries
 
-Add the following entries to your .bashrc file.  Only do this if psm and libfabric were built using the following notes.
+Add the following entries to your .bashrc file.  Only do this if psm and libfabric were built using notes in the next section.
 
 ```
 module load psm
