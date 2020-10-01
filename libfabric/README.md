@@ -1,3 +1,12 @@
+## Using psm and libfabric libraries
+
+Add the following entries to you .bashrc file
+
+```
+module load psm
+module load libfabric/1.10.1
+```
+
 ## Building psm and libfabric libraries
 
 These notes are for building psm and libfabric libraries on a Linux cluster which uses Truelogic Infiniband cards
@@ -33,7 +42,3 @@ cp -r psm /usr/local/Modules/modulefiles/.
 
 ```
 
-4. Entries in the .bashrc file
-
-module load psm
-module load libfabric/1.10.1
