@@ -1,0 +1,30 @@
+#%Module@VER@#####################################################################
+
+proc ModulesHelp { } {
+    global helpmsg
+    puts stderr "\t$helpmsg\n"
+}
+
+
+
+
+set psm_dir /usr/local/psm/usr
+
+#
+
+if [ file isdirectory $psm_dir ] {
+    module-whatis "Sets up Intel psm environment"
+    set helpmsg "Sets up Intel psm environment"
+
+    setenv PSM_DIR   $psm_dir
+
+    prepend-path PATH $psm_dir/bin
+    prepend-path C_INCLUDE_PATH $psm_dir/include 
+    prepend-path CPLUS_INCLUDE_PATH $psm_dir/include 
+    prepend-path CPATH $psm_dir/include 
+    prepend-path LD_LIBRARY_PATH $psm_dir/lib64
+} else {
+    module-whatis "Intel psm is not installed"
+    set helpmsg "Intel psm is not installed"
+}
+
