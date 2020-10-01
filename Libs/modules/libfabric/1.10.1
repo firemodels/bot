@@ -1,0 +1,32 @@
+#%Module@VER@#####################################################################
+
+proc ModulesHelp { } {
+    global helpmsg
+    puts stderr "\t$helpmsg\n"
+}
+
+
+
+
+set libfabric_dir /usr/local/libfabric
+
+#
+
+if [ file isdirectory $libfabric_dir ] {
+    module-whatis "Sets up libfabric-1.10.1 environment"
+    set helpmsg "Sets up libfabric-1.10.1 environment"
+
+    setenv LIBFABRIC_DIR   $libfabric_dir
+
+    prepend-path PATH $libfabric_dir/bin
+    prepend-path C_INCLUDE_PATH $libfabric_dir/include 
+    prepend-path CPLUS_INCLUDE_PATH $libfabric_dir/include 
+    prepend-path CPATH $libfabric_dir/include 
+    prepend-path LD_LIBRARY_PATH $libfabric_dir/lib
+    prepend-path FI_PROVIDER_PATH $libfabric_dir/lib
+    prepend-path MANPATH $libfabric_dir/share
+} else {
+    module-whatis "libfabric-1.10.1 is not installed"
+    set helpmsg "libfabric-1.10.1 is not installed"
+}
+
