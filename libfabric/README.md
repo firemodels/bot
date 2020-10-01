@@ -4,7 +4,7 @@ These notes are for building psm and libfabric libraries on a Linux cluster whic
 
 1. Build the psm library
 ```
-cd bot/libfabric
+cd bot/Libs
 git clone https://github.com/intel/psm.git
 cd psm
 module purge
@@ -15,7 +15,7 @@ sudo make DESTDIR=/usr/local/psm install
 2. Build the libfabric library using psm built in previous step
 
 ```
-cd bot/libfabric
+cd bot/Libs
 wget https://github.com/ofiwg/libfabric/releases/download/v1.10.1/libfabric-1.10.1.tar.bz2
 tar -xvf libfabric-1.10.1.tar.bz2
 cd libfabric-1.10.1
@@ -27,7 +27,7 @@ make install
 3. Copy the psm and libabric modules to a location where the module command can find them
 
 ```
-cd bot/libfabric/modules
+cd bot/Libs/modules
 cp -r libfabric /usr/local/Modules/modulefiles/.
 cp -r psm /usr/local/Modules/modulefiles/.
 
