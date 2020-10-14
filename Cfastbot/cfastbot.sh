@@ -1379,14 +1379,9 @@ if [[ "$IFORT_COMPILER" != "" ]] ; then
   source $IFORT_COMPILER/bin/compilervars.sh intel64
 fi
 
-while getopts '3achiI:m:Mp:q:r:suU' OPTION
+while getopts 'achiI:m:Mp:q:r:suU' OPTION
 do
 case $OPTION in
-   3)
-    size=32
-    size2=-3
-    compiler=gnu
-     ;;
    a)
      RUNAUTO="y"
      ;;
