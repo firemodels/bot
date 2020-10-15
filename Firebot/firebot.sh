@@ -835,10 +835,10 @@ run_verification_cases_release()
      echo ./Run_FDS_Cases.sh $INTEL2 -b -o 1 -q $QUEUE           >> $OUTPUT_DIR/stage5 2>&1
           ./Run_FDS_Cases.sh $INTEL2 -b -o 1 -q $QUEUE           >> $OUTPUT_DIR/stage5 2>&1
 # run initial restart cases
-#     if [ -e $fdsrepo/Verification/RESTART_cases.sh ]; then
-#       echo ./Run_FDS_Cases.sh $INTEL2 -r 1 -o 1 -q $QUEUE       >> $OUTPUT_DIR/stage5 2>&1
-#            ./Run_FDS_Cases.sh $INTEL2 -r 1 -o 1 -q $QUEUE       >> $OUTPUT_DIR/stage5 2>&1
-#     fi
+     if [ -e $fdsrepo/Verification/RESTART_cases.sh ]; then
+       echo ./Run_FDS_Cases.sh $INTEL2 -r 1 -o 1 -q $QUEUE       >> $OUTPUT_DIR/stage5 2>&1
+             /Run_FDS_Cases.sh $INTEL2 -r 1 -o 1 -q $QUEUE       >> $OUTPUT_DIR/stage5 2>&1
+     fi
      echo ""                                                     >> $OUTPUT_DIR/stage5 2>&1
    fi
 
@@ -2327,7 +2327,8 @@ if [[ "$BUILD_ONLY" == "" ]]; then
 # Depends on successful FDS compile
   if [[ $FDS_release_success ]] && [[ "$SKIPRELEASE" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
     run_verification_cases_release
-#    run_verification_cases_restart
+    run_verification_cases_restart
+# this also checks restart cases (using same criteria)
     check_cases_release $fdsrepo/Verification 'final'
   fi
 
