@@ -861,7 +861,7 @@ run_verification_cases_release()
    wait_cases_release_end 'verification'
 
    # run restart cases (after regulcar cases have finished)
-   if [ -e $fdsrepo/Verification/RESTART_cases.sh ]; then
+   if [ -e $fdsrepo/Verification/FDS_RESTART_cases.sh ]; then
      echo "   release (restart)"
      cd $fdsrepo/Verification/scripts
 
