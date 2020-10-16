@@ -833,7 +833,7 @@ run_verification_cases_release()
    if [ "$SUBSET_CASES" == "" ]; then
      echo 'Running FDS benchmark verification cases:'            >> $OUTPUT_DIR/stage5 2>&1
      echo ./Run_FDS_Cases.sh $INTEL2 -b -o 1 -q $QUEUE           >> $OUTPUT_DIR/stage5 2>&1
-          ./Run_FDS_Cases.sh $INTEL2 -b -o 1 -q $QUEUE           >> $OUTPUT_DIR/stage5 2>&1
+     ./Run_FDS_Cases.sh $INTEL2 -b -o 1 -q $QUEUE                >> $OUTPUT_DIR/stage5 2>&1
      echo ""                                                     >> $OUTPUT_DIR/stage5 2>&1
    fi
 
@@ -845,31 +845,35 @@ run_verification_cases_release()
 #   echo 'Running FDS thread checking verification cases:' >> $OUTPUT_DIR/stage5
    touch $OUTPUT_DIR/stage5i
    if [ "$SKIPINSPECT" == "" ]; then
-     cd ../Thread_Check
+     cd $fdsrepo/Verification/Thread_Check
      echo ./inspection.sh -p 6 -q $QUEUE  inspector_test.fds     >> $OUTPUT_DIR/stage5i 2>&1
 #        ./inspection.sh -p 6 -q $QUEUE  inspector_test.fds      >> $OUTPUT_DIR/stage5i 2>&1
      echo ""                                                     >> $OUTPUT_DIR/stage5i 2>&1
    fi
 
-   cd ../scripts
+   cd $fdsrepo/Verification/scripts
    echo 'Running FDS non-benchmark verification cases:'             >> $OUTPUT_DIR/stage5 2>&1
    echo ./Run_FDS_Cases.sh $INTEL2 $SUBSET_CASES -R -o 1 -q $QUEUE  >> $OUTPUT_DIR/stage5 2>&1
-        ./Run_FDS_Cases.sh $INTEL2 $SUBSET_CASES -R -o 1 -q $QUEUE  >> $OUTPUT_DIR/stage5 2>&1
+   cd $fdsrepo/Verification/scripts
+   ./Run_FDS_Cases.sh $INTEL2 $SUBSET_CASES -R -o 1 -q $QUEUE       >> $OUTPUT_DIR/stage5 2>&1
    echo ""                                                          >> $OUTPUT_DIR/stage5 2>&1
 
    # Wait for non-benchmark verification cases to end
    wait_cases_release_end 'verification'
 
    # run restart cases (after regulcar cases have finished)
+   echo before FDS_RESTART_Cases.sh file check                      >> $OUTPUT_DIR/stage5 
+   echo RESTART_script=$fdsrepo/Verification/FDS_RESTART_Cases.sh   >> $OUTPUT_DIR/stage5 
+   echo before FDS_RESTART_Cases.sh file check
+   echo RESTART_script=$fdsrepo/Verification/FDS_RESTART_Cases.sh
    if [ -e $fdsrepo/Verification/FDS_RESTART_Cases.sh ]; then
      echo "   release (restart)"
-     cd $fdsrepo/Verification/scripts
 
      echo ""                                        i               >> $OUTPUT_DIR/stage5 2>&1
      echo 'Running FDS restart verification cases:'                 >> $OUTPUT_DIR/stage5 2>&1
      echo ./Run_FDS_Cases.sh $INTEL2 -r -o 1 -q $QUEUE              >> $OUTPUT_DIR/stage5 2>&1
-# run restart cases after restart time
-          ./Run_FDS_Cases.sh $INTEL2 -r -o 1 -q $QUEUE              >> $OUTPUT_DIR/stage5 2>&1
+     cd $fdsrepo/Verification/scripts
+     ./Run_FDS_Cases.sh $INTEL2 -r -o 1 -q $QUEUE                   >> $OUTPUT_DIR/stage5 2>&1
      echo ""                                                        >> $OUTPUT_DIR/stage5 2>&1
 
      # Wait for restart verification cases to end
@@ -877,6 +881,7 @@ run_verification_cases_release()
    fi
 
 #  check whether cases have run 
+   cd $fdsrepo/Verification/scripts
    ./Run_FDS_Cases.sh $SUBSET_CASES -C  >> $OUTPUT_DIR/stage5 2>&1
 }
 
