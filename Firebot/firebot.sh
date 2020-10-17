@@ -862,10 +862,6 @@ run_verification_cases_release()
    wait_cases_release_end 'verification'
 
    # run restart cases (after regulcar cases have finished)
-   echo before FDS_RESTART_Cases.sh file check                      >> $OUTPUT_DIR/stage5 
-   echo RESTART_script=$fdsrepo/Verification/FDS_RESTART_Cases.sh   >> $OUTPUT_DIR/stage5 
-   echo before FDS_RESTART_Cases.sh file check
-   echo RESTART_script=$fdsrepo/Verification/FDS_RESTART_Cases.sh
    if [ -e $fdsrepo/Verification/FDS_RESTART_Cases.sh ]; then
      echo "   release (restart)"
 
