@@ -756,13 +756,12 @@ check_smv_utilities()
 }
 
 #---------------------------------------------
-#                   check_cases_release
+#       check_verification_cases_release
 #---------------------------------------------
 
-check_cases_release()
+check_verification_cases_release()
 {
    local dir=$1
-   local status=$2
 
    # Scan for and report any errors in FDS cases
    cd $dir
@@ -792,26 +791,62 @@ check_cases_release()
 }
 
 #---------------------------------------------
+#       check_validation_cases_release
+#---------------------------------------------
+
+check_validation_cases_release()
+{
+   local dir=$1
+
+   # Scan for and report any errors in FDS cases
+   cd $dir
+
+   if [[ `grep 'Run aborted'            $OUTPUT_DIR/stage5b     | grep -v grep`                    == "" ]] && \
+      [[ `grep 'ERROR'                  $OUTPUT_DIR/stage5b     | grep -v geom_bad | grep -v grep` == "" ]] && \
+      [[ `grep Segmentation             */Current_Results/*.err | grep -v grep`                    == "" ]] && \
+      [[ `grep ERROR:                   */Current_Results/*.out | grep -v grep     | grep -v echo` == "" ]] && \
+      [[ `grep 'BAD TERMINATION'        */Current_Results/*.log | grep -v grep`                    == "" ]] && \
+      [[ `grep forrtl                   */Current_Results/*.err | grep -v grep`                    == "" ]]
+   then
+      cases_debug_success=true
+   else
+      grep 'Run aborted'                $OUTPUT_DIR/stage5b      | grep -v grep                    >> $OUTPUT_DIR/stage5b_errors
+      grep 'ERROR'                      $OUTPUT_DIR/stage5b      | grep -v geom_bad | grep -v grep >> $OUTPUT_DIR/stage5b_errors
+      grep Segmentation                 */Current_Results/*.err  | grep -v grep                    >> $OUTPUT_DIR/stage5b_errors
+      grep ERROR:                       */Current_Results/*.out  | grep -v grep     | grep -v echo >> $OUTPUT_DIR/stage5b_errors
+      grep -A 2 'BAD TERMINATION'       */Current_Results/*.log  | grep -v grep                    >> $OUTPUT_DIR/stage5b_errors
+      grep -A 20 forrtl                 */Current_Results/*.err  | grep -v grep                    >> $OUTPUT_DIR/stage5b_errors
+
+      echo "Errors from Stage 5b - Run ${2} cases - release mode:" >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage5b_errors                               >> $ERROR_LOG
+      echo ""                                                      >> $ERROR_LOG
+   fi
+}
+
+#---------------------------------------------
 #                   wait_cases_release_end
 #---------------------------------------------
 
 wait_cases_release_end()
 {
+   CASETYPE=$1
+   STAGE=$2
+
    # Scans qstat and waits for cases to end
    if [[ "$QUEUE" == "none" ]]
    then
      while [[          `ps -u $USER -f | fgrep .fds | grep -v firebot | grep -v grep` != '' ]]; do
         JOBS_REMAINING=`ps -u $USER -f | fgrep .fds | grep -v firebot | grep -v grep | wc -l`
 
-        echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage5
-        TIME_LIMIT_STAGE="5"
+        echo "Waiting for ${JOBS_REMAINING} $CASETYPE cases to complete." >> $OUTPUT_DIR/$STAGE
+        TIME_LIMIT_STAGE="$STAGE"
         check_time_limit
         sleep 60
      done
    else
      while          [[ `qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$'` != '' ]]; do
         JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$' | wc -l`
-        echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage5
+        echo "Waiting for ${JOBS_REMAINING} $CASETYPE cases to complete." >> $OUTPUT_DIR/$STAGE
         TIME_LIMIT_STAGE="5"
         check_time_limit
         sleep 30
@@ -839,7 +874,7 @@ run_verification_cases_release()
 
    # Wait for benchmark verification cases to end
 # let benchmark and regular cases run at the same time - for now
-#   wait_cases_release_end 'verification'
+#   wait_cases_release_end verification stage5
 
 # comment out thread checking cases for now   
 #   echo 'Running FDS thread checking verification cases:' >> $OUTPUT_DIR/stage5
@@ -859,7 +894,7 @@ run_verification_cases_release()
    echo ""                                                          >> $OUTPUT_DIR/stage5 2>&1
 
    # Wait for non-benchmark verification cases to end
-   wait_cases_release_end 'verification'
+   wait_cases_release_end verification stage5
 
    # run restart cases (after regulcar cases have finished)
    if [ -e $fdsrepo/Verification/FDS_RESTART_Cases.sh ]; then
@@ -873,12 +908,33 @@ run_verification_cases_release()
      echo ""                                                        >> $OUTPUT_DIR/stage5 2>&1
 
      # Wait for restart verification cases to end
-     wait_cases_release_end 'verification'
+     wait_cases_release_end verification stage5
    fi
 
 #  check whether cases have run 
    cd $fdsrepo/Verification/scripts
    ./Run_FDS_Cases.sh $SUBSET_CASES -C  >> $OUTPUT_DIR/stage5 2>&1
+}
+
+#---------------------------------------------
+#                   run_validation_cases_release
+#---------------------------------------------
+
+run_validation_cases_release()
+{
+   echo "   release"
+   cd $fdsrepo/Validation
+
+   echo 'Running FDS validation cases:'                             >> $OUTPUT_DIR/stage5b 2>&1
+   echo ./Run_Parallel.sh -m 1 -q $QUEUE                            >> $OUTPUT_DIR/stage5b 2>&1
+        ./Run_Parallel.sh -m 1 -q $QUEUE                            >> $OUTPUT_DIR/stage5b 2>&1
+   echo ./Run_Serial.sh   -m 1 -q $QUEUE                            >> $OUTPUT_DIR/stage5b 2>&1
+        ./Run_Serial.sh   -m 1 -q $QUEUE                            >> $OUTPUT_DIR/stage5b 2>&1
+   echo ""                                                          >> $OUTPUT_DIR/stage5b 2>&1
+
+   # Wait for non-benchmark verification cases to end
+   wait_cases_release_end validation stage5b
+
 }
 
 #---------------------------------------------
@@ -1804,9 +1860,10 @@ SKIPRELEASE=
 SUBSET_CASES=
 FDS_TAG=
 SMV_TAG=
+VALIDATION=
 
 #*** parse command line arguments
-while getopts 'b:BcCdiJm:Mp:q:R:sSTuUx:X:y:Y:w:' OPTION
+while getopts 'b:BcCdiJm:Mp:q:R:sSTuUVx:X:y:Y:w:' OPTION
 do
 case $OPTION in
   b)
@@ -1869,6 +1926,9 @@ case $OPTION in
    ;;
   U)
    UPLOADGUIDES=1
+   ;;
+  V)
+   VALIDATION=1
    ;;
   x)
    FDS_REV="$OPTARG"
@@ -2318,7 +2378,17 @@ if [[ "$BUILD_ONLY" == "" ]]; then
   if [[ $FDS_release_success ]] && [[ "$SKIPRELEASE" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
     run_verification_cases_release
 # this also checks restart cases (using same criteria)
-    check_cases_release $fdsrepo/Verification 'final'
+    check_verification_cases_release $fdsrepo/Verification
+  fi
+
+### Stage 5b ###
+# Depends on successful FDS compile
+  if [[ $FDS_release_success ]] && [[ "$SKIPRELEASE" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
+    if [ "$VALIDATION" != "" ]; then
+      run_validation_cases_release
+# this also checks restart cases (using same criteria)
+      check_validation_cases_release $fdsrepo/Validation
+    fi
   fi
 
 ### Stage 6 ###
