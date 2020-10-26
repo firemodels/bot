@@ -858,9 +858,9 @@ wait_cases_release_end()
 #                   run_verification_cases_release
 #---------------------------------------------
 
-run_verification_cases_release()
+run_VV_cases_release()
 {
-   # Start running all FDS verification cases
+   # run all FDS verification cases
 
    echo "   release"
    cd $fdsrepo/Verification/scripts
@@ -893,6 +893,24 @@ run_verification_cases_release()
    ./Run_FDS_Cases.sh $INTEL2 $SUBSET_CASES -R -o 1 -q $QUEUE       >> $OUTPUT_DIR/stage5 2>&1
    echo ""                                                          >> $OUTPUT_DIR/stage5 2>&1
 
+   # run all FDS validation cases 1 time step
+   if [ "$VALIDATION" != "" ]; then
+     echo "Running FDS Validation Cases (1 time step)"
+     echo "   release"
+     cd $fdsrepo/Validation
+
+     echo 'Running FDS validation cases:'                             >> $OUTPUT_DIR/stage5b 2>&1
+     echo ./Run_Serial.sh   -j $JOBPREFIX -m 1 -q $QUEUE              >> $OUTPUT_DIR/stage5b 2>&1
+          ./Run_Serial.sh   -j $JOBPREFIX -m 1 -q $QUEUE              >> $OUTPUT_DIR/stage5b 2>&1
+     echo ./Run_Parallel.sh -j $JOBPREFIX -m 1 -q $QUEUE              >> $OUTPUT_DIR/stage5b 2>&1
+          ./Run_Parallel.sh -j $JOBPREFIX -m 1 -q $QUEUE              >> $OUTPUT_DIR/stage5b 2>&1
+     echo ""                                                          >> $OUTPUT_DIR/stage5b 2>&1
+
+   # Wait for non-benchmark verification cases to end
+     wait_cases_release_end validation stage5b
+   fi
+
+
    # Wait for non-benchmark verification cases to end
    wait_cases_release_end verification stage5
 
@@ -914,27 +932,6 @@ run_verification_cases_release()
 #  check whether cases have run 
    cd $fdsrepo/Verification/scripts
    ./Run_FDS_Cases.sh $SUBSET_CASES -C  >> $OUTPUT_DIR/stage5 2>&1
-}
-
-#---------------------------------------------
-#                   run_validation_cases_release
-#---------------------------------------------
-
-run_validation_cases_release()
-{
-   echo "   release"
-   cd $fdsrepo/Validation
-
-   echo 'Running FDS validation cases:'                             >> $OUTPUT_DIR/stage5b 2>&1
-   echo ./Run_Parallel.sh -m 1 -q $QUEUE                            >> $OUTPUT_DIR/stage5b 2>&1
-        ./Run_Parallel.sh -m 1 -q $QUEUE                            >> $OUTPUT_DIR/stage5b 2>&1
-   echo ./Run_Serial.sh   -m 1 -q $QUEUE                            >> $OUTPUT_DIR/stage5b 2>&1
-        ./Run_Serial.sh   -m 1 -q $QUEUE                            >> $OUTPUT_DIR/stage5b 2>&1
-   echo ""                                                          >> $OUTPUT_DIR/stage5b 2>&1
-
-   # Wait for non-benchmark verification cases to end
-   wait_cases_release_end validation stage5b
-
 }
 
 #---------------------------------------------
@@ -2376,16 +2373,10 @@ if [[ "$BUILD_ONLY" == "" ]]; then
 ### Stage 5 ###
 # Depends on successful FDS compile
   if [[ $FDS_release_success ]] && [[ "$SKIPRELEASE" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
-    run_verification_cases_release
+    run_VV_cases_release
 # this also checks restart cases (using same criteria)
     check_verification_cases_release $fdsrepo/Verification
-  fi
-
-### Stage 5b ###
-# Depends on successful FDS compile
-  if [[ $FDS_release_success ]] && [[ "$SKIPRELEASE" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
     if [ "$VALIDATION" != "" ]; then
-      run_validation_cases_release
 # this also checks restart cases (using same criteria)
       check_validation_cases_release $fdsrepo/Validation
     fi
