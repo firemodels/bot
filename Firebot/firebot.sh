@@ -931,7 +931,12 @@ run_VV_cases_release()
 
 #  check whether cases have run 
    cd $fdsrepo/Verification/scripts
-   ./Run_FDS_Cases.sh $SUBSET_CASES -C  >> $OUTPUT_DIR/stage5 2>&1
+echo ./Run_FDS_Cases.sh $SUBSET_CASES -C  >> $OUTPUT_DIR/stage5 2>&1
+     ./Run_FDS_Cases.sh $SUBSET_CASES -C  >> $OUTPUT_DIR/stage5 2>&1
+echo ./Run_Serial.sh   -C                 >> $OUTPUT_DIR/stage5b 2>&1
+     ./Run_Serial.sh   -C                 >> $OUTPUT_DIR/stage5b 2>&1
+echo ./Run_Parallel.sh -C                 >> $OUTPUT_DIR/stage5b 2>&1
+     ./Run_Parallel.sh -C                 >> $OUTPUT_DIR/stage5b 2>&1
 }
 
 #---------------------------------------------
