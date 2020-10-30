@@ -756,13 +756,12 @@ check_smv_utilities()
 }
 
 #---------------------------------------------
-#                   check_cases_release
+#       check_verification_cases_release
 #---------------------------------------------
 
-check_cases_release()
+check_verification_cases_release()
 {
    local dir=$1
-   local status=$2
 
    # Scan for and report any errors in FDS cases
    cd $dir
@@ -792,26 +791,63 @@ check_cases_release()
 }
 
 #---------------------------------------------
+#       check_validation_cases_release
+#---------------------------------------------
+
+check_validation_cases_release()
+{
+   local dir=$1
+   local subdir=$2
+
+   # Scan for and report any errors in FDS cases
+   cd $dir
+
+   if [[ `grep 'Run aborted'            $OUTPUT_DIR/stage5b | grep -v grep`                    == "" ]] && \
+      [[ `grep 'ERROR'                  $OUTPUT_DIR/stage5b | grep -v geom_bad | grep -v grep` == "" ]] && \
+      [[ `grep Segmentation             */$subdir/*.err     | grep -v grep`                    == "" ]] && \
+      [[ `grep ERROR:                   */$subdir/*.out     | grep -v grep     | grep -v echo` == "" ]] && \
+      [[ `grep 'BAD TERMINATION'        */$subdir/*.log     | grep -v grep`                    == "" ]] && \
+      [[ `grep forrtl                   */$subdir/*.err     | grep -v grep`                    == "" ]]
+   then
+      cases_debug_success=true
+   else
+      grep 'Run aborted'                $OUTPUT_DIR/stage5b | grep -v grep                    >> $OUTPUT_DIR/stage5b_errors
+      grep 'ERROR'                      $OUTPUT_DIR/stage5b | grep -v geom_bad | grep -v grep >> $OUTPUT_DIR/stage5b_errors
+      grep Segmentation                 */$subdir//*.err    | grep -v grep                    >> $OUTPUT_DIR/stage5b_errors
+      grep ERROR:                       */$subdir/*.out     | grep -v grep     | grep -v echo >> $OUTPUT_DIR/stage5b_errors
+      grep -A 2 'BAD TERMINATION'       */$subdir/*.log     | grep -v grep                    >> $OUTPUT_DIR/stage5b_errors
+      grep -A 20 forrtl                 */$subdir/*.err     | grep -v grep                    >> $OUTPUT_DIR/stage5b_errors
+
+      echo "Errors from Stage 5b - Run ${2} cases - release mode:" >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage5b_errors                               >> $ERROR_LOG
+      echo ""                                                      >> $ERROR_LOG
+   fi
+}
+
+#---------------------------------------------
 #                   wait_cases_release_end
 #---------------------------------------------
 
 wait_cases_release_end()
 {
+   CASETYPE=$1
+   STAGE=$2
+
    # Scans qstat and waits for cases to end
    if [[ "$QUEUE" == "none" ]]
    then
      while [[          `ps -u $USER -f | fgrep .fds | grep -v firebot | grep -v grep` != '' ]]; do
         JOBS_REMAINING=`ps -u $USER -f | fgrep .fds | grep -v firebot | grep -v grep | wc -l`
 
-        echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage5
-        TIME_LIMIT_STAGE="5"
+        echo "Waiting for ${JOBS_REMAINING} $CASETYPE cases to complete." >> $OUTPUT_DIR/$STAGE
+        TIME_LIMIT_STAGE="$STAGE"
         check_time_limit
         sleep 60
      done
    else
      while          [[ `qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$'` != '' ]]; do
         JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$' | wc -l`
-        echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage5
+        echo "Waiting for ${JOBS_REMAINING} $CASETYPE cases to complete." >> $OUTPUT_DIR/$STAGE
         TIME_LIMIT_STAGE="5"
         check_time_limit
         sleep 30
@@ -823,14 +859,16 @@ wait_cases_release_end()
 #                   run_verification_cases_release
 #---------------------------------------------
 
-run_verification_cases_release()
+run_VV_cases_release()
 {
-   # Start running all FDS verification cases
+   # run all FDS verification cases
 
-   echo "   release"
+   if [ "$CHECK_CLUSTER" == "" ]; then
+     echo "   release"
+   fi
    cd $fdsrepo/Verification/scripts
    # Run FDS with 1 OpenMP thread
-   if [ "$SUBSET_CASES" == "" ]; then
+   if [[ "$SUBSET_CASES" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
      echo 'Running FDS benchmark verification cases:'            >> $OUTPUT_DIR/stage5 2>&1
      echo ./Run_FDS_Cases.sh $INTEL2 -b -o 1 -q $QUEUE           >> $OUTPUT_DIR/stage5 2>&1
      ./Run_FDS_Cases.sh $INTEL2 -b -o 1 -q $QUEUE                >> $OUTPUT_DIR/stage5 2>&1
@@ -839,30 +877,64 @@ run_verification_cases_release()
 
    # Wait for benchmark verification cases to end
 # let benchmark and regular cases run at the same time - for now
-#   wait_cases_release_end 'verification'
+#   wait_cases_release_end verification stage5
 
 # comment out thread checking cases for now   
 #   echo 'Running FDS thread checking verification cases:' >> $OUTPUT_DIR/stage5
-   touch $OUTPUT_DIR/stage5i
-   if [ "$SKIPINSPECT" == "" ]; then
+   if [[ "$SKIPINSPECT" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+     touch $OUTPUT_DIR/stage5i
      cd $fdsrepo/Verification/Thread_Check
      echo ./inspection.sh -p 6 -q $QUEUE  inspector_test.fds     >> $OUTPUT_DIR/stage5i 2>&1
 #        ./inspection.sh -p 6 -q $QUEUE  inspector_test.fds      >> $OUTPUT_DIR/stage5i 2>&1
      echo ""                                                     >> $OUTPUT_DIR/stage5i 2>&1
    fi
 
-   cd $fdsrepo/Verification/scripts
-   echo 'Running FDS non-benchmark verification cases:'             >> $OUTPUT_DIR/stage5 2>&1
-   echo ./Run_FDS_Cases.sh $INTEL2 $SUBSET_CASES -R -o 1 -q $QUEUE  >> $OUTPUT_DIR/stage5 2>&1
-   cd $fdsrepo/Verification/scripts
-   ./Run_FDS_Cases.sh $INTEL2 $SUBSET_CASES -R -o 1 -q $QUEUE       >> $OUTPUT_DIR/stage5 2>&1
-   echo ""                                                          >> $OUTPUT_DIR/stage5 2>&1
+   if [[ "$CHECK_CLUSTER" == "" ]]; then
+     cd $fdsrepo/Verification/scripts
+     echo 'Running FDS non-benchmark verification cases:'             >> $OUTPUT_DIR/stage5 2>&1
+     echo ./Run_FDS_Cases.sh $INTEL2 $SUBSET_CASES -R -o 1 -q $QUEUE  >> $OUTPUT_DIR/stage5 2>&1
+     cd $fdsrepo/Verification/scripts
+     ./Run_FDS_Cases.sh $INTEL2 $SUBSET_CASES -R -o 1 -q $QUEUE       >> $OUTPUT_DIR/stage5 2>&1
+     echo ""                                                          >> $OUTPUT_DIR/stage5 2>&1
+   fi
+
+   # run all FDS validation cases 1 time step
+   RUN_VAL=
+   if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+     RUN_VAL=1
+     echo "Running FDS Validation Cases (1 time step)"
+     echo "   release"
+     cd $fdsrepo/Validation
+
+     echo 'Running FDS validation cases:'                             >> $OUTPUT_DIR/stage5b 2>&1
+     echo ./Run_Serial.sh   -j $JOBPREFIX -m 1 -q $QUEUE              >> $OUTPUT_DIR/stage5b 2>&1
+          ./Run_Serial.sh   -j $JOBPREFIX -m 1 -q $QUEUE              >> $OUTPUT_DIR/stage5b 2>&1
+     echo ./Run_Parallel.sh -j $JOBPREFIX -m 1 -q $QUEUE              >> $OUTPUT_DIR/stage5b 2>&1
+          ./Run_Parallel.sh -j $JOBPREFIX -m 1 -q $QUEUE              >> $OUTPUT_DIR/stage5b 2>&1
+     echo ""                                                          >> $OUTPUT_DIR/stage5b 2>&1
+   fi
+
+# run validation case in FDS_Val_Cases.sh
+   if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" != "" ]]; then
+     RUN_VAL=1
+     echo "Running FDS Validation Cases (1 time step)"
+     echo "   release"
+     cd $fdsrepo/Verification/scripts
+     echo ./Run_FDS_Cases.sh -V -j $JOBPREFIX -m 1 -q $QUEUE          >> $OUTPUT_DIR/stage5b 2>&1
+          ./Run_FDS_Cases.sh -V -j $JOBPREFIX -m 1 -q $QUEUE          >> $OUTPUT_DIR/stage5b 2>&1
+     echo ""                                                          >> $OUTPUT_DIR/stage5b 2>&1
+   fi
+
+   if [ "$RUN_VAL" == "1" ]; then
+   # Wait for non-benchmark verification cases to end
+     wait_cases_release_end validation stage5b
+   fi
 
    # Wait for non-benchmark verification cases to end
-   wait_cases_release_end 'verification'
+   wait_cases_release_end verification stage5
 
    # run restart cases (after regulcar cases have finished)
-   if [ -e $fdsrepo/Verification/FDS_RESTART_Cases.sh ]; then
+   if [[ -e $fdsrepo/Verification/FDS_RESTART_Cases.sh ]] && [[ "$CHECK_CLUSTER" == "" ]] ; then
      echo "   release (restart)"
 
      echo ""                                        i               >> $OUTPUT_DIR/stage5 2>&1
@@ -873,12 +945,30 @@ run_verification_cases_release()
      echo ""                                                        >> $OUTPUT_DIR/stage5 2>&1
 
      # Wait for restart verification cases to end
-     wait_cases_release_end 'verification'
+     wait_cases_release_end verification stage5
    fi
 
 #  check whether cases have run 
-   cd $fdsrepo/Verification/scripts
-   ./Run_FDS_Cases.sh $SUBSET_CASES -C  >> $OUTPUT_DIR/stage5 2>&1
+if [[ "$CHECK_CLUSTER" == "" ]] ; then
+  cd $fdsrepo/Verification/scripts
+  echo ./Run_FDS_Cases.sh $SUBSET_CASES -C  >> $OUTPUT_DIR/stage5 2>&1
+       ./Run_FDS_Cases.sh $SUBSET_CASES -C  >> $OUTPUT_DIR/stage5 2>&1
+fi
+
+if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]] ; then
+  cd $fdsrepo/Validation
+  echo ./Run_Serial.sh   -C                 >> $OUTPUT_DIR/stage5b 2>&1
+       ./Run_Serial.sh   -C                 >> $OUTPUT_DIR/stage5b 2>&1
+  echo ./Run_Parallel.sh -C                 >> $OUTPUT_DIR/stage5b 2>&1
+       ./Run_Parallel.sh -C                 >> $OUTPUT_DIR/stage5b 2>&1
+fi
+
+if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" != "" ]] ; then
+     cd $fdsrepo/Verification/scripts
+  echo ./Run_FDS_Cases.sh -V -C >> $OUTPUT_DIR/stage5b 2>&1
+       ./Run_FDS_Cases.sh -V -C >> $OUTPUT_DIR/stage5b 2>&1
+  echo ""                       >> $OUTPUT_DIR/stage5b 2>&1
+fi
 }
 
 #---------------------------------------------
@@ -1804,9 +1894,11 @@ SKIPRELEASE=
 SUBSET_CASES=
 FDS_TAG=
 SMV_TAG=
+VALIDATION=
+CHECK_CLUSTER=
 
 #*** parse command line arguments
-while getopts 'b:BcCdiJm:Mp:q:R:sSTuUx:X:y:Y:w:' OPTION
+while getopts 'b:BcCdiJm:Mp:q:R:sSTuUV:x:X:y:Y:w:' OPTION
 do
 case $OPTION in
   b)
@@ -1869,6 +1961,15 @@ case $OPTION in
    ;;
   U)
    UPLOADGUIDES=1
+   ;;
+  V)
+   
+   VALIDATION="$OPTARG"
+   if [ "$VALIDATION" == "all" ]; then
+     CHECK_CLUSTER=
+   else
+     CHECK_CLUSTER=1
+   fi
    ;;
   x)
    FDS_REV="$OPTARG"
@@ -2132,7 +2233,7 @@ start_time=`date`
 
 echo "Status"
 echo "------"
-if [[ "$CLONE_REPOS" == "" ]]; then
+if [[ "$CLONE_REPOS" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
   if [[ "$CLEANREPO" == "1" ]] ; then
     if [ "$BUILD_ONLY" == "" ]; then
       clean_repo2 exp master || exit 1
@@ -2155,13 +2256,15 @@ fi
       UPDATING=1
       echo Updating
       update_repo fds $FDSBRANCH || exit 1
-      update_repo smv $SMVBRANCH || exit 1
-      update_repo fig master || exit 1
-      update_repo out master || exit 1
-      update_repo exp master || exit 1
+      if [[ "$CHECK_CLUSTER" == "" ]]; then
+        update_repo smv $SMVBRANCH || exit 1
+        update_repo fig master || exit 1
+        update_repo out master || exit 1
+        update_repo exp master || exit 1
+      fi
     fi
 # we are not cloning fig, out and exp so update them
-    if [[ "$CLONE_REPOS" != "" ]] && [[ "$CLONE_FDSSMV" != "" ]]; then
+    if [[ "$CLONE_REPOS" != "" ]] && [[ "$CLONE_FDSSMV" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
       UPDATING=1
       echo Updating
       update_repo fig master || exit 1
@@ -2189,34 +2292,36 @@ fi
 # turn off dos line checking temporarily
 CHECK_LINES=
 
-if [ "$CHECK_LINES" == "1" ]; then
-  rm -f $CRLF_WARNINGS
-  echo Checking for DOS line endings
-  echo "   bot repo"
-  find_CRLF $repo/bot bot
+if [ "$CHECK_CLUSTER" == "" ]; then
+  if [ "$CHECK_LINES" == "1" ]; then
+    rm -f $CRLF_WARNINGS
+    echo Checking for DOS line endings
+    echo "   bot repo"
+    find_CRLF $repo/bot bot
 
-  echo "   exp repo"
-  find_CRLF $repo/exp exp
+    echo "   exp repo"
+    find_CRLF $repo/exp exp
 
-  echo "   fds repo"
-  find_CRLF $repo/fds fds
+    echo "   fds repo"
+    find_CRLF $repo/fds fds
 
-  echo "   out repo"
-  find_CRLF $repo/out out
+    echo "   out repo"
+    find_CRLF $repo/out out
 
-  echo "   smv repo"
-  find_CRLF $repo/smv smv
+    echo "   smv repo"
+    find_CRLF $repo/smv smv
 
-  check_CRLF
-else
-  if [ "$BUILD_ONLY" == "" ]; then
-    echo "DOS line endings only checked when cloning or cleaning repos"
+    check_CRLF
+  else
+    if [ "$BUILD_ONLY" == "" ]; then
+      echo "DOS line endings only checked when cloning or cleaning repos"
+    fi
   fi
 fi
 
 get_fds_revision $FDSBRANCH || exit 1
 get_smv_revision $SMVBRANCH || exit 1
-if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
+if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
   get_exp_revision master || exit 1
   get_fig_revision master || exit 1
   get_out_revision master || exit 1
@@ -2233,10 +2338,10 @@ rm /tmp/mailtest.$$
 # archive repo sizes
 # (only if the repos are cloned or cleaned)
 
-if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
-if [ "$ARCHIVE_REPO_SIZES" == "1" ]; then
-  archive_repo_sizes
-fi
+if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+  if [ "$ARCHIVE_REPO_SIZES" == "1" ]; then
+    archive_repo_sizes
+  fi
 fi
 
 check_git_checkout
@@ -2249,79 +2354,100 @@ if [ "$MANUALS_MATLAB_ONLY" == "" ]; then
 fi
 # if something goes wrong with the openmp inspector
 # comment the following 6 lines (including 'if' and and 'fi'  lines
-if [[ "$SKIPINSPECT" == "" ]] && [[ "$platform" == "linux" ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
+if [[ "$SKIPINSPECT" == "" ]] && [[ "$platform" == "linux" ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
   build_inspect_fds
 #  inspect_fds
 #  check_inspect_fds
 fi
 
-### Stage 2b ###
-if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
+###****** Stage 2b ###
+
+if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
   compile_fds_mpi_db
   check_compile_fds_mpi_db
 fi
 
-### Stage 2d ###
-if [[ "$OPENMPI_GNU" != "" ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
+###*** Stage 2d ###
+
+if [[ "$OPENMPI_GNU" != "" ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
   compile_fds_mpi_gnu_db
   check_compile_fds_mpi_gnu_db
 fi
 
-### Stage 2c ###
+###*** Stage 2c ###
+
 if [[ "$SKIPRELEASE" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
   compile_fds_mpi
   check_compile_fds_mpi
 fi
 
-if [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
+if [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
 $COPY_APPS fds > $OUTPUT_DIR/stage3d
 fi
 
-### Stage 3a ###
-if [[ "$SKIPPICTURES" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
+###*** Stage 3a ###
+
+if [[ "$SKIPPICTURES" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
   compile_smv_utilities
   check_smv_utilities
 fi
 
-### Stage 3b ###
-if [[ "$SKIPPICTURES" == "" ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
+###*** Stage 3b ###
+
+if [[ "$SKIPPICTURES" == "" ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
   compile_smv_db
   check_compile_smv_db
 fi
 
-### Stage 3c ###
-if [[ "$SKIPPICTURES" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
+###*** Stage 3c ###
+
+if [[ "$SKIPPICTURES" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
   compile_smv
   check_compile_smv
   $COPY_APPS smv >> $OUTPUT_DIR/stage3d
 fi
 
 
-### Stage 4 ###
+###*** Stage 4 ###
 
 # Depends on successful FDS debug compile
-if [[ $FDS_debug_success ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
+if [[ $FDS_debug_success ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
    run_verification_cases_debug
    check_cases_debug $fdsrepo/Verification 'verification'
 fi
 
-if [[ "$BUILD_ONLY" == "" ]]; then
+if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
 # clean debug stage
   cd $fdsrepo
   if [[ "$CLEANREPO" == "1" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
     echo "   cleaning Verification"
     clean_repo $fdsrepo/Verification $FDSBRANCH || exit 1
   fi
+fi
 
-### Stage 5 ###
+###*** Stage 5 ###
+
+if [[ "$BUILD_ONLY" == "" ]];  then
 # Depends on successful FDS compile
   if [[ $FDS_release_success ]] && [[ "$SKIPRELEASE" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
-    run_verification_cases_release
-# this also checks restart cases (using same criteria)
-    check_cases_release $fdsrepo/Verification 'final'
-  fi
+    run_VV_cases_release
 
-### Stage 6 ###
+# this also checks restart cases (using same criteria)
+    if [ "$CHECK_CLUSTER" == "" ]; then
+      check_verification_cases_release $fdsrepo/Verification
+    fi
+    if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+      check_validation_cases_release $fdsrepo/Validation Current_Results
+    fi
+    if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" != "" ]]; then
+      check_validation_cases_release $fdsrepo/Validation FDS_Input_Files
+    fi
+  fi
+fi
+
+###*** Stage 6 ###
+if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+
 # Depends on successful SMV compile
   if [ "$SKIPPICTURES" == "" ] ; then
     if [[ $smv_release_success ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] ; then
@@ -2331,7 +2457,9 @@ if [[ "$BUILD_ONLY" == "" ]]; then
   fi
 
   if [ "$SKIPMATLAB" == "" ] ; then
-### Stage 7a ###
+
+###*** Stage 7a ###
+
     check_matlab_license_server
     if [ $matlab_success == true ]; then
       run_matlab_verification
@@ -2339,7 +2467,8 @@ if [[ "$BUILD_ONLY" == "" ]]; then
       check_verification_stats
     fi
 
-### Stage 7b ###
+###*** Stage 7b ###
+
     check_matlab_license_server
     if [ $matlab_success == true ]; then
       run_matlab_validation
@@ -2350,10 +2479,12 @@ if [[ "$BUILD_ONLY" == "" ]]; then
     fi
   fi
 
-### Stage 7c ###
+###*** Stage 7c ###
+
   generate_timing_stats
 
-### Stage 8 ###
+###*** Stage 8 ###
+
   if [ "$SKIPMATLAB" == "" ] ; then
     make_fds_user_guide
 #    make_geom_notes
@@ -2420,9 +2551,10 @@ if [[ "$BUILD_ONLY" == "" ]]; then
   fi
 fi
 
-# archive apps
+###*** archive apps
+
 get_firebot_success
-if [[ "$firebot_success" == "1" ]] ; then
+if [[ "$firebot_success" == "1" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
   rm -f $APPS_DIR/*
   cp $LATESTAPPS_DIR/* $APPS_DIR/.
 
@@ -2435,10 +2567,11 @@ if [[ "$firebot_success" == "1" ]] ; then
   fi
 fi
 
-### Wrap up and report results ###
+###*** Wrap up and report results ###
+
 set_files_world_readable
 save_build_status
-if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
+if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]  && [[ "$CHECK_CLUSTER" == "" ]]; then
   archive_timing_stats
 fi
 email_build_status 'Firebot'

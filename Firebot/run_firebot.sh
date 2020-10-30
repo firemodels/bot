@@ -1,4 +1,4 @@
- #!/bin/bash
+#!/bin/bash
 
 # The Firebot script is part of an automated continuous integration system.
 # Consult the FDS Config Management Plan for more information.
@@ -44,6 +44,8 @@ echo "-R branch_name - clone fds, exp, fig, out and smv repos. fds and smv repos
 echo "     will be checked out with a branch named 'branch_name'"
 echo "-T - only clone the fds and smv repos (this option is set by default when"
 echo "     only building apps (-B) and cloning repos (-R)"
+echo "-V option - if option is 'all' run all validation cases 1 time step, otherwise"
+echo "            run validation cases in fds/Validation/FDS_Val_Cases.sh 1 time step"
 echo "-x fds_rev - run firebot using the fds revision named fds_rev [default: origin/master]"
 echo "-X fds_tag - when cloning, tag the fds repo using fds_tag"
 echo "-y smv_rev - run firebot using the smv revision named smv_rev [default: origin/master]"
@@ -203,10 +205,11 @@ LOCAL=
 MANUALS_MATLAB_ONLY=
 FDS_TAG=
 SMV_TAG=
+VALIDATION=
 
 #*** parse command line options
 
-while getopts 'bBcCdfg:G:hHiJkm:MnOPq:R:sSTuUvw:x:X:y:Y:' OPTION
+while getopts 'bBcCdfg:G:hHiJkm:MnOPq:R:sSTuUvV:w:x:X:y:Y:' OPTION
 do
 case $OPTION  in
   b)
@@ -289,6 +292,9 @@ case $OPTION  in
    RUNFIREBOT=
    ECHO="echo"
    ;;
+  V)
+   VALIDATION="$OPTARG"
+   ;;
   w)
    WEB_DIR="$OPTARG"
    ;;
@@ -313,6 +319,10 @@ case $OPTION  in
 esac
 done
 shift $(($OPTIND-1))
+
+if [ "$VALIDATION" != "" ]; then
+  VALIDATION="-V $VALIDATION"
+fi
 
 CLONE_REPOS_ARG=$CLONE_REPOS
 if [ "$FDS_REV" == "" ]; then
@@ -530,7 +540,7 @@ BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
 firebot_status=0
-$ECHO  ./firebot.sh -p $firebot_pid $UPDATEREPO $INTEL $BUILD_ONLY $FORCECLONE $BRANCH $DEBUG_MODE $MANUALS_MATLAB_ONLY $SUBSET_CASES $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $USEINSTALL $UPLOADGUIDES $CLEANREPO $QUEUE $SKIPMATLAB $CLONE_REPOS $CLONE_FDSSMV  $EMAIL $WEB_DIR "$@"
+$ECHO  ./firebot.sh -p $firebot_pid $UPDATEREPO $INTEL $BUILD_ONLY $FORCECLONE $BRANCH $DEBUG_MODE $MANUALS_MATLAB_ONLY $SUBSET_CASES $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $USEINSTALL $UPLOADGUIDES $CLEANREPO $QUEUE $SKIPMATLAB $CLONE_REPOS $CLONE_FDSSMV $VALIDATION $EMAIL $WEB_DIR "$@"
 firebot_status=$?
 if [ -e $firebot_pid ]; then
   rm -f $firebot_pid
