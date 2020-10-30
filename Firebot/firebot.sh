@@ -797,25 +797,26 @@ check_verification_cases_release()
 check_validation_cases_release()
 {
    local dir=$1
+   local subdir=$2
 
    # Scan for and report any errors in FDS cases
    cd $dir
 
-   if [[ `grep 'Run aborted'            $OUTPUT_DIR/stage5b     | grep -v grep`                    == "" ]] && \
-      [[ `grep 'ERROR'                  $OUTPUT_DIR/stage5b     | grep -v geom_bad | grep -v grep` == "" ]] && \
-      [[ `grep Segmentation             */Current_Results/*.err | grep -v grep`                    == "" ]] && \
-      [[ `grep ERROR:                   */Current_Results/*.out | grep -v grep     | grep -v echo` == "" ]] && \
-      [[ `grep 'BAD TERMINATION'        */Current_Results/*.log | grep -v grep`                    == "" ]] && \
-      [[ `grep forrtl                   */Current_Results/*.err | grep -v grep`                    == "" ]]
+   if [[ `grep 'Run aborted'            $OUTPUT_DIR/stage5b | grep -v grep`                    == "" ]] && \
+      [[ `grep 'ERROR'                  $OUTPUT_DIR/stage5b | grep -v geom_bad | grep -v grep` == "" ]] && \
+      [[ `grep Segmentation             */$subdir/*.err     | grep -v grep`                    == "" ]] && \
+      [[ `grep ERROR:                   */$subdir/*.out     | grep -v grep     | grep -v echo` == "" ]] && \
+      [[ `grep 'BAD TERMINATION'        */$subdir/*.log     | grep -v grep`                    == "" ]] && \
+      [[ `grep forrtl                   */$subdir/*.err     | grep -v grep`                    == "" ]]
    then
       cases_debug_success=true
    else
-      grep 'Run aborted'                $OUTPUT_DIR/stage5b      | grep -v grep                    >> $OUTPUT_DIR/stage5b_errors
-      grep 'ERROR'                      $OUTPUT_DIR/stage5b      | grep -v geom_bad | grep -v grep >> $OUTPUT_DIR/stage5b_errors
-      grep Segmentation                 */Current_Results/*.err  | grep -v grep                    >> $OUTPUT_DIR/stage5b_errors
-      grep ERROR:                       */Current_Results/*.out  | grep -v grep     | grep -v echo >> $OUTPUT_DIR/stage5b_errors
-      grep -A 2 'BAD TERMINATION'       */Current_Results/*.log  | grep -v grep                    >> $OUTPUT_DIR/stage5b_errors
-      grep -A 20 forrtl                 */Current_Results/*.err  | grep -v grep                    >> $OUTPUT_DIR/stage5b_errors
+      grep 'Run aborted'                $OUTPUT_DIR/stage5b | grep -v grep                    >> $OUTPUT_DIR/stage5b_errors
+      grep 'ERROR'                      $OUTPUT_DIR/stage5b | grep -v geom_bad | grep -v grep >> $OUTPUT_DIR/stage5b_errors
+      grep Segmentation                 */subdir//*.err     | grep -v grep                    >> $OUTPUT_DIR/stage5b_errors
+      grep ERROR:                       */$subdir/*.out     | grep -v grep     | grep -v echo >> $OUTPUT_DIR/stage5b_errors
+      grep -A 2 'BAD TERMINATION'       */$subdir/*.log     | grep -v grep                    >> $OUTPUT_DIR/stage5b_errors
+      grep -A 20 forrtl                 */$subdir/*.err     | grep -v grep                    >> $OUTPUT_DIR/stage5b_errors
 
       echo "Errors from Stage 5b - Run ${2} cases - release mode:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage5b_errors                               >> $ERROR_LOG
@@ -862,7 +863,9 @@ run_VV_cases_release()
 {
    # run all FDS verification cases
 
-   echo "   release"
+   if [ "$CHECK_CLUSTER" == "" ]; then
+     echo "   release"
+   fi
    cd $fdsrepo/Verification/scripts
    # Run FDS with 1 OpenMP thread
    if [[ "$SUBSET_CASES" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
@@ -878,8 +881,8 @@ run_VV_cases_release()
 
 # comment out thread checking cases for now   
 #   echo 'Running FDS thread checking verification cases:' >> $OUTPUT_DIR/stage5
-   touch $OUTPUT_DIR/stage5i
    if [[ "$SKIPINSPECT" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+     touch $OUTPUT_DIR/stage5i
      cd $fdsrepo/Verification/Thread_Check
      echo ./inspection.sh -p 6 -q $QUEUE  inspector_test.fds     >> $OUTPUT_DIR/stage5i 2>&1
 #        ./inspection.sh -p 6 -q $QUEUE  inspector_test.fds      >> $OUTPUT_DIR/stage5i 2>&1
@@ -897,7 +900,7 @@ run_VV_cases_release()
 
    # run all FDS validation cases 1 time step
    RUN_VAL=
-   if [ "$VALIDATION" != "" ]; then
+   if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
      RUN_VAL=1
      echo "Running FDS Validation Cases (1 time step)"
      echo "   release"
@@ -912,8 +915,10 @@ run_VV_cases_release()
    fi
 
 # run validation case in FDS_Val_Cases.sh
-   if [[ "$VALIDATION" == "" ]] && [[ "$CHECK_CLUSTER" != "" ]] ; then
+   if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" != "" ]]; then
      RUN_VAL=1
+     echo "Running FDS Validation Cases (1 time step)"
+     echo "   release"
      cd $fdsrepo/Verification/scripts
      echo ./Run_FDS_Cases.sh -V -j $JOBPREFIX -m 1 -q $QUEUE          >> $OUTPUT_DIR/stage5b 2>&1
             ./Run_FDS_Cases.sh -V -j $JOBPREFIX -m 1 -q $QUEUE          >> $OUTPUT_DIR/stage5b 2>&1
@@ -950,7 +955,7 @@ if [[ "$CHECK_CLUSTER" == "" ]] ; then
        ./Run_FDS_Cases.sh $SUBSET_CASES -C  >> $OUTPUT_DIR/stage5 2>&1
 fi
 
-if [[ "$VALIDATION" != "" ]] ; then
+if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]] ; then
   cd $fdsrepo/Validation
   echo ./Run_Serial.sh   -C                 >> $OUTPUT_DIR/stage5b 2>&1
        ./Run_Serial.sh   -C                 >> $OUTPUT_DIR/stage5b 2>&1
@@ -958,7 +963,7 @@ if [[ "$VALIDATION" != "" ]] ; then
        ./Run_Parallel.sh -C                 >> $OUTPUT_DIR/stage5b 2>&1
 fi
 
-if [[ "$VALIDATION" == "" ]] && [[ "$CHECK_CLUSTER" != "" ]] ; then
+if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" != "" ]] ; then
      cd $fdsrepo/Verification/scripts
   echo ./Run_FDS_Cases.sh -V -C >> $OUTPUT_DIR/stage5b 2>&1
        ./Run_FDS_Cases.sh -V -C >> $OUTPUT_DIR/stage5b 2>&1
@@ -1959,9 +1964,9 @@ case $OPTION in
    ;;
   V)
    
-   VAL_OPTION="$OPTARG"
-   if [ "$VAL_OPTION" == "all" ] then
-     VALIDATION=1
+   VALIDATION="$OPTARG"
+   if [ "$VALIDATION" == "all" ]; then
+     CHECK_CLUSTER=
    else
      CHECK_CLUSTER=1
    fi
@@ -2228,7 +2233,7 @@ start_time=`date`
 
 echo "Status"
 echo "------"
-if [[ "$CLONE_REPOS" == "" ]]; then
+if [[ "$CLONE_REPOS" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
   if [[ "$CLEANREPO" == "1" ]] ; then
     if [ "$BUILD_ONLY" == "" ]; then
       clean_repo2 exp master || exit 1
@@ -2251,13 +2256,15 @@ fi
       UPDATING=1
       echo Updating
       update_repo fds $FDSBRANCH || exit 1
-      update_repo smv $SMVBRANCH || exit 1
-      update_repo fig master || exit 1
-      update_repo out master || exit 1
-      update_repo exp master || exit 1
+      if [[ "$CHECK_CLUSTER" == "" ]]; then
+        update_repo smv $SMVBRANCH || exit 1
+        update_repo fig master || exit 1
+        update_repo out master || exit 1
+        update_repo exp master || exit 1
+      fi
     fi
 # we are not cloning fig, out and exp so update them
-    if [[ "$CLONE_REPOS" != "" ]] && [[ "$CLONE_FDSSMV" != "" ]]; then
+    if [[ "$CLONE_REPOS" != "" ]] && [[ "$CLONE_FDSSMV" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
       UPDATING=1
       echo Updating
       update_repo fig master || exit 1
@@ -2285,34 +2292,36 @@ fi
 # turn off dos line checking temporarily
 CHECK_LINES=
 
-if [ "$CHECK_LINES" == "1" ]; then
-  rm -f $CRLF_WARNINGS
-  echo Checking for DOS line endings
-  echo "   bot repo"
-  find_CRLF $repo/bot bot
+if [ "$CHECK_CLUSTER" == "" ]; then
+  if [ "$CHECK_LINES" == "1" ]; then
+    rm -f $CRLF_WARNINGS
+    echo Checking for DOS line endings
+    echo "   bot repo"
+    find_CRLF $repo/bot bot
 
-  echo "   exp repo"
-  find_CRLF $repo/exp exp
+    echo "   exp repo"
+    find_CRLF $repo/exp exp
 
-  echo "   fds repo"
-  find_CRLF $repo/fds fds
+    echo "   fds repo"
+    find_CRLF $repo/fds fds
 
-  echo "   out repo"
-  find_CRLF $repo/out out
+    echo "   out repo"
+    find_CRLF $repo/out out
 
-  echo "   smv repo"
-  find_CRLF $repo/smv smv
+    echo "   smv repo"
+    find_CRLF $repo/smv smv
 
-  check_CRLF
-else
-  if [ "$BUILD_ONLY" == "" ]; then
-    echo "DOS line endings only checked when cloning or cleaning repos"
+    check_CRLF
+  else
+    if [ "$BUILD_ONLY" == "" ]; then
+      echo "DOS line endings only checked when cloning or cleaning repos"
+    fi
   fi
 fi
 
 get_fds_revision $FDSBRANCH || exit 1
 get_smv_revision $SMVBRANCH || exit 1
-if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
+if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
   get_exp_revision master || exit 1
   get_fig_revision master || exit 1
   get_out_revision master || exit 1
@@ -2329,10 +2338,10 @@ rm /tmp/mailtest.$$
 # archive repo sizes
 # (only if the repos are cloned or cleaned)
 
-if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
-if [ "$ARCHIVE_REPO_SIZES" == "1" ]; then
-  archive_repo_sizes
-fi
+if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+  if [ "$ARCHIVE_REPO_SIZES" == "1" ]; then
+    archive_repo_sizes
+  fi
 fi
 
 check_git_checkout
@@ -2414,21 +2423,30 @@ if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
     echo "   cleaning Verification"
     clean_repo $fdsrepo/Verification $FDSBRANCH || exit 1
   fi
+fi
 
 ###*** Stage 5 ###
 
+if [[ "$BUILD_ONLY" == "" ]];  then
 # Depends on successful FDS compile
   if [[ $FDS_release_success ]] && [[ "$SKIPRELEASE" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
     run_VV_cases_release
 # this also checks restart cases (using same criteria)
-    check_verification_cases_release $fdsrepo/Verification
-    if [ "$VALIDATION" != "" ]; then
-# this also checks restart cases (using same criteria)
-      check_validation_cases_release $fdsrepo/Validation
+    if [ "$CHECK_CLUSTER" == "" ]; then
+      check_verification_cases_release $fdsrepo/Verification
     fi
+    if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+# this also checks restart cases (using same criteria)
+      check_validation_cases_release $fdsrepo/Validation Current_Results
+    fi
+    if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" != "" ]]; then
+# this also checks restart cases (using same criteria)
+      check_validation_cases_release $fdsrepo/Validation FDS_Input_Files
   fi
+fi
 
 ###*** Stage 6 ###
+if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
 
 # Depends on successful SMV compile
   if [ "$SKIPPICTURES" == "" ] ; then
