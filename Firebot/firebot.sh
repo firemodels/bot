@@ -813,7 +813,7 @@ check_validation_cases_release()
    else
       grep 'Run aborted'                $OUTPUT_DIR/stage5b | grep -v grep                    >> $OUTPUT_DIR/stage5b_errors
       grep 'ERROR'                      $OUTPUT_DIR/stage5b | grep -v geom_bad | grep -v grep >> $OUTPUT_DIR/stage5b_errors
-      grep Segmentation                 */subdir//*.err     | grep -v grep                    >> $OUTPUT_DIR/stage5b_errors
+      grep Segmentation                 */$subdir//*.err    | grep -v grep                    >> $OUTPUT_DIR/stage5b_errors
       grep ERROR:                       */$subdir/*.out     | grep -v grep     | grep -v echo >> $OUTPUT_DIR/stage5b_errors
       grep -A 2 'BAD TERMINATION'       */$subdir/*.log     | grep -v grep                    >> $OUTPUT_DIR/stage5b_errors
       grep -A 20 forrtl                 */$subdir/*.err     | grep -v grep                    >> $OUTPUT_DIR/stage5b_errors
@@ -921,7 +921,7 @@ run_VV_cases_release()
      echo "   release"
      cd $fdsrepo/Verification/scripts
      echo ./Run_FDS_Cases.sh -V -j $JOBPREFIX -m 1 -q $QUEUE          >> $OUTPUT_DIR/stage5b 2>&1
-            ./Run_FDS_Cases.sh -V -j $JOBPREFIX -m 1 -q $QUEUE          >> $OUTPUT_DIR/stage5b 2>&1
+          ./Run_FDS_Cases.sh -V -j $JOBPREFIX -m 1 -q $QUEUE          >> $OUTPUT_DIR/stage5b 2>&1
      echo ""                                                          >> $OUTPUT_DIR/stage5b 2>&1
    fi
 
@@ -2431,17 +2431,17 @@ if [[ "$BUILD_ONLY" == "" ]];  then
 # Depends on successful FDS compile
   if [[ $FDS_release_success ]] && [[ "$SKIPRELEASE" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
     run_VV_cases_release
+
 # this also checks restart cases (using same criteria)
     if [ "$CHECK_CLUSTER" == "" ]; then
       check_verification_cases_release $fdsrepo/Verification
     fi
     if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-# this also checks restart cases (using same criteria)
       check_validation_cases_release $fdsrepo/Validation Current_Results
     fi
     if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" != "" ]]; then
-# this also checks restart cases (using same criteria)
       check_validation_cases_release $fdsrepo/Validation FDS_Input_Files
+    fi
   fi
 fi
 
