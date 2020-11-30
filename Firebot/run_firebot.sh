@@ -28,6 +28,7 @@ echo "-M - only run matlab and build manuals stage"
 echo "-O - use OpenMPI version fds"
 echo "-P - remove run status (PID) file"
 echo "-d - only run cases in debug mode"
+echo "-N - skip matlabe, pictures and manuals stages"
 echo "-s - use startup files to set the environment, not modules"
 echo "-S - run subset cases, do not generate pictures, run matlab or generate manuals"
 echo "-U - upload guides (only by user firebot)"
@@ -209,7 +210,7 @@ VALIDATION=
 
 #*** parse command line options
 
-while getopts 'bBcCdfg:G:hHiJkm:MnOPq:R:sSTuUvV:w:x:X:y:Y:' OPTION
+while getopts 'bBcCdfg:G:hHiJkm:MnNOPq:R:sSTuUvV:w:x:X:y:Y:' OPTION
 do
 case $OPTION  in
   b)
@@ -259,6 +260,9 @@ case $OPTION  in
    ;;
   n)
    UPDATEREPO=
+   ;;
+  N)
+   SKIPMATLAB=-s
    ;;
   O)
    INTEL=

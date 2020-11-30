@@ -1946,6 +1946,7 @@ case $OPTION in
    ;;
   s)
    SKIPMATLAB=1
+   SKIPPICTURES=1
    ;;
   S)
    SUBSET_CASES="-S"
