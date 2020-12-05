@@ -62,6 +62,8 @@ smvrepo=$repo_root/smv
 cd $scriptdir
 
 TODIR=$HOME/.bundle
+MKDIR $TODIR
+MKDIR $TODIR/apps
 
 # copy smokeview files
 
