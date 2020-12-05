@@ -1388,6 +1388,7 @@ generate_timing_stats()
    cd $fdsrepo/Utilities/Scripts
    ./fds_timing_stats.sh firebot 1 > fds_benchmarktiming_stats.csv
    BENCHMARK_FDS_TIMES=`tail -1 fds_benchmarktiming_stats.csv`
+   echo "$BENCHMARK_FDS_TIMES"     > $LATESTAPPS_DIR/fds_benchmark_time.txt
 }
 
 #---------------------------------------------
@@ -1401,7 +1402,6 @@ archive_timing_stats()
    cp fds_timing_stats.csv "$HISTORY_DIR/${FDS_REVISION}_timing.csv"
    cp fds_benchmarktiming_stats.csv "$HISTORY_DIR/${FDS_REVISION}_benchmarktiming.csv"
    BENCHMARK_FDS_TIMES=`tail -1 fds_benchmarktiming_stats.csv`
-   echo "$BENCHMARK_FDS_TIMES"     > $LATESTAPPS_DIR/fds_benchmark_time.txt
   if [ "$UPLOADGUIDES" == "1" ]; then
      if [ "$USER" == "firebot" ]; then
         cd $botrepo/Firebot
