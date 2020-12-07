@@ -1096,13 +1096,13 @@ check_fds_pictures()
 
    # Scan for and report any warnings in make FDS pictures process
    cd $firebotdir
-   if [[ `grep -i -I -E "Warning" $OUTPUT_DIR/stage6` == "" ]]
+   if [[ `grep -i -I -E "Warning" $OUTPUT_DIR/stage6`| grep -v 'known incorrect'  == "" ]]
    then
       # Continue along
       :
    else
       echo "Warnings from Stage 6 - Make FDS pictures:" >> $WARNING_LOG
-      grep -A 1 -i -I -E "Warning" $OUTPUT_DIR/stage6 >> $WARNING_LOG
+      grep -A 1 -i -I -E "Warning" $OUTPUT_DIR/stage6 | grep -v 'known incorrect' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
 }
