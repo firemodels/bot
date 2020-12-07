@@ -1117,7 +1117,7 @@ run_matlab_license_test()
    echo "   license test"
    # Run simple test to see if Matlab license is available
    cd $fdsrepo/Utilities/Matlab
-   matlab -r "try, disp('Running Matlab License Check'), catch, disp('License Error'), err = lasterror, err.message, err.stack, end, exit" &> $OUTPUT_DIR/stage7_matlab_license
+   matlab -nodisplay -r "try, disp('Running Matlab License Check'), catch, disp('License Error'), err = lasterror, err.message, err.stack, end, exit" &> $OUTPUT_DIR/stage7_matlab_license
 }
 
 #---------------------------------------------
@@ -1170,7 +1170,7 @@ run_matlab_verification()
    echo "   verification plots"
    # Run Matlab plotting script
    cd $fdsrepo/Utilities/Matlab
-   matlab -r "try, disp('Running Matlab Verification script'), FDS_verification_script, catch, disp('Error'), err = lasterror, err.message, err.stack, end, exit" &> $OUTPUT_DIR/stage7a_verification
+   matlab -nodisplay -r "try, disp('Running Matlab Verification script'), FDS_verification_script, catch, disp('Error'), err = lasterror, err.message, err.stack, end, exit" &> $OUTPUT_DIR/stage7a_verification
 }
 
 #---------------------------------------------
@@ -1281,7 +1281,7 @@ run_matlab_validation()
    echo "   validation plots"
    # Run Matlab plotting script
    cd $fdsrepo/Utilities/Matlab
-   matlab -r "try, disp('Running Matlab Validation script'), FDS_validation_script, catch, disp('Error'), err = lasterror, err.message, err.stack, end, exit" &> $OUTPUT_DIR/stage7b_validation
+   matlab -nodisplay -r "try, disp('Running Matlab Validation script'), FDS_validation_script, catch, disp('Error'), err = lasterror, err.message, err.stack, end, exit" &> $OUTPUT_DIR/stage7b_validation
 }
 
 #---------------------------------------------
