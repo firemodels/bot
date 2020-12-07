@@ -561,7 +561,7 @@ check_verification_cases_debug()
 
    if [[ `grep -rIi 'Run aborted' $OUTPUT_DIR/stage3a` == "" ]] && \
       [[ `grep -rIi 'Segmentation' Visualization/* WUI/* ` == "" ]] && \
-      [[ `grep -rIi 'ERROR:' Visualization/* WUI/* ` == "" ]] && \
+      [[ `grep -rI  'ERROR:' Visualization/* WUI/* ` == "" ]] && \
       [[ `grep -rIi 'STOP: Numerical' Visualization/* WUI/* ` == "" ]] && \
       [[ `grep -rIi 'forrtl' Visualization/* WUI/* ` == "" ]]
    then
@@ -569,7 +569,7 @@ check_verification_cases_debug()
    else
       grep -rIi 'Run aborted' $OUTPUT_DIR/stage3a > $OUTPUT_DIR/stage3a_errors
       grep -rIi 'Segmentation' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3a_errors
-      grep -rIi 'ERROR:' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3a_errors
+      grep -rI  'ERROR:' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3a_errors
       grep -rIi 'STOP: Numerical' -rIi Visualization/* WUI/* >> $OUTPUT_DIR/stage3a_errors
       grep -rIi -A 20 'forrtl' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3a_errors
       
@@ -893,7 +893,7 @@ check_verification_cases_release()
 
    if [[ `grep -rIi 'Run aborted' $OUTPUT_DIR/stage3b` == "" ]] && \
       [[ `grep -rIi 'Segmentation' Visualization/* WUI/* ` == "" ]] && \
-      [[ `grep -rIi 'ERROR:' Visualization/* WUI/*  ` == "" ]] && \
+      [[ `grep -rI  'ERROR:' Visualization/* WUI/*  ` == "" ]] && \
       [[ `grep -rIi 'STOP: Numerical' Visualization/* WUI/*  ` == "" ]] && \
       [[ `grep -rIi  'forrtl' Visualization/* WUI/*  ` == "" ]]
    then
@@ -901,7 +901,7 @@ check_verification_cases_release()
    else
       grep -rIi 'Run aborted' $OUTPUT_DIR/stage3b > $OUTPUT_DIR/stage3b_errors
       grep -rIi 'Segmentation' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3b_errors
-      grep -rIi 'ERROR:' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3b_errors
+      grep -rI  'ERROR:' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3b_errors
       grep -rIi 'STOP: Numerical' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3b_errors
       grep -rIi -A 20 'forrtl' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3b_errors
 
