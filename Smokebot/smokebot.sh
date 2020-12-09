@@ -440,13 +440,13 @@ check_compile_fds_mpi_db()
    fi
 
    # Check for compiler warnings/remarks
-   if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage1b| grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'` == "" ]]
+   if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage1b| grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'` == "" ]]
    then
       # Continue along
       :
    else
       echo "Stage 1b warnings:" >> $WARNING_LOG
-      grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage1b | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'>> $WARNING_LOG
+      grep -A 5 -i -E 'warning|remark' $OUTPUT_DIR/stage1b | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'>> $WARNING_LOG
       echo "" >> $WARNING_LOG
    # if the executable does not exist then an email has already been sent
       if [ -e "fds_${INTEL}mpi_${COMPILER}_${platform}_64$DB" ] ; then
@@ -561,7 +561,7 @@ check_verification_cases_debug()
 
    if [[ `grep -rIi 'Run aborted' $OUTPUT_DIR/stage3a` == "" ]] && \
       [[ `grep -rIi 'Segmentation' Visualization/* WUI/* ` == "" ]] && \
-      [[ `grep -rI 'ERROR:' Visualization/* WUI/* ` == "" ]] && \
+      [[ `grep -rI  'ERROR:' Visualization/* WUI/* ` == "" ]] && \
       [[ `grep -rIi 'STOP: Numerical' Visualization/* WUI/* ` == "" ]] && \
       [[ `grep -rIi 'forrtl' Visualization/* WUI/* ` == "" ]]
    then
@@ -569,7 +569,7 @@ check_verification_cases_debug()
    else
       grep -rIi 'Run aborted' $OUTPUT_DIR/stage3a > $OUTPUT_DIR/stage3a_errors
       grep -rIi 'Segmentation' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3a_errors
-      grep -rI 'ERROR:' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3a_errors
+      grep -rI  'ERROR:' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3a_errors
       grep -rIi 'STOP: Numerical' -rIi Visualization/* WUI/* >> $OUTPUT_DIR/stage3a_errors
       grep -rIi -A 20 'forrtl' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3a_errors
       
@@ -578,12 +578,12 @@ check_verification_cases_debug()
       echo "" >> $ERROR_LOG
       THIS_FDS_FAILED=1
    fi
-   if [[ `grep 'Warning' -rI $OUTPUT_DIR/stage3a` == "" ]] 
+   if [[ `grep 'Warning' -irI $OUTPUT_DIR/stage3a` == "" ]] 
    then
       no_warnings=true
    else
       echo "Stage 3a warnings:" >> $WARNING_LOG
-      grep 'Warning' -rI $OUTPUT_DIR/stage3a >> $WARNING_LOG
+      grep 'Warning' -irI $OUTPUT_DIR/stage3a >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
 }
@@ -622,13 +622,13 @@ check_compile_fds_mpi()
 
    # Check for compiler warnings/remarks
    # 'performing multi-file optimizations' and 'generating object file' are part of a normal compile
-   if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage1c | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented'` == "" ]]
+   if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage1c | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented'` == "" ]]
    then
       # Continue along
       :
    else
       echo "Stage 1c warnings:" >> $WARNING_LOG
-      grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage1c | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
+      grep -A 5 -i -E 'warning|remark' $OUTPUT_DIR/stage1c | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
       compile_errors=1
    fi
@@ -893,7 +893,7 @@ check_verification_cases_release()
 
    if [[ `grep -rIi 'Run aborted' $OUTPUT_DIR/stage3b` == "" ]] && \
       [[ `grep -rIi 'Segmentation' Visualization/* WUI/* ` == "" ]] && \
-      [[ `grep -rI 'ERROR:' Visualization/* WUI/*  ` == "" ]] && \
+      [[ `grep -rI  'ERROR:' Visualization/* WUI/*  ` == "" ]] && \
       [[ `grep -rIi 'STOP: Numerical' Visualization/* WUI/*  ` == "" ]] && \
       [[ `grep -rIi  'forrtl' Visualization/* WUI/*  ` == "" ]]
    then
@@ -901,7 +901,7 @@ check_verification_cases_release()
    else
       grep -rIi 'Run aborted' $OUTPUT_DIR/stage3b > $OUTPUT_DIR/stage3b_errors
       grep -rIi 'Segmentation' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3b_errors
-      grep -rI 'ERROR:' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3b_errors
+      grep -rI  'ERROR:' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3b_errors
       grep -rIi 'STOP: Numerical' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3b_errors
       grep -rIi -A 20 'forrtl' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3b_errors
 
@@ -912,12 +912,12 @@ check_verification_cases_release()
    fi
 
       
-   if [[ `grep 'Warning' -rI $OUTPUT_DIR/stage3b` == "" ]] 
+   if [[ `grep 'Warning' -irI $OUTPUT_DIR/stage3b` == "" ]] 
    then
       no_warnings=true
    else
       echo "Stage 3b warnings:" >> $WARNING_LOG
-      grep 'Warning' -rI $OUTPUT_DIR/stage3b >> $WARNING_LOG
+      grep 'Warning' -irI $OUTPUT_DIR/stage3b >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
 }
@@ -959,13 +959,13 @@ check_compile_smv_db()
 
    # Check for compiler warnings/remarks
    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-    if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage2b | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]
+    if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage2b | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]
     then
       # Continue along
       :
     else
       echo "Stage 2b warnings:" >> $WARNING_LOG
-      grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage2b | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
+      grep -A 5 -i -E 'warning|remark' $OUTPUT_DIR/stage2b | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
       compile_errors=1
     fi
@@ -1009,13 +1009,13 @@ check_compile_smv()
 
    # Check for compiler warnings/remarks
    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-    if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage2c | grep -v 'feupdateenv is not implemented' | grep -v 'was built for newer' | grep -v 'lcilkrts linked'` == "" ]]
+    if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage2c | grep -v 'feupdateenv is not implemented' | grep -v 'was built for newer' | grep -v 'lcilkrts linked'` == "" ]]
     then
       # Continue along
       :
     else
       echo "Stage 2c warnings:" >> $WARNING_LOG
-      grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage2c | grep -v 'feupdateenv is not implemented' | grep -v 'was built for newer' | grep -v 'lcilkrts linked' >> $WARNING_LOG
+      grep -A 5 -i -E 'warning|remark' $OUTPUT_DIR/stage2c | grep -v 'feupdateenv is not implemented' | grep -v 'was built for newer' | grep -v 'lcilkrts linked' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
       compile_errors=1
     fi
@@ -1045,23 +1045,23 @@ check_smv_pictures()
    # Scan and report any errors in make SMV pictures process
    cd $smokebotdir
    echo "   checking"
-   if [[ `grep -I -E "Segmentation|Error" $OUTPUT_DIR/stage4a` == "" ]]
+   if [[ `grep -I -E -i "Segmentation|Error" $OUTPUT_DIR/stage4a` == "" ]]
    then
       stage4a_smvpics_success=true
    else
       cp $OUTPUT_DIR/stage4a  $OUTPUT_DIR/stage4a_errors
 
       echo "Errors from Stage 4a - Make SMV pictures (release mode):" >> $ERROR_LOG
-      grep -B 5 -A 5 -I -E "Segmentation|Error"  $OUTPUT_DIR/stage4a  >> $ERROR_LOG
+      grep -B 5 -A 5 -I -E -i "Segmentation|Error"  $OUTPUT_DIR/stage4a  >> $ERROR_LOG
       echo "" >> $ERROR_LOG
    fi
-   if [[ `grep -I -E "Warning" $OUTPUT_DIR/stage4a` == "" ]]
+   if [[ `grep -I -E -i "Warning" $OUTPUT_DIR/stage4a` == "" ]]
    then
       # Continue along
       :
    else
       echo "Warnings from Stage 4a - Make SMV pictures (release mode):" >> $WARNING_LOG
-      grep -A 2 -I -E "Warning" $OUTPUT_DIR/stage4a                     >> $WARNING_LOG
+      grep -A 2 -I -E -i "Warning" $OUTPUT_DIR/stage4a                     >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
 }
@@ -1085,7 +1085,7 @@ check_smv_movies()
 {
    cd $smokebotdir
    echo "   checking"
-   if [[ `grep -I -E "Segmentation|Error" $OUTPUT_DIR/stage4b` == "" ]]
+   if [[ `grep -I -E -i "Segmentation|Error" $OUTPUT_DIR/stage4b` == "" ]]
    then
       stage4b_success=true
    else
@@ -1098,13 +1098,13 @@ check_smv_movies()
 
    # Scan for and report any warnings in make SMV pictures process
    cd $smokebotdir
-   if [[ `grep -I -E "Warning" $OUTPUT_DIR/stage4b` == "" ]]
+   if [[ `grep -I -E -i "Warning" $OUTPUT_DIR/stage4b` == "" ]]
    then
       # Continue along
       :
    else
       echo "Warnings from Stage 4b - Make SMV movies (release mode):" >> $WARNING_LOG
-      grep -I -E "Warning" $OUTPUT_DIR/stage4b                        >> $WARNING_LOG
+      grep -I -E -i "Warning" $OUTPUT_DIR/stage4b                        >> $WARNING_LOG
       echo ""                                                         >> $WARNING_LOG
    fi
 }
