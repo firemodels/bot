@@ -117,10 +117,10 @@ function install_smv(args){
 
 <p><table border=on>
 <tr>
-<th colspan=3>Libraries</th>
+<th colspan=4>Libraries</th>
 </tr>
 <tr>
-<th>Windows</th><th>Linux</th><th>OSX</th>
+<th>Windows</th><th>Linux</th><th>OSX</th><th>OSX No Quartz</th>
 </tr>
 
 <tr>
@@ -129,6 +129,7 @@ function install_smv(args){
 </td>
 <td align=center><button onclick="build_libs('linux')">Build</button></td>
 <td align=center><button onclick="build_libs('osx')">Build</button></td>
+<td align=center><button onclick="build_libs('osxnoquartz')">Build</button></td>
 </tr>
 </table>
 
@@ -231,13 +232,16 @@ function install_smv(args){
 
 <tr>
 <td align=center>
-<button onclick="build_smv('windows test')">Build</button>
+<button onclick="build_smv('windows test')">Build</button><br>
 <button onclick="build_smv('windows testinc')">Inc</button>
 </td>
 <td align=center>
 <button onclick="build_smv('linux test')">Build</button>
 </td>
-<td align=center><button onclick="build_smv('osx test')">Build</button></td>
+<td align=center>
+<button onclick="build_smv('osx test')">Quartz</button><br>
+<button onclick="build_smv('osxnoq test')">No Quartz</button>
+</td>
 </tr>
 
 <tr>
