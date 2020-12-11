@@ -120,8 +120,8 @@ function install_smv(args){
 <th colspan=4>Libraries</th>
 </tr>
 <tr>
-<th>Windows</th><th>Linux</th><th>OSX</th><th>OSX No Quartz</th>
-</tr>
+<th rowspan=2>Windows</th><th rowspan=2>Linux</th><th colspan=2>OSX</th></tr>
+<tr><th>Quartz</th><th>No Quartz</th></tr>
 
 <tr>
 <td align=center>
@@ -226,38 +226,35 @@ function install_smv(args){
 <td align=center>
 
 <p><table border=on>
-<tr><th colspan=3>Smokeview Test</th></tr>
+<tr><th colspan=4>Smokeview Test</th></tr>
 
-<tr><th>Windows</th><th>Linux</th><th>OSX</th></tr>
-
+<tr><th rowspan=2>Windows</th><th rowspan=2>Linux</th><th colspan=2>OSX</th></tr>
+<tr><th>Quartz</th><th>No Quartz</th></tr>
 <tr>
 <td align=center>
 <button onclick="build_smv('windows test')">Build</button><br>
-<button onclick="build_smv('windows testinc')">Inc</button>
 </td>
 <td align=center>
 <button onclick="build_smv('linux test')">Build</button>
 </td>
-<td align=center>
-<button onclick="build_smv('osx test')">Quartz</button><br>
-<button onclick="build_smv('osxnoq test')">No Quartz</button>
-</td>
+<td align=center><button onclick="build_smv('osx test')">Build</button></td>
+<td align=center><button onclick="build_smv('osxnoq test')">Build</button></td>
 </tr>
 
 <tr>
 <td align=center><button onclick="package_smv('windows test')">Bundle</button></td>
 <td align=center><button onclick="package_smv('linux test')">Bundle</button></td>
-<td align=center><button onclick="package_smv('osx test')">Bundle</button></td>
+<td align=center colspan=2><button onclick="package_smv('osx test')">Bundle</button></td>
 </tr>
 
 <tr>
 <td align=center><button onclick="install_smv('windows test')">Install</button></td>
 <td align=center><button onclick="install_smv('linux test')">Install</button></td>
-<td align=center><button onclick="install_smv('osx test')">Install</button></td>
+<td align=center colspan=2><button onclick="install_smv('osx test')">Install</button></td>
 </tr>
 
 <tr>
-<td colspan=3 align=center>
+<td colspan=4 align=center>
 <button onclick="run_script('\\bot\\Scripts\\webUPLOADsmv2git.bat')">Upload</button>
 <button onclick="run_script('\\bot\\Scripts\\webCOPYsmv.bat')">Copy</button>
 </td>
@@ -265,6 +262,11 @@ function install_smv(args){
 
 </tr>
 </table>
+<p><table border=on>
+<tr><th colspan=3>Misc</th></tr>
+<tr><td><button onclick="build_smv('windows testinc')">Windows Test Incremental Build</button></tr>
+</table>
+
 <p><table border=on>
 <tr><th colspan=3>Smokeview Release</th></tr>
 
@@ -333,16 +335,12 @@ function install_smv(args){
 </tr>
 </table>
 
-<p><table border=on>
+<p>
+<table border=on>
 <tr><th>Other</th></tr>
-<tr>
-<td align=center><button onclick="run_script('\\bot\\Scripts\\webTEST_setup.bat')">Test web scripts</button></td>
-</tr>
-<tr>
-<td align=center><a href="getting_started.html">Build checklist</a></td>
-</tr>
+<tr><td align=center><button onclick="run_script('\\bot\\Scripts\\webTEST_setup.bat')">Test web scripts</button></td></tr>
+<tr><td align=center><a href="getting_started.html">Build checklist</a></td></tr>
 </table>
-
 
 
 <p><hr>
