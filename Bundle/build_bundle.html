@@ -81,12 +81,19 @@ function copy_smvapps(platform){
 <td align=center><button onclick="install_fdssmv('linux')">Install</button></td>
 <td align=center><button onclick="install_fdssmv('osx')">Install</button></td>
 </tr>
+<tr></tr>
+<tr>
+<td colspan=3>Clean Upload directories:
+<button onclick="run_script('\\bot\\Bundle\\fds\\scripts\\webCleanUploadWin.bat')">Windows</button>
+<button onclick="run_script('\\bot\\Bundle\\fds\\scripts\\webCleanUploadAll.bat')">All</button>
+</td>
+</tr>
+
 
 <tr>
 <td align=center colspan=3>
-<button onclick="run_script('\\bot\\Bundle\\fds\\scripts\\webCleanUploadWin.bat')">Clean Windows</button>
-<button onclick="run_script('\\bot\\Bundle\\fds\\scripts\\webCleanUploadAll.bat')">Clean All</button>
-<button onclick="run_script('\\bot\\Bundle\\fds\\scripts\\webUPLOADbundles.bat')">Upload</button>
+<button onclick="run_script('\\bot\\Bundle\\fds\\scripts\\webUPLOADbundles.bat')">Upload to Github</button>
+<button onclick="run_script('\\bot\\Bundle\\fds\\scripts\\webCOPYbundles.bat')">Copy to Google drive</button>
 </td>
 </tr>
 
