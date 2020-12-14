@@ -78,7 +78,7 @@ function install_smv(args){
 </tr>
 
 <tr>
-<th align=center rowspan=2>Clean</th><th> Repos</th>
+<th align=center rowspan=3>Clean</th><th> Repos</th>
 <td align=center>
 <button onclick="run_script('\\bot\\Scripts\\webclean_win.bat')">Windows</button>
 <button onclick="run_script('\\bot\\Scripts\\webclean_all.bat')">All</button>
@@ -88,8 +88,16 @@ function install_smv(args){
 <tr>
 <th align=center>Uploads</th>
 <td align=center>
-<button onclick="run_script('\\bot\\Bundle\\fds\\scripts\\webCLEANuploadwin.bat')">Windows</button>
-<button onclick="run_script('\\bot\\Bundle\\fds\\scripts\\webCLEANuploadall.bat')">All</button>
+<button onclick="run_script('\\bot\\Scripts\\webCleanUploadWin.bat')">Windows</button>
+<button onclick="run_script('\\bot\\Scripts\\webCleanUploadAll.bat')">All</button>
+</td>
+</tr>
+
+<tr>
+<th align=center>SMV Build</th>
+<td align=center>
+<button onclick="run_script('\\bot\\Scripts\\webCleanwinobjs.bat')">Windows</button>
+<button onclick="run_script('\\bot\\Scripts\\webCLEANobjs.bat')">All</button>
 </td>
 </tr>
 
