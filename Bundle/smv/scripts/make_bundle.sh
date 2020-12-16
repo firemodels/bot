@@ -130,9 +130,11 @@ CP $UTILSCRIPTDIR   slice2html.sh     $PLATFORMDIR/$smvbin slice2html.sh
 CP $UTILSCRIPTDIR   slice2mp4.sh      $PLATFORMDIR/$smvbin slice2mp4.sh
 
 SCP $PLATFORMHOST $BACKGROUNDDIR background_${platform}_64 $PLATFORMDIR/$smvbin background
-SCP $PLATFORMHOST $SMVDIR        smokeview_${platform}_${TEST}64  $PLATFORMDIR/$smvbin smokeview
 if [ "$platform" == "osx" ]; then
-  SCP $PLATFORMHOST ${SMVDIRNOQ}  smokeview_${platform}_${TEST}noq_64  $PLATFORMDIR/$smvbin smokeview_noq
+  SCP $PLATFORMHOST $SMVDIR       smokeview_${platform}_${TEST}64      $PLATFORMDIR/$smvbin smokeview_q
+  SCP $PLATFORMHOST ${SMVDIRNOQ}  smokeview_${platform}_${TEST}noq_64  $PLATFORMDIR/$smvbin smokeview
+else
+  SCP $PLATFORMHOST $SMVDIR        smokeview_${platform}_${TEST}64  $PLATFORMDIR/$smvbin smokeview_q
 fi
 if [ "$edition" == "test" ]; then
   SCP $PLATFORMHOST $GNUSMVDIR     smokeview_${platform}_${TEST}64p $PLATFORMDIR/$smvbin smokeview_gnu
