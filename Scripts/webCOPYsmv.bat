@@ -23,6 +23,10 @@ set "googledir=%userprofile%\Google Drive\SMV_Test_Versions\"
 
 if NOT exist "%googledir%\*" goto error
 
+erase "%googledir%\*lnx*"
+erase "%googledir%\*osx*"
+erase "%googledir%\*win*"
+
 call :copyfile %uploaddir% %smv_revision%_win.exe   "%googledir%"
 call :copyfile %uploaddir% %smv_revision%_win.sha1  "%googledir%"
 call :copyfile %uploaddir% %smv_revision%_lnx.sh    "%googledir%"
@@ -34,7 +38,6 @@ echo.
 echo copy complete
 pause
 goto eof
-
 
 ::---------------------------------------------
   :copyfile
