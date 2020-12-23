@@ -1,4 +1,4 @@
- <html>
+<html>
 
 <head>
 <TITLE>Smokeview</TITLE>
@@ -129,7 +129,7 @@ function install_smv(args){
 </tr>
 <tr>
 <th rowspan=2>Windows</th><th rowspan=2>Linux</th><th colspan=2>OSX</th></tr>
-<tr><th>Quartz</th><th>No Quartz</th></tr>
+<tr><th>Quartz</th><th>Non-Quartz</th></tr>
 
 <tr>
 <td align=center>
@@ -137,8 +137,7 @@ function install_smv(args){
 </td>
 <td align=center><button onclick="build_libs('linux')">Build</button></td>
 <td align=center><button onclick="build_libs('osx')">Build</button></td>
-<td align=center><button onclick="build_libs('osxnoquartz')">Build</button></td>
-</tr>
+<td align=center><button onclick="build_libs('osxnoquartzh')">Build</butt</tr>
 </table>
 
 
@@ -237,7 +236,7 @@ function install_smv(args){
 <tr><th colspan=4>Smokeview Test</th></tr>
 
 <tr><th rowspan=2>Windows</th><th rowspan=2>Linux</th><th colspan=2>OSX</th></tr>
-<tr><th>Quartz</th><th>No Quartz</th></tr>
+<tr><th >Quartz</th><th>Non-Quartz</th></tr>
 <tr>
 <td align=center>
 <button onclick="build_smv('windows test')">Build</button><br>
@@ -246,23 +245,23 @@ function install_smv(args){
 <button onclick="build_smv('linux test')">Build</button>
 </td>
 <td align=center><button onclick="build_smv('osx test')">Build</button></td>
-<td align=center><button onclick="build_smv('osxnoq test')">Build</button></td>
+<td align=center><button onclick="build_smv('osxnoqh test')">Build</button></td>
 </tr>
 
 <tr>
 <td align=center><button onclick="package_smv('windows test')">Bundle</button></td>
 <td align=center><button onclick="package_smv('linux test')">Bundle</button></td>
-<td align=center colspan=2><button onclick="package_smv('osx test')">Bundle</button></td>
+<td align=center colspan=3><button onclick="package_smv('osx test')">Bundle</button></td>
 </tr>
 
 <tr>
 <td align=center><button onclick="install_smv('windows test')">Install</button></td>
 <td align=center><button onclick="install_smv('linux test')">Install</button></td>
-<td align=center colspan=2><button onclick="install_smv('osx test')">Install</button></td>
+<td align=center colspan=3><button onclick="install_smv('osx test')">Install</button></td>
 </tr>
 
 <tr>
-<td colspan=4 align=center>
+<td colspan=5 align=center>
 <button onclick="run_script('\\bot\\Scripts\\webUPLOADsmv2git.bat')">Upload</button>
 <button onclick="run_script('\\bot\\Scripts\\webCOPYsmv.bat')">Copy</button>
 </td>
