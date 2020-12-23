@@ -87,7 +87,6 @@ CPDIR ()
 BACKGROUNDDIR=$REMOTESVNROOT/smv/Build/background/intel_${platform}_64
 SMVDIR=$REMOTESVNROOT/smv/Build/smokeview/intel_${platform}_64
 SMVDIRNOQ=$REMOTESVNROOT/smv/Build/smokeview/intel_${platform}_noq_64
-SMVDIRNOQL=$REMOTESVNROOT/smv/Build/smokeview/intel_${platform}_noql_64
 GNUSMVDIR=$REMOTESVNROOT/smv/Build/smokeview/gnu_${platform}_64
 SMZDIR=$REMOTESVNROOT/smv/Build/smokezip/intel_${platform}_64
 SMDDIR=$REMOTESVNROOT/smv/Build/smokediff/intel_${platform}_64
@@ -134,7 +133,6 @@ SCP $PLATFORMHOST $BACKGROUNDDIR background_${platform}_64 $PLATFORMDIR/$smvbin 
 if [ "$platform" == "osx" ]; then
   SCP $PLATFORMHOST $SMVDIR       smokeview_${platform}_${TEST}64       $PLATFORMDIR/$smvbin smokeview_q
   SCP $PLATFORMHOST ${SMVDIRNOQ}  smokeview_${platform}_${TEST}noq_64   $PLATFORMDIR/$smvbin smokeview
-  SCP $PLATFORMHOST ${SMVDIRNOQL} smokeview_${platform}_${TEST}noql_64  $PLATFORMDIR/$smvbin smokeview_noql
 else
   SCP $PLATFORMHOST $SMVDIR        smokeview_${platform}_${TEST}64  $PLATFORMDIR/$smvbin smokeview_q
 fi
