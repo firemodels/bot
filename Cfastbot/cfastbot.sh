@@ -1547,7 +1547,7 @@ UploadGuides=$cfastrepo/Utilities/cfastbot/upload_guides.sh
 START_TIME=$(date +%s)
 
 # Set time limit
-TIME_LIMIT=10800
+TIME_LIMIT=14400
 TIME_LIMIT_EMAIL_NOTIFICATION="unsent"
 
 
