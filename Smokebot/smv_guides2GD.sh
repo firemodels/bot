@@ -7,6 +7,10 @@ CURDIR=`pwd`
 # directory containing guides on google drive : FDS-SMV Newest Manuals
 MANUAL_PARENT_ID=0B_wB1pJL2bFQUlJwMmNfaHlqME0
 FIGURES_PARENT_ID=0B-W-dkXwdHWNOGVsZXNzTjdLek0
+MANIDS=$HOME/.smokebot/smv_guides_ids.sh
+if [ -e $MANIDS ]; then
+  source $MANIDS
+fi
 
 UPLOADGUIDE ()
 {
