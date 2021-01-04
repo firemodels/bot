@@ -1113,7 +1113,7 @@ archive_validation_stats()
       fi
    fi
    CD_REPO $cfastrepo/Validation/scripts $cfastbranch || return 1
-   if [ -e get_time.sh ]; then
+   if [ -e gettime.sh ]; then
      ./Run_CFAST_Cases.sh -t > $HISTORY_DIR/${GIT_REVISION}_timing.csv
    fi
    return 0
