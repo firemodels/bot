@@ -134,11 +134,13 @@ if [ "$platform" == "osx" ]; then
   SCP $PLATFORMHOST $SMVDIR       smokeview_${platform}_${TEST}64       $PLATFORMDIR/$smvbin smokeview_q
   SCP $PLATFORMHOST ${SMVDIRNOQ}  smokeview_${platform}_${TEST}noq_64   $PLATFORMDIR/$smvbin smokeview
 else
-  SCP $PLATFORMHOST $SMVDIR        smokeview_${platform}_${TEST}64  $PLATFORMDIR/$smvbin smokeview_q
+  SCP $PLATFORMHOST $SMVDIR        smokeview_${platform}_${TEST}64  $PLATFORMDIR/$smvbin smokeview
 fi
 if [ "$edition" == "test" ]; then
   SCP $PLATFORMHOST $GNUSMVDIR     smokeview_${platform}_${TEST}64p $PLATFORMDIR/$smvbin smokeview_gnu
-  SCP $PLATFORMHOST $FORBUNDLE     smokeview_p                      $PLATFORMDIR/$smvbin smokeview_p
+  if [ -e $PLATFORMDIR/$smvbin/smokeview_gnu ]; then
+    SCP $PLATFORMHOST $FORBUNDLE     smokeview_p                      $PLATFORMDIR/$smvbin smokeview_p
+  fi
 fi
 SCP $PLATFORMHOST $SMDDIR        smokediff_${platform}_64         $PLATFORMDIR/$smvbin smokediff
 SCP $PLATFORMHOST $SMZDIR        smokezip_${platform}_64          $PLATFORMDIR/$smvbin smokezip
