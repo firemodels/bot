@@ -1114,7 +1114,10 @@ archive_validation_stats()
    fi
    CD_REPO $cfastrepo/Validation/scripts $cfastbranch || return 1
    if [ -e gettime.sh ]; then
-     ./Run_CFAST_Cases.sh -t > $HISTORY_DIR/${GIT_REVISION}_timing.csv
+     TIMEFILE=$HISTORY_DIR/${GIT_REVISION}_timing.csv
+     ./Run_CFAST_Cases.sh -t | grep -v submitted > $TIMEFILE
+     total_time=`cat $TIMEFILE | awk -F',' '{ SUM += $2} END { print SUM }'`
+     echo $total_time >> $TIMEFILE
    fi
    return 0
 }
@@ -1267,11 +1270,14 @@ email_build_status()
       echo "The current git revision is ${GIT_REVISION}" >> $TIME_LOG
    fi
    echo "-------------------------------" >> $TIME_LOG
-   echo "Host: $hostname " >> $TIME_LOG
+   echo "Host: $hostname "  >> $TIME_LOG
    echo "Start Time: $start_time " >> $TIME_LOG
    echo "Stop Time: $stop_time " >> $TIME_LOG
+if [ "$total_time" != "" ]; then
+   echo " run time: $total_time" >> $TIME_LOG
+fi
    if [[ "$UPLOAD" == "1" ]]; then
-      echo "-------------------------------" >> $TIME_LOG
+      echo "-------------------------------"                           >> $TIME_LOG
       echo "Manuals (private): http://blaze.nist.gov/cfastbot/manuals" >> $TIME_LOG
       echo "Manuals  (public): https://goo.gl/jR6uSj" >> $TIME_LOG
       echo "-------------------------------" >> $TIME_LOG
