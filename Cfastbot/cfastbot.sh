@@ -1270,11 +1270,11 @@ email_build_status()
       echo "The current git revision is ${GIT_REVISION}" >> $TIME_LOG
    fi
    echo "-------------------------------" >> $TIME_LOG
-   echo "Host: $hostname "  >> $TIME_LOG
-   echo "Start Time: $start_time " >> $TIME_LOG
-   echo "Stop Time: $stop_time " >> $TIME_LOG
+   echo "             Host: $hostname "  >> $TIME_LOG
+   echo "       Start Time: $start_time " >> $TIME_LOG
+   echo "        Stop Time: $stop_time " >> $TIME_LOG
 if [ "$total_time" != "" ]; then
-   echo " run time: $total_time" >> $TIME_LOG
+   echo "         Run Time: $total_time" >> $TIME_LOG
 fi
    if [[ "$UPLOAD" == "1" ]]; then
       echo "-------------------------------"                           >> $TIME_LOG
