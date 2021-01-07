@@ -2404,7 +2404,8 @@ if [[ "$SKIPRELEASE" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
 fi
 
 if [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-$COPY_APPS fds > $OUTPUT_DIR/stage3d
+  cd $firebotdir
+  $COPY_APPS fds > $OUTPUT_DIR/stage3d
 fi
 
 ###*** Stage 3a ###
@@ -2426,6 +2427,7 @@ fi
 if [[ "$SKIPPICTURES" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
   compile_smv
   check_compile_smv
+  cd $firebotdir
   $COPY_APPS smv >> $OUTPUT_DIR/stage3d
 fi
 
