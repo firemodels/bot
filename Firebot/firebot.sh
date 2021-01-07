@@ -679,18 +679,14 @@ compile_smv_utilities()
    # smokeview libraries
    if [ "$USEINSTALL" == "" ]; then
      echo "   Smokeview"
-     if [ "$platform" == "osx" ]; then 
-       echo "      quartz libraries"
-     else
-       echo "      libraries"
-     fi
+     echo "      libraries"
      cd $smvrepo/Build/LIBS/intel_${platform}${size}
      ./make_LIBS.sh >> $OUTPUT_DIR/stage3a 2>&1
      echo "" >> $OUTPUT_DIR/stage3a 2>&1
     
      if [ "$platform" == "osx" ]; then 
-       echo "      non-quartz libraries"
-       cd $smvrepo/Build/LIBS/intel_osx_noq_64
+       echo "      quartz libraries"
+       cd $smvrepo/Build/LIBS/intel_osx_q_64
        ./make_LIBS.sh >> $OUTPUT_DIR/stage3a 2>&1
        echo "" >> $OUTPUT_DIR/stage3a 2>&1
      fi
@@ -1036,16 +1032,12 @@ compile_smv()
 {
    # Clean and compile SMV
    if [ "$USEINSTALL" == "" ]; then
-     if [ "$platform" == "osx" ]; then 
-       echo "      quartz release"
-     else
-       echo "      release"
-     fi
+     echo "      release"
      cd $smvrepo/Build/smokeview/intel_${platform}${size}
      ./make_smokeview.sh &> $OUTPUT_DIR/stage3c
      if [ "$platform" == "osx" ]; then 
-       echo "      non-quartz release"
-       cd $smvrepo/Build/smokeview/intel_osx_noq_64
+       echo "      quartz release"
+       cd $smvrepo/Build/smokeview/intel_osx_q_64
        ./make_smokeview.sh &> $OUTPUT_DIR/stage3c
      fi
    fi
