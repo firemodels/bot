@@ -73,7 +73,14 @@ if [ "$type" == "smv" ]; then
   CP $smvrepo/Build/background/intel$OS background$OS $TODIR/apps background
   CP $smvrepo/Build/hashfile/intel$OS   hashfile$OS   $TODIR/apps hashfile
   CP $smvrepo/Build/smokediff/intel$OS  smokediff$OS  $TODIR/apps smokediff
-  CP $smvrepo/Build/smokeview/intel$OS  smokeview$OS  $TODIR/apps smokeview
+  if [ "$OS" == "osx_64" ]; then
+    CP $smvrepo/Build/smokeview/intel_osx_noq_64  smokeview_osx_noq_64  $TODIR/apps smokeview
+    if [ -e $smvrepo/Build/smokeview/intel_osx_64/smokeview$OS ]; then
+      CP $smvrepo/Build/smokeview/intel_osx_64    smokeview$OS          $TODIR/apps smokeview_q
+    fi
+  else
+    CP $smvrepo/Build/smokeview/intel$OS  smokeview$OS  $TODIR/apps smokeview
+  fi
   CP $smvrepo/Build/smokezip/intel$OS   smokezip$OS   $TODIR/apps smokezip
   CP $smvrepo/Build/wind2fds/intel$OS   wind2fds$OS   $TODIR/apps wind2fds
 fi
