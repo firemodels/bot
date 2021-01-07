@@ -1987,12 +1987,20 @@ case $OPTION in
    ;;
   x)
    FDS_REV="$OPTARG"
+   if [ "$FDS_REV" == "latest" ]; then
+     UPDATEREPO=1
+     FDS_REV=
+   fi
    ;;
   X)
    FDS_TAG="$OPTARG"
    ;;
   y)
    SMV_REV="$OPTARG"
+   if [ "$SMV_REV" == "latest" ]; then
+     UPDATEREPO=1
+     SMV_REV=
+   fi
    ;;
   Y)
    SMV_TAG="$OPTARG"
