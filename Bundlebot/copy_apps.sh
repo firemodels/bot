@@ -3,6 +3,12 @@ app_type=$1
 eval dir_from=$2
 error_log=$3
 
+platform="linux"
+if [ "`uname`" == "Darwin" ] ; then
+  platform="osx"
+fi
+
+
 
 if [ "$app_type" != "fds" ]; then
   app_type="smv"
@@ -58,6 +64,9 @@ if [ "$app_type" == "smv" ]; then
   CP hashfile
   CP smokediff
   CP smokeview
+  if [ "$platform" == "osx" ]; then
+    CP smokeview_q
+  fi
   CP smokezip
   CP wind2fds
   CP SMV_REVISION
