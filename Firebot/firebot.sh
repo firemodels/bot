@@ -690,7 +690,7 @@ compile_smv_utilities()
     
      if [ "$platform" == "osx" ]; then 
        echo "      non-quartz libraries"
-       cd $smvrepo/Build/LIBS/intel_intel_osx_noq_64
+       cd $smvrepo/Build/LIBS/intel_osx_noq_64
        ./make_LIBS.sh >> $OUTPUT_DIR/stage3a 2>&1
        echo "" >> $OUTPUT_DIR/stage3a 2>&1
      fi
