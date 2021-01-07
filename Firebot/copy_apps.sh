@@ -75,8 +75,8 @@ if [ "$type" == "smv" ]; then
   CP $smvrepo/Build/smokediff/intel$OS  smokediff$OS  $TODIR/apps smokediff
   if [ "$OS" == "osx_64" ]; then
     CP $smvrepo/Build/smokeview/intel_osx_noq_64  smokeview_osx_noq_64  $TODIR/apps smokeview
-    if [ -e $smvrepo/Build/sokeview/intel$OS/smokeview$OS ]; then
-      CP $smvrepo/Build/smokeview/intel$OS          smokeview$OS          $TODIR/apps smokeview_q
+    if [ -e $smvrepo/Build/smokeview/intel_osx_64/smokeview$OS ]; then
+      CP $smvrepo/Build/smokeview/intel_osx_64    smokeview$OS          $TODIR/apps smokeview_q
     fi
   else
     CP $smvrepo/Build/smokeview/intel$OS  smokeview$OS  $TODIR/apps smokeview

@@ -1037,7 +1037,7 @@ compile_smv()
    # Clean and compile SMV
    if [ "$USEINSTALL" == "" ]; then
      if [ "$platform" == "osx" ]; then 
-       echo "      non-quartz release"
+       echo "      quartz release"
      else
        echo "      release"
      fi
