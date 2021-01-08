@@ -33,13 +33,13 @@ if "%platform%" == "windows" (
 if "%platform%" == "linux" (
   echo.
   echo *** linux
-  plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/run_command.sh bot/Firebot copy_apps.sh %type%
+  plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/run_command.sh bot/Firebot copy_fds_apps.sh 
   goto eof
 )
 if "%platform%" == "osx" (
   echo.
   echo *** osx
-  plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/run_command.sh bot/Firebot copy_apps.sh %type%
+  plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/run_command.sh bot/Firebot copy_fds_apps.sh
   goto eof
 )
 
