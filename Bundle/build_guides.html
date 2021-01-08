@@ -13,7 +13,7 @@ function get_fullpath(command,platform){
   return fullpath;
 }
 function run_script(script){
-  MyObject.Run(get_fullpath("../../smv/scripts/webRUN_script.bat ",script));
+  MyObject.Run(get_fullpath("../scripts/webRUN_script.bat ",script));
 }
 function build_fdsguide(guide){
   MyObject.Run(get_fullpath("../../smv/scripts/webBUILDfdsguide.bat ",guide));
