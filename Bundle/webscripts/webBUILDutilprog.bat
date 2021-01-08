@@ -1,9 +1,8 @@
 @echo off
-setlocal EnableDelayedExpansion
-set platform=%1
-set type=fds
+set prog=%1
+set platform=%2
 
-:: batch file to install the FDS-SMV bundle on Windows, Linux or OSX systems
+:: batch file to build utility programs on Windows, Linux or OSX systems
 
 :: setup environment variables (defining where repository resides etc) 
 
@@ -20,30 +19,27 @@ goto:eof
 :endif_envexist
 
 call %envfile%
-%svn_drive%
 echo.
+echo  Building %prog% for 64 bit %platform%
+Title Building %prog% for 64 bit %platform%
+
+%svn_drive%
+
 
 if "%platform%" == "windows" (
-  echo.
-  echo *** windows
-  cd %svn_root%\bot\Bundlebot
-  call copy_apps %type%
+  cd %svn_root%\fds\Utilities\%prog%\intel_win_64
+  call make_%prog% %type%
   goto eof
 )
 if "%platform%" == "linux" (
-  echo.
-  echo *** linux
-  plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/run_command.sh bot/Firebot copy_apps.sh %type%
+  plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/run_command.sh fds/Utilities/%prog%/intel_linux_64 make_%prog%.sh
+  pause
   goto eof
 )
 if "%platform%" == "osx" (
-  echo.
-  echo *** osx
-  plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/run_command.sh bot/Firebot copy_apps.sh %type%
+  plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/run_command.sh fds/Utilities/%prog%/intel_osx_64 make_%prog%.sh
+  pause
   goto eof
 )
 
 :eof
-echo.
-echo copy complete
-pause

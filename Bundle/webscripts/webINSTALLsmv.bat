@@ -33,7 +33,7 @@ if "%buildtype%" == "release" (
 %svn_drive%
 
 if "%platform%" == "windows" (
-  cd $HOME\.bundle\uploads
+  cd %userprofile%\.bundle\uploads
   if "%buildtype%" == "test" (
     echo Running Smokeview installer:  %smv_revision%_win.exe
     call %smv_revision%_win.exe
