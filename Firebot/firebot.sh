@@ -657,7 +657,7 @@ check_compile_fds_mpi()
 
 
 #---------------------------------------------
-#                   compile_smv_utilities
+#                   CP
 #---------------------------------------------
 
 CP()
@@ -683,6 +683,13 @@ compile_smv_utilities()
      cd $smvrepo/Build/LIBS/intel_${platform}${size}
      ./make_LIBS.sh >> $OUTPUT_DIR/stage3a 2>&1
      echo "" >> $OUTPUT_DIR/stage3a 2>&1
+    
+     if [ "$platform" == "osx" ]; then 
+       echo "      quartz libraries"
+       cd $smvrepo/Build/LIBS/intel_osx_q_64
+       ./make_LIBS.sh >> $OUTPUT_DIR/stage3a 2>&1
+       echo "" >> $OUTPUT_DIR/stage3a 2>&1
+     fi
 
    # smokezip:
      echo "      smokezip"
@@ -1027,7 +1034,13 @@ compile_smv()
    if [ "$USEINSTALL" == "" ]; then
      echo "      release"
      cd $smvrepo/Build/smokeview/intel_${platform}${size}
-     ./make_smokeview.sh &> $OUTPUT_DIR/stage3c
+     echo "" > $OUTPUT_DIR/stage3c 2>&1
+     ./make_smokeview.sh >> $OUTPUT_DIR/stage3c 2>&1
+     if [ "$platform" == "osx" ]; then 
+       echo "      quartz release"
+       cd $smvrepo/Build/smokeview/intel_osx_q_64
+       ./make_smokeview.sh >> $OUTPUT_DIR/stage3c 2>&1
+     fi
    fi
 }
 
@@ -1038,15 +1051,29 @@ compile_smv()
 check_compile_smv()
 {
   # Check for errors in SMV release compilation
+  smv_errors=
   if [ "$USEINSTALL" == "" ]; then
     cd $smvrepo/Build/smokeview/intel_${platform}${size}
     if [ -e "smokeview_${platform}${size}" ]; then
       smv_release_success=true
       CP smokeview_${platform}${size} $LATESTAPPS_DIR/smokeview
     else
+      smv_errors=1
       echo "Errors from Stage 3c - Compile SMV release:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage3c >> $ERROR_LOG
       echo "" >> $ERROR_LOG
+    fi
+    if [ "$platform" == "osx" ]; then 
+      cd $smvrepo/Build/smokeview/intel_osx_q_64
+      if [ -e "smokeview_osx_q_64" ]; then
+        CP smokeview_osx_q_64 $LATESTAPPS_DIR/smokeview_q
+      else
+        echo "Errors from Stage 3c - Compile quart SMV release:" >> $ERROR_LOG
+        if [ "$smv_errors" == "" ]; then
+          cat $OUTPUT_DIR/stage3c >> $ERROR_LOG
+        fi
+        echo "" >> $ERROR_LOG
+      fi
     fi
 
     # Check for compiler warnings/remarks
@@ -1975,12 +2002,20 @@ case $OPTION in
    ;;
   x)
    FDS_REV="$OPTARG"
+   if [ "$FDS_REV" == "latest" ]; then
+     UPDATEREPO=1
+     FDS_REV=
+   fi
    ;;
   X)
    FDS_TAG="$OPTARG"
    ;;
   y)
    SMV_REV="$OPTARG"
+   if [ "$SMV_REV" == "latest" ]; then
+     UPDATEREPO=1
+     SMV_REV=
+   fi
    ;;
   Y)
    SMV_TAG="$OPTARG"
@@ -2170,7 +2205,8 @@ if [ "QUEUE" == "none" ]; then
 fi
 
 UploadGuides=$botrepo/Firebot/fds_guides2GD.sh
-COPY_APPS=$botrepo/Firebot/copy_apps.sh
+COPY_FDS_APPS=$botrepo/Firebot/copy_fds_apps.sh
+COPY_SMV_APPS=$botrepo/Firebot/copy_smv_apps.sh
 
 echo ""
 echo "Settings"
@@ -2383,15 +2419,16 @@ if [[ "$SKIPRELEASE" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
   check_compile_fds_mpi
 fi
 
-if [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-$COPY_APPS fds > $OUTPUT_DIR/stage3d
-fi
-
 ###*** Stage 3a ###
 
 if [[ "$SKIPPICTURES" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
   compile_smv_utilities
   check_smv_utilities
+fi
+
+if [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+  cd $firebotdir
+  $COPY_FDS_APPS > $OUTPUT_DIR/stage3d
 fi
 
 ###*** Stage 3b ###
@@ -2406,9 +2443,9 @@ fi
 if [[ "$SKIPPICTURES" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
   compile_smv
   check_compile_smv
-  $COPY_APPS smv >> $OUTPUT_DIR/stage3d
+  cd $firebotdir
+  $COPY_SMV_APPS >> $OUTPUT_DIR/stage3d
 fi
-
 
 ###*** Stage 4 ###
 
