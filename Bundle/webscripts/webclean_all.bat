@@ -44,7 +44,7 @@ set scriptdir=%linux_svn_root%/bot/Bundle/fds/scripts/
 echo.
 echo ------------------------------------------------------------------------
 echo Cleaning source and build directories in the Linux repository %linux_svn_root%, on %linux_hostname%
-plink %plink_options% %linux_logon% %scriptdir%/clean_repo_sourcebuild.sh  %linux_svn_root%/fds %linux_hostname%
+plink %plink_options% %linux_logon% %scriptdir%/clean_repo_sourcebuild.sh
 
 echo.
 echo ------------------------------------------------------------------------

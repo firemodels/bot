@@ -38,7 +38,7 @@ plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/clean.sh       
 echo.
 echo *** osx
 plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/clean.sh       smv/Build/smokeview/intel_osx_64
-plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/clean.sh       smv/Build/smokeview/intel_osx_noq_64 
+plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/clean.sh       smv/Build/smokeview/intel_osx_q_64 
 plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/clean.sh       smv/Build/smokeview/gnu_osx_64 
 
 
