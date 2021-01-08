@@ -13,25 +13,25 @@ function get_fullpath(command,platform){
   return fullpath;
 }
 function run_script(script){
-  MyObject.Run(get_fullpath("../scripts/webRUN_script.bat ",script));
+  MyObject.Run(get_fullpath("webscripts/webRUN_script.bat ",script));
 }
 function build_fdsguide(guide){
-  MyObject.Run(get_fullpath("../../smv/scripts/webBUILDfdsguide.bat ",guide));
+  MyObject.Run(get_fullpath("webscripts/webBUILDfdsguide.bat ",guide));
 }
 function build_smvguide(guide){
-  MyObject.Run(get_fullpath("../../smv/scripts/webBUILDsmvguide.bat ",guide));
+  MyObject.Run(get_fullpath("webscripts/webBUILDsmvguide.bat ",guide));
 }
 function view_fdsguide(guide){
-  MyObject.Run(get_fullpath("../../smv/scripts/webVIEWfdsguide.bat ",guide));
+  MyObject.Run(get_fullpath("webscripts/webVIEWfdsguide.bat ",guide));
 }
 function view_smvguide(guide){
-  MyObject.Run(get_fullpath("../../smv/scripts/webVIEWsmvguide.bat ",guide));
+  MyObject.Run(get_fullpath("webscripts/webVIEWsmvguide.bat ",guide));
 }
 function copy_guides(guide){
-  MyObject.Run(get_fullpath("../../smv/scripts/webCOPYguides.bat ",guide));
+  MyObject.Run(get_fullpath("webscripts/webCOPYguides.bat ",guide));
 }
 function get_figs(guide){
-  MyObject.Run(get_fullpath("../../smv/scripts/webGETfigs.bat ",guide));
+  MyObject.Run(get_fullpath("webscripts/webGETfigs.bat ",guide));
 }
 </script>
 </HEAD>
@@ -52,7 +52,7 @@ function get_figs(guide){
 <td rowspan=2 align=center>
 Windows<br>
 ~\.bundle\pubs<br>
-<button onclick="run_script('\\bot\\Scripts\\openguidedir.bat')">Show</button>
+<button onclick="run_script('\\bot\\Bundle\\webscripts\\webOpenGuideDir.bat')">Show</button>
 </td>
 <td><button onclick="copy_guides('to_linux')">==></button></td>
 <td>Linux ~/.bundle/pubs</td>
@@ -143,13 +143,13 @@ Windows<br>
 <tr><th colspan=2>Web Summary</th></tr>
 <tr>
 <td><button onclick="get_figs('websummary')">Update</button></td>
-<td><button onclick="run_script('\\smv\\scripts\\webVIEW_localimages.bat')">View</button></td>
+<td><button onclick="run_script('\\bot\\Bundle\\webscripts\\webVIEW_localimages.bat')">View</button></td>
 </tr>
 </table>
 
 <h3>Other</h3>
 <p>
-<button onclick="run_script('\\bot\\Scripts\\webEDIT_build_guides.bat')">Edit this page</button><br>
+<button onclick="run_script('\\bot\\Bundle\\webscripts\\webEDIT_build_guides.bat')">Edit this page</button><br>
 <p><hr>
 
 </BODY>

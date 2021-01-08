@@ -1,6 +1,5 @@
 @echo off
-
-:: setup environment variables (defining where repository resides etc) 
+set guide=%1
 
 set envfile="%userprofile%"\fds_smv_env.bat
 IF EXIST %envfile% GOTO endif_envexist
@@ -9,15 +8,16 @@ echo Create a file named %envfile% and use smv/scripts/fds_smv_env_template.bat
 echo as an example.
 echo.
 echo Aborting now...
-
 pause>NUL
 goto:eof
 
 :endif_envexist
 
+echo Creating figures for the Smokeview User's guide
+
 call %envfile%
 
 %svn_drive%
+cd %svn_root%\smv\Manuals\%guide%
 
-call %svn_root%\%1
-
+start sumatrapdf %guide%.pdf
