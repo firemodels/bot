@@ -14,28 +14,28 @@ function get_fullpath(command,platform){
   return fullpath;
 }
 function run_script(script){
-  MyObject.Run(get_fullpath("../../smv/scripts/webRUN_script.bat ",script));
+  MyObject.Run(get_fullpath("../Scripts/webRUN_script.bat ",script));
 }
 function build_libs(platform){
-  MyObject.Run(get_fullpath("../../smv/scripts/webBUILDlibs.bat ",platform));
+  MyObject.Run(get_fullpath("../Scripts/webBUILDlibs.bat ",platform));
 }
 function build_smv(args){
-  MyObject.Run(get_fullpath("../../smv/scripts/webBUILDsmv.bat ",args));
+  MyObject.Run(get_fullpath("../Scripts/webBUILDsmv.bat ",args));
 }
 function build_prog(args){
-  MyObject.Run(get_fullpath("../../smv/scripts/webBUILDprog.bat ",args));
+  MyObject.Run(get_fullpath("../Scripts/webBUILDprog.bat ",args));
 }
 function build_allprog(args){
-  MyObject.Run(get_fullpath("../../smv/scripts/webBUILDallprog.bat ",args));
+  MyObject.Run(get_fullpath("../Scripts/webBUILDallprog.bat ",args));
 }
 function build_utilprog(args){
-  MyObject.Run(get_fullpath("../../smv/scripts/webBUILDutilprog.bat ",args));
+  MyObject.Run(get_fullpath("../Scripts/webBUILDutilprog.bat ",args));
 }
 function package_smv(args){
-  MyObject.Run(get_fullpath("smv/scripts/webPACKAGEsmv.bat ",args));
+  MyObject.Run(get_fullpath("../Scripts/webPACKAGEsmv.bat ",args));
 }
 function install_smv(args){
-  MyObject.Run(get_fullpath("../../smv/scripts/webINSTALLsmv.bat ",args));
+  MyObject.Run(get_fullpath("../Scripts/webINSTALLsmv.bat ",args));
 }
 </script>
 </HEAD>
