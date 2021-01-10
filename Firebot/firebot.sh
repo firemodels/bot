@@ -585,6 +585,7 @@ check_cases_debug()
 
    if [[ `grep 'Run aborted'     $OUTPUT_DIR/stage4 | grep -v grep`                == "" ]] && \
       [[ `grep Segmentation      */*.err            | grep -v grep`                == "" ]] && \
+      [[ `grep ERROR:        */*.err | grep -v grep | grep -v geom_bad `           == "" ]] && \
       [[ `grep ERROR:            */*.out            | grep -v grep | grep -v echo` == "" ]] && \
       [[ `grep 'BAD TERMINATION' */*.log            | grep -v grep`                == "" ]] && \
       [[ `grep forrtl            */*.err            | grep -v grep`                == "" ]]
@@ -593,6 +594,7 @@ check_cases_debug()
    else
       grep 'Run aborted'          $OUTPUT_DIR/stage4 | grep -v grep                >> $OUTPUT_DIR/stage4_errors
       grep Segmentation           */*.err            | grep -v grep                >> $OUTPUT_DIR/stage4_errors
+      grep ERROR:            */*.err  | grep -v grep | grep -v geom_bad            >> $OUTPUT_DIR/stage4_errors
       grep ERROR:                 */*.out            | grep -v grep | grep -v echo >> $OUTPUT_DIR/stage4_errors
       grep -A 2 'BAD TERMINATION' */*.log            | grep -v grep                >> $OUTPUT_DIR/stage4_errors
       grep -A 20 forrtl           */*.err            | grep -v grep                >> $OUTPUT_DIR/stage4_errors
@@ -776,6 +778,7 @@ check_verification_cases_release()
    if [[ `grep 'Run aborted'            $OUTPUT_DIR/stage5  | grep -v grep`                    == "" ]] && \
       [[ `grep 'ERROR'                  $OUTPUT_DIR/stage5  | grep -v geom_bad | grep -v grep` == "" ]] && \
       [[ `grep Segmentation             */*.err             | grep -v grep`                    == "" ]] && \
+      [[ `grep ERROR:                   */*.err             | grep -v grep | grep -v geom_bad` == "" ]] && \
       [[ `grep ERROR:                   */*.out             | grep -v grep | grep -v echo`     == "" ]] && \
       [[ `grep 'BAD TERMINATION'        */*.log             | grep -v grep`                    == "" ]] && \
       [[ `grep forrtl                   */*.err             | grep -v grep`                    == "" ]] && \
@@ -786,6 +789,7 @@ check_verification_cases_release()
       grep 'Run aborted'                $OUTPUT_DIR/stage5  | grep -v grep                    >> $OUTPUT_DIR/stage5_errors
       grep 'ERROR'                      $OUTPUT_DIR/stage5  | grep -v geom_bad | grep -v grep >> $OUTPUT_DIR/stage5_errors
       grep Segmentation                 */*.err             | grep -v grep                    >> $OUTPUT_DIR/stage5_errors
+      grep ERROR:                       */*.err             | grep -v grep | grep -v geom_bad >> $OUTPUT_DIR/stage5_errors
       grep ERROR:                       */*.out             | grep -v grep | grep -v echo     >> $OUTPUT_DIR/stage5_errors
       grep -A 2 'BAD TERMINATION'       */*.log             | grep -v grep                    >> $OUTPUT_DIR/stage5_errors
       grep -A 20 forrtl                 */*.err             | grep -v grep                    >> $OUTPUT_DIR/stage5_errors
@@ -812,6 +816,7 @@ check_validation_cases_release()
    if [[ `grep 'Run aborted'            $OUTPUT_DIR/stage5b | grep -v grep`                    == "" ]] && \
       [[ `grep 'ERROR'                  $OUTPUT_DIR/stage5b | grep -v geom_bad | grep -v grep` == "" ]] && \
       [[ `grep Segmentation             */$subdir/*.err     | grep -v grep`                    == "" ]] && \
+      [[ `grep ERROR:                   */$subdir/*.err     | grep -v grep | grep -v geom_bad` == "" ]] && \
       [[ `grep ERROR:                   */$subdir/*.out     | grep -v grep     | grep -v echo` == "" ]] && \
       [[ `grep 'BAD TERMINATION'        */$subdir/*.log     | grep -v grep`                    == "" ]] && \
       [[ `grep forrtl                   */$subdir/*.err     | grep -v grep`                    == "" ]]
@@ -821,6 +826,7 @@ check_validation_cases_release()
       grep 'Run aborted'                $OUTPUT_DIR/stage5b | grep -v grep                    >> $OUTPUT_DIR/stage5b_errors
       grep 'ERROR'                      $OUTPUT_DIR/stage5b | grep -v geom_bad | grep -v grep >> $OUTPUT_DIR/stage5b_errors
       grep Segmentation                 */$subdir//*.err    | grep -v grep                    >> $OUTPUT_DIR/stage5b_errors
+      grep ERROR:                       */$subdir//*.err    | grep -v grep | grep -v geom_bad >> $OUTPUT_DIR/stage5b_errors
       grep ERROR:                       */$subdir/*.out     | grep -v grep     | grep -v echo >> $OUTPUT_DIR/stage5b_errors
       grep -A 2 'BAD TERMINATION'       */$subdir/*.log     | grep -v grep                    >> $OUTPUT_DIR/stage5b_errors
       grep -A 20 forrtl                 */$subdir/*.err     | grep -v grep                    >> $OUTPUT_DIR/stage5b_errors
