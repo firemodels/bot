@@ -3,6 +3,7 @@
 #*** Linux parameters
 
 intel_mpi_version_linux=20u1
+#intel_mpi_version_linux=oneapi
 mpi_version_linux=INTEL
 
 #*** OSX parameters
