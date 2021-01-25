@@ -145,7 +145,7 @@ run_auto()
     fi
   fi
   echo -e "Smokebot run initiated." >> $MESSAGE_FILE
-  cat $MESSAGE_FILE | mail -s "smokebot run initiated" $mailTo > /dev/null
+  cat $MESSAGE_FILE | mail $REPLYTO -s "smokebot run initiated" $mailTo > /dev/null
   return 0
 }
 
@@ -211,7 +211,7 @@ check_time_limit()
 
       if [ $ELAPSED_TIME -gt $TIME_LIMIT ]
       then
-         echo -e "smokebot has been running for more than 12 hours in Stage ${TIME_LIMIT_STAGE}. \n\nPlease ensure that there are no problems. \n\nThis is a notification only and does not terminate smokebot." | mail -s "smokebot Notice: smokebot has been running for more than 12 hours." $mailTo > /dev/null
+         echo -e "smokebot has been running for more than 12 hours in Stage ${TIME_LIMIT_STAGE}. \n\nPlease ensure that there are no problems. \n\nThis is a notification only and does not terminate smokebot." | mail $REPLYTO -s "smokebot Notice: smokebot has been running for more than 12 hours." $mailTo > /dev/null
          TIME_LIMIT_EMAIL_NOTIFICATION="sent"
       fi
    fi
@@ -1304,7 +1304,7 @@ email_compile_errors()
   fi 
 
   if [[ -e $SMOKEBOT_LOG ]]; then
-    cat $SMOKEBOT_LOG | mail -s "smokebot compile errors and/or warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailToSMV > /dev/null
+    cat $SMOKEBOT_LOG | mail $REPLYTO -s "smokebot compile errors and/or warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailToSMV > /dev/null
     rm -f $SMOKEBOT_LOG
   fi
 }
@@ -1399,17 +1399,17 @@ email_build_status()
   NAMELIST_LOGS="$NAMELIST_NODOC_LOG $NAMELIST_NOSOURCE_LOG"
   if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]; then
     # Send email with failure message and warnings, body of email contains appropriate log file
-    cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "smokebot failure and warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+    cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot failure and warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
 
   # Check for errors only
   elif [ -e $ERROR_LOG ]; then
     # Send email with failure message, body of email contains error log file
-    cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "smokebot failure on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+    cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot failure on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
 
   # Check for warnings only
   elif [ -e $WARNING_LOG ]; then
      # Send email with success message, include warnings
-    cat $WARNING_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "smokebot success with warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+    cat $WARNING_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot success with warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
 
   # No errors or warnings
   else
@@ -1422,7 +1422,7 @@ email_build_status()
 
       # Send success message with links to nightly manuals
 
-    cat $TIME_LOG $NAMELIST_LOGS | mail -s "smokebot success on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+    cat $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot success on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
 
 # save apps that were built for bundling
 
@@ -1782,10 +1782,22 @@ if [ -e $FDS_STATUS_FILE ] ; then
   LAST_FDS_FAILED=`cat $FDS_STATUS_FILE`
 fi
 
+
 # Load mailing list for status report
+
+if [ -e $EMAIL_LIST ]; then
+  source $EMAIL_LIST
+fi
+
+# define reply to address to prevent bounced emails when doing a reply all to smokebot's status emails
+
+REPLYTO=
+if "$replyToSMV" != "" ]; then
+  REPLYTO="-r $replyToSMV"
+fi
+
 if [ "$mailTo" == "" ]; then
   if [ -e $EMAIL_LIST ]; then
-    source $EMAIL_LIST
     mailTo=$mailToSMV
     if [[ "$LAST_FDS_FAILED" == "1" ]] ; then
       mailTo=$mailToFDS
