@@ -1792,7 +1792,7 @@ fi
 # define reply to address to prevent bounced emails when doing a reply all to smokebot's status emails
 
 REPLYTO=
-if "$replyToSMV" != "" ]; then
+if [ "$replyToSMV" != "" ]; then
   REPLYTO="-r $replyToSMV"
 fi
 
