@@ -1793,7 +1793,7 @@ fi
 
 REPLYTO=
 if [ "$replyToSMV" != "" ]; then
-  REPLYTO="-r $replyToSMV"
+  REPLYTO="-S replyto=\"$replyToSMV\""
 fi
 
 if [ "$mailTo" == "" ]; then
