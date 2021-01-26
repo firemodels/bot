@@ -1453,7 +1453,7 @@ fi
 if [ "$mailTo" == "" ]; then
   if [ "$mailToCFAST" != "" ]; then
     mailTo=$mailToCFAST
-  fi`
+  fi
 fi
 
 if [ "$mailTo" == "" ]; then
