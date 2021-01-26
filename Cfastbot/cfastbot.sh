@@ -133,9 +133,9 @@ run_auto()
 
    echo -e "CFASTbot run initiated." >> $MESSAGE_FILE
    if [ "$partial" == "" ]; then
-     cat $MESSAGE_FILE | mail -s "CFASTbot run initiated" $mailTo &> /dev/null
+     cat $MESSAGE_FILE | mail $REPLYTO -s "CFASTbot run initiated" $mailTo &> /dev/null
    else
-     cat $MESSAGE_FILE | mail -s "CFASTbot run initiated (skip matlab/doc stages)" $mailTo &> /dev/null
+     cat $MESSAGE_FILE | mail $REPLYTO -s "CFASTbot run initiated (skip matlab/doc stages)" $mailTo &> /dev/null
    fi
 }
 
@@ -155,7 +155,7 @@ check_time_limit()
 
       if [ $ELAPSED_TIME -gt $TIME_LIMIT ]
       then
-         echo -e "CFASTbot has been running for more than 3 hours in Stage ${TIME_LIMIT_STAGE}. \n\nPlease ensure that there are no problems. \n\nThis is a notification only and does not terminate CFASTbot." | mail -s "CFASTbot Notice: CFASTbot has been running for more than 3 hours." $mailTo &> /dev/null
+         echo -e "CFASTbot has been running for more than 3 hours in Stage ${TIME_LIMIT_STAGE}. \n\nPlease ensure that there are no problems. \n\nThis is a notification only and does not terminate CFASTbot." | mail $REPLYTO -s "CFASTbot Notice: CFASTbot has been running for more than 3 hours." $mailTo &> /dev/null
          TIME_LIMIT_EMAIL_NOTIFICATION="sent"
       fi
    fi
@@ -1291,33 +1291,33 @@ fi
    then
      cat $TIME_LOG >> $WARNING_LOG
      # Send email with failure message and warnings, body of email contains appropriate log file
-     cat $ERROR_LOG $TIME_LOG | mail -s "CFASTbot build failure and warnings on ${hostname}. Revision ${GIT_REVISION}." $mailTo &> /dev/null
-     cat $TIME_LOG | mail -s "CFASTbot build failure and warnings on ${hostname}. Revision ${GIT_REVISION}." $mailTo &> /dev/null
+     cat $ERROR_LOG $TIME_LOG | mail $REPLYTO -s "CFASTbot build failure and warnings on ${hostname}. Revision ${GIT_REVISION}." $mailTo &> /dev/null
+     cat $TIME_LOG | mail $REPLYTO -s "CFASTbot build failure and warnings on ${hostname}. Revision ${GIT_REVISION}." $mailTo &> /dev/null
 
    # Check for errors only
    elif [ -e $ERROR_LOG ]
    then
       # Send email with failure message, body of email contains error log file
-      cat $ERROR_LOG $TIME_LOG | mail -s "CFASTbot build failure on ${hostname}. Revision ${GIT_REVISION}." $mailTo &> /dev/null
-      cat $TIME_LOG | mail -s "CFASTbot build failure on ${hostname}. Revision ${GIT_REVISION}." $mailTo &> /dev/null
+      cat $ERROR_LOG $TIME_LOG | mail $REPLYTO -s "CFASTbot build failure on ${hostname}. Revision ${GIT_REVISION}." $mailTo &> /dev/null
+      cat $TIME_LOG | mail $REPLYTO -s "CFASTbot build failure on ${hostname}. Revision ${GIT_REVISION}." $mailTo &> /dev/null
 
    # Check for warnings only
    elif [ -e $WARNING_LOG ]
    then
       # Send email with success message, include warnings
-      cat $WARNING_LOG $TIME_LOG mail -s "CFASTbot build success with warnings on ${hostname}. Revision ${GIT_REVISION}." $mailTo &> /dev/null
-      cat $TIME_LOG mail -s "CFASTbot build success with warnings on ${hostname}. Revision ${GIT_REVISION}." $mailTo &> /dev/null
+      cat $WARNING_LOG $TIME_LOG | mail $REPLYTO -s "CFASTbot build success with warnings on ${hostname}. Revision ${GIT_REVISION}." $mailTo &> /dev/null
+      cat $TIME_LOG | mail $REPLYTO -s "CFASTbot build success with warnings on ${hostname}. Revision ${GIT_REVISION}." $mailTo &> /dev/null
 
    # No errors or warnings
    else
       # Send empty email with success message
-      cat $TIME_LOG | mail -s "CFASTbot build success on ${hostname}! Revision ${GIT_REVISION}." $mailTo &> /dev/null
+      cat $TIME_LOG | mail $REPLYTO -s "CFASTbot build success on ${hostname}! Revision ${GIT_REVISION}." $mailTo &> /dev/null
    fi
 
    # Send email notification if validation statistics have changed.
    if [ -e $VALIDATION_STATS_LOG ]
    then
-      mail -s "CFASTbot notice. Validation statistics have changed for Revision ${GIT_REVISION}." $mailTo < $VALIDATION_STATS_LOG &> /dev/null      
+      mail $REPLYTO -s "CFASTbot notice. Validation statistics have changed for Revision ${GIT_REVISION}." $mailTo < $VALIDATION_STATS_LOG &> /dev/null      
    fi
    if [[ "$UPLOADGUIDES" == "1" ]]; then
      if [ -e $UploadGuides ]; then
@@ -1441,14 +1441,25 @@ shift $(($OPTIND-1))
 
 echo $$ > $PID_FILE
 
-if [ "$mailTo" == "" ]; then
-  if [ -e $EMAIL_LIST ]; then
-    source $EMAIL_LIST
-  fi
+if [ -e $EMAIL_LIST ]; then
+  source $EMAIL_LIST
 fi
+
+REPLYTO=
+if [ "$replyToCFAST" != "" ]; then
+  REPLYTO="-S replyto=\"$replyToCFAST\""
+fi
+
+if [ "$mailTo" == "" ]; then
+  if [ "$mailToCFAST" != "" ]; then
+    mailTo=$mailToCFAST
+  fi`
+fi
+
 if [ "$mailTo" == "" ]; then
   mailTo=`git config user.email`
 fi
+
 if [ "$mailTo" == "" ]; then
   mailTo=`whoami`@`hostname`
 fi
