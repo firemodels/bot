@@ -152,8 +152,17 @@ rmdir /S /Q "%SMV6%"
 echo.
 echo *** Copying installation files to %INSTALLDIR%
 if NOT EXIST "%INSTALLDIR%" mkdir "%INSTALLDIR%" > Nul
-xcopy /E /I /H /Q firemodels\FDS6 "%FDS6%"     > Nul
-xcopy /E /I /H /Q firemodels\SMV6 "%SMV6%"     > Nul
+
+set "LOGFILE=%INSTALLDIR%\fds_install.log"
+echo FDS/Smokeview installation log         > "%LOGFILE%"
+
+echo.                                      >> "%LOGFILE%"
+echo *** Copying fds files                     >> "%LOGFILE%"
+xcopy /E /I /H /Q firemodels\FDS6 "%FDS6%" >> "%LOGFILE%"
+
+echo.                                      >> "%LOGFILE%"
+echo *** Copying smokeview files               >> "%LOGFILE%"
+xcopy /E /I /H /Q firemodels\SMV6 "%SMV6%" >> "%LOGFILE%"
 
 set "filepath=%FDS6%\bin\fds.exe%"
 call :is_file_copied fds.exe
@@ -167,15 +176,17 @@ call :is_file_copied mpiexec.exe
 echo        copy complete
 
 echo *** Removing previous FDS/Smokeview entries from the system and user path.
-call "%UNINSTALLDIR%\set_path.exe" -s -m -b -r "nist\fds" >Nul
-call "%UNINSTALLDIR%\set_path.exe" -u -m -b -r "FDS\FDS5" >Nul
-call "%UNINSTALLDIR%\set_path.exe" -s -m -b -r "FDS\FDS5" >Nul
-call "%UNINSTALLDIR%\set_path.exe" -u -m -b -r "FDS\FDS6" >Nul
-call "%UNINSTALLDIR%\set_path.exe" -s -m -b -r "FDS\FDS6" >Nul
-call "%UNINSTALLDIR%\set_path.exe" -s -m -b -r "firemodels\FDS6" >Nul
-call "%UNINSTALLDIR%\set_path.exe" -s -m -b -r "firemodels\SMV6" >Nul
-call "%UNINSTALLDIR%\set_path.exe" -u -m -b -r "firemodels\FDS6" >Nul
-call "%UNINSTALLDIR%\set_path.exe" -u -m -b -r "firemodels\SMV6" >Nul
+echo.                                                                           >> "%LOGFILE%"
+echo *** Removing previous FDS/Smokeview entries from the system and user path. >> "%LOGFILE%"
+call "%UNINSTALLDIR%\set_path.exe" -s -m -b -r "nist\fds"        >> "%LOGFILE%"
+call "%UNINSTALLDIR%\set_path.exe" -u -m -b -r "FDS\FDS5"        >> "%LOGFILE%"
+call "%UNINSTALLDIR%\set_path.exe" -s -m -b -r "FDS\FDS5"        >> "%LOGFILE%"
+call "%UNINSTALLDIR%\set_path.exe" -u -m -b -r "FDS\FDS6"        >> "%LOGFILE%"
+call "%UNINSTALLDIR%\set_path.exe" -s -m -b -r "FDS\FDS6"        >> "%LOGFILE%"
+call "%UNINSTALLDIR%\set_path.exe" -s -m -b -r "firemodels\FDS6" >> "%LOGFILE%"
+call "%UNINSTALLDIR%\set_path.exe" -s -m -b -r "firemodels\SMV6" >> "%LOGFILE%"
+call "%UNINSTALLDIR%\set_path.exe" -u -m -b -r "firemodels\FDS6" >> "%LOGFILE%"
+call "%UNINSTALLDIR%\set_path.exe" -u -m -b -r "firemodels\SMV6" >> "%LOGFILE%"
 
 :: ------------ create aliases ----------------
 
@@ -185,22 +196,26 @@ set numcoresfile="%TEMP%\numcoresfile"
 
 echo *** Setting up PATH variable.
 
+echo.                                                       >> "%LOGFILE%"
+echo *** Setting up PATH variable                           >> "%LOGFILE%"
 if NOT "%option_install%" == "1" goto skip_systempath
-  call "%UNINSTALLDIR%\set_path.exe" -s -m -f "%FDS6%\bin" > Nul
-  call "%UNINSTALLDIR%\set_path.exe" -s -m -f "%SMV6%"     > Nul
+  call "%UNINSTALLDIR%\set_path.exe" -s -m -f "%FDS6%\bin"  >> "%LOGFILE%"
+  call "%UNINSTALLDIR%\set_path.exe" -s -m -f "%SMV6%"      >> "%LOGFILE%"
   goto after_setpath
 :skip_systempath
 
-call "%UNINSTALLDIR%\set_path.exe" -u -m -f "%FDS6%\bin" > Nul
-call "%UNINSTALLDIR%\set_path.exe" -u -m -f "%SMV6%"     > Nul
+call "%UNINSTALLDIR%\set_path.exe" -u -m -f "%FDS6%\bin" >> "%LOGFILE%"
+call "%UNINSTALLDIR%\set_path.exe" -u -m -f "%SMV6%"      >> "%LOGFILE%"
 
 :after_setpath
 
 :: ------------- file association -------------
 echo *** Associating the .smv file extension with smokeview.exe
 
-ftype smvDoc="%SMV6%\smokeview.exe" "%%1" >Nul
-assoc .smv=smvDoc>Nul
+echo.                                                           >> "%LOGFILE%"
+echo *** Associating the .smv file extension with smokeview.exe >> "%LOGFILE%"
+ftype smvDoc="%SMV6%\smokeview.exe" "%%1"                       >> "%LOGFILE%"
+assoc .smv=smvDoc                                               >> "%LOGFILE%"
 
 set FDSSTART=%ALLUSERSPROFILE%\Start Menu\Programs\FDS6
 
@@ -210,24 +225,26 @@ if exist "%FDSSTART%" rmdir /q /s "%FDSSTART%"
 
 mkdir "%FDSSTART%"
 
-copy "%DOCDIR%\FDS_on_the_Web\Official_Web_Site.url"     "%FDSSTART%\FDS Home Page.url"         > Nul
+echo.                              >> "%LOGFILE%"
+echo *** Setting up shortcuts/urls >> "%LOGFILE%"
+call :copy_url "%DOCDIR%\FDS_on_the_Web\Official_Web_Site.url"     "%FDSSTART%\FDS Home Page.url"
 
 mkdir "%FDSSTART%\Guides and Release Notes"
-"%FDS6%\shortcut.exe" /F:"%FDSSTART%\Guides and Release Notes\FDS Config Management Plan.lnk"          /T:"%DOCDIR%\Guides_and_Release_Notes\FDS_Config_Management_Plan.pdf"    /A:C >NUL
-"%FDS6%\shortcut.exe" /F:"%FDSSTART%\Guides and Release Notes\FDS User Guide.lnk"                      /T:"%DOCDIR%\Guides_and_Release_Notes\FDS_User_Guide.pdf"                /A:C >NUL
-"%FDS6%\shortcut.exe" /F:"%FDSSTART%\Guides and Release Notes\FDS Technical Reference Guide.lnk"       /T:"%DOCDIR%\Guides_and_Release_Notes\FDS_Technical_Reference_Guide.pdf" /A:C >NUL
-"%FDS6%\shortcut.exe" /F:"%FDSSTART%\Guides and Release Notes\FDS Validation Guide.lnk"                /T:"%DOCDIR%\Guides_and_Release_Notes\FDS_Validation_Guide.pdf"          /A:C >NUL
-"%FDS6%\shortcut.exe" /F:"%FDSSTART%\Guides and Release Notes\FDS Verification Guide.lnk"              /T:"%DOCDIR%\Guides_and_Release_Notes\FDS_Verification_Guide.pdf"        /A:C >NUL
-"%FDS6%\shortcut.exe" /F:"%FDSSTART%\Guides and Release Notes\FDS Release Notes.lnk"                   /T:"%DOCDIR%\Guides_and_Release_Notes\FDS_Release_Notes.htm"             /A:C >NUL
-"%FDS6%\shortcut.exe" /F:"%FDSSTART%\Guides and Release Notes\Smokeview User Guide.lnk"                /T:"%DOCDIR%\Guides_and_Release_Notes\SMV_User_Guide.pdf"                /A:C >NUL
-"%FDS6%\shortcut.exe" /F:"%FDSSTART%\Guides and Release Notes\Smokeview Technical Reference Guide.lnk" /T:"%DOCDIR%\Guides_and_Release_Notes\SMV_Technical_Reference_Guide.pdf" /A:C >NUL
-"%FDS6%\shortcut.exe" /F:"%FDSSTART%\Guides and Release Notes\Smokeview Verification Guide.lnk"        /T:"%DOCDIR%\Guides_and_Release_Notes\SMV_Verification_Guide.pdf"        /A:C >NUL
-"%FDS6%\shortcut.exe" /F:"%FDSSTART%\Guides and Release Notes\Smokeview release notes.lnk"             /T:"%DOCDIR%\Guides_and_Release_Notes\Smokeview_release_notes.html"      /A:C >NUL
+call :setup_shortcut "%FDSSTART%\Guides and Release Notes\FDS Config Management Plan.lnk"          "%DOCDIR%\Guides_and_Release_Notes\FDS_Config_Management_Plan.pdf"
+call :setup_shortcut "%FDSSTART%\Guides and Release Notes\FDS User Guide.lnk"                      "%DOCDIR%\Guides_and_Release_Notes\FDS_User_Guide.pdf"
+call :setup_shortcut "%FDSSTART%\Guides and Release Notes\FDS Technical Reference Guide.lnk"       "%DOCDIR%\Guides_and_Release_Notes\FDS_Technical_Reference_Guide.pdf"
+call :setup_shortcut "%FDSSTART%\Guides and Release Notes\FDS Validation Guide.lnk"                "%DOCDIR%\Guides_and_Release_Notes\FDS_Validation_Guide.pdf"  
+call :setup_shortcut "%FDSSTART%\Guides and Release Notes\FDS Verification Guide.lnk"              "%DOCDIR%\Guides_and_Release_Notes\FDS_Verification_Guide.pdf"
+call :setup_shortcut "%FDSSTART%\Guides and Release Notes\FDS Release Notes.lnk"                   "%DOCDIR%\Guides_and_Release_Notes\FDS_Release_Notes.htm"
+call :setup_shortcut "%FDSSTART%\Guides and Release Notes\Smokeview User Guide.lnk"                "%DOCDIR%\Guides_and_Release_Notes\SMV_User_Guide.pdf"
+call :setup_shortcut "%FDSSTART%\Guides and Release Notes\Smokeview Technical Reference Guide.lnk" "%DOCDIR%\Guides_and_Release_Notes\SMV_Technical_Reference_Guide.pdf"
+call :setup_shortcut "%FDSSTART%\Guides and Release Notes\Smokeview Verification Guide.lnk"        "%DOCDIR%\Guides_and_Release_Notes\SMV_Verification_Guide.pdf"
+call :setup_shortcut "%FDSSTART%\Guides and Release Notes\Smokeview release notes.lnk"             "%DOCDIR%\Guides_and_Release_Notes\Smokeview_release_notes.html"
+call :setup_shortcut "%FDSSTART%\Uninstall.lnk"                                                    "%UNINSTALLDIR%\uninstall.bat"
 
-"%FDS6%\shortcut.exe" /F:"%FDSSTART%\Uninstall.lnk"  /T:"%UNINSTALLDIR%\uninstall.bat" /A:C >NUL
 
-"%FDS6%\shortcut.exe" /F:"%FDSSTART%\CMDfds.lnk"             /T:"%COMSPEC%" /P:"/k fdsinit" /W:"%userprofile%" /A:C >NUL
-"%FDS6%\shortcut.exe" /F:"%userprofile%\Desktop\CMDfds.lnk"  /T:"%COMSPEC%" /P:"/k fdsinit" /W:"%userprofile%" /A:C >NUL
+call :setup_cmdfds "%FDSSTART%\CMDfds.lnk"
+call :setup_cmdfds "%userprofile%\Desktop\CMDfds.lnk"
 
 :: ----------- setting up openmp threads environment variable
 
@@ -243,21 +260,32 @@ if %ncores% GEQ 8 (
     set nthreads=1 
   )
 )
-setx -m OMP_NUM_THREADS %nthreads% > Nul
+
+echo.                                            >> "%LOGFILE%"
+echo *** Setting up the OMP_NUM_THREADS variable >> "%LOGFILE%"
+setx -m OMP_NUM_THREADS %nthreads%               >> "%LOGFILE%"
 
 :: ----------- setting up firewall for mpi version of FDS
 
 :: remove smpd and hydra
 
-smpd -remove 1>> Nul 2>&1
+echo.                   >> "%LOGFILE%"
+echo *** Removing smpd  >> "%LOGFILE%"
+smpd -remove          1>> Nul 2>&1
+echo.                   >> "%LOGFILE%"
+echo *** Removing hydra >> "%LOGFILE%"
 hydra_service -remove 1>> Nul 2>&1
 
-set "firewall_setup=%FDS6%\setup_fds_firewall.bat"
+echo.                                    >> "%LOGFILE%"
+echo *** Setting up firewall exceptions. >> "%LOGFILE%"
 echo *** Setting up firewall exceptions.
+set "firewall_setup=%FDS6%\setup_fds_firewall.bat"
 call "%firewall_setup%" "%FDS6%\bin\mpi"
 
 :: ----------- setting up uninstall file
 
+echo.                                     >> "%LOGFILE%"
+echo *** Setting up the Uninstall script. >> "%LOGFILE%"
 echo *** Setting up the Uninstall script.
 
 :: remove smokeview path and directory
@@ -307,8 +335,10 @@ echo Set objWshProcessEnv = objWshShell.Environment("PROCESS")             >> "%
 echo objShell.ShellExecute "%ELEVATE_APP%", "%ELEVATE_PARMS%", "", "runas" >> "%UNINSTALLDIR%\uninstall.vbs"
 echo WScript.Sleep 10000                                                   >> "%UNINSTALLDIR%\uninstall.vbs"
 
-erase "%firewall_setup%"               > Nul
-erase "%FDS6%\shortcut.exe"            > Nul
+echo.                                  >> "%LOGFILE%"
+echo *** Cleanup                       >> "%LOGFILE%"
+erase "%firewall_setup%"               >> "%LOGFILE%"
+erase "%FDS6%\shortcut.exe"            >> "%LOGFILE%"
 
 echo.
 echo To run fds for cases using this computer only, open the
@@ -334,6 +364,41 @@ goto eof
   if not exist "%filepath%" echo.
   if not exist "%filepath%" echo ***error: %file% failed to copy to %filepath%
   exit /b 0
+
+:-------------------------------------------------------------------------
+:setup_cmdfds
+:-------------------------------------------------------------------------
+set outfile=%1
+
+"%FDS6%\shortcut.exe" /F:%outfile% /T:"%COMSPEC%"   /P:"/k fdsinit" /W:"%userprofile%" /A:C > Nul
+if     exist %outfile% echo The shortcut %outfile% was created                    >> "%LOGFILE%
+if NOT exist %outfile% echo ***error: The shortcut %outfile% failed to be created >> "%LOGFILE%
+
+exit /b
+
+:-------------------------------------------------------------------------
+:setup_shortcut
+:-------------------------------------------------------------------------
+set infile=%2
+set outfile=%1
+
+"%FDS6%\shortcut.exe" /F:%outfile% /T:%infile%    /A:C  > Nul
+if     exist %outfile% echo The shortcut %outfile% was created                    >> "%LOGFILE%
+if NOT exist %outfile% echo ***error: The shortcut %outfile% failed to be created >> "%LOGFILE%
+
+exit /b
+
+:-------------------------------------------------------------------------
+:copy_url
+:-------------------------------------------------------------------------
+set infile=%1
+set outfile=%2
+
+copy %infile% %outfile%  
+if     exist %outfile% echo The url %outfile% was created                    >> "%LOGFILE%
+if NOT exist %outfile% echo ***error: The url %outfile% failed to be created >> "%LOGFILE%
+
+exit /b
 
 :-------------------------------------------------------------------------
 :get_yesnoextract
