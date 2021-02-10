@@ -129,15 +129,16 @@ function install_smv(args){
 </tr>
 <tr>
 <th rowspan=2>Windows</th><th rowspan=2>Linux</th><th colspan=2>OSX</th></tr>
-<tr><th>X11</th><th>Apple</th></tr>
+<tr><th>Apple</th><th>X11</th></tr>
 
 <tr>
 <td align=center>
 <button onclick="build_libs('windows')">Build</button>
 </td>
 <td align=center><button onclick="build_libs('linux')">Build</button></td>
+<td align=center><button onclick="build_libs('osx')">Build</button></td>
 <td align=center><button onclick="build_libs('osxquartz')">Build</button></td>
-<td align=center><button onclick="build_libs('osx')">Build</butt</tr>
+</tr>
 </table>
 
 
@@ -236,7 +237,7 @@ function install_smv(args){
 <tr><th colspan=4>Smokeview Test</th></tr>
 
 <tr><th rowspan=2>Windows</th><th rowspan=2>Linux</th><th colspan=2>OSX</th></tr>
-<tr><th>X11</th><th>Apple</th></tr>
+<tr><th>Apple</th><th>X11</th></tr>
 <tr>
 <td align=center>
 <button onclick="build_smv('windows test')">Build</button><br>
@@ -244,8 +245,8 @@ function install_smv(args){
 <td align=center>
 <button onclick="build_smv('linux test')">Build</button>
 </td>
-<td align=center><button onclick="build_smv('osxquartz test')">Build</button></td>
 <td align=center><button onclick="build_smv('osx test')">Build</button></td>
+<td align=center><button onclick="build_smv('osxquartz test')">Build</button></td>
 </tr>
 
 <tr>
@@ -278,13 +279,13 @@ function install_smv(args){
 <tr><th colspan=4>Smokeview Release</th></tr>
 
 <tr><th rowspan=2>Windows</th><th rowspan=2>Linux</th><th colspan=2>OSX</th></tr>
-<tr><th>X11</th><th>Apple</th></tr>
+<tr><th>Apple</th><th>X11</th></tr>
 
 <tr>
 <td align=center><button onclick="build_smv('windows release')">Build</button></td>
 <td align=center><button onclick="build_smv('linux release')">Build</button></td>
-<td align=center><button onclick="build_smv('osxquartz release')">Build</button></td>
 <td align=center><button onclick="build_smv('osx release')">Build</button></td>
+<td align=center><button onclick="build_smv('osxquartz release')">Build</button></td>
 </tr>
 
 <tr>
