@@ -2581,6 +2581,15 @@ if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
         sed "s/&&SMV_BUILD&&/$SMV_REVISION/g"   > $FDS_SUMMARY_DIR/diffs/index.html
         cat $FDS_SUMMARY_DIR/diff_trailer.html >> $FDS_SUMMARY_DIR/diffs/index.html
 
+        if [[ `grep 'warning' $OUTPUT_DIR/stage8_image_compare` == "" ]]
+        then
+      # Continue along
+          :
+        else
+          echo "Warnings from Stage 8 - Image comparisons:" >> $WARNING_LOG
+          grep 'warning' $OUTPUT_DIR/stage8_image_compare   >> $WARNING_LOG
+        fi
+
         if [ "$WEB_DIR" != "" ]; then
           if [ -d $WEB_DIR ]; then
             CUR_DIR=`pwd`

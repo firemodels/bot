@@ -3,6 +3,8 @@ BASE_DIR=$1
 NEW_DIR=$2
 DIFF_DIR=$3
 
+TOLERANCE=0.2
+
 CURDIR=`pwd`
 if [ "$BASE_DIR" == "" ]; then
   BASE_DIR=../../fig/compare//firebot/images/
@@ -60,7 +62,8 @@ if [ "$ABORT" != "" ]; then
 fi
 
 SUBDIR=user
-echo comparing images in directories $BASE_DIR/$SUBDIR and $NEW_DIR/$SUBDIR
+echo ""
+echo Comparing images in directories $BASE_DIR/$SUBDIR and $NEW_DIR/$SUBDIR
 for f in $BASE_DIR/$SUBDIR/*.png; do
   base=`basename $f`
   from_file=$BASE_DIR/$SUBDIR/$base
@@ -69,14 +72,20 @@ for f in $BASE_DIR/$SUBDIR/*.png; do
   rm -f $diff_file
   if [ -e $from_file ]; then
     if [ -e $to_file ]; then
-#      compare -metric AE -fuzz 5% $from_file $to_file $diff_file >& /dev/null
-      compare $from_file $to_file $diff_file
+      diff=`compare -metric rmse $from_file $to_file $diff_file |& awk -F'('  '{printf $2}' | awk -F')' '{printf $1}i'`
+      if [[ "$diff" != "0" ]] && [[ ! $diff == *"e"* ]]; then
+        iftest=`echo "${diff} > ${TOLERANCE}" | bc`
+        if [ 1 -eq $iftest ]; then
+          echo "***warning: image $base has changedi. rmse=$diff > $TOLERANCE"
+        fi
+      fi
     fi
   fi
 done
 
 SUBDIR=verification
-echo comparing images in directories $BASE_DIR/$SUBDIR and $NEW_DIR/$SUBDIR
+echo ""
+echo Comparing images in directories $BASE_DIR/$SUBDIR and $NEW_DIR/$SUBDIR
 for f in $BASE_DIR/$SUBDIR/*.png; do
   base=`basename $f`
   from_file=$BASE_DIR/$SUBDIR/$base
@@ -85,8 +94,13 @@ for f in $BASE_DIR/$SUBDIR/*.png; do
   rm -f $diff_file
   if [ -e $from_file ]; then
     if [ -e $to_file ]; then
-#      compare -metric AE -fuzz 5% $from_file $to_file $diff_file >& /dev/null
-      compare $from_file $to_file $diff_file
+      diff=`compare -metric rmse $from_file $to_file $diff_file |& awk -F'('  '{printf $2}' | awk -F')' '{printf $1}i'`
+      if [[ "$diff" != "0" ]] && [[ ! $diff == *"e"* ]]; then
+        iftest=`echo "${diff} > ${TOLERANCE}" | bc`
+        if [ 1 -eq $iftest ]; then
+          echo "***warning: image $base has changedi. rmse=$diff > $TOLERANCE"
+        fi
+      fi
     fi
   fi
 done
