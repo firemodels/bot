@@ -363,53 +363,6 @@ archive_compiler_version()
 }
 
 #---------------------------------------------
-#                   build_inspect_fds
-#---------------------------------------------
-
-build_inspect_fds()
-{
-   # build an openmp thread checker version of fds
-   echo "      inspection"
-   cd $fdsrepo/Build/${INTEL}mpi_intel_linux_64_inspect
-   make -f ../makefile clean &> /dev/null
-   ./make_fds.sh &> $OUTPUT_DIR/stage2a
-}
-
-#---------------------------------------------
-#                   inspect_fds
-#---------------------------------------------
-
-inspect_fds()
-{
-   # Perform OpenMP thread checking (locate deadlocks and data races)
-   echo "      inspection"
-   cd $fdsrepo/Verification/Thread_Check/
-   ./inspect_openmp.sh -I thread_check.fds &> $OUTPUT_DIR/stage2a
-}
-
-#---------------------------------------------
-#                   check_inspect_fds
-#---------------------------------------------
-
-check_inspect_fds()
-{
-
-   # grep -v 'Warning: One or more threads in the application accessed ...' ignores a known compiler warning that displays even without errors
-      if [[ `grep -i -E 'warning|remark|problem|error' $fdsrepo/Verification/Thread_Check/race_test_4.err | grep -v '0 new problem(s) found' | grep -v 'Warning: One or more threads in the application accessed the stack of another thread'` == "" ]]
-   then
-      # Continue along
-      :
-   else
-      echo "Errors from Stage 2a - Compile and inspect FDS debug:" >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage2a >> $ERROR_LOG
-      echo "" >> $ERROR_LOG
-      echo "For more details, cd to Verification/Thread_Check and view results in the " >> $ERROR_LOG
-      echo "inspect_results directory after running the inspect_report.sh script." >> $ERROR_LOG
-      echo "" >> $ERROR_LOG
-   fi
-}
-
-#---------------------------------------------
 #                   compile_fds_mpi_db
 #---------------------------------------------
 
@@ -891,16 +844,6 @@ run_VV_cases_release()
    # Wait for benchmark verification cases to end
 # let benchmark and regular cases run at the same time - for now
 #   wait_cases_release_end verification stage5
-
-# comment out thread checking cases for now   
-#   echo 'Running FDS thread checking verification cases:' >> $OUTPUT_DIR/stage5
-   if [[ "$SKIPINSPECT" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-     touch $OUTPUT_DIR/stage5i
-     cd $fdsrepo/Verification/Thread_Check
-     echo ./inspection.sh -p 6 -q $QUEUE  inspector_test.fds     >> $OUTPUT_DIR/stage5i 2>&1
-#        ./inspection.sh -p 6 -q $QUEUE  inspector_test.fds      >> $OUTPUT_DIR/stage5i 2>&1
-     echo ""                                                     >> $OUTPUT_DIR/stage5i 2>&1
-   fi
 
    if [[ "$CHECK_CLUSTER" == "" ]]; then
      cd $fdsrepo/Verification/scripts
@@ -1923,7 +1866,6 @@ FORCECLONE=
 
 SKIPMATLAB=
 SKIPPICTURES=
-SKIPINSPECT=
 SKIPRELEASE=
 SUBSET_CASES=
 FDS_TAG=
@@ -1952,7 +1894,6 @@ case $OPTION in
    ;;
   d)
    SKIPRELEASE=1
-   SKIPINSPECT=1
    SKIPMATLAB=1
    SKIPPICTURES=1
    ;;
@@ -1984,7 +1925,6 @@ case $OPTION in
    ;;
   S)
    SUBSET_CASES="-S"
-   SKIPINSPECT=1
    SKIPMATLAB=1
    SKIPPICTURES=1
    ;;
@@ -2229,9 +2169,6 @@ if [ "$IFORT_VERSION" != "" ]; then
   echo "      Fortran: $IFORT_VERSION"
 fi
 
-if [ "$SKIPINSPECT" != "" ]; then
-  echo "     Skipping: thread checking stage"
-fi
 if [ "$SUBSET_CASES" != "" ]; then
   echo "      Running: subset of cases"
 fi
@@ -2395,13 +2332,6 @@ archive_compiler_version
 if [ "$MANUALS_MATLAB_ONLY" == "" ]; then
   echo Building
   echo "   FDS"
-fi
-# if something goes wrong with the openmp inspector
-# comment the following 6 lines (including 'if' and and 'fi'  lines
-if [[ "$SKIPINSPECT" == "" ]] && [[ "$platform" == "linux" ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-  build_inspect_fds
-#  inspect_fds
-#  check_inspect_fds
 fi
 
 ###****** Stage 2b ###
