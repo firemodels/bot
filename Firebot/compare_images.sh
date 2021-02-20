@@ -3,7 +3,12 @@ BASE_DIR=$1
 NEW_DIR=$2
 DIFF_DIR=$3
 
+METRIC=rmse
+HAVE_USER_DIFFS=
+HAVE_VER_DIFFS=
+
 TOLERANCE=0.2
+HEIGHT=300
 
 CURDIR=`pwd`
 if [ "$BASE_DIR" == "" ]; then
@@ -24,6 +29,12 @@ if [ "$DIFF_DIR" == "" ]; then
   DIFF_DIR=`pwd`
   cd $CURDIR
 fi
+SUMMARY_DIR=../../fds/Manuals/FDS_Summary/
+cd $SUMMARY_DIR
+SUMMARY_DIR=`pwd`
+cd $CURDIR
+
+HTML_DIFF=$SUMMARY_DIR/fds_diffs.html
 
 CHECK_DIR ()
 {
@@ -61,47 +72,140 @@ if [ "$ABORT" != "" ]; then
   exit
 fi
 
+#*** generate user guide differences
+
 SUBDIR=user
 echo ""
-echo Comparing images in directories $BASE_DIR/$SUBDIR and $NEW_DIR/$SUBDIR
+echo Comparing images in directories:
+echo "  $BASE_DIR/$SUBDIR "
+echo "  $NEW_DIR/$SUBDIR"
+echo ""
 for f in $BASE_DIR/$SUBDIR/*.png; do
   base=`basename $f`
   from_file=$BASE_DIR/$SUBDIR/$base
   to_file=$NEW_DIR/$SUBDIR/$base
   diff_file=$DIFF_DIR/$SUBDIR/$base
+  diff_file_changed=$DIFF_DIR/$SUBDIR/$base.changed
   rm -f $diff_file
-  if [ -e $from_file ]; then
-    if [ -e $to_file ]; then
-      diff=`compare -metric rmse $from_file $to_file $diff_file |& awk -F'('  '{printf $2}' | awk -F')' '{printf $1}i'`
-      if [[ "$diff" != "0" ]] && [[ ! $diff == *"e"* ]]; then
-        iftest=`echo "${diff} > ${TOLERANCE}" | bc`
-        if [ 1 -eq $iftest ]; then
-          echo "***warning: image $base has changedi. rmse=$diff > $TOLERANCE"
-        fi
+  rm -f $diff_file_changed
+  if [[ -e $from_file ]] && [[ -e $to_file ]]; then
+    diff=`compare -metric $METRIC $from_file $to_file $diff_file |& awk -F'('  '{printf $2}' | awk -F')' '{printf $1}i'`
+    if [[ "$diff" != "0" ]] && [[ ! $diff == *"e"* ]]; then
+      iftest=`echo "${diff} > ${TOLERANCE}" | bc`
+      if [ 1 -eq $iftest ]; then
+        echo "***warning: image $base has changedi. error criteria=$diff > $TOLERANCE"
+        touch $diff_file_changed
+        HAVE_USER_DIFFS=1
       fi
     fi
   fi
 done
 
+#*** generate verificaiton guide differences
+
 SUBDIR=verification
 echo ""
-echo Comparing images in directories $BASE_DIR/$SUBDIR and $NEW_DIR/$SUBDIR
+echo Comparing images in directories:
+echo "  $BASE_DIR/$SUBDIR "
+echo "  $NEW_DIR/$SUBDIR"
+echo ""
 for f in $BASE_DIR/$SUBDIR/*.png; do
   base=`basename $f`
   from_file=$BASE_DIR/$SUBDIR/$base
   to_file=$NEW_DIR/$SUBDIR/$base
   diff_file=$DIFF_DIR/$SUBDIR/$base
+  diff_file_changed=$DIFF_DIR/$SUBDIR/$base.changed
   rm -f $diff_file
-  if [ -e $from_file ]; then
-    if [ -e $to_file ]; then
-      diff=`compare -metric rmse $from_file $to_file $diff_file |& awk -F'('  '{printf $2}' | awk -F')' '{printf $1}i'`
-      if [[ "$diff" != "0" ]] && [[ ! $diff == *"e"* ]]; then
-        iftest=`echo "${diff} > ${TOLERANCE}" | bc`
-        if [ 1 -eq $iftest ]; then
-          echo "***warning: image $base has changedi. rmse=$diff > $TOLERANCE"
-        fi
+  rm -f $diff_file_changed
+  if [[ -e $from_file ]] && [[ -e $to_file ]]; then
+    diff=`compare -metric $METRIC $from_file $to_file $diff_file |& awk -F'('  '{printf $2}' | awk -F')' '{printf $1}i'`
+    if [[ "$diff" != "0" ]] && [[ ! $diff == *"e"* ]]; then
+      iftest=`echo "${diff} > ${TOLERANCE}" | bc`
+      if [ 1 -eq $iftest ]; then
+        echo "***warning: image $base has changedi. error criteria=$diff > $TOLERANCE"
+        touch $diff_file_changed
+        HAVE_VER_DIFFS=1
       fi
     fi
   fi
 done
-echo complete
+
+HAVE_DIFFS=
+if [ "$HAVE_USER_DIFFS" != "" ]; then
+  HAVE_DIFFS=1
+fi
+if [ "$HAVE_VER_DIFFS" != "" ]; then
+  HAVE_DIFFS=1
+fi
+
+HMTL_DIFF=$SUMMARY_DIR/fds_diffs.html
+
+#*** output html header
+
+if [ "$HAVE_DIFFS" != "" ]; then
+  cat $SUMMARY_DIR/diff_header.html   > $HTML_DIFF
+fi
+
+#*** output User guide image differences
+
+if [ "$HAVE_USER_DIFFS" ]; then
+  SUBDIR=user
+  cat << EOF >> $HTML_DIFF
+<h2>FDS User Guide Image Differences<h2>
+<table border=on>
+<tr><th rowspan=2>File Name</th><th colspan=3 align=center>Images</th></tr>
+<th>Base</th><th>Current</th><th>Difference</th></tr>
+EOF
+  for f in `ls $DIFF_DIR/$SUBDIR/*.changed`; do
+    pngfile=`basename $f .changed`
+    cp $BASE_DIR/$SUBDIR/$pngfile $SUMMARY_DIR/diffs/base/$SUBDIR/.
+cat << EOF >> $HTML_DIFF
+<tr>
+<th>$pngfile:</th>
+<td><img height=$HEIGHT src=diffs/base/$SUBDIR/$pngfile></td>
+<td><img height=$HEIGHT src=images/$SUBDIR/$pngfile></td>
+<td><img height=$HEIGHT src=diffs/images/$SUBDIR/$pngfile></td>
+</tr>
+EOF
+  done
+cat << EOF >> $HTML_DIFF
+</table>
+EOF
+fi
+
+#*** output Verification guide image differences
+
+if [ "$HAVE_VER_DIFFS" ]; then
+  SUBDIR=verification
+  cat << EOF >> $HTML_DIFF
+<h2>FDS Verification Guide Image Differences<h2>
+<table border=on>
+<tr><th rowspan=2>File Name</th><th colspan=3 align=center>Images</th></tr>
+<th>Base</th><th>Current</th><th>Difference</th></tr>
+EOF
+  for f in `ls $DIFF_DIR/$SUBDIR/*.changed`; do
+    pngfile=`basename $f .changed`
+    cp $BASE_DIR/$SUBDIR/$pngfile $SUMMARY_DIR/diffs/base/$SUBDIR/.
+cat << EOF >> $HTML_DIFF
+<tr>
+<th>$pngfile:</th>
+<td><img height=$HEIGHT src=diffs/base/$SUBDIR/$pngfile></td>
+<td><img height=$HEIGHT src=images/$SUBDIR/$pngfile></td>
+<td><img height=$HEIGHT src=diffs/images/$SUBDIR/$pngfile></td>
+</tr>
+EOF
+  done
+cat << EOF >> $HTML_DIFF
+</table>
+EOF
+fi
+
+if [ "$HAVE_DIFFS" != "" ]; then
+  cat $SUMMARY_DIR/diff_trailer.html   >> $HTML_DIFF
+fi
+
+if [ "$HAVE_DIFFS" == "" ]; then
+  echo no images have changed
+else
+  echo changed images in $HTML_DIFF
+fi
