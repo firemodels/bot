@@ -41,8 +41,11 @@ HTML_DIFF=$SUMMARY_DIR/diffs/index.html
 
 #*** setup revision strings
 
-cd ../../fds
+cd $CURDIR/../../fds
 FDS_REVISION=`git describe --long --dirty`
+
+cd $CURDIR/../../fig
+FIG_REVISION=`git describe --long --dirty`
 
 cd $CURDIR/../../smv
 SMV_REVISION=`git describe --long --dirty`
@@ -109,7 +112,11 @@ for f in $BASE_DIR/$SUBDIR/*.png; do
     fi
   fi
 done
-echo $DIFFS
+if [ "$SUBDIR" == "user" ]; then
+  HAVE_USER_DIFFS=$DIFFS
+else
+  HAVE_VER_DIFFS=$DIFFS
+fi
 }
 
 #---------------------------------------------------------
@@ -122,14 +129,22 @@ SUBDIR=$1
 GUIDE=$2
 OPTION=$3
 
+TITLE="FDS $GUIDE Guide"
+
   cat << EOF >> $HTML_DIFF
-<h2>FDS $GUIDE Guide Image Differences</h2>
+<h3>$TITLE</h3>
 EOF
+
+DIFF_TITLE=
+if [ "$OPTION" != "all" ]; then
+DIFF_TITLE="<th>Difference</th>"
+fi
+echo DIFF_TITLE=$DIFF_TITLE
 
   cat << EOF >> $HTML_DIFF
 <table border=on>
-<tr><th>File Name</th>
-<th>Base</th><th>Current</th><th>Difference</th></tr>
+<tr><th>File Name<br>Error</th>
+<th>$FIG_REVISION</th><th>$FDS_REVISION</th>$DIFF_TITLE</tr>
 EOF
   for f in `ls $DIFF_DIR/$SUBDIR/*.png`; do
     base=`basename $f .png`
@@ -140,6 +155,7 @@ EOF
     if [[ ! -e $DIFF_DIR/$SUBDIR/$changefile ]] && [[ "$OPTION" != "all" ]]; then
       continue;
     fi
+    METRIC=`cat $DIFF_DIR/$SUBDIR/$metricfile`
     cp $BASE_DIR/$SUBDIR/$pngfile $SUMMARY_DIR/diffs/base/$SUBDIR/.
     IMAGE_HEIGHT=`identify -format '%h' $BASE_DIR/$SUBDIR/$pngfile`
     IMAGE_WIDTH=`identify -format '%w' $BASE_DIR/$SUBDIR/$pngfile`
@@ -148,24 +164,20 @@ EOF
     else
       SIZE="width=$WIDTH"
     fi
+
 cat << EOF >> $HTML_DIFF
 <tr>
-<th>$pngfile:</th>
+<th>$pngfile<br>$METRIC</th>
 <td><img $SIZE src=base/$SUBDIR/$pngfile></td>
 <td><img $SIZE src=../images/$SUBDIR/$pngfile></td>
 EOF
-METRIC=`cat $DIFF_DIR/$SUBDIR/$metricfile`
-if [ -e $DIFF_DIR/$SUBDIR/$changefile ]; then
+if [[ "$OPTION" != "all" ]] && [[ -e $DIFF_DIR/$SUBDIR/$changefile ]]; then
 cat << EOF >> $HTML_DIFF
-<td align=center><img $SIZE src=images/$SUBDIR/$pngfile><br>$METRIC </td>
-</tr>
-EOF
-else
-cat << EOF >> $HTML_DIFF
-<td align=center>$METRIC</td>
+<td align=center><img $SIZE src=images/$SUBDIR/$pngfile></td>
 </tr>
 EOF
 fi
+
   done
 cat << EOF >> $HTML_DIFF
 </table>
@@ -194,11 +206,11 @@ fi
 
 #*** generate user guide differences
 
-HAVE_USER_DIFFS=`FIND_DIFFS user`
+FIND_DIFFS user
 
 #*** generate verificaiton guide differences
 
-HAVE_VER_DIFFS=`FIND_DIFFS verification`
+FIND_DIFFS verification
 
 HAVE_DIFFS=
 if [ "$HAVE_USER_DIFFS" != "" ]; then
@@ -214,10 +226,10 @@ DATE=`date`
 cat << EOF  > $HTML_DIFF
 <html>
 <head>
-<TITLE>FDS Image Differences</TITLE>
+<TITLE>FDS User/Verificaiton Guide Images</TITLE>
 </HEAD>
 <BODY BGCOLOR="#FFFFFF" >
-<h2>FDS Image Differences - $DATE</h2>
+<h2>FDS User/Verification Guide Images - $DATE</h2>
 <h3>
 FDS revision: $FDS_REVISION<br>
 SMV revision: $SMV_REVISION<br>
@@ -231,16 +243,25 @@ EOF
 
 #*** output differences if any
 
+if [ "$HAVE_DIFFS" == "1" ]; then
+cat << EOF  >> $HTML_DIFF
+<h2>Differences</h2>
+EOF
+
 if [ "$HAVE_USER_DIFFS" == "1" ]; then
   OUTPUT_HTML user User diffs
 fi
 if [ "$HAVE_VER_DIFFS" == "1" ]; then
   OUTPUT_HTML verification Verification diffs
 fi
+fi
 
 
 #*** output all images
 
+cat << EOF  >> $HTML_DIFF
+<h2>Images</h2>
+EOF
 OUTPUT_HTML user User all
 OUTPUT_HTML verification Verification all
 
@@ -251,3 +272,4 @@ if [ "$HAVE_DIFFS" == "" ]; then
 else
   echo changed images in $HTML_DIFF
 fi
+
