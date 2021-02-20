@@ -9,6 +9,8 @@ HAVE_VER_DIFFS=
 
 TOLERANCE=0.2
 HEIGHT=300
+WIDTH=300
+
 
 CURDIR=`pwd`
 if [ "$BASE_DIR" == "" ]; then
@@ -32,6 +34,14 @@ fi
 SUMMARY_DIR=../../fds/Manuals/FDS_Summary/
 cd $SUMMARY_DIR
 SUMMARY_DIR=`pwd`
+cd $CURDIR
+
+cd ../../fds
+FDS_REVISION=`git describe --long --dirty`
+
+cd $CURDIR/../../smv
+SMV_REVISION=`git describe --long --dirty`
+
 cd $CURDIR
 
 HTML_DIFF=$SUMMARY_DIR/diffs/index.html
@@ -67,7 +77,7 @@ if [ $notfound -ne 0 ]; then
 fi
 CHECK_DIR $BASE_DIR 1
 CHECK_DIR $NEW_DIR 1
-CHECK_DIR $DIFF_DIR
+
 if [ "$ABORT" != "" ]; then
   exit
 fi
@@ -86,10 +96,11 @@ for f in $BASE_DIR/$SUBDIR/*.png; do
   to_file=$NEW_DIR/$SUBDIR/$base
   diff_file=$DIFF_DIR/$SUBDIR/$base
   diff_file_changed=$DIFF_DIR/$SUBDIR/$base.changed
-  rm -f $diff_file
-  rm -f $diff_file_changed
+  diff_file_metric=$DIFF_DIR/$SUBDIR/$base.metric
+  rm -f $diff_file $diff_file_changed $diff_file_metric
   if [[ -e $from_file ]] && [[ -e $to_file ]]; then
     diff=`compare -metric $METRIC $from_file $to_file $diff_file |& awk -F'('  '{printf $2}' | awk -F')' '{printf $1}i'`
+    echo $diff > $diff_file_metric
     if [[ "$diff" != "0" ]] && [[ ! $diff == *"e"* ]]; then
       iftest=`echo "${diff} > ${TOLERANCE}" | bc`
       if [ 1 -eq $iftest ]; then
@@ -115,10 +126,11 @@ for f in $BASE_DIR/$SUBDIR/*.png; do
   to_file=$NEW_DIR/$SUBDIR/$base
   diff_file=$DIFF_DIR/$SUBDIR/$base
   diff_file_changed=$DIFF_DIR/$SUBDIR/$base.changed
-  rm -f $diff_file
-  rm -f $diff_file_changed
+  diff_file_metric=$DIFF_DIR/$SUBDIR/$base.metric
+  rm -f $diff_file $diff_file_changed $diff_file_metric
   if [[ -e $from_file ]] && [[ -e $to_file ]]; then
     diff=`compare -metric $METRIC $from_file $to_file $diff_file |& awk -F'('  '{printf $2}' | awk -F')' '{printf $1}i'`
+    echo $diff > $diff_file_metric
     if [[ "$diff" != "0" ]] && [[ ! $diff == *"e"* ]]; then
       iftest=`echo "${diff} > ${TOLERANCE}" | bc`
       if [ 1 -eq $iftest ]; then
@@ -142,31 +154,70 @@ HMTL_DIFF=$SUMMARY_DIR/fds_diffs.html
 
 #*** output html header
 
-cat $SUMMARY_DIR/diff_header.html   > $HTML_DIFF
+DATE=`date`
+cat << EOF  > $HTML_DIFF
+<html>
+<head>
+<TITLE>FDS Image Differences</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF" >
+<h2>FDS Image Differences - $DATE</h2>
+<h3>
+FDS revision: $FDS_REVISION<br>
+SMV revision: $SMV_REVISION<br>
+Metric      : $METRIC<br>
+Tolerance   : $TOLERANCE
+</h3>
+
+<p><hr>
+EOF
+
 
 #*** output User guide image differences
   cat << EOF >> $HTML_DIFF
 <h2>FDS User Guide Image Differences</h2>
 EOF
 
-if [ "$HAVE_USER_DIFFS" != "" ]; then
+#if [ "$HAVE_USER_DIFFS" != "" ]; then
+if [ "1" == "1" ]; then
   SUBDIR=user
   cat << EOF >> $HTML_DIFF
 <table border=on>
 <tr><th>File Name</th>
 <th>Base</th><th>Current</th><th>Difference</th></tr>
 EOF
-  for f in `ls $DIFF_DIR/$SUBDIR/*.changed`; do
-    pngfile=`basename $f .changed`
+  for f in `ls $DIFF_DIR/$SUBDIR/*.png`; do
+    base=`basename $f .png`
+    pngfile=$base.png
+    changefile=$base.png.changed
+    metricfile=$base.png.metric
+    
     cp $BASE_DIR/$SUBDIR/$pngfile $SUMMARY_DIR/diffs/base/$SUBDIR/.
+    IMAGE_HEIGHT=`identify -format '%h' $BASE_DIR/$SUBDIR/$pngfile`
+    IMAGE_WIDTH=`identify -format '%w' $BASE_DIR/$SUBDIR/$pngfile`
+    if [ $IMAGE_HEIGHT -gt $IMAGE_WIDTH ]; then
+      SIZE="height=$HEIGHT"
+    else
+      SIZE="width=$WIDTH"
+    fi
 cat << EOF >> $HTML_DIFF
 <tr>
 <th>$pngfile:</th>
-<td><img height=$HEIGHT src=base/$SUBDIR/$pngfile></td>
-<td><img height=$HEIGHT src=../images/$SUBDIR/$pngfile></td>
-<td><img height=$HEIGHT src=images/$SUBDIR/$pngfile></td>
+<td><img $SIZE src=base/$SUBDIR/$pngfile></td>
+<td><img $SIZE src=../images/$SUBDIR/$pngfile></td>
+EOF
+METRIC=`cat $DIFF_DIR/$SUBDIR/$metricfile`
+if [ -e $DIFF_DIR/$SUBDIR/$changefile ]; then
+cat << EOF >> $HTML_DIFF
+<td align=center><img $SIZE src=images/$SUBDIR/$pngfile><br>$METRIC </td>
 </tr>
 EOF
+else
+cat << EOF >> $HTML_DIFF
+<td align=center>$METRIC</td>
+</tr>
+EOF
+fi
   done
 cat << EOF >> $HTML_DIFF
 </table>
