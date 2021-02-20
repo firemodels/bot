@@ -34,7 +34,7 @@ cd $SUMMARY_DIR
 SUMMARY_DIR=`pwd`
 cd $CURDIR
 
-HTML_DIFF=$SUMMARY_DIR/fds_diffs.html
+HTML_DIFF=$SUMMARY_DIR/diffs/index.html
 
 CHECK_DIR ()
 {
@@ -142,18 +142,18 @@ HMTL_DIFF=$SUMMARY_DIR/fds_diffs.html
 
 #*** output html header
 
-if [ "$HAVE_DIFFS" != "" ]; then
-  cat $SUMMARY_DIR/diff_header.html   > $HTML_DIFF
-fi
+cat $SUMMARY_DIR/diff_header.html   > $HTML_DIFF
 
 #*** output User guide image differences
+  cat << EOF >> $HTML_DIFF
+<h2>FDS User Guide Image Differences</h2>
+EOF
 
-if [ "$HAVE_USER_DIFFS" ]; then
+if [ "$HAVE_USER_DIFFS" != "" ]; then
   SUBDIR=user
   cat << EOF >> $HTML_DIFF
-<h2>FDS User Guide Image Differences<h2>
 <table border=on>
-<tr><th rowspan=2>File Name</th><th colspan=3 align=center>Images</th></tr>
+<tr><th>File Name</th>
 <th>Base</th><th>Current</th><th>Difference</th></tr>
 EOF
   for f in `ls $DIFF_DIR/$SUBDIR/*.changed`; do
@@ -162,25 +162,32 @@ EOF
 cat << EOF >> $HTML_DIFF
 <tr>
 <th>$pngfile:</th>
-<td><img height=$HEIGHT src=diffs/base/$SUBDIR/$pngfile></td>
+<td><img height=$HEIGHT src=base/$SUBDIR/$pngfile></td>
+<td><img height=$HEIGHT src=../images/$SUBDIR/$pngfile></td>
 <td><img height=$HEIGHT src=images/$SUBDIR/$pngfile></td>
-<td><img height=$HEIGHT src=diffs/images/$SUBDIR/$pngfile></td>
 </tr>
 EOF
   done
 cat << EOF >> $HTML_DIFF
 </table>
+EOF
+fi
+if [ "$HAVE_USER_DIFFS" == "" ]; then
+  cat << EOF >> $HTML_DIFF
+<p>No images have changed
 EOF
 fi
 
 #*** output Verification guide image differences
+  cat << EOF >> $HTML_DIFF
+<h2>FDS Verification Guide Image Differences</h2>
+EOF
 
-if [ "$HAVE_VER_DIFFS" ]; then
+if [ "$HAVE_VER_DIFFS" != "" ]; then
   SUBDIR=verification
   cat << EOF >> $HTML_DIFF
-<h2>FDS Verification Guide Image Differences<h2>
 <table border=on>
-<tr><th rowspan=2>File Name</th><th colspan=3 align=center>Images</th></tr>
+<tr><th>File Name</th>
 <th>Base</th><th>Current</th><th>Difference</th></tr>
 EOF
   for f in `ls $DIFF_DIR/$SUBDIR/*.changed`; do
@@ -189,9 +196,9 @@ EOF
 cat << EOF >> $HTML_DIFF
 <tr>
 <th>$pngfile:</th>
-<td><img height=$HEIGHT src=diffs/base/$SUBDIR/$pngfile></td>
+<td><img height=$HEIGHT src=/base/$SUBDIR/$pngfile></td>
+<td><img height=$HEIGHT src=../images/$SUBDIR/$pngfile></td>
 <td><img height=$HEIGHT src=images/$SUBDIR/$pngfile></td>
-<td><img height=$HEIGHT src=diffs/images/$SUBDIR/$pngfile></td>
 </tr>
 EOF
   done
@@ -199,10 +206,13 @@ cat << EOF >> $HTML_DIFF
 </table>
 EOF
 fi
-
-if [ "$HAVE_DIFFS" != "" ]; then
-  cat $SUMMARY_DIR/diff_trailer.html   >> $HTML_DIFF
+if [ "$HAVE_VER_DIFFS" == "" ]; then
+  cat << EOF >> $HTML_DIFF
+<p>No images have changed
+EOF
 fi
+
+cat $SUMMARY_DIR/diff_trailer.html   >> $HTML_DIFF
 
 if [ "$HAVE_DIFFS" == "" ]; then
   echo no images have changed
