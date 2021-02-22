@@ -8,8 +8,8 @@ HAVE_USER_DIFFS=
 HAVE_VER_DIFFS=
 
 TOLERANCE=0.2
-HEIGHT=300
-WIDTH=300
+HEIGHT=450
+WIDTH=450
 
 #*** setup directories
 
@@ -45,7 +45,26 @@ cd $CURDIR/../../fds
 FDS_REVISION=`git describe --long --dirty`
 
 cd $CURDIR/../../fig
-FIG_REVISION=`git describe --long --dirty`
+FIGREPO=`pwd`
+
+FIG_USER_FDS_REVISION_FILE=$FIGREPO/compare/firebot/images/user/FDS_REVISION
+FIG_VER_FDS_REVISION_FILE=$FIGREPO/compare/firebot/images/verification/FDS_REVISION
+FIG_USER_SMV_REVISION_FILE=$FIGREPO/compare/firebot/images/user/SMV_REVISION
+FIG_VER_SMV_REVISION_FILE=$FIGREPO/compare/firebot/images/verification/SMV_REVISION
+
+FIG_USER_FDS_REVISION=`git describe --dirty --long`
+FIG_USER_SMV_REVISION=
+if [[ -e $FIG_USER_FDS_REVISION_FILE ]] && [[ -e $FIG_USER_SMV_REVISION_FILE ]]; then
+  FIG_USER_FDS_REVISION=`head -1 $FIG_USER_FDS_REVISION_FILE`
+  FIG_USER_SMV_REVISION=`head -1 $FIG_USER_SMV_REVISION_FILE`
+fi
+
+FIG_VER_FDS_REVISION=`git describe --dirty --long`
+FIG_VER_SMV_REVISION=
+if [[ -e $FIG_VER_FDS_REVISION_FILE ]] && [[ -e $FIG_VER_SMV_REVISION_FILE ]]; then
+  FIG_VER_FDS_REVISION=`head -1 $FIG_VER_FDS_REVISION_FILE`
+  FIG_VER_SMV_REVISION=`head -1 $FIG_VER_SMV_REVISION_FILE`
+fi
 
 cd $CURDIR/../../smv
 SMV_REVISION=`git describe --long --dirty`
@@ -128,6 +147,8 @@ OUTPUT_HTML ()
 SUBDIR=$1
 GUIDE=$2
 OPTION=$3
+REV1=$4
+REV2=$5
 
 TITLE="FDS $GUIDE Guide"
 
@@ -139,11 +160,14 @@ DIFF_TITLE=
 if [ "$OPTION" != "all" ]; then
 DIFF_TITLE="<th>Difference</th>"
 fi
-
+if [ "$REV2" != "" ]; then
+  REV1="$REV1<br>$REV2"
+fi
   cat << EOF >> $HTML_DIFF
 <table border=on>
-<tr><th>File Name<br>Error</th>
-<th>$FIG_REVISION</th><th>$FDS_REVISION</th>$DIFF_TITLE</tr>
+<tr>
+<th>Base<br>$REV1</th>
+<th>Current<br>$FDS_REVISION<br>$SMV_REVISION</th>$DIFF_TITLE</tr>
 EOF
   for f in `ls $DIFF_DIR/$SUBDIR/*.png`; do
     base=`basename $f .png`
@@ -166,7 +190,6 @@ EOF
 
 cat << EOF >> $HTML_DIFF
 <tr>
-<th>$pngfile<br>$METRIC</th>
 <td><img $SIZE src=base/$SUBDIR/$pngfile></td>
 <td><img $SIZE src=../images/$SUBDIR/$pngfile></td>
 EOF
@@ -174,6 +197,11 @@ if [[ "$OPTION" != "all" ]] && [[ -e $DIFF_DIR/$SUBDIR/$changefile ]]; then
 cat << EOF >> $HTML_DIFF
 <td align=center><img $SIZE src=images/$SUBDIR/$pngfile></td>
 </tr>
+<tr><th colspan=3>$pngfile - $METRIC</th></tr>
+EOF
+else
+cat << EOF >> $HTML_DIFF
+<tr><th colspan=2>$pngfile - $METRIC</th></tr>
 EOF
 fi
 
@@ -248,10 +276,10 @@ cat << EOF  >> $HTML_DIFF
 EOF
 
 if [ "$HAVE_USER_DIFFS" == "1" ]; then
-  OUTPUT_HTML user User diffs
+  OUTPUT_HTML user         User         diffs $FIG_USER_FDS_REVISION $FIG_USER_SMV_REVISION
 fi
 if [ "$HAVE_VER_DIFFS" == "1" ]; then
-  OUTPUT_HTML verification Verification diffs
+  OUTPUT_HTML verification Verification diffs $FIG_VER_FDS_REVISION  $FIG_VER_SMV_REVISION
 fi
 fi
 
@@ -261,8 +289,8 @@ fi
 cat << EOF  >> $HTML_DIFF
 <h2>Images</h2>
 EOF
-OUTPUT_HTML user User all
-OUTPUT_HTML verification Verification all
+OUTPUT_HTML user         User         all $FIG_USER_FDS_REVISION $FIG_USER_SMV_REVISION
+OUTPUT_HTML verification Verification all $FIG_VER_FDS_REVISION  $FIG_VER_SMV_REVISION
 
 cat $SUMMARY_DIR/diff_trailer.html   >> $HTML_DIFF
 
