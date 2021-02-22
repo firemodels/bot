@@ -139,7 +139,6 @@ DIFF_TITLE=
 if [ "$OPTION" != "all" ]; then
 DIFF_TITLE="<th>Difference</th>"
 fi
-echo DIFF_TITLE=$DIFF_TITLE
 
   cat << EOF >> $HTML_DIFF
 <table border=on>
