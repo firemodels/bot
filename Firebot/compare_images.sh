@@ -158,7 +158,7 @@ EOF
 
 DIFF_TITLE=
 if [ "$OPTION" != "all" ]; then
-DIFF_TITLE="<th>Difference</th>"
+DIFF_TITLE="<th align=left>Difference<br>white: where two images are the same<br>red: where two images are different</th>"
 fi
 if [ "$REV2" != "" ]; then
   REV1="$REV1<br>$REV2"
@@ -166,8 +166,8 @@ fi
   cat << EOF >> $HTML_DIFF
 <table border=on>
 <tr>
-<th>Base<br>$REV1</th>
-<th>Current<br>$FDS_REVISION<br>$SMV_REVISION</th>$DIFF_TITLE</tr>
+<th align=left>Base<br>$REV1</th>
+<th align=left>Current<br>$FDS_REVISION<br>$SMV_REVISION</th>$DIFF_TITLE</tr>
 EOF
   for f in `ls $DIFF_DIR/$SUBDIR/*.png`; do
     base=`basename $f .png`
@@ -178,7 +178,7 @@ EOF
     if [[ ! -e $DIFF_DIR/$SUBDIR/$changefile ]] && [[ "$OPTION" != "all" ]]; then
       continue;
     fi
-    METRIC=`cat $DIFF_DIR/$SUBDIR/$metricfile`
+    ERROR=`cat $DIFF_DIR/$SUBDIR/$metricfile`
     cp $BASE_DIR/$SUBDIR/$pngfile $SUMMARY_DIR/diffs/base/$SUBDIR/.
     IMAGE_HEIGHT=`identify -format '%h' $BASE_DIR/$SUBDIR/$pngfile`
     IMAGE_WIDTH=`identify -format '%w' $BASE_DIR/$SUBDIR/$pngfile`
@@ -197,11 +197,11 @@ if [[ "$OPTION" != "all" ]] && [[ -e $DIFF_DIR/$SUBDIR/$changefile ]]; then
 cat << EOF >> $HTML_DIFF
 <td align=center><img $SIZE src=images/$SUBDIR/$pngfile></td>
 </tr>
-<tr><th colspan=3>$pngfile - $METRIC</th></tr>
+<tr><th colspan=3>$pngfile - $METRIC=$ERROR</th></tr>
 EOF
 else
 cat << EOF >> $HTML_DIFF
-<tr><th colspan=2>$pngfile - $METRIC</th></tr>
+<tr><th colspan=2>$pngfile - $METRIC=$ERROR</th></tr>
 EOF
 fi
 
