@@ -4,6 +4,7 @@ NEW_DIR=$2
 DIFF_DIR=$3
 
 METRIC=rmse
+METRIC_LABEL="Root Mean Square Error (rmse)"
 HAVE_USER_DIFFS=
 HAVE_VER_DIFFS=
 
@@ -109,7 +110,7 @@ echo Comparing images in directories:
 echo "  $BASE_DIR/$SUBDIR "
 echo "  $NEW_DIR/$SUBDIR"
 echo ""
-DIFFS=0
+DIFFS=
 for f in $BASE_DIR/$SUBDIR/*.png; do
   base=`basename $f`
   from_file=$BASE_DIR/$SUBDIR/$base
@@ -139,6 +140,41 @@ fi
 }
 
 #---------------------------------------------------------
+#*** OUTPUT_LINKS
+#---------------------------------------------------------
+
+OUTPUT_LINKS ()
+{
+local SUBDIR=$1
+local OPTION=$2
+LINK1="[<a href="#userdiffs">User Guide Differences</a>]"
+LINK2="[<a href="#verificationdiffs">Verification Guide Differences</a>]"
+LINK3="[<a href="#userall">User Guide Images</a>]"
+LINK4="[<a href="#verificationall">Verification Guides Images</a>]"
+if [[ "$SUBDIR" == "user" ]] && [[ "$OPTION" == "all" ]]; then
+  LINK3=
+fi
+if [[ "$SUBDIR" == "user" ]] && [[ "$OPTION" != "all" ]]; then
+  LINK1=
+fi
+if [[ "$SUBDIR" == "verification" ]] && [[ "$OPTION" == "all" ]]; then
+  LINK4=
+fi
+if [[ "$SUBDIR" == "verification" ]] && [[ "$OPTION" != "all" ]]; then
+  LINK2=
+fi
+if [ "$HAVE_USER_DIFFS" == "" ]; then
+  LINK1=
+fi
+if [ "$HAVE_VER_DIFFS" == "" ]; then
+  LINK2=
+fi
+cat << EOF >> $HTML_DIFF
+<p>$LINK1$LINK2$LINK3$LINK4
+EOF
+}
+
+#---------------------------------------------------------
 #*** output html
 #---------------------------------------------------------
 
@@ -150,11 +186,20 @@ OPTION=$3
 REV1=$4
 REV2=$5
 
-TITLE="FDS $GUIDE Guide"
+if [ "$OPTION" == "all" ]; then
+  SUFFIX=Images
+else
+  SUFFIX=Differences
+fi
+
+TITLE="$GUIDE Guide $SUFFIX"
 
   cat << EOF >> $HTML_DIFF
-<h3>$TITLE</h3>
+<a name="$SUBDIR$OPTION">
+<h2>$TITLE</h2>
 EOF
+
+OUTPUT_LINKS $SUBDIR $OPTION
 
 DIFF_TITLE=
 if [ "$OPTION" != "all" ]; then
@@ -240,10 +285,10 @@ FIND_DIFFS user
 FIND_DIFFS verification
 
 HAVE_DIFFS=
-if [ "$HAVE_USER_DIFFS" != "" ]; then
+if [ "$HAVE_USER_DIFFS" == "1" ]; then
   HAVE_DIFFS=1
 fi
-if [ "$HAVE_VER_DIFFS" != "" ]; then
+if [ "$HAVE_VER_DIFFS" == "1" ]; then
   HAVE_DIFFS=1
 fi
 
@@ -253,17 +298,21 @@ DATE=`date`
 cat << EOF  > $HTML_DIFF
 <html>
 <head>
-<TITLE>FDS User/Verificaiton Guide Images</TITLE>
+<TITLE>FDS User and Verificaiton Guide Image Comparison</TITLE>
 </HEAD>
 <BODY BGCOLOR="#FFFFFF" >
-<h2>FDS User/Verification Guide Images - $DATE</h2>
+<h2>FDS User and Verification Guide Image Comparison - $DATE</h2>
 <h3>
 FDS revision: $FDS_REVISION<br>
 SMV revision: $SMV_REVISION<br>
-Metric      : $METRIC<br>
-Tolerance   : $TOLERANCE
+Metric      : ${METRIC_LABEL}<br>
+Tolerance   : $TOLERANCE<br>
 </h3>
+EOF
 
+OUTPUT_LINKS 
+
+cat << EOF  >> $HTML_DIFF
 <p><hr>
 EOF
 
@@ -271,9 +320,6 @@ EOF
 #*** output differences if any
 
 if [ "$HAVE_DIFFS" == "1" ]; then
-cat << EOF  >> $HTML_DIFF
-<h2>Differences</h2>
-EOF
 
 if [ "$HAVE_USER_DIFFS" == "1" ]; then
   OUTPUT_HTML user         User         diffs $FIG_USER_FDS_REVISION $FIG_USER_SMV_REVISION
@@ -281,14 +327,15 @@ fi
 if [ "$HAVE_VER_DIFFS" == "1" ]; then
   OUTPUT_HTML verification Verification diffs $FIG_VER_FDS_REVISION  $FIG_VER_SMV_REVISION
 fi
+else
+cat << EOF  >> $HTML_DIFF
+<p>None
+EOF
 fi
 
 
 #*** output all images
 
-cat << EOF  >> $HTML_DIFF
-<h2>Images</h2>
-EOF
 OUTPUT_HTML user         User         all $FIG_USER_FDS_REVISION $FIG_USER_SMV_REVISION
 OUTPUT_HTML verification Verification all $FIG_VER_FDS_REVISION  $FIG_VER_SMV_REVISION
 
