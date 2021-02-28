@@ -38,7 +38,7 @@ cd $SUMMARY_DIR
 SUMMARY_DIR=`pwd`
 cd $CURDIR
 
-HTML_DIFF=$SUMMARY_DIR/diffs/index.html
+HTML_DIFF=$SUMMARY_DIR/index.html
 
 #*** setup revision strings
 
@@ -151,6 +151,7 @@ LINK1="[<a href="#userdiffs">User Guide Differences</a>]"
 LINK2="[<a href="#verificationdiffs">Verification Guide Differences</a>]"
 LINK3="[<a href="#userall">User Guide Images</a>]"
 LINK4="[<a href="#verificationall">Verification Guides Images</a>]"
+LINK5="[<a href="#manuals">Manuals</a>]"
 if [[ "$SUBDIR" == "user" ]] && [[ "$OPTION" == "all" ]]; then
   LINK3=
 fi
@@ -170,7 +171,7 @@ if [ "$HAVE_VER_DIFFS" == "" ]; then
   LINK2=
 fi
 cat << EOF >> $HTML_DIFF
-<p>$LINK1$LINK2$LINK3$LINK4
+<p>$LINK1$LINK2$LINK3$LINK4$LINK5
 EOF
 }
 
@@ -235,12 +236,12 @@ EOF
 
 cat << EOF >> $HTML_DIFF
 <tr>
-<td><img $SIZE src=base/$SUBDIR/$pngfile></td>
-<td><img $SIZE src=../images/$SUBDIR/$pngfile></td>
+<td><img $SIZE src=diffs/base/$SUBDIR/$pngfile></td>
+<td><img $SIZE src=images/$SUBDIR/$pngfile></td>
 EOF
 if [[ "$OPTION" != "all" ]] && [[ -e $DIFF_DIR/$SUBDIR/$changefile ]]; then
 cat << EOF >> $HTML_DIFF
-<td align=center><img $SIZE src=images/$SUBDIR/$pngfile></td>
+<td align=center><img $SIZE src=diffs/images/$SUBDIR/$pngfile></td>
 </tr>
 <tr><th colspan=3>$pngfile - $METRIC=$ERROR</th></tr>
 EOF
@@ -298,10 +299,10 @@ DATE=`date`
 cat << EOF  > $HTML_DIFF
 <html>
 <head>
-<TITLE>FDS User and Verificaiton Guide Image Comparison</TITLE>
+<TITLE>Firebot Summary</TITLE>
 </HEAD>
 <BODY BGCOLOR="#FFFFFF" >
-<h2>FDS User and Verification Guide Image Comparison - $DATE</h2>
+<h2>Firebot Summary - $DATE</h2>
 <h3>
 FDS revision: $FDS_REVISION<br>
 SMV revision: $SMV_REVISION<br>
@@ -339,7 +340,37 @@ fi
 OUTPUT_HTML user         User         all $FIG_USER_FDS_REVISION $FIG_USER_SMV_REVISION
 OUTPUT_HTML verification Verification all $FIG_VER_FDS_REVISION  $FIG_VER_SMV_REVISION
 
-cat $SUMMARY_DIR/diff_trailer.html   >> $HTML_DIFF
+LINK1="[<a href="#userdiffs">User Guide Differences</a>]"
+LINK2="[<a href="#verificationdiffs">Verification Guide Differences</a>]"
+LINK3="[<a href="#userall">User Guide Images</a>]"
+LINK4="[<a href="#verificationall">Verification Guides Images</a>]"
+if [[ "$HAVE_USER_DIFFS" == "" ]]; then
+  LINK1=
+fi
+if [[ "$HAVE_VER_DIFFS" == "" ]]; then
+  LINK2=
+fi
+cat << EOF  >> $HTML_DIFF
+<a name="manuals">
+<h2>Guides</h2>
+<p>$LINK1$LINK2$LINK3$LINK4[Manuals]
+<ul>
+<li><a href="manuals/FDS_Config_Management_Plan.pdf">FDS Config Management Plan</a>
+<li><a href="manuals/FDS_Technical_Reference_Guide.pdf">FDS Technical Reference Guide</a>
+<li><a href="manuals/FDS_User_Guide.pdf">FDS User Guide</a>
+<li><a href="manuals/FDS_Validation_Guide.pdf">FDS Validation Guide</a>
+<li><a href="manuals/FDS_Verification_Guide.pdf">FDS Verification Guide</a>
+<li><a href="manuals/geom_notes.pdf">geom notes</a>
+</ul>
+
+<p><hr>
+
+
+</BODY>
+</HTML>
+EOF
+
+
 
 if [ "$HAVE_DIFFS" == "" ]; then
   echo no images have changed
