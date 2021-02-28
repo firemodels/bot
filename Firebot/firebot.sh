@@ -2505,11 +2505,6 @@ if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
         CURDIR=`pwd`
         cd $botrepo/Firebot
         ./compare_images.sh $figrepo/compare/firebot/images $FDS_SUMMARY_DIR/images $FDS_SUMMARY_DIR/diffs/images >& $OUTPUT_DIR/stage8_image_compare
-        sed "s/&&DATE&&/$DATE/g"              $FDS_SUMMARY_DIR/index_template.html | \
-        sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                      | \
-        sed "s/&&LINK&&/<a href=\"..\/index.html\">original<\/a> - differences/g"  | \
-        sed "s/&&SMV_BUILD&&/$SMV_REVISION/g"   > $FDS_SUMMARY_DIR/diffs/index.html
-        cat $FDS_SUMMARY_DIR/diff_trailer.html >> $FDS_SUMMARY_DIR/diffs/index.html
 
         if [[ `grep 'warning' $OUTPUT_DIR/stage8_image_compare` == "" ]]
         then
@@ -2520,6 +2515,7 @@ if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
           grep 'warning' $OUTPUT_DIR/stage8_image_compare   >> $WARNING_LOG
         fi
 
+        ./FDS_Summary.sh $FDS_REVISION $SMV_REVISION "$DATE" > $FDS_SUMMARY_DIR/index.html
         if [ "$WEB_DIR" != "" ]; then
           if [ -d $WEB_DIR ]; then
             CUR_DIR=`pwd`
