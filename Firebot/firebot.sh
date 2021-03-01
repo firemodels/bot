@@ -2489,22 +2489,13 @@ if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
         cp $fdsrepo/Manuals/FDS_User_Guide/SCRIPT_FIGURES/*.png         $FDS_SUMMARY_DIR/images/user/.
         cp $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/*.png $FDS_SUMMARY_DIR/images/verification/.
         DATE=`date +"%b %d, %Y - %r"`
-
-        sed "s/&&DATE&&/$DATE/g"                $FDS_SUMMARY_DIR/index_template.html | \
-        sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                        | \
-        sed "s/&&LINK&&/original - <a href=\"diffs\/index.html\">differences<\/a>/g" | \
-        sed "s/&&SMV_BUILD&&/$SMV_REVISION/g"    > $FDS_SUMMARY_DIR/index.html
-        cat $FDS_SUMMARY_DIR/index_trailer.html >> $FDS_SUMMARY_DIR/index.html
-
-        notfound=`$HTML2PDF -V 2>&1 | tail -1 | grep "not found" | wc -l`
-        if [ $notfound -eq 0 ]; then
-          $HTML2PDF $FDS_SUMMARY_DIR/index.html $FDS_SUMMARY_DIR/FDS_Summary.pdf
-          cp $FDS_SUMMARY_DIR/FDS_Summary.pdf   $NEWGUIDE_DIR/.
-        fi
+# compare images
 
         CURDIR=`pwd`
         cd $botrepo/Firebot
         ./compare_images.sh $figrepo/compare/firebot/images $FDS_SUMMARY_DIR/images $FDS_SUMMARY_DIR/diffs/images >& $OUTPUT_DIR/stage8_image_compare
+
+# check images
 
         if [[ `grep 'warning' $OUTPUT_DIR/stage8_image_compare` == "" ]]
         then
@@ -2514,6 +2505,8 @@ if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
           echo "Warnings from Stage 8 - Image comparisons:" >> $WARNING_LOG
           grep 'warning' $OUTPUT_DIR/stage8_image_compare   >> $WARNING_LOG
         fi
+
+# create summary web page
 
         ./FDS_Summary.sh $FDS_REVISION $SMV_REVISION "$DATE" > $FDS_SUMMARY_DIR/index.html
         if [ "$WEB_DIR" != "" ]; then
@@ -2526,6 +2519,15 @@ if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
             cd $CUR_DIR
           fi
         fi
+
+# convert summary web page to a PDF
+
+        notfound=`$HTML2PDF -V 2>&1 | tail -1 | grep "not found" | wc -l`
+        if [ $notfound -eq 0 ]; then
+          $HTML2PDF $FDS_SUMMARY_DIR/index.html $FDS_SUMMARY_DIR/FDS_Summary.pdf
+          cp $FDS_SUMMARY_DIR/FDS_Summary.pdf   $NEWGUIDE_DIR/.
+        fi
+
       fi
     fi
   fi
