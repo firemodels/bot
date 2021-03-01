@@ -111,7 +111,7 @@ echo "  $BASE_DIR/$SUBDIR "
 echo "  $NEW_DIR/$SUBDIR"
 echo ""
 DIFFS=
-for f in $BASE_DIR/$SUBDIR/*.png; do
+for f in $NEW_DIR/$SUBDIR/*.png; do
   base=`basename $f`
   from_file=$BASE_DIR/$SUBDIR/$base
   to_file=$NEW_DIR/$SUBDIR/$base
@@ -125,11 +125,15 @@ for f in $BASE_DIR/$SUBDIR/*.png; do
     if [[ "$diff" != "0" ]] && [[ ! $diff == *"e"* ]]; then
       iftest=`echo "${diff} > ${TOLERANCE}" | bc`
       if [ 1 -eq $iftest ]; then
-        echo "***warning: image $base has changedi. error criteria=$diff > $TOLERANCE"
+        echo "***warning: image $base has changed. error criteria=$diff > $TOLERANCE"
         touch $diff_file_changed
         DIFFS=1
       fi
     fi
+  fi
+  if [[ ! -e $from_file ]]; then
+    echo "***warning: base image $from_file does not exist."
+    echo "            Copy $to_file to the fig repo"
   fi
 done
 if [ "$SUBDIR" == "user" ]; then
@@ -375,6 +379,6 @@ EOF
 if [ "$HAVE_DIFFS" == "" ]; then
   echo no images have changed
 else
-  echo changed images in $HTML_DIFF
+  echo image differences summarized in $HTML_DIFF
 fi
 
