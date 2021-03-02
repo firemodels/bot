@@ -6,7 +6,7 @@ CURDIR=`pwd`
 # directory id's containing guides, figures and hashes on google drive
 MANUAL_PARENT_ID=0B_wB1pJL2bFQUlJwMmNfaHlqME0
 
-UPLOADGUIDE ()
+UPLOADSUMMARY ()
 {
   cd $FROMDIR
   FILE=$1
