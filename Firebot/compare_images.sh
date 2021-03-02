@@ -214,7 +214,7 @@ if [ "$REV2" != "" ]; then
   REV1="$REV1<br>$REV2"
 fi
   cat << EOF >> $HTML_DIFF
-<table border=on>
+<p><table border=on>
 <tr>
 <th align=left>Base<br>$REV1</th>
 <th align=left>Current<br>$FDS_REVISION<br>$SMV_REVISION</th>$DIFF_TITLE</tr>
