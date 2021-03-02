@@ -9,8 +9,8 @@ HAVE_USER_DIFFS=
 HAVE_VER_DIFFS=
 
 TOLERANCE=0.2
-HEIGHT=450
-WIDTH=450
+HEIGHT=200
+WIDTH=200
 
 #*** setup directories
 
@@ -151,8 +151,8 @@ OUTPUT_LINKS ()
 {
 local SUBDIR=$1
 local OPTION=$2
-LINK1="[<a href="#userdiffs">User Guide Differences</a>]"
-LINK2="[<a href="#verificationdiffs">Verification Guide Differences</a>]"
+LINK1="[<a href="#userdiffs">User Guide Image Differences</a>]"
+LINK2="[<a href="#verificationdiffs">Verification Guide Image Differences</a>]"
 LINK3="[<a href="#userall">User Guide Images</a>]"
 LINK4="[<a href="#verificationall">Verification Guides Images</a>]"
 LINK5="[<a href="#manuals">Manuals</a>]"
@@ -194,7 +194,7 @@ REV2=$5
 if [ "$OPTION" == "all" ]; then
   SUFFIX=Images
 else
-  SUFFIX=Differences
+  SUFFIX="Image Differences"
 fi
 
 TITLE="$GUIDE Guide $SUFFIX"
@@ -240,18 +240,24 @@ EOF
 
 cat << EOF >> $HTML_DIFF
 <tr>
-<td><img $SIZE src=diffs/base/$SUBDIR/$pngfile></td>
-<td><img $SIZE src=images/$SUBDIR/$pngfile></td>
+<td><a href="diffs/base/$SUBDIR/$pngfile"><img $SIZE src=diffs/base/$SUBDIR/$pngfile></a></td>
+<td><a href="images/$SUBDIR/$pngfile"><img $SIZE src=images/$SUBDIR/$pngfile></a></td>
 EOF
 if [[ "$OPTION" != "all" ]] && [[ -e $DIFF_DIR/$SUBDIR/$changefile ]]; then
 cat << EOF >> $HTML_DIFF
-<td align=center><img $SIZE src=diffs/images/$SUBDIR/$pngfile></td>
+<td align=center><a href="diffs/images/$SUBDIR/$pngfile"><img $SIZE src=diffs/images/$SUBDIR/$pngfile></a></td>
 </tr>
-<tr><th colspan=3>$pngfile - $METRIC=$ERROR</th></tr>
+<tr><th colspan=3>^ $pngfile - $METRIC=$ERROR ^</th></tr>
 EOF
 else
 cat << EOF >> $HTML_DIFF
-<tr><th colspan=2>$pngfile - $METRIC=$ERROR</th></tr>
+<tr>
+EOF
+cat << EOF >> $HTML_DIFF
+<th colspan=2>^ $pngfile - $METRIC=$ERROR ^</th>
+EOF
+cat << EOF >> $HTML_DIFF
+</tr>
 EOF
 fi
 
@@ -307,12 +313,12 @@ cat << EOF  > $HTML_DIFF
 </HEAD>
 <BODY BGCOLOR="#FFFFFF" >
 <h2>Firebot Summary - $DATE</h2>
-<h3>
-FDS revision: $FDS_REVISION<br>
-SMV revision: $SMV_REVISION<br>
-Metric      : ${METRIC_LABEL}<br>
-Tolerance   : $TOLERANCE<br>
-</h3>
+<table>
+<tr><th align=left>FDS revision:</th><td> $FDS_REVISION</td></tr>
+<tr><th align=left>SMV revision:</th><td> $SMV_REVISION</td></tr>
+<tr><th align=left>Metric:</th><td> ${METRIC_LABEL}</td></tr>
+<tr><th align=left>Tolerance:</th><td> $TOLERANCE</td></tr>
+</table>
 EOF
 
 OUTPUT_LINKS 
@@ -344,8 +350,8 @@ fi
 OUTPUT_HTML user         User         all $FIG_USER_FDS_REVISION $FIG_USER_SMV_REVISION
 OUTPUT_HTML verification Verification all $FIG_VER_FDS_REVISION  $FIG_VER_SMV_REVISION
 
-LINK1="[<a href="#userdiffs">User Guide Differences</a>]"
-LINK2="[<a href="#verificationdiffs">Verification Guide Differences</a>]"
+LINK1="[<a href="#userdiffs">User Image Guide Differences</a>]"
+LINK2="[<a href="#verificationdiffs">Verification Guide Image Differences</a>]"
 LINK3="[<a href="#userall">User Guide Images</a>]"
 LINK4="[<a href="#verificationall">Verification Guides Images</a>]"
 if [[ "$HAVE_USER_DIFFS" == "" ]]; then
