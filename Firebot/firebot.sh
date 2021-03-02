@@ -1968,29 +1968,25 @@ case $OPTION in
    ;;
   w)
    WEB_DIR="$OPTARG"
+   if [ ! -d $WEB_DIR ]; then
+     WEB_DIR=
+   fi
    ;;
 esac
 done
 shift $(($OPTIND-1))
 
 if [ "$WEB_DIR" != "" ]; then
-  if [ -d $WEB_DIR ]; then
-    testfile=$WEB_DIR/test.$$
-    touch $testfile >& /dev/null
-    if [ -e $testfile ]; then
-      rm $testfile
-    else
-      WEB_DIR=
-    fi
+  testfile=$WEB_DIR/test.$$
+  touch $testfile >& /dev/null
+  if [ -e $testfile ]; then
+    WEB_HOST=`hostname -A | awk '{print $2}'`
+    WEB_URL=http://$WEB_HOST/`basename $WEB_DIR`
+    rm -f $testfile
   else
     WEB_DIR=
+    WEB_URL=
   fi
-fi
-if [ "$WEB_DIR" != "" ]; then
-  WEB_HOST=`hostname -A | awk '{print $2}'`
-  WEB_URL=http://$WEB_HOST/`basename $WEB_DIR`
-else
-  WEB_URL=
 fi
 
 # Load mailing list for status report
