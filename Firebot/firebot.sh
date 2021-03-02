@@ -1707,6 +1707,11 @@ email_build_status()
         echo "" >> $WARNING_LOG
      fi
    fi
+   if [ "$WEB_DIR" != "" ]; then
+     if [ -d $WEB_DIR ]; then
+       $UploadSummary $NEWGUIDE_DIR >> $OUTPUT_DIR/stage10_upload_google  2>&1
+     fi
+   fi
 
    # Check for warnings and errors
    NAMELIST_LOGS="$NAMELIST_NODOC_LOG $NAMELIST_NOSOURCE_LOG"
@@ -2147,6 +2152,7 @@ if [ "QUEUE" == "none" ]; then
 fi
 
 UploadGuides=$botrepo/Firebot/fds_guides2GD.sh
+UploadSummary=$botrepo/Firebot/fds_summary2GD.sh
 COPY_FDS_APPS=$botrepo/Firebot/copy_fds_apps.sh
 COPY_SMV_APPS=$botrepo/Firebot/copy_smv_apps.sh
 
@@ -2502,9 +2508,6 @@ if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
           grep 'warning' $OUTPUT_DIR/stage8_image_compare   >> $WARNING_LOG
         fi
 
-# create summary web page
-
-        ./FDS_Summary.sh $FDS_REVISION $SMV_REVISION "$DATE" > $FDS_SUMMARY_DIR/index.html
         if [ "$WEB_DIR" != "" ]; then
           if [ -d $WEB_DIR ]; then
             CUR_DIR=`pwd`
