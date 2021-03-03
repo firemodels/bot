@@ -1644,6 +1644,46 @@ get_firebot_success()
 }
 
 #---------------------------------------------
+#                   make_fds_summary
+#---------------------------------------------
+
+make_fds_summary()
+{
+  if [ -d $FDS_SUMMARY_DIR ]; then
+    cp $fdsrepo/Manuals/FDS_User_Guide/SCRIPT_FIGURES/*.png         $FDS_SUMMARY_DIR/images/user/.
+    cp $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/*.png $FDS_SUMMARY_DIR/images/verification/.
+    DATE=`date +"%b %d, %Y - %r"`
+
+# compare images
+
+    CURDIR=`pwd`
+    cd $botrepo/Firebot
+    ./compare_images.sh $figrepo/compare/firebot/images $FDS_SUMMARY_DIR/images $FDS_SUMMARY_DIR/diffs/images >& $OUTPUT_DIR/stage8_image_compare
+
+# check images
+
+    if [[ `grep 'warning' $OUTPUT_DIR/stage8_image_compare` == "" ]]
+    then
+      # Continue along
+      :
+    else
+      echo "Warnings from Stage 8 - Image comparisons:" >> $WARNING_LOG
+      grep 'warning' $OUTPUT_DIR/stage8_image_compare   >> $WARNING_LOG
+    fi
+    if [ "$WEB_DIR" != "" ]; then
+      if [ -d $WEB_DIR ]; then
+        CUR_DIR=`pwd`
+        cd $WEB_DIR
+        rm -r images manuals diffs *.html
+        cp -r $FDS_SUMMARY_DIR/* .
+        rm *template.html
+        cd $CUR_DIR
+      fi
+    fi
+  fi
+}
+
+#---------------------------------------------
 #                   email_build_status
 #---------------------------------------------
 
@@ -2434,6 +2474,7 @@ if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
     if [[ $smv_release_success ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] ; then
       make_fds_pictures
       check_fds_pictures
+      make_fds_summary
     fi
   fi
 
@@ -2490,39 +2531,6 @@ if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
       copy_fds_technical_guide
       copy_fds_validation_guide
       copy_fds_Config_management_plan
-
-      if [ -d $FDS_SUMMARY_DIR ]; then
-        cp $fdsrepo/Manuals/FDS_User_Guide/SCRIPT_FIGURES/*.png         $FDS_SUMMARY_DIR/images/user/.
-        cp $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/*.png $FDS_SUMMARY_DIR/images/verification/.
-        DATE=`date +"%b %d, %Y - %r"`
-# compare images
-
-        CURDIR=`pwd`
-        cd $botrepo/Firebot
-        ./compare_images.sh $figrepo/compare/firebot/images $FDS_SUMMARY_DIR/images $FDS_SUMMARY_DIR/diffs/images >& $OUTPUT_DIR/stage8_image_compare
-
-# check images
-
-        if [[ `grep 'warning' $OUTPUT_DIR/stage8_image_compare` == "" ]]
-        then
-      # Continue along
-          :
-        else
-          echo "Warnings from Stage 8 - Image comparisons:" >> $WARNING_LOG
-          grep 'warning' $OUTPUT_DIR/stage8_image_compare   >> $WARNING_LOG
-        fi
-
-        if [ "$WEB_DIR" != "" ]; then
-          if [ -d $WEB_DIR ]; then
-            CUR_DIR=`pwd`
-            cd $WEB_DIR
-            rm -r images manuals diffs *.html
-            cp -r $FDS_SUMMARY_DIR/* .
-            rm *template.html
-            cd $CUR_DIR
-          fi
-        fi
-      fi
     fi
   fi
 fi

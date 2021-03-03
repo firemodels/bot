@@ -163,7 +163,6 @@ LINK1="[<a href="#userdiffs">User Guide Image Differences</a>]"
 LINK2="[<a href="#verificationdiffs">Verification Guide Image Differences</a>]"
 LINK3="[<a href="#userall">User Guide Images</a>]"
 LINK4="[<a href="#verificationall">Verification Guides Images</a>]"
-LINK5="[<a href="#manuals">Manuals</a>]"
 if [[ "$SUBDIR" == "user" ]] && [[ "$OPTION" == "all" ]]; then
   LINK3=
 fi
@@ -183,7 +182,7 @@ if [ "$HAVE_VER_DIFFS" == "" ]; then
   LINK2=
 fi
 cat << EOF >> $HTML_DIFF
-<p>$LINK1$LINK2$LINK3$LINK4$LINK5
+<p>$LINK1$LINK2$LINK3$LINK4
 EOF
 }
 
@@ -317,10 +316,10 @@ DATE=`date`
 cat << EOF  > $HTML_DIFF
 <html>
 <head>
-<TITLE>Firebot Summary</TITLE>
+<TITLE>Firebot Images</TITLE>
 </HEAD>
 <BODY BGCOLOR="#FFFFFF" >
-<h2>Firebot Summary - $DATE</h2>
+<h2>Firebot Images - $DATE</h2>
 
 <table>
 <tr><th align=left>FDS revision:</th><td> $FDS_REVISION</td></tr>
@@ -373,21 +372,7 @@ if [[ "$HAVE_VER_DIFFS" == "" ]]; then
   LINK2=
 fi
 cat << EOF  >> $HTML_DIFF
-<a name="manuals">
-<h2>Guides</h2>
-<p>$LINK1$LINK2$LINK3$LINK4[Manuals]
-<ul>
-<li><a href="manuals/FDS_Config_Management_Plan.pdf">FDS Config Management Plan</a>
-<li><a href="manuals/FDS_Technical_Reference_Guide.pdf">FDS Technical Reference Guide</a>
-<li><a href="manuals/FDS_User_Guide.pdf">FDS User Guide</a>
-<li><a href="manuals/FDS_Validation_Guide.pdf">FDS Validation Guide</a>
-<li><a href="manuals/FDS_Verification_Guide.pdf">FDS Verification Guide</a>
-<li><a href="manuals/geom_notes.pdf">geom notes</a>
-</ul>
-
 <p><hr>
-
-
 </BODY>
 </HTML>
 EOF
