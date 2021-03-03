@@ -1866,6 +1866,8 @@ CLONE_FDSSMV=
 FDS_REV=origin/master
 SMV_REV=origin/master
 WEB_DIR=
+WEB_BASE_DIR=
+WEB_ROOT=
 HTML2PDF=wkhtmltopdf
 FORCECLONE=
 
@@ -1879,7 +1881,7 @@ VALIDATION=
 CHECK_CLUSTER=
 
 #*** parse command line arguments
-while getopts 'b:BcCdiJm:Mp:q:R:sSTuUV:x:X:y:Y:w:' OPTION
+while getopts 'b:BcCdiJm:Mp:q:R:sSTuUV:x:X:y:Y:w:W:' OPTION
 do
 case $OPTION in
   b)
@@ -1973,22 +1975,31 @@ case $OPTION in
    ;;
   w)
    WEB_DIR="$OPTARG"
-   if [ ! -d $WEB_DIR ]; then
-     WEB_DIR=
-   fi
+   ;;
+  W)
+   WEB_ROOT="$OPTARG"
    ;;
 esac
 done
 shift $(($OPTIND-1))
 
 if [ "$WEB_DIR" != "" ]; then
+  WEB_BASE_DIR=$WEB_DIR
+  WEB_DIR=$WEB_ROOT/$WEB_DIR
+  if [ ! -d $WEB_DIR ]; then
+    WEB_DIR=
+    WEB_BASE_DIR=
+  fi
+fi
+if [ "$WEB_DIR" != "" ]; then
   testfile=$WEB_DIR/test.$$
   touch $testfile >& /dev/null
   if [ -e $testfile ]; then
     WEB_HOST=`hostname -A | awk '{print $2}'`
-    WEB_URL=http://$WEB_HOST/`basename $WEB_DIR`
+    WEB_URL=http://$WEB_HOST/$WEB_BASE_DIR
     rm -f $testfile
   else
+    WEB_BASE_DIR=
     WEB_DIR=
     WEB_URL=
   fi
