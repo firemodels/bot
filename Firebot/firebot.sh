@@ -1660,16 +1660,26 @@ make_fds_summary()
     cd $botrepo/Firebot
     ./compare_images.sh $figrepo/compare/firebot/images $FDS_SUMMARY_DIR/images $FDS_SUMMARY_DIR/diffs/images >& $OUTPUT_DIR/stage8_image_compare
 
-# check images
-
-    if [[ `grep 'warning' $OUTPUT_DIR/stage8_image_compare` == "" ]]
+# look for fyis
+    if [[ `grep '***fyi:' $OUTPUT_DIR/stage8_image_compare` == "" ]]
     then
       # Continue along
       :
     else
-      echo "Warnings from Stage 8 - Image comparisons:" >> $WARNING_LOG
-      grep 'warning' $OUTPUT_DIR/stage8_image_compare   >> $WARNING_LOG
+      echo "FYIs from Stage 8 - Image comparisons:"     >> $FYI_LOG
+      grep '***fyi:' $OUTPUT_DIR/stage8_image_compare   >> $FYI_LOG
     fi
+
+# look for warnings
+    if [[ `grep '***warning:' $OUTPUT_DIR/stage8_image_compare` == "" ]]
+    then
+      # Continue along
+      :
+    else
+      echo "Warnings from Stage 8 - Image comparisons:"     >> $WARNING_LOG
+      grep '***warning:' $OUTPUT_DIR/stage8_image_compare   >> $WARNING_LOG
+    fi
+    
     if [ "$WEB_DIR" != "" ]; then
       if [ -d $WEB_DIR ]; then
         CUR_DIR=`pwd`
@@ -1757,7 +1767,7 @@ email_build_status()
      # Send email with failure message and warnings, body of email contains appropriate log file
      echo "[$botuser] $bottype failure and warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH."
      if [ "$HAVE_MAIL" == "1" ]; then
-       cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype failure and warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
+       cat $ERROR_LOG $FYI_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype failure and warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
      fi
 
    # Check for errors only
@@ -1766,7 +1776,7 @@ email_build_status()
       # Send email with failure message, body of email contains error log file
       echo "[$botuser] $bottype failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH."
       if [ "$HAVE_MAIL" == "1" ]; then
-        cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
+        cat $ERROR_LOG $FYI_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
       fi
 
    # Check for warnings only
@@ -1777,7 +1787,7 @@ email_build_status()
       # Send email with success message, include warnings
       echo "[$botuser] $bottype success, with warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH"
       if [ "$HAVE_MAIL" == "1" ]; then
-        cat $WARNING_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype success, with warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
+        cat $WARNING_LOG $FYI_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype success, with warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
       fi
 
    # No errors or warnings
@@ -1789,7 +1799,7 @@ email_build_status()
       firebot_status=0
       echo "[$botuser] $bottype success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH"
       if [ "$HAVE_MAIL" == "1" ]; then
-        cat $TIME_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
+        cat $TIME_LOG $FYI_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
       fi
    fi
 }
@@ -1832,6 +1842,7 @@ TIME_LOG=$OUTPUT_DIR/timings
 ERROR_LOG=$OUTPUT_DIR/errors
 VALIDATION_ERROR_LOG=$OUTPUT_DIR/validation_errors
 WARNING_LOG=$OUTPUT_DIR/warnings
+FYI_LOG=$OUTPUT_DIR/fyis
 NEWGUIDE_DIR=$OUTPUT_DIR/Newest_Guides
 MANUALS_DIR=$HOME/.firebot/Manuals
 MANUALS_LATEST_DIR=$HOME/.firebot/Manuals_latest
@@ -2255,6 +2266,8 @@ TIME_LIMIT_EMAIL_NOTIFICATION="unsent"
 
 hostname=`hostname`
 start_time=`date`
+
+touch $FYI_LOG
 
 ### Stage 1 ###
 

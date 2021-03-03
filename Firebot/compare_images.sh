@@ -3,6 +3,9 @@ BASE_DIR=$1
 NEW_DIR=$2
 DIFF_DIR=$3
 
+FYI=fyi
+# to flag image differences as warning's, uncomment the following line
+FYI=warning
 METRIC=rmse
 METRIC_LABEL="Root Mean Square Error (rmse)"
 HAVE_USER_DIFFS=
@@ -133,14 +136,14 @@ for f in $NEW_DIR/$SUBDIR/*.png; do
     if [[ "$diff" != "0" ]] && [[ ! $diff == *"e"* ]]; then
       iftest=`echo "${diff} > ${TOLERANCE}" | bc`
       if [ 1 -eq $iftest ]; then
-        echo "***warning: image $base has changed. $METRIC error=$diff > $TOLERANCE"
+        echo "***$FYI: image $base has changed. $METRIC error=$diff > $TOLERANCE"
         touch $diff_file_changed
         DIFFS=1
       fi
     fi
   fi
   if [[ ! -e $from_file ]]; then
-    echo "***warning: base image $from_file does not exist."
+    echo "***$FYI: base image $from_file does not exist."
     echo "            Copy $to_file to the fig repo"
   fi
 done
