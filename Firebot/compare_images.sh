@@ -21,6 +21,14 @@ if [ "$BASE_DIR" == "" ]; then
   BASE_DIR=`pwd`
   cd $CURDIR
 fi
+FDS_REPO=../../fds
+cd $FDS_REPO
+FDS_REPO=`pwd`
+cd $CURDIR
+SMV_REPO=../../smv
+cd $SMV_REPO
+SMV_REPO=`pwd`
+cd $CURDIR
 if [ "$NEW_DIR" == "" ]; then
   NEW_DIR=../../fds/Manuals/FDS_Summary/images/
   cd $NEW_DIR
@@ -313,8 +321,12 @@ cat << EOF  > $HTML_DIFF
 </HEAD>
 <BODY BGCOLOR="#FFFFFF" >
 <h2>Firebot Summary - $DATE</h2>
+
 <table>
 <tr><th align=left>FDS revision:</th><td> $FDS_REVISION</td></tr>
+<tr><th align=left>FDS repo:</th><td>$FDS_REPO</td></tr>
+<tr><th align=left>SMV revision:</th><td> $SMV_REVISION</td></tr>
+<tr><th align=left>SMV repo:</th><td>$SMV_REPO</td></tr>
 <tr><th align=left>SMV revision:</th><td> $SMV_REVISION</td></tr>
 <tr><th align=left>Metric:</th><td> ${METRIC_LABEL}</td></tr>
 <tr><th align=left>Tolerance:</th><td> $TOLERANCE</td></tr>
