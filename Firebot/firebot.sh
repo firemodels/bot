@@ -1707,11 +1707,6 @@ email_build_status()
         echo "" >> $WARNING_LOG
      fi
    fi
-   if [ "$WEB_DIR" != "" ]; then
-     if [ -d $WEB_DIR ]; then
-       $UploadSummary $NEWGUIDE_DIR >> $OUTPUT_DIR/stage10_upload_google  2>&1
-     fi
-   fi
 
    # Check for warnings and errors
    NAMELIST_LOGS="$NAMELIST_NODOC_LOG $NAMELIST_NOSOURCE_LOG"
@@ -1868,7 +1863,6 @@ SMV_REV=origin/master
 WEB_DIR=
 WEB_BASE_DIR=
 WEB_ROOT=
-HTML2PDF=wkhtmltopdf
 FORCECLONE=
 
 SKIPMATLAB=
@@ -2163,7 +2157,6 @@ if [ "QUEUE" == "none" ]; then
 fi
 
 UploadGuides=$botrepo/Firebot/fds_guides2GD.sh
-UploadSummary=$botrepo/Firebot/fds_summary2GD.sh
 COPY_FDS_APPS=$botrepo/Firebot/copy_fds_apps.sh
 COPY_SMV_APPS=$botrepo/Firebot/copy_smv_apps.sh
 
@@ -2529,15 +2522,6 @@ if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
             cd $CUR_DIR
           fi
         fi
-
-# convert summary web page to a PDF
-
-        notfound=`$HTML2PDF -V 2>&1 | tail -1 | grep "not found" | wc -l`
-        if [ $notfound -eq 0 ]; then
-          $HTML2PDF $FDS_SUMMARY_DIR/index.html $FDS_SUMMARY_DIR/FDS_Summary.pdf
-          cp $FDS_SUMMARY_DIR/FDS_Summary.pdf   $NEWGUIDE_DIR/.
-        fi
-
       fi
     fi
   fi
