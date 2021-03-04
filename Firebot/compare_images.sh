@@ -136,14 +136,14 @@ for f in $NEW_DIR/$SUBDIR/*.png; do
     if [[ "$diff" != "0" ]] && [[ ! $diff == *"e"* ]]; then
       iftest=`echo "${diff} > ${TOLERANCE}" | bc`
       if [ 1 -eq $iftest ]; then
-        echo "***$FYI: image $base has changed. $METRIC error=$diff > $TOLERANCE"
+        echo "***$FYI: The image $base has changed. $METRIC error=$diff > $TOLERANCE"
         touch $diff_file_changed
         DIFFS=1
       fi
     fi
   fi
   if [[ ! -e $from_file ]]; then
-    echo "***$FYI: base image $from_file does not exist."
+    echo "***$FYI: The base image $from_file does not exist."
     echo "            Copy $to_file to the fig repo"
   fi
 done
