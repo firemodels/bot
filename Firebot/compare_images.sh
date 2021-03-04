@@ -5,7 +5,7 @@ DIFF_DIR=$3
 
 FYI=fyi
 # to flag image differences as warning's, uncomment the following line
-FYI=warning
+#FYI=warning
 METRIC=rmse
 METRIC_LABEL="Root Mean Square Error (rmse)"
 HAVE_USER_DIFFS=
