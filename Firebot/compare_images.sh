@@ -24,13 +24,16 @@ if [ "$BASE_DIR" == "" ]; then
   BASE_DIR=`pwd`
   cd $CURDIR
 fi
+
 FDS_REPO=../../fds
 cd $FDS_REPO
 FDS_REPO=`pwd`
+
 cd $CURDIR
 SMV_REPO=../../smv
 cd $SMV_REPO
 SMV_REPO=`pwd`
+
 cd $CURDIR
 if [ "$NEW_DIR" == "" ]; then
   NEW_DIR=../../fds/Manuals/FDS_Summary/images/
@@ -38,12 +41,18 @@ if [ "$NEW_DIR" == "" ]; then
   NEW_DIR=`pwd`
   cd $CURDIR
 fi
+
 if [ "$DIFF_DIR" == "" ]; then
   DIFF_DIR=../../fds/Manuals/FDS_Summary/diffs/images/
   cd $DIFF_DIR
   DIFF_DIR=`pwd`
-  cd $CURDIR
 fi
+if [ -d $DIFF_DIR ]; then
+  cd $DIFF_DIR
+  git clean -dxf >& /dev/null
+fi
+
+cd $CURDIR
 SUMMARY_DIR=../../fds/Manuals/FDS_Summary/
 cd $SUMMARY_DIR
 SUMMARY_DIR=`pwd`
