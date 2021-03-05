@@ -48,6 +48,9 @@ if [ "$DIFF_DIR" == "" ]; then
   DIFF_DIR=`pwd`
   cd $CURDIR
 fi
+cd $DIFF_DIR
+echo cleaning diff directory
+git clean -dxf >& /dev/null
 
 SUMMARY_DIR=$SMV_REPO/Manuals/SMV_Summary/
 cd $SUMMARY_DIR
@@ -83,7 +86,7 @@ if [[ -e $FIG_VER_FDS_REVISION_FILE ]] && [[ -e $FIG_VER_SMV_REVISION_FILE ]]; t
   FIG_VER_SMV_REVISION=`head -1 $FIG_VER_SMV_REVISION_FILE`
 fi
 
-cd SMV_REPO
+cd $SMV_REPO
 SMV_REVISION=`git describe --long --dirty`
 
 cd $CURDIR
@@ -137,6 +140,9 @@ for f in $NEW_DIR/$SUBDIR/*.png; do
   rm -f $diff_file $diff_file_changed $diff_file_metric
   if [[ -e $from_file ]] && [[ -e $to_file ]]; then
     diff=`compare -metric $METRIC $from_file $to_file $diff_file |& awk -F'('  '{printf $2}' | awk -F')' '{printf $1}i'`
+    if [ "$diff" == "" ]; then
+      diff=0
+    fi
     echo $diff > $diff_file_metric
     if [[ "$diff" != "0" ]] && [[ ! $diff == *"e"* ]]; then
       iftest=`echo "${diff} > ${TOLERANCE}" | bc`
@@ -172,16 +178,16 @@ LINK2="[<a href="#verificationdiffs">Verification Guide Image Differences</a>]"
 LINK3="[<a href="#userall">User Guide Images</a>]"
 LINK4="[<a href="#verificationall">Verification Guides Images</a>]"
 if [[ "$SUBDIR" == "user" ]] && [[ "$OPTION" == "all" ]]; then
-  LINK3=
+  LINK3="[User Guide Images]"
 fi
 if [[ "$SUBDIR" == "user" ]] && [[ "$OPTION" != "all" ]]; then
-  LINK1=
+  LINK1="[User Guide Image Differences]"
 fi
 if [[ "$SUBDIR" == "verification" ]] && [[ "$OPTION" == "all" ]]; then
-  LINK4=
+  LINK4="[Verification Guides Images]"
 fi
 if [[ "$SUBDIR" == "verification" ]] && [[ "$OPTION" != "all" ]]; then
-  LINK2=
+  LINK2="[Verification Guide Image Differences]"
 fi
 if [ "$HAVE_USER_DIFFS" == "" ]; then
   LINK1=
@@ -232,9 +238,18 @@ fi
 <p><table border=on>
 <tr>
 <th align=left>Base<br>$REV1</th>
-<th align=left>Current<br>$FDS_REVISION<br>$SMV_REVISION</th>$DIFF_TITLE</tr>
+<th align=left>Current<br>$FDS_REVISION<br>$SMV_REVISION</th>$DIFF_TITLE
+<th align=left>Base<br>$REV1</th>
+<th align=left>Current<br>$FDS_REVISION<br>$SMV_REVISION</th>$DIFF_TITLE
+<th align=left>Base<br>$REV1</th>
+<th align=left>Current<br>$FDS_REVISION<br>$SMV_REVISION</th>$DIFF_TITLE
+</tr>
 EOF
+  let counter=0
+  table_size=3
   for f in `ls $DIFF_DIR/$SUBDIR/*.png`; do
+    let counter=counter+1
+    counter=$(($counter%$table_size))
     base=`basename $f .png`
     pngfile=$base.png
     changefile=$base.png.changed
@@ -253,27 +268,29 @@ EOF
       SIZE="width=$WIDTH"
     fi
 
+if [ $counter -eq 1 ]; then
 cat << EOF >> $HTML_DIFF
 <tr>
-<td><a href="diffs/base/$SUBDIR/$pngfile"><img $SIZE src=diffs/base/$SUBDIR/$pngfile></a></td>
-<td><a href="images/$SUBDIR/$pngfile"><img $SIZE src=images/$SUBDIR/$pngfile></a></td>
 EOF
+fi
+cat << EOF >> $HTML_DIFF
+<td><a href="diffs/base/$SUBDIR/$pngfile"><img $SIZE src=diffs/base/$SUBDIR/$pngfile></a><br>
+$pngfile
+</td>
+<td><a href="images/$SUBDIR/$pngfile"><img $SIZE src=images/$SUBDIR/$pngfile></a><br>
+$METRIC=$ERROR
+</td>
+EOF
+
 if [[ "$OPTION" != "all" ]] && [[ -e $DIFF_DIR/$SUBDIR/$changefile ]]; then
 cat << EOF >> $HTML_DIFF
 <td align=center><a href="diffs/images/$SUBDIR/$pngfile"><img $SIZE src=diffs/images/$SUBDIR/$pngfile></a></td>
-</tr>
-<tr><th colspan=3>^ $pngfile - $METRIC=$ERROR ^</th></tr>
 EOF
-else
-cat << EOF >> $HTML_DIFF
-<tr>
-EOF
-cat << EOF >> $HTML_DIFF
-<th colspan=2>^ $pngfile - $METRIC=$ERROR ^</th>
-EOF
+if [ $counter -eq 1 ]; then
 cat << EOF >> $HTML_DIFF
 </tr>
 EOF
+fi
 fi
 
   done
@@ -357,10 +374,6 @@ fi
 if [ "$HAVE_VER_DIFFS" == "1" ]; then
   OUTPUT_HTML verification Verification diffs $FIG_VER_FDS_REVISION  $FIG_VER_SMV_REVISION
 fi
-else
-cat << EOF  >> $HTML_DIFF
-<p>None
-EOF
 fi
 
 
