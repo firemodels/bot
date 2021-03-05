@@ -19,6 +19,9 @@ function run_script(script){
 function build_libs(platform){
   MyObject.Run(get_fullpath("webscripts/webBUILDlibs.bat ",platform));
 }
+function archive_smv(args){
+  MyObject.Run(get_fullpath("webscripts/webARCHIVEbundle.bat ",args));
+}
 function build_smv(args){
   MyObject.Run(get_fullpath("webscripts/webBUILDsmv.bat ",args));
 }
@@ -257,6 +260,11 @@ function install_smv(args){
 <td align=center><button onclick="package_smv('windows test')">Bundle</button></td>
 <td align=center><button onclick="package_smv('linux test')">Bundle</button></td>
 <td align=center colspan=3><button onclick="package_smv('osx test')">Bundle</button></td>
+</tr>
+<tr>
+<td align=center></td>
+<td align=center><button onclick="archive_smv('linux')">Archive</button></td>
+<td align=center colspan=3><button onclick="archive_smv('osx')">Archive</button></td>
 </tr>
 
 <tr>
