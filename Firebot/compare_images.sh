@@ -22,9 +22,14 @@ if [ "$BASE_DIR" == "" ]; then
   BASE_DIR=../../fig/compare//firebot/images/
   cd $BASE_DIR
   BASE_DIR=`pwd`
-  cd $CURDIR
 fi
 
+cd $CURDIR
+REPO=../..
+cd $REPO
+REPO=`pwd`
+
+cd $CURDIR
 FDS_REPO=../../fds
 cd $FDS_REPO
 FDS_REPO=`pwd`
@@ -176,16 +181,16 @@ LINK2="[<a href="#verificationdiffs">Verification Guide Image Differences</a>]"
 LINK3="[<a href="#userall">User Guide Images</a>]"
 LINK4="[<a href="#verificationall">Verification Guides Images</a>]"
 if [[ "$SUBDIR" == "user" ]] && [[ "$OPTION" == "all" ]]; then
-  LINK3=
+  LINK3="[User Guide Images]"
 fi
 if [[ "$SUBDIR" == "user" ]] && [[ "$OPTION" != "all" ]]; then
-  LINK1=
+  LINK1="[User Guide Image Differences]"
 fi
 if [[ "$SUBDIR" == "verification" ]] && [[ "$OPTION" == "all" ]]; then
-  LINK4=
+  LINK4="[Verification Guides Images]"
 fi
 if [[ "$SUBDIR" == "verification" ]] && [[ "$OPTION" != "all" ]]; then
-  LINK2=
+  LINK2="[Verification Guide Image Differences]"
 fi
 if [ "$HAVE_USER_DIFFS" == "" ]; then
   LINK1=
@@ -227,7 +232,7 @@ OUTPUT_LINKS $SUBDIR $OPTION
 
 DIFF_TITLE=
 if [ "$OPTION" != "all" ]; then
-DIFF_TITLE="<th align=left>Difference<br>white: where two images are the same<br>red: where two images are different</th>"
+DIFF_TITLE="<th align=left>Difference<br>white: where images are the same<br>red: where images are different</th>"
 fi
 if [ "$REV2" != "" ]; then
   REV1="$REV1<br>$REV2"
@@ -335,21 +340,12 @@ cat << EOF  > $HTML_DIFF
 
 <table>
 <tr><th align=left>FDS revision:</th><td> $FDS_REVISION</td></tr>
-<tr><th align=left>FDS repo:</th><td>$FDS_REPO</td></tr>
 <tr><th align=left>SMV revision:</th><td> $SMV_REVISION</td></tr>
-<tr><th align=left>SMV repo:</th><td>$SMV_REPO</td></tr>
-<tr><th align=left>SMV revision:</th><td> $SMV_REVISION</td></tr>
+<tr><th align=left>Repo root:</th><td> $REPO</td></tr>
 <tr><th align=left>Metric:</th><td> ${METRIC_LABEL}</td></tr>
 <tr><th align=left>Tolerance:</th><td> $TOLERANCE</td></tr>
 </table>
 EOF
-
-OUTPUT_LINKS 
-
-cat << EOF  >> $HTML_DIFF
-<p><hr>
-EOF
-
 
 #*** output differences if any
 
@@ -363,7 +359,8 @@ if [ "$HAVE_VER_DIFFS" == "1" ]; then
 fi
 else
 cat << EOF  >> $HTML_DIFF
-<p>None
+<h3>Image Differences</h3>
+<p>All images are within the error tolerance
 EOF
 fi
 
