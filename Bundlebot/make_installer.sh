@@ -534,13 +534,6 @@ module load $SMVMODULE
 <ul>
 STARTUP
 
-if [ "$ostype" == "OSX" ]; then
-cat << STARTUP >> \$STARTUPtmp
-<li> Install XQuartz which can be downloaded from https://xquartz.org .
-Smokeview 6.7.15 and later requires this library.
-STARTUP
-fi
-
 cat << STARTUP >> \$STARTUPtmp
 <li>Log out and log back in so changes will take effect.
 </ul>
@@ -576,25 +569,8 @@ echo "module load $SMVMODULE"
 echo ""
 EOF
 
-if [ "$ostype" == "OSX" ]; then
-cat << EOF >> $INSTALLER
-echo "2. Install XQuartz which can be downloaded from https://xquartz.org"
-echo "   Smokeview 6.7.15 and later requires this library"
-echo ""
-EOF
-fi
-
-if [ "$ostype" == "OSX" ]; then
-cat << EOF >> $INSTALLER
-echo "3. Log out and log back in so the changes will take effect."
-EOF
-else
 cat << EOF >> $INSTALLER
 echo "2. Log out and log back in so the changes will take effect."
-EOF
-fi
-
-cat << EOF >> $INSTALLER
 echo ""
 echo "*** To uninstall fds and smokeview, erase the directory: "
 echo "\$FDS_root"

@@ -1644,6 +1644,56 @@ get_firebot_success()
 }
 
 #---------------------------------------------
+#                   make_fds_summary
+#---------------------------------------------
+
+make_fds_summary()
+{
+  if [ -d $FDS_SUMMARY_DIR ]; then
+    cp $fdsrepo/Manuals/FDS_User_Guide/SCRIPT_FIGURES/*.png         $FDS_SUMMARY_DIR/images/user/.
+    cp $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/*.png $FDS_SUMMARY_DIR/images/verification/.
+    DATE=`date +"%b %d, %Y - %r"`
+
+# compare images
+
+    CURDIR=`pwd`
+    cd $botrepo/Firebot
+    ./compare_images.sh $figrepo/compare/firebot/images $FDS_SUMMARY_DIR/images $FDS_SUMMARY_DIR/diffs/images >& $OUTPUT_DIR/stage8_image_compare
+
+# look for fyis
+    if [[ `grep '***fyi:' $OUTPUT_DIR/stage8_image_compare` == "" ]]
+    then
+      # Continue along
+      :
+    else
+      echo "FYIs from Stage 8 - Image comparisons:"     >> $FYI_LOG
+      grep '***fyi:' $OUTPUT_DIR/stage8_image_compare   >> $FYI_LOG
+    fi
+
+# look for warnings
+    if [[ `grep '***warning:' $OUTPUT_DIR/stage8_image_compare` == "" ]]
+    then
+      # Continue along
+      :
+    else
+      echo "Warnings from Stage 8 - Image comparisons:"     >> $WARNING_LOG
+      grep '***warning:' $OUTPUT_DIR/stage8_image_compare   >> $WARNING_LOG
+    fi
+    
+    if [ "$WEB_DIR" != "" ]; then
+      if [ -d $WEB_DIR ]; then
+        CUR_DIR=`pwd`
+        cd $WEB_DIR
+        rm -r images manuals diffs *.html
+        cp -r $FDS_SUMMARY_DIR/* .
+        rm *template.html
+        cd $CUR_DIR
+      fi
+    fi
+  fi
+}
+
+#---------------------------------------------
 #                   email_build_status
 #---------------------------------------------
 
@@ -1717,7 +1767,7 @@ email_build_status()
      # Send email with failure message and warnings, body of email contains appropriate log file
      echo "[$botuser] $bottype failure and warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH."
      if [ "$HAVE_MAIL" == "1" ]; then
-       cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype failure and warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
+       cat $ERROR_LOG $FYI_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype failure and warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
      fi
 
    # Check for errors only
@@ -1726,7 +1776,7 @@ email_build_status()
       # Send email with failure message, body of email contains error log file
       echo "[$botuser] $bottype failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH."
       if [ "$HAVE_MAIL" == "1" ]; then
-        cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
+        cat $ERROR_LOG $FYI_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
       fi
 
    # Check for warnings only
@@ -1737,7 +1787,7 @@ email_build_status()
       # Send email with success message, include warnings
       echo "[$botuser] $bottype success, with warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH"
       if [ "$HAVE_MAIL" == "1" ]; then
-        cat $WARNING_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype success, with warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
+        cat $WARNING_LOG $FYI_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype success, with warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
       fi
 
    # No errors or warnings
@@ -1749,7 +1799,7 @@ email_build_status()
       firebot_status=0
       echo "[$botuser] $bottype success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH"
       if [ "$HAVE_MAIL" == "1" ]; then
-        cat $TIME_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
+        cat $TIME_LOG $FYI_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
       fi
    fi
 }
@@ -1792,6 +1842,7 @@ TIME_LOG=$OUTPUT_DIR/timings
 ERROR_LOG=$OUTPUT_DIR/errors
 VALIDATION_ERROR_LOG=$OUTPUT_DIR/validation_errors
 WARNING_LOG=$OUTPUT_DIR/warnings
+FYI_LOG=$OUTPUT_DIR/fyis
 NEWGUIDE_DIR=$OUTPUT_DIR/Newest_Guides
 MANUALS_DIR=$HOME/.firebot/Manuals
 MANUALS_LATEST_DIR=$HOME/.firebot/Manuals_latest
@@ -1861,7 +1912,8 @@ CLONE_FDSSMV=
 FDS_REV=origin/master
 SMV_REV=origin/master
 WEB_DIR=
-HTML2PDF=wkhtmltopdf
+WEB_BASE_DIR=
+WEB_ROOT=
 FORCECLONE=
 
 SKIPMATLAB=
@@ -1874,7 +1926,7 @@ VALIDATION=
 CHECK_CLUSTER=
 
 #*** parse command line arguments
-while getopts 'b:BcCdiJm:Mp:q:R:sSTuUV:x:X:y:Y:w:' OPTION
+while getopts 'b:BcCdiJm:Mp:q:R:sSTuUV:x:X:y:Y:w:W:' OPTION
 do
 case $OPTION in
   b)
@@ -1969,28 +2021,33 @@ case $OPTION in
   w)
    WEB_DIR="$OPTARG"
    ;;
+  W)
+   WEB_ROOT="$OPTARG"
+   ;;
 esac
 done
 shift $(($OPTIND-1))
 
 if [ "$WEB_DIR" != "" ]; then
-  if [ -d $WEB_DIR ]; then
-    testfile=$WEB_DIR/test.$$
-    touch $testfile >& /dev/null
-    if [ -e $testfile ]; then
-      rm $testfile
-    else
-      WEB_DIR=
-    fi
-  else
+  WEB_BASE_DIR=$WEB_DIR
+  WEB_DIR=$WEB_ROOT/$WEB_DIR
+  if [ ! -d $WEB_DIR ]; then
     WEB_DIR=
+    WEB_BASE_DIR=
   fi
 fi
 if [ "$WEB_DIR" != "" ]; then
-  WEB_HOST=`hostname -A | awk '{print $2}'`
-  WEB_URL=http://$WEB_HOST/`basename $WEB_DIR`
-else
-  WEB_URL=
+  testfile=$WEB_DIR/test.$$
+  touch $testfile >& /dev/null
+  if [ -e $testfile ]; then
+    WEB_HOST=`hostname -A | awk '{print $2}'`
+    WEB_URL=http://$WEB_HOST/$WEB_BASE_DIR
+    rm -f $testfile
+  else
+    WEB_BASE_DIR=
+    WEB_DIR=
+    WEB_URL=
+  fi
 fi
 
 # Load mailing list for status report
@@ -2210,6 +2267,8 @@ TIME_LIMIT_EMAIL_NOTIFICATION="unsent"
 hostname=`hostname`
 start_time=`date`
 
+touch $FYI_LOG
+
 ### Stage 1 ###
 
 echo "Status"
@@ -2428,6 +2487,7 @@ if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
     if [[ $smv_release_success ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] ; then
       make_fds_pictures
       check_fds_pictures
+      make_fds_summary
     fi
   fi
 
@@ -2484,44 +2544,6 @@ if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
       copy_fds_technical_guide
       copy_fds_validation_guide
       copy_fds_Config_management_plan
-
-      if [ -d $FDS_SUMMARY_DIR ]; then
-        cp $fdsrepo/Manuals/FDS_User_Guide/SCRIPT_FIGURES/*.png         $FDS_SUMMARY_DIR/images/user/.
-        cp $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/*.png $FDS_SUMMARY_DIR/images/verification/.
-        DATE=`date +"%b %d, %Y - %r"`
-
-        sed "s/&&DATE&&/$DATE/g"                $FDS_SUMMARY_DIR/index_template.html | \
-        sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                        | \
-        sed "s/&&LINK&&/original - <a href=\"diffs\/index.html\">differences<\/a>/g" | \
-        sed "s/&&SMV_BUILD&&/$SMV_REVISION/g"    > $FDS_SUMMARY_DIR/index.html
-        cat $FDS_SUMMARY_DIR/index_trailer.html >> $FDS_SUMMARY_DIR/index.html
-
-        notfound=`$HTML2PDF -V 2>&1 | tail -1 | grep "not found" | wc -l`
-        if [ $notfound -eq 0 ]; then
-          $HTML2PDF $FDS_SUMMARY_DIR/index.html $FDS_SUMMARY_DIR/FDS_Summary.pdf
-          cp $FDS_SUMMARY_DIR/FDS_Summary.pdf   $NEWGUIDE_DIR/.
-        fi
-
-        CURDIR=`pwd`
-        cd $botrepo/Firebot
-        ./compare_images.sh $figrepo/compare/firebot/images $FDS_SUMMARY_DIR/images $FDS_SUMMARY_DIR/diffs/images >& $OUTPUT_DIR/stage8_image_compare
-        sed "s/&&DATE&&/$DATE/g"              $FDS_SUMMARY_DIR/index_template.html | \
-        sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                      | \
-        sed "s/&&LINK&&/<a href=\"..\/index.html\">original<\/a> - differences/g"  | \
-        sed "s/&&SMV_BUILD&&/$SMV_REVISION/g"   > $FDS_SUMMARY_DIR/diffs/index.html
-        cat $FDS_SUMMARY_DIR/diff_trailer.html >> $FDS_SUMMARY_DIR/diffs/index.html
-
-        if [ "$WEB_DIR" != "" ]; then
-          if [ -d $WEB_DIR ]; then
-            CUR_DIR=`pwd`
-            cd $WEB_DIR
-            rm -r images manuals diffs *.html
-            cp -r $FDS_SUMMARY_DIR/* .
-            rm *template.html
-            cd $CUR_DIR
-          fi
-        fi
-      fi
     fi
   fi
 fi

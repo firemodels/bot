@@ -19,6 +19,9 @@ function run_script(script){
 function build_libs(platform){
   MyObject.Run(get_fullpath("webscripts/webBUILDlibs.bat ",platform));
 }
+function archive_smv(args){
+  MyObject.Run(get_fullpath("webscripts/webARCHIVEbundle.bat ",args));
+}
 function build_smv(args){
   MyObject.Run(get_fullpath("webscripts/webBUILDsmv.bat ",args));
 }
@@ -125,19 +128,22 @@ function install_smv(args){
 
 <p><table border=on>
 <tr>
-<th colspan=4>Libraries</th>
+<th colspan=3>Libraries</th>
 </tr>
 <tr>
-<th rowspan=2>Windows</th><th rowspan=2>Linux</th><th colspan=2>OSX</th></tr>
-<tr><th>X11</th><th>Apple</th></tr>
+<th>Windows</th><th>Linux</th><th>OSX</th></tr>
+
+<!--
+<td align=center><button onclick="build_libs('osxquartz')">Build</button></td>
+-->
 
 <tr>
 <td align=center>
 <button onclick="build_libs('windows')">Build</button>
 </td>
 <td align=center><button onclick="build_libs('linux')">Build</button></td>
-<td align=center><button onclick="build_libs('osxquartz')">Build</button></td>
-<td align=center><button onclick="build_libs('osx')">Build</butt</tr>
+<td align=center><button onclick="build_libs('osx')">Build</button></td>
+</tr>
 </table>
 
 
@@ -232,11 +238,14 @@ function install_smv(args){
 </td>
 <td align=center>
 
-<p><table border=on>
-<tr><th colspan=4>Smokeview Test</th></tr>
+<!--
+<td align=center><button onclick="build_smv('osxquartz test')">Build</button></td>
+-->
 
-<tr><th rowspan=2>Windows</th><th rowspan=2>Linux</th><th colspan=2>OSX</th></tr>
-<tr><th>X11</th><th>Apple</th></tr>
+<p><table border=on>
+<tr><th colspan=3>Test Smokeview</th></tr>
+
+<tr><th>Windows</th><th>Linux</th><th>OSX</th></tr>
 <tr>
 <td align=center>
 <button onclick="build_smv('windows test')">Build</button><br>
@@ -244,7 +253,6 @@ function install_smv(args){
 <td align=center>
 <button onclick="build_smv('linux test')">Build</button>
 </td>
-<td align=center><button onclick="build_smv('osxquartz test')">Build</button></td>
 <td align=center><button onclick="build_smv('osx test')">Build</button></td>
 </tr>
 
@@ -252,6 +260,11 @@ function install_smv(args){
 <td align=center><button onclick="package_smv('windows test')">Bundle</button></td>
 <td align=center><button onclick="package_smv('linux test')">Bundle</button></td>
 <td align=center colspan=3><button onclick="package_smv('osx test')">Bundle</button></td>
+</tr>
+<tr>
+<td align=center></td>
+<td align=center><button onclick="archive_smv('linux')">Archive</button></td>
+<td align=center colspan=3><button onclick="archive_smv('osx')">Archive</button></td>
 </tr>
 
 <tr>
@@ -269,21 +282,24 @@ function install_smv(args){
 
 </tr>
 </table>
+
+<!--
+<td align=center><button onclick="build_smv('osxquartz release')">Build</button></td>
+-->
+
 <p><table border=on>
 <tr><th colspan=3>Misc</th></tr>
 <tr><td><button onclick="build_smv('windows testinc')">Windows Test Incremental Build</button></tr>
 </table>
 
 <p><table border=on>
-<tr><th colspan=4>Smokeview Release</th></tr>
+<tr><th colspan=3>Release Smokeview</th></tr>
 
-<tr><th rowspan=2>Windows</th><th rowspan=2>Linux</th><th colspan=2>OSX</th></tr>
-<tr><th>X11</th><th>Apple</th></tr>
+<tr><th>Windows</th><th>Linux</th><th>OSX</th></tr>
 
 <tr>
 <td align=center><button onclick="build_smv('windows release')">Build</button></td>
 <td align=center><button onclick="build_smv('linux release')">Build</button></td>
-<td align=center><button onclick="build_smv('osxquartz release')">Build</button></td>
 <td align=center><button onclick="build_smv('osx release')">Build</button></td>
 </tr>
 

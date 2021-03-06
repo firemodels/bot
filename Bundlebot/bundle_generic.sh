@@ -378,9 +378,6 @@ echo ""
 
 CP $APPS_DIR background $smvbindir background
 CP $APPS_DIR smokeview  $smvbindir smokeview
-if [ "$platform" == "osx" ]; then
-  CP $APPS_DIR smokeview_q  $smvbindir smokeview_q
-fi
 CP $APPS_DIR smokediff  $smvbindir smokediff
 CP $APPS_DIR smokezip   $smvbindir smokezip
 CP $APPS_DIR wind2fds   $smvbindir wind2fds
