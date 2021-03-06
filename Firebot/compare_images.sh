@@ -289,11 +289,6 @@ fi
 cat << EOF >> $HTML_DIFF
 </table>
 EOF
-if [ "$HAVE_USER_DIFFS" == "" ]; then
-  cat << EOF >> $HTML_DIFF
-<p>No images have changed
-EOF
-fi
 }
 
 # make sure the Imagemagic utility compare is on this system
