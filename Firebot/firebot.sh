@@ -1739,7 +1739,7 @@ email_build_status()
      echo "            status:  https://pages.nist.gov/fds-smv/firebot_status.html" >> $TIME_LOG
    fi
    if [ "$WEB_URL" != "" ]; then
-     echo "           summary: $WEB_URL"  >> $TIME_LOG
+     echo "            images: $WEB_URL"  >> $TIME_LOG
    fi
    echo "-------------------------------" >> $TIME_LOG
 

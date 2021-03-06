@@ -359,7 +359,7 @@ if [ "$HAVE_VER_DIFFS" == "1" ]; then
 fi
 else
 cat << EOF  >> $HTML_DIFF
-<h3>Image Differences</h3>
+<h2>Image Differences</h2>
 <p>All images are within the error tolerance
 EOF
 fi
