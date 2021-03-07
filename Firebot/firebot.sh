@@ -523,7 +523,7 @@ run_verification_cases_debug()
    if [ "$CLONE_REPOS" == "" ]; then
      cd $fdsrepo/$VERIFICATION_DEBUG
      find . -name '*.stop' -exec rm -f {} \;
-   ]
+   fi
 }
 
 #---------------------------------------------
