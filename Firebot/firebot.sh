@@ -487,8 +487,8 @@ wait_cases_debug_end()
         sleep 30
      done
    else
-     while          [[ `qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$'` != '' ]]; do
-        JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$' | wc -l`
+     while          [[ `qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX_DEBUG | grep -v 'C$'` != '' ]]; do
+        JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX_DEBUG | grep -v 'C$' | wc -l`
         echo "Waiting for ${JOBS_REMAINING} ${1} cases to complete." >> $OUTPUT_DIR/stage4
         TIME_LIMIT_STAGE="3"
         check_time_limit
@@ -504,24 +504,26 @@ wait_cases_debug_end()
 run_verification_cases_debug()
 {
    # Start running all FDS verification cases in delayed stop debug mode
-   cd $fdsrepo/Verification/scripts
+   cd $fdsrepo/$VERIFICATION_DEBUG/scripts
    # Run FDS with delayed stop files (with 1 OpenMP thread and 1 iteration)
    echo "Running FDS Verification Cases"
    echo "   debug"
-   echo 'Running FDS verification cases:'                               >> $OUTPUT_DIR/stage4 2>&1
-   echo ./Run_FDS_Cases.sh -o 1 -d -m 1 $INTEL2 $SUBSET_CASES -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
-        ./Run_FDS_Cases.sh -o 1 -d -m 1 $INTEL2 $SUBSET_CASES -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
+   echo 'Running FDS verification cases:'                                                   >> $OUTPUT_DIR/stage4 2>&1
+   echo ./Run_FDS_Cases.sh -o 1 -d -m 1 $INTEL2 $SUBSET_CASES -q $QUEUE -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage4 2>&1
+        ./Run_FDS_Cases.sh -o 1 -d -m 1 $INTEL2 $SUBSET_CASES -q $QUEUE -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage4 2>&1
    echo "" >> $OUTPUT_DIR/stage4 2>&1
 
    # Wait for all verification cases to end
    wait_cases_debug_end 'verification'
 
 #  check whether cases have run
-   ./Run_FDS_Cases.sh $SUBSET_CASES -C                                  >> $OUTPUT_DIR/stage4 2>&1
+   ./Run_FDS_Cases.sh $SUBSET_CASES -C                                  -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage4 2>&1
 
    # Remove all .stop files from Verification directories (recursively)
-   cd $fdsrepo/Verification
-   find . -name '*.stop' -exec rm -f {} \;
+   if [ "$CLONE_REPOS" == "" ]; then
+     cd $fdsrepo/$VERIFICATION_DEBUG
+     find . -name '*.stop' -exec rm -f {} \;
+   ]
 }
 
 #---------------------------------------------
@@ -560,7 +562,7 @@ check_cases_debug()
       echo "#/bin/bash" > $OUTPUT_DIR/stage4_filelist
 # comment out following line until verified that it works
 #      grep err: $OUTPUT_DIR/stage4_errors | awk -F':' '{ print "cp " $1 " /tmp/."}'  | sort -u >> $OUTPUT_DIR/stage4_filelist
-      cd $fdsrepo/Verification
+      cd $fdsrepo/$VERIFICATION_DEBUG
    fi
 }
 
@@ -811,8 +813,8 @@ wait_cases_release_end()
         sleep 60
      done
    else
-     while          [[ `qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$'` != '' ]]; do
-        JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$' | wc -l`
+     while          [[ `qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX_RELEASE | grep -v 'C$'` != '' ]]; do
+        JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX_RELEASE | grep -v 'C$' | wc -l`
         echo "Waiting for ${JOBS_REMAINING} $CASETYPE cases to complete." >> $OUTPUT_DIR/$STAGE
         TIME_LIMIT_STAGE="5"
         check_time_limit
@@ -835,10 +837,10 @@ run_VV_cases_release()
    cd $fdsrepo/Verification/scripts
    # Run FDS with 1 OpenMP thread
    if [[ "$SUBSET_CASES" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-     echo 'Running FDS benchmark verification cases:'            >> $OUTPUT_DIR/stage5 2>&1
-     echo ./Run_FDS_Cases.sh $INTEL2 -b -o 1 -q $QUEUE           >> $OUTPUT_DIR/stage5 2>&1
-     ./Run_FDS_Cases.sh $INTEL2 -b -o 1 -q $QUEUE                >> $OUTPUT_DIR/stage5 2>&1
-     echo ""                                                     >> $OUTPUT_DIR/stage5 2>&1
+     echo 'Running FDS benchmark verification cases:'                        >> $OUTPUT_DIR/stage5 2>&1
+     echo ./Run_FDS_Cases.sh $INTEL2 -b -o 1 -q $QUEUE -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
+     ./Run_FDS_Cases.sh $INTEL2 -b -o 1      -q $QUEUE -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
+     echo ""                                                                 >> $OUTPUT_DIR/stage5 2>&1
    fi
 
    # Wait for benchmark verification cases to end
@@ -848,10 +850,10 @@ run_VV_cases_release()
    if [[ "$CHECK_CLUSTER" == "" ]]; then
      cd $fdsrepo/Verification/scripts
      echo 'Running FDS non-benchmark verification cases:'             >> $OUTPUT_DIR/stage5 2>&1
-     echo ./Run_FDS_Cases.sh $INTEL2 $SUBSET_CASES -R -o 1 -q $QUEUE  >> $OUTPUT_DIR/stage5 2>&1
+     echo ./Run_FDS_Cases.sh $INTEL2 $SUBSET_CASES -R -o 1 -q $QUEUE -j $JOBPREFIX_RELEASE  >> $OUTPUT_DIR/stage5 2>&1
      cd $fdsrepo/Verification/scripts
-     ./Run_FDS_Cases.sh $INTEL2 $SUBSET_CASES -R -o 1 -q $QUEUE       >> $OUTPUT_DIR/stage5 2>&1
-     echo ""                                                          >> $OUTPUT_DIR/stage5 2>&1
+     ./Run_FDS_Cases.sh      $INTEL2 $SUBSET_CASES -R -o 1 -q $QUEUE -j $JOBPREFIX_RELEASE  >> $OUTPUT_DIR/stage5 2>&1
+     echo ""                                                                                >> $OUTPUT_DIR/stage5 2>&1
    fi
 
    # run all FDS validation cases 1 time step
@@ -863,10 +865,10 @@ run_VV_cases_release()
      cd $fdsrepo/Validation
 
      echo 'Running FDS validation cases:'                             >> $OUTPUT_DIR/stage5b 2>&1
-     echo ./Run_Serial.sh   -j $JOBPREFIX -m 1 -q $QUEUE              >> $OUTPUT_DIR/stage5b 2>&1
-          ./Run_Serial.sh   -j $JOBPREFIX -m 1 -q $QUEUE              >> $OUTPUT_DIR/stage5b 2>&1
-     echo ./Run_Parallel.sh -j $JOBPREFIX -m 1 -q $QUEUE              >> $OUTPUT_DIR/stage5b 2>&1
-          ./Run_Parallel.sh -j $JOBPREFIX -m 1 -q $QUEUE              >> $OUTPUT_DIR/stage5b 2>&1
+     echo ./Run_Serial.sh   -j $JOBPREFIX_RELEASE -m 1 -q $QUEUE      >> $OUTPUT_DIR/stage5b 2>&1
+          ./Run_Serial.sh   -j $JOBPREFIX_RELEASE -m 1 -q $QUEUE      >> $OUTPUT_DIR/stage5b 2>&1
+     echo ./Run_Parallel.sh -j $JOBPREFIX_RELEASE -m 1 -q $QUEUE      >> $OUTPUT_DIR/stage5b 2>&1
+          ./Run_Parallel.sh -j $JOBPREFIX_RELEASE -m 1 -q $QUEUE      >> $OUTPUT_DIR/stage5b 2>&1
      echo ""                                                          >> $OUTPUT_DIR/stage5b 2>&1
    fi
 
@@ -876,8 +878,8 @@ run_VV_cases_release()
      echo "Running FDS Validation Cases (1 time step)"
      echo "   release"
      cd $fdsrepo/Verification/scripts
-     echo ./Run_FDS_Cases.sh -V -j $JOBPREFIX -m 1 -q $QUEUE          >> $OUTPUT_DIR/stage5b 2>&1
-          ./Run_FDS_Cases.sh -V -j $JOBPREFIX -m 1 -q $QUEUE          >> $OUTPUT_DIR/stage5b 2>&1
+     echo ./Run_FDS_Cases.sh -V -j $JOBPREFIX_RELEASE -m 1 -q $QUEUE  >> $OUTPUT_DIR/stage5b 2>&1
+          ./Run_FDS_Cases.sh -V -j $JOBPREFIX_RELEASE -m 1 -q $QUEUE  >> $OUTPUT_DIR/stage5b 2>&1
      echo ""                                                          >> $OUTPUT_DIR/stage5b 2>&1
    fi
 
@@ -893,12 +895,12 @@ run_VV_cases_release()
    if [[ -e $fdsrepo/Verification/FDS_RESTART_Cases.sh ]] && [[ "$CHECK_CLUSTER" == "" ]] ; then
      echo "   release (restart)"
 
-     echo ""                                        i               >> $OUTPUT_DIR/stage5 2>&1
-     echo 'Running FDS restart verification cases:'                 >> $OUTPUT_DIR/stage5 2>&1
-     echo ./Run_FDS_Cases.sh $INTEL2 -r -o 1 -q $QUEUE              >> $OUTPUT_DIR/stage5 2>&1
+     echo ""                                        i                        >> $OUTPUT_DIR/stage5 2>&1
+     echo 'Running FDS restart verification cases:'                          >> $OUTPUT_DIR/stage5 2>&1
+     echo ./Run_FDS_Cases.sh $INTEL2 -r -o 1 -q $QUEUE -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
      cd $fdsrepo/Verification/scripts
-     ./Run_FDS_Cases.sh $INTEL2 -r -o 1 -q $QUEUE                   >> $OUTPUT_DIR/stage5 2>&1
-     echo ""                                                        >> $OUTPUT_DIR/stage5 2>&1
+          ./Run_FDS_Cases.sh $INTEL2 -r -o 1 -q $QUEUE -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
+     echo ""                                                                 >> $OUTPUT_DIR/stage5 2>&1
 
      # Wait for restart verification cases to end
      wait_cases_release_end verification stage5
@@ -907,22 +909,22 @@ run_VV_cases_release()
 #  check whether cases have run 
 if [[ "$CHECK_CLUSTER" == "" ]] ; then
   cd $fdsrepo/Verification/scripts
-  echo ./Run_FDS_Cases.sh $SUBSET_CASES -C  >> $OUTPUT_DIR/stage5 2>&1
-       ./Run_FDS_Cases.sh $SUBSET_CASES -C  >> $OUTPUT_DIR/stage5 2>&1
+  echo ./Run_FDS_Cases.sh $SUBSET_CASES -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
+       ./Run_FDS_Cases.sh $SUBSET_CASES -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
 fi
 
 if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]] ; then
   cd $fdsrepo/Validation
-  echo ./Run_Serial.sh   -C                 >> $OUTPUT_DIR/stage5b 2>&1
-       ./Run_Serial.sh   -C                 >> $OUTPUT_DIR/stage5b 2>&1
-  echo ./Run_Parallel.sh -C                 >> $OUTPUT_DIR/stage5b 2>&1
-       ./Run_Parallel.sh -C                 >> $OUTPUT_DIR/stage5b 2>&1
+  echo ./Run_Serial.sh   -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5b 2>&1
+       ./Run_Serial.sh   -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5b 2>&1
+  echo ./Run_Parallel.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5b 2>&1
+       ./Run_Parallel.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5b 2>&1
 fi
 
 if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" != "" ]] ; then
      cd $fdsrepo/Verification/scripts
-  echo ./Run_FDS_Cases.sh -V -C >> $OUTPUT_DIR/stage5b 2>&1
-       ./Run_FDS_Cases.sh -V -C >> $OUTPUT_DIR/stage5b 2>&1
+  echo ./Run_FDS_Cases.sh -V -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5b 2>&1
+       ./Run_FDS_Cases.sh -V -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5b 2>&1
   echo ""                       >> $OUTPUT_DIR/stage5b 2>&1
 fi
 }
@@ -1894,9 +1896,8 @@ COMPILER=intel
 QUEUE=firebot
 CLEANREPO=
 UPDATEREPO=
-if [ "$JOBPREFIX" == "" ]; then
-  export JOBPREFIX=FB_
-fi
+JOBPREFIX_RELEASE=FBR_
+JOBPREFIX_DEBUG=FBD_
 
 DB=_db
 
@@ -2147,6 +2148,15 @@ CD_REPO $botrepo $BOTBRANCH || exit 1
 if [ "$BOTBRANCH" == "current" ]; then
   cd $botrepo
   BOTBRANCH=`git rev-parse --abbrev-ref HEAD`
+fi
+
+# if the fds repo is cloned, make a copy of the Verification directory and run fds in debug mode in this directory
+if [ "$CLONE_REPOS" != "" ]; then
+  cd $fdsrepo
+  VERIFICATION_DEBUG=Verification_DB
+  cp -r Verification $VERIFICATION_DEBUG
+else
+  VERIFICATION_DEBUG=Verification
 fi
 
 #save apps and pubs in directories under .firebot/$FDSBRANCH
@@ -2447,15 +2457,15 @@ fi
 # Depends on successful FDS debug compile
 if [[ $FDS_debug_success ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
    run_verification_cases_debug
-   check_cases_debug $fdsrepo/Verification 'verification'
+   check_cases_debug $fdsrepo/$VERIFICATION_DEBUG 'verification'
 fi
 
-if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-# clean debug stage
+if [[ "$CLONE_REPOS" == "" ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+# clean debug stage (only if repos were not cloned)
   cd $fdsrepo
   if [[ "$CLEANREPO" == "1" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
     echo "   cleaning Verification"
-    clean_repo $fdsrepo/Verification $FDSBRANCH || exit 1
+    clean_repo $fdsrepo/$VERIFICATION_DEBUG $FDSBRANCH || exit 1
   fi
 fi
 
