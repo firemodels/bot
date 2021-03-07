@@ -289,11 +289,6 @@ fi
 cat << EOF >> $HTML_DIFF
 </table>
 EOF
-if [ "$HAVE_USER_DIFFS" == "" ]; then
-  cat << EOF >> $HTML_DIFF
-<p>No images have changed
-EOF
-fi
 }
 
 # make sure the Imagemagic utility compare is on this system
@@ -359,7 +354,7 @@ if [ "$HAVE_VER_DIFFS" == "1" ]; then
 fi
 else
 cat << EOF  >> $HTML_DIFF
-<h3>Image Differences</h3>
+<h2>Image Differences</h2>
 <p>All images are within the error tolerance
 EOF
 fi
