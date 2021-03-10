@@ -641,13 +641,6 @@ compile_smv_utilities()
      ./make_LIBS.sh >> $OUTPUT_DIR/stage3a 2>&1
      echo "" >> $OUTPUT_DIR/stage3a 2>&1
     
-     if [ "$platform" == "osx" ]; then 
-       echo "      quartz libraries"
-       cd $smvrepo/Build/LIBS/intel_osx_q_64
-       ./make_LIBS.sh >> $OUTPUT_DIR/stage3a 2>&1
-       echo "" >> $OUTPUT_DIR/stage3a 2>&1
-     fi
-
    # smokezip:
      echo "      smokezip"
      cd $smvrepo/Build/smokezip/${COMPILER}_${platform}${size}
@@ -987,11 +980,6 @@ compile_smv()
      cd $smvrepo/Build/smokeview/intel_${platform}${size}
      echo "" > $OUTPUT_DIR/stage3c 2>&1
      ./make_smokeview.sh >> $OUTPUT_DIR/stage3c 2>&1
-     if [ "$platform" == "osx" ]; then 
-       echo "      quartz release"
-       cd $smvrepo/Build/smokeview/intel_osx_q_64
-       ./make_smokeview.sh >> $OUTPUT_DIR/stage3c 2>&1
-     fi
    fi
 }
 
@@ -1013,18 +1001,6 @@ check_compile_smv()
       echo "Errors from Stage 3c - Compile SMV release:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage3c >> $ERROR_LOG
       echo "" >> $ERROR_LOG
-    fi
-    if [ "$platform" == "osx" ]; then 
-      cd $smvrepo/Build/smokeview/intel_osx_q_64
-      if [ -e "smokeview_osx_q_64" ]; then
-        CP smokeview_osx_q_64 $LATESTAPPS_DIR/smokeview_q
-      else
-        echo "Errors from Stage 3c - Compile quart SMV release:" >> $ERROR_LOG
-        if [ "$smv_errors" == "" ]; then
-          cat $OUTPUT_DIR/stage3c >> $ERROR_LOG
-        fi
-        echo "" >> $ERROR_LOG
-      fi
     fi
 
     # Check for compiler warnings/remarks
