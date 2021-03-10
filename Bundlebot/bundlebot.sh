@@ -8,10 +8,10 @@ mpi_version_linux=INTEL
 
 #*** OSX parameters
 
-intel_mpi_version_osx=19u4
-mpi_version_osx=3.1.2
-#intel_mpi_version_osx=oneapi
-#mpi_version_osx=3.1.6
+#intel_mpi_version_osx=19u4
+#mpi_version_osx=3.1.2
+intel_mpi_version_osx=oneapi
+mpi_version_osx=4.1.0
 
 #---------------------------------------------
 #                   usage
