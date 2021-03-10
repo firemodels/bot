@@ -137,6 +137,8 @@ echo "  $NEW_DIR/$SUBDIR"
 echo ""
 DIFFS=
 rm -f $NEW_DIR/$SUBDIR/blur*.png
+file_list=$DIFF_DIR/$SUBDIR/file_list
+rm -f $file_list
 for f in $NEW_DIR/$SUBDIR/*.png; do
   base=`basename $f`
   blur_base=blur_$base
@@ -153,6 +155,7 @@ for f in $NEW_DIR/$SUBDIR/*.png; do
     convert $to_file   -blur 0x2 $blur_to_file
     diff=`compare -metric $METRIC $blur_from_file $blur_to_file $diff_file |& awk -F'('  '{printf $2}' | awk -F')' '{printf $1}i'`
     echo $diff > $diff_file_metric
+    echo $base $diff >> $file_list
     if [[ "$diff" != "0" ]] && [[ ! $diff == *"e"* ]]; then
       iftest=`echo "${diff} > ${TOLERANCE}" | bc`
       if [ 1 -eq $iftest ]; then
@@ -217,29 +220,21 @@ OUTPUT_HTML ()
 {
 SUBDIR=$1
 GUIDE=$2
-OPTION=$3
-REV1=$4
-REV2=$5
+REV1=$3
+REV2=$4
 
-if [ "$OPTION" == "all" ]; then
-  SUFFIX=Images
-else
-  SUFFIX="Image Differences"
-fi
+SUFFIX=Images
 
 TITLE="$GUIDE Guide $SUFFIX"
 
   cat << EOF >> $HTML_DIFF
-<a name="$SUBDIR$OPTION">
+<a name="${SUBDIR}all">
 <h2>$TITLE</h2>
 EOF
 
-OUTPUT_LINKS $SUBDIR $OPTION
+OUTPUT_LINKS $SUBDIR all
 
 DIFF_TITLE=
-if [ "$OPTION" != "all" ]; then
-DIFF_TITLE="<th align=left>Difference<br>white: where images are the same<br>red: where images are different</th>"
-fi
 if [ "$REV2" != "" ]; then
   REV1="$REV1<br>$REV2"
 fi
@@ -249,18 +244,18 @@ fi
 <th align=left>Base<br>$REV1</th>
 <th align=left>Current<br>$FDS_REVISION<br>$SMV_REVISION</th>$DIFF_TITLE</tr>
 EOF
-  for f in `ls $DIFF_DIR/$SUBDIR/*.png`; do
+file_list=$DIFF_DIR/$SUBDIR/file_list
+FILELIST=`sort -k2,2nr  -k1,1 $file_list | awk '{print $1}'`
+  for f in $FILELIST; do
     base=`basename $f .png`
     pngfile=$base.png
     changefile=$base.png.changed
     metricfile=$base.png.metric
 
-    if [[ ! -e $DIFF_DIR/$SUBDIR/$changefile ]] && [[ "$OPTION" != "all" ]]; then
-      continue;
-    fi
     ERROR=`cat $DIFF_DIR/$SUBDIR/$metricfile`
+    COMPARE=`echo $ERROR'>'$TOLERANCE | bc -l`
     STYLE=
-    if [ "$ERROR" != "0" ]; then
+    if [ "$COMPARE" == "1" ]; then
       STYLE="style=\"color:red\""
     fi
     cp $BASE_DIR/$SUBDIR/$pngfile $SUMMARY_DIR/diffs/base/$SUBDIR/.
@@ -277,13 +272,6 @@ cat << EOF >> $HTML_DIFF
 <td><a href="diffs/base/$SUBDIR/$pngfile"><img $SIZE src=diffs/base/$SUBDIR/$pngfile></a></td>
 <td><a href="images/$SUBDIR/$pngfile"><img $SIZE src=images/$SUBDIR/$pngfile></a></td>
 EOF
-if [[ "$OPTION" != "all" ]] && [[ -e $DIFF_DIR/$SUBDIR/$changefile ]]; then
-cat << EOF >> $HTML_DIFF
-<td align=center><a href="diffs/images/$SUBDIR/$pngfile"><img $SIZE src=diffs/images/$SUBDIR/$pngfile></a></td>
-</tr>
-<tr><th colspan=3>^ $pngfile,  $METRIC=<span $STYLE>$ERROR</span> ^</th></tr>
-EOF
-else
 cat << EOF >> $HTML_DIFF
 <tr>
 EOF
@@ -293,7 +281,6 @@ EOF
 cat << EOF >> $HTML_DIFF
 </tr>
 EOF
-fi
 
   done
 cat << EOF >> $HTML_DIFF
@@ -344,36 +331,17 @@ cat << EOF  > $HTML_DIFF
 <h2>Firebot Images - $DATE</h2>
 
 <table>
-<tr><th align=left>FDS revision:</th><td> $FDS_REVISION</td></tr>
-<tr><th align=left>SMV revision:</th><td> $SMV_REVISION</td></tr>
-<tr><th align=left>Repo root:</th><td> $REPO</td></tr>
+<tr><th align=left>Versions:</th><td> $FDS_REVISION, SMV_REVISION</td></tr>
+<tr><th align=left>Root:</th><td> $REPO</td></tr>
 <tr><th align=left>Metric:</th><td> ${METRIC_LABEL}</td></tr>
 <tr><th align=left>Tolerance:</th><td> $TOLERANCE</td></tr>
 </table>
 EOF
 
-#*** output differences if any
-
-if [ "$HAVE_DIFFS" == "1" ]; then
-
-if [ "$HAVE_USER_DIFFS" == "1" ]; then
-  OUTPUT_HTML user         User         diffs $FIG_USER_FDS_REVISION $FIG_USER_SMV_REVISION
-fi
-if [ "$HAVE_VER_DIFFS" == "1" ]; then
-  OUTPUT_HTML verification Verification diffs $FIG_VER_FDS_REVISION  $FIG_VER_SMV_REVISION
-fi
-else
-cat << EOF  >> $HTML_DIFF
-<h2>Image Differences</h2>
-<p>All images are within the error tolerance
-EOF
-fi
-
-
 #*** output all images
 
-OUTPUT_HTML user         User         all $FIG_USER_FDS_REVISION $FIG_USER_SMV_REVISION
-OUTPUT_HTML verification Verification all $FIG_VER_FDS_REVISION  $FIG_VER_SMV_REVISION
+OUTPUT_HTML user         User         $FIG_USER_FDS_REVISION $FIG_USER_SMV_REVISION
+OUTPUT_HTML verification Verification $FIG_VER_FDS_REVISION  $FIG_VER_SMV_REVISION
 
 LINK1="[<a href="#userdiffs">User Image Guide Differences</a>]"
 LINK2="[<a href="#verificationdiffs">Verification Guide Image Differences</a>]"
