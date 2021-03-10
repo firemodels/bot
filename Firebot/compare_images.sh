@@ -201,12 +201,6 @@ fi
 if [[ "$SUBDIR" == "verification" ]] && [[ "$OPTION" != "all" ]]; then
   LINK2="[Verification Guide Image Differences]"
 fi
-if [ "$HAVE_USER_DIFFS" == "" ]; then
-  LINK1=
-fi
-if [ "$HAVE_VER_DIFFS" == "" ]; then
-  LINK2=
-fi
 cat << EOF >> $HTML_DIFF
 <p>$LINK1$LINK2$LINK3$LINK4
 EOF
@@ -225,27 +219,14 @@ REV2=$4
 
 SUFFIX=Images
 
-TITLE="$GUIDE Guide $SUFFIX"
-
-  cat << EOF >> $HTML_DIFF
-<a name="${SUBDIR}all">
-<h2>$TITLE</h2>
-EOF
-
-OUTPUT_LINKS $SUBDIR all
-
 DIFF_TITLE=
 if [ "$REV2" != "" ]; then
   REV1="$REV1<br>$REV2"
 fi
-  cat << EOF >> $HTML_DIFF
-<p><table border=on>
-<tr>
-<th align=left>Base<br>$REV1</th>
-<th align=left>Current<br>$FDS_REVISION<br>$SMV_REVISION</th>$DIFF_TITLE</tr>
-EOF
 file_list=$DIFF_DIR/$SUBDIR/file_list
 FILELIST=`sort -k2,2nr  -k1,1 $file_list | awk '{print $1}'`
+  START_DIFF=0
+  START_REST=0
   for f in $FILELIST; do
     base=`basename $f .png`
     pngfile=$base.png
@@ -253,6 +234,46 @@ FILELIST=`sort -k2,2nr  -k1,1 $file_list | awk '{print $1}'`
     metricfile=$base.png.metric
 
     ERROR=`cat $DIFF_DIR/$SUBDIR/$metricfile`
+    if [ "$ERROR" == "0" ]; then
+      if [ "$START_REST" == "0" ]; then
+        START_REST=1
+      fi
+    else
+      if [ "$START_DIFF" == "0" ]; then
+        START_DIFF=1
+      fi
+    fi
+
+    if [ "$START_DIFF" == "1" ]; then
+OUTPUT_LINKS $SUBDIR diffs
+  cat << EOF >> $HTML_DIFF
+<a name="${SUBDIR}diffs">
+<h2>$GUIDE Guide Image Differences</h2>
+<p><table border=on>
+<tr>
+<th align=left>Base<br>$REV1</th>
+<th align=left>Current<br>$FDS_REVISION<br>$SMV_REVISION</th>$DIFF_TITLE</tr>
+EOF
+      START_DIFF=2
+    fi
+    
+    if [ "$START_REST" == "1" ]; then
+      if [ "$START_DIFF" == "2" ]; then
+        cat << EOF >> $HTML_DIFF
+</table>
+EOF
+      fi
+OUTPUT_LINKS $SUBDIR all
+  cat << EOF >> $HTML_DIFF
+<a name="${SUBDIR}all">
+<h2>$GUIDE Guide Images</h2>
+<p><table border=on>
+<tr>
+<th align=left>Base<br>$REV1</th>
+<th align=left>Current<br>$FDS_REVISION<br>$SMV_REVISION</th>$DIFF_TITLE</tr>
+EOF
+      START_REST=2
+    fi
     COMPARE=`echo $ERROR'>'$TOLERANCE | bc -l`
     STYLE=
     if [ "$COMPARE" == "1" ]; then
