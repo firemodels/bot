@@ -12,8 +12,8 @@ HAVE_USER_DIFFS=
 HAVE_VER_DIFFS=
 
 TOLERANCE=0.2
-HEIGHT=200
-WIDTH=200
+HEIGHT=250
+WIDTH=250
 
 #*** setup directories
 
@@ -136,16 +136,22 @@ echo "  $BASE_DIR/$SUBDIR "
 echo "  $NEW_DIR/$SUBDIR"
 echo ""
 DIFFS=
+rm -f $NEW_DIR/$SUBDIR/blur*.png
 for f in $NEW_DIR/$SUBDIR/*.png; do
   base=`basename $f`
+  blur_base=blur_$base
   from_file=$BASE_DIR/$SUBDIR/$base
+  blur_from_file=$BASE_DIR/$SUBDIR/$blur_base
   to_file=$NEW_DIR/$SUBDIR/$base
+  blur_to_file=$NEW_DIR/$SUBDIR/$blur_base
   diff_file=$DIFF_DIR/$SUBDIR/$base
   diff_file_changed=$DIFF_DIR/$SUBDIR/$base.changed
   diff_file_metric=$DIFF_DIR/$SUBDIR/$base.metric
   rm -f $diff_file $diff_file_changed $diff_file_metric
   if [[ -e $from_file ]] && [[ -e $to_file ]]; then
-    diff=`compare -metric $METRIC $from_file $to_file $diff_file |& awk -F'('  '{printf $2}' | awk -F')' '{printf $1}i'`
+    convert $from_file -blur 0x2 $blur_from_file
+    convert $to_file   -blur 0x2 $blur_to_file
+    diff=`compare -metric $METRIC $blur_from_file $blur_to_file $diff_file |& awk -F'('  '{printf $2}' | awk -F')' '{printf $1}i'`
     echo $diff > $diff_file_metric
     if [[ "$diff" != "0" ]] && [[ ! $diff == *"e"* ]]; then
       iftest=`echo "${diff} > ${TOLERANCE}" | bc`
@@ -253,6 +259,10 @@ EOF
       continue;
     fi
     ERROR=`cat $DIFF_DIR/$SUBDIR/$metricfile`
+    STYLE=
+    if [ "$ERROR" != "0" ]; then
+      STYLE="style=\"color:red\""
+    fi
     cp $BASE_DIR/$SUBDIR/$pngfile $SUMMARY_DIR/diffs/base/$SUBDIR/.
     IMAGE_HEIGHT=`identify -format '%h' $BASE_DIR/$SUBDIR/$pngfile`
     IMAGE_WIDTH=`identify -format '%w' $BASE_DIR/$SUBDIR/$pngfile`
@@ -271,14 +281,14 @@ if [[ "$OPTION" != "all" ]] && [[ -e $DIFF_DIR/$SUBDIR/$changefile ]]; then
 cat << EOF >> $HTML_DIFF
 <td align=center><a href="diffs/images/$SUBDIR/$pngfile"><img $SIZE src=diffs/images/$SUBDIR/$pngfile></a></td>
 </tr>
-<tr><th colspan=3>^ $pngfile - $METRIC=$ERROR ^</th></tr>
+<tr><th colspan=3>^ $pngfile,  $METRIC=<span $STYLE>$ERROR</span> ^</th></tr>
 EOF
 else
 cat << EOF >> $HTML_DIFF
 <tr>
 EOF
 cat << EOF >> $HTML_DIFF
-<th colspan=2>^ $pngfile - $METRIC=$ERROR ^</th>
+<th colspan=2>^ $pngfile, $METRIC=<span $STYLE>$ERROR</span> ^</th>
 EOF
 cat << EOF >> $HTML_DIFF
 </tr>
