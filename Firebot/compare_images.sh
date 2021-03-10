@@ -259,6 +259,10 @@ EOF
       continue;
     fi
     ERROR=`cat $DIFF_DIR/$SUBDIR/$metricfile`
+    STYLE=
+    if [ "$ERROR" != "0" ]; then
+      STYLE="style=\"color:red\""
+    fi
     cp $BASE_DIR/$SUBDIR/$pngfile $SUMMARY_DIR/diffs/base/$SUBDIR/.
     IMAGE_HEIGHT=`identify -format '%h' $BASE_DIR/$SUBDIR/$pngfile`
     IMAGE_WIDTH=`identify -format '%w' $BASE_DIR/$SUBDIR/$pngfile`
@@ -277,14 +281,14 @@ if [[ "$OPTION" != "all" ]] && [[ -e $DIFF_DIR/$SUBDIR/$changefile ]]; then
 cat << EOF >> $HTML_DIFF
 <td align=center><a href="diffs/images/$SUBDIR/$pngfile"><img $SIZE src=diffs/images/$SUBDIR/$pngfile></a></td>
 </tr>
-<tr><th colspan=3>^ $pngfile - $METRIC=$ERROR ^</th></tr>
+<tr><th colspan=3>^ $pngfile,  $METRIC=<span $STYLE>$ERROR</span> ^</th></tr>
 EOF
 else
 cat << EOF >> $HTML_DIFF
 <tr>
 EOF
 cat << EOF >> $HTML_DIFF
-<th colspan=2>^ $pngfile - $METRIC=$ERROR ^</th>
+<th colspan=2>^ $pngfile, $METRIC=<span $STYLE>$ERROR</span> ^</th>
 EOF
 cat << EOF >> $HTML_DIFF
 </tr>
