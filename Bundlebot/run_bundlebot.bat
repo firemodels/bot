@@ -305,7 +305,7 @@ if "x%upload_bundle%" == "x" goto skip_upload
   echo uploading bundle
   echo.
   call upload_bundle %FDS_REVISION_BUNDLER% %SMV_REVISION_BUNDLER% %nightly% %bundle_hostname% || exit /b 1
-:skip_uplood
+:skip_upload
 
 goto eof
 

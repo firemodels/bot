@@ -132,7 +132,6 @@ CP $UTILSCRIPTDIR   slice2mp4.sh      $PLATFORMDIR/$smvbin slice2mp4.sh
 SCP $PLATFORMHOST $BACKGROUNDDIR background_${platform}_64 $PLATFORMDIR/$smvbin background
 if [ "$platform" == "osx" ]; then
   SCP $PLATFORMHOST $SMVDIR       smokeview_${platform}_${TEST}64       $PLATFORMDIR/$smvbin smokeview
-  SCP $PLATFORMHOST $SMVDIRQ      smokeview_${platform}_${TEST}q_64     $PLATFORMDIR/$smvbin smokeview_q
 else
   SCP $PLATFORMHOST $SMVDIR        smokeview_${platform}_${TEST}64  $PLATFORMDIR/$smvbin smokeview
 fi

@@ -363,53 +363,6 @@ archive_compiler_version()
 }
 
 #---------------------------------------------
-#                   build_inspect_fds
-#---------------------------------------------
-
-build_inspect_fds()
-{
-   # build an openmp thread checker version of fds
-   echo "      inspection"
-   cd $fdsrepo/Build/${INTEL}mpi_intel_linux_64_inspect
-   make -f ../makefile clean &> /dev/null
-   ./make_fds.sh &> $OUTPUT_DIR/stage2a
-}
-
-#---------------------------------------------
-#                   inspect_fds
-#---------------------------------------------
-
-inspect_fds()
-{
-   # Perform OpenMP thread checking (locate deadlocks and data races)
-   echo "      inspection"
-   cd $fdsrepo/Verification/Thread_Check/
-   ./inspect_openmp.sh -I thread_check.fds &> $OUTPUT_DIR/stage2a
-}
-
-#---------------------------------------------
-#                   check_inspect_fds
-#---------------------------------------------
-
-check_inspect_fds()
-{
-
-   # grep -v 'Warning: One or more threads in the application accessed ...' ignores a known compiler warning that displays even without errors
-      if [[ `grep -i -E 'warning|remark|problem|error' $fdsrepo/Verification/Thread_Check/race_test_4.err | grep -v '0 new problem(s) found' | grep -v 'Warning: One or more threads in the application accessed the stack of another thread'` == "" ]]
-   then
-      # Continue along
-      :
-   else
-      echo "Errors from Stage 2a - Compile and inspect FDS debug:" >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage2a >> $ERROR_LOG
-      echo "" >> $ERROR_LOG
-      echo "For more details, cd to Verification/Thread_Check and view results in the " >> $ERROR_LOG
-      echo "inspect_results directory after running the inspect_report.sh script." >> $ERROR_LOG
-      echo "" >> $ERROR_LOG
-   fi
-}
-
-#---------------------------------------------
 #                   compile_fds_mpi_db
 #---------------------------------------------
 
@@ -534,8 +487,8 @@ wait_cases_debug_end()
         sleep 30
      done
    else
-     while          [[ `qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$'` != '' ]]; do
-        JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$' | wc -l`
+     while          [[ `qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX_DEBUG | grep -v 'C$'` != '' ]]; do
+        JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX_DEBUG | grep -v 'C$' | wc -l`
         echo "Waiting for ${JOBS_REMAINING} ${1} cases to complete." >> $OUTPUT_DIR/stage4
         TIME_LIMIT_STAGE="3"
         check_time_limit
@@ -551,24 +504,26 @@ wait_cases_debug_end()
 run_verification_cases_debug()
 {
    # Start running all FDS verification cases in delayed stop debug mode
-   cd $fdsrepo/Verification/scripts
+   cd $fdsrepo/$VERIFICATION_DEBUG/scripts
    # Run FDS with delayed stop files (with 1 OpenMP thread and 1 iteration)
    echo "Running FDS Verification Cases"
    echo "   debug"
-   echo 'Running FDS verification cases:'                               >> $OUTPUT_DIR/stage4 2>&1
-   echo ./Run_FDS_Cases.sh -o 1 -d -m 1 $INTEL2 $SUBSET_CASES -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
-        ./Run_FDS_Cases.sh -o 1 -d -m 1 $INTEL2 $SUBSET_CASES -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
+   echo 'Running FDS verification cases:'                                                   >> $OUTPUT_DIR/stage4 2>&1
+   echo ./Run_FDS_Cases.sh -o 1 -d -m 1 $INTEL2 $SUBSET_CASES -q $QUEUE -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage4 2>&1
+        ./Run_FDS_Cases.sh -o 1 -d -m 1 $INTEL2 $SUBSET_CASES -q $QUEUE -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage4 2>&1
    echo "" >> $OUTPUT_DIR/stage4 2>&1
 
    # Wait for all verification cases to end
    wait_cases_debug_end 'verification'
 
 #  check whether cases have run
-   ./Run_FDS_Cases.sh $SUBSET_CASES -C                                  >> $OUTPUT_DIR/stage4 2>&1
+   ./Run_FDS_Cases.sh $SUBSET_CASES -C                                  -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage4 2>&1
 
    # Remove all .stop files from Verification directories (recursively)
-   cd $fdsrepo/Verification
-   find . -name '*.stop' -exec rm -f {} \;
+   if [ "$CLONE_REPOS" == "" ]; then
+     cd $fdsrepo/$VERIFICATION_DEBUG
+     find . -name '*.stop' -exec rm -f {} \;
+   fi
 }
 
 #---------------------------------------------
@@ -607,7 +562,7 @@ check_cases_debug()
       echo "#/bin/bash" > $OUTPUT_DIR/stage4_filelist
 # comment out following line until verified that it works
 #      grep err: $OUTPUT_DIR/stage4_errors | awk -F':' '{ print "cp " $1 " /tmp/."}'  | sort -u >> $OUTPUT_DIR/stage4_filelist
-      cd $fdsrepo/Verification
+      cd $fdsrepo/$VERIFICATION_DEBUG
    fi
 }
 
@@ -686,13 +641,6 @@ compile_smv_utilities()
      ./make_LIBS.sh >> $OUTPUT_DIR/stage3a 2>&1
      echo "" >> $OUTPUT_DIR/stage3a 2>&1
     
-     if [ "$platform" == "osx" ]; then 
-       echo "      quartz libraries"
-       cd $smvrepo/Build/LIBS/intel_osx_q_64
-       ./make_LIBS.sh >> $OUTPUT_DIR/stage3a 2>&1
-       echo "" >> $OUTPUT_DIR/stage3a 2>&1
-     fi
-
    # smokezip:
      echo "      smokezip"
      cd $smvrepo/Build/smokezip/${COMPILER}_${platform}${size}
@@ -858,8 +806,8 @@ wait_cases_release_end()
         sleep 60
      done
    else
-     while          [[ `qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$'` != '' ]]; do
-        JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$' | wc -l`
+     while          [[ `qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX_RELEASE | grep -v 'C$'` != '' ]]; do
+        JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX_RELEASE | grep -v 'C$' | wc -l`
         echo "Waiting for ${JOBS_REMAINING} $CASETYPE cases to complete." >> $OUTPUT_DIR/$STAGE
         TIME_LIMIT_STAGE="5"
         check_time_limit
@@ -882,33 +830,23 @@ run_VV_cases_release()
    cd $fdsrepo/Verification/scripts
    # Run FDS with 1 OpenMP thread
    if [[ "$SUBSET_CASES" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-     echo 'Running FDS benchmark verification cases:'            >> $OUTPUT_DIR/stage5 2>&1
-     echo ./Run_FDS_Cases.sh $INTEL2 -b -o 1 -q $QUEUE           >> $OUTPUT_DIR/stage5 2>&1
-     ./Run_FDS_Cases.sh $INTEL2 -b -o 1 -q $QUEUE                >> $OUTPUT_DIR/stage5 2>&1
-     echo ""                                                     >> $OUTPUT_DIR/stage5 2>&1
+     echo 'Running FDS benchmark verification cases:'                        >> $OUTPUT_DIR/stage5 2>&1
+     echo ./Run_FDS_Cases.sh $INTEL2 -b -o 1 -q $QUEUE -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
+     ./Run_FDS_Cases.sh $INTEL2 -b -o 1      -q $QUEUE -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
+     echo ""                                                                 >> $OUTPUT_DIR/stage5 2>&1
    fi
 
    # Wait for benchmark verification cases to end
 # let benchmark and regular cases run at the same time - for now
 #   wait_cases_release_end verification stage5
 
-# comment out thread checking cases for now   
-#   echo 'Running FDS thread checking verification cases:' >> $OUTPUT_DIR/stage5
-   if [[ "$SKIPINSPECT" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-     touch $OUTPUT_DIR/stage5i
-     cd $fdsrepo/Verification/Thread_Check
-     echo ./inspection.sh -p 6 -q $QUEUE  inspector_test.fds     >> $OUTPUT_DIR/stage5i 2>&1
-#        ./inspection.sh -p 6 -q $QUEUE  inspector_test.fds      >> $OUTPUT_DIR/stage5i 2>&1
-     echo ""                                                     >> $OUTPUT_DIR/stage5i 2>&1
-   fi
-
    if [[ "$CHECK_CLUSTER" == "" ]]; then
      cd $fdsrepo/Verification/scripts
      echo 'Running FDS non-benchmark verification cases:'             >> $OUTPUT_DIR/stage5 2>&1
-     echo ./Run_FDS_Cases.sh $INTEL2 $SUBSET_CASES -R -o 1 -q $QUEUE  >> $OUTPUT_DIR/stage5 2>&1
+     echo ./Run_FDS_Cases.sh $INTEL2 $SUBSET_CASES -R -o 1 -q $QUEUE -j $JOBPREFIX_RELEASE  >> $OUTPUT_DIR/stage5 2>&1
      cd $fdsrepo/Verification/scripts
-     ./Run_FDS_Cases.sh $INTEL2 $SUBSET_CASES -R -o 1 -q $QUEUE       >> $OUTPUT_DIR/stage5 2>&1
-     echo ""                                                          >> $OUTPUT_DIR/stage5 2>&1
+     ./Run_FDS_Cases.sh      $INTEL2 $SUBSET_CASES -R -o 1 -q $QUEUE -j $JOBPREFIX_RELEASE  >> $OUTPUT_DIR/stage5 2>&1
+     echo ""                                                                                >> $OUTPUT_DIR/stage5 2>&1
    fi
 
    # run all FDS validation cases 1 time step
@@ -920,10 +858,10 @@ run_VV_cases_release()
      cd $fdsrepo/Validation
 
      echo 'Running FDS validation cases:'                             >> $OUTPUT_DIR/stage5b 2>&1
-     echo ./Run_Serial.sh   -j $JOBPREFIX -m 1 -q $QUEUE              >> $OUTPUT_DIR/stage5b 2>&1
-          ./Run_Serial.sh   -j $JOBPREFIX -m 1 -q $QUEUE              >> $OUTPUT_DIR/stage5b 2>&1
-     echo ./Run_Parallel.sh -j $JOBPREFIX -m 1 -q $QUEUE              >> $OUTPUT_DIR/stage5b 2>&1
-          ./Run_Parallel.sh -j $JOBPREFIX -m 1 -q $QUEUE              >> $OUTPUT_DIR/stage5b 2>&1
+     echo ./Run_Serial.sh   -j $JOBPREFIX_RELEASE -m 1 -q $QUEUE      >> $OUTPUT_DIR/stage5b 2>&1
+          ./Run_Serial.sh   -j $JOBPREFIX_RELEASE -m 1 -q $QUEUE      >> $OUTPUT_DIR/stage5b 2>&1
+     echo ./Run_Parallel.sh -j $JOBPREFIX_RELEASE -m 1 -q $QUEUE      >> $OUTPUT_DIR/stage5b 2>&1
+          ./Run_Parallel.sh -j $JOBPREFIX_RELEASE -m 1 -q $QUEUE      >> $OUTPUT_DIR/stage5b 2>&1
      echo ""                                                          >> $OUTPUT_DIR/stage5b 2>&1
    fi
 
@@ -933,8 +871,8 @@ run_VV_cases_release()
      echo "Running FDS Validation Cases (1 time step)"
      echo "   release"
      cd $fdsrepo/Verification/scripts
-     echo ./Run_FDS_Cases.sh -V -j $JOBPREFIX -m 1 -q $QUEUE          >> $OUTPUT_DIR/stage5b 2>&1
-          ./Run_FDS_Cases.sh -V -j $JOBPREFIX -m 1 -q $QUEUE          >> $OUTPUT_DIR/stage5b 2>&1
+     echo ./Run_FDS_Cases.sh -V -j $JOBPREFIX_RELEASE -m 1 -q $QUEUE  >> $OUTPUT_DIR/stage5b 2>&1
+          ./Run_FDS_Cases.sh -V -j $JOBPREFIX_RELEASE -m 1 -q $QUEUE  >> $OUTPUT_DIR/stage5b 2>&1
      echo ""                                                          >> $OUTPUT_DIR/stage5b 2>&1
    fi
 
@@ -950,12 +888,12 @@ run_VV_cases_release()
    if [[ -e $fdsrepo/Verification/FDS_RESTART_Cases.sh ]] && [[ "$CHECK_CLUSTER" == "" ]] ; then
      echo "   release (restart)"
 
-     echo ""                                        i               >> $OUTPUT_DIR/stage5 2>&1
-     echo 'Running FDS restart verification cases:'                 >> $OUTPUT_DIR/stage5 2>&1
-     echo ./Run_FDS_Cases.sh $INTEL2 -r -o 1 -q $QUEUE              >> $OUTPUT_DIR/stage5 2>&1
+     echo ""                                        i                        >> $OUTPUT_DIR/stage5 2>&1
+     echo 'Running FDS restart verification cases:'                          >> $OUTPUT_DIR/stage5 2>&1
+     echo ./Run_FDS_Cases.sh $INTEL2 -r -o 1 -q $QUEUE -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
      cd $fdsrepo/Verification/scripts
-     ./Run_FDS_Cases.sh $INTEL2 -r -o 1 -q $QUEUE                   >> $OUTPUT_DIR/stage5 2>&1
-     echo ""                                                        >> $OUTPUT_DIR/stage5 2>&1
+          ./Run_FDS_Cases.sh $INTEL2 -r -o 1 -q $QUEUE -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
+     echo ""                                                                 >> $OUTPUT_DIR/stage5 2>&1
 
      # Wait for restart verification cases to end
      wait_cases_release_end verification stage5
@@ -964,22 +902,22 @@ run_VV_cases_release()
 #  check whether cases have run 
 if [[ "$CHECK_CLUSTER" == "" ]] ; then
   cd $fdsrepo/Verification/scripts
-  echo ./Run_FDS_Cases.sh $SUBSET_CASES -C  >> $OUTPUT_DIR/stage5 2>&1
-       ./Run_FDS_Cases.sh $SUBSET_CASES -C  >> $OUTPUT_DIR/stage5 2>&1
+  echo ./Run_FDS_Cases.sh $SUBSET_CASES -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
+       ./Run_FDS_Cases.sh $SUBSET_CASES -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
 fi
 
 if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]] ; then
   cd $fdsrepo/Validation
-  echo ./Run_Serial.sh   -C                 >> $OUTPUT_DIR/stage5b 2>&1
-       ./Run_Serial.sh   -C                 >> $OUTPUT_DIR/stage5b 2>&1
-  echo ./Run_Parallel.sh -C                 >> $OUTPUT_DIR/stage5b 2>&1
-       ./Run_Parallel.sh -C                 >> $OUTPUT_DIR/stage5b 2>&1
+  echo ./Run_Serial.sh   -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5b 2>&1
+       ./Run_Serial.sh   -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5b 2>&1
+  echo ./Run_Parallel.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5b 2>&1
+       ./Run_Parallel.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5b 2>&1
 fi
 
 if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" != "" ]] ; then
      cd $fdsrepo/Verification/scripts
-  echo ./Run_FDS_Cases.sh -V -C >> $OUTPUT_DIR/stage5b 2>&1
-       ./Run_FDS_Cases.sh -V -C >> $OUTPUT_DIR/stage5b 2>&1
+  echo ./Run_FDS_Cases.sh -V -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5b 2>&1
+       ./Run_FDS_Cases.sh -V -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5b 2>&1
   echo ""                       >> $OUTPUT_DIR/stage5b 2>&1
 fi
 }
@@ -1042,11 +980,6 @@ compile_smv()
      cd $smvrepo/Build/smokeview/intel_${platform}${size}
      echo "" > $OUTPUT_DIR/stage3c 2>&1
      ./make_smokeview.sh >> $OUTPUT_DIR/stage3c 2>&1
-     if [ "$platform" == "osx" ]; then 
-       echo "      quartz release"
-       cd $smvrepo/Build/smokeview/intel_osx_q_64
-       ./make_smokeview.sh >> $OUTPUT_DIR/stage3c 2>&1
-     fi
    fi
 }
 
@@ -1068,18 +1001,6 @@ check_compile_smv()
       echo "Errors from Stage 3c - Compile SMV release:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage3c >> $ERROR_LOG
       echo "" >> $ERROR_LOG
-    fi
-    if [ "$platform" == "osx" ]; then 
-      cd $smvrepo/Build/smokeview/intel_osx_q_64
-      if [ -e "smokeview_osx_q_64" ]; then
-        CP smokeview_osx_q_64 $LATESTAPPS_DIR/smokeview_q
-      else
-        echo "Errors from Stage 3c - Compile quart SMV release:" >> $ERROR_LOG
-        if [ "$smv_errors" == "" ]; then
-          cat $OUTPUT_DIR/stage3c >> $ERROR_LOG
-        fi
-        echo "" >> $ERROR_LOG
-      fi
     fi
 
     # Check for compiler warnings/remarks
@@ -1701,6 +1622,56 @@ get_firebot_success()
 }
 
 #---------------------------------------------
+#                   make_fds_summary
+#---------------------------------------------
+
+make_fds_summary()
+{
+  if [ -d $FDS_SUMMARY_DIR ]; then
+    cp $fdsrepo/Manuals/FDS_User_Guide/SCRIPT_FIGURES/*.png         $FDS_SUMMARY_DIR/images/user/.
+    cp $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/*.png $FDS_SUMMARY_DIR/images/verification/.
+    DATE=`date +"%b %d, %Y - %r"`
+
+# compare images
+
+    CURDIR=`pwd`
+    cd $botrepo/Firebot
+    ./compare_images.sh $figrepo/compare/firebot/images $FDS_SUMMARY_DIR/images $FDS_SUMMARY_DIR/diffs/images >& $OUTPUT_DIR/stage8_image_compare
+
+# look for fyis
+    if [[ `grep '***fyi:' $OUTPUT_DIR/stage8_image_compare` == "" ]]
+    then
+      # Continue along
+      :
+    else
+      echo "FYIs from Stage 8 - Image comparisons:"     >> $FYI_LOG
+      grep '***fyi:' $OUTPUT_DIR/stage8_image_compare   >> $FYI_LOG
+    fi
+
+# look for warnings
+    if [[ `grep '***warning:' $OUTPUT_DIR/stage8_image_compare` == "" ]]
+    then
+      # Continue along
+      :
+    else
+      echo "Warnings from Stage 8 - Image comparisons:"     >> $WARNING_LOG
+      grep '***warning:' $OUTPUT_DIR/stage8_image_compare   >> $WARNING_LOG
+    fi
+    
+    if [ "$WEB_DIR" != "" ]; then
+      if [ -d $WEB_DIR ]; then
+        CUR_DIR=`pwd`
+        cd $WEB_DIR
+        rm -r images manuals diffs *.html
+        cp -r $FDS_SUMMARY_DIR/* .
+        rm *template.html
+        cd $CUR_DIR
+      fi
+    fi
+  fi
+}
+
+#---------------------------------------------
 #                   email_build_status
 #---------------------------------------------
 
@@ -1746,7 +1717,7 @@ email_build_status()
      echo "            status:  https://pages.nist.gov/fds-smv/firebot_status.html" >> $TIME_LOG
    fi
    if [ "$WEB_URL" != "" ]; then
-     echo "           summary: $WEB_URL"  >> $TIME_LOG
+     echo "            images: $WEB_URL"  >> $TIME_LOG
    fi
    echo "-------------------------------" >> $TIME_LOG
 
@@ -1774,7 +1745,7 @@ email_build_status()
      # Send email with failure message and warnings, body of email contains appropriate log file
      echo "[$botuser] $bottype failure and warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH."
      if [ "$HAVE_MAIL" == "1" ]; then
-       cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype failure and warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
+       cat $ERROR_LOG $FYI_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype failure and warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
      fi
 
    # Check for errors only
@@ -1783,7 +1754,7 @@ email_build_status()
       # Send email with failure message, body of email contains error log file
       echo "[$botuser] $bottype failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH."
       if [ "$HAVE_MAIL" == "1" ]; then
-        cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
+        cat $ERROR_LOG $FYI_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
       fi
 
    # Check for warnings only
@@ -1794,7 +1765,7 @@ email_build_status()
       # Send email with success message, include warnings
       echo "[$botuser] $bottype success, with warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH"
       if [ "$HAVE_MAIL" == "1" ]; then
-        cat $WARNING_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype success, with warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
+        cat $WARNING_LOG $FYI_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype success, with warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
       fi
 
    # No errors or warnings
@@ -1806,7 +1777,7 @@ email_build_status()
       firebot_status=0
       echo "[$botuser] $bottype success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH"
       if [ "$HAVE_MAIL" == "1" ]; then
-        cat $TIME_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
+        cat $TIME_LOG $FYI_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
       fi
    fi
 }
@@ -1849,6 +1820,7 @@ TIME_LOG=$OUTPUT_DIR/timings
 ERROR_LOG=$OUTPUT_DIR/errors
 VALIDATION_ERROR_LOG=$OUTPUT_DIR/validation_errors
 WARNING_LOG=$OUTPUT_DIR/warnings
+FYI_LOG=$OUTPUT_DIR/fyis
 NEWGUIDE_DIR=$OUTPUT_DIR/Newest_Guides
 MANUALS_DIR=$HOME/.firebot/Manuals
 MANUALS_LATEST_DIR=$HOME/.firebot/Manuals_latest
@@ -1900,9 +1872,8 @@ COMPILER=intel
 QUEUE=firebot
 CLEANREPO=
 UPDATEREPO=
-if [ "$JOBPREFIX" == "" ]; then
-  export JOBPREFIX=FB_
-fi
+JOBPREFIX_RELEASE=FBR_
+JOBPREFIX_DEBUG=FBD_
 
 DB=_db
 
@@ -1918,12 +1889,12 @@ CLONE_FDSSMV=
 FDS_REV=origin/master
 SMV_REV=origin/master
 WEB_DIR=
-HTML2PDF=wkhtmltopdf
+WEB_BASE_DIR=
+WEB_ROOT=
 FORCECLONE=
 
 SKIPMATLAB=
 SKIPPICTURES=
-SKIPINSPECT=
 SKIPRELEASE=
 SUBSET_CASES=
 FDS_TAG=
@@ -1932,7 +1903,7 @@ VALIDATION=
 CHECK_CLUSTER=
 
 #*** parse command line arguments
-while getopts 'b:BcCdiJm:Mp:q:R:sSTuUV:x:X:y:Y:w:' OPTION
+while getopts 'b:BcCdiJm:Mp:q:R:sSTuUV:x:X:y:Y:w:W:' OPTION
 do
 case $OPTION in
   b)
@@ -1952,7 +1923,6 @@ case $OPTION in
    ;;
   d)
    SKIPRELEASE=1
-   SKIPINSPECT=1
    SKIPMATLAB=1
    SKIPPICTURES=1
    ;;
@@ -1984,7 +1954,6 @@ case $OPTION in
    ;;
   S)
    SUBSET_CASES="-S"
-   SKIPINSPECT=1
    SKIPMATLAB=1
    SKIPPICTURES=1
    ;;
@@ -2029,28 +1998,33 @@ case $OPTION in
   w)
    WEB_DIR="$OPTARG"
    ;;
+  W)
+   WEB_ROOT="$OPTARG"
+   ;;
 esac
 done
 shift $(($OPTIND-1))
 
 if [ "$WEB_DIR" != "" ]; then
-  if [ -d $WEB_DIR ]; then
-    testfile=$WEB_DIR/test.$$
-    touch $testfile >& /dev/null
-    if [ -e $testfile ]; then
-      rm $testfile
-    else
-      WEB_DIR=
-    fi
-  else
+  WEB_BASE_DIR=$WEB_DIR
+  WEB_DIR=$WEB_ROOT/$WEB_DIR
+  if [ ! -d $WEB_DIR ]; then
     WEB_DIR=
+    WEB_BASE_DIR=
   fi
 fi
 if [ "$WEB_DIR" != "" ]; then
-  WEB_HOST=`hostname -A | awk '{print $2}'`
-  WEB_URL=http://$WEB_HOST/`basename $WEB_DIR`
-else
-  WEB_URL=
+  testfile=$WEB_DIR/test.$$
+  touch $testfile >& /dev/null
+  if [ -e $testfile ]; then
+    WEB_HOST=`hostname -A | awk '{print $2}'`
+    WEB_URL=http://$WEB_HOST/$WEB_BASE_DIR
+    rm -f $testfile
+  else
+    WEB_BASE_DIR=
+    WEB_DIR=
+    WEB_URL=
+  fi
 fi
 
 # Load mailing list for status report
@@ -2152,6 +2126,15 @@ if [ "$BOTBRANCH" == "current" ]; then
   BOTBRANCH=`git rev-parse --abbrev-ref HEAD`
 fi
 
+# if the fds repo is cloned, make a copy of the Verification directory and run fds in debug mode in this directory
+if [ "$CLONE_REPOS" != "" ]; then
+  cd $fdsrepo
+  VERIFICATION_DEBUG=Verification_DB
+  cp -r Verification $VERIFICATION_DEBUG
+else
+  VERIFICATION_DEBUG=Verification
+fi
+
 #save apps and pubs in directories under .firebot/$FDSBRANCH
 
 BRANCH_DIR=$HOME/.firebot/$FDSBRANCH
@@ -2229,9 +2212,6 @@ if [ "$IFORT_VERSION" != "" ]; then
   echo "      Fortran: $IFORT_VERSION"
 fi
 
-if [ "$SKIPINSPECT" != "" ]; then
-  echo "     Skipping: thread checking stage"
-fi
 if [ "$SUBSET_CASES" != "" ]; then
   echo "      Running: subset of cases"
 fi
@@ -2272,6 +2252,8 @@ TIME_LIMIT_EMAIL_NOTIFICATION="unsent"
 
 hostname=`hostname`
 start_time=`date`
+
+touch $FYI_LOG
 
 ### Stage 1 ###
 
@@ -2396,13 +2378,6 @@ if [ "$MANUALS_MATLAB_ONLY" == "" ]; then
   echo Building
   echo "   FDS"
 fi
-# if something goes wrong with the openmp inspector
-# comment the following 6 lines (including 'if' and and 'fi'  lines
-if [[ "$SKIPINSPECT" == "" ]] && [[ "$platform" == "linux" ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-  build_inspect_fds
-#  inspect_fds
-#  check_inspect_fds
-fi
 
 ###****** Stage 2b ###
 
@@ -2458,15 +2433,15 @@ fi
 # Depends on successful FDS debug compile
 if [[ $FDS_debug_success ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
    run_verification_cases_debug
-   check_cases_debug $fdsrepo/Verification 'verification'
+   check_cases_debug $fdsrepo/$VERIFICATION_DEBUG 'verification'
 fi
 
-if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-# clean debug stage
+if [[ "$CLONE_REPOS" == "" ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+# clean debug stage (only if repos were not cloned)
   cd $fdsrepo
   if [[ "$CLEANREPO" == "1" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
     echo "   cleaning Verification"
-    clean_repo $fdsrepo/Verification $FDSBRANCH || exit 1
+    clean_repo $fdsrepo/$VERIFICATION_DEBUG $FDSBRANCH || exit 1
   fi
 fi
 
@@ -2498,6 +2473,7 @@ if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
     if [[ $smv_release_success ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] ; then
       make_fds_pictures
       check_fds_pictures
+      make_fds_summary
     fi
   fi
 
@@ -2554,44 +2530,6 @@ if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
       copy_fds_technical_guide
       copy_fds_validation_guide
       copy_fds_Config_management_plan
-
-      if [ -d $FDS_SUMMARY_DIR ]; then
-        cp $fdsrepo/Manuals/FDS_User_Guide/SCRIPT_FIGURES/*.png         $FDS_SUMMARY_DIR/images/user/.
-        cp $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/*.png $FDS_SUMMARY_DIR/images/verification/.
-        DATE=`date +"%b %d, %Y - %r"`
-
-        sed "s/&&DATE&&/$DATE/g"                $FDS_SUMMARY_DIR/index_template.html | \
-        sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                        | \
-        sed "s/&&LINK&&/original - <a href=\"diffs\/index.html\">differences<\/a>/g" | \
-        sed "s/&&SMV_BUILD&&/$SMV_REVISION/g"    > $FDS_SUMMARY_DIR/index.html
-        cat $FDS_SUMMARY_DIR/index_trailer.html >> $FDS_SUMMARY_DIR/index.html
-
-        notfound=`$HTML2PDF -V 2>&1 | tail -1 | grep "not found" | wc -l`
-        if [ $notfound -eq 0 ]; then
-          $HTML2PDF $FDS_SUMMARY_DIR/index.html $FDS_SUMMARY_DIR/FDS_Summary.pdf
-          cp $FDS_SUMMARY_DIR/FDS_Summary.pdf   $NEWGUIDE_DIR/.
-        fi
-
-        CURDIR=`pwd`
-        cd $botrepo/Firebot
-        ./compare_images.sh $figrepo/compare/firebot/images $FDS_SUMMARY_DIR/images $FDS_SUMMARY_DIR/diffs/images >& $OUTPUT_DIR/stage8_image_compare
-        sed "s/&&DATE&&/$DATE/g"              $FDS_SUMMARY_DIR/index_template.html | \
-        sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                      | \
-        sed "s/&&LINK&&/<a href=\"..\/index.html\">original<\/a> - differences/g"  | \
-        sed "s/&&SMV_BUILD&&/$SMV_REVISION/g"   > $FDS_SUMMARY_DIR/diffs/index.html
-        cat $FDS_SUMMARY_DIR/diff_trailer.html >> $FDS_SUMMARY_DIR/diffs/index.html
-
-        if [ "$WEB_DIR" != "" ]; then
-          if [ -d $WEB_DIR ]; then
-            CUR_DIR=`pwd`
-            cd $WEB_DIR
-            rm -r images manuals diffs *.html
-            cp -r $FDS_SUMMARY_DIR/* .
-            rm *template.html
-            cd $CUR_DIR
-          fi
-        fi
-      fi
     fi
   fi
 fi

@@ -64,9 +64,6 @@ if [ "$app_type" == "smv" ]; then
   CP hashfile
   CP smokediff
   CP smokeview
-  if [ "$platform" == "osx" ]; then
-    CP smokeview_q
-  fi
   CP smokezip
   CP wind2fds
   CP SMV_REVISION
