@@ -272,11 +272,13 @@ EOF
 </table>
 EOF
       fi
-OUTPUT_LINKS $SUBDIR all
   cat << EOF >> $HTML_DIFF
 <a name="${SUBDIR}all">
 <h2>$GUIDE Guide Images - Unchanged</h2>
 <h3>$FDS_REVISION, $SMV_REVISION</h3>
+EOF
+OUTPUT_LINKS $SUBDIR all
+  cat << EOF >> $HTML_DIFF
 <p><table border=on>
 EOF
       START_REST=2
