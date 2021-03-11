@@ -187,24 +187,27 @@ OUTPUT_LINKS ()
 {
 local SUBDIR=$1
 local OPTION=$2
-LINK1="[<a href="#userdiffs">User Images - Changed</a>]"
-LINK2="[<a href="#verificationdiffs">Verification Images - Changed</a>]"
-LINK3="[<a href="#userall">User Images - Unchanged</a>]"
-LINK4="[<a href="#verificationall">Verification Images - Unchanged</a>]"
+LINK1="[<a href="#userdiffs">Changed</a>]"
+LINK2="[<a href="#verificationdiffs">Changed</a>]"
+LINK3="[<a href="#userall">Unchanged</a>]"
+LINK4="[<a href="#verificationall">Unchanged</a>]"
 if [[ "$SUBDIR" == "user" ]] && [[ "$OPTION" == "all" ]]; then
-  LINK3="[User Images - Unchanged]"
+  LINK3="[Unchanged]"
 fi
 if [[ "$SUBDIR" == "user" ]] && [[ "$OPTION" != "all" ]]; then
-  LINK1="[User Images - Changed]"
+  LINK1="[Changed]"
 fi
 if [[ "$SUBDIR" == "verification" ]] && [[ "$OPTION" == "all" ]]; then
-  LINK4="[Verification Images - Unchanged]"
+  LINK4="[Unchanged]"
 fi
 if [[ "$SUBDIR" == "verification" ]] && [[ "$OPTION" != "all" ]]; then
-  LINK2="[Verification Images - Changed]"
+  LINK2="[Changed]"
 fi
 cat << EOF >> $HTML_DIFF
-<p>$LINK1$LINK2$LINK3$LINK4
+<table>
+<tr><td>User Images:</td><td> $LINK1$LINK3</td></tr>
+<tr><td>Verification Images:</td><td>$LINK2$LINK4</td></tr>
+</table>
 EOF
 }
 
@@ -249,10 +252,12 @@ FILELIST=`sort -k2,2nr  -k1,1 $file_list | awk '{print $1}'`
     fi
 
     if [ "$START_DIFF" == "1" ]; then
-OUTPUT_LINKS $SUBDIR diffs
   cat << EOF >> $HTML_DIFF
 <a name="${SUBDIR}diffs">
 <h2>$GUIDE Guide Images - Changed</h2>
+EOF
+OUTPUT_LINKS $SUBDIR diffs
+  cat << EOF >> $HTML_DIFF
 <p><table border=on>
 <tr>
 <th align=left>Base<br>$REV1</th>
@@ -405,16 +410,6 @@ EOF
 OUTPUT_HTML user         User         $FIG_USER_FDS_REVISION $FIG_USER_SMV_REVISION
 OUTPUT_HTML verification Verification $FIG_VER_FDS_REVISION  $FIG_VER_SMV_REVISION
 
-LINK1="[<a href="#userdiffs">User Images - Changed</a>]"
-LINK2="[<a href="#verificationdiffs">Verification Images - Changed</a>]"
-LINK3="[<a href="#userall">User Images - Unchanged</a>]"
-LINK4="[<a href="#verificationall">Verification Images - Unchanged</a>]"
-if [[ "$HAVE_USER_DIFFS" == "" ]]; then
-  LINK1=
-fi
-if [[ "$HAVE_VER_DIFFS" == "" ]]; then
-  LINK2=
-fi
 cat << EOF  >> $HTML_DIFF
 <p><hr>
 </BODY>
