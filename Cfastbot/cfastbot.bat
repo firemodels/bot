@@ -382,25 +382,45 @@ call :does_file_exist %CFDEBUGEXE% %OUTDIR%\stage1a.txt|| exit /b 1
 
 call :find_cfast_warnings "warning" %OUTDIR%\stage1a.txt "Stage 1a"
 
+echo             debug CData
+
+cd %cfastrepo%\Build\CData\intel_win_64_db
+erase *.obj *.mod *.exe *.pdb *.optrpt 1> %OUTDIR%\stage1b.txt 2>&1
+call make_cdata bot 1>> %OUTDIR%\stage1b.txt 2>&1
+
+set CData=%cfastrepo%\Build\CData\intel_win_64_db\cdata7_win_64_db.exe
+call :does_file_exist cdata7_win_64_db.exe %OUTDIR%\stage1b.txt|| exit /b 1
+call :find_cfast_warnings "warning" %OUTDIR%\stage1b.txt "Stage 1b"
+
 echo             release cfast
 
 cd %cfastrepo%\Build\CFAST\intel_win_64
-erase *.obj *.mod *.exe *.pdb *.optrpt 1> %OUTDIR%\stage1b.txt 2>&1
-call make_cfast bot %version% 1>> %OUTDIR%\stage1b.txt 2>&1
+erase *.obj *.mod *.exe *.pdb *.optrpt 1> %OUTDIR%\stage1c.txt 2>&1
+call make_cfast bot %version% 1>> %OUTDIR%\stage1c.txt 2>&1
 
 set CFEXE=%cfastrepo%\Build\CFAST\intel_win_64\cfast7_win_64.exe
-call :does_file_exist %CFEXE% %OUTDIR%\stage1b.txt|| exit /b 1
-call :find_cfast_warnings "warning" %OUTDIR%\stage1b.txt "Stage 1b"
+call :does_file_exist %CFEXE% %OUTDIR%\stage1c.txt|| exit /b 1
+call :find_cfast_warnings "warning" %OUTDIR%\stage1c.txt "Stage 1c"
 
 echo             release VandV_Calcs
 
 cd %cfastrepo%\Build\VandV_Calcs\intel_win_64
-erase *.obj *.mod *.exe *.pdb *.optrpt 1> %OUTDIR%\stage1c.txt 2>&1
-call make_vv bot 1>> %OUTDIR%\stage1c.txt 2>&1
+erase *.obj *.mod *.exe *.pdb *.optrpt 1> %OUTDIR%\stage1d.txt 2>&1
+call make_vv bot 1>> %OUTDIR%\stage1d.txt 2>&1
 
 set VandVCalcs=%cfastrepo%\Build\VandV_Calcs\intel_win_64\VandV_Calcs_win_64.exe
-call :does_file_exist VandV_Calcs_win_64.exe %OUTDIR%\stage1c.txt|| exit /b 1
-call :find_cfast_warnings "warning" %OUTDIR%\stage1c.txt "Stage 1c"
+call :does_file_exist VandV_Calcs_win_64.exe %OUTDIR%\stage1d.txt|| exit /b 1
+call :find_cfast_warnings "warning" %OUTDIR%\stage1d.txt "Stage 1d"
+
+echo             release CData
+
+cd %cfastrepo%\Build\CData\intel_win_64
+erase *.obj *.mod *.exe *.pdb *.optrpt 1> %OUTDIR%\stage1e.txt 2>&1
+call make_cdata bot 1>> %OUTDIR%\stage1e.txt 2>&1
+
+set CData=%cfastrepo%\Build\CData\intel_win_64\cdata7_win_64.exe
+call :does_file_exist cdata7_win_64.exe %OUTDIR%\stage1e.txt|| exit /b 1
+call :find_cfast_warnings "warning" %OUTDIR%\stage1e.txt "Stage 1d"
 
 :skip_build_cfast
 
