@@ -12,8 +12,10 @@ HAVE_USER_DIFFS=
 HAVE_VER_DIFFS=
 
 TOLERANCE=0.2
-HEIGHT=250
-WIDTH=250
+HEIGHT_UNCHANGED=200
+WIDTH_UNCHANGED=200
+HEIGHT_CHANGED=250
+WIDTH_CHANGED=250
 
 #*** setup directories
 
@@ -185,21 +187,21 @@ OUTPUT_LINKS ()
 {
 local SUBDIR=$1
 local OPTION=$2
-LINK1="[<a href="#userdiffs">User Guide Image Differences</a>]"
-LINK2="[<a href="#verificationdiffs">Verification Guide Image Differences</a>]"
-LINK3="[<a href="#userall">User Guide Images</a>]"
-LINK4="[<a href="#verificationall">Verification Guides Images</a>]"
+LINK1="[<a href="#userdiffs">User Images - Changed</a>]"
+LINK2="[<a href="#verificationdiffs">Verification Images - Changed</a>]"
+LINK3="[<a href="#userall">User Images - Unchanged</a>]"
+LINK4="[<a href="#verificationall">Verification Images - Unchanged</a>]"
 if [[ "$SUBDIR" == "user" ]] && [[ "$OPTION" == "all" ]]; then
-  LINK3="[User Guide Images]"
+  LINK3="[User Images - Unchanged]"
 fi
 if [[ "$SUBDIR" == "user" ]] && [[ "$OPTION" != "all" ]]; then
-  LINK1="[User Guide Image Differences]"
+  LINK1="[User Images - Changed]"
 fi
 if [[ "$SUBDIR" == "verification" ]] && [[ "$OPTION" == "all" ]]; then
-  LINK4="[Verification Guides Images]"
+  LINK4="[Verification Images - Unchanged]"
 fi
 if [[ "$SUBDIR" == "verification" ]] && [[ "$OPTION" != "all" ]]; then
-  LINK2="[Verification Guide Image Differences]"
+  LINK2="[Verification Images - Changed]"
 fi
 cat << EOF >> $HTML_DIFF
 <p>$LINK1$LINK2$LINK3$LINK4
@@ -227,6 +229,8 @@ file_list=$DIFF_DIR/$SUBDIR/file_list
 FILELIST=`sort -k2,2nr  -k1,1 $file_list | awk '{print $1}'`
   START_DIFF=0
   START_REST=0
+  let counter=0
+  table_size=4
   for f in $FILELIST; do
     base=`basename $f .png`
     pngfile=$base.png
@@ -248,7 +252,7 @@ FILELIST=`sort -k2,2nr  -k1,1 $file_list | awk '{print $1}'`
 OUTPUT_LINKS $SUBDIR diffs
   cat << EOF >> $HTML_DIFF
 <a name="${SUBDIR}diffs">
-<h2>$GUIDE Guide Image Differences</h2>
+<h2>$GUIDE Guide Images - Changed</h2>
 <p><table border=on>
 <tr>
 <th align=left>Base<br>$REV1</th>
@@ -266,13 +270,18 @@ EOF
 OUTPUT_LINKS $SUBDIR all
   cat << EOF >> $HTML_DIFF
 <a name="${SUBDIR}all">
-<h2>$GUIDE Guide Images</h2>
+<h2>$GUIDE Guide Images - Unchanged</h2>
+<h3>$FDS_REVISION, $SMV_REVISION</h3>
 <p><table border=on>
-<tr>
-<th align=left>Base<br>$REV1</th>
-<th align=left>Current<br>$FDS_REVISION<br>$SMV_REVISION</th>$DIFF_TITLE</tr>
 EOF
       START_REST=2
+    fi
+    if [ "$START_REST" == "2" ]; then
+      HEIGHT=$HEIGHT_UNCHANGED
+      WIDTH=$WIDTH_UNCHANGED
+    else
+      HEIGHT=$HEIGHT_CHANGED
+      WIDTH=$WIDTH_CHANGED
     fi
     COMPARE=`echo $ERROR'>'$TOLERANCE | bc -l`
     STYLE=
@@ -288,21 +297,53 @@ EOF
       SIZE="width=$WIDTH"
     fi
 
+if [ "$START_REST" == "2" ]; then
+  let counter=counter+1
+  counter=$(($counter%$table_size))
+  if [ $counter -eq 1 ]; then
+    cat << EOF >> $HTML_DIFF
+<tr>
+EOF
+  fi
+  cat << EOF >> $HTML_DIFF
+<td align=center><a href="diffs/base/$SUBDIR/$pngfile"><img $SIZE src=diffs/base/$SUBDIR/$pngfile></a>
+<br>$pngfile</td>
+EOF
+else
 cat << EOF >> $HTML_DIFF
 <tr>
 <td><a href="diffs/base/$SUBDIR/$pngfile"><img $SIZE src=diffs/base/$SUBDIR/$pngfile></a></td>
+EOF
+fi
+
+COLSPAN=
+if [ "$START_REST" != "2" ]; then
+  COLSPAN="colspan=2"
+  cat << EOF >> $HTML_DIFF
 <td><a href="images/$SUBDIR/$pngfile"><img $SIZE src=images/$SUBDIR/$pngfile></a></td>
 EOF
-cat << EOF >> $HTML_DIFF
-<tr>
-EOF
-cat << EOF >> $HTML_DIFF
-<th colspan=2>^ $pngfile, $METRIC=<span $STYLE>$ERROR</span> ^</th>
-EOF
-cat << EOF >> $HTML_DIFF
+fi
+
+ENDROW=
+if [ "$START_REST" != "2" ]; then
+  ENDROW=1
+fi
+if [[ "$START_REST" == "2" ]] && [[ $counter -eq 0 ]]; then
+  ENDROW=1
+fi
+if [ "$ENDROW" == "1" ]; then
+  cat << EOF >> $HTML_DIFF
 </tr>
 EOF
+fi
 
+if [ "$START_REST" != "2" ]; then
+  cat << EOF >> $HTML_DIFF
+<tr>
+<th $COLSPAN>^ $pngfile, $METRIC=<span $STYLE>$ERROR</span> ^</th>
+</tr>
+EOF
+fi
   done
 cat << EOF >> $HTML_DIFF
 </table>
@@ -352,7 +393,7 @@ cat << EOF  > $HTML_DIFF
 <h2>Firebot Images - $DATE</h2>
 
 <table>
-<tr><th align=left>Versions:</th><td> $FDS_REVISION, SMV_REVISION</td></tr>
+<tr><th align=left>Versions:</th><td> $FDS_REVISION, $SMV_REVISION</td></tr>
 <tr><th align=left>Root:</th><td> $REPO</td></tr>
 <tr><th align=left>Metric:</th><td> ${METRIC_LABEL}</td></tr>
 <tr><th align=left>Tolerance:</th><td> $TOLERANCE</td></tr>
@@ -364,10 +405,10 @@ EOF
 OUTPUT_HTML user         User         $FIG_USER_FDS_REVISION $FIG_USER_SMV_REVISION
 OUTPUT_HTML verification Verification $FIG_VER_FDS_REVISION  $FIG_VER_SMV_REVISION
 
-LINK1="[<a href="#userdiffs">User Image Guide Differences</a>]"
-LINK2="[<a href="#verificationdiffs">Verification Guide Image Differences</a>]"
-LINK3="[<a href="#userall">User Guide Images</a>]"
-LINK4="[<a href="#verificationall">Verification Guides Images</a>]"
+LINK1="[<a href="#userdiffs">User Images - Changed</a>]"
+LINK2="[<a href="#verificationdiffs">Verification Images - Changed</a>]"
+LINK3="[<a href="#userall">User Images - Unchanged</a>]"
+LINK4="[<a href="#verificationall">Verification Images - Unchanged</a>]"
 if [[ "$HAVE_USER_DIFFS" == "" ]]; then
   LINK1=
 fi
