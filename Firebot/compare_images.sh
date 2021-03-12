@@ -83,7 +83,11 @@ cd $SUMMARY_DIR
 SUMMARY_DIR=`pwd`
 cd $CURDIR
 
-HTML_DIFF=$SUMMARY_DIR/index.html
+if [ "$BASEDIR" == "Firebot" ]; then
+  HTML_DIFF=$SUMMARY_DIR/index.html
+else
+  HTML_DIFF=$SUMMARY_DIR/diffs.html
+fi
 
 #*** setup revision strings
 
