@@ -18,8 +18,12 @@ if [ ! -d  $REPO/smv ]; then
   exit
 fi
 
-if [ ! -d  $REPO/fig ]; then
-  echo "***error: $REPO/fig does not exist"
+cd $CURDIR/../..
+TOREPO=`pwd`
+cd $CURDIR
+FIG_DIR=$TOREPO/fig/compare/smokebot/images
+if [ ! -d  $TOREPO/fig ]; then
+  echo "***error: $TOREPO/fig does not exist"
   exit
 fi
 
@@ -33,15 +37,13 @@ cd $REPO/smv
 SMV_REPO=`pwd`
 SMV_REVISION=`git describe --dirty --long`
 
-FIG_DIR=$REPO/fig/compare/smokebot/images
-
 echo copying SMV user guide figures
-cp $FDS_REPO/Manuals/SMV_User_Guide/SCRIPT_FIGURES/*.png $FIG_DIR/fig/user/.
+cp $REPO/smv/Manuals/SMV_User_Guide/SCRIPT_FIGURES/*.png $FIG_DIR/user/.
 echo $FDS_REVISION > $FIG_DIR/user/FDS_REVISION
 echo $SMV_REVISION > $FIG_DIR/user/SMV_REVISION
 
 echo copying SMV verificaiton guide figures
-cp $FDS_REPO/Manuals/SMV_Verification_Guide/SCRIPT_FIGURES/*.png $FIG_DIR/verification/.
+cp $REPO/smv/Manuals/SMV_Verification_Guide/SCRIPT_FIGURES/*.png $FIG_DIR/verification/.
 echo $FDS_REVISION > $FIG_DIR/verification/FDS_REVISION
 echo $SMV_REVISION > $FIG_DIR/verification/SMV_REVISION
 
