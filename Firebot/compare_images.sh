@@ -3,6 +3,24 @@ BASE_DIR=$1
 NEW_DIR=$2
 DIFF_DIR=$3
 
+CURDIR=`pwd`
+
+BASEDIR=`basename $CURDIR`
+if [ "$BASEDIR" == "Firebot" ]; then
+  BOT_SUMMARY=fds/Manuals/FDS_Summary
+  BOT_TYPE=firebot
+  BOT_TITLE=Firebot
+fi
+if [ "$BASEDIR" == "Smokebot" ]; then
+  BOT_SUMMARY=smv/Manuals/SMV_Summary
+  BOT_TYPE=smokebot
+  BOT_TITLE=Smokebot
+fi
+if [ "$BOT_SUMMARY" == "" ]; then
+  echo "***error: compare_images.sh must be run in the Firebot or Smokebot directory"
+  exit
+fi
+
 FYI=fyi
 # to flag image differences as warning's, uncomment the following line
 #FYI=warning
@@ -21,7 +39,7 @@ WIDTH_CHANGED=250
 
 CURDIR=`pwd`
 if [ "$BASE_DIR" == "" ]; then
-  BASE_DIR=../../fig/compare//firebot/images/
+  BASE_DIR=../../fig/compare/$BOT_TYPE/images/
   cd $BASE_DIR
   BASE_DIR=`pwd`
 fi
@@ -43,14 +61,14 @@ SMV_REPO=`pwd`
 
 cd $CURDIR
 if [ "$NEW_DIR" == "" ]; then
-  NEW_DIR=../../fds/Manuals/FDS_Summary/images/
+  NEW_DIR=../../$BOT_SUMMARY/images/
   cd $NEW_DIR
   NEW_DIR=`pwd`
   cd $CURDIR
 fi
 
 if [ "$DIFF_DIR" == "" ]; then
-  DIFF_DIR=../../fds/Manuals/FDS_Summary/diffs/images/
+  DIFF_DIR=../../$BOT_SUMMARY/diffs/images/
   cd $DIFF_DIR
   DIFF_DIR=`pwd`
 fi
@@ -60,7 +78,7 @@ if [ -d $DIFF_DIR ]; then
 fi
 
 cd $CURDIR
-SUMMARY_DIR=../../fds/Manuals/FDS_Summary/
+SUMMARY_DIR=../../$BOT_SUMMARY/
 cd $SUMMARY_DIR
 SUMMARY_DIR=`pwd`
 cd $CURDIR
@@ -75,10 +93,10 @@ FDS_REVISION=`git describe --long --dirty`
 cd $CURDIR/../../fig
 FIGREPO=`pwd`
 
-FIG_USER_FDS_REVISION_FILE=$FIGREPO/compare/firebot/images/user/FDS_REVISION
-FIG_VER_FDS_REVISION_FILE=$FIGREPO/compare/firebot/images/verification/FDS_REVISION
-FIG_USER_SMV_REVISION_FILE=$FIGREPO/compare/firebot/images/user/SMV_REVISION
-FIG_VER_SMV_REVISION_FILE=$FIGREPO/compare/firebot/images/verification/SMV_REVISION
+FIG_USER_FDS_REVISION_FILE=$FIGREPO/compare/$BOT_TYPE/images/user/FDS_REVISION
+FIG_VER_FDS_REVISION_FILE=$FIGREPO/compare/$BOT_TYPE/images/verification/FDS_REVISION
+FIG_USER_SMV_REVISION_FILE=$FIGREPO/compare/$BOT_TYPE/images/user/SMV_REVISION
+FIG_VER_SMV_REVISION_FILE=$FIGREPO/compare/$BOT_TYPE/images/verification/SMV_REVISION
 
 FIG_USER_FDS_REVISION=`git describe --dirty --long`
 FIG_USER_SMV_REVISION=
@@ -156,6 +174,9 @@ for f in $NEW_DIR/$SUBDIR/*.png; do
     convert $from_file -blur 0x2 $blur_from_file
     convert $to_file   -blur 0x2 $blur_to_file
     diff=`compare -metric $METRIC $blur_from_file $blur_to_file $diff_file |& awk -F'('  '{printf $2}' | awk -F')' '{printf $1}i'`
+    if [ "$diff" == "" ]; then
+      diff=0
+    fi
     echo $diff > $diff_file_metric
     echo $base $diff >> $file_list
     if [[ "$diff" != "0" ]] && [[ ! $diff == *"e"* ]]; then
@@ -394,10 +415,10 @@ DATE=`date`
 cat << EOF  > $HTML_DIFF
 <html>
 <head>
-<TITLE>Firebot Images</TITLE>
+<TITLE>$BOT_TITLE Images</TITLE>
 </HEAD>
 <BODY BGCOLOR="#FFFFFF" >
-<h2>Firebot Images - $DATE</h2>
+<h2>$BOT_TITLE Images - $DATE</h2>
 
 <table>
 <tr><th align=left>Versions:</th><td> $FDS_REVISION, $SMV_REVISION</td></tr>
