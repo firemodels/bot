@@ -1162,7 +1162,7 @@ check_guide()
 
    SMOKEBOT_MAN_DIR=
    if [ "$WEB_DIR" != "" ]; then
-     if [ -d $WEB_ROOT/WEB_DIR/manuals ]; then
+     if [ -d $WEB_ROOT/$WEB_DIR/manuals ]; then
        SMOKEBOT_MAN_DIR=$WEB_ROOT/$WEB_DIR/manuals
      fi
    fi

@@ -350,7 +350,7 @@ if [ "$WEB_DIR" != "" ]; then
   WEB_DIR="-w $WEB_DIR"
 fi
 if [ "$WEB_ROOT" != "" ]; then
-  WEB_ROOT="-w $WEB_ROOT"
+  WEB_ROOT="-W $WEB_ROOT"
 fi
 
 COMPILER="-I $COMPILER"
