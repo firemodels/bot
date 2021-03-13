@@ -10,11 +10,13 @@ if [ "$BASEDIR" == "Firebot" ]; then
   BOT_SUMMARY=fds/Manuals/FDS_Summary
   BOT_TYPE=firebot
   BOT_TITLE=Firebot
+  HOME=
 fi
 if [ "$BASEDIR" == "Smokebot" ]; then
   BOT_SUMMARY=smv/Manuals/SMV_Summary
   BOT_TYPE=smokebot
   BOT_TITLE=Smokebot
+  HOME=1
 fi
 if [ "$BOT_SUMMARY" == "" ]; then
   echo "***error: compare_images.sh must be run in the Firebot or Smokebot directory"
@@ -236,6 +238,13 @@ if [ "$HAVE_VER_DIFFS" == "" ]; then
 fi
 cat << EOF >> $HTML_DIFF
 <table>
+EOF
+if [ "$HOME" != "" ]; then
+cat << EOF >> $HTML_DIFF
+<tr><td><a href="../index.html">Home</a></td></tr>
+EOF
+fi
+cat << EOF >> $HTML_DIFF
 <tr><td>User Images:</td><td> $LINK1$LINK3</td></tr>
 <tr><td>Verification Images:</td><td>$LINK2$LINK4</td></tr>
 </table>
