@@ -431,7 +431,7 @@ cat << EOF  > $HTML_DIFF
 <TITLE>$BOT_TITLE Images</TITLE>
 </HEAD>
 <BODY BGCOLOR="#FFFFFF" >
-<h2>$BOT_TITLE Images - $DATE</h2>
+<h2>$BOT_TITLE Image Comparison - $DATE</h2>
 
 <table>
 <tr><th align=left>Latest:</th>   <td> $FDS_REVISION         </td><td>$SMV_REVISION</td></tr>
