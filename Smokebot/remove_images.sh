@@ -28,6 +28,7 @@ rm -f *_i[1-3].png
 rm -f *_l[1-3].png
 rm -f *_v[1-3].png
 rm -f *_y[1-3].png
-rm -r *_0[0-6].png
-rm -r *_cell[1-2].png
-rm -r *_node[1-3].png
+rm -f *_0[0-6].png
+rm -f *_cell[1-2].png
+rm -f *_node[1-3].png
+rm -f fds_smv_version.png
