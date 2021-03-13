@@ -228,6 +228,12 @@ fi
 if [[ "$SUBDIR" == "verification" ]] && [[ "$OPTION" != "all" ]]; then
   LINK2="[Changed]"
 fi
+if [ "$HAVE_USER_DIFFS" == "" ]; then
+  LINK1=
+fi
+if [ "$HAVE_VER_DIFFS" == "" ]; then
+  LINK2=
+fi
 cat << EOF >> $HTML_DIFF
 <table>
 <tr><td>User Images:</td><td> $LINK1$LINK3</td></tr>
