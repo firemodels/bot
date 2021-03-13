@@ -1089,11 +1089,10 @@ check_smv_movies()
    then
       stage4c_success=true
    else
-      cp $OUTPUT_DIR/stage4c  $OUTPUT_DIR/stage4c_errors
-
-      echo "Errors from Stage 4b - Make SMV movies " >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage4c                        >> $ERROR_LOG
-      echo ""                                        >> $ERROR_LOG
+      echo "Errors from Stage 4c - Make SMV movies "                    >> $ERROR_LOG
+      grep -B 1 -A 1 -I -E -i "Segmentation|Error"  $OUTPUT_DIR/stage4c >  $OUTPUT_DIR/stage4c_errors
+      grep -B 1 -A 1 -I -E -i "Segmentation|Error"  $OUTPUT_DIR/stage4c >> $ERROR_LOG
+      echo ""                                                           >> $ERROR_LOG
    fi
 
    # Scan for and report any warnings in make SMV pictures process
@@ -1104,7 +1103,7 @@ check_smv_movies()
       :
    else
       echo "Warnings from Stage 4b - Make SMV movies (release mode):" >> $WARNING_LOG
-      grep -I -E -i "Warning" $OUTPUT_DIR/stage4c                        >> $WARNING_LOG
+      grep -I -E -i "Warning" $OUTPUT_DIR/stage4c                     >> $WARNING_LOG
       echo ""                                                         >> $WARNING_LOG
    fi
 }
