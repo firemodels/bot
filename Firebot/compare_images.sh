@@ -214,21 +214,21 @@ OUTPUT_LINKS ()
 {
 local SUBDIR=$1
 local OPTION=$2
-LINK1="[<a href="#userdiffs">Changed</a>]"
-LINK2="[<a href="#verificationdiffs">Changed</a>]"
-LINK3="[<a href="#userall">Unchanged</a>]"
-LINK4="[<a href="#verificationall">Unchanged</a>]"
+LINK1="<a href="#userdiffs">[Changed User Guide Images]</a>"
+LINK2="<a href="#verificationdiffs">[Changed Verification Guide Images]</a>"
+LINK3="<a href="#userall">[Unchanged User Guide Images]</a>"
+LINK4="<a href="#verificationall">[Unchanged Verification Guide Images]</a>"
 if [[ "$SUBDIR" == "user" ]] && [[ "$OPTION" == "all" ]]; then
-  LINK3="[Unchanged]"
+  LINK3="[Unchanged User Guide Images]"
 fi
 if [[ "$SUBDIR" == "user" ]] && [[ "$OPTION" != "all" ]]; then
-  LINK1="[Changed]"
+  LINK1="[Changed User Guide Images]"
 fi
 if [[ "$SUBDIR" == "verification" ]] && [[ "$OPTION" == "all" ]]; then
-  LINK4="[Unchanged]"
+  LINK4="[Unchanged Verification Guide Images]"
 fi
 if [[ "$SUBDIR" == "verification" ]] && [[ "$OPTION" != "all" ]]; then
-  LINK2="[Changed]"
+  LINK2="[Changed Verification Guide Images]"
 fi
 if [ "$HAVE_USER_DIFFS" == "" ]; then
   LINK1=
@@ -236,18 +236,13 @@ fi
 if [ "$HAVE_VER_DIFFS" == "" ]; then
   LINK2=
 fi
-cat << EOF >> $HTML_DIFF
-<table>
-EOF
 if [ "$HOME" != "" ]; then
 cat << EOF >> $HTML_DIFF
-<tr><td><a href="../index.html">Home</a></td></tr>
+<a href="index.html">[Home]</a>
 EOF
 fi
 cat << EOF >> $HTML_DIFF
-<tr><td>User Images:</td><td> $LINK1$LINK3</td></tr>
-<tr><td>Verification Images:</td><td>$LINK2$LINK4</td></tr>
-</table>
+$LINK1$LINK3$LINK2$LINK4
 EOF
 }
 
@@ -294,7 +289,7 @@ FILELIST=`sort -k2,2nr  -k1,1 $file_list | awk '{print $1}'`
     if [ "$START_DIFF" == "1" ]; then
   cat << EOF >> $HTML_DIFF
 <a name="${SUBDIR}diffs">
-<h2>$GUIDE Guide Images - Changed</h2>
+<h2>Changed $GUIDE Guide Images</h2>
 EOF
 OUTPUT_LINKS $SUBDIR diffs
   cat << EOF >> $HTML_DIFF
@@ -314,8 +309,7 @@ EOF
       fi
   cat << EOF >> $HTML_DIFF
 <a name="${SUBDIR}all">
-<h2>$GUIDE Guide Images - Unchanged</h2>
-<h3>$FDS_REVISION, $SMV_REVISION</h3>
+<h2>Unchanged $GUIDE Guide Images</h2>
 EOF
 OUTPUT_LINKS $SUBDIR all
   cat << EOF >> $HTML_DIFF
@@ -440,10 +434,11 @@ cat << EOF  > $HTML_DIFF
 <h2>$BOT_TITLE Images - $DATE</h2>
 
 <table>
-<tr><th align=left>Versions:</th><td> $FDS_REVISION, $SMV_REVISION</td></tr>
-<tr><th align=left>Root:</th><td> $REPO</td></tr>
-<tr><th align=left>Metric:</th><td> ${METRIC_LABEL}</td></tr>
-<tr><th align=left>Tolerance:</th><td> $TOLERANCE</td></tr>
+<tr><th align=left>Latest:</th>   <td> $FDS_REVISION         </td><td>$SMV_REVISION</td></tr>
+<tr><th align=left>Base:</th>     <td> $FIG_USER_FDS_REVISION</td><td>$FIG_USER_SMV_REVISION</td></tr>
+<tr><th align=left>Root:</th>     <td> $REPO                 </td></tr>
+<tr><th align=left>Metric:</th>   <td> ${METRIC_LABEL}       </td></tr>
+<tr><th align=left>Tolerance:</th><td> $TOLERANCE            </td></tr>
 </table>
 EOF
 
