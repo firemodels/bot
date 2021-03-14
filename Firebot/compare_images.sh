@@ -295,8 +295,8 @@ OUTPUT_LINKS $SUBDIR diffs
   cat << EOF >> $HTML_DIFF
 <p><table border=on>
 <tr>
-<th align=left>Base<br>$REV1</th>
-<th align=left>Current<br>$FDS_REVISION<br>$SMV_REVISION</th>$DIFF_TITLE</tr>
+<th align=left>Base</th>
+<th align=left>Current</th></tr>
 EOF
       START_DIFF=2
     fi
