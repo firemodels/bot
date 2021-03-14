@@ -190,8 +190,8 @@ for f in $NEW_DIR/$SUBDIR/*.png; do
       if [ 1 -eq $iftest ]; then
         echo "***$FYI: The image $base has changed. $METRIC error=$diff > $TOLERANCE"
         touch $diff_file_changed
-        DIFFS=1
       fi
+      DIFFS=1
     fi
   fi
   if [[ ! -e $from_file ]]; then
