@@ -178,6 +178,7 @@ FIREBOT_HOST=
 FIREBOT_HOME=
 WEB_DIR=
 USE_BOT_QFDS=
+WEB_ROOT=/var/www/html
 
 #*** check to see if a queing system is available
 
@@ -189,7 +190,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'abBcDfg:G:hHI:JkLm:MPq:R:TuUvw:x:y:' OPTION
+while getopts 'abBcDfg:G:hHI:JkLm:MPq:R:TuUvw:W:x:y:' OPTION
 do
 case $OPTION  in
   a)
@@ -264,6 +265,9 @@ case $OPTION  in
    ;;
   w)
    WEB_DIR="$OPTARG"
+   ;;
+  W)
+   WEB_ROOT="$OPTARG"
    ;;
   x)
    FDS_REV="-x $OPTARG"
@@ -345,6 +349,9 @@ fi
 if [ "$WEB_DIR" != "" ]; then
   WEB_DIR="-w $WEB_DIR"
 fi
+if [ "$WEB_ROOT" != "" ]; then
+  WEB_ROOT="-W $WEB_ROOT"
+fi
 
 COMPILER="-I $COMPILER"
 
@@ -425,7 +432,7 @@ BRANCH="-b $BRANCH"
 #*** run smokebot
 
 touch $smokebot_pid
-$ECHO ./$botscript $SIZE $BRANCH $FDS_REV $SMV_REV $CLONE_REPOS $CLONE_FDSSMV $RUNAUTO $INTEL $BUILD_ONLY $COMPILER $SMOKEBOT_LITE $CLEANREPO $WEB_DIR $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $SIZE $BRANCH $FDS_REV $SMV_REV $CLONE_REPOS $CLONE_FDSSMV $RUNAUTO $INTEL $BUILD_ONLY $COMPILER $SMOKEBOT_LITE $CLEANREPO $WEB_DIR $WEB_ROOT $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi
