@@ -180,6 +180,7 @@ for f in $NEW_DIR/$SUBDIR/*.png; do
     convert $from_file -blur 0x2 $blur_from_file
     convert $to_file   -blur 0x2 $blur_to_file
     diff=`compare -metric $METRIC $blur_from_file $blur_to_file $diff_file |& awk -F'('  '{printf $2}' | awk -F')' '{printf $1}i'`
+    rm -f $blur_from_file $blur_to_file
     if [ "$diff" == "" ]; then
       diff=0
     fi
