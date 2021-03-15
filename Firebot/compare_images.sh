@@ -9,13 +9,13 @@ BASEDIR=`basename $CURDIR`
 if [ "$BASEDIR" == "Firebot" ]; then
   BOT_SUMMARY=fds/Manuals/FDS_Summary
   BOT_TYPE=firebot
-  BOT_TITLE=Firebot
+  BOT_TITLE=FDS
   HOME=
 fi
 if [ "$BASEDIR" == "Smokebot" ]; then
   BOT_SUMMARY=smv/Manuals/SMV_Summary
   BOT_TYPE=smokebot
-  BOT_TITLE=Smokebot
+  BOT_TITLE=Smokeview
   HOME=1
 fi
 if [ "$BOT_SUMMARY" == "" ]; then
@@ -428,10 +428,10 @@ DATE=`date`
 cat << EOF  > $HTML_DIFF
 <html>
 <head>
-<TITLE>$BOT_TITLE Images</TITLE>
+<TITLE>$BOT_TITLE User, Verification Guide Images</title>
 </HEAD>
 <BODY BGCOLOR="#FFFFFF" >
-<h2>$BOT_TITLE Image Differences - $DATE</h2>
+<h2>$BOT_TITLE User, Verification Guide Images - $DATE</h2>
 
 <table>
 <tr><th align=left>Current:</th>   <td> $FDS_REVISION         </td><td>$SMV_REVISION</td></tr>
