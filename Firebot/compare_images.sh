@@ -296,8 +296,9 @@ OUTPUT_LINKS $SUBDIR diffs
   cat << EOF >> $HTML_DIFF
 <p><table border=on>
 <tr>
-<th align=left>Base</th>
-<th align=left>Current</th></tr>
+<th align=center>Base</th>
+<th align=center>Current</th>
+</tr>
 EOF
       START_DIFF=2
     fi
@@ -429,7 +430,7 @@ DATE=`date`
 cat << EOF  > $HTML_DIFF
 <html>
 <head>
-<TITLE>$BOT_TITLE User, Verification Guide Images</title>
+<TITLE>$BOT_TITLE User, Verification Guide Images</TITLE>
 </HEAD>
 <BODY BGCOLOR="#FFFFFF" >
 <h2>$BOT_TITLE User, Verification Guide Images - $DATE</h2>
