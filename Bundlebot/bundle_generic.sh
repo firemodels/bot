@@ -465,8 +465,11 @@ CP $smv_bundle smokeview.html $smvbindir smokeview.html
 
 CP $webgldir      runsmv_ssh.sh $smvbindir runsmv_ssh.sh
 CP $webgldir      smv2html.sh   $smvbindir smv2html.sh
-CP $utilscriptdir fds2html.sh   $smvbindir fds2html.sh
-CP $utilscriptdir fds2mp4.sh    $smvbindir fds2mp4.sh
+
+if [ "$PLATFORM" == "LINUX64" ]; then
+  CP $utilscriptdir slice2html.sh   $smvbindir slice2html.sh
+  CP $utilscriptdir slice2mp4.sh    $smvbindir slice2mp4.sh
+fi
 
 echo ""
 echo "--- copying documentation ---"

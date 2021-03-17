@@ -23,9 +23,12 @@ if [ "$BOT_SUMMARY" == "" ]; then
   exit
 fi
 
-FYI=fyi
-# to flag image differences as warning's, uncomment the following line
-#FYI=warning
+# to flag image differences as fyi's, use the following line
+#FYI=fyi
+
+# to flag image differences as warning's, use the following line
+FYI=warning
+
 METRIC=rmse
 METRIC_LABEL="Root Mean Square Error (rmse)"
 HAVE_USER_DIFFS=
