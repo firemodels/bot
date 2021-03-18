@@ -31,8 +31,10 @@ FYI=warning
 
 METRIC=rmse
 METRIC_LABEL="Root Mean Square Error (rmse)"
-HAVE_USER_DIFFS=
-HAVE_VER_DIFFS=
+HAVE_USER_DIFFS=0
+HAVE_VER_DIFFS=0
+HAVE_USER_ERRORS=0
+HAVE_VER_ERRORS=0
 
 TOLERANCE=0.2
 HEIGHT_UNCHANGED=200
@@ -164,7 +166,8 @@ echo Comparing images in directories:
 echo "  $BASE_DIR/$SUBDIR "
 echo "  $NEW_DIR/$SUBDIR"
 echo ""
-DIFFS=
+DIFFS=0
+IMAGE_ERRORS=0
 rm -f $NEW_DIR/$SUBDIR/blur*.png
 file_list=$DIFF_DIR/$SUBDIR/file_list
 rm -f $file_list
@@ -194,8 +197,9 @@ for f in $NEW_DIR/$SUBDIR/*.png; do
       if [ 1 -eq $iftest ]; then
         echo "***$FYI: The image $base has changed. $METRIC error=$diff > $TOLERANCE"
         touch $diff_file_changed
+        IMAGE_ERRORS=$((IMAGE_ERRORS + 1))
       fi
-      DIFFS=1
+      DIFFS=$((DIFFS + 1))
     fi
   fi
   if [[ ! -e $from_file ]]; then
@@ -205,8 +209,10 @@ for f in $NEW_DIR/$SUBDIR/*.png; do
 done
 if [ "$SUBDIR" == "user" ]; then
   HAVE_USER_DIFFS=$DIFFS
+  HAVE_USER_ERRORS=$IMAGE_ERRORS
 else
   HAVE_VER_DIFFS=$DIFFS
+  HAVE_VER_ERRORS=$IMAGE_ERRORS
 fi
 }
 
@@ -234,10 +240,10 @@ fi
 if [[ "$SUBDIR" == "verification" ]] && [[ "$OPTION" != "all" ]]; then
   LINK2="[Changed Verification Guide Images]"
 fi
-if [ "$HAVE_USER_DIFFS" == "" ]; then
+if [ "$HAVE_USER_DIFFS" == "0" ]; then
   LINK1=
 fi
-if [ "$HAVE_VER_DIFFS" == "" ]; then
+if [ "$HAVE_VER_DIFFS" == "0" ]; then
   LINK2=
 fi
 if [ "$HOME" != "" ]; then
@@ -419,13 +425,8 @@ FIND_DIFFS user
 
 FIND_DIFFS verification
 
-HAVE_DIFFS=
-if [ "$HAVE_USER_DIFFS" == "1" ]; then
-  HAVE_DIFFS=1
-fi
-if [ "$HAVE_VER_DIFFS" == "1" ]; then
-  HAVE_DIFFS=1
-fi
+HAVE_DIFFS=$((HAVE_USER_DIFFS+HAVE_VER_DIFFS))
+HAVE_ERRORS=$((HAVE_USER_ERRORS+HAVE_VER_ERRORS))
 
 #*** output html header
 
@@ -460,9 +461,16 @@ EOF
 
 
 
-if [ "$HAVE_DIFFS" == "" ]; then
+if [ "$HAVE_DIFFS" == "0" ]; then
   echo no images have changed
 else
+  echo $HAVE_DIFFS images have changed
+  if [ "$HAVE_ERRORS" == "0" ]; then
+    echo "no images exceed the error tolerance of $TOLERANCE"
+  else
+    echo "***warning: $HAVE_ERRORS images exceed the error tolerance of $TOLERANCE"
+  fi
   echo image differences summarized in $HTML_DIFF
 fi
+echo $HAVE_DIFFS $HAVE_ERRORS > image_differences
 
