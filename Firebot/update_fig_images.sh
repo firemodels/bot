@@ -1,5 +1,34 @@
 #!/bin/bash
-FROM_ROOT=$1
+
+#---------------------------------------------
+#                   usage
+#---------------------------------------------
+
+function usage {
+echo "update base images in fig repo"
+echo ""
+echo "Options:"
+echo "-h - display this message"
+exit 0
+}
+
+FROM_ROOT=
+
+#*** parse options
+
+while getopts 'hr:' OPTION
+do
+case $OPTION  in
+  h)
+   usage;
+   ;;
+  r)
+   FROM_ROOT="$OPTARG"
+   ;;
+esac
+done
+shift $(($OPTIND-1))
+
 
 CURDIR=`pwd`
 cd ../..
@@ -8,6 +37,20 @@ cd $CURDIR
 
 if [ "$FROM_ROOT" == "" ]; then
   FROM_ROOT=$TO_ROOT
+fi
+
+BASEDIR=`basename $CURDIR`
+if [ "$BASEDIR" == "Firebot" ]; then
+  BOT_TYPE=firebot
+  VER_GUIDE=FDS_Verification_Guide
+  USER_GUIDE=FDS_User_Guide
+  PROG=fds
+fi
+if [ "$BASEDIR" == "Smokebot" ]; then
+  BOT_TYPE=smokebot
+  VER_GUIDE=SMV_Verification_Guide
+  USER_GUIDE=SMV_User_Guide
+  PROG=smv
 fi
 
 if [ ! -d  $FROM_ROOT/fds ]; then
@@ -33,15 +76,15 @@ echo getting smv repo revision
 cd $FROM_ROOT/smv
 SMV_REVISION=`git describe --dirty --long`
 
-FIG_DIR=$TO_ROOT/fig/compare/firebot/images
+FIG_DIR=$TO_ROOT/fig/compare/$BOT_TYPE/images
 
-echo copying FDS user guide figures
-cp $FROM_ROOT/fds/Manuals/FDS_User_Guide/SCRIPT_FIGURES/*.png $FIG_DIR/user/.
+echo copying $USER_GUIDE figures
+cp $FROM_ROOT/$PROG/Manuals/$USER_GUIDE/SCRIPT_FIGURES/*.png $FIG_DIR/user/.
 echo $FDS_REVISION > $FIG_DIR/user/FDS_REVISION
 echo $SMV_REVISION > $FIG_DIR/user/SMV_REVISION
 
-echo copying FDS verificaiton guide figures
-cp $FROM_ROOT/fds/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/*.png $FIG_DIR/verification/.
+echo copying $VER_GUIDE guide figures
+cp $FROM_ROOT/$PROG/Manuals/$VER_GUIDE/SCRIPT_FIGURES/*.png $FIG_DIR/verification/.
 echo $FDS_REVISION > $FIG_DIR/verification/FDS_REVISION
 echo $SMV_REVISION > $FIG_DIR/verification/SMV_REVISION
 
