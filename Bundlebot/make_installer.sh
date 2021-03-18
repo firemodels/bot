@@ -277,14 +277,14 @@ then
 cat << EOF >> $INSTALLER
     echo "  Press 1 to install in /Applications/$INSTALLDIR [default]"
     echo "  Press 2 to install in \$HOME/$INSTALLDIR"
-    echo "  Press 3 to install in /Applications/$CUSTOMBASE/FDS6"
+    echo "  Press 3 to install in /Applications/FDS/$CUSTOMBASE"
 EOF
   else
 cat << EOF >> $INSTALLER
     echo "  Press 1 to install in \$HOME/$INSTALLDIR [default]"
     echo "  Press 2 to install in /opt/$INSTALLDIR"
     echo "  Press 3 to install in /usr/local/bin/$INSTALLDIR"
-    echo "  Press 4 to install in \$HOME/$CUSTOMBASE/FDS6"
+    echo "  Press 4 to install in \$HOME/FDS/$CUSTOMBASE"
 EOF
   fi
 cat << EOF >> $INSTALLER
@@ -307,7 +307,7 @@ cat << EOF >> $INSTALLER
   elif [[ "\$answer" == "2" ]]; then
     eval FDS_root=\$HOME/$INSTALLDIR
   elif [[ "\$answer" == "3" ]]; then
-    eval FDS_root=/Applications/$CUSTOMBASE/FDS6
+    eval FDS_root=/Applications/FDS/$CUSTOMBASE
   else
     eval FDS_root=\$answer
   fi
@@ -321,7 +321,7 @@ cat << EOF >> $INSTALLER
   elif [ "\$answer" == "3" ]; then
     FDS_root=/usr/local/bin/$INSTALLDIR
   elif [ "\$answer" == "4" ]; then
-    eval FDS_root=\$HOME/$CUSTOMBASE/FDS6
+    eval FDS_root=\$HOME/FDS/$CUSTOMBASE
   else
     eval FDS_root=\$answer
   fi
