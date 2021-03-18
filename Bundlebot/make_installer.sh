@@ -41,6 +41,7 @@ do
 case $OPTION in
   b)
   CUSTOMBASE="$OPTARG"
+  ;;
   d)
   INSTALLDIR="$OPTARG"
 # get rid of trailing slashes
