@@ -1666,6 +1666,7 @@ make_fds_summary()
         cp -r $FDS_SUMMARY_DIR/* .
         rm *template.html
         cd $CUR_DIR
+        UPDATED_WEB_IMAGES=1
       fi
     fi
   fi
@@ -1716,7 +1717,7 @@ email_build_status()
    if [ "$UPLOADGUIDES" == "1" ]; then
      echo "            status:  https://pages.nist.gov/fds-smv/firebot_status.html" >> $TIME_LOG
    fi
-   if [ "$WEB_URL" != "" ]; then
+   if [[ "$WEB_URL" != "" ]] && [[ "$UPDATED_WEB_IMAGES" != "" ]]; then
      echo "            images: $WEB_URL"  >> $TIME_LOG
    fi
    echo "-------------------------------" >> $TIME_LOG
@@ -1891,6 +1892,7 @@ SMV_REV=origin/master
 WEB_DIR=
 WEB_BASE_DIR=
 WEB_ROOT=
+UPDATED_WEB_IMAGES=
 FORCECLONE=
 
 SKIPMATLAB=
@@ -2469,12 +2471,10 @@ fi
 if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
 
 # Depends on successful SMV compile
-  if [ "$SKIPPICTURES" == "" ] ; then
-    if [[ $smv_release_success ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] ; then
-      make_fds_pictures
-      check_fds_pictures
-      make_fds_summary
-    fi
+  if [[ "$SKIPPICTURES" == "" ]] && [[ $smv_release_success ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] ; then
+    make_fds_pictures
+    check_fds_pictures
+    make_fds_summary
   fi
 
 ###*** Stage 7c ###
