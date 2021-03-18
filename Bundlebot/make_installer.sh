@@ -7,6 +7,7 @@ then
   echo "Creates an FDS/Smokeview installer sh script. "
   echo ""
   echo "  -i FDS.tar.gz - compressed tar file containing FDS distribution"
+  echo "  -b custombase - custom directory base"
   echo "  -d installdir - default install directory"
   echo "   INSTALLER.sh - bash shell script containing self-extracting Installer"
   echo "  -m MPI_VERSION- mpi version (INTEL or tar'd openmpi distribution)"
@@ -19,6 +20,7 @@ FDSEDITION=FDS6
 FDSMODULE=$FDSEDITION
 SMVEDITION=SMV6
 SMVMODULE=$SMVEDITION
+CUSTOMBASE=
 
 FDSVARS=${FDSEDITION}VARS.sh
 SMVVARS=${SMVEDITION}VARS.sh
@@ -34,9 +36,12 @@ if [ "`uname`" == "Darwin" ] ; then
   ostype2="OSX"
 fi
 
-while getopts 'd:i:m:M:' OPTION
+while getopts 'b:d:i:m:M:' OPTION
 do
 case $OPTION in
+  b)
+  CUSTOMBASE="$OPTARG"
+  ;;
   d)
   INSTALLDIR="$OPTARG"
 # get rid of trailing slashes
@@ -272,12 +277,14 @@ then
 cat << EOF >> $INSTALLER
     echo "  Press 1 to install in /Applications/$INSTALLDIR [default]"
     echo "  Press 2 to install in \$HOME/$INSTALLDIR"
+    echo "  Press 3 to install in /Applications/$CUSTOMBASE/FDS6"
 EOF
   else
 cat << EOF >> $INSTALLER
     echo "  Press 1 to install in \$HOME/$INSTALLDIR [default]"
     echo "  Press 2 to install in /opt/$INSTALLDIR"
     echo "  Press 3 to install in /usr/local/bin/$INSTALLDIR"
+    echo "  Press 4 to install in \$HOME/$CUSTOMBASE/FDS6"
 EOF
   fi
 cat << EOF >> $INSTALLER
@@ -299,6 +306,8 @@ cat << EOF >> $INSTALLER
     eval FDS_root=/Applications/$INSTALLDIR
   elif [[ "\$answer" == "2" ]]; then
     eval FDS_root=\$HOME/$INSTALLDIR
+  elif [[ "\$answer" == "3" ]]; then
+    eval FDS_root=/Applications/$CUSTOMBASE/FDS6
   else
     eval FDS_root=\$answer
   fi
@@ -311,6 +320,8 @@ cat << EOF >> $INSTALLER
     FDS_root=/opt/$INSTALLDIR
   elif [ "\$answer" == "3" ]; then
     FDS_root=/usr/local/bin/$INSTALLDIR
+  elif [ "\$answer" == "4" ]; then
+    eval FDS_root=\$HOME/$CUSTOMBASE/FDS6
   else
     eval FDS_root=\$answer
   fi
