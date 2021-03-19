@@ -4,15 +4,7 @@ if [ "`uname`" == "Darwin" ] ; then
 
 #*** OSX parameters
 
-  export INTEL_MPI_VERSION=oneapi
   export FDS_OPENMPIDIR=/opt/openmpi410_oneapi_64
-  export MPI_VERSION=4.1.0
-#else
-
-#*** Linux parameters
-
-  export INTEL_MPI_VERSION=oneapi
-  export MPI_VERSION=INTEL
 fi
 
 #---------------------------------------------
