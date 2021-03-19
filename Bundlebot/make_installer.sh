@@ -425,10 +425,10 @@ setenv          OPAL_PREFIX     \$FDS_root/bin/openmpi_64
 MODULE
 fi
 if [[ "$ostype" == "OSX" ]] && [[ "$FDS_OPENMPIDIR" != "" ]]; then
-cat << BASH >> \$BASHRCFDS
+cat << MODULE >> \$FDSMODULEtmp
 # used when building FDS
 #setenv          OPAL_PREFIX     $FDS_OPENMPIDIR
-BASH
+MODULE
 fi
 
 cp \$FDSMODULEtmp \$FDS_root/bin/modules/$FDSMODULE
