@@ -1,5 +1,20 @@
 #!/bin/bash
 
+#*** Linux parameters
+
+intel_mpi_version_linux=20u1
+#intel_mpi_version_linux=oneapi
+mpi_version_linux=INTEL
+
+#*** OSX parameters
+
+#intel_mpi_version_osx=19u4
+#mpi_version_osx=3.1.2
+#openmpi_dir=/opt/openmpi312_i20u1_64
+intel_mpi_version_osx=oneapi
+openmpi_dir=/opt/openmpi410_oneapi_64
+mpi_version_osx=4.1.0
+
 #---------------------------------------------
 #                   usage
 #---------------------------------------------
@@ -152,8 +167,13 @@ fi
 # determine platform script is running on
 
 if [ "`uname`" == "Darwin" ]; then
+  intel_mpi_version=$intel_mpi_version_osx
+  mpi_version=$mpi_version_osx
   platform=osx
+  export FDS_OPENMPIDIR=$openmpi_dir
 else
+  intel_mpi_version=$intel_mpi_version_linux
+  mpi_version=$mpi_version_linux
   platform=lnx
 fi
 
@@ -171,8 +191,8 @@ if [ "$showparms" == "1" ]; then
   echo ""
   echo " Parameters"
   echo " ----------"
-  echo "              MPI version: $MPI_VERSION"
-  echo "            Intel version: $INTEL_MPI_VERSION"
+  echo "              MPI version: $mpi_version"
+  echo "            Intel version: $intel_mpi_version"
   if [ "$USE_CACHE" == "1" ]; then
     APPDIR=.bundle
     FDS_PUBDIR=.bundle
@@ -277,7 +297,7 @@ cd $DIR
 if [ "$showparms" == "" ]; then
   echo ""
   echo "building installer"
-  $ECHO ./bundle_generic.sh $FDSREV $SMVREV $MPI_VERSION $INTEL_MPI_VERSION $bundle_dir $BUNDLE_PREFIX > $OUTPUT_DIR/stage1
+  $ECHO ./bundle_generic.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version $bundle_dir $BUNDLE_PREFIX > $OUTPUT_DIR/stage1
   if [ "$UPLOAD_GOOGLE" == "1" ]; then
     if [ -e $HOME/.bundle/$GOOGLE_DIR_ID ]; then
       echo ""
