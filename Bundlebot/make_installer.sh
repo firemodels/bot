@@ -461,8 +461,13 @@ BASH
 if [ "$MPI_VERSION" != "INTEL" ] ; then
 cat << BASH >> \$BASHRCFDS
 export PATH=\\\$FDSBINDIR/openmpi_64/bin:\\\$PATH
-export OPAL_PREFIX=\\\$FDSBINDIR/openmpi_64
+export OPAL_PREFIX=\\\$FDSBINDIR/openmpi_64  # used when running fds
 BASH
+if [[ "$ostype" == "osx" ]] && [[ "$FDS_OPENMPIDIR" != "" ]]; then
+cat << BASH >> \$BASHRCFDS
+#export OPAL_PREFIX=$FDS_OPENMPIDIR  # used when building FDS
+BASH
+fi
 fi
 
 if [ "$ostype" == "LINUX" ] ; then

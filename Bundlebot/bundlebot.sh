@@ -10,7 +10,9 @@ mpi_version_linux=INTEL
 
 #intel_mpi_version_osx=19u4
 #mpi_version_osx=3.1.2
+#openmpi_dir=/opt/openmpi312_i20u1_64
 intel_mpi_version_osx=oneapi
+openmpi_dir=/opt/openmpi410_oneapi_64
 mpi_version_osx=4.1.0
 
 #---------------------------------------------
@@ -168,6 +170,7 @@ if [ "`uname`" == "Darwin" ]; then
   intel_mpi_version=$intel_mpi_version_osx
   mpi_version=$mpi_version_osx
   platform=osx
+  export FDS_OPENMPIDIR=$openmpi_dir
 else
   intel_mpi_version=$intel_mpi_version_linux
   mpi_version=$mpi_version_linux
