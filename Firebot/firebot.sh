@@ -1719,6 +1719,11 @@ email_build_status()
    fi
    if [[ "$WEB_URL" != "" ]] && [[ "$UPDATED_WEB_IMAGES" != "" ]]; then
      echo "            images: $WEB_URL"  >> $TIME_LOG
+     if [ -e image_differences ]; then
+       NUM_CHANGES=`cat image_differences | awk '{print $1}'`
+       NUM_ERRORS=`cat image_differences | awk '{print $2}'`
+       echo "image errors/changed: $NUM_ERRORS/$NUM_CHANGES"  >> $TIME_LOG
+     fi
    fi
    echo "-------------------------------" >> $TIME_LOG
 
