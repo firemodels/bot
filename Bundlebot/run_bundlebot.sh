@@ -1,4 +1,11 @@
-#!/bin/bash
+ #!/bin/bash
+
+if [ "`uname`" == "Darwin" ] ; then
+
+#*** OSX parameters
+
+  export FDS_OPENMPIDIR=/opt/openmpi410_oneapi_64
+fi
 
 #---------------------------------------------
 #                   usage

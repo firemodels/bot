@@ -39,6 +39,7 @@ else
   platform=linux
   bundlebase=${fds_version}_${smv_version}_${NIGHTLY}lnx
 fi
+custombase=${fds_version}_${smv_version}
 
 # determine directory repos reside under
 
@@ -528,7 +529,7 @@ OPENMPIFILE=
 if [ "$openmpifile" != "" ]; then
   OPENMPIFILE="-M $openmpifile"
 fi
-$makeinstaller -i $bundlebase.tar.gz -d $INSTALLDIR -m $MPI_VERSION $OPENMPIFILE $bundlebase.sh
+$makeinstaller -i $bundlebase.tar.gz -b $custombase -d $INSTALLDIR -m $MPI_VERSION $OPENMPIFILE $bundlebase.sh
 
 cat $fdsbindir/hash/*.sha1         > $bundlebase.sha1
 cat $smvbindir/hash/*.sha1         > $bundlebase.sha1
