@@ -420,13 +420,13 @@ fi
 if [ "$MPI_VERSION" != "INTEL" ] ; then
 cat << MODULE >> \$FDSMODULEtmp
 prepend-path    PATH            \$FDS_root/bin/openmpi_64/bin
-# used when running FDS
+# used when running the bundled fds
 setenv          OPAL_PREFIX     \$FDS_root/bin/openmpi_64
 MODULE
 fi
 if [[ "$ostype" == "OSX" ]] && [[ "$FDS_OPENMPIDIR" != "" ]]; then
 cat << MODULE >> \$FDSMODULEtmp
-# used when building FDS
+# used when compiling and running the repository fds
 #setenv          OPAL_PREFIX     $FDS_OPENMPIDIR
 MODULE
 fi
@@ -468,11 +468,11 @@ BASH
 if [ "$MPI_VERSION" != "INTEL" ] ; then
 cat << BASH >> \$BASHRCFDS
 export PATH=\\\$FDSBINDIR/openmpi_64/bin:\\\$PATH
-export OPAL_PREFIX=\\\$FDSBINDIR/openmpi_64  # used when running fds
+export OPAL_PREFIX=\\\$FDSBINDIR/openmpi_64  # used when running the bundled fds
 BASH
 if [[ "$ostype" == "OSX" ]] && [[ "$FDS_OPENMPIDIR" != "" ]]; then
 cat << BASH >> \$BASHRCFDS
-#export OPAL_PREFIX=$FDS_OPENMPIDIR  # used when building FDS
+#export OPAL_PREFIX=$FDS_OPENMPIDIR  # used when compiling and running the repository fds
 BASH
 fi
 fi
