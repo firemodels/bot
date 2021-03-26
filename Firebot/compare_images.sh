@@ -199,6 +199,8 @@ for f in $NEW_DIR/$SUBDIR/*.png; do
         touch $diff_file_changed
         IMAGE_ERRORS=$((IMAGE_ERRORS + 1))
       fi
+    fi
+    if [[ "$diff" != "0" ]]; then
       DIFFS=$((DIFFS + 1))
     fi
   fi
