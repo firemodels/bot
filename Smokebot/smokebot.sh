@@ -1386,7 +1386,7 @@ email_build_status()
   cd $smokebotdir
   # Check for warnings and errors
   if [[ "$WEB_URL" != "" ]] && [[ "$UPDATED_WEB_IMAGES" == "1" ]]; then
-    echo "     Smokebot summary: $WEB_URL" >> $TIME_LOG
+    echo "               images: $WEB_URL" >> $TIME_LOG
     if [ -e image_differences ]; then
       NUM_CHANGES=`cat image_differences | awk '{print $1}'`
       NUM_ERRORS=`cat image_differences | awk '{print $2}'`
@@ -1715,7 +1715,7 @@ if [ "$WEB_DIR" != "" ]; then
 fi
 if [ "$WEB_DIR" != "" ]; then
   WEB_HOST=`hostname -A | awk '{print $2}'`
-  WEB_URL=http://$WEB_HOST/$WEB_DIR
+  WEB_URL=http://$WEB_HOST/$WEB_DIR/diffs.html
 else
   WEB_URL=
 fi
