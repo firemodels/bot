@@ -190,6 +190,9 @@ for f in $NEW_DIR/$SUBDIR/*.png; do
     if [ "$diff" == "" ]; then
       diff=0
     fi
+    if [[ $diff == *"e"* ]]; then
+      diff=$(printf "%.6f" $diff)
+    fi
     echo $diff > $diff_file_metric
     echo $base $diff >> $file_list
     if [[ "$diff" != "0" ]] && [[ ! $diff == *"e"* ]]; then
