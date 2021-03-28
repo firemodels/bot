@@ -407,12 +407,13 @@ CPDIR $texturedir $smvbindir
 # FDS 
 
 echo ""
-echo "--- fds apps ---"
+echo "--- fds apps/scripts ---"
 echo ""
 cd $fdsbindir
-CP $APPS_DIR fds       $fdsbindir fds
-CP $APPS_DIR fds2ascii $fdsbindir fds2ascii
-CP $APPS_DIR test_mpi  $fdsbindir test_mpi
+CP $APPS_DIR    fds       $fdsbindir fds
+CP $APPS_DIR    fds2ascii $fdsbindir fds2ascii
+CP $APPS_DIR    test_mpi  $fdsbindir test_mpi
+CP $fds_bundle  fds.sh    $bundledir fds.sh
 
 echo ""
 echo "--- copying mpi ---"
@@ -490,8 +491,6 @@ echo ""
 
 CP $webpagesdir FDS_Release_Notes.htm $bundledir/Documentation FDS_Release_Notes.html
 CP $webpagesdir smv_readme.html       $bundledir/Documentation SMV_Release_Notes.html
-
-# CP2 $fds_bundle readme_examples.html $bundledir/Examples
 
 export OUTDIR=$bundledir/Examples
 export QFDS=$copyfdscase
