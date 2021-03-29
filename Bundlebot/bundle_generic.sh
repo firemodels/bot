@@ -413,7 +413,7 @@ cd $fdsbindir
 CP $APPS_DIR    fds       $fdsbindir fds
 CP $APPS_DIR    fds2ascii $fdsbindir fds2ascii
 CP $APPS_DIR    test_mpi  $fdsbindir test_mpi
-CP $fds_bundle  fds.sh    $bundledir fds.sh
+CP $fds_bundle  fds.sh    $fdsbindir fds.sh
 
 echo ""
 echo "--- copying mpi ---"
