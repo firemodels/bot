@@ -17,6 +17,7 @@ set MPICH_PORT_RANGE=
 set debug=
 set oversubscribed=
 set casedir=
+set use_default_casedir=
 
 call :getopts %*
 if "%stop_script%" == "1" exit /b
@@ -42,11 +43,17 @@ if NOT "x%IN_CMDFDS%" == "x" goto skip_NO_IN_CMDFDS
 
 set ECHO=
 if "%show_only%" == "1" set ECHO=echo
+
 if "%show_only%" == "1" goto skip1
+if "x%use_default_casedir%" == "x" goto skip3
+  set casedir=%casename:~0,-4%
+:skip3
 if "x%casedir%" == "x" goto skip2
 if NOT exist %casedir% mkdir %casedir%
-copy %casename% %casedir%
-cd %casedir%
+  echo @echo off            > %casedir%.bat
+  echo smokeview %casedir% >> %casedir%.bat
+  copy %casename% %casedir%
+  cd %casedir%
 :skip2
 :skip1
 
@@ -109,10 +116,14 @@ exit /b
    set use_openmp=1
    shift
  )
- if "%1" EQU "-s" (
+ if "%1" EQU "-y" (
    set valid=1
    set casedir=%2
    shift
+ )
+ if "%1" EQU "-Y" (
+   set valid=1
+   set use_default_casedir=1
  )
  if "%1" EQU "-O" (
    set valid=1
@@ -158,7 +169,8 @@ echo -h     - display this message only
 echo -p xx  - number of MPI processes [default: 1]
 echo -o yy  - number of OpenMP threads per process [default: %OMP_NUM_THR
 echo -O     - add -env I_MPI_WAIT=1 to the mpiexec line for use when your case is oversubscribed
-::echo -s dir - copy casename.fds into dir and run the case there
 echo -v     - show fds version information
+echo -y dir - run casename.fds in directory dir
+echo -Y     - run casename.fds in directory casename
 
 exit /b
