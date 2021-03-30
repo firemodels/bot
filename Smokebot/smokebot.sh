@@ -1177,10 +1177,10 @@ check_guide()
      if [ "$SMOKEBOT_MAN_DIR" != "" ]; then
        cp $directory/$document $SMOKEBOT_MAN_DIR/.
      fi
+     chmod 664 $directory/$document
+     cp $directory/$document $SMV_SUMMARY_DIR/manuals/.
      cp $directory/$document $NEWGUIDE_DIR/.
      cp $directory/$document $LATESTPUBS_DIR/$document
-     chmod 664 $NEWGUIDE_DIR/$document
-     chmod 664 $LATESTPUBS_DIR/$document
    fi
 
    # Check for LaTeX warnings (undefined references or duplicate labels)
