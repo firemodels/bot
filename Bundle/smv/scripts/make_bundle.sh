@@ -101,6 +101,13 @@ UPDATER=$SVNROOT/bot/Bundle/smv/scripts//make_updater.sh
 uploads=$HOME/.bundle/uploads
 flushfile=$SVNROOT/smv/Build/flush/intel_${platform}_64/flush_${platform}_64
 
+if [ ! -e $HOME/.bundle ]; then
+  mkdir $HOME/.bundle
+fi
+if [ ! -e $uploads ]; then
+  mkdir $uploads
+fi
+
 cd $uploads
 
 rm -rf $PLATFORMDIR
