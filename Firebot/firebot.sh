@@ -1697,7 +1697,7 @@ email_build_status()
    echo "              queue: $QUEUE "                   >> $TIME_LOG
    echo "fds revision/branch: $FDS_REVISION/$FDSBRANCH " >> $TIME_LOG
    echo "smv revision/branch: $SMV_REVISION/$SMVBRANCH " >> $TIME_LOG
-   echo "fig revision/branch: $FIG_REVISION/msater " >> $TIME_LOG
+   echo "fig revision/branch: $FIG_REVISION/master " >> $TIME_LOG
    if [ "$IFORT_VERSION" != "" ]; then
       echo "            Fortran: $IFORT_VERSION " >> $TIME_LOG
    fi
