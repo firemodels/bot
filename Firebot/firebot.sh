@@ -1689,24 +1689,23 @@ email_build_status()
    echo "" > $TIME_LOG
    echo "-------------------------------" >> $TIME_LOG
    if [ "$BUILD_ONLY" == "1" ]; then
-     echo " build only apps"                 >> $TIME_LOG
+     echo " build only apps"                               >> $TIME_LOG
    fi
-   echo "              host: $hostname "     >> $TIME_LOG
-   echo "                OS: $platform2 "    >> $TIME_LOG
-   echo "              repo: $repo "         >> $TIME_LOG
-   echo "             queue: $QUEUE "        >> $TIME_LOG
-   echo "      fds revision: $FDS_REVISION " >> $TIME_LOG
-   echo "        fds branch: $FDSBRANCH "    >> $TIME_LOG
-   echo "      smv revision: $SMV_REVISION " >> $TIME_LOG
-   echo "        smv branch: $SMVBRANCH "    >> $TIME_LOG
+   echo "               host: $hostname "                >> $TIME_LOG
+   echo "                 OS: $platform2 "               >> $TIME_LOG
+   echo "               repo: $repo "                    >> $TIME_LOG
+   echo "              queue: $QUEUE "                   >> $TIME_LOG
+   echo "fds revision/branch: $FDS_REVISION/$FDSBRANCH " >> $TIME_LOG
+   echo "smv revision/branch: $SMV_REVISION/$SMVBRANCH " >> $TIME_LOG
+   echo "fig revision/branch: $FIG_REVISION/msater " >> $TIME_LOG
    if [ "$IFORT_VERSION" != "" ]; then
-      echo "           Fortran: $IFORT_VERSION " >> $TIME_LOG
+      echo "            Fortran: $IFORT_VERSION " >> $TIME_LOG
    fi
-   echo "        start time: $start_time "   >> $TIME_LOG
-   echo "         stop time: $stop_time "    >> $TIME_LOG
+   echo "         start time: $start_time "   >> $TIME_LOG
+   echo "          stop time: $stop_time "    >> $TIME_LOG
    if [ "$NAMELIST_NODOC_STATUS" != "" ]; then
      if [ "$NAMELIST_NODOC_STATUS" == "0" ]; then
-       echo "undocumented namelist keywords: $NAMELIST_NODOC_STATUS " >> $TIME_LOG
+       echo " undocumented namelist keywords: $NAMELIST_NODOC_STATUS " >> $TIME_LOG
      fi
    else
      NAMELIST_NODOC_LOG=
@@ -1715,14 +1714,14 @@ email_build_status()
      NAMELIST_NOSOURCE_LOG=
    fi
    if [ "$UPLOADGUIDES" == "1" ]; then
-     echo "            status:  https://pages.nist.gov/fds-smv/firebot_status.html" >> $TIME_LOG
+     echo "             status:  https://pages.nist.gov/fds-smv/firebot_status.html" >> $TIME_LOG
    fi
    if [[ "$WEB_URL" != "" ]] && [[ "$UPDATED_WEB_IMAGES" != "" ]]; then
      echo "            images: $WEB_URL"  >> $TIME_LOG
      if [ -e image_differences ]; then
        NUM_CHANGES=`cat image_differences | awk '{print $1}'`
        NUM_ERRORS=`cat image_differences | awk '{print $2}'`
-       echo "image errors/changes: $NUM_ERRORS/$NUM_CHANGES"  >> $TIME_LOG
+       echo " image errors/changes: $NUM_ERRORS/$NUM_CHANGES"  >> $TIME_LOG
      fi
    fi
    echo "-------------------------------" >> $TIME_LOG
