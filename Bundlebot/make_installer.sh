@@ -36,7 +36,9 @@ if [ "`uname`" == "Darwin" ] ; then
   ostype2="OSX"
 fi
 
-while getopts 'b:d:i:m:M:' OPTION
+FDS_VERSION=FDS
+SMV_VERSION=Smokeview
+while getopts 'b:d:f:i:m:M:s:' OPTION
 do
 case $OPTION in
   b)
@@ -47,6 +49,9 @@ case $OPTION in
 # get rid of trailing slashes
   INSTALLDIR=${INSTALLDIR%/}
   ;;
+  f)
+  FDS_VERSION="$OPTARG"
+  ;;
   i)
   FDS_TAR="$OPTARG"
   ;;
@@ -55,6 +60,9 @@ case $OPTION in
   ;;
   M)
   openmpifile="$OPTARG"
+  ;;
+  s)
+  SMV_VERSION="$OPTARG"
   ;;
 esac
 done 
@@ -103,7 +111,7 @@ OVERRIDE=\$1
 INSTALL_LOG=/tmp/fds_install_$$.log
 echo "" > \$INSTALL_LOG
 echo ""
-echo "Installing FDS $FDS_VERSIONBASE and Smokeview $SMV_VERSIONBASE for $ostype2"
+echo "Installing $FDS_VERSION and $SMV_VERSION for $ostype2"
 echo ""
 echo "Options:"
 echo "  1) Press <Enter> to begin installation [default]"
@@ -269,7 +277,7 @@ fi
 #--- get FDS root directory
 
 echo ""
-echo "FDS install options"
+echo "Options:"
 EOF
 
 if [ "$ostype" == "OSX" ]
@@ -288,7 +296,7 @@ cat << EOF >> $INSTALLER
 EOF
   fi
 cat << EOF >> $INSTALLER
-echo "  Enter a directory path to install elsewhere"
+echo "  Enter a directory path to install somewhere else"
 
 if [ "\$OVERRIDE" == "y" ] 
 then

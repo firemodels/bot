@@ -332,7 +332,7 @@ smvscriptdir=$REPO_ROOT/smv/scripts
 utilscriptdir=$REPO_ROOT/smv/Utilities/Scripts
 
 texturedir=$smv_bundle/textures
-makeinstaller=$REPO_ROOT/bot/Bundlebot/make_installer.sh
+MAKEINSTALLER=$REPO_ROOT/bot/Bundlebot/make_installer.sh
 
 fds_cases=$REPO_ROOT/fds/Verification/FDS_Cases.sh
 fds_benchamrk_cases=$REPO_ROOT/fds/Verification/FDS_Benchmark_Cases.sh
@@ -528,7 +528,7 @@ OPENMPIFILE=
 if [ "$openmpifile" != "" ]; then
   OPENMPIFILE="-M $openmpifile"
 fi
-$makeinstaller -i $bundlebase.tar.gz -b $custombase -d $INSTALLDIR -m $MPI_VERSION $OPENMPIFILE $bundlebase.sh
+$MAKEINSTALLER -i $bundlebase.tar.gz -b $custombase -d $INSTALLDIR -f $fds_version -s $smv_version -m $MPI_VERSION $OPENMPIFILE $bundlebase.sh
 
 cat $fdsbindir/hash/*.sha1         > $bundlebase.sha1
 cat $smvbindir/hash/*.sha1         > $bundlebase.sha1

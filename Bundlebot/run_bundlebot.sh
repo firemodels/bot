@@ -23,7 +23,10 @@ echo "-c - bundle without warning about cloning/erasing fds and smv repos"
 echo "-C - use FDS and smokeview hash revisions found in $CONFIG_SCRIPT"
 echo "-f - force this script to run"
 echo "-F - fds repo hash/release"
-
+echo "-p host -  host containing pubs"
+echo "           firebot/fds pubs: ~firebot/.firebot/pubs"
+echo "           smokebot/smv pubs: ~smokebot/.smokebot/pubs"
+echo "           user generated pubs: $HOME/.bundle/manuals (host=LOCAL)"
 echo "-h - display this message"
 
 FIREBOT_HOST_MSSG=
@@ -134,8 +137,9 @@ CONFIG_SCRIPT=fdssmv_config.sh
 USE_CONFIG=
 FDS_HASH=
 SMV_HASH=
+PUB_HOST=$FIREBOT_HOST
 
-while getopts 'cCfF:hH:m:rS:Uv' OPTION
+while getopts 'cCfF:hH:m:p:rS:Uv' OPTION
 do
 case $OPTION  in
   c)
@@ -158,6 +162,9 @@ case $OPTION  in
    ;;
   m)
    MAILTO="$OPTARG"
+   ;;
+  p)
+   PUB_HOST="$OPTARG"
    ;;
   S)
    SMV_RELEASE="$OPTARG"
@@ -270,7 +277,7 @@ if [ "$PROCEED" == "" ]; then
   echo "------------------------------------------------------------"
   echo "You are about to erase and then clone the fds and smv repos."
   echo "Press any key to continue or <CTRL> c to abort."
-  echo To avoid this warning, use the -c option on the command line
+  echo "To avoid this warning, use the -c option on the command line"
   echo "------------------------------------------------------------"
   echo "------------------------------------------------------------"
   read val
@@ -297,4 +304,4 @@ $ECHO ./run_firebot.sh $FORCE -c -C -B -g $FIREBOT_HOST -G $FIREBOT_HOME $JOPT $
 
 #*** generate and upload bundle
 cd $curdir
-$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH -p $FIREBOT_HOST $FDS_RELEASE $SMV_RELEASE -w $UPLOAD
+$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH -p $PUB_HOST $FDS_RELEASE $SMV_RELEASE -w $UPLOAD

@@ -241,8 +241,13 @@ if [ "$USE_CACHE" == "" ]; then
 if [ "$showparms" == "" ]; then
   error_log=/tmp/error_log.$$
   rm -f $HOME/.bundle/pubs/*
-  ./copy_pubs.sh fds $fds_pub_home/.firebot/$BRANCHDIR/pubs         $pub_host $error_log || return_code=1
-  ./copy_pubs.sh smv $smv_pub_home/.smokebot/$BRANCHDIR/pubs        $pub_host $error_log || return_code=1
+  if [ "$pub_host" == "LOCAL" ]; then
+    ./copy_pubs.sh fds $HOME/.bundle/manuals                          LOCAL     $error_log || return_code=1
+    ./copy_pubs.sh smv $HOME/.bundle/manuals                          LOCAL     $error_log || return_code=1
+  else
+    ./copy_pubs.sh fds $fds_pub_home/.firebot/$BRANCHDIR/pubs         $pub_host $error_log || return_code=1
+    ./copy_pubs.sh smv $smv_pub_home/.smokebot/$BRANCHDIR/pubs        $pub_host $error_log || return_code=1
+  fi
 
   rm -f $HOME/.bundle/apps/*
   ./copy_apps.sh fds $app_home/.firebot/$BRANCHDIR/apps             $error_log || return_code=1
