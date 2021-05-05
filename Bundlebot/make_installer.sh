@@ -106,12 +106,12 @@ echo ""
 if [ "$fds_version" != "" ]; then
   FDS_VERSION="FDS $fds_version"
 else
-  FDS_VERSION=FDS
+  FDS_VERSION="FDS"
 fi
 if [ "$smv_version" != "" ]; then
   SMV_VERSION="Smokeview $smv_version"
 else
-  SMV_VERSION=Smokeview
+  SMV_VERSION="Smokeview"
 fi
 echo "Installing $FDS_VERSION and $SMV_VERSION for $ostype2"
 echo ""
