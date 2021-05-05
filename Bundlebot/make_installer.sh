@@ -36,7 +36,9 @@ if [ "`uname`" == "Darwin" ] ; then
   ostype2="OSX"
 fi
 
-while getopts 'b:d:i:m:M:' OPTION
+FDS_VERSION=FDS
+SMV_VERSION=Smokeview
+while getopts 'b:d:f:i:m:M:s:' OPTION
 do
 case $OPTION in
   b)
@@ -47,6 +49,9 @@ case $OPTION in
 # get rid of trailing slashes
   INSTALLDIR=${INSTALLDIR%/}
   ;;
+  f)
+  FDS_VERSION="$OPTARG"
+  ;;
   i)
   FDS_TAR="$OPTARG"
   ;;
@@ -55,6 +60,9 @@ case $OPTION in
   ;;
   M)
   openmpifile="$OPTARG"
+  ;;
+  s)
+  SMV_VERSION="$OPTARG"
   ;;
 esac
 done 
@@ -103,16 +111,6 @@ OVERRIDE=\$1
 INSTALL_LOG=/tmp/fds_install_$$.log
 echo "" > \$INSTALL_LOG
 echo ""
-if [ "$fds_version" != "" ]; then
-  FDS_VERSION="FDS $fds_version"
-else
-  FDS_VERSION=FDS
-fi
-if [ "$smv_version" != "" ]; then
-  SMV_VERSION="Smokeview $smv_version"
-else
-  SMV_VERSION=Smokeview
-fi
 echo "Installing $FDS_VERSION and $SMV_VERSION for $ostype2"
 echo ""
 echo "Options:"

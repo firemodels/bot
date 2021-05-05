@@ -6,9 +6,6 @@ INTEL_COMP_VERSION=$4
 UPLOAD_DIR_ARG=$5
 NIGHTLY=$6
 
-export fds_version
-export smv_version
-
 if [ "$NIGHTLY" == "null" ]; then
   NIGHTLY=
 fi
@@ -531,7 +528,7 @@ OPENMPIFILE=
 if [ "$openmpifile" != "" ]; then
   OPENMPIFILE="-M $openmpifile"
 fi
-$MAKEINSTALLER -i $bundlebase.tar.gz -b $custombase -d $INSTALLDIR -m $MPI_VERSION $OPENMPIFILE $bundlebase.sh
+$MAKEINSTALLER -i $bundlebase.tar.gz -b $custombase -d $INSTALLDIR -f $fds_version -s $smv_version -m $MPI_VERSION $OPENMPIFILE $bundlebase.sh
 
 cat $fdsbindir/hash/*.sha1         > $bundlebase.sha1
 cat $smvbindir/hash/*.sha1         > $bundlebase.sha1
