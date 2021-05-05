@@ -103,8 +103,17 @@ OVERRIDE=\$1
 INSTALL_LOG=/tmp/fds_install_$$.log
 echo "" > \$INSTALL_LOG
 echo ""
-#echo "Installing FDS $FDS_VERSIONBASE and Smokeview $SMV_VERSIONBASE for $ostype2"
-echo "Installing FDS $fds_version and Smokeview $smv_version for $ostype2"
+if [ "$fds_version" != "" ]; then
+  FDS_VERSION="FDS $fds_version"
+else
+  FDS_VERSION=FDS
+fi
+if [ "$smv_version" != "" ]; then
+  SMV_VERSION="Smokeview $smv_version"
+else
+  SMV_VERSION=Smokeview
+fi
+echo "Installing $FDS_VERSION and $SMV_VERSION for $ostype2"
 echo ""
 echo "Options:"
 echo "  1) Press <Enter> to begin installation [default]"
