@@ -1330,6 +1330,7 @@ email_build_status()
   echo "               queue: $SMOKEBOT_QUEUE"               >> $TIME_LOG
   echo "  fds version/branch: $FDS_REVISION/$FDSBRANCH"      >> $TIME_LOG
   echo "  smv version/branch: $SMV_REVISION/$SMVBRANCH"      >> $TIME_LOG
+  echo "  bot version/branch: $BOT_REVISION/$BOTBRANCH"      >> $TIME_LOG
   echo "  fig version/branch: $FIG_REVISION/master"          >> $TIME_LOG
   echo "cfast version/branch: $CFAST_REVISION/$CFASTBRANCH"  >> $TIME_LOG
   if [ "$IFORT_VERSION" != "" ]; then
@@ -1913,6 +1914,9 @@ FDS_REVISION=`git describe --long --dirty`
 
 cd $figrepo
 FIG_REVISION=`git describe --long --dirty`
+
+cd $botrepo
+BOT_REVISION=`git describe --long --dirty`
 
 # copy smv revision and hash to the latest pubs and apps directory
 cd $smvrepo
