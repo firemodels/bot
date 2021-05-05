@@ -103,7 +103,8 @@ OVERRIDE=\$1
 INSTALL_LOG=/tmp/fds_install_$$.log
 echo "" > \$INSTALL_LOG
 echo ""
-echo "Installing FDS $FDS_VERSIONBASE and Smokeview $SMV_VERSIONBASE for $ostype2"
+#echo "Installing FDS $FDS_VERSIONBASE and Smokeview $SMV_VERSIONBASE for $ostype2"
+echo "Installing FDS $fds_version and Smokeview $smv_version for $ostype2"
 echo ""
 echo "Options:"
 echo "  1) Press <Enter> to begin installation [default]"
@@ -269,7 +270,7 @@ fi
 #--- get FDS root directory
 
 echo ""
-echo "FDS install options"
+echo "Options:"
 EOF
 
 if [ "$ostype" == "OSX" ]
@@ -288,7 +289,7 @@ cat << EOF >> $INSTALLER
 EOF
   fi
 cat << EOF >> $INSTALLER
-echo "  Enter a directory path to install elsewhere"
+echo "  Enter a directory path to install somewhere else"
 
 if [ "\$OVERRIDE" == "y" ] 
 then
