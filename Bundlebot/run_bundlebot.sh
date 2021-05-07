@@ -252,7 +252,7 @@ if [ "$SMV_HASH" != "" ]; then
     SMV_RELEASE_ARG=$SMV_TAG
   else
     SMV_TAG="-Y $SMV_RELEASE_ARG"
-  else
+  fi
 fi
   
 
