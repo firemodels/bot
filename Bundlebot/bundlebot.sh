@@ -48,6 +48,8 @@ echo "-v - show parameters used to build bundle (the bundle is not generated)"
 echo "-w - overwrite bundle (if it already exists) "
 echo "-x fds_revision - fds revision"
 echo "-y smv_revision - smv revision"
+echo "-X FDS_TAG - fds tag"
+echo "-Y SMV_TAG - smv tag"
 echo "   The -x and -y options are only used with the -R cloning option"
 exit 0
 }
@@ -86,8 +88,10 @@ BRANCH=master
 BUNDLE_PREFIX="tst"
 FDS_REVISION=
 SMV_REVISION=
+FDS_TAG=
+SMV_TAG=
 
-while getopts 'b:cd:fF:ghp:rS:tvwx:y:' OPTION
+while getopts 'b:cd:fF:ghp:rS:tvwX:x:Y:y:' OPTION
 do
 case $OPTION  in
   b)
@@ -137,8 +141,11 @@ case $OPTION  in
   x)
    FDS_REVISION=$OPTARG
    ;;
-  y)
-   SMV_REVISION=$OPTARG
+  X)
+   FDS_TAG=$OPTARG
+   ;;
+  Y)
+   SMV_TAG=$OPTARG
    ;;
 esac
 done
@@ -146,6 +153,13 @@ shift $(($OPTIND-1))
 
 # prevent more than one instance of the make_bundle.sh script from running
 # at the same time
+
+if [ "$FDS_TAG" != "" ]; then
+  FDS_REVISION=$FDS_TAG
+fi
+if [ "$SMV_TAG" != "" ]; then
+  SMV_REVISION=$SMV_TAG
+fi
 
 LOCK_FILE=$HOME/.bundle/make_bundle_lock
 if [ "$FORCE" == "" ]; then
