@@ -191,11 +191,10 @@ else
   platform=lnx
 fi
 
-BUNDLE_PREFIX_FILE=${BUNDLE_PREFIX}_
 if [ "$BRANCH" == "release" ]; then
-  BUNDLE_PREFIX=null
-  BUNDLE_PREFIX_FILE=
+  BUNDLE_PREFIX=rls
 fi
+BUNDLE_PREFIX_FILE=${BUNDLE_PREFIX}_
 BRANCHDIR=$BRANCH
 if [ "$BRANCH" != "release" ]; then
   BRANCHDIR=
