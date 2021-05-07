@@ -2,6 +2,7 @@
 filebase=$1
 NIGHTLY=$2
 platform=$3
+upload_dir=$4
 
 fullfile=$HOME/.bundle/bundles/${filebase}.sh
 
@@ -18,7 +19,7 @@ if [ "$UPLOAD_HOST" != "" ]; then
     cd $HOME/.bundle/bundles
     scp -q ${filebase}.sh   $UPLOAD_HOST\:.bundle/bundles/.
     scp -q ${filebase}.sha1 $UPLOAD_HOST\:.bundle/bundles/.
-    ssh -q $UPLOAD_HOST \( cd .bundle/bundles \; bash ./upload_bundle.sh \$HOME/.bundle/bundles $filebase $NIGHTLY $platform \)
+    ssh -q $UPLOAD_HOST \( cd .bundle/bundles \; bash ./upload_bundle.sh \$HOME/.bundle/bundles $filebase $NIGHTLY $platform $upload_dir \)
     ssh -q $UPLOAD_HOST rm .bundle/bundles/upload_bundle.sh
     cd $curdir
   fi

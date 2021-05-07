@@ -23,11 +23,13 @@ echo "-c - bundle without warning about cloning/erasing fds and smv repos"
 echo "-C - use FDS and smokeview hash revisions found in $CONFIG_SCRIPT"
 echo "-f - force this script to run"
 echo "-F - fds repo hash/release"
+echo "-h - display this message"
 echo "-p host -  host containing pubs"
 echo "           firebot/fds pubs: ~firebot/.firebot/pubs"
 echo "           smokebot/smv pubs: ~smokebot/.smokebot/pubs"
 echo "           user generated pubs: $HOME/.bundle/manuals (host=LOCAL)"
-echo "-h - display this message"
+echo "-X fdstag - when cloning, tag fds repo with fdstag"
+echo "-Y smvtag - when cloning, tag smv repo with smvtag"
 
 FIREBOT_HOST_MSSG=
 if [ "$FIREBOT_HOST" != "" ]; then
@@ -138,8 +140,10 @@ USE_CONFIG=
 FDS_HASH=
 SMV_HASH=
 PUB_HOST=$FIREBOT_HOST
+FDS_TAG=
+SMV_TAG=
 
-while getopts 'cCfF:hH:m:p:rS:Uv' OPTION
+while getopts 'cCfF:hH:m:p:rS:UvX:Y:' OPTION
 do
 case $OPTION  in
   c)
@@ -177,6 +181,12 @@ case $OPTION  in
    ;;
   v)
    ECHO=echo
+   ;;
+  X)
+   FDS_TAG="$OPTARG"
+   ;;
+  Y)
+   SMV_TAG="$OPTARG"
    ;;
 esac
 done
@@ -226,15 +236,23 @@ if [ "$SMV_RELEASE" == "" ]; then
   FDS_RELEASE_ARG=""
 fi
 
-FDS_TAG=
-SMV_TAG=
 if [ "$FDS_HASH" != "" ]; then
   FDS_RELEASE="-x $FDS_HASH"
-  FDS_TAG="-X $FDS_RELEASE_ARG"
+  if [ "$FDS_TAG" != "" ]; then
+    FDS_TAG="-X $FDS_TAG"
+    FDS_RELEASE_ARG=$FDS_TAG
+  else
+    FDS_TAG="-X $FDS_RELEASE_ARG"
+  fi
 fi
 if [ "$SMV_HASH" != "" ]; then
   SMV_RELEASE="-y $SMV_HASH"
-  SMV_TAG="-Y $SMV_RELEASE_ARG"
+  if [ "$SMV_TAG" != "" ]; then
+    SMV_TAG="-Y $SMV_TAG"
+    SMV_RELEASE_ARG=$SMV_TAG
+  else
+    SMV_TAG="-Y $SMV_RELEASE_ARG"
+  else
 fi
   
 
