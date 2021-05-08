@@ -55,7 +55,7 @@ if "x%use_config%" == "x" goto skip_config
 set nightly=tst
 set pub_dir=
 if NOT "x%BRANCH_NAME%" == "xrelease" goto skip_branch
-  set nightly=null
+  set nightly=rls
   set pub_dir=release
 :skip_branch
 
@@ -170,6 +170,12 @@ if NOT "x%FDS_HASH%" == "x" goto skip_elsehash
   goto endif_gethash
 
 :skip_elsehash
+  if "x%FDS_TAG%" == "x" goto endif3
+    set FDS_HASH=%FDS_TAG%
+  :endif3
+  if "x%SMV_TAG%" == "x" goto endif4
+    set SMV_HASH=%SMV_TAG%
+  :endif4
   set FDS_HASH_BUNDLER=%FDS_HASH%
   set SMV_HASH_BUNDLER=%SMV_HASH%
   set FDS_REVISION_BUNDLER=%FDS_HASH%
