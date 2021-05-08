@@ -52,16 +52,19 @@ if "x%use_config%" == "x" goto skip_config
   call fdssmv_config
 :skip_config
 
+:: set pubs directories
+set FDS_PUBS_DIR=%bundle_firebot_home%/.firebot/%pub_dir%/pubs
+set SMV_PUBS_DIR=%bundle_smokebot_home%/.smokebot/%pub_dir%/pubs
+
 set nightly=tst
 set pub_dir=
 if NOT "x%BRANCH_NAME%" == "xrelease" goto skip_branch
   set nightly=rls
   set pub_dir=release
+  set FDS_PUBS_DIR=.bundle/manuals
+  set SMV_PUBS_DIR=.bundle/manuals
 :skip_branch
 
-:: set pubs directories
-set FDS_PUBS_DIR=%bundle_firebot_home%/.firebot/%pub_dir%/pubs
-set SMV_PUBS_DIR=%bundle_smokebot_home%/.smokebot/%pub_dir%/pubs
 
 ::*** error checking
 
