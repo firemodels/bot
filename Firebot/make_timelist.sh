@@ -28,7 +28,9 @@ hash=`tail -2 $file | head -1`
 gitdate=`git show -s --format=%ct $hash`
 gitdate=`echo "scale=5; $gitdate - $BASETIMESTAMP" | bc`
 gitdate=`echo "scale=5; $gitdate/86400 " | bc`
-echo $gitdate,$time>> $tempfile
+if [ "$time" != "" ]; then
+  echo $gitdate,$time>> $tempfile
+fi
 done
 sort -t ',' -n -k 1 $tempfile
 rm $tempfile
