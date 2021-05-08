@@ -36,14 +36,15 @@ cat << EOF
           ['Days since Jan 1, 2016', 'Benchmark Time (s)'],
 EOF
 
-STDDEV=`./make_timelist.sh $SOPT | sort -n -k 1 -t , | tail $NHIST | awk -F ',' '{x[NR]=$2; s+=$2; n++} END{a=s/n; for (i in x){ss += (x[i]-a)^2} sd = sqrt(ss/n); print sd}'`
-MEAN=`./make_timelist.sh $SOPT | sort -n -k 1 -t , | tail $NHIST | awk -F ',' '{x[NR]=$2; s+=$2; n++} END{a=s/n; print a}'`
+./make_timelist.sh $SOPT | sort -n -k 1 -t , | tail $NHIST > timelist.out
+STDDEV=`cat timelist.out | awk -F ',' '{x[NR]=$2; s+=$2; n++} END{a=s/n; for (i in x){ss += (x[i]-a)^2} sd = sqrt(ss/n); print sd}'`
+MEAN=`cat timelist.out   | awk -F ',' '{x[NR]=$2; s+=$2; n++} END{a=s/n; print a}'`
 MEAN=`printf "%0.0f" $MEAN`
 STDDEV_PERCEN=`echo "scale=5; $STDDEV/$MEAN*100 " | bc`
 
 STDDEV=`printf "%0.1f" $STDDEV`
 STDDEV_PERCEN=`printf "%0.1f" $STDDEV_PERCEN`
-./make_timelist.sh $SOPT | sort -n -k 1 -t , | tail $NHIST | awk -F ',' '{ printf("[%s,%s],\n",$1,$2) }'
+cat timelist.out | awk -F ',' '{ printf("[%s,%s],\n",$1,$2) }'
 
 cat << EOF
         ]);
