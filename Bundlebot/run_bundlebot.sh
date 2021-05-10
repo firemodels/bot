@@ -25,8 +25,7 @@ echo "-F - fds repo hash/release"
 echo "-h - display this message"
 echo "-p host -  host containing pubs"
 echo "           firebot/fds pubs: ~firebot/.firebot/pubs"
-echo "           smokebot/smv pubs: ~smokebot/.smokebot/pubs"
-echo "           user generated pubs: $HOME/.bundle/manuals (host=LOCAL)"
+echo "-C - use pubs in $HOME/.bundle/manuals on pub_host"
 echo "-X fdstag - when cloning, tag fds repo with fdstag"
 echo "-Y smvtag - when cloning, tag smv repo with smvtag"
 
@@ -139,12 +138,16 @@ SMV_HASH=
 PUB_HOST=$FIREBOT_HOST
 FDS_TAG=
 SMV_TAG=
+CUSTOM_PUBS=
 
 while getopts 'cCfF:hH:m:p:rS:UvX:Y:' OPTION
 do
 case $OPTION  in
   c)
    PROCEED=1
+   ;;
+  C)
+   CUSTOM_PUBS=-C
    ;;
   f)
    FORCE="-f"
@@ -285,4 +288,4 @@ $ECHO ./run_firebot.sh $FORCE -c -C -B -g $FIREBOT_HOST -G $FIREBOT_HOME $JOPT $
 
 #*** generate and upload bundle
 cd $curdir
-$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH -p $PUB_HOST $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG -w $UPLOAD
+$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH $CUSTOM_PUBS -p $PUB_HOST $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG -w $UPLOAD

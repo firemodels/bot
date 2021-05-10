@@ -9,7 +9,6 @@ else
   eval pdf_from=$2
 fi
 
-
 if [ "$pub_type" != "fds" ]; then
   pub_type="smv"
 fi
@@ -23,7 +22,7 @@ CP ()
   local FROMFILE=$1
   rm -f $pdf_to/$FROMFILE
 
-  if [[ "$bot_host" != "" ]] && [[ "$bot_host" != "LOCAL" ]] && [[ `hostname` != "$bot_host" ]]; then
+  if [[ "$bot_host" != "" ]] && [[ `hostname` != "$bot_host" ]]; then
     echo "copying $FROMFILE to $pdf_to"
     scp -q $bot_host:$pdf_from/$FROMFILE $pdf_to/.
   else
