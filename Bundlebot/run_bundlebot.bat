@@ -10,7 +10,6 @@ set FDS_TAG=
 set SMV_TAG=
 set BRANCH_NAME=nightly
 set configscript=%userprofile%\.bundle\bundle_config.bat
-set use_config=
 set upload_bundle=1
 
 :: define defaults
@@ -47,10 +46,6 @@ call :getopts %*
 if "x%stopscript%" == "x" goto endif2
   exit /b 1
 :endif2
-
-if "x%use_config%" == "x" goto skip_config
-  call fdssmv_config
-:skip_config
 
 :: set pubs directories
 set FDS_PUBS_DIR=%bundle_firebot_home%/.firebot/%pub_dir%/pubs
@@ -363,10 +358,6 @@ set bundle_smokebot_home=
  )
  if "%1" EQU "-c" (
    set clone=clone
-   set valid=1
- )
- if "%1" EQU "-C" (
-   set use_config=1
    set valid=1
  )
  if "%1" EQU "-f" (
