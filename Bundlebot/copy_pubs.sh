@@ -26,14 +26,14 @@ CP ()
     echo "copying $FROMFILE to $pdf_to"
     scp -q $bot_host:$pdf_from/$FROMFILE $pdf_to/.
   else
-    if [ -e $pdf_from/$FROMFILE ]; then
-      echo "copying $FROMFILE to $pdf_to"
-      cp $pdf_from/$FROMFILE $pdf_to/.
+    if [ -e $HOME/$pdf_from/$FROMFILE ]; then
+      echo "copying $FROMFILE from $HOME/$pdf_from to $pdf_to"
+      cp $HOME/$pdf_from/$FROMFILE $pdf_to/.
     else
       echo "" >> $error_log
-      echo "***error: $pdf_from/$FROMFILE does not exist" >> $error_log
+      echo "***error: $HOME/$pdf_from/$FROMFILE does not exist" >> $error_log
       echo ""
-      echo "***error: $pdf_from/$FROMFILE does not exist"
+      echo "***error: $HOME/$pdf_from/$FROMFILE does not exist"
       return 1
     fi
   fi
