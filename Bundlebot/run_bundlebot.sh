@@ -20,14 +20,14 @@ echo "specified fds and smv repo revisions or revisions from the latest firebot 
 echo ""
 echo "Options:"
 echo "-c - bundle without warning about cloning/erasing fds and smv repos"
-echo "-C - use FDS and smokeview hash revisions found in $CONFIG_SCRIPT"
 echo "-f - force this script to run"
 echo "-F - fds repo hash/release"
+echo "-h - display this message"
 echo "-p host -  host containing pubs"
 echo "           firebot/fds pubs: ~firebot/.firebot/pubs"
-echo "           smokebot/smv pubs: ~smokebot/.smokebot/pubs"
-echo "           user generated pubs: $HOME/.bundle/manuals (host=LOCAL)"
-echo "-h - display this message"
+echo "-C - use pubs in $HOME/.bundle/manuals on pub_host"
+echo "-X fdstag - when cloning, tag fds repo with fdstag"
+echo "-Y smvtag - when cloning, tag smv repo with smvtag"
 
 FIREBOT_HOST_MSSG=
 if [ "$FIREBOT_HOST" != "" ]; then
@@ -133,20 +133,21 @@ UPLOAD=-g
 FORCE=
 RELEASE=
 BRANCH=nightly
-CONFIG_SCRIPT=fdssmv_config.sh
-USE_CONFIG=
 FDS_HASH=
 SMV_HASH=
 PUB_HOST=$FIREBOT_HOST
+FDS_TAG=
+SMV_TAG=
+CUSTOM_PUBS=
 
-while getopts 'cCfF:hH:m:p:rS:Uv' OPTION
+while getopts 'cCfF:hH:m:p:rS:UvX:Y:' OPTION
 do
 case $OPTION  in
   c)
    PROCEED=1
    ;;
   C)
-   USE_CONFIG=1
+   CUSTOM_PUBS=-C
    ;;
   f)
    FORCE="-f"
@@ -178,6 +179,12 @@ case $OPTION  in
   v)
    ECHO=echo
    ;;
+  X)
+   FDS_TAG="$OPTARG"
+   ;;
+  Y)
+   SMV_TAG="$OPTARG"
+   ;;
 esac
 done
 shift $(($OPTIND-1))
@@ -186,26 +193,6 @@ shift $(($OPTIND-1))
 JOPT="-J"
 if [ "`uname`" == "Darwin" ] ; then
   JOPT=
-fi
-
-if [[ "$USE_CONFIG" != "" ]]; then
-  if [ ! -e $CONFIG_SCRIPT ]; then
-    echo "***error: configure script $CONFIG_SCRIPT does not exist"
-    exit
-  fi
-  source $CONFIG_SCRIPT
-  ABORT=
-  if [ "$FDS_HASH" == "" ]; then
-    echo "***error: FDS_HASH not defined in $CONFIG_SCRIPT"
-    ABORT=1
-  fi
-  if [ "$SMV_HASH" == "" ]; then
-    echo "***error: SMV_HASH not defined in $CONFIG_SCRIPT"
-    ABORT=1
-  fi
-  if [ "$ABORT" != "" ]; then
-    exit
-  fi
 fi
 
 # both or neither RELEASE options must be set
@@ -226,17 +213,14 @@ if [ "$SMV_RELEASE" == "" ]; then
   FDS_RELEASE_ARG=""
 fi
 
-FDS_TAG=
-SMV_TAG=
-if [ "$FDS_HASH" != "" ]; then
-  FDS_RELEASE="-x $FDS_HASH"
-  FDS_TAG="-X $FDS_RELEASE_ARG"
+if [ "$FDS_TAG" != "" ]; then
+  FDS_TAG_ARG=$FDS_TAG
+  FDS_TAG="-X $FDS_TAG"
 fi
-if [ "$SMV_HASH" != "" ]; then
-  SMV_RELEASE="-y $SMV_HASH"
-  SMV_TAG="-Y $SMV_RELEASE_ARG"
+if [ "$SMV_TAG" != "" ]; then
+  SMV_TAG_ARG=$SMV_TAG
+  SMV_TAG="-Y $SMV_TAG"
 fi
-  
 
 FIREBOT_BRANCH_ARG=$BRANCH
 FIREBOT_BRANCH="-R $BRANCH"
@@ -252,17 +236,17 @@ echo ""
 echo "------------------------------------------------------------"
 echo "            Firebot host: $FIREBOT_HOST"
 echo "  Firebot home directory: $FIREBOT_HOME"
-if [ "$FDS_RELEASE_ARG" != "" ]; then
-  echo "                 FDS TAG: $FDS_RELEASE_ARG"
+if [ "$FDS_TAG_ARG" != "" ]; then
+  echo "                 FDS TAG: $FDS_TAG_ARG"
 fi
-if [ "$FDS_HASH" != "" ]; then
-  echo "                FDS HASH: $FDS_HASH"
+if [ "$FDS_RELEASE_ARG" != "" ]; then
+  echo "            FDS Revision: $FDS_RELEASE_ARG"
+fi
+if [ "$SMV_TAG_ARG" != "" ]; then
+  echo "                 SMV TAG: $SMV_TAG_ARG"
 fi
 if [ "$SMV_RELEASE_ARG" != "" ]; then
-  echo "                 SMV TAG: $SMV_RELEASE_ARG"
-fi
-if [ "$SMV_HASH" != "" ]; then
-  echo "                SMV HASH: $SMV_HASH"
+  echo "            SMV Revision: $SMV_RELEASE_ARG"
 fi
 echo "                   EMAIL: $MAILTO_ARG"
 echo "          Firebot branch: $FIREBOT_BRANCH_ARG"
@@ -304,4 +288,4 @@ $ECHO ./run_firebot.sh $FORCE -c -C -B -g $FIREBOT_HOST -G $FIREBOT_HOME $JOPT $
 
 #*** generate and upload bundle
 cd $curdir
-$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH -p $PUB_HOST $FDS_RELEASE $SMV_RELEASE -w $UPLOAD
+$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH $CUSTOM_PUBS -p $PUB_HOST $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG -w $UPLOAD

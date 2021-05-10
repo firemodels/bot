@@ -3,6 +3,7 @@ BUNDLE_DIR=$1
 BUNDLE_BASE=$2
 NIGHTLY=$3
 platform=$4
+GOOGLE_DIR=$5
 
 if [ "$NIGHTLY" == "null" ]; then
   NIGHTLY=
@@ -22,10 +23,15 @@ GDRIVE=~/bin/gdrive
 #  the following string is gound at the end of the URL of the nightly_bundles
 #  directory on Google Drive
 
-if [ -e $HOME/.bundle/GOOGLE_DIR_ID ]; then
-  BUNDLE_PARENT_ID=`cat $HOME/.bundle/GOOGLE_DIR_ID`
+if [ "$GOOGLE_DIR" == "" ]; then
+  GOOGLE_DIR=GOOGLE_DIR_ID
 else
-  echo "***error: the file $HOME/.bundle/GOOGLE_DIR_ID containing"
+  GOOGLE_DIR=TEST_BUNDLE_ID
+fi
+if [ -e $HOME/.bundle/$GOOGLE_DIR ]; then
+  BUNDLE_PARENT_ID=`cat $HOME/.bundle/$GOOGLE_DIR`
+else
+  echo "***error: the file $HOME/.bundle/$GOOGLE_DIR containing"
   echo "          the ID of the google drive upload directory does not exit"
   exit
 fi

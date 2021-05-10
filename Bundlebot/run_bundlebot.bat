@@ -10,7 +10,6 @@ set FDS_TAG=
 set SMV_TAG=
 set BRANCH_NAME=nightly
 set configscript=%userprofile%\.bundle\bundle_config.bat
-set use_config=
 set upload_bundle=1
 
 :: define defaults
@@ -48,20 +47,19 @@ if "x%stopscript%" == "x" goto endif2
   exit /b 1
 :endif2
 
-if "x%use_config%" == "x" goto skip_config
-  call fdssmv_config
-:skip_config
+:: set pubs directories
+set FDS_PUBS_DIR=%bundle_firebot_home%/.firebot/%pub_dir%/pubs
+set SMV_PUBS_DIR=%bundle_smokebot_home%/.smokebot/%pub_dir%/pubs
 
 set nightly=tst
 set pub_dir=
 if NOT "x%BRANCH_NAME%" == "xrelease" goto skip_branch
-  set nightly=null
+  set nightly=rls
   set pub_dir=release
+  set FDS_PUBS_DIR=.bundle/manuals
+  set SMV_PUBS_DIR=.bundle/manuals
 :skip_branch
 
-:: set pubs directories
-set FDS_PUBS_DIR=%bundle_firebot_home%/.firebot/%pub_dir%/pubs
-set SMV_PUBS_DIR=%bundle_smokebot_home%/.smokebot/%pub_dir%/pubs
 
 ::*** error checking
 
@@ -170,6 +168,12 @@ if NOT "x%FDS_HASH%" == "x" goto skip_elsehash
   goto endif_gethash
 
 :skip_elsehash
+  if "x%FDS_TAG%" == "x" goto endif3
+    set FDS_HASH=%FDS_TAG%
+  :endif3
+  if "x%SMV_TAG%" == "x" goto endif4
+    set SMV_HASH=%SMV_TAG%
+  :endif4
   set FDS_HASH_BUNDLER=%FDS_HASH%
   set SMV_HASH_BUNDLER=%SMV_HASH%
   set FDS_REVISION_BUNDLER=%FDS_HASH%
@@ -354,10 +358,6 @@ set bundle_smokebot_home=
  )
  if "%1" EQU "-c" (
    set clone=clone
-   set valid=1
- )
- if "%1" EQU "-C" (
-   set use_config=1
    set valid=1
  )
  if "%1" EQU "-f" (
