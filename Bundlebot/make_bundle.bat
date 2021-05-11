@@ -231,7 +231,7 @@ CALL :COPY  %repo_root%\smv\Build\sh2bat\intel_win_64\sh2bat.exe %out_bin%\sh2ba
 CALL :COPY "%fds_forbundle%\setup.bat"                          %out_bundle%\setup.bat
 echo %basename%                                               > %out_bundle%\basename.txt
 
-echo Install %FDS_REVISION_ARG% and %SMV_REVISION_ARG% > %fds_forbundle%\message.txt
+echo Installing %FDS_REVISION_ARG% and %SMV_REVISION_ARG% on Windows > %fds_forbundle%\message.txt
 CALL :COPY  "%fds_forbundle%\message.txt"                            %out_bundle%\message.txt
 echo Unpacking installation files for %FDS_REVISION_ARG% and %SMV_REVISION_ARG% > %fds_forbundle%\unpack.txt
 
