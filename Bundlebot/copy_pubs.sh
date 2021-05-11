@@ -3,7 +3,10 @@ pub_type=$1
 bot_host=$3
 error_log=$4
 
-if [[ "$bot_host" != "" ]] && [[ `hostname` != "$bot_host" ]]; then
+if [ "$bot_host" == "" ]; then
+  bot_host=`hostname`
+fi
+if [ `hostname` != "$bot_host" ]; then
   pdf_from=$2
 else
   eval pdf_from=$2
@@ -22,21 +25,8 @@ CP ()
   local FROMFILE=$1
   rm -f $pdf_to/$FROMFILE
 
-  if [[ "$bot_host" != "" ]] && [[ `hostname` != "$bot_host" ]]; then
-    echo "copying $FROMFILE to $pdf_to"
-    scp -q $bot_host:$pdf_from/$FROMFILE $pdf_to/.
-  else
-    if [ -e $HOME/$pdf_from/$FROMFILE ]; then
-      echo "copying $FROMFILE from $HOME/$pdf_from to $pdf_to"
-      cp $HOME/$pdf_from/$FROMFILE $pdf_to/.
-    else
-      echo "" >> $error_log
-      echo "***error: $HOME/$pdf_from/$FROMFILE does not exist" >> $error_log
-      echo ""
-      echo "***error: $HOME/$pdf_from/$FROMFILE does not exist"
-      return 1
-    fi
-  fi
+  echo "copying $FROMFILE on $bot_host to $pdf_to"
+  scp -q $bot_host:$pdf_from/$FROMFILE $pdf_to/.
   if [ ! -e $pdf_to/$FROMFILE ]; then
     echo "" >> $error_log
     echo "***error: $FROMFILE failed to copy to $pdf_to" >> $error_log
@@ -53,11 +43,7 @@ mkdir -p $pdf_to
 
 if [ "$pub_type" == "fds" ]; then
   echo ""
-  if [[ "$bot_host" != "" ]] ; then
-    echo ***copying fds pubs from $pdf_from on $bot_host
-  else
-    echo ***copying fds pubs from $pdf_from
-  fi
+  echo ***copying fds pubs from $pdf_from on $bot_host
   CP FDS_Config_Management_Plan.pdf         || exit 1
   CP FDS_Technical_Reference_Guide.pdf      || exit 1
   CP FDS_User_Guide.pdf                     || exit 1
@@ -67,11 +53,7 @@ fi
 
 if [ "$pub_type" == "smv" ]; then
   echo ""
-  if [[ "$bot_host" != "" ]] ; then
-    echo ***copying smokeview pubs from $pdf_from on $bot_host
-  else
-    echo ***copying smokeview pubs from $pdf_from
-  fi
+  echo ***copying smokeview pubs from $pdf_from on $bot_host
   CP SMV_Technical_Reference_Guide.pdf      || exit 1
   CP SMV_User_Guide.pdf                     || exit 1
   CP SMV_Verification_Guide.pdf             || exit 1
