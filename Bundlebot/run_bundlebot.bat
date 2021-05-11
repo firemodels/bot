@@ -60,7 +60,6 @@ if NOT "x%BRANCH_NAME%" == "xrelease" goto skip_branch
   set SMV_PUBS_DIR=.bundle/manuals
 :skip_branch
 
-
 ::*** error checking
 
 set abort=
@@ -168,16 +167,16 @@ if NOT "x%FDS_HASH%" == "x" goto skip_elsehash
   goto endif_gethash
 
 :skip_elsehash
+  set FDS_REVISION_BUNDLER=%FDS_HASH%
+  set SMV_REVISION_BUNDLER=%SMV_HASH%
   if "x%FDS_TAG%" == "x" goto endif3
-    set FDS_HASH=%FDS_TAG%
+    set FDS_REVISION_BUNDLER=%FDS_TAG%
   :endif3
   if "x%SMV_TAG%" == "x" goto endif4
-    set SMV_HASH=%SMV_TAG%
+    set SMV_REVISION_BUNDLER=%SMV_TAG%
   :endif4
   set FDS_HASH_BUNDLER=%FDS_HASH%
   set SMV_HASH_BUNDLER=%SMV_HASH%
-  set FDS_REVISION_BUNDLER=%FDS_HASH%
-  set SMV_REVISION_BUNDLER=%SMV_HASH%
 :endif_gethash
 
 cd %CURDIR%
