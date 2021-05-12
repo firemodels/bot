@@ -14,7 +14,7 @@ if [ "$NIGHTLY" != "" ]; then
 fi
 
 # this script assumes that fds and smokeview apps have been copied into APPS_DIR
-# manuals have been copied into GUIDE_DIR
+# and that fds and smokeview manuals have been copied into GUIDE_DIR
 
 GUIDE_DIR=$HOME/.bundle/pubs
 APPS_DIR=$HOME/.bundle/apps
