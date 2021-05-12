@@ -42,6 +42,7 @@ if "%platform%" == "windows" (
     echo Installer: %smv_version%_win.exe
     call %smv_version%_win.exe
   )
+  echo update complete
   goto eof
 )
 if "%platform%" == "linux" (
@@ -51,6 +52,7 @@ if "%platform%" == "linux" (
   if "%buildtype%" == "release" (
     plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/run_command2.sh $HOME/.bundle/uploads %smv_version%_lnx.sh y
   )
+  pause > Nul
   goto eof
 )
 if "%platform%" == "osx" (
@@ -60,10 +62,8 @@ if "%platform%" == "osx" (
   if "%buildtype%" == "release" (
     plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/run_command2.sh $HOME/.bundle/uploads %smv_version%_osx.sh y
   )
+  pause > Nul
   goto eof
 )
 
 :eof
-echo.
-echo compilation complete
-pause
