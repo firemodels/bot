@@ -21,13 +21,13 @@ goto:eof
 call %envfile%
 if "%buildtype%" == "test" (
   echo.
-  echo  Installing test %platform% Smokeview
-  Title  Installing test %platform% Smokeview
+  echo  Updating test %platform% Smokeview
+  Title  Updating test %platform% Smokeview
 )
 if "%buildtype%" == "release" (
   echo.
-  echo  Installing %platform% Smokeview
-  Title  Installing %platform% Smokeview
+  echo  Updating release %platform% Smokeview
+  Title  Updating release %platform% Smokeview
 )
 
 %svn_drive%
