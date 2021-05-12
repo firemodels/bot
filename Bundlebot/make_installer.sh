@@ -111,7 +111,7 @@ OVERRIDE=\$1
 INSTALL_LOG=/tmp/fds_install_$$.log
 echo "" > \$INSTALL_LOG
 echo ""
-echo "Installing $FDS_VERSION and $SMV_VERSION for $ostype2"
+echo "Installing $FDS_VERSION and $SMV_VERSION on $ostype2"
 echo ""
 echo "Options:"
 echo "  1) Press <Enter> to begin installation [default]"

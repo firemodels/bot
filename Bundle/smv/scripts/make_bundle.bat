@@ -87,7 +87,7 @@ CALL :COPY  %timepbuild%\timep_win_64.exe       %smvdir%\timep.exe
 CALL :COPY  %windbuild%\wind2fds_win_64.exe     %smvdir%\wind2fds.exe
 
 echo Unpacking Smokeview %smv_versionbase% installation files > %forbundle%\unpack.txt
-echo Install Smokeview %smv_versionbase%                      > %forbundle%\message.txt
+echo Updating Windows Smokeview to %smv_versionbase%          > %forbundle%\message.txt
 
 CALL :COPY  "%forbundle%\message.txt"                         %zipbase%\message.txt
 CALL :COPY  %forbundle%\setup.bat                             %zipbase%\setup.bat

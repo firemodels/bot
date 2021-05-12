@@ -1,19 +1,18 @@
 #!/bin/bash
 
+#run time libraries are located in
+#  $HOME/.bundle/BUNDLE/MPI
+
 #*** Linux parameters
 
 intel_mpi_version_linux=20u1
-#intel_mpi_version_linux=oneapi
 mpi_version_linux=INTEL
 
 #*** OSX parameters
 
-#intel_mpi_version_osx=19u4
-#mpi_version_osx=3.1.2
-#openmpi_dir=/opt/openmpi312_i20u1_64
 intel_mpi_version_osx=oneapi
-openmpi_dir=/opt/openmpi410_oneapi_64
 mpi_version_osx=4.1.0
+openmpi_dir=/opt/openmpi410_oneapi_64
 
 #---------------------------------------------
 #                   usage

@@ -327,11 +327,10 @@ echo.
 echo Options:
 echo -b - branch name [default: %BRANCH_NAME%]
 echo -c - bundle without warning about cloning/erasing fds and smv repos 
-echo -C - use FDS and smokeview hash revisions found in fdssmv_config.bat
-echo -h - display this message
-echo -H - host where firebot and smokebot were run %default_hostname%
 echo -f - firebot home directory %default_firebot_home%
 echo -F - fds repo hash
+echo -h - display this message
+echo -H - host where firebot and smokebot were run %default_hostname%
 echo -r - same as -b release
 echo -s - smokebot home directory %default_smokebot_home%
 echo -S - smv repo hash

@@ -21,13 +21,13 @@ goto:eof
 call %envfile%
 if "%buildtype%" == "test" (
   echo.
-  echo  Installing test %platform% Smokeview
-  Title  Installing test %platform% Smokeview
+  echo  Updating test %platform% Smokeview
+  Title  Updating test %platform% Smokeview
 )
 if "%buildtype%" == "release" (
   echo.
-  echo  Installing %platform% Smokeview
-  Title  Installing %platform% Smokeview
+  echo  Updating release %platform% Smokeview
+  Title  Updating release %platform% Smokeview
 )
 
 %svn_drive%
@@ -35,13 +35,14 @@ if "%buildtype%" == "release" (
 if "%platform%" == "windows" (
   cd %userprofile%\.bundle\uploads
   if "%buildtype%" == "test" (
-    echo Running Smokeview installer:  %smv_revision%_win.exe
+    echo Installer:  %smv_revision%_win.exe
     call %smv_revision%_win.exe
   )
   if "%buildtype%" == "release" (
-    echo Running Smokeview installer: %smv_version%_win.exe
+    echo Installer: %smv_version%_win.exe
     call %smv_version%_win.exe
   )
+  echo update complete
   goto eof
 )
 if "%platform%" == "linux" (
@@ -51,6 +52,7 @@ if "%platform%" == "linux" (
   if "%buildtype%" == "release" (
     plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/run_command2.sh $HOME/.bundle/uploads %smv_version%_lnx.sh y
   )
+  pause > Nul
   goto eof
 )
 if "%platform%" == "osx" (
@@ -60,10 +62,8 @@ if "%platform%" == "osx" (
   if "%buildtype%" == "release" (
     plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/run_command2.sh $HOME/.bundle/uploads %smv_version%_osx.sh y
   )
+  pause > Nul
   goto eof
 )
 
 :eof
-echo.
-echo compilation complete
-pause
