@@ -35,11 +35,11 @@ if "%buildtype%" == "release" (
 if "%platform%" == "windows" (
   cd %userprofile%\.bundle\uploads
   if "%buildtype%" == "test" (
-    echo Running Smokeview installer:  %smv_revision%_win.exe
+    echo Installer:  %smv_revision%_win.exe
     call %smv_revision%_win.exe
   )
   if "%buildtype%" == "release" (
-    echo Running Smokeview installer: %smv_version%_win.exe
+    echo Installer: %smv_version%_win.exe
     call %smv_version%_win.exe
   )
   goto eof
