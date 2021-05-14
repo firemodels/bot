@@ -25,6 +25,7 @@ The following steps need only be done once. The exact phrasing of the commands a
 5. Add lines to your `~/.bashrc` file to define the compiler environment.  For tthe Intel oneAPI compilers we use:
     ```
     source /opt/intel/oneapi/setvars.sh >& /dev/null
+    # - needed to build smokeview    
     export IFORT_COMPILER_LIB=/opt/intel/oneapi/compiler/latest/linux/compiler/lib/intel64_lin
     ulimit -s unlimited
     ```
