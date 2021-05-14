@@ -25,11 +25,9 @@ The following steps need only be done once. The exact phrasing of the commands a
 
 5. Add the following lines to your `~/.bashrc` file:
     ```
-# oneAPI start----------------------------------------
-source /opt/intel/oneapi/setvars.sh >& /dev/null
-# - needed to build smokeview
-export IFORT_COMPILER_LIB=/opt/intel/oneapi/compiler/latest/linux/compiler/lib/intel64_lin
-# oneAPI end----------------------------------------
+    source /opt/intel/oneapi/setvars.sh >& /dev/null
+    # - needed to build smokeview
+    export IFORT_COMPILER_LIB=/opt/intel/oneapi/compiler/latest/linux/compiler/lib/intel64_lin
     ulimit -s unlimited
     ```
    
