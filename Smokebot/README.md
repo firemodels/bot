@@ -23,9 +23,9 @@ The following steps only need to be done once. The exact phrasing of the command
 
 5. Add the following lines (or the equivalent if you are using a different Intel compiler) to your `~/.bashrc` file:
     ```
-source /opt/intel/oneapi/setvars.sh >& /dev/null
-# - needed to build smokeview
-export IFORT_COMPILER_LIB=/opt/intel/oneapi/compiler/latest/linux/compiler/lib/intel64_lin
+    source /opt/intel/oneapi/setvars.sh >& /dev/null
+    # - needed to build smokeview
+    export IFORT_COMPILER_LIB=/opt/intel/oneapi/compiler/latest/linux/compiler/lib/intel64_lin
     ulimit -s unlimited
     ```
 6. Setup passwordless SSH for the your account. Generate SSH keys and ensure that the head node can SSH into all of the compute nodes. Also, make sure that your account information is propagated across all compute nodes.
