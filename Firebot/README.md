@@ -1,13 +1,12 @@
 # Firebot: A Continuous Integration Tool for FDS
 
-Firebot is a verification script that can be run at regular intervals as part of a continuous integration program. At NIST, this script is run by a pseudo-user named `firebot` on a linux cluster each night. The pseudo-user `firebot` updates the various repositories in the GitHub project named `firemodels`, builds FDS and Smokeview, runs the verification cases, checks the results for accuracy, and builds all of the manuals. The entire process takes a few hours to complete.
+Firebot is a verification script that can be run at regular intervals as part of a continuous integration program. At NIST, this script is run by a pseudo-user named `firebot` on a linux cluster each night. The pseudo-user `firebot` clones the various repositories in the GitHub project named `firemodels`, builds FDS and Smokeview, runs the verification cases, checks the results for accuracy, and builds all of the manuals. The entire process takes a few hours to complete.
 
 ## Set-Up
 
 The following steps need only be done once. The exact phrasing of the commands are for the NIST linux cluster named blaze. You might need to modify the path and module names.
 
-1. Clone the repositories that are included in the GitHub organization called `firemodels`: `fds`, `smv`, `bot`, `out`, `exp`, and `fig`. A simple way to do this is to first clone `bot`.  Then cd into `bot/Scripts` and type `./setup_repos.sh -a` . This will clone all the other repos needed by firebot (or you can clone each repo in the same way as you cloned `bot`, with the exception of `exp` which requires the `--recursive` option because it has submodules).
-
+1. Clone the bot repository included in the GitHub organization named `firemodels`.  Other repositories needed by firebot will be cloned by firebot.
 
 2. Ensure that the following software packages are installed on the system:
 
@@ -30,10 +29,10 @@ source /opt/intel/oneapi/setvars.sh >& /dev/null
 export IFORT_COMPILER_LIB=/opt/intel/oneapi/compiler/latest/linux/compiler/lib/intel64_lin
     ulimit -s unlimited
     ```
-    
+
 6. Setup passwordless SSH for the your account. Generate SSH keys and ensure that the head node can SSH into all of the compute nodes. Also, make sure that your account information is propagated across all compute nodes.
 
-7. Ensure that a queue named `firebot` is created, enabled. Test the `qstat` command.  If you use some other queue say batch then use `-q batch` when running firebot.
+7. Ensure that a queue named `firebot` is created and enabled. Test the `qstat` command.  If you use some other queue say batch then use `-q batch` when running firebot.
 
 8. By default, firebot sends email to the email address configured for your bot repo (output of command `git config user.email` ) .  If you wish email to go to different email addresses, create a file named $HOME/.firebot/firebot_email_list.sh for some `user1` and `user2` (or more) that looks like:
 
@@ -51,9 +50,11 @@ The script `firebot.sh` is run using the wrapper script `run_firebot.sh`. This s
 
 A typical way to run firebot is to cd into the directory containing firbot.sh and type: 
 
-```nohup ./run_firebot.sh -c -u -J -m user@gmail.com &```
+``` nohup ./run_firebot.sh -c -u -J -q firebot -R master -m user@host.com &```
 
-The `-c` and `-u` options clean and update the repos respectively. The `-J` option directs Firebot to use the Intel suite. The email addressee shall receive notice when Firebot is done. The `nohup` at the start and `&` at the end of the command run `firebot.sh` in the background and redirect screen output to the file called `nohup.out`.
+The `-c` and `-u` options clean and update the bot respectively. The `-J` option directs Firebot to use the Intel compilers. The email addressee specified by the -m option receives a notice when Firebot is done. The -R master option causes fds, smv and other repos used by firebot to be cloned and checked out using the master branch.  The `nohup` at the start and `&` at the end of the command run `firebot.sh` in the background and redirect screen output to the file called `nohup.out`.
+
+Note, firebot clones the repos it uses so not be used in repos where you are doing work.  You should run firebot in a fresh repo.  You can however run firebot without cloning repos by NOT specifying the -R master option.  In this case, firebot will update and clean repos (if you have specifeid the -u and -c options).
 
 To kill firebot, cd to the directory containing firebot.sh and type:
 
