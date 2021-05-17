@@ -1264,17 +1264,22 @@ email_build_status()
 {
    echo $THIS_CFAST_FAILED>$CFAST_STATUS_FILE
    stop_time=`date`
+   IFORT_VERSION=`ifort -v 2>&1`
    if [[ $SKIP_git_UPDATE_AND_PROPFIX ]] ; then
       echo "CFASTbot was invoked with the -s option (SKIP_git_UPDATE_AND_PROPFIX)." >> $TIME_LOG
       echo "Skipping git revert, update, and property fix operations." >> $TIME_LOG
       echo "The current git revision is ${GIT_REVISION}" >> $TIME_LOG
    fi
-   echo "-------------------------------" >> $TIME_LOG
-   echo "             Host: $hostname "  >> $TIME_LOG
-   echo "       Start Time: $start_time " >> $TIME_LOG
-   echo "        Stop Time: $stop_time " >> $TIME_LOG
+   echo "-------------------------------"      >> $TIME_LOG
+   echo "             Host: $hostname "        >> $TIME_LOG
+   echo "             repo: $cfastrepo "       >> $TIME_LOG
+   echo "   cfast revision: $CFAST_REVISION "  >> $TIME_LOG
+   echo "     smv revision: $SMV_REVISION "    >> $TIME_LOG
+   echo "          Fortran: $IFORT_VERSION "   >> $TIME_LOG
+   echo "       Start Time: $start_time "      >> $TIME_LOG
+   echo "        Stop Time: $stop_time "       >> $TIME_LOG
 if [ "$total_time" != "" ]; then
-   echo "         Run Time: $total_time" >> $TIME_LOG
+   echo "         Run Time: $total_time"       >> $TIME_LOG
 fi
    if [[ "$UPLOAD" == "1" ]]; then
       echo "-------------------------------"                           >> $TIME_LOG
@@ -1610,6 +1615,17 @@ if [ "$UPDATEREPO" == "1" ]; then
 else
   echo Repos not updated
 fi
+
+cur_dir=`pwd`
+
+CD_REPO $reponame/cfast $cfastbranch || return 1
+CFAST_REVISION=`git describe --dirty --long`
+
+CD_REPO $reponame/smv   $smvbranch || return 1
+SMV_REVISION=`git describe --dirty --long`
+
+cd $cur_dir
+
 check_git_checkout
 
 ### Stage 2a ###
