@@ -2076,6 +2076,9 @@ echo "------"
   echo Cleaning bot repo
   clean_firebot_metafiles
 
+#*** write out file when firebot first starts
+date > $OUTPUT_DIR/stage0_start 2>&1
+
 #*** clone repos
 
 if [[ "$CLONE_REPOS" != "" ]]; then
