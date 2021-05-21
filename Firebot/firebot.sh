@@ -2070,6 +2070,8 @@ outrepo=$repo/out
 
 FDS_SUMMARY_DIR=$fdsrepo/Manuals/FDS_Summary
 
+date > $OUTPUT_DIR/stage0_start 2>&1
+
 #*** clean repos
 echo "Status"
 echo "------"
