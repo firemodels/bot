@@ -2091,20 +2091,18 @@ if [[ "$CLONE_REPOS" != "" ]]; then
    # clone all repos
     ./setup_repos.sh $FORCECLONE -F > $OUTPUT_DIR/stage1_clone 2>&1
   fi
-  if [ "$CLONE_REPOS" != "master" ]; then
-    FDSBRANCH=$CLONE_REPOS
-    cd $fdsrepo
-    git checkout -b $FDSBRANCH $FDS_REV >> $OUTPUT_DIR/stage1_clone 2>&1
-    if [ "$FDS_TAG" != "" ]; then
-      git tag -a $FDS_TAG -m "tag for $FDS_TAG"  >> $OUTPUT_DIR/stage1_clone 2>&1
-    fi
+  FDSBRANCH=$CLONE_REPOS
+  cd $fdsrepo
+  git checkout -b $FDSBRANCH $FDS_REV >> $OUTPUT_DIR/stage1_clone 2>&1
+  if [ "$FDS_TAG" != "" ]; then
+    git tag -a $FDS_TAG -m "tag for $FDS_TAG"  >> $OUTPUT_DIR/stage1_clone 2>&1
+  fi
 
-    SMVBRANCH=$CLONE_REPOS
-    cd $smvrepo
-    git checkout -b $SMVBRANCH $SMV_REV >> $OUTPUT_DIR/stage1_clone 2>&1
-    if [ "$SMV_TAG" != "" ]; then
-      git tag -a $SMV_TAG -m "tag for $SMV_TAG"  >> $OUTPUT_DIR/stage1_clone 2>&1
-    fi
+  SMVBRANCH=$CLONE_REPOS
+  cd $smvrepo
+  git checkout -b $SMVBRANCH $SMV_REV >> $OUTPUT_DIR/stage1_clone 2>&1
+  if [ "$SMV_TAG" != "" ]; then
+    git tag -a $SMV_TAG -m "tag for $SMV_TAG"  >> $OUTPUT_DIR/stage1_clone 2>&1
   fi
   ARCHIVE_REPO_SIZES=1
 fi
