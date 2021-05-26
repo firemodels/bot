@@ -1495,6 +1495,8 @@ CLONE_REPOS=
 CLONE_FDSSMV=
 FDS_REV=origin/master
 SMV_REV=origin/master
+FDS_TAG=
+SMV_TAG=
 CHECKOUT=
 compile_errors=
 
@@ -1504,7 +1506,7 @@ echo $$ > $PID_FILE
 
 #*** parse command line options
 
-while getopts 'ab:BcI:JLm:Mo:q:R:TuUw:W:x:y:' OPTION
+while getopts 'ab:BcI:JLm:Mo:q:R:TuUw:W:x:X:y:Y:' OPTION
 do
 case $OPTION in
   a)
@@ -1570,9 +1572,15 @@ case $OPTION in
    FDS_REV="$OPTARG"
    CHECKOUT=1
    ;;
+  X)
+   FDS_TAG="$OPTARG"
+   ;;
   y)
    SMV_REV="$OPTARG"
    CHECKOUT=1
+   ;;
+  Y)
+   SMV_TAG="$OPTARG"
    ;;
 esac
 done
@@ -1643,19 +1651,23 @@ if [[ "$CLONE_REPOS" != "" ]]; then
 # only clone fds and smv repos
   if [ "$CLONE_FDSSMV" != "" ]; then
    # only clone the fds and smv repos - used when just compiling the fds and smv apps
-  ./setup_repos.sh -T > $OUTPUT_DIR/stage1_clone 2>&1
+  ./setup_repos.sh -T                           > $OUTPUT_DIR/stage1_clone 2>&1
   else
    # clone all repos
-    ./setup_repos.sh -F > $OUTPUT_DIR/stage1_clone 2>&1
+    ./setup_repos.sh -F                         > $OUTPUT_DIR/stage1_clone 2>&1
   fi
-  if [ "$CLONE_REPOS" != "master" ]; then
-    FDSBRANCH=$CLONE_REPOS
-    cd $fdsrepo
-    git checkout -b $FDSBRANCH $FDS_REV >> $OUTPUT_DIR/stage1_clone 2>&1
+  FDSBRANCH=$CLONE_REPOS
+  cd $fdsrepo
+  git checkout -b $FDSBRANCH $FDS_REV          >> $OUTPUT_DIR/stage1_clone 2>&1
+  if [ "$FDS_TAG" != "" ]; then
+    git tag -a $FDS_TAG -m "tag for $FDS_TAG"  >> $OUTPUT_DIR/stage1_clone 2>&1
+  fi
 
-    SMVBRANCH=$CLONE_REPOS
-    cd $smvrepo
-    git checkout -b $SMVBRANCH $SMV_REV >> $OUTPUT_DIR/stage1_clone 2>&1
+  SMVBRANCH=$CLONE_REPOS
+  cd $smvrepo
+  git checkout -b $SMVBRANCH $SMV_REV          >> $OUTPUT_DIR/stage1_clone 2>&1
+  if [ "$SMV_TAG" != "" ]; then
+    git tag -a $SMV_TAG -m "tag for $SMV_TAG"  >> $OUTPUT_DIR/stage1_clone 2>&1
   fi
 fi
 
