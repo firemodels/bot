@@ -45,7 +45,9 @@ echo "   master, release or test [default: master]"
 echo "-T - only clone the fds and smv repos (this option is set by default when"
 echo "     only building apps (-B) and cloning repos (-R) options are used"
 echo "-x fds_rev - checkout fds repo using fds_rev revision [default: origin/master]"
+echo "-X fds_tag - when cloning, tag the fds repo with fds_tag"
 echo "-y smv_rev - checkout smv repo using smv_rev revision [default: origin/master]"
+echo "-Y smv_tag - when cloning, tag the smv repo with smv_tag"
 echo "   the -x and -y options are only used with the -R option i.e. when"
 echo "   the repos are being cloned"
 }
@@ -174,6 +176,8 @@ BUILD_ONLY=
 CLONE_REPOS=
 FDS_REV=
 SMV_REV=
+FDS_TAG=
+SMV_TAG=
 FIREBOT_HOST=
 FIREBOT_HOME=
 WEB_DIR=
@@ -190,7 +194,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'abBcDfg:G:hHI:JkLm:MPq:R:TuUvw:W:x:y:' OPTION
+while getopts 'abBcDfg:G:hHI:JkLm:MPq:R:TuUvw:W:x:X:y:Y:' OPTION
 do
 case $OPTION  in
   a)
@@ -272,8 +276,14 @@ case $OPTION  in
   x)
    FDS_REV="-x $OPTARG"
    ;;
+  X)
+   FDS_TAG="-X $OPTARG"
+   ;;
   y)
    SMV_REV="-y $OPTARG"
+   ;;
+  Y)
+   SMV_TAG="-Y $OPTARG"
    ;;
   \?)
   echo "***error: unknown option entered. aborting smokebot"
@@ -432,7 +442,7 @@ BRANCH="-b $BRANCH"
 #*** run smokebot
 
 touch $smokebot_pid
-$ECHO ./$botscript $SIZE $BRANCH $FDS_REV $SMV_REV $CLONE_REPOS $CLONE_FDSSMV $RUNAUTO $INTEL $BUILD_ONLY $COMPILER $SMOKEBOT_LITE $CLEANREPO $WEB_DIR $WEB_ROOT $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $SIZE $BRANCH $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $CLONE_REPOS $CLONE_FDSSMV $RUNAUTO $INTEL $BUILD_ONLY $COMPILER $SMOKEBOT_LITE $CLEANREPO $WEB_DIR $WEB_ROOT $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi
