@@ -598,16 +598,7 @@ echo "export MODULEPATH=\$FDS_root/bin/modules:\\\$MODULEPATH"
 echo "module load $FDSMODULE"
 echo "module load $SMVMODULE"
 echo ""
-EOF
-
-cat << EOF >> $INSTALLER
-echo "2. Log out and log back in so the changes will take effect."
-echo ""
-echo "*** To uninstall fds and smokeview, erase the directory: "
-echo "\$FDS_root"
-echo "and remove any changes you made to your startup file."
-echo ""
-echo "*** Installation complete."
+echo "2. Log out and log back in so that the changes will take effect."
 exit 0
 
 
