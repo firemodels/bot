@@ -47,18 +47,20 @@ if "x%stopscript%" == "x" goto endif2
   exit /b 1
 :endif2
 
-:: set pubs directories
-set FDS_PUBS_DIR=%bundle_firebot_home%/.firebot/%pub_dir%/pubs
-set SMV_PUBS_DIR=%bundle_smokebot_home%/.smokebot/%pub_dir%/pubs
-
 set nightly=tst
 set pub_dir=
 if NOT "x%BRANCH_NAME%" == "xrelease" goto skip_branch
   set nightly=rls
   set pub_dir=release
+:skip_branch
+
+:: set pubs directories
+set FDS_PUBS_DIR=%bundle_firebot_home%/.firebot/%pub_dir%/pubs
+set SMV_PUBS_DIR=%bundle_smokebot_home%/.smokebot/%pub_dir%/pubs
+if NOT "x%CUSTOM_MANUALS%" == "xcustom" goto skip_custom
   set FDS_PUBS_DIR=.bundle/manuals
   set SMV_PUBS_DIR=.bundle/manuals
-:skip_branch
+:skip_custom
 
 ::*** error checking
 
@@ -327,6 +329,7 @@ echo.
 echo Options:
 echo -b - branch name [default: %BRANCH_NAME%]
 echo -c - bundle without warning about cloning/erasing fds and smv repos 
+echo -C - get manuals from .bundle/manuals
 echo -f - firebot home directory %default_firebot_home%
 echo -F - fds repo hash
 echo -h - display this message
@@ -356,6 +359,10 @@ set bundle_smokebot_home=
  )
  if "%1" EQU "-c" (
    set clone=clone
+   set valid=1
+ )
+ if "%1" EQU "-C" (
+   set CUSTOM_MANUALS=custom
    set valid=1
  )
  if "%1" EQU "-f" (
