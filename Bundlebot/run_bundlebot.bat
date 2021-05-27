@@ -334,7 +334,8 @@ echo -f - firebot home directory %default_firebot_home%
 echo -F - fds repo hash
 echo -h - display this message
 echo -H - host where firebot and smokebot were run %default_hostname%
-echo -r - same as -b release
+echo -r - same as -b release or -R release
+echo -R - branch name [default: %BRANCH_NAME%]
 echo -s - smokebot home directory %default_smokebot_home%
 echo -S - smv repo hash
 echo -U - do not upload bundle
@@ -353,6 +354,11 @@ set bundle_smokebot_home=
  set valid=0
  set arg=%1
  if "%1" EQU "-b" (
+   set BRANCH_NAME=%2
+   set valid=1
+   shift
+ )
+ if "%1" EQU "-R" (
    set BRANCH_NAME=%2
    set valid=1
    shift
