@@ -41,7 +41,8 @@ else
   echo "-m mailto - email address"
 fi
 
-echo "-r - create a release bundle"
+echo "-R branch - clone repos using name branch"
+echo "-r - create a release bundle (same as -R branc)"
 echo "-S - smv repo hash/release"
 echo "-U - do not upload bundle file."
 echo "     By default the bundle is uploaded to a Google drive "
@@ -140,7 +141,7 @@ FDS_TAG=
 SMV_TAG=
 CUSTOM_PUBS=
 
-while getopts 'cCfF:hH:m:p:rS:UvX:Y:' OPTION
+while getopts 'cCfF:hH:m:p:rR:S:UvX:Y:' OPTION
 do
 case $OPTION  in
   c)
@@ -172,6 +173,9 @@ case $OPTION  in
    ;;
   r)
    BRANCH=release
+   ;;
+  R)
+   BRANCH="$OPTARG"
    ;;
   U)
    UPLOAD=
