@@ -1,2 +1,2 @@
 @echo off
-run_bundlebot -c -r -F bc4183f5 -S f7186e73 -X FDStest -Y SMVtest
+run_bundlebot -c -R release -F 536c429eb -X FDS6.7.6 -S 26236e7bc -Y SMV6.7.16
