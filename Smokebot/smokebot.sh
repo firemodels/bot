@@ -1644,6 +1644,9 @@ figrepo=$repo/fig
 
 clean_smokebot_history
 
+#*** write out file when firebot first starts
+date > $OUTPUT_DIR/stage0_start 2>&1
+
 if [[ "$CLONE_REPOS" != "" ]]; then
   echo Cloning repos
   cd $botrepo/Scripts
