@@ -253,6 +253,13 @@ echo ""
 echo "------------------------------------------------------------"
 echo "            Firebot host: $FIREBOT_HOST"
 echo "  Firebot home directory: $FIREBOT_HOME"
+echo "          Firebot branch: $FIREBOT_BRANCH_ARG"
+echo "       Intel mpi version: $INTEL_MPI_VERSION"
+echo "             MPI version: $MPI_VERSION"
+if [ "$OPENMPI_DIR" ]; then
+  echo "             OpenMPI dir: $OPENMPI_DIR"
+fi
+echo "                Pub host: $PUB_HOST"
 if [ "$FDS_TAG_ARG" != "" ]; then
   echo "                 FDS TAG: $FDS_TAG_ARG"
 fi
@@ -265,16 +272,7 @@ fi
 if [ "$SMV_RELEASE_ARG" != "" ]; then
   echo "            SMV Revision: $SMV_RELEASE_ARG"
 fi
-echo "            Firebot host: $FIREBOT_HOST"
-echo "                Pub host: $PUB_HOST"
-echo "       Intel mpi version: $INTEL_MPI_VERSION"
-echo "             MPI version: $MPI_VERSION"
-if [ "$OPENMPI_DIR" ]; then
-  echo "             OpenMPI dir: $OPENMPI_DIR"
-fi
-
 echo "                   EMAIL: $MAILTO_ARG"
-echo "          Firebot branch: $FIREBOT_BRANCH_ARG"
 echo "------------------------------------------------------------"
 echo ""
 
