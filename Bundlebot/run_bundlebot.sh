@@ -267,7 +267,7 @@ if [ "$SMV_RELEASE_ARG" != "" ]; then
 fi
 echo "            Firebot host: $FIREBOT_HOST"
 echo "                Pub host: $PUB_HOST"
-echo "       Intel mpi version: INTEL_MPI_VERSION"
+echo "       Intel mpi version: $INTEL_MPI_VERSION"
 echo "             MPI version: $MPI_VERSION"
 if [ "$OPENMPI_DIR" ]; then
   echo "             OpenMPI dir: $OPENMPI_DIR"
