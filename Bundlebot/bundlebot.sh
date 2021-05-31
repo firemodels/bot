@@ -5,20 +5,20 @@
 
 if [ "`uname`" == "Darwin" ]; then
 #*** OSX parameters
-  intel_mpi_version_osx=oneapi
+  intel_mpi_version=oneapi
   mpi_version=4.1.0
   openmpi_dir=/opt/openmpi410_oneapi_64
 else
 #*** Linux parameters
-  intel_mpi_version_linux=oneapi
+  intel_mpi_version=oneapi
   mpi_version_linux=INTEL
 fi
 
 if [ "$INTEL_MPI_VERSION" != "" ]; then
-  intel_mpi_version_osx=$INTEL_MPI_VERSION
+  intel_mpi_version=$INTEL_MPI_VERSION
 fi
 if [ "$MPI_VERSION" != "" ]; then
-  mpi_version_osx=$MPI_VERSION
+  mpi_version=$MPI_VERSION
 fi
 if [ "$OPENMPI_DIR" != "" ]; then
   openmpi_dir=$OPENMPI_DIR
@@ -220,6 +220,9 @@ if [ "$showparms" == "1" ]; then
   echo " ----------"
   echo "              MPI version: $mpi_version"
   echo "            Intel version: $intel_mpi_version"
+if [ "$openmpi_dir" != "" ]; then
+  echo "              openmpi dir: $openmpi_dir"
+fi
   if [ "$USE_CACHE" == "1" ]; then
     APPDIR=.bundle
     FDS_PUBDIR=.bundle
