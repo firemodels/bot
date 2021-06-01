@@ -25,6 +25,7 @@ echo "-F - fds repo hash/release"
 echo "-h - display this message"
 echo "-p host -  host containing pubs"
 echo "           firebot/fds pubs: ~firebot/.firebot/pubs"
+echo "-P parameter_file - file containing bundle settings"
 echo "-C - use pubs in $HOME/.bundle/manuals on pub_host"
 echo "-X fdstag - when cloning, tag fds repo with fdstag"
 echo "-Y smvtag - when cloning, tag smv repo with smvtag"
@@ -140,8 +141,9 @@ PUB_HOST=$FIREBOT_HOST
 FDS_TAG=
 SMV_TAG=
 CUSTOM_PUBS=
+PARAMETER_FILE=
 
-while getopts 'cCfF:hH:m:p:rR:S:UvX:Y:' OPTION
+while getopts 'cCfF:hH:m:p:P:rR:S:UvX:Y:' OPTION
 do
 case $OPTION  in
   c)
@@ -168,14 +170,17 @@ case $OPTION  in
   p)
    PUB_HOST="$OPTARG"
    ;;
-  S)
-   SMV_RELEASE="$OPTARG"
+  P)
+   PARAMETER_FILE="$OPTARG"
    ;;
   r)
    BRANCH=release
    ;;
   R)
    BRANCH="$OPTARG"
+   ;;
+  S)
+   SMV_RELEASE="$OPTARG"
    ;;
   U)
    UPLOAD=
@@ -192,6 +197,14 @@ case $OPTION  in
 esac
 done
 shift $(($OPTIND-1))
+
+if [ "$PARAMETER_FILE" != "" ]; then
+  if [ -e $PARAMEER_FILE ]; then
+    source $PARAMETER_FILE
+  else
+    echo "***error: parameter file, $PARAMETER_FILE, does not exist"
+  fi
+fi
 
 # Linux or OSX
 JOPT="-J"
@@ -240,6 +253,13 @@ echo ""
 echo "------------------------------------------------------------"
 echo "            Firebot host: $FIREBOT_HOST"
 echo "  Firebot home directory: $FIREBOT_HOME"
+echo "          Firebot branch: $FIREBOT_BRANCH_ARG"
+echo "       Intel mpi version: $INTEL_MPI_VERSION"
+echo "             MPI version: $MPI_VERSION"
+if [ "$OPENMPI_DIR" ]; then
+  echo "             OpenMPI dir: $OPENMPI_DIR"
+fi
+echo "                Pub host: $PUB_HOST"
 if [ "$FDS_TAG_ARG" != "" ]; then
   echo "                 FDS TAG: $FDS_TAG_ARG"
 fi
@@ -253,7 +273,6 @@ if [ "$SMV_RELEASE_ARG" != "" ]; then
   echo "            SMV Revision: $SMV_RELEASE_ARG"
 fi
 echo "                   EMAIL: $MAILTO_ARG"
-echo "          Firebot branch: $FIREBOT_BRANCH_ARG"
 echo "------------------------------------------------------------"
 echo ""
 

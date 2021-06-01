@@ -3,16 +3,26 @@
 #run time libraries are located in
 #  $HOME/.bundle/BUNDLE/MPI
 
-#*** Linux parameters
-
-intel_mpi_version_linux=20u1
-mpi_version_linux=INTEL
-
+if [ "`uname`" == "Darwin" ]; then
 #*** OSX parameters
+  intel_mpi_version=oneapi
+  mpi_version=4.1.0
+  openmpi_dir=/opt/openmpi410_oneapi_64
+else
+#*** Linux parameters
+  intel_mpi_version=oneapi
+  mpi_version_linux=INTEL
+fi
 
-intel_mpi_version_osx=oneapi
-mpi_version_osx=4.1.0
-openmpi_dir=/opt/openmpi410_oneapi_64
+if [ "$INTEL_MPI_VERSION" != "" ]; then
+  intel_mpi_version=$INTEL_MPI_VERSION
+fi
+if [ "$MPI_VERSION" != "" ]; then
+  mpi_version=$MPI_VERSION
+fi
+if [ "$OPENMPI_DIR" != "" ]; then
+  openmpi_dir=$OPENMPI_DIR
+fi
 
 #---------------------------------------------
 #                   usage
@@ -185,13 +195,9 @@ fi
 # determine platform script is running on
 
 if [ "`uname`" == "Darwin" ]; then
-  intel_mpi_version=$intel_mpi_version_osx
-  mpi_version=$mpi_version_osx
   platform=osx
   export FDS_OPENMPIDIR=$openmpi_dir
 else
-  intel_mpi_version=$intel_mpi_version_linux
-  mpi_version=$mpi_version_linux
   platform=lnx
 fi
 
@@ -214,6 +220,9 @@ if [ "$showparms" == "1" ]; then
   echo " ----------"
   echo "              MPI version: $mpi_version"
   echo "            Intel version: $intel_mpi_version"
+if [ "$openmpi_dir" != "" ]; then
+  echo "              openmpi dir: $openmpi_dir"
+fi
   if [ "$USE_CACHE" == "1" ]; then
     APPDIR=.bundle
     FDS_PUBDIR=.bundle
