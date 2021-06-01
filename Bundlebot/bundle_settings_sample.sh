@@ -8,6 +8,7 @@ PUB_HOST=blaze.el.nist.gov
 # email address where results are sent to
 MAILTO=username@xxx.yyy
 
+# compiler settings ffor FDS 6.7.6 and smokeview 6.7.16 release
 # base string of intel mpi library
 export INTEL_MPI_VERSION=oneapi
 
