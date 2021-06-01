@@ -100,14 +100,13 @@ CP ()
 
 UNTAR ()
 {
-  local FROMDIR=$1
-  local FROMFILE=$2
-  local TODIR=$3
-  local TODIR2=$4
+  local FROMFILE=$1
+  local TODIR=$2
+  local TODIR2=$3
   local ERR=
-  if [ ! -e $FROMDIR/$FROMFILE ]; then
-    echo "***error: the file $FROMFILE was not found in $FROMDIR" >> $errlog
-    echo "***error: the file $FROMFILE was not found in $FROMDIR"
+  if [ ! -e $FROMFILE ]; then
+    echo "***error: $FROMFILE was not found" >> $errlog
+    echo "***error: $FROMFILE was not found"
     ERR="1"
     if [ "$NOPAUSE" == "" ]; then
       read val
@@ -115,10 +114,9 @@ UNTAR ()
   else
     curdir=`pwd`
     cd $TODIR
-    echo "utarring: $FROMFILE"
-    echo "    from: $FROMDIR"
-    echo "      to: $TODIR"
-    tar xvf $FROMDIR/$FROMFILE
+    echo "untarring: $FROMFILE"
+    echo "       to: $TODIR"
+    tar xvf $FROMFILE
     cd $curdir
   fi
   if [ -e $TODIR/$TODIR2 ]; then
@@ -420,18 +418,24 @@ echo "--- copying mpi ---"
 echo ""
 openmpifile=
 if [ "$MPI_VERSION" == "INTEL" ]; then
-  intelmpifile=INTEL${INTEL_COMP_VERSION}linux_64.tar.gz
-  UNTAR $MPI_DIR $intelmpifile $fdsbindir INTEL
+  intelmpifile=$MPI_DIR/INTEL${INTEL_COMP_VERSION}linux_64.tar.gz
+  if [ "$INTELMPI_TARFILE" != "" ]; then
+    intelmpifile=$INTELMPI_TARFILE
+  fi
+  UNTAR $intelmpifile $fdsbindir INTEL
   MPIEXEC=$fdsbindir/INTEL/bin/mpiexec
 else
   if [ "$PLATFORM" == "LINUX64" ]; then
-    openmpifile=openmpi_${MPI_VERSION}_linux_64_${INTEL_COMP_VERSION}.tar.gz
+    openmpifile=$MPI_DIR/openmpi_${MPI_VERSION}_linux_64_${INTEL_COMP_VERSION}.tar.gz
   fi
   if [ "$PLATFORM" == "OSX64" ]; then
-    openmpifile=openmpi_${MPI_VERSION}_osx_64_${INTEL_COMP_VERSION}.tar.gz
+    openmpifile=$MPI_DIR/openmpi_${MPI_VERSION}_osx_64_${INTEL_COMP_VERSION}.tar.gz
+  fi
+  if [ "$OPENMPI_TARFILE" != "" ]; then
+    openmpifile=$OPENMPI_TARFILE
   fi
 #  CP $MPI_DIR $openmpifile  $fdsbindir $openmpifile
-  UNTAR $MPI_DIR $openmpifile $fdsbindir openmpi_64
+  UNTAR $openmpifile $fdsbindir openmpi_64
   MPIEXEC=$fdsbindir/openmpi_64/bin/mpiexec
 fi
 
