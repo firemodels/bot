@@ -8,6 +8,8 @@ These steps are outlined in more detail below.
 
 ### Bundling Steps
 
+Warning: these scripts erase and clone fresh copies of the fds and smv repos.  You should only run these scripts in repos where you do not do daily work.
+
 1. Run firebot on a Linux computer to generate FDS manuals. If firebot is successful, documents are copied to the
 directory $HOME/.firebot/pubs and $HOME/.firebot/branch_name/pubs . At NIST this occurs nightly.
 The manuals for the FDS 6.7.6 release were generated using the script `build_fds_manuals.sh`. This script runs
@@ -43,6 +45,8 @@ for building a Windows bundle.  Edit this
 file and change the fds and smv hash and tags for a different release.
 
 ### Summary
+
+Warning: these scripts erase and clone fresh copies of the fds and smv repos.  You should only run these scripts in repos where you do not do daily work.
 
 1. Edit build_fds_manuals.sh, build_smv_manuals.sh, build_release.sh and build_release.bat updating hashes and tags.  Commit these files.
 2. Run build_fds_manuals.sh in firebot account.
