@@ -1,5 +1,7 @@
 #  Building Bundles
 
+Preliminary notes on building bundles.
+
 This directory contains scripts for building FDS/Smokeview installation files or bundles bundles for Windows, Linux and OSX (Mac) computers.
 Bundles are built nightly whenever firebot passes and whenever FDS and Smokeview is released.
 Building a bundle consists of three steps: 1. run firebot to generate FDS manuals, 2. run smokebot to generate
