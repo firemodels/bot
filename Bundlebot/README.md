@@ -42,6 +42,14 @@ Similarly, the windows batch file, `build_release.bat` contains the line
 for building a Windows bundle.  Edit this
 file and change the fds and smv hash and tags for a different release.
 
+### Summary
+
+1. Edit build_fds_manuals.sh, build_smv_manuals.sh, build_release.sh and build_release.bat updating hashes and tags.  Commit these files.
+2. Run build_fds_manuals.sh in firebot account.
+3. Run build_smv_manuals.sh in smokebot account.
+4. After manuals are built, run build_release.sh on both a Linux and Mac computer.  Run build_release.bat on a Mac.
+ 
+
 
 
 
