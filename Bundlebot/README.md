@@ -10,7 +10,10 @@ These steps are outlined in more detail below.
 
 1. Run firebot on a Linux computer to generate FDS manuals. If firebot is successful, documents are copied to the
 directory $HOME/.firebot/pubs and $HOME/.firebot/branc_name/pubs . At NIST this occurs nightly.
-The manuals for the FDS 6.7.6 release were generated using `build_fds_manuals.sh`.
+The manuals for the FDS 6.7.6 release were generated using the script `build_fds_manuals.sh`. This script runs
+firebot with the options 
+using `-x 5064c500c -X FDS6.7.6` for specifying the fds revision and tag  and options `-y a2687cda4 -Y SMV6.7.16`  for 
+specifying the smv repo revision and tag.
 2. Run smokebot on a Linux computer to generate Smokeview manuals. Similarly if smokebot is successful,
 documents are copied to $HOME/.smokebot/pubs. 
 At NIST this occurs whenever FDS and/or Smokeview source changes or at least once a day if the smokeview source has not changed.
