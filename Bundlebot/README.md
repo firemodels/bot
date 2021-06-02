@@ -9,14 +9,18 @@ These steps are outlined in more detail below.
 ### Bundling Steps
 
 1. Run firebot on a Linux computer to generate FDS manuals. If firebot is successful, documents are copied to the
-directory $HOME/.firebot/pubs and $HOME/.firebot/branc_name/pubs . At NIST this occurs nightly.
+directory $HOME/.firebot/pubs and $HOME/.firebot/branch_name/pubs . At NIST this occurs nightly.
 The manuals for the FDS 6.7.6 release were generated using the script `build_fds_manuals.sh`. This script runs
 firebot with the options 
 using `-x 5064c500c -X FDS6.7.6` for specifying the fds revision and tag  and options `-y a2687cda4 -Y SMV6.7.16`  for 
 specifying the smv repo revision and tag.
 2. Run smokebot on a Linux computer to generate Smokeview manuals. Similarly if smokebot is successful,
-documents are copied to $HOME/.smokebot/pubs. 
-At NIST this occurs whenever FDS and/or Smokeview source changes or at least once a day if the smokeview source has not changed.
+documents are copied to `$HOME/.smokebot/pubs` and `$HOME/.smokebot/branch_name/pubs`. 
+At NIST this occurs whenever the FDS and/or Smokeview source changes in the entral repo or once a day if the smokeview source has not changed.
+Similary, the manuals for the SMV 6.7.16 release were generated using the script `build_smv_manuals.sh`. This script runs
+smokebot with the options 
+using `-x 5064c500c -X FDS6.7.6` for specifying the fds revision and tag  and options `-y a2687cda4 -Y SMV6.7.16`  for 
+specifying the smv repo revision and tag.
 3. Run the script `run_bundlebot.sh` on a Linux or OSX computer or `run_bundlebot.bat` on a Windows computer
 to build the applications and bundle.  These scripts upload the bundles to the 
 [nightly builds google drive directory)](https://drive.google.com/drive/folders/1X-gRYGPGtcewgnNiNBuho3U8zDFVqFsC?usp=sharing)
