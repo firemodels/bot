@@ -638,6 +638,9 @@ if %nothaveValidation% == 0 (
 echo             Configuration Management Guide
 call :build_guide Configuration_Guide %cfastrepo%\Manuals\Configuration_Guide 1>> %OUTDIR%\stage6.txt 2>&1
 
+echo             CData Guide
+call :build_guide CData_Guide %cfastrepo%\Manuals\Monte_Carlo_Guide 1>> %OUTDIR%\stage6.txt 2>&1
+
 call :GET_DURATION MAKEGUIDES %MAKEGUIDES_beg%
 call :GET_DURATION TOTALTIME %TIME_beg%
 
