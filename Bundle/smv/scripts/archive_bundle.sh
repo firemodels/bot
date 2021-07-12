@@ -23,7 +23,7 @@ if [ -d $upload_dir/google_test/$SMVBINDIR ]; then
 fi
 cp -r $upload_dir/$bundle/smvbin $upload_dir/google_test/$SMVBINDIR
 if [ -d $upload_dir/google_test/$SMVBINDIR ]; then
-  echo The directory $upload_dir/google_test/$SMVBINDIR was creaetd
+  echo The directory $upload_dir/google_test/$SMVBINDIR was created
 else
   echo "***error: $upload_dir/google_test/$SMVBINDIR was not copied"
 fi
