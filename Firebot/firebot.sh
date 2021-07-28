@@ -328,6 +328,18 @@ get_fig_revision()
    return 0
 }
 
+#---------------------------------------------
+#                   get_bot_revision
+#---------------------------------------------
+
+get_bot_revision()
+{
+   CD_REPO $repo/bot master || return 1
+
+   BOT_REVISION=`git describe --long --dirty`
+   return 0
+}
+
 
 
 
@@ -1697,6 +1709,7 @@ email_build_status()
    echo "              queue: $QUEUE "                   >> $TIME_LOG
    echo "fds revision/branch: $FDS_REVISION/$FDSBRANCH " >> $TIME_LOG
    echo "smv revision/branch: $SMV_REVISION/$SMVBRANCH " >> $TIME_LOG
+   echo "bot revision/branch: $BOT_REVISION/master     " >> $TIME_LOG
    echo "fig revision/branch: $FIG_REVISION/master "     >> $TIME_LOG
    echo "out revision/branch: $OUT_REVISION/master "     >> $TIME_LOG
    if [ "$IFORT_VERSION" != "" ]; then
@@ -2357,6 +2370,7 @@ fi
 
 get_fds_revision $FDSBRANCH || exit 1
 get_smv_revision $SMVBRANCH || exit 1
+get_bot_revision            || exit 1
 if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
   get_exp_revision master || exit 1
   get_fig_revision master || exit 1
