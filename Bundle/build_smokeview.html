@@ -62,10 +62,17 @@ function install_smv(args){
 </tr>
 
 <tr>
-<th align=center colspan=2>Update Repos</th>
+<th align=center rowspan=2>Update<br>Repos</th>
+<th>FDS,SMV,...</th>
 <td align=center>
 <button onclick="run_script('\\bot\\Bundle\\webscripts\\webUPDATEwindowsrepos.bat')">Windows</button>
 <button onclick="run_script('\\bot\\Bundle\\webscripts\\webUPDATErepos.bat')">All</button>
+</td>
+</tr>
+<tr>
+<th>SMV</th>
+<td align=center>
+<button onclick="run_script('\\bot\\Bundle\\webscripts\\webUPDATESMVrepos.bat')">All</button>
 </td>
 </tr>
 
