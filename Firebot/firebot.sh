@@ -2546,6 +2546,15 @@ if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
       rm -rf $MANUALS_DIR
       cp -r $fdsrepo/Manuals $MANUALS_DIR
 
+# copy to a 2nd location that is accessible via cross mounts
+      if [ "$FIREBOT_MANUALS_DIR" != "" ]; then
+        if [ ! -d $FIREBOT_MANUALS_DIR ]; then
+          mkdir $FIREBOT_MANUALS_DIR
+        fi
+        rm -rf $FIREBOT_MANUALS_DIR
+        cp -r $fdsrepo/Manuals $FIREBOT_MANUALS_DIR
+      fi
+
       cp $LATESTAPPS_DIR/FDS_REVISION $PUBS_DIR/FDS_REVISION
       copy_fds_user_guide
       copy_fds_verification_guide
