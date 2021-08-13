@@ -30,7 +30,7 @@ CP ()
     echo "***error: destination directory $TOBASEDIR/$FROMDIR does not exist"
     return_code=1
   fi
-  if ["$return_code" == "1" ]; then
+  if [ "$return_code" == "1" ]; then
     return 1
   fi
   echo copying $FROMFILE from $FROMBASEDIR/$FROMDIR to $TOBASEDIR/$FROMDIR
