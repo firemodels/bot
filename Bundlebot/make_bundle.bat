@@ -298,9 +298,6 @@ cd %fds_examples%
 %repo_root%\smv\Build\sh2bat\intel_win_64\sh2bat %fds_casessh% %fds_casesbat%
 call %fds_casesbat%>Nul
 
-echo.
-echo --- copying auxilliary files ---
-echo %fds_auxfilesbat% %fds_examples% %out_examples%
 call %fds_auxfilesbat% %fds_examples% %out_examples%
 
 cd %smv_examples%
