@@ -106,6 +106,7 @@ set smv_casessh=%repo_root%\smv\Verification\scripts\SMV_Cases.sh
 set smv_casesbat=%repo_root%\smv\Verification\scripts\SMV_Cases.bat
 set wui_casessh=%repo_root%\smv\Verification\scripts\WUI_Cases.sh
 set wui_casesbat=%repo_root%\smv\Verification\scripts\WUI_Cases.bat
+set fds_auxfilesbat=%repo_root%\bot\Bundlebot\copy_fds_aux_files.bat
 
 set copyFDScases=%repo_root%\bot\Bundle\fds\scripts\copyFDScases.bat
 set copyCFASTcases=%repo_root%\bot\Bundle\fds\scripts\copyCFASTcases.bat
@@ -297,6 +298,7 @@ set RUNCFAST=call %copyCFASTcases%
 cd %fds_examples%
 %repo_root%\smv\Build\sh2bat\intel_win_64\sh2bat %fds_casessh% %fds_casesbat%
 call %fds_casesbat%>Nul
+call %fds_auxfilesbat% %fds_examples% %out_examples%
 
 cd %smv_examples%
 %repo_root%\smv\Build\sh2bat\intel_win_64\sh2bat %smv_casessh% %smv_casesbat%
