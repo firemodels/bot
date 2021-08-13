@@ -507,7 +507,7 @@ echo "--- copying example files ---"
 echo ""
 cd $FDSExamplesDirectory
 $fds_cases
-$fds_benchmark_cases
+#$fds_benchmark_cases
 $fds_aux_files $FDSExamplesDirectory $bundledir/Examples
 cd $SMVExamplesDirectory
 $wui_cases
