@@ -333,7 +333,8 @@ texturedir=$smv_bundle/textures
 MAKEINSTALLER=$REPO_ROOT/bot/Bundlebot/make_installer.sh
 
 fds_cases=$REPO_ROOT/fds/Verification/FDS_Cases.sh
-fds_benchamrk_cases=$REPO_ROOT/fds/Verification/FDS_Benchmark_Cases.sh
+fds_benchmark_cases=$REPO_ROOT/fds/Verification/FDS_Benchmark_Cases.sh
+fds_aux_files=$REPO_ROOT/bot/Bundlebot/copy_fds_aux_files.sh
 smv_cases=$REPO_ROOT/smv/Verification/scripts/SMV_Cases.sh
 wui_cases=$REPO_ROOT/smv/Verification/scripts/WUI_Cases.sh
 copyfdscase=$REPO_ROOT/bot/Bundle/fds/scripts/copyfdscase.sh
@@ -506,7 +507,8 @@ echo "--- copying example files ---"
 echo ""
 cd $FDSExamplesDirectory
 $fds_cases
-$fds_benchmark_cases
+#$fds_benchmark_cases
+$fds_aux_files $FDSExamplesDirectory $bundledir/Examples
 cd $SMVExamplesDirectory
 $wui_cases
 $smv_cases

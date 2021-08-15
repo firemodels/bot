@@ -106,6 +106,7 @@ set smv_casessh=%repo_root%\smv\Verification\scripts\SMV_Cases.sh
 set smv_casesbat=%repo_root%\smv\Verification\scripts\SMV_Cases.bat
 set wui_casessh=%repo_root%\smv\Verification\scripts\WUI_Cases.sh
 set wui_casesbat=%repo_root%\smv\Verification\scripts\WUI_Cases.bat
+set fds_auxfilesbat=%repo_root%\bot\Bundlebot\copy_fds_aux_files.bat
 
 set copyFDScases=%repo_root%\bot\Bundle\fds\scripts\copyFDScases.bat
 set copyCFASTcases=%repo_root%\bot\Bundle\fds\scripts\copyCFASTcases.bat
@@ -286,17 +287,18 @@ CALL :COPY "%repo_root%\webpages\smv_readme.html"      "%out_guides%\Smokeview_r
 CALL :COPY "%fds_forbundle%\Overview.html"             "%out_doc%\Overview.html"
 CALL :COPY "%fds_forbundle%\FDS_Web_Site.url"          "%out_web%\Official_Web_Site.url"
 
-echo.
-echo --- copying example files ---
-
 set outdir=%out_examples%
 set QFDS=call %copyFDScases%
 set RUNTFDS=call %copyFDScases%
 set RUNCFAST=call %copyCFASTcases%
 
+echo.
+echo --- copying example files ---
 cd %fds_examples%
 %repo_root%\smv\Build\sh2bat\intel_win_64\sh2bat %fds_casessh% %fds_casesbat%
 call %fds_casesbat%>Nul
+
+call %fds_auxfilesbat% %fds_examples% %out_examples%
 
 cd %smv_examples%
 %repo_root%\smv\Build\sh2bat\intel_win_64\sh2bat %smv_casessh% %smv_casesbat%
