@@ -78,10 +78,17 @@ Firebot compares images it generates with a corresponding set of base images loc
 To update the base images on a Linux or Mac computer:
 
 ```
+type commands to bring fig repo up to date
 cd bot/Firebot
 ./update_repo_images.sh -r /home/username/FireModels_fork
 
 ```
 
-where `/home/username/FireModels_fork` is the directory containg the `bot` and `fig` repos.  
+where `/home/username/FireModels_fork` is the directory containg the `bot` and `fig` repos.  At NIST we would type the commands
+
+```
+type commands to bring fig repo up to date
+cd bot/Firebot
+./update_repo_images -r ~firebot/Firebot_clone
+```
 
