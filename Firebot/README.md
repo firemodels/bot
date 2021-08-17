@@ -71,3 +71,17 @@ MAILTO=""
 ```
 
 The output from firebot is written into the directory called `output` which is in the same directory as the `firebot.sh` script itself. When firebot completes, email should be sent to the specified list of addresses. The fds/Manuals directory in the fds repo containing manuals and figures is copied to the directdory $HOME/.firebot/Manuals .
+
+## Updating Comparison Images
+
+Firebot compares images it generates with a corresponding set of base images located in the fig repo.
+To update the base images on a Linux or Mac computer:
+
+```
+cd bot/Firebot
+./update_repo_images.sh -r /home/username/FireModels_fork
+
+```
+
+where `/home/username/FireModels_fork` is the directory containg the `bot` and `fig` repos.  
+
