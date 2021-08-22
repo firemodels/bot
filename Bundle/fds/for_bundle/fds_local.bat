@@ -23,6 +23,11 @@ call :getopts %*
 if "%stop_script%" == "1" exit /b
 call :set_openmp_defaults
 
+if "x%IN_CMDFDS%" == "x1" goto skip_NO_IN_CMDFDS
+  echo ***Error: not using the FDS command shell, CMDfds, to run fds
+  exit /b
+:skip_NO_IN_CMDFDS
+
 if "%show_version%" == "0" goto skip_showversion
   mpiexec -localonly -n 1 fds
 goto eof
@@ -35,11 +40,6 @@ if "%have_casename%" == "1" goto skip_casename_test
   if "%show_only%" == "1" goto skip_casename_test
   exit /b
 :skip_casename_test
-
-if NOT "x%IN_CMDFDS%" == "x" goto skip_NO_IN_CMDFDS
-  echo ***warning: not using the CMDfds command shell to run fds
-  pause
-:skip_NO_IN_CMDFDS
 
 set ECHO=
 if "%show_only%" == "1" set ECHO=echo
