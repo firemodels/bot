@@ -28,8 +28,7 @@ echo "-M - only run matlab and build manuals stage"
 echo "-O - use OpenMPI version fds"
 echo "-P - remove run status (PID) file"
 echo "-d - only run cases in debug mode"
-echo "-N - skip matlabe, pictures and manuals stages"
-echo "-s - use startup files to set the environment, not modules"
+echo "-N - skip matlab, pictures and manuals stages"
 echo "-S - run subset cases, do not generate pictures, run matlab or generate manuals"
 echo "-U - upload guides (only by user firebot)"
 echo "-w webdir - copy firebot web summary to $WEB_ROOT/webdir"
@@ -193,7 +192,6 @@ CLONE_REPOS=
 CLONE_REPOS_ARG=
 CLONE_FDSSMV=
 BUILD_ONLY=
-export QFDS_STARTUP=
 FDS_REV=
 SMV_REV=
 FDS_REV_ARG=
@@ -213,7 +211,7 @@ VALIDATION=
 
 #*** parse command line options
 
-while getopts 'bBcCdfg:G:hHiJkm:MnNOPq:R:sSTuUvV:w:W:x:X:y:Y:' OPTION
+while getopts 'bBcCdfg:G:hHiJkm:MnNOPq:R:STuUvV:w:W:x:X:y:Y:' OPTION
 do
 case $OPTION  in
   b)
@@ -280,9 +278,6 @@ case $OPTION  in
    CLONE_REPOS="$OPTARG"
    BRANCH=current
    ;;
-  s)
-    export QFDS_STARTUP=1
-    ;;
   S)
     SUBSET_CASES="-S"
    ;;
