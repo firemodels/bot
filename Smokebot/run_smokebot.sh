@@ -14,7 +14,6 @@ echo ""
 echo "Miscellaneous:"
 echo "-a - only run if the FDS or smokeview source has changed"
 echo "-b - use the current branch"
-echo "-D - use startup files to set the environment not modules"
 echo "-f - force smokebot to run"
 echo "-I compiler - intel or gnu [default: $COMPILER]"
 echo "-J use Intel MPI version of fds"
@@ -170,7 +169,6 @@ COMPILER=intel
 SMOKEBOT_LITE=
 ECHO=
 INTEL=
-export QFDS_STARTUP=
 REMOVE_PID=
 BUILD_ONLY=
 CLONE_REPOS=
@@ -194,7 +192,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'abBcDfg:G:hHI:JkLm:MPq:R:TuUvw:W:x:X:y:Y:' OPTION
+while getopts 'abBcfg:G:hHI:JkLm:MPq:R:TuUvw:W:x:X:y:Y:' OPTION
 do
 case $OPTION  in
   a)
@@ -208,9 +206,6 @@ case $OPTION  in
    ;;
   c)
    CLEANREPO=-c
-   ;;
-  D)
-   export QFDS_STARTUP=1
    ;;
   f)
    FORCE=1
