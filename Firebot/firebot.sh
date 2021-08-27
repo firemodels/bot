@@ -382,7 +382,7 @@ compile_fds_mpi_db()
 {
    # Clean and compile FDS MPI debug
    echo "      MPI Intel debug"
-   cd $fdsrepo/Build/${INTEL}mpi_intel_${platform}${size}$DB
+   cd $fdsrepo/Build/${INTEL}mpi_${COMPILER}_${platform}${size}$DB
    make -f ../makefile clean &> /dev/null
    ./make_fds.sh &> $OUTPUT_DIR/stage2b
 }
@@ -394,8 +394,8 @@ compile_fds_mpi_db()
 check_compile_fds_mpi_db()
 {
    # Check for errors in FDS MPI debug compilation
-   cd $fdsrepo/Build/${INTEL}mpi_intel_${platform}${size}$DB
-   if [ -e "fds_${INTEL}mpi_intel_${platform}${size}$DB" ]
+   cd $fdsrepo/Build/${INTEL}mpi_${COMPILER}_${platform}${size}$DB
+   if [ -e "fds_${INTEL}mpi_${COMPILER}_${platform}${size}$DB" ]
    then
       FDS_debug_success=true
    else
@@ -587,7 +587,7 @@ compile_fds_mpi()
    # Clean and compile FDS MPI
    echo "      MPI Intel release"
    echo "" > $OUTPUT_DIR/stage2c
-   cd $fdsrepo/Build/${INTEL}mpi_intel_${platform}${size}
+   cd $fdsrepo/Build/${INTEL}mpi_${COMPILER}_${platform}${size}
    make -f ../makefile clean &> /dev/null
    ./make_fds.sh &> $OUTPUT_DIR/stage2c
 }
@@ -599,11 +599,11 @@ compile_fds_mpi()
 check_compile_fds_mpi()
 {
    # Check for errors in FDS MPI compilation
-   cd $fdsrepo/Build/${INTEL}mpi_intel_${platform}${size}
-   if [ -e "fds_${INTEL}mpi_intel_${platform}${size}" ]
+   cd $fdsrepo/Build/${INTEL}mpi_${COMPILER}_${platform}${size}
+   if [ -e "fds_${INTEL}mpi_${COMPILER}_${platform}${size}" ]
    then
       FDS_release_success=true
-      cp fds_${INTEL}mpi_intel_${platform}${size} $LATESTAPPS_DIR/fds
+      cp fds_${INTEL}mpi_${COMPILER}_${platform}${size} $LATESTAPPS_DIR/fds
    else
       echo "Errors from Stage 2c - Compile FDS MPI release:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage2c >> $ERROR_LOG
@@ -648,7 +648,7 @@ compile_smv_utilities()
 # smokeview libraries
   echo "   Smokeview"
   echo "      libraries"
-  cd $smvrepo/Build/LIBS/intel_${platform}${size}
+  cd $smvrepo/Build/LIBS/${COMPILER}_${platform}${size}
   ./make_LIBS.sh >> $OUTPUT_DIR/stage3a 2>&1
   echo "" >> $OUTPUT_DIR/stage3a 2>&1
     
@@ -937,7 +937,7 @@ compile_smv_db()
 {
 # Clean and compile SMV debug
   echo "      debug"
-  cd $smvrepo/Build/smokeview/intel_${platform}${size}
+  cd $smvrepo/Build/smokeview/${COMPILER}_${platform}${size}
   ./make_smokeview_db.sh &> $OUTPUT_DIR/stage3b
 }
 
@@ -948,7 +948,7 @@ compile_smv_db()
 check_compile_smv_db()
 {
 # Check for errors in SMV debug compilation
- cd $smvrepo/Build/smokeview/intel_${platform}${size}
+ cd $smvrepo/Build/smokeview/${COMPILER}_${platform}${size}
  if [ -e "smokeview_${platform}${size}_db" ]; then
    smv_debug_success=true
  else
@@ -977,7 +977,7 @@ compile_smv()
 {
    # Clean and compile SMV
   echo "      release"
-  cd $smvrepo/Build/smokeview/intel_${platform}${size}
+  cd $smvrepo/Build/smokeview/${COMPILER}_${platform}${size}
   echo "" > $OUTPUT_DIR/stage3c 2>&1
   ./make_smokeview.sh >> $OUTPUT_DIR/stage3c 2>&1
 }
@@ -990,7 +990,7 @@ check_compile_smv()
 {
   # Check for errors in SMV release compilation
   smv_errors=
-  cd $smvrepo/Build/smokeview/intel_${platform}${size}
+  cd $smvrepo/Build/smokeview/${COMPILER}_${platform}${size}
   if [ -e "smokeview_${platform}${size}" ]; then
     smv_release_success=true
     CP smokeview_${platform}${size} $LATESTAPPS_DIR/smokeview
