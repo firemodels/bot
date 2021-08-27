@@ -645,73 +645,68 @@ CP()
 
 compile_smv_utilities()
 {  
-   # smokeview libraries
-   if [ "$USEINSTALL" == "" ]; then
-     echo "   Smokeview"
-     echo "      libraries"
-     cd $smvrepo/Build/LIBS/intel_${platform}${size}
-     ./make_LIBS.sh >> $OUTPUT_DIR/stage3a 2>&1
-     echo "" >> $OUTPUT_DIR/stage3a 2>&1
+# smokeview libraries
+  echo "   Smokeview"
+  echo "      libraries"
+  cd $smvrepo/Build/LIBS/intel_${platform}${size}
+  ./make_LIBS.sh >> $OUTPUT_DIR/stage3a 2>&1
+  echo "" >> $OUTPUT_DIR/stage3a 2>&1
     
-   # smokezip:
-     echo "      smokezip"
-     cd $smvrepo/Build/smokezip/${COMPILER}_${platform}${size}
-     rm -f *.o smokezip_${platform}${size}
+# smokezip:
+  echo "      smokezip"
+  cd $smvrepo/Build/smokezip/${COMPILER}_${platform}${size}
+  rm -f *.o smokezip_${platform}${size}
 
-     ./make_smokezip.sh >> $OUTPUT_DIR/stage3a 2>&1
-     CP smokezip_${platform}${size} $LATESTAPPS_DIR/smokezip
-     echo "" >> $OUTPUT_DIR/stage3a 2>&1
+  ./make_smokezip.sh >> $OUTPUT_DIR/stage3a 2>&1
+  CP smokezip_${platform}${size} $LATESTAPPS_DIR/smokezip
+  echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
-   # smokediff:
-     echo "      smokediff"
-     cd $smvrepo/Build/smokediff/${COMPILER}_${platform}${size}
-     rm -f *.o smokediff_${platform}${size}
-     ./make_smokediff.sh >> $OUTPUT_DIR/stage3a 2>&1
-     CP smokediff_${platform}${size} $LATESTAPPS_DIR/smokediff
-     echo "" >> $OUTPUT_DIR/stage3a 2>&1
+# smokediff:
+  echo "      smokediff"
+  cd $smvrepo/Build/smokediff/${COMPILER}_${platform}${size}
+  rm -f *.o smokediff_${platform}${size}
+  ./make_smokediff.sh >> $OUTPUT_DIR/stage3a 2>&1
+  CP smokediff_${platform}${size} $LATESTAPPS_DIR/smokediff
+  echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
-   # background
-     echo "      background"
-     cd $smvrepo/Build/background/${COMPILER}_${platform}${size}
-     rm -f *.o background_${platform}${size}
-     ./make_background.sh >> $OUTPUT_DIR/stage3a 2>&1
-     CP background_${platform}${size} $LATESTAPPS_DIR/background
+# background
+  echo "      background"
+  cd $smvrepo/Build/background/${COMPILER}_${platform}${size}
+  rm -f *.o background_${platform}${size}
+  ./make_background.sh >> $OUTPUT_DIR/stage3a 2>&1
+  CP background_${platform}${size} $LATESTAPPS_DIR/background
 
-  # wind2fds:
-     echo "      wind2fds"
-     cd $smvrepo/Build/wind2fds/${COMPILER}_${platform}${size}
-     rm -f *.o wind2fds_${platform}${size}
-     ./make_wind2fds.sh >> $OUTPUT_DIR/stage3a 2>&1
-     CP wind2fds_${platform}${size} $LATESTAPPS_DIR/wind2fds
-    echo "" >> $OUTPUT_DIR/stage3a 2>&1
+# wind2fds:
+  echo "      wind2fds"
+  cd $smvrepo/Build/wind2fds/${COMPILER}_${platform}${size}
+  rm -f *.o wind2fds_${platform}${size}
+  ./make_wind2fds.sh >> $OUTPUT_DIR/stage3a 2>&1
+  CP wind2fds_${platform}${size} $LATESTAPPS_DIR/wind2fds
+ echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
-  # hashfile:
-     echo "      hashfile"
-     cd $smvrepo/Build/hashfile/${COMPILER}_${platform}${size}
-     rm -f *.o hashfile_${platform}${size}
-     ./make_hashfile.sh >> $OUTPUT_DIR/stage3a 2>&1
-     CP hashfile_${platform}${size} $LATESTAPPS_DIR/hashfile
-    echo "" >> $OUTPUT_DIR/stage3a 2>&1
+# hashfile:
+  echo "      hashfile"
+  cd $smvrepo/Build/hashfile/${COMPILER}_${platform}${size}
+  rm -f *.o hashfile_${platform}${size}
+  ./make_hashfile.sh >> $OUTPUT_DIR/stage3a 2>&1
+  CP hashfile_${platform}${size} $LATESTAPPS_DIR/hashfile
+  echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
-  # fds2asci
-     echo "      fds2ascii"
-     cd $fdsrepo/Utilities/fds2ascii/${COMPILER}_${platform}${size}
-     rm -f *.o fds2ascii_${platform}${size}
-     ./make_fds2ascii.sh >> $OUTPUT_DIR/stage3a 2>&1
-     cp fds2ascii_${platform}${size} $LATESTAPPS_DIR/fds2ascii
-    echo "" >> $OUTPUT_DIR/stage3a 2>&1
+# fds2asci
+  echo "      fds2ascii"
+  cd $fdsrepo/Utilities/fds2ascii/${COMPILER}_${platform}${size}
+  rm -f *.o fds2ascii_${platform}${size}
+  ./make_fds2ascii.sh >> $OUTPUT_DIR/stage3a 2>&1
+  cp fds2ascii_${platform}${size} $LATESTAPPS_DIR/fds2ascii
+  echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
-  # test_mpi
-     echo "      test_mpi"
-     cd $fdsrepo/Utilities/test_mpi/${INTEL}mpi_${COMPILER}_${platform}
-     rm -f *.o test_mpi
-     ./make_test_mpi.sh >> $OUTPUT_DIR/stage3a 2>&1
-     cp test_mpi $LATESTAPPS_DIR/test_mpi
-    echo "" >> $OUTPUT_DIR/stage3a 2>&1
-
-   else
-     echo "   Smokeview - using installed smokeview"
-   fi
+# test_mpi
+  echo "      test_mpi"
+  cd $fdsrepo/Utilities/test_mpi/${INTEL}mpi_${COMPILER}_${platform}
+  rm -f *.o test_mpi
+  ./make_test_mpi.sh >> $OUTPUT_DIR/stage3a 2>&1
+  cp test_mpi $LATESTAPPS_DIR/test_mpi
+  echo "" >> $OUTPUT_DIR/stage3a 2>&1
 }
 
 #---------------------------------------------
@@ -940,12 +935,10 @@ fi
 
 compile_smv_db()
 {
-   # Clean and compile SMV debug
-   if [ "$USEINSTALL" == "" ]; then
-     echo "      debug"
-     cd $smvrepo/Build/smokeview/intel_${platform}${size}
-     ./make_smokeview_db.sh &> $OUTPUT_DIR/stage3b
-   fi
+# Clean and compile SMV debug
+  echo "      debug"
+  cd $smvrepo/Build/smokeview/intel_${platform}${size}
+  ./make_smokeview_db.sh &> $OUTPUT_DIR/stage3b
 }
 
 #---------------------------------------------
@@ -954,30 +947,26 @@ compile_smv_db()
 
 check_compile_smv_db()
 {
-  # Check for errors in SMV debug compilation
-  if [ "$USEINSTALL" == "" ]; then
-    cd $smvrepo/Build/smokeview/intel_${platform}${size}
-    if [ -e "smokeview_${platform}${size}_db" ]; then
-      smv_debug_success=true
-    else
-      echo "Errors from Stage 3b - Compile SMV debug:" >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage3b >> $ERROR_LOG
-      echo "" >> $ERROR_LOG
-    fi
+# Check for errors in SMV debug compilation
+ cd $smvrepo/Build/smokeview/intel_${platform}${size}
+ if [ -e "smokeview_${platform}${size}_db" ]; then
+   smv_debug_success=true
+ else
+   echo "Errors from Stage 3b - Compile SMV debug:" >> $ERROR_LOG
+   cat $OUTPUT_DIR/stage3b >> $ERROR_LOG
+   echo "" >> $ERROR_LOG
+ fi
 
-    # Check for compiler warnings/remarks
-    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-    if [[ `grep -E -i 'warning|remark' $OUTPUT_DIR/stage3b | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]; then
-      # Continue along
-      :
-    else
-      echo "Warnings from Stage 3b - Compile SMV debug:" >> $WARNING_LOG
-      grep -A 5 -E -i 'warning|remark' $OUTPUT_DIR/stage3b | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
-      echo "" >> $WARNING_LOG
-    fi
-  else
-    smv_debug_success=true
-  fi
+ # Check for compiler warnings/remarks
+ # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
+ if [[ `grep -E -i 'warning|remark' $OUTPUT_DIR/stage3b | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]; then
+   # Continue along
+   :
+ else
+   echo "Warnings from Stage 3b - Compile SMV debug:" >> $WARNING_LOG
+   grep -A 5 -E -i 'warning|remark' $OUTPUT_DIR/stage3b | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
+   echo "" >> $WARNING_LOG
+ fi
 }
 
 #---------------------------------------------
@@ -987,12 +976,10 @@ check_compile_smv_db()
 compile_smv()
 {
    # Clean and compile SMV
-   if [ "$USEINSTALL" == "" ]; then
-     echo "      release"
-     cd $smvrepo/Build/smokeview/intel_${platform}${size}
-     echo "" > $OUTPUT_DIR/stage3c 2>&1
-     ./make_smokeview.sh >> $OUTPUT_DIR/stage3c 2>&1
-   fi
+  echo "      release"
+  cd $smvrepo/Build/smokeview/intel_${platform}${size}
+  echo "" > $OUTPUT_DIR/stage3c 2>&1
+  ./make_smokeview.sh >> $OUTPUT_DIR/stage3c 2>&1
 }
 
 #---------------------------------------------
@@ -1003,30 +990,28 @@ check_compile_smv()
 {
   # Check for errors in SMV release compilation
   smv_errors=
-  if [ "$USEINSTALL" == "" ]; then
-    cd $smvrepo/Build/smokeview/intel_${platform}${size}
-    if [ -e "smokeview_${platform}${size}" ]; then
-      smv_release_success=true
-      CP smokeview_${platform}${size} $LATESTAPPS_DIR/smokeview
-    else
-      smv_errors=1
-      echo "Errors from Stage 3c - Compile SMV release:" >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage3c >> $ERROR_LOG
-      echo "" >> $ERROR_LOG
-    fi
-
-    # Check for compiler warnings/remarks
-    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-    if [[ `grep -E -i 'warning|remark' $OUTPUT_DIR/stage3c | grep -v 'was built for newer' | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]; then
-      # Continue along
-      :
-    else
-      echo "Warnings from Stage 3c - Compile SMV release:" >> $WARNING_LOG
-      grep -A 5 -E -i 'warning|remark' $OUTPUT_DIR/stage3c | grep -v 'was built for new' | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
-      echo "" >> $WARNING_LOG
-    fi
+  cd $smvrepo/Build/smokeview/intel_${platform}${size}
+  if [ -e "smokeview_${platform}${size}" ]; then
     smv_release_success=true
+    CP smokeview_${platform}${size} $LATESTAPPS_DIR/smokeview
+  else
+    smv_errors=1
+    echo "Errors from Stage 3c - Compile SMV release:" >> $ERROR_LOG
+    cat $OUTPUT_DIR/stage3c >> $ERROR_LOG
+    echo "" >> $ERROR_LOG
   fi
+
+  # Check for compiler warnings/remarks
+  # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
+  if [[ `grep -E -i 'warning|remark' $OUTPUT_DIR/stage3c | grep -v 'was built for newer' | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]; then
+    # Continue along
+    :
+  else
+    echo "Warnings from Stage 3c - Compile SMV release:" >> $WARNING_LOG
+    grep -A 5 -E -i 'warning|remark' $OUTPUT_DIR/stage3c | grep -v 'was built for new' | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
+    echo "" >> $WARNING_LOG
+  fi
+  smv_release_success=true
 }
 
 #---------------------------------------------
@@ -1038,7 +1023,7 @@ make_fds_pictures()
    # Run Make FDS Pictures script
    echo Generating FDS images
    cd $fdsrepo/Verification/scripts
-   ./Make_FDS_Pictures.sh $USEINSTALL &> $OUTPUT_DIR/stage6
+   ./Make_FDS_Pictures.sh &> $OUTPUT_DIR/stage6
 }
 
 #---------------------------------------------
@@ -1886,7 +1871,6 @@ fi
 
 #*** set initial values
 
-USEINSTALL=
 COMPILER=intel
 QUEUE=firebot
 CLEANREPO=
@@ -1923,7 +1907,7 @@ VALIDATION=
 CHECK_CLUSTER=
 
 #*** parse command line arguments
-while getopts 'b:BcCdiJm:Mp:q:R:sSTuUV:x:X:y:Y:w:W:' OPTION
+while getopts 'b:BcCdJm:Mp:q:R:sSTuUV:x:X:y:Y:w:W:' OPTION
 do
 case $OPTION in
   b)
@@ -1945,9 +1929,6 @@ case $OPTION in
    SKIPRELEASE=1
    SKIPMATLAB=1
    SKIPPICTURES=1
-   ;;
-  i)
-   USEINSTALL="-r"
    ;;
   J)
    INTEL=i
@@ -2187,33 +2168,6 @@ if [ "$COMPILER" == "intel" ]; then
    fi
 else
    notfound=`gcc -help 2>&1 | tail -1 | grep "not found" | wc -l`
-fi
-if [ $notfound == 1 ] ; then
-  USEINSTALL="-r"
-fi
-
-#*** if using the install option, make sure smokeview is installed
-
-notfound=
-if [ "$USEINSTALL" != "" ]; then
-   notfound=`smokeview -v 2>&1 | tail -1 | grep "not found" | wc -l`
-   if [ $notfound == 1 ]; then
-      echo "Error: smokeview not found. firebot aborted."
-      echo "Error: smokeview not found. firebot aborted." >> $OUTPUT_DIR/stage1 2>&1
-      exit 1
-   fi
-fi
-
-notfound=
-if [ "QUEUE" == "none" ]; then
-   notfound=`background -v 2>&1 | tail -1 | grep "not found" | wc -l`
-   if [ $notfound == 1 ]; then
-      echo "Error: The program background was not found.  firebot aborted"
-      echo "       Add the directory containing fds and smokeview to your path"
-      echo "       (same directory containing fds and smokeview)"
-      echo "Error: background not found. firebot aborted." >> $OUTPUT_DIR/stage1 2>&1
-      exit 1
-   fi
 fi
 
 UploadGuides=$botrepo/Firebot/fds_guides2GD.sh
