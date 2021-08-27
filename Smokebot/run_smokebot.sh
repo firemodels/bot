@@ -1,7 +1,6 @@
 #!/bin/bash
 EMAIL_LIST="$HOME/.smokebot/smokebot_email_list.sh"
 
-
 # The Smokebot script is part of an automated continuous integration system.
 # Consult the FDS Config Management Plan for more information.
 
@@ -35,7 +34,7 @@ echo "Build apps, set repo revisions:"
 echo "-B - only build apps"
 echo "-g firebot_host - host where firebot was run"
 echo "-G firebot_home - home directory where firebot was run"
-echo "   The -g and -G options are used when clonging repos (-R option)"
+echo "   The -g and -G options are used when cloning repos (-R option)"
 echo "   to build apps using the same repo revisions as used with the last"
 echo "   successful firebot run"
 echo "-R release_type (master, release or test) - clone fds, exp, fig, out and smv repos"
