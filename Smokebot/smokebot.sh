@@ -544,7 +544,7 @@ run_verification_cases_debug()
 
    # Submit SMV verification cases and wait for them to start
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3a 2>&1
-   ./Run_SMV_Cases.sh $INTEL2 -Y -c $cfastrepo -I $COMPILER $USEINSTALL2 -j $JOBPREFIX -m 2 -d -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3a 2>&1
+   ./Run_SMV_Cases.sh $INTEL2 -Y -c $cfastrepo $USEINSTALL2 -j $JOBPREFIX -m 2 -d -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3a 2>&1
 }
 
 #---------------------------------------------
@@ -876,7 +876,7 @@ run_verification_cases_release()
    # Start running all SMV verification cases
    cd $smvrepo/Verification/scripts
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3b 2>&1
-   ./Run_SMV_Cases.sh $INTEL2 -Y -c $cfastrepo -I $COMPILER -j $JOBPREFIX $USEINSTALL2 $RUN_OPENMP -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3b 2>&1
+   ./Run_SMV_Cases.sh $INTEL2 -Y -c $cfastrepo -j $JOBPREFIX $USEINSTALL2 $RUN_OPENMP -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3b 2>&1
 }
 
 #---------------------------------------------
@@ -1032,7 +1032,7 @@ make_smv_pictures()
    echo Generating
    echo "   images"
    cd $smvrepo/Verification/scripts
-   ./Make_SMV_Pictures.sh -Y -q $SMOKEBOT_QUEUE -I $COMPILER -j SMV_ $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4a
+   ./Make_SMV_Pictures.sh -Y -q $SMOKEBOT_QUEUE -j SMV_ $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4a
    grep -v FreeFontPath $OUTPUT_DIR/stage4a &> $OUTPUT_DIR/stage4b
 }
 
@@ -1506,7 +1506,7 @@ echo $$ > $PID_FILE
 
 #*** parse command line options
 
-while getopts 'ab:BcI:JLm:Mo:q:R:TuUw:W:x:X:y:Y:' OPTION
+while getopts 'ab:BcJLm:Mo:q:R:TuUw:W:x:X:y:Y:' OPTION
 do
 case $OPTION in
   a)
@@ -1525,9 +1525,6 @@ case $OPTION in
    ;;
   c)
    CLEANREPO=1
-   ;;
-  I)
-   COMPILER="$OPTARG"
    ;;
   J)
    INTEL=i
@@ -1739,14 +1736,10 @@ else
   WEB_URL=
 fi
 
-if [ "$COMPILER" == "intel" ]; then
-  if [[ "$IFORT_COMPILER" != "" ]] ; then
-    source $IFORT_COMPILER/bin/compilervars.sh intel64
-  fi 
-  notfound=`icc -help 2>&1 | tail -1 | grep "not found" | wc -l`
-else
-  notfound=`gcc -help 2>&1 | tail -1 | grep "not found" | wc -l`
-fi
+if [[ "$IFORT_COMPILER" != "" ]] ; then
+  source $IFORT_COMPILER/bin/compilervars.sh intel64
+fi 
+notfound=`icc -help 2>&1 | tail -1 | grep "not found" | wc -l`
 if [ "$notfound" == "1" ] ; then
   export haveCC="0"
   USEINSTALL="-i"
