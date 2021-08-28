@@ -1,7 +1,6 @@
 #!/bin/bash
 EMAIL_LIST="$HOME/.smokebot/smokebot_email_list.sh"
 
-
 # The Smokebot script is part of an automated continuous integration system.
 # Consult the FDS Config Management Plan for more information.
 
@@ -15,7 +14,6 @@ echo "Miscellaneous:"
 echo "-a - only run if the FDS or smokeview source has changed"
 echo "-b - use the current branch"
 echo "-f - force smokebot to run"
-echo "-I compiler - intel or gnu [default: $COMPILER]"
 echo "-J use Intel MPI version of fds"
 echo "-k - kill smokebot if it is running"
 echo "-L - smokebot lite,  build debug apps and run cases using debug fds"
@@ -35,7 +33,7 @@ echo "Build apps, set repo revisions:"
 echo "-B - only build apps"
 echo "-g firebot_host - host where firebot was run"
 echo "-G firebot_home - home directory where firebot was run"
-echo "   The -g and -G options are used when clonging repos (-R option)"
+echo "   The -g and -G options are used when cloning repos (-R option)"
 echo "   to build apps using the same repo revisions as used with the last"
 echo "   successful firebot run"
 echo "-R release_type (master, release or test) - clone fds, exp, fig, out and smv repos"
@@ -165,7 +163,6 @@ RUNSMOKEBOT=1
 MOVIE=
 UPLOAD=
 FORCE=
-COMPILER=intel
 SMOKEBOT_LITE=
 ECHO=
 INTEL=
@@ -192,7 +189,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'abBcfg:G:hHI:JkLm:MPq:R:TuUvw:W:x:X:y:Y:' OPTION
+while getopts 'abBcfg:G:hHJkLm:MPq:R:TuUvw:W:x:X:y:Y:' OPTION
 do
 case $OPTION  in
   a)
@@ -221,9 +218,6 @@ case $OPTION  in
    ;;
   H)
    usage "-H"
-   ;;
-  I)
-   COMPILER="$OPTARG"
    ;;
   J)
    INTEL="-J"
@@ -358,8 +352,6 @@ if [ "$WEB_ROOT" != "" ]; then
   WEB_ROOT="-W $WEB_ROOT"
 fi
 
-COMPILER="-I $COMPILER"
-
 #*** kill smokebot
 
 if [ "$KILL_SMOKEBOT" == "1" ]; then
@@ -437,7 +429,7 @@ BRANCH="-b $BRANCH"
 #*** run smokebot
 
 touch $smokebot_pid
-$ECHO ./$botscript $SIZE $BRANCH $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $CLONE_REPOS $CLONE_FDSSMV $RUNAUTO $INTEL $BUILD_ONLY $COMPILER $SMOKEBOT_LITE $CLEANREPO $WEB_DIR $WEB_ROOT $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $SIZE $BRANCH $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $CLONE_REPOS $CLONE_FDSSMV $RUNAUTO $INTEL $BUILD_ONLY $SMOKEBOT_LITE $CLEANREPO $WEB_DIR $WEB_ROOT $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi
