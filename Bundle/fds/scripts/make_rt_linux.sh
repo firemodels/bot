@@ -37,6 +37,7 @@ mkdir $TOROOT
 mkdir $TOROOT/bin
 mkdir $TOROOT/lib
 mkdir $TOROOT/prov
+echo $version > $TODIR/version
 
 cp $FROMROOT/bin/hydra_bstrap_proxy $TOROOT/bin/.
 
