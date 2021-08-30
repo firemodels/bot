@@ -1,8 +1,17 @@
 #!/bin/bash
-TODIR=INTEL.$$
+version=oneapiU3
+TODIR=/tmp/INTEL
+
+TARFILE=$HOME/.bundle/BUNDLE/MPI/INTEL${version}linux_64.tar
+
+if [ -e $TODIR ]; then
+  rm -rf $TODIR
+fi
+rm -f $TARFILE
+rm -f ${TARFILE}.gz
 
 FROMROOT=/opt/intel/oneapi/mpi/latest
-TOROOT=$HOME/.bundle/BUNDLE/MPI/$TODIR
+TOROOT=$TODIR
 
 #---------------------------------------------
 #                   CP
@@ -57,3 +66,11 @@ echo ***copying prov files
   CP /opt/intel/oneapi/mpi/latest/libfabric/lib/prov prov  librxm-fi.so
   CP /opt/intel/oneapi/mpi/latest/libfabric/lib/prov prov  libshm-fi.so
   CP /opt/intel/oneapi/mpi/latest/libfabric/lib/prov prov  libsockets-fi.so
+
+CURDIR=`pwd`
+cd /tmp
+echo
+echo ***creating compressed tar file: $TARFILE
+tar cvf $TARFILE  INTEL
+gzip $TARFILE
+cd $CURDIR
