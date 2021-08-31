@@ -11,6 +11,10 @@ mkdir %INTELDIR%
 
 set "FROMDIR=%I_MPI_ONEAPI_ROOT%\bin"
 
+echo %INTELDIR% > %TODIR%\version
+echo.
+echo ***copying files from %FROMDIR%
+echo.
 call :copyfile hydra_bstrap_proxy.exe
 call :copyfile hydra_pmi_proxy.exe
 call :copyfile hydra_service.exe
@@ -22,11 +26,20 @@ call :copyfile mpiexec.exe
 
 set "FROMDIR=%I_MPI_ONEAPI_ROOT%\bin\release"
 
+echo.
+echo ***copying files from %FROMDIR%
+echo.
 call :copyfile impi.dll
 
 set "FROMDIR=%I_MPI_ONEAPI_ROOT%\libfabric\bin"
 
+echo.
+echo ***copying files from %FROMDIR%
+echo.
 call :copyfile libfabric.dll
+
+echo.
+echo ***copy complete
 goto eof
 
 ::---------------------------------------------
@@ -39,8 +52,8 @@ if NOT exist "%FROMDIR%\%FROMFILE%" echo "***error: %FROMFILE% was not found in 
 if NOT exist "%FROMDIR%\%FROMFILE%" exit /b
 
 copy "%FROMDIR%\%FROMFILE%" %TODIR%\%FROMFILE% > Nul 2> Nul
-if exist "%TODIR%\%FROMFILE%" echo %FROMFILE% copied
-if NOT exist %TODIR%\%FROMFILE% echo %FROMFILE% failed to copy
+if exist "%TODIR%\%FROMFILE%" echo    %FROMFILE% copied
+if NOT exist %TODIR%\%FROMFILE% echo ***error: %FROMFILE% failed to copy
 exit /b
 
 :eof
