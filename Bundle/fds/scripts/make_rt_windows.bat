@@ -11,6 +11,7 @@ mkdir %INTELDIR%
 
 set "FROMDIR=%I_MPI_ONEAPI_ROOT%\bin"
 
+echo %INTELDIR% > %TODIR%\version
 echo.
 echo ***copying files from %FROMDIR%
 echo.
