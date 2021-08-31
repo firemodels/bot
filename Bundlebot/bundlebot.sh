@@ -10,7 +10,7 @@ if [ "`uname`" == "Darwin" ]; then
   openmpi_dir=/opt/openmpi410_oneapi_64
 else
 #*** Linux parameters
-  intel_mpi_version=oneapi
+  intel_mpi_version=oneapiU3
   mpi_version_linux=INTEL
 fi
 
