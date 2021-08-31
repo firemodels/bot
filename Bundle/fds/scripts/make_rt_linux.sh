@@ -1,6 +1,12 @@
 #!/bin/bash
-version=oneapiU3
-TODIR=/tmp/INTEL
+#version=oneapiU3
+
+if [ "$version" == "" ]; then
+  echo ***error: version undefined, edit script to define version
+  exit
+fi
+
+TODIR=$HOME/.bundle/INTEL
 
 TARFILE=$HOME/.bundle/BUNDLE/MPI/INTEL${version}linux_64.tar
 
@@ -9,9 +15,6 @@ if [ -e $TODIR ]; then
 fi
 rm -f $TARFILE
 rm -f ${TARFILE}.gz
-
-FROMROOT=/opt/intel/oneapi/mpi/latest
-TOROOT=$TODIR
 
 #---------------------------------------------
 #                   CP
@@ -22,24 +25,28 @@ CP ()
   FROMDIR=$1
   TODIR=$2
   FILE=$3
-  FULLFILE=$FROMDIR/$FILE
-  if [ -e $FULLFILE ]; then
-    cp $FULLFILE $TOROOT/$TODIR/.
-    echo "$FULLFILE copied"
+  if [ -e $FROMDIR/$FILE ]; then
+    cp $FROMDIR/$FILE $TOROOT/$TODIR/$FILE
+    if [ -e $TOROOT/$TODIR/$FILE ]; then
+      echo $FILE copied
+    else
+      echo $FILE failed to copy
+    fi
   else
-    echo "***error: $FULLFILE does not exist"
+    echo "***error: $FROMDIR/$FILE does not exist"
   fi
 }
 
-
-
+FROMROOT=/opt/intel/oneapi/mpi/latest
+TOROOT=$TODIR
 mkdir $TOROOT
 mkdir $TOROOT/bin
 mkdir $TOROOT/lib
 mkdir $TOROOT/prov
-echo $version > $TODIR/version
 
-cp $FROMROOT/bin/hydra_bstrap_proxy $TOROOT/bin/.
+echo
+echo ***copying version info
+echo $version > $TODIR/version
 
 echo
 echo ***copying lib files
