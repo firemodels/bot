@@ -1,17 +1,23 @@
 #!/bin/bash
 version=oneapiU3
-TODIR=/tmp/INTEL
 
-TARFILE=$HOME/.bundle/BUNDLE/MPI/INTEL${version}linux_64.tar
+if [ "$version" == "" ]; then
+  echo ***error: version undefined, edit $0 to define version
+  exit
+fi
+
+INTELDIR=$HOME/.bundle
+TODIR=$INTELDIR/INTEL
+
+TARBASE=$HOME/.bundle/BUNDLE/MPI/
+TARROOT=INTEL${version}linux_64.tar
+TARFILE=$TARBASE/$TARROOT
 
 if [ -e $TODIR ]; then
   rm -rf $TODIR
 fi
 rm -f $TARFILE
 rm -f ${TARFILE}.gz
-
-FROMROOT=/opt/intel/oneapi/mpi/latest
-TOROOT=$TODIR
 
 #---------------------------------------------
 #                   CP
@@ -22,24 +28,28 @@ CP ()
   FROMDIR=$1
   TODIR=$2
   FILE=$3
-  FULLFILE=$FROMDIR/$FILE
-  if [ -e $FULLFILE ]; then
-    cp $FULLFILE $TOROOT/$TODIR/.
-    echo "$FULLFILE copied"
+  if [ -e $FROMDIR/$FILE ]; then
+    cp $FROMDIR/$FILE $TOROOT/$TODIR/$FILE
+    if [ -e $TOROOT/$TODIR/$FILE ]; then
+      echo $FILE copied
+    else
+      echo $FILE failed to copy
+    fi
   else
-    echo "***error: $FULLFILE does not exist"
+    echo "***error: $FROMDIR/$FILE does not exist"
   fi
 }
 
-
-
+FROMROOT=/opt/intel/oneapi/mpi/latest
+TOROOT=$TODIR
 mkdir $TOROOT
 mkdir $TOROOT/bin
 mkdir $TOROOT/lib
 mkdir $TOROOT/prov
-echo $version > $TODIR/version
 
-cp $FROMROOT/bin/hydra_bstrap_proxy $TOROOT/bin/.
+echo
+echo ***copying version info
+echo $version > $TODIR/version
 
 echo
 echo ***copying lib files
@@ -69,9 +79,11 @@ echo ***copying prov files
   CP /opt/intel/oneapi/mpi/latest/libfabric/lib/prov prov  libsockets-fi.so
 
 CURDIR=`pwd`
-cd /tmp
+cd $INTELDIR
 echo
-echo ***creating compressed tar file: $TARFILE
-tar cvf $TARFILE  INTEL
+echo ***creating tar file: $TARROOT
+tar cvf $TARFILE  INTEL >& /dev/null
+echo ***compressing tar file: ${TARROOT}.gz
 gzip $TARFILE
+echo ***complete
 cd $CURDIR
