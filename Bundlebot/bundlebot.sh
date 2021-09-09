@@ -5,9 +5,9 @@
 
 if [ "`uname`" == "Darwin" ]; then
 #*** OSX parameters
-  intel_mpi_version=oneapi
+  intel_mpi_version=oneapiU3
   mpi_version=4.1.0
-  openmpi_dir=/opt/openmpi410_oneapi_64
+  openmpi_dir=/opt/openmpi410_oneapiU3_64
 else
 #*** Linux parameters
   intel_mpi_version=oneapiU3
