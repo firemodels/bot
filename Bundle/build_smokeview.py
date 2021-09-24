@@ -31,6 +31,8 @@ def install_smv_lnx():  os.system("start " + webscript_dir + "webINSTALLsmv linu
 def install_smv_osx():  os.system("start " + webscript_dir + "webINSTALLsmv osx test")
 def archive_smv_lnx():  os.system("start " + webscript_dir + "webARCHIVEbundle linux test")
 def archive_smv_osx():  os.system("start " + webscript_dir + "webARCHIVEbundle osx test")
+def upload_bundle():  os.system("start " + webscript_dir + "webUPLOADsmv2git")
+def copy_bundle():    os.system("start " + webscript_dir + "webCOPYsmv")
 
 root.title('Smokeview')
 root.resizable(0, 0)
@@ -128,6 +130,9 @@ bundle_label.grid(column=0, row=R, sticky=E)
 q = Button(root, text="Bundle",     command=bundle_smv_win)
 q.grid(row=R, column=1)
 
+r = Button(root, text="Bundle",     command=bundle_smv_lnx)
+r.grid(row=R, column=2)
+
 s = Button(root, text="Bundle",     command=bundle_smv_osx)
 s.grid(row=R, column=3)
 
@@ -143,11 +148,23 @@ x.grid(row=R, column=3)
 # ------------------------- install smokeview ------------------------------
 
 R=10
+install_label = Label(root, text="Install:")
+install_label.grid(column=0, row=R, sticky=E)
 t = Button(root, text="Install",     command=install_smv_win)
 t.grid(row=R, column=1)
 u = Button(root, text="Install",     command=install_smv_lnx)
 u.grid(row=R, column=2)
 v = Button(root, text="Install",     command=install_smv_osx)
 v.grid(row=R, column=3)
+
+# ------------------------- install smokeview ------------------------------
+
+R=11
+upload_label = Label(root, text="Upload:")
+upload_label.grid(column=0, row=R, sticky=E)
+y = Button(root, text="Upload",     command=upload_bundle)
+y.grid(row=R, column=2)
+z = Button(root, text="Copy",     command=copy_bundle)
+z.grid(row=R, column=3)
 
 root.mainloop()
