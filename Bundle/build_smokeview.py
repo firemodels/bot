@@ -76,53 +76,53 @@ linux_label.grid(column=2, row=R)
 osx_label = Label(root, text="OSX")
 osx_label.grid(column=3, row=R)
 
-# ------------------------- Build smokeview ------------------------------
-
-R=6
-R2=7
-smokeview_label = Label(root, text="Smokeview:")
-smokeview_label.grid(column=0, row=R, sticky=E)
-g = Button(root, text="Build",     command=build_smv_win)
-g.grid(row=R, column=1)
-
-h = Button(root, text="Build inc", command=build_smv_win_inc)
-h.grid(row=R2, column=1)
-
-i = Button(root, text="Build",   command=build_smv_lnx)
-i.grid(row=R, column=2)
-
-j = Button(root, text="Build",     command=build_smv_osx)
-j.grid(row=R, column=3)
-
 # ------------------------- Build libraries ------------------------------
 
 R=4
 lib_label = Label(root, text="Libraries:")
 lib_label.grid(column=0, row=R, sticky=E)
-k = Button(root, text="Build",     command=build_lib_win)
-k.grid(row=R, column=1)
+g = Button(root, text="Build",     command=build_lib_win)
+g.grid(row=R, column=1)
 
-l = Button(root, text="Build",     command=build_lib_lnx)
-l.grid(row=R, column=2)
+h = Button(root, text="Build",     command=build_lib_lnx)
+h.grid(row=R, column=2)
 
-m = Button(root, text="Build",     command=build_lib_osx)
-m.grid(row=R, column=3)
+i = Button(root, text="Build",     command=build_lib_osx)
+i.grid(row=R, column=3)
 
 # ------------------------- Build utilities ------------------------------
 
 R=5
 util_label = Label(root, text="Utilities:")
 util_label.grid(column=0, row=R, sticky=E)
-n = Button(root, text="Build",     command=build_util_win)
-n.grid(row=R, column=1)
+j = Button(root, text="Build",     command=build_util_win)
+j.grid(row=R, column=1)
 
-o = Button(root, text="Build",     command=build_util_lnx)
-o.grid(row=R, column=2)
+k = Button(root, text="Build",     command=build_util_lnx)
+k.grid(row=R, column=2)
 
-p = Button(root, text="Build",     command=build_util_osx)
-p.grid(row=R, column=3)
+l = Button(root, text="Build",     command=build_util_osx)
+l.grid(row=R, column=3)
 
 # ------------------------- bundle smokeview ------------------------------
+
+# ------------------------- Build smokeview ------------------------------
+
+R=6
+R2=7
+smokeview_label = Label(root, text="Smokeview:")
+smokeview_label.grid(column=0, row=R, sticky=E)
+m = Button(root, text="Build",     command=build_smv_win)
+m.grid(row=R, column=1)
+
+n = Button(root, text="Build inc", command=build_smv_win_inc)
+n.grid(row=R2, column=1)
+
+o = Button(root, text="Build",   command=build_smv_lnx)
+o.grid(row=R, column=2)
+
+p = Button(root, text="Build",     command=build_smv_osx)
+p.grid(row=R, column=3)
 
 R=8
 bundle_label = Label(root, text="Bundle:")
@@ -139,23 +139,23 @@ s.grid(row=R, column=3)
 # ------------------------- archive smokeview ------------------------------
 
 R=9
-w = Button(root, text="Archive",   command=archive_smv_lnx)
-w.grid(row=R, column=2)
+t = Button(root, text="Archive",   command=archive_smv_lnx)
+t.grid(row=R, column=2)
 
-x = Button(root, text="Archive",     command=archive_smv_osx)
-x.grid(row=R, column=3)
+u = Button(root, text="Archive",     command=archive_smv_osx)
+u.grid(row=R, column=3)
 
 # ------------------------- install smokeview ------------------------------
 
 R=10
 install_label = Label(root, text="Install:")
 install_label.grid(column=0, row=R, sticky=E)
-t = Button(root, text="Install",     command=install_smv_win)
-t.grid(row=R, column=1)
-u = Button(root, text="Install",     command=install_smv_lnx)
-u.grid(row=R, column=2)
-v = Button(root, text="Install",     command=install_smv_osx)
-v.grid(row=R, column=3)
+v = Button(root, text="Install",     command=install_smv_win)
+v.grid(row=R, column=1)
+w = Button(root, text="Install",     command=install_smv_lnx)
+w.grid(row=R, column=2)
+x = Button(root, text="Install",     command=install_smv_osx)
+x.grid(row=R, column=3)
 
 # ------------------------- install smokeview ------------------------------
 
@@ -164,7 +164,7 @@ upload_label = Label(root, text="Upload:")
 upload_label.grid(column=0, row=R, sticky=E)
 y = Button(root, text="Upload",     command=upload_bundle)
 y.grid(row=R, column=2)
-z = Button(root, text="Copy",     command=copy_bundle)
+z = Button(root, text="Copy",       command=copy_bundle)
 z.grid(row=R, column=3)
 
 root.mainloop()
