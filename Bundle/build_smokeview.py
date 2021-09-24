@@ -33,6 +33,8 @@ def archive_smv_lnx():  os.system("start " + webscript_dir + "webARCHIVEbundle l
 def archive_smv_osx():  os.system("start " + webscript_dir + "webARCHIVEbundle osx test")
 def upload_bundle():  os.system("start " + webscript_dir + "webUPLOADsmv2git")
 def copy_bundle():    os.system("start " + webscript_dir + "webCOPYsmv")
+def webCOPYhome2config():    os.system("start " + webscript_dir + "webCOPYhome2config")
+def webCOPYconfig2home():    os.system("start " + webscript_dir + "webCOPYconfig2home")
 
 root.title('Smokeview')
 root.resizable(0, 0)
@@ -104,8 +106,6 @@ k.grid(row=R, column=2)
 l = Button(root, text="Build",     command=build_util_osx)
 l.grid(row=R, column=3)
 
-# ------------------------- bundle smokeview ------------------------------
-
 # ------------------------- Build smokeview ------------------------------
 
 R=6
@@ -123,6 +123,8 @@ o.grid(row=R, column=2)
 
 p = Button(root, text="Build",     command=build_smv_osx)
 p.grid(row=R, column=3)
+
+# ------------------------- bundle smokeview ------------------------------
 
 R=8
 bundle_label = Label(root, text="Bundle:")
@@ -166,5 +168,24 @@ y = Button(root, text="Upload",     command=upload_bundle)
 y.grid(row=R, column=2)
 z = Button(root, text="Copy",       command=copy_bundle)
 z.grid(row=R, column=3)
+
+# ------------------------- synchronize ------------------------------
+
+R=12
+synch_label = Label(root, text="settings:")
+synch_label.grid(column=0, row=R, sticky=E)
+aa = Button(root, text="settings==>>smv",     command=webCOPYhome2config)
+aa.grid(row=R, column=1)
+bb = Button(root, text="settings<<==smv",     command=webCOPYconfig2home)
+bb.grid(row=R, column=2)
+
+
+R=13
+gsmv_label = Label(root, text="gsmv/bib:")
+gsmv_label.grid(column=0, row=R, sticky=E)
+cc = Button(root, text="fds==>>smv",     command=webCOPYhome2config)
+cc.grid(row=R, column=1)
+dd = Button(root, text="fds<<==smv",     command=webCOPYconfig2home)
+dd.grid(row=R, column=2)
 
 root.mainloop()
