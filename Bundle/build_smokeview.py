@@ -52,11 +52,15 @@ root.resizable(0, 0)
 # ------------------------- Show repo revisions ------------------------------
 
 R=0
+repos_label = Label(root, text="Repos")
+repos_label.grid(column=1, row=R, columnspan=2)
+
+R=R+1
 show_label = Label(root, text="Show:")
 show_label.grid(column=0, row=R, sticky=E)
 b = Button(root, text="Branch",       command=show_branch)
 b.grid(row=R, column=1)
-c = Button(root, text="Repos",        command=show_repos)
+c = Button(root, text="Revision",        command=show_repos)
 c.grid(row=R, column=2)
 
 # ------------------------- Update repos ------------------------------
@@ -68,12 +72,24 @@ d = Button(root, text="Windows",    command=update_windows)
 d.grid(row=R, column=1)
 
 e = Button(root, text="All",        command=update_all)
-e.grid(row=1, column=2)
+e.grid(row=R, column=2)
+
+# ------------------------- Set bundle revision ------------------------------
+
+R=R+1
+set_label = Label(root, text="Bundle revision")
+set_label.grid(column=1, row=R)
+R=R+1
+f = Button(root, text="Set",      command=set_revision)
+f.grid(row=R, column=1)
 
 # ------------------------- clean ------------------------------
 
 R=R+1
-set_clean_repos = Label(root, text="Clean repos:")
+clean_label = Label(root, text="Clean")
+clean_label.grid(column=1, row=R, columnspan=2)
+R=R+1
+set_clean_repos = Label(root, text="repos:")
 set_clean_repos.grid(column=0, row=R, sticky=E)
 ee = Button(root, text="Windows",      command=clean_repos_win)
 ee.grid(row=R, column=1)
@@ -81,7 +97,7 @@ ff = Button(root, text="All",      command=clean_repos_all)
 ff.grid(row=R, column=2)
 
 R=R+1
-set_clean_uploads = Label(root, text="Clean uploads:")
+set_clean_uploads = Label(root, text="uploads:")
 set_clean_uploads.grid(column=0, row=R, sticky=E)
 gg = Button(root, text="Windows",      command=clean_uploads_win)
 gg.grid(row=R, column=1)
@@ -89,22 +105,18 @@ hh = Button(root, text="All",      command=clean_uploads_all)
 hh.grid(row=R, column=2)
 
 R=R+1
-set_clean_smv = Label(root, text="Clean SMV build:")
+set_clean_smv = Label(root, text="SMV build dirs:")
 set_clean_smv.grid(column=0, row=R, sticky=E)
 ii = Button(root, text="Windows",      command=clean_smv_win)
 ii.grid(row=R, column=1)
 jj = Button(root, text="All",      command=clean_smv_all)
 jj.grid(row=R, column=2)
 
-# ------------------------- Set bundle revision ------------------------------
+# ------------------------- Platform labels ------------------------------
 
 R=R+1
-set_label = Label(root, text="Set:")
-set_label.grid(column=0, row=R, sticky=E)
-f = Button(root, text="Bundle Revision",      command=set_revision)
-f.grid(row=R, column=1)
-
-# ------------------------- Platform labels ------------------------------
+build_label = Label(root, text="Build libraries/utilities")
+build_label.grid(column=1, row=R, columnspan=3)
 
 R=R+1
 windows_label = Label(root, text="Windows")
@@ -143,6 +155,18 @@ l = Button(root, text="Build",     command=build_util_osx)
 l.grid(row=R, column=3)
 
 # ------------------------- Build smokeview ------------------------------
+
+R=R+1
+build2_label = Label(root, text="Test Smokeview")
+build2_label.grid(column=1, row=R, columnspan=3)
+
+R=R+1
+windows2_label = Label(root, text="Windows")
+windows2_label.grid(column=1, row=R)
+linux2_label = Label(root, text="Linux")
+linux2_label.grid(column=2, row=R)
+osx2_label = Label(root, text="OSX")
+osx2_label.grid(column=3, row=R)
 
 R=R+1
 R2=R+1
@@ -208,11 +232,14 @@ z.grid(row=R, column=3)
 # ------------------------- synchronize ------------------------------
 
 R=R+1
-synch_label = Label(root, text="settings:")
-synch_label.grid(column=0, row=R, sticky=E)
-aa = Button(root, text="settings==>>smv",     command=webCOPYhome2config)
+synch_label = Label(root, text="Sychronize")
+synch_label.grid(column=1, row=R, columnspan=2)
+R=R+1
+synch2_label = Label(root, text="settings:")
+synch2_label.grid(column=0, row=R, sticky=E)
+aa = Button(root, text="==>>smv",     command=webCOPYhome2config)
 aa.grid(row=R, column=1)
-bb = Button(root, text="settings<<==smv",     command=webCOPYconfig2home)
+bb = Button(root, text="<<==smv",     command=webCOPYconfig2home)
 bb.grid(row=R, column=2)
 
 
