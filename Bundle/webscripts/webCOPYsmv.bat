@@ -17,6 +17,7 @@ goto:eof
 :endif_envexist
 
 %svn_drive%
+call %envfile%
 
 set uploaddir=%userprofile%\.bundle\uploads
 set "googledir=%userprofile%\Google Drive\SMV_Test_Versions\"
