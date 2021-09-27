@@ -45,6 +45,12 @@ def clean_uploads_win():  os.system("start " + webscript_dir + "webCleanUploadWi
 def clean_uploads_all():  os.system("start " + webscript_dir + "webCleanUploadAll")
 def clean_smv_win():      os.system("start " + webscript_dir + "webCleanWinSMVobjs")
 def clean_smv_all():      os.system("start " + webscript_dir + "webCleanSMVobjs")
+def set_branch():         os.system("start " + webscript_dir + "webSET_branches")
+def add_notes():          os.system("start " + webscript_dir + "webGET_smvlog")
+def edit_notes():         os.system("start " + webscript_dir + "webEDIT_release_notes")
+def view_notes():         os.system("start " + webscript_dir + "webVIEW_release_notes")
+def edit_this_page():     os.system("start " + webscript_dir + "webEDIT_build_smokeview_py")
+def edit_settings():      os.system("start " + webscript_dir + "webEDIT_setup")
 
 root.title('Smokeview')
 root.resizable(0, 0)
@@ -74,14 +80,15 @@ d.grid(row=R, column=1)
 e = Button(root, text="All",        command=update_all)
 e.grid(row=R, column=2)
 
-# ------------------------- Set bundle revision ------------------------------
+# ------------------------- Set  ------------------------------
 
 R=R+1
-set_label = Label(root, text="Bundle revision")
-set_label.grid(column=1, row=R)
-R=R+1
-f = Button(root, text="Set",      command=set_revision)
+set_label = Label(root, text="Set:")
+set_label.grid(column=0, row=R, sticky=E)
+f = Button(root, text="Bundle rev",      command=set_revision)
 f.grid(row=R, column=1)
+f = Button(root, text="Master branch",      command=set_branch)
+f.grid(row=R, column=2)
 
 # ------------------------- clean ------------------------------
 
@@ -111,6 +118,29 @@ ii = Button(root, text="Windows",      command=clean_smv_win)
 ii.grid(row=R, column=1)
 jj = Button(root, text="All",      command=clean_smv_all)
 jj.grid(row=R, column=2)
+
+# ------------------------- Edit ------------------------------
+
+R=R+1
+edit_label = Label(root, text="Edit")
+edit_label.grid(column=1, row=R, columnspan=3)
+R=R+1
+release_notes = Label(root, text="Release notes:")
+release_notes.grid(column=0, row=R, sticky=E)
+aaa = Button(root, text="Add",      command=add_notes)
+aaa.grid(row=R, column=1)
+bbb = Button(root, text="Edit",      command=edit_notes)
+bbb.grid(row=R, column=2)
+ccc = Button(root, text="View",      command=view_notes)
+ccc.grid(row=R, column=3)
+
+R=R+1
+release_notes = Label(root, text="Edit:")
+release_notes.grid(column=0, row=R, sticky=E)
+ddd = Button(root, text="This script",      command=edit_this_page)
+ddd.grid(row=R, column=1)
+eee = Button(root, text="Settings",      command=edit_settings)
+eee.grid(row=R, column=2)
 
 # ------------------------- Platform labels ------------------------------
 
