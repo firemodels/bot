@@ -61,20 +61,17 @@ root.resizable(0, 0)
 # ------------------------- Show repo revisions ------------------------------
 
 R=0
-repos_label = Label(root, text="Repos")
-repos_label.grid(column=1, row=R, columnspan=2)
+Label(root, text="Repos").grid(column=1, row=R, columnspan=2)
 
 R=R+1
-show_label = Label(root, text="Show:")
-show_label.grid(column=0, row=R, sticky=E)
+Label(root, text="Show:").grid(column=0, row=R, sticky=E)
 Button(root, text="Branch",       command=show_branch).grid(row=R, column=1)
 Button(root, text="Revision",     command=show_repos).grid(row=R, column=2)
 
 # ------------------------- Update repos ------------------------------
 
 R=R+1
-update_label = Label(root, text="Update:")
-update_label.grid(column=0, row=R, sticky=E)
+Label(root, text="Update:").grid(column=0, row=R, sticky=E)
 Button(root, text="Windows",    command=update_windows).grid(row=R, column=1)
 Button(root, text="All",        command=update_all).grid(row=R, column=2)
 
