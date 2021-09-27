@@ -1,5 +1,6 @@
 from sys import platform
 import sys
+from functools import partial
 
 if platform != "win32":
   print("***error: this script only runs on Windows computers")
@@ -17,47 +18,42 @@ bot_repo = repo_root + "bot\\"
 smv_repo = repo_root + "smv\\"
 webscript_dir  = bot_repo + "Bundle\\webscripts\\"
 
+def restart_program():
+    python = sys.executable
+    os.execl(python, python, * sys.argv)
+
 # link windows batch files to python commands
 
-def show_branch():        os.system("start " + webscript_dir + "webSHOW_branches")
-def show_repos():         os.system("start " + webscript_dir + "webSHOW_revisions")
-def update_windows():     os.system("start " + webscript_dir + "webUPDATEwindowsrepos")
-def update_all():         os.system("start " + webscript_dir + "webUPDATErepos")
-def set_revision():       os.system("start " + webscript_dir + "webSET_bundle_revision")
-def build_smv_win_inc():  os.system("start " + webscript_dir + "webBUILDsmv windows testinc")
-def build_smv_win():      os.system("start " + webscript_dir + "webBUILDsmv windows test")
-def build_smv_lnx():      os.system("start " + webscript_dir + "webBUILDsmv linux test")
-def build_smv_osx():      os.system("start " + webscript_dir + "webBUILDsmv osx test")
-def build_lib_win():      os.system("start " + webscript_dir + "webBUILDlibs windows")
-def build_lib_lnx():      os.system("start " + webscript_dir + "webBUILDlibs linux")
-def build_lib_osx():      os.system("start " + webscript_dir + "webBUILDlibs osx")
-def build_util_win():     os.system("start " + webscript_dir + "webBUILDallprog windows")
-def build_util_lnx():     os.system("start " + webscript_dir + "webBUILDallprog linux")
-def build_util_osx():     os.system("start " + webscript_dir + "webBUILDallprog osx")
-def bundle_smv_win():     os.system("start " + webscript_dir + "webPACKAGEsmv windows test")
-def bundle_smv_lnx():     os.system("start " + webscript_dir + "webPACKAGEsmv linux test")
-def bundle_smv_osx():     os.system("start " + webscript_dir + "webPACKAGEsmv osx test")
-def install_smv_win():    os.system("start " + webscript_dir + "webINSTALLsmv windows test")
-def install_smv_lnx():    os.system("start " + webscript_dir + "webINSTALLsmv linux test")
-def install_smv_osx():    os.system("start " + webscript_dir + "webINSTALLsmv osx test")
-def archive_smv_lnx():    os.system("start " + webscript_dir + "webARCHIVEbundle linux test")
-def archive_smv_osx():    os.system("start " + webscript_dir + "webARCHIVEbundle osx test")
-def upload_bundle():      os.system("start " + webscript_dir + "webUPLOADsmv2git")
-def copy_bundle():        os.system("start " + webscript_dir + "webCOPYsmv")
-def webCOPYhome2config(): os.system("start " + webscript_dir + "webCOPYhome2config")
-def webCOPYconfig2home(): os.system("start " + webscript_dir + "webCOPYconfig2home")
-def clean_repos_win():    os.system("start " + webscript_dir + "webclean_win")
-def clean_repos_all():    os.system("start " + webscript_dir + "webclean_all")
-def clean_uploads_win():  os.system("start " + webscript_dir + "webCleanUploadWin")
-def clean_uploads_all():  os.system("start " + webscript_dir + "webCleanUploadAll")
-def clean_smv_win():      os.system("start " + webscript_dir + "webCleanWinSMVobjs")
-def clean_smv_all():      os.system("start " + webscript_dir + "webCleanSMVobjs")
-def set_branch():         os.system("start " + webscript_dir + "webSET_branches")
-def add_notes():          os.system("start " + webscript_dir + "webGET_smvlog")
-def edit_notes():         os.system("start " + webscript_dir + "webEDIT_release_notes")
-def view_notes():         os.system("start " + webscript_dir + "webVIEW_release_notes")
-def edit_this_page():     os.system("start " + webscript_dir + "webEDIT_build_smokeview_py")
-def edit_settings():      os.system("start " + webscript_dir + "webEDIT_setup")
+def show_branch():                 os.system("start " + webscript_dir + "webSHOW_branches")
+def show_repos():                  os.system("start " + webscript_dir + "webSHOW_revisions")
+def update_windows():              os.system("start " + webscript_dir + "webUPDATEwindowsrepos")
+def update_all():                  os.system("start " + webscript_dir + "webUPDATErepos")
+def set_revision():                os.system("start " + webscript_dir + "webSET_bundle_revision")
+def build_smv_win_inc():           os.system("start " + webscript_dir + "webBUILDsmv windows testinc")
+def build_smv(platform, option):   os.system("start " + webscript_dir + "webBUILDsmv "      + platform + " " + option )
+def build_lib(platform):           os.system("start " + webscript_dir + "webBUILDlibs "     + platform)
+def build_util(platform):          os.system("start " + webscript_dir + "webBUILDallprog "  + platform)
+def bundle_smv(platform, option):  os.system("start " + webscript_dir + "webPACKAGEsmv "    + platform + " " + option )
+def install_smv(platform, option): os.system("start " + webscript_dir + "webINSTALLsmv "    + platform + " " + option )
+def archive_smv(platform, option): os.system("start " + webscript_dir + "webARCHIVEbundle " + platform + " " + option )
+def upload_bundle():               os.system("start " + webscript_dir + "webUPLOADsmv2git")
+def copy_bundle():                 os.system("start " + webscript_dir + "webCOPYsmv")
+def webCOPYhome2config():          os.system("start " + webscript_dir + "webCOPYhome2config")
+def webCOPYconfig2home():          os.system("start " + webscript_dir + "webCOPYconfig2home")
+def webSYNCHfds2smv():             os.system("start " + webscript_dir + "webSYNCHfds2smv")
+def webSYNCHsmv2fds():             os.system("start " + webscript_dir + "webSYNCHsmv2fds")
+def clean_repos_win():             os.system("start " + webscript_dir + "webclean_win")
+def clean_repos_all():             os.system("start " + webscript_dir + "webclean_all")
+def clean_uploads_win():           os.system("start " + webscript_dir + "webCleanUploadWin")
+def clean_uploads_all():           os.system("start " + webscript_dir + "webCleanUploadAll")
+def clean_smv_win():               os.system("start " + webscript_dir + "webCleanWinSMVobjs")
+def clean_smv_all():               os.system("start " + webscript_dir + "webCleanSMVobjs")
+def set_branch():                  os.system("start " + webscript_dir + "webSET_branches")
+def add_notes():                   os.system("start " + webscript_dir + "webGET_smvlog")
+def edit_notes():                  os.system("start " + webscript_dir + "webEDIT_release_notes")
+def view_notes():                  os.system("start " + webscript_dir + "webVIEW_release_notes")
+def edit_this_page():              os.system("start " + webscript_dir + "webEDIT_build_smokeview_py")
+def edit_settings():               os.system("start " + webscript_dir + "webEDIT_setup")
 
 root.title('Smokeview')
 root.resizable(0, 0)
@@ -168,13 +164,13 @@ osx_label.grid(column=3, row=R)
 R=R+1
 lib_label = Label(root, text="Libraries:")
 lib_label.grid(column=0, row=R, sticky=E)
-g = Button(root, text="Build",     command=build_lib_win)
+g = Button(root, text="Build",     command=partial(build_lib, "windows"))
 g.grid(row=R, column=1)
 
-h = Button(root, text="Build",     command=build_lib_lnx)
+h = Button(root, text="Build",     command=partial(build_lib, "linux"))
 h.grid(row=R, column=2)
 
-i = Button(root, text="Build",     command=build_lib_osx)
+i = Button(root, text="Build",     command=partial(build_lib, "osx"))
 i.grid(row=R, column=3)
 
 # ------------------------- Build utilities ------------------------------
@@ -182,13 +178,13 @@ i.grid(row=R, column=3)
 R=R+1
 util_label = Label(root, text="Utilities:")
 util_label.grid(column=0, row=R, sticky=E)
-j = Button(root, text="Build",     command=build_util_win)
+j = Button(root, text="Build",     command=partial(build_util, "windows"))
 j.grid(row=R, column=1)
 
-k = Button(root, text="Build",     command=build_util_lnx)
+k = Button(root, text="Build",     command=partial(build_util, "linux"))
 k.grid(row=R, column=2)
 
-l = Button(root, text="Build",     command=build_util_osx)
+l = Button(root, text="Build",     command=partial(build_util, "osx"))
 l.grid(row=R, column=3)
 
 # ------------------------- Build smokeview ------------------------------
@@ -209,16 +205,16 @@ R=R+1
 R2=R+1
 smokeview_label = Label(root, text="Smokeview:")
 smokeview_label.grid(column=0, row=R, sticky=E)
-m = Button(root, text="Build",     command=build_smv_win)
+m = Button(root, text="Build",     command=partial(build_smv, "windows", "test") )
 m.grid(row=R, column=1)
 
 n = Button(root, text="Build inc", command=build_smv_win_inc)
 n.grid(row=R2, column=1)
 
-o = Button(root, text="Build",   command=build_smv_lnx)
+o = Button(root, text="Build",     command=partial(build_smv, "linux", "test") )
 o.grid(row=R, column=2)
 
-p = Button(root, text="Build",     command=build_smv_osx)
+p = Button(root, text="Build",     command=partial(build_smv, "osx", "test") )
 p.grid(row=R, column=3)
 
 # ------------------------- bundle smokeview ------------------------------
@@ -226,22 +222,22 @@ p.grid(row=R, column=3)
 R=R+2
 bundle_label = Label(root, text="Bundle:")
 bundle_label.grid(column=0, row=R, sticky=E)
-q = Button(root, text="Bundle",     command=bundle_smv_win)
+q = Button(root, text="Bundle",     command=partial(bundle_smv, "windows", "test"))
 q.grid(row=R, column=1)
 
-r = Button(root, text="Bundle",     command=bundle_smv_lnx)
+r = Button(root, text="Bundle",     command=partial(bundle_smv, "linux", "test"))
 r.grid(row=R, column=2)
 
-s = Button(root, text="Bundle",     command=bundle_smv_osx)
+s = Button(root, text="Bundle",     command=partial(bundle_smv, "osx", "test"))
 s.grid(row=R, column=3)
 
 # ------------------------- archive smokeview ------------------------------
 
 R=R+1
-t = Button(root, text="Archive",   command=archive_smv_lnx)
+t = Button(root, text="Archive",   command=partial(archive_smv, "linux", "test"))
 t.grid(row=R, column=2)
 
-u = Button(root, text="Archive",     command=archive_smv_osx)
+u = Button(root, text="Archive",   command=partial(archive_smv, "osx", "test"))
 u.grid(row=R, column=3)
 
 # ------------------------- install smokeview ------------------------------
@@ -249,14 +245,14 @@ u.grid(row=R, column=3)
 R=R+1
 install_label = Label(root, text="Install:")
 install_label.grid(column=0, row=R, sticky=E)
-v = Button(root, text="Install",     command=install_smv_win)
+v = Button(root, text="Install",     command=partial(install_smv, "windows", "test"))
 v.grid(row=R, column=1)
-w = Button(root, text="Install",     command=install_smv_lnx)
+w = Button(root, text="Install",     command=partial(install_smv, "linux", "test"))
 w.grid(row=R, column=2)
-x = Button(root, text="Install",     command=install_smv_osx)
+x = Button(root, text="Install",     command=partial(install_smv, "osx", "test"))
 x.grid(row=R, column=3)
 
-# ------------------------- install smokeview ------------------------------
+# ------------------------- upload smv bundle ------------------------------
 
 R=R+1
 upload_label = Label(root, text="Upload:")
@@ -283,9 +279,13 @@ bb.grid(row=R, column=2)
 R=R+1
 gsmv_label = Label(root, text="gsmv/bib:")
 gsmv_label.grid(column=0, row=R, sticky=E)
-cc = Button(root, text="fds==>>smv",     command=webCOPYhome2config)
+cc = Button(root, text="fds==>>smv",     command=webSYNCHfds2smv)
 cc.grid(row=R, column=1)
-dd = Button(root, text="fds<<==smv",     command=webCOPYconfig2home)
+dd = Button(root, text="fds<<==smv",     command=webSYNCHsmv2fds)
 dd.grid(row=R, column=2)
+
+R=R+1
+Button(root, text="Refresh", command=restart_program).grid(row=R, column=0)
+
 
 root.mainloop()
