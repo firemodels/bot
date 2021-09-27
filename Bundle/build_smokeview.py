@@ -1,3 +1,10 @@
+from sys import platform
+import sys
+
+if platform != "win32":
+  print("***error: this script only runs on Windows computers")
+  sys.exit()
+
 from tkinter import *
 import os
 
@@ -10,7 +17,7 @@ bot_repo = repo_root + "bot\\"
 smv_repo = repo_root + "smv\\"
 webscript_dir  = bot_repo + "Bundle\\webscripts\\"
 
-# link winows batch files to python commands
+# link windows batch files to python commands
 
 def show_branch():        os.system("start " + webscript_dir + "webSHOW_branches")
 def show_repos():         os.system("start " + webscript_dir + "webSHOW_revisions")
