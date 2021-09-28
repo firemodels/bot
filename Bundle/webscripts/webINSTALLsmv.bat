@@ -32,7 +32,7 @@ if "%buildtype%" == "release" (
 
 %svn_drive%
 
-if "%platform%" == "windows" (
+if "%platform%" == "Windows" (
   cd %userprofile%\.bundle\uploads
   if "%buildtype%" == "test" (
     echo Installer:  %smv_revision%_win.exe
@@ -45,7 +45,7 @@ if "%platform%" == "windows" (
   echo update complete
   goto eof
 )
-if "%platform%" == "linux" (
+if "%platform%" == "Linux" (
   if "%buildtype%" == "test" (
     plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/run_command2.sh $HOME/.bundle/uploads %smv_revision%_lnx.sh y
   )
@@ -55,7 +55,7 @@ if "%platform%" == "linux" (
   pause > Nul
   goto eof
 )
-if "%platform%" == "osx" (
+if "%platform%" == "OSX" (
   if "%buildtype%" == "test" (
     plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/run_command2.sh $HOME/.bundle/uploads %smv_revision%_osx.sh y
   )

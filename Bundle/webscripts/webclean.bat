@@ -1,4 +1,5 @@
 @echo off
+setlocal EnableDelayedExpansion
 set platform=%1
 
 :: batch file used to update Windows, Linux and OSX GIT repos
@@ -39,7 +40,7 @@ git clean -dxf
 echo Cleaning %svn_root%\smv\Build
 cd %svn_root%\smv\Build
 git clean -dxf
-if "%platform% == "Windows" goto eof
+if "%platform%" == "Windows" goto eof
 
 set scriptdir=%linux_svn_root%/bot/Bundle/fds/scripts/
 

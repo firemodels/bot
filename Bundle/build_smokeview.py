@@ -45,7 +45,7 @@ def build_lib():                   os.system("start " + webscript_dir + "webBUIL
 def build_util():                  os.system("start " + webscript_dir + "webBUILDallprog "  + platforms[v.get()])
 def bundle_smv():                  os.system("start " + webscript_dir + "webPACKAGEsmv "    + platforms[v.get()] + " " + "test" )
 def install_smv():                 os.system("start " + webscript_dir + "webINSTALLsmv "    + platforms[v.get()] + " " + "test" )
-def archive_smv(): os.system("start " + webscript_dir + "webARCHIVEAllbundle"  )
+def archive_smv():                 os.system("start " + webscript_dir + "webARCHIVEAllbundle"  )
 def upload_bundle():               os.system("start " + webscript_dir + "webUPLOADsmv2git")
 def copy_bundle():                 os.system("start " + webscript_dir + "webCOPYsmv")
 def webCOPYhome2config():          os.system("start " + webscript_dir + "webCOPYhome2config")
@@ -110,9 +110,9 @@ Radiobutton(root,
 
 R=R+1
 Label(root, text="Clean:").grid(column=0, row=R)
-Button(root, text="Repos",   width=button_width, command=clean_repos).grid(row=R,     column=1)
+Button(root, text="Repos",   width=button_width, command=clean_repos).grid(row=R,   column=1)
 Button(root, text="Uploads", width=button_width, command=clean_uploads).grid(row=R, column=2)
-Button(root, text="SMV",     width=button_width, command=clean_smv).grid(row=R,         column=3)
+Button(root, text="SMV",     width=button_width, command=clean_smv).grid(row=R,     column=3)
 
 # ------------------------- Edit ------------------------------
 
@@ -172,11 +172,12 @@ Button(root, text="INC",         width=button_width, command=build_smv_win_inc).
 R=R+1
 Button(root, text="Bundle",  width=button_width, command=bundle_smv).grid(row=R, column=0)
 Button(root, text="Install", width=button_width, command=install_smv).grid(row=R, column=1)
-Button(root, text="Upload",  width=button_width, command=upload_bundle).grid(row=R, column=2)
-Button(root, text="Copy",    width=button_width, command=copy_bundle).grid(row=R, column=3)
+
 
 R=R+1
-Button(root, text="Archive", width=button_width, command=archive_smv).grid(row=R, column=0)
+Button(root, text="Upload",  width=button_width, command=upload_bundle).grid(row=R, column=0)
+Button(root, text="Copy",    width=button_width, command=copy_bundle).grid(row=R, column=1)
+Button(root, text="Archive", width=button_width, command=archive_smv).grid(row=R, column=2)
 
 # ------------------------- synchronize ------------------------------
 

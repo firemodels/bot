@@ -28,6 +28,7 @@ cd "%userprofile%\.bundle"
 rmdir /q /s uploads
 mkdir uploads
 if "%platform%" == "Windows" goto eof
+
 echo.
 echo *** linux
 plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/run_command.sh bot/Bundle/fds/scripts clean_upload.sh

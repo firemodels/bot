@@ -23,7 +23,7 @@ call %envfile%
 
 :: windows
 
-if "%platform%" == "windows" (
+if "%platform%" == "Windows" (
   title building libraries for windows using the Intel compilers
   cd %svn_root%\smv\Build\LIBS\intel_win_64
   make_LIBS
@@ -66,7 +66,7 @@ if "%platform%" == "osxquartz" (
 
 :: osx
 
-if "%platform%" == "osx" (
+if "%platform%" == "OSX" (
   title building libraries for osx - non Quartz
   start /wait "cleaning osx libraries" plink %plink_options% %osx_logon% %linux_svn_root%/smv/Build/LIBS/intel_osx_64/make_LIBS.sh -t clean
   start "building osx glui library" plink %plink_options% %osx_logon% %linux_svn_root%/smv/Build/LIBS/intel_osx_64/make_LIBS.sh -Q -t glui
@@ -93,7 +93,7 @@ if "%platform%" == "gnulinux" (
 
 :: linux
 
-if "%platform%" == "linux" (
+if "%platform%" == "Linux" (
   title building libraries for linux
   start /wait "cleaning linux libraries" plink %plink_options% %linux_logon% %linux_svn_root%/smv/Build/LIBS/intel_linux_64/make_LIBS.sh    -t clean
   start "building linux glut library" plink %plink_options% %linux_logon% %linux_svn_root%/smv/Build/LIBS/intel_linux_64/make_LIBS.sh -t glut
