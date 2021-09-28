@@ -27,6 +27,9 @@ platforms = ["", "Windows", "Linux", "OSX"]
 v=IntVar()
 v.set(1)
 
+w=IntVar()
+w.set(1)
+
 # link windows batch files to python commands
 
 def show_branch():                 os.system("start " + webscript_dir + "webSHOW_branches")
@@ -47,12 +50,9 @@ def webCOPYhome2config():          os.system("start " + webscript_dir + "webCOPY
 def webCOPYconfig2home():          os.system("start " + webscript_dir + "webCOPYconfig2home")
 def webSYNCHfds2smv():             os.system("start " + webscript_dir + "webSYNCHfds2smv")
 def webSYNCHsmv2fds():             os.system("start " + webscript_dir + "webSYNCHsmv2fds")
-def clean_repos_win():             os.system("start " + webscript_dir + "webclean_win")
-def clean_repos_all():             os.system("start " + webscript_dir + "webclean_all")
-def clean_uploads_win():           os.system("start " + webscript_dir + "webCleanUploadWin")
-def clean_uploads_all():           os.system("start " + webscript_dir + "webCleanUploadAll")
-def clean_smv_win():               os.system("start " + webscript_dir + "webCleanWinSMVobjs")
-def clean_smv_all():               os.system("start " + webscript_dir + "webCleanSMVobjs")
+def clean_repos():                 os.system("start " + webscript_dir + "webclean "       + platforms[w.get()])
+def clean_uploads():               os.system("start " + webscript_dir + "webCleanUpload " + platforms[w.get()])
+def clean_smv():                   os.system("start " + webscript_dir + "webCleanSMV "    + platforms[w.get()])
 def set_branch():                  os.system("start " + webscript_dir + "webSET_branches")
 def add_notes():                   os.system("start " + webscript_dir + "webGET_smvlog")
 def edit_notes():                  os.system("start " + webscript_dir + "webEDIT_release_notes")
@@ -90,22 +90,27 @@ Button(root, text="Master",   command=set_branch).grid(row=R, column=2)
 # ------------------------- clean ------------------------------
 
 R=R+1
-Label(root, text="Clean").grid(column=0, row=R, columnspan=3)
+Label(root, text="Clean").grid(column=0, row=R, columnspan=4)
 
 R=R+1
-Label(root, text="repos:").grid(column=0, row=R, sticky=E)
-Button(root, text="Windows",  command=clean_repos_win).grid(row=R, column=1)
-Button(root, text="All",      command=clean_repos_all).grid(row=R, column=2)
+
+Radiobutton(root, 
+               text="Windows",
+               padx = 0, 
+               variable=w, 
+               value=1).grid(row=R, column=0)
+
+Radiobutton(root, 
+               text="All",
+               padx = 0, 
+               variable=w, 
+               value=2).grid(row=R, column=1)
 
 R=R+1
-Label(root, text="uploads:").grid(column=0, row=R, sticky=E)
-Button(root, text="Windows",  command=clean_uploads_win).grid(row=R, column=1)
-Button(root, text="All",      command=clean_uploads_all).grid(row=R, column=2)
-
-R=R+1
-Label(root, text="SMV build:").grid(column=0, row=R, sticky=E)
-Button(root, text="Windows",  command=clean_smv_win).grid(row=R, column=1)
-Button(root, text="All",      command=clean_smv_all).grid(row=R, column=2)
+Label(root, text="Clean:").grid(column=0, row=R)
+Button(root, text="Repos",  command=clean_repos).grid(row=R,     column=1)
+Button(root, text="Uploads",  command=clean_uploads).grid(row=R, column=2)
+Button(root, text="SMV",  command=clean_smv).grid(row=R,         column=3)
 
 # ------------------------- Edit ------------------------------
 

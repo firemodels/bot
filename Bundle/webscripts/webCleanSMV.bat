@@ -1,5 +1,6 @@
 @echo off
 setlocal EnableDelayedExpansion
+set platform=%1
 
 :: batch file to install the FDS-SMV bundle on Windows, Linux or OSX systems
 
@@ -26,6 +27,7 @@ echo cleaning smokeview build directories
 echo *** windows
 cd %svn_root%\smv\Build\smokeview\intel_win_64
 git clean -dxf
+if "%platform%" == "Windows" goto eof
 
 echo.
 echo *** linux
@@ -40,5 +42,6 @@ plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/clean.sh       sm
 plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/clean.sh       smv/Build/smokeview/gnu_osx_64 
 
 
+:eof
 echo.
 pause

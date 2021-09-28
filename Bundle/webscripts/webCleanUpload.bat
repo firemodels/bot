@@ -1,5 +1,6 @@
 @echo off
 setlocal EnableDelayedExpansion
+set platform=%1
 
 :: batch file to install the FDS-SMV bundle on Windows, Linux or OSX systems
 
@@ -26,7 +27,7 @@ echo cleaning "%userprofile%\.bundle\uploads"
 cd "%userprofile%\.bundle"
 rmdir /q /s uploads
 mkdir uploads
-
+if "%platform%" == "Windows" goto eof
 echo.
 echo *** linux
 plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/run_command.sh bot/Bundle/fds/scripts clean_upload.sh
@@ -35,5 +36,6 @@ echo.
 echo *** osx
 plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/run_command.sh bot/Bundle/fds/scripts clean_upload.sh
 
+:eof
 echo.
 pause
