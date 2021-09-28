@@ -39,7 +39,7 @@ def show_repos():                  os.system("start " + webscript_dir + "webSHOW
 def update_windows():              os.system("start " + webscript_dir + "webUPDATEwindowsrepos")
 def update_all():                  os.system("start " + webscript_dir + "webUPDATErepos")
 def set_revision():                os.system("start " + webscript_dir + "webSET_bundle_revision")
-def build_smv_win_inc():           os.system("start " + webscript_dir + "webBUILDsmv windows testinc")
+def build_smv_win_inc():           os.system("start " + webscript_dir + "webBUILDsmv Windows testinc")
 def build_smv():                   os.system("start " + webscript_dir + "webBUILDsmv  "     + platforms[v.get()] + " " + "test" )
 def build_lib():                   os.system("start " + webscript_dir + "webBUILDlibs "     + platforms[v.get()])
 def build_util():                  os.system("start " + webscript_dir + "webBUILDallprog "  + platforms[v.get()])
