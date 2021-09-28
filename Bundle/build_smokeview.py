@@ -84,8 +84,8 @@ Button(root, text="All",        command=update_all).grid(row=R, column=2)
 
 R=R+1
 Label(root, text="Set:").grid(column=0, row=R, sticky=E)
-Button(root, text="Bundle rev",      command=set_revision).grid(row=R, column=1)
-Button(root, text="Master branch",   command=set_branch).grid(row=R, column=2)
+Button(root, text="Bundle",      command=set_revision).grid(row=R, column=1)
+Button(root, text="Master",   command=set_branch).grid(row=R, column=2)
 
 # ------------------------- clean ------------------------------
 
@@ -103,7 +103,7 @@ Button(root, text="Windows",  command=clean_uploads_win).grid(row=R, column=1)
 Button(root, text="All",      command=clean_uploads_all).grid(row=R, column=2)
 
 R=R+1
-Label(root, text="SMV build dirs:").grid(column=0, row=R, sticky=E)
+Label(root, text="SMV build:").grid(column=0, row=R, sticky=E)
 Button(root, text="Windows",  command=clean_smv_win).grid(row=R, column=1)
 Button(root, text="All",      command=clean_smv_all).grid(row=R, column=2)
 
@@ -113,7 +113,7 @@ R=R+1
 Label(root, text="Edit").grid(column=0, row=R, columnspan=4)
 
 R=R+1
-Label(root, text="Release notes:").grid(column=0, row=R, sticky=E)
+Label(root, text="Notes:").grid(column=0, row=R, sticky=E)
 Button(root, text="Add",      command=add_notes).grid(row=R, column=1)
 Button(root, text="Edit",     command=edit_notes).grid(row=R, column=2)
 Button(root, text="View",     command=view_notes).grid(row=R, column=3)
