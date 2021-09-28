@@ -39,7 +39,7 @@ Title Bundling %type% Smokeview for %platform%
 
 :: windows
 
-if "%platform%" == "windows" (
+if "%platform%" == "Windows" (
   call %svn_root%\bot\Bundle\smv\scripts\make_%type%bundle
   goto eof
 )
@@ -56,7 +56,7 @@ if NOT exist %uploaddir% mkdir %uploaddir%
 
 :: linux
 
-if "%platform%" == "linux" (
+if "%platform%" == "Linux" (
 
   echo.
   echo --- making 64 bit Linux Smokeview installer ---
@@ -82,7 +82,7 @@ if "%platform%" == "linux" (
 
 :: osx
 
-if "%platform%" == "osx" (
+if "%platform%" == "OSX" (
   echo.
   echo --- making 64 bit OSX Smokeview installer ---
   echo.

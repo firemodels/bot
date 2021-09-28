@@ -57,7 +57,7 @@ if "%platform%" == "windowsgnu" (
   goto eof
 )
 
-if "%platform%" == "windows" (
+if "%platform%" == "Windows" (
   cd %svn_root%\smv\Build\smokeview\intel_win_64
   call make_smokeview %wintype% %wininc% -glut -icon
   goto eof
@@ -65,7 +65,7 @@ if "%platform%" == "windows" (
 
 :: ----------- linux -----------------
 
-if "%platform%" == "linux" (
+if "%platform%" == "Linux" (
   plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/run_command.sh smv/Build/smokeview/intel_linux_64 make_smokeview.sh %type%
   goto eof
 )
@@ -80,7 +80,7 @@ if "%platform%" == "osxquartz" (
   plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/run_command.sh smv/Build/smokeview/intel_osx_q_64 make_smokeview.sh %type%
   goto eof
 )
-if "%platform%" == "osx" (
+if "%platform%" == "OSX" (
   plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/run_command.sh smv/Build/smokeview/intel_osx_64 make_smokeview.sh %type%
   goto eof
 )
