@@ -122,17 +122,13 @@ Label(root, text="Edit").grid(column=0, row=R, columnspan=4)
 R=R+1
 Label(root, text="Notes:").grid(column=0, row=R, sticky=E)
 Button(root, text="Add",      width=button_width, command=add_notes).grid(row=R, column=1)
-Button(root, text="Edit",     width=button_width, command=edit_notes).grid(row=R, column=2)
-Button(root, text="View",     width=button_width, command=view_notes).grid(row=R, column=3)
+Button(root, text="View",     width=button_width, command=view_notes).grid(row=R, column=2)
 
 R=R+1
-Label(root, text="Script:").grid(column=0, row=R, sticky=E)
-Button(root, text="Edit",    width=button_width, command=edit_this_page).grid(row=R, column=1)
-Button(root, text="Refresh", width=button_width, command=restart_program).grid(row=R, column=2)
-
-R=R+1
-Label(root, text="Settings:").grid(column=0, row=R, sticky=E)
-Button(root, text="Edit",      width=button_width, command=edit_settings).grid(row=R, column=1)
+Label(root, text="Edit:").grid(column=0, row=R, sticky=E)
+Button(root, text="Script",    width=button_width, command=edit_this_page).grid(row=R, column=1)
+Button(root, text="Settings",  width=button_width, command=edit_settings).grid(row=R, column=2)
+Button(root, text="Notes",     width=button_width, command=edit_notes).grid(row=R, column=3)
 
 # ------------------------- Build/Bundle/Install ------------------------------
 
@@ -193,5 +189,8 @@ R=R+1
 Label(root, text="gsmv/bib:").grid(column=0, row=R, sticky=E)
 Button(root, text="fds->smv", width=button_width, command=webSYNCHfds2smv).grid(row=R, column=1)
 Button(root, text="fds<-smv", width=button_width, command=webSYNCHsmv2fds).grid(row=R, column=2)
+
+R=R+1
+Button(root, text="Refresh", width=button_width, command=restart_program).grid(row=R, column=0)
 
 root.mainloop()
