@@ -1,19 +1,18 @@
 from sys import platform
 import sys
 from functools import partial
+from tkinter import *
+import os
 
 if platform != "win32":
   print("***error: this script only runs on Windows computers")
   sys.exit()
 
-from tkinter import *
-import os
-
 root = Tk()
 
 # directory locations
 
-repo_root = "..\\..\\"
+repo_root = os.path.dirname(os.path.realpath(__file__)) + "\\..\\..\\"
 bot_repo = repo_root + "bot\\"
 smv_repo = repo_root + "smv\\"
 webscript_dir  = bot_repo + "Bundle\\webscripts\\"
@@ -131,7 +130,7 @@ Button(root, text="Settings",  width=button_width, command=edit_settings).grid(r
 # ------------------------- Build/Bundle/Install ------------------------------
 
 R=R+1
-Label(root, text="---Build/Bundle/Install---").grid(column=0, row=R, columnspan=4)
+Label(root, text="---Build/Bundle/Install---").grid(column=0, row=R, columnspan=3)
 
 R=R+1
 
@@ -186,7 +185,7 @@ Button(root, text="<-smv",  width=button_width, command=webCOPYconfig2home).grid
 R=R+1
 Label(root, text="gsmv/bib:").grid(column=0, row=R, sticky=E)
 Button(root, text="fds->smv", width=button_width, command=webSYNCHfds2smv).grid(row=R, column=1)
-Button(root, text="fds<-smv", width=button_width, command=webSYNCHsmv2fds).grid(row=R, column=2)
+Button(root, text="fds<-smv", width=button_width, command=webSYNCHsmv2fds).grid(row=R, column=2, ipadx=3)
 
 R=R+1
 Button(root, text="Refresh", width=button_width, command=restart_program).grid(row=R, column=0)
