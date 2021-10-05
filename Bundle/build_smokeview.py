@@ -5,7 +5,7 @@ from tkinter import *
 import os
 
 if platform != "win32":
-  print("***warning: this widgets in this script only run on Windows computers")
+  print("***warning: the widgets in this script only run on Windows computers")
 #  sys.exit()
 
 root = Tk()
