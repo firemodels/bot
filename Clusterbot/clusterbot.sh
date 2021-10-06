@@ -3,38 +3,38 @@
 ERROR=
 if [ "$CB_HOSTS" == "" ]; then
   ERROR=1
-  echo "***error: environment variable CB_HOSTS not define"
+  echo "***error: environment variable CB_HOSTS not defined"
 fi
-if [[ "$CB_HOST1" != "" ]] && [[ "$CB_HOSTIB1" == "" ]]; then
-  ERROR=1
-  echo "***error: CB_HOSTIB1 must be defined if CB_HOST1 is defined"
+if [ "$CB_HOST1" != "" ]; fi
+  HAVE_IB=1
+  if [ "$CB_HOSTIB1" == "" ]; then
+    ERROR=1
+    echo "***error: CB_HOSTIB1 must be defined if CB_HOST1 is defined"
+  fi
 fi
-if [[ "$CB_HOST2" != "" ]] && [[ "$CB_HOSTIB2" == "" ]]; then
-  ERROR=1
-  echo "***error: CB_HOSTIB2 must be defined if CB_HOST2 is defined"
+if [ "$CB_HOST2" != "" ]; fi
+  HAVE_IB=1
+  if [ "$CB_HOSTIB2" == "" ]; then
+    ERROR=1
+    echo "***error: CB_HOSTIB2 must be defined if CB_HOST2 is defined"
+  fi
 fi
-if [[ "$CB_HOST3" != "" ]] && [[ "$CB_HOSTIB3" == "" ]]; then
-  ERROR=1
-  echo "***error: CB_HOSTIB3 must be defined if CB_HOST3 is defined"
+if [ "$CB_HOST3" != "" ]; fi
+  HAVE_IB=1
+  if [ "$CB_HOSTIB3" == "" ]; then
+    ERROR=1
+    echo "***error: CB_HOSTIB3 must be defined if CB_HOST3 is defined"
+  fi
 fi
-if [[ "$CB_HOST4" != "" ]] && [[ "$CB_HOSTIB4" == "" ]]; then
-  ERROR=1
-  echo "***error: CB_HOSTIB4 must be defined if CB_HOST4 is defined"
+if [ "$CB_HOST4" != "" ]; fi
+  HAVE_IB=1
+  if [ "$CB_HOSTIB4" == "" ]; then
+    ERROR=1
+    echo "***error: CB_HOSTIB4 must be defined if CB_HOST4 is defined"
+  fi
 fi
 if [ "$ERROR" == "1" ]; then
   exit
-fi
-if [ "$CB_HOST1" != "" ]; then
-  HAVE_IB=1
-fi
-if [ "$CB_HOST2" != "" ]; then
-  HAVE_IB=1
-fi
-if [ "$CB_HOST3" != "" ]; then
-  HAVE_IB=1
-fi
-if [ "$CB_HOST4" != "" ]; then
-  HAVE_IB=1
 fi
 
 export CHECK_CLUSTER=1
