@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# --------------------- initial error checking --------------------
+
 ERROR=
 if [ "$CB_HOSTS" == "" ]; then
   ERROR=1
@@ -42,11 +44,13 @@ ETHOUT=/tmp/out.$$
 FSOUT=/tmp/fsout.$$
 IBOUT=/tmp/ibout.$$
 
-# check ethernet
+# --------------------- check ethernet --------------------
+
 pdsh -t 2 -w $CB_HOSTS date   >& $ETHOUT
 ETHDOWN=`grep timed  $ETHOUT | grep out | awk '{printf "%s%s", $6," " }'`
 
-# check file systems
+# --------------------- check file systems --------------------
+
 pdsh -t 2 -w $CB_HOSTS "df -k -t nfs | wc -l" |&  grep -v ssh | sort >& $FSOUT
 
 NF0=`head -1 $FSOUT | awk '{print $2}'`
@@ -73,7 +77,8 @@ else
   echo "hosts down(ETH): $ETHDOWN"
 fi
 
-# check infiniband
+# --------------------- check infiniband --------------------
+
 if [ "$HAVE_IB" == "1" ]; then
   echo "" > $IBOUT
   if [ "$CB_HOST1" != "" ]; then
@@ -96,5 +101,6 @@ if [ "$HAVE_IB" == "1" ]; then
   fi
 fi
 
-# cleanup
+# --------------------- cleanup --------------------
+
 rm -f $FSOUT $ETHOUT $IBOUT
