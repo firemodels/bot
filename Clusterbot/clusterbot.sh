@@ -51,24 +51,38 @@ fi
 echo
 echo "--------------- cluster status $CB_HOSTS ---------------"
 
-# --------------------- check slurm daemon --------------------
+# --------------------- check ethernet --------------------
 
-pdsh -t 2 -w $CB_HOSTS "ps -el | grep slurmd | wc -l" |&  grep -v ssh | sort >& $SLURMOUT
-cat $SLURMOUT | awk -F':' '{print $1}' > $UP_HOSTS
-SLURMDOWN=
-while read line 
-do
-  host=`echo $line | awk '{print $1}'`
-  host=`echo $host | sed 's/.$//'`
-  NSLURM=`echo $line | awk '{print $2}'`
-  if [ "$NSLURM" == "0" ]; then
-    SLURMDOWN="$SLURMDOWN $host"
-  fi
-done < $SLURMOUT
-if [ "$SLURMDOWN" == "" ]; then
-  echo "slurmd running on all hosts"
+pdsh -t 2 -w $CB_HOSTS date   >& $ETHOUT
+ETHDOWN=`grep timed  $ETHOUT | grep out | awk '{printf "%s%s", $6," " }'`
+if [ "$ETHDOWN" == "" ]; then
+  echo "Ethernet up on all hosts"
 else
-  echo "slurmd down on: $SLURMDOWN"
+  echo "Ethernet down on: $ETHDOWN"
+fi
+
+# --------------------- check infiniband --------------------
+
+if [ "$HAVE_IB" == "1" ]; then
+  echo "" > $IBOUT
+  if [ "$CB_HOST1" != "" ]; then
+    ssh $CB_HOST1 pdsh -t 2 -w $CB_HOSTIB1 date  >>  $IBOUT 2>&1
+  fi
+  if [ "$CB_HOST2" != "" ]; then
+    ssh $CB_HOST2 pdsh -t 2 -w $CB_HOSTIB2 date  >>  $IBOUT 2>&1
+  fi
+  if [ "$CB_HOST3" != "" ]; then
+    ssh $CB_HOST3 pdsh -t 2 -w $CB_HOSTIB3 date  >>  $IBOUT 2>&1
+  fi
+  if [ "$CB_HOST4" != "" ]; then
+    ssh $CB_HOST4 pdsh -t 2 -w $CB_HOSTIB4 date  >>  $IBOUT 2>&1
+  fi
+  IBDOWN=`grep timed  $IBOUT | grep out | sort | awk '{printf "%s%s", $6," " }'`
+  if [ "$IBDOWN" == "" ]; then
+    echo "Infiniband up on all hosts"
+  else
+    echo "Infiniband down on: $IBDOWN"
+  fi
 fi
 
 # --------------------- check file systems --------------------
@@ -104,38 +118,24 @@ else
   echo "hosts down(slurm): $DOWN_HOST_LIST"
 fi
 
-# --------------------- check ethernet --------------------
+# --------------------- check slurm daemon --------------------
 
-pdsh -t 2 -w $CB_HOSTS date   >& $ETHOUT
-ETHDOWN=`grep timed  $ETHOUT | grep out | awk '{printf "%s%s", $6," " }'`
-if [ "$ETHDOWN" == "" ]; then
-  echo "Ethernet up on all hosts"
+pdsh -t 2 -w $CB_HOSTS "ps -el | grep slurmd | wc -l" |&  grep -v ssh | sort >& $SLURMOUT
+cat $SLURMOUT | awk -F':' '{print $1}' > $UP_HOSTS
+SLURMDOWN=
+while read line 
+do
+  host=`echo $line | awk '{print $1}'`
+  host=`echo $host | sed 's/.$//'`
+  NSLURM=`echo $line | awk '{print $2}'`
+  if [ "$NSLURM" == "0" ]; then
+    SLURMDOWN="$SLURMDOWN $host"
+  fi
+done < $SLURMOUT
+if [ "$SLURMDOWN" == "" ]; then
+  echo "slurmd running on all hosts"
 else
-  echo "Ethernet down on: $ETHDOWN"
-fi
-
-# --------------------- check infiniband --------------------
-
-if [ "$HAVE_IB" == "1" ]; then
-  echo "" > $IBOUT
-  if [ "$CB_HOST1" != "" ]; then
-    ssh $CB_HOST1 pdsh -t 2 -w $CB_HOSTIB1 date  >>  $IBOUT 2>&1
-  fi
-  if [ "$CB_HOST2" != "" ]; then
-    ssh $CB_HOST2 pdsh -t 2 -w $CB_HOSTIB2 date  >>  $IBOUT 2>&1
-  fi
-  if [ "$CB_HOST3" != "" ]; then
-    ssh $CB_HOST3 pdsh -t 2 -w $CB_HOSTIB3 date  >>  $IBOUT 2>&1
-  fi
-  if [ "$CB_HOST4" != "" ]; then
-    ssh $CB_HOST4 pdsh -t 2 -w $CB_HOSTIB4 date  >>  $IBOUT 2>&1
-  fi
-  IBDOWN=`grep timed  $IBOUT | grep out | sort | awk '{printf "%s%s", $6," " }'`
-  if [ "$IBDOWN" == "" ]; then
-    echo "Infiniband up on all hosts"
-  else
-    echo "Infiniband down on: $IBDOWN"
-  fi
+  echo "slurmd down on: $SLURMDOWN"
 fi
 
 # --------------------- cleanup --------------------
