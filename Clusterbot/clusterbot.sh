@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# --------------------- define file names --------------------
+
+ETHOUT=/tmp/out.$$
+FSOUT=/tmp/fsout.$$
+IBOUT=/tmp/ibout.$$
+SLURMOUT=/tmp/slurmout.$$
+DOWN_HOSTS=/tmp/downhosts.$$
+
 # --------------------- initial error checking --------------------
 
 ERROR=
@@ -38,14 +46,6 @@ fi
 if [ "$ERROR" == "1" ]; then
   exit
 fi
-
-# --------------------- define file names --------------------
-
-export CHECK_CLUSTER=1
-ETHOUT=/tmp/out.$$
-FSOUT=/tmp/fsout.$$
-IBOUT=/tmp/ibout.$$
-SLURMOUT=/tmp/slurmout.$$
 
 # --------------------- check slurm daemon --------------------
 
@@ -88,6 +88,31 @@ else
   echo "hosts not mounting $NF0 file systems: $FSDOWN"
 fi
 
+# --------------------- check slurm --------------------
+
+pbsnodes -l | awk '{print $1}' | sort -u  > $DOWN_HOSTS
+
+nlines_down=0
+if [ -e $DOWN_HOSTS ]; then
+  nlines_down=`cat $DOWN_HOSTS | wc -l`
+fi
+
+#define array of hosts that are down
+
+DOWN_HOST_LIST=
+for HOST in `cat $DOWN_HOSTS`; do
+  if [ "$DOWN_HOST_LIST" == "" ]; then
+    DOWN_HOST_LIST="$HOST"
+  else
+    DOWN_HOST_LIST="$DOWN_HOST_LIST $HOST"
+  fi
+done
+if [ "$DOWN_HOST_LIST" == "" ]; then
+  echo "slurm on line for all hosts ($CB_HOSTS)"
+else
+  echo "hosts down(slurm): $DOWN_HOST_LIST"
+fi
+
 # --------------------- check ethernet --------------------
 
 pdsh -t 2 -w $CB_HOSTS date   >& $ETHOUT
@@ -114,7 +139,7 @@ if [ "$HAVE_IB" == "1" ]; then
   if [ "$CB_HOST4" != "" ]; then
     ssh $CB_HOST4 pdsh -t 2 -w $CB_HOSTIB4 date  >>  $IBOUT 2>&1
   fi
-  IBDOWN=`grep timed  $IBOUT | grep out | awk '{printf "%s%s", $6," " }'`
+  IBDOWN=`grep timed  $IBOUT | grep out | sort | awk '{printf "%s%s", $6," " }'`
   if [ "$IBDOWN" == "" ]; then
     echo "all infiniband interfaces are working ($CB_HOSTIB1$CB_HOSTB2$CB_HOSTIB3$CB_HOSTIB4)"
   else
@@ -124,4 +149,4 @@ fi
 
 # --------------------- cleanup --------------------
 
-rm -f $FSOUT $ETHOUT $IBOUT
+rm -f $DOWN_HOSTS $FSOUT $ETHOUT $IBOUT
