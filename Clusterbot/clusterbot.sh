@@ -99,7 +99,7 @@ pbsnodes -l | awk '{print $1}' | sort -u  > $DOWN_HOSTS
 DOWN_HOST_LIST=`grep -f $DOWN_HOSTS $UP_HOSTS`
 
 if [ "$DOWN_HOST_LIST" == "" ]; then
-  echo "slurm on line on all hosts"
+  echo "Slurm online on all hosts"
 else
   echo "hosts down(slurm): $DOWN_HOST_LIST"
 fi
