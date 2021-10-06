@@ -39,15 +39,32 @@ if [ "$ERROR" == "1" ]; then
   exit
 fi
 
+# --------------------- define file names --------------------
+
 export CHECK_CLUSTER=1
 ETHOUT=/tmp/out.$$
 FSOUT=/tmp/fsout.$$
 IBOUT=/tmp/ibout.$$
+SLURMOUT=/tmp/slurmout.$$
 
-# --------------------- check ethernet --------------------
+# --------------------- check slurm daemon --------------------
 
-pdsh -t 2 -w $CB_HOSTS date   >& $ETHOUT
-ETHDOWN=`grep timed  $ETHOUT | grep out | awk '{printf "%s%s", $6," " }'`
+pdsh -t 2 -w $CB_HOSTS "ps -el | grep slurmd | wc -l" |&  grep -v ssh | sort >& $SLURMOUT
+SLURMDOWN=
+while read line 
+do
+  host=`echo $line | awk '{print $1}'`
+  host=`echo $host | sed 's/.$//'`
+  NSLURM=`echo $line | awk '{print $2}'`
+  if [ "$NSLURM" == "0" ]; then
+    SLURMDOWN="$SLURMDOWN $host"
+  fi
+done < $SLURMOUT
+if [ "$SLURMDOWN" == "" ]; then
+  echo "all hosts are running slurmd ($CB_HOSTS)"
+else
+  echo "hosts not running slurmd: $SLURMDOWN"
+fi
 
 # --------------------- check file systems --------------------
 
@@ -71,6 +88,10 @@ else
   echo "hosts not mounting $NF0 file systems: $FSDOWN"
 fi
 
+# --------------------- check ethernet --------------------
+
+pdsh -t 2 -w $CB_HOSTS date   >& $ETHOUT
+ETHDOWN=`grep timed  $ETHOUT | grep out | awk '{printf "%s%s", $6," " }'`
 if [ "$ETHDOWN" == "" ]; then
   echo "all ethernet interfaces are working ($CB_HOSTS)"
 else
