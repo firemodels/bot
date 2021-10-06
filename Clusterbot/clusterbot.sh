@@ -7,6 +7,7 @@ FSOUT=/tmp/fsout.$$
 IBOUT=/tmp/ibout.$$
 SLURMOUT=/tmp/slurmout.$$
 DOWN_HOSTS=/tmp/downhosts.$$
+UP_HOSTS=/tmp/uphosts.$$
 
 # --------------------- initial error checking --------------------
 
@@ -50,6 +51,7 @@ fi
 # --------------------- check slurm daemon --------------------
 
 pdsh -t 2 -w $CB_HOSTS "ps -el | grep slurmd | wc -l" |&  grep -v ssh | sort >& $SLURMOUT
+cat $SLURMOUT | awk -F':' '{print $1}' > $UP_HOSTS
 SLURMDOWN=
 while read line 
 do
@@ -91,22 +93,8 @@ fi
 # --------------------- check slurm --------------------
 
 pbsnodes -l | awk '{print $1}' | sort -u  > $DOWN_HOSTS
+DOWN_HOST_LIST=`grep -f $DOWN_HOSTS $UP_HOSTS`
 
-nlines_down=0
-if [ -e $DOWN_HOSTS ]; then
-  nlines_down=`cat $DOWN_HOSTS | wc -l`
-fi
-
-#define array of hosts that are down
-
-DOWN_HOST_LIST=
-for HOST in `cat $DOWN_HOSTS`; do
-  if [ "$DOWN_HOST_LIST" == "" ]; then
-    DOWN_HOST_LIST="$HOST"
-  else
-    DOWN_HOST_LIST="$DOWN_HOST_LIST $HOST"
-  fi
-done
 if [ "$DOWN_HOST_LIST" == "" ]; then
   echo "slurm on line for all hosts ($CB_HOSTS)"
 else
@@ -149,4 +137,4 @@ fi
 
 # --------------------- cleanup --------------------
 
-rm -f $DOWN_HOSTS $FSOUT $ETHOUT $IBOUT
+rm -f $DOWN_HOSTS $UP_HOSTS $FSOUT $ETHOUT $IBOUT
