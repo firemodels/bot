@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# --------------------- define file names --------------------
+
+ETHOUT=/tmp/out.$$
+FSOUT=/tmp/fsout.$$
+IBOUT=/tmp/ibout.$$
+SLURMOUT=/tmp/slurmout.$$
+DOWN_HOSTS=/tmp/downhosts.$$
+UP_HOSTS=/tmp/uphosts.$$
+
 # --------------------- initial error checking --------------------
 
 ERROR=
@@ -39,63 +48,17 @@ if [ "$ERROR" == "1" ]; then
   exit
 fi
 
-# --------------------- define file names --------------------
-
-export CHECK_CLUSTER=1
-ETHOUT=/tmp/out.$$
-FSOUT=/tmp/fsout.$$
-IBOUT=/tmp/ibout.$$
-SLURMOUT=/tmp/slurmout.$$
-
-# --------------------- check slurm daemon --------------------
-
-pdsh -t 2 -w $CB_HOSTS "ps -el | grep slurmd | wc -l" |&  grep -v ssh | sort >& $SLURMOUT
-SLURMDOWN=
-while read line 
-do
-  host=`echo $line | awk '{print $1}'`
-  host=`echo $host | sed 's/.$//'`
-  NSLURM=`echo $line | awk '{print $2}'`
-  if [ "$NSLURM" == "0" ]; then
-    SLURMDOWN="$SLURMDOWN $host"
-  fi
-done < $SLURMOUT
-if [ "$SLURMDOWN" == "" ]; then
-  echo "all hosts are running slurmd ($CB_HOSTS)"
-else
-  echo "hosts not running slurmd: $SLURMDOWN"
-fi
-
-# --------------------- check file systems --------------------
-
-pdsh -t 2 -w $CB_HOSTS "df -k -t nfs | wc -l" |&  grep -v ssh | sort >& $FSOUT
-
-NF0=`head -1 $FSOUT | awk '{print $2}'`
-FSDOWN=
-while read line 
-do
-  host=`echo $line | awk '{print $1}'`
-  host=`echo $host | sed 's/.$//'`
-  NFI=`echo $line | awk '{print $2}'`
-  if [ "$NFI" != "$NF0" ]; then
-    FSDOWN="$FSDOWN $host"
-  fi
-done < $FSOUT
-
-if [ "$FSDOWN" == "" ]; then
-  echo "all hosts are mounting $NF0 file systems ($CB_HOSTS)"
-else
-  echo "hosts not mounting $NF0 file systems: $FSDOWN"
-fi
+echo
+echo "--------------- cluster status $CB_HOSTS ---------------"
 
 # --------------------- check ethernet --------------------
 
 pdsh -t 2 -w $CB_HOSTS date   >& $ETHOUT
 ETHDOWN=`grep timed  $ETHOUT | grep out | awk '{printf "%s%s", $6," " }'`
 if [ "$ETHDOWN" == "" ]; then
-  echo "all ethernet interfaces are working ($CB_HOSTS)"
+  echo "Ethernet up on all hosts"
 else
-  echo "hosts down(ETH): $ETHDOWN"
+  echo "Ethernet down on: $ETHDOWN"
 fi
 
 # --------------------- check infiniband --------------------
@@ -114,14 +77,67 @@ if [ "$HAVE_IB" == "1" ]; then
   if [ "$CB_HOST4" != "" ]; then
     ssh $CB_HOST4 pdsh -t 2 -w $CB_HOSTIB4 date  >>  $IBOUT 2>&1
   fi
-  IBDOWN=`grep timed  $IBOUT | grep out | awk '{printf "%s%s", $6," " }'`
+  IBDOWN=`grep timed  $IBOUT | grep out | sort | awk '{printf "%s%s", $6," " }'`
   if [ "$IBDOWN" == "" ]; then
-    echo "all infiniband interfaces are working ($CB_HOSTIB1$CB_HOSTB2$CB_HOSTIB3$CB_HOSTIB4)"
+    echo "Infiniband up on all hosts"
   else
-    echo "hosts down(IB): $IBDOWN"
+    echo "Infiniband down on: $IBDOWN"
   fi
+fi
+
+# --------------------- check file systems --------------------
+
+pdsh -t 2 -w $CB_HOSTS "df -k -t nfs | tail -n +2 | wc -l" |&  grep -v ssh | sort >& $FSOUT
+cat $FSOUT | awk -F':' '{print $1}' > $UP_HOSTS
+
+NF0=`head -1 $FSOUT | awk '{print $2}'`
+FSDOWN=
+while read line 
+do
+  host=`echo $line | awk '{print $1}'`
+  host=`echo $host | sed 's/.$//'`
+  NFI=`echo $line | awk '{print $2}'`
+  if [ "$NFI" != "$NF0" ]; then
+    FSDOWN="$FSDOWN $host"
+  fi
+done < $FSOUT
+
+if [ "$FSDOWN" == "" ]; then
+  echo "$NF0 file systems mounted on all hosts"
+else
+  echo "Hosts not mounting $NF0 file systems: $FSDOWN"
+fi
+
+# --------------------- check slurm --------------------
+
+pbsnodes -l | awk '{print $1}' | sort -u  > $DOWN_HOSTS
+DOWN_HOST_LIST=`grep -f $DOWN_HOSTS $UP_HOSTS`
+
+if [ "$DOWN_HOST_LIST" == "" ]; then
+  echo "Slurm up on all hosts"
+else
+  echo "hosts down(slurm): $DOWN_HOST_LIST"
+fi
+
+# --------------------- check slurm daemon --------------------
+
+pdsh -t 2 -w $CB_HOSTS "ps -el | grep slurmd | wc -l" |&  grep -v ssh | sort >& $SLURMOUT
+SLURMDOWN=
+while read line 
+do
+  host=`echo $line | awk '{print $1}'`
+  host=`echo $host | sed 's/.$//'`
+  NSLURM=`echo $line | awk '{print $2}'`
+  if [ "$NSLURM" == "0" ]; then
+    SLURMDOWN="$SLURMDOWN $host"
+  fi
+done < $SLURMOUT
+if [ "$SLURMDOWN" == "" ]; then
+  echo "slurmd running on all hosts"
+else
+  echo "slurmd down on: $SLURMDOWN"
 fi
 
 # --------------------- cleanup --------------------
 
-rm -f $FSOUT $ETHOUT $IBOUT
+rm -f $DOWN_HOSTS $UP_HOSTS $SLURMOUT $FSOUT $ETHOUT $IBOUT
