@@ -48,6 +48,9 @@ if [ "$ERROR" == "1" ]; then
   exit
 fi
 
+echo
+echo "--------------- cluster status $CB_HOSTS ---------------"
+
 # --------------------- check slurm daemon --------------------
 
 pdsh -t 2 -w $CB_HOSTS "ps -el | grep slurmd | wc -l" |&  grep -v ssh | sort >& $SLURMOUT
@@ -63,9 +66,9 @@ do
   fi
 done < $SLURMOUT
 if [ "$SLURMDOWN" == "" ]; then
-  echo "all hosts are running slurmd ($CB_HOSTS)"
+  echo "slurmd running on all hosts"
 else
-  echo "hosts not running slurmd: $SLURMDOWN"
+  echo "slurmd down on: $SLURMDOWN"
 fi
 
 # --------------------- check file systems --------------------
@@ -85,9 +88,9 @@ do
 done < $FSOUT
 
 if [ "$FSDOWN" == "" ]; then
-  echo "all hosts are mounting $NF0 file systems ($CB_HOSTS)"
+  echo "$NF0 file systems mounted on all hosts"
 else
-  echo "hosts not mounting $NF0 file systems: $FSDOWN"
+  echo "Hosts not mounting $NF0 file systems: $FSDOWN"
 fi
 
 # --------------------- check slurm --------------------
@@ -96,7 +99,7 @@ pbsnodes -l | awk '{print $1}' | sort -u  > $DOWN_HOSTS
 DOWN_HOST_LIST=`grep -f $DOWN_HOSTS $UP_HOSTS`
 
 if [ "$DOWN_HOST_LIST" == "" ]; then
-  echo "slurm on line for all hosts ($CB_HOSTS)"
+  echo "slurm on line on all hosts"
 else
   echo "hosts down(slurm): $DOWN_HOST_LIST"
 fi
@@ -106,9 +109,9 @@ fi
 pdsh -t 2 -w $CB_HOSTS date   >& $ETHOUT
 ETHDOWN=`grep timed  $ETHOUT | grep out | awk '{printf "%s%s", $6," " }'`
 if [ "$ETHDOWN" == "" ]; then
-  echo "all ethernet interfaces are working ($CB_HOSTS)"
+  echo "Ethernet up on all hosts"
 else
-  echo "hosts down(ETH): $ETHDOWN"
+  echo "Ethernet down on: $ETHDOWN"
 fi
 
 # --------------------- check infiniband --------------------
@@ -129,12 +132,12 @@ if [ "$HAVE_IB" == "1" ]; then
   fi
   IBDOWN=`grep timed  $IBOUT | grep out | sort | awk '{printf "%s%s", $6," " }'`
   if [ "$IBDOWN" == "" ]; then
-    echo "all infiniband interfaces are working ($CB_HOSTIB1$CB_HOSTB2$CB_HOSTIB3$CB_HOSTIB4)"
+    echo "Infiniband up on all hosts"
   else
-    echo "hosts down(IB): $IBDOWN"
+    echo "Infiniband down on: $IBDOWN"
   fi
 fi
 
 # --------------------- cleanup --------------------
 
-rm -f $DOWN_HOSTS $UP_HOSTS $FSOUT $ETHOUT $IBOUT
+rm -f $DOWN_HOSTS $UP_HOSTS $SLURMOUT $FSOUT $ETHOUT $IBOUT
