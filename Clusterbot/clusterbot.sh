@@ -5,6 +5,7 @@
 ETHOUT=/tmp/out.$$
 FSOUT=/tmp/fsout.$$
 IBOUT=/tmp/ibout.$$
+IBRATE=/tmp/ibrate.$$
 SLURMOUT=/tmp/slurmout.$$
 DOWN_HOSTS=/tmp/downhosts.$$
 UP_HOSTS=/tmp/uphosts.$$
@@ -85,6 +86,25 @@ if [ "$HAVE_IB" == "1" ]; then
   else
     echo "Infiniband down on: $IBDOWN"
   fi
+
+  pdsh -t 2 -w $CB_HOSTS  /usr/sbin/ibstat |& grep "Rate" | grep -v ssh | sort >& $IBRATE
+  RATE0=`head -1 $IBRATE | awk '{print $3}'`
+  RATEBAD=
+  while read line 
+  do
+    host=`echo $line | awk '{print $1}'`
+    host=`echo $host | sed 's/.$//'`
+    RATEI=`echo $line | awk '{print $3}'`
+    if [ "$RATEI" != "$RATE0" ]; then
+      RATEBAD="$RATEBAD $host/$RATEI"
+  fi
+  done < $IBRATE
+
+  if [ "RATEBAD" == "" ]; then
+    echo "Infiniband speed is $RATE0 Gb/s on all${ACCESSIBLE}hosts"
+  else
+    echo "Hosts not running infiniband at $RATE0 Gb/s: $RATEBAD"
+  fi
 fi
 
 # --------------------- check file systems --------------------
@@ -142,4 +162,4 @@ fi
 
 # --------------------- cleanup --------------------
 
-rm -f $DOWN_HOSTS $UP_HOSTS $SLURMOUT $FSOUT $ETHOUT $IBOUT
+rm -f $DOWN_HOSTS $UP_HOSTS $SLURMOUT $FSOUT $ETHOUT $IBOUT $IBRATE
