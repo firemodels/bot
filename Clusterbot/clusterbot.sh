@@ -87,7 +87,8 @@ fi
 
 # --------------------- check file systems --------------------
 
-pdsh -t 2 -w $CB_HOSTS "df -k -t nfs | wc -l" |&  grep -v ssh | sort >& $FSOUT
+pdsh -t 2 -w $CB_HOSTS "df -k -t nfs | tail -n +2 | wc -l" |&  grep -v ssh | sort >& $FSOUT
+cat $FSOUT | awk -F':' '{print $1}' > $UP_HOSTS
 
 NF0=`head -1 $FSOUT | awk '{print $2}'`
 FSDOWN=
@@ -113,7 +114,7 @@ pbsnodes -l | awk '{print $1}' | sort -u  > $DOWN_HOSTS
 DOWN_HOST_LIST=`grep -f $DOWN_HOSTS $UP_HOSTS`
 
 if [ "$DOWN_HOST_LIST" == "" ]; then
-  echo "Slurm online on all hosts"
+  echo "Slurm up on all hosts"
 else
   echo "hosts down(slurm): $DOWN_HOST_LIST"
 fi
@@ -121,7 +122,6 @@ fi
 # --------------------- check slurm daemon --------------------
 
 pdsh -t 2 -w $CB_HOSTS "ps -el | grep slurmd | wc -l" |&  grep -v ssh | sort >& $SLURMOUT
-cat $SLURMOUT | awk -F':' '{print $1}' > $UP_HOSTS
 SLURMDOWN=
 while read line 
 do
