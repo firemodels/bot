@@ -57,8 +57,10 @@ pdsh -t 2 -w $CB_HOSTS date   >& $ETHOUT
 ETHDOWN=`grep timed  $ETHOUT | grep out | awk '{printf "%s%s", $6," " }'`
 if [ "$ETHDOWN" == "" ]; then
   echo "Ethernet up on all hosts"
+  ACCESSIBLE=" "
 else
   echo "Ethernet down on: $ETHDOWN"
+  ACCESSIBLE=" accessible "
 fi
 
 # --------------------- check infiniband --------------------
@@ -79,7 +81,7 @@ if [ "$HAVE_IB" == "1" ]; then
   fi
   IBDOWN=`grep timed  $IBOUT | grep out | sort | awk '{printf "%s%s", $6," " }'`
   if [ "$IBDOWN" == "" ]; then
-    echo "Infiniband up on all hosts"
+    echo "Infiniband up on all${ACCESSIBLE}hosts"
   else
     echo "Infiniband down on: $IBDOWN"
   fi
@@ -103,7 +105,7 @@ do
 done < $FSOUT
 
 if [ "$FSDOWN" == "" ]; then
-  echo "$NF0 file systems mounted on all hosts"
+  echo "$NF0 file systems mounted on all${ACCESSIBLE}hosts"
 else
   echo "Hosts not mounting $NF0 file systems: $FSDOWN"
 fi
@@ -114,7 +116,7 @@ pbsnodes -l | awk '{print $1}' | sort -u  > $DOWN_HOSTS
 DOWN_HOST_LIST=`grep -f $DOWN_HOSTS $UP_HOSTS`
 
 if [ "$DOWN_HOST_LIST" == "" ]; then
-  echo "Slurm up on all hosts"
+  echo "Slurm up on all${ACCESSIBLE}hosts"
 else
   echo "hosts down(slurm): $DOWN_HOST_LIST"
 fi
@@ -133,7 +135,7 @@ do
   fi
 done < $SLURMOUT
 if [ "$SLURMDOWN" == "" ]; then
-  echo "slurmd running on all hosts"
+  echo "slurmd running on all${ACCESSIBLE}hosts"
 else
   echo "slurmd down on: $SLURMDOWN"
 fi
