@@ -5,28 +5,28 @@ if [ "$CB_HOSTS" == "" ]; then
   ERROR=1
   echo "***error: environment variable CB_HOSTS not defined"
 fi
-if [ "$CB_HOST1" != "" ]; fi
+if [ "$CB_HOST1" != "" ]; then
   HAVE_IB=1
   if [ "$CB_HOSTIB1" == "" ]; then
     ERROR=1
     echo "***error: CB_HOSTIB1 must be defined if CB_HOST1 is defined"
   fi
 fi
-if [ "$CB_HOST2" != "" ]; fi
+if [ "$CB_HOST2" != "" ]; then
   HAVE_IB=1
   if [ "$CB_HOSTIB2" == "" ]; then
     ERROR=1
     echo "***error: CB_HOSTIB2 must be defined if CB_HOST2 is defined"
   fi
 fi
-if [ "$CB_HOST3" != "" ]; fi
+if [ "$CB_HOST3" != "" ]; then
   HAVE_IB=1
   if [ "$CB_HOSTIB3" == "" ]; then
     ERROR=1
     echo "***error: CB_HOSTIB3 must be defined if CB_HOST3 is defined"
   fi
 fi
-if [ "$CB_HOST4" != "" ]; fi
+if [ "$CB_HOST4" != "" ]; then
   HAVE_IB=1
   if [ "$CB_HOSTIB4" == "" ]; then
     ERROR=1
@@ -62,13 +62,13 @@ do
 done < $FSOUT
 
 if [ "$FSDOWN" == "" ]; then
-  echo "all hosts are mounting $NF0 file systems"
+  echo "all hosts are mounting $NF0 file systems ($CB_HOSTS)"
 else
   echo "hosts not mounting $NF0 file systems: $FSDOWN"
 fi
 
 if [ "$ETHDOWN" == "" ]; then
-  echo "all ethernet interfaces are working"
+  echo "all ethernet interfaces are working ($CB_HOSTS)"
 else
   echo "hosts down(ETH): $ETHDOWN"
 fi
@@ -90,7 +90,7 @@ if [ "$HAVE_IB" == "1" ]; then
   fi
   IBDOWN=`grep timed  $IBOUT | grep out | awk '{printf "%s%s", $6," " }'`
   if [ "$IBDOWN" == "" ]; then
-    echo "all infiniband interfaces are working"
+    echo "all infiniband interfaces are working ($CB_HOSTIB1$CB_HOSTB2$CB_HOSTIB3$CB_HOSTIB4)"
   else
     echo "hosts down(IB): $IBDOWN"
   fi
