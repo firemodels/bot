@@ -54,7 +54,7 @@ echo "--------------- cluster status $CB_HOSTS ---------------"
 # --------------------- check ethernet --------------------
 
 pdsh -t 2 -w $CB_HOSTS date   >& $ETHOUT
-ETHDOWN=`grep timed  $ETHOUT | grep out | awk '{printf "%s%s", $6," " }'`
+ETHDOWN=`sort $ETHOUT | grep connect | awk '{printf "%s%s", $6," " }'`
 if [ "$ETHDOWN" == "" ]; then
   echo "Ethernet up on all hosts"
   ACCESSIBLE=" "
@@ -113,12 +113,17 @@ fi
 # --------------------- check slurm --------------------
 
 pbsnodes -l | awk '{print $1}' | sort -u  > $DOWN_HOSTS
-DOWN_HOST_LIST=`grep -f $DOWN_HOSTS $UP_HOSTS`
+SLURMDOWN=
+while read line 
+do
+  host=`echo $line | awk '{print $1}'`
+  SLURMDOWN="$SLURMDOWN $host"
+done < $DOWN_HOSTS
 
-if [ "$DOWN_HOST_LIST" == "" ]; then
+if [ "$SLURMDOWN" == "" ]; then
   echo "Slurm up on all${ACCESSIBLE}hosts"
 else
-  echo "hosts down(slurm): $DOWN_HOST_LIST"
+  echo "Slurm down on: $SLURMDOWN"
 fi
 
 # --------------------- check slurm daemon --------------------
