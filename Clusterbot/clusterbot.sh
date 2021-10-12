@@ -5,6 +5,8 @@
 ETHOUT=/tmp/out.$$
 FSOUT=/tmp/fsout.$$
 IBOUT=/tmp/ibout.$$
+#IBRATE=/tmp/ibrate.$$
+IBRATE=ibrate.$$
 SLURMOUT=/tmp/slurmout.$$
 DOWN_HOSTS=/tmp/downhosts.$$
 UP_HOSTS=/tmp/uphosts.$$
@@ -54,7 +56,7 @@ echo "--------------- cluster status $CB_HOSTS ---------------"
 # --------------------- check ethernet --------------------
 
 pdsh -t 2 -w $CB_HOSTS date   >& $ETHOUT
-ETHDOWN=`grep timed  $ETHOUT | grep out | awk '{printf "%s%s", $6," " }'`
+ETHDOWN=`sort $ETHOUT | grep connect | awk '{printf "%s%s", $6," " }'`
 if [ "$ETHDOWN" == "" ]; then
   echo "Ethernet up on all hosts"
   ACCESSIBLE=" "
@@ -85,6 +87,27 @@ if [ "$HAVE_IB" == "1" ]; then
   else
     echo "Infiniband down on: $IBDOWN"
   fi
+
+# --------------------- check infiniband speed --------------------
+
+  CURDIR=`pwd`
+  pdsh -t 2 -w $CB_HOSTS $CURDIR/ibspeed.sh |& grep -v ssh | sort >& $IBRATE
+  RATE0=`head -1 $IBRATE | awk '{print $2}'`
+  RATEBAD=
+  while read line 
+  do
+    host=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
+    RATEI=`echo $line | awk '{print $2}'`
+    if [ "$RATEI" != "$RATE0" ]; then
+      RATEBAD="$RATEBAD $host/$RATEI"
+  fi
+  done < $IBRATE
+
+  if [ "RATEBAD" == "" ]; then
+    echo "Infiniband speed is $RATE0 Gb/s on all${ACCESSIBLE}hosts"
+  else
+    echo "Infiniband speed is $RATE0 Gb/s except for: $RATEBAD"
+  fi
 fi
 
 # --------------------- check file systems --------------------
@@ -113,12 +136,17 @@ fi
 # --------------------- check slurm --------------------
 
 pbsnodes -l | awk '{print $1}' | sort -u  > $DOWN_HOSTS
-DOWN_HOST_LIST=`grep -f $DOWN_HOSTS $UP_HOSTS`
+SLURMDOWN=
+while read line 
+do
+  host=`echo $line | awk '{print $1}'`
+  SLURMDOWN="$SLURMDOWN $host"
+done < $DOWN_HOSTS
 
-if [ "$DOWN_HOST_LIST" == "" ]; then
+if [ "$SLURMDOWN" == "" ]; then
   echo "Slurm up on all${ACCESSIBLE}hosts"
 else
-  echo "hosts down(slurm): $DOWN_HOST_LIST"
+  echo "Slurm down on: $SLURMDOWN"
 fi
 
 # --------------------- check slurm daemon --------------------
