@@ -67,7 +67,7 @@ root.resizable(0, 0)
 # ------------------------- Edit ------------------------------
 
 R=0
-Label(root, text="---Edit---").grid(column=0, row=R, columnspan=4)
+Label(root, text="---------Edit---------").grid(column=0, row=R, columnspan=4)
 
 R=R+1
 Label(root, text="Notes:").grid(column=0, row=R, sticky=E)
@@ -82,7 +82,7 @@ Button(root, text="Settings",  width=button_width, command=edit_settings).grid(r
 # ------------------------- Show repo revisions ------------------------------
 
 R=R+1
-Label(root, text="---Repos---").grid(column=0, row=R, columnspan=3)
+Label(root, text="---------Repos---------").grid(column=0, row=R, columnspan=3)
 
 R=R+1
 Label(root, text="Show:").grid(column=0, row=R, sticky=E)
@@ -106,7 +106,7 @@ Button(root, text="Master",   width=button_width, command=set_branch).grid(row=R
 # ------------------------- clean ------------------------------
 
 R=R+1
-Label(root, text="---Clean---").grid(column=0, row=R, columnspan=4)
+Label(root, text="---------Clean---------").grid(column=0, row=R, columnspan=4)
 
 R=R+1
 
@@ -130,7 +130,7 @@ Button(root, text="Smv",     width=button_width, command=clean_smv).grid(row=R, 
 # ------------------------- Build/Bundle/Install ------------------------------
 
 R=R+1
-Label(root, text="---Build/Bundle/Install---").grid(column=0, row=R, columnspan=3)
+Label(root, text="------Build/Bundle/Install------").grid(column=0, row=R, columnspan=3)
 
 R=R+1
 
@@ -152,19 +152,24 @@ Radiobutton(root,
                variable=v, 
                value=3).grid(row=R, column=2)
 
-# ------------------------- Build libraries ------------------------------
+# ------------------------- Build libraries/utilities ------------------------------
 
 R=R+1
-Button(root, text="Build Libs",  width=button_width, command=build_lib).grid(row=R,  column=0)
-Button(root, text="Build Utils", width=button_width, command=build_util).grid(row=R, column=1)
-Button(root, text="Build Smv",   width=button_width, command=build_smv).grid(row=R,  column=2)
+Label(root,  text="Build:").grid(column=0, row=R, sticky=E)
+Button(root, text="Libs",  width=button_width, command=build_lib).grid(row=R,  column=1)
+Button(root, text="Utils", width=button_width, command=build_util).grid(row=R, column=2)
+
+# ------------------------- Build smokeview ------------------------------
+R=R+1
+Label(root,  text="Build:").grid(column=0, row=R, sticky=E)
+Button(root, text="Smv(full)",   width=button_width, command=build_smv).grid(row=R,  column=1)
+Button(root, text="Smv(inc)",    width=button_width, command=build_smv_win_inc).grid(row=R, column=2)
 
 # ------------------------- bundle smokeview ------------------------------
 
 R=R+1
-Button(root, text="Bundle",  width=button_width, command=bundle_smv).grid(row=R,        column=0)
-Button(root, text="Install", width=button_width, command=install_smv).grid(row=R,       column=1)
-Button(root, text="Inc Smv",     width=button_width, command=build_smv_win_inc).grid(row=R, column=2)
+Button(root, text="Bundle",  width=button_width, command=bundle_smv).grid(row=R,        column=1)
+Button(root, text="Install", width=button_width, command=install_smv).grid(row=R,       column=2)
 
 
 R=R+1
@@ -175,7 +180,7 @@ Button(root, text="Archive", width=button_width, command=archive_smv).grid(row=R
 # ------------------------- synchronize ------------------------------
 
 R=R+1
-Label(root, text="---Sychronize---").grid(column=0, row=R, columnspan=3)
+Label(root, text="---------Sychronize---------").grid(column=0, row=R, columnspan=3)
 R=R+1
 Label(root, text="settings:").grid(column=0, row=R, sticky=E)
 Button(root, text="->smv",  width=button_width, command=webCOPYhome2config).grid(row=R, column=1)
