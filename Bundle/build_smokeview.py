@@ -67,7 +67,7 @@ root.resizable(0, 0)
 # ------------------------- Edit ------------------------------
 
 R=0
-Label(root, text="---------Edit---------").grid(column=0, row=R, columnspan=4)
+Label(root, text="------------Edit------------").grid(column=0, row=R, columnspan=4)
 
 R=R+1
 Label(root, text="Notes:").grid(column=0, row=R, sticky=E)
@@ -82,7 +82,7 @@ Button(root, text="Settings",  width=button_width, command=edit_settings).grid(r
 # ------------------------- Show repo revisions ------------------------------
 
 R=R+1
-Label(root, text="---------Repos---------").grid(column=0, row=R, columnspan=3)
+Label(root, text="------------Repos------------").grid(column=0, row=R, columnspan=3)
 
 R=R+1
 Label(root, text="Show:").grid(column=0, row=R, sticky=E)
@@ -106,7 +106,7 @@ Button(root, text="Master",   width=button_width, command=set_branch).grid(row=R
 # ------------------------- clean ------------------------------
 
 R=R+1
-Label(root, text="---------Clean---------").grid(column=0, row=R, columnspan=4)
+Label(root, text="------------Clean------------").grid(column=0, row=R, columnspan=4)
 
 R=R+1
 
@@ -180,7 +180,7 @@ Button(root, text="Archive", width=button_width, command=archive_smv).grid(row=R
 # ------------------------- synchronize ------------------------------
 
 R=R+1
-Label(root, text="---------Sychronize---------").grid(column=0, row=R, columnspan=3)
+Label(root, text="------------Sychronize------------").grid(column=0, row=R, columnspan=3)
 R=R+1
 Label(root, text="settings:").grid(column=0, row=R, sticky=E)
 Button(root, text="->smv",  width=button_width, command=webCOPYhome2config).grid(row=R, column=1)
