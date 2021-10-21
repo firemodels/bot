@@ -180,7 +180,7 @@ do
   host=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
   SLURMRPMI=`echo $line | awk '{print $2}'`
   if [ "$SLURMRPMI" != "$SLURMRPM0" ]; then
-    if [ "$SLURMRPMI" != "Connecton" ]; then
+    if [ "$SLURMRPMI" != "Connection" ]; then
       SLURMBAD="$SLURMBAD $host/$SLURMRPMI"
     fi
   fi
