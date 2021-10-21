@@ -86,15 +86,15 @@ Label(root, text="------------Repos------------").grid(column=0, row=R, columnsp
 
 R=R+1
 Label(root, text="Show:").grid(column=0, row=R, sticky=E)
-Button(root, text="Branch",       width=button_width, command=show_branch).grid(row=R, column=1)
-Button(root, text="Revision",     width=button_width, command=show_repos).grid(row=R,  column=2)
+Button(root, text="Revision",     width=button_width, command=show_repos).grid(row=R,  column=1)
+Button(root, text="Branch",       width=button_width, command=show_branch).grid(row=R, column=2)
 
 # ------------------------- Update repos ------------------------------
 
 R=R+1
 Label(root, text="Update:").grid(column=0, row=R, sticky=E)
-Button(root, text="Windows",    width=button_width, command=update_windows).grid(row=R, column=1)
-Button(root, text="All",        width=button_width, command=update_all).grid(row=R,     column=2)
+Button(root, text="All",        width=button_width, command=update_all).grid(row=R,     column=1)
+Button(root, text="Windows",    width=button_width, command=update_windows).grid(row=R, column=2)
 
 # ------------------------- Set  ------------------------------
 

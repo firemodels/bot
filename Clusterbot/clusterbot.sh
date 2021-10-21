@@ -2,12 +2,12 @@
 
 # --------------------- define file names --------------------
 
-ETHOUT=/tmp/out.$$
+ETHOUT=/tmp/ethout.$$
 FSOUT=/tmp/fsout.$$
 IBOUT=/tmp/ibout.$$
-#IBRATE=/tmp/ibrate.$$
-IBRATE=ibrate.$$
+IBRATE=/tmp/ibrate.$$
 SLURMOUT=/tmp/slurmout.$$
+SLURMRPMOUT=/tmp/slurmrpmout.$$
 DOWN_HOSTS=/tmp/downhosts.$$
 UP_HOSTS=/tmp/uphosts.$$
 
@@ -56,7 +56,7 @@ echo "--------------- cluster status $CB_HOSTS ---------------"
 # --------------------- check ethernet --------------------
 
 pdsh -t 2 -w $CB_HOSTS date   >& $ETHOUT
-ETHDOWN=`sort $ETHOUT | grep connect | awk '{printf "%s%s", $6," " }'`
+ETHDOWN=`sort $ETHOUT | grep timed | awk '{printf "%s%s", $1," " }' | awk -F':' '{printf $1}'`
 if [ "$ETHDOWN" == "" ]; then
   echo "Ethernet up on all hosts"
   ACCESSIBLE=" "
@@ -81,7 +81,7 @@ if [ "$HAVE_IB" == "1" ]; then
   if [ "$CB_HOST4" != "" ]; then
     ssh $CB_HOST4 pdsh -t 2 -w $CB_HOSTIB4 date  >>  $IBOUT 2>&1
   fi
-  IBDOWN=`grep timed  $IBOUT | grep out | sort | awk '{printf "%s%s", $6," " }'`
+  IBDOWN=`grep timed  $IBOUT | grep out | sort | awk '{printf "%s%s", $1," " }' | awk -F':' '{printf $1}'`
   if [ "$IBDOWN" == "" ]; then
     echo "Infiniband up on all${ACCESSIBLE}hosts"
   else
@@ -99,14 +99,16 @@ if [ "$HAVE_IB" == "1" ]; then
     host=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
     RATEI=`echo $line | awk '{print $2}'`
     if [ "$RATEI" != "$RATE0" ]; then
-      RATEBAD="$RATEBAD $host/$RATEI"
-  fi
+      if [ "$RATEI" != "Connection" ]; then
+        RATEBAD="$RATEBAD $host/$RATEI"
+      fi
+    fi
   done < $IBRATE
 
   if [ "RATEBAD" == "" ]; then
     echo "Infiniband speed is $RATE0 Gb/s on all${ACCESSIBLE}hosts"
   else
-    echo "Infiniband speed is $RATE0 Gb/s except for: $RATEBAD"
+    echo "Infiniband speed is $RATE0 Gb/s except on: $RATEBAD"
   fi
 fi
 
@@ -168,6 +170,28 @@ else
   echo "slurmd down on: $SLURMDOWN"
 fi
 
+# --------------------- check slurm rpm --------------------
+
+pdsh -t 2 -w $CB_HOSTS "rpm -qa | grep slurm | grep devel" |& grep -v ssh | sort >& $SLURMRPMOUT
+SLURMRPM0=`head -1 $SLURMRPMOUT | awk '{print $2}'`
+SLURMBAD=
+while read line 
+do
+  host=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
+  SLURMRPMI=`echo $line | awk '{print $2}'`
+  if [ "$SLURMRPMI" != "$SLURMRPM0" ]; then
+    if [ "$SLURMRPMI" != "Connecton" ]; then
+      SLURMBAD="$SLURMBAD $host/$SLURMRPMI"
+    fi
+  fi
+done < $SLURMRPMOUT
+
+if [ "$SLURMBAD" == "" ]; then
+  echo "slurm rpm version is $SLURMRPM0 on all${ACCESSIBLE}hosts"
+else
+  echo "hosts not using $SLURMRPM0: $SLURMBAD"
+fi
+
 # --------------------- cleanup --------------------
 
-rm -f $DOWN_HOSTS $UP_HOSTS $SLURMOUT $FSOUT $ETHOUT $IBOUT
+rm -f $IBRATE $DOWN_HOSTS $UP_HOSTS $SLURMOUT $SLURMRPMOUT $FSOUT $ETHOUT $IBOUT
