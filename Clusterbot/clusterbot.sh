@@ -6,8 +6,9 @@ ETHOUT=/tmp/out.$$
 FSOUT=/tmp/fsout.$$
 IBOUT=/tmp/ibout.$$
 #IBRATE=/tmp/ibrate.$$
-IBRATE=ibrate.$$
+IBRATE=/tmp/ibrate.$$
 SLURMOUT=/tmp/slurmout.$$
+SLURMRPMOUT=/tmp/slurmrpmout.$$
 DOWN_HOSTS=/tmp/downhosts.$$
 UP_HOSTS=/tmp/uphosts.$$
 
@@ -106,7 +107,7 @@ if [ "$HAVE_IB" == "1" ]; then
   if [ "RATEBAD" == "" ]; then
     echo "Infiniband speed is $RATE0 Gb/s on all${ACCESSIBLE}hosts"
   else
-    echo "Infiniband speed is $RATE0 Gb/s except for: $RATEBAD"
+    echo "Infiniband speed is $RATE0 Gb/s except on: $RATEBAD"
   fi
 fi
 
@@ -168,6 +169,26 @@ else
   echo "slurmd down on: $SLURMDOWN"
 fi
 
+# --------------------- check slurm rpm --------------------
+
+pdsh -t 2 -w $CB_HOSTS "rpm -qa | grep slurm | grep devel" |& grep -v ssh | sort >& $SLURMRPMOUT
+SLURMRPM0=`head -1 $SLURMRPMOUT | awk '{print $2}'`
+SLURMBAD=
+while read line 
+do
+  host=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
+  SLURMRPMI=`echo $line | awk '{print $2}'`
+  if [ "$SLURMRPMI" != "$SLURMRPM0" ]; then
+    SLURMBAD="$SLURMBAD $host/$SLURMRPMI"
+fi
+done < $SLURMRPMOUT
+
+if [ "$SLURMBAD" == "" ]; then
+  echo "slurm rpm version is $SLURMRPM0 on all${ACCESSIBLE}hosts"
+else
+  echo "hosts not using $SLURMRPM0: $SLURMBAD"
+fi
+
 # --------------------- cleanup --------------------
 
-rm -f $DOWN_HOSTS $UP_HOSTS $SLURMOUT $FSOUT $ETHOUT $IBOUT
+rm -f $IBRATE $DOWN_HOSTS $UP_HOSTS $SLURMOUT $SLURMRPMOUT $FSOUT $ETHOUT $IBOUT
