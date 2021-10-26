@@ -74,6 +74,7 @@ fi
 # --------------------- define file names --------------------
 
 ETHOUT=ethout.$$
+CLUSTEROUT=clusterout.$$
 ETHUP=ethup.33
 CHECKEROUT=checkerout.$$
 FSOUT=/tmp/fsout.$$
@@ -265,34 +266,36 @@ fi
 
 RUN_CLUSTER_CHECK ()
 {
-  local CB_HOSTIB_ARG=$1
+  local CB_HOST_ARG=$1
   local LOG=$2
 
-  if [ "$CB_HOSTIB_ARG" == "" ]; then
+  if [ "$CB_HOST_ARG" == "" ]; then
     return
   fi
-  NODEFILE=$LOG.hosts
-  CB_HOST_LOCAL=`echo $CB_HOSTIB_ARG | sed -e "s/-ib$//"`
-  echo "" > $ETHOUT
-  pdsh -t 2 -w $CB_HOST_LOCAL date   >& $ETHOUT
-  sort $ETHOUT | grep -v ssh | awk '{print $1 }' | awk -F':' '{print $1}' > $NODEFILE
+  NODEFILE=output/$LOG.hosts
+  echo "" > $CLUSTEROUT
+  pdsh -t 2 -w $CB_HOST_ARG date   >& $CLUSTEROUT
+  sort $CLUSTEROUT | grep -v ssh | awk '{print $1 }' | awk -F':' '{print $1}' > $NODEFILE
   nup=`wc -l $NODEFILE`
   if [ "$nup" == "0" ]; then
-    echo "***Error: all nodes in $CB_HOST_LOCAL are down - cluster checker not run"
+    echo "***Error: all nodes in $CB_HOST_ARG are down - cluster checker not run"
   else
-   echo "running cluster checker on host up in $CB_HOST_LOCAL (hosts in $NODEFILE)"
-   $CHECK_CLUSTER -f $NODEFILE -o ${LOG}_results.log >& ${LOG}.out
+   echo "running cluster checker on hosts up in $CB_HOST_ARG (hosts in $NODEFILE)"
+   $CHECK_CLUSTER -f $NODEFILE -o ${LOG}_results.log >& output/${LOG}.out
    if [ -e clck_execution_warnings.log ]; then
-     mv clck_execution_warnings.log ${LOG}_execution_warnings.log
+     mv clck_execution_warnings.log output/${LOG}_execution_warnings.log
+   fi
+   if [ -e ${LOG}_results.log  ]; then
+     mv ${LOG}_results.log  output/.
    fi
   fi
 }
 
 if [ "$CHECK_CLUSTER" != "" ]; then
-  RUN_CLUSTER_CHECK $CB_HOSTIB1 IB1
-  RUN_CLUSTER_CHECK $CB_HOSTIB2 IB2
-  RUN_CLUSTER_CHECK $CB_HOSTIB3 IB3
-  RUN_CLUSTER_CHECK $CB_HOSTIB4 IB4
+  RUN_CLUSTER_CHECK $CB_HOSTETH1 ETH1
+  RUN_CLUSTER_CHECK $CB_HOSTETH2 ETH2
+  RUN_CLUSTER_CHECK $CB_HOSTETH3 ETH3
+  RUN_CLUSTER_CHECK $CB_HOSTETH4 ETH4
 fi
 
 # --------------------- check file systems --------------------
@@ -377,4 +380,4 @@ fi
 
 # --------------------- cleanup --------------------
 
-rm -f $IBRATE $DOWN_HOSTS $UP_HOSTS $SLURMOUT $SLURMRPMOUT $FSOUT $IBOUT $SUBNETOUT $MOUNTOUT
+rm -f $IBRATE $DOWN_HOSTS $UP_HOSTS $SLURMOUT $SLURMRPMOUT $FSOUT $IBOUT $SUBNETOUT  $ETHOUT $CLUSTEROUT $MOUNTOUT
