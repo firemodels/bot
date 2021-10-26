@@ -5,6 +5,7 @@
 ETHOUT=/tmp/ethout.$$
 FSOUT=/tmp/fsout.$$
 IBOUT=/tmp/ibout.$$
+SUBNETOUT=/tmp/subnetout.$$
 IBRATE=/tmp/ibrate.$$
 SLURMOUT=/tmp/slurmout.$$
 SLURMRPMOUT=/tmp/slurmrpmout.$$
@@ -87,6 +88,32 @@ if [ "$HAVE_IB" == "1" ]; then
   else
     echo "Infiniband down on: $IBDOWN"
   fi
+
+# --------------------- check infiniband subnet manager --------------------
+SUBNET_CHECK ()
+{
+  local CB_HOST_ARG=$1
+  local CB_HOSTIB_ARG=$2
+
+  echo "" > $SUBNETOUT
+  if [ "$CB_HOST_ARG" != "" ]; then
+    ssh $CB_HOST_ARG pdsh -t 2 -w $CB_HOSTIB_ARG ps -el |& grep opensm  >>  $SUBNETOUT 2>&1
+  fi
+  SUB1=`grep opensm  $SUBNETOUT | sort | awk '{printf "%s%s", $1," " }' | awk -F':' '{printf $1}'`
+  if [ "$SUB1" == "" ]; then
+    echo "Subnet manager not running on any hosts in $CB_HOSTIB_ARG"
+  else
+    echo "Subnet manager running on: $SUB1 for hosts:$CB_HOSTIB_ARG"
+  fi
+}
+
+if [ "$HAVE_IB" == "1" ]; then
+  SUBNET_CHECK $CB_HOST1 $CB_HOSTIB1
+  SUBNET_CHECK $CB_HOST2 $CB_HOSTIB2
+  SUBNET_CHECK $CB_HOST3 $CB_HOSTIB3
+  SUBNET_CHECK $CB_HOST4 $CB_HOSTIB4
+fi
+
 
 # --------------------- check infiniband speed --------------------
 
@@ -194,4 +221,4 @@ fi
 
 # --------------------- cleanup --------------------
 
-rm -f $IBRATE $DOWN_HOSTS $UP_HOSTS $SLURMOUT $SLURMRPMOUT $FSOUT $ETHOUT $IBOUT
+rm -f $IBRATE $DOWN_HOSTS $UP_HOSTS $SLURMOUT $SLURMRPMOUT $FSOUT $ETHOUT $IBOUT $SUBNETOUT
