@@ -1,9 +1,43 @@
 #!/bin/bash
 
+# ---------------------------- usage ----------------------------------
+
+function usage {
+  echo "Usage: clusterbot.sh "
+  echo ""
+  echo "clusterbot.sh - peform various checks on a Linux cluster"
+  echo ""
+  echo " -h - display this message"
+  echo " -m - mount file systems on each host"
+  echo " -s - restart subnet manager on each infiniband subnet"
+  exit
+}
+
+RESTART_SUBNET=
+MOUNT_FS=
+while getopts 'hms' OPTION
+do
+case $OPTION  in
+  h)
+   usage
+   exit
+   ;;
+  m)
+   MOUNT_FS=1
+   ;;
+  s)
+   RESTART_SUBNET=1
+   ;;
+esac
+done
+shift $(($OPTIND-1))
+
+
 # --------------------- define file names --------------------
 
 ETHOUT=/tmp/ethout.$$
 FSOUT=/tmp/fsout.$$
+MOUNTOUT=/tmp/mountout.$$
 IBOUT=/tmp/ibout.$$
 SUBNETOUT=/tmp/subnetout.$$
 IBRATE=/tmp/ibrate.$$
@@ -49,6 +83,51 @@ if [ "$CB_HOST4" != "" ]; then
 fi
 if [ "$ERROR" == "1" ]; then
   exit
+fi
+
+if [ "$MOUNT_FS" == "1" ]; then
+  pdsh -t 2 -w $CB_HOSTS mount -a |& grep timed | sort | awk -F':' '{print $1}'>& $MOUNTOUT
+
+  MOUNTDOWN=
+  while read line 
+  do
+    host=`echo $line | awk '{print $1}'`
+    MOUNTDOWN="$MOUNTDOWN $host"
+  done < $MOUNTOUT
+
+  if [ "$MOUNTDOWN" == "" ]; then
+    echo "mount -a succeeded on all hosts in $CB_HOSTS"
+  else
+    echo "mount -a failed on: $MOUNTDOWN"
+  fi
+fi
+
+if [ "$RESTART_SUBNET" == "1" ]; then
+  if [ "$HAVE_IB" == "1" ]; then
+    if [ "$CB_HOST1" != "" ]; then
+      echo "restarting the subnet manager opensm on $CB_HOST1"
+      ssh $CB_HOST1 systcl opensm restart
+    fi
+    if [ "$CB_HOST2" != "" ]; then
+      echo "restarting the subnet manager opensm on $CB_HOST2"
+      ssh $CB_HOST2 systcl opensm restart
+    fi
+    if [ "$CB_HOST3" != "" ]; then
+      echo "restarting the subnet manager opensm on $CB_HOST3"
+      ssh $CB_HOST3 systcl opensm restart
+    fi
+    if [ "$CB_HOST4" != "" ]; then
+      echo "restarting the subnet manager opensm on $CB_HOST4"
+      ssh $CB_HOST4 systcl opensm restart
+    fi
+  else
+    echo "***Error: infiniband not running on the linux cluser"
+  fi
+  exit
+fi
+
+if [ "$MOUNT_FS" == "1" ]; then
+  exit   
 fi
 
 echo
@@ -221,4 +300,4 @@ fi
 
 # --------------------- cleanup --------------------
 
-rm -f $IBRATE $DOWN_HOSTS $UP_HOSTS $SLURMOUT $SLURMRPMOUT $FSOUT $ETHOUT $IBOUT $SUBNETOUT
+rm -f $IBRATE $DOWN_HOSTS $UP_HOSTS $SLURMOUT $SLURMRPMOUT $FSOUT $ETHOUT $IBOUT $SUBNETOUT $MOUNTOUT
