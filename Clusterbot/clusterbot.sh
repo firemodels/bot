@@ -15,6 +15,7 @@ function usage {
 
 RESTART_SUBNET=
 MOUNT_FS=
+ERROR=
 while getopts 'hms' OPTION
 do
 case $OPTION  in
@@ -24,13 +25,25 @@ case $OPTION  in
    ;;
   m)
    MOUNT_FS=1
+   if [ `whoami` != "root" ]; then
+     ERROR=1
+     echo "***Error: you need to be root to use the -m option"
+   fi
    ;;
   s)
    RESTART_SUBNET=1
+   if [ `whoami` != "root" ]; then
+     ERROR=1
+     echo "***Error: you need to be root to use the -s option"
+   fi
    ;;
 esac
 done
 shift $(($OPTIND-1))
+
+if [ "$ERROR" == "1" ]; then
+  exit
+fi
 
 
 # --------------------- define file names --------------------
