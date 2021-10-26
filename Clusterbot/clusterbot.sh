@@ -266,12 +266,10 @@ fi
 
 RUN_CLUSTER_CHECK ()
 {
-  local CB_HOST_ARG=$1
-  local LOG=$2
+  local LOG=$1
+  local CB_HOST_ARG=$2
 
-  if [ "$CB_HOST_ARG" == "" ]; then
-    return
-  fi
+  if [ "$CB_HOST_ARG" != "" ]; then
   NODEFILE=output/$LOG.hosts
   echo "" > $CLUSTEROUT
   pdsh -t 2 -w $CB_HOST_ARG date   >& $CLUSTEROUT
@@ -289,13 +287,14 @@ RUN_CLUSTER_CHECK ()
      mv ${LOG}_results.log  output/.
    fi
   fi
+  fi
 }
 
 if [ "$CHECK_CLUSTER" != "" ]; then
-  RUN_CLUSTER_CHECK $CB_HOSTETH1 ETH1
-  RUN_CLUSTER_CHECK $CB_HOSTETH2 ETH2
-  RUN_CLUSTER_CHECK $CB_HOSTETH3 ETH3
-  RUN_CLUSTER_CHECK $CB_HOSTETH4 ETH4
+  RUN_CLUSTER_CHECK ETH1 $CB_HOSTETH1
+  RUN_CLUSTER_CHECK ETH2 $CB_HOSTETH2
+  RUN_CLUSTER_CHECK ETH3 $CB_HOSTETH3
+  RUN_CLUSTER_CHECK ETH4 $CB_HOSTETH4
 fi
 
 # --------------------- check file systems --------------------
