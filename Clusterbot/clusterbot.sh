@@ -73,10 +73,10 @@ fi
 
 # --------------------- define file names --------------------
 
-ETHOUT=ethout.$$
-CLUSTEROUT=clusterout.$$
-ETHUP=ethup.33
-CHECKEROUT=checkerout.$$
+ETHOUT=/tmp/ethout.$$
+CLUSTEROUT=/tmp/clusterout.$$
+ETHUP=/tmp/ethup.33
+CHECKEROUT=/tmp/checkerout.$$
 FSOUT=/tmp/fsout.$$
 MOUNTOUT=/tmp/mountout.$$
 IBOUT=/tmp/ibout.$$
@@ -221,9 +221,9 @@ SUBNET_CHECK ()
   fi
   echo "" > $SUBNETOUT
   if [ "$CB_HOST_ARG" != "" ]; then
-    ssh $CB_HOST_ARG pdsh -t 2 -w $CB_HOSTIB_ARG ps -el |& grep opensm  >>  $SUBNETOUT 2>&1
+    ssh $CB_HOST_ARG pdsh -t 2 -w $CB_HOST_ARG,$CB_HOSTIB_ARG ps -el |& sort -u | grep opensm  >>  $SUBNETOUT 2>&1
   fi
-  SUB1=`grep opensm  $SUBNETOUT | sort | awk '{printf "%s%s", $1," " }' | awk -F':' '{printf $1}'`
+  SUB1=`grep opensm  $SUBNETOUT | awk -F':' '{print $1}' | sort -u | awk '{printf "%s%s", $1," " }'`
   if [ "$SUB1" == "" ]; then
     echo "Subnet manager not running on any hosts in $CB_HOSTIB_ARG"
   else
@@ -281,7 +281,7 @@ RUN_CLUSTER_CHECK ()
     if [ "$nup" == "0" ]; then
       echo "***Error: all nodes in $CB_HOST_ARG are down - cluster checker not run"
     else
-     echo "running Intel cluster checker on $CB_HOST_ARG"
+     echo "running Intel cluster checker on $CB_HOST_ARG - results in $RESULTSFILE and $WARNINGFILE"
      $CHECK_CLUSTER -l error -f $NODEFILE -o $RESULTSFILE >& $OUTFILE
      if [ -e clck_execution_warnings.log ]; then
        mv clck_execution_warnings.log $WARNINGFILE
@@ -379,4 +379,4 @@ fi
 
 # --------------------- cleanup --------------------
 
-rm -f $IBRATE $DOWN_HOSTS $UP_HOSTS $SLURMOUT $SLURMRPMOUT $FSOUT $IBOUT $SUBNETOUT  $ETHOUT $CLUSTEROUT $MOUNTOUT
+rm -f $CLUSTEROUT $DOWN_HOSTS $ETHOUT $FSOUT $IBOUT $IBRATE $MOUNTOUT $SLURMOUT $SLURMRPMOUT $SUBNETOUT $UP_HOSTS 
