@@ -84,6 +84,8 @@ SLURMRPMOUT=/tmp/slurmrpmout.$$
 DOWN_HOSTS=/tmp/downhosts.$$
 UP_HOSTS=/tmp/uphosts.$$
 
+# --------------------- setup Intel cluster checker  --------------------
+
 SETUP_CLCK
 
 # --------------------- initial error checking --------------------
@@ -171,14 +173,9 @@ if [ "$MOUNT_FS" == "1" ]; then
 fi
 
 echo
-echo "--------------- Linux Cluster Status: $CB_HOSTS ---------------"
-
-# --------------------- setup Intel cluster checker  --------------------
-
-SETUP_CLCK
-
+echo "---------- Linux Cluster Status: $CB_HOSTS ----------"
 echo ""
-echo "------------------------------- network checks -------------------------------------"
+echo "--------------------- network checks ---------------------------"
 # --------------------- check ethernet --------------------
 
 pdsh -t 2 -w $CB_HOSTS date   >& $ETHOUT
@@ -214,10 +211,11 @@ if [ "$HAVE_IB" == "1" ]; then
   else
     echo "   $CB_HOSTS: ***Warning: Infiniband down on $IBDOWN"
   fi
+fi
 
 # --------------------- check infiniband subnet manager --------------------
 echo ""
-echo "------------------------------- infiniband checks -------------------------------------"
+echo "--------------------- infiniband checks ---------------------------"
 
 SUBNET_CHECK ()
 {
@@ -268,17 +266,17 @@ IBSPEED ()
   done < $IBRATE
 
    if [ "$RATEBAD" == "" ]; then
-    echo "   ${CB_HOST_ARG}-ib: Infiniband speed is $RATE0 Gb/s on each host"
+    echo "   ${CB_HOST_ARG}-ib: Infiniband - $RATE0 Gb/s  on each host"
   else
-    echo "   ${CB_HOST_ARG}-ib: ***Warning: Infiniband speed is $RATE0 Gb/s on each host except $RATEBAD"
+    echo "   ${CB_HOST_ARG}-ib: ***Warning: Infiniband - $RATE0 Gb/s on each host except $RATEBAD"
   fi
 }
+if [ "$HAVE_IB" == "1" ]; then
   echo ""
   IBSPEED $CB_HOSTETH1
   IBSPEED $CB_HOSTETH2
   IBSPEED $CB_HOSTETH3
   IBSPEED $CB_HOSTETH4
-
 fi
 
 # --------------------- run cluster checker --------------------
@@ -310,7 +308,7 @@ RUN_CLUSTER_CHECK ()
 
 if [ "$CHECK_CLUSTER" != "" ]; then
 echo ""
-echo "------------------------------- Intel Cluster Checker -------------------------------------"
+echo "--------------------- Intel Cluster Checker ---------------------------"
   RUN_CLUSTER_CHECK ETH1 $CB_HOSTETH1
   RUN_CLUSTER_CHECK ETH2 $CB_HOSTETH2
   RUN_CLUSTER_CHECK ETH3 $CB_HOSTETH3
@@ -348,7 +346,7 @@ CORE_CHECK ()
 }
 
 echo ""
-echo "------------------------------- CPU/Disk checks -------------------------------------"
+echo "--------------------- CPU/Disk checks ---------------------------"
 CORE_CHECK $CB_HOSTETH1
 CORE_CHECK $CB_HOSTETH2
 CORE_CHECK $CB_HOSTETH3
@@ -379,7 +377,7 @@ fi
 
 # --------------------- check slurm --------------------
 echo ""
-echo "------------------------------- Slurm checks -------------------------------------"
+echo "--------------------- Slurm checks ---------------------------"
 
 pbsnodes -l | awk '{print $1}' | sort -u  > $DOWN_HOSTS
 SLURMDOWN=
