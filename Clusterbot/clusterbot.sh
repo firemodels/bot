@@ -136,7 +136,7 @@ if [ "$MOUNT_FS" == "1" ]; then
   done < $MOUNTOUT
 
   if [ "$MOUNTDOWN" == "" ]; then
-    echo "mount -a succeeded on all hosts in $CB_HOSTS"
+    echo "mount -a succeeded on each host in $CB_HOSTS"
   else
     echo "mount -a failed on: $MOUNTDOWN"
   fi
@@ -171,30 +171,29 @@ if [ "$MOUNT_FS" == "1" ]; then
 fi
 
 echo
-echo "--------------- cluster status $CB_HOSTS ---------------"
+echo "--------------- Linux Cluster Status: $CB_HOSTS ---------------"
 
 # --------------------- setup Intel cluster checker  --------------------
 
 SETUP_CLCK
 
+echo ""
+echo "------------------------------- network checks -------------------------------------"
 # --------------------- check ethernet --------------------
 
 pdsh -t 2 -w $CB_HOSTS date   >& $ETHOUT
-ETHDOWN=`sort $ETHOUT | grep timed | awk -F':' '{print $1}' | awk '{printf "%s%s", $1," " }'`
+ETHDOWN=`sort $ETHOUT | grep timed | awk -F':' '{print $1}' | awk '{printf "%s ", $1}'`
 
-echo ""
 if [ "$ETHDOWN" == "" ]; then
-  echo "Ethernet up on all hosts"
-  ACCESSIBLE=" "
+  echo "   $CB_HOSTS: Ethernet up on each host"
 else
-  echo "***Warning: Ethernet down on $ETHDOWN"
-  ACCESSIBLE=" accessible "
+  echo "   $CB_HOSTS: ***Warning: Ethernet down on $ETHDOWN"
 fi
 
 # --------------------- check infiniband --------------------
 
 if [ "$HAVE_IB" == "1" ]; then
-  echo "" > $IBOUT
+  rm -rf $IBOUT
   if [ "$CB_HOST1" != "" ]; then
     ssh $CB_HOST1 pdsh -t 2 -w $CB_HOSTIB1 date  >>  $IBOUT 2>&1
   fi
@@ -209,14 +208,15 @@ if [ "$HAVE_IB" == "1" ]; then
   fi
   IBDOWN=`grep timed  ibout | grep out | sort | awk -F':' '{print $1}' | awk '{printf "%s ", $1}'`
 
-  echo ""
   if [ "$IBDOWN" == "" ]; then
-    echo "Infiniband up on all${ACCESSIBLE}hosts"
+    echo "   $CB_HOSTS: Infiniband up on each host"
   else
-    echo "***Warning: Infiniband down on $IBDOWN"
+    echo "   $CB_HOSTS: ***Warning: Infiniband down on $IBDOWN"
   fi
 
 # --------------------- check infiniband subnet manager --------------------
+echo ""
+echo "------------------------------- infiniband checks -------------------------------------"
 
 SUBNET_CHECK ()
 {
@@ -228,11 +228,10 @@ SUBNET_CHECK ()
   fi
   ssh $CB_HOST_ARG pdsh -t 2 -w $CB_HOST_ARG,$CB_HOSTIB_ARG ps -el |& sort -u | grep opensm  >  $SUBNETOUT 2>&1
   SUB1=`cat  $SUBNETOUT | awk -F':' '{print $1}' | sort -u | awk '{printf "%s%s", $1," " }'`
-  echo ""
   if [ "$SUB1" == "" ]; then
-    echo "***Error: Subnet manager not running on any hosts in $CB_HOSTIB_ARG"
+    echo "   $CB_HOSTIB_ARG: **Error: subnet manager not running on any host"
   else
-    echo "Subnet manager for subnet $CB_HOSTIB_ARG running on $SUB1"
+    echo "   $CB_HOSTIB_ARG: subnet manager running on $SUB1"
   fi
 }
 
@@ -262,9 +261,9 @@ fi
 
   echo ""
   if [ "RATEBAD" == "" ]; then
-    echo "Infiniband speed is $RATE0 Gb/s on all${ACCESSIBLE}hosts"
+    echo "   $CB_HOSTS: Infiniband speed is $RATE0 Gb/s on each host"
   else
-    echo "***Warning: Infiniband speed is $RATE0 Gb/s except on $RATEBAD"
+    echo "   $CB_HOSTS: ***Warning: Infiniband speed is $RATE0 Gb/s except on $RATEBAD"
   fi
 fi
 
@@ -284,19 +283,20 @@ RUN_CLUSTER_CHECK ()
     sort $CLUSTEROUT | grep -v ssh | awk '{print $1 }' | awk -F':' '{print $1}' > $NODEFILE
     nup=`wc -l $NODEFILE`
     if [ "$nup" == "0" ]; then
-      echo "***Error: all nodes in $CB_HOST_ARG are down - cluster checker not run"
+      echo "   $CB_HOST_ARG: ***Error: all nodes are down - cluster checker not run"
     else
-     echo "running Intel cluster checker on $CB_HOST_ARG - results in $RESULTSFILE and $WARNINGFILE"
-     $CHECK_CLUSTER -l error -f $NODEFILE -o $RESULTSFILE >& $OUTFILE
-     if [ -e clck_execution_warnings.log ]; then
-       mv clck_execution_warnings.log $WARNINGFILE
-     fi
+      echo "   $CB_HOST_ARG: results in $RESULTSFILE and $WARNINGFILE"
+      $CHECK_CLUSTER -l error -f $NODEFILE -o $RESULTSFILE >& $OUTFILE
+      if [ -e clck_execution_warnings.log ]; then
+        mv clck_execution_warnings.log $WARNINGFILE
+      fi
     fi
   fi
 }
 
 if [ "$CHECK_CLUSTER" != "" ]; then
-  echo ""
+echo ""
+echo "------------------------------- Intel Cluster Checker -------------------------------------"
   RUN_CLUSTER_CHECK ETH1 $CB_HOSTETH1
   RUN_CLUSTER_CHECK ETH2 $CB_HOSTETH2
   RUN_CLUSTER_CHECK ETH3 $CB_HOSTETH3
@@ -326,14 +326,15 @@ CORE_CHECK ()
     fi
   done < $FSOUT
 
-  echo ""
   if [ "$FSDOWN" == "" ]; then
-    echo "$NF0 cores on each host in $CB_HOSTETH_ARG"
+    echo "   $CB_HOSTETH_ARG: $NF0 cores on each host"
   else
-    echo "***Warning: $NF0 cores on all hosts in $CB_HOSTETH_ARG except $FSDOWN"
+    echo "   $CB_HOSTETH_ARG: ***Warning: $NF0 cores on each host except $FSDOWN"
   fi
 }
 
+echo ""
+echo "------------------------------- CPU/Disk checks -------------------------------------"
 CORE_CHECK $CB_HOSTETH1
 CORE_CHECK $CB_HOSTETH2
 CORE_CHECK $CB_HOSTETH3
@@ -356,14 +357,15 @@ do
   fi
 done < $FSOUT
 
-echo ""
 if [ "$FSDOWN" == "" ]; then
-  echo "$NF0 file systems mounted on all${ACCESSIBLE}hosts"
+  echo "   $CB_HOSTS: $NF0 file systems mounted on each host"
 else
-  echo "***Warning: $NF0 file systems not mounted on $FSDOWN"
+  echo "   $CB_HOSTS: ***Warning: $NF0 file systems not mounted on $FSDOWN"
 fi
 
 # --------------------- check slurm --------------------
+echo ""
+echo "------------------------------- Slurm checks -------------------------------------"
 
 pbsnodes -l | awk '{print $1}' | sort -u  > $DOWN_HOSTS
 SLURMDOWN=
@@ -373,11 +375,10 @@ do
   SLURMDOWN="$SLURMDOWN $host"
 done < $DOWN_HOSTS
 
-echo ""
 if [ "$SLURMDOWN" == "" ]; then
-  echo "Slurm up on all${ACCESSIBLE}hosts"
+  echo "   $CB_HOSTS: Slurm up on each host"
 else
-  echo "***Warning: Slurm down on $SLURMDOWN"
+  echo "   $CB_HOSTS: ***Warning: Slurm down on $SLURMDOWN"
 fi
 
 # --------------------- check slurm daemon --------------------
@@ -394,11 +395,10 @@ do
   fi
 done < $SLURMOUT
 
-echo ""
 if [ "$SLURMDOWN" == "" ]; then
-  echo "slurmd running on all${ACCESSIBLE}hosts"
+  echo "   $CB_HOSTS: slurmd running on each host"
 else
-  echo "***Warning: slurmd down on $SLURMDOWN"
+  echo "   $CB_HOSTS: ***Warning: slurmd down on $SLURMDOWN"
 fi
 
 # --------------------- check slurm rpm --------------------
@@ -417,11 +417,10 @@ do
   fi
 done < $SLURMRPMOUT
 
-echo ""
 if [ "$SLURMBAD" == "" ]; then
-  echo "slurm rpm version is $SLURMRPM0 on all${ACCESSIBLE}hosts"
+  echo "   $CB_HOSTS: $SLURMRPM0 installed on each host"
 else
-  echo "***Warning: $SLURMRPM0 not installed on $SLURMBAD"
+  echo "   $CB_HOSTS: ***Warning: $SLURMRPM0 not installed on $SLURMBAD"
 fi
 
 # --------------------- cleanup --------------------
