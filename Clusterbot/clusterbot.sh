@@ -422,8 +422,6 @@ fi
 rm -f $DAEMONOUT
 }
 
-CHECK_DAEMON slurmd $CB_HOSTS
-
 # --------------------- check slurm rpm --------------------
 
 pdsh -t 2 -w $CB_HOSTS "rpm -qa | grep slurm | grep devel" |& grep -v ssh | sort >& $SLURMRPMOUT
@@ -445,6 +443,50 @@ if [ "$SLURMBAD" == "" ]; then
 else
   echo "   $CB_HOSTS: ***Warning: $SLURMRPM0 not installed on $SLURMBAD"
 fi
+
+# --------------------- check daemons --------------------
+
+echo ""
+echo "--------------------- daemon checks ---------------------------"
+
+CHECK_DAEMON slurmd $CB_HOSTS
+
+GANGLIA=`ps -el | grep gmetad`
+if [ "$GANGLIA" != "" ]; then
+  CHECK_DAEMON gmond $CB_HOSTS
+fi
+
+echo ""
+echo "--------------------- rpm check ---------------------------"
+
+rm -f $HOME/.rpms/rpm*.txt
+pdsh -t 2 -w $CB_HOSTS `pwd`/getrpms.sh >& $SLURMRPMOUT
+
+CURDIR=`pwd`
+cd $HOME/.rpms
+rpm0=`ls -l rpm*.txt | head -1 | awk '{print $9}'`
+host0=`echo $rpm0 | sed 's/.txt$//'`
+host0=`echo $host0 | sed 's/^rpm_//'`
+RPMDIFF=
+for f in rpm*.txt
+do
+  ndiff=`diff $rpm0 $f | wc -l`
+  if [ "$ndiff" != "0" ]; then
+    hostdiff=`echo $f | sed 's/.txt$//'`
+    hostdiff=`echo $hostdiff | sed 's/^rpm_//'`
+    RPMDIFF="$RPMDIFF $hostdiff"
+  fi
+done
+cd $CURDIR
+
+if [ "$RPMDIFF" == "" ]; then
+  echo "   $CB_HOSTS: rpms the same each host"
+else
+  echo "   $CB_HOSTS: ***Warning: $host0 rpms different from those on $RPMDIFF "
+fi
+
+
+
 
 # --------------------- cleanup --------------------
 
