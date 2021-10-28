@@ -244,8 +244,13 @@ fi
 
 # --------------------- check infiniband speed --------------------
 
+IBSPEED ()
+{
+  local CB_HOST_ARG=$1
+  local CB_HOSTIB_ARG=$2
+
   CURDIR=`pwd`
-  pdsh -t 2 -w $CB_HOSTS $CURDIR/ibspeed.sh |& grep -v ssh | sort >& $IBRATE
+  pdsh -t 2 -w $CB_HOST_ARG $CURDIR/ibspeed.sh |& grep -v ssh | sort >& $IBRATE
   RATE0=`head -1 $IBRATE | awk '{print $2}'`
   RATEBAD=
   while read line 
@@ -259,12 +264,18 @@ fi
     fi
   done < $IBRATE
 
-  echo ""
-  if [ "RATEBAD" == "" ]; then
-    echo "   $CB_HOSTS: Infiniband speed is $RATE0 Gb/s on each host"
+   if [ "$RATEBAD" == "" ]; then
+    echo "   $CB_HOSTIB_ARG: Infiniband speed is $RATE0 Gb/s on each host"
   else
-    echo "   $CB_HOSTS: ***Warning: Infiniband speed is $RATE0 Gb/s except on $RATEBAD"
+    echo "   $CB_HOSTIB_ARG: ***Warning: Infiniband speed is $RATE0 Gb/s on each host except $RATEBAD"
   fi
+}
+  echo ""
+  IBSPEED $CB_HOSTETH1 $CB_HOSTIB1
+  IBSPEED $CB_HOSTETH2 $CB_HOSTIB2
+  IBSPEED $CB_HOSTETH3 $CB_HOSTIB3
+  IBSPEED $CB_HOSTETH4 $CB_HOSTIB4
+
 fi
 
 # --------------------- run cluster checker --------------------
