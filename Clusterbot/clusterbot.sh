@@ -194,6 +194,7 @@ fi
 
 if [ "$HAVE_IB" == "1" ]; then
   rm -rf $IBOUT
+  touch $IBOUT
   if [ "$CB_HOST1" != "" ]; then
     ssh $CB_HOST1 pdsh -t 2 -w $CB_HOSTIB1 date  >>  $IBOUT 2>&1
   fi
@@ -206,7 +207,7 @@ if [ "$HAVE_IB" == "1" ]; then
   if [ "$CB_HOST4" != "" ]; then
     ssh $CB_HOST4 pdsh -t 2 -w $CB_HOSTIB4 date  >>  $IBOUT 2>&1
   fi
-  IBDOWN=`grep timed  ibout | grep out | sort | awk -F':' '{print $1}' | awk '{printf "%s ", $1}'`
+  IBDOWN=`grep timed  $IBOUT | grep out | sort | awk -F':' '{print $1}' | awk '{printf "%s ", $1}'`
 
   if [ "$IBDOWN" == "" ]; then
     echo "   $CB_HOSTS: Infiniband up on each host"
@@ -247,8 +248,10 @@ fi
 IBSPEED ()
 {
   local CB_HOST_ARG=$1
-  local CB_HOSTIB_ARG=$2
-
+ 
+  if [ "$CB_HOST_ARG" == "" ]; then
+    return
+  fi
   CURDIR=`pwd`
   pdsh -t 2 -w $CB_HOST_ARG $CURDIR/ibspeed.sh |& grep -v ssh | sort >& $IBRATE
   RATE0=`head -1 $IBRATE | awk '{print $2}'`
@@ -265,16 +268,16 @@ IBSPEED ()
   done < $IBRATE
 
    if [ "$RATEBAD" == "" ]; then
-    echo "   $CB_HOSTIB_ARG: Infiniband speed is $RATE0 Gb/s on each host"
+    echo "   ${CB_HOST_ARG}-ib: Infiniband speed is $RATE0 Gb/s on each host"
   else
-    echo "   $CB_HOSTIB_ARG: ***Warning: Infiniband speed is $RATE0 Gb/s on each host except $RATEBAD"
+    echo "   ${CB_HOST_ARG}-ib: ***Warning: Infiniband speed is $RATE0 Gb/s on each host except $RATEBAD"
   fi
 }
   echo ""
-  IBSPEED $CB_HOSTETH1 $CB_HOSTIB1
-  IBSPEED $CB_HOSTETH2 $CB_HOSTIB2
-  IBSPEED $CB_HOSTETH3 $CB_HOSTIB3
-  IBSPEED $CB_HOSTETH4 $CB_HOSTIB4
+  IBSPEED $CB_HOSTETH1
+  IBSPEED $CB_HOSTETH2
+  IBSPEED $CB_HOSTETH3
+  IBSPEED $CB_HOSTETH4
 
 fi
 
