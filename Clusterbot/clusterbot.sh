@@ -207,7 +207,7 @@ if [ "$HAVE_IB" == "1" ]; then
   if [ "$CB_HOST4" != "" ]; then
     ssh $CB_HOST4 pdsh -t 2 -w $CB_HOSTIB4 date  >>  $IBOUT 2>&1
   fi
-  IBDOWN=`grep timed  $IBOUT | grep out | sort | awk -F':' '{printf $1}' | awk '{printf "%s%s", $1," " }'`
+  IBDOWN=`grep timed  ibout | grep out | sort | awk -F':' '{print $1}' | awk '{printf "%s ", $1}'`
 
   echo ""
   if [ "$IBDOWN" == "" ]; then
@@ -226,8 +226,7 @@ SUBNET_CHECK ()
   if [ "$CB_HOST_ARG" == "" ]; then
     return
   fi
-  echo "" > $SUBNETOUT
-  ssh $CB_HOST_ARG pdsh -t 2 -w $CB_HOST_ARG,$CB_HOSTIB_ARG ps -el |& sort -u | grep opensm  >>  $SUBNETOUT 2>&1
+  ssh $CB_HOST_ARG pdsh -t 2 -w $CB_HOST_ARG,$CB_HOSTIB_ARG ps -el |& sort -u | grep opensm  >  $SUBNETOUT 2>&1
   SUB1=`cat  $SUBNETOUT | awk -F':' '{print $1}' | sort -u | awk '{printf "%s%s", $1," " }'`
   echo ""
   if [ "$SUB1" == "" ]; then
@@ -238,7 +237,6 @@ SUBNET_CHECK ()
 }
 
 if [ "$HAVE_IB" == "1" ]; then
-  echo ""
   SUBNET_CHECK $CB_HOST1 $CB_HOSTIB1
   SUBNET_CHECK $CB_HOST2 $CB_HOSTIB2
   SUBNET_CHECK $CB_HOST3 $CB_HOSTIB3
@@ -282,7 +280,6 @@ RUN_CLUSTER_CHECK ()
     WARNINGFILE=output/${LOG}_execution_warnings.log
     OUTFILE=output/${LOG}.out
     RESULTSFILE=output/${LOG}_results.out
-    echo "" > $CLUSTEROUT
     pdsh -t 2 -w $CB_HOST_ARG date   >& $CLUSTEROUT
     sort $CLUSTEROUT | grep -v ssh | awk '{print $1 }' | awk -F':' '{print $1}' > $NODEFILE
     nup=`wc -l $NODEFILE`
@@ -305,6 +302,42 @@ if [ "$CHECK_CLUSTER" != "" ]; then
   RUN_CLUSTER_CHECK ETH3 $CB_HOSTETH3
   RUN_CLUSTER_CHECK ETH4 $CB_HOSTETH4
 fi
+
+# --------------------- check number of cores --------------------
+
+CORE_CHECK ()
+{
+  local CB_HOSTETH_ARG=$1
+
+  if [ "$CB_HOSTETH_ARG" == "" ]; then
+    return 0
+  fi
+  pdsh -t 2 -w $CB_HOSTETH_ARG "grep cpuid /proc/cpuinfo | wc -l" |&  grep -v ssh | sort >  $FSOUT 2>&1
+
+  NF0=`head -1 $FSOUT | awk '{print $2}'`
+  FSDOWN=
+  while read line 
+  do
+    host=`echo $line | awk '{print $1}'`
+    host=`echo $host | sed 's/.$//'`
+    NFI=`echo $line | awk '{print $2}'`
+    if [ "$NFI" != "$NF0" ]; then
+      FSDOWN="$FSDOWN $host/$NFI"
+    fi
+  done < $FSOUT
+
+  echo ""
+  if [ "$FSDOWN" == "" ]; then
+    echo "$NF0 cores on each host in $CB_HOSTETH_ARG"
+  else
+    echo "***Warning: $NF0 cores on all hosts in $CB_HOSTETH_ARG except $FSDOWN"
+  fi
+}
+
+CORE_CHECK $CB_HOSTETH1
+CORE_CHECK $CB_HOSTETH2
+CORE_CHECK $CB_HOSTETH3
+CORE_CHECK $CB_HOSTETH4
 
 # --------------------- check file systems --------------------
 
