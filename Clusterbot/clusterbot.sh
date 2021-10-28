@@ -395,23 +395,34 @@ fi
 
 # --------------------- check slurm daemon --------------------
 
-pdsh -t 2 -w $CB_HOSTS "ps -el | grep slurmd | wc -l" |&  grep -v ssh | sort >& $SLURMOUT
-SLURMDOWN=
+CHECK_DAEMON ()
+{
+ local DAEMON_ARG=$1
+ local CB_HOST_ARG=$2
+
+DAEMONOUT=/tmp/daemon.out.$$
+
+pdsh -t 2 -w $CB_HOST_ARG "ps -el | grep $DAEMON_ARG | wc -l" |&  grep -v ssh | sort >& $DAEMONOUT
+DAEMONDOWN=
 while read line 
 do
   host=`echo $line | awk '{print $1}'`
   host=`echo $host | sed 's/.$//'`
-  NSLURM=`echo $line | awk '{print $2}'`
-  if [ "$NSLURM" == "0" ]; then
-    SLURMDOWN="$SLURMDOWN $host"
+  NDAEMON=`echo $line | awk '{print $2}'`
+  if [ "$NDAEMON" == "0" ]; then
+    DAEMONDOWN="$DAEMONDOWN $host"
   fi
-done < $SLURMOUT
+done < $DAEMONOUT
 
-if [ "$SLURMDOWN" == "" ]; then
-  echo "   $CB_HOSTS: slurmd running on each host"
+if [ "$DAEMONDOWN" == "" ]; then
+  echo "   $CB_HOST_ARG: $DAEMON_ARG running on each host"
 else
-  echo "   $CB_HOSTS: ***Warning: slurmd down on $SLURMDOWN"
+  echo "   $CB_HOST_ARG: ***Warning: $DAEMON_ARG down on $DAEMONDOWN"
 fi
+rm -f $DAEMONOUT
+}
+
+CHECK_DAEMON slurmd $CB_HOSTS
 
 # --------------------- check slurm rpm --------------------
 
