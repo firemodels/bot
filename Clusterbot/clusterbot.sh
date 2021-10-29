@@ -9,7 +9,6 @@ function usage {
   echo ""
   echo "clusterbot.sh - peform various checks on a Linux cluster"
   echo ""
-  echo " -c - run Intel cluster checker"
   echo " -h - display this message"
   echo " -m - mount file systems on each host"
   echo " -s - restart subnet manager on each infiniband subnet"
@@ -38,7 +37,8 @@ SETUP_CLCK()
 RESTART_SUBNET=
 MOUNT_FS=
 ERROR=
-while getopts 'hms' OPTION
+RPMCHECK=
+while getopts 'hmrs' OPTION
 do
 case $OPTION  in
   h)
@@ -51,6 +51,9 @@ case $OPTION  in
      ERROR=1
      echo "***Error: you need to be root to use the -m option"
    fi
+   ;;
+  r)
+   RPMCHECK=1
    ;;
   s)
    RESTART_SUBNET=1
@@ -493,11 +496,13 @@ else
 fi
 }
 
-RPM_CHECK $CB_HOSTETH1
-RPM_CHECK $CB_HOSTETH2
-RPM_CHECK $CB_HOSTETH3
-RPM_CHECK $CB_HOSTETH4
-RPM_CHECK $CB_HOSTS
+if [ "$RPMCHECK" == "" ]; then
+  RPM_CHECK $CB_HOSTETH1
+  RPM_CHECK $CB_HOSTETH2
+  RPM_CHECK $CB_HOSTETH3
+  RPM_CHECK $CB_HOSTETH4
+  RPM_CHECK $CB_HOSTS
+fi
 
 
 
