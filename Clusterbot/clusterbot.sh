@@ -7,7 +7,7 @@
 function usage {
   echo "Usage: clusterbot.sh "
   echo ""
-  echo "clusterbot.sh - peform various checks on a Linux cluster"
+  echo "clusterbot.sh - perform various checks on a Linux cluster"
   echo ""
   echo " -h - display this message"
   echo " -m - mount file systems on each host"
@@ -26,7 +26,7 @@ SETUP_CLCK()
   notfound=`cat $out | tail -1 | grep "not found" | wc -l`
   rm $out
   if [ "$notfound" == "1" ] ; then
-    echo "***warning: cluster checker, clck, not installd or not in path"
+    echo "***warning: cluster checker, clck, not installed or not in path"
   else
     CHECK_CLUSTER=`which clck`
   fi
