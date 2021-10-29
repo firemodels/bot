@@ -457,10 +457,17 @@ if [ "$GANGLIA" != "" ]; then
 fi
 
 echo ""
-echo "--------------------- rpm check ---------------------------"
+echo "--------------------- rpm checks ---------------------------"
 
+RPM_CHECK ()
+{
+ local CB_HOST_ARG=$1
+
+if [ "$CB_HOST_ARG" == "" ]; then
+  return 0
+fi
 rm -f $HOME/.rpms/rpm*.txt
-pdsh -t 2 -w $CB_HOSTS `pwd`/getrpms.sh >& $SLURMRPMOUT
+pdsh -t 2 -w $CB_HOST_ARG `pwd`/getrpms.sh >& $SLURMRPMOUT
 
 CURDIR=`pwd`
 cd $HOME/.rpms
@@ -480,11 +487,17 @@ done
 cd $CURDIR
 
 if [ "$RPMDIFF" == "" ]; then
-  echo "   $CB_HOSTS: rpms the same each host"
+  echo "   $CB_HOST_ARG: rpms the same on each host"
 else
-  echo "   $CB_HOSTS: ***Warning: $host0 rpms different from those on $RPMDIFF "
+  echo "   $CB_HOST_ARG: ***Warning: $host0 rpms different from those on $RPMDIFF "
 fi
+}
 
+RPM_CHECK $CB_HOSTETH1
+RPM_CHECK $CB_HOSTETH2
+RPM_CHECK $CB_HOSTETH3
+RPM_CHECK $CB_HOSTETH4
+RPM_CHECK $CB_HOSTS
 
 
 
