@@ -118,17 +118,6 @@ echo "--------------------- network checks --------------------------"
 pdsh -t 2 -w $CB_HOSTS date   >& $ETHOUT
 ETHDOWN=`sort $ETHOUT | grep -E 'timed|refused|route' | awk -F':' '{print $1}' | awk '{printf "%s ", $1}'`
 
-EXCLUDE_LIST=
-if [ $ETHDOWN!="" ]; then
-  for i in $TEST; do
-    if [ "$i" == "" ]; then
-      EXCLUDE_LIST="-x $i"
-    else
-      EXCLUDE_LIST="$EXCLUDE_LIST,$i"
-    fi
-  done
-fi
-
 if [ "$ETHDOWN" == "" ]; then
   echo "   $CB_HOSTS: Ethernet up on each host"
 else
