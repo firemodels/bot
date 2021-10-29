@@ -33,17 +33,13 @@ SETUP_CLCK()
 
 
 ERROR=
-RPMCHECK=
 FIX=
-while getopts 'hr' OPTION
+while getopts 'h' OPTION
 do
 case $OPTION  in
   h)
    usage
    exit
-   ;;
-  r)
-   RPMCHECK=1
    ;;
 esac
 done
@@ -442,18 +438,18 @@ if [ "$RPMDIFF" == "" ]; then
   echo "   $CB_HOST_ARG: rpms the same on each host"
 else
   echo "   $CB_HOST_ARG: ***Warning: $host0 rpms different from those on $RPMDIFF "
+  echo "      To fix: reimage node or install updated rpm packages"
+  FIX=1
 fi
 }
 
-if [ "$RPMCHECK" != "" ]; then
-  echo ""
-  echo "--------------------- rpm checks ------------------------------"
-  RPM_CHECK $CB_HOSTETH1
-  RPM_CHECK $CB_HOSTETH2
-  RPM_CHECK $CB_HOSTETH3
-  RPM_CHECK $CB_HOSTETH4
-  RPM_CHECK $CB_HOSTS
-fi
+echo ""
+echo "--------------------- rpm checks ------------------------------"
+RPM_CHECK $CB_HOSTETH1
+RPM_CHECK $CB_HOSTETH2
+RPM_CHECK $CB_HOSTETH3
+RPM_CHECK $CB_HOSTETH4
+RPM_CHECK $CB_HOSTS
 
 if [ "$FIX" != "" ]; then
   echo ""
