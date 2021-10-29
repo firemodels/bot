@@ -7,12 +7,9 @@
 function usage {
   echo "Usage: clusterbot.sh "
   echo ""
-  echo "clusterbot.sh - peform various checks on a Linux cluster"
+  echo "clusterbot.sh - perform various checks on a Linux cluster"
   echo ""
-  echo " -c - run Intel cluster checker"
   echo " -h - display this message"
-  echo " -m - mount file systems on each host"
-  echo " -s - restart subnet manager on each infiniband subnet"
   exit
 }
 
@@ -27,7 +24,7 @@ SETUP_CLCK()
   notfound=`cat $out | tail -1 | grep "not found" | wc -l`
   rm $out
   if [ "$notfound" == "1" ] ; then
-    echo "***warning: cluster checker, clck, not installd or not in path"
+    echo "***warning: cluster checker, clck, not installed or not in path"
   else
     CHECK_CLUSTER=`which clck`
   fi
@@ -35,29 +32,14 @@ SETUP_CLCK()
 }
 
 
-RESTART_SUBNET=
-MOUNT_FS=
 ERROR=
-while getopts 'hms' OPTION
+FIX=
+while getopts 'h' OPTION
 do
 case $OPTION  in
   h)
    usage
    exit
-   ;;
-  m)
-   MOUNT_FS=1
-   if [ `whoami` != "root" ]; then
-     ERROR=1
-     echo "***Error: you need to be root to use the -m option"
-   fi
-   ;;
-  s)
-   RESTART_SUBNET=1
-   if [ `whoami` != "root" ]; then
-     ERROR=1
-     echo "***Error: you need to be root to use the -s option"
-   fi
    ;;
 esac
 done
@@ -83,6 +65,8 @@ SLURMOUT=/tmp/slurmout.$$
 SLURMRPMOUT=/tmp/slurmrpmout.$$
 DOWN_HOSTS=/tmp/downhosts.$$
 UP_HOSTS=/tmp/uphosts.$$
+
+# --------------------- setup Intel cluster checker  --------------------
 
 SETUP_CLCK
 
@@ -125,64 +109,14 @@ if [ "$ERROR" == "1" ]; then
   exit
 fi
 
-if [ "$MOUNT_FS" == "1" ]; then
-  pdsh -t 2 -w $CB_HOSTS mount -a |& grep timed | sort | awk -F':' '{print $1}'>& $MOUNTOUT
-
-  MOUNTDOWN=
-  while read line 
-  do
-    host=`echo $line | awk '{print $1}'`
-    MOUNTDOWN="$MOUNTDOWN $host"
-  done < $MOUNTOUT
-
-  if [ "$MOUNTDOWN" == "" ]; then
-    echo "mount -a succeeded on each host in $CB_HOSTS"
-  else
-    echo "mount -a failed on: $MOUNTDOWN"
-  fi
-fi
-
-if [ "$RESTART_SUBNET" == "1" ]; then
-  if [ "$HAVE_IB" == "1" ]; then
-    if [ "$CB_HOST1" != "" ]; then
-      echo "restarting the subnet manager opensm on $CB_HOST1"
-      ssh $CB_HOST1 systcl opensm restart
-    fi
-    if [ "$CB_HOST2" != "" ]; then
-      echo "restarting the subnet manager opensm on $CB_HOST2"
-      ssh $CB_HOST2 systcl opensm restart
-    fi
-    if [ "$CB_HOST3" != "" ]; then
-      echo "restarting the subnet manager opensm on $CB_HOST3"
-      ssh $CB_HOST3 systcl opensm restart
-    fi
-    if [ "$CB_HOST4" != "" ]; then
-      echo "restarting the subnet manager opensm on $CB_HOST4"
-      ssh $CB_HOST4 systcl opensm restart
-    fi
-  else
-    echo "***Error: infiniband not running on the linux cluser"
-  fi
-  exit
-fi
-
-if [ "$MOUNT_FS" == "1" ]; then
-  exit   
-fi
-
 echo
-echo "--------------- Linux Cluster Status: $CB_HOSTS ---------------"
-
-# --------------------- setup Intel cluster checker  --------------------
-
-SETUP_CLCK
-
+echo "---------- Linux Cluster Status: $CB_HOSTS ----------"
 echo ""
-echo "------------------------------- network checks -------------------------------------"
+echo "--------------------- network checks --------------------------"
 # --------------------- check ethernet --------------------
 
 pdsh -t 2 -w $CB_HOSTS date   >& $ETHOUT
-ETHDOWN=`sort $ETHOUT | grep timed | awk -F':' '{print $1}' | awk '{printf "%s ", $1}'`
+ETHDOWN=`sort $ETHOUT | grep -E 'timed|refused|route' | awk -F':' '{print $1}' | awk '{printf "%s ", $1}'`
 
 if [ "$ETHDOWN" == "" ]; then
   echo "   $CB_HOSTS: Ethernet up on each host"
@@ -207,17 +141,18 @@ if [ "$HAVE_IB" == "1" ]; then
   if [ "$CB_HOST4" != "" ]; then
     ssh $CB_HOST4 pdsh -t 2 -w $CB_HOSTIB4 date  >>  $IBOUT 2>&1
   fi
-  IBDOWN=`grep timed  $IBOUT | grep out | sort | awk -F':' '{print $1}' | awk '{printf "%s ", $1}'`
+  IBDOWN=`grep -E 'timed|refused|route'  $IBOUT | grep out | sort | awk -F':' '{print $1}' | awk '{printf "%s ", $1}'`
 
   if [ "$IBDOWN" == "" ]; then
     echo "   $CB_HOSTS: Infiniband up on each host"
   else
     echo "   $CB_HOSTS: ***Warning: Infiniband down on $IBDOWN"
   fi
+fi
 
 # --------------------- check infiniband subnet manager --------------------
 echo ""
-echo "------------------------------- infiniband checks -------------------------------------"
+echo "--------------------- infiniband checks -----------------------"
 
 SUBNET_CHECK ()
 {
@@ -231,6 +166,8 @@ SUBNET_CHECK ()
   SUB1=`cat  $SUBNETOUT | awk -F':' '{print $1}' | sort -u | awk '{printf "%s%s", $1," " }'`
   if [ "$SUB1" == "" ]; then
     echo "   $CB_HOSTIB_ARG: **Error: subnet manager not running on any host"
+    echo "      To fix: ssh $CB_HOST_ARG service opensm start   "
+    FIX=1
   else
     echo "   $CB_HOSTIB_ARG: subnet manager running on $SUB1"
   fi
@@ -268,17 +205,17 @@ IBSPEED ()
   done < $IBRATE
 
    if [ "$RATEBAD" == "" ]; then
-    echo "   ${CB_HOST_ARG}-ib: Infiniband speed is $RATE0 Gb/s on each host"
+    echo "   ${CB_HOST_ARG}-ib: Infiniband - $RATE0 Gb/s  on each host"
   else
-    echo "   ${CB_HOST_ARG}-ib: ***Warning: Infiniband speed is $RATE0 Gb/s on each host except $RATEBAD"
+    echo "   ${CB_HOST_ARG}-ib: ***Warning: Infiniband - $RATE0 Gb/s on each host except $RATEBAD"
   fi
 }
+if [ "$HAVE_IB" == "1" ]; then
   echo ""
   IBSPEED $CB_HOSTETH1
   IBSPEED $CB_HOSTETH2
   IBSPEED $CB_HOSTETH3
   IBSPEED $CB_HOSTETH4
-
 fi
 
 # --------------------- run cluster checker --------------------
@@ -310,7 +247,7 @@ RUN_CLUSTER_CHECK ()
 
 if [ "$CHECK_CLUSTER" != "" ]; then
 echo ""
-echo "------------------------------- Intel Cluster Checker -------------------------------------"
+echo "--------------------- Intel Cluster Checker -------------------"
   RUN_CLUSTER_CHECK ETH1 $CB_HOSTETH1
   RUN_CLUSTER_CHECK ETH2 $CB_HOSTETH2
   RUN_CLUSTER_CHECK ETH3 $CB_HOSTETH3
@@ -344,11 +281,13 @@ CORE_CHECK ()
     echo "   $CB_HOSTETH_ARG: $NF0 cores on each host"
   else
     echo "   $CB_HOSTETH_ARG: ***Warning: $NF0 cores on each host except $FSDOWN"
+    echo "      To fix: boot into BIOS and disable hyperthreading"
+    FIX=1
   fi
 }
 
 echo ""
-echo "------------------------------- CPU/Disk checks -------------------------------------"
+echo "--------------------- CPU/Disk checks -------------------------"
 CORE_CHECK $CB_HOSTETH1
 CORE_CHECK $CB_HOSTETH2
 CORE_CHECK $CB_HOSTETH3
@@ -375,11 +314,14 @@ if [ "$FSDOWN" == "" ]; then
   echo "   $CB_HOSTS: $NF0 file systems mounted on each host"
 else
   echo "   $CB_HOSTS: ***Warning: $NF0 file systems not mounted on $FSDOWN"
+  echo "      To fix: run mount -a on each host using:"
+  echo "           pdsh -t 2 -w $CB_HOSTS mount -a"
+  FIX=1
 fi
 
 # --------------------- check slurm --------------------
 echo ""
-echo "------------------------------- Slurm checks -------------------------------------"
+echo "--------------------- Slurm checks ----------------------------"
 
 pbsnodes -l | awk '{print $1}' | sort -u  > $DOWN_HOSTS
 SLURMDOWN=
@@ -392,28 +334,42 @@ done < $DOWN_HOSTS
 if [ "$SLURMDOWN" == "" ]; then
   echo "   $CB_HOSTS: Slurm up on each host"
 else
-  echo "   $CB_HOSTS: ***Warning: Slurm down on $SLURMDOWN"
+  echo "   $CB_HOSTS: ***Warning: Slurm offline on $SLURMDOWN"
+  echo "      To fix:  scontrol update nodename=HOST state=resume"
+  echo "      This fix can only be applied to a HOST that is up and with a working ethernet and infiniband network connection."
+  FIX=1
 fi
 
 # --------------------- check slurm daemon --------------------
 
-pdsh -t 2 -w $CB_HOSTS "ps -el | grep slurmd | wc -l" |&  grep -v ssh | sort >& $SLURMOUT
-SLURMDOWN=
+CHECK_DAEMON ()
+{
+ local DAEMON_ARG=$1
+ local CB_HOST_ARG=$2
+
+DAEMONOUT=/tmp/daemon.out.$$
+
+pdsh -t 2 -w $CB_HOST_ARG "ps -el | grep $DAEMON_ARG | wc -l" |&  grep -v ssh | sort >& $DAEMONOUT
+DAEMONDOWN=
 while read line 
 do
   host=`echo $line | awk '{print $1}'`
   host=`echo $host | sed 's/.$//'`
-  NSLURM=`echo $line | awk '{print $2}'`
-  if [ "$NSLURM" == "0" ]; then
-    SLURMDOWN="$SLURMDOWN $host"
+  NDAEMON=`echo $line | awk '{print $2}'`
+  if [ "$NDAEMON" == "0" ]; then
+    DAEMONDOWN="$DAEMONDOWN $host"
   fi
-done < $SLURMOUT
+done < $DAEMONOUT
 
-if [ "$SLURMDOWN" == "" ]; then
-  echo "   $CB_HOSTS: slurmd running on each host"
+if [ "$DAEMONDOWN" == "" ]; then
+  echo "   $CB_HOST_ARG: $DAEMON_ARG running on each host"
 else
-  echo "   $CB_HOSTS: ***Warning: slurmd down on $SLURMDOWN"
+  echo "   $CB_HOST_ARG: ***Warning: $DAEMON_ARG down on $DAEMONDOWN"
+  echo "      To fix:  pdsh -t 2 -w $CB_HOST_ARG service $DAEMON_ARG start"
+  FIX=1
 fi
+rm -f $DAEMONOUT
+}
 
 # --------------------- check slurm rpm --------------------
 
@@ -435,7 +391,72 @@ if [ "$SLURMBAD" == "" ]; then
   echo "   $CB_HOSTS: $SLURMRPM0 installed on each host"
 else
   echo "   $CB_HOSTS: ***Warning: $SLURMRPM0 not installed on $SLURMBAD"
+  echo "      To fix: ask system administrator to update slurm rpm packages"
+  FIX=1
 fi
+
+# --------------------- check daemons --------------------
+
+echo ""
+echo "--------------------- daemon checks ---------------------------"
+
+CHECK_DAEMON slurmd $CB_HOSTS
+
+GANGLIA=`ps -el | grep gmetad`
+if [ "$GANGLIA" != "" ]; then
+  CHECK_DAEMON gmond $CB_HOSTS
+fi
+
+RPM_CHECK ()
+{
+ local CB_HOST_ARG=$1
+
+if [ "$CB_HOST_ARG" == "" ]; then
+  return 0
+fi
+rm -f $HOME/.rpms/rpm*.txt
+pdsh -t 2 -w $CB_HOST_ARG `pwd`/getrpms.sh >& $SLURMRPMOUT
+
+CURDIR=`pwd`
+cd $HOME/.rpms
+rpm0=`ls -l rpm*.txt | head -1 | awk '{print $9}'`
+host0=`echo $rpm0 | sed 's/.txt$//'`
+host0=`echo $host0 | sed 's/^rpm_//'`
+RPMDIFF=
+for f in rpm*.txt
+do
+  ndiff=`diff $rpm0 $f | wc -l`
+  if [ "$ndiff" != "0" ]; then
+    hostdiff=`echo $f | sed 's/.txt$//'`
+    hostdiff=`echo $hostdiff | sed 's/^rpm_//'`
+    RPMDIFF="$RPMDIFF $hostdiff"
+  fi
+done
+cd $CURDIR
+
+if [ "$RPMDIFF" == "" ]; then
+  echo "   $CB_HOST_ARG: rpms the same on each host"
+else
+  echo "   $CB_HOST_ARG: ***Warning: $host0 rpms different from those on $RPMDIFF "
+  echo "      To fix: reimage node or install updated rpm packages"
+  FIX=1
+fi
+}
+
+echo ""
+echo "--------------------- rpm checks ------------------------------"
+RPM_CHECK $CB_HOSTETH1
+RPM_CHECK $CB_HOSTETH2
+RPM_CHECK $CB_HOSTETH3
+RPM_CHECK $CB_HOSTETH4
+RPM_CHECK $CB_HOSTS
+
+if [ "$FIX" != "" ]; then
+  echo ""
+  echo "***Important:  all fixes must be applied as root. ***"
+fi
+
+
 
 # --------------------- cleanup --------------------
 
