@@ -120,7 +120,7 @@ echo "--------------------- network checks --------------------------"
 # --------------------- check ethernet --------------------
 
 pdsh -t 2 -w $CB_HOSTS date   >& $ETHOUT
-ETHDOWN=`sort $ETHOUT | grep timed | awk -F':' '{print $1}' | awk '{printf "%s ", $1}'`
+ETHDOWN=`sort $ETHOUT | grep -E 'timed|refused|route' | awk -F':' '{print $1}' | awk '{printf "%s ", $1}'`
 
 if [ "$ETHDOWN" == "" ]; then
   echo "   $CB_HOSTS: Ethernet up on each host"
@@ -145,7 +145,7 @@ if [ "$HAVE_IB" == "1" ]; then
   if [ "$CB_HOST4" != "" ]; then
     ssh $CB_HOST4 pdsh -t 2 -w $CB_HOSTIB4 date  >>  $IBOUT 2>&1
   fi
-  IBDOWN=`grep timed  $IBOUT | grep out | sort | awk -F':' '{print $1}' | awk '{printf "%s ", $1}'`
+  IBDOWN=`grep -E 'timed|refused|route'  $IBOUT | grep out | sort | awk -F':' '{print $1}' | awk '{printf "%s ", $1}'`
 
   if [ "$IBDOWN" == "" ]; then
     echo "   $CB_HOSTS: Infiniband up on each host"
@@ -338,8 +338,9 @@ done < $DOWN_HOSTS
 if [ "$SLURMDOWN" == "" ]; then
   echo "   $CB_HOSTS: Slurm up on each host"
 else
-  echo "   $CB_HOSTS: ***Warning: Slurm down on $SLURMDOWN"
-  echo "      To fix for each HOST down use:  scontrol update nodename=HOST state=resume"
+  echo "   $CB_HOSTS: ***Warning: Slurm offline on $SLURMDOWN"
+  echo "      To fix:  scontrol update nodename=HOST state=resume"
+  echo "      This fix can only be applied to a HOST that is up and with a working ethernet and infiniband network connection."
   FIX=1
 fi
 
@@ -456,7 +457,7 @@ fi
 
 if [ "$FIX" != "" ]; then
   echo ""
-  echo "*** all fixes must be applied as root"
+  echo "***Important:  all fixes must be applied as root. ***"
 fi
 
 
