@@ -10,8 +10,6 @@ function usage {
   echo "clusterbot.sh - perform various checks on a Linux cluster"
   echo ""
   echo " -h - display this message"
-  echo " -m - mount file systems on each host"
-  echo " -s - restart subnet manager on each infiniband subnet"
   exit
 }
 
@@ -34,33 +32,18 @@ SETUP_CLCK()
 }
 
 
-RESTART_SUBNET=
-MOUNT_FS=
 ERROR=
 RPMCHECK=
-while getopts 'hmrs' OPTION
+FIX=
+while getopts 'hr' OPTION
 do
 case $OPTION  in
   h)
    usage
    exit
    ;;
-  m)
-   MOUNT_FS=1
-   if [ `whoami` != "root" ]; then
-     ERROR=1
-     echo "***Error: you need to be root to use the -m option"
-   fi
-   ;;
   r)
    RPMCHECK=1
-   ;;
-  s)
-   RESTART_SUBNET=1
-   if [ `whoami` != "root" ]; then
-     ERROR=1
-     echo "***Error: you need to be root to use the -s option"
-   fi
    ;;
 esac
 done
@@ -130,51 +113,6 @@ if [ "$ERROR" == "1" ]; then
   exit
 fi
 
-if [ "$MOUNT_FS" == "1" ]; then
-  pdsh -t 2 -w $CB_HOSTS mount -a |& grep timed | sort | awk -F':' '{print $1}'>& $MOUNTOUT
-
-  MOUNTDOWN=
-  while read line 
-  do
-    host=`echo $line | awk '{print $1}'`
-    MOUNTDOWN="$MOUNTDOWN $host"
-  done < $MOUNTOUT
-
-  if [ "$MOUNTDOWN" == "" ]; then
-    echo "mount -a succeeded on each host in $CB_HOSTS"
-  else
-    echo "mount -a failed on: $MOUNTDOWN"
-  fi
-fi
-
-if [ "$RESTART_SUBNET" == "1" ]; then
-  if [ "$HAVE_IB" == "1" ]; then
-    if [ "$CB_HOST1" != "" ]; then
-      echo "restarting the subnet manager opensm on $CB_HOST1"
-      ssh $CB_HOST1 systcl opensm restart
-    fi
-    if [ "$CB_HOST2" != "" ]; then
-      echo "restarting the subnet manager opensm on $CB_HOST2"
-      ssh $CB_HOST2 systcl opensm restart
-    fi
-    if [ "$CB_HOST3" != "" ]; then
-      echo "restarting the subnet manager opensm on $CB_HOST3"
-      ssh $CB_HOST3 systcl opensm restart
-    fi
-    if [ "$CB_HOST4" != "" ]; then
-      echo "restarting the subnet manager opensm on $CB_HOST4"
-      ssh $CB_HOST4 systcl opensm restart
-    fi
-  else
-    echo "***Error: infiniband not running on the linux cluser"
-  fi
-  exit
-fi
-
-if [ "$MOUNT_FS" == "1" ]; then
-  exit   
-fi
-
 echo
 echo "---------- Linux Cluster Status: $CB_HOSTS ----------"
 echo ""
@@ -232,6 +170,8 @@ SUBNET_CHECK ()
   SUB1=`cat  $SUBNETOUT | awk -F':' '{print $1}' | sort -u | awk '{printf "%s%s", $1," " }'`
   if [ "$SUB1" == "" ]; then
     echo "   $CB_HOSTIB_ARG: **Error: subnet manager not running on any host"
+    echo "      To fix: ssh $CB_HOST_ARG service opensm start   "
+    FIX=1
   else
     echo "   $CB_HOSTIB_ARG: subnet manager running on $SUB1"
   fi
@@ -345,6 +285,8 @@ CORE_CHECK ()
     echo "   $CB_HOSTETH_ARG: $NF0 cores on each host"
   else
     echo "   $CB_HOSTETH_ARG: ***Warning: $NF0 cores on each host except $FSDOWN"
+    echo "      To fix: boot into BIOS and disable hyperthreading"
+    FIX=1
   fi
 }
 
@@ -376,6 +318,9 @@ if [ "$FSDOWN" == "" ]; then
   echo "   $CB_HOSTS: $NF0 file systems mounted on each host"
 else
   echo "   $CB_HOSTS: ***Warning: $NF0 file systems not mounted on $FSDOWN"
+  echo "      To fix: run mount -a on each host using:"
+  echo "           pdsh -t 2 -w $CB_HOSTS mount -a"
+  FIX=1
 fi
 
 # --------------------- check slurm --------------------
@@ -394,6 +339,8 @@ if [ "$SLURMDOWN" == "" ]; then
   echo "   $CB_HOSTS: Slurm up on each host"
 else
   echo "   $CB_HOSTS: ***Warning: Slurm down on $SLURMDOWN"
+  echo "      To fix for each HOST down use:  scontrol update nodename=HOST state=resume"
+  FIX=1
 fi
 
 # --------------------- check slurm daemon --------------------
@@ -421,6 +368,8 @@ if [ "$DAEMONDOWN" == "" ]; then
   echo "   $CB_HOST_ARG: $DAEMON_ARG running on each host"
 else
   echo "   $CB_HOST_ARG: ***Warning: $DAEMON_ARG down on $DAEMONDOWN"
+  echo "      To fix:  pdsh -t 2 -w $CB_HOST_ARG service $DAEMON_ARG start"
+  FIX=1
 fi
 rm -f $DAEMONOUT
 }
@@ -445,6 +394,8 @@ if [ "$SLURMBAD" == "" ]; then
   echo "   $CB_HOSTS: $SLURMRPM0 installed on each host"
 else
   echo "   $CB_HOSTS: ***Warning: $SLURMRPM0 not installed on $SLURMBAD"
+  echo "      To fix: ask system administrator to update slurm rpm packages"
+  FIX=1
 fi
 
 # --------------------- check daemons --------------------
@@ -458,9 +409,6 @@ GANGLIA=`ps -el | grep gmetad`
 if [ "$GANGLIA" != "" ]; then
   CHECK_DAEMON gmond $CB_HOSTS
 fi
-
-echo ""
-echo "--------------------- rpm checks ------------------------------"
 
 RPM_CHECK ()
 {
@@ -496,12 +444,19 @@ else
 fi
 }
 
-if [ "$RPMCHECK" == "" ]; then
+if [ "$RPMCHECK" != "" ]; then
+  echo ""
+  echo "--------------------- rpm checks ------------------------------"
   RPM_CHECK $CB_HOSTETH1
   RPM_CHECK $CB_HOSTETH2
   RPM_CHECK $CB_HOSTETH3
   RPM_CHECK $CB_HOSTETH4
   RPM_CHECK $CB_HOSTS
+fi
+
+if [ "$FIX" != "" ]; then
+  echo ""
+  echo "*** all fixes must be applied as root"
 fi
 
 
