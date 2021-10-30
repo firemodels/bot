@@ -118,7 +118,7 @@ pdsh -t 2 -w $CB_HOSTS date   >& $ETHOUT
 ETHDOWN=`sort $ETHOUT | grep -E 'timed|refused|route' | awk -F':' '{print $1}' | awk '{printf "%s ", $1}'`
 
 if [ "$ETHDOWN" == "" ]; then
-  echo "   $CB_HOSTS: Ethernet up on each host"
+  echo "   $CB_HOSTS: Ethernet up"
 else
   echo "   $CB_HOSTS: ***Warning: Ethernet down on $ETHDOWN"
 fi
@@ -143,7 +143,7 @@ if [ "$HAVE_IB" == "1" ]; then
   IBDOWN=`grep -E 'timed|refused|route'  $IBOUT | grep out | sort | awk -F':' '{print $1}' | awk '{printf "%s ", $1}'`
 
   if [ "$IBDOWN" == "" ]; then
-    echo "   $CB_HOSTS: Infiniband up on each host"
+    echo "   $CB_HOSTS: Infiniband up"
   else
     echo "   $CB_HOSTS: ***Warning: Infiniband down on $IBDOWN"
   fi
@@ -164,10 +164,10 @@ SUBNET_CHECK ()
   ssh $CB_HOST_ARG pdsh -t 2 -w $CB_HOST_ARG,$CB_HOSTIB_ARG ps -el |& sort -u | grep opensm  >  $SUBNETOUT 2>&1
   SUB1=`cat  $SUBNETOUT | awk -F':' '{print $1}' | sort -u | awk '{printf "%s%s", $1," " }'`
   if [ "$SUB1" == "" ]; then
-    echo "   $CB_HOSTIB_ARG: **Error: subnet manager not running on any host"
-    echo "      To fix: sudo ssh $CB_HOST_ARG service opensm start   "
+    echo "   $CB_HOSTIB_ARG: **Error: subnet manager (opensm) not running on any host"
+    echo "      Fix: sudo ssh $CB_HOST_ARG service opensm start   "
   else
-    echo "   $CB_HOSTIB_ARG: subnet manager running on $SUB1"
+    echo "   $CB_HOSTIB_ARG: subnet manager (opensm) running on $SUB1"
   fi
 }
 
@@ -197,15 +197,19 @@ IBSPEED ()
     RATEI=`echo $line | awk '{print $2}'`
     if [ "$RATEI" != "$RATE0" ]; then
       if [ "$RATEI" != "Connection" ]; then
-        RATEBAD="$RATEBAD $host/$RATEI"
+        if [ "$RATEBAD" == "" ]; then
+          RATEBAD="$host/$RATEI"
+        else
+          RATEBAD="$RATEBAD $host/$RATEI"
+        fi
       fi
     fi
   done < $IBRATE
 
    if [ "$RATEBAD" == "" ]; then
-    echo "   ${CB_HOST_ARG}-ib: Infiniband - $RATE0 Gb/s  on each host"
+    echo "   ${CB_HOST_ARG}-ib: Infiniband data rate is $RATE0 Gb/s"
   else
-    echo "   ${CB_HOST_ARG}-ib: ***Warning: Infiniband - $RATE0 Gb/s on each host except $RATEBAD"
+    echo "   ${CB_HOST_ARG}-ib: ***Warning: Infiniband data rate is $RATE0 Gb/s except on $RATEBAD"
   fi
 }
 if [ "$HAVE_IB" == "1" ]; then
@@ -232,7 +236,7 @@ RUN_CLUSTER_CHECK ()
     sort $CLUSTEROUT | grep -v ssh | awk '{print $1 }' | awk -F':' '{print $1}' > $NODEFILE
     nup=`wc -l $NODEFILE`
     if [ "$nup" == "0" ]; then
-      echo "   $CB_HOST_ARG: ***Error: all nodes are down - cluster checker not run"
+      echo "   $CB_HOST_ARG: ***Error: all hosts are down - cluster checker not run"
     else
       echo "   $CB_HOST_ARG: results in $RESULTSFILE and $WARNINGFILE"
       $CHECK_CLUSTER -l error -f $NODEFILE -o $RESULTSFILE >& $OUTFILE
@@ -271,14 +275,18 @@ PROVISION_DATE ()
     host=`echo $host | sed 's/.$//'`
     NFI=`echo $line | awk '{print $2}'`
     if [ "$NFI" != "$NF0" ]; then
-      FSDOWN="$FSDOWN $host/$NFI"
+      if [ "$FSDOWN" == "" ]; then
+        FSDOWN="$host/$NFI"
+      else
+        FSDOWN="$FSDOWN $host/$NFI"
+      fi
     fi
   done < $FSOUT
 
   if [ "$FSDOWN" == "" ]; then
-    echo "   $CB_HOSTETH_ARG: Provisioning date on each host is $NF0"
+    echo "   $CB_HOSTETH_ARG: Provisioning date is $NF0"
   else
-    echo "   $CB_HOSTETH_ARG: Provisioning date on each host is $NF0 except for $FSDOWN"
+    echo "   $CB_HOSTETH_ARG: Provisioning date is $NF0 except on $FSDOWN"
   fi
 }
 
@@ -309,15 +317,19 @@ CORE_CHECK ()
     host=`echo $host | sed 's/.$//'`
     NFI=`echo $line | awk '{print $2}'`
     if [ "$NFI" != "$NF0" ]; then
-      FSDOWN="$FSDOWN $host/$NFI"
+      if [ "$FSDOWN" == "" ]; then
+        FSDOWN="$host/$NFI"
+      else
+        FSDOWN="$FSDOWN $host/$NFI"
+      fi
     fi
   done < $FSOUT
 
   if [ "$FSDOWN" == "" ]; then
-    echo "   $CB_HOSTETH_ARG: $NF0 cores on each host"
+    echo "   $CB_HOSTETH_ARG: $NF0 cores"
   else
-    echo "   $CB_HOSTETH_ARG: ***Warning: $NF0 cores on each host except $FSDOWN"
-    echo "      To fix: boot into BIOS and disable hyperthreading"
+    echo "   $CB_HOSTETH_ARG: ***Warning: $NF0 cores except $FSDOWN"
+    echo "      Fix: boot into BIOS and disable hyperthreading"
   fi
 }
 
@@ -341,15 +353,19 @@ do
   host=`echo $host | sed 's/.$//'`
   NFI=`echo $line | awk '{print $2}'`
   if [ "$NFI" != "$NF0" ]; then
-    FSDOWN="$FSDOWN $host"
+    if [ "$FSDOWN" == "" ]; then
+      FSDOWN="$host"
+    else
+      FSDOWN="$FSDOWN $host"
+    fi
   fi
 done < $FSOUT
 
 if [ "$FSDOWN" == "" ]; then
-  echo "   $CB_HOSTS: $NF0 file systems mounted on each host"
+  echo "   $CB_HOSTS: $NF0 file systems mounted"
 else
   echo "   $CB_HOSTS: ***Warning: $NF0 file systems not mounted on $FSDOWN"
-  echo "      To fix: sudo pdsh -t 2 -w $CB_HOSTS mount -a"
+  echo "      Fix: sudo pdsh -t 2 -w $CB_HOSTS mount -a"
 fi
 
 # --------------------- check slurm --------------------
@@ -365,10 +381,10 @@ do
 done < $DOWN_HOSTS
 
 if [ "$SLURMDOWN" == "" ]; then
-  echo "   $CB_HOSTS: Slurm up on each host"
+  echo "   $CB_HOSTS: Slurm online"
 else
   echo "   $CB_HOSTS: ***Warning: Slurm offline on $SLURMDOWN"
-  echo "      To fix:  sudo scontrol update nodename=HOST state=resume"
+  echo "      Fix: sudo scontrol update nodename=HOST state=resume"
   echo "      This fix can only be applied to a HOST that is up and with a working ethernet and infiniband network connection."
 fi
 
@@ -394,10 +410,10 @@ do
 done < $DAEMONOUT
 
 if [ "$DAEMONDOWN" == "" ]; then
-  echo "   $CB_HOST_ARG: $DAEMON_ARG running on each host"
+  echo "   $CB_HOST_ARG: $DAEMON_ARG running"
 else
   echo "   $CB_HOST_ARG: ***Warning: $DAEMON_ARG down on $DAEMONDOWN"
-  echo "      To fix:  sudo pdsh -t 2 -w $CB_HOST_ARG service $DAEMON_ARG start"
+  echo "      Fix: sudo pdsh -t 2 -w $CB_HOST_ARG service $DAEMON_ARG start"
 fi
 rm -f $DAEMONOUT
 }
@@ -413,16 +429,20 @@ do
   SLURMRPMI=`echo $line | awk '{print $2}'`
   if [ "$SLURMRPMI" != "$SLURMRPM0" ]; then
     if [ "$SLURMRPMI" != "Connection" ]; then
-      SLURMBAD="$SLURMBAD $host/$SLURMRPMI"
+      if [ "$SLURMBAD" == "" ]; then
+        SLURMBAD="$host/$SLURMRPMI"
+      else
+        SLURMBAD="$SLURMBAD $host/$SLURMRPMI"
+      fi
     fi
   fi
 done < $SLURMRPMOUT
 
 if [ "$SLURMBAD" == "" ]; then
-  echo "   $CB_HOSTS: $SLURMRPM0 installed on each host"
+  echo "   $CB_HOSTS: $SLURMRPM0 installed"
 else
   echo "   $CB_HOSTS: ***Warning: $SLURMRPM0 not installed on $SLURMBAD"
-  echo "      To fix: ask system administrator to update slurm rpm packages"
+  echo "      Fix: ask system administrator to update slurm rpm packages"
 fi
 
 # --------------------- check daemons --------------------
@@ -459,16 +479,20 @@ do
   if [ "$ndiff" != "0" ]; then
     hostdiff=`echo $f | sed 's/.txt$//'`
     hostdiff=`echo $hostdiff | sed 's/^rpm_//'`
-    RPMDIFF="$RPMDIFF $hostdiff"
+    if [ "$RPMDIFF" == "" ]; then
+      RPMDIFF="$hostdiff"
+    else
+      RPMDIFF="$RPMDIFF $hostdiff"
+    fi
   fi
 done
 cd $CURDIR
 
 if [ "$RPMDIFF" == "" ]; then
-  echo "   $CB_HOST_ARG: rpms the same on each host"
+  echo "   $CB_HOST_ARG: rpms the same"
 else
   echo "   $CB_HOST_ARG: ***Warning: $host0 rpms different from those on $RPMDIFF "
-  echo "      To fix: reimage node or install updated rpm packages"
+  echo "      Fix: reimage host or install updated rpm packages"
 fi
 }
 
