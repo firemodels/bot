@@ -33,7 +33,6 @@ SETUP_CLCK()
 
 
 ERROR=
-FIX=
 while getopts 'h' OPTION
 do
 case $OPTION  in
@@ -166,8 +165,7 @@ SUBNET_CHECK ()
   SUB1=`cat  $SUBNETOUT | awk -F':' '{print $1}' | sort -u | awk '{printf "%s%s", $1," " }'`
   if [ "$SUB1" == "" ]; then
     echo "   $CB_HOSTIB_ARG: **Error: subnet manager not running on any host"
-    echo "      To fix: ssh $CB_HOST_ARG service opensm start   "
-    FIX=1
+    echo "      To fix: sudo ssh $CB_HOST_ARG service opensm start   "
   else
     echo "   $CB_HOSTIB_ARG: subnet manager running on $SUB1"
   fi
@@ -254,6 +252,44 @@ echo "--------------------- Intel Cluster Checker -------------------"
   RUN_CLUSTER_CHECK ETH4 $CB_HOSTETH4
 fi
 
+# --------------------- check provisioning date --------------------
+
+PROVISION_DATE ()
+{
+  local CB_HOSTETH_ARG=$1
+
+  if [ "$CB_HOSTETH_ARG" == "" ]; then
+    return 0
+  fi
+  pdsh -t 2 -w $CB_HOSTETH_ARG `pwd`/getrevdate.sh |&  grep -v ssh | sort >  $FSOUT 2>&1
+
+  NF0=`head -1 $FSOUT | awk '{print $2}'`
+  FSDOWN=
+  while read line 
+  do
+    host=`echo $line | awk '{print $1}'`
+    host=`echo $host | sed 's/.$//'`
+    NFI=`echo $line | awk '{print $2}'`
+    if [ "$NFI" != "$NF0" ]; then
+      FSDOWN="$FSDOWN $host/$NFI"
+    fi
+  done < $FSOUT
+
+  if [ "$FSDOWN" == "" ]; then
+    echo "   $CB_HOSTETH_ARG: Provisioning date on each host is $NF0"
+  else
+    echo "   $CB_HOSTETH_ARG: Provisioning date on each host is $NF0 except for $FSDOWN"
+  fi
+}
+
+echo ""
+echo "--------------------- Provisioning date check -------------------------"
+PROVISION_DATE $CB_HOSTETH1
+PROVISION_DATE $CB_HOSTETH2
+PROVISION_DATE $CB_HOSTETH3
+PROVISION_DATE $CB_HOSTETH4
+PROVISION_DATE $CB_HOSTS
+
 # --------------------- check number of cores --------------------
 
 CORE_CHECK ()
@@ -282,7 +318,6 @@ CORE_CHECK ()
   else
     echo "   $CB_HOSTETH_ARG: ***Warning: $NF0 cores on each host except $FSDOWN"
     echo "      To fix: boot into BIOS and disable hyperthreading"
-    FIX=1
   fi
 }
 
@@ -314,9 +349,7 @@ if [ "$FSDOWN" == "" ]; then
   echo "   $CB_HOSTS: $NF0 file systems mounted on each host"
 else
   echo "   $CB_HOSTS: ***Warning: $NF0 file systems not mounted on $FSDOWN"
-  echo "      To fix: run mount -a on each host using:"
-  echo "           pdsh -t 2 -w $CB_HOSTS mount -a"
-  FIX=1
+  echo "      To fix: sudo pdsh -t 2 -w $CB_HOSTS mount -a"
 fi
 
 # --------------------- check slurm --------------------
@@ -335,9 +368,8 @@ if [ "$SLURMDOWN" == "" ]; then
   echo "   $CB_HOSTS: Slurm up on each host"
 else
   echo "   $CB_HOSTS: ***Warning: Slurm offline on $SLURMDOWN"
-  echo "      To fix:  scontrol update nodename=HOST state=resume"
+  echo "      To fix:  sudo scontrol update nodename=HOST state=resume"
   echo "      This fix can only be applied to a HOST that is up and with a working ethernet and infiniband network connection."
-  FIX=1
 fi
 
 # --------------------- check slurm daemon --------------------
@@ -365,8 +397,7 @@ if [ "$DAEMONDOWN" == "" ]; then
   echo "   $CB_HOST_ARG: $DAEMON_ARG running on each host"
 else
   echo "   $CB_HOST_ARG: ***Warning: $DAEMON_ARG down on $DAEMONDOWN"
-  echo "      To fix:  pdsh -t 2 -w $CB_HOST_ARG service $DAEMON_ARG start"
-  FIX=1
+  echo "      To fix:  sudo pdsh -t 2 -w $CB_HOST_ARG service $DAEMON_ARG start"
 fi
 rm -f $DAEMONOUT
 }
@@ -392,7 +423,6 @@ if [ "$SLURMBAD" == "" ]; then
 else
   echo "   $CB_HOSTS: ***Warning: $SLURMRPM0 not installed on $SLURMBAD"
   echo "      To fix: ask system administrator to update slurm rpm packages"
-  FIX=1
 fi
 
 # --------------------- check daemons --------------------
@@ -439,7 +469,6 @@ if [ "$RPMDIFF" == "" ]; then
 else
   echo "   $CB_HOST_ARG: ***Warning: $host0 rpms different from those on $RPMDIFF "
   echo "      To fix: reimage node or install updated rpm packages"
-  FIX=1
 fi
 }
 
@@ -450,13 +479,6 @@ RPM_CHECK $CB_HOSTETH2
 RPM_CHECK $CB_HOSTETH3
 RPM_CHECK $CB_HOSTETH4
 RPM_CHECK $CB_HOSTS
-
-if [ "$FIX" != "" ]; then
-  echo ""
-  echo "***Important:  all fixes must be applied as root. ***"
-fi
-
-
 
 # --------------------- cleanup --------------------
 
