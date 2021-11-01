@@ -14,7 +14,49 @@ function usage {
 }
 
 #---------------------------------------------
-#                   is_clck_installed
+#                   MAKE_DATA_DIRS
+#---------------------------------------------
+
+MAKE_DATA_DIRS()
+{
+  tempfile=$SCRIPTDIR/temp.$$
+  touch $tempfile
+  ERROR=
+  if [ -e $tempfile ]; then
+    rm $tempfile
+    CB_DATA_DIR=$SCRIPTDIR
+  else
+    CB_DATA_DIR=$HOME/.clusterbot
+    if [ ! -d $CB_DATA_DIR ]; then
+      mkdir $CB_DATA_DIR
+    fi
+  fi
+  OUTPUT_DIR=$CB_DATA_DIR/output
+  FILES_DIR=$CB_DATA_DIR/files
+  if [ ! -d $OUTPUT_DIR ]; then
+    mkdir $OUTPUT_DIR
+    if [ ! -d $OUTPUT_DIR ]; then
+      echo "***error: failed to create the directory: $OUTPUT_DIR"
+      ERROR=1
+    fi
+  fi
+  if [ ! -d $FILES_DIR ]; then
+    mkdir $FILES_DIR
+    if [ ! -d $FILES_DIR ]; then
+      echo "***error: failed to create the directory: $FILES_DIR"
+      ERROR=1
+    fi
+  fi
+  if [ "$ERROR" == "1" ]; then
+    return 1
+  fi
+  rm -f $OUTPUT_DIR/*
+  rm -f $FILES_DIR/*
+  return 0
+}
+
+#---------------------------------------------
+#                   SETUP_CLCK
 #---------------------------------------------
 
 SETUP_CLCK()
@@ -32,7 +74,13 @@ SETUP_CLCK()
 }
 
 
-ERROR=
+SCRIPTDIR=`pwd`
+BIN=`dirname "$0"`
+if [ "$BIN" == "." ]; then
+  BIN=
+fi
+SCRIPTDIR=$SCRIPTDIR/$BIN
+
 while getopts 'h' OPTION
 do
 case $OPTION  in
@@ -44,26 +92,25 @@ esac
 done
 shift $(($OPTIND-1))
 
-if [ "$ERROR" == "1" ]; then
-  exit
-fi
+# --------------------- make surer output directories exist  --------------------
 
+MAKE_DATA_DIRS ||  exit
 
 # --------------------- define file names --------------------
 
-ETHOUT=/tmp/ethout.$$
-CLUSTEROUT=/tmp/clusterout.$$
-ETHUP=/tmp/ethup.33
-CHECKEROUT=/tmp/checkerout.$$
-FSOUT=/tmp/fsout.$$
-MOUNTOUT=/tmp/mountout.$$
-IBOUT=/tmp/ibout.$$
-SUBNETOUT=/tmp/subnetout.$$
-IBRATE=/tmp/ibrate.$$
-SLURMOUT=/tmp/slurmout.$$
-SLURMRPMOUT=/tmp/slurmrpmout.$$
-DOWN_HOSTS=/tmp/downhosts.$$
-UP_HOSTS=/tmp/uphosts.$$
+ETHOUT=$FILES_DIR/ethout.$$
+CLUSTEROUT=$FILES_DIR/clusterout.$$
+ETHUP=$FILES_DIR/ethup.33
+CHECKEROUT=$FILES_DIR/checkerout.$$
+FSOUT=$FILES_DIR/fsout.$$
+MOUNTOUT=$FILES_DIR/mountout.$$
+IBOUT=$FILES_DIR/ibout.$$
+SUBNETOUT=$FILES_DIR/subnetout.$$
+IBRATE=$FILES_DIR/ibrate.$$
+SLURMOUT=$FILES_DIR/slurmout.$$
+SLURMRPMOUT=$FILES_DIR/slurmrpmout.$$
+DOWN_HOSTS=$FILES_DIR/downhosts.$$
+UP_HOSTS=$FILES_DIR/uphosts.$$
 
 # --------------------- setup Intel cluster checker  --------------------
 
@@ -118,7 +165,7 @@ pdsh -t 2 -w $CB_HOSTS date   >& $ETHOUT
 ETHDOWN=`sort $ETHOUT | grep -E 'timed|refused|route' | awk -F':' '{print $1}' | awk '{printf "%s ", $1}'`
 
 if [ "$ETHDOWN" == "" ]; then
-  echo "   $CB_HOSTS: Ethernet up on each host"
+  echo "   $CB_HOSTS: Ethernet up"
 else
   echo "   $CB_HOSTS: ***Warning: Ethernet down on $ETHDOWN"
 fi
@@ -143,7 +190,7 @@ if [ "$HAVE_IB" == "1" ]; then
   IBDOWN=`grep -E 'timed|refused|route'  $IBOUT | grep out | sort | awk -F':' '{print $1}' | awk '{printf "%s ", $1}'`
 
   if [ "$IBDOWN" == "" ]; then
-    echo "   $CB_HOSTS: Infiniband up on each host"
+    echo "   $CB_HOSTS: Infiniband up"
   else
     echo "   $CB_HOSTS: ***Warning: Infiniband down on $IBDOWN"
   fi
@@ -164,10 +211,10 @@ SUBNET_CHECK ()
   ssh $CB_HOST_ARG pdsh -t 2 -w $CB_HOST_ARG,$CB_HOSTIB_ARG ps -el |& sort -u | grep opensm  >  $SUBNETOUT 2>&1
   SUB1=`cat  $SUBNETOUT | awk -F':' '{print $1}' | sort -u | awk '{printf "%s%s", $1," " }'`
   if [ "$SUB1" == "" ]; then
-    echo "   $CB_HOSTIB_ARG: **Error: subnet manager not running on any host"
-    echo "      To fix: sudo ssh $CB_HOST_ARG service opensm start   "
+    echo "   $CB_HOSTIB_ARG: **Error: subnet manager (opensm) not running on any host"
+    echo "      Fix: sudo ssh $CB_HOST_ARG service opensm start   "
   else
-    echo "   $CB_HOSTIB_ARG: subnet manager running on $SUB1"
+    echo "   $CB_HOSTIB_ARG: subnet manager (opensm) running on $SUB1"
   fi
 }
 
@@ -197,15 +244,19 @@ IBSPEED ()
     RATEI=`echo $line | awk '{print $2}'`
     if [ "$RATEI" != "$RATE0" ]; then
       if [ "$RATEI" != "Connection" ]; then
-        RATEBAD="$RATEBAD $host/$RATEI"
+        if [ "$RATEBAD" == "" ]; then
+          RATEBAD="$host/$RATEI"
+        else
+          RATEBAD="$RATEBAD $host/$RATEI"
+        fi
       fi
     fi
   done < $IBRATE
 
    if [ "$RATEBAD" == "" ]; then
-    echo "   ${CB_HOST_ARG}-ib: Infiniband - $RATE0 Gb/s  on each host"
+    echo "   ${CB_HOST_ARG}-ib: Infiniband data rate is $RATE0 Gb/s"
   else
-    echo "   ${CB_HOST_ARG}-ib: ***Warning: Infiniband - $RATE0 Gb/s on each host except $RATEBAD"
+    echo "   ${CB_HOST_ARG}-ib: ***Warning: Infiniband data rate is $RATE0 Gb/s except on $RATEBAD"
   fi
 }
 if [ "$HAVE_IB" == "1" ]; then
@@ -224,17 +275,17 @@ RUN_CLUSTER_CHECK ()
   local CB_HOST_ARG=$2
 
   if [ "$CB_HOST_ARG" != "" ]; then
-    NODEFILE=output/$LOG.hosts
-    WARNINGFILE=output/${LOG}_execution_warnings.log
-    OUTFILE=output/${LOG}.out
-    RESULTSFILE=output/${LOG}_results.out
+    NODEFILE=$OUTPUT_DIR/$LOG.hosts
+    WARNINGFILE=$OUTPUT_DIR/${LOG}_execution_warnings.log
+    OUTFILE=$OUTPUT_DIR/${LOG}.out
+    RESULTSFILE=$OUTPUT_DIR/${LOG}_results.out
     pdsh -t 2 -w $CB_HOST_ARG date   >& $CLUSTEROUT
     sort $CLUSTEROUT | grep -v ssh | awk '{print $1 }' | awk -F':' '{print $1}' > $NODEFILE
     nup=`wc -l $NODEFILE`
     if [ "$nup" == "0" ]; then
-      echo "   $CB_HOST_ARG: ***Error: all nodes are down - cluster checker not run"
+      echo "   $CB_HOST_ARG: ***Error: all hosts are down - cluster checker not run"
     else
-      echo "   $CB_HOST_ARG: results in $RESULTSFILE and $WARNINGFILE"
+      echo "   $CB_HOST_ARG: results in `basename $RESULTSFILE` and `basename $WARNINGFILE`"
       $CHECK_CLUSTER -l error -f $NODEFILE -o $RESULTSFILE >& $OUTFILE
       if [ -e clck_execution_warnings.log ]; then
         mv clck_execution_warnings.log $WARNINGFILE
@@ -244,8 +295,8 @@ RUN_CLUSTER_CHECK ()
 }
 
 if [ "$CHECK_CLUSTER" != "" ]; then
-echo ""
-echo "--------------------- Intel Cluster Checker -------------------"
+  echo ""
+  echo "--------------------- Intel Cluster Checker -------------------"
   RUN_CLUSTER_CHECK ETH1 $CB_HOSTETH1
   RUN_CLUSTER_CHECK ETH2 $CB_HOSTETH2
   RUN_CLUSTER_CHECK ETH3 $CB_HOSTETH3
@@ -271,14 +322,18 @@ PROVISION_DATE ()
     host=`echo $host | sed 's/.$//'`
     NFI=`echo $line | awk '{print $2}'`
     if [ "$NFI" != "$NF0" ]; then
-      FSDOWN="$FSDOWN $host/$NFI"
+      if [ "$FSDOWN" == "" ]; then
+        FSDOWN="$host/$NFI"
+      else
+        FSDOWN="$FSDOWN $host/$NFI"
+      fi
     fi
   done < $FSOUT
 
   if [ "$FSDOWN" == "" ]; then
-    echo "   $CB_HOSTETH_ARG: Provisioning date on each host is $NF0"
+    echo "   $CB_HOSTETH_ARG: Provisioning date is $NF0"
   else
-    echo "   $CB_HOSTETH_ARG: Provisioning date on each host is $NF0 except for $FSDOWN"
+    echo "   $CB_HOSTETH_ARG: Provisioning date is $NF0 except on $FSDOWN"
   fi
 }
 
@@ -288,7 +343,6 @@ PROVISION_DATE $CB_HOSTETH1
 PROVISION_DATE $CB_HOSTETH2
 PROVISION_DATE $CB_HOSTETH3
 PROVISION_DATE $CB_HOSTETH4
-PROVISION_DATE $CB_HOSTS
 
 # --------------------- check number of cores --------------------
 
@@ -309,24 +363,73 @@ CORE_CHECK ()
     host=`echo $host | sed 's/.$//'`
     NFI=`echo $line | awk '{print $2}'`
     if [ "$NFI" != "$NF0" ]; then
-      FSDOWN="$FSDOWN $host/$NFI"
+      if [ "$FSDOWN" == "" ]; then
+        FSDOWN="$host/$NFI"
+      else
+        FSDOWN="$FSDOWN $host/$NFI"
+      fi
     fi
   done < $FSOUT
 
   if [ "$FSDOWN" == "" ]; then
-    echo "   $CB_HOSTETH_ARG: $NF0 cores on each host"
+    echo "   $CB_HOSTETH_ARG: $NF0 cores"
   else
-    echo "   $CB_HOSTETH_ARG: ***Warning: $NF0 cores on each host except $FSDOWN"
-    echo "      To fix: boot into BIOS and disable hyperthreading"
+    echo "   $CB_HOSTETH_ARG: ***Warning: $NF0 cores except $FSDOWN"
+    echo "      Fix: boot into BIOS and disable hyperthreading"
   fi
 }
 
 echo ""
-echo "--------------------- CPU/Disk checks -------------------------"
+echo "--------------------- CPU/Memory/Disk checks -------------------------"
 CORE_CHECK $CB_HOSTETH1
 CORE_CHECK $CB_HOSTETH2
 CORE_CHECK $CB_HOSTETH3
 CORE_CHECK $CB_HOSTETH4
+
+# --------------------- memory check --------------------
+
+MEMORY_CHECK ()
+{
+  local outdir=$1
+  local CB_HOST_ARG=$2
+
+  if [ "$CB_HOST_ARG" == "" ]; then
+    return 0
+  fi
+  MEMORY_OUT=$outdir/memory_out
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getmem.sh $outdir |& grep -v ssh | sort >& $MEMORY_OUT
+  memory0=`head -1 $MEMORY_OUT | awk '{print $2}'`
+
+  CURDIR=`pwd`
+  cd $outdir
+ 
+  MEMORY_DIFF=
+  while read line 
+  do
+    hosti=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
+    memoryi=`echo $line | awk '{print $2}'`
+    if [ "$memory0" != "$memoryi" ]; then
+      if [ "$MEMORY_DIFF" == "" ]; then
+        MEMORY_DIFF="$hosti/$memoryi"
+      else
+        MEMORY_DIFF="$MEMORY_DIFF $hosti/$memoryi"
+      fi
+    fi
+  done < $MEMORY_OUT
+  cd $CURDIR
+
+  if [ "$MEMORY_DIFF" == "" ]; then
+    echo "   $CB_HOST_ARG: $memory0 Mb"
+  else
+    echo "   $CB_HOST_ARG: ***Warning: $memory0 Mb except on $MEMORY_DIFF "
+  fi
+}
+
+echo ""
+MEMORY_CHECK $FILES_DIR $CB_HOSTETH1
+MEMORY_CHECK $FILES_DIR $CB_HOSTETH2
+MEMORY_CHECK $FILES_DIR $CB_HOSTETH3
+MEMORY_CHECK $FILES_DIR $CB_HOSTETH4
 
 # --------------------- check file systems --------------------
 
@@ -341,15 +444,20 @@ do
   host=`echo $host | sed 's/.$//'`
   NFI=`echo $line | awk '{print $2}'`
   if [ "$NFI" != "$NF0" ]; then
-    FSDOWN="$FSDOWN $host"
+    if [ "$FSDOWN" == "" ]; then
+      FSDOWN="$host"
+    else
+      FSDOWN="$FSDOWN $host"
+    fi
   fi
 done < $FSOUT
 
+echo ""
 if [ "$FSDOWN" == "" ]; then
-  echo "   $CB_HOSTS: $NF0 file systems mounted on each host"
+  echo "   $CB_HOSTS: $NF0 file systems mounted"
 else
   echo "   $CB_HOSTS: ***Warning: $NF0 file systems not mounted on $FSDOWN"
-  echo "      To fix: sudo pdsh -t 2 -w $CB_HOSTS mount -a"
+  echo "      Fix: sudo pdsh -t 2 -w $CB_HOSTS mount -a"
 fi
 
 # --------------------- check slurm --------------------
@@ -361,14 +469,18 @@ SLURMDOWN=
 while read line 
 do
   host=`echo $line | awk '{print $1}'`
-  SLURMDOWN="$SLURMDOWN $host"
+  if [ "$SLURMDOWN" == "" ]; then
+    SLURMDOWN="$host"
+  else
+    SLURMDOWN="$SLURMDOWN $host"
+  fi
 done < $DOWN_HOSTS
 
 if [ "$SLURMDOWN" == "" ]; then
-  echo "   $CB_HOSTS: Slurm up on each host"
+  echo "   $CB_HOSTS: Slurm online"
 else
   echo "   $CB_HOSTS: ***Warning: Slurm offline on $SLURMDOWN"
-  echo "      To fix:  sudo scontrol update nodename=HOST state=resume"
+  echo "      Fix: sudo scontrol update nodename=HOST state=resume"
   echo "      This fix can only be applied to a HOST that is up and with a working ethernet and infiniband network connection."
 fi
 
@@ -379,7 +491,7 @@ CHECK_DAEMON ()
  local DAEMON_ARG=$1
  local CB_HOST_ARG=$2
 
-DAEMONOUT=/tmp/daemon.out.$$
+DAEMONOUT=$FILES_DIR/daemon.out.$$
 
 pdsh -t 2 -w $CB_HOST_ARG "ps -el | grep $DAEMON_ARG | wc -l" |&  grep -v ssh | sort >& $DAEMONOUT
 DAEMONDOWN=
@@ -394,10 +506,10 @@ do
 done < $DAEMONOUT
 
 if [ "$DAEMONDOWN" == "" ]; then
-  echo "   $CB_HOST_ARG: $DAEMON_ARG running on each host"
+  echo "   $CB_HOST_ARG: $DAEMON_ARG running"
 else
   echo "   $CB_HOST_ARG: ***Warning: $DAEMON_ARG down on $DAEMONDOWN"
-  echo "      To fix:  sudo pdsh -t 2 -w $CB_HOST_ARG service $DAEMON_ARG start"
+  echo "      Fix: sudo pdsh -t 2 -w $CB_HOST_ARG service $DAEMON_ARG start"
 fi
 rm -f $DAEMONOUT
 }
@@ -413,16 +525,20 @@ do
   SLURMRPMI=`echo $line | awk '{print $2}'`
   if [ "$SLURMRPMI" != "$SLURMRPM0" ]; then
     if [ "$SLURMRPMI" != "Connection" ]; then
-      SLURMBAD="$SLURMBAD $host/$SLURMRPMI"
+      if [ "$SLURMBAD" == "" ]; then
+        SLURMBAD="$host/$SLURMRPMI"
+      else
+        SLURMBAD="$SLURMBAD $host/$SLURMRPMI"
+      fi
     fi
   fi
 done < $SLURMRPMOUT
 
 if [ "$SLURMBAD" == "" ]; then
-  echo "   $CB_HOSTS: $SLURMRPM0 installed on each host"
+  echo "   $CB_HOSTS: $SLURMRPM0 installed"
 else
   echo "   $CB_HOSTS: ***Warning: $SLURMRPM0 not installed on $SLURMBAD"
-  echo "      To fix: ask system administrator to update slurm rpm packages"
+  echo "      Fix: ask system administrator to update slurm rpm packages"
 fi
 
 # --------------------- check daemons --------------------
@@ -437,6 +553,8 @@ if [ "$GANGLIA" != "" ]; then
   CHECK_DAEMON gmond $CB_HOSTS
 fi
 
+# --------------------- rpm check --------------------
+
 RPM_CHECK ()
 {
  local CB_HOST_ARG=$1
@@ -444,11 +562,11 @@ RPM_CHECK ()
 if [ "$CB_HOST_ARG" == "" ]; then
   return 0
 fi
-rm -f $HOME/.rpms/rpm*.txt
-pdsh -t 2 -w $CB_HOST_ARG `pwd`/getrpms.sh >& $SLURMRPMOUT
+rm -f $FILES_DIR/rpm*.txt
+pdsh -t 2 -w $CB_HOST_ARG `pwd`/getrpms.sh $FILES_DIR >& $SLURMRPMOUT
 
 CURDIR=`pwd`
-cd $HOME/.rpms
+cd $FILES_DIR
 rpm0=`ls -l rpm*.txt | head -1 | awk '{print $9}'`
 host0=`echo $rpm0 | sed 's/.txt$//'`
 host0=`echo $host0 | sed 's/^rpm_//'`
@@ -459,16 +577,20 @@ do
   if [ "$ndiff" != "0" ]; then
     hostdiff=`echo $f | sed 's/.txt$//'`
     hostdiff=`echo $hostdiff | sed 's/^rpm_//'`
-    RPMDIFF="$RPMDIFF $hostdiff"
+    if [ "$RPMDIFF" == "" ]; then
+      RPMDIFF="$hostdiff"
+    else
+      RPMDIFF="$RPMDIFF $hostdiff"
+    fi
   fi
 done
 cd $CURDIR
 
 if [ "$RPMDIFF" == "" ]; then
-  echo "   $CB_HOST_ARG: rpms the same on each host"
+  echo "   $CB_HOST_ARG: rpms are the same"
 else
-  echo "   $CB_HOST_ARG: ***Warning: $host0 rpms different from those on $RPMDIFF "
-  echo "      To fix: reimage node or install updated rpm packages"
+  echo "   $CB_HOST_ARG: ***Warning: $host0 rpms are different from those on $RPMDIFF "
+  echo "      Fix: reimage host or install updated rpm packages"
 fi
 }
 
@@ -480,6 +602,177 @@ RPM_CHECK $CB_HOSTETH3
 RPM_CHECK $CB_HOSTETH4
 RPM_CHECK $CB_HOSTS
 
-# --------------------- cleanup --------------------
+# --------------------- mount check --------------------
 
-rm -f $CLUSTEROUT $DOWN_HOSTS $ETHOUT $FSOUT $IBOUT $IBRATE $MOUNTOUT $SLURMOUT $SLURMRPMOUT $SUBNETOUT $UP_HOSTS 
+MOUNT_CHECK ()
+{
+  local outdir=$1
+  local CB_HOST_ARG=$2
+  file=file_mounts
+
+  if [ "$CB_HOST_ARG" == "" ]; then
+    return 0
+  fi
+  FILE_OUT=$outdir/file_out
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getmounts.sh $outdir |& grep -v ssh | sort >& $FILE_OUT
+  file0=`head -1 $FILE_OUT | awk '{print $2}'`
+
+  CURDIR=`pwd`
+  cd $outdir
+ 
+  FILEDIFF=
+  while read line 
+  do
+    hosti=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
+    filei=`echo $line | awk '{print $2}'`
+    ndiff=`diff $file0 $filei | wc -l`
+    if [ "$ndiff" != "0" ]; then
+      if [ "$FILEDIFF" == "" ]; then
+        FILEDIFF="$hosti"
+      else
+        FILEDIFF="$FILEDIFF $hosti"
+      fi
+    fi
+  done < $FILE_OUT
+  cd $CURDIR
+
+  if [ "$FILEDIFF" == "" ]; then
+    echo "   $CB_HOST_ARG: $file (df -k -t nfs) are the same"
+  else
+    echo "   $CB_HOST_ARG: ***Warning: $file (df -k -t nfs) are different on $FILEDIFF "
+  fi
+}
+
+# --------------------- fstab check --------------------
+
+FSTAB_CHECK ()
+{
+  local outdir=$1
+  local CB_HOST_ARG=$2
+  file=/etc/fstab
+
+  if [ "$CB_HOST_ARG" == "" ]; then
+    return 0
+  fi
+  FILE_OUT=$outdir/file_out
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getfstab.sh $outdir |& grep -v ssh | sort >& $FILE_OUT
+  file0=`head -1 $FILE_OUT | awk '{print $2}'`
+
+  CURDIR=`pwd`
+  cd $outdir
+ 
+  FILEDIFF=
+  while read line 
+  do
+    hosti=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
+    filei=`echo $line | awk '{print $2}'`
+    ndiff=`diff -w $file0 $filei | wc -l`
+    if [ "$ndiff" != "0" ]; then
+      if [ "$FILEDIFF" == "" ]; then
+        FILEDIFF="$hosti"
+      else
+        FILEDIFF="$FILEDIFF $hosti"
+      fi
+    fi
+  done < $FILE_OUT
+  cd $CURDIR
+
+  if [ "$FILEDIFF" == "" ]; then
+    echo "   $CB_HOST_ARG: $file is the same"
+  else
+    echo "   $CB_HOST_ARG: ***Warning: $file is different on $FILEDIFF "
+  fi
+}
+
+# --------------------- file check --------------------
+
+FILE_CHECK ()
+{
+  local file=$1
+  local outdir=$2
+  local CB_HOST_ARG=$3
+
+  if [ "$CB_HOST_ARG" == "" ]; then
+    return 0
+  fi
+  FILE_OUT=$outdir/file_out
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getfile.sh $file $outdir |& grep -v ssh | sort >& $FILE_OUT
+  file0=`head -1 $FILE_OUT | awk '{print $2}'`
+
+  CURDIR=`pwd`
+  cd $outdir
+ 
+  FILEDIFF=
+  while read line 
+  do
+    hosti=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
+    filei=`echo $line | awk '{print $2}'`
+    ndiff=`diff $file0 $filei | wc -l`
+    if [ "$ndiff" != "0" ]; then
+      if [ "$FILEDIFF" == "" ]; then
+        FILEDIFF="$hosti"
+      else
+        FILEDIFF="$FILEDIFF $hosti"
+      fi
+    fi
+  done < $FILE_OUT
+  cd $CURDIR
+
+  if [ "$FILEDIFF" == "" ]; then
+    echo "   $CB_HOST_ARG: $file is the same"
+  else
+    echo "   $CB_HOST_ARG: ***Warning: $file is different on $FILEDIFF "
+  fi
+}
+
+echo ""
+echo "--------------------- file checks ------------------------------"
+FILE_CHECK /etc/slurm/slurm.conf $FILES_DIR $CB_HOSTETH1 
+FILE_CHECK /etc/slurm/slurm.conf $FILES_DIR $CB_HOSTETH2 
+FILE_CHECK /etc/slurm/slurm.conf $FILES_DIR $CB_HOSTETH3 
+FILE_CHECK /etc/slurm/slurm.conf $FILES_DIR $CB_HOSTETH4 
+FILE_CHECK /etc/slurm/slurm.conf $FILES_DIR $CB_HOSTS
+
+if [ "$GANGLIA" != "" ]; then
+  echo ""
+  FILE_CHECK /etc/ganglia/gmond.conf $FILES_DIR $CB_HOSTETH1 
+  FILE_CHECK /etc/ganglia/gmond.conf $FILES_DIR $CB_HOSTETH2 
+  FILE_CHECK /etc/ganglia/gmond.conf $FILES_DIR $CB_HOSTETH3 
+  FILE_CHECK /etc/ganglia/gmond.conf $FILES_DIR $CB_HOSTETH4 
+  FILE_CHECK /etc/ganglia/gmond.conf $FILES_DIR $CB_HOSTS
+fi
+
+echo ""
+FILE_CHECK /etc/passwd $FILES_DIR $CB_HOSTETH1 
+FILE_CHECK /etc/passwd $FILES_DIR $CB_HOSTETH2 
+FILE_CHECK /etc/passwd $FILES_DIR $CB_HOSTETH3 
+FILE_CHECK /etc/passwd $FILES_DIR $CB_HOSTETH4 
+FILE_CHECK /etc/passwd $FILES_DIR $CB_HOSTS
+
+echo ""
+FILE_CHECK /etc/group $FILES_DIR $CB_HOSTETH1 
+FILE_CHECK /etc/group $FILES_DIR $CB_HOSTETH2 
+FILE_CHECK /etc/group $FILES_DIR $CB_HOSTETH3 
+FILE_CHECK /etc/group $FILES_DIR $CB_HOSTETH4 
+FILE_CHECK /etc/group $FILES_DIR $CB_HOSTS
+
+echo ""
+FILE_CHECK /etc/exports $FILES_DIR $CB_HOSTETH1 
+FILE_CHECK /etc/exports $FILES_DIR $CB_HOSTETH2 
+FILE_CHECK /etc/exports $FILES_DIR $CB_HOSTETH3 
+FILE_CHECK /etc/exports $FILES_DIR $CB_HOSTETH4 
+FILE_CHECK /etc/exports $FILES_DIR $CB_HOSTS
+
+echo ""
+FSTAB_CHECK $FILES_DIR $CB_HOSTETH1 
+FSTAB_CHECK $FILES_DIR $CB_HOSTETH2 
+FSTAB_CHECK $FILES_DIR $CB_HOSTETH3 
+FSTAB_CHECK $FILES_DIR $CB_HOSTETH4 
+FSTAB_CHECK $FILES_DIR $CB_HOSTS
+
+echo ""
+MOUNT_CHECK $FILES_DIR $CB_HOSTETH1 
+MOUNT_CHECK $FILES_DIR $CB_HOSTETH2 
+MOUNT_CHECK $FILES_DIR $CB_HOSTETH3 
+MOUNT_CHECK $FILES_DIR $CB_HOSTETH4 
+MOUNT_CHECK $FILES_DIR $CB_HOSTS
