@@ -42,7 +42,7 @@ MAKE_DATA_DIRS()
   fi
   if [ ! -d $FILES_DIR ]; then
     mkdir $FILES_DIR
-    if [ ! -d $FILES_DIR_DIR ]; then
+    if [ ! -d $FILES_DIR ]; then
       echo "***error: failed to create the directory: $FILES_DIR"
       ERROR=1
     fi
@@ -275,17 +275,17 @@ RUN_CLUSTER_CHECK ()
   local CB_HOST_ARG=$2
 
   if [ "$CB_HOST_ARG" != "" ]; then
-    NODEFILE=OUTPUT_DIR/$LOG.hosts
-    WARNINGFILE=OUTPUT_DIR/${LOG}_execution_warnings.log
-    OUTFILE=OUTPUT_DIR/${LOG}.out
-    RESULTSFILE=OUTPUT_DIR/${LOG}_results.out
+    NODEFILE=$OUTPUT_DIR/$LOG.hosts
+    WARNINGFILE=$OUTPUT_DIR/${LOG}_execution_warnings.log
+    OUTFILE=$OUTPUT_DIR/${LOG}.out
+    RESULTSFILE=$OUTPUT_DIR/${LOG}_results.out
     pdsh -t 2 -w $CB_HOST_ARG date   >& $CLUSTEROUT
     sort $CLUSTEROUT | grep -v ssh | awk '{print $1 }' | awk -F':' '{print $1}' > $NODEFILE
     nup=`wc -l $NODEFILE`
     if [ "$nup" == "0" ]; then
       echo "   $CB_HOST_ARG: ***Error: all hosts are down - cluster checker not run"
     else
-      echo "   $CB_HOST_ARG: results in $RESULTSFILE and $WARNINGFILE"
+      echo "   $CB_HOST_ARG: results in `basename $RESULTSFILE` and `basename $WARNINGFILE`"
       $CHECK_CLUSTER -l error -f $NODEFILE -o $RESULTSFILE >& $OUTFILE
       if [ -e clck_execution_warnings.log ]; then
         mv clck_execution_warnings.log $WARNINGFILE
@@ -550,3 +550,172 @@ RPM_CHECK $CB_HOSTETH2
 RPM_CHECK $CB_HOSTETH3
 RPM_CHECK $CB_HOSTETH4
 RPM_CHECK $CB_HOSTS
+
+MOUNT_CHECK ()
+{
+  local outdir=$1
+  local CB_HOST_ARG=$2
+  file=file_mounts
+
+  if [ "$CB_HOST_ARG" == "" ]; then
+    return 0
+  fi
+  FILE_OUT=$outdir/file_out
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getmounts.sh $outdir |& grep -v ssh | sort >& $FILE_OUT
+  file0=`head -1 $FILE_OUT | awk '{print $2}'`
+
+  CURDIR=`pwd`
+  cd $outdir
+ 
+  FILEDIFF=
+  while read line 
+  do
+    hosti=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
+    filei=`echo $line | awk '{print $2}'`
+    ndiff=`diff $file0 $filei | wc -l`
+    if [ "$ndiff" != "0" ]; then
+      if [ "$FILEDIFF" == "" ]; then
+        FILEDIFF="$hosti"
+      else
+        FILEDIFF="$FILEDIFF $hosti"
+      fi
+    fi
+  done < $FILE_OUT
+  cd $CURDIR
+
+  if [ "$FILEDIFF" == "" ]; then
+    echo "   $CB_HOST_ARG: $file are the same"
+  else
+    echo "   $CB_HOST_ARG: ***Warning: $file arer different on $FILEDIFF "
+  fi
+}
+
+FSTAB_CHECK ()
+{
+  local outdir=$1
+  local CB_HOST_ARG=$2
+  file=/etc/fstab
+
+  if [ "$CB_HOST_ARG" == "" ]; then
+    return 0
+  fi
+  FILE_OUT=$outdir/file_out
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getfstab.sh $outdir |& grep -v ssh | sort >& $FILE_OUT
+  file0=`head -1 $FILE_OUT | awk '{print $2}'`
+
+  CURDIR=`pwd`
+  cd $outdir
+ 
+  FILEDIFF=
+  while read line 
+  do
+    hosti=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
+    filei=`echo $line | awk '{print $2}'`
+    ndiff=`diff $file0 $filei | wc -l`
+    if [ "$ndiff" != "0" ]; then
+      if [ "$FILEDIFF" == "" ]; then
+        FILEDIFF="$hosti"
+      else
+        FILEDIFF="$FILEDIFF $hosti"
+      fi
+    fi
+  done < $FILE_OUT
+  cd $CURDIR
+
+  if [ "$FILEDIFF" == "" ]; then
+    echo "   $CB_HOST_ARG: $file is the same"
+  else
+    echo "   $CB_HOST_ARG: ***Warning: $file is different on $FILEDIFF "
+  fi
+}
+
+FILE_CHECK ()
+{
+  local file=$1
+  local outdir=$2
+  local CB_HOST_ARG=$3
+
+  if [ "$CB_HOST_ARG" == "" ]; then
+    return 0
+  fi
+  FILE_OUT=$outdir/file_out
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getfile.sh $file $outdir |& grep -v ssh | sort >& $FILE_OUT
+  file0=`head -1 $FILE_OUT | awk '{print $2}'`
+
+  CURDIR=`pwd`
+  cd $outdir
+ 
+  FILEDIFF=
+  while read line 
+  do
+    hosti=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
+    filei=`echo $line | awk '{print $2}'`
+    ndiff=`diff $file0 $filei | wc -l`
+    if [ "$ndiff" != "0" ]; then
+      if [ "$FILEDIFF" == "" ]; then
+        FILEDIFF="$hosti"
+      else
+        FILEDIFF="$FILEDIFF $hosti"
+      fi
+    fi
+  done < $FILE_OUT
+  cd $CURDIR
+
+  if [ "$FILEDIFF" == "" ]; then
+    echo "   $CB_HOST_ARG: $file is the same"
+  else
+    echo "   $CB_HOST_ARG: ***Warning: $file is different on $FILEDIFF "
+  fi
+}
+
+echo ""
+echo "--------------------- file checks ------------------------------"
+FILE_CHECK /etc/slurm/slurm.conf $FILES_DIR $CB_HOSTETH1 
+FILE_CHECK /etc/slurm/slurm.conf $FILES_DIR $CB_HOSTETH2 
+FILE_CHECK /etc/slurm/slurm.conf $FILES_DIR $CB_HOSTETH3 
+FILE_CHECK /etc/slurm/slurm.conf $FILES_DIR $CB_HOSTETH4 
+FILE_CHECK /etc/slurm/slurm.conf $FILES_DIR $CB_HOSTS
+
+if [ "$GANGLIA" != "" ]; then
+  echo ""
+  FILE_CHECK /etc/ganglia/gmond.conf $FILES_DIR $CB_HOSTETH1 
+  FILE_CHECK /etc/ganglia/gmond.conf $FILES_DIR $CB_HOSTETH2 
+  FILE_CHECK /etc/ganglia/gmond.conf $FILES_DIR $CB_HOSTETH3 
+  FILE_CHECK /etc/ganglia/gmond.conf $FILES_DIR $CB_HOSTETH4 
+  FILE_CHECK /etc/ganglia/gmond.conf $FILES_DIR $CB_HOSTS
+fi
+
+echo ""
+FILE_CHECK /etc/passwd $FILES_DIR $CB_HOSTETH1 
+FILE_CHECK /etc/passwd $FILES_DIR $CB_HOSTETH2 
+FILE_CHECK /etc/passwd $FILES_DIR $CB_HOSTETH3 
+FILE_CHECK /etc/passwd $FILES_DIR $CB_HOSTETH4 
+FILE_CHECK /etc/passwd $FILES_DIR $CB_HOSTS
+
+echo ""
+FILE_CHECK /etc/group $FILES_DIR $CB_HOSTETH1 
+FILE_CHECK /etc/group $FILES_DIR $CB_HOSTETH2 
+FILE_CHECK /etc/group $FILES_DIR $CB_HOSTETH3 
+FILE_CHECK /etc/group $FILES_DIR $CB_HOSTETH4 
+FILE_CHECK /etc/group $FILES_DIR $CB_HOSTS
+
+echo ""
+FILE_CHECK /etc/exports $FILES_DIR $CB_HOSTETH1 
+FILE_CHECK /etc/exports $FILES_DIR $CB_HOSTETH2 
+FILE_CHECK /etc/exports $FILES_DIR $CB_HOSTETH3 
+FILE_CHECK /etc/exports $FILES_DIR $CB_HOSTETH4 
+FILE_CHECK /etc/exports $FILES_DIR $CB_HOSTS
+
+echo ""
+FSTAB_CHECK $FILES_DIR $CB_HOSTETH1 
+FSTAB_CHECK $FILES_DIR $CB_HOSTETH2 
+FSTAB_CHECK $FILES_DIR $CB_HOSTETH3 
+FSTAB_CHECK $FILES_DIR $CB_HOSTETH4 
+FSTAB_CHECK $FILES_DIR $CB_HOSTS
+
+echo ""
+MOUNT_CHECK $FILES_DIR $CB_HOSTETH1 
+MOUNT_CHECK $FILES_DIR $CB_HOSTETH2 
+MOUNT_CHECK $FILES_DIR $CB_HOSTETH3 
+MOUNT_CHECK $FILES_DIR $CB_HOSTETH4 
+MOUNT_CHECK $FILES_DIR $CB_HOSTS
