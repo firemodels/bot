@@ -343,7 +343,6 @@ PROVISION_DATE $CB_HOSTETH1
 PROVISION_DATE $CB_HOSTETH2
 PROVISION_DATE $CB_HOSTETH3
 PROVISION_DATE $CB_HOSTETH4
-PROVISION_DATE $CB_HOSTS
 
 # --------------------- check number of cores --------------------
 
@@ -381,11 +380,56 @@ CORE_CHECK ()
 }
 
 echo ""
-echo "--------------------- CPU/Disk checks -------------------------"
+echo "--------------------- CPU/Memory/Disk checks -------------------------"
 CORE_CHECK $CB_HOSTETH1
 CORE_CHECK $CB_HOSTETH2
 CORE_CHECK $CB_HOSTETH3
 CORE_CHECK $CB_HOSTETH4
+
+# --------------------- memory check --------------------
+
+MEMORY_CHECK ()
+{
+  local outdir=$1
+  local CB_HOST_ARG=$2
+
+  if [ "$CB_HOST_ARG" == "" ]; then
+    return 0
+  fi
+  MEMORY_OUT=$outdir/memory_out
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getmem.sh $outdir |& grep -v ssh | sort >& $MEMORY_OUT
+  memory0=`head -1 $MEMORY_OUT | awk '{print $2}'`
+
+  CURDIR=`pwd`
+  cd $outdir
+ 
+  MEMORY_DIFF=
+  while read line 
+  do
+    hosti=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
+    memoryi=`echo $line | awk '{print $2}'`
+    if [ "$memory0" != "$memoryi" ]; then
+      if [ "$MEMORY_DIFF" == "" ]; then
+        MEMORY_DIFF="$hosti/$memoryi"
+      else
+        MEMORY_DIFF="$MEMORY_DIFF $hosti/$memoryi"
+      fi
+    fi
+  done < $MEMORY_OUT
+  cd $CURDIR
+
+  if [ "$MEMORY_DIFF" == "" ]; then
+    echo "   $CB_HOST_ARG: $memory0 Mb"
+  else
+    echo "   $CB_HOST_ARG: ***Warning: $memory0 Mb except on $MEMORY_DIFF "
+  fi
+}
+
+echo ""
+MEMORY_CHECK $FILES_DIR $CB_HOSTETH1
+MEMORY_CHECK $FILES_DIR $CB_HOSTETH2
+MEMORY_CHECK $FILES_DIR $CB_HOSTETH3
+MEMORY_CHECK $FILES_DIR $CB_HOSTETH4
 
 # --------------------- check file systems --------------------
 
@@ -408,6 +452,7 @@ do
   fi
 done < $FSOUT
 
+echo ""
 if [ "$FSDOWN" == "" ]; then
   echo "   $CB_HOSTS: $NF0 file systems mounted"
 else
@@ -424,7 +469,11 @@ SLURMDOWN=
 while read line 
 do
   host=`echo $line | awk '{print $1}'`
-  SLURMDOWN="$SLURMDOWN $host"
+  if [ "$SLURMDOWN" == "" ]; then
+    SLURMDOWN="$host"
+  else
+    SLURMDOWN="$SLURMDOWN $host"
+  fi
 done < $DOWN_HOSTS
 
 if [ "$SLURMDOWN" == "" ]; then
@@ -538,9 +587,9 @@ done
 cd $CURDIR
 
 if [ "$RPMDIFF" == "" ]; then
-  echo "   $CB_HOST_ARG: rpms the same"
+  echo "   $CB_HOST_ARG: rpms are the same"
 else
-  echo "   $CB_HOST_ARG: ***Warning: $host0 rpms different from those on $RPMDIFF "
+  echo "   $CB_HOST_ARG: ***Warning: $host0 rpms are different from those on $RPMDIFF "
   echo "      Fix: reimage host or install updated rpm packages"
 fi
 }
@@ -588,9 +637,9 @@ MOUNT_CHECK ()
   cd $CURDIR
 
   if [ "$FILEDIFF" == "" ]; then
-    echo "   $CB_HOST_ARG: $file are the same"
+    echo "   $CB_HOST_ARG: $file (df -k -t nfs) are the same"
   else
-    echo "   $CB_HOST_ARG: ***Warning: $file arer different on $FILEDIFF "
+    echo "   $CB_HOST_ARG: ***Warning: $file (df -k -t nfs) are different on $FILEDIFF "
   fi
 }
 
