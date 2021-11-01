@@ -587,7 +587,7 @@ done
 cd $CURDIR
 
 if [ "$RPMDIFF" == "" ]; then
-  echo "   $CB_HOST_ARG: rpms are the same"
+  echo "   $CB_HOST_ARG: rpms are identical"
 else
   echo "   $CB_HOST_ARG: ***Warning: $host0 rpms are different from those on $RPMDIFF "
   echo "      Fix: reimage host or install updated rpm packages"
@@ -678,7 +678,7 @@ FSTAB_CHECK ()
   cd $CURDIR
 
   if [ "$FILEDIFF" == "" ]; then
-    echo "   $CB_HOST_ARG: $file is the same"
+    echo "   $CB_HOST_ARG: $file identical"
   else
     echo "   $CB_HOST_ARG: ***Warning: $file is different on $FILEDIFF "
   fi
@@ -719,43 +719,54 @@ FILE_CHECK ()
   cd $CURDIR
 
   if [ "$FILEDIFF" == "" ]; then
-    echo "   $CB_HOST_ARG: $file is the same"
+    echo "   $CB_HOST_ARG: $file is identical"
   else
     echo "   $CB_HOST_ARG: ***Warning: $file is different on $FILEDIFF "
   fi
 }
 
+# --------------------- host check --------------------
+
+HOST_CHECK ()
+{
+  local outdir=$1
+  local CB_HOST_ARG=$2
+  file=/etc/hosts
+
+  if [ "$CB_HOST_ARG" == "" ]; then
+    return 0
+  fi
+  FILE_OUT=$outdir/hosts_out
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/gethost.sh $outdir |& grep -v ssh | sort >& $FILE_OUT
+  file0=`head -1 $FILE_OUT | awk '{print $2}'`
+
+  CURDIR=`pwd`
+  cd $outdir
+ 
+  FILEDIFF=
+  while read line 
+  do
+    hosti=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
+    filei=`echo $line | awk '{print $2}'`
+    ndiff=`diff $file0 $filei | wc -l`
+    if [ "$ndiff" != "0" ]; then
+      if [ "$FILEDIFF" == "" ]; then
+        FILEDIFF="$hosti"
+      else
+        FILEDIFF="$FILEDIFF $hosti"
+      fi
+    fi
+  done < $FILE_OUT
+  cd $CURDIR
+
+  if [ "$FILEDIFF" == "" ]; then
+    echo "   $CB_HOST_ARG: $file is identical (except for lines containing localhost)"
+  else
+    echo "   $CB_HOST_ARG: ***Warning: $file is different on $FILEDIFF "
+  fi
+}
 echo ""
 echo "--------------------- file checks ------------------------------"
-FILE_CHECK /etc/slurm/slurm.conf $FILES_DIR $CB_HOSTETH1 
-FILE_CHECK /etc/slurm/slurm.conf $FILES_DIR $CB_HOSTETH2 
-FILE_CHECK /etc/slurm/slurm.conf $FILES_DIR $CB_HOSTETH3 
-FILE_CHECK /etc/slurm/slurm.conf $FILES_DIR $CB_HOSTETH4 
-FILE_CHECK /etc/slurm/slurm.conf $FILES_DIR $CB_HOSTS
-
-if [ "$GANGLIA" != "" ]; then
-  echo ""
-  FILE_CHECK /etc/ganglia/gmond.conf $FILES_DIR $CB_HOSTETH1 
-  FILE_CHECK /etc/ganglia/gmond.conf $FILES_DIR $CB_HOSTETH2 
-  FILE_CHECK /etc/ganglia/gmond.conf $FILES_DIR $CB_HOSTETH3 
-  FILE_CHECK /etc/ganglia/gmond.conf $FILES_DIR $CB_HOSTETH4 
-  FILE_CHECK /etc/ganglia/gmond.conf $FILES_DIR $CB_HOSTS
-fi
-
-echo ""
-FILE_CHECK /etc/passwd $FILES_DIR $CB_HOSTETH1 
-FILE_CHECK /etc/passwd $FILES_DIR $CB_HOSTETH2 
-FILE_CHECK /etc/passwd $FILES_DIR $CB_HOSTETH3 
-FILE_CHECK /etc/passwd $FILES_DIR $CB_HOSTETH4 
-FILE_CHECK /etc/passwd $FILES_DIR $CB_HOSTS
-
-echo ""
-FILE_CHECK /etc/group $FILES_DIR $CB_HOSTETH1 
-FILE_CHECK /etc/group $FILES_DIR $CB_HOSTETH2 
-FILE_CHECK /etc/group $FILES_DIR $CB_HOSTETH3 
-FILE_CHECK /etc/group $FILES_DIR $CB_HOSTETH4 
-FILE_CHECK /etc/group $FILES_DIR $CB_HOSTS
-
 echo ""
 FILE_CHECK /etc/exports $FILES_DIR $CB_HOSTETH1 
 FILE_CHECK /etc/exports $FILES_DIR $CB_HOSTETH2 
@@ -769,6 +780,45 @@ FSTAB_CHECK $FILES_DIR $CB_HOSTETH2
 FSTAB_CHECK $FILES_DIR $CB_HOSTETH3 
 FSTAB_CHECK $FILES_DIR $CB_HOSTETH4 
 FSTAB_CHECK $FILES_DIR $CB_HOSTS
+
+if [ "$GANGLIA" != "" ]; then
+  echo ""
+  FILE_CHECK /etc/ganglia/gmond.conf $FILES_DIR $CB_HOSTETH1 
+  FILE_CHECK /etc/ganglia/gmond.conf $FILES_DIR $CB_HOSTETH2 
+  FILE_CHECK /etc/ganglia/gmond.conf $FILES_DIR $CB_HOSTETH3 
+  FILE_CHECK /etc/ganglia/gmond.conf $FILES_DIR $CB_HOSTETH4 
+  FILE_CHECK /etc/ganglia/gmond.conf $FILES_DIR $CB_HOSTS
+fi
+
+echo ""
+FILE_CHECK /etc/group $FILES_DIR $CB_HOSTETH1 
+FILE_CHECK /etc/group $FILES_DIR $CB_HOSTETH2 
+FILE_CHECK /etc/group $FILES_DIR $CB_HOSTETH3 
+FILE_CHECK /etc/group $FILES_DIR $CB_HOSTETH4 
+FILE_CHECK /etc/group $FILES_DIR $CB_HOSTS
+
+echo ""
+HOST_CHECK $FILES_DIR $CB_HOSTETH1 
+HOST_CHECK $FILES_DIR $CB_HOSTETH2 
+HOST_CHECK $FILES_DIR $CB_HOSTETH3 
+HOST_CHECK $FILES_DIR $CB_HOSTETH4 
+HOST_CHECK $FILES_DIR $CB_HOSTS
+
+echo ""
+FILE_CHECK /etc/passwd $FILES_DIR $CB_HOSTETH1 
+FILE_CHECK /etc/passwd $FILES_DIR $CB_HOSTETH2 
+FILE_CHECK /etc/passwd $FILES_DIR $CB_HOSTETH3 
+FILE_CHECK /etc/passwd $FILES_DIR $CB_HOSTETH4 
+FILE_CHECK /etc/passwd $FILES_DIR $CB_HOSTS
+
+
+echo ""
+FILE_CHECK /etc/slurm/slurm.conf $FILES_DIR $CB_HOSTETH1 
+FILE_CHECK /etc/slurm/slurm.conf $FILES_DIR $CB_HOSTETH2 
+FILE_CHECK /etc/slurm/slurm.conf $FILES_DIR $CB_HOSTETH3 
+FILE_CHECK /etc/slurm/slurm.conf $FILES_DIR $CB_HOSTETH4 
+FILE_CHECK /etc/slurm/slurm.conf $FILES_DIR $CB_HOSTS
+
 
 echo ""
 MOUNT_CHECK $FILES_DIR $CB_HOSTETH1 
