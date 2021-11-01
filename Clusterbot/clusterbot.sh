@@ -295,8 +295,8 @@ RUN_CLUSTER_CHECK ()
 }
 
 if [ "$CHECK_CLUSTER" != "" ]; then
-echo ""
-echo "--------------------- Intel Cluster Checker -------------------"
+  echo ""
+  echo "--------------------- Intel Cluster Checker -------------------"
   RUN_CLUSTER_CHECK ETH1 $CB_HOSTETH1
   RUN_CLUSTER_CHECK ETH2 $CB_HOSTETH2
   RUN_CLUSTER_CHECK ETH3 $CB_HOSTETH3
@@ -611,7 +611,7 @@ FSTAB_CHECK ()
   do
     hosti=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
     filei=`echo $line | awk '{print $2}'`
-    ndiff=`diff $file0 $filei | wc -l`
+    ndiff=`diff -w $file0 $filei | wc -l`
     if [ "$ndiff" != "0" ]; then
       if [ "$FILEDIFF" == "" ]; then
         FILEDIFF="$hosti"
