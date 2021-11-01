@@ -504,6 +504,8 @@ if [ "$GANGLIA" != "" ]; then
   CHECK_DAEMON gmond $CB_HOSTS
 fi
 
+# --------------------- rpm check --------------------
+
 RPM_CHECK ()
 {
  local CB_HOST_ARG=$1
@@ -511,11 +513,11 @@ RPM_CHECK ()
 if [ "$CB_HOST_ARG" == "" ]; then
   return 0
 fi
-rm -f $HOME/.rpms/rpm*.txt
-pdsh -t 2 -w $CB_HOST_ARG `pwd`/getrpms.sh >& $SLURMRPMOUT
+rm -f $FILES_DIR/rpm*.txt
+pdsh -t 2 -w $CB_HOST_ARG `pwd`/getrpms.sh $FILES_DIR >& $SLURMRPMOUT
 
 CURDIR=`pwd`
-cd $HOME/.rpms
+cd $FILES_DIR
 rpm0=`ls -l rpm*.txt | head -1 | awk '{print $9}'`
 host0=`echo $rpm0 | sed 's/.txt$//'`
 host0=`echo $host0 | sed 's/^rpm_//'`
@@ -550,6 +552,8 @@ RPM_CHECK $CB_HOSTETH2
 RPM_CHECK $CB_HOSTETH3
 RPM_CHECK $CB_HOSTETH4
 RPM_CHECK $CB_HOSTS
+
+# --------------------- mount check --------------------
 
 MOUNT_CHECK ()
 {
@@ -590,6 +594,8 @@ MOUNT_CHECK ()
   fi
 }
 
+# --------------------- fstab check --------------------
+
 FSTAB_CHECK ()
 {
   local outdir=$1
@@ -628,6 +634,8 @@ FSTAB_CHECK ()
     echo "   $CB_HOST_ARG: ***Warning: $file is different on $FILEDIFF "
   fi
 }
+
+# --------------------- file check --------------------
 
 FILE_CHECK ()
 {
