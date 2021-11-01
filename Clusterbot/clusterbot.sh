@@ -14,7 +14,49 @@ function usage {
 }
 
 #---------------------------------------------
-#                   is_clck_installed
+#                   MAKE_DATA_DIRS
+#---------------------------------------------
+
+MAKE_DATA_DIRS()
+{
+  tempfile=$SCRIPTDIR/temp.$$
+  touch $tempfile
+  ERROR=
+  if [ -e $tempfile ]; then
+    rm $tempfile
+    CB_DATA_DIR=$SCRIPTDIR
+  else
+    CB_DATA_DIR=$HOME/.clusterbot
+    if [ ! -d $CB_DATA_DIR ]; then
+      mkdir $CB_DATA_DIR
+    fi
+  fi
+  OUTPUT_DIR=$CB_DATA_DIR/output
+  FILES_DIR=$CB_DATA_DIR/files
+  if [ ! -d $OUTPUT_DIR ]; then
+    mkdir $OUTPUT_DIR
+    if [ ! -d $OUTPUT_DIR ]; then
+      echo "***error: failed to create the directory: $OUTPUT_DIR"
+      ERROR=1
+    fi
+  fi
+  if [ ! -d $FILES_DIR ]; then
+    mkdir $FILES_DIR
+    if [ ! -d $FILES_DIR_DIR ]; then
+      echo "***error: failed to create the directory: $FILES_DIR"
+      ERROR=1
+    fi
+  fi
+  if [ "$ERROR" == "1" ]; then
+    return 1
+  fi
+  rm -f $OUTPUT_DIR/*
+  rm -f $FILES_DIR/*
+  return 0
+}
+
+#---------------------------------------------
+#                   SETUP_CLCK
 #---------------------------------------------
 
 SETUP_CLCK()
@@ -32,7 +74,13 @@ SETUP_CLCK()
 }
 
 
-ERROR=
+SCRIPTDIR=`pwd`
+BIN=`dirname "$0"`
+if [ "$BIN" == "." ]; then
+  BIN=
+fi
+SCRIPTDIR=$SCRIPTDIR/$BIN
+
 while getopts 'h' OPTION
 do
 case $OPTION  in
@@ -44,26 +92,25 @@ esac
 done
 shift $(($OPTIND-1))
 
-if [ "$ERROR" == "1" ]; then
-  exit
-fi
+# --------------------- make surer output directories exist  --------------------
 
+MAKE_DATA_DIRS ||  exit
 
 # --------------------- define file names --------------------
 
-ETHOUT=/tmp/ethout.$$
-CLUSTEROUT=/tmp/clusterout.$$
-ETHUP=/tmp/ethup.33
-CHECKEROUT=/tmp/checkerout.$$
-FSOUT=/tmp/fsout.$$
-MOUNTOUT=/tmp/mountout.$$
-IBOUT=/tmp/ibout.$$
-SUBNETOUT=/tmp/subnetout.$$
-IBRATE=/tmp/ibrate.$$
-SLURMOUT=/tmp/slurmout.$$
-SLURMRPMOUT=/tmp/slurmrpmout.$$
-DOWN_HOSTS=/tmp/downhosts.$$
-UP_HOSTS=/tmp/uphosts.$$
+ETHOUT=$FILES_DIR/ethout.$$
+CLUSTEROUT=$FILES_DIR/clusterout.$$
+ETHUP=$FILES_DIR/ethup.33
+CHECKEROUT=$FILES_DIR/checkerout.$$
+FSOUT=$FILES_DIR/fsout.$$
+MOUNTOUT=$FILES_DIR/mountout.$$
+IBOUT=$FILES_DIR/ibout.$$
+SUBNETOUT=$FILES_DIR/subnetout.$$
+IBRATE=$FILES_DIR/ibrate.$$
+SLURMOUT=$FILES_DIR/slurmout.$$
+SLURMRPMOUT=$FILES_DIR/slurmrpmout.$$
+DOWN_HOSTS=$FILES_DIR/downhosts.$$
+UP_HOSTS=$FILES_DIR/uphosts.$$
 
 # --------------------- setup Intel cluster checker  --------------------
 
@@ -228,10 +275,10 @@ RUN_CLUSTER_CHECK ()
   local CB_HOST_ARG=$2
 
   if [ "$CB_HOST_ARG" != "" ]; then
-    NODEFILE=output/$LOG.hosts
-    WARNINGFILE=output/${LOG}_execution_warnings.log
-    OUTFILE=output/${LOG}.out
-    RESULTSFILE=output/${LOG}_results.out
+    NODEFILE=OUTPUT_DIR/$LOG.hosts
+    WARNINGFILE=OUTPUT_DIR/${LOG}_execution_warnings.log
+    OUTFILE=OUTPUT_DIR/${LOG}.out
+    RESULTSFILE=OUTPUT_DIR/${LOG}_results.out
     pdsh -t 2 -w $CB_HOST_ARG date   >& $CLUSTEROUT
     sort $CLUSTEROUT | grep -v ssh | awk '{print $1 }' | awk -F':' '{print $1}' > $NODEFILE
     nup=`wc -l $NODEFILE`
@@ -395,7 +442,7 @@ CHECK_DAEMON ()
  local DAEMON_ARG=$1
  local CB_HOST_ARG=$2
 
-DAEMONOUT=/tmp/daemon.out.$$
+DAEMONOUT=$FILES_DIR/daemon.out.$$
 
 pdsh -t 2 -w $CB_HOST_ARG "ps -el | grep $DAEMON_ARG | wc -l" |&  grep -v ssh | sort >& $DAEMONOUT
 DAEMONDOWN=
@@ -503,7 +550,3 @@ RPM_CHECK $CB_HOSTETH2
 RPM_CHECK $CB_HOSTETH3
 RPM_CHECK $CB_HOSTETH4
 RPM_CHECK $CB_HOSTS
-
-# --------------------- cleanup --------------------
-
-rm -f $CLUSTEROUT $DOWN_HOSTS $ETHOUT $FSOUT $IBOUT $IBRATE $MOUNTOUT $SLURMOUT $SLURMRPMOUT $SUBNETOUT $UP_HOSTS 
