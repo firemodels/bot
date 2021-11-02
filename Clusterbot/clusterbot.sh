@@ -387,6 +387,25 @@ CORE_CHECK $CB_HOSTETH2
 CORE_CHECK $CB_HOSTETH3
 CORE_CHECK $CB_HOSTETH4
 
+MEM_DIFF ()
+{
+  MEM1=$1
+  MEM2=$2
+
+  if [ "$MEM1" == "$MEM2" ]; then
+    return 0
+  fi
+  DIFF=`echo $((MEM1 - MEM2))`
+  if [ "$DIFF" == "1"  ]; then
+    return 0
+  fi
+  DIFF=`echo $((MEM2 - MEM1))`
+  if [ "$DIFF" == "1"  ]; then
+    return 0
+  fi
+  return 1
+}
+
 # --------------------- memory check --------------------
 
 MEMORY_CHECK ()
@@ -409,7 +428,8 @@ MEMORY_CHECK ()
   do
     hosti=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
     memoryi=`echo $line | awk '{print $2}'`
-    if [ "$memory0" != "$memoryi" ]; then
+    MEM_DIFF $memory0 $memoryi
+    if [ "$?" == "1" ]; then
       if [ "$MEMORY_DIFF" == "" ]; then
         MEMORY_DIFF="$hosti/$memoryi"
       else
@@ -420,9 +440,9 @@ MEMORY_CHECK ()
   cd $CURDIR
 
   if [ "$MEMORY_DIFF" == "" ]; then
-    echo "   $CB_HOST_ARG: $memory0 Mb memory"
+    echo "   $CB_HOST_ARG: $memory0 MB memory"
   else
-    echo "   $CB_HOST_ARG: ***Warning: $memory0 Mb memory except on $MEMORY_DIFF "
+    echo "   $CB_HOST_ARG: ***Warning: $memory0 MB memory except on $MEMORY_DIFF "
   fi
 }
 
@@ -482,7 +502,8 @@ if [ "$SLURMDOWN" == "" ]; then
 else
   echo "   $CB_HOSTS: ***Warning: slurm offline on $SLURMDOWN"
   echo "      Fix: sudo scontrol update nodename=HOST state=resume"
-  echo "      This fix can only be applied to a HOST that is up and with a working ethernet and infiniband network connection."
+  echo "      This fix can only be applied to a HOST that is up and with"
+  echo "      a working ethernet and infiniband network connection."
 fi
 
 # --------------------- check slurm daemon --------------------
@@ -685,7 +706,7 @@ FSTAB_CHECK ()
   cd $CURDIR
 
   if [ "$FILEDIFF" == "" ]; then
-    echo "   $CB_HOST_ARG: $file identical"
+    echo "   $CB_HOST_ARG: $file is identical"
     return 0
   else
     echo "   $CB_HOST_ARG: ***Warning: $file is different on $FILEDIFF "
@@ -787,75 +808,76 @@ if [ "$?" == "1" ]; then
   FILE_CHECK /etc/exports $FILES_DIR $CB_HOSTETH2 
   FILE_CHECK /etc/exports $FILES_DIR $CB_HOSTETH3 
   FILE_CHECK /etc/exports $FILES_DIR $CB_HOSTETH4 
+  echo ""
 fi
 
-echo ""
 FSTAB_CHECK $FILES_DIR $CB_HOSTS
 if [ "$?" == "1" ]; then
   FSTAB_CHECK $FILES_DIR $CB_HOSTETH1 
   FSTAB_CHECK $FILES_DIR $CB_HOSTETH2 
   FSTAB_CHECK $FILES_DIR $CB_HOSTETH3 
   FSTAB_CHECK $FILES_DIR $CB_HOSTETH4 
+  echo ""
 fi
 
 if [ "$GANGLIA" != "" ]; then
-  echo ""
   FILE_CHECK /etc/ganglia/gmond.conf $FILES_DIR $CB_HOSTS
   if [ "$?" == "1" ]; then
     FILE_CHECK /etc/ganglia/gmond.conf $FILES_DIR $CB_HOSTETH1 
     FILE_CHECK /etc/ganglia/gmond.conf $FILES_DIR $CB_HOSTETH2 
     FILE_CHECK /etc/ganglia/gmond.conf $FILES_DIR $CB_HOSTETH3 
     FILE_CHECK /etc/ganglia/gmond.conf $FILES_DIR $CB_HOSTETH4 
+    echo ""
   fi
 fi
 
-echo ""
 FILE_CHECK /etc/group $FILES_DIR $CB_HOSTS
 if [ "$?" == "1" ]; then
   FILE_CHECK /etc/group $FILES_DIR $CB_HOSTETH1 
   FILE_CHECK /etc/group $FILES_DIR $CB_HOSTETH2 
   FILE_CHECK /etc/group $FILES_DIR $CB_HOSTETH3 
   FILE_CHECK /etc/group $FILES_DIR $CB_HOSTETH4 
+  echo ""
 fi
 
-echo ""
 HOST_CHECK $FILES_DIR $CB_HOSTS
 if [ "$?" == "1" ]; then
   HOST_CHECK $FILES_DIR $CB_HOSTETH1 
   HOST_CHECK $FILES_DIR $CB_HOSTETH2 
   HOST_CHECK $FILES_DIR $CB_HOSTETH3 
   HOST_CHECK $FILES_DIR $CB_HOSTETH4 
+  echo ""
 fi
 
-echo ""
 FILE_CHECK /etc/passwd $FILES_DIR $CB_HOSTS
 if [ "$?" == "1" ]; then
   FILE_CHECK /etc/passwd $FILES_DIR $CB_HOSTETH1 
   FILE_CHECK /etc/passwd $FILES_DIR $CB_HOSTETH2 
   FILE_CHECK /etc/passwd $FILES_DIR $CB_HOSTETH3 
   FILE_CHECK /etc/passwd $FILES_DIR $CB_HOSTETH4 
+  echo ""
 fi
 
-echo ""
 FILE_CHECK /etc/slurm/slurm.conf $FILES_DIR $CB_HOSTS
 if [ "$?" == "1" ]; then
   FILE_CHECK /etc/slurm/slurm.conf $FILES_DIR $CB_HOSTETH1 
   FILE_CHECK /etc/slurm/slurm.conf $FILES_DIR $CB_HOSTETH2 
   FILE_CHECK /etc/slurm/slurm.conf $FILES_DIR $CB_HOSTETH3 
   FILE_CHECK /etc/slurm/slurm.conf $FILES_DIR $CB_HOSTETH4 
+  echo ""
 fi
 
-echo ""
 MOUNT_CHECK $FILES_DIR $CB_HOSTS
 if [ "$?" == "1" ]; then
   MOUNT_CHECK $FILES_DIR $CB_HOSTETH1 
   MOUNT_CHECK $FILES_DIR $CB_HOSTETH2 
   MOUNT_CHECK $FILES_DIR $CB_HOSTETH3 
   MOUNT_CHECK $FILES_DIR $CB_HOSTETH4 
+  echo ""
 fi
 
 STOP_TIME=`date`
 echo ""
 echo "--------------------- clusterbot complete ------------------------------"
 echo "start time: $START_TIME"
-echo " stop time: $STOP_TIME"
+echo "stop time: $STOP_TIME"
