@@ -156,7 +156,7 @@ if [ "$ERROR" == "1" ]; then
 fi
 
 echo
-echo "---------- $CB_HOSTS Status ----------"
+echo "---------- $CB_HOSTS status - `date` ----------"
 echo ""
 echo "--------------------- network checks --------------------------"
 # --------------------- check ethernet --------------------
