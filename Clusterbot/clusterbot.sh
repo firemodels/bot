@@ -98,6 +98,7 @@ MAKE_DATA_DIRS ||  exit
 
 # --------------------- define file names --------------------
 
+START_TIME=`date`
 ETHOUT=$FILES_DIR/ethout.$$
 CLUSTEROUT=$FILES_DIR/clusterout.$$
 ETHUP=$FILES_DIR/ethup.33
@@ -852,3 +853,9 @@ if [ "$?" == "1" ]; then
   MOUNT_CHECK $FILES_DIR $CB_HOSTETH3 
   MOUNT_CHECK $FILES_DIR $CB_HOSTETH4 
 fi
+
+STOP_TIME=`date`
+echo ""
+echo "--------------------- clusterbot complete ------------------------------"
+echo "start time: $START_TIME"
+echo " stop time: $STOP_TIME"
