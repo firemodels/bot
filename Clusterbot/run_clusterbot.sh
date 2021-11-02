@@ -54,7 +54,7 @@ cd $BINDIR
 ./clusterbot.sh | tee  $OUTPUT
 if [ "$EMAIL" != "" ]; then
   echo emailing results to $EMAIL
-  cat $OUTPUT | mail -s "cluster status: $CB_HOSTS " $EMAIL
+  cat $OUTPUT | mail -s "clusterbot status: $CB_HOSTS " $EMAIL
 fi
 
 cd $CURDIR
