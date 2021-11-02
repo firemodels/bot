@@ -331,14 +331,14 @@ PROVISION_DATE ()
   done < $FSOUT
 
   if [ "$FSDOWN" == "" ]; then
-    echo "   $CB_HOSTETH_ARG: Provisioning date is $NF0"
+    echo "   $CB_HOSTETH_ARG: Systems imaged on $NF0"
   else
-    echo "   $CB_HOSTETH_ARG: Provisioning date is $NF0 except on $FSDOWN"
+    echo "   $CB_HOSTETH_ARG: Systems built on $NF0 except for $FSDOWN"
   fi
 }
 
 echo ""
-echo "--------------------- Provisioning date check -------------------------"
+echo "--------------------- System build date check -------------------------"
 PROVISION_DATE $CB_HOSTETH1
 PROVISION_DATE $CB_HOSTETH2
 PROVISION_DATE $CB_HOSTETH3
@@ -419,9 +419,9 @@ MEMORY_CHECK ()
   cd $CURDIR
 
   if [ "$MEMORY_DIFF" == "" ]; then
-    echo "   $CB_HOST_ARG: $memory0 Mb"
+    echo "   $CB_HOST_ARG: $memory0 Mb memory"
   else
-    echo "   $CB_HOST_ARG: ***Warning: $memory0 Mb except on $MEMORY_DIFF "
+    echo "   $CB_HOST_ARG: ***Warning: $memory0 Mb memory except on $MEMORY_DIFF "
   fi
 }
 
@@ -462,7 +462,7 @@ fi
 
 # --------------------- check slurm --------------------
 echo ""
-echo "--------------------- Slurm checks ----------------------------"
+echo "--------------------- slurm checks ----------------------------"
 
 pbsnodes -l | awk '{print $1}' | sort -u  > $DOWN_HOSTS
 SLURMDOWN=
@@ -477,9 +477,9 @@ do
 done < $DOWN_HOSTS
 
 if [ "$SLURMDOWN" == "" ]; then
-  echo "   $CB_HOSTS: Slurm online"
+  echo "   $CB_HOSTS: slurm online"
 else
-  echo "   $CB_HOSTS: ***Warning: Slurm offline on $SLURMDOWN"
+  echo "   $CB_HOSTS: ***Warning: slurm offline on $SLURMDOWN"
   echo "      Fix: sudo scontrol update nodename=HOST state=resume"
   echo "      This fix can only be applied to a HOST that is up and with a working ethernet and infiniband network connection."
 fi
@@ -637,7 +637,7 @@ MOUNT_CHECK ()
   cd $CURDIR
 
   if [ "$FILEDIFF" == "" ]; then
-    echo "   $CB_HOST_ARG: $file (df -k -t nfs) are the same"
+    echo "   $CB_HOST_ARG: $file (df -k -t nfs) are identical"
   else
     echo "   $CB_HOST_ARG: ***Warning: $file (df -k -t nfs) are different on $FILEDIFF "
   fi
@@ -760,7 +760,7 @@ HOST_CHECK ()
   cd $CURDIR
 
   if [ "$FILEDIFF" == "" ]; then
-    echo "   $CB_HOST_ARG: $file is identical (except for lines containing localhost)"
+    echo "   $CB_HOST_ARG: $file is identical (except for entries containing localhost)"
   else
     echo "   $CB_HOST_ARG: ***Warning: $file is different on $FILEDIFF "
   fi
