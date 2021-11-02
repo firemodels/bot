@@ -156,7 +156,7 @@ if [ "$ERROR" == "1" ]; then
 fi
 
 echo
-echo "---------- Linux Cluster Status: $CB_HOSTS ----------"
+echo "---------- $CB_HOSTS Status ----------"
 echo ""
 echo "--------------------- network checks --------------------------"
 # --------------------- check ethernet --------------------
@@ -338,7 +338,7 @@ PROVISION_DATE ()
 }
 
 echo ""
-echo "--------------------- System build date check -------------------------"
+echo "--------------------- system build date check -------------------------"
 PROVISION_DATE $CB_HOSTETH1
 PROVISION_DATE $CB_HOSTETH2
 PROVISION_DATE $CB_HOSTETH3
@@ -372,9 +372,9 @@ CORE_CHECK ()
   done < $FSOUT
 
   if [ "$FSDOWN" == "" ]; then
-    echo "   $CB_HOSTETH_ARG: $NF0 cores"
+    echo "   $CB_HOSTETH_ARG: $NF0 CPU cores"
   else
-    echo "   $CB_HOSTETH_ARG: ***Warning: $NF0 cores except $FSDOWN"
+    echo "   $CB_HOSTETH_ARG: ***Warning: $NF0 CPU cores except $FSDOWN"
     echo "      Fix: boot into BIOS and disable hyperthreading"
   fi
 }
@@ -588,19 +588,23 @@ cd $CURDIR
 
 if [ "$RPMDIFF" == "" ]; then
   echo "   $CB_HOST_ARG: rpms are identical"
+  return 0
 else
   echo "   $CB_HOST_ARG: ***Warning: $host0 rpms are different from those on $RPMDIFF "
   echo "      Fix: reimage host or install updated rpm packages"
+  return 1
 fi
 }
 
 echo ""
 echo "--------------------- rpm checks ------------------------------"
-RPM_CHECK $CB_HOSTETH1
-RPM_CHECK $CB_HOSTETH2
-RPM_CHECK $CB_HOSTETH3
-RPM_CHECK $CB_HOSTETH4
 RPM_CHECK $CB_HOSTS
+if [ "$?" == "1" ]; then
+  RPM_CHECK $CB_HOSTETH1
+  RPM_CHECK $CB_HOSTETH2
+  RPM_CHECK $CB_HOSTETH3
+  RPM_CHECK $CB_HOSTETH4
+fi
 
 # --------------------- mount check --------------------
 
@@ -638,8 +642,10 @@ MOUNT_CHECK ()
 
   if [ "$FILEDIFF" == "" ]; then
     echo "   $CB_HOST_ARG: $file (df -k -t nfs) are identical"
+    return 0
   else
     echo "   $CB_HOST_ARG: ***Warning: $file (df -k -t nfs) are different on $FILEDIFF "
+    return 1
   fi
 }
 
@@ -679,8 +685,10 @@ FSTAB_CHECK ()
 
   if [ "$FILEDIFF" == "" ]; then
     echo "   $CB_HOST_ARG: $file identical"
+    return 0
   else
     echo "   $CB_HOST_ARG: ***Warning: $file is different on $FILEDIFF "
+    return 1
   fi
 }
 
@@ -720,8 +728,10 @@ FILE_CHECK ()
 
   if [ "$FILEDIFF" == "" ]; then
     echo "   $CB_HOST_ARG: $file is identical"
+    return 0
   else
     echo "   $CB_HOST_ARG: ***Warning: $file is different on $FILEDIFF "
+    return 1
   fi
 }
 
@@ -761,68 +771,84 @@ HOST_CHECK ()
 
   if [ "$FILEDIFF" == "" ]; then
     echo "   $CB_HOST_ARG: $file is identical (except for entries containing localhost)"
+    return 0
   else
     echo "   $CB_HOST_ARG: ***Warning: $file is different on $FILEDIFF "
+    return 1
   fi
 }
 echo ""
 echo "--------------------- file checks ------------------------------"
 echo ""
-FILE_CHECK /etc/exports $FILES_DIR $CB_HOSTETH1 
-FILE_CHECK /etc/exports $FILES_DIR $CB_HOSTETH2 
-FILE_CHECK /etc/exports $FILES_DIR $CB_HOSTETH3 
-FILE_CHECK /etc/exports $FILES_DIR $CB_HOSTETH4 
 FILE_CHECK /etc/exports $FILES_DIR $CB_HOSTS
-
-echo ""
-FSTAB_CHECK $FILES_DIR $CB_HOSTETH1 
-FSTAB_CHECK $FILES_DIR $CB_HOSTETH2 
-FSTAB_CHECK $FILES_DIR $CB_HOSTETH3 
-FSTAB_CHECK $FILES_DIR $CB_HOSTETH4 
-FSTAB_CHECK $FILES_DIR $CB_HOSTS
-
-if [ "$GANGLIA" != "" ]; then
-  echo ""
-  FILE_CHECK /etc/ganglia/gmond.conf $FILES_DIR $CB_HOSTETH1 
-  FILE_CHECK /etc/ganglia/gmond.conf $FILES_DIR $CB_HOSTETH2 
-  FILE_CHECK /etc/ganglia/gmond.conf $FILES_DIR $CB_HOSTETH3 
-  FILE_CHECK /etc/ganglia/gmond.conf $FILES_DIR $CB_HOSTETH4 
-  FILE_CHECK /etc/ganglia/gmond.conf $FILES_DIR $CB_HOSTS
+if [ "$?" == "1" ]; then
+  FILE_CHECK /etc/exports $FILES_DIR $CB_HOSTETH1 
+  FILE_CHECK /etc/exports $FILES_DIR $CB_HOSTETH2 
+  FILE_CHECK /etc/exports $FILES_DIR $CB_HOSTETH3 
+  FILE_CHECK /etc/exports $FILES_DIR $CB_HOSTETH4 
 fi
 
 echo ""
-FILE_CHECK /etc/group $FILES_DIR $CB_HOSTETH1 
-FILE_CHECK /etc/group $FILES_DIR $CB_HOSTETH2 
-FILE_CHECK /etc/group $FILES_DIR $CB_HOSTETH3 
-FILE_CHECK /etc/group $FILES_DIR $CB_HOSTETH4 
+FSTAB_CHECK $FILES_DIR $CB_HOSTS
+if [ "$?" == "1" ]; then
+  FSTAB_CHECK $FILES_DIR $CB_HOSTETH1 
+  FSTAB_CHECK $FILES_DIR $CB_HOSTETH2 
+  FSTAB_CHECK $FILES_DIR $CB_HOSTETH3 
+  FSTAB_CHECK $FILES_DIR $CB_HOSTETH4 
+fi
+
+if [ "$GANGLIA" != "" ]; then
+  echo ""
+  FILE_CHECK /etc/ganglia/gmond.conf $FILES_DIR $CB_HOSTS
+  if [ "$?" == "1" ]; then
+    FILE_CHECK /etc/ganglia/gmond.conf $FILES_DIR $CB_HOSTETH1 
+    FILE_CHECK /etc/ganglia/gmond.conf $FILES_DIR $CB_HOSTETH2 
+    FILE_CHECK /etc/ganglia/gmond.conf $FILES_DIR $CB_HOSTETH3 
+    FILE_CHECK /etc/ganglia/gmond.conf $FILES_DIR $CB_HOSTETH4 
+  fi
+fi
+
+echo ""
 FILE_CHECK /etc/group $FILES_DIR $CB_HOSTS
+if [ "$?" == "1" ]; then
+  FILE_CHECK /etc/group $FILES_DIR $CB_HOSTETH1 
+  FILE_CHECK /etc/group $FILES_DIR $CB_HOSTETH2 
+  FILE_CHECK /etc/group $FILES_DIR $CB_HOSTETH3 
+  FILE_CHECK /etc/group $FILES_DIR $CB_HOSTETH4 
+fi
 
 echo ""
-HOST_CHECK $FILES_DIR $CB_HOSTETH1 
-HOST_CHECK $FILES_DIR $CB_HOSTETH2 
-HOST_CHECK $FILES_DIR $CB_HOSTETH3 
-HOST_CHECK $FILES_DIR $CB_HOSTETH4 
 HOST_CHECK $FILES_DIR $CB_HOSTS
+if [ "$?" == "1" ]; then
+  HOST_CHECK $FILES_DIR $CB_HOSTETH1 
+  HOST_CHECK $FILES_DIR $CB_HOSTETH2 
+  HOST_CHECK $FILES_DIR $CB_HOSTETH3 
+  HOST_CHECK $FILES_DIR $CB_HOSTETH4 
+fi
 
 echo ""
-FILE_CHECK /etc/passwd $FILES_DIR $CB_HOSTETH1 
-FILE_CHECK /etc/passwd $FILES_DIR $CB_HOSTETH2 
-FILE_CHECK /etc/passwd $FILES_DIR $CB_HOSTETH3 
-FILE_CHECK /etc/passwd $FILES_DIR $CB_HOSTETH4 
 FILE_CHECK /etc/passwd $FILES_DIR $CB_HOSTS
-
+if [ "$?" == "1" ]; then
+  FILE_CHECK /etc/passwd $FILES_DIR $CB_HOSTETH1 
+  FILE_CHECK /etc/passwd $FILES_DIR $CB_HOSTETH2 
+  FILE_CHECK /etc/passwd $FILES_DIR $CB_HOSTETH3 
+  FILE_CHECK /etc/passwd $FILES_DIR $CB_HOSTETH4 
+fi
 
 echo ""
-FILE_CHECK /etc/slurm/slurm.conf $FILES_DIR $CB_HOSTETH1 
-FILE_CHECK /etc/slurm/slurm.conf $FILES_DIR $CB_HOSTETH2 
-FILE_CHECK /etc/slurm/slurm.conf $FILES_DIR $CB_HOSTETH3 
-FILE_CHECK /etc/slurm/slurm.conf $FILES_DIR $CB_HOSTETH4 
 FILE_CHECK /etc/slurm/slurm.conf $FILES_DIR $CB_HOSTS
-
+if [ "$?" == "1" ]; then
+  FILE_CHECK /etc/slurm/slurm.conf $FILES_DIR $CB_HOSTETH1 
+  FILE_CHECK /etc/slurm/slurm.conf $FILES_DIR $CB_HOSTETH2 
+  FILE_CHECK /etc/slurm/slurm.conf $FILES_DIR $CB_HOSTETH3 
+  FILE_CHECK /etc/slurm/slurm.conf $FILES_DIR $CB_HOSTETH4 
+fi
 
 echo ""
-MOUNT_CHECK $FILES_DIR $CB_HOSTETH1 
-MOUNT_CHECK $FILES_DIR $CB_HOSTETH2 
-MOUNT_CHECK $FILES_DIR $CB_HOSTETH3 
-MOUNT_CHECK $FILES_DIR $CB_HOSTETH4 
 MOUNT_CHECK $FILES_DIR $CB_HOSTS
+if [ "$?" == "1" ]; then
+  MOUNT_CHECK $FILES_DIR $CB_HOSTETH1 
+  MOUNT_CHECK $FILES_DIR $CB_HOSTETH2 
+  MOUNT_CHECK $FILES_DIR $CB_HOSTETH3 
+  MOUNT_CHECK $FILES_DIR $CB_HOSTETH4 
+fi
