@@ -215,7 +215,12 @@ SUBNET_CHECK ()
     echo "   $CB_HOSTIB_ARG: **Error: subnet manager (opensm) not running on any host"
     echo "      Fix: sudo ssh $CB_HOST_ARG service opensm start   "
   else
-    echo "   $CB_HOSTIB_ARG: subnet manager (opensm) running on $SUB1"
+    SUBNETCOUNT=`cat  $SUBNETOUT | awk -F':' '{print $1}' | sort -u | wc -l`
+    if [ "$SUBNETCOUNT" == "1" ]; then
+      echo "   $CB_HOSTIB_ARG: subnet manager (opensm) running on $SUB1"
+    else
+      echo "   $CB_HOSTIB_ARG: subnet manager (opensm) running on $SUBNETCOUNT hosts"
+    fi
   fi
 }
 
