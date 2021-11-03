@@ -55,10 +55,12 @@ echo updating bot rep
 git fetch origin        &> /dev/null
 git merge origin/master &> /dev/null
 
+REV=`git describe --dirty --long`
+
 ./clusterbot.sh | tee  $OUTPUT
 if [ "$EMAIL" != "" ]; then
   echo emailing results to $EMAIL
-  cat $OUTPUT | mail -s "clusterbot status: $CB_HOSTS " $EMAIL
+  cat $OUTPUT | mail -s "clusterbot status: $CB_HOSTS - $REV" $EMAIL
 fi
 
 cd $CURDIR
