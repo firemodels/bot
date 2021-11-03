@@ -51,7 +51,7 @@ else
 fi
 cd $BINDIR
 
-echo updating bot rep
+echo updating bot repo
 git fetch origin        &> /dev/null
 git merge origin/master &> /dev/null
 
