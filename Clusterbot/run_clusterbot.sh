@@ -51,6 +51,10 @@ else
 fi
 cd $BINDIR
 
+echo updating bot rep
+git fetch origin        &> /dev/null
+git merge origin/master &> /dev/null
+
 ./clusterbot.sh | tee  $OUTPUT
 if [ "$EMAIL" != "" ]; then
   echo emailing results to $EMAIL
