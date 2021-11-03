@@ -1,6 +1,4 @@
 #!/bin/bash
-todir=$1
-
 file=memory
 base=`basename $file`
 memory=`grep MemTotal /proc/meminfo | awk '{print $2}'` 

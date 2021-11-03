@@ -125,28 +125,24 @@ if [ "$CB_HOSTS" == "" ]; then
   echo "***error: environment variable CB_HOSTS not defined"
 fi
 if [ "$CB_HOST1" != "" ]; then
-  HAVE_IB=1
   if [ "$CB_HOSTIB1" == "" ]; then
     ERROR=1
     echo "***error: CB_HOSTIB1 must be defined if CB_HOST1 is defined"
   fi
 fi
 if [ "$CB_HOST2" != "" ]; then
-  HAVE_IB=1
   if [ "$CB_HOSTIB2" == "" ]; then
     ERROR=1
     echo "***error: CB_HOSTIB2 must be defined if CB_HOST2 is defined"
   fi
 fi
 if [ "$CB_HOST3" != "" ]; then
-  HAVE_IB=1
   if [ "$CB_HOSTIB3" == "" ]; then
     ERROR=1
     echo "***error: CB_HOSTIB3 must be defined if CB_HOST3 is defined"
   fi
 fi
 if [ "$CB_HOST4" != "" ]; then
-  HAVE_IB=1
   if [ "$CB_HOSTIB4" == "" ]; then
     ERROR=1
     echo "***error: CB_HOSTIB4 must be defined if CB_HOST4 is defined"
@@ -173,23 +169,23 @@ fi
 
 # --------------------- check infiniband --------------------
 
-if [ "$HAVE_IB" == "1" ]; then
-  rm -rf $IBOUT
-  touch $IBOUT
-  if [ "$CB_HOST1" != "" ]; then
-    ssh $CB_HOST1 pdsh -t 2 -w $CB_HOSTIB1 date  >>  $IBOUT 2>&1
-  fi
-  if [ "$CB_HOST2" != "" ]; then
-    ssh $CB_HOST2 pdsh -t 2 -w $CB_HOSTIB2 date  >>  $IBOUT 2>&1
-  fi
-  if [ "$CB_HOST3" != "" ]; then
-    ssh $CB_HOST3 pdsh -t 2 -w $CB_HOSTIB3 date  >>  $IBOUT 2>&1
-  fi
-  if [ "$CB_HOST4" != "" ]; then
-    ssh $CB_HOST4 pdsh -t 2 -w $CB_HOSTIB4 date  >>  $IBOUT 2>&1
-  fi
-  IBDOWN=`grep -E 'timed|refused|route'  $IBOUT | grep out | sort | awk -F':' '{print $1}' | awk '{printf "%s ", $1}'`
+rm -rf $IBOUT
+touch $IBOUT
+if [[ "$CB_HOST1" != "" ]] && [[ $CB_HOSTIB1 != "" ]]; then
+  ssh $CB_HOST1 pdsh -t 2 -w $CB_HOSTIB1 date  >>  $IBOUT 2>&1
+fi
+if [[ "$CB_HOST2" != "" ]] && [[ $CB_HOSTIB2 != "" ]]; then
+  ssh $CB_HOST2 pdsh -t 2 -w $CB_HOSTIB2 date  >>  $IBOUT 2>&1
+fi
+if [[ "$CB_HOST3" != "" ]] && [[ $CB_HOSTIB3 != "" ]]; then
+  ssh $CB_HOST3 pdsh -t 2 -w $CB_HOSTIB3 date  >>  $IBOUT 2>&1
+fi
+if [[ "$CB_HOST4" != "" ]] && [[ $CB_HOSTIB4 != "" ]]; then
+  ssh $CB_HOST4 pdsh -t 2 -w $CB_HOSTIB4 date  >>  $IBOUT 2>&1
+fi
+IBDOWN=`grep -E 'timed|refused|route'  $IBOUT | grep out | sort | awk -F':' '{print $1}' | awk '{printf "%s ", $1}'`
 
+if [ `cat $IBOUT | wc -l` -ne 0 ]; then
   if [ "$IBDOWN" == "" ]; then
     echo "   $CB_HOSTS: Infiniband up"
   else
@@ -206,6 +202,9 @@ SUBNET_CHECK ()
   local CB_HOST_ARG=$1
   local CB_HOSTIB_ARG=$2
 
+  if [ "$CB_HOSTIB_ARG" == "" ]; then
+    return
+  fi
   if [ "$CB_HOST_ARG" == "" ]; then
     return
   fi
@@ -224,12 +223,10 @@ SUBNET_CHECK ()
   fi
 }
 
-if [ "$HAVE_IB" == "1" ]; then
-  SUBNET_CHECK $CB_HOST1 $CB_HOSTIB1
-  SUBNET_CHECK $CB_HOST2 $CB_HOSTIB2
-  SUBNET_CHECK $CB_HOST3 $CB_HOSTIB3
-  SUBNET_CHECK $CB_HOST4 $CB_HOSTIB4
-fi
+SUBNET_CHECK $CB_HOST1 $CB_HOSTIB1
+SUBNET_CHECK $CB_HOST2 $CB_HOSTIB2
+SUBNET_CHECK $CB_HOST3 $CB_HOSTIB3
+SUBNET_CHECK $CB_HOST4 $CB_HOSTIB4
 
 # --------------------- check infiniband speed --------------------
 
@@ -243,6 +240,9 @@ IBSPEED ()
   CURDIR=`pwd`
   pdsh -t 2 -w $CB_HOST_ARG $CURDIR/ibspeed.sh |& grep -v ssh | sort >& $IBRATE
   RATE0=`head -1 $IBRATE | awk '{print $2}'`
+  if [ "$RATE0" == "0" ]; then
+    return
+  fi
   RATEBAD=
   while read line 
   do
@@ -259,19 +259,17 @@ IBSPEED ()
     fi
   done < $IBRATE
 
-   if [ "$RATEBAD" == "" ]; then
+  if [ "$RATEBAD" == "" ]; then
     echo "   ${CB_HOST_ARG}-ib: Infiniband data rate is $RATE0 Gb/s"
   else
     echo "   ${CB_HOST_ARG}-ib: ***Warning: Infiniband data rate is $RATE0 Gb/s except on $RATEBAD"
   fi
 }
-if [ "$HAVE_IB" == "1" ]; then
-  echo ""
-  IBSPEED $CB_HOSTETH1
-  IBSPEED $CB_HOSTETH2
-  IBSPEED $CB_HOSTETH3
-  IBSPEED $CB_HOSTETH4
-fi
+echo ""
+IBSPEED $CB_HOSTETH1
+IBSPEED $CB_HOSTETH2
+IBSPEED $CB_HOSTETH3
+IBSPEED $CB_HOSTETH4
 
 # --------------------- run cluster checker --------------------
 
@@ -411,6 +409,51 @@ MEM_DIFF ()
   return 1
 }
 
+# --------------------- speed check --------------------
+
+SPEED_CHECK ()
+{
+  local outdir=$1
+  local CB_HOST_ARG=$2
+
+  if [ "$CB_HOST_ARG" == "" ]; then
+    return 0
+  fi
+  SPEED_OUT=$outdir/speed_out
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getspeed.sh  |& grep -v ssh | sort >& $SPEED_OUT
+  speed0=`head -1 $SPEED_OUT | awk '{print $2}'`
+
+  CURDIR=`pwd`
+  cd $outdir
+ 
+  SPEED_DIFF=
+  while read line 
+  do
+    hosti=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
+    speedi=`echo $line | awk '{print $2}'`
+    if [ "$speed0" != "$speedi" ]; then
+      if [ "$SPEED_DIFF" == "" ]; then
+        SPEED_DIFF="$hosti/$speedi"
+      else
+        SPEED_DIFF="$SPEED_DIFF $hosti/$speedi"
+      fi
+    fi
+  done < $SPEED_OUT
+  cd $CURDIR
+
+  if [ "$SPEED_DIFF" == "" ]; then
+    echo "   $CB_HOST_ARG: $speed0"
+  else
+    echo "   $CB_HOST_ARG: ***Warning: $speed0 except on $SPEED_DIFF "
+  fi
+}
+
+echo ""
+SPEED_CHECK $FILES_DIR $CB_HOSTETH1
+SPEED_CHECK $FILES_DIR $CB_HOSTETH2
+SPEED_CHECK $FILES_DIR $CB_HOSTETH3
+SPEED_CHECK $FILES_DIR $CB_HOSTETH4
+
 # --------------------- memory check --------------------
 
 MEMORY_CHECK ()
@@ -422,7 +465,7 @@ MEMORY_CHECK ()
     return 0
   fi
   MEMORY_OUT=$outdir/memory_out
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getmem.sh $outdir |& grep -v ssh | sort >& $MEMORY_OUT
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getmem.sh  |& grep -v ssh | sort >& $MEMORY_OUT
   memory0=`head -1 $MEMORY_OUT | awk '{print $2}'`
 
   CURDIR=`pwd`
@@ -445,9 +488,9 @@ MEMORY_CHECK ()
   cd $CURDIR
 
   if [ "$MEMORY_DIFF" == "" ]; then
-    echo "   $CB_HOST_ARG: $memory0 MB memory"
+    echo "   $CB_HOST_ARG: $memory0 MB"
   else
-    echo "   $CB_HOST_ARG: ***Warning: $memory0 MB memory except on $MEMORY_DIFF "
+    echo "   $CB_HOST_ARG: ***Warning: $memory0 MB except on $MEMORY_DIFF "
   fi
 }
 
