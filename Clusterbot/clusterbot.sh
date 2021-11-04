@@ -72,9 +72,11 @@ SETUP_CLCK()
   fi
   return 0
 }
+
 #---------------------------------------------
 #                   CHECK_DAEMON
 #---------------------------------------------
+
 CHECK_DAEMON ()
 {
  local DAEMON_ARG=$1
@@ -103,9 +105,11 @@ else
 fi
 rm -f $DAEMONOUT
 }
+
 #---------------------------------------------
 #                   ACCT_CHECK
 #---------------------------------------------
+
 ACCT_CHECK ()
 {
   local file=$1
@@ -147,9 +151,11 @@ ACCT_CHECK ()
     return 1
   fi
 }
+
 #---------------------------------------------
 #                   FILE_CHECK
 #---------------------------------------------
+
 FILE_CHECK ()
 {
   local file=$1
@@ -200,9 +206,11 @@ FILE_CHECK ()
     return 1
   fi
 }
+
 #---------------------------------------------
 #                   MOUNT_CHECK
 #---------------------------------------------
+
 MOUNT_CHECK ()
 {
   local INDENT=$1
@@ -252,9 +260,11 @@ MOUNT_CHECK ()
     return 1
   fi
 }
+
 #---------------------------------------------
 #                   FSTAB_CHECK
 #---------------------------------------------
+
 FSTAB_CHECK ()
 {
   local outdir=$1
@@ -304,9 +314,11 @@ FSTAB_CHECK ()
     return 1
   fi
 }
+
 #---------------------------------------------
 #                   HOST_CHECK
 #---------------------------------------------
+
 HOST_CHECK ()
 {
   local outdir=$1
@@ -356,9 +368,11 @@ HOST_CHECK ()
     return 1
   fi
 }
+
 #---------------------------------------------
 #                   RPM_CHECK
 #---------------------------------------------
+
 RPM_CHECK ()
 {
  local INDENT=$1
@@ -409,6 +423,286 @@ else
   return 1
 fi
 }
+
+#---------------------------------------------
+#                   SUBNET_CHECK
+#---------------------------------------------
+
+SUBNET_CHECK ()
+{
+  local CB_HOST_ARG=$1
+  local CB_HOSTIB_ARG=$2
+
+  if [ "$CB_HOSTIB_ARG" == "" ]; then
+    return
+  fi
+  if [ "$CB_HOST_ARG" == "" ]; then
+    return
+  fi
+  ssh $CB_HOST_ARG pdsh -t 2 -w $CB_HOST_ARG,$CB_HOSTIB_ARG ps -el |& sort -u | grep opensm  >  $SUBNETOUT 2>&1
+  SUB1=`cat  $SUBNETOUT | awk -F':' '{print $1}' | sort -u | awk '{printf "%s%s", $1," " }'`
+  if [ "$SUB1" == "" ]; then
+    echo "   $CB_HOSTIB_ARG: **Error: opensm not running on any host"
+    echo "      Fix: sudo ssh $CB_HOST_ARG service opensm start   "
+  else
+    SUBNETCOUNT=`cat  $SUBNETOUT | awk -F':' '{print $1}' | sort -u | wc -l`
+    if [ "$SUBNETCOUNT" == "1" ]; then
+      echo "   $CB_HOSTIB_ARG: opensm running on $SUB1"
+    else
+      echo "   $CB_HOSTIB_ARG: opensm running on $SUBNETCOUNT hosts"
+    fi
+  fi
+}
+
+#---------------------------------------------
+#                   IBSPEED
+#---------------------------------------------
+
+IBSPEED ()
+{
+  local CB_HOST_ARG=$1
+ 
+  if [ "$CB_HOST_ARG" == "" ]; then
+    return
+  fi
+  CURDIR=`pwd`
+  pdsh -t 2 -w $CB_HOST_ARG $CURDIR/ibspeed.sh |& grep -v ssh | sort >& $IBRATE
+  RATE0=`head -1 $IBRATE | awk '{print $2}'`
+  if [ "$RATE0" == "0" ]; then
+    return
+  fi
+  RATEBAD=
+  while read line 
+  do
+    host=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
+    RATEI=`echo $line | awk '{print $2}'`
+    if [ "$RATEI" != "$RATE0" ]; then
+      if [ "$RATEI" != "Connection" ]; then
+        if [ "$RATEBAD" == "" ]; then
+          RATEBAD="$host/$RATEI"
+        else
+          RATEBAD="$RATEBAD $host/$RATEI"
+        fi
+      fi
+    fi
+  done < $IBRATE
+
+  if [ "$RATEBAD" == "" ]; then
+    echo "   ${CB_HOST_ARG}-ib: Infiniband data rate is $RATE0 Gb/s"
+  else
+    echo "   ${CB_HOST_ARG}-ib: ***Warning: Infiniband data rate is $RATE0 Gb/s except on $RATEBAD"
+  fi
+}
+
+#---------------------------------------------
+#                   RUN_CLUSTER_CHECK
+#---------------------------------------------
+
+RUN_CLUSTER_CHECK ()
+{
+  local LOG=$1
+  local CB_HOST_ARG=$2
+
+  if [ "$CB_HOST_ARG" != "" ]; then
+    NODEFILE=$OUTPUT_DIR/$LOG.hosts
+    WARNINGFILE=$OUTPUT_DIR/${LOG}_execution_warnings.log
+    OUTFILE=$OUTPUT_DIR/${LOG}.out
+    RESULTSFILE=$OUTPUT_DIR/${LOG}_results.out
+    pdsh -t 2 -w $CB_HOST_ARG date   >& $CLUSTEROUT
+    sort $CLUSTEROUT | grep -v ssh | awk '{print $1 }' | awk -F':' '{print $1}' > $NODEFILE
+    nup=`wc -l $NODEFILE`
+    if [ "$nup" == "0" ]; then
+      echo "   $CB_HOST_ARG: ***Error: all hosts are down - cluster checker not run"
+    else
+      echo "   $CB_HOST_ARG: results in `basename $RESULTSFILE` and `basename $WARNINGFILE`"
+      $CHECK_CLUSTER -l error -f $NODEFILE -o $RESULTSFILE >& $OUTFILE
+      if [ -e clck_execution_warnings.log ]; then
+        mv clck_execution_warnings.log $WARNINGFILE
+      fi
+    fi
+  fi
+}
+
+#---------------------------------------------
+#                   PROVISION_DATE_CHECK
+#---------------------------------------------
+
+PROVISION_DATE_CHECK ()
+{
+  local CB_HOSTETH_ARG=$1
+
+  if [ "$CB_HOSTETH_ARG" == "" ]; then
+    return 0
+  fi
+  pdsh -t 2 -w $CB_HOSTETH_ARG `pwd`/getrevdate.sh |&  grep -v ssh | sort >  $FSOUT 2>&1
+
+  NF0=`head -1 $FSOUT | awk '{print $2}'`
+  FSDOWN=
+  while read line 
+  do
+    host=`echo $line | awk '{print $1}'`
+    host=`echo $host | sed 's/.$//'`
+    NFI=`echo $line | awk '{print $2}'`
+    if [ "$NFI" != "$NF0" ]; then
+      if [ "$FSDOWN" == "" ]; then
+        FSDOWN="$host/$NFI"
+      else
+        FSDOWN="$FSDOWN $host/$NFI"
+      fi
+    fi
+  done < $FSOUT
+
+  if [ "$FSDOWN" == "" ]; then
+    echo "   $CB_HOSTETH_ARG: imaged on $NF0"
+  else
+    echo "   $CB_HOSTETH_ARG: built on $NF0 except for $FSDOWN"
+  fi
+}
+
+#---------------------------------------------
+#                   CORE_CHECK
+#---------------------------------------------
+
+CORE_CHECK ()
+{
+  local CB_HOSTETH_ARG=$1
+
+  if [ "$CB_HOSTETH_ARG" == "" ]; then
+    return 0
+  fi
+  pdsh -t 2 -w $CB_HOSTETH_ARG "grep cpuid /proc/cpuinfo | wc -l" |&  grep -v ssh | sort >  $FSOUT 2>&1
+
+  NF0=`head -1 $FSOUT | awk '{print $2}'`
+  FSDOWN=
+  while read line 
+  do
+    host=`echo $line | awk '{print $1}'`
+    host=`echo $host | sed 's/.$//'`
+    NFI=`echo $line | awk '{print $2}'`
+    if [ "$NFI" != "$NF0" ]; then
+      if [ "$FSDOWN" == "" ]; then
+        FSDOWN="$host/$NFI"
+      else
+        FSDOWN="$FSDOWN $host/$NFI"
+      fi
+    fi
+  done < $FSOUT
+
+  if [ "$FSDOWN" == "" ]; then
+    echo "   $CB_HOSTETH_ARG: $NF0 CPU cores"
+  else
+    echo "   $CB_HOSTETH_ARG: ***Warning: $NF0 CPU cores except $FSDOWN"
+    echo "      Fix: boot into BIOS and disable hyperthreading"
+  fi
+}
+
+#---------------------------------------------
+#                   MEMORY_CHECK
+#---------------------------------------------
+
+MEMORY_CHECK ()
+{
+  local outdir=$1
+  local CB_HOST_ARG=$2
+
+  if [ "$CB_HOST_ARG" == "" ]; then
+    return 0
+  fi
+  MEMORY_OUT=$outdir/memory_out
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getmem.sh  |& grep -v ssh | sort >& $MEMORY_OUT
+  memory0=`head -1 $MEMORY_OUT | awk '{print $2}'`
+
+  CURDIR=`pwd`
+  cd $outdir
+ 
+  MEMORY_DIFF=
+  while read line 
+  do
+    hosti=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
+    memoryi=`echo $line | awk '{print $2}'`
+    MEM_DIFF $memory0 $memoryi
+    if [ "$?" == "1" ]; then
+      if [ "$MEMORY_DIFF" == "" ]; then
+        MEMORY_DIFF="$hosti/$memoryi"
+      else
+        MEMORY_DIFF="$MEMORY_DIFF $hosti/$memoryi"
+      fi
+    fi
+  done < $MEMORY_OUT
+  cd $CURDIR
+
+  if [ "$MEMORY_DIFF" == "" ]; then
+    echo "   $CB_HOST_ARG: $memory0 MB"
+  else
+    echo "   $CB_HOST_ARG: ***Warning: $memory0 MB except on $MEMORY_DIFF "
+  fi
+}
+
+#---------------------------------------------
+#                   MEM_DIFF
+#---------------------------------------------
+
+MEM_DIFF ()
+{
+  MEM1=$1
+  MEM2=$2
+
+  if [ "$MEM1" == "$MEM2" ]; then
+    return 0
+  fi
+  DIFF=`echo $((MEM1 - MEM2))`
+  if [ "$DIFF" == "1"  ]; then
+    return 0
+  fi
+  DIFF=`echo $((MEM2 - MEM1))`
+  if [ "$DIFF" == "1"  ]; then
+    return 0
+  fi
+  return 1
+}
+
+#---------------------------------------------
+#                   SPEED_CHECK
+#---------------------------------------------
+
+SPEED_CHECK ()
+{
+  local outdir=$1
+  local CB_HOST_ARG=$2
+
+  if [ "$CB_HOST_ARG" == "" ]; then
+    return 0
+  fi
+  SPEED_OUT=$outdir/speed_out
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getspeed.sh  |& grep -v ssh | sort >& $SPEED_OUT
+  speed0=`head -1 $SPEED_OUT | awk '{print $2}'`
+
+  CURDIR=`pwd`
+  cd $outdir
+ 
+  SPEED_DIFF=
+  while read line 
+  do
+    hosti=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
+    speedi=`echo $line | awk '{print $2}'`
+    if [ "$speed0" != "$speedi" ]; then
+      if [ "$SPEED_DIFF" == "" ]; then
+        SPEED_DIFF="$hosti/$speedi"
+      else
+        SPEED_DIFF="$SPEED_DIFF $hosti/$speedi"
+      fi
+    fi
+  done < $SPEED_OUT
+  cd $CURDIR
+
+  if [ "$SPEED_DIFF" == "" ]; then
+    echo "   $CB_HOST_ARG: CPU clock rate is $speed0"
+  else
+    echo "   $CB_HOST_ARG: ***Warning: CPU clock rate is $speed0 except on $SPEED_DIFF "
+  fi
+}
+
+#************************** beginning of scrript ******************************************
 
 SCRIPTDIR=`pwd`
 BIN=`dirname "$0"`
@@ -569,74 +863,13 @@ fi
 echo ""
 echo "--------------------- infiniband checks -----------------------"
 
-SUBNET_CHECK ()
-{
-  local CB_HOST_ARG=$1
-  local CB_HOSTIB_ARG=$2
-
-  if [ "$CB_HOSTIB_ARG" == "" ]; then
-    return
-  fi
-  if [ "$CB_HOST_ARG" == "" ]; then
-    return
-  fi
-  ssh $CB_HOST_ARG pdsh -t 2 -w $CB_HOST_ARG,$CB_HOSTIB_ARG ps -el |& sort -u | grep opensm  >  $SUBNETOUT 2>&1
-  SUB1=`cat  $SUBNETOUT | awk -F':' '{print $1}' | sort -u | awk '{printf "%s%s", $1," " }'`
-  if [ "$SUB1" == "" ]; then
-    echo "   $CB_HOSTIB_ARG: **Error: opensm not running on any host"
-    echo "      Fix: sudo ssh $CB_HOST_ARG service opensm start   "
-  else
-    SUBNETCOUNT=`cat  $SUBNETOUT | awk -F':' '{print $1}' | sort -u | wc -l`
-    if [ "$SUBNETCOUNT" == "1" ]; then
-      echo "   $CB_HOSTIB_ARG: opensm running on $SUB1"
-    else
-      echo "   $CB_HOSTIB_ARG: opensm running on $SUBNETCOUNT hosts"
-    fi
-  fi
-}
-
 SUBNET_CHECK $CB_HOST1 $CB_HOSTIB1
 SUBNET_CHECK $CB_HOST2 $CB_HOSTIB2
 SUBNET_CHECK $CB_HOST3 $CB_HOSTIB3
 SUBNET_CHECK $CB_HOST4 $CB_HOSTIB4
 
-# --------------------- check infiniband speed --------------------
+# --------------------- infiniband speed check --------------------
 
-IBSPEED ()
-{
-  local CB_HOST_ARG=$1
- 
-  if [ "$CB_HOST_ARG" == "" ]; then
-    return
-  fi
-  CURDIR=`pwd`
-  pdsh -t 2 -w $CB_HOST_ARG $CURDIR/ibspeed.sh |& grep -v ssh | sort >& $IBRATE
-  RATE0=`head -1 $IBRATE | awk '{print $2}'`
-  if [ "$RATE0" == "0" ]; then
-    return
-  fi
-  RATEBAD=
-  while read line 
-  do
-    host=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
-    RATEI=`echo $line | awk '{print $2}'`
-    if [ "$RATEI" != "$RATE0" ]; then
-      if [ "$RATEI" != "Connection" ]; then
-        if [ "$RATEBAD" == "" ]; then
-          RATEBAD="$host/$RATEI"
-        else
-          RATEBAD="$RATEBAD $host/$RATEI"
-        fi
-      fi
-    fi
-  done < $IBRATE
-
-  if [ "$RATEBAD" == "" ]; then
-    echo "   ${CB_HOST_ARG}-ib: Infiniband data rate is $RATE0 Gb/s"
-  else
-    echo "   ${CB_HOST_ARG}-ib: ***Warning: Infiniband data rate is $RATE0 Gb/s except on $RATEBAD"
-  fi
-}
 echo ""
 IBSPEED $CB_HOSTETH1
 IBSPEED $CB_HOSTETH2
@@ -644,31 +877,6 @@ IBSPEED $CB_HOSTETH3
 IBSPEED $CB_HOSTETH4
 
 # --------------------- run cluster checker --------------------
-
-RUN_CLUSTER_CHECK ()
-{
-  local LOG=$1
-  local CB_HOST_ARG=$2
-
-  if [ "$CB_HOST_ARG" != "" ]; then
-    NODEFILE=$OUTPUT_DIR/$LOG.hosts
-    WARNINGFILE=$OUTPUT_DIR/${LOG}_execution_warnings.log
-    OUTFILE=$OUTPUT_DIR/${LOG}.out
-    RESULTSFILE=$OUTPUT_DIR/${LOG}_results.out
-    pdsh -t 2 -w $CB_HOST_ARG date   >& $CLUSTEROUT
-    sort $CLUSTEROUT | grep -v ssh | awk '{print $1 }' | awk -F':' '{print $1}' > $NODEFILE
-    nup=`wc -l $NODEFILE`
-    if [ "$nup" == "0" ]; then
-      echo "   $CB_HOST_ARG: ***Error: all hosts are down - cluster checker not run"
-    else
-      echo "   $CB_HOST_ARG: results in `basename $RESULTSFILE` and `basename $WARNINGFILE`"
-      $CHECK_CLUSTER -l error -f $NODEFILE -o $RESULTSFILE >& $OUTFILE
-      if [ -e clck_execution_warnings.log ]; then
-        mv clck_execution_warnings.log $WARNINGFILE
-      fi
-    fi
-  fi
-}
 
 if [ "$CHECK_CLUSTER" != "" ]; then
   echo ""
@@ -681,79 +889,14 @@ fi
 
 # --------------------- check provisioning date --------------------
 
-PROVISION_DATE ()
-{
-  local CB_HOSTETH_ARG=$1
-
-  if [ "$CB_HOSTETH_ARG" == "" ]; then
-    return 0
-  fi
-  pdsh -t 2 -w $CB_HOSTETH_ARG `pwd`/getrevdate.sh |&  grep -v ssh | sort >  $FSOUT 2>&1
-
-  NF0=`head -1 $FSOUT | awk '{print $2}'`
-  FSDOWN=
-  while read line 
-  do
-    host=`echo $line | awk '{print $1}'`
-    host=`echo $host | sed 's/.$//'`
-    NFI=`echo $line | awk '{print $2}'`
-    if [ "$NFI" != "$NF0" ]; then
-      if [ "$FSDOWN" == "" ]; then
-        FSDOWN="$host/$NFI"
-      else
-        FSDOWN="$FSDOWN $host/$NFI"
-      fi
-    fi
-  done < $FSOUT
-
-  if [ "$FSDOWN" == "" ]; then
-    echo "   $CB_HOSTETH_ARG: imaged on $NF0"
-  else
-    echo "   $CB_HOSTETH_ARG: built on $NF0 except for $FSDOWN"
-  fi
-}
-
 echo ""
 echo "--------------------- image date check -------------------------"
-PROVISION_DATE $CB_HOSTETH1
-PROVISION_DATE $CB_HOSTETH2
-PROVISION_DATE $CB_HOSTETH3
-PROVISION_DATE $CB_HOSTETH4
+PROVISION_DATE_CHECK $CB_HOSTETH1
+PROVISION_DATE_CHECK $CB_HOSTETH2
+PROVISION_DATE_CHECK $CB_HOSTETH3
+PROVISION_DATE_CHECK $CB_HOSTETH4
 
 # --------------------- check number of cores --------------------
-
-CORE_CHECK ()
-{
-  local CB_HOSTETH_ARG=$1
-
-  if [ "$CB_HOSTETH_ARG" == "" ]; then
-    return 0
-  fi
-  pdsh -t 2 -w $CB_HOSTETH_ARG "grep cpuid /proc/cpuinfo | wc -l" |&  grep -v ssh | sort >  $FSOUT 2>&1
-
-  NF0=`head -1 $FSOUT | awk '{print $2}'`
-  FSDOWN=
-  while read line 
-  do
-    host=`echo $line | awk '{print $1}'`
-    host=`echo $host | sed 's/.$//'`
-    NFI=`echo $line | awk '{print $2}'`
-    if [ "$NFI" != "$NF0" ]; then
-      if [ "$FSDOWN" == "" ]; then
-        FSDOWN="$host/$NFI"
-      else
-        FSDOWN="$FSDOWN $host/$NFI"
-      fi
-    fi
-  done < $FSOUT
-
-  if [ "$FSDOWN" == "" ]; then
-    echo "   $CB_HOSTETH_ARG: $NF0 CPU cores"
-  else
-    echo "   $CB_HOSTETH_ARG: ***Warning: $NF0 CPU cores except $FSDOWN"
-    echo "      Fix: boot into BIOS and disable hyperthreading"
-  fi
-}
 
 echo ""
 echo "--------------------- CPU checks -------------------------"
@@ -762,63 +905,6 @@ CORE_CHECK $CB_HOSTETH2
 CORE_CHECK $CB_HOSTETH3
 CORE_CHECK $CB_HOSTETH4
 
-MEM_DIFF ()
-{
-  MEM1=$1
-  MEM2=$2
-
-  if [ "$MEM1" == "$MEM2" ]; then
-    return 0
-  fi
-  DIFF=`echo $((MEM1 - MEM2))`
-  if [ "$DIFF" == "1"  ]; then
-    return 0
-  fi
-  DIFF=`echo $((MEM2 - MEM1))`
-  if [ "$DIFF" == "1"  ]; then
-    return 0
-  fi
-  return 1
-}
-
-# --------------------- speed check --------------------
-
-SPEED_CHECK ()
-{
-  local outdir=$1
-  local CB_HOST_ARG=$2
-
-  if [ "$CB_HOST_ARG" == "" ]; then
-    return 0
-  fi
-  SPEED_OUT=$outdir/speed_out
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getspeed.sh  |& grep -v ssh | sort >& $SPEED_OUT
-  speed0=`head -1 $SPEED_OUT | awk '{print $2}'`
-
-  CURDIR=`pwd`
-  cd $outdir
- 
-  SPEED_DIFF=
-  while read line 
-  do
-    hosti=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
-    speedi=`echo $line | awk '{print $2}'`
-    if [ "$speed0" != "$speedi" ]; then
-      if [ "$SPEED_DIFF" == "" ]; then
-        SPEED_DIFF="$hosti/$speedi"
-      else
-        SPEED_DIFF="$SPEED_DIFF $hosti/$speedi"
-      fi
-    fi
-  done < $SPEED_OUT
-  cd $CURDIR
-
-  if [ "$SPEED_DIFF" == "" ]; then
-    echo "   $CB_HOST_ARG: CPU clock rate is $speed0"
-  else
-    echo "   $CB_HOST_ARG: ***Warning: CPU clock rate is $speed0 except on $SPEED_DIFF "
-  fi
-}
 
 echo ""
 SPEED_CHECK $FILES_DIR $CB_HOSTETH1
@@ -828,44 +914,6 @@ SPEED_CHECK $FILES_DIR $CB_HOSTETH4
 
 echo ""
 echo "--------------------- memory check -------------------------"
-
-MEMORY_CHECK ()
-{
-  local outdir=$1
-  local CB_HOST_ARG=$2
-
-  if [ "$CB_HOST_ARG" == "" ]; then
-    return 0
-  fi
-  MEMORY_OUT=$outdir/memory_out
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getmem.sh  |& grep -v ssh | sort >& $MEMORY_OUT
-  memory0=`head -1 $MEMORY_OUT | awk '{print $2}'`
-
-  CURDIR=`pwd`
-  cd $outdir
- 
-  MEMORY_DIFF=
-  while read line 
-  do
-    hosti=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
-    memoryi=`echo $line | awk '{print $2}'`
-    MEM_DIFF $memory0 $memoryi
-    if [ "$?" == "1" ]; then
-      if [ "$MEMORY_DIFF" == "" ]; then
-        MEMORY_DIFF="$hosti/$memoryi"
-      else
-        MEMORY_DIFF="$MEMORY_DIFF $hosti/$memoryi"
-      fi
-    fi
-  done < $MEMORY_OUT
-  cd $CURDIR
-
-  if [ "$MEMORY_DIFF" == "" ]; then
-    echo "   $CB_HOST_ARG: $memory0 MB"
-  else
-    echo "   $CB_HOST_ARG: ***Warning: $memory0 MB except on $MEMORY_DIFF "
-  fi
-}
 
 MEMORY_CHECK $FILES_DIR $CB_HOSTETH1
 MEMORY_CHECK $FILES_DIR $CB_HOSTETH2
@@ -1028,7 +1076,7 @@ ACCT_CHECK /etc/group  $FILES_DIR $CB_HOSTS
 ACCT_CHECK /etc/passwd $FILES_DIR $CB_HOSTS
 
 echo ""
-echo "--------------------- file checks ------------------------------"
+echo "--------------------- general file checks ------------------------------"
 
 if [ "$GANGLIA" != "" ]; then
   FILE_CHECK /etc/ganglia/gmond.conf Warning 0 $FILES_DIR $CB_HOSTS
