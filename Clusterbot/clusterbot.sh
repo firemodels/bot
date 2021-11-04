@@ -857,10 +857,8 @@ if [ "$IBDOWN" != "" ]; then
     fi
   done
 fi
-if [ "$IB_LIST" == "" ]; then
-  echo "   $CB_HOSTS: infiniband up on all hosts with working ethernet"
-else
-  echo "   $CB_HOSTS: ***Error: ethernet up, infiniband down on $IB_LIST"
+if [ "$IB_LIST" != "" ]; then
+  echo "   $CB_HOSTS: ***Error: ethernet up and infiniband down on $IB_LIST"
 fi
 
 # --------------------- check infiniband subnet manager --------------------
