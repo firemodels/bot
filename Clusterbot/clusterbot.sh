@@ -664,7 +664,7 @@ MEMORY_CHECK ()
   if [ "$MEMORY_DIFF" == "" ]; then
     echo "   $CB_HOST_ARG: $memory0 MB or greater"
   else
-    echo "   $CB_HOST_ARG: ***Warning: $memory0 MB eor greater xcept on $MEMORY_DIFF "
+    echo "   $CB_HOST_ARG: ***Warning: $memory0 MB or greater xcept on $MEMORY_DIFF "
   fi
 }
 
