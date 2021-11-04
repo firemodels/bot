@@ -841,17 +841,16 @@ fi
 # --------------------- check for hosts with working ethernet, non-working infiniband  --------------------
 
 UP_ETH=` pdsh -t 2 -w $CB_HOSTS   date |& grep -v ssh  | awk -F':' '{print $1}' | sort` 
-DOWN_IB=`pdsh -t 2 -w $CB_HOSTIB1 date |& grep connect | awk -F':' '{print $1}' | sort` 
 
 IB_LIST=
-if [ "$DOWN_IB" != "" ]; then
-  for h in $DOWN_IB ; do
+if [ "$IBDOWN" != "" ]; then
+  for h in $IBDOWN ; do
     suffix=-ib
     h=${h%$suffix}
     IS_HOST_UP $h
     if [ "$?" == "1" ]; then
       if [ "$IB_LIST" == "" ]; then
-        IB_LIST=$h
+        IB_LIST="$h"
       else
         IB_LIST="$IB_LIST $h"
       fi
