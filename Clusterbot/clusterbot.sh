@@ -104,6 +104,50 @@ fi
 rm -f $DAEMONOUT
 }
 #---------------------------------------------
+#                   ACCT_CHECK
+#---------------------------------------------
+ACCT_CHECK ()
+{
+  local file=$1
+  local outdir=$2
+  local CB_HOST_ARG=$3
+
+  if [ "$CB_HOST_ARG" == "" ]; then
+    return 0
+  fi
+  FILE_OUT=$outdir/file_out
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getfile.sh $file $outdir |& grep -v ssh | sort >& $FILE_OUT
+  file0=`head -1 $FILE_OUT | awk '{print $2}'`
+
+  CURDIR=`pwd`
+  cd $outdir
+ 
+  FILEDIFF=
+  while read line 
+  do
+    hosti=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
+    filei=`echo $line | awk '{print $2}'`
+    ndiff=`diff $file0 $filei | wc -l`
+    if [ "$ndiff" != "0" ]; then
+      if [ "$FILEDIFF" == "" ]; then
+        FILEDIFF="$hosti"
+      else
+        FILEDIFF="$FILEDIFF $hosti"
+      fi
+    fi
+  done < $FILE_OUT
+  cd $CURDIR
+
+  if [ "$FILEDIFF" == "" ]; then
+    echo "   $CB_HOST_ARG: $file is identical"
+    return 0
+  else
+    echo "   $CB_HOST_ARG: ***Error: $file is different on $FILEDIFF "
+    echo "         Fix: sudo passsync"
+    return 1
+  fi
+}
+#---------------------------------------------
 #                   FILE_CHECK
 #---------------------------------------------
 FILE_CHECK ()
@@ -979,8 +1023,12 @@ if [ "$?" == "1" ]; then
 fi
 
 echo ""
-echo "--------------------- file checks ------------------------------"
+echo "--------------------- accounting file checks ------------------------------"
+ACCT_CHECK /etc/group  $FILES_DIR $CB_HOSTS
+ACCT_CHECK /etc/passwd $FILES_DIR $CB_HOSTS
+
 echo ""
+echo "--------------------- file checks ------------------------------"
 
 if [ "$GANGLIA" != "" ]; then
   FILE_CHECK /etc/ganglia/gmond.conf Warning 0 $FILES_DIR $CB_HOSTS
@@ -993,28 +1041,12 @@ if [ "$GANGLIA" != "" ]; then
   fi
 fi
 
-FILE_CHECK /etc/group Error 0 $FILES_DIR $CB_HOSTS
-if [ "$?" == "1" ]; then
-  FILE_CHECK /etc/group Error 1 $FILES_DIR $CB_HOSTETH1 
-  FILE_CHECK /etc/group Error 1 $FILES_DIR $CB_HOSTETH2 
-  FILE_CHECK /etc/group Error 1 $FILES_DIR $CB_HOSTETH3 
-  FILE_CHECK /etc/group Error 1 $FILES_DIR $CB_HOSTETH4 
-fi
-
 HOST_CHECK $FILES_DIR 0 $CB_HOSTS
 if [ "$?" == "1" ]; then
   HOST_CHECK $FILES_DIR 1 $CB_HOSTETH1 
   HOST_CHECK $FILES_DIR 1 $CB_HOSTETH2 
   HOST_CHECK $FILES_DIR 1 $CB_HOSTETH3 
   HOST_CHECK $FILES_DIR 1 $CB_HOSTETH4 
-fi
-
-FILE_CHECK /etc/passwd Error 0 $FILES_DIR $CB_HOSTS
-if [ "$?" == "1" ]; then
-  FILE_CHECK /etc/passwd Error 1 $FILES_DIR $CB_HOSTETH1 
-  FILE_CHECK /etc/passwd Error 1 $FILES_DIR $CB_HOSTETH2 
-  FILE_CHECK /etc/passwd Error 1 $FILES_DIR $CB_HOSTETH3 
-  FILE_CHECK /etc/passwd Error 1 $FILES_DIR $CB_HOSTETH4 
 fi
 
 STOP_TIME=`date`
