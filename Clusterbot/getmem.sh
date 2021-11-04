@@ -1,9 +1,6 @@
 #!/bin/bash
-todir=$1
-
 file=memory
 base=`basename $file`
 memory=`grep MemTotal /proc/meminfo | awk '{print $2}'` 
-div=1000
-memory=`echo $((memory / div))`
+memory=`echo $((memory / 1024))`
 echo $memory

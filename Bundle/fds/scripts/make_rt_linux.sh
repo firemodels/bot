@@ -1,5 +1,5 @@
 #!/bin/bash
-version=oneapiU3
+version=oneapiU4
 
 if [ "$version" == "" ]; then
   echo ***error: version undefined, edit $0 to define version
