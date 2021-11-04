@@ -72,7 +72,299 @@ SETUP_CLCK()
   fi
   return 0
 }
+#---------------------------------------------
+#                   CHECK_DAEMON
+#---------------------------------------------
+CHECK_DAEMON ()
+{
+ local DAEMON_ARG=$1
+ local ERRWARN=$2
+ local CB_HOST_ARG=$3
 
+DAEMONOUT=$FILES_DIR/daemon.out.$$
+
+pdsh -t 2 -w $CB_HOST_ARG "ps -el | grep $DAEMON_ARG | wc -l" |&  grep -v ssh | sort >& $DAEMONOUT
+DAEMONDOWN=
+while read line 
+do
+  host=`echo $line | awk '{print $1}'`
+  host=`echo $host | sed 's/.$//'`
+  NDAEMON=`echo $line | awk '{print $2}'`
+  if [ "$NDAEMON" == "0" ]; then
+    DAEMONDOWN="$DAEMONDOWN $host"
+  fi
+done < $DAEMONOUT
+
+if [ "$DAEMONDOWN" == "" ]; then
+  echo "   $CB_HOST_ARG: $DAEMON_ARG running"
+else
+  echo "   $CB_HOST_ARG: ***$ERRWARN: $DAEMON_ARG down on $DAEMONDOWN"
+  echo "      Fix: sudo pdsh -t 2 -w $CB_HOST_ARG service $DAEMON_ARG start"
+fi
+rm -f $DAEMONOUT
+}
+#---------------------------------------------
+#                   FILE_CHECK
+#---------------------------------------------
+FILE_CHECK ()
+{
+  local file=$1
+  local ERRWARN=$2
+  local INDENT=$3
+  local outdir=$4
+  local CB_HOST_ARG=$5
+
+  if [ "$CB_HOST_ARG" == "" ]; then
+    return 0
+  fi
+  FILE_OUT=$outdir/file_out
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getfile.sh $file $outdir |& grep -v ssh | sort >& $FILE_OUT
+  file0=`head -1 $FILE_OUT | awk '{print $2}'`
+
+  CURDIR=`pwd`
+  cd $outdir
+ 
+  FILEDIFF=
+  while read line 
+  do
+    hosti=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
+    filei=`echo $line | awk '{print $2}'`
+    ndiff=`diff $file0 $filei | wc -l`
+    if [ "$ndiff" != "0" ]; then
+      if [ "$FILEDIFF" == "" ]; then
+        FILEDIFF="$hosti"
+      else
+        FILEDIFF="$FILEDIFF $hosti"
+      fi
+    fi
+  done < $FILE_OUT
+  cd $CURDIR
+
+  if [ "$FILEDIFF" == "" ]; then
+    if [ "$INDENT" == "1" ]; then
+      echo "   $CB_HOST_ARG:    $file is identical"
+    else
+      echo "   $CB_HOST_ARG: $file is identical"
+    fi
+    return 0
+  else
+    if [ "$INDENT" == "1" ]; then
+      echo "   $CB_HOST_ARG:    ***$ERRWARN: $file is different on $FILEDIFF "
+    else
+      echo "   $CB_HOST_ARG: ***$ERRWARN: $file is different on $FILEDIFF "
+    fi
+    return 1
+  fi
+}
+#---------------------------------------------
+#                   MOUNT_CHECK
+#---------------------------------------------
+MOUNT_CHECK ()
+{
+  local INDENT=$1
+  local outdir=$2
+  local CB_HOST_ARG=$3
+  file="NFS mounts"
+
+  if [ "$CB_HOST_ARG" == "" ]; then
+    return 0
+  fi
+  FILE_OUT=$outdir/file_out
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getmounts.sh $outdir |& grep -v ssh | sort >& $FILE_OUT
+  file0=`head -1 $FILE_OUT | awk '{print $2}'`
+
+  CURDIR=`pwd`
+  cd $outdir
+ 
+  FILEDIFF=
+  while read line 
+  do
+    hosti=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
+    filei=`echo $line | awk '{print $2}'`
+    ndiff=`diff $file0 $filei | wc -l`
+    if [ "$ndiff" != "0" ]; then
+      if [ "$FILEDIFF" == "" ]; then
+        FILEDIFF="$hosti"
+      else
+        FILEDIFF="$FILEDIFF $hosti"
+      fi
+    fi
+  done < $FILE_OUT
+  cd $CURDIR
+
+  if [ "$FILEDIFF" == "" ]; then
+    if [ "$INDENT" == "1" ]; then
+       echo "   $CB_HOST_ARG:    $file are identical (df -k -t nfs)"
+    else
+       echo "   $CB_HOST_ARG: $file are identical (df -k -t nfs)"
+    fi
+    return 0
+  else
+    if [ "$INDENT" == "1" ]; then
+       echo "   $CB_HOST_ARG:    ***Error: $file (df -k -t nfs) are different on $FILEDIFF "
+    else
+       echo "   $CB_HOST_ARG: ***Error: $file (df -k -t nfs) are different on $FILEDIFF "
+    fi
+    return 1
+  fi
+}
+#---------------------------------------------
+#                   FSTAB_CHECK
+#---------------------------------------------
+FSTAB_CHECK ()
+{
+  local outdir=$1
+  local INDENT=$2
+  local CB_HOST_ARG=$3
+  file=/etc/fstab
+
+  if [ "$CB_HOST_ARG" == "" ]; then
+    return 0
+  fi
+  FILE_OUT=$outdir/file_out
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getfstab.sh $outdir |& grep -v ssh | sort >& $FILE_OUT
+  file0=`head -1 $FILE_OUT | awk '{print $2}'`
+
+  CURDIR=`pwd`
+  cd $outdir
+ 
+  FILEDIFF=
+  while read line 
+  do
+    hosti=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
+    filei=`echo $line | awk '{print $2}'`
+    ndiff=`diff -w $file0 $filei | wc -l`
+    if [ "$ndiff" != "0" ]; then
+      if [ "$FILEDIFF" == "" ]; then
+        FILEDIFF="$hosti"
+      else
+        FILEDIFF="$FILEDIFF $hosti"
+      fi
+    fi
+  done < $FILE_OUT
+  cd $CURDIR
+
+  if [ "$FILEDIFF" == "" ]; then
+    if [ "$INDENT" == "1" ]; then
+      echo "   $CB_HOST_ARG:    $file is identical"
+    else
+      echo "   $CB_HOST_ARG: $file is identical"
+    fi
+    return 0
+  else
+    if [ "$INDENT" == "1" ]; then
+       echo "   $CB_HOST_ARG:    ***Error: $file is different on $FILEDIFF "
+    else
+       echo "   $CB_HOST_ARG: ***Error: $file is different on $FILEDIFF "
+    fi
+    return 1
+  fi
+}
+#---------------------------------------------
+#                   HOST_CHECK
+#---------------------------------------------
+HOST_CHECK ()
+{
+  local outdir=$1
+  INDENT=$2
+  local CB_HOST_ARG=$3
+  file=/etc/hosts
+
+  if [ "$CB_HOST_ARG" == "" ]; then
+    return 0
+  fi
+  FILE_OUT=$outdir/hosts_out
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/gethost.sh $outdir |& grep -v ssh | sort >& $FILE_OUT
+  file0=`head -1 $FILE_OUT | awk '{print $2}'`
+
+  CURDIR=`pwd`
+  cd $outdir
+ 
+  FILEDIFF=
+  while read line 
+  do
+    hosti=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
+    filei=`echo $line | awk '{print $2}'`
+    ndiff=`diff $file0 $filei | wc -l`
+    if [ "$ndiff" != "0" ]; then
+      if [ "$FILEDIFF" == "" ]; then
+        FILEDIFF="$hosti"
+      else
+        FILEDIFF="$FILEDIFF $hosti"
+      fi
+    fi
+  done < $FILE_OUT
+  cd $CURDIR
+
+  if [ "$FILEDIFF" == "" ]; then
+    if [  "$INDENT" == "1" ]; then
+       echo "   $CB_HOST_ARG:    $file is identical (except for entries containing localhost)"
+    else
+       echo "   $CB_HOST_ARG: $file is identical (except for entries containing localhost)"
+    fi
+    return 0
+  else
+    if [ "$INDENT" == "1" ]; then
+       echo "   $CB_HOST_ARG:    ***Error: $file is different on $FILEDIFF "
+    else
+       echo "   $CB_HOST_ARG: ***Error: $file is different on $FILEDIFF "
+    fi
+    return 1
+  fi
+}
+#---------------------------------------------
+#                   RPM_CHECK
+#---------------------------------------------
+RPM_CHECK ()
+{
+ local INDENT=$1
+ local CB_HOST_ARG=$2
+
+if [ "$CB_HOST_ARG" == "" ]; then
+  return 0
+fi
+rm -f $FILES_DIR/rpm*.txt
+pdsh -t 2 -w $CB_HOST_ARG `pwd`/getrpms.sh $FILES_DIR >& $SLURMRPMOUT
+
+CURDIR=`pwd`
+cd $FILES_DIR
+rpm0=`ls -l rpm*.txt | head -1 | awk '{print $9}'`
+host0=`echo $rpm0 | sed 's/.txt$//'`
+host0=`echo $host0 | sed 's/^rpm_//'`
+RPMDIFF=
+for f in rpm*.txt
+do
+  ndiff=`diff $rpm0 $f | wc -l`
+  if [ "$ndiff" != "0" ]; then
+    hostdiff=`echo $f | sed 's/.txt$//'`
+    hostdiff=`echo $hostdiff | sed 's/^rpm_//'`
+    if [ "$RPMDIFF" == "" ]; then
+      RPMDIFF="$hostdiff"
+    else
+      RPMDIFF="$RPMDIFF $hostdiff"
+    fi
+  fi
+done
+cd $CURDIR
+
+if [ "$RPMDIFF" == "" ]; then
+  if [ "$INDENT" == "1" ]; then
+     echo "   $CB_HOST_ARG:    rpms are identical"
+  else
+     echo "   $CB_HOST_ARG: rpms are identical"
+  fi
+  return 0
+else
+  if [ "$INDENT" == "1" ]; then
+     echo "   $CB_HOST_ARG:    ***Error: $host0 rpms are different from those on $RPMDIFF "
+     echo "         Fix: reimage host or install updated rpm packages"
+  else
+     echo "   $CB_HOST_ARG: ***Error: $host0 rpms are different from those on $RPMDIFF "
+     echo "      Fix: reimage host or install updated rpm packages"
+  fi
+  return 1
+fi
+}
 
 SCRIPTDIR=`pwd`
 BIN=`dirname "$0"`
@@ -247,14 +539,14 @@ SUBNET_CHECK ()
   ssh $CB_HOST_ARG pdsh -t 2 -w $CB_HOST_ARG,$CB_HOSTIB_ARG ps -el |& sort -u | grep opensm  >  $SUBNETOUT 2>&1
   SUB1=`cat  $SUBNETOUT | awk -F':' '{print $1}' | sort -u | awk '{printf "%s%s", $1," " }'`
   if [ "$SUB1" == "" ]; then
-    echo "   $CB_HOSTIB_ARG: **Error: subnet manager (opensm) not running on any host"
+    echo "   $CB_HOSTIB_ARG: **Error: opensm not running on any host"
     echo "      Fix: sudo ssh $CB_HOST_ARG service opensm start   "
   else
     SUBNETCOUNT=`cat  $SUBNETOUT | awk -F':' '{print $1}' | sort -u | wc -l`
     if [ "$SUBNETCOUNT" == "1" ]; then
-      echo "   $CB_HOSTIB_ARG: subnet manager (opensm) running on $SUB1"
+      echo "   $CB_HOSTIB_ARG: opensm running on $SUB1"
     else
-      echo "   $CB_HOSTIB_ARG: subnet manager (opensm) running on $SUBNETCOUNT hosts"
+      echo "   $CB_HOSTIB_ARG: opensm running on $SUBNETCOUNT hosts"
     fi
   fi
 }
@@ -539,6 +831,8 @@ MEMORY_CHECK $FILES_DIR $CB_HOSTETH4
 echo ""
 echo "--------------------- disk check -------------------------"
 
+#*** check number of file systems mounted
+
 pdsh -t 2 -w $CB_HOSTS "df -k -t nfs | tail -n +2 | wc -l" |&  grep -v ssh | sort >& $FSOUT
 cat $FSOUT | awk -F':' '{print $1}' > $UP_HOSTS
 
@@ -565,9 +859,40 @@ else
   echo "      Fix: sudo pdsh -t 2 -w $CB_HOSTS mount -a"
 fi
 
+#*** check /etc/exports file
+
+FILE_CHECK /etc/exports Error 0 $FILES_DIR $CB_HOSTS
+if [ "$?" == "1" ]; then
+  FILE_CHECK /etc/exports Error 1 $FILES_DIR $CB_HOSTETH1 
+  FILE_CHECK /etc/exports Error 1 $FILES_DIR $CB_HOSTETH2 
+  FILE_CHECK /etc/exports Error 1 $FILES_DIR $CB_HOSTETH3 
+  FILE_CHECK /etc/exports Error 1 $FILES_DIR $CB_HOSTETH4 
+fi
+
+#*** check /etc/fstab file
+
+FSTAB_CHECK $FILES_DIR 0 $CB_HOSTS
+if [ "$?" == "1" ]; then
+  FSTAB_CHECK $FILES_DIR 1 $CB_HOSTETH1 
+  FSTAB_CHECK $FILES_DIR 1 $CB_HOSTETH2 
+  FSTAB_CHECK $FILES_DIR 1 $CB_HOSTETH3 
+  FSTAB_CHECK $FILES_DIR 1 $CB_HOSTETH4 
+  echo ""
+fi
+
+MOUNT_CHECK 0 $FILES_DIR $CB_HOSTS
+if [ "$?" == "1" ]; then
+  MOUNT_CHECK 1 $FILES_DIR $CB_HOSTETH1 
+  MOUNT_CHECK 1 $FILES_DIR $CB_HOSTETH2 
+  MOUNT_CHECK 1 $FILES_DIR $CB_HOSTETH3 
+  MOUNT_CHECK 1 $FILES_DIR $CB_HOSTETH4 
+  echo ""
+fi
+
 echo ""
 echo "--------------------- slurm checks ----------------------------"
 
+#*** check that slurm is online
 pbsnodes -l | awk '{print $1}' | sort -u  > $DOWN_HOSTS
 SLURMDOWN=
 while read line 
@@ -589,38 +914,22 @@ else
   echo "      a working ethernet and infiniband network connection."
 fi
 
-# --------------------- check slurm daemon --------------------
+#*** heck slurm configuration file --------------------
 
-CHECK_DAEMON ()
-{
- local DAEMON_ARG=$1
- local ERRWARN=$2
- local CB_HOST_ARG=$3
-
-DAEMONOUT=$FILES_DIR/daemon.out.$$
-
-pdsh -t 2 -w $CB_HOST_ARG "ps -el | grep $DAEMON_ARG | wc -l" |&  grep -v ssh | sort >& $DAEMONOUT
-DAEMONDOWN=
-while read line 
-do
-  host=`echo $line | awk '{print $1}'`
-  host=`echo $host | sed 's/.$//'`
-  NDAEMON=`echo $line | awk '{print $2}'`
-  if [ "$NDAEMON" == "0" ]; then
-    DAEMONDOWN="$DAEMONDOWN $host"
-  fi
-done < $DAEMONOUT
-
-if [ "$DAEMONDOWN" == "" ]; then
-  echo "   $CB_HOST_ARG: $DAEMON_ARG running"
-else
-  echo "   $CB_HOST_ARG: ***$ERRWARN: $DAEMON_ARG down on $DAEMONDOWN"
-  echo "      Fix: sudo pdsh -t 2 -w $CB_HOST_ARG service $DAEMON_ARG start"
+FILE_CHECK /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTS
+if [ "$?" == "1" ]; then
+  FILE_CHECK /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTETH1 
+  FILE_CHECK /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTETH2 
+  FILE_CHECK /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTETH3 
+  FILE_CHECK /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTETH4 
+  echo ""
 fi
-rm -f $DAEMONOUT
-}
 
-# --------------------- check slurm rpm --------------------
+#*** check slurm daemon
+
+CHECK_DAEMON slurmd Error $CB_HOSTS
+
+#*** check slurm rpm
 
 pdsh -t 2 -w $CB_HOSTS "rpm -qa | grep slurm | grep devel" |& grep -v ssh | sort >& $SLURMRPMOUT
 SLURMRPM0=`head -1 $SLURMRPMOUT | awk '{print $2}'`
@@ -649,296 +958,29 @@ fi
 
 # --------------------- check daemons --------------------
 
-echo ""
-echo "--------------------- daemon check ---------------------------"
-
-CHECK_DAEMON slurmd Error $CB_HOSTS
-
 GANGLIA=`ps -el | grep gmetad`
 if [ "$GANGLIA" != "" ]; then
+  echo ""
+  echo "--------------------- daemon check ---------------------------"
+#*** check ganglia daemon
   CHECK_DAEMON gmond Warning $CB_HOSTS
 fi
 
 # --------------------- rpm check --------------------
 
-RPM_CHECK ()
-{
- local CB_HOST_ARG=$1
-
-if [ "$CB_HOST_ARG" == "" ]; then
-  return 0
-fi
-rm -f $FILES_DIR/rpm*.txt
-pdsh -t 2 -w $CB_HOST_ARG `pwd`/getrpms.sh $FILES_DIR >& $SLURMRPMOUT
-
-CURDIR=`pwd`
-cd $FILES_DIR
-rpm0=`ls -l rpm*.txt | head -1 | awk '{print $9}'`
-host0=`echo $rpm0 | sed 's/.txt$//'`
-host0=`echo $host0 | sed 's/^rpm_//'`
-RPMDIFF=
-for f in rpm*.txt
-do
-  ndiff=`diff $rpm0 $f | wc -l`
-  if [ "$ndiff" != "0" ]; then
-    hostdiff=`echo $f | sed 's/.txt$//'`
-    hostdiff=`echo $hostdiff | sed 's/^rpm_//'`
-    if [ "$RPMDIFF" == "" ]; then
-      RPMDIFF="$hostdiff"
-    else
-      RPMDIFF="$RPMDIFF $hostdiff"
-    fi
-  fi
-done
-cd $CURDIR
-
-if [ "$RPMDIFF" == "" ]; then
-  echo "   $CB_HOST_ARG: rpms are identical"
-  return 0
-else
-  echo "   $CB_HOST_ARG: ***Error: $host0 rpms are different from those on $RPMDIFF "
-  echo "      Fix: reimage host or install updated rpm packages"
-  return 1
-fi
-}
-
 echo ""
 echo "--------------------- rpm check ------------------------------"
-RPM_CHECK $CB_HOSTS
+RPM_CHECK 0 $CB_HOSTS
 if [ "$?" == "1" ]; then
-  RPM_CHECK $CB_HOSTETH1
-  RPM_CHECK $CB_HOSTETH2
-  RPM_CHECK $CB_HOSTETH3
-  RPM_CHECK $CB_HOSTETH4
+  RPM_CHECK 1 $CB_HOSTETH1
+  RPM_CHECK 1 $CB_HOSTETH2
+  RPM_CHECK 1 $CB_HOSTETH3
+  RPM_CHECK 1 $CB_HOSTETH4
 fi
 
-# --------------------- mount check --------------------
-
-MOUNT_CHECK ()
-{
-  local INDENT=$1
-  local outdir=$2
-  local CB_HOST_ARG=$3
-  file="NFS mounts"
-
-  if [ "$CB_HOST_ARG" == "" ]; then
-    return 0
-  fi
-  FILE_OUT=$outdir/file_out
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getmounts.sh $outdir |& grep -v ssh | sort >& $FILE_OUT
-  file0=`head -1 $FILE_OUT | awk '{print $2}'`
-
-  CURDIR=`pwd`
-  cd $outdir
- 
-  FILEDIFF=
-  while read line 
-  do
-    hosti=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
-    filei=`echo $line | awk '{print $2}'`
-    ndiff=`diff $file0 $filei | wc -l`
-    if [ "$ndiff" != "0" ]; then
-      if [ "$FILEDIFF" == "" ]; then
-        FILEDIFF="$hosti"
-      else
-        FILEDIFF="$FILEDIFF $hosti"
-      fi
-    fi
-  done < $FILE_OUT
-  cd $CURDIR
-
-  if [ "$FILEDIFF" == "" ]; then
-    if [ "$INDENT" == "1" ]; then
-       echo "   $CB_HOST_ARG:    $file are identical (df -k -t nfs)"
-    else
-       echo "   $CB_HOST_ARG: $file are identical (df -k -t nfs)"
-    fi
-    return 0
-  else
-    if [ "$INDENT" == "1" ]; then
-       echo "   $CB_HOST_ARG:    ***Error: $file (df -k -t nfs) are different on $FILEDIFF "
-    else
-       echo "   $CB_HOST_ARG: ***Error: $file (df -k -t nfs) are different on $FILEDIFF "
-    fi
-    return 1
-  fi
-}
-
-# --------------------- fstab check --------------------
-
-FSTAB_CHECK ()
-{
-  local outdir=$1
-  local INDENT=$2
-  local CB_HOST_ARG=$3
-  file=/etc/fstab
-
-  if [ "$CB_HOST_ARG" == "" ]; then
-    return 0
-  fi
-  FILE_OUT=$outdir/file_out
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getfstab.sh $outdir |& grep -v ssh | sort >& $FILE_OUT
-  file0=`head -1 $FILE_OUT | awk '{print $2}'`
-
-  CURDIR=`pwd`
-  cd $outdir
- 
-  FILEDIFF=
-  while read line 
-  do
-    hosti=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
-    filei=`echo $line | awk '{print $2}'`
-    ndiff=`diff -w $file0 $filei | wc -l`
-    if [ "$ndiff" != "0" ]; then
-      if [ "$FILEDIFF" == "" ]; then
-        FILEDIFF="$hosti"
-      else
-        FILEDIFF="$FILEDIFF $hosti"
-      fi
-    fi
-  done < $FILE_OUT
-  cd $CURDIR
-
-  if [ "$FILEDIFF" == "" ]; then
-    if [ "$INDENT" == "1" ]; then
-      echo "   $CB_HOST_ARG:    $file is identical"
-    else
-      echo "   $CB_HOST_ARG: $file is identical"
-    fi
-    return 0
-  else
-    if [ "$INDENT" == "1" ]; then
-       echo "   $CB_HOST_ARG:    ***Error: $file is different on $FILEDIFF "
-    else
-       echo "   $CB_HOST_ARG: ***Error: $file is different on $FILEDIFF "
-    fi
-    return 1
-  fi
-}
-
-# --------------------- file check --------------------
-
-FILE_CHECK ()
-{
-  local file=$1
-  local ERRWARN=$2
-  local INDENT=$3
-  local outdir=$4
-  local CB_HOST_ARG=$5
-
-  if [ "$CB_HOST_ARG" == "" ]; then
-    return 0
-  fi
-  FILE_OUT=$outdir/file_out
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getfile.sh $file $outdir |& grep -v ssh | sort >& $FILE_OUT
-  file0=`head -1 $FILE_OUT | awk '{print $2}'`
-
-  CURDIR=`pwd`
-  cd $outdir
- 
-  FILEDIFF=
-  while read line 
-  do
-    hosti=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
-    filei=`echo $line | awk '{print $2}'`
-    ndiff=`diff $file0 $filei | wc -l`
-    if [ "$ndiff" != "0" ]; then
-      if [ "$FILEDIFF" == "" ]; then
-        FILEDIFF="$hosti"
-      else
-        FILEDIFF="$FILEDIFF $hosti"
-      fi
-    fi
-  done < $FILE_OUT
-  cd $CURDIR
-
-  if [ "$FILEDIFF" == "" ]; then
-    if [ "$INDENT" == "1" ]; then
-      echo "   $CB_HOST_ARG:    $file is identical"
-    else
-      echo "   $CB_HOST_ARG: $file is identical"
-    fi
-    return 0
-  else
-    if [ "$INDENT" == "1" ]; then
-      echo "   $CB_HOST_ARG: ***$ERRWARN:    $file is different on $FILEDIFF "
-    else
-      echo "   $CB_HOST_ARG: ***$ERRWARN: $file is different on $FILEDIFF "
-    fi
-    return 1
-  fi
-}
-
-# --------------------- host check --------------------
-
-HOST_CHECK ()
-{
-  local outdir=$1
-  INDENT=$2
-  local CB_HOST_ARG=$3
-  file=/etc/hosts
-
-  if [ "$CB_HOST_ARG" == "" ]; then
-    return 0
-  fi
-  FILE_OUT=$outdir/hosts_out
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/gethost.sh $outdir |& grep -v ssh | sort >& $FILE_OUT
-  file0=`head -1 $FILE_OUT | awk '{print $2}'`
-
-  CURDIR=`pwd`
-  cd $outdir
- 
-  FILEDIFF=
-  while read line 
-  do
-    hosti=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
-    filei=`echo $line | awk '{print $2}'`
-    ndiff=`diff $file0 $filei | wc -l`
-    if [ "$ndiff" != "0" ]; then
-      if [ "$FILEDIFF" == "" ]; then
-        FILEDIFF="$hosti"
-      else
-        FILEDIFF="$FILEDIFF $hosti"
-      fi
-    fi
-  done < $FILE_OUT
-  cd $CURDIR
-
-  if [ "$FILEDIFF" == "" ]; then
-    if [  "$INDENT" == "1" ]; then
-       echo "   $CB_HOST_ARG:    $file is identical (except for entries containing localhost)"
-    else
-       echo "   $CB_HOST_ARG: $file is identical (except for entries containing localhost)"
-    fi
-    return 0
-  else
-    if [ "$INDENT" == "1" ]; then
-       echo "   $CB_HOST_ARG:    ***Error: $file is different on $FILEDIFF "
-    else
-       echo "   $CB_HOST_ARG: ***Error: $file is different on $FILEDIFF "
-    fi
-    return 1
-  fi
-}
 echo ""
 echo "--------------------- file checks ------------------------------"
 echo ""
-FILE_CHECK /etc/exports Error 0 $FILES_DIR $CB_HOSTS
-if [ "$?" == "1" ]; then
-  FILE_CHECK /etc/exports Error 1 $FILES_DIR $CB_HOSTETH1 
-  FILE_CHECK /etc/exports Error 1 $FILES_DIR $CB_HOSTETH2 
-  FILE_CHECK /etc/exports Error 1 $FILES_DIR $CB_HOSTETH3 
-  FILE_CHECK /etc/exports Error 1 $FILES_DIR $CB_HOSTETH4 
-fi
-
-FSTAB_CHECK $FILES_DIR 0 $CB_HOSTS
-if [ "$?" == "1" ]; then
-  FSTAB_CHECK $FILES_DIR 1 $CB_HOSTETH1 
-  FSTAB_CHECK $FILES_DIR 1 $CB_HOSTETH2 
-  FSTAB_CHECK $FILES_DIR 1 $CB_HOSTETH3 
-  FSTAB_CHECK $FILES_DIR 1 $CB_HOSTETH4 
-  echo ""
-fi
 
 if [ "$GANGLIA" != "" ]; then
   FILE_CHECK /etc/ganglia/gmond.conf Warning 0 $FILES_DIR $CB_HOSTS
@@ -973,24 +1015,6 @@ if [ "$?" == "1" ]; then
   FILE_CHECK /etc/passwd Error 1 $FILES_DIR $CB_HOSTETH2 
   FILE_CHECK /etc/passwd Error 1 $FILES_DIR $CB_HOSTETH3 
   FILE_CHECK /etc/passwd Error 1 $FILES_DIR $CB_HOSTETH4 
-fi
-
-FILE_CHECK /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTS
-if [ "$?" == "1" ]; then
-  FILE_CHECK /etc/slurm/slurm.conf Error 1 $FILES_DIR $CB_HOSTETH1 
-  FILE_CHECK /etc/slurm/slurm.conf Error 1 $FILES_DIR $CB_HOSTETH2 
-  FILE_CHECK /etc/slurm/slurm.conf Error 1 $FILES_DIR $CB_HOSTETH3 
-  FILE_CHECK /etc/slurm/slurm.conf Error 1 $FILES_DIR $CB_HOSTETH4 
-  echo ""
-fi
-
-MOUNT_CHECK 0 $FILES_DIR $CB_HOSTS
-if [ "$?" == "1" ]; then
-  MOUNT_CHECK 1 $FILES_DIR $CB_HOSTETH1 
-  MOUNT_CHECK 1 $FILES_DIR $CB_HOSTETH2 
-  MOUNT_CHECK 1 $FILES_DIR $CB_HOSTETH3 
-  MOUNT_CHECK 1 $FILES_DIR $CB_HOSTETH4 
-  echo ""
 fi
 
 STOP_TIME=`date`
