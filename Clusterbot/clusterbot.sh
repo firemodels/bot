@@ -193,6 +193,42 @@ if [ `cat $IBOUT | wc -l` -ne 0 ]; then
   fi
 fi
 
+# --------------------- get list host's accessible via etherrnet  --------------------
+
+CONTAINS ()
+{
+  ITEM=$1
+  LIST=$2
+  for i in $LIST ; do
+    if [ "$ITEM" == "$i" ]; then
+      return 1
+    fi
+  done
+  return 0
+}
+
+UP_ETH=` pdsh -t 2 -w $CB_HOSTS   date |& grep -v ssh  | awk -F':' '{print $1}' | sort` 
+DOWN_IB=`pdsh -t 2 -w $CB_HOSTIB1 date |& grep connect | awk -F':' '{print $1}' | sort` 
+
+IB_LIST=
+if [ "$DOWN_IB" != "" ]; then
+  for h in $DOWN_IB ; do
+    suffix=-ib
+    h=${h%$suffix}
+    CONTAINS ${h} "${UP_ETH}"
+    if [ "$?" == "1" ]; then
+      if [ "$IB_LIST" == "" ]; then
+        IB_LIST=$h
+      else
+        IB_LIST="$IB_LIST $h"
+      fi
+    fi
+  done
+fi
+if [ "$IB_LIST" != "" ]; then
+  echo "   $CB_HOSTS: ***Error: ethernet up, infiniband down on $IB_LIST"
+fi
+
 # --------------------- check infiniband subnet manager --------------------
 echo ""
 echo "--------------------- infiniband checks -----------------------"
