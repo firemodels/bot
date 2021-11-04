@@ -1,10 +1,10 @@
 #!/bin/bash
 
 #---------------------------------------------
-# ---------------------------- usage ----------------------------------
+# ---------------------------- USAGE ----------------------------------
 #---------------------------------------------
 
-function usage {
+function USAGE {
   echo "Usage: clusterbot.sh "
   echo ""
   echo "clusterbot.sh - perform various checks on a Linux cluster"
@@ -730,7 +730,7 @@ while getopts 'h' OPTION
 do
 case $OPTION  in
   h)
-   usage
+   USAGE
    exit
    ;;
 esac
@@ -838,7 +838,7 @@ if [ `cat $IBOUT | wc -l` -ne 0 ]; then
   fi
 fi
 
-# --------------------- get list host's accessible via etherrnet  --------------------
+# --------------------- check for hosts with working ethernet, non-working infiniband  --------------------
 
 UP_ETH=` pdsh -t 2 -w $CB_HOSTS   date |& grep -v ssh  | awk -F':' '{print $1}' | sort` 
 DOWN_IB=`pdsh -t 2 -w $CB_HOSTIB1 date |& grep connect | awk -F':' '{print $1}' | sort` 
