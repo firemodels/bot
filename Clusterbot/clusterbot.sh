@@ -702,6 +702,21 @@ SPEED_CHECK ()
   fi
 }
 
+#---------------------------------------------
+#                   IS_HOST_UP
+#---------------------------------------------
+
+IS_HOST_UP ()
+{
+  ITEM=$1
+  for i in $UP_ETH ; do
+    if [ "$ITEM" == "$i" ]; then
+      return 1
+    fi
+  done
+  return 0
+}
+
 #************************** beginning of scrript ******************************************
 
 SCRIPTDIR=`pwd`
@@ -825,18 +840,6 @@ fi
 
 # --------------------- get list host's accessible via etherrnet  --------------------
 
-CONTAINS ()
-{
-  ITEM=$1
-  LIST=$2
-  for i in $LIST ; do
-    if [ "$ITEM" == "$i" ]; then
-      return 1
-    fi
-  done
-  return 0
-}
-
 UP_ETH=` pdsh -t 2 -w $CB_HOSTS   date |& grep -v ssh  | awk -F':' '{print $1}' | sort` 
 DOWN_IB=`pdsh -t 2 -w $CB_HOSTIB1 date |& grep connect | awk -F':' '{print $1}' | sort` 
 
@@ -845,7 +848,7 @@ if [ "$DOWN_IB" != "" ]; then
   for h in $DOWN_IB ; do
     suffix=-ib
     h=${h%$suffix}
-    CONTAINS ${h} "${UP_ETH}"
+    IS_HOST_UP $h
     if [ "$?" == "1" ]; then
       if [ "$IB_LIST" == "" ]; then
         IB_LIST=$h
@@ -856,6 +859,8 @@ if [ "$DOWN_IB" != "" ]; then
   done
 fi
 if [ "$IB_LIST" != "" ]; then
+  echo "   $CB_HOSTS: infiniband up on all hosts with working ethernet"
+else
   echo "   $CB_HOSTS: ***Error: ethernet up, infiniband down on $IB_LIST"
 fi
 
