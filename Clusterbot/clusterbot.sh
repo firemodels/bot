@@ -597,6 +597,35 @@ CORE_CHECK ()
 }
 
 #---------------------------------------------
+#                   MEM_DIFF
+#---------------------------------------------
+
+MEM_DIFF ()
+{
+  MEM1=$1
+  MEM2=$2
+  MIN_MEM=$3
+
+  if [ "$MEM1" == "$MEM2" ]; then
+    return 0
+  fi
+  if [ "$MIN_MEM" != "" ]; then
+    if [ $MEM2 -gt $MIN_MEM ]; then
+      return 0
+    fi
+  fi
+  DIFF=`echo $((MEM1 - MEM2))`
+  if [ "$DIFF" == "1"  ]; then
+    return 0
+  fi
+  DIFF=`echo $((MEM2 - MEM1))`
+  if [ "$DIFF" == "1"  ]; then
+    return 0
+  fi
+  return 1
+}
+
+#---------------------------------------------
 #                   MEMORY_CHECK
 #---------------------------------------------
 
@@ -604,6 +633,7 @@ MEMORY_CHECK ()
 {
   local outdir=$1
   local CB_HOST_ARG=$2
+  local MIN_MEM=$3
 
   if [ "$CB_HOST_ARG" == "" ]; then
     return 0
@@ -620,7 +650,7 @@ MEMORY_CHECK ()
   do
     hosti=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
     memoryi=`echo $line | awk '{print $2}'`
-    MEM_DIFF $memory0 $memoryi
+    MEM_DIFF $memory0 $memoryi $MIN_MEM
     if [ "$?" == "1" ]; then
       if [ "$MEMORY_DIFF" == "" ]; then
         MEMORY_DIFF="$hosti/$memoryi"
@@ -632,33 +662,10 @@ MEMORY_CHECK ()
   cd $CURDIR
 
   if [ "$MEMORY_DIFF" == "" ]; then
-    echo "   $CB_HOST_ARG: $memory0 MB"
+    echo "   $CB_HOST_ARG: $memory0 MB or greater"
   else
-    echo "   $CB_HOST_ARG: ***Warning: $memory0 MB except on $MEMORY_DIFF "
+    echo "   $CB_HOST_ARG: ***Warning: $memory0 MB eor greater xcept on $MEMORY_DIFF "
   fi
-}
-
-#---------------------------------------------
-#                   MEM_DIFF
-#---------------------------------------------
-
-MEM_DIFF ()
-{
-  MEM1=$1
-  MEM2=$2
-
-  if [ "$MEM1" == "$MEM2" ]; then
-    return 0
-  fi
-  DIFF=`echo $((MEM1 - MEM2))`
-  if [ "$DIFF" == "1"  ]; then
-    return 0
-  fi
-  DIFF=`echo $((MEM2 - MEM1))`
-  if [ "$DIFF" == "1"  ]; then
-    return 0
-  fi
-  return 1
 }
 
 #---------------------------------------------
@@ -917,10 +924,10 @@ SPEED_CHECK $FILES_DIR $CB_HOSTETH4
 echo ""
 echo "--------------------- memory check -------------------------"
 
-MEMORY_CHECK $FILES_DIR $CB_HOSTETH1
-MEMORY_CHECK $FILES_DIR $CB_HOSTETH2
-MEMORY_CHECK $FILES_DIR $CB_HOSTETH3
-MEMORY_CHECK $FILES_DIR $CB_HOSTETH4
+MEMORY_CHECK $FILES_DIR $CB_HOSTETH1 $CB_MEM1
+MEMORY_CHECK $FILES_DIR $CB_HOSTETH2 $CB_MEM2
+MEMORY_CHECK $FILES_DIR $CB_HOSTETH3 $CB_MEM3
+MEMORY_CHECK $FILES_DIR $CB_HOSTETH4 $CB_MEM4
 
 echo ""
 echo "--------------------- disk check -------------------------"
