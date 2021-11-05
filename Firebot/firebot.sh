@@ -2292,8 +2292,8 @@ if [ "$BUILD_ONLY" == "1" ]; then
   CHECK_LINES=
 fi
 
-# turn off dos line checking temporarily
-CHECK_LINES=
+# comment next line to turn on dos line ending checks
+#CHECK_LINES=
 
 if [ "$CHECK_CLUSTER" == "" ]; then
   if [ "$CHECK_LINES" == "1" ]; then
