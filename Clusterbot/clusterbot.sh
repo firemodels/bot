@@ -10,7 +10,11 @@ function USAGE {
   echo "clusterbot.sh - perform various checks on a Linux cluster"
   echo ""
   echo " -h - display this message"
-  echo " -q  queue - run test jobs using queue [default: $TEST_QUEUE]"
+  echo " -q  queue - run test jobs using queue"
+  if [ "$HAVE_CB_QUEUES" != "" ]; then
+    echo "             if queue=each then jobs will run in: $CB_QUEUE1"
+    echo "             $CB_QUEUE2 $CB_QUEUE3 $CB_QUEUE4 $CB_QUEUE5 queus"
+  fi
   exit
 }
 
@@ -862,10 +866,24 @@ if [ "$BIN" == "." ]; then
 fi
 SCRIPTDIR=$SCRIPTDIR/$BIN
 
-TEST_QUEUE=batch
-if [ "$CB_QUEUE" != "" ]; then
-  TEST_QUEUE=$CB_QUEUE
+TEST_QUEUE=
+HAVE_CB_QUEUES=
+if [ "$CB_QUEUE1" != "" ]; then
+  HAVE_CB_QUEUES=1
 fi
+if [ "$CB_QUEUE2" != "" ]; then
+  HAVE_CB_QUEUES=1
+fi
+if [ "$CB_QUEUE3" != "" ]; then
+  HAVE_CB_QUEUES=1
+fi
+if [ "$CB_QUEUE4" != "" ]; then
+  HAVE_CB_QUEUES=1
+fi
+if [ "$CB_QUEUE5" != "" ]; then
+  HAVE_CB_QUEUES=1
+fi
+
 NCASES_PER_QUEUE=20
 
 while getopts 'hq:' OPTION
@@ -877,6 +895,13 @@ case $OPTION  in
    ;;
   q)
    TEST_QUEUE="$OPTARG"
+   if [ "$TEST_QUEUE" == "each" ]; then
+     if [ "$HAVE_CB_QUEUES" == "" ]; then
+       echo "***error: environment variables CB_QUEUE1, CB_QUEUE2, "
+       echo "          CB_QUEUE3, CB_QUEUE4 and/or CB_QUEUE5 not defined"
+       echo "          use a different queue name"
+       exit
+   fi
    ;;
 esac
 done
@@ -945,11 +970,17 @@ fi
 # --------------------- run fds test cases --------------------
 # (check that they finished ok at the end of the script)
 
-RUN_TEST_CASES $JOBPREFIX $CB_QUEUE1
-RUN_TEST_CASES $JOBPREFIX $CB_QUEUE2
-RUN_TEST_CASES $JOBPREFIX $CB_QUEUE3
-RUN_TEST_CASES $JOBPREFIX $CB_QUEUE4
-RUN_TEST_CASES $JOBPREFIX $CB_QUEUE5
+if [ "$TEST_QUEUE" != "" ]; then
+  if [ "$TEST_QUEUE" == "each" ]; then
+    RUN_TEST_CASES $JOBPREFIX $CB_QUEUE1
+    RUN_TEST_CASES $JOBPREFIX $CB_QUEUE2
+    RUN_TEST_CASES $JOBPREFIX $CB_QUEUE3
+    RUN_TEST_CASES $JOBPREFIX $CB_QUEUE4
+    RUN_TEST_CASES $JOBPREFIX $CB_QUEUE5
+  else
+    RUN_TEST_CASES $JOBPREFIX $TEST_QUEUE
+  fi
+fi
 
 echo
 echo "---------- $CB_HOSTS status - `date` ----------"
@@ -1265,14 +1296,20 @@ if [ "$?" == "1" ]; then
   HOST_CHECK $FILES_DIR 1 $CB_HOSTETH4 
 fi
 
-echo ""
-echo "--------------------- check test cases ------------------------------"
-WAIT_TEST_CASES_END $JOBPREFIX
-CHECK_TEST_CASES $JOBPREFIX $CB_QUEUE1
-CHECK_TEST_CASES $JOBPREFIX $CB_QUEUE2
-CHECK_TEST_CASES $JOBPREFIX $CB_QUEUE3
-CHECK_TEST_CASES $JOBPREFIX $CB_QUEUE4
-CHECK_TEST_CASES $JOBPREFIX $CB_QUEUE5
+if [ "$TEST_QUEUE" != "" ]; then
+  echo ""
+  echo "--------------------- check test cases ------------------------------"
+  WAIT_TEST_CASES_END $JOBPREFIX
+  if [ "$TEST_QUEUE" == "each" ]; then
+    CHECK_TEST_CASES $JOBPREFIX $CB_QUEUE1
+    CHECK_TEST_CASES $JOBPREFIX $CB_QUEUE2
+    CHECK_TEST_CASES $JOBPREFIX $CB_QUEUE3
+    CHECK_TEST_CASES $JOBPREFIX $CB_QUEUE4
+    CHECK_TEST_CASES $JOBPREFIX $CB_QUEUE5
+  else
+    CHECK_TEST_CASES $JOBPREFIX $TEST_QUEUE
+  fi
+fi
 
 STOP_TIME=`date`
 echo ""
