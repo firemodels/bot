@@ -10,6 +10,7 @@ function USAGE {
   echo "clusterbot.sh - perform various checks on a Linux cluster"
   echo ""
   echo " -h - display this message"
+  echo " -q  queue - run test jobs using queue [default: $TEST_QUEUE]"
   exit
 }
 
@@ -32,11 +33,19 @@ MAKE_DATA_DIRS()
     fi
   fi
   OUTPUT_DIR=$CB_DATA_DIR/output
+  FDSOUTPUT_DIR=$CB_DATA_DIR/fdsoutput
   FILES_DIR=$CB_DATA_DIR/files
   if [ ! -d $OUTPUT_DIR ]; then
     mkdir $OUTPUT_DIR
     if [ ! -d $OUTPUT_DIR ]; then
       echo "***error: failed to create the directory: $OUTPUT_DIR"
+      ERROR=1
+    fi
+  fi
+  if [ ! -d $FDSOUTPUT_DIR ]; then
+    mkdir $FDSOUTPUT_DIR
+    if [ ! -d $FDSOUTPUT_DIR ]; then
+      echo "***error: failed to create the directory: $FDSOUTPUT_DIR"
       ERROR=1
     fi
   fi
@@ -52,6 +61,7 @@ MAKE_DATA_DIRS()
   fi
   rm -f $OUTPUT_DIR/*
   rm -f $FILES_DIR/*
+  rm -f $FDSOUTPUT_DIR/*
   return 0
 }
 
@@ -724,6 +734,106 @@ IS_HOST_UP ()
   return 0
 }
 
+#---------------------------------------------
+#                   GET_CHID
+#---------------------------------------------
+
+GET_CHID ()
+{
+base=$1
+num=$2
+
+if [ $num -gt 99 ]; then
+  CHID=$base$num
+else
+  if [ $num -gt 9 ]; then
+    CHID=${base}0$num
+  else
+    CHID=${base}00$num
+  fi
+fi
+echo $CHID
+}
+
+#---------------------------------------------
+#                   WAIT_CASES_END
+#---------------------------------------------
+
+WAIT_TEST_CASES_END()
+{
+  JOBPREFIX=$1
+# Scans job queue and waits for cases to end
+  while          [[ `qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$'` != '' ]]; do
+    JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$' | wc -l`
+    sleep 30
+  done
+}
+
+#---------------------------------------------
+#                   RUN_TEST_CASES
+#---------------------------------------------
+
+RUN_TEST_CASES ()
+{
+  QUEUE=$1
+  local CURDIR=`pwd`
+
+# make we can find qfds.sh 
+  QFDS=
+  QFDSDIR=$SCRIPTDIR/../../fds/Utilities/Scripts
+  if [ -d $QFDSDIR ]; then
+    cd $QFDSDIR
+    QFDS=`pwd`/qfds.sh
+    if [ ! -e $QFDS ]; then
+      QFDS=
+    fi
+    cd $CURDIR
+  fi
+  if [ "$QFDS" == "" ]; then
+    echo "***error: qfds.sh not found, test cases not run"
+    return 1
+  fi
+  
+  cd $FDSOUTPUT_DIR
+  JOBPREFIX=CB_
+  for i in `seq 1 $NCASES_PER_QUEUE`; do
+    CHID=`GET_CHID clustertest $i`
+    ../makecase.sh $CHID $FDSOUTPUT_DIR
+    $QFDS -p 24 -j $JOBPREFIX -q $QUEUE $CHID.fds >& /dev/null
+  done
+
+  WAIT_TEST_CASES_END $JOBPREFIX
+  CHECK_TEST_CASES $QUEUE
+}
+
+#---------------------------------------------
+#                   CHECK_TEST_CASES
+#---------------------------------------------
+
+CHECK_TEST_CASES ()
+{
+  QUEUE=$1
+
+  FAIL=0
+  for i in `seq 1 $NCASES_PER_QUEUE`; do
+    CHID=`GET_CHID clustertest $i`
+    OUTFILE=$CHID.out
+    if [ -e $OUTFILE ]; then
+      CHECK=`tail -10 $OUTFILE | grep successfully | wc -l`
+    else
+      CHECK=0
+    fi
+    if [ "$CHECK" == "0" ]; then
+      FAIL=$((FAIL+1))
+    fi
+  done
+  if [ "$FAIL" == "0" ]; then
+    echo "$QUEUE:   all ($NCASES_PER_QUEUE) cases ran successfully"
+  else
+    echo "$QUEUE: ***error: $FAIL out of $NCASES_PER_QUEUE cases failed to run"
+  fi
+}
+
 #************************** beginning of scrript ******************************************
 
 SCRIPTDIR=`pwd`
@@ -733,12 +843,21 @@ if [ "$BIN" == "." ]; then
 fi
 SCRIPTDIR=$SCRIPTDIR/$BIN
 
-while getopts 'h' OPTION
+TEST_QUEUE=batch
+if [ "$CB_QUEUE" != "" ]; then
+  TEST_QUEUE=$CB_QUEUE
+fi
+NCASES_PER_QUEUE=10
+
+while getopts 'hq:' OPTION
 do
 case $OPTION  in
   h)
    USAGE
    exit
+   ;;
+  q)
+   TEST_QUEUE="$OPTARG"
    ;;
 esac
 done
@@ -803,6 +922,11 @@ fi
 if [ "$ERROR" == "1" ]; then
   exit
 fi
+
+# --------------------- check check that fds cases can run --------------------
+
+RUN_TEST_CASES $TEST_QUEUE
+exit
 
 echo
 echo "---------- $CB_HOSTS status - `date` ----------"
