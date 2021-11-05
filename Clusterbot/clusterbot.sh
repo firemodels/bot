@@ -124,6 +124,7 @@ ACCT_CHECK ()
 {
   local file=$1
   local outdir=$2
+
   local CB_HOST_ARG=$3
 
   if [ "$CB_HOST_ARG" == "" ]; then
@@ -133,7 +134,7 @@ ACCT_CHECK ()
   pdsh -t 2 -w $CB_HOST_ARG `pwd`/getfile.sh $file $outdir |& grep -v ssh | sort >& $FILE_OUT
   file0=`head -1 $FILE_OUT | awk '{print $2}'`
 
-  CURDIR=`pwd`
+  local CURDIR=`pwd`
   cd $outdir
  
   FILEDIFF=
@@ -181,7 +182,7 @@ FILE_CHECK ()
   pdsh -t 2 -w $CB_HOST_ARG `pwd`/getfile.sh $file $outdir |& grep -v ssh | sort >& $FILE_OUT
   file0=`head -1 $FILE_OUT | awk '{print $2}'`
 
-  CURDIR=`pwd`
+  local CURDIR=`pwd`
   cd $outdir
  
   FILEDIFF=
@@ -226,6 +227,7 @@ MOUNT_CHECK ()
   local INDENT=$1
   local outdir=$2
   local CB_HOST_ARG=$3
+
   file="NFS mounts"
 
   if [ "$CB_HOST_ARG" == "" ]; then
@@ -235,7 +237,7 @@ MOUNT_CHECK ()
   pdsh -t 2 -w $CB_HOST_ARG `pwd`/getmounts.sh $outdir |& grep -v ssh | sort >& $FILE_OUT
   file0=`head -1 $FILE_OUT | awk '{print $2}'`
 
-  CURDIR=`pwd`
+  local CURDIR=`pwd`
   cd $outdir
  
   FILEDIFF=
@@ -280,6 +282,7 @@ FSTAB_CHECK ()
   local outdir=$1
   local INDENT=$2
   local CB_HOST_ARG=$3
+
   file=/etc/fstab
 
   if [ "$CB_HOST_ARG" == "" ]; then
@@ -289,7 +292,7 @@ FSTAB_CHECK ()
   pdsh -t 2 -w $CB_HOST_ARG `pwd`/getfstab.sh $outdir |& grep -v ssh | sort >& $FILE_OUT
   file0=`head -1 $FILE_OUT | awk '{print $2}'`
 
-  CURDIR=`pwd`
+  local CURDIR=`pwd`
   cd $outdir
  
   FILEDIFF=
@@ -334,6 +337,7 @@ HOST_CHECK ()
   local outdir=$1
   INDENT=$2
   local CB_HOST_ARG=$3
+
   file=/etc/hosts
 
   if [ "$CB_HOST_ARG" == "" ]; then
@@ -343,7 +347,7 @@ HOST_CHECK ()
   pdsh -t 2 -w $CB_HOST_ARG `pwd`/gethost.sh $outdir |& grep -v ssh | sort >& $FILE_OUT
   file0=`head -1 $FILE_OUT | awk '{print $2}'`
 
-  CURDIR=`pwd`
+  local CURDIR=`pwd`
   cd $outdir
  
   FILEDIFF=
@@ -394,7 +398,7 @@ fi
 rm -f $FILES_DIR/rpm*.txt
 pdsh -t 2 -w $CB_HOST_ARG `pwd`/getrpms.sh $FILES_DIR >& $SLURMRPMOUT
 
-CURDIR=`pwd`
+local CURDIR=`pwd`
 cd $FILES_DIR
 rpm0=`ls -l rpm*.txt | head -1 | awk '{print $9}'`
 host0=`echo $rpm0 | sed 's/.txt$//'`
@@ -475,7 +479,7 @@ IBSPEED ()
   if [ "$CB_HOST_ARG" == "" ]; then
     return
   fi
-  CURDIR=`pwd`
+  local CURDIR=`pwd`
   pdsh -t 2 -w $CB_HOST_ARG $CURDIR/ibspeed.sh |& grep -v ssh | sort >& $IBRATE
   RATE0=`head -1 $IBRATE | awk '{print $2}'`
   if [ "$RATE0" == "0" ]; then
@@ -652,7 +656,7 @@ MEMORY_CHECK ()
   pdsh -t 2 -w $CB_HOST_ARG `pwd`/getmem.sh  |& grep -v ssh | sort >& $MEMORY_OUT
   memory0=`head -1 $MEMORY_OUT | awk '{print $2}'`
 
-  CURDIR=`pwd`
+  local CURDIR=`pwd`
   cd $outdir
  
   MEMORY_DIFF=
@@ -694,7 +698,7 @@ SPEED_CHECK ()
   pdsh -t 2 -w $CB_HOST_ARG `pwd`/getspeed.sh  |& grep -v ssh | sort >& $SPEED_OUT
   speed0=`head -1 $SPEED_OUT | awk '{print $2}'`
 
-  CURDIR=`pwd`
+  local CURDIR=`pwd`
   cd $outdir
  
   SPEED_DIFF=
@@ -725,7 +729,8 @@ SPEED_CHECK ()
 
 IS_HOST_UP ()
 {
-  ITEM=$1
+  local ITEM=$1
+
   for i in $UP_ETH ; do
     if [ "$ITEM" == "$i" ]; then
       return 1
@@ -740,19 +745,19 @@ IS_HOST_UP ()
 
 GET_CHID ()
 {
-base=$1
-num=$2
+  local base=$1
+  local num=$2
 
-if [ $num -gt 99 ]; then
-  CHID=$base$num
-else
-  if [ $num -gt 9 ]; then
-    CHID=${base}0$num
+  if [ $num -gt 99 ]; then
+    CHID=$base$num
   else
-    CHID=${base}00$num
+    if [ $num -gt 9 ]; then
+      CHID=${base}0$num
+    else
+      CHID=${base}00$num
+    fi
   fi
-fi
-echo $CHID
+  echo $CHID
 }
 
 #---------------------------------------------
@@ -761,10 +766,11 @@ echo $CHID
 
 WAIT_TEST_CASES_END()
 {
-  JOBPREFIX=$1
+  local PREFIX=$1
+
 # Scans job queue and waits for cases to end
-  while          [[ `qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$'` != '' ]]; do
-    JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$' | wc -l`
+  while          [[ `qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $PREFIX | grep -v 'C$'` != '' ]]; do
+    JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $PREFIX | grep -v 'C$' | wc -l`
     sleep 30
   done
 }
@@ -775,8 +781,14 @@ WAIT_TEST_CASES_END()
 
 RUN_TEST_CASES ()
 {
-  QUEUE=$1
+  local PREFIX=$1
+  local QUEUE=$2
+
   local CURDIR=`pwd`
+
+  if [ "$QUEUE" == "" ]; then
+    return
+  fi
 
 # make we can find qfds.sh 
   QFDS=
@@ -795,15 +807,12 @@ RUN_TEST_CASES ()
   fi
   
   cd $FDSOUTPUT_DIR
-  JOBPREFIX=CB_
   for i in `seq 1 $NCASES_PER_QUEUE`; do
-    CHID=`GET_CHID clustertest $i`
+    CHID=`GET_CHID ${QUEUE}_ $i`
     ../makecase.sh $CHID $FDSOUTPUT_DIR
-    $QFDS -p 24 -j $JOBPREFIX -q $QUEUE $CHID.fds >& /dev/null
+    $QFDS -p 24 -j $PREFIX -q $QUEUE $CHID.fds >& /dev/null
   done
-
-  WAIT_TEST_CASES_END $JOBPREFIX
-  CHECK_TEST_CASES $QUEUE
+ cd $CURDIR
 }
 
 #---------------------------------------------
@@ -812,11 +821,19 @@ RUN_TEST_CASES ()
 
 CHECK_TEST_CASES ()
 {
-  QUEUE=$1
+  local PREFIX=$1
+  local QUEUE=$2
 
+  if [ "$QUEUE" == "" ]; then
+    return
+  fi
+
+  local CURDIR=`pwd`
+
+  cd $FDSOUTPUT_DIR
   FAIL=0
   for i in `seq 1 $NCASES_PER_QUEUE`; do
-    CHID=`GET_CHID clustertest $i`
+    CHID=`GET_CHID ${QUEUE}_ $i`
     OUTFILE=$CHID.out
     if [ -e $OUTFILE ]; then
       CHECK=`tail -10 $OUTFILE | grep successfully | wc -l`
@@ -828,14 +845,16 @@ CHECK_TEST_CASES ()
     fi
   done
   if [ "$FAIL" == "0" ]; then
-    echo "$QUEUE:   all ($NCASES_PER_QUEUE) cases ran successfully"
+    echo "$QUEUE:   all $NCASES_PER_QUEUE cases ran successfully"
   else
     echo "$QUEUE: ***error: $FAIL out of $NCASES_PER_QUEUE cases failed to run"
   fi
+  cd $CURDIR
 }
 
 #************************** beginning of scrript ******************************************
 
+JOBPREFIX=CB_
 SCRIPTDIR=`pwd`
 BIN=`dirname "$0"`
 if [ "$BIN" == "." ]; then
@@ -847,7 +866,7 @@ TEST_QUEUE=batch
 if [ "$CB_QUEUE" != "" ]; then
   TEST_QUEUE=$CB_QUEUE
 fi
-NCASES_PER_QUEUE=10
+NCASES_PER_QUEUE=20
 
 while getopts 'hq:' OPTION
 do
@@ -923,10 +942,14 @@ if [ "$ERROR" == "1" ]; then
   exit
 fi
 
-# --------------------- check check that fds cases can run --------------------
+# --------------------- run fds test cases --------------------
+# (check that they finished ok at the end of the script)
 
-RUN_TEST_CASES $TEST_QUEUE
-exit
+RUN_TEST_CASES $JOBPREFIX $CB_QUEUE1
+RUN_TEST_CASES $JOBPREFIX $CB_QUEUE2
+RUN_TEST_CASES $JOBPREFIX $CB_QUEUE3
+RUN_TEST_CASES $JOBPREFIX $CB_QUEUE4
+RUN_TEST_CASES $JOBPREFIX $CB_QUEUE5
 
 echo
 echo "---------- $CB_HOSTS status - `date` ----------"
@@ -1241,6 +1264,15 @@ if [ "$?" == "1" ]; then
   HOST_CHECK $FILES_DIR 1 $CB_HOSTETH3 
   HOST_CHECK $FILES_DIR 1 $CB_HOSTETH4 
 fi
+
+echo ""
+echo "--------------------- check test cases ------------------------------"
+WAIT_TEST_CASES_END $JOBPREFIX
+CHECK_TEST_CASES $JOBPREFIX $CB_QUEUE1
+CHECK_TEST_CASES $JOBPREFIX $CB_QUEUE2
+CHECK_TEST_CASES $JOBPREFIX $CB_QUEUE3
+CHECK_TEST_CASES $JOBPREFIX $CB_QUEUE4
+CHECK_TEST_CASES $JOBPREFIX $CB_QUEUE5
 
 STOP_TIME=`date`
 echo ""
