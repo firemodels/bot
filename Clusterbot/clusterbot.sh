@@ -10,10 +10,10 @@ function USAGE {
   echo "clusterbot.sh - perform various checks on a Linux cluster"
   echo ""
   echo " -h - display this message"
-  echo " -q  queue - run test jobs using queue"
+  echo " -q  q - run test cases using the Slurm queue q"
   if [ "$HAVE_CB_QUEUES" != "" ]; then
-    echo "             if queue=each then jobs will run in: $CB_QUEUE1"
-    echo "             $CB_QUEUE2 $CB_QUEUE3 $CB_QUEUE4 $CB_QUEUE5 queus"
+    echo "         if q=each then test cases will run using: $CB_QUEUE1"
+    echo "         $CB_QUEUE2 $CB_QUEUE3 $CB_QUEUE4 $CB_QUEUE5 queus"
   fi
   exit
 }
@@ -901,6 +901,7 @@ case $OPTION  in
        echo "          CB_QUEUE3, CB_QUEUE4 and/or CB_QUEUE5 not defined"
        echo "          use a different queue name"
        exit
+     fi
    fi
    ;;
 esac
