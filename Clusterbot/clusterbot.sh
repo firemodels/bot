@@ -9,6 +9,7 @@ function USAGE {
   echo ""
   echo "clusterbot.sh - perform various checks on a Linux cluster"
   echo ""
+  echo " -f - force clusterbot run"
   echo " -h - display this message"
   echo " -q  q - run test cases using the Slurm queue q"
   if [ "$HAVE_CB_QUEUES" != "" ]; then
@@ -765,6 +766,21 @@ GET_CHID ()
 }
 
 #---------------------------------------------
+#                   HAVE_JOBS_RUNNING
+#---------------------------------------------
+
+HAVE_JOBS_RUNNING ()
+{
+  local PREFIX=$1
+
+  JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $PREFIX | grep -v 'C$' | wc -l`
+  if [ "$JOBS_REMAINING" == "0" ]; then
+    return 0;
+  fi
+  return 1
+}
+
+#---------------------------------------------
 #                   WAIT_CASES_END
 #---------------------------------------------
 
@@ -885,10 +901,14 @@ if [ "$CB_QUEUE5" != "" ]; then
 fi
 
 NCASES_PER_QUEUE=20
+FORCE_UNLOCK=
 
-while getopts 'hq:' OPTION
+while getopts 'fhq:' OPTION
 do
 case $OPTION  in
+  f)
+   FORCE_UNLOCK=1
+   ;;
   h)
    USAGE
    exit
@@ -928,6 +948,18 @@ SLURMOUT=$FILES_DIR/slurmout.$$
 SLURMRPMOUT=$FILES_DIR/slurmrpmout.$$
 DOWN_HOSTS=$FILES_DIR/downhosts.$$
 UP_HOSTS=$FILES_DIR/uphosts.$$
+LOCK_FILE=$HOME/.clusterbot/lockfile
+
+if [ ! -d $HOME/.clusterbot ]; then
+  mkdir $HOME/.clusterbot
+fi
+if [[ "$FORCE_UNLOCK" == "" ]] && [[ -e $LOCK_FILE ]]; then
+  echo "***error: another instance of clusterbot.sh is running"
+  echo "          If this is not the case, rerun using the -f option"
+  exit
+fi
+
+touch $LOCK_FILE
 
 # --------------------- setup Intel cluster checker  --------------------
 
@@ -972,6 +1004,12 @@ fi
 # (check that they finished ok at the end of the script)
 
 if [ "$TEST_QUEUE" != "" ]; then
+  HAVE_JOBS_RUNNING $JOBPREFIX
+  if [ "$?" == "1" ]; then
+    echo "***error: clusterbot cases are still running"
+    echo "          kill these cases or start clusterbot again WITHOUT the -q option"
+    exit
+  fi
   if [ "$TEST_QUEUE" == "each" ]; then
     RUN_TEST_CASES $JOBPREFIX $CB_QUEUE1
     RUN_TEST_CASES $JOBPREFIX $CB_QUEUE2
@@ -1317,3 +1355,5 @@ echo ""
 echo "--------------------- clusterbot complete ------------------------------"
 echo "start time: $START_TIME"
 echo "stop time: $STOP_TIME"
+
+rm $LOCK_FILE
