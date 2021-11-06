@@ -1,9 +1,13 @@
 #!/bin/bash
 chid=$1
 outdir=$2
+TERMINAL=$3
 
 fdscase=$chid.fds
 
+if [ "$TERMINAL" != "" ]; then
+  outdir=/tmp
+fi
 cat << EOF > $outdir/$fdscase
 &HEAD CHID='$chid',TITLE='cluster test case $num' /
 
@@ -22,3 +26,7 @@ cat << EOF > $outdir/$fdscase
 
 &TAIL /
 EOF
+if [ "$TERMINAL" != "" ]; then
+  cat $outdir/$fdscase
+  rm $outdir/$fdscase
+fi

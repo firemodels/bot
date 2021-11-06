@@ -1,22 +1,38 @@
 #!/bin/bash
 
 #---------------------------------------------
-# ---------------------------- USAGE ----------------------------------
+#                   USAGE
 #---------------------------------------------
 
 function USAGE {
   echo "Usage: clusterbot.sh "
   echo ""
-  echo "clusterbot.sh - perform various checks on a Linux cluster"
+  echo "clusterbot.sh - perform various checks to verify a Linux cluster is working properly. If the -q option"
+  echo "                is specified, run test cases on multiple nodes. The test cases are very simple designed"
+  echo "                only to verify that communication works between processes.  To run more realistic test"
+  echo "                cases, use firebot or smokebot."
   echo ""
-  echo " -f - force clusterbot run"
+  echo " -f - override lock to force clusterbot run"
   echo " -h - display this message"
-  echo " -q  q - run test cases using the Slurm queue q"
+  echo " -n n - run n cases on each queue [default: $NCASES_PER_QUEUE]"
   if [ "$HAVE_CB_QUEUES" != "" ]; then
-    echo "         if q=each then test cases will run using: $CB_QUEUE1"
-    echo "         $CB_QUEUE2 $CB_QUEUE3 $CB_QUEUE4 $CB_QUEUE5 queus"
+    echo " -q q - run test cases where q is one of the queues:"
+    echo "        $CB_QUEUE1 $CB_QUEUE2 $CB_QUEUE3 $CB_QUEUE4 $CB_QUEUE5."
+    echo "        if q=each then test cases will run using "
+    echo "        each of these queues."
+  else
+    echo " -q q - run test cases using the queue q."
   fi
+  echo " -s - show a sample test case"
   exit
+}
+
+#---------------------------------------------
+#                   SHOW_TEST_CASE
+#---------------------------------------------
+
+SHOW_TEST_CASE () {
+  $SCRIPTDIR/makecase.sh test . TERMINAL
 }
 
 #---------------------------------------------
@@ -810,7 +826,7 @@ RUN_TEST_CASES ()
     return
   fi
 
-# make we can find qfds.sh 
+# make sure we can find qfds.sh 
   QFDS=
   QFDSDIR=$SCRIPTDIR/../../fds/Utilities/Scripts
   if [ -d $QFDSDIR ]; then
@@ -903,7 +919,7 @@ fi
 NCASES_PER_QUEUE=20
 FORCE_UNLOCK=
 
-while getopts 'fhq:' OPTION
+while getopts 'fhn:q:s' OPTION
 do
 case $OPTION  in
   f)
@@ -912,6 +928,15 @@ case $OPTION  in
   h)
    USAGE
    exit
+   ;;
+  n)
+   NCASES="$OPTARG"
+   re='^[0-9]+$'
+   if ! [[ $NCASES =~ $re ]] ; then
+     echo "***error: -n "$OPTARG" not a number"
+     exit
+   fi 
+   NCASES_PER_QUEUE=$NCASES
    ;;
   q)
    TEST_QUEUE="$OPTARG"
@@ -922,13 +947,25 @@ case $OPTION  in
        echo "          use a different queue name"
        exit
      fi
+   else
+     sinfo | awk 'NR > 2 { print $1 }' | awk -F'*' '{print $1}' | sort -u > /tmp/queues.$$
+     have_queue=`grep -w $TEST_QUEUE /tmp/queues.$$ | wc -l`
+     rm /tmp/queues.$$
+     if [ "$have_queue" == "0" ]; then
+       echo "***error: $TEST_QUEUE is an invalid queue"
+       exit
+      fi
    fi
+   ;;
+   s)
+    SHOW_TEST_CASE
+    exit
    ;;
 esac
 done
 shift $(($OPTIND-1))
 
-# --------------------- make surer output directories exist  --------------------
+# --------------------- make sure output directories exist  --------------------
 
 MAKE_DATA_DIRS ||  exit
 
