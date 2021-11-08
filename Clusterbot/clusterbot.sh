@@ -268,6 +268,59 @@ FILE_CHECK ()
 }
 
 #---------------------------------------------
+#                   TIME_CHECK
+#---------------------------------------------
+
+TIME_CHECK ()
+{
+  local INDENT=$1
+  local TOLERANCE=$2
+  local outdir=$3
+  local CB_HOST_ARG=$4
+
+  if [ "$CB_HOST_ARG" == "" ]; then
+    return 0
+  fi
+  FILE_OUT=$outdir/file_out
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/gettime_error.sh |& grep -v ssh | grep -v Connection | sort >& $FILE_OUT
+
+  local CURDIR=`pwd`
+  cd $outdir
+ 
+  TIMEERROR_LIST=
+  while read line 
+  do
+    hosti=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
+    timei=`echo $line | awk '{print $2}'`
+    TOBIG=`echo "$timei > $TOLERANCE" | bc -l`
+    if [ "$TOBIG" == "1" ]; then
+      if [ "$TIMEROR_LIST" == "" ]; then
+        TIMEERROR_LIST="$hosti/$timei"
+      else
+        TIMEERROR_LIST="$TIMEERROR_LIST $hosti/$timei"
+      fi
+    fi
+  done < $FILE_OUT
+  cd $CURDIR
+
+  if [ "$TIMEERROR_LIST" == "" ]; then
+    if [ "$INDENT" == "1" ]; then
+      echo "   $CB_HOST_ARG:    all time errors < $TOLERANCE s"
+    else
+      echo "   $CB_HOST_ARG: all time errors < $TOLERANCE s"
+    fi
+    return 0
+  else
+    if [ "$INDENT" == "1" ]; then
+      echo "   $CB_HOST_ARG:    ***Error: time error > $TOLERANCE s on $TIMEERROR_LIST"
+    else
+      echo "   $CB_HOST_ARG: ***Error: time error > $TOLERANCE s on $TIMEERROR_LIST"
+    fi
+    return 1
+  fi
+}
+
+#---------------------------------------------
 #                   MOUNT_CHECK
 #---------------------------------------------
 
@@ -1119,7 +1172,8 @@ fi
 
 if [ "$ONLY_RUN_TEST_CASES" != "1" ]; then
   echo
-  echo "---------- $CB_HOSTS status - `date`  - `git describe --dirty --long` ----------"
+  echo "---------- $CB_HOSTS status - `date` ----------"
+  echo "---------- `git describe --dirty --long` ----------"
 fi
 if [ "$TEST_QUEUE" != "" ]; then
   echo ""
@@ -1274,6 +1328,17 @@ MEMORY_CHECK $FILES_DIR $CB_HOSTETH1 $CB_MEM1
 MEMORY_CHECK $FILES_DIR $CB_HOSTETH2 $CB_MEM2
 MEMORY_CHECK $FILES_DIR $CB_HOSTETH3 $CB_MEM3
 MEMORY_CHECK $FILES_DIR $CB_HOSTETH4 $CB_MEM4
+
+echo ""
+echo "--------------------- time check --------------------------"
+TOLERANCE=0.01
+TIME_CHECK 0 $TOLERANCE $FILES_DIR $CB_HOSTS 
+if [ "$?" == "1" ]; then
+  TIME_CHECK 1 $TOLERANCE $FILES_DIR $CB_HOSTETH1 
+  TIME_CHECK 1 $TOLERANCE $FILES_DIR $CB_HOSTETH2
+  TIME_CHECK 1 $TOLERANCE $FILES_DIR $CB_HOSTETH3 
+  TIME_CHECK 1 $TOLERANCE $FILES_DIR $CB_HOSTETH4 
+fi
 
 echo ""
 echo "--------------------- disk check -------------------------"
