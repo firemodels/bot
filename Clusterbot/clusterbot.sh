@@ -1077,7 +1077,7 @@ case $OPTION  in
    NCASES="$OPTARG"
    re='^[0-9]+$'
    if ! [[ $NCASES =~ $re ]] ; then
-     echo "***error: -n "$OPTARG" not a number"
+     echo "***error: -n $NCASES not a number"
      exit
    fi 
    NCASES_PER_QUEUE=$NCASES
