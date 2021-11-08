@@ -33,11 +33,13 @@ fopt=
 nopt=
 QOPT=
 qopt=
+FORCE_UNLOCK=
 while getopts 'fhm:n:q:Q:' OPTION
 do
 case $OPTION  in
   f)
    fopt="-f"
+   FORCE_UNLOCK=1
    ;;
   h)
    USAGE
@@ -66,6 +68,13 @@ esac
 done
 shift $(($OPTIND-1))
 
+LOCK_FILE=$HOME/.clusterbot/lockfile
+if [[ "$FORCE_UNLOCK" == "" ]] && [[ -e $LOCK_FILE ]]; then
+  echo "***error: another instance of clusterbot.sh is running"
+  echo "          If this is not the case, rerun using the -f option"
+  exit
+fi
+rm -f $LOCK_FILE
 
 CURDIR=`pwd`
 
