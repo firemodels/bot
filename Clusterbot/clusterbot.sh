@@ -23,16 +23,9 @@ function USAGE {
   else
     echo " -q q - run test cases using the queue q."
   fi
-  echo " -s - show a sample test case"
+  echo " -Q  q - same as the -q option except that only test cases are run."
+  echo "         Other tests are not performed."
   exit
-}
-
-#---------------------------------------------
-#                   SHOW_TEST_CASE
-#---------------------------------------------
-
-SHOW_TEST_CASE () {
-  $SCRIPTDIR/makecase.sh test . TERMINAL
 }
 
 #---------------------------------------------
@@ -116,7 +109,7 @@ CHECK_DAEMON ()
 
 DAEMONOUT=$FILES_DIR/daemon.out.$$
 
-pdsh -t 2 -w $CB_HOST_ARG "ps -el | grep $DAEMON_ARG | wc -l" |&  grep -v ssh | sort >& $DAEMONOUT
+pdsh -t 2 -w $CB_HOST_ARG "ps -el | grep $DAEMON_ARG | wc -l" |&  grep -v ssh | grep -v Connection | sort >& $DAEMONOUT
 DAEMONDOWN=
 while read line 
 do
@@ -152,7 +145,7 @@ ACCT_CHECK ()
     return 0
   fi
   FILE_OUT=$outdir/file_out
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getfile.sh $file $outdir |& grep -v ssh | sort >& $FILE_OUT
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getfile.sh $file $outdir |& grep -v ssh | grep -v Connection | sort >& $FILE_OUT
   file0=`head -1 $FILE_OUT | awk '{print $2}'`
 
   local CURDIR=`pwd`
@@ -200,7 +193,7 @@ FILE_CHECK ()
     return 0
   fi
   FILE_OUT=$outdir/file_out
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getfile.sh $file $outdir |& grep -v ssh | sort >& $FILE_OUT
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getfile.sh $file $outdir |& grep -v ssh | grep -v Connection | sort >& $FILE_OUT
   file0=`head -1 $FILE_OUT | awk '{print $2}'`
 
   local CURDIR=`pwd`
@@ -255,7 +248,7 @@ MOUNT_CHECK ()
     return 0
   fi
   FILE_OUT=$outdir/file_out
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getmounts.sh $outdir |& grep -v ssh | sort >& $FILE_OUT
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getmounts.sh $outdir |& grep -v ssh | grep -v Connection | sort >& $FILE_OUT
   file0=`head -1 $FILE_OUT | awk '{print $2}'`
 
   local CURDIR=`pwd`
@@ -310,7 +303,7 @@ FSTAB_CHECK ()
     return 0
   fi
   FILE_OUT=$outdir/file_out
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getfstab.sh $outdir |& grep -v ssh | sort >& $FILE_OUT
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getfstab.sh $outdir |& grep -v ssh | grep -v Connection | sort >& $FILE_OUT
   file0=`head -1 $FILE_OUT | awk '{print $2}'`
 
   local CURDIR=`pwd`
@@ -365,7 +358,7 @@ HOST_CHECK ()
     return 0
   fi
   FILE_OUT=$outdir/hosts_out
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/gethost.sh $outdir |& grep -v ssh | sort >& $FILE_OUT
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/gethost.sh $outdir |& grep -v ssh | grep -v Connection | sort >& $FILE_OUT
   file0=`head -1 $FILE_OUT | awk '{print $2}'`
 
   local CURDIR=`pwd`
@@ -501,7 +494,7 @@ IBSPEED ()
     return
   fi
   local CURDIR=`pwd`
-  pdsh -t 2 -w $CB_HOST_ARG $CURDIR/ibspeed.sh |& grep -v ssh | sort >& $IBRATE
+  pdsh -t 2 -w $CB_HOST_ARG $CURDIR/ibspeed.sh |& grep -v ssh | grep -v Connection | sort >& $IBRATE
   RATE0=`head -1 $IBRATE | awk '{print $2}'`
   if [ "$RATE0" == "0" ]; then
     return
@@ -544,7 +537,7 @@ RUN_CLUSTER_CHECK ()
     OUTFILE=$OUTPUT_DIR/${LOG}.out
     RESULTSFILE=$OUTPUT_DIR/${LOG}_results.out
     pdsh -t 2 -w $CB_HOST_ARG date   >& $CLUSTEROUT
-    sort $CLUSTEROUT | grep -v ssh | awk '{print $1 }' | awk -F':' '{print $1}' > $NODEFILE
+    sort $CLUSTEROUT | grep -v ssh | grep -v Connection | awk '{print $1 }' | awk -F':' '{print $1}' > $NODEFILE
     nup=`wc -l $NODEFILE`
     if [ "$nup" == "0" ]; then
       echo "   $CB_HOST_ARG: ***Error: all hosts are down - cluster checker not run"
@@ -569,7 +562,7 @@ PROVISION_DATE_CHECK ()
   if [ "$CB_HOSTETH_ARG" == "" ]; then
     return 0
   fi
-  pdsh -t 2 -w $CB_HOSTETH_ARG `pwd`/getrevdate.sh |&  grep -v ssh | sort >  $FSOUT 2>&1
+  pdsh -t 2 -w $CB_HOSTETH_ARG `pwd`/getrevdate.sh |&  grep -v ssh | grep -v Connection | sort >  $FSOUT 2>&1
 
   NF0=`head -1 $FSOUT | awk '{print $2}'`
   FSDOWN=
@@ -605,7 +598,7 @@ CORE_CHECK ()
   if [ "$CB_HOSTETH_ARG" == "" ]; then
     return 0
   fi
-  pdsh -t 2 -w $CB_HOSTETH_ARG "grep cpuid /proc/cpuinfo | wc -l" |&  grep -v ssh | sort >  $FSOUT 2>&1
+  pdsh -t 2 -w $CB_HOSTETH_ARG "grep cpuid /proc/cpuinfo | wc -l" |&  grep -v ssh | grep -v Connection | sort >  $FSOUT 2>&1
 
   NF0=`head -1 $FSOUT | awk '{print $2}'`
   FSDOWN=
@@ -674,7 +667,7 @@ MEMORY_CHECK ()
     return 0
   fi
   MEMORY_OUT=$outdir/memory_out
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getmem.sh  |& grep -v ssh | sort >& $MEMORY_OUT
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getmem.sh  |& grep -v ssh | grep -v Connection | sort >& $MEMORY_OUT
   memory0=`head -1 $MEMORY_OUT | awk '{print $2}'`
 
   local CURDIR=`pwd`
@@ -716,7 +709,7 @@ SPEED_CHECK ()
     return 0
   fi
   SPEED_OUT=$outdir/speed_out
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getspeed.sh  |& grep -v ssh | sort >& $SPEED_OUT
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getspeed.sh  |& grep -v ssh | grep -v Connection | sort >& $SPEED_OUT
   speed0=`head -1 $SPEED_OUT | awk '{print $2}'`
 
   local CURDIR=`pwd`
@@ -803,10 +796,14 @@ HAVE_JOBS_RUNNING ()
 WAIT_TEST_CASES_END()
 {
   local PREFIX=$1
+  local REPORT_STATUS=$2
 
 # Scans job queue and waits for cases to end
   while          [[ `qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $PREFIX | grep -v 'C$'` != '' ]]; do
     JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $PREFIX | grep -v 'C$' | wc -l`
+    if [ "$REPORT_STATUS" == "1" ]; then
+      echo "Waiting for $JOBS_REMAINING test cases to complete."
+    fi
     sleep 30
   done
 }
@@ -848,14 +845,15 @@ RUN_TEST_CASES ()
     ../makecase.sh $CHID $FDSOUTPUT_DIR
     $QFDS -p 24 -j $PREFIX -q $QUEUE $CHID.fds >& /dev/null
   done
- cd $CURDIR
+  echo "   $NCASES_PER_QUEUE test cases submitted to the $QUEUE queue"
+  cd $CURDIR
 }
 
 #---------------------------------------------
-#                   CHECK_TEST_CASES
+#                   CHECK_FDS_OUT
 #---------------------------------------------
 
-CHECK_TEST_CASES ()
+CHECK_FDS_OUT ()
 {
   local PREFIX=$1
   local QUEUE=$2
@@ -888,6 +886,51 @@ CHECK_TEST_CASES ()
   cd $CURDIR
 }
 
+#---------------------------------------------
+#                   CHECK_TEST_CASES
+#---------------------------------------------
+
+CHECK_TEST_CASES ()
+{
+  local REPORT_STATUS=$1
+  echo ""
+  echo "--------------------- check test cases ------------------------------"
+  WAIT_TEST_CASES_END $JOBPREFIX $REPORT_STATUS
+  if [ "$TEST_QUEUE" == "each" ]; then
+    CHECK_FDS_OUT $JOBPREFIX $CB_QUEUE1
+    CHECK_FDS_OUT $JOBPREFIX $CB_QUEUE2
+    CHECK_FDS_OUT $JOBPREFIX $CB_QUEUE3
+    CHECK_FDS_OUT $JOBPREFIX $CB_QUEUE4
+    CHECK_FDS_OUT $JOBPREFIX $CB_QUEUE5
+  else
+    CHECK_FDS_OUT $JOBPREFIX $TEST_QUEUE
+  fi
+}
+
+#---------------------------------------------
+#                   SETUP_QUEUES
+#---------------------------------------------
+
+SETUP_QUEUES () {
+  TEST_QUEUE=$1
+  if [ "$TEST_QUEUE" == "each" ]; then
+    if [ "$HAVE_CB_QUEUES" == "" ]; then
+      echo "***error: environment variables CB_QUEUE1, CB_QUEUE2, "
+      echo "          CB_QUEUE3, CB_QUEUE4 and/or CB_QUEUE5 not defined"
+      echo "          use a different queue name"
+      exit
+    fi
+  else
+    sinfo | awk 'NR > 2 { print $1 }' | awk -F'*' '{print $1}' | sort -u > /tmp/queues.$$
+    have_queue=`grep -w $TEST_QUEUE /tmp/queues.$$ | wc -l`
+    rm /tmp/queues.$$
+    if [ "$have_queue" == "0" ]; then
+      echo "***error: $TEST_QUEUE is an invalid queue"
+      exit
+     fi
+  fi
+}
+
 #************************** beginning of scrript ******************************************
 
 JOBPREFIX=CB_
@@ -918,8 +961,9 @@ fi
 
 NCASES_PER_QUEUE=20
 FORCE_UNLOCK=
+ONLY_RUN_TEST_CASES=
 
-while getopts 'fhn:q:s' OPTION
+while getopts 'fhn:q:Q:' OPTION
 do
 case $OPTION  in
   f)
@@ -938,28 +982,12 @@ case $OPTION  in
    fi 
    NCASES_PER_QUEUE=$NCASES
    ;;
-  q)
-   TEST_QUEUE="$OPTARG"
-   if [ "$TEST_QUEUE" == "each" ]; then
-     if [ "$HAVE_CB_QUEUES" == "" ]; then
-       echo "***error: environment variables CB_QUEUE1, CB_QUEUE2, "
-       echo "          CB_QUEUE3, CB_QUEUE4 and/or CB_QUEUE5 not defined"
-       echo "          use a different queue name"
-       exit
-     fi
-   else
-     sinfo | awk 'NR > 2 { print $1 }' | awk -F'*' '{print $1}' | sort -u > /tmp/queues.$$
-     have_queue=`grep -w $TEST_QUEUE /tmp/queues.$$ | wc -l`
-     rm /tmp/queues.$$
-     if [ "$have_queue" == "0" ]; then
-       echo "***error: $TEST_QUEUE is an invalid queue"
-       exit
-      fi
-   fi
+  Q)
+   ONLY_RUN_TEST_CASES=1
+   SETUP_QUEUES $OPTARG
    ;;
-   s)
-    SHOW_TEST_CASE
-    exit
+  q)
+   SETUP_QUEUES $OPTARG
    ;;
 esac
 done
@@ -1040,7 +1068,13 @@ fi
 # --------------------- run fds test cases --------------------
 # (check that they finished ok at the end of the script)
 
+if [ "$ONLY_RUN_TEST_CASES" != "1" ]; then
+  echo
+  echo "---------- $CB_HOSTS status - `date` ----------"
+fi
 if [ "$TEST_QUEUE" != "" ]; then
+  echo ""
+  echo "--------------------- submitting test cases ------------------------------"
   HAVE_JOBS_RUNNING $JOBPREFIX
   if [ "$?" == "1" ]; then
     echo "***error: clusterbot cases are still running"
@@ -1057,9 +1091,18 @@ if [ "$TEST_QUEUE" != "" ]; then
     RUN_TEST_CASES $JOBPREFIX $TEST_QUEUE
   fi
 fi
+if [ "$ONLY_RUN_TEST_CASES" == "1" ]; then
+  CHECK_TEST_CASES $ONLY_RUN_TEST_CASES
+  STOP_TIME=`date`
+  echo ""
+  echo "--------------------- clusterbot complete ------------------------------"
+  echo "start time: $START_TIME"
+  echo "stop time: $STOP_TIME"
 
-echo
-echo "---------- $CB_HOSTS status - `date` ----------"
+  rm $LOCK_FILE
+  exit
+fi
+
 echo ""
 echo "--------------------- network checks --------------------------"
 # --------------------- check ethernet --------------------
@@ -1101,7 +1144,7 @@ fi
 
 # --------------------- check for hosts with working ethernet, non-working infiniband  --------------------
 
-UP_ETH=` pdsh -t 2 -w $CB_HOSTS   date |& grep -v ssh  | awk -F':' '{print $1}' | sort` 
+UP_ETH=` pdsh -t 2 -w $CB_HOSTS   date |& grep -v ssh  | grep -v Connection | awk -F':' '{print $1}' | sort` 
 
 IB_LIST=
 if [ "$IBDOWN" != "" ]; then
@@ -1188,7 +1231,7 @@ echo "--------------------- disk check -------------------------"
 
 #*** check number of file systems mounted
 
-pdsh -t 2 -w $CB_HOSTS "df -k -t nfs | tail -n +2 | wc -l" |&  grep -v ssh | sort >& $FSOUT
+pdsh -t 2 -w $CB_HOSTS "df -k -t nfs | tail -n +2 | wc -l" |&  grep -v ssh | grep -v Connection | sort >& $FSOUT
 cat $FSOUT | awk -F':' '{print $1}' > $UP_HOSTS
 
 NF0=`head -1 $FSOUT | awk '{print $2}'`
@@ -1286,7 +1329,7 @@ CHECK_DAEMON slurmd Error $CB_HOSTS
 
 #*** check slurm rpm
 
-pdsh -t 2 -w $CB_HOSTS "rpm -qa | grep slurm | grep devel" |& grep -v ssh | sort >& $SLURMRPMOUT
+pdsh -t 2 -w $CB_HOSTS "rpm -qa | grep slurm | grep devel" |& grep -v ssh | grep -v Connection | sort >& $SLURMRPMOUT
 SLURMRPM0=`head -1 $SLURMRPMOUT | awk '{print $2}'`
 SLURMBAD=
 while read line 
@@ -1372,19 +1415,8 @@ if [ "$?" == "1" ]; then
   HOST_CHECK $FILES_DIR 1 $CB_HOSTETH4 
 fi
 
-if [ "$TEST_QUEUE" != "" ]; then
-  echo ""
-  echo "--------------------- check test cases ------------------------------"
-  WAIT_TEST_CASES_END $JOBPREFIX
-  if [ "$TEST_QUEUE" == "each" ]; then
-    CHECK_TEST_CASES $JOBPREFIX $CB_QUEUE1
-    CHECK_TEST_CASES $JOBPREFIX $CB_QUEUE2
-    CHECK_TEST_CASES $JOBPREFIX $CB_QUEUE3
-    CHECK_TEST_CASES $JOBPREFIX $CB_QUEUE4
-    CHECK_TEST_CASES $JOBPREFIX $CB_QUEUE5
-  else
-    CHECK_TEST_CASES $JOBPREFIX $TEST_QUEUE
-  fi
+if [[ "$ONLY_RUN_TEST_CASES" != "1" ]] && [[ "$TEST_QUEUE" != "" ]]; then
+  CHECK_TEST_CASES 0
 fi
 
 STOP_TIME=`date`
