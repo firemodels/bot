@@ -860,7 +860,7 @@ RUN_TEST_CASES ()
 
 # make sure we can find qfds.sh 
   QFDS=
-  QFDSDIR=$SCRIPTDIR/../../fds/Utilities/Scripts
+  QFDSDIR=$FIREMODELS/fds/Utilities/Scripts
   if [ -d $QFDSDIR ]; then
     cd $QFDSDIR
     QFDS=`pwd`/qfds.sh
@@ -873,6 +873,18 @@ RUN_TEST_CASES ()
     echo "***error: qfds.sh not found, test cases not run"
     return 1
   fi
+  if [ "$FIREMODELS" == "" ]; then
+    echo "***error: FIREMODELS environment variable not defined,"
+    echo "          test cases not run."
+    return 1
+  else
+    if [ ! -e $FIREMODELS/fds/Build/impi_intel_linux_64/fds_impi_intel_linux_64 ]; then
+       echo "***error: fds executable not found.  Was expecting it at:"
+       echo "          $FIREMODELS/fds/Build/impi_intel_linux_64/fds_impi_intel_linux_64 ,"
+       echo "          test cases not run."
+       return 1
+    fi
+  fi 
   
   cd $FDSOUTPUT_DIR
   for i in `seq 1 $NCASES_PER_QUEUE`; do
