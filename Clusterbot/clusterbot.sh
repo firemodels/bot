@@ -29,6 +29,25 @@ function USAGE {
 }
 
 #---------------------------------------------
+#                   MKDIR
+#---------------------------------------------
+
+MKDIR ()
+{
+ local dir=$1
+
+ if [ ! -d $dir ]; then
+   echo making directory $dir
+   mkdir -p $dir
+ fi
+ if [ ! -d $dir ]; then
+   error "***error: failed to create the directory $dir"
+   return 0
+ fi
+ return 1
+}
+
+#---------------------------------------------
 #                   MAKE_DATA_DIRS
 #---------------------------------------------
 
@@ -42,33 +61,22 @@ MAKE_DATA_DIRS()
     CB_DATA_DIR=$SCRIPTDIR
   else
     CB_DATA_DIR=$HOME/.clusterbot
-    if [ ! -d $CB_DATA_DIR ]; then
-      mkdir $CB_DATA_DIR
-    fi
+    MKDIR $CB_DATA_DIR
   fi
   OUTPUT_DIR=$CB_DATA_DIR/output
   FDSOUTPUT_DIR=$CB_DATA_DIR/fdsoutput
   FILES_DIR=$CB_DATA_DIR/files
-  if [ ! -d $OUTPUT_DIR ]; then
-    mkdir $OUTPUT_DIR
-    if [ ! -d $OUTPUT_DIR ]; then
-      echo "***error: failed to create the directory: $OUTPUT_DIR"
-      ERROR=1
-    fi
+  MKDIR $OUTPUT_DIR
+  if [ "$?" == "0" ]; then
+    ERROR=1
   fi
-  if [ ! -d $FDSOUTPUT_DIR ]; then
-    mkdir $FDSOUTPUT_DIR
-    if [ ! -d $FDSOUTPUT_DIR ]; then
-      echo "***error: failed to create the directory: $FDSOUTPUT_DIR"
-      ERROR=1
-    fi
+  MKDIR $FDSOUTPUT_DIR
+  if [ "$?" == "0" ]; then
+    ERROR=1
   fi
-  if [ ! -d $FILES_DIR ]; then
-    mkdir $FILES_DIR
-    if [ ! -d $FILES_DIR ]; then
-      echo "***error: failed to create the directory: $FILES_DIR"
-      ERROR=1
-    fi
+  MKDIR $FILES_DIR
+  if [ "$?" == "0" ]; then
+    ERROR=1
   fi
   if [ "$ERROR" == "1" ]; then
     return 1
@@ -95,6 +103,33 @@ SETUP_CLCK()
     CHECK_CLUSTER=`which clck`
   fi
   return 0
+}
+
+#---------------------------------------------
+#                   CHECK_DIR_LIST
+#---------------------------------------------
+
+CHECK_DIR_LIST()
+{
+  local basedir=$1
+  local rootdir=$2
+
+  currentdirlist=/tmp/dirlist.$$
+  ls -l $basedir/$rootdir | sed '1 d' > $currentdirlist
+  
+  if [ ! -d $DIRLIST/$rootdir ]; then
+    cp $currentdirlist $DIRLIST/$rootdir
+  fi
+  
+  ndiffs=`diff $DIRLIST/$rootdir $currentdirlist | wc -l`
+ 
+  dirdate=`ls -l $DIRLIST/$rootdir | awk '{print $6" "$7" "$8}'`
+  if [ "$ndiffs" == "0" ]; then
+    echo "   `hostname -s`: $basedir/$rootdir contents have not changed since $dirdate"
+  else
+    echo "   `hostname -s`: $basedir/$rootdir contents have changed since $dirdate"
+  fi
+  rm $currentdirlist
 }
 
 #---------------------------------------------
@@ -931,7 +966,7 @@ SETUP_QUEUES () {
   fi
 }
 
-#************************** beginning of scrript ******************************************
+#************************** beginning of script ******************************************
 
 JOBPREFIX=CB_
 SCRIPTDIR=`pwd`
@@ -1015,9 +1050,11 @@ DOWN_HOSTS=$FILES_DIR/downhosts.$$
 UP_HOSTS=$FILES_DIR/uphosts.$$
 LOCK_FILE=$HOME/.clusterbot/lockfile
 
-if [ ! -d $HOME/.clusterbot ]; then
-  mkdir $HOME/.clusterbot
-fi
+MKDIR $HOME/.clusterbot
+MKDIR $HOME/.clusterbot/dirlist
+
+DIRLIST=$HOME/.clusterbot/dirlist
+
 if [[ "$FORCE_UNLOCK" == "" ]] && [[ -e $LOCK_FILE ]]; then
   echo "***error: another instance of clusterbot.sh is running"
   echo "          If this is not the case, rerun using the -f option"
@@ -1414,6 +1451,11 @@ if [ "$?" == "1" ]; then
   HOST_CHECK $FILES_DIR 1 $CB_HOSTETH3 
   HOST_CHECK $FILES_DIR 1 $CB_HOSTETH4 
 fi
+
+echo ""
+echo "--------------------- directory content checks --------------------------"
+CHECK_DIR_LIST /etc ssh
+CHECK_DIR_LIST /etc slurm
 
 if [[ "$ONLY_RUN_TEST_CASES" != "1" ]] && [[ "$TEST_QUEUE" != "" ]]; then
   CHECK_TEST_CASES 0
