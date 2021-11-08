@@ -1330,7 +1330,19 @@ MEMORY_CHECK $FILES_DIR $CB_HOSTETH3 $CB_MEM3
 MEMORY_CHECK $FILES_DIR $CB_HOSTETH4 $CB_MEM4
 
 echo ""
-echo "--------------------- time check --------------------------"
+echo "--------------------- time checks --------------------------"
+
+CHECK_DAEMON chronyd Error $CB_HOSTS
+
+FILE_CHECK /etc/chrony.conf Error 0 $FILES_DIR $CB_HOSTS
+if [ "$?" == "1" ]; then
+  FILE_CHECK /etc/chrony.conf Error 1 $FILES_DIR $CB_HOSTETH1 
+  FILE_CHECK /etc/chrony.conf Error 1 $FILES_DIR $CB_HOSTETH2 
+  FILE_CHECK /etc/chrony.conf Error 1 $FILES_DIR $CB_HOSTETH3 
+  FILE_CHECK /etc/chrony.conf Error 1 $FILES_DIR $CB_HOSTETH4 
+  echo ""
+fi
+
 TOLERANCE=0.01
 TIME_CHECK 0 $TOLERANCE $FILES_DIR $CB_HOSTS 
 if [ "$?" == "1" ]; then
@@ -1470,16 +1482,13 @@ fi
 
 # --------------------- check daemons --------------------
 
-echo ""
-echo "--------------------- daemon check ---------------------------"
-
 GANGLIA=`ps -el | grep gmetad`
 if [ "$GANGLIA" != "" ]; then
+echo ""
+echo "--------------------- daemon check ---------------------------"
 #*** check ganglia daemon
   CHECK_DAEMON gmond Warning $CB_HOSTS
 fi
-
-CHECK_DAEMON chronyd Error $CB_HOSTS
 
 # --------------------- rpm check --------------------
 
@@ -1500,15 +1509,6 @@ ACCT_CHECK /etc/passwd $FILES_DIR $CB_HOSTS
 
 echo ""
 echo "--------------------- general file checks ------------------------------"
-
-FILE_CHECK /etc/chrony.conf Error 0 $FILES_DIR $CB_HOSTS
-if [ "$?" == "1" ]; then
-  FILE_CHECK /etc/chrony.conf Error 1 $FILES_DIR $CB_HOSTETH1 
-  FILE_CHECK /etc/chrony.conf Error 1 $FILES_DIR $CB_HOSTETH2 
-  FILE_CHECK /etc/chrony.conf Error 1 $FILES_DIR $CB_HOSTETH3 
-  FILE_CHECK /etc/chrony.conf Error 1 $FILES_DIR $CB_HOSTETH4 
-  echo ""
-fi
 
 if [ "$GANGLIA" != "" ]; then
   FILE_CHECK /etc/ganglia/gmond.conf Warning 0 $FILES_DIR $CB_HOSTS
