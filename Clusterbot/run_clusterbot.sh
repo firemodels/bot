@@ -38,29 +38,25 @@ cd $BINDIR
 BINDIR=`pwd`
 cd $CURDIR
 
-TEST=$BINDIR/test.$$
-touch $TEST
-if [ -e $TEST ]; then
-  rm $TEST
-  OUTPUT=$BINDIR/clusterbot.out
-else
-  if [ ! -d $HOME/.clusterbot ]; then
-    mkdir $HOME/.clusterbot
-  fi
-  OUTPUT=$HOME/.clusterbot/clusterbot.out
+if [ ! -d $HOME/.clusterbot ]; then
+  mkdir $HOME/.clusterbot
 fi
+OUTPUT=$HOME/.clusterbot/clusterbot.out
+
 cd $BINDIR
 
 echo updating bot repo
 git fetch origin        &> /dev/null
 git merge origin/master &> /dev/null
 
-REV=`git describe --dirty --long`
-
+echo "Revision: $REV" > $HEAD
 ./clusterbot.sh | tee  $OUTPUT
+
+nerrors=`grep ***Error $OUTPUT | wc -l`
+nwarnings=`grep ***Warning $OUTPUT | wc -l`
 if [ "$EMAIL" != "" ]; then
   echo emailing results to $EMAIL
-  cat $OUTPUT | mail -s "clusterbot status: $CB_HOSTS - $REV" $EMAIL
+  cat $OUTPUT | mail -s "$CB_HOSTS status: $nerrors Errrors, $nwarnings Warnings" $EMAIL
 fi
 
 cd $CURDIR

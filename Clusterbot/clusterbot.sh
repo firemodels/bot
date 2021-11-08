@@ -1119,7 +1119,7 @@ fi
 
 if [ "$ONLY_RUN_TEST_CASES" != "1" ]; then
   echo
-  echo "---------- $CB_HOSTS status - `date` ----------"
+  echo "---------- $CB_HOSTS status - `date`  - `git describe --dirty --long` ----------"
 fi
 if [ "$TEST_QUEUE" != "" ]; then
   echo ""
