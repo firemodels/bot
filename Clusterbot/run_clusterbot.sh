@@ -59,10 +59,10 @@ case $OPTION  in
    nopt="-n $NCASES_PER_QUEUE"
    ;;
   Q)
-   QOPT=-Q $OPTARG"
+   QOPT="-Q $OPTARG"
    ;;
   q)
-   qopt=-Q $OPTARG"
+   qopt="-q $OPTARG"
    ;;
 esac
 done
