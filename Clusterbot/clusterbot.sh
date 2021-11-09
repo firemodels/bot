@@ -133,6 +133,38 @@ CHECK_DIR_LIST()
 }
 
 #---------------------------------------------
+#                   CHECK_FILE_DATE
+#---------------------------------------------
+
+CHECK_FILE_DATE()
+{
+  local fullfile=$1
+  local file=`basename $fullfile`
+  local filels=${file}.ls
+
+  if [ ! $fullfile ]; then
+    echo "***error: $fullfile does not exist"
+    return
+  fi
+  currentfilelist=/tmp/dirlist.$$
+  ls -l $fullfile  > $currentfilelist
+  
+  if [ ! -e $DIRLIST/$filels ]; then
+    cp $currentfilelist $DIRLIST/$filels
+  fi
+  
+  diffs=`diff $DIRLIST/$filels $currentfilelist | wc -l`
+ 
+  dirdate=`cat $DIRLIST/$filels | awk '{print $6" "$7" "$8}'`
+  if [ "$diffs" == "0" ]; then
+    echo "   `hostname -s`: $fullfile has not changed since $dirdate"
+  else
+    echo "   `hostname -s`: ***Warning: $fullfile has changed since $dirdate"
+  fi
+  rm $currentfilelist
+}
+
+#---------------------------------------------
 #                   CHECK_DAEMON
 #---------------------------------------------
 
@@ -213,10 +245,10 @@ ACCT_CHECK ()
 }
 
 #---------------------------------------------
-#                   FILE_CHECK
+#                   CHECK_FILE
 #---------------------------------------------
 
-FILE_CHECK ()
+CHECK_FILE ()
 {
   local file=$1
   local ERRWARN=$2
@@ -475,9 +507,9 @@ HOST_CHECK ()
 
   if [ "$FILEDIFF" == "" ]; then
     if [  "$INDENT" == "1" ]; then
-       echo "   $CB_HOST_ARG:    $file is identical (except for entries containing localhost)"
+       echo "   $CB_HOST_ARG:    $file is identical"
     else
-       echo "   $CB_HOST_ARG: $file is identical (except for entries containing localhost)"
+       echo "   $CB_HOST_ARG: $file is identical"
     fi
     return 0
   else
@@ -1342,12 +1374,12 @@ echo "--------------------- clock checks --------------------------"
 
 CHECK_DAEMON chronyd Error $CB_HOSTS
 
-FILE_CHECK /etc/chrony.conf Error 0 $FILES_DIR $CB_HOSTS
+CHECK_FILE /etc/chrony.conf Error 0 $FILES_DIR $CB_HOSTS
 if [ "$?" == "1" ]; then
-  FILE_CHECK /etc/chrony.conf Error 1 $FILES_DIR $CB_HOSTETH1 
-  FILE_CHECK /etc/chrony.conf Error 1 $FILES_DIR $CB_HOSTETH2 
-  FILE_CHECK /etc/chrony.conf Error 1 $FILES_DIR $CB_HOSTETH3 
-  FILE_CHECK /etc/chrony.conf Error 1 $FILES_DIR $CB_HOSTETH4 
+  CHECK_FILE /etc/chrony.conf Error 1 $FILES_DIR $CB_HOSTETH1 
+  CHECK_FILE /etc/chrony.conf Error 1 $FILES_DIR $CB_HOSTETH2 
+  CHECK_FILE /etc/chrony.conf Error 1 $FILES_DIR $CB_HOSTETH3 
+  CHECK_FILE /etc/chrony.conf Error 1 $FILES_DIR $CB_HOSTETH4 
   echo ""
 fi
 
@@ -1393,12 +1425,12 @@ fi
 
 #*** check /etc/exports file
 
-FILE_CHECK /etc/exports Error 0 $FILES_DIR $CB_HOSTS
+CHECK_FILE /etc/exports Error 0 $FILES_DIR $CB_HOSTS
 if [ "$?" == "1" ]; then
-  FILE_CHECK /etc/exports Error 1 $FILES_DIR $CB_HOSTETH1 
-  FILE_CHECK /etc/exports Error 1 $FILES_DIR $CB_HOSTETH2 
-  FILE_CHECK /etc/exports Error 1 $FILES_DIR $CB_HOSTETH3 
-  FILE_CHECK /etc/exports Error 1 $FILES_DIR $CB_HOSTETH4 
+  CHECK_FILE /etc/exports Error 1 $FILES_DIR $CB_HOSTETH1 
+  CHECK_FILE /etc/exports Error 1 $FILES_DIR $CB_HOSTETH2 
+  CHECK_FILE /etc/exports Error 1 $FILES_DIR $CB_HOSTETH3 
+  CHECK_FILE /etc/exports Error 1 $FILES_DIR $CB_HOSTETH4 
 fi
 
 #*** check /etc/fstab file
@@ -1448,14 +1480,15 @@ fi
 
 #*** check slurm configuration file --------------------
 
-FILE_CHECK /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTS
+CHECK_FILE /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTS
 if [ "$?" == "1" ]; then
-  FILE_CHECK /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTETH1 
-  FILE_CHECK /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTETH2 
-  FILE_CHECK /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTETH3 
-  FILE_CHECK /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTETH4 
+  CHECK_FILE /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTETH1 
+  CHECK_FILE /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTETH2 
+  CHECK_FILE /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTETH3 
+  CHECK_FILE /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTETH4 
   echo ""
 fi
+CHECK_FILE_DATE /etc/slurm/slurmdbd.conf
 
 #*** check slurm daemon
 
@@ -1519,12 +1552,12 @@ echo ""
 echo "--------------------- general file checks ------------------------------"
 
 if [ "$GANGLIA" != "" ]; then
-  FILE_CHECK /etc/ganglia/gmond.conf Warning 0 $FILES_DIR $CB_HOSTS
+  CHECK_FILE /etc/ganglia/gmond.conf Warning 0 $FILES_DIR $CB_HOSTS
   if [ "$?" == "1" ]; then
-    FILE_CHECK /etc/ganglia/gmond.conf Warning 1 $FILES_DIR $CB_HOSTETH1 
-    FILE_CHECK /etc/ganglia/gmond.conf Warning 1 $FILES_DIR $CB_HOSTETH2 
-    FILE_CHECK /etc/ganglia/gmond.conf Warning 1 $FILES_DIR $CB_HOSTETH3 
-    FILE_CHECK /etc/ganglia/gmond.conf Warning 1 $FILES_DIR $CB_HOSTETH4 
+    CHECK_FILE /etc/ganglia/gmond.conf Warning 1 $FILES_DIR $CB_HOSTETH1 
+    CHECK_FILE /etc/ganglia/gmond.conf Warning 1 $FILES_DIR $CB_HOSTETH2 
+    CHECK_FILE /etc/ganglia/gmond.conf Warning 1 $FILES_DIR $CB_HOSTETH3 
+    CHECK_FILE /etc/ganglia/gmond.conf Warning 1 $FILES_DIR $CB_HOSTETH4 
     echo ""
   fi
 fi
@@ -1536,6 +1569,8 @@ if [ "$?" == "1" ]; then
   HOST_CHECK $FILES_DIR 1 $CB_HOSTETH3 
   HOST_CHECK $FILES_DIR 1 $CB_HOSTETH4 
 fi
+
+CHECK_FILE_DATE /etc/ssh/sshd_config
 
 echo ""
 echo "--------------------- directory content checks --------------------------"
