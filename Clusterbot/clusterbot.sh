@@ -1178,7 +1178,10 @@ fi
 if [ "$ONLY_RUN_TEST_CASES" != "1" ]; then
   echo
   echo "---------- $CB_HOSTS status - `date` ----------"
-  echo "---------- `git describe --dirty --long` ----------"
+  not_have_git=`git describe --dirty --long |& grep fatal | wc -l`
+  if [ "$not_have_git" == "0" ]; then
+    echo "---------- `git describe --dirty --long` ----------"
+  fi
 fi
 if [ "$TEST_QUEUE" != "" ]; then
   echo ""

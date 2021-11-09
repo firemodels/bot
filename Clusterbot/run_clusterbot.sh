@@ -86,9 +86,12 @@ OUTPUT=$HOME/.clusterbot/clusterbot.out
 
 cd $BINDIR
 
-echo updating bot repo
-git fetch origin        &> /dev/null
-git merge origin/master &> /dev/null
+not_have_git=`git describe --dirty --long |& grep fatal | wc -l`
+if [ "$not_have_git" == "0" ]; then
+  echo updating bot repo
+  git fetch origin        &> /dev/null
+  git merge origin/master &> /dev/null
+fi
 
 ./clusterbot.sh $fopt $nopt $QOPT $qopt | tee  $OUTPUT
 
