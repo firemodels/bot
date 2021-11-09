@@ -1446,7 +1446,7 @@ else
   echo "      a working ethernet and infiniband network connection."
 fi
 
-#*** heck slurm configuration file --------------------
+#*** check slurm configuration file --------------------
 
 FILE_CHECK /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTS
 if [ "$?" == "1" ]; then
