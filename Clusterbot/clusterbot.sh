@@ -1,16 +1,50 @@
 #!/bin/bash
 
 #---------------------------------------------
-# ---------------------------- USAGE ----------------------------------
+#                   USAGE
 #---------------------------------------------
 
 function USAGE {
   echo "Usage: clusterbot.sh "
   echo ""
-  echo "clusterbot.sh - perform various checks on a Linux cluster"
+  echo "clusterbot.sh - perform various checks to verify a Linux cluster is working properly. If the -q option"
+  echo "                is specified, run test cases on multiple nodes. The test cases are very simple designed"
+  echo "                only to verify that communication works between processes.  To run more realistic test"
+  echo "                cases, use firebot or smokebot."
   echo ""
+  echo " -f - override lock to force clusterbot run"
   echo " -h - display this message"
+  echo " -n n - run n cases on each queue [default: $NCASES_PER_QUEUE]"
+  if [ "$HAVE_CB_QUEUES" != "" ]; then
+    echo " -q q - run test cases where q is one of the queues:"
+    echo "        $CB_QUEUE1 $CB_QUEUE2 $CB_QUEUE3 $CB_QUEUE4 $CB_QUEUE5."
+    echo "        if q=each then test cases will run using "
+    echo "        each of these queues."
+  else
+    echo " -q q - run test cases using the queue q."
+  fi
+  echo " -Q  q - same as the -q option except that only test cases are run."
+  echo "         Other tests are not performed."
   exit
+}
+
+#---------------------------------------------
+#                   MKDIR
+#---------------------------------------------
+
+MKDIR ()
+{
+ local dir=$1
+
+ if [ ! -d $dir ]; then
+   echo making directory $dir
+   mkdir -p $dir
+ fi
+ if [ ! -d $dir ]; then
+   error "***error: failed to create the directory $dir"
+   return 0
+ fi
+ return 1
 }
 
 #---------------------------------------------
@@ -27,31 +61,29 @@ MAKE_DATA_DIRS()
     CB_DATA_DIR=$SCRIPTDIR
   else
     CB_DATA_DIR=$HOME/.clusterbot
-    if [ ! -d $CB_DATA_DIR ]; then
-      mkdir $CB_DATA_DIR
-    fi
+    MKDIR $CB_DATA_DIR
   fi
   OUTPUT_DIR=$CB_DATA_DIR/output
+  FDSOUTPUT_DIR=$CB_DATA_DIR/fdsoutput
   FILES_DIR=$CB_DATA_DIR/files
-  if [ ! -d $OUTPUT_DIR ]; then
-    mkdir $OUTPUT_DIR
-    if [ ! -d $OUTPUT_DIR ]; then
-      echo "***error: failed to create the directory: $OUTPUT_DIR"
-      ERROR=1
-    fi
+  MKDIR $OUTPUT_DIR
+  if [ "$?" == "0" ]; then
+    ERROR=1
   fi
-  if [ ! -d $FILES_DIR ]; then
-    mkdir $FILES_DIR
-    if [ ! -d $FILES_DIR ]; then
-      echo "***error: failed to create the directory: $FILES_DIR"
-      ERROR=1
-    fi
+  MKDIR $FDSOUTPUT_DIR
+  if [ "$?" == "0" ]; then
+    ERROR=1
+  fi
+  MKDIR $FILES_DIR
+  if [ "$?" == "0" ]; then
+    ERROR=1
   fi
   if [ "$ERROR" == "1" ]; then
     return 1
   fi
   rm -f $OUTPUT_DIR/*
   rm -f $FILES_DIR/*
+  rm -f $FDSOUTPUT_DIR/*
   return 0
 }
 
@@ -74,6 +106,33 @@ SETUP_CLCK()
 }
 
 #---------------------------------------------
+#                   CHECK_DIR_LIST
+#---------------------------------------------
+
+CHECK_DIR_LIST()
+{
+  local basedir=$1
+  local rootdir=$2
+
+  currentdirlist=/tmp/dirlist.$$
+  ls -l $basedir/$rootdir | sed '1 d' > $currentdirlist
+  
+  if [ ! -d $DIRLIST/$rootdir ]; then
+    cp $currentdirlist $DIRLIST/$rootdir
+  fi
+  
+  ndiffs=`diff $DIRLIST/$rootdir $currentdirlist | wc -l`
+ 
+  dirdate=`ls -l $DIRLIST/$rootdir | awk '{print $6" "$7" "$8}'`
+  if [ "$ndiffs" == "0" ]; then
+    echo "   `hostname -s`: $basedir/$rootdir contents have not changed since $dirdate"
+  else
+    echo "   `hostname -s`: $basedir/$rootdir contents have changed since $dirdate"
+  fi
+  rm $currentdirlist
+}
+
+#---------------------------------------------
 #                   CHECK_DAEMON
 #---------------------------------------------
 
@@ -85,7 +144,7 @@ CHECK_DAEMON ()
 
 DAEMONOUT=$FILES_DIR/daemon.out.$$
 
-pdsh -t 2 -w $CB_HOST_ARG "ps -el | grep $DAEMON_ARG | wc -l" |&  grep -v ssh | sort >& $DAEMONOUT
+pdsh -t 2 -w $CB_HOST_ARG "ps -el | grep $DAEMON_ARG | wc -l" |&  grep -v ssh | grep -v Connection | sort >& $DAEMONOUT
 DAEMONDOWN=
 while read line 
 do
@@ -114,16 +173,17 @@ ACCT_CHECK ()
 {
   local file=$1
   local outdir=$2
+
   local CB_HOST_ARG=$3
 
   if [ "$CB_HOST_ARG" == "" ]; then
     return 0
   fi
   FILE_OUT=$outdir/file_out
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getfile.sh $file $outdir |& grep -v ssh | sort >& $FILE_OUT
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getfile.sh $file $outdir |& grep -v ssh | grep -v Connection | sort >& $FILE_OUT
   file0=`head -1 $FILE_OUT | awk '{print $2}'`
 
-  CURDIR=`pwd`
+  local CURDIR=`pwd`
   cd $outdir
  
   FILEDIFF=
@@ -168,10 +228,10 @@ FILE_CHECK ()
     return 0
   fi
   FILE_OUT=$outdir/file_out
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getfile.sh $file $outdir |& grep -v ssh | sort >& $FILE_OUT
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getfile.sh $file $outdir |& grep -v ssh | grep -v Connection | sort >& $FILE_OUT
   file0=`head -1 $FILE_OUT | awk '{print $2}'`
 
-  CURDIR=`pwd`
+  local CURDIR=`pwd`
   cd $outdir
  
   FILEDIFF=
@@ -208,6 +268,64 @@ FILE_CHECK ()
 }
 
 #---------------------------------------------
+#                   TIME_CHECK
+#---------------------------------------------
+
+TIME_CHECK ()
+{
+  local INDENT=$1
+  local TOLERANCE=$2
+  local outdir=$3
+  local CB_HOST_ARG=$4
+
+  if [ "$CB_HOST_ARG" == "" ]; then
+    return 0
+  fi
+  FILE_OUT=$outdir/file_out
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/gettime_error.sh |& grep -v ssh | grep -v Connection | sort >& $FILE_OUT
+
+  local CURDIR=`pwd`
+  cd $outdir
+ 
+  MAX_ERROR=`head -1 $FILE_OUT | awk '{print $2}'`
+  TIMEERROR_LIST=
+  while read line 
+  do
+    hosti=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
+    timei=`echo $line | awk '{print $2}'`
+    IS_BIGGER=`echo "$timei > $MAX_ERROR" | bc -l`
+    if [ "$IS_BIGGER" == "1" ]; then
+      MAX_ERROR=$timei
+    fi
+    TOBIG=`echo "$timei > $TOLERANCE" | bc -l`
+    if [ "$TOBIG" == "1" ]; then
+      if [ "$TIMEROR_LIST" == "" ]; then
+        TIMEERROR_LIST="$hosti/$timei"
+      else
+        TIMEERROR_LIST="$TIMEERROR_LIST $hosti/$timei"
+      fi
+    fi
+  done < $FILE_OUT
+  cd $CURDIR
+
+  if [ "$TIMEERROR_LIST" == "" ]; then
+    if [ "$INDENT" == "1" ]; then
+      echo "   $CB_HOST_ARG:    max error = $MAX_ERROR s < $TOLERANCE s"
+    else
+      echo "   $CB_HOST_ARG: max error = $MAX_ERROR s < $TOLERANCE s"
+    fi
+    return 0
+  else
+    if [ "$INDENT" == "1" ]; then
+      echo "   $CB_HOST_ARG:    ***Error: time error > $TOLERANCE s on $TIMEERROR_LIST"
+    else
+      echo "   $CB_HOST_ARG: ***Error: time error > $TOLERANCE s on $TIMEERROR_LIST"
+    fi
+    return 1
+  fi
+}
+
+#---------------------------------------------
 #                   MOUNT_CHECK
 #---------------------------------------------
 
@@ -216,16 +334,17 @@ MOUNT_CHECK ()
   local INDENT=$1
   local outdir=$2
   local CB_HOST_ARG=$3
+
   file="NFS mounts"
 
   if [ "$CB_HOST_ARG" == "" ]; then
     return 0
   fi
   FILE_OUT=$outdir/file_out
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getmounts.sh $outdir |& grep -v ssh | sort >& $FILE_OUT
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getmounts.sh $outdir |& grep -v ssh | grep -v Connection | sort >& $FILE_OUT
   file0=`head -1 $FILE_OUT | awk '{print $2}'`
 
-  CURDIR=`pwd`
+  local CURDIR=`pwd`
   cd $outdir
  
   FILEDIFF=
@@ -270,16 +389,17 @@ FSTAB_CHECK ()
   local outdir=$1
   local INDENT=$2
   local CB_HOST_ARG=$3
+
   file=/etc/fstab
 
   if [ "$CB_HOST_ARG" == "" ]; then
     return 0
   fi
   FILE_OUT=$outdir/file_out
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getfstab.sh $outdir |& grep -v ssh | sort >& $FILE_OUT
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getfstab.sh $outdir |& grep -v ssh | grep -v Connection | sort >& $FILE_OUT
   file0=`head -1 $FILE_OUT | awk '{print $2}'`
 
-  CURDIR=`pwd`
+  local CURDIR=`pwd`
   cd $outdir
  
   FILEDIFF=
@@ -324,16 +444,17 @@ HOST_CHECK ()
   local outdir=$1
   INDENT=$2
   local CB_HOST_ARG=$3
+
   file=/etc/hosts
 
   if [ "$CB_HOST_ARG" == "" ]; then
     return 0
   fi
   FILE_OUT=$outdir/hosts_out
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/gethost.sh $outdir |& grep -v ssh | sort >& $FILE_OUT
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/gethost.sh $outdir |& grep -v ssh | grep -v Connection | sort >& $FILE_OUT
   file0=`head -1 $FILE_OUT | awk '{print $2}'`
 
-  CURDIR=`pwd`
+  local CURDIR=`pwd`
   cd $outdir
  
   FILEDIFF=
@@ -384,7 +505,7 @@ fi
 rm -f $FILES_DIR/rpm*.txt
 pdsh -t 2 -w $CB_HOST_ARG `pwd`/getrpms.sh $FILES_DIR >& $SLURMRPMOUT
 
-CURDIR=`pwd`
+local CURDIR=`pwd`
 cd $FILES_DIR
 rpm0=`ls -l rpm*.txt | head -1 | awk '{print $9}'`
 host0=`echo $rpm0 | sed 's/.txt$//'`
@@ -465,8 +586,8 @@ IBSPEED ()
   if [ "$CB_HOST_ARG" == "" ]; then
     return
   fi
-  CURDIR=`pwd`
-  pdsh -t 2 -w $CB_HOST_ARG $CURDIR/ibspeed.sh |& grep -v ssh | sort >& $IBRATE
+  local CURDIR=`pwd`
+  pdsh -t 2 -w $CB_HOST_ARG $CURDIR/ibspeed.sh |& grep -v ssh | grep -v Connection | sort >& $IBRATE
   RATE0=`head -1 $IBRATE | awk '{print $2}'`
   if [ "$RATE0" == "0" ]; then
     return
@@ -509,7 +630,7 @@ RUN_CLUSTER_CHECK ()
     OUTFILE=$OUTPUT_DIR/${LOG}.out
     RESULTSFILE=$OUTPUT_DIR/${LOG}_results.out
     pdsh -t 2 -w $CB_HOST_ARG date   >& $CLUSTEROUT
-    sort $CLUSTEROUT | grep -v ssh | awk '{print $1 }' | awk -F':' '{print $1}' > $NODEFILE
+    sort $CLUSTEROUT | grep -v ssh | grep -v Connection | awk '{print $1 }' | awk -F':' '{print $1}' > $NODEFILE
     nup=`wc -l $NODEFILE`
     if [ "$nup" == "0" ]; then
       echo "   $CB_HOST_ARG: ***Error: all hosts are down - cluster checker not run"
@@ -534,7 +655,7 @@ PROVISION_DATE_CHECK ()
   if [ "$CB_HOSTETH_ARG" == "" ]; then
     return 0
   fi
-  pdsh -t 2 -w $CB_HOSTETH_ARG `pwd`/getrevdate.sh |&  grep -v ssh | sort >  $FSOUT 2>&1
+  pdsh -t 2 -w $CB_HOSTETH_ARG `pwd`/getrevdate.sh |&  grep -v ssh | grep -v Connection | sort >  $FSOUT 2>&1
 
   NF0=`head -1 $FSOUT | awk '{print $2}'`
   FSDOWN=
@@ -570,7 +691,7 @@ CORE_CHECK ()
   if [ "$CB_HOSTETH_ARG" == "" ]; then
     return 0
   fi
-  pdsh -t 2 -w $CB_HOSTETH_ARG "grep cpuid /proc/cpuinfo | wc -l" |&  grep -v ssh | sort >  $FSOUT 2>&1
+  pdsh -t 2 -w $CB_HOSTETH_ARG "grep cpuid /proc/cpuinfo | wc -l" |&  grep -v ssh | grep -v Connection | sort >  $FSOUT 2>&1
 
   NF0=`head -1 $FSOUT | awk '{print $2}'`
   FSDOWN=
@@ -639,10 +760,10 @@ MEMORY_CHECK ()
     return 0
   fi
   MEMORY_OUT=$outdir/memory_out
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getmem.sh  |& grep -v ssh | sort >& $MEMORY_OUT
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getmem.sh  |& grep -v ssh | grep -v Connection | sort >& $MEMORY_OUT
   memory0=`head -1 $MEMORY_OUT | awk '{print $2}'`
 
-  CURDIR=`pwd`
+  local CURDIR=`pwd`
   cd $outdir
  
   MEMORY_DIFF=
@@ -664,7 +785,7 @@ MEMORY_CHECK ()
   if [ "$MEMORY_DIFF" == "" ]; then
     echo "   $CB_HOST_ARG: $memory0 MB or greater"
   else
-    echo "   $CB_HOST_ARG: ***Warning: $memory0 MB or greater xcept on $MEMORY_DIFF "
+    echo "   $CB_HOST_ARG: ***Warning: $memory0 MB or greater except on $MEMORY_DIFF "
   fi
 }
 
@@ -681,10 +802,10 @@ SPEED_CHECK ()
     return 0
   fi
   SPEED_OUT=$outdir/speed_out
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getspeed.sh  |& grep -v ssh | sort >& $SPEED_OUT
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getspeed.sh  |& grep -v ssh | grep -v Connection | sort >& $SPEED_OUT
   speed0=`head -1 $SPEED_OUT | awk '{print $2}'`
 
-  CURDIR=`pwd`
+  local CURDIR=`pwd`
   cd $outdir
  
   SPEED_DIFF=
@@ -715,7 +836,8 @@ SPEED_CHECK ()
 
 IS_HOST_UP ()
 {
-  ITEM=$1
+  local ITEM=$1
+
   for i in $UP_ETH ; do
     if [ "$ITEM" == "$i" ]; then
       return 1
@@ -724,8 +846,199 @@ IS_HOST_UP ()
   return 0
 }
 
-#************************** beginning of scrript ******************************************
+#---------------------------------------------
+#                   GET_CHID
+#---------------------------------------------
 
+GET_CHID ()
+{
+  local base=$1
+  local num=$2
+
+  if [ $num -gt 99 ]; then
+    CHID=$base$num
+  else
+    if [ $num -gt 9 ]; then
+      CHID=${base}0$num
+    else
+      CHID=${base}00$num
+    fi
+  fi
+  echo $CHID
+}
+
+#---------------------------------------------
+#                   HAVE_JOBS_RUNNING
+#---------------------------------------------
+
+HAVE_JOBS_RUNNING ()
+{
+  local PREFIX=$1
+
+  JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $PREFIX | grep -v 'C$' | wc -l`
+  if [ "$JOBS_REMAINING" == "0" ]; then
+    return 0;
+  fi
+  return 1
+}
+
+#---------------------------------------------
+#                   WAIT_CASES_END
+#---------------------------------------------
+
+WAIT_TEST_CASES_END()
+{
+  local PREFIX=$1
+  local REPORT_STATUS=$2
+
+# Scans job queue and waits for cases to end
+  while          [[ `qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $PREFIX | grep -v 'C$'` != '' ]]; do
+    JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $PREFIX | grep -v 'C$' | wc -l`
+    if [ "$REPORT_STATUS" == "1" ]; then
+      echo "Waiting for $JOBS_REMAINING test cases to complete."
+    fi
+    sleep 30
+  done
+}
+
+#---------------------------------------------
+#                   RUN_TEST_CASES
+#---------------------------------------------
+
+RUN_TEST_CASES ()
+{
+  local PREFIX=$1
+  local QUEUE=$2
+
+  local CURDIR=`pwd`
+
+  if [ "$QUEUE" == "" ]; then
+    return
+  fi
+
+# make sure we can find qfds.sh 
+  QFDS=
+  QFDSDIR=$FIREMODELS/fds/Utilities/Scripts
+  if [ -d $QFDSDIR ]; then
+    cd $QFDSDIR
+    QFDS=`pwd`/qfds.sh
+    if [ ! -e $QFDS ]; then
+      QFDS=
+    fi
+    cd $CURDIR
+  fi
+  if [ "$QFDS" == "" ]; then
+    echo "***error: qfds.sh not found, test cases not run"
+    return 1
+  fi
+  if [ "$FIREMODELS" == "" ]; then
+    echo "***error: FIREMODELS environment variable not defined,"
+    echo "          test cases not run."
+    return 1
+  else
+    if [ ! -e $FIREMODELS/fds/Build/impi_intel_linux_64/fds_impi_intel_linux_64 ]; then
+       echo "***error: fds executable not found.  Was expecting it at:"
+       echo "          $FIREMODELS/fds/Build/impi_intel_linux_64/fds_impi_intel_linux_64 ,"
+       echo "          test cases not run."
+       return 1
+    fi
+  fi 
+  
+  cd $FDSOUTPUT_DIR
+  for i in `seq 1 $NCASES_PER_QUEUE`; do
+    CHID=`GET_CHID ${QUEUE}_ $i`
+    ../makecase.sh $CHID $FDSOUTPUT_DIR
+    $QFDS -p 24 -j $PREFIX -q $QUEUE $CHID.fds >& /dev/null
+  done
+  echo "   $NCASES_PER_QUEUE test cases submitted to the $QUEUE queue"
+  cd $CURDIR
+}
+
+#---------------------------------------------
+#                   CHECK_FDS_OUT
+#---------------------------------------------
+
+CHECK_FDS_OUT ()
+{
+  local PREFIX=$1
+  local QUEUE=$2
+
+  if [ "$QUEUE" == "" ]; then
+    return
+  fi
+
+  local CURDIR=`pwd`
+
+  cd $FDSOUTPUT_DIR
+  FAIL=0
+  for i in `seq 1 $NCASES_PER_QUEUE`; do
+    CHID=`GET_CHID ${QUEUE}_ $i`
+    OUTFILE=$CHID.out
+    if [ -e $OUTFILE ]; then
+      CHECK=`tail -10 $OUTFILE | grep successfully | wc -l`
+    else
+      CHECK=0
+    fi
+    if [ "$CHECK" == "0" ]; then
+      FAIL=$((FAIL+1))
+    fi
+  done
+  if [ "$FAIL" == "0" ]; then
+    echo "$QUEUE:   all $NCASES_PER_QUEUE cases ran successfully"
+  else
+    echo "$QUEUE: ***error: $FAIL out of $NCASES_PER_QUEUE cases failed to run"
+  fi
+  cd $CURDIR
+}
+
+#---------------------------------------------
+#                   CHECK_TEST_CASES
+#---------------------------------------------
+
+CHECK_TEST_CASES ()
+{
+  local REPORT_STATUS=$1
+  echo ""
+  echo "--------------------- check test cases ------------------------------"
+  WAIT_TEST_CASES_END $JOBPREFIX $REPORT_STATUS
+  if [ "$TEST_QUEUE" == "each" ]; then
+    CHECK_FDS_OUT $JOBPREFIX $CB_QUEUE1
+    CHECK_FDS_OUT $JOBPREFIX $CB_QUEUE2
+    CHECK_FDS_OUT $JOBPREFIX $CB_QUEUE3
+    CHECK_FDS_OUT $JOBPREFIX $CB_QUEUE4
+    CHECK_FDS_OUT $JOBPREFIX $CB_QUEUE5
+  else
+    CHECK_FDS_OUT $JOBPREFIX $TEST_QUEUE
+  fi
+}
+
+#---------------------------------------------
+#                   SETUP_QUEUES
+#---------------------------------------------
+
+SETUP_QUEUES () {
+  TEST_QUEUE=$1
+  if [ "$TEST_QUEUE" == "each" ]; then
+    if [ "$HAVE_CB_QUEUES" == "" ]; then
+      echo "***error: environment variables CB_QUEUE1, CB_QUEUE2, "
+      echo "          CB_QUEUE3, CB_QUEUE4 and/or CB_QUEUE5 not defined"
+      echo "          use a different queue name"
+      exit
+    fi
+  else
+    sinfo | awk 'NR > 2 { print $1 }' | awk -F'*' '{print $1}' | sort -u > /tmp/queues.$$
+    have_queue=`grep -w $TEST_QUEUE /tmp/queues.$$ | wc -l`
+    rm /tmp/queues.$$
+    if [ "$have_queue" == "0" ]; then
+      echo "***error: $TEST_QUEUE is an invalid queue"
+      exit
+     fi
+  fi
+}
+
+#************************** beginning of script ******************************************
+
+JOBPREFIX=CB_
 SCRIPTDIR=`pwd`
 BIN=`dirname "$0"`
 if [ "$BIN" == "." ]; then
@@ -733,18 +1046,59 @@ if [ "$BIN" == "." ]; then
 fi
 SCRIPTDIR=$SCRIPTDIR/$BIN
 
-while getopts 'h' OPTION
+TEST_QUEUE=
+HAVE_CB_QUEUES=
+if [ "$CB_QUEUE1" != "" ]; then
+  HAVE_CB_QUEUES=1
+fi
+if [ "$CB_QUEUE2" != "" ]; then
+  HAVE_CB_QUEUES=1
+fi
+if [ "$CB_QUEUE3" != "" ]; then
+  HAVE_CB_QUEUES=1
+fi
+if [ "$CB_QUEUE4" != "" ]; then
+  HAVE_CB_QUEUES=1
+fi
+if [ "$CB_QUEUE5" != "" ]; then
+  HAVE_CB_QUEUES=1
+fi
+
+NCASES_PER_QUEUE=20
+FORCE_UNLOCK=
+ONLY_RUN_TEST_CASES=
+
+while getopts 'fhn:q:Q:' OPTION
 do
 case $OPTION  in
+  f)
+   FORCE_UNLOCK=1
+   ;;
   h)
    USAGE
    exit
+   ;;
+  n)
+   NCASES="$OPTARG"
+   re='^[0-9]+$'
+   if ! [[ $NCASES =~ $re ]] ; then
+     echo "***error: -n $NCASES not a number"
+     exit
+   fi 
+   NCASES_PER_QUEUE=$NCASES
+   ;;
+  Q)
+   ONLY_RUN_TEST_CASES=1
+   SETUP_QUEUES $OPTARG
+   ;;
+  q)
+   SETUP_QUEUES $OPTARG
    ;;
 esac
 done
 shift $(($OPTIND-1))
 
-# --------------------- make surer output directories exist  --------------------
+# --------------------- make sure output directories exist  --------------------
 
 MAKE_DATA_DIRS ||  exit
 
@@ -764,6 +1118,20 @@ SLURMOUT=$FILES_DIR/slurmout.$$
 SLURMRPMOUT=$FILES_DIR/slurmrpmout.$$
 DOWN_HOSTS=$FILES_DIR/downhosts.$$
 UP_HOSTS=$FILES_DIR/uphosts.$$
+LOCK_FILE=$HOME/.clusterbot/lockfile
+
+MKDIR $HOME/.clusterbot
+MKDIR $HOME/.clusterbot/dirlist
+
+DIRLIST=$HOME/.clusterbot/dirlist
+
+if [[ "$FORCE_UNLOCK" == "" ]] && [[ -e $LOCK_FILE ]]; then
+  echo "***error: another instance of clusterbot.sh is running"
+  echo "          If this is not the case, rerun using the -f option"
+  exit
+fi
+
+touch $LOCK_FILE
 
 # --------------------- setup Intel cluster checker  --------------------
 
@@ -804,8 +1172,45 @@ if [ "$ERROR" == "1" ]; then
   exit
 fi
 
-echo
-echo "---------- $CB_HOSTS status - `date` ----------"
+# --------------------- run fds test cases --------------------
+# (check that they finished ok at the end of the script)
+
+if [ "$ONLY_RUN_TEST_CASES" != "1" ]; then
+  echo
+  echo "---------- $CB_HOSTS status - `date` ----------"
+  echo "---------- `git describe --dirty --long` ----------"
+fi
+if [ "$TEST_QUEUE" != "" ]; then
+  echo ""
+  echo "--------------------- submitting test cases ------------------------------"
+  HAVE_JOBS_RUNNING $JOBPREFIX
+  if [ "$?" == "1" ]; then
+    echo "***error: clusterbot cases are still running"
+    echo "          kill these cases or start clusterbot again WITHOUT the -q option"
+    exit
+  fi
+  if [ "$TEST_QUEUE" == "each" ]; then
+    RUN_TEST_CASES $JOBPREFIX $CB_QUEUE1
+    RUN_TEST_CASES $JOBPREFIX $CB_QUEUE2
+    RUN_TEST_CASES $JOBPREFIX $CB_QUEUE3
+    RUN_TEST_CASES $JOBPREFIX $CB_QUEUE4
+    RUN_TEST_CASES $JOBPREFIX $CB_QUEUE5
+  else
+    RUN_TEST_CASES $JOBPREFIX $TEST_QUEUE
+  fi
+fi
+if [ "$ONLY_RUN_TEST_CASES" == "1" ]; then
+  CHECK_TEST_CASES $ONLY_RUN_TEST_CASES
+  STOP_TIME=`date`
+  echo ""
+  echo "--------------------- clusterbot complete ------------------------------"
+  echo "start time: $START_TIME"
+  echo "stop time: $STOP_TIME"
+
+  rm $LOCK_FILE
+  exit
+fi
+
 echo ""
 echo "--------------------- network checks --------------------------"
 # --------------------- check ethernet --------------------
@@ -847,7 +1252,7 @@ fi
 
 # --------------------- check for hosts with working ethernet, non-working infiniband  --------------------
 
-UP_ETH=` pdsh -t 2 -w $CB_HOSTS   date |& grep -v ssh  | awk -F':' '{print $1}' | sort` 
+UP_ETH=` pdsh -t 2 -w $CB_HOSTS   date |& grep -v ssh  | grep -v Connection | awk -F':' '{print $1}' | sort` 
 
 IB_LIST=
 if [ "$IBDOWN" != "" ]; then
@@ -930,11 +1335,34 @@ MEMORY_CHECK $FILES_DIR $CB_HOSTETH3 $CB_MEM3
 MEMORY_CHECK $FILES_DIR $CB_HOSTETH4 $CB_MEM4
 
 echo ""
+echo "--------------------- time checks --------------------------"
+
+CHECK_DAEMON chronyd Error $CB_HOSTS
+
+FILE_CHECK /etc/chrony.conf Error 0 $FILES_DIR $CB_HOSTS
+if [ "$?" == "1" ]; then
+  FILE_CHECK /etc/chrony.conf Error 1 $FILES_DIR $CB_HOSTETH1 
+  FILE_CHECK /etc/chrony.conf Error 1 $FILES_DIR $CB_HOSTETH2 
+  FILE_CHECK /etc/chrony.conf Error 1 $FILES_DIR $CB_HOSTETH3 
+  FILE_CHECK /etc/chrony.conf Error 1 $FILES_DIR $CB_HOSTETH4 
+  echo ""
+fi
+
+TOLERANCE=0.01
+TIME_CHECK 0 $TOLERANCE $FILES_DIR $CB_HOSTS 
+if [ "$?" == "1" ]; then
+  TIME_CHECK 1 $TOLERANCE $FILES_DIR $CB_HOSTETH1 
+  TIME_CHECK 1 $TOLERANCE $FILES_DIR $CB_HOSTETH2
+  TIME_CHECK 1 $TOLERANCE $FILES_DIR $CB_HOSTETH3 
+  TIME_CHECK 1 $TOLERANCE $FILES_DIR $CB_HOSTETH4 
+fi
+
+echo ""
 echo "--------------------- disk check -------------------------"
 
 #*** check number of file systems mounted
 
-pdsh -t 2 -w $CB_HOSTS "df -k -t nfs | tail -n +2 | wc -l" |&  grep -v ssh | sort >& $FSOUT
+pdsh -t 2 -w $CB_HOSTS "df -k -t nfs | tail -n +2 | wc -l" |&  grep -v ssh | grep -v Connection | sort >& $FSOUT
 cat $FSOUT | awk -F':' '{print $1}' > $UP_HOSTS
 
 NF0=`head -1 $FSOUT | awk '{print $2}'`
@@ -1032,7 +1460,7 @@ CHECK_DAEMON slurmd Error $CB_HOSTS
 
 #*** check slurm rpm
 
-pdsh -t 2 -w $CB_HOSTS "rpm -qa | grep slurm | grep devel" |& grep -v ssh | sort >& $SLURMRPMOUT
+pdsh -t 2 -w $CB_HOSTS "rpm -qa | grep slurm | grep devel" |& grep -v ssh | grep -v Connection | sort >& $SLURMRPMOUT
 SLURMRPM0=`head -1 $SLURMRPMOUT | awk '{print $2}'`
 SLURMBAD=
 while read line 
@@ -1059,16 +1487,13 @@ fi
 
 # --------------------- check daemons --------------------
 
-echo ""
-echo "--------------------- daemon check ---------------------------"
-
 GANGLIA=`ps -el | grep gmetad`
 if [ "$GANGLIA" != "" ]; then
+echo ""
+echo "--------------------- daemon check ---------------------------"
 #*** check ganglia daemon
   CHECK_DAEMON gmond Warning $CB_HOSTS
 fi
-
-CHECK_DAEMON chronyd Error $CB_HOSTS
 
 # --------------------- rpm check --------------------
 
@@ -1090,15 +1515,6 @@ ACCT_CHECK /etc/passwd $FILES_DIR $CB_HOSTS
 echo ""
 echo "--------------------- general file checks ------------------------------"
 
-FILE_CHECK /etc/chrony.conf Error 0 $FILES_DIR $CB_HOSTS
-if [ "$?" == "1" ]; then
-  FILE_CHECK /etc/chrony.conf Error 1 $FILES_DIR $CB_HOSTETH1 
-  FILE_CHECK /etc/chrony.conf Error 1 $FILES_DIR $CB_HOSTETH2 
-  FILE_CHECK /etc/chrony.conf Error 1 $FILES_DIR $CB_HOSTETH3 
-  FILE_CHECK /etc/chrony.conf Error 1 $FILES_DIR $CB_HOSTETH4 
-  echo ""
-fi
-
 if [ "$GANGLIA" != "" ]; then
   FILE_CHECK /etc/ganglia/gmond.conf Warning 0 $FILES_DIR $CB_HOSTS
   if [ "$?" == "1" ]; then
@@ -1118,8 +1534,19 @@ if [ "$?" == "1" ]; then
   HOST_CHECK $FILES_DIR 1 $CB_HOSTETH4 
 fi
 
+echo ""
+echo "--------------------- directory content checks --------------------------"
+CHECK_DIR_LIST /etc ssh
+CHECK_DIR_LIST /etc slurm
+
+if [[ "$ONLY_RUN_TEST_CASES" != "1" ]] && [[ "$TEST_QUEUE" != "" ]]; then
+  CHECK_TEST_CASES 0
+fi
+
 STOP_TIME=`date`
 echo ""
 echo "--------------------- clusterbot complete ------------------------------"
 echo "start time: $START_TIME"
 echo "stop time: $STOP_TIME"
+
+rm $LOCK_FILE
