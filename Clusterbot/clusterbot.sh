@@ -117,7 +117,7 @@ CHECK_DIR_LIST()
   currentdirlist=/tmp/dirlist.$$
   ls -l $basedir/$rootdir | sed '1 d' > $currentdirlist
   
-  if [ ! -d $DIRLIST/$rootdir ]; then
+  if [ ! -e $DIRLIST/$rootdir ]; then
     cp $currentdirlist $DIRLIST/$rootdir
   fi
   
@@ -310,16 +310,16 @@ TIME_CHECK ()
 
   if [ "$TIMEERROR_LIST" == "" ]; then
     if [ "$INDENT" == "1" ]; then
-      echo "   $CB_HOST_ARG:    max error = $MAX_ERROR s < $TOLERANCE s"
+      echo "   $CB_HOST_ARG:    max clock error = $MAX_ERROR s < $TOLERANCE s"
     else
-      echo "   $CB_HOST_ARG: max error = $MAX_ERROR s < $TOLERANCE s"
+      echo "   $CB_HOST_ARG: max clock error = $MAX_ERROR s < $TOLERANCE s"
     fi
     return 0
   else
     if [ "$INDENT" == "1" ]; then
-      echo "   $CB_HOST_ARG:    ***Error: time error > $TOLERANCE s on $TIMEERROR_LIST"
+      echo "   $CB_HOST_ARG:    ***Error: clock error > $TOLERANCE s on $TIMEERROR_LIST"
     else
-      echo "   $CB_HOST_ARG: ***Error: time error > $TOLERANCE s on $TIMEERROR_LIST"
+      echo "   $CB_HOST_ARG: ***Error: clock error > $TOLERANCE s on $TIMEERROR_LIST"
     fi
     return 1
   fi
@@ -676,7 +676,7 @@ PROVISION_DATE_CHECK ()
   if [ "$FSDOWN" == "" ]; then
     echo "   $CB_HOSTETH_ARG: imaged on $NF0"
   else
-    echo "   $CB_HOSTETH_ARG: built on $NF0 except for $FSDOWN"
+    echo "   $CB_HOSTETH_ARG: imaged on $NF0 except for $FSDOWN"
   fi
 }
 
@@ -1335,7 +1335,7 @@ MEMORY_CHECK $FILES_DIR $CB_HOSTETH3 $CB_MEM3
 MEMORY_CHECK $FILES_DIR $CB_HOSTETH4 $CB_MEM4
 
 echo ""
-echo "--------------------- time checks --------------------------"
+echo "--------------------- clock checks --------------------------"
 
 CHECK_DAEMON chronyd Error $CB_HOSTS
 
