@@ -5,18 +5,14 @@
 #---------------------------------------------
 
 function USAGE {
-  echo "Usage: clusterbot.sh "
+  echo "Usage: run_smokebot.sh [options]"
   echo ""
-  echo "clusterbot.sh - perform various checks on a Linux cluster"
-  echo ""
-  echo " -h - display this message"
-  echo "Usage: clusterbot.sh "
-  echo ""
-  echo "clusterbot.sh - perform various checks to verify a Linux cluster is working properly. If the -q option"
+  echo "run_clusterbot.sh - perform various checks to verify a Linux cluster is working properly. If the -q option"
   echo "                is specified, run test cases on multiple nodes. The test cases are very simple designed"
   echo "                only to verify that communication works between processes.  To run more realistic test"
   echo "                cases, use firebot or smokebot."
   echo ""
+  echo "Options:"
   echo " -f - override lock to force clusterbot run"
   echo " -h - display this message"
   echo " -m email_address - send results to email_address"
