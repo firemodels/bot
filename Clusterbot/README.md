@@ -37,7 +37,7 @@ Options:
  -f - override lock to force clusterbot run
  -h - display this message
  -m email_address - send results to email_address
- -n n - run n cases on each queue [default: ]
+ -n n - run n cases on each queue [default: 20]
  -q q - run test cases using the queue q.
  -Q q - same as the -q option except that only test cases are run.
          Other tests are not performed.
