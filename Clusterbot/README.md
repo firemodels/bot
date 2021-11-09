@@ -20,6 +20,28 @@ To run clusterbot
   9. Check group and passwd files are identical.  Failure of this check can cause problems with some people's logins.
   10. Check /etc/ssh and /etc/slurm directories have not changed
   11. Run the Intel cluster checker
+  12. Run fds test cases.  20 test cases will run on the queue named q if you run clusterbot.sh with the `-q q` option .  The test
+   case is a simple 24 mesh case designed solely to test the communication between MPI processes
+   
+   ### Clusterbot usage
+
+```
+   Usage: run_smokebot.sh [options]
+
+run_clusterbot.sh - perform various checks to verify a Linux cluster is working properly. If the -q option
+                is specified, run test cases on multiple nodes. The test cases are very simple designed
+                only to verify that communication works between processes.  To run more realistic test
+                cases, use firebot or smokebot.
+
+Options:
+ -f - override lock to force clusterbot run
+ -h - display this message
+ -m email_address - send results to email_address
+ -n n - run n cases on each queue [default: ]
+ -q q - run test cases using the queue q.
+ -Q q - same as the -q option except that only test cases are run.
+         Other tests are not performed.
+```
   
 
 
