@@ -287,11 +287,16 @@ TIME_CHECK ()
   local CURDIR=`pwd`
   cd $outdir
  
+  MAX_ERROR=`head -1 $FILE_OUT | awk '{print $2}'`
   TIMEERROR_LIST=
   while read line 
   do
     hosti=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
     timei=`echo $line | awk '{print $2}'`
+    IS_BIGGER=`echo "$timei > $MAX_ERROR" | bc -l`
+    if [ "$IS_BIGGER" == "1" ]; then
+      MAX_ERROR=$timei
+    fi
     TOBIG=`echo "$timei > $TOLERANCE" | bc -l`
     if [ "$TOBIG" == "1" ]; then
       if [ "$TIMEROR_LIST" == "" ]; then
@@ -305,9 +310,9 @@ TIME_CHECK ()
 
   if [ "$TIMEERROR_LIST" == "" ]; then
     if [ "$INDENT" == "1" ]; then
-      echo "   $CB_HOST_ARG:    all time errors < $TOLERANCE s"
+      echo "   $CB_HOST_ARG:    max error = $MAX_ERROR s < $TOLERANCE s"
     else
-      echo "   $CB_HOST_ARG: all time errors < $TOLERANCE s"
+      echo "   $CB_HOST_ARG: max error = $MAX_ERROR s < $TOLERANCE s"
     fi
     return 0
   else
