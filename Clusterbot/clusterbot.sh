@@ -754,7 +754,7 @@ RUN_CLUSTER_CHECK ()
     pdsh -t 2 -w $CB_HOST_ARG date   >& $CLUSTEROUT
     sort $CLUSTEROUT | grep -v ssh | grep -v Connection | awk '{print $1 }' | awk -F':' '{print $1}' > $NODEFILE
     nup=`wc -l $NODEFILE`
-    if [ $nup -eq 0 ]; then
+    if [ "$nup" == "0" ]; then
       echo "   $CB_HOST_ARG: ***Error: all hosts are down - cluster checker not run"
     else
       echo "   $CB_HOST_ARG: results in `basename $RESULTSFILE` and `basename $WARNINGFILE`"
@@ -1554,7 +1554,7 @@ TEMP_SSH=/tmp/ssh.$$
 pdsh -t 2 -w $CB_HOSTS "df -k -t nfs | tail -n +2 | wc -l" >& $TEMP_SSH
 cat $TEMP_SSH | grep -v ssh | grep -v Connection | sort >& $FSOUT
 cat $FSOUT | awk -F':' '{print $1}' > $UP_HOSTS
-rm -f $TEMP_OUT
+rm -f $TEMP_SSH
 
 NF0=`head -1 $FSOUT | awk '{print $2}'`
 FSDOWN=
