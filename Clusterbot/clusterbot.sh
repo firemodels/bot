@@ -245,8 +245,10 @@ CHECK_DAEMON ()
  local CB_HOST_ARG=$3
 
 DAEMONOUT=$FILES_DIR/daemon.out.$$
+DAEMONOUT2=$FILES_DIR/daemon2.out.$$
 
-pdsh -t 2 -w $CB_HOST_ARG "ps -el | grep $DAEMON_ARG | wc -l" |&  grep -v ssh | grep -v Connection | sort >& $DAEMONOUT
+pdsh -t 2 -w $CB_HOST_ARG "ps -el | grep $DAEMON_ARG | wc -l" >&  $DAEMONOUT2
+cat $DAEMONOUT2 | grep -v ssh | grep -v Connection | sort >& $DAEMONOUT
 DAEMONDOWN=
 while read line 
 do
@@ -264,7 +266,7 @@ else
   echo "   $CB_HOST_ARG: ***$ERRWARN: $DAEMON_ARG down on $DAEMONDOWN"
   echo "      Fix: sudo pdsh -t 2 -w $CB_HOST_ARG service $DAEMON_ARG start"
 fi
-rm -f $DAEMONOUT
+rm -f $DAEMONOUT $DAEMONOUT2
 }
 
 #---------------------------------------------
@@ -281,8 +283,10 @@ ACCT_CHECK ()
   if [ "$CB_HOST_ARG" == "" ]; then
     return 0
   fi
-  FILE_OUT=$outdir/file_out
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getfile.sh $file $outdir |& grep -v ssh | grep -v Connection | sort >& $FILE_OUT
+  FILE_OUT=$outdir/acct_check.out
+  FILE_OUT2=$outdir/acct_check2.out
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getfile.sh $file $outdir >& $FILE_OUT2
+  cat $FILE_OUT2 | grep -v ssh | grep -v Connection | sort >& $FILE_OUT
   file0=`head -1 $FILE_OUT | awk '{print $2}'`
 
   local CURDIR=`pwd`
@@ -329,8 +333,10 @@ CHECK_FILE ()
   if [ "$CB_HOST_ARG" == "" ]; then
     return 0
   fi
-  FILE_OUT=$outdir/file_out
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getfile.sh $file $outdir |& grep -v ssh | grep -v Connection | sort >& $FILE_OUT
+  FILE_OUT=$outdir/check_file.out
+  FILE_OUT2=$outdir/check_file.out2
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getfile.sh $file $outdir >& $FILE_OUT2
+  cat $FILE_OUT2 | grep -v ssh | grep -v Connection | sort >& $FILE_OUT
   file0=`head -1 $FILE_OUT | awk '{print $2}'`
 
   local CURDIR=`pwd`
@@ -383,8 +389,10 @@ TIME_CHECK ()
   if [ "$CB_HOST_ARG" == "" ]; then
     return 0
   fi
-  FILE_OUT=$outdir/file_out
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/gettime_error.sh |& grep -v ssh | grep -v Connection | sort >& $FILE_OUT
+  FILE_OUT=$outdir/time_check.out
+  FILE_OUT2=$outdir/time_check.out2
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/gettime_error.sh >& $FILE_OUT2
+  cat $FILE_OUT2 | grep -v ssh | grep -v Connection | sort >& $FILE_OUT
 
   local CURDIR=`pwd`
   cd $outdir
@@ -442,8 +450,10 @@ MOUNT_CHECK ()
   if [ "$CB_HOST_ARG" == "" ]; then
     return 0
   fi
-  FILE_OUT=$outdir/file_out
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getmounts.sh $outdir |& grep -v ssh | grep -v Connection | sort >& $FILE_OUT
+  FILE_OUT=$outdir/mount_check.out
+  FILE_OUT2=$outdir/mount_check.out2
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getmounts.sh $outdir >& $FILE_OUT2
+  cat $FILE_OUT2 > grep -v ssh | grep -v Connection | sort >& $FILE_OUT
   file0=`head -1 $FILE_OUT | awk '{print $2}'`
 
   local CURDIR=`pwd`
@@ -497,8 +507,10 @@ FSTAB_CHECK ()
   if [ "$CB_HOST_ARG" == "" ]; then
     return 0
   fi
-  FILE_OUT=$outdir/file_out
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getfstab.sh $outdir |& grep -v ssh | grep -v Connection | sort >& $FILE_OUT
+  FILE_OUT=$outdir/fstab_check.out
+  FILE_OUT2=$outdir/fstab_check.out2
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getfstab.sh $outdir >& $FILE_OUT2
+  cat $FILE_OUT2 | grep -v ssh | grep -v Connection | sort >& $FILE_OUT
   file0=`head -1 $FILE_OUT | awk '{print $2}'`
 
   local CURDIR=`pwd`
@@ -552,8 +564,10 @@ HOST_CHECK ()
   if [ "$CB_HOST_ARG" == "" ]; then
     return 0
   fi
-  FILE_OUT=$outdir/hosts_out
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/gethost.sh $outdir |& grep -v ssh | grep -v Connection | sort >& $FILE_OUT
+  FILE_OUT=$outdir/host_check.out
+  FILE_OUT2=$outdir/host_check.out2
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/gethost.sh $outdir >& $FILE_OUT2
+  cat $FILE_OUT2 | grep -v ssh | grep -v Connection | sort >& $FILE_OUT
   file0=`head -1 $FILE_OUT | awk '{print $2}'`
 
   local CURDIR=`pwd`
@@ -662,7 +676,9 @@ SUBNET_CHECK ()
   if [ "$CB_HOST_ARG" == "" ]; then
     return
   fi
-  ssh $CB_HOST_ARG pdsh -t 2 -w $CB_HOST_ARG,$CB_HOSTIB_ARG ps -el |& sort -u | grep opensm  >  $SUBNETOUT 2>&1
+  SUBNET_TEMP=/tmp/subnet.$$
+  ssh $CB_HOST_ARG pdsh -t 2 -w $CB_HOST_ARG,$CB_HOSTIB_ARG ps -el >& $SUBNET_TEMP
+  cat $SUBNET_TEMP | sort -u | grep opensm  >  $SUBNETOUT 2>&1
   SUB1=`cat  $SUBNETOUT | awk -F':' '{print $1}' | sort -u | awk '{printf "%s%s", $1," " }'`
   if [ "$SUB1" == "" ]; then
     echo "   $CB_HOSTIB_ARG: **Error: opensm not running on any host"
@@ -675,6 +691,7 @@ SUBNET_CHECK ()
       echo "   $CB_HOSTIB_ARG: opensm running on $SUBNETCOUNT hosts"
     fi
   fi
+  rm -f $SUBNET_TEMP
 }
 
 #---------------------------------------------
@@ -689,7 +706,9 @@ IBSPEED ()
     return
   fi
   local CURDIR=`pwd`
-  pdsh -t 2 -w $CB_HOST_ARG $CURDIR/ibspeed.sh |& grep -v ssh | grep -v Connection | sort >& $IBRATE
+  IBTEMP=/tmp/ibnet.$$
+  pdsh -t 2 -w $CB_HOST_ARG $CURDIR/ibspeed.sh >& $IBTEMP 
+  cat $IBTEMP | grep -v ssh | grep -v Connection | sort >& $IBRATE
   RATE0=`head -1 $IBRATE | awk '{print $2}'`
   if [ "$RATE0" == "0" ]; then
     return
@@ -715,6 +734,7 @@ IBSPEED ()
   else
     echo "   ${CB_HOST_ARG}-ib: ***Warning: Infiniband data rate is $RATE0 Gb/s except on $RATEBAD"
   fi
+  rm -f $IBTEMP
 }
 
 #---------------------------------------------
@@ -757,7 +777,9 @@ PROVISION_DATE_CHECK ()
   if [ "$CB_HOSTETH_ARG" == "" ]; then
     return 0
   fi
-  pdsh -t 2 -w $CB_HOSTETH_ARG `pwd`/getrevdate.sh |&  grep -v ssh | grep -v Connection | sort >  $FSOUT 2>&1
+  PROVTEMP=/tmp/prov.$$
+  pdsh -t 2 -w $CB_HOSTETH_ARG `pwd`/getrevdate.sh >& $PROVTEMP
+  cat $PROVTEMP |  grep -v ssh | grep -v Connection | sort >  $FSOUT 2>&1
 
   NF0=`head -1 $FSOUT | awk '{print $2}'`
   FSDOWN=
@@ -780,6 +802,7 @@ PROVISION_DATE_CHECK ()
   else
     echo "   $CB_HOSTETH_ARG: imaged on $NF0 except for $FSDOWN"
   fi
+  rm -f $PROVTEMP
 }
 
 #---------------------------------------------
@@ -793,7 +816,9 @@ CORE_CHECK ()
   if [ "$CB_HOSTETH_ARG" == "" ]; then
     return 0
   fi
-  pdsh -t 2 -w $CB_HOSTETH_ARG "grep cpuid /proc/cpuinfo | wc -l" |&  grep -v ssh | grep -v Connection | sort >  $FSOUT 2>&1
+  CORETEMP=/tmp/core.$$
+  pdsh -t 2 -w $CB_HOSTETH_ARG "grep cpuid /proc/cpuinfo | wc -l" >& $CORETEMP
+  cat $CORETEMP | grep -v ssh | grep -v Connection | sort >  $FSOUT 2>&1
 
   NF0=`head -1 $FSOUT | awk '{print $2}'`
   FSDOWN=
@@ -817,6 +842,7 @@ CORE_CHECK ()
     echo "   $CB_HOSTETH_ARG: ***Warning: $NF0 CPU cores except $FSDOWN"
     echo "      Fix: boot into BIOS and disable hyperthreading"
   fi
+  rm -f $CORETEMP
 }
 
 #---------------------------------------------
@@ -861,8 +887,10 @@ MEMORY_CHECK ()
   if [ "$CB_HOST_ARG" == "" ]; then
     return 0
   fi
-  MEMORY_OUT=$outdir/memory_out
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getmem.sh  |& grep -v ssh | grep -v Connection | sort >& $MEMORY_OUT
+  MEMORY_OUT=$outdir/memory.out
+  MEMORY_OUT2=$outdir/memory.out2
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getmem.sh  >& $MEMORY_OUT2
+  cat $MEMORY_OUT2 | grep -v ssh | grep -v Connection | sort >& $MEMORY_OUT
   memory0=`head -1 $MEMORY_OUT | awk '{print $2}'`
 
   local CURDIR=`pwd`
@@ -903,8 +931,10 @@ SPEED_CHECK ()
   if [ "$CB_HOST_ARG" == "" ]; then
     return 0
   fi
-  SPEED_OUT=$outdir/speed_out
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getspeed.sh  |& grep -v ssh | grep -v Connection | sort >& $SPEED_OUT
+  SPEED_OUT=$outdir/speed.out
+  SPEED_OUT2=$outdir/speed.out2
+  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getspeed.sh  >& $SPEED_OUT2
+  cat $SPEED_OUT2 | grep -v ssh | grep -v Connection | sort >& $SPEED_OUT
   speed0=`head -1 $SPEED_OUT | awk '{print $2}'`
 
   local CURDIR=`pwd`
@@ -1206,6 +1236,7 @@ case $OPTION  in
    ;;
   r)
    CHECK_ROOT_FILES=1
+   WHOAMI=`whoami`
    CAN_I_SUDO=`grep wheel /etc/group | grep $WHOAMI | wc -l`
    if [ "$CAN_I_SUDO" == "0" ]; then
      echo "***error: $WHOAMI does not have permission to use the sudo command"
@@ -1298,10 +1329,13 @@ fi
 if [ "$ONLY_RUN_TEST_CASES" != "1" ]; then
   echo
   echo "---------- $CB_HOSTS status - `date` ----------"
-  not_have_git=`git describe --dirty --long |& grep fatal | wc -l`
+  TEMP_RUN=/tmp/run.$$
+  git describe --dirty --long >& $TEMP_RUN
+  not_have_git=`cat $TEMP_RUN | grep fatal | wc -l`
   if [ "$not_have_git" == "0" ]; then
     echo "---------- `git describe --dirty --long` ----------"
   fi
+  rm -f $TEMP_RUN
 fi
 if [ "$TEST_QUEUE" != "" ]; then
   echo ""
@@ -1341,6 +1375,7 @@ echo "--------------------- checking files and configuration parameters accessib
   CHECK_FILE_ROOT /etc/ssh/sshd_config
   CHECK_SSHD_CONFIG
 fi
+exit
 
 echo ""
 echo "--------------------- network checks --------------------------"
@@ -1382,8 +1417,10 @@ if [ `cat $IBOUT | wc -l` -ne 0 ]; then
 fi
 
 # --------------------- check for hosts with working ethernet, non-working infiniband  --------------------
-
-UP_ETH=` pdsh -t 2 -w $CB_HOSTS   date |& grep -v ssh  | grep -v Connection | awk -F':' '{print $1}' | sort` 
+TEMP_ETH=/tmp/eth.$$
+pdsh -t 2 -w $CB_HOSTS   date >& $TEMP_ETH  
+UP_ETH=`cat $TEMP_ETH| grep -v ssh  | grep -v Connection | awk -F':' '{print $1}' | sort`
+rm -f $TEMP_ETH
 
 IB_LIST=
 if [ "$IBDOWN" != "" ]; then
@@ -1493,8 +1530,11 @@ echo "--------------------- file system checks -------------------------"
 
 #*** check number of file systems mounted
 
-pdsh -t 2 -w $CB_HOSTS "df -k -t nfs | tail -n +2 | wc -l" |&  grep -v ssh | grep -v Connection | sort >& $FSOUT
+TEMP_SSH=/tmp/ssh.$$
+pdsh -t 2 -w $CB_HOSTS "df -k -t nfs | tail -n +2 | wc -l" >& $TEMP_SSH
+cat $TEMP_SSH | grep -v ssh | grep -v Connection | sort >& $FSOUT
 cat $FSOUT | awk -F':' '{print $1}' > $UP_HOSTS
+rm -f $TEMP_OUT
 
 NF0=`head -1 $FSOUT | awk '{print $2}'`
 FSDOWN=
@@ -1593,7 +1633,10 @@ CHECK_DAEMON slurmd Error $CB_HOSTS
 
 #*** check slurm rpm
 
-pdsh -t 2 -w $CB_HOSTS "rpm -qa | grep slurm | grep devel" |& grep -v ssh | grep -v Connection | sort >& $SLURMRPMOUT
+TEMP_RPM=/tmp/rpm.$$
+pdsh -t 2 -w $CB_HOSTS "rpm -qa | grep slurm | grep devel" >& $TEMP_RPM
+cat $TEMP_RPM | grep -v ssh | grep -v Connection | sort >& $SLURMRPMOUT
+rm -f $TEMP_RPM
 SLURMRPM0=`head -1 $SLURMRPMOUT | awk '{print $2}'`
 SLURMBAD=
 while read line 
