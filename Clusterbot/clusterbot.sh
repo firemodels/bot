@@ -40,7 +40,6 @@ MKDIR ()
  local dir=$1
 
  if [ ! -d $dir ]; then
-   echo making directory $dir
    mkdir -p $dir
  fi
  if [ ! -d $dir ]; then
@@ -1203,7 +1202,6 @@ case $OPTION  in
   r)
    CHECK_ROOT_FILES=1
    WHOAMI=`whoami`
-   echo "CAN_I_SUDO=`grep wheel /etc/group | grep $WHOAMI | wc -l`"
    CAN_I_SUDO=`grep wheel /etc/group | grep $WHOAMI | wc -l`
    if [ "$CAN_I_SUDO" == "0" ]; then
      echo "***error: $WHOAMI does not have permission to use the sudo command"
