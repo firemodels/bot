@@ -1169,6 +1169,16 @@ SETUP_QUEUES () {
 }
 
 #************************** beginning of script ******************************************
+
+#*** find platform script is running on
+
+platform="linux"
+if [ "`uname`" == "Darwin" ] ; then
+  platform="osx"
+fi
+
+#*** find user running script
+
 WHOAMI=`whoami`
 if [ "$WHOAMI" == "root" ]; then
   echo "***error: this script cannot be run as root"
@@ -1291,36 +1301,40 @@ SETUP_CLCK
 # --------------------- initial error checking --------------------
 
 ERROR=
-if [ "$CB_HOSTS" == "" ]; then
-  ERROR=1
-  echo "***error: environment variable CB_HOSTS not defined"
-fi
-if [ "$CB_HOST1" != "" ]; then
-  if [ "$CB_HOSTIB1" == "" ]; then
+
+#*** only do these error checks on linux computers
+if [ "$platform" == "linux" ]; then
+  if [ "$CB_HOSTS" == "" ]; then
     ERROR=1
-    echo "***error: CB_HOSTIB1 must be defined if CB_HOST1 is defined"
+    echo "***error: environment variable CB_HOSTS not defined"
   fi
-fi
-if [ "$CB_HOST2" != "" ]; then
-  if [ "$CB_HOSTIB2" == "" ]; then
-    ERROR=1
-    echo "***error: CB_HOSTIB2 must be defined if CB_HOST2 is defined"
+  if [ "$CB_HOST1" != "" ]; then
+    if [ "$CB_HOSTIB1" == "" ]; then
+     ERROR=1
+      echo "***error: CB_HOSTIB1 must be defined if CB_HOST1 is defined"
+    fi
   fi
-fi
-if [ "$CB_HOST3" != "" ]; then
-  if [ "$CB_HOSTIB3" == "" ]; then
-    ERROR=1
-    echo "***error: CB_HOSTIB3 must be defined if CB_HOST3 is defined"
+  if [ "$CB_HOST2" != "" ]; then
+    if [ "$CB_HOSTIB2" == "" ]; then
+      ERROR=1
+      echo "***error: CB_HOSTIB2 must be defined if CB_HOST2 is defined"
+    fi
   fi
-fi
-if [ "$CB_HOST4" != "" ]; then
-  if [ "$CB_HOSTIB4" == "" ]; then
-    ERROR=1
-    echo "***error: CB_HOSTIB4 must be defined if CB_HOST4 is defined"
+  if [ "$CB_HOST3" != "" ]; then
+    if [ "$CB_HOSTIB3" == "" ]; then
+      ERROR=1
+      echo "***error: CB_HOSTIB3 must be defined if CB_HOST3 is defined"
+    fi
   fi
-fi
-if [ "$ERROR" == "1" ]; then
-  exit
+  if [ "$CB_HOST4" != "" ]; then
+    if [ "$CB_HOSTIB4" == "" ]; then
+      ERROR=1
+      echo "***error: CB_HOSTIB4 must be defined if CB_HOST4 is defined"
+    fi
+  fi
+  if [ "$ERROR" == "1" ]; then
+    exit
+  fi
 fi
 
 # --------------------- run fds test cases --------------------
@@ -1369,13 +1383,15 @@ if [ "$ONLY_RUN_TEST_CASES" == "1" ]; then
 fi
 
 if [ "$CHECK_ROOT_FILES" != "" ]; then
-echo ""
-echo "--------------------- checking files and configuration parameters accessible only by root --------------------------"
+  echo ""
+  echo "--------------------- checking files and configuration parameters accessible only by root --------------------------"
   CHECK_FILE_ROOT /etc/slurm/slurmdbd.conf
   CHECK_FILE_ROOT /etc/ssh/sshd_config
   CHECK_SSHD_CONFIG
+  if [ "$platform" == "osx" ]; then
+    exit
+  fi
 fi
-exit
 
 echo ""
 echo "--------------------- network checks --------------------------"
