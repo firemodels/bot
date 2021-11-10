@@ -192,9 +192,11 @@ CHECK_FILE_ROOT ()
  
   dirdate=`ls -l $ARCHIVEDIR/$filesave | awk '{print $6" "$7" "$8}'`
   if [ $diffs -eq 0 ]; then
-    echo "   `hostname -s`: $fullfile contents have not changed since a copy was archived at $ARCHIVEDIR/$filesave on $dirdate"
+    echo "   `hostname -s`: $fullfile contents have not changed since it was archived at $ARCHIVEDIR/$filesave on $dirdate"
   else
-    echo "   `hostname -s`: ***Warning: $fullfile contents have changed since a copy was archived at $ARCHIVEDIR/$filesave on $dirdate"
+    echo "   `hostname -s`: ***Warning: $fullfile contents have changed since it was archived at $ARCHIVEDIR/$filesave on $dirdate"
+    echo "        To see changes, type:"
+    echo "        sudo diff $ARCHIVEDIR/$filesave $fullfile"
   fi
 }
 
