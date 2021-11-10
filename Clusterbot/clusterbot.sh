@@ -1139,6 +1139,11 @@ SETUP_QUEUES () {
 }
 
 #************************** beginning of script ******************************************
+WHOAMI=`whoami`
+if [ "$WHOAMI" == "root" ]; then
+  echo "***error: this script cannot be run as root"
+  exit
+fi
 
 JOBPREFIX=CB_
 SCRIPTDIR=`pwd`
@@ -1201,7 +1206,6 @@ case $OPTION  in
    ;;
   r)
    CHECK_ROOT_FILES=1
-   WHOAMI=`whoami`
    CAN_I_SUDO=`grep wheel /etc/group | grep $WHOAMI | wc -l`
    if [ "$CAN_I_SUDO" == "0" ]; then
      echo "***error: $WHOAMI does not have permission to use the sudo command"
