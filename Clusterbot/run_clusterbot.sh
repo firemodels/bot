@@ -20,6 +20,10 @@ function USAGE {
   echo " -q q - run test cases using the queue q."
   echo " -Q q - same as the -q option except that only test cases are run."
   echo "         Other tests are not performed."
+  echo " -r - check file contents readable only by root.  If this option is not"
+  echo "      used, only the file size and modification date are checked.  You"
+  echo "      need to have sudo priviledges to use this option."
+
   exit
 }
 
@@ -29,8 +33,9 @@ fopt=
 nopt=
 QOPT=
 qopt=
+ropt=
 FORCE_UNLOCK=
-while getopts 'fhm:n:q:Q:' OPTION
+while getopts 'fhm:n:q:Q:r' OPTION
 do
 case $OPTION  in
   f)
@@ -59,6 +64,9 @@ case $OPTION  in
    ;;
   q)
    qopt="-q $OPTARG"
+   ;;
+  r)
+   ropt="-r"
    ;;
 esac
 done
@@ -93,7 +101,7 @@ if [ "$not_have_git" == "0" ]; then
   git merge origin/master &> /dev/null
 fi
 
-./clusterbot.sh $fopt $nopt $QOPT $qopt | tee  $OUTPUT
+./clusterbot.sh $fopt $nopt $QOPT $qopt $ropt | tee  $OUTPUT
 
 nerrors=`grep ***Error $OUTPUT | wc -l`
 nwarnings=`grep ***Warning $OUTPUT | wc -l`

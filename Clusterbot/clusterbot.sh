@@ -25,6 +25,9 @@ function USAGE {
   fi
   echo " -Q  q - same as the -q option except that only test cases are run."
   echo "         Other tests are not performed."
+  echo " -r - check file contents readable only by root.  If this option is not"
+  echo "      used, only the file size and modification date are checked.  You"
+  echo "      need to have sudo priviledges to use this option."
   exit
 }
 
@@ -133,6 +136,46 @@ CHECK_DIR_LIST()
 }
 
 #---------------------------------------------
+#                   CHECK_FILE_ROOT
+#---------------------------------------------
+
+CHECK_FILE_ROOT ()
+{
+  local fullfile=$1
+  local file=`basename $fullfile`
+  local filesave=${file}.save
+  local fileenc=${file}.enc
+
+  USE_SUDO=
+
+  if [ ! -e $fullfile ]; then
+    echo "***error: $fullfile does not exist"
+    return
+  fi
+  
+  if [ ! -e $DIRLIST/$filesave ]; then
+    echo "*** sudo command required to check $fullfile "
+    USE_SUDO=1
+    sudo cp $fullfile $DIRLIST/$filesave
+  fi
+
+  if [ "$USE_SUDO" == "" ]; then
+    if [ "$PASSWORD_GIVEN" == "" ]; then
+      echo "*** sudo command required to check $fullfile "
+      PASSWORD_GIVEN=1
+    fi
+  fi
+  diffs=`sudo diff $DIRLIST/$filesave $fullfile | wc -l`
+ 
+  dirdate=`ls -l $DIRLIST/$filesave | awk '{print $6" "$7" "$8}'`
+  if [ "$diffs" == "0" ]; then
+    echo "   `hostname -s`: $fullfile contents have not changed since a copy was archived on $dirdate"
+  else
+    echo "   `hostname -s`: ***Warning: $fullfile contents have changed since a copy was archived on $dirdate"
+  fi
+}
+
+#---------------------------------------------
 #                   CHECK_FILE_DATE
 #---------------------------------------------
 
@@ -142,7 +185,7 @@ CHECK_FILE_DATE()
   local file=`basename $fullfile`
   local filels=${file}.ls
 
-  if [ ! $fullfile ]; then
+  if [ ! -e $fullfile ]; then
     echo "***error: $fullfile does not exist"
     return
   fi
@@ -155,11 +198,15 @@ CHECK_FILE_DATE()
   
   diffs=`diff $DIRLIST/$filels $currentfilelist | wc -l`
  
-  dirdate=`cat $DIRLIST/$filels | awk '{print $6" "$7" "$8}'`
+  original_moddate=`cat $DIRLIST/$filels | awk '{print $6" "$7" "$8}'`
+  original_filesize=`cat $DIRLIST/$filels | awk '{print $5}'`
+  current_moddate=`cat $currentfilelist | awk '{print $6" "$7" "$8}'`
+  current_filesize=`cat $currentfilelist | awk '{print $5}'`
   if [ "$diffs" == "0" ]; then
-    echo "   `hostname -s`: $fullfile has not changed since $dirdate"
+    echo "   `hostname -s`: $fullfile has not changed since it was last archived, modification date $current_moddate, file size $current_filesize"
   else
-    echo "   `hostname -s`: ***Warning: $fullfile has changed since $dirdate"
+    echo "   `hostname -s`: ***Warning: $fullfile has changed since it was last archived- current($current_moddate), original($original_moddate) modification date,"
+    echo "                  current($current_filesize), original($original_filesize) file size."
   fi
   rm $currentfilelist
 }
@@ -1099,8 +1146,10 @@ fi
 NCASES_PER_QUEUE=20
 FORCE_UNLOCK=
 ONLY_RUN_TEST_CASES=
+CHECK_ROOT_FILES=
+PASSWORD_GIVEN=
 
-while getopts 'fhn:q:Q:' OPTION
+while getopts 'fhn:q:Q:r' OPTION
 do
 case $OPTION  in
   f)
@@ -1125,6 +1174,18 @@ case $OPTION  in
    ;;
   q)
    SETUP_QUEUES $OPTARG
+   ;;
+  r)
+   CHECK_ROOT_FILES=1
+   WHOAMI=`whoami`
+   echo "CAN_I_SUDO=`grep wheel /etc/group | grep $WHOAMI | wc -l`"
+   CAN_I_SUDO=`grep wheel /etc/group | grep $WHOAMI | wc -l`
+   if [ "$CAN_I_SUDO" == "0" ]; then
+     echo "***error: $WHOAMI does not have permission to use the sudo command"
+     echo "          needed to check files readable only by root. File size and"
+     echo "          modification date will be checked instead."
+     CHECK_ROOT_FILES=
+   fi
    ;;
 esac
 done
@@ -1244,6 +1305,13 @@ if [ "$ONLY_RUN_TEST_CASES" == "1" ]; then
 
   rm $LOCK_FILE
   exit
+fi
+
+if [ "$CHECK_ROOT_FILES" != "" ]; then
+echo ""
+echo "--------------------- checking files readable only by root --------------------------"
+  CHECK_FILE_ROOT /etc/slurm/slurmdbd.conf
+  CHECK_FILE_ROOT /etc/ssh/sshd_config
 fi
 
 echo ""
@@ -1393,7 +1461,7 @@ if [ "$?" == "1" ]; then
 fi
 
 echo ""
-echo "--------------------- disk check -------------------------"
+echo "--------------------- file system checks -------------------------"
 
 #*** check number of file systems mounted
 
@@ -1488,6 +1556,7 @@ if [ "$?" == "1" ]; then
   CHECK_FILE /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTETH4 
   echo ""
 fi
+
 CHECK_FILE_DATE /etc/slurm/slurmdbd.conf
 
 #*** check slurm daemon
