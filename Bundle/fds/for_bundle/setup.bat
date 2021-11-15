@@ -1,7 +1,7 @@
 @echo off
 set script_dir=%~dp0
 
-title FDS and Smokeview Installer
+title FDS and Smokeview Installer for %username% with home directory %userprofile%
 
 :: before we do anything make sure this is a 64 bit PC
 
@@ -373,7 +373,7 @@ set outfile=%1
 "%FDS6%\shortcut.exe" /F:%outfile% /T:"%COMSPEC%"   /P:"/k fdsinit" /W:"%userprofile%" /A:C > Nul
 if     exist %outfile% echo The shortcut %outfile% was created                    >> "%LOGFILE%
 if NOT exist %outfile% echo ***error: The shortcut %outfile% failed to be created >> "%LOGFILE%
-
+if NOT exist %outfile% echo ***error: The shortcut %outfile% failed to be created
 exit /b
 
 :-------------------------------------------------------------------------
@@ -385,6 +385,7 @@ set outfile=%1
 "%FDS6%\shortcut.exe" /F:%outfile% /T:%infile%    /A:C  > Nul
 if     exist %outfile% echo The shortcut %outfile% was created                    >> "%LOGFILE%
 if NOT exist %outfile% echo ***error: The shortcut %outfile% failed to be created >> "%LOGFILE%
+if NOT exist %outfile% echo ***error: The shortcut %outfile% failed to be created
 
 exit /b
 
@@ -397,6 +398,7 @@ set outfile=%2
 copy %infile% %outfile%  
 if     exist %outfile% echo The url %outfile% was created                    >> "%LOGFILE%
 if NOT exist %outfile% echo ***error: The url %outfile% failed to be created >> "%LOGFILE%
+if NOT exist %outfile% echo ***error: The url %outfile% failed to be created
 
 exit /b
 
