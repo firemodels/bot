@@ -13,6 +13,7 @@ function USAGE {
   echo " -f - override lock to force clusterbot run"
   echo " -h - display this message"
   echo " -m email_address - send results to email_address"
+  echo " -u - update bot repo then exit"
 
   exit
 }
@@ -20,8 +21,8 @@ function USAGE {
 
 EMAIL=
 fopt=
-FORCE_UNLOCK=
-while getopts 'fhm:' OPTION
+UPDATE=
+while getopts 'fhm:u' OPTION
 do
 case $OPTION  in
   f)
@@ -34,6 +35,9 @@ case $OPTION  in
    ;;
   m)
    EMAIL="$OPTARG"
+   ;;
+  u)
+   UPDATE=1
    ;;
 esac
 done
@@ -58,23 +62,43 @@ if [ ! -d $HOME/.clusterbot ]; then
   mkdir $HOME/.clusterbot
 fi
 OUTPUT=$HOME/.clusterbot/sshbot.out
+LOGFILE=$HOME/.clusterbot/sshbot.log
 
 cd $BINDIR
 
-not_have_git=`git describe --dirty --long |& grep fatal | wc -l`
-if [ "$not_have_git" == "0" ]; then
-  echo updating bot repo
-  git fetch origin        &> /dev/null
-  git merge origin/master &> /dev/null
+WHOAMI=`whoami`
+if [ "$WHOAMI" != "root" ]; then
+  not_have_git=`git describe --dirty --long |& grep fatal | wc -l`
+  if [ "$not_have_git" == "0" ]; then
+    echo updating bot repo
+    git fetch origin        &> /dev/null
+    git merge origin/master &> /dev/null
+  fi
+fi
+if [ "$UPDATE" != "" ]; then
+  exit
 fi
 
 ./sshbot.sh $fopt | tee  $OUTPUT
 
+if [ ! -e $LOGFILE ]; then
+ cp $OUTPUT $LOGFILE
+fi
+LOGFILE2=/tmp/logfile.$$
+OUTPUT2=/tmp/output.$$
+tail -n +2 $LOGFILE > $LOGFILE2
+tail -n +2 $OUTPUT > $OUTPUT2
+nlogdiff=`diff $LOGFILE2 $OUTPUT2 | wc -l`
+rm -f $LOGILE2 $OUTPUT2
+
 nerrors=`grep ***Error $OUTPUT | wc -l`
 nwarnings=`grep ***Warning $OUTPUT | wc -l`
 if [ "$EMAIL" != "" ]; then
-  echo emailing results to $EMAIL
-  cat $OUTPUT | mail -s "ssh status: $nerrors Errrors, $nwarnings Warnings" $EMAIL
+  if [ $nlogdiff -eq 0 ]; then
+    cat $OUTPUT | mail -s "ssh configuration status: $nerrors Errors" $EMAIL
+  else
+    cat $OUTPUT | mail -s "ssh configuration status has changed:: $nerrors Errors" $EMAIL
+  fi
 fi
 
 cd $CURDIR
