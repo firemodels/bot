@@ -110,17 +110,30 @@ if [ ! -e $LOGFILE ]; then
  cp $OUTPUT $LOGFILE
 fi 
 
+LOGDATE=`cat $LOGFILE | awk '{print $6" "$7" "$8}'`
 LOGFILE2=/tmp/logfile.$$
 OUTPUT2=/tmp/output.$$
 tail -n +2 $LOGFILE > $LOGFILE2
 tail -n +2 $OUTPUT > $OUTPUT2
+
 nlogdiff=`diff $LOGFILE2 $OUTPUT2 | wc -l`
+if [ $nlogdiff -gt 0 ]; then
+ cp $OUTPUT $LOGFILE
+fi
+
 rm -f $LOGILE2 $OUTPUT2
 
+
+echo ""
+if [ $nlogdiff -eq 0 ]; then
+  echo "$CB_HOSTS status since $LOGDATE: $nerrors Errors, $nwarnings Warnings"
+else
+  echo "$CB_HOSTS status has changed: $nerrors Errors, $nwarnings Warnings"
+fi
 if [ "$EMAIL" != "" ]; then
   echo emailing results to $EMAIL
   if [ $nlogdiff -eq 0 ]; then
-    cat $OUTPUT | mail -s "$CB_HOSTS status: $nerrors Errors, $nwarnings Warnings" $EMAIL
+    cat $OUTPUT | mail -s "$CB_HOSTS status since $LOGDATE: $nerrors Errors, $nwarnings Warnings" $EMAIL
   else
     cat $OUTPUT | mail -s "$CB_HOSTS status has changed: $nerrors Errors, $nwarnings Warnings" $EMAIL
   fi

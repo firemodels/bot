@@ -84,20 +84,33 @@ fi
 if [ ! -e $LOGFILE ]; then
  cp $OUTPUT $LOGFILE
 fi
+
+LOGDATE=`ls -l $LOGFILE | awk '{print $6" "$7" "$8}'`
 LOGFILE2=/tmp/logfile.$$
 OUTPUT2=/tmp/output.$$
 tail -n +2 $LOGFILE > $LOGFILE2
 tail -n +2 $OUTPUT > $OUTPUT2
+
 nlogdiff=`diff $LOGFILE2 $OUTPUT2 | wc -l`
+if [ $nlogdiff -gt 0 ]; then
+ cp $OUTPUT $LOGFILE
+fi
+
 rm -f $LOGILE2 $OUTPUT2
 
 nerrors=`grep ***Error $OUTPUT | wc -l`
 nwarnings=`grep ***Warning $OUTPUT | wc -l`
+echo ""
+if [ $nlogdiff -eq 0 ]; then
+  echo "ssh status since $LOGDATE: $nerrors Errors"
+else
+  echo "ssh status has changed: $nerrors Errors"
+fi
 if [ "$EMAIL" != "" ]; then
   if [ $nlogdiff -eq 0 ]; then
-    cat $OUTPUT | mail -s "ssh configuration status: $nerrors Errors" $EMAIL
+    cat $OUTPUT | mail -s "ssh status since $LOGDATE: $nerrors Errors" $EMAIL
   else
-    cat $OUTPUT | mail -s "ssh configuration status has changed:: $nerrors Errors" $EMAIL
+    cat $OUTPUT | mail -s "ssh status has changed since $LOGDATE: $nerrors Errors" $EMAIL
   fi
 fi
 
