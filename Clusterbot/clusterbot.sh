@@ -455,7 +455,7 @@ MOUNT_CHECK ()
   FILE_OUT=$outdir/mount_check.out
   FILE_OUT2=$outdir/mount_check.out2
   pdsh -t 2 -w $CB_HOST_ARG `pwd`/getmounts.sh $outdir >& $FILE_OUT2
-  cat $FILE_OUT2 > grep -v ssh | grep -v Connection | sort >& $FILE_OUT
+  cat $FILE_OUT2 | grep -v ssh | grep -v Connection | sort >& $FILE_OUT
   file0=`head -1 $FILE_OUT | awk '{print $2}'`
 
   local CURDIR=`pwd`
