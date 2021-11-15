@@ -85,11 +85,7 @@ CHECK_SSHD_CONFIG ()
   local filesave=${file}.save
   local fullfile=/tmp/${file}.$$
   
-  if [ "$USE_SUDO" == "" ]; then
-    echo "*** sudo command required to perform this check"
-    USE_SUDO=1
-  fi
-  sudo sshd -T | sort >  $fullfile
+  sshd -T | sort >  $fullfile
   if [ ! -e $ARCHIVEDIR/$filesave ]; then
     cp $fullfile $ARCHIVEDIR/$filesave
   fi
@@ -121,78 +117,17 @@ CHECK_FILE_ROOT ()
     return
   fi
   
-  if [ "$USE_SUDO" == "" ]; then
-    echo "*** sudo command required to perform this check"
-    USE_SUDO=1
-  fi
   if [ ! -e $ARCHIVEDIR/$filesave ]; then
-    sudo cp $fullfile $ARCHIVEDIR/$filesave
+    cp $fullfile $ARCHIVEDIR/$filesave
   fi
 
-  diffs=`sudo diff $ARCHIVEDIR/$filesave $fullfile | wc -l`
+  diffs=`diff $ARCHIVEDIR/$filesave $fullfile | wc -l`
  
   dirdate=`ls -l $ARCHIVEDIR/$filesave | awk '{print $6" "$7" "$8}'`
   if [ $diffs -eq 0 ]; then
     echo "   `hostname -s`: $fullfile contents have not changed since a copy was archived at $ARCHIVEDIR/$filesave on $dirdate"
   else
     echo "   `hostname -s`: ***Warning: $fullfile contents have changed since a copy was archived at $ARCHIVEDIR/$filesave on $dirdate"
-  fi
-}
-
-#---------------------------------------------
-#                   CHECK_FILE
-#---------------------------------------------
-
-CHECK_FILE ()
-{
-  local file=$1
-  local ERRWARN=$2
-  local INDENT=$3
-  local outdir=$4
-  local CB_HOST_ARG=$5
-
-  if [ "$CB_HOST_ARG" == "" ]; then
-    return 0
-  fi
-  FILE_OUT=$outdir/check_file.out
-  FILE_OUT2=$outdir/check_file.out2
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getfile.sh $file $outdir >& $FILE_OUT2
-  cat $FILE_OUT2 | grep -v ssh | grep -v Connection | sort >& $FILE_OUT
-  file0=`head -1 $FILE_OUT | awk '{print $2}'`
-
-  local CURDIR=`pwd`
-  cd $outdir
- 
-  FILEDIFF=
-  while read line 
-  do
-    hosti=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
-    filei=`echo $line | awk '{print $2}'`
-    ndiff=`diff $file0 $filei | wc -l`
-    if [ $ndiff -ne 0 ]; then
-      if [ "$FILEDIFF" == "" ]; then
-        FILEDIFF="$hosti"
-      else
-        FILEDIFF="$FILEDIFF $hosti"
-      fi
-    fi
-  done < $FILE_OUT
-  cd $CURDIR
-
-  if [ "$FILEDIFF" == "" ]; then
-    if [ "$INDENT" == "1" ]; then
-      echo "   $CB_HOST_ARG:    $file is identical"
-    else
-      echo "   $CB_HOST_ARG: $file is identical"
-    fi
-    return 0
-  else
-    if [ "$INDENT" == "1" ]; then
-      echo "   $CB_HOST_ARG:    ***$ERRWARN: $file is different on $FILEDIFF "
-    else
-      echo "   $CB_HOST_ARG: ***$ERRWARN: $file is different on $FILEDIFF "
-    fi
-    return 1
   fi
 }
 
@@ -205,8 +140,6 @@ if [ "`uname`" == "Darwin" ] ; then
   platform="osx"
 fi
 
-#*** find user running script
-
 SCRIPTDIR=`pwd`
 BIN=`dirname "$0"`
 if [ "$BIN" == "." ]; then
@@ -215,11 +148,8 @@ fi
 SCRIPTDIR=$SCRIPTDIR/$BIN
 
 FORCE_UNLOCK=
-CHECK_ROOT_FILES=
-PASSWORD_GIVEN=
-USE_SUDO=
 
-while getopts 'fhr' OPTION
+while getopts 'fh' OPTION
 do
 case $OPTION  in
   f)
@@ -228,19 +158,6 @@ case $OPTION  in
   h)
    USAGE
    exit
-   ;;
-  r)
-   CHECK_ROOT_FILES=1
-   WHOAMI=`whoami`
-   if [ "$platform" == "linux" ]; then
-     CAN_I_SUDO=`grep wheel /etc/group | grep $WHOAMI | wc -l`
-     if [ $CAN_I_SUDO -eq 0 ]; then
-       echo "***error: $WHOAMI does not have permission to use the sudo command"
-       echo "          needed to check files readable only by root. File size and"
-       echo "          modification date will be checked instead."
-       CHECK_ROOT_FILES=
-     fi
-   fi
    ;;
 esac
 done
@@ -255,9 +172,10 @@ MAKE_DATA_DIRS ||  exit
 LOCK_FILE=$HOME/.clusterbot/lockfile
 
 MKDIR $HOME/.clusterbot
-MKDIR $HOME/.clusterbot/archive
 
 ARCHIVEDIR=$HOME/.clusterbot/archive
+MKDIR $ARCHIVEDIR
+
 
 if [[ "$FORCE_UNLOCK" == "" ]] && [[ -e $LOCK_FILE ]]; then
   echo "***error: another instance of sshbot.sh is running"
@@ -267,19 +185,8 @@ fi
 
 touch $LOCK_FILE
 
-# --------------------- initial error checking --------------------
-
-ERROR=
-
-if [ "$CHECK_ROOT_FILES" != "" ]; then
-  echo ""
-  echo "--------------------- checking files and configuration parameters accessible only by root --------------------------"
-  if [ "$platform" == "linux" ]; then
-    CHECK_FILE_ROOT /etc/slurm/slurmdbd.conf
-  fi
-  CHECK_FILE_ROOT /etc/ssh/sshd_config
-  CHECK_SSHD_CONFIG
-fi
+CHECK_FILE_ROOT /etc/ssh/sshd_config
+CHECK_SSHD_CONFIG
 
 STOP_TIME=`date`
 echo ""
