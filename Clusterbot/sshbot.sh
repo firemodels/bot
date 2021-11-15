@@ -84,8 +84,18 @@ CHECK_SSHD_CONFIG ()
   local file=sshdT_config
   local filesave=${file}.save
   local fullfile=/tmp/${file}.$$
-  
-  sshd -T | sort >  $fullfile
+ 
+  rm -f /tmp/fullfile.$$ 
+  sshd -T >&  /tmp/fullfile.$$
+  check=`grep 'Permission denied' /tmp/fullfile.$$ | wc -l`
+  rm /tmp/fullfile.$$
+  if [ $check -gt 0 ]; then
+    echo "***error: `whoami` does not have permission to run the command sshd -T"
+    return 
+  fi
+
+ 
+  sshd -T | sort >&  $fullfile
   if [ ! -e $ARCHIVEDIR/$filesave ]; then
     cp $fullfile $ARCHIVEDIR/$filesave
   fi
@@ -114,6 +124,16 @@ CHECK_FILE_ROOT ()
 
   if [ ! -e $fullfile ]; then
     echo "***error: $fullfile does not exist"
+    return
+  fi
+
+  rm -f /tmp/filetemp.$$ 
+  cat $fullfile >& /tmp/filetemp.$$
+  check=`grep 'Permission denied' /tmp/filetemp.$$ | wc -l`
+  if [ $check -eq 0 ]; then
+    rm -f /tmp/filetemp.$$ 
+  else
+    echo "***error: `whoami` does not have permission to examine the file $fullfile"
     return
   fi
   
