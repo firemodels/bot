@@ -29,7 +29,7 @@ MKDIR ()
    mkdir -p $dir
  fi
  if [ ! -d $dir ]; then
-   error "***error: failed to create the directory $dir"
+   error "***Error: failed to create the directory $dir"
    return 0
  fi
  return 1
@@ -90,7 +90,7 @@ CHECK_SSHD_CONFIG ()
   check=`grep 'Permission denied' /tmp/fullfile.$$ | wc -l`
   rm /tmp/fullfile.$$
   if [ $check -gt 0 ]; then
-    echo "***error: `whoami` does not have permission to run the command sshd -T"
+    echo "***Error: `whoami` does not have permission to run the command sshd -T"
     return 
   fi
 
@@ -123,7 +123,7 @@ CHECK_FILE_ROOT ()
   local fileenc=${file}.enc
 
   if [ ! -e $fullfile ]; then
-    echo "***error: $fullfile does not exist"
+    echo "***Error: $fullfile does not exist"
     return
   fi
 
@@ -133,7 +133,7 @@ CHECK_FILE_ROOT ()
   if [ $check -eq 0 ]; then
     rm -f /tmp/filetemp.$$ 
   else
-    echo "***error: `whoami` does not have permission to examine the file $fullfile"
+    echo "***Error: `whoami` does not have permission to examine the file $fullfile"
     return
   fi
   
@@ -198,7 +198,7 @@ MKDIR $ARCHIVEDIR
 
 
 if [[ "$FORCE_UNLOCK" == "" ]] && [[ -e $LOCK_FILE ]]; then
-  echo "***error: another instance of sshbot.sh is running"
+  echo "***Error: another instance of sshbot.sh is running"
   echo "          If this is not the case, rerun using the -f option"
   exit
 fi
