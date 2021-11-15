@@ -1286,9 +1286,9 @@ UP_HOSTS=$FILES_DIR/uphosts.$$
 LOCK_FILE=$HOME/.clusterbot/lockfile
 
 MKDIR $HOME/.clusterbot
-MKDIR $HOME/.clusterbot/archive
 
 ARCHIVEDIR=$HOME/.clusterbot/archive
+MKDIR $ARCHIVEDIR
 
 if [[ "$FORCE_UNLOCK" == "" ]] && [[ -e $LOCK_FILE ]]; then
   echo "***error: another instance of clusterbot.sh is running"
