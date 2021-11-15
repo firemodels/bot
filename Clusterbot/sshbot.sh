@@ -206,7 +206,9 @@ fi
 touch $LOCK_FILE
 
 CHECK_FILE_ROOT /etc/ssh/sshd_config
-CHECK_SSHD_CONFIG
+if [ "$platform" == "linux" ]; then
+  CHECK_SSHD_CONFIG
+fi
 
 STOP_TIME=`date`
 echo ""
