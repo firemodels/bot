@@ -210,10 +210,4 @@ if [ "$platform" == "linux" ]; then
   CHECK_SSHD_CONFIG
 fi
 
-STOP_TIME=`date`
-echo ""
-echo "--------------------- clusterbot complete ------------------------------"
-echo "start time: $START_TIME"
-echo "stop time: $STOP_TIME"
-
 rm $LOCK_FILE
