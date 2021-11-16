@@ -23,8 +23,14 @@ call :getopts %*
 if "%stop_script%" == "1" exit /b
 call :set_openmp_defaults
 
+if "x%IN_CMDFDS%" == "x1" goto skip_fdsinit
+  echo setting up environment for fds
+  call fdsinit
+:skip_fdsinit
+
 if "x%IN_CMDFDS%" == "x1" goto skip_NO_IN_CMDFDS
-  echo ***Error: not using the FDS command shell, CMDfds, to run fds
+  echo ***Error: environment not setup for using fds
+  echo type: fdsinit or use the CMDfds command shell
   exit /b
 :skip_NO_IN_CMDFDS
 
