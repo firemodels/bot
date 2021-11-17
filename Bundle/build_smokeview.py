@@ -40,10 +40,13 @@ def update_all():                  os.system("start " + webscript_dir + "webUPDA
 def set_revision():                os.system("start " + webscript_dir + "webSET_bundle_revision")
 def build_smv_win_inc():           os.system("start " + webscript_dir + "webBUILDsmv Windows testinc")
 def build_smv():                   os.system("start " + webscript_dir + "webBUILDsmv  "     + platforms[v.get()] + " " + "test" )
+def build_smv_rel():               os.system("start " + webscript_dir + "webBUILDsmv  "     + platforms[v.get()] + " " + "release" )
 def build_lib():                   os.system("start " + webscript_dir + "webBUILDlibs "     + platforms[v.get()])
 def build_util():                  os.system("start " + webscript_dir + "webBUILDallprog "  + platforms[v.get()])
 def bundle_smv():                  os.system("start " + webscript_dir + "webPACKAGEsmv "    + platforms[v.get()] + " " + "test" )
+def bundle_smv_rel():              os.system("start " + webscript_dir + "webPACKAGEsmv "    + platforms[v.get()] + " " + "release" )
 def install_smv():                 os.system("start " + webscript_dir + "webINSTALLsmv "    + platforms[v.get()] + " " + "test" )
+def install_smv_rel():             os.system("start " + webscript_dir + "webINSTALLsmv "    + platforms[v.get()] + " " + "release" )
 def archive_smv():                 os.system("start " + webscript_dir + "webARCHIVEAllbundle"  )
 def upload_bundle():               os.system("start " + webscript_dir + "webUPLOADsmv2git")
 def copy_bundle():                 os.system("start " + webscript_dir + "webCOPYsmv")
@@ -159,18 +162,27 @@ Label(root,  text="Build:").grid(column=0, row=R, sticky=E)
 Button(root, text="Libs",  width=button_width, command=build_lib).grid(row=R,  column=1)
 Button(root, text="Utils", width=button_width, command=build_util).grid(row=R, column=2)
 
-# ------------------------- Build smokeview ------------------------------
+# ------------------------- Build test smokeview ------------------------------
 R=R+1
-Label(root,  text="Build:").grid(column=0, row=R, sticky=E)
-Button(root, text="Smv(full)",   width=button_width, command=build_smv).grid(row=R,  column=1)
-Button(root, text="Smv(inc)",    width=button_width, command=build_smv_win_inc).grid(row=R, column=2)
+Label(root,  text="Build smv:").grid(column=0, row=R, sticky=E)
+Button(root, text="test",   width=button_width, command=build_smv).grid(row=R,  column=1)
+Button(root, text="release",   width=button_width, command=build_smv_rel).grid(row=R,  column=2)
+R=R+1
+Button(root, text="test inc",    width=button_width, command=build_smv_win_inc).grid(row=R, column=1)
 
-# ------------------------- bundle smokeview ------------------------------
+# ------------------------- bundle ------------------------------
 
 R=R+1
-Button(root, text="Bundle",  width=button_width, command=bundle_smv).grid(row=R,        column=1)
-Button(root, text="Install", width=button_width, command=install_smv).grid(row=R,       column=2)
+Label(root,  text="Bundle:").grid(column=0, row=R, sticky=E)
+Button(root, text="test",  width=button_width, command=bundle_smv).grid(row=R,        column=1)
+Button(root, text="release",  width=button_width, command=bundle_smv_rel).grid(row=R,        column=2)
 
+# ------------------------- install ------------------------------
+
+R=R+1
+Label(root,  text="Install:").grid(column=0, row=R, sticky=E)
+Button(root, text="test", width=button_width, command=install_smv).grid(row=R,       column=1)
+Button(root, text="release", width=button_width, command=install_smv_rel).grid(row=R,       column=2)
 
 R=R+1
 Button(root, text="Upload",  width=button_width, command=upload_bundle).grid(row=R, column=0)
