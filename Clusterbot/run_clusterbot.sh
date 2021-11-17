@@ -113,8 +113,8 @@ fi
 LOGDATE=`cat $LOGFILE | awk '{print $6" "$7" "$8}'`
 LOGFILE2=/tmp/logfile.$$
 OUTPUT2=/tmp/output.$$
-tail -n +2 $LOGFILE > $LOGFILE2
-tail -n +2 $OUTPUT > $OUTPUT2
+tail -n +2 $LOGFILE | grep -v 'start time' | grep -v 'stop time' > $LOGFILE2
+tail -n +2 $OUTPUT  | grep -v 'start time' | grep -v 'stop time' > $OUTPUT2
 
 nlogdiff=`diff $LOGFILE2 $OUTPUT2 | wc -l`
 if [ $nlogdiff -gt 0 ]; then
