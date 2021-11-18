@@ -1,13 +1,11 @@
 #  Building Bundles
 
-Preliminary notes on building bundles.
-
 This directory contains scripts for building FDS/Smokeview installation files or bundles for Windows, Linux and OSX (Mac) computers.
-Bundles are built nightly whenever firebot passes and whenever FDS and Smokeview is released.
+Bundles are built nightly using the fds and smv revisions from the latest firebot pass.  Bundles are also built whenever FDS and Smokeview are released.
 Building a bundle consists of three steps: 
   1. run firebot to generate FDS manuals, 
   2. run smokebot to generate Smokeview manuals 
-  3. assemble applications, example files and guides to generate the bundles.
+  3. assemble applications, example files and manuals to generate the bundles.
 These steps are outlined in more detail below.
 
 ### Bundling Steps
@@ -19,12 +17,14 @@ directory $HOME/.firebot/pubs and $HOME/.firebot/branch_name/pubs . At NIST this
 The manuals for the FDS 6.7.6 release were generated using the script `build_fds_manuals.sh`. This script runs
 firebot with the options 
 `-x 5064c500c -X FDS6.7.6` for specifying the fds revision and tag  and options `-y a2687cda4 -Y SMV6.7.16`  for 
-specifying the smv repo revision and tag. The  parameter `-R release` is also passed to firebot to name the branch release.
-It takes about seven hours to run smokebot and build the manuals.
+specifying the smv repo revision and tag. The fds and smv repos are only tagged locally.  The scripts do not push
+up these tags to github.  This is done by hand when the bundles aer published.  
+The  parameter `-R release` is also passed to firebot to give the branch the name `release`.
+It takes about seven hours to run firebot and build the fds manuals.
 2. Run smokebot on a Linux computer to generate Smokeview manuals. If smokebot is successful,
 documents are copied to `$HOME/.smokebot/pubs` and `$HOME/.smokebot/branch_name/pubs`. 
-At NIST this occurs whenever the FDS and/or Smokeview source changes in the central repo also also once a day.
-The manuals for the SMV 6.7.16 release were generated using the script `build_smv_manuals.sh`. This script runs
+At NIST this occurs whenever the FDS and/or Smokeview source changes in the central repo and also also once a day.
+The manuals for the SMV 6.7.16 release were generated using the script `build_smv_manuals.sh`. This script ran
 smokebot with the options 
 `-x 5064c500c -X FDS6.7.6` for specifying the fds revision and tag  and options `-y a2687cda4 -Y SMV6.7.16`  for 
 specifying the smv repo revision and tag. The  parameter `-R release` is also passed to smokebot to name the branch release.
