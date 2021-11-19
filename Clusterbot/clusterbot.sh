@@ -1219,12 +1219,16 @@ ONLY_RUN_TEST_CASES=
 CHECK_ROOT_FILES=
 PASSWORD_GIVEN=
 USE_SUDO=
+FAST=
 
-while getopts 'fhn:q:Q:r' OPTION
+while getopts 'fFn:q:Q:r' OPTION
 do
 case $OPTION  in
   f)
    FORCE_UNLOCK=1
+   ;;
+  F)
+   FAST=1
    ;;
   h)
    USAGE
@@ -1474,11 +1478,66 @@ SUBNET_CHECK $CB_HOST4 $CB_HOSTIB4
 
 # --------------------- infiniband speed check --------------------
 
+if [ "$FAST" == "" ]; then
+  echo ""
+  IBSPEED $CB_HOSTETH1
+  IBSPEED $CB_HOSTETH2
+  IBSPEED $CB_HOSTETH3
+  IBSPEED $CB_HOSTETH4
+fi
+
 echo ""
-IBSPEED $CB_HOSTETH1
-IBSPEED $CB_HOSTETH2
-IBSPEED $CB_HOSTETH3
-IBSPEED $CB_HOSTETH4
+echo "--------------------- slurm checks ----------------------------"
+
+#*** check that slurm is online
+pbsnodes -l | awk '{print $1}' | sort -u  > $DOWN_HOSTS
+SLURMDOWN=
+while read line 
+do
+  host=`echo $line | awk '{print $1}'`
+  if [ "$SLURMDOWN" == "" ]; then
+    SLURMDOWN="$host"
+  else
+    SLURMDOWN="$SLURMDOWN $host"
+  fi
+done < $DOWN_HOSTS
+
+if [ "$SLURMDOWN" == "" ]; then
+  echo "   $CB_HOSTS: slurm online"
+else
+  echo "   $CB_HOSTS: ***Warning: slurm offline on $SLURMDOWN"
+  echo "      Fix: sudo scontrol update nodename=HOST state=resume"
+  echo "      This fix can only be applied to a HOST that is up and with"
+  echo "      a working ethernet and infiniband network connection."
+fi
+
+#*** check slurm configuration file --------------------
+
+CHECK_FILE /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTS
+if [ "$?" == "1" ]; then
+  CHECK_FILE /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTETH1 
+  CHECK_FILE /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTETH2 
+  CHECK_FILE /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTETH3 
+  CHECK_FILE /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTETH4 
+  echo ""
+fi
+
+CHECK_FILE_DATE /etc/slurm/slurmdbd.conf
+
+#*** check slurm daemon
+
+CHECK_DAEMON slurmd Error $CB_HOSTS
+
+if [ "$FAST" == "1" ]; then
+  STOP_TIME=`date`
+  echo ""
+  echo "--------------------- clusterbot complete ------------------------------"
+  echo "start time: $START_TIME"
+  echo "stop time: $STOP_TIME"
+
+  rm $LOCK_FILE
+  exit
+fi
 
 # --------------------- run cluster checker --------------------
 
@@ -1610,48 +1669,6 @@ if [ "$?" == "1" ]; then
   MOUNT_CHECK 1 $FILES_DIR $CB_HOSTETH4 
   echo ""
 fi
-
-echo ""
-echo "--------------------- slurm checks ----------------------------"
-
-#*** check that slurm is online
-pbsnodes -l | awk '{print $1}' | sort -u  > $DOWN_HOSTS
-SLURMDOWN=
-while read line 
-do
-  host=`echo $line | awk '{print $1}'`
-  if [ "$SLURMDOWN" == "" ]; then
-    SLURMDOWN="$host"
-  else
-    SLURMDOWN="$SLURMDOWN $host"
-  fi
-done < $DOWN_HOSTS
-
-if [ "$SLURMDOWN" == "" ]; then
-  echo "   $CB_HOSTS: slurm online"
-else
-  echo "   $CB_HOSTS: ***Warning: slurm offline on $SLURMDOWN"
-  echo "      Fix: sudo scontrol update nodename=HOST state=resume"
-  echo "      This fix can only be applied to a HOST that is up and with"
-  echo "      a working ethernet and infiniband network connection."
-fi
-
-#*** check slurm configuration file --------------------
-
-CHECK_FILE /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTS
-if [ "$?" == "1" ]; then
-  CHECK_FILE /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTETH1 
-  CHECK_FILE /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTETH2 
-  CHECK_FILE /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTETH3 
-  CHECK_FILE /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTETH4 
-  echo ""
-fi
-
-CHECK_FILE_DATE /etc/slurm/slurmdbd.conf
-
-#*** check slurm daemon
-
-CHECK_DAEMON slurmd Error $CB_HOSTS
 
 #*** check slurm rpm
 

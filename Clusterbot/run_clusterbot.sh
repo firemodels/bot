@@ -14,6 +14,7 @@ function USAGE {
   echo ""
   echo "Options:"
   echo " -f - override lock to force clusterbot run"
+  echo " -F - fast checks"
   echo " -h - display this message"
   echo " -m email_address - send results to email_address"
   echo " -n n - run n cases on each queue [default: $NCASES_PER_QUEUE]"
@@ -27,20 +28,23 @@ function USAGE {
   exit
 }
 
-
 EMAIL=
 fopt=
+Fopt=
 nopt=
 QOPT=
 qopt=
 ropt=
 FORCE_UNLOCK=
-while getopts 'fhm:n:q:Q:r' OPTION
+while getopts 'fFhm:n:q:Q:r' OPTION
 do
 case $OPTION  in
   f)
    fopt="-f"
    FORCE_UNLOCK=1
+   ;;
+  F)
+   Fopt="-F"
    ;;
   h)
    USAGE
@@ -102,7 +106,7 @@ if [ "$not_have_git" == "0" ]; then
   git merge origin/master &> /dev/null
 fi
 
-./clusterbot.sh $fopt $nopt $QOPT $qopt $ropt | tee  $OUTPUT
+./clusterbot.sh $fopt $Fopt $nopt $QOPT $qopt $ropt | tee  $OUTPUT
 
 nerrors=`grep ***Error $OUTPUT | wc -l`
 nwarnings=`grep ***Warning $OUTPUT | wc -l`
