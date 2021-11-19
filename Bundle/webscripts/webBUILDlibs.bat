@@ -30,7 +30,7 @@ if "%platform%" == "Windows" (
   goto eof
 )
 
-if "%platform%" == "windowsgnu" (
+if "%platform%" == "Windowsgnu" (
   title building libraries for windows using the gnu compilers
   cd %svn_root%\smv\Build\LIBS\gnu_win_64
   make_LIBS
@@ -39,7 +39,7 @@ if "%platform%" == "windowsgnu" (
 
 :: gnuosx
 
-if "%platform%" == "gnuosx" (
+if "%platform%" == "OSXgnu" (
   title building libraries for osx using gnu
   start /wait "cleaning osx libraries"    plink %plink_options% %osx_logon% %linux_svn_root%/smv/Build/LIBS/gnu_osx_64/make_LIBS.sh -t clean
   start "building osx glui library" plink %plink_options% %osx_logon% %linux_svn_root%/smv/Build/LIBS/gnu_osx_64/make_LIBS.sh -t glui
@@ -79,7 +79,7 @@ if "%platform%" == "OSX" (
 
 :: gnulinux
 
-if "%platform%" == "gnulinux" (
+if "%platform%" == "Linuxgnu" (
   title building libraries for linux using gnu
   start /wait "cleaning linux libraries" plink %plink_options% %linux_logon% %linux_svn_root%/smv/Build/LIBS/gnu_linux_64/make_LIBS.sh    -t clean
   start "building linux glut library" plink %plink_options% %linux_logon% %linux_svn_root%/smv/Build/LIBS/gnu_linux_64/make_LIBS.sh -t glut

@@ -35,25 +35,41 @@ button_width=7
 
 def show_branch():                 os.system("start " + webscript_dir + "webSHOW_branches")
 def show_repos():                  os.system("start " + webscript_dir + "webSHOW_revisions")
+
 def update_windows():              os.system("start " + webscript_dir + "webUPDATEwindowsrepos")
+def update_smv_windows():          os.system("start " + webscript_dir + "webUPDATEwindowsSMVrepos")
 def update_all():                  os.system("start " + webscript_dir + "webUPDATErepos")
+def update_smv_all():              os.system("start " + webscript_dir + "webUPDATESMVrepos")
+
 def set_revision():                os.system("start " + webscript_dir + "webSET_bundle_revision")
+
 def build_smv_win_inc():           os.system("start " + webscript_dir + "webBUILDsmv Windows testinc")
 def build_smv():                   os.system("start " + webscript_dir + "webBUILDsmv  "     + platforms[v.get()] + " " + "test" )
+def build_smv_gnu():               os.system("start " + webscript_dir + "webBUILDsmv  "     + platforms[v.get()] + "gnu " + "test" )
+def build_smv_rel():               os.system("start " + webscript_dir + "webBUILDsmv  "     + platforms[v.get()] + " " + "release" )
 def build_lib():                   os.system("start " + webscript_dir + "webBUILDlibs "     + platforms[v.get()])
+def build_lib_gnu():               os.system("start " + webscript_dir + "webBUILDlibs "     + platforms[v.get()] + "gnu")
 def build_util():                  os.system("start " + webscript_dir + "webBUILDallprog "  + platforms[v.get()])
+
 def bundle_smv():                  os.system("start " + webscript_dir + "webPACKAGEsmv "    + platforms[v.get()] + " " + "test" )
+def bundle_smv_rel():              os.system("start " + webscript_dir + "webPACKAGEsmv "    + platforms[v.get()] + " " + "release" )
+
 def install_smv():                 os.system("start " + webscript_dir + "webINSTALLsmv "    + platforms[v.get()] + " " + "test" )
+def install_smv_rel():             os.system("start " + webscript_dir + "webINSTALLsmv "    + platforms[v.get()] + " " + "release" )
+
 def archive_smv():                 os.system("start " + webscript_dir + "webARCHIVEAllbundle"  )
 def upload_bundle():               os.system("start " + webscript_dir + "webUPLOADsmv2git")
 def copy_bundle():                 os.system("start " + webscript_dir + "webCOPYsmv")
+
 def webCOPYhome2config():          os.system("start " + webscript_dir + "webCOPYhome2config")
 def webCOPYconfig2home():          os.system("start " + webscript_dir + "webCOPYconfig2home")
 def webSYNCHfds2smv():             os.system("start " + webscript_dir + "webSYNCHfds2smv")
 def webSYNCHsmv2fds():             os.system("start " + webscript_dir + "webSYNCHsmv2fds")
+
 def clean_repos():                 os.system("start " + webscript_dir + "webclean "       + platforms[w.get()])
 def clean_uploads():               os.system("start " + webscript_dir + "webCleanUpload " + platforms[w.get()])
 def clean_smv():                   os.system("start " + webscript_dir + "webCleanSMV "    + platforms[w.get()])
+
 def set_branch():                  os.system("start " + webscript_dir + "webSET_branches")
 def add_notes():                   os.system("start " + webscript_dir + "webGET_smvlog")
 def edit_notes():                  os.system("start " + webscript_dir + "webEDIT_release_notes")
@@ -92,9 +108,16 @@ Button(root, text="Branch",       width=button_width, command=show_branch).grid(
 # ------------------------- Update repos ------------------------------
 
 R=R+1
-Label(root, text="Update:").grid(column=0, row=R, sticky=E)
+Label(root, text="Update fds,smv,...:").grid(column=0, row=R, sticky=E)
 Button(root, text="All",        width=button_width, command=update_all).grid(row=R,     column=1)
 Button(root, text="Windows",    width=button_width, command=update_windows).grid(row=R, column=2)
+
+# ------------------------- Update repos ------------------------------
+
+R=R+1
+Label(root, text="Update smv:").grid(column=0, row=R, sticky=E)
+Button(root, text="All",        width=button_width, command=update_smv_all).grid(row=R,     column=1)
+Button(root, text="Windows",    width=button_width, command=update_smv_windows).grid(row=R, column=2)
 
 # ------------------------- Set  ------------------------------
 
@@ -152,25 +175,44 @@ Radiobutton(root,
                variable=v, 
                value=3).grid(row=R, column=2)
 
-# ------------------------- Build libraries/utilities ------------------------------
+# ------------------------- Build libraries, utilities ------------------------------
 
 R=R+1
-Label(root,  text="Build:").grid(column=0, row=R, sticky=E)
+Label(root,  text="Build/Intel:").grid(column=0, row=R, sticky=E)
 Button(root, text="Libs",  width=button_width, command=build_lib).grid(row=R,  column=1)
 Button(root, text="Utils", width=button_width, command=build_util).grid(row=R, column=2)
 
-# ------------------------- Build smokeview ------------------------------
+# ------------------------- Build test smokeview ------------------------------
 R=R+1
-Label(root,  text="Build:").grid(column=0, row=R, sticky=E)
-Button(root, text="Smv(full)",   width=button_width, command=build_smv).grid(row=R,  column=1)
-Button(root, text="Smv(inc)",    width=button_width, command=build_smv_win_inc).grid(row=R, column=2)
+Label(root,  text="Build smv/Intel:").grid(column=0, row=R, sticky=E)
+Button(root, text="test",   width=button_width, command=build_smv).grid(row=R,  column=1)
+Button(root, text="release",   width=button_width, command=build_smv_rel).grid(row=R,  column=2)
+R=R+1
+Button(root, text="test inc",    width=button_width, command=build_smv_win_inc).grid(row=R, column=1)
 
-# ------------------------- bundle smokeview ------------------------------
+# ------------------------- Build gnu libraries, smokeview ------------------------------
 
 R=R+1
-Button(root, text="Bundle",  width=button_width, command=bundle_smv).grid(row=R,        column=1)
-Button(root, text="Install", width=button_width, command=install_smv).grid(row=R,       column=2)
+Label(root,  text="Build/GNU:").grid(column=0, row=R, sticky=E)
+Button(root, text="Libs",  width=button_width, command=build_lib_gnu).grid(row=R,  column=1)
+Button(root, text="smv",   width=button_width, command=build_smv_gnu).grid(row=R,  column=2)
 
+# ------------------------- bundle ------------------------------
+
+R=R+1
+Label(root,  text="Bundle:").grid(column=0, row=R, sticky=E)
+Button(root, text="test",  width=button_width, command=bundle_smv).grid(row=R,        column=1)
+Button(root, text="release",  width=button_width, command=bundle_smv_rel).grid(row=R,        column=2)
+
+# ------------------------- install ------------------------------
+
+R=R+1
+Label(root,  text="Install:").grid(column=0, row=R, sticky=E)
+Button(root, text="test", width=button_width, command=install_smv).grid(row=R,       column=1)
+Button(root, text="release", width=button_width, command=install_smv_rel).grid(row=R,       column=2)
+
+R=R+1
+Label(root, text="------Upload/Copy/Archive-------").grid(column=0, row=R, columnspan=3)
 
 R=R+1
 Button(root, text="Upload",  width=button_width, command=upload_bundle).grid(row=R, column=0)

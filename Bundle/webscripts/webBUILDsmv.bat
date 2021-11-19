@@ -51,7 +51,7 @@ if "%buildtype%" == "debug" (
    set wintype=
    set type=
 )
-if "%platform%" == "windowsgnu" (
+if "%platform%" == "Windowsgnu" (
   cd %svn_root%\smv\Build\smokeview\gnu_win_64
   call make_smokeview -test -profile
   goto eof
@@ -69,7 +69,7 @@ if "%platform%" == "Linux" (
   plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/run_command.sh smv/Build/smokeview/intel_linux_64 make_smokeview.sh %type%
   goto eof
 )
-if "%platform%" == "linuxgnu" (
+if "%platform%" == "Linuxgnu" (
   plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/run_command.sh smv/Build/smokeview/gnu_linux_64 make_smokeview.sh -p -T
   goto eof
 )
@@ -84,7 +84,7 @@ if "%platform%" == "OSX" (
   plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/run_command.sh smv/Build/smokeview/intel_osx_64 make_smokeview.sh %type%
   goto eof
 )
-if "%platform%" == "osxgnu" (
+if "%platform%" == "OSXgnu" (
   plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/run_command.sh smv/Build/smokeview/gnu_osx_64 make_smokeview.sh -p -T
   goto eof
 )
