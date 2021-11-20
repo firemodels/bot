@@ -14,7 +14,7 @@ These steps are described in more detail below.
 
 ### Bundling Steps
 
-Warning: these scripts erase and clone fresh copies of the fds and smv repos.  
+Warning: these scripts erase and clone fresh copies of the fds and smv repos.
 You should only run these scripts in repos where you do not do daily work.
 
 1. Run firebot on a Linux computer to generate FDS manuals. 
