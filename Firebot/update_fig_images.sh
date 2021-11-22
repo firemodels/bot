@@ -9,10 +9,15 @@ echo "update base images in fig repo"
 echo ""
 echo "Options:"
 echo "-h - display this message"
+echo "-r - repository root [default: $FROM_ROOT]"
 exit 0
 }
 
-FROM_ROOT=
+CURDIR=`pwd`
+cd ../..
+TO_ROOT=`pwd`
+cd $CURDIR
+FROM_ROOT=$TO_ROOT
 
 #*** parse options
 
@@ -30,15 +35,6 @@ done
 shift $(($OPTIND-1))
 
 
-CURDIR=`pwd`
-cd ../..
-TO_ROOT=`pwd`
-cd $CURDIR
-
-if [ "$FROM_ROOT" == "" ]; then
-  FROM_ROOT=$TO_ROOT
-fi
-
 BASEDIR=`basename $CURDIR`
 if [ "$BASEDIR" == "Firebot" ]; then
   BOT_TYPE=firebot
@@ -53,18 +49,23 @@ if [ "$BASEDIR" == "Smokebot" ]; then
   PROG=smv
 fi
 
+ERROR=
 if [ ! -d  $FROM_ROOT/fds ]; then
   echo "***error: $FROM_ROOT/fds does not exist"
-  exit
+  ERROR=1
 fi
 
 if [ ! -d  $FROM_ROOT/smv ]; then
   echo "***error: $FROM_ROOT/smv does not exist"
-  exit
+  ERROR=1
 fi
 
 if [ ! -d  $TO_ROOT/fig ]; then
   echo "***error: $TO_ROOT/fig does not exist"
+  ERROR=1
+fi
+
+if [ "$ERROR" == "1" ]; then
   exit
 fi
 
