@@ -22,6 +22,7 @@ def restart_program():
     os.execl(python, python, * sys.argv)
 
 platforms = ["", "Windows", "Linux", "OSX"]
+buildtype = ["", "test", "release"]
 
 v=IntVar()
 v.set(1)
@@ -31,6 +32,9 @@ w.set(1)
 
 x=IntVar()
 x.set(1)
+
+y=IntVar()
+y.set(1)
 
 button_width=7
 
@@ -54,11 +58,9 @@ def build_lib():                   os.system("start " + webscript_dir + "webBUIL
 def build_lib_gnu():               os.system("start " + webscript_dir + "webBUILDlibs "     + platforms[v.get()] + "gnu")
 def build_util():                  os.system("start " + webscript_dir + "webBUILDallprog "  + platforms[v.get()])
 
-def bundle_smv():                  os.system("start " + webscript_dir + "webPACKAGEsmv "    + platforms[x.get()] + " " + "test" )
-def bundle_smv_rel():              os.system("start " + webscript_dir + "webPACKAGEsmv "    + platforms[x.get()] + " " + "release" )
+def bundle_smv():                  os.system("start " + webscript_dir + "webPACKAGEsmv "    + platforms[x.get()] + " " + buildtype[y.get()] )
 
-def install_smv():                 os.system("start " + webscript_dir + "webINSTALLsmv "    + platforms[x.get()] + " " + "test" )
-def install_smv_rel():             os.system("start " + webscript_dir + "webINSTALLsmv "    + platforms[x.get()] + " " + "release" )
+def install_smv():                 os.system("start " + webscript_dir + "webINSTALLsmv "    + platforms[x.get()] + " " + buildtype[y.get()] )
 
 def archive_smv():                 os.system("start " + webscript_dir + "webARCHIVEAllbundle"  )
 def upload_bundle():               os.system("start " + webscript_dir + "webUPLOADsmv2git")
@@ -230,16 +232,22 @@ Radiobutton(root,
 # ------------------------- bundle ------------------------------
 
 R=R+1
-Label(root,  text="Bundle:").grid(column=0, row=R, sticky=E)
-Button(root, text="test",  width=button_width, command=bundle_smv).grid(row=R,        column=1)
-Button(root, text="release",  width=button_width, command=bundle_smv_rel).grid(row=R,        column=2)
 
-# ------------------------- install ------------------------------
+Radiobutton(root, 
+               text="test",
+               padx = 0, 
+               variable=y, 
+               value=1).grid(row=R, column=0)
+
+Radiobutton(root, 
+               text="release",
+               padx = 0, 
+               variable=y, 
+               value=2).grid(row=R, column=1)
 
 R=R+1
-Label(root,  text="Install:").grid(column=0, row=R, sticky=E)
-Button(root, text="test", width=button_width, command=install_smv).grid(row=R,       column=1)
-Button(root, text="release", width=button_width, command=install_smv_rel).grid(row=R,       column=2)
+Button(root, text="Bundle",  width=button_width, command=bundle_smv).grid(row=R,        column=0)
+Button(root, text="Install", width=button_width, command=install_smv).grid(row=R,       column=1)
 
 R=R+1
 Label(root, text="------Upload/Copy/Archive-------").grid(column=0, row=R, columnspan=3)
