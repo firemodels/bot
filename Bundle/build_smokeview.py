@@ -29,6 +29,9 @@ v.set(1)
 w=IntVar()
 w.set(1)
 
+x=IntVar()
+x.set(1)
+
 button_width=7
 
 # link windows batch files to python commands
@@ -51,11 +54,11 @@ def build_lib():                   os.system("start " + webscript_dir + "webBUIL
 def build_lib_gnu():               os.system("start " + webscript_dir + "webBUILDlibs "     + platforms[v.get()] + "gnu")
 def build_util():                  os.system("start " + webscript_dir + "webBUILDallprog "  + platforms[v.get()])
 
-def bundle_smv():                  os.system("start " + webscript_dir + "webPACKAGEsmv "    + platforms[v.get()] + " " + "test" )
-def bundle_smv_rel():              os.system("start " + webscript_dir + "webPACKAGEsmv "    + platforms[v.get()] + " " + "release" )
+def bundle_smv():                  os.system("start " + webscript_dir + "webPACKAGEsmv "    + platforms[x.get()] + " " + "test" )
+def bundle_smv_rel():              os.system("start " + webscript_dir + "webPACKAGEsmv "    + platforms[x.get()] + " " + "release" )
 
-def install_smv():                 os.system("start " + webscript_dir + "webINSTALLsmv "    + platforms[v.get()] + " " + "test" )
-def install_smv_rel():             os.system("start " + webscript_dir + "webINSTALLsmv "    + platforms[v.get()] + " " + "release" )
+def install_smv():                 os.system("start " + webscript_dir + "webINSTALLsmv "    + platforms[x.get()] + " " + "test" )
+def install_smv_rel():             os.system("start " + webscript_dir + "webINSTALLsmv "    + platforms[x.get()] + " " + "release" )
 
 def archive_smv():                 os.system("start " + webscript_dir + "webARCHIVEAllbundle"  )
 def upload_bundle():               os.system("start " + webscript_dir + "webUPLOADsmv2git")
@@ -122,9 +125,12 @@ Button(root, text="Windows",    width=button_width, command=update_smv_windows).
 # ------------------------- Set  ------------------------------
 
 R=R+1
-Label(root, text="Set:").grid(column=0, row=R, sticky=E)
+Label(root, text="Set Revision:").grid(column=0, row=R, sticky=E)
 Button(root, text="Bundle",   width=button_width, command=set_revision).grid(row=R, column=1)
-Button(root, text="Master",   width=button_width, command=set_branch).grid(row=R,   column=2)
+
+R=R+1
+Label(root, text="Set Branch:").grid(column=0, row=R, sticky=E)
+Button(root, text="Master",   width=button_width, command=set_branch).grid(row=R,   column=1)
 
 # ------------------------- clean ------------------------------
 
@@ -150,10 +156,10 @@ Button(root, text="Repos",   width=button_width, command=clean_repos).grid(row=R
 Button(root, text="Uploads", width=button_width, command=clean_uploads).grid(row=R, column=1)
 Button(root, text="Smv",     width=button_width, command=clean_smv).grid(row=R,     column=2)
 
-# ------------------------- Build/Bundle/Install ------------------------------
+# ------------------------- Build ------------------------------
 
 R=R+1
-Label(root, text="------Build/Bundle/Install------").grid(column=0, row=R, columnspan=3)
+Label(root, text="------------Build ------------").grid(column=0, row=R, columnspan=3)
 
 R=R+1
 
@@ -178,24 +184,48 @@ Radiobutton(root,
 # ------------------------- Build libraries, utilities ------------------------------
 
 R=R+1
-Label(root,  text="Build/Intel:").grid(column=0, row=R, sticky=E)
+Label(root,  text="Build(Intel):").grid(column=0, row=R, sticky=E)
 Button(root, text="Libs",  width=button_width, command=build_lib).grid(row=R,  column=1)
 Button(root, text="Utils", width=button_width, command=build_util).grid(row=R, column=2)
 
 # ------------------------- Build test smokeview ------------------------------
 R=R+1
-Label(root,  text="Build smv/Intel:").grid(column=0, row=R, sticky=E)
+Label(root,  text="Build smv(Intel):").grid(column=0, row=R, sticky=E)
 Button(root, text="test",   width=button_width, command=build_smv).grid(row=R,  column=1)
 Button(root, text="release",   width=button_width, command=build_smv_rel).grid(row=R,  column=2)
 R=R+1
+Label(root,  text="Build smv(Intel):").grid(column=0, row=R, sticky=E)
 Button(root, text="test inc",    width=button_width, command=build_smv_win_inc).grid(row=R, column=1)
 
 # ------------------------- Build gnu libraries, smokeview ------------------------------
 
 R=R+1
-Label(root,  text="Build/GNU:").grid(column=0, row=R, sticky=E)
+Label(root,  text="Build(GNU):").grid(column=0, row=R, sticky=E)
 Button(root, text="Libs",  width=button_width, command=build_lib_gnu).grid(row=R,  column=1)
 Button(root, text="smv",   width=button_width, command=build_smv_gnu).grid(row=R,  column=2)
+
+R=R+1
+Label(root, text="---------Bundle/Install---------").grid(column=0, row=R, columnspan=3)
+
+R=R+1
+
+Radiobutton(root, 
+               text="Windows",
+               padx = 0, 
+               variable=x, 
+               value=1).grid(row=R, column=0)
+
+Radiobutton(root, 
+               text="Linux",
+               padx = 0, 
+               variable=x, 
+               value=2).grid(row=R, column=1)
+
+Radiobutton(root, 
+               text="OSX",
+               padx = 0, 
+               variable=x, 
+               value=3).grid(row=R, column=2)
 
 # ------------------------- bundle ------------------------------
 
