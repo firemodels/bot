@@ -123,15 +123,15 @@ Button(root, text="Branch",       width=button_width, command=show_branch).grid(
 # ------------------------- Update repos ------------------------------
 
 R=R+1
-Label(root, text="Update fds,smv,...:").grid(column=0, row=R, sticky=E)
-Button(root, text="All",        width=button_width, command=update_all).grid(row=R,     column=1)
+Label(root, text="Update all repos:").grid(column=0, row=R, sticky=E)
+Button(root, text="All OS's",        width=button_width, command=update_all).grid(row=R,     column=1)
 Button(root, text="Windows",    width=button_width, command=update_windows).grid(row=R, column=2)
 
 # ------------------------- Update repos ------------------------------
 
 R=R+1
-Label(root, text="Update smv:").grid(column=0, row=R, sticky=E)
-Button(root, text="All",        width=button_width, command=update_smv_all).grid(row=R,     column=1)
+Label(root, text="Update smv repo:").grid(column=0, row=R, sticky=E)
+Button(root, text="All OS's",        width=button_width, command=update_smv_all).grid(row=R,     column=1)
 Button(root, text="Windows",    width=button_width, command=update_smv_windows).grid(row=R, column=2)
 
 # ------------------------- Set  ------------------------------
