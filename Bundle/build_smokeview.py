@@ -39,7 +39,7 @@ buildtype=IntVar()
 buildtype.set(1)
 
 app=IntVar()
-app.set(1)
+app.set(2)
 
 guide=IntVar()
 guide.set(1)
