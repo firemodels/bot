@@ -21,8 +21,10 @@ def restart_program():
     python = sys.executable
     os.execl(python, python, * sys.argv)
 
-platforms = ["", "Windows", "Linux", "OSX"]
+platforms  = ["", "Windows", "Linux", "OSX"]
 buildtypes = ["", "test", "release"]
+apps       = ["", "FDS", "Smokeview" ]
+guides     = ["", "User", "Verification", "Validation"]
 
 buildplatform=IntVar()
 buildplatform.set(1)
@@ -35,6 +37,12 @@ bundleplatform.set(1)
 
 buildtype=IntVar()
 buildtype.set(1)
+
+app=IntVar()
+app.set(1)
+
+guide=IntVar()
+guide.set(1)
 
 button_width=7
 
@@ -62,6 +70,8 @@ def bundle_smv():                  os.system("start " + webscript_dir + "webPACK
 
 def install_smv():                 os.system("start " + webscript_dir + "webINSTALLsmv "    + platforms[bundleplatform.get()] + " " + buildtypes[buildtype.get()] )
 
+def download_figures():            os.system("start " + webscript_dir + "webGETfigs "       + apps[app.get()]                 + " " + guides[guide.get()] )
+ 
 def archive_smv():                 os.system("start " + webscript_dir + "webARCHIVEAllbundle"  )
 def upload_bundle():               os.system("start " + webscript_dir + "webUPLOADsmv2git")
 def copy_bundle():                 os.system("start " + webscript_dir + "webCOPYsmv")
@@ -97,7 +107,7 @@ Button(root, text="View",     width=button_width, command=view_notes).grid(row=R
 
 R=R+1
 Label(root, text="Edit:").grid(column=0, row=R, sticky=E)
-Button(root, text="Script",    width=button_width, command=edit_this_page).grid(row=R, column=1)
+Button(root, text="This Script",    width=button_width, command=edit_this_page).grid(row=R, column=1)
 Button(root, text="Settings",  width=button_width, command=edit_settings).grid(row=R,  column=2)
 
 # ------------------------- Show repo revisions ------------------------------
@@ -257,6 +267,48 @@ Button(root, text="Upload",  width=button_width, command=upload_bundle).grid(row
 Button(root, text="Copy",    width=button_width, command=copy_bundle).grid(row=R,   column=1)
 Button(root, text="Archive", width=button_width, command=archive_smv).grid(row=R,   column=2)
 
+# ------------------------- get figures ------------------------------
+
+R=R+1
+Label(root, text="------------download figures------------").grid(column=0, row=R, columnspan=3)
+
+R=R+1
+
+Radiobutton(root, 
+               text="FDS",
+               padx = 0, 
+               variable=app, 
+               value=1).grid(row=R, column=0)
+
+Radiobutton(root, 
+               text="Smokeview",
+               padx = 0, 
+               variable=app, 
+               value=2).grid(row=R, column=1)
+
+R=R+1
+
+Radiobutton(root, 
+               text="User",
+               padx = 0, 
+               variable=guide, 
+               value=1).grid(row=R, column=0)
+
+Radiobutton(root, 
+               text="Verification",
+               padx = 0, 
+               variable=guide, 
+               value=2).grid(row=R, column=1)
+
+Radiobutton(root, 
+               text="Validation",
+               padx = 0, 
+               variable=guide, 
+               value=3).grid(row=R, column=2)
+
+
+R=R+1
+Button(root, text="Download", width=button_width, command=download_figures).grid(row=R,   column=0)
 # ------------------------- synchronize ------------------------------
 
 R=R+1
