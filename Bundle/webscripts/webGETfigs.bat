@@ -39,7 +39,11 @@ if "%guide%" == "Verification" (
   pscp -P 22 %linux_logon%:%smokebothome%/.smokebot/Manuals/SMV_Verification_Guide/SCRIPT_FIGURES/* .
   goto eof
 )
-
+if "%guide%" == "Validation" (
+  echo Smokeview does not have any Validation figures
+  goto eof
+)
+goto eof
 :skip_fds
 if "%guide%" == "User" (
   Title Download FDS user guide images
