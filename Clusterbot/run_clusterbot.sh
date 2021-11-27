@@ -95,6 +95,8 @@ if [ ! -d $HOME/.clusterbot ]; then
   mkdir $HOME/.clusterbot
 fi
 OUTPUT=$HOME/.clusterbot/clusterbot.out
+ERRORS=$HOME/.clusterbot/clusterbot.err
+WARNINGS=$HOME/.clusterbot/clusterbot.wrn
 LOGFILE=$HOME/.clusterbot/clusterbot.log
 
 cd $BINDIR
@@ -110,6 +112,19 @@ fi
 
 nerrors=`grep ***Error $OUTPUT | wc -l`
 nwarnings=`grep ***Warning $OUTPUT | wc -l`
+
+
+if [ $nerrors -gt 0 ]; then
+  echo "--------------------- Errors ------------------------" >  $ERRORS
+  grep ***Error $OUTPUT                                        >> $ERRORS
+  echo "-----------------------------------------------------" >> $ERRORS
+fi
+if [ $nwarnings -gt 0 ]; then
+  echo "--------------------- Warnings ----------------------"  >  $WARNINGS
+  grep ***Warning $OUTPUT                                       >> $WARNINGS
+  echo "-----------------------------------------------------"  >> $WARNINGS
+fi
+
 if [ ! -e $LOGFILE ]; then
  cp $OUTPUT $LOGFILE
 fi 
@@ -127,19 +142,19 @@ fi
 
 rm -f $LOGILE2 $OUTPUT2
 
-
 echo ""
 if [ $nlogdiff -eq 0 ]; then
   echo "$CB_HOSTS status since $LOGDATE: $nerrors Errors, $nwarnings Warnings"
 else
   echo "$CB_HOSTS status has changed: $nerrors Errors, $nwarnings Warnings"
 fi
+cat $ERRORS $WARNINGS
 if [ "$EMAIL" != "" ]; then
   echo emailing results to $EMAIL
   if [ $nlogdiff -eq 0 ]; then
-    cat $OUTPUT | mail -s "$CB_HOSTS status since $LOGDATE: $nerrors Errors, $nwarnings Warnings" $EMAIL
+    cat $ERRORS $WARNINGS $OUTPUT | mail -s "$CB_HOSTS status since $LOGDATE: $nerrors Errors, $nwarnings Warnings" $EMAIL
   else
-    cat $OUTPUT | mail -s "$CB_HOSTS status has changed: $nerrors Errors, $nwarnings Warnings" $EMAIL
+    cat $ERRORS $WARNINGS $OUTPUT | mail -s "$CB_HOSTS status has changed: $nerrors Errors, $nwarnings Warnings" $EMAIL
   fi
 fi
 
