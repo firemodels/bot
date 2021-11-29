@@ -72,6 +72,10 @@ OUTPUT=$HOME/.clusterbot/clusterbot.out
 ERRORS=$HOME/.clusterbot/clusterbot.err
 WARNINGS=$HOME/.clusterbot/clusterbot.wrn
 LOGFILE=$HOME/.clusterbot/clusterbot.log
+rm -f $OUTPUT
+
+echo "" > $ERRORS
+echo "" > $WARNINGS
 
 cd $BINDIR
 

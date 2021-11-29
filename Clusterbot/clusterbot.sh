@@ -197,9 +197,9 @@ CHECK_FILE_DATE()
   current_moddate=`cat $currentfilelist | awk '{print $6" "$7" "$8}'`
   current_filesize=`cat $currentfilelist | awk '{print $5}'`
   if [ $diffs -eq 0 ]; then
-    echo "   `hostname -s`: $fullfile has not changed since it was last archived, modification date $current_moddate, file size $current_filesize"
+    echo "   `hostname -s`: $fullfile has not changed since $current_moddate(file size: $current_filesize)"
   else
-    echo "   `hostname -s`: ***Warning: $fullfile has changed since it was last archived- current($current_moddate), original($original_moddate) modification date,"
+    echo "   `hostname -s`: ***Warning: $fullfile has changed - current($current_moddate), original($original_moddate) modification date,"
     echo "                  current($current_filesize), original($original_filesize) file size."
   fi
   rm $currentfilelist
@@ -591,20 +591,20 @@ if [ "$CB_HOST_ARG" == "" ]; then
   return 0
 fi
 rm -f $FILES_DIR/${prefix}rpm*.txt
-pdsh -t 2 -w $CB_HOST_ARG `pwd`/getrpms.sh $FILES_DIR >& $SLURMRPMOUT
+pdsh -t 2 -w $CB_HOST_ARG `pwd`/getrpms.sh $FILES_DIR $prefix >& $SLURMRPMOUT
 
 local CURDIR=`pwd`
 cd $FILES_DIR
 rpm0=`ls -l ${prefix}rpm*.txt | head -1 | awk '{print $9}'`
 host0=`echo $rpm0 | sed 's/.txt$//'`
-host0=`echo $host0 | sed 's/^rpm_//'`
+host0=`echo $host0 | sed 's/^${prefix}rpm_//'`
 RPMDIFF=
 for f in ${prefix}rpm*.txt
 do
   ndiff=`diff $rpm0 $f | wc -l`
   if [ $ndiff -ne 0 ]; then
     hostdiff=`echo $f | sed 's/.txt$//'`
-    hostdiff=`echo $hostdiff | sed 's/^rpm_//'`
+    hostdiff=`echo $hostdiff | sed 's/^${prefix}rpm_//'`
     if [ "$RPMDIFF" == "" ]; then
       RPMDIFF="$hostdiff"
     else
