@@ -589,7 +589,6 @@ RPM_CHECK ()
 if [ "$CB_HOST_ARG" == "" ]; then
   return 0
 fi
-rm -f $FILES_DIR/rpm*.txt
 pdsh -t 2 -w $CB_HOST_ARG `pwd`/getrpms.sh $FILES_DIR >& $SLURMRPMOUT
 
 local CURDIR=`pwd`
