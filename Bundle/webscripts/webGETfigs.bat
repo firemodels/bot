@@ -1,6 +1,7 @@
 @echo off
 setlocal EnableDelayedExpansion
-set whichguides=%1
+set app=%1
+set guide=%2
 
 ::  batch to copy smokview/smokebot or fdsfirebot figures to local repo
 
@@ -23,58 +24,35 @@ echo.
 
 %svn_drive%
 
-if "%whichguides%" == "websummary" (
-  Title Download web summary images
-
-  cd %svn_root%\smv\Manuals\SMV_Summary\images
-  pscp -P 22 %linux_logon%:%smokebothome%/.smokebot/Manuals/SMV_Summary/images/*  .
-
-  cd %svn_root%\smv\Manuals\SMV_Summary\images2
-  pscp -P 22 %linux_logon%:%smokebothome%/.smokebot/Manuals/SMV_Summary/images2/* .
-
-  cd %svn_root%\smv\Manuals\SMV_Summary\movies
-  pscp -P 22 %linux_logon%:%smokebothome%/.smokebot/MovieManuals/SMV_Summary/movies/*  .
-
-  cd %svn_root%\smv\Manuals\SMV_Summary\manuals
-  pscp -P 22 %linux_logon%:%smokebothome%/.smokebot/pubs/*.pdf .
-  goto eof
-)
-if "%whichguides%" == "smvug" (
+if "%app%" == "FDS" goto skip_fds
+if "%guide%" == "User" (
   Title Download smokeview user guide images
 
   cd %svn_root%\smv\Manuals\SMV_User_Guide\SCRIPT_FIGURES
   pscp -P 22 %linux_logon%:%smokebothome%/.smokebot/Manuals/SMV_User_Guide/SCRIPT_FIGURES/* .
   goto eof
 )
-if "%whichguides%" == "smvugfork" (
-  Title Download smokeview user guide images
-
-  cd %svn_root%\smv\Manuals\SMV_User_Guide\SCRIPT_FIGURES
-  pscp -P 22 %linux_logon%:%userhome%/.smokebot/Manuals/SMV_User_Guide/SCRIPT_FIGURES/* .
-  goto eof
-)
-if "%whichguides%" == "smvvg" (
+if "%guide%" == "Verification" (
   Title Download smokeview verification guide images
 
   cd %svn_root%\smv\Manuals\SMV_Verification_Guide\SCRIPT_FIGURES
   pscp -P 22 %linux_logon%:%smokebothome%/.smokebot/Manuals/SMV_Verification_Guide/SCRIPT_FIGURES/* .
   goto eof
 )
-if "%whichguides%" == "smvvgfork" (
-  Title Download smokeview verification guide images
-
-  cd %svn_root%\smv\Manuals\SMV_Verification_Guide\SCRIPT_FIGURES
-  pscp -P 22 %linux_logon%:%userhome%/.smokebot/Manuals/SMV_Verification_Guide/SCRIPT_FIGURES/* .
+if "%guide%" == "Validation" (
+  echo Smokeview does not have any Validation figures
   goto eof
 )
-if "%whichguides%" == "fdsug" (
+goto eof
+:skip_fds
+if "%guide%" == "User" (
   Title Download FDS user guide images
 
   cd %svn_root%\fds\Manuals\FDS_User_Guide\SCRIPT_FIGURES
   pscp -P 22 %linux_logon%:%firebothome%/.firebot/Manuals/FDS_User_Guide/SCRIPT_FIGURES/* .
   goto eof
 )
-if "%whichguides%" == "fdsvalg" (
+if "%guide%" == "Validation" (
   cd %svn_root%\fds\Manuals\FDS_Validation_Guide\SCRIPT_FIGURES
   for /D %%d in (*) do (
       echo.
@@ -88,7 +66,7 @@ if "%whichguides%" == "fdsvalg" (
   )
   goto eof
 )
-if "%whichguides%" == "fdsverg" (
+if "%guide%" == "Verification" (
   Title Download FDS verification guide images
 
   cd %svn_root%\fds\Manuals\FDS_Verification_Guide\SCRIPT_FIGURES

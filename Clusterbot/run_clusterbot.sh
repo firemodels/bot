@@ -1,33 +1,5 @@
 #!/bin/bash
 
-#---------------------------------------------
-# ---------------------------- USAGE ----------------------------------
-#---------------------------------------------
-
-function USAGE {
-  echo "Usage: run_smokebot.sh [options]"
-  echo ""
-  echo "run_clusterbot.sh - perform various checks to verify a Linux cluster is working properly. If the -q option"
-  echo "                is specified, run test cases on multiple nodes. The test cases are very simple designed"
-  echo "                only to verify that communication works between processes.  To run more realistic test"
-  echo "                cases, use firebot or smokebot."
-  echo ""
-  echo "Options:"
-  echo " -f - override lock to force clusterbot run"
-  echo " -F - fast checks"
-  echo " -h - display this message"
-  echo " -m email_address - send results to email_address"
-  echo " -n n - run n cases on each queue [default: $NCASES_PER_QUEUE]"
-  echo " -q q - run test cases using the queue q."
-  echo " -Q q - same as the -q option except that only test cases are run."
-  echo "         Other tests are not performed."
-  echo " -r - check file contents readable only by root.  If this option is not"
-  echo "      used, only the file size and modification date are checked.  You"
-  echo "      need to have sudo priviledges to use this option."
-
-  exit
-}
-
 EMAIL=
 fopt=
 Fopt=
@@ -36,6 +8,7 @@ QOPT=
 qopt=
 ropt=
 FORCE_UNLOCK=
+NCASES_PER_QUEUE=20
 while getopts 'fFhm:n:q:Q:r' OPTION
 do
 case $OPTION  in
@@ -47,7 +20,7 @@ case $OPTION  in
    Fopt="-F"
    ;;
   h)
-   USAGE
+   ./clusterbot_usage.sh run_clusterbot.sh $NCASES_PER_QUEUE 1
    exit
    ;;
   m)
@@ -61,7 +34,6 @@ case $OPTION  in
      exit
    fi
    NCASES_PER_QUEUE=$NCASES
-   nopt="-n $NCASES_PER_QUEUE"
    ;;
   Q)
    QOPT="-Q $OPTARG"
@@ -75,6 +47,8 @@ case $OPTION  in
 esac
 done
 shift $(($OPTIND-1))
+   
+nopt="-n $NCASES_PER_QUEUE"
 
 LOCK_FILE=$HOME/.clusterbot/lockfile
 if [[ "$FORCE_UNLOCK" == "" ]] && [[ -e $LOCK_FILE ]]; then
@@ -95,6 +69,8 @@ if [ ! -d $HOME/.clusterbot ]; then
   mkdir $HOME/.clusterbot
 fi
 OUTPUT=$HOME/.clusterbot/clusterbot.out
+ERRORS=$HOME/.clusterbot/clusterbot.err
+WARNINGS=$HOME/.clusterbot/clusterbot.wrn
 LOGFILE=$HOME/.clusterbot/clusterbot.log
 
 cd $BINDIR
@@ -110,6 +86,19 @@ fi
 
 nerrors=`grep ***Error $OUTPUT | wc -l`
 nwarnings=`grep ***Warning $OUTPUT | wc -l`
+
+
+if [ $nerrors -gt 0 ]; then
+  echo "--------------------- Errors ------------------------" >  $ERRORS
+  grep ***Error $OUTPUT                                        >> $ERRORS
+  echo "-----------------------------------------------------" >> $ERRORS
+fi
+if [ $nwarnings -gt 0 ]; then
+  echo "--------------------- Warnings ----------------------"  >  $WARNINGS
+  grep ***Warning $OUTPUT                                       >> $WARNINGS
+  echo "-----------------------------------------------------"  >> $WARNINGS
+fi
+
 if [ ! -e $LOGFILE ]; then
  cp $OUTPUT $LOGFILE
 fi 
@@ -127,19 +116,19 @@ fi
 
 rm -f $LOGILE2 $OUTPUT2
 
-
 echo ""
 if [ $nlogdiff -eq 0 ]; then
   echo "$CB_HOSTS status since $LOGDATE: $nerrors Errors, $nwarnings Warnings"
 else
   echo "$CB_HOSTS status has changed: $nerrors Errors, $nwarnings Warnings"
 fi
+cat $ERRORS $WARNINGS
 if [ "$EMAIL" != "" ]; then
   echo emailing results to $EMAIL
   if [ $nlogdiff -eq 0 ]; then
-    cat $OUTPUT | mail -s "$CB_HOSTS status since $LOGDATE: $nerrors Errors, $nwarnings Warnings" $EMAIL
+    cat $ERRORS $WARNINGS $OUTPUT | mail -s "$CB_HOSTS status since $LOGDATE: $nerrors Errors, $nwarnings Warnings" $EMAIL
   else
-    cat $OUTPUT | mail -s "$CB_HOSTS status has changed: $nerrors Errors, $nwarnings Warnings" $EMAIL
+    cat $ERRORS $WARNINGS $OUTPUT | mail -s "$CB_HOSTS status has changed: $nerrors Errors, $nwarnings Warnings" $EMAIL
   fi
 fi
 
