@@ -86,14 +86,19 @@ if [ "$not_have_git" == "0" ]; then
   git merge origin/master &> /dev/null
 fi
 
+START_TIME=`date`
 ./clusterbot.sh $fopt $Fopt $nopt $QOPT $qopt $ropt | tee  $OUTPUT
+STOP_TIME=`date`
 
 nerrors=`grep ***Error $OUTPUT | wc -l`
 nwarnings=`grep ***Warning $OUTPUT | wc -l`
 
 
+echo "-----------------------------------------------------" >  $ERRORS
+echo "start date: $START_TIME" >> $ERRORS
+echo " stop date: $STOP_TIME"  >> $ERRORS
 if [ $nerrors -gt 0 ]; then
-  echo "--------------------- Errors ------------------------" >  $ERRORS
+  echo "--------------------- Errors ------------------------" >> $ERRORS
   grep ***Error $OUTPUT                                        >> $ERRORS
   echo "-----------------------------------------------------" >> $ERRORS
 fi
@@ -108,17 +113,11 @@ if [ ! -e $LOGFILE ]; then
 fi 
 
 LOGDATE=`cat $LOGFILE | awk '{print $6" "$7" "$8}'`
-LOGFILE2=/tmp/logfile.$$
-OUTPUT2=/tmp/output.$$
-tail -n +2 $LOGFILE | grep -v 'start time' | grep -v 'stop time' > $LOGFILE2
-tail -n +2 $OUTPUT  | grep -v 'start time' | grep -v 'stop time' > $OUTPUT2
 
-nlogdiff=`diff $LOGFILE2 $OUTPUT2 | wc -l`
+nlogdiff=`diff $LOGFILE $OUTPUT | wc -l`
 if [ $nlogdiff -gt 0 ]; then
  cp $OUTPUT $LOGFILE
 fi
-
-rm -f $LOGILE2 $OUTPUT2
 
 echo ""
 if [ $nlogdiff -eq 0 ]; then

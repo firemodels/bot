@@ -1350,11 +1350,6 @@ if [ "$TEST_QUEUE" != "" ]; then
 fi
 if [ "$ONLY_RUN_TEST_CASES" == "1" ]; then
   CHECK_TEST_CASES $ONLY_RUN_TEST_CASES
-  STOP_TIME=`date`
-  echo ""
-  echo "--------------------- clusterbot complete ------------------------------"
-  echo "start time: $START_TIME"
-  echo "stop time: $STOP_TIME"
 
   rm $LOCK_FILE
   exit
@@ -1492,11 +1487,6 @@ CHECK_FILE_DATE /etc/slurm/slurmdbd.conf
 CHECK_DAEMON slurmd Error $CB_HOSTS
 
 if [ "$FAST" == "1" ]; then
-  STOP_TIME=`date`
-  echo ""
-  echo "--------------------- clusterbot complete ------------------------------"
-  echo "start time: $START_TIME"
-  echo "stop time: $STOP_TIME"
 
   rm $LOCK_FILE
   exit
@@ -1723,10 +1713,7 @@ if [[ "$ONLY_RUN_TEST_CASES" != "1" ]] && [[ "$TEST_QUEUE" != "" ]]; then
   CHECK_TEST_CASES 0
 fi
 
-STOP_TIME=`date`
 echo ""
 echo "--------------------- clusterbot complete ------------------------------"
-echo "start time: $START_TIME"
-echo "stop time: $STOP_TIME"
 
 rm $LOCK_FILE
