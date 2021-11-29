@@ -930,7 +930,7 @@ SPEED_CHECK ()
   if [ "$SPEED_DIFF" == "" ]; then
     echo "   $CB_HOST_ARG: CPU clock rate is $speed0"
   else
-    echo "   $CB_HOST_ARG: ***Warning: CPU clock rate is $speed0 except on $SPEED_DIFF "
+    echo "   $CB_HOST_ARG: CPU clock rate is $speed0 except on $SPEED_DIFF "
   fi
 }
 
@@ -1402,39 +1402,27 @@ fi
 if [[ "$CB_HOST4" != "" ]] && [[ $CB_HOSTIB4 != "" ]]; then
   ssh $CB_HOST4 pdsh -t 2 -w $CB_HOSTIB4 date  >>  $IBOUT 2>&1
 fi
-IBDOWN=`grep -E 'timed|refused|route'  $IBOUT | grep out | sort | awk -F':' '{print $1}' | awk '{printf "%s ", $1}'`
+IBDOWN_HOSTS=`grep -E 'timed|refused|route'  $IBOUT | grep out | sort | awk -F':' '{print $1}' | awk '{printf "%s ", $1}'`
+
+IBDOWN=
+for h in $IBDOWN; do
+#*** only warn if ethernet is up and infiniband is down
+  IS_HOST_UP $h
+  if [ "$?" == "1" ]; then
+    if [ "$IBDOWN" == "" ]; then
+      IBDOWN="$host"
+    else
+      IBDOWN="$IBDOWN $host"
+    fi
+  fi
+done
 
 if [ `cat $IBOUT | wc -l` -ne 0 ]; then
   if [ "$IBDOWN" == "" ]; then
-    echo "   $CB_HOSTS: Infiniband up"
+    echo "   $CB_HOSTS: Infiniband up(on all hosts that are up)"
   else
-    echo "   $CB_HOSTS: ***Warning: Infiniband down on $IBDOWN"
+    echo "   $CB_HOSTS: ***Error: Infiniband down on $IBDOWN"
   fi
-fi
-
-# --------------------- check for hosts with working ethernet, non-working infiniband  --------------------
-TEMP_ETH=/tmp/eth.$$
-pdsh -t 2 -w $CB_HOSTS   date >& $TEMP_ETH  
-UP_ETH=`cat $TEMP_ETH| grep -v ssh  | grep -v Connection | awk -F':' '{print $1}' | sort`
-rm -f $TEMP_ETH
-
-IB_LIST=
-if [ "$IBDOWN" != "" ]; then
-  for h in $IBDOWN ; do
-    suffix=-ib
-    h=${h%$suffix}
-    IS_HOST_UP $h
-    if [ "$?" == "1" ]; then
-      if [ "$IB_LIST" == "" ]; then
-        IB_LIST="$h"
-      else
-        IB_LIST="$IB_LIST $h"
-      fi
-    fi
-  done
-fi
-if [ "$IB_LIST" != "" ]; then
-  echo "   $CB_HOSTS: ***Error: ethernet up and infiniband down on $IB_LIST"
 fi
 
 # --------------------- check infiniband subnet manager --------------------
@@ -1465,15 +1453,20 @@ SLURMDOWN=
 while read line 
 do
   host=`echo $line | awk '{print $1}'`
-  if [ "$SLURMDOWN" == "" ]; then
-    SLURMDOWN="$host"
-  else
-    SLURMDOWN="$SLURMDOWN $host"
+
+#*** only warn if ethernet is up and slurm is down on a host
+  IS_HOST_UP $h
+  if [ "$?" == "1" ]; then
+    if [ "$SLURMDOWN" == "" ]; then
+      SLURMDOWN="$host"
+    else
+      SLURMDOWN="$SLURMDOWN $host"
+    fi
   fi
 done < $DOWN_HOSTS
 
 if [ "$SLURMDOWN" == "" ]; then
-  echo "   $CB_HOSTS: slurm online"
+  echo "   $CB_HOSTS: slurm online (on hosts that are up)"
 else
   echo "   $CB_HOSTS: ***Warning: slurm offline on $SLURMDOWN"
   echo "      Fix: sudo scontrol update nodename=HOST state=resume"
