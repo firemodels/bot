@@ -585,19 +585,21 @@ RPM_CHECK ()
 {
  local INDENT=$1
  local CB_HOST_ARG=$2
+ prefix=$3
 
 if [ "$CB_HOST_ARG" == "" ]; then
   return 0
 fi
+rm -f $FILES_DIR/${prefix}rpm*.txt
 pdsh -t 2 -w $CB_HOST_ARG `pwd`/getrpms.sh $FILES_DIR >& $SLURMRPMOUT
 
 local CURDIR=`pwd`
 cd $FILES_DIR
-rpm0=`ls -l rpm*.txt | head -1 | awk '{print $9}'`
+rpm0=`ls -l ${prefix}rpm*.txt | head -1 | awk '{print $9}'`
 host0=`echo $rpm0 | sed 's/.txt$//'`
 host0=`echo $host0 | sed 's/^rpm_//'`
 RPMDIFF=
-for f in rpm*.txt
+for f in ${prefix}rpm*.txt
 do
   ndiff=`diff $rpm0 $f | wc -l`
   if [ $ndiff -ne 0 ]; then
@@ -1682,12 +1684,12 @@ fi
 
 echo ""
 echo "--------------------- rpm check ------------------------------"
-RPM_CHECK 0 $CB_HOSTS
+RPM_CHECK 0 $CB_HOSTS       ALL
 if [ "$?" == "1" ]; then
-  RPM_CHECK 1 $CB_HOSTETH1
-  RPM_CHECK 1 $CB_HOSTETH2
-  RPM_CHECK 1 $CB_HOSTETH3
-  RPM_CHECK 1 $CB_HOSTETH4
+  RPM_CHECK 1 $CB_HOSTETH1  ETH1
+  RPM_CHECK 1 $CB_HOSTETH2  ETH2
+  RPM_CHECK 1 $CB_HOSTETH3  ETH3
+  RPM_CHECK 1 $CB_HOSTETH4  ETH4
 fi
 
 echo ""
