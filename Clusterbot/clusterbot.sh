@@ -1243,7 +1243,6 @@ MAKE_DATA_DIRS ||  exit
 
 # --------------------- define file names --------------------
 
-START_TIME=`date`
 ETHOUT=$FILES_DIR/ethout.$$
 CLUSTEROUT=$FILES_DIR/clusterout.$$
 ETHUP=$FILES_DIR/ethup.33
@@ -1320,7 +1319,7 @@ fi
 
 if [ "$ONLY_RUN_TEST_CASES" != "1" ]; then
   echo
-  echo "---------- $CB_HOSTS status - `date` ----------"
+  echo "---------- $CB_HOSTS status` ----------"
   TEMP_RUN=/tmp/run.$$
   git describe --dirty --long >& $TEMP_RUN
   not_have_git=`cat $TEMP_RUN | grep fatal | wc -l`
