@@ -1491,6 +1491,50 @@ if [ "$FAST" == "1" ]; then
   exit
 fi
 
+#*** check slurm rpm
+
+TEMP_RPM=/tmp/rpm.$$
+pdsh -t 2 -w $CB_HOSTS "rpm -qa | grep slurm | grep devel" >& $TEMP_RPM
+cat $TEMP_RPM | grep -v ssh | grep -v Connection | sort >& $SLURMRPMOUT
+rm -f $TEMP_RPM
+SLURMRPM0=`head -1 $SLURMRPMOUT | awk '{print $2}'`
+SLURMBAD=
+while read line 
+do
+  host=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
+  SLURMRPMI=`echo $line | awk '{print $2}'`
+  if [ "$SLURMRPMI" != "$SLURMRPM0" ]; then
+    if [ "$SLURMRPMI" != "Connection" ]; then
+      if [ "$SLURMBAD" == "" ]; then
+        SLURMBAD="$host/$SLURMRPMI"
+      else
+        SLURMBAD="$SLURMBAD $host/$SLURMRPMI"
+      fi
+    fi
+  fi
+done < $SLURMRPMOUT
+
+if [ "$SLURMBAD" == "" ]; then
+  echo "   $CB_HOSTS: $SLURMRPM0 installed"
+else
+  echo "   $CB_HOSTS: ***Error: $SLURMRPM0 not installed on $SLURMBAD"
+  echo "      Fix: ask system administrator to update slurm rpm packages"
+fi
+
+if [ "$GANGLIA" != "" ]; then
+  echo ""
+  echo "--------------------- ganglia check ------------------------------"
+  CHECK_FILE /etc/ganglia/gmond.conf Warning 0 $FILES_DIR $CB_HOSTS
+  if [ "$?" == "1" ]; then
+    CHECK_FILE /etc/ganglia/gmond.conf Warning 1 $FILES_DIR $CB_HOSTETH1 
+    CHECK_FILE /etc/ganglia/gmond.conf Warning 1 $FILES_DIR $CB_HOSTETH2 
+    CHECK_FILE /etc/ganglia/gmond.conf Warning 1 $FILES_DIR $CB_HOSTETH3 
+    CHECK_FILE /etc/ganglia/gmond.conf Warning 1 $FILES_DIR $CB_HOSTETH4 
+    echo ""
+  fi
+  CHECK_DAEMON gmond Warning $CB_HOSTS
+fi
+
 # --------------------- run cluster checker --------------------
 
 if [ "$CHECK_CLUSTER" != "" ]; then
@@ -1622,45 +1666,10 @@ if [ "$?" == "1" ]; then
   echo ""
 fi
 
-#*** check slurm rpm
-
-TEMP_RPM=/tmp/rpm.$$
-pdsh -t 2 -w $CB_HOSTS "rpm -qa | grep slurm | grep devel" >& $TEMP_RPM
-cat $TEMP_RPM | grep -v ssh | grep -v Connection | sort >& $SLURMRPMOUT
-rm -f $TEMP_RPM
-SLURMRPM0=`head -1 $SLURMRPMOUT | awk '{print $2}'`
-SLURMBAD=
-while read line 
-do
-  host=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
-  SLURMRPMI=`echo $line | awk '{print $2}'`
-  if [ "$SLURMRPMI" != "$SLURMRPM0" ]; then
-    if [ "$SLURMRPMI" != "Connection" ]; then
-      if [ "$SLURMBAD" == "" ]; then
-        SLURMBAD="$host/$SLURMRPMI"
-      else
-        SLURMBAD="$SLURMBAD $host/$SLURMRPMI"
-      fi
-    fi
-  fi
-done < $SLURMRPMOUT
-
-if [ "$SLURMBAD" == "" ]; then
-  echo "   $CB_HOSTS: $SLURMRPM0 installed"
-else
-  echo "   $CB_HOSTS: ***Error: $SLURMRPM0 not installed on $SLURMBAD"
-  echo "      Fix: ask system administrator to update slurm rpm packages"
-fi
-
 # --------------------- check daemons --------------------
 
-GANGLIA=`ps -el | grep gmetad`
-if [ "$GANGLIA" != "" ]; then
-echo ""
-echo "--------------------- daemon check ---------------------------"
-#*** check ganglia daemon
-  CHECK_DAEMON gmond Warning $CB_HOSTS
-fi
+#echo "--------------------- daemon check ---------------------------"
+#CHECK_DAEMON gmond Warning $CB_HOSTS
 
 # --------------------- rpm check --------------------
 
@@ -1675,24 +1684,12 @@ if [ "$?" == "1" ]; then
 fi
 
 echo ""
-echo "--------------------- accounting file checks ------------------------------"
+echo "--------------------- authorization file checks ------------------------------"
 ACCT_CHECK /etc/group  $FILES_DIR $CB_HOSTS
 ACCT_CHECK /etc/passwd $FILES_DIR $CB_HOSTS
 
 echo ""
 echo "--------------------- general file checks ------------------------------"
-
-if [ "$GANGLIA" != "" ]; then
-  CHECK_FILE /etc/ganglia/gmond.conf Warning 0 $FILES_DIR $CB_HOSTS
-  if [ "$?" == "1" ]; then
-    CHECK_FILE /etc/ganglia/gmond.conf Warning 1 $FILES_DIR $CB_HOSTETH1 
-    CHECK_FILE /etc/ganglia/gmond.conf Warning 1 $FILES_DIR $CB_HOSTETH2 
-    CHECK_FILE /etc/ganglia/gmond.conf Warning 1 $FILES_DIR $CB_HOSTETH3 
-    CHECK_FILE /etc/ganglia/gmond.conf Warning 1 $FILES_DIR $CB_HOSTETH4 
-    echo ""
-  fi
-fi
-
 HOST_CHECK $FILES_DIR 0 $CB_HOSTS
 if [ "$?" == "1" ]; then
   HOST_CHECK $FILES_DIR 1 $CB_HOSTETH1 
