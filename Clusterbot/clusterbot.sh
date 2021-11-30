@@ -1103,7 +1103,7 @@ CHECK_TEST_CASES ()
 {
   local REPORT_STATUS=$1
   echo ""
-  echo "--------------------- check test cases ------------------------------"
+  echo "--------------- check test cases --------------------"
   WAIT_TEST_CASES_END $JOBPREFIX $REPORT_STATUS
   if [ "$TEST_QUEUE" == "each" ]; then
     CHECK_FDS_OUT $JOBPREFIX $CB_QUEUE1
@@ -1330,7 +1330,7 @@ if [ "$ONLY_RUN_TEST_CASES" != "1" ]; then
 fi
 if [ "$TEST_QUEUE" != "" ]; then
   echo ""
-  echo "--------------------- submitting test cases ------------------------------"
+  echo "--------------- submitting test cases ---------------"
   HAVE_JOBS_RUNNING $JOBPREFIX
   if [ "$?" == "1" ]; then
     echo "***error: clusterbot cases are still running"
@@ -1368,7 +1368,7 @@ if [ "$platform" == "osx" ]; then
 fi
 
 echo ""
-echo "--------------------- ethernet check --------------------------"
+echo "--------------- ethernet check ----------------------"
 # --------------------- check ethernet --------------------
 
 pdsh -t 2 -w $CB_HOSTS date   >& $ETHOUT
@@ -1382,7 +1382,7 @@ fi
 
 # --------------------- check infiniband --------------------
 echo ""
-echo "--------------------- infiniband checks -----------------------"
+echo "--------------- infiniband checks -------------------"
 
 rm -rf $IBOUT
 touch $IBOUT
@@ -1438,7 +1438,7 @@ if [ "$FAST" == "" ]; then
 fi
 
 echo ""
-echo "--------------------- slurm checks ----------------------------"
+echo "--------------- slurm checks ------------------------"
 
 #*** check that slurm is online
 pbsnodes -l | awk '{print $1}' | sort -u  > $DOWN_HOSTS
@@ -1524,7 +1524,7 @@ CHECK_FILE_DATE /etc/slurm/slurmdbd.conf
 GANGLIA=`ps -el | grep gmetad`
 if [ "$GANGLIA" != "" ]; then
   echo ""
-  echo "--------------------- ganglia checks ------------------------------"
+  echo "--------------- ganglia checks ----------------------"
   CHECK_FILE /etc/ganglia/gmond.conf Warning 0 $FILES_DIR $CB_HOSTS
   if [ "$?" == "1" ]; then
     CHECK_FILE /etc/ganglia/gmond.conf Warning 1 $FILES_DIR $CB_HOSTETH1 
@@ -1540,7 +1540,7 @@ fi
 
 if [ "$CHECK_CLUSTER" != "" ]; then
   echo ""
-  echo "--------------------- Intel Cluster Checker -------------------"
+  echo "--------------- Intel Cluster Checker ---------------"
   RUN_CLUSTER_CHECK ETH1 $CB_HOSTETH1
   RUN_CLUSTER_CHECK ETH2 $CB_HOSTETH2
   RUN_CLUSTER_CHECK ETH3 $CB_HOSTETH3
@@ -1550,7 +1550,7 @@ fi
 # --------------------- check provisioning date --------------------
 
 echo ""
-echo "--------------------- image date check -------------------------"
+echo "--------------- image date check --------------------"
 PROVISION_DATE_CHECK $CB_HOSTETH1
 PROVISION_DATE_CHECK $CB_HOSTETH2
 PROVISION_DATE_CHECK $CB_HOSTETH3
@@ -1559,7 +1559,7 @@ PROVISION_DATE_CHECK $CB_HOSTETH4
 # --------------------- check number of cores --------------------
 
 echo ""
-echo "--------------------- CPU checks -------------------------"
+echo "--------------- CPU checks --------------------------"
 CORE_CHECK $CB_HOSTETH1
 CORE_CHECK $CB_HOSTETH2
 CORE_CHECK $CB_HOSTETH3
@@ -1573,7 +1573,7 @@ SPEED_CHECK $FILES_DIR $CB_HOSTETH3
 SPEED_CHECK $FILES_DIR $CB_HOSTETH4
 
 echo ""
-echo "--------------------- memory check -------------------------"
+echo "--------------- memory check ------------------------"
 
 MEMORY_CHECK $FILES_DIR $CB_HOSTETH1 $CB_MEM1
 MEMORY_CHECK $FILES_DIR $CB_HOSTETH2 $CB_MEM2
@@ -1581,7 +1581,7 @@ MEMORY_CHECK $FILES_DIR $CB_HOSTETH3 $CB_MEM3
 MEMORY_CHECK $FILES_DIR $CB_HOSTETH4 $CB_MEM4
 
 echo ""
-echo "--------------------- clock checks --------------------------"
+echo "--------------- clock checks ------------------------"
 
 CHECK_DAEMON chronyd Error $CB_HOSTS
 
@@ -1604,7 +1604,7 @@ if [ "$?" == "1" ]; then
 fi
 
 echo ""
-echo "--------------------- file system checks -------------------------"
+echo "--------------- file system checks ------------------"
 
 #*** check number of file systems mounted
 
@@ -1669,13 +1669,13 @@ fi
 
 # --------------------- check daemons --------------------
 
-#echo "--------------------- daemon check ---------------------------"
+#echo "--------------- daemon check ------------------------"
 #CHECK_DAEMON gmond Warning $CB_HOSTS
 
 # --------------------- rpm check --------------------
 
 echo ""
-echo "--------------------- rpm check ------------------------------"
+echo "--------------- rpm check ---------------------------"
 RPM_CHECK 0 $CB_HOSTS       ALL
 if [ "$?" == "1" ]; then
   RPM_CHECK 1 $CB_HOSTETH1  ETH1
@@ -1685,12 +1685,12 @@ if [ "$?" == "1" ]; then
 fi
 
 echo ""
-echo "--------------------- authorization file checks ------------------------------"
+echo "--------------- authorization file checks -----------"
 ACCT_CHECK /etc/group  $FILES_DIR $CB_HOSTS
 ACCT_CHECK /etc/passwd $FILES_DIR $CB_HOSTS
 
 echo ""
-echo "--------------------- general file checks ------------------------------"
+echo "--------------- general file checks -----------------"
 HOST_CHECK $FILES_DIR 0 $CB_HOSTS
 if [ "$?" == "1" ]; then
   HOST_CHECK $FILES_DIR 1 $CB_HOSTETH1 
@@ -1702,7 +1702,7 @@ fi
 CHECK_FILE_DATE /etc/ssh/sshd_config
 
 echo ""
-echo "--------------------- directory content checks --------------------------"
+echo "--------------- directory content checks ------------"
 CHECK_DIR_LIST /etc ssh
 CHECK_DIR_LIST /etc slurm
 
@@ -1711,6 +1711,6 @@ if [[ "$ONLY_RUN_TEST_CASES" != "1" ]] && [[ "$TEST_QUEUE" != "" ]]; then
 fi
 
 echo ""
-echo "--------------------- clusterbot complete ------------------------------"
+echo "--------------- clusterbot complete -----------------"
 
 rm $LOCK_FILE
