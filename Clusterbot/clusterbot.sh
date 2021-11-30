@@ -1088,9 +1088,9 @@ CHECK_FDS_OUT ()
     fi
   done
   if [ $FAIL -eq 0 ]; then
-    echo "$QUEUE:   all $NCASES_PER_QUEUE cases ran successfully"
+    echo "   $QUEUE:   all $NCASES_PER_QUEUE cases ran successfully"
   else
-    echo "$QUEUE: ***error: $FAIL out of $NCASES_PER_QUEUE cases failed to run"
+    echo "   $QUEUE: ***error: $FAIL out of $NCASES_PER_QUEUE cases failed to run"
   fi
   cd $CURDIR
 }
