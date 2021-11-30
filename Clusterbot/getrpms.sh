@@ -1,5 +1,6 @@
 #!/bin/bash
 todir=$1
+prefix=$2
 
 HOST=`hostname -s`
-rpm -qa | sort > $todir/rpm_${HOST}.txt
+rpm -qa | grep -v hponcfg | sort > $todir/${prefix}rpm_${HOST}.txt

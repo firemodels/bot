@@ -197,9 +197,9 @@ CHECK_FILE_DATE()
   current_moddate=`cat $currentfilelist | awk '{print $6" "$7" "$8}'`
   current_filesize=`cat $currentfilelist | awk '{print $5}'`
   if [ $diffs -eq 0 ]; then
-    echo "   `hostname -s`: $fullfile has not changed since it was last archived, modification date $current_moddate, file size $current_filesize"
+    echo "   `hostname -s`: $fullfile has not changed since $current_moddate(file size: $current_filesize)"
   else
-    echo "   `hostname -s`: ***Warning: $fullfile has changed since it was last archived- current($current_moddate), original($original_moddate) modification date,"
+    echo "   `hostname -s`: ***Warning: $fullfile has changed - current($current_moddate), original($original_moddate) modification date,"
     echo "                  current($current_filesize), original($original_filesize) file size."
   fi
   rm $currentfilelist
@@ -585,25 +585,26 @@ RPM_CHECK ()
 {
  local INDENT=$1
  local CB_HOST_ARG=$2
+ prefix=$3
 
 if [ "$CB_HOST_ARG" == "" ]; then
   return 0
 fi
-rm -f $FILES_DIR/rpm*.txt
-pdsh -t 2 -w $CB_HOST_ARG `pwd`/getrpms.sh $FILES_DIR >& $SLURMRPMOUT
+rm -f $FILES_DIR/${prefix}rpm*.txt
+pdsh -t 2 -w $CB_HOST_ARG `pwd`/getrpms.sh $FILES_DIR $prefix >& $SLURMRPMOUT
 
 local CURDIR=`pwd`
 cd $FILES_DIR
-rpm0=`ls -l rpm*.txt | head -1 | awk '{print $9}'`
+rpm0=`ls -l ${prefix}rpm*.txt | head -1 | awk '{print $9}'`
 host0=`echo $rpm0 | sed 's/.txt$//'`
-host0=`echo $host0 | sed 's/^rpm_//'`
+host0=`echo $host0 | sed 's/^${prefix}rpm_//'`
 RPMDIFF=
-for f in rpm*.txt
+for f in ${prefix}rpm*.txt
 do
   ndiff=`diff $rpm0 $f | wc -l`
   if [ $ndiff -ne 0 ]; then
     hostdiff=`echo $f | sed 's/.txt$//'`
-    hostdiff=`echo $hostdiff | sed 's/^rpm_//'`
+    hostdiff=`echo $hostdiff | sed 's/^${prefix}rpm_//'`
     if [ "$RPMDIFF" == "" ]; then
       RPMDIFF="$hostdiff"
     else
@@ -701,9 +702,9 @@ IBSPEED ()
   done < $IBRATE
 
   if [ "$RATEBAD" == "" ]; then
-    echo "   ${CB_HOST_ARG}-ib: Infiniband data rate is $RATE0 Gb/s"
+    echo "   ${CB_HOST_ARG}-ib: infiniband data rate is $RATE0 Gb/s"
   else
-    echo "   ${CB_HOST_ARG}-ib: ***Warning: Infiniband data rate is $RATE0 Gb/s except on $RATEBAD"
+    echo "   ${CB_HOST_ARG}-ib: ***Warning: infiniband data rate is $RATE0 Gb/s except on $RATEBAD"
   fi
   rm -f $IBTEMP
 }
@@ -929,7 +930,7 @@ SPEED_CHECK ()
   if [ "$SPEED_DIFF" == "" ]; then
     echo "   $CB_HOST_ARG: CPU clock rate is $speed0"
   else
-    echo "   $CB_HOST_ARG: ***Warning: CPU clock rate is $speed0 except on $SPEED_DIFF "
+    echo "   $CB_HOST_ARG: CPU clock rate is $speed0 except on $SPEED_DIFF "
   fi
 }
 
@@ -1053,7 +1054,7 @@ RUN_TEST_CASES ()
     ../makecase.sh $CHID $FDSOUTPUT_DIR
     $QFDS -p 24 -j $PREFIX -q $QUEUE $CHID.fds >& /dev/null
   done
-  echo "   $NCASES_PER_QUEUE test cases submitted to the $QUEUE queue"
+  echo "   $NCASES_PER_QUEUE cases submitted to $QUEUE"
   cd $CURDIR
 }
 
@@ -1087,9 +1088,9 @@ CHECK_FDS_OUT ()
     fi
   done
   if [ $FAIL -eq 0 ]; then
-    echo "$QUEUE:   all $NCASES_PER_QUEUE cases ran successfully"
+    echo "   $QUEUE:   all $NCASES_PER_QUEUE cases ran successfully"
   else
-    echo "$QUEUE: ***error: $FAIL out of $NCASES_PER_QUEUE cases failed to run"
+    echo "   $QUEUE: ***error: $FAIL out of $NCASES_PER_QUEUE cases failed to run"
   fi
   cd $CURDIR
 }
@@ -1102,7 +1103,7 @@ CHECK_TEST_CASES ()
 {
   local REPORT_STATUS=$1
   echo ""
-  echo "--------------------- check test cases ------------------------------"
+  echo "--------------- check test cases --------------------"
   WAIT_TEST_CASES_END $JOBPREFIX $REPORT_STATUS
   if [ "$TEST_QUEUE" == "each" ]; then
     CHECK_FDS_OUT $JOBPREFIX $CB_QUEUE1
@@ -1242,7 +1243,6 @@ MAKE_DATA_DIRS ||  exit
 
 # --------------------- define file names --------------------
 
-START_TIME=`date`
 ETHOUT=$FILES_DIR/ethout.$$
 CLUSTEROUT=$FILES_DIR/clusterout.$$
 ETHUP=$FILES_DIR/ethup.33
@@ -1319,18 +1319,18 @@ fi
 
 if [ "$ONLY_RUN_TEST_CASES" != "1" ]; then
   echo
-  echo "---------- $CB_HOSTS status - `date` ----------"
+  echo "------ $CB_HOSTS status ----------"
   TEMP_RUN=/tmp/run.$$
   git describe --dirty --long >& $TEMP_RUN
   not_have_git=`cat $TEMP_RUN | grep fatal | wc -l`
   if [ $not_have_git -eq 0 ]; then
-    echo "---------- `git describe --dirty --long` ----------"
+    echo "------ `git describe --dirty --long` ----------"
   fi
   rm -f $TEMP_RUN
 fi
 if [ "$TEST_QUEUE" != "" ]; then
   echo ""
-  echo "--------------------- submitting test cases ------------------------------"
+  echo "--------------- submitting test cases ------------"
   HAVE_JOBS_RUNNING $JOBPREFIX
   if [ "$?" == "1" ]; then
     echo "***error: clusterbot cases are still running"
@@ -1349,11 +1349,6 @@ if [ "$TEST_QUEUE" != "" ]; then
 fi
 if [ "$ONLY_RUN_TEST_CASES" == "1" ]; then
   CHECK_TEST_CASES $ONLY_RUN_TEST_CASES
-  STOP_TIME=`date`
-  echo ""
-  echo "--------------------- clusterbot complete ------------------------------"
-  echo "start time: $START_TIME"
-  echo "stop time: $STOP_TIME"
 
   rm $LOCK_FILE
   exit
@@ -1373,7 +1368,7 @@ if [ "$platform" == "osx" ]; then
 fi
 
 echo ""
-echo "--------------------- network checks --------------------------"
+echo "--------------- ethernet check ----------------------"
 # --------------------- check ethernet --------------------
 
 pdsh -t 2 -w $CB_HOSTS date   >& $ETHOUT
@@ -1386,6 +1381,8 @@ else
 fi
 
 # --------------------- check infiniband --------------------
+echo ""
+echo "--------------- infiniband checks -------------------"
 
 rm -rf $IBOUT
 touch $IBOUT
@@ -1401,45 +1398,30 @@ fi
 if [[ "$CB_HOST4" != "" ]] && [[ $CB_HOSTIB4 != "" ]]; then
   ssh $CB_HOST4 pdsh -t 2 -w $CB_HOSTIB4 date  >>  $IBOUT 2>&1
 fi
-IBDOWN=`grep -E 'timed|refused|route'  $IBOUT | grep out | sort | awk -F':' '{print $1}' | awk '{printf "%s ", $1}'`
+IBDOWN_HOSTS=`grep -E 'timed|refused|route'  $IBOUT | grep out | sort | awk -F':' '{print $1}' | awk '{printf "%s ", $1}'`
+
+IBDOWN=
+for h in $IBDOWN; do
+#*** only warn if ethernet is up and infiniband is down
+  IS_HOST_UP $h
+  if [ "$?" == "1" ]; then
+    if [ "$IBDOWN" == "" ]; then
+      IBDOWN="$host"
+    else
+      IBDOWN="$IBDOWN $host"
+    fi
+  fi
+done
 
 if [ `cat $IBOUT | wc -l` -ne 0 ]; then
   if [ "$IBDOWN" == "" ]; then
-    echo "   $CB_HOSTS: Infiniband up"
+    echo "   $CB_HOSTS: infiniband up on all hosts with working ethernet"
   else
-    echo "   $CB_HOSTS: ***Warning: Infiniband down on $IBDOWN"
+    echo "   $CB_HOSTS: ***Error: infiniband down on $IBDOWN"
   fi
 fi
 
-# --------------------- check for hosts with working ethernet, non-working infiniband  --------------------
-TEMP_ETH=/tmp/eth.$$
-pdsh -t 2 -w $CB_HOSTS   date >& $TEMP_ETH  
-UP_ETH=`cat $TEMP_ETH| grep -v ssh  | grep -v Connection | awk -F':' '{print $1}' | sort`
-rm -f $TEMP_ETH
-
-IB_LIST=
-if [ "$IBDOWN" != "" ]; then
-  for h in $IBDOWN ; do
-    suffix=-ib
-    h=${h%$suffix}
-    IS_HOST_UP $h
-    if [ "$?" == "1" ]; then
-      if [ "$IB_LIST" == "" ]; then
-        IB_LIST="$h"
-      else
-        IB_LIST="$IB_LIST $h"
-      fi
-    fi
-  done
-fi
-if [ "$IB_LIST" != "" ]; then
-  echo "   $CB_HOSTS: ***Error: ethernet up and infiniband down on $IB_LIST"
-fi
-
-# --------------------- check infiniband subnet manager --------------------
 echo ""
-echo "--------------------- infiniband checks -----------------------"
-
 SUBNET_CHECK $CB_HOST1 $CB_HOSTIB1
 SUBNET_CHECK $CB_HOST2 $CB_HOSTIB2
 SUBNET_CHECK $CB_HOST3 $CB_HOSTIB3
@@ -1456,7 +1438,7 @@ if [ "$FAST" == "" ]; then
 fi
 
 echo ""
-echo "--------------------- slurm checks ----------------------------"
+echo "--------------- slurm checks ------------------------"
 
 #*** check that slurm is online
 pbsnodes -l | awk '{print $1}' | sort -u  > $DOWN_HOSTS
@@ -1464,10 +1446,15 @@ SLURMDOWN=
 while read line 
 do
   host=`echo $line | awk '{print $1}'`
-  if [ "$SLURMDOWN" == "" ]; then
-    SLURMDOWN="$host"
-  else
-    SLURMDOWN="$SLURMDOWN $host"
+
+#*** only warn if ethernet is up and slurm is down on a host
+  IS_HOST_UP $h
+  if [ "$?" == "1" ]; then
+    if [ "$SLURMDOWN" == "" ]; then
+      SLURMDOWN="$host"
+    else
+      SLURMDOWN="$SLURMDOWN $host"
+    fi
   fi
 done < $DOWN_HOSTS
 
@@ -1491,28 +1478,69 @@ if [ "$?" == "1" ]; then
   echo ""
 fi
 
-CHECK_FILE_DATE /etc/slurm/slurmdbd.conf
-
 #*** check slurm daemon
 
 CHECK_DAEMON slurmd Error $CB_HOSTS
 
 if [ "$FAST" == "1" ]; then
-  STOP_TIME=`date`
-  echo ""
-  echo "--------------------- clusterbot complete ------------------------------"
-  echo "start time: $START_TIME"
-  echo "stop time: $STOP_TIME"
 
   rm $LOCK_FILE
   exit
+fi
+
+#*** check slurm rpm
+
+TEMP_RPM=/tmp/rpm.$$
+pdsh -t 2 -w $CB_HOSTS "rpm -qa | grep slurm | grep devel" >& $TEMP_RPM
+cat $TEMP_RPM | grep -v ssh | grep -v Connection | sort >& $SLURMRPMOUT
+rm -f $TEMP_RPM
+SLURMRPM0=`head -1 $SLURMRPMOUT | awk '{print $2}'`
+SLURMBAD=
+while read line 
+do
+  host=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
+  SLURMRPMI=`echo $line | awk '{print $2}'`
+  if [ "$SLURMRPMI" != "$SLURMRPM0" ]; then
+    if [ "$SLURMRPMI" != "Connection" ]; then
+      if [ "$SLURMBAD" == "" ]; then
+        SLURMBAD="$host/$SLURMRPMI"
+      else
+        SLURMBAD="$SLURMBAD $host/$SLURMRPMI"
+      fi
+    fi
+  fi
+done < $SLURMRPMOUT
+
+if [ "$SLURMBAD" == "" ]; then
+  echo "   $CB_HOSTS: $SLURMRPM0 installed"
+else
+  echo "   $CB_HOSTS: ***Error: $SLURMRPM0 not installed on $SLURMBAD"
+  echo "      Fix: ask system administrator to update slurm rpm packages"
+fi
+
+CHECK_FILE_DATE /etc/slurm/slurmdbd.conf
+
+
+GANGLIA=`ps -el | grep gmetad`
+if [ "$GANGLIA" != "" ]; then
+  echo ""
+  echo "--------------- ganglia checks ----------------------"
+  CHECK_FILE /etc/ganglia/gmond.conf Warning 0 $FILES_DIR $CB_HOSTS
+  if [ "$?" == "1" ]; then
+    CHECK_FILE /etc/ganglia/gmond.conf Warning 1 $FILES_DIR $CB_HOSTETH1 
+    CHECK_FILE /etc/ganglia/gmond.conf Warning 1 $FILES_DIR $CB_HOSTETH2 
+    CHECK_FILE /etc/ganglia/gmond.conf Warning 1 $FILES_DIR $CB_HOSTETH3 
+    CHECK_FILE /etc/ganglia/gmond.conf Warning 1 $FILES_DIR $CB_HOSTETH4 
+    echo ""
+  fi
+  CHECK_DAEMON gmond Warning $CB_HOSTS
 fi
 
 # --------------------- run cluster checker --------------------
 
 if [ "$CHECK_CLUSTER" != "" ]; then
   echo ""
-  echo "--------------------- Intel Cluster Checker -------------------"
+  echo "--------------- Intel Cluster Checker -------------"
   RUN_CLUSTER_CHECK ETH1 $CB_HOSTETH1
   RUN_CLUSTER_CHECK ETH2 $CB_HOSTETH2
   RUN_CLUSTER_CHECK ETH3 $CB_HOSTETH3
@@ -1522,7 +1550,7 @@ fi
 # --------------------- check provisioning date --------------------
 
 echo ""
-echo "--------------------- image date check -------------------------"
+echo "--------------- image date check -------------------"
 PROVISION_DATE_CHECK $CB_HOSTETH1
 PROVISION_DATE_CHECK $CB_HOSTETH2
 PROVISION_DATE_CHECK $CB_HOSTETH3
@@ -1531,7 +1559,7 @@ PROVISION_DATE_CHECK $CB_HOSTETH4
 # --------------------- check number of cores --------------------
 
 echo ""
-echo "--------------------- CPU checks -------------------------"
+echo "--------------- CPU checks --------------------------"
 CORE_CHECK $CB_HOSTETH1
 CORE_CHECK $CB_HOSTETH2
 CORE_CHECK $CB_HOSTETH3
@@ -1545,7 +1573,7 @@ SPEED_CHECK $FILES_DIR $CB_HOSTETH3
 SPEED_CHECK $FILES_DIR $CB_HOSTETH4
 
 echo ""
-echo "--------------------- memory check -------------------------"
+echo "--------------- memory check -----------------------"
 
 MEMORY_CHECK $FILES_DIR $CB_HOSTETH1 $CB_MEM1
 MEMORY_CHECK $FILES_DIR $CB_HOSTETH2 $CB_MEM2
@@ -1553,7 +1581,7 @@ MEMORY_CHECK $FILES_DIR $CB_HOSTETH3 $CB_MEM3
 MEMORY_CHECK $FILES_DIR $CB_HOSTETH4 $CB_MEM4
 
 echo ""
-echo "--------------------- clock checks --------------------------"
+echo "--------------- clock checks ------------------------"
 
 CHECK_DAEMON chronyd Error $CB_HOSTS
 
@@ -1576,7 +1604,7 @@ if [ "$?" == "1" ]; then
 fi
 
 echo ""
-echo "--------------------- file system checks -------------------------"
+echo "--------------- file system checks -----------------"
 
 #*** check number of file systems mounted
 
@@ -1639,77 +1667,30 @@ if [ "$?" == "1" ]; then
   echo ""
 fi
 
-#*** check slurm rpm
-
-TEMP_RPM=/tmp/rpm.$$
-pdsh -t 2 -w $CB_HOSTS "rpm -qa | grep slurm | grep devel" >& $TEMP_RPM
-cat $TEMP_RPM | grep -v ssh | grep -v Connection | sort >& $SLURMRPMOUT
-rm -f $TEMP_RPM
-SLURMRPM0=`head -1 $SLURMRPMOUT | awk '{print $2}'`
-SLURMBAD=
-while read line 
-do
-  host=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
-  SLURMRPMI=`echo $line | awk '{print $2}'`
-  if [ "$SLURMRPMI" != "$SLURMRPM0" ]; then
-    if [ "$SLURMRPMI" != "Connection" ]; then
-      if [ "$SLURMBAD" == "" ]; then
-        SLURMBAD="$host/$SLURMRPMI"
-      else
-        SLURMBAD="$SLURMBAD $host/$SLURMRPMI"
-      fi
-    fi
-  fi
-done < $SLURMRPMOUT
-
-if [ "$SLURMBAD" == "" ]; then
-  echo "   $CB_HOSTS: $SLURMRPM0 installed"
-else
-  echo "   $CB_HOSTS: ***Error: $SLURMRPM0 not installed on $SLURMBAD"
-  echo "      Fix: ask system administrator to update slurm rpm packages"
-fi
-
 # --------------------- check daemons --------------------
 
-GANGLIA=`ps -el | grep gmetad`
-if [ "$GANGLIA" != "" ]; then
-echo ""
-echo "--------------------- daemon check ---------------------------"
-#*** check ganglia daemon
-  CHECK_DAEMON gmond Warning $CB_HOSTS
-fi
+#echo "--------------- daemon check ------------------------"
+#CHECK_DAEMON gmond Warning $CB_HOSTS
 
 # --------------------- rpm check --------------------
 
 echo ""
-echo "--------------------- rpm check ------------------------------"
-RPM_CHECK 0 $CB_HOSTS
+echo "--------------- rpm check ---------------------------"
+RPM_CHECK 0 $CB_HOSTS       ALL
 if [ "$?" == "1" ]; then
-  RPM_CHECK 1 $CB_HOSTETH1
-  RPM_CHECK 1 $CB_HOSTETH2
-  RPM_CHECK 1 $CB_HOSTETH3
-  RPM_CHECK 1 $CB_HOSTETH4
+  RPM_CHECK 1 $CB_HOSTETH1  ETH1
+  RPM_CHECK 1 $CB_HOSTETH2  ETH2
+  RPM_CHECK 1 $CB_HOSTETH3  ETH3
+  RPM_CHECK 1 $CB_HOSTETH4  ETH4
 fi
 
 echo ""
-echo "--------------------- accounting file checks ------------------------------"
+echo "--------------- login file checks --------"
 ACCT_CHECK /etc/group  $FILES_DIR $CB_HOSTS
 ACCT_CHECK /etc/passwd $FILES_DIR $CB_HOSTS
 
 echo ""
-echo "--------------------- general file checks ------------------------------"
-
-if [ "$GANGLIA" != "" ]; then
-  CHECK_FILE /etc/ganglia/gmond.conf Warning 0 $FILES_DIR $CB_HOSTS
-  if [ "$?" == "1" ]; then
-    CHECK_FILE /etc/ganglia/gmond.conf Warning 1 $FILES_DIR $CB_HOSTETH1 
-    CHECK_FILE /etc/ganglia/gmond.conf Warning 1 $FILES_DIR $CB_HOSTETH2 
-    CHECK_FILE /etc/ganglia/gmond.conf Warning 1 $FILES_DIR $CB_HOSTETH3 
-    CHECK_FILE /etc/ganglia/gmond.conf Warning 1 $FILES_DIR $CB_HOSTETH4 
-    echo ""
-  fi
-fi
-
+echo "--------------- general file checks -----------------"
 HOST_CHECK $FILES_DIR 0 $CB_HOSTS
 if [ "$?" == "1" ]; then
   HOST_CHECK $FILES_DIR 1 $CB_HOSTETH1 
@@ -1721,7 +1702,7 @@ fi
 CHECK_FILE_DATE /etc/ssh/sshd_config
 
 echo ""
-echo "--------------------- directory content checks --------------------------"
+echo "--------------- directory content checks --------"
 CHECK_DIR_LIST /etc ssh
 CHECK_DIR_LIST /etc slurm
 
@@ -1729,10 +1710,7 @@ if [[ "$ONLY_RUN_TEST_CASES" != "1" ]] && [[ "$TEST_QUEUE" != "" ]]; then
   CHECK_TEST_CASES 0
 fi
 
-STOP_TIME=`date`
 echo ""
-echo "--------------------- clusterbot complete ------------------------------"
-echo "start time: $START_TIME"
-echo "stop time: $STOP_TIME"
+echo "--------------- clusterbot complete --------------"
 
 rm $LOCK_FILE
