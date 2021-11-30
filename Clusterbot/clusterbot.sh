@@ -702,9 +702,9 @@ IBSPEED ()
   done < $IBRATE
 
   if [ "$RATEBAD" == "" ]; then
-    echo "   ${CB_HOST_ARG}-ib: Infiniband data rate is $RATE0 Gb/s"
+    echo "   ${CB_HOST_ARG}-ib: infiniband data rate is $RATE0 Gb/s"
   else
-    echo "   ${CB_HOST_ARG}-ib: ***Warning: Infiniband data rate is $RATE0 Gb/s except on $RATEBAD"
+    echo "   ${CB_HOST_ARG}-ib: ***Warning: infiniband data rate is $RATE0 Gb/s except on $RATEBAD"
   fi
   rm -f $IBTEMP
 }
@@ -1319,7 +1319,7 @@ fi
 
 if [ "$ONLY_RUN_TEST_CASES" != "1" ]; then
   echo
-  echo "---------- $CB_HOSTS status` ----------"
+  echo "---------- $CB_HOSTS status ----------"
   TEMP_RUN=/tmp/run.$$
   git describe --dirty --long >& $TEMP_RUN
   not_have_git=`cat $TEMP_RUN | grep fatal | wc -l`
@@ -1368,7 +1368,7 @@ if [ "$platform" == "osx" ]; then
 fi
 
 echo ""
-echo "--------------------- network checks --------------------------"
+echo "--------------------- ethernet check --------------------------"
 # --------------------- check ethernet --------------------
 
 pdsh -t 2 -w $CB_HOSTS date   >& $ETHOUT
@@ -1381,6 +1381,8 @@ else
 fi
 
 # --------------------- check infiniband --------------------
+echo ""
+echo "--------------------- infiniband checks -----------------------"
 
 rm -rf $IBOUT
 touch $IBOUT
@@ -1413,16 +1415,13 @@ done
 
 if [ `cat $IBOUT | wc -l` -ne 0 ]; then
   if [ "$IBDOWN" == "" ]; then
-    echo "   $CB_HOSTS: Infiniband up(on all hosts that are up)"
+    echo "   $CB_HOSTS: infiniband up on all hosts with working ethernet"
   else
-    echo "   $CB_HOSTS: ***Error: Infiniband down on $IBDOWN"
+    echo "   $CB_HOSTS: ***Error: infiniband down on $IBDOWN"
   fi
 fi
 
-# --------------------- check infiniband subnet manager --------------------
 echo ""
-echo "--------------------- infiniband checks -----------------------"
-
 SUBNET_CHECK $CB_HOST1 $CB_HOSTIB1
 SUBNET_CHECK $CB_HOST2 $CB_HOSTIB2
 SUBNET_CHECK $CB_HOST3 $CB_HOSTIB3
@@ -1460,7 +1459,7 @@ do
 done < $DOWN_HOSTS
 
 if [ "$SLURMDOWN" == "" ]; then
-  echo "   $CB_HOSTS: slurm online (on hosts that are up)"
+  echo "   $CB_HOSTS: slurm online"
 else
   echo "   $CB_HOSTS: ***Warning: slurm offline on $SLURMDOWN"
   echo "      Fix: sudo scontrol update nodename=HOST state=resume"
@@ -1478,8 +1477,6 @@ if [ "$?" == "1" ]; then
   CHECK_FILE /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTETH4 
   echo ""
 fi
-
-CHECK_FILE_DATE /etc/slurm/slurmdbd.conf
 
 #*** check slurm daemon
 
@@ -1521,9 +1518,13 @@ else
   echo "      Fix: ask system administrator to update slurm rpm packages"
 fi
 
+CHECK_FILE_DATE /etc/slurm/slurmdbd.conf
+
+
+GANGLIA=`ps -el | grep gmetad`
 if [ "$GANGLIA" != "" ]; then
   echo ""
-  echo "--------------------- ganglia check ------------------------------"
+  echo "--------------------- ganglia checks ------------------------------"
   CHECK_FILE /etc/ganglia/gmond.conf Warning 0 $FILES_DIR $CB_HOSTS
   if [ "$?" == "1" ]; then
     CHECK_FILE /etc/ganglia/gmond.conf Warning 1 $FILES_DIR $CB_HOSTETH1 

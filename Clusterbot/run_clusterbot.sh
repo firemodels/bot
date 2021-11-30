@@ -1,6 +1,6 @@
 #!/bin/bash
 
-EMAIL=
+EMAIL=$SMV_EMAIL
 fopt=
 Fopt=
 nopt=
@@ -70,12 +70,9 @@ if [ ! -d $HOME/.clusterbot ]; then
 fi
 OUTPUT=$HOME/.clusterbot/clusterbot.out
 ERRORS=$HOME/.clusterbot/clusterbot.err
-WARNINGS=$HOME/.clusterbot/clusterbot.wrn
+HEADER=$HOME/.clusterbot/clusterbot.hdr
 LOGFILE=$HOME/.clusterbot/clusterbot.log
 rm -f $OUTPUT
-
-echo "" > $ERRORS
-echo "" > $WARNINGS
 
 cd $BINDIR
 
@@ -86,37 +83,40 @@ if [ "$not_have_git" == "0" ]; then
   git merge origin/master &> /dev/null
 fi
 
+echo > $OUTPUT
 START_TIME=`date`
 ./clusterbot.sh $fopt $Fopt $nopt $QOPT $qopt $ropt | tee  $OUTPUT
 STOP_TIME=`date`
 
-nerrors=`grep ***Error $OUTPUT | wc -l`
+nerrors=`grep ***Error     $OUTPUT | wc -l`
 nwarnings=`grep ***Warning $OUTPUT | wc -l`
 
+echo "" > $ERRORS
 
-echo "-----------------------------------------------------" >  $ERRORS
-echo "start date: $START_TIME" >> $ERRORS
-echo " stop date: $STOP_TIME"  >> $ERRORS
+echo "-----------------------------------------------------" >  $HEADER
+echo "start date: $START_TIME"                               >> $HEADER
+echo " stop date: $STOP_TIME"                                >> $HEADER
+
 if [ $nerrors -gt 0 ]; then
   echo "--------------------- Errors ------------------------" >> $ERRORS
   grep ***Error $OUTPUT                                        >> $ERRORS
   echo "-----------------------------------------------------" >> $ERRORS
 fi
 if [ $nwarnings -gt 0 ]; then
-  echo "--------------------- Warnings ----------------------"  >  $WARNINGS
-  grep ***Warning $OUTPUT                                       >> $WARNINGS
-  echo "-----------------------------------------------------"  >> $WARNINGS
+  echo "--------------------- Warnings ----------------------"  >> $ERRORS
+  grep ***Warning $OUTPUT                                       >> $ERRORS
+  echo "-----------------------------------------------------"  >> $ERRORS
 fi
 
 if [ ! -e $LOGFILE ]; then
- cp $OUTPUT $LOGFILE
+ cp $ERRORS $LOGFILE
 fi 
 
-LOGDATE=`cat $LOGFILE | awk '{print $6" "$7" "$8}'`
+LOGDATE=`ls -l $LOGFILE | awk '{print $6" "$7" "$8}'`
 
-nlogdiff=`diff $LOGFILE $OUTPUT | wc -l`
+nlogdiff=`diff $LOGFILE $ERRORS | wc -l`
 if [ $nlogdiff -gt 0 ]; then
- cp $OUTPUT $LOGFILE
+ cp $ERRORS $LOGFILE
 fi
 
 echo ""
@@ -125,13 +125,13 @@ if [ $nlogdiff -eq 0 ]; then
 else
   echo "$CB_HOSTS status has changed: $nerrors Errors, $nwarnings Warnings"
 fi
-cat $ERRORS $WARNINGS
+cat $HEADER $ERRORS 
 if [ "$EMAIL" != "" ]; then
   echo emailing results to $EMAIL
   if [ $nlogdiff -eq 0 ]; then
-    cat $ERRORS $WARNINGS $OUTPUT | mail -s "$CB_HOSTS status since $LOGDATE: $nerrors Errors, $nwarnings Warnings" $EMAIL
+    cat $HEADER $ERRORS $OUTPUT | mail -s "$CB_HOSTS status since $LOGDATE: $nerrors Errors, $nwarnings Warnings" $EMAIL
   else
-    cat $ERRORS $WARNINGS $OUTPUT | mail -s "$CB_HOSTS status has changed: $nerrors Errors, $nwarnings Warnings" $EMAIL
+    cat $HEADER $ERRORS $OUTPUT | mail -s "$CB_HOSTS status has changed: $nerrors Errors, $nwarnings Warnings" $EMAIL
   fi
 fi
 
