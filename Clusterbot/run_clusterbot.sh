@@ -93,14 +93,14 @@ nwarnings=`grep ***Warning $OUTPUT | wc -l`
 
 echo "" > $ERRORS
 
-echo "-----------------------------------------------------" >  $HEADER
-echo "start date: $START_TIME"                               >> $HEADER
-echo " stop date: $STOP_TIME"                                >> $HEADER
+echo "-----------------------------------------------------"    >  $HEADER
+echo "start: $START_TIME"                                       >> $HEADER
+echo " stop: $STOP_TIME"                                        >> $HEADER
 
 if [ $nerrors -gt 0 ]; then
-  echo "--------------------- Errors ------------------------" >> $ERRORS
-  grep ***Error $OUTPUT                                        >> $ERRORS
-  echo "-----------------------------------------------------" >> $ERRORS
+  echo "--------------------- Errors ------------------------"  >> $ERRORS
+  grep ***Error $OUTPUT                                         >> $ERRORS
+  echo "-----------------------------------------------------"  >> $ERRORS
 fi
 if [ $nwarnings -gt 0 ]; then
   echo "--------------------- Warnings ----------------------"  >> $ERRORS

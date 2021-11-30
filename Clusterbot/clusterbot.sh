@@ -1054,7 +1054,7 @@ RUN_TEST_CASES ()
     ../makecase.sh $CHID $FDSOUTPUT_DIR
     $QFDS -p 24 -j $PREFIX -q $QUEUE $CHID.fds >& /dev/null
   done
-  echo "   $NCASES_PER_QUEUE test cases submitted to the $QUEUE queue"
+  echo "   $NCASES_PER_QUEUE cases submitted to $QUEUE"
   cd $CURDIR
 }
 
@@ -1319,18 +1319,18 @@ fi
 
 if [ "$ONLY_RUN_TEST_CASES" != "1" ]; then
   echo
-  echo "---------- $CB_HOSTS status ----------"
+  echo "------ $CB_HOSTS status ----------"
   TEMP_RUN=/tmp/run.$$
   git describe --dirty --long >& $TEMP_RUN
   not_have_git=`cat $TEMP_RUN | grep fatal | wc -l`
   if [ $not_have_git -eq 0 ]; then
-    echo "---------- `git describe --dirty --long` ----------"
+    echo "------ `git describe --dirty --long` ----------"
   fi
   rm -f $TEMP_RUN
 fi
 if [ "$TEST_QUEUE" != "" ]; then
   echo ""
-  echo "--------------- submitting test cases ---------------"
+  echo "--------------- submitting test cases ------------"
   HAVE_JOBS_RUNNING $JOBPREFIX
   if [ "$?" == "1" ]; then
     echo "***error: clusterbot cases are still running"
@@ -1540,7 +1540,7 @@ fi
 
 if [ "$CHECK_CLUSTER" != "" ]; then
   echo ""
-  echo "--------------- Intel Cluster Checker ---------------"
+  echo "--------------- Intel Cluster Checker -------------"
   RUN_CLUSTER_CHECK ETH1 $CB_HOSTETH1
   RUN_CLUSTER_CHECK ETH2 $CB_HOSTETH2
   RUN_CLUSTER_CHECK ETH3 $CB_HOSTETH3
@@ -1550,7 +1550,7 @@ fi
 # --------------------- check provisioning date --------------------
 
 echo ""
-echo "--------------- image date check --------------------"
+echo "--------------- image date check -------------------"
 PROVISION_DATE_CHECK $CB_HOSTETH1
 PROVISION_DATE_CHECK $CB_HOSTETH2
 PROVISION_DATE_CHECK $CB_HOSTETH3
@@ -1573,7 +1573,7 @@ SPEED_CHECK $FILES_DIR $CB_HOSTETH3
 SPEED_CHECK $FILES_DIR $CB_HOSTETH4
 
 echo ""
-echo "--------------- memory check ------------------------"
+echo "--------------- memory check -----------------------"
 
 MEMORY_CHECK $FILES_DIR $CB_HOSTETH1 $CB_MEM1
 MEMORY_CHECK $FILES_DIR $CB_HOSTETH2 $CB_MEM2
@@ -1604,7 +1604,7 @@ if [ "$?" == "1" ]; then
 fi
 
 echo ""
-echo "--------------- file system checks ------------------"
+echo "--------------- file system checks -----------------"
 
 #*** check number of file systems mounted
 
@@ -1685,7 +1685,7 @@ if [ "$?" == "1" ]; then
 fi
 
 echo ""
-echo "--------------- authorization file checks -----------"
+echo "--------------- login file checks --------"
 ACCT_CHECK /etc/group  $FILES_DIR $CB_HOSTS
 ACCT_CHECK /etc/passwd $FILES_DIR $CB_HOSTS
 
@@ -1702,7 +1702,7 @@ fi
 CHECK_FILE_DATE /etc/ssh/sshd_config
 
 echo ""
-echo "--------------- directory content checks ------------"
+echo "--------------- directory content checks --------"
 CHECK_DIR_LIST /etc ssh
 CHECK_DIR_LIST /etc slurm
 
@@ -1711,6 +1711,6 @@ if [[ "$ONLY_RUN_TEST_CASES" != "1" ]] && [[ "$TEST_QUEUE" != "" ]]; then
 fi
 
 echo ""
-echo "--------------- clusterbot complete -----------------"
+echo "--------------- clusterbot complete --------------"
 
 rm $LOCK_FILE
