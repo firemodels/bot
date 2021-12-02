@@ -169,7 +169,7 @@ CHECK_FILE_ROOT ()
   if [ $diffs -eq 0 ]; then
     echo "   `hostname -s`: $fullfile contents have not changed since it was archived at $ARCHIVEDIR/$filesave on $dirdate"
   else
-    echo "   `hostname -s`: ***Warning: $fullfile contents have changed since it was archived at $ARCHIVEDIR/$filesave on $dirdate"
+    echo "   `hostname -s`: ***warning: $fullfile contents have changed since it was archived at $ARCHIVEDIR/$filesave on $dirdate"
     echo "        To see changes, type:"
     echo "        sudo diff $ARCHIVEDIR/$filesave $fullfile"
     if [ "$UPDATE_ARCHIVE" == "1" ]; then
@@ -208,7 +208,7 @@ CHECK_FILE_DATE()
   if [ $diffs -eq 0 ]; then
     echo "   `hostname -s`: $fullfile the same since $current_moddate(file size: $current_filesize)"
   else
-    echo "   `hostname -s`: ***Warning: $fullfile has changed - current($current_moddate), original($original_moddate) modification date,"
+    echo "   `hostname -s`: ***warning: $fullfile has changed - current($current_moddate), original($original_moddate) modification date,"
     echo "                  current($current_filesize), original($original_filesize) file size."
     if [ "$UPDATE_ARCHIVE" == "1" ]; then
       cp $currentfilelist $ARCHIVEDIR/$filels
@@ -295,7 +295,7 @@ ACCT_CHECK ()
     echo "   $CB_HOST_ARG: $file identical"
     return 0
   else
-    echo "   $CB_HOST_ARG: ***Error: $file is different on $FILEDIFF "
+    echo "   $CB_HOST_ARG: ***error: $file is different on $FILEDIFF "
     echo "         Fix: sudo passsync"
     return 1
   fi
@@ -410,9 +410,9 @@ TIME_CHECK ()
     return 0
   else
     if [ "$INDENT" == "1" ]; then
-      echo "   $CB_HOST_ARG:    ***Error: clock error > $TOLERANCE s on $TIMEERROR_LIST"
+      echo "   $CB_HOST_ARG:    ***error: clock error > $TOLERANCE s on $TIMEERROR_LIST"
     else
-      echo "   $CB_HOST_ARG: ***Error: clock error > $TOLERANCE s on $TIMEERROR_LIST"
+      echo "   $CB_HOST_ARG: ***error: clock error > $TOLERANCE s on $TIMEERROR_LIST"
     fi
     return 1
   fi
@@ -460,16 +460,16 @@ MOUNT_CHECK ()
 
   if [ "$FILEDIFF" == "" ]; then
     if [ "$INDENT" == "1" ]; then
-       echo "   $CB_HOST_ARG:    $file are identical (df -k -t nfs)"
+       echo "   $CB_HOST_ARG:    $file identical"
     else
-       echo "   $CB_HOST_ARG: $file are identical (df -k -t nfs)"
+       echo "   $CB_HOST_ARG: $file identical"
     fi
     return 0
   else
     if [ "$INDENT" == "1" ]; then
-       echo "   $CB_HOST_ARG:    ***Error: $file (df -k -t nfs) are different on $FILEDIFF "
+       echo "   $CB_HOST_ARG:    ***error: $file are different on $FILEDIFF "
     else
-       echo "   $CB_HOST_ARG: ***Error: $file (df -k -t nfs) are different on $FILEDIFF "
+       echo "   $CB_HOST_ARG: ***error: $file are different on $FILEDIFF "
     fi
     return 1
   fi
@@ -524,9 +524,9 @@ FSTAB_CHECK ()
     return 0
   else
     if [ "$INDENT" == "1" ]; then
-       echo "   $CB_HOST_ARG:    ***Error: $file is different on $FILEDIFF "
+       echo "   $CB_HOST_ARG:    ***error: $file is different on $FILEDIFF "
     else
-       echo "   $CB_HOST_ARG: ***Error: $file is different on $FILEDIFF "
+       echo "   $CB_HOST_ARG: ***error: $file is different on $FILEDIFF "
     fi
     return 1
   fi
@@ -581,9 +581,9 @@ HOST_CHECK ()
     return 0
   else
     if [ "$INDENT" == "1" ]; then
-       echo "   $CB_HOST_ARG:    ***Error: $file is different on $FILEDIFF "
+       echo "   $CB_HOST_ARG:    ***error: $file is different on $FILEDIFF "
     else
-       echo "   $CB_HOST_ARG: ***Error: $file is different on $FILEDIFF "
+       echo "   $CB_HOST_ARG: ***error: $file is different on $FILEDIFF "
     fi
     return 1
   fi
@@ -635,10 +635,10 @@ if [ "$RPMDIFF" == "" ]; then
   return 0
 else
   if [ "$INDENT" == "1" ]; then
-     echo "   $CB_HOST_ARG:    ***Error: $host0 rpms are different from those on $RPMDIFF "
+     echo "   $CB_HOST_ARG:    ***error: $host0 rpms are different from those on $RPMDIFF "
      echo "         Fix: reimage host or install updated rpm packages"
   else
-     echo "   $CB_HOST_ARG: ***Error: $host0 rpms are different from those on $RPMDIFF "
+     echo "   $CB_HOST_ARG: ***error: $host0 rpms are different from those on $RPMDIFF "
      echo "      Fix: reimage host or install updated rpm packages"
   fi
   return 1
@@ -712,7 +712,7 @@ IBSPEED ()
   if [ "$RATEBAD" == "" ]; then
     echo "   ${CB_HOST_ARG}-ib: IB data rate $RATE0 Gb/s"
   else
-    echo "   ${CB_HOST_ARG}-ib: ***Warning: IB data rate $RATE0 Gb/s except on $RATEBAD"
+    echo "   ${CB_HOST_ARG}-ib: ***warning: IB data rate $RATE0 Gb/s except on $RATEBAD"
   fi
   rm -f $IBTEMP
 }
@@ -735,7 +735,7 @@ RUN_CLUSTER_CHECK ()
     sort $CLUSTEROUT | grep -v ssh | grep -v Connection | awk '{print $1 }' | awk -F':' '{print $1}' > $NODEFILE
     nup=`wc -l $NODEFILE`
     if [ "$nup" == "0" ]; then
-      echo "   $CB_HOST_ARG: ***Error: all hosts are down - cluster checker not run"
+      echo "   $CB_HOST_ARG: ***error: all hosts are down - cluster checker not run"
     else
       echo "   $CB_HOST_ARG: results in `basename $RESULTSFILE` and `basename $WARNINGFILE`"
       $CHECK_CLUSTER -l error -f $NODEFILE -o $RESULTSFILE >& $OUTFILE
@@ -819,7 +819,7 @@ CORE_CHECK ()
   if [ "$FSDOWN" == "" ]; then
     echo "   $CB_HOSTETH_ARG: $NF0 CPU cores"
   else
-    echo "   $CB_HOSTETH_ARG: ***Warning: $NF0 CPU cores except $FSDOWN"
+    echo "   $CB_HOSTETH_ARG: ***warning: $NF0 CPU cores except $FSDOWN"
     echo "      Fix: boot into BIOS and disable hyperthreading"
   fi
   rm -f $CORETEMP
@@ -895,7 +895,7 @@ MEMORY_CHECK ()
   if [ "$MEMORY_DIFF" == "" ]; then
     echo "   $CB_HOST_ARG: $memory0 MB or greater"
   else
-    echo "   $CB_HOST_ARG: ***Warning: $memory0 MB or greater except on $MEMORY_DIFF "
+    echo "   $CB_HOST_ARG: ***warning: $memory0 MB or greater except on $MEMORY_DIFF "
   fi
 }
 
@@ -1390,7 +1390,7 @@ if [ "$ETHDOWN" == "" ]; then
   echo "   $CB_HOSTS: Ethernet up"
   ETH_ALL_UP=1
 else
-  echo "   $CB_HOSTS: ***Warning: Ethernet down on $ETHDOWN"
+  echo "   $CB_HOSTS: ***warning: Ethernet down on $ETHDOWN"
 fi
 
 # --------------------- check infiniband --------------------
@@ -1434,7 +1434,7 @@ if [ `cat $IBOUT | wc -l` -ne 0 ]; then
       echo "   $CB_HOSTS: infiniband up on working hosts"
     fi
   else
-    echo "   $CB_HOSTS: ***Error: infiniband down on $IBDOWN"
+    echo "   $CB_HOSTS: ***error: infiniband down on $IBDOWN"
   fi
 fi
 
@@ -1478,7 +1478,7 @@ done < $DOWN_HOSTS
 if [ "$SLURMDOWN" == "" ]; then
   echo "   $CB_HOSTS: slurm online"
 else
-  echo "   $CB_HOSTS: ***Warning: slurm offline on $SLURMDOWN"
+  echo "   $CB_HOSTS: ***warning: slurm offline on $SLURMDOWN"
   echo "      Fix: sudo scontrol update nodename=HOST state=resume"
   echo "      This fix can only be applied to a HOST that is up and with"
   echo "      a working ethernet and infiniband network connection."
@@ -1531,7 +1531,7 @@ done < $SLURMRPMOUT
 if [ "$SLURMBAD" == "" ]; then
   echo "   $CB_HOSTS: $SLURMRPM0 installed"
 else
-  echo "   $CB_HOSTS: ***Error: $SLURMRPM0 not installed on $SLURMBAD"
+  echo "   $CB_HOSTS: ***error: $SLURMRPM0 not installed on $SLURMBAD"
   echo "      Fix: ask system administrator to update slurm rpm packages"
 fi
 
@@ -1650,7 +1650,7 @@ done < $FSOUT
 if [ "$FSDOWN" == "" ]; then
   echo "   $CB_HOSTS: $NF0 file systems mounted"
 else
-  echo "   $CB_HOSTS: ***Error: $NF0 file systems not mounted on $FSDOWN"
+  echo "   $CB_HOSTS: ***error: $NF0 file systems not mounted on $FSDOWN"
   echo "      Fix: sudo pdsh -t 2 -w $CB_HOSTS mount -a"
 fi
 

@@ -92,8 +92,8 @@ START_TIME=`date`
 ./clusterbot.sh $fopt $Fopt $nopt $QOPT $qopt $ropt $uopt | tee  $OUTPUT
 STOP_TIME=`date`
 
-nerrors=`grep ***Error     $OUTPUT | wc -l`
-nwarnings=`grep ***Warning $OUTPUT | wc -l`
+nerrors=`grep ***error     $OUTPUT | wc -l`
+nwarnings=`grep ***warning $OUTPUT | wc -l`
 
 echo "-----------------------------------------------------"    >  $HEADER
 echo "   start: $START_TIME"                                    >> $HEADER
@@ -102,12 +102,12 @@ echo "    stop: $STOP_TIME"                                     >> $HEADER
 touch $ERRORS
 if [ $nerrors -gt 0 ]; then
   echo "--------------------- Errors ------------------------"  >> $ERRORS
-  grep ***Error $OUTPUT                                         >> $ERRORS
+  grep ***error $OUTPUT                                         >> $ERRORS
   echo "-----------------------------------------------------"  >> $ERRORS
 fi
 if [ $nwarnings -gt 0 ]; then
   echo "--------------------- Warnings ----------------------"  >> $ERRORS
-  grep ***Warning $OUTPUT                                       >> $ERRORS
+  grep ***warning $OUTPUT                                       >> $ERRORS
   echo "-----------------------------------------------------"  >> $ERRORS
 fi
 
