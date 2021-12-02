@@ -21,7 +21,7 @@ case $OPTION  in
    Fopt="-F"
    ;;
   h)
-   ./clusterbot_usage.sh run_clusterbot.sh $NCASES_PER_QUEUE 1
+   ./clusterbot_usage.sh run_clusterbot.sh $NCASES_PER_QUEUE 1 $EMAIL
    exit
    ;;
   m)
@@ -99,17 +99,23 @@ echo "-----------------------------------------------------"    >  $HEADER
 echo "   start: $START_TIME"                                    >> $HEADER
 echo "    stop: $STOP_TIME"                                     >> $HEADER
 
+rm -f $ERRORS
 touch $ERRORS
 if [ $nerrors -gt 0 ]; then
+  echo ""                                                       >> $ERRORS
   echo "--------------------- Errors ------------------------"  >> $ERRORS
   grep ***error $OUTPUT                                         >> $ERRORS
   echo "-----------------------------------------------------"  >> $ERRORS
+  echo ""                                                       >> $ERRORS
 fi
 if [ $nwarnings -gt 0 ]; then
+  echo ""                                                       >> $ERRORS
   echo "--------------------- Warnings ----------------------"  >> $ERRORS
   grep ***warning $OUTPUT                                       >> $ERRORS
   echo "-----------------------------------------------------"  >> $ERRORS
 fi
+
+echo ""                                                         >> $ERRORS
 
 if [ ! -e $LOGFILE ]; then
  cp $ERRORS $LOGFILE

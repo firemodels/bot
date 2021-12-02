@@ -2,6 +2,7 @@
 scriptname=$1
 NCASES_PER_QUEUE=$2
 SHOW_EMAIL_HELP=$3
+EMAIL=$4
 
 #---------------------------------------------
 # ---------------------------- USAGE ----------------------------------
@@ -19,7 +20,10 @@ echo " -f - override lock to force clusterbot run"
 echo " -F - fast checks"
 echo " -h - display this message"
 if [ "$SHOW_EMAIL_HELP" == "1" ]; then
-  echo " -m email_address - send results to email_address"
+  if [ "$EMAIL" != "" ]; then
+    EMAIL="{default: $EMAIL]"
+  fi
+  echo " -m email_address - send results to email_address $EMAIL"
 fi
 echo " -n n - run n cases on each queue [default: $NCASES_PER_QUEUE]"
 echo " -q q - run test cases using the queue q."
