@@ -943,14 +943,14 @@ SPEED_CHECK ()
 }
 
 #---------------------------------------------
-#                   IS_HOST_UP
+#                   IS_HOST_DOWN
 #---------------------------------------------
 
-IS_HOST_UP ()
+IS_HOST_DOWN ()
 {
   local ITEM=$1
 
-  for i in $UP_ETH ; do
+  for i in $ETHDOWN ; do
     if [ "$ITEM" == "$i" ]; then
       return 1
     fi
@@ -1387,10 +1387,10 @@ ETHDOWN=`sort $ETHOUT | grep -E 'timed|refused|route' | awk -F':' '{print $1}' |
 
 ETH_ALL_UP=
 if [ "$ETHDOWN" == "" ]; then
-  echo "   $CB_HOSTS: Ethernet up"
+  echo "   $CB_HOSTS: ethernet up"
   ETH_ALL_UP=1
 else
-  echo "   $CB_HOSTS: ***warning: Ethernet down on $ETHDOWN"
+  echo "   $CB_HOSTS: ***warning: ethernet down on $ETHDOWN"
 fi
 
 # --------------------- check infiniband --------------------
@@ -1414,14 +1414,16 @@ fi
 IBDOWN_HOSTS=`grep -E 'timed|refused|route'  $IBOUT | grep out | sort | awk -F':' '{print $1}' | awk '{printf "%s ", $1}'`
 
 IBDOWN=
-for h in $IBDOWN; do
+for hostib in $IBDOWN_HOSTS; do
 #*** only warn if ethernet is up and infiniband is down
-  IS_HOST_UP $h
-  if [ "$?" == "1" ]; then
+
+  hosteth=`echo $hostib | sed 's/-ib$//'`
+  IS_HOST_DOWN $hosteth
+  if [ "$?" == "0" ]; then
     if [ "$IBDOWN" == "" ]; then
-      IBDOWN="$host"
+      IBDOWN="$hostib"
     else
-      IBDOWN="$IBDOWN $host"
+      IBDOWN="$IBDOWN $hostib"
     fi
   fi
 done
@@ -1434,7 +1436,7 @@ if [ `cat $IBOUT | wc -l` -ne 0 ]; then
       echo "   $CB_HOSTS: infiniband up on working hosts"
     fi
   else
-    echo "   $CB_HOSTS: ***error: infiniband down on $IBDOWN"
+    echo "   $CB_HOSTS: ***error: infiniband down on $IBDOWN and nodes with non-working ethernet"
   fi
 fi
 
@@ -1464,8 +1466,7 @@ while read line
 do
   host=`echo $line | awk '{print $1}'`
 
-#*** only warn if ethernet is up and slurm is down on a host
-  IS_HOST_UP $h
+  IS_HOST_DOWN $host
   if [ "$?" == "1" ]; then
     if [ "$SLURMDOWN" == "" ]; then
       SLURMDOWN="$host"
