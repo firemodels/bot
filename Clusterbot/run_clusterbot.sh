@@ -7,9 +7,10 @@ nopt=
 QOPT=
 qopt=
 ropt=
+uopt=
 FORCE_UNLOCK=
 NCASES_PER_QUEUE=20
-while getopts 'fFhm:n:q:Q:r' OPTION
+while getopts 'fFhm:n:q:Q:ru' OPTION
 do
 case $OPTION  in
   f)
@@ -43,6 +44,9 @@ case $OPTION  in
    ;;
   r)
    ropt="-r"
+   ;;
+  u)
+   uopt="-u"
    ;;
 esac
 done
@@ -85,18 +89,17 @@ fi
 
 echo > $OUTPUT
 START_TIME=`date`
-./clusterbot.sh $fopt $Fopt $nopt $QOPT $qopt $ropt | tee  $OUTPUT
+./clusterbot.sh $fopt $Fopt $nopt $QOPT $qopt $ropt $uopt | tee  $OUTPUT
 STOP_TIME=`date`
 
 nerrors=`grep ***Error     $OUTPUT | wc -l`
 nwarnings=`grep ***Warning $OUTPUT | wc -l`
 
-echo "" > $ERRORS
-
 echo "-----------------------------------------------------"    >  $HEADER
-echo "start: $START_TIME"                                       >> $HEADER
-echo " stop: $STOP_TIME"                                        >> $HEADER
+echo "   start: $START_TIME"                                    >> $HEADER
+echo "    stop: $STOP_TIME"                                     >> $HEADER
 
+touch $ERRORS
 if [ $nerrors -gt 0 ]; then
   echo "--------------------- Errors ------------------------"  >> $ERRORS
   grep ***Error $OUTPUT                                         >> $ERRORS
@@ -119,12 +122,12 @@ if [ $nlogdiff -gt 0 ]; then
  cp $ERRORS $LOGFILE
 fi
 
-echo ""
 if [ $nlogdiff -eq 0 ]; then
-  echo "$CB_HOSTS status since $LOGDATE: $nerrors Errors, $nwarnings Warnings"
+  echo "   $CB_HOSTS status since $LOGDATE: $nerrors Errors, $nwarnings Warnings"
 else
-  echo "$CB_HOSTS status has changed: $nerrors Errors, $nwarnings Warnings"
+  echo "   $CB_HOSTS status has changed: $nerrors Errors, $nwarnings Warnings"
 fi
+echo ""
 cat $HEADER $ERRORS 
 if [ "$EMAIL" != "" ]; then
   echo emailing results to $EMAIL
