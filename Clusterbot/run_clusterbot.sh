@@ -96,6 +96,8 @@ nerrors=`grep '\*\*\*error'     $OUTPUT | wc -l`
 nwarnings=`grep '\*\*\*warning' $OUTPUT | wc -l`
 
 echo "-----------------------------------------------------"    >  $HEADER
+echo "-----------------------------------------------------"    >> $HEADER
+echo ""                                                         >> $HEADER
 echo "   start: $START_TIME"                                    >> $HEADER
 echo "    stop: $STOP_TIME"                                     >> $HEADER
 
@@ -104,17 +106,18 @@ touch $ERRORS
 if [ $nerrors -gt 0 ]; then
   echo ""                                                       >> $ERRORS
   echo "--------------------- Errors ------------------------"  >> $ERRORS
-  grep '\*\*\*error' $OUTPUT                                       >> $ERRORS
+  grep '\*\*\*error' $OUTPUT                                    >> $ERRORS
   echo "-----------------------------------------------------"  >> $ERRORS
-  echo ""                                                       >> $ERRORS
 fi
 if [ $nwarnings -gt 0 ]; then
   echo ""                                                       >> $ERRORS
   echo "--------------------- Warnings ----------------------"  >> $ERRORS
-  grep '\*\*\*warning' $OUTPUT                                     >> $ERRORS
+  grep '\*\*\*warning' $OUTPUT                                  >> $ERRORS
   echo "-----------------------------------------------------"  >> $ERRORS
 fi
-
+echo ""                                                         >> $HEADER
+echo "-----------------------------------------------------"    >> $HEADER
+echo "-----------------------------------------------------"    >> $HEADER
 echo ""                                                         >> $ERRORS
 
 if [ ! -e $LOGFILE ]; then
