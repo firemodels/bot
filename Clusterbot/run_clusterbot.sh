@@ -100,6 +100,7 @@ echo "-----------------------------------------------------"    >> $HEADER
 echo ""                                                         >> $HEADER
 echo "   start: $START_TIME"                                    >> $HEADER
 echo "    stop: $STOP_TIME"                                     >> $HEADER
+echo "    $nerrors errors, $nwarnings warnings"                 >> $HEADER
 
 rm -f $ERRORS
 touch $ERRORS
