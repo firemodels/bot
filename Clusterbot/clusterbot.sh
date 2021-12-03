@@ -609,14 +609,14 @@ local CURDIR=`pwd`
 cd $FILES_DIR
 rpm0=`ls -l ${prefix}rpm*.txt | head -1 | awk '{print $9}'`
 host0=`echo $rpm0 | sed 's/.txt$//'`
-host0=`echo $host0 | sed 's/^${prefix}rpm_//'`
+host0=`echo $host0 | sed 's/^.*rpm_//'`
 RPMDIFF=
 for f in ${prefix}rpm*.txt
 do
   ndiff=`diff $rpm0 $f | wc -l`
   if [ $ndiff -ne 0 ]; then
     hostdiff=`echo $f | sed 's/.txt$//'`
-    hostdiff=`echo $hostdiff | sed 's/^${prefix}rpm_//'`
+    hostdiff=`echo $hostdiff | sed 's/^.*rpm_//'`
     if [ "$RPMDIFF" == "" ]; then
       RPMDIFF="$hostdiff"
     else
@@ -1467,7 +1467,8 @@ do
   host=`echo $line | awk '{print $1}'`
 
   IS_HOST_DOWN $host
-  if [ "$?" == "1" ]; then
+# only care if slurm is down on a host that is up
+  if [ "$?" == "0" ]; then
     if [ "$SLURMDOWN" == "" ]; then
       SLURMDOWN="$host"
     else
