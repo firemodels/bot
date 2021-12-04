@@ -665,7 +665,7 @@ SUBNET_CHECK ()
   cat $SUBNET_TEMP | sort -u | grep opensm  >  $SUBNETOUT 2>&1
   SUB1=`cat  $SUBNETOUT | awk -F':' '{print $1}' | sort -u | awk '{printf "%s%s", $1," " }'`
   if [ "$SUB1" == "" ]; then
-    echo "   $CB_HOSTIB_ARG: **Error: opensm not running on any host"
+    echo "   $CB_HOSTIB_ARG: ***error: opensm not running on any host"
     echo "      Fix: sudo ssh $CB_HOST_ARG service opensm start   "
   else
     SUBNETCOUNT=`cat  $SUBNETOUT | awk -F':' '{print $1}' | sort -u | wc -l`
@@ -1488,18 +1488,18 @@ fi
 
 #*** check slurm configuration file --------------------
 
-CHECK_FILE /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTS
+CHECK_FILE /etc/slurm/slurm.conf error 0 $FILES_DIR $CB_HOSTS
 if [ "$?" == "1" ]; then
-  CHECK_FILE /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTETH1 
-  CHECK_FILE /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTETH2 
-  CHECK_FILE /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTETH3 
-  CHECK_FILE /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTETH4 
+  CHECK_FILE /etc/slurm/slurm.conf error 0 $FILES_DIR $CB_HOSTETH1 
+  CHECK_FILE /etc/slurm/slurm.conf error 0 $FILES_DIR $CB_HOSTETH2 
+  CHECK_FILE /etc/slurm/slurm.conf error 0 $FILES_DIR $CB_HOSTETH3 
+  CHECK_FILE /etc/slurm/slurm.conf error 0 $FILES_DIR $CB_HOSTETH4 
   echo ""
 fi
 
 #*** check slurm daemon
 
-CHECK_DAEMON slurmd Error $CB_HOSTS
+CHECK_DAEMON slurmd error $CB_HOSTS
 
 if [ "$FAST" == "1" ]; then
 
@@ -1544,15 +1544,15 @@ GANGLIA=`ps -el | grep gmetad`
 if [ "$GANGLIA" != "" ]; then
   echo ""
   echo "--------------- ganglia checks ----------------------"
-  CHECK_FILE /etc/ganglia/gmond.conf Warning 0 $FILES_DIR $CB_HOSTS
+  CHECK_FILE /etc/ganglia/gmond.conf warning 0 $FILES_DIR $CB_HOSTS
   if [ "$?" == "1" ]; then
-    CHECK_FILE /etc/ganglia/gmond.conf Warning 1 $FILES_DIR $CB_HOSTETH1 
-    CHECK_FILE /etc/ganglia/gmond.conf Warning 1 $FILES_DIR $CB_HOSTETH2 
-    CHECK_FILE /etc/ganglia/gmond.conf Warning 1 $FILES_DIR $CB_HOSTETH3 
-    CHECK_FILE /etc/ganglia/gmond.conf Warning 1 $FILES_DIR $CB_HOSTETH4 
+    CHECK_FILE /etc/ganglia/gmond.conf warning 1 $FILES_DIR $CB_HOSTETH1 
+    CHECK_FILE /etc/ganglia/gmond.conf warning 1 $FILES_DIR $CB_HOSTETH2 
+    CHECK_FILE /etc/ganglia/gmond.conf warning 1 $FILES_DIR $CB_HOSTETH3 
+    CHECK_FILE /etc/ganglia/gmond.conf warning 1 $FILES_DIR $CB_HOSTETH4 
     echo ""
   fi
-  CHECK_DAEMON gmond Warning $CB_HOSTS
+  CHECK_DAEMON gmond warning $CB_HOSTS
 fi
 
 # --------------------- run cluster checker --------------------
@@ -1602,14 +1602,14 @@ MEMORY_CHECK $FILES_DIR $CB_HOSTETH4 $CB_MEM4
 echo ""
 echo "--------------- clock checks ------------------------"
 
-CHECK_DAEMON chronyd Error $CB_HOSTS
+CHECK_DAEMON chronyd error $CB_HOSTS
 
-CHECK_FILE /etc/chrony.conf Error 0 $FILES_DIR $CB_HOSTS
+CHECK_FILE /etc/chrony.conf error 0 $FILES_DIR $CB_HOSTS
 if [ "$?" == "1" ]; then
-  CHECK_FILE /etc/chrony.conf Error 1 $FILES_DIR $CB_HOSTETH1 
-  CHECK_FILE /etc/chrony.conf Error 1 $FILES_DIR $CB_HOSTETH2 
-  CHECK_FILE /etc/chrony.conf Error 1 $FILES_DIR $CB_HOSTETH3 
-  CHECK_FILE /etc/chrony.conf Error 1 $FILES_DIR $CB_HOSTETH4 
+  CHECK_FILE /etc/chrony.conf error 1 $FILES_DIR $CB_HOSTETH1 
+  CHECK_FILE /etc/chrony.conf error 1 $FILES_DIR $CB_HOSTETH2 
+  CHECK_FILE /etc/chrony.conf error 1 $FILES_DIR $CB_HOSTETH3 
+  CHECK_FILE /etc/chrony.conf error 1 $FILES_DIR $CB_HOSTETH4 
   echo ""
 fi
 
@@ -1658,12 +1658,12 @@ fi
 
 #*** check /etc/exports file
 
-CHECK_FILE /etc/exports Error 0 $FILES_DIR $CB_HOSTS
+CHECK_FILE /etc/exports error 0 $FILES_DIR $CB_HOSTS
 if [ "$?" == "1" ]; then
-  CHECK_FILE /etc/exports Error 1 $FILES_DIR $CB_HOSTETH1 
-  CHECK_FILE /etc/exports Error 1 $FILES_DIR $CB_HOSTETH2 
-  CHECK_FILE /etc/exports Error 1 $FILES_DIR $CB_HOSTETH3 
-  CHECK_FILE /etc/exports Error 1 $FILES_DIR $CB_HOSTETH4 
+  CHECK_FILE /etc/exports error 1 $FILES_DIR $CB_HOSTETH1 
+  CHECK_FILE /etc/exports error 1 $FILES_DIR $CB_HOSTETH2 
+  CHECK_FILE /etc/exports error 1 $FILES_DIR $CB_HOSTETH3 
+  CHECK_FILE /etc/exports error 1 $FILES_DIR $CB_HOSTETH4 
 fi
 
 #*** check /etc/fstab file
@@ -1689,7 +1689,7 @@ fi
 # --------------------- check daemons --------------------
 
 #echo "--------------- daemon check ------------------------"
-#CHECK_DAEMON gmond Warning $CB_HOSTS
+#CHECK_DAEMON gmond warning $CB_HOSTS
 
 # --------------------- rpm check --------------------
 
