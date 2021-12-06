@@ -694,11 +694,15 @@ IBSPEED ()
     return
   fi
   RATEBAD=
+  WARNING=
   while read line 
   do
     host=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
     RATEI=`echo $line | awk '{print $2}'`
     if [ "$RATEI" != "$RATE0" ]; then
+      if [ $RATEI -lt $RATE0 ]; then
+        WARNING="***warning: "
+      fi
       if [ "$RATEI" != "Connection" ]; then
         if [ "$RATEBAD" == "" ]; then
           RATEBAD="$host/$RATEI"
@@ -712,7 +716,7 @@ IBSPEED ()
   if [ "$RATEBAD" == "" ]; then
     echo "   ${CB_HOST_ARG}-ib: IB data rate $RATE0 Gb/s"
   else
-    echo "   ${CB_HOST_ARG}-ib: ***warning: IB data rate $RATE0 Gb/s except on $RATEBAD"
+    echo "   ${CB_HOST_ARG}-ib: ${WARNING}IB data rate $RATE0 Gb/s except on $RATEBAD"
   fi
   rm -f $IBTEMP
 }
