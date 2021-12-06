@@ -132,29 +132,29 @@ if [ $nlogdiff -gt 0 ]; then
  cp $ERRORS $LOGFILE
 fi
 
-ERRORS=Errors
+ERRS=Errors
 if [ "$nerrors" == "1" ]; then
-  ERRORS=Error
+  ERRS=Error
 fi
 
-WARNINGS=Warnings
+WARNS=Warnings
 if [ "$nwarnings" == "1" ]; then
-  WARNINGS=Warning
+  WARNS=Warning
 fi
 
 if [ $nlogdiff -eq 0 ]; then
-  echo "   $CB_HOSTS status since $LOGDATE: $nerrors $ERRORS, $nwarnings $WARNINGS"
+  echo "   $CB_HOSTS status since $LOGDATE: $nerrors $ERRS, $nwarnings $WARNS"
 else
-  echo "   $CB_HOSTS status has changed: $nerrors $ERRORS, $nwarnings $WARNINGS"
+  echo "   $CB_HOSTS status has changed: $nerrors $ERRS, $nwarnings $WARNS"
 fi
 echo ""
 cat $HEADER $ERRORS 
 if [ "$EMAIL" != "" ]; then
   echo emailing results to $EMAIL
   if [ $nlogdiff -eq 0 ]; then
-    cat $HEADER $ERRORS $OUTPUT | mail -s "$CB_HOSTS status since $LOGDATE: $nerrors $ERRORS, $nwarnings $WARNINGS" $EMAIL
+    cat $HEADER $ERRORS $OUTPUT | mail -s "$CB_HOSTS status since $LOGDATE: $nerrors $ERRS, $nwarnings $WARNS" $EMAIL
   else
-    cat $HEADER $ERRORS $OUTPUT | mail -s "$CB_HOSTS status has changed: $nerrors $ERRORS, $nwarnings $WARNINGS" $EMAIL
+    cat $HEADER $ERRORS $OUTPUT | mail -s "$CB_HOSTS status has changed: $nerrors $ERRS, $nwarnings $WARNS" $EMAIL
   fi
 fi
 
