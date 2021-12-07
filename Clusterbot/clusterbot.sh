@@ -947,6 +947,21 @@ SPEED_CHECK ()
 }
 
 #---------------------------------------------
+#                   IS_IPMI_DOWN
+#---------------------------------------------
+
+IS_IPMI_DOWN ()
+{
+  local ITEM=$1
+
+  IS_DOWN=`ping -c 1 $ITEM |& head -2 | tail -1 | grep Unreachable | wc -l`
+  if [ $IS_DOWN -eq 1 ]; then
+    return 1
+  fi
+  return 0
+}
+
+#---------------------------------------------
 #                   IS_HOST_DOWN
 #---------------------------------------------
 
@@ -1388,6 +1403,7 @@ echo "--------------- ethernet check ----------------------"
 
 pdsh -t 2 -w $CB_HOSTS date   >& $ETHOUT
 ETHDOWN=`sort $ETHOUT | grep -E 'timed|refused|route' | awk -F':' '{print $1}' | awk '{printf "%s ", $1}'`
+ETHUP=`sort $ETHOUT | grep -v -E 'timed|refused|route' | awk -F':' '{print $1}' | awk '{printf "%s ", $1}'`
 
 ETH_ALL_UP=
 if [ "$ETHDOWN" == "" ]; then
@@ -1395,6 +1411,30 @@ if [ "$ETHDOWN" == "" ]; then
   ETH_ALL_UP=1
 else
   echo "   $CB_HOSTS: ***warning: ethernet down on $ETHDOWN"
+fi
+
+# --------------------- check ipmi --------------------
+echo ""
+echo "--------------- ipmi checks ------------"
+IPMIDOWN=
+IPMIEXT=-ipmi
+ALLETH="$ETHUP $ETHDOWN"
+ALLETH=$(echo "$ALLETH"|tr " " "\n"|sort|uniq|tr "\n" " ")
+for hosteth in $ALLETH; do
+  hostipmi=${hosteth}$IPMIEXT
+  IS_IPMI_DOWN $hostipmi
+  if [ "$?" == "1" ]; then
+    if [ "$IPMIDOWN" == "" ]; then
+      IPMIDOWN="$hosteth"
+    else
+      IPMIDOWN="$IPMIDOWN $hosteth"
+    fi
+  fi
+done
+if [ "$IPMIDOWN" == "" ]; then
+  echo "   $CB_HOSTS: ipmi up"
+else
+  echo "   $CB_HOSTS: ***warning: ipmi down on $IPMIDOWN"
 fi
 
 # --------------------- check infiniband --------------------
