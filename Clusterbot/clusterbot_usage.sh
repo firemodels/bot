@@ -27,6 +27,7 @@ if [ "$SHOW_EMAIL_HELP" == "1" ]; then
 fi
 echo " -n n - run n cases on each queue [default: $NCASES_PER_QUEUE]"
 echo " -q q - run test cases using the queue q."
+echo " -I password - check ipmi interface using password"
 echo " -Q q - same as the -q option except that only test cases are run."
 echo "         Other tests are not performed."
 echo " -r - check file contents readable only by root.  If this option is not"

@@ -1217,9 +1217,10 @@ CHECK_ROOT_FILES=
 PASSWORD_GIVEN=
 USE_SUDO=
 FAST=
+IPMI_password=
 UPDATE_ARCHIVE=
 
-while getopts 'fFhn:q:Q:ru' OPTION
+while getopts 'fFhI:n:q:Q:ru' OPTION
 do
 case $OPTION  in
   f)
@@ -1231,6 +1232,9 @@ case $OPTION  in
   h)
    ./clusterbot_usage.sh clusterbot.sh $NCASES_PER_QUEUE 0
    exit
+   ;;
+  I)
+   IPMI_passworrd=$OPTARG
    ;;
   n)
    NCASES="$OPTARG"

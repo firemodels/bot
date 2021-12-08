@@ -8,9 +8,10 @@ QOPT=
 qopt=
 ropt=
 uopt=
+Iopt=
 FORCE_UNLOCK=
 NCASES_PER_QUEUE=20
-while getopts 'fFhm:n:q:Q:ru' OPTION
+while getopts 'fFhI:m:n:q:Q:ru' OPTION
 do
 case $OPTION  in
   f)
@@ -23,6 +24,9 @@ case $OPTION  in
   h)
    ./clusterbot_usage.sh run_clusterbot.sh $NCASES_PER_QUEUE 1 $EMAIL
    exit
+   ;;
+  I)
+   Iopt="-I $OPTARG"
    ;;
   m)
    EMAIL="$OPTARG"
@@ -89,7 +93,7 @@ fi
 
 echo > $OUTPUT
 START_TIME=`date`
-./clusterbot.sh $fopt $Fopt $nopt $QOPT $qopt $ropt $uopt | tee  $OUTPUT
+./clusterbot.sh $fopt $Fopt $nopt $Iopt $QOPT $qopt $ropt $uopt | tee  $OUTPUT
 STOP_TIME=`date`
 
 nerrors=`grep '\*\*\*error'     $OUTPUT | wc -l`
