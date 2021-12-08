@@ -603,7 +603,7 @@ if [ "$CB_HOST_ARG" == "" ]; then
   return 0
 fi
 rm -f $FILES_DIR/${prefix}rpm*.txt
-pdsh -t 2 -w $CB_HOST_ARG `pwd`/getrpms.sh $FILES_DIR $prefix >& $SLURMRPMOUT
+pdsh -t 2 -w $CB_HOST_ARG `pwd`/getrpms.sh $FILES_DIR $prefix >& $SLURMRPM_OUT
 
 local CURDIR=`pwd`
 cd $FILES_DIR
@@ -646,10 +646,10 @@ fi
 }
 
 #---------------------------------------------
-#                   SUBNET_CHECK
+#                   SLURM_CHECK
 #---------------------------------------------
 
-SUBNET_CHECK ()
+SLURM_CHECK ()
 {
   local CB_HOST_ARG=$1
   local CB_HOSTIB_ARG=$2
@@ -660,18 +660,18 @@ SUBNET_CHECK ()
   if [ "$CB_HOST_ARG" == "" ]; then
     return
   fi
-  SUBNET_TEMP=/tmp/subnet.$$
-  ssh $CB_HOST_ARG pdsh -t 2 -w $CB_HOST_ARG,$CB_HOSTIB_ARG ps -el >& $SUBNET_TEMP
-  cat $SUBNET_TEMP | sort -u | grep opensm  >  $SUBNETOUT 2>&1
-  SUB1=`cat  $SUBNETOUT | awk -F':' '{print $1}' | sort -u | awk '{printf "%s%s", $1," " }'`
+  SLURM_TEMP=/tmp/slurm.$$
+  ssh $CB_HOST_ARG pdsh -t 2 -w $CB_HOST_ARG,$CB_HOSTIB_ARG ps -el >& $SLURM_TEMP
+  cat $SLURM_TEMP | sort -u | grep opensm  >  $SLURM_OUT 2>&1
+  SUB1=`cat  $SLURM_OUT | awk -F':' '{print $1}' | sort -u | awk '{printf "%s%s", $1," " }'`
   if [ "$SUB1" == "" ]; then
     echo "   $CB_HOSTIB_ARG: ***error: opensm not running on any host"
     echo "      Fix: sudo ssh $CB_HOST_ARG service opensm start   "
   else
-    SUBNETCOUNT=`cat  $SUBNETOUT | awk -F':' '{print $1}' | sort -u | wc -l`
-    echo "   $CB_HOSTIB_ARG: opensm on $SUBNETCOUNT hosts"
+    SLURMCOUNT=`cat  $SLURM_OUT | awk -F':' '{print $1}' | sort -u | wc -l`
+    echo "   $CB_HOSTIB_ARG: opensm on $SLURMCOUNT hosts"
   fi
-  rm -f $SUBNET_TEMP
+  rm -f $SLURM_TEMP
 }
 
 #---------------------------------------------
@@ -1281,10 +1281,9 @@ CHECKEROUT=$FILES_DIR/checkerout.$$
 FSOUT=$FILES_DIR/fsout.$$
 MOUNTOUT=$FILES_DIR/mountout.$$
 IBOUT=$FILES_DIR/ibout.$$
-SUBNETOUT=$FILES_DIR/subnetout.$$
+SLURM_OUT=$FILES_DIR/slurm_out.$$
 IBRATE=$FILES_DIR/ibrate.$$
-SLURMOUT=$FILES_DIR/slurmout.$$
-SLURMRPMOUT=$FILES_DIR/slurmrpmout.$$
+SLURMRPM_OUT=$FILES_DIR/slurmrpmout.$$
 DOWN_HOSTS=$FILES_DIR/downhosts.$$
 UP_HOSTS=$FILES_DIR/uphosts.$$
 LOCK_FILE=$HOME/.clusterbot/lockfile
@@ -1485,10 +1484,10 @@ if [ `cat $IBOUT | wc -l` -ne 0 ]; then
 fi
 
 echo ""
-SUBNET_CHECK $CB_HOST1 $CB_HOSTIB1
-SUBNET_CHECK $CB_HOST2 $CB_HOSTIB2
-SUBNET_CHECK $CB_HOST3 $CB_HOSTIB3
-SUBNET_CHECK $CB_HOST4 $CB_HOSTIB4
+SLURM_CHECK $CB_HOST1 $CB_HOSTIB1
+SLURM_CHECK $CB_HOST2 $CB_HOSTIB2
+SLURM_CHECK $CB_HOST3 $CB_HOSTIB3
+SLURM_CHECK $CB_HOST4 $CB_HOSTIB4
 
 # --------------------- infiniband speed check --------------------
 
@@ -1505,7 +1504,7 @@ echo "--------------- slurm checks ------------------------"
 
 #*** check that slurm is online
 pbsnodes -l | awk '{print $1}' | sort -u  > $DOWN_HOSTS
-SLURMDOWN=
+SLURM_DOWN=
 while read line 
 do
   host=`echo $line | awk '{print $1}'`
@@ -1513,18 +1512,18 @@ do
   IS_HOST_DOWN $host
 # only care if slurm is down on a host that is up
   if [ "$?" == "0" ]; then
-    if [ "$SLURMDOWN" == "" ]; then
-      SLURMDOWN="$host"
+    if [ "$SLURM_DOWN" == "" ]; then
+      SLURM_DOWN="$host"
     else
-      SLURMDOWN="$SLURMDOWN $host"
+      SLURM_DOWN="$SLURM_DOWN $host"
     fi
   fi
 done < $DOWN_HOSTS
 
-if [ "$SLURMDOWN" == "" ]; then
+if [ "$SLURM_DOWN" == "" ]; then
   echo "   $CB_HOSTS: slurm online"
 else
-  echo "   $CB_HOSTS: ***warning: slurm offline on $SLURMDOWN"
+  echo "   $CB_HOSTS: ***warning: slurm offline on $SLURM_DOWN"
   echo "      Fix: sudo scontrol update nodename=HOST state=resume"
   echo "      This fix can only be applied to a HOST that is up and with"
   echo "      a working ethernet and infiniband network connection."
@@ -1555,9 +1554,9 @@ fi
 
 TEMP_RPM=/tmp/rpm.$$
 pdsh -t 2 -w $CB_HOSTS "rpm -qa | grep slurm | grep devel" >& $TEMP_RPM
-cat $TEMP_RPM | grep -v ssh | grep -v Connection | sort >& $SLURMRPMOUT
+cat $TEMP_RPM | grep -v ssh | grep -v Connection | sort >& $SLURMRPM_OUT
 rm -f $TEMP_RPM
-SLURMRPM0=`head -1 $SLURMRPMOUT | awk '{print $2}'`
+SLURMRPM0=`head -1 $SLURMRPM_OUT | awk '{print $2}'`
 SLURMBAD=
 while read line 
 do
@@ -1572,7 +1571,7 @@ do
       fi
     fi
   fi
-done < $SLURMRPMOUT
+done < $SLURMRPM_OUT
 
 if [ "$SLURMBAD" == "" ]; then
   echo "   $CB_HOSTS: $SLURMRPM0 installed"
