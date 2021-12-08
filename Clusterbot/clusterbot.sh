@@ -962,6 +962,25 @@ IS_IPMI_DOWN ()
 }
 
 #---------------------------------------------
+#                   CAN_CONNECT_IPMI
+#---------------------------------------------
+
+CAN_CONNECT_IPMI ()
+{
+  local IPMI_HOST=$1
+
+  if [[ "$IPMI_password" != "" ]] && [[ "$IPMI_username" != "" ]]; then
+    IS_DOWN=`ipmitool -I lanplus -U $IPMI_username -P $IPMI_password -H $IPMI_HOST mc info |& head -1 | grep Unable | wc -l`
+  else
+    IS_DOWN=1
+  fi
+  if [ $IS_DOWN -eq 0 ]; then
+    return 1
+  fi
+  return 0
+}
+
+#---------------------------------------------
 #                   IS_HOST_DOWN
 #---------------------------------------------
 
@@ -1218,9 +1237,10 @@ PASSWORD_GIVEN=
 USE_SUDO=
 FAST=
 IPMI_password=
+IPMI_username=
 UPDATE_ARCHIVE=
 
-while getopts 'fFhI:n:q:Q:ru' OPTION
+while getopts 'fFhn:P:q:Q:ruU:' OPTION
 do
 case $OPTION  in
   f)
@@ -1233,9 +1253,6 @@ case $OPTION  in
    ./clusterbot_usage.sh clusterbot.sh $NCASES_PER_QUEUE 0
    exit
    ;;
-  I)
-   IPMI_passworrd=$OPTARG
-   ;;
   n)
    NCASES="$OPTARG"
    re='^[0-9]+$'
@@ -1244,6 +1261,9 @@ case $OPTION  in
      exit
    fi 
    NCASES_PER_QUEUE=$NCASES
+   ;;
+  P)
+   IPMI_password=$OPTARG
    ;;
   Q)
    ONLY_RUN_TEST_CASES=1
@@ -1267,6 +1287,9 @@ case $OPTION  in
    ;;
   u)
    UPDATE_ARCHIVE="1"
+   ;;
+  U)
+   IPMI_username=$OPTARG
    ;;
 esac
 done
@@ -1420,6 +1443,7 @@ fi
 echo ""
 echo "--------------- ipmi checks ------------"
 IPMIDOWN=
+IPMIUP=
 IPMIEXT=-ipmi
 ALLETH="$ETHUP $ETHDOWN"
 ALLETH=$(echo "$ALLETH"|tr " " "\n"|sort|uniq|tr "\n" " ")
@@ -1432,12 +1456,39 @@ for hosteth in $ALLETH; do
     else
       IPMIDOWN="$IPMIDOWN $hosteth"
     fi
+  else
+    if [ "$IPMIUP" == "" ]; then
+      IPMIUP="$hosteth"
+    else
+      IPMIUP="$IPMIUP $hosteth"
+    fi
   fi
 done
 if [ "$IPMIDOWN" == "" ]; then
   echo "   $CB_HOSTS: ipmi up"
 else
   echo "   $CB_HOSTS: ***warning: ipmi down on $IPMIDOWN"
+fi
+
+if [[ "$IPMI_username" != "" ]] && [[ "$IPMI_password" != "" ]]; then
+  IPMIDOWN=
+  IPMIEXT=-ipmi
+  for hosteth in $IPMIUP; do
+    hostipmi=${hosteth}$IPMIEXT
+    CAN_CONNECT_IPMI $hostipmi
+    if [ "$?" == "0" ]; then
+      if [ "$IPMIDOWN" == "" ]; then
+        IPMIDOWN="$hosteth"
+      else
+        IPMIDOWN="$IPMIDOWN $hosteth"
+      fi
+    fi
+  done
+  if [ "$IPMIDOWN" == "" ]; then
+    echo "   $CB_HOSTS: ipmi password set"
+  else
+    echo "   $CB_HOSTS: ***warning: ipmi password not set on $IPMIDOWN"
+  fi
 fi
 
 # --------------------- check infiniband --------------------
