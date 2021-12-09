@@ -8,9 +8,11 @@ QOPT=
 qopt=
 ropt=
 uopt=
+Popt=
+Uopt=
 FORCE_UNLOCK=
 NCASES_PER_QUEUE=20
-while getopts 'fFhm:n:q:Q:ru' OPTION
+while getopts 'fFhm:n:P:q:Q:ruU:' OPTION
 do
 case $OPTION  in
   f)
@@ -36,6 +38,9 @@ case $OPTION  in
    fi
    NCASES_PER_QUEUE=$NCASES
    ;;
+  P)
+   Popt="-P $OPTARG"
+   ;;
   Q)
    QOPT="-Q $OPTARG"
    ;;
@@ -47,6 +52,9 @@ case $OPTION  in
    ;;
   u)
    uopt="-u"
+   ;;
+  U)
+   Uopt="-U $OPTARG"
    ;;
 esac
 done
@@ -89,32 +97,34 @@ fi
 
 echo > $OUTPUT
 START_TIME=`date`
-./clusterbot.sh $fopt $Fopt $nopt $QOPT $qopt $ropt $uopt | tee  $OUTPUT
+./clusterbot.sh $fopt $Fopt $nopt $Popt $QOPT $qopt $ropt $uopt $Uopt | tee  $OUTPUT
 STOP_TIME=`date`
 
 nerrors=`grep '\*\*\*error'     $OUTPUT | wc -l`
 nwarnings=`grep '\*\*\*warning' $OUTPUT | wc -l`
 
-echo "-----------------------------------------------------"    >  $HEADER
+echo "VVVVVVVVVVVVVVVVVVVVVVVVV"                                 >  $HEADER
+echo ""                                                         >> $HEADER
 echo "   start: $START_TIME"                                    >> $HEADER
 echo "    stop: $STOP_TIME"                                     >> $HEADER
+echo "    $nerrors errors, $nwarnings warnings"                 >> $HEADER
 
 rm -f $ERRORS
 touch $ERRORS
 if [ $nerrors -gt 0 ]; then
   echo ""                                                       >> $ERRORS
   echo "--------------------- Errors ------------------------"  >> $ERRORS
-  grep '\*\*\*error' $OUTPUT                                       >> $ERRORS
+  grep '\*\*\*error' $OUTPUT                                    >> $ERRORS
   echo "-----------------------------------------------------"  >> $ERRORS
-  echo ""                                                       >> $ERRORS
 fi
 if [ $nwarnings -gt 0 ]; then
   echo ""                                                       >> $ERRORS
   echo "--------------------- Warnings ----------------------"  >> $ERRORS
-  grep '\*\*\*warning' $OUTPUT                                     >> $ERRORS
+  grep '\*\*\*warning' $OUTPUT                                  >> $ERRORS
   echo "-----------------------------------------------------"  >> $ERRORS
 fi
-
+echo ""                                                         >> $ERRORS
+echo "^^^^^^^^^^^^^^^^^^^^^^^^"                                 >> $ERRORS
 echo ""                                                         >> $ERRORS
 
 if [ ! -e $LOGFILE ]; then
@@ -128,19 +138,29 @@ if [ $nlogdiff -gt 0 ]; then
  cp $ERRORS $LOGFILE
 fi
 
+ERRS=Errors
+if [ "$nerrors" == "1" ]; then
+  ERRS=Error
+fi
+
+WARNS=Warnings
+if [ "$nwarnings" == "1" ]; then
+  WARNS=Warning
+fi
+
 if [ $nlogdiff -eq 0 ]; then
-  echo "   $CB_HOSTS status since $LOGDATE: $nerrors Errors, $nwarnings Warnings"
+  echo "   $CB_HOSTS status since $LOGDATE: $nerrors $ERRS, $nwarnings $WARNS"
 else
-  echo "   $CB_HOSTS status has changed: $nerrors Errors, $nwarnings Warnings"
+  echo "   $CB_HOSTS status has changed: $nerrors $ERRS, $nwarnings $WARNS"
 fi
 echo ""
 cat $HEADER $ERRORS 
 if [ "$EMAIL" != "" ]; then
   echo emailing results to $EMAIL
   if [ $nlogdiff -eq 0 ]; then
-    cat $HEADER $ERRORS $OUTPUT | mail -s "$CB_HOSTS status since $LOGDATE: $nerrors Errors, $nwarnings Warnings" $EMAIL
+    cat $HEADER $ERRORS $OUTPUT | mail -s "$CB_HOSTS status since $LOGDATE: $nerrors $ERRS, $nwarnings $WARNS" $EMAIL
   else
-    cat $HEADER $ERRORS $OUTPUT | mail -s "$CB_HOSTS status has changed: $nerrors Errors, $nwarnings Warnings" $EMAIL
+    cat $HEADER $ERRORS $OUTPUT | mail -s "$CB_HOSTS status has changed: $nerrors $ERRS, $nwarnings $WARNS" $EMAIL
   fi
 fi
 

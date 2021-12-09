@@ -86,7 +86,7 @@ CHECK_DIR_LIST()
   local rootdir=$2
 
   currentdirlist=/tmp/dirlist.$$
-  ls -l $basedir/$rootdir | sed '1 d' > $currentdirlist
+  ls -l $basedir/$rootdir | sort | sed '1 d' > $currentdirlist
   
   if [ ! -e $ARCHIVEDIR/$rootdir ]; then
     cp $currentdirlist $ARCHIVEDIR/$rootdir
@@ -96,9 +96,9 @@ CHECK_DIR_LIST()
  
   dirdate=`ls -l $ARCHIVEDIR/$rootdir | awk '{print $6" "$7" "$8}'`
   if [ $ndiffs -eq 0 ]; then
-    echo "   `hostname -s`: $basedir/$rootdir contents the same since $dirdate"
+    echo "   `hostname -s`: $basedir/$rootdir same since $dirdate"
   else
-    echo "   `hostname -s`: $basedir/$rootdir contents have changed since $dirdate"
+    echo "   `hostname -s`: $basedir/$rootdir changed since $dirdate"
     if [ "$UPDATE_ARCHIVE" == "1" ]; then
       cp $currentdirlist $ARCHIVEDIR/$rootdir
     fi
@@ -603,20 +603,20 @@ if [ "$CB_HOST_ARG" == "" ]; then
   return 0
 fi
 rm -f $FILES_DIR/${prefix}rpm*.txt
-pdsh -t 2 -w $CB_HOST_ARG `pwd`/getrpms.sh $FILES_DIR $prefix >& $SLURMRPMOUT
+pdsh -t 2 -w $CB_HOST_ARG `pwd`/getrpms.sh $FILES_DIR $prefix >& $SLURMRPM_OUT
 
 local CURDIR=`pwd`
 cd $FILES_DIR
 rpm0=`ls -l ${prefix}rpm*.txt | head -1 | awk '{print $9}'`
 host0=`echo $rpm0 | sed 's/.txt$//'`
-host0=`echo $host0 | sed 's/^${prefix}rpm_//'`
+host0=`echo $host0 | sed 's/^.*rpm_//'`
 RPMDIFF=
 for f in ${prefix}rpm*.txt
 do
   ndiff=`diff $rpm0 $f | wc -l`
   if [ $ndiff -ne 0 ]; then
     hostdiff=`echo $f | sed 's/.txt$//'`
-    hostdiff=`echo $hostdiff | sed 's/^${prefix}rpm_//'`
+    hostdiff=`echo $hostdiff | sed 's/^.*rpm_//'`
     if [ "$RPMDIFF" == "" ]; then
       RPMDIFF="$hostdiff"
     else
@@ -646,10 +646,10 @@ fi
 }
 
 #---------------------------------------------
-#                   SUBNET_CHECK
+#                   SLURM_CHECK
 #---------------------------------------------
 
-SUBNET_CHECK ()
+SLURM_CHECK ()
 {
   local CB_HOST_ARG=$1
   local CB_HOSTIB_ARG=$2
@@ -660,18 +660,18 @@ SUBNET_CHECK ()
   if [ "$CB_HOST_ARG" == "" ]; then
     return
   fi
-  SUBNET_TEMP=/tmp/subnet.$$
-  ssh $CB_HOST_ARG pdsh -t 2 -w $CB_HOST_ARG,$CB_HOSTIB_ARG ps -el >& $SUBNET_TEMP
-  cat $SUBNET_TEMP | sort -u | grep opensm  >  $SUBNETOUT 2>&1
-  SUB1=`cat  $SUBNETOUT | awk -F':' '{print $1}' | sort -u | awk '{printf "%s%s", $1," " }'`
+  SLURM_TEMP=/tmp/slurm.$$
+  ssh $CB_HOST_ARG pdsh -t 2 -w $CB_HOST_ARG,$CB_HOSTIB_ARG ps -el >& $SLURM_TEMP
+  cat $SLURM_TEMP | sort -u | grep opensm  >  $SLURM_OUT 2>&1
+  SUB1=`cat  $SLURM_OUT | awk -F':' '{print $1}' | sort -u | awk '{printf "%s%s", $1," " }'`
   if [ "$SUB1" == "" ]; then
-    echo "   $CB_HOSTIB_ARG: **Error: opensm not running on any host"
+    echo "   $CB_HOSTIB_ARG: ***error: opensm not running on any host"
     echo "      Fix: sudo ssh $CB_HOST_ARG service opensm start   "
   else
-    SUBNETCOUNT=`cat  $SUBNETOUT | awk -F':' '{print $1}' | sort -u | wc -l`
-    echo "   $CB_HOSTIB_ARG: opensm on $SUBNETCOUNT hosts"
+    SLURMCOUNT=`cat  $SLURM_OUT | awk -F':' '{print $1}' | sort -u | wc -l`
+    echo "   $CB_HOSTIB_ARG: opensm on $SLURMCOUNT hosts"
   fi
-  rm -f $SUBNET_TEMP
+  rm -f $SLURM_TEMP
 }
 
 #---------------------------------------------
@@ -694,11 +694,15 @@ IBSPEED ()
     return
   fi
   RATEBAD=
+  WARNING=
   while read line 
   do
     host=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
     RATEI=`echo $line | awk '{print $2}'`
     if [ "$RATEI" != "$RATE0" ]; then
+      if [ $RATEI -lt $RATE0 ]; then
+        WARNING="***warning: "
+      fi
       if [ "$RATEI" != "Connection" ]; then
         if [ "$RATEBAD" == "" ]; then
           RATEBAD="$host/$RATEI"
@@ -712,7 +716,7 @@ IBSPEED ()
   if [ "$RATEBAD" == "" ]; then
     echo "   ${CB_HOST_ARG}-ib: IB data rate $RATE0 Gb/s"
   else
-    echo "   ${CB_HOST_ARG}-ib: ***warning: IB data rate $RATE0 Gb/s except on $RATEBAD"
+    echo "   ${CB_HOST_ARG}-ib: ${WARNING}IB data rate $RATE0 Gb/s except on $RATEBAD"
   fi
   rm -f $IBTEMP
 }
@@ -943,14 +947,48 @@ SPEED_CHECK ()
 }
 
 #---------------------------------------------
-#                   IS_HOST_UP
+#                   IS_IPMI_DOWN
 #---------------------------------------------
 
-IS_HOST_UP ()
+IS_IPMI_DOWN ()
 {
   local ITEM=$1
 
-  for i in $UP_ETH ; do
+  IS_DOWN=`ping -c 1 $ITEM |& head -2 | tail -1 | grep Unreachable | wc -l`
+  if [ $IS_DOWN -eq 1 ]; then
+    return 1
+  fi
+  return 0
+}
+
+#---------------------------------------------
+#                   CAN_CONNECT_IPMI
+#---------------------------------------------
+
+CAN_CONNECT_IPMI ()
+{
+  local IPMI_HOST=$1
+
+  if [[ "$IPMI_password" != "" ]] && [[ "$IPMI_username" != "" ]]; then
+    IS_DOWN=`ipmitool -I lanplus -U $IPMI_username -P $IPMI_password -H $IPMI_HOST mc info |& head -1 | grep Unable | wc -l`
+  else
+    IS_DOWN=1
+  fi
+  if [ $IS_DOWN -eq 0 ]; then
+    return 1
+  fi
+  return 0
+}
+
+#---------------------------------------------
+#                   IS_HOST_DOWN
+#---------------------------------------------
+
+IS_HOST_DOWN ()
+{
+  local ITEM=$1
+
+  for i in $ETHDOWN ; do
     if [ "$ITEM" == "$i" ]; then
       return 1
     fi
@@ -1096,9 +1134,9 @@ CHECK_FDS_OUT ()
     fi
   done
   if [ $FAIL -eq 0 ]; then
-    echo "   $QUEUE:   all $NCASES_PER_QUEUE cases ran successfully"
+    echo "   $QUEUE:   all $NCASES_PER_QUEUE cases succeeded"
   else
-    echo "   $QUEUE: ***error: $FAIL out of $NCASES_PER_QUEUE cases failed to run"
+    echo "   $QUEUE: ***error: $FAIL/$NCASES_PER_QUEUE cases failed"
   fi
   cd $CURDIR
 }
@@ -1198,9 +1236,11 @@ CHECK_ROOT_FILES=
 PASSWORD_GIVEN=
 USE_SUDO=
 FAST=
+IPMI_password=
+IPMI_username=
 UPDATE_ARCHIVE=
 
-while getopts 'fFhn:q:Q:ru' OPTION
+while getopts 'fFhn:P:q:Q:ruU:' OPTION
 do
 case $OPTION  in
   f)
@@ -1221,6 +1261,9 @@ case $OPTION  in
      exit
    fi 
    NCASES_PER_QUEUE=$NCASES
+   ;;
+  P)
+   IPMI_password=$OPTARG
    ;;
   Q)
    ONLY_RUN_TEST_CASES=1
@@ -1245,6 +1288,9 @@ case $OPTION  in
   u)
    UPDATE_ARCHIVE="1"
    ;;
+  U)
+   IPMI_username=$OPTARG
+   ;;
 esac
 done
 shift $(($OPTIND-1))
@@ -1262,10 +1308,9 @@ CHECKEROUT=$FILES_DIR/checkerout.$$
 FSOUT=$FILES_DIR/fsout.$$
 MOUNTOUT=$FILES_DIR/mountout.$$
 IBOUT=$FILES_DIR/ibout.$$
-SUBNETOUT=$FILES_DIR/subnetout.$$
+SLURM_OUT=$FILES_DIR/slurm_out.$$
 IBRATE=$FILES_DIR/ibrate.$$
-SLURMOUT=$FILES_DIR/slurmout.$$
-SLURMRPMOUT=$FILES_DIR/slurmrpmout.$$
+SLURMRPM_OUT=$FILES_DIR/slurmrpmout.$$
 DOWN_HOSTS=$FILES_DIR/downhosts.$$
 UP_HOSTS=$FILES_DIR/uphosts.$$
 LOCK_FILE=$HOME/.clusterbot/lockfile
@@ -1384,13 +1429,66 @@ echo "--------------- ethernet check ----------------------"
 
 pdsh -t 2 -w $CB_HOSTS date   >& $ETHOUT
 ETHDOWN=`sort $ETHOUT | grep -E 'timed|refused|route' | awk -F':' '{print $1}' | awk '{printf "%s ", $1}'`
+ETHUP=`sort $ETHOUT | grep -v -E 'timed|refused|route' | awk -F':' '{print $1}' | awk '{printf "%s ", $1}'`
 
 ETH_ALL_UP=
 if [ "$ETHDOWN" == "" ]; then
-  echo "   $CB_HOSTS: Ethernet up"
+  echo "   $CB_HOSTS: ethernet up"
   ETH_ALL_UP=1
 else
-  echo "   $CB_HOSTS: ***warning: Ethernet down on $ETHDOWN"
+  echo "   $CB_HOSTS: ***warning: ethernet down on $ETHDOWN"
+fi
+
+# --------------------- check ipmi --------------------
+echo ""
+echo "--------------- ipmi checks ------------"
+IPMIDOWN=
+IPMIUP=
+IPMIEXT=-ipmi
+ALLETH="$ETHUP $ETHDOWN"
+ALLETH=$(echo "$ALLETH"|tr " " "\n"|sort|uniq|tr "\n" " ")
+for hosteth in $ALLETH; do
+  hostipmi=${hosteth}$IPMIEXT
+  IS_IPMI_DOWN $hostipmi
+  if [ "$?" == "1" ]; then
+    if [ "$IPMIDOWN" == "" ]; then
+      IPMIDOWN="$hosteth"
+    else
+      IPMIDOWN="$IPMIDOWN $hosteth"
+    fi
+  else
+    if [ "$IPMIUP" == "" ]; then
+      IPMIUP="$hosteth"
+    else
+      IPMIUP="$IPMIUP $hosteth"
+    fi
+  fi
+done
+if [ "$IPMIDOWN" == "" ]; then
+  echo "   $CB_HOSTS: ipmi up"
+else
+  echo "   $CB_HOSTS: ***warning: ipmi down on $IPMIDOWN"
+fi
+
+if [[ "$IPMI_username" != "" ]] && [[ "$IPMI_password" != "" ]]; then
+  IPMIDOWN=
+  IPMIEXT=-ipmi
+  for hosteth in $IPMIUP; do
+    hostipmi=${hosteth}$IPMIEXT
+    CAN_CONNECT_IPMI $hostipmi
+    if [ "$?" == "0" ]; then
+      if [ "$IPMIDOWN" == "" ]; then
+        IPMIDOWN="$hosteth"
+      else
+        IPMIDOWN="$IPMIDOWN $hosteth"
+      fi
+    fi
+  done
+  if [ "$IPMIDOWN" == "" ]; then
+    echo "   $CB_HOSTS: ipmi password same"
+  else
+    echo "   $CB_HOSTS: ***warning: ipmi password different on $IPMIDOWN"
+  fi
 fi
 
 # --------------------- check infiniband --------------------
@@ -1414,14 +1512,16 @@ fi
 IBDOWN_HOSTS=`grep -E 'timed|refused|route'  $IBOUT | grep out | sort | awk -F':' '{print $1}' | awk '{printf "%s ", $1}'`
 
 IBDOWN=
-for h in $IBDOWN; do
+for hostib in $IBDOWN_HOSTS; do
 #*** only warn if ethernet is up and infiniband is down
-  IS_HOST_UP $h
-  if [ "$?" == "1" ]; then
+
+  hosteth=`echo $hostib | sed 's/-ib$//'`
+  IS_HOST_DOWN $hosteth
+  if [ "$?" == "0" ]; then
     if [ "$IBDOWN" == "" ]; then
-      IBDOWN="$host"
+      IBDOWN="$hostib"
     else
-      IBDOWN="$IBDOWN $host"
+      IBDOWN="$IBDOWN $hostib"
     fi
   fi
 done
@@ -1434,15 +1534,15 @@ if [ `cat $IBOUT | wc -l` -ne 0 ]; then
       echo "   $CB_HOSTS: infiniband up on working hosts"
     fi
   else
-    echo "   $CB_HOSTS: ***error: infiniband down on $IBDOWN"
+    echo "   $CB_HOSTS: ***error: infiniband down on $IBDOWN and nodes with non-working ethernet"
   fi
 fi
 
 echo ""
-SUBNET_CHECK $CB_HOST1 $CB_HOSTIB1
-SUBNET_CHECK $CB_HOST2 $CB_HOSTIB2
-SUBNET_CHECK $CB_HOST3 $CB_HOSTIB3
-SUBNET_CHECK $CB_HOST4 $CB_HOSTIB4
+SLURM_CHECK $CB_HOST1 $CB_HOSTIB1
+SLURM_CHECK $CB_HOST2 $CB_HOSTIB2
+SLURM_CHECK $CB_HOST3 $CB_HOSTIB3
+SLURM_CHECK $CB_HOST4 $CB_HOSTIB4
 
 # --------------------- infiniband speed check --------------------
 
@@ -1459,26 +1559,26 @@ echo "--------------- slurm checks ------------------------"
 
 #*** check that slurm is online
 pbsnodes -l | awk '{print $1}' | sort -u  > $DOWN_HOSTS
-SLURMDOWN=
+SLURM_DOWN=
 while read line 
 do
   host=`echo $line | awk '{print $1}'`
 
-#*** only warn if ethernet is up and slurm is down on a host
-  IS_HOST_UP $h
-  if [ "$?" == "1" ]; then
-    if [ "$SLURMDOWN" == "" ]; then
-      SLURMDOWN="$host"
+  IS_HOST_DOWN $host
+# only care if slurm is down on a host that is up
+  if [ "$?" == "0" ]; then
+    if [ "$SLURM_DOWN" == "" ]; then
+      SLURM_DOWN="$host"
     else
-      SLURMDOWN="$SLURMDOWN $host"
+      SLURM_DOWN="$SLURM_DOWN $host"
     fi
   fi
 done < $DOWN_HOSTS
 
-if [ "$SLURMDOWN" == "" ]; then
+if [ "$SLURM_DOWN" == "" ]; then
   echo "   $CB_HOSTS: slurm online"
 else
-  echo "   $CB_HOSTS: ***warning: slurm offline on $SLURMDOWN"
+  echo "   $CB_HOSTS: ***warning: slurm offline on $SLURM_DOWN"
   echo "      Fix: sudo scontrol update nodename=HOST state=resume"
   echo "      This fix can only be applied to a HOST that is up and with"
   echo "      a working ethernet and infiniband network connection."
@@ -1486,18 +1586,18 @@ fi
 
 #*** check slurm configuration file --------------------
 
-CHECK_FILE /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTS
+CHECK_FILE /etc/slurm/slurm.conf error 0 $FILES_DIR $CB_HOSTS
 if [ "$?" == "1" ]; then
-  CHECK_FILE /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTETH1 
-  CHECK_FILE /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTETH2 
-  CHECK_FILE /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTETH3 
-  CHECK_FILE /etc/slurm/slurm.conf Error 0 $FILES_DIR $CB_HOSTETH4 
+  CHECK_FILE /etc/slurm/slurm.conf error 0 $FILES_DIR $CB_HOSTETH1 
+  CHECK_FILE /etc/slurm/slurm.conf error 0 $FILES_DIR $CB_HOSTETH2 
+  CHECK_FILE /etc/slurm/slurm.conf error 0 $FILES_DIR $CB_HOSTETH3 
+  CHECK_FILE /etc/slurm/slurm.conf error 0 $FILES_DIR $CB_HOSTETH4 
   echo ""
 fi
 
 #*** check slurm daemon
 
-CHECK_DAEMON slurmd Error $CB_HOSTS
+CHECK_DAEMON slurmd error $CB_HOSTS
 
 if [ "$FAST" == "1" ]; then
 
@@ -1509,9 +1609,9 @@ fi
 
 TEMP_RPM=/tmp/rpm.$$
 pdsh -t 2 -w $CB_HOSTS "rpm -qa | grep slurm | grep devel" >& $TEMP_RPM
-cat $TEMP_RPM | grep -v ssh | grep -v Connection | sort >& $SLURMRPMOUT
+cat $TEMP_RPM | grep -v ssh | grep -v Connection | sort >& $SLURMRPM_OUT
 rm -f $TEMP_RPM
-SLURMRPM0=`head -1 $SLURMRPMOUT | awk '{print $2}'`
+SLURMRPM0=`head -1 $SLURMRPM_OUT | awk '{print $2}'`
 SLURMBAD=
 while read line 
 do
@@ -1526,7 +1626,7 @@ do
       fi
     fi
   fi
-done < $SLURMRPMOUT
+done < $SLURMRPM_OUT
 
 if [ "$SLURMBAD" == "" ]; then
   echo "   $CB_HOSTS: $SLURMRPM0 installed"
@@ -1542,15 +1642,15 @@ GANGLIA=`ps -el | grep gmetad`
 if [ "$GANGLIA" != "" ]; then
   echo ""
   echo "--------------- ganglia checks ----------------------"
-  CHECK_FILE /etc/ganglia/gmond.conf Warning 0 $FILES_DIR $CB_HOSTS
+  CHECK_FILE /etc/ganglia/gmond.conf warning 0 $FILES_DIR $CB_HOSTS
   if [ "$?" == "1" ]; then
-    CHECK_FILE /etc/ganglia/gmond.conf Warning 1 $FILES_DIR $CB_HOSTETH1 
-    CHECK_FILE /etc/ganglia/gmond.conf Warning 1 $FILES_DIR $CB_HOSTETH2 
-    CHECK_FILE /etc/ganglia/gmond.conf Warning 1 $FILES_DIR $CB_HOSTETH3 
-    CHECK_FILE /etc/ganglia/gmond.conf Warning 1 $FILES_DIR $CB_HOSTETH4 
+    CHECK_FILE /etc/ganglia/gmond.conf warning 1 $FILES_DIR $CB_HOSTETH1 
+    CHECK_FILE /etc/ganglia/gmond.conf warning 1 $FILES_DIR $CB_HOSTETH2 
+    CHECK_FILE /etc/ganglia/gmond.conf warning 1 $FILES_DIR $CB_HOSTETH3 
+    CHECK_FILE /etc/ganglia/gmond.conf warning 1 $FILES_DIR $CB_HOSTETH4 
     echo ""
   fi
-  CHECK_DAEMON gmond Warning $CB_HOSTS
+  CHECK_DAEMON gmond warning $CB_HOSTS
 fi
 
 # --------------------- run cluster checker --------------------
@@ -1600,14 +1700,14 @@ MEMORY_CHECK $FILES_DIR $CB_HOSTETH4 $CB_MEM4
 echo ""
 echo "--------------- clock checks ------------------------"
 
-CHECK_DAEMON chronyd Error $CB_HOSTS
+CHECK_DAEMON chronyd error $CB_HOSTS
 
-CHECK_FILE /etc/chrony.conf Error 0 $FILES_DIR $CB_HOSTS
+CHECK_FILE /etc/chrony.conf error 0 $FILES_DIR $CB_HOSTS
 if [ "$?" == "1" ]; then
-  CHECK_FILE /etc/chrony.conf Error 1 $FILES_DIR $CB_HOSTETH1 
-  CHECK_FILE /etc/chrony.conf Error 1 $FILES_DIR $CB_HOSTETH2 
-  CHECK_FILE /etc/chrony.conf Error 1 $FILES_DIR $CB_HOSTETH3 
-  CHECK_FILE /etc/chrony.conf Error 1 $FILES_DIR $CB_HOSTETH4 
+  CHECK_FILE /etc/chrony.conf error 1 $FILES_DIR $CB_HOSTETH1 
+  CHECK_FILE /etc/chrony.conf error 1 $FILES_DIR $CB_HOSTETH2 
+  CHECK_FILE /etc/chrony.conf error 1 $FILES_DIR $CB_HOSTETH3 
+  CHECK_FILE /etc/chrony.conf error 1 $FILES_DIR $CB_HOSTETH4 
   echo ""
 fi
 
@@ -1623,45 +1723,25 @@ fi
 echo ""
 echo "--------------- file system checks -----------------"
 
-#*** check number of file systems mounted
+#*** check  NFS cross mounts
 
-TEMP_SSH=/tmp/ssh.$$
-pdsh -t 2 -w $CB_HOSTS "df -k -t nfs | tail -n +2 | wc -l" >& $TEMP_SSH
-cat $TEMP_SSH | grep -v ssh | grep -v Connection | sort >& $FSOUT
-cat $FSOUT | awk -F':' '{print $1}' > $UP_HOSTS
-rm -f $TEMP_SSH
-
-NF0=`head -1 $FSOUT | awk '{print $2}'`
-FSDOWN=
-while read line 
-do
-  host=`echo $line | awk '{print $1}'`
-  host=`echo $host | sed 's/.$//'`
-  NFI=`echo $line | awk '{print $2}'`
-  if [ "$NFI" != "$NF0" ]; then
-    if [ "$FSDOWN" == "" ]; then
-      FSDOWN="$host"
-    else
-      FSDOWN="$FSDOWN $host"
-    fi
-  fi
-done < $FSOUT
-
-if [ "$FSDOWN" == "" ]; then
-  echo "   $CB_HOSTS: $NF0 file systems mounted"
-else
-  echo "   $CB_HOSTS: ***error: $NF0 file systems not mounted on $FSDOWN"
-  echo "      Fix: sudo pdsh -t 2 -w $CB_HOSTS mount -a"
+MOUNT_CHECK 0 $FILES_DIR $CB_HOSTS
+if [ "$?" == "1" ]; then
+  MOUNT_CHECK 1 $FILES_DIR $CB_HOSTETH1 
+  MOUNT_CHECK 1 $FILES_DIR $CB_HOSTETH2 
+  MOUNT_CHECK 1 $FILES_DIR $CB_HOSTETH3 
+  MOUNT_CHECK 1 $FILES_DIR $CB_HOSTETH4 
+  echo ""
 fi
 
 #*** check /etc/exports file
 
-CHECK_FILE /etc/exports Error 0 $FILES_DIR $CB_HOSTS
+CHECK_FILE /etc/exports error 0 $FILES_DIR $CB_HOSTS
 if [ "$?" == "1" ]; then
-  CHECK_FILE /etc/exports Error 1 $FILES_DIR $CB_HOSTETH1 
-  CHECK_FILE /etc/exports Error 1 $FILES_DIR $CB_HOSTETH2 
-  CHECK_FILE /etc/exports Error 1 $FILES_DIR $CB_HOSTETH3 
-  CHECK_FILE /etc/exports Error 1 $FILES_DIR $CB_HOSTETH4 
+  CHECK_FILE /etc/exports error 1 $FILES_DIR $CB_HOSTETH1 
+  CHECK_FILE /etc/exports error 1 $FILES_DIR $CB_HOSTETH2 
+  CHECK_FILE /etc/exports error 1 $FILES_DIR $CB_HOSTETH3 
+  CHECK_FILE /etc/exports error 1 $FILES_DIR $CB_HOSTETH4 
 fi
 
 #*** check /etc/fstab file
@@ -1675,19 +1755,10 @@ if [ "$?" == "1" ]; then
   echo ""
 fi
 
-MOUNT_CHECK 0 $FILES_DIR $CB_HOSTS
-if [ "$?" == "1" ]; then
-  MOUNT_CHECK 1 $FILES_DIR $CB_HOSTETH1 
-  MOUNT_CHECK 1 $FILES_DIR $CB_HOSTETH2 
-  MOUNT_CHECK 1 $FILES_DIR $CB_HOSTETH3 
-  MOUNT_CHECK 1 $FILES_DIR $CB_HOSTETH4 
-  echo ""
-fi
-
 # --------------------- check daemons --------------------
 
 #echo "--------------- daemon check ------------------------"
-#CHECK_DAEMON gmond Warning $CB_HOSTS
+#CHECK_DAEMON gmond warning $CB_HOSTS
 
 # --------------------- rpm check --------------------
 
