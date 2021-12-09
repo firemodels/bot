@@ -96,9 +96,9 @@ CHECK_DIR_LIST()
  
   dirdate=`ls -l $ARCHIVEDIR/$rootdir | awk '{print $6" "$7" "$8}'`
   if [ $ndiffs -eq 0 ]; then
-    echo "   `hostname -s`: $basedir/$rootdir contents the same since $dirdate"
+    echo "   `hostname -s`: $basedir/$rootdir same since $dirdate"
   else
-    echo "   `hostname -s`: $basedir/$rootdir contents have changed since $dirdate"
+    echo "   `hostname -s`: $basedir/$rootdir changed since $dirdate"
     if [ "$UPDATE_ARCHIVE" == "1" ]; then
       cp $currentdirlist $ARCHIVEDIR/$rootdir
     fi
@@ -1134,9 +1134,9 @@ CHECK_FDS_OUT ()
     fi
   done
   if [ $FAIL -eq 0 ]; then
-    echo "   $QUEUE:   all $NCASES_PER_QUEUE cases ran successfully"
+    echo "   $QUEUE:   all $NCASES_PER_QUEUE cases succeeded
   else
-    echo "   $QUEUE: ***error: $FAIL out of $NCASES_PER_QUEUE cases failed to run"
+    echo "   $QUEUE: ***error: $FAIL/$NCASES_PER_QUEUE cases failed"
   fi
   cd $CURDIR
 }
@@ -1723,35 +1723,15 @@ fi
 echo ""
 echo "--------------- file system checks -----------------"
 
-#*** check number of file systems mounted
+#*** check  NFS cross mounts
 
-TEMP_SSH=/tmp/ssh.$$
-pdsh -t 2 -w $CB_HOSTS "df -k -t nfs | tail -n +2 | wc -l" >& $TEMP_SSH
-cat $TEMP_SSH | grep -v ssh | grep -v Connection | sort >& $FSOUT
-cat $FSOUT | awk -F':' '{print $1}' > $UP_HOSTS
-rm -f $TEMP_SSH
-
-NF0=`head -1 $FSOUT | awk '{print $2}'`
-FSDOWN=
-while read line 
-do
-  host=`echo $line | awk '{print $1}'`
-  host=`echo $host | sed 's/.$//'`
-  NFI=`echo $line | awk '{print $2}'`
-  if [ "$NFI" != "$NF0" ]; then
-    if [ "$FSDOWN" == "" ]; then
-      FSDOWN="$host"
-    else
-      FSDOWN="$FSDOWN $host"
-    fi
-  fi
-done < $FSOUT
-
-if [ "$FSDOWN" == "" ]; then
-  echo "   $CB_HOSTS: $NF0 file systems mounted"
-else
-  echo "   $CB_HOSTS: ***error: $NF0 file systems not mounted on $FSDOWN"
-  echo "      Fix: sudo pdsh -t 2 -w $CB_HOSTS mount -a"
+MOUNT_CHECK 0 $FILES_DIR $CB_HOSTS
+if [ "$?" == "1" ]; then
+  MOUNT_CHECK 1 $FILES_DIR $CB_HOSTETH1 
+  MOUNT_CHECK 1 $FILES_DIR $CB_HOSTETH2 
+  MOUNT_CHECK 1 $FILES_DIR $CB_HOSTETH3 
+  MOUNT_CHECK 1 $FILES_DIR $CB_HOSTETH4 
+  echo ""
 fi
 
 #*** check /etc/exports file
@@ -1772,15 +1752,6 @@ if [ "$?" == "1" ]; then
   FSTAB_CHECK $FILES_DIR 1 $CB_HOSTETH2 
   FSTAB_CHECK $FILES_DIR 1 $CB_HOSTETH3 
   FSTAB_CHECK $FILES_DIR 1 $CB_HOSTETH4 
-  echo ""
-fi
-
-MOUNT_CHECK 0 $FILES_DIR $CB_HOSTS
-if [ "$?" == "1" ]; then
-  MOUNT_CHECK 1 $FILES_DIR $CB_HOSTETH1 
-  MOUNT_CHECK 1 $FILES_DIR $CB_HOSTETH2 
-  MOUNT_CHECK 1 $FILES_DIR $CB_HOSTETH3 
-  MOUNT_CHECK 1 $FILES_DIR $CB_HOSTETH4 
   echo ""
 fi
 
