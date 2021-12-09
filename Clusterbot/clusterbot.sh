@@ -86,7 +86,7 @@ CHECK_DIR_LIST()
   local rootdir=$2
 
   currentdirlist=/tmp/dirlist.$$
-  ls -l $basedir/$rootdir | sed '1 d' > $currentdirlist
+  ls -l $basedir/$rootdir | sort | sed '1 d' > $currentdirlist
   
   if [ ! -e $ARCHIVEDIR/$rootdir ]; then
     cp $currentdirlist $ARCHIVEDIR/$rootdir
@@ -1485,9 +1485,9 @@ if [[ "$IPMI_username" != "" ]] && [[ "$IPMI_password" != "" ]]; then
     fi
   done
   if [ "$IPMIDOWN" == "" ]; then
-    echo "   $CB_HOSTS: ipmi password set"
+    echo "   $CB_HOSTS: ipmi password same"
   else
-    echo "   $CB_HOSTS: ***warning: ipmi password not set on $IPMIDOWN"
+    echo "   $CB_HOSTS: ***warning: ipmi password different on $IPMIDOWN"
   fi
 fi
 
