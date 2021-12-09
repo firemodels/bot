@@ -1134,7 +1134,7 @@ CHECK_FDS_OUT ()
     fi
   done
   if [ $FAIL -eq 0 ]; then
-    echo "   $QUEUE:   all $NCASES_PER_QUEUE cases succeeded
+    echo "   $QUEUE:   all $NCASES_PER_QUEUE cases succeeded"
   else
     echo "   $QUEUE: ***error: $FAIL/$NCASES_PER_QUEUE cases failed"
   fi
