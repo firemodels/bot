@@ -2,7 +2,7 @@
 bundle=$1
 
 platform="A Linux"
-if [ "`uname`" == "Darwin" ];
+if [ "`uname`" == "Darwin" ]; then
   platform="An OSX"
 fi
 
