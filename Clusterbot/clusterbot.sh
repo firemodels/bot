@@ -1664,6 +1664,18 @@ if [ "$CHECK_CLUSTER" != "" ]; then
   RUN_CLUSTER_CHECK ETH4 $CB_HOSTETH4
 fi
 
+# --------------------- rpm check --------------------
+
+echo ""
+echo "--------------- rpm check ---------------------------"
+RPM_CHECK 0 $CB_HOSTS       ALL
+if [ "$?" == "1" ]; then
+  RPM_CHECK 1 $CB_HOSTETH1  ETH1
+  RPM_CHECK 1 $CB_HOSTETH2  ETH2
+  RPM_CHECK 1 $CB_HOSTETH3  ETH3
+  RPM_CHECK 1 $CB_HOSTETH4  ETH4
+fi
+
 # --------------------- check provisioning date --------------------
 
 echo ""
@@ -1759,18 +1771,6 @@ fi
 
 #echo "--------------- daemon check ------------------------"
 #CHECK_DAEMON gmond warning $CB_HOSTS
-
-# --------------------- rpm check --------------------
-
-echo ""
-echo "--------------- rpm check ---------------------------"
-RPM_CHECK 0 $CB_HOSTS       ALL
-if [ "$?" == "1" ]; then
-  RPM_CHECK 1 $CB_HOSTETH1  ETH1
-  RPM_CHECK 1 $CB_HOSTETH2  ETH2
-  RPM_CHECK 1 $CB_HOSTETH3  ETH3
-  RPM_CHECK 1 $CB_HOSTETH4  ETH4
-fi
 
 echo ""
 echo "--------------- login file checks --------"
