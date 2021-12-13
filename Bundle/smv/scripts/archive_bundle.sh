@@ -1,9 +1,9 @@
 #!/bin/bash
 bundle=$1
 
-platform="A Linux"
+platform="Linux"
 if [ "`uname`" == "Darwin" ]; then
-  platform="An OSX"
+  platform="OSX"
 fi
 
 upload_dir=$HOME/.bundle/uploads
@@ -23,7 +23,7 @@ if [ -d $todir/smvbin ]; then
 fi
 cp -r $fromdir $todir/smvbin
 if [ -d $todir/smvbin ]; then
-  echo "  $PLATFORM Smokeview was archived in $todir/smvbin"
+  echo "  $platform Smokeview copied to $todir/smvbin"
 else
-  echo "***error: archive to $todir/smvbin failed"
+  echo "***error: smokeview copy to $todir/smvbin failed"
 fi
