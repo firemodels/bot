@@ -23,8 +23,8 @@ set env_defined=1
 set version=%smv_revision%
 
 echo.
-echo   Archiving FDS-Smokeview bundle for Linux and OSX
-Title  Archiving FDS-Smokeview bundle for Linux and OSX
+echo   Archiving Smokeview for Linux and OSX
+Title  Archiving Smokeview for Linux and OSX
 
 %svn_drive%
 
