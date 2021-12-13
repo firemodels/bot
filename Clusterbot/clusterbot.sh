@@ -1485,7 +1485,7 @@ if [[ "$IPMI_username" != "" ]] && [[ "$IPMI_password" != "" ]]; then
     fi
   done
   if [ "$IPMIDOWN" == "" ]; then
-    echo "   $CB_HOSTS: ipmi password same"
+    echo "   $CB_HOSTS: ipmi accessible"
   else
     echo "   $CB_HOSTS: ***warning: ipmi/bmc interface inaccessible on $IPMIDOWN"
   fi
