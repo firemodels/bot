@@ -1,29 +1,29 @@
 #!/bin/bash
 bundle=$1
+
+platform="Linux"
+if [ "`uname`" == "Darwin" ]; then
+  platform="OSX"
+fi
+
 upload_dir=$HOME/.bundle/uploads
-SMVBINDIR=smvbin
+fromdir=$upload_dir/$bundle/smvbin
+todir=$HOME/.bundle/google_test
 
-bundledir=$upload_dir/$upload_dir
-todir=$upload_dir/google_test
-
-if [ ! -d $upload_dir ]; then
-  echo "***error: The directory $upload_dir does not exist"
+if [ ! -d $fromdir ]; then
+  echo ***error: The directory $fromdir does not exist
   exit
 fi
-if [ ! -d $upload_dir/$bundle/smvbin ]; then
-  echo ***error: The directory $upload_dir/$bundle/smvbin does not exist
-  exit
-fi
-if [ ! -d $upload_dir/google_test ]; then
-  mkdir $upload_dir/google_test
+if [ ! -d $todir ]; then
+  mkdir $todir
 fi
 
-if [ -d $upload_dir/google_test/$SMVBINDIR ]; then
-  rm -rf $upload_dir/google_test/$SMVBINDIR
+if [ -d $todir/smvbin ]; then
+  rm -rf $todir/smvbin
 fi
-cp -r $upload_dir/$bundle/smvbin $upload_dir/google_test/$SMVBINDIR
-if [ -d $upload_dir/google_test/$SMVBINDIR ]; then
-  echo The directory $upload_dir/google_test/$SMVBINDIR was created
+cp -r $fromdir $todir/smvbin
+if [ -d $todir/smvbin ]; then
+  echo "  $platform Smokeview copied to $todir/smvbin"
 else
-  echo "***error: $upload_dir/google_test/$SMVBINDIR was not copied"
+  echo "***error: smokeview copy to $todir/smvbin failed"
 fi
