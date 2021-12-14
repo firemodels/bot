@@ -1440,7 +1440,7 @@ else
 fi
 
 # --------------------- check ipmi --------------------
-CHECK_IPMI
+CHECK_IPMI=
 if { "$CHECK_IPMI" != "" ]; then
 echo ""
 echo "--------------- ipmi checks ------------"
