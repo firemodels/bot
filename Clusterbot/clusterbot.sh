@@ -1441,7 +1441,7 @@ fi
 
 # --------------------- check ipmi --------------------
 CHECK_IPMI=
-if { "$CHECK_IPMI" != "" ]; then
+if [ "$CHECK_IPMI" != "" ]; then
 echo ""
 echo "--------------- ipmi checks ------------"
 IPMIDOWN=
