@@ -206,7 +206,7 @@ CHECK_FILE_DATE()
   current_moddate=`cat $currentfilelist | awk '{print $6" "$7" "$8}'`
   current_filesize=`cat $currentfilelist | awk '{print $5}'`
   if [ $diffs -eq 0 ]; then
-    echo "   `hostname -s`: $fullfile the same since $current_moddate(file size: $current_filesize)"
+    echo "   `hostname -s`: $fullfile same since $current_moddate(file size: $current_filesize)"
   else
     echo "   `hostname -s`: ***warning: $fullfile has changed - current($current_moddate), original($original_moddate) modification date,"
     echo "                  current($current_filesize), original($original_filesize) file size."
