@@ -1440,40 +1440,10 @@ else
 fi
 
 # --------------------- check ipmi --------------------
-CHECK_IPMI=
-if [ "$CHECK_IPMI" != "" ]; then
-echo ""
-echo "--------------- ipmi checks ------------"
-IPMIDOWN=
-IPMIUP=
-IPMIEXT=-ipmi
-ALLETH="$ETHUP $ETHDOWN"
-ALLETH=$(echo "$ALLETH"|tr " " "\n"|sort|uniq|tr "\n" " ")
-for hosteth in $ALLETH; do
-  hostipmi=${hosteth}$IPMIEXT
-  IS_IPMI_DOWN $hostipmi
-  if [ "$?" == "1" ]; then
-    if [ "$IPMIDOWN" == "" ]; then
-      IPMIDOWN="$hosteth"
-    else
-      IPMIDOWN="$IPMIDOWN $hosteth"
-    fi
-  else
-    if [ "$IPMIUP" == "" ]; then
-      IPMIUP="$hosteth"
-    else
-      IPMIUP="$IPMIUP $hosteth"
-    fi
-  fi
-done
-if [ "$IPMIDOWN" == "" ]; then
-  echo "   $CB_HOSTS: ipmi up"
-else
-  echo "   $CB_HOSTS: ***warning: ipmi down on $IPMIDOWN"
-fi
-fi
 
 if [[ "$IPMI_username" != "" ]] && [[ "$IPMI_password" != "" ]]; then
+  echo ""
+  echo "--------------- ipmi check ------------"
   IPMIDOWN=
   IPMIEXT=-ipmi
   for hosteth in $IPMIUP; do
