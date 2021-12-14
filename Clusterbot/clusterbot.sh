@@ -206,7 +206,7 @@ CHECK_FILE_DATE()
   current_moddate=`cat $currentfilelist | awk '{print $6" "$7" "$8}'`
   current_filesize=`cat $currentfilelist | awk '{print $5}'`
   if [ $diffs -eq 0 ]; then
-    echo "   `hostname -s`: $fullfile the same since $current_moddate(file size: $current_filesize)"
+    echo "   `hostname -s`: $fullfile same since $current_moddate(file size: $current_filesize)"
   else
     echo "   `hostname -s`: ***warning: $fullfile has changed - current($current_moddate), original($original_moddate) modification date,"
     echo "                  current($current_filesize), original($original_filesize) file size."
@@ -1440,37 +1440,10 @@ else
 fi
 
 # --------------------- check ipmi --------------------
-echo ""
-echo "--------------- ipmi checks ------------"
-IPMIDOWN=
-IPMIUP=
-IPMIEXT=-ipmi
-ALLETH="$ETHUP $ETHDOWN"
-ALLETH=$(echo "$ALLETH"|tr " " "\n"|sort|uniq|tr "\n" " ")
-for hosteth in $ALLETH; do
-  hostipmi=${hosteth}$IPMIEXT
-  IS_IPMI_DOWN $hostipmi
-  if [ "$?" == "1" ]; then
-    if [ "$IPMIDOWN" == "" ]; then
-      IPMIDOWN="$hosteth"
-    else
-      IPMIDOWN="$IPMIDOWN $hosteth"
-    fi
-  else
-    if [ "$IPMIUP" == "" ]; then
-      IPMIUP="$hosteth"
-    else
-      IPMIUP="$IPMIUP $hosteth"
-    fi
-  fi
-done
-if [ "$IPMIDOWN" == "" ]; then
-  echo "   $CB_HOSTS: ipmi up"
-else
-  echo "   $CB_HOSTS: ***warning: ipmi down on $IPMIDOWN"
-fi
 
 if [[ "$IPMI_username" != "" ]] && [[ "$IPMI_password" != "" ]]; then
+  echo ""
+  echo "--------------- ipmi check ------------"
   IPMIDOWN=
   IPMIEXT=-ipmi
   for hosteth in $IPMIUP; do
@@ -1485,7 +1458,7 @@ if [[ "$IPMI_username" != "" ]] && [[ "$IPMI_password" != "" ]]; then
     fi
   done
   if [ "$IPMIDOWN" == "" ]; then
-    echo "   $CB_HOSTS: ipmi password same"
+    echo "   $CB_HOSTS: ipmi accessible"
   else
     echo "   $CB_HOSTS: ***warning: ipmi/bmc interface inaccessible on $IPMIDOWN"
   fi
@@ -1664,6 +1637,18 @@ if [ "$CHECK_CLUSTER" != "" ]; then
   RUN_CLUSTER_CHECK ETH4 $CB_HOSTETH4
 fi
 
+# --------------------- rpm check --------------------
+
+echo ""
+echo "--------------- rpm check ---------------------------"
+RPM_CHECK 0 $CB_HOSTS       ALL
+if [ "$?" == "1" ]; then
+  RPM_CHECK 1 $CB_HOSTETH1  ETH1
+  RPM_CHECK 1 $CB_HOSTETH2  ETH2
+  RPM_CHECK 1 $CB_HOSTETH3  ETH3
+  RPM_CHECK 1 $CB_HOSTETH4  ETH4
+fi
+
 # --------------------- check provisioning date --------------------
 
 echo ""
@@ -1759,18 +1744,6 @@ fi
 
 #echo "--------------- daemon check ------------------------"
 #CHECK_DAEMON gmond warning $CB_HOSTS
-
-# --------------------- rpm check --------------------
-
-echo ""
-echo "--------------- rpm check ---------------------------"
-RPM_CHECK 0 $CB_HOSTS       ALL
-if [ "$?" == "1" ]; then
-  RPM_CHECK 1 $CB_HOSTETH1  ETH1
-  RPM_CHECK 1 $CB_HOSTETH2  ETH2
-  RPM_CHECK 1 $CB_HOSTETH3  ETH3
-  RPM_CHECK 1 $CB_HOSTETH4  ETH4
-fi
 
 echo ""
 echo "--------------- login file checks --------"
