@@ -1440,6 +1440,8 @@ else
 fi
 
 # --------------------- check ipmi --------------------
+CHECK_IPMI=
+if [ "$CHECK_IPMI" != "" ]; then
 echo ""
 echo "--------------- ipmi checks ------------"
 IPMIDOWN=
@@ -1468,6 +1470,7 @@ if [ "$IPMIDOWN" == "" ]; then
   echo "   $CB_HOSTS: ipmi up"
 else
   echo "   $CB_HOSTS: ***warning: ipmi down on $IPMIDOWN"
+fi
 fi
 
 if [[ "$IPMI_username" != "" ]] && [[ "$IPMI_password" != "" ]]; then
