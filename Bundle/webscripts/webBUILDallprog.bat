@@ -32,7 +32,6 @@ set progs=background flush hashfile smokediff smokezip wind2fds
 set smvprogs=get_time set_path sh2bat timep
 
 if NOT "%platform%" == "Windows" goto endif1
-  echo after if1
   for %%x in ( %progs% ) do (
     cd %svn_root%\smv\Build\%%x\intel_win_64
     start "building windows %%x" make_%%x
