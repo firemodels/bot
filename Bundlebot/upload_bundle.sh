@@ -61,7 +61,8 @@ if [ ! -e $BUNDLE_DIR/$shafile ]; then
 fi
 if [ "$upload" == "1" ]; then
   if [ "$erase" == "1" ]; then
-    $GDRIVE list  | grep ${NIGHTLY}$platform$ext | grep FDS | grep SMV | awk '{ system("~/bin/gdrive delete -i " $1)} '
+    $GDRIVE list  | grep ${NIGHTLY}$platform$ext    | grep FDS | grep SMV | awk '{ system("~/bin/gdrive delete -i " $1)} '
+    $GDRIVE list  | grep ${NIGHTLY}${platform}.sha1 | grep FDS | grep SMV | awk '{ system("~/bin/gdrive delete -i " $1)} '
   fi
   echo ""
   echo "------------------------------------------------------"
