@@ -16,6 +16,7 @@ echo "                only to verify that communication works between processes.
 echo "                cases, use firebot or smokebot."
 echo ""
 echo "Options:"
+echo " -C - do not run Intel cluster checker"
 echo " -f - override lock to force clusterbot run"
 echo " -h - display this message"
 if [ "$SHOW_EMAIL_HELP" == "1" ]; then
@@ -25,6 +26,7 @@ if [ "$SHOW_EMAIL_HELP" == "1" ]; then
   echo " -m email_address - send results to email_address $EMAIL"
 fi
 echo " -n n - run n cases on each queue [default: $NCASES_PER_QUEUE]"
+echo " -N - only perform network checks"
 echo " -P password - check ipmi interface using password"
 echo " -q q - run test cases using the queue q."
 echo " -Q q - same as the -q option except that only test cases are run."
