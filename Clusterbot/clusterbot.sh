@@ -140,45 +140,6 @@ CHECK_SSHD_CONFIG ()
 }
 
 #---------------------------------------------
-#                   CHECK_FILE_ROOT
-#---------------------------------------------
-
-CHECK_FILE_ROOT ()
-{
-  local fullfile=$1
-  local file=`basename $fullfile`
-  local filesave=${file}.save
-  local fileenc=${file}.enc
-
-  if [ ! -e $fullfile ]; then
-    echo "***error: $fullfile does not exist"
-    return
-  fi
-  
-  if [ "$USE_SUDO" == "" ]; then
-    echo "*** sudo command required to perform this check"
-    USE_SUDO=1
-  fi
-  if [ ! -e $ARCHIVEDIR/$filesave ]; then
-    sudo cp $fullfile $ARCHIVEDIR/$filesave
-  fi
-
-  diffs=`sudo diff $ARCHIVEDIR/$filesave $fullfile | wc -l`
- 
-  dirdate=`ls -l $ARCHIVEDIR/$filesave | awk '{print $6" "$7" "$8}'`
-  if [ $diffs -eq 0 ]; then
-    echo "   `hostname -s`: $fullfile contents have not changed since it was archived at $ARCHIVEDIR/$filesave on $dirdate"
-  else
-    echo "   `hostname -s`: ***warning: $fullfile contents have changed since it was archived at $ARCHIVEDIR/$filesave on $dirdate"
-    echo "        To see changes, type:"
-    echo "        sudo diff $ARCHIVEDIR/$filesave $fullfile"
-    if [ "$UPDATE_ARCHIVE" == "1" ]; then
-      sudo cp $fullfile $ARCHIVEDIR/$filesave
-    fi
-  fi
-}
-
-#---------------------------------------------
 #                   CHECK_FILE_DATE
 #---------------------------------------------
 
@@ -1232,14 +1193,13 @@ fi
 NCASES_PER_QUEUE=20
 FORCE_UNLOCK=
 ONLY_RUN_TEST_CASES=
-CHECK_ROOT_FILES=
 PASSWORD_GIVEN=
 USE_SUDO=
 IPMI_password=
 IPMI_username=
 UPDATE_ARCHIVE=
 
-while getopts 'fhn:P:q:Q:ruU:' OPTION
+while getopts 'fhn:P:q:Q:uU:' OPTION
 do
 case $OPTION  in
   f)
@@ -1267,19 +1227,6 @@ case $OPTION  in
    ;;
   q)
    SETUP_QUEUES $OPTARG
-   ;;
-  r)
-   CHECK_ROOT_FILES=1
-   WHOAMI=`whoami`
-   if [ "$platform" == "linux" ]; then
-     CAN_I_SUDO=`grep wheel /etc/group | grep $WHOAMI | wc -l`
-     if [ $CAN_I_SUDO -eq 0 ]; then
-       echo "***error: $WHOAMI does not have permission to use the sudo command"
-       echo "          needed to check files readable only by root. File size and"
-       echo "          modification date will be checked instead."
-       CHECK_ROOT_FILES=
-     fi
-   fi
    ;;
   u)
    UPDATE_ARCHIVE="1"
@@ -1406,15 +1353,6 @@ if [ "$ONLY_RUN_TEST_CASES" == "1" ]; then
   exit
 fi
 
-if [ "$CHECK_ROOT_FILES" != "" ]; then
-  echo ""
-  echo "----------- checking files and configuration parameters accessible only by root ----------------"
-  if [ "$platform" == "linux" ]; then
-    CHECK_FILE_ROOT /etc/slurm/slurmdbd.conf
-  fi
-  CHECK_FILE_ROOT /etc/ssh/sshd_config
-  CHECK_SSHD_CONFIG
-fi
 if [ "$platform" == "osx" ]; then
   exit
 fi
