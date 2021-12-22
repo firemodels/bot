@@ -2,25 +2,20 @@
 
 EMAIL=$SMV_EMAIL
 fopt=
-Fopt=
 nopt=
 QOPT=
 qopt=
-ropt=
 uopt=
 Popt=
 Uopt=
 FORCE_UNLOCK=
 NCASES_PER_QUEUE=20
-while getopts 'fFhm:n:P:q:Q:ruU:' OPTION
+while getopts 'fhm:n:P:q:Q:uU:' OPTION
 do
 case $OPTION  in
   f)
    fopt="-f"
    FORCE_UNLOCK=1
-   ;;
-  F)
-   Fopt="-F"
    ;;
   h)
    ./clusterbot_usage.sh run_clusterbot.sh $NCASES_PER_QUEUE 1 $EMAIL
@@ -46,9 +41,6 @@ case $OPTION  in
    ;;
   q)
    qopt="-q $OPTARG"
-   ;;
-  r)
-   ropt="-r"
    ;;
   u)
    uopt="-u"
@@ -97,7 +89,7 @@ fi
 
 echo > $OUTPUT
 START_TIME=`date`
-./clusterbot.sh $fopt $Fopt $nopt $Popt $QOPT $qopt $ropt $uopt $Uopt | tee  $OUTPUT
+./clusterbot.sh $fopt $nopt $Popt $QOPT $qopt $uopt $Uopt | tee  $OUTPUT
 STOP_TIME=`date`
 
 nerrors=`grep '\*\*\*error'     $OUTPUT | wc -l`
