@@ -646,10 +646,10 @@ fi
 }
 
 #---------------------------------------------
-#                   SLURM_CHECK
+#                   OPENSM_CHECK
 #---------------------------------------------
 
-SLURM_CHECK ()
+OPENSM_CHECK ()
 {
   local CB_HOST_ARG=$1
   local CB_HOSTIB_ARG=$2
@@ -1424,7 +1424,7 @@ if [ "$platform" == "osx" ]; then
 fi
 
 echo ""
-echo "----- ethernet check ------------"
+echo "----- network checks ------------"
 # --------------------- check ethernet --------------------
 
 pdsh -t 2 -w $CB_HOSTS date   >& $ETHOUT
@@ -1439,34 +1439,7 @@ else
   echo "   $CB_HOSTS: ***warning: ethernet down on $ETHDOWN"
 fi
 
-# --------------------- check ipmi --------------------
-
-if [[ "$IPMI_username" != "" ]] && [[ "$IPMI_password" != "" ]]; then
-  echo ""
-  echo "----- ipmi check ------------"
-  IPMIDOWN=
-  IPMIEXT=-ipmi
-  for hosteth in $IPMIUP; do
-    hostipmi=${hosteth}$IPMIEXT
-    CAN_CONNECT_IPMI $hostipmi
-    if [ "$?" == "0" ]; then
-      if [ "$IPMIDOWN" == "" ]; then
-        IPMIDOWN="$hosteth"
-      else
-        IPMIDOWN="$IPMIDOWN $hosteth"
-      fi
-    fi
-  done
-  if [ "$IPMIDOWN" == "" ]; then
-    echo "   $CB_HOSTS: ipmi accessible"
-  else
-    echo "   $CB_HOSTS: ***warning: ipmi/bmc interface inaccessible on $IPMIDOWN"
-  fi
-fi
-
 # --------------------- check infiniband --------------------
-echo ""
-echo "----- infiniband(IB) checks ------------"
 
 rm -rf $IBOUT
 touch $IBOUT
@@ -1511,11 +1484,34 @@ if [ `cat $IBOUT | wc -l` -ne 0 ]; then
   fi
 fi
 
+# --------------------- check ipmi --------------------
+
+if [[ "$IPMI_username" != "" ]] && [[ "$IPMI_password" != "" ]]; then
+  IPMIDOWN=
+  IPMIEXT=-ipmi
+  for hosteth in $IPMIUP; do
+    hostipmi=${hosteth}$IPMIEXT
+    CAN_CONNECT_IPMI $hostipmi
+    if [ "$?" == "0" ]; then
+      if [ "$IPMIDOWN" == "" ]; then
+        IPMIDOWN="$hosteth"
+      else
+        IPMIDOWN="$IPMIDOWN $hosteth"
+      fi
+    fi
+  done
+  if [ "$IPMIDOWN" == "" ]; then
+    echo "   $CB_HOSTS: ipmi accessible"
+  else
+    echo "   $CB_HOSTS: ***warning: ipmi/bmc interface inaccessible on $IPMIDOWN"
+  fi
+fi
+
 echo ""
-SLURM_CHECK $CB_HOST1 $CB_HOSTIB1
-SLURM_CHECK $CB_HOST2 $CB_HOSTIB2
-SLURM_CHECK $CB_HOST3 $CB_HOSTIB3
-SLURM_CHECK $CB_HOST4 $CB_HOSTIB4
+OPENSM_CHECK $CB_HOST1 $CB_HOSTIB1
+OPENSM_CHECK $CB_HOST2 $CB_HOSTIB2
+OPENSM_CHECK $CB_HOST3 $CB_HOSTIB3
+OPENSM_CHECK $CB_HOST4 $CB_HOSTIB4
 
 # --------------------- infiniband speed check --------------------
 
@@ -1528,123 +1524,12 @@ if [ "$FAST" == "" ]; then
 fi
 
 echo ""
-echo "----- slurm checks --------------"
+echo "----- OS checks -----------------"
 
-#*** check that slurm is online
-pbsnodes -l | awk '{print $1}' | sort -u  > $DOWN_HOSTS
-SLURM_DOWN=
-while read line 
-do
-  host=`echo $line | awk '{print $1}'`
-
-  IS_HOST_DOWN $host
-# only care if slurm is down on a host that is up
-  if [ "$?" == "0" ]; then
-    if [ "$SLURM_DOWN" == "" ]; then
-      SLURM_DOWN="$host"
-    else
-      SLURM_DOWN="$SLURM_DOWN $host"
-    fi
-  fi
-done < $DOWN_HOSTS
-
-if [ "$SLURM_DOWN" == "" ]; then
-  echo "   $CB_HOSTS: slurm online"
-else
-  echo "   $CB_HOSTS: ***warning: slurm offline on $SLURM_DOWN"
-  echo "      Fix: sudo scontrol update nodename=HOST state=resume"
-  echo "      This fix can only be applied to a HOST that is up and with"
-  echo "      a working ethernet and infiniband network connection."
-fi
-
-#*** check slurm configuration file --------------------
-
-CHECK_FILE /etc/slurm/slurm.conf error 0 $FILES_DIR $CB_HOSTS
-if [ "$?" == "1" ]; then
-  CHECK_FILE /etc/slurm/slurm.conf error 0 $FILES_DIR $CB_HOSTETH1 
-  CHECK_FILE /etc/slurm/slurm.conf error 0 $FILES_DIR $CB_HOSTETH2 
-  CHECK_FILE /etc/slurm/slurm.conf error 0 $FILES_DIR $CB_HOSTETH3 
-  CHECK_FILE /etc/slurm/slurm.conf error 0 $FILES_DIR $CB_HOSTETH4 
-  echo ""
-fi
-
-#*** check slurm daemon
-
-CHECK_DAEMON slurmd error $CB_HOSTS
-
-#*** check slurm directory
-
-CHECK_DIR_LIST /etc slurm
-
-if [ "$FAST" == "1" ]; then
-
-  rm $LOCK_FILE
-  exit
-fi
-
-#*** check slurm rpm
-
-TEMP_RPM=/tmp/rpm.$$
-pdsh -t 2 -w $CB_HOSTS "rpm -qa | grep slurm | grep devel" >& $TEMP_RPM
-cat $TEMP_RPM | grep -v ssh | grep -v Connection | sort >& $SLURMRPM_OUT
-rm -f $TEMP_RPM
-SLURMRPM0=`head -1 $SLURMRPM_OUT | awk '{print $2}'`
-SLURMBAD=
-while read line 
-do
-  host=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
-  SLURMRPMI=`echo $line | awk '{print $2}'`
-  if [ "$SLURMRPMI" != "$SLURMRPM0" ]; then
-    if [ "$SLURMRPMI" != "Connection" ]; then
-      if [ "$SLURMBAD" == "" ]; then
-        SLURMBAD="$host/$SLURMRPMI"
-      else
-        SLURMBAD="$SLURMBAD $host/$SLURMRPMI"
-      fi
-    fi
-  fi
-done < $SLURMRPM_OUT
-
-if [ "$SLURMBAD" == "" ]; then
-  echo "   $CB_HOSTS: $SLURMRPM0 installed"
-else
-  echo "   $CB_HOSTS: ***error: $SLURMRPM0 not installed on $SLURMBAD"
-  echo "      Fix: ask system administrator to update slurm rpm packages"
-fi
-
-CHECK_FILE_DATE /etc/slurm/slurmdbd.conf
-
-
-GANGLIA=`ps -el | grep gmetad`
-if [ "$GANGLIA" != "" ]; then
-  echo ""
-  echo "----- ganglia checks ------------"
-  CHECK_FILE /etc/ganglia/gmond.conf warning 0 $FILES_DIR $CB_HOSTS
-  if [ "$?" == "1" ]; then
-    CHECK_FILE /etc/ganglia/gmond.conf warning 1 $FILES_DIR $CB_HOSTETH1 
-    CHECK_FILE /etc/ganglia/gmond.conf warning 1 $FILES_DIR $CB_HOSTETH2 
-    CHECK_FILE /etc/ganglia/gmond.conf warning 1 $FILES_DIR $CB_HOSTETH3 
-    CHECK_FILE /etc/ganglia/gmond.conf warning 1 $FILES_DIR $CB_HOSTETH4 
-    echo ""
-  fi
-  CHECK_DAEMON gmond warning $CB_HOSTS
-fi
-
-# --------------------- run cluster checker --------------------
-
-if [ "$CHECK_CLUSTER" != "" ]; then
-  echo ""
-  echo "----- Intel Cluster Checker -------------"
-  RUN_CLUSTER_CHECK ETH1 $CB_HOSTETH1
-  RUN_CLUSTER_CHECK ETH2 $CB_HOSTETH2
-  RUN_CLUSTER_CHECK ETH3 $CB_HOSTETH3
-  RUN_CLUSTER_CHECK ETH4 $CB_HOSTETH4
-fi
+CHECK_FILE /etc/redhat-release error 0 $FILES_DIR $CB_HOSTS
 
 # --------------------- rpm check --------------------
 
-echo ""
-echo "----- rpm check -----------------"
 RPM_CHECK 0 $CB_HOSTS       ALL
 if [ "$?" == "1" ]; then
   RPM_CHECK 1 $CB_HOSTETH1  ETH1
@@ -1655,8 +1540,6 @@ fi
 
 # --------------------- check provisioning date --------------------
 
-echo ""
-echo "----- image date check ---------"
 PROVISION_DATE_CHECK $CB_HOSTETH1
 PROVISION_DATE_CHECK $CB_HOSTETH2
 PROVISION_DATE_CHECK $CB_HOSTETH3
@@ -1670,7 +1553,6 @@ CORE_CHECK $CB_HOSTETH1
 CORE_CHECK $CB_HOSTETH2
 CORE_CHECK $CB_HOSTETH3
 CORE_CHECK $CB_HOSTETH4
-
 
 echo ""
 SPEED_CHECK $FILES_DIR $CB_HOSTETH1
@@ -1761,6 +1643,119 @@ echo "----- ssh configuration checks ---"
 
 CHECK_FILE_DATE /etc/ssh/sshd_config
 CHECK_DIR_LIST  /etc ssh
+
+echo ""
+echo "----- slurm checks --------------"
+
+#*** check that slurm is online
+pbsnodes -l | awk '{print $1}' | sort -u  > $DOWN_HOSTS
+SLURM_DOWN=
+while read line 
+do
+  host=`echo $line | awk '{print $1}'`
+
+  IS_HOST_DOWN $host
+# only care if slurm is down on a host that is up
+  if [ "$?" == "0" ]; then
+    if [ "$SLURM_DOWN" == "" ]; then
+      SLURM_DOWN="$host"
+    else
+      SLURM_DOWN="$SLURM_DOWN $host"
+    fi
+  fi
+done < $DOWN_HOSTS
+
+if [ "$SLURM_DOWN" == "" ]; then
+  echo "   $CB_HOSTS: slurm online"
+else
+  echo "   $CB_HOSTS: ***warning: slurm offline on $SLURM_DOWN"
+  echo "      Fix: sudo scontrol update nodename=HOST state=resume"
+  echo "      This fix can only be applied to a HOST that is up and with"
+  echo "      a working ethernet and infiniband network connection."
+fi
+
+#*** check slurm configuration file --------------------
+
+CHECK_FILE /etc/slurm/slurm.conf error 0 $FILES_DIR $CB_HOSTS
+if [ "$?" == "1" ]; then
+  CHECK_FILE /etc/slurm/slurm.conf error 0 $FILES_DIR $CB_HOSTETH1 
+  CHECK_FILE /etc/slurm/slurm.conf error 0 $FILES_DIR $CB_HOSTETH2 
+  CHECK_FILE /etc/slurm/slurm.conf error 0 $FILES_DIR $CB_HOSTETH3 
+  CHECK_FILE /etc/slurm/slurm.conf error 0 $FILES_DIR $CB_HOSTETH4 
+  echo ""
+fi
+
+#*** check slurm daemon
+
+CHECK_DAEMON slurmd error $CB_HOSTS
+
+#*** check slurm directory
+
+CHECK_DIR_LIST /etc slurm
+
+if [ "$FAST" == "1" ]; then
+
+  rm $LOCK_FILE
+  exit
+fi
+
+#*** check slurm rpm
+
+TEMP_RPM=/tmp/rpm.$$
+pdsh -t 2 -w $CB_HOSTS "rpm -qa | grep slurm | grep devel" >& $TEMP_RPM
+cat $TEMP_RPM | grep -v ssh | grep -v Connection | sort >& $SLURMRPM_OUT
+rm -f $TEMP_RPM
+SLURMRPM0=`head -1 $SLURMRPM_OUT | awk '{print $2}'`
+SLURMBAD=
+while read line 
+do
+  host=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
+  SLURMRPMI=`echo $line | awk '{print $2}'`
+  if [ "$SLURMRPMI" != "$SLURMRPM0" ]; then
+    if [ "$SLURMRPMI" != "Connection" ]; then
+      if [ "$SLURMBAD" == "" ]; then
+        SLURMBAD="$host/$SLURMRPMI"
+      else
+        SLURMBAD="$SLURMBAD $host/$SLURMRPMI"
+      fi
+    fi
+  fi
+done < $SLURMRPM_OUT
+
+if [ "$SLURMBAD" == "" ]; then
+  echo "   $CB_HOSTS: $SLURMRPM0 installed"
+else
+  echo "   $CB_HOSTS: ***error: $SLURMRPM0 not installed on $SLURMBAD"
+  echo "      Fix: ask system administrator to update slurm rpm packages"
+fi
+
+CHECK_FILE_DATE /etc/slurm/slurmdbd.conf
+
+GANGLIA=`ps -el | grep gmetad`
+if [ "$GANGLIA" != "" ]; then
+  echo ""
+  echo "----- ganglia checks ------------"
+  CHECK_FILE /etc/ganglia/gmond.conf warning 0 $FILES_DIR $CB_HOSTS
+  if [ "$?" == "1" ]; then
+    CHECK_FILE /etc/ganglia/gmond.conf warning 1 $FILES_DIR $CB_HOSTETH1 
+    CHECK_FILE /etc/ganglia/gmond.conf warning 1 $FILES_DIR $CB_HOSTETH2 
+    CHECK_FILE /etc/ganglia/gmond.conf warning 1 $FILES_DIR $CB_HOSTETH3 
+    CHECK_FILE /etc/ganglia/gmond.conf warning 1 $FILES_DIR $CB_HOSTETH4 
+    echo ""
+  fi
+  CHECK_DAEMON gmond warning $CB_HOSTS
+fi
+
+# --------------------- run cluster checker --------------------
+
+if [ "$CHECK_CLUSTER" != "" ]; then
+  echo ""
+  echo "----- Intel Cluster Checker -------------"
+  RUN_CLUSTER_CHECK ETH1 $CB_HOSTETH1
+  RUN_CLUSTER_CHECK ETH2 $CB_HOSTETH2
+  RUN_CLUSTER_CHECK ETH3 $CB_HOSTETH3
+  RUN_CLUSTER_CHECK ETH4 $CB_HOSTETH4
+fi
 
 if [[ "$ONLY_RUN_TEST_CASES" != "1" ]] && [[ "$TEST_QUEUE" != "" ]]; then
   CHECK_TEST_CASES 0
