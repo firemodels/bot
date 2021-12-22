@@ -1110,7 +1110,7 @@ CHECK_TEST_CASES ()
 {
   local REPORT_STATUS=$1
   echo ""
-  echo "----- check test cases ----------"
+  echo "----- FDS case check ----------"
   WAIT_TEST_CASES_END $JOBPREFIX $REPORT_STATUS
   if [ "$TEST_QUEUE" == "each" ]; then
     CHECK_FDS_OUT $JOBPREFIX $CB_QUEUE1
