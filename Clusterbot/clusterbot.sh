@@ -1467,14 +1467,6 @@ OPENSM_CHECK $CB_HOST2 $CB_HOSTIB2
 OPENSM_CHECK $CB_HOST3 $CB_HOSTIB3
 OPENSM_CHECK $CB_HOST4 $CB_HOSTIB4
 
-# --------------------- infiniband speed check --------------------
-
-echo ""
-IBSPEED $CB_HOSTETH1
-IBSPEED $CB_HOSTETH2
-IBSPEED $CB_HOSTETH3
-IBSPEED $CB_HOSTETH4
-
 if [ "$ONLY_NETWORK_CHECKS" != "" ]; then
   echo ""
   echo "----- clusterbot complete --------------"
@@ -1482,6 +1474,14 @@ if [ "$ONLY_NETWORK_CHECKS" != "" ]; then
   rm $LOCK_FILE
   exit
 fi
+
+# --------------------- infiniband speed check --------------------
+
+echo ""
+IBSPEED $CB_HOSTETH1
+IBSPEED $CB_HOSTETH2
+IBSPEED $CB_HOSTETH3
+IBSPEED $CB_HOSTETH4
 
 echo ""
 echo "----- OS checks -----------------"

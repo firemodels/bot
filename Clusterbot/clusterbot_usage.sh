@@ -24,6 +24,7 @@ if [ "$SHOW_EMAIL_HELP" == "1" ]; then
     EMAIL="{default: $EMAIL]"
   fi
   echo " -m email_address - send results to email_address $EMAIL"
+  echo " -M - only send an email if there are errors or warnings"
 fi
 echo " -n n - run n cases on each queue [default: $NCASES_PER_QUEUE]"
 echo " -N - only perform network checks"
