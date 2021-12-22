@@ -1235,19 +1235,15 @@ ONLY_RUN_TEST_CASES=
 CHECK_ROOT_FILES=
 PASSWORD_GIVEN=
 USE_SUDO=
-FAST=
 IPMI_password=
 IPMI_username=
 UPDATE_ARCHIVE=
 
-while getopts 'fFhn:P:q:Q:ruU:' OPTION
+while getopts 'fhn:P:q:Q:ruU:' OPTION
 do
 case $OPTION  in
   f)
    FORCE_UNLOCK=1
-   ;;
-  F)
-   FAST=1
    ;;
   h)
    ./clusterbot_usage.sh clusterbot.sh $NCASES_PER_QUEUE 0
@@ -1515,13 +1511,11 @@ OPENSM_CHECK $CB_HOST4 $CB_HOSTIB4
 
 # --------------------- infiniband speed check --------------------
 
-if [ "$FAST" == "" ]; then
-  echo ""
-  IBSPEED $CB_HOSTETH1
-  IBSPEED $CB_HOSTETH2
-  IBSPEED $CB_HOSTETH3
-  IBSPEED $CB_HOSTETH4
-fi
+echo ""
+IBSPEED $CB_HOSTETH1
+IBSPEED $CB_HOSTETH2
+IBSPEED $CB_HOSTETH3
+IBSPEED $CB_HOSTETH4
 
 echo ""
 echo "----- OS checks -----------------"
@@ -1692,12 +1686,6 @@ CHECK_DAEMON slurmd error $CB_HOSTS
 #*** check slurm directory
 
 CHECK_DIR_LIST /etc slurm
-
-if [ "$FAST" == "1" ]; then
-
-  rm $LOCK_FILE
-  exit
-fi
 
 #*** check slurm rpm
 
