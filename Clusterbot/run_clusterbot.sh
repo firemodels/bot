@@ -107,7 +107,7 @@ STOP_TIME=`date`
 nerrors=`grep '\*\*\*error'     $OUTPUT | wc -l`
 nwarnings=`grep '\*\*\*warning' $OUTPUT | wc -l`
 
-echo "VVVVVVVVVVVVVVVVVVVVVVVVV"                                 >  $HEADER
+echo "VVVVVVVVVVVVVVVVVVVVVVVVV"                                 > $HEADER
 echo ""                                                         >> $HEADER
 echo "   start: $START_TIME"                                    >> $HEADER
 echo "    stop: $STOP_TIME"                                     >> $HEADER
