@@ -1110,7 +1110,7 @@ CHECK_TEST_CASES ()
 {
   local REPORT_STATUS=$1
   echo ""
-  echo "----- check test cases ----------"
+  echo "----- FDS case check ----------"
   WAIT_TEST_CASES_END $JOBPREFIX $REPORT_STATUS
   if [ "$TEST_QUEUE" == "each" ]; then
     CHECK_FDS_OUT $JOBPREFIX $CB_QUEUE1
@@ -1198,16 +1198,25 @@ USE_SUDO=
 IPMI_password=
 IPMI_username=
 UPDATE_ARCHIVE=
+USE_INTEL_CLUSTER_CHECKER=1
+ONLY_NETWORK_CHECKS=
+QUEUE=
 
-while getopts 'fhn:P:q:Q:uU:' OPTION
+while getopts 'Cfhn:NP:q:Q:uU:' OPTION
 do
 case $OPTION  in
+  C)
+   USE_INTEL_CLUSTER_CHECKER=
+   ;;
   f)
    FORCE_UNLOCK=1
    ;;
   h)
    ./clusterbot_usage.sh clusterbot.sh $NCASES_PER_QUEUE 0
    exit
+   ;;
+  N)
+   ONLY_NETWORK_CHECKS=1
    ;;
   n)
    NCASES="$OPTARG"
@@ -1223,10 +1232,10 @@ case $OPTION  in
    ;;
   Q)
    ONLY_RUN_TEST_CASES=1
-   SETUP_QUEUES $OPTARG
+   QUEUE=$OPTARG
    ;;
   q)
-   SETUP_QUEUES $OPTARG
+   QUEUE=$OPTARG
    ;;
   u)
    UPDATE_ARCHIVE="1"
@@ -1237,6 +1246,15 @@ case $OPTION  in
 esac
 done
 shift $(($OPTIND-1))
+
+if [ "$ONLY_NETWORK_CHECKS" == "1" ]; then
+   ONLY_RUN_TEST_CASES=
+   QUEUE=
+fi
+
+if [ "$QUEUE" != "" ]; then
+   SETUP_QUEUES $QUEUE
+fi
 
 # --------------------- make sure output directories exist  --------------------
 
@@ -1273,7 +1291,9 @@ touch $LOCK_FILE
 
 # --------------------- setup Intel cluster checker  --------------------
 
-SETUP_CLCK
+if [ "$USE_INTEL_CLUSTER_CHECKER" != "" ]; then
+  SETUP_CLCK
+fi
 
 # --------------------- initial error checking --------------------
 
@@ -1446,6 +1466,14 @@ OPENSM_CHECK $CB_HOST1 $CB_HOSTIB1
 OPENSM_CHECK $CB_HOST2 $CB_HOSTIB2
 OPENSM_CHECK $CB_HOST3 $CB_HOSTIB3
 OPENSM_CHECK $CB_HOST4 $CB_HOSTIB4
+
+if [ "$ONLY_NETWORK_CHECKS" != "" ]; then
+  echo ""
+  echo "----- clusterbot complete --------------"
+
+  rm $LOCK_FILE
+  exit
+fi
 
 # --------------------- infiniband speed check --------------------
 

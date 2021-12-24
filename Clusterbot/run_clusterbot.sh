@@ -1,8 +1,11 @@
 #!/bin/bash
 
 EMAIL=$SMV_EMAIL
+Copt=
 fopt=
 nopt=
+Nopt=
+NOEMAIL=
 QOPT=
 qopt=
 uopt=
@@ -10,9 +13,12 @@ Popt=
 Uopt=
 FORCE_UNLOCK=
 NCASES_PER_QUEUE=20
-while getopts 'fhm:n:P:q:Q:uU:' OPTION
+while getopts 'Cfhm:n:MNP:q:Q:uU:' OPTION
 do
 case $OPTION  in
+  C)
+   Copt="-C"
+   ;;
   f)
    fopt="-f"
    FORCE_UNLOCK=1
@@ -23,6 +29,12 @@ case $OPTION  in
    ;;
   m)
    EMAIL="$OPTARG"
+   ;;
+  M)
+   NOEMAIL=1
+   ;;
+  N)
+   Nopt="-N"
    ;;
   n)
    NCASES="$OPTARG"
@@ -89,18 +101,19 @@ fi
 
 echo > $OUTPUT
 START_TIME=`date`
-./clusterbot.sh $fopt $nopt $Popt $QOPT $qopt $uopt $Uopt | tee  $OUTPUT
+./clusterbot.sh $Copt $fopt $Nopt $nopt $Popt $QOPT $qopt $uopt $Uopt | tee  $OUTPUT
 STOP_TIME=`date`
 
 nerrors=`grep '\*\*\*error'     $OUTPUT | wc -l`
 nwarnings=`grep '\*\*\*warning' $OUTPUT | wc -l`
 
-echo "VVVVVVVVVVVVVVVVVVVVVVVVV"                                 >  $HEADER
+echo "VVVVVVVVVVVVVVVVVVVVVVVVV"                                 > $HEADER
 echo ""                                                         >> $HEADER
 echo "   start: $START_TIME"                                    >> $HEADER
 echo "    stop: $STOP_TIME"                                     >> $HEADER
 echo "    $nerrors errors, $nwarnings warnings"                 >> $HEADER
 
+HAVE_ERRWARN=
 rm -f $ERRORS
 touch $ERRORS
 if [ $nerrors -gt 0 ]; then
@@ -108,16 +121,23 @@ if [ $nerrors -gt 0 ]; then
   echo "--------------------- Errors ------------------------"  >> $ERRORS
   grep '\*\*\*error' $OUTPUT                                    >> $ERRORS
   echo "-----------------------------------------------------"  >> $ERRORS
+  HAVE_ERRWARN=1
 fi
 if [ $nwarnings -gt 0 ]; then
   echo ""                                                       >> $ERRORS
   echo "--------------------- Warnings ----------------------"  >> $ERRORS
   grep '\*\*\*warning' $OUTPUT                                  >> $ERRORS
   echo "-----------------------------------------------------"  >> $ERRORS
+  HAVE_ERRWARN=1
 fi
 echo ""                                                         >> $ERRORS
 echo "^^^^^^^^^^^^^^^^^^^^^^^^"                                 >> $ERRORS
 echo ""                                                         >> $ERRORS
+
+# don't send an email if there are no errors and warnings and if the -M option was used
+if [[  "$HAVE_ERRWARN" == "" ]] && [[ "$NOEMAIL" == "1" ]]; then
+  EMAIL=
+fi
 
 if [ ! -e $LOGFILE ]; then
  cp $ERRORS $LOGFILE
