@@ -134,12 +134,6 @@ Label(root, text="Update smv repo:").grid(column=0, row=R, sticky=E)
 Button(root, text="All OS's",        width=button_width, command=update_smv_all).grid(row=R,     column=1)
 Button(root, text="Windows",    width=button_width, command=update_smv_windows).grid(row=R, column=2)
 
-# ------------------------- Set  ------------------------------
-
-R=R+1
-Label(root, text="Set Revision:").grid(column=0, row=R, sticky=E)
-Button(root, text="Bundle",   width=button_width, command=set_revision).grid(row=R, column=1)
-
 R=R+1
 Label(root, text="Set Branch:").grid(column=0, row=R, sticky=E)
 Button(root, text="Master",   width=button_width, command=set_branch).grid(row=R,   column=1)
@@ -258,6 +252,7 @@ Radiobutton(root,
 R=R+1
 Button(root, text="Bundle",  width=button_width, command=bundle_smv).grid(row=R,        column=0)
 Button(root, text="Install", width=button_width, command=install_smv).grid(row=R,       column=1)
+Button(root, text="Set Rev",   width=button_width, command=set_revision).grid(row=R, column=2)
 
 R=R+1
 Label(root, text="------Upload/Copy/Archive-------").grid(column=0, row=R, columnspan=3)
