@@ -98,7 +98,7 @@ root.resizable(0, 0)
 # ------------------------- Edit ------------------------------
 
 R=0
-Label(root, text="------------Edit------------").grid(column=0, row=R, columnspan=4)
+Label(root, text="------------EDIT------------").grid(column=0, row=R, columnspan=4)
 
 R=R+1
 Label(root, text="Notes:").grid(column=0, row=R, sticky=E)
@@ -113,7 +113,7 @@ Button(root, text="Settings",  width=button_width, command=edit_settings).grid(r
 # ------------------------- Show repo revisions ------------------------------
 
 R=R+1
-Label(root, text="------------Repos------------").grid(column=0, row=R, columnspan=3)
+Label(root, text="------------REPOS------------").grid(column=0, row=R, columnspan=3)
 
 R=R+1
 Label(root, text="Show:").grid(column=0, row=R, sticky=E)
@@ -134,12 +134,6 @@ Label(root, text="Update smv repo:").grid(column=0, row=R, sticky=E)
 Button(root, text="All OS's",        width=button_width, command=update_smv_all).grid(row=R,     column=1)
 Button(root, text="Windows",    width=button_width, command=update_smv_windows).grid(row=R, column=2)
 
-# ------------------------- Set  ------------------------------
-
-R=R+1
-Label(root, text="Set Revision:").grid(column=0, row=R, sticky=E)
-Button(root, text="Bundle",   width=button_width, command=set_revision).grid(row=R, column=1)
-
 R=R+1
 Label(root, text="Set Branch:").grid(column=0, row=R, sticky=E)
 Button(root, text="Master",   width=button_width, command=set_branch).grid(row=R,   column=1)
@@ -147,7 +141,7 @@ Button(root, text="Master",   width=button_width, command=set_branch).grid(row=R
 # ------------------------- clean ------------------------------
 
 R=R+1
-Label(root, text="------------Clean------------").grid(column=0, row=R, columnspan=4)
+Label(root, text="------------CLEAN------------").grid(column=0, row=R, columnspan=4)
 
 R=R+1
 
@@ -171,7 +165,7 @@ Button(root, text="Smv",     width=button_width, command=clean_smv).grid(row=R, 
 # ------------------------- Build ------------------------------
 
 R=R+1
-Label(root, text="------------Build ------------").grid(column=0, row=R, columnspan=3)
+Label(root, text="------------BUILD------------").grid(column=0, row=R, columnspan=3)
 
 R=R+1
 
@@ -217,7 +211,7 @@ Button(root, text="Libs",  width=button_width, command=build_lib_gnu).grid(row=R
 Button(root, text="smv",   width=button_width, command=build_smv_gnu).grid(row=R,  column=2)
 
 R=R+1
-Label(root, text="---------Bundle/Install---------").grid(column=0, row=R, columnspan=3)
+Label(root, text="---------BUNDLE/INSTALL---------").grid(column=0, row=R, columnspan=3)
 
 R=R+1
 
@@ -258,9 +252,10 @@ Radiobutton(root,
 R=R+1
 Button(root, text="Bundle",  width=button_width, command=bundle_smv).grid(row=R,        column=0)
 Button(root, text="Install", width=button_width, command=install_smv).grid(row=R,       column=1)
+Button(root, text="Set Rev",   width=button_width, command=set_revision).grid(row=R, column=2)
 
 R=R+1
-Label(root, text="------Upload/Copy/Archive-------").grid(column=0, row=R, columnspan=3)
+Label(root, text="------UPLOAD/COPY/ARCHIVE-------").grid(column=0, row=R, columnspan=3)
 
 R=R+1
 Button(root, text="Upload",  width=button_width, command=upload_bundle).grid(row=R, column=0)
@@ -270,7 +265,7 @@ Button(root, text="Archive", width=button_width, command=archive_smv).grid(row=R
 # ------------------------- get figures ------------------------------
 
 R=R+1
-Label(root, text="------------download figures------------").grid(column=0, row=R, columnspan=3)
+Label(root, text="------------DOWNLOAD FIGURES------------").grid(column=0, row=R, columnspan=3)
 
 R=R+1
 
@@ -312,7 +307,7 @@ Button(root, text="Download", width=button_width, command=download_figures).grid
 # ------------------------- synchronize ------------------------------
 
 R=R+1
-Label(root, text="------------Sychronize------------").grid(column=0, row=R, columnspan=3)
+Label(root, text="------------SYCHRONIZE------------").grid(column=0, row=R, columnspan=3)
 R=R+1
 Label(root, text="settings:").grid(column=0, row=R, sticky=E)
 Button(root, text="->smv",  width=button_width, command=webCOPYhome2config).grid(row=R, column=1)
