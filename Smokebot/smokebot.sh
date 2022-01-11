@@ -504,13 +504,13 @@ check_compile_fds_mpi_gnu_dbORIG()
      fi
 
    # Check for compiler warnings/remarks
-     if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage1d | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented'` == "" ]]
+     if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage1d | grep -v mpiifort | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented'` == "" ]]
      then
       # Continue along
       :
      else
         echo "Warnings from Stage 1d - Compile gnu Fortran FDS MPI debug:" >> $WARNING_LOG
-        grep -i -A 5 -E 'warning|remark' $OUTPUT_DIR/stage1d | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
+        grep -i -A 5 -E 'warning|remark' $OUTPUT_DIR/stage1d | grep -v mpiifort | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
         echo "" >> $WARNING_LOG
         compile_errors=1
      fi
