@@ -90,6 +90,7 @@ follow the usual procedure to incorporate updated fig repo images into your repo
 At NIST we would type the following command to generate the new base set of images
 
 ```
+cd $HOME/FireModels_fork/bot/Firebot
 ./update_repo_images -r ~firebot/Firebot_clone
 ```
 
