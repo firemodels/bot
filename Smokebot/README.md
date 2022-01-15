@@ -73,7 +73,7 @@ The output from smokebot is written into the directory called `output` which is 
 
 Smokebot compares images it generates with a corresponding set of base images located in the fig repo.
 Firebot and Smokebot use the same update_repo_images.sh script.
-To update the base images on a Linux or Mac computer:
+To update the base set of images on a Linux or Mac computer:
 
 ```
 bring fig repo up to date
@@ -85,7 +85,7 @@ follow usual procedure to incorporate updated fig repo images into your repo and
 
 ```
 
-At NIST we would type this command to generate the new set of base images
+At NIST we would type the following command to generate the new set of base images
 
 ```
 ../Firebot/update_repo_images.sh -r ~smokebot/Firebot_clone
