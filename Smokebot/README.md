@@ -87,5 +87,6 @@ follow usual procedure to incorporate updated fig repo images into your repo and
 At NIST we would type the following command to generate the new set of base images
 
 ```
+cd $HOME/FireModels_fork/bot/Smokebot
 ../Firebot/update_repo_images.sh -r ~smokebot/Firebot_clone
 ```
