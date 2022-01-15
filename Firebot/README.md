@@ -81,16 +81,15 @@ To update the base images on a Linux or Mac computer:
 bring fig repo up to date
 cd bot/Firebot
 ./update_repo_images.sh -r /home/username/FireModels_fork
+  where `/home/username/FireModels_fork` is the directory containing the `bot` and `fig` repos.  
 cd bot/fig
 follow usual procedure to incorporate updated fig repo images into your repo and github ie stage, commit, push and do a pull request
 
 ```
 
-where `/home/username/FireModels_fork` is the directory containg the `bot` and `fig` repos.  At NIST we would type the commands
+At NIST we would type the following command to generate the new base set of images
 
 ```
-type commands to bring fig repo up to date
-cd bot/Firebot
 ./update_repo_images -r ~firebot/Firebot_clone
 ```
 
