@@ -79,11 +79,11 @@ To update the base images on a Linux or Mac computer:
 
 ```
 bring fig repo up to date
-cd bot/Firebot
-./update_repo_images.sh -r /home/username/FireModels_fork
-  where `/home/username/FireModels_fork` is the directory containing the `bot` and `fig` repos.  
-cd bot/fig
-follow usual procedure to incorporate updated fig repo images into your repo and github ie stage, commit, push and do a pull request
+cd $HOME/FireModels_fork/bot/Firebot
+./update_repo_images.sh -r /path_to_firebot_root
+  where `/path_to_firebot_root` is the root directory containing the bot/Firebot directory that generated the images.  
+cd $HOME/FireModels_fork/bot/fig
+follow the usual procedure to incorporate updated fig repo images into your repo and github ie stage, commit, push and do a pull request
 
 ```
 
