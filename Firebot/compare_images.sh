@@ -445,11 +445,13 @@ cat << EOF  > $HTML_DIFF
 <h2>$BOT_TITLE User, Verification Guide Images - $DATE</h2>
 
 <table>
-<tr><th align=left>Current:</th>   <td> $FDS_REVISION         </td><td>$SMV_REVISION</td></tr>
-<tr><th align=left>Base:</th>     <td> $FIG_USER_FDS_REVISION</td><td>$FIG_USER_SMV_REVISION</td></tr>
-<tr><th align=left>Root:</th>     <td> $REPO                 </td></tr>
-<tr><th align=left>Metric:</th>   <td> ${METRIC_LABEL}       </td></tr>
-<tr><th align=left>Tolerance:</th><td> $TOLERANCE            </td></tr>
+<tr><th align=left>Current:</th>        <td> $FDS_REVISION         </td><td>$SMV_REVISION</td></tr>
+<tr><th align=left>Base:</th>           <td> $FIG_USER_FDS_REVISION</td><td>$FIG_USER_SMV_REVISION</td></tr>
+<tr><th align=left>Root:</th>           <td> $REPO                 </td></tr>
+<tr><th align=left>Differences:</th>    <td> $HAVE_DIFFS           </td></tr>
+<tr><th align=left>Errors:</th>         <td> $HAVE_ERRORS          </td></tr>
+<tr><th align=left>Metric:</th>         <td> ${METRIC_LABEL}       </td></tr>
+<tr><th align=left>Tolerance:</th>      <td> $TOLERANCE            </td></tr>
 </table>
 EOF
 
