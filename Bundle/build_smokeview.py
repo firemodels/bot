@@ -124,7 +124,7 @@ Button(root, text="Branch",       width=button_width, command=show_branch).grid(
 
 R=R+1
 Label(root, text="Update all repos:").grid(column=0, row=R, sticky=E)
-Button(root, text="All OS's",        width=button_width, command=update_all).grid(row=R,     column=1)
+Button(root, text="All OS's",        width=button_width, command=update_all, bg='blue', fg='white').grid(row=R,     column=1)
 Button(root, text="Windows",    width=button_width, command=update_windows).grid(row=R, column=2)
 
 # ------------------------- Update repos ------------------------------
@@ -197,7 +197,7 @@ Button(root, text="Utils", width=button_width, command=build_util).grid(row=R, c
 # ------------------------- Build test smokeview ------------------------------
 R=R+1
 Label(root,  text="Build smv(Intel):").grid(column=0, row=R, sticky=E)
-Button(root, text="test",   width=button_width, command=build_smv).grid(row=R,  column=1)
+Button(root, text="test",   width=button_width, command=build_smv, fg='white', bg='blue').grid(row=R,  column=1)
 Button(root, text="release",   width=button_width, command=build_smv_rel).grid(row=R,  column=2)
 R=R+1
 Label(root,  text="Build smv(Intel):").grid(column=0, row=R, sticky=E)
@@ -250,7 +250,7 @@ Radiobutton(root,
                value=2).grid(row=R, column=1)
 
 R=R+1
-Button(root, text="Bundle",  width=button_width, command=bundle_smv).grid(row=R,        column=0)
+Button(root, text="Bundle",  width=button_width, fg='white', bg='blue', command=bundle_smv).grid(row=R,        column=0)
 Button(root, text="Install", width=button_width, command=install_smv).grid(row=R,       column=1)
 Button(root, text="Set Rev",   width=button_width, command=set_revision).grid(row=R, column=2)
 
