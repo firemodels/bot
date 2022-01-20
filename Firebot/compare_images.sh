@@ -448,8 +448,8 @@ cat << EOF  > $HTML_DIFF
 <tr><th align=left>Current:</th>          <td> $FDS_REVISION              </td><td>$SMV_REVISION</td></tr>
 <tr><th align=left>Base:</th>             <td> $FIG_USER_FDS_REVISION     </td><td>$FIG_USER_SMV_REVISION</td></tr>
 <tr><th align=left>Root:</th>             <td> $REPO                      </td></tr>
-<tr><th align=left>Diffs/Errors:</th>     <td> $HAVE_DIFFS/$HAVE_ERRORS   </td></tr>
 <tr><th align=left>Metric/Tolerance:</th> <td> ${METRIC_LABEL}/$TOLERANCE </td></tr>
+<tr><th align=left>Diffs/Errors:</th>     <td> $HAVE_DIFFS/$HAVE_ERRORS   </td></tr>
 </table>
 EOF
 
