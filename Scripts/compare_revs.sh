@@ -10,6 +10,19 @@ fi
 if [ "$REPO2" == "" ]; then
   REPO2=$HOME/FireModels_clonef
 fi
+abort=
+if [ ! -d $REPO1 ]; then
+  echo "***error: $REPO1 does not exist"
+  abort=1
+fi
+if [ ! -d $REPO2 ]; then
+  echo "***error: $REPO2 does not exist"
+  abort=1
+fi
+if [ "$abort" != "" ]; then
+  exit
+fi
+
 REPOS="bot fds fig smv exp out"
 echo ""
 echo "comparing $REPOS repos in:"
