@@ -1,6 +1,7 @@
 #!/bin/bash
 REPO1=$1
 REPO2=$2
+CURDIR=`pwd`
 if [ "$REPO1" == "firebot" ]; then
   REPO1=~firebot/FireModels_clone
 fi
@@ -8,7 +9,9 @@ if [ "$REPO1" == "smokebot" ]; then
   REPO1=~smokebot/FireModels_central
 fi
 if [ "$REPO2" == "" ]; then
-  REPO2=$HOME/FireModels_clonef
+  cd ../..
+  REPO2=`pwd`
+  cd $CURDIR
 fi
 abort=
 if [ ! -d $REPO1 ]; then
