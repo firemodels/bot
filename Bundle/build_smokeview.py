@@ -98,7 +98,7 @@ root.resizable(0, 0)
 # ------------------------- Edit ------------------------------
 
 R=0
-Label(root, text="------------EDIT------------").grid(column=0, row=R, columnspan=4)
+Label(root, text="-------------------EDIT------------------").grid(column=0, row=R, columnspan=4)
 
 R=R+1
 Label(root, text="Notes:").grid(column=0, row=R, sticky=E)
@@ -113,7 +113,7 @@ Button(root, text="Settings",  width=button_width, command=edit_settings).grid(r
 # ------------------------- Show repo revisions ------------------------------
 
 R=R+1
-Label(root, text="------------REPOS------------").grid(column=0, row=R, columnspan=3)
+Label(root, text="------------------REPOS------------------").grid(column=0, row=R, columnspan=3)
 
 R=R+1
 Label(root, text="Show:").grid(column=0, row=R, sticky=E)
@@ -141,7 +141,7 @@ Button(root, text="Master",   width=button_width, command=set_branch).grid(row=R
 # ------------------------- clean ------------------------------
 
 R=R+1
-Label(root, text="------------CLEAN------------").grid(column=0, row=R, columnspan=4)
+Label(root, text="------------------CLEAN------------------").grid(column=0, row=R, columnspan=4)
 
 R=R+1
 
@@ -165,7 +165,7 @@ Button(root, text="Smv",     width=button_width, command=clean_smv).grid(row=R, 
 # ------------------------- Build ------------------------------
 
 R=R+1
-Label(root, text="------------BUILD------------").grid(column=0, row=R, columnspan=3)
+Label(root, text="------------------BUILD------------------").grid(column=0, row=R, columnspan=3)
 
 R=R+1
 
@@ -211,7 +211,7 @@ Button(root, text="Libs",  width=button_width, command=build_lib_gnu).grid(row=R
 Button(root, text="smv",   width=button_width, command=build_smv_gnu).grid(row=R,  column=2)
 
 R=R+1
-Label(root, text="---------BUNDLE/INSTALL---------").grid(column=0, row=R, columnspan=3)
+Label(root, text="--------------BUNDLE/INSTALL-------------").grid(column=0, row=R, columnspan=3)
 
 R=R+1
 
@@ -255,17 +255,22 @@ Button(root, text="Install", width=button_width, command=install_smv).grid(row=R
 Button(root, text="Set Rev",   width=button_width, command=set_revision).grid(row=R, column=2)
 
 R=R+1
-Label(root, text="------UPLOAD/COPY/ARCHIVE-------").grid(column=0, row=R, columnspan=3)
+Label(root, text="--------BUNDLE ==>> Google Drive--------").grid(column=0, row=R, columnspan=3)
 
 R=R+1
-Button(root, text="Upload",  width=button_width, command=upload_bundle).grid(row=R, column=0)
-Button(root, text="Copy",    width=button_width, command=copy_bundle).grid(row=R,   column=1)
-Button(root, text="Archive", width=button_width, command=archive_smv).grid(row=R,   column=2)
+Button(root, text="Copy",    width=button_width, command=copy_bundle).grid(row=R,   column=0)
+Button(root, text="Upload",  width=button_width, command=upload_bundle).grid(row=R, column=1)
+
+R=R+1
+Label(root, text="-----------BUNDLE ==>> CLUSTER-----------").grid(column=0, row=R, columnspan=3)
+
+R=R+1
+Button(root, text="Copy", width=button_width, command=archive_smv).grid(row=R,   column=0)
 
 # ------------------------- get figures ------------------------------
 
 R=R+1
-Label(root, text="------------DOWNLOAD FIGURES------------").grid(column=0, row=R, columnspan=3)
+Label(root, text="------------DOWNLOAD FIGURES-------------").grid(column=0, row=R, columnspan=3)
 
 R=R+1
 
@@ -307,7 +312,7 @@ Button(root, text="Download", width=button_width, command=download_figures).grid
 # ------------------------- synchronize ------------------------------
 
 R=R+1
-Label(root, text="------------SYCHRONIZE------------").grid(column=0, row=R, columnspan=3)
+Label(root, text="------------SYCHRONIZE FILES ------------").grid(column=0, row=R, columnspan=3)
 R=R+1
 Label(root, text="settings:").grid(column=0, row=R, sticky=E)
 Button(root, text="->smv",  width=button_width, command=webCOPYhome2config).grid(row=R, column=1)
