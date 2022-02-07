@@ -44,7 +44,7 @@ app.set(2)
 guide=IntVar()
 guide.set(1)
 
-button_width=7
+button_width=8
 
 # link windows batch files to python commands
 
@@ -203,7 +203,7 @@ Button(root, text="release",   width=button_width, command=build_smv_rel).grid(r
 R=R+1
 Label(root,  text="Build smv(Intel):").grid(column=0, row=R, sticky=E)
 Button(root, text="test inc",    width=button_width, command=build_smv_win_inc).grid(row=R, column=1)
-Button(root, text="test deb",    width=button_width, command=build_smv_win_deb).grid(row=R, column=2)
+Button(root, text="test debug",    width=button_width, command=build_smv_win_deb).grid(row=R, column=2)
 
 # ------------------------- Build gnu libraries, smokeview ------------------------------
 
