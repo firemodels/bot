@@ -59,6 +59,7 @@ def update_smv_all():              os.system("start " + webscript_dir + "webUPDA
 def set_revision():                os.system("start " + webscript_dir + "webSET_bundle_revision")
 
 def build_smv_win_inc():           os.system("start " + webscript_dir + "webBUILDsmv Windows testinc")
+def build_smv_win_deb():           os.system("start " + webscript_dir + "webBUILDsmv Windows debug")
 def build_smv():                   os.system("start " + webscript_dir + "webBUILDsmv  "     + platforms[buildplatform.get()] + " "    + "test" )
 def build_smv_gnu():               os.system("start " + webscript_dir + "webBUILDsmv  "     + platforms[buildplatform.get()] + "gnu " + "test" )
 def build_smv_rel():               os.system("start " + webscript_dir + "webBUILDsmv  "     + platforms[buildplatform.get()] + " "    + "release" )
@@ -202,6 +203,7 @@ Button(root, text="release",   width=button_width, command=build_smv_rel).grid(r
 R=R+1
 Label(root,  text="Build smv(Intel):").grid(column=0, row=R, sticky=E)
 Button(root, text="test inc",    width=button_width, command=build_smv_win_inc).grid(row=R, column=1)
+Button(root, text="test deb",    width=button_width, command=build_smv_win_deb).grid(row=R, column=2)
 
 # ------------------------- Build gnu libraries, smokeview ------------------------------
 
