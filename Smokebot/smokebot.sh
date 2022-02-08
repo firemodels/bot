@@ -440,13 +440,13 @@ check_compile_fds_mpi_db()
    fi
 
    # Check for compiler warnings/remarks
-   if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage1b| grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'` == "" ]]
+   if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage1b| grep -v mpiifort -v | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'` == "" ]]
    then
       # Continue along
       :
    else
       echo "Stage 1b warnings:" >> $WARNING_LOG
-      grep -A 5 -i -E 'warning|remark' $OUTPUT_DIR/stage1b | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'>> $WARNING_LOG
+      grep -A 5 -i -E 'warning|remark' $OUTPUT_DIR/stage1b | grep -v mpiifort | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'>> $WARNING_LOG
       echo "" >> $WARNING_LOG
    # if the executable does not exist then an email has already been sent
       if [ -e "fds_${INTEL}mpi_${COMPILER}_${platform}_64$DB" ] ; then

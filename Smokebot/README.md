@@ -68,3 +68,25 @@ MAILTO=""
 ```
 
 The output from smokebot is written into the directory called `output` which is in the same directory as the `smokebot.sh` script itself. When smokebot completes, email should be sent to the specified list of addresses.
+
+## Updating Comparison Images
+
+Smokebot compares images it generates with a corresponding set of base images located in the fig repo.
+Firebot and Smokebot use the same update_repo_images.sh script.
+To update the base set of images on a Linux or Mac computer:
+
+```
+bring fig repo up to date
+cd $HOME/FireModels_fork/bot/Smokebot
+./update_repo_images.sh -r /path_to_smokebot_root
+  where `/path_to_smokebot_root` is the root directory containing the bot/Smokebot directory that generated the images.  
+cd $HOME/FireModels_fork/bot/fig
+follow usual procedure to incorporate updated fig repo images into your repo and github ie stage, commit, push and do a pull request
+```
+
+At NIST we would type the following command to generate the new set of base images
+
+```
+cd $HOME/FireModels_fork/bot/Smokebot
+../Firebot/update_repo_images.sh -r ~smokebot/Firebot_clone
+```

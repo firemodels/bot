@@ -191,7 +191,7 @@ CHECK_DAEMON ()
 DAEMONOUT=$FILES_DIR/daemon.out.$$
 DAEMONOUT2=$FILES_DIR/daemon2.out.$$
 
-pdsh -t 2 -w $CB_HOST_ARG "ps -el | grep $DAEMON_ARG | wc -l" >&  $DAEMONOUT2
+pdsh -t 1 -w $CB_HOST_ARG "ps -el | grep $DAEMON_ARG | wc -l" >&  $DAEMONOUT2
 cat $DAEMONOUT2 | grep -v ssh | grep -v Connection | sort >& $DAEMONOUT
 DAEMONDOWN=
 while read line 
@@ -208,7 +208,7 @@ if [ "$DAEMONDOWN" == "" ]; then
   echo "   $CB_HOST_ARG: $DAEMON_ARG running"
 else
   echo "   $CB_HOST_ARG: ***$ERRWARN: $DAEMON_ARG down on $DAEMONDOWN"
-  echo "      Fix: sudo pdsh -t 2 -w $CB_HOST_ARG service $DAEMON_ARG start"
+  echo "      Fix: sudo pdsh -t 1 -w $CB_HOST_ARG service $DAEMON_ARG start"
 fi
 rm -f $DAEMONOUT $DAEMONOUT2
 }
@@ -229,7 +229,7 @@ ACCT_CHECK ()
   fi
   FILE_OUT=$outdir/acct_check.out
   FILE_OUT2=$outdir/acct_check2.out
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getfile.sh $file $outdir >& $FILE_OUT2
+  pdsh -t 1 -w $CB_HOST_ARG `pwd`/getfile.sh $file $outdir >& $FILE_OUT2
   cat $FILE_OUT2 | grep -v ssh | grep -v Connection | sort >& $FILE_OUT
   file0=`head -1 $FILE_OUT | awk '{print $2}'`
 
@@ -279,7 +279,7 @@ CHECK_FILE ()
   fi
   FILE_OUT=$outdir/check_file.out
   FILE_OUT2=$outdir/check_file.out2
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getfile.sh $file $outdir >& $FILE_OUT2
+  pdsh -t 1 -w $CB_HOST_ARG `pwd`/getfile.sh $file $outdir >& $FILE_OUT2
   cat $FILE_OUT2 | grep -v ssh | grep -v Connection | sort >& $FILE_OUT
   file0=`head -1 $FILE_OUT | awk '{print $2}'`
 
@@ -335,7 +335,7 @@ TIME_CHECK ()
   fi
   FILE_OUT=$outdir/time_check.out
   FILE_OUT2=$outdir/time_check.out2
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/gettime_error.sh >& $FILE_OUT2
+  pdsh -t 1 -w $CB_HOST_ARG `pwd`/gettime_error.sh >& $FILE_OUT2
   cat $FILE_OUT2 | grep -v ssh | grep -v Connection | sort >& $FILE_OUT
 
   local CURDIR=`pwd`
@@ -396,7 +396,7 @@ MOUNT_CHECK ()
   fi
   FILE_OUT=$outdir/mount_check.out
   FILE_OUT2=$outdir/mount_check.out2
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getmounts.sh $outdir >& $FILE_OUT2
+  pdsh -t 1 -w $CB_HOST_ARG `pwd`/getmounts.sh $outdir >& $FILE_OUT2
   cat $FILE_OUT2 | grep -v ssh | grep -v Connection | sort >& $FILE_OUT
   file0=`head -1 $FILE_OUT | awk '{print $2}'`
 
@@ -453,7 +453,7 @@ FSTAB_CHECK ()
   fi
   FILE_OUT=$outdir/fstab_check.out
   FILE_OUT2=$outdir/fstab_check.out2
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getfstab.sh $outdir >& $FILE_OUT2
+  pdsh -t 1 -w $CB_HOST_ARG `pwd`/getfstab.sh $outdir >& $FILE_OUT2
   cat $FILE_OUT2 | grep -v ssh | grep -v Connection | sort >& $FILE_OUT
   file0=`head -1 $FILE_OUT | awk '{print $2}'`
 
@@ -510,7 +510,7 @@ HOST_CHECK ()
   fi
   FILE_OUT=$outdir/host_check.out
   FILE_OUT2=$outdir/host_check.out2
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/gethost.sh $outdir >& $FILE_OUT2
+  pdsh -t 1 -w $CB_HOST_ARG `pwd`/gethost.sh $outdir >& $FILE_OUT2
   cat $FILE_OUT2 | grep -v ssh | grep -v Connection | sort >& $FILE_OUT
   file0=`head -1 $FILE_OUT | awk '{print $2}'`
 
@@ -564,7 +564,7 @@ if [ "$CB_HOST_ARG" == "" ]; then
   return 0
 fi
 rm -f $FILES_DIR/${prefix}rpm*.txt
-pdsh -t 2 -w $CB_HOST_ARG `pwd`/getrpms.sh $FILES_DIR $prefix >& $SLURMRPM_OUT
+pdsh -t 1 -w $CB_HOST_ARG `pwd`/getrpms.sh $FILES_DIR $prefix >& $SLURMRPM_OUT
 
 local CURDIR=`pwd`
 cd $FILES_DIR
@@ -622,7 +622,7 @@ OPENSM_CHECK ()
     return
   fi
   SLURM_TEMP=/tmp/slurm.$$
-  ssh $CB_HOST_ARG pdsh -t 2 -w $CB_HOST_ARG,$CB_HOSTIB_ARG ps -el >& $SLURM_TEMP
+  ssh $CB_HOST_ARG pdsh -t 1 -w $CB_HOST_ARG,$CB_HOSTIB_ARG ps -el >& $SLURM_TEMP
   cat $SLURM_TEMP | sort -u | grep opensm  >  $SLURM_OUT 2>&1
   SUB1=`cat  $SLURM_OUT | awk -F':' '{print $1}' | sort -u | awk '{printf "%s%s", $1," " }'`
   if [ "$SUB1" == "" ]; then
@@ -648,7 +648,7 @@ IBSPEED ()
   fi
   local CURDIR=`pwd`
   IBTEMP=/tmp/ibnet.$$
-  pdsh -t 2 -w $CB_HOST_ARG $CURDIR/ibspeed.sh >& $IBTEMP 
+  pdsh -t 1 -w $CB_HOST_ARG $CURDIR/ibspeed.sh >& $IBTEMP 
   cat $IBTEMP | grep -v ssh | grep -v Connection | sort >& $IBRATE
   RATE0=`head -1 $IBRATE | awk '{print $2}'`
   if [ $RATE0 -eq 0 ]; then
@@ -696,7 +696,7 @@ RUN_CLUSTER_CHECK ()
     WARNINGFILE=$OUTPUT_DIR/${LOG}_execution_warnings.log
     OUTFILE=$OUTPUT_DIR/${LOG}.out
     RESULTSFILE=$OUTPUT_DIR/${LOG}_results.out
-    pdsh -t 2 -w $CB_HOST_ARG date   >& $CLUSTEROUT
+    pdsh -t 1 -w $CB_HOST_ARG date   >& $CLUSTEROUT
     sort $CLUSTEROUT | grep -v ssh | grep -v Connection | awk '{print $1 }' | awk -F':' '{print $1}' > $NODEFILE
     nup=`wc -l $NODEFILE`
     if [ "$nup" == "0" ]; then
@@ -723,7 +723,7 @@ PROVISION_DATE_CHECK ()
     return 0
   fi
   PROVTEMP=/tmp/prov.$$
-  pdsh -t 2 -w $CB_HOSTETH_ARG `pwd`/getrevdate.sh >& $PROVTEMP
+  pdsh -t 1 -w $CB_HOSTETH_ARG `pwd`/getrevdate.sh >& $PROVTEMP
   cat $PROVTEMP |  grep -v ssh | grep -v Connection | sort >  $FSOUT 2>&1
 
   NF0=`head -1 $FSOUT | awk '{print $2}'`
@@ -762,7 +762,7 @@ CORE_CHECK ()
     return 0
   fi
   CORETEMP=/tmp/core.$$
-  pdsh -t 2 -w $CB_HOSTETH_ARG "grep cpuid /proc/cpuinfo | wc -l" >& $CORETEMP
+  pdsh -t 1 -w $CB_HOSTETH_ARG "grep cpuid /proc/cpuinfo | wc -l" >& $CORETEMP
   cat $CORETEMP | grep -v ssh | grep -v Connection | sort >  $FSOUT 2>&1
 
   NF0=`head -1 $FSOUT | awk '{print $2}'`
@@ -834,7 +834,7 @@ MEMORY_CHECK ()
   fi
   MEMORY_OUT=$outdir/memory.out
   MEMORY_OUT2=$outdir/memory.out2
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getmem.sh  >& $MEMORY_OUT2
+  pdsh -t 1 -w $CB_HOST_ARG `pwd`/getmem.sh  >& $MEMORY_OUT2
   cat $MEMORY_OUT2 | grep -v ssh | grep -v Connection | sort >& $MEMORY_OUT
   memory0=`head -1 $MEMORY_OUT | awk '{print $2}'`
 
@@ -878,7 +878,7 @@ SPEED_CHECK ()
   fi
   SPEED_OUT=$outdir/speed.out
   SPEED_OUT2=$outdir/speed.out2
-  pdsh -t 2 -w $CB_HOST_ARG `pwd`/getspeed.sh  >& $SPEED_OUT2
+  pdsh -t 1 -w $CB_HOST_ARG `pwd`/getspeed.sh  >& $SPEED_OUT2
   cat $SPEED_OUT2 | grep -v ssh | grep -v Connection | sort >& $SPEED_OUT
   speed0=`head -1 $SPEED_OUT | awk '{print $2}'`
 
@@ -1110,7 +1110,7 @@ CHECK_TEST_CASES ()
 {
   local REPORT_STATUS=$1
   echo ""
-  echo "----- check test cases ----------"
+  echo "----- FDS case check ----------"
   WAIT_TEST_CASES_END $JOBPREFIX $REPORT_STATUS
   if [ "$TEST_QUEUE" == "each" ]; then
     CHECK_FDS_OUT $JOBPREFIX $CB_QUEUE1
@@ -1198,16 +1198,25 @@ USE_SUDO=
 IPMI_password=
 IPMI_username=
 UPDATE_ARCHIVE=
+USE_INTEL_CLUSTER_CHECKER=1
+ONLY_NETWORK_CHECKS=
+QUEUE=
 
-while getopts 'fhn:P:q:Q:uU:' OPTION
+while getopts 'Cfhn:NP:q:Q:uU:' OPTION
 do
 case $OPTION  in
+  C)
+   USE_INTEL_CLUSTER_CHECKER=
+   ;;
   f)
    FORCE_UNLOCK=1
    ;;
   h)
    ./clusterbot_usage.sh clusterbot.sh $NCASES_PER_QUEUE 0
    exit
+   ;;
+  N)
+   ONLY_NETWORK_CHECKS=1
    ;;
   n)
    NCASES="$OPTARG"
@@ -1223,10 +1232,10 @@ case $OPTION  in
    ;;
   Q)
    ONLY_RUN_TEST_CASES=1
-   SETUP_QUEUES $OPTARG
+   QUEUE=$OPTARG
    ;;
   q)
-   SETUP_QUEUES $OPTARG
+   QUEUE=$OPTARG
    ;;
   u)
    UPDATE_ARCHIVE="1"
@@ -1237,6 +1246,15 @@ case $OPTION  in
 esac
 done
 shift $(($OPTIND-1))
+
+if [ "$ONLY_NETWORK_CHECKS" == "1" ]; then
+   ONLY_RUN_TEST_CASES=
+   QUEUE=
+fi
+
+if [ "$QUEUE" != "" ]; then
+   SETUP_QUEUES $QUEUE
+fi
 
 # --------------------- make sure output directories exist  --------------------
 
@@ -1273,7 +1291,9 @@ touch $LOCK_FILE
 
 # --------------------- setup Intel cluster checker  --------------------
 
-SETUP_CLCK
+if [ "$USE_INTEL_CLUSTER_CHECKER" != "" ]; then
+  SETUP_CLCK
+fi
 
 # --------------------- initial error checking --------------------
 
@@ -1361,7 +1381,7 @@ echo ""
 echo "----- network checks ------------"
 # --------------------- check ethernet --------------------
 
-pdsh -t 2 -w $CB_HOSTS date   >& $ETHOUT
+pdsh -t 1 -w $CB_HOSTS date   >& $ETHOUT
 ETHDOWN=`sort $ETHOUT | grep -E 'timed|refused|route' | awk -F':' '{print $1}' | awk '{printf "%s ", $1}'`
 ETHUP=`sort $ETHOUT | grep -v -E 'timed|refused|route' | awk -F':' '{print $1}' | awk '{printf "%s ", $1}'`
 
@@ -1378,16 +1398,16 @@ fi
 rm -rf $IBOUT
 touch $IBOUT
 if [[ "$CB_HOST1" != "" ]] && [[ $CB_HOSTIB1 != "" ]]; then
-  ssh $CB_HOST1 pdsh -t 2 -w $CB_HOSTIB1 date  >>  $IBOUT 2>&1
+  ssh $CB_HOST1 pdsh -t 1 -w $CB_HOSTIB1 date  >>  $IBOUT 2>&1
 fi
 if [[ "$CB_HOST2" != "" ]] && [[ $CB_HOSTIB2 != "" ]]; then
-  ssh $CB_HOST2 pdsh -t 2 -w $CB_HOSTIB2 date  >>  $IBOUT 2>&1
+  ssh $CB_HOST2 pdsh -t 1 -w $CB_HOSTIB2 date  >>  $IBOUT 2>&1
 fi
 if [[ "$CB_HOST3" != "" ]] && [[ $CB_HOSTIB3 != "" ]]; then
-  ssh $CB_HOST3 pdsh -t 2 -w $CB_HOSTIB3 date  >>  $IBOUT 2>&1
+  ssh $CB_HOST3 pdsh -t 1 -w $CB_HOSTIB3 date  >>  $IBOUT 2>&1
 fi
 if [[ "$CB_HOST4" != "" ]] && [[ $CB_HOSTIB4 != "" ]]; then
-  ssh $CB_HOST4 pdsh -t 2 -w $CB_HOSTIB4 date  >>  $IBOUT 2>&1
+  ssh $CB_HOST4 pdsh -t 1 -w $CB_HOSTIB4 date  >>  $IBOUT 2>&1
 fi
 IBDOWN_HOSTS=`grep -E 'timed|refused|route'  $IBOUT | grep out | sort | awk -F':' '{print $1}' | awk '{printf "%s ", $1}'`
 
@@ -1446,6 +1466,14 @@ OPENSM_CHECK $CB_HOST1 $CB_HOSTIB1
 OPENSM_CHECK $CB_HOST2 $CB_HOSTIB2
 OPENSM_CHECK $CB_HOST3 $CB_HOSTIB3
 OPENSM_CHECK $CB_HOST4 $CB_HOSTIB4
+
+if [ "$ONLY_NETWORK_CHECKS" != "" ]; then
+  echo ""
+  echo "----- clusterbot complete --------------"
+
+  rm $LOCK_FILE
+  exit
+fi
 
 # --------------------- infiniband speed check --------------------
 
@@ -1628,7 +1656,7 @@ CHECK_DIR_LIST /etc slurm
 #*** check slurm rpm
 
 TEMP_RPM=/tmp/rpm.$$
-pdsh -t 2 -w $CB_HOSTS "rpm -qa | grep slurm | grep devel" >& $TEMP_RPM
+pdsh -t 1 -w $CB_HOSTS "rpm -qa | grep slurm | grep devel" >& $TEMP_RPM
 cat $TEMP_RPM | grep -v ssh | grep -v Connection | sort >& $SLURMRPM_OUT
 rm -f $TEMP_RPM
 SLURMRPM0=`head -1 $SLURMRPM_OUT | awk '{print $2}'`
