@@ -9,6 +9,7 @@ function usage {
   echo ""
   echo " -d dir - directory where fds is built"
   echo " -h   - show this message"
+  echo " -j prefix  - specif a job prefix"
   echo " -q q - name of queue. [default: batch]"
   echo " -v   - show script"
   exit
@@ -21,6 +22,7 @@ CURDIR=`pwd`
 cd $QFDS_PATH
 QFDS_DIR=`pwd`
 cd $CURDIR
+JOBPREFIX=fds_build
 
 #*** define toplevel of the repos
 
@@ -29,10 +31,11 @@ if [ "$FIREMODELS" != "" ]; then
   FDSROOT=$FIREMODELS
 fi
 showscript=
+QUEUE=batch
 
 #*** read in parameters from command line
 
-while getopts 'd:hq:v' OPTION
+while getopts 'd:hj:q:v' OPTION
 do
 case $OPTION  in
   d)
@@ -42,8 +45,11 @@ case $OPTION  in
    usage
    exit
    ;;
+  j)
+   JOBPREFIX="$OPTARG"
+   ;;
   q)
-   queue="$OPTARG"
+   QUEUE="$OPTARG"
    ;;
   v)
    showscript=1
@@ -61,12 +67,19 @@ fulldir=`pwd`
 
 outerr=$fulldir/fdsbuild.err
 outlog=$fulldir/fdsbuild.log
+qlog=$fulldir/fdsbuild.qlog
+scriptlog=$fulldir/fdsbuild.scriptlog
 
-cat << EOF >> $scriptfile
-#SBATCH -J $JOBPREFIX$infile
+commandline=`echo $* | sed 's/-V//' | sed 's/-v//'`
+scriptfile=`mktemp /tmp/script.$$.XXXXXX`
+
+cat << EOF > $scriptfile
+#!/bin/bash
+# $0 $commandline
+#SBATCH -J $JOBPREFIX
 #SBATCH -e $outerr
 #SBATCH -o $outlog
-#SBATCH --partition=$queue
+#SBATCH --partition=$QUEUE
 #SBATCH --ntasks=1
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=1
@@ -100,11 +113,11 @@ echo
 echo \`date\`
 echo "     Directory: \`pwd\`"
 echo "          Host: \`hostname\`"
-echo "----------------" >> $qlog
-echo "started fds build at \`date\`"  >> $qlog
+echo "----------------"
+echo "started fds build at \`date\`"
 cd $fulldir
-./make_fds.sh                         >> $qlog
-echo "finished fds build at \`date\`" >> $qlog
+./make_fds.sh
+echo "finished fds build at \`date\`"
 EOF
 
 #*** output script file to screen if -v option was selected
@@ -116,16 +129,17 @@ if [ "$showscript" == "1" ]; then
 fi
 
 #*** output info to screen
-  echo "submitted at `date`"                                      > $qlog
-  echo "          Input dir:$builddir"                     | tee -a $qlog
-  echo "              Queue:$queue"                        | tee -a $qlog
+  echo "submitted at `date`"
+  echo "          Input dir:$builddir"
+  echo "              Queue:$QUEUE"
 
 #*** run script
 
 echo 
 chmod +x $scriptfile
 
-$QSUB $scriptfile | tee -a $qlog
+QSUB="sbatch -p $QUEUE --ignore-pbs"
+$QSUB $scriptfile          
 cat $scriptfile            > $scriptlog
 echo "#$QSUB $scriptfile" >> $scriptlog
 rm $scriptfile

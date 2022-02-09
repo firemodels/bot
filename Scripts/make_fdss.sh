@@ -14,19 +14,24 @@ git clean -dxf
 cd $CURDIR/../../fds
 FDSREPO=`pwd`
 commit_file=$CURDIR/$1
-cat $commit_file
 COMMITS=`cat $commit_file | awk -F';' '{print $1}'`
 count=1
 for commit in $COMMITS; do
-git checkout master
-COMMITDIR=$TESTDIR/${count}_$commit
-count=$((count+1))
-mkdir $COMMITDIR
-cd $FDSREPO
-git checkout $commit
-cp -r $FDSREPO/Source $COMMITDIR/Source
-cp -r $FDSREPO/Build $COMMITDIR/Build
-cd $COMMITDIR/Build/impi_intel_linux_64
-./make_fds.sh >& /dev/null &
+  cd $FDSREPO
+  git checkout master >& /dev/null
+  COMMITDIR=$TESTDIR/${count}_$commit
+  mkdir $COMMITDIR
+  count=$((count+1))
+  cd $FDSREPO
+  git checkout $commit >& /dev/null
+  cp -r $FDSREPO/Source $COMMITDIR/Source
+  cp -r $FDSREPO/Build  $COMMITDIR/Build
+  rm $COMMITDIR/Build/impi_intel_linux_64/*.o
+  rm $COMMITDIR/Build/impi_intel_linux_64/*.mod
+  rm $COMMITDIR/Build/impi_intel_linux_64/fds*
+  cd $CURDIR
+  echo building fds using revision $commit
+  ./qbuild.sh -j fds$commit -d $COMMITDIR/Build/impi_intel_linux_64 > $CURDIR/script.xxx
 done
-git checkout master
+echo $FDSREPO
+git checkout master >& /dev/null
