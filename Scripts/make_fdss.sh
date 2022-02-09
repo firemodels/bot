@@ -11,6 +11,8 @@ function usage {
   echo ""
   echo " -c casename.fds - path of fds case to run"
 #  echo " -d dir - root directory where fdss are built [default: $CURDIR/TESTDIR]"
+  echo " -f   - force cloning of the fds_test repo"
+  echo " -F   - use existing fds_test repo"
   echo " -e entry - makefile entry used to build fds [default: $MAKE]"
   echo " -n n     - specify maximum number of fdss to build [default: $MAXN]"
   echo " -r revs - file containing revisions used to build fds [default: $REVISIONS]"
@@ -55,10 +57,12 @@ CASENAME=
 SKIPBUILD=
 SKIPRUN=
 MAXN=10
+FORCECLONE=
+USEEXISTING=
 
 #*** read in parameters from command line
 
-while getopts 'c:d:e:hi:n:q:r:sS' OPTION
+while getopts 'c:d:e:fFhi:n:q:r:sS' OPTION
 do
 case $OPTION  in
   c)
@@ -69,6 +73,12 @@ case $OPTION  in
    ;;
   e)
    MAKEENTRY="$OPTARG"
+   ;;
+  f)
+   FORCECLONE=1
+   ;;
+  F)
+   USEEXISTING=1
    ;;
   h)
    usage
@@ -92,6 +102,14 @@ case $OPTION  in
 esac
 done
 shift $(($OPTIND-1))
+
+if [ "$USEEXISTING" == "1" ]; then
+  if [ "$FORCECLONE" == "1" ]; then
+    echo "***error: cannot speciy both -f and -F options"
+    usage
+    exit
+  fi
+fi
 
 ABORT=
 # make sure revision file exists
@@ -119,22 +137,47 @@ fi
 
 
 # make sure fds repo exists
-FDSREPO=$CURDIR/../../fds
+FDSREPO=$CURDIR/../../fds_test
+if [ -d $FDSREPO ]; then
+  cd $FDSREPO
+  FDSREPO=`pwd`
+  if [ "$USEEXISTING" == "" ]; then
+    if [ "$FORCECLONE" == "1" ]; then
+      cd $CURDIR
+      echo cloning fds into fds_test
+      rm -rf $FDSREPO 
+      ./setup_repos.sh -G -t -C >& /dev/null
+    else
+      echo "***error: The repo fds_test exists. Erase $FDSREPO"
+      echo "          or use the -f option to force cloning"
+      echo "          or the -F option to use the existing fds_test repo"
+      ABORT=1
+    fi
+  fi 
+else
+  cd $CURDIR
+  echo cloning fds into fds_test
+  ./setup_repos.sh -G -t -C >& /dev/null
+fi
+
+cd $FDSREPO
+FDSREPO=`pwd`
 if [ ! -d $FDSREPO ]; then
-  echo "***error: fds repo does not exist"
+  echo "***error: The repo fds_test does not exists."
   ABORT=1
 fi
+cd $CURDIR
 
 # make sure makefile entry exists
 if [ ! -d $FDSREPO/Build/$MAKE ]; then
-  echo "***error: makefile entry $MAKE does not existt"
+  echo "***error: The makefile entry $MAKE does not existt"
   ABORT=1
 fi
 
 # if casename.fds is specified, make sure it exists
 if [ "$CASENAME" != "" ]; then
   if [ ! -e $CASENAME ]; then
-    echo "***error: the fds casename, $CASENAME, does not exist"
+    echo "***error: The fds casename, $CASENAME, does not exist"
     ABORT=1
   fi
 fi
@@ -172,9 +215,9 @@ if [ "$SKIPBUILD" == "" ]; then
     git checkout $commit >& /dev/null
     cp -r $FDSREPO/Source $COMMITDIR/Source
     cp -r $FDSREPO/Build  $COMMITDIR/Build
-    rm $COMMITDIR/Build/$MAKEENTRY/*.o
-    rm $COMMITDIR/Build/$MAKEENTRY/*.mod
-    rm $COMMITDIR/Build/$MAKEENTRY/fds*
+    rm -f $COMMITDIR/Build/$MAKEENTRY/*.o
+    rm -f $COMMITDIR/Build/$MAKEENTRY/*.mod
+    rm -f $COMMITDIR/Build/$MAKEENTRY/fds*
     cd $CURDIR
     echo ""
     DATE=`grep $commit $REVISIONS | awk -F';' '{print $3}'`

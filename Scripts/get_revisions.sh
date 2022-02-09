@@ -4,22 +4,23 @@
 #---------------------------------------------
 
 function usage {
-  echo "Usage: get_logs.sh"
+  echo "Usage: get_revisions.sh"
   echo ""
-  echo "get_logs.sh"
+  echo "get_revisions.sh"
   echo ""
-  echo " -a date - include revisions after date dd-mon-yyyy e.g. 17-Nov-2021"
-  echo " -b date - include revisions before date dd-mon-yyyy [default: current date]"
-  echo " -n n    - maximum number of revisions [default: $MAXN]"
+  echo " -a date - include revisions after date [default: $AFTERARG]"
+  echo " -b date - include revisions before date [default: $BEFOREARG]"
+  echo " -n n    - maximum number of revisions to include [default: $MAXN]"
   echo " -h      - show this message"
   echo " -r revs - file containing revisions used to build fds [default: $REVISIONS]"
   exit
 }
 
 REVISIONS=revisions.txt
-MAXN=100
-AFTER=1-Jan-2021
-BEFORE=
+MAXN=10
+AFTERARG=1-Jan-2021
+BEFOREARG=`date +%d-%b-%Y`
+AFTERARG=`date -d "-3 month" +%d-%b-%Y`
 
 #*** read in parameters from command line
 
@@ -27,10 +28,10 @@ while getopts 'a:b:n:hr:' OPTION
 do
 case $OPTION  in
   a)
-   AFTER="$OPTARG"
+   AFTERARG="$OPTARG"
    ;;
   b)
-   BEFORE="$OPTARG"
+   BEFOREARG="$OPTARG"
    ;;
   h)
    usage
@@ -46,11 +47,11 @@ esac
 done
 shift $(($OPTIND-1))
 
-if [ "$AFTER" != "" ]; then
-  AFTER="--after=$AFTER"
+if [ "$AFTERARG" != "" ]; then
+  AFTER="--after=$AFTERARG"
 fi
-if [ "$BEFORE" != "" ]; then
-  BEFORE="--before=$BEFORE"
+if [ "$BEFOREARG" != "" ]; then
+  BEFORE="--before=$BEFOREARG"
 fi
 
 CURDIR=`pwd`
@@ -58,7 +59,8 @@ cd ../../fds
 FDSREPO=`pwd`
 cd $FDSREPO
 TEMPREVS=/tmp/revs.$$
-TEMPREVS2=/tmp/revs2.$$
+
+echo "Outputting $MAXN revisions between $AFTERARG and $BEFOREARG to $REVISIONS"
 git log --no-merges --date=short  $AFTER $BEFORE  --format="%h;%cnn;%cd;%s" Source > $TEMPREVS
 NL=`cat $TEMPREVS | wc -l`
 if [ $NL -gt $MAXN ]; then
