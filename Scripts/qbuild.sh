@@ -129,18 +129,12 @@ if [ "$showscript" == "1" ]; then
   exit
 fi
 
-#*** output info to screen
-  echo "submitted at `date`"
-  echo "          Input dir:$builddir"
-  echo "              Queue:$QUEUE"
-
 #*** run script
 
-echo 
 chmod +x $scriptfile
 
 QSUB="sbatch -p $QUEUE --ignore-pbs"
-$QSUB $scriptfile          
+$QSUB $scriptfile        >& /dev/null 
 cat $scriptfile            > $scriptlog
 echo "#$QSUB $scriptfile" >> $scriptlog
 rm $scriptfile

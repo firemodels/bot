@@ -12,6 +12,7 @@ function usage {
   echo " -c casename.fds - path of fds case to run"
 #  echo " -d dir - root directory where fdss are built [default: $CURDIR/TESTDIR]"
   echo " -e entry - makefile entry used to build fds [default: $MAKE]"
+  echo " -n n     - specify maximum number of fdss to build [default: $MAXN]"
   echo " -r revs - file containing revisions used to build fds [default: $REVISIONS]"
   echo " -h   - show this message"
   echo " -q q - name of queue used to build fdss. [default: $QUEUE]"
@@ -53,10 +54,11 @@ TESTDIR=TESTDIR
 CASENAME=
 SKIPBUILD=
 SKIPRUN=
+MAXN=10
 
 #*** read in parameters from command line
 
-while getopts 'c:d:e:hi:q:r:sS' OPTION
+while getopts 'c:d:e:hi:n:q:r:sS' OPTION
 do
 case $OPTION  in
   c)
@@ -71,6 +73,9 @@ case $OPTION  in
   h)
    usage
    exit
+   ;;
+  n)
+   MAXN="$OPTARG"
    ;;
   q)
    QUEUE="$OPTARG"
@@ -93,6 +98,14 @@ ABORT=
 if [ ! -e $REVISONS  ]; then
   echo "***error: revision file, $REVISIONS, does not exist"
   ABORT=1
+else
+  NL=`cat $REVISIONS | wc -l`
+  if [ $NL -gt $MAXN ]; then
+    echo "***error: number of entries=$NL in $REVISIONS greater than $MAXN."
+    echo "          Either specify a larger number with -n or"
+    echo "          reduce the number of entries in $REVISIONS ."
+    ABORT=1
+  fi
 fi
 
 # make sure test directory exists
@@ -149,57 +162,58 @@ JOBPREFIX=BFDS_
 
 #*** build fds for each revision in commit file
 if [ "$SKIPBUILD" == "" ]; then
-cd $COMMITDIR
-git clean -dxf
-for commit in $COMMITS; do
+  cd $TESTDIR
+  git clean -dxf
+  for commit in $COMMITS; do
+    cd $FDSREPO
+    git checkout master >& /dev/null
+    COMMITDIR=$TESTDIR/${count}_$commit
+    mkdir $COMMITDIR
+    git checkout $commit >& /dev/null
+    cp -r $FDSREPO/Source $COMMITDIR/Source
+    cp -r $FDSREPO/Build  $COMMITDIR/Build
+    rm $COMMITDIR/Build/$MAKEENTRY/*.o
+    rm $COMMITDIR/Build/$MAKEENTRY/*.mod
+    rm $COMMITDIR/Build/$MAKEENTRY/fds*
+    cd $CURDIR
+    echo ""
+    DATE=`grep $commit $REVISIONS | awk -F';' '{print $3}'`
+    echo "building fds using $MAKEENTRY($commit/$DATE)"
+    ./qbuild.sh -j $JOBPREFIX${count}_$commit -d $COMMITDIR/Build/$MAKEENTRY
+    count=$((count+1))
+  done
   cd $FDSREPO
   git checkout master >& /dev/null
-  COMMITDIR=$TESTDIR/${count}_$commit
-  mkdir $COMMITDIR
-  git checkout $commit >& /dev/null
-  cp -r $FDSREPO/Source $COMMITDIR/Source
-  cp -r $FDSREPO/Build  $COMMITDIR/Build
-  rm $COMMITDIR/Build/$MAKEENTRY/*.o
-  rm $COMMITDIR/Build/$MAKEENTRY/*.mod
-  rm $COMMITDIR/Build/$MAKEENTRY/fds*
-  cd $CURDIR
-  echo ""
-  echo building fds using sequence_revision: ${count}_$commit, makefile entry:  $MAKEENTRY
-  ./qbuild.sh -j $JOBPREFIX${count}_$commit -d $COMMITDIR/Build/$MAKEENTRY
-  count=$((count+1))
-done
-cd $FDSREPO
-git checkout master >& /dev/null
-wait_build_end
-echo fdss have been built
+  wait_build_end
+  echo fdss have been built
 fi
 
 #run case for each fds that was built
 if [ "$SKIPRUN" == "" ]; then
-JOBPREFIX=RFDS_
-count=1
-for commit in $COMMITS; do
-  cd $CURDIR
-  ABORT=
-  COMMITDIR=$TESTDIR/${count}_$commit
-  FDSEXE=$COMMITDIR/Build/$MAKEENTRY/fds_$MAKEENTRY
-  if [ ! -d $COMMITDIR ]; then
-    echo "***error: $COMMITDIR does not exist"
-    ABORT=1
-  fi
-  if [ ! -e $FDSEXE ]; then
-    if [ -d $COMMITDIR ]; then
-      echo "***error: $FDSEXE does not exist"
+  JOBPREFIX=RFDS_
+  count=1
+  for commit in $COMMITS; do
+    cd $CURDIR
+    ABORT=
+    COMMITDIR=$TESTDIR/${count}_$commit
+    FDSEXE=$COMMITDIR/Build/$MAKEENTRY/fds_$MAKEENTRY
+    if [ ! -d $COMMITDIR ]; then
+      echo "***error: $COMMITDIR does not exist"
+      ABORT=1
     fi
-    ABORT=1
-  fi
-  if [ "$ABORT" == "" ]; then
-    cp $CASENAME $COMMITDIR/.
-    cd $COMMITDIR
-    qfds.sh -j $JOBPREFIX${count}_$commit -e $FDSEXE $CASENAME
-  fi
-  count=$((count+1))
-done
-wait_run_end
-echo $CASENAME cases have completed
+    if [ ! -e $FDSEXE ]; then
+      if [ -d $COMMITDIR ]; then
+        echo "***error: $FDSEXE does not exist"
+      fi
+      ABORT=1
+    fi
+    if [ "$ABORT" == "" ]; then
+      cp $CASENAME $COMMITDIR/.
+      cd $COMMITDIR
+      qfds.sh -j $JOBPREFIX${count}_$commit -e $FDSEXE $CASENAME
+    fi
+    count=$((count+1))
+  done
+  wait_run_end
+  echo $CASENAME cases have completed
 fi
