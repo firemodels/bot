@@ -21,7 +21,6 @@ for commit in $COMMITS; do
   git checkout master >& /dev/null
   COMMITDIR=$TESTDIR/${count}_$commit
   mkdir $COMMITDIR
-  count=$((count+1))
   cd $FDSREPO
   git checkout $commit >& /dev/null
   cp -r $FDSREPO/Source $COMMITDIR/Source
@@ -30,8 +29,10 @@ for commit in $COMMITS; do
   rm $COMMITDIR/Build/impi_intel_linux_64/*.mod
   rm $COMMITDIR/Build/impi_intel_linux_64/fds*
   cd $CURDIR
-  echo building fds using revision $commit
-  ./qbuild.sh -j fds$commit -d $COMMITDIR/Build/impi_intel_linux_64 > $CURDIR/script.xxx
+  echo building fds using revision ${count}_$commit
+  ./qbuild.sh -j fds_${count}_$commit -d $COMMITDIR/Build/impi_intel_linux_64 
+  count=$((count+1))
+  cd $FDSREPO
 done
 echo $FDSREPO
 git checkout master >& /dev/null
