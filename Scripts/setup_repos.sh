@@ -18,6 +18,7 @@ echo "-s - setup repos used by smokebot: "
 echo "    $smvrepos"
 echo "-S - setup repos used by smokebot (erase each repo first): "
 echo "    $smvrepos"
+echo "-t - append test to repo name, do not erase if repo exists"
 echo "-T - only setup fds and smv repos (erase each repo first)"
 echo "-w - setup wiki and webpage repos cloned from firemodels"
 exit
@@ -64,6 +65,7 @@ wikiwebrepos="fds.wiki fds-smv"
 repos=$fdsrepos
 eraserepos=
 FORCECLONE=
+APPENDTEST=
 
 FMROOT=
 WIKIWEB=
@@ -75,7 +77,7 @@ else
    exit
 fi
 
-while getopts 'abcCfFGhsSTw' OPTION
+while getopts 'abcCfFGhsStTw' OPTION
 do
 case $OPTION  in
   a)
@@ -106,7 +108,10 @@ case $OPTION  in
    ;;
   S)
    repos=$smvrepos;
-   eraserepos=1;
+   ;;
+  t)
+   APPENDTEST=_test
+   eraserepos=
    ;;
   T)
    repos=$fdssmvrepos;
@@ -118,6 +123,10 @@ case $OPTION  in
 esac
 done
 shift $(($OPTIND-1))
+
+if [ "$APPENDTEST" != "" ]; then
+  eraserepos=
+fi
 
 cd $FMROOT/bot
 GITHEADER=`git remote -v | grep origin | head -1 | awk  '{print $2}' | awk -F ':' '{print $1}'`
@@ -153,7 +162,7 @@ fi
 for repo in $repos
 do 
   echo
-  repo_out=$repo
+  repo_out=$repo$APPENDTEST
   WIKIWEB=
 
   cd $FMROOT
