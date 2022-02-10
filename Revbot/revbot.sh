@@ -119,7 +119,7 @@ fi
 
 ABORT=
 # make sure revision file exists
-if [ ! -e $REVISONS  ]; then
+if [ ! -e $REVISIONS  ]; then
   echo "***error: revision file, $REVISIONS, does not exist"
   ABORT=1
 else
