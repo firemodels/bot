@@ -83,7 +83,7 @@ cat << EOF > $scriptfile
 #SBATCH --ntasks=1
 #SBATCH --nodes=1
 # #SBATCH --exclusive
-#SBATCH --cpus-per-task=4
+#SBATCH --cpus-per-task=2
 #SBATCH --ntasks-per-node=1
 EOF
 if [ "$EMAIL" != "" ]; then

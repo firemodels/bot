@@ -154,7 +154,7 @@ fi
 ABORT=
 
 #make sure only db or dv is used with the -T option
-if [[ "$TYPE" != "dv" ]] && [[ "$TYPE" != "db" ]]; then
+if [[ "$TYPE" != "" ]] && [[ "$TYPE" != "dv" ]] && [[ "$TYPE" != "db" ]]; then
   echo "***error: dv or db not specified with the the -T option"
   TYPE=
   ABORT=1
