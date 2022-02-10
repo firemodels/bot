@@ -60,6 +60,12 @@ MAXN=10
 FORCECLONE=
 USEEXISTING=
 
+#define bot repo location
+BOTREPO=$CURDIR/../../bot
+cd $BOTREPO
+BOTREPO=`pwd`
+cd $CURDIR
+
 #*** read in parameters from command line
 
 while getopts 'c:d:e:fFhi:n:q:r:sS' OPTION
@@ -135,11 +141,24 @@ if [ ! -d $TESTDIR ]; then
   fi
 fi
 
-#define bot repo location
-BOTREPO=$CURDIR/../../bot
-cd $BOTREPO
-BOTREPO=`pwd`
-cd $CURDIR
+# if casename.fds is specified, make sure it exists
+if [ "$CASENAME" != "" ]; then
+  if [ ! -e $CASENAME ]; then
+    echo "***error: The fds casename, $CASENAME, does not exist"
+    ABORT=1
+  fi
+fi
+if [ "$SKIPRUN" == "" ]; then
+  if [ "$CASENAME" == "" ]; then
+    echo "***error: the fds casename file not specified."
+    ABORT=1
+  fi
+fi
+
+#abort script if any of the above tests failed
+if [ "$ABORT" != "" ]; then
+  exit
+fi
 
 # make sure test fds repo exists
 FDSREPO=$CURDIR/../../fds_test
@@ -166,7 +185,7 @@ else
 fi
 
 if [ ! -d $FDSREPO ]; then
-  echo "***error: The repo fds_test does not exists."
+  echo "***error: The repo $FDSREPO does not exist."
   ABORT=1
 fi
 
@@ -176,25 +195,10 @@ if [ ! -d $FDSREPO/Build/$MAKE ]; then
   ABORT=1
 fi
 
-# if casename.fds is specified, make sure it exists
-if [ "$CASENAME" != "" ]; then
-  if [ ! -e $CASENAME ]; then
-    echo "***error: The fds casename, $CASENAME, does not exist"
-    ABORT=1
-  fi
-fi
-if [ "$SKIPRUN" == "" ]; then
-  if [ "$CASENAME" == "" ]; then
-    echo "***error: the fds casename file not specified."
-    ABORT=1
-  fi
-fi
-
-
+#abort script if any of the above tests failed
 if [ "$ABORT" != "" ]; then
   exit
 fi
-
 
 cd $FDSREPO
 FDSREPO=`pwd`
