@@ -14,6 +14,11 @@ function usage {
   echo " -f   - force cloning of the fds_test repo"
   echo " -F   - use existing fds_test repo"
   echo " -e entry - makefile entry used to build fds [default: $MAKE]"
+if [ "$EMAIL" != "" ]; then
+  echo " -m email_address - send results to email_address [default: $EMAIL]"
+else
+  echo " -m email_address - send results to email_address"
+fi
   echo " -n n     - specify maximum number of fdss to build [default: $MAXN]"
   echo " -r revs - file containing revisions used to build fds [default: $REVISIONS]"
   echo " -h   - show this message"
@@ -64,10 +69,15 @@ USEEXISTING=
 BOTREPO=$CURDIR/../../bot
 cd $BOTREPO
 BOTREPO=`pwd`
+EMAIL=
+if [ "$REV_EMAIL" != "" ]; then
+  EMAIL=$REV_EMAIL
+fi
 
 OUTPUTDIR=$CURDIR/output
 TESTDIR=$CURDIR/TESTDIR
 SCRIPTDIR=$BOTREPO/Scripts
+SUMMARYFILE=$OUTPUTDIR/summary
 
 cd $OUTPUTDIR
 git clean -dxf >& /dev/null
@@ -81,7 +91,7 @@ cd $CURDIR
 
 #*** read in parameters from command line
 
-while getopts 'c:d:e:fFhi:n:q:r:sS' OPTION
+while getopts 'c:d:e:fFh:m:n:q:r:sS' OPTION
 do
 case $OPTION  in
   c)
@@ -102,6 +112,9 @@ case $OPTION  in
   h)
    usage
    exit
+   ;;
+  m)
+   EMAIL="$OPTARG"
    ;;
   n)
    MAXN="$OPTARG"
@@ -188,7 +201,7 @@ if [ -d $FDSREPO ]; then
       cd $CURDIR
       echo cloning fds into fds_test
       rm -rf $FDSREPO 
-      $SCRIPTDIR/setup_repos.sh -G -t -C >> $OUTPUTDIR/stage0
+      $SCRIPTDIR/setup_repos.sh -G -t -C >> $OUTPUTDIR/stage0 2>&1
     else
       echo "***error: The repo fds_test exists. Erase $FDSREPO"
       echo "          or use the -f option to force cloning"
@@ -199,7 +212,7 @@ if [ -d $FDSREPO ]; then
 else
   cd $CURDIR
   echo cloning fds into fds_test
-  $SCRIPTDIR/setup_repos.sh -G -t -C >> $OUTPUT/stage0
+  $SCRIPTDIR/setup_repos.sh -G -t -C >> $OUTPUT/stage0 2>&1
 fi
 
 if [ ! -d $FDSREPO ]; then
@@ -234,13 +247,13 @@ JOBPREFIX=BFDS_
 #*** build fds for each revision in commit file
 if [ "$SKIPBUILD" == "" ]; then
   cd $TESTDIR
-  git clean -dxf
+  git clean -dxf >& /dev/null
   for commit in $COMMITS; do
     cd $FDSREPO
-    git checkout master >> $OUTPUTDIR/stage1
+    git checkout master >> $OUTPUTDIR/stage1 2>&1
     COMMITDIR=$TESTDIR/${count}_$commit
     mkdir $COMMITDIR
-    git checkout $commit >> $OUTPUTDIR/stage1
+    git checkout $commit >> $OUTPUTDIR/stage1 2>&1
     cp -r $FDSREPO/Source $COMMITDIR/Source
     cp -r $FDSREPO/Build  $COMMITDIR/Build
     rm -f $COMMITDIR/Build/$MAKEENTRY/*.o
@@ -254,17 +267,20 @@ if [ "$SKIPBUILD" == "" ]; then
     count=$((count+1))
   done
   cd $FDSREPO
-  git checkout master >> $OUTPUTDIR/stage1
+  git checkout master >> $OUTPUTDIR/stage1 2>&1
   wait_build_end
 
   BADBUILD=
   count=1
+  compiles=0
   for commit in $COMMITS; do
     COMMITDIR=$TESTDIR/${count}_$commit
     FDSEXE=$COMMITDIR/Build/$MAKEENTRY/fds_$MAKEENTRY
     if [ ! -e $FDSEXE ]; then
       echo "***error: $FDSEXE does not exist"
       BADBUILD=1
+    else
+      compiles=$((compiles+1))
     fi
     count=$((count+1))
   done
@@ -272,6 +288,7 @@ if [ "$SKIPBUILD" == "" ]; then
     echo "all fdss were built successfully"
   fi
 fi
+total_compiles=$count
 
 #run case for each fds that was built
 if [ "$SKIPRUN" == "" ]; then
@@ -296,30 +313,46 @@ if [ "$SKIPRUN" == "" ]; then
       cp $CASENAME $COMMITDIR/.
       cd $COMMITDIR
       echo "running fds built using $MAKEENTRY($commit/$DATE)"
-      qfds.sh -j $JOBPREFIX${count}_$commit -e $FDSEXE $CASENAME >> $OUTPUTDIR/stage2
+      qfds.sh -j $JOBPREFIX${count}_$commit -e $FDSEXE $CASENAME >> $OUTPUTDIR/stage2 2>&1
     fi
     count=$((count+1))
   done
   wait_run_end
   BADRUN=
   count=1
+  runs=0
   for commit in $COMMITS; do
     COMMITDIR=$TESTDIR/${count}_$commit
     OUTFILE=$COMMITDIR/${CASE}.out
     IS_SUCCESS=0
-    if [ -e $OUTFILE]; then
+    if [ -e $OUTFILE ]; then
       IS_SUCCESS=`tail -1 $OUTFILE | grep successfully | wc -l`
     fi
     if [ $IS_SUCCESS -eq 0 ]; then
       BADRUN=1
-      echo "$COMMITDIR case failed tot finish"
+      echo "$COMMITDIR case failed to finish"
+    else
+      runs=$((runs+1))
     fi
     count=$((count+1))
   done
+  total_runs=$count
   if "$BADRUN" == "" ]; then
     echo "All $CASENAME cases finished successfully"
   fi
 fi
 stop_time=`date`
-echo "start time: $start_time " 
-echo " stop time: $stop_time "
+echo "start time: $start_time "  > $SUMMARYFILE
+echo " stop time: $stop_time "  >> $SUMMARYFILE
+if [ "$SKIPBUILD" != "" ]; then
+  echo "$compiles out of $total_compiles succeeded "  >> $SUMMARYFILE
+fi
+if [ "$SKIPRUN" != "" ]; then
+  echo "$runs out of $total_runs succeeded "  >> $SUMMARYFILE
+fi
+cat $SUMMARYFILE
+if [ "$EMAIL" != "" ]; then
+  cat $SUMMARYFILE | mail -s "revbot summary" $EMAIL
+fi
+fi
+
