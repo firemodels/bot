@@ -280,7 +280,8 @@ if [ "$SKIPBUILD" == "" ]; then
     COMMITDIR=$TESTDIR/${count}_$commit
     FDSEXE=$COMMITDIR/Build/$MAKEENTRY/fds_$MAKEENTRY
     if [ ! -e $FDSEXE ]; then
-      echo "***error: $FDSEXE does not exist" >> $OUTPUTDIR/stage1
+      echo "***error: $FDSEXE did not compile"
+      echo "***error: $FDSEXE did not compile" >> $OUTPUTDIR/stage1
       BADBUILD=1
     else
       compiles=$((compiles+1))
@@ -322,7 +323,7 @@ if [ "$SKIPRUN" == "" ]; then
       qfds.sh -j $JOBPREFIX${count}_$commit -e $FDSEXE $CASENAME >> $OUTPUTDIR/stage2 2>&1
     fi
   done
-a echo ""
+  echo ""
   wait_run_end
   BADRUN=
   count=0
