@@ -291,7 +291,7 @@ if [ "$SKIPBUILD" == "" ]; then
     rm -f $COMMITDIR/Build/$MAKEENTRY/fds*
     cd $CURDIR
     echo ""
-    DATE=`grep $commit $REVISIONS | awk -F';' '{print $3}'`
+    DATE=`grep $commit $CURDIR/$REVISIONS | awk -F';' '{print $3}'`
     echo "building fds using $MAKEENTRY($commit/$DATE)"
     if [ "$DEBUG" == "" ]; then
       $CURDIR/qbuild.sh -j $JOBPREFIX${count}_$commit -d $COMMITDIR/Build/$MAKEENTRY
@@ -353,7 +353,7 @@ if [ "$SKIPRUN" == "" ]; then
     if [ "$ABORT" == "" ]; then
       cp $CASENAME $COMMITDIR/.
       cd $COMMITDIR
-      DATE=`grep $commit $REVISIONS | awk -F';' '{print $3}'`
+      DATE=`grep $commit $CURDIR/$REVISIONS | awk -F';' '{print $3}'`
       echo "running fds built using $MAKEENTRY($commit/$DATE)"
       if [ "$DEBUG" == "" ]; then
         qfds.sh -j $JOBPREFIX${count}_$commit -e $FDSEXE $CASENAME >> $OUTPUTDIR/stage2 2>&1
