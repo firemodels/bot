@@ -48,11 +48,11 @@ wait_run_end()
       sleep 30
    done
 }
+start_time=`date`
 CURDIR=`pwd`
 QUEUE=batch
 REVISIONS=revisions.txt
 MAKEENTRY=impi_intel_linux_64
-TESTDIR=TESTDIR
 CASENAME=
 SKIPBUILD=
 SKIPRUN=
@@ -64,6 +64,19 @@ USEEXISTING=
 BOTREPO=$CURDIR/../../bot
 cd $BOTREPO
 BOTREPO=`pwd`
+
+OUTPUTDIR=$CURDIR/output
+TESTDIR=$CURDIR/TESTDIR
+SCRIPTDIR=$BOTREPO/Scripts
+
+cd $OUTPUTDIR
+git clean -dxf >& /dev/null
+cd $CURDIR
+
+echo "" > $OUTPUTDIR/stage0
+echo "" > $OUTPUTDIR/stage1
+echo "" > $OUTPUTDIR/stage2
+
 cd $CURDIR
 
 #*** read in parameters from command line
@@ -148,6 +161,11 @@ if [ "$CASENAME" != "" ]; then
     ABORT=1
   fi
 fi
+
+if [ "$CASENAME" != "" ]; then
+  CASE=${CASENAME%.*}
+fi
+
 if [ "$SKIPRUN" == "" ]; then
   if [ "$CASENAME" == "" ]; then
     echo "***error: the fds casename file not specified."
@@ -170,7 +188,7 @@ if [ -d $FDSREPO ]; then
       cd $CURDIR
       echo cloning fds into fds_test
       rm -rf $FDSREPO 
-      $BOTREPO/Scripts//setup_repos.sh -G -t -C >& /dev/null
+      $SCRIPTDIR/setup_repos.sh -G -t -C >> $OUTPUTDIR/stage0
     else
       echo "***error: The repo fds_test exists. Erase $FDSREPO"
       echo "          or use the -f option to force cloning"
@@ -181,7 +199,7 @@ if [ -d $FDSREPO ]; then
 else
   cd $CURDIR
   echo cloning fds into fds_test
-  $BOTREPO/Scripts/setup_repos.sh -G -t -C >& /dev/null
+  $SCRIPTDIR/setup_repos.sh -G -t -C >> $OUTPUT/stage0
 fi
 
 if [ ! -d $FDSREPO ]; then
@@ -190,8 +208,8 @@ if [ ! -d $FDSREPO ]; then
 fi
 
 # make sure makefile entry exists
-if [ ! -d $FDSREPO/Build/$MAKE ]; then
-  echo "***error: The makefile entry $MAKE does not existt"
+if [ ! -d $FDSREPO/Build/$MAKEENTRY ]; then
+  echo "***error: The makefile entry $MAKEENTRY does not existt"
   ABORT=1
 fi
 
@@ -219,10 +237,10 @@ if [ "$SKIPBUILD" == "" ]; then
   git clean -dxf
   for commit in $COMMITS; do
     cd $FDSREPO
-    git checkout master >& /dev/null
+    git checkout master >> $OUTPUTDIR/stage1
     COMMITDIR=$TESTDIR/${count}_$commit
     mkdir $COMMITDIR
-    git checkout $commit >& /dev/null
+    git checkout $commit >> $OUTPUTDIR/stage1
     cp -r $FDSREPO/Source $COMMITDIR/Source
     cp -r $FDSREPO/Build  $COMMITDIR/Build
     rm -f $COMMITDIR/Build/$MAKEENTRY/*.o
@@ -236,9 +254,23 @@ if [ "$SKIPBUILD" == "" ]; then
     count=$((count+1))
   done
   cd $FDSREPO
-  git checkout master >& /dev/null
+  git checkout master >> $OUTPUTDIR/stage1
   wait_build_end
-  echo fdss have been built
+
+  BADBUILD=
+  count=1
+  for commit in $COMMITS; do
+    COMMITDIR=$TESTDIR/${count}_$commit
+    FDSEXE=$COMMITDIR/Build/$MAKEENTRY/fds_$MAKEENTRY
+    if [ ! -e $FDSEXE ]; then
+      echo "***error: $FDSEXE does not exist"
+      BADBUILD=1
+    fi
+    count=$((count+1))
+  done
+  if [ "$BADBUILD" == "1" ]; then
+    echo "all fdss were built successfully"
+  fi
 fi
 
 #run case for each fds that was built
@@ -263,10 +295,31 @@ if [ "$SKIPRUN" == "" ]; then
     if [ "$ABORT" == "" ]; then
       cp $CASENAME $COMMITDIR/.
       cd $COMMITDIR
-      qfds.sh -j $JOBPREFIX${count}_$commit -e $FDSEXE $CASENAME
+      echo "running fds built using $MAKEENTRY($commit/$DATE)"
+      qfds.sh -j $JOBPREFIX${count}_$commit -e $FDSEXE $CASENAME >> $OUTPUTDIR/stage2
     fi
     count=$((count+1))
   done
   wait_run_end
-  echo $CASENAME cases have completed
+  BADRUN=
+  count=1
+  for commit in $COMMITS; do
+    COMMITDIR=$TESTDIR/${count}_$commit
+    OUTFILE=$COMMITDIR/${CASE}.out
+    IS_SUCCESS=0
+    if [ -e $OUTFILE]; then
+      IS_SUCCESS=`tail -1 $OUTFILE | grep successfully | wc -l`
+    fi
+    if [ $IS_SUCCESS -eq 0 ]; then
+      BADRUN=1
+      echo "$COMMITDIR case failed tot finish"
+    fi
+    count=$((count+1))
+  done
+  if "$BADRUN" == "" ]; then
+    echo "All $CASENAME cases finished successfully"
+  fi
 fi
+stop_time=`date`
+echo "start time: $start_time " 
+echo " stop time: $stop_time "
