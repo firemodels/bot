@@ -319,6 +319,7 @@ if [ "$SKIPRUN" == "" ]; then
     if [ "$ABORT" == "" ]; then
       cp $CASENAME $COMMITDIR/.
       cd $COMMITDIR
+      DATE=`grep $commit $REVISIONS | awk -F';' '{print $3}'`
       echo "running fds built using $MAKEENTRY($commit/$DATE)"
       qfds.sh -j $JOBPREFIX${count}_$commit -e $FDSEXE $CASENAME >> $OUTPUTDIR/stage2 2>&1
     fi
@@ -350,7 +351,7 @@ if [ "$SKIPRUN" == "" ]; then
 fi
 stop_time=`date`
 echo "start time: $start_time "  > $SUMMARYFILE
-echo "build time: $build_time "  > $SUMMARYFILE
+echo "build time: $build_time " >> $SUMMARYFILE
 echo " stop time: $stop_time "  >> $SUMMARYFILE
 if [ "$SKIPBUILD" == "" ]; then
   echo "$compiles out of $total_compiles compiles succeeded "  >> $SUMMARYFILE
