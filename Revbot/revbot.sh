@@ -64,11 +64,13 @@ SKIPRUN=
 MAXN=10
 FORCECLONE=
 USEEXISTING=
+DEBUG=
 
 #define bot repo location
 BOTREPO=$CURDIR/../../bot
 cd $BOTREPO
 BOTREPO=`pwd`
+
 EMAIL=
 if [ "$REV_MAILTO" != "" ]; then
   EMAIL=$REV_MAILTO
@@ -91,7 +93,7 @@ cd $CURDIR
 
 #*** read in parameters from command line
 
-while getopts 'c:d:e:fFhm:n:q:r:sS' OPTION
+while getopts 'c:d:De:fFhm:n:q:r:sS' OPTION
 do
 case $OPTION  in
   c)
@@ -99,6 +101,9 @@ case $OPTION  in
    ;;
   d)
    TESTDIR="$OPTARG"
+   ;;
+  D)
+   DEBUG=1
    ;;
   e)
    MAKEENTRY="$OPTARG"
@@ -193,6 +198,7 @@ fi
 
 # make sure test fds repo exists
 FDSREPO=$CURDIR/../../fds_test
+
 if [ -d $FDSREPO ]; then
   cd $FDSREPO
   FDSREPO=`pwd`
@@ -201,7 +207,9 @@ if [ -d $FDSREPO ]; then
       cd $CURDIR
       echo cloning fds into fds_test
       rm -rf $FDSREPO 
-      $SCRIPTDIR/setup_repos.sh -G -t -C >> $OUTPUTDIR/stage0 2>&1
+      cd $SCRIPTDIR
+      ./setup_repos.sh -G -t -C >> $OUTPUTDIR/stage0 2>&1
+      cd $CURDIR
     else
       echo "***error: The repo fds_test exists. Erase $FDSREPO"
       echo "          or use the -f option to force cloning"
@@ -210,9 +218,10 @@ if [ -d $FDSREPO ]; then
     fi
   fi 
 else
-  cd $CURDIR
+  cd $SCRIPTDIR
   echo cloning fds into fds_test
-  $SCRIPTDIR/setup_repos.sh -G -t -C >> $OUTPUT/stage0 2>&1
+  ./setup_repos.sh -G -t -C >> $OUTPUTDIR/stage0 2>&1
+  cd $CURDIR
 fi
 
 if [ ! -d $FDSREPO ]; then
@@ -251,10 +260,13 @@ if [ "$SKIPBUILD" == "" ]; then
   for commit in $COMMITS; do
     count=$((count+1))
     cd $FDSREPO
-    git checkout master >> $OUTPUTDIR/stage1 2>&1
+    git checkout master  >> $OUTPUTDIR/stage1 2>&1
+    git checkout $commit >> $OUTPUTDIR/stage1 2>&1
+    echo " --------------------------------------------------------------" >> $OUTPUTDIR/stage1
+    echo " --------------- checking out $commit -------------------------" >> $OUTPUTDIR/stage1
+    echo " --------------------------------------------------------------" >> $OUTPUTDIR/stage1
     COMMITDIR=$TESTDIR/${count}_$commit
     mkdir $COMMITDIR
-    git checkout $commit >> $OUTPUTDIR/stage1 2>&1
     cp -r $FDSREPO/Source $COMMITDIR/Source
     cp -r $FDSREPO/Build  $COMMITDIR/Build
     rm -f $COMMITDIR/Build/$MAKEENTRY/*.o
@@ -264,9 +276,14 @@ if [ "$SKIPBUILD" == "" ]; then
     echo ""
     DATE=`grep $commit $REVISIONS | awk -F';' '{print $3}'`
     echo "building fds using $MAKEENTRY($commit/$DATE)"
-    $CURDIR/qbuild.sh -j $JOBPREFIX${count}_$commit -d $COMMITDIR/Build/$MAKEENTRY
+    if [ "$DEBUG" == "" ]; then
+      $CURDIR/qbuild.sh -j $JOBPREFIX${count}_$commit -d $COMMITDIR/Build/$MAKEENTRY
+    fi
   done
   cd $FDSREPO
+  echo " --------------------------------------------------------------" >> $OUTPUTDIR/stage1
+  echo " --------------- checking out master  -------------------------" >> $OUTPUTDIR/stage1
+  echo " --------------------------------------------------------------" >> $OUTPUTDIR/stage1
   git checkout master >> $OUTPUTDIR/stage1 2>&1
   echo ""
   wait_build_end
@@ -321,7 +338,9 @@ if [ "$SKIPRUN" == "" ]; then
       cd $COMMITDIR
       DATE=`grep $commit $REVISIONS | awk -F';' '{print $3}'`
       echo "running fds built using $MAKEENTRY($commit/$DATE)"
-      qfds.sh -j $JOBPREFIX${count}_$commit -e $FDSEXE $CASENAME >> $OUTPUTDIR/stage2 2>&1
+      if [ "$DEBUG" == "" ]; then
+        qfds.sh -j $JOBPREFIX${count}_$commit -e $FDSEXE $CASENAME >> $OUTPUTDIR/stage2 2>&1
+      fi
     fi
   done
   echo ""
