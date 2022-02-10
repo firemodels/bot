@@ -70,8 +70,8 @@ BOTREPO=$CURDIR/../../bot
 cd $BOTREPO
 BOTREPO=`pwd`
 EMAIL=
-if [ "$REV_EMAIL" != "" ]; then
-  EMAIL=$REV_EMAIL
+if [ "$REV_MAILTO" != "" ]; then
+  EMAIL=$REV_MAILTO
 fi
 
 OUTPUTDIR=$CURDIR/output
@@ -91,7 +91,7 @@ cd $CURDIR
 
 #*** read in parameters from command line
 
-while getopts 'c:d:e:fFh:m:n:q:r:sS' OPTION
+while getopts 'c:d:e:fFhm:n:q:r:sS' OPTION
 do
 case $OPTION  in
   c)
@@ -241,7 +241,7 @@ TESTDIR=`pwd`
 # generate list of commits
 cd $CURDIR
 COMMITS=`cat $REVISIONS | awk -F';' '{print $1}'`
-count=1
+count=0
 JOBPREFIX=BFDS_
 
 #*** build fds for each revision in commit file
@@ -249,6 +249,7 @@ if [ "$SKIPBUILD" == "" ]; then
   cd $TESTDIR
   git clean -dxf >& /dev/null
   for commit in $COMMITS; do
+    count=$((count+1))
     cd $FDSREPO
     git checkout master >> $OUTPUTDIR/stage1 2>&1
     COMMITDIR=$TESTDIR/${count}_$commit
@@ -264,27 +265,26 @@ if [ "$SKIPBUILD" == "" ]; then
     DATE=`grep $commit $REVISIONS | awk -F';' '{print $3}'`
     echo "building fds using $MAKEENTRY($commit/$DATE)"
     $CURDIR/qbuild.sh -j $JOBPREFIX${count}_$commit -d $COMMITDIR/Build/$MAKEENTRY
-    count=$((count+1))
   done
   cd $FDSREPO
   git checkout master >> $OUTPUTDIR/stage1 2>&1
   wait_build_end
 
   BADBUILD=
-  count=1
+  count=0
   compiles=0
   for commit in $COMMITS; do
+    count=$((count+1))
     COMMITDIR=$TESTDIR/${count}_$commit
     FDSEXE=$COMMITDIR/Build/$MAKEENTRY/fds_$MAKEENTRY
     if [ ! -e $FDSEXE ]; then
-      echo "***error: $FDSEXE does not exist"
+      echo "***error: $FDSEXE does not exist" >> $OUTPUTDIR/stage1
       BADBUILD=1
     else
       compiles=$((compiles+1))
     fi
-    count=$((count+1))
   done
-  if [ "$BADBUILD" == "1" ]; then
+  if [ "$BADBUILD" == "" ]; then
     echo "all fdss were built successfully"
   fi
 fi
@@ -292,20 +292,24 @@ total_compiles=$count
 
 #run case for each fds that was built
 if [ "$SKIPRUN" == "" ]; then
+  echo ""
   JOBPREFIX=RFDS_
-  count=1
+  count=0
   for commit in $COMMITS; do
+    count=$((count+1))
     cd $CURDIR
     ABORT=
     COMMITDIR=$TESTDIR/${count}_$commit
     FDSEXE=$COMMITDIR/Build/$MAKEENTRY/fds_$MAKEENTRY
     if [ ! -d $COMMITDIR ]; then
       echo "***error: $COMMITDIR does not exist"
+      echo "***error: $COMMITDIR does not exist" >> $OUTPUTDIR/stage2
       ABORT=1
     fi
     if [ ! -e $FDSEXE ]; then
       if [ -d $COMMITDIR ]; then
         echo "***error: $FDSEXE does not exist"
+        echo "***error: $FDSEXE does not exist" >> $OUTPUTDIR/stage2
       fi
       ABORT=1
     fi
@@ -315,13 +319,13 @@ if [ "$SKIPRUN" == "" ]; then
       echo "running fds built using $MAKEENTRY($commit/$DATE)"
       qfds.sh -j $JOBPREFIX${count}_$commit -e $FDSEXE $CASENAME >> $OUTPUTDIR/stage2 2>&1
     fi
-    count=$((count+1))
   done
   wait_run_end
   BADRUN=
-  count=1
+  count=0
   runs=0
   for commit in $COMMITS; do
+    count=$((count+1))
     COMMITDIR=$TESTDIR/${count}_$commit
     OUTFILE=$COMMITDIR/${CASE}.out
     IS_SUCCESS=0
@@ -330,29 +334,30 @@ if [ "$SKIPRUN" == "" ]; then
     fi
     if [ $IS_SUCCESS -eq 0 ]; then
       BADRUN=1
-      echo "$COMMITDIR case failed to finish"
+      echo "The case in $COMMITDIR failed to finish"
     else
       runs=$((runs+1))
     fi
-    count=$((count+1))
   done
   total_runs=$count
-  if "$BADRUN" == "" ]; then
+  if [ "$BADRUN" == "" ]; then
     echo "All $CASENAME cases finished successfully"
   fi
 fi
 stop_time=`date`
 echo "start time: $start_time "  > $SUMMARYFILE
 echo " stop time: $stop_time "  >> $SUMMARYFILE
-if [ "$SKIPBUILD" != "" ]; then
-  echo "$compiles out of $total_compiles succeeded "  >> $SUMMARYFILE
+if [ "$SKIPBUILD" == "" ]; then
+  echo "$compiles out of $total_compiles compiles succeeded "  >> $SUMMARYFILE
 fi
-if [ "$SKIPRUN" != "" ]; then
-  echo "$runs out of $total_runs succeeded "  >> $SUMMARYFILE
+if [ "$SKIPRUN" == "" ]; then
+  echo "$runs out of $total_runs runs succeeded "  >> $SUMMARYFILE
 fi
+echo "" >> $SUMMARYFILE
+grep error $OUTPUTDIR/stage0 >> $SUMMARYFILE
+grep error $OUTPUTDIR/stage1 >> $SUMMARYFILE
+grep error $OUTPUTDIR/stage2 >> $SUMMARYFILE
 cat $SUMMARYFILE
 if [ "$EMAIL" != "" ]; then
   cat $SUMMARYFILE | mail -s "revbot summary" $EMAIL
 fi
-fi
-
