@@ -13,7 +13,6 @@ function usage {
 #  echo " -d dir - root directory where fdss are built [default: $CURDIR/TESTDIR]"
   echo " -f   - force cloning of the fds_test repo"
   echo " -F   - use existing fds_test repo"
-  echo " -e entry - makefile entry used to build fds [default: $MAKE]"
 if [ "$EMAIL" != "" ]; then
   echo " -m email_address - send results to email_address [default: $EMAIL]"
 else
@@ -25,6 +24,9 @@ fi
   echo " -q q - name of queue used to build fdss. [default: $QUEUE]"
   echo " -s   - skip build step"
   echo " -S   - skip run cases step"
+  echo " -T type - build fds using dv (development) or db (debug) makefile entries."
+  echo "           If -T is not specified then fds is built using the release entry."
+ 
   exit
 }
 
@@ -65,6 +67,7 @@ MAXN=10
 FORCECLONE=
 USEEXISTING=
 DEBUG=
+TYPE=
 
 #define bot repo location
 BOTREPO=$CURDIR/../../bot
@@ -93,7 +96,7 @@ cd $CURDIR
 
 #*** read in parameters from command line
 
-while getopts 'c:d:De:fFhm:n:q:r:sS' OPTION
+while getopts 'c:d:DfFhm:n:q:r:sST:' OPTION
 do
 case $OPTION  in
   c)
@@ -104,9 +107,6 @@ case $OPTION  in
    ;;
   D)
    DEBUG=1
-   ;;
-  e)
-   MAKEENTRY="$OPTARG"
    ;;
   f)
    FORCECLONE=1
@@ -136,6 +136,9 @@ case $OPTION  in
   S)
    SKIPRUN=1
    ;;
+  T)
+   TYPE="$OPTARG"
+   ;;
 esac
 done
 shift $(($OPTIND-1))
@@ -149,6 +152,20 @@ if [ "$USEEXISTING" == "1" ]; then
 fi
 
 ABORT=
+
+#make sure only db or dv is used with the -T option
+if [[ "$TYPE" != "dv" ]] && [[ "$TYPE" != "db" ]]; then
+  echo "***error: dv or db not specified with the the -T option"
+  TYPE=
+  ABORT=1
+fi
+if [ "$TYPE" == "dv" ]; then
+  MAKEENTRY=impi_intel_linux_64_dv
+fi
+if [ "$TYPE" == "db" ]; then
+  MAKEENTRY=impi_intel_linux_64_db
+fi
+
 # make sure revision file exists
 if [ ! -e $REVISIONS  ]; then
   echo "***error: revision file, $REVISIONS, does not exist"
