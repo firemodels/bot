@@ -5,9 +5,9 @@
 #---------------------------------------------
 
 function usage {
-  echo "Usage: makefdss.sh [-d dir ][-q queue]"
+  echo "Usage: revbot.sh [-d dir ][-q queue]"
   echo ""
-  echo "qbuild.sh builds FDS"
+  echo "revbot"
   echo ""
   echo " -c casename.fds - path of fds case to run"
 #  echo " -d dir - root directory where fdss are built [default: $CURDIR/TESTDIR]"
@@ -135,8 +135,13 @@ if [ ! -d $TESTDIR ]; then
   fi
 fi
 
+#define bot repo location
+BOTREPO=$CURDIR/../../bot
+cd $BOTREPO
+BOTREPO=`pwd`
+cd $CURDIR
 
-# make sure fds repo exists
+# make sure test fds repo exists
 FDSREPO=$CURDIR/../../fds_test
 if [ -d $FDSREPO ]; then
   cd $FDSREPO
@@ -146,7 +151,7 @@ if [ -d $FDSREPO ]; then
       cd $CURDIR
       echo cloning fds into fds_test
       rm -rf $FDSREPO 
-      ./setup_repos.sh -G -t -C >& /dev/null
+      $BOTREPO/Scripts//setup_repos.sh -G -t -C >& /dev/null
     else
       echo "***error: The repo fds_test exists. Erase $FDSREPO"
       echo "          or use the -f option to force cloning"
@@ -157,16 +162,13 @@ if [ -d $FDSREPO ]; then
 else
   cd $CURDIR
   echo cloning fds into fds_test
-  ./setup_repos.sh -G -t -C >& /dev/null
+  $BOTREPO/Scripts/setup_repos.sh -G -t -C >& /dev/null
 fi
 
-cd $FDSREPO
-FDSREPO=`pwd`
 if [ ! -d $FDSREPO ]; then
   echo "***error: The repo fds_test does not exists."
   ABORT=1
 fi
-cd $CURDIR
 
 # make sure makefile entry exists
 if [ ! -d $FDSREPO/Build/$MAKE ]; then
@@ -193,7 +195,11 @@ if [ "$ABORT" != "" ]; then
   exit
 fi
 
-# clean directory where fdss are built
+
+cd $FDSREPO
+FDSREPO=`pwd`
+
+cd $CURDIR
 cd $TESTDIR
 TESTDIR=`pwd`
 
@@ -222,7 +228,7 @@ if [ "$SKIPBUILD" == "" ]; then
     echo ""
     DATE=`grep $commit $REVISIONS | awk -F';' '{print $3}'`
     echo "building fds using $MAKEENTRY($commit/$DATE)"
-    ./qbuild.sh -j $JOBPREFIX${count}_$commit -d $COMMITDIR/Build/$MAKEENTRY
+    $CURDIR/qbuild.sh -j $JOBPREFIX${count}_$commit -d $COMMITDIR/Build/$MAKEENTRY
     count=$((count+1))
   done
   cd $FDSREPO
