@@ -10,7 +10,7 @@ function usage {
   echo "revbot"
   echo ""
   echo " -c casename.fds - path of fds case to run"
-#  echo " -d dir - root directory where fdss are built [default: $CURDIR/TESTDIR]"
+  echo " -d dir - root directory where fdss are built [default: $TESTDIR]"
   echo " -f   - force cloning of the fds_test repo"
   echo " -F   - use existing fds_test repo"
 if [ "$EMAIL" != "" ]; then
@@ -18,14 +18,16 @@ if [ "$EMAIL" != "" ]; then
 else
   echo " -m email_address - send results to email_address"
 fi
-  echo " -n n     - specify maximum number of fdss to build [default: $MAXN]"
-  echo " -r revs - file containing revisions used to build fds [default: $REVISIONS]"
+  echo " -N n - specify maximum number of fdss to build [default: $MAXN]"
+  echo " -n n - number of MPI processes per node used when running cases [default: 1]"
+  echo " -p p - number of MPI processes used when runnng cases [default: 1] "
+  echo " -r revfile - file containing revisions used to build fds [default: $REVISIONS]"
   echo " -h   - show this message"
-  echo " -q q - name of queue used to build fdss. [default: $QUEUE]"
+  echo " -q q - name of queue used to build fdss. [default: batch]"
   echo " -s   - skip build step"
   echo " -S   - skip run cases step"
   echo " -T type - build fds using dv (development) or db (debug) makefile entries."
-  echo "           If -T is not specified then fds is built using the release entry."
+  echo "           If -T is not specified then fds is built using the release makefile entry."
  
   exit
 }
@@ -57,7 +59,7 @@ wait_run_end()
 }
 start_time=`date`
 CURDIR=`pwd`
-QUEUE=batch
+qopt=
 REVISIONS=revisions.txt
 MAKEENTRY=impi_intel_linux_64
 CASENAME=
@@ -68,6 +70,8 @@ FORCECLONE=
 USEEXISTING=
 DEBUG=
 TYPE=
+popt=
+nopt=
 
 #define bot repo location
 BOTREPO=$CURDIR/../../bot
@@ -96,7 +100,7 @@ cd $CURDIR
 
 #*** read in parameters from command line
 
-while getopts 'c:d:DfFhm:n:q:r:sST:' OPTION
+while getopts 'c:d:DfFhm:n:N:q:r:sST:' OPTION
 do
 case $OPTION  in
   c)
@@ -121,11 +125,17 @@ case $OPTION  in
   m)
    EMAIL="$OPTARG"
    ;;
+  p)
+   popt="-p $OPTARG"
+   ;;
   n)
+   nopt="-n $OPTARG"
+   ;;
+  N)
    MAXN="$OPTARG"
    ;;
   q)
-   QUEUE="$OPTARG"
+   qopt="-q $OPTARG"
    ;;
   r)
    REVISIONS="$OPTARG"
@@ -356,7 +366,7 @@ if [ "$SKIPRUN" == "" ]; then
       DATE=`grep $commit $CURDIR/$REVISIONS | awk -F';' '{print $3}'`
       echo "running fds built using $MAKEENTRY($commit/$DATE)"
       if [ "$DEBUG" == "" ]; then
-        qfds.sh -j $JOBPREFIX${count}_$commit -e $FDSEXE $CASENAME >> $OUTPUTDIR/stage2 2>&1
+        qfds.sh -j $JOBPREFIX${count}_$commit -e $FDSEXE $CASENAME $popt $nopt $qopt >> $OUTPUTDIR/stage2 2>&1
       fi
     fi
   done
