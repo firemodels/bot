@@ -268,7 +268,9 @@ if [ "$SKIPBUILD" == "" ]; then
   done
   cd $FDSREPO
   git checkout master >> $OUTPUTDIR/stage1 2>&1
+  echo ""
   wait_build_end
+  build_time=`date`
 
   BADBUILD=
   count=0
@@ -320,6 +322,7 @@ if [ "$SKIPRUN" == "" ]; then
       qfds.sh -j $JOBPREFIX${count}_$commit -e $FDSEXE $CASENAME >> $OUTPUTDIR/stage2 2>&1
     fi
   done
+a echo ""
   wait_run_end
   BADRUN=
   count=0
@@ -346,6 +349,7 @@ if [ "$SKIPRUN" == "" ]; then
 fi
 stop_time=`date`
 echo "start time: $start_time "  > $SUMMARYFILE
+echo "build time: $build_time "  > $SUMMARYFILE
 echo " stop time: $stop_time "  >> $SUMMARYFILE
 if [ "$SKIPBUILD" == "" ]; then
   echo "$compiles out of $total_compiles compiles succeeded "  >> $SUMMARYFILE
@@ -357,6 +361,7 @@ echo "" >> $SUMMARYFILE
 grep error $OUTPUTDIR/stage0 >> $SUMMARYFILE
 grep error $OUTPUTDIR/stage1 >> $SUMMARYFILE
 grep error $OUTPUTDIR/stage2 >> $SUMMARYFILE
+echo ""
 cat $SUMMARYFILE
 if [ "$EMAIL" != "" ]; then
   cat $SUMMARYFILE | mail -s "revbot summary" $EMAIL
