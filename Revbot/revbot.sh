@@ -5,11 +5,13 @@
 #---------------------------------------------
 
 function usage {
-  echo "Usage: revbot.sh [-d dir ][-q queue]"
+  echo "Usage: revbot.sh [opitons] [casename.fds]"
+  echo "       revbot.sh builds fdss for each revision found in a revision file."
+  echo "       Then runs the casename case for each fds. If casename was not specified"
+  echo "       then only the fdss are built"
   echo ""
-  echo "revbot"
+  echo "Options:"
   echo ""
-  echo " -c casename.fds - path of fds case to run"
   echo " -d dir - root directory where fdss are built [default: $TESTDIR]"
   echo " -f   - force cloning of the fds_test repo"
   echo " -F   - use existing fds_test repo"
@@ -22,10 +24,10 @@ fi
   echo " -n n - number of MPI processes per node used when running cases [default: 1]"
   echo " -p p - number of MPI processes used when runnng cases [default: 1] "
   echo " -r revfile - file containing revisions used to build fds [default: $REVISIONS]"
+  echo "              The revfile is built by the get_revisions.sh script"
   echo " -h   - show this message"
   echo " -q q - name of queue used to build fdss. [default: batch]"
   echo " -s   - skip build step"
-  echo " -S   - skip run cases step"
   echo " -T type - build fds using dv (development) or db (debug) makefile entries."
   echo "           If -T is not specified then fds is built using the release makefile entry."
  
@@ -100,12 +102,9 @@ cd $CURDIR
 
 #*** read in parameters from command line
 
-while getopts 'c:d:DfFhm:n:N:q:r:sST:' OPTION
+while getopts 'd:DfFhm:n:N:p:q:r:sT:' OPTION
 do
 case $OPTION  in
-  c)
-   CASENAME="$OPTARG"
-   ;;
   d)
    TESTDIR="$OPTARG"
    ;;
@@ -125,14 +124,14 @@ case $OPTION  in
   m)
    EMAIL="$OPTARG"
    ;;
-  p)
-   popt="-p $OPTARG"
-   ;;
   n)
    nopt="-n $OPTARG"
    ;;
   N)
    MAXN="$OPTARG"
+   ;;
+  p)
+   popt="-p $OPTARG"
    ;;
   q)
    qopt="-q $OPTARG"
@@ -143,15 +142,17 @@ case $OPTION  in
   s)
    SKIPBUILD=1
    ;;
-  S)
-   SKIPRUN=1
-   ;;
   T)
    TYPE="$OPTARG"
    ;;
 esac
 done
 shift $(($OPTIND-1))
+
+CASENAME=$1
+if [ "$CASENAME" == "" ]; then
+  SKIPRUN=1
+fi
 
 if [ "$USEEXISTING" == "1" ]; then
   if [ "$FORCECLONE" == "1" ]; then
@@ -202,20 +203,14 @@ fi
 # if casename.fds is specified, make sure it exists
 if [ "$CASENAME" != "" ]; then
   if [ ! -e $CASENAME ]; then
-    echo "***error: The fds casename, $CASENAME, does not exist"
+    echo "***error: The fds input file, $CASENAME, does not exist"
     ABORT=1
   fi
 fi
 
 if [ "$CASENAME" != "" ]; then
   CASE=${CASENAME%.*}
-fi
-
-if [ "$SKIPRUN" == "" ]; then
-  if [ "$CASENAME" == "" ]; then
-    echo "***error: the fds casename file not specified."
-    ABORT=1
-  fi
+  BASECASENAME=`basename $CASENAME`
 fi
 
 #abort script if any of the above tests failed
@@ -304,7 +299,9 @@ if [ "$SKIPBUILD" == "" ]; then
     DATE=`grep $commit $CURDIR/$REVISIONS | awk -F';' '{print $3}'`
     echo "building fds using $MAKEENTRY($commit/$DATE)"
     if [ "$DEBUG" == "" ]; then
-      $CURDIR/qbuild.sh -j $JOBPREFIX${count}_$commit -d $COMMITDIR/Build/$MAKEENTRY
+      $CURDIR/qbuild.sh -j $JOBPREFIX${count}_$commit -d $COMMITDIR/Build/$MAKEENTRY $qopt
+    else
+      echo "$CURDIR/qbuild.sh -j $JOBPREFIX${count}_$commit -d $COMMITDIR/Build/$MAKEENTRY $qopt"
     fi
   done
   cd $FDSREPO
@@ -366,7 +363,9 @@ if [ "$SKIPRUN" == "" ]; then
       DATE=`grep $commit $CURDIR/$REVISIONS | awk -F';' '{print $3}'`
       echo "running fds built using $MAKEENTRY($commit/$DATE)"
       if [ "$DEBUG" == "" ]; then
-        qfds.sh -j $JOBPREFIX${count}_$commit -e $FDSEXE $CASENAME $popt $nopt $qopt >> $OUTPUTDIR/stage2 2>&1
+        qfds.sh -j $JOBPREFIX${count}_$commit -e $FDSEXE $BASECASENAME $popt $nopt $qopt >> $OUTPUTDIR/stage2 2>&1
+      else
+        echo "qfds.sh -j $JOBPREFIX${count}_$commit -e $FDSEXE $BASECASENAME $popt $nopt $qopt"
       fi
     fi
   done
