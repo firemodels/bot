@@ -1,16 +1,16 @@
-#!/bin/bash
+v!/bin/bash
 
 #---------------------------------------------
 #                   usage
 #---------------------------------------------
 
 function usage {
-  echo "Usage: rfds.sh [options] [casename.fds]"
-  echo "       rfds.sh builds fds for a set of revisions found in a revision file."
+  echo "Usage: revbot.sh [options] [casename.fds]"
+  echo "       revbot.sh builds fds for a set of revisions found in a revision file."
   echo "       It then runs casename.fds for each fds that was built. If casename.fds"
   echo "       was not specified then only the fdss are built. The revision file"
   echo "       is generated using the script get_revisions.sh.  git checkout revisions"
-  echo "       are performed on a copy of the fds repo cloned by this script.  So rfds.sh"
+  echo "       are performed on a copy of the fds repo cloned by this script.  So revbot.sh"
   echo "       will not effect the fds repo you normally work with."
   echo ""
   echo "Options:"
@@ -414,5 +414,5 @@ grep error $OUTPUTDIR/stage2 >> $SUMMARYFILE
 echo ""
 cat $SUMMARYFILE
 if [ "$EMAIL" != "" ]; then
-  cat $SUMMARYFILE | mail -s "`hostname -s`: rfds summary" $EMAIL
+  cat $SUMMARYFILE | mail -s "`hostname -s`: revbot summary" $EMAIL
 fi
