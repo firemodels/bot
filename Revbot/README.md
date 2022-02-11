@@ -67,3 +67,9 @@ Run 25 versions of fds on ```casename.fds`` using the revisions in ```revisions.
 
 ```./revbot.sh -N 25 -p 8 casename.fds```
  
+ Generate a list of 20 revisions commited in October of 2021.  
+``` ./get_revisions.sh  -a 1-Oct-2021 -b 31-Oct-2021 -n 20 ```
+
+Assume the fds repo was previously cloned by ```revbot.sh``` , use -F to reuse this repo. Use -T dv to run ```casename.fds``` using the dv version of fds
+(build using the impi_intel_linux_64_dv makefile entry)
+```./revbot -F -N 20 -T dv casename.fds```
