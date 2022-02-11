@@ -1,4 +1,4 @@
-# Revbot: Script for testing fds by building and running it for many repo revisons
+# Revbot: Scripts for testing fds by building and running it for many repo revisons
 
 ## revbot.sh 
 
