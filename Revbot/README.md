@@ -1,6 +1,8 @@
-# Revbot: A script for testing fds by running it for using many fds repo revisons
+# Revbot: A script for testing fds by building and running it for many repo revisons
 
-### revbot.sh usage
+## revbot.sh 
+
+### Usage
 
 revbot.sh [options] [casename.fds]
 
@@ -11,7 +13,7 @@ is generated using the script get_revisions.sh.  git checkout revisions
 are performed on a copy of the fds repo cloned by this script.  So revbot.sh
 will not effect the fds repo you normally work with.
 
-### revbot.sh options
+### Options
 
 ```
  -d dir - root directory where fdss are built [default: ...bot/Revbot/TESTDIR]
@@ -33,7 +35,9 @@ will not effect the fds repo you normally work with.
            (impi_intel_linux_64) makefile entry.
 ```
 
-### get_revisions.sh usage
+## get_revisions.sh
+
+### Usage
 
 get_revisions.sh [options]
 get_revisions.sh generates a list of fds revisions from
@@ -41,7 +45,7 @@ bewteen optionally specified dates.  The file generated
 is used by the script revbot.sh to build and run multiple
 versions of fds, one version for each repo revision
 
-### get-revision.sh options:
+### Options
 
 ```
  -a date - include revisions after date [default: 10-Nov-2021 (3 months before current date)]
