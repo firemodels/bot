@@ -30,6 +30,8 @@ fi
   echo "              The revfile is built by the get_revisions.sh script"
   echo " -h   - show this message"
   echo " -q q - name of batch queue used to build fdss and to run cases. [default: batch]"
+  echo " -r repo - repo can be fds or smv. [default: $REPO}.  If smv the revbot.sh only builds"
+  echo "           smokeview, it does not run or view cases"
   echo " -s   - skip the build step (fdss were built eariler)"
   echo " -T type - build fds using type dv (impi_intel_linux_64_dv) or type db (impi_intel_linux_64_db)"
   echo "           makefile entries. If -T is not specified then fds is built using the release"
@@ -65,7 +67,7 @@ wait_run_end()
 start_time=`date`
 CURDIR=`pwd`
 qopt=
-REVISIONS=revisions.txt
+REVISIONS=${REPO}_revisions.txt
 MAKEENTRY=impi_intel_linux_64
 CASENAME=
 SKIPBUILD=
@@ -77,6 +79,7 @@ DEBUG=
 TYPE=
 popt=
 nopt=
+REPO=fds
 
 #define bot repo location
 BOTREPO=$CURDIR/../../bot
@@ -140,7 +143,7 @@ case $OPTION  in
    qopt="-q $OPTARG"
    ;;
   r)
-   REVISIONS="$OPTARG"
+   REPO="$OPTARG"
    ;;
   s)
    SKIPBUILD=1
@@ -153,6 +156,21 @@ done
 shift $(($OPTIND-1))
 
 CASENAME=$1
+ABORT=
+
+if [[ "$REPO" != "fds" ]] && [[ "$REPO" != "smv" ]]; then
+  echo "***error: this script only runs on the fds or smv repos" ]; then
+  ABORT=1
+fi 
+if [ "$REPO" == "smv" ]; then
+  SKIPRUN=1
+  REVISIONS=${REPO}_revisions.txt
+  if [ "$CASENAME" != "" ]; then
+    echo "***warning: $CASENAME will be ignored when running this script with the smv repo"
+    CASENAME=
+  fi
+fi
+
 if [ "$CASENAME" == "" ]; then
   SKIPRUN=1
 fi
@@ -160,12 +178,9 @@ fi
 if [ "$USEEXISTING" == "1" ]; then
   if [ "$FORCECLONE" == "1" ]; then
     echo "***error: cannot speciy both -f and -F options"
-    usage
-    exit
+    ABORT=1
   fi
 fi
-
-ABORT=
 
 #make sure only db or dv is used with the -T option
 if [[ "$TYPE" != "" ]] && [[ "$TYPE" != "dv" ]] && [[ "$TYPE" != "db" ]]; then
@@ -222,21 +237,21 @@ if [ "$ABORT" != "" ]; then
 fi
 
 # make sure test fds repo exists
-FDSREPO=$CURDIR/../../fds_test
+TESTREPO=$CURDIR/../../fds_test
 
-if [ -d $FDSREPO ]; then
-  cd $FDSREPO
-  FDSREPO=`pwd`
+if [ -d $TESTREPO ]; then
+  cd $TESTREPO
+  TESTREPO=`pwd`
   if [ "$USEEXISTING" == "" ]; then
     if [ "$FORCECLONE" == "1" ]; then
       cd $CURDIR
       echo cloning fds into fds_test
-      rm -rf $FDSREPO 
+      rm -rf $TESTREPO 
       cd $SCRIPTDIR
       ./setup_repos.sh -G -t -C >> $OUTPUTDIR/stage0 2>&1
       cd $CURDIR
     else
-      echo "***error: The repo fds_test exists. Erase $FDSREPO"
+      echo "***error: The repo fds_test exists. Erase $TESTREPO"
       echo "          or use the -f option to force cloning"
       echo "          or the -F option to use the existing fds_test repo"
       ABORT=1
@@ -249,13 +264,13 @@ else
   cd $CURDIR
 fi
 
-if [ ! -d $FDSREPO ]; then
-  echo "***error: The repo $FDSREPO does not exist."
+if [ ! -d $TESTREPO ]; then
+  echo "***error: The repo $TESTREPO does not exist."
   ABORT=1
 fi
 
 # make sure makefile entry exists
-if [ ! -d $FDSREPO/Build/$MAKEENTRY ]; then
+if [ ! -d $TESTREPO/Build/$MAKEENTRY ]; then
   echo "***error: The makefile entry $MAKEENTRY does not existt"
   ABORT=1
 fi
@@ -265,8 +280,8 @@ if [ "$ABORT" != "" ]; then
   exit
 fi
 
-cd $FDSREPO
-FDSREPO=`pwd`
+cd $TESTREPO
+TESTREPO=`pwd`
 
 cd $CURDIR
 cd $TESTDIR
@@ -284,7 +299,7 @@ if [ "$SKIPBUILD" == "" ]; then
   git clean -dxf >& /dev/null
   for commit in $COMMITS; do
     count=$((count+1))
-    cd $FDSREPO
+    cd $TESTREPO
     git checkout master  >> $OUTPUTDIR/stage1 2>&1
     git checkout $commit >> $OUTPUTDIR/stage1 2>&1
     echo " --------------------------------------------------------------" >> $OUTPUTDIR/stage1
@@ -292,8 +307,8 @@ if [ "$SKIPBUILD" == "" ]; then
     echo " --------------------------------------------------------------" >> $OUTPUTDIR/stage1
     COMMITDIR=$TESTDIR/${count}_$commit
     mkdir $COMMITDIR
-    cp -r $FDSREPO/Source $COMMITDIR/Source
-    cp -r $FDSREPO/Build  $COMMITDIR/Build
+    cp -r $TESTREPO/Source $COMMITDIR/Source
+    cp -r $TESTREPO/Build  $COMMITDIR/Build
     rm -f $COMMITDIR/Build/$MAKEENTRY/*.o
     rm -f $COMMITDIR/Build/$MAKEENTRY/*.mod
     rm -f $COMMITDIR/Build/$MAKEENTRY/fds*
@@ -307,7 +322,7 @@ if [ "$SKIPBUILD" == "" ]; then
       echo "$CURDIR/qbuild.sh -j $JOBPREFIX${count}_$commit -d $COMMITDIR/Build/$MAKEENTRY $qopt"
     fi
   done
-  cd $FDSREPO
+  cd $TESTREPO
   echo " --------------------------------------------------------------" >> $OUTPUTDIR/stage1
   echo " --------------- checking out master  -------------------------" >> $OUTPUTDIR/stage1
   echo " --------------------------------------------------------------" >> $OUTPUTDIR/stage1
