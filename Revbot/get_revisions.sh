@@ -4,9 +4,13 @@
 #---------------------------------------------
 
 function usage {
-  echo "Usage: get_revisions.sh"
+  echo "Usage: get_revisions.sh [options]"
+  echo "       get_revisions.sh generates a list of fds revisions from"
+  echo "       bewteen optionally specified dates.  The file generated"
+  echo "       is used by the script revbot.sh to build and run multiple"
+  echo "       versions of fds, one version for each repo revision" 
   echo ""
-  echo "get_revisions.sh"
+  echo "Options:"
   echo ""
   echo " -a date - include revisions after date [default: $AFTERARG]"
   echo " -b date - include revisions before date [default: $BEFOREARG]"
