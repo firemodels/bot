@@ -1,4 +1,4 @@
-!/bin/bash
+#!/bin/bash
 
 #---------------------------------------------
 #                   usage
@@ -160,7 +160,7 @@ CASENAME=$1
 ABORT=
 
 if [[ "$REPO" != "fds" ]] && [[ "$REPO" != "smv" ]]; then
-  echo "***error: this script only runs using the fds or smv repos" ]; then
+  echo "***error: this script only runs using the fds or smv repos"
   ABORT=1
 fi 
 if [ "$REPO" == "smv" ]; then
@@ -261,7 +261,7 @@ if [ "$ABORT" != "" ]; then
   exit
 fi
 
-# make sure test fds repo exists
+# make sure test repo exists
 TESTREPO=$CURDIR/../../${REPO}_test
 
 if [ -d $TESTREPO ]; then
@@ -273,7 +273,7 @@ if [ -d $TESTREPO ]; then
       echo cloning $REPO into ${REPO}_test
       rm -rf $TESTREPO 
       cd $SCRIPTDIR
-      ./setup_repos.sh -G -t -C >> $OUTPUTDIR/stage0 2>&1
+      ./setup_repos.sh -H $REPO -t -C >> $OUTPUTDIR/stage0 2>&1
       cd $CURDIR
     else
       echo "***error: The repo ${REPO}_test exists. Erase $TESTREPO"
@@ -285,7 +285,7 @@ if [ -d $TESTREPO ]; then
 else
   cd $SCRIPTDIR
   echo cloning ${REPO} into ${REPO}_test
-  ./setup_repos.sh -G -t -C >> $OUTPUTDIR/stage0 2>&1
+  ./setup_repos.sh -H $REPO -t -C >> $OUTPUTDIR/stage0 2>&1
   cd $CURDIR
 fi
 
@@ -325,7 +325,7 @@ COMMITS=`cat $REVISIONS | awk -F';' '{print $1}'`
 count=0
 JOBPREFIX=B${repo}_
 
-#*** build fds for each revision in commit file
+#*** build fds or smokeview for each revision in commit file
 if [ "$SKIPBUILD" == "" ]; then
   cd $TESTDIR
   git clean -dxf >& /dev/null
@@ -369,7 +369,7 @@ if [ "$SKIPBUILD" == "" ]; then
     if [ "$REPO" == "fds" ]; then
       EXE=$COMMITDIR/$BUILDDIR/fds_$MAKEENTRY
     else
-      EXE=$COMMITDIR/$BUILDDIR/smokeview_$MAKEENTRY
+      EXE=$COMMITDIR/$BUILDDIR/smokeview_linux_64$DB
     fi
     if [ ! -e $EXE ]; then
       echo "***error: $EXE did not compile"
