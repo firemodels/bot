@@ -13,6 +13,7 @@ echo "    $fdsrepos"
 echo "-F - setup repos used by firebot (erase each repo first): "
 echo "    $firebotrepos"
 echo "-G - only clone fds repo (erase first)"
+echo "-H repo - only clone repo (erase first)"
 echo "-h - display this message"
 echo "-s - setup repos used by smokebot: "
 echo "    $smvrepos"
@@ -54,7 +55,6 @@ SETUP_REMOTE ()
 
 CURDIR=`pwd`
 
-fdsreposonly="fds"
 fdsrepos="exp fds fig out smv"
 fdssmvrepos="fds smv"
 firebotrepos="exp fds fds-smv fig out smv"
@@ -77,7 +77,7 @@ else
    exit
 fi
 
-while getopts 'abcCfFGhsStTw' OPTION
+while getopts 'abcCfFGH:hsStTw' OPTION
 do
 case $OPTION  in
   a)
@@ -97,7 +97,14 @@ case $OPTION  in
    eraserepos=1
    ;;
   G)
-   repos=$fdsreposonly;
+   repos=fds;
+   eraserepos=1;
+   ;;
+  H)
+   repos="$OPTARG";
+   if [ "$repos" != "smv" ]; then
+     repos="fds"
+   fi
    eraserepos=1;
    ;;
   h)
