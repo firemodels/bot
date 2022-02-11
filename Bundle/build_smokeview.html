@@ -1,4 +1,4 @@
- <html>
+<html>
 
 <head>
 <TITLE>Smokeview</TITLE>
@@ -14,28 +14,31 @@ function get_fullpath(command,platform){
   return fullpath;
 }
 function run_script(script){
-  MyObject.Run(get_fullpath("../../smv/scripts/webRUN_script.bat ",script));
+  MyObject.Run(get_fullpath("webscripts/webRUN_script.bat ",script));
 }
 function build_libs(platform){
-  MyObject.Run(get_fullpath("../../smv/scripts/webBUILDlibs.bat ",platform));
+  MyObject.Run(get_fullpath("webscripts/webBUILDlibs.bat ",platform));
+}
+function archive_smv(args){
+  MyObject.Run(get_fullpath("webscripts/webARCHIVEbundle.bat ",args));
 }
 function build_smv(args){
-  MyObject.Run(get_fullpath("../../smv/scripts/webBUILDsmv.bat ",args));
+  MyObject.Run(get_fullpath("webscripts/webBUILDsmv.bat ",args));
 }
 function build_prog(args){
-  MyObject.Run(get_fullpath("../../smv/scripts/webBUILDprog.bat ",args));
+  MyObject.Run(get_fullpath("webscripts/webBUILDprog.bat ",args));
 }
 function build_allprog(args){
-  MyObject.Run(get_fullpath("../../smv/scripts/webBUILDallprog.bat ",args));
+  MyObject.Run(get_fullpath("webscripts/webBUILDallprog.bat ",args));
 }
 function build_utilprog(args){
-  MyObject.Run(get_fullpath("../../smv/scripts/webBUILDutilprog.bat ",args));
+  MyObject.Run(get_fullpath("webscripts/webBUILDutilprog.bat ",args));
 }
 function package_smv(args){
-  MyObject.Run(get_fullpath("smv/scripts/webPACKAGEsmv.bat ",args));
+  MyObject.Run(get_fullpath("webscripts/webPACKAGEsmv.bat ",args));
 }
 function install_smv(args){
-  MyObject.Run(get_fullpath("../../smv/scripts/webINSTALLsmv.bat ",args));
+  MyObject.Run(get_fullpath("webscripts/webINSTALLsmv.bat ",args));
 }
 </script>
 </HEAD>
@@ -48,57 +51,81 @@ function install_smv(args){
 <hr size="1">
 
 <p><table border=on>
+
 <tr>
-<th align=center>Update Repos</th>
+<th align=center  colspan=2>Show</th>
 <td align=center>
-<button onclick="run_script('\\smv\\scripts\\webUPDATEwindowsrepos.bat')">Windows</button>
-<button onclick="run_script('\\smv\\scripts\\webUPDATErepos.bat')">All</button>
+<button onclick="run_script('\\bot\\Bundle\\webscripts\\webSHOW_branches.bat')">Branch</button>
+<button onclick="run_script('\\bot\\Bundle\\webscripts\\webSHOW_revisions.bat')">Repos</button>
+</td>
+</td>
+</tr>
+
+<tr>
+<th align=center rowspan=2>Update</th>
+<th>All repos</th>
+<td align=center>
+<button onclick="run_script('\\bot\\Bundle\\webscripts\\webUPDATEwindowsrepos.bat')">Windows</button>
+<button onclick="run_script('\\bot\\Bundle\\webscripts\\webUPDATErepos.bat')">All</button>
 </td>
 </tr>
 <tr>
-<th align=center>Show Revision</th>
+<th>SMV repo</th>
 <td align=center>
-<button onclick="run_script('\\smv\\scripts\\webSET_bundle_revision.bat')">Bundles</button>
-<button onclick="run_script('\\smv\\scripts\\webSHOW_revisions.bat')">Repos</button>
+<button onclick="run_script('\\bot\\Bundle\\webscripts\\webUPDATEwindowsSMVrepos.bat')">Windows</button>
+<button onclick="run_script('\\bot\\Bundle\\webscripts\\webUPDATESMVrepos.bat')">All</button>
 </td>
 </tr>
+
 <tr>
-<th align=center>Clean Repos</th>
+<th align=center rowspan=2>Set</th><th>Revision</th><td align=center>
+<button onclick="run_script('\\bot\\Bundle\\webscripts\\webSET_bundle_revision.bat')">Test Bundles</button>
+</tr>
+
+<tr>
+<th>Branch</th><td align=center>
+<button onclick="run_script('\\bot\\Bundle\\webscripts\\webSET_branches.bat')">Master</button>
+<button onclick="run_script('\\bot\\Bundle\\webscripts\\webSET_tags.bat')">Release</button>
+</tr>
+
+<tr>
+<th align=center rowspan=3>Clean</th><th> Repos</th>
 <td align=center>
-<button onclick="run_script('\\smv\\scripts\\webclean_win.bat')">Windows</button>
-<button onclick="run_script('\\smv\\scripts\\webclean_all.bat')">All</button>
+<button onclick="run_script('\\bot\\Bundle\\webscripts\\webclean_win.bat')">Windows</button>
+<button onclick="run_script('\\bot\\Bundle\\webscripts\\webclean_all.bat')">All</button>
 </td>
 </tr>
+
 <tr>
-<th align=center>Clean Uploads</th>
+<th align=center>Uploads</th>
 <td align=center>
-<button onclick="run_script('\\bot\\Bundle\\fds\\scripts\\webCLEANuploadwin.bat')">Windows</button>
-<button onclick="run_script('\\bot\\Bundle\\fds\\scripts\\webCLEANuploadall.bat')">All</button>
+<button onclick="run_script('\\bot\\Bundle\\webscripts\\webCleanUploadWin.bat')">Windows</button>
+<button onclick="run_script('\\bot\\Bundle\\webscripts\\webCleanUploadAll.bat')">All</button>
 </td>
 </tr>
+
 <tr>
-<th align=center>Branch</th><td align=center>
-<button onclick="run_script('\\smv\\scripts\\webSET_branches.bat')">Set master</button>
-<button onclick="run_script('\\smv\\scripts\\webSHOW_branches.bat')">Show</button></td>
-</tr>
-<tr>
-<th align=center>Tag</th><td align=center>
-<button onclick="run_script('\\smv\\scripts\\webSET_tags.bat')">Set</button>
-<button onclick="run_script('\\smv\\scripts\\webSHOW_tags.bat')">Show</button>
-</tr>
-<tr>
-<th align=center>Notes</th>
+<th align=center>SMV Build</th>
 <td align=center>
-<button onclick="run_script('\\smv\\scripts\\webGET_smvlog.bat')">Add</button>
-<button onclick="run_script('\\smv\\scripts\\webEDIT_release_notes.bat')">Edit</button>
-<button onclick="run_script('\\smv\\scripts\\webVIEW_release_notes.bat')">View</button>
+<button onclick="run_script('\\bot\\Bundle\\webscripts\\webCleanWinSMVobjs.bat')">Windows</button>
+<button onclick="run_script('\\bot\\Bundle\\webscripts\\webCleanSMVobjs.bat')">All</button>
 </td>
 </tr>
+
 <tr>
-<th>Edit</th>
+<th align=center colspan=2>Release Notes</th>
 <td align=center>
-<button onclick="run_script('\\bot\\Scripts\\webEDIT_build_smokeview.bat')">This Page</button>
-<button onclick="run_script('\\smv\\scripts\\webEDIT_setup.bat')">Settings</button>
+<button onclick="run_script('\\bot\\Bundle\\webscripts\\webGET_smvlog.bat')">Add</button>
+<button onclick="run_script('\\bot\\Bundle\\webscripts\\webEDIT_release_notes.bat')">Edit</button>
+<button onclick="run_script('\\bot\\Bundle\\webscripts\\webVIEW_release_notes.bat')">View</button>
+</td>
+</tr>
+
+<tr>
+<th colspan=2>Edit</th>
+<td align=center>
+<button onclick="run_script('\\bot\\Bundle\\webscripts\\webEDIT_build_smokeview.bat')">This Page</button>
+<button onclick="run_script('\\bot\\Bundle\\webscripts\\webEDIT_setup.bat')">Settings</button>
 </td>
 </tr>
 </table>
@@ -112,8 +139,11 @@ function install_smv(args){
 <th colspan=3>Libraries</th>
 </tr>
 <tr>
-<th>Windows</th><th>Linux</th><th>OSX</th>
-</tr>
+<th>Windows</th><th>Linux</th><th>OSX</th></tr>
+
+<!--
+<td align=center><button onclick="build_libs('osxquartz')">Build</button></td>
+-->
 
 <tr>
 <td align=center>
@@ -146,13 +176,6 @@ function install_smv(args){
 <td align=center><button onclick="build_prog('background windows')">Build</button></td>
 <td align=center><button onclick="build_prog('background linux')">Build</button></td>
 <td align=center><button onclick="build_prog('background osx')">Build</button></td>
-</tr>
-
-<tr>
-<th>dem2fds</th>
-<td align=center><button onclick="build_prog('dem2fds windows')">Build</button></td>
-<td align=center><button onclick="build_prog('dem2fds linux')">Build</button></td>
-<td align=center><button onclick="build_prog('dem2fds osx')">Build</button></td>
 </tr>
 
 <tr>
@@ -223,15 +246,18 @@ function install_smv(args){
 </td>
 <td align=center>
 
+<!--
+<td align=center><button onclick="build_smv('osxquartz test')">Build</button></td>
+-->
+
 <p><table border=on>
-<tr><th colspan=3>Smokeview Test</th></tr>
+<tr><th colspan=3>Test Smokeview</th></tr>
 
 <tr><th>Windows</th><th>Linux</th><th>OSX</th></tr>
-
 <tr>
 <td align=center>
 <button onclick="build_smv('windows test')">Build</button>
-<button onclick="build_smv('windows testinc')">Inc</button>
+<button onclick="build_smv('windows testinc')">Build Inc</button
 </td>
 <td align=center>
 <button onclick="build_smv('linux test')">Build</button>
@@ -242,23 +268,36 @@ function install_smv(args){
 <tr>
 <td align=center><button onclick="package_smv('windows test')">Bundle</button></td>
 <td align=center><button onclick="package_smv('linux test')">Bundle</button></td>
-<td align=center><button onclick="package_smv('osx test')">Bundle</button></td>
+<td align=center colspan=3><button onclick="package_smv('osx test')">Bundle</button></td>
+</tr>
+<tr>
+<td align=center></td>
+<td align=center><button onclick="archive_smv('linux')">Archive</button></td>
+<td align=center colspan=3><button onclick="archive_smv('osx')">Archive</button></td>
 </tr>
 
 <tr>
 <td align=center><button onclick="install_smv('windows test')">Install</button></td>
 <td align=center><button onclick="install_smv('linux test')">Install</button></td>
-<td align=center><button onclick="install_smv('osx test')">Install</button></td>
+<td align=center colspan=3><button onclick="install_smv('osx test')">Install</button></td>
 </tr>
 
 <tr>
-<td colspan=3 align=center><button onclick="run_script('\\smv\\scripts\\webUPLOADsmv2git.bat')">Upload</button></td>
+<td colspan=5 align=center>
+<button onclick="run_script('\\bot\\Bundle\\webscripts\\webUPLOADsmv2git.bat')">Upload</button>
+<button onclick="run_script('\\bot\\Bundle\\webscripts\\webCOPYsmv.bat')">Copy</button>
+</td>
 </tr>
 
 </tr>
 </table>
+
+<!--
+<td align=center><button onclick="build_smv('osxquartz release')">Build</button></td>
+-->
+
 <p><table border=on>
-<tr><th colspan=3>Smokeview Release</th></tr>
+<tr><th colspan=3>Release Smokeview</th></tr>
 
 <tr><th>Windows</th><th>Linux</th><th>OSX</th></tr>
 
@@ -271,16 +310,18 @@ function install_smv(args){
 <tr>
 <td align=center><button onclick="package_smv('windows release')">Bundle</button></td>
 <td align=center><button onclick="package_smv('linux release')">Bundle</button></td>
-<td align=center><button onclick="package_smv('osx release')">Bundle</button></td>
+<td align=center colspan=2><button onclick="package_smv('osx release')">Bundle</button></td>
 </tr>
 
 <tr>
 <td align=center><button onclick="install_smv('windows release')">Install</button></td>
 <td align=center><button onclick="install_smv('linux release')">Install</button></td>
-<td align=center><button onclick="install_smv('osx release')">Install</button></td>
+<td align=center colspan=2><button onclick="install_smv('osx release')">Install</button></td>
 </tr>
 <tr>
-<td colspan=3 align=center><button onclick="run_script('\\smv\\scripts\\webUPLOADsmv2git.bat')">Upload</button></td>
+<td colspan=4 align=center>
+<button onclick="run_script('\\bot\\Bundle\\webscripts\\webUPLOADsmv2git.bat')">Upload</button>
+</td>
 </tr>
 
 </table>
@@ -314,25 +355,20 @@ function install_smv(args){
 <p><table border=on>
 <tr><th colspan=3>Synchronize</th></tr>
 <tr><th>settings</th>
-<td align=center><button onclick="run_script('\\smv\\scripts\\webCOPYhome2config.bat')"> settings ==>> smv </button></td>
-<td align=center><button onclick="run_script('\\smv\\scripts\\webCOPYconfig2home.bat')"> settings <<== smv </button></td>
+<td align=center><button onclick="run_script('\\bot\\Bundle\\webscripts\\webCOPYhome2config.bat')"> settings ==>> smv </button></td>
+<td align=center><button onclick="run_script('\\bot\\Bundle\\webscripts\\webCOPYconfig2home.bat')"> settings <<== smv </button></td>
 </tr>
 <tr><th>gsmv/bib</th>
-<td align=center><button onclick="run_script('\\smv\\scripts\\webSYNCHfds2smv.bat')">fds ==>> smv</button></td>
-<td align=center><button onclick="run_script('\\smv\\scripts\\webSYNCHsmv2fds.bat')">fds <<== smv</button></td>
+<td align=center><button onclick="run_script('\\bot\\Bundle\\webscripts\\webSYNCHfds2smv.bat')">fds ==>> smv</button></td>
+<td align=center><button onclick="run_script('\\bot\\Bundle\\webscripts\\webSYNCHsmv2fds.bat')">fds <<== smv</button></td>
 </tr>
 </table>
 
-<p><table border=on>
+<p>
+<table border=on>
 <tr><th>Other</th></tr>
-<tr>
-<td align=center><button onclick="run_script('\\bot\\Scripts\\webTEST_setup.bat')">Test web scripts</button></td>
-</tr>
-<tr>
-<td align=center><a href="getting_started.html">Build checklist</a></td>
-</tr>
+<tr><td align=center><a href="getting_started.html">Build checklist</a></td></tr>
 </table>
-
 
 
 <p><hr>

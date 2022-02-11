@@ -133,9 +133,9 @@ run_auto()
 
    echo -e "CFASTbot run initiated." >> $MESSAGE_FILE
    if [ "$partial" == "" ]; then
-     cat $MESSAGE_FILE | mail -s "CFASTbot run initiated" $mailTo &> /dev/null
+     cat $MESSAGE_FILE | mail $REPLYTO -s "CFASTbot run initiated" $mailTo &> /dev/null
    else
-     cat $MESSAGE_FILE | mail -s "CFASTbot run initiated (skip matlab/doc stages)" $mailTo &> /dev/null
+     cat $MESSAGE_FILE | mail $REPLYTO -s "CFASTbot run initiated (skip matlab/doc stages)" $mailTo &> /dev/null
    fi
 }
 
@@ -155,7 +155,7 @@ check_time_limit()
 
       if [ $ELAPSED_TIME -gt $TIME_LIMIT ]
       then
-         echo -e "CFASTbot has been running for more than 3 hours in Stage ${TIME_LIMIT_STAGE}. \n\nPlease ensure that there are no problems. \n\nThis is a notification only and does not terminate CFASTbot." | mail -s "CFASTbot Notice: CFASTbot has been running for more than 3 hours." $mailTo &> /dev/null
+         echo -e "CFASTbot has been running for more than 3 hours in Stage ${TIME_LIMIT_STAGE}. \n\nPlease ensure that there are no problems. \n\nThis is a notification only and does not terminate CFASTbot." | mail $REPLYTO -s "CFASTbot Notice: CFASTbot has been running for more than 3 hours." $mailTo &> /dev/null
          TIME_LIMIT_EMAIL_NOTIFICATION="sent"
       fi
    fi
@@ -598,8 +598,8 @@ check_compile_smv()
 wait_vv_cases_debug_start()
 {
    # Scans qstat and waits for V&V cases to start
-   while [[ `qstat -a | grep $(whoami) | grep -v grep | grep $JOBPREFIX | grep Q` != '' ]]; do
-      JOBS_REMAINING=`qstat -a | grep $(whoami) | grep -v grep | grep $JOBPREFIX | grep Q | wc -l`
+   while [[          `qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$'` != '' ]]; do
+      JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$' | wc -l`
       echo "Waiting for ${JOBS_REMAINING} V&V cases to start." >> $OUTPUT_DIR/stage4
       TIME_LIMIT_STAGE="4"
       check_time_limit
@@ -624,8 +624,8 @@ wait_vv_cases_debug_end()
         sleep 30
      done
    else
-     while [[ `qstat -a | awk '{print $2 $4}' | grep $(whoami) | grep $JOBPREFIX` != '' ]]; do
-        JOBS_REMAINING=`qstat -a | awk '{print $2 $4}' | grep $(whoami) | grep $JOBPREFIX | wc -l`
+     while [[          `qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$'` != '' ]]; do
+        JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$' | wc -l`
         echo "Waiting for ${JOBS_REMAINING} ${1} cases to complete." >> $OUTPUT_DIR/stage4
         TIME_LIMIT_STAGE="4"
         check_time_limit
@@ -730,8 +730,8 @@ check_vv_cases_debug()
 wait_vv_cases_release_start()
 {
    # Scans qstat and waits for V&V cases to start
-   while [[ `qstat -a | grep $(whoami) | grep -v grep | grep $JOBPREFIX | grep Q` != '' ]]; do
-      JOBS_REMAINING=`qstat -a | grep $(whoami) | grep -v grep | grep $JOBPREFIX | grep Q | wc -l`
+   while [[          `qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$'` != '' ]]; do
+      JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$' | wc -l`
       echo "Waiting for ${JOBS_REMAINING} V&V cases to start." >> $OUTPUT_DIR/stage5
       TIME_LIMIT_STAGE="5"
       check_time_limit
@@ -756,8 +756,8 @@ wait_vv_cases_release_end()
         sleep 30
      done
    else
-     while [[ `qstat -a | awk '{print $2 $4}' | grep $(whoami) | grep $JOBPREFIX` != '' ]]; do
-        JOBS_REMAINING=`qstat -a | awk '{print $2 $4}' | grep $(whoami) | grep $JOBPREFIX | wc -l`
+     while [[          `qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$'` != '' ]]; do
+        JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$' | wc -l`
         echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage5
         TIME_LIMIT_STAGE="5"
         check_time_limit
@@ -1112,6 +1112,13 @@ archive_validation_stats()
         chmod +w /var/www/html/cfastbot/manuals/Validation_Statistics/${STATS_FILE_BASENAME}_${GIT_REVISION}.csv
       fi
    fi
+   CD_REPO $cfastrepo/Validation/scripts $cfastbranch || return 1
+   if [ -e gettime.sh ]; then
+     TIMEFILE=$HISTORY_DIR/${GIT_REVISION}_timing.csv
+     ./Run_CFAST_Cases.sh -t | grep -v submitted > $TIMEFILE
+     total_time=`cat $TIMEFILE | awk -F',' '{ SUM += $2} END { print SUM }'`
+     echo $total_time >> $TIMEFILE
+   fi
    return 0
 }
 
@@ -1257,17 +1264,25 @@ email_build_status()
 {
    echo $THIS_CFAST_FAILED>$CFAST_STATUS_FILE
    stop_time=`date`
+   IFORT_VERSION=`ifort -v 2>&1`
    if [[ $SKIP_git_UPDATE_AND_PROPFIX ]] ; then
       echo "CFASTbot was invoked with the -s option (SKIP_git_UPDATE_AND_PROPFIX)." >> $TIME_LOG
       echo "Skipping git revert, update, and property fix operations." >> $TIME_LOG
       echo "The current git revision is ${GIT_REVISION}" >> $TIME_LOG
    fi
-   echo "-------------------------------" >> $TIME_LOG
-   echo "Host: $hostname " >> $TIME_LOG
-   echo "Start Time: $start_time " >> $TIME_LOG
-   echo "Stop Time: $stop_time " >> $TIME_LOG
+   echo "-------------------------------"      >> $TIME_LOG
+   echo "             Host: $hostname "        >> $TIME_LOG
+   echo "             repo: $cfastrepo "       >> $TIME_LOG
+   echo "   cfast revision: $CFAST_REVISION "  >> $TIME_LOG
+   echo "     smv revision: $SMV_REVISION "    >> $TIME_LOG
+   echo "          Fortran: $IFORT_VERSION "   >> $TIME_LOG
+   echo "       Start Time: $start_time "      >> $TIME_LOG
+   echo "        Stop Time: $stop_time "       >> $TIME_LOG
+if [ "$total_time" != "" ]; then
+   echo "         Run Time: $total_time"       >> $TIME_LOG
+fi
    if [[ "$UPLOAD" == "1" ]]; then
-      echo "-------------------------------" >> $TIME_LOG
+      echo "-------------------------------"                           >> $TIME_LOG
       echo "Manuals (private): http://blaze.nist.gov/cfastbot/manuals" >> $TIME_LOG
       echo "Manuals  (public): https://goo.gl/jR6uSj" >> $TIME_LOG
       echo "-------------------------------" >> $TIME_LOG
@@ -1281,33 +1296,33 @@ email_build_status()
    then
      cat $TIME_LOG >> $WARNING_LOG
      # Send email with failure message and warnings, body of email contains appropriate log file
-     cat $ERROR_LOG $TIME_LOG | mail -s "CFASTbot build failure and warnings on ${hostname}. Revision ${GIT_REVISION}." $mailTo &> /dev/null
-     cat $TIME_LOG | mail -s "CFASTbot build failure and warnings on ${hostname}. Revision ${GIT_REVISION}." $mailTo &> /dev/null
+     cat $ERROR_LOG $TIME_LOG | mail $REPLYTO -s "CFASTbot build failure and warnings on ${hostname}. Revision ${GIT_REVISION}." $mailTo &> /dev/null
+     cat $TIME_LOG | mail $REPLYTO -s "CFASTbot build failure and warnings on ${hostname}. Revision ${GIT_REVISION}." $mailTo &> /dev/null
 
    # Check for errors only
    elif [ -e $ERROR_LOG ]
    then
       # Send email with failure message, body of email contains error log file
-      cat $ERROR_LOG $TIME_LOG | mail -s "CFASTbot build failure on ${hostname}. Revision ${GIT_REVISION}." $mailTo &> /dev/null
-      cat $TIME_LOG | mail -s "CFASTbot build failure on ${hostname}. Revision ${GIT_REVISION}." $mailTo &> /dev/null
+      cat $ERROR_LOG $TIME_LOG | mail $REPLYTO -s "CFASTbot build failure on ${hostname}. Revision ${GIT_REVISION}." $mailTo &> /dev/null
+      cat $TIME_LOG | mail $REPLYTO -s "CFASTbot build failure on ${hostname}. Revision ${GIT_REVISION}." $mailTo &> /dev/null
 
    # Check for warnings only
    elif [ -e $WARNING_LOG ]
    then
       # Send email with success message, include warnings
-      cat $WARNING_LOG $TIME_LOG mail -s "CFASTbot build success with warnings on ${hostname}. Revision ${GIT_REVISION}." $mailTo &> /dev/null
-      cat $TIME_LOG mail -s "CFASTbot build success with warnings on ${hostname}. Revision ${GIT_REVISION}." $mailTo &> /dev/null
+      cat $WARNING_LOG $TIME_LOG | mail $REPLYTO -s "CFASTbot build success with warnings on ${hostname}. Revision ${GIT_REVISION}." $mailTo &> /dev/null
+      cat $TIME_LOG | mail $REPLYTO -s "CFASTbot build success with warnings on ${hostname}. Revision ${GIT_REVISION}." $mailTo &> /dev/null
 
    # No errors or warnings
    else
       # Send empty email with success message
-      cat $TIME_LOG | mail -s "CFASTbot build success on ${hostname}! Revision ${GIT_REVISION}." $mailTo &> /dev/null
+      cat $TIME_LOG | mail $REPLYTO -s "CFASTbot build success on ${hostname}! Revision ${GIT_REVISION}." $mailTo &> /dev/null
    fi
 
    # Send email notification if validation statistics have changed.
    if [ -e $VALIDATION_STATS_LOG ]
    then
-      mail -s "CFASTbot notice. Validation statistics have changed for Revision ${GIT_REVISION}." $mailTo < $VALIDATION_STATS_LOG &> /dev/null      
+      mail $REPLYTO -s "CFASTbot notice. Validation statistics have changed for Revision ${GIT_REVISION}." $mailTo < $VALIDATION_STATS_LOG &> /dev/null      
    fi
    if [[ "$UPLOADGUIDES" == "1" ]]; then
      if [ -e $UploadGuides ]; then
@@ -1334,7 +1349,7 @@ GITSTATUS_DIR=$HOME/.cfastbot
 EMAIL_LIST=$GITSTATUS_DIR/cfastbot_email_list.sh
 PID_FILE=$GITSTATUS_DIR/cfastbot_pid
 OUTPUT_DIR=$cfastbotdir/output
-HISTORY_DIR=$cfastbotdir/history
+HISTORY_DIR=$GITSTATUS_DIR/history
 ERROR_LOG=$OUTPUT_DIR/errors
 TIME_LOG=$OUTPUT_DIR/timings
 WARNING_LOG=$OUTPUT_DIR/warnings
@@ -1346,8 +1361,8 @@ echo "Settings"
 echo "--------"
 echo "    Run dir: $cfastbotdir"
 MKDIR $OUTPUT_DIR
-MKDIR $HISTORY_DIR
 MKDIR $GITSTATUS_DIR
+MKDIR $HISTORY_DIR
 
 #*** make sure cfastbot is running in the correct directory
 
@@ -1379,14 +1394,9 @@ if [[ "$IFORT_COMPILER" != "" ]] ; then
   source $IFORT_COMPILER/bin/compilervars.sh intel64
 fi
 
-while getopts '3achiI:m:Mp:q:r:suU' OPTION
+while getopts 'achiI:m:Mp:q:r:suU' OPTION
 do
 case $OPTION in
-   3)
-    size=32
-    size2=-3
-    compiler=gnu
-     ;;
    a)
      RUNAUTO="y"
      ;;
@@ -1436,14 +1446,25 @@ shift $(($OPTIND-1))
 
 echo $$ > $PID_FILE
 
+if [ -e $EMAIL_LIST ]; then
+  source $EMAIL_LIST
+fi
+
+REPLYTO=
+if [ "$replyToCFAST" != "" ]; then
+  REPLYTO="-S replyto=\"$replyToCFAST\""
+fi
+
 if [ "$mailTo" == "" ]; then
-  if [ -e $EMAIL_LIST ]; then
-    source $EMAIL_LIST
+  if [ "$mailToCFAST" != "" ]; then
+    mailTo=$mailToCFAST
   fi
 fi
+
 if [ "$mailTo" == "" ]; then
   mailTo=`git config user.email`
 fi
+
 if [ "$mailTo" == "" ]; then
   mailTo=`whoami`@`hostname`
 fi
@@ -1552,7 +1573,7 @@ UploadGuides=$cfastrepo/Utilities/cfastbot/upload_guides.sh
 START_TIME=$(date +%s)
 
 # Set time limit
-TIME_LIMIT=10800
+TIME_LIMIT=14400
 TIME_LIMIT_EMAIL_NOTIFICATION="unsent"
 
 
@@ -1594,6 +1615,17 @@ if [ "$UPDATEREPO" == "1" ]; then
 else
   echo Repos not updated
 fi
+
+cur_dir=`pwd`
+
+CD_REPO $reponame/cfast $cfastbranch || return 1
+CFAST_REVISION=`git describe --dirty --long`
+
+CD_REPO $reponame/smv   $smvbranch || return 1
+SMV_REVISION=`git describe --dirty --long`
+
+cd $cur_dir
+
 check_git_checkout
 
 ### Stage 2a ###

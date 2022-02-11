@@ -3,8 +3,16 @@ BUNDLE_DIR=$1
 BUNDLE_BASE=$2
 NIGHTLY=$3
 platform=$4
+GOOGLE_DIR=$5
 
-scriptdir=`dirname "$(readlink -f "$0")"`
+if [ "$NIGHTLY" == "null" ]; then
+  NIGHTLY=
+else
+  NIGHTLY=${NIGHTLY}_
+fi
+
+scriptdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
 cd $scriptdir
 
 erase=1
@@ -15,10 +23,15 @@ GDRIVE=~/bin/gdrive
 #  the following string is gound at the end of the URL of the nightly_bundles
 #  directory on Google Drive
 
-if [ -e $HOME/.bundle/GOOGLE_DIR_ID ]; then
-  BUNDLE_PARENT_ID=`cat $HOME/.bundle/GOOGLE_DIR_ID`
+if [ "$GOOGLE_DIR" == "" ]; then
+  GOOGLE_DIR=GOOGLE_DIR_ID
 else
-  echo "***error: the file $HOME/.bundle/GOOGLE_DIR_ID containing"
+  GOOGLE_DIR=TEST_BUNDLE_ID
+fi
+if [ -e $HOME/.bundle/$GOOGLE_DIR ]; then
+  BUNDLE_PARENT_ID=`cat $HOME/.bundle/$GOOGLE_DIR`
+else
+  echo "***error: the file $HOME/.bundle/$GOOGLE_DIR containing"
   echo "          the ID of the google drive upload directory does not exit"
   exit
 fi
@@ -48,9 +61,14 @@ if [ ! -e $BUNDLE_DIR/$shafile ]; then
 fi
 if [ "$upload" == "1" ]; then
   if [ "$erase" == "1" ]; then
-    $GDRIVE list  | grep ${NIGHTLY}_$platform | awk '{ system("~/bin/gdrive delete -i " $1)} '
+    $GDRIVE list  | grep ${NIGHTLY}$platform$ext    | grep FDS | grep SMV | awk '{ system("~/bin/gdrive delete -i " $1)} '
+    $GDRIVE list  | grep ${NIGHTLY}${platform}.sha1 | grep FDS | grep SMV | awk '{ system("~/bin/gdrive delete -i " $1)} '
   fi
-  echo uploading $BUNDLE_DIR/$file
+  echo ""
+  echo "------------------------------------------------------"
+  echo "------------------------------------------------------"
+  echo "uploading $BUNDLE_DIR/$file"
+  echo ""
   $GDRIVE upload -p $BUNDLE_PARENT_ID -f $BUNDLE_DIR/$file
   nfiles=`$GDRIVE list  | grep $file | wc -l`
   if [ $nfiles -eq 0 ]; then
@@ -63,7 +81,11 @@ if [ "$upload" == "1" ]; then
       echo "$BUNDLE_DIR/$file uploaded."
     fi
   fi
+  echo ""
+  echo "------------------------------------------------------"
+  echo "------------------------------------------------------"
   echo uploading $BUNDLE_DIR/$shafile
+  echo ""
   $GDRIVE upload -p $BUNDLE_PARENT_ID -f $BUNDLE_DIR/$shafile
   nfiles=`$GDRIVE list  | grep $shafile | wc -l`
   if [ $nfiles -eq 0 ]; then

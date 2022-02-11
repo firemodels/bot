@@ -145,7 +145,7 @@ run_auto()
     fi
   fi
   echo -e "Smokebot run initiated." >> $MESSAGE_FILE
-  cat $MESSAGE_FILE | mail -s "smokebot run initiated" $mailTo > /dev/null
+  cat $MESSAGE_FILE | mail $REPLYTO -s "smokebot run initiated" $mailTo > /dev/null
   return 0
 }
 
@@ -211,7 +211,7 @@ check_time_limit()
 
       if [ $ELAPSED_TIME -gt $TIME_LIMIT ]
       then
-         echo -e "smokebot has been running for more than 12 hours in Stage ${TIME_LIMIT_STAGE}. \n\nPlease ensure that there are no problems. \n\nThis is a notification only and does not terminate smokebot." | mail -s "smokebot Notice: smokebot has been running for more than 12 hours." $mailTo > /dev/null
+         echo -e "smokebot has been running for more than 12 hours in Stage ${TIME_LIMIT_STAGE}. \n\nPlease ensure that there are no problems. \n\nThis is a notification only and does not terminate smokebot." | mail $REPLYTO -s "smokebot Notice: smokebot has been running for more than 12 hours." $mailTo > /dev/null
          TIME_LIMIT_EMAIL_NOTIFICATION="sent"
       fi
    fi
@@ -440,13 +440,13 @@ check_compile_fds_mpi_db()
    fi
 
    # Check for compiler warnings/remarks
-   if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage1b| grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'` == "" ]]
+   if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage1b| grep -v mpiifort -v | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'` == "" ]]
    then
       # Continue along
       :
    else
       echo "Stage 1b warnings:" >> $WARNING_LOG
-      grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage1b | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'>> $WARNING_LOG
+      grep -A 5 -i -E 'warning|remark' $OUTPUT_DIR/stage1b | grep -v mpiifort | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'>> $WARNING_LOG
       echo "" >> $WARNING_LOG
    # if the executable does not exist then an email has already been sent
       if [ -e "fds_${INTEL}mpi_${COMPILER}_${platform}_64$DB" ] ; then
@@ -544,7 +544,7 @@ run_verification_cases_debug()
 
    # Submit SMV verification cases and wait for them to start
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3a 2>&1
-   ./Run_SMV_Cases.sh $INTEL2 $YOPT -c $cfastrepo -I $COMPILER $USEINSTALL2 -j $JOBPREFIX -m 2 -d -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3a 2>&1
+   ./Run_SMV_Cases.sh $INTEL2 -Y -c $cfastrepo $USEINSTALL2 -j $JOBPREFIX -m 2 -d -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3a 2>&1
 }
 
 #---------------------------------------------
@@ -561,7 +561,7 @@ check_verification_cases_debug()
 
    if [[ `grep -rIi 'Run aborted' $OUTPUT_DIR/stage3a` == "" ]] && \
       [[ `grep -rIi 'Segmentation' Visualization/* WUI/* ` == "" ]] && \
-      [[ `grep -rI 'ERROR:' Visualization/* WUI/* ` == "" ]] && \
+      [[ `grep -rI  'ERROR:' Visualization/* WUI/* ` == "" ]] && \
       [[ `grep -rIi 'STOP: Numerical' Visualization/* WUI/* ` == "" ]] && \
       [[ `grep -rIi 'forrtl' Visualization/* WUI/* ` == "" ]]
    then
@@ -569,7 +569,7 @@ check_verification_cases_debug()
    else
       grep -rIi 'Run aborted' $OUTPUT_DIR/stage3a > $OUTPUT_DIR/stage3a_errors
       grep -rIi 'Segmentation' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3a_errors
-      grep -rI 'ERROR:' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3a_errors
+      grep -rI  'ERROR:' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3a_errors
       grep -rIi 'STOP: Numerical' -rIi Visualization/* WUI/* >> $OUTPUT_DIR/stage3a_errors
       grep -rIi -A 20 'forrtl' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3a_errors
       
@@ -578,12 +578,12 @@ check_verification_cases_debug()
       echo "" >> $ERROR_LOG
       THIS_FDS_FAILED=1
    fi
-   if [[ `grep 'Warning' -rI $OUTPUT_DIR/stage3a` == "" ]] 
+   if [[ `grep 'Warning' -irI $OUTPUT_DIR/stage3a` == "" ]] 
    then
       no_warnings=true
    else
       echo "Stage 3a warnings:" >> $WARNING_LOG
-      grep 'Warning' -rI $OUTPUT_DIR/stage3a >> $WARNING_LOG
+      grep 'Warning' -irI $OUTPUT_DIR/stage3a >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
 }
@@ -622,13 +622,13 @@ check_compile_fds_mpi()
 
    # Check for compiler warnings/remarks
    # 'performing multi-file optimizations' and 'generating object file' are part of a normal compile
-   if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage1c | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented'` == "" ]]
+   if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage1c | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented'` == "" ]]
    then
       # Continue along
       :
    else
       echo "Stage 1c warnings:" >> $WARNING_LOG
-      grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage1c | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
+      grep -A 5 -i -E 'warning|remark' $OUTPUT_DIR/stage1c | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
       compile_errors=1
    fi
@@ -676,14 +676,6 @@ compile_smv_utilities()
      ./make_background.sh >> $OUTPUT_DIR/stage2a 2>&1
      cp background_${platform}_64 $LATESTAPPS_DIR/background
 
-   # dem2fds
-     echo "      dem2fds"
-     cd $smvrepo/Build/dem2fds/${COMPILER}_${platform}_64
-     rm -f *.o dem2fds_${platform}_64
-     echo 'Compiling dem2fds:' >> $OUTPUT_DIR/stage2a 2>&1
-     ./make_dem2fds.sh >> $OUTPUT_DIR/stage2a 2>&1
-     cp dem2fds_${platform}_64 $LATESTAPPS_DIR/dem2fds
-   
    # hashfile
      echo "      hashfile"
      cd $smvrepo/Build/hashfile/${COMPILER}_${platform}_64
@@ -777,19 +769,42 @@ check_common_files()
 
 check_smv_utilities()
 {
+   SMOKEZIP="$smvrepo/Build/smokezip/${COMPILER}_${platform}_64/smokezip_${platform}_64"
+   SMOKEDIFF="$smvrepo/Build/smokediff/${COMPILER}_${platform}_64/smokediff_${platform}_64"
+   WIND2FDS="$smvrepo/Build/wind2fds/${COMPILER}_${platform}_64/wind2fds_${platform}_64"
+   BACKGROUND="$smvrepo/Build/background/${COMPILER}_${platform}_64/background_${platform}_64"
    if [ "$haveCC" == "1" ] ; then
      # Check for errors in SMV utilities compilation
      cd $smvrepo
-     if [ -e "$smvrepo/Build/smokezip/${COMPILER}_${platform}_64/smokezip_${platform}_64" ]    && \
-        [ -e "$smvrepo/Build/smokediff/${COMPILER}_${platform}_64/smokediff_${platform}_64" ]  && \
-        [ -e "$smvrepo/Build/wind2fds/${COMPILER}_${platform}_64/wind2fds_${platform}_64" ]    && \
-        [ -e "$smvrepo/Build/dem2fds/${COMPILER}_${platform}_64/dem2fds_${platform}_64" ]      && \
-        [ -e "$smvrepo/Build/background/${COMPILER}_${platform}_64/background_${platform}_64" ]
+     if [ -e "$SMOKEZIP" ]    && \
+        [ -e "$SMOKEDIFF" ]  && \
+        [ -e "$WIND2FDS" ]    && \
+        [ -e "$BACKGROUND" ]
      then
         stage_utilities_success="1"
      else
         stage_utilities_success="0"
         echo "Errors from Stage 2c - Compile SMV utilities:" >> $ERROR_LOG
+        if [ ! -e "$SMOKEZIP" ]; then
+          echo ""
+          echo "error: smokezip failed to compile"           >> $ERROR_LOG
+          echo "       $SMOKEZIP does not exist"             >> $ERROR_LOG
+        fi
+        if [ ! -e "$SMOKEDIFF" ]; then
+          echo ""
+          echo "error: smokediff failed to compile"          >> $ERROR_LOG
+          echo "       $SMOKEDIFF does not exist"            >> $ERROR_LOG
+        fi 
+        if [ ! -e "$WIND2FDS" ]; then
+          echo ""
+          echo "error: wind2fds failed to compile"           >> $ERROR_LOG
+          echo "       $WIND2FDS does not exist"             >> $ERROR_LOG
+        fi 
+        if [ ! -e "$BACKGROUND" ]; then
+          echo ""
+          echo "error: background failed to compile"         >> $ERROR_LOG
+          echo "       $BACKGROUND does not exist"           >> $ERROR_LOG
+        fi 
         cat $OUTPUT_DIR/stage2c                              >> $ERROR_LOG
         echo ""                                              >> $ERROR_LOG
         compile_errors=1
@@ -800,7 +815,6 @@ check_smv_utilities()
      is_file_installed smokezip
      is_file_installed smokediff
      is_file_installed wind2fds
-     is_file_installed dem2fds
      is_file_installed background
      if [ "$stage_utilities_success" == "0" ] ; then
         echo "Errors from Stage 2c - Smokeview and utilities:" >> $ERROR_LOG
@@ -862,7 +876,7 @@ run_verification_cases_release()
    # Start running all SMV verification cases
    cd $smvrepo/Verification/scripts
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3b 2>&1
-   ./Run_SMV_Cases.sh $INTEL2 $YOPT -c $cfastrepo -I $COMPILER -j $JOBPREFIX $USEINSTALL2 $RUN_OPENMP -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3b 2>&1
+   ./Run_SMV_Cases.sh $INTEL2 -Y -c $cfastrepo -j $JOBPREFIX $USEINSTALL2 $RUN_OPENMP -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3b 2>&1
 }
 
 #---------------------------------------------
@@ -879,7 +893,7 @@ check_verification_cases_release()
 
    if [[ `grep -rIi 'Run aborted' $OUTPUT_DIR/stage3b` == "" ]] && \
       [[ `grep -rIi 'Segmentation' Visualization/* WUI/* ` == "" ]] && \
-      [[ `grep -rI 'ERROR:' Visualization/* WUI/*  ` == "" ]] && \
+      [[ `grep -rI  'ERROR:' Visualization/* WUI/*  ` == "" ]] && \
       [[ `grep -rIi 'STOP: Numerical' Visualization/* WUI/*  ` == "" ]] && \
       [[ `grep -rIi  'forrtl' Visualization/* WUI/*  ` == "" ]]
    then
@@ -887,7 +901,7 @@ check_verification_cases_release()
    else
       grep -rIi 'Run aborted' $OUTPUT_DIR/stage3b > $OUTPUT_DIR/stage3b_errors
       grep -rIi 'Segmentation' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3b_errors
-      grep -rI 'ERROR:' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3b_errors
+      grep -rI  'ERROR:' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3b_errors
       grep -rIi 'STOP: Numerical' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3b_errors
       grep -rIi -A 20 'forrtl' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3b_errors
 
@@ -898,12 +912,12 @@ check_verification_cases_release()
    fi
 
       
-   if [[ `grep 'Warning' -rI $OUTPUT_DIR/stage3b` == "" ]] 
+   if [[ `grep 'Warning' -irI $OUTPUT_DIR/stage3b` == "" ]] 
    then
       no_warnings=true
    else
       echo "Stage 3b warnings:" >> $WARNING_LOG
-      grep 'Warning' -rI $OUTPUT_DIR/stage3b >> $WARNING_LOG
+      grep 'Warning' -irI $OUTPUT_DIR/stage3b >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
 }
@@ -945,13 +959,13 @@ check_compile_smv_db()
 
    # Check for compiler warnings/remarks
    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-    if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage2b | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]
+    if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage2b | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]
     then
       # Continue along
       :
     else
       echo "Stage 2b warnings:" >> $WARNING_LOG
-      grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage2b | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
+      grep -A 5 -i -E 'warning|remark' $OUTPUT_DIR/stage2b | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
       compile_errors=1
     fi
@@ -995,13 +1009,13 @@ check_compile_smv()
 
    # Check for compiler warnings/remarks
    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-    if [[ `grep -E 'warning|remark' $OUTPUT_DIR/stage2c | grep -v 'feupdateenv is not implemented' | grep -v 'was built for newer' | grep -v 'lcilkrts linked'` == "" ]]
+    if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage2c | grep -v 'feupdateenv is not implemented' | grep -v 'was built for newer' | grep -v 'lcilkrts linked'` == "" ]]
     then
       # Continue along
       :
     else
       echo "Stage 2c warnings:" >> $WARNING_LOG
-      grep -A 5 -E 'warning|remark' $OUTPUT_DIR/stage2c | grep -v 'feupdateenv is not implemented' | grep -v 'was built for newer' | grep -v 'lcilkrts linked' >> $WARNING_LOG
+      grep -A 5 -i -E 'warning|remark' $OUTPUT_DIR/stage2c | grep -v 'feupdateenv is not implemented' | grep -v 'was built for newer' | grep -v 'lcilkrts linked' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
       compile_errors=1
     fi
@@ -1018,8 +1032,8 @@ make_smv_pictures()
    echo Generating
    echo "   images"
    cd $smvrepo/Verification/scripts
-   ./Make_SMV_Pictures.sh $YOPT -q $SMOKEBOT_QUEUE -I $COMPILER -j SMV_ $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4a_orig
-   grep -v FreeFontPath $OUTPUT_DIR/stage4a_orig &> $OUTPUT_DIR/stage4a
+   ./Make_SMV_Pictures.sh -Y -q $SMOKEBOT_QUEUE -j SMV_ $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4a
+   grep -v FreeFontPath $OUTPUT_DIR/stage4a &> $OUTPUT_DIR/stage4b
 }
 
 #---------------------------------------------
@@ -1031,23 +1045,23 @@ check_smv_pictures()
    # Scan and report any errors in make SMV pictures process
    cd $smokebotdir
    echo "   checking"
-   if [[ `grep -I -E "Segmentation|Error" $OUTPUT_DIR/stage4a` == "" ]]
+   if [[ `grep -I -E -i "Segmentation|Error" $OUTPUT_DIR/stage4b` == "" ]]
    then
-      stage4a_smvpics_success=true
+      stage4b_smvpics_success=true
    else
-      cp $OUTPUT_DIR/stage4a  $OUTPUT_DIR/stage4a_errors
+      cp $OUTPUT_DIR/stage4b  $OUTPUT_DIR/stage4b_errors
 
       echo "Errors from Stage 4a - Make SMV pictures (release mode):" >> $ERROR_LOG
-      grep -B 5 -A 5 -I -E "Segmentation|Error"  $OUTPUT_DIR/stage4a  >> $ERROR_LOG
+      grep -B 5 -A 5 -I -E -i "Segmentation|Error"  $OUTPUT_DIR/stage4b  >> $ERROR_LOG
       echo "" >> $ERROR_LOG
    fi
-   if [[ `grep -I -E "Warning" $OUTPUT_DIR/stage4a` == "" ]]
+   if [[ `grep -I -E -i "Warning" $OUTPUT_DIR/stage4b` == "" ]]
    then
       # Continue along
       :
    else
       echo "Warnings from Stage 4a - Make SMV pictures (release mode):" >> $WARNING_LOG
-      grep -A 2 -I -E "Warning" $OUTPUT_DIR/stage4a                     >> $WARNING_LOG
+      grep -A 2 -I -E -i "Warning" $OUTPUT_DIR/stage4b                     >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
 }
@@ -1060,7 +1074,7 @@ make_smv_movies()
 {
    echo "   movies"
    cd $smvrepo/Verification
-   scripts/Make_SMV_Movies.sh -q $SMOKEBOT_QUEUE 2>&1  &> $OUTPUT_DIR/stage4b
+   scripts/Make_SMV_Movies.sh -q $SMOKEBOT_QUEUE 2>&1  &> $OUTPUT_DIR/stage4c
 }
 
 #---------------------------------------------
@@ -1071,26 +1085,25 @@ check_smv_movies()
 {
    cd $smokebotdir
    echo "   checking"
-   if [[ `grep -I -E "Segmentation|Error" $OUTPUT_DIR/stage4b` == "" ]]
+   if [[ `grep -I -E -i "Segmentation|Error" $OUTPUT_DIR/stage4c` == "" ]]
    then
-      stage4b_success=true
+      stage4c_success=true
    else
-      cp $OUTPUT_DIR/stage4b  $OUTPUT_DIR/stage4b_errors
-
-      echo "Errors from Stage 4b - Make SMV movies " >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage4b                        >> $ERROR_LOG
-      echo ""                                        >> $ERROR_LOG
+      echo "Errors from Stage 4c - Make SMV movies "                    >> $ERROR_LOG
+      grep -B 1 -A 1 -I -E -i "Segmentation|Error"  $OUTPUT_DIR/stage4c >  $OUTPUT_DIR/stage4c_errors
+      grep -B 1 -A 1 -I -E -i "Segmentation|Error"  $OUTPUT_DIR/stage4c >> $ERROR_LOG
+      echo ""                                                           >> $ERROR_LOG
    fi
 
    # Scan for and report any warnings in make SMV pictures process
    cd $smokebotdir
-   if [[ `grep -I -E "Warning" $OUTPUT_DIR/stage4b` == "" ]]
+   if [[ `grep -I -E -i "Warning" $OUTPUT_DIR/stage4c` == "" ]]
    then
       # Continue along
       :
    else
       echo "Warnings from Stage 4b - Make SMV movies (release mode):" >> $WARNING_LOG
-      grep -I -E "Warning" $OUTPUT_DIR/stage4b                        >> $WARNING_LOG
+      grep -I -E -i "Warning" $OUTPUT_DIR/stage4c                     >> $WARNING_LOG
       echo ""                                                         >> $WARNING_LOG
    fi
 }
@@ -1149,8 +1162,8 @@ check_guide()
 
    SMOKEBOT_MAN_DIR=
    if [ "$WEB_DIR" != "" ]; then
-     if [ -d $WEB_DIR/manuals ]; then
-       SMOKEBOT_MAN_DIR=$WEB_DIR/manuals
+     if [ -d $WEB_ROOT/$WEB_DIR/manuals ]; then
+       SMOKEBOT_MAN_DIR=$WEB_ROOT/$WEB_DIR/manuals
      fi
    fi
 
@@ -1164,10 +1177,10 @@ check_guide()
      if [ "$SMOKEBOT_MAN_DIR" != "" ]; then
        cp $directory/$document $SMOKEBOT_MAN_DIR/.
      fi
+     chmod 664 $directory/$document
+     cp $directory/$document $SMV_SUMMARY_DIR/manuals/.
      cp $directory/$document $NEWGUIDE_DIR/.
      cp $directory/$document $LATESTPUBS_DIR/$document
-     chmod 664 $NEWGUIDE_DIR/$document
-     chmod 664 $LATESTPUBS_DIR/$document
    fi
 
    # Check for LaTeX warnings (undefined references or duplicate labels)
@@ -1290,7 +1303,7 @@ email_compile_errors()
   fi 
 
   if [[ -e $SMOKEBOT_LOG ]]; then
-    cat $SMOKEBOT_LOG | mail -s "smokebot compile errors and/or warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailToSMV > /dev/null
+    cat $SMOKEBOT_LOG | mail $REPLYTO -s "smokebot compile errors and/or warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailToSMV > /dev/null
     rm -f $SMOKEBOT_LOG
   fi
 }
@@ -1317,6 +1330,8 @@ email_build_status()
   echo "               queue: $SMOKEBOT_QUEUE"               >> $TIME_LOG
   echo "  fds version/branch: $FDS_REVISION/$FDSBRANCH"      >> $TIME_LOG
   echo "  smv version/branch: $SMV_REVISION/$SMVBRANCH"      >> $TIME_LOG
+  echo "  bot version/branch: $BOT_REVISION/$BOTBRANCH"      >> $TIME_LOG
+  echo "  fig version/branch: $FIG_REVISION/master"          >> $TIME_LOG
   echo "cfast version/branch: $CFAST_REVISION/$CFASTBRANCH"  >> $TIME_LOG
   if [ "$IFORT_VERSION" != "" ]; then
     echo "              Fortran: $IFORT_VERSION "            >> $TIME_LOG
@@ -1372,8 +1387,13 @@ email_build_status()
   fi
   cd $smokebotdir
   # Check for warnings and errors
-  if [ "$WEB_URL" != "" ]; then
-    echo "     Smokebot summary: $WEB_URL" >> $TIME_LOG
+  if [[ "$WEB_URL" != "" ]] && [[ "$UPDATED_WEB_IMAGES" == "1" ]]; then
+    echo "               images: $WEB_URL" >> $TIME_LOG
+    if [ -e image_differences ]; then
+      NUM_CHANGES=`cat image_differences | awk '{print $1}'`
+      NUM_ERRORS=`cat image_differences | awk '{print $2}'`
+      echo "image errors/changes: $NUM_ERRORS/$NUM_CHANGES"  >> $TIME_LOG
+    fi
   fi
   if [ "$UPLOADRESULTS" == "1" ]; then
     echo "      Smokebot status: https://pages.nist.gov/fds-smv/smokebot_status.html" >> $TIME_LOG
@@ -1385,17 +1405,17 @@ email_build_status()
   NAMELIST_LOGS="$NAMELIST_NODOC_LOG $NAMELIST_NOSOURCE_LOG"
   if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]; then
     # Send email with failure message and warnings, body of email contains appropriate log file
-    cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "smokebot failure and warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+    cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot failure and warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
 
   # Check for errors only
   elif [ -e $ERROR_LOG ]; then
     # Send email with failure message, body of email contains error log file
-    cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "smokebot failure on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+    cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot failure on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
 
   # Check for warnings only
   elif [ -e $WARNING_LOG ]; then
      # Send email with success message, include warnings
-    cat $WARNING_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "smokebot success with warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+    cat $WARNING_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot success with warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
 
   # No errors or warnings
   else
@@ -1408,7 +1428,7 @@ email_build_status()
 
       # Send success message with links to nightly manuals
 
-    cat $TIME_LOG $NAMELIST_LOGS | mail -s "smokebot success on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+    cat $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot success on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
 
 # save apps that were built for bundling
 
@@ -1429,7 +1449,6 @@ email_build_status()
 
 #*** define initial values
 
-YOPT=-Y
 smokebotdir=`pwd`
 OUTPUT_DIR="$smokebotdir/output"
 HISTORY_DIR_ARCHIVE="$HOME/.smokebot/history"
@@ -1443,9 +1462,12 @@ EMAIL_LIST="$HOME/.smokebot/smokebot_email_list.sh"
 TIME_LOG=$OUTPUT_DIR/timings
 ERROR_LOG=$OUTPUT_DIR/errors
 WARNING_LOG=$OUTPUT_DIR/warnings
+FYI_LOG=$OUTPUT_DIR/fyis
 STAGE_STATUS=$OUTPUT_DIR/stage_status
 NEWGUIDE_DIR=$OUTPUT_DIR/Newest_Guides
 WEB_DIR=
+WEB_ROOT=
+UPDATED_WEB_IMAGES=
 SMOKEBOT_LITE=
 export SCRIPTFILES=$smokebotdir/scriptfiles
 
@@ -1473,6 +1495,8 @@ CLONE_REPOS=
 CLONE_FDSSMV=
 FDS_REV=origin/master
 SMV_REV=origin/master
+FDS_TAG=
+SMV_TAG=
 CHECKOUT=
 compile_errors=
 
@@ -1482,7 +1506,7 @@ echo $$ > $PID_FILE
 
 #*** parse command line options
 
-while getopts 'ab:BcI:JLm:Mo:q:R:TuUw:x:y:' OPTION
+while getopts 'ab:BcJLm:Mo:q:R:TuUw:W:x:X:y:Y:' OPTION
 do
 case $OPTION in
   a)
@@ -1501,9 +1525,6 @@ case $OPTION in
    ;;
   c)
    CLEANREPO=1
-   ;;
-  I)
-   COMPILER="$OPTARG"
    ;;
   J)
    INTEL=i
@@ -1541,13 +1562,22 @@ case $OPTION in
   w)
    WEB_DIR="$OPTARG"
    ;;
+  W)
+   WEB_ROOT="$OPTARG"
+   ;;
   x)
    FDS_REV="$OPTARG"
    CHECKOUT=1
    ;;
+  X)
+   FDS_TAG="$OPTARG"
+   ;;
   y)
    SMV_REV="$OPTARG"
    CHECKOUT=1
+   ;;
+  Y)
+   SMV_TAG="$OPTARG"
    ;;
 esac
 done
@@ -1605,10 +1635,14 @@ botrepo=$repo/bot
 cfastrepo=$repo/cfast
 fdsrepo=$repo/fds
 smvrepo=$repo/smv
+figrepo=$repo/fig
 
 # clean smokebot output files
 
 clean_smokebot_history
+
+#*** write out file when firebot first starts
+date > $OUTPUT_DIR/stage0_start 2>&1
 
 if [[ "$CLONE_REPOS" != "" ]]; then
   echo Cloning repos
@@ -1617,19 +1651,25 @@ if [[ "$CLONE_REPOS" != "" ]]; then
 # only clone fds and smv repos
   if [ "$CLONE_FDSSMV" != "" ]; then
    # only clone the fds and smv repos - used when just compiling the fds and smv apps
-  ./setup_repos.sh -T > $OUTPUT_DIR/stage1_clone 2>&1
+  ./setup_repos.sh -T                           > $OUTPUT_DIR/stage1_clone 2>&1
   else
    # clone all repos
-    ./setup_repos.sh -F > $OUTPUT_DIR/stage1_clone 2>&1
+    ./setup_repos.sh -F                         > $OUTPUT_DIR/stage1_clone 2>&1
   fi
-  if [ "$CLONE_REPOS" != "master" ]; then
+  if [[ "$CLONE_REPOS" != "master" ]]; then
     FDSBRANCH=$CLONE_REPOS
     cd $fdsrepo
-    git checkout -b $FDSBRANCH $FDS_REV >> $OUTPUT_DIR/stage1_clone 2>&1
+    git checkout -b $FDSBRANCH $FDS_REV          >> $OUTPUT_DIR/stage1_clone 2>&1
+    if [ "$FDS_TAG" != "" ]; then
+      git tag -a $FDS_TAG -m "tag for $FDS_TAG"  >> $OUTPUT_DIR/stage1_clone 2>&1
+    fi
 
     SMVBRANCH=$CLONE_REPOS
     cd $smvrepo
-    git checkout -b $SMVBRANCH $SMV_REV >> $OUTPUT_DIR/stage1_clone 2>&1
+    git checkout -b $SMVBRANCH $SMV_REV          >> $OUTPUT_DIR/stage1_clone 2>&1
+    if [ "$SMV_TAG" != "" ]; then
+      git tag -a $SMV_TAG -m "tag for $SMV_TAG"  >> $OUTPUT_DIR/stage1_clone 2>&1
+    fi
   fi
 fi
 
@@ -1659,6 +1699,8 @@ if [ "$SMVBRANCH" == "current" ]; then
   SMVBRANCH=`git rev-parse --abbrev-ref HEAD`
 fi
 
+CD_REPO $figrepo master ||  exit 1
+
 #save apps and pubs in directories under .smokebot/$SMVBRANCH
 BRANCH_DIR=$HOME/.smokebot/$SMVBRANCH
 BRANCHPUBS_DIR=$BRANCH_DIR/pubs
@@ -1675,8 +1717,8 @@ if [[ $RUNAUTO == "y" ]] ; then
 fi
 
 if [ "$WEB_DIR" != "" ]; then
-  if [ -d $WEB_DIR ]; then
-    testfile=$WEB_DIR/test.$$
+  if [ -d $WEB_ROOT/$WEB_DIR ]; then
+    testfile=$WEB_ROOT/$WEB_DIR/test.$$
     touch $testfile >& /dev/null
     if [ -e $testfile ]; then
       rm $testfile
@@ -1689,19 +1731,15 @@ if [ "$WEB_DIR" != "" ]; then
 fi
 if [ "$WEB_DIR" != "" ]; then
   WEB_HOST=`hostname -A | awk '{print $2}'`
-  WEB_URL=http://$WEB_HOST/`basename $WEB_DIR`
+  WEB_URL=http://$WEB_HOST/$WEB_DIR/diffs.html
 else
   WEB_URL=
 fi
 
-if [ "$COMPILER" == "intel" ]; then
-  if [[ "$IFORT_COMPILER" != "" ]] ; then
-    source $IFORT_COMPILER/bin/compilervars.sh intel64
-  fi 
-  notfound=`icc -help 2>&1 | tail -1 | grep "not found" | wc -l`
-else
-  notfound=`gcc -help 2>&1 | tail -1 | grep "not found" | wc -l`
-fi
+if [[ "$IFORT_COMPILER" != "" ]] ; then
+  source $IFORT_COMPILER/bin/compilervars.sh intel64
+fi 
+notfound=`icc -help 2>&1 | tail -1 | grep "not found" | wc -l`
 if [ "$notfound" == "1" ] ; then
   export haveCC="0"
   USEINSTALL="-i"
@@ -1746,7 +1784,7 @@ else
   echo "update repos: no"
 fi
 if [ "$WEB_DIR" != "" ]; then
-  echo "     web dir: $WEB_DIR"
+  echo "     web dir: $WEB_ROOT/$WEB_DIR"
 fi
 if [ "$WEB_URL" != "" ]; then
   echo "         URL: $WEB_URL"
@@ -1769,10 +1807,22 @@ if [ -e $FDS_STATUS_FILE ] ; then
   LAST_FDS_FAILED=`cat $FDS_STATUS_FILE`
 fi
 
+
 # Load mailing list for status report
+
+if [ -e $EMAIL_LIST ]; then
+  source $EMAIL_LIST
+fi
+
+# define reply to address to prevent bounced emails when doing a reply all to smokebot's status emails
+
+REPLYTO=
+if [ "$replyToSMV" != "" ]; then
+  REPLYTO="-S replyto=\"$replyToSMV\""
+fi
+
 if [ "$mailTo" == "" ]; then
   if [ -e $EMAIL_LIST ]; then
-    source $EMAIL_LIST
     mailTo=$mailToSMV
     if [[ "$LAST_FDS_FAILED" == "1" ]] ; then
       mailTo=$mailToFDS
@@ -1864,11 +1914,19 @@ check_update_repo
 
 #define repo revisions
 
+rm -f $FYI_LOG
+touch $FYI_LOG
 cd $cfastrepo
 CFAST_REVISION=`git describe --long --dirty`
 
 cd $fdsrepo
 FDS_REVISION=`git describe --long --dirty`
+
+cd $figrepo
+FIG_REVISION=`git describe --long --dirty`
+
+cd $botrepo
+BOT_REVISION=`git describe --long --dirty`
 
 # copy smv revision and hash to the latest pubs and apps directory
 cd $smvrepo
@@ -2015,10 +2073,6 @@ MAKEGUIDES_beg=`GET_TIME`
 if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
   if [[ $stage_ver_release_success ]] ; then
      echo Making guides
-     if [ "$YOPT" == "" ]; then
-       echo "   geometry notes"
-       make_guide geom_notes $fdsrepo/Manuals/FDS_User_Guide geometry_notes
-     fi
      echo "   user"
      make_guide SMV_User_Guide                $smvrepo/Manuals/SMV_User_Guide                SMV_User_Guide
      echo "   technical"
@@ -2041,13 +2095,44 @@ if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
        sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                          | \
        sed "s/&&SMV_BUILD&&/$SMV_REVISION/g" > $SMV_SUMMARY_DIR/movies.html
 
+# copy images to be compared to summary directory
+       cp $smvrepo/Manuals/SMV_User_Guide/SCRIPT_FIGURES/*.png         $SMV_SUMMARY_DIR/images/user/.
+       cp $smvrepo/Manuals/SMV_Verification_Guide/SCRIPT_FIGURES/*.png $SMV_SUMMARY_DIR/images/verification/.
+       cd $botrepo/Smokebot
+       ./remove_images.sh $SMV_SUMMARY_DIR/images
+
+# compare images generated by this smokebot run with a base set in the fig repo
+       cd $botrepo/Smokebot
+       ../Firebot/compare_images.sh $figrepo/compare/smokebot/images $SMV_SUMMARY_DIR/images $SMV_SUMMARY_DIR/diffs/images >& $OUTPUT_DIR/stage5_image_compare
+       UPDATED_WEB_IMAGES=1
+
+# look for fyis
+       if [[ `grep '***fyi:' $OUTPUT_DIR/stage5_image_compare` == "" ]]
+       then
+         # Continue along
+         :
+       else
+         echo "FYIs from Stage 5 - Image comparisons:"     >> $FYI_LOG
+         grep '***fyi:' $OUTPUT_DIR/stage5_image_compare   >> $FYI_LOG
+       fi
+
+# look for warnings
+       if [[ `grep '***warning:' $OUTPUT_DIR/stage5_image_compare` == "" ]]
+       then
+         # Continue along
+         :
+       else
+         echo "Warnings from Stage 5 - Image comparisons:"     >> $WARNING_LOG
+         grep '***warning:' $OUTPUT_DIR/stage5_image_compare   >> $WARNING_LOG
+       fi
+       
        if [ "$WEB_DIR" != "" ]; then
-         rm -rf $WEB_DIR/images $WEB_DIR/images2 $WEB_DIR/manuals $WEB_DIR/*.html
+         rm -rf $WEB_ROOT/$WEB_DIR/images $WEB_ROOT/$WEB_DIR/images2 $WEB_ROOT/$WEB_DIR/manuals $WEB_ROOT/$WEB_DIR/*.html
          if [ "$MAKEMOVIES" != "0" ]; then
-           rm -rf $WEB_DIR/movies
+           rm -rf $WEB_ROOT/$WEB_DIR/movies
          fi
-         cp -r $SMV_SUMMARY_DIR/* $WEB_DIR/.
-         rm -f $WEB_DIR/*template.html
+         cp -r $SMV_SUMMARY_DIR/* $WEB_ROOT/$WEB_DIR/.
+         rm -f $WEB_ROOT/$WEB_DIR/*template.html
        fi
      fi
 

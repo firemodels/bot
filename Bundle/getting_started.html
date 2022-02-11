@@ -14,11 +14,16 @@ function get_fullpath(command,platform){
   return fullpath;
 }
 function run_script(script){
-  MyObject.Run(get_fullpath("../scripts/webRUN_script.bat ",script));
+  MyObject.Run(get_fullpath("webscripts/webRUN_script.bat ",script));
 }
 </script>
 </HEAD>
 <BODY BGCOLOR="#FFFFFF" >
+<a href="build_bundle.html"><font size=5>Bundle</font></a> -
+<a href="build_fds.html"><font size=5>FDS</font></a> - 
+<a href="build_smokeview.html"><font size=5>Smokeview</font></a> - 
+<a href="build_guides.html"><font size=5>Guides</font></a>
+
 <h2>Getting Started using FDS/Smokeview Build Scripts</h2>
 <hr size="1">
 
@@ -29,7 +34,7 @@ function run_script(script){
 <ol>
 <li>Open the <tt>Utilities\Scripts</tt> folder and double-click on the file <tt>COPY_fds_smv_env.bat</tt>. 
 This copies <tt>fds-smv_env.bat</tt> to your home directory.
-<li><button onclick="run_script('\\bot\\Scripts\\webEDIT_setup.bat')">Click here</button> to update the <tt>fds_smv_env.bat</tt> configuration file.
+<li><button onclick="run_script('\\bot\\Bundle\\webscripts\\webEDIT_setup.bat')">Click here</button> to update the <tt>fds_smv_env.bat</tt> configuration file.
 (Define your FDS/Smokeview repository location.)
 </ol>
 
@@ -64,20 +69,12 @@ is located in the <tt>.ssh</tt> directory in your home directory.
 
 <h3>Testing the Setup</h3>
 <ul>
-<p><li><button onclick="run_script('\\smv\\scripts\\webTEST_setup.bat')">Click here</button> to verify that software tools
+<p><li><button onclick="run_script('\\bot\\Bundle\\webscripts\\webTestSetup.bat')">Click here</button> to verify that software tools
 needed by the FDS-Smokeview web scripts are installed.
 </ul>
 
-<h3>Using the Scripts</h3>
-Click on 
-<a href="build_fds.html">FDS</a>,
-<a href="build_smokeview.html">Smokeview</a>,
-<a href="build_guides.html">Guides</a>,
-<a href="build_bundle.html">Bundle</a>
-to build FDS, Smokeview, guides or bundle.
-
 <p><hr>
-<p><button onclick="run_script('\\smv\\scripts\\webEDIT_getting_started.bat')">Edit this web page</button>
+<p><button onclick="run_script('\\bot\\Bundle\\webscripts\\webEDIT_getting_started.bat')">Edit this web page</button>
 
 
 

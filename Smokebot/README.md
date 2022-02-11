@@ -1,16 +1,16 @@
 # Smokebot: A Continuous Integration Tool for Smokeview
 
-Smokebot is a verification test script that can be run at a regular intervals as part of a continuous integration program. At NIST, the script is run by a pseudo-user named `smokebot` on a linux cluster each night. The pseudo-user `smokebot` updates the various repositories in the GitHub project named `firemodels`, compiles FDS and Smokeview, runs the verification cases, generates smokeview images, and compiles all of the manuals. The entire process takes an hour to complete.
+Smokebot is a verification test script that can be run at regular intervals as part of a continuous integration program. At NIST, the script is run by a pseudo-user named `smokebot` on a linux cluster each night and whenever updates are made the fds or smv repos. The pseudo-user `smokebot` updates the various repositories in the GitHub project named `firemodels`, compiles FDS and Smokeview, runs the verification cases, generates smokeview images, and builds all of the smokeview manuals. The entire process takes an hour to complete.
 
 ## Set-Up
 
-The following steps need only be done once. The exact phrasing of the commands are for the NIST linux cluster named blaze. You might need to modify the path and module names.
+The following steps only need to be done once. The exact phrasing of the commands are for the NIST linux cluster named blaze. You might need to modify the path and module names.
 
 1. Clone the repositories that are included in the GitHub organization called `firemodels`: `bot`, `cfast`, `fds`, `fig` and `smv`. Clone `bot` first, then cd into `bot/Scripts` and type `./setup_repos.sh -a` . This will clone all the other repos needed in the same directory as `bot` (or you can clone each repo in the same way as you cloned `bot`).
 
 2. Ensure that the following software packages are installed on the system:
 
-    * Intel Fortran and C compilers and Intel Inspector
+    * Intel Fortran and C compilers
     * Gnu Fortran compiler
     * LaTeX (TeX Live distribution), be sure to make this the default LaTeX in the system-wide PATH
 
@@ -21,19 +21,16 @@ The following steps need only be done once. The exact phrasing of the commands a
    yum install mesa-libGL-devel mesa-libGLU-devel libXmu-devel libXi-devel xorg-x11-server-Xvfb
    ```
 
-5. Add the following lines to your `~/.bashrc` file:
+5. Add the following lines (or the equivalent if you are using a different Intel compiler) to your `~/.bashrc` file:
     ```
-    . /usr/local/Modules/3.2.10/init/bash
-    module load null modules torque-maui
-    module load intel/18
-    module load gfortran492
+    source /opt/intel/oneapi/setvars.sh >& /dev/null
+    # - needed to build smokeview
+    export IFORT_COMPILER_LIB=/opt/intel/oneapi/compiler/latest/linux/compiler/lib/intel64_lin
     ulimit -s unlimited
     ```
-    Note that these modules load the Intel Fortran and Gnu Fortran compilers, both of which are used to check FDS for syntax errors and consisistency with the Fortran 2008 standard.
-    
 6. Setup passwordless SSH for the your account. Generate SSH keys and ensure that the head node can SSH into all of the compute nodes. Also, make sure that your account information is propagated across all compute nodes.
 
-7. Ensure that a queue named `smokebot` is created, enabled, and started in the torque queueing system and that nodes are defined for this queue. Test the `qstat` command.  If you use some other queue say batch then use `-q batch` when running smokebot.
+7. Ensure that a queue named `smokebot` is created and enabled. Test the `qstat` command.  If you use some other queue say batch then use `-q batch` when running smokebot.
 
 8. By default, smokebot sends email to the email address configured for your bot repo (output of command `git config user.email` ) .  If you wish email to go to different email addresses, create a file named $HOME/.smokebot/firebot_email_list.sh for some `user1` and `user2` (or more) that looks like:
 
@@ -46,7 +43,7 @@ mailToFDS="user1@host1.com, user2@host2.com"
 
 ## Running Smokebot
 
-The script `smokebot.sh` is run using the wrapper script `run_smokebot.sh`. This script uses a semaphore file that ensures multiple instances of smokebot do not run, which would cause file conflicts. To see the various options associated with running smokebot, type
+The script `smokebot.sh` is run using the wrapper script `run_smokebot.sh`. This script uses a lock file that ensures multiple instances of smokebot do not run at the same time. To see the various options associated with running smokebot, type
 ```
 ./run_smokebot.sh -H
 ```
@@ -71,3 +68,25 @@ MAILTO=""
 ```
 
 The output from smokebot is written into the directory called `output` which is in the same directory as the `smokebot.sh` script itself. When smokebot completes, email should be sent to the specified list of addresses.
+
+## Updating Comparison Images
+
+Smokebot compares images it generates with a corresponding set of base images located in the fig repo.
+Firebot and Smokebot use the same update_repo_images.sh script.
+To update the base set of images on a Linux or Mac computer:
+
+```
+bring fig repo up to date
+cd $HOME/FireModels_fork/bot/Smokebot
+./update_repo_images.sh -r /path_to_smokebot_root
+  where `/path_to_smokebot_root` is the root directory containing the bot/Smokebot directory that generated the images.  
+cd $HOME/FireModels_fork/bot/fig
+follow usual procedure to incorporate updated fig repo images into your repo and github ie stage, commit, push and do a pull request
+```
+
+At NIST we would type the following command to generate the new set of base images
+
+```
+cd $HOME/FireModels_fork/bot/Smokebot
+../Firebot/update_repo_images.sh -r ~smokebot/Firebot_clone
+```

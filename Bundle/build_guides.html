@@ -13,25 +13,25 @@ function get_fullpath(command,platform){
   return fullpath;
 }
 function run_script(script){
-  MyObject.Run(get_fullpath("../../smv/scripts/webRUN_script.bat ",script));
+  MyObject.Run(get_fullpath("webscripts/webRUN_script.bat ",script));
 }
 function build_fdsguide(guide){
-  MyObject.Run(get_fullpath("../../smv/scripts/webBUILDfdsguide.bat ",guide));
+  MyObject.Run(get_fullpath("webscripts/webBUILDfdsguide.bat ",guide));
 }
 function build_smvguide(guide){
-  MyObject.Run(get_fullpath("../../smv/scripts/webBUILDsmvguide.bat ",guide));
+  MyObject.Run(get_fullpath("webscripts/webBUILDsmvguide.bat ",guide));
 }
 function view_fdsguide(guide){
-  MyObject.Run(get_fullpath("../../smv/scripts/webVIEWfdsguide.bat ",guide));
+  MyObject.Run(get_fullpath("webscripts/webVIEWfdsguide.bat ",guide));
 }
 function view_smvguide(guide){
-  MyObject.Run(get_fullpath("../../smv/scripts/webVIEWsmvguide.bat ",guide));
+  MyObject.Run(get_fullpath("webscripts/webVIEWsmvguide.bat ",guide));
 }
 function copy_guides(guide){
-  MyObject.Run(get_fullpath("../../smv/scripts/webCOPYguides.bat ",guide));
+  MyObject.Run(get_fullpath("webscripts/webCOPYguides.bat ",guide));
 }
 function get_figs(guide){
-  MyObject.Run(get_fullpath("../../smv/scripts/webGETfigs.bat ",guide));
+  MyObject.Run(get_fullpath("webscripts/webGETfigs.bat ",guide));
 }
 </script>
 </HEAD>
@@ -52,7 +52,7 @@ function get_figs(guide){
 <td rowspan=2 align=center>
 Windows<br>
 ~\.bundle\pubs<br>
-<button onclick="run_script('\\bot\\Scripts\\openguidedir.bat')">Show</button>
+<button onclick="run_script('\\bot\\Bundle\\webscripts\\webOpenGuideDir.bat')">Show</button>
 </td>
 <td><button onclick="copy_guides('to_linux')">==></button></td>
 <td>Linux ~/.bundle/pubs</td>
@@ -73,85 +73,83 @@ Windows<br>
 <p>Steps below not needed to create bundles
 
 <p><table border=on>
-<tr><th colspan=3>Smokeview Guide Images</th></tr>
+
+<tr><th colspan=7>Smokeview</th></tr>
+
+<tr><th colspan=4>Images</th><th colspan=3>Guides</th></tr>
 <tr>
-<td align=center>User</td>
-<td><button onclick="get_figs('smvug')">==></button></td>
-<td align=center rowspan=2>Windows<br>repo</td>
+<th rowspan=2>Central</th>
+<td align=center>User</td><td><button onclick="get_figs('smvug')">==></button></td><td align=center rowspan=4>Windows<br>repo</td>
+<th>Technical</th><th>User</th><th>Verification</th></tr>
+</tr>
+
+<tr align=center>
+<td>Verification</td><td><button onclick="get_figs('smvvg')">==></button></td>
+<td><button onclick="build_smvguide('SMV_Technical_Reference_Guide')">Build</button></td>
+<td><button onclick="build_smvguide('SMV_User_Guide')">Build</button></td>
+<td><button onclick="build_smvguide('SMV_Verification_Guide')">Build</button></td>
+</tr>
+
+<tr align=center>
+<th rowspan=2>Fork</th>
+<td align=center>User</td><td><button onclick="get_figs('smvugfork')">==></button></td>
+<td><button onclick="view_smvguide('SMV_Technical_Reference_Guide')">View</button></td>
+<td><button onclick="view_smvguide('SMV_User_Guide')">View</button></td>
+<td><button onclick="view_smvguide('SMV_Verification_Guide')">View</button></td>
 </tr>
 
 <tr>
-<td>Verification</td>
-<td><button onclick="get_figs('smvvg')">==></button></td>
+<td>Verification</td><td><button onclick="get_figs('smvvgfork')">==></button></td>
 </tr>
 </table>
 
 <p><table border=on>
-<tr><th colspan=3>FDS Guide Images</th></tr>
+<tr><th colspan=8>FDS</th></tr>
+<tr><th colspan=3>Images</th><th colspan=5>Guides</th></tr>
+
 <tr>
 <td align=center>User</td>
 <td><button onclick="get_figs('fdsug')">==></button></td>
 <td align=center rowspan=3>Windows<br>repo</td>
+<th>Config</th><th>Technical</th><th>User</th><th>Validation</th><th>Verification</th>
 </tr>
 
-<tr>
+
+<tr align=center>
 <td align=center>Verification</td>
 <td><button onclick="get_figs('fdsverg')">==></button></td>
-</tr>
-
-<tr>
-<td align=center>Validation</td>
-<td><button onclick="get_figs('fdsvalg')">==></button></td>
-</tr>
-</table>
-
-<p>
-<table border=on>
-<tr><th colspan=2>Web Summary</th></tr>
-<tr>
-<td><button onclick="get_figs('websummary')">Update</button></td>
-<td><button onclick="run_script('\\smv\\scripts\\webVIEW_localimages.bat')">View</button></td>
-</tr>
-</table>
-
-<p><table border=on>
-<tr><th colspan=5>FDS Guides</th></tr>
-<tr><th>Config</th><th>Technical</th><th>User</th><th>Validation</th><th>Verification</th></tr>
-<tr align=center>
 <td><button onclick="build_fdsguide('FDS_Config_management_Plan')">Build</button></td>
 <td><button onclick="build_fdsguide('FDS_Technical_Reference_Guide')">Build</button></td>
 <td><button onclick="build_fdsguide('FDS_User_Guide')">Build</button></td>
 <td><button onclick="build_fdsguide('FDS_Validation_Guide')">Build</button></td>
 <td><button onclick="build_fdsguide('FDS_Verification_Guide')">Build</button></td>
 </tr>
+
 <tr align=center>
+<td align=center>Validation</td>
+<td><button onclick="get_figs('fdsvalg')">==></button></td>
 <td><button onclick="view_fdsguide('FDS_Config_management_Plan')">View</button></td>
 <td><button onclick="view_fdsguide('FDS_Technical_Reference_Guide')">View</button></td>
 <td><button onclick="view_fdsguide('FDS_User_Guide')">View</button></td>
 <td><button onclick="view_fdsguide('FDS_Validation_Guide')">View</button></td>
 <td><button onclick="view_fdsguide('FDS_Verification_Guide')">View</button></td>
+
 </tr>
 </table>
 
-<p><table border=on>
-<tr><th colspan=3>Smokeview Guides</th></tr>
-<tr><th>Technical</th><th>User</th><th>Verification</th></tr>
-<tr align=center>
-<td><button onclick="build_smvguide('SMV_Technical_Reference_Guide')">Build</button></td>
-<td><button onclick="build_smvguide('SMV_User_Guide')">Build</button></td>
-<td><button onclick="build_smvguide('SMV_Verification_Guide')">Build</button></td>
-</tr>
-<tr align=center>
-<td><button onclick="view_smvguide('SMV_Technical_Reference_Guide')">View</button></td>
-<td><button onclick="view_smvguide('SMV_User_Guide')">View</button></td>
-<td><button onclick="view_smvguide('SMV_Verification_Guide')">View</button></td>
+
+<p>
+<table border=on>
+<tr><th colspan=2>Web Summary</th></tr>
+<tr>
+<td><button onclick="get_figs('websummary')">Update</button></td>
+<td><button onclick="run_script('\\bot\\Bundle\\webscripts\\webVIEW_localimages.bat')">View</button></td>
 </tr>
 </table>
-
 
 <h3>Other</h3>
 <p>
-<button onclick="run_script('\\bot\\Scripts\\webEDIT_build_guides.bat')">Edit this page</button><br>
+<button onclick="run_script('\\bot\\Bundle\\webscripts\\webEDIT_build_guides.bat')">Edit this page</button><br>
 <p><hr>
 
 </BODY>

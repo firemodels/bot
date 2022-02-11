@@ -3,6 +3,12 @@ app_type=$1
 eval dir_from=$2
 error_log=$3
 
+platform="linux"
+if [ "`uname`" == "Darwin" ] ; then
+  platform="osx"
+fi
+
+
 
 if [ "$app_type" != "fds" ]; then
   app_type="smv"
@@ -56,7 +62,6 @@ if [ "$app_type" == "smv" ]; then
   echo ***copying smokeview apps from $dir_from
   CP background
   CP hashfile
-  CP dem2fds
   CP smokediff
   CP smokeview
   CP smokezip

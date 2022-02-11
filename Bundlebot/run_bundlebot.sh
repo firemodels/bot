@@ -1,4 +1,57 @@
-#!/bin/bash
+ #!/bin/bash
+
+if [ "`uname`" == "Darwin" ] ; then
+
+#*** OSX parameters
+
+  export FDS_OPENMPIDIR=/opt/openmpi410_oneapi_64
+fi
+
+#---------------------------------------------
+#                   usage
+#---------------------------------------------
+
+function usage {
+echo ""
+echo "run_bundlebot.sh usage"
+echo ""
+echo "This script builds FDS and Smokeview apps and generates a bundle using either the"
+echo "specified fds and smv repo revisions or revisions from the latest firebot pass."
+echo ""
+echo "Options:"
+echo "-c - bundle without warning about cloning/erasing fds and smv repos"
+echo "-f - force this script to run"
+echo "-F - fds repo hash/release"
+echo "-h - display this message"
+echo "-p host -  host containing pubs"
+echo "           firebot/fds pubs: ~firebot/.firebot/pubs"
+echo "-P parameter_file - file containing bundle settings"
+echo "-C - use pubs in $HOME/.bundle/manuals on pub_host"
+echo "-X fdstag - when cloning, tag fds repo with fdstag"
+echo "-Y smvtag - when cloning, tag smv repo with smvtag"
+
+FIREBOT_HOST_MSSG=
+if [ "$FIREBOT_HOST" != "" ]; then
+  FIREBOT_HOST_MSSG="[default: $FIREBOT_HOST]"
+fi
+echo "-H host - firebot/smokebot host $FIREBOT_HOST_MSSG"
+
+if [ "$MAILTO" != "" ]; then
+  echo "-m mailto - email address [default: $MAILTO]"
+else
+  echo "-m mailto - email address"
+fi
+
+echo "-R branch - clone repos using name branch"
+echo "-r - create a release bundle (same as -R branc)"
+echo "-S - smv repo hash/release"
+echo "-U - do not upload bundle file."
+echo "     By default the bundle is uploaded to a Google drive "
+echo "     directory with id found in the file:"
+echo "     $HOME/.bundle/GOOGLE_DIR_ID"
+echo "-v - show settings used to build bundle"
+exit 0
+}
 
 #---------------------------------------------
 #                   CHK_REPO
@@ -40,7 +93,6 @@ CD_REPO ()
   fi
   return 0
 }
-
 #---------------------------------------------
 #                   update_repo
 #---------------------------------------------
@@ -53,21 +105,191 @@ UPDATE_REPO()
    CD_REPO $repo/$reponame $branch || return 1
 
    echo Updating $branch on repo $repo/$reponame
-   git remote update
+   git fetch origin
    git merge origin/$branch
-   have_firemodels=`git remote -v | grep firemodels | wc  -l`
-   if [ $have_firemodels -gt 0 ]; then
-      git merge firemodels/$branch
-      need_push=`git status -uno | head -2 | grep -v nothing | wc -l`
-      if [ $need_push -gt 1 ]; then
-        echo "***warning: firemodels commits to $reponame repo need to be pushed to origin"
-        git status -uno | head -2 | grep -v nothing
-      fi
-   fi
    return 0
 }
 
+
+#-------------------- start of script ---------------------------------
+
+if [ -e $HOME/.bundle/bundle_config.sh ]; then
+  source $HOME/.bundle/bundle_config.sh
+else
+  echo ***error: configuration file $HOME/.bundle/bundle_config.sh is not defined
+  exit 1
+fi
+FIREBOT_HOST=$bundle_hostname
+FIREBOT_HOME=$bundle_firebot_home
+
+MAILTO=
+if [ "$EMAIL" != "" ]; then
+  MAILTO=$EMAIL
+fi
+FDS_RELEASE=
+SMV_RELEASE=
+ECHO=
+PROCEED=
+UPLOAD=-g
+
+FORCE=
+RELEASE=
+BRANCH=nightly
+FDS_HASH=
+SMV_HASH=
+PUB_HOST=$FIREBOT_HOST
+FDS_TAG=
+SMV_TAG=
+CUSTOM_PUBS=
+PARAMETER_FILE=
+
+while getopts 'cCfF:hH:m:p:P:rR:S:UvX:Y:' OPTION
+do
+case $OPTION  in
+  c)
+   PROCEED=1
+   ;;
+  C)
+   CUSTOM_PUBS=-C
+   ;;
+  f)
+   FORCE="-f"
+   ;;
+  F)
+   FDS_RELEASE="$OPTARG"
+   ;;
+  h)
+   usage
+   ;;
+  H)
+   FIREBOT_HOST="$OPTARG"
+   ;;
+  m)
+   MAILTO="$OPTARG"
+   ;;
+  p)
+   PUB_HOST="$OPTARG"
+   ;;
+  P)
+   PARAMETER_FILE="$OPTARG"
+   ;;
+  r)
+   BRANCH=release
+   ;;
+  R)
+   BRANCH="$OPTARG"
+   ;;
+  S)
+   SMV_RELEASE="$OPTARG"
+   ;;
+  U)
+   UPLOAD=
+   ;;
+  v)
+   ECHO=echo
+   ;;
+  X)
+   FDS_TAG="$OPTARG"
+   ;;
+  Y)
+   SMV_TAG="$OPTARG"
+   ;;
+esac
+done
+shift $(($OPTIND-1))
+
+if [ "$PARAMETER_FILE" != "" ]; then
+  if [ -e $PARAMEER_FILE ]; then
+    source $PARAMETER_FILE
+  else
+    echo "***error: parameter file, $PARAMETER_FILE, does not exist"
+  fi
+fi
+
+# Linux or OSX
+JOPT="-J"
+if [ "`uname`" == "Darwin" ] ; then
+  JOPT=
+fi
+
+# both or neither RELEASE options must be set
+FDS_RELEASE_ARG=$FDS_RELEASE
+SMV_RELEASE_ARG=$SMV_RELEASE
+if [ "$FDS_RELEASE" != "" ]; then
+  if [ "$SMV_RELEASE" != "" ]; then
+    FDS_RELEASE="-x $FDS_RELEASE"
+    SMV_RELEASE="-y $SMV_RELEASE"
+  fi
+fi
+if [ "$FDS_RELEASE" == "" ]; then
+  SMV_RELEASE=""
+  SMV_RELEASE_ARG=""
+fi
+if [ "$SMV_RELEASE" == "" ]; then
+  FDS_RELEASE=""
+  FDS_RELEASE_ARG=""
+fi
+
+if [ "$FDS_TAG" != "" ]; then
+  FDS_TAG_ARG=$FDS_TAG
+  FDS_TAG="-X $FDS_TAG"
+fi
+if [ "$SMV_TAG" != "" ]; then
+  SMV_TAG_ARG=$SMV_TAG
+  SMV_TAG="-Y $SMV_TAG"
+fi
+
+FIREBOT_BRANCH_ARG=$BRANCH
+FIREBOT_BRANCH="-R $BRANCH"
+BUNDLE_BRANCH="-b $BRANCH"
+
+# email address
+MAILTO_ARG=$MAILTO
+if [ "$MAILTO" != "" ]; then
+  MAILTO="-m $MAILTO"
+fi
+
+echo ""
+echo "------------------------------------------------------------"
+echo "            Firebot host: $FIREBOT_HOST"
+echo "  Firebot home directory: $FIREBOT_HOME"
+echo "          Firebot branch: $FIREBOT_BRANCH_ARG"
+echo "       Intel mpi version: $INTEL_MPI_VERSION"
+echo "             MPI version: $MPI_VERSION"
+if [ "$OPENMPI_DIR" ]; then
+  echo "             OpenMPI dir: $OPENMPI_DIR"
+fi
+echo "                Pub host: $PUB_HOST"
+if [ "$FDS_TAG_ARG" != "" ]; then
+  echo "                 FDS TAG: $FDS_TAG_ARG"
+fi
+if [ "$FDS_RELEASE_ARG" != "" ]; then
+  echo "            FDS Revision: $FDS_RELEASE_ARG"
+fi
+if [ "$SMV_TAG_ARG" != "" ]; then
+  echo "                 SMV TAG: $SMV_TAG_ARG"
+fi
+if [ "$SMV_RELEASE_ARG" != "" ]; then
+  echo "            SMV Revision: $SMV_RELEASE_ARG"
+fi
+echo "                   EMAIL: $MAILTO_ARG"
+echo "------------------------------------------------------------"
+echo ""
+
 curdir=`pwd`
+
+if [ "$PROCEED" == "" ]; then
+  echo ""
+  echo "------------------------------------------------------------"
+  echo "------------------------------------------------------------"
+  echo "You are about to erase and then clone the fds and smv repos."
+  echo "Press any key to continue or <CTRL> c to abort."
+  echo "To avoid this warning, use the -c option on the command line"
+  echo "------------------------------------------------------------"
+  echo "------------------------------------------------------------"
+  read val
+fi
+
 commands=$0
 DIR=$(dirname "${commands}")
 cd $DIR
@@ -78,67 +300,15 @@ repo=`pwd`
 
 cd $DIR
 
-BRANCH="-b release"
+#*** update bot and webpages repos
+UPDATE_REPO bot      master     || exit 1
+UPDATE_REPO webpages nist-pages || exit 1
 
-while getopts 'b:cd:fF:ghp:rS:tvVw' OPTION
-do
-case $OPTION  in
-  b)
-   bopt="-b $OPTARG"
-   ;;
-  c)
-   copt="-c"
-   ;;
-  d)
-   dopt="-d $OPTARG"
-   ;;
-  f)
-   fopt="-f"
-   ;;
-  F)
-   FOPT="-F $OPTARG"
-   ;;
-  g)
-   gopt="-g"
-   ;;
-  h)
-   hopt="-h"
-   ;;
-  p)
-   popt="-p $OPTARG"
-   ;;
-  r)
-   ropt="-r"
-   ;;
-  S)
-   SOPT="-S $OPTARG"
-   ;;
-  t)
-   topt="-t"
-   ;;
-  v)
-   vopt="-v"
-   ;;
-  V)
-   VOPT="-V"
-   ;;
-  w)
-   wopt="-w"
-   ;;
-esac
-done
-shift $(($OPTIND-1))
-
-# update repo 
-if [ "$hopt" == "" ]; then
-if [ "$vopt" == "" ]; then
-  UPDATE_REPO bot master || exit 1
-fi
-fi
-
-cd $DIR
-./bundlebot.sh $bopt $copt $dopt $fopt $FOPT $gopt $hopt $popt $ropt $SOPT $topt $uopt $vopt $VOPT $wopt
-
+#*** build apps
 cd $curdir
+cd ../Firebot
+$ECHO ./run_firebot.sh $FORCE -c -C -B -g $FIREBOT_HOST -G $FIREBOT_HOME $JOPT $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG $FIREBOT_BRANCH -T $MAILTO || exit 1
 
-exit 0
+#*** generate and upload bundle
+cd $curdir
+$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH $CUSTOM_PUBS -p $PUB_HOST $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG -w $UPLOAD

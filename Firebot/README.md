@@ -1,13 +1,12 @@
 # Firebot: A Continuous Integration Tool for FDS
 
-Firebot is a verification test script that can be run at regular intervals as part of a continuous integration program. At NIST, the script is run by a pseudo-user named `firebot` on a linux cluster each night. The pseudo-user `firebot` updates the various repositories in the GitHub project named `firemodels`, compiles FDS and Smokeview, runs the verification cases, checks the results for accuracy, and compiles all of the manuals. The entire process takes a few hours to complete.
+Firebot is a verification script that can be run at regular intervals as part of a continuous integration program. At NIST, this script is run by a pseudo-user named `firebot` on a linux cluster each night. The pseudo-user `firebot` clones the various repositories in the GitHub project named `firemodels`, builds FDS and Smokeview, runs the verification cases, checks the results for accuracy, and builds all of the manuals. The entire process takes a few hours to complete.
 
 ## Set-Up
 
 The following steps need only be done once. The exact phrasing of the commands are for the NIST linux cluster named blaze. You might need to modify the path and module names.
 
-1. Clone the repositories that are included in the GitHub organization called `firemodels`: `fds`, `smv`, `bot`, `out`, `exp`, and `fig`. A simple way to do this is to first clone `bot`.  Then cd into `bot/Scripts` and type `./setup_repos.sh -a` . This will clone all the other repos needed by firebot (or you can clone each repo in the same way as you cloned `bot`, with the exception of `exp` which requires the `--recursive` option because it has submodules).
-
+1. Clone the bot repository included in the GitHub organization named `firemodels`.  Other repositories needed by firebot will be cloned by firebot.
 
 2. Ensure that the following software packages are installed on the system:
 
@@ -23,24 +22,17 @@ The following steps need only be done once. The exact phrasing of the commands a
    yum install mesa-libGL-devel mesa-libGLU-devel libXmu-devel libXi-devel xorg-x11-server-Xvfb
    ```
 
-5. Add the following lines to your `~/.bashrc` file:
+5. Add lines to your `~/.bashrc` file to define the compiler environment.  For tthe Intel oneAPI compilers we use:
     ```
-    . /usr/local/Modules/3.2.10/init/bash
-    module load null modules torque-maui
-    module load intel/18
+    source /opt/intel/oneapi/setvars.sh >& /dev/null
+    # - needed to build smokeview    
+    export IFORT_COMPILER_LIB=/opt/intel/oneapi/compiler/latest/linux/compiler/lib/intel64_lin
     ulimit -s unlimited
     ```
-    Note that these modules load the Intel Fortran compiler and other necessary Intel libraries. If you want to do a debug compile with the Gnu fortran compiler, add
-    ```
-    module load gfortran492
-    module load openmpi/300gnu_64ib
-    export OPENMPI_GNU=openmpi/300gnu_64ib
-    ```
-    Both the Intel and Gnu compilers are used to check FDS for syntax errors and consisistency with the Fortran 2008 standard.
-    
+
 6. Setup passwordless SSH for the your account. Generate SSH keys and ensure that the head node can SSH into all of the compute nodes. Also, make sure that your account information is propagated across all compute nodes.
 
-7. Ensure that a queue named `firebot` is created, enabled, and started in the torque queueing system and that nodes are defined for this queue. Test the `qstat` command.  If you use some other queue say batch then use `-q batch` when running firebot.
+7. Ensure that a queue named `firebot` is created and enabled. Test the `qstat` command.  If you use some other queue say batch then use `-q batch` when running firebot.
 
 8. By default, firebot sends email to the email address configured for your bot repo (output of command `git config user.email` ) .  If you wish email to go to different email addresses, create a file named $HOME/.firebot/firebot_email_list.sh for some `user1` and `user2` (or more) that looks like:
 
@@ -58,9 +50,11 @@ The script `firebot.sh` is run using the wrapper script `run_firebot.sh`. This s
 
 A typical way to run firebot is to cd into the directory containing firbot.sh and type: 
 
-```nohup ./run_firebot.sh -c -u -J -m user@gmail.com &```
+``` nohup ./run_firebot.sh -c -u -J -q firebot -R master -m user@host.com &```
 
-The `-c` and `-u` options clean and update the repos respectively. The `-J` option directs Firebot to use the Intel suite. The email addressee shall receive notice when Firebot is done. The `nohup` at the start and `&` at the end of the command run `firebot.sh` in the background and redirect screen output to the file called `nohup.out`.
+The `-c` and `-u` options clean and update the bot respectively. The `-J` option directs Firebot to use the Intel compilers. The email addressee specified by the -m option receives a notice when Firebot is done. The -R master option causes fds, smv and other repos used by firebot to be cloned and checked out using the master branch.  The `nohup` at the start and `&` at the end of the command run `firebot.sh` in the background and redirect screen output to the file called `nohup.out`.
+
+Note, firebot clones the repos it uses so not be used in repos where you are doing work.  You should run firebot in a fresh repo.  You can however run firebot without cloning repos by NOT specifying the -R master option.  In this case, firebot will update and clean repos (if you have specifeid the -u and -c options).
 
 To kill firebot, cd to the directory containing firebot.sh and type:
 
@@ -77,3 +71,26 @@ MAILTO=""
 ```
 
 The output from firebot is written into the directory called `output` which is in the same directory as the `firebot.sh` script itself. When firebot completes, email should be sent to the specified list of addresses. The fds/Manuals directory in the fds repo containing manuals and figures is copied to the directdory $HOME/.firebot/Manuals .
+
+## Updating Comparison Images
+
+Firebot compares images it generates with a corresponding set of base images located in the fig repo.
+To update the base images on a Linux or Mac computer:
+
+```
+bring fig repo up to date
+cd $HOME/FireModels_fork/bot/Firebot
+./update_repo_images.sh -r /path_to_firebot_root
+  where `/path_to_firebot_root` is the root directory containing the bot/Firebot directory that generated the images.  
+cd $HOME/FireModels_fork/bot/fig
+follow the usual procedure to incorporate updated fig repo images into your repo and github ie stage, commit, push and do a pull request
+
+```
+
+At NIST we would type the following command to generate the new base set of images
+
+```
+cd $HOME/FireModels_fork/bot/Firebot
+./update_repo_images -r ~firebot/Firebot_clone
+```
+

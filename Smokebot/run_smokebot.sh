@@ -1,7 +1,6 @@
 #!/bin/bash
 EMAIL_LIST="$HOME/.smokebot/smokebot_email_list.sh"
 
-
 # The Smokebot script is part of an automated continuous integration system.
 # Consult the FDS Config Management Plan for more information.
 
@@ -14,9 +13,7 @@ echo ""
 echo "Miscellaneous:"
 echo "-a - only run if the FDS or smokeview source has changed"
 echo "-b - use the current branch"
-echo "-D - use startup files to set the environment not modules"
 echo "-f - force smokebot to run"
-echo "-I compiler - intel or gnu [default: $COMPILER]"
 echo "-J use Intel MPI version of fds"
 echo "-k - kill smokebot if it is running"
 echo "-L - smokebot lite,  build debug apps and run cases using debug fds"
@@ -36,7 +33,7 @@ echo "Build apps, set repo revisions:"
 echo "-B - only build apps"
 echo "-g firebot_host - host where firebot was run"
 echo "-G firebot_home - home directory where firebot was run"
-echo "   The -g and -G options are used when clonging repos (-R option)"
+echo "   The -g and -G options are used when cloning repos (-R option)"
 echo "   to build apps using the same repo revisions as used with the last"
 echo "   successful firebot run"
 echo "-R release_type (master, release or test) - clone fds, exp, fig, out and smv repos"
@@ -45,7 +42,9 @@ echo "   master, release or test [default: master]"
 echo "-T - only clone the fds and smv repos (this option is set by default when"
 echo "     only building apps (-B) and cloning repos (-R) options are used"
 echo "-x fds_rev - checkout fds repo using fds_rev revision [default: origin/master]"
+echo "-X fds_tag - when cloning, tag the fds repo with fds_tag"
 echo "-y smv_rev - checkout smv repo using smv_rev revision [default: origin/master]"
+echo "-Y smv_tag - when cloning, tag the smv repo with smv_tag"
 echo "   the -x and -y options are only used with the -R option i.e. when"
 echo "   the repos are being cloned"
 }
@@ -164,20 +163,21 @@ RUNSMOKEBOT=1
 MOVIE=
 UPLOAD=
 FORCE=
-COMPILER=intel
 SMOKEBOT_LITE=
 ECHO=
 INTEL=
-export QFDS_STARTUP=
 REMOVE_PID=
 BUILD_ONLY=
 CLONE_REPOS=
 FDS_REV=
 SMV_REV=
+FDS_TAG=
+SMV_TAG=
 FIREBOT_HOST=
 FIREBOT_HOME=
 WEB_DIR=
 USE_BOT_QFDS=
+WEB_ROOT=/var/www/html
 
 #*** check to see if a queing system is available
 
@@ -189,7 +189,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'abBcDfg:G:hHI:JkLm:MPq:R:TuUvw:x:y:' OPTION
+while getopts 'abBcfg:G:hHJkLm:MPq:R:TuUvw:W:x:X:y:Y:' OPTION
 do
 case $OPTION  in
   a)
@@ -203,9 +203,6 @@ case $OPTION  in
    ;;
   c)
    CLEANREPO=-c
-   ;;
-  D)
-   export QFDS_STARTUP=1
    ;;
   f)
    FORCE=1
@@ -221,9 +218,6 @@ case $OPTION  in
    ;;
   H)
    usage "-H"
-   ;;
-  I)
-   COMPILER="$OPTARG"
    ;;
   J)
    INTEL="-J"
@@ -265,11 +259,20 @@ case $OPTION  in
   w)
    WEB_DIR="$OPTARG"
    ;;
+  W)
+   WEB_ROOT="$OPTARG"
+   ;;
   x)
    FDS_REV="-x $OPTARG"
    ;;
+  X)
+   FDS_TAG="-X $OPTARG"
+   ;;
   y)
    SMV_REV="-y $OPTARG"
+   ;;
+  Y)
+   SMV_TAG="-Y $OPTARG"
    ;;
   \?)
   echo "***error: unknown option entered. aborting smokebot"
@@ -345,8 +348,9 @@ fi
 if [ "$WEB_DIR" != "" ]; then
   WEB_DIR="-w $WEB_DIR"
 fi
-
-COMPILER="-I $COMPILER"
+if [ "$WEB_ROOT" != "" ]; then
+  WEB_ROOT="-W $WEB_ROOT"
+fi
 
 #*** kill smokebot
 
@@ -409,7 +413,7 @@ if [ "$EMAIL" != "" ]; then
 fi
 
 #*** for now always assume the bot repo is always in the master branch
-#    and that the -b branch option only apples to the fds and smv repos
+#    and that the -b branch option only applies to the fds and smv repos
 
 if [[ "$RUNSMOKEBOT" == "1" ]]; then
   if [[ "$UPDATEREPO" == "-u" ]]; then
@@ -425,7 +429,7 @@ BRANCH="-b $BRANCH"
 #*** run smokebot
 
 touch $smokebot_pid
-$ECHO ./$botscript $SIZE $BRANCH $FDS_REV $SMV_REV $CLONE_REPOS $CLONE_FDSSMV $RUNAUTO $INTEL $BUILD_ONLY $COMPILER $SMOKEBOT_LITE $CLEANREPO $WEB_DIR $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $SIZE $BRANCH $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $CLONE_REPOS $CLONE_FDSSMV $RUNAUTO $INTEL $BUILD_ONLY $SMOKEBOT_LITE $CLEANREPO $WEB_DIR $WEB_ROOT $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi

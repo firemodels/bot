@@ -7,6 +7,7 @@ then
   echo "Creates an FDS/Smokeview installer sh script. "
   echo ""
   echo "  -i FDS.tar.gz - compressed tar file containing FDS distribution"
+  echo "  -b custombase - custom directory base"
   echo "  -d installdir - default install directory"
   echo "   INSTALLER.sh - bash shell script containing self-extracting Installer"
   echo "  -m MPI_VERSION- mpi version (INTEL or tar'd openmpi distribution)"
@@ -19,6 +20,7 @@ FDSEDITION=FDS6
 FDSMODULE=$FDSEDITION
 SMVEDITION=SMV6
 SMVMODULE=$SMVEDITION
+CUSTOMBASE=
 
 FDSVARS=${FDSEDITION}VARS.sh
 SMVVARS=${SMVEDITION}VARS.sh
@@ -34,13 +36,21 @@ if [ "`uname`" == "Darwin" ] ; then
   ostype2="OSX"
 fi
 
-while getopts 'd:i:m:M:' OPTION
+FDS_VERSION=FDS
+SMV_VERSION=Smokeview
+while getopts 'b:d:f:i:m:M:s:' OPTION
 do
 case $OPTION in
+  b)
+  CUSTOMBASE="$OPTARG"
+  ;;
   d)
   INSTALLDIR="$OPTARG"
 # get rid of trailing slashes
   INSTALLDIR=${INSTALLDIR%/}
+  ;;
+  f)
+  FDS_VERSION="$OPTARG"
   ;;
   i)
   FDS_TAR="$OPTARG"
@@ -50,6 +60,9 @@ case $OPTION in
   ;;
   M)
   openmpifile="$OPTARG"
+  ;;
+  s)
+  SMV_VERSION="$OPTARG"
   ;;
 esac
 done 
@@ -98,7 +111,7 @@ OVERRIDE=\$1
 INSTALL_LOG=/tmp/fds_install_$$.log
 echo "" > \$INSTALL_LOG
 echo ""
-echo "Installing FDS $FDS_VERSIONBASE and Smokeview $SMV_VERSIONBASE for $ostype2"
+echo "Installing $FDS_VERSION and $SMV_VERSION on $ostype2"
 echo ""
 echo "Options:"
 echo "  1) Press <Enter> to begin installation [default]"
@@ -264,7 +277,7 @@ fi
 #--- get FDS root directory
 
 echo ""
-echo "FDS install options"
+echo "Options:"
 EOF
 
 if [ "$ostype" == "OSX" ]
@@ -272,16 +285,18 @@ then
 cat << EOF >> $INSTALLER
     echo "  Press 1 to install in /Applications/$INSTALLDIR [default]"
     echo "  Press 2 to install in \$HOME/$INSTALLDIR"
+    echo "  Press 3 to install in /Applications/FDS/$CUSTOMBASE"
 EOF
   else
 cat << EOF >> $INSTALLER
     echo "  Press 1 to install in \$HOME/$INSTALLDIR [default]"
     echo "  Press 2 to install in /opt/$INSTALLDIR"
     echo "  Press 3 to install in /usr/local/bin/$INSTALLDIR"
+    echo "  Press 4 to install in \$HOME/FDS/$CUSTOMBASE"
 EOF
   fi
 cat << EOF >> $INSTALLER
-echo "  Enter a directory path to install elsewhere"
+echo "  Enter a directory path to install somewhere else"
 
 if [ "\$OVERRIDE" == "y" ] 
 then
@@ -299,6 +314,8 @@ cat << EOF >> $INSTALLER
     eval FDS_root=/Applications/$INSTALLDIR
   elif [[ "\$answer" == "2" ]]; then
     eval FDS_root=\$HOME/$INSTALLDIR
+  elif [[ "\$answer" == "3" ]]; then
+    eval FDS_root=/Applications/FDS/$CUSTOMBASE
   else
     eval FDS_root=\$answer
   fi
@@ -311,6 +328,8 @@ cat << EOF >> $INSTALLER
     FDS_root=/opt/$INSTALLDIR
   elif [ "\$answer" == "3" ]; then
     FDS_root=/usr/local/bin/$INSTALLDIR
+  elif [ "\$answer" == "4" ]; then
+    eval FDS_root=\$HOME/FDS/$CUSTOMBASE
   else
     eval FDS_root=\$answer
   fi
@@ -409,7 +428,14 @@ fi
 if [ "$MPI_VERSION" != "INTEL" ] ; then
 cat << MODULE >> \$FDSMODULEtmp
 prepend-path    PATH            \$FDS_root/bin/openmpi_64/bin
+# used when running the bundled fds
 setenv          OPAL_PREFIX     \$FDS_root/bin/openmpi_64
+MODULE
+fi
+if [[ "$ostype" == "OSX" ]] && [[ "$FDS_OPENMPIDIR" != "" ]]; then
+cat << MODULE >> \$FDSMODULEtmp
+# used when compiling and running the repository fds
+#setenv          OPAL_PREFIX     $FDS_OPENMPIDIR
 MODULE
 fi
 
@@ -450,8 +476,13 @@ BASH
 if [ "$MPI_VERSION" != "INTEL" ] ; then
 cat << BASH >> \$BASHRCFDS
 export PATH=\\\$FDSBINDIR/openmpi_64/bin:\\\$PATH
-export OPAL_PREFIX=\\\$FDSBINDIR/openmpi_64
+export OPAL_PREFIX=\\\$FDSBINDIR/openmpi_64  # used when running the bundled fds
 BASH
+if [[ "$ostype" == "OSX" ]] && [[ "$FDS_OPENMPIDIR" != "" ]]; then
+cat << BASH >> \$BASHRCFDS
+#export OPAL_PREFIX=$FDS_OPENMPIDIR  # used when compiling and running the repository fds
+BASH
+fi
 fi
 
 if [ "$ostype" == "LINUX" ] ; then
@@ -506,8 +537,8 @@ chmod +x \$FDS_root/bin/$SMVVARS
 #--- create startup readme file
 
 cat << STARTUP > \$STARTUPtmp
-<h3>Defining Environment Variables Used by FDS</h3>
-Options:
+<h3>Installation Notes
+<h4>Defining Environment Variables Used by FDS</h4>
 <ul>
 <li>Add the following lines to one of your startup files
 (usually \$HOME/.bashrc).<br>
@@ -529,12 +560,20 @@ export MODULEPATH=\$FDS_root/bin/modules:\\\$MODULEPATH
 module load $FDSMODULE
 module load $SMVMODULE
 </pre>
+</ul>
+<h4>Wrapping Up the Installation</h4>
+<ul>
+STARTUP
 
+cat << STARTUP >> \$STARTUPtmp
 <li>Log out and log back in so changes will take effect.
-
-<li>To uninstall fds, erase the directory:<br>
+</ul>
+<h4>Uninstalling FDS and Smokeview</h4>
+<ul>
+<li>To uninstall fds and smokeview, erase the directory:<br>
 \$FDS_root 
 <p>and remove changes you made to your startup files.
+</ul>
 
 STARTUP
 
@@ -545,7 +584,9 @@ EOF
 cat << EOF >> $INSTALLER
 echo ""
 echo "-----------------------------------------------"
-echo "*** To complete the installation add the following lines to your startup file"
+echo "*** To complete the installation:"
+echo ""
+echo "1. Add the following lines to your startup file"
 echo "   (usually \$HOME/.bashrc)."
 echo ""
 echo "source \$FDS_root/bin/$FDSVARS "
@@ -557,13 +598,7 @@ echo "export MODULEPATH=\$FDS_root/bin/modules:\\\$MODULEPATH"
 echo "module load $FDSMODULE"
 echo "module load $SMVMODULE"
 echo ""
-echo "*** Log out and log back in so the changes will take effect."
-echo ""
-echo "*** To uninstall fds, erase the directory: "
-echo "\$FDS_root"
-echo "and remove any changes you made to your startup file."
-echo ""
-echo "*** Installation complete."
+echo "2. Log out and log back in so that the changes will take effect."
 exit 0
 
 

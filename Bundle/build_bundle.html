@@ -13,22 +13,22 @@ function get_fullpath(command,platform){
   return fullpath;
 }
 function view_manifest(platform){
-  MyObject.Run(get_fullpath("fds/scripts/webVIEWmanifest.bat ",platform));
+  MyObject.Run(get_fullpath("webscripts/webVIEWmanifest.bat ",platform));
 }
 function run_script(script){
-  MyObject.Run(get_fullpath("fds/scripts/webRUN_script.bat ",script));
+  MyObject.Run(get_fullpath("webscripts/webRUN_script.bat ",script));
 }
 function bundle_fdssmv(platform){
-  MyObject.Run(get_fullpath("fds/scripts/webBUNDLEfdssmv.bat ",platform));
+  MyObject.Run(get_fullpath("webscripts/webBUNDLEfdssmv.bat ",platform));
 }
 function install_fdssmv(platform){
-  MyObject.Run(get_fullpath("fds/scripts/webINSTALLfdssmv.bat ",platform));
+  MyObject.Run(get_fullpath("webscripts/webINSTALLfdssmv.bat ",platform));
 }
 function copy_fdsapps(platform){
-  MyObject.Run(get_fullpath("fds/scripts/webCopyFDSApps.bat ",platform));
+  MyObject.Run(get_fullpath("webscripts/webCopyFDSApps.bat ",platform));
 }
 function copy_smvapps(platform){
-  MyObject.Run(get_fullpath("fds/scripts/webCopySMVApps.bat ",platform));
+  MyObject.Run(get_fullpath("webscripts/webCopySMVApps.bat ",platform));
 }
 </script>
 </HEAD>
@@ -81,12 +81,19 @@ function copy_smvapps(platform){
 <td align=center><button onclick="install_fdssmv('linux')">Install</button></td>
 <td align=center><button onclick="install_fdssmv('osx')">Install</button></td>
 </tr>
+<tr></tr>
+<tr>
+<td colspan=3>Clean Upload directories:
+<button onclick="run_script('\\bot\\Bundle\\webscripts\\webCleanUploadWin.bat')">Windows</button>
+<button onclick="run_script('\\bot\\Bundle\\webscripts\\webCleanUploadAll.bat')">All</button>
+</td>
+</tr>
+
 
 <tr>
 <td align=center colspan=3>
-<button onclick="run_script('\\bot\\Bundle\\fds\\scripts\\webCleanUploadWin.bat')">Clean Windows</button>
-<button onclick="run_script('\\bot\\Bundle\\fds\\scripts\\webCleanUploadAll.bat')">Clean All</button>
-<button onclick="run_script('\\bot\\Bundle\\fds\\scripts\\webUPLOADbundles.bat')">Upload</button>
+<button onclick="run_script('\\bot\\Bundle\\webscripts\\webUPLOADbundles.bat')">Upload to Github</button>
+<button onclick="run_script('\\bot\\Bundle\\webscripts\\webCOPYbundles.bat')">Copy to Google drive</button>
 </td>
 </tr>
 
@@ -94,8 +101,8 @@ function copy_smvapps(platform){
 
 <h3>Other</h3>
 <ul>
-<li><button onclick="run_script('\\bot\\Scripts\\webEDIT_bundle.bat')">Edit this page</button>
-<li><a href="../../smv/Build/getting_started.html">FDS/Smokeview build page checklist</a>
+<li><button onclick="run_script('\\bot\\Bundle\\webscripts\\webEDIT_bundle.bat')">Edit this page</button>
+<li><a href="getting_started.html">FDS/Smokeview build page checklist</a>
 </ul>
 
 <p><hr>

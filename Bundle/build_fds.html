@@ -13,19 +13,19 @@ function get_fullpath(command,platform){
   return fullpath;
 }
 function run_script(script){
-  MyObject.Run(get_fullpath("fds/scripts/webRUN_script.bat ",script));
+  MyObject.Run(get_fullpath("webscripts/webRUN_script.bat ",script));
 }
 function build_fds(args){
-  MyObject.Run(get_fullpath("../../fds/Build/Scripts/webBUILDfds.bat ",args));
+  MyObject.Run(get_fullpath("webscripts/webBUILDfds.bat ",args));
 }
 function build_fds_debug(args){
-  MyObject.Run(get_fullpath("../../fds/Build/Scripts/webBUILDfdsdebug.bat ",args));
+  MyObject.Run(get_fullpath("webscripts/webBUILDfdsdebug.bat ",args));
 }
 function build_fds_dv(args){
-  MyObject.Run(get_fullpath("../../fds/Build/Scripts/webBUILDfdsdv.bat ",args));
+  MyObject.Run(get_fullpath("webscripts/webBUILDfdsdv.bat ",args));
 }
 function build_test(args){
-  MyObject.Run(get_fullpath("../../fds/Build/Scripts/webBUILDtest.bat ",args));
+  MyObject.Run(get_fullpath("webscripts/webBUILDtest.bat ",args));
 }
 </script>
 </HEAD>
@@ -97,8 +97,8 @@ function build_test(args){
 </table>
 
 <ul>
-<li><button onclick="run_script('\\bot\\Scripts\\webEDIT_build_fds.bat')">Edit this page</button>
-<li><a href="../../smv/Build/getting_started.html">FDS/Smokeview build page checklist</a>
+<li><button onclick="run_script('\\bot\\Bundle\\webscripts\\webEDIT_build_fds.bat')">Edit this page</button>
+<li><a href="getting_started.html">FDS/Smokeview build page checklist</a>
 </ul>
 
 <p><hr>

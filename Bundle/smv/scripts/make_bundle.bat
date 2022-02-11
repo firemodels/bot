@@ -33,7 +33,6 @@ set forbundle=%svn_root%\bot\Bundle\smv\for_bundle
 set webgldir=%svn_root%\bot\Bundle\smv\for_bundle\webgl
 set smvscripts=%svn_root%\smv\scripts
 set svzipbuild=%svn_root%\smv\Build\smokezip\%BUILDDIR%
-set dem2fdsbuild=%svn_root%\smv\Build\dem2fds\%BUILDDIR%
 set svdiffbuild=%svn_root%\smv\Build\smokediff\%BUILDDIR%
 set bgbuild=%svn_root%\smv\Build\background\intel_win_64
 set hashfilebuild=%svn_root%\smv\Build\hashfile\%BUILDDIR%
@@ -80,17 +79,15 @@ CALL :COPY  %webgldir%\smv2html.bat   %smvdir%\smv2html.bat
 ::CALL :COPY  %webgldir%\smv_setup.bat  %smvdir%\smv_setup.bat
 
 CALL :COPY  %bgbuild%\background_win_64.exe     %smvdir%\background.exe
-CALL :COPY  %dem2fdsbuild%\dem2fds_win_64.exe   %smvdir%\dem2fds.exe
 CALL :COPY  %flushfilebuild%\flush_win_64.exe   %smvdir%\flush.exe
 CALL :COPY  %hashfilebuild%\hashfile_win_64.exe %smvdir%\hashfile.exe
 CALL :COPY  %svdiffbuild%\smokediff_win_64.exe  %smvdir%\smokediff.exe
 CALL :COPY  %svzipbuild%\smokezip_win_64.exe    %smvdir%\smokezip.exe
 CALL :COPY  %timepbuild%\timep_win_64.exe       %smvdir%\timep.exe
 CALL :COPY  %windbuild%\wind2fds_win_64.exe     %smvdir%\wind2fds.exe
-CALL :COPY %repoexes%\openvr_api.dll                    %smvdir%\openvr_api.dll
 
 echo Unpacking Smokeview %smv_versionbase% installation files > %forbundle%\unpack.txt
-echo Install Smokeview %smv_versionbase%                      > %forbundle%\message.txt
+echo Updating Windows Smokeview to %smv_versionbase%          > %forbundle%\message.txt
 
 CALL :COPY  "%forbundle%\message.txt"                         %zipbase%\message.txt
 CALL :COPY  %forbundle%\setup.bat                             %zipbase%\setup.bat
@@ -101,7 +98,6 @@ cd %smvdir%
 %hashfileexe% smokeview.exe  >  hash\smokeview_%revision%.sha1
 %hashfileexe% smokezip.exe   >  hash\smokezip_%revision%.sha1
 %hashfileexe% smokediff.exe  >  hash\smokediff_%revision%.sha1
-%hashfileexe% dem2fds.exe    >  hash\dem2fds_%revision%.sha1
 %hashfileexe% background.exe >  hash\background_%revision%.sha1
 %hashfileexe% hashfile.exe   >  hash\hashfile_%revision%.sha1
 %hashfileexe% wind2fds.exe   >  hash\wind2fds_%revision%.sha1

@@ -170,12 +170,12 @@ set repeatvar=%3
 set answer=%answer:~0,1%
 if "%answer%" == "Y" set answer=y
 if "%answer%" == "N" set answer=n
-if "%answer%" == "S" set answer=s
+if "%answer%" == "Q" set answer=s
 set %answervar%=%answer%
 set repeat=1
 if "%answer%" == "y" set repeat=0
 if "%answer%" == "n" set repeat=0
-if "%answer%" == "s" set repeat=2
+if "%answer%" == "q" set repeat=2
 set %repeatvar%=%repeat%
 exit /b
 

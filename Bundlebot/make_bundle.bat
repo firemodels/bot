@@ -58,6 +58,10 @@ if "x%SMV_REVISION_ARG%" == "x" goto skip_smv_version
   set smv_version=%SMV_REVISION_ARG%
 :skip_smv_version
 
+if NOT "x%nightly%" == "xnull" goto skip_nightly_null
+  set nightly=
+:skip_nightly_null
+
 if "x%nightly%" == "x" goto skip_nightly
   set nightly=_%nightly%
 :skip_nightly
@@ -102,6 +106,7 @@ set smv_casessh=%repo_root%\smv\Verification\scripts\SMV_Cases.sh
 set smv_casesbat=%repo_root%\smv\Verification\scripts\SMV_Cases.bat
 set wui_casessh=%repo_root%\smv\Verification\scripts\WUI_Cases.sh
 set wui_casesbat=%repo_root%\smv\Verification\scripts\WUI_Cases.bat
+set fds_auxfilesbat=%repo_root%\bot\Bundlebot\copy_fds_aux_files.bat
 
 set copyFDScases=%repo_root%\bot\Bundle\fds\scripts\copyFDScases.bat
 set copyCFASTcases=%repo_root%\bot\Bundle\fds\scripts\copyCFASTcases.bat
@@ -176,14 +181,12 @@ CALL :TOMANIFESTMPI   %out_bin%\mpi\mpiexec.exe  mpiexec
 CALL :TOMANIFESTSMV   %out_smv%\smokeview.exe    smokeview
 
 CALL :COPY  %bundle_dir%\smv\background.exe %out_bin%\background.exe
-CALL :COPY  %bundle_dir%\smv\dem2fds.exe    %out_smv%\dem2fds.exe 
 CALL :COPY  %bundle_dir%\smv\hashfile.exe   %out_smv%\hashfile.exe 
 CALL :COPY  %bundle_dir%\smv\smokediff.exe  %out_smv%\smokediff.exe
 CALL :COPY  %bundle_dir%\smv\smokezip.exe   %out_smv%\smokezip.exe 
 CALL :COPY  %bundle_dir%\smv\wind2fds.exe   %out_smv%\wind2fds.exe 
 
 CALL :TOMANIFESTSMV   %out_bin%\background.exe background
-CALL :TOMANIFESTSMV   %out_smv%\dem2fds.exe    dem2fds
 CALL :TOMANIFESTLIST  %out_bin%\fds2ascii.exe  fds2ascii
 CALL :TOMANIFESTSMV   %out_smv%\hashfile.exe   hashfile
 CALL :TOMANIFESTSMV   %out_smv%\smokediff.exe  smokediff
@@ -213,7 +216,6 @@ cd %out_smv%
 %hashfile% smokeview.exe  >  hash\smokeview_%smv_version%.exe.sha1
 %hashfile% smokediff.exe  >  hash\smokediff_%smv_version%.exe.sha1
 %hashfile% smokezip.exe   >  hash\smokezip_%smv_version%.exe.sha1
-%hashfile% dem2fds.exe    >  hash\dem2fds_%smv_version%.exe.sha1
 %hashfile% wind2fds.exe   >  hash\wind2fds_%smv_version%.exe.sha1
 cd hash
 cat *.sha1              >>  %upload_dir%\%basename%.sha1
@@ -230,9 +232,9 @@ CALL :COPY  %repo_root%\smv\Build\sh2bat\intel_win_64\sh2bat.exe %out_bin%\sh2ba
 CALL :COPY "%fds_forbundle%\setup.bat"                          %out_bundle%\setup.bat
 echo %basename%                                               > %out_bundle%\basename.txt
 
-echo Install FDS %fds_versionbase% and Smokeview %smv_versionbase% > %fds_forbundle%\message.txt
+echo Installing %FDS_REVISION_ARG% and %SMV_REVISION_ARG% on Windows        > %fds_forbundle%\message.txt
 CALL :COPY  "%fds_forbundle%\message.txt"                            %out_bundle%\message.txt
-echo Unpacking installation files for FDS %fds_versionbase% and Smokeview %smv_versionbase% > %fds_forbundle%\unpack.txt
+echo Unpacking %FDS_REVISION_ARG% and %SMV_REVISION_ARG% installation files > %fds_forbundle%\unpack.txt
 
 echo.
 echo --- copying auxillary files ---
@@ -285,17 +287,18 @@ CALL :COPY "%repo_root%\webpages\smv_readme.html"      "%out_guides%\Smokeview_r
 CALL :COPY "%fds_forbundle%\Overview.html"             "%out_doc%\Overview.html"
 CALL :COPY "%fds_forbundle%\FDS_Web_Site.url"          "%out_web%\Official_Web_Site.url"
 
-echo.
-echo --- copying example files ---
-
 set outdir=%out_examples%
 set QFDS=call %copyFDScases%
 set RUNTFDS=call %copyFDScases%
 set RUNCFAST=call %copyCFASTcases%
 
+echo.
+echo --- copying example files ---
 cd %fds_examples%
 %repo_root%\smv\Build\sh2bat\intel_win_64\sh2bat %fds_casessh% %fds_casesbat%
 call %fds_casesbat%>Nul
+
+call %fds_auxfilesbat% %fds_examples% %out_examples%
 
 cd %smv_examples%
 %repo_root%\smv\Build\sh2bat\intel_win_64\sh2bat %smv_casessh% %smv_casesbat%
@@ -328,7 +331,7 @@ cd %upload_dir%
 echo Press Setup to begin installation. > %fds_forbundle%\main.txt
 if exist %basename%.exe erase %basename%.exe
 
-wzipse32 %basename%.zip -setup -auto -i %fds_forbundle%\icon.ico -t %fds_forbundle%\unpack.txt -runasadmin -a %fds_forbundle%\about.txt -st"FDS %fds_version% Smokeview %smv_version% Setup" -o -c cmd /k firemodels\setup.bat
+wzipse32 %basename%.zip -setup -auto -i %fds_forbundle%\icon.ico -t %fds_forbundle%\unpack.txt -runasadmin -a %fds_forbundle%\about.txt -st"%fds_version% %smv_version%" -o -c cmd /k firemodels\setup.bat
 
 %hashfile% %basename%.exe   >>  %upload_dir%\%basename%.sha1
 

@@ -6,12 +6,15 @@ INTEL_COMP_VERSION=$4
 UPLOAD_DIR_ARG=$5
 NIGHTLY=$6
 
+if [ "$NIGHTLY" == "null" ]; then
+  NIGHTLY=
+fi
 if [ "$NIGHTLY" != "" ]; then
   NIGHTLY="${NIGHTLY}_"
 fi
 
 # this script assumes that fds and smokeview apps have been copied into APPS_DIR
-# manuals have been copied into GUIDE_DIR
+# and that fds and smokeview manuals have been copied into GUIDE_DIR
 
 GUIDE_DIR=$HOME/.bundle/pubs
 APPS_DIR=$HOME/.bundle/apps
@@ -30,14 +33,18 @@ INSTALLDIR=FDS/FDS6
 errlog=/tmp/errlog.$$
 
 if [ "`uname`" == "Darwin" ] ; then
+  platform=osx
   bundlebase=${fds_version}_${smv_version}_${NIGHTLY}osx
 else
+  platform=linux
   bundlebase=${fds_version}_${smv_version}_${NIGHTLY}lnx
 fi
+custombase=${fds_version}_${smv_version}
 
 # determine directory repos reside under
 
-scriptdir=`dirname "$(readlink "$0")"`
+scriptdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
 curdir=`pwd`
 cd $scriptdir/../..
 REPO_ROOT=`pwd`
@@ -93,14 +100,13 @@ CP ()
 
 UNTAR ()
 {
-  local FROMDIR=$1
-  local FROMFILE=$2
-  local TODIR=$3
-  local TODIR2=$4
+  local FROMFILE=$1
+  local TODIR=$2
+  local TODIR2=$3
   local ERR=
-  if [ ! -e $FROMDIR/$FROMFILE ]; then
-    echo "***error: the file $FROMFILE was not found in $FROMDIR" >> $errlog
-    echo "***error: the file $FROMFILE was not found in $FROMDIR"
+  if [ ! -e $FROMFILE ]; then
+    echo "***error: $FROMFILE was not found" >> $errlog
+    echo "***error: $FROMFILE was not found"
     ERR="1"
     if [ "$NOPAUSE" == "" ]; then
       read val
@@ -108,10 +114,9 @@ UNTAR ()
   else
     curdir=`pwd`
     cd $TODIR
-    echo "utarring: $FROMFILE"
-    echo "    from: $FROMDIR"
-    echo "      to: $TODIR"
-    tar xvf $FROMDIR/$FROMFILE
+    echo "untarring: $FROMFILE"
+    echo "       to: $TODIR"
+    tar xvf $FROMFILE
     cd $curdir
   fi
   if [ -e $TODIR/$TODIR2 ]; then
@@ -313,8 +318,6 @@ else
   PLATFORM=LINUX64
 fi
 
-smvscriptdir=$REPO_ROOT/smv/scripts
-
 bundledir=$UPLOAD_DIR/$bundlebase
 smvbindir=$bundledir/smvbin
 fdsbindir=$bundledir/bin
@@ -323,12 +326,15 @@ webpagesdir=$REPO_ROOT/webpages
 fds_bundle=$REPO_ROOT/bot/Bundle/fds/for_bundle
 smv_bundle=$REPO_ROOT/bot/Bundle/smv/for_bundle
 webgldir=$REPO_ROOT/bot/Bundle/smv/for_bundle/webgl
+smvscriptdir=$REPO_ROOT/smv/scripts
+utilscriptdir=$REPO_ROOT/smv/Utilities/Scripts
 
 texturedir=$smv_bundle/textures
-makeinstaller=$REPO_ROOT/bot/Bundlebot/make_installer.sh
+MAKEINSTALLER=$REPO_ROOT/bot/Bundlebot/make_installer.sh
 
 fds_cases=$REPO_ROOT/fds/Verification/FDS_Cases.sh
-fds_benchamrk_cases=$REPO_ROOT/fds/Verification/FDS_Benchmark_Cases.sh
+fds_benchmark_cases=$REPO_ROOT/fds/Verification/FDS_Benchmark_Cases.sh
+fds_aux_files=$REPO_ROOT/bot/Bundlebot/copy_fds_aux_files.sh
 smv_cases=$REPO_ROOT/smv/Verification/scripts/SMV_Cases.sh
 wui_cases=$REPO_ROOT/smv/Verification/scripts/WUI_Cases.sh
 copyfdscase=$REPO_ROOT/bot/Bundle/fds/scripts/copyfdscase.sh
@@ -374,7 +380,6 @@ CP $APPS_DIR background $smvbindir background
 CP $APPS_DIR smokeview  $smvbindir smokeview
 CP $APPS_DIR smokediff  $smvbindir smokediff
 CP $APPS_DIR smokezip   $smvbindir smokezip
-CP $APPS_DIR dem2fds    $smvbindir dem2fds
 CP $APPS_DIR wind2fds   $smvbindir wind2fds
 CP $APPS_DIR hashfile   $smvbindir hashfile
 
@@ -391,7 +396,6 @@ $APPS_DIR/hashfile background > hash/background.sha1
 $APPS_DIR/hashfile smokeview  > hash/smokeview.sha1
 $APPS_DIR/hashfile smokediff  > hash/smokediff.sha1
 $APPS_DIR/hashfile smokezip   > hash/smokezip.sha1
-$APPS_DIR/hashfile dem2fds    > hash/dem2fds.sha1
 $APPS_DIR/hashfile wind2fds   > hash/wind2fds.sha1
 $APPS_DIR/hashfile hashfile   > hash/hashfile.sha1
 cd $CURDIR
@@ -402,30 +406,37 @@ CPDIR $texturedir $smvbindir
 # FDS 
 
 echo ""
-echo "--- fds apps ---"
+echo "--- fds apps/scripts ---"
 echo ""
 cd $fdsbindir
-CP $APPS_DIR fds       $fdsbindir fds
-CP $APPS_DIR fds2ascii $fdsbindir fds2ascii
-CP $APPS_DIR test_mpi  $fdsbindir test_mpi
+CP $APPS_DIR    fds       $fdsbindir fds
+CP $APPS_DIR    fds2ascii $fdsbindir fds2ascii
+CP $APPS_DIR    test_mpi  $fdsbindir test_mpi
+CP $fds_bundle  fds.sh    $fdsbindir fds.sh
 
 echo ""
 echo "--- copying mpi ---"
 echo ""
 openmpifile=
 if [ "$MPI_VERSION" == "INTEL" ]; then
-  intelmpifile=INTEL${INTEL_COMP_VERSION}linux_64.tar.gz
-  UNTAR $MPI_DIR $intelmpifile $fdsbindir INTEL
+  intelmpifile=$MPI_DIR/INTEL${INTEL_COMP_VERSION}linux_64.tar.gz
+  if [ "$INTELMPI_TARFILE" != "" ]; then
+    intelmpifile=$INTELMPI_TARFILE
+  fi
+  UNTAR $intelmpifile $fdsbindir INTEL
   MPIEXEC=$fdsbindir/INTEL/bin/mpiexec
 else
   if [ "$PLATFORM" == "LINUX64" ]; then
-    openmpifile=openmpi_${MPI_VERSION}_linux_64_${INTEL_COMP_VERSION}.tar.gz
+    openmpifile=$MPI_DIR/openmpi_${MPI_VERSION}_linux_64_${INTEL_COMP_VERSION}.tar.gz
   fi
   if [ "$PLATFORM" == "OSX64" ]; then
-    openmpifile=openmpi_${MPI_VERSION}_osx_64_${INTEL_COMP_VERSION}.tar.gz
+    openmpifile=$MPI_DIR/openmpi_${MPI_VERSION}_osx_64_${INTEL_COMP_VERSION}.tar.gz
+  fi
+  if [ "$OPENMPI_TARFILE" != "" ]; then
+    openmpifile=$OPENMPI_TARFILE
   fi
 #  CP $MPI_DIR $openmpifile  $fdsbindir $openmpifile
-  UNTAR $MPI_DIR $openmpifile $fdsbindir openmpi_64
+  UNTAR $openmpifile $fdsbindir openmpi_64
   MPIEXEC=$fdsbindir/openmpi_64/bin/mpiexec
 fi
 
@@ -434,7 +445,6 @@ TOMANIFESTMPI  $MPIEXEC              mpiexec
 TOMANIFESTSMV  $smvbindir/smokeview  smokeview
 
 TOMANIFESTSMV  $smvbindir/background background
-TOMANIFESTSMV  $smvbindir/dem2fds    dem2fds
 TOMANIFESTLIST $fdsbindir/fds2ascii  fds2ascii
 TOMANIFESTSMV  $smvbindir/hashfile   hashfile
 TOMANIFESTSMV  $smvbindir/smokediff  smokediff
@@ -460,8 +470,13 @@ CP $smv_bundle smokeview.html $smvbindir smokeview.html
 
 # smokeview to html conversion scripts
 
-CP $webgldir runsmv_ssh.sh $smvbindir runsmv_ssh.sh
-CP $webgldir smv2html.sh   $smvbindir smv2html.sh
+CP $webgldir      runsmv_ssh.sh $smvbindir runsmv_ssh.sh
+CP $webgldir      smv2html.sh   $smvbindir smv2html.sh
+
+if [ "$PLATFORM" == "LINUX64" ]; then
+  CP $utilscriptdir slice2html.sh   $smvbindir slice2html.sh
+  CP $utilscriptdir slice2mp4.sh    $smvbindir slice2mp4.sh
+fi
 
 echo ""
 echo "--- copying documentation ---"
@@ -482,8 +497,6 @@ echo ""
 CP $webpagesdir FDS_Release_Notes.htm $bundledir/Documentation FDS_Release_Notes.html
 CP $webpagesdir smv_readme.html       $bundledir/Documentation SMV_Release_Notes.html
 
-# CP2 $fds_bundle readme_examples.html $bundledir/Examples
-
 export OUTDIR=$bundledir/Examples
 export QFDS=$copyfdscase
 export RUNTFDS=$copyfdscase
@@ -494,7 +507,8 @@ echo "--- copying example files ---"
 echo ""
 cd $FDSExamplesDirectory
 $fds_cases
-$fds_benchmark_cases
+#$fds_benchmark_cases
+$fds_aux_files $FDSExamplesDirectory $bundledir/Examples
 cd $SMVExamplesDirectory
 $wui_cases
 $smv_cases
@@ -520,7 +534,7 @@ OPENMPIFILE=
 if [ "$openmpifile" != "" ]; then
   OPENMPIFILE="-M $openmpifile"
 fi
-$makeinstaller -i $bundlebase.tar.gz -d $INSTALLDIR -m $MPI_VERSION $OPENMPIFILE $bundlebase.sh
+$MAKEINSTALLER -i $bundlebase.tar.gz -b $custombase -d $INSTALLDIR -f $fds_version -s $smv_version -m $MPI_VERSION $OPENMPIFILE $bundlebase.sh
 
 cat $fdsbindir/hash/*.sha1         > $bundlebase.sha1
 cat $smvbindir/hash/*.sha1         > $bundlebase.sha1

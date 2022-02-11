@@ -36,14 +36,15 @@ cat << EOF
           ['Days since Jan 1, 2016', 'Benchmark Time (s)'],
 EOF
 
-STDDEV=`./make_timelist.sh $SOPT | sort -n -k 1 -t , | tail $NHIST | awk -F ',' '{x[NR]=$2; s+=$2; n++} END{a=s/n; for (i in x){ss += (x[i]-a)^2} sd = sqrt(ss/n); print sd}'`
-MEAN=`./make_timelist.sh $SOPT | sort -n -k 1 -t , | tail $NHIST | awk -F ',' '{x[NR]=$2; s+=$2; n++} END{a=s/n; print a}'`
+./make_timelist.sh $SOPT | sort -n -k 1 -t , | tail $NHIST > timelist.out
+STDDEV=`cat timelist.out | awk -F ',' '{x[NR]=$2; s+=$2; n++} END{a=s/n; for (i in x){ss += (x[i]-a)^2} sd = sqrt(ss/n); print sd}'`
+MEAN=`cat timelist.out   | awk -F ',' '{x[NR]=$2; s+=$2; n++} END{a=s/n; print a}'`
 MEAN=`printf "%0.0f" $MEAN`
 STDDEV_PERCEN=`echo "scale=5; $STDDEV/$MEAN*100 " | bc`
 
 STDDEV=`printf "%0.1f" $STDDEV`
 STDDEV_PERCEN=`printf "%0.1f" $STDDEV_PERCEN`
-./make_timelist.sh $SOPT | sort -n -k 1 -t , | tail $NHIST | awk -F ',' '{ printf("[%s,%s],\n",$1,$2) }'
+cat timelist.out | awk -F ',' '{ printf("[%s,%s],\n",$1,$2) }'
 
 cat << EOF
         ]);
@@ -74,16 +75,16 @@ EOF
 
 CURDIR=`pwd`
 cd $historydir
-ls -tl *-????????.txt | awk '{system("head "  $9)}' | sort -t ';' -r -n -k 7 | head -1 | \
+ls -tl *.txt | grep -v compiler | grep -v warning | grep -v error | awk '{system("head "  $9)}' | sort -t ';' -r -n -k 7 | head -1 | \
              awk -F ';' '{cputime="Benchmark time: "$9" s";\
                           host="Host: "$10;\
                           font="<font color=\"#00FF00\">";\
                           if($8=="2")font="<font color=\"#FF00FF\">";\
                           if($8=="3")font="<font color=\"#FF0000\">";\
                           printf("%s %s</font><br>\n",font,$1);\
-                          printf("<a href=\"https://github.com/firemodels/fds/commit/%s\">FDS Revision: %s</a><br>\n",$4,$5);\
+                          printf("<a href=\"https://github.com/firemodels/fds/commit/%s\">FDS Revision: %s </a><br>\n",$4,$5);\
                           printf("FDS Revision date: %s<br>\n",$2);\
-                          if($11!=""&&$12!="")printf("<a href=\"https://github.com/firemodels/smv/commit/%s\">SMV Revision: %s</a><br>\n",$11,$12);\
+                          if($11!=""&&$12!="")printf("<a href=\"https://github.com/firemodels/smv/commit/%s\">SMV Revision: %s </a><br>\n",$11,$12);\
                           if($9!="")printf("%s <br>\n",cputime);\
                           if($10!="")printf("%s <br>\n",host);\
                           }' 
@@ -105,16 +106,16 @@ fi
 
 CURDIR=`pwd`
 cd $historydir
-ls -tl *-????????.txt | awk '{system("head "  $9)}' | sort -t ';' -r -n -k 7 | head $NHIST | \
+ls -tl *.txt | grep -v compiler | grep -v warning | grep -v error | awk '{system("head "  $9)}' | sort -t ';' -r -n -k 7 | head $NHIST | \
              awk -F ';' '{cputime="Benchmark time: "$9" s";\
                           host="Host: "$10;\
                           font="<font color=\"#00FF00\">";\
                           if($8=="2")font="<font color=\"#FF00FF\">";\
                           if($8=="3")font="<font color=\"#FF0000\">";\
                           printf("<p>%s %s</font><br>\n",font,$1);\
-                          printf("<a href=\"https://github.com/firemodels/fds/commit/%s\">FDS Revision: %s</a><br>\n",$4,$5);\
+                          printf("<a href=\"https://github.com/firemodels/fds/commit/%s\">FDS Revision: %s </a><br>\n",$4,$5);\
                           printf("FDS Revision date: %s<br>\n",$2);\
-                          if($11!=""&&$12!="")printf("<a href=\"https://github.com/firemodels/smv/commit/%s\">SMV Revision: %s</a><br>\n",$11,$12);\
+                          if($11!=""&&$12!="")printf("<a href=\"https://github.com/firemodels/smv/commit/%s\">SMV Revision: %s </a><br>\n",$11,$12);\
                           if($9!="")printf("%s <br>\n",cputime);\
                           if($10!="")printf("%s <br>\n",host);\
                           }' 
