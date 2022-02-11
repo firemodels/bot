@@ -5,10 +5,11 @@
 #---------------------------------------------
 
 function usage {
-  echo "Usage: revbot.sh [opitons] [casename.fds]"
-  echo "       revbot.sh builds fdss for each revision found in a revision file."
-  echo "       Then runs the casename case for each fds. If casename was not specified"
-  echo "       then only the fdss are built"
+  echo "Usage: rfds.sh [options] [casename.fds]"
+  echo "       rfds.sh builds fds for a set of revisions found in a revision file."
+  echo "       It then runs a case for each fds that was built. If casename.fds"
+  echo "       was not specified then only fdss are built. The revision file"
+  echo "       is generated using the script get_revisions.sh"
   echo ""
   echo "Options:"
   echo ""
@@ -23,14 +24,14 @@ fi
   echo " -N n - specify maximum number of fdss to build [default: $MAXN]"
   echo " -n n - number of MPI processes per node used when running cases [default: 1]"
   echo " -p p - number of MPI processes used when runnng cases [default: 1] "
-  echo " -r revfile - file containing revisions used to build fds [default: $REVISIONS]"
+  echo " -r revfile - file containing list of revisions used to build fds [default: $REVISIONS]"
   echo "              The revfile is built by the get_revisions.sh script"
   echo " -h   - show this message"
-  echo " -q q - name of queue used to build fdss. [default: batch]"
-  echo " -s   - skip build step"
-  echo " -T type - build fds using dv (development) or db (debug) makefile entries."
-  echo "           If -T is not specified then fds is built using the release makefile entry."
- 
+  echo " -q q - name of batch queue used to build fdss and to run cases. [default: batch]"
+  echo " -s   - skip the build step (fdss were built eariler)"
+  echo " -T type - build fds using type dv (impi_intel_linux_64_dv) or type db (impi_intel_linux_64_db)"
+  echo "           makefile entries. If -T is not specified then fds is built using the release"
+  echo "           (impi_intel_linux_64) makefile entry."
   exit
 }
 
@@ -411,5 +412,5 @@ grep error $OUTPUTDIR/stage2 >> $SUMMARYFILE
 echo ""
 cat $SUMMARYFILE
 if [ "$EMAIL" != "" ]; then
-  cat $SUMMARYFILE | mail -s "revbot summary" $EMAIL
+  cat $SUMMARYFILE | mail -s "rfds summary" $EMAIL
 fi
