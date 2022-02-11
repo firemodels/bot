@@ -1,4 +1,4 @@
-v!/bin/bash
+!/bin/bash
 
 #---------------------------------------------
 #                   usage
@@ -80,6 +80,7 @@ TYPE=
 popt=
 nopt=
 REPO=fds
+SMVDEBUG=
 
 #define bot repo location
 BOTREPO=$CURDIR/../../bot
@@ -159,7 +160,7 @@ CASENAME=$1
 ABORT=
 
 if [[ "$REPO" != "fds" ]] && [[ "$REPO" != "smv" ]]; then
-  echo "***error: this script only runs on the fds or smv repos" ]; then
+  echo "***error: this script only runs using the fds or smv repos" ]; then
   ABORT=1
 fi 
 if [ "$REPO" == "smv" ]; then
@@ -182,17 +183,41 @@ if [ "$USEEXISTING" == "1" ]; then
   fi
 fi
 
-#make sure only db or dv is used with the -T option
-if [[ "$TYPE" != "" ]] && [[ "$TYPE" != "dv" ]] && [[ "$TYPE" != "db" ]]; then
-  echo "***error: dv or db not specified with the the -T option"
-  TYPE=
-  ABORT=1
+#make sure only db or dv is used with the -T option with fds repos
+if [[ "$REPO" == "fds" ]] && [[ "$TYPE" != "" ]]; then
+  if [[ "$TYPE" != "dv" ]] && [[ "$TYPE" != "db" ]]; then
+    echo "***error: only dv or db can be specified with the -T option"
+    echo            "when the using the fds repo"
+    TYPE=
+    ABORT=1
+  fi
 fi
-if [ "$TYPE" == "dv" ]; then
-  MAKEENTRY=impi_intel_linux_64_dv
+
+#make sure only db used with the -T option with smv repos
+if [[ "$REPO" == "smv" ]] && [[ "$TYPE" != "" ]]; then
+  if [[ "$TYPE" != "db" ]]; then
+    echo "***error: only db can be specified with the -T option"
+    echo "          when using the smv repo"
+    TYPE=
+    ABORT=1
+  fi
 fi
-if [ "$TYPE" == "db" ]; then
-  MAKEENTRY=impi_intel_linux_64_db
+
+if [ "$REPO" == "fds" ]; then
+  if [ "$TYPE" == "dv" ]; then
+    MAKEENTRY=impi_intel_linux_64_dv
+  fi
+  if [ "$TYPE" == "db" ]; then
+    MAKEENTRY=impi_intel_linux_64_db
+  fi
+  BUILDDIR=Build/$MAKEENTRY
+fi
+if [ "$REPO" == "smv" ]; then
+  MAKEENTRY=intel_linux_64
+  BUILDDIR=Build/smokeview/$MAKEENTRY
+  if [ "$TYPE" == "db" ]; then
+    SMVDEBUG="-D"
+  fi
 fi
 
 # make sure revision file exists
@@ -237,7 +262,7 @@ if [ "$ABORT" != "" ]; then
 fi
 
 # make sure test fds repo exists
-TESTREPO=$CURDIR/../../fds_test
+TESTREPO=$CURDIR/../../${REPO}_test
 
 if [ -d $TESTREPO ]; then
   cd $TESTREPO
@@ -245,21 +270,21 @@ if [ -d $TESTREPO ]; then
   if [ "$USEEXISTING" == "" ]; then
     if [ "$FORCECLONE" == "1" ]; then
       cd $CURDIR
-      echo cloning fds into fds_test
+      echo cloning $REPO into ${REPO}_test
       rm -rf $TESTREPO 
       cd $SCRIPTDIR
       ./setup_repos.sh -G -t -C >> $OUTPUTDIR/stage0 2>&1
       cd $CURDIR
     else
-      echo "***error: The repo fds_test exists. Erase $TESTREPO"
+      echo "***error: The repo ${REPO}_test exists. Erase $TESTREPO"
       echo "          or use the -f option to force cloning"
-      echo "          or the -F option to use the existing fds_test repo"
+      echo "          or the -F option to use the existing ${REPO}_test repo"
       ABORT=1
     fi
   fi 
 else
   cd $SCRIPTDIR
-  echo cloning fds into fds_test
+  echo cloning ${REPO} into ${REPO}_test
   ./setup_repos.sh -G -t -C >> $OUTPUTDIR/stage0 2>&1
   cd $CURDIR
 fi
@@ -270,9 +295,17 @@ if [ ! -d $TESTREPO ]; then
 fi
 
 # make sure makefile entry exists
-if [ ! -d $TESTREPO/Build/$MAKEENTRY ]; then
-  echo "***error: The makefile entry $MAKEENTRY does not existt"
-  ABORT=1
+if [ "$REPO" == "fds" ]; then
+  if [ ! -d $TESTREPO/Build/$MAKEENTRY ]; then
+    echo "***error: The makefile entry $MAKEENTRY does not exist"
+    ABORT=1
+  fi
+fi
+if [ "$REPO" == "smv" ]; then
+  if [ ! -d $TESTREPO/Build/smokeview/$MAKEENTRY ]; then
+    echo "***error: The makefile entry $MAKEENTRY does not exist"
+    ABORT=1
+  fi
 fi
 
 #abort script if any of the above tests failed
@@ -283,7 +316,6 @@ fi
 cd $TESTREPO
 TESTREPO=`pwd`
 
-cd $CURDIR
 cd $TESTDIR
 TESTDIR=`pwd`
 
@@ -291,7 +323,7 @@ TESTDIR=`pwd`
 cd $CURDIR
 COMMITS=`cat $REVISIONS | awk -F';' '{print $1}'`
 count=0
-JOBPREFIX=BFDS_
+JOBPREFIX=B${repo}_
 
 #*** build fds for each revision in commit file
 if [ "$SKIPBUILD" == "" ]; then
@@ -309,17 +341,14 @@ if [ "$SKIPBUILD" == "" ]; then
     mkdir $COMMITDIR
     cp -r $TESTREPO/Source $COMMITDIR/Source
     cp -r $TESTREPO/Build  $COMMITDIR/Build
-    rm -f $COMMITDIR/Build/$MAKEENTRY/*.o
-    rm -f $COMMITDIR/Build/$MAKEENTRY/*.mod
-    rm -f $COMMITDIR/Build/$MAKEENTRY/fds*
     cd $CURDIR
     echo ""
     DATE=`grep $commit $CURDIR/$REVISIONS | awk -F';' '{print $3}'`
-    echo "building fds using $MAKEENTRY($commit/$DATE)"
+    echo "building $REPO using $MAKEENTRY($commit/$DATE)"
     if [ "$DEBUG" == "" ]; then
-      $CURDIR/qbuild.sh -j $JOBPREFIX${count}_$commit -d $COMMITDIR/Build/$MAKEENTRY $qopt
+      $CURDIR/qbuild.sh $SMVDEBUG -j $JOBPREFIX${count}_$commit -d $COMMITDIR/$BUILDDIR $qopt
     else
-      echo "$CURDIR/qbuild.sh -j $JOBPREFIX${count}_$commit -d $COMMITDIR/Build/$MAKEENTRY $qopt"
+      echo "$CURDIR/qbuild.sh $SMVDEBUG -j $JOBPREFIX${count}_$commit -d $COMMITDIR/$BUILDDIR $qopt"
     fi
   done
   cd $TESTREPO
@@ -337,17 +366,21 @@ if [ "$SKIPBUILD" == "" ]; then
   for commit in $COMMITS; do
     count=$((count+1))
     COMMITDIR=$TESTDIR/${count}_$commit
-    FDSEXE=$COMMITDIR/Build/$MAKEENTRY/fds_$MAKEENTRY
-    if [ ! -e $FDSEXE ]; then
-      echo "***error: $FDSEXE did not compile"
-      echo "***error: $FDSEXE did not compile" >> $OUTPUTDIR/stage1
+    if [ "$REPO" == "fds" ]; then
+      EXE=$COMMITDIR/$BUILDDIR/fds_$MAKEENTRY
+    else
+      EXE=$COMMITDIR/$BUILDDIR/smokeview_$MAKEENTRY
+    fi
+    if [ ! -e $EXE ]; then
+      echo "***error: $EXE did not compile"
+      echo "***error: $EXE did not compile" >> $OUTPUTDIR/stage1
       BADBUILD=1
     else
       compiles=$((compiles+1))
     fi
   done
   if [ "$BADBUILD" == "" ]; then
-    echo "all fdss were built successfully"
+    echo "all programs were built successfully"
   fi
 fi
 total_compiles=$count

@@ -8,6 +8,7 @@ function usage {
   echo "qbuild.sh builds FDS"
   echo ""
   echo " -d dir - directory where fds is built"
+  echo " -D     - debug smokeview build"
   echo " -h   - show this message"
   echo " -j prefix  - specif a job prefix"
   echo " -q q - name of queue. [default: batch]"
@@ -32,14 +33,20 @@ if [ "$FIREMODELS" != "" ]; then
 fi
 showscript=
 QUEUE=batch
+DB=
+DEBUG=" "
 
 #*** read in parameters from command line
 
-while getopts 'd:hj:q:v' OPTION
+while getopts 'd:Dhj:q:v' OPTION
 do
 case $OPTION  in
   d)
    builddir="$OPTARG"
+   ;;
+  D)
+   DB="_db"
+   DEBUG=" debug "
    ;;
   h)
    usage
@@ -115,10 +122,17 @@ echo \`date\`
 echo "     Directory: \`pwd\`"
 echo "          Host: \`hostname\`"
 echo "----------------"
-echo "started fds build at \`date\`"
 cd $fulldir
-./make_fds.sh
-echo "finished fds build at \`date\`"
+if [ -e make_fds.sh ]; then
+  echo "started fds build at \`date\`"
+  ./make_fds.sh
+  echo "finished fds build at \`date\`"
+fi
+if [ -e make_smokeview$DB.sh ]; then
+  echo "started$DEBUGsmokeview build at \`date\`"
+  ./make_smokeview$DB.sh
+  echo "finished$DEBUGsmokeview build at \`date\`"
+fi
 EOF
 
 #*** output script file to screen if -v option was selected
