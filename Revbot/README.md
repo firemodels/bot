@@ -48,11 +48,12 @@ versions of fds, one version for each repo revision
 ### Options
 
 ```
- -a date - include revisions after date [default: 10-Nov-2021 (3 months before current date)]
- -b date - include revisions before date [default: 10-Feb-2022 (current date)]
+ -a date - include revisions after date [default: 11-Nov-2021]
+ -b date - include revisions before date [default: 11-Feb-2022]
  -n n    - maximum number of revisions to include [default: 10]
  -h      - show this message
- -r revs - file containing revisions used to build fds [default: revisions.txt]
+ -r repo - generate revisions for repo [default: fds]
+           A list of revisions are outputted to fds_revisions.txt
  ```
  
  ## Example Usage

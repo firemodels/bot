@@ -16,15 +16,18 @@ function usage {
   echo " -b date - include revisions before date [default: $BEFOREARG]"
   echo " -n n    - maximum number of revisions to include [default: $MAXN]"
   echo " -h      - show this message"
-  echo " -r revs - file containing revisions used to build fds [default: $REVISIONS]"
+  echo " -r repo - generate revisions for repo [default: $REPO]"
+  echo "           A list of revisions are outputted to $REVISIONS"
   exit
 }
 
-REVISIONS=revisions.txt
 MAXN=10
 AFTERARG=1-Jan-2021
 BEFOREARG=`date +%d-%b-%Y`
 AFTERARG=`date -d "-3 month" +%d-%b-%Y`
+REPO=fds
+REVISIONS=${REPO}_revisions.txt
+MAXN=10
 
 #*** read in parameters from command line
 
@@ -45,11 +48,13 @@ case $OPTION  in
    MAXN="$OPTARG"
    ;;
   r)
-   REVISIONS="$OPTARG"
+   REPO="$OPTARG"
    ;;
 esac
 done
 shift $(($OPTIND-1))
+
+REVISIONS=${REPO}_revisions.txt
 
 if [ "$AFTERARG" != "" ]; then
   AFTER="--after=$AFTERARG"
@@ -59,9 +64,17 @@ if [ "$BEFOREARG" != "" ]; then
 fi
 
 CURDIR=`pwd`
-cd ../../fds
-FDSREPO=`pwd`
-cd $FDSREPO
+
+REPODIR=../../$REPO
+if [ ! -d $REPODIR ]; then
+  echo "***error: The repo ../../$REPO does not exist"
+  exit
+exist
+  cd $REPODIR
+  REPODIR=`pwd`
+fi
+
+cd $REPODIR
 TEMPREVS=/tmp/revs.$$
 
 echo "Outputting $MAXN revisions between $AFTERARG and $BEFOREARG to $REVISIONS"
