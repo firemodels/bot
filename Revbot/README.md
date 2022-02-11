@@ -54,3 +54,16 @@ versions of fds, one version for each repo revision
  -h      - show this message
  -r revs - file containing revisions used to build fds [default: revisions.txt]
  ```
+ 
+ ## Example Usage
+ 
+```cd ...bot/Revbot```
+
+Generate a list of 25 revision of the fds repo between now and 3 months ago. Output these revisons into the file ```revisions.txt``` .
+
+``` ./get_revisions.sh -n 25 ```
+
+Run 25 versions of fds on ```casename.fds`` using the revisions in ```revisions.txt```  generated previously.  Run ```casename.fds``` using 8 processes.
+
+```./revbot.sh -N 25 -p 8 casename.fds```
+ 
