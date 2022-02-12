@@ -7,7 +7,9 @@ to compile each fds or smokeview. It does this on compute nodes of a Linux clust
 computation load and more importantly to not impact the head node.
 
 You can use these scripts to do the equivalent of a ```git bisect``` where you examine the results of each case until you focus 
-in on the problem commit.  If the commits in the revision file are not adjacent you can use still use `git bisect` to find the problem commit.
+in on the problem commit.  Since all of the revisions are tested at once and take the same time to test as a single revision debugging can occur much quicker.
+If the commits in the revision file are not adjacent you can use still use `git bisect` to find the problem commit or repeat the ```get_revisons.sh```, 
+```rrevbot.sh``` cycle reducing the range of commits being tested.
 
 ## revbot.sh 
 
