@@ -5,10 +5,11 @@
 
 function usage {
   echo "Usage: get_revisions.sh [options]"
-  echo "       get_revisions.sh generates a list of fds revisions from"
-  echo "       bewteen optionally specified dates.  The file generated"
-  echo "       is used by the script revbot.sh to build and run multiple"
-  echo "       versions of fds, one version for each repo revision" 
+  echo "       get_revisions.sh generates a list of fds or smv revisions"
+  echo "       committed between optionally specified dates.  The file"
+  echo "       generated is used by the script revbot.sh to build and run"
+  echo "       multiple versions of fds, one version for each repo"
+  echo "       revision or to build multiple versions of smokeview"
   echo ""
   echo "Options:"
   echo ""

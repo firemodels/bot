@@ -6,36 +6,41 @@
 
 function usage {
   echo "Usage: revbot.sh [options] [casename.fds]"
-  echo "       revbot.sh builds fds for a set of revisions found in a revision file."
-  echo "       It then runs casename.fds for each fds that was built. If casename.fds"
-  echo "       was not specified then only the fdss are built. The revision file"
-  echo "       is generated using the script get_revisions.sh.  git checkout revisions"
-  echo "       are performed on a copy of the fds repo cloned by this script.  So revbot.sh"
-  echo "       will not effect the fds repo you normally work with."
+  echo "       revbot.sh builds fds or smokeview for a set of revisions found in"
+  echo "       a revision file. If fds was built, it also runs casename.fds for."
+  echo "       each fds that was built. The revision file is generated using"
+  echo "       get_revisions.txt. git checkout revisions are performed on a"
+  echo "       copy of the fds or smv repo cloned by this script.  So revbot.sh"
+  echo "       does not effect the repo you normally work with."
   echo ""
-  echo "Options:"
-  echo ""
-  echo " -d dir - root directory where fdss are built [default: $TESTDIR]"
-  echo " -f   - force cloning of the fds_test repo"
-  echo " -F   - use existing fds_test repo"
+  echo "Commonly Used Options:"
+  echo " -h   - show commonly used options"
+  echo " -H   - show all options"
 if [ "$EMAIL" != "" ]; then
   echo " -m email_address - send results to email_address [default: $EMAIL]"
 else
   echo " -m email_address - send results to email_address"
 fi
-  echo " -N n - specify maximum number of fdss to build [default: $MAXN]"
+  echo " -N n - specify maximum number of fdss or smokeviews to build [default: $MAXN]"
+  echo " -q q - name of batch queue used to build fdss and to run cases. [default: batch]"
+  echo " -r repo - repo can be fds or smv. [default: $REPO}.  If smv the revbot.sh only builds"
+  echo "           smokeview, it does not run or view cases"
+if [ "$ALL_OPTIONS" != "" ]; then
+  echo ""
+  echo "Other Options:"
+  echo ""
+  echo " -d dir - root directory where fdss are built [default: $TESTDIR]"
+  echo " -f   - force cloning of the fds_test repo"
+  echo " -F   - use existing fds_test repo"
   echo " -n n - number of MPI processes per node used when running cases [default: 1]"
   echo " -p p - number of MPI processes used when runnng cases [default: 1] "
   echo " -r revfile - file containing list of revisions used to build fds [default: $REVISIONS]"
   echo "              The revfile is built by the get_revisions.sh script"
-  echo " -h   - show this message"
-  echo " -q q - name of batch queue used to build fdss and to run cases. [default: batch]"
-  echo " -r repo - repo can be fds or smv. [default: $REPO}.  If smv the revbot.sh only builds"
-  echo "           smokeview, it does not run or view cases"
   echo " -s   - skip the build step (fdss were built eariler)"
   echo " -T type - build fds using type dv (impi_intel_linux_64_dv) or type db (impi_intel_linux_64_db)"
   echo "           makefile entries. If -T is not specified then fds is built using the release"
   echo "           (impi_intel_linux_64) makefile entry."
+fi
   exit
 }
 
@@ -81,6 +86,7 @@ popt=
 nopt=
 REPO=fds
 SMVDEBUG=
+ALL_OPTIONS=
 
 #define bot repo location
 BOTREPO=$CURDIR/../../bot
@@ -109,7 +115,7 @@ cd $CURDIR
 
 #*** read in parameters from command line
 
-while getopts 'd:DfFhm:n:N:p:q:r:sT:' OPTION
+while getopts 'd:DfHFhm:n:N:p:q:r:sT:' OPTION
 do
 case $OPTION  in
   d)
@@ -123,6 +129,11 @@ case $OPTION  in
    ;;
   F)
    USEEXISTING=1
+   ;;
+  H)
+   ALL_OPTIONS=1
+   usage
+   exit
    ;;
   h)
    usage
