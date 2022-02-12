@@ -62,6 +62,7 @@ revision or to build multiple versions of smokeview
  
  ## Example Usage
  
+ cd to Revbot directory
 ```cd ...bot/Revbot```
 
 Generate a list of 25 revision of the fds repo between now and 3 months ago. Output these revisons to the file ```revisions.txt``` .
@@ -76,7 +77,7 @@ Run 25 versions of fds on ```casename.fds``` using the revisions in ```revisions
 
 ``` ./get_revisions.sh  -a 1-Oct-2021 -b 31-Oct-2021 -n 20 ```
 
-Assume the fds repo was previously cloned by ```revbot.sh``` , use -F to reuse this repo. Use -T dv to run ```casename.fds``` using the dv version of fds
+Assume the fds repo was previously cloned by ```revbot.sh``` , use -F to reuse this repo. Use -T dv to run ```casename.fds``` with the dv version of fds
 (build using the impi_intel_linux_64_dv makefile entry)
 
 ```./revbot -F -N 20 -T dv casename.fds```
