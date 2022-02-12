@@ -2,8 +2,6 @@
 
 ## revbot.sh 
 
-### Usage
-
 revbot.sh [options] [casename.fds]
 
 revbot.sh builds fds or smokeview for a set of revisions found in
@@ -42,8 +40,6 @@ does not effect the repo you normally work with.
 ```
 
 ## get_revisions.sh
-
-### Usage
 
 get_revisions.sh [options]
 get_revisions.sh generates a list of fds or smv revisions
