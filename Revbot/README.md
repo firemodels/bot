@@ -14,7 +14,7 @@ does not effect the repo you normally work with.
 ### Commonly Used Options
 
 ```
-  -h   - show commonly used options
+ -h   - show commonly used options
  -H   - show all options
  -m email_address - send results to email_address
  -N n - specify maximum number of fdss or smokeviews to build [default: 10]
