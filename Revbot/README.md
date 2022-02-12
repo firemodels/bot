@@ -16,22 +16,22 @@ will not effect the fds repo you normally work with.
 ### Options
 
 ```
- -d dir - root directory where fdss are built [default: ...bot/Revbot/TESTDIR]
+ -d dir - root directory where fdss are built [default: .../bot/Revbot/TESTDIR]
  -f   - force cloning of the fds_test repo
  -F   - use existing fds_test repo
- -m email_address - send results to email_address [default: gforney@gmail.com]
+ -m email_address - send results to email_address
  -N n - specify maximum number of fdss to build [default: 10]
  -n n - number of MPI processes per node used when running cases [default: 1]
  -p p - number of MPI processes used when runnng cases [default: 1]
- -r revfile - file containing list of revisions used to build fds 
-              [default: revisions.txt]
+ -r revfile - file containing list of revisions used to build fds [default: _revisions.txt]
               The revfile is built by the get_revisions.sh script
  -h   - show this message
  -q q - name of batch queue used to build fdss and to run cases. [default: batch]
+ -r repo - repo can be fds or smv. [default: fds}.  If smv the revbot.sh only builds
+           smokeview, it does not run or view cases
  -s   - skip the build step (fdss were built eariler)
- -T type - build fds using type dv (impi_intel_linux_64_dv) or 
-           type db (impi_intel_linux_64_db) makefile entries. If -T is not
-           specified then fds is built using the release
+ -T type - build fds using type dv (impi_intel_linux_64_dv) or type db (impi_intel_linux_64_db)
+           makefile entries. If -T is not specified then fds is built using the release
            (impi_intel_linux_64) makefile entry.
 ```
 
@@ -40,10 +40,12 @@ will not effect the fds repo you normally work with.
 ### Usage
 
 get_revisions.sh [options]
-get_revisions.sh generates a list of fds revisions from
-bewteen optionally specified dates.  The file generated
-is used by the script revbot.sh to build and run multiple
-versions of fds, one version for each repo revision
+get_revisions.sh generates a list of fds or smv revisions
+committed between optionally specified dates.  The file
+generated is used by the script revbot.sh to build and run
+multiple versions of fds, one version for each repo
+revision or to build multiple versions of smokeview
+
 
 ### Options
 
