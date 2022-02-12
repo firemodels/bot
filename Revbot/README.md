@@ -1,4 +1,13 @@
-# Revbot: Scripts for testing fds and smokeview
+# Scripts for testing fds and smokeview
+
+This directory contains three scripts, get_revision.sh, revbot.sh and qbuild.sh. get_revisons.sh is used to generate a file 
+containing a list of revisions for the fds or smv repo.  revbot.sh then uses this file to build fds or smokeview for each of those
+revisions.  In the case of fds, revbot.sh can also run a test case for those revisions.   qbuild.sh is run by revbot.sh to compile each fds or smokeview.
+It does it on compute nodes of a Linux cluster rather than the head node to spread out the computation load.
+
+You can use these scripts to do the equivalent of a ```git bisect```
+where you examine the results of each case until you focus in on the problem commit.  If the commits in the revision file are not adjacent you can
+use still use `git bisect` to find the problem commit.
 
 ## revbot.sh 
 
