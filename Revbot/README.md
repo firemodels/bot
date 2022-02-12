@@ -1,4 +1,4 @@
-# Revbot: Scripts for testing fds by building and running it for many repo revisons
+# Revbot: Scripts for testing fds and smokeview
 
 ## revbot.sh 
 
@@ -6,12 +6,12 @@
 
 revbot.sh [options] [casename.fds]
 
-revbot.sh builds fds for a set of revisions found in a revision file.
-It then runs casename.fds for each fds that was built. If casename.fds
-was not specified then only the fdss are built. The revision file
-is generated using the script get_revisions.sh.  git checkout revisions
-are performed on a copy of the fds repo cloned by this script.  So revbot.sh
-will not effect the fds repo you normally work with.
+revbot.sh builds fds or smokeview for a set of revisions found in a
+revision file. If fds was built, it also runs casename.fds for each
+fds that was built. The revision file is generated using get_revisions.sh.
+git checkout revisions are performed on a copy of the fds or smv
+repo cloned by this script.  So revbot.sh will not effect the repo
+you normally work with.
 
 ### Options
 
