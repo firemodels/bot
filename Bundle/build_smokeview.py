@@ -71,6 +71,8 @@ def bundle_smv():                  os.system("start " + webscript_dir + "webPACK
 
 def install_smv():                 os.system("start " + webscript_dir + "webINSTALLsmv "    + platforms[bundleplatform.get()] + " " + buildtypes[buildtype.get()] )
 
+def bundle_install_smv():          os.system("start " + webscript_dir + "webPACKAGEINSTALLsmv " + platforms[bundleplatform.get()] + " " + buildtypes[buildtype.get()] )
+
 def download_figures():            os.system("start " + webscript_dir + "webGETfigs "       + apps[app.get()]                 + " " + guides[guide.get()] )
  
 def archive_smv():                 os.system("start " + webscript_dir + "webARCHIVEAllbundle"  )
@@ -202,7 +204,7 @@ Button(root, text="test",   width=button_width, command=build_smv, fg='white', b
 Button(root, text="release",   width=button_width, command=build_smv_rel).grid(row=R,  column=2)
 R=R+1
 Label(root,  text="Build smv(Intel):").grid(column=0, row=R, sticky=E)
-Button(root, text="test inc",    width=button_width, command=build_smv_win_inc).grid(row=R, column=1)
+Button(root, text="Win test inc",    width=button_width, command=build_smv_win_inc).grid(row=R, column=1)
 Button(root, text="test debug",    width=button_width, command=build_smv_win_deb).grid(row=R, column=2)
 
 # ------------------------- Build gnu libraries, smokeview ------------------------------
@@ -252,9 +254,12 @@ Radiobutton(root,
                value=2).grid(row=R, column=1)
 
 R=R+1
-Button(root, text="Bundle",  width=button_width, fg='white', bg='blue', command=bundle_smv).grid(row=R,        column=0)
-Button(root, text="Install", width=button_width, command=install_smv).grid(row=R,       column=1)
-Button(root, text="Set Rev",   width=button_width, command=set_revision).grid(row=R, column=2)
+Button(root, text="BundleInst", width=button_width,  fg='white', bg='blue', command=bundle_install_smv).grid(row=R,       column=0)
+Button(root, text="Bundle",     width=button_width, command=bundle_smv).grid(row=R,        column=1)
+Button(root, text="Install",    width=button_width, command=install_smv).grid(row=R,       column=2)
+
+R=R+1
+Button(root, text="Set Rev",   width=button_width, command=set_revision).grid(row=R, column=0)
 
 R=R+1
 Label(root, text="--------BUNDLE ==>> Google Drive--------").grid(column=0, row=R, columnspan=3)

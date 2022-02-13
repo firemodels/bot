@@ -1,6 +1,7 @@
 @echo off
 set platform=%1
 set buildtype=%2
+set nopause=%3
 
 ::  batch file to build test or release Smokeview on a Windows, OSX or Linux system
 
@@ -13,6 +14,7 @@ echo Create a file named %envfile% and use smv/scripts/fds_smv_env_template.bat
 echo as an example.
 echo.
 echo Aborting now...
+if "x%nopause%" == "xnopause" goto eof
 pause>NUL
 goto:eof
 
@@ -52,6 +54,7 @@ if "%platform%" == "Linux" (
   if "%buildtype%" == "release" (
     plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/run_command2.sh $HOME/.bundle/uploads %smv_version%_lnx.sh y
   )
+  if "x%nopause%" == "xnopause" goto eof
   pause > Nul
   goto eof
 )
@@ -62,6 +65,7 @@ if "%platform%" == "OSX" (
   if "%buildtype%" == "release" (
     plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/run_command2.sh $HOME/.bundle/uploads %smv_version%_osx.sh y
   )
+  if "x%nopause%" == "xnopause" goto eof
   pause > Nul
   goto eof
 )
