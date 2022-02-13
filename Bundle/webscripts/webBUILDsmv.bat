@@ -48,7 +48,7 @@ if "%buildtype%" == "release" (
    set type=-r
 )
 if "%buildtype%" == "debug" (
-   set wintype=
+   set wintype=-debug
    set type=
 )
 if "%platform%" == "Windowsgnu" (

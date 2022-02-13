@@ -5,6 +5,8 @@ set platform=%1
 :: build type is test or release
 set buildtype=%2
 
+set nopause=nopause
+
 :: setup environment variables (defining where repository resides etc) 
 
 set envfile="%userprofile%"\fds_smv_env.bat
@@ -106,6 +108,8 @@ if "%platform%" == "OSX" (
 )
 
 :eof
+if "x%nopause%" == "xnopause" goto eof2
 echo.
 echo Bundle build complete
 pause
+:eof2
