@@ -105,6 +105,6 @@ At NIST we would type the following command to generate the new base set of imag
 
 ```
 cd $HOME/FireModels_fork/bot/Firebot
-./scripts/update_repo_images -r ~firebot/Firebot_clone
+../scripts/update_repo_images -r ~firebot/Firebot_clone
 ```
 
