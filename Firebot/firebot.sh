@@ -240,6 +240,7 @@ get_smv_revision()
 
    git update-index --refresh
    SMV_REVISION=`git describe --long --dirty`
+   echo $SMV_REVISION > $repo/fds/Manuals/SMV_REVISION
    subrev=`git describe --abbrev | awk -F '-' '{print $2}'`
    if [ "$subrev" == "" ]; then
      git describe --abbrev | awk -F '-' '{print $1"-0"}' > $LATESTAPPS_DIR/SMV_REVISION
@@ -266,6 +267,7 @@ get_fds_revision()
 
    git update-index --refresh
    FDS_REVISION=`git describe --long --dirty`
+   echo $FDS_REVISION > $repo/fds/Manuals/FDS_REVISION
    subrev=`git describe --abbrev | awk -F '-' '{print $2}'`
    if [ "$subrev" == "" ]; then
      git describe --abbrev | awk -F '-' '{print $1"-0"}' > $LATESTAPPS_DIR/FDS_REVISION
