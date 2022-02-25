@@ -10,7 +10,9 @@ set FDS_TAG=
 set SMV_TAG=
 set BRANCH_NAME=nightly
 set configscript=%userprofile%\.bundle\bundle_config.bat
+set logfile=%userprofile%\.bundle\logfile.txt
 set upload_bundle=1
+set emailto=
 
 :: define defaults
 
@@ -118,6 +120,14 @@ if exist ..\webpages goto endif4
   exit /b 1
 :endif4
 
+set email=%botrepo%\Scripts\email.bat
+set emailexe=%userprofile%\bin\mailsend.exe
+if "x%emailto%" == "x" goto endif5
+  if exist %emailexe% goto endif5
+    echo ***warrning: email program %emailexe% does not exist
+    set emailto=
+:endif5
+
 cd ..\webpages
 set webpagesrepo=%CD%
 
@@ -183,41 +193,46 @@ if NOT "x%FDS_HASH%" == "x" goto skip_elsehash
 
 cd %CURDIR%
 
-echo.
-echo ------------------------------------------------------
-echo ------------------------------------------------------
-echo Building bundle using:
-echo.
+echo.                                                         > %logfile%
+echo ------------------------------------------------------  >> %logfile%
+echo ------------------------------------------------------  >> %logfile%
+echo Building bundle using:                                  >> %logfile%
+echo.                                                        >> %logfile%
 if "x%FDS_REVISION_BUNDLER%" == "x" goto skip_fdsrev
-  echo             FDS revision: %FDS_REVISION_BUNDLER%
+  echo             FDS revision: %FDS_REVISION_BUNDLER%      >> %logfile%
 :skip_fdsrev
 
 if "x%FDS_HASH_BUNDLER%" == "x" goto skip_fdshash
-echo            FDS repo hash: %FDS_HASH_BUNDLER%
+echo            FDS repo hash: %FDS_HASH_BUNDLER%            >> %logfile%
 :skip_fdshash
 
 if "x%FDS_TAG%" == "x" goto skip_fdstag
-echo             FDS repo tag: %FDS_TAG%
+echo             FDS repo tag: %FDS_TAG%                     >> %logfile%
 :skip_fdstag
 
 if "x%SMV_REVISION_BUNDLER%" == "x" goto skip_smvrev
-  echo             smv revision: %SMV_REVISION_BUNDLER%
+  echo             smv revision: %SMV_REVISION_BUNDLER%      >> %logfile%
 :skip_smvrev
 
 if "x%SMV_HASH_BUNDLER%" == "x" goto skip_smvhash
-echo            SMV repo hash: %SMV_HASH_BUNDLER%
+echo            SMV repo hash: %SMV_HASH_BUNDLER%            >> %logfile%
 :skip_smvhash
 
 if "x%SMV_TAG%" == "x" goto skip_smvtag
-echo             SMV repo tag: %SMV_TAG%
+echo             SMV repo tag: %SMV_TAG%                     >> %logfile%
 :skip_smvtag
 
-echo    firebot/smokebot host: %bundle_hostname%
-echo   firebot home directory: %bundle_firebot_home%
-echo        FDS pub directory: %FDS_PUBS_DIR%
-echo  smokebot home directory: %bundle_smokebot_home%
-echo Smokeview pubs directory: %SMV_PUBS_DIR%
-echo.
+echo    firebot/smokebot host: %bundle_hostname%             >> %logfile%
+echo   firebot home directory: %bundle_firebot_home%         >> %logfile%
+echo        FDS pub directory: %FDS_PUBS_DIR%                >> %logfile%
+echo  smokebot home directory: %bundle_smokebot_home%        >> %logfile%
+echo Smokeview pubs directory: %SMV_PUBS_DIR%                >> %logfile%
+if NOT "%emailto%" == "" (
+  echo                    email: %emailto%                   >> %logfile%
+)
+echo.                                                        >> %logfile%
+
+type %logfile%
 
 if "x%clone%" == "xclone" goto skip_warning
   echo.
@@ -312,6 +327,10 @@ if "x%upload_bundle%" == "x" goto skip_upload
   call upload_bundle %FDS_REVISION_BUNDLER% %SMV_REVISION_BUNDLER% %nightly% %bundle_hostname% || exit /b 1
 :skip_upload
 
+if "x%emailto%" == "x" goto endif6
+  call %email% %emailto% "PC bundle %FDS_REVISION_BUNDLER% %SMV_REVISION_BUNDLER% created on %COMPUTERNAME%" %logfile%
+:endif6
+
 goto eof
 
 
@@ -334,6 +353,7 @@ echo -f - firebot home directory %default_firebot_home%
 echo -F - fds repo hash
 echo -h - display this message
 echo -H - host where firebot and smokebot were run %default_hostname%
+echo -m mailtto - send email to mailto
 echo -r - same as -b release or -R release
 echo -R - branch name [default: %BRANCH_NAME%]
 echo -s - smokebot home directory %default_smokebot_home%
@@ -388,6 +408,11 @@ set bundle_smokebot_home=
  )
  if "%1" EQU "-H" (
    set bundle_hostname=%2
+   set valid=1
+   shift
+ )
+ if "%1" EQU "-m" (
+   set emailto=%2
    set valid=1
    shift
  )

@@ -1936,6 +1936,9 @@ SMV_SHORTHASH=`git rev-parse --short HEAD`
 SMV_LONGHASH=`git rev-parse HEAD`
 SMV_DATE=`git log -1 --format=%cd --date=local $SMV_SHORTHASH`
 
+echo $FDS_REVISION > $smvrepo/Manuals/FDS_REVISION
+echo $SMV_REVISION > $smvrepo/Manuals/SMV_REVISION
+
 subrev=`git describe --abbrev | awk -F '-' '{print $2}'`
 if [ "$subrev" == "" ]; then
   git describe --abbrev | awk -F '-' '{print $1"-0"}' > $LATESTAPPS_DIR/SMV_REVISION
