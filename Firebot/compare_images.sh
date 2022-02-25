@@ -451,7 +451,7 @@ cat << EOF  > $HTML_DIFF
 <tr><th align=left>Fig revision:</th>     <td> $FIG_REVISION</tr>
 <tr><th align=left>Root:</th>             <td> $REPO                      </td></tr>
 <tr><th align=left>Metric/Tolerance:</th> <td> ${METRIC_LABEL}/$TOLERANCE </td></tr>
-<tr><th align=left>Diffs/Errors:</th>     <td> $HAVE_DIFFS/$HAVE_ERRORS   </td></tr>
+<tr><th align=left>Differences/Errors:</th>     <td> $HAVE_DIFFS/$HAVE_ERRORS   </td></tr>
 </table>
 EOF
 
