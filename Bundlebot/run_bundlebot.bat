@@ -120,7 +120,7 @@ if exist ..\webpages goto endif4
   exit /b 1
 :endif4
 
-set email=%botrepo%\Scripts\email.bat
+set email=%botrepo%\Scripts\email_insert.bat
 set emailexe=%userprofile%\bin\mailsend.exe
 if "x%emailto%" == "x" goto endif5
   if exist %emailexe% goto endif5
