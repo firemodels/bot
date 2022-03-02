@@ -254,9 +254,9 @@ Radiobutton(root,
                value=2).grid(row=R, column=1)
 
 R=R+1
-Button(root, text="Bundle/Inst", width=button_width,  fg='white', bg='blue', command=bundle_install_smv).grid(row=R,       column=0)
-Button(root, text="Bundle",     width=button_width, command=bundle_smv).grid(row=R,        column=1)
-Button(root, text="Install",    width=button_width, command=install_smv).grid(row=R,       column=2)
+Button(root, text="Bundle",     width=button_width, command=bundle_smv).grid(row=R,        column=0)
+Button(root, text="Install",    width=button_width, command=install_smv).grid(row=R,       column=1)
+Button(root, text="Bundle/Install", width=button_width,  fg='white', bg='blue', command=bundle_install_smv).grid(row=R,       column=2)
 
 R=R+1
 Button(root, text="Set Bundle Rev",   width=button_width, command=set_revision).grid(row=R, column=0)
