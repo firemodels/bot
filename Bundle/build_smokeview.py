@@ -44,7 +44,7 @@ app.set(2)
 guide=IntVar()
 guide.set(1)
 
-button_width=8
+button_width=11
 
 # link windows batch files to python commands
 
@@ -254,25 +254,20 @@ Radiobutton(root,
                value=2).grid(row=R, column=1)
 
 R=R+1
-Button(root, text="BundleInst", width=button_width,  fg='white', bg='blue', command=bundle_install_smv).grid(row=R,       column=0)
-Button(root, text="Bundle",     width=button_width, command=bundle_smv).grid(row=R,        column=1)
-Button(root, text="Install",    width=button_width, command=install_smv).grid(row=R,       column=2)
+Button(root, text="Bundle",     width=button_width, command=bundle_smv).grid(row=R,        column=0)
+Button(root, text="Install",    width=button_width, command=install_smv).grid(row=R,       column=1)
+Button(root, text="Bundle/Install", width=button_width,  fg='white', bg='blue', command=bundle_install_smv).grid(row=R,       column=2)
 
 R=R+1
-Button(root, text="Set Rev",   width=button_width, command=set_revision).grid(row=R, column=0)
+Button(root, text="Set Bundle Rev",   width=button_width, command=set_revision).grid(row=R, column=0)
 
 R=R+1
-Label(root, text="--------BUNDLE ==>> Google Drive--------").grid(column=0, row=R, columnspan=3)
+Label(root, text="-----BUNDLE --> Google Drive/cluster-----").grid(column=0, row=R, columnspan=3)
 
 R=R+1
-Button(root, text="Copy",    width=button_width, command=copy_bundle).grid(row=R,   column=0)
-Button(root, text="Upload",  width=button_width, command=upload_bundle).grid(row=R, column=1)
-
-R=R+1
-Label(root, text="-----------BUNDLE ==>> CLUSTER-----------").grid(column=0, row=R, columnspan=3)
-
-R=R+1
-Button(root, text="Copy", width=button_width, command=archive_smv).grid(row=R,   column=0)
+Button(root, text="Copy --> G.D.",    width=button_width, command=copy_bundle).grid(row=R,   column=0)
+Button(root, text="Upload --> G.D.",  width=button_width, command=upload_bundle).grid(row=R, column=1)
+Button(root, text="Copy --> cluster", width=button_width+1, command=archive_smv).grid(row=R,   column=2)
 
 # ------------------------- get figures ------------------------------
 

@@ -1649,10 +1649,6 @@ fi
 
 CHECK_DAEMON slurmd error $CB_HOSTS
 
-#*** check slurm directory
-
-CHECK_DIR_LIST /etc slurm
-
 #*** check slurm rpm
 
 TEMP_RPM=/tmp/rpm.$$
@@ -1683,7 +1679,7 @@ else
   echo "      Fix: ask system administrator to update slurm rpm packages"
 fi
 
-CHECK_FILE_DATE /etc/slurm/slurmdbd.conf
+#*** ganglia checks -----------------------------
 
 GANGLIA=`ps -el | grep gmetad`
 if [ "$GANGLIA" != "" ]; then

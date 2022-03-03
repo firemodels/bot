@@ -2130,10 +2130,12 @@ if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
        fi
        
        if [ "$WEB_DIR" != "" ]; then
-         rm -rf $WEB_ROOT/$WEB_DIR/images $WEB_ROOT/$WEB_DIR/images2 $WEB_ROOT/$WEB_DIR/manuals $WEB_ROOT/$WEB_DIR/*.html
-         if [ "$MAKEMOVIES" != "0" ]; then
-           rm -rf $WEB_ROOT/$WEB_DIR/movies
+         WEB_DIR_OLD=${WEB_DIR}_old
+         rm -rf $WEB_ROOT/$WEB_DIR_OLD
+         if [ -d $WEB_ROOT/$WEB_DIR ]; then
+           mv $WEB_ROOT/$WEB_DIR $WEB_ROOT/$WEB_DIR_OLD
          fi
+         mkdir $WEB_ROOT/$WEB_DIR
          cp -r $SMV_SUMMARY_DIR/* $WEB_ROOT/$WEB_DIR/.
          rm -f $WEB_ROOT/$WEB_DIR/*template.html
        fi

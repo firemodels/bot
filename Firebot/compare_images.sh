@@ -103,6 +103,7 @@ FDS_REVISION=`git describe --long --dirty`
 
 cd $CURDIR/../../fig
 FIGREPO=`pwd`
+FIG_REVISION=`git describe --long --dirty`
 
 FIG_USER_FDS_REVISION_FILE=$FIGREPO/compare/$BOT_TYPE/images/user/FDS_REVISION
 FIG_VER_FDS_REVISION_FILE=$FIGREPO/compare/$BOT_TYPE/images/verification/FDS_REVISION
@@ -447,9 +448,10 @@ cat << EOF  > $HTML_DIFF
 <table>
 <tr><th align=left>Current:</th>          <td> $FDS_REVISION              </td><td>$SMV_REVISION</td></tr>
 <tr><th align=left>Base:</th>             <td> $FIG_USER_FDS_REVISION     </td><td>$FIG_USER_SMV_REVISION</td></tr>
+<tr><th align=left>Fig revision:</th>     <td> $FIG_REVISION</tr>
 <tr><th align=left>Root:</th>             <td> $REPO                      </td></tr>
 <tr><th align=left>Metric/Tolerance:</th> <td> ${METRIC_LABEL}/$TOLERANCE </td></tr>
-<tr><th align=left>Diffs/Errors:</th>     <td> $HAVE_DIFFS/$HAVE_ERRORS   </td></tr>
+<tr><th align=left>Differences/Errors:</th>     <td> $HAVE_DIFFS/$HAVE_ERRORS   </td></tr>
 </table>
 EOF
 
