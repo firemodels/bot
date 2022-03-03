@@ -1645,6 +1645,10 @@ if [ "$?" == "1" ]; then
   echo ""
 fi
 
+#*** check slurmdbd.conf file date
+
+CHECK_FILE_DATE /etc/slurm/slurmdbd.conf
+
 #*** check slurm daemon
 
 CHECK_DAEMON slurmd error $CB_HOSTS
@@ -1679,7 +1683,7 @@ else
   echo "      Fix: ask system administrator to update slurm rpm packages"
 fi
 
-CHECK_FILE_DATE /etc/slurm/slurmdbd.conf
+#*** ganglia checks -----------------------------
 
 GANGLIA=`ps -el | grep gmetad`
 if [ "$GANGLIA" != "" ]; then
