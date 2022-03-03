@@ -1645,10 +1645,6 @@ if [ "$?" == "1" ]; then
   echo ""
 fi
 
-#*** check slurmdbd.conf file date
-
-CHECK_FILE_DATE /etc/slurm/slurmdbd.conf
-
 #*** check slurm daemon
 
 CHECK_DAEMON slurmd error $CB_HOSTS
