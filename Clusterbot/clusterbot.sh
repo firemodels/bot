@@ -1649,10 +1649,6 @@ fi
 
 CHECK_DAEMON slurmd error $CB_HOSTS
 
-#*** check slurm directory
-
-CHECK_DIR_LIST /etc slurm
-
 #*** check slurm rpm
 
 TEMP_RPM=/tmp/rpm.$$
