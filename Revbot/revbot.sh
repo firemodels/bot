@@ -34,8 +34,6 @@ if [ "$ALL_OPTIONS" != "" ]; then
   echo " -F   - use existing fds_test repo"
   echo " -n n - number of MPI processes per node used when running cases [default: 1]"
   echo " -p p - number of MPI processes used when runnng cases [default: 1] "
-  echo " -r revfile - file containing list of revisions used to build fds [default: $REVISIONS]"
-  echo "              The revfile is built by the get_revisions.sh script"
   echo " -s   - skip the build step (fdss were built eariler)"
   echo " -T type - build fds using type dv (impi_intel_linux_64_dv) or type db (impi_intel_linux_64_db)"
   echo "           makefile entries. If -T is not specified then fds is built using the release"
@@ -174,9 +172,9 @@ if [[ "$REPO" != "fds" ]] && [[ "$REPO" != "smv" ]]; then
   echo "***error: this script only runs using the fds or smv repos"
   ABORT=1
 fi 
+REVISIONS=${REPO}_revisions.txt
 if [ "$REPO" == "smv" ]; then
   SKIPRUN=1
-  REVISIONS=${REPO}_revisions.txt
   if [ "$CASENAME" != "" ]; then
     echo "***warning: $CASENAME will be ignored when running this script with the smv repo"
     CASENAME=
@@ -339,6 +337,7 @@ JOBPREFIX=B${repo}_
 #*** build fds or smokeview for each revision in commit file
 if [ "$SKIPBUILD" == "" ]; then
   cd $TESTDIR
+  rm -rf */.git
   git clean -dxf >& /dev/null
   for commit in $COMMITS; do
     count=$((count+1))
@@ -350,8 +349,12 @@ if [ "$SKIPBUILD" == "" ]; then
     echo " --------------------------------------------------------------" >> $OUTPUTDIR/stage1
     COMMITDIR=$TESTDIR/${count}_$commit
     mkdir $COMMITDIR
-    cp -r $TESTREPO/Source $COMMITDIR/Source
-    cp -r $TESTREPO/Build  $COMMITDIR/Build
+    cp -r $TESTREPO/Source    $COMMITDIR/Source
+    cp -r $TESTREPO/Build     $COMMITDIR/Build
+if [ "$REPO" == "smv" ]; then
+    cp -r $TESTREPO/Utilities $COMMITDIR/Utilities
+fi
+    cp -r $TESTREPO/.git      $COMMITDIR/.git
     cd $CURDIR
     echo ""
     DATE=`grep $commit $CURDIR/$REVISIONS | awk -F';' '{print $3}'`

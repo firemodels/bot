@@ -72,10 +72,10 @@ fi
 cd $builddir
 fulldir=`pwd`
 
-outerr=$fulldir/fdsbuild.err
-outlog=$fulldir/fdsbuild.log
-qlog=$fulldir/fdsbuild.qlog
-scriptlog=$fulldir/fdsbuild.scriptlog
+outerr=$fulldir/build.err
+outlog=$fulldir/build.log
+qlog=$fulldir/build.qlog
+scriptlog=$fulldir/build.scriptlog
 
 commandline=`echo $* | sed 's/-V//' | sed 's/-v//'`
 scriptfile=`mktemp /tmp/script.$$.XXXXXX`
@@ -122,18 +122,23 @@ echo \`date\`
 echo "     Directory: \`pwd\`"
 echo "          Host: \`hostname\`"
 echo "----------------"
+export LD_LIBRARY_PATH=/lib64:\$LD_LIBRARY_PATH
 cd $fulldir
-if [ -e make_fds.sh ]; then
-  echo "started fds build at \`date\`"
-  ./make_fds.sh
-  echo "finished fds build at \`date\`"
-fi
-if [ -e make_smokeview$DB.sh ]; then
-  echo "started$DEBUGsmokeview build at \`date\`"
-  ./make_smokeview$DB.sh
-  echo "finished$DEBUGsmokeview build at \`date\`"
-fi
 EOF
+if [ -e $fulldir/make_fds.sh ]; then
+cat << EOF >> $scriptfile
+echo "started fds build at \`date\`"
+./make_fds.sh
+echo "finished fds build at \`date\`"
+EOF
+fi
+if [ -e $fulldir/make_smokeview$DB.sh ]; then
+cat << EOF >> $scriptfile
+echo "started$DEBUGsmokeview build at \`date\`"
+./make_smokeview$DB.sh
+echo "finished$DEBUGsmokeview build at \`date\`"
+EOF
+fi
 
 #*** output script file to screen if -v option was selected
 
