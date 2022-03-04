@@ -122,7 +122,6 @@ echo \`date\`
 echo "     Directory: \`pwd\`"
 echo "          Host: \`hostname\`"
 echo "----------------"
-export LD_LIBRARY_PATH=/lib64:\$LD_LIBRARY_PATH
 cd $fulldir
 EOF
 if [ -e $fulldir/make_fds.sh ]; then
