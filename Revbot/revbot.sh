@@ -212,6 +212,7 @@ if [[ "$REPO" == "smv" ]] && [[ "$TYPE" != "" ]]; then
   fi
 fi
 
+JOBPREFIX=CF${repo}_
 if [ "$REPO" == "fds" ]; then
   if [ "$TYPE" == "dv" ]; then
     MAKEENTRY=impi_intel_linux_64_dv
@@ -227,6 +228,7 @@ if [ "$REPO" == "smv" ]; then
   if [ "$TYPE" == "db" ]; then
     SMVDEBUG="-D"
   fi
+  JOBPREFIX=CS${repo}_
 fi
 
 # make sure revision file exists
@@ -332,7 +334,6 @@ TESTDIR=`pwd`
 cd $CURDIR
 COMMITS=`cat $REVISIONS | awk -F';' '{print $1}'`
 count=0
-JOBPREFIX=B${repo}_
 
 #*** build fds or smokeview for each revision in commit file
 if [ "$SKIPBUILD" == "" ]; then
