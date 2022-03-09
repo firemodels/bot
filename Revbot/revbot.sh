@@ -212,7 +212,7 @@ if [[ "$REPO" == "smv" ]] && [[ "$TYPE" != "" ]]; then
   fi
 fi
 
-JOBPREFIX=CF${repo}_
+JOBPREFIX=TF${repo}_
 if [ "$REPO" == "fds" ]; then
   if [ "$TYPE" == "dv" ]; then
     MAKEENTRY=impi_intel_linux_64_dv
@@ -228,7 +228,7 @@ if [ "$REPO" == "smv" ]; then
   if [ "$TYPE" == "db" ]; then
     SMVDEBUG="-D"
   fi
-  JOBPREFIX=CS${repo}_
+  JOBPREFIX=TS${repo}_
 fi
 
 # make sure revision file exists
@@ -359,7 +359,7 @@ fi
     cd $CURDIR
     echo ""
     DATE=`grep $commit $CURDIR/$REVISIONS | awk -F';' '{print $3}'`
-    echo "building $REPO using $MAKEENTRY($commit/$DATE)"
+    echo "building $REPO using $MAKEENTRY(${count}_$commit/$DATE)"
     if [ "$DEBUG" == "" ]; then
       $CURDIR/qbuild.sh $SMVDEBUG -j $JOBPREFIX${count}_$commit -d $COMMITDIR/$BUILDDIR $qopt
     else
