@@ -16,6 +16,7 @@ function usage {
   echo " -a date - include revisions after date [default: $AFTERARG]"
   echo " -b date - include revisions before date [default: $BEFOREARG]"
   echo " -n n    - maximum number of revisions to include [default: $MAXN]"
+  echo " -N n    - include n revision before date specified by -b"
   echo " -h      - show this message"
   echo " -r repo - generate revisions for repo [default: $REPO]"
   echo "           A list of revisions are outputted to $REVISIONS"
@@ -23,16 +24,16 @@ function usage {
 }
 
 MAXN=10
-AFTERARG=1-Jan-2021
 BEFOREARG=`date +%d-%b-%Y`
 AFTERARG=`date -d "-3 month" +%d-%b-%Y`
 REPO=fds
 REVISIONS=${REPO}_revisions.txt
 MAXN=10
+NREVS=
 
 #*** read in parameters from command line
 
-while getopts 'a:b:n:hr:' OPTION
+while getopts 'a:b:n:N:hr:' OPTION
 do
 case $OPTION  in
   a)
@@ -47,6 +48,9 @@ case $OPTION  in
    ;;
   n)
    MAXN="$OPTARG"
+   ;;
+  N)
+   NREVS="$OPTARG"
    ;;
   r)
    REPO="$OPTARG"
@@ -63,6 +67,9 @@ fi
 if [ "$BEFOREARG" != "" ]; then
   BEFORE="--before=$BEFOREARG"
 fi
+if [ "$NREVS" != "" ]; then
+  AFTER="--after=1-Jan-2020"
+fi
 
 CURDIR=`pwd`
 
@@ -78,13 +85,18 @@ fi
 cd $REPODIR
 TEMPREVS=/tmp/revs.$$
 
-echo "Outputting $MAXN revisions between $AFTERARG and $BEFOREARG to $REVISIONS"
 git log --no-merges --date=short  $AFTER $BEFORE  --format="%h;%cnn;%cd;%s" Source > $TEMPREVS
 NL=`cat $TEMPREVS | wc -l`
-if [ $NL -gt $MAXN ]; then
-  SKIP=`expr $NL / $MAXN`
-  awk -v NUM=$SKIP 'NR %NUM == 0' $TEMPREVS | head -$MAXN > $CURDIR/$REVISIONS
+if [ "$NREVS" == "" ]; then
+  echo "Outputting $MAXN revisions between $AFTERARG and $BEFOREARG to $REVISIONS"
+  if [ $NL -gt $MAXN ]; then
+    SKIP=`expr $NL / $MAXN`
+    awk -v NUM=$SKIP 'NR %NUM == 0' $TEMPREVS | head -$MAXN > $CURDIR/$REVISIONS
+  else
+    cp $TEMPREVS $CURDIR/$REVISIONS
+  fi
 else
-  cp $TEMPREVS $CURDIR/$REVISIONS
+  echo "Outputting $NREVS revisions before $BEFOREARG to $REVISIONS"
+  cat $TEMPREVS | head -$NREVS > $CURDIR/$REVISIONS
 fi
 rm $TEMPREVS
