@@ -340,6 +340,7 @@ if [ "$SKIPBUILD" == "" ]; then
   cd $TESTDIR
   rm -rf */.git
   git clean -dxf >& /dev/null
+  mkdir bin
   for commit in $COMMITS; do
     count=$((count+1))
     cd $TESTREPO
@@ -382,15 +383,17 @@ fi
     count=$((count+1))
     COMMITDIR=$TESTDIR/${count}_$commit
     if [ "$REPO" == "fds" ]; then
-      EXE=$COMMITDIR/$BUILDDIR/fds_$MAKEENTRY
+      EXEBASE=fds_$MAKEENTRY
     else
-      EXE=$COMMITDIR/$BUILDDIR/smokeview_linux_64$DB
+      EXEBASE=smokeview_linux_64$DB
     fi
+    EXE=$COMMITDIR/$BUILDDIR/$EXEBASE
     if [ ! -e $EXE ]; then
       echo "***error: $EXE did not compile"
       echo "***error: $EXE did not compile" >> $OUTPUTDIR/stage1
       BADBUILD=1
     else
+      cp $EXE $TESTDIR/bin/${EXEBASE}_${count}_$commit
       compiles=$((compiles+1))
     fi
   done
