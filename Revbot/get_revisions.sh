@@ -96,7 +96,8 @@ if [ "$NREVS" == "" ]; then
     cp $TEMPREVS $CURDIR/$REVISIONS
   fi
 else
-  echo "Outputting $NREVS revisions before $BEFOREARG to $REVISIONS"
   cat $TEMPREVS | head -$NREVS > $CURDIR/$REVISIONS
+  AFTERARG=`cat $CURDIR/$REVISIONS | tail -1 | awk -F';' '{print $3}'`
+  echo "Outputting $NREVS revisions between $AFTERARG and $BEFOREARG to $REVISIONS"
 fi
 rm $TEMPREVS
