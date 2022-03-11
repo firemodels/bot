@@ -2,9 +2,9 @@
 
 This directory contains three scripts, ```get_revision.sh```, ```revbot.sh``` and ```qbuild.sh```. ```get_revisons.sh``` is used to generate a file 
 containing a list of revisions for the fds or smv repo.  ```revbot.sh``` then uses this file to build fds or smokeview for each of those
-revisions.  In the case of fds, ```revbot.sh``` can also run a test case for those revisions.   ```qbuild.sh``` is run by ```revbot.sh``` 
-to compile each fds or smokeview. It does this on compute nodes of a Linux cluster rather than the head node to spread out the 
-computation load and more importantly to not impact the head node.
+revisions.  In the case of fds, ```revbot.sh``` can also run a test case for those revisions.   ```qbuild.sh``` is use by ```revbot.sh``` 
+to compile fds or smokeview for each revision. It does this on compute nodes of a Linux cluster rather than the head node in order to spread out the 
+computational load and more importantly to not impact the head node.
 
 You can use these scripts to do the equivalent of a ```git bisect``` where you examine the results of each case until you focus 
 in on the problem commit.  Since all of the revisions are tested at once and take the same time to test as a single revision, debugging can occur much quicker.
@@ -30,7 +30,7 @@ does not effect the repo you normally work with.
  -m email_address - send results to email_address
  -N n - specify maximum number of fdss or smokeviews to build [default: 10]
  -q q - name of batch queue used to build fdss and to run cases. [default: batch]
- -r repo - repo can be fds or smv. [default: fds}.  If smv the revbot.sh only builds
+ -r repo - repo can be fds or smv. [default: fds].  If smv the revbot.sh only builds
            smokeview, it does not run or view cases
 ```
 
@@ -73,7 +73,7 @@ revision or to build multiple versions of smokeview
  
  ## Example Usage
  
- cd to Revbot directory
+ cd to the Revbot directory
 ```cd ...bot/Revbot```
 
 Generate a list of 25 revision of the fds repo between now and 3 months ago. Output these revisons to the file ```revisions.txt``` .

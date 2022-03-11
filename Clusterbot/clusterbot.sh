@@ -1005,6 +1005,10 @@ WAIT_TEST_CASES_END()
 # Scans job queue and waits for cases to end
   while          [[ `qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $PREFIX | grep -v 'C$'` != '' ]]; do
     JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $PREFIX | grep -v 'C$' | wc -l`
+      if [ $SECONDS -gt $MAXRUNTIME ]; then
+         qstat -a  | grep $(whoami) | grep $JOBPREFIX |  awk '{ system("scancel  " $1)}'
+         break
+      fi
     if [ "$REPORT_STATUS" == "1" ]; then
       echo "Waiting for $JOBS_REMAINING test cases to complete."
     fi
@@ -1201,6 +1205,7 @@ UPDATE_ARCHIVE=
 USE_INTEL_CLUSTER_CHECKER=1
 ONLY_NETWORK_CHECKS=
 QUEUE=
+MAXRUNTIME=600
 
 while getopts 'Cfhn:NP:q:Q:uU:' OPTION
 do
