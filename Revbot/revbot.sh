@@ -464,9 +464,9 @@ if [ "$SKIPRUN" == "" ]; then
   echo "$runs out of $total_runs runs succeeded "  >> $SUMMARYFILE
 fi
 echo "" >> $SUMMARYFILE
-grep error $OUTPUTDIR/stage0 >> $SUMMARYFILE
-grep error $OUTPUTDIR/stage1 >> $SUMMARYFILE
-grep error $OUTPUTDIR/stage2 >> $SUMMARYFILE
+grep -e '\*\*\*error' $OUTPUTDIR/stage0 >> $SUMMARYFILE
+grep -e '\*\*\*error' $OUTPUTDIR/stage1 >> $SUMMARYFILE
+grep -e '\*\*\*error' $OUTPUTDIR/stage2 >> $SUMMARYFILE
 echo ""
 cat $SUMMARYFILE
 if [ "$EMAIL" != "" ]; then
