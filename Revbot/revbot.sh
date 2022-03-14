@@ -14,7 +14,7 @@ function usage {
   echo "       does not effect the repo you normally work with."
   echo ""
   echo "Commonly Used Options:"
-  echo " -h   - show options"
+  echo " -h   - show this message"
 if [ "$EMAIL" != "" ]; then
   echo " -m email_address - send results to email_address [default: $EMAIL]"
 else
