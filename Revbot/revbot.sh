@@ -383,7 +383,7 @@ fi
       echo "***error: $EXE did not compile" >> $OUTPUTDIR/stage1
       BADBUILD=1
     else
-      cp $EXE $TESTDIR/bin/${EXEBASE}_${count}_$commit
+      cp $EXE $TESTDIR/bin/${repo}_${count}_$commit
       compiles=$((compiles+1))
     fi
   done
