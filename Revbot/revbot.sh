@@ -14,8 +14,7 @@ function usage {
   echo "       does not effect the repo you normally work with."
   echo ""
   echo "Commonly Used Options:"
-  echo " -h   - show commonly used options"
-  echo " -H   - show all options"
+  echo " -h   - show options"
 if [ "$EMAIL" != "" ]; then
   echo " -m email_address - send results to email_address [default: $EMAIL]"
 else
@@ -25,10 +24,8 @@ fi
   echo " -q q - name of batch queue used to build fdss and to run cases. [default: batch]"
   echo " -r repo - repo can be fds or smv. [default: $REPO}.  If smv the revbot.sh only builds"
   echo "           smokeview, it does not run or view cases"
-if [ "$ALL_OPTIONS" != "" ]; then
   echo ""
   echo "Other Options:"
-  echo ""
   echo " -d dir - root directory where fdss are built [default: $TESTDIR]"
   echo " -f   - force cloning of the fds_test repo"
   echo " -F   - use existing fds_test repo"
@@ -38,7 +35,6 @@ if [ "$ALL_OPTIONS" != "" ]; then
   echo " -T type - build fds using type dv (impi_intel_linux_64_dv) or type db (impi_intel_linux_64_db)"
   echo "           makefile entries. If -T is not specified then fds is built using the release"
   echo "           (impi_intel_linux_64) makefile entry."
-fi
   exit
 }
 
@@ -84,7 +80,6 @@ popt=
 nopt=
 REPO=fds
 SMVDEBUG=
-ALL_OPTIONS=
 
 #define bot repo location
 BOTREPO=$CURDIR/../../bot
@@ -113,7 +108,7 @@ cd $CURDIR
 
 #*** read in parameters from command line
 
-while getopts 'd:DfHFhm:n:N:p:q:r:sT:' OPTION
+while getopts 'd:DfFhm:n:N:p:q:r:sT:' OPTION
 do
 case $OPTION  in
   d)
@@ -127,11 +122,6 @@ case $OPTION  in
    ;;
   F)
    USEEXISTING=1
-   ;;
-  H)
-   ALL_OPTIONS=1
-   usage
-   exit
    ;;
   h)
    usage
