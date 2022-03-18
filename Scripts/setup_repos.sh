@@ -55,9 +55,9 @@ SETUP_REMOTE ()
 
 CURDIR=`pwd`
 
-fdsrepos="exp fds fig out smv"
+fdsrepos="cad exp fds fig out smv"
 fdssmvrepos="fds smv"
-firebotrepos="exp fds fds-smv fig out smv"
+firebotrepos="cad exp fds fds-smv fig out smv"
 smvrepos="cfast fds fig smv"
 cfastrepos="cfast exp fig smv"
 allrepos="cad cfast cor exp fds fig out radcal smv"
