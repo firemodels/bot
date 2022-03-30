@@ -187,6 +187,9 @@ for f in $NEW_DIR/$SUBDIR/*.png; do
     convert $from_file -blur 0x2 $blur_from_file
     convert $to_file   -blur 0x2 $blur_to_file
     diff=`compare -metric $METRIC $blur_from_file $blur_to_file $diff_file |& awk -F'('  '{printf $2}' | awk -F')' '{printf $1}i'`
+    composite $blur_from_file $blur_to_file -compose difference /tmp/diff.$$.png
+    convert /tmp/diff.$$.png -channel RGB -negate $diff_file
+    rm -f /tmp/diff.$$.png
     rm -f $blur_from_file $blur_to_file
     if [ "$diff" == "" ]; then
       diff=0
@@ -313,7 +316,7 @@ OUTPUT_LINKS $SUBDIR diffs
 <tr>
 <th align=center>Base</th>
 <th align=center>Current</th>
-</tr>
+<th align=center>|Current - Base|</th></tr>
 EOF
       START_DIFF=2
     fi
@@ -379,6 +382,7 @@ if [ "$START_REST" != "2" ]; then
   COLSPAN="colspan=2"
   cat << EOF >> $HTML_DIFF
 <td><a href="images/$SUBDIR/$pngfile"><img $SIZE src=images/$SUBDIR/$pngfile></a></td>
+<td><a href="diffs/images/$SUBDIR/$pngfile"><img $SIZE src=diffs/images/$SUBDIR/$pngfile></a></td>
 EOF
 fi
 
