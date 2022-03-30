@@ -342,8 +342,17 @@ get_bot_revision()
    return 0
 }
 
+#---------------------------------------------
+#                   get_cad_revision
+#---------------------------------------------
 
+get_cad_revision()
+{
+   CD_REPO $repo/cad master || return 1
 
+   CAD_REVISION=`git describe --long --dirty`
+   return 0
+}
 
 #---------------------------------------------
 #                   clean_git_checkout
@@ -1287,7 +1296,9 @@ archive_repo_sizes()
    fig_size=`get_repo_size fig `
    out_size=`get_repo_size out `
    smv_size=`get_repo_size smv `
-   echo $EXP_REVISION,$exp_size  >  "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.csv"
+   cad_size=`get_repo_size cad `
+   echo $CAD_REVISION,$cad_size  >  "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.csv"
+   echo $EXP_REVISION,$exp_size  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.csv"
    echo $FDS_REVISION,$fds_size  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.csv"
    echo $FIG_REVISION,$fig_size  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.csv"
    echo $OUT_REVISION,$out_size  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.csv"
@@ -1697,6 +1708,9 @@ email_build_status()
    echo "fds revision/branch: $FDS_REVISION/$FDSBRANCH " >> $TIME_LOG
    echo "smv revision/branch: $SMV_REVISION/$SMVBRANCH " >> $TIME_LOG
    echo "bot revision/branch: $BOT_REVISION/master     " >> $TIME_LOG
+   if [ "$CAD_REVISION" != "" ]; then
+     echo "cad revision/branch: $CAD_REVISION/master   " >> $TIME_LOG
+   fi
    echo "fig revision/branch: $FIG_REVISION/master "     >> $TIME_LOG
    echo "out revision/branch: $OUT_REVISION/master "     >> $TIME_LOG
    if [ "$IFORT_VERSION" != "" ]; then
@@ -2331,6 +2345,7 @@ if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK
   get_exp_revision master || exit 1
   get_fig_revision master || exit 1
   get_out_revision master || exit 1
+  get_cad_revision        || exit 1
 fi
 
 echo | mail >& /tmp/mailtest.$$

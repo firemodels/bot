@@ -480,14 +480,12 @@ fi
 #***  for now always assume the bot repo is always in the master branch
 #     and that the -b branch option only applies to the fds and smv repos
 
-if [[ "$UPDATEREPO" != "" ]]; then
-  if [[ "$RUNFIREBOT" == "1" ]]; then
-    CD_REPO $repo/bot/Firebot master  || exit 1
+if [[ "$RUNFIREBOT" == "1" ]]; then
+  CD_REPO $repo/bot/Firebot master  || exit 1
 
-    git fetch origin &> /dev/null
-    git merge origin/master &> /dev/null
-    cd $CURDIR
-  fi
+  git fetch origin &> /dev/null
+  git merge origin/master &> /dev/null
+  cd $CURDIR
 fi
 
 echo ""
