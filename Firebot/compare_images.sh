@@ -188,8 +188,17 @@ for f in $NEW_DIR/$SUBDIR/*.png; do
     convert $to_file   -blur 0x2 $blur_to_file
     diff=`compare -metric $METRIC $blur_from_file $blur_to_file $diff_file |& awk -F'('  '{printf $2}' | awk -F')' '{printf $1}i'`
     composite $blur_from_file $blur_to_file -compose difference /tmp/diff.$$.png
-    convert /tmp/diff.$$.png -channel RGB -negate $diff_file
-    rm -f /tmp/diff.$$.png
+
+    SETGRAY=
+    if [ "$SETGRAY" == "1" ]; then
+      convert /tmp/diff.$$.png   -channel    RGB -negate /tmp/diff2.$$.png
+      convert /tmp/diff2.$$.png  -colorspace Gray $diff_file
+      rm -f /tmp/diff.$$.png
+      rm -f /tmp/diff2.$$.png
+    else
+      convert /tmp/diff.$$.png -channel RGB -negate $diff_file
+      rm -f /tmp/diff.$$.png
+    fi
     rm -f $blur_from_file $blur_to_file
     if [ "$diff" == "" ]; then
       diff=0
