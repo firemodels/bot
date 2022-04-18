@@ -196,7 +196,7 @@ echo -d     - add -env I_MPI_DEBUG=5 to the mpiexec line for debugging
 echo -f     - force openmp to be used even if the number of threads is 1
 echo -h     - display this message only
 echo -p xx  - number of MPI processes [default: 1]
-echo -o yy  - number of OpenMP threads per process [default: %OMP_NUM_THR%]
+echo -o yy  - number of OpenMP threads per process [default: %OMP_NUM_THREADS% ]
 echo -O     - add -env I_MPI_WAIT=1 to the mpiexec line for use when your case is oversubscribed
 echo -v     - show fds version information
 echo -y dir - run casename.fds in directory dir
