@@ -5,6 +5,6 @@ set CURDIR=%CD%
 call run_bundlebot -c
 
 :: build but don't upload bundle (for testing)
-::call run_bundlebot -c -U
+:: call run_bundlebot -c -U
 cd %CURDIR%
 echo complete
