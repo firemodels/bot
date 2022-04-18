@@ -142,7 +142,6 @@ exit /b
  if "%1" EQU "-f" (
    set valid=1
    set force_openmp=1
-   shift
  )
  if "%1" EQU "-y" (
    set valid=1
