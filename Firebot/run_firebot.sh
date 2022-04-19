@@ -206,10 +206,11 @@ MANUALS_MATLAB_ONLY=
 FDS_TAG=
 SMV_TAG=
 VALIDATION=
+OPENMPTEST=
 
 #*** parse command line options
 
-while getopts 'bBcCdfg:G:hHJkm:MnNOPq:R:STuUvV:w:W:x:X:y:Y:' OPTION
+while getopts 'bBcCdfg:G:hHJkm:MnNoOPq:R:STuUvV:w:W:x:X:y:Y:' OPTION
 do
 case $OPTION  in
   b)
@@ -259,6 +260,9 @@ case $OPTION  in
    ;;
   N)
    SKIPMATLAB=-s
+   ;;
+  o)
+   OPENMPTEST=-o
    ;;
   O)
    INTEL=
@@ -545,7 +549,7 @@ BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
 firebot_status=0
-$ECHO  ./firebot.sh -p $firebot_pid $UPDATEREPO $INTEL $BUILD_ONLY $FORCECLONE $BRANCH $DEBUG_MODE $MANUALS_MATLAB_ONLY $SUBSET_CASES $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $UPLOADGUIDES $CLEANREPO $QUEUE $SKIPMATLAB $CLONE_REPOS $CLONE_FDSSMV $VALIDATION $EMAIL $WEB_ROOT $WEB_DIR "$@"
+$ECHO  ./firebot.sh -p $firebot_pid $UPDATEREPO $INTEL $OPENMPTEST $BUILD_ONLY $FORCECLONE $BRANCH $DEBUG_MODE $MANUALS_MATLAB_ONLY $SUBSET_CASES $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $UPLOADGUIDES $CLEANREPO $QUEUE $SKIPMATLAB $CLONE_REPOS $CLONE_FDSSMV $VALIDATION $EMAIL $WEB_ROOT $WEB_DIR "$@"
 firebot_status=$?
 if [ -e $firebot_pid ]; then
   rm -f $firebot_pid
