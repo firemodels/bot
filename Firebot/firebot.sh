@@ -691,7 +691,11 @@ compile_smv_utilities()
   cd $fdsrepo/Utilities/fds2ascii/${COMPILER}_${platform}${size}
   rm -f *.o fds2ascii_${platform}${size}
   ./make_fds2ascii.sh >> $OUTPUT_DIR/stage3a 2>&1
-  cp fds2ascii_${platform}${size} $LATESTAPPS_DIR/fds2ascii
+  if [ "$OPENMPTEST" == "" ]; then
+    cp fds2ascii_${platform}${size} $LATESTAPPS_DIR/fds2ascii
+  else
+    cp fds2ascii_${COMPILER}_${platform}${size} $LATESTAPPS_DIR/fds2ascii
+  fi
   echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
 # test_mpi
@@ -849,9 +853,9 @@ run_VV_cases_release()
      else
        echo "Running FDS verification cases:"                                       >> $OUTPUT_DIR/stage5 2>&1
      fi
-     echo ./Run_FDS_Cases.sh $INTEL2 -R $ONETHREAD -q $QUEUE -j $JOBPREFIX_RELEASE  >> $OUTPUT_DIR/stage5 2>&1
+     echo ./Run_FDS_Cases.sh $INTEL2 $REGULARCASES $ONETHREAD -q $QUEUE -j $JOBPREFIX_RELEASE  >> $OUTPUT_DIR/stage5 2>&1
      cd $fdsrepo/Verification/scripts
-     ./Run_FDS_Cases.sh      $INTEL2 -R $ONETHREAD -q $QUEUE -j $JOBPREFIX_RELEASE  >> $OUTPUT_DIR/stage5 2>&1
+     ./Run_FDS_Cases.sh      $INTEL2 $REGULARCASES $ONETHREAD -q $QUEUE -j $JOBPREFIX_RELEASE  >> $OUTPUT_DIR/stage5 2>&1
      echo ""                                                                        >> $OUTPUT_DIR/stage5 2>&1
    fi
 
@@ -2081,9 +2085,11 @@ if [ "$OPENMPTEST" == "" ]; then
   size=_64
   GNU_MPI=mpi_
   ONETHREAD="-o 1"
+  REGULARCASES="-R"
 else
   GNU_MPI=ompi_
   ONETHREAD=
+  REGULARCASES=
 fi
 smvsize=_64
 
