@@ -1897,7 +1897,6 @@ JOBPREFIX_DEBUG=FBD_
 
 DB=_db
 
-ARCHIVE_REPO_SIZES=
 REPOEMAIL=
 UPLOADGUIDES=0
 FDS_REVISION=
@@ -2143,7 +2142,6 @@ if [[ "$CLONE_REPOS" != "" ]]; then
       git tag -a $SMV_TAG -m "tag for $SMV_TAG"  >> $OUTPUT_DIR/stage1_clone 2>&1
     fi
   fi
-  ARCHIVE_REPO_SIZES=1
 fi
 
 #*** make sure repos exist and have expected branches
@@ -2284,7 +2282,6 @@ if [[ "$CLONE_REPOS" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
     fi 
     clean_repo2 smv $SMVBRANCH || exit 1
   fi
-  ARCHIVE_REPO_SIZES=1
 fi
 
 #*** update repos
@@ -2375,15 +2372,6 @@ if [ $notfound -gt 0 ]; then
   HAVE_MAIL=
 fi
 rm /tmp/mailtest.$$
-
-# archive repo sizes
-# (only if the repos are cloned or cleaned)
-
-if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-  if [ "$ARCHIVE_REPO_SIZES" == "1" ]; then
-    archive_repo_sizes
-  fi
-fi
 
 check_git_checkout
 archive_compiler_version
