@@ -594,7 +594,7 @@ check_compile_fds_mpi()
   local FDSEXE=$2
   local MPTYPE=$3
   cd $FDSDIR
-  if [ -e FDSEXE ]
+  if [ -e $FDSEXE ]
   then
      FDS_release_success=true
      cp $FDSEXE $LATESTAPPS_DIR/fds${MPTYPE}
@@ -689,7 +689,7 @@ compile_smv_utilities()
 # fds2asci
   echo "      fds2ascii"
   cd $fdsrepo/Utilities/fds2ascii/${COMPILER}_${platform}${size}
-  mm -f *.o fds2ascii_${platform}${size}
+  rm -f *.o fds2ascii_${platform}${size}
   ./make_fds2ascii.sh >> $OUTPUT_DIR/stage3a 2>&1
   cp fds2ascii_${platform}${size} $LATESTAPPS_DIR/fds2ascii
   echo "" >> $OUTPUT_DIR/stage3a 2>&1
