@@ -2399,7 +2399,7 @@ fi
 if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
   if [ "$OPENMPTEST" == "" ]; then 
     compile_fds_mpi_db $FDS_DB_DIR
-    check_fds_mpi_db   $FDS_DB_DIR $FDS_DB_EXE
+    check_compile_fds_mpi_db   $FDS_DB_DIR $FDS_DB_EXE
   else
     compile_fds_mpi_db         $FDS_DB_DIR                           no_openmp
     check_compile_fds_mpi_db   $FDS_DB_DIR $FDS_DB_EXE               no_openmp
@@ -2420,8 +2420,8 @@ fi
 
 if [[ "$SKIPRELEASE" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
   if [ "$OPENMPTEST" == "" ]; then 
-    compile_fds_mpi $FDS_DIR
-    check_fds_mpi   $FDS_DIR $FDS_EXE
+    compile_fds_mpi         $FDS_DIR
+    check_compile_fds_mpi   $FDS_DIR $FDS_EXE
   else
     compile_fds_mpi         $FDS_DIR                        no_openmp
     check_compile_fds_mpi   $FDS_DIR $FDS_EXE               no_openmp
