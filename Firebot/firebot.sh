@@ -511,15 +511,15 @@ run_verification_cases_debug()
    echo "Running FDS Verification Cases"
    echo "   debug"
    echo 'Running FDS verification cases:'                                                   >> $OUTPUT_DIR/stage4 2>&1
-   echo ./Run_FDS_Cases.sh $ONETHREAD -d -m 1 $INTEL2 $SUBSET_CASES -q $QUEUE -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage4 2>&1
-        ./Run_FDS_Cases.sh $ONETHREAD -d -m 1 $INTEL2 $SUBSET_CASES -q $QUEUE -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage4 2>&1
+   echo ./Run_FDS_Cases.sh $ONETHREAD -d -m 1 $INTEL2 -q $QUEUE -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage4 2>&1
+        ./Run_FDS_Cases.sh $ONETHREAD -d -m 1 $INTEL2 -q $QUEUE -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage4 2>&1
    echo "" >> $OUTPUT_DIR/stage4 2>&1
 
    # Wait for all verification cases to end
    wait_cases_debug_end 'verification'
 
 #  check whether cases have run
-   ./Run_FDS_Cases.sh $SUBSET_CASES -C                                  -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage4 2>&1
+   ./Run_FDS_Cases.sh -C                                  -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage4 2>&1
 
    # Remove all .stop files from Verification directories (recursively)
    if [ "$CLONE_REPOS" == "" ]; then
@@ -830,7 +830,7 @@ run_VV_cases_release()
    fi
    cd $fdsrepo/Verification/scripts
    # Run FDS with 1 OpenMP thread
-   if [[ "$SUBSET_CASES" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+   if [[ "$CHECK_CLUSTER" == "" ]]; then
      echo 'Running FDS benchmark verification cases:'                        >> $OUTPUT_DIR/stage5 2>&1
      echo ./Run_FDS_Cases.sh $INTEL2 -b $ONETHREAD -q $QUEUE -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
      ./Run_FDS_Cases.sh $INTEL2 -b $ONETHREAD      -q $QUEUE -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
@@ -844,9 +844,9 @@ run_VV_cases_release()
    if [[ "$CHECK_CLUSTER" == "" ]]; then
      cd $fdsrepo/Verification/scripts
      echo 'Running FDS non-benchmark verification cases:'             >> $OUTPUT_DIR/stage5 2>&1
-     echo ./Run_FDS_Cases.sh $INTEL2 $SUBSET_CASES -R $ONETHREAD -q $QUEUE -j $JOBPREFIX_RELEASE  >> $OUTPUT_DIR/stage5 2>&1
+     echo ./Run_FDS_Cases.sh $INTEL2 -R $ONETHREAD -q $QUEUE -j $JOBPREFIX_RELEASE  >> $OUTPUT_DIR/stage5 2>&1
      cd $fdsrepo/Verification/scripts
-     ./Run_FDS_Cases.sh      $INTEL2 $SUBSET_CASES -R $ONETHREAD -q $QUEUE -j $JOBPREFIX_RELEASE  >> $OUTPUT_DIR/stage5 2>&1
+     ./Run_FDS_Cases.sh      $INTEL2 -R $ONETHREAD -q $QUEUE -j $JOBPREFIX_RELEASE  >> $OUTPUT_DIR/stage5 2>&1
      echo ""                                                                                >> $OUTPUT_DIR/stage5 2>&1
    fi
 
@@ -903,8 +903,8 @@ run_VV_cases_release()
 #  check whether cases have run 
 if [[ "$CHECK_CLUSTER" == "" ]] ; then
   cd $fdsrepo/Verification/scripts
-  echo ./Run_FDS_Cases.sh $SUBSET_CASES -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
-       ./Run_FDS_Cases.sh $SUBSET_CASES -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
+  echo ./Run_FDS_Cases.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
+       ./Run_FDS_Cases.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
 fi
 
 if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]] ; then
@@ -1912,7 +1912,6 @@ FORCECLONE=
 SKIPMATLAB=
 SKIPPICTURES=
 SKIPRELEASE=
-SUBSET_CASES=
 FDS_TAG=
 SMV_TAG=
 VALIDATION=
@@ -1920,7 +1919,7 @@ CHECK_CLUSTER=
 OPENMPTEST=
 
 #*** parse command line arguments
-while getopts 'b:BcCdJm:Mop:q:R:sSTuUV:x:X:y:Y:w:W:' OPTION
+while getopts 'b:BcCdJm:Mop:q:R:sTuUV:x:X:y:Y:w:W:' OPTION
 do
 case $OPTION in
   b)
@@ -1966,11 +1965,6 @@ case $OPTION in
    CLONE_REPOS="$OPTARG"
    ;;
   s)
-   SKIPMATLAB=1
-   SKIPPICTURES=1
-   ;;
-  S)
-   SUBSET_CASES="-S"
    SKIPMATLAB=1
    SKIPPICTURES=1
    ;;
@@ -2229,9 +2223,6 @@ if [ "$IFORT_VERSION" != "" ]; then
   echo "      Fortran: $IFORT_VERSION"
 fi
 
-if [ "$SUBSET_CASES" != "" ]; then
-  echo "      Running: subset of cases"
-fi
 if [ "$SKIPRELEASE" != "" ]; then
   echo "     Skipping: release cases stage"
 fi

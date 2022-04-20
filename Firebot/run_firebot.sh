@@ -28,7 +28,6 @@ echo "-O - use OpenMPI version fds"
 echo "-P - remove run status (PID) file"
 echo "-d - only run cases in debug mode"
 echo "-N - skip matlab, pictures and manuals stages"
-echo "-S - run subset cases, do not generate pictures, run matlab or generate manuals"
 echo "-U - upload guides (only by user firebot)"
 echo "-w webdir - copy firebot web summary to $WEB_ROOT/webdir"
 echo "-W webroot - root web directory [default: $WEB_ROOT]"
@@ -199,7 +198,6 @@ FIREBOT_HOME=
 WEB_DIR=
 WEB_ROOT=/var/www/html
 FORCECLONE=
-SUBSET_CASES=
 DEBUG_MODE=
 LOCAL=
 MANUALS_MATLAB_ONLY=
@@ -210,7 +208,7 @@ OPENMPTEST=
 
 #*** parse command line options
 
-while getopts 'bBcCdfg:G:hHJkm:MnNoOPq:R:STuUvV:w:W:x:X:y:Y:' OPTION
+while getopts 'bBcCdfg:G:hHJkm:MnNoOPq:R:TuUvV:w:W:x:X:y:Y:' OPTION
 do
 case $OPTION  in
   b)
@@ -276,9 +274,6 @@ case $OPTION  in
   R)
    CLONE_REPOS="$OPTARG"
    BRANCH=current
-   ;;
-  S)
-    SUBSET_CASES="-S"
    ;;
   T)
     CLONE_FDSSMV="-T"
@@ -549,7 +544,7 @@ BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
 touch $firebot_pid
 firebot_status=0
-$ECHO  ./firebot.sh -p $firebot_pid $UPDATEREPO $INTEL $OPENMPTEST $BUILD_ONLY $FORCECLONE $BRANCH $DEBUG_MODE $MANUALS_MATLAB_ONLY $SUBSET_CASES $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $UPLOADGUIDES $CLEANREPO $QUEUE $SKIPMATLAB $CLONE_REPOS $CLONE_FDSSMV $VALIDATION $EMAIL $WEB_ROOT $WEB_DIR "$@"
+$ECHO  ./firebot.sh -p $firebot_pid $UPDATEREPO $INTEL $OPENMPTEST $BUILD_ONLY $FORCECLONE $BRANCH $DEBUG_MODE $MANUALS_MATLAB_ONLY $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $UPLOADGUIDES $CLEANREPO $QUEUE $SKIPMATLAB $CLONE_REPOS $CLONE_FDSSMV $VALIDATION $EMAIL $WEB_ROOT $WEB_DIR "$@"
 firebot_status=$?
 if [ -e $firebot_pid ]; then
   rm -f $firebot_pid
