@@ -642,54 +642,54 @@ compile_smv_utilities()
 # smokeview libraries
   echo "   Smokeview"
   echo "      libraries"
-  cd $smvrepo/Build/LIBS/${COMPILER}_${platform}${size}
+  cd $smvrepo/Build/LIBS/${COMPILER}_${platform}${smvsize}
   ./make_LIBS.sh >> $OUTPUT_DIR/stage3a 2>&1
   echo "" >> $OUTPUT_DIR/stage3a 2>&1
     
 # smokezip:
   echo "      smokezip"
-  cd $smvrepo/Build/smokezip/${COMPILER}_${platform}${size}
-  rm -f *.o smokezip_${platform}${size}
+  cd $smvrepo/Build/smokezip/${COMPILER}_${platform}${smvsize}
+  rm -f *.o smokezip_${platform}${smvsize}
 
   ./make_smokezip.sh >> $OUTPUT_DIR/stage3a 2>&1
-  CP smokezip_${platform}${size} $LATESTAPPS_DIR/smokezip
+  CP smokezip_${platform}${smvsize} $LATESTAPPS_DIR/smokezip
   echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
 # smokediff:
   echo "      smokediff"
-  cd $smvrepo/Build/smokediff/${COMPILER}_${platform}${size}
-  rm -f *.o smokediff_${platform}${size}
+  cd $smvrepo/Build/smokediff/${COMPILER}_${platform}${smvsize}
+  rm -f *.o smokediff_${platform}${smvsize}
   ./make_smokediff.sh >> $OUTPUT_DIR/stage3a 2>&1
-  CP smokediff_${platform}${size} $LATESTAPPS_DIR/smokediff
+  CP smokediff_${platform}${smvsize} $LATESTAPPS_DIR/smokediff
   echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
 # background
   echo "      background"
-  cd $smvrepo/Build/background/${COMPILER}_${platform}${size}
-  rm -f *.o background_${platform}${size}
+  cd $smvrepo/Build/background/${COMPILER}_${platform}${smvsize}
+  rm -f *.o background_${platform}${smvsize}
   ./make_background.sh >> $OUTPUT_DIR/stage3a 2>&1
-  CP background_${platform}${size} $LATESTAPPS_DIR/background
+  CP background_${platform}${smvsize} $LATESTAPPS_DIR/background
 
 # wind2fds:
   echo "      wind2fds"
-  cd $smvrepo/Build/wind2fds/${COMPILER}_${platform}${size}
-  rm -f *.o wind2fds_${platform}${size}
+  cd $smvrepo/Build/wind2fds/${COMPILER}_${platform}${smvsize}
+  rm -f *.o wind2fds_${platform}${smvsize}
   ./make_wind2fds.sh >> $OUTPUT_DIR/stage3a 2>&1
-  CP wind2fds_${platform}${size} $LATESTAPPS_DIR/wind2fds
+  CP wind2fds_${platform}${smvsize} $LATESTAPPS_DIR/wind2fds
  echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
 # hashfile:
   echo "      hashfile"
-  cd $smvrepo/Build/hashfile/${COMPILER}_${platform}${size}
-  rm -f *.o hashfile_${platform}${size}
+  cd $smvrepo/Build/hashfile/${COMPILER}_${platform}${smvsize}
+  rm -f *.o hashfile_${platform}${smvsize}
   ./make_hashfile.sh >> $OUTPUT_DIR/stage3a 2>&1
-  CP hashfile_${platform}${size} $LATESTAPPS_DIR/hashfile
+  CP hashfile_${platform}${smvsize} $LATESTAPPS_DIR/hashfile
   echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
 # fds2asci
   echo "      fds2ascii"
   cd $fdsrepo/Utilities/fds2ascii/${COMPILER}_${platform}${size}
-  rm -f *.o fds2ascii_${platform}${size}
+  mm -f *.o fds2ascii_${platform}${size}
   ./make_fds2ascii.sh >> $OUTPUT_DIR/stage3a 2>&1
   cp fds2ascii_${platform}${size} $LATESTAPPS_DIR/fds2ascii
   echo "" >> $OUTPUT_DIR/stage3a 2>&1
@@ -931,7 +931,7 @@ compile_smv_db()
 {
 # Clean and compile SMV debug
   echo "      debug"
-  cd $smvrepo/Build/smokeview/${COMPILER}_${platform}${size}
+  cd $smvrepo/Build/smokeview/${COMPILER}_${platform}${smvsize}
   ./make_smokeview_db.sh &> $OUTPUT_DIR/stage3b
 }
 
@@ -942,8 +942,8 @@ compile_smv_db()
 check_compile_smv_db()
 {
 # Check for errors in SMV debug compilation
- cd $smvrepo/Build/smokeview/${COMPILER}_${platform}${size}
- if [ -e "smokeview_${platform}${size}_db" ]; then
+ cd $smvrepo/Build/smokeview/${COMPILER}_${platform}${smvsize}
+ if [ -e "smokeview_${platform}${smvsize}_db" ]; then
    smv_debug_success=true
  else
    echo "Errors from Stage 3b - Compile SMV debug:" >> $ERROR_LOG
@@ -971,7 +971,7 @@ compile_smv()
 {
    # Clean and compile SMV
   echo "      release"
-  cd $smvrepo/Build/smokeview/${COMPILER}_${platform}${size}
+  cd $smvrepo/Build/smokeview/${COMPILER}_${platform}${smvsize}
   echo "" > $OUTPUT_DIR/stage3c 2>&1
   ./make_smokeview.sh >> $OUTPUT_DIR/stage3c 2>&1
 }
@@ -984,10 +984,10 @@ check_compile_smv()
 {
   # Check for errors in SMV release compilation
   smv_errors=
-  cd $smvrepo/Build/smokeview/${COMPILER}_${platform}${size}
-  if [ -e "smokeview_${platform}${size}" ]; then
+  cd $smvrepo/Build/smokeview/${COMPILER}_${platform}${smvsize}
+  if [ -e "smokeview_${platform}${smvsize}" ]; then
     smv_release_success=true
-    CP smokeview_${platform}${size} $LATESTAPPS_DIR/smokeview
+    CP smokeview_${platform}${smvsize} $LATESTAPPS_DIR/smokeview
   else
     smv_errors=1
     echo "Errors from Stage 3c - Compile SMV release:" >> $ERROR_LOG
@@ -2085,6 +2085,7 @@ if [ "$OPENMPTEST" == "" ]; then
 else
   GNU_MPI=ompi_
 fi
+smvsize=_64
 
 GNU_COMPILER=gnu_
 
