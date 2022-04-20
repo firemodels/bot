@@ -510,10 +510,10 @@ run_verification_cases_debug()
    # Run FDS with delayed stop files (with 1 OpenMP thread and 1 iteration)
    echo "Running FDS Verification Cases"
    echo "   debug"
-   echo 'Running FDS verification cases:'                                                   >> $OUTPUT_DIR/stage4 2>&1
+   echo "Running FDS verification cases:"                                           >> $OUTPUT_DIR/stage4 2>&1
    echo ./Run_FDS_Cases.sh $ONETHREAD -d -m 1 $INTEL2 -q $QUEUE -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage4 2>&1
         ./Run_FDS_Cases.sh $ONETHREAD -d -m 1 $INTEL2 -q $QUEUE -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage4 2>&1
-   echo "" >> $OUTPUT_DIR/stage4 2>&1
+   echo ""                                                                          >> $OUTPUT_DIR/stage4 2>&1
 
    # Wait for all verification cases to end
    wait_cases_debug_end 'verification'
@@ -832,7 +832,7 @@ run_VV_cases_release()
    # Run FDS with 1 OpenMP thread
 
    if [[ "$OPENMPTEST" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-     echo 'Running FDS benchmark verification cases:'                              >> $OUTPUT_DIR/stage5 2>&1
+     echo "Running FDS benchmark verification cases:"                              >> $OUTPUT_DIR/stage5 2>&1
      echo ./Run_FDS_Cases.sh $INTEL2 -b $ONETHREAD -q $QUEUE -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
      ./Run_FDS_Cases.sh $INTEL2 -b $ONETHREAD      -q $QUEUE -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
      echo ""                                                                       >> $OUTPUT_DIR/stage5 2>&1
@@ -845,9 +845,9 @@ run_VV_cases_release()
    if [[ "$CHECK_CLUSTER" == "" ]]; then
      cd $fdsrepo/Verification/scripts
      if [[ "$OPENMPTEST" == "" ]]; then
-       echo 'Running FDS non-benchmark verification cases:'                         >> $OUTPUT_DIR/stage5 2>&1
+       echo "Running FDS non-benchmark verification cases:"                         >> $OUTPUT_DIR/stage5 2>&1
      else
-       echo 'Running FDS verification cases:'                                       >> $OUTPUT_DIR/stage5 2>&1
+       echo "Running FDS verification cases:"                                       >> $OUTPUT_DIR/stage5 2>&1
      fi
      echo ./Run_FDS_Cases.sh $INTEL2 -R $ONETHREAD -q $QUEUE -j $JOBPREFIX_RELEASE  >> $OUTPUT_DIR/stage5 2>&1
      cd $fdsrepo/Verification/scripts
