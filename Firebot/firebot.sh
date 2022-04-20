@@ -830,11 +830,12 @@ run_VV_cases_release()
    fi
    cd $fdsrepo/Verification/scripts
    # Run FDS with 1 OpenMP thread
-   if [[ "$CHECK_CLUSTER" == "" ]]; then
-     echo 'Running FDS benchmark verification cases:'                        >> $OUTPUT_DIR/stage5 2>&1
+
+   if [[ "$OPENMPTEST" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+     echo 'Running FDS benchmark verification cases:'                              >> $OUTPUT_DIR/stage5 2>&1
      echo ./Run_FDS_Cases.sh $INTEL2 -b $ONETHREAD -q $QUEUE -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
      ./Run_FDS_Cases.sh $INTEL2 -b $ONETHREAD      -q $QUEUE -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
-     echo ""                                                                 >> $OUTPUT_DIR/stage5 2>&1
+     echo ""                                                                       >> $OUTPUT_DIR/stage5 2>&1
    fi
 
    # Wait for benchmark verification cases to end
@@ -843,11 +844,15 @@ run_VV_cases_release()
 
    if [[ "$CHECK_CLUSTER" == "" ]]; then
      cd $fdsrepo/Verification/scripts
-     echo 'Running FDS non-benchmark verification cases:'             >> $OUTPUT_DIR/stage5 2>&1
+     if [[ "$OPENMPTEST" == "" ]]; then
+       echo 'Running FDS non-benchmark verification cases:'                         >> $OUTPUT_DIR/stage5 2>&1
+     else
+       echo 'Running FDS verification cases:'                                       >> $OUTPUT_DIR/stage5 2>&1
+     fi
      echo ./Run_FDS_Cases.sh $INTEL2 -R $ONETHREAD -q $QUEUE -j $JOBPREFIX_RELEASE  >> $OUTPUT_DIR/stage5 2>&1
      cd $fdsrepo/Verification/scripts
      ./Run_FDS_Cases.sh      $INTEL2 -R $ONETHREAD -q $QUEUE -j $JOBPREFIX_RELEASE  >> $OUTPUT_DIR/stage5 2>&1
-     echo ""                                                                                >> $OUTPUT_DIR/stage5 2>&1
+     echo ""                                                                        >> $OUTPUT_DIR/stage5 2>&1
    fi
 
    # run all FDS validation cases 1 time step
