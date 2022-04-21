@@ -734,8 +734,7 @@ check_verification_cases_release()
       [[ `grep ERROR:                   */*.err             | grep -v grep | grep -v geom_bad` == "" ]] && \
       [[ `grep ERROR:                   */*.out             | grep -v grep | grep -v echo`     == "" ]] && \
       [[ `grep 'BAD TERMINATION'        */*.log             | grep -v grep`                    == "" ]] && \
-      [[ `grep forrtl                   */*.err             | grep -v grep`                    == "" ]] && \
-      [[ `grep 'Inspector found errors' $OUTPUT_DIR/stage5i | grep -v grep`                    == "" ]]
+      [[ `grep forrtl                   */*.err             | grep -v grep`                    == "" ]]
    then
       cases_debug_success=true
    else
@@ -746,7 +745,6 @@ check_verification_cases_release()
       grep ERROR:                       */*.out             | grep -v grep | grep -v echo     >> $OUTPUT_DIR/stage5_errors
       grep -A 2 'BAD TERMINATION'       */*.log             | grep -v grep                    >> $OUTPUT_DIR/stage5_errors
       grep -A 20 forrtl                 */*.err             | grep -v grep                    >> $OUTPUT_DIR/stage5_errors
-      grep 'Inspector found errors'     $OUTPUT_DIR/stage5i | grep -v grep                    >> $OUTPUT_DIR/stage5_errors
 
       echo "Errors from Stage 5 - Run ${2} cases - release mode:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage5_errors                               >> $ERROR_LOG
