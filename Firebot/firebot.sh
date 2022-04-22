@@ -600,7 +600,11 @@ check_compile_fds_mpi()
   if [ -e $FDSEXE ]
   then
      FDS_release_success=true
-     cp $FDSEXE $LATESTAPPS_DIR/fds${MPTYPE}
+     if [ "$MPTYPE" == "" ]; then
+       cp $FDSEXE $LATESTAPPS_DIR/fds
+     else
+       cp $FDSEXE $LATESTAPPS_DIR/fds_${MPTYPE}
+     fi
   else
      echo "Errors from Stage 2c - Compile FDS MPI${MPTYPE} release:" >> $ERROR_LOG
      cat $OUTPUT_DIR/stage2c${MPTYPE}                                >> $ERROR_LOG
@@ -2392,12 +2396,9 @@ fi
 ###****** Stage 2b ###
 
 if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-  if [ "$OPENMPTEST" == "" ]; then 
-    compile_fds_mpi_db $FDS_DB_DIR
-    check_compile_fds_mpi_db   $FDS_DB_DIR $FDS_DB_EXE
-  else
-    compile_fds_mpi_db         $FDS_DB_DIR                           no_openmp
-    check_compile_fds_mpi_db   $FDS_DB_DIR $FDS_DB_EXE               no_openmp
+  compile_fds_mpi_db         $FDS_DB_DIR
+  check_compile_fds_mpi_db   $FDS_DB_DIR $FDS_DB_EXE
+  if [ "$OPENMPTEST" != "" ]; then 
     compile_fds_mpi_db         $FDS_OPENMP_DB_DIR                    openmp
     check_compile_fds_mpi_db   $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
   fi
@@ -2414,12 +2415,9 @@ fi
 ###*** Stage 2c ###
 
 if [[ "$SKIPRELEASE" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
-  if [ "$OPENMPTEST" == "" ]; then 
-    compile_fds_mpi         $FDS_DIR
-    check_compile_fds_mpi   $FDS_DIR $FDS_EXE
-  else
-    compile_fds_mpi         $FDS_DIR                        no_openmp
-    check_compile_fds_mpi   $FDS_DIR $FDS_EXE               no_openmp
+  compile_fds_mpi         $FDS_DIR
+  check_compile_fds_mpi   $FDS_DIR $FDS_EXE
+  if [ "$OPENMPTEST" != "" ]; then 
     compile_fds_mpi         $FDS_OPENMP_DIR                 openmp
     check_compile_fds_mpi   $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
   fi
