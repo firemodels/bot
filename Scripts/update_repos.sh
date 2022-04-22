@@ -104,5 +104,6 @@ do
   echo
   UPDATE_REPO2 $repo
 done
+echo update complete
 
 cd $CURDIR

@@ -391,11 +391,13 @@ archive_compiler_version()
 
 compile_fds_mpi_db()
 {
+  local FDSDIR=$1
+  local MPTYPE=$2
    # Clean and compile FDS MPI debug
-   echo "      MPI Intel debug"
-   cd $fdsrepo/Build/${INTEL}mpi_${COMPILER}_${platform}${size}$DB
+   echo "      MPI $MPTYPE Intel debug"
+   cd $FDSDIR
    make -f ../makefile clean &> /dev/null
-   ./make_fds.sh &> $OUTPUT_DIR/stage2b
+   ./make_fds.sh &> $OUTPUT_DIR/stage2b${MPTYPE}
 }
 
 #---------------------------------------------
@@ -404,27 +406,30 @@ compile_fds_mpi_db()
 
 check_compile_fds_mpi_db()
 {
+  local FDSDIR=$1
+  local FDSEXE=$2
+  local MPTYPE=$3
    # Check for errors in FDS MPI debug compilation
-   cd $fdsrepo/Build/${INTEL}mpi_${COMPILER}_${platform}${size}$DB
-   if [ -e "fds_${INTEL}mpi_${COMPILER}_${platform}${size}$DB" ]
+   cd $FDSDIR
+   if [ -e $FDSEXE ]
    then
       FDS_debug_success=true
    else
-      echo "Errors from Stage 2b - Compile FDS MPI debug:" >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage2b >> $ERROR_LOG
-      echo "" >> $ERROR_LOG
+      echo "Errors from Stage 2b$MPTYPE - Compile FDS MPI$MPTYPE debug:"   >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage2b${MPTYPE}                                     >> $ERROR_LOG
+      echo ""                                                              >> $ERROR_LOG
    fi
 
  
   # Check for compiler warnings/remarks
    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-   if [[ `grep -E -i 'warning|remark' $OUTPUT_DIR/stage2b | grep -v mpiifort | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented'` == "" ]]
+   if [[ `grep -E -i 'warning|remark' $OUTPUT_DIR/stage2b${MPTYPE} | grep -v mpiifort | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented'` == "" ]]
    then
       # Continue along
       :
    else
       echo "Warnings from Stage 2b - Compile FDS MPI debug:" >> $WARNING_LOG
-      grep -A 5 -E -i 'warning|remark' $OUTPUT_DIR/stage2b | grep -v mpiifort | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
+      grep -A 5 -E -i 'warning|remark' $OUTPUT_DIR/stage2b${MPTYPE} | grep -v mpiifort | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
 }
@@ -435,25 +440,26 @@ check_compile_fds_mpi_db()
 
 compile_fds_mpi_gnu_db()
 {
-   # Clean and compile FDS MPI debug
-   compile_gnu=
-   if [ "$OPENMPI_INTEL" != "" ]; then
-     if [ "$OPENMPI_GNU" != "" ]; then
-       if [ "$GFORTRAN" != "" ]; then
-         module unload $OPENMPI_INTEL
-         module load $OPENMPI_GNU
-         module load $GFORTRAN
-         echo "      MPI gfortran debug"
-         compile_gnu=1
-         cd $fdsrepo/Build/mpi_gnu_${platform}${size}$DB
-         make -f ../makefile clean &> /dev/null
-         ./make_fds.sh &> $OUTPUT_DIR/stage2d
-         module unload $OPENMPI_GNU
-         module unload $GFORTRAN
-         module load $OPENMPI_INTEL
-       fi
-     fi
-   fi
+  local FDSDIR=$1
+  # Clean and compile FDS MPI debug
+  compile_gnu=
+  if [ "$OPENMPI_INTEL" != "" ]; then
+    module unload $OPENMPI_INTEL
+  fi
+  if [[ "$OPENMPI_GNU" != "" ]] && [[ "$GFORTRAN" != "" ]]; then
+    module load $OPENMPI_GNU
+    module load $GFORTRAN
+    echo "      MPI gfortran debug"
+    compile_gnu=1
+    cd $FDSDIR
+    make -f ../makefile clean &> /dev/null
+    ./make_fds.sh &> $OUTPUT_DIR/stage2d
+    module unload $OPENMPI_GNU
+    module unload $GFORTRAN
+  fi
+  if [ "$OPENMPI_INTEL" != "" ]; then
+    module load $OPENMPI_INTEL
+  fi
 }
 
 #---------------------------------------------
@@ -464,33 +470,6 @@ check_compile_fds_mpi_gnu_db()
 # force the gnu compile to pass until it can compile
 # fds with the findloc routine
         FDS_gnu_debug_success=true
-}
-
-check_compile_fds_mpi_gnu_dbORIG()
-{
-   # Check for errors in FDS MPI debug compilation
-   if [ "$compile_gnu" == "1" ]; then
-     cd $fdsrepo/Build/mpi_gnu_${platform}${size}$DB
-     if [ -e "fds_mpi_gnu_${platform}${size}$DB" ]
-     then
-        FDS_gnu_debug_success=true
-     else
-        echo "Errors from Stage 2d - Compile gnu Fortran FDS MPI debug:" >> $ERROR_LOG
-        cat $OUTPUT_DIR/stage2d >> $ERROR_LOG
-        echo "" >> $ERROR_LOG
-     fi
-  
-     # Check for compiler warnings/remarks
-     if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage2d | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented'` == "" ]]
-     then
-        # Continue along
-        :
-     else
-        echo "Warnings from Stage 2d - Compile gnu Fortran FDS MPI debug:" >> $WARNING_LOG
-        grep -i -A 5 -E 'warning|remark' $OUTPUT_DIR/stage2d | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
-        echo "" >> $WARNING_LOG
-   fi
-   fi
 }
 
 #---------------------------------------------
@@ -531,16 +510,16 @@ run_verification_cases_debug()
    # Run FDS with delayed stop files (with 1 OpenMP thread and 1 iteration)
    echo "Running FDS Verification Cases"
    echo "   debug"
-   echo 'Running FDS verification cases:'                                                   >> $OUTPUT_DIR/stage4 2>&1
-   echo ./Run_FDS_Cases.sh -o 1 -d -m 1 $INTEL2 $SUBSET_CASES -q $QUEUE -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage4 2>&1
-        ./Run_FDS_Cases.sh -o 1 -d -m 1 $INTEL2 $SUBSET_CASES -q $QUEUE -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage4 2>&1
-   echo "" >> $OUTPUT_DIR/stage4 2>&1
+   echo "Running FDS verification cases:"                                           >> $OUTPUT_DIR/stage4 2>&1
+   echo ./Run_FDS_Cases.sh $ONETHREAD -d -m 1 $INTEL2 -q $QUEUE -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage4 2>&1
+        ./Run_FDS_Cases.sh $ONETHREAD -d -m 1 $INTEL2 -q $QUEUE -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage4 2>&1
+   echo ""                                                                          >> $OUTPUT_DIR/stage4 2>&1
 
    # Wait for all verification cases to end
    wait_cases_debug_end 'verification'
 
 #  check whether cases have run
-   ./Run_FDS_Cases.sh $SUBSET_CASES -C                                  -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage4 2>&1
+   ./Run_FDS_Cases.sh -C                                  -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage4 2>&1
 
    # Remove all .stop files from Verification directories (recursively)
    if [ "$CLONE_REPOS" == "" ]; then
@@ -596,11 +575,12 @@ check_cases_debug()
 compile_fds_mpi()
 {
    # Clean and compile FDS MPI
-   echo "      MPI Intel release"
-   echo "" > $OUTPUT_DIR/stage2c
-   cd $fdsrepo/Build/${INTEL}mpi_${COMPILER}_${platform}${size}
-   make -f ../makefile clean &> /dev/null
-   ./make_fds.sh &> $OUTPUT_DIR/stage2c
+  local FDSDIR=$1
+  local MPTYPE=$2
+  echo "      MPI $MPTYPE Intel release"
+  cd $FDSDIR
+  make -f ../makefile clean &> /dev/null
+  ./make_fds.sh &> $OUTPUT_DIR/stage2c${MPTYPE}
 }
 
 #---------------------------------------------
@@ -610,29 +590,35 @@ compile_fds_mpi()
 check_compile_fds_mpi()
 {
    # Check for errors in FDS MPI compilation
-   cd $fdsrepo/Build/${INTEL}mpi_${COMPILER}_${platform}${size}
-   if [ -e "fds_${INTEL}mpi_${COMPILER}_${platform}${size}" ]
-   then
-      FDS_release_success=true
-      cp fds_${INTEL}mpi_${COMPILER}_${platform}${size} $LATESTAPPS_DIR/fds
-   else
-      echo "Errors from Stage 2c - Compile FDS MPI release:" >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage2c >> $ERROR_LOG
-      echo "" >> $ERROR_LOG
-   fi
+  local FDSDIR=$1
+  local FDSEXE=$2
+  local MPTYPE=$3
+  if [ "$MPTYPE" != "" ]; then
+    MPTYPE="_$MPTYPE"
+  fi
+  cd $FDSDIR
+  if [ -e $FDSEXE ]
+  then
+     FDS_release_success=true
+     cp $FDSEXE $LATESTAPPS_DIR/fds${MPTYPE}
+  else
+     echo "Errors from Stage 2c - Compile FDS MPI${MPTYPE} release:" >> $ERROR_LOG
+     cat $OUTPUT_DIR/stage2c${MPTYPE}                                >> $ERROR_LOG
+     echo ""                                                         >> $ERROR_LOG
+  fi
 
-   # Check for compiler warnings/remarks
-   # 'performing multi-file optimizations' and 'generating object file' are part of a normal compile
-   # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-   if [[ `grep -E -i 'warning|remark' $OUTPUT_DIR/stage2c | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'` == "" ]]
-   then
-      # Continue along
-      :
-   else
-      echo "Warnings from Stage 2c - Compile FDS MPI release:" >> $WARNING_LOG
-      grep -A 5 -E -i 'warning|remark' $OUTPUT_DIR/stage2c | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file' >> $WARNING_LOG
-      echo "" >> $WARNING_LOG
-   fi
+  # Check for compiler warnings/remarks
+  # 'performing multi-file optimizations' and 'generating object file' are part of a normal compile
+  # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
+  if [[ `grep -E -i 'warning|remark' $OUTPUT_DIR/stage2c${MPTYPE} | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'` == "" ]]
+  then
+     # Continue along
+     :
+  else
+     echo "Warnings from Stage 2c - Compile FDS MPI release:" >> $WARNING_LOG
+     grep -A 5 -E -i 'warning|remark' $OUTPUT_DIR/stage2c${MPTYPE} | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file' >> $WARNING_LOG
+     echo "" >> $WARNING_LOG
+  fi
 }
 
 
@@ -659,48 +645,48 @@ compile_smv_utilities()
 # smokeview libraries
   echo "   Smokeview"
   echo "      libraries"
-  cd $smvrepo/Build/LIBS/${COMPILER}_${platform}${size}
+  cd $smvrepo/Build/LIBS/${COMPILER}_${platform}${smvsize}
   ./make_LIBS.sh >> $OUTPUT_DIR/stage3a 2>&1
   echo "" >> $OUTPUT_DIR/stage3a 2>&1
     
 # smokezip:
   echo "      smokezip"
-  cd $smvrepo/Build/smokezip/${COMPILER}_${platform}${size}
-  rm -f *.o smokezip_${platform}${size}
+  cd $smvrepo/Build/smokezip/${COMPILER}_${platform}${smvsize}
+  rm -f *.o smokezip_${platform}${smvsize}
 
   ./make_smokezip.sh >> $OUTPUT_DIR/stage3a 2>&1
-  CP smokezip_${platform}${size} $LATESTAPPS_DIR/smokezip
+  CP smokezip_${platform}${smvsize} $LATESTAPPS_DIR/smokezip
   echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
 # smokediff:
   echo "      smokediff"
-  cd $smvrepo/Build/smokediff/${COMPILER}_${platform}${size}
-  rm -f *.o smokediff_${platform}${size}
+  cd $smvrepo/Build/smokediff/${COMPILER}_${platform}${smvsize}
+  rm -f *.o smokediff_${platform}${smvsize}
   ./make_smokediff.sh >> $OUTPUT_DIR/stage3a 2>&1
-  CP smokediff_${platform}${size} $LATESTAPPS_DIR/smokediff
+  CP smokediff_${platform}${smvsize} $LATESTAPPS_DIR/smokediff
   echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
 # background
   echo "      background"
-  cd $smvrepo/Build/background/${COMPILER}_${platform}${size}
-  rm -f *.o background_${platform}${size}
+  cd $smvrepo/Build/background/${COMPILER}_${platform}${smvsize}
+  rm -f *.o background_${platform}${smvsize}
   ./make_background.sh >> $OUTPUT_DIR/stage3a 2>&1
-  CP background_${platform}${size} $LATESTAPPS_DIR/background
+  CP background_${platform}${smvsize} $LATESTAPPS_DIR/background
 
 # wind2fds:
   echo "      wind2fds"
-  cd $smvrepo/Build/wind2fds/${COMPILER}_${platform}${size}
-  rm -f *.o wind2fds_${platform}${size}
+  cd $smvrepo/Build/wind2fds/${COMPILER}_${platform}${smvsize}
+  rm -f *.o wind2fds_${platform}${smvsize}
   ./make_wind2fds.sh >> $OUTPUT_DIR/stage3a 2>&1
-  CP wind2fds_${platform}${size} $LATESTAPPS_DIR/wind2fds
+  CP wind2fds_${platform}${smvsize} $LATESTAPPS_DIR/wind2fds
  echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
 # hashfile:
   echo "      hashfile"
-  cd $smvrepo/Build/hashfile/${COMPILER}_${platform}${size}
-  rm -f *.o hashfile_${platform}${size}
+  cd $smvrepo/Build/hashfile/${COMPILER}_${platform}${smvsize}
+  rm -f *.o hashfile_${platform}${smvsize}
   ./make_hashfile.sh >> $OUTPUT_DIR/stage3a 2>&1
-  CP hashfile_${platform}${size} $LATESTAPPS_DIR/hashfile
+  CP hashfile_${platform}${smvsize} $LATESTAPPS_DIR/hashfile
   echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
 # fds2asci
@@ -708,12 +694,16 @@ compile_smv_utilities()
   cd $fdsrepo/Utilities/fds2ascii/${COMPILER}_${platform}${size}
   rm -f *.o fds2ascii_${platform}${size}
   ./make_fds2ascii.sh >> $OUTPUT_DIR/stage3a 2>&1
-  cp fds2ascii_${platform}${size} $LATESTAPPS_DIR/fds2ascii
+  if [ "$OPENMPTEST" == "" ]; then
+    cp fds2ascii_${platform}${size} $LATESTAPPS_DIR/fds2ascii
+  else
+    cp fds2ascii_${COMPILER}_${platform}${size} $LATESTAPPS_DIR/fds2ascii
+  fi
   echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
 # test_mpi
   echo "      test_mpi"
-  cd $fdsrepo/Utilities/test_mpi/${INTEL}mpi_${COMPILER}_${platform}
+  cd $fdsrepo/Utilities/test_mpi/${MPI_TYPE}_${COMPILER}_${platform}
   rm -f *.o test_mpi
   ./make_test_mpi.sh >> $OUTPUT_DIR/stage3a 2>&1
   cp test_mpi $LATESTAPPS_DIR/test_mpi
@@ -747,8 +737,7 @@ check_verification_cases_release()
       [[ `grep ERROR:                   */*.err             | grep -v grep | grep -v geom_bad` == "" ]] && \
       [[ `grep ERROR:                   */*.out             | grep -v grep | grep -v echo`     == "" ]] && \
       [[ `grep 'BAD TERMINATION'        */*.log             | grep -v grep`                    == "" ]] && \
-      [[ `grep forrtl                   */*.err             | grep -v grep`                    == "" ]] && \
-      [[ `grep 'Inspector found errors' $OUTPUT_DIR/stage5i | grep -v grep`                    == "" ]]
+      [[ `grep forrtl                   */*.err             | grep -v grep`                    == "" ]]
    then
       cases_debug_success=true
    else
@@ -759,7 +748,6 @@ check_verification_cases_release()
       grep ERROR:                       */*.out             | grep -v grep | grep -v echo     >> $OUTPUT_DIR/stage5_errors
       grep -A 2 'BAD TERMINATION'       */*.log             | grep -v grep                    >> $OUTPUT_DIR/stage5_errors
       grep -A 20 forrtl                 */*.err             | grep -v grep                    >> $OUTPUT_DIR/stage5_errors
-      grep 'Inspector found errors'     $OUTPUT_DIR/stage5i | grep -v grep                    >> $OUTPUT_DIR/stage5_errors
 
       echo "Errors from Stage 5 - Run ${2} cases - release mode:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage5_errors                               >> $ERROR_LOG
@@ -847,11 +835,12 @@ run_VV_cases_release()
    fi
    cd $fdsrepo/Verification/scripts
    # Run FDS with 1 OpenMP thread
-   if [[ "$SUBSET_CASES" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-     echo 'Running FDS benchmark verification cases:'                        >> $OUTPUT_DIR/stage5 2>&1
-     echo ./Run_FDS_Cases.sh $INTEL2 -b -o 1 -q $QUEUE -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
-     ./Run_FDS_Cases.sh $INTEL2 -b -o 1      -q $QUEUE -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
-     echo ""                                                                 >> $OUTPUT_DIR/stage5 2>&1
+
+   if [[ "$OPENMPTEST" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+     echo "Running FDS benchmark verification cases:"                              >> $OUTPUT_DIR/stage5 2>&1
+     echo ./Run_FDS_Cases.sh $INTEL2 -b $ONETHREAD -q $QUEUE -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
+     ./Run_FDS_Cases.sh $INTEL2 -b $ONETHREAD      -q $QUEUE -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
+     echo ""                                                                       >> $OUTPUT_DIR/stage5 2>&1
    fi
 
    # Wait for benchmark verification cases to end
@@ -860,11 +849,15 @@ run_VV_cases_release()
 
    if [[ "$CHECK_CLUSTER" == "" ]]; then
      cd $fdsrepo/Verification/scripts
-     echo 'Running FDS non-benchmark verification cases:'             >> $OUTPUT_DIR/stage5 2>&1
-     echo ./Run_FDS_Cases.sh $INTEL2 $SUBSET_CASES -R -o 1 -q $QUEUE -j $JOBPREFIX_RELEASE  >> $OUTPUT_DIR/stage5 2>&1
+     if [[ "$OPENMPTEST" == "" ]]; then
+       echo "Running FDS non-benchmark verification cases:"                         >> $OUTPUT_DIR/stage5 2>&1
+     else
+       echo "Running FDS verification cases:"                                       >> $OUTPUT_DIR/stage5 2>&1
+     fi
+     echo ./Run_FDS_Cases.sh $INTEL2 $REGULARCASES $ONETHREAD -q $QUEUE -j $JOBPREFIX_RELEASE  >> $OUTPUT_DIR/stage5 2>&1
      cd $fdsrepo/Verification/scripts
-     ./Run_FDS_Cases.sh      $INTEL2 $SUBSET_CASES -R -o 1 -q $QUEUE -j $JOBPREFIX_RELEASE  >> $OUTPUT_DIR/stage5 2>&1
-     echo ""                                                                                >> $OUTPUT_DIR/stage5 2>&1
+     ./Run_FDS_Cases.sh      $INTEL2 $REGULARCASES $ONETHREAD -q $QUEUE -j $JOBPREFIX_RELEASE  >> $OUTPUT_DIR/stage5 2>&1
+     echo ""                                                                        >> $OUTPUT_DIR/stage5 2>&1
    fi
 
    # run all FDS validation cases 1 time step
@@ -908,9 +901,9 @@ run_VV_cases_release()
 
      echo ""                                        i                        >> $OUTPUT_DIR/stage5 2>&1
      echo 'Running FDS restart verification cases:'                          >> $OUTPUT_DIR/stage5 2>&1
-     echo ./Run_FDS_Cases.sh $INTEL2 -r -o 1 -q $QUEUE -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
+     echo ./Run_FDS_Cases.sh $INTEL2 -r $ONETHREAD -q $QUEUE -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
      cd $fdsrepo/Verification/scripts
-          ./Run_FDS_Cases.sh $INTEL2 -r -o 1 -q $QUEUE -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
+          ./Run_FDS_Cases.sh $INTEL2 -r $ONETHREAD -q $QUEUE -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
      echo ""                                                                 >> $OUTPUT_DIR/stage5 2>&1
 
      # Wait for restart verification cases to end
@@ -920,8 +913,8 @@ run_VV_cases_release()
 #  check whether cases have run 
 if [[ "$CHECK_CLUSTER" == "" ]] ; then
   cd $fdsrepo/Verification/scripts
-  echo ./Run_FDS_Cases.sh $SUBSET_CASES -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
-       ./Run_FDS_Cases.sh $SUBSET_CASES -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
+  echo ./Run_FDS_Cases.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
+       ./Run_FDS_Cases.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
 fi
 
 if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]] ; then
@@ -948,7 +941,7 @@ compile_smv_db()
 {
 # Clean and compile SMV debug
   echo "      debug"
-  cd $smvrepo/Build/smokeview/${COMPILER}_${platform}${size}
+  cd $smvrepo/Build/smokeview/${COMPILER}_${platform}${smvsize}
   ./make_smokeview_db.sh &> $OUTPUT_DIR/stage3b
 }
 
@@ -959,8 +952,8 @@ compile_smv_db()
 check_compile_smv_db()
 {
 # Check for errors in SMV debug compilation
- cd $smvrepo/Build/smokeview/${COMPILER}_${platform}${size}
- if [ -e "smokeview_${platform}${size}_db" ]; then
+ cd $smvrepo/Build/smokeview/${COMPILER}_${platform}${smvsize}
+ if [ -e "smokeview_${platform}${smvsize}_db" ]; then
    smv_debug_success=true
  else
    echo "Errors from Stage 3b - Compile SMV debug:" >> $ERROR_LOG
@@ -988,7 +981,7 @@ compile_smv()
 {
    # Clean and compile SMV
   echo "      release"
-  cd $smvrepo/Build/smokeview/${COMPILER}_${platform}${size}
+  cd $smvrepo/Build/smokeview/${COMPILER}_${platform}${smvsize}
   echo "" > $OUTPUT_DIR/stage3c 2>&1
   ./make_smokeview.sh >> $OUTPUT_DIR/stage3c 2>&1
 }
@@ -1001,10 +994,10 @@ check_compile_smv()
 {
   # Check for errors in SMV release compilation
   smv_errors=
-  cd $smvrepo/Build/smokeview/${COMPILER}_${platform}${size}
-  if [ -e "smokeview_${platform}${size}" ]; then
+  cd $smvrepo/Build/smokeview/${COMPILER}_${platform}${smvsize}
+  if [ -e "smokeview_${platform}${smvsize}" ]; then
     smv_release_success=true
-    CP smokeview_${platform}${size} $LATESTAPPS_DIR/smokeview
+    CP smokeview_${platform}${smvsize} $LATESTAPPS_DIR/smokeview
   else
     smv_errors=1
     echo "Errors from Stage 3c - Compile SMV release:" >> $ERROR_LOG
@@ -1812,7 +1805,20 @@ echo $0 $* >> command.firebot
 
 # Start firebot timer
 START_TIME=$(date +%s)
-size=_64
+
+#*** file descriptors
+
+FDSGNU_DB_DIR=
+FDSGNU_DB_EXE=
+
+FDS_OPENMP_DB_EXE=
+FDS_OPENMP_DB_DIR=
+FDS_DB_EXE=
+FDS_DB_DIR=
+FDS_OPENMP_EXE=
+FDS_OPENMP_DIR=
+FDS_EXE=
+FDS_DIR=
 
 # define run directories
 PID_FILE=~/.fdssmvgit/firesmokebot_pid
@@ -1896,7 +1902,6 @@ JOBPREFIX_DEBUG=FBD_
 
 DB=_db
 
-ARCHIVE_REPO_SIZES=
 REPOEMAIL=
 UPLOADGUIDES=0
 FDS_REVISION=
@@ -1916,14 +1921,14 @@ FORCECLONE=
 SKIPMATLAB=
 SKIPPICTURES=
 SKIPRELEASE=
-SUBSET_CASES=
 FDS_TAG=
 SMV_TAG=
 VALIDATION=
 CHECK_CLUSTER=
+OPENMPTEST=
 
 #*** parse command line arguments
-while getopts 'b:BcCdJm:Mp:q:R:sSTuUV:x:X:y:Y:w:W:' OPTION
+while getopts 'b:BcCdJm:Mop:q:R:sTuUV:x:X:y:Y:w:W:' OPTION
 do
 case $OPTION in
   b)
@@ -1947,7 +1952,7 @@ case $OPTION in
    SKIPPICTURES=1
    ;;
   J)
-   INTEL=i
+   MPI_TYPE=impi
    INTEL2="-J"
    ;;
   m)
@@ -1955,6 +1960,9 @@ case $OPTION in
    ;;
   M)
    MANUALS_MATLAB_ONLY=1
+   ;;
+  o)
+   OPENMPTEST=1
    ;;
   p)
    PID_FILE="$OPTARG"
@@ -1966,11 +1974,6 @@ case $OPTION in
    CLONE_REPOS="$OPTARG"
    ;;
   s)
-   SKIPMATLAB=1
-   SKIPPICTURES=1
-   ;;
-  S)
-   SUBSET_CASES="-S"
    SKIPMATLAB=1
    SKIPPICTURES=1
    ;;
@@ -2079,6 +2082,35 @@ botrepo=$repo/bot
 figrepo=$repo/fig
 outrepo=$repo/out
 
+if [ "$OPENMPTEST" == "" ]; then
+  size=_64
+  GNU_MPI=mpi_
+  ONETHREAD="-o 1"
+  REGULARCASES="-R"
+else
+  GNU_MPI=ompi_
+  ONETHREAD=
+  REGULARCASES=
+fi
+smvsize=_64
+
+GNU_COMPILER=gnu_
+
+FDSGNU_DB_DIR=$fdsrepo/Build/${GNU_MPI}${GNU_COMPILER}${platform}${size}_db
+FDSGNU_DB_EXE=
+
+FDS_OPENMP_DB_DIR=$fdsrepo/Build/${MPI_TYPE}_${COMPILER}_${platform}_openmp${size}_db
+FDS_OPENMP_DB_EXE=fds_${MPI_TYPE}_${COMPILER}_${platform}_openmp${size}_db
+
+FDS_DB_DIR=$fdsrepo/Build/${MPI_TYPE}_${COMPILER}_${platform}${size}_db
+FDS_DB_EXE=fds_${MPI_TYPE}_${COMPILER}_${platform}${size}_db
+
+FDS_OPENMP_DIR=$fdsrepo/Build/${MPI_TYPE}_${COMPILER}_${platform}_openmp${size}
+FDS_OPENMP_EXE=fds_${MPI_TYPE}_${COMPILER}_${platform}_openmp${size}
+
+FDS_DIR=$fdsrepo/Build/${MPI_TYPE}_${COMPILER}_${platform}${size}
+FDS_EXE=fds_${MPI_TYPE}_${COMPILER}_${platform}${size}
+
 FDS_SUMMARY_DIR=$fdsrepo/Manuals/FDS_Summary
 
 #*** clean repos
@@ -2117,7 +2149,6 @@ if [[ "$CLONE_REPOS" != "" ]]; then
       git tag -a $SMV_TAG -m "tag for $SMV_TAG"  >> $OUTPUT_DIR/stage1_clone 2>&1
     fi
   fi
-  ARCHIVE_REPO_SIZES=1
 fi
 
 #*** make sure repos exist and have expected branches
@@ -2175,9 +2206,6 @@ echo $$ > $PID_FILE
 IFORT_VERSION=
 notfound=
 if [ "$COMPILER" == "intel" ]; then
-   if [[ "$IFORT_COMPILER" != "" ]] ; then
-      source $IFORT_COMPILER/bin/compilervars.sh intel64
-   fi
    notfound=`ifort -help 2>&1 | tail -1 | grep "not found" | wc -l`
    if [ $notfound -eq 0 ]; then
      IFORT_VERSION=`ifort -v 2>&1`
@@ -2205,9 +2233,6 @@ if [ "$IFORT_VERSION" != "" ]; then
   echo "      Fortran: $IFORT_VERSION"
 fi
 
-if [ "$SUBSET_CASES" != "" ]; then
-  echo "      Running: subset of cases"
-fi
 if [ "$SKIPRELEASE" != "" ]; then
   echo "     Skipping: release cases stage"
 fi
@@ -2264,7 +2289,6 @@ if [[ "$CLONE_REPOS" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
     fi 
     clean_repo2 smv $SMVBRANCH || exit 1
   fi
-  ARCHIVE_REPO_SIZES=1
 fi
 
 #*** update repos
@@ -2356,15 +2380,6 @@ if [ $notfound -gt 0 ]; then
 fi
 rm /tmp/mailtest.$$
 
-# archive repo sizes
-# (only if the repos are cloned or cleaned)
-
-if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-  if [ "$ARCHIVE_REPO_SIZES" == "1" ]; then
-    archive_repo_sizes
-  fi
-fi
-
 check_git_checkout
 archive_compiler_version
 
@@ -2377,22 +2392,31 @@ fi
 ###****** Stage 2b ###
 
 if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-  compile_fds_mpi_db
-  check_compile_fds_mpi_db
+  compile_fds_mpi_db         $FDS_DB_DIR
+  check_compile_fds_mpi_db   $FDS_DB_DIR $FDS_DB_EXE
+  if [ "$OPENMPTEST" != "" ]; then 
+    compile_fds_mpi_db         $FDS_OPENMP_DB_DIR                    openmp
+    check_compile_fds_mpi_db   $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
+  fi
 fi
 
 ###*** Stage 2d ###
 
 if [[ "$OPENMPI_GNU" != "" ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-  compile_fds_mpi_gnu_db
+
+  compile_fds_mpi_gnu_db       $FDSGNU_DB_DIR
   check_compile_fds_mpi_gnu_db
 fi
 
 ###*** Stage 2c ###
 
 if [[ "$SKIPRELEASE" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
-  compile_fds_mpi
-  check_compile_fds_mpi
+  compile_fds_mpi         $FDS_DIR
+  check_compile_fds_mpi   $FDS_DIR $FDS_EXE
+  if [ "$OPENMPTEST" != "" ]; then 
+    compile_fds_mpi         $FDS_OPENMP_DIR                 openmp
+    check_compile_fds_mpi   $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
+  fi
 fi
 
 ###*** Stage 3a ###

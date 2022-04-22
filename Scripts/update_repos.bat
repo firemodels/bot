@@ -32,6 +32,8 @@ for %%x in ( %allrepos% ) do ( call :update_repo %%x )
 
 for %%x in ( %webrepos% ) do ( call :update_repo2 %%x )
 
+echo update complete
+
 cd %CURDIR%
 
 goto eof
