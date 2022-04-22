@@ -593,7 +593,7 @@ check_compile_fds_mpi()
   local FDSDIR=$1
   local FDSEXE=$2
   local MPTYPE=$3
-  if [ "$MPTYPE" != "" ]; theen
+  if [ "$MPTYPE" != "" ]; then
     MPTYPE="_$MPTYPE"
   fi
   cd $FDSDIR
