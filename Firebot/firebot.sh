@@ -594,17 +594,13 @@ check_compile_fds_mpi()
   local FDSEXE=$2
   local MPTYPE=$3
   if [ "$MPTYPE" != "" ]; theen
-    MPTYPE="_$$MPTYPE"
+    MPTYPE="_$MPTYPE"
   fi
   cd $FDSDIR
   if [ -e $FDSEXE ]
   then
      FDS_release_success=true
-     if [ "$MPTYPE" == "" ]; then
-       cp $FDSEXE $LATESTAPPS_DIR/fds
-     else
-       cp $FDSEXE $LATESTAPPS_DIR/fds_${MPTYPE}
-     fi
+     cp $FDSEXE $LATESTAPPS_DIR/fds${MPTYPE}
   else
      echo "Errors from Stage 2c - Compile FDS MPI${MPTYPE} release:" >> $ERROR_LOG
      cat $OUTPUT_DIR/stage2c${MPTYPE}                                >> $ERROR_LOG
