@@ -1925,7 +1925,7 @@ FDS_TAG=
 SMV_TAG=
 VALIDATION=
 CHECK_CLUSTER=
-OPENMPTEST=
+OPENMPTEST=1
 
 #*** parse command line arguments
 while getopts 'b:BcCdJm:Mop:q:R:sTuUV:x:X:y:Y:w:W:' OPTION
@@ -1962,7 +1962,7 @@ case $OPTION in
    MANUALS_MATLAB_ONLY=1
    ;;
   o)
-   OPENMPTEST=1
+   OPENMPTEST=
    ;;
   p)
    PID_FILE="$OPTARG"
