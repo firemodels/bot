@@ -2143,7 +2143,7 @@ if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
 
      notfound=`$HTML2PDF -V 2>&1 | tail -1 | grep "not found" | wc -l`
      if [ $notfound -eq 0 ]; then
-       $HTML2PDF $smvrepo/Manuals/SMV_Summary/index.html $smvrepo/Manuals/SMV_Summary/SMV_Summary.pdf
+       $HTML2PDF --enable-local-file-access $smvrepo/Manuals/SMV_Summary/index.html $smvrepo/Manuals/SMV_Summary/SMV_Summary.pdf
        cp $smvrepo/Manuals/SMV_Summary/SMV_Summary.pdf $NEWGUIDE_DIR/.
      fi
   else
