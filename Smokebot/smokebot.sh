@@ -2143,8 +2143,10 @@ if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
 
      notfound=`$HTML2PDF -V 2>&1 | tail -1 | grep "not found" | wc -l`
      if [ $notfound -eq 0 ]; then
-       $HTML2PDF --enable-local-file-access $smvrepo/Manuals/SMV_Summary/diffs.html $smvrepo/Manuals/SMV_Summary/SMV_Diffs.pdf
-       cp $smvrepo/Manuals/SMV_Summary/SMV_Diffs.pdf $NEWGUIDE_DIR/.
+       if [ -e  $smvrepo/Manuals/SMV_Summary/diffs.html ]; then
+         $HTML2PDF --enable-local-file-access $smvrepo/Manuals/SMV_Summary/diffs.html $smvrepo/Manuals/SMV_Summary/SMV_Diffs.pdf
+         cp $smvrepo/Manuals/SMV_Summary/SMV_Diffs.pdf $NEWGUIDE_DIR/.
+       fi
      fi
   else
      echo Errors found, not building guides
