@@ -39,7 +39,8 @@ echo "-g firebot_host - host where firebot was run"
 echo "-G firebot_home - home directory where firebot was run"
 echo "   The -g and -G options are used when cloning repos (-R option)"
 echo "   to build apps using the same repo revisions as used with the last"
-echo "-o firebot is being run in old Build directory structure"
+echo "   successful firebot run"
+echo "-o firebot is being run in new Build directory structure"
 echo "-R branch_name - clone fds, exp, fig, out and smv repos. fds and smv repos"
 echo "     will be checked out with a branch named 'branch_name'"
 echo "-T - only clone the fds and smv repos (this option is set by default when"
@@ -204,7 +205,7 @@ MANUALS_MATLAB_ONLY=
 FDS_TAG=
 SMV_TAG=
 VALIDATION=
-OPENMPTEST=-o
+OPENMPTEST=
 
 #*** parse command line options
 
@@ -260,7 +261,7 @@ case $OPTION  in
    SKIPMATLAB=-s
    ;;
   o)
-   OPENMPTEST=
+   OPENMPTEST=-o
    ;;
   O)
    INTEL=
