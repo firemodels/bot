@@ -87,7 +87,6 @@ CPDIR ()
 BACKGROUNDDIR=$REMOTESVNROOT/smv/Build/background/intel_${platform}_64
 SMVDIR=$REMOTESVNROOT/smv/Build/smokeview/intel_${platform}_64
 SMVDIRQ=$REMOTESVNROOT/smv/Build/smokeview/intel_${platform}_q_64
-GNUSMVDIR=$REMOTESVNROOT/smv/Build/smokeview/gnu_${platform}_64
 SMZDIR=$REMOTESVNROOT/smv/Build/smokezip/intel_${platform}_64
 SMDDIR=$REMOTESVNROOT/smv/Build/smokediff/intel_${platform}_64
 WIND2FDSDIR=$REMOTESVNROOT/smv/Build/wind2fds/intel_${platform}_64
@@ -141,12 +140,6 @@ if [ "$platform" == "osx" ]; then
   SCP $PLATFORMHOST $SMVDIR       smokeview_${platform}_${TEST}64       $PLATFORMDIR/$smvbin smokeview
 else
   SCP $PLATFORMHOST $SMVDIR        smokeview_${platform}_${TEST}64  $PLATFORMDIR/$smvbin smokeview
-fi
-if [ "$edition" == "test" ]; then
-  SCP $PLATFORMHOST $GNUSMVDIR     smokeview_${platform}_${TEST}64p $PLATFORMDIR/$smvbin smokeview_gnu
-  if [ -e $PLATFORMDIR/$smvbin/smokeview_gnu ]; then
-    SCP $PLATFORMHOST $FORBUNDLE     smokeview_p                      $PLATFORMDIR/$smvbin smokeview_p
-  fi
 fi
 SCP $PLATFORMHOST $SMDDIR        smokediff_${platform}_64         $PLATFORMDIR/$smvbin smokediff
 SCP $PLATFORMHOST $SMZDIR        smokezip_${platform}_64          $PLATFORMDIR/$smvbin smokezip

@@ -61,10 +61,8 @@ def set_revision():                os.system("start " + webscript_dir + "webSET_
 def build_smv_win_inc():           os.system("start " + webscript_dir + "webBUILDsmv Windows testinc")
 def build_smv_win_deb():           os.system("start " + webscript_dir + "webBUILDsmv Windows debug")
 def build_smv():                   os.system("start " + webscript_dir + "webBUILDsmv  "     + platforms[buildplatform.get()] + " "    + "test" )
-def build_smv_gnu():               os.system("start " + webscript_dir + "webBUILDsmv  "     + platforms[buildplatform.get()] + "gnu " + "test" )
 def build_smv_rel():               os.system("start " + webscript_dir + "webBUILDsmv  "     + platforms[buildplatform.get()] + " "    + "release" )
 def build_lib():                   os.system("start " + webscript_dir + "webBUILDlibs "     + platforms[buildplatform.get()])
-def build_lib_gnu():               os.system("start " + webscript_dir + "webBUILDlibs "     + platforms[buildplatform.get()] + "gnu")
 def build_util():                  os.system("start " + webscript_dir + "webBUILDallprog "  + platforms[buildplatform.get()])
 
 def bundle_smv():                  os.system("start " + webscript_dir + "webPACKAGEsmv "    + platforms[bundleplatform.get()] + " " + buildtypes[buildtype.get()] )
@@ -206,13 +204,6 @@ R=R+1
 Label(root,  text="Build smv(Intel):").grid(column=0, row=R, sticky=E)
 Button(root, text="Win test inc",    width=button_width, command=build_smv_win_inc).grid(row=R, column=1)
 Button(root, text="test debug",    width=button_width, command=build_smv_win_deb).grid(row=R, column=2)
-
-# ------------------------- Build gnu libraries, smokeview ------------------------------
-
-R=R+1
-Label(root,  text="Build(GNU):").grid(column=0, row=R, sticky=E)
-Button(root, text="Libs",  width=button_width, command=build_lib_gnu).grid(row=R,  column=1)
-Button(root, text="smv",   width=button_width, command=build_smv_gnu).grid(row=R,  column=2)
 
 R=R+1
 Label(root, text="--------------BUNDLE/INSTALL-------------").grid(column=0, row=R, columnspan=3)
