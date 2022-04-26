@@ -24,11 +24,9 @@ call %envfile%
 %svn_drive%
 
 set BUILDDIR=intel_win_64
-set GNUBUILDDIR=gnu_win_64
 
 set version=%smv_version%
 set smvbuild=%svn_root%\smv\Build\smokeview\%BUILDDIR%
-set gnusmvbuild=%svn_root%\smv\Build\smokeview\%GNUBUILDDIR%
 set forbundle=%svn_root%\bot\Bundle\smv\for_bundle
 set webgldir=%svn_root%\bot\Bundle\smv\for_bundle\webgl
 set smvscripts=%svn_root%\smv\scripts
@@ -64,7 +62,6 @@ mkdir %smvdir%\hash
 CALL :COPY  %svn_root%\smv\Build\set_path\intel_win_64\set_path_win_64.exe "%smvdir%\set_path.exe"
 
 CALL :COPY  %smvbuild%\smokeview_win_64.exe            %smvdir%\smokeview.exe
-::CALL :COPY  %gnusmvbuild%\smokeview_win_test_64_db.exe %smvdir%\smokeview_gnu.exe
 
 CALL :COPY  %smvscripts%\jp2conv.bat %smvdir%\jp2conv.bat
 
