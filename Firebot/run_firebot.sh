@@ -35,12 +35,12 @@ echo ""
 echo "Build apps, set repo revisions"
 echo "-B - only build apps"
 echo "-C - when cloning repos proceed without giving a warning"
+echo "-D firebot is being run using new fds Build directory structure"
 echo "-g firebot_host - host where firebot was run"
 echo "-G firebot_home - home directory where firebot was run"
 echo "   The -g and -G options are used when cloning repos (-R option)"
 echo "   to build apps using the same repo revisions as used with the last"
 echo "   successful firebot run"
-echo "-o firebot is being run in new Build directory structure"
 echo "-R branch_name - clone fds, exp, fig, out and smv repos. fds and smv repos"
 echo "     will be checked out with a branch named 'branch_name'"
 echo "-T - only clone the fds and smv repos (this option is set by default when"
@@ -209,7 +209,7 @@ OPENMPTEST=
 
 #*** parse command line options
 
-while getopts 'bBcCdfg:G:hHJkm:MnNoOPq:R:TuUvV:w:W:x:X:y:Y:' OPTION
+while getopts 'bBcCdDfg:G:hHJkm:MnNOPq:R:TuUvV:w:W:x:X:y:Y:' OPTION
 do
 case $OPTION  in
   b)
@@ -226,6 +226,9 @@ case $OPTION  in
    ;;
   d)
    DEBUG_MODE="-d"
+   ;;
+  D)
+   OPENMPTEST=-D
    ;;
   f)
    FORCE=1
@@ -259,9 +262,6 @@ case $OPTION  in
    ;;
   N)
    SKIPMATLAB=-s
-   ;;
-  o)
-   OPENMPTEST=-o
    ;;
   O)
    INTEL=

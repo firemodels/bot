@@ -1928,7 +1928,7 @@ CHECK_CLUSTER=
 OPENMPTEST=
 
 #*** parse command line arguments
-while getopts 'b:BcCdJm:Mop:q:R:sTuUV:x:X:y:Y:w:W:' OPTION
+while getopts 'b:BcCdDJm:Mp:q:R:sTuUV:x:X:y:Y:w:W:' OPTION
 do
 case $OPTION in
   b)
@@ -1951,6 +1951,9 @@ case $OPTION in
    SKIPMATLAB=1
    SKIPPICTURES=1
    ;;
+  D)
+   OPENMPTEST=1
+   ;;
   J)
    MPI_TYPE=impi
    INTEL2="-J"
@@ -1960,9 +1963,6 @@ case $OPTION in
    ;;
   M)
    MANUALS_MATLAB_ONLY=1
-   ;;
-  o)
-   OPENMPTEST=1
    ;;
   p)
    PID_FILE="$OPTARG"
