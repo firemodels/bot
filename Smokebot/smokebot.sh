@@ -412,13 +412,16 @@ check_update_repo()
 
 compile_fds_mpi_db()
 {
+  local FDSDIR=$1
+  local FDSEXE=$2
+  local MPTYPE=$3
+
    # Clean and compile mpi FDS debug
-   echo "   FDS"
-   echo "      debug"
-   cd $fdsrepo/Build/${INTEL}mpi_${COMPILER}_${platform}_64$DB
-   rm -f fds_${INTEL}mpi_${COMPILER}_${platform}_64$DB
+   echo "      debug $MPTYPE"
+   cd $FDSDIR
+   rm -f $FDSEXE
    make --makefile ../makefile clean &> /dev/null
-   ./make_fds.sh &> $OUTPUT_DIR/stage1b
+   ./make_fds.sh &> $OUTPUT_DIR/stage1b${MPTYPE}
 }
 
 #---------------------------------------------
@@ -427,13 +430,16 @@ compile_fds_mpi_db()
 
 check_compile_fds_mpi_db()
 {
+  local FDSDIR=$1
+  local FDSEXE=$2
+  local MPTYPE=$3
    # Check for errors in FDS debug compilation
-   cd $fdsrepo/Build/${INTEL}mpi_${COMPILER}_${platform}_64$DB
-   if [ -e "fds_${INTEL}mpi_${COMPILER}_${platform}_64$DB" ]; then
+   cd $FDSDIR
+   if [ -e $FDSEXE ]; then
       stage_fdsdb_success=true
    else
-      echo "Errors from Stage 1b - Compile FDS MPI debug:" >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage1b                              >> $ERROR_LOG
+      echo "Errors from Stage 1b$MPTYPE - Compile FDS MPI$MPTYPE debug:"   >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage1b$MPTYPE                       >> $ERROR_LOG
       echo ""                                              >> $ERROR_LOG
       THIS_FDS_FAILED=1
       compile_errors=1
@@ -446,10 +452,10 @@ check_compile_fds_mpi_db()
       :
    else
       echo "Stage 1b warnings:" >> $WARNING_LOG
-      grep -A 5 -i -E 'warning|remark' $OUTPUT_DIR/stage1b | grep -v mpiifort | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'>> $WARNING_LOG
+      grep -A 5 -i -E 'warning|remark' $OUTPUT_DIR/stage1b$MPTYPE | grep -v mpiifort | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'>> $WARNING_LOG
       echo "" >> $WARNING_LOG
    # if the executable does not exist then an email has already been sent
-      if [ -e "fds_${INTEL}mpi_${COMPILER}_${platform}_64$DB" ] ; then
+      if [ ! -e $FDSEXE ] ; then
         THIS_FDS_FAILED=1
       fi
       compile_errors=1
@@ -470,7 +476,7 @@ compile_fds_mpi_gnu_db()
        module unload $OPENMPI_INTEL
        module load $OPENMPI_GNU
        echo "      MPI gfortran debug"
-       cd $fdsrepo/Build/mpi_gnu_${platform}_64$DB
+       cd $FDSGNU_DB_DIR
        make -f ../makefile clean &> /dev/null
        ./make_fds.sh &> $OUTPUT_DIR/stage1d
        module unload $OPENMPI_GNU
@@ -492,8 +498,8 @@ check_compile_fds_mpi_gnu_dbORIG()
 {
    # Check for errors in FDS MPI debug compilation
    if [ "$compile_gnu" == "1" ]; then
-     cd $fdsrepo/Build/mpi_gnu_${platform}_64$DB
-     if [ -e "fds_mpi_gnu_${platform}_64$DB" ]
+     cd $FDSGNU_DB_DIR
+     if [ -e $FDSGNU_DB_EXE ]
      then
         FDS_debug_success=true
      else
@@ -544,7 +550,7 @@ run_verification_cases_debug()
 
    # Submit SMV verification cases and wait for them to start
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3a 2>&1
-   ./Run_SMV_Cases.sh $INTEL2 -Y -c $cfastrepo $USEINSTALL2 -j $JOBPREFIX -m 2 -d -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3a 2>&1
+   ./Run_SMV_Cases.sh $INTEL2 -Y $NEWFDSDIR -c $cfastrepo $USEINSTALL2 -j $JOBPREFIX -m 2 -d -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3a 2>&1
 }
 
 #---------------------------------------------
@@ -594,12 +600,16 @@ check_verification_cases_debug()
 
 compile_fds_mpi()
 {
+  local FDSDIR=$1
+  local FDSEXE=$2
+  local MPTYPE=$3
+
    # Clean and compile FDS
-   echo "      release"
-   cd $fdsrepo/Build/${INTEL}mpi_${COMPILER}_${platform}_64
-   rm -f fds_${INTEL}mpi_${COMPILER}_${platform}_64
+   echo "      release $MPTYPE"
+   cd $FDSDIR
+   rm -f $FDSEXE
    make --makefile ../makefile clean &> /dev/null
-   ./make_fds.sh &> $OUTPUT_DIR/stage1c
+   ./make_fds.sh &> $OUTPUT_DIR/stage1c$MPTYPE
 }
 
 #---------------------------------------------
@@ -608,27 +618,31 @@ compile_fds_mpi()
 
 check_compile_fds_mpi()
 {
+  local FDSDIR=$1
+  local FDSEXE=$2
+  local MPTYPE=$3
+
    # Check for errors in FDS compilation
-   cd $fdsrepo/Build/${INTEL}mpi_${COMPILER}_${platform}_64
-   if [ -e "fds_${INTEL}mpi_${COMPILER}_${platform}_64" ]
+   cd $FDSDIR
+   if [ -e $FDSEXE ]
    then
       stage_ver_release_success=true
    else
       echo "Errors from Stage 1c - Compile FDS release:" >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage1c >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage1c$MPTYPE >> $ERROR_LOG
       echo "" >> $ERROR_LOG
       compile_errors=1
    fi
 
    # Check for compiler warnings/remarks
    # 'performing multi-file optimizations' and 'generating object file' are part of a normal compile
-   if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage1c | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented'` == "" ]]
+   if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage1c$MPTYPE | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented'` == "" ]]
    then
       # Continue along
       :
    else
       echo "Stage 1c warnings:" >> $WARNING_LOG
-      grep -A 5 -i -E 'warning|remark' $OUTPUT_DIR/stage1c | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
+      grep -A 5 -i -E 'warning|remark' $OUTPUT_DIR/stage1c$MPTYPE | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
       compile_errors=1
    fi
@@ -876,7 +890,7 @@ run_verification_cases_release()
    # Start running all SMV verification cases
    cd $smvrepo/Verification/scripts
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3b 2>&1
-   ./Run_SMV_Cases.sh $INTEL2 -Y -c $cfastrepo -j $JOBPREFIX $USEINSTALL2 $RUN_OPENMP -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3b 2>&1
+   ./Run_SMV_Cases.sh $INTEL2 -Y -c $cfastrepo $NEWFDSDIR -j $JOBPREFIX $USEINSTALL2 $RUN_OPENMP -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3b 2>&1
 }
 
 #---------------------------------------------
@@ -1499,6 +1513,7 @@ FDS_TAG=
 SMV_TAG=
 CHECKOUT=
 compile_errors=
+OPENMPTEST=
 
 #*** save pid so -k option (kill smokebot) may be used lateer
 
@@ -1506,7 +1521,7 @@ echo $$ > $PID_FILE
 
 #*** parse command line options
 
-while getopts 'ab:BcJLm:Mo:q:R:TuUw:W:x:X:y:Y:' OPTION
+while getopts 'ab:BcDJLm:Mo:q:R:TuUw:W:x:X:y:Y:' OPTION
 do
 case $OPTION in
   a)
@@ -1526,7 +1541,11 @@ case $OPTION in
   c)
    CLEANREPO=1
    ;;
+  D)
+   OPENMPTEST=1
+   ;;
   J)
+   MPI_TYPE=impi
    INTEL=i
    INTEL2="-J"
    ;;
@@ -1636,6 +1655,40 @@ cfastrepo=$repo/cfast
 fdsrepo=$repo/fds
 smvrepo=$repo/smv
 figrepo=$repo/fig
+
+if [ "$OPENMPTEST" == "" ]; then
+  size=_64
+  GNU_MPI=mpi_
+  NEWFDSDIR=
+else
+  size=
+  GNU_MPI=ompi_
+  NEWFDSDIR="-D"
+fi
+
+platform="linux"
+platform2="Linux"
+if [ "`uname`" == "Darwin" ]
+then
+  platform="osx"
+  platform2="OSX"
+fi
+export platform
+
+FDSGNU_DB_DIR=$fdsrepo/Build/${GNU_MPI}${GNU_COMPILER}${platform}${size}_db
+FDSGNU_DB_EXE=
+
+FDS_OPENMP_DB_DIR=$fdsrepo/Build/${MPI_TYPE}_${COMPILER}_${platform}_openmp${size}_db
+FDS_OPENMP_DB_EXE=fds_${MPI_TYPE}_${COMPILER}_${platform}_openmp${size}_db
+
+FDS_DB_DIR=$fdsrepo/Build/${MPI_TYPE}_${COMPILER}_${platform}${size}_db
+FDS_DB_EXE=fds_${MPI_TYPE}_${COMPILER}_${platform}${size}_db
+
+FDS_OPENMP_DIR=$fdsrepo/Build/${MPI_TYPE}_${COMPILER}_${platform}_openmp${size}
+FDS_OPENMP_EXE=fds_${MPI_TYPE}_${COMPILER}_${platform}_openmp${size}
+
+FDS_DIR=$fdsrepo/Build/${MPI_TYPE}_${COMPILER}_${platform}${size}
+FDS_EXE=fds_${MPI_TYPE}_${COMPILER}_${platform}${size}
 
 # clean smokebot output files
 
@@ -1749,17 +1802,6 @@ else
   USEINSTALL=
   USEINSTALL2=
 fi
-
-DB=_db
-
-platform="linux"
-platform2="Linux"
-if [ "`uname`" == "Darwin" ]
-then
-  platform="osx"
-  platform2="OSX"
-fi
-export platform
 
 echo ""
 echo "Smokebot Settings"
@@ -1963,8 +2005,12 @@ if [ "$BUILD_ONLY" == "" ]; then
   check_compile_cfast
 
 #stage1B
-  compile_fds_mpi_db
-  check_compile_fds_mpi_db
+  compile_fds_mpi_db        $FDS_DB_DIR $FDS_DB_EXE
+  check_compile_fds_mpi_db  $FDS_DB_DIR $FDS_DB_EXE
+  if [ "$OPENMPTEST" != "" ]; then
+    compile_fds_mpi_db        $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
+    check_compile_fds_mpi_db  $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
+  fi
   if [ "$OPENMPI_GNU" != "" ]; then
     compile_fds_mpi_gnu_db
     check_compile_fds_mpi_gnu_db
@@ -1972,8 +2018,12 @@ if [ "$BUILD_ONLY" == "" ]; then
 
 #stage1C
   if [ "$SMOKEBOT_LITE" == "" ]; then
-     compile_fds_mpi
-     check_compile_fds_mpi
+     compile_fds_mpi        $FDS_DIR $FDS_EXE
+     check_compile_fds_mpi  $FDS_DIR $FDS_EXE
+     if [ "$OPENMPTEST" != "" ]; then
+       compile_fds_mpi        $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
+       check_compile_fds_mpi  $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
+     fi
   fi
 
 #----------------------------- Stage 2 build smokeview     --------------------------------------
