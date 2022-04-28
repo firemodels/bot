@@ -779,8 +779,6 @@ check_common_files()
 {
   # only compare files if latest repo revisions are checkout out
   if [ "$CHECKOUT" == "" ]; then
-#    compare_fds_smv_common_files Source               Source/smokeview     gsmv.f90
-    compare_fds_smv_common_files Utilities/Scripts    Utilities/Scripts    qfds.sh
     compare_fds_smv_common_files Manuals/Bibliography Manuals/Bibliography BIBLIO_FDS_general.tex
     compare_fds_smv_common_files Manuals/Bibliography Manuals/Bibliography BIBLIO_FDS_mathcomp.tex
     compare_fds_smv_common_files Manuals/Bibliography Manuals/Bibliography BIBLIO_FDS_refs.tex
@@ -1514,7 +1512,6 @@ mailTo=
 UPLOADRESULTS=
 COMPILER=intel
 PID_FILE=~/.fdssmvgit/firesmokebot_pid
-INTEL=
 HTML2PDF=wkhtmltopdf
 BUILD_ONLY=
 CLONE_REPOS=
@@ -1558,7 +1555,6 @@ case $OPTION in
    ;;
   J)
    MPI_TYPE=impi
-   INTEL=i
    INTEL2="-J"
    ;;
   L)
