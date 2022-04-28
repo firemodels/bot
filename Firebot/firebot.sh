@@ -1925,7 +1925,7 @@ FDS_TAG=
 SMV_TAG=
 VALIDATION=
 CHECK_CLUSTER=
-OPENMPTEST=
+OPENMPTEST=1
 MPI_TYPE=mpi
 
 #*** parse command line arguments
@@ -1953,7 +1953,7 @@ case $OPTION in
    SKIPPICTURES=1
    ;;
   D)
-   OPENMPTEST=1
+   OPENMPTEST=
    ;;
   J)
    MPI_TYPE=impi

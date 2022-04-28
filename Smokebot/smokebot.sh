@@ -1525,7 +1525,7 @@ FDS_TAG=
 SMV_TAG=
 CHECKOUT=
 compile_errors=
-OPENMPTEST=
+OPENMPTEST=1
 
 #*** save pid so -k option (kill smokebot) may be used lateer
 
@@ -1554,7 +1554,7 @@ case $OPTION in
    CLEANREPO=1
    ;;
   D)
-   OPENMPTEST=1
+   OPENMPTEST=
    ;;
   J)
    MPI_TYPE=impi
