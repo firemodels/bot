@@ -420,6 +420,7 @@ compile_fds_mpi_db()
    echo "      debug $MPTYPE"
    cd $FDSDIR
    rm -f $FDSEXE
+   echo ""                     > $OUTPUT_DIR/stage1b$MPTYPE
    $botrepo/Scripts/build_fds.sh $OUTPUT_DIR/stage1b$MPTYPE &
 }
 
@@ -438,8 +439,8 @@ check_compile_fds_mpi_db()
       stage_fdsdb_success=true
    else
       echo "Errors from Stage 1b$MPTYPE - Compile FDS MPI$MPTYPE debug:"   >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage1b$MPTYPE                       >> $ERROR_LOG
-      echo ""                                              >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage1b$MPTYPE                                       >> $ERROR_LOG
+      echo ""                                                              >> $ERROR_LOG
       THIS_FDS_FAILED=1
       compile_errors=1
    fi
@@ -607,6 +608,7 @@ compile_fds_mpi()
    echo "      release $MPTYPE"
    cd $FDSDIR
    rm -f $FDSEXE
+   echo ""                     > $OUTPUT_DIR/stage1c$MPTYPE
    $botrepo/Scripts/build_fds.sh $OUTPUT_DIR/stage1c$MPTYPE &
 }
 
@@ -618,7 +620,7 @@ wait_compile_end()
 {
    local compile_dir=$1
      while [[  -e $compile_dir/complete    ]]; do
-        sleep 10
+        sleep 5
      done
 }
 
@@ -867,7 +869,7 @@ wait_verification_cases_end()
         echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/$stage
         TIME_LIMIT_STAGE=$stagelimit
         check_time_limit
-        sleep 60
+        sleep 30
      done
    else
      while           [[ `qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$'` != '' ]]; do
@@ -875,7 +877,7 @@ wait_verification_cases_end()
         echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/$stage
         TIME_LIMIT_STAGE=$stagelimit
         check_time_limit
-        sleep 60
+        sleep 30
      done
    fi
 }
@@ -2026,11 +2028,11 @@ if [ "$BUILD_ONLY" == "" ]; then
        compile_fds_mpi        $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
      fi
   fi
-  wait_compile_end $FDS_DB_DIR
   wait_compile_end $FDS_DIR
+  wait_compile_end $FDS_DB_DIR
   if [ "$OPENMPTEST" != "" ]; then
-    wait_compile_end $FDS_OPENMP_DB_DIR
     wait_compile_end $FDS_OPENMP_DIR
+    wait_compile_end $FDS_OPENMP_DB_DIR
   fi
    echo "      fds compilations complete"
 
