@@ -162,12 +162,14 @@ echo ^</h2^>                                  >> %MANIFEST%
 
 
 CALL :COPY  %bundle_dir%\fds\fds.exe        %out_bin%\fds.exe
+CALL :COPY  %bundle_dir%\fds\fds_openmp.exe %out_bin%\fds_openmp.exe
 CALL :COPY  %bundle_dir%\fds\fds2ascii.exe  %out_bin%\fds2ascii.exe
 CALL :COPY  %bundle_dir%\fds\test_mpi.exe   %out_bin%\test_mpi.exe
 
 CALL :COPY  %bundle_dir%\smv\smokeview.exe  %out_smv%\smokeview.exe
 
 CALL :TOMANIFESTFDS   %out_bin%\fds.exe          fds
+CALL :TOMANIFESTFDS   %out_bin%\fds_openmp.exe   fds_openmp
 
 set curdir=%CD%
 cd %out_bin%
@@ -209,7 +211,7 @@ cd %out_bin%
 %hashfile% background.exe >  hash\background_%fds_version%.exe.sha1
 %hashfile% test_mpi.exe   >  hash\test_mpi_%fds_version%.exe.sha1
 cd hash
-cat *.sha1              >  %upload_dir%\%basename%.sha1
+cat *.sha1                >  %upload_dir%\%basename%.sha1
 
 cd %out_smv%
 %hashfile% hashfile.exe   >  hash\hashfile_%smv_version%.exe.sha1
@@ -218,7 +220,7 @@ cd %out_smv%
 %hashfile% smokezip.exe   >  hash\smokezip_%smv_version%.exe.sha1
 %hashfile% wind2fds.exe   >  hash\wind2fds_%smv_version%.exe.sha1
 cd hash
-cat *.sha1              >>  %upload_dir%\%basename%.sha1
+cat *.sha1                >> %upload_dir%\%basename%.sha1
 
 cd %curdir%
 CALL :COPY %in_intel_dll%\libiomp5md.dll                        %out_bin%\libiomp5md.dll
@@ -226,6 +228,7 @@ CALL :COPY "%fds_forbundle%\fdsinit.bat"                        %out_bin%\fdsini
 CALL :COPY "%fds_forbundle%\fdspath.bat"                        %out_bin%\fdspath.bat
 CALL :COPY "%fds_forbundle%\helpfds.bat"                        %out_bin%\helpfds.bat
 CALL :COPY "%fds_forbundle%\fds_local.bat"                      %out_bin%\fds_local.bat
+CALL :COPY "%fds_forbundle%\fds_local_test.bat"                 %out_bin%\fds_local_test.bat
 CALL :COPY  %repo_root%\smv\Build\sh2bat\intel_win_64\sh2bat.exe %out_bin%\sh2bat.exe
 
 :: setup program for new installer
