@@ -36,9 +36,10 @@ if NOT exist %BUNDLE_DIR%\fds mkdir %BUNDLE_DIR%\fds
 echo erasing %BUNDLE_DIR%\fds
 echo.
 erase /q %BUNDLE_DIR%\fds\*
-call :copyfile %fdsrepo%\Build\impi_intel_win_64           fds_impi_win_64.exe  %BUNDLE_DIR%\fds fds.exe
-call :copyfile %fdsrepo%\Utilities\fds2ascii\intel_win_64  fds2ascii_win_64.exe %BUNDLE_DIR%\fds fds2ascii.exe
-call :copyfile %fdsrepo%\Utilities\test_mpi\impi_intel_win test_mpi.exe         %BUNDLE_DIR%\fds test_mpi.exe
+call :copyfile %fdsrepo%\Build\impi_intel_win              fds_impi_win.exe          %BUNDLE_DIR%\fds fds.exe
+call :copyfile %fdsrepo%\Build\impi_intel_win_openmp       fds_impi_win_openmp.exe   %BUNDLE_DIR%\fds fds_openmp.exe
+call :copyfile %fdsrepo%\Utilities\fds2ascii\intel_win_64  fds2ascii_win_64.exe      %BUNDLE_DIR%\fds fds2ascii.exe
+call :copyfile %fdsrepo%\Utilities\test_mpi\impi_intel_win test_mpi.exe              %BUNDLE_DIR%\fds test_mpi.exe
 :skip_fds
 
 goto eof
