@@ -162,12 +162,14 @@ echo ^</h2^>                                  >> %MANIFEST%
 
 
 CALL :COPY  %bundle_dir%\fds\fds.exe        %out_bin%\fds.exe
+CALL :COPY  %bundle_dir%\fds\fds_openmp.exe %out_bin%\fds_openmp.exe
 CALL :COPY  %bundle_dir%\fds\fds2ascii.exe  %out_bin%\fds2ascii.exe
 CALL :COPY  %bundle_dir%\fds\test_mpi.exe   %out_bin%\test_mpi.exe
 
 CALL :COPY  %bundle_dir%\smv\smokeview.exe  %out_smv%\smokeview.exe
 
 CALL :TOMANIFESTFDS   %out_bin%\fds.exe          fds
+CALL :TOMANIFESTFDS   %out_bin%\fds_openmp.exe   fds_openmp
 
 set curdir=%CD%
 cd %out_bin%
