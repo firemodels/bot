@@ -420,8 +420,7 @@ compile_fds_mpi_db()
    echo "      debug $MPTYPE"
    cd $FDSDIR
    rm -f $FDSEXE
-   make --makefile ../makefile clean &> /dev/null
-   ./make_fds.sh &> $OUTPUT_DIR/stage1b${MPTYPE}
+   $botrepo/Scripts/build_fds.sh $OUTPUT_DIR/stage1b$MPTYPE &
 }
 
 #---------------------------------------------
@@ -608,8 +607,19 @@ compile_fds_mpi()
    echo "      release $MPTYPE"
    cd $FDSDIR
    rm -f $FDSEXE
-   make --makefile ../makefile clean &> /dev/null
-   ./make_fds.sh &> $OUTPUT_DIR/stage1c$MPTYPE
+   $botrepo/Scripts/build_fds.sh $OUTPUT_DIR/stage1c$MPTYPE &
+}
+
+#---------------------------------------------
+#                   wait_compile_end
+#---------------------------------------------
+
+wait_compile_end()
+{
+   local compile_dir=$1
+     while [[  -e $compile_dir/complete    ]]; do
+        sleep 10
+     done
 }
 
 #---------------------------------------------
@@ -2005,25 +2015,42 @@ if [ "$BUILD_ONLY" == "" ]; then
   check_compile_cfast
 
 #stage1B
+   echo "   fds (background)"
   compile_fds_mpi_db        $FDS_DB_DIR $FDS_DB_EXE
-  check_compile_fds_mpi_db  $FDS_DB_DIR $FDS_DB_EXE
   if [ "$OPENMPTEST" != "" ]; then
     compile_fds_mpi_db        $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
-    check_compile_fds_mpi_db  $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
   fi
-  if [ "$OPENMPI_GNU" != "" ]; then
-    compile_fds_mpi_gnu_db
-    check_compile_fds_mpi_gnu_db
+  if [ "$SMOKEBOT_LITE" == "" ]; then
+     compile_fds_mpi        $FDS_DIR $FDS_EXE
+     if [ "$OPENMPTEST" != "" ]; then
+       compile_fds_mpi        $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
+     fi
+  fi
+  wait_compile_end $FDS_DB_DIR
+  wait_compile_end $FDS_DIR
+  if [ "$OPENMPTEST" != "" ]; then
+    wait_compile_end $FDS_OPENMP_DB_DIR
+    wait_compile_end $FDS_OPENMP_DIR
+  fi
+   echo "      fds compilations complete"
+
+
+  check_compile_fds_mpi_db  $FDS_DB_DIR $FDS_DB_EXE
+  if [ "$OPENMPTEST" != "" ]; then
+    check_compile_fds_mpi_db  $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
   fi
 
 #stage1C
   if [ "$SMOKEBOT_LITE" == "" ]; then
-     compile_fds_mpi        $FDS_DIR $FDS_EXE
      check_compile_fds_mpi  $FDS_DIR $FDS_EXE
      if [ "$OPENMPTEST" != "" ]; then
-       compile_fds_mpi        $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
        check_compile_fds_mpi  $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
      fi
+  fi
+
+  if [ "$OPENMPI_GNU" != "" ]; then
+    compile_fds_mpi_gnu_db
+    check_compile_fds_mpi_gnu_db
   fi
 
 #----------------------------- Stage 2 build smokeview     --------------------------------------
