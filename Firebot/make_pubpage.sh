@@ -26,9 +26,13 @@ cat << EOF
 <!DOCTYPE html>
 <html><head><title>$TITLE Build Status</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+  google.charts.load('current', {'packages':['corechart']});
 EOF
 
 ./make_time_plot.sh  $SOPT -n $NHIST -t timelist.out
+./make_histogram_plot.sh  $SOPT 
 
 STDDEV=`cat timelist.out | awk -F ',' '{x[NR]=$2; s+=$2; n++} END{a=s/n; for (i in x){ss += (x[i]-a)^2} sd = sqrt(ss/n); print sd}'`
 MEAN=`cat timelist.out   | awk -F ',' '{x[NR]=$2; s+=$2; n++} END{a=s/n; print a}'`
@@ -40,6 +44,7 @@ STDDEV_PERCEN=`printf "%0.1f" $STDDEV_PERCEN`
 
 
 cat << EOF
+</script>
 </head>
 <body>
 <h2>$TITLE Summary</h2>
@@ -70,6 +75,8 @@ cat << EOF
 <div id="curve_chart" style="width: 500px; height: 300px"></div>
 Mean: $MEAN s <br>
 Standard deviation: $STDDEV s ($STDDEV_PERCEN %) <br>
+<h3>Timing Distribution</h3>
+<div id="hist_chart" style="width: 500px; height: 300px"></div>
 <h3>Manuals</h3>
 <a href="http://goo.gl/n1Q3WH">Manuals</a>
 

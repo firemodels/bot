@@ -19,9 +19,6 @@ done
 shift $(($OPTIND-1))
 
 cat << EOF
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-      google.charts.load('current', {'packages':['corechart']});
       google.charts.setOnLoadCallback(drawChart);
 
       function drawChart() {
@@ -51,5 +48,4 @@ cat << EOF
 
         chart.draw(data, options);
       }
-    </script>
 EOF
