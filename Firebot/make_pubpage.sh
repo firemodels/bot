@@ -26,17 +26,10 @@ cat << EOF
 <!DOCTYPE html>
 <html><head><title>$TITLE Build Status</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-      google.charts.load('current', {'packages':['corechart']});
-      google.charts.setOnLoadCallback(drawChart);
-
-      function drawChart() {
-        var data = google.visualization.arrayToDataTable([
-          ['Days since Jan 1, 2016', 'Benchmark Time (s)'],
 EOF
 
-./make_timelist.sh $SOPT | sort -n -k 1 -t , | tail $NHIST > timelist.out
+./make_time_plot.sh  $SOPT -n $NHIST -t timelist.out
+
 STDDEV=`cat timelist.out | awk -F ',' '{x[NR]=$2; s+=$2; n++} END{a=s/n; for (i in x){ss += (x[i]-a)^2} sd = sqrt(ss/n); print sd}'`
 MEAN=`cat timelist.out   | awk -F ',' '{x[NR]=$2; s+=$2; n++} END{a=s/n; print a}'`
 MEAN=`printf "%0.0f" $MEAN`
@@ -44,28 +37,9 @@ STDDEV_PERCEN=`echo "scale=5; $STDDEV/$MEAN*100 " | bc`
 
 STDDEV=`printf "%0.1f" $STDDEV`
 STDDEV_PERCEN=`printf "%0.1f" $STDDEV_PERCEN`
-cat timelist.out | awk -F ',' '{ printf("[%s,%s],\n",$1,$2) }'
+
 
 cat << EOF
-        ]);
-
-        var options = {
-          title: '',
-          curveType: 'line',
-          legend: { position: 'right' },
-          colors: ['black'],
-          pointSize: 5,
-          hAxis:{ title: 'Day'},
-          vAxis:{ title: 'Time (s)'}
-        };
-        options.legend = 'none';
-
-        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
-
-        chart.draw(data, options);
-      }
-    </script>
-
 </head>
 <body>
 <h2>$TITLE Summary</h2>
