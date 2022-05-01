@@ -15,6 +15,8 @@ echo "-a file - file containing 'after' fds case times [default: $after]"
 echo "-A dir - directory containing 'after' timing file [default: $afterdir]"
 echo "-b file - file containing 'before' fds case times [default: $before]"
 echo "-B dir - directory containing 'before' timing file [default: $beforedir]"
+echo "-d file - file containing relative time differences [default: $differences]"
+echo "-s file - file containing time difference summary [default: $summary]"
 echo "-h - display this message"
 exit 0
 }
@@ -38,10 +40,12 @@ before=base_times.csv
 afterdir=~firebot/.firebot/history
 after=`ls -rtlm $afterdir/*timing*csv | grep -v bench | tail -1 | awk -F',' '{print $1}'`
 after=`basename $after`
+differences=fds_timing_diffs
+summary=fds_timing_summary
 
 #*** parse options
 
-while getopts 'a:A:b:B:h' OPTION
+while getopts 'a:A:b:B:d:hs:' OPTION
 do
 case $OPTION  in
   a)
@@ -56,6 +60,12 @@ case $OPTION  in
   B)
    beforedir="$OPTARG"
    ;;
+  d)
+   differences="$OPTARG"
+   ;;
+  s)
+   summary="$OPTARG"
+   ;;
   h)
    usage;
    ;;
@@ -67,6 +77,8 @@ botrepo=../../bot
 cd $botrepo
 botrepo=`pwd`
 cd $CURDIR
+rm -f $differences
+rm -f $summary
 
 cat $beforedir/$before | head -n -2 | awk -F ',' '{if (NR!=1)  {print($1) }}' > $filelist
 
@@ -81,8 +93,13 @@ for file in `cat $filelist`; do
     continue
   fi
   time_before=`echo $line_before | awk -F',' '{print $2}'`
+  bigger_than=$((`echo "$time_before > 300.0"| bc`))
   time_after=`echo $line_after |   awk -F',' '{print $2}'`
   time_diff=`echo "$time_after - $time_before" | bc`
+  if [ $bigger_than -eq 1 ]; then
+    rel_time_diff=`echo "100.0*$time_diff / $time_before" | bc`
+    echo $rel_time_diff >> $differences
+  fi
   got_smaller=$((`echo "$time_before > $time_after"| bc`))
   if [ $got_smaller -eq 1 ]; then
     files_down=$((files_down+1))
@@ -95,8 +112,8 @@ done
 files_total=`echo "$files_up+$files_down"|bc`
 time_total=`echo "$time_up-$time_down"|bc`
 
-echo "smaller,$files_down,$time_down"
-echo "bigger,$files_up,$time_up"
-echo "total,$files_total,$time_total"
+echo "smaller,$files_down,$time_down"  > $summary
+echo "bigger,$files_up,$time_up"      >> $summary   
+echo "total,$files_total,$time_total" >> $summary
 
 rm $filelist
