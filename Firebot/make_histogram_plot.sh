@@ -1,7 +1,15 @@
 #!/bin/bash
 SOPT=
 fopt=
-timefile=../Scripts/fds_timing_diffs
+
+CURDIR=`pwd`
+FIREBOTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+cd $FIREBOTDIR/../Scripts
+SCRIPTDIR=`pwd`
+cd $CURDIR
+
+timefile=$SCRIPTDIR/fds_timing_diffs
+summaryfile=$SCRIPTDIR/fds_timing_diffs
 
 while getopts 'f:s' OPTION
 do
@@ -16,6 +24,10 @@ case $OPTION  in
 esac
 done
 shift $(($OPTIND-1))
+
+cd $SCRIPTDIR
+./compare_fds_timings.sh
+cd $CURDIR
 
 cat << EOF
       google.charts.setOnLoadCallback(drawHistogram);
@@ -37,9 +49,7 @@ cat << EOF
           legend: { position: 'right' },
           colors: ['black'],
           pointSize: 5,
-          hAxis:{ title: 'relative time percentage difference'},
-          vAxis:{ title: 'number', scaleType: 'mirrorLog'},
-          histogram: { lastBuucketPercentil: 10},
+          hAxis:{ title: 'relative CPU time difference (%)'},
         };
         options.legend = 'none';
 

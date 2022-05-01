@@ -24,19 +24,27 @@ exit 0
 filelist=/tmp/fds_times$$.txt
 
 CURDIR=`pwd`
+
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+cd $SCRIPTDIR
+SCRIPTDIR=`pwd`
+
+cd $CURDIR
 fdsrepo=../../fds
 cd $fdsrepo
 fdsrepo=`pwd`
-cd $CURDIR
 
-CURDIR=`pwd`
+cd $CURDIR
 figrepo=../../fig
 cd $figrepo
 figrepo=`pwd`
+
 cd $CURDIR
 
 beforedir=$figrepo/compare/firebot/times
-before=base_times.csv
+before=`ls -rtlm $beforedir/*timing*csv | grep -v bench | tail -1 | awk -F',' '{print $1}'`
+before=`basename $before`
+
 afterdir=~firebot/.firebot/history
 after=`ls -rtlm $afterdir/*timing*csv | grep -v bench | tail -1 | awk -F',' '{print $1}'`
 after=`basename $after`
@@ -92,28 +100,36 @@ for file in `cat $filelist`; do
   if [ "$line_after" == "" ]; then
     continue
   fi
+#  time_before=`echo $line_before | awk -F',' '{print $3}' | printf "%.12f"`
   time_before=`echo $line_before | awk -F',' '{print $2}'`
-  bigger_than=$((`echo "$time_before > 300.0"| bc`))
+  bigger_than=$((`echo "$time_before > 60.0"| bc`))
+#  time_after=`echo $line_after |   awk -F',' '{print $3}' | printf "%.12f"`
   time_after=`echo $line_after |   awk -F',' '{print $2}'`
   time_diff=`echo "$time_after - $time_before" | bc`
   if [ $bigger_than -eq 1 ]; then
     rel_time_diff=`echo "100.0*$time_diff / $time_before" | bc`
     echo $rel_time_diff >> $differences
-  fi
-  got_smaller=$((`echo "$time_before > $time_after"| bc`))
-  if [ $got_smaller -eq 1 ]; then
-    files_down=$((files_down+1))
-    time_down=`echo "$time_down - ($time_diff)" | bc`
-  else
-    files_up=$((files_up+1))
-    time_up=`echo "$time_up + ($time_diff)" | bc`
+    got_smaller=$((`echo "$time_before > $time_after"| bc`))
+    if [ $got_smaller -eq 1 ]; then
+      files_down=$((files_down+1))
+      time_down=`echo "$time_down - ($time_diff)" | bc`
+    else
+      files_up=$((files_up+1))
+      time_up=`echo "$time_up + ($time_diff)" | bc`
+    fi
   fi
 done
 files_total=`echo "$files_up+$files_down"|bc`
 time_total=`echo "$time_up-$time_down"|bc`
 
-echo "smaller,$files_down,$time_down"  > $summary
-echo "bigger,$files_up,$time_up"      >> $summary   
-echo "total,$files_total,$time_total" >> $summary
+# FDS6.7.7-1051-gb130afc2e_timing.csv
+before_rev=`echo $before | awk -F'_' '{print $1}'`
+after_rev=`echo $after   | awk -F'_' '{print $1}'`
+
+echo "faster,$files_down,$time_down"  >  $SCRIPTDIR/$summary
+echo "slower,$files_up,$time_up"      >> $SCRIPTDIR/$summary   
+echo "total,$files_total,$time_total" >> $SCRIPTDIR/$summary
+echo "base,$before_rev"               >> $SCRIPTDIR/$summary
+echo "current,$after_rev"             >> $SCRIPTDIR/$summary
 
 rm $filelist

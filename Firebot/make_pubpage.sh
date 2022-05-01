@@ -53,6 +53,10 @@ cat << EOF
 EOF
 
 CURDIR=`pwd`
+cd ../Scripts
+SCRIPTDIR=`pwd`
+
+cd $CURDIR
 cd $historydir
 ls -tl *.txt | grep -v compiler | grep -v warning | grep -v error | awk '{system("head "  $9)}' | sort -t ';' -r -n -k 7 | head -1 | \
              awk -F ';' '{cputime="Benchmark time: "$9" s";\
@@ -69,13 +73,35 @@ ls -tl *.txt | grep -v compiler | grep -v warning | grep -v error | awk '{system
                           }' 
 cd $CURDIR
 
+BASE_TIMEREV=`grep   base    $SCRIPTDIR/fds_timing_summary | awk -F',' '{print $2}'`
+CURENT_TIMEREV=`grep current $SCRIPTDIR/fds_timing_summary | awk -F',' '{print $2}'`
+
+FASTCOUNT=`grep faster $SCRIPTDIR/fds_timing_summary | awk -F',' '{print $2}'`
+FASTSIZE=`grep faster  $SCRIPTDIR/fds_timing_summary | awk -F',' '{print $3}'`
+SLOWCOUNT=`grep slower $SCRIPTDIR/fds_timing_summary | awk -F',' '{print $2}'`
+SLOWSIZE=`grep slower  $SCRIPTDIR/fds_timing_summary | awk -F',' '{print $3}'`
+ALLCOUNT=`grep total $SCRIPTDIR/fds_timing_summary | awk -F',' '{print $2}'`
+ALLSIZE=`grep total  $SCRIPTDIR/fds_timing_summary | awk -F',' '{print $3}'`
+
 cat << EOF
 <h3>Timing History</h3>
 
 <div id="curve_chart" style="width: 500px; height: 300px"></div>
 Mean: $MEAN s <br>
 Standard deviation: $STDDEV s ($STDDEV_PERCEN %) <br>
-<h3>Timing Relative Difference Distribution</h3>
+
+<h3>Relative CPU Time Difference Distribution</h3>
+<p>Base: $BASE_TIMEREV<br>
+Current: $CURENT_TIMEREV<br>
+
+<table border=on>
+<caption>Run Time Changes <br>(Run Times > 60 s)</caption>
+<tr><th></th><th>number</th><th>time change (s)</th></tr>
+<tr><th>slower</th><td>$SLOWCOUNT</td><td>$SLOWSIZE</td></tr>
+<tr><th>faster</th><td>$FASTCOUNT</td><td>-$FASTSIZE</td></tr>
+<tr><th>all</th><td>$ALLCOUNT</td><td>$ALLSIZE</td></tr>
+</table>
+
 <div id="hist_chart" style="width: 500px; height: 300px"></div>
 <h3>Manuals</h3>
 <a href="http://goo.gl/n1Q3WH">Manuals</a>
@@ -85,7 +111,6 @@ Standard deviation: $STDDEV s ($STDDEV_PERCEN %) <br>
 EOF
 fi
 
-CURDIR=`pwd`
 cd $historydir
 ls -tl *.txt | grep -v compiler | grep -v warning | grep -v error | awk '{system("head "  $9)}' | sort -t ';' -r -n -k 7 | head $NHIST | \
              awk -F ';' '{cputime="Benchmark time: "$9" s";\
