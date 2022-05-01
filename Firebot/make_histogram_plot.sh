@@ -1,6 +1,7 @@
 #!/bin/bash
 SOPT=
 fopt=
+timefile=../Scripts/fds_timing_diffs
 
 while getopts 'f:s' OPTION
 do
@@ -16,23 +17,15 @@ esac
 done
 shift $(($OPTIND-1))
 
-if [ "$fopt" == "" ]; then
-  if [ "$SOPT" == "" ]; then
-    timefile=`ls -rtlm ~firebot/.firebot/history/*timing*csv | grep -v bench | tail -1 | awk -F',' '{print $1}'`
-  else
-    timefile=`ls -rtlm ~smokebot/.smokebot/history/*timing*csv | grep -v bench | tail -1 | awk -F',' '{print $1}'`
-  fi
-fi
-
 cat << EOF
       google.charts.setOnLoadCallback(drawHistogram);
 
       function drawHistogram() {
         var data = google.visualization.arrayToDataTable([
-          ['time (s)'],
+          ['relative time difference'],
 EOF
 
-cat $timefile | head -n -2 | awk -F ',' '{if (NR!=1)  {printf("[%s],\n",$2) }}' | grep -v -F [],
+cat $timefile | awk -F ',' '{printf("[%s],\n",$1)}' 
 
 #          histogram: { lastBucketPercentile: 5 }
 cat << EOF
@@ -44,7 +37,7 @@ cat << EOF
           legend: { position: 'right' },
           colors: ['black'],
           pointSize: 5,
-          hAxis:{ title: 'time (s)'},
+          hAxis:{ title: 'relative time percentage difference'},
           vAxis:{ title: 'number', scaleType: 'mirrorLog'},
           histogram: { lastBuucketPercentil: 10},
         };

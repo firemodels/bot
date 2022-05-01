@@ -31,7 +31,7 @@ cat << EOF
   google.charts.load('current', {'packages':['corechart']});
 EOF
 
-./make_time_plot.sh  $SOPT -n $NHIST -t timelist.out
+./make_time_plot.sh       $SOPT -n $NHIST -t timelist.out
 ./make_histogram_plot.sh  $SOPT 
 
 STDDEV=`cat timelist.out | awk -F ',' '{x[NR]=$2; s+=$2; n++} END{a=s/n; for (i in x){ss += (x[i]-a)^2} sd = sqrt(ss/n); print sd}'`
@@ -75,7 +75,7 @@ cat << EOF
 <div id="curve_chart" style="width: 500px; height: 300px"></div>
 Mean: $MEAN s <br>
 Standard deviation: $STDDEV s ($STDDEV_PERCEN %) <br>
-<h3>Timing Distribution</h3>
+<h3>Timing Relative Difference Distribution</h3>
 <div id="hist_chart" style="width: 500px; height: 300px"></div>
 <h3>Manuals</h3>
 <a href="http://goo.gl/n1Q3WH">Manuals</a>
