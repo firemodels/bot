@@ -62,8 +62,8 @@ call :BUILD     get_time
 call :BUILDSMV
 
 :: verify fds apps were built
-call :CHECK_BUILDUTIL fds2ascii intel_win
-call :CHECK_BUILDUTIL test_mpi  
+call :CHECK_BUILDUTIL    fds2ascii intel_win
+call :CHECK_BUILDTESTMPI test_mpi  intel_win  
 call :CHECK_BUILDFDS
 call :CHECK_BUILDFDSOPENMP
 
@@ -139,6 +139,21 @@ echo ***building %prog% 1>> %compile_log% 2>&1
 cd %fdsrepo%\Utilities\%prog%\%builddir%
 call make_%prog% bot 1>> %compile_log% 2>&1
 exit /b /0
+
+:: -------------------------------------------------------------
+ :CHECK_BUILDTESTMPI
+:: -------------------------------------------------------------
+
+set prog=%1
+set builddir=%2
+
+if NOT exist %fdsrepo%\Utilities\%prog%\%builddir%\%prog%.exe goto check_util
+exit /b /0
+:check_util
+echo ***error: The program %prog%.exe failed to build
+echo ***error: The program %prog%.exe failed to build  1>> %error_log% 2>&1
+set error=1
+exit /b /1
 
 :: -------------------------------------------------------------
  :CHECK_BUILDUTIL
