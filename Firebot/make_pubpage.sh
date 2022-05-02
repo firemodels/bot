@@ -26,17 +26,14 @@ cat << EOF
 <!DOCTYPE html>
 <html><head><title>$TITLE Build Status</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-      google.charts.load('current', {'packages':['corechart']});
-      google.charts.setOnLoadCallback(drawChart);
-
-      function drawChart() {
-        var data = google.visualization.arrayToDataTable([
-          ['Days since Jan 1, 2016', 'Benchmark Time (s)'],
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+  google.charts.load('current', {'packages':['corechart']});
 EOF
 
-./make_timelist.sh $SOPT | sort -n -k 1 -t , | tail $NHIST > timelist.out
+./make_time_plot.sh       $SOPT -n $NHIST -t timelist.out
+./make_histogram_plot.sh  $SOPT 
+
 STDDEV=`cat timelist.out | awk -F ',' '{x[NR]=$2; s+=$2; n++} END{a=s/n; for (i in x){ss += (x[i]-a)^2} sd = sqrt(ss/n); print sd}'`
 MEAN=`cat timelist.out   | awk -F ',' '{x[NR]=$2; s+=$2; n++} END{a=s/n; print a}'`
 MEAN=`printf "%0.0f" $MEAN`
@@ -44,28 +41,10 @@ STDDEV_PERCEN=`echo "scale=5; $STDDEV/$MEAN*100 " | bc`
 
 STDDEV=`printf "%0.1f" $STDDEV`
 STDDEV_PERCEN=`printf "%0.1f" $STDDEV_PERCEN`
-cat timelist.out | awk -F ',' '{ printf("[%s,%s],\n",$1,$2) }'
+
 
 cat << EOF
-        ]);
-
-        var options = {
-          title: '',
-          curveType: 'line',
-          legend: { position: 'right' },
-          colors: ['black'],
-          pointSize: 5,
-          hAxis:{ title: 'Day'},
-          vAxis:{ title: 'Time (s)'}
-        };
-        options.legend = 'none';
-
-        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
-
-        chart.draw(data, options);
-      }
-    </script>
-
+</script>
 </head>
 <body>
 <h2>$TITLE Summary</h2>
@@ -74,6 +53,10 @@ cat << EOF
 EOF
 
 CURDIR=`pwd`
+cd ../Scripts
+SCRIPTDIR=`pwd`
+
+cd $CURDIR
 cd $historydir
 ls -tl *.txt | grep -v compiler | grep -v warning | grep -v error | awk '{system("head "  $9)}' | sort -t ';' -r -n -k 7 | head -1 | \
              awk -F ';' '{cputime="Benchmark time: "$9" s";\
@@ -90,12 +73,36 @@ ls -tl *.txt | grep -v compiler | grep -v warning | grep -v error | awk '{system
                           }' 
 cd $CURDIR
 
+BASE_TIMEREV=`grep   base    $SCRIPTDIR/fds_timing_summary | awk -F',' '{print $2}'`
+CURENT_TIMEREV=`grep current $SCRIPTDIR/fds_timing_summary | awk -F',' '{print $2}'`
+
+FASTCOUNT=`grep faster $SCRIPTDIR/fds_timing_summary | awk -F',' '{print $2}'`
+FASTSIZE=`grep faster  $SCRIPTDIR/fds_timing_summary | awk -F',' '{print $3}'`
+SLOWCOUNT=`grep slower $SCRIPTDIR/fds_timing_summary | awk -F',' '{print $2}'`
+SLOWSIZE=`grep slower  $SCRIPTDIR/fds_timing_summary | awk -F',' '{print $3}'`
+ALLCOUNT=`grep total $SCRIPTDIR/fds_timing_summary | awk -F',' '{print $2}'`
+ALLSIZE=`grep total  $SCRIPTDIR/fds_timing_summary | awk -F',' '{print $3}'`
+
 cat << EOF
 <h3>Timing History</h3>
 
 <div id="curve_chart" style="width: 500px; height: 300px"></div>
 Mean: $MEAN s <br>
 Standard deviation: $STDDEV s ($STDDEV_PERCEN %) <br>
+
+<h3>Relative CPU Time Difference Distribution</h3>
+<p>Base: $BASE_TIMEREV<br>
+Current: $CURENT_TIMEREV<br>
+
+<table border=on>
+<caption>Run Time Changes <br>(Run Times > 60 s)</caption>
+<tr><th></th><th>number</th><th>time change (s)</th></tr>
+<tr><th>slower</th><td>$SLOWCOUNT</td><td>$SLOWSIZE</td></tr>
+<tr><th>faster</th><td>$FASTCOUNT</td><td>-$FASTSIZE</td></tr>
+<tr><th>all</th><td>$ALLCOUNT</td><td>$ALLSIZE</td></tr>
+</table>
+
+<div id="hist_chart" style="width: 500px; height: 300px"></div>
 <h3>Manuals</h3>
 <a href="http://goo.gl/n1Q3WH">Manuals</a>
 
@@ -104,7 +111,6 @@ Standard deviation: $STDDEV s ($STDDEV_PERCEN %) <br>
 EOF
 fi
 
-CURDIR=`pwd`
 cd $historydir
 ls -tl *.txt | grep -v compiler | grep -v warning | grep -v error | awk '{system("head "  $9)}' | sort -t ';' -r -n -k 7 | head $NHIST | \
              awk -F ';' '{cputime="Benchmark time: "$9" s";\

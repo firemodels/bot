@@ -1926,7 +1926,7 @@ SMV_TAG=
 VALIDATION=
 CHECK_CLUSTER=
 OPENMPTEST=1
-MPI_TYPE=mpi
+MPI_TYPE=ompi
 
 #*** parse command line arguments
 while getopts 'b:BcCdDJm:Mp:q:R:sTuUV:x:X:y:Y:w:W:' OPTION
