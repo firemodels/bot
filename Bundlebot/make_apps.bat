@@ -98,6 +98,7 @@ echo ***building fds 1>> %compile_log% 2>&1
 cd %fdsrepo%\Build\impi_intel_win
 call make_fds bot 1>> %compile_log% 2>&1
 
+echo ***building fds openmp
 echo ***building fds openmp 1>> %compile_log% 2>&1
 cd %fdsrepo%\Build\impi_intel_win_openmp
 call make_fds bot 1>> %compile_log% 2>&1
