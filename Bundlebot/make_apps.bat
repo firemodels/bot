@@ -62,7 +62,7 @@ call :BUILD     get_time
 call :BUILDSMV
 
 :: verify fds apps were built
-call :CHECK_BUILDUTIL fds2ascii intel_win_64 _win_64
+call :CHECK_BUILDUTIL fds2ascii intel_win _win
 call :CHECK_BUILDUTIL test_mpi  impi_intel_win
 call :CHECK_BUILDFDS
 call :CHECK_BUILDFDSOPENMP
@@ -107,7 +107,7 @@ exit /b /0
  :CHECK_BUILDFDS
 :: -------------------------------------------------------------
 
-if NOT exist %fdsrepo%\Build\impi_intel_win\fds_impi_win.exe goto check_fds
+if NOT exist %fdsrepo%\Build\impi_intel_win\fds_impi_intel_win.exe goto check_fds
 exit /b /0
 :check_fds
 echo ***error: The program fds_impi_win.exe failed to build
@@ -118,7 +118,7 @@ exit /b /1
  :CHECK_BUILDFDSOPENMP
 :: -------------------------------------------------------------
 
-if NOT exist %fdsrepo%\Build\impi_intel_win_openmp\fds_impi_win_openmp.exe goto check_fds
+if NOT exist %fdsrepo%\Build\impi_intel_win_openmp\fds_impi_intel_win_openmp.exe goto check_fds
 exit /b /0
 :check_fds
 echo ***error: The program fds_impi_win_openmp.exe failed to build
