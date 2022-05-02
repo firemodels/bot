@@ -72,7 +72,7 @@ set fds_non_openmp=fds
 set fds=%fds_openmp%
 set openmp_env=-env OMP_THREADS %n_openmp%
 
-:: use non-openmp fds if nuumber of threads is 1 and openmp is not being forced
+:: use non-openmp fds if number of threads is 1 and openmp is not being forced
 
 if NOT "%n_openmp%" == "1" goto skip1
 if "%force_openmp%" == "1" goto skip1
