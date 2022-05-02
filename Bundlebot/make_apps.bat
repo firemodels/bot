@@ -63,7 +63,7 @@ call :BUILDSMV
 
 :: verify fds apps were built
 call :CHECK_BUILDUTIL fds2ascii intel_win
-call :CHECK_BUILDUTIL test_mpi  impi_intel_win
+call :CHECK_BUILDUTIL test_mpi  
 call :CHECK_BUILDFDS
 call :CHECK_BUILDFDSOPENMP
 
