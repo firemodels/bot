@@ -42,8 +42,7 @@ figrepo=`pwd`
 cd $CURDIR
 
 beforedir=$figrepo/compare/firebot/times
-before=`ls -rtlm $beforedir/*timing*csv | grep -v bench | tail -1 | awk -F',' '{print $1}'`
-before=`basename $before`
+before=base_times.csv
 
 afterdir=~firebot/.firebot/history
 after=`ls -rtlm $afterdir/*timing*csv | grep -v bench | tail -1 | awk -F',' '{print $1}'`
@@ -122,8 +121,11 @@ done
 files_total=`echo "$files_up+$files_down"|bc`
 time_total=`echo "$time_up-$time_down"|bc`
 
-# FDS6.7.7-1051-gb130afc2e_timing.csv
-before_rev=`echo $before | awk -F'_' '{print $1}'`
+if [ "$before" == "base_times.csv" ]; then
+  before_rev=`cat $figrepo/compare/firebot/times/FDS_REVISION`
+else
+  before_rev=`echo $before | awk -F'_' '{print $1}'`
+fi
 after_rev=`echo $after   | awk -F'_' '{print $1}'`
 
 echo "faster,$files_down,$time_down"  >  $SCRIPTDIR/$summary
