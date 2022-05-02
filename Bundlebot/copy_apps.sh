@@ -52,6 +52,7 @@ if [ "$app_type" == "fds" ]; then
   echo
   echo ***copying fds apps from $dir_from
   CP fds
+  CP fds_openmp
   CP fds2ascii
   CP test_mpi
   CP FDS_REVISION
