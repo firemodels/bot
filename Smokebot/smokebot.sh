@@ -619,9 +619,9 @@ compile_fds_mpi()
 wait_compile_end()
 {
    local compile_dir=$1
-     while [[  -e $compile_dir/complete    ]]; do
-        sleep 5
-     done
+   while [[  -e $compile_dir/complete    ]]; do
+      sleep 5
+   done
 }
 
 #---------------------------------------------
@@ -640,7 +640,7 @@ check_compile_fds_mpi()
    then
       stage_ver_release_success=true
    else
-      echo "Errors from Stage 1c - Compile FDS release:" >> $ERROR_LOG
+      echo "Errors from Stage 1c$MPTYPE - Compile FDS MPI$MPYPE release:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage1c$MPTYPE >> $ERROR_LOG
       echo "" >> $ERROR_LOG
       compile_errors=1
@@ -779,8 +779,6 @@ check_common_files()
 {
   # only compare files if latest repo revisions are checkout out
   if [ "$CHECKOUT" == "" ]; then
-#    compare_fds_smv_common_files Source               Source/smokeview     gsmv.f90
-    compare_fds_smv_common_files Utilities/Scripts    Utilities/Scripts    qfds.sh
     compare_fds_smv_common_files Manuals/Bibliography Manuals/Bibliography BIBLIO_FDS_general.tex
     compare_fds_smv_common_files Manuals/Bibliography Manuals/Bibliography BIBLIO_FDS_mathcomp.tex
     compare_fds_smv_common_files Manuals/Bibliography Manuals/Bibliography BIBLIO_FDS_refs.tex
@@ -1514,7 +1512,6 @@ mailTo=
 UPLOADRESULTS=
 COMPILER=intel
 PID_FILE=~/.fdssmvgit/firesmokebot_pid
-INTEL=
 HTML2PDF=wkhtmltopdf
 BUILD_ONLY=
 CLONE_REPOS=
@@ -1558,7 +1555,6 @@ case $OPTION in
    ;;
   J)
    MPI_TYPE=impi
-   INTEL=i
    INTEL2="-J"
    ;;
   L)
@@ -2016,12 +2012,12 @@ if [ "$BUILD_ONLY" == "" ]; then
 
 #stage1B
    echo "   fds (background)"
-  compile_fds_mpi_db        $FDS_DB_DIR $FDS_DB_EXE
+  compile_fds_mpi_db          $FDS_DB_DIR        $FDS_DB_EXE
   if [ "$OPENMPTEST" != "" ]; then
     compile_fds_mpi_db        $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
   fi
   if [ "$SMOKEBOT_LITE" == "" ]; then
-     compile_fds_mpi        $FDS_DIR $FDS_EXE
+     compile_fds_mpi          $FDS_DIR        $FDS_EXE
      if [ "$OPENMPTEST" != "" ]; then
        compile_fds_mpi        $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
      fi
@@ -2032,17 +2028,16 @@ if [ "$BUILD_ONLY" == "" ]; then
     wait_compile_end $FDS_OPENMP_DIR
     wait_compile_end $FDS_OPENMP_DB_DIR
   fi
-   echo "      fds compilations complete"
+  echo "      fds compilations complete"
 
-
-  check_compile_fds_mpi_db  $FDS_DB_DIR $FDS_DB_EXE
+  check_compile_fds_mpi_db    $FDS_DB_DIR        $FDS_DB_EXE
   if [ "$OPENMPTEST" != "" ]; then
     check_compile_fds_mpi_db  $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
   fi
 
 #stage1C
   if [ "$SMOKEBOT_LITE" == "" ]; then
-     check_compile_fds_mpi  $FDS_DIR $FDS_EXE
+     check_compile_fds_mpi    $FDS_DIR        $FDS_EXE
      if [ "$OPENMPTEST" != "" ]; then
        check_compile_fds_mpi  $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
      fi
