@@ -42,6 +42,7 @@ else
   echo "-m mailto - email address"
 fi
 
+echo "-L - build apps using latest revision"
 echo "-R branch - clone repos using name branch"
 echo "-r - create a release bundle (same as -R branc)"
 echo "-S - smv repo hash/release"
@@ -142,8 +143,9 @@ FDS_TAG=
 SMV_TAG=
 CUSTOM_PUBS=
 PARAMETER_FILE=
+LATEST=
 
-while getopts 'cCfF:hH:m:p:P:rR:S:UvX:Y:' OPTION
+while getopts 'cCfF:hH:Lm:p:P:rR:S:UvX:Y:' OPTION
 do
 case $OPTION  in
   c)
@@ -163,6 +165,9 @@ case $OPTION  in
    ;;
   H)
    FIREBOT_HOST="$OPTARG"
+   ;;
+  L)
+   LATEST=1
    ;;
   m)
    MAILTO="$OPTARG"
@@ -301,13 +306,22 @@ repo=`pwd`
 cd $DIR
 
 #*** update bot and webpages repos
-UPDATE_REPO bot      master     || exit 1
-UPDATE_REPO webpages nist-pages || exit 1
+if [ "$ECHO" == "" ]; then
+  UPDATE_REPO bot      master     || exit 1
+  UPDATE_REPO webpages nist-pages || exit 1
+fi
+
+gopt="-g $FIREBOT_HOST"
+Gopt="-G $FIREBOT_HOME"
+if [ "$LATEST" != "" ]; then
+  gopt=
+  Gopt=
+fi
 
 #*** build apps
 cd $curdir
 cd ../Firebot
-$ECHO ./run_firebot.sh $FORCE -c -C -B -g $FIREBOT_HOST -G $FIREBOT_HOME $JOPT $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG $FIREBOT_BRANCH -T $MAILTO || exit 1
+$ECHO ./run_firebot.sh $FORCE -c -C -B $gopt $Gopt $JOPT $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG $FIREBOT_BRANCH -T $MAILTO || exit 1
 
 #*** generate and upload bundle
 cd $curdir
