@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CONFIG=$HOME/.bundle/bundle_config
+CONFIG=$HOME/.bundle/bundle_config.sh
 echo "testing bundle scripts - building test bunde"
 if [ -e $CONFIG ]; then
   source  $CONFIG
