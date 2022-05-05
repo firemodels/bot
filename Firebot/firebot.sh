@@ -1742,6 +1742,16 @@ email_build_status()
      fi
    fi
    echo "-------------------------------" >> $TIME_LOG
+   if [ -e output/timing_summary ]; then
+     cat output/timing_suummary           >> $TIME_LOG
+     echo "-------------------------------" >> $TIME_LOG
+   fi
+   if [ -e output/timing_errors ]; then
+      echo ***warning: cases with increased CPU run-times > 200%" >> $TIME_LOG
+      cat timing_errors  | awk -F',' '{print $1,$3,"-->",$4}'     >> $TIME_LOG
+   fi
+   echo "-------------------------------"                         >> $TIME_LOG
+   fi
 
 #  upload guides to a google drive directory
    get_firebot_success

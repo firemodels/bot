@@ -26,7 +26,7 @@ done
 shift $(($OPTIND-1))
 
 cd $SCRIPTDIR
-./compare_fds_timings.sh
+./compare_fds_timings.sh -o $FIREBOTDIR/output
 cd $CURDIR
 
 cat << EOF

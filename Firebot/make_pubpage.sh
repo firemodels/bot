@@ -83,6 +83,15 @@ SLOWSIZE=`grep slower  $SCRIPTDIR/fds_timing_summary | awk -F',' '{print $3}'`
 ALLCOUNT=`grep total $SCRIPTDIR/fds_timing_summary | awk -F',' '{print $2}'`
 ALLSIZE=`grep total  $SCRIPTDIR/fds_timing_summary | awk -F',' '{print $3}'`
 
+cat << EOF > output/timing_summary
+Base: $BASE_TIMEREV
+Current: $CURENT_TIMEREV
+
+slower(count/time): $SLOWCOUNT, $SLOWSIZE s
+faster(count/time): $FASTCOUNT, $FASTSIZE s
+  total(count/ime): $ALLCOUNT, $ALLSIZE s
+EOF
+
 cat << EOF
 <h3>Timing History</h3>
 

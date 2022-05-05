@@ -15,9 +15,8 @@ echo "-a file - file containing 'after' fds case times [default: $after]"
 echo "-A dir - directory containing 'after' timing file [default: $afterdir]"
 echo "-b file - file containing 'before' fds case times [default: $before]"
 echo "-B dir - directory containing 'before' timing file [default: $beforedir]"
-echo "-d file - file containing relative time differences [default: $differences]"
-echo "-s file - file containing time difference summary [default: $summary]"
 echo "-h - display this message"
+echo "-o dir  - directory containing output [default: $OUTPUT]"
 exit 0
 }
 
@@ -28,6 +27,7 @@ CURDIR=`pwd`
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 cd $SCRIPTDIR
 SCRIPTDIR=`pwd`
+OUTPUT=$SCRIPTDIR
 
 cd $CURDIR
 fdsrepo=../../fds
@@ -47,12 +47,10 @@ before=base_times.csv
 afterdir=~firebot/.firebot/history
 after=`ls -rtlm $afterdir/*timing*csv | grep -v bench | tail -1 | awk -F',' '{print $1}'`
 after=`basename $after`
-differences=fds_timing_diffs
-summary=fds_timing_summary
 
 #*** parse options
 
-while getopts 'a:A:b:B:d:hs:' OPTION
+while getopts 'a:A:b:B:d:ho:s:' OPTION
 do
 case $OPTION  in
   a)
@@ -67,11 +65,8 @@ case $OPTION  in
   B)
    beforedir="$OPTARG"
    ;;
-  d)
-   differences="$OPTARG"
-   ;;
-  s)
-   summary="$OPTARG"
+  o)
+   OUTPUT="$OPTARG"
    ;;
   h)
    usage;
@@ -80,12 +75,17 @@ esac
 done
 shift $(($OPTIND-1))
 
+TIMING_ERRORS=$OUTPUT/timing_errors
+DIFFERENCES=$OUTPUT/fds_timing_diffs
+SUMMARY=$OUTPUT/fds_timing_summary
+
 botrepo=../../bot
 cd $botrepo
 botrepo=`pwd`
 cd $CURDIR
-rm -f $differences
-rm -f $summary
+rm -f $DIFFERENCES
+rm -f $SUMMARY
+rm -f $TIMING_ERRORS
 
 cat $beforedir/$before | head -n -2 | awk -F ',' '{if (NR!=1)  {print($1) }}' > $filelist
 
@@ -107,7 +107,10 @@ for file in `cat $filelist`; do
   time_diff=`echo "$time_after - $time_before" | bc`
   if [ $bigger_than -eq 1 ]; then
     rel_time_diff=`echo "100.0*$time_diff / $time_before" | bc`
-    echo $rel_time_diff >> $differences
+    if [ $rel_time_diff -gt 200 ]; then
+        echo $file,$rel_time_diff,$time_before,$time_after >> $TIMING_ERRORS
+    fi
+    echo $rel_time_diff >> $DIFFERENCES
     got_smaller=$((`echo "$time_before > $time_after"| bc`))
     if [ $got_smaller -eq 1 ]; then
       files_down=$((files_down+1))
@@ -128,10 +131,10 @@ else
 fi
 after_rev=`echo $after   | awk -F'_' '{print $1}'`
 
-echo "faster,$files_down,$time_down"  >  $SCRIPTDIR/$summary
-echo "slower,$files_up,$time_up"      >> $SCRIPTDIR/$summary   
-echo "total,$files_total,$time_total" >> $SCRIPTDIR/$summary
-echo "base,$before_rev"               >> $SCRIPTDIR/$summary
-echo "current,$after_rev"             >> $SCRIPTDIR/$summary
+echo "faster,$files_down,$time_down"  >  $SUMMARY
+echo "slower,$files_up,$time_up"      >> $SUMMARY
+echo "total,$files_total,$time_total" >> $SUMMARY
+echo "base,$before_rev"               >> $SUMMARY
+echo "current,$after_rev"             >> $SUMMARY
 
 rm $filelist
