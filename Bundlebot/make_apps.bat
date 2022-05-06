@@ -45,7 +45,7 @@ call setup_intel_compilers.bat 1>> %compile_log% 2>&1
 timeout /t 30 > Nul
 
 :: build fds apps
-call :BUILDUTIL fds2ascii intel_win_64 win_64
+call :BUILDUTIL fds2ascii intel_win
 call :BUILDUTIL test_mpi  impi_intel_win
 call :BUILDFDS
 
@@ -62,8 +62,8 @@ call :BUILD     get_time
 call :BUILDSMV
 
 :: verify fds apps were built
-call :CHECK_BUILDUTIL fds2ascii intel_win_64 _win_64
-call :CHECK_BUILDUTIL test_mpi  impi_intel_win
+call :CHECK_BUILDUTIL    fds2ascii intel_win
+call :CHECK_BUILDTESTMPI  
 call :CHECK_BUILDFDS
 call :CHECK_BUILDFDSOPENMP
 
@@ -98,6 +98,7 @@ echo ***building fds 1>> %compile_log% 2>&1
 cd %fdsrepo%\Build\impi_intel_win
 call make_fds bot 1>> %compile_log% 2>&1
 
+echo ***building fds openmp
 echo ***building fds openmp 1>> %compile_log% 2>&1
 cd %fdsrepo%\Build\impi_intel_win_openmp
 call make_fds bot 1>> %compile_log% 2>&1
@@ -107,7 +108,7 @@ exit /b /0
  :CHECK_BUILDFDS
 :: -------------------------------------------------------------
 
-if NOT exist %fdsrepo%\Build\impi_intel_win\fds_impi_win.exe goto check_fds
+if NOT exist %fdsrepo%\Build\impi_intel_win\fds_impi_intel_win.exe goto check_fds
 exit /b /0
 :check_fds
 echo ***error: The program fds_impi_win.exe failed to build
@@ -118,7 +119,7 @@ exit /b /1
  :CHECK_BUILDFDSOPENMP
 :: -------------------------------------------------------------
 
-if NOT exist %fdsrepo%\Build\impi_intel_win_openmp\fds_impi_win_openmp.exe goto check_fds
+if NOT exist %fdsrepo%\Build\impi_intel_win_openmp\fds_impi_intel_win_openmp.exe goto check_fds
 exit /b /0
 :check_fds
 echo ***error: The program fds_impi_win_openmp.exe failed to build
@@ -141,6 +142,19 @@ call make_%prog% bot 1>> %compile_log% 2>&1
 exit /b /0
 
 :: -------------------------------------------------------------
+ :CHECK_BUILDTESTMPI
+:: -------------------------------------------------------------
+
+
+if NOT exist %fdsrepo%\Utilities\test_mpi\impi_intel_win\test_mpi.exe goto check_util
+exit /b /0
+:check_util
+echo ***error: The program test_mpi.exe failed to build
+echo ***error: The program test_mpi.exe failed to build  1>> %error_log% 2>&1
+set error=1
+exit /b /1
+
+:: -------------------------------------------------------------
  :CHECK_BUILDUTIL
 :: -------------------------------------------------------------
 
@@ -148,11 +162,11 @@ set prog=%1
 set builddir=%2
 set suffix=%3
 
-if NOT exist %fdsrepo%\Utilities\%prog%\%builddir%\%prog%%suffix%.exe goto check_util
+if NOT exist %fdsrepo%\Utilities\%prog%\%builddir%\%prog%_%builddir%.exe goto check_util
 exit /b /0
 :check_util
-echo ***error: The program %prog%%suffix%.exe failed to build
-echo ***error: The program %prog%%suffix%.exe failed to build  1>> %error_log% 2>&1
+echo ***error: The program %prog%_%builddir%.exe failed to build
+echo ***error: The program %prog%_%builddir%.exe failed to build  1>> %error_log% 2>&1
 set error=1
 exit /b /1
 

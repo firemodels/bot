@@ -393,6 +393,9 @@ compile_fds_mpi_db()
 {
   local FDSDIR=$1
   local MPTYPE=$2
+  if [ "$MPTYPE" != "" ]; then
+    MPTYPE="_$MPTYPE"
+  fi
    # Clean and compile FDS MPI debug
    echo "      MPI $MPTYPE Intel debug"
    cd $FDSDIR
@@ -409,29 +412,32 @@ check_compile_fds_mpi_db()
   local FDSDIR=$1
   local FDSEXE=$2
   local MPTYPE=$3
+  if [ "$MPTYPE" != "" ]; then
+    MPTYPE="_$MPTYPE"
+  fi
    # Check for errors in FDS MPI debug compilation
-   cd $FDSDIR
-   if [ -e $FDSEXE ]
-   then
-      FDS_debug_success=true
-   else
-      echo "Errors from Stage 2b$MPTYPE - Compile FDS MPI$MPTYPE debug:"   >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage2b${MPTYPE}                                     >> $ERROR_LOG
-      echo ""                                                              >> $ERROR_LOG
-   fi
+  cd $FDSDIR
+  if [ -e $FDSEXE ]
+  then
+     FDS_debug_success=true
+  else
+     echo "Errors from Stage 2b$MPTYPE - Compile FDS MPI$MPTYPE debug:"   >> $ERROR_LOG
+     cat $OUTPUT_DIR/stage2b${MPTYPE}                                     >> $ERROR_LOG
+     echo ""                                                              >> $ERROR_LOG
+  fi
 
  
   # Check for compiler warnings/remarks
    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-   if [[ `grep -E -i 'warning|remark' $OUTPUT_DIR/stage2b${MPTYPE} | grep -v mpiifort | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented'` == "" ]]
-   then
+  if [[ `grep -E -i 'warning|remark' $OUTPUT_DIR/stage2b${MPTYPE} | grep -v mpiifort | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented'` == "" ]]
+  then
       # Continue along
       :
-   else
-      echo "Warnings from Stage 2b - Compile FDS MPI debug:" >> $WARNING_LOG
-      grep -A 5 -E -i 'warning|remark' $OUTPUT_DIR/stage2b${MPTYPE} | grep -v mpiifort | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
-      echo "" >> $WARNING_LOG
-   fi
+  else
+     echo "Warnings from Stage 2b - Compile FDS MPI debug:" >> $WARNING_LOG
+     grep -A 5 -E -i 'warning|remark' $OUTPUT_DIR/stage2b${MPTYPE} | grep -v mpiifort | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
+     echo "" >> $WARNING_LOG
+  fi
 }
 
 #---------------------------------------------
@@ -577,6 +583,9 @@ compile_fds_mpi()
    # Clean and compile FDS MPI
   local FDSDIR=$1
   local MPTYPE=$2
+  if [ "$MPTYPE" != "" ]; then
+    MPTYPE="_$MPTYPE"
+  fi
   echo "      MPI $MPTYPE Intel release"
   cd $FDSDIR
   make -f ../makefile clean &> /dev/null
@@ -1732,7 +1741,16 @@ email_build_status()
        echo " image errors/changes: $NUM_ERRORS/$NUM_CHANGES"  >> $TIME_LOG
      fi
    fi
-   echo "-------------------------------" >> $TIME_LOG
+   echo "-------------------------------"    >> $TIME_LOG
+   if [ -e output/timing_summary ]; then
+     cat output/timing_suummary              >> $TIME_LOG
+     echo "-------------------------------"  >> $TIME_LOG
+   fi
+   if [ -e output/timing_errors ]; then
+      echo "***warning: cases with increased CPU run-times > 200%" >> $TIME_LOG
+      cat timing_errors  | awk -F',' '{print $1,$3,"-->",$4}'      >> $TIME_LOG
+      echo "-------------------------------"                       >> $TIME_LOG
+   fi
 
 #  upload guides to a google drive directory
    get_firebot_success
@@ -1926,7 +1944,7 @@ SMV_TAG=
 VALIDATION=
 CHECK_CLUSTER=
 OPENMPTEST=1
-MPI_TYPE=mpi
+MPI_TYPE=ompi
 
 #*** parse command line arguments
 while getopts 'b:BcCdDJm:Mp:q:R:sTuUV:x:X:y:Y:w:W:' OPTION
