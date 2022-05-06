@@ -1747,8 +1747,8 @@ email_build_status()
      echo "-------------------------------"  >> $TIME_LOG
    fi
    if [ -e output/timing_errors ]; then
-      echo "***warning: cases with increased CPU run-times > 200%" >> $TIME_LOG
-      cat timing_errors  | awk -F',' '{print $1,$3,"-->",$4}'      >> $TIME_LOG
+      echo "***Warning: the following cases increased run-time more than 200%" >> $TIME_LOG
+      cat output/timing_errors  | awk -F',' '{print $1,$3,"-->",$4}'      >> $TIME_LOG
       echo "-------------------------------"                       >> $TIME_LOG
    fi
 
