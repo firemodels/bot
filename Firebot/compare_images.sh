@@ -2,8 +2,13 @@
 BASE_DIR=$1
 NEW_DIR=$2
 DIFF_DIR=$3
+ERROR_DIR=$4
 
 CURDIR=`pwd`
+
+if [ ! -e $ERROR_DIR ] then
+  mkdir $ERROR_DIR
+fi
 
 BASEDIR=`basename $CURDIR`
 if [ "$BASEDIR" == "Firebot" ]; then
@@ -167,6 +172,10 @@ echo Comparing images in directories:
 echo "  $BASE_DIR/$SUBDIR "
 echo "  $NEW_DIR/$SUBDIR"
 echo ""
+
+ERROR_SUBDIR=$ERROR_DIR/$SUBDIR
+rm -r -f $ERROR_SUBDIR
+mkdir $ERROR_SUBDIR
 DIFFS=0
 IMAGE_ERRORS=0
 rm -f $NEW_DIR/$SUBDIR/blur*.png
@@ -214,6 +223,7 @@ for f in $NEW_DIR/$SUBDIR/*.png; do
         echo "***$FYI: The image $base has changed. $METRIC error=$diff > $TOLERANCE"
         touch $diff_file_changed
         IMAGE_ERRORS=$((IMAGE_ERRORS + 1))
+        cp $base $ERROR_SUBDIR/.
       fi
     fi
     if [[ "$diff" != "0" ]]; then
