@@ -74,7 +74,7 @@ ls -tl *.txt | grep -v compiler | grep -v warning | grep -v error | awk '{system
 cd $CURDIR
 
 BASE_TIMEREV=`grep   base    output/fds_timing_summary | awk -F',' '{print $2}'`
-CURENT_TIMEREV=`grep current output/fds_timing_summary | awk -F',' '{print $2}'`
+CURRENT_TIMEREV=`grep current output/fds_timing_summary | awk -F',' '{print $2}'`
 
 FASTCOUNT=`grep faster       output/fds_timing_summary | awk -F',' '{print $2}'`
 FASTSIZE=`grep faster        output/fds_timing_summary | awk -F',' '{print $3}'`
@@ -85,7 +85,7 @@ ALLSIZE=`grep total          output/fds_timing_summary | awk -F',' '{print $3}'`
 
 cat << EOF > output/timing_summary
 Base: $BASE_TIMEREV
-Current: $CURENT_TIMEREV
+Current: $CURRENT_TIMEREV
 
 slower(count/time): $SLOWCOUNT, $SLOWSIZE s
 faster(count/time): $FASTCOUNT, $FASTSIZE s
@@ -93,15 +93,14 @@ faster(count/time): $FASTCOUNT, $FASTSIZE s
 EOF
 
 cat << EOF
-<h3>Timing History</h3>
+<h3>Time History</h3>
 
 <div id="curve_chart" style="width: 500px; height: 300px"></div>
 Mean: $MEAN s <br>
-Standard deviation: $STDDEV s ($STDDEV_PERCEN %) <br>
 
-<h3>Relative CPU Time Difference Distribution</h3>
+<h3>Time Differences</h3>
 <p>Base: $BASE_TIMEREV<br>
-Current: $CURENT_TIMEREV<br>
+Current: $CURRENT_TIMEREV<br>
 
 <table border=on>
 <caption>Run Time Changes <br>(Run Times > 60 s)</caption>
