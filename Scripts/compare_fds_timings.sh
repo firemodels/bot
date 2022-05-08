@@ -99,11 +99,13 @@ for file in `cat $filelist`; do
   if [ "$line_after" == "" ]; then
     continue
   fi
-#  time_before=`echo $line_before | awk -F',' '{print $3}' | printf "%.12f"`
-  time_before=`echo $line_before | awk -F',' '{print $2}'`
+  time_before=`echo $line_before | awk -F',' '{print $3}'`
+  time_before=$(printf "%.14f" $time_before)
+  time_before=`echo $time_before | sed 's/\.*00*$//'`
   bigger_than=$((`echo "$time_before > 60.0"| bc`))
-#  time_after=`echo $line_after |   awk -F',' '{print $3}' | printf "%.12f"`
-  time_after=`echo $line_after |   awk -F',' '{print $2}'`
+  time_after=`echo $line_after |   awk -F',' '{print $3}'`
+  time_after=$(printf "%.14f" $time_after)
+  time_after=`echo $time_after | sed 's/\.*00*$//'`
   time_diff=`echo "$time_after - $time_before" | bc`
   if [ $bigger_than -eq 1 ]; then
     rel_time_diff=`echo "100.0*$time_diff / $time_before" | bc`
