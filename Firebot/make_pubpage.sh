@@ -73,15 +73,15 @@ ls -tl *.txt | grep -v compiler | grep -v warning | grep -v error | awk '{system
                           }' 
 cd $CURDIR
 
-BASE_TIMEREV=`grep   base    $SCRIPTDIR/fds_timing_summary | awk -F',' '{print $2}'`
-CURENT_TIMEREV=`grep current $SCRIPTDIR/fds_timing_summary | awk -F',' '{print $2}'`
+BASE_TIMEREV=`grep   base    output/fds_timing_summary | awk -F',' '{print $2}'`
+CURENT_TIMEREV=`grep current output/fds_timing_summary | awk -F',' '{print $2}'`
 
-FASTCOUNT=`grep faster $SCRIPTDIR/fds_timing_summary | awk -F',' '{print $2}'`
-FASTSIZE=`grep faster  $SCRIPTDIR/fds_timing_summary | awk -F',' '{print $3}'`
-SLOWCOUNT=`grep slower $SCRIPTDIR/fds_timing_summary | awk -F',' '{print $2}'`
-SLOWSIZE=`grep slower  $SCRIPTDIR/fds_timing_summary | awk -F',' '{print $3}'`
-ALLCOUNT=`grep total $SCRIPTDIR/fds_timing_summary | awk -F',' '{print $2}'`
-ALLSIZE=`grep total  $SCRIPTDIR/fds_timing_summary | awk -F',' '{print $3}'`
+FASTCOUNT=`grep faster       output/fds_timing_summary | awk -F',' '{print $2}'`
+FASTSIZE=`grep faster        output/fds_timing_summary | awk -F',' '{print $3}'`
+SLOWCOUNT=`grep slower       output/fds_timing_summary | awk -F',' '{print $2}'`
+SLOWSIZE=`grep slower        output/fds_timing_summary | awk -F',' '{print $3}'`
+ALLCOUNT=`grep total         output/fds_timing_summary | awk -F',' '{print $2}'`
+ALLSIZE=`grep total          output/fds_timing_summary | awk -F',' '{print $3}'`
 
 cat << EOF > output/timing_summary
 Base: $BASE_TIMEREV
