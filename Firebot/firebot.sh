@@ -1648,7 +1648,7 @@ make_fds_summary()
 
     CURDIR=`pwd`
     cd $botrepo/Firebot
-    ./compare_images.sh $figrepo/compare/firebot/images $FDS_SUMMARY_DIR/images $FDS_SUMMARY_DIR/diffs/images >& $OUTPUT_DIR/stage8_image_compare
+    ./compare_images.sh $figrepo/compare/firebot/images $FDS_SUMMARY_DIR/images $FDS_SUMMARY_DIR/diffs/images $OUTPUT_DIR/error_images >& $OUTPUT_DIR/stage8_image_compare
 
 # look for fyis
     if [[ `grep '***fyi:' $OUTPUT_DIR/stage8_image_compare` == "" ]]
@@ -1747,8 +1747,8 @@ email_build_status()
      echo "-------------------------------"  >> $TIME_LOG
    fi
    if [ -e output/timing_errors ]; then
-      echo "***warning: cases with increased CPU run-times > 200%" >> $TIME_LOG
-      cat timing_errors  | awk -F',' '{print $1,$3,"-->",$4}'      >> $TIME_LOG
+      echo "***Warning: the following cases increased run-time more than 200%" >> $TIME_LOG
+      cat output/timing_errors  | awk -F',' '{print $1,$3,"-->",$4}'      >> $TIME_LOG
       echo "-------------------------------"                       >> $TIME_LOG
    fi
 
