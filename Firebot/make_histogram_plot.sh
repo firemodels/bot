@@ -8,8 +8,7 @@ cd $FIREBOTDIR/../Scripts
 SCRIPTDIR=`pwd`
 cd $CURDIR
 
-timefile=$SCRIPTDIR/fds_timing_diffs
-summaryfile=$SCRIPTDIR/fds_timing_diffs
+timefile=$FIREBOTDIR/output/fds_timing_diffs
 
 while getopts 'f:s' OPTION
 do

@@ -40,8 +40,6 @@ if NOT "%platform%" == "Windows" goto endif1
     cd %svn_root%\smv\Build\%%x\intel_win_64
     start "building windows %%x" make_%%x
   ) 
-    cd %svn_root%\fds\Utilities\fds2ascii\intel_win_64
-    start "building windows fds2ascii" make_fds2ascii
   ) 
 ::  call :not_built
   goto eof
