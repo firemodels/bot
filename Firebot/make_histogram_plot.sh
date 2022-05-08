@@ -50,6 +50,8 @@ cat << EOF
           colors: ['black'],
           pointSize: 5,
           hAxis:{ title: 'relative CPU time difference (%)'},
+          vAxis: { scaleType: 'mirrorLog' },
+          histogram: { lastBucketPercentile: 5 }
         };
         options.legend = 'none';
 
