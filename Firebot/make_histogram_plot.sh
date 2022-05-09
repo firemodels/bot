@@ -48,9 +48,10 @@ cat << EOF
           legend: { position: 'right' },
           colors: ['black'],
           pointSize: 5,
-          hAxis:{ title: 'relative CPU time difference (%)'},
+          hAxis:{ title: 'relative time difference (%)'},
           vAxis: { scaleType: 'mirrorLog' },
-          histogram: { lastBucketPercentile: 5 }
+          histogram: { lastBucketPercentile: 1 },
+          histogram: { bucketSize: 25 }
         };
         options.legend = 'none';
 
