@@ -1747,9 +1747,9 @@ email_build_status()
      echo "-------------------------------"  >> $TIME_LOG
    fi
    if [ -e output/timing_errors ]; then
-      echo "***Warning: the following cases increased run-time more than 200%" >> $TIME_LOG
-      cat output/timing_errors  | awk -F',' '{print $1,$3,"-->",$4}'      >> $TIME_LOG
-      echo "-------------------------------"                       >> $TIME_LOG
+      echo "***Warning: cases with > 200% increased run-time"        >> $TIME_LOG
+      cat output/timing_errors  | awk -F',' '{print $1,$3,"-->",$4}' >> $TIME_LOG
+      echo "-------------------------------"                         >> $TIME_LOG
    fi
 
 #  upload guides to a google drive directory
