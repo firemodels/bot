@@ -1743,7 +1743,7 @@ email_build_status()
    fi
    echo "-------------------------------"    >> $TIME_LOG
    if [ -e output/timing_summary ]; then
-     cat output/timing_suummary              >> $TIME_LOG
+     cat output/timing_summary               >> $TIME_LOG
      echo "-------------------------------"  >> $TIME_LOG
    fi
    if [ -e output/timing_errors ]; then
