@@ -250,13 +250,8 @@ Button(root, text="Bundle/Install", width=button_width,  fg='white', bg='blue', 
 
 R=R+1
 Button(root, text="Set Bundle Rev",   width=button_width, command=set_revision).grid(row=R, column=0)
-
-R=R+1
-Label(root, text="-----BUNDLE --> Google Drive/cluster-----").grid(column=0, row=R, columnspan=3)
-
-R=R+1
-Button(root, text="Upload --> G.D.",  width=button_width, command=upload_bundle).grid(row=R, column=0)
-Button(root, text="Copy --> cluster", width=button_width+1, command=archive_smv).grid(row=R,   column=1)
+Button(root, text="Upload --> G.D.",  width=button_width, command=upload_bundle).grid(row=R, column=1)
+Button(root, text="Set LNX/OSX", width=button_width+1, command=archive_smv).grid(row=R,   column=2)
 
 # ------------------------- get figures ------------------------------
 
