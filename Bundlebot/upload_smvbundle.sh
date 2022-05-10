@@ -14,15 +14,18 @@ if [ ! -e $GDRIVE ] ; then
   echo "***error: the program $GDRIVE used to upload files to google drive does not exist"
   exit
 fi
+if [ ! -e $HOME/$FROM_DIR/$FROM_FILE ] ; then
+  echo "***error: $FROM_FILE does not exist in $HOME/$FROM_DIR"
+  exit
+fi
 
 $GDRIVE list  | grep ^SMV | grep $PLATFORM | awk '{ system("~/bin/gdrive delete -i " $1)} '
-echo ""
-echo "***uploading $FROM_FILE"
-echo ""
-$GDRIVE upload -p $GOOGLE_ID -f $FROM_DIR/$FROM_FILE
+echo "***uploading $FROM_FILE to Google Drive"
+$GDRIVE upload -p $GOOGLE_ID -f $HOME/$FROM_DIR/$FROM_FILE >& /dev/null
 nfiles=`$GDRIVE list  | grep $FROM_FILE | wc -l`
 if [ $nfiles -eq 0 ]; then
   echo "*** warning: The file $FROM_FILE failed to upload to google drive"
 else
   echo "$FROM_FILE uploaded."
 fi
+echo ""
