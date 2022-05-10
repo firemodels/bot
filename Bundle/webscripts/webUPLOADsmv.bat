@@ -23,12 +23,12 @@ set uploaddir=%userprofile%\.bundle\uploads
 set CURDIR=%CD%
 
 
-call :uploadfile %uploaddir% %smv_revision%_win.exe    win
-call :uploadfile %uploaddir% %smv_revision%_win.sha1   win
-call :uploadfile %uploaddir% %smv_revision%_lnx.sh     lnx
-call :uploadfile %uploaddir% %smv_revision%_lnx.sha1   lnx
-call :uploadfile %uploaddir% %smv_revision%_osx.sh     osx
-call :uploadfile %uploaddir% %smv_revision%_osx.sha1   osx
+call :uploadfile %uploaddir% %smv_revision%_win.exe    win exe
+call :uploadfile %uploaddir% %smv_revision%_win.sha1   win sha1
+call :uploadfile %uploaddir% %smv_revision%_lnx.sh     lnx sh
+call :uploadfile %uploaddir% %smv_revision%_lnx.sha1   lnx sha1
+call :uploadfile %uploaddir% %smv_revision%_osx.sh     osx sh
+call :uploadfile %uploaddir% %smv_revision%_osx.sha1   osx sha1
 
 echo.
 echo upload complete
@@ -42,6 +42,7 @@ goto eof
 set FROMDIR=%1
 set FROMFILE=%2
 set PLATFORM=%3
+set EXT=%4
 
 if exist %FROMDIR%\%FROMFILE% goto else1
     echo "***error: %FROMFILE% was not found in %FROMDIR%"
@@ -50,7 +51,7 @@ if exist %FROMDIR%\%FROMFILE% goto else1
     cd %FROMDIR%
     echo uploading %FROMFILE% to %linux_hostname%
     pscp -P 22 %FROMFILE%    %linux_hostname%:.bundle/bundles/.
-    plink %plink_options% %linux_logon%  %linux_svn_root%/bot/Bundlebot/upload_smvbundle.sh .bundle/bundles %FROMFILE% %PLATFORM%
+    plink %plink_options% %linux_logon%  %linux_svn_root%/bot/Bundlebot/upload_smvbundle.sh .bundle/bundles %FROMFILE% %PLATFORM% %EXT%
 :endif1
 exit /b
 
