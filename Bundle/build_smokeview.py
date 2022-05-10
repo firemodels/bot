@@ -74,8 +74,7 @@ def bundle_install_smv():          os.system("start " + webscript_dir + "webPACK
 def download_figures():            os.system("start " + webscript_dir + "webGETfigs "       + apps[app.get()]                 + " " + guides[guide.get()] )
  
 def archive_smv():                 os.system("start " + webscript_dir + "webARCHIVEAllbundle"  )
-def upload_bundle():               os.system("start " + webscript_dir + "webUPLOADsmv2git")
-def copy_bundle():                 os.system("start " + webscript_dir + "webCOPYsmv")
+def upload_bundle():               os.system("start " + webscript_dir + "webUPLOADsmv")
 
 def webCOPYhome2config():          os.system("start " + webscript_dir + "webCOPYhome2config")
 def webCOPYconfig2home():          os.system("start " + webscript_dir + "webCOPYconfig2home")
@@ -256,9 +255,8 @@ R=R+1
 Label(root, text="-----BUNDLE --> Google Drive/cluster-----").grid(column=0, row=R, columnspan=3)
 
 R=R+1
-Button(root, text="Copy --> G.D.",    width=button_width, command=copy_bundle).grid(row=R,   column=0)
-Button(root, text="Upload --> G.D.",  width=button_width, command=upload_bundle).grid(row=R, column=1)
-Button(root, text="Copy --> cluster", width=button_width+1, command=archive_smv).grid(row=R,   column=2)
+Button(root, text="Upload --> G.D.",  width=button_width, command=upload_bundle).grid(row=R, column=0)
+Button(root, text="Copy --> cluster", width=button_width+1, command=archive_smv).grid(row=R,   column=1)
 
 # ------------------------- get figures ------------------------------
 
