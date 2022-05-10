@@ -2,6 +2,7 @@
 FROM_DIR=$1
 FROM_FILE=$2
 PLATFORM=$3
+EXT=$4
 
 scriptdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
@@ -19,7 +20,7 @@ if [ ! -e $HOME/$FROM_DIR/$FROM_FILE ] ; then
   exit
 fi
 
-$GDRIVE list  | grep ^SMV | grep $PLATFORM | awk '{ system("~/bin/gdrive delete -i " $1)} '
+$GDRIVE list  | grep $PLATFORM | grep $EXT | awk '$2 ~ /^SMV/ { system("~/bin/gdrive delete -i " $1)} '
 echo "***uploading $FROM_FILE to Google Drive"
 $GDRIVE upload -p $GOOGLE_ID -f $HOME/$FROM_DIR/$FROM_FILE >& /dev/null
 nfiles=`$GDRIVE list  | grep $FROM_FILE | wc -l`
