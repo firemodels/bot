@@ -205,7 +205,7 @@ Button(root, text="Win test inc",    width=button_width, command=build_smv_win_i
 Button(root, text="test debug",    width=button_width, command=build_smv_win_deb).grid(row=R, column=2)
 
 R=R+1
-Label(root, text="--------------BUNDLE/INSTALL-------------").grid(column=0, row=R, columnspan=3)
+Label(root, text="----------BUNDLE/INSTALL/UPLOAD----------").grid(column=0, row=R, columnspan=3)
 
 R=R+1
 
@@ -226,8 +226,6 @@ Radiobutton(root,
                padx = 0, 
                variable=bundleplatform, 
                value=3).grid(row=R, column=2)
-
-# ------------------------- bundle ------------------------------
 
 R=R+1
 
@@ -250,8 +248,8 @@ Button(root, text="Bundle/Install", width=button_width,  fg='white', bg='blue', 
 
 R=R+1
 Button(root, text="Set Bundle Rev",   width=button_width, command=set_revision).grid(row=R, column=0)
-Button(root, text="Upload --> G.D.",  width=button_width, command=upload_bundle).grid(row=R, column=1)
-Button(root, text="Set LNX/OSX", width=button_width+1, command=archive_smv).grid(row=R,   column=2)
+Button(root, text="Upload --> G.D.",  width=button_width+1, command=upload_bundle).grid(row=R, column=1)
+Button(root, text="LNX/OSX shortcuts", width=button_width+4, command=archive_smv).grid(row=R,   column=2)
 
 # ------------------------- get figures ------------------------------
 
