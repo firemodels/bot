@@ -22,6 +22,7 @@ call %envfile%
 set uploaddir=%userprofile%\.bundle\uploads
 set CURDIR=%CD%
 
+start chrome https://drive.google.com/drive/u/0/folders/0B_wB1pJL2bFQc1F4cjJWY2duWTA?resourcekey=0-J_yHat7iJoBp1fk6QS8gMA
 
 call :uploadfile %uploaddir% %smv_revision%_win.exe    win exe
 call :uploadfile %uploaddir% %smv_revision%_win.sha1   win sha1
