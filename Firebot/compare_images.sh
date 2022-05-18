@@ -6,7 +6,7 @@ ERROR_DIR=$4
 
 CURDIR=`pwd`
 
-if [ ! -e $ERROR_DIR ] then
+if [ ! -e $ERROR_DIR ]; then
   mkdir $ERROR_DIR
 fi
 
