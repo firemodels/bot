@@ -79,7 +79,7 @@ echo getting smv repo revision
 cd $FROM_ROOT/smv
 SMV_REVISION=`git describe --dirty --long`
 
-FIG_DIR=$TO_ROOT/fig/compare/$BOT_TYPE/images
+FIG_DIR=$TO_ROOT/fig/$PROG/Reference_Figures
 
 FROM_USER_DIR=$FROM_USER/SCRIPT_FIGURES
 FROM_VER_DIR=$FROM_VER/SCRIPT_FIGURES
