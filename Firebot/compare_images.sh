@@ -79,6 +79,14 @@ if [ "$NEW_DIR" == "" ]; then
   cd $CURDIR
 fi
 
+if [ "$ERROR_DIR" == "" ]; then
+  ERROR_DIR=../../$BOT_SUMMARY/diffs/errors/
+  if [ ! -d $ERROR_DIR ]; then
+    mkdir $ERROR_DIR
+  fi
+  cd $ERROR_DIR
+  ERROR_DIR=`pwd`
+fi
 if [ "$DIFF_DIR" == "" ]; then
   DIFF_DIR=../../$BOT_SUMMARY/diffs/images/
   cd $DIFF_DIR
@@ -110,10 +118,10 @@ cd $CURDIR/../../fig
 FIGREPO=`pwd`
 FIG_REVISION=`git describe --long --dirty`
 
-FIG_USER_FDS_REVISION_FILE=$FIGREPO/compare/$BOT_TYPE/images/user/FDS_REVISION
-FIG_VER_FDS_REVISION_FILE=$FIGREPO/compare/$BOT_TYPE/images/verification/FDS_REVISION
-FIG_USER_SMV_REVISION_FILE=$FIGREPO/compare/$BOT_TYPE/images/user/SMV_REVISION
-FIG_VER_SMV_REVISION_FILE=$FIGREPO/compare/$BOT_TYPE/images/verification/SMV_REVISION
+FIG_USER_FDS_REVISION_FILE=$FIGREPO/compare/$BOT_TYPE/images/FDS_REVISION
+FIG_VER_FDS_REVISION_FILE=$FIGREPO/compare/$BOT_TYPE/images/FDS_REVISION
+FIG_USER_SMV_REVISION_FILE=$FIGREPO/compare/$BOT_TYPE/images/SMV_REVISION
+FIG_VER_SMV_REVISION_FILE=$FIGREPO/compare/$BOT_TYPE/images/SMV_REVISION
 
 FIG_USER_FDS_REVISION=`git describe --dirty --long`
 FIG_USER_SMV_REVISION=
@@ -148,12 +156,8 @@ CHECK_DIR ()
     ABORT=1
   else
     if [ "$CHECKSUB" != "" ]; then
-      if [ ! -d $DIR/user ]; then
-        echo "***error: directory $DIR/user does not exist"
-        ABORT=1
-      fi
-      if [ ! -d $DIR/verification ]; then
-        echo "***error: directory $DIR/verification does not exist"
+      if [ ! -d $DIR ]; then
+        echo "***error: directory $DIR does not exist"
         ABORT=1
       fi
     fi
@@ -169,12 +173,13 @@ FIND_DIFFS ()
 SUBDIR=$1
 echo ""
 echo Comparing images in directories:
-echo "  $BASE_DIR/$SUBDIR "
+echo "  $BASE_DIR "
 echo "  $NEW_DIR/$SUBDIR"
 echo ""
 
 ERROR_SUBDIR=$ERROR_DIR/$SUBDIR
 rm -r -f $ERROR_SUBDIR
+echo `pwd`
 mkdir $ERROR_SUBDIR
 DIFFS=0
 IMAGE_ERRORS=0
