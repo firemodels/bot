@@ -51,7 +51,11 @@ WIDTH_CHANGED=250
 
 CURDIR=`pwd`
 if [ "$BASE_DIR" == "" ]; then
-  BASE_DIR=../../fig/compare/$BOT_TYPE/images/
+  if [ "$BOT_TYPE" == "firebot" ]; then
+    BASE_DIR=../../fig/fds/Reference_Figures
+  else
+    BASE_DIR=../../fig/smv/Reference_Figures
+  fi
   cd $BASE_DIR
   BASE_DIR=`pwd`
 fi
@@ -179,7 +183,6 @@ echo ""
 
 ERROR_SUBDIR=$ERROR_DIR/$SUBDIR
 rm -r -f $ERROR_SUBDIR
-echo `pwd`
 mkdir $ERROR_SUBDIR
 DIFFS=0
 IMAGE_ERRORS=0
@@ -189,8 +192,8 @@ rm -f $file_list
 for f in $NEW_DIR/$SUBDIR/*.png; do
   base=`basename $f`
   blur_base=blur_$base
-  from_file=$BASE_DIR/$SUBDIR/$base
-  blur_from_file=$BASE_DIR/$SUBDIR/$blur_base
+  from_file=$BASE_DIR/$base
+  blur_from_file=$BASE_DIR/$blur_base
   to_file=$NEW_DIR/$SUBDIR/$base
   blur_to_file=$NEW_DIR/$SUBDIR/$blur_base
   diff_file=$DIFF_DIR/$SUBDIR/$base
@@ -228,7 +231,8 @@ for f in $NEW_DIR/$SUBDIR/*.png; do
         echo "***$FYI: The image $base has changed. $METRIC error=$diff > $TOLERANCE"
         touch $diff_file_changed
         IMAGE_ERRORS=$((IMAGE_ERRORS + 1))
-        cp $base $ERROR_SUBDIR/.
+#        cp $base $ERROR_SUBDIR/.
+        cp $f $ERROR_SUBDIR/.
       fi
     fi
     if [[ "$diff" != "0" ]]; then
@@ -373,9 +377,9 @@ EOF
     if [ "$COMPARE" == "1" ]; then
       STYLE="style=\"color:red\""
     fi
-    cp $BASE_DIR/$SUBDIR/$pngfile $SUMMARY_DIR/diffs/base/$SUBDIR/.
-    IMAGE_HEIGHT=`identify -format '%h' $BASE_DIR/$SUBDIR/$pngfile`
-    IMAGE_WIDTH=`identify -format '%w' $BASE_DIR/$SUBDIR/$pngfile`
+    cp $BASE_DIR/$pngfile $SUMMARY_DIR/diffs/base/$SUBDIR/.
+    IMAGE_HEIGHT=`identify -format '%h' $BASE_DIR/$pngfile`
+    IMAGE_WIDTH=`identify -format '%w' $BASE_DIR/$pngfile`
     if [ $IMAGE_HEIGHT -gt $IMAGE_WIDTH ]; then
       SIZE="height=$HEIGHT"
     else
@@ -474,9 +478,9 @@ cat << EOF  > $HTML_DIFF
 <h2>$BOT_TITLE User, Verification Guide Images - $DATE</h2>
 
 <table>
-<tr><th align=left>Current:</th>          <td> $FDS_REVISION              </td><td>$SMV_REVISION</td></tr>
-<tr><th align=left>Base:</th>             <td> $FIG_USER_FDS_REVISION     </td><td>$FIG_USER_SMV_REVISION</td></tr>
-<tr><th align=left>Fig revision:</th>     <td> $FIG_REVISION</tr>
+<tr><th align=left>FDS revision:</th>     <td> $FDS_REVISION              </td></tr>
+<tr><th align=left>SMV revision:</th>     <td> $SMV_REVISION              </td></tr>
+<tr><th align=left>Fig revision:</th>     <td> $FIG_REVISION              </td></tr>
 <tr><th align=left>Root:</th>             <td> $REPO                      </td></tr>
 <tr><th align=left>Metric/Tolerance:</th> <td> ${METRIC_LABEL}/$TOLERANCE </td></tr>
 <tr><th align=left>Differences/Errors:</th>     <td> $HAVE_DIFFS/$HAVE_ERRORS   </td></tr>
