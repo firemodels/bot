@@ -29,7 +29,7 @@ if [ -d $FDS_SUMMARY_DIR ]; then
 # compare images
 
   cd $botrepo/Firebot
-  ./compare_images.sh $figrepo/compare/firebot/images $FDS_SUMMARY_DIR/images $FDS_SUMMARY_DIR/diffs/images |& tee $OUTPUT_DIR/image_compare
+  ./compare_images.sh $figrepo/fds/Reference_Figures $FDS_SUMMARY_DIR/images $FDS_SUMMARY_DIR/diffs/images |& tee $OUTPUT_DIR/image_compare
 
 # look for fyis
   if [[ `grep '***fyi:' $OUTPUT_DIR/image_compare` == "" ]]
@@ -47,7 +47,7 @@ if [ -d $FDS_SUMMARY_DIR ]; then
     # Continue along
     :
   else
-    echo "IMage comparison Warnings:"
+    echo "Image comparison Warnings:"
     grep '***warning:' $OUTPUT_DIR/image_compare
   fi
 else

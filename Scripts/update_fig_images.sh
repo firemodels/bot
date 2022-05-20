@@ -9,7 +9,6 @@ echo "update base images in fig repo"
 echo ""
 echo "Options:"
 echo "-h - display this message"
-echo "-a - update all changed images"
 echo "-r repo_root - repository root [default: $FROM_ROOT]"
 exit 0
 }
@@ -19,16 +18,12 @@ cd ../..
 TO_ROOT=`pwd`
 cd $CURDIR
 FROM_ROOT=$TO_ROOT
-UPDATE_ALL=
 
 #*** parse options
 
-while getopts 'ahr:' OPTION
+while getopts 'hr:' OPTION
 do
 case $OPTION  in
-  a)
-   UPDATE_ALL=1
-   ;;
   h)
    usage;
    ;;
@@ -86,23 +81,18 @@ SMV_REVISION=`git describe --dirty --long`
 
 FIG_DIR=$TO_ROOT/fig/compare/$BOT_TYPE/images
 
-if [ "$UPDATE_ALL" != "" ]; then
-  FROM_USER_DIR=$FROM_USER/SCRIPT_FIGURES
-  FROM_VER_DIR=$FROM_VER/SCRIPT_FIGURES
-else
-  FROM_USER_DIR=$CURDIR/output/error_images/user
-  FROM_VER_DIR=$CURDIR/output/error_images/verification
-fi
+FROM_USER_DIR=$FROM_USER/SCRIPT_FIGURES
+FROM_VER_DIR=$FROM_VER/SCRIPT_FIGURES
 
 #*** copying user user gide images
 if [ -d $FROM_USER_DIR ]; then
-  nfiles=`ls -Al $FROM_USER_DIR | wc -l`
+  nfiles=`ls -Al $FROM_USER_DIR/*.png | wc -l`
   if [ $nfiles -gt 0 ]; then
-    cp $FROM_USER_DIR/*.png $FIG_DIR/user/.
+    cp $FROM_USER_DIR/*.png $FIG_DIR/.
   fi
-  echo $FDS_REVISION > $FIG_DIR/user/FDS_REVISION
-  echo $SMV_REVISION > $FIG_DIR/user/SMV_REVISION
-  echo $nfiles user images copied to $FIG_DIR/verification
+  echo $FDS_REVISION > $FIG_DIR/FDS_REVISION
+  echo $SMV_REVISION > $FIG_DIR/SMV_REVISION
+  echo $nfiles user images copied to $FIG_DIR
 else
   echo ***error: directory $FROM_USER_DIR does not exist
 fi
@@ -110,13 +100,13 @@ fi
 # copying verification guide images
 
 if [ -d $FROM_VER_DIR ]; then
-  nfiles=`ls -Al $FROM_VER_DIR | wc -l`
+  nfiles=`ls -Al $FROM_VER_DIR/*.png | wc -l`
   if [ $nfiles -gt 0 ]; then
-    cp $FROM_VER_DIR/*.png $FIG_DIR/verification/.
+    cp $FROM_VER_DIR/*.png $FIG_DIR/.
   fi
-  echo $FDS_REVISION > $FIG_DIR/verification/FDS_REVISION
-  echo $SMV_REVISION > $FIG_DIR/verification/SMV_REVISION
-  echo $nfiles user images copied to $FIG_DIR/verification
+  echo $FDS_REVISION > $FIG_DIR/FDS_REVISION
+  echo $SMV_REVISION > $FIG_DIR/SMV_REVISION
+  echo $nfiles user images copied to $FIG_DIR
 else
   echo ***error: directory $FROM_VER_DIR does not exist
 fi
