@@ -41,7 +41,7 @@ figrepo=`pwd`
 
 cd $CURDIR
 
-beforedir=$figrepo/compare/firebot/times
+beforedir=$figrepo/fds/Reference_Times
 before=base_times.csv
 
 afterdir=~firebot/.firebot/history
@@ -127,7 +127,7 @@ files_total=`echo "$files_up+$files_down"|bc`
 time_total=`echo "$time_up-$time_down"|bc`
 
 if [ "$before" == "base_times.csv" ]; then
-  before_rev=`cat $figrepo/compare/firebot/times/FDS_REVISION`
+  before_rev=`cat $figrepo/fds/Reference_Times/FDS_REVISION`
 else
   before_rev=`echo $before | awk -F'_' '{print $1}'`
 fi
