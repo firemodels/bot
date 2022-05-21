@@ -16,12 +16,14 @@ if [ "$BASEDIR" == "Firebot" ]; then
   BOT_TYPE=firebot
   BOT_TITLE=FDS
   HOME=
+  PROG=fds
 fi
 if [ "$BASEDIR" == "Smokebot" ]; then
   BOT_SUMMARY=smv/Manuals/SMV_Summary
   BOT_TYPE=smokebot
   BOT_TITLE=Smokeview
   HOME=1
+  PROG=smv
 fi
 if [ "$BOT_SUMMARY" == "" ]; then
   echo "***error: compare_images.sh must be run in the Firebot or Smokebot directory"
@@ -122,10 +124,10 @@ cd $CURDIR/../../fig
 FIGREPO=`pwd`
 FIG_REVISION=`git describe --long --dirty`
 
-FIG_USER_FDS_REVISION_FILE=$FIGREPO/compare/$BOT_TYPE/images/FDS_REVISION
-FIG_VER_FDS_REVISION_FILE=$FIGREPO/compare/$BOT_TYPE/images/FDS_REVISION
-FIG_USER_SMV_REVISION_FILE=$FIGREPO/compare/$BOT_TYPE/images/SMV_REVISION
-FIG_VER_SMV_REVISION_FILE=$FIGREPO/compare/$BOT_TYPE/images/SMV_REVISION
+FIG_USER_FDS_REVISION_FILE=$FIGREPO/$PROG/FDS_REVISION
+FIG_VER_FDS_REVISION_FILE=$FIGREPO/$PROG/FDS_REVISION
+FIG_USER_SMV_REVISION_FILE=$FIGREPO/$PROG/SMV_REVISION
+FIG_VER_SMV_REVISION_FILE=$FIGREPO/$PROG/SMV_REVISION
 
 FIG_USER_FDS_REVISION=`git describe --dirty --long`
 FIG_USER_SMV_REVISION=
