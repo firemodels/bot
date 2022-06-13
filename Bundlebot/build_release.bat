@@ -6,5 +6,5 @@
 ::run_bundlebot -c -R release -F fe0d4ef38 -X FDS6.7.7 -S dce043cd7 -Y SMV6.7.18
 
 :: FDS 6.7.8 and smokeview 6.7.19
-run_bundlebot -c -R release -F 8b2548bcf -X FDS6.7.8 -S dba4189c8 -Y SMV6.7.19
+run_bundlebot -c -R release -F fbf3e11ee -X FDS6.7.8 -S 6d3363037 -Y SMV6.7.19
 
