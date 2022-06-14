@@ -72,7 +72,7 @@ set fds_openmp=fds_openmp
 set fds_non_openmp=fds
 
 set fds=%fds_openmp%
-set openmp_env=-env OMP_THREADS %n_openmp%
+set "openmp_env=-env OMP_NUM_THREADS %n_openmp%"
 
 :: use non-openmp fds if number of threads is 1 and openmp is not being forced
 
