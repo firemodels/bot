@@ -58,6 +58,9 @@ echo ***copying file from %FROMDIR%
 call :copyfile libiomp5md.dll
 
 echo.
+echo ***files copied to %TODIR%
+
+echo.
 echo ***copy complete
 goto eof
 
