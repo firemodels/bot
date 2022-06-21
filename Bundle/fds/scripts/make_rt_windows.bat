@@ -1,5 +1,5 @@
 @echo off
-set INTELDIR=INTELoneapiu4
+set INTELDIR=INTELoneapi1p6
 
 if x%INTELDIR% == x echo error ***error: INTELDIR not defined, edit script to define
 if x%INTELDIR% == x exit /b
@@ -56,6 +56,9 @@ set TODIR=%DIST_INTELDIR%
 echo.
 echo ***copying file from %FROMDIR%
 call :copyfile libiomp5md.dll
+
+echo.
+echo ***files copied to %TODIR%
 
 echo.
 echo ***copy complete
