@@ -1,5 +1,5 @@
 #!/bin/bash
-version=oneapiU4
+version=oneapi1p6
 
 if [ "$version" == "" ]; then
   echo ***error: version undefined, edit $0 to define version
@@ -83,7 +83,7 @@ cd $INTELDIR
 echo
 echo ***creating tar file: $TARROOT
 tar cvf $TARFILE  INTEL >& /dev/null
-echo ***compressing tar file: ${TARROOT}.gz
+echo ***compressing tar file: ${TARROOT}.gz in $TARBASE
 gzip $TARFILE
 echo ***complete
 cd $CURDIR
