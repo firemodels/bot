@@ -1,5 +1,5 @@
 @echo off
-set INTELDIR=INTELoneapiu4
+set INTELDIR=INTELoneapi1p6
 
 if x%INTELDIR% == x echo error ***error: INTELDIR not defined, edit script to define
 if x%INTELDIR% == x exit /b
