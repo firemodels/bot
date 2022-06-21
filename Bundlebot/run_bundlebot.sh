@@ -110,8 +110,8 @@ FIREBOT_HOST=$bundle_hostname
 FIREBOT_HOME=$bundle_firebot_home
 
 MAILTO=
-if [ "$EMAIL" != "" ]; then
-  MAILTO=$EMAIL
+if [ "$BUNDLE_EMAIL" != "" ]; then
+  MAILTO=$BUNDLE_EMAIL
 fi
 FDS_RELEASE=
 SMV_RELEASE=
