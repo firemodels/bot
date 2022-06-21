@@ -22,12 +22,6 @@ echo "-C - use pubs in $HOME/.bundle/manuals on pub_host"
 echo "-X fdstag - when cloning, tag fds repo with fdstag"
 echo "-Y smvtag - when cloning, tag smv repo with smvtag"
 
-FIREBOT_HOST_MSSG=
-if [ "$FIREBOT_HOST" != "" ]; then
-  FIREBOT_HOST_MSSG="[default: $FIREBOT_HOST]"
-fi
-echo "-H host - firebot/smokebot host $FIREBOT_HOST_MSSG"
-
 if [ "$MAILTO" != "" ]; then
   echo "-m mailto - email address [default: $MAILTO]"
 else
@@ -136,7 +130,7 @@ SMV_TAG=
 CUSTOM_PUBS=
 LATEST=
 
-while getopts 'cCfF:hH:Lm:p:rR:S:UvX:Y:' OPTION
+while getopts 'cCfF:hLm:rR:S:UvX:Y:' OPTION
 do
 case $OPTION  in
   c)
@@ -154,17 +148,11 @@ case $OPTION  in
   h)
    usage
    ;;
-  H)
-   FIREBOT_HOST="$OPTARG"
-   ;;
   L)
    LATEST=1
    ;;
   m)
    MAILTO="$OPTARG"
-   ;;
-  p)
-   PUB_HOST="$OPTARG"
    ;;
   r)
    BRANCH=release
@@ -305,4 +293,4 @@ $ECHO ./run_firebot.sh $FORCE -c -C -B $gopt $Gopt $JOPT $FDS_RELEASE $FDS_TAG $
 
 #*** generate and upload bundle
 cd $curdir
-$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH $CUSTOM_PUBS -p $PUB_HOST $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG -w $UPLOAD
+$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH $CUSTOM_PUBS $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG -w $UPLOAD
