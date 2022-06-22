@@ -1,12 +1,5 @@
  #!/bin/bash
 
-if [ "`uname`" == "Darwin" ] ; then
-
-#*** OSX parameters
-
-  export FDS_OPENMPIDIR=/opt/openmpi410_oneapi_64
-fi
-
 #---------------------------------------------
 #                   usage
 #---------------------------------------------
@@ -25,16 +18,9 @@ echo "-F - fds repo hash/release"
 echo "-h - display this message"
 echo "-p host -  host containing pubs"
 echo "           firebot/fds pubs: ~firebot/.firebot/pubs"
-echo "-P parameter_file - file containing bundle settings"
 echo "-C - use pubs in $HOME/.bundle/manuals on pub_host"
 echo "-X fdstag - when cloning, tag fds repo with fdstag"
 echo "-Y smvtag - when cloning, tag smv repo with smvtag"
-
-FIREBOT_HOST_MSSG=
-if [ "$FIREBOT_HOST" != "" ]; then
-  FIREBOT_HOST_MSSG="[default: $FIREBOT_HOST]"
-fi
-echo "-H host - firebot/smokebot host $FIREBOT_HOST_MSSG"
 
 if [ "$MAILTO" != "" ]; then
   echo "-m mailto - email address [default: $MAILTO]"
@@ -124,8 +110,8 @@ FIREBOT_HOST=$bundle_hostname
 FIREBOT_HOME=$bundle_firebot_home
 
 MAILTO=
-if [ "$EMAIL" != "" ]; then
-  MAILTO=$EMAIL
+if [ "$BUNDLE_EMAIL" != "" ]; then
+  MAILTO=$BUNDLE_EMAIL
 fi
 FDS_RELEASE=
 SMV_RELEASE=
@@ -142,10 +128,9 @@ PUB_HOST=$FIREBOT_HOST
 FDS_TAG=
 SMV_TAG=
 CUSTOM_PUBS=
-PARAMETER_FILE=
 LATEST=
 
-while getopts 'cCfF:hH:Lm:p:P:rR:S:UvX:Y:' OPTION
+while getopts 'cCfF:hLm:rR:S:UvX:Y:' OPTION
 do
 case $OPTION  in
   c)
@@ -163,20 +148,11 @@ case $OPTION  in
   h)
    usage
    ;;
-  H)
-   FIREBOT_HOST="$OPTARG"
-   ;;
   L)
    LATEST=1
    ;;
   m)
    MAILTO="$OPTARG"
-   ;;
-  p)
-   PUB_HOST="$OPTARG"
-   ;;
-  P)
-   PARAMETER_FILE="$OPTARG"
    ;;
   r)
    BRANCH=release
@@ -202,14 +178,6 @@ case $OPTION  in
 esac
 done
 shift $(($OPTIND-1))
-
-if [ "$PARAMETER_FILE" != "" ]; then
-  if [ -e $PARAMEER_FILE ]; then
-    source $PARAMETER_FILE
-  else
-    echo "***error: parameter file, $PARAMETER_FILE, does not exist"
-  fi
-fi
 
 # Linux or OSX
 JOPT="-J"
@@ -325,4 +293,4 @@ $ECHO ./run_firebot.sh $FORCE -c -C -B $gopt $Gopt $JOPT $FDS_RELEASE $FDS_TAG $
 
 #*** generate and upload bundle
 cd $curdir
-$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH $CUSTOM_PUBS -p $PUB_HOST $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG -w $UPLOAD
+$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH $CUSTOM_PUBS $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG -w $UPLOAD

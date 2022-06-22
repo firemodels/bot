@@ -3,17 +3,6 @@
 #run time libraries are located in
 #  $HOME/.bundle/BUNDLE/MPI
 
-if [ "`uname`" == "Darwin" ]; then
-#*** OSX parameters
-  intel_mpi_version=oneapiU4
-  mpi_version=4.1.0
-  openmpi_dir=/opt/openmpi410_oneapiU4_64
-else
-#*** Linux parameters
-  intel_mpi_version=oneapiU4
-  mpi_version_linux=INTEL
-fi
-
 if [ "$INTEL_MPI_VERSION" != "" ]; then
   intel_mpi_version=$INTEL_MPI_VERSION
 fi
