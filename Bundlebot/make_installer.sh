@@ -108,7 +108,7 @@ cat << EOF > $INSTALLER
 #!/bin/bash
 
 OVERRIDE=\$1
-INSTALL_LOG=/tmp/fds_install_$$.log
+INSTALL_LOG=/tmp/fds_install_\$\$.log
 echo "" > \$INSTALL_LOG
 echo ""
 echo "Installing $FDS_VERSION and $SMV_VERSION on $ostype2"
