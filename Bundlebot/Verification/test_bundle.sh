@@ -6,7 +6,12 @@ P=$1
 O=$2
 INPUT=$3
 if [ "`uname`" == "Darwin" ]; then
-  mpiexec -n $P fds $INPUT
+  export OMP_NUM_THREADS=$O
+  FDS=fds
+  if [ "$O" != "1" ]; then
+    FDS=fds_openmp
+  fi
+  mpiexec -n $P $FDS $INPUT
 else
   $QFDS -i -o $O -p $P $INPUT
 fi
