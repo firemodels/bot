@@ -1,17 +1,15 @@
 #!/bin/bash
-QFDS="../../../fds/Utilities/Scripts/qfds.sh -j BUN"
 RUN_FDS()
 {
 P=$1
 O=$2
 INPUT=$3
-echo "MPI processes: $P, OpenMP threads: $O"
-#if [ "`uname`" == "Darwin" ]; then
   export OMP_NUM_THREADS=$O
   FDS=fds
   if [ "$O" != "1" ]; then
     FDS=fds_openmp
   fi
+  echo "MPI processes: $P, OpenMP threads: $O program: $FDS"
   mpiexec -n $P $FDS   $INPUT >& ${INPUT}.out
   success=`grep success ${INPUT}.out | wc -l`
   if [ $success -eq 1 ]; then
@@ -19,9 +17,6 @@ echo "MPI processes: $P, OpenMP threads: $O"
   else
     echo "   $INPUT failed"
   fi
-#else
-#  $QFDS -i -o $O -p $P $INPUT >& ${INPUT}.out
-#fi
 }
 
 have_mpiexec=`which mpiexec      | wc -l`
@@ -46,6 +41,7 @@ if [ $have_smokeview -eq 0 ]; then
   error=1
 fi
 if [ "$error" != "" ]; then
+  echo " setup bash environment so FDS and smokeview are in you path"
   exit
 fi
 
@@ -57,31 +53,31 @@ echo "fds_openmp path: `which fds_openmp`"
 echo " smokeview path: `which smokeview`"
 
 echo ""
-echo "Press any key to view fds version info or <CTRL> c to abort."
+echo "***Press any key to view fds version info or <CTRL> c to abort."
 read val
 
 echo "" | fds
 
 echo ""
-echo "Press any key to view fds_openmp version info or <CTRL> c to abort."
+echo "***Press any key to view fds_openmp version info or <CTRL> c to abort."
 read val
 
 echo "" | fds_openmp
 
 echo ""
-echo "Press any key to view smokeview version info or <CTRL> c to abort."
+echo "***Press any key to view smokeview version info or <CTRL> c to abort."
 read val
 
 smokeview -v
 
 echo ""
-echo "Press any key to view mpiexec version info or <CTRL> c to abort."
+echo "***Press any key to view mpiexec version info or <CTRL> c to abort."
 read val
 
-mpiexec | grep Version
+mpiexec -V
 
 echo ""
-echo "Press any key to run test cases or <CTRL> c to abort"
+echo "***Press any key to run test cases or <CTRL> c to abort"
 read val
 
 RUN_FDS 1 1 test01a.fds
