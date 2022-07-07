@@ -1051,9 +1051,9 @@ RUN_TEST_CASES ()
     echo "          test cases not run."
     return 1
   else
-    if [ ! -e $FIREMODELS/fds/Build/impi_intel_linux_64/fds_impi_intel_linux_64 ]; then
+    if [ ! -e $FIREMODELS/fds/Build/impi_intel_linux/fds_impi_intel_linux ]; then
        echo "***error: fds executable not found.  Was expecting it at:"
-       echo "          $FIREMODELS/fds/Build/impi_intel_linux_64/fds_impi_intel_linux_64 ,"
+       echo "          $FIREMODELS/fds/Build/impi_intel_linux/fds_impi_intel_linux ,"
        echo "          test cases not run."
        return 1
     fi
