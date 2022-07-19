@@ -74,7 +74,8 @@ def bundle_install_smv():          os.system("start " + webscript_dir + "webPACK
 def download_figures():            os.system("start " + webscript_dir + "webGETfigs "       + apps[app.get()]                 + " " + guides[guide.get()] )
  
 def archive_smv():                 os.system("start " + webscript_dir + "webARCHIVEAllbundle"  )
-def upload_bundle():               os.system("start " + webscript_dir + "webUPLOADsmv")
+def upload_all_bundles():          os.system("start " + webscript_dir + "webUPLOADAllsmv")
+def upload_win_bundle():           os.system("start " + webscript_dir + "webUPLOADWinsmv")
 
 def webCOPYhome2config():          os.system("start " + webscript_dir + "webCOPYhome2config")
 def webCOPYconfig2home():          os.system("start " + webscript_dir + "webCOPYconfig2home")
@@ -248,8 +249,11 @@ Button(root, text="Bundle/Install", width=button_width,  fg='white', bg='blue', 
 
 R=R+1
 Button(root, text="Set Bundle Rev",   width=button_width, command=set_revision).grid(row=R, column=0)
-Button(root, text="Upload --> G.D.",  width=button_width+1, command=upload_bundle).grid(row=R, column=1)
-Button(root, text="LNX/OSX shortcuts", width=button_width+4, command=archive_smv).grid(row=R,   column=2)
+Button(root, text="LNX/OSX shortcuts", width=button_width+4,    command=archive_smv).grid(row=R,   column=1)
+
+R=R+1
+Button(root, text="Win Bundle->G.D.",  width=button_width+2, command=upload_win_bundle).grid(row=R, column=0)
+Button(root, text="All Bundles->G.D.",  width=button_width+2, command=upload_all_bundles).grid(row=R, column=1)
 
 # ------------------------- get figures ------------------------------
 
