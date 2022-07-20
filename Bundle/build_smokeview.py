@@ -136,8 +136,10 @@ Button(root, text="All OS's",        width=button_width, command=update_smv_all)
 Button(root, text="Windows",    width=button_width, command=update_smv_windows).grid(row=R, column=2)
 
 R=R+1
-Label(root, text="Set Branch:").grid(column=0, row=R, sticky=E)
-Button(root, text="Master",   width=button_width, command=set_branch).grid(row=R,   column=1)
+Label(root, text="Set:").grid(column=0, row=R, sticky=E)
+Button(root, text="Master branch",     width=button_width, command=set_branch).grid(row=R,     column=1)
+Button(root, text="Bundle Revision",   width=button_width+2, command=set_revision).grid(row=R, column=2)
+
 
 # ------------------------- clean ------------------------------
 
@@ -206,7 +208,7 @@ Button(root, text="Win test inc",    width=button_width, command=build_smv_win_i
 Button(root, text="test debug",    width=button_width, command=build_smv_win_deb).grid(row=R, column=2)
 
 R=R+1
-Label(root, text="----------BUNDLE/INSTALL/UPLOAD----------").grid(column=0, row=R, columnspan=3)
+Label(root, text="-------------BUNDLE/INSTALL--------------").grid(column=0, row=R, columnspan=3)
 
 R=R+1
 
@@ -248,12 +250,11 @@ Button(root, text="Install",    width=button_width, command=install_smv).grid(ro
 Button(root, text="Bundle/Install", width=button_width,  fg='white', bg='blue', command=bundle_install_smv).grid(row=R,       column=2)
 
 R=R+1
-Button(root, text="Set Bundle Rev",   width=button_width, command=set_revision).grid(row=R, column=0)
-Button(root, text="LNX/OSX shortcuts", width=button_width+4,    command=archive_smv).grid(row=R,   column=1)
-
+Label(root, text="-------------UPLOAD BUNDLES--------------").grid(column=0, row=R, columnspan=3)
 R=R+1
 Button(root, text="Win Bundle->G.D.",  width=button_width+2, command=upload_win_bundle).grid(row=R, column=0)
 Button(root, text="All Bundles->G.D.",  width=button_width+2, command=upload_all_bundles).grid(row=R, column=1)
+Button(root, text="Set LNX/OSX shortcuts", width=button_width+6,    command=archive_smv).grid(row=R,   column=2)
 
 # ------------------------- get figures ------------------------------
 
@@ -303,14 +304,14 @@ R=R+1
 Label(root, text="------------SYCHRONIZE FILES ------------").grid(column=0, row=R, columnspan=3)
 R=R+1
 Label(root, text="settings:").grid(column=0, row=R, sticky=E)
-Button(root, text="->smv",  width=button_width, command=webCOPYhome2config).grid(row=R, column=1)
-Button(root, text="<-smv",  width=button_width, command=webCOPYconfig2home).grid(row=R, column=2)
+Button(root, text="---> smv",  width=button_width, command=webCOPYhome2config).grid(row=R, column=1)
+Button(root, text="<--- smv",  width=button_width, command=webCOPYconfig2home).grid(row=R, column=2)
 
 
 R=R+1
 Label(root, text="gsmv/bib:").grid(column=0, row=R, sticky=E)
-Button(root, text="fds->smv", width=button_width, command=webSYNCHfds2smv).grid(row=R, column=1)
-Button(root, text="fds<-smv", width=button_width, command=webSYNCHsmv2fds).grid(row=R, column=2, ipadx=3)
+Button(root, text="fds ---> smv", width=button_width, command=webSYNCHfds2smv).grid(row=R, column=1)
+Button(root, text="fds <--- smv", width=button_width, command=webSYNCHsmv2fds).grid(row=R, column=2, ipadx=3)
 
 R=R+1
 Button(root, text="Refresh", width=button_width, command=restart_program).grid(row=R, column=0)
