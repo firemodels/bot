@@ -138,7 +138,7 @@ Button(root, text="Windows",    width=button_width, command=update_smv_windows).
 R=R+1
 Label(root, text="Set:").grid(column=0, row=R, sticky=E)
 Button(root, text="Master branch",     width=button_width, command=set_branch).grid(row=R,     column=1)
-Button(root, text="Bundle Revision",   width=button_width+2, command=set_revision).grid(row=R, column=2)
+Button(root, text="Bundle Revision",   width=button_width+2, command=set_revision, bg='blue', fg='white').grid(row=R, column=2)
 
 
 # ------------------------- clean ------------------------------
