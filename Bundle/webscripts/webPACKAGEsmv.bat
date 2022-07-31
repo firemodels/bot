@@ -63,22 +63,7 @@ if "%platform%" == "Linux" (
   echo.
   echo --- making 64 bit Linux Smokeview installer ---
   echo.
-  plink %plink_options% %linux_logon% %scriptdir%/scripts/make_bundle.sh %buildtype% %version% %linux_svn_root% %linux_hostname% %linux_svn_root%
-
-  echo.
-  echo --- downloading installer ---
-  echo.
-
-  if "%buildtype%" == "release" (
-    cd %uploaddir%
-    pscp %linux_logon%:%bundledir%/%version%_lnx.sh   .
-    pscp %linux_logon%:%bundledir%/%version%_lnx.sha1 .
-  )
-  if "%buildtype%" == "test" (
-    cd %uploaddir%
-    pscp %linux_logon%:%bundledir%/%version%_lnx.sh   .
-    pscp %linux_logon%:%bundledir%/%version%_lnx.sha1 .
-  )
+  plink %plink_options% %linux_logon% %scriptdir%/scripts/make_bundle.sh %buildtype% %version% %linux_svn_root% %linux_hostname% %linux_svn_root% %linux_hostname% 
   goto eof
 )
 
@@ -88,22 +73,7 @@ if "%platform%" == "OSX" (
   echo.
   echo --- making 64 bit OSX Smokeview installer ---
   echo.
-  plink %plink_options% %osx_logon% %scriptdir%/scripts/make_bundle.sh %buildtype% %version% %linux_svn_root% %osx_hostname% %linux_svn_root%
-
-  echo.
-  echo --- downloading installer ---
-  echo.
-
-  if "%buildtype%" == "release" (
-    cd %uploaddir%
-    pscp %osx_logon%:%bundledir%/%version%_osx.sh   .
-    pscp %osx_logon%:%bundledir%/%version%_osx.sha1 .
-  )
-  if "%buildtype%" == "test" (
-    cd %uploaddir%
-    pscp %osx_logon%:%bundledir%/%version%_osx.sh   .
-    pscp %osx_logon%:%bundledir%/%version%_osx.sha1 .
-  )
+  plink %plink_options% %osx_logon% %scriptdir%/scripts/make_bundle.sh %buildtype% %version% %linux_svn_root% %osx_hostname% %linux_svn_root% %linux_hostname% 
   goto eof
 )
 
