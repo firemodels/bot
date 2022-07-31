@@ -24,12 +24,12 @@ set CURDIR=%CD%
 
 start chrome https://drive.google.com/drive/u/0/folders/0B_wB1pJL2bFQc1F4cjJWY2duWTA?resourcekey=0-J_yHat7iJoBp1fk6QS8gMA
 
-call :uploadfile %uploaddir% %smv_revision%_win.exe    win exe
-call :uploadfile %uploaddir% %smv_revision%_win.sha1   win sha1
-call :uploadfile %uploaddir% %smv_revision%_lnx.sh     lnx sh
-call :uploadfile %uploaddir% %smv_revision%_lnx.sha1   lnx sha1
-call :uploadfile %uploaddir% %smv_revision%_osx.sh     osx sh
-call :uploadfile %uploaddir% %smv_revision%_osx.sha1   osx sha1
+call :uploadwinfile %uploaddir% %smv_revision%_win.exe    win exe
+call :uploadwinfile %uploaddir% %smv_revision%_win.sha1   win sha1
+call :uploadfile                %smv_revision%_lnx.sh     lnx sh
+call :uploadfile                %smv_revision%_lnx.sha1   lnx sha1
+call :uploadfile                %smv_revision%_osx.sh     osx sh
+call :uploadfile                %smv_revision%_osx.sha1   osx sha1
 
 echo.
 echo upload complete
@@ -37,7 +37,7 @@ pause
 goto eof
 
 ::---------------------------------------------
-  :uploadfile
+  :uploadwinfile
 ::---------------------------------------------
 
 set FROMDIR=%1
@@ -54,6 +54,17 @@ if exist %FROMDIR%\%FROMFILE% goto else1
     pscp -P 22 %FROMFILE%    %linux_hostname%:.bundle/bundles/.
     plink %plink_options% %linux_logon%  %linux_svn_root%/bot/Bundlebot/upload_smvbundle.sh .bundle/bundles %FROMFILE% %PLATFORM% %EXT%
 :endif1
+exit /b
+
+::---------------------------------------------
+  :uploadfile
+::---------------------------------------------
+
+set FROMFILE=%1
+set PLATFORM=%2
+set EXT=%3
+
+plink %plink_options% %linux_logon%  %linux_svn_root%/bot/Bundlebot/upload_smvbundle.sh .bundle/uploads %FROMFILE% %PLATFORM% %EXT%
 exit /b
 
 :eof
