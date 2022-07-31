@@ -173,8 +173,11 @@ $HASHFILE $PLATFORMDIR.sh > $PLATFORMDIR.sh.sha1
 cat $PLATFORMDIR.sh.sha1 >> $uploads/$PLATFORMDIR.sha1
 rm $PLATFORMDIR.sh.sha1
 if [[ "$UPLOADHOST" != "" && "$UPLOADHOST" != "$PLATFORMHOST" ]]; then
-  scp PLATFORMDIR.sh      $UPLOADHOST\:$uploads/.
-  scp PLATFORMDIR.sh.sha1 $UPLOADHOST\:$uploads/.
+  scp -q $PLATFORMDIR.sh      $UPLOADHOST\:$uploads/.
+  scp -q $PLATFORMDIR.sh.sha1 $UPLOADHOST\:$uploads/.
+  echo "$PLATFORMDIR.sh copied to $uploads on $UPLOADHOST"
+else
+  echo "$PLATFORMDIR.sh copied to $uploads on $PLATFORMHOST"
 fi
 
 if [ -e $errlog ]; then
