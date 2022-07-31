@@ -6,6 +6,7 @@ revision=$2
 REMOTESVNROOT=$3
 PLATFORMHOST=$4
 SVNROOT=~/$5
+UPLOADHOST=$6
 
 smvbin=smvbin
 
@@ -171,6 +172,10 @@ $UPDATER ${platform2} $revision $PLATFORMDIR.tar.gz $PLATFORMDIR.sh FDS/$FDSEDIT
 $HASHFILE $PLATFORMDIR.sh > $PLATFORMDIR.sh.sha1
 cat $PLATFORMDIR.sh.sha1 >> $uploads/$PLATFORMDIR.sha1
 rm $PLATFORMDIR.sh.sha1
+if [[ "$UPLOADHOST" != "" && "$UPLOADHOST" != "$PLATFORMHOST" ]]; then
+  scp PLATFORMDIR.sh      $UPLOADHOST\:$uploads/.
+  scp PLATFORMDIR.sh.sha1 $UPLOADHOST\:$uploads/.
+fi
 
 if [ -e $errlog ]; then
   numerrs=`cat $errlog | wc -l `
