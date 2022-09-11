@@ -25,10 +25,10 @@ CHECK_KW ()
  grep Match$TYPE $smv_dir/$FILE              | awk -F'"' '{ print $2}' |                                             sort -u > $SMVFILE
  grep hitem$type $mandir/SMV_User_Guide.tex  | awk -F'{' '{ print $2}' | awk -F'}' '{ print $1}' | sed 's/\\_/_/g' | sort -u > $MANFILE
 
- echo in smokeview source not smokeview user guide  > smv_$type
+ echo $type keywords in smokeview source not in smokeview user guide  > smv_$type
  git diff --no-index $SMVFILE $MANFILE  | grep ^- | sed 's/^-//g' >> smv_${type}
 
- echo in smokeview user guide not smokeview source  > smvug_$type
+ echo $type keywords in smokeview user guide not in smokeview source  > smvug_$type
  git diff --no-index $SMVFILE $MANFILE  | grep ^+ | sed 's/^-//g' >> smvug_${type}
 
  rm $SMVFILE $MANFILE
