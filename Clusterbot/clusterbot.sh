@@ -1141,7 +1141,7 @@ SETUP_QUEUES () {
       exit
     fi
   else
-    sinfo | awk 'NR > 2 { print $1 }' | awk -F'*' '{print $1}' | sort -u > /tmp/queues.$$
+    sinfo | awk 'NR > 1 { print $1 }' | awk -F'*' '{print $1}' | sort -u > /tmp/queues.$$
     have_queue=`grep -w $TEST_QUEUE /tmp/queues.$$ | wc -l`
     rm /tmp/queues.$$
     if [ $have_queue -eq 0 ]; then
