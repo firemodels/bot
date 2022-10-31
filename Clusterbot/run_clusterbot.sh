@@ -13,7 +13,7 @@ Popt=
 Uopt=
 FORCE_UNLOCK=
 NCASES_PER_QUEUE=20
-while getopts 'Cfhm:n:MNP:q:Q:uU:' OPTION
+while getopts 'CfHhm:n:MNP:q:Q:uU:' OPTION
 do
 case $OPTION  in
   C)
@@ -22,6 +22,10 @@ case $OPTION  in
   f)
    fopt="-f"
    FORCE_UNLOCK=1
+   ;;
+  H)
+   ./clusterbot_usage.sh run_clusterbot.sh $NCASES_PER_QUEUE 1 $EMAIL
+   exit
    ;;
   h)
    ./clusterbot_usage.sh run_clusterbot.sh $NCASES_PER_QUEUE 1 $EMAIL
