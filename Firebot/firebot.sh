@@ -2127,7 +2127,7 @@ FDS_EXE=fds_${MPI_TYPE}_${COMPILER}_${platform}${size}
 
 FDS_SUMMARY_DIR=$fdsrepo/Manuals/FDS_Summary
 
-GETREVDATE=$botrepo/Scriptdir/get_rev_date.sh
+GETREVDATE=$botrepo/Scripts/get_rev_date.sh
 
 REVDATE=`$GETREVDATE $fdsrepo`
 REVDATEFILE=${REVDATE}_REVDATE
