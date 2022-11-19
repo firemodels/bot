@@ -271,6 +271,13 @@ if [ "$showparms" == "" ]; then
   rm -f $HOME/.bundle/apps/*
   ./copy_apps.sh fds $app_home/.firebot/$BRANCHDIR/apps                   $error_log || return_code=1
   ./copy_apps.sh smv $app_home/.firebot/$BRANCHDIR/apps                   $error_log || return_code=1
+
+  NREVFILE=`ls -l $app_home/.firebot/$BRANCHDIR/apps/*REVDATE | wc -l`
+  if [ $NREVFILE -eq 1 ]; then
+    REVFILE=`basename $app_home/.firebot/$BRANCHDIR/apps/*REVDATE`
+  else
+    REVFILE=
+  fi
  
   if [ "$return_code" == "1" ]; then
     cat $error_log
@@ -327,7 +334,7 @@ if [ "$showparms" == "" ]; then
       echo ""
       echo "uploading installer"
       if [ "$platform" == "lnx" ]; then
-        ./upload_bundle.sh $bundle_dir $installer_base_platform $BUNDLE_PREFIX $platform $UPLOAD_DIR   > $OUTPUT_DIR/stage2
+        ./upload_bundle.sh $bundle_dir $installer_base_platform $BUNDLE_PREFIX $platform $UPLOAD_DIR $REVFILE  > $OUTPUT_DIR/stage2
       else
         ./ssh_upload_bundle.sh         $installer_base_platform $BUNDLE_PREFIX $platform $UPLOAD_DIR   > $OUTPUT_DIR/stage2
       fi

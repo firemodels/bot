@@ -51,8 +51,8 @@ fi
 file=${BUNDLE_BASE}$ext
 shafile=${BUNDLE_BASE}.sha1
 if [ "$REVBASE" != "" ]; then
-  REVFILEFROM=${REVBASE}_REVDATE
-  REVFILETO=${REVBASE}_REVDATE_${platform}
+  REVFILEFROM=${REVBASE}
+  REVFILETO=${REVBASE}_${platform}
 fi
 
 upload=1
