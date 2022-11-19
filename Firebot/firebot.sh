@@ -2039,7 +2039,7 @@ esac
 done
 shift $(($OPTIND-1))
 
-REVDATE=`$GETREVDATE`
+REVDATE=`$GETREVDATE $fdsrepo`
 REVDATEFILE=${REVDATE}_REVDATE
 
 if [ "$WEB_DIR" != "" ]; then
