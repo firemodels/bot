@@ -2039,9 +2039,6 @@ esac
 done
 shift $(($OPTIND-1))
 
-REVDATE=`$GETREVDATE $fdsrepo`
-REVDATEFILE=${REVDATE}_REVDATE
-
 if [ "$WEB_DIR" != "" ]; then
   WEB_BASE_DIR=$WEB_DIR
   WEB_DIR=$WEB_ROOT/$WEB_DIR
@@ -2131,6 +2128,9 @@ FDS_EXE=fds_${MPI_TYPE}_${COMPILER}_${platform}${size}
 FDS_SUMMARY_DIR=$fdsrepo/Manuals/FDS_Summary
 
 GETREVDATE=$botrepo/Scriptdir/get_rev_date.sh
+
+REVDATE=`$GETREVDATE $fdsrepo`
+REVDATEFILE=${REVDATE}_REVDATE
 
 #*** clean repos
 echo "Status"
