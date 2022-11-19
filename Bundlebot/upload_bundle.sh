@@ -4,6 +4,7 @@ BUNDLE_BASE=$2
 NIGHTLY=$3
 platform=$4
 GOOGLE_DIR=$5
+REVBASE=$6
 
 if [ "$NIGHTLY" == "null" ]; then
   NIGHTLY=
@@ -49,6 +50,10 @@ fi
 
 file=${BUNDLE_BASE}$ext
 shafile=${BUNDLE_BASE}.sha1
+if [ "$REVBASE" != "" ]; then
+  REVFILEFROM=${REVBASE}_REVDATE
+  REVFILETO=${REVBASE}_REVDATE_${platform}
+fi
 
 upload=1
 if [ ! -e $BUNDLE_DIR/$file ]; then
@@ -63,6 +68,7 @@ if [ "$upload" == "1" ]; then
   if [ "$erase" == "1" ]; then
     $GDRIVE list  | grep ${NIGHTLY}$platform$ext    | grep FDS | grep SMV | awk '{ system("~/bin/gdrive delete -i " $1)} '
     $GDRIVE list  | grep ${NIGHTLY}${platform}.sha1 | grep FDS | grep SMV | awk '{ system("~/bin/gdrive delete -i " $1)} '
+    $GDRIVE list  | grep REVDATE_${platform}                              | awk '{ system("~/bin/gdrive delete -i " $1)} '
   fi
   echo ""
   echo "------------------------------------------------------"
@@ -96,6 +102,22 @@ if [ "$upload" == "1" ]; then
       rm -f $BUNDLE_DIR/$shafile
     else
       echo "$BUNDLE_DIR/$shafile uploaded."
+    fi
+  fi
+  if [ "$REVFILEBASE" != "" ]; then
+    echo ""
+    echo "------------------------------------------------------"
+    echo "------------------------------------------------------"
+    echo uploading $BUNDLE_DIR/$REVFILEFROM to $REVFILETO on google drive
+    echo ""
+    cp $BUNDLE_DIR/$REVFILEFROM /tmp/$REVFILETO
+    $GDRIVE upload -p $BUNDLE_PARENT_ID -f /tmp/$REVFILETO
+    rm /tmp/$REVFILETO
+    nfiles=`$GDRIVE list  | grep $REVFILETO | wc -l`
+    if [ $nfiles -eq 0 ]; then
+      echo "*** warning: The file $REVFILETO failed to upload to google drive"
+    else
+      echo "$REVFILETO uploaded."
     fi
   fi
 else
