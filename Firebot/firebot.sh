@@ -275,6 +275,8 @@ get_fds_revision()
      git describe --abbrev | awk -F '-' '{print $1"-"$2}' > $LATESTAPPS_DIR/FDS_REVISION
    fi
    FDS_SHORTHASH=`git rev-parse --short HEAD`
+
+   touch $LATESTAPPS_DIR/$REVDATEFILE
    echo $FDS_SHORTHASH > $LATESTAPPS_DIR/FDS_HASH
    FDS_LONGHASH=`git rev-parse HEAD`
    FDS_DATE=`git log -1 --format=%cd --date=local $FDS_SHORTHASH`
@@ -1859,7 +1861,7 @@ WARNING_LOG=$OUTPUT_DIR/warnings
 FYI_LOG=$OUTPUT_DIR/fyis
 NEWGUIDE_DIR=$OUTPUT_DIR/Newest_Guides
 MANUALS_DIR=$HOME/.firebot/Manuals
-MANUALS_LATEST_DIR=$HOME/.firebot/Manuals_latest
+LATESTMANUALS_DIR=$HOME/.firebot/Manuals_latest
 EMAIL_LIST=$HOME/.firebot/firebot_email_list.sh
 CRLF_WARNINGS=$OUTPUT_DIR/stage1_crlf_warnings
 
@@ -2037,6 +2039,9 @@ esac
 done
 shift $(($OPTIND-1))
 
+REVDATE=`$GETREVDATE`
+REVDATEFILE=${REVDATE}_REVDATE
+
 if [ "$WEB_DIR" != "" ]; then
   WEB_BASE_DIR=$WEB_DIR
   WEB_DIR=$WEB_ROOT/$WEB_DIR
@@ -2124,6 +2129,8 @@ FDS_DIR=$fdsrepo/Build/${MPI_TYPE}_${COMPILER}_${platform}${size}
 FDS_EXE=fds_${MPI_TYPE}_${COMPILER}_${platform}${size}
 
 FDS_SUMMARY_DIR=$fdsrepo/Manuals/FDS_Summary
+
+GETREVDATE=$botrepo/Scriptdir/get_rev_date.sh
 
 #*** clean repos
 echo "Status"
@@ -2564,8 +2571,9 @@ if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
     get_firebot_success
 
 # copy repo manuals to Manualslatest directory whether firebot passes or fails
-    rm -rf $MANUALS_LATEST_DIR
-    cp -r $fdsrepo/Manuals $MANUALS_LATEST_DIR
+    rm -rf $LATESTMANUALS_DIR
+    touch $LATESTMANUALS_DIR/$REVDATEFILE
+    cp -r $fdsrepo/Manuals $LATESTMANUALS_DIR
     if [[ "$firebot_success" == "1" ]] ; then
 
 # copy repo manuals to Manuals directory only if firebot
