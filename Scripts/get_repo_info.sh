@@ -16,5 +16,5 @@ if [ "$platform" == "linux" ]; then
 else
   REVDATE=`date -r "$TIMESTAMP" `
 fi
-echo $repo repo with hash $HASH commited on ${REVDATE}
+echo $repo repo hash: $HASH, commit date: ${REVDATE}
 
