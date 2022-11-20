@@ -39,6 +39,7 @@ else
   platform=linux
   bundlebase=${fds_version}_${smv_version}_${NIGHTLY}lnx
 fi
+SHA_REPO_FILE=${bundlebase}.sha1_repodate
 custombase=${fds_version}_${smv_version}
 
 # determine directory repos reside under
@@ -536,11 +537,11 @@ if [ "$openmpifile" != "" ]; then
 fi
 $MAKEINSTALLER -i $bundlebase.tar.gz -b $custombase -d $INSTALLDIR -f $fds_version -s $smv_version -m $MPI_VERSION $OPENMPIFILE $bundlebase.sh
 
-cat $fdsbindir/hash/*.sha1         > $bundlebase.sha1
-cat $smvbindir/hash/*.sha1        >> $bundlebase.sha1
-$APPS_DIR/hashfile $bundlebase.sh >> $bundlebase.sha1
-$botscriptdir/get_repo_info.sh $REPO_ROOT/fds >> $bundlebase.sha1
-$botscriptdir/get_repo_info.sh $REPO_ROOT/smv >> $bundlebase.sha1
+cat $fdsbindir/hash/*.sha1         > $SHA_REPO_FILE
+cat $smvbindir/hash/*.sha1        >> $SHA_REPO_FILE
+$APPS_DIR/hashfile $bundlebase.sh >> $SHA_REPO_FILE
+$botscriptdir/get_repo_info.sh $REPO_ROOT/fds >> $SHA_REPO_FILE
+$botscriptdir/get_repo_info.sh $REPO_ROOT/smv >> $SHA_REPO_FILE
 
 if [ -e $errlog ]; then
   numerrs=`cat $errlog | wc -l `
