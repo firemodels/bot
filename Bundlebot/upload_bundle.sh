@@ -89,7 +89,7 @@ if [ "$upload" == "1" ]; then
   $GDRIVE upload -p $BUNDLE_PARENT_ID -f $BUNDLE_DIR/$shafile
   nfiles=`$GDRIVE list  | grep $shafile | wc -l`
   if [ $nfiles -eq 0 ]; then
-    echo "*** warning: The sha1 file $sha1file failed to upload to google drive"
+    echo "*** warning: The sha1 file $shafile failed to upload to google drive"
   else
     if [ "$erase_local" == "1" ]; then
       echo "$BUNDLE_DIR/$shafile uploaded.  Erasing from $BUNDLE_DIR"
