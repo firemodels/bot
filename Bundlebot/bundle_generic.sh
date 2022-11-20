@@ -328,6 +328,7 @@ smv_bundle=$REPO_ROOT/bot/Bundle/smv/for_bundle
 webgldir=$REPO_ROOT/bot/Bundle/smv/for_bundle/webgl
 smvscriptdir=$REPO_ROOT/smv/scripts
 utilscriptdir=$REPO_ROOT/smv/Utilities/Scripts
+botscriptdir=$REPO_ROOT/bot/Scripts
 
 texturedir=$smv_bundle/textures
 MAKEINSTALLER=$REPO_ROOT/bot/Bundlebot/make_installer.sh
@@ -538,6 +539,8 @@ $MAKEINSTALLER -i $bundlebase.tar.gz -b $custombase -d $INSTALLDIR -f $fds_versi
 cat $fdsbindir/hash/*.sha1         > $bundlebase.sha1
 cat $smvbindir/hash/*.sha1        >> $bundlebase.sha1
 $APPS_DIR/hashfile $bundlebase.sh >> $bundlebase.sha1
+$botscriptdir/get_repo_info.sh $REPO_ROOT/fds >> $bundlebase.sha1
+$botscriptdir/get_repo_info.sh $REPO_ROOT/smv >> $bundlebase.sha1
 
 if [ -e $errlog ]; then
   numerrs=`cat $errlog | wc -l `
