@@ -72,6 +72,7 @@ set  in_shortcut=%userprofile%\.bundle\BUNDLE\WINDOWS\repoexes
 
 set basename=%fds_version%_%smv_version%%nightly%_win
 set hashfile=%repo_root%\smv\Build\hashfile\intel_win_64\hashfile_win_64.exe
+set getrepoinfo=%repo_root%\bot\Scripts\get_repo_info.bat
 if exist %hashfile% goto endif0
   echo ***warning: %hashfile% does not exist
   echo Bundle will not contain hashes of application files
@@ -333,7 +334,9 @@ if exist %basename%.exe erase %basename%.exe
 
 wzipse32 %basename%.zip -setup -auto -i %fds_forbundle%\icon.ico -t %fds_forbundle%\unpack.txt -runasadmin -a %fds_forbundle%\about.txt -st"%fds_version% %smv_version%" -o -c cmd /k firemodels\setup.bat
 
-%hashfile% %basename%.exe   >>  %upload_dir%\%basename%.sha1
+%hashfile% %basename%.exe         >>  %upload_dir%\%basename%.sha1
+call %getrepoinfo% %repo_root%\fds >> %upload_dir%\%basename%.sha1
+call %getrepoinfo% %repo_root%\smv >> %upload_dir%\%basename%.sha1
 
 CALL :COPY %upload_dir%\%basename%.exe  %bundles_dir%\%basename%.exe
 CALL :COPY %upload_dir%\%basename%.sha1 %bundles_dir%\%basename%.sha1
