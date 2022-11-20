@@ -335,8 +335,8 @@ if exist %basename%.exe erase %basename%.exe
 wzipse32 %basename%.zip -setup -auto -i %fds_forbundle%\icon.ico -t %fds_forbundle%\unpack.txt -runasadmin -a %fds_forbundle%\about.txt -st"%fds_version% %smv_version%" -o -c cmd /k firemodels\setup.bat
 
 %hashfile% %basename%.exe         >>  %upload_dir%\%basename%.sha1
-call %getrepoinfo% %reporoot%\fds >> %upload_dir%\%basename%.sha1
-call %getrepoinfo% %reporoot%\smv >> %upload_dir%\%basename%.sha1
+call %getrepoinfo% %repo_root%\fds >> %upload_dir%\%basename%.sha1
+call %getrepoinfo% %repo_root%\smv >> %upload_dir%\%basename%.sha1
 
 CALL :COPY %upload_dir%\%basename%.exe  %bundles_dir%\%basename%.exe
 CALL :COPY %upload_dir%\%basename%.sha1 %bundles_dir%\%basename%.sha1
