@@ -536,7 +536,7 @@ fi
 $MAKEINSTALLER -i $bundlebase.tar.gz -b $custombase -d $INSTALLDIR -f $fds_version -s $smv_version -m $MPI_VERSION $OPENMPIFILE $bundlebase.sh
 
 cat $fdsbindir/hash/*.sha1         > $bundlebase.sha1
-cat $smvbindir/hash/*.sha1         > $bundlebase.sha1
+cat $smvbindir/hash/*.sha1        >> $bundlebase.sha1
 $APPS_DIR/hashfile $bundlebase.sh >> $bundlebase.sha1
 
 if [ -e $errlog ]; then
