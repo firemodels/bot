@@ -70,7 +70,10 @@ set      in_impi=%userprofile%\.bundle\BUNDLE\WINDOWS\%INTELVERSION%
 set in_intel_dll=%userprofile%\.bundle\BUNDLE\WINDOWS\%INTELVERSION%
 set  in_shortcut=%userprofile%\.bundle\BUNDLE\WINDOWS\repoexes
 
-set basename=%fds_version%_%smv_version%%nightly%_win
+call %repo_root%\bot\Scripts\get_repo_info %repo_root%\fds 1 > FDSREPODATE.out
+set /p FDSREPODATE=<FDSREPODATE.out
+erase FDSREPODATE.out
+set basename=%fds_version%_%smv_version%_%FDSREPODATE%%nightly%_win
 set hashfile=%repo_root%\smv\Build\hashfile\intel_win_64\hashfile_win_64.exe
 set getrepoinfo=%repo_root%\bot\Scripts\get_repo_info.bat
 if exist %hashfile% goto endif0
