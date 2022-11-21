@@ -22,7 +22,7 @@ else
   if [ "$option" == "" ]; then
     REVDATE=`date -r "$TIMESTAMP" `
   else
-    REVDATE=`date +'%Y%b%d' -r "$TIMESTAMP"`
+    REVDATE=`date -r "$TIMESTAMP" "+%Y%b%d"`
   fi
 fi
 if [ "$option" == "" ]; then
