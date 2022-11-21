@@ -1,5 +1,6 @@
 #!/bin/bash
 repopath=$1
+option=$2
 
 if [ "`uname`" == "Darwin" ]; then
   platform="osx"
@@ -12,9 +13,21 @@ cd $repopath
 HASH=`git rev-parse --short HEAD`
 TIMESTAMP=`git show -s --format=%ct $SHORTHASH`
 if [ "$platform" == "linux" ]; then
-  REVDATE=`date -d "@$TIMESTAMP" `
+  if [ "$option" == "" ]; then
+    REVDATE=`date -d "@$TIMESTAMP" `
+  else
+    REVDATE=`date +'%Y%b%d' -d "@$TIMESTAMP"`
+  fi
 else
-  REVDATE=`date -r "$TIMESTAMP" `
+  if [ "$option" == "" ]; then
+    REVDATE=`date -r "$TIMESTAMP" `
+  else
+    REVDATE=`date +'%Y%b%d' -r "$TIMESTAMP"`
+  fi
 fi
-echo $repo repo hash: $HASH, commit date: ${REVDATE}
+if [ "$option" == "" ]; then
+  echo $repo repo hash: $HASH, commit date: ${REVDATE}
+else
+  echo $REVDATE
+fi
 
