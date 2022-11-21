@@ -32,16 +32,6 @@ fi
 INSTALLDIR=FDS/FDS6
 errlog=/tmp/errlog.$$
 
-if [ "`uname`" == "Darwin" ] ; then
-  platform=osx
-  bundlebase=${fds_version}_${smv_version}_${NIGHTLY}osx
-else
-  platform=linux
-  bundlebase=${fds_version}_${smv_version}_${NIGHTLY}lnx
-fi
-SHA_REPO_FILE=${bundlebase}.sha1_repodate
-custombase=${fds_version}_${smv_version}
-
 # determine directory repos reside under
 
 scriptdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
@@ -50,6 +40,18 @@ curdir=`pwd`
 cd $scriptdir/../..
 REPO_ROOT=`pwd`
 cd $curdir
+
+FDSREPODATE=`$REPO_ROOT/bot/Scripts/get_repo_info.sh $REPO_ROOT/fds 1`
+
+if [ "`uname`" == "Darwin" ] ; then
+  platform=osx
+  bundlebase=${fds_version}_${smv_version}_${FDSREPODATE}_${NIGHTLY}osx
+else
+  platform=linux
+  bundlebase=${fds_version}_${smv_version}_${FDSREPODATE}_${NIGHTLY}lnx
+fi
+SHA_REPO_FILE=${bundlebase}.sha1_repodate
+custombase=${fds_version}_${smv_version}
 
 # create upload directory if it doesn't exist
 
