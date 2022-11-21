@@ -52,7 +52,7 @@ set bundle_dir=%userprofile%\.bundle\bundles
 call %repo_root%\bot\Scripts\get_repo_info %repo_root%\fds 1 > FDSREPODATE.out
 set /p FDSREPODATE=<FDSREPODATE.out
 erase FDSREPODATE.out
-set basename=%fds_version%_%smv_version%_%FDSREPODATE%%nightly%_win
+set basename=%fds_version_arg%_%smv_version_arg%_%FDSREPODATE%%nightly%_win
 
 set bundlefile=%bundle_dir%\%basename%.exe
 set bundleshafile=%bundle_dir%\%basename%.sha1_repodate
