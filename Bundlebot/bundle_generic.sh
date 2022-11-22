@@ -50,7 +50,7 @@ else
   platform=linux
   bundlebase=${fds_version}_${smv_version}_${FDSREPODATE}_${NIGHTLY}lnx
 fi
-SHA_REPO_FILE=${bundlebase}.sha1_repodate
+SHA_REPO_FILE=${bundlebase}_sha1_repodate
 custombase=${fds_version}_${smv_version}
 
 # create upload directory if it doesn't exist
