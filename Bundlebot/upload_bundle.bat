@@ -55,7 +55,7 @@ erase FDSREPODATE.out
 set basename=%fds_version_arg%_%smv_version_arg%_%FDSREPODATE%%nightly%_win
 
 set bundlefile=%bundle_dir%\%basename%.exe
-set bundleshafile=%bundle_dir%\%basename%_sha1_repodate
+set bundleshafile=%bundle_dir%\%basename%.sha1_repodate
 
 if EXIST %bundlefile% goto skip_upload
   echo ***Error: bundle file %basename%.exe does not exist in %bundle_dir%
@@ -64,10 +64,10 @@ if EXIST %bundlefile% goto skip_upload
 
 if NOT EXIST "%BUNDLEDIR%" goto if_bundledir
   erase "%BUNDLEDIR%"\*tst_win.exe  1> Nul 2>&1
-  erase "%BUNDLEDIR%"\*tst_win_sha1_repodate 1> Nul 2>&1
+  erase "%BUNDLEDIR%"\*tst_win.sha1_repodate 1> Nul 2>&1
 
   copy %bundlefile%    "%BUNDLEDIR%\%basename%.exe"
-  copy %bundleshafile% "%BUNDLEDIR%\%basename%_sha1_repodate"
+  copy %bundleshafile% "%BUNDLEDIR%\%basename%.sha1_repodate"
   exit /b 0
 :if_bundledir
 

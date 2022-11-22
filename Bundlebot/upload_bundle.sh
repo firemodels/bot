@@ -48,7 +48,7 @@ else
 fi
 
 file=${BUNDLE_BASE}$ext
-shafile=${BUNDLE_BASE}_sha1_repodate
+shafile=${BUNDLE_BASE}.sha1_repodate
 
 upload=1
 if [ ! -e $BUNDLE_DIR/$file ]; then
@@ -62,7 +62,7 @@ fi
 if [ "$upload" == "1" ]; then
   if [ "$erase" == "1" ]; then
     $GDRIVE list  | grep ${NIGHTLY}$platform$ext             | grep FDS | grep SMV | awk '{ system("~/bin/gdrive delete -i " $1)} '
-    $GDRIVE list  | grep ${NIGHTLY}${platform}_sha1_repodate | grep FDS | grep SMV | awk '{ system("~/bin/gdrive delete -i " $1)} '
+    $GDRIVE list  | grep ${NIGHTLY}${platform}.sha1_repodate | grep FDS | grep SMV | awk '{ system("~/bin/gdrive delete -i " $1)} '
   fi
   echo ""
   echo "------------------------------------------------------"
