@@ -8,6 +8,11 @@ set smv_version_arg=%2
 set nightly_arg=%3
 set upload_host=%4
 
+set curdir=%CD%
+cd ..\..
+set repo_root=%CD%
+cd %curdir%
+
 set envfile="%userprofile%"\fds_smv_env.bat
 IF EXIST %envfile% GOTO endif_envexist
 echo ***Fatal error.  The environment setup file %envfile% does not exist. 
@@ -44,10 +49,13 @@ if NOT "%nightly_arg%" == "rls" goto endif3
 :endif3
 
 set bundle_dir=%userprofile%\.bundle\bundles
-set basename=%fds_version_arg%_%smv_version_arg%%nightly%_win
+call %repo_root%\bot\Scripts\get_repo_info %repo_root%\fds 1 > FDSREPODATE.out
+set /p FDSREPODATE=<FDSREPODATE.out
+erase FDSREPODATE.out
+set basename=%fds_version_arg%_%smv_version_arg%_%FDSREPODATE%%nightly%_win
 
 set bundlefile=%bundle_dir%\%basename%.exe
-set bundleshafile=%bundle_dir%\%basename%.sha1
+set bundleshafile=%bundle_dir%\%basename%.sha1_repodate
 
 if EXIST %bundlefile% goto skip_upload
   echo ***Error: bundle file %basename%.exe does not exist in %bundle_dir%
@@ -56,10 +64,10 @@ if EXIST %bundlefile% goto skip_upload
 
 if NOT EXIST "%BUNDLEDIR%" goto if_bundledir
   erase "%BUNDLEDIR%"\*tst_win.exe  1> Nul 2>&1
-  erase "%BUNDLEDIR%"\*tst_win.sha1 1> Nul 2>&1
+  erase "%BUNDLEDIR%"\*tst_win.sha1_repodate 1> Nul 2>&1
 
   copy %bundlefile%    "%BUNDLEDIR%\%basename%.exe"
-  copy %bundleshafile% "%BUNDLEDIR%\%basename%.sha1"
+  copy %bundleshafile% "%BUNDLEDIR%\%basename%.sha1_repodate"
   exit /b 0
 :if_bundledir
 
