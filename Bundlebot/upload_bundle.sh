@@ -48,7 +48,7 @@ else
 fi
 
 file=${BUNDLE_BASE}$ext
-shafile=${BUNDLE_BASE}.sha1
+shafile=${BUNDLE_BASE}.sha1_repodate
 
 upload=1
 if [ ! -e $BUNDLE_DIR/$file ]; then
@@ -61,8 +61,8 @@ if [ ! -e $BUNDLE_DIR/$shafile ]; then
 fi
 if [ "$upload" == "1" ]; then
   if [ "$erase" == "1" ]; then
-    $GDRIVE list  | grep ${NIGHTLY}$platform$ext    | grep FDS | grep SMV | awk '{ system("~/bin/gdrive delete -i " $1)} '
-    $GDRIVE list  | grep ${NIGHTLY}${platform}.sha1 | grep FDS | grep SMV | awk '{ system("~/bin/gdrive delete -i " $1)} '
+    $GDRIVE list  | grep ${NIGHTLY}$platform$ext                            | grep FDS | grep SMV | awk '{ system("~/bin/gdrive delete -i " $1)} '
+    $GDRIVE list  | grep ${platform}                   | grep sha1_repodate | grep FDS | grep SMV | awk '{ system("~/bin/gdrive delete -i " $1)} '
   fi
   echo ""
   echo "------------------------------------------------------"
@@ -89,7 +89,7 @@ if [ "$upload" == "1" ]; then
   $GDRIVE upload -p $BUNDLE_PARENT_ID -f $BUNDLE_DIR/$shafile
   nfiles=`$GDRIVE list  | grep $shafile | wc -l`
   if [ $nfiles -eq 0 ]; then
-    echo "*** warning: The sha1 file $sha1file failed to upload to google drive"
+    echo "*** warning: The sha1 file $shafile failed to upload to google drive"
   else
     if [ "$erase_local" == "1" ]; then
       echo "$BUNDLE_DIR/$shafile uploaded.  Erasing from $BUNDLE_DIR"

@@ -31,10 +31,10 @@ fi
   echo " -F   - use existing fds_test repo"
   echo " -n n - number of MPI processes per node used when running cases [default: 1]"
   echo " -p p - number of MPI processes used when runnng cases [default: 1] "
-  echo " -s   - skip the build step (fdss were built eariler)"
-  echo " -T type - build fds using type dv (impi_intel_linux_64_dv) or type db (impi_intel_linux_64_db)"
+  echo " -s   - skip the build step (fdss were built earlier)"
+  echo " -T type - build fds using type dv (impi_intel_linux_dv) or type db (impi_intel_linux_db)"
   echo "           makefile entries. If -T is not specified then fds is built using the release"
-  echo "           (impi_intel_linux_64) makefile entry."
+  echo "           (impi_intel_linux) makefile entry."
   exit
 }
 
@@ -67,7 +67,7 @@ start_time=`date`
 CURDIR=`pwd`
 qopt=
 REVISIONS=${REPO}_revisions.txt
-MAKEENTRY=impi_intel_linux_64
+MAKEENTRY=impi_intel_linux
 CASENAME=
 SKIPBUILD=
 SKIPRUN=
@@ -205,15 +205,15 @@ fi
 JOBPREFIX=TF${repo}_
 if [ "$REPO" == "fds" ]; then
   if [ "$TYPE" == "dv" ]; then
-    MAKEENTRY=impi_intel_linux_64_dv
+    MAKEENTRY=impi_intel_linux_dv
   fi
   if [ "$TYPE" == "db" ]; then
-    MAKEENTRY=impi_intel_linux_64_db
+    MAKEENTRY=impi_intel_linux_db
   fi
   BUILDDIR=Build/$MAKEENTRY
 fi
 if [ "$REPO" == "smv" ]; then
-  MAKEENTRY=intel_linux_64
+  MAKEENTRY=intel_linux
   BUILDDIR=Build/smokeview/$MAKEENTRY
   if [ "$TYPE" == "db" ]; then
     SMVDEBUG="-D"
@@ -422,9 +422,10 @@ if [ "$SKIPRUN" == "" ]; then
       DATE=`grep $commit $CURDIR/$REVISIONS | awk -F';' '{print $3}'`
       echo "running fds built using $MAKEENTRY($commit/$DATE)"
       if [ "$DEBUG" == "" ]; then
-        qfds.sh -j $JOBPREFIX${count}_$commit -e $FDSEXE $BASECASENAME $popt $nopt $qopt >> $OUTPUTDIR/stage2 2>&1
+        echo "qfds.sh -j $JOBPREFIX${count}_$commit -e $FDSEXE $popt $nopt $qopt $BASECASENAME"
+        qfds.sh -j $JOBPREFIX${count}_$commit -e $FDSEXE $popt $nopt $qopt $BASECASENAME
       else
-        echo "qfds.sh -j $JOBPREFIX${count}_$commit -e $FDSEXE $BASECASENAME $popt $nopt $qopt"
+        echo "qfds.sh -j $JOBPREFIX${count}_$commit -e $FDSEXE $popt $nopt $qopt $BASECASENAME"
       fi
     fi
   done

@@ -32,15 +32,6 @@ fi
 INSTALLDIR=FDS/FDS6
 errlog=/tmp/errlog.$$
 
-if [ "`uname`" == "Darwin" ] ; then
-  platform=osx
-  bundlebase=${fds_version}_${smv_version}_${NIGHTLY}osx
-else
-  platform=linux
-  bundlebase=${fds_version}_${smv_version}_${NIGHTLY}lnx
-fi
-custombase=${fds_version}_${smv_version}
-
 # determine directory repos reside under
 
 scriptdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
@@ -49,6 +40,18 @@ curdir=`pwd`
 cd $scriptdir/../..
 REPO_ROOT=`pwd`
 cd $curdir
+
+FDSREPODATE=`$REPO_ROOT/bot/Scripts/get_repo_info.sh $REPO_ROOT/fds 1`
+
+if [ "`uname`" == "Darwin" ] ; then
+  platform=osx
+  bundlebase=${fds_version}_${smv_version}_${FDSREPODATE}_${NIGHTLY}osx
+else
+  platform=linux
+  bundlebase=${fds_version}_${smv_version}_${FDSREPODATE}_${NIGHTLY}lnx
+fi
+SHA_REPO_FILE=${bundlebase}.sha1_repodate
+custombase=${fds_version}_${smv_version}
 
 # create upload directory if it doesn't exist
 
@@ -328,6 +331,7 @@ smv_bundle=$REPO_ROOT/bot/Bundle/smv/for_bundle
 webgldir=$REPO_ROOT/bot/Bundle/smv/for_bundle/webgl
 smvscriptdir=$REPO_ROOT/smv/scripts
 utilscriptdir=$REPO_ROOT/smv/Utilities/Scripts
+botscriptdir=$REPO_ROOT/bot/Scripts
 
 texturedir=$smv_bundle/textures
 MAKEINSTALLER=$REPO_ROOT/bot/Bundlebot/make_installer.sh
@@ -535,9 +539,11 @@ if [ "$openmpifile" != "" ]; then
 fi
 $MAKEINSTALLER -i $bundlebase.tar.gz -b $custombase -d $INSTALLDIR -f $fds_version -s $smv_version -m $MPI_VERSION $OPENMPIFILE $bundlebase.sh
 
-cat $fdsbindir/hash/*.sha1         > $bundlebase.sha1
-cat $smvbindir/hash/*.sha1         > $bundlebase.sha1
-$APPS_DIR/hashfile $bundlebase.sh >> $bundlebase.sha1
+cat $fdsbindir/hash/*.sha1         > $SHA_REPO_FILE
+cat $smvbindir/hash/*.sha1        >> $SHA_REPO_FILE
+$APPS_DIR/hashfile $bundlebase.sh >> $SHA_REPO_FILE
+$botscriptdir/get_repo_info.sh $REPO_ROOT/fds >> $SHA_REPO_FILE
+$botscriptdir/get_repo_info.sh $REPO_ROOT/smv >> $SHA_REPO_FILE
 
 if [ -e $errlog ]; then
   numerrs=`cat $errlog | wc -l `

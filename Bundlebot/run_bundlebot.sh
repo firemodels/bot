@@ -109,6 +109,8 @@ fi
 FIREBOT_HOST=$bundle_hostname
 FIREBOT_HOME=$bundle_firebot_home
 
+LOCKFILE=$HOME/.bundle/lock
+
 MAILTO=
 if [ "$BUNDLE_EMAIL" != "" ]; then
   MAILTO=$BUNDLE_EMAIL
@@ -249,6 +251,15 @@ echo "                   EMAIL: $MAILTO_ARG"
 echo "------------------------------------------------------------"
 echo ""
 
+if [ -e $LOCKFILE ]; then
+  if [ "$FORCE" == "" ]; then
+    echo "run_bundlebot.sh script already running."
+    echo "If this is not the case, rerun using the -f option"
+    exit
+  fi
+fi
+touch $LOCKFILE
+
 curdir=`pwd`
 
 if [ "$PROCEED" == "" ]; then
@@ -294,3 +305,4 @@ $ECHO ./run_firebot.sh $FORCE -c -C -B $gopt $Gopt $JOPT $FDS_RELEASE $FDS_TAG $
 #*** generate and upload bundle
 cd $curdir
 $ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH $CUSTOM_PUBS $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG -w $UPLOAD
+rm $LOCKFILE
