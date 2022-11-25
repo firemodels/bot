@@ -242,9 +242,12 @@ call :setup_shortcut "%FDSSTART%\Guides and Release Notes\Smokeview Verification
 call :setup_shortcut "%FDSSTART%\Guides and Release Notes\Smokeview release notes.lnk"             "%DOCDIR%\Guides_and_Release_Notes\Smokeview_release_notes.html"
 call :setup_shortcut "%FDSSTART%\Uninstall.lnk"                                                    "%UNINSTALLDIR%\uninstall.bat"
 
+set DESKTOPDIR=%userprofile%\Desktop
+if NOT exist %DESKTOPDIR% set DESKTOPDIR=%userprofile%\OneDrive\Desktop
+if NOT exist %DESKTOPDIR% echo "***error: directory containing desktop files not found"
 
 call :setup_cmdfds "%FDSSTART%\CMDfds.lnk"
-call :setup_cmdfds "%userprofile%\Desktop\CMDfds.lnk"
+call :setup_cmdfds "%DESKTOPDIR%\CMDfds.lnk"
 
 :: ----------- setting up openmp threads environment variable
 
@@ -296,8 +299,8 @@ echo call "%UNINSTALLDIR%\set_path.exe" -s -b -r %SMV6%       >> "%UNINSTALLDIR%
 echo rmdir /s /q "%SMV6%"                                     >> "%UNINSTALLDIR%\uninstall_base.bat"
 echo :skip2                                                   >> "%UNINSTALLDIR%\uninstall_base.bat"
 
-echo echo Removing CMDfds desktop shortcut                    >> "%UNINSTALLDIR%\uninstall_base.bat"
-echo if exist %userprofile%\Desktop\CMDfds.lnk erase %userprofile%\Desktop\CMDfds.lnk  >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo echo Removing CMDfds desktop shortcut                           >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo if exist %DESKTOPDIR%\CMDfds.lnk erase %DESKTOPDIR%\CMDfds.lnk  >> "%UNINSTALLDIR%\uninstall_base.bat"
 
 :: remove FDS path and directory
 
