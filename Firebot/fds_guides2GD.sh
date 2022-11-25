@@ -19,10 +19,10 @@ UPLOADHASH ()
     $GDRIVE upload -p $HASHES_PARENT_ID -f $FILE
     npubs=`$GDRIVE list | grep $FILE | wc -l`
     if [ $npubs -eq 0 ]; then
-      echo "*** warning: The file $FILE failed to upload to google drive"
+      echo "*** FYI: The file $FILE failed to upload to google drive"
     fi
     if [ $npubs -gt 1 ]; then
-      echo "*** warning: More than one copy of $FILE exists on google drive"
+      echo "*** FYI: More than one copy of $FILE exists on google drive"
     fi
   fi
 }
@@ -37,10 +37,10 @@ UPLOADGUIDE ()
     $GDRIVE upload -p $MANUAL_PARENT_ID -f $FILEnew
     npubs=`$GDRIVE list  | grep $FILEnew | wc -l`
     if [ $npubs -eq 0 ]; then
-      echo "*** warning: The guide $FILEnew failed to upload to google drive"
+      echo "*** FYI: The guide $FILEnew failed to upload to google drive"
     fi
     if [ $npubs -gt 1 ]; then
-      echo "*** warning: More than one copy of $FILEnew exists on google drive"
+      echo "*** FYI: More than one copy of $FILEnew exists on google drive"
     fi
   fi
 }
@@ -62,10 +62,10 @@ UPLOADFIGURES ()
   $GDRIVE upload -p $FIGURES_PARENT_ID -f $tarfile.gz
   npubs=`$GDRIVE list  | grep $tarfile.gz | wc -l`
   if [ $npubs -eq 0 ]; then
-    echo "*** warning: The $tarfile.gz failed to upload to google drive"
+    echo "*** FYI: The $tarfile.gz failed to upload to google drive"
   fi
   if [ $npubs -gt 1 ]; then
-    echo "*** warning: More than one copy of $tarfile.gz exists on google drive"
+    echo "*** FYI: More than one copy of $tarfile.gz exists on google drive"
   fi
 }
 
