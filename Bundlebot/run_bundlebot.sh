@@ -184,7 +184,10 @@ shift $(($OPTIND-1))
 # Linux or OSX
 JOPT="-J"
 if [ "`uname`" == "Darwin" ] ; then
+  platform=osx
   JOPT=
+else
+  platform=lnx
 fi
 
 # both or neither RELEASE options must be set
@@ -300,7 +303,12 @@ fi
 #*** build apps
 cd $curdir
 cd ../Firebot
+if [ "$platform" == "osx" ]; then
+# remove || exit 1 until compiler warnings are removed
+$ECHO ./run_firebot.sh $FORCE -c -C -B $gopt $Gopt $JOPT $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG $FIREBOT_BRANCH -T $MAILTO
+else
 $ECHO ./run_firebot.sh $FORCE -c -C -B $gopt $Gopt $JOPT $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG $FIREBOT_BRANCH -T $MAILTO || exit 1
+fi
 
 #*** generate and upload bundle
 cd $curdir

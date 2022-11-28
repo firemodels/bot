@@ -66,7 +66,6 @@ CP $smvrepo/Build/hashfile/intel$OS   hashfile$OS   $TODIR/apps hashfile
 CP $smvrepo/Build/smokediff/intel$OS  smokediff$OS  $TODIR/apps smokediff
 if [ "$OS" == "_osx_64" ]; then
   CP $smvrepo/Build/smokeview/intel_osx_64      smokeview_osx_64   $TODIR/apps smokeview
-  CP $smvrepo/Build/smokeview/intel_osx_q_64    smokeview_osx_q_64 $TODIR/apps smokeview_q
 else
   CP $smvrepo/Build/smokeview/intel$OS  smokeview$OS  $TODIR/apps smokeview
 fi

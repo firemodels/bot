@@ -39,13 +39,13 @@ CP ()
 # ----------------- start of script ------------------------------
 
 if [ "`uname`" == "Darwin" ]; then
-  OS=_osx_64
-  OS2=_osx
-  MPI=mpi
+  OS=_osx
+  MPI=ompi
+  MPI2=
 else
-  OS=_linux_64
-  OS2=_linux
-  MPI=impi
+  OS=_linux
+  MPI=ompi
+  MPI2=impi
 fi
 
 # get repo root name
@@ -67,5 +67,8 @@ MKDIR $TODIR/apps
 echo
 echo ***copying fds apps
 CP $fdsrepo/Build/${MPI}_intel$OS               fds_${MPI}_intel$OS $TODIR/apps fds
-CP $fdsrepo/Utilities/fds2ascii/intel$OS        fds2ascii$OS        $TODIR/apps fds2ascii
-CP $fdsrepo/Utilities/test_mpi/${MPI}_intel$OS2 test_mpi            $TODIR/apps test_mpi
+if [ "$MPI2" != "" ]; then
+  CP $fdsrepo/Build/${MPI2}_intel$OS               fds_${MPI2}_intel$OS $TODIR/apps fds
+fi
+CP $fdsrepo/Utilities/fds2ascii/intel$OS        fds2ascii_intel$OS  $TODIR/apps fds2ascii
+CP $fdsrepo/Utilities/test_mpi/${MPI}_intel$OS  test_mpi            $TODIR/apps test_mpi
