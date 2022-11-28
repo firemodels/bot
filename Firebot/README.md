@@ -48,13 +48,18 @@ The script `firebot.sh` is run using the wrapper script `run_firebot.sh`. This s
 ./run_firebot.sh -H
 ```
 
-A typical way to run firebot is to cd into the directory containing firbot.sh and type: 
+A typical way to run firebot is to cd into the directory containing firebot.sh and type: 
 
-``` nohup ./run_firebot.sh -c -u -J -q firebot -R master -m user@host.com &```
+``` nohup ./run_firebot.sh -c -u -J -q firebot -m user@host.com &```
 
-The `-c` and `-u` options clean and update the bot respectively. The `-J` option directs Firebot to use the Intel compilers. The email addressee specified by the -m option receives a notice when Firebot is done. The -R master option causes fds, smv and other repos used by firebot to be cloned and checked out using the master branch.  The `nohup` at the start and `&` at the end of the command run `firebot.sh` in the background and redirect screen output to the file called `nohup.out`.
+The `-c` and `-u` options clean and update the bot respectively. The `-J` option directs Firebot to use the Intel compilers. 
+The email addressee specified by the -m option receives a notice when Firebot is done. 
+The `nohup` at the start and `&` at the end of the command run `firebot.sh` in the background and redirect screen 
+output to the file called `nohup.out`.
 
-Note, firebot clones the repos it uses so not be used in repos where you are doing work.  You should run firebot in a fresh repo.  You can however run firebot without cloning repos by NOT specifying the -R master option.  In this case, firebot will update and clean repos (if you have specifeid the -u and -c options).
+Note, firebot clones the repos it uses so not be used in repos where you are doing work.  
+You should run firebot in a fresh repo.  You can however run firebot without cloning repos by NOT specifying the -R master option.  
+In this case, firebot will update and clean repos (if you have specifeid the -u and -c options).
 
 To kill firebot, cd to the directory containing firebot.sh and type:
 
