@@ -237,7 +237,6 @@ get_smv_revision()
 
    CD_REPO $repo/smv $branch || return 1
 
-
    git update-index --refresh
    SMV_REVISION=`git describe --long --dirty`
    echo $SMV_REVISION > $repo/fds/Manuals/SMV_REVISION
@@ -263,7 +262,6 @@ get_fds_revision()
    local branch=$1
 
    CD_REPO $repo/fds $branch || return 1
-
 
    git update-index --refresh
    FDS_REVISION=`git describe --long --dirty`
@@ -292,7 +290,6 @@ get_exp_revision()
 
    CD_REPO $repo/exp $branch || return 1
 
-
    git update-index --refresh
    EXP_REVISION=`git describe --long --dirty`
    return 0
@@ -308,7 +305,6 @@ get_out_revision()
 
    CD_REPO $repo/out $branch || return 1
 
-
    git update-index --refresh
    OUT_REVISION=`git describe --long --dirty`
    return 0
@@ -323,7 +319,6 @@ get_fig_revision()
    local branch=$1
 
    CD_REPO $repo/fig $branch || return 1
-
 
    git update-index --refresh
    FIG_REVISION=`git describe --long --dirty`
@@ -1877,6 +1872,7 @@ MKDIR $LATESTAPPS_DIR
 
 WEBBRANCH=nist-pages
 FDSBRANCH=master
+OUTBRANCH=master
 SMVBRANCH=master
 BOTBRANCH=master
 BRANCH=master
@@ -1948,6 +1944,7 @@ case $OPTION in
    FDSBRANCH=$BRANCH
    SMVBRANCH=$BRANCH
    BOTBRANCH=$BRANCH
+   OUTBRANCH=$BRANCH
    ;;
   B)
    BUILD_ONLY=1
@@ -2182,7 +2179,6 @@ fi
 cd $fdsrepo
 FDSREPO_HASH=`git rev-parse HEAD`
 
-
 CD_REPO $smvrepo $SMVBRANCH || exit 1
 if [ "$SMVBRANCH" == "current" ]; then
   cd $smvrepo
@@ -2191,6 +2187,13 @@ fi
 cd $smvrepo
 SMVREPO_HASH=`git rev-parse HEAD`
 
+CD_REPO $outrepo $OUTBRANCH || exit 1
+if [ "$OUTBRANCH" == "current" ]; then
+  cd $outrepo
+  OUTBRANCH=`git rev-parse --abbrev-ref HEAD`
+fi
+cd $outrepo
+OUTREPO_HASH=`git rev-parse HEAD`
 
 CD_REPO $botrepo $BOTBRANCH || exit 1
 if [ "$BOTBRANCH" == "current" ]; then
@@ -2247,6 +2250,8 @@ if [ "$BUILD_ONLY" == "1" ]; then
 fi
 echo "     FDS repo: $fdsrepo"
 echo "   FDS branch: $FDSBRANCH"
+echo "     OUT repo: $outrepo"
+echo "   OUT branch: $OUTBRANCH"
 echo "     SMV repo: $smvrepo"
 echo "   SMV branch: $SMVBRANCH"
 echo "      Run dir: $firebotdir"
@@ -2305,8 +2310,8 @@ if [[ "$CLONE_REPOS" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
     fi
     clean_repo2 fds $FDSBRANCH || exit 1
     if [ "$BUILD_ONLY" == "" ]; then
-      clean_repo2 fig master || exit 1
-      clean_repo2 out master || exit 1
+      clean_repo2 fig master     || exit 1
+      clean_repo2 out $OUTBRANCH || exit 1
     fi 
     clean_repo2 smv $SMVBRANCH || exit 1
   fi
@@ -2388,10 +2393,10 @@ get_fds_revision $FDSBRANCH || exit 1
 get_smv_revision $SMVBRANCH || exit 1
 get_bot_revision            || exit 1
 if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-  get_exp_revision master || exit 1
-  get_fig_revision master || exit 1
-  get_out_revision master || exit 1
-  get_cad_revision        || exit 1
+  get_exp_revision master     || exit 1
+  get_fig_revision master     || exit 1
+  get_out_revision $OUTBRANCH || exit 1
+  get_cad_revision            || exit 1
 fi
 
 echo | mail >& /tmp/mailtest.$$
