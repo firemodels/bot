@@ -76,6 +76,8 @@ def download_figures():            os.system("start " + webscript_dir + "webGETf
 def archive_smv():                 os.system("start " + webscript_dir + "webARCHIVEAllbundle"  )
 def upload_all_bundles():          os.system("start " + webscript_dir + "webUPLOADAllsmv")
 def upload_win_bundle():           os.system("start " + webscript_dir + "webUPLOADWinsmv")
+def upload_lnx_bundle():           os.system("start " + webscript_dir + "webUPLOADlnxsmv")
+def upload_osx_bundle():           os.system("start " + webscript_dir + "webUPLOADosxsmv")
 
 def webCOPYhome2config():          os.system("start " + webscript_dir + "webCOPYhome2config")
 def webCOPYconfig2home():          os.system("start " + webscript_dir + "webCOPYconfig2home")
@@ -250,10 +252,14 @@ Button(root, text="Install",    width=button_width, command=install_smv).grid(ro
 Button(root, text="Bundle/Install", width=button_width,  fg='white', bg='blue', command=bundle_install_smv).grid(row=R,       column=2)
 
 R=R+1
-Label(root, text="-------------UPLOAD BUNDLES--------------").grid(column=0, row=R, columnspan=3)
+Label(root, text="-----UPLOAD BUNDLES to google drive------").grid(column=0, row=R, columnspan=3)
 R=R+1
-Button(root, text="Win Bundle->G.D.",  width=button_width+2, command=upload_win_bundle).grid(row=R, column=0)
-Button(root, text="All Bundles->G.D.",  width=button_width+2, command=upload_all_bundles).grid(row=R, column=1)
+Button(root, text="Windows",  width=button_width+2, command=upload_win_bundle).grid(row=R, column=0)
+Button(root, text="Linux",  width=button_width+2, command=upload_lnx_bundle).grid(row=R, column=1)
+Button(root, text="OSX",  width=button_width+2, command=upload_osx_bundle).grid(row=R, column=2)
+
+R=R+1
+Button(root, text="All",  width=button_width+2, command=upload_all_bundles).grid(row=R, column=0)
 Button(root, text="Set LNX/OSX shortcuts", width=button_width+6,    command=archive_smv).grid(row=R,   column=2)
 
 # ------------------------- get figures ------------------------------
