@@ -1936,12 +1936,14 @@ VALIDATION=
 CHECK_CLUSTER=
 OPENMPTEST=1
 MPI_TYPE=ompi
+BOPT=
 
 #*** parse command line arguments
 while getopts 'b:BcCdDJm:Mp:q:R:sTuUV:x:X:y:Y:w:W:' OPTION
 do
 case $OPTION in
   b)
+   BOPT=1
    BRANCH="$OPTARG"
    FDSBRANCH=$BRANCH
    SMVBRANCH=$BRANCH
@@ -2038,6 +2040,10 @@ esac
 done
 shift $(($OPTIND-1))
 
+if [ "$BOPT" != "" ]; then
+  UPDATEREPO=
+fi  
+
 if [ "$WEB_DIR" != "" ]; then
   WEB_BASE_DIR=$WEB_DIR
   WEB_DIR=$WEB_ROOT/$WEB_DIR
@@ -2095,6 +2101,7 @@ botrepo=$repo/bot
 figrepo=$repo/fig
 outrepo=$repo/out
 exprepo=$repo/exp
+cadrepo=$repo/cad
 
 if [ "$OPENMPTEST" == "" ]; then
   size=_64
@@ -2200,6 +2207,14 @@ fi
 cd $outrepo
 OUTREPO_HASH=`git rev-parse HEAD`
 
+CD_REPO $cadrepo $CADBRANCH || exit 1
+if [ "$CADBRANCH" == "current" ]; then
+  cd $cadrepo
+  CADBRANCH=`git rev-parse --abbrev-ref HEAD`
+fi
+cd $cadrepo
+CADREPO_HASH=`git rev-parse HEAD`
+
 CD_REPO $figrepo $FIGBRANCH || exit 1
 if [ "$FIGBRANCH" == "current" ]; then
   cd $figrepo
@@ -2221,6 +2236,8 @@ if [ "$BOTBRANCH" == "current" ]; then
   cd $botrepo
   BOTBRANCH=`git rev-parse --abbrev-ref HEAD`
 fi
+cd $botrepo
+BOTREPO_HASH=`git rev-parse HEAD`
 
 # if the fds repo is cloned, make a copy of the Verification directory and run fds in debug mode in this directory
 if [ "$CLONE_REPOS" != "" ]; then
@@ -2274,6 +2291,8 @@ echo "   FDS branch: $FDSBRANCH"
 echo "     SMV repo: $smvrepo"
 echo "   SMV branch: $SMVBRANCH"
 echo ""
+echo "     CAD repo: $cadrepo"
+echo "   CAD branch: $CADBRANCH"
 echo "     EXP repo: $exprepo"
 echo "   EXP branch: $EXPBRANCH"
 echo "     FIG repo: $figrepo"
@@ -2417,12 +2436,12 @@ fi
 
 get_fds_revision $FDSBRANCH || exit 1
 get_smv_revision $SMVBRANCH || exit 1
-get_bot_revision            || exit 1
+get_bot_revision $BOTBRANCH || exit 1
 if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-  get_exp_revision master     || exit 1
-  get_fig_revision master     || exit 1
-  get_out_revision $OUTBRANCH || exit 1
-  get_cad_revision            || exit 1
+  get_exp_revision $EXPBRANCH     || exit 1
+  get_fig_revision $FIGBRANCH     || exit 1
+  get_out_revision $OUTBRANCH     || exit 1
+  get_cad_revision $CADBRANCH     || exit 1
 fi
 
 echo | mail >& /tmp/mailtest.$$
