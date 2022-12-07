@@ -12,7 +12,7 @@ fi
 if [ "$OPENMPI_DIR" != "" ]; then
   openmpi_dir=$OPENMPI_DIR
 fi
-APPS=appslatest
+APPS=apps
 
 #---------------------------------------------
 #                   usage

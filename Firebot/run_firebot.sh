@@ -103,6 +103,7 @@ CD_REPO ()
   CHK_REPO $repodir || return 1
 
   cd $repodir
+  if [ "$branch" != "" "current" ]; then
   if [ "$branch" != "" ]; then
      CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
      if [ "$CURRENT_BRANCH" != "$branch" ]; then
@@ -110,6 +111,7 @@ CD_REPO ()
        echo "Found branch $CURRENT_BRANCH. Aborting firebot."
        return 1
      fi
+  fi
   fi
   return 0
 }
