@@ -1873,6 +1873,8 @@ MKDIR $LATESTAPPS_DIR
 WEBBRANCH=nist-pages
 FDSBRANCH=master
 OUTBRANCH=master
+FIGBRANCH=master
+EXPBRANCH=master
 SMVBRANCH=master
 BOTBRANCH=master
 BRANCH=master
@@ -1945,6 +1947,8 @@ case $OPTION in
    SMVBRANCH=$BRANCH
    BOTBRANCH=$BRANCH
    OUTBRANCH=$BRANCH
+   FIGBRANCH=$BRANCH
+   EXPBRANCH=$BRANCH
    ;;
   B)
    BUILD_ONLY=1
@@ -2090,6 +2094,7 @@ smvrepo=$repo/smv
 botrepo=$repo/bot
 figrepo=$repo/fig
 outrepo=$repo/out
+exprepo=$repo/exp
 
 if [ "$OPENMPTEST" == "" ]; then
   size=_64
@@ -2195,6 +2200,22 @@ fi
 cd $outrepo
 OUTREPO_HASH=`git rev-parse HEAD`
 
+CD_REPO $figrepo $FIGBRANCH || exit 1
+if [ "$FIGBRANCH" == "current" ]; then
+  cd $figrepo
+  FIGBRANCH=`git rev-parse --abbrev-ref HEAD`
+fi
+cd $figrepo
+FIGREPO_HASH=`git rev-parse HEAD`
+
+CD_REPO $exprepo $EXPBRANCH || exit 1
+if [ "$EXPBRANCH" == "current" ]; then
+  cd $exprepo
+  EXPBRANCH=`git rev-parse --abbrev-ref HEAD`
+fi
+cd $exprepo
+EXPREPO_HASH=`git rev-parse HEAD`
+
 CD_REPO $botrepo $BOTBRANCH || exit 1
 if [ "$BOTBRANCH" == "current" ]; then
   cd $botrepo
@@ -2250,10 +2271,15 @@ if [ "$BUILD_ONLY" == "1" ]; then
 fi
 echo "     FDS repo: $fdsrepo"
 echo "   FDS branch: $FDSBRANCH"
-echo "     OUT repo: $outrepo"
-echo "   OUT branch: $OUTBRANCH"
 echo "     SMV repo: $smvrepo"
 echo "   SMV branch: $SMVBRANCH"
+echo ""
+echo "     EXP repo: $exprepo"
+echo "   EXP branch: $EXPBRANCH"
+echo "     FIG repo: $figrepo"
+echo "   FIG branch: $FIGBRANCH"
+echo "     OUT repo: $outrepo"
+echo "   OUT branch: $OUTBRANCH"
 echo "      Run dir: $firebotdir"
 if [ "$IFORT_VERSION" != "" ]; then
   echo "      Fortran: $IFORT_VERSION"
