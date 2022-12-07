@@ -317,7 +317,6 @@ get_out_revision()
 get_fig_revision()
 {
    local branch=$1
-
    CD_REPO $repo/fig $branch || return 1
 
    git update-index --refresh
@@ -331,7 +330,8 @@ get_fig_revision()
 
 get_bot_revision()
 {
-   CD_REPO $repo/bot master || return 1
+   local branch=$1
+   CD_REPO $repo/bot $branch || return 1
 
    BOT_REVISION=`git describe --long --dirty`
    return 0
@@ -343,7 +343,8 @@ get_bot_revision()
 
 get_cad_revision()
 {
-   CD_REPO $repo/cad master || return 1
+   local branch=$1
+   CD_REPO $repo/cad $branch || return 1
 
    CAD_REVISION=`git describe --long --dirty`
    return 0
@@ -1696,12 +1697,12 @@ email_build_status()
    echo "              queue: $QUEUE "                   >> $TIME_LOG
    echo "fds revision/branch: $FDS_REVISION/$FDSBRANCH " >> $TIME_LOG
    echo "smv revision/branch: $SMV_REVISION/$SMVBRANCH " >> $TIME_LOG
-   echo "bot revision/branch: $BOT_REVISION/master     " >> $TIME_LOG
+   echo "bot revision/branch: $BOT_REVISION/$BOTBRANCH " >> $TIME_LOG
    if [ "$CAD_REVISION" != "" ]; then
-     echo "cad revision/branch: $CAD_REVISION/master   " >> $TIME_LOG
+     echo "cad revision/branch: $CAD_REVISION/$CADBRANCH  " >> $TIME_LOG
    fi
-   echo "fig revision/branch: $FIG_REVISION/master "     >> $TIME_LOG
-   echo "out revision/branch: $OUT_REVISION/master "     >> $TIME_LOG
+   echo "fig revision/branch: $FIG_REVISION/$FIGBRANCH "     >> $TIME_LOG
+   echo "out revision/branch: $OUT_REVISION/$OUTBRANCH "     >> $TIME_LOG
    if [ "$IFORT_VERSION" != "" ]; then
       echo "            Fortran: $IFORT_VERSION " >> $TIME_LOG
    fi
@@ -2182,7 +2183,6 @@ if [[ "$CLONE_REPOS" != "" ]]; then
 fi
 
 #*** make sure repos exist and have expected branches
-
 CD_REPO $fdsrepo $FDSBRANCH || exit 1
 if [ "$FDSBRANCH" == "current" ]; then
   cd $fdsrepo
@@ -2190,7 +2190,6 @@ if [ "$FDSBRANCH" == "current" ]; then
 fi
 cd $fdsrepo
 FDSREPO_HASH=`git rev-parse HEAD`
-
 CD_REPO $smvrepo $SMVBRANCH || exit 1
 if [ "$SMVBRANCH" == "current" ]; then
   cd $smvrepo
@@ -2198,7 +2197,6 @@ if [ "$SMVBRANCH" == "current" ]; then
 fi
 cd $smvrepo
 SMVREPO_HASH=`git rev-parse HEAD`
-
 CD_REPO $outrepo $OUTBRANCH || exit 1
 if [ "$OUTBRANCH" == "current" ]; then
   cd $outrepo
@@ -2214,7 +2212,6 @@ if [ "$CADBRANCH" == "current" ]; then
 fi
 cd $cadrepo
 CADREPO_HASH=`git rev-parse HEAD`
-
 CD_REPO $figrepo $FIGBRANCH || exit 1
 if [ "$FIGBRANCH" == "current" ]; then
   cd $figrepo
@@ -2351,11 +2348,11 @@ echo "------"
 if [[ "$CLONE_REPOS" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
   if [[ "$CLEANREPO" == "1" ]] ; then
     if [ "$BUILD_ONLY" == "" ]; then
-      clean_repo2 exp master || exit 1
+      clean_repo2 exp $EXPBRANCH|| exit 1
     fi
     clean_repo2 fds $FDSBRANCH || exit 1
     if [ "$BUILD_ONLY" == "" ]; then
-      clean_repo2 fig master     || exit 1
+      clean_repo2 fig $FIGBRANCH     || exit 1
       clean_repo2 out $OUTBRANCH || exit 1
     fi 
     clean_repo2 smv $SMVBRANCH || exit 1
@@ -2373,18 +2370,18 @@ fi
       update_repo fds $FDSBRANCH || exit 1
       if [[ "$CHECK_CLUSTER" == "" ]]; then
         update_repo smv $SMVBRANCH || exit 1
-        update_repo fig master || exit 1
-        update_repo out master || exit 1
-        update_repo exp master || exit 1
+        update_repo fig $FIGBRANCH || exit 1
+        update_repo out $OUTBRANCH || exit 1
+        update_repo exp $EXPBRANCH || exit 1
       fi
     fi
 # we are not cloning fig, out and exp so update them
     if [[ "$CLONE_REPOS" != "" ]] && [[ "$CLONE_FDSSMV" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
       UPDATING=1
       echo Updating
-      update_repo fig master || exit 1
-      update_repo out master || exit 1
-      update_repo exp master || exit 1
+      update_repo fig $FIGBRANCH || exit 1
+      update_repo out $OUTBRANCH || exit 1
+      update_repo exp $EXPBRANCH || exit 1
     fi
   fi
   if [ "$UPDATING" == "" ]; then
