@@ -22,7 +22,6 @@ def restart_program():
     os.execl(python, python, * sys.argv)
 
 platforms  = ["", "Windows", "Linux", "OSX"]
-buildtypes = ["", "test", "release"]
 apps       = ["", "FDS", "Smokeview" ]
 guides     = ["", "User", "Verification", "Validation"]
 
@@ -65,11 +64,11 @@ def build_smv_rel():               os.system("start " + webscript_dir + "webBUIL
 def build_lib():                   os.system("start " + webscript_dir + "webBUILDlibs "     + platforms[buildplatform.get()])
 def build_util():                  os.system("start " + webscript_dir + "webBUILDallprog "  + platforms[buildplatform.get()])
 
-def bundle_smv():                  os.system("start " + webscript_dir + "webPACKAGEsmv "    + platforms[bundleplatform.get()] + " " + buildtypes[buildtype.get()] )
+def bundle_smv():                  os.system("start " + webscript_dir + "webPACKAGEsmv "    + platforms[bundleplatform.get()] + " test" )
 
-def install_smv():                 os.system("start " + webscript_dir + "webINSTALLsmv "    + platforms[bundleplatform.get()] + " " + buildtypes[buildtype.get()] )
+def install_smv():                 os.system("start " + webscript_dir + "webINSTALLsmv "    + platforms[bundleplatform.get()] + " test" )
 
-def bundle_install_smv():          os.system("start " + webscript_dir + "webPACKAGEINSTALLsmv " + platforms[bundleplatform.get()] + " " + buildtypes[buildtype.get()] )
+def bundle_install_smv():          os.system("start " + webscript_dir + "webPACKAGEINSTALLsmv " + platforms[bundleplatform.get()] + " test" )
 
 def download_figures():            os.system("start " + webscript_dir + "webGETfigs "       + apps[app.get()]                 + " " + guides[guide.get()] )
  
@@ -202,7 +201,7 @@ Button(root, text="Utils", width=button_width, command=build_util).grid(row=R, c
 # ------------------------- Build test smokeview ------------------------------
 R=R+1
 Label(root,  text="Build smv(Intel):").grid(column=0, row=R, sticky=E)
-Button(root, text="test",   width=button_width, command=build_smv, fg='white', bg='blue').grid(row=R,  column=1)
+Button(root, text="test",      width=button_width, command=build_smv, fg='white', bg='blue').grid(row=R,  column=1)
 Button(root, text="release",   width=button_width, command=build_smv_rel).grid(row=R,  column=2)
 R=R+1
 Label(root,  text="Build smv(Intel):").grid(column=0, row=R, sticky=E)
@@ -231,20 +230,6 @@ Radiobutton(root,
                padx = 0, 
                variable=bundleplatform, 
                value=3).grid(row=R, column=2)
-
-R=R+1
-
-Radiobutton(root, 
-               text="test",
-               padx = 0, 
-               variable=buildtype, 
-               value=1).grid(row=R, column=0)
-
-Radiobutton(root, 
-               text="release",
-               padx = 0, 
-               variable=buildtype, 
-               value=2).grid(row=R, column=1)
 
 R=R+1
 Button(root, text="Bundle",     width=button_width, command=bundle_smv).grid(row=R,        column=0)
