@@ -1,28 +1,7 @@
 <html>
 <head>
 <TITLE>Getting Started using FDS/Smokeview Build Scripts</TITLE>
-<script type="text/javascript">
-// for debugging:
-//document.getElementById("demo").innerHTML = fullcommand;
-
-
-MyObject = new ActiveXObject("WScript.Shell")
-function get_fullpath(command,platform){
-  var location = window.location.pathname;
-  var directoryPath = location.substring(1, location.lastIndexOf("/")+1);
-  var fullpath = directoryPath.concat(command).concat(platform);
-  return fullpath;
-}
-function run_script(script){
-  MyObject.Run(get_fullpath("webscripts/webRUN_script.bat ",script));
-}
-</script>
-</HEAD>
 <BODY BGCOLOR="#FFFFFF" >
-<a href="build_bundle.html"><font size=5>Bundle</font></a> -
-<a href="build_fds.html"><font size=5>FDS</font></a> - 
-<a href="build_smokeview.html"><font size=5>Smokeview</font></a> - 
-<a href="build_guides.html"><font size=5>Guides</font></a>
 
 <h2>Getting Started using FDS/Smokeview Build Scripts</h2>
 <hr size="1">
@@ -34,8 +13,6 @@ function run_script(script){
 <ol>
 <li>Open the <tt>Utilities\Scripts</tt> folder and double-click on the file <tt>COPY_fds_smv_env.bat</tt>. 
 This copies <tt>fds-smv_env.bat</tt> to your home directory.
-<li><button onclick="run_script('\\bot\\Bundle\\webscripts\\webEDIT_setup.bat')">Click here</button> to update the <tt>fds_smv_env.bat</tt> configuration file.
-(Define your FDS/Smokeview repository location.)
 </ol>
 
 <p><li>Compiling software
@@ -66,17 +43,6 @@ is located in the <tt>.ssh</tt> directory in your home directory.
 <li>Add Winzip and Winzip self extractor locations to system PATH variable
 </ol>
 </ul>
-
-<h3>Testing the Setup</h3>
-<ul>
-<p><li><button onclick="run_script('\\bot\\Bundle\\webscripts\\webTestSetup.bat')">Click here</button> to verify that software tools
-needed by the FDS-Smokeview web scripts are installed.
-</ul>
-
-<p><hr>
-<p><button onclick="run_script('\\bot\\Bundle\\webscripts\\webEDIT_getting_started.bat')">Edit this web page</button>
-
-
 
 
 </BODY>
