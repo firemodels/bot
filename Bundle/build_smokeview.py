@@ -194,19 +194,15 @@ Radiobutton(root,
 # ------------------------- Build libraries, utilities ------------------------------
 
 R=R+1
-Label(root,  text="Build(Intel):").grid(column=0, row=R, sticky=E)
+Label(root,  text="Build:").grid(column=0, row=R, sticky=E)
 Button(root, text="Libs",  width=button_width, command=build_lib).grid(row=R,  column=1)
 Button(root, text="Utils", width=button_width, command=build_util).grid(row=R, column=2)
 
 # ------------------------- Build test smokeview ------------------------------
 R=R+1
-Label(root,  text="Build smv(Intel):").grid(column=0, row=R, sticky=E)
+Label(root,  text="Build smv:").grid(column=0, row=R, sticky=E)
 Button(root, text="test",      width=button_width, command=build_smv, fg='white', bg='blue').grid(row=R,  column=1)
-Button(root, text="release",   width=button_width, command=build_smv_rel).grid(row=R,  column=2)
-R=R+1
-Label(root,  text="Build smv(Intel):").grid(column=0, row=R, sticky=E)
-Button(root, text="Win test inc",    width=button_width, command=build_smv_win_inc).grid(row=R, column=1)
-Button(root, text="test debug",    width=button_width, command=build_smv_test_deb).grid(row=R, column=2)
+Button(root, text="Win test inc",    width=button_width, command=build_smv_win_inc).grid(row=R, column=2)
 
 R=R+1
 Label(root, text="-------------BUNDLE/INSTALL--------------").grid(column=0, row=R, columnspan=3)
@@ -239,13 +235,13 @@ Button(root, text="Bundle/Install", width=button_width,  fg='white', bg='blue', 
 R=R+1
 Label(root, text="-----UPLOAD BUNDLES to google drive------").grid(column=0, row=R, columnspan=3)
 R=R+1
-Button(root, text="Windows",  width=button_width+2, command=upload_win_bundle).grid(row=R, column=0)
-Button(root, text="Linux",  width=button_width+2, command=upload_lnx_bundle).grid(row=R, column=1)
-Button(root, text="OSX",  width=button_width+2, command=upload_osx_bundle).grid(row=R, column=2)
+Button(root, text="Windows",  width=button_width, command=upload_win_bundle).grid(row=R, column=0)
+Button(root, text="Linux",  width=button_width, command=upload_lnx_bundle).grid(row=R, column=1)
+Button(root, text="OSX",  width=button_width, command=upload_osx_bundle).grid(row=R, column=2)
 
 R=R+1
-Button(root, text="All",  width=button_width+2, command=upload_all_bundles).grid(row=R, column=0)
-Button(root, text="Set LNX/OSX shortcuts", width=button_width+6,    command=archive_smv).grid(row=R,   column=2)
+Button(root, text="All",  width=button_width, command=upload_all_bundles).grid(row=R, column=0)
+Button(root, text="LNX/OSX shortcuts", width=button_width+3,    command=archive_smv).grid(row=R,   column=2)
 
 # ------------------------- get figures ------------------------------
 
