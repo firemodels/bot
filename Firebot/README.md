@@ -77,39 +77,3 @@ MAILTO=""
 
 The output from firebot is written into the directory called `output` which is in the same directory as the `firebot.sh` script itself. When firebot completes, email should be sent to the specified list of addresses. The fds/Manuals directory in the fds repo containing manuals and figures is copied to the directdory $HOME/.firebot/Manuals .
 
-## Updating Comparison Images
-
-Firebot compares images it generates with a corresponding set of base images located in the fig repo.
-To update the base images on a Linux or Mac computer:
-
-Assume bot, fig, fds repos etc are under $HOME/FireModels_fork
-
-1.  bring fig repo up to date
-```
-    cd $HOME/FireModels_fork/fig
-    git remote update
-    git merge firemodels/master
-    git merge origin/master
-    git push origin master
-```
-2. compare images
-```
-  cd $HOME/FireModels_fork/bot/Firebot
-  ./scripts/update_repo_images.sh -r /path_to_firebot_root
-```
-  where `/path_to_firebot_root` is the root directory containing the bot/Firebot directory that generated the images.  
-
-3. add updated images to fig repo
-  ```cd $HOME/FireModels_fork/bot/fig```
-  follow the usual procedure to incorporate updated fig repo images into your repo and github 
-  ie stage, commit, push and do a pull request
-
-
-
-At NIST we would type the following command to generate the new base set of images
-
-```
-cd $HOME/FireModels_fork/bot/Firebot
-../scripts/update_repo_images -r ~firebot/Firebot_clone
-```
-
