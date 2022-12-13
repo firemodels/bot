@@ -1,6 +1,6 @@
 # CFASTbot: A Continuous Integration Tool for CFAST
 
-CFASTbot is a verification test script that can be run at a regular intervals as part of a continuous integration program. At NIST, the script is run by a pseudo-user named `cfast` on a linux cluster each day. The pseudo-user `cfast` updates the various repositories in the GitHub project named `firemodels`, compiles CFAST and Smokeview, runs the validation and verification cases, checks the results for accuracy, and builds all of the manuals. The entire process takes about an hour to complete.
+CFASTbot is a script that can be run at a regular intervals as part of a continuous integration program. At NIST, the script is run by a pseudo-user named `cfast` on a linux cluster each day. The pseudo-user `cfast` updates the various repositories in the GitHub project named `firemodels`, compiles CFAST and Smokeview, runs the validation and verification cases, checks the results for accuracy, and builds all of the manuals. The entire process takes about an hour to complete.
 
 ## Set-Up
 
@@ -8,11 +8,9 @@ The following steps need only be done once. The exact phrasing of the commands a
 
 1. Clone the repositories that are included in the GitHub organization called `firemodels`: `cfast`, `smv`, `bot`, and `exp`. Clone `bot` first, then cd into `bot/Scripts` and type `./setup_repos.sh -c` . This will clone all the other repos needed in the same directory as `bot` (or you can clone each repo in the same way as you cloned `bot`).
 
-
 2. Ensure that the following software packages are installed on the system:
 
-    * Intel Fortran and C compilers and Intel Inspector
-    * Gnu Fortran compiler
+    * Intel Fortran and C compilers
     * LaTeX (TeX Live distribution), be sure to make this the default LaTeX in the system-wide PATH
     * Matlab (test the command `matlab`)
 
@@ -33,7 +31,7 @@ The following steps need only be done once. The exact phrasing of the commands a
    
 6. Setup passwordless SSH for the your account. Generate SSH keys and ensure that the head node can SSH into all of the compute nodes. Also, make sure that your account information is propagated across all compute nodes.
 
-7. If desired, ensure that a queue named `cfastbot` is created and enabled. Test the `qstat` command.  If you use some other queue say batch then use `-q batch` when running CFASTbot.  
+7. If desired, ensure that a queue named `cfastbot` is created and enabled. Test the `qstat` command.  If you use some other queue, e.g. batch, then use `-q batch` when running CFASTbot.  
 
 8. By default, CFASTbot sends email to the email address configured for your bot repo (output of command `git config user.email` ) .  If you wish email to go to different email addresses, create a file named $HOME/.cfastbot/cfastbot_email_list.sh for some `user1` and `user2` (or more) that looks like:
    ```
@@ -48,6 +46,12 @@ The script `cfastbot.sh` is run using the wrapper script `run_cfastbot.sh`. This
 ./run_cfastbot.sh -H
 ```
 Important things to consider: do you want to test your own local changes, or update your repositories from the central repository? Do you want to skip certain stages of the process?
+
+If you just want to test the version of `cfast`, `smv`, and `exp`, issue the following command from within the `Cfastbot` directory of the `bot` repository:
+```
+nohup ./run_cfastbot.sh -c -m <email address> &
+```
+The `-c` option directs cfastbot to clean the repositories as needed. Be careful if you have unversioned files within the repositories that would be erased.
 
 You can start cfastbot at some future time using `crontab` with an entry like the following:
 ```
