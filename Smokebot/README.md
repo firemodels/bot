@@ -87,7 +87,7 @@ Assume bot, fig, smv repos etc are under $HOME/FireModels_fork
 2. compare images
 ```
   cd $HOME/FireModels_fork/bot/Firebot
-  ./scripts/update_repo_images.sh -r /path_to_firebot_root
+  ../scripts/update_repo_images.sh -r /path_to_firebot_root
 ```
   where `/path_to_firebot_root` is the root directory containing the bot/Firebot directory that generated the images.  
 
