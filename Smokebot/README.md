@@ -86,10 +86,10 @@ Assume bot, fig, smv repos etc are under $HOME/FireModels_fork
 ```
 2. compare images
 ```
-  cd $HOME/FireModels_fork/bot/Firebot
-  ./scripts/update_repo_images.sh -r /path_to_firebot_root
+  cd $HOME/FireModels_fork/bot/Smokebot
+  ../scripts/update_repo_images.sh -r path_to_smokebot_root  (at NIST: ~smokebot/Firemodels_clone )
 ```
-  where `/path_to_firebot_root` is the root directory containing the bot/Firebot directory that generated the images.  
+  where `path_to_smokebot_root` is the root directory containing the bot/Smokebot directory that generated the images.  
 
 3. add updated images to fig repo
   ```cd $HOME/FireModels_fork/bot/fig```
