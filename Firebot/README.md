@@ -95,14 +95,18 @@ Assume bot, fig and fds repos etc are under $HOME/FireModels_fork
 2. add updated timings to fig repo
 
 Each time firebot runs it outputs a timing spreadsheet file (file with .csv extention) to
-$HOME/.firebot/history . The file will have a name like `FDS6.7.9-1277-g43cd84dc2_timing.csv` .
-To updating the reference timing file in the fig repo
+$HOME/.firebot/history where $HOME is home directory of the account that ran firebot. 
+The file will have a name like `FDS6.7.9-1277-g43cd84dc2_timing.csv` .
+To update the reference timing file in the fig repo:
 
-   *  copy the desired timing.csv file from .firebot/history (usually the latest) to the path_to_fig_repo/fds/Reference_Times directory and
-name it base_times.csv
-   * cd into the fds repo where firebot was run and type git describe --dirty --local path_to_fig_repo/fds/Reference_Times/FDS_REVISION
+   *  Copy the desired timing.csv file from .firebot/history (usually the latest) to the path_to_fig_repo/fds/Reference_Times directory and
+rename the file base_times.csv
+   * cd into the fds repo where firebot was run and type git describe --dirty --local .  Copy the output of this 
+   command path_to_fig_repo/fds/Reference_Times/FDS_REVISION
 
 FDS_REVISION is also copied into the fig repo so we know what version of fds produced the reference times.
+
+
 
 
  
