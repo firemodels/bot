@@ -28,9 +28,6 @@ guides     = ["", "User", "Verification", "Validation", "Technical"]
 platform=IntVar()
 platform.set(1)
 
-cleanplatform=IntVar()
-cleanplatform.set(1)
-
 buildtype=IntVar()
 buildtype.set(1)
 
@@ -82,9 +79,9 @@ def webCOPYconfig2home():          os.system("start " + webscript_dir + "webCOPY
 def webSYNCHfds2smv():             os.system("start " + webscript_dir + "webSYNCHfds2smv")
 def webSYNCHsmv2fds():             os.system("start " + webscript_dir + "webSYNCHsmv2fds")
 
-def clean_repos():                 os.system("start " + webscript_dir + "webclean "       + platforms[cleanplatform.get()])
-def clean_uploads():               os.system("start " + webscript_dir + "webCleanUpload " + platforms[cleanplatform.get()])
-def clean_smv():                   os.system("start " + webscript_dir + "webCleanSMV "    + platforms[cleanplatform.get()])
+def clean_repos():                 os.system("start " + webscript_dir + "webclean "       + platforms[platform.get()])
+def clean_uploads():               os.system("start " + webscript_dir + "webCleanUpload " + platforms[platform.get()])
+def clean_smv():                   os.system("start " + webscript_dir + "webCleanSMV "    + platforms[platform.get()])
 
 def set_branch():                  os.system("start " + webscript_dir + "webSET_branches")
 def add_notes():                   os.system("start " + webscript_dir + "webGET_smvlog")
@@ -102,15 +99,15 @@ R=0
 Label(root, text="----------------------------EDIT-----------------------------").grid(column=0, row=R, columnspan=4)
 
 R=R+1
-Button(root, text="Add Notes",      width=button_width, command=add_notes).grid(row=R,  column=0)
-Button(root, text="View Notes",     width=button_width, command=view_notes).grid(row=R, column=1)
-Button(root, text="Edit Script",    width=button_width, command=edit_this_page).grid(row=R, column=2)
-Button(root, text="Edit Settings",  width=button_width, command=edit_settings).grid(row=R,  column=3)
+Button(root, text="Edit Script",    width=button_width, command=edit_this_page).grid(row=R, column=0)
+Button(root, text="Edit Settings",  width=button_width, command=edit_settings).grid(row=R,  column=1)
+Button(root, text="Add Notes",      width=button_width, command=add_notes).grid(row=R,  column=2)
+Button(root, text="View Notes",     width=button_width, command=view_notes).grid(row=R, column=3)
 
 # ------------------------- Show repo revisions ------------------------------
 
 R=R+1
-Label(root, text="----------------------------REPOS----------------------------").grid(column=0, row=R, columnspan=4)
+Label(root, text="-----------------------SHOW/SET REPOS-----------------------").grid(column=0, row=R, columnspan=4)
 
 R=R+1
 Button(root, text="Show Revision",     width=button_width, command=show_repos).grid(row=R,  column=0)
@@ -121,41 +118,18 @@ Button(root, text="Set Bundle Rev",   width=button_width+2, command=set_revision
 # ------------------------- Update repos ------------------------------
 
 R=R+1
-Button(root, text="Update All/OSs",    width=button_width, command=update_all, bg='blue', fg='white').grid(row=R,     column=0)
-Button(root, text="Update All/Win",    width=button_width, command=update_windows).grid(row=R, column=1)
-Button(root, text="Update smv/OSs",    width=button_width, command=update_smv_all).grid(row=R,     column=2)
-Button(root, text="Update smv/Win",    width=button_width, command=update_smv_windows).grid(row=R, column=3)
-
-
-
-# ------------------------- clean ------------------------------
+Label(root, text="-------------------------UPDATE REPOS-------------------------").grid(column=0, row=R, columnspan=4)
 
 R=R+1
-Label(root, text="----------------------------CLEAN----------------------------").grid(column=0, row=R, columnspan=4)
-
-R=R+1
-
-Radiobutton(root, 
-               text="Windows",
-               padx = 0, 
-               variable=cleanplatform, 
-               value=1).grid(row=R, column=0)
-
-Radiobutton(root, 
-               text="All",
-               padx = 0, 
-               variable=cleanplatform, 
-               value=2).grid(row=R, column=1)
-
-R=R+1
-Button(root, text="Repos",   width=button_width, command=clean_repos).grid(row=R,   column=0)
-Button(root, text="Uploads", width=button_width, command=clean_uploads).grid(row=R, column=1)
-Button(root, text="Smv",     width=button_width, command=clean_smv).grid(row=R,     column=2)
+Button(root, text="All",    width=button_width, command=update_all, bg='blue', fg='white').grid(row=R,     column=0)
+Button(root, text="All on Win",    width=button_width, command=update_windows).grid(row=R, column=1)
+Button(root, text="smv on all",    width=button_width, command=update_smv_all).grid(row=R,     column=2)
+Button(root, text="smv on Win",    width=button_width, command=update_smv_windows).grid(row=R, column=3)
 
 # ------------------------- Build ------------------------------
 
 R=R+1
-Label(root, text="---------------------BUILD/BUNDLE/INSTALL---------------------").grid(column=0, row=R, columnspan=4)
+Label(root, text="----------------------------BUILD-----------------------------").grid(column=0, row=R, columnspan=4)
 
 R=R+1
 
@@ -179,6 +153,10 @@ Radiobutton(root,
 
 # ------------------------- Build libraries, utilities ------------------------------
 
+R=R+1
+Button(root, text="Clean Repos",   width=button_width, command=clean_repos).grid(row=R,   column=0)
+Button(root, text="Clean Uploads", width=button_width, command=clean_uploads).grid(row=R, column=1)
+Button(root, text="Clean smv",     width=button_width, command=clean_smv).grid(row=R,     column=2)
 R=R+1
 Button(root, text="Libs",  width=button_width, command=build_lib).grid(row=R,  column=0)
 Button(root, text="Utils", width=button_width, command=build_util).grid(row=R, column=1)
