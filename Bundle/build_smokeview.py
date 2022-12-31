@@ -24,7 +24,6 @@ def restart_program():
 platforms  = ["", "Windows", "Linux", "OSX"]
 apps       = ["", "FDS", "Smokeview" ]
 guides     = ["", "User", "Verification", "Validation"]
-userverguides     = ["", "User", "Verification"]
 
 buildplatform=IntVar()
 buildplatform.set(1)
@@ -43,9 +42,6 @@ app.set(2)
 
 guide=IntVar()
 guide.set(1)
-
-userverguide=IntVar()
-userverguide.set(1)
 
 button_width=11
 
@@ -75,6 +71,8 @@ def install_smv():                 os.system("start " + webscript_dir + "webINST
 def bundle_install_smv():          os.system("start " + webscript_dir + "webPACKAGEINSTALLsmv " + platforms[bundleplatform.get()] + " test" )
 
 def download_figures():            os.system("start " + webscript_dir + "webGETfigs "       + apps[app.get()]                 + " " + guides[guide.get()] )
+def build_guides():                os.system("start " + webscript_dir + "webBUILDguides "   + apps[app.get()]                 + " " + guides[guide.get()] )
+def view_guides():                 os.system("start " + webscript_dir + "webVIEWguides "    + apps[app.get()]                 + " " + guides[guide.get()] )
  
 def archive_smv():                 os.system("start " + webscript_dir + "webARCHIVEAllbundle"  )
 def upload_all_bundles():          os.system("start " + webscript_dir + "webUPLOADAllsmv")
@@ -97,11 +95,6 @@ def edit_notes():                  os.system("start " + webscript_dir + "webEDIT
 def view_notes():                  os.system("start " + webscript_dir + "webVIEW_release_notes")
 def edit_this_page():              os.system("start " + webscript_dir + "webEDIT_build_smokeview_py")
 def edit_settings():               os.system("start " + webscript_dir + "webEDIT_setup")
-
-def webBUILDsmvguide():            os.system("start " + webscript_dir + "webBUILDsmvguide"  + " SMV_" + userverguides[userverguide.get()] + "_Guide")
-def webBUILDfdsguide():            os.system("start " + webscript_dir + "webBUILDfdsguide"  + " FDS_" + userverguides[userverguide.get()] + "_Guide")
-def webVIEWsmvguide():             os.system("start " + webscript_dir + "webVIEWsmvguide"   + " SMV_" + userverguides[userverguide.get()] + "_Guide")
-def webVIEWfdsguide():             os.system("start " + webscript_dir + "webVIEWfdsguide"   + " FDS_" + userverguides[userverguide.get()] + "_Guide")
 
 root.title('Smokeview')
 root.resizable(0, 0)
@@ -252,10 +245,10 @@ R=R+1
 Button(root, text="All",  width=button_width, command=upload_all_bundles).grid(row=R, column=0)
 Button(root, text="LNX/OSX shortcuts", width=button_width+3,    command=archive_smv).grid(row=R,   column=2)
 
-# ------------------------- get figures ------------------------------
+# ------------------------- guides ------------------------------
 
 R=R+1
-Label(root, text="------------DOWNLOAD FIGURES-------------").grid(column=0, row=R, columnspan=3)
+Label(root, text="-----------------GUIDES------------------").grid(column=0, row=R, columnspan=3)
 
 R=R+1
 
@@ -293,34 +286,9 @@ Radiobutton(root,
 
 
 R=R+1
-Button(root, text="Download", width=button_width, command=download_figures).grid(row=R,   column=0)
-# ------------------------- build/view guides ------------------------------
-
-R=R+1
-Label(root, text="------------Build/View Guides ------------").grid(column=0, row=R, columnspan=3)
-R=R+1
-
-Radiobutton(root, 
-               text="User",
-               padx = 0, 
-               variable=userverguide, 
-               value=1).grid(row=R, column=0)
-
-Radiobutton(root, 
-               text="Verification",
-               padx = 0, 
-               variable=userverguide, 
-               value=2).grid(row=R, column=1)
-
-R=R+1
-Label(root, text="Build:").grid(column=0, row=R, sticky=E)
-Button(root, text="Smokeview",  width=button_width, command=webBUILDsmvguide).grid(row=R, column=1)
-Button(root, text="FDS",        width=button_width, command=webBUILDfdsguide).grid(row=R, column=2)
-
-R=R+1
-Label(root, text="View:").grid(column=0, row=R, sticky=E)
-Button(root, text="Smokview",   width=button_width, command=webVIEWsmvguide).grid(row=R, column=1)
-Button(root, text="FDS",        width=button_width, command=webVIEWfdsguide).grid(row=R, column=2)
+Button(root, text="Get Figs", width=button_width, command=download_figures).grid(row=R,   column=0)
+Button(root, text="Build",    width=button_width, command=build_guides).grid(row=R,   column=1)
+Button(root, text="View",     width=button_width, command=view_guides).grid(row=R,   column=2)
 
 # ------------------------- synchronize ------------------------------
 
