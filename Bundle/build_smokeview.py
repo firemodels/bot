@@ -23,7 +23,7 @@ def restart_program():
 
 platforms  = ["", "Windows", "Linux", "OSX"]
 apps       = ["", "FDS", "Smokeview" ]
-guides     = ["", "User", "Verification", "Validation"]
+guides     = ["", "User", "Verification", "Validation", "Technical"]
 
 buildplatform=IntVar()
 buildplatform.set(1)
@@ -263,6 +263,12 @@ Radiobutton(root,
                padx = 0, 
                variable=app, 
                value=2).grid(row=R, column=1)
+
+Radiobutton(root, 
+               text="Technical",
+               padx = 0, 
+               variable=guide, 
+               value=4).grid(row=R, column=2)
 
 R=R+1
 
