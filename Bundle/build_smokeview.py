@@ -25,14 +25,11 @@ platforms  = ["", "Windows", "Linux", "OSX"]
 apps       = ["", "FDS", "Smokeview" ]
 guides     = ["", "User", "Verification", "Validation", "Technical"]
 
-buildplatform=IntVar()
-buildplatform.set(1)
+platform=IntVar()
+platform.set(1)
 
 cleanplatform=IntVar()
 cleanplatform.set(1)
-
-bundleplatform=IntVar()
-bundleplatform.set(1)
 
 buildtype=IntVar()
 buildtype.set(1)
@@ -58,17 +55,17 @@ def update_smv_all():              os.system("start " + webscript_dir + "webUPDA
 def set_revision():                os.system("start " + webscript_dir + "webSET_bundle_revision")
 
 def build_smv_win_inc():           os.system("start " + webscript_dir + "webBUILDsmv Windows testinc")
-def build_smv_test_deb():          os.system("start " + webscript_dir + "webBUILDsmvdebug " + platforms[buildplatform.get()])
-def build_smv():                   os.system("start " + webscript_dir + "webBUILDsmv  "     + platforms[buildplatform.get()] + " "    + "test" )
-def build_smv_rel():               os.system("start " + webscript_dir + "webBUILDsmv  "     + platforms[buildplatform.get()] + " "    + "release" )
-def build_lib():                   os.system("start " + webscript_dir + "webBUILDlibs "     + platforms[buildplatform.get()])
-def build_util():                  os.system("start " + webscript_dir + "webBUILDallprog "  + platforms[buildplatform.get()])
+def build_smv_test_deb():          os.system("start " + webscript_dir + "webBUILDsmvdebug " + platforms[platform.get()])
+def build_smv():                   os.system("start " + webscript_dir + "webBUILDsmv  "     + platforms[platform.get()] + " "    + "test" )
+def build_smv_rel():               os.system("start " + webscript_dir + "webBUILDsmv  "     + platforms[platform.get()] + " "    + "release" )
+def build_lib():                   os.system("start " + webscript_dir + "webBUILDlibs "     + platforms[platform.get()])
+def build_util():                  os.system("start " + webscript_dir + "webBUILDallprog "  + platforms[platform.get()])
 
-def bundle_smv():                  os.system("start " + webscript_dir + "webPACKAGEsmv "    + platforms[bundleplatform.get()] + " test" )
+def bundle_smv():                  os.system("start " + webscript_dir + "webPACKAGEsmv "    + platforms[platform.get()] + " test" )
 
-def install_smv():                 os.system("start " + webscript_dir + "webINSTALLsmv "    + platforms[bundleplatform.get()] + " test" )
+def install_smv():                 os.system("start " + webscript_dir + "webINSTALLsmv "    + platforms[platform.get()] + " test" )
 
-def bundle_install_smv():          os.system("start " + webscript_dir + "webPACKAGEINSTALLsmv " + platforms[bundleplatform.get()] + " test" )
+def bundle_install_smv():          os.system("start " + webscript_dir + "webPACKAGEINSTALLsmv " + platforms[platform.get()] + " test" )
 
 def download_figures():            os.system("start " + webscript_dir + "webGETfigs "       + apps[app.get()]                 + " " + guides[guide.get()] )
 def build_guides():                os.system("start " + webscript_dir + "webBUILDguides "   + apps[app.get()]                 + " " + guides[guide.get()] )
@@ -158,26 +155,26 @@ Button(root, text="Smv",     width=button_width, command=clean_smv).grid(row=R, 
 # ------------------------- Build ------------------------------
 
 R=R+1
-Label(root, text="----------------------------BUILD----------------------------").grid(column=0, row=R, columnspan=4)
+Label(root, text="---------------------BUILD/BUNDLE/INSTALL---------------------").grid(column=0, row=R, columnspan=4)
 
 R=R+1
 
 Radiobutton(root, 
                text="Windows",
                padx = 0, 
-               variable=buildplatform, 
+               variable=platform, 
                value=1).grid(row=R, column=0)
 
 Radiobutton(root, 
                text="Linux",
                padx = 0, 
-               variable=buildplatform, 
+               variable=platform, 
                value=2).grid(row=R, column=1)
 
 Radiobutton(root, 
                text="OSX",
                padx = 0, 
-               variable=buildplatform, 
+               variable=platform, 
                value=3).grid(row=R, column=2)
 
 # ------------------------- Build libraries, utilities ------------------------------
@@ -187,30 +184,6 @@ Button(root, text="Libs",  width=button_width, command=build_lib).grid(row=R,  c
 Button(root, text="Utils", width=button_width, command=build_util).grid(row=R, column=1)
 Button(root, text="smv test",      width=button_width, command=build_smv, fg='white', bg='blue').grid(row=R,  column=2)
 Button(root, text="smv Win test inc",    width=button_width, command=build_smv_win_inc).grid(row=R, column=3)
-
-R=R+1
-Label(root, text="------------------------BUNDLE/INSTALL-----------------------").grid(column=0, row=R, columnspan=4)
-
-R=R+1
-
-Radiobutton(root, 
-               text="Windows",
-               padx = 0, 
-               variable=bundleplatform, 
-               value=1).grid(row=R, column=0)
-
-Radiobutton(root, 
-               text="Linux",
-               padx = 0, 
-               variable=bundleplatform, 
-               value=2).grid(row=R, column=1)
-
-Radiobutton(root, 
-               text="OSX",
-               padx = 0, 
-               variable=bundleplatform, 
-               value=3).grid(row=R, column=2)
-
 R=R+1
 Button(root, text="Bundle",     width=button_width, command=bundle_smv).grid(row=R,        column=0)
 Button(root, text="Install",    width=button_width, command=install_smv).grid(row=R,       column=1)
