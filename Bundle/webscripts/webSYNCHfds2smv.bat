@@ -31,8 +31,6 @@ call :COPY %fdsdir%\authors.tex      %smvdir%
 set fdsdir=%svn_root%\fds\Source
 set smvdir=%svn_root%\smv\Source\smokeview
 
-call :COPY %fdsdir%\gsmv.f90 %smvdir%
-
 cd %CURDIR%
 GOTO EOF
 
