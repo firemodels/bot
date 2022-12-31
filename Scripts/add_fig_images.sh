@@ -9,7 +9,7 @@ echo "add modified fig images to fig repo"
 echo ""
 echo "Options:"
 echo "-h - display this message"
-echo "-b - html base"
+echo "-b - html base [default: $HTMLBASE]"
 exit 0
 }
 HTMLBASE=clonef
@@ -47,5 +47,5 @@ for f in $VERFILES
 do
 git add $f
 done
-git checkout *.png
+git clean -dxf
 

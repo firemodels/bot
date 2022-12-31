@@ -40,7 +40,11 @@ if "%guide%" == "Verification" (
   goto eof
 )
 if "%guide%" == "Validation" (
-  echo Smokeview does not have any Validation figures
+  echo Smokeview does not have any Validation figures to download
+  goto eof
+)
+if "%guide%" == "Technical" (
+  echo Smokeview does not have any Technical guide figures to download
   goto eof
 )
 goto eof
@@ -76,6 +80,10 @@ if "%guide%" == "Verification" (
 
   cd %svn_root%\fds\Manuals\fds/FDS_Verification_Guide\SCRIPT_FIGURES\Scatterplots
   pscp -P 22 %linux_logon%:%firebothome%/.firebot/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/Scatterplots/* .
+  goto eof
+)
+if "%guide%" == "Technical" (
+  echo FDS does not have any Technical guide figures to download
   goto eof
 )
 
