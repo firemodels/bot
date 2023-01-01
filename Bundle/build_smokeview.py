@@ -118,13 +118,13 @@ Button(root, text="Set Bundle Rev",   width=button_width+2, command=set_revision
 # ------------------------- Update repos ------------------------------
 
 R=R+1
-Label(root, text="-------------------------UPDATE REPOS-------------------------").grid(column=0, row=R, columnspan=4)
+Label(root, text="-----------------UPDATE REPOS(repos/platforms)-----------------").grid(column=0, row=R, columnspan=4)
 
 R=R+1
-Button(root, text="All",    width=button_width, command=update_all, bg='blue', fg='white').grid(row=R,     column=0)
-Button(root, text="All on Win",    width=button_width, command=update_windows).grid(row=R, column=1)
-Button(root, text="smv on all",    width=button_width, command=update_smv_all).grid(row=R,     column=2)
-Button(root, text="smv on Win",    width=button_width, command=update_smv_windows).grid(row=R, column=3)
+Button(root, text="All/All",    width=button_width, command=update_all, bg='blue', fg='white').grid(row=R,     column=0)
+Button(root, text="All/Win",    width=button_width, command=update_windows).grid(row=R, column=1)
+Button(root, text="smv/All",    width=button_width, command=update_smv_all).grid(row=R,     column=2)
+Button(root, text="smv/Win",    width=button_width, command=update_smv_windows).grid(row=R, column=3)
 
 # ------------------------- Build ------------------------------
 
@@ -229,7 +229,7 @@ Button(root, text="View",     width=button_width, command=view_guides).grid(row=
 # ------------------------- synchronize ------------------------------
 
 R=R+1
-Label(root, text="-------------------SYNCHRONIZE SETTINGS/BIB------------------").grid(column=0, row=R, columnspan=4)
+Label(root, text="-------------------------SYNCHRONIZE-------------------------").grid(column=0, row=R, columnspan=4)
 R=R+1
 Button(root, text="settings ---> smv",  width=button_width, command=webCOPYhome2config).grid(row=R, column=0)
 Button(root, text="smv ---> settings",  width=button_width, command=webCOPYconfig2home).grid(row=R, column=1)
