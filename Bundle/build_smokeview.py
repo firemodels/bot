@@ -37,7 +37,7 @@ app.set(2)
 guide=IntVar()
 guide.set(1)
 
-button_width=13
+button_width=15
 
 # link windows batch files to python commands
 
@@ -121,10 +121,10 @@ R=R+1
 Label(root, text="-----------------UPDATE REPOS(repos/platforms)-----------------").grid(column=0, row=R, columnspan=4)
 
 R=R+1
-Button(root, text="All/All",    width=button_width, command=update_all, bg='blue', fg='white').grid(row=R,     column=0)
-Button(root, text="All/Win",    width=button_width, command=update_windows).grid(row=R, column=1)
-Button(root, text="smv/All",    width=button_width, command=update_smv_all).grid(row=R,     column=2)
-Button(root, text="smv/Win",    width=button_width, command=update_smv_windows).grid(row=R, column=3)
+Button(root, text="All(LNX/OSX/Win)",    width=button_width, command=update_all, bg='blue', fg='white').grid(row=R,     column=0)
+Button(root, text="All(Win)",    width=button_width, command=update_windows).grid(row=R, column=1)
+Button(root, text="smv(LNX/OSX/Win)",    width=button_width, command=update_smv_all).grid(row=R,     column=2)
+Button(root, text="smv(Win)",    width=button_width, command=update_smv_windows).grid(row=R, column=3)
 
 # ------------------------- Build ------------------------------
 
