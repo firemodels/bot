@@ -37,7 +37,7 @@ app.set(2)
 guide=IntVar()
 guide.set(1)
 
-button_width=15
+button_width=13
 
 # link windows batch files to python commands
 
@@ -59,8 +59,10 @@ def build_lib():                   os.system("start " + webscript_dir + "webBUIL
 def build_util():                  os.system("start " + webscript_dir + "webBUILDallprog "  + platforms[platform.get()])
 
 def bundle_smv():                  os.system("start " + webscript_dir + "webPACKAGEsmv "    + platforms[platform.get()] + " test" )
+def bundle_smv_rel():              os.system("start " + webscript_dir + "webPACKAGEsmv "    + platforms[platform.get()] + " release" )
 
 def install_smv():                 os.system("start " + webscript_dir + "webINSTALLsmv "    + platforms[platform.get()] + " test" )
+def install_smv_rel():             os.system("start " + webscript_dir + "webINSTALLsmv "    + platforms[platform.get()] + " release" )
 
 def bundle_install_smv():          os.system("start " + webscript_dir + "webPACKAGEINSTALLsmv " + platforms[platform.get()] + " test" )
 
@@ -69,10 +71,10 @@ def build_guides():                os.system("start " + webscript_dir + "webBUIL
 def view_guides():                 os.system("start " + webscript_dir + "webVIEWguides "    + apps[app.get()]                 + " " + guides[guide.get()] )
  
 def archive_smv():                 os.system("start " + webscript_dir + "webARCHIVEAllbundle"  )
-def upload_all_bundles():          os.system("start " + webscript_dir + "webUPLOADAllsmv")
 def upload_win_bundle():           os.system("start " + webscript_dir + "webUPLOADWinsmv")
 def upload_lnx_bundle():           os.system("start " + webscript_dir + "webUPLOADlnxsmv")
 def upload_osx_bundle():           os.system("start " + webscript_dir + "webUPLOADosxsmv")
+def upload_bundle_rel():           os.system("start " + webscript_dir + "webUPLOADsmvrelease")
 
 def webCOPYhome2config():          os.system("start " + webscript_dir + "webCOPYhome2config")
 def webCOPYconfig2home():          os.system("start " + webscript_dir + "webCOPYconfig2home")
@@ -113,7 +115,7 @@ R=R+1
 Button(root, text="Show Revision",     width=button_width, command=show_repos).grid(row=R,  column=0)
 Button(root, text="Show Branch",       width=button_width, command=show_branch).grid(row=R, column=1)
 Button(root, text="Set Master branch",     width=button_width, command=set_branch).grid(row=R,     column=2)
-Button(root, text="Set Bundle Rev",   width=button_width+2, command=set_revision, bg='blue', fg='white').grid(row=R, column=3)
+Button(root, text="Set Test Bundle Rev",   width=button_width+2, command=set_revision, bg='blue', fg='white').grid(row=R, column=3)
 
 # ------------------------- Update repos ------------------------------
 
@@ -123,7 +125,7 @@ Label(root, text="--------------------------UPDATE REPOS------------------------
 R=R+1
 Button(root, text="All",    width=button_width, command=update_all, bg='blue', fg='white').grid(row=R,     column=0)
 Button(root, text="All(Win)",    width=button_width, command=update_windows).grid(row=R, column=1)
-Button(root, text="smv(LNX/OSX/Win)",    width=button_width, command=update_smv_all).grid(row=R,     column=2)
+Button(root, text="smv(All platforms)",    width=button_width, command=update_smv_all).grid(row=R,     column=2)
 Button(root, text="smv(Win)",    width=button_width, command=update_smv_windows).grid(row=R, column=3)
 
 # ------------------------- Build ------------------------------
@@ -160,21 +162,30 @@ Button(root, text="Clean smv",     width=button_width, command=clean_smv).grid(r
 R=R+1
 Button(root, text="Libs",  width=button_width, command=build_lib).grid(row=R,  column=0)
 Button(root, text="Utils", width=button_width, command=build_util).grid(row=R, column=1)
-Button(root, text="smv test",      width=button_width, command=build_smv, fg='white', bg='blue').grid(row=R,  column=2)
-Button(root, text="smv Win test inc",    width=button_width, command=build_smv_win_inc).grid(row=R, column=3)
 R=R+1
-Button(root, text="Bundle",     width=button_width, command=bundle_smv).grid(row=R,        column=0)
-Button(root, text="Install",    width=button_width, command=install_smv).grid(row=R,       column=1)
-Button(root, text="Bundle/Install", width=button_width,  fg='white', bg='blue', command=bundle_install_smv).grid(row=R,       column=2)
-Button(root, text="LNX/OSX shortcuts", width=button_width+3,    command=archive_smv).grid(row=R,   column=3)
+Button(root, text="smv test",     width=button_width, command=build_smv,     fg='white', bg='blue').grid(row=R,  column=0)
+Button(root, text="Bundle test",  width=button_width, command=bundle_smv).grid(row=R,        column=1)
+Button(root, text="Install test", width=button_width, command=install_smv).grid(row=R,       column=2)
+
+R=R+1
+Button(root, text="smv release",     width=button_width, command=build_smv_rel).grid(row=R,  column=0)
+Button(root, text="Bundle release",  width=button_width, command=bundle_smv_rel).grid(row=R,        column=1)
+Button(root, text="Install release", width=button_width, command=install_smv_rel).grid(row=R,       column=2)
+
+R=R+1
+Button(root, text="smv Win test inc",  width=button_width,   command=build_smv_win_inc).grid(row=R, column=0)
+Button(root, text="smv test debug",    width=button_width,   command=build_smv_test_deb).grid(row=R,  column=1)
+Button(root, text="LNX/OSX shortcuts", width=button_width+3, command=archive_smv).grid(row=R,   column=2)
+
+#Button(root, text="Bundle/Install", width=button_width,  fg='white', bg='blue', command=bundle_install_smv).grid(row=R,       column=2)
 
 R=R+1
 Label(root, text="------------------------UPLOAD BUNDLES-----------------------").grid(column=0, row=R, columnspan=4)
 R=R+1
-Button(root, text="Windows",  width=button_width, command=upload_win_bundle).grid(row=R, column=0)
-Button(root, text="Linux",  width=button_width, command=upload_lnx_bundle).grid(row=R, column=1)
-Button(root, text="OSX",  width=button_width, command=upload_osx_bundle).grid(row=R, column=2)
-Button(root, text="All",  width=button_width, command=upload_all_bundles).grid(row=R, column=3)
+Button(root, text="Windows test", width=button_width, command=upload_win_bundle).grid(row=R, column=0)
+Button(root, text="Linux test",   width=button_width, command=upload_lnx_bundle).grid(row=R, column=1)
+Button(root, text="OSX test",     width=button_width, command=upload_osx_bundle).grid(row=R, column=2)
+Button(root, text="Release", width=button_width, command=upload_bundle_rel).grid(row=R, column=3)
 
 # ------------------------- guides ------------------------------
 
