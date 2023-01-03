@@ -107,8 +107,8 @@ Label(root, text="----------------------------EDIT-----------------------------"
 R=R+1
 Button(root, text="Edit Script",    width=button_width, command=edit_this_page).grid(row=R, column=0)
 Button(root, text="Edit Settings",  width=button_width, command=edit_settings).grid(row=R,  column=1)
-Button(root, text="Add Notes",      width=button_width, command=add_notes).grid(row=R,  column=2)
-Button(root, text="View Notes",     width=button_width, command=view_notes).grid(row=R, column=3)
+Button(root, text="Add Notes",      width=button_width, command=add_notes).grid(row=R,      column=2)
+Button(root, text="View Notes",     width=button_width, command=view_notes).grid(row=R,     column=3)
 
 # ------------------------- Show repo revisions ------------------------------
 
@@ -116,10 +116,10 @@ R=R+1
 Label(root, text="-----------------------SHOW/SET REPOS-----------------------").grid(column=0, row=R, columnspan=4)
 
 R=R+1
-Button(root, text="Show Revision",     width=button_width, command=show_repos).grid(row=R,  column=0)
-Button(root, text="Show Branch",       width=button_width, command=show_branch).grid(row=R, column=1)
-Button(root, text="Set Master branch",     width=button_width, command=set_branch).grid(row=R,     column=2)
-Button(root, text="Set Test Bundle Rev",   width=button_width+2, command=set_revision, bg='blue', fg='white').grid(row=R, column=3)
+Button(root, text="Show Revision",       width=button_width,   command=show_repos).grid(row=R,  column=0)
+Button(root, text="Show Branch",         width=button_width,   command=show_branch).grid(row=R, column=1)
+Button(root, text="Set Master branch",   width=button_width,   command=set_branch).grid(row=R,     column=2)
+Button(root, text="Set Test Bundle Rev", width=button_width+2, command=set_revision, bg='blue', fg='white').grid(row=R, column=3)
 
 # ------------------------- Update repos ------------------------------
 
@@ -138,38 +138,13 @@ R=R+1
 Label(root, text="----------------------------BUILD-----------------------------").grid(column=0, row=R, columnspan=4)
 
 R=R+1
-
-Radiobutton(root, 
-               text="test",
-               padx = 0, 
-               variable=version, 
-               value=1).grid(row=R, column=0)
-
-Radiobutton(root, 
-               text="release",
-               padx = 0, 
-               variable=version, 
-               value=2).grid(row=R, column=1)
+Radiobutton(root, text="test",    padx = 0, variable=version, value=1).grid(row=R, column=0)
+Radiobutton(root, text="release", padx = 0, variable=version, value=2).grid(row=R, column=1)
 
 R=R+1
-
-Radiobutton(root, 
-               text="Windows",
-               padx = 0, 
-               variable=platform, 
-               value=1).grid(row=R, column=0)
-
-Radiobutton(root, 
-               text="Linux",
-               padx = 0, 
-               variable=platform, 
-               value=2).grid(row=R, column=1)
-
-Radiobutton(root, 
-               text="OSX",
-               padx = 0, 
-               variable=platform, 
-               value=3).grid(row=R, column=2)
+Radiobutton(root, text="Windows", padx = 0, variable=platform, value=1).grid(row=R, column=0)
+Radiobutton(root, text="Linux",   padx = 0, variable=platform, value=2).grid(row=R, column=1)
+Radiobutton(root, text="OSX",     padx = 0, variable=platform, value=3).grid(row=R, column=2)
 
 # ------------------------- Build libraries, utilities ------------------------------
 
@@ -187,9 +162,9 @@ Button(root, text="Bundle",  width=button_width, command=bundle_smv).grid(row=R,
 Button(root, text="Install", width=button_width, command=install_smv).grid(row=R,       column=2)
 
 R=R+1
-Button(root, text="smv Win test inc",  width=button_width,   command=build_smv_win_inc).grid(row=R, column=0)
-Button(root, text="smv test debug",    width=button_width,   command=build_smv_test_deb).grid(row=R,  column=1)
-Button(root, text="LNX/OSX shortcuts", width=button_width+3, command=archive_smv).grid(row=R,   column=2)
+Button(root, text="smv Win test inc",  width=button_width,   command=build_smv_win_inc).grid(row=R,  column=0)
+Button(root, text="smv test debug",    width=button_width,   command=build_smv_test_deb).grid(row=R, column=1)
+Button(root, text="LNX/OSX shortcuts", width=button_width+3, command=archive_smv).grid(row=R,        column=2)
 
 #Button(root, text="Bundle/Install", width=button_width,  fg='white', bg='blue', command=bundle_install_smv).grid(row=R,       column=2)
 
@@ -199,7 +174,7 @@ R=R+1
 Button(root, text="Windows test", width=button_width, command=upload_win_bundle).grid(row=R, column=0)
 Button(root, text="Linux test",   width=button_width, command=upload_lnx_bundle).grid(row=R, column=1)
 Button(root, text="OSX test",     width=button_width, command=upload_osx_bundle).grid(row=R, column=2)
-Button(root, text="Release", width=button_width, command=upload_bundle_rel).grid(row=R, column=3)
+Button(root, text="Release",      width=button_width, command=upload_bundle_rel).grid(row=R, column=3)
 
 # ------------------------- guides ------------------------------
 
@@ -207,49 +182,19 @@ R=R+1
 Label(root, text="----------------------------GUIDES---------------------------").grid(column=0, row=R, columnspan=4)
 
 R=R+1
-
-Radiobutton(root, 
-               text="FDS",
-               padx = 0, 
-               variable=app, 
-               value=1).grid(row=R, column=0)
-
-Radiobutton(root, 
-               text="Smokeview",
-               padx = 0, 
-               variable=app, 
-               value=2).grid(row=R, column=1)
+Radiobutton(root, text="FDS",       padx = 0, variable=app, value=1).grid(row=R, column=0)
+Radiobutton(root, text="Smokeview", padx = 0, variable=app, value=2).grid(row=R, column=1)
 
 R=R+1
-
-Radiobutton(root, 
-               text="User",
-               padx = 0, 
-               variable=guide, 
-               value=1).grid(row=R, column=0)
-
-Radiobutton(root, 
-               text="Verification",
-               padx = 0, 
-               variable=guide, 
-               value=2).grid(row=R, column=1)
-
-Radiobutton(root, 
-               text="Validation",
-               padx = 0, 
-               variable=guide, 
-               value=3).grid(row=R, column=2)
-
-Radiobutton(root, 
-               text="Technical",
-               padx = 0, 
-               variable=guide, 
-               value=4).grid(row=R, column=3)
+Radiobutton(root, text="User",         padx = 0, variable=guide, value=1).grid(row=R, column=0)
+Radiobutton(root, text="Verification", padx = 0, variable=guide, value=2).grid(row=R, column=1)
+Radiobutton(root, text="Validation",   padx = 0, variable=guide, value=3).grid(row=R, column=2)
+Radiobutton(root, text="Technical",    padx = 0, variable=guide, value=4).grid(row=R, column=3)
 
 R=R+1
-Button(root, text="Get Figs", width=button_width, command=download_figures).grid(row=R,   column=0)
-Button(root, text="Build",    width=button_width, command=build_guides).grid(row=R,   column=1)
-Button(root, text="View",     width=button_width, command=view_guides).grid(row=R,   column=2)
+Button(root, text="Get Figs", width=button_width, command=download_figures).grid(row=R, column=0)
+Button(root, text="Build",    width=button_width, command=build_guides).grid(row=R,     column=1)
+Button(root, text="View",     width=button_width, command=view_guides).grid(row=R,      column=2)
 
 # ------------------------- synchronize ------------------------------
 
@@ -258,8 +203,8 @@ Label(root, text="-------------------------SYNCHRONIZE-------------------------"
 R=R+1
 Button(root, text="settings ---> smv",  width=button_width, command=webCOPYhome2config).grid(row=R, column=0)
 Button(root, text="smv ---> settings",  width=button_width, command=webCOPYconfig2home).grid(row=R, column=1)
-Button(root, text="fds bib ---> smv", width=button_width, command=webSYNCHfds2smv).grid(row=R, column=2)
-Button(root, text="smv bib ---> fds", width=button_width, command=webSYNCHsmv2fds).grid(row=R, column=3, ipadx=3)
+Button(root, text="fds bib ---> smv",   width=button_width, command=webSYNCHfds2smv).grid(row=R,    column=2)
+Button(root, text="smv bib ---> fds",   width=button_width, command=webSYNCHsmv2fds).grid(row=R,    column=3, ipadx=3)
 
 R=R+1
 Button(root, text="Refresh", width=button_width, command=restart_program).grid(row=R, column=0)
