@@ -119,7 +119,6 @@ R=R+1
 Button(root, text="Show Revision",       width=button_width,   command=show_repos).grid(row=R,  column=0)
 Button(root, text="Show Branch",         width=button_width,   command=show_branch).grid(row=R, column=1)
 Button(root, text="Set Master branch",   width=button_width,   command=set_branch).grid(row=R,     column=2)
-Button(root, text="Set Test Bundle Rev", width=button_width+2, command=set_revision, bg='blue', fg='white').grid(row=R, column=3)
 
 # ------------------------- Update repos ------------------------------
 
@@ -149,21 +148,29 @@ Radiobutton(root, text="OSX",     padx = 0, variable=platform, value=3).grid(row
 # ------------------------- Build libraries, utilities ------------------------------
 
 R=R+1
-Button(root, text="Clean Repos",   width=button_width, command=clean_repos).grid(row=R,   column=0)
-Button(root, text="Clean Uploads", width=button_width, command=clean_uploads).grid(row=R, column=1)
-Button(root, text="Clean smv",     width=button_width, command=clean_smv).grid(row=R,     column=2)
+Label(root, text="Clean:").grid(column=0, row=R)
+Button(root, text="Repos",   width=button_width, command=clean_repos).grid(row=R,   column=1)
+Button(root, text="Uploads", width=button_width, command=clean_uploads).grid(row=R, column=2)
+Button(root, text="smv",     width=button_width, command=clean_smv).grid(row=R,     column=3)
 R=R+1
-Button(root, text="Libs",     width=button_width, command=build_lib).grid(row=R,  column=0)
-Button(root, text="Utils",    width=button_width, command=build_util).grid(row=R, column=1)
-Button(root, text="Show Bundle Revs", width=button_width, command=get_revisions).grid(row=R, column=2)
-R=R+1
-Button(root, text="smv",     width=button_width, command=build_smv,     fg='white', bg='blue').grid(row=R,  column=0)
-Button(root, text="Bundle",  width=button_width, command=bundle_smv).grid(row=R,        column=1)
-Button(root, text="Install", width=button_width, command=install_smv).grid(row=R,       column=2)
+Label(root, text="Build:").grid(column=0, row=R)
+Button(root, text="Libs",     width=button_width, command=build_lib).grid(row=R,  column=1)
+Button(root, text="Utils",    width=button_width, command=build_util).grid(row=R, column=2)
+Button(root, text="smv",     width=button_width, command=build_smv,     fg='white', bg='blue').grid(row=R,  column=3)
 
 R=R+1
-Button(root, text="smv Win test inc",  width=button_width,   command=build_smv_win_inc).grid(row=R,  column=0)
-Button(root, text="smv test debug",    width=button_width,   command=build_smv_test_deb).grid(row=R, column=1)
+Button(root, text="smv test debug",    width=button_width,   command=build_smv_test_deb).grid(row=R, column=2)
+Button(root, text="smv Win test inc",  width=button_width,   command=build_smv_win_inc).grid(row=R,  column=3)
+
+R=R+1
+Label(root, text="Bundle:").grid(column=0, row=R)
+Button(root, text="Bundle",  width=button_width, command=bundle_smv).grid(row=R,        column=1)
+Button(root, text="Set Test Bundle Rev", width=button_width+2, command=set_revision, bg='blue', fg='white').grid(row=R, column=2)
+Button(root, text="Show Bundle Revs", width=button_width, command=get_revisions).grid(row=R, column=3)
+
+R=R+1
+Label(root, text="Install:").grid(column=0, row=R)
+Button(root, text="Install", width=button_width, command=install_smv).grid(row=R,       column=1)
 Button(root, text="LNX/OSX shortcuts", width=button_width+3, command=archive_smv).grid(row=R,        column=2)
 
 #Button(root, text="Bundle/Install", width=button_width,  fg='white', bg='blue', command=bundle_install_smv).grid(row=R,       column=2)
