@@ -22,20 +22,25 @@ call %envfile%
 %svn_drive%
 echo.
 
+if NOT "%platform%" == "Windows" goto skip_windows
 echo *** windows
 echo cleaning "%userprofile%\.bundle\uploads"
 cd "%userprofile%\.bundle"
 rmdir /q /s uploads
 mkdir uploads
-if "%platform%" == "Windows" goto eof
+:skip_windows
 
+if NOT "%platform%" == "Linux" goto skip_linux
 echo.
 echo *** linux
 plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/run_command.sh bot/Bundle/fds/scripts clean_upload.sh
+:skip_linux
 
+if NOT "%platform%" == "OSX" goto skip_osx
 echo.
 echo *** osx
 plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/run_command.sh bot/Bundle/fds/scripts clean_upload.sh
+:skip_osx
 
 :eof
 echo.
