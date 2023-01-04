@@ -113,7 +113,7 @@ Button(root, text="View Notes",     width=button_width, command=view_notes).grid
 # ------------------------- Show repo revisions ------------------------------
 
 R=R+1
-Label(root, text="-----------------------SHOW/SET REPOS-----------------------").grid(column=0, row=R, columnspan=4)
+Label(root, text="----------------------------REPOS----------------------------").grid(column=0, row=R, columnspan=4)
 
 R=R+1
 Button(root, text="Show Revision",       width=button_width,   command=show_repos).grid(row=R,  column=0)
@@ -123,7 +123,7 @@ Button(root, text="Set Master branch",   width=button_width,   command=set_branc
 # ------------------------- Update repos ------------------------------
 
 R=R+1
-Label(root, text="--------------------------UPDATE REPOS-------------------------").grid(column=0, row=R, columnspan=4)
+Label(root, text="-----------------------------UPDATE----------------------------").grid(column=0, row=R, columnspan=4)
 
 R=R+1
 Button(root, text="All",    width=button_width, command=update_all, bg='blue', fg='white').grid(row=R,     column=0)
@@ -176,7 +176,7 @@ Button(root, text="LNX/OSX shortcuts", width=button_width+3, command=archive_smv
 #Button(root, text="Bundle/Install", width=button_width,  fg='white', bg='blue', command=bundle_install_smv).grid(row=R,       column=2)
 
 R=R+1
-Label(root, text="------------------------UPLOAD BUNDLES-----------------------").grid(column=0, row=R, columnspan=4)
+Label(root, text="----------------------------UPLOAD---------------------------").grid(column=0, row=R, columnspan=4)
 R=R+1
 Button(root, text="Windows test", width=button_width, command=upload_win_bundle).grid(row=R, column=0)
 Button(root, text="Linux test",   width=button_width, command=upload_lnx_bundle).grid(row=R, column=1)
