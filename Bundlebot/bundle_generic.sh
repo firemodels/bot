@@ -333,6 +333,7 @@ smvscriptdir=$REPO_ROOT/smv/scripts
 utilscriptdir=$REPO_ROOT/smv/Utilities/Scripts
 botscriptdir=$REPO_ROOT/bot/Scripts
 
+colorbarsdir=$smv_bundle/colorbars
 texturedir=$smv_bundle/textures
 MAKEINSTALLER=$REPO_ROOT/bot/Bundlebot/make_installer.sh
 
@@ -357,6 +358,7 @@ mkdir $fdsbindir/hash
 
 mkdir -p $smvbindir
 mkdir -p $smvbindir/hash
+mkdir $smvbindir/colorbars
 mkdir $smvbindir/textures
 
 #
@@ -403,6 +405,7 @@ $APPS_DIR/hashfile wind2fds   > hash/wind2fds.sha1
 $APPS_DIR/hashfile hashfile   > hash/hashfile.sha1
 cd $CURDIR
 
+CPDIR $colorbarsdir $smvbindir
 CP $smvscriptdir jp2conv.sh $smvbindir jp2conv.sh
 CPDIR $texturedir $smvbindir
 
