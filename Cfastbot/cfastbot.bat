@@ -233,7 +233,7 @@ echo             found sh2bat
 
 if %use_installed_smokeview% == 0 goto skip1
 if %nothaveICC% == 0 goto skip1
-  call :is_file_installed smokeview|| exit /b 1
+  call :is_smokeview_installed|| exit /b 1
   echo             found smokeview
   set SMOKEVIEW=smokeview.exe
 :skip1
@@ -241,7 +241,7 @@ if %nothaveICC% == 0 goto skip1
 ::---------------- mailsend
 
 if NOT exist %emailexe% (
-  echo ***warning: email client not found.   
+  echo ***warning: email client not found. 
   echo             cfastbot messages will only be sent to the console.
 ) else (
   echo             found mailsend
@@ -766,6 +766,22 @@ exit /b 0
 
   set program=%1
   %program% --help 1>> %OUTDIR%\stage_exist.txt 2>&1
+  type %OUTDIR%\stage_exist.txt | find /i /c "not recognized" > %OUTDIR%\stage_count.txt
+  set /p nothave=<%OUTDIR%\stage_count.txt
+  if %nothave% == 1 (
+    echo "***Fatal error: %program% not present"
+    echo "***Fatal error: %program% not present" > %errorlog%
+    echo "cfastbot run aborted"
+    call :output_abort_message
+    exit /b 1
+  )
+  exit /b 0
+
+:: -------------------------------------------------------------
+:is_smokeview_installed
+:: -------------------------------------------------------------
+
+  smokeview -version 1>> %OUTDIR%\stage_exist.txt 2>&1
   type %OUTDIR%\stage_exist.txt | find /i /c "not recognized" > %OUTDIR%\stage_count.txt
   set /p nothave=<%OUTDIR%\stage_count.txt
   if %nothave% == 1 (

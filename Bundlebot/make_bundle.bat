@@ -102,6 +102,7 @@ set smv_examples=%repo_root%\smv\Verification
 
 set out_smv=%out_bundle%\%smvversion%
 set out_textures=%out_smv%\textures
+set out_colorbars=%out_smv%\colorbars
 set out_smvhash=%out_smv%\hash
 
 set fds_casessh=%repo_root%\fds\Verification\FDS_Cases.sh
@@ -126,6 +127,7 @@ mkdir %out_bundle%\%fdsversion%
 mkdir %out_bundle%\%smvversion%
 mkdir %out_bin%
 mkdir %out_textures%
+mkdir %out_colorbars%
 mkdir %out_doc%
 mkdir %out_guides%
 mkdir %out_web%
@@ -251,6 +253,8 @@ CALL :COPY  %smv_forbundle%\smokeview.ini  %out_smv%\.
 CALL :COPY  %smv_forbundle%\smokeview.ini  %out_smv%\.
 CALL :COPY  %smv_forbundle%\smokeview.html %out_smv%\.
 
+echo copying colorbars
+copy %smv_forbundle%\colorbars\*.csv         %out_colorbars%\.>Nul
 
 echo copying textures
 copy %smv_forbundle%\textures\*.jpg          %out_textures%\.>Nul

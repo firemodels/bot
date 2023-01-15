@@ -111,6 +111,10 @@ mkdir %smvdir%\textures
 copy %forbundle%\textures\*.jpg %smvdir%\textures>Nul
 copy %forbundle%\textures\*.png %smvdir%\textures>Nul
 
+echo copying colorbars
+mkdir %smvdir%\colorbars
+copy %forbundle%\colorbars\*.csv %smvdir%\colorbars>Nul
+
 CALL :COPY  %forbundle%\objects.svo             %smvdir%\.
 CALL :COPY  %sh2bat%\sh2bat.exe                 %smvdir%\.
 CALL :COPY  %gettime%\get_time_win_64.exe       %smvdir%\get_time.exe
