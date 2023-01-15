@@ -122,7 +122,8 @@ mkdir -p $PLATFORMDIR/Documentation
 echo ""
 echo "---- copying files ----"
 echo ""
-CPDIR $FORBUNDLE/textures $PLATFORMDIR/bin/textures
+CPDIR $FORBUNDLE/textures  $PLATFORMDIR/bin/textures
+CPDIR $FORBUNDLE/colorbars $PLATFORMDIR/bin/colorbars
 
 cp $FORBUNDLE/*.png $PLATFORMDIR/$smvbin/.
 cp $FORBUNDLE/*.po $PLATFORMDIR/$smvbin/.
