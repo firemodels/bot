@@ -97,6 +97,10 @@ CALL :COPY %forbundle%\smokeview.ini             %smvdir%\smokeview.ini
 CALL :COPY %forbundle%\smokeview.html            %smvdir%\smokeview.html
 CALL :COPY %forbundle%\\webvr\smokeview_vr.html  %smvdir%\smokeview_vr.html
 
+echo copying colorbars
+mkdir %smvdir%\colorbars
+copy %forbundle%\colorbars\*.csv                 %smvdir%\colorbars>Nul
+
 echo copying textures
 mkdir %smvdir%\textures
 copy %forbundle%\textures\*.jpg                  %smvdir%\textures>Nul
