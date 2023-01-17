@@ -28,12 +28,14 @@ set BUILDDIR=intel_win_64
 
 :: test info
 set version=%smv_revision%
+set versionbase=%version%
 set zipbase=%version%_win
 
 :: release info
 if "x%option%" == "xtest" goto skip_release1 
   set version=%smv_version%
   set zipbase=%version%_win
+  set versionbase=%smv_versionbase%
 :skip_release1
 
 set smvbuild=%svn_root%\smv\Build\smokeview\%BUILDDIR%
@@ -98,8 +100,8 @@ CALL :COPY  %svzipbuild%\smokezip_win_64.exe    %smvdir%\smokezip.exe
 CALL :COPY  %timepbuild%\timep_win_64.exe       %smvdir%\timep.exe
 CALL :COPY  %windbuild%\wind2fds_win_64.exe     %smvdir%\wind2fds.exe
 
-echo Unpacking Smokeview %smv_versionbase% installation files > %forbundle%\unpack.txt
-echo Updating Windows Smokeview to %smv_versionbase%          > %forbundle%\message.txt
+echo Unpacking Smokeview %versionbase% installation files > %forbundle%\unpack.txt
+echo Updating Windows Smokeview to %versionbase%          > %forbundle%\message.txt
 
 CALL :COPY  "%forbundle%\message.txt"                         %zipbase%\message.txt
 CALL :COPY  %forbundle%\setup.bat                             %zipbase%\setup.bat
