@@ -1,4 +1,5 @@
 @echo off
+set option=%1
 set SMVEDITION=SMV6
 
 :: Windows batch file to build a smokeview bundle
@@ -25,7 +26,16 @@ call %envfile%
 
 set BUILDDIR=intel_win_64
 
-set version=%smv_version%
+:: test info
+set version=%smv_revision%
+set zipbase=%version%_win
+
+:: release info
+if "x%option%" == "xtest" goto skip_release1 
+  set version=%smv_version%
+  set zipbase=%version%_win
+:skip_release1
+
 set smvbuild=%svn_root%\smv\Build\smokeview\%BUILDDIR%
 set forbundle=%svn_root%\bot\Bundle\smv\for_bundle
 set webgldir=%svn_root%\bot\Bundle\smv\for_bundle\webgl
@@ -42,7 +52,6 @@ set gettime=%svn_root%\smv\Build\get_time\%BUILDDIR%
 set hashfileexe=%hashfilebuild%\hashfile_win_64.exe
 set repoexes=%userprofile%\.bundle\BUNDLE\WINDOWS\repoexes
 
-set zipbase=%version%_win
 set smvdir=%zipbase%\%SMVEDITION%
 
 cd %userprofile%
@@ -61,7 +70,13 @@ mkdir %smvdir%\hash
 
 CALL :COPY  %svn_root%\smv\Build\set_path\intel_win_64\set_path_win_64.exe "%smvdir%\set_path.exe"
 
-CALL :COPY  %smvbuild%\smokeview_win_64.exe            %smvdir%\smokeview.exe
+if NOT "x%option%" == "xtest" goto skip_test1 
+  CALL :COPY  %smvbuild%\smokeview_win_test_64.exe  %smvdir%\smokeview.exe
+:skip_test1
+
+if "x%option%" == "xtest" goto skip_release2 
+  CALL :COPY  %smvbuild%\smokeview_win_64.exe       %smvdir%\smokeview.exe
+:skip_release2
 
 CALL :COPY  %smvscripts%\jp2conv.bat %smvdir%\jp2conv.bat
 
@@ -124,10 +139,11 @@ echo.
 echo --- compressing distribution directory ---
 echo.
 cd %zipbase%
+if exist ..\%zipbase%.zip erase ..\%zipbase%.zip
+if exist ..\%zipbase%.exe erase ..\%zipbase%.exe
 wzzip -a -r -P ..\%zipbase%.zip * >Nul
 
 cd ..
-if exist %zipbase%.exe erase %zipbase%.exe
 
 echo.
 echo --- creating installer ---
