@@ -6,6 +6,15 @@ if [ -e $uploads ]; then
   echo cleaning $uploads on `hostname`
   mkdir $uploads
 else
- echo ***error: upload directory does not exist
+ echo ***error: directory $uploads does not exist
+ mkdir -p $uploads
+fi
+uploads=$HOME/.bundle/bundles
+if [ -e $uploads ]; then
+  rm -rf $uploads
+  echo cleaning $uploads on `hostname`
+  mkdir $uploads
+else
+ echo ***error: directory $uploads does not exist
  mkdir -p $uploads
 fi
