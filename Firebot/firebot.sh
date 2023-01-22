@@ -1706,8 +1706,15 @@ email_build_status()
    if [ "$IFORT_VERSION" != "" ]; then
       echo "            Fortran: $IFORT_VERSION " >> $TIME_LOG
    fi
-   echo "         start time: $start_time "   >> $TIME_LOG
-   echo "          stop time: $stop_time "    >> $TIME_LOG
+   echo "          start time: $start_time "    >> $TIME_LOG
+   echo "          setup time: $setup_time "    >> $TIME_LOG
+   echo "        compile time: $compile_time "  >> $TIME_LOG
+   echo "         stage4 time: $stage4_time "   >> $TIME_LOG
+   echo "         stage5 time: $stage5_time "   >> $TIME_LOG
+   echo "         stage6 time: $stage6_time "   >> $TIME_LOG
+   echo "         stage7 time: $stage7_time "   >> $TIME_LOG
+   echo "         stage8 time: $stage8_time "   >> $TIME_LOG
+   echo "          stop time: $stop_time "      >> $TIME_LOG
    if [ "$NAMELIST_NODOC_STATUS" != "" ]; then
      if [ "$NAMELIST_NODOC_STATUS" == "0" ]; then
        echo " undocumented namelist keywords: $NAMELIST_NODOC_STATUS " >> $TIME_LOG
@@ -1809,6 +1816,7 @@ email_build_status()
 
 echo $0 $* >> command.firebot
 
+start_time=`date`
 # Start firebot timer
 START_TIME=$(date +%s)
 
@@ -2181,6 +2189,7 @@ if [[ "$CLONE_REPOS" != "" ]]; then
   fi
   ARCHIVE_REPO_SIZES=1
 fi
+setup_time=`date`
 
 #*** make sure repos exist and have expected branches
 CD_REPO $fdsrepo $FDSBRANCH || exit 1
@@ -2337,7 +2346,6 @@ TIME_LIMIT=43200
 TIME_LIMIT_EMAIL_NOTIFICATION="unsent"
 
 hostname=`hostname`
-start_time=`date`
 
 touch $FYI_LOG
 
@@ -2468,7 +2476,7 @@ if [ "$MANUALS_MATLAB_ONLY" == "" ]; then
 fi
 
 ###****** Stage 2b ###
-
+compile_time=`date`
 if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
   compile_fds_mpi_db         $FDS_DB_DIR
   check_compile_fds_mpi_db   $FDS_DB_DIR $FDS_DB_EXE
@@ -2527,6 +2535,7 @@ fi
 
 ###*** Stage 4 ###
 
+stage4_time=`date`
 # Depends on successful FDS debug compile
 if [[ $FDS_debug_success ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
    run_verification_cases_debug
@@ -2544,6 +2553,7 @@ fi
 
 ###*** Stage 5 ###
 
+stage5_time=`date`
 if [[ "$BUILD_ONLY" == "" ]];  then
 # Depends on successful FDS compile
   if [[ $FDS_release_success ]] && [[ "$SKIPRELEASE" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
@@ -2562,6 +2572,7 @@ if [[ "$BUILD_ONLY" == "" ]];  then
   fi
 fi
 
+stage6_time=`date`
 ###*** Stage 6 ###
 if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
 
@@ -2580,6 +2591,7 @@ if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
 
 ###*** Stage 7a ###
 
+stage7_time=`date`
     check_matlab_license_server
     if [ $matlab_success == true ]; then
       run_matlab_verification
@@ -2601,6 +2613,7 @@ if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
 
 ###*** Stage 8 ###
 
+stage8_time=`date`
   if [ "$SKIPMATLAB" == "" ] ; then
     make_fds_user_guide
 #    make_geom_notes
