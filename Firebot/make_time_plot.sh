@@ -34,11 +34,11 @@ cat << EOF
         ]);
 
         var options = {
+          min: 0,
           title: '',
           curveType: 'line',
           legend: { position: 'right' },
           colors: ['black'],
-          pointSize: 5,
           hAxis:{ title: 'Day'},
           vAxis:{ title: 'Time (s)'}
         };

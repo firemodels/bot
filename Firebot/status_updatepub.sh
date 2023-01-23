@@ -83,3 +83,4 @@ cp $newpage firebot_status.html
 git add firebot_status.html
 git commit -m "firebot: update firebot status page `date`"
 git push origin $WEBBRANCH
+#cp ~/.firebot/newpage /var/www/html/firebot/clone/new.html

@@ -3,7 +3,7 @@ historydir=~/.firebot/history
 BODY=
 TITLE=Firebot
 SOPT=
-NHIST=-30
+NHIST=-180
 
 while getopts 'bs' OPTION
 do

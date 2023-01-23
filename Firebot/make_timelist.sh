@@ -21,7 +21,8 @@ case $OPTION  in
 esac
 done
 shift $(($OPTIND-1))
-for file in $historydir/*benchmark*csv 
+#for file in $historydir/*benchmark*csv 
+for file in $historydir/*_timing.csv 
 do
 time=`tail -1 $file`
 hash=`tail -2 $file | head -1`

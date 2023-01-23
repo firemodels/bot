@@ -21,7 +21,8 @@ done
 shift $(($OPTIND-1))
 
 CASE=$1
-for file in $historydir/*benchmark*csv 
+#for file in $historydir/*benchmark*csv 
+for file in $historydir/*_timing.csv 
 do
 time=`grep $CASE $file | awk -F ',' '{print $2}'`
 hash=`tail -2 $file | head -1`
