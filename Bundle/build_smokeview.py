@@ -89,8 +89,8 @@ def clean_repos():                 os.system("start " + webscript_dir + "webclea
 def clean_uploads():               os.system("start " + webscript_dir + "webCleanUpload " + platforms[platform.get()])
 def clean_smv():                   os.system("start " + webscript_dir + "webCleanSMV "    + platforms[platform.get()])
 
-def set_branch_master_master():    os.system("start " + webscript_dir + "webSET_branches_master")
-def set_branch_master_devel():     os.system("start " + webscript_dir + "webSET_branches_devel")
+def set_branch_master():           os.system("start " + webscript_dir + "webSET_branches_master")
+def set_branch_devel():            os.system("start " + webscript_dir + "webSET_branches_devel")
 def add_notes():                   os.system("start " + webscript_dir + "webGET_smvlog")
 def edit_notes():                  os.system("start " + webscript_dir + "webEDIT_release_notes")
 def view_notes():                  os.system("start " + webscript_dir + "webVIEW_release_notes")
