@@ -89,7 +89,8 @@ def clean_repos():                 os.system("start " + webscript_dir + "webclea
 def clean_uploads():               os.system("start " + webscript_dir + "webCleanUpload " + platforms[platform.get()])
 def clean_smv():                   os.system("start " + webscript_dir + "webCleanSMV "    + platforms[platform.get()])
 
-def set_branch():                  os.system("start " + webscript_dir + "webSET_branches")
+def set_branch_master_master():    os.system("start " + webscript_dir + "webSET_branches_master")
+def set_branch_master_devel():     os.system("start " + webscript_dir + "webSET_branches_devel")
 def add_notes():                   os.system("start " + webscript_dir + "webGET_smvlog")
 def edit_notes():                  os.system("start " + webscript_dir + "webEDIT_release_notes")
 def view_notes():                  os.system("start " + webscript_dir + "webVIEW_release_notes")
@@ -116,9 +117,10 @@ R=R+1
 Label(root, text="----------------------------REPOS----------------------------").grid(column=0, row=R, columnspan=4)
 
 R=R+1
-Button(root, text="Show Revision",       width=button_width,   command=show_repos).grid(row=R,  column=0)
-Button(root, text="Show Branch",         width=button_width,   command=show_branch).grid(row=R, column=1)
-Button(root, text="Set Master branch",   width=button_width,   command=set_branch).grid(row=R,     column=2)
+Button(root, text="Show Revision",   width=button_width,   command=show_repos).grid(row=R,  column=0)
+Button(root, text="Show Branch",     width=button_width,   command=show_branch).grid(row=R, column=1)
+Button(root, text="Set all master",  width=button_width+1, command=set_branch_master).grid(row=R,     column=2)
+Button(root, text="Set smv devel",   width=button_width+1, command=set_branch_devel).grid(row=R,     column=3)
 
 # ------------------------- Update repos ------------------------------
 
