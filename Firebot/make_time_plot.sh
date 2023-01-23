@@ -1,6 +1,6 @@
 #!/bin/bash
 SOPT=
-NHIST=-30
+NHIST=-180
 
 while getopts 'n:st:' OPTION
 do
