@@ -45,11 +45,11 @@ git checkout master
 
 echo.
 echo Linux
-plink %plink_options% %linux_logon% %scriptdir%/setbranch.sh  %linux_svn_root%/smv
+plink %plink_options% %linux_logon% %scriptdir%/setbranch_master.sh  %linux_svn_root%/smv
 
 echo.
 echo OSX
-plink %plink_options% %osx_logon% %scriptdir%/setbranch.sh  %linux_svn_root%/smv
+plink %plink_options% %osx_logon% %scriptdir%/setbranch_master.sh  %linux_svn_root%/smv
 
 echo.
 echo ---------------------------*** bot ***--------------------------------
@@ -59,11 +59,11 @@ git checkout master
 
 echo.
 echo Linux
-plink %plink_options% %linux_logon% %scriptdir%/setbranch.sh  %linux_svn_root%/bot
+plink %plink_options% %linux_logon% %scriptdir%/setbranch_master.sh  %linux_svn_root%/bot
 
 echo.
 echo OSX
-plink %plink_options% %osx_logon% %scriptdir%/setbranch.sh  %linux_svn_root%/bot
+plink %plink_options% %osx_logon% %scriptdir%/setbranch_master.sh  %linux_svn_root%/bot
 
 echo.
 pause
