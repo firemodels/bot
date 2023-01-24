@@ -1706,12 +1706,13 @@ email_build_status()
    if [ "$IFORT_VERSION" != "" ]; then
       echo "            Fortran: $IFORT_VERSION " >> $TIME_LOG
    fi
-   echo "     start date/time: $start_time "    >> $TIME_LOG
+   echo "          start time: $start_time "    >> $TIME_LOG
+   echo "           stop time: $stop_time "     >> $TIME_LOG
    echo "         setup repos: $clone_time "    >> $TIME_LOG
    echo "       setup firebot: $setup_time "    >> $TIME_LOG
    echo "      build software: $build_time "    >> $TIME_LOG
-   echo "     run debug cases: $debug_time "    >> $TIME_LOG
-   echo "   run release cases: $release_time "  >> $TIME_LOG
+   echo "    run cases(debug): $debug_time "    >> $TIME_LOG
+   echo "  run cases(release): $release_time "  >> $TIME_LOG
    echo "       make pictures: $picture_time "  >> $TIME_LOG
    echo "          run matlab: $matlab_time "   >> $TIME_LOG
    echo "        build guides: $manuals_time "  >> $TIME_LOG
@@ -2191,7 +2192,7 @@ if [[ "$CLONE_REPOS" != "" ]]; then
   ARCHIVE_REPO_SIZES=1
 fi
 clone_time=`./time_diff.sh 0 $SECONDS`
-SECONDS=
+SECONDS=0
 
 #*** make sure repos exist and have expected branches
 CD_REPO $fdsrepo $FDSBRANCH || exit 1
@@ -2479,7 +2480,7 @@ fi
 
 ###****** Stage 2b ###
 setup_time=`./time_diff.sh 0 $SECONDS`
-SECONDS=
+SECONDS=0
 if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
   compile_fds_mpi_db         $FDS_DB_DIR
   check_compile_fds_mpi_db   $FDS_DB_DIR $FDS_DB_EXE
@@ -2539,7 +2540,7 @@ fi
 ###*** Stage 4 ###
 
 build_time=`./time_diff.sh 0 $SECONDS`
-SECONDS=
+SECONDS=0
 # Depends on successful FDS debug compile
 if [[ $FDS_debug_success ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
    run_verification_cases_debug
@@ -2555,7 +2556,7 @@ if [[ "$CLONE_REPOS" == "" ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER
   fi
 fi
 debug_time=`./time_diff.sh 0 $SECONDS`
-SECONDS=
+SECONDS=0
 
 ###*** Stage 5 ###
 
@@ -2578,7 +2579,7 @@ if [[ "$BUILD_ONLY" == "" ]];  then
 fi
 
 release_time=`./time_diff.sh 0 $SECONDS`
-SECONDS=
+SECONDS=0
 
 ###*** Stage 6 ###
 if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
@@ -2590,7 +2591,7 @@ if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
     make_fds_summary
   fi
 picture_time=`./time_diff.sh 0 $SECONDS`
-SECONDS=
+SECONDS=0
 
 ###*** Stage 7c ###
 
@@ -2619,7 +2620,7 @@ SECONDS=
     fi
   fi
 matlab_time=`./time_diff.sh 0 $SECONDS`
-SECONDS=
+SECONDS=0
 
 ###*** Stage 8 ###
 
@@ -2660,7 +2661,7 @@ SECONDS=
   fi
 fi
 manuals_time=`./time_diff.sh 0 $SECONDS`
-SECONDS=
+SECONDS=0
 
 ###*** archive apps
 
