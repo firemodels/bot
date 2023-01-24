@@ -1,0 +1,9 @@
+#!/bin/bash
+TBEG=$1
+TEND=$2
+DIFF=$((TEND-TBEG))
+HOURS=$(($DIFF / 3600))
+MINUTES=$(($DIFF / 60))
+MINUTES=$(($MINUTES % 60))
+SEC=$(($DIFF % 60))
+echo "${HOURS}H ${MINUTES}M ${SEC}S "
