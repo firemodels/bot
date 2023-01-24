@@ -1,18 +1,25 @@
 #!/bin/bash
 TBEG=$1
 TEND=$2
+
+#------------------------------------------------------
+#                 CONVERT
+#------------------------------------------------------
+CONVERT ()
+{
+  ARG=$1
+  ARG2=$2
+  if [ "$ARG" == "0" ]; then
+    ARG=""
+  else
+    ARG=$ARG$ARG2
+  fi
+  echo $ARG
+}
+
 DIFF=$((TEND-TBEG))
-HOURS=$(($DIFF / 3600))
+HOURS=`CONVERT $(($DIFF / 3600)) h`
 MINUTES=$(($DIFF / 60))
-MINUTES=$(($MINUTES % 60))
-SEC=$(($DIFF % 60))
-if [ $HOURS -lt 10 ]; then
-  HOURS="0$HOURS"
-fi
-if [ $MINUTES -lt 10 ]; then
-  MINUTES="0$MINUTES"
-fi
-if [ $SEC -lt 10 ]; then
-  SEC="0$SEC"
-fi
-echo "${HOURS}:${MINUTES}:${SEC}"
+MINUTES=`CONVERT $(($MINUTES % 60)) m`
+SEC=`CONVERT $(($DIFF % 60)) s`
+echo $HOURS $MINUTES $SEC
