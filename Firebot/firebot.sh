@@ -1739,7 +1739,11 @@ email_build_status()
    fi
    echo "          start time: $start_time "    >> $TIME_LOG
    echo "           stop time: $stop_time "     >> $TIME_LOG
+if [ "$CLONE_REPOS" == "" ]; then
    echo "         setup repos: $CLONE_DIFF "    >> $TIME_LOG
+else
+   echo "         clone repos: $CLONE_DIFF "    >> $TIME_LOG
+fi
    echo "       setup firebot: $SETUP_DIFF "    >> $TIME_LOG
    echo "      build software: $BUILD_DIFF "    >> $TIME_LOG
    echo "    run cases(debug): $DEBUG_DIFF "    >> $TIME_LOG
@@ -2574,7 +2578,7 @@ if [[ "$SKIPPICTURES" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHE
   $COPY_SMV_APPS >> $OUTPUT_DIR/stage3d
 fi
 BUILD_end=`GET_TIME`
-BUILD_diff=`GET_DURATION $BUILD_beg $BUILD_end`
+BUILD_DIFF=`GET_DURATION $BUILD_beg $BUILD_end`
 
 ###*** Stage 4 ###
 
