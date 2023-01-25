@@ -1247,20 +1247,23 @@ GET_TIME(){
 GET_DURATION(){
   local time_before=$1
   local time_after=$2
-  
-  DIFF_TIME=`echo $(($time_after-$time_before))`
-  TIME_H=`echo $(($DIFF_TIME / 3600 ))`
-  TIME_M=`echo $((($DIFF_TIME % 3600 ) / 60))`
-  TIME_S=`echo $(($DIFF_TIME % 60 ))`
-  if (( "$DIFF_TIME" >= 3600 )) ; then
-    echo "${TIME_H}h ${TIME_M}m ${TIME_S}s"
+  local __var=$3
+
+  DELTA_TIME=`echo $(($time_after-$time_before))`
+  TIME_H=`echo $(($DELTA_TIME / 3600 ))`
+  TIME_M=`echo $((($DELTA_TIME % 3600 ) / 60))`
+  TIME_S=`echo $(($DELTA_TIME % 60 ))`
+  if (( "$DELTA_TIME" >= 3600 )) ; then
+    DIFF_TIME="${TIME_H}h ${TIME_M}m ${TIME_S}s"
   else
-    if (( "$DIFF_TIME" >= 60 )) ; then
-      echo "${TIME_M}m ${TIME_S}s"
+    if (( "$DELTA_TIME" >= 60 )) ; then
+      DIFF_TIME="${TIME_M}m ${TIME_S}s"
     else
-      echo "${TIME_S}s"
+      DIFF_TIME="${TIME_S}s"
     fi
   fi
+  eval ${__var}_DIFF="'${DIFF_TIME}'"
+  eval ${__var}_DELTA="'${DELTA_TIME}'"
 }
 
 #---------------------------------------------
@@ -1386,6 +1389,25 @@ archive_timing_stats()
    cd $fdsrepo/Utilities/Scripts
    cp fds_timing_stats.csv "$HISTORY_DIR/${FDS_REVISION}_timing.csv"
    sort -r -k 2 -t  ',' -n fds_timing_stats.csv | head -10 | awk -F',' '{print $1":", $2}' > $OUTPUT_DIR/slow_cases
+
+# output firebot timing info
+# The offset below is computed by substituting
+# Jan 1, 2016 5 UTC (12 AM EST) into a web form
+# found at: http://www.unixtimestamp.com/
+   CURRENTDIR=`pwd`
+   cd $fdsrepo
+   BASETIMESTAMP=1451624400
+   gitdate=`git show -s --format=%ct $FDS_SHORTHASH`
+   gitdate=`echo "scale=5; $gitdate - $BASETIMESTAMP" | bc`
+   gitdate=`echo "scale=5; $gitdate/86400 " | bc`
+   cd $CURRENTDIR
+
+   if[ ! -e $HISTORY_DIR/firebot_times.csv ]; then
+     echo "day,date,revision,clone,setup,build,debug,release,picture,matlab,manuals,total" > $HISTORY_DIR/firebot_times.csv
+     echo ",,,s,s,s,s,s,s,s,s,s" >> $HISTORY_DIR/firebot_times.csv
+   fi
+   echo $gitdate,$FDS_DATE,$FDS_REVISION,$CLONE_DELTA,$SETUP_DELTA,$BUILD_DELTA,$DEBUG_DELTA,$RELEASE_DELTA,$PICTURE_DELTA,$MATLAB_DELTA,$MANUALS_DELTA,$TOTAL_DELTA >> $HISTORY_DIR/firebot_times.csv
+
    cp fds_benchmarktiming_stats.csv "$HISTORY_DIR/${FDS_REVISION}_benchmarktiming.csv"
    BENCHMARK_FDS_TIMES=`tail -1 fds_benchmarktiming_stats.csv`
   if [ "$UPLOADGUIDES" == "1" ]; then
@@ -2235,7 +2257,7 @@ if [[ "$CLONE_REPOS" != "" ]]; then
   ARCHIVE_REPO_SIZES=1
 fi
 CLONE_end=`GET_TIME`
-CLONE_DIFF=`GET_DURATION $CLONE_beg $CLONE_end`
+GET_DURATION $CLONE_beg $CLONE_end CLONE
 
 SETUP_beg=`GET_TIME`
 #*** make sure repos exist and have expected branches
@@ -2522,7 +2544,7 @@ if [ "$MANUALS_MATLAB_ONLY" == "" ]; then
   echo "   FDS"
 fi
 SETUP_end=`GET_TIME`
-SETUP_DIFF=`GET_DURATION $SETUP_beg $SETUP_end`
+GET_DURATION $SETUP_beg $SETUP_end SETUP
 
 ###****** Stage 2b ###
 
@@ -2583,7 +2605,7 @@ if [[ "$SKIPPICTURES" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHE
   $COPY_SMV_APPS >> $OUTPUT_DIR/stage3d
 fi
 BUILD_end=`GET_TIME`
-BUILD_DIFF=`GET_DURATION $BUILD_beg $BUILD_end`
+GET_DURATION $BUILD_beg $BUILD_end BUILD
 
 ###*** Stage 4 ###
 
@@ -2603,7 +2625,7 @@ if [[ "$CLONE_REPOS" == "" ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER
   fi
 fi
 DEBUG_end=`GET_TIME`
-DEBUG_DIFF=`GET_DURATION $DEBUG_beg $DEBUG_end`
+GET_DURATION $DEBUG_beg $DEBUG_end DEBUG
 
 ###*** Stage 5 ###
 
@@ -2626,7 +2648,7 @@ if [[ "$BUILD_ONLY" == "" ]];  then
   fi
 fi
 RELEASE_end=`GET_TIME`
-RELEASE_DIFF=`GET_DURATION $RELEASE_beg $RELEASE_end`
+GET_DURATION $RELEASE_beg $RELEASE_end RELEASE
 
 ###*** Stage 6 ###
 PICTURE_beg=`GET_TIME`
@@ -2639,7 +2661,7 @@ if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
     make_fds_summary
   fi
 PICTURE_end=`GET_TIME`
-PICTURE_DIFF=`GET_DURATION $PICTURE_beg $PICTURE_end`
+GET_DURATION $PICTURE_beg $PICTURE_end PICTURE
 
 ###*** Stage 7c ###
 
@@ -2668,7 +2690,7 @@ MATLAB_beg=`GET_TIME`
     fi
   fi
 MATLAB_end=`GET_TIME`
-MATLAB_DIFF=`GET_DURATION $MATLAB_beg $MATLAB_end`
+GET_DURATION $MATLAB_beg $MATLAB_end MATLAB
 
 ###*** Stage 8 ###
 
@@ -2726,9 +2748,9 @@ if [[ "$firebot_success" == "1" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
   fi
 fi
 MANUALS_end=`GET_TIME`
-MANUALS_DIFF=`GET_DURATION $MANUALS_beg $MANUALS_end`
+GET_DURATION $MANUALS_beg $MANUALS_end MANUALS
 SCRIPT_end=`GET_TIME`
-SCRIPT_DIFF=`GET_DURATION $SCRIPT_beg $SCRIPT_end`
+GET_DURATION $SCRIPT_beg $SCRIPT_end SCRIPT
 
 ###*** Wrap up and report results ###
 
