@@ -1385,6 +1385,7 @@ archive_timing_stats()
    echo archiving timing stats
    cd $fdsrepo/Utilities/Scripts
    cp fds_timing_stats.csv "$HISTORY_DIR/${FDS_REVISION}_timing.csv"
+   sort -r -k 2 -t  ',' -n fds_timing_stats.csv | head -10 | awk -F',' '{print $1":", $2}' > $OUTPUT_DIR/slow_cases
    cp fds_benchmarktiming_stats.csv "$HISTORY_DIR/${FDS_REVISION}_benchmarktiming.csv"
    BENCHMARK_FDS_TIMES=`tail -1 fds_benchmarktiming_stats.csv`
   if [ "$UPLOADGUIDES" == "1" ]; then
@@ -1774,6 +1775,10 @@ fi
      fi
    fi
    echo "-------------------------------"    >> $TIME_LOG
+   if [ -e output/slow_cases ]; then
+     cat output/slow_cases                   >> $TIME_LOG
+     echo "-------------------------------"  >> $TIME_LOG
+   fi
    if [ -e output/timing_summary ]; then
      cat output/timing_summary               >> $TIME_LOG
      echo "-------------------------------"  >> $TIME_LOG
