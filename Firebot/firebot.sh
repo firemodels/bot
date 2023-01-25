@@ -1233,6 +1233,37 @@ check_validation_stats()
 }
 
 #---------------------------------------------
+#                   GET_TIME
+#---------------------------------------------
+
+GET_TIME(){
+  echo $(date +"%s")
+}
+
+#---------------------------------------------
+#                   GET_DURATION
+#---------------------------------------------
+
+GET_DURATION(){
+  local time_before=$1
+  local time_after=$2
+  
+  DIFF_TIME=`echo $(($time_after-$time_before))`
+  TIME_H=`echo $(($DIFF_TIME / 3600 ))`
+  TIME_M=`echo $((($DIFF_TIME % 3600 ) / 60))`
+  TIME_S=`echo $(($DIFF_TIME % 60 ))`
+  if (( "$DIFF_TIME" >= 3600 )) ; then
+    echo "${TIME_H}h ${TIME_M}m ${TIME_S}s"
+  else
+    if (( "$DIFF_TIME" >= 60 )) ; then
+      echo "${TIME_M}m ${TIME_S}s"
+    else
+      echo "${TIME_S}s"
+    fi
+  fi
+}
+
+#---------------------------------------------
 #                   run_matlab_validation
 #---------------------------------------------
 
@@ -1708,15 +1739,15 @@ email_build_status()
    fi
    echo "          start time: $start_time "    >> $TIME_LOG
    echo "           stop time: $stop_time "     >> $TIME_LOG
-   echo "         setup repos: $clone_time "    >> $TIME_LOG
-   echo "       setup firebot: $setup_time "    >> $TIME_LOG
-   echo "      build software: $build_time "    >> $TIME_LOG
-   echo "    run cases(debug): $debug_time "    >> $TIME_LOG
-   echo "  run cases(release): $release_time "  >> $TIME_LOG
-   echo "       make pictures: $picture_time "  >> $TIME_LOG
-   echo "          run matlab: $matlab_time "   >> $TIME_LOG
-   echo "        build guides: $manuals_time "  >> $TIME_LOG
-   echo "    finish date/time: $stop_time "     >> $TIME_LOG
+   echo "         setup repos: $CLONE_DIFF "    >> $TIME_LOG
+   echo "       setup firebot: $SETUP_DIFF "    >> $TIME_LOG
+   echo "      build software: $BUILD_DIFF "    >> $TIME_LOG
+   echo "    run cases(debug): $DEBUG_DIFF "    >> $TIME_LOG
+   echo "  run cases(release): $RELEASE_DIFF "  >> $TIME_LOG
+   echo "       make pictures: $PICTURE_DIFF "  >> $TIME_LOG
+   echo "          run matlab: $MATLAB_DIFF "   >> $TIME_LOG
+   echo "        build guides: $MANUALS_DIFF "  >> $TIME_LOG
+   echo "               total: $SCRIPT_DIFF "    >> $TIME_LOG
    if [ "$NAMELIST_NODOC_STATUS" != "" ]; then
      if [ "$NAMELIST_NODOC_STATUS" == "0" ]; then
        echo " undocumented namelist keywords: $NAMELIST_NODOC_STATUS " >> $TIME_LOG
@@ -1818,6 +1849,9 @@ email_build_status()
 
 echo $0 $* >> command.firebot
 
+
+SCRIPT_beg=`GET_TIME`
+CLONE_beg=`GET_TIME`
 start_time=`date`
 # Start firebot timer
 START_TIME=$(date +%s)
@@ -2191,9 +2225,10 @@ if [[ "$CLONE_REPOS" != "" ]]; then
   fi
   ARCHIVE_REPO_SIZES=1
 fi
-clone_time=`./time_diff.sh 0 $SECONDS`
-SECONDS=0
+CLONE_end=`GET_TIME`
+CLONE_DIFF=`GET_DURATION $CLONE_beg $CLONE_end`
 
+SETUP_beg=`GET_TIME`
 #*** make sure repos exist and have expected branches
 CD_REPO $fdsrepo $FDSBRANCH || exit 1
 if [ "$FDSBRANCH" == "current" ]; then
@@ -2477,10 +2512,12 @@ if [ "$MANUALS_MATLAB_ONLY" == "" ]; then
   echo Building
   echo "   FDS"
 fi
+SETUP_end=`GET_TIME`
+SETUP_DIFF=`GET_DURATION $SETUP_beg $SETUP_end`
 
 ###****** Stage 2b ###
-setup_time=`./time_diff.sh 0 $SECONDS`
-SECONDS=0
+
+BUILD_beg=`GET_TIME`
 if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
   compile_fds_mpi_db         $FDS_DB_DIR
   check_compile_fds_mpi_db   $FDS_DB_DIR $FDS_DB_EXE
@@ -2536,11 +2573,12 @@ if [[ "$SKIPPICTURES" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHE
   cd $firebotdir
   $COPY_SMV_APPS >> $OUTPUT_DIR/stage3d
 fi
+BUILD_end=`GET_TIME`
+BUILD_diff=`GET_DURATION $BUILD_beg $BUILD_end`
 
 ###*** Stage 4 ###
 
-build_time=`./time_diff.sh 0 $SECONDS`
-SECONDS=0
+DEBUG_beg=`GET_TIME`
 # Depends on successful FDS debug compile
 if [[ $FDS_debug_success ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
    run_verification_cases_debug
@@ -2555,11 +2593,12 @@ if [[ "$CLONE_REPOS" == "" ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER
     clean_repo $fdsrepo/$VERIFICATION_DEBUG $FDSBRANCH || exit 1
   fi
 fi
-debug_time=`./time_diff.sh 0 $SECONDS`
-SECONDS=0
+DEBUG_end=`GET_TIME`
+DEBUG_DIFF=`GET_DURATION $DEBUG_beg $DEBUG_end`
 
 ###*** Stage 5 ###
 
+RELEASE_beg=`GET_TIME`
 if [[ "$BUILD_ONLY" == "" ]];  then
 # Depends on successful FDS compile
   if [[ $FDS_release_success ]] && [[ "$SKIPRELEASE" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
@@ -2577,11 +2616,11 @@ if [[ "$BUILD_ONLY" == "" ]];  then
     fi
   fi
 fi
-
-release_time=`./time_diff.sh 0 $SECONDS`
-SECONDS=0
+RELEASE_end=`GET_TIME`
+RELEASE_DIFF=`GET_DURATION $RELEASE_beg $RELEASE_end`
 
 ###*** Stage 6 ###
+PICTURE_beg=`GET_TIME`
 if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
 
 # Depends on successful SMV compile
@@ -2590,13 +2629,13 @@ if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
     check_fds_pictures
     make_fds_summary
   fi
-picture_time=`./time_diff.sh 0 $SECONDS`
-SECONDS=0
+PICTURE_end=`GET_TIME`
+PICTURE_DIFF=`GET_DURATION $PICTURE_beg $PICTURE_end`
 
 ###*** Stage 7c ###
 
+MATLAB_beg=`GET_TIME`
   generate_timing_stats
-
   if [ "$SKIPMATLAB" == "" ] ; then
 
 ###*** Stage 7a ###
@@ -2619,11 +2658,12 @@ SECONDS=0
       check_validation_stats
     fi
   fi
-matlab_time=`./time_diff.sh 0 $SECONDS`
-SECONDS=0
+MATLAB_end=`GET_TIME`
+MATLAB_DIFF=`GET_DURATION $MATLAB_beg $MATLAB_end`
 
 ###*** Stage 8 ###
 
+MANUALS_beg=`GET_TIME`
   if [ "$SKIPMATLAB" == "" ] ; then
     make_fds_user_guide
 #    make_geom_notes
@@ -2660,8 +2700,6 @@ SECONDS=0
     fi
   fi
 fi
-manuals_time=`./time_diff.sh 0 $SECONDS`
-SECONDS=0
 
 ###*** archive apps
 
@@ -2678,6 +2716,10 @@ if [[ "$firebot_success" == "1" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
     cp $PUBS_DIR/*       $BRANCHPUBS_DIR/.
   fi
 fi
+MANUALS_end=`GET_TIME`
+MANUALS_DIFF=`GET_DURATION $MANUALS_beg $MANUALS_end`
+SCRIPT_end=`GET_TIME`
+SCRIPT_DIFF=`GET_DURATION $SCRIPT_beg $SCRIPT_end`
 
 ###*** Wrap up and report results ###
 
