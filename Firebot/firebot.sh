@@ -1402,7 +1402,7 @@ archive_timing_stats()
    gitdate=`echo "scale=5; $gitdate/86400 " | bc`
    cd $CURRENTDIR
 
-   if[ ! -e $HISTORY_DIR/firebot_times.csv ]; then
+   if [ ! -e $HISTORY_DIR/firebot_times.csv ]; then
      echo "day,date,revision,clone,setup,build,debug,release,picture,matlab,manuals,total" > $HISTORY_DIR/firebot_times.csv
      echo ",,,s,s,s,s,s,s,s,s,s" >> $HISTORY_DIR/firebot_times.csv
    fi
