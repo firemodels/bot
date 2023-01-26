@@ -1233,6 +1233,40 @@ check_validation_stats()
 }
 
 #---------------------------------------------
+#                   GET_TIME
+#---------------------------------------------
+
+GET_TIME(){
+  echo $(date +"%s")
+}
+
+#---------------------------------------------
+#                   GET_DURATION
+#---------------------------------------------
+
+GET_DURATION(){
+  local time_before=$1
+  local time_after=$2
+  local __var=$3
+
+  DELTA_TIME=`echo $(($time_after-$time_before))`
+  TIME_H=`echo $(($DELTA_TIME / 3600 ))`
+  TIME_M=`echo $((($DELTA_TIME % 3600 ) / 60))`
+  TIME_S=`echo $(($DELTA_TIME % 60 ))`
+  if (( "$DELTA_TIME" >= 3600 )) ; then
+    DIFF_TIME="${TIME_H}h ${TIME_M}m ${TIME_S}s"
+  else
+    if (( "$DELTA_TIME" >= 60 )) ; then
+      DIFF_TIME="${TIME_M}m ${TIME_S}s"
+    else
+      DIFF_TIME="${TIME_S}s"
+    fi
+  fi
+  eval ${__var}_DIFF="'${DIFF_TIME}'"
+  eval ${__var}_DELTA="'${DELTA_TIME}'"
+}
+
+#---------------------------------------------
 #                   run_matlab_validation
 #---------------------------------------------
 
@@ -1354,6 +1388,26 @@ archive_timing_stats()
    echo archiving timing stats
    cd $fdsrepo/Utilities/Scripts
    cp fds_timing_stats.csv "$HISTORY_DIR/${FDS_REVISION}_timing.csv"
+   sort -r -k 2 -t  ',' -n fds_timing_stats.csv | head -10 | awk -F',' '{print $1":", $2}' > $OUTPUT_DIR/slow_cases
+
+# output firebot timing info
+# The offset below is computed by substituting
+# Jan 1, 2016 5 UTC (12 AM EST) into a web form
+# found at: http://www.unixtimestamp.com/
+   CURRENTDIR=`pwd`
+   cd $fdsrepo
+   BASETIMESTAMP=1451624400
+   gitdate=`git show -s --format=%ct $FDS_SHORTHASH`
+   gitdate=`echo "scale=5; $gitdate - $BASETIMESTAMP" | bc`
+   gitdate=`echo "scale=5; $gitdate/86400 " | bc`
+   cd $CURRENTDIR
+
+   if [ ! -e $HISTORY_DIR/firebot_times.csv ]; then
+     echo "day,date,revision,clone,setup,build,debug,release,picture,matlab,manuals,total" > $HISTORY_DIR/firebot_times.csv
+     echo ",,,s,s,s,s,s,s,s,s,s" >> $HISTORY_DIR/firebot_times.csv
+   fi
+   echo $gitdate,$FDS_DATE,$FDS_REVISION,$CLONE_DELTA,$SETUP_DELTA,$BUILD_DELTA,$DEBUG_DELTA,$RELEASE_DELTA,$PICTURE_DELTA,$MATLAB_DELTA,$MANUALS_DELTA,$SCRIPT_DELTA >> $HISTORY_DIR/firebot_times.csv
+
    cp fds_benchmarktiming_stats.csv "$HISTORY_DIR/${FDS_REVISION}_benchmarktiming.csv"
    BENCHMARK_FDS_TIMES=`tail -1 fds_benchmarktiming_stats.csv`
   if [ "$UPLOADGUIDES" == "1" ]; then
@@ -1707,14 +1761,20 @@ email_build_status()
       echo "            Fortran: $IFORT_VERSION " >> $TIME_LOG
    fi
    echo "          start time: $start_time "    >> $TIME_LOG
-   echo "          setup time: $setup_time "    >> $TIME_LOG
-   echo "        compile time: $compile_time "  >> $TIME_LOG
-   echo "         stage4 time: $stage4_time "   >> $TIME_LOG
-   echo "         stage5 time: $stage5_time "   >> $TIME_LOG
-   echo "         stage6 time: $stage6_time "   >> $TIME_LOG
-   echo "         stage7 time: $stage7_time "   >> $TIME_LOG
-   echo "         stage8 time: $stage8_time "   >> $TIME_LOG
-   echo "          stop time: $stop_time "      >> $TIME_LOG
+   echo "           stop time: $stop_time "     >> $TIME_LOG
+if [ "$CLONE_REPOS" == "" ]; then
+   echo "         setup repos: $CLONE_DIFF "    >> $TIME_LOG
+else
+   echo "         clone repos: $CLONE_DIFF "    >> $TIME_LOG
+fi
+   echo "       setup firebot: $SETUP_DIFF "    >> $TIME_LOG
+   echo "      build software: $BUILD_DIFF "    >> $TIME_LOG
+   echo "    run cases(debug): $DEBUG_DIFF "    >> $TIME_LOG
+   echo "  run cases(release): $RELEASE_DIFF "  >> $TIME_LOG
+   echo "       make pictures: $PICTURE_DIFF "  >> $TIME_LOG
+   echo "          run matlab: $MATLAB_DIFF "   >> $TIME_LOG
+   echo "        build guides: $MANUALS_DIFF "  >> $TIME_LOG
+   echo "               total: $SCRIPT_DIFF "    >> $TIME_LOG
    if [ "$NAMELIST_NODOC_STATUS" != "" ]; then
      if [ "$NAMELIST_NODOC_STATUS" == "0" ]; then
        echo " undocumented namelist keywords: $NAMELIST_NODOC_STATUS " >> $TIME_LOG
@@ -1737,6 +1797,11 @@ email_build_status()
      fi
    fi
    echo "-------------------------------"    >> $TIME_LOG
+   if [ -e output/slow_cases ]; then
+     echo "cases with longest runtime"       >> $TIME_LOG
+     cat output/slow_cases                   >> $TIME_LOG
+     echo "-------------------------------"  >> $TIME_LOG
+   fi
    if [ -e output/timing_summary ]; then
      cat output/timing_summary               >> $TIME_LOG
      echo "-------------------------------"  >> $TIME_LOG
@@ -1816,6 +1881,9 @@ email_build_status()
 
 echo $0 $* >> command.firebot
 
+
+SCRIPT_beg=`GET_TIME`
+CLONE_beg=`GET_TIME`
 start_time=`date`
 # Start firebot timer
 START_TIME=$(date +%s)
@@ -2189,8 +2257,10 @@ if [[ "$CLONE_REPOS" != "" ]]; then
   fi
   ARCHIVE_REPO_SIZES=1
 fi
-setup_time=`date`
+CLONE_end=`GET_TIME`
+GET_DURATION $CLONE_beg $CLONE_end CLONE
 
+SETUP_beg=`GET_TIME`
 #*** make sure repos exist and have expected branches
 CD_REPO $fdsrepo $FDSBRANCH || exit 1
 if [ "$FDSBRANCH" == "current" ]; then
@@ -2474,9 +2544,12 @@ if [ "$MANUALS_MATLAB_ONLY" == "" ]; then
   echo Building
   echo "   FDS"
 fi
+SETUP_end=`GET_TIME`
+GET_DURATION $SETUP_beg $SETUP_end SETUP
 
 ###****** Stage 2b ###
-compile_time=`date`
+
+BUILD_beg=`GET_TIME`
 if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
   compile_fds_mpi_db         $FDS_DB_DIR
   check_compile_fds_mpi_db   $FDS_DB_DIR $FDS_DB_EXE
@@ -2532,10 +2605,12 @@ if [[ "$SKIPPICTURES" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHE
   cd $firebotdir
   $COPY_SMV_APPS >> $OUTPUT_DIR/stage3d
 fi
+BUILD_end=`GET_TIME`
+GET_DURATION $BUILD_beg $BUILD_end BUILD
 
 ###*** Stage 4 ###
 
-stage4_time=`date`
+DEBUG_beg=`GET_TIME`
 # Depends on successful FDS debug compile
 if [[ $FDS_debug_success ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
    run_verification_cases_debug
@@ -2550,10 +2625,12 @@ if [[ "$CLONE_REPOS" == "" ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER
     clean_repo $fdsrepo/$VERIFICATION_DEBUG $FDSBRANCH || exit 1
   fi
 fi
+DEBUG_end=`GET_TIME`
+GET_DURATION $DEBUG_beg $DEBUG_end DEBUG
 
 ###*** Stage 5 ###
 
-stage5_time=`date`
+RELEASE_beg=`GET_TIME`
 if [[ "$BUILD_ONLY" == "" ]];  then
 # Depends on successful FDS compile
   if [[ $FDS_release_success ]] && [[ "$SKIPRELEASE" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
@@ -2571,9 +2648,11 @@ if [[ "$BUILD_ONLY" == "" ]];  then
     fi
   fi
 fi
+RELEASE_end=`GET_TIME`
+GET_DURATION $RELEASE_beg $RELEASE_end RELEASE
 
-stage6_time=`date`
 ###*** Stage 6 ###
+PICTURE_beg=`GET_TIME`
 if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
 
 # Depends on successful SMV compile
@@ -2582,16 +2661,17 @@ if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
     check_fds_pictures
     make_fds_summary
   fi
+PICTURE_end=`GET_TIME`
+GET_DURATION $PICTURE_beg $PICTURE_end PICTURE
 
 ###*** Stage 7c ###
 
+MATLAB_beg=`GET_TIME`
   generate_timing_stats
-
   if [ "$SKIPMATLAB" == "" ] ; then
 
 ###*** Stage 7a ###
 
-stage7_time=`date`
     check_matlab_license_server
     if [ $matlab_success == true ]; then
       run_matlab_verification
@@ -2610,10 +2690,12 @@ stage7_time=`date`
       check_validation_stats
     fi
   fi
+MATLAB_end=`GET_TIME`
+GET_DURATION $MATLAB_beg $MATLAB_end MATLAB
 
 ###*** Stage 8 ###
 
-stage8_time=`date`
+MANUALS_beg=`GET_TIME`
   if [ "$SKIPMATLAB" == "" ] ; then
     make_fds_user_guide
 #    make_geom_notes
@@ -2666,6 +2748,10 @@ if [[ "$firebot_success" == "1" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
     cp $PUBS_DIR/*       $BRANCHPUBS_DIR/.
   fi
 fi
+MANUALS_end=`GET_TIME`
+GET_DURATION $MANUALS_beg $MANUALS_end MANUALS
+SCRIPT_end=`GET_TIME`
+GET_DURATION $SCRIPT_beg $SCRIPT_end SCRIPT
 
 ###*** Wrap up and report results ###
 
