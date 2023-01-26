@@ -1798,6 +1798,7 @@ fi
    fi
    echo "-------------------------------"    >> $TIME_LOG
    if [ -e output/slow_cases ]; then
+     echo "cases with longest runtime"       >> $TIME_LOG
      cat output/slow_cases                   >> $TIME_LOG
      echo "-------------------------------"  >> $TIME_LOG
    fi
