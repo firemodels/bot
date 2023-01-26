@@ -1164,6 +1164,7 @@ archive_timing_stats()
   cd $smvrepo/Utilities/Scripts
   cp smv_timing_stats.csv          "$HISTORY_DIR_ARCHIVE/${SMV_REVISION}_timing.csv"
   cp smv_benchmarktiming_stats.csv "$HISTORY_DIR_ARCHIVE/${SMV_REVISION}_benchmarktiming.csv"
+  sort -r -k 2 -t  ',' -n smv_timing_stats.csv | head -10 | awk -F',' '{print $1":", $2}' > $OUTPUT_DIR/slow_cases
   TOTAL_SMV_TIMES=`tail -1 smv_benchmarktiming_stats.csv`
   if [[ "$UPLOADRESULTS" == "1" ]] && [[ "$USER" == "smokebot" ]]; then
     cd $botrepo/Smokebot
@@ -1425,7 +1426,12 @@ email_build_status()
       echo "        latest guides: $GUIDESURL" >> $TIME_LOG
     fi
   fi
-  echo "-------------------------------" >> $TIME_LOG
+  echo "-------------------------------"   >> $TIME_LOG
+  if [ -e $OUTPUT_DIR/slow_cases ]; then
+    echo "cases with longest runtime"      >> $TIME_LOG
+    cat $OUTPUT_DIR/slow_cases             >> $TIME_LOG
+    echo "-------------------------------" >> $TIME_LOG
+  fi
   NAMELIST_LOGS="$NAMELIST_NODOC_LOG $NAMELIST_NOSOURCE_LOG"
   if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]; then
     # Send email with failure message and warnings, body of email contains appropriate log file
