@@ -1363,7 +1363,12 @@ email_build_status()
   fi
   echo "          start time: $start_time "                  >> $TIME_LOG
   echo "           stop time: $stop_time "                   >> $TIME_LOG
-  echo "               setup: $DIFF_PRELIM"                  >> $TIME_LOG
+  if [ "$CLONE_REPOS" == "" ]; then
+    echo "         setup repos: $DIFF_CLONE"                  >> $TIME_LOG
+  else
+    echo "         clone repos: $DIFF_CLONE"                  >> $TIME_LOG
+  fi
+  echo "      setup smokebot: $DIFF_SETUP"                   >> $TIME_LOG
   echo "      build software: $DIFF_BUILDSOFTWARE"           >> $TIME_LOG
   echo "    run cases(debug): $DIFF_RUN_DEBUG_CASES"         >> $TIME_LOG
   echo "  run cases(release): $DIFF_RUN_RELEASE_CASES"       >> $TIME_LOG
@@ -1479,6 +1484,8 @@ email_build_status()
 
 #*** define initial values
 
+SCRIPT_TIME_beg=`GET_TIME`
+CLONE_beg=`GET_TIME`
 smokebotdir=`pwd`
 OUTPUT_DIR="$smokebotdir/output"
 HISTORY_DIR_ARCHIVE="$HOME/.smokebot/history"
@@ -1918,8 +1925,6 @@ TIME_LIMIT=43200
 TIME_LIMIT_EMAIL_NOTIFICATION="unsent"
 
 
-SCRIPT_TIME_beg=`GET_TIME`
-PRELIM_beg=`GET_TIME`
 echo "" > $STAGE_STATUS
 hostname=`hostname`
 start_time=`date`
@@ -1966,7 +1971,16 @@ fi
 
 check_update_repo
 
+CLONE_end=`GET_TIME`
+DIFF_CLONE=`GET_DURATION $CLONE_beg $CLONE_end`
+if [ "$CLONE_REPOS" == "" ]; then
+  echo "Setup repos: $DIFF_CLONE" >> $STAGE_STATUS
+else
+  echo "Cone repos: $DIFF_CLONE" >> $STAGE_STATUS
+fi
+
 #define repo revisions
+SETUP_beg=`GET_TIME`
 
 rm -f $FYI_LOG
 touch $FYI_LOG
@@ -2004,9 +2018,9 @@ git rev-parse --short HEAD > $LATESTAPPS_DIR/SMV_HASH
 cp $LATESTAPPS_DIR/SMV_REVISION $LATESTPUBS_DIR/SMV_REVISION
 cp $LATESTAPPS_DIR/SMV_HASH     $LATESTPUBS_DIR/SMV_HASH
 
-PRELIM_end=`GET_TIME`
-DIFF_PRELIM=`GET_DURATION $PRELIM_beg $PRELIM_end`
-echo "Preliminary: $DIFF_PRELIM" >> $STAGE_STATUS
+SETUP_end=`GET_TIME`
+DIFF_SETUP=`GET_DURATION $SETUP_beg $SETUP_end`
+echo "Setup smokebot: $DIFF_SETUP" >> $STAGE_STATUS
 
 #----------------------------- Stage 1 build cfast and FDS     --------------------------------------
 
