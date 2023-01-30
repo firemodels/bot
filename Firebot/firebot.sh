@@ -1403,10 +1403,10 @@ archive_timing_stats()
    cd $CURRENTDIR
 
    if [ ! -e $HISTORY_DIR/firebot_times.csv ]; then
-     echo "day,date,revision,clone,setup,build,debug,release,picture,matlab,manuals,total" > $HISTORY_DIR/firebot_times.csv
-     echo ",,,s,s,s,s,s,s,s,s,s" >> $HISTORY_DIR/firebot_times.csv
+     echo "day,date,revision,pass/fail,clone,setup,build,debug,release,picture,matlab,manuals,total" > $HISTORY_DIR/firebot_times.csv
+     echo ",,,,s,s,s,s,s,s,s,s,s" >> $HISTORY_DIR/firebot_times.csv
    fi
-   echo $gitdate,$FDS_DATE,$FDS_REVISION,$CLONE_DELTA,$SETUP_DELTA,$BUILD_DELTA,$DEBUG_DELTA,$RELEASE_DELTA,$PICTURE_DELTA,$MATLAB_DELTA,$MANUALS_DELTA,$SCRIPT_DELTA >> $HISTORY_DIR/firebot_times.csv
+   echo $gitdate,$FDS_DATE,$FDS_REVISION,$firebot_success,$CLONE_DELTA,$SETUP_DELTA,$BUILD_DELTA,$DEBUG_DELTA,$RELEASE_DELTA,$PICTURE_DELTA,$MATLAB_DELTA,$MANUALS_DELTA,$SCRIPT_DELTA >> $HISTORY_DIR/firebot_times.csv
 
    cp fds_benchmarktiming_stats.csv "$HISTORY_DIR/${FDS_REVISION}_benchmarktiming.csv"
    BENCHMARK_FDS_TIMES=`tail -1 fds_benchmarktiming_stats.csv`
@@ -1668,10 +1668,10 @@ get_firebot_success()
 {
    firebot_success=1
    if [[ -e $WARNING_LOG ]]; then
-     firebot_success=
+     firebot_success=0
    fi
    if [[ -e $ERROR_LOG ]]; then
-     firebot_success=
+     firebot_success=0
    fi
 }
 
