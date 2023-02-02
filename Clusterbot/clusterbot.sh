@@ -557,8 +557,8 @@ HOST_CHECK ()
 RPM_CHECK ()
 {
  local INDENT=$1
- local CB_HOST_ARG=$2
- prefix=$3
+ local prefix=$2
+ local CB_HOST_ARG=$3
 
 if [ "$CB_HOST_ARG" == "" ]; then
   return 0
@@ -1495,12 +1495,12 @@ CHECK_FILE /etc/redhat-release error 0 $FILES_DIR $CB_HOSTS
 
 # --------------------- rpm check --------------------
 
-RPM_CHECK 0 $CB_HOSTS       ALL
+RPM_CHECK 0 ALL $CB_HOSTS 
 if [ "$?" == "1" ]; then
-  RPM_CHECK 1 $CB_HOSTETH1  ETH1
-  RPM_CHECK 1 $CB_HOSTETH2  ETH2
-  RPM_CHECK 1 $CB_HOSTETH3  ETH3
-  RPM_CHECK 1 $CB_HOSTETH4  ETH4
+  RPM_CHECK 1 ETH1 $CB_HOSTETH1
+  RPM_CHECK 1 ETH2 $CB_HOSTETH2
+  RPM_CHECK 1 ETH3 $CB_HOSTETH3
+  RPM_CHECK 1 ETH4 $CB_HOSTETH4
 fi
 
 # --------------------- check provisioning date --------------------
@@ -1657,7 +1657,7 @@ CHECK_DAEMON slurmd error $CB_HOSTS
 #*** check slurm rpm
 
 TEMP_RPM=/tmp/rpm.$$
-pdsh -t 1 -w $CB_HOSTS "rpm -qa | grep slurm | grep devel" >& $TEMP_RPM
+pdsh -t 1 -w $CB_HOSTS "rpm -qa | grep 'slurm-devel'" >& $TEMP_RPM
 cat $TEMP_RPM | grep -v ssh | grep -v Connection | sort >& $SLURMRPM_OUT
 rm -f $TEMP_RPM
 SLURMRPM0=`head -1 $SLURMRPM_OUT | awk '{print $2}'`

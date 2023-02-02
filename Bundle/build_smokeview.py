@@ -119,8 +119,8 @@ Label(root, text="----------------------------REPOS----------------------------"
 R=R+1
 Button(root, text="Show Revision",   width=button_width,   command=show_repos).grid(row=R,  column=0)
 Button(root, text="Show Branch",     width=button_width,   command=show_branch).grid(row=R, column=1)
-Button(root, text="Set all master",  width=button_width+1, command=set_branch_master).grid(row=R,     column=2)
-Button(root, text="Set smv devel",   width=button_width+1, command=set_branch_devel).grid(row=R,     column=3)
+Button(root, text="Set all to master",  width=button_width+1, command=set_branch_master).grid(row=R,     column=2)
+Button(root, text="Set smv to devel",   width=button_width+1, command=set_branch_devel).grid(row=R,     column=3)
 
 # ------------------------- Update repos ------------------------------
 
