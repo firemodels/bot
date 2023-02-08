@@ -1188,6 +1188,22 @@ make_cfast_user_guide()
 }
 
 #---------------------------------------------
+#                   make_cdata_guide
+#---------------------------------------------
+
+make_cdata_guide()
+{
+   # Build CDATA guide
+   echo Building CData guide
+   CD_REPO $cfastrepo/Manuals/Monte_Carlo_Guide $cfastbranch || return 1
+   ./make_guide.sh &> $OUTPUT_DIR/stage8_cdata_guide
+
+   # Check guide for completion and copy to website if successful
+   check_guide $OUTPUT_DIR/stage8_cdata_guide $cfastrepo/Manuals/Monte_Carlo_Guide CData_Guide.pdf 'CData Guide'
+   return 0
+}
+
+#---------------------------------------------
 #                   make_cfast_vv_guide
 #---------------------------------------------
 
@@ -1705,6 +1721,7 @@ if [[ "$SKIP" == "" ]]; then
   make_cfast_user_guide || exit 1
   make_cfast_vv_guide || exit 1
   make_cfast_config_guide || exit 1
+  make_cdata_guide || exit 1
 fi
 
 ### Report results ###
