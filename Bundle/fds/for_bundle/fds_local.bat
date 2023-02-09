@@ -82,6 +82,7 @@ if "%force_openmp%" == "1" goto skip1
   set openmp_env=
 :skip1
 
+TITLE mpiexec -localonly -n %n_mpi% %openmp_env% %debug% %oversubscribed% %fabric% %fds% %casename%
 %ECHO% mpiexec -localonly -n %n_mpi% %openmp_env% %debug% %oversubscribed% %fabric% %fds% %casename%
 
 :eof
