@@ -1722,6 +1722,10 @@ if [[ "$SKIP" == "" ]]; then
   make_cfast_vv_guide || exit 1
   make_cfast_config_guide || exit 1
   make_cdata_guide || exit 1
+  if [ -d $GITSTATUS_DIR/Manuals ]; then
+    rm -rf $GITSTATUS_DIR/Manuals
+  fi
+  cp -r $cfastrepo/Manuals $GITSTATUS_DIR/.
 fi
 
 ### Report results ###
