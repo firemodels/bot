@@ -119,7 +119,7 @@ Label(root, text="----------------------------REPOS----------------------------"
 R=R+1
 Button(root, text="Show Revision",   width=button_width,   command=show_repos).grid(row=R,  column=0)
 Button(root, text="Show Branch",     width=button_width,   command=show_branch).grid(row=R, column=1)
-Button(root, text="Set all to master",  width=button_width+1, command=set_branch_master).grid(row=R,     column=2)
+Button(root, text="Set all repos to master",  width=button_width+3, command=set_branch_master).grid(row=R,     column=2)
 Button(root, text="Set smv to devel",   width=button_width+1, command=set_branch_devel).grid(row=R,     column=3)
 
 # ------------------------- Update repos ------------------------------
@@ -128,10 +128,10 @@ R=R+1
 Label(root, text="-----------------------------UPDATE----------------------------").grid(column=0, row=R, columnspan=4)
 
 R=R+1
-Button(root, text="All",    width=button_width, command=update_all, bg='blue', fg='white').grid(row=R,     column=0)
-Button(root, text="All(Win)",    width=button_width, command=update_windows).grid(row=R, column=1)
-Button(root, text="smv(All platforms)",    width=button_width, command=update_smv_all).grid(row=R,     column=2)
-Button(root, text="smv(Win)",    width=button_width, command=update_smv_windows).grid(row=R, column=3)
+Button(root, text="All repos/OS's",    width=button_width, command=update_all, bg='blue', fg='white').grid(row=R,     column=0)
+Button(root, text="All repos/Win",    width=button_width, command=update_windows).grid(row=R, column=1)
+Button(root, text="smv/All OS's",    width=button_width, command=update_smv_all).grid(row=R,     column=2)
+Button(root, text="smv/Win",    width=button_width, command=update_smv_windows).grid(row=R, column=3)
 
 # ------------------------- Build ------------------------------
 
