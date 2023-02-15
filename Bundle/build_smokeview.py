@@ -128,7 +128,7 @@ R=R+1
 Label(root, text="-----------------------------UPDATE----------------------------").grid(column=0, row=R, columnspan=4)
 
 R=R+1
-Button(root, text="All repos/OS's",    width=button_width, command=update_all, bg='blue', fg='white').grid(row=R,     column=0)
+Button(root, text="All repos/All OS's",    width=button_width, command=update_all, bg='blue', fg='white').grid(row=R,     column=0)
 Button(root, text="All repos/Win",    width=button_width, command=update_windows).grid(row=R, column=1)
 Button(root, text="smv/All OS's",    width=button_width, command=update_smv_all).grid(row=R,     column=2)
 Button(root, text="smv/Win",    width=button_width, command=update_smv_windows).grid(row=R, column=3)
