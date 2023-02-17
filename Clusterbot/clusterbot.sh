@@ -257,7 +257,6 @@ ACCT_CHECK ()
     return 0
   else
     echo "   $CB_HOST_ARG: ***error: $file is different on $FILEDIFF "
-    echo "         Fix: sudo passsync"
     return 1
   fi
 }
@@ -626,11 +625,11 @@ OPENSM_CHECK ()
   cat $SLURM_TEMP | sort -u | grep opensm  >  $SLURM_OUT 2>&1
   SUB1=`cat  $SLURM_OUT | awk -F':' '{print $1}' | sort -u | awk '{printf "%s%s", $1," " }'`
   if [ "$SUB1" == "" ]; then
-    echo "   $CB_HOSTIB_ARG: ***error: opensm not running on any host"
+    echo "   $CB_HOST_ARG,$CB_HOSTIB_ARG: ***error: opensm not running on any host"
     echo "      Fix: sudo ssh $CB_HOST_ARG service opensm start   "
   else
     SLURMCOUNT=`cat  $SLURM_OUT | awk -F':' '{print $1}' | sort -u | wc -l`
-    echo "   $CB_HOSTIB_ARG: opensm on $SLURMCOUNT hosts"
+    echo "   $CB_HOST_ARG,$CB_HOSTIB_ARG: opensm on $SLURMCOUNT hosts"
   fi
   rm -f $SLURM_TEMP
 }
@@ -1494,8 +1493,7 @@ echo "----- OS checks -----------------"
 CHECK_FILE /etc/redhat-release error 0 $FILES_DIR $CB_HOSTS
 
 # --------------------- rpm check --------------------
-
-RPM_CHECK 0 ALL $CB_HOSTS 
+RPM_CHECK 0 ALL $CB_HOSTS
 if [ "$?" == "1" ]; then
   RPM_CHECK 1 ETH1 $CB_HOSTETH1
   RPM_CHECK 1 ETH2 $CB_HOSTETH2
@@ -1504,7 +1502,6 @@ if [ "$?" == "1" ]; then
 fi
 
 # --------------------- check provisioning date --------------------
-
 PROVISION_DATE_CHECK $CB_HOSTETH1
 PROVISION_DATE_CHECK $CB_HOSTETH2
 PROVISION_DATE_CHECK $CB_HOSTETH3
@@ -1657,7 +1654,7 @@ CHECK_DAEMON slurmd error $CB_HOSTS
 #*** check slurm rpm
 
 TEMP_RPM=/tmp/rpm.$$
-pdsh -t 1 -w $CB_HOSTS "rpm -qa | grep 'slurm-devel'" >& $TEMP_RPM
+pdsh -t 1 -w $CB_HOSTS "rpm -qa | grep slurm-pmi-devel" >& $TEMP_RPM
 cat $TEMP_RPM | grep -v ssh | grep -v Connection | sort >& $SLURMRPM_OUT
 rm -f $TEMP_RPM
 SLURMRPM0=`head -1 $SLURMRPM_OUT | awk '{print $2}'`
