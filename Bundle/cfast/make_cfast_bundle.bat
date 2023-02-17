@@ -3,13 +3,12 @@
 
 set THISDIR=%CD%
 
-cd ..\..\..\..
+cd ..\..\..
 set GITROOT=%CD%
 cd %THISDIR%
 
 set CFASTREPO=%GITROOT%\cfast
 set SCRIPTDIR=%CFASTREPO%\Utilities\for_bundle\scripts
-set EXTRAS=%GITROOT%\Extras
 set VSSTUDIO=%CFASTREPO%\Utilities\Visual_Studio
 
 cd %VSSTUDIO%
