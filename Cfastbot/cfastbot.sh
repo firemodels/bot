@@ -1195,11 +1195,11 @@ make_cdata_guide()
 {
    # Build CDATA guide
    echo Building CData guide
-   CD_REPO $cfastrepo/Manuals/Monte_Carlo_Guide $cfastbranch || return 1
+   CD_REPO $cfastrepo/Manuals/CData_Guide $cfastbranch || return 1
    ./make_guide.sh &> $OUTPUT_DIR/stage8_cdata_guide
 
    # Check guide for completion and copy to website if successful
-   check_guide $OUTPUT_DIR/stage8_cdata_guide $cfastrepo/Manuals/Monte_Carlo_Guide CData_Guide.pdf 'CData Guide'
+   check_guide $OUTPUT_DIR/stage8_cdata_guide $cfastrepo/Manuals/CData_Guide CData_Guide.pdf 'CData Guide'
    return 0
 }
 
