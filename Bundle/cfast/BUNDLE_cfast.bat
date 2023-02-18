@@ -30,16 +30,14 @@ set bundleinfo=%cfast_root%\Utilities\for_bundle\scripts\bundleinfo
 
 call Create_Install_Files.bat
 
-copy "%bundleinfo%\wrapup_cfast_install.bat"           "%DISTDIR%\wrapup_cfast_install.bat"
+copy "%bundleinfo%\wrapup_cfast_install.bat"           "%DISTDIR%\wrapup_cfast_install.bat"   > Nul 2>&1
 
 cd %DISTDIR%
-wzzip -a -r -P ..\%installerbase%.zip * ..\SMV6 > Nul
+wzzip -a -r -P ..\%installerbase%.zip * ..\SMV6   > Nul 2>&1
 
 :: create an installation file from the zipped bundle directory
 
-echo.
 echo ***Creating installer
-echo.
 
 cd %DISTDIR%\..
 echo Setup is about to install CFAST 7  > %bundleinfo%\message.txt
@@ -47,15 +45,12 @@ echo Press Setup to begin installation. > %bundleinfo%\main.txt
 if exist %installerbase%.exe erase %installerbase%.exe
 wzipse32 %installerbase%.zip -runasadmin -a %bundleinfo%\about.txt -st"cfast 7 Setup" -d "c:\Program Files\firemodels\%distname%" -c wrapup_cfast_install.bat
 
-echo copying %installerbase%.exe to %cfast_root%\Utilities\uploads\cftest.exe"
-copy %installerbase%.exe %cfast_root%\Utilities\uploads\cftest.exe"
+echo ***Copying %installerbase%.exe to %cfast_root%\Utilities\uploads\cftest.exe
+copy %installerbase%.exe %cfast_root%\Utilities\uploads\cftest.exe   > Nul 2>&1
 
 
-echo.
 echo ***cfast bundle built
-echo.
 
 cd %CURDIR%
-pause
 
 

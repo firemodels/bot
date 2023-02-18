@@ -1,4 +1,4 @@
-:: @echo off
+@echo off
 
 set CURDIR=%CD%
 
@@ -7,51 +7,74 @@ set CURDIR=%CD%
 cd ..\..\..\cfast
 set cfast_root=%CD%
 
-@echo ***     Create NPlot
+@echo ***Creating NPlot
 cd %cfast_root%\..\Extras\nplot
 set MSBUILD="C:\Program Files\Microsoft Visual Studio\2022\Community\Msbuild\Current\Bin\MSBuild.exe"
-%MSBUILD%  NPlot.sln /target:NPlot /p:Configuration=Release /p:Platform="Any CPU"
-copy %cfast_root%\..\Extras\nplot\src\bin\NPlot.dll %cfast_root%\Utilities\for_bundle\Bin\ /Y
+%MSBUILD%  NPlot.sln /target:NPlot /p:Configuration=Release /p:Platform="Any CPU" > Nul 2>&1
+call :copy_file %cfast_root%\..\Extras\nplot\src\bin NPlot.dll %cfast_root%\Utilities\for_bundle\Bin NPlot.dll
 
-@echo *** Create CFAST executables
 
-@echo ***     Create CEdit
+@echo ***Creating CEdit
 cd %cfast_root%\Build\Cedit
-call make_cedit.bat bot
-copy %cfast_root%\Source\Cedit\obj\Release\CEdit.exe %cfast_root%\Utilities\for_bundle\Bin\CEdit.exe /Y
+call make_cedit.bat bot  > Nul 2>&1
+call :copy_file %cfast_root%\Source\Cedit\obj\Release CEdit.exe %cfast_root%\Utilities\for_bundle\Bin CEdit.exe
 
-@echo ***     Create CFAST
-call %cfast_root%\Build\scripts\setup_intel_compilers.bat intel64
+@echo ***Creating CFAST
+call %cfast_root%\Build\scripts\setup_intel_compilers.bat intel64  > Nul 2>&1
 cd %cfast_root%\Build\CFAST\intel_win_64
-call make_cfast.bat bot release
-copy cfast7_win_64.exe %cfast_root%\Utilities\for_bundle\Bin\cfast.exe /Y
+call make_cfast.bat bot release > Nul 2>&1
+call :copy_file . cfast7_win_64.exe %cfast_root%\Utilities\for_bundle\Bin cfast.exe
 
-@echo ***     Create CData
-call %cfast_root%\Build\scripts\setup_intel_compilers.bat intel64
+@echo ***Creating CData
 cd %cfast_root%\Build\Cdata\intel_win_64
-call make_cdata.bat bot release
-copy cdata7_win_64.exe %cfast_root%\Utilities\for_bundle\Bin\cdata.exe /Y
+call make_cdata.bat bot release > Nul 2>&1
+call :copy_file . cdata7_win_64.exe %cfast_root%\Utilities\for_bundle\Bin cdata.exe
 
-@echo ***     Create VandVCalcs
+@echo ***Creating VandVCalcs
 cd %cfast_root%\Build\VandV_Calcs\intel_win_64
-call make_vv.bat bot release
-copy VandV_Calcs_win_64.exe %cfast_root%\Utilities\for_bundle\Bin\VandV_Calcs.exe /Y
+call make_vv.bat bot release > Nul 2>&1
+call :copy_file . VandV_Calcs_win_64.exe %cfast_root%\Utilities\for_bundle\Bin VandV_Calcs.exe
 
 cd %cfast_root%\Utilities\for_bundle\scripts
 
-copy %cfast_root%\..\Extras\Bin\*.* %cfast_root%\Utilities\for_bundle\Bin\ /Y
+call :copy_dir %cfast_root%\..\Extras\Bin %cfast_root%\Utilities\for_bundle\Bin
 
-@echo *** Copying Smokeview executables
+@echo ***Copying Smokeview executables
 
 if NOT exist %cfast_root%\Utilities\for_bundle\SMV6 (
    mkdir %cfast_root%\Utilities\for_bundle\SMV6
 )
-copy %cfast_root%\..\Extras\SMV6\*.* %cfast_root%\Utilities\for_bundle\SMV6\ /Y
+call :copy_dir %cfast_root%\..\Extras\SMV6 %cfast_root%\Utilities\for_bundle\SMV6
 if NOT exist %cfast_root%\Utilities\for_bundle\SMV6\textures (
    mkdir %cfast_root%\Utilities\for_bundle\SMV6\textures
 )
-copy %cfast_root%\..\Extras\SMV6\textures\*.* %cfast_root%\Utilities\for_bundle\SMV6\textures\ /Y
+call :copy_dir %cfast_root%\..\Extras\SMV6\textures %cfast_root%\Utilities\for_bundle\SMV6\textures
 
-@echo *** copy install utilities
-copy %cfast_root%\..\Extras\SMV6\set_path.exe %cfast_root%\Utilities\for_bundle\bin\ /Y
-copy %cfast_root%\..\Extras\Bin\Shortcut.exe %cfast_root%\Utilities\for_bundle\bin\ /Y
+@echo ***Copying install utilities
+call :copy_file %cfast_root%\..\Extras\SMV6 set_path.exe %cfast_root%\Utilities\for_bundle\bin set_path.exe
+call :copy_file %cfast_root%\..\Extras\Bin Shortcut.exe  %cfast_root%\Utilities\for_bundle\bin Shortcut.exe 
+
+goto eof
+
+:: -------------------------------------------------
+:copy_file
+:: -------------------------------------------------
+set fromdir=%1
+set fromfile=%2
+set todir=%3
+set tofile=%4
+
+copy %fromdir%\%fromfile% %todir%\%tofile% /Y  > Nul 2>&1
+if NOT EXIST %todir%\%tofile% echo ***error: %todir%\%tofile% failed to copy
+exit /b
+
+:: -------------------------------------------------
+:copy_dir
+:: -------------------------------------------------
+set fromdir=%1
+set todir=%2
+
+copy %fromdir% %todir% /Y  > Nul 2>&1
+exit /b
+
+:eof
