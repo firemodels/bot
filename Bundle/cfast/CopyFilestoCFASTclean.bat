@@ -7,32 +7,50 @@ set CURDIR=%CD%
 cd ..\..\..\cfast
 set cfast_root=%CD%
 
+set stage2out=%CURDIR%\out\stage2_build_apps
+
+echo. > %stage2out%
+
+@echo.  >> %stage2out%
 @echo ***Creating NPlot
+@echo.  >> %stage2out%
+@echo ***Creating NPlot >> %stage2out%
 cd %cfast_root%\..\Extras\nplot
 set MSBUILD="C:\Program Files\Microsoft Visual Studio\2022\Community\Msbuild\Current\Bin\MSBuild.exe"
-%MSBUILD%  NPlot.sln /target:NPlot /p:Configuration=Release /p:Platform="Any CPU" > Nul 2>&1
+%MSBUILD%  NPlot.sln /target:NPlot /p:Configuration=Release /p:Platform="Any CPU" >> %stage2out% 2>&1
 call :copy_file %cfast_root%\..\Extras\nplot\src\bin NPlot.dll %cfast_root%\Utilities\for_bundle\Bin NPlot.dll
 
-
+@echo.  >> %stage2out%
 @echo ***Creating CEdit
+@echo.  >> %stage2out%
+@echo ***Creating CEdit >> %stage2out%
 cd %cfast_root%\Build\Cedit
-call make_cedit.bat bot  > Nul 2>&1
+call make_cedit.bat bot  >> %stage2out% 2>&1
 call :copy_file %cfast_root%\Source\Cedit\obj\Release CEdit.exe %cfast_root%\Utilities\for_bundle\Bin CEdit.exe
 
+@echo.  >> %stage2out%
 @echo ***Creating CFAST
-call %cfast_root%\Build\scripts\setup_intel_compilers.bat intel64  > Nul 2>&1
+@echo.  >> %stage2out%
+@echo ***Creating CFAST >> %stage2out%
+call %cfast_root%\Build\scripts\setup_intel_compilers.bat intel64 >> %stage2out% 2>&1
 cd %cfast_root%\Build\CFAST\intel_win_64
-call make_cfast.bat bot release > Nul 2>&1
+call make_cfast.bat bot release >> %stage2out% 2>&1
 call :copy_file . cfast7_win_64.exe %cfast_root%\Utilities\for_bundle\Bin cfast.exe
 
+@echo.  >> %stage2out%
 @echo ***Creating CData
+@echo.  >> %stage2out%
+@echo ***Creating CData >> %stage2out%
 cd %cfast_root%\Build\Cdata\intel_win_64
-call make_cdata.bat bot release > Nul 2>&1
+call make_cdata.bat bot release >> %stage2out% 2>&1
 call :copy_file . cdata7_win_64.exe %cfast_root%\Utilities\for_bundle\Bin cdata.exe
 
+@echo.  >> %stage2out%
 @echo ***Creating VandVCalcs
+@echo.  >> %stage2out%
+@echo ***Creating VandVCalcs >> %stage2out%
 cd %cfast_root%\Build\VandV_Calcs\intel_win_64
-call make_vv.bat bot release > Nul 2>&1
+call make_vv.bat bot release >> %stage2out% 2>&1
 call :copy_file . VandV_Calcs_win_64.exe %cfast_root%\Utilities\for_bundle\Bin VandV_Calcs.exe
 
 cd %cfast_root%\Utilities\for_bundle\scripts

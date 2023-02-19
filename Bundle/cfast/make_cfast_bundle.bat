@@ -12,13 +12,17 @@ set CFASTREPO=%GITROOT%\cfast
 set SCRIPTDIR=%CFASTREPO%\Utilities\for_bundle\scripts
 set VSSTUDIO=%CFASTREPO%\Utilities\Visual_Studio
 
+cd %THISDIR%
+echo ***Cleaning cfast bundle build directory
+git clean -dxf  > Nul 2>&1
+
 cd %CFASTREPO%
 echo ***Cleaning cfast repo
 git clean -dxf  > Nul 2>&1
 
 cd %THISDIR%
 echo ***Restoring project configuration files 
-call Restore_vs_config %VSSTUDIO%  > Nul 2>&1
+call Restore_vs_config %VSSTUDIO%  > %THISDIR%\out\stage1_config 2>&1
 
 cd %THISDIR%
 call CopyFilestoCFASTclean
