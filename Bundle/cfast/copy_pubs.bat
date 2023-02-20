@@ -1,37 +1,27 @@
 @echo off
-set error=0
-set bot_type=%1
-set pdf_from_dir=%2
-set bot_host=%3
+setlocal
+set bot_host=%1
 
-set "PUBDIR=%userprofile%\Google Drive\FDS-SMV Newest Manuals\"
+set cfastbundledir=%CD%
 
-set pdf_to_dir=%userprofile%\.bundle\pubs
 
-if NOT exist %userprofile%\.bundle mkdir %userprofile%\.bundle
-if NOT exist %pdf_to_dir% mkdir %pdf_to_dir%
+cd ..\..\..\cfast
+set cfastrepo=%CD%
+set manuals=%cfastrepo%\Manuals
+set PDFS=%userprofile%\.cfast\PDFS
 
-echo.
-echo From directory: %pdf_from_dir%
-echo   To directory: %pdf_to_dir%
+if NOT exist %userprofile%\.cfast mkdir %userprofile%\.cfast
+if NOT exist %PDFS% mkdir %PDFS%
+erase %PDFS%\*.pdf   > Nul 2>&1
 
-if "x%bot_host%" == "x" goto endif0
-  echo           host: %bot_host% 
-:endif0
 
-if "%bot_type%" == "firebot" (
-  call :copy_file FDS_Config_Management_Plan.pdf
-  call :copy_file FDS_Technical_Reference_Guide.pdf
-  call :copy_file FDS_User_Guide.pdf
-  call :copy_file FDS_Validation_Guide.pdf
-  call :copy_file FDS_Verification_Guide.pdf
-)
+set hosthome=/home2/smokevis2/cfast/FireModels_central/cfast/Manuals
 
-if "%bot_type%" == "smokebot" (
-  call :copy_file SMV_Technical_Reference_Guide.pdf
-  call :copy_file SMV_User_Guide.pdf
-  call :copy_file SMV_Verification_Guide.pdf
-)
+call :copy_file Tech_Ref
+call :copy_file Users_Guide
+call :copy_file Validation_Guide
+call :copy_file Configuration_Guide
+call :copy_file CData_Guide
 
 goto eof
 
@@ -39,30 +29,12 @@ goto eof
 :copy_file
 :: -------------------------------------------------
 set file=%1
-
-set "fullfile=%PUBDIR%\%file%"
-if NOT exist "%fullfile%" goto getfile_if
-  echo        copying: %file%
-  copy "%fullfile%" %pdf_to_dir%\%file% > Nul
-  exit /b 0
-:getfile_if
-
-echo        copying: %file%
-if "x%bot_host%" == "x" goto else1
-  pscp -P 22 %bot_host%:%pdf_from_dir%/%file% %pdf_to_dir%\.
-  if EXIST %pdf_to_dir%\%file% goto endif1
-  echo ***Error: unable to copy %file% from %bot_host%:%pdf_from_dir%/%file%
-  set error=1
-  goto endif1
-:else1
-  copy %pdf_from_dir%\%file% %pdf_to_dir%
-  if EXIST %pdf_to_dir%\%file% goto endif1
-  echo ***Error: unable to copy %file% from %pdf_from_dir%\%file%
-  set error=1
-:endif1
-exit /b
-
-:eof
-
-if "%error%" == "0" exit /b 0
+set fullfile=%PDFS%\%file%.pdf
+echo | set /p dummyName=***downloading %file%.pdf: 
+pscp -P 22 %bot_host%:%hosthome%/%file%/%file%.pdf %fullfile%  > Nul 2>&1
+if NOT exist %fullfile% echo failed
+if exist %fullfile% echo succeeded
 exit /b 1
+
+cd %cfastbundledir%
+:eof

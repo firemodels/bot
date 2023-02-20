@@ -20,11 +20,11 @@ mkdir %SMVDISTDIR%\textures
 
 echo ***Copying executables
 
-call :COPY  %bindir%\CData.exe %DISTDIR%\
-call :COPY  %bindir%\CEdit.exe %DISTDIR%\
-call :COPY  %bindir%\CFAST.exe %DISTDIR%\
+call :COPY  %bindir%\CData.exe                %DISTDIR%\
+call :COPY  %bindir%\CEdit.exe                %DISTDIR%\
+call :COPY  %bindir%\CFAST.exe                %DISTDIR%\
 call :COPY  %vandvdir%\VandV_Calcs_win_64.exe %DISTDIR%\VandV_Calcs.exe
-call :COPY  %bindir%\background.exe %DISTDIR%\
+call :COPY  %bindir%\..\SMV6\background.exe   %DISTDIR%\
 
 echo ***Copying CFAST DLLs
 
@@ -65,25 +65,26 @@ call :COPY  %docdir%\CData_Guide\Examples\*.in   %DISTDIR%\Examples\
 
 echo ***Copying CFAST documentation
 
-call :COPY %docdir%\Tech_Ref\Tech_Ref.pdf                       %DISTDIR%\Documents\
-call :COPY %docdir%\Users_Guide\Users_Guide.pdf                 %DISTDIR%\Documents\
-call :COPY %docdir%\Validation_Guide\Validation_Guide.pdf       %DISTDIR%\Documents\
-call :COPY %docdir%\Configuration_Guide\Configuration_Guide.pdf %DISTDIR%\Documents\
-call :COPY %docdir%\CData_Guide\CData_Guide.pdf                 %DISTDIR%\Documents\
+set PDFS=%userprofile%\.cfast\PDFS
+call :COPY %PDFS%\Tech_Ref.pdf            %DISTDIR%\Documents\
+call :COPY %PDFS%\Users_Guide.pdf         %DISTDIR%\Documents\
+call :COPY %PDFS%\Validation_Guide.pdf    %DISTDIR%\Documents\
+call :COPY %PDFS%\Configuration_Guide.pdf %DISTDIR%\Documents\
+call :COPY %PDFS%\CData_Guide.pdf         %DISTDIR%\Documents\
 
 echo ***Copying Smokeview files
 
-call :COPY %bindir%\..\SMV6\background.exe			%SMVDISTDIR%\
-call :COPY %bindir%\..\SMV6\get_time.exe			%SMVDISTDIR%\
-call :COPY %bindir%\..\SMV6\sh2bat.exe				%SMVDISTDIR%\
-call :COPY %bindir%\..\SMV6\smokediff.exe			%SMVDISTDIR%\
-call :COPY %bindir%\..\SMV6\smokeview.exe			%SMVDISTDIR%\
-call :COPY %bindir%\..\SMV6\smokezip.exe			%SMVDISTDIR%\
-call :COPY %bindir%\..\SMV6\wind2fds.exe			%SMVDISTDIR%\
-call :COPY %bindir%\..\SMV6\objects.svo				%SMVDISTDIR%\
-call :COPY %bindir%\..\SMV6\textures				%SMVDISTDIR%\
-call :COPY %bindir%\..\SMV6\volrender.ssf			%SMVDISTDIR%\
-call :COPY_DIR %bindir%\..\SMV6\textures            %SMVDISTDIR%\textures\
+call :COPY %bindir%\..\SMV6\background.exe %SMVDISTDIR%\
+call :COPY %bindir%\..\SMV6\get_time.exe   %SMVDISTDIR%\
+call :COPY %bindir%\..\SMV6\sh2bat.exe     %SMVDISTDIR%\
+call :COPY %bindir%\..\SMV6\smokediff.exe  %SMVDISTDIR%\
+call :COPY %bindir%\..\SMV6\smokeview.exe  %SMVDISTDIR%\
+call :COPY %bindir%\..\SMV6\smokezip.exe   %SMVDISTDIR%\
+call :COPY %bindir%\..\SMV6\wind2fds.exe   %SMVDISTDIR%\
+call :COPY %bindir%\..\SMV6\objects.svo    %SMVDISTDIR%\
+call :COPY %bindir%\..\SMV6\textures       %SMVDISTDIR%\
+call :COPY %bindir%\..\SMV6\volrender.ssf  %SMVDISTDIR%\
+call :COPY_DIR %bindir%\..\SMV6\textures   %SMVDISTDIR%\textures\
 
 echo ***Copying Uninstall files
 
