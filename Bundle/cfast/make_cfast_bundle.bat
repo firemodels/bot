@@ -22,7 +22,7 @@ git clean -dxf  > Nul 2>&1
 
 cd %THISDIR%
 echo ***Restoring project configuration files 
-call Restore_vs_config %VSSTUDIO%  > %THISDIR%\out\stage1_config 2>&1
+call Restore_vs_config %VSSTUDIO%  %THISDIR%\out\stage1_config
 
 cd %THISDIR%
 call CopyFilestoCFASTclean
