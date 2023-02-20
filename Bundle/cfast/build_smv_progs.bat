@@ -19,21 +19,16 @@ goto:eof
 :endif_envexist
 
 call %envfile%
-echo.
-echo  Building smokeview programs
-Title Building smokeview programs
 
 %svn_drive%
 cd ..\..\..\smv
 set smvrepo=%CD%
-echo smvrepo=%smvrepo%
-pause
 
-set progs=background flush hashfile smokediff smokezip wind2fds get_time set_path sh2bat timep
+set progs=background get_time set_path sh2bat smokediff smokezip wind2fds    
 call %smvrepo%\Utilities\Scripts\setup_intel_compilers.bat
 for %%x in ( %progs% ) do (
   cd %smvrepo%\Build\%%x\intel_win_64
-  echo ***building: %%x %CD%
+  echo ***Building %%x
   call make_%%x bot > Nul 2>&1
   if NOT exist %%x_win_64.exe echo ***error: %%x_win_64.exe does not exist::
 )
