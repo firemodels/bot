@@ -1,5 +1,6 @@
 @echo off
 setlocal
+set smvrepo=%1
 set CURDIR=%CD%
 
 :: batch file to build smokeview utility programs on Windows, Linux or OSX platforms
@@ -21,8 +22,10 @@ goto:eof
 call %envfile%
 
 %svn_drive%
-cd ..\..\..\smv
-set smvrepo=%CD%
+
+cd %smvrepo%\Build\LIBS\intel_win_64
+echo ***Building Libraries
+call make_LIBS_bot > Nul 2>&1
 
 set progs=background get_time set_path sh2bat smokediff smokezip wind2fds    
 call %smvrepo%\Utilities\Scripts\setup_intel_compilers.bat

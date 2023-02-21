@@ -17,10 +17,10 @@ echo. > %stage2out%
 @echo ***Building NPlot
 @echo.  >> %stage2out%
 @echo ***Building NPlot >> %stage2out%
-cd %cfast_root%\..\Extras\nplot
+cd %cfast_root%\..\nplot
 set MSBUILD="C:\Program Files\Microsoft Visual Studio\2022\Community\Msbuild\Current\Bin\MSBuild.exe"
 %MSBUILD%  NPlot.sln /target:NPlot /p:Configuration=Release /p:Platform="Any CPU" >> %stage2out% 2>&1
-call :copy_file %cfast_root%\..\Extras\nplot\src\bin NPlot.dll %cfast_root%\Utilities\for_bundle\Bin NPlot.dll
+call :copy_file %cfast_root%\..\nplot\src\bin NPlot.dll %cfast_root%\Utilities\for_bundle\Bin NPlot.dll
 
 @echo.  >> %stage2out%
 @echo ***Building CEdit
@@ -56,23 +56,6 @@ call make_vv.bat bot release >> %stage2out% 2>&1
 call :copy_file . VandV_Calcs_win_64.exe %cfast_root%\Utilities\for_bundle\Bin VandV_Calcs.exe
 
 cd %cfast_root%\Utilities\for_bundle\scripts
-
-call :copy_dir %cfast_root%\..\Extras\Bin %cfast_root%\Utilities\for_bundle\Bin
-
-::@echo ***Copying Smokeview executables
-
-::if NOT exist %cfast_root%\Utilities\for_bundle\SMV6 (
-::   mkdir %cfast_root%\Utilities\for_bundle\SMV6
-::)
-::call :copy_dir %cfast_root%\..\Extras\SMV6 %cfast_root%\Utilities\for_bundle\SMV6
-::if NOT exist %cfast_root%\Utilities\for_bundle\SMV6\textures (
-::   mkdir %cfast_root%\Utilities\for_bundle\SMV6\textures
-::)
-::call :copy_dir %cfast_root%\..\Extras\SMV6\textures %cfast_root%\Utilities\for_bundle\SMV6\textures
-
-::@echo ***Copying install utilities
-::call :copy_file %cfast_root%\..\Extras\SMV6 set_path.exe %cfast_root%\Utilities\for_bundle\bin set_path.exe
-::call :copy_file %cfast_root%\..\Extras\Bin Shortcut.exe  %cfast_root%\Utilities\for_bundle\bin Shortcut.exe 
 
 goto eof
 

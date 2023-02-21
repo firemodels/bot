@@ -28,6 +28,11 @@ if exist %SMVDISTDIR% rmdir /s /q %SMVDISTDIR%
 mkdir %SMVDISTDIR%
 mkdir %SMVDISTDIR%\textures
 
+echo .
+echo ***Creating smokeview executables
+call build_smv_progs %smvrepo%
+cd %CURDIR2%
+
 echo ***Copying CFAST executables
 
 call :COPY  %bindir%\CData.exe                %DISTDIR%\
@@ -52,22 +57,6 @@ call :COPY  %bindir%\C1.Win.C1Sizer.4.8.dll          %DISTDIR%\
 call :COPY  %bindir%\C1.Win.ImportServices.4.8.dll   %DISTDIR%\
 call :COPY  %bindir%\NPlot.dll 				        %DISTDIR%\
 
-echo ***Copying CFAST support files
-
-call :COPY  %bindir%\AllFires.in              %DISTDIR%\
-call :COPY  %bindir%\thermal.csv              %DISTDIR%
-call :COPY  %bindir%\3_panel_workstation.o    %DISTDIR%\
-call :COPY  %bindir%\bunkbed.o                %DISTDIR%\
-call :COPY  %bindir%\burner.o                 %DISTDIR%\
-call :COPY  %bindir%\curtains.o               %DISTDIR%\
-call :COPY  %bindir%\kiosk.o                  %DISTDIR%\
-call :COPY  %bindir%\mattress_and_boxspring.o %DISTDIR%\
-call :COPY  %bindir%\sofa.o                   %DISTDIR%\
-call :COPY  %bindir%\tv_set.o                 %DISTDIR%\
-call :COPY  %bindir%\upholstered_chair.o      %DISTDIR%\
-call :COPY  %bindir%\wardrobe.o               %DISTDIR%\
-call :COPY  %bindir%\wood_wall.o              %DISTDIR%\
-
 echo ***Copying CFAST example files
 
 call :COPY  %bindir%\Data\Users_Guide_Example.in %DISTDIR%\Examples\
@@ -81,11 +70,6 @@ call :COPY %PDFS%\Users_Guide.pdf         %DISTDIR%\Documents\
 call :COPY %PDFS%\Validation_Guide.pdf    %DISTDIR%\Documents\
 call :COPY %PDFS%\Configuration_Guide.pdf %DISTDIR%\Documents\
 call :COPY %PDFS%\CData_Guide.pdf         %DISTDIR%\Documents\
-
-echo .
-echo ***Creating smokeview executables
-call build_smv_progs
-cd %CURDIR2%
 
 echo ***Copying Smokeview files
 
