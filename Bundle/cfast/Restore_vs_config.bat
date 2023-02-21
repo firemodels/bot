@@ -1,6 +1,7 @@
 @echo off
 set FROMDIR=%1
-set outfile=%2
+set NPLOTDIR=%2
+set outfile=%3
 echo. > %outfile%
 call :copy_file %FROMDIR% CFAST.sln             %FROMDIR%\..\..
 call :copy_file %FROMDIR% CFAST.vfproj          %FROMDIR%\..\..\Source\CFAST
@@ -8,6 +9,7 @@ call :copy_file %FROMDIR% CEdit.vbproj          %FROMDIR%\..\..\Source\CEdit
 call :copy_file %FROMDIR% CData.vfproj          %FROMDIR%\..\..\Source\CData
 call :copy_file %FROMDIR% Create_scripts.vfproj %FROMDIR%\..\..\Source\Create_scripts
 call :copy_file %FROMDIR% VandV_Calcs.vfproj    %FROMDIR%\..\..\Source\VandV_Calcs
+call :copy_file %NPLOTDIR% NPlot.sln            %NPLOTDIR%\..\..\..\nplot
 
 goto eof
 :: -------------------------------------------------
