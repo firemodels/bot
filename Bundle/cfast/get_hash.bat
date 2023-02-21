@@ -23,10 +23,10 @@ set PDFS=%userprofile%\.cfast\PDFS
 if NOT exist %userprofile%\.cfast mkdir %userprofile%\.cfast
 if NOT exist %PDFS% mkdir %PDFS%
 
-echo Downloading cfast repo hash
+echo | set /p dummyName=Downloading cfast repo hash: 
 call :gethash CFAST_HASH
 
-echo Downloading smv repo hash
+echo | set /p dummyName=Downloading smv repo hash: 
 call :gethash SMV_HASH
 goto eof
 
