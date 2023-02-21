@@ -1,9 +1,20 @@
 @echo off
 setlocal
-set bot_host=%1
 
 set cfastbundledir=%CD%
 
+set configfile=%userprofile%\.bundle\bundle_config.bat
+
+if not exist %configfile% echo ***error: %userprofile%\bundle_config.bat does not exist
+if not exist %configfile% exit /b
+
+call %configfile%
+set error=0
+if x%bundle_hostname% == x echo ***error: bundle_hostname variable is not defined
+if x%bundle_hostname% == x set error=1
+if x%bundle_cfastbot_home% == x echo ***error: bundle_cfastbot_home variable is not defined
+if x%bundle_cfastbot_home% == x set error=1
+if %error% == 1 exit /b
 
 cd ..\..\..\cfast
 set cfastrepo=%CD%
@@ -15,7 +26,8 @@ if NOT exist %PDFS% mkdir %PDFS%
 erase %PDFS%\*.pdf   > Nul 2>&1
 
 
-set hosthome=/home2/smokevis2/cfast/FireModels_central/cfast/Manuals
+set hosthome=%bundle_cfastbot_home%/.cfastbot/Manuals
+echo Downloading cfast PDFs from %hosthome% on %bundle_hostname%
 
 call :copy_file Tech_Ref
 call :copy_file Users_Guide
@@ -31,7 +43,7 @@ goto eof
 set file=%1
 set fullfile=%PDFS%\%file%.pdf
 echo | set /p dummyName=***downloading %file%.pdf: 
-pscp -P 22 %bot_host%:%hosthome%/%file%/%file%.pdf %fullfile%  > Nul 2>&1
+pscp -P 22 %bundle_hostname%:%hosthome%/%file%/%file%.pdf %fullfile%  > Nul 2>&1
 if NOT exist %fullfile% echo failed
 if exist %fullfile% echo succeeded
 exit /b 1
