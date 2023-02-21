@@ -24,16 +24,21 @@ if NOT exist %userprofile%\.cfast mkdir %userprofile%\.cfast
 if NOT exist %PDFS% mkdir %PDFS%
 
 echo Downloading cfast repo hash
-if exist %PDFS%\CFASTHASH erase %PDFS%\CFASTHASH
-pscp -P 22 %bundle_hostname%:%bundle_cfastbot_home%/.cfastbot/Manuals/HASH %PDFS%\CFASTHASH  > Nul 2>&1
-if NOT exist %PDFS%\CFASTHASH echo failed
-if exist %PDFS%\CFASTHASH echo succeeded
+call :gethash CFAST_HASH
 
 echo Downloading smv repo hash
-if exist %PDFS%\SMVHASH erase %PDFS%\SMVHASH
-pscp -P 22 %bundle_hostname%:%bundle_smokebot_home%/.smokebot/apps/SMV_HASH %PDFS%\SMV_HASH  > Nul 2>&1
-if NOT exist %PDFS%\SMV_HASH echo failed
-if exist %PDFS%\SMV_HASH echo succeeded
-exit /b 1
+call :gethash SMV_HASH
+goto eof
+
+::------------------------------------------
+:gethash
+set type=%1
+if exist %PDFS%\%type% erase %PDFS%\%type%
+pscp -P 22 %bundle_hostname%:%bundle_cfastbot_home%/.cfastbot/Manuals/%type% %PDFS%\%type%  > Nul 2>&1
+if NOT exist %PDFS%\%type% echo failed
+if exist %PDFS%\%type% echo succeeded
+exit /b
+
+:eof
 
 cd %cfastbundledir%
