@@ -13,6 +13,8 @@ cd %cfast_root%\..\smv
 set smvrepo=%CD%
 cd %CURDIR2%
 
+echo.
+echo ***Copying CFAST files
 echo ***Making directories
 
 if exist %DISTDIR% rmdir /s /q %DISTDIR%
@@ -26,7 +28,7 @@ if exist %SMVDISTDIR% rmdir /s /q %SMVDISTDIR%
 mkdir %SMVDISTDIR%
 mkdir %SMVDISTDIR%\textures
 
-echo ***Copying cfast executables
+echo ***Copying CFAST executables
 
 call :COPY  %bindir%\CData.exe                %DISTDIR%\
 call :COPY  %bindir%\CEdit.exe                %DISTDIR%\
@@ -81,7 +83,7 @@ call :COPY %PDFS%\Configuration_Guide.pdf %DISTDIR%\Documents\
 call :COPY %PDFS%\CData_Guide.pdf         %DISTDIR%\Documents\
 
 echo .
-echo ***Create smokeview executables
+echo ***Creating smokeview executables
 call build_smv_progs
 cd %CURDIR2%
 
@@ -99,6 +101,8 @@ call :COPY %botrepo%\Bundle\smv\for_bundle\objects.svo    %SMVDISTDIR%\
 call :COPY %botrepo%\Bundle\smv\for_bundle\volrender.ssf  %SMVDISTDIR%\
 call :COPY_DIR %botrepo%\Bundle\smv\for_bundle\textures   %SMVDISTDIR%\textures\
 
+echo.
+echo ***Creating installer
 echo ***Copying Uninstall files
 
 call :COPY  %bundleinfo%\uninstall.bat        %DISTDIR%\Uninstall

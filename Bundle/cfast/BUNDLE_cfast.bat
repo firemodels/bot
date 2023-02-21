@@ -35,13 +35,14 @@ call Create_Install_Files.bat
 copy "%bundleinfo%\wrapup_cfast_install.bat"           "%DISTDIR%\wrapup_cfast_install.bat"   > Nul 2>&1
 
 cd %DISTDIR%
+echo ***Compressing installation files
 echo. > %stage3out%
 echo ***zipping bundle files > %stage3out%
 wzzip -a -r -P ..\%installerbase%.zip * ..\SMV6   >> %stage3out% 2>&1
 
 :: create an installation file from the zipped bundle directory
 
-echo ***Creating installer
+echo ***Creating installation file
 
 cd %DISTDIR%\..
 echo Setup is about to install CFAST 7  > %bundleinfo%\message.txt
@@ -52,7 +53,7 @@ wzipse32 %installerbase%.zip -runasadmin -a %bundleinfo%\about.txt -st"cfast 7 S
 echo ***Copying %installerbase%.exe to %cfast_root%\Utilities\uploads\cftest.exe
 copy %installerbase%.exe %cfast_root%\Utilities\uploads\cftest.exe   >> %stage3out% 2>&1
 
-echo ***cfast bundle built
+echo ***CFAST installer built
 
 cd %CURDIR%
 

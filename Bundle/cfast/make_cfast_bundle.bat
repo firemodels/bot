@@ -3,7 +3,8 @@ SETLOCAL
 
 set THISDIR=%CD%
 
-echo ***Building cfast bundle
+echo ***Building CFAST bundle
+echo ***Setting up repos
 cd ..\..\..
 set GITROOT=%CD%
 cd %THISDIR%
@@ -13,11 +14,11 @@ set SCRIPTDIR=%CFASTREPO%\Utilities\for_bundle\scripts
 set VSSTUDIO=%CFASTREPO%\Utilities\Visual_Studio
 
 cd %THISDIR%
-echo ***Cleaning cfast bundle build directory
+echo ***Cleaning CFAST bundle build directory
 git clean -dxf  > Nul 2>&1
 
 cd %CFASTREPO%
-echo ***Cleaning cfast repo
+echo ***Cleaning CFAST repo
 git clean -dxf  > Nul 2>&1
 
 cd %THISDIR%
