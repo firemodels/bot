@@ -1333,6 +1333,10 @@ fi
    else
       # Send empty email with success message
       cat $TIME_LOG | mail $REPLYTO -s "CFASTbot build success on ${hostname}! Revision ${GIT_REVISION}." $mailTo &> /dev/null
+      if [ -d $LATEST_MANUALS_DIR ]; then
+        rm -rf $MANUALS_DIR
+        cp -r $LATEST_MANUALS_DIR $MANUALS_DIR
+      fi
    fi
 
    # Send email notification if validation statistics have changed.
@@ -1362,6 +1366,8 @@ size2=
 cfastbotdir="`pwd`"
 
 GITSTATUS_DIR=$HOME/.cfastbot
+LATEST_MANUALS_DIR=$GITSTATUS_DIR/Manuals_latest
+MANUALS_DIR=$GITSTATUS_DIR/Manuals
 EMAIL_LIST=$GITSTATUS_DIR/cfastbot_email_list.sh
 PID_FILE=$GITSTATUS_DIR/cfastbot_pid
 OUTPUT_DIR=$cfastbotdir/output
@@ -1722,10 +1728,9 @@ if [[ "$SKIP" == "" ]]; then
   make_cfast_vv_guide || exit 1
   make_cfast_config_guide || exit 1
   make_cdata_guide || exit 1
-  if [ -d $GITSTATUS_DIR/Manuals ]; then
-    rm -rf $GITSTATUS_DIR/Manuals
-  fi
-  cp -r $cfastrepo/Manuals $GITSTATUS_DIR/.
+  rm -rf $LATEST_MANUALS_DIR
+  cp -r $cfastrepo/Manuals $LATEST_MANUALS_DIR
+  echo $GIT_SHORTHASH > $LATEST_MANUALS_DIR/HASH
 fi
 
 ### Report results ###
