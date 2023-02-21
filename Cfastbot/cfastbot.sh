@@ -1642,9 +1642,11 @@ cur_dir=`pwd`
 
 CD_REPO $reponame/cfast $cfastbranch || return 1
 CFAST_REVISION=`git describe --dirty --long`
+CFAST_SHORTHASH=`git rev-parse --short HEAD`
 
 CD_REPO $reponame/smv   $smvbranch || return 1
 SMV_REVISION=`git describe --dirty --long`
+SMV_SHORTHASH=`git rev-parse --short HEAD`
 
 cd $cur_dir
 
@@ -1730,7 +1732,8 @@ if [[ "$SKIP" == "" ]]; then
   make_cdata_guide || exit 1
   rm -rf $LATEST_MANUALS_DIR
   cp -r $cfastrepo/Manuals $LATEST_MANUALS_DIR
-  echo $GIT_SHORTHASH > $LATEST_MANUALS_DIR/HASH
+  echo $CFAST_SHORTHASH > $LATEST_MANUALS_DIR/CFAST_HASH
+  echo $SMV_SHORTHASH   > $LATEST_MANUALS_DIR/SMV_HASH
 fi
 
 ### Report results ###
