@@ -14,6 +14,8 @@ if x%bundle_hostname% == x echo ***error: bundle_hostname variable is not define
 if x%bundle_hostname% == x set error=1
 if x%bundle_cfastbot_home% == x echo ***error: bundle_cfastbot_home variable is not defined
 if x%bundle_cfastbot_home% == x set error=1
+if x%bundle_smokebot_home% == x echo ***error: bundle_smokebot_home variable is not defined
+if x%bundle_smokebot_home% == x set error=1
 if %error% == 1 exit /b
 
 set PDFS=%userprofile%\.cfast\PDFS
@@ -21,15 +23,17 @@ set PDFS=%userprofile%\.cfast\PDFS
 if NOT exist %userprofile%\.cfast mkdir %userprofile%\.cfast
 if NOT exist %PDFS% mkdir %PDFS%
 
-set hosthome=%bundle_cfastbot_home%/.cfastbot/Manuals
-set hashfile=%userprofile%\.cfast\HASH
-echo Downloading cfast repo hash from %hosthome% on %bundle_hostname%
+echo Downloading cfast repo hash
+if exist %PDFS%\CFASTHASH erase %PDFS%\CFASTHASH
+pscp -P 22 %bundle_hostname%:%bundle_cfastbot_home%/.cfastbot/Manuals/HASH %PDFS%\CFASTHASH  > Nul 2>&1
+if NOT exist %PDFS%\CFASTHASH echo failed
+if exist %PDFS%\CFASTHASH echo succeeded
 
-if exist %PDFS%\HASH erase %PDFS%\HASH
-pscp -P 22 %bundle_hostname%:%hosthome%/HASH %PDFS%\HASH  > Nul 2>&1
-if NOT exist %PDFS%\HASH echo failed
-if exist %PDFS%\HASH echo succeeded
+echo Downloading smv repo hash
+if exist %PDFS%\SMVHASH erase %PDFS%\SMVHASH
+pscp -P 22 %bundle_hostname%:%bundle_smokebot_home%/.smokebot/apps/SMV_HASH %PDFS%\SMV_HASH  > Nul 2>&1
+if NOT exist %PDFS%\SMV_HASH echo failed
+if exist %PDFS%\SMV_HASH echo succeeded
 exit /b 1
 
 cd %cfastbundledir%
-:eof
