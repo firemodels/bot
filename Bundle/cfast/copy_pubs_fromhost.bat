@@ -23,8 +23,7 @@ set PDFS=%userprofile%\.cfast\PDFS
 
 if NOT exist %userprofile%\.cfast mkdir %userprofile%\.cfast
 if NOT exist %PDFS% mkdir %PDFS%
-erase %PDFS%\*.pdf   > Nul 2>&1
-
+erase %PDFS%\*.pdf > Nul 2>&1
 
 set hosthome=%bundle_cfastbot_home%/.cfastbot/Manuals
 echo Downloading cfast PDFs from %hosthome% on %bundle_hostname%
