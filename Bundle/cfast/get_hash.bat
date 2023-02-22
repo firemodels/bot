@@ -32,6 +32,7 @@ goto eof
 
 ::------------------------------------------
 :gethash
+::------------------------------------------
 set type=%1
 if exist %PDFS%\%type% erase %PDFS%\%type%
 pscp -P 22 %bundle_hostname%:%bundle_cfastbot_home%/.cfastbot/Manuals/%type% %PDFS%\%type%  > Nul 2>&1

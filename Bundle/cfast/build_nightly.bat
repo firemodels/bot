@@ -22,14 +22,14 @@ set error=0
 set smvhash_file=%userprofile%\.cfast\PDFS\SMV_HASH
 set cfasthash_file=%userprofile%\.cfast\PDFS\CFAST_HASH
 
+echo ***Get cfast and smv repo hashes from last cfastbot pass
+call get_hash > Nul 2>&1
+
 if not exist %smvhash_file% echo ***error: %smvhash_file% does not exist
 if not exist %smvhash_file% set error=1
 if not exist %cfasthash_file% echo ***error: %cfasthash_file% does not exist
 if not exist %cfasthash_file% set error=1
 if %error% == 1 exit /b
-
-echo ***Get cfast and smv repo hashes from last cfastbot pass
-call get_hash > Nul 2>&1
 
 set /p smvhash=<%smvhash_file%
 set /p cfasthash=<%cfasthash_file%
