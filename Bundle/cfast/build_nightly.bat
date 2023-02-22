@@ -24,17 +24,18 @@ set smvrevision_file=%userprofile%\.cfast\PDFS\SMV_REVISION
 set cfasthash_file=%userprofile%\.cfast\PDFS\CFAST_HASH
 set cfastrevision_file=%userprofile%\.cfast\PDFS\CFAST_REVISION
 
-echo ***Get cfast and smv repo hashes from last cfastbot pass
-call get_hash > Nul 2>&1
+echo ***Get cfast and smv repo hashes and revisions from last cfastbot pass
+call get_hashrev > Nul 2>&1
 
 if not exist %smvhash_file% echo ***error: %smvhash_file% does not exist
 if not exist %smvhash_file% set error=1
 if not exist %cfasthash_file% echo ***error: %cfasthash_file% does not exist
 if not exist %cfasthash_file% set error=1
+if not exist %smvrevision_file% echo ***error: %smvrevision_file% does not exist
+if not exist %smvrevision_file% set error=1
+if not exist %cfastrevision_file% echo ***error: %cfastrevision_file% does not exist
+if not exist %cfastrevision_file% set error=1
 if %error% == 1 exit /b
-
-echo ***Get cfast and smv repo hashes and revisions from last cfastbot pass
-call get_hashrev > Nul 2>&1
 
 set /p smvhash=<%smvhash_file%
 set /p smvrevision=<%smvrevision_file%
