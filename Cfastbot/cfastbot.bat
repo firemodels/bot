@@ -60,6 +60,14 @@ if not exist output mkdir output
 if not exist history mkdir history
 if not exist timings mkdir timings
 
+if not exist %userprofile%\.cfast mkdir %userprofile%\.cfast
+
+set PDFS=%userprofile%\.cfast\PDFS
+set PDFS_LATEST=%userprofile%\.cfast\PDFS_LATEST
+
+if not exist %PDFS% mkdir %PDFS%
+if not exist %PDFS_LATEST% mkdir %PDFS_LATEST%
+
 set OUTDIR=%CURDIR%\output
 set HISTORYDIR=%CURDIR%\history
 set TIMINGSDIR=%CURDIR%\timings
@@ -352,7 +360,6 @@ if %update% == 0 goto skip_update1
 
 cd %cfastrepo%
 git log --abbrev-commit . | head -1 | gawk "{print $2}" > %revisionfilestring%
-
 set /p revisionstring=<%revisionfilestring%
 
 git log --abbrev-commit . | head -1 | gawk "{print $2}" > %revisionfilenum%
@@ -362,6 +369,13 @@ set errorlogpc=%HISTORYDIR%\errors_%revisionnum%.txt
 set warninglogpc=%HISTORYDIR%\warnings_%revisionnum%.txt
 
 set timingslogfile=%TIMINGSDIR%\timings_%revisionnum%.txt
+
+git rev-parse --short HEAD > %PDFS_LATEST%\CFAST_HASH
+
+cd %smvrepo%
+git rev-parse --short HEAD > %PDFS_LATEST%\SMV_HASH
+
+cd %cfastrepo%
 
 :: -------------------------------------------------------------
 ::                           stage 1 - build cfast
@@ -675,6 +689,12 @@ sed "s/$/\r/" < %errorlog% > %errorlogpc%
 if %havewarnings% == 0 (
   if %haveerrors% == 0 (
     set message=success
+    erase %PDFS%\*.pdf               1> Nul 2>&1
+    copy %PDFS_LATEST%\*.pdf %PDFS%  1> Nul 2>&1
+
+    erase %PDFS%\*HASH               1> Nul 2>&1
+    copy %PDFS_LATEST%\*HASH %PDFS%  1> Nul 2>&1
+    
   ) else (
     echo. >> %infofile%
     type %errorlogpc% >> %infofile%
@@ -961,7 +981,8 @@ if %nwarnings% GTR 0 (
   type %OUTDIR%\stage_warning.txt >> %warninglog%
   set havewarnings=1
 )
-
+if exist %PDFS_LATEST%\%guide%.pdf erase %PDFS_LATEST%\%guide%.pdf 1> Nul 2>&1
+copy %guide%.pdf %PDFS_LATEST%\%guide%.pdf 1> Nul 2>&1
 exit /b
 
 :eof

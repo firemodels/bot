@@ -23,7 +23,7 @@ set PDFS=%userprofile%\.cfast\PDFS
 if NOT exist %userprofile%\.cfast mkdir %userprofile%\.cfast
 if NOT exist %PDFS% mkdir %PDFS%
 
-echo | set /p dummyName=Downloading cfast repo hash: 
+echo | set /p dummyName=Downloading CFAST repo hash: 
 call :gethash CFAST_HASH
 
 echo | set /p dummyName=Downloading smv repo hash: 
@@ -32,6 +32,7 @@ goto eof
 
 ::------------------------------------------
 :gethash
+::------------------------------------------
 set type=%1
 if exist %PDFS%\%type% erase %PDFS%\%type%
 pscp -P 22 %bundle_hostname%:%bundle_cfastbot_home%/.cfastbot/Manuals/%type% %PDFS%\%type%  > Nul 2>&1

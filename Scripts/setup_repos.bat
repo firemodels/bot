@@ -14,6 +14,7 @@ if not exist ..\.gitbot goto skip1
 
 set fdsrepos=exp fds fig out smv
 set fdssmvrepos=fds smv
+set cfastsmvrepos=cfast smv nplot
 set smvrepos=cfast fds fig smv
 set cfastrepos=cfast exp fig smv nplot
 set allrepos= cad cfast cor exp fds fig out radcal smv
@@ -171,6 +172,11 @@ echo.
  if /I "%1" EQU "-c" (
    set valid=1
    set repos=%cfastrepos%
+ )
+ if /I "%1" EQU "-C" (
+   set valid=1
+   set erase_repos=1
+   set repos=%cfastsmvrepos%
  )
  if /I "%1" EQU "-f" (
    set valid=1

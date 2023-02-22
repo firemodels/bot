@@ -5,6 +5,11 @@ set vandvdir=%cfast_root%\Build\VandV_Calcs\intel_win_64
 set docdir=%cfast_root%\Manuals
 set CURDIR2=%CD%
 
+set configfile=%userprofile%\.bundle\bundle_config.bat
+
+if not exist %configfile% echo ***error: %userprofile%\bundle_config.bat does not exist
+if not exist %configfile% exit /b
+
 cd %cfast_root%\..\bot
 set botrepo=%CD%
 cd %CURDIR2%
@@ -13,6 +18,8 @@ cd %cfast_root%\..\smv
 set smvrepo=%CD%
 cd %CURDIR2%
 
+echo.
+echo ***Copying CFAST files
 echo ***Making directories
 
 if exist %DISTDIR% rmdir /s /q %DISTDIR%
@@ -26,7 +33,12 @@ if exist %SMVDISTDIR% rmdir /s /q %SMVDISTDIR%
 mkdir %SMVDISTDIR%
 mkdir %SMVDISTDIR%\textures
 
-echo ***Copying cfast executables
+echo .
+echo ***Building smokeview executables
+call build_smv_progs %smvrepo%
+cd %CURDIR2%
+
+echo ***Copying CFAST executables
 
 call :COPY  %bindir%\CData.exe                %DISTDIR%\
 call :COPY  %bindir%\CEdit.exe                %DISTDIR%\
@@ -48,23 +60,7 @@ call :COPY  %bindir%\C1.Win.C1Report.4.8.dll         %DISTDIR%\
 call :COPY  %bindir%\C1.Win.C1ReportDesigner.4.8.dll %DISTDIR%\
 call :COPY  %bindir%\C1.Win.C1Sizer.4.8.dll          %DISTDIR%\
 call :COPY  %bindir%\C1.Win.ImportServices.4.8.dll   %DISTDIR%\
-call :COPY  %bindir%\NPlot.dll 				        %DISTDIR%\
-
-echo ***Copying CFAST support files
-
-call :COPY  %bindir%\AllFires.in              %DISTDIR%\
-call :COPY  %bindir%\thermal.csv              %DISTDIR%
-call :COPY  %bindir%\3_panel_workstation.o    %DISTDIR%\
-call :COPY  %bindir%\bunkbed.o                %DISTDIR%\
-call :COPY  %bindir%\burner.o                 %DISTDIR%\
-call :COPY  %bindir%\curtains.o               %DISTDIR%\
-call :COPY  %bindir%\kiosk.o                  %DISTDIR%\
-call :COPY  %bindir%\mattress_and_boxspring.o %DISTDIR%\
-call :COPY  %bindir%\sofa.o                   %DISTDIR%\
-call :COPY  %bindir%\tv_set.o                 %DISTDIR%\
-call :COPY  %bindir%\upholstered_chair.o      %DISTDIR%\
-call :COPY  %bindir%\wardrobe.o               %DISTDIR%\
-call :COPY  %bindir%\wood_wall.o              %DISTDIR%\
+call :COPY  %bindir%\NPlot.dll 				         %DISTDIR%\
 
 echo ***Copying CFAST example files
 
@@ -74,16 +70,11 @@ call :COPY  %docdir%\CData_Guide\Examples\*.in   %DISTDIR%\Examples\
 echo ***Copying CFAST documentation
 
 set PDFS=%userprofile%\.cfast\PDFS
-call :COPY %PDFS%\Tech_Ref.pdf            %DISTDIR%\Documents\
-call :COPY %PDFS%\Users_Guide.pdf         %DISTDIR%\Documents\
-call :COPY %PDFS%\Validation_Guide.pdf    %DISTDIR%\Documents\
-call :COPY %PDFS%\Configuration_Guide.pdf %DISTDIR%\Documents\
-call :COPY %PDFS%\CData_Guide.pdf         %DISTDIR%\Documents\
-
-echo .
-echo ***Create smokeview executables
-call build_smv_progs
-cd %CURDIR2%
+call :COPYPDF Tech_Ref
+call :COPYPDF Users_Guide
+call :COPYPDF Validation_Guide
+call :COPYPDF Configuration_Guide
+call :COPYPDF CData_Guide
 
 echo ***Copying Smokeview files
 
@@ -99,6 +90,8 @@ call :COPY %botrepo%\Bundle\smv\for_bundle\objects.svo    %SMVDISTDIR%\
 call :COPY %botrepo%\Bundle\smv\for_bundle\volrender.ssf  %SMVDISTDIR%\
 call :COPY_DIR %botrepo%\Bundle\smv\for_bundle\textures   %SMVDISTDIR%\textures\
 
+echo.
+echo ***Creating installer
 echo ***Copying Uninstall files
 
 call :COPY  %bundleinfo%\uninstall.bat        %DISTDIR%\Uninstall
@@ -132,7 +125,32 @@ IF EXIST %infile%       copy %infile% %SMVDISTDIR%\%inprog%.exe > Nul 2>&1
 IF NOT EXIST %SMVDISTDIR%\%inprog%.exe echo ***Error: %infile% copy failed
 exit /b
 
+:-------------------------------------------------
+:COPYPDF
+:-------------------------------------------------
+set infile=%1
+set fullfile=%PDFS%\%infile%.pdf
+IF NOT EXIST %fullfile% call :GETPDF %infile%
+IF EXIST %fullfile%       copy %fullfile% %DISTDIR%\Documents\ > Nul 2>&1
+IF NOT EXIST %fullfile%   echo ***Warning: %fullfile% does not exist
+exit /b
+
+:: -------------------------------------------------
+:GETPDF
+:: -------------------------------------------------
+set file=%1
+set fullfile=%PDFS%\%file%.pdf
+set hosthome=%bundle_cfastbot_home%/.cfastbot/Manuals
+echo | set /p dummyName=***downloading %file%: 
+echo pscp -P 22 %bundle_hostname%:%hosthome%/%file%/%file%.pdf %fullfile% 
+pscp -P 22 %bundle_hostname%:%hosthome%/%file%/%file%.pdf %fullfile% 
+if NOT exist %fullfile% echo failed
+if exist %fullfile% echo succeeded
+exit /b 1
+
+:: -------------------------------------------------
 :COPY_DIR
+:: -------------------------------------------------
 set indir=%1
 set outdir=%2
 copy %indir% %outdir% > Nul 2>&1
