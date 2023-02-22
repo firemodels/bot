@@ -1,4 +1,6 @@
 @echo off
+set cfastrev=%1
+set smvrev=%2
 Title Bundle cfast for Windows
 
 
@@ -35,7 +37,7 @@ call Create_Install_Files.bat
 copy "%bundleinfo%\wrapup_cfast_install.bat"           "%DISTDIR%\wrapup_cfast_install.bat"   > Nul 2>&1
 
 cd %DISTDIR%
-echo ***Compressing installation files
+echo ***Compressing installation files%
 echo. > %stage3out%
 echo ***zipping bundle files > %stage3out%
 wzzip -a -r -P ..\%installerbase%.zip * ..\SMV6   >> %stage3out% 2>&1
@@ -50,8 +52,9 @@ echo Press Setup to begin installation. > %bundleinfo%\main.txt
 if exist %installerbase%.exe erase %installerbase%.exe
 wzipse32 %installerbase%.zip -runasadmin -a %bundleinfo%\about.txt -st"cfast 7 Setup" -d "c:\Program Files\firemodels\%distname%" -c wrapup_cfast_install.bat
 
-echo ***Copying %installerbase%.exe to %cfast_root%\Utilities\uploads\cftest.exe
-copy %installerbase%.exe %cfast_root%\Utilities\uploads\cftest.exe   >> %stage3out% 2>&1
+set outexe=%cfastrev%_%smvrev%_tst_win.exe
+echo ***Copying %installerbase%.exe to %cfast_root%\Utilities\uploads\%outexe%
+copy %installerbase%.exe %cfast_root%\Utilities\uploads\%outexe%   >> %stage3out% 2>&1
 
 echo ***CFAST installer built
 

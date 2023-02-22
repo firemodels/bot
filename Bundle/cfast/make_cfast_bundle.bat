@@ -1,4 +1,6 @@
 @echo off
+set cfastrev=%1
+set smvrev=%2
 SETLOCAL
 
 set THISDIR=%CD%
@@ -29,6 +31,6 @@ cd %THISDIR%
 call CopyFilestoCFASTclean
 
 cd %THISDIR%
-call BUNDLE_cfast
+call BUNDLE_cfast %cfastrev% %smvrev%
 
 cd %THISDIR%
