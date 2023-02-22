@@ -1,6 +1,7 @@
 @echo off
 set cfastrev=%1
 set smvrev=%2
+set upload=%3
 SETLOCAL
 
 set THISDIR=%CD%
@@ -31,6 +32,6 @@ cd %THISDIR%
 call CopyFilestoCFASTclean
 
 cd %THISDIR%
-call BUNDLE_cfast %cfastrev% %smvrev%
+call BUNDLE_cfast %cfastrev% %smvrev% %upload%
 
 cd %THISDIR%

@@ -3,8 +3,6 @@ setlocal
 
 set cfast_revision=%1
 set smv_revision=%2
-set cfast_revision=CFAST7.7.4-31
-set smv_revision=SMV6.7.21-1044
 set nightly_arg=tst
 
 

@@ -1,6 +1,7 @@
 @echo off
 set cfastrev=%1
 set smvrev=%2
+set upload=%3
 Title Bundle cfast for Windows
 
 
@@ -60,6 +61,13 @@ echo ***Copying %installerbase%.exe to %uploaddir%\%outexe%
 copy %installerbase%.exe %uploaddir%\%outexe%   >> %stage3out% 2>&1
 
 echo ***CFAST installer built
+
+if NOT x%upload% == x1 goto endif1
+  cd %CURDIR%
+  call upload_cfast_bundle %cfastrev% %smvrev%
+  echo ***CFAST installer uploaded
+:endif1
+
 
 cd %CURDIR%
 
