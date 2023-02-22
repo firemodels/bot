@@ -1643,10 +1643,25 @@ cur_dir=`pwd`
 CD_REPO $reponame/cfast $cfastbranch || return 1
 CFAST_REVISION=`git describe --dirty --long`
 CFAST_SHORTHASH=`git rev-parse --short HEAD`
+# CFAST_REV same as CFAST_REVISION without the hash on the end
+subrev=`git describe --abbrev | awk -F '-' '{print $2}'`
+if [ "$subrev" == "" ]; then
+  CFAST_REV=`git describe --abbrev | awk -F '-' '{print $1"-0"}'`
+else
+  CFAST_REV=`git describe --abbrev | awk -F '-' '{print $1"-"$2}'`
+fi
+
 
 CD_REPO $reponame/smv   $smvbranch || return 1
 SMV_REVISION=`git describe --dirty --long`
 SMV_SHORTHASH=`git rev-parse --short HEAD`
+# SMV_REV same as SMV_REVISION without the hash on the end
+subrev=`git describe --abbrev | awk -F '-' '{print $2}'`
+if [ "$subrev" == "" ]; then
+  SMV_REV=`git describe --abbrev | awk -F '-' '{print $1"-0"}'`
+else
+  SMV_REV=`git describe --abbrev | awk -F '-' '{print $1"-"$2}'`
+fi
 
 cd $cur_dir
 
@@ -1734,8 +1749,8 @@ if [[ "$SKIP" == "" ]]; then
   cp -r $cfastrepo/Manuals $LATEST_MANUALS_DIR
   echo $CFAST_SHORTHASH > $LATEST_MANUALS_DIR/CFAST_HASH
   echo $SMV_SHORTHASH   > $LATEST_MANUALS_DIR/SMV_HASH
-  echo $CFAST_REVISION  > $LATEST_MANUALS_DIR/CFAST_REVISION
-  echo $SMV_REVISION    > $LATEST_MANUALS_DIR/SMV_REVISION
+  echo $CFAST_REV       > $LATEST_MANUALS_DIR/CFAST_REVISION
+  echo $SMV_REV         > $LATEST_MANUALS_DIR/SMV_REVISION
 fi
 
 ### Report results ###
