@@ -1,8 +1,8 @@
 #!/bin/bash
 FROM_DIR=$1
 FROM_FILE=$2
-PLATFORM=$3
-EXT=$4
+PLATFORM=win
+EXT=exe
 
 scriptdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
