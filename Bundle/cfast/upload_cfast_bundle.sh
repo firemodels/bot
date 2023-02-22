@@ -3,6 +3,7 @@ FROM_DIR=$1
 FROM_FILE=$2
 PLATFORM=win
 EXT=exe
+FROM_FILE=${FROM_FILE}.$EXT
 
 scriptdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
