@@ -12,7 +12,7 @@ set stage2out=%CURDIR%\out\stage2_build_apps
 echo. > %stage2out%
 
 @echo.
-@echo ***Creating CFAST executables
+@echo ***Building CFAST executables
 @echo.  >> %stage2out%
 @echo ***Building NPlot
 @echo.  >> %stage2out%

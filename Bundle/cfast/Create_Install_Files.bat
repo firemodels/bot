@@ -5,6 +5,11 @@ set vandvdir=%cfast_root%\Build\VandV_Calcs\intel_win_64
 set docdir=%cfast_root%\Manuals
 set CURDIR2=%CD%
 
+set configfile=%userprofile%\.bundle\bundle_config.bat
+
+if not exist %configfile% echo ***error: %userprofile%\bundle_config.bat does not exist
+if not exist %configfile% exit /b
+
 cd %cfast_root%\..\bot
 set botrepo=%CD%
 cd %CURDIR2%
@@ -29,7 +34,7 @@ mkdir %SMVDISTDIR%
 mkdir %SMVDISTDIR%\textures
 
 echo .
-echo ***Creating smokeview executables
+echo ***Building smokeview executables
 call build_smv_progs %smvrepo%
 cd %CURDIR2%
 
@@ -55,7 +60,7 @@ call :COPY  %bindir%\C1.Win.C1Report.4.8.dll         %DISTDIR%\
 call :COPY  %bindir%\C1.Win.C1ReportDesigner.4.8.dll %DISTDIR%\
 call :COPY  %bindir%\C1.Win.C1Sizer.4.8.dll          %DISTDIR%\
 call :COPY  %bindir%\C1.Win.ImportServices.4.8.dll   %DISTDIR%\
-call :COPY  %bindir%\NPlot.dll 				        %DISTDIR%\
+call :COPY  %bindir%\NPlot.dll 				         %DISTDIR%\
 
 echo ***Copying CFAST example files
 
@@ -65,11 +70,11 @@ call :COPY  %docdir%\CData_Guide\Examples\*.in   %DISTDIR%\Examples\
 echo ***Copying CFAST documentation
 
 set PDFS=%userprofile%\.cfast\PDFS
-call :COPY %PDFS%\Tech_Ref.pdf            %DISTDIR%\Documents\
-call :COPY %PDFS%\Users_Guide.pdf         %DISTDIR%\Documents\
-call :COPY %PDFS%\Validation_Guide.pdf    %DISTDIR%\Documents\
-call :COPY %PDFS%\Configuration_Guide.pdf %DISTDIR%\Documents\
-call :COPY %PDFS%\CData_Guide.pdf         %DISTDIR%\Documents\
+call :COPYPDF Tech_Ref
+call :COPYPDF Users_Guide
+call :COPYPDF Validation_Guide
+call :COPYPDF Configuration_Guide
+call :COPYPDF CData_Guide
 
 echo ***Copying Smokeview files
 
@@ -120,7 +125,32 @@ IF EXIST %infile%       copy %infile% %SMVDISTDIR%\%inprog%.exe > Nul 2>&1
 IF NOT EXIST %SMVDISTDIR%\%inprog%.exe echo ***Error: %infile% copy failed
 exit /b
 
+:-------------------------------------------------
+:COPYPDF
+:-------------------------------------------------
+set infile=%1
+set fullfile=%PDFS%\%infile%.pdf
+IF NOT EXIST %fullfile% call :GETPDF %infile%
+IF EXIST %fullfile%       copy %fullfile% %DISTDIR%\Documents\ > Nul 2>&1
+IF NOT EXIST %fullfile%   echo ***Warning: %fullfile% does not exist
+exit /b
+
+:: -------------------------------------------------
+:GETPDF
+:: -------------------------------------------------
+set file=%1
+set fullfile=%PDFS%\%file%.pdf
+set hosthome=%bundle_cfastbot_home%/.cfastbot/Manuals
+echo | set /p dummyName=***downloading %file%: 
+echo pscp -P 22 %bundle_hostname%:%hosthome%/%file%/%file%.pdf %fullfile% 
+pscp -P 22 %bundle_hostname%:%hosthome%/%file%/%file%.pdf %fullfile% 
+if NOT exist %fullfile% echo failed
+if exist %fullfile% echo succeeded
+exit /b 1
+
+:: -------------------------------------------------
 :COPY_DIR
+:: -------------------------------------------------
 set indir=%1
 set outdir=%2
 copy %indir% %outdir% > Nul 2>&1

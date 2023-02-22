@@ -52,9 +52,12 @@ echo Press Setup to begin installation. > %bundleinfo%\main.txt
 if exist %installerbase%.exe erase %installerbase%.exe
 wzipse32 %installerbase%.zip -runasadmin -a %bundleinfo%\about.txt -st"cfast 7 Setup" -d "c:\Program Files\firemodels\%distname%" -c wrapup_cfast_install.bat
 
+set uploaddir=%userprofile%\.bundle\uploads
+if not exist %userprofile%\.bundle         mkdir %userprofile%\.bundle
+if not exist %uploaddir% mkdir %uploaddir%
 set outexe=%cfastrev%_%smvrev%_tst_win.exe
-echo ***Copying %installerbase%.exe to %cfast_root%\Utilities\uploads\%outexe%
-copy %installerbase%.exe %cfast_root%\Utilities\uploads\%outexe%   >> %stage3out% 2>&1
+echo ***Copying %installerbase%.exe to %uploaddir%\%outexe%
+copy %installerbase%.exe %uploaddir%\%outexe%   >> %stage3out% 2>&1
 
 echo ***CFAST installer built
 
