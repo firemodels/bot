@@ -1,10 +1,15 @@
 @echo off
+
+:: builds a cfast bundle using either specified cfast and smv repo revisions or the revisions used in the latest
+:: cfastbot pass 
 setlocal
 
-set cfastrevision=latest
-set smvrevision=latest
+set cfasthash=latest
+set smvhash=latest
 set upload=0
 set clone=
+set build_cedit=1
+set use_cfastbot_hash=0
 
 call :getopts %*
 
@@ -23,14 +28,13 @@ if "x%clone%" == "xclone" goto skip_warning
   pause >Nul
 :skip_warning
 
-if NOT %cfastrevision% == latest goto endif1
+
+if %use_cfastbot_hash% == 0 goto skip_gethash
   set error=0
   set smvhash_file=%userprofile%\.cfast\PDFS\SMV_HASH
   set cfasthash_file=%userprofile%\.cfast\PDFS\CFAST_HASH
-
   echo ***Get cfast and smv repo hashes from the last cfastbot pass
-  call get_hashrev > Nul 2>&1
-
+  call get_hash > Nul 2>&1
   if not exist %smvhash_file% echo ***error: %smvhash_file% does not exist
   if not exist %smvhash_file% set error=1
   if not exist %cfasthash_file% echo ***error: %cfasthash_file% does not exist
@@ -39,7 +43,8 @@ if NOT %cfastrevision% == latest goto endif1
 
   set /p smvhash=<%smvhash_file%
   set /p cfasthash=<%cfasthash_file%
-:endif1
+:skip_gethash
+
 
 set curdir=%CD%
 cd ..\..\..
@@ -50,7 +55,7 @@ set botrepo=%gitroot%\bot
 
 cd %curdir%
 
-echo ***Cloning cfast, nplot and smv repos
+echo ***Cloning cfast(%cfasthash%), nplot and smv repos(%smvhash%)
 call clone_repos %cfasthash% %smvhash% nightly  > Nul 2>&1
 
 set cfastrevision_file=%userprofile%\.cfast\PDFS\CFAST_REVISION
@@ -72,7 +77,12 @@ if NOT x%upload% == x1 echo upload installer: no
 
 cd %curdir%
 echo.
-call make_cfast_bundle %cfastrevision% %smvrevision% %upload%
+
+set upload_arg=
+if %upload% == 1 set upload_arg=-U
+set build_cedit_arg=
+if %build_cedit% == 0 set build_cedit_arg=-E
+call make_cfast_bundle -C %cfastrevision% -S %smvrevision% %upload_arg% %build_cedit_arg%
 
 goto eof
 
@@ -83,17 +93,17 @@ goto eof
 
 :usage
 echo.
-echo run_bundlebot usage
+echo build_bundle usage
 echo.
 echo This script using the cfast and smv repo revisions from the latest cfastbot pass.
 echo.
 echo Options:
-echo -C hash - cfast repo hash - if hash=latest then cfast and smv repos will be
-echo           cloned using the revision from the latest cfastbot pass (default: latest)
+echo -B      - use cfast and smv hashes from latest cfastbot pass
+echo -C hash - cfast repo hash - if hash=latest then use most recent hash (default: latest)
+echo -E        skip Cedit build
 echo -f - force erasing and cloning of cfast and smv repos without warning first
 echo -h - display this message
-echo -S hash - smv repo hash - if hash=latest then cfast and smv repos will be
-echo           cloned using the revision from the latest cfastbot pass (default: latest)
+echo -S hash - smv repo hash - if hash=latest then use most recent hash (default: latest)
 echo -u -  upload bundle to a google drive directory
 exit /b 0
 
@@ -104,9 +114,17 @@ exit /b 0
  if (%1)==() exit /b
  set valid=0
  set arg=%1
+ if "%1" EQU "-B" (
+   set use_cfastbot_hash=1
+   set valid=1
+ )
  if "%1" EQU "-C" (
    set cfasthash=%2
    shift
+   set valid=1
+ )
+ if "%1" EQU "-E" (
+   set build_cedit=0
    set valid=1
  )
  if "%1" EQU "-f" (

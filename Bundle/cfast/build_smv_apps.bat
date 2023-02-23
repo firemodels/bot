@@ -9,7 +9,7 @@ call %smvrepo%\Utilities\Scripts\setup_intel_compilers.bat
 
 echo ***Building Libraries
 cd %smvrepo%\..\bot\Bundle\cfast
-call make_LIBS > Nul 2>&1
+call build_smv_libs > Nul 2>&1
 
 set progs=background get_time set_path sh2bat smokediff smokezip wind2fds    
 for %%x in ( %progs% ) do (
