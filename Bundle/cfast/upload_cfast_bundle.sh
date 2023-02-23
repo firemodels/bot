@@ -21,13 +21,13 @@ if [ ! -e $HOME/$FROM_DIR/$FROM_FILE ] ; then
   exit
 fi
 
-$GDRIVE list  | grep $PLATFORM | grep $EXT | awk '$2 ~ /^SMV/ { system("~/bin/gdrive delete -i " $1)} '
+$GDRIVE list  | grep $PLATFORM | grep $EXT | awk '$2 ~ /^CFAST/ { system("~/bin/gdrive delete -i " $1)} '
 echo "***uploading $FROM_FILE to Google Drive"
 $GDRIVE upload -p $GOOGLE_ID -f $HOME/$FROM_DIR/$FROM_FILE >& /dev/null
 nfiles=`$GDRIVE list  | grep $FROM_FILE | wc -l`
 if [ $nfiles -eq 0 ]; then
   echo "*** warning: The file $FROM_FILE failed to upload to google drive"
 else
-  echo "$FROM_FILE uploaded."
+  echo "***$FROM_FILE uploaded."
 fi
 echo ""
