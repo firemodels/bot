@@ -1,4 +1,7 @@
 @echo off
+set cfastrev=%1
+set smvrev=%2
+set upload=%3
 Title Bundle cfast for Windows
 
 
@@ -35,7 +38,7 @@ call Create_Install_Files.bat
 copy "%bundleinfo%\wrapup_cfast_install.bat"           "%DISTDIR%\wrapup_cfast_install.bat"   > Nul 2>&1
 
 cd %DISTDIR%
-echo ***Compressing installation files
+echo ***Compressing installation files%
 echo. > %stage3out%
 echo ***zipping bundle files > %stage3out%
 wzzip -a -r -P ..\%installerbase%.zip * ..\SMV6   >> %stage3out% 2>&1
@@ -53,11 +56,18 @@ wzipse32 %installerbase%.zip -runasadmin -a %bundleinfo%\about.txt -st"cfast 7 S
 set uploaddir=%userprofile%\.bundle\uploads
 if not exist %userprofile%\.bundle         mkdir %userprofile%\.bundle
 if not exist %uploaddir% mkdir %uploaddir%
-
-echo ***Copying %installerbase%.exe to %uploaddir%\cftest.exe
-copy %installerbase%.exe %uploaddir%\cftest.exe   >> %stage3out% 2>&1
+set outexe=%cfastrev%_%smvrev%_tst_win.exe
+echo ***Copying %installerbase%.exe to %uploaddir%\%outexe%
+copy %installerbase%.exe %uploaddir%\%outexe%   >> %stage3out% 2>&1
 
 echo ***CFAST installer built
+
+if NOT x%upload% == x1 goto endif1
+  cd %CURDIR%
+  call upload_cfast_bundle %cfastrev% %smvrev%
+  echo ***CFAST installer uploaded
+:endif1
+
 
 cd %CURDIR%
 

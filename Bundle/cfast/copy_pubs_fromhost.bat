@@ -40,11 +40,12 @@ goto eof
 :copy_file
 :: -------------------------------------------------
 set file=%1
-set fullfile=%PDFS%\%file%.pdf
+set tofile=%PDFS%\%file%.pdf
+if exist %tofile% erase %tofile%
 echo | set /p dummyName=***downloading %file%.pdf: 
-pscp -P 22 %bundle_hostname%:%hosthome%/%file%/%file%.pdf %fullfile%  > Nul 2>&1
-if NOT exist %fullfile% echo failed
-if exist %fullfile% echo succeeded
+pscp -P 22 %bundle_hostname%:%hosthome%/%file%/%file%.pdf %tofile%  > Nul 2>&1
+if NOT exist %tofile% echo failed
+if exist %tofile% echo succeeded
 exit /b 1
 
 cd %cfastbundledir%

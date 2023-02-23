@@ -5,30 +5,13 @@ set CURDIR=%CD%
 
 :: batch file to build smokeview utility programs on Windows, Linux or OSX platforms
 
-:: setup environment variables (defining where repository resides etc) 
+call %smvrepo%\Utilities\Scripts\setup_intel_compilers.bat
 
-set envfile="%userprofile%"\fds_smv_env.bat
-IF EXIST %envfile% GOTO endif_envexist
-echo ***Fatal error.  The environment setup file %envfile% does not exist. 
-echo Create a file named %envfile% and use smv/scripts/fds_smv_env_template.bat
-echo as an example.
-echo.
-echo Aborting now...
-pause>NUL
-goto:eof
-
-:endif_envexist
-
-call %envfile%
-
-%svn_drive%
-
-cd %smvrepo%\Build\LIBS\intel_win_64
 echo ***Building Libraries
-call make_LIBS_bot > Nul 2>&1
+cd %smvrepo%\..\bot\Bundle\cfast
+call make_LIBS > Nul 2>&1
 
 set progs=background get_time set_path sh2bat smokediff smokezip wind2fds    
-call %smvrepo%\Utilities\Scripts\setup_intel_compilers.bat
 for %%x in ( %progs% ) do (
   cd %smvrepo%\Build\%%x\intel_win_64
   echo ***Building %%x
