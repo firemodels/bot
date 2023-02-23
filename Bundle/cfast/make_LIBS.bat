@@ -23,31 +23,31 @@ set BUILDDIR=%CD%
 
 :: ZLIB
 cd %SRCDIR%\zlib128
-start "building windows zlib"  %STARTOPT% %BUILDLIB% libz.lib %LIBDIR%\zlib.lib
+start "building zlib"     %STARTOPT% %BUILDLIB% libz.lib %LIBDIR%\zlib.lib
 
 :: JPEG
 cd %SRCDIR%\jpeg-9b
-start "building windows jpeg"  %STARTOPT% %BUILDLIB% libjpeg.lib  %LIBDIR%\jpeg.lib
+start "building jpeg"     %STARTOPT% %BUILDLIB% libjpeg.lib  %LIBDIR%\jpeg.lib
 
 :: PNG
 cd %SRCDIR%\png-1.6.21
-start "building windows png"  %STARTOPT% %BUILDLIB% libpng.lib %LIBDIR%\png.lib
+start "building png"      %STARTOPT% %BUILDLIB% libpng.lib %LIBDIR%\png.lib
 
 :: GD
 cd %SRCDIR%\gd-2.0.15
-start "building windows gd"  %STARTOPT% call %BUILDLIB% libgd.lib %LIBDIR%\gd.lib
+start "building gd"       %STARTOPT% call %BUILDLIB% libgd.lib %LIBDIR%\gd.lib
 
 :: GLUT
 cd %SRCDIR%\glut-3.7.6
-start "building windows glut"  %STARTOPT% %BUILDLIB% libglutwin.lib %LIBDIR%\glut32.lib
+start "building glut"     %STARTOPT% %BUILDLIB% libglutwin.lib %LIBDIR%\glut32.lib
 
 :: GLUI
 cd %SRCDIR%\glui_v2_1_beta
-start "building windows glui"  %STARTOPT% %BUILDLIB% libglui.lib %LIBDIR%\glui.lib
+start "building glui"     %STARTOPT% %BUILDLIB% libglui.lib %LIBDIR%\glui.lib
 
 :: pthreads
 cd %SRCDIR%\pthreads
-start "building windows pthreads"  %STARTOPT% %BUILDLIB% libpthreads.lib %LIBDIR%\pthreads.lib
+start "building pthreads" %STARTOPT% %BUILDLIB% libpthreads.lib %LIBDIR%\pthreads.lib
 
 cd %CURDIR%
 
