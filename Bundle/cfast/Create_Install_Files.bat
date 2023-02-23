@@ -6,9 +6,10 @@ set docdir=%cfast_root%\Manuals
 set CURDIR2=%CD%
 
 set configfile=%userprofile%\.bundle\bundle_config.bat
-
 if not exist %configfile% echo ***error: %userprofile%\bundle_config.bat does not exist
 if not exist %configfile% exit /b
+call %configfile%
+call check_config || exit /b 1
 
 cd %cfast_root%\..\bot
 set botrepo=%CD%
@@ -142,8 +143,7 @@ set file=%1
 set fullfile=%PDFS%\%file%.pdf
 set hosthome=%bundle_cfastbot_home%/.cfastbot/Manuals
 echo | set /p dummyName=***downloading %file%: 
-echo pscp -P 22 %bundle_hostname%:%hosthome%/%file%/%file%.pdf %fullfile% 
-pscp -P 22 %bundle_hostname%:%hosthome%/%file%/%file%.pdf %fullfile% 
+pscp -P 22 %bundle_host%:%hosthome%/%file%/%file%.pdf %fullfile% 
 if NOT exist %fullfile% echo failed
 if exist %fullfile% echo succeeded
 exit /b 1
