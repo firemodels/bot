@@ -2,6 +2,7 @@
 set cfastrev=%1
 set smvrev=%2
 set upload=%3
+set build_cedit=%4
 SETLOCAL
 
 set THISDIR=%CD%
@@ -29,9 +30,9 @@ echo ***Restoring project configuration files
 call Restore_vs_config %VSSTUDIO%  %THISDIR% %THISDIR%\out\stage1_config
 
 cd %THISDIR%
-call CopyFilestoCFASTclean
+call CopyFilestoCFASTclean %build_cedit%
 
 cd %THISDIR%
-call BUNDLE_cfast %cfastrev% %smvrev% %upload%
+call BUNDLE_cfast %cfastrev% %smvrev% %upload% %build_cedit%
 
 cd %THISDIR%

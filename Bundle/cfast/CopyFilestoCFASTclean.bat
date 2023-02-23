@@ -1,4 +1,5 @@
 @echo off
+set build_cedit=%1
 
 set CURDIR=%CD%
 
@@ -22,13 +23,15 @@ set MSBUILD="C:\Program Files\Microsoft Visual Studio\2022\Community\Msbuild\Cur
 %MSBUILD%  NPlot.sln /target:NPlot /p:Configuration=Release /p:Platform="Any CPU" >> %stage2out% 2>&1
 call :copy_file %cfast_root%\..\nplot\src\bin NPlot.dll %cfast_root%\Utilities\for_bundle\Bin NPlot.dll
 
-@echo.  >> %stage2out%
-@echo ***Building CEdit
-@echo.  >> %stage2out%
-@echo ***Building CEdit >> %stage2out%
-cd %cfast_root%\Build\Cedit
-call make_cedit.bat bot  >> %stage2out% 2>&1
-call :copy_file %cfast_root%\Source\Cedit\obj\Release CEdit.exe %cfast_root%\Utilities\for_bundle\Bin CEdit.exe
+if %build_cedit% == 0 goto skip_build_cedit
+   @echo.  >> %stage2out%
+   @echo ***Building CEdit
+   @echo.  >> %stage2out%
+   @echo ***Building CEdit >> %stage2out%
+   cd %cfast_root%\Build\Cedit
+   call make_cedit.bat bot  >> %stage2out% 2>&1
+   call :copy_file %cfast_root%\Source\Cedit\obj\Release CEdit.exe %cfast_root%\Utilities\for_bundle\Bin CEdit.exe
+:skip_build_cedit
 
 @echo.  >> %stage2out%
 @echo ***Building CFAST

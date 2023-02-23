@@ -1,4 +1,5 @@
 @echo off
+set build_cedit=%1
 
 set bindir=%cfast_root%\Utilities\for_bundle\Bin
 set vandvdir=%cfast_root%\Build\VandV_Calcs\intel_win_64
@@ -42,26 +43,30 @@ cd %CURDIR2%
 echo ***Copying CFAST executables
 
 call :COPY  %bindir%\CData.exe                %DISTDIR%\
-call :COPY  %bindir%\CEdit.exe                %DISTDIR%\
+if %build_cedit% == 0 goto skip_build_cedit
+   call :COPY  %bindir%\CEdit.exe             %DISTDIR%\
+:skip_build_cedit
 call :COPY  %bindir%\CFAST.exe                %DISTDIR%\
 call :COPY  %vandvdir%\VandV_Calcs_win_64.exe                               %DISTDIR%\VandV_Calcs.exe
 call :COPY  %smvrepo%\Build\background\intel_win_64\background_win_64.exe   %DISTDIR%\background.exe
 
-echo ***Copying CFAST DLLs
+if %build_cedit% == 0 goto skip_build_cedit2
+   echo ***Copying CEdit DLLs
 
-call :COPY  %bindir%\C1.C1Pdf.4.8.dll                %DISTDIR%\
-call :COPY  %bindir%\C1.C1Report.4.8.dll             %DISTDIR%\
-call :COPY  %bindir%\C1.Zip.dll                      %DISTDIR%\
-call :COPY  %bindir%\C1.Win.4.8.dll                  %DISTDIR%\
-call :COPY  %bindir%\C1.Win.BarCode.4.8.dll          %DISTDIR%\
-call :COPY  %bindir%\C1.Win.C1Document.4.8.dll       %DISTDIR%\
-call :COPY  %bindir%\C1.Win.C1DX.4.8.dll             %DISTDIR%\
-call :COPY  %bindir%\C1.Win.C1FlexGrid.4.8.dll       %DISTDIR%\
-call :COPY  %bindir%\C1.Win.C1Report.4.8.dll         %DISTDIR%\
-call :COPY  %bindir%\C1.Win.C1ReportDesigner.4.8.dll %DISTDIR%\
-call :COPY  %bindir%\C1.Win.C1Sizer.4.8.dll          %DISTDIR%\
-call :COPY  %bindir%\C1.Win.ImportServices.4.8.dll   %DISTDIR%\
-call :COPY  %bindir%\NPlot.dll 				         %DISTDIR%\
+   call :COPY  %bindir%\C1.C1Pdf.4.8.dll                %DISTDIR%\
+   call :COPY  %bindir%\C1.C1Report.4.8.dll             %DISTDIR%\
+   call :COPY  %bindir%\C1.Zip.dll                      %DISTDIR%\
+   call :COPY  %bindir%\C1.Win.4.8.dll                  %DISTDIR%\
+   call :COPY  %bindir%\C1.Win.BarCode.4.8.dll          %DISTDIR%\
+   call :COPY  %bindir%\C1.Win.C1Document.4.8.dll       %DISTDIR%\
+   call :COPY  %bindir%\C1.Win.C1DX.4.8.dll             %DISTDIR%\
+   call :COPY  %bindir%\C1.Win.C1FlexGrid.4.8.dll       %DISTDIR%\
+   call :COPY  %bindir%\C1.Win.C1Report.4.8.dll         %DISTDIR%\
+   call :COPY  %bindir%\C1.Win.C1ReportDesigner.4.8.dll %DISTDIR%\
+   call :COPY  %bindir%\C1.Win.C1Sizer.4.8.dll          %DISTDIR%\
+   call :COPY  %bindir%\C1.Win.ImportServices.4.8.dll   %DISTDIR%\
+   call :COPY  %bindir%\NPlot.dll 				        %DISTDIR%\
+:skip_build_cedit2
 
 echo ***Copying CFAST example files
 

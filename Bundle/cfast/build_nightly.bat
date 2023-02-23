@@ -5,6 +5,7 @@ set cfastrevision=latest
 set smvrevision=latest
 set upload=0
 set clone=
+set build_cedit=1
 
 call :getopts %*
 
@@ -72,7 +73,7 @@ if NOT x%upload% == x1 echo upload installer: no
 
 cd %curdir%
 echo.
-call make_cfast_bundle %cfastrevision% %smvrevision% %upload%
+call make_cfast_bundle %cfastrevision% %smvrevision% %upload% %build_cedit%
 
 goto eof
 
@@ -90,6 +91,7 @@ echo.
 echo Options:
 echo -C hash - cfast repo hash - if hash=latest then cfast and smv repos will be
 echo           cloned using the revision from the latest cfastbot pass (default: latest)
+echo -E        skip Cedit build
 echo -f - force erasing and cloning of cfast and smv repos without warning first
 echo -h - display this message
 echo -S hash - smv repo hash - if hash=latest then cfast and smv repos will be
@@ -107,6 +109,10 @@ exit /b 0
  if "%1" EQU "-C" (
    set cfasthash=%2
    shift
+   set valid=1
+ )
+ if "%1" EQU "-E" (
+   set build_cedit=0
    set valid=1
  )
  if "%1" EQU "-f" (

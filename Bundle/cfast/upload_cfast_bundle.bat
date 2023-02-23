@@ -1,8 +1,8 @@
 @echo off
 setlocal
 
-set cfast_revision=CFAST7.7.4-34
-set smv_revision=SMV6.7.21-1044
+set cfast_revision=%1
+set smv_revision=%2
 set nightly_arg=tst
 
 
@@ -26,7 +26,6 @@ echo ***Uploading %fullfile% to %bundle_host%
 pscp -P 22 %fullfile% %bundle_host%:.bundle/uploads/.
 
 :: upload to google drive
-echo plink %plink_options% %bundle_logon%@bundle_host% %bundle_root%/bot/Bundle/cfast/upload_cfast_bundle.sh .bundle/uploads %basename%
 plink %plink_options% %bundle_logon%@%bundle_host% %bundle_root%/bot/Bundle/cfast/upload_cfast_bundle.sh .bundle/uploads %basename%
 
 exit /b 0
