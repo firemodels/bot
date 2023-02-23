@@ -23,9 +23,9 @@ call %envfile%
 
 %svn_drive%
 
-cd %smvrepo%\Build\LIBS\intel_win_64
+cd %CD%
 echo ***Building Libraries
-call make_LIBS_bot > Nul 2>&1
+call make_LIBS > Nul 2>&1
 
 set progs=background get_time set_path sh2bat smokediff smokezip wind2fds    
 call %smvrepo%\Utilities\Scripts\setup_intel_compilers.bat
