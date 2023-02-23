@@ -28,7 +28,7 @@ if NOT %cfastrevision% == latest goto endif1
   set smvhash_file=%userprofile%\.cfast\PDFS\SMV_HASH
   set cfasthash_file=%userprofile%\.cfast\PDFS\CFAST_HASH
 
-  echo ***Get cfast and smv repo hashes from last cfastbot pass
+  echo ***Get cfast and smv repo hashes from the last cfastbot pass
   call get_hashrev > Nul 2>&1
 
   if not exist %smvhash_file% echo ***error: %smvhash_file% does not exist
