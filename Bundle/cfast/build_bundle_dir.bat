@@ -35,11 +35,6 @@ if exist %SMVDISTDIR% rmdir /s /q %SMVDISTDIR%
 mkdir %SMVDISTDIR%
 mkdir %SMVDISTDIR%\textures
 
-echo .
-echo ***Building smokeview executables
-call build_smv_progs %smvrepo%
-cd %CURDIR2%
-
 echo ***Copying CFAST executables
 
 call :COPY  %bindir%\CData.exe                %DISTDIR%\

@@ -1,4 +1,7 @@
 @echo off
+
+:: builds a cfast bundle using either specified cfast and smv repo revisions or the revisions used in the latest
+:: cfastbot pass 
 setlocal
 
 set cfastrevision=latest
@@ -73,7 +76,12 @@ if NOT x%upload% == x1 echo upload installer: no
 
 cd %curdir%
 echo.
-call make_cfast_bundle %cfastrevision% %smvrevision% %upload% %build_cedit%
+
+set upload_arg=
+if %upload% == 1 set upload_arg=-U
+set build_cedit_arg=
+if %build_cedit% == 0 set build_cedit_arg=-E
+call make_cfast_bundle -C %cfastrevision% -S %smvrevision% %upload_arg% %build_cedit_arg%
 
 goto eof
 
@@ -84,7 +92,7 @@ goto eof
 
 :usage
 echo.
-echo run_bundlebot usage
+echo build_bundle usage
 echo.
 echo This script using the cfast and smv repo revisions from the latest cfastbot pass.
 echo.

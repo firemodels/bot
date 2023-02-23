@@ -34,7 +34,7 @@ set git_drive=c:
 set DISTDIR=%cfast_root%\Utilities\for_bundle\scripts\BUNDLEDIR\%installerbase%
 set bundleinfo=%cfast_root%\Utilities\for_bundle\scripts\bundleinfo
 
-call Create_Install_Files.bat %build_cedit%
+call build_bundle_dir.bat %build_cedit%
 
 copy "%bundleinfo%\wrapup_cfast_install.bat"           "%DISTDIR%\wrapup_cfast_install.bat"   > Nul 2>&1
 
