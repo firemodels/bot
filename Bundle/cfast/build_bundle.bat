@@ -95,16 +95,18 @@ goto eof
 echo.
 echo build_bundle usage
 echo.
-echo This script using the cfast and smv repo revisions from the latest cfastbot pass.
+echo This script builds a cfast bundle.
 echo.
 echo Options:
-echo -B      - use cfast and smv hashes from latest cfastbot pass
-echo -C hash - cfast repo hash - if hash=latest then use most recent hash (default: latest)
+echo -B      - use cfast and smv commits from the latest cfastbot pass
+echo -C hash - build bundle using cfast repo commit with hash 'hash' .
+echo           If hash=latest then use most the recent commit (default: latest)
 echo -E        skip Cedit build
-echo -f - force erasing and cloning of cfast and smv repos without warning first
-echo -h - display this message
-echo -S hash - smv repo hash - if hash=latest then use most recent hash (default: latest)
-echo -u -  upload bundle to a google drive directory
+echo -f      - force erasing and cloning of cfast and smv repos without warning first
+echo -h      - display this message
+echo -S hash - build bundle using smv repo commit with hash 'hash' .
+echo           If hash=latest then use most the recent commit (default: latest)
+echo -u      - upload bundle to a google drive directory
 exit /b 0
 
 ::-----------------------------------------------------------------------
