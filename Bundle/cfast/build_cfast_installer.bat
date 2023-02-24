@@ -26,6 +26,12 @@ set cfast_root=%CD%
 
 cd ..\smv
 set smv_root=%CD%
+
+:: define bot_root
+
+cd ..\bot
+set bot_root=%CD%
+
 cd %CURDIR%
 
 set git_drive=c:
@@ -33,6 +39,12 @@ set git_drive=c:
 
 set DISTDIR=%cfast_root%\Utilities\for_bundle\scripts\BUNDLEDIR\%installerbase%
 set bundleinfo=%cfast_root%\Utilities\for_bundle\scripts\bundleinfo
+set bundlenewinfo=%bot_root%\bundle\cfast\for_bundle\
+
+echo Unpacking %cfastrev% and %smvrev% installation files > %bundlenewinfo%\unpack.txt
+CALL :COPY %bundlenewinfo% setup.bat                      %DISTDIR%  setup.bat
+
+
 
 call build_bundle_dir.bat %build_cedit%
 
@@ -53,6 +65,8 @@ echo Setup is about to install CFAST 7  > %bundleinfo%\message.txt
 echo Press Setup to begin installation. > %bundleinfo%\main.txt
 if exist %installerbase%.exe erase %installerbase%.exe
 wzipse32 %installerbase%.zip -runasadmin -a %bundleinfo%\about.txt -st"cfast 7 Setup" -d "c:\Program Files\firemodels\%distname%" -c wrapup_cfast_install.bat
+::wzipse32 %installerbase%.zip -runasadmin -setup -auto -i %bundlenewinfo%\icon.ico -t %bundlenewinfo%\unpack.txt -a %bundleinfo%\about.txt -st"CFAST %cfast_version% Setup" -o -c cmd /k setup.bat
+
 
 set uploaddir=%userprofile%\.bundle\uploads
 if not exist %userprofile%\.bundle         mkdir %userprofile%\.bundle
@@ -72,4 +86,19 @@ if NOT x%upload% == x1 goto endif1
 
 cd %CURDIR%
 
+goto eof
 
+::------------------------------------------------
+:COPY
+::------------------------------------------------
+set fromdir=%1
+set fromfile=%2
+set todir=%3
+set tofile=%4
+IF NOT EXIST %fromdir%\%fromfile% echo ***error: %fromdir%\%fromfile% does not exist
+IF EXIST %fromdir%\%fromfile%     copy %fromdir%\%fromfile% %todir%\%tofile% > Nul 2>&1
+IF NOT EXIST %todir%\%tofile%     echo ***error: %fromdir%\%fromfile% failed to copy
+IF NOT EXIST %todir%\%tofile%     echo           to %todir%\%tofile%
+exit /b
+
+:eof
