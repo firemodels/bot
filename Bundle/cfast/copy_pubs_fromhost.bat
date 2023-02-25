@@ -19,7 +19,7 @@ if NOT exist %PDFS% mkdir %PDFS%
 erase %PDFS%\*.pdf > Nul 2>&1
 
 set hosthome=%bundle_cfastbot_home%/.cfastbot/Manuals
-echo Downloading CFAST PDFs from %hosthome% on %bundle_hostname%
+echo Downloading CFAST PDFs from %hosthome% on %bundle_host%
 
 call :copy_file Tech_Ref
 call :copy_file Users_Guide
