@@ -6,6 +6,7 @@ set cfastrev=cfasttest
 set smvrev=smvtest
 set upload=0
 set build_cedit=1
+set only_installer=0
 SETLOCAL
 
 call :getopts %*
@@ -22,29 +23,31 @@ set CFASTREPO=%GITROOT%\cfast
 set SCRIPTDIR=%CFASTREPO%\Utilities\for_bundle\scripts
 set VSSTUDIO=%CFASTREPO%\Utilities\Visual_Studio
 
-cd %THISDIR%
-echo ***Cleaning CFAST bundle build directory
-git clean -dxf  > Nul 2>&1
+if %only_installer% == 1 goto only_installer
+   cd %THISDIR%
+   echo ***Cleaning CFAST bundle build directory
+   git clean -dxf  > Nul 2>&1
 
-cd %CFASTREPO%
-echo ***Cleaning CFAST repo
-git clean -dxf  > Nul 2>&1
+   cd %CFASTREPO%
+   echo ***Cleaning CFAST repo
+   git clean -dxf  > Nul 2>&1
+ 
+   cd %THISDIR%
+   echo ***Restoring project configuration files 
+   call Restore_vs_config %VSSTUDIO%  %THISDIR% %THISDIR%\out\stage1_config
 
-cd %THISDIR%
-echo ***Restoring project configuration files 
-call Restore_vs_config %VSSTUDIO%  %THISDIR% %THISDIR%\out\stage1_config
+   cd %THISDIR%
+   call build_cfast_apps %build_cedit%
 
-cd %THISDIR%
-call build_cfast_apps %build_cedit%
+   echo .
+   echo ***Building smokeview executables
+   cd %THISDIR%\..\..\..\smv
+   set smvrepo=%CD%
 
-echo .
-echo ***Building smokeview executables
-cd %THISDIR%\..\..\..\smv
-set smvrepo=%CD%
+   cd %THISDIR%
+   call build_smv_apps %smvrepo%
 
-cd %THISDIR%
-call build_smv_apps %smvrepo%
-
+:only_installer
 cd %THISDIR%
 call build_cfast_installer %cfastrev% %smvrev% %upload% %build_cedit%
 
@@ -89,6 +92,10 @@ exit /b 0
    call :usage
    set stopscript=1
    exit /b
+ )
+ if "%1" EQU "-I" (
+   set only_installer=1
+   set valid=1
  )
  if "%1" EQU "-S" (
    set smvrev=%2

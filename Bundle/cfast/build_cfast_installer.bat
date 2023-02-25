@@ -41,14 +41,11 @@ set DISTDIR=%cfast_root%\Utilities\for_bundle\scripts\BUNDLEDIR\%installerbase%
 set bundleinfo=%cfast_root%\Utilities\for_bundle\scripts\bundleinfo
 set bundlenewinfo=%bot_root%\bundle\cfast\for_bundle\
 
-echo Unpacking %cfastrev% and %smvrev% installation files > %bundlenewinfo%\unpack.txt
-CALL :COPY %bundlenewinfo% setup.bat                      %DISTDIR%  setup.bat
-
-
-
 call build_bundle_dir.bat %build_cedit%
 
-copy "%bundleinfo%\wrapup_cfast_install.bat"           "%DISTDIR%\wrapup_cfast_install.bat"   > Nul 2>&1
+echo Unpacking %cfastrev% and %smvrev% installation files > %bundlenewinfo%\unpack.txt
+CALL :COPY %bundlenewinfo% setup.bat %DISTDIR% setup.bat
+call :COPY %bundleinfo% wrapup_cfast_install.bat %DISTDIR% wrapup_cfast_install.bat
 
 cd %DISTDIR%
 echo ***Compressing installation files%
