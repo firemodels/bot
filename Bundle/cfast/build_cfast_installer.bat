@@ -8,7 +8,7 @@ Title Bundle cfast for Windows
 
 :: installation settings settings
 
-set installerbase=cfast7_installer
+set installerbase=cfast7
 set distname=cfast7
 
 :: VVVVVVVVVVVVVVVVV shouldn't need to change anything below VVVVVVVVVVVVVVV
@@ -37,32 +37,33 @@ cd %CURDIR%
 set git_drive=c:
 %git_drive%
 
-set DISTDIR=%cfast_root%\Utilities\for_bundle\scripts\BUNDLEDIR\%installerbase%
+set FIREMODELSDIR=%cfast_root%\Utilities\for_bundle\scripts\BUNDLEDIR\firemodels
+set CFASTDISTDIR=%FIREMODELSDIR%\%installerbase%
 set bundleinfo=%cfast_root%\Utilities\for_bundle\scripts\bundleinfo
 set bundlenewinfo=%bot_root%\bundle\cfast\for_bundle\
 
 call build_bundle_dir.bat %build_cedit%
 
 echo Unpacking %cfastrev% and %smvrev% installation files > %bundlenewinfo%\unpack.txt
-CALL :COPY %bundlenewinfo% setup.bat %DISTDIR% setup.bat
-call :COPY %bundleinfo% wrapup_cfast_install.bat %DISTDIR% wrapup_cfast_install.bat
+echo %installerbase% > %FIREMODELSDIR%\basename.txt
+CALL :COPY %bundlenewinfo% setup.bat                %FIREMODELSDIR% setup.bat
+call :COPY %bundleinfo%    wrapup_cfast_install.bat %CFASTDISTDIR% wrapup_cfast_install.bat
 
-cd %DISTDIR%
+cd %FIREMODELSDIR%\..
 echo ***Compressing installation files%
 echo. > %stage3out%
 echo ***zipping bundle files > %stage3out%
-wzzip -a -r -P ..\%installerbase%.zip * ..\SMV6   >> %stage3out% 2>&1
-
+wzzip -a -r -P ..\%installerbase%.zip firemodels   >> %stage3out% 2>&1
 :: create an installation file from the zipped bundle directory
 
 echo ***Creating installation file
 
-cd %DISTDIR%\..
+cd %FIREMODELSDIR%\..\..
 echo Setup is about to install CFAST 7  > %bundleinfo%\message.txt
 echo Press Setup to begin installation. > %bundleinfo%\main.txt
 if exist %installerbase%.exe erase %installerbase%.exe
-wzipse32 %installerbase%.zip -runasadmin -a %bundleinfo%\about.txt -st"cfast 7 Setup" -d "c:\Program Files\firemodels\%distname%" -c wrapup_cfast_install.bat
-::wzipse32 %installerbase%.zip -runasadmin -setup -auto -i %bundlenewinfo%\icon.ico -t %bundlenewinfo%\unpack.txt -a %bundleinfo%\about.txt -st"CFAST %cfast_version% Setup" -o -c cmd /k setup.bat
+::wzipse32 %installerbase%.zip -runasadmin -a %bundleinfo%\about.txt -st"cfast 7 Setup" -d "c:\Program Files\firemodels\%distname%" -c wrapup_cfast_install.bat
+wzipse32 %installerbase%.zip -runasadmin -setup -auto -i %bundlenewinfo%\icon.ico -t %bundlenewinfo%\unpack.txt -a %bundleinfo%\about.txt -st"CFAST %cfast_version% Setup" -o -c cmd /k firemodels\setup.bat
 
 
 set uploaddir=%userprofile%\.bundle\uploads

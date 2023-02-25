@@ -92,8 +92,7 @@ if "%option_install%" == "0" goto abort
 set "BASEDIR=%SystemDrive%\Program Files"
 if "%option_install%" == "2" set "BASEDIR=%userprofile%"
 
-set subdir=firemodels
-set "INSTALLDIR=%BASEDIR%\%subdir%"
+set "INSTALLDIR=%BASEDIR%\firemodels"
 echo.
 if "%auto_install%" == "n" set /p INSTALLDIR="Enter Cfast root directory (default: %INSTALLDIR%):"
 
@@ -106,7 +105,7 @@ echo Installation directory: %INSTALLDIR%
 echo.
 
 set "SMV6=%INSTALLDIR%\SMV6"
-set "CFAST7=%INSTALLDIR%\cfast"
+set "CFAST7=%INSTALLDIR%\cfast7"
 set "UNINSTALLDIR=%CFAST7%\Uninstall"
 
 set need_overwrite=0
@@ -115,7 +114,7 @@ if EXIST "%SMV6%" set need_overwrite=1
 
 :quest2
 if "%need_overwrite%" == "0" goto else1 
-  if "%auto_install%" == "n" echo The directories %subdir%\FDS6 and/or %subdir%\SMV6 exist. 
+  if "%auto_install%" == "n" echo The directories firemodels\FDS6 and/or firemodels\SMV6 exist. 
   set option=n
   if "%auto_install%" == "y" set option=y 
   if "%auto_install%" == "n" set /p option="Do you wish to overwrite them? (yes, no (default: no)):"
@@ -134,10 +133,10 @@ goto begin
 
 :proceed
 
-if NOT exist "%CFAST7%" goto skip_remove_fds6
-echo *** Removing %CFAST7%
-rmdir /S /Q "%CFAST7%"
-:skip_remove_fds6
+if NOT exist "%CFAST7%" goto skip_remove_cfast
+   echo *** Removing %CFAST7%
+   rmdir /S /Q "%CFAST7%"
+:skip_remove_cfast
 
 if NOT exist "%SMV6%" goto skip_remove_smv6
 echo *** Removing %SMV6%
@@ -149,11 +148,11 @@ rmdir /S /Q "%SMV6%"
 echo.
 echo *** Copying installation files to %INSTALLDIR%
 if NOT EXIST "%INSTALLDIR%" mkdir "%INSTALLDIR%" > Nul
-xcopy /E /I /H /Q firemodels\cfast "%CFAST7%"     > Nul
-xcopy /E /I /H /Q firemodels\SMV6  "%SMV6%"     > Nul
+xcopy /E /I /H /Q firemodels\cfast7 "%CFAST7%"    > Nul
+xcopy /E /I /H /Q firemodels\SMV6  "%SMV6%"      > Nul
 
-set "filepath=%CFAST7%\\cfast7.exe%"
-call :is_file_copied cfast7.exe
+set "filepath=%CFAST7%\cfast.exe"
+call :is_file_copied cfast.exe
 
 set "filepath=%SMV6%\smokeview.exe"
 call :is_file_copied smokeview.exe
@@ -186,6 +185,7 @@ assoc .smv=smvDoc>Nul
 
 set CFASTSTART=%ALLUSERSPROFILE%\Start Menu\Programs\CFAST7
 
+goto skip_shortcuts
 :: ------------- start menu shortcuts ---------------
 echo *** Adding document shortcuts to the Start menu.
 if exist "%CFASTSTART%" rmdir /q /s "%CFASTSTART%"
@@ -195,15 +195,16 @@ mkdir "%CFASTSTART%"
 mkdir "%cfaststartmenu%"
 
 mkdir "%cfaststartmenu%\Guides"
-"%CFAST7%\shortcut.exe" /F:"%cfaststartmenu%\Guides\CFAST Users Guide.lnk"                                     /T:"%CFAST7%\Documents\Users_Guide.pdf"         /A:C >NUL
-"%CFAST7%\shortcut.exe" /F:"%cfaststartmenu%\Guides\CFAST Technical Reference Guide.lnk"                       /T:"%CFAST7%\Documents\Tech_Ref.pdf"            /A:C >NUL
-"%CFAST7%\shortcut.exe" /F:"%cfaststartmenu%\Guides\CFAST Software Development and Model Evaluation Guide.lnk" /T:"%CFAST7%\Documents\Validation_Guide.pdf"    /A:C >NUL
-"%CFAST7%\shortcut.exe" /F:"%cfaststartmenu%\Guides\CFAST Configuration Management.lnk"                        /T:"%CFAST7%\Documents\Configuration_Guide.pdf" /A:C >NUL
-"%CFAST7%\shortcut.exe" /F:"%cfaststartmenu%\CFAST7.lnk"                                                       /T:"%CFAST7%\CEdit.exe"                         /A:C >NUL
-"%CFAST7%\shortcut.exe" /F:"%cfaststartmenu%\Smokeview.lnk"                                                    /T:"%SMV6%\smokeview.exe"                       /A:C >NUL
-"%CFAST7%\shortcut.exe" /F:"%cfaststartmenu%\Uninstall.lnk"                                                    /T:"%CFAST7%\Uninstall\uninstall.bat"           /A:C >NUL
+"%UNINSTALLDIR%\shortcut.exe" /F:"%cfaststartmenu%\Guides\CFAST Users Guide.lnk"                                     /T:"%CFAST7%\Documents\Users_Guide.pdf"         /A:C >NUL
+"%UNINSTALLDIR%\shortcut.exe" /F:"%cfaststartmenu%\Guides\CFAST Technical Reference Guide.lnk"                       /T:"%CFAST7%\Documents\Tech_Ref.pdf"            /A:C >NUL
+"%UNINSTALLDIR%\shortcut.exe" /F:"%cfaststartmenu%\Guides\CFAST Software Development and Model Evaluation Guide.lnk" /T:"%CFAST7%\Documents\Validation_Guide.pdf"    /A:C >NUL
+"%UNINSTALLDIR%\shortcut.exe" /F:"%cfaststartmenu%\Guides\CFAST Configuration Management.lnk"                        /T:"%CFAST7%\Documents\Configuration_Guide.pdf" /A:C >NUL
+"%UNINSTALLDIR%\shortcut.exe" /F:"%cfaststartmenu%\CFAST7.lnk"                                                       /T:"%CFAST7%\CEdit.exe"                         /A:C >NUL
+"%UNINSTALLDIR%\shortcut.exe" /F:"%cfaststartmenu%\Smokeview.lnk"                                                    /T:"%SMV6%\smokeview.exe"                       /A:C >NUL
+"%UNINSTALLDIR%\shortcut.exe" /F:"%cfaststartmenu%\Uninstall.lnk"                                                    /T:"%CFAST7%\Uninstall\uninstall.bat"           /A:C >NUL
 
-"%CFAST7%\shortcut.exe" /F:"%CFASTSTART%\Uninstall.lnk"  /T:"%UNINSTALLDIR%\uninstall.bat" /A:C >NUL
+"%UNINSTALLDIR%\shortcut.exe" /F:"%CFASTSTART%\Uninstall.lnk"  /T:"%UNINSTALLDIR%\uninstall.bat" /A:C >NUL
+:skip_shortcuts
 
 :: ----------- setting up uninstall file
 
@@ -260,9 +261,6 @@ echo *** Press any key, then reboot to complete the installation.  ***
 pause>NUL
 goto eof
 
-:-------------------------------------------------------------------------
-:----------------------subroutines----------------------------------------
-:-------------------------------------------------------------------------
 
 :: -------------------------------------------------------------
 :is_file_copied
