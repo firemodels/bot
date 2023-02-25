@@ -16,6 +16,7 @@ call :getopts %*
 
 if x%stopscript% == x1 exit /b
 
+if "x%only_installer%" == "x-I" goto skip_warning
 if "x%clone%" == "xclone" goto skip_warning
   echo.
   echo ---------------------------------------------------------------

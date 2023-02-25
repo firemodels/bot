@@ -46,6 +46,7 @@ call build_bundle_dir.bat %build_cedit%
 
 echo Unpacking %cfastrev% and %smvrev% installation files > %bundlenewinfo%\unpack.txt
 echo %installerbase% > %FIREMODELSDIR%\basename.txt
+echo %cfastrev% and %smvrev%> %FIREMODELSDIR%\versions.txt 
 CALL :COPY %bundlenewinfo% setup.bat                %FIREMODELSDIR% setup.bat
 call :COPY %bundleinfo%    wrapup_cfast_install.bat %CFASTDISTDIR% wrapup_cfast_install.bat
 
@@ -59,8 +60,7 @@ wzzip -a -r -P ..\%installerbase%.zip firemodels   >> %stage3out% 2>&1
 echo ***Creating installation file
 
 cd %FIREMODELSDIR%\..\..
-echo Setup is about to install CFAST 7  > %bundleinfo%\message.txt
-echo Press Setup to begin installation. > %bundleinfo%\main.txt
+echo Setup is about to install CFAST 7  > %FIREMODELSDIR%\message.txt
 if exist %installerbase%.exe erase %installerbase%.exe
 ::wzipse32 %installerbase%.zip -runasadmin -a %bundleinfo%\about.txt -st"cfast 7 Setup" -d "c:\Program Files\firemodels\%distname%" -c wrapup_cfast_install.bat
 wzipse32 %installerbase%.zip -runasadmin -setup -auto -i %bundlenewinfo%\icon.ico -t %bundlenewinfo%\unpack.txt -a %bundleinfo%\about.txt -st"CFAST %cfast_version% Setup" -o -c cmd /k firemodels\setup.bat
