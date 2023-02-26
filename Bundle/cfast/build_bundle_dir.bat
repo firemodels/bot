@@ -97,10 +97,10 @@ echo.
 echo ***Creating installer
 echo ***Copying Uninstall files
 
-call :COPY  %bundleinfo%\uninstall.bat        %CFASTDISTDIR%\Uninstall
-call :COPY  %bundleinfo%\uninstall_cfast.bat  %CFASTDISTDIR%\Uninstall\uninstall_base.bat 
-call :COPY  %bundleinfo%\uninstall_cfast2.bat %CFASTDISTDIR%\Uninstall\uninstall_base2.bat 
-call :COPY  %bundleinfo%\uninstall_cfast2.bat %CFASTDISTDIR%\Uninstall\uninstall_base2.bat
+
+call :COPY  %botrepo%\Bundle\cfast\for_bundle\uninstall.bat           %CFASTDISTDIR%\Uninstall
+call :COPY  %botrepo%\Bundle\cfast\for_bundle\uninstall_cfast.bat     %CFASTDISTDIR%\Uninstall\uninstall_base.bat 
+call :COPY  %botrepo%\Bundle\cfast\for_bundle\uninstall_cfast2.bat    %CFASTDISTDIR%\Uninstall\uninstall_base2.bat 
 call :COPY  %smvrepo%\Build\set_path\intel_win_64\set_path_win_64.exe %CFASTDISTDIR%\Uninstall\set_path.exe
 call :COPY  %botrepo%\Bundle\smv\for_bundle\Shortcut                  %CFASTDISTDIR%\Uninstall\shortcut.exe
 

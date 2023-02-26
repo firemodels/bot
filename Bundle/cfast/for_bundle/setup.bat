@@ -180,14 +180,12 @@ echo *** Associating the .smv file extension with smokeview.exe
 ftype smvDoc="%SMV6%\smokeview.exe" "%%1" >Nul
 assoc .smv=smvDoc>Nul
 
-set CFASTSTART=%ALLUSERSPROFILE%\Start Menu\Programs\CFAST7
+::set CFASTSTART=%ALLUSERSPROFILE%\Start Menu\Programs\CFAST7
+set cfaststartmenu=%ProgramData%\Microsoft\Windows\Start Menu\Programs\CFAST7
 
-goto skip_shortcuts
 :: ------------- start menu shortcuts ---------------
 echo *** Adding document shortcuts to the Start menu.
-if exist "%CFASTSTART%" rmdir /q /s "%CFASTSTART%"
-
-mkdir "%CFASTSTART%"
+if exist "%cfaststartmenu%" rmdir /q /s "%cfaststartmenu%"
 
 mkdir "%cfaststartmenu%"
 
@@ -196,34 +194,32 @@ mkdir "%cfaststartmenu%\Guides"
 "%UNINSTALLDIR%\shortcut.exe" /F:"%cfaststartmenu%\Guides\CFAST Technical Reference Guide.lnk"                       /T:"%CFAST7%\Documents\Tech_Ref.pdf"            /A:C >NUL
 "%UNINSTALLDIR%\shortcut.exe" /F:"%cfaststartmenu%\Guides\CFAST Software Development and Model Evaluation Guide.lnk" /T:"%CFAST7%\Documents\Validation_Guide.pdf"    /A:C >NUL
 "%UNINSTALLDIR%\shortcut.exe" /F:"%cfaststartmenu%\Guides\CFAST Configuration Management.lnk"                        /T:"%CFAST7%\Documents\Configuration_Guide.pdf" /A:C >NUL
-"%UNINSTALLDIR%\shortcut.exe" /F:"%cfaststartmenu%\CFAST7.lnk"                                                       /T:"%CFAST7%\CEdit.exe"                         /A:C >NUL
+"%UNINSTALLDIR%\shortcut.exe" /F:"%cfaststartmenu%\CEdit.lnk"                                                        /T:"%CFAST7%\CEdit.exe"                         /A:C >NUL
 "%UNINSTALLDIR%\shortcut.exe" /F:"%cfaststartmenu%\Smokeview.lnk"                                                    /T:"%SMV6%\smokeview.exe"                       /A:C >NUL
-"%UNINSTALLDIR%\shortcut.exe" /F:"%cfaststartmenu%\Uninstall.lnk"                                                    /T:"%CFAST7%\Uninstall\uninstall.bat"           /A:C >NUL
-
-"%UNINSTALLDIR%\shortcut.exe" /F:"%CFASTSTART%\Uninstall.lnk"  /T:"%UNINSTALLDIR%\uninstall.bat" /A:C >NUL
-:skip_shortcuts
+"%UNINSTALLDIR%\shortcut.exe" /F:"%cfaststartmenu%\Uninstall.lnk"                                                    /T:"%UNINSTALLDIR%\uninstall.bat"               /A:C >NUL
 
 :: ----------- setting up uninstall file
 
 echo *** Setting up the Uninstall script.
 
-:: remove smokeview path and directory
+:: if fds exists then only remove cfast
+:: if fds does not exist then remove both cfast and smv
 
-echo if "%cfastinstalled%" == "1" goto skip2                  >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo set errorlevel=0                                         >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo where fds ^> Nul                                         >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo if %%errorlevel%% == 0 goto skip2                        >> "%UNINSTALLDIR%\uninstall_base.bat"
 echo echo Removing "%SMV6%" from the System Path              >> "%UNINSTALLDIR%\uninstall_base.bat"
-echo call "%UNINSTALLDIR%\set_path.exe" -s -b -r %SMV6%       >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo call "%UNINSTALLDIR%\set_path.exe" -s -b -r "%SMV6%"     >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo echo Removing "%SMV6%" directory                         >> "%UNINSTALLDIR%\uninstall_base.bat"
 echo rmdir /s /q "%SMV6%"                                     >> "%UNINSTALLDIR%\uninstall_base.bat"
 echo :skip2                                                   >> "%UNINSTALLDIR%\uninstall_base.bat"
 
-:: if cfast exists then only remove fds
-:: if cfast does not exist then remove everything
-
-echo if exist "%CFAST7%" goto skip_remove                     >> "%UNINSTALLDIR%\uninstall_base.bat"
-echo   echo Removing "%CFAST7%"                               >> "%UNINSTALLDIR%\uninstall_base.bat"
-echo   rmdir /s /q  "%CFAST7%"                                >> "%UNINSTALLDIR%\uninstall_base.bat"
-echo   echo Removing "%INSTALLDIR%"                           >> "%UNINSTALLDIR%\uninstall_base.bat"
-echo   rmdir "%INSTALLDIR%"                                   >> "%UNINSTALLDIR%\uninstall_base.bat"
-echo :skip_remove                                             >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo echo Removing "%CFAST7%" from system path                >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo call "%UNINSTALLDIR%\set_path.exe" -s -b -r "%CFAST7%"   >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo echo Removing "%CFAST7%" directory                       >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo rmdir /s /q  "%CFAST7%"                                  >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo echo Removing "%INSTALLDIR%"                             >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo rmdir "%INSTALLDIR%"                                     >> "%UNINSTALLDIR%\uninstall_base.bat"
 
 echo echo *** Uninstall complete                              >> "%UNINSTALLDIR%\uninstall_base.bat"
 echo pause>Nul                                                >> "%UNINSTALLDIR%\uninstall_base.bat"
