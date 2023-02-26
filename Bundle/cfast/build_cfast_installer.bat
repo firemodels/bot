@@ -37,7 +37,15 @@ cd %CURDIR%
 set git_drive=c:
 %git_drive%
 
-set FIREMODELSDIR=%cfast_root%\Utilities\for_bundle\scripts\BUNDLEDIR\firemodels
+set outbase=%cfastrev%_%smvrev%_tst_win
+set outexe=%outbase%.exe
+
+set BUNDLEBASE=%userprofile%\.bundle\uploads\%outbase%
+if exist %BUNDLEBASE% rmdir /s /q %BUNDLEBASE%
+mkdir %BUNDLEBASE%
+
+set FIREMODELSDIR=%BUNDLEBASE%\firemodels
+mkdir %FIREMODELSDIR%
 set CFASTDISTDIR=%FIREMODELSDIR%\%installerbase%
 set bundleinfo=%cfast_root%\Utilities\for_bundle\scripts\bundleinfo
 set bundlenewinfo=%bot_root%\bundle\cfast\for_bundle\
@@ -69,7 +77,6 @@ wzipse32 %installerbase%.zip -runasadmin -setup -auto -i %bundlenewinfo%\icon.ic
 set uploaddir=%userprofile%\.bundle\uploads
 if not exist %userprofile%\.bundle         mkdir %userprofile%\.bundle
 if not exist %uploaddir% mkdir %uploaddir%
-set outexe=%cfastrev%_%smvrev%_tst_win.exe
 echo ***Copying %installerbase%.exe to %uploaddir%\%outexe%
 copy %installerbase%.exe %uploaddir%\%outexe%   >> %stage3out% 2>&1
 
