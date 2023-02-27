@@ -202,9 +202,9 @@ mkdir "%cfaststartmenu%\Guides"
 "%INST_UNINSTALLDIR%\shortcut.exe" /F:"%cfaststartmenu%\Guides\CFAST Technical Reference Guide.lnk"                       /T:"%CFAST7%\Documents\Tech_Ref.pdf"            /A:C >NUL
 "%INST_UNINSTALLDIR%\shortcut.exe" /F:"%cfaststartmenu%\Guides\CFAST Software Development and Model Evaluation Guide.lnk" /T:"%CFAST7%\Documents\Validation_Guide.pdf"    /A:C >NUL
 "%INST_UNINSTALLDIR%\shortcut.exe" /F:"%cfaststartmenu%\Guides\CFAST Configuration Management.lnk"                        /T:"%CFAST7%\Documents\Configuration_Guide.pdf" /A:C >NUL
-"%INST_UNINSTALLDIR%\shortcut.exe" /F:"%cfaststartmenu%\CEdit.lnk"                                                        /T:"%CFAST7%\CEdit.exe"                         /A:C >NUL
+"%INST_UNINSTALLDIR%\shortcut.exe" /F:"%cfaststartmenu%\CFASTlnk"                                                         /T:"%CFAST7%\CEdit.exe"                         /A:C >NUL
+"%INST_UNINSTALLDIR%\shortcut.exe" /F:"%cfaststartmenu%\Smokeview.lnk"                                                    /T:"%SMV6%\smokeview.exe"                       /A:C >NUL
 "%INST_UNINSTALLDIR%\shortcut.exe" /F:"%cfaststartmenu%\Uninstall.lnk"                                                    /T:"%INST_UNINSTALLDIR%\uninstall.bat"          /A:C >NUL
-::"%INST_UNINSTALLDIR%\shortcut.exe" /F:"%cfaststartmenu%\Smokeview.lnk"                                                    /T:"%SMV6%\smokeview.exe"                       /A:C >NUL
 
 :: ----------- setting up uninstall file
 

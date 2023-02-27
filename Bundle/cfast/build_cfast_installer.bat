@@ -38,7 +38,6 @@ set git_drive=c:
 %git_drive%
 
 set outbase=%cfastrev%_%smvrev%_tst_win
-set outexe=%outbase%.exe
 
 set BUNDLEBASE=%userprofile%\.bundle\uploads\%outbase%
 if exist %BUNDLEBASE% rmdir /s /q %BUNDLEBASE%
@@ -53,7 +52,7 @@ set bundlenewinfo=%bot_root%\bundle\cfast\for_bundle\
 call build_bundle_dir.bat %build_cedit%
 
 echo Unpacking %cfastrev% and %smvrev% installation files > %bundlenewinfo%\unpack.txt
-echo %installerbase% > %FIREMODELSDIR%\basename.txt
+echo %installerbase%         > %FIREMODELSDIR%\basename.txt
 echo %cfastrev% and %smvrev% > %FIREMODELSDIR%\versions.txt 
 echo %cfastrev%              > %FIREMODELSDIR%\cfast_version.txt 
 echo %smvrev%                > %FIREMODELSDIR%\smv_version.txt 
@@ -64,23 +63,24 @@ cd %FIREMODELSDIR%\..
 echo ***Compressing installation files%
 echo. > %stage3out%
 echo ***zipping bundle files > %stage3out%
-wzzip -a -r -P ..\%installerbase%.zip firemodels   >> %stage3out% 2>&1
+if exist ..\%outbase%.zip erase ..\%outbase%.zip
+wzzip -a -r -P ..\%outbase%.zip firemodels   >> %stage3out% 2>&1
 :: create an installation file from the zipped bundle directory
 
 echo ***Creating installation file
 
 cd %FIREMODELSDIR%\..\..
 echo Setup is about to install CFAST 7  > %FIREMODELSDIR%\message.txt
-if exist %installerbase%.exe erase %installerbase%.exe
-::wzipse32 %installerbase%.zip -runasadmin -a %bundleinfo%\about.txt -st"cfast 7 Setup" -d "c:\Program Files\firemodels\%distname%" -c wrapup_cfast_install.bat
-wzipse32 %installerbase%.zip -runasadmin -setup -auto -i %bundlenewinfo%\icon.ico -t %bundlenewinfo%\unpack.txt -a %bundleinfo%\about.txt -st"CFAST %cfast_version% Setup" -o -c cmd /k firemodels\setup.bat
+if exist %outbase%.exe erase %outbase%.exe
+wzipse32 %outbase%.zip -runasadmin -setup -auto -i %bundlenewinfo%\icon.ico -t %bundlenewinfo%\unpack.txt -a %bundleinfo%\about.txt -st"CFAST %cfast_version% Setup" -o -c cmd /k firemodels\setup.bat
 
 
 set uploaddir=%userprofile%\.bundle\uploads
 if not exist %userprofile%\.bundle         mkdir %userprofile%\.bundle
 if not exist %uploaddir% mkdir %uploaddir%
-echo ***Copying %installerbase%.exe to %uploaddir%\%outexe%
-copy %installerbase%.exe %uploaddir%\%outexe%   >> %stage3out% 2>&1
+echo ***Copying %outbase%.exe to %uploaddir%
+copy %outbase%.exe %uploaddir%\%outbase%.exe   >> %stage3out% 2>&1
+copy %outbase%.zip %uploaddir%\%outbase%.zip   >> %stage3out% 2>&1
 
 echo ***CFAST installer built
 
