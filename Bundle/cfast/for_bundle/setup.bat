@@ -17,32 +17,26 @@ if defined PROGRAMFILES(X86) (
   goto abort
 )
 
-:: form extraction directory
+:: get install option from user
 
-set /p basename=<firemodels\basename.txt
 set /p versions=<firemodels\versions.txt
 set /p cfast_version=<firemodels\cfast_version.txt
 set /p smv_version=<firemodels\smv_version.txt
-set EXTRACTDIR=%userprofile%\%basename%
-for /f "tokens=* delims= " %%A in ('echo %EXTRACTDIR% ') do set EXTRACTDIR=%%A
-set EXTRACTDIR=%EXTRACTDIR:~0,-1%
 
 :quest1
 set auto_install=y
 echo.
 echo Install %versions%in %SystemDrive%\Program Files\firemodels ?
 echo.
-echo  yes - standard installation (use default answer for all questions)
-echo   no - customize installation (install to a different location)
-::echo extract - extract to: %EXTRACTDIR%
-::echo           and quit 
+echo  yes - install in %SystemDrive%\Program Files\firemodels
+echo        and use default answer for all questions
+echo   no - install in a different location
 echo quit - stop installation
 echo.
 set /p  auto_install="yes, no or quit?:"
 call :get_yesnoextract %auto_install% auto_install quest1_repeat
 if "%quest1_repeat%" == "1" goto quest1
 if "%quest1_repeat%" == "2" goto abort
-if "%quest1_repeat%" == "3" goto extract
 
 ::*** check if cfast and smokeview are running
 
@@ -374,23 +368,6 @@ set %countvar%=%count%
 set %stringvar%=%string%
 
 exit /b
-
-:-------------------------------------------------------------------------
-:extract
-:-------------------------------------------------------------------------
-echo.
-set "INSTALLDIR=%EXTRACTDIR%"
-set "SMV6=%INSTALLDIR%\SMV6"
-set "CFAST7=%INSTALLDIR%\cfast7"
-echo *** Copying installation files to %INSTALLDIR%
-if NOT EXIST "%INSTALLDIR%" mkdir "%INSTALLDIR%" > Nul
-xcopy /E /I /H /Q firemodels\FDS6 "%CFAST7%"     > Nul
-xcopy /E /I /H /Q firemodels\SMV6 "%SMV6%"       > Nul
-
-echo Copy complete
-echo Press any key to finish
-pause > Nul
-goto eof
 
 :abort
 echo Cfast installation aborted.

@@ -52,7 +52,6 @@ set bundlenewinfo=%bot_root%\bundle\cfast\for_bundle\
 call build_bundle_dir.bat %build_cedit%
 
 echo Unpacking %cfastrev% and %smvrev% installation files > %bundlenewinfo%\unpack.txt
-echo %installerbase%         > %FIREMODELSDIR%\basename.txt
 echo %cfastrev% and %smvrev% > %FIREMODELSDIR%\versions.txt 
 echo %cfastrev%              > %FIREMODELSDIR%\cfast_version.txt 
 echo %smvrev%                > %FIREMODELSDIR%\smv_version.txt 
