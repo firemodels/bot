@@ -11,11 +11,14 @@ IF %ERRORLEVEL% NEQ 0 (
 
 echo.
 echo *** Removing the association between .in and CEdit
-assoc .in=
-ftype ceditDoc=
+assoc .in=       > Nul 2>&1
+ftype ceditDoc=  > Nul 2>&1
 
-call :is_fds_installed
-if %fdsinstalled% == 1 goto skip1
+set have_fds=1
+where fds  > Nul 2>&1
+if %errorlevel% == 1 set have_fds=0
+
+if %have_fds% == 1 goto skip1
   echo.
   echo *** Removing the association between .smv and Smokeview
   assoc .smv=

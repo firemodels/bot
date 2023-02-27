@@ -54,7 +54,9 @@ call build_bundle_dir.bat %build_cedit%
 
 echo Unpacking %cfastrev% and %smvrev% installation files > %bundlenewinfo%\unpack.txt
 echo %installerbase% > %FIREMODELSDIR%\basename.txt
-echo %cfastrev% and %smvrev%> %FIREMODELSDIR%\versions.txt 
+echo %cfastrev% and %smvrev% > %FIREMODELSDIR%\versions.txt 
+echo %cfastrev%              > %FIREMODELSDIR%\cfast_version.txt 
+echo %smvrev%                > %FIREMODELSDIR%\smv_version.txt 
 CALL :COPY %bundlenewinfo% setup.bat                %FIREMODELSDIR% setup.bat
 call :COPY %bundleinfo%    wrapup_cfast_install.bat %CFASTDISTDIR% wrapup_cfast_install.bat
 
