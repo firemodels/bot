@@ -1,7 +1,7 @@
 @echo off
 
 set clone=
-set bundle_hostname=
+set bundle_host=
 set bundle_firebot_home=
 set bundle_smokebot_home=
 set SMV_HASH=
@@ -20,8 +20,8 @@ if NOT exist %configscript% goto skip_config
 set default_hostname=
 set default_smokebot_home=
 
-if x"%bundle_hostname%" == "x" goto def1
-  set default_hostname=[default: %bundle_hostname%]
+if x"%bundle_host%" == "x" goto def1
+  set default_hostname=[default: %bundle_host%]
 :def1
 
 if x"%bundle_smokebot_home%" == "x" goto def3
@@ -44,7 +44,7 @@ set nightly=rls
 
 ::--- make sure hostname is defined
 
-if NOT x"%bundle_hostname%" == "x" goto error1
+if NOT x"%bundle_host%" == "x" goto error1
   echo ****error:  hostname where firebot and smokebot was run not defined
   set abort=1
 :error1
@@ -192,7 +192,7 @@ if "x%upload_bundle%" == "x" goto skip_upload
   echo ------------------------------------------------------
   echo uploading bundle
   echo.
-  call upload_smv_bundle %SMV_REVISION_BUNDLER% %nightly% %bundle_hostname% || exit /b 1
+  call upload_smv_bundle %SMV_REVISION_BUNDLER% %nightly% %bundle_host% || exit /b 1
 :skip_upload
 
 goto eof
@@ -221,7 +221,7 @@ echo -S - smv repo hash
 echo -U - do not upload bundle
 echo -Y smvtag - tag the smv repo using smvtag
 exit /b 0
-set bundle_hostname=
+set bundle_host=
 set bundle_smokebot_home=
 
 ::-----------------------------------------------------------------------
@@ -250,7 +250,7 @@ set bundle_smokebot_home=
    exit /b
  )
  if "%1" EQU "-H" (
-   set bundle_hostname=%2
+   set bundle_host=%2
    set valid=1
    shift
  )
