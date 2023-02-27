@@ -26,17 +26,18 @@ set /p smv_version=<firemodels\smv_version.txt
 :quest1
 set auto_install=y
 echo.
-echo Install %versions%in %SystemDrive%\Program Files\firemodels ?
+echo Install %versions%
 echo.
-echo  yes - install in %SystemDrive%\Program Files\firemodels
-echo        and use default answer for all questions
-echo   no - install in a different location
+echo Options:
+echo    1 - install in %SystemDrive%\Program Files\firemodels
+echo    2 - install in %userprofile%\firemodels
+echo    3 - install in a different location
 echo quit - stop installation
 echo.
-set /p  auto_install="yes, no or quit?:"
-call :get_yesnoextract %auto_install% auto_install quest1_repeat
-if "%quest1_repeat%" == "1" goto quest1
-if "%quest1_repeat%" == "2" goto abort
+set /p  answer1="1, 2, 3 or quit?:"
+call :get_answer1 %answer1% repeat
+if "%repeat%" == "1" goto quest1
+if "%repeat%" == "2" goto abort
 
 ::*** check if cfast and smokeview are running
 
@@ -66,31 +67,6 @@ if "%progs_running%" == "0" goto start
 
 :start
 
-if "%auto_install%" == "y" goto skip_loc
-echo.
-type firemodels\message.txt
-echo.
-echo Options:
-echo    Press 1 to install for all users (default: 1)
-echo    Press 2 to install for user %USERNAME%
-echo    Press any other key to cancel the installation
-:skip_loc
-
-set option=1
-if "%auto_install%" == "n" set /p option="Option:"
-
-set option_install=0
-if "%option%" == "1" set option_install=1
-if "%option%" == "2" set option_install=2
-if "%option_install%" == "0" goto abort
-
-set "BASEDIR=%SystemDrive%\Program Files"
-if "%option_install%" == "2" set "BASEDIR=%userprofile%"
-
-set "INSTALLDIR=%BASEDIR%\firemodels"
-echo.
-if "%auto_install%" == "n" set /p INSTALLDIR="Enter Cfast root directory (default: %INSTALLDIR%):"
-
 ::*** start Cfast installation
 
 :install
@@ -101,7 +77,6 @@ echo.
 
 set "SMV6=%INSTALLDIR%\SMV6"
 set "CFAST7=%INSTALLDIR%\cfast7"
-set "UNINSTALLDIR=%INSTALLDIR%\Uninstall"
 
 set need_overwrite=0
 if EXIST "%CFAST7%" set need_overwrite=1 
@@ -158,9 +133,6 @@ call :is_file_copied cfast.exe
 set "filepath=%SMV6%\smokeview.exe"
 call :is_file_copied smokeview.exe
 
-echo *** Removing previous cfast entries from the system and user path.
-::call "%UNINSTALLDIR%\set_path.exe" -s -m -b -r "nist\fds" >Nul
-
 :: ------------ setting up path ------------
 
 echo *** Setting up PATH variable.
@@ -216,7 +188,7 @@ echo if     %%have_fds%% == 1 echo *** Uninstalling %cfast_version% >> "%INST_UN
 echo if NOT %%have_fds%% == 1 echo *** Uninstalling %versions%   >> "%INST_UNINSTALLDIR%\uninstall_base.bat"
 echo echo.                                                       >> "%INST_UNINSTALLDIR%\uninstall_base.bat"
 echo echo Press any key to proceed or CTRL C to abort            >> "%INST_UNINSTALLDIR%\uninstall_base.bat"
-echo pause^>NUL                                                   >> "%INST_UNINSTALLDIR%\uninstall_base.bat"
+echo pause^>NUL                                                  >> "%INST_UNINSTALLDIR%\uninstall_base.bat"
 echo if %%have_fds%% == 1 goto skip2                             >> "%INST_UNINSTALLDIR%\uninstall_base.bat"
 echo echo Removing "%SMV6%" from the System Path                 >> "%INST_UNINSTALLDIR%\uninstall_base.bat"
 echo call "%INST_UNINSTALLDIR%\set_path.exe" -s -b -r "%SMV6%"   >> "%INST_UNINSTALLDIR%\uninstall_base.bat"
@@ -287,24 +259,35 @@ goto eof
   exit /b 0
 
 :-------------------------------------------------------------------------
-:get_yesnoextract
+:get_answer1
 :-------------------------------------------------------------------------
 set answer=%1
-set answervar=%2
-set repeatvar=%3
+set repeatvar=%2
 
 set answer=%answer:~0,1%
-if "%answer%" == "Y" set answer=y
-if "%answer%" == "N" set answer=n
-if "%answer%" == "Q" set answer=q
-if "%answer%" == "E" set answer=e
-set %answervar%=%answer%
-set repeat=1
-if "%answer%" == "y" set repeat=0
-if "%answer%" == "n" set repeat=0
-if "%answer%" == "q" set repeat=2
-if "%answer%" == "e" set repeat=3
-set %repeatvar%=%repeat%
+set %repeatvar%=0
+set INSTALLDIR=
+set %repeatvar%=1
+if %answer% == 1 set "INSTALLDIR=%SystemDrive%\Program Files\firemodels"
+if %answer% == 1 set %repeatvar%=0
+if %answer% == 2 set "INSTALLDIR=%userprofile%\firemodels"
+if %answer% == 2 set %repeatvar%=0
+if %answer% == 3 call :get_custom_path %repeatvar%
+if %answer% == 3 set %repeatvar%=0
+if %answer% == q set %repeatvar%=2
+
+exit /b
+
+:-------------------------------------------------------------------------
+:get_custom_path
+:-------------------------------------------------------------------------
+set repeatvar=%1
+set %repeatvar%=0
+set /p  "INSTALLDIR=enter cfast root:"
+if NOT exist "%INSTALLDIR%" mkdir "%INSTALLDIR%
+if NOT exist "%INSTALLDIR%" echo ***error: failed to create %INSTALLDIR%
+if NOT exist "%INSTALLDIR%" set %repeatvar%=1
+
 exit /b
 
 :-------------------------------------------------------------------------
