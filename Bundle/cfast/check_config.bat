@@ -12,6 +12,7 @@ goto eof
 
 ::-------------------------------
 :check
+::-------------------------------
 set varptr=%1
 if not defined %varptr% echo ***error: environment variable %varptr% is not defined
 if not defined %varptr% exit /b 1

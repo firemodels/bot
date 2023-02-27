@@ -24,49 +24,51 @@ echo.
 echo ***Copying CFAST files
 echo ***Making directories
 
-if exist %DISTDIR% rmdir /s /q %DISTDIR%
-mkdir %DISTDIR%
-mkdir %DISTDIR%\Examples
-mkdir %DISTDIR%\Documents
-mkdir %DISTDIR%\Uninstall
+if exist %FIREMODELSDIR% rmdir /s /q %FIREMODELSDIR%
+if exist %CFASTDISTDIR%       rmdir /s /q %CFASTDISTDIR%
+mkdir %FIREMODELSDIR%
+mkdir %CFASTDISTDIR%
+mkdir %CFASTDISTDIR%\Examples
+mkdir %CFASTDISTDIR%\Documents
+mkdir %FIREMODELSDIR%\Uninstall
 
-set SMVDISTDIR=%DISTDIR%\..\SMV6
+set SMVDISTDIR=%CFASTDISTDIR%\..\SMV6
 if exist %SMVDISTDIR% rmdir /s /q %SMVDISTDIR%
 mkdir %SMVDISTDIR%
 mkdir %SMVDISTDIR%\textures
 
 echo ***Copying CFAST executables
 
-call :COPY  %bindir%\CData.exe                %DISTDIR%\
+call :COPY  %bindir%\CData.exe                %CFASTDISTDIR%\
 if %build_cedit% == 0 goto skip_build_cedit
-   call :COPY  %bindir%\CEdit.exe             %DISTDIR%\
+   call :COPY  %bindir%\CEdit.exe             %CFASTDISTDIR%\
 :skip_build_cedit
-call :COPY  %bindir%\CFAST.exe                %DISTDIR%\
-call :COPY  %vandvdir%\VandV_Calcs_win_64.exe                               %DISTDIR%\VandV_Calcs.exe
-call :COPY  %smvrepo%\Build\background\intel_win_64\background_win_64.exe   %DISTDIR%\background.exe
+call :COPY  %bindir%\CFAST.exe                %CFASTDISTDIR%\
+call :COPY  %vandvdir%\VandV_Calcs_win_64.exe                               %CFASTDISTDIR%\VandV_Calcs.exe
+call :COPY  %smvrepo%\Build\background\intel_win_64\background_win_64.exe   %CFASTDISTDIR%\background.exe
 
 if %build_cedit% == 0 goto skip_build_cedit2
    echo ***Copying CEdit DLLs
 
-   call :COPY  %bindir%\C1.C1Pdf.4.8.dll                %DISTDIR%\
-   call :COPY  %bindir%\C1.C1Report.4.8.dll             %DISTDIR%\
-   call :COPY  %bindir%\C1.Zip.dll                      %DISTDIR%\
-   call :COPY  %bindir%\C1.Win.4.8.dll                  %DISTDIR%\
-   call :COPY  %bindir%\C1.Win.BarCode.4.8.dll          %DISTDIR%\
-   call :COPY  %bindir%\C1.Win.C1Document.4.8.dll       %DISTDIR%\
-   call :COPY  %bindir%\C1.Win.C1DX.4.8.dll             %DISTDIR%\
-   call :COPY  %bindir%\C1.Win.C1FlexGrid.4.8.dll       %DISTDIR%\
-   call :COPY  %bindir%\C1.Win.C1Report.4.8.dll         %DISTDIR%\
-   call :COPY  %bindir%\C1.Win.C1ReportDesigner.4.8.dll %DISTDIR%\
-   call :COPY  %bindir%\C1.Win.C1Sizer.4.8.dll          %DISTDIR%\
-   call :COPY  %bindir%\C1.Win.ImportServices.4.8.dll   %DISTDIR%\
-   call :COPY  %bindir%\NPlot.dll 				        %DISTDIR%\
+   call :COPY  %bindir%\C1.C1Pdf.4.8.dll                %CFASTDISTDIR%\
+   call :COPY  %bindir%\C1.C1Report.4.8.dll             %CFASTDISTDIR%\
+   call :COPY  %bindir%\C1.Zip.dll                      %CFASTDISTDIR%\
+   call :COPY  %bindir%\C1.Win.4.8.dll                  %CFASTDISTDIR%\
+   call :COPY  %bindir%\C1.Win.BarCode.4.8.dll          %CFASTDISTDIR%\
+   call :COPY  %bindir%\C1.Win.C1Document.4.8.dll       %CFASTDISTDIR%\
+   call :COPY  %bindir%\C1.Win.C1DX.4.8.dll             %CFASTDISTDIR%\
+   call :COPY  %bindir%\C1.Win.C1FlexGrid.4.8.dll       %CFASTDISTDIR%\
+   call :COPY  %bindir%\C1.Win.C1Report.4.8.dll         %CFASTDISTDIR%\
+   call :COPY  %bindir%\C1.Win.C1ReportDesigner.4.8.dll %CFASTDISTDIR%\
+   call :COPY  %bindir%\C1.Win.C1Sizer.4.8.dll          %CFASTDISTDIR%\
+   call :COPY  %bindir%\C1.Win.ImportServices.4.8.dll   %CFASTDISTDIR%\
+   call :COPY  %bindir%\NPlot.dll 				        %CFASTDISTDIR%\
 :skip_build_cedit2
 
 echo ***Copying CFAST example files
 
-call :COPY  %bindir%\Data\Users_Guide_Example.in %DISTDIR%\Examples\
-call :COPY  %docdir%\CData_Guide\Examples\*.in   %DISTDIR%\Examples\
+call :COPY  %bindir%\Data\Users_Guide_Example.in %CFASTDISTDIR%\Examples\
+call :COPY  %docdir%\CData_Guide\Examples\*.in   %CFASTDISTDIR%\Examples\
 
 echo ***Copying CFAST documentation
 
@@ -95,13 +97,12 @@ echo.
 echo ***Creating installer
 echo ***Copying Uninstall files
 
-call :COPY  %bundleinfo%\uninstall.bat        %DISTDIR%\Uninstall
-call :COPY  %bundleinfo%\uninstall_cfast.bat  %DISTDIR%\Uninstall\uninstall_base.bat 
-call :COPY  %bundleinfo%\uninstall_cfast2.bat %DISTDIR%\Uninstall\uninstall_base2.bat 
-call :COPY  %bundleinfo%\uninstall_cfast2.bat %DISTDIR%\Uninstall\uninstall_base2.bat
 
-call :COPY  %smvrepo%\Build\set_path\intel_win_64\set_path_win_64.exe %DISTDIR%\set_path.exe
-call :COPY  %botrepo%\Bundle\smv\for_bundle\Shortcut                  %DISTDIR%\Shortcut.exe
+call :COPY  %botrepo%\Bundle\cfast\for_bundle\uninstall.bat           %FIREMODELSDIR%\Uninstall
+call :COPY  %botrepo%\Bundle\cfast\for_bundle\uninstall_cfast.bat     %FIREMODELSDIR%\Uninstall\uninstall_base.bat 
+call :COPY  %smvrepo%\Build\set_path\intel_win_64\set_path_win_64.exe %FIREMODELSDIR%\Uninstall\set_path.exe
+call :COPY  %botrepo%\Bundle\smv\for_bundle\Shortcut                  %FIREMODELSDIR%\Uninstall\shortcut.exe
+
 
 cd %CURDIR%
 
@@ -132,7 +133,7 @@ exit /b
 set infile=%1
 set fullfile=%PDFS%\%infile%.pdf
 IF NOT EXIST %fullfile% call :GETPDF %infile%
-IF EXIST %fullfile%       copy %fullfile% %DISTDIR%\Documents\ > Nul 2>&1
+IF EXIST %fullfile%       copy %fullfile% %CFASTDISTDIR%\Documents\ > Nul 2>&1
 IF NOT EXIST %fullfile%   echo ***Warning: %fullfile% does not exist
 exit /b
 
