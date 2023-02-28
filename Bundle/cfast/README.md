@@ -5,14 +5,32 @@ This directory contains scripts for building cfast bundles.
 ### Setting up repos for building a cfast bundle
 1. Go to the github website and fork the bot repo
 2. Create a directory named FireModels_cbundle in your home directory by opening a command shell and typing: 
-`mkdir %userprofile%\FireModels_cbundle`
-4. cd into FireModels_cbundle and clone the bot repo by typing: git clone https://github.com/username/bot.git where username is your github username.
-5. cd into FireModels_cbundle/bot/Bundle/cfast
-6. copy bundle_config.bat to %userprofile%\.bundle\bundle_config.bat .  Edit the settings in bundle_config.bat to match your computing environment.
+```
+mkdir %userprofile%\FireModels_cbundle
+```
+4. cd into FireModels_cbundle and clone the bot repo by typing: 
+```
+git clone https://github.com/username/bot.git 
+```
+where username is your github username.
+6. cd into FireModels_cbundle/bot/Bundle/cfast
+7. copy bundle_config.bat to %userprofile%\.bundle\bundle_config.bat .  Edit the settings in bundle_config.bat to match your computing environment.
 
 ### Building a bundle
-1. Get the CFAST manuals from a local cfastbot run or from a cfastbot runby typing type: copy_pubs_fromrepo if you ran cfast bot on your PC or copy_pubs_fromhost if you ran cfastbot on your Linux cluster.
-2. to build a bundle, type: build_bundle
+1. Get the CFAST manuals by typing 
+```
+copy_pubs_fromrepo -r repo_root
+```
+or 
+```
+copy_pubs_fromhost
+```
+depending on whether you ran cfastbot on your PC or a linux cluster. Both scripts put the manuals (pdf files) in the directory %userprofile%\.cfast\PDFS 
+which is where the cfast bundle scripts get them.
+3. to build a bundle, type: 
+```
+build_bundle
+```
 
 ### build_bundle usage
 ```
