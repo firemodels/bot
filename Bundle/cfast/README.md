@@ -3,11 +3,8 @@
 This directory contains scripts for building cfast bundles.
 
 ### Setting up repos for building a cfast bundle
-1. Create a directory named FireModels_cbundle in your home directory to contain the bot, cfast and smv repos by opening a command shell and typing: 
-
-```
-mkdir %userprofile%\FireModels_cbundle
-```
+1. Create a directory named FireModels_cbundle in your home directory to contain the bot, cfast and smv repos by opening a command shell and typing: `
+mkdir %userprofile%\FireModels_cbundle`
 
 2. cd into FireModels_cbundle and clone the bot repo by typing: 
 
