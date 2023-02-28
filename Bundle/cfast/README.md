@@ -5,13 +5,17 @@ This directory contains scripts for building cfast bundles.
 ### Setting up repos for building a cfast bundle
 1. Go to the github website and fork the bot repo
 2. Create a directory named FireModels_cbundle in your home directory by opening a command shell and typing: 
+3. 
 ```
 mkdir %userprofile%\FireModels_cbundle
 ```
+
 3. cd into FireModels_cbundle and clone the bot repo by typing: 
+
 ```
 git clone https://github.com/username/bot.git 
 ```
+
 where username is your github username.
 4. cd into FireModels_cbundle/bot/Bundle/cfast
 5. copy bundle_config.bat to %userprofile%\.bundle\bundle_config.bat .  Edit the settings in bundle_config.bat to match your computing environment.
