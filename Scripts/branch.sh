@@ -1,8 +1,7 @@
 #!/bin/bash
 CUR=`pwd`
 showrepos="bot cad cfast cor exp fds fig out radcal smv"
-showrepos="bot cfast fds smv"
-setrepos="bot cfast fds smv"
+setrepos="bot fds smv"
 BRANCH=master
 SHOW=1
 
@@ -12,8 +11,8 @@ echo ""
 echo "Options:"
 echo "-h - display this message"
 echo "-b branch - set branch to branch (default: $BRANCH)"
-echo "-s - show branches on $showrepos"
-echo "-S - set branches on $setrepos"
+echo "-d - display branch on $showrepos repos"
+echo "-s - set branch on $setrepos repos"
 exit
 }
 
@@ -26,7 +25,7 @@ else
    exit
 fi
 
-while getopts 'b:hsS' OPTION
+while getopts 'b:hds' OPTION
 do
 case $OPTION  in
   b)
@@ -35,10 +34,10 @@ case $OPTION  in
   h)
    usage;
    ;;
-  s)
+  d)
    SHOW=1
    ;;
-  S)
+  s)
    SHOW=
    ;;
 esac
@@ -56,7 +55,7 @@ do
   echo $repo
   cd $FMROOT/$repo
   if [ "$SHOW" == "1" ]; then
-    git branch -a
+    git branch
   else
     git checkout $BRANCH
   fi
