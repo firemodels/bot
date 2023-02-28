@@ -1,4 +1,10 @@
 #!/bin/bash
+CURRENT_DIR=`pwd`
+SCRIPTDIR=`dirname "$(readlink -f "$0")"`
+cd $SCRIPTDIR/../../..
+FIREMODELS_ROOT=`pwd`
+export FIREMODELS_ROOT
+cd $CURRENT_DIR
 
 #---------------------------------------------
 #                   MKDIR
@@ -1032,7 +1038,7 @@ RUN_TEST_CASES ()
 
 # make sure we can find qfds.sh 
   QFDS=
-  QFDSDIR=$FIREMODELS/fds/Utilities/Scripts
+  QFDSDIR=$FIREMODELS_ROOT/fds/Utilities/Scripts
   if [ -d $QFDSDIR ]; then
     cd $QFDSDIR
     QFDS=`pwd`/qfds.sh
@@ -1045,18 +1051,12 @@ RUN_TEST_CASES ()
     echo "***error: qfds.sh not found, test cases not run"
     return 1
   fi
-  if [ "$FIREMODELS" == "" ]; then
-    echo "***error: FIREMODELS environment variable not defined,"
-    echo "          test cases not run."
-    return 1
-  else
-    if [ ! -e $FIREMODELS/fds/Build/impi_intel_linux/fds_impi_intel_linux ]; then
-       echo "***error: fds executable not found.  Was expecting it at:"
-       echo "          $FIREMODELS/fds/Build/impi_intel_linux/fds_impi_intel_linux ,"
-       echo "          test cases not run."
-       return 1
-    fi
-  fi 
+  if [ ! -e $FIREMODELS_ROOT/fds/Build/impi_intel_linux/fds_impi_intel_linux ]; then
+     echo "***error: fds executable not found.  Was expecting it at:"
+     echo "          $FIREMODELS_ROOT/fds/Build/impi_intel_linux/fds_impi_intel_linux ,"
+     echo "          test cases not run."
+     return 1
+  fi
   
   cd $FDSOUTPUT_DIR
   for i in `seq 1 $NCASES_PER_QUEUE`; do

@@ -1,4 +1,11 @@
 #!/bin/bash
+CURRENT_DIR=`pwd`
+SCRIPTDIR=`dirname "$(readlink -f "$0")"`
+cd $SCRIPTDIR/../../..
+FIREMODELS_ROOT=`pwd`
+export FIREMODELS_ROOT
+cd $CURRENT_DIR
+
 
 # ---------------------------- usage ----------------------------------
 
@@ -25,12 +32,6 @@ QFDS_DIR=`pwd`
 cd $CURDIR
 JOBPREFIX=fds_build
 
-#*** define toplevel of the repos
-
-FDSROOT=~/FDS-SMV
-if [ "$FIREMODELS" != "" ]; then
-  FDSROOT=$FIREMODELS
-fi
 showscript=
 QUEUE=batch
 DB=
