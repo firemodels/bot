@@ -13,8 +13,7 @@ where username is your github username.
 3. cd into `FireModels_cbundle\bot\Bundle\cfast`
 
 4. copy bundle_config.bat to `%userprofile%\.bundle\bundle_config.bat`
-(create %userprofile%\.bundle first if it doesn't exist).  
-Edit the settings in bundle_config.bat to match your computing environment.
+(create %userprofile%\.bundle first if it doesn't exist). Edit the settings in bundle_config.bat to match your computing environment.
 
 ### Building a bundle
 1. Get the CFAST manuals by typing `copy_pubs_fromrepo -r repo_root` or `copy_pubs_fromhost` 
