@@ -1,7 +1,7 @@
 @echo off
 
 set clone=
-set bundle_hostname=
+set bundle_host=
 set bundle_firebot_home=
 set bundle_smokebot_home=
 set FDS_HASH=
@@ -25,8 +25,8 @@ set default_hostname=
 set default_firebot_home=
 set default_smokebot_home=
 
-if x"%bundle_hostname%" == "x" goto def1
-  set default_hostname=[default: %bundle_hostname%]
+if x"%bundle_host%" == "x" goto def1
+  set default_hostname=[default: %bundle_host%]
 :def1
 
 if x"%bundle_firebot_home%" == "x" goto def2
@@ -89,7 +89,7 @@ if "x%bad_hash%" == "x" goto badhash
 
 ::--- make sure hostname is defined
 
-if NOT x"%bundle_hostname%" == "x" goto error1
+if NOT x"%bundle_host%" == "x" goto error1
   echo ****error:  hostname where firebot and smokebot was run not defined
   set abort=1
 :error1
@@ -124,7 +124,7 @@ set email=%botrepo%\Scripts\email_insert.bat
 set emailexe=%userprofile%\bin\mailsend.exe
 if "x%emailto%" == "x" goto endif5
   if exist %emailexe% goto endif5
-    echo ***warrning: email program %emailexe% does not exist
+    echo ***warning: email program %emailexe% does not exist
     set emailto=
 :endif5
 
@@ -222,7 +222,7 @@ if "x%SMV_TAG%" == "x" goto skip_smvtag
 echo             SMV repo tag: %SMV_TAG%                     >> %logfile%
 :skip_smvtag
 
-echo    firebot/smokebot host: %bundle_hostname%             >> %logfile%
+echo    firebot/smokebot host: %bundle_host%             >> %logfile%
 echo   firebot home directory: %bundle_firebot_home%         >> %logfile%
 echo        FDS pub directory: %FDS_PUBS_DIR%                >> %logfile%
 echo  smokebot home directory: %bundle_smokebot_home%        >> %logfile%
@@ -296,7 +296,7 @@ echo Copying fds pubs
 echo.
 
 cd %CURDIR%
-call copy_pubs firebot  %FDS_PUBS_DIR%   %bundle_hostname% || exit /b 1
+call copy_pubs firebot  %FDS_PUBS_DIR%   %bundle_host% || exit /b 1
 
 echo.
 echo ------------------------------------------------------
@@ -305,7 +305,7 @@ echo Copying smv pubs
 echo.
 
 cd %CURDIR%
-call copy_pubs smokebot %SMV_PUBS_DIR% %bundle_hostname% || exit /b 1
+call copy_pubs smokebot %SMV_PUBS_DIR% %bundle_host% || exit /b 1
 
 echo.
 echo ------------------------------------------------------
@@ -324,7 +324,7 @@ if "x%upload_bundle%" == "x" goto skip_upload
   echo ------------------------------------------------------
   echo uploading bundle
   echo.
-  call upload_bundle %FDS_REVISION_BUNDLER% %SMV_REVISION_BUNDLER% %nightly% %bundle_hostname% || exit /b 1
+  call upload_bundle %FDS_REVISION_BUNDLER% %SMV_REVISION_BUNDLER% %nightly% %bundle_host% || exit /b 1
 :skip_upload
 
 if "x%emailto%" == "x" goto endif6
@@ -362,7 +362,7 @@ echo -U - do not upload bundle
 echo -X fdstag - tag the fds repo using fdstag
 echo -Y smvtag - tag the smv repo using smvtag
 exit /b 0
-set bundle_hostname=
+set bundle_host=
 set bundle_firebot_home=
 set bundle_smokebot_home=
 
@@ -407,7 +407,7 @@ set bundle_smokebot_home=
    exit /b
  )
  if "%1" EQU "-H" (
-   set bundle_hostname=%2
+   set bundle_host=%2
    set valid=1
    shift
  )
