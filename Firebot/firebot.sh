@@ -999,7 +999,7 @@ check_compile_smv()
 {
   # Check for errors in SMV release compilation
   smv_errors=
-  cd $smvrepo/Build/smokeview/${COMPILER}_${platform}${smvsize}
+  cd $smvrepo/Build/smokeview/${SMVCOMPILER}_${platform}${smvsize}
   if [ -e "smokeview_${platform}${smvsize}" ]; then
     smv_release_success=true
     CP smokeview_${platform}${smvsize} $LATESTAPPS_DIR/smokeview
