@@ -23,11 +23,13 @@ fi
 platform="linux"
 platform2="LINUX"
 platform3="lnx"
+COMPILER=intel
 if [ "`uname`" == "Darwin" ]
 then
   platform="osx"
   platform2="OSX"
   platform3="osx"
+  COMPILER=gnu
 fi
 
 SCP ()
@@ -85,14 +87,14 @@ CPDIR ()
 }
 
 
-BACKGROUNDDIR=$REMOTESVNROOT/smv/Build/background/intel_${platform}_64
-SMVDIR=$REMOTESVNROOT/smv/Build/smokeview/intel_${platform}_64
-SMVDIRQ=$REMOTESVNROOT/smv/Build/smokeview/intel_${platform}_q_64
-SMZDIR=$REMOTESVNROOT/smv/Build/smokezip/intel_${platform}_64
-SMDDIR=$REMOTESVNROOT/smv/Build/smokediff/intel_${platform}_64
-WIND2FDSDIR=$REMOTESVNROOT/smv/Build/wind2fds/intel_${platform}_64
-HASHFILEDIR=$REMOTESVNROOT/smv/Build/hashfile/intel_${platform}_64
-FLUSHFILEDIR=$REMOTESVNROOT/smv/Build/flush/intel_${platform}_64
+BACKGROUNDDIR=$REMOTESVNROOT/smv/Build/background/${COMPILER}_${platform}_64
+SMVDIR=$REMOTESVNROOT/smv/Build/smokeview/${COMPILER}_${platform}_64
+SMVDIRQ=$REMOTESVNROOT/smv/Build/smokeview/${COMPILER}_${platform}_q_64
+SMZDIR=$REMOTESVNROOT/smv/Build/smokezip/${COMPILER}_${platform}_64
+SMDDIR=$REMOTESVNROOT/smv/Build/smokediff/${COMPILER}_${platform}_64
+WIND2FDSDIR=$REMOTESVNROOT/smv/Build/wind2fds/${COMPILER}_${platform}_64
+HASHFILEDIR=$REMOTESVNROOT/smv/Build/hashfile/${COMPILER}_${platform}_64
+FLUSHFILEDIR=$REMOTESVNROOT/smv/Build/flush/${COMPILER}_${platform}_64
 FORBUNDLE=$SVNROOT/bot/Bundle/smv/for_bundle
 WEBGLDIR=$SVNROOT/bot/Bundle/smv/for_bundle/webgl
 UTILSCRIPTDIR=$SVNROOT/smv/Utilities/Scripts
@@ -100,7 +102,7 @@ PLATFORMDIR=$RELEASE$revision\_${platform3}
 UPDATER=$SVNROOT/bot/Bundle/smv/scripts//make_updater.sh
 uploads=$HOME/.bundle/uploads
 uploadscp=.bundle/uploads
-flushfile=$SVNROOT/smv/Build/flush/intel_${platform}_64/flush_${platform}_64
+flushfile=$SVNROOT/smv/Build/flush/${COMPILER}_${platform}_64/flush_${platform}_64
 
 if [ ! -e $HOME/.bundle ]; then
   mkdir $HOME/.bundle
