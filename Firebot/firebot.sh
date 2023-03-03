@@ -650,13 +650,13 @@ compile_smv_utilities()
 # smokeview libraries
   echo "   Smokeview"
   echo "      libraries"
-  cd $smvrepo/Build/LIBS/${COMPILER}_${platform}${smvsize}
+  cd $smvrepo/Build/LIBS/${SMVCOMPILER}_${platform}${smvsize}
   ./make_LIBS.sh >> $OUTPUT_DIR/stage3a 2>&1
   echo "" >> $OUTPUT_DIR/stage3a 2>&1
     
 # smokezip:
   echo "      smokezip"
-  cd $smvrepo/Build/smokezip/${COMPILER}_${platform}${smvsize}
+  cd $smvrepo/Build/smokezip/${SMVCOMPILER}_${platform}${smvsize}
   rm -f *.o smokezip_${platform}${smvsize}
 
   ./make_smokezip.sh >> $OUTPUT_DIR/stage3a 2>&1
@@ -665,7 +665,7 @@ compile_smv_utilities()
 
 # smokediff:
   echo "      smokediff"
-  cd $smvrepo/Build/smokediff/${COMPILER}_${platform}${smvsize}
+  cd $smvrepo/Build/smokediff/${SMVCOMPILER}_${platform}${smvsize}
   rm -f *.o smokediff_${platform}${smvsize}
   ./make_smokediff.sh >> $OUTPUT_DIR/stage3a 2>&1
   CP smokediff_${platform}${smvsize} $LATESTAPPS_DIR/smokediff
@@ -673,14 +673,14 @@ compile_smv_utilities()
 
 # background
   echo "      background"
-  cd $smvrepo/Build/background/${COMPILER}_${platform}${smvsize}
+  cd $smvrepo/Build/background/${SMVCOMPILER}_${platform}${smvsize}
   rm -f *.o background_${platform}${smvsize}
   ./make_background.sh >> $OUTPUT_DIR/stage3a 2>&1
   CP background_${platform}${smvsize} $LATESTAPPS_DIR/background
 
 # wind2fds:
   echo "      wind2fds"
-  cd $smvrepo/Build/wind2fds/${COMPILER}_${platform}${smvsize}
+  cd $smvrepo/Build/wind2fds/${SMVCOMPILER}_${platform}${smvsize}
   rm -f *.o wind2fds_${platform}${smvsize}
   ./make_wind2fds.sh >> $OUTPUT_DIR/stage3a 2>&1
   CP wind2fds_${platform}${smvsize} $LATESTAPPS_DIR/wind2fds
@@ -688,7 +688,7 @@ compile_smv_utilities()
 
 # hashfile:
   echo "      hashfile"
-  cd $smvrepo/Build/hashfile/${COMPILER}_${platform}${smvsize}
+  cd $smvrepo/Build/hashfile/${SMVCOMPILER}_${platform}${smvsize}
   rm -f *.o hashfile_${platform}${smvsize}
   ./make_hashfile.sh >> $OUTPUT_DIR/stage3a 2>&1
   CP hashfile_${platform}${smvsize} $LATESTAPPS_DIR/hashfile
@@ -946,7 +946,7 @@ compile_smv_db()
 {
 # Clean and compile SMV debug
   echo "      debug"
-  cd $smvrepo/Build/smokeview/${COMPILER}_${platform}${smvsize}
+  cd $smvrepo/Build/smokeview/${SMVCOMPILER}_${platform}${smvsize}
   ./make_smokeview_db.sh &> $OUTPUT_DIR/stage3b
 }
 
@@ -986,7 +986,7 @@ compile_smv()
 {
    # Clean and compile SMV
   echo "      release"
-  cd $smvrepo/Build/smokeview/${COMPILER}_${platform}${smvsize}
+  cd $smvrepo/Build/smokeview/${SMVCOMPILER}_${platform}${smvsize}
   echo "" > $OUTPUT_DIR/stage3c 2>&1
   ./make_smokeview.sh >> $OUTPUT_DIR/stage3c 2>&1
 }
@@ -999,7 +999,7 @@ check_compile_smv()
 {
   # Check for errors in SMV release compilation
   smv_errors=
-  cd $smvrepo/Build/smokeview/${COMPILER}_${platform}${smvsize}
+  cd $smvrepo/Build/smokeview/${SMVCOMPILER}_${platform}${smvsize}
   if [ -e "smokeview_${platform}${smvsize}" ]; then
     smv_release_success=true
     CP smokeview_${platform}${smvsize} $LATESTAPPS_DIR/smokeview
@@ -1964,9 +1964,11 @@ FDS_release_success=false
 
 platform="linux"
 platform2="Linux"
+SMVCOMPILER=intel
 if [ "`uname`" == "Darwin" ] ; then
   platform="osx"
   platform2="OSX"
+  SMVCOMPILER=gnu
 fi
 export platform
 
