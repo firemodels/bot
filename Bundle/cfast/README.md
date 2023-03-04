@@ -3,17 +3,32 @@
 This directory contains scripts for building cfast bundles.
 
 ### Setting up repos for building a cfast bundle
-1. Go to the github website and fork the bot repo
-2. Create a directory named FireModels_cbundle in your home directory by opening a CMD shell and typing: mkdir %userprofile%\FireModels_cbundle
-3. cd into FireModels_cbundle and clone the bot repo by typing: git clone https://github.com/username/bot.git where username is your github username.
-4. cd into FireModels_cbundle/bot/Bundle/cfast
-5. copy bundle_config.bat to %userprofile%\.bundle\bundle_config.bat .  Edit the settings in bundle_config.bat to match your computing environment.
+1. Create a directory named FireModels_cbundle in your home directory that will contain the bot, cfast and smv repos.
+Open a command shell and type: `mkdir %userprofile%\FireModels_cbundle` .  Note this directory name is arbitrary.
+
+2. cd into FireModels_cbundle and clone the bot repo by typing: `git clone https://github.com/firemodels/bot.git` .
+If your forked the bot repo you could type `git clone https://github.com/username/bot.git` instead
+where username is your github username.
+
+3. cd into `FireModels_cbundle\bot\Bundle\cfast`
+
+4. copy bundle_config.bat to `%userprofile%\.bundle\bundle_config.bat`
+(create %userprofile%\.bundle first if it doesn't exist). Edit the settings in bundle_config.bat to match your computing environment.
 
 ### Building a bundle
-1. Get the CFAST manuals from a local cfastbot run or from a cfastbot runby typing type: copy_pubs_fromrepo if you ran cfast bot on your PC or copy_pubs_fromhost if you ran cfastbot on your Linux cluster.
-2. to build a bundle, type: build_bundle
+1. Get the CFAST manuals by typing `copy_pubs_fromrepo -r repo_root` or `copy_pubs_fromhost` 
+depending on whether you ran cfastbot on your PC or a linux cluster. 
+If you ran cfastbot on your PC, `repo_root` is the directory containing the `cfast` repo where you
+ran cfastbot.  Both scripts put the manuals (pdf files) into the directory `%userprofile%\.cfast\PDFS`
+which is where the cfast bundle scripts obtain them.
+
+3. Finally, to build a bundle, type: `build_bundle`
 
 ### build_bundle usage
+There are several options for building a bundle. To build a bundle without CEdit (perhaps you don't have
+license keys) use the -E option.  To build using apps already built, use the -I option.  This is mainly
+used when developing the script. To run the script automatically from the Windows task manager, use the -f 
+option so the script won't pause and display a warning message about cloning repos.
 ```
 build_bundle [options]
 

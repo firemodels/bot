@@ -83,9 +83,9 @@ copy %outbase%.zip %uploaddir%\%outbase%.zip   >> %stage3out% 2>&1
 
 echo ***CFAST installer built
 
-if NOT x%upload% == x1 goto endif1
+if x%upload% == x0 goto endif1
   cd %CURDIR%
-  call upload_cfast_bundle %cfastrev% %smvrev%
+  call upload_cfast_bundle %cfastrev% %smvrev% %upload%
   echo ***CFAST installer uploaded
 :endif1
 

@@ -39,14 +39,9 @@ if "%platform%" == "Windowsgnu" (
 
 :: gnuosx
 
-if "%platform%" == "OSXgnu" (
+if "%platform%" == "OSX" (
   title building libraries for osx using gnu
-  start /wait "cleaning osx libraries"    plink %plink_options% %osx_logon% %linux_svn_root%/smv/Build/LIBS/gnu_osx_64/make_LIBS.sh -t clean
-  start "building osx glui library" plink %plink_options% %osx_logon% %linux_svn_root%/smv/Build/LIBS/gnu_osx_64/make_LIBS.sh -t glui
-  start "building osx zlib library" plink %plink_options% %osx_logon% %linux_svn_root%/smv/Build/LIBS/gnu_osx_64/make_LIBS.sh -t zlib
-  start "building osx jpeg library" plink %plink_options% %osx_logon% %linux_svn_root%/smv/Build/LIBS/gnu_osx_64/make_LIBS.sh -t jpeg
-  start "building osx png library"  plink %plink_options% %osx_logon% %linux_svn_root%/smv/Build/LIBS/gnu_osx_64/make_LIBS.sh -t png
-  start "building osx gd library"   plink %plink_options% %osx_logon% %linux_svn_root%/smv/Build/LIBS/gnu_osx_64/make_LIBS.sh -t gd
+  start "building osx glui library" /wait plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/run_command.sh smv/Build/LIBS/gnu_osx_64 make_LIBS.sh
   goto eof
 )
 
@@ -66,7 +61,7 @@ if "%platform%" == "osxquartz" (
 
 :: osx
 
-if "%platform%" == "OSX" (
+if "%platform%" == "OSXxxx" (
   title building libraries for osx - non Quartz
   start /wait "cleaning osx libraries" plink %plink_options% %osx_logon% %linux_svn_root%/smv/Build/LIBS/intel_osx_64/make_LIBS.sh -t clean
   start "building osx glui library" plink %plink_options% %osx_logon% %linux_svn_root%/smv/Build/LIBS/intel_osx_64/make_LIBS.sh -Q -t glui
