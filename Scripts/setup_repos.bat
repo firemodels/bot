@@ -14,10 +14,10 @@ if not exist ..\.gitbot goto skip1
 
 set fdsrepos=exp fds fig out smv
 set fdssmvrepos=fds smv
-set cfastsmvrepos=cfast smv nplot
 set smvrepos=cfast fds fig smv
-set cfastrepos=cfast exp fig smv nplot
-set allrepos= cad cfast cor exp fds fig out radcal smv
+set cfastsmvrepos=cfast         smv nplot
+set    cfastrepos=cfast exp fig smv nplot
+set allrepos= cad cfast cor exp fds fig out radcal smv nplot
 set wikiwebrepos= fds.wiki fds-smv
 set repos=%fdsrepos%
 set WIKIWEB=0
@@ -169,11 +169,11 @@ echo.
    set valid=1
    set repos=%allrepos%
  )
- if /I "%1" EQU "-c" (
+ if "%1" EQU "-c" (
    set valid=1
    set repos=%cfastrepos%
  )
- if /I "%1" EQU "-C" (
+ if "%1" EQU "-C" (
    set valid=1
    set erase_repos=1
    set repos=%cfastsmvrepos%
@@ -221,6 +221,7 @@ echo.
 echo Options:
 echo -a - setup all repos: %allrepos%
 echo -c - setup repos used by cfastbot: %cfastrepos%
+echo -C - setup repos used by the cfast bundle scripts: %cfastsmvrepos%
 echo -f - setup repos used by firebot: %fdsrepos%
 echo -h - display this message%
 echo -s - setup repos used by smokebot: %smvrepos%
