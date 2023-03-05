@@ -11,7 +11,6 @@ if %upload% == 0 exit /b
 set BUNDLEDIR=%userprofile%\.bundle\uploads
 set basename=%cfast_revision%_%smv_revision%_tst_win
 set fullfile=%BUNDLEDIR%\%basename%.exe
-set plink_options=-no-antispoof
 
 set configfile=%userprofile%\.bundle\bundle_config.bat
 if not exist %configfile% echo ***error: %userprofile%\bundle_config.bat does not exist
@@ -22,13 +21,22 @@ call check_config || exit /b 1
 if NOT EXIST %fullfile% echo ***Error: bundle file %basename%.exe does not exist in %BUNDLEDIR%
 if NOT EXIST %fullfile% exit /b 1
 
-:: upload to linux computer
-echo ***Uploading %fullfile% to %bundle_host%
+echo ***Uploading %fullfile% to GitHub
 
-pscp -P 22 %fullfile% %bundle_host%:.bundle/uploads/.
+set CURDIR=%CD%
 
-if %upload% == 2 exit /b
-:: upload to google drive
-plink %plink_options% %bundle_logon%@%bundle_host% %bundle_root%/bot/Bundle/cfast/upload_cfast_bundle.sh .bundle/uploads %basename%
+cd ..\..\Scripts
+set SCRIPTDIR=%CD%
 
+cd %CURDIR%\
+
+cd ..\..\..\cftest
+
+echo *** Deleting tag: CFTEST
+call %SCRIPTDIR%\delete_release -t CFTEST
+
+echo *** Adding release: tag: CFTEST title: %cfast_revision%_%smv_revision%
+call %SCRIPTDIR%\add_release -t CFTEST -T %cfast_revision%_%smv_revision% -f %fullfile%
+
+cd %CURDIR%
 exit /b 0

@@ -4,7 +4,6 @@ set tag=TEST
 
 call :getopts %*
 if %stopscript% == 1 exit /b
-
 gh release delete %tag% -y
 
 goto eof
@@ -15,7 +14,6 @@ goto eof
  set stopscript=0
  if (%1)==() exit /b
  set valid=0
- set arg=%1
  if /I "%1" EQU "-h" (
    call :usage
    set stopscript=1
@@ -23,7 +21,8 @@ goto eof
  )
  if "%1" EQU "-t" (
    set valid=1
-   set tag=%1
+   set tag=%2
+   shift
  )
  if %valid% == 0 (
    echo.
@@ -34,6 +33,7 @@ goto eof
    set stopscript=1
    exit /b 1
  )
+ shift
 if not (%1)==() goto getopts
 exit /b 0
 
@@ -46,7 +46,7 @@ echo   delete_release -t tag
 echo.
 echo Options:
 echo -h - display this message%
-echo -t - tag (default: %tag%)
+echo -t tag - delete release with tag tag (default: %tag%)
 exit /b 0
 
 :eof

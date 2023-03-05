@@ -6,7 +6,8 @@ set "title=test"
 call :getopts %*
 if %stopscript% == 1 exit /b
 
-gh release create --generate-notes %tag% %file% -t "%title%
+echo adding release: %file% with tag: %tag% and title: %title%
+gh release create --generate-notes %tag% %file% -t "%title%"
 
 goto eof
 
@@ -16,7 +17,7 @@ goto eof
  set stopscript=0
  if (%1)==() exit /b
  set valid=0
- set arg=%1
+ set "arg=%1"
  if /I "%1" EQU "-h" (
    call :usage
    set stopscript=1
@@ -24,25 +25,29 @@ goto eof
  )
  if "%1" EQU "-t" (
    set valid=1
-   set tag=%1
+   set tag=%2
+   shift
  )
  if "%1" EQU "-T" (
    set valid=1
-   set "title=%1"
+   set title=%2
+   shift
  )
  if /I "%1" EQU "-f" (
    set valid=1
-   set file=%1
+   set file=%2
+   shift
  )
  if %valid% == 0 (
    echo.
-   echo ***Error: the input argument %arg% is invalid
+   echo ***Error: the input argument "%arg%" is invalid
    echo.
    echo Usage:
    call :usage
    set stopscript=1
    exit /b 1
  )
+shift
 if not (%1)==() goto getopts
 exit /b 0
 
