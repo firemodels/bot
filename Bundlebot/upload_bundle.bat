@@ -91,4 +91,14 @@ pscp -P 22 %bundleshafile% %upload_host%:.bundle/bundles/.
 :: upload to google drive
 plink %plink_options% %linux_logon% %linux_svn_root%/bot/Bundlebot/upload_bundle.sh $HOME/.bundle/bundles %basename% %nightly_arg% win %GOOGLE_DIR%
 
+::cd  %curdir%\..\..\fdstest
+
+::echo *** Deleting tag: FDSTEST
+::call %reporoot%\bot\Scripts\delete_release -t FDSTEST
+
+::echo *** Adding release: tag: FDSTEST title: %fds_version_arg%_%smv_version_arg%_%FDSREPODATE%%nightly%
+::call %reporoot%\bot\Scripts\add_release -t FDSTEST -T %fds_version_arg%_%smv_version_arg%_%FDSREPODATE%%nightly% -f %bundlefile%
+
+::cd %curdir%
+
 exit /b 0
