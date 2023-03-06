@@ -25,6 +25,11 @@ set CURDIR=%CD%
 start chrome https://github.com/gforney/night_bundle/releases/tag/TEST_BUNDLES
 
 cd %svn_root%\night_bundle
+
+gh release view TEST_BUNDLES | grep SMV | grep win | gawk "{print $2}" > files_win.out
+for /F "tokens=*" %%A in (files.out) do gh release delete-asset TEST_BUNDLES %%A -y
+erase files_win.out
+
 gh release upload TEST_BUNDLES %uploaddir%\%smv_revision%_win.sha1 --clobber
 gh release upload TEST_BUNDLES %uploaddir%\%smv_revision%_win.exe  --clobber
 

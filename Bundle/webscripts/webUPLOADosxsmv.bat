@@ -23,10 +23,17 @@ set uploaddir=%userprofile%\.bundle\uploads
 set release_repo=%linux_svn_root%/night_bundle
 set CURDIR=%CD%
 
-start chrome https://github.com/gforney/night_bundle/releases/tag/TEST_BUNDLES
+cd %svn_root%\night_bundle
+
+set outfile=%TEMP%\files_osx.out
+gh release view TEST_BUNDLES | grep SMV | grep osx | gawk "{print $2}" > %outfile%
+for /F "tokens=*" %%A in (%outfile%) do gh release delete-asset TEST_BUNDLES %%A -y
+erase %outfile%
 
 call :uploadfile                %smv_revision%_osx.sh     osx sh
 call :uploadfile                %smv_revision%_osx.sha1   osx sha1
+
+start chrome https://github.com/gforney/night_bundle/releases/tag/TEST_BUNDLES
 
 echo.
 echo upload complete
