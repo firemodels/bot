@@ -23,7 +23,7 @@ set uploaddir=%userprofile%\.bundle\uploads
 set release_repo=%linux_svn_root%/night_bundle
 set CURDIR=%CD%
 
-start chrome https://drive.google.com/drive/u/0/folders/0B_wB1pJL2bFQc1F4cjJWY2duWTA?resourcekey=0-J_yHat7iJoBp1fk6QS8gMA
+start chrome https://github.com/gforney/night_bundle/releases/tag/TEST_BUNDLES
 
 call :uploadfile                %smv_revision%_lnx.sh     lnx sh
 call :uploadfile                %smv_revision%_lnx.sha1   lnx sha1
