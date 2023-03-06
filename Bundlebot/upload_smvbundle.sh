@@ -3,6 +3,7 @@ FROM_DIR=$1
 FROM_FILE=$2
 PLATFORM=$3
 EXT=$4
+RELEASE_BUNDLE=$5
 
 scriptdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
@@ -30,3 +31,9 @@ else
   echo "$FROM_FILE uploaded."
 fi
 echo ""
+
+if [ "$RELEASE_BUNDLE" != "" ]; then
+  cd $RELEASE_BUNDLE
+  gh release upload TEST_BUNDLES $HOME/$FROM_DIR/$FROM_FILE  --clobber
+fi
+

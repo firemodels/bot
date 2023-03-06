@@ -27,6 +27,10 @@ start chrome https://drive.google.com/drive/u/0/folders/0B_wB1pJL2bFQc1F4cjJWY2d
 call :uploadfile %uploaddir% %smv_revision%_win.exe    win exe
 call :uploadfile %uploaddir% %smv_revision%_win.sha1   win sha1
 
+cd %svn_root%\night_bundle
+gh release upload TEST_BUNDLES %uploaddir%\%smv_revision%_win.sha1 --clobber
+gh release upload TEST_BUNDLES %uploaddir%\%smv_revision%_win.exe  --clobber
+
 echo.
 echo upload complete
 pause
