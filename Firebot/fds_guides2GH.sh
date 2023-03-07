@@ -14,7 +14,7 @@ cd /home2/smokevis2/firebot/FireModels_clone/fds/Manuals/
 MANDIR=`pwd`
 cd $CURDIR
 
-cd ../../night_bundle
+cd ../../test_bundles
 TESTBUNDLEDIR=`pwd`
 cd $CURDIR
 
@@ -25,7 +25,7 @@ UPLOADHASH ()
   if [ -e $DIR/$FILE ]; then
     cd $TESTBUNDLEDIR
     echo ***Uploading $FILE
-    gh release upload TEST_BUNDLES $DIR/$FILE --clobber
+    gh release upload TEST $DIR/$FILE --clobber
   fi
 }
 
@@ -36,7 +36,7 @@ UPLOADGUIDE ()
   if [ -e $FROMDIR/$FILEnew ]; then
     cd $TESTBUNDLEDIR
     echo ***Uploading $FILEnew
-    gh release upload TEST_BUNDLES $FROMDIR/$FILEnew --clobber
+    gh release upload TEST $FROMDIR/$FILEnew --clobber
   fi
 }
 UPLOADFIGURES ()
@@ -59,7 +59,7 @@ UPLOADFIGURES ()
   gzip $tarfile
   cd $TESTBUNDLEDIR
   echo ***Uploading $tarfile.gz
-  gh release upload TEST_BUNDLES $TARHOME/$tarfile.gz --clobber
+  gh release upload TEST $TARHOME/$tarfile.gz --clobber
 }
 
 if [ -e $TESTBUNDLEDIR ] ; then
