@@ -2,6 +2,7 @@
 
 RELEASEREPO=test_bundles
 RELEASEBRANCH=TEST
+SHA1EXT=shat1_repodate
 
 #run time libraries are located in
 #  $HOME/.bundle/BUNDLE/MPI
@@ -320,8 +321,8 @@ if [ "$showparms" == "" ]; then
     echo ""
     echo "uploading installer"
     cd $REPO_ROOT/$RELEASEREPO
-    gh release upload $RELEASEBRANCH $bundle_dir/${installer_base_platform}.sh             --clobber
-    gh release upload $RELEASEBRANCH $bundle_dir/${installer_base_platform}.sha1_repodate  --clobber
+    gh release upload $RELEASEBRANCH $bundle_dir/${installer_base_platform}.sh        --clobber
+    gh release upload $RELEASEBRANCH $bundle_dir/${installer_base_platform}.$SHA1EXT  --clobber
   fi
 fi
 if [ "$ECHO" == "" ]; then

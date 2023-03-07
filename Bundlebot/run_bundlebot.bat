@@ -2,6 +2,7 @@
 
 set RELEASEREPO=test_bundles
 set RELEASEBRANCH=TEST
+set SHA1EXT=sha1_repodate
 
 set clone=
 set bundle_host=
@@ -343,8 +344,8 @@ if "x%upload_bundle%" == "x" goto skip_upload
   set /p basename=<%TEMP%\fds_smv_basename.txt
 
   set fullfilebase=%userprofile%\.bundle\bundles\%basename%
-  echo gh release upload %RELEASEBRANCH% %fullfilebase%.sha1_repodate --clobber
-  gh release upload %RELEASEBRANCH% %fullfilebase%.sha1_repodate --clobber
+  echo gh release upload %RELEASEBRANCH% %fullfilebase%.%SHA1EXT% --clobber
+  gh release upload %RELEASEBRANCH% %fullfilebase%.%SHA1EXT% --clobber
   
   echo gh release upload %RELEASEBRANCH% %fullfilebase%.exe  --clobber
   gh release upload %RELEASEBRANCH% %fullfilebase%.exe  --clobber
