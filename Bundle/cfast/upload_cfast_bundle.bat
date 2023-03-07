@@ -3,8 +3,10 @@ setlocal
 
 set cfast_revision=%1
 set smv_revision=%2
+set upload=%3%
 set nightly_arg=tst
 
+if %upload% == 0 exit /b
 
 set BUNDLEDIR=%userprofile%\.bundle\uploads
 set basename=%cfast_revision%_%smv_revision%_tst_win
@@ -25,6 +27,7 @@ echo ***Uploading %fullfile% to %bundle_host%
 
 pscp -P 22 %fullfile% %bundle_host%:.bundle/uploads/.
 
+if %upload% == 2 exit /b
 :: upload to google drive
 plink %plink_options% %bundle_logon%@%bundle_host% %bundle_root%/bot/Bundle/cfast/upload_cfast_bundle.sh .bundle/uploads %basename%
 
