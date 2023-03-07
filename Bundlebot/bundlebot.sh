@@ -1,5 +1,8 @@
 #!/bin/bash
 
+RELEASEREPO=test_bundles
+RELEASEBRANCH=TEST
+
 #run time libraries are located in
 #  $HOME/.bundle/BUNDLE/MPI
 
@@ -316,9 +319,9 @@ if [ "$showparms" == "" ]; then
   if [ "$UPLOAD_GITHUB" == "1" ]; then
     echo ""
     echo "uploading installer"
-    cd $REPO_ROOT/night_bundle
-    gh release upload TEST_BUNDLES $bundle_dir/${installer_base_platform}.sh             --clobber
-    gh release upload TEST_BUNDLES $bundle_dir/${installer_base_platform}.sha1_repodate  --clobber
+    cd $REPO_ROOT/$RELEASEREPO
+    gh release upload $RELEASEBRANCH $bundle_dir/${installer_base_platform}.sh             --clobber
+    gh release upload $RELEASEBRANCH $bundle_dir/${installer_base_platform}.sha1_repodate  --clobber
   fi
 fi
 if [ "$ECHO" == "" ]; then

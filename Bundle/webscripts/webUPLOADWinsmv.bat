@@ -1,5 +1,8 @@
 @echo off
 
+set RELEASEREPO=test_bundles
+set RELEASEBRANCH=TEST
+
 ::  batch file to build test or release Smokeview on a Windows, OSX or Linux system
 
 :: setup environment variables (defining where repository resides etc) 
@@ -22,17 +25,17 @@ call %envfile%
 set uploaddir=%userprofile%\.bundle\uploads
 set CURDIR=%CD%
 
-start chrome https://github.com/gforney/night_bundle/releases/tag/TEST_BUNDLES
+cd %svn_root%\%RELEASEREPO%
 
-cd %svn_root%\night_bundle
+set filelist=%TEMP%\smv_files_win.out
+gh release view %RELEASEBRANCH% | grep SMV | grep -v FDS | grep -v CFAST | grep win | gawk "{print $2}" > %filelist%
+for /F "tokens=*" %%A in (%filelist%) do gh release delete-asset %RELEASEBRANCH% %%A -y
+erase %filelist%
 
-gh release view TEST_BUNDLES | grep SMV | grep win | gawk "{print $2}" > files_win.out
-for /F "tokens=*" %%A in (files.out) do gh release delete-asset TEST_BUNDLES %%A -y
-erase files_win.out
+gh release upload %RELEASEBRANCH% %uploaddir%\%smv_revision%_win.sha1 --clobber
+gh release upload %RELEASEBRANCH% %uploaddir%\%smv_revision%_win.exe  --clobber
 
-gh release upload TEST_BUNDLES %uploaddir%\%smv_revision%_win.sha1 --clobber
-gh release upload TEST_BUNDLES %uploaddir%\%smv_revision%_win.exe  --clobber
-
+start chrome https://github.com/firemodels/%RELEASEREPO%/releases/tag/%RELEASEBRANCH%
 echo.
 echo upload complete
 pause
