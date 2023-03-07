@@ -20,5 +20,4 @@ call %envfile%
 cd %userprofile%\.bundle\uploads
 explorer .
 start chrome https://github.com/firemodels/smv/releases
-start chrome https://drive.google.com/drive/folders/0B_wB1pJL2bFQc1F4cjJWY2duWTA
 
