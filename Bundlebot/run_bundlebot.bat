@@ -52,7 +52,7 @@ if "x%stopscript%" == "x" goto endif2
   exit /b 1
 :endif2
 
-set nightly=tst
+set nightly=test
 set pub_dir=
 if NOT "x%BRANCH_NAME%" == "xrelease" goto skip_branch
   set nightly=rls
