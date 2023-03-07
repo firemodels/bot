@@ -300,8 +300,10 @@ cd ../..
 REPO_ROOT=`pwd`
 cd $CURDIR
 FDSREPODATE=`$REPO_ROOT/bot/Scripts/get_repo_info.sh $REPO_ROOT/fds 1`
-installer_base=${FDSREV}_${SMVREV}_${FDSREPODATE}
-installer_base_platform=${FDSREV}_${SMVREV}_${FDSREPODATE}_${BUNDLE_PREFIX_FILE}$platform
+FDSREPODATE=_${FDSREPODATE}
+FDSREPODATE=
+installer_base=${FDSREV}_${SMVREV}${FDSREPODATE}
+installer_base_platform=${FDSREV}_${SMVREV}${FDSREPODATE}_${BUNDLE_PREFIX_FILE}$platform
 if [[ "$showparms" == "" ]] && [[ "$OVERWRITE" == "" ]]; then
   installer_file=$bundle_dir/${installer_base_platform}.sh
   if [ -e $installer_file ]; then
