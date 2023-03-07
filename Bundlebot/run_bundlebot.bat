@@ -119,7 +119,7 @@ cd ..
 set botrepo=%CD%
 
 cd ..\%RELEASEREPO%
-set %RELEASEDIR%=%CD%
+set RELEASEDIR=%CD%
 
 cd %botrepo%
 
@@ -334,7 +334,7 @@ if "x%upload_bundle%" == "x" goto skip_upload
   echo uploading bundle
   echo.
 
-  cd %%RELEASEDIR%%
+  cd %RELEASEDIR%
 
   set filelist=%TEMP%\fds_smv_files_win.out
   gh release view %RELEASEBRANCH% | grep FDS | grep SMV | grep win | gawk "{print $2}" > %filelist%
