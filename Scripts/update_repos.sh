@@ -1,6 +1,6 @@
 #!/bin/bash
 CUR=`pwd`
-allrepos="bot cad cfast cor exp fds fig out radcal smv nightly_bundles"
+allrepos="bot cad cfast cor exp fds fig out radcal smv test_bundles"
 otherrepos="webpages wikis"
 BRANCH=master
 
