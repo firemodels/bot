@@ -74,6 +74,7 @@ call %repo_root%\bot\Scripts\get_repo_info %repo_root%\fds 1 > FDSREPODATE.out
 set /p FDSREPODATE=<FDSREPODATE.out
 erase FDSREPODATE.out
 set basename=%fds_version%_%smv_version%_%FDSREPODATE%%nightly%_win
+echo %basename%> %TEMP%\fds_smv_basename.txt
 set hashfile=%repo_root%\smv\Build\hashfile\intel_win_64\hashfile_win_64.exe
 set getrepoinfo=%repo_root%\bot\Scripts\get_repo_info.bat
 if exist %hashfile% goto endif0

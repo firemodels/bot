@@ -114,6 +114,11 @@ set CURDIR=%CD%
 cd ..
 set botrepo=%CD%
 
+cd ..\night_bundle
+set nightbundle=%CD%
+
+cd %botrepo%
+
 if exist ..\webpages goto endif4
   echo ***error: the webpages repo does not exist
   cd %CURDIR%
@@ -324,7 +329,22 @@ if "x%upload_bundle%" == "x" goto skip_upload
   echo ------------------------------------------------------
   echo uploading bundle
   echo.
-  call upload_bundle %FDS_REVISION_BUNDLER% %SMV_REVISION_BUNDLER% %nightly% %bundle_host% || exit /b 1
+
+  cd %nightbundle%
+
+  set filelist=%TEMP%\fds_smv_files_win.out
+  gh release view TEST_BUNDLES | grep FDS | grep SMV | grep win | gawk "{print $2}" > %filelist%
+  for /F "tokens=*" %%A in (%filelist%) do gh release delete-asset TEST_BUNDLES %%A -y
+  erase %filelist%
+
+  set /p basename=<%TEMP%\fds_smv_basename.txt
+
+  set fullfilebase=%userprofile%\.bundle\bundles\%basename%
+  echo gh release upload TEST_BUNDLES %fullfilebase%.sha1_repodate --clobber
+  gh release upload TEST_BUNDLES %fullfilebase%.sha1_repodate --clobber
+  
+  echo gh release upload TEST_BUNDLES %fullfilebase%.exe  --clobber
+  gh release upload TEST_BUNDLES %fullfilebase%.exe  --clobber
 :skip_upload
 
 if "x%emailto%" == "x" goto endif6
