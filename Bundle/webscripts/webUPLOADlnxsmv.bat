@@ -28,7 +28,7 @@ set CURDIR=%CD%
 cd %svn_root%\%RELEASEREPO%
 
 set outfile=%TEMP%\files_lnx.out
-gh release view %RELEASEBRANCH% | grep SMV | grep -v FDS | grep -v CFAST grep lnx | gawk "{print $2}" > %outfile%
+gh release view %RELEASEBRANCH% | grep SMV | grep -v FDS | grep -v CFAST | grep lnx | gawk "{print $2}" > %outfile%
 for /F "tokens=*" %%A in (%outfile%) do gh release delete-asset %RELEASEBRANCH% %%A -y
 erase %outfile%
 
