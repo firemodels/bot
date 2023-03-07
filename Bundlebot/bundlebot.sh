@@ -2,7 +2,7 @@
 
 RELEASEREPO=test_bundles
 RELEASEBRANCH=TEST
-SHA1EXT=shat1_repodate
+SHA1EXT=sha1
 
 #run time libraries are located in
 #  $HOME/.bundle/BUNDLE/MPI

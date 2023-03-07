@@ -6,7 +6,7 @@ INTEL_COMP_VERSION=$4
 UPLOAD_DIR_ARG=$5
 NIGHTLY=$6
 
-SHA1EXT=sha1_repodate
+SHA1EXT=sha1
 
 if [ "$NIGHTLY" == "null" ]; then
   NIGHTLY=
@@ -45,7 +45,7 @@ cd $curdir
 
 FDSREPODATE=`$REPO_ROOT/bot/Scripts/get_repo_info.sh $REPO_ROOT/fds 1`
 FDSREPODATE=${FDSREPODATE}_
-#FDSREPODATE=
+FDSREPODATE=
 
 if [ "`uname`" == "Darwin" ] ; then
   platform=osx

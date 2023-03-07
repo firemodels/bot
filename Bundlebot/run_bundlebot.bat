@@ -2,7 +2,7 @@
 
 set RELEASEREPO=test_bundles
 set RELEASEBRANCH=TEST
-set SHA1EXT=sha1_repodate
+set SHA1EXT=sha1
 
 set clone=
 set bundle_host=
