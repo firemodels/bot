@@ -323,12 +323,12 @@ if [ "$showparms" == "" ]; then
     echo ""
     echo "uploading installer"
     
+    cd $REPO_ROOT/$RELEASEREPO
     FILELIST=`gh release view $RELEASEBRANCH | grep SMV | grep FDS | grep $platform | awk '{print $2}'`
     for file in $FILELIST ; do
       gh release delete-asset $RELEASEBRANCH $file -y
     done
 
-    cd $REPO_ROOT/$RELEASEREPO
     gh release upload $RELEASEBRANCH $bundle_dir/${installer_base_platform}.sh        --clobber
     gh release upload $RELEASEBRANCH $bundle_dir/${installer_base_platform}.$SHA1EXT  --clobber
   fi
