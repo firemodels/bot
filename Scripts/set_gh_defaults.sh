@@ -4,3 +4,4 @@ GHDEFAULT=$2
 
 cd $REPODIR
 gh repo set-default $GHDEFAULT
+gh repo set-default --view
