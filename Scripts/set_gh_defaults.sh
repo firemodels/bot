@@ -1,7 +1,9 @@
 #!/bin/bash
-REPODIR=$1
-GHDEFAULT=$2
+REPOROOT=$1
+REPO=$2
+REPOUSER=$3
 
-cd $REPODIR
-gh repo set-default $GHDEFAULT
-gh repo set-default --view
+cd $REPOROOT/$REPO
+gh repo set-default $REPOUSER/$REPO
+gh repo set-default $REPOUSER/$REPO -v
+
