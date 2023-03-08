@@ -1,5 +1,9 @@
 @echo off
 
+set RELEASEREPO=test_bundles
+set RELEASEBRANCH=TEST
+set SHA1EXT=sha1
+
 set clone=
 set bundle_host=
 set bundle_firebot_home=
@@ -49,7 +53,7 @@ if "x%stopscript%" == "x" goto endif2
   exit /b 1
 :endif2
 
-set nightly=tst
+set nightly=test
 set pub_dir=
 if NOT "x%BRANCH_NAME%" == "xrelease" goto skip_branch
   set nightly=rls
@@ -113,6 +117,11 @@ if "x%abort%" == "x" goto error4
 set CURDIR=%CD%
 cd ..
 set botrepo=%CD%
+
+cd ..\%RELEASEREPO%
+set RELEASEDIR=%CD%
+
+cd %botrepo%
 
 if exist ..\webpages goto endif4
   echo ***error: the webpages repo does not exist
@@ -324,7 +333,22 @@ if "x%upload_bundle%" == "x" goto skip_upload
   echo ------------------------------------------------------
   echo uploading bundle
   echo.
-  call upload_bundle %FDS_REVISION_BUNDLER% %SMV_REVISION_BUNDLER% %nightly% %bundle_host% || exit /b 1
+
+  cd %RELEASEDIR%
+
+  set filelist=%TEMP%\fds_smv_files_win.out
+  gh release view %RELEASEBRANCH% | grep FDS | grep SMV | grep win | gawk "{print $2}" > %filelist%
+  for /F "tokens=*" %%A in (%filelist%) do gh release delete-asset %RELEASEBRANCH% %%A -y
+  erase %filelist%
+
+  set /p basename=<%TEMP%\fds_smv_basename.txt
+
+  set fullfilebase=%userprofile%\.bundle\bundles\%basename%
+  echo gh release upload %RELEASEBRANCH% %fullfilebase%.%SHA1EXT% --clobber
+  gh release upload %RELEASEBRANCH% %fullfilebase%.%SHA1EXT% --clobber
+  
+  echo gh release upload %RELEASEBRANCH% %fullfilebase%.exe  --clobber
+  gh release upload %RELEASEBRANCH% %fullfilebase%.exe  --clobber
 :skip_upload
 
 if "x%emailto%" == "x" goto endif6

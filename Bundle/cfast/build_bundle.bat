@@ -16,8 +16,6 @@ set configfile=%userprofile%\.bundle\bundle_config.bat
 if not exist %configfile% echo ***error: %userprofile%\bundle_config.bat does not exist
 if exist %configfile% call %configfile%
 
-if x%bundle_host% == x set upload=0
-
 call :getopts %*
 
 if x%stopscript% == x1 exit /b
@@ -83,15 +81,13 @@ echo   cfast revision: %cfastrevision%
 echo         smv hash: %smvhash%
 echo     smv revision: %smvrevision%
 if x%upload% == x0 echo upload installer: no
-if x%upload% == x1 echo  upload location: Google Drive and %bundle_host%
-if x%upload% == x2 echo  upload location: %bundle_host%
+if x%upload% == x1 echo  upload location: Github release
 
 cd %curdir%
 echo.
 
 set upload_arg=
 if %upload% == 1 set upload_arg=-u
-if %upload% == 2 set upload_arg=-U
 set build_cedit_arg=
 if %build_cedit% == 0 set build_cedit_arg=-E
 call make_cfast_bundle -C %cfastrevision% -S %smvrevision% %upload_arg% %only_installer% %build_cedit_arg%
@@ -117,14 +113,9 @@ echo -E        skip Cedit build
 echo -f      - force erasing and cloning of cfast and smv repos without warning first
 echo -h      - display this message
 echo -I      - assume apps are built, only build installer
-if     x%bundle_host% == x echo -L      - Linux host (default: none)
-if NOT x%bundle_host% == x echo -L      - Linux host (default: %bundle_host%)
 echo -S hash - build bundle using smv repo commit with hash 'hash' .
 echo           If hash=latest then use most the recent commit (default: latest)
-if NOT x%bundle_host% == x echo -u      - upload bundle to %bundle_host% a google drive
-if x%bundle_host% == x echo -u      - upload bundle to a google drive directory and a Linux host
-if NOT x%bundle_host% == x echo -U      - upload bundle to %bundle_host%
-if x%bundle_host% == x echo -U      - upload bundle to a Linux host
+echo -u      - upload bundle to a Github release
 exit /b 0
 
 ::-----------------------------------------------------------------------
@@ -160,11 +151,6 @@ exit /b 0
    set only_installer=-I
    set valid=1
  )
- if "%1" EQU "-L" (
-   set valid=1
-   set bundle_host=%1
-   exit /b
- )
  if "%1" EQU "-S" (
    set smvhash=%2
    shift
@@ -172,12 +158,6 @@ exit /b 0
  )
  if "%1" EQU "-u" (
    set upload=1
-   shift
-   set valid=1
- )
- if "%1" EQU "-U" (
-   set upload=2
-   shift
    set valid=1
  )
  shift

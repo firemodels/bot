@@ -54,8 +54,8 @@ if EXIST %bundlefile% goto skip_upload
 :skip_upload
 
 if NOT EXIST "%BUNDLEDIR%" goto if_bundledir
-  erase "%BUNDLEDIR%"\*tst_win.exe  1> Nul 2>&1
-  erase "%BUNDLEDIR%"\*tst_win.sha1 1> Nul 2>&1
+  erase "%BUNDLEDIR%"\*test_win.exe  1> Nul 2>&1
+  erase "%BUNDLEDIR%"\*test_win.sha1 1> Nul 2>&1
 
   copy %bundlefile%    "%BUNDLEDIR%\%basename%.exe"
   copy %bundleshafile% "%BUNDLEDIR%\%basename%.sha1"
