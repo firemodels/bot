@@ -2,7 +2,7 @@
 
 RELEASEREPO=test_bundles
 RELEASEBRANCH=TEST
-SHA1EXT=shat1_repodate
+SHA1EXT=sha1
 
 #run time libraries are located in
 #  $HOME/.bundle/BUNDLE/MPI
@@ -300,8 +300,10 @@ cd ../..
 REPO_ROOT=`pwd`
 cd $CURDIR
 FDSREPODATE=`$REPO_ROOT/bot/Scripts/get_repo_info.sh $REPO_ROOT/fds 1`
-installer_base=${FDSREV}_${SMVREV}_${FDSREPODATE}
-installer_base_platform=${FDSREV}_${SMVREV}_${FDSREPODATE}_${BUNDLE_PREFIX_FILE}$platform
+FDSREPODATE=_${FDSREPODATE}
+FDSREPODATE=
+installer_base=${FDSREV}_${SMVREV}${FDSREPODATE}
+installer_base_platform=${FDSREV}_${SMVREV}${FDSREPODATE}_${BUNDLE_PREFIX_FILE}$platform
 if [[ "$showparms" == "" ]] && [[ "$OVERWRITE" == "" ]]; then
   installer_file=$bundle_dir/${installer_base_platform}.sh
   if [ -e $installer_file ]; then
@@ -320,7 +322,13 @@ if [ "$showparms" == "" ]; then
   if [ "$UPLOAD_GITHUB" == "1" ]; then
     echo ""
     echo "uploading installer"
+    
     cd $REPO_ROOT/$RELEASEREPO
+    FILELIST=`gh release view $RELEASEBRANCH | grep SMV | grep FDS | grep $platform | awk '{print $2}'`
+    for file in $FILELIST ; do
+      gh release delete-asset $RELEASEBRANCH $file -y
+    done
+
     gh release upload $RELEASEBRANCH $bundle_dir/${installer_base_platform}.sh        --clobber
     gh release upload $RELEASEBRANCH $bundle_dir/${installer_base_platform}.$SHA1EXT  --clobber
   fi

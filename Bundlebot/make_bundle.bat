@@ -11,7 +11,7 @@ set SMVEDITION=SMV6
 
 set fdsversion=%FDSEDITION%
 set smvversion=%SMVEDITION%
-set SHA1EXT=sha1_repodate
+set SHA1EXT=sha1
 
 :: get git root directory
 
@@ -76,7 +76,7 @@ set /p FDSREPODATE=<FDSREPODATE.out
 erase FDSREPODATE.out
 
 set FDSREPODATE=_%FDSREPODATE%
-::set FDSREPODATE=
+set FDSREPODATE=
 
 set basename=%fds_version%_%smv_version%%FDSREPODATE%%nightly%_win
 echo %basename%> %TEMP%\fds_smv_basename.txt
