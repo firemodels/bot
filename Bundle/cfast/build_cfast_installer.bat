@@ -37,7 +37,7 @@ cd %CURDIR%
 set git_drive=c:
 %git_drive%
 
-set outbase=%cfastrev%_%smvrev%_tst_win
+set outbase=%cfastrev%_%smvrev%_test_win
 
 set BUNDLEBASE=%userprofile%\.bundle\uploads\%outbase%
 if exist %BUNDLEBASE% rmdir /s /q %BUNDLEBASE%
