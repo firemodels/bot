@@ -6,6 +6,8 @@ INTEL_COMP_VERSION=$4
 UPLOAD_DIR_ARG=$5
 NIGHTLY=$6
 
+SHA1EXT=sha1
+
 if [ "$NIGHTLY" == "null" ]; then
   NIGHTLY=
 fi
@@ -42,15 +44,17 @@ REPO_ROOT=`pwd`
 cd $curdir
 
 FDSREPODATE=`$REPO_ROOT/bot/Scripts/get_repo_info.sh $REPO_ROOT/fds 1`
+FDSREPODATE=${FDSREPODATE}_
+FDSREPODATE=
 
 if [ "`uname`" == "Darwin" ] ; then
   platform=osx
-  bundlebase=${fds_version}_${smv_version}_${FDSREPODATE}_${NIGHTLY}osx
+  bundlebase=${fds_version}_${smv_version}_${FDSREPODATE}${NIGHTLY}osx
 else
   platform=linux
-  bundlebase=${fds_version}_${smv_version}_${FDSREPODATE}_${NIGHTLY}lnx
+  bundlebase=${fds_version}_${smv_version}_${FDSREPODATE}${NIGHTLY}lnx
 fi
-SHA_REPO_FILE=${bundlebase}.sha1_repodate
+SHA_REPO_FILE=${bundlebase}.$SHA1EXT
 custombase=${fds_version}_${smv_version}
 
 # create upload directory if it doesn't exist

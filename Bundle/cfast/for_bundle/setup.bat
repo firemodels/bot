@@ -162,15 +162,14 @@ echo *** Adding document shortcuts to the Start menu.
 if exist "%cfaststartmenu%" rmdir /q /s "%cfaststartmenu%"
 
 mkdir "%cfaststartmenu%"
-
 mkdir "%cfaststartmenu%\Guides"
-"%INST_UNINSTALLDIR%\shortcut.exe" /F:"%cfaststartmenu%\Guides\CFAST Users Guide.lnk"                                     /T:"%CFAST7%\Documents\Users_Guide.pdf"         /A:C >NUL
-"%INST_UNINSTALLDIR%\shortcut.exe" /F:"%cfaststartmenu%\Guides\CFAST Technical Reference Guide.lnk"                       /T:"%CFAST7%\Documents\Tech_Ref.pdf"            /A:C >NUL
-"%INST_UNINSTALLDIR%\shortcut.exe" /F:"%cfaststartmenu%\Guides\CFAST Software Development and Model Evaluation Guide.lnk" /T:"%CFAST7%\Documents\Validation_Guide.pdf"    /A:C >NUL
-"%INST_UNINSTALLDIR%\shortcut.exe" /F:"%cfaststartmenu%\Guides\CFAST Configuration Management.lnk"                        /T:"%CFAST7%\Documents\Configuration_Guide.pdf" /A:C >NUL
-"%INST_UNINSTALLDIR%\shortcut.exe" /F:"%cfaststartmenu%\CFASTlnk"                                                         /T:"%CFAST7%\CEdit.exe"                         /A:C >NUL
-"%INST_UNINSTALLDIR%\shortcut.exe" /F:"%cfaststartmenu%\Smokeview.lnk"                                                    /T:"%SMV6%\smokeview.exe"                       /A:C >NUL
-"%INST_UNINSTALLDIR%\shortcut.exe" /F:"%cfaststartmenu%\Uninstall.lnk"                                                    /T:"%INST_UNINSTALLDIR%\uninstall.bat"          /A:C >NUL
+call :setup_shortcut "%cfaststartmenu%\Guides\CFAST Users Guide.lnk"                                     "%CFAST7%\Documents\Users_Guide.pdf"
+call :setup_shortcut "%cfaststartmenu%\Guides\CFAST Technical Reference Guide.lnk"                       "%CFAST7%\Documents\Tech_Ref.pdf"
+call :setup_shortcut "%cfaststartmenu%\Guides\CFAST Software Development and Model Evaluation Guide.lnk" "%CFAST7%\Documents\Validation_Guide.pdf"
+call :setup_shortcut "%cfaststartmenu%\Guides\CFAST Configuration Management.lnk"                        "%CFAST7%\Documents\Configuration_Guide.pdf"
+call :setup_shortcut "%cfaststartmenu%\CFAST.lnk"                                                        "%CFAST7%\CEdit.exe" 
+call :setup_shortcut "%cfaststartmenu%\Smokeview.lnk"                                                    "%SMV6%\smokeview.exe"   
+call :setup_shortcut "%cfaststartmenu%\Uninstall.lnk"                                                    "%INST_UNINSTALLDIR%\uninstall.bat"
 
 :: ----------- setting up uninstall file
 
@@ -231,6 +230,16 @@ echo *** Press any key, then reboot to complete the installation.  ***
 pause>NUL
 goto eof
 
+
+:-------------------------------------------------------------------------
+:setup_shortcut
+:-------------------------------------------------------------------------
+set outfile=%1
+set infile=%2
+
+"%INST_UNINSTALLDIR%\shortcut.exe" /F:%outfile% /T:%infile%    /A:C  > Nul
+if NOT exist %outfile% echo ***error: The shortcut %outfile% failed to be created
+exit /b
 
 :: -------------------------------------------------------------
 :is_file_copied

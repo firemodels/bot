@@ -69,8 +69,7 @@ echo -C version - cfast version (default: cfasttest)
 echo -E - skip Cedit build
 echo -h - display this message
 echo -S version - smv smokeview version (default: smvtest)
-echo -u -  upload bundle to a google drive directory and to a Linux host
-echo -U -  upload bundle to a Linux host
+echo -u -  upload bundle to a Github release
 exit /b 0
 
 ::-----------------------------------------------------------------------
@@ -105,12 +104,6 @@ exit /b 0
  )
  if "%1" EQU "-u" (
    set upload=1
-   shift
-   set valid=1
- )
- if "%1" EQU "-U" (
-   set upload=2
-   shift
    set valid=1
  )
  shift
