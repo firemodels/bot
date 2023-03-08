@@ -30,13 +30,15 @@ set SCRIPTDIR=%CD%
 
 cd %CURDIR%\
 
-cd ..\..\..\cftest
+cd ..\..\..\test_bundles
 
-echo *** Deleting tag: CFTEST
-call %SCRIPTDIR%\delete_release -t CFTEST
+set RELEASEBRANCH=TEST
+set filelist=%TEMP%\cfast_smv_files_win.out
+gh release view %RELEASEBRANCH% | grep CFAST | grep SMV | grep win | gawk "{print $2}" > %filelist%
+for /F "tokens=*" %%A in (%filelist%) do gh release delete-asset %RELEASEBRANCH% %%A -y
+erase %filelist%
 
-echo *** Adding release: tag: CFTEST title: %cfast_revision%_%smv_revision%
-call %SCRIPTDIR%\add_release -t CFTEST -T %cfast_revision%_%smv_revision% -f %fullfile%
+gh release upload TEST %fullfile% --clobber
 
 cd %CURDIR%
 exit /b 0
