@@ -1457,10 +1457,14 @@ email_build_status()
 # upload guides to a google drive directory
     if [ "$UPLOADRESULTS" == "1" ]; then
       cd $smokebotdir
-      $UploadGuidesGD $NEWGUIDE_DIR $smvrepo/Manuals &> /dev/null
-      $UploadWEB                  $smvrepo/Manuals $MAKEMOVIES &> /dev/null
+      echo  "***output guides to Github"  &> out/stage_upload
+      echo.                              &>> out/stage_upload
+      $UploadWEB                  $smvrepo/Manuals $MAKEMOVIES &>> out/stage_upload
       if [ `whoami` == "smokebot" ]; 
-        $UploadGuidesGH                                          &> /dev/null
+        echo .                                                  >> out/stage_upload
+        echo  "***out guides to Github"                         >> out/stage_upload
+        echo.                                                   >> out/stage_upload
+        $UploadGuidesGH                                        &>> out/stage_upload
       fi
     fi
 
@@ -1859,7 +1863,6 @@ cd
 
 SMV_SUMMARY_DIR=$smvrepo/Manuals/SMV_Summary
 
-UploadGuidesGD=$botrepo/Smokebot/smv_guides2GD.sh
 UploadGuidesGH=$botrepo/Smokebot/smv_guides2GH.sh
 UploadWEB=$botrepo/Smokebot/smv_web2GD.sh
 
