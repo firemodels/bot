@@ -1298,9 +1298,8 @@ if [ "$total_time" != "" ]; then
    echo "         Run Time: $total_time"       >> $TIME_LOG
 fi
    if [[ "$UPLOAD" == "1" ]]; then
-      echo "-------------------------------"                           >> $TIME_LOG
-      echo "Manuals (private): http://blaze.nist.gov/cfastbot/manuals" >> $TIME_LOG
-      echo "Manuals  (public): https://goo.gl/jR6uSj" >> $TIME_LOG
+      echo "-------------------------------"                                      >> $TIME_LOG
+      echo "Manuals https://github.com/firemodels/test_bundles/releases/tag/TEST" >> $TIME_LOG
       echo "-------------------------------" >> $TIME_LOG
    fi
    if [[ $THIS_REVISION != $LAST_CFASTSOUCEgit ]] ; then
@@ -1344,9 +1343,12 @@ fi
    then
       mail $REPLYTO -s "CFASTbot notice. Validation statistics have changed for Revision ${GIT_REVISION}." $mailTo < $VALIDATION_STATS_LOG &> /dev/null      
    fi
-   if [[ "$UPLOADGUIDES" == "1" ]]; then
-     if [ -e $UploadGuides ]; then
-        $UploadGuides $NEWGUIDE_DIR $cfastrepo/Manuals > /dev/null
+   if [[ "$UPLOAD" == "1" ]]; then
+     if [ -e $UploadGuidesGH ]; then
+       if [ `whoami` == "cfast" ]; then
+         cd $cfastrepo
+         $UploadGuidesGH
+       fi
      fi
    fi
 }
@@ -1580,7 +1582,7 @@ if [ -e $CFAST_STATUS_FILE ] ; then
 fi
 
 export JOBPREFIX=CB_
-UploadGuides=$cfastrepo/Utilities/cfastbot/upload_guides.sh
+UploadGuidesGH=$cfastrepo/Utilities/cfastbot/cfast_guides2GH.sh
 
 #  ==============================================
 #  = CFASTbot timing and notification mechanism =
