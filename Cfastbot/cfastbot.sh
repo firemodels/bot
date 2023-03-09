@@ -1163,11 +1163,11 @@ make_cfast_tech_guide()
 {
    # Build CFAST Tech Guide
    echo Building CFAST Tech guide
-   CD_REPO $cfastrepo/Manuals/Tech_Ref $cfastbranch || return 1
+   CD_REPO $cfastrepo/Manuals/CFAST_Tech_Ref $cfastbranch || return 1
    ./make_guide.sh &> $OUTPUT_DIR/stage8_cfast_tech_guide
 
    # Check guide for completion and copy to website if successful
-   check_guide $OUTPUT_DIR/stage8_cfast_tech_guide $cfastrepo/Manuals/Tech_Ref Tech_Ref.pdf 'CFAST Technical Reference Guide'
+   check_guide $OUTPUT_DIR/stage8_cfast_tech_guide $cfastrepo/Manuals/CFAST_Tech_Ref CFAST_Tech_Ref.pdf 'CFAST Technical Reference Guide'
    return 0
 }
 
@@ -1179,11 +1179,11 @@ make_cfast_user_guide()
 {
    # Build CFAST User Guide
    echo Building CFAST User guide
-   CD_REPO $cfastrepo/Manuals/Users_Guide $cfastbranch || return 1
+   CD_REPO $cfastrepo/Manuals/CFAST_Users_Guide $cfastbranch || return 1
    ./make_guide.sh &> $OUTPUT_DIR/stage8_cfast_user_guide
 
    # Check guide for completion and copy to website if successful
-   check_guide $OUTPUT_DIR/stage8_cfast_user_guide $cfastrepo/Manuals/Users_Guide Users_Guide.pdf 'CFAST Users Guide'
+   check_guide $OUTPUT_DIR/stage8_cfast_user_guide $cfastrepo/Manuals/CFAST_Users_Guide CFAST_Users_Guide.pdf 'CFAST Users Guide'
    return 0
 }
 
@@ -1195,11 +1195,11 @@ make_cdata_guide()
 {
    # Build CDATA guide
    echo Building CData guide
-   CD_REPO $cfastrepo/Manuals/CData_Guide $cfastbranch || return 1
+   CD_REPO $cfastrepo/Manuals/CFAST_CData_Guide $cfastbranch || return 1
    ./make_guide.sh &> $OUTPUT_DIR/stage8_cdata_guide
 
    # Check guide for completion and copy to website if successful
-   check_guide $OUTPUT_DIR/stage8_cdata_guide $cfastrepo/Manuals/CData_Guide CData_Guide.pdf 'CData Guide'
+   check_guide $OUTPUT_DIR/stage8_cdata_guide $cfastrepo/Manuals/CFAST_CData_Guide CFAST_CData_Guide.pdf 'CData Guide'
    return 0
 }
 
@@ -1211,11 +1211,11 @@ make_cfast_vv_guide()
 {
    # Build CFAST Tech Guide
    echo Building CFAST VV guide
-   CD_REPO $cfastrepo/Manuals/Validation_Guide $cfastbranch || return 1
+   CD_REPO $cfastrepo/Manuals/CFAST_Validation_Guide $cfastbranch || return 1
    ./make_guide.sh &> $OUTPUT_DIR/stage8_cfast_vv_guide
 
    # Check guide for completion and copy to website if successful
-   check_guide $OUTPUT_DIR/stage8_cfast_vv_guide $cfastrepo/Manuals/Validation_Guide Validation_Guide.pdf 'CFAST Verification and Validation Guide'
+   check_guide $OUTPUT_DIR/stage8_cfast_vv_guide $cfastrepo/Manuals/CFAST_Validation_Guide CFAST_Validation_Guide.pdf 'CFAST Verification and Validation Guide'
    return 0
 }
 
@@ -1227,11 +1227,11 @@ make_cfast_config_guide()
 {
    # Build CFAST Configuration Guide
    echo Building CFAST Configuration guide
-   CD_REPO $cfastrepo/Manuals/Configuration_Guide $cfastbranch || return 1
+   CD_REPO $cfastrepo/Manuals/CFAST_Configuration_Guide $cfastbranch || return 1
    ./make_guide.sh &> $OUTPUT_DIR/stage8_cfast_config_guide
 
    # Check guide for completion and copy to website if successful
-   check_guide $OUTPUT_DIR/stage8_cfast_config_guide $cfastrepo/Manuals/Configuration_Guide Configuration_Guide.pdf 'CFAST Configuration Guide'
+   check_guide $OUTPUT_DIR/stage8_cfast_config_guide $cfastrepo/Manuals/CFAST_Configuration_Guide CFAST_Configuration_Guide.pdf 'CFAST Configuration Guide'
    return 0
 }
 
