@@ -4,12 +4,12 @@ setlocal
 set cfast_revision=%1
 set smv_revision=%2
 set upload=%3%
-set nightly_arg=tst
+set nightly_arg=test
 
 if %upload% == 0 exit /b
 
 set BUNDLEDIR=%userprofile%\.bundle\uploads
-set basename=%cfast_revision%_%smv_revision%_tst_win
+set basename=%cfast_revision%_%smv_revision%_test_win
 set fullfile=%BUNDLEDIR%\%basename%.exe
 
 set configfile=%userprofile%\.bundle\bundle_config.bat
