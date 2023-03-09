@@ -639,21 +639,21 @@ call :GET_TIME MAKEGUIDES_beg
 echo Stage 6 - Building CFAST guides
 
 echo             Users Guide
-call :build_guide Users_Guide %cfastrepo%\Manuals\Users_Guide 1>> %OUTDIR%\stage6.txt 2>&1
+call :build_guide CFAST_Users_Guide %cfastrepo%\Manuals\CFAST_Users_Guide 1>> %OUTDIR%\stage6.txt 2>&1
 
 echo             Technical Reference Guide
-call :build_guide Tech_Ref %cfastrepo%\Manuals\Tech_Ref 1>> %OUTDIR%\stage6.txt 2>&1
+call :build_guide CFAST_Tech_Ref %cfastrepo%\Manuals\CFAST_Tech_Ref 1>> %OUTDIR%\stage6.txt 2>&1
 
 if %nothaveValidation% == 0 (
   echo             Validation Guide
-  call :build_guide Validation_Guide %cfastrepo%\Manuals\Validation_Guide 1>> %OUTDIR%\stage6.txt 2>&1
+  call :build_guide CFAST_Validation_Guide %cfastrepo%\Manuals\CFAST_Validation_Guide 1>> %OUTDIR%\stage6.txt 2>&1
 )
 
 echo             Configuration Management Guide
-call :build_guide Configuration_Guide %cfastrepo%\Manuals\Configuration_Guide 1>> %OUTDIR%\stage6.txt 2>&1
+call :build_guide CFAST_Configuration_Guide %cfastrepo%\Manuals\CFAST_Configuration_Guide 1>> %OUTDIR%\stage6.txt 2>&1
 
 echo             CData Guide
-call :build_guide CData_Guide %cfastrepo%\Manuals\CData_Guide 1>> %OUTDIR%\stage6.txt 2>&1
+call :build_guide CFAST_CData_Guide %cfastrepo%\Manuals\CFAST_CData_Guide 1>> %OUTDIR%\stage6.txt 2>&1
 
 call :GET_DURATION MAKEGUIDES %MAKEGUIDES_beg%
 call :GET_DURATION TOTALTIME %TIME_beg%

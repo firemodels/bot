@@ -73,11 +73,11 @@ call :COPY  %docdir%\CData_Guide\Examples\*.in   %CFASTDISTDIR%\Examples\
 echo ***Copying CFAST documentation
 
 set PDFS=%userprofile%\.cfast\PDFS
-call :COPYPDF Tech_Ref
-call :COPYPDF Users_Guide
-call :COPYPDF Validation_Guide
-call :COPYPDF Configuration_Guide
-call :COPYPDF CData_Guide
+call :COPYPDF CFAST_Tech_Ref
+call :COPYPDF CFAST_Users_Guide
+call :COPYPDF CFAST_Validation_Guide
+call :COPYPDF CFAST_Configuration_Guide
+call :COPYPDF CFAST_CData_Guide
 
 echo ***Copying Smokeview files
 

@@ -21,11 +21,11 @@ erase %PDFS%\*.pdf > Nul 2>&1
 set hosthome=%bundle_cfastbot_home%/.cfastbot/Manuals
 echo Downloading CFAST PDFs from %hosthome% on %bundle_host%
 
-call :copy_file Tech_Ref
-call :copy_file Users_Guide
-call :copy_file Validation_Guide
-call :copy_file Configuration_Guide
-call :copy_file CData_Guide
+call :copy_file CFAST_Tech_Ref
+call :copy_file CFAST_Users_Guide
+call :copy_file CFAST_Validation_Guide
+call :copy_file CFAST_Configuration_Guide
+call :copy_file CFAST_CData_Guide
 
 goto eof
 
