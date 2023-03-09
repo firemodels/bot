@@ -1,7 +1,7 @@
 @echo off
 setlocal
 set CURDIR=%CD%
-set BUILDLIB=%CURDIR%\build_lib.bat
+set BUILDLIB=%CURDIR%\build_smv_lib.bat
 
 set OPTS=i
 set STARTOPT=/MIN

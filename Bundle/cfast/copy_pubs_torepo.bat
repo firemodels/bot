@@ -11,11 +11,11 @@ set PDFS=%userprofile%\.cfast\PDFS
 if NOT exist %userprofile%\.cfast mkdir %userprofile%\.cfast
 if NOT exist %PDFS% mkdir %PDFS%
 
-call :copy_file Tech_Ref
-call :copy_file Users_Guide
-call :copy_file Validation_Guide
-call :copy_file Configuration_Guide
-call :copy_file CData_Guide
+call :copy_file CFAST_Tech_Ref
+call :copy_file CFAST_Users_Guide
+call :copy_file CFAST_Validation_Guide
+call :copy_file CFAST_Configuration_Guide
+call :copy_file CFAST_CData_Guide
 
 goto eof
 
