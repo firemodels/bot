@@ -1457,8 +1457,11 @@ email_build_status()
 # upload guides to a google drive directory
     if [ "$UPLOADRESULTS" == "1" ]; then
       cd $smokebotdir
-      $UploadGuides $NEWGUIDE_DIR $smvrepo/Manuals &> /dev/null
+      $UploadGuidesGD $NEWGUIDE_DIR $smvrepo/Manuals &> /dev/null
       $UploadWEB                  $smvrepo/Manuals $MAKEMOVIES &> /dev/null
+      if [ `whoami` == "smokebot" ]; 
+        $UploadGuidesGH                                          &> /dev/null
+      fi
     fi
 
       # Send success message with links to nightly manuals
@@ -1856,7 +1859,8 @@ cd
 
 SMV_SUMMARY_DIR=$smvrepo/Manuals/SMV_Summary
 
-UploadGuides=$botrepo/Smokebot/smv_guides2GD.sh
+UploadGuidesGD=$botrepo/Smokebot/smv_guides2GD.sh
+UploadGuidesGH=$botrepo/Smokebot/smv_guides2GH.sh
 UploadWEB=$botrepo/Smokebot/smv_web2GD.sh
 
 THIS_FDS_AUTHOR=

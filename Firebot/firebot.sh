@@ -1825,6 +1825,9 @@ fi
         grep -i -E 'warning' $OUTPUT_DIR/stage10_upload_google >> $WARNING_LOG
         echo "" >> $WARNING_LOG
      fi
+     if [ `whoami` == "firebot" ]; then
+       $UploadGuidesGH &> $OUTPUT_DIR/stage10_upload_google
+     fi
    fi
 
    # Check for warnings and errors
@@ -2355,6 +2358,7 @@ else
 fi
 
 UploadGuides=$botrepo/Firebot/fds_guides2GD.sh
+UploadGuidesGH=$botrepo/Firebot/fds_guides2GH.sh
 COPY_FDS_APPS=$botrepo/Firebot/copy_fds_apps.sh
 COPY_SMV_APPS=$botrepo/Firebot/copy_smv_apps.sh
 
