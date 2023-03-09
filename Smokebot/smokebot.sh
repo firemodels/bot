@@ -1458,12 +1458,12 @@ email_build_status()
     if [ "$UPLOADRESULTS" == "1" ]; then
       cd $smokebotdir
       echo  "***output guides to Github"  &> out/stage_upload
-      echo.                              &>> out/stage_upload
+      echo  ""                            &>> out/stage_upload
       $UploadWEB                  $smvrepo/Manuals $MAKEMOVIES &>> out/stage_upload
-      if [ `whoami` == "smokebot" ]; 
-        echo .                                                  >> out/stage_upload
+      if [ `whoami` == "smokebot" ];  then
+        echo ""                                                 >> out/stage_upload
         echo  "***out guides to Github"                         >> out/stage_upload
-        echo.                                                   >> out/stage_upload
+        echo  ""                                                >> out/stage_upload
         $UploadGuidesGH                                        &>> out/stage_upload
       fi
     fi
