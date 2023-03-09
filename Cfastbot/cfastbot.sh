@@ -1346,7 +1346,7 @@ fi
    if [[ "$UPLOAD" == "1" ]]; then
      if [ -e $UploadGuidesGH ]; then
        if [ `whoami` == "cfast" ]; then
-         cd $cfastrepo
+         cd $cfastbotdir
          $UploadGuidesGH
        fi
      fi
