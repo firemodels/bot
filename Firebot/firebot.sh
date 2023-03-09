@@ -1825,7 +1825,9 @@ fi
         grep -i -E 'warning' $OUTPUT_DIR/stage10_upload_google >> $WARNING_LOG
         echo "" >> $WARNING_LOG
      fi
-     $UploadGuidesGH &> $OUTPUT_DIR/stage10_upload_google
+     if [ `whoami` == "firebot" ]; then
+       $UploadGuidesGH &> $OUTPUT_DIR/stage10_upload_google
+     fi
    fi
 
    # Check for warnings and errors
