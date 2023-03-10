@@ -1582,7 +1582,7 @@ if [ -e $CFAST_STATUS_FILE ] ; then
 fi
 
 export JOBPREFIX=CB_
-UploadGuidesGH=$cfastrepo/Utilities/cfastbot/cfast_guides2GH.sh
+UploadGuidesGH=$cfastbotdir/cfast_guides2GH.sh
 
 #  ==============================================
 #  = CFASTbot timing and notification mechanism =
