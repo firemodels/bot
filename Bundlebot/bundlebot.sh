@@ -323,13 +323,13 @@ if [ "$showparms" == "" ]; then
     
     cd $REPO_ROOT/$GH_REPO
     gh repo set-default $GH_OWNER/$GH_REPO
-    FILELIST=`gh release view $GH_FDS_TAG | grep SMV | grep FDS | grep $platform | awk '{print $2}'`
+    FILELIST=`gh release view $GH_FDS_TAG  -R github.com/$GH_OWNER/$GH_REPO | grep SMV | grep FDS | grep $platform | awk '{print $2}'`
     for file in $FILELIST ; do
-      gh release delete-asset $GH_FDS_TAG $file -y
+      gh release delete-asset $GH_FDS_TAG $file -R github.com/$GH_OWNER/$GH_REPO -y
     done
 
-    gh release upload $GH_FDS_TAG $bundle_dir/${installer_base_platform}.sh        --clobber
-    gh release upload $GH_FDS_TAG $bundle_dir/${installer_base_platform}.$SHA1EXT  --clobber
+    gh release upload $GH_FDS_TAG $bundle_dir/${installer_base_platform}.sh         -R github.com/$GH_OWNER/$GH_REPO  --clobber
+    gh release upload $GH_FDS_TAG $bundle_dir/${installer_base_platform}.$SHA1EXT   -R github.com/$GH_OWNER/$GH_REPO  --clobber
   fi
 fi
 if [ "$ECHO" == "" ]; then
