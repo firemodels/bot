@@ -32,14 +32,12 @@ cd %CURDIR%\
 
 cd ..\..\..\%GH_REPO%
 gh repo set-default %GH_OWNER%/%GH_REPO%
-
-set RELEASEBRANCH=TEST
 set filelist=%TEMP%\cfast_smv_files_win.out
-gh release view %RELEASEBRANCH% | grep CFAST | grep SMV | grep win | gawk "{print $2}" > %filelist%
-for /F "tokens=*" %%A in (%filelist%) do gh release delete-asset %RELEASEBRANCH% %%A -y
+gh release view %CFAST_TEST% -R github.com/%GH_OWNER%/%GH_REPO% | grep CFAST | grep SMV | grep win | gawk "{print $2}" > %filelist%
+for /F "tokens=*" %%A in (%filelist%) do gh release delete-asset %CFAST_TEST% %%A -y
 erase %filelist%
 
-gh release upload %GH_CFAST_TAG% %fullfile% --clobber
+gh release upload %GH_CFAST_TAG% %fullfile% --clobber -R github.com/%GH_OWNER%/%GH_REPO%
 
 cd %CURDIR%
 exit /b 0

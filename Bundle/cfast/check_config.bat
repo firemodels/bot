@@ -7,6 +7,9 @@ call :check bundle_firebot_home    || set error=1
 call :check bundle_cfastbot_home   || set error=1
 call :check bundle_root            || set error=1
 call :check bundle_logon           || set error=1
+call :check GH_CFAST_TAG           || set error=1
+call :check GH_OWNER               || set error=1
+call :check GH_REPO                || set error=1
 
 goto eof
 
