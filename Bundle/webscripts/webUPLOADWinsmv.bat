@@ -25,17 +25,17 @@ call %envfile%
 set uploaddir=%userprofile%\.bundle\uploads
 set CURDIR=%CD%
 
-cd %svn_root%\%RELEASEREPO%
+cd %svn_root%\%GH_REPO%
 
 set filelist=%TEMP%\smv_files_win.out
-gh release view %RELEASEBRANCH% | grep SMV | grep -v FDS | grep -v CFAST | grep win | gawk "{print $2}" > %filelist%
-for /F "tokens=*" %%A in (%filelist%) do gh release delete-asset %RELEASEBRANCH% %%A -y
+gh release view %GH_SMOKEVIEW_TAG% | grep SMV | grep -v FDS | grep -v CFAST | grep win | gawk "{print $2}" > %filelist%
+for /F "tokens=*" %%A in (%filelist%) do gh release delete-asset %GH_SMOKEVIEW_TAG% %%A -y
 erase %filelist%
 
-gh release upload %RELEASEBRANCH% %uploaddir%\%smv_revision%_win.sha1 --clobber
-gh release upload %RELEASEBRANCH% %uploaddir%\%smv_revision%_win.exe  --clobber
+gh release upload %GH_SMOKEVIEW_TAG% %uploaddir%\%smv_revision%_win.sha1 --clobber
+gh release upload %GH_SMOKEVIEW_TAG% %uploaddir%\%smv_revision%_win.exe  --clobber
 
-start chrome https://github.com/firemodels/%RELEASEREPO%/releases/tag/%RELEASEBRANCH%
+start chrome https://github.com/firemodels/%GH_REPO%/releases/tag/%GH_SMOKEVIEW_TAG%
 echo.
 echo upload complete
 pause

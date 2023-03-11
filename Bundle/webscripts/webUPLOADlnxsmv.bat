@@ -1,8 +1,5 @@
 @echo off
 
-set RELEASEREPO=test_bundles
-set RELEASEBRANCH=TEST
-
 ::  batch file to build test or release Smokeview on a Windows, OSX or Linux system
 
 :: setup environment variables (defining where repository resides etc) 
@@ -25,17 +22,17 @@ call %envfile%
 set uploaddir=%userprofile%\.bundle\uploads
 set CURDIR=%CD%
 
-cd %svn_root%\%RELEASEREPO%
+cd %svn_root%\%GH_REPO%
 
 set outfile=%TEMP%\files_lnx.out
-gh release view %RELEASEBRANCH% | grep SMV | grep -v FDS | grep -v CFAST | grep lnx | gawk "{print $2}" > %outfile%
-for /F "tokens=*" %%A in (%outfile%) do gh release delete-asset %RELEASEBRANCH% %%A -y
+gh release view %GH_SMOKEVIEW_TAG% | grep SMV | grep -v FDS | grep -v CFAST | grep lnx | gawk "{print $2}" > %outfile%
+for /F "tokens=*" %%A in (%outfile%) do gh release delete-asset %GH_SMOKEVIEW_TAG% %%A -y
 erase %outfile%
 
-plink %plink_options% %linux_logon%  %linux_svn_root%/bot/Bundlebot/upload_smvbundle.sh .bundle/uploads %smv_revision%_lnx.sh   %linux_svn_root%/%RELEASEREPO% %RELEASEBRANCH%
-plink %plink_options% %linux_logon%  %linux_svn_root%/bot/Bundlebot/upload_smvbundle.sh .bundle/uploads %smv_revision%_lnx.sha1 %linux_svn_root%/%RELEASEREPO% %RELEASEBRANCH%
+plink %plink_options% %linux_logon%  %linux_svn_root%/bot/Bundlebot/upload_smvbundle.sh .bundle/uploads %smv_revision%_lnx.sh   %linux_svn_root%/%GH_REPO% %GH_SMOKEVIEW_TAG%
+plink %plink_options% %linux_logon%  %linux_svn_root%/bot/Bundlebot/upload_smvbundle.sh .bundle/uploads %smv_revision%_lnx.sha1 %linux_svn_root%/%GH_REPO% %GH_SMOKEVIEW_TAG%
 
-start chrome https://github.com/firemodels/%RELEASEREPO%/releases/tag/%RELEASEBRANCH%
+start chrome https://github.com/firemodels/%GH_REPO%/releases/tag/%GH_SMOKEVIEW_TAG%
 
 echo.
 echo upload complete
