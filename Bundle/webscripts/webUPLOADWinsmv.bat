@@ -35,7 +35,7 @@ erase %filelist%
 gh release upload %GH_SMOKEVIEW_TAG% %uploaddir%\%smv_revision%_win.sha1 -R github.com/%GH_OWNER%/%GH_REPO% --clobber
 gh release upload %GH_SMOKEVIEW_TAG% %uploaddir%\%smv_revision%_win.exe  -R github.com/%GH_OWNER%/%GH_REPO% --clobber
 
-start chrome https://github.com/firemodels/%GH_REPO%/releases/tag/%GH_SMOKEVIEW_TAG%
+start chrome https://github.com/%GH_OWNER%/%GH_REPO%/releases/tag/%GH_SMOKEVIEW_TAG%
 echo.
 echo upload complete
 pause
