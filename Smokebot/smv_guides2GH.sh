@@ -8,8 +8,9 @@ cd ../../smv/Manuals
 MANDIR=`pwd`
 cd $CURDIR
 
-cd ../../test_bundles
+cd ../../$GH_REPO
 TESTBUNDLEDIR=`pwd`
+gh repo set-default $GH_OWNER/$GH_REPO
 cd $CURDIR
 
 UPLOADHASH ()
@@ -19,7 +20,7 @@ UPLOADHASH ()
   if [ -e $DIR/$FILE ]; then
     cd $TESTBUNDLEDIR
     echo ***Uploading $FILE
-    gh release upload TEST $DIR/$FILE --clobber
+    gh release upload $GH_SMV_TAG $DIR/$FILE --clobber
   fi
 }
 
@@ -30,7 +31,7 @@ UPLOADGUIDE ()
   if [ -e $FROMDIR/$FILEnew ]; then
     cd $TESTBUNDLEDIR
     echo ***Uploading $FILEnew
-    gh release upload TEST $FROMDIR/$FILEnew --clobber
+    gh release upload $GH_SMV_TAG $FROMDIR/$FILEnew --clobber
   fi
 }
 UPLOADFIGURES ()
@@ -53,7 +54,7 @@ UPLOADFIGURES ()
   gzip $tarfile
   cd $TESTBUNDLEDIR
   echo ***Uploading $tarfile.gz
-  gh release upload TEST $TARHOME/$tarfile.gz --clobber
+  gh release upload $GH_SMV_TAG $TARHOME/$tarfile.gz --clobber
 }
 
 if [ -e $TESTBUNDLEDIR ] ; then

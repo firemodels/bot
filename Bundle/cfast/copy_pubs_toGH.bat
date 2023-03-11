@@ -5,8 +5,9 @@ set cfastbundledir=%CD%
 
 cd ..\..\..\cfast
 set cfastrepo=%CD%
-cd ..\test_bundles
+cd ..\%GH_REPO%
 set testbundlerepo=%CD%
+gh repo set-default %GH_OWNER%/%GH_REPO%
 set manuals=%cfastrepo%\Manuals
 set PDFS=%userprofile%\.cfast\PDFS
 
@@ -30,7 +31,7 @@ set fromfile=%PDFS%\%file%.pdf
 set cfastfile=%file%.pdf
 if exist %fromfile% copy %fromfile% %TEMP%\%cfastfile% 
 if exist %fromfile% echo Uploading %cfastfile% 
-if exist %fromfile% gh release upload TEST %TEMP%\%cfastfile% --clobber 
+if exist %fromfile% gh release upload %GH_CFAST_TAG% %TEMP%\%cfastfile% --clobber 
 if not exist %fromfile% echo ***error: %fromfile% does not exist
 if not exist %fromfile% exit /b 
 exit /b 1

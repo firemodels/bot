@@ -30,7 +30,8 @@ set SCRIPTDIR=%CD%
 
 cd %CURDIR%\
 
-cd ..\..\..\test_bundles
+cd ..\..\..\%GH_REPO%
+gh repo set-default %GH_OWNER%/%GH_REPO%
 
 set RELEASEBRANCH=TEST
 set filelist=%TEMP%\cfast_smv_files_win.out
@@ -38,7 +39,7 @@ gh release view %RELEASEBRANCH% | grep CFAST | grep SMV | grep win | gawk "{prin
 for /F "tokens=*" %%A in (%filelist%) do gh release delete-asset %RELEASEBRANCH% %%A -y
 erase %filelist%
 
-gh release upload TEST %fullfile% --clobber
+gh release upload %GH_CFAST_TAG% %fullfile% --clobber
 
 cd %CURDIR%
 exit /b 0

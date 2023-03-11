@@ -1,7 +1,5 @@
 @echo off
 
-set RELEASEREPO=test_bundles
-set RELEASEBRANCH=TEST
 set SHA1EXT=sha1
 
 set clone=
@@ -118,7 +116,8 @@ set CURDIR=%CD%
 cd ..
 set botrepo=%CD%
 
-cd ..\%RELEASEREPO%
+cd ..\%GH_REPO%
+gh repo set-default %GH_OWNER%/%GH_REPO%
 set RELEASEDIR=%CD%
 
 cd %botrepo%
@@ -337,18 +336,18 @@ if "x%upload_bundle%" == "x" goto skip_upload
   cd %RELEASEDIR%
 
   set filelist=%TEMP%\fds_smv_files_win.out
-  gh release view %RELEASEBRANCH% | grep FDS | grep SMV | grep win | gawk "{print $2}" > %filelist%
-  for /F "tokens=*" %%A in (%filelist%) do gh release delete-asset %RELEASEBRANCH% %%A -y
+  gh release view %GH_FDS_TAG% | grep FDS | grep SMV | grep win | gawk "{print $2}" > %filelist%
+  for /F "tokens=*" %%A in (%filelist%) do gh release delete-asset %GH_FDS_TAG% %%A -y
   erase %filelist%
 
   set /p basename=<%TEMP%\fds_smv_basename.txt
 
   set fullfilebase=%userprofile%\.bundle\bundles\%basename%
-  echo gh release upload %RELEASEBRANCH% %fullfilebase%.%SHA1EXT% --clobber
-  gh release upload %RELEASEBRANCH% %fullfilebase%.%SHA1EXT% --clobber
+  echo gh release upload %GH_FDS_TAG% %fullfilebase%.%SHA1EXT% --clobber
+  gh release upload %GH_FDS_TAG% %fullfilebase%.%SHA1EXT% --clobber
   
-  echo gh release upload %RELEASEBRANCH% %fullfilebase%.exe  --clobber
-  gh release upload %RELEASEBRANCH% %fullfilebase%.exe  --clobber
+  echo gh release upload %GH_FDS_TAG% %fullfilebase%.exe  --clobber
+  gh release upload %GH_FDS_TAG% %fullfilebase%.exe  --clobber
 :skip_upload
 
 if "x%emailto%" == "x" goto endif6

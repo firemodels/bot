@@ -1,7 +1,5 @@
 #!/bin/bash
 
-RELEASEREPO=test_bundles
-RELEASEBRANCH=TEST
 SHA1EXT=sha1
 
 #run time libraries are located in
@@ -323,14 +321,15 @@ if [ "$showparms" == "" ]; then
     echo ""
     echo "uploading installer"
     
-    cd $REPO_ROOT/$RELEASEREPO
-    FILELIST=`gh release view $RELEASEBRANCH | grep SMV | grep FDS | grep $platform | awk '{print $2}'`
+    cd $REPO_ROOT/$GH_REPO
+    gh repo set-default $GH_OWNER/$GH_REPO
+    FILELIST=`gh release view $GH_FDS_TAG | grep SMV | grep FDS | grep $platform | awk '{print $2}'`
     for file in $FILELIST ; do
-      gh release delete-asset $RELEASEBRANCH $file -y
+      gh release delete-asset $GH_FDS_TAG $file -y
     done
 
-    gh release upload $RELEASEBRANCH $bundle_dir/${installer_base_platform}.sh        --clobber
-    gh release upload $RELEASEBRANCH $bundle_dir/${installer_base_platform}.$SHA1EXT  --clobber
+    gh release upload $GH_FDS_TAG $bundle_dir/${installer_base_platform}.sh        --clobber
+    gh release upload $GH_FDS_TAG $bundle_dir/${installer_base_platform}.$SHA1EXT  --clobber
   fi
 fi
 if [ "$ECHO" == "" ]; then

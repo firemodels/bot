@@ -14,8 +14,9 @@ cd ../../fds/Manuals
 MANDIR=`pwd`
 cd $CURDIR
 
-cd ../../test_bundles
+cd ../../$GH_REPO
 TESTBUNDLEDIR=`pwd`
+gh repo set-default $GH_OWNER/$GH_REPO
 cd $CURDIR
 if [ ! -e $TESTBUNDLEDIR ]; then
    echo "***error: $TESTBUNDLEDIR does not exist"
