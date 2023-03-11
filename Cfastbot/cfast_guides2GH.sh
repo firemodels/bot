@@ -16,7 +16,7 @@ UPLOADGUIDE ()
   if [ -e $FROMDIR/$FILEnew ]; then
     cd $TESTBUNDLEDIR
     echo ***Uploading $FILEnew
-    gh release upload $GH_CFAST_TAG $FROMDIR/$FILEnew --clobber
+    gh release upload $GH_CFAST_TAG $FROMDIR/$FILEnew -R github.com/$GH_OWNER/$GH_REPO --clobber
   fi
 }
 UPLOADHASH ()
@@ -28,7 +28,7 @@ UPLOADHASH ()
     FULLHASHFILE=/tmp/${HASHFILE}
     cp $FROMDIR/$FILE $FULLHASHFILE
     echo ***Uploading $HASHFILE
-    gh release upload $GH_CFAST_TAG $FULLHASHFILE --clobber
+    gh release upload $GH_CFAST_TAG $FULLHASHFILE -R github.com/$GH_OWNER/$GH_REPO --clobber
     rm $FULLHASHFILE
   fi
 }

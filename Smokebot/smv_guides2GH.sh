@@ -20,7 +20,7 @@ UPLOADHASH ()
   if [ -e $DIR/$FILE ]; then
     cd $TESTBUNDLEDIR
     echo ***Uploading $FILE
-    gh release upload $GH_SMOKEVIEW_TAG $DIR/$FILE --clobber
+    gh release upload $GH_SMOKEVIEW_TAG $DIR/$FILE -R github.com/$GH_OWNER/$GH_REPO --clobber
   fi
 }
 
@@ -31,7 +31,7 @@ UPLOADGUIDE ()
   if [ -e $FROMDIR/$FILEnew ]; then
     cd $TESTBUNDLEDIR
     echo ***Uploading $FILEnew
-    gh release upload $GH_SMOKEVIEW_TAG $FROMDIR/$FILEnew --clobber
+    gh release upload $GH_SMOKEVIEW_TAG $FROMDIR/$FILEnew -R github.com/$GH_OWNER/$GH_REPO --clobber
   fi
 }
 UPLOADFIGURES ()
@@ -54,7 +54,7 @@ UPLOADFIGURES ()
   gzip $tarfile
   cd $TESTBUNDLEDIR
   echo ***Uploading $tarfile.gz
-  gh release upload $GH_SMOKEVIEW_TAG $TARHOME/$tarfile.gz --clobber
+  gh release upload $GH_SMOKEVIEW_TAG $TARHOME/$tarfile.gz -R github.com/$GH_OWNER/$GH_REPO --clobber
 }
 
 if [ -e $TESTBUNDLEDIR ] ; then
