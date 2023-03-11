@@ -336,18 +336,18 @@ if "x%upload_bundle%" == "x" goto skip_upload
   cd %RELEASEDIR%
 
   set filelist=%TEMP%\fds_smv_files_win.out
-  gh release view %GH_FDS_TAG% | grep FDS | grep SMV | grep win | gawk "{print $2}" > %filelist%
-  for /F "tokens=*" %%A in (%filelist%) do gh release delete-asset %GH_FDS_TAG% %%A -y
+  gh release view %GH_FDS_TAG% -R github.com/%GH_OWNER%/%GH_REPO% | grep FDS | grep SMV | grep win | gawk "{print $2}" > %filelist%
+  for /F "tokens=*" %%A in (%filelist%) do gh release delete-asset %GH_FDS_TAG% -R github.com/%GH_OWNER%/%GH_REPO% %%A -y
   erase %filelist%
 
   set /p basename=<%TEMP%\fds_smv_basename.txt
 
   set fullfilebase=%userprofile%\.bundle\bundles\%basename%
-  echo gh release upload %GH_FDS_TAG% %fullfilebase%.%SHA1EXT% --clobber
-  gh release upload %GH_FDS_TAG% %fullfilebase%.%SHA1EXT% --clobber
+  echo gh release upload %GH_FDS_TAG% %fullfilebase%.%SHA1EXT% -R github.com/%GH_OWNER%/%GH_REPO% --clobber
+  gh release upload %GH_FDS_TAG% %fullfilebase%.%SHA1EXT% -R github.com/%GH_OWNER%/%GH_REPO% --clobber
   
-  echo gh release upload %GH_FDS_TAG% %fullfilebase%.exe  --clobber
-  gh release upload %GH_FDS_TAG% %fullfilebase%.exe  --clobber
+  echo gh release upload %GH_FDS_TAG% %fullfilebase%.exe -R github.com/%GH_OWNER%/%GH_REPO% --clobber
+  gh release upload %GH_FDS_TAG% %fullfilebase%.exe -R github.com/%GH_OWNER%/%GH_REPO% --clobber
 :skip_upload
 
 if "x%emailto%" == "x" goto endif6
