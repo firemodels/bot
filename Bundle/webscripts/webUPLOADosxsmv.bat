@@ -29,8 +29,8 @@ gh release view %GH_SMOKEVIEW_TAG% | grep SMV | grep -v FDS | grep -v CFAST | gr
 for /F "tokens=*" %%A in (%outfile%) do gh release delete-asset %GH_SMOKEVIEW_TAG% %%A -y
 erase %outfile%
 
-plink %plink_options% %linux_logon%  %linux_svn_root%/bot/Bundlebot/upload_smvbundle.sh .bundle/uploads %smv_revision%_osx.sh   %linux_svn_root%/%GH_REPO% %GH_SMOKEVIEW_TAG%
-plink %plink_options% %linux_logon%  %linux_svn_root%/bot/Bundlebot/upload_smvbundle.sh .bundle/uploads %smv_revision%_osx.sha1 %linux_svn_root%/%GH_REPO% %GH_SMOKEVIEW_TAG%
+plink %plink_options% %linux_logon%  %linux_svn_root%/bot/Bundlebot/upload_smvbundle.sh .bundle/uploads %smv_revision%_osx.sh   %linux_svn_root%/%GH_REPO% %GH_SMOKEVIEW_TAG% %GH_OWNER% %GH_REPO%
+plink %plink_options% %linux_logon%  %linux_svn_root%/bot/Bundlebot/upload_smvbundle.sh .bundle/uploads %smv_revision%_osx.sha1 %linux_svn_root%/%GH_REPO% %GH_SMOKEVIEW_TAG% %GH_OWNER% %GH_REPO%
 
 start chrome https://github.com/firemodels/%GH_REPO%/releases/tag/%GH_SMOKEVIEW_TAG%
 
