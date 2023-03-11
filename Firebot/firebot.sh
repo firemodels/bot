@@ -1788,6 +1788,9 @@ fi
    if [ "$UPLOADGUIDES" == "1" ]; then
      echo "             status:  https://pages.nist.gov/fds-smv/firebot_status.html" >> $TIME_LOG
    fi
+   if [ "$GITURL" != "" ]; then
+     echo "               Pubs:  $GITURL" >> $TIME_LOG
+   fi
    if [[ "$WEB_URL" != "" ]] && [[ "$UPDATED_WEB_IMAGES" != "" ]]; then
      echo "            images: $WEB_URL"  >> $TIME_LOG
      if [ -e image_differences ]; then
@@ -1826,7 +1829,8 @@ fi
         echo "" >> $WARNING_LOG
      fi
      if [ `whoami` == "firebot" ]; then
-       $UploadGuidesGH &> $OUTPUT_DIR/stage10_upload_google
+       $UploadGuidesGH &> $OUTPUT_DIR/stage10_upload_github
+       GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_FDS_TAG
      fi
    fi
 
@@ -2019,6 +2023,7 @@ CHECK_CLUSTER=
 OPENMPTEST=1
 MPI_TYPE=ompi
 BOPT=
+GITURL=
 
 #*** parse command line arguments
 while getopts 'b:BcCdDJm:Mp:q:R:sTuUV:x:X:y:Y:w:W:' OPTION
