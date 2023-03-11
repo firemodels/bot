@@ -4,8 +4,9 @@ CURDIR=`pwd`
 
 FROMDIR=~cfast/.cfastbot/pubs
 
-cd ../../test_bundles
+cd ../../$GH_REPO
 TESTBUNDLEDIR=`pwd`
+gh repo set-default $GH_OWNER/$GH_REPO
 cd $CURDIR
 
 UPLOADGUIDE ()
@@ -15,7 +16,7 @@ UPLOADGUIDE ()
   if [ -e $FROMDIR/$FILEnew ]; then
     cd $TESTBUNDLEDIR
     echo ***Uploading $FILEnew
-    gh release upload TEST $FROMDIR/$FILEnew --clobber
+    gh release upload $GH_CFAST_TAG $FROMDIR/$FILEnew --clobber
   fi
 }
 UPLOADHASH ()
@@ -27,7 +28,7 @@ UPLOADHASH ()
     FULLHASHFILE=/tmp/${HASHFILE}
     cp $FROMDIR/$FILE $FULLHASHFILE
     echo ***Uploading $HASHFILE
-    gh release upload TEST $FULLHASHFILE --clobber
+    gh release upload $GH_CFAST_TAG $FULLHASHFILE --clobber
     rm $FULLHASHFILE
   fi
 }

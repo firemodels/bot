@@ -1,6 +1,10 @@
 #!/bin/bash
 
 CURDIR=`pwd`
+if [ "$GH_FDS_TAG" == "" ]; then
+  echo "***error: GH_FDS_TAG variable not defined"
+  exit 1
+fi
 
 cd output/Newest_Guides
 FROMDIR=`pwd`
@@ -10,13 +14,14 @@ cd ../../fds/Manuals
 MANDIR=`pwd`
 cd $CURDIR
 
-cd /home2/smokevis2/firebot/FireModels_clone/fds/Manuals/
-MANDIR=`pwd`
-cd $CURDIR
-
-cd ../../test_bundles
+cd ../../$GH_REPO
 TESTBUNDLEDIR=`pwd`
+gh repo set-default $GH_OWNER/$GH_REPO
 cd $CURDIR
+if [ ! -e $TESTBUNDLEDIR ]; then
+   echo "***error: $TESTBUNDLEDIR does not exist"
+   exit 1
+fi
 
 UPLOADHASH ()
 {
@@ -25,7 +30,7 @@ UPLOADHASH ()
   if [ -e $DIR/$FILE ]; then
     cd $TESTBUNDLEDIR
     echo ***Uploading $FILE
-    gh release upload TEST $DIR/$FILE --clobber
+    gh release upload $GH_FDS_TAG $DIR/$FILE --clobber
   fi
 }
 
@@ -36,7 +41,7 @@ UPLOADGUIDE ()
   if [ -e $FROMDIR/$FILEnew ]; then
     cd $TESTBUNDLEDIR
     echo ***Uploading $FILEnew
-    gh release upload TEST $FROMDIR/$FILEnew --clobber
+    gh release upload $GH_FDS_TAG $FROMDIR/$FILEnew --clobber
   fi
 }
 UPLOADFIGURES ()
@@ -59,22 +64,21 @@ UPLOADFIGURES ()
   gzip $tarfile
   cd $TESTBUNDLEDIR
   echo ***Uploading $tarfile.gz
-  gh release upload TEST $TARHOME/$tarfile.gz --clobber
+  gh release upload $GH_FDS_TAG $TARHOME/$tarfile.gz --clobber
 }
 
-if [ -e $TESTBUNDLEDIR ] ; then
-  UPLOADGUIDE FDS_Config_Management_Plan
-  UPLOADGUIDE FDS_Technical_Reference_Guide
-  UPLOADGUIDE FDS_User_Guide
-  UPLOADGUIDE FDS_Validation_Guide
-  UPLOADGUIDE FDS_Verification_Guide
-  UPLOADFIGURES FDS_Technical_Reference_Guide FDS_TG
-  UPLOADFIGURES FDS_User_Guide FDS_UG
-  UPLOADFIGURES FDS_Validation_Guide FDS_VALG
-  UPLOADFIGURES FDS_Verification_Guide FDS_VERG
-  UPLOADHASH FDS_HASH
-  UPLOADHASH FDS_REVISION
-  UPLOADHASH SMV_HASH
-  UPLOADHASH SMV_REVISION
-  cd $CURDIR
-fi
+UPLOADGUIDE FDS_Config_Management_Plan
+UPLOADGUIDE FDS_Technical_Reference_Guide
+UPLOADGUIDE FDS_User_Guide
+UPLOADGUIDE FDS_Validation_Guide
+UPLOADGUIDE FDS_Verification_Guide
+UPLOADFIGURES FDS_Technical_Reference_Guide FDS_TG
+UPLOADFIGURES FDS_User_Guide FDS_UG
+UPLOADFIGURES FDS_Validation_Guide FDS_VALG
+UPLOADFIGURES FDS_Verification_Guide FDS_VERG
+UPLOADHASH FDS_HASH
+UPLOADHASH FDS_REVISION
+UPLOADHASH SMV_HASH
+UPLOADHASH SMV_REVISION
+cd $CURDIR
+exit 0
