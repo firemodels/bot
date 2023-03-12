@@ -1425,13 +1425,16 @@ email_build_status()
       echo "image errors/changes: $NUM_ERRORS/$NUM_CHANGES"  >> $TIME_LOG
     fi
   fi
-  if [ "$GITURL" != "" ]; then
-      echo "                Pubs: $GITURL"  >> $TIME_LOG
-  fi
   if [ "$UPLOADRESULTS" == "1" ]; then
     echo "      Smokebot status: https://pages.nist.gov/fds-smv/smokebot_status.html" >> $TIME_LOG
-    if [ "$GUIDESURL" != "" ]; then
-      echo "        latest guides: $GUIDESURL" >> $TIME_LOG
+    if [[ ! -e $WARNING_LOG && ! -e $ERROR_LOG ]]; then
+      if [ `whoami` == "smokebot" ];  then
+        echo  "***output guides and figures to Github"             > output/stage_GHupload
+        echo  ""                                                  >> output/stage_GHupload
+        $UploadGuidesGH                                          &>> output/stage_GHupload
+        GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_SMOKEVIEW_TAG
+        echo "     Smokeview guides: $GITURL"  >> $TIME_LOG
+      fi
     fi
   fi
   echo "-------------------------------"   >> $TIME_LOG
@@ -1463,13 +1466,6 @@ email_build_status()
       echo  "***output guides to Github"  &> output/stage_upload
       echo  ""                            &>> output/stage_upload
       $UploadWEB                  $smvrepo/Manuals $MAKEMOVIES &>> output/stage_upload
-      if [ `whoami` == "smokebot" ];  then
-        echo ""                                                 >> output/stage_upload
-        echo  "***out guides to Github"                         >> output/stage_upload
-        echo  ""                                                >> output/stage_upload
-        $UploadGuidesGH                                        &>> output/stage_upload
-        GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_SMOKEVIEW_TAG
-      fi
     fi
 
       # Send success message with links to nightly manuals

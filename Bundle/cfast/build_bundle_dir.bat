@@ -142,9 +142,10 @@ exit /b
 :: -------------------------------------------------
 set file=%1
 set fullfile=%PDFS%\%file%.pdf
-set hosthome=%bundle_cfastbot_home%/.cfastbot/Manuals
 echo | set /p dummyName=***downloading %file%: 
-pscp -P 22 %bundle_host%:%hosthome%/%file%/%file%.pdf %fullfile% 
+
+gh release download %GH_CFAST_TAG% -p %file%.pdf -R github.com/%GH_OWNER%/%GH_REPO% -D %PDFS%
+
 if NOT exist %fullfile% echo failed
 if exist %fullfile% echo succeeded
 exit /b 1

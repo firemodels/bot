@@ -1297,9 +1297,6 @@ email_build_status()
    if [ "$total_time" != "" ]; then
      echo "         Run Time: $total_time"       >> $TIME_LOG
    fi
-   if [[ "$GITURL" != "" ]]; then
-     echo "             Pubs: $GITURL" >> $TIME_LOG
-   fi
    if [[ $THIS_REVISION != $LAST_CFASTSOUCEgit ]] ; then
      cat $git_CFASTSOURCELOG >> $TIME_LOG
    fi
@@ -1328,6 +1325,12 @@ email_build_status()
 
    # No errors or warnings
    else
+      if [[ "$UPLOAD" == "1" ]] && [[ -e $UploadGuidesGH ]] && [[ `whoami` == "cfast" ]]; then
+         cd $cfastbotdir
+         $UploadGuidesGH
+         GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_CFAST_TAG
+         echo "     CFAST Guides: $GITURL" >> $TIME_LOG
+      fi
       # Send empty email with success message
       cat $TIME_LOG | mail $REPLYTO -s "CFASTbot build success on ${hostname}! Revision ${GIT_REVISION}." $mailTo &> /dev/null
       if [ -d $LATEST_MANUALS_DIR ]; then
@@ -1340,15 +1343,6 @@ email_build_status()
    if [ -e $VALIDATION_STATS_LOG ]
    then
       mail $REPLYTO -s "CFASTbot notice. Validation statistics have changed for Revision ${GIT_REVISION}." $mailTo < $VALIDATION_STATS_LOG &> /dev/null      
-   fi
-   if [[ "$UPLOAD" == "1" ]]; then
-     if [ -e $UploadGuidesGH ]; then
-       if [ `whoami` == "cfast" ]; then
-         cd $cfastbotdir
-         $UploadGuidesGH
-         GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_CFAST_TAG
-       fi
-     fi
    fi
 }
 

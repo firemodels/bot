@@ -32,7 +32,10 @@ goto eof
 :getfile
 set type=%1
 if exist %PDFS%\%type% erase %PDFS%\%type%
-pscp -P 22 %bundle_host%:%bundle_cfastbot_home%/.cfastbot/Manuals/%type% %PDFS%\%type%  > Nul 2>&1
+
+echo gh release download %GH_CFAST_TAG% -p %type% -R github.com/%GH_OWNER%/%GH_REPO% -D %PDFS%
+gh release download %GH_CFAST_TAG% -p %type% -R github.com/%GH_OWNER%/%GH_REPO% -D %PDFS%
+
 if NOT exist %PDFS%\%type% echo failed
 if exist %PDFS%\%type% echo succeeded
 exit /b

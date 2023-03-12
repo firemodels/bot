@@ -24,7 +24,7 @@ UPLOADHASH ()
   FILE=$1
   if [ -e $FROMDIR/$FILE ]; then
     cd $TESTBUNDLEDIR
-    HASHFILE=${FILE}_CB
+    HASHFILE=${FILE}
     FULLHASHFILE=/tmp/${HASHFILE}
     cp $FROMDIR/$FILE $FULLHASHFILE
     echo ***Uploading $HASHFILE
