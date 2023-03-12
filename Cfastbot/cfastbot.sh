@@ -1294,13 +1294,11 @@ email_build_status()
    echo "          Fortran: $IFORT_VERSION "   >> $TIME_LOG
    echo "       Start Time: $start_time "      >> $TIME_LOG
    echo "        Stop Time: $stop_time "       >> $TIME_LOG
-if [ "$total_time" != "" ]; then
-   echo "         Run Time: $total_time"       >> $TIME_LOG
-fi
-   if [[ "$UPLOAD" == "1" ]]; then
-      echo "-------------------------------"                                      >> $TIME_LOG
-      echo "Manuals https://github.com/firemodels/test_bundles/releases/tag/TEST" >> $TIME_LOG
-      echo "-------------------------------" >> $TIME_LOG
+   if [ "$total_time" != "" ]; then
+     echo "         Run Time: $total_time"       >> $TIME_LOG
+   fi
+   if [[ "$GITURL" != "" ]]; then
+     echo "             Pubs: $GITURL" >> $TIME_LOG
    fi
    if [[ $THIS_REVISION != $LAST_CFASTSOUCEgit ]] ; then
      cat $git_CFASTSOURCELOG >> $TIME_LOG
@@ -1348,6 +1346,7 @@ fi
        if [ `whoami` == "cfast" ]; then
          cd $cfastbotdir
          $UploadGuidesGH
+         GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_CFAST_TAG
        fi
      fi
    fi
@@ -1413,6 +1412,7 @@ UPLOAD=
 USEINSTALL=
 USEINSTALL2=
 CCnotfound=
+GITURL=
 
 if [[ "$IFORT_COMPILER" != "" ]] ; then
   source $IFORT_COMPILER/bin/compilervars.sh intel64
