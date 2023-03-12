@@ -37,7 +37,7 @@ set tofile=%PDFS%\%file%.pdf
 if exist %tofile% erase %tofile%
 echo | set /p dummyName=***downloading %file%.pdf: 
 
-gh release download %GH_CFAST_TAG% -p %file%.pdf -R github.com/%GH_OWNER%/%GH_REPO% -D $PDFS%
+gh release download %GH_CFAST_TAG% -p %file%.pdf -R github.com/%GH_OWNER%/%GH_REPO% -D %PDFS%
 
 if NOT exist %tofile% echo failed
 if exist %tofile% echo succeeded

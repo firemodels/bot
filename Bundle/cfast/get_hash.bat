@@ -33,7 +33,8 @@ goto eof
 set type=%1
 if exist %PDFS%\%type% erase %PDFS%\%type%
 
-gh release download %GH_CFAST_TAG% -p %file% -R github.com/%GH_OWNER%/%GH_REPO% -D $PDFS%
+echo gh release download %GH_CFAST_TAG% -p %type% -R github.com/%GH_OWNER%/%GH_REPO% -D %PDFS%
+gh release download %GH_CFAST_TAG% -p %type% -R github.com/%GH_OWNER%/%GH_REPO% -D %PDFS%
 
 if NOT exist %PDFS%\%type% echo failed
 if exist %PDFS%\%type% echo succeeded

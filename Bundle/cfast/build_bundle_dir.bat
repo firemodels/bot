@@ -144,7 +144,7 @@ set file=%1
 set fullfile=%PDFS%\%file%.pdf
 echo | set /p dummyName=***downloading %file%: 
 
-gh release download %GH_CFAST_TAG% -p %file%.pdf -R github.com/%GH_OWNER%/%GH_REPO% -D $PDFS%
+gh release download %GH_CFAST_TAG% -p %file%.pdf -R github.com/%GH_OWNER%/%GH_REPO% -D %PDFS%
 
 if NOT exist %fullfile% echo failed
 if exist %fullfile% echo succeeded
