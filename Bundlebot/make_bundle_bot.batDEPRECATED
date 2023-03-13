@@ -1,7 +1,5 @@
 @echo off
-set bot_host=%1
-set bot_home=%2
-set branch=%3
+set branch=%1
 
 set curdir=%CD%
 
@@ -49,8 +47,8 @@ git checkout master
 
 call copy_apps firebot
 call copy_apps smokebot
-call copy_pubs firebot  .firebot/pubs  %bot_host%
-call copy_pubs smokebot .smokebot/pubs %bot_host%
+call copy_pubs firebot
+call copy_pubs smokebot
 
 call make_bundle
 goto eof

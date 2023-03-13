@@ -3,9 +3,6 @@
 set SHA1EXT=sha1
 
 set clone=
-set bundle_host=
-set bundle_firebot_home=
-set bundle_smokebot_home=
 set FDS_HASH=
 set SMV_HASH=
 set FDS_TAG=
@@ -21,23 +18,6 @@ set emailto=
 if NOT exist %configscript% goto skip_config
   call %configscript%
 :skip_config
-
-:: define default strings for the usage script
-set default_hostname=
-set default_firebot_home=
-set default_smokebot_home=
-
-if x"%bundle_host%" == "x" goto def1
-  set default_hostname=[default: %bundle_host%]
-:def1
-
-if x"%bundle_firebot_home%" == "x" goto def2
-  set default_firebot_home=[default: %bundle_firebot_home%]
-:def2
-
-if x"%bundle_smokebot_home%" == "x" goto def3
-  set default_smokebot_home=[default: %bundle_smokebot_home%]
-:def3
 
 if EXIST .bundlebot goto endif1
   echo ***error: run_bundlebot.bat must be run in bot/Bundlebot directory
@@ -57,14 +37,6 @@ if NOT "x%BRANCH_NAME%" == "xrelease" goto skip_branch
   set nightly=rls
   set pub_dir=release
 :skip_branch
-
-:: set pubs directories
-set FDS_PUBS_DIR=%bundle_firebot_home%/.firebot/%pub_dir%/pubs
-set SMV_PUBS_DIR=%bundle_smokebot_home%/.smokebot/%pub_dir%/pubs
-if NOT "x%CUSTOM_MANUALS%" == "xcustom" goto skip_custom
-  set FDS_PUBS_DIR=.bundle/manuals
-  set SMV_PUBS_DIR=.bundle/manuals
-:skip_custom
 
 ::*** error checking
 
@@ -88,23 +60,6 @@ if "x%bad_hash%" == "x" goto badhash
   echo ***error: both or neither fds and smv hashes must be specified.  Only one was found
   set abort=1
 :badhash
-
-::--- make sure hostname is defined
-
-if NOT x"%bundle_host%" == "x" goto error1
-  echo ****error:  hostname where firebot and smokebot was run not defined
-  set abort=1
-:error1
-
-if NOT x"%firebot_home%" == "x" goto error2
-  echo ****error:  firebot home directory not defined
-  set abort=1
-:error2
-
-if NOT x"%smokebot_home%" == "x" goto error3
-  echo ****error:  smokebot home directory not defined
-  set abort=1
-:error3
 
 if "x%abort%" == "x" goto error4
   call :usage
@@ -230,11 +185,6 @@ if "x%SMV_TAG%" == "x" goto skip_smvtag
 echo             SMV repo tag: %SMV_TAG%                     >> %logfile%
 :skip_smvtag
 
-echo    firebot/smokebot host: %bundle_host%             >> %logfile%
-echo   firebot home directory: %bundle_firebot_home%         >> %logfile%
-echo        FDS pub directory: %FDS_PUBS_DIR%                >> %logfile%
-echo  smokebot home directory: %bundle_smokebot_home%        >> %logfile%
-echo Smokeview pubs directory: %SMV_PUBS_DIR%                >> %logfile%
 if NOT "%emailto%" == "" (
   echo                    email: %emailto%                   >> %logfile%
 )
@@ -304,7 +254,7 @@ echo Copying fds pubs
 echo.
 
 cd %CURDIR%
-call copy_pubs firebot  %FDS_PUBS_DIR%   %bundle_host% || exit /b 1
+call copy_pubs firebot  || exit /b 1
 
 echo.
 echo ------------------------------------------------------
@@ -313,7 +263,7 @@ echo Copying smv pubs
 echo.
 
 cd %CURDIR%
-call copy_pubs smokebot %SMV_PUBS_DIR% %bundle_host% || exit /b 1
+call copy_pubs smokebot || exit /b 1
 
 echo.
 echo ------------------------------------------------------
@@ -372,22 +322,16 @@ echo Options:
 echo -b - branch name [default: %BRANCH_NAME%]
 echo -c - bundle without warning about cloning/erasing fds and smv repos 
 echo -C - get manuals from .bundle/manuals
-echo -f - firebot home directory %default_firebot_home%
 echo -F - fds repo hash
 echo -h - display this message
-echo -H - host where firebot and smokebot were run %default_hostname%
 echo -m mailtto - send email to mailto
 echo -r - same as -b release or -R release
 echo -R - branch name [default: %BRANCH_NAME%]
-echo -s - smokebot home directory %default_smokebot_home%
 echo -S - smv repo hash
 echo -U - do not upload bundle
 echo -X fdstag - tag the fds repo using fdstag
 echo -Y smvtag - tag the smv repo using smvtag
 exit /b 0
-set bundle_host=
-set bundle_firebot_home=
-set bundle_smokebot_home=
 
 ::-----------------------------------------------------------------------
 :getopts
@@ -410,15 +354,6 @@ set bundle_smokebot_home=
    set clone=clone
    set valid=1
  )
- if "%1" EQU "-C" (
-   set CUSTOM_MANUALS=custom
-   set valid=1
- )
- if "%1" EQU "-f" (
-   set bundle_firebot_home=%2
-   set valid=1
-   shift
- )
  if "%1" EQU "-F" (
    set FDS_HASH=%2
    set valid=1
@@ -429,11 +364,6 @@ set bundle_smokebot_home=
    set stopscript=1
    exit /b
  )
- if "%1" EQU "-H" (
-   set bundle_host=%2
-   set valid=1
-   shift
- )
  if "%1" EQU "-m" (
    set emailto=%2
    set valid=1
@@ -442,11 +372,6 @@ set bundle_smokebot_home=
  if "%1" EQU "-r" (
    set BRANCH_NAME=release
    set valid=1
- )
- if "%1" EQU "-s" (
-   set bundle_smokebot_home=%2
-   set valid=1
-   shift
  )
  if "%1" EQU "-S" (
    set SMV_HASH=%2
