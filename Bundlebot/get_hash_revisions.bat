@@ -26,15 +26,12 @@ goto eof
 :getfile
 ::-----------------------------------------------------------------------
 set file=%1
-if NOT exist "%HASHDIR%\%file%" goto getfile_if
-  copy "%HASHDIR%\%file%" output\%file% > Nul
-  exit /b 0
-:getfile_if
-pscp  -P 22 %firebot_host%:%firebot_home%/.firebot/apps/%file%     output\%file%     > Nul
-if exist output\%file% exit /b 0
-set error=1
-echo ***Error: unable to download %file% from %firebot_host%:%firebot_home%/.firebot/apps/%file%
-exit /b 1
+if exist output\%file% erase output\%file%
+
+echo downloading %file%
+gh release download %GH_FDS_TAG% -p %file% -R github.com/%GH_OWNER%/%GH_REPO% -D output
+if NOT exist output\%file% echo failed
+exit /b
 
 ::-----------------------------------------------------------------------
 :getopts

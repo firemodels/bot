@@ -15,7 +15,7 @@ cd %curdir%
 
 :: get fds hash of lastest successful firebot run
 
-pscp -P 22 %bot_host%:%bot_home%/.firebot/apps/FDS_HASH fds_hash
+call :getfile FDS_HASH
 set /p fds_hash=<fds_hash
 cd ..\..\..\..\fds
 set fdsrepo=%CD%
@@ -26,7 +26,7 @@ cd %curdir%
 
 :: get smv hash of lastest successful firebot run
 
-pscp -P 22 %bot_host%:%bot_home%/.firebot/apps/SMV_HASH smv_hash
+call :getfile SMV_HASH
 set /p smv_hash=<smv_hash
 cd ..\..\..\..\smv
 set smvrepo=%CD%
@@ -53,4 +53,21 @@ call copy_pubs firebot  .firebot/pubs  %bot_host%
 call copy_pubs smokebot .smokebot/pubs %bot_host%
 
 call make_bundle
+goto eof
+
+::-----------------------------------------------------------------------
+:getfile
+::-----------------------------------------------------------------------
+set file=%1
+if exist %HASHDIR%\%file% erase %HASHDIR%\%file%
+
+echo gh release download %GH_FDS_TAG% -p %type% -R github.com/%GH_OWNER%/%GH_REPO% -D %PDFS%
+gh release download %GH_FDS_TAG% -p %file% -R github.com/%GH_OWNER%/%GH_REPO% -D %PDFS%
+
+if NOT exist %PDFS%\%file% echo failed
+if exist %PDFS%\%file% echo succeeded
+exit /b
+
+
+:eof
 
