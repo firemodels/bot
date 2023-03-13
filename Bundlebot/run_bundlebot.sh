@@ -1,4 +1,4 @@
- #!/bin/bash
+#!/bin/bash
 
 #---------------------------------------------
 #                   usage
@@ -16,9 +16,6 @@ echo "-c - bundle without warning about cloning/erasing fds and smv repos"
 echo "-f - force this script to run"
 echo "-F - fds repo hash/release"
 echo "-h - display this message"
-echo "-p host -  host containing pubs"
-echo "           firebot/fds pubs: ~firebot/.firebot/pubs"
-echo "-C - use pubs in $HOME/.bundle/manuals on pub_host"
 echo "-X fdstag - when cloning, tag fds repo with fdstag"
 echo "-Y smvtag - when cloning, tag smv repo with smvtag"
 
@@ -106,9 +103,6 @@ else
   echo ***error: configuration file $HOME/.bundle/bundle_config.sh is not defined
   exit 1
 fi
-FIREBOT_HOST=$bundle_hostname
-FIREBOT_HOME=$bundle_firebot_home
-
 LOCKFILE=$HOME/.bundle/lock
 
 MAILTO=
@@ -126,20 +120,15 @@ RELEASE=
 BRANCH=nightly
 FDS_HASH=
 SMV_HASH=
-PUB_HOST=$FIREBOT_HOST
 FDS_TAG=
 SMV_TAG=
-CUSTOM_PUBS=
 LATEST=
 
-while getopts 'cCfF:hLm:rR:S:UvX:Y:' OPTION
+while getopts 'cfF:hLm:rR:S:UvX:Y:' OPTION
 do
 case $OPTION  in
   c)
    PROCEED=1
-   ;;
-  C)
-   CUSTOM_PUBS=-C
    ;;
   f)
    FORCE="-f"
@@ -229,15 +218,12 @@ fi
 
 echo ""
 echo "------------------------------------------------------------"
-echo "            Firebot host: $FIREBOT_HOST"
-echo "  Firebot home directory: $FIREBOT_HOME"
 echo "          Firebot branch: $FIREBOT_BRANCH_ARG"
 echo "       Intel mpi version: $INTEL_MPI_VERSION"
 echo "             MPI version: $MPI_VERSION"
 if [ "$OPENMPI_DIR" ]; then
   echo "             OpenMPI dir: $OPENMPI_DIR"
 fi
-echo "                Pub host: $PUB_HOST"
 if [ "$FDS_TAG_ARG" != "" ]; then
   echo "                 FDS TAG: $FDS_TAG_ARG"
 fi
@@ -293,24 +279,17 @@ if [ "$ECHO" == "" ]; then
   UPDATE_REPO webpages nist-pages || exit 1
 fi
 
-gopt="-g $FIREBOT_HOST"
-Gopt="-G $FIREBOT_HOME"
-if [ "$LATEST" != "" ]; then
-  gopt=
-  Gopt=
-fi
-
 #*** build apps
 cd $curdir
 cd ../Firebot
 if [ "$platform" == "osx" ]; then
 # remove || exit 1 until compiler warnings are removed
-$ECHO ./run_firebot.sh $FORCE -c -C -B $gopt $Gopt $JOPT $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG $FIREBOT_BRANCH -T $MAILTO
+$ECHO ./run_firebot.sh $FORCE -c -C -B -F $JOPT $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG $FIREBOT_BRANCH -T $MAILTO
 else
-$ECHO ./run_firebot.sh $FORCE -c -C -B $gopt $Gopt $JOPT $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG $FIREBOT_BRANCH -T $MAILTO || exit 1
+$ECHO ./run_firebot.sh $FORCE -c -C -B -F $JOPT $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG $FIREBOT_BRANCH -T $MAILTO || exit 1
 fi
 
 #*** generate and upload bundle
 cd $curdir
-$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH $CUSTOM_PUBS $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG -w $UPLOAD
+$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG -w $UPLOAD
 rm $LOCKFILE

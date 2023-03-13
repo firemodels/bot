@@ -2,8 +2,6 @@
 set error=0
 set bot_type=%1
 
-set "PUBDIR=%userprofile%\Google Drive\FDS-SMV Newest Manuals\"
-
 set pdf_to_dir=%userprofile%\.bundle\pubs
 
 if NOT exist %userprofile%\.bundle mkdir %userprofile%\.bundle

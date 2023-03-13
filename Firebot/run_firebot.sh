@@ -36,11 +36,7 @@ echo "Build apps, set repo revisions"
 echo "-B - only build apps"
 echo "-C - when cloning repos proceed without giving a warning"
 echo "-D firebot is being run using old fds Build directory structure"
-echo "-g firebot_host - host where firebot was run"
-echo "-G firebot_home - home directory where firebot was run"
-echo "   The -g and -G options are used when cloning repos (-R option)"
-echo "   to build apps using the same repo revisions as used with the last"
-echo "   successful firebot run"
+echo "-F - clone repos using revisions from latest firebot pass"
 echo "-R branch_name - clone fds, exp, fig, out and smv repos. fds and smv repos"
 echo "     will be checked out with a branch named 'branch_name'"
 echo "-T - only clone the fds and smv repos (this option is set by default when"
@@ -196,8 +192,7 @@ FDS_REV=
 SMV_REV=
 FDS_REV_ARG=
 SMV_REV_ARG=
-FIREBOT_HOST=
-FIREBOT_HOME=
+FIREBOT_LATEST_PASS=
 WEB_DIR=
 WEB_ROOT=/var/www/html
 FORCECLONE=
@@ -211,7 +206,7 @@ OPENMPTEST=
 
 #*** parse command line options
 
-while getopts 'bBcCdDfg:G:hHJkm:MnNOPq:R:TuUvV:w:W:x:X:y:Y:' OPTION
+while getopts 'bBcCdDfFhHJkm:MnNOPq:R:TuUvV:w:W:x:X:y:Y:' OPTION
 do
 case $OPTION  in
   b)
@@ -235,11 +230,8 @@ case $OPTION  in
   f)
    FORCE=1
    ;;
-  g)
-   FIREBOT_HOST="$OPTARG"
-   ;;
-  G)
-   FIREBOT_HOME="$OPTARG"
+  F)
+   FIREBOT_LATEST_PASS=1
    ;;
   h)
    usage;
@@ -354,18 +346,8 @@ fi
 # sync fds and smv repos with the the repos used in the last successful firebot run
 
 GET_HASH=
-if [ "$FIREBOT_HOST" != "" ]; then
+if [ "$FIREBOT_LATEST_PASS" != "" ]; then
   GET_HASH=1
-else
-  FIREBOT_HOST=`hostname`
-fi
-if [ "$FIREBOT_HOME" != "" ]; then
-  GET_HASH=1
-else
-  FIREBOT_HOME=\~firebot
-fi
-if [ "$FIREBOT_HOST" == "LOCAL" ]; then
-  FIREBOT_HOME=\$HOME/.firebot/pass
 fi
 
 if [ "$FDS_REV" != "" ]; then
@@ -377,10 +359,10 @@ if [ "$GET_HASH" != "" ]; then
     echo "          when cloning the repos, when the -R option is used"
     exit 1
   fi
-  FDS_HASH=`../Bundle/fds/scripts/get_hash.sh -r fds -g $FIREBOT_HOST -G $FIREBOT_HOME`
-  SMV_HASH=`../Bundle/fds/scripts/get_hash.sh -r smv -g $FIREBOT_HOST -G $FIREBOT_HOME`
-  FDS_REVISION=`../Bundle/fds/scripts/get_rev.sh -r fds -g $FIREBOT_HOST -G $FIREBOT_HOME`
-  SMV_REVISION=`../Bundle/fds/scripts/get_rev.sh -r smv -g $FIREBOT_HOST -G $FIREBOT_HOME`
+  FDS_HASH=`../Bundlebot/getGHfile.sh     FDS_HASH     FDS_TEST`
+  SMV_HASH=`../Bundlebot/getGHfile.sh     SMV_HASH     FDS_TEST`
+  FDS_REVISION=`../Bundlebot/getGHfile.sh FDS_REVISION FDS_TEST`
+  SMV_REVISION=`../Bundlebot/getGHfile.sh SMV_REVISION FDS_TEST`
   ABORT=
   if [ "$FDS_HASH" == "" ]; then
     ABORT=1
@@ -389,8 +371,8 @@ if [ "$GET_HASH" != "" ]; then
     ABORT=1
   fi
   if [ "$ABORT" != "" ]; then
-    echo "***error: the fds and/or smv repo hash could not be found in the directory"
-    echo "          $FIREBOT_HOME/.firebot/apps at the host $FIREBOT_HOST"
+    echo "***error: the fds and/or smv repo hash could not be found at"
+    echo "          github.com/$GH_OWNER/$GH_REPO tag: $GH_FDS_TAG"
     exit 1
   fi
   FDS_REV="-x $FDS_HASH"
