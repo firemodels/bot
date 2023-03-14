@@ -39,5 +39,5 @@ set /p INFO=<%tempfile%
 erase %tempfile%
 
 set TITLE=%PREFIX%
-if NOT "x%INFO%" == "x" set TITLE=%TITLE% (%hash% committed %INFO%)
+if NOT "x%INFO%" == "x" set TITLE=%TITLE% %hash% %INFO%
 gh release edit %tag% -t "%TITLE%" -R github.com/%GH_OWNER%/%GH_REPO%
