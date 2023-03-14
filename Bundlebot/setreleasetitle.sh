@@ -23,7 +23,7 @@ if [ "$ERROR" != "" ]; then
 fi
 
 cd ../../$repo
-INFO="`git show -s --format=%cd --date=format:'%Y-%b-%d %H:%M:%S' $hash`"
+INFO="`git show -s --format=%cd --date=format:'%Y-%b-%d %H:%M' $hash`"
 TITLE="$PREFIX"
 if [ "$INFO" != "" ]; then
   TITLE="$TITLE ($hash committed: $INFO)"
