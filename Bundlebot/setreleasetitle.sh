@@ -35,6 +35,6 @@ cd ../../$repo
 INFO="`git show -s --format=%cd --date=format:'%Y-%b-%d %H:%M' $hash`"
 TITLE="$PREFIX"
 if [ "$INFO" != "" ]; then
-  TITLE="$TITLE ($hash committed $INFO)"
+  TITLE="$TITLE $hash $INFO"
 fi
 gh release edit $tag -t "$TITLE" -R github.com/$GH_OWNER_ARG/$GH_REPO_ARG
