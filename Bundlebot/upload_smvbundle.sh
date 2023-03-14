@@ -29,7 +29,7 @@ if [ "$RELEASEBUNDLEDIR" != "" ]; then
     cd $SCRIPTDIR/../../smv
     SMV_SHORT_HASH=`git rev-parse --short HEAD`
     cd $SCRIPTDIR
-    ./setreleasetitle.sh smv $SMV_SHORT_HASH
+    ./setreleasetitle.sh smv $SMV_SHORT_HASH $GH_OWNER_ARG $GH_REPO_ARG
   fi
 fi
 
