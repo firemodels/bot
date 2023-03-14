@@ -15,7 +15,7 @@ cd $CURDIR
 
 UPLOADHASH ()
 {
-  DIR=$HOME/.smokebot/appslatest
+  DIR=$HOME/.smokebot/apps
   FILE=$1
   if [ -e $DIR/$FILE ]; then
     cd $TESTBUNDLEDIR
@@ -34,6 +34,7 @@ UPLOADGUIDE ()
     gh release upload $GH_SMOKEVIEW_TAG $FROMDIR/$FILEnew -R github.com/$GH_OWNER/$GH_REPO --clobber
   fi
 }
+
 UPLOADFIGURES ()
 {
   DIRECTORY=$1
@@ -63,5 +64,8 @@ if [ -e $TESTBUNDLEDIR ] ; then
   UPLOADGUIDE SMV_Verification_Guide
   UPLOADFIGURES SMV_User_Guide SMV_UG
   UPLOADFIGURES SMV_Verification_Guide SMV_VG
+  UPLOADHASH SMV_HASH
+  UPLOADHASH SMV_REVISION
+
   cd $CURDIR
 fi
