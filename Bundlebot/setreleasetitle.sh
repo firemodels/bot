@@ -34,4 +34,4 @@ INFO="`git show -s --format=%cd --date=format:'%Y-%b-%d %H:%M' $hash`"
 if [ "$INFO" != "" ]; then
   TITLE="$TITLE $INFO"
 fi
-echo gh release edit $tag -t "$TITLE" -R github.com/$GH_OWNER_ARG/$GH_REPO_ARG
+gh release edit $tag -t "$TITLE" -R github.com/$GH_OWNER_ARG/$GH_REPO_ARG
