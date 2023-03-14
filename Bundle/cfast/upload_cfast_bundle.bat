@@ -39,5 +39,8 @@ erase %filelist%
 
 gh release upload %GH_CFAST_TAG% %fullfile% --clobber -R github.com/%GH_OWNER%/%GH_REPO%
 
+cd %CURDIR%\..\..\Bundlebot
+call setreleasetitle cfast
+
 cd %CURDIR%
 exit /b 0
