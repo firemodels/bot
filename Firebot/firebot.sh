@@ -1796,6 +1796,14 @@ fi
        echo " image errors/changes: $NUM_ERRORS/$NUM_CHANGES"  >> $TIME_LOG
      fi
    fi
+#  upload guides to github
+   get_firebot_success
+   if [[ "$UPLOADGUIDES" == "1" ]] && [[ "$firebot_success" == "1" ]] && [[ `whoami` == "firebot" ]]; then
+     cd $firebotdir
+     $UploadGuidesGH &> $OUTPUT_DIR/stage10_upload_github
+     GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_FDS_TAG
+     echo "         FDS Guides:  $GITURL" >> $TIME_LOG
+   fi
    echo "-------------------------------"    >> $TIME_LOG
    if [ -e output/slow_cases ]; then
      echo "cases with longest runtime"       >> $TIME_LOG
@@ -1824,11 +1832,6 @@ fi
         echo "Warnings from Stage 10 - Upload documents to google drive:" >> $WARNING_LOG
         grep -i -E 'warning' $OUTPUT_DIR/stage10_upload_google >> $WARNING_LOG
         echo "" >> $WARNING_LOG
-     fi
-     if [ `whoami` == "firebot" ]; then
-       $UploadGuidesGH &> $OUTPUT_DIR/stage10_upload_github
-       GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_FDS_TAG
-       echo "         FDS Guides:  $GITURL" >> $TIME_LOG
      fi
    fi
 
