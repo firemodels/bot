@@ -7,6 +7,9 @@ GH_OWNER_ARG=$5
 GH_REPO_ARG=$6
 
 CURDIR=`pwd`
+cd $HOME/$RELEASEBUNDLEDIR/../bot/Bundlebot
+SCRIPTDIR=`pwd`
+cd $CURDIR
 
 if [ ! -e $HOME/$FROM_DIR/$FROM_FILE ] ; then
   echo "***error: $FROM_FILE does not exist in $HOME/$FROM_DIR"
@@ -23,9 +26,9 @@ if [ "$RELEASEBUNDLEDIR" != "" ]; then
     platform=linux
   fi
   if [ "$platform" == "linux" ]; then
-    cd $CURDIR/../../smv
+    cd $SCRIPTDIR/../../smv
     SMV_SHORT_HASH=`git rev-parse --short HEAD`
-    cd $CURDIR
+    cd $SCRIPTDIR
     ./setreleasetitle.sh smv $SMV_SHORT_HASH
   fi
 fi
