@@ -1802,7 +1802,7 @@ fi
      cd $firebotdir
      $UploadGuidesGH &> $OUTPUT_DIR/stage10_upload_github
      GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_FDS_TAG
-     echo "         FDS Guides:  $GITURL" >> $TIME_LOG
+     echo "FDS Test Releases and Documentation:  $GITURL" >> $TIME_LOG
    fi
    echo "-------------------------------"    >> $TIME_LOG
    if [ -e output/slow_cases ]; then
