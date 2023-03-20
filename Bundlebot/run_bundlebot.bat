@@ -71,12 +71,6 @@ set CURDIR=%CD%
 cd ..
 set botrepo=%CD%
 
-cd ..\%GH_REPO%
-gh repo set-default %GH_OWNER%/%GH_REPO%
-set RELEASEDIR=%CD%
-
-cd %botrepo%
-
 if exist ..\webpages goto endif4
   echo ***error: the webpages repo does not exist
   cd %CURDIR%
@@ -282,8 +276,6 @@ if "x%upload_bundle%" == "x" goto skip_upload
   echo ------------------------------------------------------
   echo uploading bundle
   echo.
-
-  cd %RELEASEDIR%
 
   set filelist=%TEMP%\fds_smv_files_win.out
   gh release view %GH_FDS_TAG% -R github.com/%GH_OWNER%/%GH_REPO% | grep FDS | grep SMV | grep win | gawk "{print $2}" > %filelist%
