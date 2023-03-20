@@ -29,6 +29,10 @@ SETUP_REMOTE ()
 {
   local repo_dir=$1
 
+  basedir=`basename $repo_dir`
+  if [ "$basedir" == "test7_bundles" ]; then
+    exit
+  fi
   cd $repo_dir
   if [ "$GITUSER" == "firemodels" ]; then
      ndisable=`git remote -v | grep DISABLE | wc -l`
