@@ -79,6 +79,7 @@ goto eof
   
 if "%GITUSER%" == "firemodels"  (
   if "%repo%" == "nplot" exit /b
+  if "%repo%" == "test7_bundles" exit /b
 )
 echo.
 echo ------------------------------------------------------
@@ -135,6 +136,9 @@ echo.
      exit /b 0
   )
   if "%repo%" == "nplot" (
+    exit /b
+  )
+  if "%repo%" == "test7_bundles" (
     exit /b
   )
   echo setting up remote tracking
