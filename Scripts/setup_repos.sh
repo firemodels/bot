@@ -55,12 +55,12 @@ SETUP_REMOTE ()
 
 CURDIR=`pwd`
 
-fdsrepos="cad exp fds fig out smv test_bundles"
+fdsrepos="cad exp fds fig out smv test_bundles test7_bundles"
 fdssmvrepos="fds smv"
-firebotrepos="cad exp fds fds-smv fig out smv test_bundles"
-smvrepos="cfast fds fig smv test_bundles"
-cfastrepos="cfast exp fig smv test_bundles"
-allrepos="cad cfast cor exp fds fig out radcal smv test_bundles"
+firebotrepos="cad exp fds fds-smv fig out smv test_bundles test7_bundles"
+smvrepos="cfast fds fig smv test_bundles test7_bundles"
+cfastrepos="cfast exp fig smv test_bundles test7_bundles"
+allrepos="cad cfast cor exp fds fig out radcal smv test_bundles test7_bundles"
 wikiwebrepos="fds.wiki fds-smv"
 repos=$fdsrepos
 eraserepos=
