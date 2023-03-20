@@ -8,9 +8,9 @@ cd ../../smv/Manuals
 MANDIR=`pwd`
 cd $CURDIR
 
-cd ../../$GH_REPO
-TESTBUNDLEDIR=`pwd`
-gh repo set-default $GH_OWNER/$GH_REPO
+#cd ../../$GH_REPO
+#TESTBUNDLEDIR=`pwd`
+#gh repo set-default $GH_OWNER/$GH_REPO
 cd $CURDIR
 
 UPLOADHASH ()
