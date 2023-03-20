@@ -8,11 +8,6 @@ cd ../../smv/Manuals
 MANDIR=`pwd`
 cd $CURDIR
 
-#cd ../../$GH_REPO
-#TESTBUNDLEDIR=`pwd`
-#gh repo set-default $GH_OWNER/$GH_REPO
-cd $CURDIR
-
 UPLOADHASH ()
 {
   DIR=$HOME/.smokebot/apps
@@ -66,6 +61,5 @@ if [ -e $TESTBUNDLEDIR ] ; then
   UPLOADFIGURES SMV_Verification_Guide SMV_VG
   UPLOADHASH SMV_HASH
   UPLOADHASH SMV_REVISION
-
   cd $CURDIR
 fi
