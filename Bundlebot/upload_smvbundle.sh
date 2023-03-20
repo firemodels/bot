@@ -21,9 +21,9 @@ else
   platform=linux
 fi
 if [ "$platform" == "linux" ]; then
-  cd $SCRIPTDIR/../../smv
+  cd $HOME/$SCRIPTDIR/../../smv
   SMV_SHORT_HASH=`git rev-parse --short HEAD`
-  cd $SCRIPTDIR
+  cd $HOME/$SCRIPTDIR
   ./setreleasetitle.sh smv $SMV_SHORT_HASH $GH_OWNER_ARG $GH_REPO_ARG
 fi
 
