@@ -1798,7 +1798,17 @@ fi
    fi
 #  upload guides to github
    get_firebot_success
-   if [[ "$UPLOADGUIDES" == "1" ]] && [[ "$firebot_success" == "1" ]] && [[ `whoami` == "firebot" ]]; then
+   is_bot=
+   if [ `whoami` == "firebot" ]; then
+     is_bot=1
+   fi
+   if [ `whoami` == "smokebot" ]; then
+     is_bot=1
+   fi
+   if [ `whoami` == "cfast" ]; then
+     is_bot=1
+   fi
+   if [[ "$UPLOADGUIDES" == "1" ]] && [[ "$firebot_success" == "1" ]] && [[ "$isbot"  == "1" ]]; then
      cd $firebotdir
      $UploadGuidesGH &> $OUTPUT_DIR/stage10_upload_github
      GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_FDS_TAG
