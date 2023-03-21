@@ -37,6 +37,8 @@ echo "-G firebot_home - home directory where firebot was run"
 echo "   The -g and -G options are used when cloning repos (-R option)"
 echo "   to build apps using the same repo revisions as used with the last"
 echo "   successful firebot run"
+echo "-o - specify GH_OWNER when uploading manuals. [default: $GH_OWNER]"
+echo "-r - specify GH_REPO when uploading manuals. [default: $GH_REPO]"
 echo "-R release_type (master, release or test) - clone fds, exp, fig, out and smv repos"
 echo "   fds and smv repos will be checked out with a branch named"
 echo "   master, release or test [default: master]"
@@ -191,7 +193,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'abBcDfg:G:hHJkLm:MPq:R:TuUvw:W:x:X:y:Y:' OPTION
+while getopts 'abBcDfg:G:hHJkLm:Mo:Pq:r:R:TuUvw:W:x:X:y:Y:' OPTION
 do
 case $OPTION  in
   a)
@@ -239,11 +241,17 @@ case $OPTION  in
   M)
    MOVIE="-M"
    ;;
+  o)
+   export GH_OWNER="$OPTARG"
+   ;;
   P)
    REMOVE_PID=1
    ;;
   q)
    QUEUE="$OPTARG"
+   ;;
+  r)
+   export GH_REPO="$OPTARG"
    ;;
   R)
    CLONE_REPOS="$OPTARG"

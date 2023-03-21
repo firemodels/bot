@@ -25,8 +25,6 @@ call %envfile%
 set uploaddir=%userprofile%\.bundle\uploads
 set CURDIR=%CD%
 
-cd %svn_root%\%GH_REPO%
-
 set filelist=%TEMP%\smv_files_win.out
 gh release view %GH_SMOKEVIEW_TAG%  -R github.com/%GH_OWNER%/%GH_REPO% | grep SMV | grep -v FDS | grep -v CFAST | grep win | gawk "{print $2}" > %filelist%
 for /F "tokens=*" %%A in (%filelist%) do gh release delete-asset %GH_SMOKEVIEW_TAG% %%A  -R github.com/%GH_OWNER%/%GH_REPO% -y

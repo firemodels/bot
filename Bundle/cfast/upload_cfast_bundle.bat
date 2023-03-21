@@ -30,8 +30,6 @@ set SCRIPTDIR=%CD%
 
 cd %CURDIR%\
 
-cd ..\..\..\%GH_REPO%
-gh repo set-default %GH_OWNER%/%GH_REPO%
 set filelist=%TEMP%\cfast_smv_files_win.out
 gh release view %GH_CFAST_TAG% -R github.com/%GH_OWNER%/%GH_REPO% | grep CFAST | grep SMV | grep win | gawk "{print $2}" > %filelist%
 for /F "tokens=*" %%A in (%filelist%) do gh release delete-asset %GH_CFAST_TAG% %%A -R github.com/%GH_OWNER%/%GH_REPO% -y

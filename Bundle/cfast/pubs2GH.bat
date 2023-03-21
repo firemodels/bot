@@ -5,16 +5,12 @@ set cfastbundledir=%CD%
 
 cd ..\..\..\cfast
 set cfastrepo=%CD%
-cd ..\%GH_REPO%
-set testbundlerepo=%CD%
-gh repo set-default %GH_OWNER%/%GH_REPO%
 set manuals=%cfastrepo%\Manuals
 set PDFS=%userprofile%\.cfast\PDFS
 
 if NOT exist %userprofile%\.cfast mkdir %userprofile%\.cfast
 if NOT exist %PDFS% mkdir %PDFS%
 
-cd %testbundlerepo%
 call :copy_file CFAST_Tech_Ref.pdf
 call :copy_file CFAST_Users_Guide.pdf
 call :copy_file CFAST_Validation_Guide.pdf

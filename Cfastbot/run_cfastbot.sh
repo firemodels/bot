@@ -58,6 +58,8 @@ echo "-i - use installed smokeview and background (if using the 'none' queue)"
 echo "-I - compiler [ default: $compiler]"
 echo "-k - kill cfastbot"
 echo "-m email -  email_address "
+echo "-o - specify GH_OWNER when uploading manuals. [default: $GH_OWNER]"
+echo "-r - specify GH_REPO when uploading manuals. [default: $GH_REPO]"
 echo "-q queue_name - run cases using the queue queue_name"
 echo "     default: $QUEUE"
 echo "-R - remove run status file"
@@ -166,7 +168,7 @@ USEINSTALL=
 KILL_CFASTBOT=
 ECHO=
 
-while getopts 'acfhHiI:km:Mq:RsuUv' OPTION
+while getopts 'acfhHiI:km:o:Mq:r:RsuUv' OPTION
 do
 case $OPTION  in
   a)
@@ -199,8 +201,14 @@ case $OPTION  in
   M)
    MATLABEXE="-M"
    ;;
+  o)
+   export GH_OWNER="$OPTARG"
+   ;;
   q)
    QUEUE="$OPTARG"
+   ;;
+  r)
+   export GH_REPO="$OPTARG"
    ;;
   R)
    REMOVE_PID=1

@@ -14,21 +14,11 @@ cd ../../fds/Manuals
 MANDIR=`pwd`
 cd $CURDIR
 
-cd ../../$GH_REPO
-TESTBUNDLEDIR=`pwd`
-gh repo set-default $GH_OWNER/$GH_REPO
-cd $CURDIR
-if [ ! -e $TESTBUNDLEDIR ]; then
-   echo "***error: $TESTBUNDLEDIR does not exist"
-   exit 1
-fi
-
 UPLOADHASH ()
 {
   DIR=$HOME/.firebot/appslatest
   FILE=$1
   if [ -e $DIR/$FILE ]; then
-    cd $TESTBUNDLEDIR
     echo ***Uploading $FILE
     gh release upload $GH_FDS_TAG $DIR/$FILE -R github.com/$GH_OWNER/$GH_REPO --clobber
   fi
@@ -39,7 +29,6 @@ UPLOADGUIDE ()
   FILE=$1
   FILEnew=${FILE}.pdf
   if [ -e $FROMDIR/$FILEnew ]; then
-    cd $TESTBUNDLEDIR
     echo ***Uploading $FILEnew
     gh release upload $GH_FDS_TAG $FROMDIR/$FILEnew -R github.com/$GH_OWNER/$GH_REPO --clobber
   fi
@@ -62,7 +51,6 @@ UPLOADFIGURES ()
   tar cvf $TARHOME/$tarfile . &> /dev/null
   cd $TARHOME
   gzip $tarfile
-  cd $TESTBUNDLEDIR
   echo ***Uploading $tarfile.gz
   gh release upload $GH_FDS_TAG $TARHOME/$tarfile.gz -R github.com/$GH_OWNER/$GH_REPO --clobber
 }

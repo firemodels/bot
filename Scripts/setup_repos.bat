@@ -12,12 +12,12 @@ if not exist ..\.gitbot goto skip1
    exit /b 1
 :endif1
 
-set fdsrepos=exp fds fig out smv test_bundles
+set fdsrepos=exp fds fig out smv test_bundles test7_bundles
 set fdssmvrepos=fds smv
-set smvrepos=cfast fds fig smv test_bundles
+set smvrepos=cfast fds fig smv test_bundles test7_bundles
 set cfastsmvrepos=cfast         smv nplot 
-set    cfastrepos=cfast exp fig smv nplot test_bundles
-set allrepos= cad cfast cor exp fds fig out radcal smv nplot test_bundles
+set    cfastrepos=cfast exp fig smv nplot test_bundles test7_bundles
+set allrepos= cad cfast cor exp fds fig out radcal smv nplot test_bundles test7_bundles
 set wikiwebrepos= fds.wiki fds-smv
 set repos=%fdsrepos%
 set WIKIWEB=0
@@ -79,6 +79,7 @@ goto eof
   
 if "%GITUSER%" == "firemodels"  (
   if "%repo%" == "nplot" exit /b
+  if "%repo%" == "test7_bundles" exit /b
 )
 echo.
 echo ------------------------------------------------------
@@ -135,6 +136,9 @@ echo.
      exit /b 0
   )
   if "%repo%" == "nplot" (
+    exit /b
+  )
+  if "%repo%" == "test7_bundles" (
     exit /b
   )
   echo setting up remote tracking

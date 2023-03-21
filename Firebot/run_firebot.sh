@@ -37,6 +37,8 @@ echo "-B - only build apps"
 echo "-C - when cloning repos proceed without giving a warning"
 echo "-D firebot is being run using old fds Build directory structure"
 echo "-F - clone repos using revisions from latest firebot pass"
+echo "-o - specify GH_OWNER when uploading manuals. [default: $GH_OWNER]"
+echo "-r - specify GH_REPO when uploading manuals. [default: $GH_REPO]"
 echo "-R branch_name - clone fds, exp, fig, out and smv repos. fds and smv repos"
 echo "     will be checked out with a branch named 'branch_name'"
 echo "-T - only clone the fds and smv repos (this option is set by default when"
@@ -206,7 +208,7 @@ OPENMPTEST=
 
 #*** parse command line options
 
-while getopts 'bBcCdDfFhHJkm:MnNOPq:R:TuUvV:w:W:x:X:y:Y:' OPTION
+while getopts 'bBcCdDfFhHJkm:MnNo:OPq:r:R:TuUvV:w:W:x:X:y:Y:' OPTION
 do
 case $OPTION  in
   b)
@@ -257,6 +259,9 @@ case $OPTION  in
   N)
    SKIPMATLAB=-s
    ;;
+  o)
+   export GH_OWNER="$OPTARG"
+   ;;
   O)
    INTEL=
    ;;
@@ -265,6 +270,9 @@ case $OPTION  in
    ;;
   q)
    QUEUE="$OPTARG"
+   ;;
+  r)
+   export GH_REPO="$OPTARG"
    ;;
   R)
    CLONE_REPOS="$OPTARG"

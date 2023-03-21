@@ -97,6 +97,16 @@ goto eof
    set valid=1
    shift
  )
+ if /I "%1" EQU "-o" (
+   set GH_OWNER=%2
+   set valid=1
+   shift
+ )
+ if /I "%1" EQU "-r" (
+   set GH_REPO=%2
+   set valid=1
+   shift
+ )
  if /I "%1" EQU "-force" (
    set force=1
    set valid=1
@@ -166,7 +176,9 @@ echo -clean          - clean repository
 echo -force          - force cfastbot run
 echo -installed      - use installed cfast and smokeview
 echo -nomatlab       - do not use matlab
+echo -o              - specify GH_OWNER when uploading manuals. [default: %GH_OWNER%]
 echo -official       - build official version of cfast
+echo -r              - specify GH_REPO when uploading manuals. [default: %GH_REPO%]
 echo -skip_cases     - skip over stage that runs cases
 echo -smokeview      - use installed smokeview
 echo -update         - update repository
