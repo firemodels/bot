@@ -1808,7 +1808,7 @@ fi
    if [ `whoami` == "cfast" ]; then
      is_bot=1
    fi
-   if [[ "$UPLOADGUIDES" == "1" ]] && [[ "$firebot_success" == "1" ]] && [[ "$isbot"  == "1" ]]; then
+   if [[ "$UPLOADGUIDES" == "1" ]] && [[ "$firebot_success" == "1" ]] && [[ "$is_bot"  == "1" ]]; then
      cd $firebotdir
      $UploadGuidesGH &> $OUTPUT_DIR/stage10_upload_github
      GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_FDS_TAG

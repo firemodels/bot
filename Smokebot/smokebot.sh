@@ -1427,7 +1427,17 @@ email_build_status()
   fi
   if [ "$UPLOADRESULTS" == "1" ]; then
     echo "               status: https://pages.nist.gov/fds-smv/smokebot_status.html" >> $TIME_LOG
-    if [[ `whoami` == "smokebot" ]] && [[ ! -e $WARNING_LOG ]] && [[ ! -e $ERROR_LOG ]]; then
+    is_bot=
+    if [ `whoami` == "firebot" ]; then
+      is_bot=1
+    fi
+    if [ `whoami` == "cfast" ]; then
+      is_bot=1
+    fi
+    if [ `whoami` == "smokebot" ]; then
+      is_bot=1
+    fi
+    if [[ "$isbot" == "1" ]] && [[ ! -e $WARNING_LOG ]] && [[ ! -e $ERROR_LOG ]]; then
       echo  "***output guides and figures to Github"             > output/stage_GHupload
       echo  ""                                                  >> output/stage_GHupload
       $UploadGuidesGH                                          &>> output/stage_GHupload
