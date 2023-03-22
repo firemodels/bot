@@ -20,6 +20,7 @@ UPLOADHASH ()
     FILE2=$FILE$suffix
     cp $DIR/$FILE $DIR/$FILE2
     gh release upload $GH_SMOKEVIEW_TAG $DIR/$FILE2 -R github.com/$GH_OWNER/$GH_REPO --clobber
+    rm -f $DIR/$FILE2
   fi
 }
 
