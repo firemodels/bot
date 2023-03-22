@@ -1437,7 +1437,7 @@ email_build_status()
     if [ `whoami` == "smokebot" ]; then
       is_bot=1
     fi
-    if [[ "$isbot" == "1" ]] && [[ ! -e $WARNING_LOG ]] && [[ ! -e $ERROR_LOG ]]; then
+    if [[ "$is_bot" == "1" ]] && [[ ! -e $WARNING_LOG ]] && [[ ! -e $ERROR_LOG ]]; then
       echo  "***output guides and figures to Github"             > output/stage_GHupload
       echo  ""                                                  >> output/stage_GHupload
       $UploadGuidesGH                                          &>> output/stage_GHupload
