@@ -17,10 +17,6 @@ bot_repo = repo_root + "bot\\"
 smv_repo = repo_root + "smv\\"
 webscript_dir  = bot_repo + "Bundle\\webscripts\\"
 
-def restart_program():
-    python = sys.executable
-    os.execl(python, python, * sys.argv)
-
 versions   = ["", "test", "release"]
 platforms  = ["", "Windows", "Linux", "OSX"]
 apps       = ["", "FDS", "Smokeview" ]
@@ -214,8 +210,5 @@ Button(root, text="settings ---> smv",  width=button_width, command=webCOPYhome2
 Button(root, text="smv ---> settings",  width=button_width, command=webCOPYconfig2home).grid(row=R, column=1)
 Button(root, text="fds bib ---> smv",   width=button_width, command=webSYNCHfds2smv).grid(row=R,    column=2)
 Button(root, text="smv bib ---> fds",   width=button_width, command=webSYNCHsmv2fds).grid(row=R,    column=3, ipadx=3)
-
-R=R+1
-Button(root, text="Refresh", width=button_width, command=restart_program).grid(row=R, column=0)
 
 root.mainloop()
