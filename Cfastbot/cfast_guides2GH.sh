@@ -37,21 +37,21 @@ UPLOADHASH ()
 
 
 if [ -e $TESTBUNDLEDIR ] ; then
-  FILELIST=`gh release view $GH_FDS_TAG  -R github.com/$GH_OWNER/$GH_REPO | grep CFAST_HASH | awk '{print $2}'`
+  FILELIST=`gh release view $GH_CFAST_TAG  -R github.com/$GH_OWNER/$GH_REPO | grep CFAST_HASH | awk '{print $2}'`
   for file in $FILELIST ; do
-    gh release delete-asset $GH_FDS_TAG $file -R github.com/$GH_OWNER/$GH_REPO -y
+    gh release delete-asset $GH_CFAST_TAG $file -R github.com/$GH_OWNER/$GH_REPO -y
   done
-  FILELIST=`gh release view $GH_FDS_TAG  -R github.com/$GH_OWNER/$GH_REPO | grep CFAST_REVISION | awk '{print $2}'`
+  FILELIST=`gh release view $GH_CFAST_TAG  -R github.com/$GH_OWNER/$GH_REPO | grep CFAST_REVISION | awk '{print $2}'`
   for file in $FILELIST ; do
-    gh release delete-asset $GH_FDS_TAG $file -R github.com/$GH_OWNER/$GH_REPO -y
+    gh release delete-asset $GH_CFAST_TAG $file -R github.com/$GH_OWNER/$GH_REPO -y
   done
-  FILELIST=`gh release view $GH_FDS_TAG  -R github.com/$GH_OWNER/$GH_REPO | grep SMV_HASH | awk '{print $2}'`
+  FILELIST=`gh release view $GH_CFAST_TAG  -R github.com/$GH_OWNER/$GH_REPO | grep SMV_HASH | awk '{print $2}'`
   for file in $FILELIST ; do
-    gh release delete-asset $GH_FDS_TAG $file -R github.com/$GH_OWNER/$GH_REPO -y
+    gh release delete-asset $GH_CFAST_TAG $file -R github.com/$GH_OWNER/$GH_REPO -y
   done
-  FILELIST=`gh release view $GH_FDS_TAG  -R github.com/$GH_OWNER/$GH_REPO | grep SMV_REVISION | awk '{print $2}'`
+  FILELIST=`gh release view $GH_CFAST_TAG  -R github.com/$GH_OWNER/$GH_REPO | grep SMV_REVISION | awk '{print $2}'`
   for file in $FILELIST ; do
-    gh release delete-asset $GH_FDS_TAG $file -R github.com/$GH_OWNER/$GH_REPO -y
+    gh release delete-asset $GH_CFAST_TAG $file -R github.com/$GH_OWNER/$GH_REPO -y
   done
 
   UPLOADGUIDE CFAST_Tech_Ref
