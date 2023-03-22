@@ -16,6 +16,11 @@ UPLOADHASH ()
     cd $TESTBUNDLEDIR
     echo ***Uploading $FILE
     gh release upload $GH_SMOKEVIEW_TAG $DIR/$FILE -R github.com/$GH_OWNER/$GH_REPO --clobber
+    suffix=`head -1 $DIR/$FILE`
+    FILE2=$FILE$suffix
+    cp $DIR/$FILE $DIR/$FILE2
+    gh release upload $GH_SMOKEVIEW_TAG $DIR/$FILE2 -R github.com/$GH_OWNER/$GH_REPO --clobber
+    rm -f $DIR/$FILE2
   fi
 }
 
@@ -54,6 +59,15 @@ UPLOADFIGURES ()
 }
 
 if [ -e $TESTBUNDLEDIR ] ; then
+  FILELIST=`gh release view $GH_FDS_TAG  -R github.com/$GH_OWNER/$GH_REPO | grep SMV_HASH | awk '{print $2}'`
+  for file in $FILELIST ; do
+    gh release delete-asset $GH_FDS_TAG $file -R github.com/$GH_OWNER/$GH_REPO -y
+  done
+  FILELIST=`gh release view $GH_FDS_TAG  -R github.com/$GH_OWNER/$GH_REPO | grep SMV_REVISION | awk '{print $2}'`
+  for file in $FILELIST ; do
+    gh release delete-asset $GH_FDS_TAG $file -R github.com/$GH_OWNER/$GH_REPO -y
+  done
+
   UPLOADGUIDE SMV_Technical_Reference_Guide
   UPLOADGUIDE SMV_User_Guide
   UPLOADGUIDE SMV_Verification_Guide
