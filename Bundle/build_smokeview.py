@@ -17,10 +17,6 @@ bot_repo = repo_root + "bot\\"
 smv_repo = repo_root + "smv\\"
 webscript_dir  = bot_repo + "Bundle\\webscripts\\"
 
-def restart_program():
-    python = sys.executable
-    os.execl(python, python, * sys.argv)
-
 versions   = ["", "test", "release"]
 platforms  = ["", "Windows", "Linux", "OSX"]
 apps       = ["", "FDS", "Smokeview" ]
@@ -47,7 +43,6 @@ button_width=13
 
 def show_branch():                 os.system("start " + webscript_dir + "webSHOW_branches")
 def show_repos():                  os.system("start " + webscript_dir + "webSHOW_revisions")
-def get_revisions():               os.system("start " + webscript_dir + "webGET_revisions")
 
 def update_windows():              os.system("start " + webscript_dir + "webUPDATEwindowsrepos")
 def update_smv_windows():          os.system("start " + webscript_dir + "webUPDATEwindowsSMVrepos")
@@ -156,34 +151,28 @@ Button(root, text="Uploads", width=button_width, command=clean_uploads).grid(row
 Button(root, text="smv",     width=button_width, command=clean_smv).grid(row=R,     column=3)
 R=R+1
 Label(root, text="Build:").grid(column=0, row=R)
-Button(root, text="Libs",     width=button_width, command=build_lib).grid(row=R,  column=1)
-Button(root, text="Utils",    width=button_width, command=build_util).grid(row=R, column=2)
+Button(root, text="Libs",    width=button_width, command=build_lib).grid(row=R,  column=1)
+Button(root, text="Utils",   width=button_width, command=build_util).grid(row=R, column=2)
 Button(root, text="smv",     width=button_width, command=build_smv,     fg='white', bg='blue').grid(row=R,  column=3)
 
 R=R+1
-Button(root, text="smv test debug",    width=button_width,   command=build_smv_test_deb).grid(row=R, column=2)
-Button(root, text="smv Win test inc",  width=button_width,   command=build_smv_win_inc).grid(row=R,  column=3)
+Button(root, text="Set revisions",    width=button_width+2, command=set_revision, bg='blue', fg='white').grid(row=R, column=1)
+Button(root, text="smv test debug",   width=button_width,   command=build_smv_test_deb).grid(row=R, column=2)
+Button(root, text="smv Win test inc", width=button_width,   command=build_smv_win_inc).grid(row=R,  column=3)
 
 R=R+1
 Label(root, text="Bundle:").grid(column=0, row=R)
-Button(root, text="Bundle",  width=button_width, command=bundle_smv).grid(row=R,        column=1)
-Button(root, text="Set Test Bundle Rev", width=button_width+2, command=set_revision, bg='blue', fg='white').grid(row=R, column=2)
-Button(root, text="Show Bundle Revs", width=button_width, command=get_revisions).grid(row=R, column=3)
+Button(root, text="Build",  width=button_width, command=bundle_smv).grid(row=R,        column=1)
+Button(root, text="Install", width=button_width, command=install_smv).grid(row=R,       column=2)
+Button(root, text="LNX/OSX shortcuts", width=button_width+3, command=archive_smv).grid(row=R,        column=3)
 
 R=R+1
-Label(root, text="Install:").grid(column=0, row=R)
-Button(root, text="Install", width=button_width, command=install_smv).grid(row=R,       column=1)
-Button(root, text="LNX/OSX shortcuts", width=button_width+3, command=archive_smv).grid(row=R,        column=2)
-
-#Button(root, text="Bundle/Install", width=button_width,  fg='white', bg='blue', command=bundle_install_smv).grid(row=R,       column=2)
-
-R=R+1
-Label(root, text="----------------------------UPLOAD---------------------------").grid(column=0, row=R, columnspan=4)
-R=R+1
-Button(root, text="Windows test", width=button_width, command=upload_win_bundle).grid(row=R, column=0)
-Button(root, text="Linux test",   width=button_width, command=upload_lnx_bundle).grid(row=R, column=1)
-Button(root, text="OSX test",     width=button_width, command=upload_osx_bundle).grid(row=R, column=2)
-Button(root, text="Release",      width=button_width, command=upload_bundle_rel).grid(row=R, column=3)
+Label(root, text="Upload:").grid(column=0, row=R)
+Button(root, text="Windows", width=button_width, command=upload_win_bundle).grid(row=R, column=1)
+Button(root, text="Linux",   width=button_width, command=upload_lnx_bundle).grid(row=R, column=2)
+Button(root, text="OSX",     width=button_width, command=upload_osx_bundle).grid(row=R, column=3)
+#R=R+1
+#Button(root, text="Release",      width=button_width, command=upload_bundle_rel).grid(row=R, column=1)
 
 # ------------------------- guides ------------------------------
 
@@ -214,8 +203,5 @@ Button(root, text="settings ---> smv",  width=button_width, command=webCOPYhome2
 Button(root, text="smv ---> settings",  width=button_width, command=webCOPYconfig2home).grid(row=R, column=1)
 Button(root, text="fds bib ---> smv",   width=button_width, command=webSYNCHfds2smv).grid(row=R,    column=2)
 Button(root, text="smv bib ---> fds",   width=button_width, command=webSYNCHsmv2fds).grid(row=R,    column=3, ipadx=3)
-
-R=R+1
-Button(root, text="Refresh", width=button_width, command=restart_program).grid(row=R, column=0)
 
 root.mainloop()
