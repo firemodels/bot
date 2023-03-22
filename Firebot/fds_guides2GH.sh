@@ -22,7 +22,7 @@ UPLOADHASH ()
     echo ***Uploading $FILE
     gh release upload $GH_FDS_TAG $DIR/$FILE -R github.com/$GH_OWNER/$GH_REPO --clobber
     suffix=`head -1 $DIR/$FILE`
-    FILE2=$FILE$suffix
+    FILE2=${FILE}_MANUALS_$suffix
     cp $DIR/$FILE $DIR/$FILE2
     gh release upload $GH_FDS_TAG $DIR/$FILE2 -R github.com/$GH_OWNER/$GH_REPO --clobber
     rm -f $DIR/$FILE2
