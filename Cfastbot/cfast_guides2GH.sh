@@ -25,7 +25,7 @@ UPLOADHASH ()
   if [ -e $FROMDIR/$FILE ]; then
     cd $TESTBUNDLEDIR
     suffix=`head -1 $FROMDIR/$FILE`
-    FILE2=$FILE$suffix
+    FILE2=${FILE}_MANUALS_$suffix
     cp $FROMDIR/$FILE $FROMDIR/$FILE2
     echo ***Uploading $FILE
     gh release upload $GH_CFAST_TAG $FROMDIR/$FILE -R github.com/$GH_OWNER/$GH_REPO --clobber
