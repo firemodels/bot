@@ -14,30 +14,25 @@ set PDFS=%userprofile%\.cfast\PDFS
 if NOT exist %userprofile%\.cfast mkdir %userprofile%\.cfast
 if NOT exist %PDFS% mkdir %PDFS%
 
-echo | set /p dummyName=Downloading CFAST repo hash: 
-call :getfile CFAST_HASH
+echo | set /p dummyName=Downloading CFAST_INFO: 
+call :getfile CFAST_INFO
 
-echo | set /p dummyName=Downloading CFAST repo revision: 
-call :getfile CFAST_REVISION
-
-echo | set /p dummyName=Downloading smv repo hash: 
-call :getfile SMV_HASH
-
-echo | set /p dummyName=Downloading smv repo revision: 
-call :getfile SMV_REVISION
+grep CFAST_HASH     %PDFS%\CFAST_INFO | gawk "{print $2}" > %PDFS%\CFAST_HASH
+grep CFAST_REVISION %PDFS%\CFAST_INFO | gawk "{print $2}" > %PDFS%\CFAST_REVISION
+grep SMV_HASH       %PDFS%\CFAST_INFO | gawk "{print $2}" > %PDFS%\SMV_HASH
+grep SMV_REVISION   %PDFS%\CFAST_INFO | gawk "{print $2}" > %PDFS%\SMV_REVISION
 
 goto eof
 
 ::------------------------------------------
 :getfile
-set type=%1
-if exist %PDFS%\%type% erase %PDFS%\%type%
+set file=%1
+if exist %PDFS%\%file% erase %PDFS%\%file%
 
-echo gh release download %GH_CFAST_TAG% -p %type% -R github.com/%GH_OWNER%/%GH_REPO% -D %PDFS%
-gh release download %GH_CFAST_TAG% -p %type% -R github.com/%GH_OWNER%/%GH_REPO% -D %PDFS%
+gh release download %GH_CFAST_TAG% -p %file% -R github.com/%GH_OWNER%/%GH_REPO% -D %PDFS%
 
-if NOT exist %PDFS%\%type% echo failed
-if exist %PDFS%\%type% echo succeeded
+if NOT exist %PDFS%\%file% echo failed
+if exist %PDFS%\%file% echo succeeded
 exit /b
 
 :eof
