@@ -1,10 +1,10 @@
 #!/bin/bash
   DIRLIST="`ls -d $HOME/FireModels*`"
   for DIR in $DIRLIST ; do
+    BASEDIR=`basename $DIR`
     echo
     echo ---------------------------------------------
-    BASEDIR=`basename $DIR`
-    echo *** $BASEDIR
+    echo "*** $BASEDIR"
     echo ---------------------------------------------
     cd $DIR/bot/Scripts
     ./update_repos.sh
