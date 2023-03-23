@@ -4,8 +4,12 @@
     echo
     echo ---------------------------------------------
     BASEDIR=`basename $DIR`
-    echo ***Updating repos in $BASEDIR
+    echo "*** $BASEDIR"
     echo ---------------------------------------------
+    echo -- fds branches
+    cd $DIR/fds
+    git branch -a
+    echo -- smv branches
     cd $DIR/smv
     git branch -a
   done

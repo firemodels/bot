@@ -4,7 +4,7 @@
     echo
     echo ---------------------------------------------
     BASEDIR=`basename $DIR`
-    echo ***Updating repos in $BASEDIR
+    echo *** $BASEDIR
     echo ---------------------------------------------
     cd $DIR/bot/Scripts
     ./update_repos.sh
