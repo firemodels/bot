@@ -16,10 +16,14 @@ call :copy_file CFAST_Users_Guide.pdf
 call :copy_file CFAST_Validation_Guide.pdf
 call :copy_file CFAST_Configuration_Guide.pdf
 call :copy_file CFAST_CData_Guide.pdf
-call :copy_file CFAST_HASH
-call :copy_file CFAST_REVISION
-call :copy_file SMV_HASH
-call :copy_file SMV_REVISION
+set /p CFAST_HASH=<%PDFS%\CFAST_HASH
+set /p CFAST_REVISION=<%PDFS%\CFAST_REVISION
+set /p SMV_HASH=<%PDFS%\SMV_HASH
+set /p SMV_REVISION=<%PDFS%\SMV_REVISION
+echo CFAST_HASH %CFAST_HASH%          > %PDFS%\CFAST_INFO.txt
+echo CFAST_REVISION %CFAST_REVISION% >> %PDFS%\CFAST_INFO.txt
+echo SMV_HASH %SMV_HASH%             >> %PDFS%\CFAST_INFO.txt
+echo SMV_REVISION %SMV_REVISION%     >> %PDFS%\CFAST_INFO.txt
 
 goto eof
 
