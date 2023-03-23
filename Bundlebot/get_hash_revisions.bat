@@ -3,10 +3,11 @@ set error=0
 
 call :getopts %*
 
-call :getfile FDS_HASH
-call :getfile SMV_HASH
-call :getfile FDS_REVISION
-call :getfile SMV_REVISION
+call :getfile FDS_INFO.txt
+grep FDS_HASH     output\FDS_INFO.txt | gawk "{print $2}" > output\FDS_HASH
+grep SMV_HASH     output\FDS_INFO.txt | gawk "{print $2}" > output\SMV_HASH
+grep FDS_REVISION output\FDS_INFO.txt | gawk "{print $2}" > output\FDS_REVISION
+grep SMV_REVISION output\FDS_INFO.txt | gawk "{print $2}" > output\SMV_REVISION
 goto eof
 
 
