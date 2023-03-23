@@ -13,11 +13,11 @@ UPLOADINFO ()
   DIR=$HOME/.smokebot/apps
   S_HASH=`head -1     $DIR/SMV_HASH`
   S_REVISION=`head -1 $DIR/SMV_REVISION`
-  echo "SMV_HASH          $S_HASH" > $DIR/SMV_INFO
-  echo "SMV_REVISION $S_REVISION" >> $DIR/SMV_INFO
-  echo ***Uploading SMV_INFO
-  gh release upload $GH_SMOKEVIEW_TAG $DIR/SMV_INFO -R github.com/$GH_OWNER/$GH_REPO --clobber
-  rm -f $DIR/SMV_INFO
+  echo "SMV_HASH          $S_HASH" > $DIR/SMV_INFO.txt
+  echo "SMV_REVISION $S_REVISION" >> $DIR/SMV_INFO.txt
+  echo ***Uploading SMV_INFO.txt
+  gh release upload $GH_SMOKEVIEW_TAG $DIR/SMV_INFO.txt -R github.com/$GH_OWNER/$GH_REPO --clobber
+  rm -f $DIR/SMV_INFO.txt
 }
 
 UPLOADGUIDE ()
