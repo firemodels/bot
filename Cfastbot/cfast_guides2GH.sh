@@ -19,49 +19,27 @@ UPLOADGUIDE ()
     gh release upload $GH_CFAST_TAG $FROMDIR/$FILEnew -R github.com/$GH_OWNER/$GH_REPO --clobber
   fi
 }
-UPLOADHASH ()
+UPLOADINFO ()
 {
-  FILE=$1
-  if [ -e $FROMDIR/$FILE ]; then
-    cd $TESTBUNDLEDIR
-    suffix=`head -1 $FROMDIR/$FILE`
-    FILE2=${FILE}_MANUALS_$suffix
-    cp $FROMDIR/$FILE $FROMDIR/$FILE2
-    echo ***Uploading $FILE
-    gh release upload $GH_CFAST_TAG $FROMDIR/$FILE -R github.com/$GH_OWNER/$GH_REPO --clobber
-    echo ***Uploading $FILE2
-    gh release upload $GH_CFAST_TAG $FROMDIR/$FILE2 -R github.com/$GH_OWNER/$GH_REPO --clobber
-    rm -f $FROMDIR/$FILE2
-  fi
+  C_HASH=`head -1     $FROMDIR/CFAST_HASH`
+  S_HASH=`head -1     $FROMDIR/SMV_HASH`
+  C_REVISION=`head -1 $FROMDIR/CFAST_REVISION`
+  S_REVISION=`head -1 $FROMDIR/SMV_REVISION`
+  echo "CFAST_HASH $C_HASH"          > $FROMDIR/CFAST_INFO
+  echo "CFAST_REVISION $C_REVISION" >> $FROMDIR/CFAST_INFO
+  echo "SMV_HASH $S_HASH"           >> $FROMDIR/CFAST_INFO
+  echo "SMV_REVISION $C_REVISION"   >> $FROMDIR/CFAST_INFO
+  gh release upload $GH_CFAST_TAG $FROMDIR/CFAST_INFO -R github.com/$GH_OWNER/$GH_REPO --clobber
+  rm -f $FROMDIR/CFAST_INFO
 }
 
 
 if [ -e $TESTBUNDLEDIR ] ; then
-  FILELIST=`gh release view $GH_CFAST_TAG  -R github.com/$GH_OWNER/$GH_REPO | grep CFAST_HASH | awk '{print $2}'`
-  for file in $FILELIST ; do
-    gh release delete-asset $GH_CFAST_TAG $file -R github.com/$GH_OWNER/$GH_REPO -y
-  done
-  FILELIST=`gh release view $GH_CFAST_TAG  -R github.com/$GH_OWNER/$GH_REPO | grep CFAST_REVISION | awk '{print $2}'`
-  for file in $FILELIST ; do
-    gh release delete-asset $GH_CFAST_TAG $file -R github.com/$GH_OWNER/$GH_REPO -y
-  done
-  FILELIST=`gh release view $GH_CFAST_TAG  -R github.com/$GH_OWNER/$GH_REPO | grep SMV_HASH | awk '{print $2}'`
-  for file in $FILELIST ; do
-    gh release delete-asset $GH_CFAST_TAG $file -R github.com/$GH_OWNER/$GH_REPO -y
-  done
-  FILELIST=`gh release view $GH_CFAST_TAG  -R github.com/$GH_OWNER/$GH_REPO | grep SMV_REVISION | awk '{print $2}'`
-  for file in $FILELIST ; do
-    gh release delete-asset $GH_CFAST_TAG $file -R github.com/$GH_OWNER/$GH_REPO -y
-  done
-
   UPLOADGUIDE CFAST_Tech_Ref
   UPLOADGUIDE CFAST_Users_Guide
   UPLOADGUIDE CFAST_Validation_Guide
   UPLOADGUIDE CFAST_Configuration_Guide
   UPLOADGUIDE CFAST_CData_Guide
-  UPLOADHASH SMV_HASH
-  UPLOADHASH CFAST_HASH
-  UPLOADHASH SMV_REVISION
-  UPLOADHASH CFAST_REVISION
+  UPLOADINFO
   cd $CURDIR
 fi
