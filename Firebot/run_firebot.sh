@@ -367,10 +367,11 @@ if [ "$GET_HASH" != "" ]; then
     echo "          when cloning the repos, when the -R option is used"
     exit 1
   fi
-  FDS_HASH=`../Bundlebot/getGHfile.sh     FDS_HASH     FDS_TEST`
-  SMV_HASH=`../Bundlebot/getGHfile.sh     SMV_HASH     FDS_TEST`
-  FDS_REVISION=`../Bundlebot/getGHfile.sh FDS_REVISION FDS_TEST`
-  SMV_REVISION=`../Bundlebot/getGHfile.sh SMV_REVISION FDS_TEST`
+  ../Bundlebot/getGHfile.sh     FDS_INFO.txt     FDS_TEST
+  FDS_HASH=`grep FDS_HASH  FDS_INFO.txt | awk '{print $2}'`
+  SMV_HASH=`grep SMV_HASH  FDS_INFO.txt | awk '{print $2}'`
+  FDS_REVISION=`grep FDS_REVISION  FDS_INFO.txt | awk '{print $2}'`
+  SMV_REVISION=`grep SMV_REVISION  FDS_INFO.txt | awk '{print $2}'`
   ABORT=
   if [ "$FDS_HASH" == "" ]; then
     ABORT=1
