@@ -17,13 +17,13 @@ cd $CURDIR
 UPLOADINFO ()
 {
   DIR=$HOME/.firebot/appslatest
-  echo ***Uploading FDS_INFO
-  echo "FDS_HASH     $DIR/FDS_HASH"      > $DIR/FDS_INFO
-  echo "FDS_REVISION $DIR/FDS_REVISION" >> $DIR/FDS_INFO
-  echo "SMV_HASH     $DIR/SMV_HASH"     >> $DIR/FDS_INFO
-  echo "SMV_REVISION $DIR/SMV_REVISION" >> $DIR/FDS_INFO
-  gh release upload $GH_FDS_TAG $DIR/FDS_INFO -R github.com/$GH_OWNER/$GH_REPO --clobber
-  rm -f $DIR/FDS_INFO
+  echo ***Uploading FDS_INFO.txt
+  echo "FDS_HASH     $DIR/FDS_HASH"      > $DIR/FDS_INFO.txt
+  echo "FDS_REVISION $DIR/FDS_REVISION" >> $DIR/FDS_INFO.txt
+  echo "SMV_HASH     $DIR/SMV_HASH"     >> $DIR/FDS_INFO.txt
+  echo "SMV_REVISION $DIR/SMV_REVISION" >> $DIR/FDS_INFO.txt
+  gh release upload $GH_FDS_TAG $DIR/FDS_INFO.txt -R github.com/$GH_OWNER/$GH_REPO --clobber
+  rm -f $DIR/FDS_INFO.txt
 }
 
 UPLOADGUIDE ()
@@ -56,23 +56,6 @@ UPLOADFIGURES ()
   echo ***Uploading $tarfile.gz
   gh release upload $GH_FDS_TAG $TARHOME/$tarfile.gz -R github.com/$GH_OWNER/$GH_REPO --clobber
 }
-  FILELIST=`gh release view $GH_FDS_TAG  -R github.com/$GH_OWNER/$GH_REPO | grep FDS_HASH | awk '{print $2}'`
-  for file in $FILELIST ; do
-    gh release delete-asset $GH_FDS_TAG $file -R github.com/$GH_OWNER/$GH_REPO -y
-  done
-  FILELIST=`gh release view $GH_FDS_TAG  -R github.com/$GH_OWNER/$GH_REPO | grep FDS_REVISION | awk '{print $2}'`
-  for file in $FILELIST ; do
-    gh release delete-asset $GH_FDS_TAG $file -R github.com/$GH_OWNER/$GH_REPO -y
-  done
-  FILELIST=`gh release view $GH_FDS_TAG  -R github.com/$GH_OWNER/$GH_REPO | grep SMV_HASH | awk '{print $2}'`
-  for file in $FILELIST ; do
-    gh release delete-asset $GH_FDS_TAG $file -R github.com/$GH_OWNER/$GH_REPO -y
-  done
-  FILELIST=`gh release view $GH_FDS_TAG  -R github.com/$GH_OWNER/$GH_REPO | grep SMV_REVISION | awk '{print $2}'`
-  for file in $FILELIST ; do
-    gh release delete-asset $GH_FDS_TAG $file -R github.com/$GH_OWNER/$GH_REPO -y
-  done
-
 UPLOADGUIDE FDS_Config_Management_Plan
 UPLOADGUIDE FDS_Technical_Reference_Guide
 UPLOADGUIDE FDS_User_Guide
