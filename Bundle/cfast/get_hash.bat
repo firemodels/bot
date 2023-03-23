@@ -14,13 +14,13 @@ set PDFS=%userprofile%\.cfast\PDFS
 if NOT exist %userprofile%\.cfast mkdir %userprofile%\.cfast
 if NOT exist %PDFS% mkdir %PDFS%
 
-echo | set /p dummyName=Downloading CFAST_INFO: 
-call :getfile CFAST_INFO
+echo | set /p dummyName=Downloading CFAST_INFO.txt: 
+call :getfile CFAST_INFO.txt
 
-grep CFAST_HASH     %PDFS%\CFAST_INFO | gawk "{print $2}" > %PDFS%\CFAST_HASH
-grep CFAST_REVISION %PDFS%\CFAST_INFO | gawk "{print $2}" > %PDFS%\CFAST_REVISION
-grep SMV_HASH       %PDFS%\CFAST_INFO | gawk "{print $2}" > %PDFS%\SMV_HASH
-grep SMV_REVISION   %PDFS%\CFAST_INFO | gawk "{print $2}" > %PDFS%\SMV_REVISION
+grep CFAST_HASH     %PDFS%\CFAST_INFO.txt | gawk "{print $2}" > %PDFS%\CFAST_HASH
+grep CFAST_REVISION %PDFS%\CFAST_INFO.txt | gawk "{print $2}" > %PDFS%\CFAST_REVISION
+grep SMV_HASH       %PDFS%\CFAST_INFO.txt | gawk "{print $2}" > %PDFS%\SMV_HASH
+grep SMV_REVISION   %PDFS%\CFAST_INFO.txt | gawk "{print $2}" > %PDFS%\SMV_REVISION
 
 goto eof
 
