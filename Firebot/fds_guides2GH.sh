@@ -18,10 +18,14 @@ UPLOADINFO ()
 {
   DIR=$HOME/.firebot/appslatest
   echo ***Uploading FDS_INFO.txt
-  echo "FDS_HASH     $DIR/FDS_HASH"      > $DIR/FDS_INFO.txt
-  echo "FDS_REVISION $DIR/FDS_REVISION" >> $DIR/FDS_INFO.txt
-  echo "SMV_HASH     $DIR/SMV_HASH"     >> $DIR/FDS_INFO.txt
-  echo "SMV_REVISION $DIR/SMV_REVISION" >> $DIR/FDS_INFO.txt
+  F_HASH=`head -1 $DIR/FDS_HASH`
+  F_REVISION=`head -1 $DIR/FDS_REVISION`
+  S_HASH=`head -1 $DIR/SMV_HASH`
+  S_REVISION=`head -1 $DIR/SMV_REVISION`
+  echo "FDS_HASH     $F_HASH"      > $DIR/FDS_INFO.txt
+  echo "FDS_REVISION $F_REVISION" >> $DIR/FDS_INFO.txt
+  echo "SMV_HASH     $S_HASH"     >> $DIR/FDS_INFO.txt
+  echo "SMV_REVISION $S_REVISION" >> $DIR/FDS_INFO.txt
   gh release upload $GH_FDS_TAG $DIR/FDS_INFO.txt -R github.com/$GH_OWNER/$GH_REPO --clobber
   rm -f $DIR/FDS_INFO.txt
 }
