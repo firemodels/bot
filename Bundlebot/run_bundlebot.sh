@@ -148,10 +148,10 @@ case $OPTION  in
    MAILTO="$OPTARG"
    ;;
   o)
-   export GH_OWNER="%OPTARG"
+   export GH_OWNER="$OPTARG"
    ;;
   r)
-   export GH_REPO="%OPTARG"
+   export GH_REPO="$OPTARG"
    ;;
   R)
    BRANCH="$OPTARG"
