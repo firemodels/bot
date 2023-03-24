@@ -26,6 +26,8 @@ else
 fi
 
 echo "-L - build apps using latest revision"
+echo "-o - specify GH_OWNER when building a bundle. [default: $GH_OWNER]"
+echo "-r - specify GH_REPO when building a bundle. [default: $GH_REPO]"
 echo "-R branch - clone repos using name branch"
 echo "-r - create a release bundle (same as -R branc)"
 echo "-S - smv repo hash/release"
@@ -124,7 +126,7 @@ FDS_TAG=
 SMV_TAG=
 LATEST=
 
-while getopts 'cfF:hLm:rR:S:UvX:Y:' OPTION
+while getopts 'cfF:hLm:o:r:R:S:UvX:Y:' OPTION
 do
 case $OPTION  in
   c)
@@ -145,8 +147,11 @@ case $OPTION  in
   m)
    MAILTO="$OPTARG"
    ;;
+  o)
+   export GH_OWNER="%OPTARG"
+   ;;
   r)
-   BRANCH=release
+   export GH_REPO="%OPTARG"
    ;;
   R)
    BRANCH="$OPTARG"
