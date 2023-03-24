@@ -1287,15 +1287,15 @@ email_build_status()
       echo "The current git revision is ${GIT_REVISION}" >> $TIME_LOG
    fi
    echo "-------------------------------"      >> $TIME_LOG
-   echo "             Host: $hostname "        >> $TIME_LOG
-   echo "             repo: $cfastrepo "       >> $TIME_LOG
-   echo "   cfast revision: $CFAST_REVISION "  >> $TIME_LOG
-   echo "     smv revision: $SMV_REVISION "    >> $TIME_LOG
-   echo "          Fortran: $IFORT_VERSION "   >> $TIME_LOG
-   echo "       Start Time: $start_time "      >> $TIME_LOG
-   echo "        Stop Time: $stop_time "       >> $TIME_LOG
+   echo "Host: $hostname "                     >> $TIME_LOG
+   echo "repo: $cfastrepo "                    >> $TIME_LOG
+   echo "cfast revision: $CFAST_REVISION "     >> $TIME_LOG
+   echo "smv revision: $SMV_REVISION "         >> $TIME_LOG
+   echo "Fortran: $IFORT_VERSION "             >> $TIME_LOG
+   echo "Start Time: $start_time "             >> $TIME_LOG
+   echo "Stop Time: $stop_time "               >> $TIME_LOG
    if [ "$total_time" != "" ]; then
-     echo "         Run Time: $total_time"       >> $TIME_LOG
+     echo "Run Time: $total_time"              >> $TIME_LOG
    fi
    if [[ $THIS_REVISION != $LAST_CFASTSOUCEgit ]] ; then
      cat $git_CFASTSOURCELOG >> $TIME_LOG
