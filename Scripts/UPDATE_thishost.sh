@@ -8,4 +8,4 @@ git remote update
 git merge origin/master
 git merge firemodels/master
 git push origin master
-git describe --dirty --long
+git describe --abbrev=7 --dirty --long

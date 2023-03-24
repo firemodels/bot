@@ -238,7 +238,7 @@ get_smv_revision()
    CD_REPO $repo/smv $branch || return 1
 
    git update-index --refresh
-   SMV_REVISION=`git describe --long --dirty`
+   SMV_REVISION=`git describe --abbrev=7 --long --dirty`
    echo $SMV_REVISION > $repo/fds/Manuals/SMV_REVISION
    subrev=`git describe --abbrev | awk -F '-' '{print $2}'`
    if [ "$subrev" == "" ]; then
@@ -264,7 +264,7 @@ get_fds_revision()
    CD_REPO $repo/fds $branch || return 1
 
    git update-index --refresh
-   FDS_REVISION=`git describe --long --dirty`
+   FDS_REVISION=`git describe --abbrev=7 --long --dirty`
    echo $FDS_REVISION > $repo/fds/Manuals/FDS_REVISION
    subrev=`git describe --abbrev | awk -F '-' '{print $2}'`
    if [ "$subrev" == "" ]; then
@@ -291,7 +291,7 @@ get_exp_revision()
    CD_REPO $repo/exp $branch || return 1
 
    git update-index --refresh
-   EXP_REVISION=`git describe --long --dirty`
+   EXP_REVISION=`git describe --abbrev=7 --long --dirty`
    return 0
 }
 
@@ -306,7 +306,7 @@ get_out_revision()
    CD_REPO $repo/out $branch || return 1
 
    git update-index --refresh
-   OUT_REVISION=`git describe --long --dirty`
+   OUT_REVISION=`git describe --abbrev=7 --long --dirty`
    return 0
 }
 
@@ -320,7 +320,7 @@ get_fig_revision()
    CD_REPO $repo/fig $branch || return 1
 
    git update-index --refresh
-   FIG_REVISION=`git describe --long --dirty`
+   FIG_REVISION=`git describe --abbrev=7 --long --dirty`
    return 0
 }
 
@@ -333,7 +333,7 @@ get_bot_revision()
    local branch=$1
    CD_REPO $repo/bot $branch || return 1
 
-   BOT_REVISION=`git describe --long --dirty`
+   BOT_REVISION=`git describe --abbrev=7 --long --dirty`
    return 0
 }
 
@@ -346,7 +346,7 @@ get_cad_revision()
    local branch=$1
    CD_REPO $repo/cad $branch || return 1
 
-   CAD_REVISION=`git describe --long --dirty`
+   CAD_REVISION=`git describe --abbrev=7 --long --dirty`
    return 0
 }
 

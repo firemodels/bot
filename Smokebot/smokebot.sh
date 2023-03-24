@@ -321,7 +321,7 @@ clean_repo2()
       if [ "$CLEANREPO" == "1" ]; then
         CD_REPO $repo/$repodir $branch || return 1
         git update-index --refresh
-        IS_DIRTY=`git describe --long --dirty | grep dirty | wc -l`
+        IS_DIRTY=`git describe --abbrev=7 --long --dirty | grep dirty | wc -l`
         if [ "$IS_DIRTY" == "1" ]; then
           echo "The repo $repo/$repodir has uncommitted changes."
           echo "Commit or revert these changes or re-run"
@@ -362,7 +362,7 @@ update_repo()
 
    cd $repo/$reponame
    git update-index --refresh
-   IS_DIRTY=`git describe --long --dirty | grep dirty | wc -l`
+   IS_DIRTY=`git describe --abbrev=7 --long --dirty | grep dirty | wc -l`
    if [ "$IS_DIRTY" == "1" ]; then
      echo "The repo $repo/$reponame has uncommitted changes."
      echo "Commit or revert these changes or re-run"
@@ -2001,21 +2001,21 @@ SETUP_beg=`GET_TIME`
 rm -f $FYI_LOG
 touch $FYI_LOG
 cd $cfastrepo
-CFAST_REVISION=`git describe --long --dirty`
+CFAST_REVISION=`git describe --abbrev=7 --long --dirty`
 
 cd $fdsrepo
-FDS_REVISION=`git describe --long --dirty`
+FDS_REVISION=`git describe --abbrev=7 --long --dirty`
 
 cd $figrepo
-FIG_REVISION=`git describe --long --dirty`
+FIG_REVISION=`git describe --abbrev=7 --long --dirty`
 
 cd $botrepo
-BOT_REVISION=`git describe --long --dirty`
+BOT_REVISION=`git describe --abbrev=7 --long --dirty`
 
 # copy smv revision and hash to the latest pubs and apps directory
 cd $smvrepo
 
-SMV_REVISION=`git describe --long --dirty`
+SMV_REVISION=`git describe --abbrev=7 --long --dirty`
 SMV_SHORTHASH=`git rev-parse --short HEAD`
 SMV_LONGHASH=`git rev-parse HEAD`
 SMV_DATE=`git log -1 --format=%cd --date=local $SMV_SHORTHASH`

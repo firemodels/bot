@@ -205,12 +205,12 @@ call clone_repos %FDS_HASH_BUNDLER% %SMV_HASH_BUNDLER% %BRANCH_NAME% %FDS_TAG% %
 if NOT "x%FDS_HASH%" == "x" goto skip_getrevision
 
   call :cd_repo %basedir%\fds %BRANCH_NAME% || exit /b 1
-  git describe --dirty --long > temp1
+  git describe --abbrev=7 --dirty --long > temp1
   set /p FDS_REVISION_BUNDLER=<temp1
   erase temp1
 
   call :cd_repo %basedir%\smv %BRANCH_NAME% || exit /b 1
-  git describe --dirty --long > temp1
+  git describe --abbrev=7 --dirty --long > temp1
   set /p SMV_REVISION_BUNDLER=<temp1
   erase temp1
 :skip_getrevision

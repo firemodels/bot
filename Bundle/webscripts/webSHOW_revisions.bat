@@ -68,7 +68,7 @@ goto eof
 :output_rev
 ::---------------------------------------------------------
 echo | set /p=Windows: 
-git describe --dirty > tmp1
+git describe --abbrev=7 --dirty > tmp1
 git branch --show-current > tmp2
 set /p revision=<tmp1
 set /p branch=<tmp2

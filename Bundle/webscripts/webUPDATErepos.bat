@@ -30,7 +30,7 @@ git checkout master
 git merge firemodels/master
 git merge origin/master
 git push origin master
-git describe --dirty
+git describe --dirty --abbrev=7
 
 cd %svn_root%\smv
 echo.
@@ -40,7 +40,7 @@ git checkout master
 git merge firemodels/master
 git merge origin/master
 git push origin master
-git describe --dirty
+git describe --dirty --abbrev=7
 
 cd %svn_root%\bot
 echo.
@@ -49,7 +49,7 @@ git remote update
 git checkout master
 git merge firemodels/master
 git merge origin/master
-git describe --dirty
+git describe --dirty --abbrev=7
 
 cd %svn_root%\webpages
 echo.
@@ -57,7 +57,7 @@ echo *** webpages ***
 git checkout nist-pages
 git remote update
 git merge origin/nist-pages
-git describe --dirty
+git describe --dirty --abbrev=7
 
 
 set scriptdir=%linux_svn_root%/bot/Scripts/

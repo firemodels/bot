@@ -71,13 +71,13 @@ fi
 
 echo getting fds repo revision
 cd $FROM_ROOT/fds
-FDS_REVISION=`git describe --dirty --long`
+FDS_REVISION=`git describe --abbrev=7 --dirty --long`
 FROM_USER=$FROM_ROOT/$PROG/Manuals/$USER_GUIDE
 FROM_VER=$FROM_ROOT/$PROG/Manuals/$VER_GUIDE
 
 echo getting smv repo revision
 cd $FROM_ROOT/smv
-SMV_REVISION=`git describe --dirty --long`
+SMV_REVISION=`git describe --abbrev=7 --dirty --long`
 
 FIG_DIR=$TO_ROOT/fig/$PROG/Reference_Figures
 

@@ -44,7 +44,7 @@ if "x%fds_hash%" == "x" goto end_fds_hash2
 git tag -a %fds_tag% -m "add %fds_tag% for fds repo"
 :end_fds_hash2
 :end_fds_tag
-git describe --dirty --long
+git describe --abbrev=7 --dirty --long
 git branch -a
 
 cd %smvrepo%
@@ -60,7 +60,7 @@ if "x%smv_hash%" == "x" goto end_smv_hash2
 git tag -a %smv_tag% -m "add %smv_tag% for smv repo"
 :end_smv_tag
 :end_smv_hash2
-git describe --dirty --long
+git describe --abbrev=7 --dirty --long
 git branch -a
 
 cd %CURDIR%

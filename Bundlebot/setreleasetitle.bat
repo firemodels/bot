@@ -31,7 +31,7 @@ git rev-parse --short HEAD > %tempfile%
 set /p hash=<%tempfile%
 erase %tempfile%
 
-git describe --dirty --long  > %tempfile%
+git describe --abbrev=7 --dirty --long  > %tempfile%
 set /p TITLE=<%tempfile%
 erase %tempfile%
 

@@ -23,7 +23,7 @@ set hash=%cfast_hash%
 if %hash% == latest set hash=
 git checkout -b %branch_name% %hash%
 
-git describe --dirty --long
+git describe --abbrev=7 --dirty --long
 git branch -a
 
 cd %smvrepo%
@@ -32,7 +32,7 @@ set hash=%smv_hash%
 if %hash% == latest set hash=
 git checkout -b %branch_name% %hash%
 
-git describe --dirty --long
+git describe --abbrev=7 --dirty --long
 git branch -a
 
 cd %CURDIR%

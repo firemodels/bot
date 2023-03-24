@@ -45,7 +45,7 @@ SHOW_STATUS ()
   cd $repodir
   git update-index --refresh
   git status -uno
-  git describe --dirty
+  git describe --abbrev=7 --dirty
 }
 
 SHOW_STATUS2 ()
@@ -60,7 +60,7 @@ SHOW_STATUS2 ()
   cd $repodir
   git update-index --refresh
   git status -uno
-  git describe --dirty
+  git describe --abbrev=7 --dirty
 }
 
 for repo in $allrepos

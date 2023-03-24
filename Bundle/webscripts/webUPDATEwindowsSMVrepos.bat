@@ -31,7 +31,7 @@ git checkout master
 git merge firemodels/master
 git merge origin/master
 git push origin master
-git describe --dirty
+git describe --dirty --abbrev=7
 
 set scriptdir=%linux_svn_root%/bot/Scripts/
 set linux_fdsdir=%linux_svn_root%

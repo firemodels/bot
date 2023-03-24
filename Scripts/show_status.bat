@@ -37,7 +37,7 @@ goto eof
      exit /b
   )   
   cd %repodir%
-  git describe --dirty
+  git describe --abbrev=7 --dirty
   git status -uno
   exit /b
 
