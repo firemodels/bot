@@ -221,7 +221,7 @@ clean_repo2()
 
    CD_REPO $reponame/$repo || return 1
    git update-index --refresh
-   IS_DIRTY=`git describe --long --dirty | grep dirty | wc -l`
+   IS_DIRTY=`git describe --abbrev=7 --long --dirty | grep dirty | wc -l`
    if [ "$IS_DIRTY" == "1" ]; then
      echo "The repo $reponame/$repo has uncommitted changes."
      echo "Commit or revert these changes or re-run"
@@ -245,7 +245,7 @@ update_repo()
    CD_REPO $reponame/$repo $branch || return 1
 
    if [[ "$repo" == "cfast" ]]; then
-      GIT_REVISION=`git describe --long --dirty`
+      GIT_REVISION=`git describe --abbrev=7 --long --dirty`
       GIT_SHORTHASH=`git rev-parse --short HEAD`
       GIT_LONGHASH=`git rev-parse HEAD`
       GIT_DATE=`git log -1 --format=%cd --date=local $GIT_SHORTHASH`
@@ -1647,7 +1647,7 @@ fi
 cur_dir=`pwd`
 
 CD_REPO $reponame/cfast $cfastbranch || return 1
-CFAST_REVISION=`git describe --dirty --long`
+CFAST_REVISION=`git describe --abbrev=7 --dirty --long`
 CFAST_SHORTHASH=`git rev-parse --short HEAD`
 # CFAST_REV same as CFAST_REVISION without the hash on the end
 subrev=`git describe --abbrev | awk -F '-' '{print $2}'`
@@ -1659,7 +1659,7 @@ fi
 
 
 CD_REPO $reponame/smv   $smvbranch || return 1
-SMV_REVISION=`git describe --dirty --long`
+SMV_REVISION=`git describe --abbrev=7 --dirty --long`
 SMV_SHORTHASH=`git rev-parse --short HEAD`
 # SMV_REV same as SMV_REVISION without the hash on the end
 subrev=`git describe --abbrev | awk -F '-' '{print $2}'`

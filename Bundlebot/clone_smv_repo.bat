@@ -22,7 +22,7 @@ git checkout -b %branch_name% %smv_hash%
 if "x%smv_tag%" == "x" goto skip_smv_tag
 git tag -a %smv_tag% -m "add %smv_tag% for smv repo"
 :skip_smv_tag
-git describe --dirty --long
+git describe --abbrev=7 --dirty --long
 git branch -a
 
 cd %CURDIR%

@@ -121,25 +121,25 @@ fi
 #*** setup revision strings
 
 cd $CURDIR/../../fds
-FDS_REVISION=`git describe --long --dirty`
+FDS_REVISION=`git describe --abbrev=7 --long --dirty`
 
 cd $CURDIR/../../fig
 FIGREPO=`pwd`
-FIG_REVISION=`git describe --long --dirty`
+FIG_REVISION=`git describe --abbrev=7 --long --dirty`
 
 FIG_USER_FDS_REVISION_FILE=$FIGREPO/$PROG/FDS_REVISION
 FIG_VER_FDS_REVISION_FILE=$FIGREPO/$PROG/FDS_REVISION
 FIG_USER_SMV_REVISION_FILE=$FIGREPO/$PROG/SMV_REVISION
 FIG_VER_SMV_REVISION_FILE=$FIGREPO/$PROG/SMV_REVISION
 
-FIG_USER_FDS_REVISION=`git describe --dirty --long`
+FIG_USER_FDS_REVISION=`git describe --abbrev=7 --dirty --long`
 FIG_USER_SMV_REVISION=
 if [[ -e $FIG_USER_FDS_REVISION_FILE ]] && [[ -e $FIG_USER_SMV_REVISION_FILE ]]; then
   FIG_USER_FDS_REVISION=`head -1 $FIG_USER_FDS_REVISION_FILE`
   FIG_USER_SMV_REVISION=`head -1 $FIG_USER_SMV_REVISION_FILE`
 fi
 
-FIG_VER_FDS_REVISION=`git describe --dirty --long`
+FIG_VER_FDS_REVISION=`git describe --abbrev=7 --dirty --long`
 FIG_VER_SMV_REVISION=
 if [[ -e $FIG_VER_FDS_REVISION_FILE ]] && [[ -e $FIG_VER_SMV_REVISION_FILE ]]; then
   FIG_VER_FDS_REVISION=`head -1 $FIG_VER_FDS_REVISION_FILE`
@@ -147,7 +147,7 @@ if [[ -e $FIG_VER_FDS_REVISION_FILE ]] && [[ -e $FIG_VER_SMV_REVISION_FILE ]]; t
 fi
 
 cd $CURDIR/../../smv
-SMV_REVISION=`git describe --long --dirty`
+SMV_REVISION=`git describe --abbrev=7 --long --dirty`
 
 cd $CURDIR
 

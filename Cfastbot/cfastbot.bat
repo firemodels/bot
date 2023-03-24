@@ -948,7 +948,7 @@ set guideout=%OUTDIR%\stage6_%guide%.txt
 
 cd %guide_dir%
 
-git describe --long --dirty > gitinfo.txt
+git describe --abbrev=7 --long --dirty > gitinfo.txt
 set /p gitrevision=<gitinfo.txt
 echo \newcommand^{\gitrevision^}^{%gitrevision%^} > ..\Bibliography\gitrevision.tex
 

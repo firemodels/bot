@@ -29,7 +29,7 @@ if [ "$ERROR" != "" ]; then
 fi
 
 cd ../../$repo
-TITLE=`git describe --long --dirty`
+TITLE=`git describe --abbrev=7 --long --dirty`
 INFO="`git show -s --format=%cd --date=format:'%Y-%b-%d %H:%M' $hash`"
 if [ "$INFO" != "" ]; then
   TITLE="$TITLE $INFO"
