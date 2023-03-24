@@ -35,9 +35,9 @@ for dir in bot fds fig smv exp out; do
 echo ""
 if [[ -d $REPO1/$dir ]] && [[ -d $REPO2/$dir ]]; then
   cd $REPO1/$dir
-  git describe --dirty --long
+  git describe --abbrev=7 --dirty --long
   cd $REPO2/$dir
-  git describe --dirty --long
+  git describe --abbrev=7 --dirty --long
 else
   if [ ! -d $REPO1/$dir ]; then
     echo "***errror: the directory $REPO1/$dir does not exist"

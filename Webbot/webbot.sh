@@ -131,7 +131,7 @@ update_repo()
 
    cd $repo/$reponame
    git update-index --refresh
-   IS_DIRTY=`git describe --long --dirty | grep dirty | wc -l`
+   IS_DIRTY=`git describe --abbrev=7 --long --dirty | grep dirty | wc -l`
    if [ "$IS_DIRTY" == "1" ]; then
      echo "The repo $repo/$reponame has uncommitted changes."
      echo "Commit or revert these changes"
@@ -241,7 +241,7 @@ GIT_WEB_LOG_FILE=$GIT_STATUS_DIR/web_log
 
 THIS_WEBAUTHOR=`git log . | head -2 | tail -1 | awk '{print $2}'`
 THIS_WEB_REVISION=`git log --abbrev-commit . | head -1 | awk '{print $2}'`
-THIS_WEB_VERSION=`git describe --dirty`
+THIS_WEB_VERSION=`git describe --abbrev=7 --dirty`
 if [ -e $GIT_WEB_REVISION_FILE ]; then
   LAST_WEB_REVISION=`cat $GIT_WEB_REVISION_FILE`
 else
