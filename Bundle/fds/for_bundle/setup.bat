@@ -217,8 +217,8 @@ echo *** Associating the .smv file extension with smokeview.exe >> "%LOGFILE%"
 ftype smvDoc="%SMV6%\smokeview.exe" "%%1"                       >> "%LOGFILE%"
 assoc .smv=smvDoc                                               >> "%LOGFILE%"
 
-set FDSSTART=%ALLUSERSPROFILE%\Start Menu\Programs\FDS6
-
+if exist "%ALLUSERSPROFILE%\Start Menu\Programs" set "FDSSTART=%ALLUSERSPROFILE%\Start Menu\Programs\FDS6"
+if exist "%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs" set "FDSSTART=%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\FDS6"
 :: ------------- start menu shortcuts ---------------
 echo *** Adding document shortcuts to the Start menu.
 if exist "%FDSSTART%" rmdir /q /s "%FDSSTART%"
@@ -243,11 +243,15 @@ call :setup_shortcut "%FDSSTART%\Guides and Release Notes\Smokeview release note
 call :setup_shortcut "%FDSSTART%\Uninstall.lnk"                                                    "%UNINSTALLDIR%\uninstall.bat"
 
 set DESKTOPDIR=%userprofile%\Desktop
-if NOT exist %DESKTOPDIR% set DESKTOPDIR=%userprofile%\OneDrive\Desktop
-if NOT exist %DESKTOPDIR% echo "***error: directory containing desktop files not found"
+set DESKTOPDIR11=%OneDrive%\Desktop
 
-call :setup_cmdfds "%FDSSTART%\CMDfds.lnk"
-call :setup_cmdfds "%DESKTOPDIR%\CMDfds.lnk"
+                        call :setup_cmdfds "%FDSSTART%\CMDfds.lnk"
+if exist %DESKTOPDIR%   call :setup_cmdfds "%DESKTOPDIR%\CMDfds.lnk"
+if exist %DESKTOPDIR11% call :setup_cmdfds "%DESKTOPDIR11%\CMDfds.lnk"
+set cmdexist=0
+if exist %DESKTOPDIR%\CMDfds.lnk set cmdexist=1
+if exist %DESKTOPDIR11%\CMDfds.lnk set cmdexist=1
+if "%cmdexist%" == "0" echo ***error: CMDfds failed to be copied to the desktop
 
 :: ----------- setting up openmp threads environment variable
 
@@ -299,8 +303,9 @@ echo call "%UNINSTALLDIR%\set_path.exe" -s -b -r %SMV6%       >> "%UNINSTALLDIR%
 echo rmdir /s /q "%SMV6%"                                     >> "%UNINSTALLDIR%\uninstall_base.bat"
 echo :skip2                                                   >> "%UNINSTALLDIR%\uninstall_base.bat"
 
-echo echo Removing CMDfds desktop shortcut                           >> "%UNINSTALLDIR%\uninstall_base.bat"
-echo if exist %DESKTOPDIR%\CMDfds.lnk erase %DESKTOPDIR%\CMDfds.lnk  >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo echo Removing CMDfds desktop shortcut                                   >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo if exist "%DESKTOPDIR%\CMDfds.lnk"   erase "%DESKTOPDIR%\CMDfds.lnk"    >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo if exist "%DESKTOPDIR11%\CMDfds.lnk" erase "%DESKTOPDIR11%\CMDfds.lnk"  >> "%UNINSTALLDIR%\uninstall_base.bat"
 
 :: remove FDS path and directory
 
@@ -321,9 +326,9 @@ echo   rmdir "%INSTALLDIR%"                                   >> "%UNINSTALLDIR%
 echo :skip_remove                                             >> "%UNINSTALLDIR%\uninstall_base.bat"
 
 echo echo *** Uninstall complete                              >> "%UNINSTALLDIR%\uninstall_base.bat"
-echo pause>Nul                                                >> "%UNINSTALLDIR%\uninstall_base.bat"
 
 type  "%UNINSTALLDIR%\uninstall_base2.bat"                    >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo pause>Nul                                                >> "%UNINSTALLDIR%\uninstall_base.bat"
 erase "%UNINSTALLDIR%\uninstall_base2.bat"
 
 echo "%UNINSTALLDIR%\uninstall.vbs"                           >> "%UNINSTALLDIR%\uninstall.bat"
