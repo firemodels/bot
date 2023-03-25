@@ -217,10 +217,10 @@ echo *** Associating the .smv file extension with smokeview.exe >> "%LOGFILE%"
 ftype smvDoc="%SMV6%\smokeview.exe" "%%1"                       >> "%LOGFILE%"
 assoc .smv=smvDoc                                               >> "%LOGFILE%"
 
-if exist "%ALLUSERSPROFILE%\Start Menu\Programs" set "FDSSTART=%ALLUSERSPROFILE%\Start Menu\Programs\FDS6"
+if exist "%Programdata%\Microsoft\Windows\Start Menu\Programs" set "FDSSTART=%Programdata%\Microsoft\Windows\Start Menu\Programs\FDS6"
 if exist "%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs" set "FDSSTART=%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\FDS6"
 :: ------------- start menu shortcuts ---------------
-echo *** Adding document shortcuts to the Start menu.
+echo *** Adding document shortcuts to %FDSSTART% .
 if exist "%FDSSTART%" rmdir /q /s "%FDSSTART%"
 
 mkdir "%FDSSTART%"
@@ -229,28 +229,27 @@ echo.                              >> "%LOGFILE%"
 echo *** Setting up shortcuts/urls >> "%LOGFILE%"
 call :copy_url "%DOCDIR%\FDS_on_the_Web\Official_Web_Site.url"     "%FDSSTART%\FDS Home Page.url"
 
-mkdir "%FDSSTART%\Documentation"
-call :setup_shortcut "%FDSSTART%\Documentation\FDS Config Management Plan.lnk"          "%DOCDIR%\Guides_and_Release_Notes\FDS_Config_Management_Plan.pdf"
-call :setup_shortcut "%FDSSTART%\Documentation\FDS User Guide.lnk"                      "%DOCDIR%\Guides_and_Release_Notes\FDS_User_Guide.pdf"
-call :setup_shortcut "%FDSSTART%\Documentation\FDS Technical Reference Guide.lnk"       "%DOCDIR%\Guides_and_Release_Notes\FDS_Technical_Reference_Guide.pdf"
-call :setup_shortcut "%FDSSTART%\Documentation\FDS Validation Guide.lnk"                "%DOCDIR%\Guides_and_Release_Notes\FDS_Validation_Guide.pdf"  
-call :setup_shortcut "%FDSSTART%\Documentation\FDS Verification Guide.lnk"              "%DOCDIR%\Guides_and_Release_Notes\FDS_Verification_Guide.pdf"
-call :setup_shortcut "%FDSSTART%\Documentation\FDS Release Notes.lnk"                   "%DOCDIR%\Guides_and_Release_Notes\FDS_Release_Notes.htm"
-call :setup_shortcut "%FDSSTART%\Documentation\Smokeview User Guide.lnk"                "%DOCDIR%\Guides_and_Release_Notes\SMV_User_Guide.pdf"
-call :setup_shortcut "%FDSSTART%\Documentation\Smokeview Technical Reference Guide.lnk" "%DOCDIR%\Guides_and_Release_Notes\SMV_Technical_Reference_Guide.pdf"
-call :setup_shortcut "%FDSSTART%\Documentation\Smokeview Verification Guide.lnk"        "%DOCDIR%\Guides_and_Release_Notes\SMV_Verification_Guide.pdf"
-call :setup_shortcut "%FDSSTART%\Documentation\Smokeview release notes.lnk"             "%DOCDIR%\Guides_and_Release_Notes\Smokeview_release_notes.html"
+call :setup_shortcut "%FDSSTART%\FDS Config Management Plan.lnk"          "%DOCDIR%\Guides_and_Release_Notes\FDS_Config_Management_Plan.pdf"
+call :setup_shortcut "%FDSSTART%\FDS User Guide.lnk"                      "%DOCDIR%\Guides_and_Release_Notes\FDS_User_Guide.pdf"
+call :setup_shortcut "%FDSSTART%\FDS Technical Reference Guide.lnk"       "%DOCDIR%\Guides_and_Release_Notes\FDS_Technical_Reference_Guide.pdf"
+call :setup_shortcut "%FDSSTART%\FDS Validation Guide.lnk"                "%DOCDIR%\Guides_and_Release_Notes\FDS_Validation_Guide.pdf"  
+call :setup_shortcut "%FDSSTART%\FDS Verification Guide.lnk"              "%DOCDIR%\Guides_and_Release_Notes\FDS_Verification_Guide.pdf"
+call :setup_shortcut "%FDSSTART%\FDS Release Notes.lnk"                   "%DOCDIR%\Guides_and_Release_Notes\FDS_Release_Notes.htm"
+call :setup_shortcut "%FDSSTART%\Smokeview User Guide.lnk"                "%DOCDIR%\Guides_and_Release_Notes\SMV_User_Guide.pdf"
+call :setup_shortcut "%FDSSTART%\Smokeview Technical Reference Guide.lnk" "%DOCDIR%\Guides_and_Release_Notes\SMV_Technical_Reference_Guide.pdf"
+call :setup_shortcut "%FDSSTART%\Smokeview Verification Guide.lnk"        "%DOCDIR%\Guides_and_Release_Notes\SMV_Verification_Guide.pdf"
+call :setup_shortcut "%FDSSTART%\Smokeview release notes.lnk"             "%DOCDIR%\Guides_and_Release_Notes\Smokeview_release_notes.html"
 call :setup_shortcut "%FDSSTART%\Uninstall.lnk"                                         "%UNINSTALLDIR%\uninstall.bat"
 
-set DESKTOPDIR=%userprofile%\Desktop
-set DESKTOPDIR11=%OneDrive%\Desktop
+set "DESKTOPDIR=%userprofile%\Desktop"
+set "DESKTOPDIR11=%OneDrive%\Desktop"
 
                         call :setup_cmdfds "%FDSSTART%\CMDfds.lnk"
-if exist %DESKTOPDIR%   call :setup_cmdfds "%DESKTOPDIR%\CMDfds.lnk"
-if exist %DESKTOPDIR11% call :setup_cmdfds "%DESKTOPDIR11%\CMDfds.lnk"
+if exist "%DESKTOPDIR%"   call :setup_cmdfds "%DESKTOPDIR%\CMDfds.lnk"
+if exist "%DESKTOPDIR11%" call :setup_cmdfds "%DESKTOPDIR11%\CMDfds.lnk"
 set cmdexist=0
-if exist %DESKTOPDIR%\CMDfds.lnk set cmdexist=1
-if exist %DESKTOPDIR11%\CMDfds.lnk set cmdexist=1
+if exist "%DESKTOPDIR%\CMDfds.lnk"   set cmdexist=1
+if exist "%DESKTOPDIR11%\CMDfds.lnk" set cmdexist=1
 if "%cmdexist%" == "0" echo ***error: CMDfds failed to be copied to the desktop
 
 :: ----------- setting up openmp threads environment variable
