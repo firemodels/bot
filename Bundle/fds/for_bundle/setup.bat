@@ -239,12 +239,12 @@ call :setup_shortcut "%FDSSTART%\Smokeview User Guide.lnk"                "%DOCD
 call :setup_shortcut "%FDSSTART%\Smokeview Technical Reference Guide.lnk" "%DOCDIR%\Guides_and_Release_Notes\SMV_Technical_Reference_Guide.pdf"
 call :setup_shortcut "%FDSSTART%\Smokeview Verification Guide.lnk"        "%DOCDIR%\Guides_and_Release_Notes\SMV_Verification_Guide.pdf"
 call :setup_shortcut "%FDSSTART%\Smokeview release notes.lnk"             "%DOCDIR%\Guides_and_Release_Notes\Smokeview_release_notes.html"
-call :setup_shortcut "%FDSSTART%\Uninstall.lnk"                                         "%UNINSTALLDIR%\uninstall.bat"
+call :setup_shortcut "%FDSSTART%\Uninstall.lnk"                           "%UNINSTALLDIR%\uninstall.bat"
 
 set "DESKTOPDIR=%userprofile%\Desktop"
 set "DESKTOPDIR11=%OneDrive%\Desktop"
 
-                        call :setup_cmdfds "%FDSSTART%\CMDfds.lnk"
+                          call :setup_cmdfds "%FDSSTART%\CMDfds.lnk"
 if exist "%DESKTOPDIR%"   call :setup_cmdfds "%DESKTOPDIR%\CMDfds.lnk"
 if exist "%DESKTOPDIR11%" call :setup_cmdfds "%DESKTOPDIR11%\CMDfds.lnk"
 set cmdexist=0
