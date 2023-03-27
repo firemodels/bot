@@ -179,6 +179,23 @@ CALL :COPY  %bundle_dir%\fds\test_mpi.exe   %out_bin%\test_mpi.exe
 
 CALL :COPY  %bundle_dir%\smv\smokeview.exe  %out_smv%\smokeview.exe
 
+
+IF  X%SETVARS_COMPLETED% == X1 GOTO intel_envexist
+
+  IF NOT DEFINED ONEAPI_ROOT goto intel_notexist
+
+  call "%ONEAPI_ROOT%\setvars" intel64 > Nul
+  set INTEL_IFORT=ifort
+
+  IF  X%SETVARS_COMPLETED% == X1 GOTO intel_envexist
+
+:intel_notexist
+  echo ***error: Intel compiler environment is not setup
+  goto :eof
+
+:intel_envexist
+:eof
+
 CALL :TOMANIFESTFDS   %out_bin%\fds.exe          fds
 CALL :TOMANIFESTFDS   %out_bin%\fds_openmp.exe   fds_openmp
 

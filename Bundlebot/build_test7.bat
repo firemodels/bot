@@ -1,8 +1,9 @@
 @echo off
 set GH_REPO=test7_bundles
+set GH_OWNER=gforney
 
 :: FDS 7 tet and smokeview 7 test
-run_bundlebot -c -R release -F 4f017f05f -X FDS7TEST -S dbfdc2afe -Y SMV7TEST
+run_bundlebot -c -R release -F 7bd533e01 -X FDS-6.8.0 -S dbfdc2afe -Y SMV-6.8.0
 
 
 :: FDS 6.7.9 and smokeview 6.7.21

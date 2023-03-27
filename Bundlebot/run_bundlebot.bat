@@ -11,6 +11,8 @@ set BRANCH_NAME=nightly
 set configscript=%userprofile%\.bundle\bundle_config.bat
 set logfile=%userprofile%\.bundle\logfile.txt
 set upload_bundle=1
+set build_apps=1
+set clone_repos=1
 set emailto=
 
 :: define defaults
@@ -199,7 +201,9 @@ if "x%clone%" == "xclone" goto skip_warning
   pause >Nul
 :skip_warning
 
+if "x%clone_repos%" == "x" goto skip_clone
 call clone_repos %FDS_HASH_BUNDLER% %SMV_HASH_BUNDLER% %BRANCH_NAME% %FDS_TAG% %SMV_TAG% || exit /b 1
+:skip_clone
 
 :: define revisions if hashes were specified on the command line
 if NOT "x%FDS_HASH%" == "x" goto skip_getrevision
@@ -222,7 +226,9 @@ echo Building apps
 echo.
 
 cd %CURDIR%
+if "x%build_apps%" == "x" goto skip_build
 call make_apps         || exit /b 1
+:skip_build
 
 echo.
 echo ------------------------------------------------------
@@ -314,6 +320,7 @@ echo Options:
 echo -b - branch name [default: %BRANCH_NAME%]
 echo -c - bundle without warning about cloning/erasing fds and smv repos 
 echo -C - get manuals from .bundle/manuals
+echo -D - for development, turn off making apps and uploading bundle
 echo -F - fds repo hash
 echo -h - display this message
 echo -m mailtto - send email to mailto
@@ -344,6 +351,12 @@ exit /b 0
  )
  if "%1" EQU "-c" (
    set clone=clone
+   set valid=1
+ )
+ if "%1" EQU "-D" (
+   set clone_repos=
+   set build_apps=
+   set upload_bundle=
    set valid=1
  )
  if "%1" EQU "-F" (

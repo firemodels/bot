@@ -154,8 +154,8 @@ echo *** Associating the .smv file extension with smokeview.exe
 ftype smvDoc="%SMV6%\smokeview.exe" "%%1" >Nul
 assoc .smv=smvDoc>Nul
 
-::set CFASTSTART=%ALLUSERSPROFILE%\Start Menu\Programs\CFAST7
-set cfaststartmenu=%ProgramData%\Microsoft\Windows\Start Menu\Programs\CFAST7
+if exist "%ProgramData%\Microsoft\Windows\Start Menu\Programs" set "cfaststartmenu=%ProgramData%\Microsoft\Windows\Start Menu\Programs\CFAST7"
+if exist "%ALLUSERSPROFILE%\Start Menu\Programs" set "cfaststartmenu=%ALLUSERSPROFILE%\Start Menu\Programs\CFAST7"
 
 :: ------------- start menu shortcuts ---------------
 echo *** Adding document shortcuts to the Start menu.
@@ -186,8 +186,6 @@ echo if %%errorlevel%% == 1 set have_fds=0                       >> "%INST_UNINS
 echo if     %%have_fds%% == 1 echo *** Uninstalling %cfast_version% >> "%INST_UNINSTALLDIR%\uninstall_base.bat"
 echo if NOT %%have_fds%% == 1 echo *** Uninstalling %versions%   >> "%INST_UNINSTALLDIR%\uninstall_base.bat"
 echo echo.                                                       >> "%INST_UNINSTALLDIR%\uninstall_base.bat"
-echo echo Press any key to proceed or CTRL C to abort            >> "%INST_UNINSTALLDIR%\uninstall_base.bat"
-echo pause^>NUL                                                  >> "%INST_UNINSTALLDIR%\uninstall_base.bat"
 echo if %%have_fds%% == 1 goto skip2                             >> "%INST_UNINSTALLDIR%\uninstall_base.bat"
 echo echo Removing "%SMV6%" from the System Path                 >> "%INST_UNINSTALLDIR%\uninstall_base.bat"
 echo call "%INST_UNINSTALLDIR%\set_path.exe" -s -b -r "%SMV6%"   >> "%INST_UNINSTALLDIR%\uninstall_base.bat"
@@ -199,6 +197,8 @@ echo echo Removing "%CFAST7%" from system path                   >> "%INST_UNINS
 echo call "%INST_UNINSTALLDIR%\set_path.exe" -s -b -r "%CFAST7%" >> "%INST_UNINSTALLDIR%\uninstall_base.bat"
 echo echo Removing "%CFAST7%" directory                          >> "%INST_UNINSTALLDIR%\uninstall_base.bat"
 echo rmdir /s /q  "%CFAST7%"                                     >> "%INST_UNINSTALLDIR%\uninstall_base.bat"
+echo echo Removing cfast start menu                              >> "%INST_UNINSTALLDIR%\uninstall_base.bat"
+echo rmdir /s /q "%cfaststartmenu%"                              >> "%INST_UNINSTALLDIR%\uninstall_base.bat"
 echo.                                                            >> "%INST_UNINSTALLDIR%\uninstall_base.bat"
 
 echo if %%have_fds%% == 1 goto skip3                             >> "%INST_UNINSTALLDIR%\uninstall_base.bat"
@@ -207,8 +207,7 @@ echo rmdir /s /q "%INSTALLDIR%"                                  >> "%INST_UNINS
 echo :skip3                                                      >> "%INST_UNINSTALLDIR%\uninstall_base.bat"
 echo.                                                            >> "%INST_UNINSTALLDIR%\uninstall_base.bat"
 
-echo echo *** Uninstall complete                                 >> "%INST_UNINSTALLDIR%\uninstall_base.bat"
-echo pause^>Nul                                                  >> "%INST_UNINSTALLDIR%\uninstall_base.bat"
+echo pause                                                       >> "%INST_UNINSTALLDIR%\uninstall_base.bat"
 echo.                                                            >> "%INST_UNINSTALLDIR%\uninstall_base.bat"
 
 echo "%INST_UNINSTALLDIR%\uninstall.vbs"                         >> "%INST_UNINSTALLDIR%\uninstall.bat"
@@ -221,7 +220,7 @@ echo Set objShell = CreateObject("Shell.Application")                       > "%
 echo Set objWshShell = WScript.CreateObject("WScript.Shell")               >> "%INST_UNINSTALLDIR%\uninstall.vbs"
 echo Set objWshProcessEnv = objWshShell.Environment("PROCESS")             >> "%INST_UNINSTALLDIR%\uninstall.vbs"
 echo objShell.ShellExecute "%ELEVATE_APP%", "%ELEVATE_PARMS%", "", "runas" >> "%INST_UNINSTALLDIR%\uninstall.vbs"
-echo WScript.Sleep 10000                                                   >> "%INST_UNINSTALLDIR%\uninstall.vbs"
+echo WScript.Sleep 100                                                     >> "%INST_UNINSTALLDIR%\uninstall.vbs"
 
 
 call :is_file_in_path smokeview

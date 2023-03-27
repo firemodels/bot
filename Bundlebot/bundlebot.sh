@@ -160,9 +160,13 @@ else
 fi
 
 if [ "$BRANCH" == "release" ]; then
-  BUNDLE_PREFIX=rls
+  BUNDLE_PREFIX=
 fi
-BUNDLE_PREFIX_FILE=${BUNDLE_PREFIX}_
+
+BUNDLE_PREFIX_FILE=
+if [ "$BUNDLE_PREFIX" != "" ]; then
+  BUNDLE_PREFIX_FILE=${BUNDLE_PREFIX}_
+fi
 BRANCHDIR=$BRANCH
 if [ "$BRANCH" != "release" ]; then
   BRANCHDIR=

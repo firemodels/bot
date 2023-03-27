@@ -24,8 +24,3 @@ if %have_fds% == 1 goto skip1
   assoc .smv=
   ftype smvDoc=
 :skip1
-
-echo. 
-echo *** Removing cfast from the Start menu.
-rmdir /q /s "%ProgramData%\Microsoft\Windows\Start Menu\Programs\CFAST7"
-
