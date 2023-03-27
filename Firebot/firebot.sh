@@ -1969,6 +1969,7 @@ WEBBRANCH=nist-pages
 FDSBRANCH=master
 OUTBRANCH=master
 FIGBRANCH=master
+CADBRANCH=master
 EXPBRANCH=master
 SMVBRANCH=master
 BOTBRANCH=master
@@ -2048,6 +2049,7 @@ case $OPTION in
    BOTBRANCH=$BRANCH
    OUTBRANCH=$BRANCH
    FIGBRANCH=$BRANCH
+   CADBRANCH=$BRANCH
    EXPBRANCH=$BRANCH
    ;;
   B)
@@ -2283,6 +2285,7 @@ GET_DURATION $CLONE_beg $CLONE_end CLONE
 
 SETUP_beg=`GET_TIME`
 #*** make sure repos exist and have expected branches
+
 CD_REPO $fdsrepo $FDSBRANCH || exit 1
 if [ "$FDSBRANCH" == "current" ]; then
   cd $fdsrepo
@@ -2290,6 +2293,7 @@ if [ "$FDSBRANCH" == "current" ]; then
 fi
 cd $fdsrepo
 FDSREPO_HASH=`git rev-parse HEAD`
+
 CD_REPO $smvrepo $SMVBRANCH || exit 1
 if [ "$SMVBRANCH" == "current" ]; then
   cd $smvrepo
@@ -2297,6 +2301,7 @@ if [ "$SMVBRANCH" == "current" ]; then
 fi
 cd $smvrepo
 SMVREPO_HASH=`git rev-parse HEAD`
+
 CD_REPO $outrepo $OUTBRANCH || exit 1
 if [ "$OUTBRANCH" == "current" ]; then
   cd $outrepo
@@ -2312,6 +2317,7 @@ if [ "$CADBRANCH" == "current" ]; then
 fi
 cd $cadrepo
 CADREPO_HASH=`git rev-parse HEAD`
+
 CD_REPO $figrepo $FIGBRANCH || exit 1
 if [ "$FIGBRANCH" == "current" ]; then
   cd $figrepo
