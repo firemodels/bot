@@ -155,7 +155,7 @@ ftype smvDoc="%SMV6%\smokeview.exe" "%%1" >Nul
 assoc .smv=smvDoc>Nul
 
 if exist "%ProgramData%\Microsoft\Windows\Start Menu\Programs" set "cfaststartmenu=%ProgramData%\Microsoft\Windows\Start Menu\Programs\CFAST7"
-if exist "%ALLUSERSPROFILE%\Start Menu\Programs" set "cfaststartmenu=%ALLUSERSPROFILE%\Start Menu\Programs\CFAST7"
+if exist "%ALLUSERSPROFILE%\Start Menu\Programs"               set "cfaststartmenu=%ALLUSERSPROFILE%\Start Menu\Programs\CFAST7"
 
 :: ------------- start menu shortcuts ---------------
 echo *** Adding document shortcuts to the Start menu.
@@ -163,10 +163,10 @@ if exist "%cfaststartmenu%" rmdir /q /s "%cfaststartmenu%"
 
 mkdir "%cfaststartmenu%"
 mkdir "%cfaststartmenu%\Guides"
-call :setup_shortcut "%cfaststartmenu%\Guides\CFAST Users Guide.lnk"                                     "%CFAST7%\Documents\Users_Guide.pdf"
-call :setup_shortcut "%cfaststartmenu%\Guides\CFAST Technical Reference Guide.lnk"                       "%CFAST7%\Documents\Tech_Ref.pdf"
-call :setup_shortcut "%cfaststartmenu%\Guides\CFAST Software Development and Model Evaluation Guide.lnk" "%CFAST7%\Documents\Validation_Guide.pdf"
-call :setup_shortcut "%cfaststartmenu%\Guides\CFAST Configuration Management.lnk"                        "%CFAST7%\Documents\Configuration_Guide.pdf"
+call :setup_shortcut "%cfaststartmenu%\Guides\CFAST Users Guide.lnk"                                     "%CFAST7%\Documents\CFAST_Users_Guide.pdf"
+call :setup_shortcut "%cfaststartmenu%\Guides\CFAST Technical Reference Guide.lnk"                       "%CFAST7%\Documents\CFAST_Tech_Ref.pdf"
+call :setup_shortcut "%cfaststartmenu%\Guides\CFAST Software Development and Model Evaluation Guide.lnk" "%CFAST7%\Documents\CFAST_Validation_Guide.pdf"
+call :setup_shortcut "%cfaststartmenu%\Guides\CFAST Configuration Management.lnk"                        "%CFAST7%\Documents\CFAST_Configuration_Guide.pdf"
 call :setup_shortcut "%cfaststartmenu%\CFAST.lnk"                                                        "%CFAST7%\CEdit.exe" 
 call :setup_shortcut "%cfaststartmenu%\Smokeview.lnk"                                                    "%SMV6%\smokeview.exe"   
 call :setup_shortcut "%cfaststartmenu%\Uninstall.lnk"                                                    "%INST_UNINSTALLDIR%\uninstall.bat"
