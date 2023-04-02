@@ -1056,8 +1056,8 @@ make_smv_pictures()
    echo Generating
    echo "   images"
    cd $smvrepo/Verification/scripts
-   ./Make_SMV_Pictures.sh -Y -q $SMOKEBOT_QUEUE -j SMV_ $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4a
-   grep -v FreeFontPath $OUTPUT_DIR/stage4a &> $OUTPUT_DIR/stage4b
+   ./Make_SMV_Pictures.sh -Y -q $SMOKEBOT_QUEUE -j SMV_ $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4a_picts
+   grep -v FreeFontPath $OUTPUT_DIR/stage4a_picts &> $OUTPUT_DIR/stage4b_picts
 }
 
 #---------------------------------------------
@@ -1069,23 +1069,23 @@ check_smv_pictures()
    # Scan and report any errors in make SMV pictures process
    cd $smokebotdir
    echo "   checking"
-   if [[ `grep -I -E -i "Segmentation|Error" $OUTPUT_DIR/stage4b` == "" ]]
+   if [[ `grep -I -E -i "Segmentation|Error" $OUTPUT_DIR/stage4b_picts` == "" ]]
    then
-      stage4b_smvpics_success=true
+      stage4b_picts_smvpics_success=true
    else
-      cp $OUTPUT_DIR/stage4b  $OUTPUT_DIR/stage4b_errors
+      cp $OUTPUT_DIR/stage4b_picts  $OUTPUT_DIR/stage4b_picts_errors
 
       echo "Errors from Stage 4a - Make SMV pictures (release mode):" >> $ERROR_LOG
-      grep -B 5 -A 5 -I -E -i "Segmentation|Error"  $OUTPUT_DIR/stage4b  >> $ERROR_LOG
+      grep -B 5 -A 5 -I -E -i "Segmentation|Error"  $OUTPUT_DIR/stage4b_picts  >> $ERROR_LOG
       echo "" >> $ERROR_LOG
    fi
-   if [[ `grep -I -E -i "Warning" $OUTPUT_DIR/stage4b` == "" ]]
+   if [[ `grep -I -E -i "Warning" $OUTPUT_DIR/stage4b_picts` == "" ]]
    then
       # Continue along
       :
    else
       echo "Warnings from Stage 4a - Make SMV pictures (release mode):" >> $WARNING_LOG
-      grep -A 2 -I -E -i "Warning" $OUTPUT_DIR/stage4b                     >> $WARNING_LOG
+      grep -A 2 -I -E -i "Warning" $OUTPUT_DIR/stage4b_picts                     >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
 }
@@ -1098,7 +1098,7 @@ make_smv_movies()
 {
    echo "   movies"
    cd $smvrepo/Verification
-   scripts/Make_SMV_Movies.sh -q $SMOKEBOT_QUEUE 2>&1  &> $OUTPUT_DIR/stage4c
+   scripts/Make_SMV_Movies.sh -q $SMOKEBOT_QUEUE 2>&1  &> $OUTPUT_DIR/stage4c_mp4
 }
 
 #---------------------------------------------
@@ -1109,25 +1109,25 @@ check_smv_movies()
 {
    cd $smokebotdir
    echo "   checking"
-   if [[ `grep -I -E -i "Segmentation|Error" $OUTPUT_DIR/stage4c` == "" ]]
+   if [[ `grep -I -E -i "Segmentation|Error" $OUTPUT_DIR/stage4c_mp4` == "" ]]
    then
-      stage4c_success=true
+      stage4c_mp4_success=true
    else
       echo "Errors from Stage 4c - Make SMV movies "                    >> $ERROR_LOG
-      grep -B 1 -A 1 -I -E -i "Segmentation|Error"  $OUTPUT_DIR/stage4c >  $OUTPUT_DIR/stage4c_errors
-      grep -B 1 -A 1 -I -E -i "Segmentation|Error"  $OUTPUT_DIR/stage4c >> $ERROR_LOG
+      grep -B 1 -A 1 -I -E -i "Segmentation|Error"  $OUTPUT_DIR/stage4c_mp4 >  $OUTPUT_DIR/stage4c_mp4_errors
+      grep -B 1 -A 1 -I -E -i "Segmentation|Error"  $OUTPUT_DIR/stage4c_mp4 >> $ERROR_LOG
       echo ""                                                           >> $ERROR_LOG
    fi
 
    # Scan for and report any warnings in make SMV pictures process
    cd $smokebotdir
-   if [[ `grep -I -E -i "Warning" $OUTPUT_DIR/stage4c` == "" ]]
+   if [[ `grep -I -E -i "Warning" $OUTPUT_DIR/stage4c_mp4` == "" ]]
    then
       # Continue along
       :
    else
       echo "Warnings from Stage 4b - Make SMV movies (release mode):" >> $WARNING_LOG
-      grep -I -E -i "Warning" $OUTPUT_DIR/stage4c                     >> $WARNING_LOG
+      grep -I -E -i "Warning" $OUTPUT_DIR/stage4c_mp4                     >> $WARNING_LOG
       echo ""                                                         >> $WARNING_LOG
    fi
 }
