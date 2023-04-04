@@ -608,8 +608,8 @@ compile_fds_mpi()
    echo "      release $MPTYPE"
    cd $FDSDIR
    rm -f $FDSEXE
-   echo ""                     > $OUTPUT_DIR/stage1c$MPTYPE
-   $botrepo/Scripts/build_fds.sh $OUTPUT_DIR/stage1c$MPTYPE
+   echo ""                     > $OUTPUT_DIR/stage1c_fds_rls$MPTYPE
+   $botrepo/Scripts/build_fds.sh $OUTPUT_DIR/stage1c_fds_rls$MPTYPE
 }
 
 #---------------------------------------------
@@ -641,20 +641,20 @@ check_compile_fds_mpi()
       stage_ver_release_success=true
    else
       echo "Errors from Stage 1c$MPTYPE - Compile FDS MPI$MPYPE release:" >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage1c$MPTYPE >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage1c_fds_rls$MPTYPE >> $ERROR_LOG
       echo "" >> $ERROR_LOG
       compile_errors=1
    fi
 
    # Check for compiler warnings/remarks
    # 'performing multi-file optimizations' and 'generating object file' are part of a normal compile
-   if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage1c$MPTYPE | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented'` == "" ]]
+   if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage1c_fds_rls$MPTYPE | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented'` == "" ]]
    then
       # Continue along
       :
    else
       echo "Stage 1c warnings:" >> $WARNING_LOG
-      grep -A 5 -i -E 'warning|remark' $OUTPUT_DIR/stage1c$MPTYPE | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
+      grep -A 5 -i -E 'warning|remark' $OUTPUT_DIR/stage1c_fds_rls$MPTYPE | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
       compile_errors=1
    fi
