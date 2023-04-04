@@ -25,7 +25,7 @@ cd $CURDIR
 TIMING_DIR=~firebot/.firebot/history
 TIMING_FILE=
 FIG_REPO=$TO_ROOT/fig
-TO_DIR=$FIG_REPO/compare/firebot/times
+TO_DIR=$FIG_REPO/fds/Reference_Times
 if [ -e $TIMING_DIR ]; then
   TIMING_FILE=`ls -rth $TIMING_DIR/*_timing.csv | tail -1`
   TIMING_FILE=`basename $TIMING_FILE`
