@@ -162,7 +162,7 @@ Button(root, text="smv Win test inc", width=button_width,   command=build_smv_wi
 
 R=R+1
 Label(root, text="Bundle:").grid(column=0, row=R)
-Button(root, text="Build",  width=button_width, command=bundle_smv).grid(row=R,        column=1)
+Button(root, text="Bundle",  width=button_width, command=bundle_smv).grid(row=R,        column=1)
 Button(root, text="Install", width=button_width, command=install_smv).grid(row=R,       column=2)
 Button(root, text="LNX/OSX shortcuts", width=button_width+3, command=archive_smv).grid(row=R,        column=3)
 
