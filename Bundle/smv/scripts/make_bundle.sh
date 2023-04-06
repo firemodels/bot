@@ -3,9 +3,7 @@ FDSEDITION=FDS6
 
 edition=$1
 revision=$2
-REMOTESVNROOT=$3
-PLATFORMHOST=$4
-SVNROOT=~/$5
+GITROOT=~/$3
 
 smvbin=smvbin
 
@@ -30,33 +28,6 @@ then
   platform3="osx"
   COMPILER=gnu
 fi
-
-SCP ()
-{
-  HOST=$1
-  FROMDIR=$2
-  FROMFILE=$3
-  TODIR=$4
-  TOFILE=$5
-
-  SHORTHOST=`echo $HOST | awk -F'.' '{printf $1}'`
-  if [ "`hostname -s`" == "$SHORTHOST" ]; then
-    cp $HOME/$FROMDIR/$FROMFILE $TODIR/$TOFILE 2>/dev/null
-  else
-    scp $HOST\:$FROMDIR/$FROMFILE $TODIR/$TOFILE 2>/dev/null
-  fi
-  if [ -e $TODIR/$TOFILE ]; then
-    if [ "`hostname -s`" == "$SHORTHOST" ]; then
-      echo "$TOFILE copied"
-    else
-      echo "$TOFILE copied from $HOST:$FROMDIR/$FROMFILE"
-    fi
-  else
-    echo "***error: the file $TOFILE failed to copy from: ">>$errlog
-    echo "$HOST:$FROMDIR/$FROMFILE">>$errlog
-    echo "">>$errlog
-  fi
-}
 
 CP ()
 {
@@ -95,22 +66,22 @@ CPDIR ()
 }
 
 
-BACKGROUNDDIR=$REMOTESVNROOT/smv/Build/background/${COMPILER}_${platform}_64
-SMVDIR=$REMOTESVNROOT/smv/Build/smokeview/${COMPILER}_${platform}_64
-SMVDIRQ=$REMOTESVNROOT/smv/Build/smokeview/${COMPILER}_${platform}_q_64
-SMZDIR=$REMOTESVNROOT/smv/Build/smokezip/${COMPILER}_${platform}_64
-SMDDIR=$REMOTESVNROOT/smv/Build/smokediff/${COMPILER}_${platform}_64
-WIND2FDSDIR=$REMOTESVNROOT/smv/Build/wind2fds/${COMPILER}_${platform}_64
-HASHFILEDIR=$REMOTESVNROOT/smv/Build/hashfile/${COMPILER}_${platform}_64
-FLUSHFILEDIR=$REMOTESVNROOT/smv/Build/flush/${COMPILER}_${platform}_64
-FORBUNDLE=$SVNROOT/bot/Bundle/smv/for_bundle
-WEBGLDIR=$SVNROOT/bot/Bundle/smv/for_bundle/webgl
-UTILSCRIPTDIR=$SVNROOT/smv/Utilities/Scripts
+BACKGROUNDDIR=$GITROOT/smv/Build/background/${COMPILER}_${platform}_64
+SMVDIR=$GITROOT/smv/Build/smokeview/${COMPILER}_${platform}_64
+SMVDIRQ=$GITROOT/smv/Build/smokeview/${COMPILER}_${platform}_q_64
+SMZDIR=$GITROOT/smv/Build/smokezip/${COMPILER}_${platform}_64
+SMDDIR=$GITROOT/smv/Build/smokediff/${COMPILER}_${platform}_64
+WIND2FDSDIR=$GITROOT/smv/Build/wind2fds/${COMPILER}_${platform}_64
+HASHFILEDIR=$GITROOT/smv/Build/hashfile/${COMPILER}_${platform}_64
+FLUSHFILEDIR=$GITROOT/smv/Build/flush/${COMPILER}_${platform}_64
+FORBUNDLE=$GITROOT/bot/Bundle/smv/for_bundle
+WEBGLDIR=$GITROOT/bot/Bundle/smv/for_bundle/webgl
+UTILSCRIPTDIR=$GITROOT/smv/Utilities/Scripts
 PLATFORMDIR=$RELEASE$revision\_${platform3}
-UPDATER=$SVNROOT/bot/Bundle/smv/scripts//make_updater.sh
+UPDATER=$GITROOT/bot/Bundle/smv/scripts//make_updater.sh
 uploads=$HOME/.bundle/uploads
 uploadscp=.bundle/uploads
-flushfile=$SVNROOT/smv/Build/flush/${COMPILER}_${platform}_64/flush_${platform}_64
+flushfile=$GITROOT/smv/Build/flush/${COMPILER}_${platform}_64/flush_${platform}_64
 
 if [ ! -e $HOME/.bundle ]; then
   mkdir $HOME/.bundle
@@ -148,21 +119,21 @@ CP $WEBGLDIR        smv2html.sh       $PLATFORMDIR/$smvbin smv2html.sh
 CP $UTILSCRIPTDIR   slice2html.sh     $PLATFORMDIR/$smvbin slice2html.sh
 CP $UTILSCRIPTDIR   slice2mp4.sh      $PLATFORMDIR/$smvbin slice2mp4.sh
 
-SCP $PLATFORMHOST $BACKGROUNDDIR background_${platform}_64 $PLATFORMDIR/$smvbin background
+CP  $BACKGROUNDDIR background_${platform}_64 $PLATFORMDIR/$smvbin background
 if [ "$platform" == "osx" ]; then
-  SCP $PLATFORMHOST $SMVDIR       smokeview_${platform}_${TEST}64       $PLATFORMDIR/$smvbin smokeview
+  CP  $SMVDIR       smokeview_${platform}_${TEST}64       $PLATFORMDIR/$smvbin smokeview
 else
-  SCP $PLATFORMHOST $SMVDIR        smokeview_${platform}_${TEST}64  $PLATFORMDIR/$smvbin smokeview
+  CP  $SMVDIR        smokeview_${platform}_${TEST}64  $PLATFORMDIR/$smvbin smokeview
 fi
-SCP $PLATFORMHOST $SMDDIR        smokediff_${platform}_64         $PLATFORMDIR/$smvbin smokediff
-SCP $PLATFORMHOST $SMZDIR        smokezip_${platform}_64          $PLATFORMDIR/$smvbin smokezip
-SCP $PLATFORMHOST $WIND2FDSDIR   wind2fds_${platform}_64          $PLATFORMDIR/$smvbin wind2fds
-SCP $PLATFORMHOST $HASHFILEDIR   hashfile_${platform}_64          $PLATFORMDIR/$smvbin hashfile
-SCP $PLATFORMHOST $FLUSHFILEDIR  flush_${platform}_64             $PLATFORMDIR/$smvbin flush
+CP  $SMDDIR        smokediff_${platform}_64         $PLATFORMDIR/$smvbin smokediff
+CP  $SMZDIR        smokezip_${platform}_64          $PLATFORMDIR/$smvbin smokezip
+CP  $WIND2FDSDIR   wind2fds_${platform}_64          $PLATFORMDIR/$smvbin wind2fds
+CP  $HASHFILEDIR   hashfile_${platform}_64          $PLATFORMDIR/$smvbin hashfile
+CP  $FLUSHFILEDIR  flush_${platform}_64             $PLATFORMDIR/$smvbin flush
 
 CURDIR=`pwd`
 cd $PLATFORMDIR/$smvbin
-HASHFILE=$HOME/$HASHFILEDIR/hashfile_${platform}_64
+HASHFILE=$HASHFILEDIR/hashfile_${platform}_64
 $HASHFILE background > background.sha1
 $HASHFILE smokediff  > smokediff.sha1
 $HASHFILE smokeview  > smokeview.sha1
