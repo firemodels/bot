@@ -40,9 +40,17 @@ SCP ()
   TODIR=$4
   TOFILE=$5
 
-  scp $HOST\:$FROMDIR/$FROMFILE $TODIR/$TOFILE 2>/dev/null
+  if [ "`hostname`" == "$HOST" ]; then
+    cp $HOME/$FROMDIR/$FROMFILE $TODIR/$TOFILE 2>/dev/null
+  else
+    scp $HOST\:$FROMDIR/$FROMFILE $TODIR/$TOFILE 2>/dev/null
+  fi
   if [ -e $TODIR/$TOFILE ]; then
-    echo "$TOFILE copied from $HOST"
+    if [ "`hostname`" == "$HOST" ]; then
+      echo "$TOFILE copied"
+    else
+      echo "$TOFILE copied from $HOST:$FROMDIR/$FROMFILE"
+    fi
   else
     echo "***error: the file $TOFILE failed to copy from: ">>$errlog
     echo "$HOST:$FROMDIR/$FROMFILE">>$errlog
