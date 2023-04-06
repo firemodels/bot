@@ -40,13 +40,14 @@ SCP ()
   TODIR=$4
   TOFILE=$5
 
-  if [ "`hostname`" == "$HOST" ]; then
+  SHORTHOST=`echo $HOST | awk -F'.' '{printf $1}'`
+  if [ "`hostname -s`" == "$SHORTHOST" ]; then
     cp $HOME/$FROMDIR/$FROMFILE $TODIR/$TOFILE 2>/dev/null
   else
     scp $HOST\:$FROMDIR/$FROMFILE $TODIR/$TOFILE 2>/dev/null
   fi
   if [ -e $TODIR/$TOFILE ]; then
-    if [ "`hostname`" == "$HOST" ]; then
+    if [ "`hostname -s`" == "$SHORTHOST" ]; then
       echo "$TOFILE copied"
     else
       echo "$TOFILE copied from $HOST:$FROMDIR/$FROMFILE"
