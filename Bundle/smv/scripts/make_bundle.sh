@@ -155,8 +155,8 @@ $UPDATER ${platform2} $revision $PLATFORMDIR.tar.gz $PLATFORMDIR.sh FDS/$FDSEDIT
 $HASHFILE $PLATFORMDIR.sh > $PLATFORMDIR.sh.sha1
 cat $PLATFORMDIR.sh.sha1 >> $uploads/$PLATFORMDIR.sha1
 rm $PLATFORMDIR.sh.sha1
-echo "$PLATFORMDIR.sh   copied to $uploads on $PLATFORMHOST"
-echo "$PLATFORMDIR.sha1 copied to $uploads on $PLATFORMHOST"
+echo "$PLATFORMDIR.sh   copied to $uploads on `hostname`"
+echo "$PLATFORMDIR.sha1 copied to $uploads on `hostname`"
 
 if [ -e $errlog ]; then
   numerrs=`cat $errlog | wc -l `
