@@ -95,7 +95,7 @@ if "x%bot%" == "xbot" goto skip2
 :endif0
 
 set in_pdf=%userprofile%\.bundle\pubs
-set smv_forbundle=%repo_root%\bot\Bundle\smv\for_bundle
+set smv_forbundle=%repo_root%\bot\Bundlebot\smv\for_bundle
 
 set basedir=%upload_dir%\%basename%
 
@@ -122,10 +122,10 @@ set smv_casesbat=%repo_root%\smv\Verification\scripts\SMV_Cases.bat
 set wui_casessh=%repo_root%\smv\Verification\scripts\WUI_Cases.sh
 set wui_casesbat=%repo_root%\smv\Verification\scripts\WUI_Cases.bat
 
-set copyFDScases=%repo_root%\bot\Bundle\fds\scripts\copyFDScases.bat
-set copyCFASTcases=%repo_root%\bot\Bundle\fds\scripts\copyCFASTcases.bat
+set copyFDScases=%repo_root%\bot\Bundlebot\fds\scripts\copyFDScases.bat
+set copyCFASTcases=%repo_root%\bot\Bundlebot\fds\scripts\copyCFASTcases.bat
 
-set fds_forbundle=%repo_root%\bot\Bundle\fds\for_bundle
+set fds_forbundle=%repo_root%\bot\Bundlebot\fds\for_bundle
 
 :: erase the temporary bundle directory if it already exists
 
