@@ -25,7 +25,7 @@ if NOT "x%repo%" == "xcfast" goto endif3
 if NOT x%ERROR% == x exit /b
 
 set tempfile=%temp%\tempfile
-cd ..\..\%repo%
+cd ..\..\..\%repo%
 
 git rev-parse --short HEAD > %tempfile%
 set /p hash=<%tempfile%
