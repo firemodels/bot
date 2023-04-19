@@ -89,19 +89,19 @@ call :COPYPROG smokediff
 call :COPYPROG smokeview test_
 call :COPYPROG smokezip
 call :COPYPROG wind2fds
-call :COPY %botrepo%\Bundle\smv\for_bundle\objects.svo    %SMVDISTDIR%\
-call :COPY %botrepo%\Bundle\smv\for_bundle\volrender.ssf  %SMVDISTDIR%\
-call :COPY_DIR %botrepo%\Bundle\smv\for_bundle\textures   %SMVDISTDIR%\textures\
+call :COPY %botrepo%\Bundlebot\smv\for_bundle\objects.svo    %SMVDISTDIR%\
+call :COPY %botrepo%\Bundlebot\smv\for_bundle\volrender.ssf  %SMVDISTDIR%\
+call :COPY_DIR %botrepo%\Bundlebot\smv\for_bundle\textures   %SMVDISTDIR%\textures\
 
 echo.
 echo ***Creating installer
 echo ***Copying Uninstall files
 
 
-call :COPY  %botrepo%\Bundle\cfast\for_bundle\uninstall.bat           %FIREMODELSDIR%\Uninstall
-call :COPY  %botrepo%\Bundle\cfast\for_bundle\uninstall_cfast.bat     %FIREMODELSDIR%\Uninstall\uninstall_base.bat 
+call :COPY  %botrepo%\Bundlebot\cfast\for_bundle\uninstall.bat           %FIREMODELSDIR%\Uninstall
+call :COPY  %botrepo%\Bundlebot\cfast\for_bundle\uninstall_cfast.bat     %FIREMODELSDIR%\Uninstall\uninstall_base.bat 
 call :COPY  %smvrepo%\Build\set_path\intel_win_64\set_path_win_64.exe %FIREMODELSDIR%\Uninstall\set_path.exe
-call :COPY  %botrepo%\Bundle\smv\for_bundle\Shortcut                  %FIREMODELSDIR%\Uninstall\shortcut.exe
+call :COPY  %botrepo%\Bundlebot\smv\for_bundle\Shortcut                  %FIREMODELSDIR%\Uninstall\shortcut.exe
 
 
 cd %CURDIR%

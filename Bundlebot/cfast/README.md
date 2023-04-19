@@ -10,7 +10,7 @@ Open a command shell and type: `mkdir %userprofile%\FireModels_cbundle` .  Note 
 If your forked the bot repo you could type `git clone https://github.com/username/bot.git` instead
 where username is your github username.
 
-3. cd into `FireModels_cbundle\bot\Bundle\cfast`
+3. cd into `FireModels_cbundle\bot\Bundlebot\cfast`
 
 4. copy bundle_config.bat to `%userprofile%\.bundle\bundle_config.bat`
 (create %userprofile%\.bundle first if it doesn't exist). Edit the settings in bundle_config.bat to match your computing environment.

@@ -18,5 +18,5 @@ goto:eof
 call %envfile%
 
 %svn_drive%
-cd %svn_root%\bot\Bundle
+cd %svn_root%\bot\Bundlebot
 start notepad build_smokeview.py
