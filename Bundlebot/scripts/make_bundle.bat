@@ -260,7 +260,7 @@ CALL :COPY "%fds_forbundle%\fdsinit.bat"                        %out_bin%\fdsini
 CALL :COPY "%fds_forbundle%\fdspath.bat"                        %out_bin%\fdspath.bat
 CALL :COPY "%fds_forbundle%\helpfds.bat"                        %out_bin%\helpfds.bat
 CALL :COPY "%fds_forbundle%\fds_local.bat"                      %out_bin%\fds_local.bat
-CALL :COPY "%fds_forbundle%\fds_local_test.bat"                 %out_bin%\fds_local_test.bat
+::CALL :COPY "%fds_forbundle%\fds_local_test.bat"                 %out_bin%\fds_local_test.bat
 CALL :COPY  %repo_root%\smv\Build\sh2bat\intel_win_64\sh2bat.exe %out_bin%\sh2bat.exe
 
 :: setup program for new installer
