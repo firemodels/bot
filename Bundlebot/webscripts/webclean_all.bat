@@ -39,7 +39,7 @@ echo Cleaning %svn_root%\smv\Build
 cd %svn_root%\smv\Build
 git clean -dxf
 
-set scriptdir=%linux_svn_root%/bot/Bundle/fds/scripts/
+set scriptdir=%linux_svn_root%/bot/Bundlebot/fds/scripts/
 
 echo.
 echo ------------------------------------------------------------------------

@@ -42,13 +42,13 @@ Title Bundling %type% Smokeview for %platform%
 :: windows
 
 if "%platform%" == "Windows" (
-  call %svn_root%\bot\Bundle\smv\scripts\make_%type%bundle
+  call %svn_root%\bot\Bundlebot\smv\scripts\make_%type%bundle
   goto eof
 )
 
 cd %svn_root%\smv\scripts
 
-set scriptdir=%linux_svn_root%/bot/Bundle/smv
+set scriptdir=%linux_svn_root%/bot/Bundlebot/smv
 set bundledir=.bundle/uploads
 set todir=%userprofile%\.bundle
 set uploaddir=%todir%\uploads

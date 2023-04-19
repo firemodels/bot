@@ -43,7 +43,7 @@ cd %svn_root%\smv\Build
 git clean -dxf
 :skip_windows
 
-set scriptdir=%linux_svn_root%/bot/Bundle/fds/scripts/
+set scriptdir=%linux_svn_root%/bot/Bundlebot/fds/scripts/
 
 if NOT "%platform%" == "Linux" goto skip_linux
 echo.

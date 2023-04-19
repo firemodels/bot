@@ -18,5 +18,5 @@ goto:eof
 call %envfile%
 
 %svn_drive%
-cd %svn_root%\bot\Bundle
+cd %svn_root%\bot\Bundlebot
 start notepad getting_started.html
