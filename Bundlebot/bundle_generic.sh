@@ -69,7 +69,7 @@ if [ ! -e $APPS_DIR ]; then
   mkdir $APPS_DIR
 fi
 
-# this script is called by make_bundle.sh located in bot/Bundle/fds/linux or osx
+# this script is called by make_bundle.sh located in bot/Bundlebot/fds/linux or osx
 
 # -------------------- CP -------------------
 
@@ -330,9 +330,9 @@ smvbindir=$bundledir/smvbin
 fdsbindir=$bundledir/bin
 
 webpagesdir=$REPO_ROOT/webpages
-fds_bundle=$REPO_ROOT/bot/Bundle/fds/for_bundle
-smv_bundle=$REPO_ROOT/bot/Bundle/smv/for_bundle
-webgldir=$REPO_ROOT/bot/Bundle/smv/for_bundle/webgl
+fds_bundle=$REPO_ROOT/bot/Bundlebot/fds/for_bundle
+smv_bundle=$REPO_ROOT/bot/Bundlebot/smv/for_bundle
+webgldir=$REPO_ROOT/bot/Bundlebot/smv/for_bundle/webgl
 smvscriptdir=$REPO_ROOT/smv/scripts
 utilscriptdir=$REPO_ROOT/smv/Utilities/Scripts
 botscriptdir=$REPO_ROOT/bot/Scripts
@@ -345,8 +345,8 @@ fds_cases=$REPO_ROOT/fds/Verification/FDS_Cases.sh
 fds_benchmark_cases=$REPO_ROOT/fds/Verification/FDS_Benchmark_Cases.sh
 smv_cases=$REPO_ROOT/smv/Verification/scripts/SMV_Cases.sh
 wui_cases=$REPO_ROOT/smv/Verification/scripts/WUI_Cases.sh
-copyfdscase=$REPO_ROOT/bot/Bundle/fds/scripts/copyfdscase.sh
-copycfastcase=$REPO_ROOT/bot/Bundle/fds/scripts/copycfastcase.sh
+copyfdscase=$REPO_ROOT/bot/Bundlebot/fds/scripts/copyfdscase.sh
+copycfastcase=$REPO_ROOT/bot/Bundlebot/fds/scripts/copycfastcase.sh
 FDSExamplesDirectory=$REPO_ROOT/fds/Verification
 SMVExamplesDirectory=$REPO_ROOT/smv/Verification
 

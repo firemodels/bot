@@ -1,6 +1,4 @@
 @echo off
-setlocal EnableDelayedExpansion
-set platform=%1
 
 :: batch file used to update Windows, Linux and OSX GIT repos
 
@@ -20,7 +18,6 @@ goto:eof
 
 call %envfile%
 
-if NOT "%platform%" == "Windows" goto skip_windows
 echo.
 echo ------------------------------------------------------------------------
 %svn_drive%
@@ -41,23 +38,17 @@ git clean -dxf
 echo Cleaning %svn_root%\smv\Build
 cd %svn_root%\smv\Build
 git clean -dxf
-:skip_windows
 
-set scriptdir=%linux_svn_root%/bot/Bundle/fds/scripts/
+set scriptdir=%linux_svn_root%/bot/Bundlebot/fds/scripts/
 
-if NOT "%platform%" == "Linux" goto skip_linux
 echo.
 echo ------------------------------------------------------------------------
 echo Cleaning source and build directories in the Linux repository %linux_svn_root%, on %linux_hostname%
 plink %plink_options% %linux_logon% %scriptdir%/clean_repo_sourcebuild.sh
-:skip_linux
 
-if NOT "%platform%" == "OSX" goto skip_osx
 echo.
 echo ------------------------------------------------------------------------
 echo Cleaning source and build directories in the OSX repository %linux_svn_root%/fds, on %osx_hostname%
 plink %plink_options% %osx_logon% %scriptdir%/clean_repo_sourcebuild.sh
-:skip_osx
 
-:eof
 pause

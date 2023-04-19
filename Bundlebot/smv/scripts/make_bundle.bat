@@ -39,8 +39,8 @@ if "x%option%" == "xtest" goto skip_release1
 :skip_release1
 
 set smvbuild=%svn_root%\smv\Build\smokeview\%BUILDDIR%
-set forbundle=%svn_root%\bot\Bundle\smv\for_bundle
-set webgldir=%svn_root%\bot\Bundle\smv\for_bundle\webgl
+set forbundle=%svn_root%\bot\Bundlebot\smv\for_bundle
+set webgldir=%svn_root%\bot\Bundlebot\smv\for_bundle\webgl
 set smvscripts=%svn_root%\smv\scripts
 set svzipbuild=%svn_root%\smv\Build\smokezip\%BUILDDIR%
 set svdiffbuild=%svn_root%\smv\Build\smokediff\%BUILDDIR%

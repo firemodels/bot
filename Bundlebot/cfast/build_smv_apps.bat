@@ -8,7 +8,7 @@ set CURDIR=%CD%
 call %smvrepo%\Utilities\Scripts\setup_intel_compilers.bat
 
 echo ***Building Libraries
-cd %smvrepo%\..\bot\Bundle\cfast
+cd %smvrepo%\..\bot\Bundlebot\cfast
 call build_smv_libs > Nul 2>&1
 
 set progs=background get_time set_path sh2bat smokediff smokezip wind2fds    

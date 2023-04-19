@@ -37,13 +37,13 @@ mkdir bundles
 if NOT "%platform%" == "Linux" goto skip_linux
 echo.
 echo *** linux
-plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/run_command.sh bot/Bundle/fds/scripts clean_upload.sh
+plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/run_command.sh bot/Bundlebot/fds/scripts clean_upload.sh
 :skip_linux
 
 if NOT "%platform%" == "OSX" goto skip_osx
 echo.
 echo *** osx
-plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/run_command.sh bot/Bundle/fds/scripts clean_upload.sh
+plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/run_command.sh bot/Bundlebot/fds/scripts clean_upload.sh
 :skip_osx
 
 :eof

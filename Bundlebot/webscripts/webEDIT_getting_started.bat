@@ -18,5 +18,5 @@ goto:eof
 call %envfile%
 
 %svn_drive%
-cd %svn_root%\bot\Bundle
-start notepad build_smokeview.html
+cd %svn_root%\bot\Bundlebot
+start notepad getting_started.html
