@@ -70,10 +70,13 @@ if "x%abort%" == "x" goto error4
 
 :: make sure we are running in the master branch
 set CURDIR=%CD%
-cd ..
+cd ..\..\..
+set REPOROOT=%CD%
+
+cd %REPOROOT%\bot
 set botrepo=%CD%
 
-if exist ..\webpages goto endif4
+if exist %REPOROOT%\webpages goto endif4
   echo ***error: the webpages repo does not exist
   cd %CURDIR%
   exit /b 1
@@ -87,7 +90,7 @@ if "x%emailto%" == "x" goto endif5
     set emailto=
 :endif5
 
-cd ..\webpages
+cd %REPOROOT%\webpages
 set webpagesrepo=%CD%
 
 cd ..

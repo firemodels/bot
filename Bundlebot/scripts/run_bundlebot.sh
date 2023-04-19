@@ -273,7 +273,7 @@ DIR=$(dirname "${commands}")
 cd $DIR
 DIR=`pwd`
 
-cd ../..
+cd ../../..
 repo=`pwd`
 
 cd $DIR
@@ -286,7 +286,7 @@ fi
 
 #*** build apps
 cd $curdir
-cd ../Firebot
+cd $repo/bot/Firebot
 if [ "$platform" == "osx" ]; then
 # remove || exit 1 until compiler warnings are removed
 $ECHO ./run_firebot.sh $FORCE -c -C -B -F $JOPT $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG $FIREBOT_BRANCH -T $MAILTO

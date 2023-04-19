@@ -19,16 +19,18 @@ if NOT "x%smv_hash%" == "x" goto skip_smv_hash
 :skip_smv_hash
 
 set CURDIR=%CD%
+cd ..\..\..
+set REPOROOT=%CD%
 
-cd ..\Scripts
+cd %REPOROOT%\bot\\Scripts
 call setup_repos -T -n
 
 cd %CURDIR%
 
-cd ..\..\fds
+cd %REPOROOT%\fds
 set fdsrepo=%CD%
 
-cd ..\smv
+cd %REPOROOT%\smv
 set smvrepo=%CD%
 
 cd %fdsrepo%

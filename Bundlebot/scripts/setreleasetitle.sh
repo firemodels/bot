@@ -28,7 +28,7 @@ if [ "$ERROR" != "" ]; then
   exit
 fi
 
-cd ../../$repo
+cd ../../../$repo
 TITLE=`git describe --abbrev=7 --long --dirty`
 INFO="`git show -s --format=%cd --date=format:'%Y-%b-%d %H:%M' $hash`"
 if [ "$INFO" != "" ]; then

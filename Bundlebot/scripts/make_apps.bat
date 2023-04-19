@@ -13,13 +13,16 @@ echo. > %clean_log%
 echo. > %compile_log%
 echo. > %error_log%
 
-cd ..\..\smv\
+cd ..\..\..
+set REPOROOT=%CD%
+
+cd %REPOROOT%\smv\
 set smvrepo=%CD%
 
-cd ..\fds
+cd %REPOROOT%\fds
 set fdsrepo=%CD%
 
-cd ..\bot
+cd %REPOROOT%\bot
 set botrepo=%CD%
 
 cd %smvrepo%\Source

@@ -26,7 +26,7 @@ echo.
 if "%platform%" == "windows" (
   echo.
   echo *** windows
-  cd %svn_root%\bot\Bundlebot
+  cd %svn_root%\bot\Bundlebot\scripts
   call copy_apps %type%
   goto eof
 )

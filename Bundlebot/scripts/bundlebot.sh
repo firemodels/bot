@@ -251,7 +251,7 @@ if [ "$SMV_REVISION" == "" ]; then
   fi
 fi
 
-cd ../..
+cd ../../..
 REPO_ROOT=`pwd`
 cd $CURDIR
 FDSREPODATE=`$REPO_ROOT/bot/Scripts/get_repo_info.sh $REPO_ROOT/fds 1`
@@ -286,7 +286,7 @@ if [ "$showparms" == "" ]; then
     gh release upload $GH_FDS_TAG $bundle_dir/${installer_base_platform}.sh         -R github.com/$GH_OWNER/$GH_REPO  --clobber
     gh release upload $GH_FDS_TAG $bundle_dir/${installer_base_platform}.$SHA1EXT   -R github.com/$GH_OWNER/$GH_REPO  --clobber
     if [ "$platform" == "lnx" ]; then
-      cd $DIR/../../fds
+      cd $REPO_ROOT/fds
       FDS_SHORT_HASH=`git rev-parse --short HEAD`
       cd $DIR
       ./setreleasetitle.sh fds $FDS_SHORT_HASH
