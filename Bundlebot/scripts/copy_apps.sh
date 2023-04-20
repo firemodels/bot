@@ -25,7 +25,7 @@ CP ()
   if [ -e $dir_from/$FROMFILE ]; then
     cp $dir_from/$FROMFILE $dir_to/. 
     if [ -e $dir_to/$FROMFILE ]; then
-      echo $FROMFILE copied to $dir_to
+      echo "   $FROMFILE copied to $dir_to"
     else
       echo "" 
       echo ***error: $FROMFILE failed to copy to $dir_to
