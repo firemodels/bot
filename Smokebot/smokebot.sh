@@ -2027,7 +2027,7 @@ subrev=`git describe --abbrev | awk -F '-' '{print $2}'`
 if [ "$subrev" == "" ]; then
   git describe --abbrev | awk -F '-' '{print $1"-0"}' > $LATESTAPPS_DIR/SMV_REVISION
 else
-  git describe --abbrev | awk -F '-' '{print $1"-"$2}' > $LATESTAPPS_DIR/SMV_REVISION
+  git describe --abbrev | awk -F '-' '{print $1"-"$2"-"$3}' > $LATESTAPPS_DIR/SMV_REVISION
 fi
 git rev-parse --short HEAD > $LATESTAPPS_DIR/SMV_HASH
 
