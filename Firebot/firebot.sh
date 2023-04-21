@@ -270,7 +270,7 @@ get_fds_revision()
    if [ "$subrev" == "" ]; then
      git describe --abbrev | awk -F '-' '{print $1"-0"}' > $LATESTAPPS_DIR/FDS_REVISION
    else
-     git describe --abbrev | awk -F '-' '{print $1"-"$2}' > $LATESTAPPS_DIR/FDS_REVISION
+     git describe --abbrev | awk -F '-' '{print $1"-"$2"-"$3}' > $LATESTAPPS_DIR/FDS_REVISION
    fi
    FDS_SHORTHASH=`git rev-parse --short HEAD`
    echo $FDS_SHORTHASH > $LATESTAPPS_DIR/FDS_HASH
