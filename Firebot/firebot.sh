@@ -1755,11 +1755,13 @@ email_build_status()
    if [ "$CAD_REVISION" != "" ]; then
      echo "cad revision/branch: $CAD_REVISION/$CADBRANCH  " >> $TIME_LOG
    fi
+   echo "exp revision/branch: $EXP_REVISION/$EXPBRANCH "    >> $TIME_LOG
    echo "fig revision/branch: $FIG_REVISION/$FIGBRANCH "    >> $TIME_LOG
    echo "out revision/branch: $OUT_REVISION/$OUTBRANCH "    >> $TIME_LOG
    if [ "$IFORT_VERSION" != "" ]; then
       echo "Fortran: $IFORT_VERSION "                       >> $TIME_LOG
    fi
+   echo ""                                                  >> $TIME_LOG
    echo "start time: $start_time "                          >> $TIME_LOG
    echo "stop time: $stop_time "                            >> $TIME_LOG
 if [ "$CLONE_REPOS" == "" ]; then
@@ -1775,6 +1777,7 @@ fi
    echo "run matlab: $MATLAB_DIFF "                         >> $TIME_LOG
    echo "build guides: $MANUALS_DIFF "                      >> $TIME_LOG
    echo "total: $SCRIPT_DIFF "                              >> $TIME_LOG
+   echo ""                                                  >> $TIME_LOG
    if [ "$NAMELIST_NODOC_STATUS" != "" ]; then
      if [ "$NAMELIST_NODOC_STATUS" == "0" ]; then
        echo "undocumented namelist keywords: $NAMELIST_NODOC_STATUS " >> $TIME_LOG
