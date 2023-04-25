@@ -91,6 +91,7 @@ echo.
 
   if "%repo%" == "fds.wiki" (
      set repo_out=wikis
+     set repouser_out=wikis_%GITUSER%
      set WIKIWEB=1
   )
   if "%repo%" == "fds-smv" (
@@ -115,6 +116,7 @@ echo.
   if "%WIKIWEB%" == "1" (
      cd %FMROOT%
      git clone %GITHEADER%firemodels/%repo%.git %repo_out%
+     git clone %GITHEADER%%GITUSER%/%repo%.git  %repouser_out%
      exit /b 0
   )
   
