@@ -86,10 +86,9 @@ ALLSIZE=`grep total          output/fds_timing_summary | awk -F',' '{print $3}'`
 cat << EOF > output/timing_summary
 Base: $BASE_TIMEREV
 Current: $CURRENT_TIMEREV
-
 slower(count/time): $SLOWCOUNT, $SLOWSIZE s
 faster(count/time): $FASTCOUNT, $FASTSIZE s
-  total(count/ime): $ALLCOUNT, $ALLSIZE s
+total(count/ime): $ALLCOUNT, $ALLSIZE s
 EOF
 
 cat << EOF
