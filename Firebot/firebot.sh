@@ -1749,6 +1749,10 @@ email_build_status()
    echo "OS: $platform2 "                                   >> $TIME_LOG
    echo "repo: $repo "                                      >> $TIME_LOG
    echo "queue: $QUEUE "                                    >> $TIME_LOG
+   if [ "$IFORT_VERSION" != "" ]; then
+      echo "Fortran: $IFORT_VERSION "                       >> $TIME_LOG
+   fi
+   echo ""                                                  >> $TIME_LOG
    echo "fds revision/branch: $FDS_REVISION/$FDSBRANCH "    >> $TIME_LOG
    echo "smv revision/branch: $SMV_REVISION/$SMVBRANCH "    >> $TIME_LOG
    echo "bot revision/branch: $BOT_REVISION/$BOTBRANCH "    >> $TIME_LOG
@@ -1758,9 +1762,6 @@ email_build_status()
    echo "exp revision/branch: $EXP_REVISION/$EXPBRANCH "    >> $TIME_LOG
    echo "fig revision/branch: $FIG_REVISION/$FIGBRANCH "    >> $TIME_LOG
    echo "out revision/branch: $OUT_REVISION/$OUTBRANCH "    >> $TIME_LOG
-   if [ "$IFORT_VERSION" != "" ]; then
-      echo "Fortran: $IFORT_VERSION "                       >> $TIME_LOG
-   fi
    echo ""                                                  >> $TIME_LOG
    echo "start time: $start_time "                          >> $TIME_LOG
    echo "stop time: $stop_time "                            >> $TIME_LOG
@@ -1817,20 +1818,20 @@ fi
      GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_FDS_TAG
      echo "FDS Test Releases and Documentation:  $GITURL" >> $TIME_LOG
    fi
-   echo "-------------------------------"    >> $TIME_LOG
+   echo ""                                   >> $TIME_LOG
    if [ -e output/slow_cases ]; then
-     echo "cases with longest runtime"       >> $TIME_LOG
+     echo "cases with longest runtime:"       >> $TIME_LOG
      cat output/slow_cases                   >> $TIME_LOG
-     echo "-------------------------------"  >> $TIME_LOG
+     echo ""                                 >> $TIME_LOG
    fi
    if [ -e output/timing_summary ]; then
      cat output/timing_summary               >> $TIME_LOG
-     echo "-------------------------------"  >> $TIME_LOG
+     echo ""                                 >> $TIME_LOG
    fi
    if [ -e output/timing_errors ]; then
       echo "***Warning: cases with > 200% increased run-time"        >> $TIME_LOG
       cat output/timing_errors  | awk -F',' '{print $1,$3,"-->",$4}' >> $TIME_LOG
-      echo "-------------------------------"                         >> $TIME_LOG
+      echo ""                         >> $TIME_LOG
    fi
 
 #  upload guides to a google drive directory
