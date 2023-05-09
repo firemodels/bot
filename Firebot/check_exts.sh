@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# this script is a prototype for identifying file extensiions not documented in the FDS user's guide
+# for now the input directory is hard wired to the fds Complex_Geometry  Verification directory
+# with the firebot account.  This script will be made more general after file extensions identified now
+# are documented.
+
 REPOROOT=~firebot/FireModels_clone
 FROMDIR=$REPOROOT/fds/Verification/Complex_Geometry
 EXT_DIR=output/ext_fds_dir
