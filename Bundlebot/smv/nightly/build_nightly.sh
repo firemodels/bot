@@ -1,11 +1,16 @@
 #!/bin/bash
 platform=linux
+platform2=lnx
+if [ "`uname`" == "Darwin" ] ; then
+  platform="osx"
+  platform2="osx"
+fi
 
-# batch file for creating libraries on windows, linux or osx
 
 curdir=`pwd`
 cd ../../../..
 reporoot=`pwd`
+basereporoot=`basename $reporoot`
 cd $curdir
 
 echo -----------------------------------------------------------------------------
@@ -20,6 +25,8 @@ echo ---------------------- get clone smv repo ---------------------------------
 echo -----------------------------------------------------------------------------
 
 ./clone_repos.sh $smv_hash
+cd $reporoot/smv
+smv_revision=`git describe --abbrev=7 --dirty --long`
 
 # build libraries
 echo building libraries
@@ -46,7 +53,6 @@ echo ---------------------- building smokeview ---------------------------------
 echo -----------------------------------------------------------------------------
 cd $reporoot/smv/Build/smokeview/intel_${platform}_64
 ./make_smokeview.sh
-exit
 
 echo
 echo -----------------------------------------------------------------------------
@@ -54,7 +60,8 @@ echo ---------------------- Building Smokeview bundle --------------------------
 echo -----------------------------------------------------------------------------
 echo
 
-%reporoot%/bot/Bundlebot/smv/scripts/make_testbundle
+$reporoot/bot/Bundlebot/smv/scripts/make_bundle.sh test $smv_revision $basereporoot
+
 
 echo
 echo -----------------------------------------------------------------------------
@@ -62,10 +69,9 @@ echo ---------------------- Uploading Smokeview bundle -------------------------
 echo -----------------------------------------------------------------------------
 echo
 
-uploaddir=$HOME/.bundle/uploads
+uploaddir=.bundle/uploads
+$reporoot/bot/Bundlebot/scripts/upload_smvbundle.sh $uploaddir ${smv_revision}_${platform2}.sh     $basereporoot/bot/Bundlebot/scripts $GH_SMOKEVIEW_TAG $GH_OWNER $GH_REPO --clobber
+$reporoot/bot/Bundlebot/scripts/upload_smvbundle.sh $uploaddir ${smv_revision}_${platform2}.sha1   $basereporoot/bot/Bundlebot/scripts $GH_SMOKEVIEW_TAG $GH_OWNER $GH_REPO --clobber
 
-
-echo.
 echo upload complete
 
-cd %curdir%
