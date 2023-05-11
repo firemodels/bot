@@ -32,7 +32,7 @@ smv_revision=`git describe --abbrev=7 --dirty --long`
 
 # build libraries
 echo building libraries
-cd $reporoot/smv/Build/LIBS/${gnu}_${platform}_64
+cd $reporoot/smv/Build/LIBS/${comp}_${platform}_64
 ./make_LIBS.sh
 
 echo.
@@ -54,7 +54,7 @@ echo ---------------------------------------------------------------------------
 echo ---------------------- building smokeview -----------------------------------------
 echo -----------------------------------------------------------------------------
 cd $reporoot/smv/Build/smokeview/${comp}_${platform}_64
-./make_smokeview.sh
+./make_smokeview.sh -t
 
 echo
 echo -----------------------------------------------------------------------------
