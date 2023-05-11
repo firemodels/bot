@@ -24,7 +24,7 @@ echo ---------------------------------------------------------------------------
 
 call clone_repos %smv_hash%
 cd %reporoot%\smv
-git describe --abbrev-7 --long --dirty > %outdir%\smvrepo_revision
+git describe --abbrev=7 --long --dirty > %outdir%\smvrepo_revision
 set /p smvrepo_revision=<%outdir%\smvrepo_revision
 
 
