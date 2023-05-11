@@ -1,5 +1,6 @@
 @echo off
 set option=%1
+set version_arg=%2
 set SMVEDITION=SMV6
 
 :: Windows batch file to build a smokeview bundle
@@ -27,6 +28,7 @@ call %envfile%
 set BUILDDIR=intel_win_64
 
 :: test info
+if NOT x%version_arg% == x set smv_revision=%version_arg%
 set version=%smv_revision%
 set versionbase=%version%
 set zipbase=%version%_win
