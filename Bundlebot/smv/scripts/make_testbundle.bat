@@ -16,6 +16,6 @@ set CURDIR=%CD%
 call %envfile%
 
 %svn_drive%
-set scriptdir=%svn_root%\bot\Bundlebot\smv\scripts
+set scriptdir=%~dp0
 
 call %scriptdir%\make_bundle test %revision_arg%
