@@ -39,7 +39,7 @@ Title Building applications
 
 %svn_drive%
 
-set progs=background flush hashfile smokediff smokezip wind2fds
+set "progs=background flush hashfile smokediff smokezip wind2fds"
 
 for %%x in ( %progs% ) do (
   title Building %%x
@@ -48,7 +48,7 @@ for %%x in ( %progs% ) do (
   echo -----------------------------------------------------------------------------
   echo ---------------------- building %%x -----------------------------------------
   echo -----------------------------------------------------------------------------
-  call make_%%x bot
+  make -j 4 SHELL="%ComSpec%" -f ..\Makefile intel_win_64
 ) 
 
 echo.
@@ -86,7 +86,6 @@ echo.
 Title Building Smokeview bundle
 
 set uploaddir=%userprofile%\.bundle\uploads
-set CURDIR=%CD%
 
 set filelist=%TEMP%\smv_files_win.out
 gh release view %GH_SMOKEVIEW_TAG%  -R github.com/%GH_OWNER%/%GH_REPO% | grep SMV | grep -v FDS | grep -v CFAST | grep win | gawk "{print $2}" > %filelist%
@@ -96,7 +95,6 @@ erase %filelist%
 gh release upload %GH_SMOKEVIEW_TAG% %uploaddir%\%smv_revision%_win.sha1 -R github.com/%GH_OWNER%/%GH_REPO% --clobber
 gh release upload %GH_SMOKEVIEW_TAG% %uploaddir%\%smv_revision%_win.exe  -R github.com/%GH_OWNER%/%GH_REPO% --clobber
 
-start chrome https://github.com/%GH_OWNER%/%GH_REPO%/releases/tag/%GH_SMOKEVIEW_TAG%
 echo.
 echo upload complete
 
