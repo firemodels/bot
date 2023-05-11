@@ -1,9 +1,11 @@
 #!/bin/bash
 platform=linux
 platform2=lnx
+comp=intel
 if [ "`uname`" == "Darwin" ] ; then
   platform="osx"
   platform2="osx"
+  comp=gnu
 fi
 
 
@@ -30,7 +32,7 @@ smv_revision=`git describe --abbrev=7 --dirty --long`
 
 # build libraries
 echo building libraries
-cd $reporoot/smv/Build/LIBS/intel_${platform}_64
+cd $reporoot/smv/Build/LIBS/${gnu}_${platform}_64
 ./make_LIBS.sh
 
 echo.
@@ -39,7 +41,7 @@ echo  Building applications
 progs="background flush hashfile smokediff smokezip wind2fds"
 
 for prog in $progs; do 
-  cd $reporoot/smv/Build/$prog/intel_${platform}_64
+  cd $reporoot/smv/Build/$prog/${comp}_${platform}_64
   echo
   echo -----------------------------------------------------------------------------
   echo ---------------------- building $prog -----------------------------------------
@@ -51,7 +53,7 @@ echo.
 echo -----------------------------------------------------------------------------
 echo ---------------------- building smokeview -----------------------------------------
 echo -----------------------------------------------------------------------------
-cd $reporoot/smv/Build/smokeview/intel_${platform}_64
+cd $reporoot/smv/Build/smokeview/${comp}_${platform}_64
 ./make_smokeview.sh
 
 echo
