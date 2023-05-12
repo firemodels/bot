@@ -19,6 +19,7 @@ set outdir=%CD%
 
 cd %currentdir%
 
+git clean -dxf > Nul 2>&1
 call get_hash_revisions > Nul 2>&1
 set /p smv_hash=<output\SMV_HASH
 
