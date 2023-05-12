@@ -1,7 +1,8 @@
 @echo off
 
-git clean -dxf
-git remote update
-git merge origin/master
-call smv_bundle.bat %*
+echo *** updating bot repo
+git clean -dxf          > Nul 2>&1
+git remote update       > Nul 2>&1
+git merge origin/master > Nul 2>&1
+call bundle_smv.bat %*
 
