@@ -21,6 +21,7 @@ echo "-S - setup repos used by smokebot (erase each repo first): "
 echo "    $smvrepos"
 echo "-t - append test to repo name, do not erase if repo exists"
 echo "-T - only setup fds and smv repos (erase each repo first)"
+echo "-U - only setup smv repo (erase each repo first)"
 echo "-w - setup wiki and webpage repos cloned from firemodels"
 exit
 }
@@ -61,6 +62,7 @@ CURDIR=`pwd`
 
 fdsrepos="cad exp fds fig out smv test_bundles test7_bundles"
 fdssmvrepos="fds smv"
+smvonlyrepos="smv"
 firebotrepos="cad exp fds fds-smv fig out smv test_bundles test7_bundles"
 smvrepos="cfast fds fig smv test_bundles test7_bundles"
 cfastrepos="cfast exp fig smv test_bundles test7_bundles"
@@ -81,7 +83,7 @@ else
    exit
 fi
 
-while getopts 'abcCfFGH:hsStTw' OPTION
+while getopts 'abcCfFGH:hsStTUw' OPTION
 do
 case $OPTION  in
   a)
@@ -126,6 +128,10 @@ case $OPTION  in
    ;;
   T)
    repos=$fdssmvrepos;
+   eraserepos=1
+   ;;
+  U)
+   repos=$smvonlyrepos;
    eraserepos=1
    ;;
   w)

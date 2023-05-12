@@ -14,6 +14,7 @@ if not exist ..\.gitbot goto skip1
 
 set fdsrepos=exp fds fig out smv test_bundles test7_bundles
 set fdssmvrepos=fds smv
+set smvonlyrepo=smv
 set smvrepos=cfast fds fig smv test_bundles test7_bundles
 set cfastsmvrepos=cfast         smv nplot 
 set    cfastrepos=cfast exp fig smv nplot test_bundles test7_bundles
@@ -192,9 +193,14 @@ echo.
    set valid=1
    set pause_script=0
  )
- if /I "%1" EQU "-s" (
+ if "%1" EQU "-s" (
    set valid=1
    set repos=%smvrepos%
+ )
+ if "%1" EQU "-S" (
+   set valid=1
+   set erase_repos=1
+   set repos=%smvonlyrepo%
  )
  if /I "%1" EQU "-w" (
    set valid=1
@@ -231,6 +237,7 @@ echo -C - setup repos used by the cfast bundle scripts: %cfastsmvrepos%
 echo -f - setup repos used by firebot: %fdsrepos%
 echo -h - display this message%
 echo -s - setup repos used by smokebot: %smvrepos%
+echo -S - setup only smv repo - erase repo first
 echo -T - setup only fds and smv repos - erase repos first
 echo -w - setup wiki and webpage repos cloned from firemodels
 exit /b 0

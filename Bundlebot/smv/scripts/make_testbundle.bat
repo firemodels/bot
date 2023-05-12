@@ -1,4 +1,5 @@
 @echo off
+set revision_arg=%1
 set envfile="%userprofile%"\fds_smv_env.bat
 IF EXIST %envfile% GOTO endif_envexist
 echo ***Fatal error.  The environment setup file %envfile% does not exist. 
@@ -15,6 +16,6 @@ set CURDIR=%CD%
 call %envfile%
 
 %svn_drive%
-set scriptdir=%svn_root%\bot\Bundlebot\smv\scripts
+set scriptdir=%~dp0
 
-call %scriptdir%\make_bundle test
+call %scriptdir%\make_bundle test %revision_arg%
