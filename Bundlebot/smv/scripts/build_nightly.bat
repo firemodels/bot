@@ -10,47 +10,44 @@ if "x%stopscript%" == "x" goto endif2
 
 :: batch file for creating libraries on windows, linux or osx
 
-set curdir=%CD%
+set currentdir=%CD%
 cd ..\..\..\..
 set reporoot=%CD%
 
-cd %curdir%\output
+cd %currentdir%\output
 set outdir=%CD%
 
-cd %curdir%
+cd %currentdir%
 
-echo -----------------------------------------------------------------------------
-echo ---------------------- get smv repo revision --------------------------------
-echo -----------------------------------------------------------------------------
-
-call get_hash_revisions
+call get_hash_revisions > Nul 2>&1
 set /p smv_hash=<output\SMV_HASH
 
-echo -----------------------------------------------------------------------------
-echo ---------------------- get clone smv repo ---------------------------------
-echo -----------------------------------------------------------------------------
+echo *** cloning smv repo
 
-call clone_repos %smv_hash%
+call clone_repos %smv_hash%  > Nul 2>&1
 cd %reporoot%\smv
-git describe --abbrev=7 --long --dirty > %outdir%\smvrepo_revision
+git describe --abbrev=7 --long --dirty > %outdir%\smvrepo_revision  > Nul 2>&1
 set /p smvrepo_revision=<%outdir%\smvrepo_revision
+echo ***     smv hash: %smv_hash%
+echo *** smv revision: %smvrepo_revision%
+echo.
 
 
 :: setup compiler environment
 if x%setup_intel% == x1 goto skip1
+echo *** defining compiler environment
 set setup_intel=1
-call %reporoot%\smv\Utilities\Scripts\setup_intel_compilers.bat
+call %reporoot%\smv\Utilities\Scripts\setup_intel_compilers.bat > Nul 2>&1
 :skip1
 
 
 :: build libraries
 title building libraries
-echo building libraries
+echo *** building libraries
 cd %reporoot%\smv\Build\LIBS\intel_win_64
-call make_LIBS bot
+call make_LIBS bot > Nul 2>&1
 
-echo.
-echo  Building applications
+echo *** Building applications
 Title Building applications
 
 %svn_drive%
@@ -60,35 +57,21 @@ set "progs=background flush hashfile smokediff smokezip wind2fds"
 for %%x in ( %progs% ) do (
   title Building %%x
   cd %reporoot%\smv\Build\%%x\intel_win_64
-    echo.
-  echo -----------------------------------------------------------------------------
-  echo ---------------------- building %%x -----------------------------------------
-  echo -----------------------------------------------------------------------------
-  make -j 4 SHELL="%ComSpec%" -f ..\Makefile intel_win_64
+  echo *** building %%x
+  make -j 4 SHELL="%ComSpec%" -f ..\Makefile intel_win_64 > Nul 2>&1
 ) 
 
-echo.
-echo -----------------------------------------------------------------------------
-echo ---------------------- building smokeview -----------------------------------------
-echo -----------------------------------------------------------------------------
+echo *** building smokeview
 cd %reporoot%\smv\Build\smokeview\intel_win_64
 title Building smokeview
-call make_smokeview -bot
+call make_smokeview -bot > Nul 2>&1
 
-echo.
-echo -----------------------------------------------------------------------------
-echo ---------------------- Building Smokeview bundle -----------------------------------------
-echo -----------------------------------------------------------------------------
-echo.
+echo *** bundling smokeview
 Title Building Smokeview bundle
 
-call %reporoot%\bot\Bundlebot\smv\scripts\make_testbundle %smvrepo_revision%
+call %reporoot%\bot\Bundlebot\smv\scripts\make_testbundle %smvrepo_revision% > Nul 2>&1
 
-echo.
-echo -----------------------------------------------------------------------------
-echo ---------------------- Uploading Smokeview bundle -----------------------------------------
-echo -----------------------------------------------------------------------------
-echo.
+echo *** uploading Smokeview bundle
 Title Building Smokeview bundle
 
 set uploaddir=%userprofile%\.bundle\uploads
@@ -101,10 +84,9 @@ erase %filelist%
 gh release upload %GH_SMOKEVIEW_TAG% %uploaddir%\%smvrepo_revision%_win.sha1 -R github.com/%GH_OWNER%/%GH_REPO% --clobber
 gh release upload %GH_SMOKEVIEW_TAG% %uploaddir%\%smvrepo_revision%_win.exe  -R github.com/%GH_OWNER%/%GH_REPO% --clobber
 
-echo.
-echo upload complete
+echo *** upload complete
 
-cd %curdir%
+cd %currentdir%
 
 goto eof
 
