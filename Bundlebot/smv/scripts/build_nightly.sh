@@ -73,6 +73,11 @@ echo ---------------------- Uploading Smokeview bundle -------------------------
 echo -----------------------------------------------------------------------------
 echo
 
+FILELIST=`gh release view $GH_SMOKEVIEW_TAG  -R github.com/$GH_OWNER/$GH_REPO | grep SMV | grep -v FDS | grep $platform | awk '{print $2}'`
+for file in $FILELIST ; do
+  gh release delete-asset $GH_SMOKEVIEW_TAG $file -R github.com/$GH_OWNER/$GH_REPO -y
+done
+
 uploaddir=.bundle/uploads
 $reporoot/bot/Bundlebot/scripts/upload_smvbundle.sh $uploaddir ${smv_revision}_${platform2}.sh     $basereporoot/bot/Bundlebot/scripts $GH_SMOKEVIEW_TAG $GH_OWNER $GH_REPO --clobber
 $reporoot/bot/Bundlebot/scripts/upload_smvbundle.sh $uploaddir ${smv_revision}_${platform2}.sha1   $basereporoot/bot/Bundlebot/scripts $GH_SMOKEVIEW_TAG $GH_OWNER $GH_REPO --clobber
