@@ -117,7 +117,7 @@ echo ---------------------- Uploading Smokeview bundle -------------------------
 echo -----------------------------------------------------------------------------
 echo
 
-FILELIST=`gh release view $GH_SMOKEVIEW_TAG  -R github.com/$GH_OWNER/$GH_REPO | grep SMV | grep -v FDS | grep $platform | awk '{print $2}'`
+FILELIST=`gh release view $GH_SMOKEVIEW_TAG  -R github.com/$GH_OWNER/$GH_REPO | grep SMV | grep -v FDS | grep $platform2 | awk '{print $2}'`
 for file in $FILELIST ; do
   gh release delete-asset $GH_SMOKEVIEW_TAG $file -R github.com/$GH_OWNER/$GH_REPO -y
 done
