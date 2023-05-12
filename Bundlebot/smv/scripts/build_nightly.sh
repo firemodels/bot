@@ -21,6 +21,7 @@ echo ---------------------------------------------------------------------------
 
 ./get_hash_revisions.sh
 smv_hash=`head -1 output/SMV_HASH`
+echo smv_hash=$smv_hash
 
 echo -----------------------------------------------------------------------------
 echo ---------------------- get clone smv repo ---------------------------------
@@ -29,6 +30,7 @@ echo ---------------------------------------------------------------------------
 ./clone_repos.sh $smv_hash
 cd $reporoot/smv
 smv_revision=`git describe --abbrev=7 --dirty --long`
+echo smv_revision=$smv_revision
 
 # build libraries
 echo building libraries
