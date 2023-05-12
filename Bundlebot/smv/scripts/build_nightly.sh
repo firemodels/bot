@@ -57,7 +57,6 @@ echo "*** get smv repo revision"
 
 ./get_hash_revisions.sh >& /dev/null
 smv_hash=`head -1 output/SMV_HASH`
-echo "*** smv_hash: $smv_hash"
 
 ./clone_repos.sh $smv_hash >& /dev/null
 cd $reporoot/smv
