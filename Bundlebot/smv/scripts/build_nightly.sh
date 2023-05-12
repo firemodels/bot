@@ -1,4 +1,29 @@
 #!/bin/bash
+
+#---------------------------------------------
+#                   usage
+#---------------------------------------------
+
+function usage {
+echo ""
+echo "$0 usage"
+echo ""
+echo "This script builds a smokeview bundle using the"
+echo "smv repo revision from the latest smokebot pass."
+echo ""
+echo "Options:"
+echo "-h - display this message"
+
+#if [ "$MAILTO" != "" ]; then
+#  echo "-m mailto - email address [default: $MAILTO]"
+#else
+#  echo "-m mailto - email address"
+#fi
+exit 0
+}
+
+#*** determine platform script is running on
+
 platform=linux
 platform2=lnx
 comp=intel
@@ -8,6 +33,19 @@ if [ "`uname`" == "Darwin" ] ; then
   comp=gnu
 fi
 
+#---------------------------------------------
+#               get options
+#---------------------------------------------
+
+while getopts 'h' OPTION
+do
+case $OPTION  in
+  h)
+   usage
+   ;;
+esac
+done
+shift $(($OPTIND-1))
 
 curdir=`pwd`
 cd ../../../..
@@ -32,13 +70,19 @@ cd $reporoot/smv
 smv_revision=`git describe --abbrev=7 --dirty --long`
 echo smv_revision=$smv_revision
 
+echo -----------------------------------------------------------------------------
+echo ---------------------- building libraries ---------------------------------
+echo -----------------------------------------------------------------------------
+
 # build libraries
-echo building libraries
 cd $reporoot/smv/Build/LIBS/${comp}_${platform}_64
 ./make_LIBS.sh
 
 echo.
-echo  Building applications
+
+echo -----------------------------------------------------------------------------
+echo ---------------------- building applications ---------------------------------
+echo -----------------------------------------------------------------------------
 
 progs="background flush hashfile smokediff smokezip wind2fds"
 
