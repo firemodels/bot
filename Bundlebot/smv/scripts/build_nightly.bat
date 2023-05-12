@@ -1,5 +1,13 @@
 @echo off
 
+::*** parse command line arguments
+call :getopts %*
+
+if "x%stopscript%" == "x" goto endif2
+  exit /b 1
+:endif2
+
+
 :: batch file for creating libraries on windows, linux or osx
 
 set curdir=%CD%
@@ -97,3 +105,49 @@ echo.
 echo upload complete
 
 cd %curdir%
+
+goto eof
+
+::-----------------------------------------------------------------------
+:usage
+::-----------------------------------------------------------------------
+
+:usage
+echo.
+echo run_bundlebot usage
+echo.
+echo This script builds a smokeview bundle using the
+echo smv repo revision from the latest smokebot pass.
+echo.
+echo Options:
+echo -h - display this message
+exit /b 0
+
+::-----------------------------------------------------------------------
+:getopts
+::-----------------------------------------------------------------------
+ set stopscript=
+ if (%1)==() exit /b
+ set valid=0
+ set arg=%1
+ if "%1" EQU "-h" (
+   call :usage
+   set stopscript=1
+   exit /b
+ )
+ shift
+ if %valid% == 0 (
+   echo.
+   echo ***Error: the input argument %arg% is invalid
+   echo.
+   echo Usage:
+   call :usage
+   set stopscript=1
+   exit /b 1
+ )
+if not (%1)==() goto getopts
+exit /b 0
+
+:eof
+
+
