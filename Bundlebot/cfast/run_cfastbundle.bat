@@ -73,7 +73,7 @@ set /p cfastrevision=<%cfastrevision_file%
 
 set smvrevision_file=%userprofile%\.cfast\PDFS\SMV_REVISION
 cd %smvrepo%
-git describe  --abbrev=7 --long | gawk -F"-" "{printf $1\"-\"$2}" > %smvrevision_file%
+git describe  --abbrev=7 --long | gawk -F"-" "{printf $1\"-\"$2\"-\"$3}" > %smvrevision_file%
 set /p smvrevision=<%smvrevision_file%
 
 echo       cfast hash: %cfasthash%
