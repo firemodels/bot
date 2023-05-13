@@ -1666,7 +1666,7 @@ subrev=`git describe --abbrev | awk -F '-' '{print $2}'`
 if [ "$subrev" == "" ]; then
   SMV_REV=`git describe --abbrev | awk -F '-' '{print $1"-0"}'`
 else
-  SMV_REV=`git describe --abbrev | awk -F '-' '{print $1"-"$2}'`
+  SMV_REV=`git describe --abbrev | awk -F '-' '{print $1"-"$2"-"$3}'`
 fi
 
 cd $cur_dir
