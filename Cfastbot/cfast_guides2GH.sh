@@ -2,7 +2,7 @@
 
 CURDIR=`pwd`
 
-FROMDIR=~cfast/.cfastbot/pubs
+FROMDIR=~cfast/.cfastbot/Manuals
 
 cd ../../$GH_REPO
 TESTBUNDLEDIR=`pwd`
