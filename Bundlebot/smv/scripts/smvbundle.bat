@@ -19,13 +19,12 @@ set outdir=%CD%
 
 cd %currentdir%
 
-git clean -dxf > Nul 2>&1
-call get_hash_revisions > Nul 2>&1
+call get_hash_revisions > %outdir%\stage1_hash 2>&1
 set /p smv_hash=<output\SMV_HASH
 
 echo *** cloning smv repo
 
-call clone_repos %smv_hash%  > Nul 2>&1
+call clone_repos %smv_hash%  > %outdir%\stage2_clone 2>&1
 cd %reporoot%\smv
 git describe --abbrev=7 --long --dirty > %outdir%\smvrepo_revision
 set /p smvrepo_revision=<%outdir%\smvrepo_revision
@@ -38,7 +37,7 @@ echo.
 if x%setup_intel% == x1 goto skip1
 echo *** defining compiler environment
 set setup_intel=1
-call %reporoot%\smv\Utilities\Scripts\setup_intel_compilers.bat > Nul 2>&1
+call %reporoot%\smv\Utilities\Scripts\setup_intel_compilers.bat > %outdir%\stage2_compiler_setup 2>&1
 :skip1
 
 
@@ -46,7 +45,7 @@ call %reporoot%\smv\Utilities\Scripts\setup_intel_compilers.bat > Nul 2>&1
 title building libraries
 echo *** building libraries
 cd %reporoot%\smv\Build\LIBS\intel_win_64
-call make_LIBS bot > Nul 2>&1
+call make_LIBS bot > %outdir%\stage3_LIBS 2>&1
 
 echo *** Building applications
 Title Building applications
@@ -59,18 +58,18 @@ for %%x in ( %progs% ) do (
   title Building %%x
   cd %reporoot%\smv\Build\%%x\intel_win_64
   echo *** building %%x
-  make -j 4 SHELL="%ComSpec%" -f ..\Makefile intel_win_64 > Nul 2>&1
+  make -j 4 SHELL="%ComSpec%" -f ..\Makefile intel_win_64 > %outdir%\stage4_%%x 2>&1
 ) 
 
 echo *** building smokeview
 cd %reporoot%\smv\Build\smokeview\intel_win_64
 title Building smokeview
-call make_smokeview -bot > Nul 2>&1
+call make_smokeview -bot > %outdir%\stage5_smokeview 2>&1
 
 echo *** bundling smokeview
 Title Building Smokeview bundle
 
-call %reporoot%\bot\Bundlebot\smv\scripts\make_testbundle %smvrepo_revision% > Nul 2>&1
+call %reporoot%\bot\Bundlebot\smv\scripts\make_testbundle %smvrepo_revision% > %outdir%\stage6_bundle 2>&1
 
 echo *** uploading Smokeview bundle
 Title Building Smokeview bundle
