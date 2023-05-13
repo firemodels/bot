@@ -51,14 +51,17 @@ curdir=`pwd`
 cd ../../../..
 reporoot=`pwd`
 basereporoot=`basename $reporoot`
+cd $curdir/output
+
+outdir=`pwd`
 cd $curdir
 
 echo "*** get smv repo revision"
 
-./get_hash_revisions.sh >& output/stage1_hash
-smv_hash=`head -1 output/SMV_HASH`
+./get_hash_revisions.sh >& $outdir/stage1_hash
+smv_hash=`head -1 $outdir/SMV_HASH`
 
-./clone_repos.sh $smv_hash >& output/stage2_clone
+./clone_repos.sh $smv_hash >& $outdir/stage2_clone
 cd $reporoot/smv
 smv_revision=`git describe --abbrev=7 --dirty --long`
 echo "***     smv_hash: $smv_hash"
@@ -68,7 +71,7 @@ echo "*** building libraries"
 
 # build libraries
 cd $reporoot/smv/Build/LIBS/${comp}_${platform}_64
-./make_LIBS.sh >& output/stage3_LIBS
+./make_LIBS.sh >& $outdir/stage3_LIBS
 
 echo "*** building applications"
 
@@ -77,16 +80,16 @@ progs="background flush hashfile smokediff smokezip wind2fds"
 for prog in $progs; do 
   cd $reporoot/smv/Build/$prog/${comp}_${platform}_64
   echo "*** building $prog"
-  ./make_${prog}.sh >& output/stage4_$prog
+  ./make_${prog}.sh >& $outdir/stage4_$prog
 done
 
 echo "*** building smokeview"
 cd $reporoot/smv/Build/smokeview/${comp}_${platform}_64
-./make_smokeview.sh -t >& output/stage5_smokeview
+./make_smokeview.sh -t >& $outdir/stage5_smokeview
 
 echo "*** bundling smokeview"
 
-$reporoot/bot/Bundlebot/smv/scripts/make_bundle.sh test $smv_revision $basereporoot >& output/stage6_bundle
+$reporoot/bot/Bundlebot/smv/scripts/make_bundle.sh test $smv_revision $basereporoot >& $outdir/stage6_bundle
 
 
 echo "*** uploading smokeview bundle"
