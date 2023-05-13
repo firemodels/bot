@@ -68,7 +68,7 @@ if %build_cedit% == 0 goto skip_build_cedit2
 echo ***Copying CFAST example files
 
 call :COPY  %bindir%\Data\Users_Guide_Example.in %CFASTDISTDIR%\Examples\
-call :COPY  %docdir%\CData_Guide\Examples\*.in   %CFASTDISTDIR%\Examples\
+call :COPY  %docdir%\CFAST_CData_Guide\Examples\*.in   %CFASTDISTDIR%\Examples\
 
 echo ***Copying CFAST documentation
 
