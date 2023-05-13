@@ -47,7 +47,7 @@ set FIREMODELSDIR=%BUNDLEBASE%\firemodels
 mkdir %FIREMODELSDIR%
 set CFASTDISTDIR=%FIREMODELSDIR%\%installerbase%
 set bundleinfo=%cfast_root%\Utilities\for_bundle\scripts\bundleinfo
-set bundlenewinfo=%bot_root%\bundle\cfast\for_bundle\
+set bundlenewinfo=%bot_root%\Bundlebot\cfast\for_bundle\
 
 call build_bundle_dir.bat %build_cedit%
 

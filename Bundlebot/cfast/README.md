@@ -22,15 +22,15 @@ If you ran cfastbot on your PC, `repo_root` is the directory containing the `cfa
 ran cfastbot.  Both scripts put the manuals (pdf files) into the directory `%userprofile%\.cfast\PDFS`
 which is where the cfast bundle scripts obtain them.
 
-3. Finally, to build a bundle, type: `build_bundle`
+3. Finally, to build a bundle, type: `run_cfastbundle`
 
-### build_bundle usage
+### run_cfastbundle usage
 There are several options for building a bundle. To build a bundle without CEdit (perhaps you don't have
 license keys) use the -E option.  To build using apps already built, use the -I option.  This is mainly
 used when developing the script. To run the script automatically from the Windows task manager, use the -f 
 option so the script won't pause and display a warning message about cloning repos.
 ```
-build_bundle [options]
+run_cfastbundle [options]
 
 Options:
 -B      - use cfast and smv commits from the latest cfastbot pass

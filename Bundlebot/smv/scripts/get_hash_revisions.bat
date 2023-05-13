@@ -4,9 +4,7 @@ set error=0
 call :getopts %*
 
 call :getfile SMV_INFO.txt
-grep FDS_HASH     output\SMV_INFO.txt | gawk "{print $2}" > output\FDS_HASH
 grep SMV_HASH     output\SMV_INFO.txt | gawk "{print $2}" > output\SMV_HASH
-grep FDS_REVISION output\SMV_INFO.txt | gawk "{print $2}" > output\FDS_REVISION
 grep SMV_REVISION output\SMV_INFO.txt | gawk "{print $2}" > output\SMV_REVISION
 goto eof
 
@@ -18,7 +16,7 @@ set file=%1
 if exist output\%file% erase output\%file%
 
 echo downloading %file%
-gh release download %GH_SMV_TAG% -p %file% -R github.com/%GH_OWNER%/%GH_REPO% -D output
+gh release download %GH_SMV_TAG% -p %file% -R github.com/%GH_OWNER%/%GH_REPO% -D output --clobber
 if NOT exist output\%file% echo failed
 exit /b
 
