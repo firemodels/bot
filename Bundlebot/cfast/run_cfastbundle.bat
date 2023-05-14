@@ -106,7 +106,7 @@ echo.
 echo This script builds a cfast bundle.
 echo.
 echo Options:
-echo -B      - use cfast and smv commits from the latest cfastbot pass
+echo -B      - build bundle using cfast and smv commits from the latest cfastbot pass
 echo -C hash - build bundle using cfast repo commit with hash 'hash' .
 echo           If hash=latest then use most the recent commit (default: latest)
 echo -E        skip Cedit build
