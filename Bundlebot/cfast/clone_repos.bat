@@ -36,4 +36,3 @@ git describe --abbrev=7 --dirty --long
 git branch -a
 
 cd %CURDIR%
-

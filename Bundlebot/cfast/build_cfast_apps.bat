@@ -17,7 +17,9 @@ echo. > %stage2out%
 @echo.  >> %stage2out%
 @echo ***Building NPlot
 @echo.  >> %stage2out%
-@echo ***Building NPlot >> %stage2out%
+@echo ------------------------------------------------------------------------- >> %stage2out%
+@echo ***Building NPlot                                                         >> %stage2out%
+@echo ------------------------------------------------------------------------- >> %stage2out%
 cd %cfast_root%\..\nplot
 set MSBUILD="C:\Program Files\Microsoft Visual Studio\2022\Community\Msbuild\Current\Bin\MSBuild.exe"
 %MSBUILD%  NPlot.sln /target:NPlot /p:Configuration=Release /p:Platform="Any CPU" >> %stage2out% 2>&1
@@ -27,23 +29,38 @@ if %build_cedit% == 0 goto skip_build_cedit
    @echo.  >> %stage2out%
    @echo ***Building CEdit
    @echo.  >> %stage2out%
-   @echo ***Building CEdit >> %stage2out%
+   @echo ------------------------------------------------------------------------- >> %stage2out%
+   @echo ***Building CEdit                                                         >> %stage2out%
+   @echo ------------------------------------------------------------------------- >> %stage2out%
    cd %cfast_root%\Build\Cedit
    call make_cedit.bat bot  >> %stage2out% 2>&1
    call :copy_file %cfast_root%\Source\Cedit\obj\Release CEdit.exe %cfast_root%\Utilities\for_bundle\Bin CEdit.exe
 :skip_build_cedit
 
 @echo.  >> %stage2out%
+@echo ------------------------------------------------------------------------- >> %stage2out%
 @echo ***Building CFAST
+@echo ***Building CFAST                                                         >> %stage2out%
+@echo ------------------------------------------------------------------------- >> %stage2out%
 @echo.  >> %stage2out%
 @echo ***Building CFAST >> %stage2out%
+
+:: skip intel setup if it was already setup
+if x%inteldefined% == x1 goto skip_intel
+set inteldefined=1
+echo setting up intel compilers
 call %cfast_root%\Build\scripts\setup_intel_compilers.bat intel64 >> %stage2out% 2>&1
+:skip_intel
+
 cd %cfast_root%\Build\CFAST\intel_win_64
 call make_cfast.bat bot release >> %stage2out% 2>&1
 call :copy_file . cfast7_win_64.exe %cfast_root%\Utilities\for_bundle\Bin cfast.exe
 
 @echo.  >> %stage2out%
+@echo ------------------------------------------------------------------------- >> %stage2out%
+@echo ***Building CDATA                                                         >> %stage2out%
 @echo ***Building CData
+@echo ------------------------------------------------------------------------- >> %stage2out%
 @echo.  >> %stage2out%
 @echo ***Building CData >> %stage2out%
 cd %cfast_root%\Build\Cdata\intel_win_64
@@ -51,7 +68,10 @@ call make_cdata.bat bot release >> %stage2out% 2>&1
 call :copy_file . cdata7_win_64.exe %cfast_root%\Utilities\for_bundle\Bin cdata.exe
 
 @echo.  >> %stage2out%
+@echo ------------------------------------------------------------------------- >> %stage2out%
+@echo ***Building VandVCalcs                                                    >> %stage2out%
 @echo ***Building VandVCalcs
+@echo ------------------------------------------------------------------------- >> %stage2out%
 @echo.  >> %stage2out%
 @echo ***Building VandVCalcs >> %stage2out%
 cd %cfast_root%\Build\VandV_Calcs\intel_win_64

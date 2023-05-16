@@ -1,4 +1,5 @@
 @echo off
+setlocal
 
 :: builds a cfast bundle using exising cfast and smv repos
 
@@ -7,7 +8,6 @@ set smvrev=smvtest
 set upload=0
 set build_cedit=1
 set only_installer=0
-SETLOCAL
 
 call :getopts %*
 
@@ -39,7 +39,7 @@ if %only_installer% == 1 goto only_installer
    cd %THISDIR%
    call build_cfast_apps %build_cedit%
 
-   echo .
+   echo.
    echo ***Building smokeview executables
    cd %THISDIR%\..\..\..\smv
    set smvrepo=%CD%

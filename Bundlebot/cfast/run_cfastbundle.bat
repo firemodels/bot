@@ -1,8 +1,8 @@
 @echo off
+setlocal
 
 :: builds a cfast bundle using either specified cfast and smv repo revisions or the revisions used in the latest
 :: cfastbot pass 
-setlocal
 
 set cfasthash=latest
 set smvhash=latest
@@ -175,5 +175,6 @@ exit /b 0
 if not (%1)==() goto getopts
 exit /b 0
 
+endlocal
 :eof
 
