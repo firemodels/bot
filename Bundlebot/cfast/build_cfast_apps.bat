@@ -37,45 +37,50 @@ if %build_cedit% == 0 goto skip_build_cedit
    call :copy_file %cfast_root%\Source\Cedit\obj\Release CEdit.exe %cfast_root%\Utilities\for_bundle\Bin CEdit.exe
 :skip_build_cedit
 
-@echo.  >> %stage2out%
-@echo ------------------------------------------------------------------------- >> %stage2out%
-@echo ***Building CFAST
-@echo ***Building CFAST                                                         >> %stage2out%
-@echo ------------------------------------------------------------------------- >> %stage2out%
-@echo.  >> %stage2out%
-@echo ***Building CFAST >> %stage2out%
-
 :: skip intel setup if it was already setup
 if x%inteldefined% == x1 goto skip_intel
+@echo.                                                                          >> %stage2out%
+@echo ------------------------------------------------------------------------- >> %stage2out%
+@echo ***Setting up Intel Compilers                                             >> %stage2out%
+@echo ------------------------------------------------------------------------- >> %stage2out%
+@echo.                                                                          >> %stage2out%
+@echo ***Setting up Intel Compilers
 set inteldefined=1
 echo setting up intel compilers
-call %cfast_root%\Build\scripts\setup_intel_compilers.bat intel64 >> %stage2out% 2>&1
+call %cfast_root%\Build\scripts\setup_intel_compilers.bat intel64                >> %stage2out% 2>&1
 :skip_intel
 
+@echo.                                                                          >> %stage2out%
+@echo ------------------------------------------------------------------------- >> %stage2out%
+@echo ***Building CFAST                                                         >> %stage2out%
+@echo ------------------------------------------------------------------------- >> %stage2out%
+@echo.                                                                          >> %stage2out%
+
+@echo ***Building CFAST
 cd %cfast_root%\Build\CFAST\intel_win_64
-call make_cfast.bat bot release >> %stage2out% 2>&1
+call make_cfast.bat bot release                                                  >> %stage2out% 2>&1
 call :copy_file . cfast7_win_64.exe %cfast_root%\Utilities\for_bundle\Bin cfast.exe
 
-@echo.  >> %stage2out%
+@echo.                                                                          >> %stage2out%
 @echo ------------------------------------------------------------------------- >> %stage2out%
 @echo ***Building CDATA                                                         >> %stage2out%
-@echo ***Building CData
 @echo ------------------------------------------------------------------------- >> %stage2out%
-@echo.  >> %stage2out%
-@echo ***Building CData >> %stage2out%
+@echo.                                                                          >> %stage2out%
+
+@echo ***Building CData
 cd %cfast_root%\Build\Cdata\intel_win_64
-call make_cdata.bat bot release >> %stage2out% 2>&1
+call make_cdata.bat bot release                                                 >> %stage2out% 2>&1
 call :copy_file . cdata7_win_64.exe %cfast_root%\Utilities\for_bundle\Bin cdata.exe
 
-@echo.  >> %stage2out%
+@echo.                                                                          >> %stage2out%
 @echo ------------------------------------------------------------------------- >> %stage2out%
 @echo ***Building VandVCalcs                                                    >> %stage2out%
-@echo ***Building VandVCalcs
 @echo ------------------------------------------------------------------------- >> %stage2out%
-@echo.  >> %stage2out%
-@echo ***Building VandVCalcs >> %stage2out%
+@echo.                                                                          >> %stage2out%
+
+@echo ***Building VandVCalcs
 cd %cfast_root%\Build\VandV_Calcs\intel_win_64
-call make_vv.bat bot release >> %stage2out% 2>&1
+call make_vv.bat bot release                                                    >> %stage2out% 2>&1
 call :copy_file . VandV_Calcs_win_64.exe %cfast_root%\Utilities\for_bundle\Bin VandV_Calcs.exe
 
 cd %cfast_root%\Utilities\for_bundle\scripts
