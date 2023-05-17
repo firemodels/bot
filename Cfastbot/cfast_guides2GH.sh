@@ -30,7 +30,6 @@ UPLOADINFO ()
   echo "SMV_HASH       $S_HASH"     >> $FROMDIR/CFAST_INFO.txt
   echo "SMV_REVISION   $S_REVISION" >> $FROMDIR/CFAST_INFO.txt
   gh release upload $GH_CFAST_TAG $FROMDIR/CFAST_INFO.txt -R github.com/$GH_OWNER/$GH_REPO --clobber
-  rm -f $FROMDIR/CFAST_INFO.txt
 }
 
 
