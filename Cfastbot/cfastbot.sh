@@ -1335,18 +1335,18 @@ email_build_status()
       if [ `whoami` == "smokebot" ]; then
          is_bot=1
       fi
+      if [ -d $LATEST_MANUALS_DIR ]; then
+        rm -rf $MANUALS_DIR
+        cp -r $LATEST_MANUALS_DIR $MANUALS_DIR
+      fi
       if [[ "$UPLOAD" == "1" ]] && [[ -e $UploadGuidesGH ]] && [[ "$is_bot"  == "1" ]]; then
          cd $cfastbotdir
-         $UploadGuidesGH
+         $UploadGuidesGH >& $OUTPUT_DIR/stage_upload
          GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_CFAST_TAG
          echo "     CFAST Guides: $GITURL" >> $TIME_LOG
       fi
       # Send empty email with success message
       cat $TIME_LOG | mail $REPLYTO -s "CFASTbot build success on ${hostname}! Revision ${GIT_REVISION}." $mailTo &> /dev/null
-      if [ -d $LATEST_MANUALS_DIR ]; then
-        rm -rf $MANUALS_DIR
-        cp -r $LATEST_MANUALS_DIR $MANUALS_DIR
-      fi
    fi
 
    # Send email notification if validation statistics have changed.
