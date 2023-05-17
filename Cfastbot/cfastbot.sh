@@ -1289,8 +1289,11 @@ email_build_status()
    echo "-------------------------------"      >> $TIME_LOG
    echo "Host: $hostname "                     >> $TIME_LOG
    echo "repo: $cfastrepo "                    >> $TIME_LOG
+   echo "bot revision: $BOT_REVISION "         >> $TIME_LOG
    echo "cfast revision: $CFAST_REVISION "     >> $TIME_LOG
+   echo "exp revision: $EXP_REVISION "         >> $TIME_LOG
    echo "smv revision: $SMV_REVISION "         >> $TIME_LOG
+   echo ""                                     >> $TIME_LOG
    echo "Fortran: $IFORT_VERSION "             >> $TIME_LOG
    echo "Start Time: $start_time "             >> $TIME_LOG
    echo "Stop Time: $stop_time "               >> $TIME_LOG
@@ -1499,6 +1502,10 @@ fi
 
 # define repo names, make sure they exist
 
+botrepo=$reponame/bot
+botbranch=master
+CD_REPO $botrepo $botbranch || exit 1
+
 cfastrepo=$reponame/cfast
 cfastbranch=master
 CD_REPO $cfastrepo $cfastbranch || exit 1
@@ -1645,6 +1652,12 @@ else
 fi
 
 cur_dir=`pwd`
+
+CD_REPO $reponame/bot $botbranch || return 1
+BOT_REVISION=`git describe --abbrev=7 --dirty --long`
+
+CD_REPO $reponame/exp $expbranch || return 1
+EXP_REVISION=`git describe --abbrev=7 --dirty --long`
 
 CD_REPO $reponame/cfast $cfastbranch || return 1
 CFAST_REVISION=`git describe --abbrev=7 --dirty --long`
