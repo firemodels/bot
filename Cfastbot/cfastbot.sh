@@ -1342,9 +1342,9 @@ email_build_status()
         rm -rf $MANUALS_DIR
         cp -r $LATEST_MANUALS_DIR $MANUALS_DIR
       fi
-      if [[ "$UPLOAD" == "1" ]] && [[ -e $UploadGuidesGH ]] && [[ "$is_bot"  == "1" ]]; then
+      if [[ "$UPLOAD" == "1" ]] && [[ -e $Guides2GH ]] && [[ "$is_bot"  == "1" ]]; then
          cd $cfastbotdir
-         $UploadGuidesGH >& $OUTPUT_DIR/stage_upload
+         $Guides2GH >& $OUTPUT_DIR/stage_upload
          GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_CFAST_TAG
          echo "     CFAST Guides: $GITURL" >> $TIME_LOG
       fi
@@ -1593,7 +1593,7 @@ if [ -e $CFAST_STATUS_FILE ] ; then
 fi
 
 export JOBPREFIX=CB_
-UploadGuidesGH=$cfastbotdir/cfast_guides2GH.sh
+Guides2GH=$cfastbotdir/guides2GH.sh
 
 #  ==============================================
 #  = CFASTbot timing and notification mechanism =

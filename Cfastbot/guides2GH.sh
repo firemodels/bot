@@ -7,11 +7,13 @@ FROMDIR=~cfast/.cfastbot/Manuals
 UPLOADGUIDE ()
 {
   FILE=$1
-  FILEnew=${FILE}.pdf
+  FILEnew=${FILE}/${FILE}.pdf
   if [ -e $FROMDIR/$FILEnew ]; then
     cd $TESTBUNDLEDIR
     echo ***Uploading $FILEnew
     gh release upload $GH_CFAST_TAG $FROMDIR/$FILEnew -R github.com/$GH_OWNER/$GH_REPO --clobber
+  else
+    echo $FROMDIR/$FILEnew does not exist
   fi
 }
 UPLOADINFO ()
