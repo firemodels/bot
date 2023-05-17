@@ -4,11 +4,6 @@ CURDIR=`pwd`
 
 FROMDIR=~cfast/.cfastbot/Manuals
 
-cd ../../$GH_REPO
-TESTBUNDLEDIR=`pwd`
-gh repo set-default $GH_OWNER/$GH_REPO
-cd $CURDIR
-
 UPLOADGUIDE ()
 {
   FILE=$1
@@ -33,12 +28,9 @@ UPLOADINFO ()
 }
 
 
-if [ -e $TESTBUNDLEDIR ] ; then
-  UPLOADGUIDE CFAST_Tech_Ref
-  UPLOADGUIDE CFAST_Users_Guide
-  UPLOADGUIDE CFAST_Validation_Guide
-  UPLOADGUIDE CFAST_Configuration_Guide
-  UPLOADGUIDE CFAST_CData_Guide
-  UPLOADINFO
-  cd $CURDIR
-fi
+UPLOADGUIDE CFAST_Tech_Ref
+UPLOADGUIDE CFAST_Users_Guide
+UPLOADGUIDE CFAST_Validation_Guide
+UPLOADGUIDE CFAST_Configuration_Guide
+UPLOADGUIDE CFAST_CData_Guide
+UPLOADINFO
