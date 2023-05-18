@@ -132,7 +132,7 @@ exit /b
 :-------------------------------------------------
 set infile=%1
 set fullfile=%PDFS%\%infile%.pdf
-IF NOT EXIST %fullfile% call :GETPDF %infile%
+call :GETPDF %infile%
 IF EXIST %fullfile%       copy %fullfile% %CFASTDISTDIR%\Documents\ > Nul 2>&1
 IF NOT EXIST %fullfile%   echo ***Warning: %fullfile% does not exist
 exit /b
@@ -144,7 +144,7 @@ set file=%1
 set fullfile=%PDFS%\%file%.pdf
 echo | set /p dummyName=***downloading %file%: 
 
-gh release download %GH_CFAST_TAG% -p %file%.pdf -R github.com/%GH_OWNER%/%GH_REPO% -D %PDFS%
+gh release download %GH_CFAST_TAG% -p %file%.pdf -R github.com/%GH_OWNER%/%GH_REPO% -D %PDFS% --clobber
 
 if NOT exist %fullfile% echo failed
 if exist %fullfile% echo succeeded
