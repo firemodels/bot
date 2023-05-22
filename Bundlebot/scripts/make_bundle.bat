@@ -138,6 +138,10 @@ mkdir %out_bundle%\%smvversion%
 mkdir %out_bin%
 mkdir %out_textures%
 mkdir %out_colorbars%
+mkdir %out_colorbars%\linear
+mkdir %out_colorbars%\divergent
+mkdir %out_colorbars%\rainbow
+mkdir %out_colorbars%\circular
 mkdir %out_doc%
 mkdir %out_guides%
 mkdir %out_web%
@@ -281,7 +285,10 @@ CALL :COPY  %smv_forbundle%\smokeview.ini  %out_smv%\.
 CALL :COPY  %smv_forbundle%\smokeview.html %out_smv%\.
 
 echo copying colorbars
-copy %smv_forbundle%\colorbars\*.csv         %out_colorbars%\.>Nul
+copy %smv_forbundle%\colorbars\linear\*.csv    %out_colorbars%\linear    >Nul
+copy %smv_forbundle%\colorbars\rainbow\*.csv   %out_colorbars%\rainbow   >Nul
+copy %smv_forbundle%\colorbars\divergent\*.csv %out_colorbars%\divergent >Nul
+copy %smv_forbundle%\colorbars\circular\*.csv  %out_colorbars%\circular  >Nul
 
 echo copying textures
 copy %smv_forbundle%\textures\*.jpg          %out_textures%\.>Nul
