@@ -2767,8 +2767,15 @@ fi
 
 ###*** archive apps
 
+copy_apps=
 get_firebot_success
 if [[ "$firebot_success" == "1" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+  copy_apps=1
+fi
+if [ "$BUILD_ONLY" == "1" ]; then
+  copy_apps=1
+fi
+if [ "$copy_apps" == "1" ]; then
   rm -f $APPS_DIR/*
   cp $LATESTAPPS_DIR/* $APPS_DIR/.
 
