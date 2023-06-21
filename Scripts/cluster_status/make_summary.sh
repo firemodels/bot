@@ -1,4 +1,10 @@
 #!/bin/bash
+HOST_BASE=$1
+HOST_BEG=$2
+HOST_END=$3
+webpage=$4
+TEMP_IP=$5
+
 logdir=$HOME/.cluster_status
 lockfile=$logdir/lockfile_make_summary
 if [ -e $lockfile ]; then
@@ -9,9 +15,8 @@ fi
 touch $lockfile
 
 TIMELENGTH=7.0
-HOSTS_PER_ROW=6
+HOSTS_PER_ROW=7
 
-webpage=$1
 if [ "$webpage" == "" ]; then
   if [ "$STATUS_WEBPAGE" == "" ]; then
     webpage=/var/www/html/summary.html
@@ -20,24 +25,21 @@ if [ "$webpage" == "" ]; then
   fi
 fi
 
-TEMP_IP=$2
 if [[ "$TEMP_IP" == "" ]] && [[ "$STATUS_TEMP_IP" != "" ]]; then
   TEMP_IP=$STATUS_TEMP_IP
 fi
 
-# up nodes
-nodefile=/tmp/nodefile.$$
-pbsnodes -l free | awk '{print $1}'          >  $nodefile
-pbsnodes -l job-exclusive | awk '{print $1}' >> $nodefile
-pbsnodes -l job-sharing | awk '{print $1}'   >> $nodefile
-pbsnodes -l busy | awk '{print $1}'          >> $nodefile
-pbsnodes -l time-shared | awk '{print $1}'   >> $nodefile
-UP_HOSTS=`sort -u $nodefile`
+allnodes=/tmp/allnodes.$$
+downnodes=/tmp/downnodes.$$
+upnodes=/tmp/upnodes.$$
+./Get_Host_Status.sh $HOST_BASE $HOST_BEG $HOST_END $allnodes $downnodes $upnodes
 
-# add down/offline nodes to up nodes to get all nodes
-pbsnodes -l | awk '{print $1}' >> $nodefile
-ALL_HOSTS=`sort -u $nodefile`
-rm -rf $nodefile
+UP_HOSTS=`cat $upnodes`
+ALL_HOSTS=`cat $allnodes`
+
+rm -rf $allnodes
+rm -rf $upnodes
+rm -rf $downnodes
 
 temp_webpage=summary.html
 currentdate=`date "+%b %d %Y %R:%S"`
@@ -92,6 +94,7 @@ for host in $UP_HOSTS
 do
 add_load $host
 done
+
 echo "$decdate,$total_load,$temp" >> $loadfile
 
 cat << EOF > $temp_webpage
@@ -115,7 +118,7 @@ EOF
 
 lasttime=`cat $loadfile | tail -1 | awk -F',' '{print $1}'`
 firsttime="$( bc <<<"$lasttime - $TIMELENGTH" )"
-cat $loadfile | awk -v firsttime="$firsttime" -F',' '{if($1>firsttime) { printf("[%s,%s],\n",$1,$3) }}'  >> $temp_webpage
+cat $loadfile | tail -5000 | awk -v firsttime="$firsttime" -F',' '{if($1>firsttime) { printf("[%s,%s],\n",$1,$3) }}'  >> $temp_webpage
 
 cat << EOF >> $temp_webpage
         ]);
@@ -146,7 +149,7 @@ cat << EOF >> $temp_webpage
           ['days since Jan 1', 'load'],
 EOF
 
-cat $loadfile | awk -v firsttime="$firsttime" -F',' '{if($1>firsttime) { printf("[%s,%s],\n",$1,$2) }}'  >> $temp_webpage
+cat $loadfile | tail -4000 | awk -v firsttime="$firsttime" -F',' '{if($1>firsttime) { printf("[%s,%s],\n",$1,$2) }}'  >> $temp_webpage
 
 cat << EOF >> $temp_webpage
         ]);
@@ -183,7 +186,7 @@ fi
 
 cat << EOF >> $temp_webpage
 <h3>
-Load: $total_load<br>
+Load: $total_load
 EOF
 if [ "$TEMP_IP" != "" ]; then
 cat << EOF >> $temp_webpage
@@ -307,7 +310,7 @@ done
 
 if [ $count -gt 0 ]; then
 cat << EOF >> $temp_webpage
-<h3>Node Usage</h3>
+<h3>Usage</h3>
 <table border=on>
 <tr>
 <td bgcolor="#ffffff">load &lt; 1.0</td>
@@ -324,7 +327,7 @@ cat << EOF >> $temp_webpage
 <p><table border=on>
 EOF
 
-# output individual blaze entries
+# output individual node entries
 
 count=0
 newrow=0
