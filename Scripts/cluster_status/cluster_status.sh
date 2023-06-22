@@ -150,6 +150,20 @@ if [ "$STATUS_MAILTO" == "" ]; then
      error=1
 fi
 
+if [ "$STATUS_WEBPAGE" == "" ]; then
+     echo "***error: STATUS_WEBPAGE variable not defined"
+     echo " define STATUS_WEBPAGE or use the -w option"
+     error=1
+else
+     have_webpage=`touch $STATUS_WEBPAGE |& grep 'Permission denied' | wc -l`
+     if [ $have_webpage -gt 0 ]; then
+       echo "***error: unable to write to $STATUS_WEBPAGE"
+       echo "  change ownership of $STATUS_WEBPAGE so that `whoami` has write permission"
+       ls -l $STATUS_WEBPAGE
+       error=1
+     fi
+fi
+
 if [ -e $lockfile ]; then
   echo "***error: cluster_status.sh script already running (lock file exists)"
   echo "  use the -f option if this is not the case"
@@ -158,9 +172,12 @@ fi
 
 if [ "$error" != "" ]; then
   SHOW_PARAMS=1
+  echo 
 fi
 
 if [ "$SHOW_PARAMS" != "" ]; then
+  echo "Settings"
+  echo "--------"
   echo "     HOST_BASE: $HOST_BASE"
   echo "      HOST_BEG: $HOST_BEG"
   echo "      HOST_END: $HOST_END"
@@ -175,7 +192,8 @@ if [ "$SHOW_PARAMS" != "" ]; then
 fi
 
 if [ "$error" != "" ]; then
-  echo $0 script aborted
+  echo
+  echo script aborted
   exit
 fi
 
