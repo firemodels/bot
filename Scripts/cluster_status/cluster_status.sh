@@ -1,26 +1,14 @@
 #!/bin/bash
-arg=$1
-HOST_BASE=$2
-HOST_BEG=$3
-HOST_END=$4
 
-# 1.  define the STATUS_WEBPAGE environmental containing the webpage directory for summary results
-#     produced by this script
+# environment varibles used by script
+# 1.  STATUS_WEBPAGE - webpage conaining summary results
 #     example: 
 #        export STATUS_WEBPAGE=/var/www/html/summary.html
-# 2.  define the STATUS_MAILTO environment variable containing an email
-#     address to email results too.
+# 2.  STATUS_MAILTO email address where results are sent to.
 #     example: 
 #        export STATUS_MAILTO=user@gmail.com
-# 3.  define the STATUS_TEMP_IP variable if you have a temperature sensor
-#     (this script will not generate temperature plots if STATUS_TEMP_IP
-#     is blank)
-
-daily=
-if [ "$arg" == "daily" ]; then
-  daily=daily
-  arg=gettemp
-fi
+# 3.  STATUS_TEMP_IP ip address of a temperature sensor (optional)
+#     temperature plots are not generated if STATUS_TEMP_IP is blank)
 
 WARN_TEMP ()
 {
@@ -29,13 +17,169 @@ WARN_TEMP ()
   if [ ! -e $temphigh_lock ]; then
     if (( $(echo "$temp > $temp_high" |bc -l) )); then
       touch $temphigh_lock
-      echo "" | Mail -s "***warning temp: $temp" gforney@gmail.com randy.mcdermott@gmail.com
+      echo "" | Mail -s "***warning temp: $temp" $STATUS_MAILTO
     fi
   fi
 }
 
+# ---------------------------- usage ----------------------------------
+
+function usage {
+  echo " generate a web page summarizing cluster status usage"
+  echo " -b - first node index - default: $HOST_BEG"
+  echo " -e - last node index - default: $HOST_END"
+  echo " -H - base name of compute nodes - default: $HOST_BASE"
+  echo " -h - show this message"
+  echo " -i - reset host status files (files containing hosts that are up and down)"
+if [ "$STATUS_MAILTO" != "" ]; then
+  echo " -m email_address - default: $STATUS_MAILTO"
+else
+  echo " -m email_address"
+fi
+  echo " -o - option - daily, none, gettemp"
+  echo " -s - send out an email summarizing the cluster status"
+if [ "$STATUS_TEMP_IP" != "" ]; then
+  echo " -t temp_ip_address - default: $STATUS_TEMP_IP"
+else
+  echo " -t temp_ip_address "
+fi
+  echo " -v - show parameters used to run script - do not run script"
+if [ "$STATUS_WEBPAGE" != "" ]; then
+  echo " -w webpage - default: $STATUS_WEBPAGE"
+else
+  echo " -w webpage"
+fi
+echo "example:"
+echo "./cluster_status.sh -H blaze -b 1 -e 144 -m user@nist.gov"
+  rm -f $lockfile
+  exit
+}
+
+DOWN_NODES=down_nodes.$$
+UP_NODES=up_nodes.$$
+ALL_NODES=all_nodes.$$
+
+dshout=dsh.out.$$
 logdir=$HOME/.cluster_status
-if [ "$arg" == "gettemp" ]; then
+nodeup=$logdir/node_up
+nodedown=$logdir/node_down
+upnow=$logdir/upnow
+downnow=$logdir/downnow
+summary=$logdir/summary
+updir=$logdir/up
+downdir=$logdir/down
+INIT=
+SUMMARY=
+temp_up_file=/tmp/cluster_nodes.$$
+HOST_BASE=`hostname -s`
+HOST_BEG=1
+HOST_END=1
+logdir=$HOME/.cluster_status
+if [ ! -d $logdir ]; then
+  mkdir $logdir
+fi
+lockfile=$logdir/cluster_status_lock
+locksummaryfile=$logdir/lockfile_make_summary
+SHOW_PARAMS=
+
+while getopts 'b:e:fhH:im:o:st:vw:' OPTION
+do
+case $OPTION in
+  b)
+  HOST_BEG="$OPTARG"
+  ;;
+  e)
+  HOST_END="$OPTARG"
+  ;;
+  f)
+  rm -f $lockfile
+  rm -f $locksummaryfile
+  ;;
+  H)
+  HOST_BASE="$OPTARG"
+  ;;
+  h)
+  usage
+  ;;
+  i)
+  INIT=1
+  ;;
+  m)
+  STATUS_MAILTO="$OPTARG"
+  ;;
+  o)
+  scriptoption="$OPTARG"
+  if [[ "$scriptoption" != "daily" ]] && [[ "$scriptoption" != "gettemp" ]]; then
+    scriptoption="none"
+  fi
+  ;;
+  s)
+  SUMMARY=1
+  ;;
+  t)
+  STATUS_TEMP_IP="$OPTARG"
+  ;;
+  v)
+  SHOW_PARAMS=1
+  ;;
+  w)
+  STATUS_WEBPAGE="$OPTARG"
+  ;;
+esac
+done
+shift $(($OPTIND-1))
+
+error=
+dsh_missing=`dsh  -h |& grep 'command not' | wc -l`
+if [ "$dsh_missing" == "1" ]; then
+  echo "***error: dsh command not found"
+  error=1
+fi
+
+if [ "$STATUS_TEMP_IP" == "" ]; then
+  if [ "$scriptoption" == "gettemp" ]; then
+     echo "***error: temperature sensor not available"
+     echo " use -o daily or -o none"
+     error=1
+  fi
+fi
+
+if [ "$STATUS_MAILTO" == "" ]; then
+     echo "***error: email mailto address not defined"
+     echo " define STATUS_MAILTO or use the -m option"
+     error=1
+fi
+
+if [ -e $lockfile ]; then
+  echo "***error: cluster_status.sh script already running (lock file exists)"
+  echo "  use the -f option if this is not the case"
+  error=1
+fi
+
+if [ "$error" != "" ]; then
+  SHOW_PARAMS=1
+fi
+
+if [ "$SHOW_PARAMS" != "" ]; then
+  echo "     HOST_BASE: $HOST_BASE"
+  echo "      HOST_BEG: $HOST_BEG"
+  echo "      HOST_END: $HOST_END"
+  echo " STATUS_MAILTO: $STATUS_MAILTO"
+  if [ "$STATUS_TEMP_IP" != "" ]; then
+    echo "STATUS_TEMP_IP: $STATUS_TEMP_IP"
+  fi
+  echo "STATUS_WEBPAGE: $STATUS_WEBPAGE"
+  if [ "$error" == "" ]; then
+    exit
+  fi
+fi
+
+if [ "$error" != "" ]; then
+  echo $0 script aborted
+  exit
+fi
+
+if [ "$scriptoption" == "gettemp" ]; then
   load=`tail -1 ~/.cluster_status/load_status.csv | awk -F',' '{print $2}'`
   temp=`tail -1 ~/.cluster_status/load_status.csv | awk -F',' '{print $3}'`
   tempcrit=88.0
@@ -56,27 +200,13 @@ if [ "$arg" == "gettemp" ]; then
   WARN_TEMP 89.0 lock89
   WARN_TEMP 91.0 lock91
 
-  if [ "$daily" == "daily" ]; then
-    echo "" | Mail -s "cluster check - temperature: $temp load: $load" gforney@gmail.com
-  fi
-  exit
-fi
-lockfile=$logdir/cluster_status_lock
-if [ -e $lockfile ]; then
-  echo "***error: cluster_status.sh script already running"
-  echo "  exiting"
+  echo "" | Mail -s "cluster check - temperature: $temp load: $load" $STATUS_MAILTO
   exit
 fi
 touch $lockfile
 
-if [ "$STATUS_WEBPAGE" == "" ]; then
-  webpage=/var/www/html/summary.html
-else
-  webpage=$STATUS_WEBPAGE
-fi
-if [ "$STATUS_MAILTO" != "" ]; then
-  mailTo=$STATUS_MAILTO
-fi
+webpage=$STATUS_WEBPAGE
+mailTo=$STATUS_MAILTO
 if [ "$STATUS_TEMP_IP" != "" ]; then
   TEMP_IP=$STATUS_TEMP_IP
 fi
@@ -84,64 +214,6 @@ fi
 # ---------------------------------------------------------------------
 # shouldn't have to modify any lines below
 
-# ---------------------------- usage ----------------------------------
-
-# error checking
-
-function usage {
-  echo " -h - show this message"
-  echo " -i - initialize host status files"
-  echo " -s - send out an email summarizing the cluster status"
-  rm $lockfile
-  exit
-}
-if [ "$webpage" == "" ]; then
-  echo "***error: The summary web page location is not defined."
-  echo "   Define the environment variable STATUS_WEBPAGE"
-  echo "   use chown to make it owned by the user `whoami`"
-  rm $lockfile
-  exit
-fi
-if [ ! -e $webpage ]; then
-  echo "***error: The summary web page $webpage does not exist."
-  echo "   Define the environment variable STATUS_WEBPAGE"
-  echo "   and use chown to make it owned by the user `whoami`"
-  rm $lockfile
-  exit
-fi
-
-DOWN_NODES=down_nodes.$$
-UP_NODES=up_nodes.$$
-ALL_NODES=all_nodes.$$
-
-dshout=dsh.out.$$
-logdir=$HOME/.cluster_status
-nodeup=$logdir/node_up
-nodedown=$logdir/node_down
-upnow=$logdir/upnow
-downnow=$logdir/downnow
-summary=$logdir/summary
-updir=$logdir/up
-downdir=$logdir/down
-INIT=
-SUMMARY=
-temp_up_file=/tmp/cluster_nodes.$$
-
-while getopts 'his' OPTION
-do
-case $OPTION in
-  h)
-  usage
-  ;;
-  i)
-  INIT=1
-  ;;
-  s)
-  SUMMARY=1
-  ;;
-esac
-done
-shift $(($OPTIND-1))
 DSH=dsh
 
 source ./Get_Host_Status.sh $HOST_BASE $HOST_BEG $HOST_END $ALL_NODES $DOWN_NODES $UP_NODES
