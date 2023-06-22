@@ -1,10 +1,10 @@
 #!/bin/bash
-qstatout=qstat.out.$$
+output=user_usage.out.$$
 infoout=info.out.$$
-qstat -a | awk 'NR>5' | awk '{print $2," ",$7}' | sort > $qstatout
-njobs=`cat $qstatout | wc -l`
+squeue -r -h -o "%u %t %C" | awk '{print $1, $2, $3}' | grep R | awk '{print $1,$3}' | sort> $output
+njobs=`cat $output | wc -l`
 if [ $njobs -gt 0 ]; then
-awk '{a[$1] += $2} END{for (i in a) print i,a[i]}' $qstatout | sort > $infoout
+awk '{a[$1] += $2} END{for (i in a) print i,a[i]}' $output | sort > $infoout
 cat << EOF
 <table>
 <tr>
@@ -12,7 +12,7 @@ cat << EOF
 <table border=on>
 <tr><th>User</th><th>cores</th></tr>
 EOF
-  cat $infoout | awk '{print "<tr><td>",$1,"</td>", "<td align=right>",$2,"</td></tr>"}' 
+  cat $infoout | awk '{sum+=$2;print "<tr><td align=left>",$1,"</td>", "<td align=right>",$2,"</td></tr>"} END{print "<tr><th align=left>Total</th><td align=right>",sum,"</td></tr>"}' 
 cat << EOF
 </table>
 </td>
@@ -28,4 +28,4 @@ cat << EOF
 EOF
 rm -f $infoout
 fi
-rm $qstatout
+rm $output
