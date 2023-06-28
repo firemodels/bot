@@ -14,6 +14,7 @@ if not exist ..\.gitbot goto skip1
 
 set fdsrepos=exp fds fig out smv test_bundles test7_bundles
 set fdssmvrepos=fds smv
+set vklrepos=openvkl
 set smvonlyrepo=smv
 set smvrepos=cfast fds fig smv test_bundles test7_bundles
 set cfastsmvrepos=cfast         smv nplot 
@@ -146,8 +147,12 @@ echo.
   )
   echo setting up remote tracking
   cd %repo_dir%
-  git remote add firemodels %GITHEADER%firemodels/%repo%.git
-  git remote set-url --push firemodels DISABLE
+  set CENTRAL=openvkl
+  if "%repo%" == "openvkl" goto endif2
+  set CENTRAL=firemodels
+:endif2
+  git remote add %CENTRAL% %GITHEADER%%CENTRAL%/%repo%.git
+  git remote set-url --push %CENTRAL% DISABLE
   git remote update
   exit /b 0
 
@@ -202,6 +207,10 @@ echo.
    set erase_repos=1
    set repos=%smvonlyrepo%
  )
+ if "%1" EQU "-v" (
+   set valid=1
+   set repos=%vklrepos%
+ )
  if /I "%1" EQU "-w" (
    set valid=1
    set repos=%wikiwebrepos%
@@ -239,6 +248,7 @@ echo -h - display this message%
 echo -s - setup repos used by smokebot: %smvrepos%
 echo -S - setup only smv repo - erase repo first
 echo -T - setup only fds and smv repos - erase repos first
+echo -v - setup openvkl repo
 echo -w - setup wiki and webpage repos cloned from firemodels
 exit /b 0
 
