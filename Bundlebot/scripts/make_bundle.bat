@@ -283,6 +283,7 @@ CALL :COPY  %smv_forbundle%\volrender.ssf  %out_smv%\.
 CALL :COPY  %smv_forbundle%\smokeview.ini  %out_smv%\.
 CALL :COPY  %smv_forbundle%\smokeview.ini  %out_smv%\.
 CALL :COPY  %smv_forbundle%\smokeview.html %out_smv%\.
+CALL :COPY  %smv_forbundle%\.smokeview_bin %out_smv%\.
 
 echo copying colorbars
 copy %smv_forbundle%\colorbars\linear\*.csv    %out_colorbars%\linear    >Nul

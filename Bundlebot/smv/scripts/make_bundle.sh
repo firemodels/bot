@@ -118,6 +118,7 @@ CP $WEBGLDIR        runsmv_ssh.sh     $PLATFORMDIR/$smvbin runsmv_ssh.sh
 CP $WEBGLDIR        smv2html.sh       $PLATFORMDIR/$smvbin smv2html.sh
 CP $UTILSCRIPTDIR   slice2html.sh     $PLATFORMDIR/$smvbin slice2html.sh
 CP $UTILSCRIPTDIR   slice2mp4.sh      $PLATFORMDIR/$smvbin slice2mp4.sh
+CP $FORBUNDLE       .smokeview_bin    $PLATFORMDIR/$smvbin .smokeview_bin
 
 CP  $BACKGROUNDDIR background_${platform}_64 $PLATFORMDIR/$smvbin background
 if [ "$platform" == "osx" ]; then
