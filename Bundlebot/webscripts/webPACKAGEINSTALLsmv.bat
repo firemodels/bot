@@ -5,8 +5,8 @@ set platform=%1
 :: build type is test or release
 set buildtype=%2
 
-set SCRIPTDIR=%~dp0
-cd %SCRIPTDIR%
+set SSCRIPTDIR=%~dp0
+cd %SSCRIPTDIR%
 call webPACKAGEsmv %platform% %buildtype% nopause
-cd %SCRIPTDIR%
+cd %SSCRIPTDIR%
 call webINSTALLsmv %platform% %buildtype% nopause

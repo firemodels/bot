@@ -421,7 +421,7 @@ compile_fds_mpi_db()
    cd $FDSDIR
    rm -f $FDSEXE
    echo ""                     > $OUTPUT_DIR/stage1b_fds_dbg$MPTYPE
-   $botrepo/Scripts/build_fds.sh $OUTPUT_DIR/stage1b_fds_dbg$MPTYPE
+   $botrepo/Scripts/build_fds.sh $OUTPUT_DIR/stage1b_fds_dbg$MPTYPE &
 }
 
 #---------------------------------------------
@@ -609,7 +609,7 @@ compile_fds_mpi()
    cd $FDSDIR
    rm -f $FDSEXE
    echo ""                     > $OUTPUT_DIR/stage1c_fds_rls$MPTYPE
-   $botrepo/Scripts/build_fds.sh $OUTPUT_DIR/stage1c_fds_rls$MPTYPE
+   $botrepo/Scripts/build_fds.sh $OUTPUT_DIR/stage1c_fds_rls$MPTYPE &
 }
 
 #---------------------------------------------
