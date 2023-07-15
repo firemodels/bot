@@ -540,17 +540,19 @@ run_verification_cases_debug()
      cd $smvrepo/Verification
      clean_repo $smvrepo/Verification
    fi
+   rm -rf $smvrepo/Verification_dbg
+   cp -r $smvrepo/Verification $smvrepo/Verification_dbg
 
    #  =====================
    #  = Run all SMV cases =
    #  =====================
 
    echo "   running (debug mode)"
-   cd $smvrepo/Verification/scripts
+   cd $smvrepo/Verification_dbg/scripts
 
    # Submit SMV verification cases and wait for them to start
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3a_vv_dbg 2>&1
-   ./Run_SMV_Cases.sh $INTEL2 -Y -c $cfastrepo $USEINSTALL2 -j $JOBPREFIX -m 2 -d -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3a_vv_dbg 2>&1
+   ./Run_SMV_Cases.sh $INTEL2 -Y -c $cfastrepo $USEINSTALL2 -j $JOBPREFIX -m 2 -d -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3a_vv_dbg 2>&1 
 }
 
 #---------------------------------------------
@@ -563,7 +565,7 @@ check_verification_cases_debug()
    wait_verification_cases_end stage3a_vv_dbg 3a
 
    # Scan and report any errors in FDS verification cases
-   cd $smvrepo/Verification
+   cd $smvrepo/Verification_dbg
 
    if [[ `grep -rIi 'Run aborted' $OUTPUT_DIR/stage3a_vv_dbg` == "" ]] && \
       [[ `grep -rIi 'Segmentation' Visualization/* WUI/* ` == "" ]] && \
@@ -2122,7 +2124,6 @@ if [ "$BUILD_ONLY" == "" ]; then
   RUN_DEBUG_CASES_beg=`GET_TIME`
   if [ $stage_fdsdb_success ]; then
      run_verification_cases_debug
-     check_verification_cases_debug
   fi
   RUN_DEBUG_CASES_end=`GET_TIME`
   DIFF_RUN_DEBUG_CASES=`GET_DURATION $RUN_DEBUG_CASES_beg $RUN_DEBUG_CASES_end`
@@ -2130,11 +2131,14 @@ if [ "$BUILD_ONLY" == "" ]; then
 
   RUN_RELEASE_CASES_beg=`GET_TIME`
 #stage3b_vv_rls
-  if [ "$SMOKEBOT_LITE" == "" ]; then
-    if [[ $stage_ver_release_success ]] ; then
-      run_verification_cases_release
-      check_verification_cases_release
-    fi
+  if [[ "$SMOKEBOT_LITE" == "" ]] && [[ $stage_ver_release_success ]]; then
+    run_verification_cases_release
+  fi
+  if [ $stage_fdsdb_success ]; then
+     check_verification_cases_debug
+  fi
+  if [[ "$SMOKEBOT_LITE" == "" ]] && [[ $stage_ver_release_success ]]; then
+    check_verification_cases_release
   fi
 fi
 
