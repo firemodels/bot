@@ -1523,7 +1523,6 @@ NEWGUIDE_DIR=$OUTPUT_DIR/Newest_Guides
 WEB_DIR=
 WEB_ROOT=
 UPDATED_WEB_IMAGES=
-SMOKEBOT_LITE=
 export SCRIPTFILES=$smokebotdir/scriptfiles
 
 WEBBRANCH=nist-pages
@@ -1562,7 +1561,7 @@ echo $$ > $PID_FILE
 
 #*** parse command line options
 
-while getopts 'ab:BcDJLm:Mo:q:R:TuUw:W:x:X:y:Y:' OPTION
+while getopts 'ab:BcDJm:Mo:q:R:TuUw:W:x:X:y:Y:' OPTION
 do
 case $OPTION in
   a)
@@ -1588,9 +1587,6 @@ case $OPTION in
   J)
    MPI_TYPE=impi
    INTEL2="-J"
-   ;;
-  L)
-   SMOKEBOT_LITE=1
    ;;
   m)
    mailTo="$OPTARG"
@@ -2052,46 +2048,33 @@ if [ "$BUILD_ONLY" == "" ]; then
 
 #stage1B
    echo "   fds"
-  compile_fds_mpi_db          $FDS_DB_DIR        $FDS_DB_EXE
+  compile_fds_mpi_db       $FDS_DB_DIR        $FDS_DB_EXE
+  compile_fds_mpi          $FDS_DIR           $FDS_EXE
   if [ "$OPENMPTEST" != "" ]; then
-    compile_fds_mpi_db        $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
-  fi
-  if [ "$SMOKEBOT_LITE" == "" ]; then
-     compile_fds_mpi          $FDS_DIR        $FDS_EXE
-     if [ "$OPENMPTEST" != "" ]; then
-       compile_fds_mpi        $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
-     fi
+    compile_fds_mpi_db     $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
+    compile_fds_mpi        $FDS_OPENMP_DIR    $FDS_OPENMP_EXE openmp
   fi
   
   wait_compile_end $FDS_DB_DIR
+  wait_compile_end $FDS_DIR
   if [ "$OPENMPTEST" != "" ]; then
     wait_compile_end $FDS_OPENMP_DB_DIR
-  fi
-  if [ "$SMOKEBOT_LITE" == "" ]; then
-    wait_compile_end $FDS_DIR
-    if [ "$OPENMPTEST" != "" ]; then
-      wait_compile_end $FDS_OPENMP_DIR
-    fi
+    wait_compile_end $FDS_OPENMP_DIR
   fi
   echo "      fds compilations complete"
 
   check_compile_fds_mpi_db    $FDS_DB_DIR        $FDS_DB_EXE
+  check_compile_fds_mpi       $FDS_DIR           $FDS_EXE
   if [ "$OPENMPTEST" != "" ]; then
     check_compile_fds_mpi_db  $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
-  fi
-
-#stage1C
-  if [ "$SMOKEBOT_LITE" == "" ]; then
-     check_compile_fds_mpi    $FDS_DIR        $FDS_EXE
-     if [ "$OPENMPTEST" != "" ]; then
-       check_compile_fds_mpi  $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
-     fi
+    check_compile_fds_mpi     $FDS_OPENMP_DIR    $FDS_OPENMP_EXE openmp
   fi
 
   if [ "$OPENMPI_GNU" != "" ]; then
     compile_fds_mpi_gnu_db
     check_compile_fds_mpi_gnu_db
   fi
+  echo "      fds compilation checks complete"
 
 #----------------------------- Stage 2 build smokeview     --------------------------------------
 
@@ -2106,10 +2089,8 @@ fi
 
 
 #stage2c_smv_rls
-if [ "$SMOKEBOT_LITE" == "" ]; then
-  compile_smv
-  check_compile_smv
-fi
+compile_smv
+check_compile_smv
 
 #stage2d_common_files
 check_common_files
@@ -2138,13 +2119,13 @@ if [ "$BUILD_ONLY" == "" ]; then
 
   RUN_RELEASE_CASES_beg=`GET_TIME`
 #stage3b_vv_rls
-  if [[ "$SMOKEBOT_LITE" == "" ]] && [[ $stage_ver_release_success ]]; then
+  if [[ $stage_ver_release_success ]]; then
     run_verification_cases_release
   fi
   if [ $stage_fdsdb_success ]; then
      check_verification_cases_debug
   fi
-  if [[ "$SMOKEBOT_LITE" == "" ]] && [[ $stage_ver_release_success ]]; then
+  if [[ $stage_ver_release_success ]]; then
     check_verification_cases_release
   fi
 fi
@@ -2158,7 +2139,7 @@ echo "Run cases(release): $DIFF_RUN_RELEASE_CASES" >> $STAGE_STATUS
 ### Stage 4a generate images
 
 MAKEPICTURES_beg=`GET_TIME`
-if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
+if [[ "$BUILD_ONLY" == "" ]]; then
   if [[ $stage_ver_release_success ]] ; then
     make_smv_pictures
     check_smv_pictures
@@ -2168,7 +2149,7 @@ MAKEPICTURES_end=`GET_TIME`
 DIFF_MAKEPICTURES=`GET_DURATION $MAKEPICTURES_beg $MAKEPICTURES_end`
 echo "Make pictures: $DIFF_MAKEPICTURES" >> $STAGE_STATUS
 
-if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
+if [[ "$BUILD_ONLY" == "" ]]; then
   if [ "$MAKEMOVIES" == "1" ]; then
     MAKEMOVIES_beg=`GET_TIME`
 
@@ -2183,7 +2164,7 @@ if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
   fi
 fi
 
-if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
+if [[ "$BUILD_ONLY" == "" ]]; then
   if [[ $stage_ver_release_success ]] ; then
     generate_timing_stats
   fi
@@ -2192,7 +2173,7 @@ fi
 #----------------------------- Stage 5 generate manuals     --------------------------------------
 
 MAKEGUIDES_beg=`GET_TIME`
-if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
+if [[ "$BUILD_ONLY" == "" ]]; then
   if [[ $stage_ver_release_success ]] ; then
      echo Making guides
      echo "   user"
@@ -2299,10 +2280,8 @@ save_build_status
 
 if [ "$BUILD_ONLY" == "" ]; then
   save_manuals_dir
-  if [ "$SMOKEBOT_LITE" == "" ]; then
-    if [[ $stage_ver_release_success ]] ; then
-      archive_timing_stats
-    fi
+  if [[ $stage_ver_release_success ]] ; then
+    archive_timing_stats
   fi
 fi
 echo "   emailing results"
