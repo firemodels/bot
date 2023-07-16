@@ -621,7 +621,7 @@ compile_fds_mpi()
 wait_compile_end()
 {
    local compile_dir=$1
-   while [[  -e $compile_dir/complete    ]]; do
+   while [[  -e $compile_dir/compiling    ]]; do
       sleep 5
    done
 }
