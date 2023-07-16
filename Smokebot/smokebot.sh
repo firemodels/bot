@@ -2051,7 +2051,7 @@ if [ "$BUILD_ONLY" == "" ]; then
   check_compile_cfast
 
 #stage1B
-   echo "   fds (background)"
+   echo "   fds"
   compile_fds_mpi_db          $FDS_DB_DIR        $FDS_DB_EXE
   if [ "$OPENMPTEST" != "" ]; then
     compile_fds_mpi_db        $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
@@ -2062,11 +2062,16 @@ if [ "$BUILD_ONLY" == "" ]; then
        compile_fds_mpi        $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
      fi
   fi
-  wait_compile_end $FDS_DIR
+  
   wait_compile_end $FDS_DB_DIR
   if [ "$OPENMPTEST" != "" ]; then
-    wait_compile_end $FDS_OPENMP_DIR
     wait_compile_end $FDS_OPENMP_DB_DIR
+  fi
+  if [ "$SMOKEBOT_LITE" == "" ]; then
+    wait_compile_end $FDS_DIR
+    if [ "$OPENMPTEST" != "" ]; then
+      wait_compile_end $FDS_OPENMP_DIR
+    fi
   fi
   echo "      fds compilations complete"
 
