@@ -844,7 +844,7 @@ run_verification_cases_release()
    # Start running all SMV verification cases
    cd $smvrepo/Verification/scripts
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
-   ./Run_SMV_Cases.sh $INTEL2 -Y -c $cfastrepo -j $JOBPREFIXR $USEINSTALL2 $RUN_OPENMP -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
+   ./Run_SMV_Cases.sh $INTEL2 -Y -c $cfastrepo -j $JOBPREFIXR $USEINSTALL2 -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
 }
 
 #---------------------------------------------
@@ -1474,8 +1474,6 @@ BOTBRANCH=master
 SMOKEBOT_QUEUE=smokebot
 MAKEMOVIES=0
 RUNAUTO=
-OPENMP=
-RUN_OPENMP=
 CLEANREPO=0
 UPDATEREPO=0
 mailTo=
@@ -1498,7 +1496,7 @@ echo $$ > $PID_FILE
 
 #*** parse command line options
 
-while getopts 'ab:cJm:Mo:q:R:uUw:W:x:X:y:Y:' OPTION
+while getopts 'ab:cJm:Mq:R:uUw:W:x:X:y:Y:' OPTION
 do
 case $OPTION in
   a)
@@ -1524,11 +1522,6 @@ case $OPTION in
    ;;
   M)
    MAKEMOVIES="1"
-   ;;
-  o)
-   nthreads="$OPTARG"
-   OPENMP=openmp_
-   RUN_OPENMP="-o $nthreads"
    ;;
   q)
    SMOKEBOT_QUEUE="$OPTARG"
@@ -1635,14 +1628,8 @@ export platform
 FDSGNU_DB_DIR=$fdsrepo/Build/${GNU_MPI}${GNU_COMPILER}${platform}${size}_db
 FDSGNU_DB_EXE=
 
-FDS_OPENMP_DB_DIR=$fdsrepo/Build/${MPI_TYPE}_${COMPILER}_${platform}_openmp${size}_db
-FDS_OPENMP_DB_EXE=fds_${MPI_TYPE}_${COMPILER}_${platform}_openmp${size}_db
-
 FDS_DB_DIR=$fdsrepo/Build/${MPI_TYPE}_${COMPILER}_${platform}${size}_db
 FDS_DB_EXE=fds_${MPI_TYPE}_${COMPILER}_${platform}${size}_db
-
-FDS_OPENMP_DIR=$fdsrepo/Build/${MPI_TYPE}_${COMPILER}_${platform}_openmp${size}
-FDS_OPENMP_EXE=fds_${MPI_TYPE}_${COMPILER}_${platform}_openmp${size}
 
 FDS_DIR=$fdsrepo/Build/${MPI_TYPE}_${COMPILER}_${platform}${size}
 FDS_EXE=fds_${MPI_TYPE}_${COMPILER}_${platform}${size}
@@ -1968,8 +1955,6 @@ echo "   fds"
 
 touch              $FDS_DB_DIR/compiling
 touch              $FDS_DIR/compiling
-touch              $FDS_OPENMP_DB_DIR/compiling
-touch              $FDS_OPENMP_DIR/compiling
 
 compile_fds_mpi_db $FDS_DB_DIR        $FDS_DB_EXE
 compile_fds_mpi    $FDS_DIR           $FDS_EXE
