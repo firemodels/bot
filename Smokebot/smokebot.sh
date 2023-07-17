@@ -1551,7 +1551,6 @@ FDS_TAG=
 SMV_TAG=
 CHECKOUT=
 compile_errors=
-OPENMPTEST=1
 GITURL=
 
 #*** save pid so -k option (kill smokebot) may be used lateer
@@ -1560,7 +1559,7 @@ echo $$ > $PID_FILE
 
 #*** parse command line options
 
-while getopts 'ab:cDJm:Mo:q:R:uUw:W:x:X:y:Y:' OPTION
+while getopts 'ab:cJm:Mo:q:R:uUw:W:x:X:y:Y:' OPTION
 do
 case $OPTION in
   a)
@@ -1576,9 +1575,6 @@ case $OPTION in
    ;;
   c)
    CLEANREPO=1
-   ;;
-  D)
-   OPENMPTEST=
    ;;
   J)
    MPI_TYPE=impi
@@ -1685,13 +1681,8 @@ fdsrepo=$repo/fds
 smvrepo=$repo/smv
 figrepo=$repo/fig
 
-if [ "$OPENMPTEST" == "" ]; then
-  size=_64
-  GNU_MPI=mpi_
-else
-  size=
-  GNU_MPI=ompi_
-fi
+size=
+GNU_MPI=ompi_
 
 platform="linux"
 platform2="Linux"
@@ -2035,31 +2026,28 @@ check_compile_cfast
 
 #stage1B
 echo "   fds"
-touch $FDS_DB_DIR/compiling
-touch $FDS_DIR/compiling
-compile_fds_mpi_db       $FDS_DB_DIR        $FDS_DB_EXE
-compile_fds_mpi          $FDS_DIR           $FDS_EXE
-if [ "$OPENMPTEST" != "" ]; then
-  touch $FDS_OPENMP_DB_DIR/compiling
-  touch $FDS_OPENMP_DIR/compiling
-  compile_fds_mpi_db     $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
-  compile_fds_mpi        $FDS_OPENMP_DIR    $FDS_OPENMP_EXE openmp
-fi
+
+touch              $FDS_DB_DIR/compiling
+touch              $FDS_DIR/compiling
+touch              $FDS_OPENMP_DB_DIR/compiling
+touch              $FDS_OPENMP_DIR/compiling
+
+compile_fds_mpi_db $FDS_DB_DIR        $FDS_DB_EXE
+compile_fds_mpi    $FDS_DIR           $FDS_EXE
+compile_fds_mpi_db $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
+compile_fds_mpi    $FDS_OPENMP_DIR    $FDS_OPENMP_EXE openmp
   
-wait_compile_end $FDS_DB_DIR
-wait_compile_end $FDS_DIR
-if [ "$OPENMPTEST" != "" ]; then
-  wait_compile_end $FDS_OPENMP_DB_DIR
-  wait_compile_end $FDS_OPENMP_DIR
-fi
+wait_compile_end   $FDS_DB_DIR
+wait_compile_end   $FDS_DIR
+wait_compile_end   $FDS_OPENMP_DB_DIR
+wait_compile_end   $FDS_OPENMP_DIR
+
 echo "      fds compilations complete"
 
-check_compile_fds_mpi_db    $FDS_DB_DIR        $FDS_DB_EXE
-check_compile_fds_mpi       $FDS_DIR           $FDS_EXE
-if [ "$OPENMPTEST" != "" ]; then
-  check_compile_fds_mpi_db  $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
-  check_compile_fds_mpi     $FDS_OPENMP_DIR    $FDS_OPENMP_EXE openmp
-fi
+check_compile_fds_mpi_db  $FDS_DB_DIR        $FDS_DB_EXE
+check_compile_fds_mpi     $FDS_DIR           $FDS_EXE
+check_compile_fds_mpi_db  $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
+check_compile_fds_mpi     $FDS_OPENMP_DIR    $FDS_OPENMP_EXE openmp
 
 if [ "$OPENMPI_GNU" != "" ]; then
   compile_fds_mpi_gnu_db

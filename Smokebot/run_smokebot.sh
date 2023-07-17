@@ -28,7 +28,6 @@ echo "-U - upload guides"
 echo "-w directory - web directory containing summary pages"
 echo ""
 echo "Build apps, set repo revisions:"
-echo "-D smokebot is being run using the old fds Build directory structure"
 echo "-g firebot_host - host where firebot was run"
 echo "-G firebot_home - home directory where firebot was run"
 echo "   The -g and -G options are used when cloning repos (-R option)"
@@ -174,7 +173,6 @@ FIREBOT_HOME=
 WEB_DIR=
 USE_BOT_QFDS=
 WEB_ROOT=/var/www/html
-OPENMPTEST=
 
 #*** check to see if a queing system is available
 
@@ -186,7 +184,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'abcDfg:G:hHJkm:Mo:Pq:r:R:TuUvw:W:x:X:y:Y:' OPTION
+while getopts 'abcfg:G:hHJkm:Mo:Pq:r:R:TuUvw:W:x:X:y:Y:' OPTION
 do
 case $OPTION  in
   a)
@@ -197,9 +195,6 @@ case $OPTION  in
    ;;
   c)
    CLEANREPO=-c
-   ;;
-  D)
-   OPENMPTEST=-D
    ;;
   f)
    FORCE=1
@@ -424,7 +419,7 @@ BRANCH="-b $BRANCH"
 #*** run smokebot
 
 touch $smokebot_pid
-$ECHO ./$botscript $SIZE $BRANCH $FDS_REV $FDS_TAG $SMV_REV $OPENMPTEST $SMV_TAG $CLONE_REPOS $RUNAUTO $INTEL $CLEANREPO $WEB_DIR $WEB_ROOT $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $SIZE $BRANCH $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $CLONE_REPOS $RUNAUTO $INTEL $CLEANREPO $WEB_DIR $WEB_ROOT $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi
