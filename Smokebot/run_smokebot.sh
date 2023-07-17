@@ -16,8 +16,6 @@ echo "-b - use the current branch"
 echo "-f - force smokebot to run"
 echo "-J use Intel MPI version of fds"
 echo "-k - kill smokebot if it is running"
-echo "-L - smokebot lite,  build debug apps and run cases using debug fds"
-echo "     (no release fds, no release cases, no manuals, etc)"
 echo "-q queue [default: $QUEUE]"
 if [ "$EMAIL" != "" ]; then
   echo "-m email_address - [default: $EMAIL]"
@@ -166,7 +164,6 @@ RUNSMOKEBOT=1
 MOVIE=
 UPLOAD=
 FORCE=
-SMOKEBOT_LITE=
 ECHO=
 INTEL=
 REMOVE_PID=
@@ -193,7 +190,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'abBcDfg:G:hHJkLm:Mo:Pq:r:R:TuUvw:W:x:X:y:Y:' OPTION
+while getopts 'abBcDfg:G:hHJkm:Mo:Pq:r:R:TuUvw:W:x:X:y:Y:' OPTION
 do
 case $OPTION  in
   a)
@@ -231,9 +228,6 @@ case $OPTION  in
    ;;
   k)
    KILL_SMOKEBOT=1
-   ;;
-  L)
-   SMOKEBOT_LITE="-L"
    ;;
   m)
    EMAIL="$OPTARG"
@@ -440,7 +434,7 @@ BRANCH="-b $BRANCH"
 #*** run smokebot
 
 touch $smokebot_pid
-$ECHO ./$botscript $SIZE $BRANCH $FDS_REV $FDS_TAG $SMV_REV $OPENMPTEST $SMV_TAG $CLONE_REPOS $CLONE_FDSSMV $RUNAUTO $INTEL $BUILD_ONLY $SMOKEBOT_LITE $CLEANREPO $WEB_DIR $WEB_ROOT $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $SIZE $BRANCH $FDS_REV $FDS_TAG $SMV_REV $OPENMPTEST $SMV_TAG $CLONE_REPOS $CLONE_FDSSMV $RUNAUTO $INTEL $BUILD_ONLY $CLEANREPO $WEB_DIR $WEB_ROOT $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi
