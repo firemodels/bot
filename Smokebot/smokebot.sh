@@ -462,66 +462,6 @@ check_compile_fds_mpi_db()
    fi
 }
 
-#---------------------------------------------
-#                   compile_fds_mpi_gnu_db
-#---------------------------------------------
-
-compile_fds_mpi_gnu_db()
-{
-   # Clean and compile FDS MPI debug
-   compile_gnu=
-   if [ "$OPENMPI_INTEL" != "" ]; then
-     if [ "$OPENMPI_GNU" != "" ]; then
-       compile_gnu=1
-       module unload $OPENMPI_INTEL
-       module load $OPENMPI_GNU
-       echo "      MPI gfortran debug"
-       cd $FDSGNU_DB_DIR
-       make -f ../makefile clean &> /dev/null
-       ./make_fds.sh &> $OUTPUT_DIR/stage1d
-       module unload $OPENMPI_GNU
-       module load $OPENMPI_INTEL
-     fi
-   fi
-}
-
-#---------------------------------------------
-#                   check_compile_fds_mpi_gnu_db
-#---------------------------------------------
-check_compile_fds_mpi_gnu_db()
-{
-# force a pass until gfortran can compile a routine with the findloc routine
-        FDS_debug_success=true
-}
-
-check_compile_fds_mpi_gnu_dbORIG()
-{
-   # Check for errors in FDS MPI debug compilation
-   if [ "$compile_gnu" == "1" ]; then
-     cd $FDSGNU_DB_DIR
-     if [ -e $FDSGNU_DB_EXE ]
-     then
-        FDS_debug_success=true
-     else
-        echo "Errors from Stage 1d - Compile gnu Fortran FDS MPI debug:" >> $ERROR_LOG
-        cat $OUTPUT_DIR/stage1d >> $ERROR_LOG
-        echo "" >> $ERROR_LOG
-        compile_errors=1
-     fi
-
-   # Check for compiler warnings/remarks
-     if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage1d | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented'` == "" ]]
-     then
-      # Continue along
-      :
-     else
-        echo "Warnings from Stage 1d - Compile gnu Fortran FDS MPI debug:" >> $WARNING_LOG
-        grep -i -A 5 -E 'warning|remark' $OUTPUT_DIR/stage1d | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
-        echo "" >> $WARNING_LOG
-        compile_errors=1
-     fi
-   fi
-}
 
 #---------------------------------------------
 #                   run_verification_cases_debug
@@ -1374,8 +1314,7 @@ email_build_status()
   fi
   echo "setup smokebot: $DIFF_SETUP"                        >> $TIME_LOG
   echo "build software: $DIFF_BUILDSOFTWARE"                >> $TIME_LOG
-  echo "run cases(debug): $DIFF_RUN_DEBUG_CASES"            >> $TIME_LOG
-  echo "run cases(release): $DIFF_RUN_RELEASE_CASES"        >> $TIME_LOG
+  echo "run cases: $DIFF_RUN_CASES"                         >> $TIME_LOG
   echo "make pictures: $DIFF_MAKEPICTURES"                  >> $TIME_LOG
   if [ "$MAKEMOVIES" == "1" ]; then
     echo "make movies: $DIFF_MAKEMOVIES"                    >> $TIME_LOG
@@ -2034,25 +1973,13 @@ touch              $FDS_OPENMP_DIR/compiling
 
 compile_fds_mpi_db $FDS_DB_DIR        $FDS_DB_EXE
 compile_fds_mpi    $FDS_DIR           $FDS_EXE
-wait_compile_end   $FDS_DB_DIR
-wait_compile_end   $FDS_DIR
-
-echo "      fds compilations complete"
-
-check_compile_fds_mpi_db  $FDS_DB_DIR        $FDS_DB_EXE
-check_compile_fds_mpi     $FDS_DIR           $FDS_EXE
-
-if [ "$OPENMPI_GNU" != "" ]; then
-  compile_fds_mpi_gnu_db
-  check_compile_fds_mpi_gnu_db
-fi
-echo "      fds compilation checks complete"
 
 #----------------------------- Stage 2 build smokeview     --------------------------------------
 
 #stage2a_smvutil
 compile_smv_utilities
 check_smv_utilities
+echo "      smv utility compilation complete"
 
 #stage2b_smv_dbg
 compile_smv_db
@@ -2061,9 +1988,18 @@ check_compile_smv_db
 #stage2c_smv_rls
 compile_smv
 check_compile_smv
+echo "      smokeview compilation complete"
 
 #stage2d_common_files
 check_common_files
+
+wait_compile_end   $FDS_DB_DIR
+wait_compile_end   $FDS_DIR
+
+
+check_compile_fds_mpi_db  $FDS_DB_DIR        $FDS_DB_EXE
+check_compile_fds_mpi     $FDS_DIR           $FDS_EXE
+echo "      fds compilation complete"
 
 BUILDSOFTWARE_end=`GET_TIME`
 DIFF_BUILDSOFTWARE=`GET_DURATION $BUILDSOFTWARE_beg $BUILDSOFTWARE_end`
@@ -2078,15 +2014,11 @@ fi
 #----------------------------- Stage 3 run verification case     --------------------------------------
 
 #stage3a_vv_dbg begin
-RUN_DEBUG_CASES_beg=`GET_TIME`
+RUN_CASES_beg=`GET_TIME`
 if [ $stage_fdsdb_success ]; then
    run_verification_cases_debug
 fi
-RUN_DEBUG_CASES_end=`GET_TIME`
-DIFF_RUN_DEBUG_CASES=`GET_DURATION $RUN_DEBUG_CASES_beg $RUN_DEBUG_CASES_end`
-echo "Run cases(debug): $DIFF_RUN_DEBUG_CASES" >> $STAGE_STATUS
 
-RUN_RELEASE_CASES_beg=`GET_TIME`
 #stage3b_vv_rls
 if [[ $stage_ver_release_success ]]; then
   run_verification_cases_release
@@ -2098,9 +2030,9 @@ if [[ $stage_ver_release_success ]]; then
   check_verification_cases_release
 fi
 
-RUN_RELEASE_CASES_end=`GET_TIME`
-DIFF_RUN_RELEASE_CASES=`GET_DURATION $RUN_RELEASE_CASES_beg $RUN_RELEASE_CASES_end`
-echo "Run cases(release): $DIFF_RUN_RELEASE_CASES" >> $STAGE_STATUS
+RUN_CASES_end=`GET_TIME`
+DIFF_RUN_CASES=`GET_DURATION $RUN_CASES_beg $RUN_CASES_end`
+echo "Run cases: $DIFF_RUN_CASES" >> $STAGE_STATUS
 
 #----------------------------- Stage 4 generate images and movies     --------------------------------------
 
