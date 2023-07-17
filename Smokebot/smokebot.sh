@@ -277,7 +277,6 @@ compile_cfast()
    cd $SMOKEBOT_HOME_DIR
 
     # Build CFAST
-    echo "Building"
     echo "   release cfast"
     cd $cfastrepo/Build/CFAST/${COMPILER}_${platform}_64
     rm -f cfast7_${platform}_64
@@ -417,7 +416,7 @@ compile_fds_mpi_db()
   local MPTYPE=$3
 
    # Clean and compile mpi FDS debug
-   echo "      debug $MPTYPE"
+   echo "   debug fds $MPTYPE"
    cd $FDSDIR
    rm -f $FDSEXE
    echo ""                     > $OUTPUT_DIR/stage1b_fds_dbg$MPTYPE
@@ -547,7 +546,7 @@ compile_fds_mpi()
   local MPTYPE=$3
 
    # Clean and compile FDS
-   echo "      release $MPTYPE"
+   echo "   release fds $MPTYPE"
    cd $FDSDIR
    rm -f $FDSEXE
    echo ""                     > $OUTPUT_DIR/stage1c_fds_rls$MPTYPE
@@ -609,17 +608,16 @@ check_compile_fds_mpi()
 
 compile_smv_utilities()
 {
-   echo "   smokeview utilities"
    echo "" > $OUTPUT_DIR/stage2a_smvutil
    if [ "$haveCC" == "1" ] ; then
    # smokeview libraries
-     echo "      libraries"
+     echo "   libraries"
      cd $smvrepo/Build/LIBS/${COMPILER}_${platform}_64
      echo 'Building Smokeview libraries:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
      ./make_LIBS.sh >> $OUTPUT_DIR/stage2a_smvutil 2>&1
 
    # smokezip:
-     echo "      smokezip"
+     echo "   smokezip"
      cd $smvrepo/Build/smokezip/${COMPILER}_${platform}_64
      rm -f *.o smokezip_${platform}_64
 
@@ -629,7 +627,7 @@ compile_smv_utilities()
      cp smokezip_${platform}_64 $LATESTAPPS_DIR/smokezip
 
    # smokediff:
-     echo "      smokediff"
+     echo "   smokediff"
      cd $smvrepo/Build/smokediff/${COMPILER}_${platform}_64
      rm -f *.o smokediff_${platform}_64
      echo 'Compiling smokediff:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
@@ -638,7 +636,7 @@ compile_smv_utilities()
      cp smokediff_${platform}_64 $LATESTAPPS_DIR/smokediff
 
    # background
-     echo "      background"
+     echo "   background"
      cd $smvrepo/Build/background/${COMPILER}_${platform}_64
      rm -f *.o background_${platform}_64
      echo 'Compiling background:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
@@ -646,7 +644,7 @@ compile_smv_utilities()
      cp background_${platform}_64 $LATESTAPPS_DIR/background
 
    # hashfile
-     echo "      hashfile"
+     echo "   hashfile"
      cd $smvrepo/Build/hashfile/${COMPILER}_${platform}_64
      rm -f *.o hashfile_${platform}_64
      echo 'Compiling hashfile:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
@@ -654,7 +652,7 @@ compile_smv_utilities()
      cp hashfile_${platform}_64 $LATESTAPPS_DIR/hashfile
 
   # wind2fds:
-     echo "      wind2fds"
+     echo "   wind2fds"
      cd $smvrepo/Build/wind2fds/${COMPILER}_${platform}_64
      rm -f *.o wind2fds_${platform}_64
      echo 'Compiling wind2fds:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
@@ -898,8 +896,7 @@ compile_smv_db()
 {
    if [ "$haveCC" == "1" ] ; then
    # Clean and compile SMV debug
-     echo "   smokeview"
-     echo "      debug"
+     echo "   debug smokeview"
      cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_64
      rm -f smokeview_${platform}_64_db
      ./make_smokeview_db.sh &> $OUTPUT_DIR/stage2b_smv_dbg
@@ -948,7 +945,7 @@ compile_smv()
 {
    if [ "$haveCC" == "1" ] ; then
    # Clean and compile SMV
-     echo "      release"
+     echo "   release smokeview"
      cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_64
      rm -f smokeview_${platform}_64
      ./make_smokeview.sh &> $OUTPUT_DIR/stage2c_smv_rls
@@ -1948,7 +1945,7 @@ echo "Setup smokebot: $DIFF_SETUP" >> $STAGE_STATUS
 BUILDSOFTWARE_beg=`GET_TIME`
 
 #stage1B
-echo "   fds"
+echo "Building"
 
 touch              $FDS_DB_DIR/compiling
 touch              $FDS_DIR/compiling
@@ -1965,7 +1962,6 @@ check_compile_cfast
 #stage2a_smvutil
 compile_smv_utilities
 check_smv_utilities
-echo "      smv utility compilation complete"
 
 #stage2b_smv_dbg
 compile_smv_db
@@ -1974,7 +1970,6 @@ check_compile_smv_db
 #stage2c_smv_rls
 compile_smv
 check_compile_smv
-echo "      smokeview compilation complete"
 
 #stage2d_common_files
 check_common_files
@@ -1985,7 +1980,6 @@ wait_compile_end   $FDS_DIR
 
 check_compile_fds_mpi_db  $FDS_DB_DIR        $FDS_DB_EXE
 check_compile_fds_mpi     $FDS_DIR           $FDS_EXE
-echo "      fds compilation complete"
 
 BUILDSOFTWARE_end=`GET_TIME`
 DIFF_BUILDSOFTWARE=`GET_DURATION $BUILDSOFTWARE_beg $BUILDSOFTWARE_end`
