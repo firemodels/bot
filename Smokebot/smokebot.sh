@@ -2033,21 +2033,14 @@ touch              $FDS_OPENMP_DB_DIR/compiling
 touch              $FDS_OPENMP_DIR/compiling
 
 compile_fds_mpi_db $FDS_DB_DIR        $FDS_DB_EXE
-#compile_fds_mpi_db $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
-#wait_compile_end   $FDS_OPENMP_DB_DIR
-
 compile_fds_mpi    $FDS_DIR           $FDS_EXE
-#compile_fds_mpi    $FDS_OPENMP_DIR    $FDS_OPENMP_EXE openmp
 wait_compile_end   $FDS_DB_DIR
 wait_compile_end   $FDS_DIR
-#wait_compile_end   $FDS_OPENMP_DIR
 
 echo "      fds compilations complete"
 
 check_compile_fds_mpi_db  $FDS_DB_DIR        $FDS_DB_EXE
 check_compile_fds_mpi     $FDS_DIR           $FDS_EXE
-#check_compile_fds_mpi_db  $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
-#check_compile_fds_mpi     $FDS_OPENMP_DIR    $FDS_OPENMP_EXE openmp
 
 if [ "$OPENMPI_GNU" != "" ]; then
   compile_fds_mpi_gnu_db
