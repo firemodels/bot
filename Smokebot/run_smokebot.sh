@@ -39,8 +39,6 @@ echo "-r - specify GH_REPO when uploading manuals. [default: $GH_REPO]"
 echo "-R release_type (master, release or test) - clone fds, exp, fig, out and smv repos"
 echo "   fds and smv repos will be checked out with a branch named"
 echo "   master, release or test [default: master]"
-echo "-T - only clone the fds and smv repos (this option is set by default when"
-echo "     only building apps (-B) and cloning repos (-R) options are used"
 echo "-x fds_rev - checkout fds repo using fds_rev revision [default: origin/master]"
 echo "-X fds_tag - when cloning, tag the fds repo with fds_tag"
 echo "-y smv_rev - checkout smv repo using smv_rev revision [default: origin/master]"
@@ -245,9 +243,6 @@ case $OPTION  in
   R)
    CLONE_REPOS="$OPTARG"
    ;;
-  T)
-    CLONE_FDSSMV="-T"
-   ;;
   u)
    UPDATEREPO=-u
    ;;
@@ -429,7 +424,7 @@ BRANCH="-b $BRANCH"
 #*** run smokebot
 
 touch $smokebot_pid
-$ECHO ./$botscript $SIZE $BRANCH $FDS_REV $FDS_TAG $SMV_REV $OPENMPTEST $SMV_TAG $CLONE_REPOS $CLONE_FDSSMV $RUNAUTO $INTEL $CLEANREPO $WEB_DIR $WEB_ROOT $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $SIZE $BRANCH $FDS_REV $FDS_TAG $SMV_REV $OPENMPTEST $SMV_TAG $CLONE_REPOS $RUNAUTO $INTEL $CLEANREPO $WEB_DIR $WEB_ROOT $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi

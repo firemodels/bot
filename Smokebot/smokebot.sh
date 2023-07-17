@@ -1545,7 +1545,6 @@ COMPILER=intel
 PID_FILE=~/.fdssmvgit/firesmokebot_pid
 HTML2PDF=wkhtmltopdf
 CLONE_REPOS=
-CLONE_FDSSMV=
 FDS_REV=origin/master
 SMV_REV=origin/master
 FDS_TAG=
@@ -1561,7 +1560,7 @@ echo $$ > $PID_FILE
 
 #*** parse command line options
 
-while getopts 'ab:cDJm:Mo:q:R:TuUw:W:x:X:y:Y:' OPTION
+while getopts 'ab:cDJm:Mo:q:R:uUw:W:x:X:y:Y:' OPTION
 do
 case $OPTION in
   a)
@@ -1601,9 +1600,6 @@ case $OPTION in
    ;;
   R)
    CLONE_REPOS="$OPTARG"
-   ;;
-  T)
-   CLONE_FDSSMV=1
    ;;
   u)
    UPDATEREPO=1
@@ -1733,13 +1729,8 @@ if [[ "$CLONE_REPOS" != "" ]]; then
   cd $botrepo/Scripts
 
 # only clone fds and smv repos
-  if [ "$CLONE_FDSSMV" != "" ]; then
-   # only clone the fds and smv repos - used when just compiling the fds and smv apps
-  ./setup_repos.sh -T                           > $OUTPUT_DIR/stage1_clone 2>&1
-  else
    # clone all repos
     ./setup_repos.sh -F                         > $OUTPUT_DIR/stage1_clone 2>&1
-  fi
   if [[ "$CLONE_REPOS" != "master" ]]; then
     FDSBRANCH=$CLONE_REPOS
     cd $fdsrepo
