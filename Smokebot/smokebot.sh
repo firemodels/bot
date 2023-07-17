@@ -1946,9 +1946,6 @@ echo "Setup smokebot: $DIFF_SETUP" >> $STAGE_STATUS
 #----------------------------- Stage 1 build cfast and FDS     --------------------------------------
 
 BUILDSOFTWARE_beg=`GET_TIME`
-# stage1A
-compile_cfast
-check_compile_cfast
 
 #stage1B
 echo "   fds"
@@ -1958,6 +1955,10 @@ touch              $FDS_DIR/compiling
 
 compile_fds_mpi_db $FDS_DB_DIR        $FDS_DB_EXE
 compile_fds_mpi    $FDS_DIR           $FDS_EXE
+
+# stage1A
+compile_cfast
+check_compile_cfast
 
 #----------------------------- Stage 2 build smokeview     --------------------------------------
 
