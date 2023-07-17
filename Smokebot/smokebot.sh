@@ -2048,10 +2048,14 @@ if [ "$BUILD_ONLY" == "" ]; then
   check_compile_cfast
 
 #stage1B
-   echo "   fds"
+  echo "   fds"
+  touch $FDS_DB_DIR/compiling
+  touch $FDS_DIR/compiling
   compile_fds_mpi_db       $FDS_DB_DIR        $FDS_DB_EXE
   compile_fds_mpi          $FDS_DIR           $FDS_EXE
   if [ "$OPENMPTEST" != "" ]; then
+    touch $FDS_OPENMP_DB_DIR/compiling
+    touch $FDS_OPENMP_DIR/compiling
     compile_fds_mpi_db     $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
     compile_fds_mpi        $FDS_OPENMP_DIR    $FDS_OPENMP_EXE openmp
   fi
