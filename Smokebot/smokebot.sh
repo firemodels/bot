@@ -277,7 +277,6 @@ compile_cfast()
    cd $SMOKEBOT_HOME_DIR
 
     # Build CFAST
-    echo "Building"
     echo "   release cfast"
     cd $cfastrepo/Build/CFAST/${COMPILER}_${platform}_64
     rm -f cfast7_${platform}_64
@@ -417,7 +416,7 @@ compile_fds_mpi_db()
   local MPTYPE=$3
 
    # Clean and compile mpi FDS debug
-   echo "      debug $MPTYPE"
+   echo "   debug fds $MPTYPE"
    cd $FDSDIR
    rm -f $FDSEXE
    echo ""                     > $OUTPUT_DIR/stage1b_fds_dbg$MPTYPE
@@ -462,66 +461,6 @@ check_compile_fds_mpi_db()
    fi
 }
 
-#---------------------------------------------
-#                   compile_fds_mpi_gnu_db
-#---------------------------------------------
-
-compile_fds_mpi_gnu_db()
-{
-   # Clean and compile FDS MPI debug
-   compile_gnu=
-   if [ "$OPENMPI_INTEL" != "" ]; then
-     if [ "$OPENMPI_GNU" != "" ]; then
-       compile_gnu=1
-       module unload $OPENMPI_INTEL
-       module load $OPENMPI_GNU
-       echo "      MPI gfortran debug"
-       cd $FDSGNU_DB_DIR
-       make -f ../makefile clean &> /dev/null
-       ./make_fds.sh &> $OUTPUT_DIR/stage1d
-       module unload $OPENMPI_GNU
-       module load $OPENMPI_INTEL
-     fi
-   fi
-}
-
-#---------------------------------------------
-#                   check_compile_fds_mpi_gnu_db
-#---------------------------------------------
-check_compile_fds_mpi_gnu_db()
-{
-# force a pass until gfortran can compile a routine with the findloc routine
-        FDS_debug_success=true
-}
-
-check_compile_fds_mpi_gnu_dbORIG()
-{
-   # Check for errors in FDS MPI debug compilation
-   if [ "$compile_gnu" == "1" ]; then
-     cd $FDSGNU_DB_DIR
-     if [ -e $FDSGNU_DB_EXE ]
-     then
-        FDS_debug_success=true
-     else
-        echo "Errors from Stage 1d - Compile gnu Fortran FDS MPI debug:" >> $ERROR_LOG
-        cat $OUTPUT_DIR/stage1d >> $ERROR_LOG
-        echo "" >> $ERROR_LOG
-        compile_errors=1
-     fi
-
-   # Check for compiler warnings/remarks
-     if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage1d | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented'` == "" ]]
-     then
-      # Continue along
-      :
-     else
-        echo "Warnings from Stage 1d - Compile gnu Fortran FDS MPI debug:" >> $WARNING_LOG
-        grep -i -A 5 -E 'warning|remark' $OUTPUT_DIR/stage1d | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
-        echo "" >> $WARNING_LOG
-        compile_errors=1
-     fi
-   fi
-}
 
 #---------------------------------------------
 #                   run_verification_cases_debug
@@ -607,7 +546,7 @@ compile_fds_mpi()
   local MPTYPE=$3
 
    # Clean and compile FDS
-   echo "      release $MPTYPE"
+   echo "   release fds $MPTYPE"
    cd $FDSDIR
    rm -f $FDSEXE
    echo ""                     > $OUTPUT_DIR/stage1c_fds_rls$MPTYPE
@@ -669,17 +608,16 @@ check_compile_fds_mpi()
 
 compile_smv_utilities()
 {
-   echo "   smokeview utilities"
    echo "" > $OUTPUT_DIR/stage2a_smvutil
    if [ "$haveCC" == "1" ] ; then
    # smokeview libraries
-     echo "      libraries"
+     echo "   libraries"
      cd $smvrepo/Build/LIBS/${COMPILER}_${platform}_64
      echo 'Building Smokeview libraries:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
      ./make_LIBS.sh >> $OUTPUT_DIR/stage2a_smvutil 2>&1
 
    # smokezip:
-     echo "      smokezip"
+     echo "   smokezip"
      cd $smvrepo/Build/smokezip/${COMPILER}_${platform}_64
      rm -f *.o smokezip_${platform}_64
 
@@ -689,7 +627,7 @@ compile_smv_utilities()
      cp smokezip_${platform}_64 $LATESTAPPS_DIR/smokezip
 
    # smokediff:
-     echo "      smokediff"
+     echo "   smokediff"
      cd $smvrepo/Build/smokediff/${COMPILER}_${platform}_64
      rm -f *.o smokediff_${platform}_64
      echo 'Compiling smokediff:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
@@ -698,7 +636,7 @@ compile_smv_utilities()
      cp smokediff_${platform}_64 $LATESTAPPS_DIR/smokediff
 
    # background
-     echo "      background"
+     echo "   background"
      cd $smvrepo/Build/background/${COMPILER}_${platform}_64
      rm -f *.o background_${platform}_64
      echo 'Compiling background:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
@@ -706,7 +644,7 @@ compile_smv_utilities()
      cp background_${platform}_64 $LATESTAPPS_DIR/background
 
    # hashfile
-     echo "      hashfile"
+     echo "   hashfile"
      cd $smvrepo/Build/hashfile/${COMPILER}_${platform}_64
      rm -f *.o hashfile_${platform}_64
      echo 'Compiling hashfile:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
@@ -714,7 +652,7 @@ compile_smv_utilities()
      cp hashfile_${platform}_64 $LATESTAPPS_DIR/hashfile
 
   # wind2fds:
-     echo "      wind2fds"
+     echo "   wind2fds"
      cd $smvrepo/Build/wind2fds/${COMPILER}_${platform}_64
      rm -f *.o wind2fds_${platform}_64
      echo 'Compiling wind2fds:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
@@ -904,7 +842,7 @@ run_verification_cases_release()
    # Start running all SMV verification cases
    cd $smvrepo/Verification/scripts
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
-   ./Run_SMV_Cases.sh $INTEL2 -Y -c $cfastrepo -j $JOBPREFIXR $USEINSTALL2 $RUN_OPENMP -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
+   ./Run_SMV_Cases.sh $INTEL2 -Y -c $cfastrepo -j $JOBPREFIXR $USEINSTALL2 -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
 }
 
 #---------------------------------------------
@@ -958,8 +896,7 @@ compile_smv_db()
 {
    if [ "$haveCC" == "1" ] ; then
    # Clean and compile SMV debug
-     echo "   smokeview"
-     echo "      debug"
+     echo "   debug smokeview"
      cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_64
      rm -f smokeview_${platform}_64_db
      ./make_smokeview_db.sh &> $OUTPUT_DIR/stage2b_smv_dbg
@@ -1008,7 +945,7 @@ compile_smv()
 {
    if [ "$haveCC" == "1" ] ; then
    # Clean and compile SMV
-     echo "      release"
+     echo "   release smokeview"
      cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_64
      rm -f smokeview_${platform}_64
      ./make_smokeview.sh &> $OUTPUT_DIR/stage2c_smv_rls
@@ -1374,8 +1311,7 @@ email_build_status()
   fi
   echo "setup smokebot: $DIFF_SETUP"                        >> $TIME_LOG
   echo "build software: $DIFF_BUILDSOFTWARE"                >> $TIME_LOG
-  echo "run cases(debug): $DIFF_RUN_DEBUG_CASES"            >> $TIME_LOG
-  echo "run cases(release): $DIFF_RUN_RELEASE_CASES"        >> $TIME_LOG
+  echo "run cases: $DIFF_RUN_CASES"                         >> $TIME_LOG
   echo "make pictures: $DIFF_MAKEPICTURES"                  >> $TIME_LOG
   if [ "$MAKEMOVIES" == "1" ]; then
     echo "make movies: $DIFF_MAKEMOVIES"                    >> $TIME_LOG
@@ -1535,8 +1471,6 @@ BOTBRANCH=master
 SMOKEBOT_QUEUE=smokebot
 MAKEMOVIES=0
 RUNAUTO=
-OPENMP=
-RUN_OPENMP=
 CLEANREPO=0
 UPDATEREPO=0
 mailTo=
@@ -1559,7 +1493,7 @@ echo $$ > $PID_FILE
 
 #*** parse command line options
 
-while getopts 'ab:cJm:Mo:q:R:uUw:W:x:X:y:Y:' OPTION
+while getopts 'ab:cJm:Mq:R:uUw:W:x:X:y:Y:' OPTION
 do
 case $OPTION in
   a)
@@ -1585,11 +1519,6 @@ case $OPTION in
    ;;
   M)
    MAKEMOVIES="1"
-   ;;
-  o)
-   nthreads="$OPTARG"
-   OPENMP=openmp_
-   RUN_OPENMP="-o $nthreads"
    ;;
   q)
    SMOKEBOT_QUEUE="$OPTARG"
@@ -1696,14 +1625,8 @@ export platform
 FDSGNU_DB_DIR=$fdsrepo/Build/${GNU_MPI}${GNU_COMPILER}${platform}${size}_db
 FDSGNU_DB_EXE=
 
-FDS_OPENMP_DB_DIR=$fdsrepo/Build/${MPI_TYPE}_${COMPILER}_${platform}_openmp${size}_db
-FDS_OPENMP_DB_EXE=fds_${MPI_TYPE}_${COMPILER}_${platform}_openmp${size}_db
-
 FDS_DB_DIR=$fdsrepo/Build/${MPI_TYPE}_${COMPILER}_${platform}${size}_db
 FDS_DB_EXE=fds_${MPI_TYPE}_${COMPILER}_${platform}${size}_db
-
-FDS_OPENMP_DIR=$fdsrepo/Build/${MPI_TYPE}_${COMPILER}_${platform}_openmp${size}
-FDS_OPENMP_EXE=fds_${MPI_TYPE}_${COMPILER}_${platform}_openmp${size}
 
 FDS_DIR=$fdsrepo/Build/${MPI_TYPE}_${COMPILER}_${platform}${size}
 FDS_EXE=fds_${MPI_TYPE}_${COMPILER}_${platform}${size}
@@ -2020,40 +1943,19 @@ echo "Setup smokebot: $DIFF_SETUP" >> $STAGE_STATUS
 #----------------------------- Stage 1 build cfast and FDS     --------------------------------------
 
 BUILDSOFTWARE_beg=`GET_TIME`
-# stage1A
-compile_cfast
-check_compile_cfast
 
 #stage1B
-echo "   fds"
+echo "Building"
 
 touch              $FDS_DB_DIR/compiling
 touch              $FDS_DIR/compiling
-touch              $FDS_OPENMP_DB_DIR/compiling
-touch              $FDS_OPENMP_DIR/compiling
 
 compile_fds_mpi_db $FDS_DB_DIR        $FDS_DB_EXE
-#compile_fds_mpi_db $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
-#wait_compile_end   $FDS_OPENMP_DB_DIR
-
 compile_fds_mpi    $FDS_DIR           $FDS_EXE
-#compile_fds_mpi    $FDS_OPENMP_DIR    $FDS_OPENMP_EXE openmp
-wait_compile_end   $FDS_DB_DIR
-wait_compile_end   $FDS_DIR
-#wait_compile_end   $FDS_OPENMP_DIR
 
-echo "      fds compilations complete"
-
-check_compile_fds_mpi_db  $FDS_DB_DIR        $FDS_DB_EXE
-check_compile_fds_mpi     $FDS_DIR           $FDS_EXE
-#check_compile_fds_mpi_db  $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
-#check_compile_fds_mpi     $FDS_OPENMP_DIR    $FDS_OPENMP_EXE openmp
-
-if [ "$OPENMPI_GNU" != "" ]; then
-  compile_fds_mpi_gnu_db
-  check_compile_fds_mpi_gnu_db
-fi
-echo "      fds compilation checks complete"
+# stage1A
+compile_cfast
+check_compile_cfast
 
 #----------------------------- Stage 2 build smokeview     --------------------------------------
 
@@ -2072,6 +1974,13 @@ check_compile_smv
 #stage2d_common_files
 check_common_files
 
+wait_compile_end   $FDS_DB_DIR
+wait_compile_end   $FDS_DIR
+
+
+check_compile_fds_mpi_db  $FDS_DB_DIR        $FDS_DB_EXE
+check_compile_fds_mpi     $FDS_DIR           $FDS_EXE
+
 BUILDSOFTWARE_end=`GET_TIME`
 DIFF_BUILDSOFTWARE=`GET_DURATION $BUILDSOFTWARE_beg $BUILDSOFTWARE_end`
 echo "Build Software: $DIFF_BUILDSOFTWARE" >> $STAGE_STATUS
@@ -2085,15 +1994,11 @@ fi
 #----------------------------- Stage 3 run verification case     --------------------------------------
 
 #stage3a_vv_dbg begin
-RUN_DEBUG_CASES_beg=`GET_TIME`
+RUN_CASES_beg=`GET_TIME`
 if [ $stage_fdsdb_success ]; then
    run_verification_cases_debug
 fi
-RUN_DEBUG_CASES_end=`GET_TIME`
-DIFF_RUN_DEBUG_CASES=`GET_DURATION $RUN_DEBUG_CASES_beg $RUN_DEBUG_CASES_end`
-echo "Run cases(debug): $DIFF_RUN_DEBUG_CASES" >> $STAGE_STATUS
 
-RUN_RELEASE_CASES_beg=`GET_TIME`
 #stage3b_vv_rls
 if [[ $stage_ver_release_success ]]; then
   run_verification_cases_release
@@ -2105,9 +2010,9 @@ if [[ $stage_ver_release_success ]]; then
   check_verification_cases_release
 fi
 
-RUN_RELEASE_CASES_end=`GET_TIME`
-DIFF_RUN_RELEASE_CASES=`GET_DURATION $RUN_RELEASE_CASES_beg $RUN_RELEASE_CASES_end`
-echo "Run cases(release): $DIFF_RUN_RELEASE_CASES" >> $STAGE_STATUS
+RUN_CASES_end=`GET_TIME`
+DIFF_RUN_CASES=`GET_DURATION $RUN_CASES_beg $RUN_CASES_end`
+echo "Run cases: $DIFF_RUN_CASES" >> $STAGE_STATUS
 
 #----------------------------- Stage 4 generate images and movies     --------------------------------------
 
