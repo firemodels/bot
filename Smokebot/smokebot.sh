@@ -486,7 +486,7 @@ run_verification_cases_debug()
    #  = Run all SMV cases =
    #  =====================
 
-   echo "   running (debug mode)"
+   echo "   running in debug mode"
    cd $smvrepo/Verification_dbg/scripts
 
    # Submit SMV verification cases and wait for them to start
@@ -838,7 +838,7 @@ run_verification_cases_release()
      cd $smvrepo/Verification
      clean_repo $smvrepo/Verification
    fi
-   echo "   running (release mode)"
+   echo "   running in release mode"
    # Start running all SMV verification cases
    cd $smvrepo/Verification/scripts
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
