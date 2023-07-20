@@ -474,8 +474,8 @@ run_verification_cases_debug()
 
    # Remove all .stop and .err files from Verification directories (recursively)
    if [ "$CLEANREPO" == "1" ]; then
-     echo "Verification cases"
-     echo "   cleaning"
+     echo "Verification"
+     echo "   clean Verification directory"
      cd $smvrepo/Verification
      clean_repo $smvrepo/Verification
    fi
@@ -486,7 +486,7 @@ run_verification_cases_debug()
    #  = Run all SMV cases =
    #  =====================
 
-   echo "   running in debug mode"
+   echo "   run cases using debug FDS"
    cd $smvrepo/Verification_dbg/scripts
 
    # Submit SMV verification cases and wait for them to start
@@ -832,13 +832,7 @@ run_verification_cases_release()
    #  = Remove .stop files =
    #  ======================
 
-   # Remove all .stop and .err files from Verification directories (recursively)
-   if [ "$CLEANREPO" == "1" ]; then
-     echo "   cleaning"
-     cd $smvrepo/Verification
-     clean_repo $smvrepo/Verification
-   fi
-   echo "   running in release mode"
+   echo "   run cases using release FDS"
    # Start running all SMV verification cases
    cd $smvrepo/Verification/scripts
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
