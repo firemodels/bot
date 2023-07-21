@@ -1310,7 +1310,12 @@ email_build_status()
   if [ "$MAKEMOVIES" == "1" ]; then
     echo "make movies: $DIFF_MAKEMOVIES"                    >> $TIME_LOG
   fi
-  echo "make guides: $DIFF_MAKEGUIDES"                      >> $TIME_LOG
+if [ "$DIFF_MAKEGUIDES" != "" ]; then
+  echo "build guides: $DIFF_MAKEGUIDES"                     >> $TIME_LOG
+fi
+if [ "$DIFF_COMPAREIMAGES" != "" ]; then
+  echo "compare images: $DIFF_COMPAREIMAGES"                >> $TIME_LOG
+fi
   echo "total: $DIFF_SCRIPT_TIME"                           >> $TIME_LOG
   echo "benchmark time(s): $TOTAL_SMV_TIMES"                >> $TIME_LOG
   DISPLAY_FDS_REVISION=
@@ -2040,8 +2045,8 @@ fi
 
 #----------------------------- Stage 5 generate manuals     --------------------------------------
 
-MAKEGUIDES_beg=`GET_TIME`
 if [[ $stage_ver_release_success ]] ; then
+   MAKEGUIDES_beg=`GET_TIME`
    echo Making guides
    echo "   user"
    make_guide SMV_User_Guide                $smvrepo/Manuals/SMV_User_Guide                SMV_User_Guide
@@ -2064,7 +2069,12 @@ if [[ $stage_ver_release_success ]] ; then
      sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                          | \
      sed "s/&&SMV_BUILD&&/$SMV_REVISION/g" > $SMV_SUMMARY_DIR/movies.html
 
+     MAKEGUIDES_end=`GET_TIME`
+     DIFF_MAKEGUIDES=`GET_DURATION $MAKEGUIDES_beg $MAKEGUIDES_end`
+     echo "Make guides: $DIFF_MAKEGUIDES" >> $STAGE_STATUS
+
 # copy images to be compared to summary directory
+     COMPAREIMAGES_beg=`GET_TIME`
      cp $smvrepo/Manuals/SMV_User_Guide/SCRIPT_FIGURES/*.png         $SMV_SUMMARY_DIR/images/user/.
      cp $smvrepo/Manuals/SMV_Verification_Guide/SCRIPT_FIGURES/*.png $SMV_SUMMARY_DIR/images/verification/.
      cd $botrepo/Smokebot
@@ -2075,6 +2085,10 @@ if [[ $stage_ver_release_success ]] ; then
      cd $botrepo/Smokebot
    echo Compare images
      ../Firebot/compare_images.sh $figrepo/smv/Reference_Figures $SMV_SUMMARY_DIR/images $SMV_SUMMARY_DIR/diffs/images $OUTPUT_DIR/error_images $TOLERANCE >& $OUTPUT_DIR/stage5_image_compare
+     COMPAREIMAGES_end=`GET_TIME`
+     DIFF_COMPAREIMAGES=`GET_DURATION $COMPAREIMAGES_beg $COMPAREIMAGES_end`
+     echo "Compare images: $DIFF_COMPAREIMAGES" >> $STAGE_STATUS
+
      UPDATED_WEB_IMAGES=1
 
 # look for fyis
@@ -2130,9 +2144,6 @@ if [ "$NAMELIST_NOSOURCE_STATUS" != "0" ]; then
   NAMELIST_NOSOURCE_LOG=$OUTPUT_DIR/stage5_namelists_nosource.txt
 fi
 
-MAKEGUIDES_end=`GET_TIME`
-DIFF_MAKEGUIDES=`GET_DURATION $MAKEGUIDES_beg $MAKEGUIDES_end`
-echo "Make guides: $DIFF_MAKEGUIDES" >> $STAGE_STATUS
 
 SCRIPT_TIME_end=`GET_TIME`
 DIFF_SCRIPT_TIME=`GET_DURATION $SCRIPT_TIME_beg $SCRIPT_TIME_end`
