@@ -32,9 +32,6 @@ echo "-R branch - clone repos using name branch"
 echo "-r - create a release bundle (same as -R branc)"
 echo "-S - smv repo hash/release"
 echo "-U - do not upload bundle file."
-echo "     By default the bundle is uploaded to a Google drive "
-echo "     directory with id found in the file:"
-echo "     $HOME/.bundle/GOOGLE_DIR_ID"
 echo "-v - show settings used to build bundle"
 exit 0
 }
@@ -125,10 +122,14 @@ SMV_HASH=
 FDS_TAG=
 SMV_TAG=
 LATEST=
+INSTALL=
 
-while getopts 'cfF:hLm:o:r:R:S:UvX:Y:' OPTION
+while getopts 'BcfF:hLm:o:r:R:S:UvX:Y:' OPTION
 do
 case $OPTION  in
+  B)
+   INSTALL="-B"
+   ;;
   c)
    PROCEED=1
    ;;
@@ -296,5 +297,5 @@ fi
 
 #*** generate and upload bundle
 cd $curdir
-$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG -w $UPLOAD
+$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH $FDS_RELEASE $INSTALL $FDS_TAG $SMV_RELEASE $SMV_TAG -w $UPLOAD
 rm $LOCKFILE
