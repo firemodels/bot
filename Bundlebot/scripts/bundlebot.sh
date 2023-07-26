@@ -297,6 +297,7 @@ if [ "$ECHO" == "" ]; then
   LATEST=$bundle_dir/FDS_SMV_latest_$platform.sh
   rm -f  $LATEST
   ln -s $bundle_dir/${installer_base_platform}.sh $LATEST
+  cp $REPO_ROOT/bot/Bundlebot/scripts/autoinstall.txt $bundle_dir/.
   rm -f  $bundle_dir/${installer_base_platform}.tar.gz
   rm -rf $bundle_dir/${installer_base_platform}
 fi
