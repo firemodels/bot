@@ -307,12 +307,9 @@ if [ "$ECHO" == "" ]; then
   cp $REPO_ROOT/bot/Bundlebot/scripts/autoinstall.txt $bundle_dir/.
   rm -f  ${BUNDLEBASE}.tar.gz
   rm -rf $BUNDLEBASE
-  echo INSTALL=$INSTALL
-  echo "cd $bundle_dir"
-  echo "cat autoinstall.txt | bash $LATEST >& $bundle_dir/fds_smv_latest_install.txt"
   if [ "$INSTALL" != "" ]; then
     cd $bundle_dir
-    cat autoinstall.txt | bash $LATEST >& $bundle_dir/fds_smv_latest_install.txt
+    cat autoinstall.txt | bash $LATEST >& $HOME/.bundle/bundle_lnx_nightly_install.log
   fi
 fi
 rm -f $LOCK_FILE
