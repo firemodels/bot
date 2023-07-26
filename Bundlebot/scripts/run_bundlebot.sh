@@ -32,9 +32,6 @@ echo "-R branch - clone repos using name branch"
 echo "-r - create a release bundle (same as -R branc)"
 echo "-S - smv repo hash/release"
 echo "-U - do not upload bundle file."
-echo "     By default the bundle is uploaded to a Google drive "
-echo "     directory with id found in the file:"
-echo "     $HOME/.bundle/GOOGLE_DIR_ID"
 echo "-v - show settings used to build bundle"
 exit 0
 }
