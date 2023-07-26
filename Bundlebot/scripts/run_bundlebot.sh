@@ -122,10 +122,14 @@ SMV_HASH=
 FDS_TAG=
 SMV_TAG=
 LATEST=
+INSTALL=
 
-while getopts 'cfF:hLm:o:r:R:S:UvX:Y:' OPTION
+while getopts 'BcfF:hLm:o:r:R:S:UvX:Y:' OPTION
 do
 case $OPTION  in
+  B)
+   INSTALL="-B"
+   ;;
   c)
    PROCEED=1
    ;;
@@ -293,5 +297,5 @@ fi
 
 #*** generate and upload bundle
 cd $curdir
-$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG -w $UPLOAD
+$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH $FDS_RELEASE $INSTALL $FDS_TAG $SMV_RELEASE $SMV_TAG -w $UPLOAD
 rm $LOCKFILE

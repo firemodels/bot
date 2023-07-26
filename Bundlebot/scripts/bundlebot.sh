@@ -74,10 +74,14 @@ FDS_REVISION=
 SMV_REVISION=
 FDS_TAG=
 SMV_TAG=
+INSTALL=
 
-while getopts 'b:cd:fghrtvwX:x:Y:y:' OPTION
+while getopts 'Bb:cd:fghrtvwX:x:Y:y:' OPTION
 do
 case $OPTION  in
+  B)
+   INSTALL=1
+   ;;
   b)
    BRANCH=$OPTARG
    ;;
@@ -300,6 +304,10 @@ if [ "$ECHO" == "" ]; then
   cp $REPO_ROOT/bot/Bundlebot/scripts/autoinstall.txt $bundle_dir/.
   rm -f  $bundle_dir/${installer_base_platform}.tar.gz
   rm -rf $bundle_dir/${installer_base_platform}
+  if [ "$INSTALL" != "" ]; then
+    cd $bundle_dir
+    cat autoinstall.txt | bash $LATEST
+  fi
 fi
 rm -f $LOCK_FILE
 exit 0
