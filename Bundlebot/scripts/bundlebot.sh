@@ -306,7 +306,7 @@ if [ "$ECHO" == "" ]; then
   rm -rf $bundle_dir/${installer_base_platform}
   if [ "$INSTALL" != "" ]; then
     cd $bundle_dir
-    cat autoinstall.txt | bash $LATEST
+    cat autoinstall.txt | bash $LATEST >& $bundle_dir/fds_smv_latest_install.txt
   fi
 fi
 rm -f $LOCK_FILE
