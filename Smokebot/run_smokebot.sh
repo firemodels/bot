@@ -16,8 +16,6 @@ echo "-b - use the current branch"
 echo "-f - force smokebot to run"
 echo "-J use Intel MPI version of fds"
 echo "-k - kill smokebot if it is running"
-echo "-L - smokebot lite,  build debug apps and run cases using debug fds"
-echo "     (no release fds, no release cases, no manuals, etc)"
 echo "-q queue [default: $QUEUE]"
 if [ "$EMAIL" != "" ]; then
   echo "-m email_address - [default: $EMAIL]"
@@ -30,8 +28,6 @@ echo "-U - upload guides"
 echo "-w directory - web directory containing summary pages"
 echo ""
 echo "Build apps, set repo revisions:"
-echo "-B - only build apps"
-echo "-D smokebot is being run using the old fds Build directory structure"
 echo "-g firebot_host - host where firebot was run"
 echo "-G firebot_home - home directory where firebot was run"
 echo "   The -g and -G options are used when cloning repos (-R option)"
@@ -42,8 +38,6 @@ echo "-r - specify GH_REPO when uploading manuals. [default: $GH_REPO]"
 echo "-R release_type (master, release or test) - clone fds, exp, fig, out and smv repos"
 echo "   fds and smv repos will be checked out with a branch named"
 echo "   master, release or test [default: master]"
-echo "-T - only clone the fds and smv repos (this option is set by default when"
-echo "     only building apps (-B) and cloning repos (-R) options are used"
 echo "-x fds_rev - checkout fds repo using fds_rev revision [default: origin/master]"
 echo "-X fds_tag - when cloning, tag the fds repo with fds_tag"
 echo "-y smv_rev - checkout smv repo using smv_rev revision [default: origin/master]"
@@ -166,11 +160,9 @@ RUNSMOKEBOT=1
 MOVIE=
 UPLOAD=
 FORCE=
-SMOKEBOT_LITE=
 ECHO=
 INTEL=
 REMOVE_PID=
-BUILD_ONLY=
 CLONE_REPOS=
 FDS_REV=
 SMV_REV=
@@ -181,7 +173,6 @@ FIREBOT_HOME=
 WEB_DIR=
 USE_BOT_QFDS=
 WEB_ROOT=/var/www/html
-OPENMPTEST=
 
 #*** check to see if a queing system is available
 
@@ -193,7 +184,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'abBcDfg:G:hHJkLm:Mo:Pq:r:R:TuUvw:W:x:X:y:Y:' OPTION
+while getopts 'abcfg:G:hHJkm:Mo:Pq:r:R:TuUvw:W:x:X:y:Y:' OPTION
 do
 case $OPTION  in
   a)
@@ -202,14 +193,8 @@ case $OPTION  in
   b)
    BRANCH="current"
    ;;
-  B)
-   BUILD_ONLY="-B"
-   ;;
   c)
    CLEANREPO=-c
-   ;;
-  D)
-   OPENMPTEST=-D
    ;;
   f)
    FORCE=1
@@ -232,9 +217,6 @@ case $OPTION  in
   k)
    KILL_SMOKEBOT=1
    ;;
-  L)
-   SMOKEBOT_LITE="-L"
-   ;;
   m)
    EMAIL="$OPTARG"
    ;;
@@ -255,9 +237,6 @@ case $OPTION  in
    ;;
   R)
    CLONE_REPOS="$OPTARG"
-   ;;
-  T)
-    CLONE_FDSSMV="-T"
    ;;
   u)
    UPDATEREPO=-u
@@ -440,7 +419,7 @@ BRANCH="-b $BRANCH"
 #*** run smokebot
 
 touch $smokebot_pid
-$ECHO ./$botscript $SIZE $BRANCH $FDS_REV $FDS_TAG $SMV_REV $OPENMPTEST $SMV_TAG $CLONE_REPOS $CLONE_FDSSMV $RUNAUTO $INTEL $BUILD_ONLY $SMOKEBOT_LITE $CLEANREPO $WEB_DIR $WEB_ROOT $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $SIZE $BRANCH $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $CLONE_REPOS $RUNAUTO $INTEL $CLEANREPO $WEB_DIR $WEB_ROOT $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi

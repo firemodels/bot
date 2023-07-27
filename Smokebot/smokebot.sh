@@ -277,7 +277,6 @@ compile_cfast()
    cd $SMOKEBOT_HOME_DIR
 
     # Build CFAST
-    echo "Building"
     echo "   release cfast"
     cd $cfastrepo/Build/CFAST/${COMPILER}_${platform}_64
     rm -f cfast7_${platform}_64
@@ -417,11 +416,11 @@ compile_fds_mpi_db()
   local MPTYPE=$3
 
    # Clean and compile mpi FDS debug
-   echo "      debug $MPTYPE"
+   echo "   debug fds $MPTYPE"
    cd $FDSDIR
    rm -f $FDSEXE
    echo ""                     > $OUTPUT_DIR/stage1b_fds_dbg$MPTYPE
-   $botrepo/Scripts/build_fds.sh $OUTPUT_DIR/stage1b_fds_dbg$MPTYPE
+   $botrepo/Scripts/build_fds.sh $OUTPUT_DIR/stage1b_fds_dbg$MPTYPE &
 }
 
 #---------------------------------------------
@@ -462,66 +461,6 @@ check_compile_fds_mpi_db()
    fi
 }
 
-#---------------------------------------------
-#                   compile_fds_mpi_gnu_db
-#---------------------------------------------
-
-compile_fds_mpi_gnu_db()
-{
-   # Clean and compile FDS MPI debug
-   compile_gnu=
-   if [ "$OPENMPI_INTEL" != "" ]; then
-     if [ "$OPENMPI_GNU" != "" ]; then
-       compile_gnu=1
-       module unload $OPENMPI_INTEL
-       module load $OPENMPI_GNU
-       echo "      MPI gfortran debug"
-       cd $FDSGNU_DB_DIR
-       make -f ../makefile clean &> /dev/null
-       ./make_fds.sh &> $OUTPUT_DIR/stage1d
-       module unload $OPENMPI_GNU
-       module load $OPENMPI_INTEL
-     fi
-   fi
-}
-
-#---------------------------------------------
-#                   check_compile_fds_mpi_gnu_db
-#---------------------------------------------
-check_compile_fds_mpi_gnu_db()
-{
-# force a pass until gfortran can compile a routine with the findloc routine
-        FDS_debug_success=true
-}
-
-check_compile_fds_mpi_gnu_dbORIG()
-{
-   # Check for errors in FDS MPI debug compilation
-   if [ "$compile_gnu" == "1" ]; then
-     cd $FDSGNU_DB_DIR
-     if [ -e $FDSGNU_DB_EXE ]
-     then
-        FDS_debug_success=true
-     else
-        echo "Errors from Stage 1d - Compile gnu Fortran FDS MPI debug:" >> $ERROR_LOG
-        cat $OUTPUT_DIR/stage1d >> $ERROR_LOG
-        echo "" >> $ERROR_LOG
-        compile_errors=1
-     fi
-
-   # Check for compiler warnings/remarks
-     if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage1d | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented'` == "" ]]
-     then
-      # Continue along
-      :
-     else
-        echo "Warnings from Stage 1d - Compile gnu Fortran FDS MPI debug:" >> $WARNING_LOG
-        grep -i -A 5 -E 'warning|remark' $OUTPUT_DIR/stage1d | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
-        echo "" >> $WARNING_LOG
-        compile_errors=1
-     fi
-   fi
-}
 
 #---------------------------------------------
 #                   run_verification_cases_debug
@@ -535,22 +474,24 @@ run_verification_cases_debug()
 
    # Remove all .stop and .err files from Verification directories (recursively)
    if [ "$CLEANREPO" == "1" ]; then
-     echo "Verification cases"
-     echo "   cleaning"
+     echo "Verification"
+     echo "   clean Verification directory"
      cd $smvrepo/Verification
      clean_repo $smvrepo/Verification
    fi
+   rm -rf $smvrepo/Verification_dbg
+   cp -r $smvrepo/Verification $smvrepo/Verification_dbg
 
    #  =====================
    #  = Run all SMV cases =
    #  =====================
 
-   echo "   running (debug mode)"
-   cd $smvrepo/Verification/scripts
+   echo "   run cases using debug FDS"
+   cd $smvrepo/Verification_dbg/scripts
 
    # Submit SMV verification cases and wait for them to start
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3a_vv_dbg 2>&1
-   ./Run_SMV_Cases.sh $INTEL2 -Y -c $cfastrepo $USEINSTALL2 -j $JOBPREFIX -m 2 -d -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3a_vv_dbg 2>&1
+   ./Run_SMV_Cases.sh $INTEL2 -Y -c $cfastrepo $USEINSTALL2 -j $JOBPREFIXD -m 2 -d -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3a_vv_dbg 2>&1 
 }
 
 #---------------------------------------------
@@ -560,10 +501,10 @@ run_verification_cases_debug()
 check_verification_cases_debug()
 {
    # Wait for SMV verification cases to end
-   wait_verification_cases_end stage3a_vv_dbg 3a
+   wait_verification_cases_end stage3a_vv_dbg 3a $JOBPREFIXD
 
    # Scan and report any errors in FDS verification cases
-   cd $smvrepo/Verification
+   cd $smvrepo/Verification_dbg
 
    if [[ `grep -rIi 'Run aborted' $OUTPUT_DIR/stage3a_vv_dbg` == "" ]] && \
       [[ `grep -rIi 'Segmentation' Visualization/* WUI/* ` == "" ]] && \
@@ -605,11 +546,11 @@ compile_fds_mpi()
   local MPTYPE=$3
 
    # Clean and compile FDS
-   echo "      release $MPTYPE"
+   echo "   release fds $MPTYPE"
    cd $FDSDIR
    rm -f $FDSEXE
    echo ""                     > $OUTPUT_DIR/stage1c_fds_rls$MPTYPE
-   $botrepo/Scripts/build_fds.sh $OUTPUT_DIR/stage1c_fds_rls$MPTYPE
+   $botrepo/Scripts/build_fds.sh $OUTPUT_DIR/stage1c_fds_rls$MPTYPE &
 }
 
 #---------------------------------------------
@@ -619,7 +560,8 @@ compile_fds_mpi()
 wait_compile_end()
 {
    local compile_dir=$1
-   while [[  -e $compile_dir/complete    ]]; do
+   sleep 5
+   while [[  -e $compile_dir/compiling    ]]; do
       sleep 5
    done
 }
@@ -666,17 +608,16 @@ check_compile_fds_mpi()
 
 compile_smv_utilities()
 {
-   echo "   smokeview utilities"
    echo "" > $OUTPUT_DIR/stage2a_smvutil
    if [ "$haveCC" == "1" ] ; then
    # smokeview libraries
-     echo "      libraries"
+     echo "   libraries"
      cd $smvrepo/Build/LIBS/${COMPILER}_${platform}_64
      echo 'Building Smokeview libraries:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
      ./make_LIBS.sh >> $OUTPUT_DIR/stage2a_smvutil 2>&1
 
    # smokezip:
-     echo "      smokezip"
+     echo "   smokezip"
      cd $smvrepo/Build/smokezip/${COMPILER}_${platform}_64
      rm -f *.o smokezip_${platform}_64
 
@@ -686,7 +627,7 @@ compile_smv_utilities()
      cp smokezip_${platform}_64 $LATESTAPPS_DIR/smokezip
 
    # smokediff:
-     echo "      smokediff"
+     echo "   smokediff"
      cd $smvrepo/Build/smokediff/${COMPILER}_${platform}_64
      rm -f *.o smokediff_${platform}_64
      echo 'Compiling smokediff:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
@@ -695,7 +636,7 @@ compile_smv_utilities()
      cp smokediff_${platform}_64 $LATESTAPPS_DIR/smokediff
 
    # background
-     echo "      background"
+     echo "   background"
      cd $smvrepo/Build/background/${COMPILER}_${platform}_64
      rm -f *.o background_${platform}_64
      echo 'Compiling background:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
@@ -703,7 +644,7 @@ compile_smv_utilities()
      cp background_${platform}_64 $LATESTAPPS_DIR/background
 
    # hashfile
-     echo "      hashfile"
+     echo "   hashfile"
      cd $smvrepo/Build/hashfile/${COMPILER}_${platform}_64
      rm -f *.o hashfile_${platform}_64
      echo 'Compiling hashfile:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
@@ -711,7 +652,7 @@ compile_smv_utilities()
      cp hashfile_${platform}_64 $LATESTAPPS_DIR/hashfile
 
   # wind2fds:
-     echo "      wind2fds"
+     echo "   wind2fds"
      cd $smvrepo/Build/wind2fds/${COMPILER}_${platform}_64
      rm -f *.o wind2fds_${platform}_64
      echo 'Compiling wind2fds:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
@@ -858,6 +799,7 @@ wait_verification_cases_end()
 {
    stage=$1
    stagelimit=$2
+   prefix=$3
    # Scans qstat and waits for verification cases to end
    if [[ "$SMOKEBOT_QUEUE" == "none" ]]
    then
@@ -870,8 +812,8 @@ wait_verification_cases_end()
         sleep 30
      done
    else
-     while           [[ `qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$'` != '' ]]; do
-        JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami)  | grep $JOBPREFIX | grep -v 'C$' | wc -l`
+     while           [[ `qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $prefix | grep -v 'C$'` != '' ]]; do
+        JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami)  | grep $prefix | grep -v 'C$' | wc -l`
         echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/$stage
         TIME_LIMIT_STAGE=$stagelimit
         check_time_limit
@@ -890,17 +832,11 @@ run_verification_cases_release()
    #  = Remove .stop files =
    #  ======================
 
-   # Remove all .stop and .err files from Verification directories (recursively)
-   if [ "$CLEANREPO" == "1" ]; then
-     echo "   cleaning"
-     cd $smvrepo/Verification
-     clean_repo $smvrepo/Verification
-   fi
-   echo "   running (release mode)"
+   echo "   run cases using release FDS"
    # Start running all SMV verification cases
    cd $smvrepo/Verification/scripts
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
-   ./Run_SMV_Cases.sh $INTEL2 -Y -c $cfastrepo -j $JOBPREFIX $USEINSTALL2 $RUN_OPENMP -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
+   ./Run_SMV_Cases.sh $INTEL2 -Y -c $cfastrepo -j $JOBPREFIXR $USEINSTALL2 -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
 }
 
 #---------------------------------------------
@@ -910,7 +846,7 @@ run_verification_cases_release()
 check_verification_cases_release()
 {
    # Wait for all verification cases to end
-   wait_verification_cases_end stage3b_vv_rls 3b
+   wait_verification_cases_end stage3b_vv_rls 3b $JOBPREFIXR
 
    # Scan and report any errors in FDS verification cases
    cd $smvrepo/Verification
@@ -954,8 +890,7 @@ compile_smv_db()
 {
    if [ "$haveCC" == "1" ] ; then
    # Clean and compile SMV debug
-     echo "   smokeview"
-     echo "      debug"
+     echo "   debug smokeview"
      cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_64
      rm -f smokeview_${platform}_64_db
      ./make_smokeview_db.sh &> $OUTPUT_DIR/stage2b_smv_dbg
@@ -1004,7 +939,7 @@ compile_smv()
 {
    if [ "$haveCC" == "1" ] ; then
    # Clean and compile SMV
-     echo "      release"
+     echo "   release smokeview"
      cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_64
      rm -f smokeview_${platform}_64
      ./make_smokeview.sh &> $OUTPUT_DIR/stage2c_smv_rls
@@ -1370,13 +1305,17 @@ email_build_status()
   fi
   echo "setup smokebot: $DIFF_SETUP"                        >> $TIME_LOG
   echo "build software: $DIFF_BUILDSOFTWARE"                >> $TIME_LOG
-  echo "run cases(debug): $DIFF_RUN_DEBUG_CASES"            >> $TIME_LOG
-  echo "run cases(release): $DIFF_RUN_RELEASE_CASES"        >> $TIME_LOG
+  echo "run cases: $DIFF_RUN_CASES"                         >> $TIME_LOG
   echo "make pictures: $DIFF_MAKEPICTURES"                  >> $TIME_LOG
   if [ "$MAKEMOVIES" == "1" ]; then
     echo "make movies: $DIFF_MAKEMOVIES"                    >> $TIME_LOG
   fi
-  echo "make guides: $DIFF_MAKEGUIDES"                      >> $TIME_LOG
+if [ "$DIFF_MAKEGUIDES" != "" ]; then
+  echo "build guides: $DIFF_MAKEGUIDES"                     >> $TIME_LOG
+fi
+if [ "$DIFF_COMPAREIMAGES" != "" ]; then
+  echo "compare images: $DIFF_COMPAREIMAGES"                >> $TIME_LOG
+fi
   echo "total: $DIFF_SCRIPT_TIME"                           >> $TIME_LOG
   echo "benchmark time(s): $TOTAL_SMV_TIMES"                >> $TIME_LOG
   DISPLAY_FDS_REVISION=
@@ -1520,7 +1459,6 @@ NEWGUIDE_DIR=$OUTPUT_DIR/Newest_Guides
 WEB_DIR=
 WEB_ROOT=
 UPDATED_WEB_IMAGES=
-SMOKEBOT_LITE=
 export SCRIPTFILES=$smokebotdir/scriptfiles
 
 WEBBRANCH=nist-pages
@@ -1532,8 +1470,6 @@ BOTBRANCH=master
 SMOKEBOT_QUEUE=smokebot
 MAKEMOVIES=0
 RUNAUTO=
-OPENMP=
-RUN_OPENMP=
 CLEANREPO=0
 UPDATEREPO=0
 mailTo=
@@ -1541,16 +1477,13 @@ UPLOADRESULTS=
 COMPILER=intel
 PID_FILE=~/.fdssmvgit/firesmokebot_pid
 HTML2PDF=wkhtmltopdf
-BUILD_ONLY=
 CLONE_REPOS=
-CLONE_FDSSMV=
 FDS_REV=origin/master
 SMV_REV=origin/master
 FDS_TAG=
 SMV_TAG=
 CHECKOUT=
 compile_errors=
-OPENMPTEST=1
 GITURL=
 
 #*** save pid so -k option (kill smokebot) may be used lateer
@@ -1559,7 +1492,7 @@ echo $$ > $PID_FILE
 
 #*** parse command line options
 
-while getopts 'ab:BcDJLm:Mo:q:R:TuUw:W:x:X:y:Y:' OPTION
+while getopts 'ab:cJm:Mq:R:uUw:W:x:X:y:Y:' OPTION
 do
 case $OPTION in
   a)
@@ -1573,21 +1506,12 @@ case $OPTION in
      BOTBRANCH="current"
    fi
    ;;
-  B)
-   BUILD_ONLY="1"
-   ;;
   c)
    CLEANREPO=1
-   ;;
-  D)
-   OPENMPTEST=
    ;;
   J)
    MPI_TYPE=impi
    INTEL2="-J"
-   ;;
-  L)
-   SMOKEBOT_LITE=1
    ;;
   m)
    mailTo="$OPTARG"
@@ -1595,19 +1519,11 @@ case $OPTION in
   M)
    MAKEMOVIES="1"
    ;;
-  o)
-   nthreads="$OPTARG"
-   OPENMP=openmp_
-   RUN_OPENMP="-o $nthreads"
-   ;;
   q)
    SMOKEBOT_QUEUE="$OPTARG"
    ;;
   R)
    CLONE_REPOS="$OPTARG"
-   ;;
-  T)
-   CLONE_FDSSMV=1
    ;;
   u)
    UPDATEREPO=1
@@ -1693,13 +1609,8 @@ fdsrepo=$repo/fds
 smvrepo=$repo/smv
 figrepo=$repo/fig
 
-if [ "$OPENMPTEST" == "" ]; then
-  size=_64
-  GNU_MPI=mpi_
-else
-  size=
-  GNU_MPI=ompi_
-fi
+size=
+GNU_MPI=ompi_
 
 platform="linux"
 platform2="Linux"
@@ -1713,14 +1624,8 @@ export platform
 FDSGNU_DB_DIR=$fdsrepo/Build/${GNU_MPI}${GNU_COMPILER}${platform}${size}_db
 FDSGNU_DB_EXE=
 
-FDS_OPENMP_DB_DIR=$fdsrepo/Build/${MPI_TYPE}_${COMPILER}_${platform}_openmp${size}_db
-FDS_OPENMP_DB_EXE=fds_${MPI_TYPE}_${COMPILER}_${platform}_openmp${size}_db
-
 FDS_DB_DIR=$fdsrepo/Build/${MPI_TYPE}_${COMPILER}_${platform}${size}_db
 FDS_DB_EXE=fds_${MPI_TYPE}_${COMPILER}_${platform}${size}_db
-
-FDS_OPENMP_DIR=$fdsrepo/Build/${MPI_TYPE}_${COMPILER}_${platform}_openmp${size}
-FDS_OPENMP_EXE=fds_${MPI_TYPE}_${COMPILER}_${platform}_openmp${size}
 
 FDS_DIR=$fdsrepo/Build/${MPI_TYPE}_${COMPILER}_${platform}${size}
 FDS_EXE=fds_${MPI_TYPE}_${COMPILER}_${platform}${size}
@@ -1737,13 +1642,8 @@ if [[ "$CLONE_REPOS" != "" ]]; then
   cd $botrepo/Scripts
 
 # only clone fds and smv repos
-  if [ "$CLONE_FDSSMV" != "" ]; then
-   # only clone the fds and smv repos - used when just compiling the fds and smv apps
-  ./setup_repos.sh -T                           > $OUTPUT_DIR/stage1_clone 2>&1
-  else
    # clone all repos
     ./setup_repos.sh -F                         > $OUTPUT_DIR/stage1_clone 2>&1
-  fi
   if [[ "$CLONE_REPOS" != "master" ]]; then
     FDSBRANCH=$CLONE_REPOS
     cd $fdsrepo
@@ -1922,7 +1822,8 @@ if [ "$mailToCFAST" == "" ]; then
   mailToCFAST=$mailTo
 fi
 
-JOBPREFIX=SB_
+JOBPREFIXR=SBR_
+JOBPREFIXD=SBD_
 
 #  =============================================
 #  = Smokebot timing and notification mechanism =
@@ -2041,69 +1942,43 @@ echo "Setup smokebot: $DIFF_SETUP" >> $STAGE_STATUS
 #----------------------------- Stage 1 build cfast and FDS     --------------------------------------
 
 BUILDSOFTWARE_beg=`GET_TIME`
-if [ "$BUILD_ONLY" == "" ]; then
-# stage1A
-  compile_cfast
-  check_compile_cfast
 
 #stage1B
-   echo "   fds (background)"
-  compile_fds_mpi_db          $FDS_DB_DIR        $FDS_DB_EXE
-  if [ "$OPENMPTEST" != "" ]; then
-    compile_fds_mpi_db        $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
-  fi
-  if [ "$SMOKEBOT_LITE" == "" ]; then
-     compile_fds_mpi          $FDS_DIR        $FDS_EXE
-     if [ "$OPENMPTEST" != "" ]; then
-       compile_fds_mpi        $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
-     fi
-  fi
-  wait_compile_end $FDS_DIR
-  wait_compile_end $FDS_DB_DIR
-  if [ "$OPENMPTEST" != "" ]; then
-    wait_compile_end $FDS_OPENMP_DIR
-    wait_compile_end $FDS_OPENMP_DB_DIR
-  fi
-  echo "      fds compilations complete"
+echo "Building"
 
-  check_compile_fds_mpi_db    $FDS_DB_DIR        $FDS_DB_EXE
-  if [ "$OPENMPTEST" != "" ]; then
-    check_compile_fds_mpi_db  $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
-  fi
+touch              $FDS_DB_DIR/compiling
+touch              $FDS_DIR/compiling
 
-#stage1C
-  if [ "$SMOKEBOT_LITE" == "" ]; then
-     check_compile_fds_mpi    $FDS_DIR        $FDS_EXE
-     if [ "$OPENMPTEST" != "" ]; then
-       check_compile_fds_mpi  $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
-     fi
-  fi
+compile_fds_mpi_db $FDS_DB_DIR        $FDS_DB_EXE
+compile_fds_mpi    $FDS_DIR           $FDS_EXE
 
-  if [ "$OPENMPI_GNU" != "" ]; then
-    compile_fds_mpi_gnu_db
-    check_compile_fds_mpi_gnu_db
-  fi
+# stage1A
+compile_cfast
+check_compile_cfast
 
 #----------------------------- Stage 2 build smokeview     --------------------------------------
 
 #stage2a_smvutil
-  compile_smv_utilities
-  check_smv_utilities
+compile_smv_utilities
+check_smv_utilities
 
 #stage2b_smv_dbg
-  compile_smv_db
-  check_compile_smv_db
-fi
-
+compile_smv_db
+check_compile_smv_db
 
 #stage2c_smv_rls
-if [ "$SMOKEBOT_LITE" == "" ]; then
-  compile_smv
-  check_compile_smv
-fi
+compile_smv
+check_compile_smv
 
 #stage2d_common_files
 check_common_files
+
+wait_compile_end   $FDS_DB_DIR
+wait_compile_end   $FDS_DIR
+
+
+check_compile_fds_mpi_db  $FDS_DB_DIR        $FDS_DB_EXE
+check_compile_fds_mpi     $FDS_DIR           $FDS_EXE
 
 BUILDSOFTWARE_end=`GET_TIME`
 DIFF_BUILDSOFTWARE=`GET_DURATION $BUILDSOFTWARE_beg $BUILDSOFTWARE_end`
@@ -2118,164 +1993,157 @@ fi
 #----------------------------- Stage 3 run verification case     --------------------------------------
 
 #stage3a_vv_dbg begin
-if [ "$BUILD_ONLY" == "" ]; then
-  RUN_DEBUG_CASES_beg=`GET_TIME`
-  if [ $stage_fdsdb_success ]; then
-     run_verification_cases_debug
-     check_verification_cases_debug
-  fi
-  RUN_DEBUG_CASES_end=`GET_TIME`
-  DIFF_RUN_DEBUG_CASES=`GET_DURATION $RUN_DEBUG_CASES_beg $RUN_DEBUG_CASES_end`
-  echo "Run cases(debug): $DIFF_RUN_DEBUG_CASES" >> $STAGE_STATUS
-
-  RUN_RELEASE_CASES_beg=`GET_TIME`
-#stage3b_vv_rls
-  if [ "$SMOKEBOT_LITE" == "" ]; then
-    if [[ $stage_ver_release_success ]] ; then
-      run_verification_cases_release
-      check_verification_cases_release
-    fi
-  fi
+RUN_CASES_beg=`GET_TIME`
+if [ $stage_fdsdb_success ]; then
+   run_verification_cases_debug
 fi
 
-RUN_RELEASE_CASES_end=`GET_TIME`
-DIFF_RUN_RELEASE_CASES=`GET_DURATION $RUN_RELEASE_CASES_beg $RUN_RELEASE_CASES_end`
-echo "Run cases(release): $DIFF_RUN_RELEASE_CASES" >> $STAGE_STATUS
+#stage3b_vv_rls
+if [[ $stage_ver_release_success ]]; then
+  run_verification_cases_release
+fi
+if [ $stage_fdsdb_success ]; then
+   check_verification_cases_debug
+fi
+if [[ $stage_ver_release_success ]]; then
+  check_verification_cases_release
+fi
+
+RUN_CASES_end=`GET_TIME`
+DIFF_RUN_CASES=`GET_DURATION $RUN_CASES_beg $RUN_CASES_end`
+echo "Run cases: $DIFF_RUN_CASES" >> $STAGE_STATUS
 
 #----------------------------- Stage 4 generate images and movies     --------------------------------------
 
 ### Stage 4a generate images
 
 MAKEPICTURES_beg=`GET_TIME`
-if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
-  if [[ $stage_ver_release_success ]] ; then
-    make_smv_pictures
-    check_smv_pictures
-  fi
+if [[ $stage_ver_release_success ]] ; then
+  make_smv_pictures
+  check_smv_pictures
 fi
 MAKEPICTURES_end=`GET_TIME`
 DIFF_MAKEPICTURES=`GET_DURATION $MAKEPICTURES_beg $MAKEPICTURES_end`
 echo "Make pictures: $DIFF_MAKEPICTURES" >> $STAGE_STATUS
 
-if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
-  if [ "$MAKEMOVIES" == "1" ]; then
-    MAKEMOVIES_beg=`GET_TIME`
+if [ "$MAKEMOVIES" == "1" ]; then
+  MAKEMOVIES_beg=`GET_TIME`
 
 ### Stage 4b generate movies
 
-    make_smv_movies
-    check_smv_movies
+  make_smv_movies
+  check_smv_movies
 
-    MAKEMOVIES_end=`GET_TIME`
-    DIFF_MAKEMOVIES=`GET_DURATION $MAKEMOVIES_beg $MAKEMOVIES_end`
-    echo "Make movies: $DIFF_MAKEMOVIES" >> $STAGE_STATUS
-  fi
+  MAKEMOVIES_end=`GET_TIME`
+  DIFF_MAKEMOVIES=`GET_DURATION $MAKEMOVIES_beg $MAKEMOVIES_end`
+  echo "Make movies: $DIFF_MAKEMOVIES" >> $STAGE_STATUS
 fi
 
-if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
-  if [[ $stage_ver_release_success ]] ; then
-    generate_timing_stats
-  fi
+if [[ $stage_ver_release_success ]] ; then
+  generate_timing_stats
 fi
 
 #----------------------------- Stage 5 generate manuals     --------------------------------------
 
-MAKEGUIDES_beg=`GET_TIME`
-if [[ "$SMOKEBOT_LITE" == "" ]] && [[ "$BUILD_ONLY" == "" ]]; then
-  if [[ $stage_ver_release_success ]] ; then
-     echo Making guides
-     echo "   user"
-     make_guide SMV_User_Guide                $smvrepo/Manuals/SMV_User_Guide                SMV_User_Guide
-     echo "   technical"
-     make_guide SMV_Technical_Reference_Guide $smvrepo/Manuals/SMV_Technical_Reference_Guide SMV_Technical_Reference_Guide
-     echo "   verification"
-     make_guide SMV_Verification_Guide        $smvrepo/Manuals/SMV_Verification_Guide        SMV_Verification_Guide
+if [[ $stage_ver_release_success ]] ; then
+   MAKEGUIDES_beg=`GET_TIME`
+   echo Making guides
+   echo "   user"
+   make_guide SMV_User_Guide                $smvrepo/Manuals/SMV_User_Guide                SMV_User_Guide
+   echo "   technical"
+   make_guide SMV_Technical_Reference_Guide $smvrepo/Manuals/SMV_Technical_Reference_Guide SMV_Technical_Reference_Guide
+   echo "   verification"
+   make_guide SMV_Verification_Guide        $smvrepo/Manuals/SMV_Verification_Guide        SMV_Verification_Guide
 
-     if [ -d $SMV_SUMMARY_DIR ]; then
-       DATE=`date +"%b %d, %Y - %r"`
+   if [ -d $SMV_SUMMARY_DIR ]; then
+     DATE=`date +"%b %d, %Y - %r"`
 
-       sed "s/&&DATE&&/$DATE/g"                $SMV_SUMMARY_DIR/index_template.html   | \
-       sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                          | \
-       sed "s/&&SMV_BUILD&&/$SMV_REVISION/g" > $SMV_SUMMARY_DIR/index.html
+     sed "s/&&DATE&&/$DATE/g"                $SMV_SUMMARY_DIR/index_template.html   | \
+     sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                          | \
+     sed "s/&&SMV_BUILD&&/$SMV_REVISION/g" > $SMV_SUMMARY_DIR/index.html
+     sed "s/&&DATE&&/$DATE/g"                $SMV_SUMMARY_DIR/manuals_template.html | \
+     sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                          | \
+     sed "s/&&SMV_BUILD&&/$SMV_REVISION/g" > $SMV_SUMMARY_DIR/manuals.html
 
-       sed "s/&&DATE&&/$DATE/g"                $SMV_SUMMARY_DIR/manuals_template.html | \
-       sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                          | \
-       sed "s/&&SMV_BUILD&&/$SMV_REVISION/g" > $SMV_SUMMARY_DIR/manuals.html
+     sed "s/&&DATE&&/$DATE/g"                $SMV_SUMMARY_DIR/movies_template.html  | \
+     sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                          | \
+     sed "s/&&SMV_BUILD&&/$SMV_REVISION/g" > $SMV_SUMMARY_DIR/movies.html
 
-       sed "s/&&DATE&&/$DATE/g"                $SMV_SUMMARY_DIR/movies_template.html  | \
-       sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                          | \
-       sed "s/&&SMV_BUILD&&/$SMV_REVISION/g" > $SMV_SUMMARY_DIR/movies.html
+     MAKEGUIDES_end=`GET_TIME`
+     DIFF_MAKEGUIDES=`GET_DURATION $MAKEGUIDES_beg $MAKEGUIDES_end`
+     echo "Make guides: $DIFF_MAKEGUIDES" >> $STAGE_STATUS
 
 # copy images to be compared to summary directory
-       cp $smvrepo/Manuals/SMV_User_Guide/SCRIPT_FIGURES/*.png         $SMV_SUMMARY_DIR/images/user/.
-       cp $smvrepo/Manuals/SMV_Verification_Guide/SCRIPT_FIGURES/*.png $SMV_SUMMARY_DIR/images/verification/.
-       cd $botrepo/Smokebot
-       ./remove_images.sh $SMV_SUMMARY_DIR/images
+     COMPAREIMAGES_beg=`GET_TIME`
+     cp $smvrepo/Manuals/SMV_User_Guide/SCRIPT_FIGURES/*.png         $SMV_SUMMARY_DIR/images/user/.
+     cp $smvrepo/Manuals/SMV_Verification_Guide/SCRIPT_FIGURES/*.png $SMV_SUMMARY_DIR/images/verification/.
+     cd $botrepo/Smokebot
+     ./remove_images.sh $SMV_SUMMARY_DIR/images
 
 # compare images generated by this smokebot run with a base set in the fig repo
-       TOLERANCE=0.2
-       cd $botrepo/Smokebot
-       ../Firebot/compare_images.sh $figrepo/smv/Reference_Figures $SMV_SUMMARY_DIR/images $SMV_SUMMARY_DIR/diffs/images $OUTPUT_DIR/error_images $TOLERANCE >& $OUTPUT_DIR/stage5_image_compare
-       UPDATED_WEB_IMAGES=1
+     TOLERANCE=0.2
+     cd $botrepo/Smokebot
+   echo Compare images
+     ../Firebot/compare_images.sh $figrepo/smv/Reference_Figures $SMV_SUMMARY_DIR/images $SMV_SUMMARY_DIR/diffs/images $OUTPUT_DIR/error_images $TOLERANCE >& $OUTPUT_DIR/stage5_image_compare
+     COMPAREIMAGES_end=`GET_TIME`
+     DIFF_COMPAREIMAGES=`GET_DURATION $COMPAREIMAGES_beg $COMPAREIMAGES_end`
+     echo "Compare images: $DIFF_COMPAREIMAGES" >> $STAGE_STATUS
+
+     UPDATED_WEB_IMAGES=1
 
 # look for fyis
-       if [[ `grep '***fyi:' $OUTPUT_DIR/stage5_image_compare` == "" ]]
-       then
-         # Continue along
-         :
-       else
-         echo "FYIs from Stage 5 - Image comparisons:"     >> $FYI_LOG
-         grep '***fyi:' $OUTPUT_DIR/stage5_image_compare   >> $FYI_LOG
-       fi
+     if [[ `grep '***fyi:' $OUTPUT_DIR/stage5_image_compare` == "" ]]; then
+       # Continue along
+       :
+     else
+       echo "FYIs from Stage 5 - Image comparisons:"     >> $FYI_LOG
+       grep '***fyi:' $OUTPUT_DIR/stage5_image_compare   >> $FYI_LOG
+     fi
 
 # look for warnings
-       if [[ `grep '***warning:' $OUTPUT_DIR/stage5_image_compare` == "" ]]
-       then
-         # Continue along
-         :
-       else
-         echo "Warnings from Stage 5 - Image comparisons:"     >> $WARNING_LOG
-         grep '***warning:' $OUTPUT_DIR/stage5_image_compare   >> $WARNING_LOG
-       fi
+     if [[ `grep '***warning:' $OUTPUT_DIR/stage5_image_compare` == "" ]]; then
+       # Continue along
+       :
+     else
+       echo "Warnings from Stage 5 - Image comparisons:"     >> $WARNING_LOG
+       grep '***warning:' $OUTPUT_DIR/stage5_image_compare   >> $WARNING_LOG
+     fi
        
-       if [ "$WEB_DIR" != "" ]; then
-         WEB_DIR_OLD=${WEB_DIR}_old
-         rm -rf $WEB_ROOT/$WEB_DIR_OLD
-         if [ -d $WEB_ROOT/$WEB_DIR ]; then
-           mv $WEB_ROOT/$WEB_DIR $WEB_ROOT/$WEB_DIR_OLD
-         fi
-         mkdir $WEB_ROOT/$WEB_DIR
-         cp -r $SMV_SUMMARY_DIR/* $WEB_ROOT/$WEB_DIR/.
-         rm -f $WEB_ROOT/$WEB_DIR/*template.html
+     if [ "$WEB_DIR" != "" ]; then
+       WEB_DIR_OLD=${WEB_DIR}_old
+       rm -rf $WEB_ROOT/$WEB_DIR_OLD
+       if [ -d $WEB_ROOT/$WEB_DIR ]; then
+         mv $WEB_ROOT/$WEB_DIR $WEB_ROOT/$WEB_DIR_OLD
        fi
+       mkdir $WEB_ROOT/$WEB_DIR
+       cp -r $SMV_SUMMARY_DIR/* $WEB_ROOT/$WEB_DIR/.
+       rm -f $WEB_ROOT/$WEB_DIR/*template.html
      fi
+   fi
 
-     notfound=`$HTML2PDF -V 2>&1 | tail -1 | grep "not found" | wc -l`
-     if [ $notfound -eq 0 ]; then
-       if [ -e  $smvrepo/Manuals/SMV_Summary/diffs.html ]; then
-         $HTML2PDF --enable-local-file-access $smvrepo/Manuals/SMV_Summary/diffs.html $smvrepo/Manuals/SMV_Summary/SMV_Diffs.pdf
-         cp $smvrepo/Manuals/SMV_Summary/SMV_Diffs.pdf $NEWGUIDE_DIR/.
-       fi
+   notfound=`$HTML2PDF -V 2>&1 | tail -1 | grep "not found" | wc -l`
+   if [ $notfound -eq 0 ]; then
+     if [ -e  $smvrepo/Manuals/SMV_Summary/diffs.html ]; then
+       $HTML2PDF --enable-local-file-access $smvrepo/Manuals/SMV_Summary/diffs.html $smvrepo/Manuals/SMV_Summary/SMV_Diffs.pdf
+       cp $smvrepo/Manuals/SMV_Summary/SMV_Diffs.pdf $NEWGUIDE_DIR/.
      fi
-  else
-     echo Errors found, not building guides
-  fi
-
-  cd $botrepo/Firebot
-  ./compare_namelists.sh $OUTPUT_DIR stage5 > $OUTPUT_DIR/stage5_namelist_check
-  NAMELIST_NODOC_STATUS=`cat $OUTPUT_DIR/stage5_namelist_check | head -1 | awk -F' ' '{print $1}'`
-  if [ "$NAMELIST_NODOC_STATUS" != "0" ]; then
-    NAMELIST_NODOC_LOG=$OUTPUT_DIR/stage5_namelists_nodoc.txt
-  fi
-  NAMELIST_NOSOURCE_STATUS=`cat $OUTPUT_DIR/stage5_namelist_check | tail -1 | awk -F' ' '{print $1}'`
-  if [ "$NAMELIST_NOSOURCE_STATUS" != "0" ]; then
-    NAMELIST_NOSOURCE_LOG=$OUTPUT_DIR/stage5_namelists_nosource.txt
-  fi
+   fi
+else
+   echo Errors found, not building guides
 fi
 
-MAKEGUIDES_end=`GET_TIME`
-DIFF_MAKEGUIDES=`GET_DURATION $MAKEGUIDES_beg $MAKEGUIDES_end`
-echo "Make guides: $DIFF_MAKEGUIDES" >> $STAGE_STATUS
+cd $botrepo/Firebot
+   echo Compare namelists
+./compare_namelists.sh $OUTPUT_DIR stage5 > $OUTPUT_DIR/stage5_namelist_check
+NAMELIST_NODOC_STATUS=`cat $OUTPUT_DIR/stage5_namelist_check | head -1 | awk -F' ' '{print $1}'`
+if [ "$NAMELIST_NODOC_STATUS" != "0" ]; then
+  NAMELIST_NODOC_LOG=$OUTPUT_DIR/stage5_namelists_nodoc.txt
+fi
+NAMELIST_NOSOURCE_STATUS=`cat $OUTPUT_DIR/stage5_namelist_check | tail -1 | awk -F' ' '{print $1}'`
+if [ "$NAMELIST_NOSOURCE_STATUS" != "0" ]; then
+  NAMELIST_NOSOURCE_LOG=$OUTPUT_DIR/stage5_namelists_nosource.txt
+fi
+
 
 SCRIPT_TIME_end=`GET_TIME`
 DIFF_SCRIPT_TIME=`GET_DURATION $SCRIPT_TIME_beg $SCRIPT_TIME_end`
@@ -2286,13 +2154,9 @@ echo Reporting results
 set_files_world_readable || exit 1
 save_build_status
 
-if [ "$BUILD_ONLY" == "" ]; then
-  save_manuals_dir
-  if [ "$SMOKEBOT_LITE" == "" ]; then
-    if [[ $stage_ver_release_success ]] ; then
-      archive_timing_stats
-    fi
-  fi
+save_manuals_dir
+if [[ $stage_ver_release_success ]] ; then
+  archive_timing_stats
 fi
 echo "   emailing results"
 email_build_status

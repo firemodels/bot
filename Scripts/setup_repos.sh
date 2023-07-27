@@ -22,6 +22,7 @@ echo "    $smvrepos"
 echo "-t - append test to repo name, do not erase if repo exists"
 echo "-T - only setup fds and smv repos (erase each repo first)"
 echo "-U - only setup smv repo (erase each repo first)"
+echo "-v - setup openvkl repo"
 echo "-w - setup wiki and webpage repos cloned from firemodels"
 exit
 }
@@ -37,23 +38,28 @@ SETUP_REMOTE ()
   cd $repo_dir
   if [ "$GITUSER" == "firemodels" ]; then
      ndisable=`git remote -v | grep DISABLE | wc -l`
-      if [ $ndisable -eq 0 ]; then
-         echo disabling push access to firemodels
-         git remote set-url --push origin DISABLE
-      fi
+     if [ $ndisable -eq 0 ]; then
+        echo disabling push access to firemodels
+        git remote set-url --push origin DISABLE
+     fi
   else
-     have_central=`git remote -v | awk '{print $1}' | grep firemodels | wc -l`
+     if [ "$repo" == "openvkl" ]; then
+       CENTRAL=openvkl
+     else
+       CENTRAL=firemodels
+     fi
+     have_central=`git remote -v | awk '{print $1}' | grep $CENTRAL | wc -l`
      if [ $have_central -eq 0 ]; then
-        echo setting up remote tracking with firemodels
-        git remote add firemodels ${GITHEADER}firemodels/$repo.git
+        echo setting up remote tracking with $CENTRAL
+        git remote add $CENTRAL ${GITHEADER}$CENTRAL/$repo.git
         git remote update
      fi
      ndisable=`git remote -v | grep DISABLE | wc -l`
      if [ $ndisable -eq 0 ]; then
-       echo "   disabling push access to firemodels"
-       git remote set-url --push firemodels DISABLE
+       echo "   disabling push access to $CENTRAL"
+       git remote set-url --push $CENTRAL DISABLE
      else
-       echo "   push access to firemodels already disabled"
+       echo "   push access to $CENTRAL already disabled"
      fi
   fi
 }
@@ -65,6 +71,7 @@ fdssmvrepos="fds smv"
 smvonlyrepos="smv"
 firebotrepos="cad exp fds fds-smv fig out smv test_bundles"
 smvrepos="cfast fds fig smv test_bundles test7_bundles"
+vklrepos="openvkl"
 cfastrepos="cfast exp fig smv test_bundles test7_bundles"
 allrepos="cad cfast cor exp fds fig out radcal smv test_bundles test7_bundles"
 wikiwebrepos="fds.wiki fds-smv"
@@ -83,7 +90,7 @@ else
    exit
 fi
 
-while getopts 'abcCfFGH:hsStTUw' OPTION
+while getopts 'abcCfFGH:hsStTUvw' OPTION
 do
 case $OPTION  in
   a)
@@ -133,6 +140,9 @@ case $OPTION  in
   U)
    repos=$smvonlyrepos;
    eraserepos=1
+   ;;
+  v)
+   repos=$vklrepos;
    ;;
   w)
    repos=$wikiwebrepos;

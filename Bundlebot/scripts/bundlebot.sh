@@ -74,10 +74,14 @@ FDS_REVISION=
 SMV_REVISION=
 FDS_TAG=
 SMV_TAG=
+INSTALL=
 
-while getopts 'b:cd:fghrtvwX:x:Y:y:' OPTION
+while getopts 'Bb:cd:fghrtvwX:x:Y:y:' OPTION
 do
 case $OPTION  in
+  B)
+   INSTALL=1
+   ;;
   b)
    BRANCH=$OPTARG
    ;;
@@ -294,8 +298,19 @@ if [ "$showparms" == "" ]; then
   fi
 fi
 if [ "$ECHO" == "" ]; then
-  rm -f  $bundle_dir/${installer_base_platform}.tar.gz
-  rm -rf $bundle_dir/${installer_base_platform}
+  LATEST=$bundle_dir/FDS_SMV_latest_$platform.sh
+  BUNDLEBASE=$bundle_dir/${installer_base_platform}
+  if [ -e ${BUNDLEBASE}.sh ]; then
+    rm -f  $LATEST
+    ln -s ${BUNDLEBASE}.sh $LATEST
+  fi
+  cp $REPO_ROOT/bot/Bundlebot/scripts/autoinstall.txt $bundle_dir/.
+  rm -f  ${BUNDLEBASE}.tar.gz
+  rm -rf $BUNDLEBASE
+  if [ "$INSTALL" != "" ]; then
+    cd $bundle_dir
+    cat autoinstall.txt | bash $LATEST >& $HOME/.bundle/bundle_lnx_nightly_install.log
+  fi
 fi
 rm -f $LOCK_FILE
 exit 0
