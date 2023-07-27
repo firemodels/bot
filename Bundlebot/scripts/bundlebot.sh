@@ -299,14 +299,17 @@ if [ "$showparms" == "" ]; then
 fi
 if [ "$ECHO" == "" ]; then
   LATEST=$bundle_dir/FDS_SMV_latest_$platform.sh
-  rm -f  $LATEST
-  ln -s $bundle_dir/${installer_base_platform}.sh $LATEST
+  BUNDLEBASE=$bundle_dir/${installer_base_platform}
+  if [ -e ${BUNDLEBASE}.sh ]; then
+    rm -f  $LATEST
+    ln -s ${BUNDLEBASE}.sh $LATEST
+  fi
   cp $REPO_ROOT/bot/Bundlebot/scripts/autoinstall.txt $bundle_dir/.
-  rm -f  $bundle_dir/${installer_base_platform}.tar.gz
-  rm -rf $bundle_dir/${installer_base_platform}
+  rm -f  ${BUNDLEBASE}.tar.gz
+  rm -rf $BUNDLEBASE
   if [ "$INSTALL" != "" ]; then
     cd $bundle_dir
-    cat autoinstall.txt | bash $LATEST
+    cat autoinstall.txt | bash $LATEST >& $HOME/.bundle/bundle_lnx_nightly_install.log
   fi
 fi
 rm -f $LOCK_FILE
