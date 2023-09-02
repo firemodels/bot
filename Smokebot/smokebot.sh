@@ -1505,6 +1505,7 @@ case $OPTION in
      FDSBRANCH="current"
      CFASTBRANCH="current"
      BOTBRANCH="current"
+     FIGBRANCH="current"
    fi
    ;;
   c)
