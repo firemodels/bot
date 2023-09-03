@@ -1284,18 +1284,18 @@ email_build_status()
   stop_time=`date`
   IFORT_VERSION=`ifort -v 2>&1`
   echo "----------------------------------------------"      > $TIME_LOG
-  echo "host: $hostname "                                   >> $TIME_LOG
-  echo "OS: $platform2"                                     >> $TIME_LOG
+  echo "host/OS: $hostname/$platform2"                      >> $TIME_LOG
   echo "repo: $repo"                                        >> $TIME_LOG
   echo "queue: $SMOKEBOT_QUEUE"                             >> $TIME_LOG
-  echo "fds version/branch: $FDS_REVISION/$FDSBRANCH"       >> $TIME_LOG
-  echo "smv version/branch: $SMV_REVISION/$SMVBRANCH"       >> $TIME_LOG
   echo "bot version/branch: $BOT_REVISION/$BOTBRANCH"       >> $TIME_LOG
-  echo "fig version/branch: $FIG_REVISION/$FIGBRANCH"       >> $TIME_LOG
   echo "cfast version/branch: $CFAST_REVISION/$CFASTBRANCH" >> $TIME_LOG
+  echo "fds version/branch: $FDS_REVISION/$FDSBRANCH"       >> $TIME_LOG
+  echo "fig version/branch: $FIG_REVISION/$FIGBRANCH"       >> $TIME_LOG
+  echo "smv version/branch: $SMV_REVISION/$SMVBRANCH"       >> $TIME_LOG
   if [ "$IFORT_VERSION" != "" ]; then
     echo "Fortran: $IFORT_VERSION "                         >> $TIME_LOG
   fi
+  echo ""                                                   >> $TIME_LOG
   echo "start time: $start_time "                           >> $TIME_LOG
   echo "stop time: $stop_time "                             >> $TIME_LOG
   if [ "$CLONE_REPOS" == "" ]; then
@@ -1318,6 +1318,7 @@ if [ "$DIFF_COMPAREIMAGES" != "" ]; then
 fi
   echo "total: $DIFF_SCRIPT_TIME"                           >> $TIME_LOG
   echo "benchmark time(s): $TOTAL_SMV_TIMES"                >> $TIME_LOG
+  echo ""                                                   >> $TIME_LOG
   DISPLAY_FDS_REVISION=
   DISPLAY_SMV_REVISION=
   if [ "$RUNAUTO" == "y" ]; then
@@ -1357,11 +1358,12 @@ fi
   cd $smokebotdir
   # Check for warnings and errors
   if [[ "$WEB_URL" != "" ]] && [[ "$UPDATED_WEB_IMAGES" == "1" ]]; then
-    echo "               images: $WEB_URL" >> $TIME_LOG
     if [ -e image_differences ]; then
       NUM_CHANGES=`cat image_differences | awk '{print $1}'`
       NUM_ERRORS=`cat image_differences | awk '{print $2}'`
-      echo "image errors/changes: $NUM_ERRORS/$NUM_CHANGES"  >> $TIME_LOG
+      echo "images: URL: $WEB_URL, errors/changes: $NUM_ERRORS/$NUM_CHANGES"  >> $TIME_LOG
+    else
+      echo "images: URL: $WEB_URL" >> $TIME_LOG
     fi
   fi
   if [ "$UPLOADRESULTS" == "1" ]; then
