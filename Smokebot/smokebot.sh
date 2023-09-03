@@ -72,7 +72,7 @@ run_auto()
 
   if [[ "$UPDATEREPO" == "1" ]] ; then
     update_repo smv $SMVBRANCH || return 1
-    update_repo fig master     || return 1
+    update_repo fig $FIGBRANCH || return 1
     update_repo fds $FDSBRANCH || return 1
   fi
 
@@ -1291,7 +1291,7 @@ email_build_status()
   echo "fds version/branch: $FDS_REVISION/$FDSBRANCH"       >> $TIME_LOG
   echo "smv version/branch: $SMV_REVISION/$SMVBRANCH"       >> $TIME_LOG
   echo "bot version/branch: $BOT_REVISION/$BOTBRANCH"       >> $TIME_LOG
-  echo "fig version/branch: $FIG_REVISION/master"           >> $TIME_LOG
+  echo "fig version/branch: $FIG_REVISION/$FIGBRANCH"       >> $TIME_LOG
   echo "cfast version/branch: $CFAST_REVISION/$CFASTBRANCH" >> $TIME_LOG
   if [ "$IFORT_VERSION" != "" ]; then
     echo "Fortran: $IFORT_VERSION "                         >> $TIME_LOG
@@ -1466,6 +1466,7 @@ FDSBRANCH=master
 SMVBRANCH=master
 CFASTBRANCH=master
 BOTBRANCH=master
+FIGBRANCH=master
 
 SMOKEBOT_QUEUE=smokebot
 MAKEMOVIES=0
@@ -1504,6 +1505,7 @@ case $OPTION in
      FDSBRANCH="current"
      CFASTBRANCH="current"
      BOTBRANCH="current"
+     FIGBRANCH="current"
    fi
    ;;
   c)
@@ -1687,7 +1689,11 @@ if [ "$SMVBRANCH" == "current" ]; then
   SMVBRANCH=`git rev-parse --abbrev-ref HEAD`
 fi
 
-CD_REPO $figrepo master ||  exit 1
+CD_REPO $figrepo $FIGBRANCH ||  exit 1
+if [ "$FIGBRANCH" == "current" ]; then
+  cd $figrepo
+  FIGBRANCH=`git rev-parse --abbrev-ref HEAD`
+fi
 
 #save apps and pubs in directories under .smokebot/$SMVBRANCH
 BRANCH_DIR=$HOME/.smokebot/$SMVBRANCH
@@ -1741,14 +1747,16 @@ fi
 echo ""
 echo "Smokebot Settings"
 echo "-----------------"
-echo "    FDS repo: $fdsrepo"
-echo "  FDS branch: $FDSBRANCH"
-echo "    SMV repo: $smvrepo"
-echo "  SMV branch: $SMVBRANCH"
-echo "  CFAST repo: $cfastrepo"
-echo "CFAST branch: $CFASTBRANCH"
 echo "    bot repo: $botrepo"
 echo "  bot branch: $BOTBRANCH"
+echo "  CFAST repo: $cfastrepo"
+echo "CFAST branch: $CFASTBRANCH"
+echo "    FDS repo: $fdsrepo"
+echo "  FDS branch: $FDSBRANCH"
+echo "    FIG repo: $figrepo"
+echo "  FIG branch: $FIGBRANCH"
+echo "    SMV repo: $smvrepo"
+echo "  SMV branch: $SMVBRANCH"
 echo "     Run dir: $smokebotdir"
 if [ "$CLEANREPO" == "1" ]; then
   echo " clean repos: yes"
@@ -1857,7 +1865,7 @@ if [ "$CLEANREPO" == "1" ]; then
   echo "   fds"
   clean_repo2 fds $FDSBRANCH || exit 1
   echo "   fig"
-  clean_repo2 fig master || exit 1
+  clean_repo2 fig $FIGBRANCH || exit 1
   echo "   smv"
   clean_repo2 smv $SMVBRANCH || exit 1
 else
@@ -1875,7 +1883,7 @@ if [ "$UPDATEREPO" == "1" ]; then
     echo "   fds (cloned - not updating)"
   fi
   echo "   fig"
-  update_repo fig master     || exit 1
+  update_repo fig $FIGBRANCH   || exit 1
   if [ "$CLONE_REPOS" == "" ]; then
     echo "   smv"
     update_repo smv $SMVBRANCH || exit 1
