@@ -1287,11 +1287,11 @@ email_build_status()
   echo "host/OS: $hostname/$platform2"                      >> $TIME_LOG
   echo "repo: $repo"                                        >> $TIME_LOG
   echo "queue: $SMOKEBOT_QUEUE"                             >> $TIME_LOG
-  echo "bot version/branch: $BOT_REVISION/$BOTBRANCH"       >> $TIME_LOG
-  echo "cfast version/branch: $CFAST_REVISION/$CFASTBRANCH" >> $TIME_LOG
-  echo "fds version/branch: $FDS_REVISION/$FDSBRANCH"       >> $TIME_LOG
-  echo "fig version/branch: $FIG_REVISION/$FIGBRANCH"       >> $TIME_LOG
-  echo "smv version/branch: $SMV_REVISION/$SMVBRANCH"       >> $TIME_LOG
+  echo "$BOT_REVISION/$BOTBRANCH"                           >> $TIME_LOG
+  echo "$CFAST_REVISION/$CFASTBRANCH"                       >> $TIME_LOG
+  echo "$FDS_REVISION/$FDSBRANCH"                           >> $TIME_LOG
+  echo "$FIG_REVISION/$FIGBRANCH"                           >> $TIME_LOG
+  echo "$SMV_REVISION/$SMVBRANCH"                           >> $TIME_LOG
   if [ "$IFORT_VERSION" != "" ]; then
     echo "Fortran: $IFORT_VERSION "                         >> $TIME_LOG
   fi
