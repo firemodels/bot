@@ -2394,24 +2394,17 @@ echo "--------"
 if [ "$BUILD_ONLY" == "1" ]; then
   echo "Only build apps"
 fi
-echo "     FDS repo: $fdsrepo"
-echo "   FDS branch: $FDSBRANCH"
-echo "     SMV repo: $smvrepo"
-echo "   SMV branch: $SMVBRANCH"
+echo "     CAD repo/branch: $cadrepo/$CADBRANCH"
+echo "     EXP repo/branch: $exprepo/$EXPBRANCH"
+echo "     FDS repo/branch: $fdsrepo/$FDSBRANCH"
+echo "     FIG repo/branch: $figrepo/$FIGBRANCH"
+echo "     SMV repo/branch: $smvrepo/$SMVBRANCH"
+echo "     OUT repo/branch: $outrepo/$OUTBRANCH"
 echo ""
-echo "     CAD repo: $cadrepo"
-echo "   CAD branch: $CADBRANCH"
-echo "     EXP repo: $exprepo"
-echo "   EXP branch: $EXPBRANCH"
-echo "     FIG repo: $figrepo"
-echo "   FIG branch: $FIGBRANCH"
-echo "     OUT repo: $outrepo"
-echo "   OUT branch: $OUTBRANCH"
 echo "      Run dir: $firebotdir"
 if [ "$IFORT_VERSION" != "" ]; then
   echo "      Fortran: $IFORT_VERSION"
 fi
-
 if [ "$SKIPRELEASE" != "" ]; then
   echo "     Skipping: release cases stage"
 fi
