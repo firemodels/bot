@@ -1753,15 +1753,15 @@ email_build_status()
       echo "Fortran: $IFORT_VERSION "                       >> $TIME_LOG
    fi
    echo ""                                                  >> $TIME_LOG
-   echo "fds revision/branch: $FDS_REVISION/$FDSBRANCH "    >> $TIME_LOG
-   echo "smv revision/branch: $SMV_REVISION/$SMVBRANCH "    >> $TIME_LOG
-   echo "bot revision/branch: $BOT_REVISION/$BOTBRANCH "    >> $TIME_LOG
+   echo "$BOT_REVISION/$BOTBRANCH "    >> $TIME_LOG
    if [ "$CAD_REVISION" != "" ]; then
-     echo "cad revision/branch: $CAD_REVISION/$CADBRANCH  " >> $TIME_LOG
+     echo "$CAD_REVISION/$CADBRANCH  " >> $TIME_LOG
    fi
-   echo "exp revision/branch: $EXP_REVISION/$EXPBRANCH "    >> $TIME_LOG
-   echo "fig revision/branch: $FIG_REVISION/$FIGBRANCH "    >> $TIME_LOG
-   echo "out revision/branch: $OUT_REVISION/$OUTBRANCH "    >> $TIME_LOG
+   echo "$EXP_REVISION/$EXPBRANCH "    >> $TIME_LOG
+   echo "$FDS_REVISION/$FDSBRANCH "    >> $TIME_LOG
+   echo "$FIG_REVISION/$FIGBRANCH "    >> $TIME_LOG
+   echo "$OUT_REVISION/$OUTBRANCH "    >> $TIME_LOG
+   echo "$SMV_REVISION/$SMVBRANCH "    >> $TIME_LOG
    echo ""                                                  >> $TIME_LOG
    echo "start time: $start_time "                          >> $TIME_LOG
    echo "stop time: $stop_time "                            >> $TIME_LOG

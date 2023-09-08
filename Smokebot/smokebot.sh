@@ -1288,14 +1288,16 @@ email_build_status()
   echo "OS: $platform2"                                     >> $TIME_LOG
   echo "repo: $repo"                                        >> $TIME_LOG
   echo "queue: $SMOKEBOT_QUEUE"                             >> $TIME_LOG
-  echo "fds version/branch: $FDS_REVISION/$FDSBRANCH"       >> $TIME_LOG
-  echo "smv version/branch: $SMV_REVISION/$SMVBRANCH"       >> $TIME_LOG
-  echo "bot version/branch: $BOT_REVISION/$BOTBRANCH"       >> $TIME_LOG
-  echo "fig version/branch: $FIG_REVISION/master"           >> $TIME_LOG
-  echo "cfast version/branch: $CFAST_REVISION/$CFASTBRANCH" >> $TIME_LOG
   if [ "$IFORT_VERSION" != "" ]; then
     echo "Fortran: $IFORT_VERSION "                         >> $TIME_LOG
   fi
+  echo ""                                                   >> $TIME_LOG
+  echo "$BOT_REVISION/$BOTBRANCH"                           >> $TIME_LOG
+  echo "$CFAST_REVISION/$CFASTBRANCH"                       >> $TIME_LOG
+  echo "$FDS_REVISION/$FDSBRANCH"                           >> $TIME_LOG
+  echo "$FIG_REVISION/master"                               >> $TIME_LOG
+  echo "$SMV_REVISION/$SMVBRANCH"                           >> $TIME_LOG
+  echo ""                                                   >> $TIME_LOG
   echo "start time: $start_time "                           >> $TIME_LOG
   echo "stop time: $stop_time "                             >> $TIME_LOG
   if [ "$CLONE_REPOS" == "" ]; then
@@ -1357,15 +1359,16 @@ fi
   cd $smokebotdir
   # Check for warnings and errors
   if [[ "$WEB_URL" != "" ]] && [[ "$UPDATED_WEB_IMAGES" == "1" ]]; then
-    echo "               images: $WEB_URL" >> $TIME_LOG
     if [ -e image_differences ]; then
       NUM_CHANGES=`cat image_differences | awk '{print $1}'`
       NUM_ERRORS=`cat image_differences | awk '{print $2}'`
-      echo "image errors/changes: $NUM_ERRORS/$NUM_CHANGES"  >> $TIME_LOG
+      echo "images: $WEB_URL, errors/changes: $NUM_ERRORS/$NUM_CHANGES" >> $TIME_LOG
+    else
+      echo "images: $WEB_URL" >> $TIME_LOG
     fi
   fi
   if [ "$UPLOADRESULTS" == "1" ]; then
-    echo "               status: https://pages.nist.gov/fds-smv/smokebot_status.html" >> $TIME_LOG
+    echo "status: https://pages.nist.gov/fds-smv/smokebot_status.html" >> $TIME_LOG
     is_bot=
     if [ `whoami` == "firebot" ]; then
       is_bot=1
@@ -1381,14 +1384,14 @@ fi
       echo  ""                                                  >> output/stage_GHupload
       $UploadGuidesGH                                          &>> output/stage_GHupload
       GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_SMOKEVIEW_TAG
-      echo "               guides: $GITURL"  >> $TIME_LOG
+      echo "guides: $GITURL"  >> $TIME_LOG
     fi
   fi
-  echo "-------------------------------"   >> $TIME_LOG
+  echo ""                                  >> $TIME_LOG
   if [ -e $OUTPUT_DIR/slow_cases ]; then
     echo "cases with longest runtime"      >> $TIME_LOG
     cat $OUTPUT_DIR/slow_cases             >> $TIME_LOG
-    echo "-------------------------------" >> $TIME_LOG
+    echo ""                                >> $TIME_LOG
   fi
   NAMELIST_LOGS="$NAMELIST_NODOC_LOG $NAMELIST_NOSOURCE_LOG"
   if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]; then

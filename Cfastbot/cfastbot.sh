@@ -1286,15 +1286,16 @@ email_build_status()
       echo "Skipping git revert, update, and property fix operations." >> $TIME_LOG
       echo "The current git revision is ${GIT_REVISION}" >> $TIME_LOG
    fi
-   echo "-------------------------------"      >> $TIME_LOG
+   echo ""                                     >> $TIME_LOG
    echo "Host: $hostname "                     >> $TIME_LOG
    echo "repo: $cfastrepo "                    >> $TIME_LOG
-   echo "bot revision: $BOT_REVISION "         >> $TIME_LOG
-   echo "cfast revision: $CFAST_REVISION "     >> $TIME_LOG
-   echo "exp revision: $EXP_REVISION "         >> $TIME_LOG
-   echo "smv revision: $SMV_REVISION "         >> $TIME_LOG
-   echo ""                                     >> $TIME_LOG
    echo "Fortran: $IFORT_VERSION "             >> $TIME_LOG
+   echo ""                                     >> $TIME_LOG
+   echo "$BOT_REVISION "                       >> $TIME_LOG
+   echo "$CFAST_REVISION "                     >> $TIME_LOG
+   echo "$EXP_REVISION "                       >> $TIME_LOG
+   echo "$SMV_REVISION "                       >> $TIME_LOG
+   echo ""                                     >> $TIME_LOG
    echo "Start Time: $start_time "             >> $TIME_LOG
    echo "Stop Time: $stop_time "               >> $TIME_LOG
    if [ "$total_time" != "" ]; then
@@ -1346,7 +1347,8 @@ email_build_status()
          cd $cfastbotdir
          $Guides2GH >& $OUTPUT_DIR/stage_upload
          GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_CFAST_TAG
-         echo "     CFAST Guides: $GITURL" >> $TIME_LOG
+         echo ""                >> $TIME_LOG
+         echo "Guides: $GITURL" >> $TIME_LOG
       fi
       # Send empty email with success message
       cat $TIME_LOG | mail $REPLYTO -s "CFASTbot build success on ${hostname}! Revision ${GIT_REVISION}." $mailTo &> /dev/null
