@@ -72,7 +72,7 @@ run_auto()
 
   if [[ "$UPDATEREPO" == "1" ]] ; then
     update_repo smv $SMVBRANCH || return 1
-    update_repo fig master     || return 1
+    update_repo fig $FIGBRANCH || return 1
     update_repo fds $FDSBRANCH || return 1
   fi
 
@@ -1284,19 +1284,17 @@ email_build_status()
   stop_time=`date`
   IFORT_VERSION=`ifort -v 2>&1`
   echo "----------------------------------------------"      > $TIME_LOG
-  echo "host: $hostname "                                   >> $TIME_LOG
-  echo "OS: $platform2"                                     >> $TIME_LOG
+  echo "host/OS: $hostname/$platform2"                      >> $TIME_LOG
   echo "repo: $repo"                                        >> $TIME_LOG
   echo "queue: $SMOKEBOT_QUEUE"                             >> $TIME_LOG
-  if [ "$IFORT_VERSION" != "" ]; then
-    echo "Fortran: $IFORT_VERSION "                         >> $TIME_LOG
-  fi
-  echo ""                                                   >> $TIME_LOG
   echo "$BOT_REVISION/$BOTBRANCH"                           >> $TIME_LOG
   echo "$CFAST_REVISION/$CFASTBRANCH"                       >> $TIME_LOG
   echo "$FDS_REVISION/$FDSBRANCH"                           >> $TIME_LOG
-  echo "$FIG_REVISION/master"                               >> $TIME_LOG
+  echo "$FIG_REVISION/$FIGBRANCH"                           >> $TIME_LOG
   echo "$SMV_REVISION/$SMVBRANCH"                           >> $TIME_LOG
+  if [ "$IFORT_VERSION" != "" ]; then
+    echo "Fortran: $IFORT_VERSION "                         >> $TIME_LOG
+  fi
   echo ""                                                   >> $TIME_LOG
   echo "start time: $start_time "                           >> $TIME_LOG
   echo "stop time: $stop_time "                             >> $TIME_LOG
@@ -1320,6 +1318,7 @@ if [ "$DIFF_COMPAREIMAGES" != "" ]; then
 fi
   echo "total: $DIFF_SCRIPT_TIME"                           >> $TIME_LOG
   echo "benchmark time(s): $TOTAL_SMV_TIMES"                >> $TIME_LOG
+  echo ""                                                   >> $TIME_LOG
   DISPLAY_FDS_REVISION=
   DISPLAY_SMV_REVISION=
   if [ "$RUNAUTO" == "y" ]; then
@@ -1362,9 +1361,9 @@ fi
     if [ -e image_differences ]; then
       NUM_CHANGES=`cat image_differences | awk '{print $1}'`
       NUM_ERRORS=`cat image_differences | awk '{print $2}'`
-      echo "images: $WEB_URL, errors/changes: $NUM_ERRORS/$NUM_CHANGES" >> $TIME_LOG
+      echo "images: URL: $WEB_URL, errors/changes: $NUM_ERRORS/$NUM_CHANGES"  >> $TIME_LOG
     else
-      echo "images: $WEB_URL" >> $TIME_LOG
+      echo "images: URL: $WEB_URL" >> $TIME_LOG
     fi
   fi
   if [ "$UPLOADRESULTS" == "1" ]; then
@@ -1469,6 +1468,7 @@ FDSBRANCH=master
 SMVBRANCH=master
 CFASTBRANCH=master
 BOTBRANCH=master
+FIGBRANCH=master
 
 SMOKEBOT_QUEUE=smokebot
 MAKEMOVIES=0
@@ -1507,6 +1507,7 @@ case $OPTION in
      FDSBRANCH="current"
      CFASTBRANCH="current"
      BOTBRANCH="current"
+     FIGBRANCH="current"
    fi
    ;;
   c)
@@ -1690,7 +1691,11 @@ if [ "$SMVBRANCH" == "current" ]; then
   SMVBRANCH=`git rev-parse --abbrev-ref HEAD`
 fi
 
-CD_REPO $figrepo master ||  exit 1
+CD_REPO $figrepo $FIGBRANCH ||  exit 1
+if [ "$FIGBRANCH" == "current" ]; then
+  cd $figrepo
+  FIGBRANCH=`git rev-parse --abbrev-ref HEAD`
+fi
 
 #save apps and pubs in directories under .smokebot/$SMVBRANCH
 BRANCH_DIR=$HOME/.smokebot/$SMVBRANCH
@@ -1744,14 +1749,16 @@ fi
 echo ""
 echo "Smokebot Settings"
 echo "-----------------"
-echo "    FDS repo: $fdsrepo"
-echo "  FDS branch: $FDSBRANCH"
-echo "    SMV repo: $smvrepo"
-echo "  SMV branch: $SMVBRANCH"
-echo "  CFAST repo: $cfastrepo"
-echo "CFAST branch: $CFASTBRANCH"
 echo "    bot repo: $botrepo"
 echo "  bot branch: $BOTBRANCH"
+echo "  CFAST repo: $cfastrepo"
+echo "CFAST branch: $CFASTBRANCH"
+echo "    FDS repo: $fdsrepo"
+echo "  FDS branch: $FDSBRANCH"
+echo "    FIG repo: $figrepo"
+echo "  FIG branch: $FIGBRANCH"
+echo "    SMV repo: $smvrepo"
+echo "  SMV branch: $SMVBRANCH"
 echo "     Run dir: $smokebotdir"
 if [ "$CLEANREPO" == "1" ]; then
   echo " clean repos: yes"
@@ -1860,7 +1867,7 @@ if [ "$CLEANREPO" == "1" ]; then
   echo "   fds"
   clean_repo2 fds $FDSBRANCH || exit 1
   echo "   fig"
-  clean_repo2 fig master || exit 1
+  clean_repo2 fig $FIGBRANCH || exit 1
   echo "   smv"
   clean_repo2 smv $SMVBRANCH || exit 1
 else
@@ -1878,7 +1885,7 @@ if [ "$UPDATEREPO" == "1" ]; then
     echo "   fds (cloned - not updating)"
   fi
   echo "   fig"
-  update_repo fig master     || exit 1
+  update_repo fig $FIGBRANCH   || exit 1
   if [ "$CLONE_REPOS" == "" ]; then
     echo "   smv"
     update_repo smv $SMVBRANCH || exit 1
