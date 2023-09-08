@@ -1367,7 +1367,7 @@ fi
     fi
   fi
   if [ "$UPLOADRESULTS" == "1" ]; then
-    echo "               status: https://pages.nist.gov/fds-smv/smokebot_status.html" >> $TIME_LOG
+    echo "status: https://pages.nist.gov/fds-smv/smokebot_status.html" >> $TIME_LOG
     is_bot=
     if [ `whoami` == "firebot" ]; then
       is_bot=1
@@ -1383,14 +1383,14 @@ fi
       echo  ""                                                  >> output/stage_GHupload
       $UploadGuidesGH                                          &>> output/stage_GHupload
       GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_SMOKEVIEW_TAG
-      echo "               guides: $GITURL"  >> $TIME_LOG
+      echo "guides: $GITURL"  >> $TIME_LOG
     fi
   fi
-  echo "-------------------------------"   >> $TIME_LOG
+  echo ""                                  >> $TIME_LOG
   if [ -e $OUTPUT_DIR/slow_cases ]; then
-    echo "cases with longest runtime"      >> $TIME_LOG
+    echo "cases with longest runtime:"      >> $TIME_LOG
     cat $OUTPUT_DIR/slow_cases             >> $TIME_LOG
-    echo "-------------------------------" >> $TIME_LOG
+    echo ""                                >> $TIME_LOG
   fi
   NAMELIST_LOGS="$NAMELIST_NODOC_LOG $NAMELIST_NOSOURCE_LOG"
   if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]; then
