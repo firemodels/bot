@@ -842,7 +842,7 @@ run_verification_cases_release()
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
    RUN_OPT=-Y
    if [ "$LITE" != "" ]; then
-     LITE=-L
+     RUN_OPT=-L
    fi
    ./Run_SMV_Cases.sh $INTEL2 $RUN_OPT -c $cfastrepo -j $JOBPREFIXR $USEINSTALL2 -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
 }
