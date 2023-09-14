@@ -491,7 +491,11 @@ run_verification_cases_debug()
 
    # Submit SMV verification cases and wait for them to start
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3a_vv_dbg 2>&1
-   ./Run_SMV_Cases.sh $INTEL2 -Y -c $cfastrepo $USEINSTALL2 -j $JOBPREFIXD -m 2 -d -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3a_vv_dbg 2>&1 
+   RUN_OPT=-Y
+   if [ "$LITE" != "" ]; then
+     RUN_OPT=-L
+   fi
+   ./Run_SMV_Cases.sh $INTEL2 $RUNOPT -c $cfastrepo $USEINSTALL2 -j $JOBPREFIXD -m 2 -d -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3a_vv_dbg 2>&1 
 }
 
 #---------------------------------------------
@@ -836,7 +840,11 @@ run_verification_cases_release()
    # Start running all SMV verification cases
    cd $smvrepo/Verification/scripts
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
-   ./Run_SMV_Cases.sh $INTEL2 -Y -c $cfastrepo -j $JOBPREFIXR $USEINSTALL2 -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
+   RUN_OPT=-Y
+   if [ "$LITE" != "" ]; then
+     LITE=-L
+   fi
+   ./Run_SMV_Cases.sh $INTEL2 $RUN_OPT -c $cfastrepo -j $JOBPREFIXR $USEINSTALL2 -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
 }
 
 #---------------------------------------------
@@ -991,7 +999,11 @@ make_smv_pictures()
    echo Generating
    echo "   images"
    cd $smvrepo/Verification/scripts
-   ./Make_SMV_Pictures.sh -Y -q $SMOKEBOT_QUEUE -j SMV_ $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4a_picts
+   RUN_OPT=-Y
+   if [ "$LITE" != "" ]; then
+     RUN_OPT=-L
+   fi
+   ./Make_SMV_Pictures.sh $RUN_OPT -q $SMOKEBOT_QUEUE -j SMV_ $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4a_picts
    grep -v FreeFontPath $OUTPUT_DIR/stage4a_picts &> $OUTPUT_DIR/stage4b_picts
 }
 
@@ -1488,6 +1500,7 @@ SMV_TAG=
 CHECKOUT=
 compile_errors=
 GITURL=
+LITE=
 
 #*** save pid so -k option (kill smokebot) may be used lateer
 
@@ -1495,7 +1508,7 @@ echo $$ > $PID_FILE
 
 #*** parse command line options
 
-while getopts 'ab:cJm:Mq:R:uUw:W:x:X:y:Y:' OPTION
+while getopts 'ab:cJLm:Mq:R:uUw:W:x:X:y:Y:' OPTION
 do
 case $OPTION in
   a)
@@ -1516,6 +1529,9 @@ case $OPTION in
   J)
    MPI_TYPE=impi
    INTEL2="-J"
+   ;;
+  L)
+   LITE=1
    ;;
   m)
    mailTo="$OPTARG"
@@ -2057,13 +2073,15 @@ fi
 
 if [[ $stage_ver_release_success ]] ; then
    MAKEGUIDES_beg=`GET_TIME`
-   echo Making guides
-   echo "   user"
-   make_guide SMV_User_Guide                $smvrepo/Manuals/SMV_User_Guide                SMV_User_Guide
-   echo "   technical"
-   make_guide SMV_Technical_Reference_Guide $smvrepo/Manuals/SMV_Technical_Reference_Guide SMV_Technical_Reference_Guide
-   echo "   verification"
-   make_guide SMV_Verification_Guide        $smvrepo/Manuals/SMV_Verification_Guide        SMV_Verification_Guide
+   if [ "$LITE" == "" ]; then
+     echo Making guides
+     echo "   user"
+     make_guide SMV_User_Guide                $smvrepo/Manuals/SMV_User_Guide                SMV_User_Guide
+     echo "   technical"
+     make_guide SMV_Technical_Reference_Guide $smvrepo/Manuals/SMV_Technical_Reference_Guide SMV_Technical_Reference_Guide
+     echo "   verification"
+     make_guide SMV_Verification_Guide        $smvrepo/Manuals/SMV_Verification_Guide        SMV_Verification_Guide
+   fi
 
    if [ -d $SMV_SUMMARY_DIR ]; then
      DATE=`date +"%b %d, %Y - %r"`

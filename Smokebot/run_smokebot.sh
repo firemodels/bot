@@ -33,6 +33,7 @@ echo "-G firebot_home - home directory where firebot was run"
 echo "   The -g and -G options are used when cloning repos (-R option)"
 echo "   to build apps using the same repo revisions as used with the last"
 echo "   successful firebot run"
+echo "-L run smokebot in 'lite' mode - run a subset of cases, don't build manuals"
 echo "-o - specify GH_OWNER when uploading manuals. [default: $GH_OWNER]"
 echo "-r - specify GH_REPO when uploading manuals. [default: $GH_REPO]"
 echo "-R release_type (master, release or test) - clone fds, exp, fig, out and smv repos"
@@ -173,6 +174,7 @@ FIREBOT_HOME=
 WEB_DIR=
 USE_BOT_QFDS=
 WEB_ROOT=/var/www/html
+LITE=
 
 #*** check to see if a queing system is available
 
@@ -184,7 +186,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'abcfg:G:hHJkm:Mo:Pq:r:R:TuUvw:W:x:X:y:Y:' OPTION
+while getopts 'abcfg:G:hHJkLm:Mo:Pq:r:R:TuUvw:W:x:X:y:Y:' OPTION
 do
 case $OPTION  in
   a)
@@ -216,6 +218,9 @@ case $OPTION  in
    ;;
   k)
    KILL_SMOKEBOT=1
+   ;;
+  L)
+   LITE="-L"
    ;;
   m)
    EMAIL="$OPTARG"
@@ -419,7 +424,7 @@ BRANCH="-b $BRANCH"
 #*** run smokebot
 
 touch $smokebot_pid
-$ECHO ./$botscript $SIZE $BRANCH $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $CLONE_REPOS $RUNAUTO $INTEL $CLEANREPO $WEB_DIR $WEB_ROOT $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $SIZE $BRANCH $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $CLONE_REPOS $LITE $RUNAUTO $INTEL $CLEANREPO $WEB_DIR $WEB_ROOT $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi
