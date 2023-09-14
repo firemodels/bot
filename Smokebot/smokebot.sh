@@ -491,11 +491,15 @@ run_verification_cases_debug()
 
    # Submit SMV verification cases and wait for them to start
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3a_vv_dbg 2>&1
-   RUN_OPT=-Y
+   RUNOPT=-Y
    if [ "$LITE" != "" ]; then
-     RUN_OPT=-L
+     RUNOPT=-L
    fi
-   ./Run_SMV_Cases.sh $INTEL2 $RUNOPT -c $cfastrepo $USEINSTALL2 -j $JOBPREFIXD -m 2 -d -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3a_vv_dbg 2>&1 
+   COMPOPT=
+   if [ "$COMPILER" == "gnu" ]; then
+     COMPOPT=-C
+   fi
+   ./Run_SMV_Cases.sh $INTEL2 $RUNOPT $COMPOPT -c $cfastrepo $USEINSTALL2 -j $JOBPREFIXD -m 2 -d -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3a_vv_dbg 2>&1 
 }
 
 #---------------------------------------------
@@ -840,11 +844,15 @@ run_verification_cases_release()
    # Start running all SMV verification cases
    cd $smvrepo/Verification/scripts
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
-   RUN_OPT=-Y
+   RUNOPT=-Y
    if [ "$LITE" != "" ]; then
-     RUN_OPT=-L
+     RUNOPT=-L
    fi
-   ./Run_SMV_Cases.sh $INTEL2 $RUN_OPT -c $cfastrepo -j $JOBPREFIXR $USEINSTALL2 -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
+   COMPOPT=
+   if [ "$COMPILER" == "gnu" ]; then
+     COMPOPT=-C
+   fi
+   ./Run_SMV_Cases.sh $INTEL2 $RUNOPT $COMPOPT -c $cfastrepo -j $JOBPREFIXR $USEINSTALL2 -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
 }
 
 #---------------------------------------------
@@ -999,11 +1007,15 @@ make_smv_pictures()
    echo Generating
    echo "   images"
    cd $smvrepo/Verification/scripts
-   RUN_OPT=-Y
+   RUNOPT=-Y
    if [ "$LITE" != "" ]; then
-     RUN_OPT=-L
+     RUNOPT=-L
    fi
-   ./Make_SMV_Pictures.sh $RUN_OPT -q $SMOKEBOT_QUEUE -j SMV_ $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4a_picts
+   COMPOPT=
+   if [ "$COMPILER" == "gnu" ]; then
+     COMPOPT=-C
+   fi
+   ./Make_SMV_Pictures.sh $RUNOPT $COMPOPT -q $SMOKEBOT_QUEUE -j SMV_ $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4a_picts
    grep -v FreeFontPath $OUTPUT_DIR/stage4a_picts &> $OUTPUT_DIR/stage4b_picts
 }
 
@@ -1508,7 +1520,7 @@ echo $$ > $PID_FILE
 
 #*** parse command line options
 
-while getopts 'ab:cJLm:Mq:R:uUw:W:x:X:y:Y:' OPTION
+while getopts 'ab:cCJLm:Mq:R:uUw:W:x:X:y:Y:' OPTION
 do
 case $OPTION in
   a)
@@ -1525,6 +1537,9 @@ case $OPTION in
    ;;
   c)
    CLEANREPO=1
+   ;;
+  C)
+   COMPILER=gnu
    ;;
   J)
    MPI_TYPE=impi
