@@ -1834,21 +1834,6 @@ fi
       echo ""                         >> $TIME_LOG
    fi
 
-#  upload guides to a google drive directory
-   get_firebot_success
-   if [[ "$UPLOADGUIDES" == "1" ]] && [[ "$firebot_success" == "1" ]]; then
-     cd $firebotdir
-     $UploadGuides $NEWGUIDE_DIR $fdsrepo/Manuals &> $OUTPUT_DIR/stage10_upload_google
-     if [[ `grep -i -E 'warning' $OUTPUT_DIR/stage10_upload_google` == "" ]]; then
-       # Continue along
-       :
-      else
-        echo "Warnings from Stage 10 - Upload documents to google drive:" >> $WARNING_LOG
-        grep -i -E 'warning' $OUTPUT_DIR/stage10_upload_google >> $WARNING_LOG
-        echo "" >> $WARNING_LOG
-     fi
-   fi
-
    # Check for warnings and errors
    NAMELIST_LOGS="$NAMELIST_NODOC_LOG $NAMELIST_NOSOURCE_LOG"
    if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]
@@ -2383,7 +2368,6 @@ else
    notfound=`gcc -help 2>&1 | tail -1 | grep "not found" | wc -l`
 fi
 
-UploadGuides=$botrepo/Firebot/fds_guides2GD.sh
 UploadGuidesGH=$botrepo/Firebot/fds_guides2GH.sh
 COPY_FDS_APPS=$botrepo/Firebot/copy_fds_apps.sh
 COPY_SMV_APPS=$botrepo/Firebot/copy_smv_apps.sh
