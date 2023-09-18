@@ -41,3 +41,4 @@ export DISPLAY=:0
 
 To run smokeview, you need to also run Xming on your PC.
 
+
