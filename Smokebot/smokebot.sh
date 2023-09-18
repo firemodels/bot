@@ -831,7 +831,7 @@ wait_verification_cases_end()
 }
 
 #---------------------------------------------
-#                   run_verification_cases_relase
+#                   run_verification_cases_release
 #---------------------------------------------
 
 run_verification_cases_release()
@@ -1540,6 +1540,8 @@ case $OPTION in
    ;;
   C)
    COMPILER=gnu
+   MPI_TYPE=ompi
+   export OMP_NUM_THREADS=1
    ;;
   J)
    MPI_TYPE=impi
@@ -1766,7 +1768,11 @@ fi
 if [[ "$IFORT_COMPILER" != "" ]] ; then
   source $IFORT_COMPILER/bin/compilervars.sh intel64
 fi 
-notfound=`icc -help 2>&1 | tail -1 | grep "not found" | wc -l`
+if [ "$COMPILER" == "gnu" ]; then
+  notfound=`gcc -help 2>&1 | tail -1 | grep "not found" | wc -l`
+else
+  notfound=`icc -help 2>&1 | tail -1 | grep "not found" | wc -l`
+fi
 if [ "$notfound" == "1" ] ; then
   export haveCC="0"
   USEINSTALL="-i"
