@@ -491,7 +491,15 @@ run_verification_cases_debug()
 
    # Submit SMV verification cases and wait for them to start
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3a_vv_dbg 2>&1
-   ./Run_SMV_Cases.sh $INTEL2 -Y -c $cfastrepo $USEINSTALL2 -j $JOBPREFIXD -m 2 -d -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3a_vv_dbg 2>&1 
+   RUNOPT=-Y
+   if [ "$LITE" != "" ]; then
+     RUNOPT=-L
+   fi
+   COMPOPT=
+   if [ "$COMPILER" == "gnu" ]; then
+     COMPOPT=-C
+   fi
+   ./Run_SMV_Cases.sh $INTEL2 $RUNOPT $COMPOPT -c $cfastrepo $USEINSTALL2 -j $JOBPREFIXD -m 2 -d -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3a_vv_dbg 2>&1 
 }
 
 #---------------------------------------------
@@ -823,7 +831,7 @@ wait_verification_cases_end()
 }
 
 #---------------------------------------------
-#                   run_verification_cases_relase
+#                   run_verification_cases_release
 #---------------------------------------------
 
 run_verification_cases_release()
@@ -836,7 +844,15 @@ run_verification_cases_release()
    # Start running all SMV verification cases
    cd $smvrepo/Verification/scripts
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
-   ./Run_SMV_Cases.sh $INTEL2 -Y -c $cfastrepo -j $JOBPREFIXR $USEINSTALL2 -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
+   RUNOPT=-Y
+   if [ "$LITE" != "" ]; then
+     RUNOPT=-L
+   fi
+   COMPOPT=
+   if [ "$COMPILER" == "gnu" ]; then
+     COMPOPT=-C
+   fi
+   ./Run_SMV_Cases.sh $INTEL2 $RUNOPT $COMPOPT -c $cfastrepo -j $JOBPREFIXR $USEINSTALL2 -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
 }
 
 #---------------------------------------------
@@ -991,7 +1007,15 @@ make_smv_pictures()
    echo Generating
    echo "   images"
    cd $smvrepo/Verification/scripts
-   ./Make_SMV_Pictures.sh -Y -q $SMOKEBOT_QUEUE -j SMV_ $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4a_picts
+   RUNOPT=-Y
+   if [ "$LITE" != "" ]; then
+     RUNOPT=-L
+   fi
+   COMPOPT=
+   if [ "$COMPILER" == "gnu" ]; then
+     COMPOPT=-C
+   fi
+   ./Make_SMV_Pictures.sh $RUNOPT $COMPOPT -q $SMOKEBOT_QUEUE -j SMV_ $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4a_picts
    grep -v FreeFontPath $OUTPUT_DIR/stage4a_picts &> $OUTPUT_DIR/stage4b_picts
 }
 
@@ -1488,6 +1512,7 @@ SMV_TAG=
 CHECKOUT=
 compile_errors=
 GITURL=
+LITE=
 
 #*** save pid so -k option (kill smokebot) may be used lateer
 
@@ -1495,7 +1520,7 @@ echo $$ > $PID_FILE
 
 #*** parse command line options
 
-while getopts 'ab:cJm:Mq:R:uUw:W:x:X:y:Y:' OPTION
+while getopts 'ab:cCJLm:Mq:R:uUw:W:x:X:y:Y:' OPTION
 do
 case $OPTION in
   a)
@@ -1513,9 +1538,17 @@ case $OPTION in
   c)
    CLEANREPO=1
    ;;
+  C)
+   COMPILER=gnu
+   MPI_TYPE=ompi
+   export OMP_NUM_THREADS=1
+   ;;
   J)
    MPI_TYPE=impi
    INTEL2="-J"
+   ;;
+  L)
+   LITE=1
    ;;
   m)
    mailTo="$OPTARG"
@@ -1735,7 +1768,11 @@ fi
 if [[ "$IFORT_COMPILER" != "" ]] ; then
   source $IFORT_COMPILER/bin/compilervars.sh intel64
 fi 
-notfound=`icc -help 2>&1 | tail -1 | grep "not found" | wc -l`
+if [ "$COMPILER" == "gnu" ]; then
+  notfound=`gcc -help 2>&1 | tail -1 | grep "not found" | wc -l`
+else
+  notfound=`icc -help 2>&1 | tail -1 | grep "not found" | wc -l`
+fi
 if [ "$notfound" == "1" ] ; then
   export haveCC="0"
   USEINSTALL="-i"
