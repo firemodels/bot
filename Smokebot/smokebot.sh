@@ -145,7 +145,9 @@ run_auto()
     fi
   fi
   echo -e "Smokebot run initiated." >> $MESSAGE_FILE
-  cat $MESSAGE_FILE | mail $REPLYTO -s "smokebot run initiated" $mailTo > /dev/null
+  if [ "$HAVEMAIL" != "" ]; then
+    cat $MESSAGE_FILE | mail $REPLYTO -s "smokebot run initiated" $mailTo > /dev/null
+  fi
   return 0
 }
 
@@ -209,8 +211,7 @@ check_time_limit()
       CURRENT_TIME=$(date +%s)
       ELAPSED_TIME=$(echo "$CURRENT_TIME-$START_TIME"|bc)
 
-      if [ $ELAPSED_TIME -gt $TIME_LIMIT ]
-      then
+      if [[ "$HAVEMAIL" != "" ]] && [[ $ELAPSED_TIME -gt $TIME_LIMIT ]]; then
          echo -e "smokebot has been running for more than 12 hours in Stage ${TIME_LIMIT_STAGE}. \n\nPlease ensure that there are no problems. \n\nThis is a notification only and does not terminate smokebot." | mail $REPLYTO -s "smokebot Notice: smokebot has been running for more than 12 hours." $mailTo > /dev/null
          TIME_LIMIT_EMAIL_NOTIFICATION="sent"
       fi
@@ -1286,7 +1287,7 @@ email_compile_errors()
     cat $WARNING_LOG >> $SMOKEBOT_LOG
   fi 
 
-  if [[ -e $SMOKEBOT_LOG ]]; then
+  if [[ "$HAVEMAIL" != "" ]] && [[ -e $SMOKEBOT_LOG ]]; then
     cat $SMOKEBOT_LOG | mail $REPLYTO -s "smokebot compile errors and/or warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailToSMV > /dev/null
     rm -f $SMOKEBOT_LOG
   fi
@@ -1417,19 +1418,23 @@ fi
     echo ""                                >> $TIME_LOG
   fi
   NAMELIST_LOGS="$NAMELIST_NODOC_LOG $NAMELIST_NOSOURCE_LOG"
-  if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]; then
+  if [[ "$HAVEMAIL" != "" ]] && [[ -e $WARNING_LOG && -e $ERROR_LOG ]]; then
     # Send email with failure message and warnings, body of email contains appropriate log file
     cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot failure and warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
 
   # Check for errors only
   elif [ -e $ERROR_LOG ]; then
     # Send email with failure message, body of email contains error log file
-    cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot failure on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+    if [ "$HAVEMAIL" != "" ]; then
+      cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot failure on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+    fi
 
   # Check for warnings only
   elif [ -e $WARNING_LOG ]; then
      # Send email with success message, include warnings
-    cat $WARNING_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot success with warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+    if [ "$HAVEMAIL" != "" ]; then
+      cat $WARNING_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot success with warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+    fi
 
   # No errors or warnings
   else
@@ -1443,7 +1448,9 @@ fi
 
       # Send success message with links to nightly manuals
 
-    cat $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot success on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+    if [ "$HAVEMAIL" != "" ]; then
+      cat $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot success on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+    fi
 
 # save apps that were built for bundling
 
@@ -1513,6 +1520,7 @@ CHECKOUT=
 compile_errors=
 GITURL=
 LITE=
+HAVEMAIL=`which mail`
 
 #*** save pid so -k option (kill smokebot) may be used lateer
 
