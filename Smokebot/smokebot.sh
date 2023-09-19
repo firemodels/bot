@@ -2094,15 +2094,13 @@ fi
 
 if [[ $stage_ver_release_success ]] ; then
    MAKEGUIDES_beg=`GET_TIME`
-   if [ "$LITE" == "" ]; then
-     echo Making guides
-     echo "   user"
-     make_guide SMV_User_Guide                $smvrepo/Manuals/SMV_User_Guide                SMV_User_Guide
-     echo "   technical"
-     make_guide SMV_Technical_Reference_Guide $smvrepo/Manuals/SMV_Technical_Reference_Guide SMV_Technical_Reference_Guide
-     echo "   verification"
-     make_guide SMV_Verification_Guide        $smvrepo/Manuals/SMV_Verification_Guide        SMV_Verification_Guide
-   fi
+   echo Making guides
+   echo "   user"
+   make_guide SMV_User_Guide                $smvrepo/Manuals/SMV_User_Guide                SMV_User_Guide
+   echo "   technical"
+   make_guide SMV_Technical_Reference_Guide $smvrepo/Manuals/SMV_Technical_Reference_Guide SMV_Technical_Reference_Guide
+   echo "   verification"
+   make_guide SMV_Verification_Guide        $smvrepo/Manuals/SMV_Verification_Guide        SMV_Verification_Guide
 
    if [ -d $SMV_SUMMARY_DIR ]; then
      DATE=`date +"%b %d, %Y - %r"`
