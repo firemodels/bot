@@ -1520,7 +1520,7 @@ CHECKOUT=
 compile_errors=
 GITURL=
 LITE=
-HAVEMAIL=`which mail`
+HAVEMAIL=`which mail |& grep -v 'no mail'`
 
 #*** save pid so -k option (kill smokebot) may be used lateer
 
