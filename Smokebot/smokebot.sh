@@ -1421,12 +1421,14 @@ fi
   if [[ "$HAVEMAIL" != "" ]] && [[ -e $WARNING_LOG && -e $ERROR_LOG ]]; then
     # Send email with failure message and warnings, body of email contains appropriate log file
     cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot failure and warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+    cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS > $FULL_LOG
 
   # Check for errors only
   elif [ -e $ERROR_LOG ]; then
     # Send email with failure message, body of email contains error log file
     if [ "$HAVEMAIL" != "" ]; then
       cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot failure on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+      cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS > $FULL_LOG
     fi
 
   # Check for warnings only
@@ -1434,6 +1436,7 @@ fi
      # Send email with success message, include warnings
     if [ "$HAVEMAIL" != "" ]; then
       cat $WARNING_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot success with warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+      cat $WARNING_LOG $TIME_LOG $NAMELIST_LOGS > $FULL_LOG
     fi
 
   # No errors or warnings
@@ -1450,6 +1453,7 @@ fi
 
     if [ "$HAVEMAIL" != "" ]; then
       cat $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot success on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+      cat $TIME_LOG $NAMELIST_LOGS > $FULL_LOG
     fi
 
 # save apps that were built for bundling
@@ -1462,6 +1466,9 @@ fi
 
     rm -f $BRANCHPUBS_DIR/*
     cp $LATESTPUBS_DIR/* $BRANCHPUBS_DIR/.
+  fi
+  if [ "$HAVEMAIL" == "" ]; then
+    cat $FULL_LOG
   fi
 }
 
@@ -1485,6 +1492,7 @@ PUBS_DIR=$HOME/.smokebot/pubs
 EMAIL_LIST="$HOME/.smokebot/smokebot_email_list.sh"
 TIME_LOG=$OUTPUT_DIR/timings
 ERROR_LOG=$OUTPUT_DIR/errors
+FULL_LOG=$OUTPUT_DIR/full_log
 WARNING_LOG=$OUTPUT_DIR/warnings
 FYI_LOG=$OUTPUT_DIR/fyis
 STAGE_STATUS=$OUTPUT_DIR/stage_status
@@ -2203,5 +2211,7 @@ save_manuals_dir
 if [[ $stage_ver_release_success ]] ; then
   archive_timing_stats
 fi
-echo "   emailing results"
+if [ "$HAVEMAIL" != "" ]; then
+  echo "   emailing results"
+fi
 email_build_status
