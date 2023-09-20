@@ -1624,15 +1624,6 @@ if [[ "$SMOKEBOT_QUEUE" == "none" ]] && [[ -e $SCRIPTFILES ]]; then
   rm -f $SCRIPTFILES
 fi
 
-if [ "$SMOKEBOT_QUEUE" == "none" ]; then
-  notfound=`$BACKGROUND -v 2>&1 | tail -1 | grep "not found" | wc -l`
-  if [ $notfound -eq 1 ]; then
-    echo "Error: The program $BACKGROUND"
-    echo "       was not built, smokebot aborted."
-    exit
-  fi
-fi
-
 #*** create pub directory
 
 MKDIR $HOME/.smokebot
