@@ -1307,7 +1307,11 @@ email_build_status()
   fi
   echo $THIS_FDS_FAILED>$FDS_STATUS_FILE
   stop_time=`date`
-  IFORT_VERSION=`ifort -v 2>&1`
+  if [ "$COMPILER" == "intel" ]; then
+    IFORT_VERSION=`ifort -v 2>&1`
+  else
+    IFORT_VERSION=`gfortran --version | head -1`
+  fi
   echo "----------------------------------------------"      > $TIME_LOG
   echo "host/OS: $hostname/$platform2"                      >> $TIME_LOG
   echo "repo: $repo"                                        >> $TIME_LOG
@@ -1794,17 +1798,12 @@ fi
 echo ""
 echo "Smokebot Settings"
 echo "-----------------"
-echo "    bot repo: $botrepo"
-echo "  bot branch: $BOTBRANCH"
-echo "  CFAST repo: $cfastrepo"
-echo "CFAST branch: $CFASTBRANCH"
-echo "    FDS repo: $fdsrepo"
-echo "  FDS branch: $FDSBRANCH"
-echo "    FIG repo: $figrepo"
-echo "  FIG branch: $FIGBRANCH"
-echo "    SMV repo: $smvrepo"
-echo "  SMV branch: $SMVBRANCH"
-echo "     Run dir: $smokebotdir"
+echo "    bot repo;branch: $botrepo;$BOTBRANCH"
+echo "  CFAST repo;branch: $cfastrepo;$CFASTBRANCH"
+echo "    FDS repo;branch: $fdsrepo;$FDSBRANCH"
+echo "    FIG repo;branch: $figrepo;$FIGBRANCH"
+echo "    SMV repo;branch: $smvrepo;$SMVBRANCH"
+echo "      run directory: $smokebotdir"
 if [ "$CLEANREPO" == "1" ]; then
   echo " clean repos: yes"
 else
