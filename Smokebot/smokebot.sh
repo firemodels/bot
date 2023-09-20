@@ -1420,7 +1420,7 @@ fi
   NAMELIST_LOGS="$NAMELIST_NODOC_LOG $NAMELIST_NOSOURCE_LOG"
   if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]; then
     # Send email with failure message and warnings, body of email contains appropriate log file
-    if [ "$HAVEMAIL != "" ]; then
+    if [ "$HAVEMAIL" != "" ]; then
       cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot failure and warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
     fi
     cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS > $FULL_LOG
