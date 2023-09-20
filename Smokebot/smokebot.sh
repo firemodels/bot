@@ -1418,9 +1418,11 @@ fi
     echo ""                                >> $TIME_LOG
   fi
   NAMELIST_LOGS="$NAMELIST_NODOC_LOG $NAMELIST_NOSOURCE_LOG"
-  if [[ "$HAVEMAIL" != "" ]] && [[ -e $WARNING_LOG && -e $ERROR_LOG ]]; then
+  if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]; then
     # Send email with failure message and warnings, body of email contains appropriate log file
-    cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot failure and warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+    if [ "$HAVEMAIL != "" ]; then
+      cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot failure and warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+    fi
     cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS > $FULL_LOG
 
   # Check for errors only
@@ -1428,16 +1430,16 @@ fi
     # Send email with failure message, body of email contains error log file
     if [ "$HAVEMAIL" != "" ]; then
       cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot failure on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
-      cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS > $FULL_LOG
     fi
+    cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS > $FULL_LOG
 
   # Check for warnings only
   elif [ -e $WARNING_LOG ]; then
      # Send email with success message, include warnings
     if [ "$HAVEMAIL" != "" ]; then
       cat $WARNING_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot success with warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
-      cat $WARNING_LOG $TIME_LOG $NAMELIST_LOGS > $FULL_LOG
     fi
+    cat $WARNING_LOG $TIME_LOG $NAMELIST_LOGS > $FULL_LOG
 
   # No errors or warnings
   else
@@ -1453,8 +1455,8 @@ fi
 
     if [ "$HAVEMAIL" != "" ]; then
       cat $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot success on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
-      cat $TIME_LOG $NAMELIST_LOGS > $FULL_LOG
     fi
+    cat $TIME_LOG $NAMELIST_LOGS > $FULL_LOG
 
 # save apps that were built for bundling
 
