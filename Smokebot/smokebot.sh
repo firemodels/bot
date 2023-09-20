@@ -1307,7 +1307,11 @@ email_build_status()
   fi
   echo $THIS_FDS_FAILED>$FDS_STATUS_FILE
   stop_time=`date`
-  IFORT_VERSION=`ifort -v 2>&1`
+  if [ "$COMPILER" == "intel" ]; then
+    IFORT_VERSION=`ifort -v 2>&1`
+  else
+    IFORT_VERSION=`gfortran --version | head -1`
+  fi
   echo "----------------------------------------------"      > $TIME_LOG
   echo "host/OS: $hostname/$platform2"                      >> $TIME_LOG
   echo "repo: $repo"                                        >> $TIME_LOG
@@ -1418,9 +1422,12 @@ fi
     echo ""                                >> $TIME_LOG
   fi
   NAMELIST_LOGS="$NAMELIST_NODOC_LOG $NAMELIST_NOSOURCE_LOG"
-  if [[ "$HAVEMAIL" != "" ]] && [[ -e $WARNING_LOG && -e $ERROR_LOG ]]; then
+  if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]; then
     # Send email with failure message and warnings, body of email contains appropriate log file
-    cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot failure and warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+    if [ "$HAVEMAIL" != "" ]; then
+      cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot failure and warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+    fi
+    cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS > $FULL_LOG
 
   # Check for errors only
   elif [ -e $ERROR_LOG ]; then
@@ -1428,6 +1435,7 @@ fi
     if [ "$HAVEMAIL" != "" ]; then
       cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot failure on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
     fi
+    cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS > $FULL_LOG
 
   # Check for warnings only
   elif [ -e $WARNING_LOG ]; then
@@ -1435,6 +1443,7 @@ fi
     if [ "$HAVEMAIL" != "" ]; then
       cat $WARNING_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot success with warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
     fi
+    cat $WARNING_LOG $TIME_LOG $NAMELIST_LOGS > $FULL_LOG
 
   # No errors or warnings
   else
@@ -1451,6 +1460,7 @@ fi
     if [ "$HAVEMAIL" != "" ]; then
       cat $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot success on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
     fi
+    cat $TIME_LOG $NAMELIST_LOGS > $FULL_LOG
 
 # save apps that were built for bundling
 
@@ -1462,6 +1472,9 @@ fi
 
     rm -f $BRANCHPUBS_DIR/*
     cp $LATESTPUBS_DIR/* $BRANCHPUBS_DIR/.
+  fi
+  if [ "$HAVEMAIL" == "" ]; then
+    cat $FULL_LOG
   fi
 }
 
@@ -1485,6 +1498,7 @@ PUBS_DIR=$HOME/.smokebot/pubs
 EMAIL_LIST="$HOME/.smokebot/smokebot_email_list.sh"
 TIME_LOG=$OUTPUT_DIR/timings
 ERROR_LOG=$OUTPUT_DIR/errors
+FULL_LOG=$OUTPUT_DIR/full_log
 WARNING_LOG=$OUTPUT_DIR/warnings
 FYI_LOG=$OUTPUT_DIR/fyis
 STAGE_STATUS=$OUTPUT_DIR/stage_status
@@ -1622,16 +1636,6 @@ fi
 
 if [[ "$SMOKEBOT_QUEUE" == "none" ]] && [[ -e $SCRIPTFILES ]]; then
   rm -f $SCRIPTFILES
-fi
-
-if [ "$SMOKEBOT_QUEUE" == "none" ]; then
-  notfound=`background -v 2>&1 | tail -1 | grep "not found" | wc -l`
-  if [ $notfound -eq 1 ]; then
-    echo "Error: The program background was not found.  smokebot aborted"
-    echo "       Add the directory containing background to your path"
-    echo "       (same directory containing fds and smokeview)"
-    exit
-  fi
 fi
 
 #*** create pub directory
@@ -1794,17 +1798,12 @@ fi
 echo ""
 echo "Smokebot Settings"
 echo "-----------------"
-echo "    bot repo: $botrepo"
-echo "  bot branch: $BOTBRANCH"
-echo "  CFAST repo: $cfastrepo"
-echo "CFAST branch: $CFASTBRANCH"
-echo "    FDS repo: $fdsrepo"
-echo "  FDS branch: $FDSBRANCH"
-echo "    FIG repo: $figrepo"
-echo "  FIG branch: $FIGBRANCH"
-echo "    SMV repo: $smvrepo"
-echo "  SMV branch: $SMVBRANCH"
-echo "     Run dir: $smokebotdir"
+echo "    bot repo;branch: $botrepo;$BOTBRANCH"
+echo "  CFAST repo;branch: $cfastrepo;$CFASTBRANCH"
+echo "    FDS repo;branch: $fdsrepo;$FDSBRANCH"
+echo "    FIG repo;branch: $figrepo;$FIGBRANCH"
+echo "    SMV repo;branch: $smvrepo;$SMVBRANCH"
+echo "      run directory: $smokebotdir"
 if [ "$CLEANREPO" == "1" ]; then
   echo " clean repos: yes"
 else
@@ -2213,5 +2212,7 @@ save_manuals_dir
 if [[ $stage_ver_release_success ]] ; then
   archive_timing_stats
 fi
-echo "   emailing results"
+if [ "$HAVEMAIL" != "" ]; then
+  echo "   emailing results"
+fi
 email_build_status
