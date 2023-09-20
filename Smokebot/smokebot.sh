@@ -1625,11 +1625,10 @@ if [[ "$SMOKEBOT_QUEUE" == "none" ]] && [[ -e $SCRIPTFILES ]]; then
 fi
 
 if [ "$SMOKEBOT_QUEUE" == "none" ]; then
-  notfound=`background -v 2>&1 | tail -1 | grep "not found" | wc -l`
+  notfound=`$BACKGROUND -v 2>&1 | tail -1 | grep "not found" | wc -l`
   if [ $notfound -eq 1 ]; then
-    echo "Error: The program background was not found.  smokebot aborted"
-    echo "       Add the directory containing background to your path"
-    echo "       (same directory containing fds and smokeview)"
+    echo "Error: The program $BACKGROUND"
+    echo "       was not built, smokebot aborted."
     exit
   fi
 fi
