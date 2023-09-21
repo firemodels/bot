@@ -501,7 +501,7 @@ run_verification_cases_debug()
    if [ "$COMPILER" == "gnu" ]; then
      COMPOPT=-C
    fi
-   ./Run_SMV_Cases.sh $INTEL2 $RUNOPT $COMPOPT -c $cfastrepo $USEINSTALL2 -j $JOBPREFIXD -m 2 -d -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3a_vv_dbg 2>&1 
+   ./Run_SMV_Cases.sh $INTEL2 $RUNOPT $COMPOPT -c $cfastrepo $USEINSTALL2 -j $JOBPREFIXD -m 2 -d -q $QUEUE >> $OUTPUT_DIR/stage3a_vv_dbg 2>&1 
 }
 
 #---------------------------------------------
@@ -780,10 +780,6 @@ check_smv_utilities()
           echo ""
           echo "error: background failed to compile"         >> $ERROR_LOG
           echo "       $BACKGROUND does not exist"           >> $ERROR_LOG
-        else
-          if [ "$QUEUE" == "none" ]; then
-            BACKGROUNDEXE=$BACKGROUND
-          fi
         fi
         cat $OUTPUT_DIR/stage2c_smv_rls                              >> $ERROR_LOG
         echo ""                                              >> $ERROR_LOG
@@ -804,8 +800,10 @@ check_smv_utilities()
         compile_errors=1
      fi
    fi
-   if [ "$BACKGROUNDEXE" != "" ]; then
-     BACKGROUNDEXE="-b $BACKGROUNDEXE"
+   if [ "$BACKGROUND" != "" ]; then
+     if [ "$QUEUE" == "none" ]; then
+       BACKGROUNDEXE="-b $BACKGROUND"
+     fi
    fi
 }
 
@@ -819,7 +817,7 @@ wait_verification_cases_end()
    stagelimit=$2
    prefix=$3
    # Scans qstat and waits for verification cases to end
-   if [[ "$SMOKEBOT_QUEUE" == "none" ]]
+   if [[ "$QUEUE" == "none" ]]
    then
      while [[          `ps -u $USER -f | fgrep .fds | grep -v smokebot | grep -v grep` != '' ]]; do
         JOBS_REMAINING=`ps -u $USER -f | fgrep .fds | grep -v smokebot | grep -v grep | wc -l`
@@ -863,7 +861,7 @@ run_verification_cases_release()
    if [ "$COMPILER" == "gnu" ]; then
      COMPOPT=-C
    fi
-   ./Run_SMV_Cases.sh $INTEL2 $RUNOPT $COMPOPT -c $cfastrepo -j $JOBPREFIXR $USEINSTALL2 -q $SMOKEBOT_QUEUE >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
+   ./Run_SMV_Cases.sh $INTEL2 $RUNOPT $COMPOPT -c $cfastrepo -j $JOBPREFIXR $USEINSTALL2 -q $QUEUE >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
 }
 
 #---------------------------------------------
@@ -1026,7 +1024,7 @@ make_smv_pictures()
    if [ "$COMPILER" == "gnu" ]; then
      COMPOPT=-C
    fi
-   ./Make_SMV_Pictures.sh $RUNOPT $COMPOPT -q $SMOKEBOT_QUEUE -j SMV_ $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4a_picts
+   ./Make_SMV_Pictures.sh $RUNOPT $COMPOPT -q $QUEUE -j SMV_ $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4a_picts
    grep -v FreeFontPath $OUTPUT_DIR/stage4a_picts &> $OUTPUT_DIR/stage4b_picts
 }
 
@@ -1068,7 +1066,7 @@ make_smv_movies()
 {
    echo "   movies"
    cd $smvrepo/Verification
-   scripts/Make_SMV_Movies.sh -q $SMOKEBOT_QUEUE 2>&1  &> $OUTPUT_DIR/stage4c_mp4
+   scripts/Make_SMV_Movies.sh -q $QUEUE 2>&1  &> $OUTPUT_DIR/stage4c_mp4
 }
 
 #---------------------------------------------
@@ -1325,7 +1323,7 @@ email_build_status()
   echo "----------------------------------------------"      > $TIME_LOG
   echo "host/OS: $hostname/$platform2"                      >> $TIME_LOG
   echo "repo: $repo"                                        >> $TIME_LOG
-  echo "queue: $SMOKEBOT_QUEUE"                             >> $TIME_LOG
+  echo "queue: $QUEUE"                             >> $TIME_LOG
   echo "$BOT_REVISION/$BOTBRANCH"                           >> $TIME_LOG
   echo "$CFAST_REVISION/$CFASTBRANCH"                       >> $TIME_LOG
   echo "$FDS_REVISION/$FDSBRANCH"                           >> $TIME_LOG
@@ -1525,7 +1523,7 @@ CFASTBRANCH=master
 BOTBRANCH=master
 FIGBRANCH=master
 
-SMOKEBOT_QUEUE=smokebot
+QUEUE=smokebot
 MAKEMOVIES=0
 RUNAUTO=
 CLEANREPO=0
@@ -1589,7 +1587,7 @@ case $OPTION in
    MAKEMOVIES="1"
    ;;
   q)
-   SMOKEBOT_QUEUE="$OPTARG"
+   QUEUE="$OPTARG"
    ;;
   R)
    CLONE_REPOS="$OPTARG"
@@ -1644,7 +1642,7 @@ else
   exit 1
 fi
 
-if [[ "$SMOKEBOT_QUEUE" == "none" ]] && [[ -e $SCRIPTFILES ]]; then
+if [[ "$QUEUE" == "none" ]] && [[ -e $SCRIPTFILES ]]; then
   rm -f $SCRIPTFILES
 fi
 
