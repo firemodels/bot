@@ -496,6 +496,7 @@ run_verification_cases_debug()
    if [ "$LITE" != "" ]; then
      RUNOPT=-L
    fi
+   RUNOPT="$RUNOPT $BACKGROUNDEXE"
    COMPOPT=
    if [ "$COMPILER" == "gnu" ]; then
      COMPOPT=-C
@@ -747,6 +748,7 @@ check_smv_utilities()
    SMOKEDIFF="$smvrepo/Build/smokediff/${COMPILER}_${platform}_64/smokediff_${platform}_64"
    WIND2FDS="$smvrepo/Build/wind2fds/${COMPILER}_${platform}_64/wind2fds_${platform}_64"
    BACKGROUND="$smvrepo/Build/background/${COMPILER}_${platform}_64/background_${platform}_64"
+   BACKGROUNDEXE=
    if [ "$haveCC" == "1" ] ; then
      # Check for errors in SMV utilities compilation
      cd $smvrepo
@@ -778,7 +780,11 @@ check_smv_utilities()
           echo ""
           echo "error: background failed to compile"         >> $ERROR_LOG
           echo "       $BACKGROUND does not exist"           >> $ERROR_LOG
-        fi 
+        else
+          if [ "$QUEUE" == "none" ]; then
+            BACKGROUNDEXE=$BACKGROUND
+          fi
+        fi
         cat $OUTPUT_DIR/stage2c_smv_rls                              >> $ERROR_LOG
         echo ""                                              >> $ERROR_LOG
         compile_errors=1
@@ -797,6 +803,9 @@ check_smv_utilities()
         echo ""                                                >> $ERROR_LOG
         compile_errors=1
      fi
+   fi
+   if [ "$BACKGROUNDEXE" != "" ]; then
+     BACKGROUNDEXE="-b $BACKGROUNDEXE"
    fi
 }
 
@@ -849,6 +858,7 @@ run_verification_cases_release()
    if [ "$LITE" != "" ]; then
      RUNOPT=-L
    fi
+   RUNOPT="$RUNOPT $BACKGROUNDEXE"
    COMPOPT=
    if [ "$COMPILER" == "gnu" ]; then
      COMPOPT=-C
