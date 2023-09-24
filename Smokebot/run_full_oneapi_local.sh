@@ -1,4 +1,7 @@
 #!/bin/bash
 OPTION=$1
 
-./run_smokebot.sh -c -b $OPTION -q none
+# -c clean repos
+# -b use existing branches
+# -J use intel compilers
+./run_smokebot.sh -c -b -J $OPTION -q none
