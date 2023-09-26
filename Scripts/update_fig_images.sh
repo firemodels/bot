@@ -79,7 +79,16 @@ echo getting smv repo revision
 cd $FROM_ROOT/smv
 SMV_REVISION=`git describe --abbrev=7 --dirty --long`
 
-FIG_DIR=$TO_ROOT/fig/$PROG/Reference_Figures
+if [ "$PROG" == "fds" ]; then
+  FIG_DIR=$TO_ROOT/fig/fds/Reference_Figures
+fi
+if [ "$PROG" == "smv" ]; then
+  if [ "`hostname -s`" == "blaze" ]; then
+    FIG_DIR=$TO_ROOT/fig/smv/Reference_Figures/Default
+  else
+    FIG_DIR=$TO_ROOT/fig/smv/Reference_Figures/Other
+  fi
+fi
 
 FROM_USER_DIR=$FROM_USER/SCRIPT_FIGURES
 FROM_VER_DIR=$FROM_VER/SCRIPT_FIGURES

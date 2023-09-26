@@ -59,7 +59,11 @@ if [ "$BASE_DIR" == "" ]; then
   if [ "$BOT_TYPE" == "firebot" ]; then
     BASE_DIR=../../fig/fds/Reference_Figures
   else
-    BASE_DIR=../../fig/smv/Reference_Figures
+    if [ "$BOTHOST" "" ]; then
+      BASE_DIR=../../fig/smv/Reference_Figures/Default
+    else
+      BASE_DIR=../../fig/smv/Reference_Figures/Virtual
+    fi
   fi
   cd $BASE_DIR
   BASE_DIR=`pwd`
