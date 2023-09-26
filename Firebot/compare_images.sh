@@ -50,6 +50,7 @@ HEIGHT_UNCHANGED=200
 WIDTH_UNCHANGED=200
 HEIGHT_CHANGED=250
 WIDTH_CHANGED=250
+HOSTNAME=`hostname -s`
 
 #*** setup directories
 
@@ -57,7 +58,7 @@ CURDIR=`pwd`
 if [ "$BOT_TYPE" == "firebot" ]; then
   REFERENCE_DIR=../../fig/fds/Reference_Figures
 else
-  if [ "`hostname -s`" "blaze" ]; then
+  if [ "$HOSTNAME" == "blaze" ]; then
     REFERENCE_DIR=../../fig/smv/Reference_Figures/Default
   else
     REFERENCE_DIR=../../fig/smv/Reference_Figures/Other
