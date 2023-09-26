@@ -878,11 +878,11 @@ check_verification_cases_release()
    then
       stage3b_vv_rls_success=true
    else
-      grep -rIi 'Run aborted' $OUTPUT_DIR/stage3b_vv_rls > $OUTPUT_DIR/stage3b_vv_rls_errors
-      grep -rIi 'Segmentation' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3b_vv_rls_errors
-      grep -rI  'ERROR:' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3b_vv_rls_errors
+      grep -rIi 'Run aborted' $OUTPUT_DIR/stage3b_vv_rls  > $OUTPUT_DIR/stage3b_vv_rls_errors
+      grep -rIi 'Segmentation' Visualization/* WUI/*     >> $OUTPUT_DIR/stage3b_vv_rls_errors
+      grep -rI  'ERROR:' Visualization/* WUI/*           >> $OUTPUT_DIR/stage3b_vv_rls_errors
       grep -rIi 'STOP: Numerical' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3b_vv_rls_errors
-      grep -rIi -A 20 'forrtl' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3b_vv_rls_errors
+      grep -rIi -A 20 'forrtl' Visualization/* WUI/*     >> $OUTPUT_DIR/stage3b_vv_rls_errors
 
       echo "Errors from Stage 3b - Run verification cases (release mode):" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage3b_vv_rls_errors >> $ERROR_LOG
@@ -891,12 +891,14 @@ check_verification_cases_release()
    fi
 
       
-   if [[ `grep 'Warning' -irI $OUTPUT_DIR/stage3b_vv_rls` == "" ]] 
+   if [[ `grep 'Warning' -irI $OUTPUT_DIR/stage3b_vv_rls | grep -v 'SPEC' | grep -v 'Sum of'` == "" ]] && \
+      [[ `grep 'Warning' -irI Visualization/* WUI/*      | grep -v 'SPEC' | grep -v 'Sum of'` == "" ]]
    then
       no_warnings=true
    else
       echo "Stage 3b warnings:" >> $WARNING_LOG
-      grep 'Warning' -irI $OUTPUT_DIR/stage3b_vv_rls >> $WARNING_LOG
+      grep 'Warning' -irI $OUTPUT_DIR/stage3b_vv_rls | grep -v 'SPEC' | grep -v 'Sum of' >> $WARNING_LOG
+      grep 'Warning' -irI Visualization/* WUI/*      | grep -v 'SPEC' | grep -v 'Sum of' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
 }
