@@ -535,12 +535,14 @@ check_verification_cases_debug()
       echo "" >> $ERROR_LOG
       THIS_FDS_FAILED=1
    fi
-   if [[ `grep 'Warning' -irI $OUTPUT_DIR/stage3a_vv_dbg` == "" ]] 
+   if [[ `grep 'Warning' -irI $OUTPUT_DIR/stage3a_vv_dbg | grep -v 'SPEC' | grep -v 'Sum of'` == "" ]] && \
+      [[ `grep 'Warning' -irI Visualization/* WUI/*      | grep -v 'SPEC' | grep -v 'Sum of'` == "" ]]
    then
       no_warnings=true
    else
-      echo "Stage 3a warnings:" >> $WARNING_LOG
-      grep 'Warning' -irI $OUTPUT_DIR/stage3a_vv_dbg >> $WARNING_LOG
+      echo "Stage 3b warnings:" >> $WARNING_LOG
+      grep 'Warning' -irI $OUTPUT_DIR/stage3a_vv_dbg | grep -v 'SPEC' | grep -v 'Sum of' >> $WARNING_LOG
+      grep 'Warning' -irI Visualization/* WUI/*      | grep -v 'SPEC' | grep -v 'Sum of' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
 }
