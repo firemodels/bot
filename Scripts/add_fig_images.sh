@@ -29,15 +29,15 @@ esac
 done
 shift $(($OPTIND-1))
 
-CURDIR=`pwd`
-if [ "`hostname -s" == "blaze" ]; then
-  TODIR=../../fig/smv/Reference_Figures/Default
+cd ../..
+REPOROOT=`pwd`
+if [ "`hostname -s`" == "blaze" ]; then
+  TODIR=$REPOROOT/fig/smv/Reference_Figures/Default
 else
-  TODIR=../../fig/smv/Reference_Figures/Other
+  TODIR=$REPOROOT/fig/smv/Reference_Figures/Other
 fi
-cd $TODIR
-TODIR=`pwd`
-FROMBASE=/var/www/html/`whoami`/$HTMLBASE/diffs/base
+FROMBASE=$REPOROOT/smv/Manuals/SMV_Summary/diffs/base
+#FROMBASE=/var/www/html/`whoami`/$HTMLBASE/diffs/base
 cd $FROMBASE/user
 USERFILES=`ls *.png`
 cd $FROMBASE/verification
