@@ -1023,7 +1023,7 @@ make_smv_pictures()
      COMPOPT=-C
    fi
    ./Make_SMV_Pictures.sh $RUNOPT $COMPOPT -q $QUEUE -j SMV_ $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4a_picts
-   grep -v FreeFontPath $OUTPUT_DIR/stage4a_picts &> $OUTPUT_DIR/stage4b_picts
+   grep -v FreeFontPath $OUTPUT_DIR/stage4a_picts | grep -v libpng &> $OUTPUT_DIR/stage4b_picts
 }
 
 #---------------------------------------------
@@ -1430,24 +1430,27 @@ fi
   NAMELIST_LOGS="$NAMELIST_NODOC_LOG $NAMELIST_NOSOURCE_LOG"
   if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]; then
     # Send email with failure message and warnings, body of email contains appropriate log file
+    SUBJECT="smokebot failure and warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH"
     if [ "$HAVEMAIL" != "" ]; then
-      cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot failure and warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+      cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "$SUBJECT" $mailTo > /dev/null
     fi
     cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS > $FULL_LOG
 
   # Check for errors only
   elif [ -e $ERROR_LOG ]; then
     # Send email with failure message, body of email contains error log file
+    SUBJECT="smokebot failure on ${hostname}. ${SMV_REVISION}, $SMVBRANCH"
     if [ "$HAVEMAIL" != "" ]; then
-      cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot failure on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+      cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "$SUBJECT" $mailTo > /dev/null
     fi
     cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS > $FULL_LOG
 
   # Check for warnings only
   elif [ -e $WARNING_LOG ]; then
      # Send email with success message, include warnings
+    SUBJECT="smokebot success with warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH"
     if [ "$HAVEMAIL" != "" ]; then
-      cat $WARNING_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot success with warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+      cat $WARNING_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "$SUBJECT" $mailTo > /dev/null
     fi
     cat $WARNING_LOG $TIME_LOG $NAMELIST_LOGS > $FULL_LOG
 
@@ -1463,8 +1466,9 @@ fi
 
       # Send success message with links to nightly manuals
 
+    SUBJECT="smokebot success on ${hostname}. ${SMV_REVISION}, $SMVBRANCH"
     if [ "$HAVEMAIL" != "" ]; then
-      cat $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot success on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+      cat $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "$SUBJECT" $mailTo > /dev/null
     fi
     cat $TIME_LOG $NAMELIST_LOGS > $FULL_LOG
 
@@ -1481,6 +1485,8 @@ fi
   fi
   if [ "$HAVEMAIL" == "" ]; then
     cat $FULL_LOG
+    echo ""
+    echo $SUBJECT
   fi
 }
 
