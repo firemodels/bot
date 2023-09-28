@@ -1490,7 +1490,7 @@ fi
   if [ "$HAVEMAIL" == "" ]; then
     cat $FULL_LOG
     echo ""
-    echo $SUBJECT
+    echo "smokebot status: $SUBJECT"
   fi
 }
 
@@ -1652,16 +1652,16 @@ if [ "$CACHE_DIR" != "" ]; then
   cd $CACHE_DIR
   CACHE_DIR=`pwd`
   cd $CUR_DIR
-  if [ ! -d $CACHE_DIR/fds ]; then
-    echo "***error: cache directory $CACHE_DIR/fds does not exist"
+  if [ ! -d $CACHE_DIR/Build ]; then
+    echo "***error: cache directory $CACHE_DIR/Build does not exist"
     ABORT=1
   fi
-  if [ ! -d $CACHE_DIR/Verification ]; then
-    echo "***error: cache directory $CACHE_DIR/Verification does not exist"
+  if [ ! -d $CACHE_DIR/WUI ]; then
+    echo "***error: cache directory $CACHE_DIR/WUI does not exist"
     ABORT=1
   fi
-  if [ ! -d $CACHE_DIR/Verification_dbg ]; then
-    echo "***error: cache directory $CACHE_DIR/Verification_dbg does not exist"
+  if [ ! -d $CACHE_DIR/Visualization ]; then
+    echo "***error: cache directory $CACHE_DIR/Visualization does not exist"
     ABORT=1
   fi
 fi
@@ -2055,7 +2055,12 @@ if [ "$CACHE_DIR" == "" ]; then
 else
   echo "   debug fds(cached)"
   echo "   release fds(cached)"
-  cp -r $CACHE_DIR/fds/Build/* $fdsrepo/Build/.
+  if [ ! -d $fdsrepo ]; then
+    echo "*error: repo $fdsrepo does not exist"
+    exit
+  fi
+  rm -rf $fdsrepo/Build
+  cp -r $CACHE_DIR/Build $fdsrepo/.
 fi
 
 # stage1A
@@ -2111,8 +2116,14 @@ if [[ $stage_ver_release_success ]]; then
   if [ "$CACHE_DIR" == "" ]; then
     run_verification_cases_release
   else
-     rm -rf $smvrepo/Verification
-     cp -r $CACHE_DIR/Verification $smvrepo/.
+     if [ ! -d $smvrepo ]; then
+       echo "***error: $smvrepo does not exist"
+       exit
+     fi
+     rm -rf $smvrepo/Verification/WUI
+     rm -rf $smvrepo/Verification/Visualization
+     cp -r $CACHE_DIR/WUI           $smvrepo/Verification/.
+     cp -r $CACHE_DIR/Visualization $smvrepo/Verification/.
   fi
 fi
 if [ "$CACHE_DIR" == "" ]; then
