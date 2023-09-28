@@ -446,6 +446,7 @@ check_compile_fds_mpi_db()
    fi
 
    # Check for compiler warnings/remarks
+   if [ -e $OUTPUT_DIR/stage1b_fds_dbg ]; then
    if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage1b_fds_dbg| grep -v mpiifort -v | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'` == "" ]]
    then
       # Continue along
@@ -459,6 +460,7 @@ check_compile_fds_mpi_db()
         THIS_FDS_FAILED=1
       fi
       compile_errors=1
+   fi
    fi
 }
 
@@ -602,6 +604,7 @@ check_compile_fds_mpi()
 
    # Check for compiler warnings/remarks
    # 'performing multi-file optimizations' and 'generating object file' are part of a normal compile
+   if [ -e $OUTPUT_DIR/stage1c_fds_rls$MPTYPE ]; then
    if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage1c_fds_rls$MPTYPE | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented'` == "" ]]
    then
       # Continue along
@@ -611,6 +614,7 @@ check_compile_fds_mpi()
       grep -A 5 -i -E 'warning|remark' $OUTPUT_DIR/stage1c_fds_rls$MPTYPE | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
       compile_errors=1
+   fi
    fi
 }
 
@@ -1546,6 +1550,7 @@ CHECKOUT=
 compile_errors=
 GITURL=
 LITE=
+CACHE_DIR=
 HAVEMAIL=`which mail |& grep -v 'no mail'`
 
 #*** save pid so -k option (kill smokebot) may be used lateer
@@ -1554,7 +1559,7 @@ echo $$ > $PID_FILE
 
 #*** parse command line options
 
-while getopts 'ab:cCJLm:Mq:R:uUw:W:x:X:y:Y:' OPTION
+while getopts 'ab:cCJLm:Mq:R:s:uUw:W:x:X:y:Y:' OPTION
 do
 case $OPTION in
   a)
@@ -1596,6 +1601,9 @@ case $OPTION in
   R)
    CLONE_REPOS="$OPTARG"
    ;;
+  s)
+   CACHE_DIR="$OPTARG"
+   ;;
   u)
    UPDATEREPO=1
    ;;
@@ -1632,6 +1640,33 @@ if [ "$CLONE_REPOS" != "" ]; then
       CLONE_REPO="master"
     fi
   fi
+fi
+
+ABORT=
+if [ "$CACHE_DIR" != "" ]; then
+  if [ ! -d $CACHE_DIR ]; then
+    echo "***error: cache directory $CACHE_DIR does not exist"
+    exit
+  fi
+  CUR_DIR=`pwd`
+  cd $CACHE_DIR
+  CACHE_DIR=`pwd`
+  cd $CUR_DIR
+  if [ ! -d $CACHE_DIR/fds ]; then
+    echo "***error: cache directory $CACHE_DIR/fds does not exist"
+    ABORT=1
+  fi
+  if [ ! -d $CACHE_DIR/Verification ]; then
+    echo "***error: cache directory $CACHE_DIR/Verification does not exist"
+    ABORT=1
+  fi
+  if [ ! -d $CACHE_DIR/Verification_dbg ]; then
+    echo "***error: cache directory $CACHE_DIR/Verification_dbg does not exist"
+    ABORT=1
+  fi
+fi
+if [ "$ABORT" != "" ]; then
+  exit
 fi
 
 #*** make sure smokebot is running in the right directory
@@ -2012,11 +2047,16 @@ BUILDSOFTWARE_beg=`GET_TIME`
 #stage1B
 echo "Building"
 
-touch              $FDS_DB_DIR/compiling
-touch              $FDS_DIR/compiling
-
-compile_fds_mpi_db $FDS_DB_DIR        $FDS_DB_EXE
-compile_fds_mpi    $FDS_DIR           $FDS_EXE
+if [ "$CACHE_DIR" == "" ]; then
+  touch              $FDS_DB_DIR/compiling
+  touch              $FDS_DIR/compiling
+  compile_fds_mpi_db $FDS_DB_DIR        $FDS_DB_EXE
+  compile_fds_mpi    $FDS_DIR           $FDS_EXE
+else
+  echo "   debug fds(cached)"
+  echo "   release fds(cached)"
+  cp -r $CACHE_DIR/fds/Build/* $fdsrepo/Build/.
+fi
 
 # stage1A
 compile_cfast
@@ -2039,10 +2079,10 @@ check_compile_smv
 #stage2d_common_files
 check_common_files
 
-wait_compile_end   $FDS_DB_DIR
-wait_compile_end   $FDS_DIR
-
-
+if [ "$CACHE_DIR" == "" ]; then
+  wait_compile_end   $FDS_DB_DIR
+  wait_compile_end   $FDS_DIR
+fi
 check_compile_fds_mpi_db  $FDS_DB_DIR        $FDS_DB_EXE
 check_compile_fds_mpi     $FDS_DIR           $FDS_EXE
 
@@ -2061,18 +2101,27 @@ fi
 #stage3a_vv_dbg begin
 RUN_CASES_beg=`GET_TIME`
 if [ $stage_fdsdb_success ]; then
-   run_verification_cases_debug
+   if [ "$CACHE_DIR" == "" ]; then
+     run_verification_cases_debug
+   fi
 fi
 
 #stage3b_vv_rls
 if [[ $stage_ver_release_success ]]; then
-  run_verification_cases_release
+  if [ "$CACHE_DIR" == "" ]; then
+    run_verification_cases_release
+  else
+     rm -rf $smvrepo/Verification
+     cp -r $CACHE_DIR/Verification $smvrepo/.
+  fi
 fi
-if [ $stage_fdsdb_success ]; then
-   check_verification_cases_debug
-fi
-if [[ $stage_ver_release_success ]]; then
-  check_verification_cases_release
+if [ "$CACHE_DIR" == "" ]; then
+  if [ $stage_fdsdb_success ]; then
+     check_verification_cases_debug
+  fi
+  if [[ $stage_ver_release_success ]]; then
+    check_verification_cases_release
+  fi
 fi
 
 RUN_CASES_end=`GET_TIME`
