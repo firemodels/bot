@@ -177,7 +177,6 @@ FIREBOT_HOME=
 WEB_DIR=
 USE_BOT_QFDS=
 WEB_ROOT=/var/www/html
-LITE=
 GNU=
 CACHE_DIR=
 
@@ -191,7 +190,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'abcCfg:G:hHJkLm:Mo:Pq:r:R:s:TuUvw:W:x:X:y:Y:' OPTION
+while getopts 'abcCfg:G:hHJkm:Mo:Pq:r:R:s:TuUvw:W:x:X:y:Y:' OPTION
 do
 case $OPTION  in
   a)
@@ -226,9 +225,6 @@ case $OPTION  in
    ;;
   k)
    KILL_SMOKEBOT=1
-   ;;
-  L)
-   LITE="-L"
    ;;
   m)
    EMAIL="$OPTARG"
@@ -435,7 +431,7 @@ BRANCH="-b $BRANCH"
 #*** run smokebot
 
 touch $smokebot_pid
-$ECHO ./$botscript $SIZE $BRANCH $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $CLONE_REPOS $CACHE_DIR $GNU $LITE $RUNAUTO $INTEL $CLEANREPO $WEB_DIR $WEB_ROOT $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $SIZE $BRANCH $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $CLONE_REPOS $CACHE_DIR $GNU $RUNAUTO $INTEL $CLEANREPO $WEB_DIR $WEB_ROOT $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi

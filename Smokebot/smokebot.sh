@@ -495,9 +495,6 @@ run_verification_cases_debug()
    # Submit SMV verification cases and wait for them to start
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3a_vv_dbg 2>&1
    RUNOPT=-Y
-   if [ "$LITE" != "" ]; then
-     RUNOPT=-L
-   fi
    RUNOPT="$RUNOPT"
    COMPOPT=
    if [ "$COMPILER" == "gnu" ]; then
@@ -853,9 +850,6 @@ run_verification_cases_release()
    cd $smvrepo/Verification/scripts
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
    RUNOPT=-Y
-   if [ "$LITE" != "" ]; then
-     RUNOPT=-L
-   fi
    RUNOPT="$RUNOPT"
    COMPOPT=
    if [ "$COMPILER" == "gnu" ]; then
@@ -1019,9 +1013,6 @@ make_smv_pictures()
    echo "   images"
    cd $smvrepo/Verification/scripts
    RUNOPT=-Y
-   if [ "$LITE" != "" ]; then
-     RUNOPT=-L
-   fi
    COMPOPT=
    if [ "$COMPILER" == "gnu" ]; then
      COMPOPT=-C
@@ -1549,7 +1540,6 @@ SMV_TAG=
 CHECKOUT=
 compile_errors=
 GITURL=
-LITE=
 CACHE_DIR=
 HAVEMAIL=`which mail |& grep -v 'no mail'`
 
@@ -1559,7 +1549,7 @@ echo $$ > $PID_FILE
 
 #*** parse command line options
 
-while getopts 'ab:cCJLm:Mq:R:s:uUw:W:x:X:y:Y:' OPTION
+while getopts 'ab:cCJm:Mq:R:s:uUw:W:x:X:y:Y:' OPTION
 do
 case $OPTION in
   a)
@@ -1585,9 +1575,6 @@ case $OPTION in
   J)
    MPI_TYPE=impi
    INTEL2="-J"
-   ;;
-  L)
-   LITE=1
    ;;
   m)
    mailTo="$OPTARG"
