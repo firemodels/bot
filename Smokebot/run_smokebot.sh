@@ -12,6 +12,7 @@ function usage_all {
 echo ""
 echo "Miscellaneous:"
 echo "-a - only run if the FDS or smokeview source has changed"
+echo "-A - only run if the smokeview source has changed"
 echo "-b - use the current branch"
 echo "-f - force smokebot to run"
 echo "-J use Intel MPI version of fds"
@@ -190,11 +191,14 @@ fi
 
 #*** parse command line options
 
-while getopts 'abcCfg:G:hHJkm:Mo:Pq:r:R:s:TuUvw:W:x:X:y:Y:' OPTION
+while getopts 'aAbcCfg:G:hHJkm:Mo:Pq:r:R:s:TuUvw:W:x:X:y:Y:' OPTION
 do
 case $OPTION  in
   a)
    RUNAUTO=-a
+   ;;
+  A)
+   RUNAUTO=-A
    ;;
   b)
    BRANCH="current"
