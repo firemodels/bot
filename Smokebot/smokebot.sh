@@ -1300,11 +1300,13 @@ email_compile_errors()
 
 email_build_status()
 {
-  if [[ "$THIS_FDS_FAILED" == "1" ]] ; then
-    mailTo="$mailToFDS"
-  fi
-  if [[ "$THIS_CFAST_FAILED" == "1" ]] ; then
-    mailTo="$mailToCFAST"
+  if [ "$RUNAUTO" == "" ]; then
+    if [[ "$THIS_FDS_FAILED" == "1" ]] ; then
+      mailTo="$mailToFDS"
+    fi
+    if [[ "$THIS_CFAST_FAILED" == "1" ]] ; then
+      mailTo="$mailToCFAST"
+    fi
   fi
   echo $THIS_FDS_FAILED>$FDS_STATUS_FILE
   stop_time=`date`
