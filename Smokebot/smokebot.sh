@@ -1353,7 +1353,7 @@ fi
   echo ""                                                   >> $TIME_LOG
   DISPLAY_FDS_REVISION=
   DISPLAY_SMV_REVISION=
-  if [ "$RUNAUTO" == "y" ]; then
+  if [ "$RUNAUTO" != "" ]; then
     DISPLAY_FDS_REVISION=1
     DISPLAY_SMV_REVISION=1
   fi
@@ -1551,11 +1551,14 @@ echo $$ > $PID_FILE
 
 #*** parse command line options
 
-while getopts 'ab:cCJm:Mq:R:s:uUw:W:x:X:y:Y:' OPTION
+while getopts 'aAb:cCJm:Mq:R:s:uUw:W:x:X:y:Y:' OPTION
 do
 case $OPTION in
   a)
-   RUNAUTO="y"
+   RUNAUTO="a"
+   ;;
+  A)
+   RUNAUTO="A"
    ;;
   b)
    SMVBRANCH="$OPTARG"
@@ -1789,8 +1792,12 @@ MKDIR $BRANCHAPPS_DIR
 # if -a option is invoked, only proceed running smokebot if the
 # smokeview or FDS source has changed
 
-if [[ $RUNAUTO == "y" ]] ; then
-  run_auto || exit 1
+if [[ $RUNAUTO != "" ]] ; then
+  runoption=""
+  if [ "$RUNAUTO" == "A" ]; then
+    runoption="smv"
+  fi
+  run_auto $runoption || exit 1
 fi
 
 if [ "$WEB_DIR" != "" ]; then
