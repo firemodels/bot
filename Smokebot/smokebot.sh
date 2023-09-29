@@ -446,6 +446,7 @@ check_compile_fds_mpi_db()
    fi
 
    # Check for compiler warnings/remarks
+   if [ -e $OUTPUT_DIR/stage1b_fds_dbg ]; then
    if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage1b_fds_dbg| grep -v mpiifort -v | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'` == "" ]]
    then
       # Continue along
@@ -459,6 +460,7 @@ check_compile_fds_mpi_db()
         THIS_FDS_FAILED=1
       fi
       compile_errors=1
+   fi
    fi
 }
 
@@ -493,10 +495,7 @@ run_verification_cases_debug()
    # Submit SMV verification cases and wait for them to start
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3a_vv_dbg 2>&1
    RUNOPT=-Y
-   if [ "$LITE" != "" ]; then
-     RUNOPT=-L
-   fi
-   RUNOPT="$RUNOPT $BACKGROUNDEXE"
+   RUNOPT="$RUNOPT"
    COMPOPT=
    if [ "$COMPILER" == "gnu" ]; then
      COMPOPT=-C
@@ -535,12 +534,14 @@ check_verification_cases_debug()
       echo "" >> $ERROR_LOG
       THIS_FDS_FAILED=1
    fi
-   if [[ `grep 'Warning' -irI $OUTPUT_DIR/stage3a_vv_dbg` == "" ]] 
+   if [[ `grep 'Warning' -irI $OUTPUT_DIR/stage3a_vv_dbg | grep -v 'SPEC' | grep -v 'Sum of'` == "" ]] && \
+      [[ `grep 'Warning' -irI Visualization/* WUI/*      | grep -v 'SPEC' | grep -v 'Sum of'` == "" ]]
    then
       no_warnings=true
    else
-      echo "Stage 3a warnings:" >> $WARNING_LOG
-      grep 'Warning' -irI $OUTPUT_DIR/stage3a_vv_dbg >> $WARNING_LOG
+      echo "Stage 3b warnings:" >> $WARNING_LOG
+      grep 'Warning' -irI $OUTPUT_DIR/stage3a_vv_dbg | grep -v 'SPEC' | grep -v 'Sum of' >> $WARNING_LOG
+      grep 'Warning' -irI Visualization/* WUI/*      | grep -v 'SPEC' | grep -v 'Sum of' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
 }
@@ -600,6 +601,7 @@ check_compile_fds_mpi()
 
    # Check for compiler warnings/remarks
    # 'performing multi-file optimizations' and 'generating object file' are part of a normal compile
+   if [ -e $OUTPUT_DIR/stage1c_fds_rls$MPTYPE ]; then
    if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage1c_fds_rls$MPTYPE | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented'` == "" ]]
    then
       # Continue along
@@ -609,6 +611,7 @@ check_compile_fds_mpi()
       grep -A 5 -i -E 'warning|remark' $OUTPUT_DIR/stage1c_fds_rls$MPTYPE | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
       compile_errors=1
+   fi
    fi
 }
 
@@ -748,7 +751,6 @@ check_smv_utilities()
    SMOKEDIFF="$smvrepo/Build/smokediff/${COMPILER}_${platform}_64/smokediff_${platform}_64"
    WIND2FDS="$smvrepo/Build/wind2fds/${COMPILER}_${platform}_64/wind2fds_${platform}_64"
    BACKGROUND="$smvrepo/Build/background/${COMPILER}_${platform}_64/background_${platform}_64"
-   BACKGROUNDEXE=
    if [ "$haveCC" == "1" ] ; then
      # Check for errors in SMV utilities compilation
      cd $smvrepo
@@ -800,11 +802,6 @@ check_smv_utilities()
         compile_errors=1
      fi
    fi
-   if [ "$BACKGROUND" != "" ]; then
-     if [ "$QUEUE" == "none" ]; then
-       BACKGROUNDEXE="-b $BACKGROUND"
-     fi
-   fi
 }
 
 #---------------------------------------------
@@ -853,10 +850,7 @@ run_verification_cases_release()
    cd $smvrepo/Verification/scripts
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
    RUNOPT=-Y
-   if [ "$LITE" != "" ]; then
-     RUNOPT=-L
-   fi
-   RUNOPT="$RUNOPT $BACKGROUNDEXE"
+   RUNOPT="$RUNOPT"
    COMPOPT=
    if [ "$COMPILER" == "gnu" ]; then
      COMPOPT=-C
@@ -884,11 +878,11 @@ check_verification_cases_release()
    then
       stage3b_vv_rls_success=true
    else
-      grep -rIi 'Run aborted' $OUTPUT_DIR/stage3b_vv_rls > $OUTPUT_DIR/stage3b_vv_rls_errors
-      grep -rIi 'Segmentation' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3b_vv_rls_errors
-      grep -rI  'ERROR:' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3b_vv_rls_errors
+      grep -rIi 'Run aborted' $OUTPUT_DIR/stage3b_vv_rls  > $OUTPUT_DIR/stage3b_vv_rls_errors
+      grep -rIi 'Segmentation' Visualization/* WUI/*     >> $OUTPUT_DIR/stage3b_vv_rls_errors
+      grep -rI  'ERROR:' Visualization/* WUI/*           >> $OUTPUT_DIR/stage3b_vv_rls_errors
       grep -rIi 'STOP: Numerical' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3b_vv_rls_errors
-      grep -rIi -A 20 'forrtl' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3b_vv_rls_errors
+      grep -rIi -A 20 'forrtl' Visualization/* WUI/*     >> $OUTPUT_DIR/stage3b_vv_rls_errors
 
       echo "Errors from Stage 3b - Run verification cases (release mode):" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage3b_vv_rls_errors >> $ERROR_LOG
@@ -897,12 +891,14 @@ check_verification_cases_release()
    fi
 
       
-   if [[ `grep 'Warning' -irI $OUTPUT_DIR/stage3b_vv_rls` == "" ]] 
+   if [[ `grep 'Warning' -irI $OUTPUT_DIR/stage3b_vv_rls | grep -v 'SPEC' | grep -v 'Sum of'` == "" ]] && \
+      [[ `grep 'Warning' -irI Visualization/* WUI/*      | grep -v 'SPEC' | grep -v 'Sum of'` == "" ]]
    then
       no_warnings=true
    else
       echo "Stage 3b warnings:" >> $WARNING_LOG
-      grep 'Warning' -irI $OUTPUT_DIR/stage3b_vv_rls >> $WARNING_LOG
+      grep 'Warning' -irI $OUTPUT_DIR/stage3b_vv_rls | grep -v 'SPEC' | grep -v 'Sum of' >> $WARNING_LOG
+      grep 'Warning' -irI Visualization/* WUI/*      | grep -v 'SPEC' | grep -v 'Sum of' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
 }
@@ -1017,15 +1013,12 @@ make_smv_pictures()
    echo "   images"
    cd $smvrepo/Verification/scripts
    RUNOPT=-Y
-   if [ "$LITE" != "" ]; then
-     RUNOPT=-L
-   fi
    COMPOPT=
    if [ "$COMPILER" == "gnu" ]; then
      COMPOPT=-C
    fi
    ./Make_SMV_Pictures.sh $RUNOPT $COMPOPT -q $QUEUE -j SMV_ $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4a_picts
-   grep -v FreeFontPath $OUTPUT_DIR/stage4a_picts &> $OUTPUT_DIR/stage4b_picts
+   grep -v FreeFontPath $OUTPUT_DIR/stage4a_picts | grep -v libpng &> $OUTPUT_DIR/stage4b_picts
 }
 
 #---------------------------------------------
@@ -1432,24 +1425,27 @@ fi
   NAMELIST_LOGS="$NAMELIST_NODOC_LOG $NAMELIST_NOSOURCE_LOG"
   if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]; then
     # Send email with failure message and warnings, body of email contains appropriate log file
+    SUBJECT="smokebot failure and warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH"
     if [ "$HAVEMAIL" != "" ]; then
-      cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot failure and warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+      cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "$SUBJECT" $mailTo > /dev/null
     fi
     cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS > $FULL_LOG
 
   # Check for errors only
   elif [ -e $ERROR_LOG ]; then
     # Send email with failure message, body of email contains error log file
+    SUBJECT="smokebot failure on ${hostname}. ${SMV_REVISION}, $SMVBRANCH"
     if [ "$HAVEMAIL" != "" ]; then
-      cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot failure on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+      cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "$SUBJECT" $mailTo > /dev/null
     fi
     cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS > $FULL_LOG
 
   # Check for warnings only
   elif [ -e $WARNING_LOG ]; then
      # Send email with success message, include warnings
+    SUBJECT="smokebot success with warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH"
     if [ "$HAVEMAIL" != "" ]; then
-      cat $WARNING_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot success with warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+      cat $WARNING_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "$SUBJECT" $mailTo > /dev/null
     fi
     cat $WARNING_LOG $TIME_LOG $NAMELIST_LOGS > $FULL_LOG
 
@@ -1465,8 +1461,9 @@ fi
 
       # Send success message with links to nightly manuals
 
+    SUBJECT="smokebot success on ${hostname}. ${SMV_REVISION}, $SMVBRANCH"
     if [ "$HAVEMAIL" != "" ]; then
-      cat $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "smokebot success on ${hostname}. ${SMV_REVISION}, $SMVBRANCH" $mailTo > /dev/null
+      cat $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "$SUBJECT" $mailTo > /dev/null
     fi
     cat $TIME_LOG $NAMELIST_LOGS > $FULL_LOG
 
@@ -1483,6 +1480,8 @@ fi
   fi
   if [ "$HAVEMAIL" == "" ]; then
     cat $FULL_LOG
+    echo ""
+    echo "smokebot status: $SUBJECT"
   fi
 }
 
@@ -1541,7 +1540,7 @@ SMV_TAG=
 CHECKOUT=
 compile_errors=
 GITURL=
-LITE=
+CACHE_DIR=
 HAVEMAIL=`which mail |& grep -v 'no mail'`
 
 #*** save pid so -k option (kill smokebot) may be used lateer
@@ -1550,7 +1549,7 @@ echo $$ > $PID_FILE
 
 #*** parse command line options
 
-while getopts 'ab:cCJLm:Mq:R:uUw:W:x:X:y:Y:' OPTION
+while getopts 'ab:cCJm:Mq:R:s:uUw:W:x:X:y:Y:' OPTION
 do
 case $OPTION in
   a)
@@ -1577,9 +1576,6 @@ case $OPTION in
    MPI_TYPE=impi
    INTEL2="-J"
    ;;
-  L)
-   LITE=1
-   ;;
   m)
    mailTo="$OPTARG"
    ;;
@@ -1591,6 +1587,9 @@ case $OPTION in
    ;;
   R)
    CLONE_REPOS="$OPTARG"
+   ;;
+  s)
+   CACHE_DIR="$OPTARG"
    ;;
   u)
    UPDATEREPO=1
@@ -1628,6 +1627,33 @@ if [ "$CLONE_REPOS" != "" ]; then
       CLONE_REPO="master"
     fi
   fi
+fi
+
+ABORT=
+if [ "$CACHE_DIR" != "" ]; then
+  if [ ! -d $CACHE_DIR ]; then
+    echo "***error: cache directory $CACHE_DIR does not exist"
+    exit
+  fi
+  CUR_DIR=`pwd`
+  cd $CACHE_DIR
+  CACHE_DIR=`pwd`
+  cd $CUR_DIR
+  if [ ! -d $CACHE_DIR/Build ]; then
+    echo "***error: cache directory $CACHE_DIR/Build does not exist"
+    ABORT=1
+  fi
+  if [ ! -d $CACHE_DIR/WUI ]; then
+    echo "***error: cache directory $CACHE_DIR/WUI does not exist"
+    ABORT=1
+  fi
+  if [ ! -d $CACHE_DIR/Visualization ]; then
+    echo "***error: cache directory $CACHE_DIR/Visualization does not exist"
+    ABORT=1
+  fi
+fi
+if [ "$ABORT" != "" ]; then
+  exit
 fi
 
 #*** make sure smokebot is running in the right directory
@@ -2008,11 +2034,21 @@ BUILDSOFTWARE_beg=`GET_TIME`
 #stage1B
 echo "Building"
 
-touch              $FDS_DB_DIR/compiling
-touch              $FDS_DIR/compiling
-
-compile_fds_mpi_db $FDS_DB_DIR        $FDS_DB_EXE
-compile_fds_mpi    $FDS_DIR           $FDS_EXE
+if [ "$CACHE_DIR" == "" ]; then
+  touch              $FDS_DB_DIR/compiling
+  touch              $FDS_DIR/compiling
+  compile_fds_mpi_db $FDS_DB_DIR        $FDS_DB_EXE
+  compile_fds_mpi    $FDS_DIR           $FDS_EXE
+else
+  echo "   debug fds(cached)"
+  echo "   release fds(cached)"
+  if [ ! -d $fdsrepo ]; then
+    echo "*error: repo $fdsrepo does not exist"
+    exit
+  fi
+  rm -rf $fdsrepo/Build
+  cp -r $CACHE_DIR/Build $fdsrepo/.
+fi
 
 # stage1A
 compile_cfast
@@ -2035,10 +2071,10 @@ check_compile_smv
 #stage2d_common_files
 check_common_files
 
-wait_compile_end   $FDS_DB_DIR
-wait_compile_end   $FDS_DIR
-
-
+if [ "$CACHE_DIR" == "" ]; then
+  wait_compile_end   $FDS_DB_DIR
+  wait_compile_end   $FDS_DIR
+fi
 check_compile_fds_mpi_db  $FDS_DB_DIR        $FDS_DB_EXE
 check_compile_fds_mpi     $FDS_DIR           $FDS_EXE
 
@@ -2057,18 +2093,33 @@ fi
 #stage3a_vv_dbg begin
 RUN_CASES_beg=`GET_TIME`
 if [ $stage_fdsdb_success ]; then
-   run_verification_cases_debug
+   if [ "$CACHE_DIR" == "" ]; then
+     run_verification_cases_debug
+   fi
 fi
 
 #stage3b_vv_rls
 if [[ $stage_ver_release_success ]]; then
-  run_verification_cases_release
+  if [ "$CACHE_DIR" == "" ]; then
+    run_verification_cases_release
+  else
+     if [ ! -d $smvrepo ]; then
+       echo "***error: $smvrepo does not exist"
+       exit
+     fi
+     rm -rf $smvrepo/Verification/WUI
+     rm -rf $smvrepo/Verification/Visualization
+     cp -r $CACHE_DIR/WUI           $smvrepo/Verification/.
+     cp -r $CACHE_DIR/Visualization $smvrepo/Verification/.
+  fi
 fi
-if [ $stage_fdsdb_success ]; then
-   check_verification_cases_debug
-fi
-if [[ $stage_ver_release_success ]]; then
-  check_verification_cases_release
+if [ "$CACHE_DIR" == "" ]; then
+  if [ $stage_fdsdb_success ]; then
+     check_verification_cases_debug
+  fi
+  if [[ $stage_ver_release_success ]]; then
+    check_verification_cases_release
+  fi
 fi
 
 RUN_CASES_end=`GET_TIME`
@@ -2145,11 +2196,11 @@ if [[ $stage_ver_release_success ]] ; then
 # compare images generated by this smokebot run with a base set in the fig repo
      TOLERANCE=0.2
      cd $botrepo/Smokebot
-   echo Compare images
-     ../Firebot/compare_images.sh $figrepo/smv/Reference_Figures $SMV_SUMMARY_DIR/images $SMV_SUMMARY_DIR/diffs/images $OUTPUT_DIR/error_images $TOLERANCE >& $OUTPUT_DIR/stage5_image_compare
+   echo Comparing images
+     ../Firebot/compare_images.sh $SMV_SUMMARY_DIR/images $SMV_SUMMARY_DIR/diffs/images $OUTPUT_DIR/error_images $TOLERANCE >& $OUTPUT_DIR/stage5_image_compare
      COMPAREIMAGES_end=`GET_TIME`
      DIFF_COMPAREIMAGES=`GET_DURATION $COMPAREIMAGES_beg $COMPAREIMAGES_end`
-     echo "Compare images: $DIFF_COMPAREIMAGES" >> $STAGE_STATUS
+     echo "Comparing images: $DIFF_COMPAREIMAGES" >> $STAGE_STATUS
 
      UPDATED_WEB_IMAGES=1
 

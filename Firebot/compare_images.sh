@@ -1,9 +1,8 @@
 #!/bin/bash
-BASE_DIR=$1
-NEW_DIR=$2
-DIFF_DIR=$3
-ERROR_DIR=$4
-TOLERANCE=$5
+NEW_DIR=$1
+DIFF_DIR=$2
+ERROR_DIR=$3
+TOLERANCE=$4
 
 CURDIR=`pwd`
 
@@ -51,19 +50,22 @@ HEIGHT_UNCHANGED=200
 WIDTH_UNCHANGED=200
 HEIGHT_CHANGED=250
 WIDTH_CHANGED=250
+HOSTNAME=`hostname -s`
 
 #*** setup directories
 
 CURDIR=`pwd`
-if [ "$BASE_DIR" == "" ]; then
-  if [ "$BOT_TYPE" == "firebot" ]; then
-    BASE_DIR=../../fig/fds/Reference_Figures
+if [ "$BOT_TYPE" == "firebot" ]; then
+  REFERENCE_DIR=../../fig/fds/Reference_Figures
+else
+  if [ "$HOSTNAME" == "blaze" ]; then
+    REFERENCE_DIR=../../fig/smv/Reference_Figures/Default
   else
-    BASE_DIR=../../fig/smv/Reference_Figures
+    REFERENCE_DIR=../../fig/smv/Reference_Figures/Other
   fi
-  cd $BASE_DIR
-  BASE_DIR=`pwd`
 fi
+cd $REFERENCE_DIR
+REFERENCE_DIR=`pwd`
 
 cd $CURDIR
 REPO=../..
@@ -182,7 +184,7 @@ FIND_DIFFS ()
 SUBDIR=$1
 echo ""
 echo Comparing images in directories:
-echo "  $BASE_DIR "
+echo "  $REFERENCE_DIR "
 echo "  $NEW_DIR/$SUBDIR"
 echo ""
 
@@ -197,8 +199,8 @@ rm -f $file_list
 for f in $NEW_DIR/$SUBDIR/*.png; do
   base=`basename $f`
   blur_base=blur_$base
-  from_file=$BASE_DIR/$base
-  blur_from_file=$BASE_DIR/$blur_base
+  from_file=$REFERENCE_DIR/$base
+  blur_from_file=$REFERENCE_DIR/$blur_base
   to_file=$NEW_DIR/$SUBDIR/$base
   blur_to_file=$NEW_DIR/$SUBDIR/$blur_base
   diff_file=$DIFF_DIR/$SUBDIR/$base
@@ -382,9 +384,9 @@ EOF
     if [ "$COMPARE" == "1" ]; then
       STYLE="style=\"color:red\""
     fi
-    cp $BASE_DIR/$pngfile $SUMMARY_DIR/diffs/base/$SUBDIR/.
-    IMAGE_HEIGHT=`identify -format '%h' $BASE_DIR/$pngfile`
-    IMAGE_WIDTH=`identify -format '%w' $BASE_DIR/$pngfile`
+    cp $REFERENCE_DIR/$pngfile $SUMMARY_DIR/diffs/base/$SUBDIR/.
+    IMAGE_HEIGHT=`identify -format '%h' $REFERENCE_DIR/$pngfile`
+    IMAGE_WIDTH=`identify -format '%w' $REFERENCE_DIR/$pngfile`
     if [ $IMAGE_HEIGHT -gt $IMAGE_WIDTH ]; then
       SIZE="height=$HEIGHT"
     else
@@ -454,7 +456,7 @@ if [ $notfound -ne 0 ]; then
   ABORT=1
 fi
 
-CHECK_DIR $BASE_DIR 1
+CHECK_DIR $REFERENCE_DIR 1
 CHECK_DIR $NEW_DIR 1
 if [ "$ABORT" != "" ]; then
   exit
