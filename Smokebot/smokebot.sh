@@ -1418,11 +1418,12 @@ fi
       if [[ ! -e $WARNING_LOG ]] && [[ ! -e $ERROR_LOG ]]; then
         $UploadGuidesGH                                          &>> output/stage_GHupload
         echo "guides: $GITURL"  >> $TIME_LOG
+      fi
     fi
   fi
   echo ""                                  >> $TIME_LOG
   if [ -e $OUTPUT_DIR/slow_cases ]; then
-    echo "cases with longest runtime:"      >> $TIME_LOG
+    echo "cases with longest runtime:"     >> $TIME_LOG
     cat $OUTPUT_DIR/slow_cases             >> $TIME_LOG
     echo ""                                >> $TIME_LOG
   fi
