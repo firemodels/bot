@@ -1426,12 +1426,16 @@ fi
     cat $OUTPUT_DIR/slow_cases             >> $TIME_LOG
     echo ""                                >> $TIME_LOG
   fi
+  ATTACH=
+  if [ -e $smvrepo/Manuals/SMV_Summary/SMV_Diffs.pdf ]; then
+    ATTACH="-a $smvrepo/Manuals/SMV_Summary/SMV_Diffs.pdf"
+  fi
   NAMELIST_LOGS="$NAMELIST_NODOC_LOG $NAMELIST_NOSOURCE_LOG"
   if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]; then
     # Send email with failure message and warnings, body of email contains appropriate log file
     SUBJECT="smokebot failure and warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH"
     if [ "$HAVEMAIL" != "" ]; then
-      cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "$SUBJECT" $mailTo > /dev/null
+      cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "$SUBJECT" $ATTACH $mailTo > /dev/null
     fi
     cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS > $FULL_LOG
 
@@ -1440,7 +1444,7 @@ fi
     # Send email with failure message, body of email contains error log file
     SUBJECT="smokebot failure on ${hostname}. ${SMV_REVISION}, $SMVBRANCH"
     if [ "$HAVEMAIL" != "" ]; then
-      cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "$SUBJECT" $mailTo > /dev/null
+      cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "$SUBJECT" $ATTACH $mailTo > /dev/null
     fi
     cat $ERROR_LOG $TIME_LOG $NAMELIST_LOGS > $FULL_LOG
 
@@ -1449,7 +1453,7 @@ fi
      # Send email with success message, include warnings
     SUBJECT="smokebot success with warnings on ${hostname}. ${SMV_REVISION}, $SMVBRANCH"
     if [ "$HAVEMAIL" != "" ]; then
-      cat $WARNING_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "$SUBJECT" $mailTo > /dev/null
+      cat $WARNING_LOG $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "$SUBJECT" $ATTACH $mailTo > /dev/null
     fi
     cat $WARNING_LOG $TIME_LOG $NAMELIST_LOGS > $FULL_LOG
 
@@ -1467,7 +1471,7 @@ fi
 
     SUBJECT="smokebot success on ${hostname}. ${SMV_REVISION}, $SMVBRANCH"
     if [ "$HAVEMAIL" != "" ]; then
-      cat $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "$SUBJECT" $mailTo > /dev/null
+      cat $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "$SUBJECT" $ATTACH $mailTo > /dev/null
     fi
     cat $TIME_LOG $NAMELIST_LOGS > $FULL_LOG
 
