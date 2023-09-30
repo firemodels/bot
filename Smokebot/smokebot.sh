@@ -1412,12 +1412,12 @@ fi
     fi
     if [[ "$is_bot" == "1" ]]; then
       GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_SMOKEVIEW_TAG
+      echo "guides/summary: $GITURL"  >> $TIME_LOG
       echo  "***output guides, figures and image summary to Github"             > output/stage_GHupload
       echo  ""                                                  >> output/stage_GHupload
       $UploadSummaryGH                                          &>> output/stage_GHupload
       if [[ ! -e $WARNING_LOG ]] && [[ ! -e $ERROR_LOG ]]; then
         $UploadGuidesGH                                          &>> output/stage_GHupload
-        echo "guides: $GITURL"  >> $TIME_LOG
       fi
     fi
   fi
