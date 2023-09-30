@@ -1410,12 +1410,14 @@ fi
     if [ `whoami` == "smokebot" ]; then
       is_bot=1
     fi
-    if [[ "$is_bot" == "1" ]] && [[ ! -e $WARNING_LOG ]] && [[ ! -e $ERROR_LOG ]]; then
-      echo  "***output guides and figures to Github"             > output/stage_GHupload
-      echo  ""                                                  >> output/stage_GHupload
-      $UploadGuidesGH                                          &>> output/stage_GHupload
+    if [[ "$is_bot" == "1" ]]; then
       GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_SMOKEVIEW_TAG
-      echo "guides: $GITURL"  >> $TIME_LOG
+      echo  "***output guides, figures and image summary to Github"             > output/stage_GHupload
+      echo  ""                                                  >> output/stage_GHupload
+      $UploadSummaryGH                                          &>> output/stage_GHupload
+      if [[ ! -e $WARNING_LOG ]] && [[ ! -e $ERROR_LOG ]]; then
+        $UploadGuidesGH                                          &>> output/stage_GHupload
+        echo "guides: $GITURL"  >> $TIME_LOG
     fi
   fi
   echo ""                                  >> $TIME_LOG
@@ -1870,6 +1872,7 @@ cd
 SMV_SUMMARY_DIR=$smvrepo/Manuals/SMV_Summary
 
 UploadGuidesGH=$botrepo/Smokebot/smv_guides2GH.sh
+UploadSummaryGH=$botrepo/Smokebot/smv_summary2GH.sh
 UploadWEB=$botrepo/Smokebot/smv_web2GD.sh
 
 THIS_FDS_AUTHOR=
