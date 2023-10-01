@@ -1794,6 +1794,9 @@ fi
    fi
    if [[ "$WEB_URL" != "" ]] && [[ "$UPDATED_WEB_IMAGES" != "" ]]; then
      echo "images: $WEB_URL"  >> $TIME_LOG
+     if [ "$WEB_DIR" != "" ]; then
+       echo "images dir: $WEB_DIR"  >> $TIME_LOG
+     fi
      if [ -e image_differences ]; then
        NUM_CHANGES=`cat image_differences | awk '{print $1}'`
        NUM_ERRORS=`cat image_differences | awk '{print $2}'`
