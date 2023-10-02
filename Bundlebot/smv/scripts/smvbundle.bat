@@ -1,4 +1,5 @@
 @echo off
+setlocal
 
 ::*** parse command line arguments
 call :getopts %*
@@ -10,14 +11,15 @@ if "x%stopscript%" == "x" goto endif2
 
 :: batch file for creating libraries on windows, linux or osx
 
-set currentdir=%CD%
+set scriptdir=%~dp0
+cd %scriptdir%
 cd ..\..\..\..
 set reporoot=%CD%
 
-cd %currentdir%\output
+cd %scriptdir%\output
 set outdir=%CD%
 
-cd %currentdir%
+cd %scriptdir%
 
 call get_hash_revisions > %outdir%\stage1_hash 2>&1
 set /p smv_hash=<output\SMV_HASH
@@ -52,7 +54,7 @@ Title Building applications
 
 %svn_drive%
 
-set "progs=background flush hashfile smokediff smokezip wind2fds"
+set "progs=background flush hashfile smokediff smokezip wind2fds set_path timep get_time"
 
 for %%x in ( %progs% ) do (
   title Building %%x
@@ -86,7 +88,7 @@ gh release upload %GH_SMOKEVIEW_TAG% %uploaddir%\%smvrepo_revision%_win.exe  -R 
 
 echo *** upload complete
 
-cd %currentdir%
+cd %scriptdir%
 
 goto eof
 

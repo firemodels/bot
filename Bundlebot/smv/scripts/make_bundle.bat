@@ -1,7 +1,13 @@
 @echo off
+setlocal
 set option=%1
 set version_arg=%2
 set SMVEDITION=SMV6
+
+set scriptdir=%~dp0
+cd %scriptdir%
+cd ..\..\..\..
+set reporoot=%CD%
 
 :: Windows batch file to build a smokeview bundle
 
@@ -40,19 +46,19 @@ if "x%option%" == "xtest" goto skip_release1
   set versionbase=%smv_versionbase%
 :skip_release1
 
-set smvbuild=%svn_root%\smv\Build\smokeview\%BUILDDIR%
-set forbundle=%svn_root%\bot\Bundlebot\smv\for_bundle
-set webgldir=%svn_root%\bot\Bundlebot\smv\for_bundle\webgl
-set smvscripts=%svn_root%\smv\scripts
-set svzipbuild=%svn_root%\smv\Build\smokezip\%BUILDDIR%
-set svdiffbuild=%svn_root%\smv\Build\smokediff\%BUILDDIR%
-set bgbuild=%svn_root%\smv\Build\background\intel_win_64
-set hashfilebuild=%svn_root%\smv\Build\hashfile\%BUILDDIR%
-set flushfilebuild=%svn_root%\smv\Build\flush\%BUILDDIR%
-set timepbuild=%svn_root%\smv\Build\timep\%BUILDDIR%
-set windbuild=%svn_root%\smv\Build\wind2fds\%BUILDDIR%
-set sh2bat=%svn_root%\smv\Build\sh2bat\intel_win_64
-set gettime=%svn_root%\smv\Build\get_time\%BUILDDIR%
+set smvbuild=%reporoot%\smv\Build\smokeview\%BUILDDIR%
+set forbundle=%reporoot%\bot\Bundlebot\smv\for_bundle
+set webgldir=%reporoot%\bot\Bundlebot\smv\for_bundle\webgl
+set smvscripts=%reporoot%\smv\scripts
+set svzipbuild=%reporoot%\smv\Build\smokezip\%BUILDDIR%
+set svdiffbuild=%reporoot%\smv\Build\smokediff\%BUILDDIR%
+set bgbuild=%reporoot%\smv\Build\background\intel_win_64
+set hashfilebuild=%reporoot%\smv\Build\hashfile\%BUILDDIR%
+set flushfilebuild=%reporoot%\smv\Build\flush\%BUILDDIR%
+set timepbuild=%reporoot%\smv\Build\timep\%BUILDDIR%
+set windbuild=%reporoot%\smv\Build\wind2fds\%BUILDDIR%
+set sh2bat=%reporoot%\smv\Build\sh2bat\intel_win_64
+set gettime=%reporoot%\smv\Build\get_time\%BUILDDIR%
 set hashfileexe=%hashfilebuild%\hashfile_win_64.exe
 set repoexes=%userprofile%\.bundle\BUNDLE\WINDOWS\repoexes
 
@@ -72,7 +78,7 @@ IF EXIST %smvdir% rmdir /S /Q %smvdir%
 mkdir %smvdir%
 mkdir %smvdir%\hash
 
-CALL :COPY  %svn_root%\smv\Build\set_path\intel_win_64\set_path_win_64.exe "%smvdir%\set_path.exe"
+CALL :COPY  %reporoot%\smv\Build\set_path\intel_win_64\set_path_win_64.exe "%smvdir%\set_path.exe"
 
 if NOT "x%option%" == "xtest" goto skip_test1 
   CALL :COPY  %smvbuild%\smokeview_win_test_64.exe  %smvdir%\smokeview.exe
@@ -145,7 +151,7 @@ copy %forbundle%\colorbars\circular\*.csv  %smvdir%\colorbars\circular  >Nul
 CALL :COPY  %forbundle%\objects.svo             %smvdir%\.
 CALL :COPY  %sh2bat%\sh2bat.exe                 %smvdir%\.
 CALL :COPY  %gettime%\get_time_win_64.exe       %smvdir%\get_time.exe
-CALL :COPY  %svn_root%\webpages\smv_readme.html %smvdir%\release_notes.html
+CALL :COPY  %reporoot%\webpages\smv_readme.html %smvdir%\release_notes.html
 CALL :COPY  %forbundle%\.smokeview_bin          %smvdir%\.
 
 echo.
