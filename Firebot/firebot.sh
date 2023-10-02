@@ -1795,8 +1795,13 @@ fi
    if [[ "$WEB_URL" != "" ]] && [[ "$UPDATED_WEB_IMAGES" != "" ]]; then
      echo "images: $WEB_URL"  >> $TIME_LOG
      if [ "$WEB_DIR" != "" ]; then
-       echo "images dir: $WEB_DIR"  >> $TIME_LOG
+       echo "images dir: $WEB_DIR or $FDS_SUMMARY_DIR"  >> $TIME_LOG
      fi
+   fi
+   if [ "$MAKE_SUMMARY" != "" ]; then
+     echo "summary dir: $FDS_SUMMARY_DIR"  >> $TIME_LOG
+   fi
+   if [[ "$WEB_URL" != "" ]] && [[ "$UPDATED_WEB_IMAGES" != "" ]]; then
      if [ -e image_differences ]; then
        NUM_CHANGES=`cat image_differences | awk '{print $1}'`
        NUM_ERRORS=`cat image_differences | awk '{print $2}'`
@@ -2031,6 +2036,7 @@ OPENMPTEST=1
 MPI_TYPE=ompi
 BOPT=
 GITURL=
+MAKE_SUMMARY=
 
 #*** parse command line arguments
 while getopts 'b:BcCdDJm:Mp:q:R:sTuUV:x:X:y:Y:w:W:' OPTION
@@ -2676,6 +2682,7 @@ if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
     make_fds_pictures
     check_fds_pictures
     make_fds_summary
+    MAKE_SUMMARY=1
   fi
 PICTURE_end=`GET_TIME`
 GET_DURATION $PICTURE_beg $PICTURE_end PICTURE
