@@ -15,14 +15,12 @@ if [ "$BASEDIR" == "Firebot" ]; then
   BOT_SUMMARY=fds/Manuals/FDS_Summary
   BOT_TYPE=firebot
   BOT_TITLE=FDS
-  HOME=
   PROG=fds
 fi
 if [ "$BASEDIR" == "Smokebot" ]; then
   BOT_SUMMARY=smv/Manuals/SMV_Summary
   BOT_TYPE=smokebot
   BOT_TITLE=Smokeview
-  HOME=1
   PROG=smv
 fi
 if [ "$BOT_SUMMARY" == "" ]; then
@@ -114,11 +112,7 @@ cd $SUMMARY_DIR
 SUMMARY_DIR=`pwd`
 cd $CURDIR
 
-if [ "$BASEDIR" == "Firebot" ]; then
-  HTML_DIFF=$SUMMARY_DIR/index.html
-else
-  HTML_DIFF=$SUMMARY_DIR/diffs.html
-fi
+HTML_DIFF=$SUMMARY_DIR/diffs.html
 
 #*** setup revision strings
 
@@ -290,11 +284,10 @@ fi
 if [ "$HAVE_VER_DIFFS" == "0" ]; then
   LINK2=
 fi
-if [ "$HOME" != "" ]; then
 cat << EOF >> $HTML_DIFF
-<a href="index.html">[Home]</a>
+<a href="diffs.html">[Diffs]</a>
+<a href="index.html">[Summary]</a>
 EOF
-fi
 cat << EOF >> $HTML_DIFF
 $LINK1$LINK3$LINK2$LINK4
 EOF
