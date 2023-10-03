@@ -266,8 +266,12 @@ LINK1="<a href="#userdiffs">[Changed User Guide Images]</a>"
 LINK2="<a href="#verificationdiffs">[Changed Verification Guide Images]</a>"
 LINK3="<a href="#userall">[Unchanged User Guide Images]</a>"
 LINK4="<a href="#verificationall">[Unchanged Verification Guide Images]</a>"
-if [ "$BOT_TITLE" == "FDS" ]; then
-LINK5="<a href="manuals.html">[Manuals]</a>"
+if [ "$BASE_DIR" == "Firebot" ]; then
+  if [ "$SUBDIR" == "manuals" ]; then
+      LINK5="[Manuals]"
+    else
+      LINK5="<a href="#manuals">[Manuals]</a>"
+  fi
 fi
 if [[ "$SUBDIR" == "user" ]] && [[ "$OPTION" == "all" ]]; then
   LINK3="[Unchanged User Guide Images]"
@@ -471,7 +475,7 @@ DATE=`date`
 cat << EOF  > $HTML_DIFF
 <html>
 <head>
-<TITLE>$BOT_TITLE User and Verification Guide Image Differences</TITLE>
+<TITLE>$BOT_TITLE Summary</TITLE>
 </HEAD>
 <BODY BGCOLOR="#FFFFFF" >
 <h2>$BOT_TITLE User and Verification Guide Image Differences - $DATE</h2>
@@ -490,6 +494,20 @@ EOF
 
 OUTPUT_HTML user         User         $FIG_USER_FDS_REVISION $FIG_USER_SMV_REVISION
 OUTPUT_HTML verification Verification $FIG_VER_FDS_REVISION  $FIG_VER_SMV_REVISION
+
+if [ "$BASEDIR" == "Firebot" ]; then
+cat << EOF  >> $HTML_DIFF
+<h3 id="manuals">Manuals</h3>
+OUTPUT_LINKS manuals
+<ul>
+<li><a href="manuals/FDS_Config_Management_Plan.pdf">FDS Config Management Plan</a>
+<li><a href="manuals/FDS_Technical_Reference_Guide.pdf">FDS Technical Reference Guide</a>
+<li><a href="manuals/FDS_User_Guide.pdf">FDS User Guide</a>
+<li><a href="manuals/FDS_Validation_Guide.pdf">FDS Validation Guide</a>
+<li><a href="manuals/FDS_Verification_Guide.pdf">FDS Verification Guide</a>
+</ul>
+EOF
+fi
 
 cat << EOF  >> $HTML_DIFF
 <p><hr>
