@@ -112,7 +112,7 @@ cd $SUMMARY_DIR
 SUMMARY_DIR=`pwd`
 cd $CURDIR
 
-HTML_DIFF=$SUMMARY_DIR/diffs.html
+HTML_DIFF=$SUMMARY_DIR/index.html
 
 #*** setup revision strings
 
@@ -266,7 +266,7 @@ LINK1="<a href="#userdiffs">[Changed User Guide Images]</a>"
 LINK2="<a href="#verificationdiffs">[Changed Verification Guide Images]</a>"
 LINK3="<a href="#userall">[Unchanged User Guide Images]</a>"
 LINK4="<a href="#verificationall">[Unchanged Verification Guide Images]</a>"
-LINK5="<a href="index.html">[Manuals]</a>"
+LINK5="<a href="manuals.html">[Manuals]</a>"
 if [[ "$SUBDIR" == "user" ]] && [[ "$OPTION" == "all" ]]; then
   LINK3="[Unchanged User Guide Images]"
 fi
@@ -469,10 +469,10 @@ DATE=`date`
 cat << EOF  > $HTML_DIFF
 <html>
 <head>
-<TITLE>$BOT_TITLE User, Verification Guide Images</TITLE>
+<TITLE>$BOT_TITLE User and Verification Guide Image Differences</TITLE>
 </HEAD>
 <BODY BGCOLOR="#FFFFFF" >
-<h2>$BOT_TITLE User, Verification Guide Images - $DATE</h2>
+<h2>$BOT_TITLE User and Verification Guide Image Differences - $DATE</h2>
 
 <table>
 <tr><th align=left>FDS revision:</th>     <td> $FDS_REVISION              </td></tr>

@@ -1690,7 +1690,7 @@ make_fds_summary()
 
     CURDIR=`pwd`
     cd $botrepo/Firebot
-    ./FDS_Summary.sh $FDS_REVISION $SMV_REVISION > $FDS_SUMMARY_DIR/index.html
+    ./FDS_Summary.sh $FDS_REVISION $SMV_REVISION > $FDS_SUMMARY_DIR/manuals.html
     ./compare_images.sh $FDS_SUMMARY_DIR/images $FDS_SUMMARY_DIR/diffs/images $OUTPUT_DIR/error_images >& $OUTPUT_DIR/stage8_image_compare
 
 # look for fyis
@@ -1794,9 +1794,9 @@ fi
      echo "status:  https://pages.nist.gov/fds-smv/firebot_status.html" >> $TIME_LOG
    fi
    if [[ "$WEB_URL" != "" ]] && [[ "$UPDATED_WEB_IMAGES" != "" ]]; then
-     echo "images: $WEB_URL"  >> $TIME_LOG
+     echo "image url: $WEB_URL"  >> $TIME_LOG
      if [ "$WEB_DIR" != "" ]; then
-       echo "images dir: $WEB_DIR or $FDS_SUMMARY_DIR"  >> $TIME_LOG
+       echo "image dir: $WEB_DIR"  >> $TIME_LOG
      fi
    fi
    if [ "$MAKE_SUMMARY" != "" ]; then
@@ -2148,7 +2148,7 @@ fi
 
 if [ "$WEB_DIR" != "" ]; then
   WEB_BASE_DIR=$WEB_DIR
-  WEB_DIR=$WEB_ROOT/$WEB_DIR
+  
   if [ ! -d $WEB_DIR ]; then
     WEB_DIR=
     WEB_BASE_DIR=
