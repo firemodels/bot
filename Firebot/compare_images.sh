@@ -266,7 +266,9 @@ LINK1="<a href="#userdiffs">[Changed User Guide Images]</a>"
 LINK2="<a href="#verificationdiffs">[Changed Verification Guide Images]</a>"
 LINK3="<a href="#userall">[Unchanged User Guide Images]</a>"
 LINK4="<a href="#verificationall">[Unchanged Verification Guide Images]</a>"
+if [ "$BOT_TITLE" == "FDS" ]; then
 LINK5="<a href="manuals.html">[Manuals]</a>"
+fi
 if [[ "$SUBDIR" == "user" ]] && [[ "$OPTION" == "all" ]]; then
   LINK3="[Unchanged User Guide Images]"
 fi
