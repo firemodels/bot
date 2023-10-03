@@ -246,6 +246,8 @@ for f in $NEW_DIR/$SUBDIR/*.png; do
     if [[ "$diff" != "0" ]]; then
       DIFFS=$((DIFFS + 1))
     fi
+    mogrify -resize 200x200 $from_file
+    mogrify -resize 200x200 $to_file
   fi
   if [[ ! -e $from_file ]]; then
     echo "***$FYI: The base image $from_file does not exist."
