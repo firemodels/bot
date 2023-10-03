@@ -15,8 +15,8 @@ FDS build: $FDSREVISION<br>
 Smokeview build: $SMVREVISION
 </h3>
 
-<h3><a href="diffs.html"</a>Image Comparison</a></h3>
-<h3>Guides</h3>
+<h3><a href="diffs.html"</a>Image Comparisons</a></h3>
+<h3>Manuals</h3>
 <ul>
 <li><a href="manuals/FDS_Config_Management_Plan.pdf">FDS Config Management Plan</a>
 <li><a href="manuals/FDS_Technical_Reference_Guide.pdf">FDS Technical Reference Guide</a>

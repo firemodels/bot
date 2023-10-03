@@ -266,6 +266,7 @@ LINK1="<a href="#userdiffs">[Changed User Guide Images]</a>"
 LINK2="<a href="#verificationdiffs">[Changed Verification Guide Images]</a>"
 LINK3="<a href="#userall">[Unchanged User Guide Images]</a>"
 LINK4="<a href="#verificationall">[Unchanged Verification Guide Images]</a>"
+LINK5="<a href="index.html">[Manuals]</a>"
 if [[ "$SUBDIR" == "user" ]] && [[ "$OPTION" == "all" ]]; then
   LINK3="[Unchanged User Guide Images]"
 fi
@@ -285,11 +286,7 @@ if [ "$HAVE_VER_DIFFS" == "0" ]; then
   LINK2=
 fi
 cat << EOF >> $HTML_DIFF
-<a href="diffs.html">[Diffs]</a>
-<a href="index.html">[Summary]</a>
-EOF
-cat << EOF >> $HTML_DIFF
-$LINK1$LINK3$LINK2$LINK4
+$LINK1$LINK3$LINK2$LINK4$LINK5
 EOF
 }
 
