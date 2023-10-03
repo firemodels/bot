@@ -15,7 +15,7 @@ if [ ! -d $DIR ]; then
 fi
 
 rm -f $DIR/FDS_Summary.tar
-tar cvf $DIR/FDS_Summary.tar FDS_Summary >& /dev/null
+tar cvf $DIR/FDS_Summary.tar FDS_Summary --exclude 'FDS_Summary/manuals' >& /dev/null
 echo ***Uploading FDS_Summary.tar
 gh release upload $GH_FDS_TAG $DIR/FDS_Summary.tar -R github.com/$GH_OWNER/$GH_REPO --clobber
 

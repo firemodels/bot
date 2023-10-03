@@ -50,6 +50,13 @@ HEIGHT_CHANGED=250
 WIDTH_CHANGED=250
 HOSTNAME=`hostname -s`
 
+# add manuals
+
+ADD_MANUALS=
+if [[ "$BASEDIR" == "Firebot" ]] && [[ "$GH_FDS_TAG" != "" ]] && [[ "$GH_OWNER" != "" ]] && [[ "$GH_REPO" != "" ]]; then
+  ADD_MANUALS=1
+fi
+
 #*** setup directories
 
 CURDIR=`pwd`
@@ -266,13 +273,6 @@ LINK1="<a href="#userdiffs">[Changed User Guide Images]</a>"
 LINK2="<a href="#verificationdiffs">[Changed Verification Guide Images]</a>"
 LINK3="<a href="#userall">[Unchanged User Guide Images]</a>"
 LINK4="<a href="#verificationall">[Unchanged Verification Guide Images]</a>"
-if [ "$BASEDIR" == "Firebot" ]; then
-  if [ "$SUBDIR" == "manuals" ]; then
-      LINK5="[Manuals]"
-    else
-      LINK5="<a href="#manuals">[Manuals]</a>"
-  fi
-fi
 if [[ "$SUBDIR" == "user" ]] && [[ "$OPTION" == "all" ]]; then
   LINK3="[Unchanged User Guide Images]"
 fi
@@ -292,7 +292,7 @@ if [ "$HAVE_VER_DIFFS" == "0" ]; then
   LINK2=
 fi
 cat << EOF >> $HTML_DIFF
-$LINK1$LINK3$LINK2$LINK4$LINK5
+$LINK1$LINK3$LINK2$LINK4
 EOF
 }
 
@@ -487,6 +487,13 @@ cat << EOF  > $HTML_DIFF
 <tr><th align=left>Root:</th>             <td> $REPO                      </td></tr>
 <tr><th align=left>Metric/Tolerance:</th> <td> ${METRIC_LABEL}/$TOLERANCE </td></tr>
 <tr><th align=left>Differences/Errors:</th>     <td> $HAVE_DIFFS/$HAVE_ERRORS   </td></tr>
+EOF
+if [ "$ADD_MANUALS" != "" ]; then
+cat << EOF  >> $HTML_DIFF
+<tr><th align=left>Bundles/Guides/Figures:</th><td><a href="https://github.com/$GH_OWNER/$GH_REPO">https://github.com/$GH_OWNER/$GH_REPO</a></td></tr>
+EOF
+fi
+cat << EOF  >> $HTML_DIFF
 </table>
 EOF
 
@@ -494,22 +501,6 @@ EOF
 
 OUTPUT_HTML user         User         $FIG_USER_FDS_REVISION $FIG_USER_SMV_REVISION
 OUTPUT_HTML verification Verification $FIG_VER_FDS_REVISION  $FIG_VER_SMV_REVISION
-
-if [ "$BASEDIR" == "Firebot" ]; then
-cat << EOF  >> $HTML_DIFF
-<h3 id="manuals">Manuals</h3>
-EOF
-OUTPUT_LINKS manuals
-cat << EOF  >> $HTML_DIFF
-<ul>
-<li><a href="manuals/FDS_Config_Management_Plan.pdf">FDS Config Management Plan</a>
-<li><a href="manuals/FDS_Technical_Reference_Guide.pdf">FDS Technical Reference Guide</a>
-<li><a href="manuals/FDS_User_Guide.pdf">FDS User Guide</a>
-<li><a href="manuals/FDS_Validation_Guide.pdf">FDS Validation Guide</a>
-<li><a href="manuals/FDS_Verification_Guide.pdf">FDS Verification Guide</a>
-</ul>
-EOF
-fi
 
 cat << EOF  >> $HTML_DIFF
 <p><hr>
