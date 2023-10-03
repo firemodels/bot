@@ -15,14 +15,12 @@ if [ "$BASEDIR" == "Firebot" ]; then
   BOT_SUMMARY=fds/Manuals/FDS_Summary
   BOT_TYPE=firebot
   BOT_TITLE=FDS
-  HOME=
   PROG=fds
 fi
 if [ "$BASEDIR" == "Smokebot" ]; then
   BOT_SUMMARY=smv/Manuals/SMV_Summary
   BOT_TYPE=smokebot
   BOT_TITLE=Smokeview
-  HOME=1
   PROG=smv
 fi
 if [ "$BOT_SUMMARY" == "" ]; then
@@ -51,6 +49,13 @@ WIDTH_UNCHANGED=200
 HEIGHT_CHANGED=250
 WIDTH_CHANGED=250
 HOSTNAME=`hostname -s`
+
+# add manuals
+
+ADD_MANUALS=
+if [[ "$BASEDIR" == "Firebot" ]] && [[ "$GH_FDS_TAG" != "" ]] && [[ "$GH_OWNER" != "" ]] && [[ "$GH_REPO" != "" ]]; then
+  ADD_MANUALS=1
+fi
 
 #*** setup directories
 
@@ -114,11 +119,7 @@ cd $SUMMARY_DIR
 SUMMARY_DIR=`pwd`
 cd $CURDIR
 
-if [ "$BASEDIR" == "Firebot" ]; then
-  HTML_DIFF=$SUMMARY_DIR/index.html
-else
-  HTML_DIFF=$SUMMARY_DIR/diffs.html
-fi
+HTML_DIFF=$SUMMARY_DIR/index.html
 
 #*** setup revision strings
 
@@ -289,11 +290,6 @@ if [ "$HAVE_USER_DIFFS" == "0" ]; then
 fi
 if [ "$HAVE_VER_DIFFS" == "0" ]; then
   LINK2=
-fi
-if [ "$HOME" != "" ]; then
-cat << EOF >> $HTML_DIFF
-<a href="index.html">[Home]</a>
-EOF
 fi
 cat << EOF >> $HTML_DIFF
 $LINK1$LINK3$LINK2$LINK4
@@ -479,10 +475,10 @@ DATE=`date`
 cat << EOF  > $HTML_DIFF
 <html>
 <head>
-<TITLE>$BOT_TITLE User, Verification Guide Images</TITLE>
+<TITLE>$BOT_TITLE Summary</TITLE>
 </HEAD>
 <BODY BGCOLOR="#FFFFFF" >
-<h2>$BOT_TITLE User, Verification Guide Images - $DATE</h2>
+<h2>$BOT_TITLE Summary - $DATE</h2>
 
 <table>
 <tr><th align=left>FDS revision:</th>     <td> $FDS_REVISION              </td></tr>
@@ -491,6 +487,13 @@ cat << EOF  > $HTML_DIFF
 <tr><th align=left>Root:</th>             <td> $REPO                      </td></tr>
 <tr><th align=left>Metric/Tolerance:</th> <td> ${METRIC_LABEL}/$TOLERANCE </td></tr>
 <tr><th align=left>Differences/Errors:</th>     <td> $HAVE_DIFFS/$HAVE_ERRORS   </td></tr>
+EOF
+if [ "$ADD_MANUALS" != "" ]; then
+cat << EOF  >> $HTML_DIFF
+<tr><th align=left>Bundles/Guides/Figures:</th><td><a href="https://github.com/$GH_OWNER/$GH_REPO">https://github.com/$GH_OWNER/$GH_REPO</a></td></tr>
+EOF
+fi
+cat << EOF  >> $HTML_DIFF
 </table>
 EOF
 

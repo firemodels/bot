@@ -12,7 +12,7 @@ cd $SCRIPT_DIR/../..
 ROOT_DIR=`pwd`
 
 SUMMARY_DIR=$ROOT_DIR/smv/Manuals/SMV_Summary
-SUMMARY_FILE=$SUMMARY_DIR/diffs.html
+SUMMARY_FILE=$SUMMARY_DIR/index.html
 if [ -e $SUMMARY_FILE ]; then
   firefox $SUMMARY_FILE
 else
