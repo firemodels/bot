@@ -265,6 +265,15 @@ else
 fi
 }
 
+
+#---------------------------------------------------------
+#*** REDUCE_IMAGES
+#---------------------------------------------------------
+
+REDUCE_IMAGES ()
+{
+}
+
 #---------------------------------------------------------
 #*** OUTPUT_LINKS
 #---------------------------------------------------------
@@ -379,6 +388,7 @@ EOF
       HEIGHT=$HEIGHT_CHANGED
       WIDTH=$WIDTH_CHANGED
     fi
+    SIZE_CONVERT=${HEIGHT}x${WIDTH}
     COMPARE=`echo $ERROR'>'$TOLERANCE | bc -l`
     STYLE=
     if [ "$COMPARE" == "1" ]; then
