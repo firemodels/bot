@@ -402,13 +402,13 @@ if [ "$START_REST" == "2" ]; then
 EOF
   fi
   cat << EOF >> $HTML_DIFF
-<td align=center><a href="diffs/base/$SUBDIR/$pngfile"><img $SIZE src=diffs/base/$SUBDIR/$pngfile></a>
+<td align=center><img $SIZE src=diffs/base/$SUBDIR/$pngfile>
 <br>$pngfile</td>
 EOF
 else
 cat << EOF >> $HTML_DIFF
 <tr>
-<td><a href="diffs/base/$SUBDIR/$pngfile"><img $SIZE src=diffs/base/$SUBDIR/$pngfile></a></td>
+<td><img $SIZE src=diffs/base/$SUBDIR/$pngfile></td>
 EOF
 fi
 
@@ -416,8 +416,8 @@ COLSPAN=
 if [ "$START_REST" != "2" ]; then
   COLSPAN="colspan=2"
   cat << EOF >> $HTML_DIFF
-<td><a href="images/$SUBDIR/$pngfile"><img $SIZE src=images/$SUBDIR/$pngfile></a></td>
-<td><a href="diffs/images/$SUBDIR/$pngfile"><img $SIZE src=diffs/images/$SUBDIR/$pngfile></a></td>
+<td><img $SIZE src=images/$SUBDIR/$pngfile></td>
+<td><img $SIZE src=diffs/images/$SUBDIR/$pngfile></td>
 EOF
 fi
 
