@@ -275,6 +275,10 @@ cd $SUMMARY_DIR
 rm -f images/*.png
 mogrify -resize 250x250 images/user/*.png
 mogrify -resize 250x250 images/verification/*.png
+mogrify -resize 250x250 diffs/base/user/*.png
+mogrify -resize 250x250 diffs/base/verification/*.png
+mogrify -resize 250x250 diffs/images/user/*.png
+mogrify -resize 250x250 diffs/images/verification/*.png
 }
 
 #---------------------------------------------------------
