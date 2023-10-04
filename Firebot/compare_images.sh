@@ -14,13 +14,13 @@ BASEDIR=`basename $CURDIR`
 if [ "$BASEDIR" == "Firebot" ]; then
   BOT_SUMMARY=fds/Manuals/FDS_Summary
   BOT_TYPE=firebot
-  BOT_TITLE=FDS
+  BOT_TITLE=Firebot
   PROG=fds
 fi
 if [ "$BASEDIR" == "Smokebot" ]; then
   BOT_SUMMARY=smv/Manuals/SMV_Summary
   BOT_TYPE=smokebot
-  BOT_TITLE=Smokeview
+  BOT_TITLE=Smokebot
   PROG=smv
 fi
 if [ "$BOT_SUMMARY" == "" ]; then
@@ -52,9 +52,13 @@ HOSTNAME=`hostname -s`
 
 # add manuals
 
-ADD_MANUALS=
+ADD_FDS_MANUALS=
 if [[ "$BASEDIR" == "Firebot" ]] && [[ "$GH_FDS_TAG" != "" ]] && [[ "$GH_OWNER" != "" ]] && [[ "$GH_REPO" != "" ]]; then
-  ADD_MANUALS=1
+  ADD_FDS_MANUALS=1
+fi
+ADD_SMOKEVIEW_MANUALS=
+if [[ "$BASEDIR" == "Smokebot" ]] && [[ "$GH_SMOKEVIEW_TAG" != "" ]] && [[ "$GH_OWNER" != "" ]] && [[ "$GH_REPO" != "" ]]; then
+  ADD_SMOKEVIEW_MANUALS=1
 fi
 
 #*** setup directories
@@ -488,9 +492,14 @@ cat << EOF  > $HTML_DIFF
 <tr><th align=left>Metric/Tolerance:</th> <td> ${METRIC_LABEL}/$TOLERANCE </td></tr>
 <tr><th align=left>Differences/Errors:</th>     <td> $HAVE_DIFFS/$HAVE_ERRORS   </td></tr>
 EOF
-if [ "$ADD_MANUALS" != "" ]; then
+if [ "$ADD_FDS_MANUALS" != "" ]; then
 cat << EOF  >> $HTML_DIFF
-<tr><th align=left>Bundles/Guides/Figures:</th><td><a href="https://github.com/$GH_OWNER/$GH_REPO">https://github.com/$GH_OWNER/$GH_REPO</a></td></tr>
+<tr><th align=left>Bundles/Guides/Figures:</th><td><a href="https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_FDS_TAG">https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_FDS_TAG</a></td></tr>
+EOF
+fi
+if [ "$ADD_SMOKEVIEW_MANUALS" != "" ]; then
+cat << EOF  >> $HTML_DIFF
+<tr><th align=left>Bundles/Guides/Figures:</th><td><a href="https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_SMOKEVIEW_TAG">https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_SMOKEVIEW_TAG</a></td></tr>
 EOF
 fi
 cat << EOF  >> $HTML_DIFF

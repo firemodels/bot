@@ -1823,7 +1823,7 @@ fi
    if [[ "$UPLOADGUIDES" == "1" ]] && [[ "$is_bot"  == "1" ]]; then
      cd $firebotdir
      GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_FDS_TAG
-     echo "FDS Test Releases, Documentation and Summary:  $GITURL" >> $TIME_LOG
+     echo "Bundles, Guides, Summary:  $GITURL" >> $TIME_LOG
      $SummaryGH &> $OUTPUT_DIR/stage10_upload_github
      if [[ "$firebot_success" == "1" ]]; then
        $UploadGuidesGH &>> $OUTPUT_DIR/stage10_upload_github
