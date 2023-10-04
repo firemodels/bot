@@ -273,12 +273,12 @@ REDUCE_IMAGES ()
 {
 cd $SUMMARY_DIR
 rm -f images/*.png
-mogrify -resize 250x250 images/user/*.png
-mogrify -resize 250x250 images/verification/*.png
-mogrify -resize 250x250 diffs/base/user/*.png
-mogrify -resize 250x250 diffs/base/verification/*.png
-mogrify -resize 250x250 diffs/images/user/*.png
-mogrify -resize 250x250 diffs/images/verification/*.png
+mogrify -resize 200x200 images/user/*.png
+mogrify -resize 200x200 images/verification/*.png
+mogrify -resize 200x200 diffs/base/user/*.png
+mogrify -resize 200x200 diffs/base/verification/*.png
+mogrify -resize 200x200 diffs/images/user/*.png
+mogrify -resize 200x200 diffs/images/verification/*.png
 }
 
 #---------------------------------------------------------
