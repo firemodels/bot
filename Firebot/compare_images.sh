@@ -265,13 +265,16 @@ else
 fi
 }
 
-
 #---------------------------------------------------------
 #*** REDUCE_IMAGES
 #---------------------------------------------------------
 
 REDUCE_IMAGES ()
 {
+cd $SUMMARY_DIR
+rm -f images/*.png
+mogrify -resize 250x250 images/user/*.png
+mogrify -resize 250x250 images/verification/*.png
 }
 
 #---------------------------------------------------------
@@ -527,7 +530,7 @@ cat << EOF  >> $HTML_DIFF
 </HTML>
 EOF
 
-
+REDUCE_IMAGES
 
 if [ "$HAVE_DIFFS" == "0" ]; then
   echo no images have changed
