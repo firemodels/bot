@@ -13,6 +13,7 @@ echo ""
 echo "************************************"
 echo ***install packages for building smokeview
 sudo apt -y install freeglut3-dev mesa-utils libx11-dev libxmu-dev libxi-dev
+sudo apt -y install ffmpeg
 sudo apt -y install clang-format clang-tidy
 
 echo ""
