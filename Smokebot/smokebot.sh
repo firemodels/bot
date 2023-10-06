@@ -1388,14 +1388,15 @@ fi
     NAMELIST_NOSOURCE_LOG=
   fi
   cd $smokebotdir
+  echo ""  >> $TIME_LOG
   # Check for warnings and errors
   if [[ "$WEB_URL" != "" ]] && [[ "$UPDATED_WEB_IMAGES" == "1" ]]; then
     if [ -e image_differences ]; then
       NUM_CHANGES=`cat image_differences | awk '{print $1}'`
       NUM_ERRORS=`cat image_differences | awk '{print $2}'`
-      echo "images: URL: $WEB_URL, errors/changes: $NUM_ERRORS/$NUM_CHANGES"  >> $TIME_LOG
+      echo "images: $WEB_URL, errors/changes: $NUM_ERRORS/$NUM_CHANGES"  >> $TIME_LOG
     else
-      echo "images: URL: $WEB_URL" >> $TIME_LOG
+      echo "images: $WEB_URL" >> $TIME_LOG
     fi
   fi
   if [ "$UPLOADRESULTS" == "1" ]; then
@@ -1412,7 +1413,7 @@ fi
     fi
     if [[ "$is_bot" == "1" ]]; then
       GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_SMOKEVIEW_TAG
-      echo "guides/summary: $GITURL"  >> $TIME_LOG
+      echo "Bundles/Guides/Figures: $GITURL"  >> $TIME_LOG
       echo  "***output guides, figures and image summary to Github"             > output/stage_GHupload
       echo  ""                                                  >> output/stage_GHupload
       $UploadSummaryGH                                          &>> output/stage_GHupload
@@ -1818,7 +1819,7 @@ if [ "$WEB_DIR" != "" ]; then
 fi
 if [ "$WEB_DIR" != "" ]; then
   WEB_HOST=`hostname -A | awk '{print $2}'`
-  WEB_URL=http://$WEB_HOST/$WEB_DIR/diffs.html
+  WEB_URL=http://$WEB_HOST/$WEB_DIR
 else
   WEB_URL=
 fi
