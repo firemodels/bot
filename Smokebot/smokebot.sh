@@ -1393,9 +1393,9 @@ fi
     if [ -e image_differences ]; then
       NUM_CHANGES=`cat image_differences | awk '{print $1}'`
       NUM_ERRORS=`cat image_differences | awk '{print $2}'`
-      echo "images: URL: $WEB_URL, errors/changes: $NUM_ERRORS/$NUM_CHANGES"  >> $TIME_LOG
+      echo "images: $WEB_URL, errors/changes: $NUM_ERRORS/$NUM_CHANGES"  >> $TIME_LOG
     else
-      echo "images: URL: $WEB_URL" >> $TIME_LOG
+      echo "images: $WEB_URL" >> $TIME_LOG
     fi
   fi
   if [ "$UPLOADRESULTS" == "1" ]; then
@@ -1818,7 +1818,7 @@ if [ "$WEB_DIR" != "" ]; then
 fi
 if [ "$WEB_DIR" != "" ]; then
   WEB_HOST=`hostname -A | awk '{print $2}'`
-  WEB_URL=http://$WEB_HOST/$WEB_DIR/diffs.html
+  WEB_URL=http://$WEB_HOST/$WEB_DIR
 else
   WEB_URL=
 fi
