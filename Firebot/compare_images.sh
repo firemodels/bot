@@ -266,6 +266,22 @@ fi
 }
 
 #---------------------------------------------------------
+#*** REDUCE_IMAGES
+#---------------------------------------------------------
+
+REDUCE_IMAGES ()
+{
+cd $SUMMARY_DIR
+rm -f images/*.png
+mogrify -resize 200x200 images/user/*.png
+mogrify -resize 200x200 images/verification/*.png
+mogrify -resize 200x200 diffs/base/user/*.png
+mogrify -resize 200x200 diffs/base/verification/*.png
+mogrify -resize 200x200 diffs/images/user/*.png
+mogrify -resize 200x200 diffs/images/verification/*.png
+}
+
+#---------------------------------------------------------
 #*** OUTPUT_LINKS
 #---------------------------------------------------------
 
@@ -277,6 +293,10 @@ LINK1="<a href="#userdiffs">[Changed User Guide Images]</a>"
 LINK2="<a href="#verificationdiffs">[Changed Verification Guide Images]</a>"
 LINK3="<a href="#userall">[Unchanged User Guide Images]</a>"
 LINK4="<a href="#verificationall">[Unchanged Verification Guide Images]</a>"
+LINK5="<a href="#manuals">[Guides]</a>"
+if [[ "$SUBDIR" == "manuals" ]]; then
+  LINK5="[Guides]"
+fi
 if [[ "$SUBDIR" == "user" ]] && [[ "$OPTION" == "all" ]]; then
   LINK3="[Unchanged User Guide Images]"
 fi
@@ -296,7 +316,7 @@ if [ "$HAVE_VER_DIFFS" == "0" ]; then
   LINK2=
 fi
 cat << EOF >> $HTML_DIFF
-$LINK1$LINK3$LINK2$LINK4
+$LINK1$LINK3$LINK2$LINK4$LINK5
 EOF
 }
 
@@ -346,7 +366,7 @@ FILELIST=`sort -k2,2nr  -k1,1 $file_list | awk '{print $1}'`
 <h2>Changed $GUIDE Guide Images</h2>
 EOF
 OUTPUT_LINKS $SUBDIR diffs
-  cat << EOF >> $HTML_DIFF
+cat << EOF >> $HTML_DIFF
 <p><table border=on>
 <tr>
 <th align=center>Base</th>
@@ -379,6 +399,7 @@ EOF
       HEIGHT=$HEIGHT_CHANGED
       WIDTH=$WIDTH_CHANGED
     fi
+    SIZE_CONVERT=${HEIGHT}x${WIDTH}
     COMPARE=`echo $ERROR'>'$TOLERANCE | bc -l`
     STYLE=
     if [ "$COMPARE" == "1" ]; then
@@ -402,13 +423,13 @@ if [ "$START_REST" == "2" ]; then
 EOF
   fi
   cat << EOF >> $HTML_DIFF
-<td align=center><a href="diffs/base/$SUBDIR/$pngfile"><img $SIZE src=diffs/base/$SUBDIR/$pngfile></a>
+<td align=center><img $SIZE src=diffs/base/$SUBDIR/$pngfile>
 <br>$pngfile</td>
 EOF
 else
 cat << EOF >> $HTML_DIFF
 <tr>
-<td><a href="diffs/base/$SUBDIR/$pngfile"><img $SIZE src=diffs/base/$SUBDIR/$pngfile></a></td>
+<td><img $SIZE src=diffs/base/$SUBDIR/$pngfile></td>
 EOF
 fi
 
@@ -416,8 +437,8 @@ COLSPAN=
 if [ "$START_REST" != "2" ]; then
   COLSPAN="colspan=2"
   cat << EOF >> $HTML_DIFF
-<td><a href="images/$SUBDIR/$pngfile"><img $SIZE src=images/$SUBDIR/$pngfile></a></td>
-<td><a href="diffs/images/$SUBDIR/$pngfile"><img $SIZE src=diffs/images/$SUBDIR/$pngfile></a></td>
+<td><img $SIZE src=images/$SUBDIR/$pngfile></td>
+<td><img $SIZE src=diffs/images/$SUBDIR/$pngfile></td>
 EOF
 fi
 
@@ -510,14 +531,23 @@ EOF
 
 OUTPUT_HTML user         User         $FIG_USER_FDS_REVISION $FIG_USER_SMV_REVISION
 OUTPUT_HTML verification Verification $FIG_VER_FDS_REVISION  $FIG_VER_SMV_REVISION
-
+cat << EOF >> $HTML_DIFF
+<h2 id="manuals">Guides</h2>
+EOF
+OUTPUT_LINKS manuals
 cat << EOF  >> $HTML_DIFF
+<ul>
+<li><a href="manuals/SMV_User_Guide.pdf">Smokeview User Guide</a>
+<li><a href="manuals/SMV_Verification_Guide.pdf">Smokeview Verification Guide</a>
+<li><a href="manuals/SMV_Technical_Reference_Guide.pdf">Smokeview Technical Reference Guide</a>
+</ul>
+
 <p><hr>
 </BODY>
 </HTML>
 EOF
 
-
+REDUCE_IMAGES
 
 if [ "$HAVE_DIFFS" == "0" ]; then
   echo no images have changed

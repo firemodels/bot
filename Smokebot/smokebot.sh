@@ -2184,14 +2184,7 @@ if [[ $stage_ver_release_success ]] ; then
    if [ -d $SMV_SUMMARY_DIR ]; then
      DATE=`date +"%b %d, %Y - %r"`
 
-     sed "s/&&DATE&&/$DATE/g"                $SMV_SUMMARY_DIR/index_template.html   | \
-     sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                          | \
-     sed "s/&&SMV_BUILD&&/$SMV_REVISION/g" > $SMV_SUMMARY_DIR/index.html
-     sed "s/&&DATE&&/$DATE/g"                $SMV_SUMMARY_DIR/manuals_template.html | \
-     sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                          | \
-     sed "s/&&SMV_BUILD&&/$SMV_REVISION/g" > $SMV_SUMMARY_DIR/manuals.html
-
-     sed "s/&&DATE&&/$DATE/g"                $SMV_SUMMARY_DIR/movies_template.html  | \
+     sed "s/&&DATE&&/$DATE/g"                $SMV_SUMMARY_DIR/templates/movies_template.html  | \
      sed "s/&&FDS_BUILD&&/$FDS_REVISION/g"                                          | \
      sed "s/&&SMV_BUILD&&/$SMV_REVISION/g" > $SMV_SUMMARY_DIR/movies.html
 
