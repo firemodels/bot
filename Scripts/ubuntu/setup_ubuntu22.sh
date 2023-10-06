@@ -12,7 +12,8 @@ sudo apt -y install gfortran openmpi-bin openmpi-doc libopenmpi-dev
 echo ""
 echo "************************************"
 echo ***install packages for building smokeview
-sudo apt -y install freeglut3-dev mesa-utils libx11-dev libxmu-dev libxi-dev
+sudo apt -y install libx11-dev libxmu-dev libxi-dev
+sudo apt -y install mesa-common-dev mesa-utils libgl-dev libglu1-mesa-dev
 sudo apt -y install clang-format clang-tidy
 
 echo ""
@@ -39,7 +40,7 @@ curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo 
 
 # download and setup oneapi compilers
 
-echo echo the following commands to install oneapi compilers
+echo the following are commands to download and install oneapi compilers
 echo wget https://registrationcenter-download.intel.com/akdlm/IRC_NAS/992857b9-624c-45de-9701-f6445d845359/l_BaseKit_p_2023.2.0.49397_offline.sh
 echo wget https://registrationcenter-download.intel.com/akdlm/IRC_NAS/0722521a-34b5-4c41-af3f-d5d14e88248d/l_HPCKit_p_2023.2.0.49440_offline.sh
 echo sudo sh ./l_BaseKit_p_2023.2.0.49397_offline.sh
