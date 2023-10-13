@@ -1388,6 +1388,7 @@ fi
     NAMELIST_NOSOURCE_LOG=
   fi
   cd $smokebotdir
+  echo ""  >> $TIME_LOG
   # Check for warnings and errors
   if [[ "$WEB_URL" != "" ]] && [[ "$UPDATED_WEB_IMAGES" == "1" ]]; then
     if [ -e image_differences ]; then
@@ -1412,7 +1413,7 @@ fi
     fi
     if [[ "$is_bot" == "1" ]]; then
       GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_SMOKEVIEW_TAG
-      echo "guides/summary: $GITURL"  >> $TIME_LOG
+      echo "Bundles/Guides/Figures: $GITURL"  >> $TIME_LOG
       echo  "***output guides, figures and image summary to Github"             > output/stage_GHupload
       echo  ""                                                  >> output/stage_GHupload
       $UploadSummaryGH                                          &>> output/stage_GHupload
