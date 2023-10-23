@@ -14,6 +14,7 @@ echo "************************************"
 echo ***install packages for building smokeview
 sudo apt -y install libx11-dev libxmu-dev libxi-dev
 sudo apt -y install mesa-common-dev mesa-utils libgl-dev libglu1-mesa-dev
+sudo apt -y install ffmpeg
 sudo apt -y install clang-format clang-tidy
 
 echo ""
