@@ -1391,12 +1391,19 @@ fi
   echo ""  >> $TIME_LOG
   # Check for warnings and errors
   if [[ "$WEB_URL" != "" ]] && [[ "$UPDATED_WEB_IMAGES" == "1" ]]; then
-    if [ -e image_differences ]; then
-      NUM_CHANGES=`cat image_differences | awk '{print $1}'`
-      NUM_ERRORS=`cat image_differences | awk '{print $2}'`
+    if [ -e $IMAGE_DIFFS ]; then
+      NUM_CHANGES=`cat $IMAGE_DIFFS | awk '{print $1}'`
+      NUM_ERRORS=`cat $IMAGE_DIFFS | awk '{print $2}'`
       echo "images: $WEB_URL, errors/changes: $NUM_ERRORS/$NUM_CHANGES"  >> $TIME_LOG
     else
       echo "images: $WEB_URL" >> $TIME_LOG
+    fi
+  fi
+  if [[ "$WEB_URL" == "" ]]; then
+    if [ -e $IMAGE_DIFFS ]; then
+      NUM_CHANGES=`cat $IMAGE_DIFFS | awk '{print $1}'`
+      NUM_ERRORS=`cat $IMAGE_DIFFS | awk '{print $2}'`
+      echo "images errors/changes: $NUM_ERRORS/$NUM_CHANGES"  >> $TIME_LOG
     fi
   fi
   if [ "$UPLOADRESULTS" == "1" ]; then
@@ -1872,6 +1879,7 @@ echo ""
 cd
 
 SMV_SUMMARY_DIR=$smvrepo/Manuals/SMV_Summary
+IMAGE_DIFFS=$SMV_SUMMARY_DIR/image_differences
 
 UploadGuidesGH=$botrepo/Smokebot/smv_guides2GH.sh
 UploadSummaryGH=$botrepo/Smokebot/smv_summary2GH.sh
