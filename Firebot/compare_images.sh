@@ -121,6 +121,8 @@ cd $CURDIR
 SUMMARY_DIR=../../$BOT_SUMMARY/
 cd $SUMMARY_DIR
 SUMMARY_DIR=`pwd`
+IMAGE_DIFFS=$SUMMARY_DIR/image_differences
+
 cd $CURDIR
 
 HTML_DIFF=$SUMMARY_DIR/index.html
@@ -560,5 +562,5 @@ else
   fi
   echo image differences summarized in $HTML_DIFF
 fi
-echo $HAVE_DIFFS $HAVE_ERRORS > image_differences
+echo $HAVE_DIFFS $HAVE_ERRORS > $IMAGE_DIFFS
 

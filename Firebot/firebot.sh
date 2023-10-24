@@ -1802,9 +1802,9 @@ fi
      echo "summary dir: $FDS_SUMMARY_DIR"  >> $TIME_LOG
    fi
    if [[ "$WEB_URL" != "" ]] && [[ "$UPDATED_WEB_IMAGES" != "" ]]; then
-     if [ -e image_differences ]; then
-       NUM_CHANGES=`cat image_differences | awk '{print $1}'`
-       NUM_ERRORS=`cat image_differences | awk '{print $2}'`
+     if [ -e $IMAGE_DIFFS ]; then
+       NUM_CHANGES=`cat $IMAGE_DIFFS | awk '{print $1}'`
+       NUM_ERRORS=`cat $IMAGE_DIFFS | awk '{print $2}'`
        echo "image errors/changes: $NUM_ERRORS/$NUM_CHANGES"  >> $TIME_LOG
      fi
    fi
@@ -2235,6 +2235,7 @@ FDS_DIR=$fdsrepo/Build/${MPI_TYPE}_${COMPILER}_${platform}${size}
 FDS_EXE=fds_${MPI_TYPE}_${COMPILER}_${platform}${size}
 
 FDS_SUMMARY_DIR=$fdsrepo/Manuals/FDS_Summary
+IMAGE_DIFFS=$FDS_SUMMARY_DIR/image_differences
 
 #*** clean repos
 echo "Status"
