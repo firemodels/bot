@@ -2148,6 +2148,7 @@ fi
 
 if [ "$WEB_DIR" != "" ]; then
   WEB_BASE_DIR=$WEB_DIR
+  WEB_DIR=$WEB_ROOT/$WEB_DIR
   
   if [ ! -d $WEB_DIR ]; then
     WEB_DIR=
