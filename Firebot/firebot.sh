@@ -1105,6 +1105,12 @@ scan_matlab_license_test()
 
 check_matlab_license_server()
 {
+   matlab -help  >& /tmp/matlabtest.$$
+   notfound=`grep 'command not found' /tmp/matlabtest.$$ | wc -l`
+   if [ $notfound -gt 0 ]; then
+     module load matlab
+   fi
+   rm /tmp/matlabtest.$$
    SKIPMATLAB="1"
    for i in 1 2 3 4
    do
