@@ -2007,7 +2007,7 @@ fi
 #*** set initial values
 
 COMPILER=intel
-QUEUE=firebot
+QUEUE=
 CLEANREPO=
 UPDATEREPO=
 JOBPREFIX_RELEASE=FBR_
