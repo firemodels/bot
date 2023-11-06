@@ -11,7 +11,11 @@ function usage_all {
 echo ""
 echo "Miscellaneous:"
 echo "-b - use the current branch"
-echo "-q queue - specify queue [default: $QUEUE]"
+if [ "$QUEUE" != "" ]; then
+  echo "-q queue - specify queue [default: $QUEUE]"
+else
+  echo "-q queue - specify queue"
+fi
 echo "-f - force firebot run"
 if [ "$INTEL" != "" ]; then
   echo "-J - use Intel MPI version fds [default]"
@@ -159,10 +163,12 @@ echo $0 $* > command.firebot
 
 #*** checking to see if a queing system is available
 
-QUEUE=firebot
-notfound=`qstat -a 2>&1 | tail -1 | grep "not found" | wc -l`
+notfound=`sinfo 2>&1 | tail -1 | grep "not found" | wc -l`
 if [ $notfound -eq 1 ] ; then
   QUEUE=none
+fi
+if [ "$QUEUE" != "none" ]; then
+  QUEUE=`sinfo -ho "%P" | grep *$ | sed -e 's/[*]$//'`
 fi
 
 INTEL=
@@ -535,7 +541,12 @@ fi
 # if cloning repos, only update and clean bot repo (which has already been done)
 
 BRANCH="-b $BRANCH"
-QUEUE="-q $QUEUE"
+if [ "$QUEUE" == "" ]; then
+  echo "***error: a queue is not defined. Use the -q option to define a queue to run cases."
+  exit
+else
+  QUEUE="-q $QUEUE"
+fi
 touch $firebot_pid
 firebot_status=0
 $ECHO  ./firebot.sh -p $firebot_pid $UPDATEREPO $INTEL $OPENMPTEST $BUILD_ONLY $FORCECLONE $BRANCH $DEBUG_MODE $MANUALS_MATLAB_ONLY $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $UPLOADGUIDES $CLEANREPO $QUEUE $SKIPMATLAB $CLONE_REPOS $CLONE_FDSSMV $VALIDATION $EMAIL $WEB_ROOT $WEB_DIR "$@"
