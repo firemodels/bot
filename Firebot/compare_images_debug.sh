@@ -30,7 +30,10 @@ botrepo=$repo/bot
 
 FDS_SUMMARY_DIR=$fdsrepo/Manuals/FDS_Summary
 
+echo "copying user guide pngs"
 cp $fdsrepo/Manuals/FDS_User_Guide/SCRIPT_FIGURES/*.png         $FDS_SUMMARY_DIR/images/user/.
+
+echo "copying verification guide pngs"
 cp $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/*.png $FDS_SUMMARY_DIR/images/verification/.
 
 cd $botrepo/Firebot
