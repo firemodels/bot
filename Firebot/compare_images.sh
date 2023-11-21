@@ -204,6 +204,7 @@ rm -f $NEW_DIR/$SUBDIR/blur*.png
 file_list=$DIFF_DIR/$SUBDIR/file_list
 rm -f $file_list
 for f in $NEW_DIR/$SUBDIR/*.png; do
+  echo ""
   base=`basename $f`
   blur_base=blur_$base
   from_file=$REFERENCE_DIR/$base
