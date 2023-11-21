@@ -5,6 +5,7 @@ cd ../..
 repo=`pwd`
 cd $firebotdir
 fdsrepo=$repo/fds
+botrepo=$repo/bot
 
 FDS_SUMMARY_DIR=$fdsrepo/Manuals/FDS_Summary
 OUTPUT_DIR="$firebotdir/output"
