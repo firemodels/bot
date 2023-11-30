@@ -190,7 +190,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'aAbcCfg:G:hHJkm:Mo:Pq:r:R:s:TuUvw:W:x:X:y:Y:' OPTION
+while getopts 'aAB:bcCfg:G:hHJkm:Mo:Pq:r:R:s:TuUvw:W:x:X:y:Y:' OPTION
 do
 case $OPTION  in
   a)
@@ -201,6 +201,9 @@ case $OPTION  in
    ;;
   b)
    BRANCH="current"
+   ;;
+  B)
+   BRANCH="$OPTARG"
    ;;
   c)
    CLEANREPO=-c
