@@ -426,7 +426,7 @@ fi
 #    and that the -b branch option only applies to the fds and smv repos
 
 if [[ "$RUNSMOKEBOT" == "1" ]]; then
-   CD_REPO $repo/bot/Smokebot $BRANCH || exit 1
+   CD_REPO $repo/bot/Smokebot master || exit 1
      
    git fetch origin &> /dev/null
    git merge origin/master &> /dev/null
