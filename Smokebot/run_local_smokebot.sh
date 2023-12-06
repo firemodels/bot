@@ -1,8 +1,9 @@
 #!/bin/bash
 OPTION=$1
 
-# -c clean repos
 # -b use existing branches
+# -c clean repos
+# -f force a smokebot run
 # -J use intel compilers
 # -s cache_dir use results previously computed
 # -S build smokeview with the Intel Sanitize option
