@@ -2068,8 +2068,8 @@ if [ "$CACHE_DIR" == "" ]; then
   compile_fds_mpi_db $FDS_DB_DIR        $FDS_DB_EXE
   compile_fds_mpi    $FDS_DIR           $FDS_EXE
 else
-  echo "   debug fds(cached)"
-  echo "   release fds(cached)"
+  echo "   debug fds(from cache)"
+  echo "   release fds(from cache)"
   if [ ! -d $fdsrepo ]; then
     echo "*error: repo $fdsrepo does not exist"
     exit
