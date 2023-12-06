@@ -916,7 +916,7 @@ compile_smv_db()
      echo "   debug smokeview"
      cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_64
      rm -f smokeview_${platform}_64_db
-     ./make_smokeview_db.sh &> $OUTPUT_DIR/stage2b_smv_dbg
+     ./make_smokeview_db.sh $SANITIZE &> $OUTPUT_DIR/stage2b_smv_dbg
    fi
 }
 
@@ -965,7 +965,7 @@ compile_smv()
      echo "   release smokeview"
      cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_64
      rm -f smokeview_${platform}_64
-     ./make_smokeview.sh &> $OUTPUT_DIR/stage2c_smv_rls
+     ./make_smokeview.sh $SANITIZE  &> $OUTPUT_DIR/stage2c_smv_rls
    fi
 }
 
@@ -1553,6 +1553,7 @@ SMV_REV=origin/master
 FDS_TAG=
 SMV_TAG=
 CHECKOUT=
+SANITIZE=
 compile_errors=
 GITURL=
 CACHE_DIR=
@@ -1564,7 +1565,7 @@ echo $$ > $PID_FILE
 
 #*** parse command line options
 
-while getopts 'aAb:cCJm:Mq:R:s:uUw:W:x:X:y:Y:' OPTION
+while getopts 'aAb:cCJm:Mq:R:s:SuUw:W:x:X:y:Y:' OPTION
 do
 case $OPTION in
   a)
@@ -1608,6 +1609,9 @@ case $OPTION in
    ;;
   s)
    CACHE_DIR="$OPTARG"
+   ;;
+  S)
+   SANITIZE=-S
    ;;
   u)
    UPDATEREPO=1
