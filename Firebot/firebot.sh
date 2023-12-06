@@ -1105,6 +1105,12 @@ scan_matlab_license_test()
 
 check_matlab_license_server()
 {
+   matlab -help  >& /tmp/matlabtest.$$
+   notfound=`grep 'command not found' /tmp/matlabtest.$$ | wc -l`
+   if [ $notfound -gt 0 ]; then
+     module load matlab
+   fi
+   rm /tmp/matlabtest.$$
    SKIPMATLAB="1"
    for i in 1 2 3 4
    do
@@ -2001,7 +2007,7 @@ fi
 #*** set initial values
 
 COMPILER=intel
-QUEUE=firebot
+QUEUE=
 CLEANREPO=
 UPDATEREPO=
 JOBPREFIX_RELEASE=FBR_
@@ -2148,6 +2154,7 @@ fi
 
 if [ "$WEB_DIR" != "" ]; then
   WEB_BASE_DIR=$WEB_DIR
+  WEB_DIR=$WEB_ROOT/$WEB_DIR
   
   if [ ! -d $WEB_DIR ]; then
     WEB_DIR=
