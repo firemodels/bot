@@ -688,7 +688,7 @@ is_file_installed()
 {
   local program=$1
   
-  notfound=`$program -help | tail -1 | grep "not found" | wc -l`
+  notfound=`$program -help |& tail -1 | grep "not found" | wc -l`
   if [ "$notfound" == "1" ] ; then
     stage2a_smvutil_success="0"
     echo "***error: $program not installed" >> $OUTPUT_DIR/stage2a_smvutil
@@ -1843,7 +1843,7 @@ fi
 if [ "$COMPILER" == "gnu" ]; then
   notfound=`gcc -help 2>&1 | tail -1 | grep "not found" | wc -l`
 else
-  notfound=`icc -help 2>&1 | tail -1 | grep "not found" | wc -l`
+  notfound=`icx -help 2>&1 | tail -1 | grep "not found" | wc -l`
 fi
 if [ "$notfound" == "1" ] ; then
   export haveCC="0"
