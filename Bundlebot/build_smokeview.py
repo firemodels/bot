@@ -52,7 +52,8 @@ def update_smv_all():              os.system("start " + webscript_dir + "webUPDA
 def set_revision():                os.system("start " + webscript_dir + "webSET_bundle_revision")
 
 def build_smv_win_inc():           os.system("start " + webscript_dir + "webBUILDsmv Windows testinc")
-def build_smv_test_deb():          os.system("start " + webscript_dir + "webBUILDsmvdebug " + platforms[platform.get()])
+def build_smv_test_deb():          os.system("start " + webscript_dir + "webBUILDsmvdebug "    + platforms[platform.get()])
+def build_smv_test_san():          os.system("start " + webscript_dir + "webBUILDsmvsanitize " + platforms[platform.get()])
 
 def build_smz():                   os.system("start " + webscript_dir + "webBUILDsmz  "     + platforms[platform.get()] + " " + versions[version.get()] )
 def build_smv():                   os.system("start " + webscript_dir + "webBUILDsmv  "     + platforms[platform.get()] + " " + versions[version.get()] )
@@ -158,11 +159,13 @@ Button(root, text="Utilities",  width=button_width, command=build_util).grid(row
 Button(root, text="smv",        width=button_width, command=build_smv,     fg='white', bg='blue').grid(row=R,  column=3)
 
 R=R+1
-Button(root, text="smokezip",         width=button_width, command=build_smz).grid(row=R, column=1)
-Button(root, text="smv test debug",   width=button_width, command=build_smv_test_deb).grid(row=R, column=2)
-Button(root, text="smv Win test inc", width=button_width, command=build_smv_win_inc).grid(row=R,  column=3)
+Button(root, text="smv test debug",    width=button_width, command=build_smv_test_deb).grid(row=R, column=1)
+Button(root, text="smv test sanitize", width=button_width, command=build_smv_test_san).grid(row=R, column=2)
+Button(root, text="smv Win test inc",  width=button_width, command=build_smv_win_inc).grid(row=R,  column=3)
 
-#Button(root, text="Set shortcuts",    width=button_width, command=archive_smv).grid(row=R,       column=2)
+R=R+1
+Button(root, text="smokezip",          width=button_width, command=build_smz).grid(row=R,   column=1)
+Button(root, text="Set shortcuts",     width=button_width, command=archive_smv).grid(row=R, column=2)
 
 R=R+1
 Label(root, text="Bundle:").grid(column=0, row=R)
