@@ -688,7 +688,7 @@ is_file_installed()
 {
   local program=$1
   
-  notfound=`$program -help | tail -1 | grep "not found" | wc -l`
+  notfound=`$program -help |& tail -1 | grep "not found" | wc -l`
   if [ "$notfound" == "1" ] ; then
     stage2a_smvutil_success="0"
     echo "***error: $program not installed" >> $OUTPUT_DIR/stage2a_smvutil
@@ -916,7 +916,7 @@ compile_smv_db()
      echo "   debug smokeview"
      cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_64
      rm -f smokeview_${platform}_64_db
-     ./make_smokeview_db.sh &> $OUTPUT_DIR/stage2b_smv_dbg
+     ./make_smokeview_db.sh $SANITIZE &> $OUTPUT_DIR/stage2b_smv_dbg
    fi
 }
 
@@ -965,7 +965,7 @@ compile_smv()
      echo "   release smokeview"
      cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_64
      rm -f smokeview_${platform}_64
-     ./make_smokeview.sh &> $OUTPUT_DIR/stage2c_smv_rls
+     ./make_smokeview.sh $SANITIZE  &> $OUTPUT_DIR/stage2c_smv_rls
    fi
 }
 
@@ -1553,6 +1553,7 @@ SMV_REV=origin/master
 FDS_TAG=
 SMV_TAG=
 CHECKOUT=
+SANITIZE=
 compile_errors=
 GITURL=
 CACHE_DIR=
@@ -1564,7 +1565,7 @@ echo $$ > $PID_FILE
 
 #*** parse command line options
 
-while getopts 'aAb:cCJm:Mq:R:s:uUw:W:x:X:y:Y:' OPTION
+while getopts 'aAb:cCJm:Mq:R:s:SuUw:W:x:X:y:Y:' OPTION
 do
 case $OPTION in
   a)
@@ -1608,6 +1609,9 @@ case $OPTION in
    ;;
   s)
    CACHE_DIR="$OPTARG"
+   ;;
+  S)
+   SANITIZE=-S
    ;;
   u)
    UPDATEREPO=1
@@ -1839,7 +1843,7 @@ fi
 if [ "$COMPILER" == "gnu" ]; then
   notfound=`gcc -help 2>&1 | tail -1 | grep "not found" | wc -l`
 else
-  notfound=`icc -help 2>&1 | tail -1 | grep "not found" | wc -l`
+  notfound=`icx -help 2>&1 | tail -1 | grep "not found" | wc -l`
 fi
 if [ "$notfound" == "1" ] ; then
   export haveCC="0"
@@ -2064,8 +2068,8 @@ if [ "$CACHE_DIR" == "" ]; then
   compile_fds_mpi_db $FDS_DB_DIR        $FDS_DB_EXE
   compile_fds_mpi    $FDS_DIR           $FDS_EXE
 else
-  echo "   debug fds(cached)"
-  echo "   release fds(cached)"
+  echo "   debug fds(from cache)"
+  echo "   release fds(from cache)"
   if [ ! -d $fdsrepo ]; then
     echo "*error: repo $fdsrepo does not exist"
     exit

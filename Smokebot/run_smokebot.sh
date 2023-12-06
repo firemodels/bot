@@ -42,6 +42,8 @@ echo "-s dir - use cached fds, Verification and Verification_dbg directories"
 echo "         located under the directory dir"
 echo "   fds and smv repos will be checked out with a branch named"
 echo "   master, release or test [default: master]"
+echo "-S - build smokeview using the Intel sanitize option"
+echo "     (only if the 2024 or later compiler is installed)"
 echo "-x fds_rev - checkout fds repo using fds_rev revision [default: origin/master]"
 echo "-X fds_tag - when cloning, tag the fds repo with fds_tag"
 echo "-y smv_rev - checkout smv repo using smv_rev revision [default: origin/master]"
@@ -174,6 +176,7 @@ FDS_TAG=
 SMV_TAG=
 FIREBOT_HOST=
 FIREBOT_HOME=
+SANITIZE=
 WEB_DIR=
 USE_BOT_QFDS=
 WEB_ROOT=/var/www/html
@@ -190,7 +193,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'aAB:bcCfg:G:hHJkm:Mo:Pq:r:R:s:TuUvw:W:x:X:y:Y:' OPTION
+while getopts 'aAB:bcCfg:G:hHJkm:Mo:Pq:r:R:s:STuUvw:W:x:X:y:Y:' OPTION
 do
 case $OPTION  in
   a)
@@ -252,6 +255,9 @@ case $OPTION  in
    ;;
   s)
    CACHE_DIR="-s $OPTARG"
+   ;;
+  S)
+   SANITIZE=-S
    ;;
   R)
    CLONE_REPOS="$OPTARG"
@@ -437,7 +443,7 @@ BRANCH="-b $BRANCH"
 #*** run smokebot
 
 touch $smokebot_pid
-$ECHO ./$botscript $SIZE $BRANCH $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $CLONE_REPOS $CACHE_DIR $GNU $RUNAUTO $INTEL $CLEANREPO $WEB_DIR $WEB_ROOT $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $SIZE $BRANCH $SANITIZE $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $CLONE_REPOS $CACHE_DIR $GNU $RUNAUTO $INTEL $CLEANREPO $WEB_DIR $WEB_ROOT $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi
