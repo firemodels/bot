@@ -100,6 +100,9 @@ run_auto()
   cd $ROOT_DIR
   THIS_ROOTAUTHOR=`git log . | head -2 | tail -1 | awk '{print $2}'`
   THIS_ROOT_REVISION=`git log --abbrev-commit . | head -1 | awk '{printf $2}'`
+  if [ ! -e $GIT_ROOT_REVISION_FILE ]; then
+    touch $GIT_ROOT_REVISION_FILE
+  fi
   LAST_ROOT_REVISION=`cat $GIT_ROOT_REVISION_FILE`
   git log . | head -5 | tail -1 > $GIT_ROOT_LOG_FILE
 
