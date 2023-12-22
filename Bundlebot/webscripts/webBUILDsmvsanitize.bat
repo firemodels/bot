@@ -26,7 +26,7 @@ Title Building debug test Smokeview for %platform%
 
 if "%platform%" == "Windows" (
   cd %svn_root%\smv\Build\smokeview\intel_win_64
-  call make_smokeview -test -glut -icon -sanitize
+  call make_smokeview -test -glut -sanitize
   goto eof
 )
 

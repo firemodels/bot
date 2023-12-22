@@ -164,14 +164,15 @@ Button(root, text="smv test sanitize", width=button_width, command=build_smv_tes
 Button(root, text="smv Win test inc",  width=button_width, command=build_smv_win_inc).grid(row=R,  column=3)
 
 R=R+1
-Button(root, text="smokezip",          width=button_width, command=build_smz).grid(row=R,   column=1)
-Button(root, text="Set shortcuts",     width=button_width, command=archive_smv).grid(row=R, column=2)
+Button(root, text="smokezip",      width=button_width, command=build_smz).grid(row=R,   column=1)
+Button(root, text="Set shortcuts", width=button_width, command=archive_smv).grid(row=R, column=2)
+Button(root, text="Set revisions", width=button_width, command=set_revision, bg='blue', fg='white').grid(row=R, column=3)
 
 R=R+1
 Label(root, text="Bundle:").grid(column=0, row=R)
-Button(root, text="Set revisions",    width=button_width, command=set_revision, bg='blue', fg='white').grid(row=R, column=1)
-Button(root, text="Bundle",           width=button_width,   command=bundle_smv).grid(row=R,        column=2)
-Button(root, text="Install",          width=button_width,   command=install_smv).grid(row=R,       column=3)
+Button(root, text="Bundle",           width=button_width,   command=bundle_smv).grid(row=R,        column=1)
+Button(root, text="Install",          width=button_width,   command=install_smv).grid(row=R,       column=2)
+Button(root, text="Bundle/Install",   width=button_width,   command=bundle_install_smv).grid(row=R,       column=3)
 
 R=R+1
 Label(root, text="Upload:").grid(column=0, row=R)
