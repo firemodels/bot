@@ -858,6 +858,7 @@ run_verification_cases_release()
      COMPOPT=-C
    fi
    ./Run_SMV_Cases.sh $INTEL2 $RUNOPT $COMPOPT -c $cfastrepo -j $JOBPREFIXR $USEINSTALL2 -q $QUEUE >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
+   ./Run_RESTART_Cases.sh -q $QUEUE                                                                >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
 }
 
 #---------------------------------------------
