@@ -57,34 +57,19 @@ def build_smv_test_san():          os.system("start " + webscript_dir + "webBUIL
 
 def build_smz():                   os.system("start " + webscript_dir + "webBUILDsmz  "     + platforms[platform.get()] + " " + versions[version.get()] )
 
-def build_lib_win():               os.system("start " + webscript_dir + "webBUILDlibs "     + "Windows")
-def build_lib_lnx():               os.system("start " + webscript_dir + "webBUILDlibs "     + "Linux")
-def build_lib_osx():               os.system("start " + webscript_dir + "webBUILDlibs "     + "OSX")
+def build_lib():               os.system("start " + webscript_dir + "webBUILDlibs "     + platforms[platform.get()])
+def build_util():              os.system("start " + webscript_dir + "webBUILDallprog "  + platforms[platform.get()])
+def build_smv():               os.system("start " + webscript_dir + "webBUILDsmv  "     + platforms[platform.get()]  + " " + versions[version.get()] )
 
-def build_smv_win():               os.system("start " + webscript_dir + "webBUILDsmv  "     + "Windows" + " " + versions[version.get()] )
-def build_smv_lnx():               os.system("start " + webscript_dir + "webBUILDsmv  "     + "Linux"   + " " + versions[version.get()] )
-def build_smv_osx():               os.system("start " + webscript_dir + "webBUILDsmv  "     + "OSX"     + " " + versions[version.get()] )
-
-def build_util_win():              os.system("start " + webscript_dir + "webBUILDallprog "  + "Windows")
-def build_util_lnx():              os.system("start " + webscript_dir + "webBUILDallprog "  + "Linux")
-def build_util_osx():              os.system("start " + webscript_dir + "webBUILDallprog "  + "OSX")
-
-def bundle_smv_win():              os.system("start " + webscript_dir + "webPACKAGEsmv "    + "Windows" + " " + versions[version.get()] )
-def bundle_smv_lnx():              os.system("start " + webscript_dir + "webPACKAGEsmv "    + "Linux"   + " " + versions[version.get()] )
-def bundle_smv_osx():              os.system("start " + webscript_dir + "webPACKAGEsmv "    + "OSX"     + " " + versions[version.get()] )
-
-def install_smv_win():             os.system("start " + webscript_dir + "webINSTALLsmv "    + "Windows" + " " + versions[version.get()] )
-def install_smv_lnx():             os.system("start " + webscript_dir + "webINSTALLsmv "    + "Linux" + " " + versions[version.get()] )
-def install_smv_osx():             os.system("start " + webscript_dir + "webINSTALLsmv "    + "OSX" + " " + versions[version.get()] )
+def bundle_smv():              os.system("start " + webscript_dir + "webPACKAGEsmv "     + platforms[platform.get()]  + " " + versions[version.get()] )
+def install_smv():             os.system("start " + webscript_dir + "webINSTALLsmv "     + platforms[platform.get()]  + " " + versions[version.get()] )
+def upload_bundle():           os.system("start " + webscript_dir + "webUPLOADWinallsmv " + platforms[platform.get()])
 
 def download_figures():            os.system("start " + webscript_dir + "webGETfigs "       + apps[app.get()]                 + " " + guides[guide.get()] )
 def build_guides():                os.system("start " + webscript_dir + "webBUILDguides "   + apps[app.get()]                 + " " + guides[guide.get()] )
 def view_guides():                 os.system("start " + webscript_dir + "webVIEWguides "    + apps[app.get()]                 + " " + guides[guide.get()] )
  
 def archive_smv():                 os.system("start " + webscript_dir + "webARCHIVEAllbundle"  )
-def upload_win_bundle():           os.system("start " + webscript_dir + "webUPLOADWinsmv")
-def upload_lnx_bundle():           os.system("start " + webscript_dir + "webUPLOADlnxsmv")
-def upload_osx_bundle():           os.system("start " + webscript_dir + "webUPLOADosxsmv")
 def upload_bundle_rel():           os.system("start " + webscript_dir + "webUPLOADsmvrelease")
 
 def webCOPYhome2config():          os.system("start " + webscript_dir + "webCOPYhome2config")
@@ -145,41 +130,6 @@ Button(root, text="smv/Win",    width=button_width, command=update_smv_windows).
 R=R+1
 Label(root, text="----------------------------BUILD-----------------------------").grid(column=0, row=R, columnspan=4)
 
-R=R+1
-Label(root, text="Build Libs:").grid(column=0, row=R)
-Button(root, text="Windows", width=button_width, command=build_lib_win).grid(row=R,  column=1)
-Button(root, text="Linux",   width=button_width, command=build_lib_lnx).grid(row=R,  column=2)
-Button(root, text="OSX",     width=button_width, command=build_lib_osx).grid(row=R,  column=3)
-
-R=R+1
-Label(root, text="Build Utils:").grid(column=0, row=R)
-Button(root, text="Windows", width=button_width, command=build_util_win).grid(row=R, column=1)
-Button(root, text="Linux",   width=button_width, command=build_util_lnx).grid(row=R, column=2)
-Button(root, text="OSX",     width=button_width, command=build_util_osx).grid(row=R, column=3)
-
-R=R+1
-Label(root, text="Build SMV:").grid(column=0, row=R)
-Button(root, text="Windows", width=button_width, command=build_smv_win,    ).grid(row=R,  column=1)
-Button(root, text="Linux",   width=button_width, command=build_smv_lnx,    ).grid(row=R,  column=2)
-Button(root, text="OSX",     width=button_width, command=build_smv_osx,    ).grid(row=R,  column=3)
-
-R=R+1
-Label(root, text="Bundle:").grid(column=0, row=R)
-Button(root, text="Windows", width=button_width,   command=bundle_smv_win).grid(row=R,        column=1)
-Button(root, text="Linux",   width=button_width,   command=bundle_smv_lnx).grid(row=R,        column=2)
-Button(root, text="OSX",     width=button_width,   command=bundle_smv_osx).grid(row=R,        column=3)
-
-R=R+1
-Label(root, text="Upload:").grid(column=0, row=R)
-Button(root, text="Windows", width=button_width, command=upload_win_bundle).grid(row=R, column=1)
-Button(root, text="Linux",   width=button_width, command=upload_lnx_bundle).grid(row=R, column=2)
-Button(root, text="OSX",     width=button_width, command=upload_osx_bundle).grid(row=R, column=3)
-
-R=R+1
-Label(root, text="Install:").grid(column=0, row=R)
-Button(root, text="Windows",        width=button_width,   command=install_smv_win).grid(row=R,       column=1)
-Button(root, text="Linux",          width=button_width,   command=install_smv_lnx).grid(row=R,       column=2)
-Button(root, text="OSX",            width=button_width,   command=install_smv_osx).grid(row=R,       column=3)
 
 R=R+1
 Radiobutton(root, text="test",    padx = 0, variable=version, value=1).grid(row=R, column=0)
@@ -198,6 +148,11 @@ Button(root, text="smv",     width=button_width, command=clean_smv).grid(row=R, 
 
 R=R+1
 Label(root, text="Build:").grid(column=0, row=R)
+Button(root, text="Libs",  width=button_width, command=build_lib).grid(row=R,  column=1)
+Button(root, text="Utils", width=button_width, command=build_util).grid(row=R, column=2)
+Button(root, text="smv",   width=button_width, command=build_smv, bg='blue', fg='white').grid(row=R,  column=3)
+
+R=R+1
 Button(root, text="smv test debug",    width=button_width, command=build_smv_test_deb).grid(row=R, column=1)
 Button(root, text="smv test sanitize", width=button_width, command=build_smv_test_san).grid(row=R, column=2)
 Button(root, text="smv Win test inc",  width=button_width, command=build_smv_win_inc).grid(row=R,  column=3)
@@ -206,6 +161,12 @@ R=R+1
 Button(root, text="smokezip",      width=button_width, command=build_smz).grid(row=R,   column=1)
 Button(root, text="Set shortcuts", width=button_width, command=archive_smv).grid(row=R, column=2)
 Button(root, text="Set revisions", width=button_width, command=set_revision, bg='blue', fg='white').grid(row=R, column=3)
+
+R=R+1
+Label(root, text="Package:").grid(column=0, row=R)
+Button(root, text="Bundle", width=button_width, command=bundle_smv).grid(row=R,   column=1)
+Button(root, text="Install",width=button_width, command=install_smv).grid(row=R,  column=2)
+Button(root, text="Upload", width=button_width, command=upload_bundle).grid(row=R, column=3)
 
 # ------------------------- guides ------------------------------
 
