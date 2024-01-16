@@ -56,10 +56,18 @@ def build_smv_test_deb():          os.system("start " + webscript_dir + "webBUIL
 def build_smv_test_san():          os.system("start " + webscript_dir + "webBUILDsmvsanitize " + platforms[platform.get()])
 
 def build_smz():                   os.system("start " + webscript_dir + "webBUILDsmz  "     + platforms[platform.get()] + " " + versions[version.get()] )
-def build_smv():                   os.system("start " + webscript_dir + "webBUILDsmv  "     + platforms[platform.get()] + " " + versions[version.get()] )
-def build_lib():                   os.system("start " + webscript_dir + "webBUILDlibs "     + platforms[platform.get()])
-def build_util():                  os.system("start " + webscript_dir + "webBUILDallprog "  + platforms[platform.get()])
 
+def build_lib_win():               os.system("start " + webscript_dir + "webBUILDlibs "     + "Windows")
+def build_lib_lnx():               os.system("start " + webscript_dir + "webBUILDlibs "     + "Linux")
+def build_lib_osx():               os.system("start " + webscript_dir + "webBUILDlibs "     + "OSX")
+
+def build_smv_win():               os.system("start " + webscript_dir + "webBUILDsmv  "     + "Windows" + " " + versions[version.get()] )
+def build_smv_lnx():               os.system("start " + webscript_dir + "webBUILDsmv  "     + "Linux"   + " " + versions[version.get()] )
+def build_smv_osx():               os.system("start " + webscript_dir + "webBUILDsmv  "     + "OSX"     + " " + versions[version.get()] )
+
+def build_util_win():              os.system("start " + webscript_dir + "webBUILDallprog "  + "Windows")
+def build_util_lnx():              os.system("start " + webscript_dir + "webBUILDallprog "  + "Linux")
+def build_util_osx():              os.system("start " + webscript_dir + "webBUILDallprog "  + "OSX")
 
 def bundle_smv_win():              os.system("start " + webscript_dir + "webPACKAGEsmv "    + "Windows" + " " + versions[version.get()] )
 def bundle_smv_lnx():              os.system("start " + webscript_dir + "webPACKAGEsmv "    + "Linux"   + " " + versions[version.get()] )
@@ -138,43 +146,28 @@ R=R+1
 Label(root, text="----------------------------BUILD-----------------------------").grid(column=0, row=R, columnspan=4)
 
 R=R+1
-Radiobutton(root, text="test",    padx = 0, variable=version, value=1).grid(row=R, column=0)
-Radiobutton(root, text="release", padx = 0, variable=version, value=2).grid(row=R, column=1)
+Label(root, text="Build Libs:").grid(column=0, row=R)
+Button(root, text="Windows", width=button_width, command=build_lib_win).grid(row=R,  column=1)
+Button(root, text="Linux",   width=button_width, command=build_lib_lnx).grid(row=R,  column=2)
+Button(root, text="OSX",     width=button_width, command=build_lib_osx).grid(row=R,  column=3)
 
 R=R+1
-Radiobutton(root, text="Windows", padx = 0, variable=platform, value=1).grid(row=R, column=0)
-Radiobutton(root, text="Linux",   padx = 0, variable=platform, value=2).grid(row=R, column=1)
-Radiobutton(root, text="OSX",     padx = 0, variable=platform, value=3).grid(row=R, column=2)
-
-# ------------------------- Build libraries, utilities ------------------------------
-
-R=R+1
-Label(root, text="Clean:").grid(column=0, row=R)
-Button(root, text="Repos",   width=button_width, command=clean_repos).grid(row=R,   column=1)
-Button(root, text="Uploads", width=button_width, command=clean_uploads).grid(row=R, column=2)
-Button(root, text="smv",     width=button_width, command=clean_smv).grid(row=R,     column=3)
+Label(root, text="Build Utils:").grid(column=0, row=R)
+Button(root, text="Windows", width=button_width, command=build_util_win).grid(row=R, column=1)
+Button(root, text="Linux",   width=button_width, command=build_util_lnx).grid(row=R, column=2)
+Button(root, text="OSX",     width=button_width, command=build_util_osx).grid(row=R, column=3)
 
 R=R+1
-Label(root, text="Build:").grid(column=0, row=R)
-Button(root, text="Libs",       width=button_width, command=build_lib).grid(row=R,  column=1)
-Button(root, text="Utilities",  width=button_width, command=build_util).grid(row=R, column=2)
-Button(root, text="smv",        width=button_width, command=build_smv,     fg='white', bg='blue').grid(row=R,  column=3)
-
-R=R+1
-Button(root, text="smv test debug",    width=button_width, command=build_smv_test_deb).grid(row=R, column=1)
-Button(root, text="smv test sanitize", width=button_width, command=build_smv_test_san).grid(row=R, column=2)
-Button(root, text="smv Win test inc",  width=button_width, command=build_smv_win_inc).grid(row=R,  column=3)
-
-R=R+1
-Button(root, text="smokezip",      width=button_width, command=build_smz).grid(row=R,   column=1)
-Button(root, text="Set shortcuts", width=button_width, command=archive_smv).grid(row=R, column=2)
-Button(root, text="Set revisions", width=button_width, command=set_revision, bg='blue', fg='white').grid(row=R, column=3)
+Label(root, text="Build SMV:").grid(column=0, row=R)
+Button(root, text="Windows", width=button_width, command=build_smv_win,    ).grid(row=R,  column=1)
+Button(root, text="Linux",   width=button_width, command=build_smv_lnx,    ).grid(row=R,  column=2)
+Button(root, text="OSX",     width=button_width, command=build_smv_osx,    ).grid(row=R,  column=3)
 
 R=R+1
 Label(root, text="Bundle:").grid(column=0, row=R)
-Button(root, text="Windows",       width=button_width,   command=bundle_smv_win).grid(row=R,        column=1)
-Button(root, text="Linux",         width=button_width,   command=bundle_smv_lnx).grid(row=R,        column=2)
-Button(root, text="OSX",           width=button_width,   command=bundle_smv_osx).grid(row=R,        column=3)
+Button(root, text="Windows", width=button_width,   command=bundle_smv_win).grid(row=R,        column=1)
+Button(root, text="Linux",   width=button_width,   command=bundle_smv_lnx).grid(row=R,        column=2)
+Button(root, text="OSX",     width=button_width,   command=bundle_smv_osx).grid(row=R,        column=3)
 
 R=R+1
 Label(root, text="Upload:").grid(column=0, row=R)
@@ -187,6 +180,32 @@ Label(root, text="Install:").grid(column=0, row=R)
 Button(root, text="Windows",        width=button_width,   command=install_smv_win).grid(row=R,       column=1)
 Button(root, text="Linux",          width=button_width,   command=install_smv_lnx).grid(row=R,       column=2)
 Button(root, text="OSX",            width=button_width,   command=install_smv_osx).grid(row=R,       column=3)
+
+R=R+1
+Radiobutton(root, text="test",    padx = 0, variable=version, value=1).grid(row=R, column=0)
+Radiobutton(root, text="release", padx = 0, variable=version, value=2).grid(row=R, column=1)
+
+R=R+1
+Radiobutton(root, text="Windows", padx = 0, variable=platform, value=1).grid(row=R, column=0)
+Radiobutton(root, text="Linux",   padx = 0, variable=platform, value=2).grid(row=R, column=1)
+Radiobutton(root, text="OSX",     padx = 0, variable=platform, value=3).grid(row=R, column=2)
+
+R=R+1
+Label(root, text="Clean:").grid(column=0, row=R)
+Button(root, text="Repos",   width=button_width, command=clean_repos).grid(row=R,   column=1)
+Button(root, text="Uploads", width=button_width, command=clean_uploads).grid(row=R, column=2)
+Button(root, text="smv",     width=button_width, command=clean_smv).grid(row=R,     column=3)
+
+R=R+1
+Label(root, text="Build:").grid(column=0, row=R)
+Button(root, text="smv test debug",    width=button_width, command=build_smv_test_deb).grid(row=R, column=1)
+Button(root, text="smv test sanitize", width=button_width, command=build_smv_test_san).grid(row=R, column=2)
+Button(root, text="smv Win test inc",  width=button_width, command=build_smv_win_inc).grid(row=R,  column=3)
+
+R=R+1
+Button(root, text="smokezip",      width=button_width, command=build_smz).grid(row=R,   column=1)
+Button(root, text="Set shortcuts", width=button_width, command=archive_smv).grid(row=R, column=2)
+Button(root, text="Set revisions", width=button_width, command=set_revision, bg='blue', fg='white').grid(row=R, column=3)
 
 # ------------------------- guides ------------------------------
 
