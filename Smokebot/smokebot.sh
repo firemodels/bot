@@ -513,9 +513,6 @@ run_verification_cases_debug()
 
 check_verification_cases_debug()
 {
-   # Wait for SMV verification cases to end
-   wait_verification_cases_end stage3a_vv_dbg 3a $JOBPREFIXD
-
    # Scan and report any errors in FDS verification cases
    cd $smvrepo/Verification_dbg
 
@@ -861,6 +858,7 @@ run_verification_cases_release()
      COMPOPT=-C
    fi
    ./Run_SMV_Cases.sh $INTEL2 $RUNOPT $COMPOPT -c $cfastrepo -j $JOBPREFIXR $USEINSTALL2 -q $QUEUE >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
+   ./Run_RESTART_Cases.sh -q $QUEUE                                                                >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
 }
 
 #---------------------------------------------
@@ -869,9 +867,6 @@ run_verification_cases_release()
 
 check_verification_cases_release()
 {
-   # Wait for all verification cases to end
-   wait_verification_cases_end stage3b_vv_rls 3b $JOBPREFIXR
-
    # Scan and report any errors in FDS verification cases
    cd $smvrepo/Verification
 
@@ -2123,9 +2118,11 @@ fi
 
 #stage3a_vv_dbg begin
 RUN_CASES_beg=`GET_TIME`
+RUN_CASES=
 if [ $stage_fdsdb_success ]; then
    if [ "$CACHE_DIR" == "" ]; then
      run_verification_cases_debug
+     RUN_CASES=1
    fi
 fi
 
@@ -2133,6 +2130,7 @@ fi
 if [[ $stage_ver_release_success ]]; then
   if [ "$CACHE_DIR" == "" ]; then
     run_verification_cases_release
+    RUN_CASES=1
   else
      if [ ! -d $smvrepo ]; then
        echo "***error: $smvrepo does not exist"
@@ -2144,6 +2142,17 @@ if [[ $stage_ver_release_success ]]; then
      cp -r $CACHE_DIR/Visualization $smvrepo/Verification/.
   fi
 fi
+
+if [ "$RUN_CASES" != "" ]; then
+  wait_verification_cases_end stage3a_vv_dbg 3a $JOBPREFIXD
+  wait_verification_cases_end stage3b_vv_rls 3b $JOBPREFIXR
+  if [ -e $smvrepo/Verification/scripts/RESTART2_Cases.sh ]; then
+    cd $smvrepo/Verification/scripts
+    ./RESTART2_Cases.sh $JOBPREFIXR
+    wait_verification_cases_end stage3c_vv_restart 3c $JOBPREFIXR
+  fi
+fi
+
 if [ "$CACHE_DIR" == "" ]; then
   if [ $stage_fdsdb_success ]; then
      check_verification_cases_debug
