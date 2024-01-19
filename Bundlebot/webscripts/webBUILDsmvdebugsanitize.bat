@@ -26,21 +26,21 @@ Title Building debug test Smokeview for %platform%
 
 if "%platform%" == "Windows" (
   cd %svn_root%\smv\Build\smokeview\intel_win_64
-  call make_smokeview_db -test -glut -icon
+  call make_smokeview_db -test -glut -icon -sanitize
   goto eof
 )
 
 :: ----------- linux -----------------
 
 if "%platform%" == "Linux" (
-  plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/run_command.sh smv/Build/smokeview/intel_linux_64 make_smokeview_db.sh -t
+  echo sanitize option not available for Linux
   goto eof
 )
 
 :: ----------- osx -----------------
 
 if "%platform%" == "OSX" (
-  plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/run_command.sh smv/Build/smokeview/intel_osx_64 make_smokeview_db.sh -t
+  echo sanitize option not available for OSX
   goto eof
 )
 
