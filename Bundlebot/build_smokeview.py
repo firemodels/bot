@@ -153,8 +153,8 @@ Button(root, text="Utils", width=button_width, command=build_util).grid(row=R, c
 Button(root, text="smv",   width=button_width, command=build_smv, bg='blue', fg='white').grid(row=R,  column=3)
 
 R=R+1
-Button(root, text="smv test debug sanitize",    width=button_width, command=build_smv_test_deb).grid(row=R, column=1)
-Button(root, text="smv test sanitize", width=button_width, command=build_smv_test_san).grid(row=R, column=2)
+Button(root, text="smv dbg sanitize",  width=button_width, command=build_smv_test_deb).grid(row=R, column=1)
+Button(root, text="smv sanitize",      width=button_width, command=build_smv_test_san).grid(row=R, column=2)
 Button(root, text="smv Win test inc",  width=button_width, command=build_smv_win_inc).grid(row=R,  column=3)
 
 R=R+1
