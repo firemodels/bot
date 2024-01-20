@@ -52,8 +52,8 @@ def update_smv_all():              os.system("start " + webscript_dir + "webUPDA
 def set_revision():                os.system("start " + webscript_dir + "webSET_bundle_revision")
 
 def build_smv_win_inc():           os.system("start " + webscript_dir + "webBUILDsmv Windows testinc")
-def build_smv_test_deb():          os.system("start " + webscript_dir + "webBUILDsmvdebug "    + platforms[platform.get()])
-def build_smv_test_san():          os.system("start " + webscript_dir + "webBUILDsmvsanitize " + platforms[platform.get()])
+def build_smv_test_deb():          os.system("start " + webscript_dir + "webBUILDsmvdebugsanitize "    + platforms[platform.get()])
+def build_smv_test_san():          os.system("start " + webscript_dir + "webBUILDsmvsanitize "         + platforms[platform.get()])
 
 def build_smz():                   os.system("start " + webscript_dir + "webBUILDsmz  "     + platforms[platform.get()] + " " + versions[version.get()] )
 
@@ -63,7 +63,7 @@ def build_smv():               os.system("start " + webscript_dir + "webBUILDsmv
 
 def bundle_smv():              os.system("start " + webscript_dir + "webPACKAGEsmv "     + platforms[platform.get()]  + " " + versions[version.get()] )
 def install_smv():             os.system("start " + webscript_dir + "webINSTALLsmv "     + platforms[platform.get()]  + " " + versions[version.get()] )
-def upload_bundle():           os.system("start " + webscript_dir + "webUPLOADWinallsmv " + platforms[platform.get()])
+def upload_bundle():           os.system("start " + webscript_dir + "webUPLOADallsmv "   + platforms[platform.get()])
 
 def download_figures():            os.system("start " + webscript_dir + "webGETfigs "       + apps[app.get()]                 + " " + guides[guide.get()] )
 def build_guides():                os.system("start " + webscript_dir + "webBUILDguides "   + apps[app.get()]                 + " " + guides[guide.get()] )
@@ -153,7 +153,7 @@ Button(root, text="Utils", width=button_width, command=build_util).grid(row=R, c
 Button(root, text="smv",   width=button_width, command=build_smv, bg='blue', fg='white').grid(row=R,  column=3)
 
 R=R+1
-Button(root, text="smv test debug",    width=button_width, command=build_smv_test_deb).grid(row=R, column=1)
+Button(root, text="smv test debug sanitize",    width=button_width, command=build_smv_test_deb).grid(row=R, column=1)
 Button(root, text="smv test sanitize", width=button_width, command=build_smv_test_san).grid(row=R, column=2)
 Button(root, text="smv Win test inc",  width=button_width, command=build_smv_win_inc).grid(row=R,  column=3)
 
