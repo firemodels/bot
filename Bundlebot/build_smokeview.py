@@ -63,7 +63,7 @@ def build_smv():               os.system("start " + webscript_dir + "webBUILDsmv
 
 def bundle_smv():              os.system("start " + webscript_dir + "webPACKAGEsmv "     + platforms[platform.get()]  + " " + versions[version.get()] )
 def install_smv():             os.system("start " + webscript_dir + "webINSTALLsmv "     + platforms[platform.get()]  + " " + versions[version.get()] )
-def upload_bundle():           os.system("start " + webscript_dir + "webUPLOADWinallsmv " + platforms[platform.get()])
+def upload_bundle():           os.system("start " + webscript_dir + "webUPLOADallsmv "   + platforms[platform.get()])
 
 def download_figures():            os.system("start " + webscript_dir + "webGETfigs "       + apps[app.get()]                 + " " + guides[guide.get()] )
 def build_guides():                os.system("start " + webscript_dir + "webBUILDguides "   + apps[app.get()]                 + " " + guides[guide.get()] )
