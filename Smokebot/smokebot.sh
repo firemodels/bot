@@ -1028,6 +1028,8 @@ make_smv_pictures()
 check_smv_pictures()
 {
    # Scan and report any errors in make SMV pictures process
+   grep -I -E -i Segmentation $smvrepo/Verification/Visualization/*.err >> $OUTPUT_DIR/stage4b_picts
+   grep -I -E -i Segmentation $smvrepo/Verification/WUI/*.err           >> $OUTPUT_DIR/stage4b_picts
    cd $smokebotdir
    echo "   checking"
    if [[ `grep -I -E -i "Segmentation|Error" $OUTPUT_DIR/stage4b_picts` == "" ]]
