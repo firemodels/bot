@@ -14,9 +14,6 @@ These steps are described in more detail below.
 
 ### Bundling Steps
 
-Warning: these scripts erase and clone fresh copies of the fds and smv repos.
-You should only run these scripts in repos where you do not do daily work.
-
 > [!CAUTION]
 > These scripts erase and clone fresh copies of the fds and smv repos. You should only run these scripts in repos where you do not do daily work.
 
