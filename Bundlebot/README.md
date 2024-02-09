@@ -17,6 +17,9 @@ These steps are described in more detail below.
 Warning: these scripts erase and clone fresh copies of the fds and smv repos.
 You should only run these scripts in repos where you do not do daily work.
 
+> [!CAUTION]
+> These scripts erase and clone fresh copies of the fds and smv repos. You should only run these scripts in repos where you do not do daily work.
+
 1. Run firebot on a Linux computer to generate FDS manuals. 
 If firebot is successful (no errors or warnings), documents are copied to the
 $HOME/.firebot/pubs and $HOME/.firebot/branch_name/pubs directories. At NIST this occurs every night.
@@ -59,7 +62,8 @@ file and change the fds and smv hash and tags for a different release.
 
 ### Summary
 
-Warning: it is worth repeating that these scripts erase and clone fresh copies of the fds and smv repos.  You should only run these scripts in repos where you do not do daily work.
+> [!CAUTION]
+> It is worth repeating that these scripts erase and clone fresh copies of the fds and smv repos.  You should only run these scripts in repos where you do not do daily work.
 
 1. Edit build_fds_manuals.sh, build_smv_manuals.sh, build_release.sh and build_release.bat updating hashes and tags.  
 Commit these files.
