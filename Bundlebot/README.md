@@ -39,8 +39,7 @@ specifying the smv repo revision and tag. The  parameter `-R release` is also pa
 It takes about one hour to run smokebot and build the manuals.
 3. Run the script `build_release.sh` on a Linux or OSX computer or `build_release.bat` on a Windows computer
 to build the applications and bundle.  After building the bundles, these scripts upload them to the 
-[nightly builds google drive directory)](https://drive.google.com/drive/folders/1X-gRYGPGtcewgnNiNBuho3U8zDFVqFsC?usp=sharing)
-so that they can be tested before being published.
+GitHub [test_bundles](https://github.com/firemodels/test_bundles) repository so that they can be tested before being published.
 
 The bash script `build_release.sh` is used to build release bundles on a Linux or Mac computer.
 It contains the following line for building the FDS6.7.6 and Smokeview 6.7.16 release bundle. Edit this
