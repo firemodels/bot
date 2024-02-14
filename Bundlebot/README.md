@@ -14,7 +14,9 @@ These steps are described in more detail below.
 
 ### Preliminary Step
 
-This section outlines steps used to create a set of repos used by the bundle scripts to build bundles.  These steps only need to be performed once and are the same steps used by the firebot and smokebot verification scripts to clone repos.  The bundling process erases and clones repos.  So bundles should not be created in repos where you do your daily work. Release bundles should be built on the same computers where nightly bundles are built to insure that compiler versions and OpenMPI libraries are consistent.  
+The bundling process erases and clones repos.  So bundles should not be created in repos where you do your daily work. This section gives steps for creating directories used by the bundle scripts to build bundles.  These steps only need to be performed once and are the same steps used by the firebot and smokebot verification scripts to clone repos.  
+
+Note, release bundles should be built on the same computers where nightly bundles are built to insure that compiler versions and OpenMPI libraries are consistent. 
 
 Type the following commands:
 1.  mkdir $HOME/FireModels_bundle
