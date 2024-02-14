@@ -9,6 +9,7 @@ Building a bundle consists of three steps:
   1. run firebot to generate FDS manuals, 
   2. run smokebot to generate Smokeview manuals 
   3. assemble applications, example files and manuals to generate the bundles.
+
 These steps are described in more detail below.
 
 ### Preliminary Step
