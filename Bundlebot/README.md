@@ -3,7 +3,7 @@
 
 ### Overview
 
-This directory contains scripts for building FDS/Smokeview installation files or bundles for Windows, Linux and OSX (Mac) computers. Two bundle variations are built.  Bundles are built nightly using the fds and smv revisions from the latest firebot pass. Bundles are also built whenever FDS and Smokeview are released.
+This directory contains scripts for building FDS/Smokeview installation files or bundles for Windows, Linux and OSX (Mac) computers. Two bundle variations are built.  Bundles are built nightly using fds and smv revisions from the latest firebot pass. Bundles are also built whenever FDS and Smokeview are released.  In this case the user specifies the fds and smv revision and tags.
 
 Building a bundle consists of three steps: 
   1. run firebot to generate FDS manuals, 
@@ -13,10 +13,11 @@ These steps are described in more detail below.
 
 ### Preliminary Step
 
-The bundling process erases and clones repos.  So bundles should not be created in repos where you do your daily work.  The steps below create repo directories used by the bundle scripts.  This is the same process used by the firebot and smokebot verification scripts. Type the following commands:
+This section outlines steps used to create a set of repos used by the bundle scripts to build bundles.  These steps only need to be performed once and are the same steps used by the firebot and smokebot verification scripts to clone repos.  The bundling process erases and clones repos.  So bundles should not be created in repos where you do your daily work. Release bundles should be built on the same computers where nightly bundles are built to insure that compiler versions and OpenMPI libraries are consistent.  
 
+Type the following commands:
 1.  mkdir $HOME/FireModels_bundle
-2.  git clone git@github.com:gforney/bot.git
+2.  git clone git@github.com:USERNAME/bot.git (where USERNAME is your github username)
 3.  cd bot/Scripts
 4.  ./setup_repos.sh -a
 5.  ./setup_repos.sh -w
