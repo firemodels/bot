@@ -1,1 +1,3 @@
-./run_smokebot.sh -c -u -J -q smokebot -m gforney@gmail.com  -x b81287c1e -X FDS6.7.9 -y 33420d46b -Y SMV6.7.21 -R release -M -U -w smokebot/clone
+#!/bin/bash
+source BUILD_revtag.sh
+./run_smokebot.sh -c -u -J -q smokebot -m gforney@gmail.com  -x $BUNDLE_FDS_REVISION -X $BUNDLE_FDS_TAG -y $BUNDLE_SMV_REVISION -Y $BUNDLE_SMV_TAG -R release -M -U -w smokebot/clone

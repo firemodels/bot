@@ -1,1 +1,3 @@
-./run_firebot.sh -c -J -q firebot -m gforney@gmail.com -x 886e00965 -X FDS-6.8.0 -y d02fd6867 -Y SMV-6.8.0 -r test7_bundles -U -o gforney -R release 
+#!/bin/bash
+source BUILD_revtag.sh
+./run_firebot.sh -c -J -q firebot -m gforney@gmail.com -x $BUNDLE_FDS_REVISION -X $BUNDLE_FDS_TAG  -y $BUNDLE_SMV_REVISION -Y $BUNDLE_SMV_TAG -r test7_bundles -U -o gforney -R release 
