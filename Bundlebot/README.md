@@ -1,3 +1,4 @@
+
 #  Building Bundles
 
 ### Overview
@@ -9,6 +10,18 @@ Building a bundle consists of three steps:
   2. run smokebot to generate Smokeview manuals 
   3. assemble applications, example files and manuals to generate the bundles.
 These steps are described in more detail below.
+
+### Preliminary Step
+
+The bundling process erases and clones repos.  So bundles should not be created in repos where you do your daily work.  The steps below create repo directories used by the bundle scripts.  This is the same process used by the firebot and smokebot verification scripts. Type the following commands:
+
+1.  mkdir $HOME/FireModels_bundle
+2.  git clone git@github.com:gforney/bot.git
+3.  cd bot/Scripts
+4.  ./setup_repos.sh -a
+5.  ./setup_repos.sh -w
+
+Note to update the repos just created (at a later time), cd to bot/Scripts and type: ./update_repos.sh .
 
 ### Bundling Steps
 
