@@ -3,36 +3,48 @@
 
 ### Overview
 
-This directory contains scripts for building Windows, Linux and OSX FDS/Smokeview bundles. Two variations are built.  Bundles are built nightly using fds and smv repo revisions from the latest firebot pass. Bundles are also built whenever FDS and Smokeview are released.  In this case, revisions and tags for the fds and smv repos are specified.
+This directory contains scripts for building FDS/Smokeview bundles for Windows, Linux and OSX FDS/Smokeview computing platforms. Two types of bundles are built.  Bundles are built every night using fds and smv repo revisions from the latest firebot pass. Bundles are also built whenever FDS and Smokeview are released.  In this case, revisions and tags for the fds and smv repos are specified.
 
 Building a bundle consists of three steps: 
-  1. run firebot to generate FDS manuals, 
-  2. run smokebot to generate Smokeview manuals 
-  3. assemble applications, example files and manuals to generate the bundles.
+  1. Run firebot to generate FDS manuals, 
+  2. Run smokebot to generate Smokeview manuals 
+  3. Assemble applications, example files and manuals to generate the bundles.
 
 These steps are described in more detail below.
 
 ### Preliminary Step
 
-The bundling process erases and clones repos.  So bundles should not be created within a directory tree where daily work is performed. This section gives steps for creating directories used by the bundle scripts.  This only needs to be performed once and is the same method firebot and smokebot uses to clone repos.  
+The bundling process erases and clones fresh copies of fds and repos.  So bundles should not be created within a directory tree where daily work is performed. This section gives steps for creating repo directories used by the bundle scripts.  This only needs to be performed once and is the same method firebot and smokebot uses to clone repos.  
 
 Note, release bundles should be built on the same computer where nightly bundles are built to insure that compiler versions and OpenMPI libraries are consistent. 
 
 To generate a set of repos, type the following commands:
 1.  cd to your home directory and type mkdir FireModels_bundle
-2.  git clone git@github.com:USERNAME/bot.git (where USERNAME is your github username)
+2.  git clone git@github.com:USERNAME/bot.git (where USERNAME is your github username) 
 3.  cd bot/Scripts
 4.  ./setup_repos.sh -a
 5.  ./setup_repos.sh -w  this creates the wiki and web repos
 
-Note to update the repos just created at a later time, cd to bot/Scripts and type: ./update_repos.sh . To clone directories on a Windows computer use \ not / and type setup_repos not setup_repos.sh .
+Notes:
+
+1. To update the repos just created at a later time, cd to bot/Scripts and type: ./update_repos.sh .
+2. To clone directories on a Windows computer use \ not / and type setup_repos not setup_repos.sh .
 
 ### Bundling Steps
 
 > [!CAUTION]
-> Again, these bundle scripts erase and clone fresh copies of the fds and smv repos. You should not run these scripts in repos where you perforum daily work.
+> Again, these bundle scripts erase and clone fresh copies of the fds and smv repos. You should not run these scripts in repos where you perform daily work.
 
-1. Run firebot on a Linux computer to generate FDS manuals.  If firebot is successful (no errors or warnings), documents are copied to the $HOME/.firebot/pubs and $HOME/.firebot/branch_name/pubs directories. At NIST this occurs every night. The manuals for the FDS 6.7.6 release were generated using the script `build_fds_manuals.sh`. This script runs firebot with the options `-x 5064c500c -X FDS6.7.6` for specifying the fds revision and tag  and options `-y a2687cda4 -Y SMV6.7.16`  for specifying the smv repo revision and tag. The tags are only created in the local fds and smv repos.  They are not pushed up to GitHub. If errors are discovered in the bundles that require more commits a tag does not need to be undone. Tagging is done by hand when the bundles are eventually published. The  parameter `-R release` is also passed to firebot to name the branch `release`. It takes about seven hours to run firebot and build the fds manuals.
+1. cd to bot/Bundlebot/scripts
+2. edit the file BUNDLE_config.sh and define the environment variables `BUNDLE_FDS_REVISION`, `BUNDLE_FDS_TAG`, `BUNDLE_SMV_REVISION` and `BUNDLE_SMV_TAG` . The variables below were defined using tags and revisions for a firebot pass on Feb 9, 2024.
+
+   ```
+export BUNDLE_FDS_REVISION=c1b5f1a
+export BUNDLE_FDS_TAG=FDS-6.9.0
+export BUNDLE_SMV_REVISION=b837eeb
+export BUNDLE_SMV_TAG=SMV-6.9.0
+```
+1. Build fds manuals. Run firebot on a Linux computer to generate FDS manuals.  If firebot is successful (no errors or warnings), documents are copied to the $HOME/.firebot/pubs and $HOME/.firebot/branch_name/pubs directories. At NIST this occurs every night. The manuals for the FDS 6.7.6 release were generated using the script `build_fds_manuals.sh`. This script runs firebot with the options `-x 5064c500c -X FDS6.7.6` for specifying the fds revision and tag  and options `-y a2687cda4 -Y SMV6.7.16`  for specifying the smv repo revision and tag. The tags are only created in the local fds and smv repos.  They are not pushed up to GitHub. If errors are discovered in the bundles that require more commits a tag does not need to be undone. Tagging is done by hand when the bundles are eventually published. The  parameter `-R release` is also passed to firebot to name the branch `release`. It takes about seven hours to run firebot and build the fds manuals.
 2. Run smokebot on a Linux computer to generate Smokeview manuals. If smokebot is successful, documents are copied to `$HOME/.smokebot/pubs` and `$HOME/.smokebot/branch_name/pubs`.  At NIST this occurs whenever the FDS and/or Smokeview source changes and also also once a day. The manuals for the SMV 6.7.16 release were generated using the script `build_smv_manuals.sh`. Similar ot firebot, this script ran smokebot with  `-x 5064c500c -X FDS6.7.6` for specifying the fds revision and tag and with `-y a2687cda4 -Y SMV6.7.16`  for specifying the smv repo revision and tag. The  parameter `-R release` is also passed to smokebot to name the branch `release`. It takes about one hour to run smokebot and build the manuals.
 3. Run the script `build_release.sh` on a Linux or OSX computer or `build_release.bat` on a Windows computer to build the applications and bundle.  After building the bundles, these scripts upload them to the GitHub [test_bundles](https://github.com/firemodels/test_bundles) repository so that they can be tested before being published.
 
