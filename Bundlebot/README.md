@@ -15,7 +15,7 @@ These steps are described in more detail below.
 ### Bundling Steps
 
 > [!CAUTION]
-> Bundle scripts erase and clone fresh copies of the fds and smv repos. These scripts should not be run in repos where daily work is performed.  At NIST Linux and OSX bundles are built in the firebot user account under the directory Firemodels_bundle . 
+> Bundle scripts erase and clone fresh copies of the fds and smv repos. These scripts should not be run in repos where daily work is performed.  At NIST Linux and OSX bundles are built in the firebot user account in the directory Firemodels_bundle/bot/Bundlebot/scripts . 
 
 1. switch to the firebot account (type: `sudo su - firebot`)  and cd to Firemodels_bundle/bot/Bundlebot/scripts
 2. **Configure the scripts.**  Edit the script `BUNDLE_config.sh` and define the environment variables: `BUNDLE_FDS_REVISION`, `BUNDLE_FDS_TAG`, `BUNDLE_SMV_REVISION` and `BUNDLE_SMV_TAG` . The variables below were defined using revisions for a firebot pass on Feb 9, 2024. The string `test` was appended to the TAG environment variables so that any test bundles created would not be confused with official ones.
