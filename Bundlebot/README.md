@@ -3,7 +3,7 @@
 
 ### Overview
 
-This directory contains scripts for building FDS/Smokeview bundles for Windows, Linux and OSX computing platforms. Two types of bundles are built.  Bundles are built every night using fds and smv repo revisions from the latest firebot pass. Bundles are also built whenever FDS and Smokeview are released.  In this case, revisions and tags for the fds and smv repos are specified.
+This directory contains scripts for building FDS/Smokeview bundles on Windows, Linux and OSX computing platforms. Two types of bundles are built.  Bundles are built every night using fds and smv repo revisions from the latest firebot pass. Bundles are also built whenever FDS and Smokeview are released.  In this case, revisions and tags for the fds and smv repos are specified.
 
 Building a bundle consists of three steps: 
   1. Run firebot to generate FDS manuals.
