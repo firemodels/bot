@@ -14,9 +14,7 @@ These steps are described in more detail below.
 
 ### Preliminary Step
 
-The bundling process erases and clones fresh copies of fds and repos.  So bundles should not be created within a directory tree where daily work is performed. This section gives steps for creating repo directories used by the bundle scripts.  This only needs to be performed once and is the same method firebot and smokebot uses to clone repos.  
-
-Note, release bundles should be built on the same computer where nightly bundles are built to insure that compiler versions and OpenMPI libraries are consistent. 
+The bundling process erases and clones fresh copies of fds and smv repos.  So bundles should not be created within a directory tree where daily work is performed. This section gives steps for creating repo directories used by the bundle scripts.  This only needs to be performed once and is the same method used by firebot and smokebot to clone repos.  
 
 To generate a set of repos, type the following commands:
 1.  cd to your home directory and type mkdir FireModels_bundle
@@ -29,6 +27,7 @@ Notes:
 
 1. To update the repos just created at a later time, cd to bot/Scripts and type: ./update_repos.sh .
 2. To clone directories on a Windows computer use \ not / and type setup_repos not setup_repos.sh .
+3. Release bundles should be built on the same computer where nightly bundles are built to insure that compiler versions and OpenMPI libraries are consistent.
 
 ### Bundling Steps
 
