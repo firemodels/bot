@@ -1,4 +1,6 @@
 #!/bin/bash
+# build a release bundle using revision and tags defined in BUILD_config.sh .
+# the bundle is uploaded to the github website with username firemodels and release fds
 RELEASE=$1
 if [ "$RELEASE" == "" ]; then
   RELEASE=fds
