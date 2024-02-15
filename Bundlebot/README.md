@@ -26,8 +26,8 @@ export BUNDLE_SMV_REVISION=b837eeb
 export BUNDLE_SMV_TAG=SMV-6.9.0test
 ```
 3. **Build the fds manuals.**
-   a. step 1
-   b. step 2.
+   1. step 1
+   2. step 2.
 Run the script `BUILD_fds_manuals.sh` in the firebot account.  This script runs firebot using revisions and tags defined in BUNDLE_config.sh and takes about 7 hours to complete.  When a firebot run is successful (no errors or warnings), documents are copied to the directory $HOME/.firebot/pubs and $HOME/.firebot/branch_name/pubs. At NIST this occurs every night. Note, tags are only created in the local fds and smv repos.  They are not pushed up to GitHub. So, if errors are discovered in the bundles that require more commits, a tag does not need to be undone. Tagging is done by hand when the bundles are eventually published.
 5. **Build the smokeview manuals.** Run the script BUILD_smv_manuals.sh in the smokebot account (type: `sudo su - smokebot` to switch accounts).  Since firebot and smokbot are run in two different accounts, they can be run at the same time.  This script runs smokebot using revisions and tags defined in BUNDLE_config.sh.
 6. **Build the bundle.**  Run the script `BUILD_release_bundle.sh` in the firebot account (type: `sudo su - firebot` to switch accounts).  The same script can be run on a Linux and OSX computer.  While testing, run the script `BUILD_test_release.sh`. After building the bundles, these scripts upload them to the GitHub [test_bundles](https://github.com/firemodels/test_bundles) repository so that they can be tested before being published.  Edit this file and change the fds and smv hash and tags for a different release.
