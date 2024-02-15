@@ -37,8 +37,7 @@ Notes:
 
 1. cd to bot/Bundlebot/scripts
 2. edit the file BUNDLE_config.sh and define the environment variables `BUNDLE_FDS_REVISION`, `BUNDLE_FDS_TAG`, `BUNDLE_SMV_REVISION` and `BUNDLE_SMV_TAG` . The variables below were defined using tags and revisions for a firebot pass on Feb 9, 2024.
-
-   ```
+```
 export BUNDLE_FDS_REVISION=c1b5f1a
 export BUNDLE_FDS_TAG=FDS-6.9.0
 export BUNDLE_SMV_REVISION=b837eeb
