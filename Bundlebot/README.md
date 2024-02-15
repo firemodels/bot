@@ -31,7 +31,7 @@ export BUNDLE_SMV_TAG=SMV-6.9.0test
 > [!CAUTION]
 > Bundle scripts erase and clone fresh copies of the fds and smv repos. These scripts should not be run in repos where daily work is performed.  At NIST, Linux and OSX bundles are built in the firebot user account in the directory Firemodels_bundle/bot/Bundlebot/scripts . 
 
-1. **Build the fds manuals.** Run the script `BUILD_fds_manuals.sh` in the firebot account.  This script runs firebot using revisions and tags defined in BUNDLE_config.sh and takes about 7 hours to complete.  FDS guides are copied to the directory $HOME/.firebot/pubs when a firebot run is successful (no errors or warnings).  Note, tags are only created in the local fds and smv repos.  They are not pushed up to GitHub. So, if errors are discovered in the bundles that require more commits, a tag does not need to be undone. Tagging may be performed after the bundles are published.
+1. **Build the FDS manuals.** Run the script `BUILD_fds_manuals.sh` in the firebot account.  This script runs firebot using revisions and tags defined in BUNDLE_config.sh and takes about 7 hours to complete.  FDS guides are copied to the directory $HOME/.firebot/pubs when a firebot run is successful (no errors or warnings).  Note, tags are only created in the local fds and smv repos.  They are not pushed up to GitHub. So, if errors are discovered in the bundles that require more commits, a tag does not need to be undone. Tagging may be performed after the bundles are published.
    1. switch to the firebot account (type: `sudo su - firebot`)
    2. `cd Firemodels_bundle/bot/Bundlebot/scripts`
    3. `./Build_fds_manuals.sh`
@@ -41,7 +41,7 @@ export BUNDLE_SMV_TAG=SMV-6.9.0test
    2. `cd Firemodels_bundle/bot/Bundlebot/scripts`
    3. `./Build_smv_manuals.sh`
 
-3. **Build the bundle.**  After the fds and smokeview manuals are built, run the script `BUILD_release_bundle.sh` in the firebot account (type: `sudo su - firebot` to switch accounts).  The same script can be run on a Linux and OSX computer.  While testing, run the script `BUILD_test_release.sh`. After building the bundles, these scripts upload them to the GitHub [test_bundles](https://github.com/firemodels/test_bundles) repository so that they can be tested before being published.  Edit this file and change the fds and smv hash and tags for a different release.
+3. **Build the bundle.**  After the FDS and smokeview manuals are built, run the script `BUILD_release_bundle.sh` in the firebot account (type: `sudo su - firebot` to switch accounts).  The same script can be run on a Linux and OSX computer.  While testing, run the script `BUILD_test_release.sh`. After building the bundles, these scripts upload them to the GitHub [test_bundles](https://github.com/firemodels/test_bundles) repository so that they can be tested before being published.  Edit this file and change the fds and smv hash and tags for a different release.
    1. switch to the firebot account (type: `sudo su - firebot`)
    2. `cd Firemodels_bundle/bot/Bundlebot/scripts`
    3. type: `./Build_release_bundle.sh` if building an `official` bundle, type `./Build_test_bundle.sh` if building a test bundle.  The only difference between these two options is where the bundles are uploaded. 
