@@ -37,15 +37,28 @@ export BUNDLE_SMV_TAG=SMV-6.9.0test
    2. `cd Firemodels_bundle/bot/Bundlebot/scripts`
    3. `./Build_fds_manuals.sh`
     
-2. **Build the smokeview manuals.** Smokeview manuals are built similarly to the FDS manuals.  Run the script BUILD_smv_manuals.sh in the smokebot account.  Since firebot and smokebot are run in two different accounts, they can be run at the same time.  This script runs smokebot using revisions and tags defined in BUNDLE_config.sh. (Note: check to see if BUILD_smv_manuals.sh can be run in the firebot account - this would simplify the workflow)
-   1. switch to the smokebot account (type: `sudo su - smokebot`)
+2. **Build the smokeview manuals.** Smokeview manuals are built similarly to the FDS manuals. This script runs smokebot using revisions and tags defined in BUNDLE_config.sh. (Note: Assume that smokeview manuals can be build in firebot account - have not verified yet)
+   1. switch to the firebot account if not already there (type: `sudo su - smokebot`)
    2. `cd Firemodels_bundle/bot/Bundlebot/scripts`
    3. `./Build_smv_manuals.sh`
 
 3. **Build the bundle.**  After the FDS and smokeview manuals are built, run the script `BUILD_release_bundle.sh` in the firebot account (type: `sudo su - firebot` to switch accounts).  The same script can be run on a Linux and OSX computer.  While testing, run the script `BUILD_test_release.sh`. After building the bundles, these scripts upload them to the GitHub [test_bundles](https://github.com/firemodels/test_bundles) repository so that they can be tested before being published.  Edit this file and change the fds and smv hash and tags for a different release.
-   1. switch to the firebot account (type: `sudo su - firebot`)
+   1. switch to the firebot account if not already there (type: `sudo su - firebot`)
    2. `cd Firemodels_bundle/bot/Bundlebot/scripts`
-   3. type: `./Build_release_bundle.sh` if building an `official` bundle, type `./Build_test_bundle.sh` if building a test bundle.  The only difference between these two options is where the bundles are uploaded. 
+   3. type: `./Build_release_bundle.sh` if building an `official` bundle, type `./Build_test_bundle.sh` if building a test bundle.  The only difference between these two options is where the bundles are uploaded.
+  
+   ### Summary
+
+   Steps for building a bundle.
+
+   1. edit `BUILD_config.sh`, defining revision and tags for this bundle
+   2. `sudo su - firebot`
+   3. `cd FireModels_bundle/bot/Bundlebot/scripts`
+   4. `nohup ./Build_smv_manuals.sh &`
+   5. after step 3 complates (about 30 minutes)
+      `nohup ./Build_fds_manuals.sh &`
+   6. after step 4. completes (about 7 hours)
+      `nohup /Build_release_bundle.sh &`
  
 
 
