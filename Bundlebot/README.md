@@ -35,17 +35,17 @@ export BUNDLE_SMV_TAG=SMV-6.9.0test
 1. **Build the FDS manuals.** Run the script `BUILD_fds_manuals.sh` in the firebot account.  This script runs firebot using revisions and tags defined in BUNDLE_config.sh and takes about 7 hours to complete.  Note, tags are only created in the local fds and smv repos.  They are not pushed up to GitHub. So a tag does not need to be undone if errors are discovered in the bundles that require more commits, . Tagging may be performed after the bundles are published.
    1. switch to the firebot account (type: `sudo su - firebot`)
    2. `cd Firemodels_bundle/bot/Bundlebot/scripts`
-   3. `./Build_fds_manuals.sh`
+   3. `./BUILD_fds_manuals.sh`
     
 2. **Build the smokeview manuals.** Smokeview manuals are built similarly to the FDS manuals. This script runs smokebot using revisions and tags defined in BUNDLE_config.sh. (Note: Assume that smokeview manuals can be build in firebot account - have not verified yet)
    1. switch to the firebot account if not already there (type: `sudo su - smokebot`)
    2. `cd Firemodels_bundle/bot/Bundlebot/scripts`
-   3. `./Build_smv_manuals.sh`
+   3. `./BUILD_smv_manuals.sh`
 
 3. **Build the bundle.**  After the FDS and smokeview manuals are built, run the script `BUILD_release_bundle.sh` in the firebot account (type: `sudo su - firebot` to switch accounts).  The same script can be run on a Linux and OSX computer.  While testing, run the script `BUILD_test_release.sh`. After building the bundles, these scripts upload them to the GitHub [test_bundles](https://github.com/firemodels/test_bundles) repository so that they can be tested before being published.  Edit this file and change the fds and smv hash and tags for a different release.
    1. switch to the firebot account if not already there (type: `sudo su - firebot`)
    2. `cd Firemodels_bundle/bot/Bundlebot/scripts`
-   3. type: `./Build_release_bundle.sh` if building an `official` bundle, type `./Build_test_bundle.sh` if building a test bundle.  The only difference between these two options is where the bundles are uploaded.
+   3. type: `./BUILD_release_bundle.sh` if building an `official` bundle, type `./BUILD_test_bundle.sh` if building a test bundle.  The only difference between these two options is where the bundles are uploaded.
   
    ### Summary
 
@@ -54,11 +54,11 @@ export BUNDLE_SMV_TAG=SMV-6.9.0test
    1. edit `bot/Bundlebot/scripts/BUILD_config.sh`, defining revision and tags for this bundle.  Commit and push up changes to the central repo.
    2. `sudo su - firebot`
    3. `cd FireModels_bundle/bot/Bundlebot/scripts`
-   4. `nohup ./Build_smv_manuals.sh &`
+   4. `nohup ./BUILD_smv_manuals.sh &`
    after this step completes (about 30 minutes) continue to the next step.
-   6. `nohup ./Build_fds_manuals.sh &`
+   6. `nohup ./BUILD_fds_manuals.sh &`
    after this step completes (about 7 hours) continue to the next step.
-   8. `nohup /Build_release_bundle.sh &`
+   8. `nohup /BUILD_release_bundle.sh &`
  
 
 
