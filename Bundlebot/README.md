@@ -49,7 +49,7 @@ export BUNDLE_SMV_TAG=SMV-6.9.0test
   
    ### Summary
 
-   Steps for building a bundle. Bundle scripts are in bot/Bundlebot/scripts.
+   Steps for building a bundle. 
 
    1. edit `bot/Bundlebot/scripts/BUILD_config.sh`, defining revision and tags for this bundle.  Commit and push up changes to the central repo.
    2. `sudo su - firebot`
