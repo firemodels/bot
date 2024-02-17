@@ -8,7 +8,7 @@ This directory contains scripts for building FDS/Smokeview bundles on Windows, L
 Building a bundle consists of three steps: 
   1.Build FDS manuals (run the script `BUILD_fds_manuals.sh`).
   2. Build Smokeview manuals (run the script `BUILD_smv_manuals.sh`). 
-  3. Assemble applications, example files and manuals to generate the bundles by running the script `BUILD_release_bundle.sh` on a Linux or OSX computer or `BUILD_release_bundle.bat` on a Windows PC. The scripts `BUILD_test_bundle.sh` and `BUILD_test_bundle.bat` may be run when building test bundles.
+  3. Assemble applications, example files and manuals to generate the bundles by running the script `BUILD_release_bundle.sh` on a Linux or OSX computer or `BUILD_release_bundle.bat` on a Windows PC. The scripts `BUILD_test_bundle.sh` and `BUILD_test_bundle.bat` may be run when building test bundles. In this case, the bundles are uploaded to a different location.
 
 These steps are described in more detail below.
 
@@ -19,12 +19,12 @@ The scripts for building FDS and Smokeview manuals and building the bundle use t
 2. Edit the script `BUNDLE_config.sh` and define the environment variables: `BUNDLE_FDS_REVISION`, `BUNDLE_FDS_TAG`, `BUNDLE_SMV_REVISION` and `BUNDLE_SMV_TAG` for the revision and tag you wish to build a bundle for.
 3. Commit and push up these changes to the central repo .
 
-The variables below were defined using revisions for a firebot pass on Feb 9, 2024. The string `test` was appended to the TAG environment variables so that any test bundles created would not be confused with official ones.
+The variables below were defined using revisions for a firebot pass on Feb 9, 2024. The string `tst` was appended to the TAG environment variables so that any test bundles created would not be confused with official ones.
 ```
 export BUNDLE_FDS_REVISION=c1b5f1a
-export BUNDLE_FDS_TAG=FDS-6.9.0test
+export BUNDLE_FDS_TAG=FDS-6.9.0tst
 export BUNDLE_SMV_REVISION=b837eeb
-export BUNDLE_SMV_TAG=SMV-6.9.0test
+export BUNDLE_SMV_TAG=SMV-6.9.0tst
 ```
 
 ### Bundling Steps
@@ -45,7 +45,7 @@ export BUNDLE_SMV_TAG=SMV-6.9.0test
 3. **Build the bundle.**  After the FDS and smokeview manuals are built, run the script `BUILD_release_bundle.sh` in the firebot account (type: `sudo su - firebot` to switch accounts).  The same script can be run on a Linux and OSX computer.  While testing, run the script `BUILD_test_release.sh`. After building the bundles, these scripts upload them to the GitHub [test_bundles](https://github.com/firemodels/test_bundles) repository so that they can be tested before being published.  Edit this file and change the fds and smv hash and tags for a different release. To build a Windows bundle run the scripot `BUILD_release_bundle.bat` on a Windows PC.
    1. switch to the firebot account if not already there (type: `sudo su - firebot`)
    2. `cd Firemodels_bundle/bot/Bundlebot/scripts`
-   3. type: `./BUILD_release_bundle.sh` if building an `official` bundle, type `./BUILD_test_bundle.sh` if building a test bundle.  Likewise, type `BUILD_release_bundle` or `BUILD_test_bundle` on a PC to build a Windows bundle.  The only difference between release and test scripts is where the bundles are uploaded.
+   3. Type: `./BUILD_release_bundle.sh` if building a Linux or OSX release bundle. Type `BUILD_release_bundle` if building a Windows bundle.
   
    ### Summary
 
@@ -60,13 +60,9 @@ export BUNDLE_SMV_TAG=SMV-6.9.0test
    after this step completes (about 7 hours) run one of the following scripts
    6. `nohup ./BUILD_release_bundle.sh &` Linux or OSX release bundle
       
-      `nohup /BUILD_test_bundle.sh &` Linux or OSX test bundle
-      
       `BUILD_release_bundle` Windows release bundle
       
-      `BUILD_test_bundle` Windows test bundle
-      
- 
+ Note: note `nohup` is used on a Linux or Mac computer so that the script will continue to run if the command shell is disconnected.  The output form the command goes the file `nohup.out`.
 
 
 
