@@ -5,10 +5,11 @@
 
 This directory contains scripts for building FDS/Smokeview bundles on Windows, Linux and OSX computers. 
 
-Building a bundle consists of three steps: 
-  1. Building FDS manuals (running the script `BUILD_fds_manuals.sh`).
-  2. Building Smokeview manuals (running the script `BUILD_smv_manuals.sh`). 
-  3. Assembling applications, example files and manuals to generate the bundles by running the script `BUILD_release_bundle.sh` on a Linux or OSX computer or `BUILD_release_bundle.bat` on a Windows PC. The scripts `BUILD_test_bundle.sh` and `BUILD_test_bundle.bat` may be run when building test bundles. Trelease and test scripts are the same except that the release script uploads bundles to https://github.com/firemodels/fds/releases and the test scripts upload the bundles to https://github.com/firemodels/test_bundles/releases/tag/FDS_TEST .
+Building a bundle consists of several steps: 
+  1. Defining fds and smv revisions and tags you want to use for making the bundles (modifying `BUNDLE_config.sh` and `BUNDLE_config.bat` scripts)
+  2. Building FDS manuals (running the  `BUILD_fds_manuals.sh` script).
+  3. Building Smokeview manuals (running the `BUILD_smv_manuals.sh` script). 
+  4. Assembling applications, example files and manuals to generate the bundles by running the script `BUILD_release_bundle.sh` on a Linux or OSX computer or `BUILD_release_bundle.bat` on a Windows PC. The scripts `BUILD_test_bundle.sh` and `BUILD_test_bundle.bat` may be run when building test bundles. The release and test scripts are the same except for where the bundles are uploaded.  The release script uploads bundles to https://github.com/firemodels/fds/releases and the test scripts upload the bundles to https://github.com/firemodels/test_bundles/releases/tag/FDS_TEST .
   
 These steps are described in more detail below.
 
