@@ -14,7 +14,7 @@ These steps are described in more detail below.
 
 ### Setting Revisions and Tags  
 
-The scripts for building FDS and Smokeview manuals and building the bundle use the same revision and tag parameters.  These parameters are defined in the script `BUNDLE_config.sh` .  The following steps to define these parameters can be performed in your own bot repo as long as you commit and push up your changes to the central repo.
+The scripts for building FDS and Smokeview manuals and building the bundle use the same revision and tag parameters.  These parameters are defined in the script `BUNDLE_config.sh` on Linux and OSX computers and `BUNDLE_config.bat` on a Windows PC.  The following steps to define these parameters can be performed in your own bot repo as long as you commit and push up your changes to the central repo.
 1. `cd bot/Bundlebot/scripts`
 2. Edit the script `BUNDLE_config.sh` and define the environment variables: `BUNDLE_FDS_REVISION`, `BUNDLE_FDS_TAG`, `BUNDLE_SMV_REVISION` and `BUNDLE_SMV_TAG` for the revision and tag you wish to build a bundle for.
 3. Commit and push up these changes to the central repo .
