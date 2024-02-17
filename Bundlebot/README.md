@@ -8,7 +8,7 @@ This directory contains scripts for building FDS/Smokeview bundles on Windows, L
 Building a bundle consists of three steps: 
   1.Build FDS manuals (run the script `BUILD_fds_manuals.sh`).
   2. Build Smokeview manuals (run the script `BUILD_smv_manuals.sh`). 
-  3. Assemble applications, example files and manuals to generate the bundles (run the script `BUILD_release_bundle.sh` or `BUILD_test_bundle.sh`).
+  3. Assemble applications, example files and manuals to generate the bundles by running the script `BUILD_release_bundle.sh` on a Linux or OSX computer or `BUILD_release_bundle.bat` on a Windows PC. The scripts `BUILD_test_bundle.sh` and `BUILD_test_bundle.bat` may be run when building test bundles.
 
 These steps are described in more detail below.
 
@@ -42,10 +42,10 @@ export BUNDLE_SMV_TAG=SMV-6.9.0test
    2. `cd Firemodels_bundle/bot/Bundlebot/scripts`
    3. `./BUILD_smv_manuals.sh`
 
-3. **Build the bundle.**  After the FDS and smokeview manuals are built, run the script `BUILD_release_bundle.sh` in the firebot account (type: `sudo su - firebot` to switch accounts).  The same script can be run on a Linux and OSX computer.  While testing, run the script `BUILD_test_release.sh`. After building the bundles, these scripts upload them to the GitHub [test_bundles](https://github.com/firemodels/test_bundles) repository so that they can be tested before being published.  Edit this file and change the fds and smv hash and tags for a different release.
+3. **Build the bundle.**  After the FDS and smokeview manuals are built, run the script `BUILD_release_bundle.sh` in the firebot account (type: `sudo su - firebot` to switch accounts).  The same script can be run on a Linux and OSX computer.  While testing, run the script `BUILD_test_release.sh`. After building the bundles, these scripts upload them to the GitHub [test_bundles](https://github.com/firemodels/test_bundles) repository so that they can be tested before being published.  Edit this file and change the fds and smv hash and tags for a different release. To build a Windows bundle run the scripot `BUILD_release_bundle.bat` on a Windows PC.
    1. switch to the firebot account if not already there (type: `sudo su - firebot`)
    2. `cd Firemodels_bundle/bot/Bundlebot/scripts`
-   3. type: `./BUILD_release_bundle.sh` if building an `official` bundle, type `./BUILD_test_bundle.sh` if building a test bundle.  The only difference between these two options is where the bundles are uploaded.
+   3. type: `./BUILD_release_bundle.sh` if building an `official` bundle, type `./BUILD_test_bundle.sh` if building a test bundle.  Likewise, type `BUILD_release_bundle` or `BUILD_test_bundle` on a PC to build a Windows bundle.  The only difference between release and test scripts is where the bundles are uploaded.
   
    ### Summary
 
@@ -58,7 +58,7 @@ export BUNDLE_SMV_TAG=SMV-6.9.0test
    after this step completes (about 30 minutes) continue to the next step.
    6. `nohup ./BUILD_fds_manuals.sh &`
    after this step completes (about 7 hours) continue to the next step.
-   8. `nohup ./BUILD_release_bundle.sh &` or `nohup /BUILD_test_bundle.sh &` if testing
+   7a. `nohup ./BUILD_release_bundle.sh &` or `nohup /BUILD_test_bundle.sh &` if testing
  
 
 
