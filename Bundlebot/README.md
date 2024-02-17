@@ -6,7 +6,7 @@
 This directory contains scripts for building FDS/Smokeview bundles on Windows, Linux and OSX (Macintosh) computers. 
 
 Building a bundle consists of three steps: 
-  1.Build FDS manuals (run the script `BUILD_fds_manuals.sh`).
+  1. Build FDS manuals (run the script `BUILD_fds_manuals.sh`).
   2. Build Smokeview manuals (run the script `BUILD_smv_manuals.sh`). 
   3. Assemble applications, example files and manuals to generate the bundles by running the script `BUILD_release_bundle.sh` on a Linux or OSX computer or `BUILD_release_bundle.bat` on a Windows PC. The scripts `BUILD_test_bundle.sh` and `BUILD_test_bundle.bat` may be run when building test bundles. In this case, the bundles are uploaded to a different location.
 
