@@ -58,13 +58,13 @@ export BUNDLE_SMV_TAG=SMV-6.9.0test
    after this step completes (about 30 minutes) continue to the next step.
    5. `nohup ./BUILD_fds_manuals.sh &`
    after this step completes (about 7 hours) run one of the following scripts
-   6. `nohup ./BUILD_release_bundle.sh &`
+   6. `nohup ./BUILD_release_bundle.sh &` Linux or OSX release bundle
       
-      `nohup /BUILD_test_bundle.sh &`
+      `nohup /BUILD_test_bundle.sh &` Linux or OSX test bundle
       
-      `BUILD_release_bundle`
+      `BUILD_release_bundle` Windows release bundle
       
-      `BUILD_test_bundle`
+      `BUILD_test_bundle` Windows test bundle
       
  
 
