@@ -40,7 +40,7 @@ export BUNDLE_SMV_TAG=SMV-6.9.0tst
    4. `./BUILD_fds_manuals.sh`
 
 2. **Build the smokeview manuals.** Smokeview manuals are built similarly to the FDS manuals. This script runs smokebot using revisions and tags defined in BUNDLE_config.sh. (Note: Assume that smokeview manuals can be build in firebot account - have not verified yet)
-   1. switch to the firebot account if not already there (type: `sudo su - smokebot`)
+   1. switch to the firebot account if not already there (type: `sudo su - firebot`)
    2. `cd Firemodels_bundle/bot/Bundlebot/build`
    3. Update the bot repo.
    4. `./BUILD_smv_manuals.sh`
