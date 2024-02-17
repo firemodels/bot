@@ -3,7 +3,7 @@
 
 ### Overview
 
-This directory contains scripts for building FDS/Smokeview bundles on Windows, Linux and OSX computing platforms. 
+This directory contains scripts for building FDS/Smokeview bundles on Windows, Linux and OSX (Macintosh) computers. 
 
 Building a bundle consists of three steps: 
   1.Build FDS manuals (run the script `BUILD_fds_manuals.sh`).
