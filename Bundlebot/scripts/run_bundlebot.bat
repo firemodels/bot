@@ -342,6 +342,11 @@ exit /b 0
  if (%1)==() exit /b
  set valid=0
  set arg=%1
+ if "%1" EQU "-G" (
+   set GH_REPO=%2
+   set valid=1
+   shift
+ )
  if "%1" EQU "-b" (
    set BRANCH_NAME=%2
    set valid=1
