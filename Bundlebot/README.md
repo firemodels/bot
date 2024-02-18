@@ -5,10 +5,10 @@
 
 The directory `bot/Bundlebot/build` contains scripts for building FDS/Smokeview bundles on Windows, Linux and OSX computers. Building a bundle consists of several steps: 
 
-  1. Define fds and smv revisions and tags you want to use for making the bundles (modify `BUNDLE_config.sh` and `BUNDLE_config.bat`)
-  2. Build FDS manuals. Run the  script `BUILD_fds_manuals.sh option` where option can be test or release, test is the default.
+  1. Define fds and smv revisions and tags you want to use for making the bundles. Modify `BUNDLE_config.sh` and `BUNDLE_config.bat`.
+  2. Build FDS manuals. Run the  script `BUILD_fds_manuals.sh option` where option can be test or release. If option is missing, test is the default.
   3. Build Smokeview manuals. Run the script `BUILD_smv_manuals.sh option` where option is defined as before. 
-  4. Assemble applications, example files and manuals to generate bundles.  On a Linux or OSX computer run the script `BUILD_bundle.sh option` where option is defined as before. Similarly on a Windows PC run the script `BUILD_bundle.bat option`. In release mode, a bundle is uploaded to  https://github.com/firemodels/fds/releases. In test mode, the bundle is uploaded to https://github.com/firemodels/test_bundles/releases/ .
+  4. Assemble applications, example files and manuals to generate a bundle.  On a Linux or OSX computer run the script `BUILD_bundle.sh option` where option is defined as before. Similarly on a Windows PC run the script `BUILD_bundle.bat option`. In release mode, a bundle is uploaded to  https://github.com/firemodels/fds/releases. In test mode, the bundle is uploaded to https://github.com/firemodels/test_bundles/releases/ .
   
 These steps are described in more detail below.
 
