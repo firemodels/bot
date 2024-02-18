@@ -1,6 +1,10 @@
 #!/bin/bash
+option=$1
+if [ "$option" != "release" ]; then
+  option=test
+fi
 # this script runs firebot to build fds manuals using revision and tags defined in BUILD_config.sh
-source BUILD_config.sh
+source BUILD_config.sh $option
 MAILTO=
 GHOWNER=
 if [ "$BUNDLE_EMAIL" != "" ]; then
