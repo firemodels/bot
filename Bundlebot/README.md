@@ -39,10 +39,10 @@ export BUNDLE_SMV_TAG=SMV-6.9.0tst
    4. `nohup ./BUILD_fds_manuals.sh`
 
 2. **Build the smokeview manuals.** Smokeview manuals are built similarly to the FDS manuals. This script runs smokebot using revisions and tags defined in BUNDLE_config.sh.
-   1. switch to the firebot account if not already there (type: `sudo su - firebot`)
+   1. switch to the smokebot account if not already there (type: `sudo su - smokebot`) .  Note, the smokeview manuals should be able to be built in the firebot account but for some reason this is not working now.  For now, build the smokeview manuals in the smokebot account.
    2. `cd Firemodels_bundle/bot/Bundlebot/build`
    3. Update the bot repo.
-   4. `./BUILD_smv_manuals.sh`
+   4. `nohup ./BUILD_smv_manuals.sh`
 
 3. **Build the bundle.**  After the FDS and smokeview manuals are built, run the script `BUILD_release_bundle.sh` in the firebot account (type: `sudo su - firebot` to switch accounts).  The same script can be run on a Linux and OSX computer.  Note, the OSX bundle generating script obtains the manuals built on the Linux computer. The manuals do not need to be rebuilt on the Mac.  Run the script `BUILD_release_bundle.bat` on a Windows PC. While testing, run the script `BUILD_test_release.sh`. The test versions of the bundle scripts upload the bundles to https://github.com/firemodels/test_bundles so that they can be tested before being made generally available.  Similarly, to build a Windows bundle run the script `BUILD_release_bundle.bat` on a Windows PC.
    1. switch to the firebot account if not already there (type: `sudo su - firebot`)
