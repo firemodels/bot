@@ -24,17 +24,19 @@ set SVNROOT=%repo_root%
 
 :: setup .bundle and upload directories
 
-set bundle_dir=%userprofile%\.bundle
-if NOT exist %bundle_dir% mkdir %bundle_dir%
+set bundle_dir=c:\firebot\.bundle
+if NOT exist %bundle_dir% echo ***error: The directory %bundle_dir% does not exist
+if NOT exist %bundle_dir% pause
+if NOT exist %bundle_dir% exit /b
 
-set upload_dir=%userprofile%\.bundle\uploads
+set upload_dir=%bundle_dir%\uploads
 if NOT exist %upload_dir% mkdir %upload_dir%
 
-set bundles_dir=%userprofile%\.bundle\bundles
+set bundles_dir=%bundle_dir%\bundles
 if NOT exist %bundles_dir% mkdir %bundles_dir%
 
 if "%env_defined%" == "1" goto endif_env_defined
-set envfile="%userprofile%"\fds_smv_env.bat
+set envfile="c:\firebot\fds_smv_env.bat
 IF EXIST %envfile% GOTO endif_envexist2
 echo ***Fatal error.  The environment setup file %envfile% does not exist. 
 echo Create a file named %envfile% and use smv/scripts/fds_smv_env_template.bat
@@ -71,9 +73,9 @@ if "x%nightly%" == "x" goto skip_nightly
   set nightly=_%nightly%
 :skip_nightly
 
-set      in_impi=%userprofile%\.bundle\BUNDLE\WINDOWS\%INTELVERSION%
-set in_intel_dll=%userprofile%\.bundle\BUNDLE\WINDOWS\%INTELVERSION%
-set  in_shortcut=%userprofile%\.bundle\BUNDLE\WINDOWS\repoexes
+set      in_impi=%bundle_dir%\BUNDLE\WINDOWS\%INTELVERSION%
+set in_intel_dll=%bundle_dir%\BUNDLE\WINDOWS\%INTELVERSION%
+set  in_shortcut=%bundle_dir%\BUNDLE\WINDOWS\repoexes
 
 call %repo_root%\bot\Scripts\get_repo_info %repo_root%\fds 1 > FDSREPODATE.out
 set /p FDSREPODATE=<FDSREPODATE.out
@@ -94,7 +96,7 @@ if "x%bot%" == "xbot" goto skip2
 :skip2
 :endif0
 
-set in_pdf=%userprofile%\.bundle\pubs
+set in_pdf=%bundle_dir%\pubs
 set smv_forbundle=%repo_root%\bot\Bundlebot\smv\for_bundle
 
 set basedir=%upload_dir%\%basename%
