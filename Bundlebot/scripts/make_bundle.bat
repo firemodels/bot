@@ -36,7 +36,7 @@ set bundles_dir=%bundle_dir%\bundles
 if NOT exist %bundles_dir% mkdir %bundles_dir%
 
 if "%env_defined%" == "1" goto endif_env_defined
-set envfile="c:\firebot\fds_smv_env.bat
+set envfile=c:\firebot\fds_smv_env.bat
 IF EXIST %envfile% GOTO endif_envexist2
 echo ***Fatal error.  The environment setup file %envfile% does not exist. 
 echo Create a file named %envfile% and use smv/scripts/fds_smv_env_template.bat
