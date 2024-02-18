@@ -64,9 +64,9 @@ export BUNDLE_SMV_TAG=SMV-6.9.0tst
    after this step completes (about 30 minutes) continue to the next step.
    6. `nohup ./BUILD_fds_manuals.sh option &`
    after this step completes (about 7 hours) run 
-   7. `nohup ./BUILD_release_bundle.sh option &` if building a Linux or OSX bundle or run the following (on a PC) if building a Windows bundle
+   7. `nohup ./BUILD_bundle.sh option &` if building a Linux or OSX bundle or run
       
-      `BUILD_release_bundle` Windows release bundle option
+      `BUILD_bundle option` if building a Windows bundle.
       
  Note: `nohup` is used when building bundles on Linux and OSX computers so that the bundle generating script will continue to run if the command shell is disconnected from your terminal.  The output goes to the file `nohup.out`.
  
