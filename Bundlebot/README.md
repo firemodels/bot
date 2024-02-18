@@ -3,9 +3,8 @@
 
 ### Overview
 
-This directory contains scripts for building FDS/Smokeview bundles on Windows, Linux and OSX computers. 
+The directory `bot/Bundlebot/build` contains scripts for building FDS/Smokeview bundles on Windows, Linux and OSX computers. Building a bundle consists of several steps: 
 
-Building a bundle consists of several steps: 
   1. Defining fds and smv revisions and tags you want to use for making the bundles (modifying `BUNDLE_config.sh` and `BUNDLE_config.bat` scripts)
   2. Building FDS manuals (running the  `BUILD_fds_manuals.sh` script).
   3. Building Smokeview manuals (running the `BUILD_smv_manuals.sh` script). 
