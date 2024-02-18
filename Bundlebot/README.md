@@ -3,19 +3,19 @@
 
 ### Overview
 
-The directory [bot/Bundlebot/build](https://github.com/firemodels/bot/tree/master/Bundlebot/build) contains scripts for building FDS/Smokeview bundles on Windows, Linux and OSX computers. The steps to building a bundle are: 
+The directory [bot/Bundlebot/build](https://github.com/firemodels/bot/tree/master/Bundlebot/build) contains scripts for building FDS/Smokeview bundles on Windows, Linux and OSX computers. Steps for building a bundle are: 
 
-   1. edit `bot/Bundlebot/build/BUILD_config.sh`, defining revision and tags for this bundle.  Commit and push up changes to the central repo (edits can be made in your own bot repo).
-   2. On the host that runs firebot, type: `sudo su - firebot` to switch to the firebot account.
+   1. edit `bot/Bundlebot/build/BUILD_config.sh` and `bot/Bundlebot/build/BUILD_config.bat` defining revision and tag environmental variables for this bundle.  Commit and push up changes to the central repo (edits can be made in your own bot repo).
+   2. On the host that runs firebot (blaze at NIST), type: `sudo su - firebot` to switch to the firebot account.
    3. `cd FireModels_bundle/bot/Bundlebot/build`
-   4. Update the bot repo. In the steps below, option can be test or release. `option` defaults to test if it is not specified.
-   5. `nohup ./BUILD_smv_manuals.sh option &`
-   after this step completes (about 30 minutes) continue to the next step.
-   6. type: `tail -f nohup.out` to see script output.
-   after this step completes (about 7 hours) run 
+   4. Update the bot repo. In the steps below, option can be test or release. The parameter `option` defaults to test if it is not specified.
+   5. `nohup ./BUILD_fds_manuals.sh option &`
+    after this step completes (about 7 hours) continue
+   6. `nohup ./BUILD_smv_manuals.sh option &`
+   after this step completes (about 30 minutes) continue
    7. `nohup ./BUILD_bundle.sh option &` if building a Linux or OSX bundle or run
       
-      `BUILD_bundle option` if building a Windows bundle.
+      `BUILD_bundle option` if building a Windows bundle (nohup is not available on Windows).
       
 Note: `nohup` is used when building bundles on Linux and OSX computers so that the bundle generating script will continue to run if the command shell is disconnected from your terminal.  The output goes to the file `nohup.out`. Type: `tail -f nohup.out` to see script output.
 
