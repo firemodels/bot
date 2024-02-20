@@ -11,7 +11,9 @@ The directory [bot/Bundlebot/build](https://github.com/firemodels/bot/tree/maste
    4. The parameter `option` in the following steps can be test or release. `option` defaults to test if it is not specified. Use test until you are ready to build bundles for a release.
    6. Type: `nohup ./BUILD_fds_manuals.sh option &` to build FDS manuals.  After this step completes (about 7 hours) continue to the next step
    7. Type: `nohup ./BUILD_smv_manuals.sh option &` to build Smokeview manuals. After this step completes (about 30 minutes) continue to the next step
-   8. Type (on  Linux or Mac computer): `nohup ./BUILD_bundle.sh option &` to build a Linux or OSX bundles. 
+   8. Type : `nohup ./BUILD_bundle.sh option &` on a Linux computer to build a Linux bundle.
+    
+     Type : `nohup ./BUILD_bundle.sh option &` on a Mac computer to build a Mac bundle. 
 
       Type (on a PC): `BUILD_bundle option` to build a Windows bundle. (nohup is not available on Windows).
       
