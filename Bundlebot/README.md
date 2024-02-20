@@ -9,7 +9,7 @@ The directory [bot/Bundlebot/build](https://github.com/firemodels/bot/tree/maste
    2. Type: `sudo su - firebot` on the host that runs firebot (blaze at Nist) to switch to the firebot account.
    3. `cd FireModels_bundle/bot/Bundlebot/build` and update the repo.
    4. The parameter `option` in the following steps can be test or release. `option` defaults to test if it is not specified. Use test until you are ready to build bundles for a release.
-   6. Type: `nohup ./BUILD_fds_manuals.sh option &` to build FDS manuals.  After this step completes (about 7 hours) continue to next step
+   6. Type: `nohup ./BUILD_fds_manuals.sh option &` to build FDS manuals.  After this step completes (about 7 hours) continue to the next step
    7. Type: `nohup ./BUILD_smv_manuals.sh option &` to build Smokeview manuals. After this step completes (about 30 minutes) continue to the next step
    8. Type (on  Linux or Mac computer): `nohup ./BUILD_bundle.sh option &` to build a Linux or OSX bundles. 
 
