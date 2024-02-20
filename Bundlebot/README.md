@@ -13,9 +13,9 @@ The directory [bot/Bundlebot/build](https://github.com/firemodels/bot/tree/maste
    7. Type: `nohup ./BUILD_smv_manuals.sh option &` to build Smokeview manuals. After this step completes (about 30 minutes) continue to the next step
    8. Type : `nohup ./BUILD_bundle.sh option &` on a Linux computer to build a Linux bundle.
     
-     Type : `nohup ./BUILD_bundle.sh option &` on a Mac computer to build a Mac bundle. 
+Type : `nohup ./BUILD_bundle.sh option &` on a Mac computer to build a Mac bundle. 
 
-      Type (on a PC): `BUILD_bundle option` to build a Windows bundle. (nohup is not available on Windows).
+Type (on a PC): `BUILD_bundle option` to build a Windows bundle. (nohup is not available on Windows).
       
 Note: `nohup` is used when building bundles on Linux and OSX computers so that the bundle generating script will continue to run if the command shell is disconnected from your terminal.  The output goes to the file `nohup.out`. Type: `tail -f nohup.out` to see script output.
 
