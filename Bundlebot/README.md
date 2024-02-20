@@ -15,7 +15,7 @@ The directory [bot/Bundlebot/build](https://github.com/firemodels/bot/tree/maste
 
       Type : `nohup ./BUILD_bundle.sh option &` on a Mac computer to build a Mac bundle.
 
-      Type (on a PC): `BUILD_bundle option` to build a Windows bundle. (nohup is not available on Windows).
+      Type: `BUILD_bundle option` on a Windows PC to build a Windows bundle. (nohup is not available on Windows).
       
 Note: `nohup` is used when building bundles on Linux and OSX computers so that the bundle generating script will continue to run if the command shell is disconnected from your terminal.  The output goes to the file `nohup.out`. Type: `tail -f nohup.out` to see script output.
 
