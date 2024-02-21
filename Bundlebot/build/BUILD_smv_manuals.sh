@@ -7,6 +7,12 @@ fi
 source GH_config.sh $option
 source BUILD_config.sh
 
+echo ***updating repos
+CURDIR=`pwd`
+cd ../../Scripts
+./Update_repos.sh
+cd $CURDIR
+
 MAILTO=
 GHOWNER=
 GHREPO=
