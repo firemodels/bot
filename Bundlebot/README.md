@@ -8,14 +8,13 @@ The directory [bot/Bundlebot/build](https://github.com/firemodels/bot/tree/maste
    1. edit `BUILD_config.sh` and `BUILD_config.bat` defining revision and tag environmental variables for this bundle.  Commit and push up changes to the central rep. These edits can be made in your own bot repo.
    2. Type: `sudo su - firebot` on the computer that runs firebot (blaze at Nist) to switch to the firebot user account.
    3. `cd FireModels_bundle/bot/Bundlebot/build` and update the repo.
-   4. In each step below, the parameter `option` can be `test` or `release`. `option` defaults to `test` if it is not specified. Use `test` until you are ready to build bundles for a release.
-   6. Type: `nohup ./BUILD_fds_manuals.sh option &` to build FDS manuals.  After this step completes (about 7 hours) continue to the next step
-   7. Type: `nohup ./BUILD_smv_manuals.sh option &` to build Smokeview manuals. After this step completes (about 30 minutes) continue to the next step
-   8. Type : `nohup ./BUILD_bundle.sh option &` on a Linux computer to build a Linux bundle.
+   4. Type: `nohup ./BUILD_fds_manuals.sh &` to build FDS manuals.  After this step completes (about 7 hours) continue to the next step
+   5. Type: `nohup ./BUILD_smv_manuals.sh &` to build Smokeview manuals. After this step completes (about 30 minutes) continue to the next step
+   6. Type : `nohup ./BUILD_bundle.sh &` on a Linux computer to build a Linux bundle.
 
-      Type : `nohup ./BUILD_bundle.sh option &` on a Mac computer to build a Mac bundle.
+      Type : `nohup ./BUILD_bundle.sh &` on a Mac computer to build a Mac bundle.
 
-      Type: `BUILD_bundle option` on a Windows PC to build a Windows bundle. (nohup is not available on Windows).
+      Type: `BUILD_bundle ` on a Windows PC to build a Windows bundle. (nohup is not available on Windows).
       
 Note: `nohup` is used when building bundles on Linux and OSX computers so that the bundle generating script will continue to run if the command shell is disconnected from your terminal.  The output goes to the file `nohup.out`. Type: `tail -f nohup.out` to see script output.
 
@@ -45,19 +44,16 @@ export BUNDLE_SMV_TAG=SMV-6.9.0tst
    1. switch to the firebot account (type: `sudo su - firebot`)
    2. `cd Firemodels_bundle/bot/Bundlebot/build`
    3. Update the bot repo.
-   4. `nohup ./BUILD_fds_manuals.sh option`
-      where `option` is release or test
+   4. `nohup ./BUILD_fds_manuals.sh &`
 
 2. **Build the smokeview manuals.** Smokeview manuals are built similarly to the FDS manuals. This script runs smokebot using revisions and tags defined in BUNDLE_config.sh.  Smokeview manuals built in this step are uploaded to a github release where the bundle generating scripts can access them.
    1. switch to the firebot account if not already there (type: `sudo su - firebot`) . 
    2. `cd Firemodels_bundle/bot/Bundlebot/build`
    3. Update the bot repo.
-   4. `nohup ./BUILD_smv_manuals.sh option`
-      where `option` is release or test.
-
-3. **Build the bundle.**  After the FDS and smokeview manuals are built, run the script `BUILD_bundle.sh option`  in the firebot account (type: `sudo su - firebot` to switch accounts).  Note, use the same option (release or test) as was used when building the FDS and smokeview manuals. The bundle generating script uploads the bundle to https://github.com/firemodels/fds/releases when option=release and to https://github.com/firemodels/test_bundles/releases/ when option=test .  To build a Windows bundle run the script `BUILD_bundle.bat opton` on a Windows PC.
+   4. `nohup ./BUILD_smv_manuals.sh`
+   
+3. **Build the bundle.**  After the FDS and smokeview manuals are built, run the script `BUILD_bundle.sh`  in the firebot account (type: `sudo su - firebot` to switch accounts).  To build a Windows bundle run the script `BUILD_bundle.bat`
    1. switch to the firebot account if not already there (type: `sudo su - firebot`)
    2. `cd Firemodels_bundle/bot/Bundlebot/build`
    3. Update the bot repo.
-   4. Type: `./BUILD_bundle.sh option` if building a Linux or OSX release bundle. Type `BUILD_release_bundle option` if building a Windows bundle where as before option can be test or release.
-  
+   4. Type: `./BUILD_bundle.sh` if building a Linux or OSX release bundle. Type `BUILD_release_bundle option` if building a Windows bundle.
