@@ -7,6 +7,12 @@ fi
 source GH_config.sh $option
 source BUILD_config.sh
 
+CURDIR=`pwd`
+cd ../../Scripts
+echo ***updating repos
+./update_repos.sh
+cd $CURDIR
+
 MAILTO=
 GHOWNER=
 if [ "$BUNDLE_EMAIL" != "" ]; then
