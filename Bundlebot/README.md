@@ -26,5 +26,7 @@ The directory [bot/Bundlebot/build](https://github.com/firemodels/bot/tree/maste
 
 4. Tags are only created in the local fds and smv repos, they are not pushed up to GitHub. Tags then does not need to be undone if errors are discovered that require more commits. New tags may be pushed up to github after the bundles are published.
 
-5. When BUNDLE_OPTION is set to test in the BUILD_config scripts, bundles are uploaded to https://github.com/firemodels/test_bundles/releases/tag/FDS_TEST . When BUNDLE_OPTION is set to release in the BUILD_config scripts, bundles are uploaded to https://github.com/firemodels/fds/releases (the official release location).
-    
+5. Bundles are uploaded to https://github.com/firemodels/test_bundles/releases/tag/FDS_TEST when `BUNDLE_OPTION` is set to `test` in the BUILD_config scripts.
+
+6. Bundles are uploaded to https://github.com/firemodels/fds/releases (the official release location) when `BUNDLE_OPTION` is set to `release` in the BUILD_config scripts.
+   
