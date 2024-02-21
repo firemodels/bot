@@ -1,7 +1,4 @@
 @echo off
-set option=%1
-
-call GH_config %option%
 call BUILD_config
 
 cd ..\scripts
