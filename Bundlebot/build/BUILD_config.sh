@@ -7,7 +7,6 @@
 # FDS-6.8.0-1523-g29bcb71/master
 # SMV-6.8.0-2073-g0f8b692/master
 
-export BUNDLE_OPTION=test
 export BUNDLE_FDS_REVISION=debb46d
 export BUNDLE_FDS_TAG=FDS-6.9.0
 export BUNDLE_SMV_REVISION=0f8b692
