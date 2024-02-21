@@ -1,10 +1,5 @@
 #!/bin/bash
 # this script runs smokebot to build smokeview manuals using revision and tags defined in BUILD_config.sh
-option=$1
-if [ "$option" != "release" ]; then
-  option=test
-fi
-source GH_config.sh $option
 source BUILD_config.sh
 
 echo ***updating repos
