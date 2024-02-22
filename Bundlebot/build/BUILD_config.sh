@@ -23,6 +23,7 @@ fi
 if [ "BUNDLE_OPTION" == "test" ]; then
   GH_REPO=test_bundles
   GH_FDS_TAG=BUNDLE_TEST
+  GH_SMOKEVIEW_TAG=BUNDLE_TEST
 fi
 if [ "BUNDLE_OPTION" == "release" ]; then
   GH_REPO=fds
