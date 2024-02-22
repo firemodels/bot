@@ -17,15 +17,15 @@ export BUNDLE_SMV_TAG=SMV-6.9.0
 
 # lines below should not need to be changed
 
-if [ "BUNDLE_OPTION" != "release" ]; then
+if [ "$BUNDLE_OPTION" != "release" ]; then
   BUNDLE_OPTION=test
 fi
-if [ "BUNDLE_OPTION" == "test" ]; then
+if [ "$BUNDLE_OPTION" == "test" ]; then
   GH_REPO=test_bundles
   GH_FDS_TAG=BUNDLE_TEST
   GH_SMOKEVIEW_TAG=BUNDLE_TEST
 fi
-if [ "BUNDLE_OPTION" == "release" ]; then
+if [ "$BUNDLE_OPTION" == "release" ]; then
   GH_REPO=fds
 fi
 export GH_REPO
