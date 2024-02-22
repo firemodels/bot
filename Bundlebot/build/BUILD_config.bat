@@ -20,4 +20,5 @@ set BUNDLE_SMV_TAG=SMV-6.9.0
 if NOT "%BUNDLE_OPTION%" == "release" set BUNDLE_OPTION=test
 if "%BUNDLE_OPTION%" == "test" set GH_REPO=test_bundles
 if "%BUNDLE_OPTION%" == "test" set GH_FDS_TAG=BUNDLE_TEST
+if "%BUNDLE_OPTION%" == "test" set GH_SMOKEVIEW_TAG=BUNDLE_TEST
 if "%BUNDLE_OPTION%" == "release" set GH_REPO=fds
