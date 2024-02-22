@@ -18,15 +18,15 @@ The directory [bot/Bundlebot/build](https://github.com/firemodels/bot/tree/maste
 
 ### Notes
       
-1. `nohup` is used when building bundles on Linux and OSX computers so that the bundle generating script will continue to run if the command shell is disconnected from your terminal.  The output goes to the file `nohup.out`. You can type `tail -f nohup.out` to see script output while the script is running.
+1. `nohup` is used when building bundles on Linux and OSX computers so that the bundle generating script will continue to run if the command shell is disconnected from your terminal.  The output goes to the file `nohup.out`. Type `tail -f nohup.out` to see  output while the script is running.
 
 2. The scripts for building FDS and Smokeview manuals and building the bundle use environment variables to define repo revisions and tags.  These variables are defined in the scripts `BUNDLE_config.sh` and `BUNDLE_config.bat` .
 
-3. Bundle scripts erase and clone fresh copies of the fds and smv repos. These scripts should not be run in repos where daily work is performed.   At NIST, Linux Manuals are built in the firebot user account in the directory Firemodels_bundle/bot/Bundlebot/build directory on blaze.
+3. Bundle scripts erase and clone fresh copies of the fds and smv repos. These scripts should not be run in repos where daily work is performed.   At NIST, Linux Manuals are built in the firebot user account in the directory Firemodels_bundle/bot/Bundlebot/build directory on the host blaze.
 
-4. Tags are only created in the local fds and smv repos, they are not pushed up to GitHub. Tags then does not need to be undone if errors are discovered that require more commits. New tags may be pushed up to github after the bundles are published.
+4. Tags are only created in the local fds and smv repos, they are not pushed up to GitHub. Tags then does not need to be deleted if errors are discovered that require more commits. Once the bundles are published, these tags may be pushed up to github.
 
-5. Bundles are uploaded to https://github.com/firemodels/test_bundles/releases/tag/FDS_TEST when `BUNDLE_OPTION` is set to `test` in the BUILD_config scripts.
+5. Bundles are uploaded to https://github.com/firemodels/test_bundles/releases/tag/BUNDLE_TEST when `BUNDLE_OPTION` is set to `test` in the BUILD_config scripts.
 
 6. Bundles are uploaded to https://github.com/firemodels/fds/releases (the official release location) when `BUNDLE_OPTION` is set to `release` in the BUILD_config scripts.
    
