@@ -2,10 +2,14 @@
 
 CURDIR=`pwd`
 
-FROMDIR=~smokebot/.smokebot/pubs
+PUBSDIR=$HOME/.smokebot/pubs_latest
 
 cd ../../smv/Manuals
 MANDIR=`pwd`
+
+cd $HOME/.smokebot/apps_latest
+APPSDIR=`pwd`
+
 cd $CURDIR
 
 UPLOADINFO ()
@@ -20,14 +24,26 @@ UPLOADINFO ()
   rm -f $DIR/SMV_INFO.txt
 }
 
+UPLOADAPP ()
+{
+  FILE=$1
+  if [ -e $APPSDIR/$FILE ]; then
+    echo ***Uploading $FILE
+    gh release upload $GH_SMOKEVIEW_TAG $APPSDIR/$FILE -R github.com/$GH_OWNER/$GH_REPO --clobber
+  else
+    echo ***error: $APPSDIR/$FILE not found
+  fi
+}
+
 UPLOADGUIDE ()
 {
   FILE=$1
   FILEnew=${FILE}.pdf
-  if [ -e $FROMDIR/$FILEnew ]; then
-    cd $TESTBUNDLEDIR
+  if [ -e $PUBSDIR/$FILEnew ]; then
     echo ***Uploading $FILEnew
-    gh release upload $GH_SMOKEVIEW_TAG $FROMDIR/$FILEnew -R github.com/$GH_OWNER/$GH_REPO --clobber
+    gh release upload $GH_SMOKEVIEW_TAG $PUBSDIR/$FILEnew -R github.com/$GH_OWNER/$GH_REPO --clobber
+  else
+    echo ***error: $PUBSDIR/$FILEnew not found
   fi
 }
 
@@ -49,16 +65,19 @@ UPLOADFIGURES ()
   tar cvf $TARHOME/$tarfile . &> /dev/null
   cd $TARHOME
   gzip $tarfile
-  cd $TESTBUNDLEDIR
   echo ***Uploading $tarfile.gz
   gh release upload $GH_SMOKEVIEW_TAG $TARHOME/$tarfile.gz -R github.com/$GH_OWNER/$GH_REPO --clobber
 }
-if [ -e $TESTBUNDLEDIR ] ; then
-  UPLOADGUIDE SMV_Technical_Reference_Guide
-  UPLOADGUIDE SMV_User_Guide
-  UPLOADGUIDE SMV_Verification_Guide
-  UPLOADFIGURES SMV_User_Guide SMV_UG
-  UPLOADFIGURES SMV_Verification_Guide SMV_VG
-  UPLOADINFO
-  cd $CURDIR
-fi
+
+UPLOADAPP background
+UPLOADAPP hashfile
+UPLOADAPP smokediff
+UPLOADAPP smokeview
+UPLOADAPP smokezip
+UPLOADAPP wind2fds
+UPLOADGUIDE SMV_Technical_Reference_Guide
+UPLOADGUIDE SMV_User_Guide
+UPLOADGUIDE SMV_Verification_Guide
+UPLOADFIGURES SMV_User_Guide SMV_UG
+UPLOADFIGURES SMV_Verification_Guide SMV_VG
+UPLOADINFO
