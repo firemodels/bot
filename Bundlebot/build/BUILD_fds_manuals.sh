@@ -1,6 +1,13 @@
 #!/bin/bash
 # this script runs firebot to build fds manuals using revision and tags defined in BUILD_config.sh
 source BUILD_config.sh
+
+CURDIR=`pwd`
+cd ../../Scripts
+echo ***updating repos
+./update_repos.sh
+cd $CURDIR
+
 MAILTO=
 GHOWNER=
 if [ "$BUNDLE_EMAIL" != "" ]; then

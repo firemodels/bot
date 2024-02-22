@@ -1,6 +1,13 @@
 #!/bin/bash
 # this script runs smokebot to build smokeview manuals using revision and tags defined in BUILD_config.sh
 source BUILD_config.sh
+
+echo ***updating repos
+CURDIR=`pwd`
+cd ../../Scripts
+./Update_repos.sh
+cd $CURDIR
+
 MAILTO=
 GHOWNER=
 GHREPO=
