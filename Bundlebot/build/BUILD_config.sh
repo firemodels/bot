@@ -30,3 +30,4 @@ if [ "BUNDLE_OPTION" == "release" ]; then
 fi
 export GH_REPO
 export GH_FDS_TAG
+export GH_SMOKEVIEW_TAG
