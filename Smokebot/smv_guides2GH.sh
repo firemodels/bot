@@ -24,17 +24,6 @@ UPLOADINFO ()
   rm -f $DIR/SMV_INFO.txt
 }
 
-UPLOADAPP ()
-{
-  FILE=$1
-  if [ -e $APPSDIR/$FILE ]; then
-    echo ***Uploading $FILE
-    gh release upload $GH_SMOKEVIEW_TAG $APPSDIR/$FILE -R github.com/$GH_OWNER/$GH_REPO --clobber
-  else
-    echo ***error: $APPSDIR/$FILE not found
-  fi
-}
-
 UPLOADGUIDE ()
 {
   FILE=$1
@@ -69,12 +58,6 @@ UPLOADFIGURES ()
   gh release upload $GH_SMOKEVIEW_TAG $TARHOME/$tarfile.gz -R github.com/$GH_OWNER/$GH_REPO --clobber
 }
 
-UPLOADAPP background
-UPLOADAPP hashfile
-UPLOADAPP smokediff
-UPLOADAPP smokeview
-UPLOADAPP smokezip
-UPLOADAPP wind2fds
 UPLOADGUIDE SMV_Technical_Reference_Guide
 UPLOADGUIDE SMV_User_Guide
 UPLOADGUIDE SMV_Verification_Guide

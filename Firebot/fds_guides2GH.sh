@@ -34,17 +34,6 @@ UPLOADINFO ()
   rm -f $DIR/FDS_INFO.txt
 }
 
-UPLOADAPP ()
-{
-  FILE=$1
-  if [ -e $APPSDIR/$FILE ]; then
-    echo ***Uploading $FILE
-    gh release upload $GH_FDS_TAG $APPSDIR/$FILE -R github.com/$GH_OWNER/$GH_REPO --clobber
-  else
-    echo ***error: $APPSDIR/$FILE not found
-  fi
-}
-
 UPLOADGUIDE ()
 {
   FILE=$1
@@ -78,9 +67,6 @@ UPLOADFIGURES ()
   echo ***Uploading $tarfile.gz
   gh release upload $GH_FDS_TAG $TARHOME/$tarfile.gz -R github.com/$GH_OWNER/$GH_REPO --clobber
 }
-UPLOADAPP fds
-UPLOADAPP fds_openmp
-UPLOADAPP fds2ascii
 UPLOADGUIDE FDS_Config_Management_Plan
 UPLOADGUIDE FDS_Technical_Reference_Guide
 UPLOADGUIDE FDS_User_Guide
