@@ -1,12 +1,12 @@
 #!/bin/bash
-option=$1
-if [ "$option" != "release" ]; then
-  option=test
-fi
-source GH_config.sh $option
-
 # this script runs smokebot to build smokeview manuals using revision and tags defined in BUILD_config.sh
-source BUILD_config.sh $option
+source BUILD_config.sh
+
+echo ***updating repos
+CURDIR=`pwd`
+cd ../../Scripts
+./Update_repos.sh
+cd $CURDIR
 
 MAILTO=
 GHOWNER=

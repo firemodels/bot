@@ -6,8 +6,12 @@ if [ "$GH_FDS_TAG" == "" ]; then
   exit 1
 fi
 
+cd $HOME/.firebot/appslatest
+APPSDIR=`pwd`
+cd $CURDIR
+
 cd output/Newest_Guides
-FROMDIR=`pwd`
+PUBDIR=`pwd`
 cd $CURDIR
 
 cd ../../fds/Manuals
@@ -30,15 +34,29 @@ UPLOADINFO ()
   rm -f $DIR/FDS_INFO.txt
 }
 
+UPLOADAPP ()
+{
+  FILE=$1
+  if [ -e $APPSDIR/$FILE ]; then
+    echo ***Uploading $FILE
+    gh release upload $GH_FDS_TAG $APPSDIR/$FILE -R github.com/$GH_OWNER/$GH_REPO --clobber
+  else
+    echo ***error: $APPSDIR/$FILE not found
+  fi
+}
+
 UPLOADGUIDE ()
 {
   FILE=$1
   FILEnew=${FILE}.pdf
-  if [ -e $FROMDIR/$FILEnew ]; then
+  if [ -e $PUBDIR/$FILEnew ]; then
     echo ***Uploading $FILEnew
-    gh release upload $GH_FDS_TAG $FROMDIR/$FILEnew -R github.com/$GH_OWNER/$GH_REPO --clobber
+    gh release upload $GH_FDS_TAG $PUBDIR/$FILEnew -R github.com/$GH_OWNER/$GH_REPO --clobber
+  else
+    echo ***error: $PUBDIR/$FILEnew not found
   fi
 }
+
 UPLOADFIGURES ()
 {
   DIRECTORY=$1
@@ -60,6 +78,9 @@ UPLOADFIGURES ()
   echo ***Uploading $tarfile.gz
   gh release upload $GH_FDS_TAG $TARHOME/$tarfile.gz -R github.com/$GH_OWNER/$GH_REPO --clobber
 }
+UPLOADAPP fds
+UPLOADAPP fds_openmp
+UPLOADAPP fds2ascii
 UPLOADGUIDE FDS_Config_Management_Plan
 UPLOADGUIDE FDS_Technical_Reference_Guide
 UPLOADGUIDE FDS_User_Guide

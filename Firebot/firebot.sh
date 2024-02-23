@@ -2389,7 +2389,7 @@ else
    notfound=`gcc -help 2>&1 | tail -1 | grep "not found" | wc -l`
 fi
 
-UploadGuidesGH=$botrepo/Firebot/fds_guides2GH.sh
+UploadGuidesGH=$botrepo/Firebot/fds_guidesapps2GH.sh
 SummaryGH=$botrepo/Firebot/summary2GH.sh
 COPY_FDS_APPS=$botrepo/Firebot/copy_fds_apps.sh
 COPY_SMV_APPS=$botrepo/Firebot/copy_smv_apps.sh
