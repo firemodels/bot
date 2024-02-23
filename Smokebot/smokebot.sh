@@ -1887,7 +1887,7 @@ cd
 SMV_SUMMARY_DIR=$smvrepo/Manuals/SMV_Summary
 IMAGE_DIFFS=$SMV_SUMMARY_DIR/image_differences
 
-UploadGuidesGH=$botrepo/Smokebot/smv_guidesapps2GH.sh
+UploadGuidesGH=$botrepo/Smokebot/smv_guides2GH.sh
 UploadSummaryGH=$botrepo/Smokebot/smv_summary2GH.sh
 UploadWEB=$botrepo/Smokebot/smv_web2GD.sh
 
