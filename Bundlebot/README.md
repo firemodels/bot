@@ -16,7 +16,7 @@ The directory [bot/Bundlebot/build](https://github.com/firemodels/bot/tree/maste
 
    8. Type: `BUILD_bundle ` on a Windows PC to build a Windows bundle. (nohup is not available on Windows).
 
-   9. When the test bundles are ready to be published, type: `GH2bundles.sh` to download the bundles to the `bundles` directory.  Then upload these bundles to the fds release page to create a release. Type `GH2bundles.bat` if on a PC.
+   9. Type: `GH2bundles.sh` to download the bundles to the `bundles` directory when the bundles are ready to be published.  Type `GH2bundles.bat` if on a PC . Upload these bundles to the fds release page at at https://github.com/firemodels/fds/releases to create a new release. .
 
 ### Notes
       
