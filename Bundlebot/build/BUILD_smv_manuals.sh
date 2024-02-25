@@ -5,7 +5,7 @@ source BUILD_config.sh
 echo ***updating repos
 CURDIR=`pwd`
 cd ../../Scripts
-./Update_repos.sh
+./update_repos.sh
 cd $CURDIR
 
 MAILTO=
