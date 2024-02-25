@@ -13,7 +13,7 @@ find_CRLF()
   crlf_temp=/tmp/crlf.$$
 
   cd $repodir
-  grep -IURl --exclude="*.pdf" --exclude-dir=".git"  --exclude-dir="output" $'\r'  > $crlf_temp
+  grep -IURl --exclude="*.pdf" --exclude="nohup.out" --exclude-dir=".git"  --exclude-dir="output" $'\r'  > $crlf_temp
   nlines=`cat $crlf_temp | wc -l`
   if [ $nlines -gt 0 ]; then
     echo "$reponame files with CRLF line endings: "
