@@ -16,14 +16,16 @@ The directory [bot/Bundlebot/build](https://github.com/firemodels/bot/tree/maste
 
    8. Type: `BUILD_bundle ` on a Windows PC to build a Windows bundle. (nohup is not available on Windows).
 
+   9. When the test bundles are ready to be published, type: `GH2bundles.sh` to download the bundles to the `bundles` directory.  Then upload these bundles to the fds release page to create a release. Type `GH2bundles.bat` if on a PC.
+
 ### Notes
       
 1. `nohup` is used when building bundles on Linux and OSX computers so that the bundle generating script will continue to run if the command shell is disconnected from your terminal.  The output goes to the file `nohup.out`. Type `tail -f nohup.out` to see  output while the script is running.
 
-2. The scripts for building FDS and Smokeview manuals and building the bundle use environment variables to define repo revisions and tags.  These variables are defined in the scripts `BUNDLE_config.sh` and `BUNDLE_config.bat` .
+2. The scripts for building FDS and Smokeview manuals and building the bundle use environment variables to define repo revisions and tags.  These variables are defined in the scripts `BUNDLE_config.sh` (on Linux and Mac computer) and `BUNDLE_config.bat` (on Windows computers).
 
 3. Bundle scripts erase and clone fresh copies of the fds and smv repos. These scripts should not be run in repos where daily work is performed.   At NIST, Linux Manuals are built in the firebot user account in the directory Firemodels_bundle/bot/Bundlebot/build directory on the host blaze.
 
 4. Tags are only created in the local fds and smv repos, they are not pushed up to GitHub. Tags then does not need to be deleted if errors are discovered that require more commits. Once the bundles are published, these tags may be pushed up to github.
 
-5. Bundles are uploaded to https://github.com/firemodels/test_bundles/releases/tag/BUNDLE_TEST 
+5. Test bundles are uploaded to https://github.com/firemodels/test_bundles/releases/tag/BUNDLE_TEST 
