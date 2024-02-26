@@ -11,11 +11,8 @@ The directory [bot/Bundlebot/build](https://github.com/firemodels/bot/tree/maste
    4. Type: `nohup ./BUILD_fds_manuals.sh &` to build FDS manuals.  After this step completes (about 7 hours) continue to the next step
    5. Type: `nohup ./BUILD_smv_manuals.sh &` to build Smokeview manuals (in the same account). After this step completes (about 30 minutes) continue to the next step
    6. Type : `nohup ./BUILD_bundle.sh &` on a Linux computer to build a Linux bundle.
-
    7. Type : `nohup ./BUILD_bundle.sh &` on a Mac computer to build a Mac bundle.
-
    8. Type: `BUILD_bundle ` on a Windows PC to build a Windows bundle. (nohup is not available on Windows).
-
    9. Type: `GH2bundles.sh` to download the bundles to the `bundles` directory when the bundles are ready to be published.  Type `GH2bundles.bat` if on a PC . Draft a new release at https://github.com/firemodels/fds/releases then upload the bundles from the `bundles` directory to this new release.
 
 ### Notes
