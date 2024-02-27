@@ -3,7 +3,7 @@
 
 ### Overview
 
-The directory [bot/Bundlebot/build](https://github.com/firemodels/bot/tree/master/Bundlebot/build) contains scripts for building FDS/Smokeview bundles on Windows, Linux and OSX computers. Basically you edit a configuration script defining revisions and tags, run scripts for building FDS and Smokeview manuals and finally run scripts for building the bundles.  These steps are given in more detail below: 
+The directory [bot/Bundlebot/build](https://github.com/firemodels/bot/tree/master/Bundlebot/build) contains scripts for building FDS/Smokeview bundles on Windows, Linux and OSX computers. The workflow is to edit configuration scripts defining tags and associated revisions, run scripts for building FDS and Smokeview manuals and finally run scripts for building the bundles.  These steps are given in more detail below: 
 
    1. edit `BUILD_config.sh` and `BUILD_config.bat` defining revision and tag environmental variables for this bundle.  Commit and push up changes to the central repo.
    2. Type: `sudo su - firebot` on the computer that runs firebot (blaze at Nist) to switch to the firebot user account.
