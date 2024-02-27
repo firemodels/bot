@@ -3,7 +3,7 @@
 
 ### Overview
 
-The directory [bot/Bundlebot/build](https://github.com/firemodels/bot/tree/master/Bundlebot/build) contains scripts for building FDS/Smokeview bundles on Windows, Linux and OSX computers. Basically you edit a configuration script defining revisions and tags, run scripts for building FDS and Smokeview manuals and finally run scripts for building the bundles.  Steps for building bundles are given in more detail below: 
+The directory [bot/Bundlebot/build](https://github.com/firemodels/bot/tree/master/Bundlebot/build) contains scripts for building FDS/Smokeview bundles on Windows, Linux and OSX computers. Basically you edit a configuration script defining revisions and tags, run scripts for building FDS and Smokeview manuals and finally run scripts for building the bundles.  These steps are given in more detail below: 
 
    1. edit `BUILD_config.sh` and `BUILD_config.bat` defining revision and tag environmental variables for this bundle.  Commit and push up changes to the central repo.
    2. Type: `sudo su - firebot` on the computer that runs firebot (blaze at Nist) to switch to the firebot user account.
@@ -13,7 +13,7 @@ The directory [bot/Bundlebot/build](https://github.com/firemodels/bot/tree/maste
    6. Type : `nohup ./BUILD_bundle.sh &` on a Linux computer to build a Linux bundle.
    7. Type : `nohup ./BUILD_bundle.sh &` on a Mac computer to build a Mac bundle.
    8. Type: `BUILD_bundle ` on a Windows PC to build a Windows bundle. (nohup is not available on Windows).
-   9. Type: `GH2bundles.sh` to download the bundles to the `bundles` directory when the bundles are ready to be published.  Type `GH2bundles.bat` if on a PC . Draft a new release at https://github.com/firemodels/fds/releases then upload the bundles from the `bundles` directory to this new release.
+   9. Type: `GH2bundles.sh` when the bundles are ready to be published to download the bundles to the `bot/Bundlebot/build/bundles` directory .  Type `GH2bundles.bat` if on a PC . Draft a new release at https://github.com/firemodels/fds/releases then upload the bundles from the `bundles` directory to this new release.
 
 ### Notes
       
