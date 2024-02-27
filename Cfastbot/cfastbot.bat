@@ -184,7 +184,7 @@ if %nothaveICC% == 1 goto skip_build_gettime0
     cd %smvrepo%\Build\get_time\intel_win_64
     echo             building get_time
     call make_get_time bot >Nul 2>&1
-    set gettimeexe=%smvrepo%\Build\get_time\intel_win_64\get_time_64.exe
+    set gettimeexe=%smvrepo%\Build\get_time\intel_win_64\get_time_win_64.exe
 :skip_build_gettime0
 call :is_file_installed %gettimeexe%|| exit /b 1
 echo             found get_time
@@ -257,8 +257,8 @@ if NOT exist %emailexe% (
 
 ::*** looking for cut
 
-call :is_file_installed cut|| exit /b 1
-echo             found cut
+::call :is_file_installed cut|| exit /b 1
+::echo             found cut
 
 ::*** looking for gawk
 
@@ -448,6 +448,8 @@ if %build_gettime% == 0 goto skip_build_gettime
   echo             get_time
   call make_get_time bot >Nul 2>&1
   set gettimeexe=%smvrepo%\Build\get_time\intel_win_64\get_time_64.exe
+  set gettimeex=%smvrepo%\Build\get_time\intel_win_64\get_time_win_64.exe
+  if exist %gettimeex% copy %gettimeex% %gettimeexe%
   call :is_file_installed %gettimeexe%|| exit /b 1
 :skip_build_gettime
 
@@ -456,6 +458,8 @@ if %build_background% == 0 goto skip_build_background
   echo             background
   call make_background bot >Nul 2>&1
   set backgroundexe=%smvrepo%\Build\background\intel_win_64\background.exe
+  set backgroundex=%smvrepo%\Build\background\intel_win_64\background_win_64.exe
+  if exist %backgroundex% copy %backgroundex% %backgroundexe%
 :skip_build_background
 
 if %build_sh2bat% == 0 goto skip_sh2bat
@@ -463,6 +467,8 @@ if %build_sh2bat% == 0 goto skip_sh2bat
   echo             sh2bat
   call make_sh2bat bot >Nul 2>&1
   set sh2batexe=%smvrepo%\Build\sh2bat\intel_win_64\sh2bat.exe
+  set sh2batex=%smvrepo%\Build\sh2bat\intel_win_64\sh2bat_win_64.exe
+  if exist %sh2batex% copy %sh2batex% %sh2batexe%
   call :is_file_installed %sh2batexe% || exit /b 1
 :skip_sh2bat
 
@@ -491,7 +497,7 @@ echo             debug
 
 cd %smvrepo%\Build\smokeview\intel_win_64
 erase *.obj *.mod *.exe smokeview_win_64_db.exe 1> %OUTDIR%\stage2a.txt 2>&1
-call make_smokeview_db -r bot 1>> %OUTDIR%\stage2a.txt 2>&1
+call make_smokeview_db -release bot 1>> %OUTDIR%\stage2a.txt 2>&1
 
 call :does_file_exist smokeview_win_64_db.exe %OUTDIR%\stage2a.txt|| exit /b 1
 call :find_smokeview_warnings "warning" %OUTDIR%\stage2a.txt "Stage 2a"
@@ -500,7 +506,7 @@ echo             release
 
 cd %smvrepo%\Build\smokeview\intel_win_64
 erase *.obj *.mod smokeview_win_64.exe 1> %OUTDIR%\stage2b.txt 2>&1
-call make_smokeview -r bot 1>> %OUTDIR%\stage2b.txt 2>&1
+call make_smokeview -release bot 1>> %OUTDIR%\stage2b.txt 2>&1
 set SMOKEVIEW=%smvrepo%\Build\intel_win_64\smokeview_win_64.exe
 
 call :does_file_exist smokeview_win_64.exe %OUTDIR%\stage2b.txt|| exit /b 1
