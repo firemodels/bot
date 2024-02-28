@@ -36,15 +36,15 @@ echo.
 echo   Building FDS-Smokeview bundle for %platform%
 Title  Building FDS-Smokeview bundle for %platform%
 
-%svn_drive%
+%git_drive%
 
 if "%platform%" == "windows" (
-  call "%svn_root%\bot\Bundlebot\scripts/make_bundle"
+  call "%git_root%\bot\Bundlebot\scripts/make_bundle"
   goto eof
 )
 if "%platform%" == "linux" (
   set bundledir=%fds_version%_%smv_version%_lnx
-  plink %plink_options% %linux_logon% %linux_svn_root%/bot/Bundlebot/scripts/make_bundle_fromweb.sh %fds_version% %smv_version% %linux_mpi_version% %linux_intel_mpi_version%
+  plink %plink_options% %linux_logon% %linux_git_root%/bot/Bundlebot/scripts/make_bundle_fromweb.sh %fds_version% %smv_version% %linux_mpi_version% %linux_intel_mpi_version%
 
   echo Downloading compressed archive to:
   echo   %upload_dir%\!bundledir!.sh
@@ -55,7 +55,7 @@ if "%platform%" == "linux" (
 )
 if "%platform%" == "osx" (
   set bundledir=%fds_version%_%smv_version%_osx
-  plink %plink_options% %osx_logon% %linux_svn_root%/bot/Bundlebot/scripts/make_bundle_fromweb.sh  %fds_version% %smv_version% %osx_mpi_version% %osx_comp_version%
+  plink %plink_options% %osx_logon% %linux_git_root%/bot/Bundlebot/scripts/make_bundle_fromweb.sh  %fds_version% %smv_version% %osx_mpi_version% %osx_comp_version%
 
   echo Downloading compressed archive to:
   echo   %upload_dir%\!bundledir!.sh

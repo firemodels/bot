@@ -18,9 +18,9 @@ goto:eof
 
 call %envfile%
 echo.
-echo copy %svn_root%\smv\scripts\fds_smv_env.bat to %userprofile%\fds_smv_env.bat
+echo copy %git_root%\smv\scripts\fds_smv_env.bat to %userprofile%\fds_smv_env.bat
 pause
-copy  %svn_root%\smv\scripts\fds_smv_env.bat %userprofile%\fds_smv_env.bat
+copy  %git_root%\smv\scripts\fds_smv_env.bat %userprofile%\fds_smv_env.bat
 echo.
 echo copy complete
 pause

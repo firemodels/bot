@@ -23,7 +23,7 @@ goto:eof
 
 call %envfile%
 
-%svn_drive%
+%git_drive%
 
 set type=
 if "%buildtype%" == "test" (
@@ -42,13 +42,13 @@ Title Bundling %type% Smokeview for %platform%
 :: windows
 
 if "%platform%" == "Windows" (
-  call %svn_root%\bot\Bundlebot\smv\scripts\make_%type%bundle
+  call %git_root%\bot\Bundlebot\smv\scripts\make_%type%bundle
   goto eof
 )
 
-cd %svn_root%\smv\scripts
+cd %git_root%\smv\scripts
 
-set scriptdir=%linux_svn_root%/bot/Bundlebot/smv
+set scriptdir=%linux_git_root%/bot/Bundlebot/smv
 set bundledir=.bundle/uploads
 set todir=%userprofile%\.bundle
 set uploaddir=%todir%\uploads
@@ -63,7 +63,7 @@ if "%platform%" == "Linux" (
   echo.
   echo --- making 64 bit Linux Smokeview installer ---
   echo.
-  plink %plink_options% %linux_logon% %scriptdir%/scripts/make_bundle.sh %buildtype% %version% %linux_svn_root%
+  plink %plink_options% %linux_logon% %scriptdir%/scripts/make_bundle.sh %buildtype% %version% %linux_git_root%
   goto eof
 )
 
@@ -73,7 +73,7 @@ if "%platform%" == "OSX" (
   echo.
   echo --- making 64 bit OSX Smokeview installer ---
   echo.
-  plink %plink_options% %osx_logon% %scriptdir%/scripts/make_bundle.sh %buildtype% %version% %linux_svn_root%
+  plink %plink_options% %osx_logon% %scriptdir%/scripts/make_bundle.sh %buildtype% %version% %linux_git_root%
   goto eof
 )
 

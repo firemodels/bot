@@ -32,7 +32,7 @@ if "%buildtype%" == "release" (
   Title  Updating release %platform% Smokeview
 )
 
-%svn_drive%
+%git_drive%
 
 if "%platform%" == "Windows" (
   cd %userprofile%\.bundle\uploads
@@ -49,10 +49,10 @@ if "%platform%" == "Windows" (
 )
 if "%platform%" == "Linux" (
   if "%buildtype%" == "test" (
-    plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/run_command2.sh $HOME/.bundle/uploads %smv_revision%_lnx.sh y
+    plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/run_command2.sh $HOME/.bundle/uploads %smv_revision%_lnx.sh y
   )
   if "%buildtype%" == "release" (
-    plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/run_command2.sh $HOME/.bundle/uploads %smv_version%_lnx.sh y
+    plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/run_command2.sh $HOME/.bundle/uploads %smv_version%_lnx.sh y
   )
   if "x%nopause%" == "xnopause" goto eof
   pause > Nul
@@ -60,10 +60,10 @@ if "%platform%" == "Linux" (
 )
 if "%platform%" == "OSX" (
   if "%buildtype%" == "test" (
-    plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/run_command2.sh $HOME/.bundle/uploads %smv_revision%_osx.sh y
+    plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/run_command2.sh $HOME/.bundle/uploads %smv_revision%_osx.sh y
   )
   if "%buildtype%" == "release" (
-    plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/run_command2.sh $HOME/.bundle/uploads %smv_version%_osx.sh y
+    plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/run_command2.sh $HOME/.bundle/uploads %smv_version%_osx.sh y
   )
   if "x%nopause%" == "xnopause" goto eof
   pause > Nul

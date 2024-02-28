@@ -21,7 +21,7 @@ goto:eof
 call %envfile%
 echo.
 
-%svn_drive%
+%git_drive%
 
 if "%whichguides%" == "from_smv_linux" (
   set "fromdir=%smokebothome%/.smokebot/pubs"

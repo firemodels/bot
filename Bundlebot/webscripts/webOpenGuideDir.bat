@@ -1,5 +1,5 @@
 @echo off
 
-%svn_drive%
+%git_drive%
 cd %userprofile%\.bundle\pubs
 explorer .

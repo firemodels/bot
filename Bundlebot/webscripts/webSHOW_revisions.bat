@@ -19,48 +19,48 @@ goto:eof
 call %envfile%
 
 echo ---------------------------*** fds ***--------------------------------
-%svn_drive%
-cd %svn_root%\fds
+%git_drive%
+cd %git_root%\fds
 call :output_rev
 
-set scriptdir=%linux_svn_root%/bot/Scripts/
-set linux_fdsdir=%linux_svn_root%
+set scriptdir=%linux_git_root%/bot/Scripts/
+set linux_fdsdir=%linux_git_root%
 
 echo | set /p=Linux:   
-plink %plink_options% %linux_logon% %scriptdir%/showrevision.sh  %linux_svn_root%/fds
+plink %plink_options% %linux_logon% %scriptdir%/showrevision.sh  %linux_git_root%/fds
 
 echo | set /p=OSX:     
-plink %plink_options% %osx_logon% %scriptdir%/showrevision.sh  %linux_svn_root%/fds
+plink %plink_options% %osx_logon% %scriptdir%/showrevision.sh  %linux_git_root%/fds
 
 echo ---------------------------*** smv ***--------------------------------
-cd %svn_root%\smv
+cd %git_root%\smv
 call :output_rev
 
 echo | set /p=Linux:   
-plink %plink_options% %linux_logon% %scriptdir%/showrevision.sh  %linux_svn_root%/smv
+plink %plink_options% %linux_logon% %scriptdir%/showrevision.sh  %linux_git_root%/smv
 
 echo | set /p=OSX:     
-plink %plink_options% %osx_logon% %scriptdir%/showrevision.sh  %linux_svn_root%/smv
+plink %plink_options% %osx_logon% %scriptdir%/showrevision.sh  %linux_git_root%/smv
 
 echo ---------------------------*** bot ***--------------------------------
-cd %svn_root%\bot
+cd %git_root%\bot
 call :output_rev
 
 echo | set /p=Linux:   
-plink %plink_options% %linux_logon% %scriptdir%/showrevision.sh  %linux_svn_root%/bot
+plink %plink_options% %linux_logon% %scriptdir%/showrevision.sh  %linux_git_root%/bot
 
 echo | set /p=OSX:     
-plink %plink_options% %osx_logon% %scriptdir%/showrevision.sh  %linux_svn_root%/bot
+plink %plink_options% %osx_logon% %scriptdir%/showrevision.sh  %linux_git_root%/bot
 
 echo ---------------------------*** web ***--------------------------------
-cd %svn_root%\webpages
+cd %git_root%\webpages
 call :output_rev
 
 echo | set /p=Linux:   
-plink %plink_options% %linux_logon% %scriptdir%/showrevision.sh  %linux_svn_root%/webpages
+plink %plink_options% %linux_logon% %scriptdir%/showrevision.sh  %linux_git_root%/webpages
 
 echo | set /p=OSX:     
-plink %plink_options% %osx_logon% %scriptdir%/showrevision.sh  %linux_svn_root%/webpages
+plink %plink_options% %osx_logon% %scriptdir%/showrevision.sh  %linux_git_root%/webpages
 pause
 goto eof
 

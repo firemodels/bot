@@ -20,24 +20,24 @@ call %envfile%
 
 echo.
 echo ------------------------------------------------------------------------
-%svn_drive%
+%git_drive%
 
 set CURDIR=%CD%
 
-echo Cleaning %svn_root%\fds\Source
-cd %svn_root%\fds\Source
+echo Cleaning %git_root%\fds\Source
+cd %git_root%\fds\Source
 git clean -dxf
 
-echo Cleaning %svn_root%\fds\Build
-cd %svn_root%\fds\Build
+echo Cleaning %git_root%\fds\Build
+cd %git_root%\fds\Build
 git clean -dxf
 
-echo Cleaning %svn_root%\smv\Source
-cd %svn_root%\smv\Source
+echo Cleaning %git_root%\smv\Source
+cd %git_root%\smv\Source
 git clean -dxf
 
-echo Cleaning %svn_root%\smv\Build
-cd %svn_root%\smv\Build
+echo Cleaning %git_root%\smv\Build
+cd %git_root%\smv\Build
 git clean -dxf
 
 echo Cleaning %userprofile%\.bundle\uploads

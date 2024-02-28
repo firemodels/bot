@@ -15,7 +15,7 @@ goto:eof
 set CURDIR=%CD%
 call %envfile%
 
-%svn_drive%
+%git_drive%
 set scriptdir=%~dp0
 
 call %scriptdir%\make_bundle test %revision_arg%

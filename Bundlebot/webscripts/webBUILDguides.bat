@@ -22,20 +22,20 @@ goto:eof
 call %envfile%
 echo.
 
-%svn_drive%
+%git_drive%
 
 if "%app%" == "FDS" goto skip_fds
 if "%guide%" == "User" (
   Title Build Smokeview User Guide
 
-  cd %svn_root%\smv\Manuals\SMV_User_Guide\
+  cd %git_root%\smv\Manuals\SMV_User_Guide\
   call make_guide
   goto eof
 )
 if "%guide%" == "Verification" (
   Title Build Smokeview Verification Guide
 
-  cd %svn_root%\smv\Manuals\SMV_Verification_Guide\
+  cd %git_root%\smv\Manuals\SMV_Verification_Guide\
   call make_guide
   goto eof
 )
@@ -46,7 +46,7 @@ if "%guide%" == "Validation" (
 if "%guide%" == "Technical" (
   Title Build Smokeview Technical Reference Guide
 
-  cd %svn_root%\smv\Manuals\SMV_Technical_Reference_Guide\
+  cd %git_root%\smv\Manuals\SMV_Technical_Reference_Guide\
   call make_guide
   goto eof
 )
@@ -55,27 +55,27 @@ goto eof
 if "%guide%" == "User" (
   Title Build FDS User Guide
 
-  cd %svn_root%\fds\Manuals\FDS_User_Guide\
+  cd %git_root%\fds\Manuals\FDS_User_Guide\
   call make_guide
   goto eof
 )
 if "%guide%" == "Validation" (
   Title Build FDS Validation Guide
-  cd %svn_root%\fds\Manuals\FDS_Validation_Guide\
+  cd %git_root%\fds\Manuals\FDS_Validation_Guide\
   call make_guide
   goto eof
 )
 if "%guide%" == "Verification" (
   Title Build FDS Verification Guide
 
-  cd %svn_root%\fds\Manuals\FDS_Verification_Guide\
+  cd %git_root%\fds\Manuals\FDS_Verification_Guide\
   call make_guide
   goto eof
 )
 if "%guide%" == "Technical" (
   Title Build FDS Technical Reference Guide
 
-  cd %svn_root%\fds\Manuals\FDS_Technical_Reference_Guide\
+  cd %git_root%\fds\Manuals\FDS_Technical_Reference_Guide\
   call make_guide
   goto eof
 )

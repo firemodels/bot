@@ -18,21 +18,21 @@ goto:eof
 
 call %envfile%
 
-set scriptdir=%linux_svn_root%/bot/Scripts/
+set scriptdir=%linux_git_root%/bot/Scripts/
 
 echo.
 echo ---------------------------*** smv ***--------------------------------
-cd %svn_root%\smv
+cd %git_root%\smv
 echo Windows
 git checkout devel
 
 echo.
 echo Linux
-plink %plink_options% %linux_logon% %scriptdir%/setbranch_devel.sh  %linux_svn_root%/smv
+plink %plink_options% %linux_logon% %scriptdir%/setbranch_devel.sh  %linux_git_root%/smv
 
 echo.
 echo OSX
-plink %plink_options% %osx_logon% %scriptdir%/setbranch_devel.sh  %linux_svn_root%/smv
+plink %plink_options% %osx_logon% %scriptdir%/setbranch_devel.sh  %linux_git_root%/smv
 
 
 echo.

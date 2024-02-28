@@ -20,9 +20,9 @@ call %envfile%
 
 echo.
 echo ---------------------- windows: %COMPUTERNAME% ------------------------------
-echo repo: %svn_root%
-%svn_drive%
-cd %svn_root%\fds
+echo repo: %git_root%
+%git_drive%
+cd %git_root%\fds
 echo.
 echo *** fds ***
 git remote update
@@ -31,7 +31,7 @@ git merge firemodels/master
 git merge origin/master
 git describe --dirty --abbrev=7
 
-cd %svn_root%\smv
+cd %git_root%\smv
 echo.
 echo *** smv ***
 git remote update
@@ -40,7 +40,7 @@ git merge firemodels/master
 git merge origin/master
 git describe --dirty --abbrev=7
 
-cd %svn_root%\bot
+cd %git_root%\bot
 echo.
 echo *** bot ***
 git remote update
@@ -49,7 +49,7 @@ git merge firemodels/master
 git merge origin/master
 git describe --dirty --abbrev=7
 
-cd %svn_root%\webpages
+cd %git_root%\webpages
 echo.
 echo *** webpages ***
 git checkout nist-pages
