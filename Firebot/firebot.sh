@@ -1849,7 +1849,11 @@ fi
    if [ -e output/timing_errors ]; then
       echo "***Warning: cases with > 200% increased run-time"        >> $TIME_LOG
       cat output/timing_errors  | awk -F',' '{print $1,$3,"-->",$4}' >> $TIME_LOG
-      echo ""                         >> $TIME_LOG
+      echo ""                                                        >> $TIME_LOG
+      echo ""                                                        >> $WARNING_LOG
+      echo "***Warning: cases with > 200% increased run-time"        >> $WARNING_LOG
+      cat output/timing_errors  | awk -F',' '{print $1,$3,"-->",$4}' >> $WARNING_LOG
+      echo ""                                                        >> $WARNING_LOG
    fi
 
    # Check for warnings and errors
