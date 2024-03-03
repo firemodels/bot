@@ -3,13 +3,14 @@
 # It is run by the other BUILD scripts. 
 # You do not need to run it.
 
-# FDS-6.8.0-1630-gbc9da7890/master
-# SMV-6.8.0-2077-g009e372/master
+# revisions from 3/3/2024 firebot pass
+# FDS-6.8.0-1640-g80124a6/master
+# SMV-6.8.0-2108-g4a5edb7/master
 
-export BUNDLE_FDS_REVISION=bc9da7890
-export BUNDLE_FDS_TAG=FDS-6.9.0
-export BUNDLE_SMV_REVISION=009e372
-export BUNDLE_SMV_TAG=SMV-6.9.0
+# BUNDLE_FDS_REVISION=80124a6
+# BUNDLE_FDS_TAG=FDS-6.9.0
+# BUNDLE_SMV_REVISION=4a5edb7
+# BUNDLE_SMV_TAG=SMV-6.9.0
 
 # lines below should not need to be changed
 
