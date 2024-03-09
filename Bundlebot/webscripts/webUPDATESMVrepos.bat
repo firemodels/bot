@@ -20,10 +20,10 @@ call %envfile%
 
 echo.
 echo ---------------------- windows: %COMPUTERNAME% ------------------------------
-echo repo: %svn_root%
-%svn_drive%
+echo repo: %git_root%
+%git_drive%
 
-cd %svn_root%\smv
+cd %git_root%\smv
 echo.
 echo *** smv ***
 git remote update
@@ -33,23 +33,23 @@ git merge origin/master
 git push origin master
 git describe --dirty --abbrev=7
 
-set scriptdir=%linux_svn_root%/bot/Scripts/
-set linux_fdsdir=%linux_svn_root%
+set scriptdir=%linux_git_root%/bot/Scripts/
+set linux_fdsdir=%linux_git_root%
 
 echo.
 echo ---------------------- linux: %linux_hostname% ------------------------------
-echo repo: %linux_svn_root%
+echo repo: %linux_git_root%
 
 echo.
 echo *** smv ***
-plink %plink_options% %linux_logon% %scriptdir%/UPDATE_thishost.sh  %linux_svn_root%/smv
+plink %plink_options% %linux_logon% %scriptdir%/UPDATE_thishost.sh  %linux_git_root%/smv
 
 echo.
 echo ---------------------- osx: %osx_hostname% ------------------------------
-echo repo: %linux_svn_root%
+echo repo: %linux_git_root%
 
 echo.
 echo *** smv ***
-plink %plink_options% %osx_logon% %scriptdir%/UPDATE_thishost.sh  %linux_svn_root%/smv
+plink %plink_options% %osx_logon% %scriptdir%/UPDATE_thishost.sh  %linux_git_root%/smv
 
 pause

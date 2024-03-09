@@ -24,7 +24,7 @@ echo.
 echo  Building %buildtype% Smokezip for %platform%
 Title Building %buildtype% Smokezip for %platform%
 
-%svn_drive%
+%git_drive%
 
 set wintype=
 set type=
@@ -32,7 +32,7 @@ set wininc=
 set inc=
 
 if "%platform%" == "Windows" (
-  cd %svn_root%\smv\Build\smokezip\intel_win_64
+  cd %git_root%\smv\Build\smokezip\intel_win_64
   call make_smokezip
   goto eof
 )
@@ -40,14 +40,14 @@ if "%platform%" == "Windows" (
 :: ----------- linux -----------------
 
 if "%platform%" == "Linux" (
-  plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/run_command.sh smv/Build/smokezip/intel_linux_64 make_smokezip.sh
+  plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/run_command.sh smv/Build/smokezip/intel_linux_64 make_smokezip.sh
   goto eof
 )
 
 :: ----------- osx -----------------
 
 if "%platform%" == "OSX" (
-  plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/run_command.sh smv/Build/smokezip/intel_osx_64 make_smokezip.sh
+  plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/run_command.sh smv/Build/smokezip/intel_osx_64 make_smokezip.sh
   goto eof
 )
 

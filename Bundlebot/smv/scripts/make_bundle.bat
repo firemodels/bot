@@ -29,7 +29,7 @@ set CURDIR=%CD%
 
 call %envfile%
 
-%svn_drive%
+%git_drive%
 
 set BUILDDIR=intel_win_64
 

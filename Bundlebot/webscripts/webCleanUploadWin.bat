@@ -20,7 +20,7 @@ goto:eof
 :endif_envexist
 
 call %envfile%
-%svn_drive%
+%git_drive%
 echo.
 
 echo *** windows

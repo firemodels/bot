@@ -17,7 +17,7 @@ goto:eof
 
 call %envfile%
 
-%svn_drive%
+%git_drive%
 
-call %svn_root%\%1
+call %git_root%\%1
 

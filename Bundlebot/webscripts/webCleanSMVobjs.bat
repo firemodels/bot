@@ -18,26 +18,26 @@ goto:eof
 :endif_envexist
 
 call %envfile%
-%svn_drive%
+%git_drive%
 echo.
 
 echo cleaning smokeview build directories
 
 echo *** windows
-cd %svn_root%\smv\Build\smokeview\intel_win_64
+cd %git_root%\smv\Build\smokeview\intel_win_64
 git clean -dxf
 
 echo.
 echo *** linux
-plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/clean.sh       smv/Build/smokeview/intel_linux_64
-plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/clean.sh       smv/Build/smokeview/gnu_linux_64 
+plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/clean.sh       smv/Build/smokeview/intel_linux_64
+plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/clean.sh       smv/Build/smokeview/gnu_linux_64 
 
 
 echo.
 echo *** osx
-plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/clean.sh       smv/Build/smokeview/intel_osx_64
-plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/clean.sh       smv/Build/smokeview/intel_osx_q_64 
-plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/clean.sh       smv/Build/smokeview/gnu_osx_64 
+plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/clean.sh       smv/Build/smokeview/intel_osx_64
+plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/clean.sh       smv/Build/smokeview/intel_osx_q_64 
+plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/clean.sh       smv/Build/smokeview/gnu_osx_64 
 
 
 echo.

@@ -20,9 +20,9 @@ call %envfile%
 
 echo.
 echo ---------------------- windows: %COMPUTERNAME% ------------------------------
-echo repo: %svn_root%
-%svn_drive%
-cd %svn_root%\fds
+echo repo: %git_root%
+%git_drive%
+cd %git_root%\fds
 echo.
 echo *** fds ***
 git remote update
@@ -32,7 +32,7 @@ git merge origin/master
 git push origin master
 git describe --dirty --abbrev=7
 
-cd %svn_root%\smv
+cd %git_root%\smv
 echo.
 echo *** smv ***
 git remote update
@@ -42,7 +42,7 @@ git merge origin/master
 git push origin master
 git describe --dirty --abbrev=7
 
-cd %svn_root%\bot
+cd %git_root%\bot
 echo.
 echo *** bot ***
 git remote update
@@ -51,7 +51,7 @@ git merge firemodels/master
 git merge origin/master
 git describe --dirty --abbrev=7
 
-cd %svn_root%\webpages
+cd %git_root%\webpages
 echo.
 echo *** webpages ***
 git checkout nist-pages
@@ -60,44 +60,44 @@ git merge origin/nist-pages
 git describe --dirty --abbrev=7
 
 
-set scriptdir=%linux_svn_root%/bot/Scripts/
-set linux_fdsdir=%linux_svn_root%
+set scriptdir=%linux_git_root%/bot/Scripts/
+set linux_fdsdir=%linux_git_root%
 
 echo.
 echo ---------------------- linux: %linux_hostname% ------------------------------
-echo repo: %linux_svn_root%
+echo repo: %linux_git_root%
 echo.
 echo *** fds ***
-plink %plink_options% %linux_logon% %scriptdir%/UPDATE_thishost.sh  %linux_svn_root%/fds
+plink %plink_options% %linux_logon% %scriptdir%/UPDATE_thishost.sh  %linux_git_root%/fds
 
 echo.
 echo *** smv ***
-plink %plink_options% %linux_logon% %scriptdir%/UPDATE_thishost.sh  %linux_svn_root%/smv
+plink %plink_options% %linux_logon% %scriptdir%/UPDATE_thishost.sh  %linux_git_root%/smv
 
 echo.
 echo *** bot ***
-plink %plink_options% %linux_logon% %scriptdir%/UPDATE_thishost.sh  %linux_svn_root%/bot
+plink %plink_options% %linux_logon% %scriptdir%/UPDATE_thishost.sh  %linux_git_root%/bot
 
 echo.
 echo *** webpages ***
-plink %plink_options% %linux_logon% %scriptdir%/UPDATE_webpages.sh  %linux_svn_root%/webpages
+plink %plink_options% %linux_logon% %scriptdir%/UPDATE_webpages.sh  %linux_git_root%/webpages
 
 echo.
 echo ---------------------- osx: %osx_hostname% ------------------------------
-echo repo: %linux_svn_root%
+echo repo: %linux_git_root%
 echo.
 echo *** fds ***
-plink %plink_options% %osx_logon% %scriptdir%/UPDATE_thishost.sh  %linux_svn_root%/fds
+plink %plink_options% %osx_logon% %scriptdir%/UPDATE_thishost.sh  %linux_git_root%/fds
 
 echo.
 echo *** smv ***
-plink %plink_options% %osx_logon% %scriptdir%/UPDATE_thishost.sh  %linux_svn_root%/smv
+plink %plink_options% %osx_logon% %scriptdir%/UPDATE_thishost.sh  %linux_git_root%/smv
 
 echo.
 echo *** bot ***
-plink %plink_options% %osx_logon% %scriptdir%/UPDATE_thishost.sh  %linux_svn_root%/bot
+plink %plink_options% %osx_logon% %scriptdir%/UPDATE_thishost.sh  %linux_git_root%/bot
 
 echo.
 echo *** webpages ***
-plink %plink_options% %osx_logon% %scriptdir%/UPDATE_webpages.sh  %linux_svn_root%/webpages
+plink %plink_options% %osx_logon% %scriptdir%/UPDATE_webpages.sh  %linux_git_root%/webpages
 pause

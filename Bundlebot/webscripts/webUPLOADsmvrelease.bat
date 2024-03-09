@@ -16,7 +16,7 @@ goto:eof
 
 :endif_envexist
 
-%svn_drive%
+%git_drive%
 call %envfile%
 
 set uploaddir=%userprofile%\.bundle\uploads

@@ -22,10 +22,10 @@ echo.
 echo  Building debug test Smokeview for %platform%
 Title Building debug test Smokeview for %platform%
 
-%svn_drive%
+%git_drive%
 
 if "%platform%" == "Windows" (
-  cd %svn_root%\smv\Build\smokeview\intel_win_64
+  cd %git_root%\smv\Build\smokeview\intel_win_64
   call make_smokeview -test -glut -sanitize
   goto eof
 )
@@ -33,7 +33,7 @@ if "%platform%" == "Windows" (
 :: ----------- linux -----------------
 
 if "%platform%" == "Linux" (
-::  plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/run_command.sh smv/Build/smokeview/intel_linux_64 make_smokeview_db.sh -t -s
+::  plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/run_command.sh smv/Build/smokeview/intel_linux_64 make_smokeview_db.sh -t -s
   echo sanitize option not available for Linux
   goto eof
 )
