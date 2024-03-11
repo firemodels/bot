@@ -14,6 +14,11 @@ cd %CURDIR%
 call :downloadfile SMOKEVIEW_TEST SMV_UG_figures.tar.gz
 call :downloadfile SMOKEVIEW_TEST SMV_VG_figures.tar.gz
 
+call :downloadfile FDS_TEST FDS_UG_figures.tar.gz
+call :downloadfile FDS_TEST FDS_TG_figures.tar.gz
+call :downloadfile FDS_TEST FDS_VERG_figures.tar.gz
+call :downloadfile FDS_TEST FDS_VALG_figures.tar.gz
+
 cd %CURDIR%
 goto eof
 
