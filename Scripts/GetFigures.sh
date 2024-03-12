@@ -87,7 +87,7 @@ if [[ "$FDS" == "" ]] && [[ "$SMV" == "" ]]; then
 fi
 
 if [ "SMV" != "" ]; then
-  if [ "$USER" == "" ]] && [[ "$VER" == "" ]]; then
+  if [[ "$USER" == "" ]] && [[ "$VER" == "" ]]; then
     USER=1
   fi
 fi
@@ -103,8 +103,8 @@ CURDIR=`pwd`
 cd files
 FILESDIR=`pwd`
 
-echo ***cleaning $FILESDIR
-git clean -dxf
+echo cleaning $FILESDIR
+git clean -dxf 
 
 cd $CURDIR
 
@@ -112,6 +112,7 @@ DOWNLOADFILE ()
 {
   TAG=$1
   FILE=$2
+  echo ""
   echo downloading $FILE
   gh release download $TAG -p $FILE -D $FILESDIR  -R github.com/$GH_OWNER/$GH_REPO
 }
@@ -121,7 +122,7 @@ COPYFILES ()
   TODIR=$1
   FILE=$2
   if [ -d $TODIR ]; then
-    echo "*** untarring $FILE to $TODIR"
+    echo "untarring $FILE to $TODIR"
     cd $TODIR
     if [ -e $FILESDIR/$FILE ]; then
       tar xf $FILESDIR/$FILE > /dev/null 2>&1
