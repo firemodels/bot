@@ -1,4 +1,101 @@
+
 #!/bin/bash
+
+#---------------------------------------------
+#                   usage
+#---------------------------------------------
+
+function usage {
+echo "Download FDS and/or Smokeview manual figures from github and copy to their"
+echo "respecitve manual SCRIPT_DIRS directories"
+echo ""
+echo "Usage:"
+echo "GetFigures.sh options"
+echo ""
+echo "Options:"
+echo "-a - copy all FDS and Smokeview manual figures"
+echo "-f - copy FDS figures for manuals specified by -u, -v, -V and or -t options"
+echo "-F - copy FDS figures for all guides"
+echo "-h - display this message"
+echo "-f - copy Smokeview figures for manuals specified by -u and/or -v options"
+echo "-S - copy Smokeview figures for both user and verification guides"
+echo "-t - copy FDS technical guide figures"
+echo "-u - copy user guide figures  (also specify either -f or -s)"
+echo "-v - copy verification guide figures  (also specify either -f or -s)"
+echo "-V - copy FDS validation guide figures"
+exit 0
+}
+
+#*** parse command line options
+
+while getopts 'hfsuvVt' OPTION
+do
+case $OPTION  in
+  a)
+  FDS=1
+  SMV=1
+  USER=1
+  VER=1
+  VAL=1
+  TECH=1
+  f)
+  FDS=1
+  ;;
+  F)
+  FDS=1
+  USER=1
+  VER=1
+  VAL=1
+  TECH=1
+  ;;
+  h)
+   usage;
+   ;;
+  s)
+  SMV=1
+  ;;
+  S)
+  SMV=1
+  USER=1
+  VER=1
+  ;;
+  t)
+  FDS=1
+  TECH=1
+  ;;
+  u)
+  USER=1
+  ;;
+  v)
+  VER=1
+  ;;
+  V)
+  FDS=1
+  VAL=1
+  ;;
+  \?)
+  echo "***error: unknown option entered. aborting firebot"
+  exit 1
+  ;;
+esac
+done
+shift $(($OPTIND-1))
+
+if [[ "$FDS" == "" ]] && [[ "$SMV" == "" ]]; then
+  FDS=1
+fi
+
+if [ "SMV" != "" ]; then
+  if [ "$USER" == "" ]] && [[ "$VER" == "" ]]; then
+    USER=1
+  fi
+fi
+
+if [ "FDS" != "" ]; then
+  if [[ "$USER" == "" ]] && [[ "$VER" == "" ]] && [[ "$VAL" == "" ]] && [[ "$TECH" == "" ]]; then
+    USER=1
+  fi
+fi
 
 CURDIR=`pwd`
 
@@ -35,21 +132,22 @@ COPYFILES ()
   fi
 }
 
-DOWNLOADFILE SMOKEVIEW_TEST SMV_UG_figures.tar.gz
-DOWNLOADFILE SMOKEVIEW_TEST SMV_VG_figures.tar.gz
-
 SMVREPO=../../../smv
 cd $SMVREPO
 SMVREPO=`pwd`
 cd $CURDIR
 
-COPYFILES $SMVREPO//Manuals/SMV_User_Guide/SCRIPT_FIGURES        SMV_UG_figures.tar.gz
-COPYFILES $SMVREPO/Manuals/SMV_Verification_Guide/SCRIPT_FIGURES SMV_VG_figures.tar.gz
+if [ "$SMV" != "" ]; then
+  if [ "$USER" != "" ]; then
+    DOWNLOADFILE SMOKEVIEW_TEST SMV_UG_figures.tar.gz
+    COPYFILES $SMVREPO//Manuals/SMV_User_Guide/SCRIPT_FIGURES        SMV_UG_figures.tar.gz
+  fi
 
-DOWNLOADFILE  FDS_TEST FDS_UG_figures.tar.gz
-DOWNLOADFILE  FDS_TEST FDS_TG_figures.tar.gz
-DOWNLOADFILE  FDS_TEST FDS_VERG_figures.tar.gz
-DOWNLOADFILE  FDS_TEST FDS_VALG_figures.tar.gz
+  if [ "$VER" != "" ]; then
+    DOWNLOADFILE SMOKEVIEW_TEST SMV_VG_figures.tar.gz
+    COPYFILES $SMVREPO/Manuals/SMV_Verification_Guide/SCRIPT_FIGURES SMV_VG_figures.tar.gz
+  fi
+fi
 
 cd $CURDIR
 FDSREPO=../../../fds
@@ -57,10 +155,26 @@ cd $FDSREPO
 FDSREPO=`pwd`
 cd $CURDIR
 
-COPYFILES $FDSREPO/Manuals/FDS_User_Guide/SCRIPT_FIGURES                FDS_UG_figures.tar.gz
-COPYFILES $FDSREPO/Manuals/FDS_Technical_Reference_Guide/SCRIPT_FIGURES FDS_TG_figures.tar.gz
-COPYFILES $FDSREPO/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES        FDS_VERG_figures.tar.gz
-COPYFILES $FDSREPO/Manuals/FDS_Validation_Guide/SCRIPT_FIGURES          FDS_VALG_figures.tar.gz
+if [ "$FDS" != "" ]; then
+  if [ "$USER" != "" ]; then
+    DOWNLOADFILE  FDS_TEST FDS_UG_figures.tar.gz
+    COPYFILES $FDSREPO/Manuals/FDS_User_Guide/SCRIPT_FIGURES                FDS_UG_figures.tar.gz
+  fi
 
+  if [ "$TECH" != "" ]; then
+    DOWNLOADFILE  FDS_TEST FDS_TG_figures.tar.gz
+    COPYFILES $FDSREPO/Manuals/FDS_Technical_Reference_Guide/SCRIPT_FIGURES FDS_TG_figures.tar.gz
+  fi
+
+  if [ "$VER" != "" ]; then
+    DOWNLOADFILE  FDS_TEST FDS_VERG_figures.tar.gz
+    COPYFILES $FDSREPO/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES        FDS_VERG_figures.tar.gz
+  fi
+
+  if [ "$VAL" != "" ]; then
+    DOWNLOADFILE  FDS_TEST FDS_VALG_figures.tar.gz
+    COPYFILES $FDSREPO/Manuals/FDS_Validation_Guide/SCRIPT_FIGURES          FDS_VALG_figures.tar.gz
+  fi
+fi
 cd $CURDIR
 exit 0
