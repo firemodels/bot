@@ -6,11 +6,11 @@
 #---------------------------------------------
 
 function usage {
-echo "Download FDS and/or Smokeview manual figures from github and copy to their"
-echo "respecitve manual SCRIPT_DIRS directories"
-echo ""
 echo "Usage:"
 echo "GetFigures.sh options"
+echo ""
+echo "Download FDS and/or Smokeview manual figures from github and copy to their"
+echo "respecitve manual SCRIPT_DIRS directories"
 echo ""
 echo "Options:"
 echo "-a - copy all FDS and Smokeview manual figures"
