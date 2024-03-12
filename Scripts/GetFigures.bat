@@ -92,6 +92,7 @@ goto eof
     cd %TODIR%
     if NOT EXIST %FILESDIR%\%FILE% goto copy_else2
       tar xf %FILESDIR%\%FILE% 
+      git checkout .gitignore 2> Nul
       goto copy_endif1
     :copy_else2
       echo "***error: %FILESDIR%\%FILE% does not exist"
