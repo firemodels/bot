@@ -1,5 +1,6 @@
-
 #!/bin/bash
+GH_OWNER=firemodels
+GH_REPO=test_bundles
 
 #---------------------------------------------
 #                   usage
