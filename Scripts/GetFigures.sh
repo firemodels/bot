@@ -2,10 +2,10 @@
 
 CURDIR=`pwd`
 
-cd bundles
-BUNDLEDIR=`pwd`
+cd files
+FILESDIR=`pwd`
 
-echo ***cleaning $BUNDLEDIR
+echo ***cleaning $FILESDIR
 git clean -dxf
 
 cd $CURDIR
@@ -15,7 +15,7 @@ DOWNLOADFILE ()
   TAG=$1
   FILE=$2
   echo downloading $FILE
-  gh release download $TAG -p $FILE -D $BUNDLEDIR  -R github.com/$GH_OWNER/$GH_REPO
+  gh release download $TAG -p $FILE -D $FILESDIR  -R github.com/$GH_OWNER/$GH_REPO
 }
 
 COPYFILES ()
@@ -25,10 +25,10 @@ COPYFILES ()
   if [ -d $TODIR ]; then
     echo "*** untarring $FILE to $TODIR"
     cd $TODIR
-    if [ -e $BUNDLEDIR/$FILE ]; then
-      tar xf $BUNDLEDIR/$FILE > /dev/null 2>&1
+    if [ -e $FILESDIR/$FILE ]; then
+      tar xf $FILESDIR/$FILE > /dev/null 2>&1
     else
-      echo "***error: $BUNDLEDIR/$FILE does not exist"
+      echo "***error: $FILESDIR/$FILE does not exist"
     fi
   else
     echo ***error: $TODIR does not exist
@@ -57,11 +57,10 @@ cd $FDSREPO
 FDSREPO=`pwd`
 cd $CURDIR
 
-SMVREPO=../../../smv
-cd $SMVREPO
-SMVREPO=`pwd`
-cd $CURDIR
+COPYFILES $FDSREPO/Manuals/FDS_User_Guide/SCRIPT_FIGURES                FDS_UG_figures.tar.gz
+COPYFILES $FDSREPO/Manuals/FDS_Technical_Reference_Guide/SCRIPT_FIGURES FDS_TG_figures.tar.gz
+COPYFILES $FDSREPO/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES        FDS_VERG_figures.tar.gz
+COPYFILES $FDSREPO/Manuals/FDS_Validation_Guide/SCRIPT_FIGURES          FDS_VALG_figures.tar.gz
 
-echo ***files downloaded to $BUNDLEDIR
 cd $CURDIR
 exit 0
