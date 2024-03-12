@@ -28,7 +28,7 @@ exit 0
 
 #*** parse command line options
 
-while getopts 'hfsuvVt' OPTION
+while getopts 'afFhsStuvV' OPTION
 do
 case $OPTION  in
   a)
@@ -38,6 +38,7 @@ case $OPTION  in
   VER=1
   VAL=1
   TECH=1
+  ;;
   f)
   FDS=1
   ;;
@@ -132,7 +133,7 @@ COPYFILES ()
   fi
 }
 
-SMVREPO=../../../smv
+SMVREPO=../../smv
 cd $SMVREPO
 SMVREPO=`pwd`
 cd $CURDIR
@@ -150,7 +151,7 @@ if [ "$SMV" != "" ]; then
 fi
 
 cd $CURDIR
-FDSREPO=../../../fds
+FDSREPO=../../fds
 cd $FDSREPO
 FDSREPO=`pwd`
 cd $CURDIR
