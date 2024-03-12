@@ -104,7 +104,7 @@ cd files
 FILESDIR=`pwd`
 
 echo cleaning $FILESDIR
-git clean -dxf 
+git clean -dxf >& /dev/null
 
 cd $CURDIR
 
