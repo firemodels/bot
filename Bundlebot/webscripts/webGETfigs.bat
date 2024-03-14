@@ -23,67 +23,47 @@ call %envfile%
 echo.
 
 %svn_drive%
+cd %svn_root%\bot\Scripts
 
 if "%app%" == "FDS" goto skip_fds
 if "%guide%" == "User" (
-  Title Download smokeview user guide images
-
-  cd %svn_root%\smv\Manuals\SMV_User_Guide\SCRIPT_FIGURES
-  pscp -P 22 %linux_logon%:%smokebothome%/.smokebot/Manuals/SMV_User_Guide/SCRIPT_FIGURES/* .
+  Title Download Smokeview User Guide images
+  GetFigures -s -u
   goto eof
 )
 if "%guide%" == "Verification" (
-  Title Download smokeview verification guide images
-
-  cd %svn_root%\smv\Manuals\SMV_Verification_Guide\SCRIPT_FIGURES
-  pscp -P 22 %linux_logon%:%smokebothome%/.smokebot/Manuals/SMV_Verification_Guide/SCRIPT_FIGURES/* .
+  Title Download Smokeview Verification Guide images
+  GetFigures -s -v
   goto eof
 )
 if "%guide%" == "Validation" (
-  echo Smokeview does not have any Validation figures to download
+  echo Smokeview does not have any Validation Guide images to download
   goto eof
 )
 if "%guide%" == "Technical" (
-  echo Smokeview does not have any Technical guide figures to download
+  echo Smokeview does not have any Technical Guide images to download
   goto eof
 )
 goto eof
 :skip_fds
 if "%guide%" == "User" (
   Title Download FDS user guide images
-
-  cd %svn_root%\fds\Manuals\FDS_User_Guide\SCRIPT_FIGURES
-  pscp -P 22 %linux_logon%:%firebothome%/.firebot/Manuals/FDS_User_Guide/SCRIPT_FIGURES/* .
+  GetFigures -f -u
   goto eof
 )
 if "%guide%" == "Validation" (
-  cd %svn_root%\fds\Manuals\FDS_Validation_Guide\SCRIPT_FIGURES
-  for /D %%d in (*) do (
-      echo.
-      echo copying files from %%d
-      cd %%d
-
-      Title Download FDS validation guide %%d images
-
-      pscp -P 22 %linux_logon%:%firebothome%/.firebot/Manuals/FDS_Validation_Guide/SCRIPT_FIGURES/%%d/* .
-      cd ..
-  )
+  Title Download FDS Validation guide %%d images
+  GetFigures -f -V
   goto eof
 )
 if "%guide%" == "Verification" (
-  Title Download FDS verification guide images
-
-  cd %svn_root%\fds\Manuals\FDS_Verification_Guide\SCRIPT_FIGURES
-  pscp -P 22 %linux_logon%:%firebothome%/.firebot/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/* .
-
-  Title Download FDS verification guide scatterplot images
-
-  cd %svn_root%\fds\Manuals\fds/FDS_Verification_Guide\SCRIPT_FIGURES\Scatterplots
-  pscp -P 22 %linux_logon%:%firebothome%/.firebot/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/Scatterplots/* .
+  Title Download FDS Verification guide images
+  GetFigures -f -v
   goto eof
 )
 if "%guide%" == "Technical" (
-  echo FDS does not have any Technical guide figures to download
+  Title Download FDS Technical Guide images
+  GetFigures -f -t
   goto eof
 )
 
