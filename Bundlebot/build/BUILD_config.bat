@@ -3,13 +3,9 @@
 :: It is run by the other BUILD scripts.
 :: You do not need to run it.
 
-:: revisions from 3/3/2024 firebot pass
-:: FDS-6.8.0-1640-g80124a6/master
-:: SMV-6.8.0-2108-g4a5edb7/master
-
-set BUNDLE_FDS_REVISION=80124a6
+set BUNDLE_FDS_REVISION=37c2bc2ab
 set BUNDLE_FDS_TAG=FDS-6.9.0
-set BUNDLE_SMV_REVISION=4a5edb7
+set BUNDLE_SMV_REVISION=2dfdc6674
 set BUNDLE_SMV_TAG=SMV-6.9.0
 
 :: lines below should not need to be changed
