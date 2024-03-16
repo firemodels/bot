@@ -265,7 +265,7 @@ CALL :COPY "%fds_forbundle%\fdspath.bat"                        %out_bin%\fdspat
 CALL :COPY "%fds_forbundle%\helpfds.bat"                        %out_bin%\helpfds.bat
 CALL :COPY "%fds_forbundle%\fds_local.bat"                      %out_bin%\fds_local.bat
 ::CALL :COPY "%fds_forbundle%\fds_local_test.bat"                 %out_bin%\fds_local_test.bat
-CALL :COPY  %repo_root%\smv\Build\sh2bat\intel_win_64\sh2bat.exe %out_bin%\sh2bat.exe
+CALL :COPY  %repo_root%\smv\Build\sh2bat\intel_win_64\sh2bat_win_64.exe %out_bin%\sh2bat.exe
 
 :: setup program for new installer
 CALL :COPY "%fds_forbundle%\setup.bat"                          %out_bundle%\setup.bat
@@ -340,13 +340,13 @@ set RUNCFAST=call %copyCFASTcases%
 echo.
 echo --- copying example files ---
 cd %fds_examples%
-%repo_root%\smv\Build\sh2bat\intel_win_64\sh2bat %fds_casessh% %fds_casesbat%
+%repo_root%\smv\Build\sh2bat\intel_win_64\sh2bat_win_64 %fds_casessh% %fds_casesbat%
 call %fds_casesbat%>Nul
 
 cd %smv_examples%
-%repo_root%\smv\Build\sh2bat\intel_win_64\sh2bat %smv_casessh% %smv_casesbat%
+%repo_root%\smv\Build\sh2bat\intel_win_64\sh2bat_win_64 %smv_casessh% %smv_casesbat%
 call %smv_casesbat%>Nul
-%repo_root%\smv\Build\sh2bat\intel_win_64\sh2bat %wui_casessh% %wui_casesbat%
+%repo_root%\smv\Build\sh2bat\intel_win_64\sh2bat_win_64 %wui_casessh% %wui_casesbat%
 call %wui_casesbat%>Nul
 
 echo.

@@ -295,10 +295,13 @@ if "x%upload_bundle%" == "x" goto skip_upload
 
   set fullfilebase=%userprofile%\.bundle\bundles\%basename%
   echo gh release upload %GH_FDS_TAG% %fullfilebase%.%SHA1EXT% -R github.com/%GH_OWNER%/%GH_REPO% --clobber
-  gh release upload %GH_FDS_TAG% %fullfilebase%.%SHA1EXT% -R github.com/%GH_OWNER%/%GH_REPO% --clobber
+       gh release upload %GH_FDS_TAG% %fullfilebase%.%SHA1EXT% -R github.com/%GH_OWNER%/%GH_REPO% --clobber
   
   echo gh release upload %GH_FDS_TAG% %fullfilebase%.exe -R github.com/%GH_OWNER%/%GH_REPO% --clobber
-  gh release upload %GH_FDS_TAG% %fullfilebase%.exe -R github.com/%GH_OWNER%/%GH_REPO% --clobber
+       gh release upload %GH_FDS_TAG% %fullfilebase%.exe -R github.com/%GH_OWNER%/%GH_REPO% --clobber
+
+  echo gh release upload %GH_FDS_TAG% %fullfilebase%.zip -R github.com/%GH_OWNER%/%GH_REPO% --clobber
+       gh release upload %GH_FDS_TAG% %fullfilebase%.zip -R github.com/%GH_OWNER%/%GH_REPO% --clobber
 :skip_upload
 
 if "x%emailto%" == "x" goto endif6
