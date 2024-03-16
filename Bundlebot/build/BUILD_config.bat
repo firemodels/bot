@@ -3,7 +3,7 @@
 :: It is run by the other BUILD scripts.
 :: You do not need to run it.
 
-set BUNDLE_FDS_REVISION=37c2bc2ab
+set BUNDLE_FDS_REVISION=a33726c82
 set BUNDLE_FDS_TAG=FDS-6.9.0
 set BUNDLE_SMV_REVISION=2dfdc6674
 set BUNDLE_SMV_TAG=SMV-6.9.0
