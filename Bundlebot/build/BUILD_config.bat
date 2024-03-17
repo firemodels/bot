@@ -5,7 +5,7 @@
 
 set BUNDLE_FDS_REVISION=a33726c82
 set BUNDLE_FDS_TAG=FDS-6.9.0
-set BUNDLE_SMV_REVISION=2dfdc6674
+set BUNDLE_SMV_REVISION=d5e9e21f2
 set BUNDLE_SMV_TAG=SMV-6.9.0
 
 :: lines below should not need to be changed

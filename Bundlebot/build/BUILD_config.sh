@@ -5,7 +5,7 @@
 
 export BUNDLE_FDS_REVISION=a33726c82
 export BUNDLE_FDS_TAG=FDS-6.9.0
-export BUNDLE_SMV_REVISION=2dfdc6674
+export BUNDLE_SMV_REVISION=d5e9e21f2
 export BUNDLE_SMV_TAG=SMV-6.9.0
 
 # lines below should not need to be changed
