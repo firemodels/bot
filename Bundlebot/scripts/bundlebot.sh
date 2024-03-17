@@ -289,6 +289,7 @@ if [ "$showparms" == "" ]; then
 
     gh release upload $GH_FDS_TAG $bundle_dir/${installer_base_platform}.sh         -R github.com/$GH_OWNER/$GH_REPO  --clobber
     gh release upload $GH_FDS_TAG $bundle_dir/${installer_base_platform}.$SHA1EXT   -R github.com/$GH_OWNER/$GH_REPO  --clobber
+    gh release upload $GH_FDS_TAG $bundle_dir/${installer_base_platform}.tar.gz     -R github.com/$GH_OWNER/$GH_REPO  --clobber
     if [ "$platform" == "lnx" ]; then
       cd $REPO_ROOT/fds
       FDS_SHORT_HASH=`git rev-parse --short HEAD`
