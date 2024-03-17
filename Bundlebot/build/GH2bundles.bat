@@ -26,7 +26,7 @@ call :downloadfile %BUNDLE_BASE%lnx.sh
 call :downloadfile %BUNDLE_BASE%lnx.tar.gz
 call :downloadfile %BUNDLE_BASE%lnx.sha1
 call :downloadfile %BUNDLE_BASE%osx.sh
-call :downloadfile %BUNDLE_BASE%osx.tar.tz
+call :downloadfile %BUNDLE_BASE%osx.tar.gz
 call :downloadfile %BUNDLE_BASE%osx.sha1
 call :downloadfile %BUNDLE_BASE%win.exe
 call :downloadfile %BUNDLE_BASE%win.zip
