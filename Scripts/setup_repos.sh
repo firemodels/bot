@@ -216,11 +216,17 @@ do
     if [ -e $repo_out ]; then
       echo removing $repo_out
       rm -rf $repo_out
+      if [ -e $repo_out ]; then
+         echo "***error: the directory $repo_out failed to be removed"
+      fi
     fi
   fi
   if [ "$WIKIWEB" == "1" ]; then
      cd $FMROOT
      git clone ${GITHEADER}firemodels/$repo.git $repo_out
+     if [ ! -d $repo_out ]; then
+        echo "***error: clone of $repo.git to $repo_out failed"
+     fi
      continue
   fi
 
@@ -235,6 +241,9 @@ do
      RECURSIVE=--recursive
   fi
   git clone $RECURSIVE $GITHEADER$GITUSER/$repo.git $repo_out
+  if [ ! -d $repo_out ]; then
+    echo "***error: clone of $repo.git to $repo_out failed"
+  fi
 
   SETUP_REMOTE $repo_dir
 
