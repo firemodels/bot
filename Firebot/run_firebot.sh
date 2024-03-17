@@ -198,8 +198,6 @@ CLONE_FDSSMV=
 BUILD_ONLY=
 FDS_REV=
 SMV_REV=
-FDS_REV_ARG=
-SMV_REV_ARG=
 FIREBOT_LATEST_PASS=
 WEB_DIR=
 WEB_ROOT=/var/www/html
@@ -307,15 +305,13 @@ case $OPTION  in
    WEB_ROOT="$OPTARG"
    ;;
   x)
-   FDS_REV_ARG="$OPTARG"
-   FDS_REV="-x $FDS_REV_ARG"
+   FDS_REV="-x $OPTARG"
    ;;
   X)
    FDS_TAG="-X $OPTARG"
    ;;
   y)
-   SMV_REV_ARG="$OPTARG"
-   SMV_REV="-y $SMV_REV_ARG"
+   SMV_REV="-y $OPTARG"
    ;;
   Y)
    SMV_TAG="-Y $OPTARG"
