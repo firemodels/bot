@@ -642,6 +642,28 @@ CP()
 }
 
 #---------------------------------------------
+#                   CHECKOUT_REPO
+#---------------------------------------------
+
+CHECKOUT_REPO()
+{
+ local_branch=$1
+ local_repo=$2
+ local_rev=$3
+ local_tag=$4
+
+ cd $local_repo
+ if [ "$use_only_tags" == "" ]; then
+   git checkout -b $local_branch $local_rev         >> $OUTPUT_DIR/stage1_clone 2>&1
+   if [ "$local_tag" != "" ]; then
+     git tag -a $local_tag -m "tag for $local_tag"  >> $OUTPUT_DIR/stage1_clone 2>&1
+   fi
+ else
+   git checkout -b $local_branch $local_tag         >> $OUTPUT_DIR/stage1_clone 2>&1
+ fi
+}
+
+#---------------------------------------------
 #                   compile_smv_utilities
 #---------------------------------------------
 
@@ -2277,26 +2299,10 @@ if [[ "$CLONE_REPOS" != "" ]]; then
   fi
   if [ "$CLONE_REPOS" != "master" ]; then
     FDSBRANCH=$CLONE_REPOS
-    cd $fdsrepo
-    if [ "$use_only_tags" == "" ]; then
-      git checkout -b $FDSBRANCH $FDS_REV >> $OUTPUT_DIR/stage1_clone 2>&1
-      if [ "$FDS_TAG" != "" ]; then
-        git tag -a $FDS_TAG -m "tag for $FDS_TAG"  >> $OUTPUT_DIR/stage1_clone 2>&1
-      fi
-    else
-      git checkout -b $FDSBRANCH $FDS_TAG >> $OUTPUT_DIR/stage1_clone 2>&1
-    fi
+    CHECKOUT_REPO $FDSBRANCH $fdsrepo $FDS_REV $FDS_TAG 
 
     SMVBRANCH=$CLONE_REPOS
-    cd $smvrepo
-    if [ "$use_only_tags" == "" ]; then
-      git checkout -b $SMVBRANCH $SMV_REV >> $OUTPUT_DIR/stage1_clone 2>&1
-      if [ "$SMV_TAG" != "" ]; then
-        git tag -a $SMV_TAG -m "tag for $SMV_TAG"  >> $OUTPUT_DIR/stage1_clone 2>&1
-      fi
-    else
-      git checkout -b $SMVBRANCH $SMV_TAG >> $OUTPUT_DIR/stage1_clone 2>&1
-    fi
+    CHECKOUT_REPO $SMVBRANCH $smvrepo $SMV_REV $SMV_TAG 
   fi
   ARCHIVE_REPO_SIZES=1
 fi
