@@ -1,6 +1,6 @@
 @echo off
 :: This scripts obtains revisions and tags for a bundle.
-set base_tag=%1
+set base_tag=6.9.0
 
 set repos=fds smv cad exp fig out
 set CURDIR=%CD%
@@ -9,7 +9,7 @@ cd %gitroot%
 set gitroot=%CD%
 cd %CURDIR%
 
-for %%r in ( fds ) do ( call :outrev %%r )
+for %%r in ( %repos%) do ( call :outrev %%r )
 goto eof
 
 :outrev
@@ -21,6 +21,7 @@ if NOT EXIST %gitroot%\%rev% goto else1
 
    echo %rev% | gawk "{print toupper($0)}" > file.out
    set /p REPO=<file.out
+   call :TRIM %REPO% REPO
 
    set TAG=%REPO%-%base_tag%
    echo set BUNDLE_%REPO%_REVISION=%REVISION%
@@ -28,8 +29,12 @@ if NOT EXIST %gitroot%\%rev% goto else1
    echo.
    goto endif1
 :else1
-   echo "***error: repo $$gitroot/$repo does not exist"
+   echo "***error: repo %gitroot%/%repo% does not exist"
 :endif1
+exit /b
+
+:TRIM
+SET %2=%1
 exit /b
 
 :eof
