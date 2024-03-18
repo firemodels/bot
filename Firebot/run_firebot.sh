@@ -54,6 +54,7 @@ echo "-X fds_tag - when cloning, tag the fds repo using fds_tag"
 echo "-y smv_rev - run firebot using the smv revision named smv_rev [default: origin/master]"
 echo "-Y smv_tag - when cloning, tag the smv repo using smv_tag"
 echo "   The -x and -y options are only used with the -R cloning option"
+echo "-z file - use revisions and tags in file to clone repos"
 }
 
 #---------------------------------------------
@@ -209,10 +210,11 @@ FDS_TAG=
 SMV_TAG=
 VALIDATION=
 OPENMPTEST=
+CLONEFILE=
 
 #*** parse command line options
 
-while getopts 'bBcCdDfFhHJkm:MnNo:OPq:r:R:TuUvV:w:W:x:X:y:Y:' OPTION
+while getopts 'bBcCdDfFhHJkm:MnNo:OPq:r:R:TuUvV:w:W:x:X:y:Y:z:' OPTION
 do
 case $OPTION  in
   b)
@@ -315,6 +317,9 @@ case $OPTION  in
    ;;
   Y)
    SMV_TAG="-Y $OPTARG"
+   ;;
+  z)
+   CLONEFILE="-z $OPTARG"
    ;;
   \?)
   echo "***error: unknown option entered. aborting firebot"
@@ -545,7 +550,7 @@ else
 fi
 touch $firebot_pid
 firebot_status=0
-$ECHO  ./firebot.sh -p $firebot_pid $UPDATEREPO $INTEL $OPENMPTEST $BUILD_ONLY $FORCECLONE $BRANCH $DEBUG_MODE $MANUALS_MATLAB_ONLY $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $UPLOADGUIDES $CLEANREPO $QUEUE $SKIPMATLAB $CLONE_REPOS $CLONE_FDSSMV $VALIDATION $EMAIL $WEB_ROOT $WEB_DIR "$@"
+$ECHO  ./firebot.sh -p $firebot_pid $UPDATEREPO $INTEL $OPENMPTEST $BUILD_ONLY $FORCECLONE $BRANCH $DEBUG_MODE $MANUALS_MATLAB_ONLY $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $UPLOADGUIDES $CLEANREPO $QUEUE $SKIPMATLAB $CLONE_REPOS $CLONE_FDSSMV $VALIDATION $CLONEFILE $EMAIL $WEB_ROOT $WEB_DIR "$@"
 firebot_status=$?
 if [ -e $firebot_pid ]; then
   rm -f $firebot_pid

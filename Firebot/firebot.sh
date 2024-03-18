@@ -2076,9 +2076,10 @@ MPI_TYPE=ompi
 BOPT=
 GITURL=
 MAKE_SUMMARY=
+CLONEFILE=
 
 #*** parse command line arguments
-while getopts 'b:BcCdDJm:Mp:q:R:sTuUV:x:X:y:Y:w:W:' OPTION
+while getopts 'b:BcCdDJm:Mp:q:R:sTuUV:x:X:y:Y:w:W:z:' OPTION
 do
 case $OPTION in
   b)
@@ -2175,6 +2176,9 @@ case $OPTION in
    ;;
   W)
    WEB_ROOT="$OPTARG"
+   ;;
+  z)
+   CLONEFILE="$OPTARG"
    ;;
 esac
 done
