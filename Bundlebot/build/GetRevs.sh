@@ -1,7 +1,6 @@
 #!/bin/bash
-# This scripts defines revisions and tags for a bundle.
-# It is run by the other BUILD scripts. 
-# You do not need to run it.
+# This scripts obtains revisions and tags for a bundle.
+
 base_tag=$1
 
 repos="fds smv cad exp fig out"
