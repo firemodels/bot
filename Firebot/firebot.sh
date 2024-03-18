@@ -2079,7 +2079,7 @@ MAKE_SUMMARY=
 CLONEFILE=
 
 #*** parse command line arguments
-while getopts 'b:BcCdDJm:Mp:q:R:sTuUV:x:X:y:Y:w:W:z:' OPTION
+while getopts 'b:BcCdDJm:Mp:q:R:sTuUV:x:X:y:Y:w:W:z' OPTION
 do
 case $OPTION in
   b)
@@ -2178,7 +2178,7 @@ case $OPTION in
    WEB_ROOT="$OPTARG"
    ;;
   z)
-   CLONEFILE="$OPTARG"
+   CLONEFILE="1"
    ;;
 esac
 done
@@ -2247,6 +2247,14 @@ figrepo=$repo/fig
 outrepo=$repo/out
 exprepo=$repo/exp
 cadrepo=$repo/cad
+
+if [ "$CLONEREPO" != "" ]; then
+  CLONEREPO=$botrepo/Bundlebot/build/BUILD_config.sh
+  if [ ! -x $CLONEREPO ]; then
+    echo "***error: $CLONEREPO does not exist or is not executable"
+    CLONEREPO=
+  fi
+fi
 
 if [ "$OPENMPTEST" == "" ]; then
   size=_64

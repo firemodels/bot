@@ -214,7 +214,7 @@ CLONEFILE=
 
 #*** parse command line options
 
-while getopts 'bBcCdDfFhHJkm:MnNo:OPq:r:R:TuUvV:w:W:x:X:y:Y:z:' OPTION
+while getopts 'bBcCdDfFhHJkm:MnNo:OPq:r:R:TuUvV:w:W:x:X:y:Y:z' OPTION
 do
 case $OPTION  in
   b)
@@ -319,7 +319,7 @@ case $OPTION  in
    SMV_TAG="-Y $OPTARG"
    ;;
   z)
-   CLONEFILE="-z $OPTARG"
+   CLONEFILE="-z"
    ;;
   \?)
   echo "***error: unknown option entered. aborting firebot"
