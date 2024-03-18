@@ -481,10 +481,22 @@ fi
 #     and that the -b branch option only applies to the fds and smv repos
 
 if [[ "$RUNFIREBOT" == "1" ]]; then
-  CD_REPO $repo/bot/Firebot master  || exit 1
+  if [ -d $repo/bot/Firebot ]; then
+    cd $repo/bot/Firebot
+    BOT_BRANCH=`git rev-parse --abbrev-ref HEAD`
+  else
+    echo "***error: directory $repo/bot/Firebot does not exist"
+    exit
+  fi
 
-  git fetch origin &> /dev/null
-  git merge origin/master &> /dev/null
+  if [ "$BOT_BRANCH" == "master" ]; then
+    CD_REPO $repo/bot/Firebot master  || exit 1
+
+    git fetch origin &> /dev/null
+    git merge origin/master &> /dev/null
+  else
+    echo "***warning: bot repo is in $BOT_BRANCH branch not master, will not be updated"
+  fi
   cd $CURDIR
 fi
 
