@@ -2248,11 +2248,11 @@ outrepo=$repo/out
 exprepo=$repo/exp
 cadrepo=$repo/cad
 
-if [ "$CLONEREPO" != "" ]; then
-  CLONEREPO=$botrepo/Bundlebot/build/BUILD_config.sh
-  if [ ! -x $CLONEREPO ]; then
-    echo "***error: $CLONEREPO does not exist or is not executable"
-    CLONEREPO=
+if [ "$CLONEFILE" != "" ]; then
+  CLONEFILE=$botrepo/Bundlebot/build/BUILD_config.sh
+  if [ ! -x $CLONEFILE ]; then
+    echo "***error: $CLONEFILE does not exist or is not executable"
+    CLONEFILE=
   fi
 fi
 
@@ -2310,11 +2310,32 @@ if [[ "$CLONE_REPOS" != "" ]]; then
     ./setup_repos.sh $FORCECLONE -F > $OUTPUT_DIR/stage1_clone 2>&1
   fi
   if [ "$CLONE_REPOS" != "master" ]; then
-    FDSBRANCH=$CLONE_REPOS
-    CHECKOUT_REPO $FDSBRANCH $fdsrepo $FDS_REV $FDS_TAG 
+    if [ "$CLONEFILE" == "" ]; then
+      FDSBRANCH=$CLONE_REPOS
+      CHECKOUT_REPO $FDSBRANCH $fdsrepo $FDS_REV $FDS_TAG 
 
-    SMVBRANCH=$CLONE_REPOS
-    CHECKOUT_REPO $SMVBRANCH $smvrepo $SMV_REV $SMV_TAG 
+      SMVBRANCH=$CLONE_REPOS
+      CHECKOUT_REPO $SMVBRANCH $smvrepo $SMV_REV $SMV_TAG 
+    else
+      source $CLONEFILE 
+      FDSBRANCH=$CLONE_REPOS
+      CHECKOUT_REPO $FDSBRANCH $fdsrepo $BUNDLE_FDS_REVISION  $BUNDLE_FDS_TAG 
+
+      SMVBRANCH=$CLONE_REPOS
+      CHECKOUT_REPO $SMVBRANCH $smvrepo $BUNDLE_SMV_REVISION  $BUNDLE_SMV_TAG 
+
+      CADBRANCH=$CLONE_REPOS
+      CHECKOUT_REPO $CADBRANCH $cadrepo $BUNDLE_CAD_REVISION  $BUNDLE_CAD_TAG 
+
+      EXPBRANCH=$CLONE_REPOS
+      CHECKOUT_REPO $EXPBRANCH $exprepo $BUNDLE_EXP_REVISION  $BUNDLE_EXP_TAG 
+      
+      FIGBRANCH=$CLONE_REPOS
+      CHECKOUT_REPO $FIGBRANCH $figrepo $BUNDLE_FIG_REVISION  $BUNDLE_FIG_TAG 
+
+      OUTBRANCH=$CLONE_REPOS
+      CHECKOUT_REPO $OUTBRANCH $outrepo $BUNDLE_OUT_REVISION  $BUNDLE_OUT_TAG 
+    fi
   fi
   ARCHIVE_REPO_SIZES=1
 fi
