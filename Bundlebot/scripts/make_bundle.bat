@@ -380,9 +380,11 @@ wzipse32 %basename%.zip -setup -auto -i %fds_forbundle%\icon.ico -t %fds_forbund
 call %getrepoinfo% %repo_root%\fds >> %upload_dir%\%basename%.%SHA1EXT%
 call %getrepoinfo% %repo_root%\smv >> %upload_dir%\%basename%.%SHA1EXT%
 
-CALL :COPY %upload_dir%\%basename%.exe  %bundles_dir%\%basename%.exe
+CALL :COPY %upload_dir%\%basename%.exe       %bundles_dir%\%basename%.exe
 CALL :COPY %upload_dir%\%basename%.%SHA1EXT% %bundles_dir%\%basename%.%SHA1EXT%
-CALL :COPY %MANIFEST%                   %upload_dir%\%basename%_manifest.html
+CALL :COPY %upload_dir%\%basename%.zip       %bundles_dir%\%basename%.zip
+CALL :COPY %MANIFEST%                        %upload_dir%\%basename%_manifest.html
+CALL :COPY %MANIFEST%                        %bundles_dir%\%basename%_manifest.html
 
 echo.
 echo --- installer built ---
