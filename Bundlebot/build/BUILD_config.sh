@@ -3,9 +3,12 @@
 # It is run by the other BUILD scripts. 
 # You do not need to run it.
 
-export BUNDLE_FDS_REVISION=c6187c747
+# FDS-6.8.0-1732-g633956926
+# SMV-6.8.0-2184-g1225e3df7
+
+export BUNDLE_FDS_REVISION=633956926
 export BUNDLE_FDS_TAG=FDS-6.9.0
-export BUNDLE_SMV_REVISION=d5e9e21f2
+export BUNDLE_SMV_REVISION=d1225e3df7
 export BUNDLE_SMV_TAG=SMV-6.9.0
 
 # lines below should not need to be changed

@@ -25,18 +25,23 @@ DOWNLOADFILE FDS_Technical_Reference_Guide.pdf
 DOWNLOADFILE FDS_User_Guide.pdf
 DOWNLOADFILE FDS_Validation_Guide.pdf
 DOWNLOADFILE FDS_Verification_Guide.pdf
+
 DOWNLOADFILE SMV_User_Guide.pdf
 DOWNLOADFILE SMV_Verification_Guide.pdf
 DOWNLOADFILE SMV_Technical_Reference_Guide.pdf
+
 DOWNLOADFILE ${BUNDLE_BASE}lnx.sh
 #DOWNLOADFILE ${BUNDLE_BASE}lnx.tar.gz
 DOWNLOADFILE ${BUNDLE_BASE}lnx.sha1
+
 DOWNLOADFILE ${BUNDLE_BASE}osx.sh
 #DOWNLOADFILE ${BUNDLE_BASE}osx.tar.gz
 DOWNLOADFILE ${BUNDLE_BASE}osx.sha1
+
 DOWNLOADFILE ${BUNDLE_BASE}win.exe
 #DOWNLOADFILE ${BUNDLE_BASE}win.zip
 DOWNLOADFILE ${BUNDLE_BASE}win.sha1
+
 echo ***files downloaded to $BUNDLEDIR
 cd $CURDIR
 exit 0
