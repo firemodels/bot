@@ -8,7 +8,7 @@
 
 export BUNDLE_FDS_REVISION=633956926
 export BUNDLE_FDS_TAG=FDS-6.9.0
-export BUNDLE_SMV_REVISION=d1225e3df7
+export BUNDLE_SMV_REVISION=1225e3df7
 export BUNDLE_SMV_TAG=SMV-6.9.0
 
 # lines below should not need to be changed
