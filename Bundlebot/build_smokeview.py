@@ -141,6 +141,10 @@ Radiobutton(root, text="Linux",   padx = 0, variable=platform, value=2).grid(row
 Radiobutton(root, text="OSX",     padx = 0, variable=platform, value=3).grid(row=R, column=2)
 
 R=R+1
+Radiobutton(root, text="test",    padx = 0, variable=version, value=1).grid(row=R, column=0)
+Radiobutton(root, text="release", padx = 0, variable=version, value=2).grid(row=R, column=1)
+
+R=R+1
 Label(root, text="Clean:").grid(column=0, row=R)
 Button(root, text="Repos",   width=button_width, command=clean_repos).grid(row=R,   column=1)
 Button(root, text="Uploads", width=button_width, command=clean_uploads).grid(row=R, column=2)
