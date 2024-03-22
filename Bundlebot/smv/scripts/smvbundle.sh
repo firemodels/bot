@@ -13,6 +13,7 @@ echo "smv repo revision from the latest smokebot pass."
 echo ""
 echo "Options:"
 echo "-h - display this message"
+echo "-r - release bundle"
 echo "-z - use GH_SMV_REVISION and GH_SMV_TAG "
 
 #if [ "$MAILTO" != "" ]; then
@@ -34,16 +35,20 @@ if [ "`uname`" == "Darwin" ] ; then
   comp=gnu
 fi
 USE_GH_VARS=
+RELEASE=
 
 #---------------------------------------------
 #               get options
 #---------------------------------------------
 
-while getopts 'hz' OPTION
+while getopts 'hrz' OPTION
 do
 case $OPTION  in
   h)
    usage
+   ;;
+  r)
+   RELEASE=release
    ;;
   z)
    USE_GH_VARS=1
@@ -84,7 +89,7 @@ else
   smv_hash=$BUNDLE_SMV_REVISION
 fi
 
-./clone_repos.sh $smv_hash >& $outdir/stage2_clone
+./clone_repos.sh $smv_hash $RELEASE >& $outdir/stage2_clone
 cd $reporoot/smv
 if [ "$USE_GH_VARS" != "" ]; then
   git tag -a $BUNDLE_SMV_TAG -m "tag for smokeview release" >> $outdir/stage2_clone 2>&1
