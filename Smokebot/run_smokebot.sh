@@ -29,7 +29,8 @@ echo "-U - upload guides"
 echo "-w directory - web directory containing summary pages"
 echo ""
 echo "Build apps, set repo revisions:"
-echo "-C use gnu compilers"
+echo "-C - force clone"
+echo "-D use gnu compilers"
 echo "-g firebot_host - host where firebot was run"
 echo "-G firebot_home - home directory where firebot was run"
 echo "   The -g and -G options are used when cloning repos (-R option)"
@@ -166,6 +167,7 @@ RUNSMOKEBOT=1
 MOVIE=
 UPLOAD=
 FORCE=
+FORCECLONE=
 ECHO=
 INTEL=
 REMOVE_PID=
@@ -193,7 +195,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'aAB:bcCfg:G:hHJkm:Mo:Pq:r:R:s:STuUvw:W:x:X:y:Y:' OPTION
+while getopts 'aAB:bcCDfFg:G:hHJkm:Mo:Pq:r:R:s:STuUvw:W:x:X:y:Y:' OPTION
 do
 case $OPTION  in
   a)
@@ -212,7 +214,10 @@ case $OPTION  in
    CLEANREPO=-c
    ;;
   C)
-   GNU="-C"
+   FORCECLONE="-C"
+   ;;
+  D)
+   GNU="-D"
    ;;
   f)
    FORCE=1
@@ -442,7 +447,7 @@ BRANCH="-b $BRANCH"
 #*** run smokebot
 
 touch $smokebot_pid
-$ECHO ./$botscript $SIZE $BRANCH $SANITIZE $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $CLONE_REPOS $CACHE_DIR $GNU $RUNAUTO $INTEL $CLEANREPO $WEB_DIR $WEB_ROOT $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $SIZE $BRANCH $SANITIZE $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $CLONE_REPOS $CACHE_DIR $FORCE $GNU $RUNAUTO $INTEL $CLEANREPO $WEB_DIR $WEB_ROOT $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi

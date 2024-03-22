@@ -3,12 +3,14 @@ CUR=`pwd`
 allrepos="bot cad cfast cor exp fds fig out radcal smv test_bundles test7_bundles"
 otherrepos="webpages wikis"
 BRANCH=master
+CHECKOUT_MASTER=
 
 function usage {
 echo "Update the repos $allrepos if they exist"
 echo ""
 echo "Options:"
 echo "-h - display this message"
+echo "-m - checkout master branch before updating"
 exit
 }
 
@@ -21,11 +23,14 @@ else
    exit
 fi
 
-while getopts 'h' OPTION
+while getopts 'hm' OPTION
 do
 case $OPTION  in
   h)
    usage;
+   ;;
+  m)
+   CHECKOUT_MASTER=1
    ;;
 esac
 done
@@ -42,6 +47,9 @@ UPDATE_REPO ()
      return
   fi
   cd $repodir
+  if [ "$CHECKOUT_MASTER" != "" ]; then
+    git checkout master
+  fi 
   CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
   if [ "$BRANCH" != "$CURRENT_BRANCH" ]; then
     echo "Skipping, found branch $CURRENT_BRANCH, expecting branch $BRANCH"
@@ -82,6 +90,9 @@ UPDATE_REPO2 ()
   fi
   echo "------------- $repo -------------------------------------------"
   cd $repodir
+  if [ "$CHECKOUT_MASTER" != "" ]; then
+    git checkout master
+  fi 
   BRANCH=`git rev-parse --abbrev-ref HEAD`
   echo ""
   echo "***  updating from firemodels"
