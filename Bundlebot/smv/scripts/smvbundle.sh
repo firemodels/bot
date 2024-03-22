@@ -13,6 +13,8 @@ echo "smv repo revision from the latest smokebot pass."
 echo ""
 echo "Options:"
 echo "-h - display this message"
+echo "-r - release bundle"
+echo "-z - use GH_SMV_REVISION and GH_SMV_TAG "
 
 #if [ "$MAILTO" != "" ]; then
 #  echo "-m mailto - email address [default: $MAILTO]"
@@ -32,16 +34,24 @@ if [ "`uname`" == "Darwin" ] ; then
   platform2="osx"
   comp=gnu
 fi
+USE_GH_VARS=
+RELEASE=
 
 #---------------------------------------------
 #               get options
 #---------------------------------------------
 
-while getopts 'h' OPTION
+while getopts 'hrz' OPTION
 do
 case $OPTION  in
   h)
    usage
+   ;;
+  r)
+   RELEASE=release
+   ;;
+  z)
+   USE_GH_VARS=1
    ;;
 esac
 done
@@ -57,13 +67,39 @@ outdir=`pwd`
 cd $curdir
 
 echo "*** get smv repo revision"
+ERROR=
+if [ "$USE_GH_VARS" != "" ]; then
+  if [ "$BUNDLE_SMV_REVISION" == "" ]; then
+    echo "***error: BUNDLE_SMV_REVISION not defined"
+    ERROR=1
+  fi
+  if [ "$BUNDLE_SMV_TAG" == "" ]; then
+    echo "***error: BUNDLE_SMV_TAG not defined"
+    ERROR=1
+  fi
+  if [ "$ERROR" != "" ]; then
+    exit
+  fi
+fi
 
-./get_hash_revisions.sh >& $outdir/stage1_hash
-smv_hash=`head -1 $outdir/SMV_HASH`
+if [ "$USE_GH_VARS" == "" ]; then
+  ./get_hash_revisions.sh >& $outdir/stage1_hash
+  smv_hash=`head -1 $outdir/SMV_HASH`
+else
+  smv_hash=$BUNDLE_SMV_REVISION
+fi
 
-./clone_repos.sh $smv_hash >& $outdir/stage2_clone
+./clone_repos.sh $smv_hash $RELEASE >& $outdir/stage2_clone
 cd $reporoot/smv
-smv_revision=`git describe --abbrev=7 --dirty --long`
+if [ "$USE_GH_VARS" != "" ]; then
+  git tag -a $BUNDLE_SMV_TAG -m "tag for smokeview release" >> $outdir/stage2_clone 2>&1
+fi
+
+if [ "$USE_GH_VARS" == "" ]; then
+  smv_revision=`git describe --abbrev=7 --dirty --long`
+else
+  smv_revision=$BUNDLE_SMV_TAG
+fi
 echo "***     smv_hash: $smv_hash"
 echo "*** smv_revision: $smv_revision"
 

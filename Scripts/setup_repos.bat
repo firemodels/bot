@@ -245,6 +245,7 @@ echo -c - setup repos used by cfastbot: %cfastrepos%
 echo -C - setup repos used by the cfast bundle scripts: %cfastsmvrepos%
 echo -f - setup repos used by firebot: %fdsrepos%
 echo -h - display this message%
+echo -n - do not pause script
 echo -s - setup repos used by smokebot: %smvrepos%
 echo -S - setup only smv repo - erase repo first
 echo -T - setup only fds and smv repos - erase repos first

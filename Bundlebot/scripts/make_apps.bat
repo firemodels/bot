@@ -44,7 +44,7 @@ git clean -dxf  1>> %clean_log% 2>&1
 
 :: setup compiler
 cd %CURDIR%
-call setup_intel_compilers.bat 1>> %compile_log% 2>&1
+call %smvrepo%\Utilities\Scripts\setup_intel_compilers.bat 1>> %compile_log% 2>&1
 timeout /t 30 > Nul
 
 :: build fds apps
