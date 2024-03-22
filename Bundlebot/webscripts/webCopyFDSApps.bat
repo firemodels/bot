@@ -20,26 +20,26 @@ goto:eof
 :endif_envexist
 
 call %envfile%
-%svn_drive%
+%git_drive%
 echo.
 
 if "%platform%" == "windows" (
   echo.
   echo *** windows
-  cd %svn_root%\bot\Bundlebot\scripts
+  cd %git_root%\bot\Bundlebot\scripts
   call copy_apps %type%
   goto eof
 )
 if "%platform%" == "linux" (
   echo.
   echo *** linux
-  plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/run_command.sh bot/Firebot copy_fds_apps.sh 
+  plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/run_command.sh bot/Firebot copy_fds_apps.sh 
   goto eof
 )
 if "%platform%" == "osx" (
   echo.
   echo *** osx
-  plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/run_command.sh bot/Firebot copy_fds_apps.sh
+  plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/run_command.sh bot/Firebot copy_fds_apps.sh
   goto eof
 )
 

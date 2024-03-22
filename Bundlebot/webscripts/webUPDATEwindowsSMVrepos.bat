@@ -20,10 +20,10 @@ call %envfile%
 
 echo.
 echo ---------------------- windows: %COMPUTERNAME% ------------------------------
-echo repo: %svn_root%
-%svn_drive%
+echo repo: %git_root%
+%git_drive%
 
-cd %svn_root%\smv
+cd %git_root%\smv
 echo.
 echo *** smv ***
 git remote update
@@ -33,7 +33,7 @@ git merge origin/master
 git push origin master
 git describe --dirty --abbrev=7
 
-set scriptdir=%linux_svn_root%/bot/Scripts/
-set linux_fdsdir=%linux_svn_root%
+set scriptdir=%linux_git_root%/bot/Scripts/
+set linux_fdsdir=%linux_git_root%
 
 pause

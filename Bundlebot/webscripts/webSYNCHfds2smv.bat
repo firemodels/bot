@@ -18,18 +18,18 @@ goto:eof
 set CURDIR=%CD%
 call %envfile%
 
-%svn_drive%
+%git_drive%
 
-set fdsdir=%svn_root%\fds\Manuals\Bibliography
-set smvdir=%svn_root%\smv\Manuals\Bibliography
+set fdsdir=%git_root%\fds\Manuals\Bibliography
+set smvdir=%git_root%\smv\Manuals\Bibliography
 
 call :COPY %fdsdir%\FDS_general.bib  %smvdir%
 call :COPY %fdsdir%\FDS_mathcomp.bib %smvdir%
 call :COPY %fdsdir%\FDS_refs.bib     %smvdir%
 call :COPY %fdsdir%\authors.tex      %smvdir%
 
-set fdsdir=%svn_root%\fds\Source
-set smvdir=%svn_root%\smv\Source\smokeview
+set fdsdir=%git_root%\fds\Source
+set smvdir=%git_root%\smv\Source\smokeview
 
 cd %CURDIR%
 GOTO EOF

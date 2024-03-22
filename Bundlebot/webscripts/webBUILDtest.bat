@@ -22,23 +22,23 @@ echo.
 echo  Building test_mpi for %platform%
 Title Building test_mpi for %platform%
 
-%svn_drive%
+%git_drive%
 
 if "%platform%" == "windows" (
-  cd %svn_root%\fds\Utilities\test_mpi\impi_intel_win
+  cd %git_root%\fds\Utilities\test_mpi\impi_intel_win
   erase *.obj *.mod *.exe
   call make_test_mpi
   goto eof
 )
 if "%platform%" == "linux" (
-  plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/clean.sh fds/Utilities/test_mpi/impi_intel_linux
-  plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/run_command.sh fds/Utilities/test_mpi/impi_intel_linux make_test_mpi.sh
+  plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/clean.sh fds/Utilities/test_mpi/impi_intel_linux
+  plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Utilities/test_mpi/impi_intel_linux make_test_mpi.sh
   pause
   goto eof
 )
 if "%platform%" == "osx" (
-  plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/clean.sh fds/Utilities/test_mpi/mpi_intel_osx
-  plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/run_command.sh fds/Utilities/test_mpi/mpi_intel_osx make_test_mpi.sh
+  plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/clean.sh fds/Utilities/test_mpi/mpi_intel_osx
+  plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Utilities/test_mpi/mpi_intel_osx make_test_mpi.sh
   pause
   goto eof
 )

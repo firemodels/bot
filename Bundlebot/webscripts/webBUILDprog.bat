@@ -23,21 +23,21 @@ echo.
 echo  Building %prog% for 64 bit %platform%
 Title Building %prog% for 64 bit %platform%
 
-%svn_drive%
+%git_drive%
 
 
 if "%platform%" == "windows" (
-  cd %svn_root%\smv\Build\%prog%\intel_win_64
+  cd %git_root%\smv\Build\%prog%\intel_win_64
   call make_%prog%
   goto eof
 )
 if "%platform%" == "linux" (
-  plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/run_command.sh smv/Build/%prog%/intel_linux_64 make_%prog%.sh
+  plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/run_command.sh smv/Build/%prog%/intel_linux_64 make_%prog%.sh
   pause
   goto eof
 )
 if "%platform%" == "osx" (
-  plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/run_command.sh smv/Build/%prog%/intel_osx_64 make_%prog%.sh
+  plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/run_command.sh smv/Build/%prog%/intel_osx_64 make_%prog%.sh
   pause
   goto eof
 )

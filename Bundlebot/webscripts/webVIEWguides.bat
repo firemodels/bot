@@ -22,20 +22,20 @@ goto:eof
 call %envfile%
 echo.
 
-%svn_drive%
+%git_drive%
 
 if "%app%" == "FDS" goto skip_fds
 if "%guide%" == "User" (
   Title View Smokeview User Guide
 
-  cd %svn_root%\smv\Manuals\SMV_User_Guide\
+  cd %git_root%\smv\Manuals\SMV_User_Guide\
   start sumatrapdf SMV_User_Guide.pdf
   goto eof
 )
 if "%guide%" == "Verification" (
   Title View Smokeview Verification Guide
 
-  cd %svn_root%\smv\Manuals\SMV_Verification_Guide\
+  cd %git_root%\smv\Manuals\SMV_Verification_Guide\
   start sumatrapdf SMV_Verification_Guide.pdf
   goto eof
 )
@@ -46,7 +46,7 @@ if "%guide%" == "Validation" (
 if "%guide%" == "Technical" (
   Title View Smokeview Technical Reference Guide
 
-  cd %svn_root%\smv\Manuals\SMV_Technical_Reference_Guide\
+  cd %git_root%\smv\Manuals\SMV_Technical_Reference_Guide\
   start sumatrapdf SMV_Technical_Reference_Guide.pdf
   goto eof
 )
@@ -55,27 +55,27 @@ goto eof
 if "%guide%" == "User" (
   Title View FDS User Guide
 
-  cd %svn_root%\fds\Manuals\FDS_User_Guide\
+  cd %git_root%\fds\Manuals\FDS_User_Guide\
   start sumatrapdf FDS_User_Guide.pdf
   goto eof
 )
 if "%guide%" == "Validation" (
   Title View FDS Validation Guide
-  cd %svn_root%\fds\Manuals\FDS_Validation_Guide\
+  cd %git_root%\fds\Manuals\FDS_Validation_Guide\
   start sumatrapdf FDS_Validation_Guide.pdf
   goto eof
 )
 if "%guide%" == "Verification" (
   Title View FDS Verification Guide
 
-  cd %svn_root%\fds\Manuals\FDS_Verification_Guide\
+  cd %git_root%\fds\Manuals\FDS_Verification_Guide\
   call make_guide
   goto eof
 )
 if "%guide%" == "Technical" (
   Title View FDS Technical Reference Guide
 
-  cd %svn_root%\fds\Manuals\FDS_Technical_Reference_Guide\
+  cd %git_root%\fds\Manuals\FDS_Technical_Reference_Guide\
   start sumatrapdf FDS_Technical_Reference_Guide.pdf
   goto eof
 )

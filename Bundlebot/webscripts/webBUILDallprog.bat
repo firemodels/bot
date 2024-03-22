@@ -24,7 +24,7 @@ echo.
 echo  Building smokeview utilities for 64 bit %platform%
 Title Building smokeview utilities for 64 bit %platform%
 
-%svn_drive%
+%git_drive%
 
 set EXIT_SCRIPT=1
 
@@ -33,11 +33,11 @@ set smvprogs=get_time set_path sh2bat timep
 
 if NOT "%platform%" == "Windows" goto endif1
   for %%x in ( %progs% ) do (
-    cd %svn_root%\smv\Build\%%x\intel_win_64
+    cd %git_root%\smv\Build\%%x\intel_win_64
     start "building windows %%x" make_%%x
   ) 
   for %%x in ( %smvprogs% ) do (
-    cd %svn_root%\smv\Build\%%x\intel_win_64
+    cd %git_root%\smv\Build\%%x\intel_win_64
     start "building windows %%x" make_%%x
   ) 
   ) 
@@ -47,18 +47,18 @@ if NOT "%platform%" == "Windows" goto endif1
 
 if NOT "%platform%" == "Linux" goto endif2
   for %%x in ( %progs% ) do (
-    start "building linux %%x" plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/run_command.sh smv/Build/%%x/intel_linux_64 make_%%x.sh
+    start "building linux %%x" plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/run_command.sh smv/Build/%%x/intel_linux_64 make_%%x.sh
   )
-  start "building linux %%x" plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/run_command.sh fds/Utilities/fds2ascii/intel_linux make_fds2ascii.sh
+  start "building linux %%x" plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Utilities/fds2ascii/intel_linux make_fds2ascii.sh
   pause
   goto eof
 :endif2
 
 if NOT "%platform%" == "OSX" goto endif3
   for %%x in ( %progs% ) do (
-    start "building osx %%x" plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/run_command.sh smv/Build/%%x/gnu_osx_64 make_%%x.sh
+    start "building osx %%x" plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/run_command.sh smv/Build/%%x/gnu_osx_64 make_%%x.sh
   )
-  start "building osx fds2ascii" plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/run_command.sh fds/Utilities/fds2ascii/gnu_osx make_fds2ascii.sh
+  start "building osx fds2ascii" plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Utilities/fds2ascii/gnu_osx make_fds2ascii.sh
   pause
   goto eof
 :endif3

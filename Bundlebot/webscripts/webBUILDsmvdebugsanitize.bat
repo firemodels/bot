@@ -22,10 +22,10 @@ echo.
 echo  Building debug test Smokeview for %platform%
 Title Building debug test Smokeview for %platform%
 
-%svn_drive%
+%git_drive%
 
 if "%platform%" == "Windows" (
-  cd %svn_root%\smv\Build\smokeview\intel_win_64
+  cd %git_root%\smv\Build\smokeview\intel_win_64
   call make_smokeview_db -test -glut -icon -sanitize
   goto eof
 )

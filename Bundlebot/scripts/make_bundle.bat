@@ -20,7 +20,7 @@ set curdir=%CD%
 cd %scriptdir%\..\..\..
 set repo_root=%CD%
 cd %scriptdir%
-set SVNROOT=%repo_root%
+set GITROOT=%repo_root%
 
 :: setup .bundle and upload directories
 

@@ -16,7 +16,7 @@ echo Viewing animation web page
 
 call %envfile%
 
-%svn_drive%
-cd %svn_root%\smv\Manuals\SMV_Summary
+%git_drive%
+cd %git_root%\smv\Manuals\SMV_Summary
 
 start explorer index.html

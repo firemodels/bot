@@ -20,13 +20,13 @@ goto:eof
 :endif_envexist
 
 call %envfile%
-%svn_drive%
+%git_drive%
 echo.
 
 echo cleaning smokeview build directories
 
 echo *** windows
-cd %svn_root%\smv\Build\smokeview\intel_win_64
+cd %git_root%\smv\Build\smokeview\intel_win_64
 git clean -dxf
 
 
