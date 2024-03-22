@@ -32,12 +32,14 @@ git clean -dxf  1>> %clean_log% 2>&1
 
 :: setup compiler
 cd %CURDIR%
-call setup_intel_compilers.bat 1>> %compile_log% 2>&1
+call %smvrepo%\Utilties\Scripts\setup_intel_compilers.bat 1>> %compile_log% 2>&1
 timeout /t 30 > Nul
 
 :: build smokeview libraries and apps
 call :BUILDLIB
 call :BUILD     background
+call :BUILD     flush
+call :BUILD     timep
 call :BUILD     hashfile
 call :BUILD     smokediff
 call :BUILD     smokezip
@@ -49,6 +51,8 @@ call :BUILDSMV
 
 :: verify smokeview apps were built
 call :CHECK_BUILD     background
+call :CHECK_BUILD     flush
+call :CHECK_BUILD     timep
 call :CHECK_BUILD     hashfile
 call :CHECK_BUILD     smokediff
 call :CHECK_BUILD     smokezip

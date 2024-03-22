@@ -12,7 +12,7 @@ cd ..\..\..
 set REPOROOT=%CD%
 
 cd %REPOROOT%\bot\Scripts
-call setup_repos -T -n
+call setup_repos -S -n
 
 cd %CURDIR%
 
