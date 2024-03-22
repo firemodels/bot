@@ -90,7 +90,11 @@ if [ "$USE_GH_VARS" != "" ]; then
   git tag -a $BUNDLE_SMV_TAG -m "tag for smokeview release" >> $outdir/stage2_clone 2>&1
 fi
 
-smv_revision=`git describe --abbrev=7 --dirty --long`
+if [ "$USE_GH_VARS" == "" ]; then
+  smv_revision=`git describe --abbrev=7 --dirty --long`
+else
+  smv_revision=$BUNDLE_SMV_TAG
+fi
 echo "***     smv_hash: $smv_hash"
 echo "*** smv_revision: $smv_revision"
 
