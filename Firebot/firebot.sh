@@ -2249,7 +2249,7 @@ exprepo=$repo/exp
 cadrepo=$repo/cad
 
 if [ "$CLONEFILE" != "" ]; then
-  CLONEFILE=$botrepo/Bundlebot/build/BUILD_config.sh
+  CLONEFILE=$botrepo/Bundlebot/release/BUILD_config.sh
   if [ ! -x $CLONEFILE ]; then
     echo "***error: $CLONEFILE does not exist or is not executable"
     CLONEFILE=
