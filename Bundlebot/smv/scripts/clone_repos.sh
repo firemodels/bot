@@ -1,6 +1,11 @@
 #!/bin/bash
 smv_hash=$1
-branch_name=nightly
+release=$2
+if [ "$release" == "" ]; then
+  branch_name=nightly
+else
+  branch_name=release
+fi
 
 CURDIR=`pwd`
 cd ../../../..
