@@ -1,5 +1,7 @@
 @echo off
-call ..\build\BUILD_config
+call BUILD_config
+set BUNDLE_SMV_TAG=SMV-6.9.0test
+
 
 set basename=%BUNDLE_SMV_TAG%_win
 set fullfilebase=%userprofile%\.bundle\uploads\%basename%
