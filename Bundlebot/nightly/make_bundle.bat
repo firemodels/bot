@@ -20,7 +20,7 @@ set curdir=%CD%
 cd %scriptdir%\..\..\..
 set repo_root=%CD%
 cd %scriptdir%
-set SVNROOT=%repo_root%
+set GITROOT=%repo_root%
 
 :: setup .bundle and upload directories
 
@@ -376,7 +376,7 @@ if exist %basename%.exe erase %basename%.exe
 
 wzipse32 %basename%.zip -setup -auto -i %fds_forbundle%\icon.ico -t %fds_forbundle%\unpack.txt -runasadmin -a %fds_forbundle%\about.txt -st"%fds_version% %smv_version%" -o -c cmd /k firemodels\setup.bat
 
-%hashfile% %basename%.exe         >>  %upload_dir%\%basename%.%SHA1EXT%
+%hashfile% %basename%.exe          >> %upload_dir%\%basename%.%SHA1EXT%
 call %getrepoinfo% %repo_root%\fds >> %upload_dir%\%basename%.%SHA1EXT%
 call %getrepoinfo% %repo_root%\smv >> %upload_dir%\%basename%.%SHA1EXT%
 

@@ -54,6 +54,7 @@ echo "-X fds_tag - when cloning, tag the fds repo using fds_tag"
 echo "-y smv_rev - run firebot using the smv revision named smv_rev [default: origin/master]"
 echo "-Y smv_tag - when cloning, tag the smv repo using smv_tag"
 echo "   The -x and -y options are only used with the -R cloning option"
+echo "-z file - use revisions and tags in file to clone repos"
 }
 
 #---------------------------------------------
@@ -198,8 +199,6 @@ CLONE_FDSSMV=
 BUILD_ONLY=
 FDS_REV=
 SMV_REV=
-FDS_REV_ARG=
-SMV_REV_ARG=
 FIREBOT_LATEST_PASS=
 WEB_DIR=
 WEB_ROOT=/var/www/html
@@ -211,10 +210,11 @@ FDS_TAG=
 SMV_TAG=
 VALIDATION=
 OPENMPTEST=
+CLONEFILE=
 
 #*** parse command line options
 
-while getopts 'bBcCdDfFhHJkm:MnNo:OPq:r:R:TuUvV:w:W:x:X:y:Y:' OPTION
+while getopts 'bBcCdDfFhHJkm:MnNo:OPq:r:R:TuUvV:w:W:x:X:y:Y:z' OPTION
 do
 case $OPTION  in
   b)
@@ -307,18 +307,19 @@ case $OPTION  in
    WEB_ROOT="$OPTARG"
    ;;
   x)
-   FDS_REV_ARG="$OPTARG"
-   FDS_REV="-x $FDS_REV_ARG"
+   FDS_REV="-x $OPTARG"
    ;;
   X)
    FDS_TAG="-X $OPTARG"
    ;;
   y)
-   SMV_REV_ARG="$OPTARG"
-   SMV_REV="-y $SMV_REV_ARG"
+   SMV_REV="-y $OPTARG"
    ;;
   Y)
    SMV_TAG="-Y $OPTARG"
+   ;;
+  z)
+   CLONEFILE="-z"
    ;;
   \?)
   echo "***error: unknown option entered. aborting firebot"
@@ -373,7 +374,7 @@ if [ "$GET_HASH" != "" ]; then
     echo "          when cloning the repos, when the -R option is used"
     exit 1
   fi
-  ../Bundlebot/scripts/getGHfile.sh     FDS_INFO.txt     FDS_TEST
+  ../Bundlebot/nightly/getGHfile.sh     FDS_INFO.txt     FDS_TEST
   FDS_HASH=`grep FDS_HASH  FDS_INFO.txt | awk '{print $2}'`
   SMV_HASH=`grep SMV_HASH  FDS_INFO.txt | awk '{print $2}'`
   FDS_REVISION=`grep FDS_REVISION  FDS_INFO.txt | awk '{print $2}'`
@@ -480,10 +481,22 @@ fi
 #     and that the -b branch option only applies to the fds and smv repos
 
 if [[ "$RUNFIREBOT" == "1" ]]; then
-  CD_REPO $repo/bot/Firebot master  || exit 1
+  if [ -d $repo/bot/Firebot ]; then
+    cd $repo/bot/Firebot
+    BOT_BRANCH=`git rev-parse --abbrev-ref HEAD`
+  else
+    echo "***error: directory $repo/bot/Firebot does not exist"
+    exit
+  fi
 
-  git fetch origin &> /dev/null
-  git merge origin/master &> /dev/null
+  if [ "$BOT_BRANCH" == "master" ]; then
+    CD_REPO $repo/bot/Firebot master  || exit 1
+
+    git fetch origin &> /dev/null
+    git merge origin/master &> /dev/null
+  else
+    echo "***warning: bot repo is in $BOT_BRANCH branch not master, will not be updated"
+  fi
   cd $CURDIR
 fi
 
@@ -549,7 +562,7 @@ else
 fi
 touch $firebot_pid
 firebot_status=0
-$ECHO  ./firebot.sh -p $firebot_pid $UPDATEREPO $INTEL $OPENMPTEST $BUILD_ONLY $FORCECLONE $BRANCH $DEBUG_MODE $MANUALS_MATLAB_ONLY $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $UPLOADGUIDES $CLEANREPO $QUEUE $SKIPMATLAB $CLONE_REPOS $CLONE_FDSSMV $VALIDATION $EMAIL $WEB_ROOT $WEB_DIR "$@"
+$ECHO  ./firebot.sh -p $firebot_pid $UPDATEREPO $INTEL $OPENMPTEST $BUILD_ONLY $FORCECLONE $BRANCH $DEBUG_MODE $MANUALS_MATLAB_ONLY $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $UPLOADGUIDES $CLEANREPO $QUEUE $SKIPMATLAB $CLONE_REPOS $CLONE_FDSSMV $VALIDATION $CLONEFILE $EMAIL $WEB_ROOT $WEB_DIR "$@"
 firebot_status=$?
 if [ -e $firebot_pid ]; then
   rm -f $firebot_pid

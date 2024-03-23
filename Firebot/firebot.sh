@@ -642,6 +642,28 @@ CP()
 }
 
 #---------------------------------------------
+#                   CHECKOUT_REPO
+#---------------------------------------------
+
+CHECKOUT_REPO()
+{
+ local_branch=$1
+ local_repo=$2
+ local_rev=$3
+ local_tag=$4
+
+ cd $local_repo
+ if [ "$use_only_tags" == "" ]; then
+   git checkout -b $local_branch $local_rev         >> $OUTPUT_DIR/stage1_clone 2>&1
+   if [ "$local_tag" != "" ]; then
+     git tag -a $local_tag -m "tag for $local_tag"  >> $OUTPUT_DIR/stage1_clone 2>&1
+   fi
+ else
+   git checkout -b $local_branch $local_tag         >> $OUTPUT_DIR/stage1_clone 2>&1
+ fi
+}
+
+#---------------------------------------------
 #                   compile_smv_utilities
 #---------------------------------------------
 
@@ -2058,9 +2080,10 @@ MPI_TYPE=ompi
 BOPT=
 GITURL=
 MAKE_SUMMARY=
+CLONEFILE=
 
 #*** parse command line arguments
-while getopts 'b:BcCdDJm:Mp:q:R:sTuUV:x:X:y:Y:w:W:' OPTION
+while getopts 'b:BcCdDJm:Mp:q:R:sTuUV:x:X:y:Y:w:W:z' OPTION
 do
 case $OPTION in
   b)
@@ -2158,6 +2181,9 @@ case $OPTION in
   W)
    WEB_ROOT="$OPTARG"
    ;;
+  z)
+   CLONEFILE="1"
+   ;;
 esac
 done
 shift $(($OPTIND-1))
@@ -2226,6 +2252,14 @@ outrepo=$repo/out
 exprepo=$repo/exp
 cadrepo=$repo/cad
 
+if [ "$CLONEFILE" != "" ]; then
+  CLONEFILE=$botrepo/Bundlebot/release/BUILD_config.sh
+  if [ ! -x $CLONEFILE ]; then
+    echo "***error: $CLONEFILE does not exist or is not executable"
+    CLONEFILE=
+  fi
+fi
+
 if [ "$OPENMPTEST" == "" ]; then
   size=_64
   GNU_MPI=mpi_
@@ -2280,26 +2314,31 @@ if [[ "$CLONE_REPOS" != "" ]]; then
     ./setup_repos.sh $FORCECLONE -F > $OUTPUT_DIR/stage1_clone 2>&1
   fi
   if [ "$CLONE_REPOS" != "master" ]; then
-    FDSBRANCH=$CLONE_REPOS
-    cd $fdsrepo
-    if [ "$use_only_tags" == "" ]; then
-      git checkout -b $FDSBRANCH $FDS_REV >> $OUTPUT_DIR/stage1_clone 2>&1
-      if [ "$FDS_TAG" != "" ]; then
-        git tag -a $FDS_TAG -m "tag for $FDS_TAG"  >> $OUTPUT_DIR/stage1_clone 2>&1
-      fi
-    else
-      git checkout -b $FDSBRANCH $FDS_TAG >> $OUTPUT_DIR/stage1_clone 2>&1
-    fi
+    if [ "$CLONEFILE" == "" ]; then
+      FDSBRANCH=$CLONE_REPOS
+      CHECKOUT_REPO $FDSBRANCH $fdsrepo $FDS_REV $FDS_TAG 
 
-    SMVBRANCH=$CLONE_REPOS
-    cd $smvrepo
-    if [ "$use_only_tags" == "" ]; then
-      git checkout -b $SMVBRANCH $SMV_REV >> $OUTPUT_DIR/stage1_clone 2>&1
-      if [ "$SMV_TAG" != "" ]; then
-        git tag -a $SMV_TAG -m "tag for $SMV_TAG"  >> $OUTPUT_DIR/stage1_clone 2>&1
-      fi
+      SMVBRANCH=$CLONE_REPOS
+      CHECKOUT_REPO $SMVBRANCH $smvrepo $SMV_REV $SMV_TAG 
     else
-      git checkout -b $SMVBRANCH $SMV_TAG >> $OUTPUT_DIR/stage1_clone 2>&1
+      source $CLONEFILE 
+      FDSBRANCH=$CLONE_REPOS
+      CHECKOUT_REPO $FDSBRANCH $fdsrepo $BUNDLE_FDS_REVISION  $BUNDLE_FDS_TAG 
+
+      SMVBRANCH=$CLONE_REPOS
+      CHECKOUT_REPO $SMVBRANCH $smvrepo $BUNDLE_SMV_REVISION  $BUNDLE_SMV_TAG 
+
+      CADBRANCH=$CLONE_REPOS
+      CHECKOUT_REPO $CADBRANCH $cadrepo $BUNDLE_CAD_REVISION  $BUNDLE_CAD_TAG 
+
+      EXPBRANCH=$CLONE_REPOS
+      CHECKOUT_REPO $EXPBRANCH $exprepo $BUNDLE_EXP_REVISION  $BUNDLE_EXP_TAG 
+      
+      FIGBRANCH=$CLONE_REPOS
+      CHECKOUT_REPO $FIGBRANCH $figrepo $BUNDLE_FIG_REVISION  $BUNDLE_FIG_TAG 
+
+      OUTBRANCH=$CLONE_REPOS
+      CHECKOUT_REPO $OUTBRANCH $outrepo $BUNDLE_OUT_REVISION  $BUNDLE_OUT_TAG 
     fi
   fi
   ARCHIVE_REPO_SIZES=1

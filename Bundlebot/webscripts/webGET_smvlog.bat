@@ -18,11 +18,11 @@ goto:eof
 
 call %envfile%
 
-%svn_drive%
+%git_drive%
 set curdir=%CD%
-cd %svn_root%\smv\source
+cd %git_root%\smv\source
 echo add log entries for commmits made since %smvlogdate% to smokeview release notes
 pause
-git log --pretty=oneline --abbrev-commit --since=%smvlogdate% .>> %svn_root%\webpages\smv_readme.html
+git log --pretty=oneline --abbrev-commit --since=%smvlogdate% .>> %git_root%\webpages\smv_readme.html
 cd %curdir%
 pause

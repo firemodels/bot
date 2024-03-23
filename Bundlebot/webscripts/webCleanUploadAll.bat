@@ -18,7 +18,7 @@ goto:eof
 :endif_envexist
 
 call %envfile%
-%svn_drive%
+%git_drive%
 echo.
 
 echo *** windows
@@ -29,11 +29,11 @@ mkdir uploads
 
 echo.
 echo *** linux
-plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/run_command.sh bot/Bundlebot/fds/scripts clean_upload.sh
+plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/run_command.sh bot/Bundlebot/fds/scripts clean_upload.sh
 
 echo.
 echo *** osx
-plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/run_command.sh bot/Bundlebot/fds/scripts clean_upload.sh
+plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/run_command.sh bot/Bundlebot/fds/scripts clean_upload.sh
 
 echo.
 pause

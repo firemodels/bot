@@ -1565,7 +1565,7 @@ echo $$ > $PID_FILE
 
 #*** parse command line options
 
-while getopts 'aAb:cCJm:Mq:R:s:SuUw:W:x:X:y:Y:' OPTION
+while getopts 'aAb:cCDJm:Mq:R:s:SuUw:W:x:X:y:Y:' OPTION
 do
 case $OPTION in
   a)
@@ -1587,6 +1587,9 @@ case $OPTION in
    CLEANREPO=1
    ;;
   C)
+   FORCECLONE="-C"
+   ;;
+  D)
    COMPILER=gnu
    MPI_TYPE=ompi
    export OMP_NUM_THREADS=1
@@ -1748,7 +1751,7 @@ if [[ "$CLONE_REPOS" != "" ]]; then
 
 # only clone fds and smv repos
    # clone all repos
-    ./setup_repos.sh -F                         > $OUTPUT_DIR/stage1_clone 2>&1
+    ./setup_repos.sh -F $FORCECLONE              > $OUTPUT_DIR/stage1_clone 2>&1
   if [[ "$CLONE_REPOS" != "master" ]]; then
     FDSBRANCH=$CLONE_REPOS
     cd $fdsrepo

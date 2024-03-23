@@ -52,7 +52,7 @@ call make_LIBS bot > %outdir%\stage3_LIBS 2>&1
 echo *** Building applications
 Title Building applications
 
-%svn_drive%
+%git_drive%
 
 set "progs=background flush hashfile smokediff smokezip wind2fds set_path timep get_time"
 

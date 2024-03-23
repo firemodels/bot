@@ -20,8 +20,8 @@ call %envfile%
 
 echo.
 echo ---------------------------*** fds ***--------------------------------
-%svn_drive%
-cd %svn_root%\fds
+%git_drive%
+cd %git_root%\fds
 echo Windows
 git checkout master
 if x"%fds_tags%" == "x" goto skip_fds_tag
@@ -30,21 +30,21 @@ git branch -d release > Nul 2> Nul
 git checkout %fds_tag% -b release
 :skip_fds_tag
 
-set scriptdir=%linux_svn_root%/bot/Scripts/
-set linux_fdsdir=%linux_svn_root%
+set scriptdir=%linux_git_root%/bot/Scripts/
+set linux_fdsdir=%linux_git_root%
 
 echo.
 echo Linux
-plink %plink_options% %linux_logon% %scriptdir%/set_releasetag.sh  %linux_svn_root%/fds %fds_tag%
+plink %plink_options% %linux_logon% %scriptdir%/set_releasetag.sh  %linux_git_root%/fds %fds_tag%
 echo.
 
 echo OSX
-plink %plink_options% %osx_logon% %scriptdir%/set_releasetag.sh  %linux_svn_root%/fds %fds_tag%
+plink %plink_options% %osx_logon% %scriptdir%/set_releasetag.sh  %linux_git_root%/fds %fds_tag%
 
 
 echo.
 echo ---------------------------*** smv ***--------------------------------
-cd %svn_root%\smv
+cd %git_root%\smv
 echo Windows
 git checkout master
 
@@ -56,11 +56,11 @@ git checkout %smv_tag% -b release
 
 echo.
 echo Linux
-plink %plink_options% %linux_logon% %scriptdir%/set_releasetag.sh  %linux_svn_root%/smv %smv_tag%
+plink %plink_options% %linux_logon% %scriptdir%/set_releasetag.sh  %linux_git_root%/smv %smv_tag%
 
 echo.
 echo OSX
-plink %plink_options% %osx_logon% %scriptdir%/set_releasetag.sh  %linux_svn_root%/smv %smv_tag%
+plink %plink_options% %osx_logon% %scriptdir%/set_releasetag.sh  %linux_git_root%/smv %smv_tag%
 
 echo.
 pause

@@ -22,8 +22,8 @@ goto:eof
 call %envfile%
 echo.
 
-%svn_drive%
-cd %svn_root%\bot\Scripts
+%git_drive%
+cd %git_root%\bot\Scripts
 
 if "%app%" == "FDS" goto skip_fds
 if "%guide%" == "User" (

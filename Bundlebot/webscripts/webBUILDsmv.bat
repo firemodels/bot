@@ -24,7 +24,7 @@ echo.
 echo  Building %buildtype% Smokeview for %platform%
 Title Building %buildtype% Smokeview for %platform%
 
-%svn_drive%
+%git_drive%
 
 set wintype=
 set type=
@@ -52,13 +52,13 @@ if "%buildtype%" == "debug" (
    set type=
 )
 if "%platform%" == "Windowsgnu" (
-  cd %svn_root%\smv\Build\smokeview\gnu_win_64
+  cd %git_root%\smv\Build\smokeview\gnu_win_64
   call make_smokeview -test -profile
   goto eof
 )
 
 if "%platform%" == "Windows" (
-  cd %svn_root%\smv\Build\smokeview\intel_win_64
+  cd %git_root%\smv\Build\smokeview\intel_win_64
   call make_smokeview %wintype% %wininc% -glut -icon
   goto eof
 )
@@ -66,26 +66,26 @@ if "%platform%" == "Windows" (
 :: ----------- linux -----------------
 
 if "%platform%" == "Linux" (
-  plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/run_command.sh smv/Build/smokeview/intel_linux_64 make_smokeview.sh %type%
+  plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/run_command.sh smv/Build/smokeview/intel_linux_64 make_smokeview.sh %type%
   goto eof
 )
 if "%platform%" == "Linuxgnu" (
-  plink %plink_options% %linux_logon% %linux_svn_root%/smv/scripts/run_command.sh smv/Build/smokeview/gnu_linux_64 make_smokeview.sh -p -T
+  plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/run_command.sh smv/Build/smokeview/gnu_linux_64 make_smokeview.sh -p -T
   goto eof
 )
 
 :: ----------- osx -----------------
 
 if "%platform%" == "osxquartz" (
-  plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/run_command.sh smv/Build/smokeview/intel_osx_q_64 make_smokeview.sh %type%
+  plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/run_command.sh smv/Build/smokeview/intel_osx_q_64 make_smokeview.sh %type%
   goto eof
 )
 if "%platform%" == "OSXxxx" (
-  plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/run_command.sh smv/Build/smokeview/intel_osx_64 make_smokeview.sh %type%
+  plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/run_command.sh smv/Build/smokeview/intel_osx_64 make_smokeview.sh %type%
   goto eof
 )
 if "%platform%" == "OSX" (
-  plink %plink_options% %osx_logon% %linux_svn_root%/smv/scripts/run_command.sh smv/Build/smokeview/gnu_osx_64 make_smokeview.sh %type%
+  plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/run_command.sh smv/Build/smokeview/gnu_osx_64 make_smokeview.sh %type%
   goto eof
 )
 

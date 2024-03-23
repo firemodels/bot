@@ -17,6 +17,6 @@ goto:eof
 
 call %envfile%
 
-%svn_drive%
-cd %svn_root%\webpages
+%git_drive%
+cd %git_root%\webpages
 notepad smv_readme.html

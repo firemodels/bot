@@ -20,50 +20,50 @@ call %envfile%
 
 echo.
 echo ---------------------------*** fds ***--------------------------------
-%svn_drive%
-cd %svn_root%\fds
+%git_drive%
+cd %git_root%\fds
 echo Windows
 git checkout master
 
-set scriptdir=%linux_svn_root%/bot/Scripts/
-set linux_fdsdir=%linux_svn_root%
+set scriptdir=%linux_git_root%/bot/Scripts/
+set linux_fdsdir=%linux_git_root%
 
 echo.
 echo Linux
-plink %plink_options% %linux_logon% %scriptdir%/setbranch_master.sh  %linux_svn_root%/fds
+plink %plink_options% %linux_logon% %scriptdir%/setbranch_master.sh  %linux_git_root%/fds
 echo.
 
 echo OSX
-plink %plink_options% %osx_logon% %scriptdir%/setbranch_master.sh  %linux_svn_root%/fds
+plink %plink_options% %osx_logon% %scriptdir%/setbranch_master.sh  %linux_git_root%/fds
 
 
 echo.
 echo ---------------------------*** smv ***--------------------------------
-cd %svn_root%\smv
+cd %git_root%\smv
 echo Windows
 git checkout master
 
 echo.
 echo Linux
-plink %plink_options% %linux_logon% %scriptdir%/setbranch_master.sh  %linux_svn_root%/smv
+plink %plink_options% %linux_logon% %scriptdir%/setbranch_master.sh  %linux_git_root%/smv
 
 echo.
 echo OSX
-plink %plink_options% %osx_logon% %scriptdir%/setbranch_master.sh  %linux_svn_root%/smv
+plink %plink_options% %osx_logon% %scriptdir%/setbranch_master.sh  %linux_git_root%/smv
 
 echo.
 echo ---------------------------*** bot ***--------------------------------
-cd %svn_root%\bot
+cd %git_root%\bot
 echo Windows
 git checkout master
 
 echo.
 echo Linux
-plink %plink_options% %linux_logon% %scriptdir%/setbranch_master.sh  %linux_svn_root%/bot
+plink %plink_options% %linux_logon% %scriptdir%/setbranch_master.sh  %linux_git_root%/bot
 
 echo.
 echo OSX
-plink %plink_options% %osx_logon% %scriptdir%/setbranch_master.sh  %linux_svn_root%/bot
+plink %plink_options% %osx_logon% %scriptdir%/setbranch_master.sh  %linux_git_root%/bot
 
 echo.
 pause

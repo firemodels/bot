@@ -39,17 +39,17 @@ echo.
 echo   Archiving FDS-Smokeview bundle for %platform%
 Title  Archiving FDS-Smokeview bundle for %platform%
 
-%svn_drive%
+%git_drive%
 
 if "%platform%" == "windows" (
   goto eof
 )
 if "%platform%" == "linux" (
-  plink %plink_options% %linux_logon% %linux_svn_root%/bot/Bundlebot/smv/scripts/archive_bundle.sh %version%_lnx
+  plink %plink_options% %linux_logon% %linux_git_root%/bot/Bundlebot/smv/scripts/archive_bundle.sh %version%_lnx
   goto eof
 )
 if "%platform%" == "osx" (
-  plink %plink_options% %osx_logon% %linux_svn_root%/bot/Bundlebot/smv/scripts/archive_bundle.sh %version%_osx
+  plink %plink_options% %osx_logon% %linux_git_root%/bot/Bundlebot/smv/scripts/archive_bundle.sh %version%_osx
   goto eof
 )
 

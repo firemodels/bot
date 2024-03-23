@@ -339,7 +339,7 @@ botscriptdir=$REPO_ROOT/bot/Scripts
 
 colorbarsdir=$smv_bundle/colorbars
 texturedir=$smv_bundle/textures
-MAKEINSTALLER=$REPO_ROOT/bot/Bundlebot/scripts/make_installer.sh
+MAKEINSTALLER=$REPO_ROOT/bot/Bundlebot/nightly/make_installer.sh
 
 fds_cases=$REPO_ROOT/fds/Verification/FDS_Cases.sh
 fds_benchmark_cases=$REPO_ROOT/fds/Verification/FDS_Benchmark_Cases.sh

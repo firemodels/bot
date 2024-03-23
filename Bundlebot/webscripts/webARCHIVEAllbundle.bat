@@ -26,10 +26,10 @@ echo.
 echo   Archiving Smokeview for Linux and OSX
 Title  Archiving Smokeview for Linux and OSX
 
-%svn_drive%
+%git_drive%
 
-plink %plink_options% %linux_logon% %linux_svn_root%/bot/Bundlebot/smv/scripts/archive_bundle.sh %version%_lnx
-plink %plink_options% %osx_logon% %linux_svn_root%/bot/Bundlebot/smv/scripts/archive_bundle.sh %version%_osx
+plink %plink_options% %linux_logon% %linux_git_root%/bot/Bundlebot/smv/scripts/archive_bundle.sh %version%_lnx
+plink %plink_options% %osx_logon% %linux_git_root%/bot/Bundlebot/smv/scripts/archive_bundle.sh %version%_osx
 
 :eof
 echo.
