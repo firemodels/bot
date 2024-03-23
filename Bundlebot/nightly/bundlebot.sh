@@ -305,7 +305,7 @@ if [ "$ECHO" == "" ]; then
     rm -f  $LATEST
     ln -s ${BUNDLEBASE}.sh $LATEST
   fi
-  cp $REPO_ROOT/bot/Bundlebot/scripts/autoinstall.txt $bundle_dir/.
+  cp $REPO_ROOT/bot/Bundlebot/nightly/autoinstall.txt $bundle_dir/.
   rm -f  ${BUNDLEBASE}.tar.gz
   rm -rf $BUNDLEBASE
   if [ "$INSTALL" != "" ]; then
