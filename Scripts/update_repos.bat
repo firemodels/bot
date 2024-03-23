@@ -22,6 +22,7 @@ set ahead=0
 set wc=%repo%\bot\Scripts\bin\wc
 set grep=%repo%\bot\Scripts\bin\grep
 set gawk=%repo%\bot\Scripts\bin\gawk
+set setbranchmaster=
 
 call :getopts %*
 if %stopscript% == 1 (
@@ -48,6 +49,9 @@ goto eof
      exit /b
   )   
   cd %repodir%
+  if "x%setbranchmaster%" == "x" goto skip_setbranch
+    git checkout master
+:skip_setbranch
   git rev-parse --abbrev-ref HEAD | head -1 > %CURDIR%\gitbranch.out
   set /p CURRENT_BRANCH=<%CURDIR%\gitbranch.out
   if NOT "%CURRENT_BRANCH%" == "%BRANCH%" (
@@ -110,6 +114,10 @@ goto eof
    set stopscript=1
    exit /b
  )
+ if /I "%1" EQU "-m" (
+   set setbranchmaster=1
+   exit /b
+ )
  shift
  if %valid% == 0 (
    echo.
@@ -128,6 +136,7 @@ echo Update the repos %allrepos% if they exist
 echo.
 echo Options:
 echo -h - display this message
+echo -m - checkout the master branch before updating a repo
 exit /b
 
 :eof
