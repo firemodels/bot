@@ -1095,13 +1095,13 @@ check_fds_pictures()
 
 run_matlab_license_test()
 {
+   DEBUG="strace -t -T -f -e trace=network -o $OUTPUT_DIR/stage7_matlab_strace"
    echo Matlab
    echo "   license test"
    # Run simple test to see if Matlab license is available
    cd $fdsrepo/Utilities/Matlab
    date -Iseconds &> $OUTPUT_DIR/stage7_matlab_license
-#   strace -t -T -f -e trace=network -o $OUTPUT_DIR/stage7_matlab_strace matlab -nodisplay -r "try, disp('Running Matlab License Check'), catch, disp('License Error'), err = lasterror, err.message, err.stack, end, exit" >> $OUTPUT_DIR/stage7_matlab_license 2>&1
-   matlab -nodisplay -r "try, disp('Running Matlab License Check'), catch, disp('License Error'), err = lasterror, err.message, err.stack, end, exit" >> $OUTPUT_DIR/stage7_matlab_license 2>&1
+   $DEBUG matlab -nodisplay -r "try, disp('Running Matlab License Check'), catch, disp('License Error'), err = lasterror, err.message, err.stack, end, exit" >> $OUTPUT_DIR/stage7_matlab_license 2>&1
    date -Iseconds >> $OUTPUT_DIR/stage7_matlab_license 2>&1
 #   matlab -nodisplay -r "try, disp('Running Matlab License Check'), catch, disp('License Error'), err = lasterror, err.message, err.stack, end, exit" &> $OUTPUT_DIR/stage7_matlab_license
 }
