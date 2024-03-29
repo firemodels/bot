@@ -1108,11 +1108,14 @@ check_python_setup()
 {
    # Check that python environment has been setup
    python_success=true
-   if [[ `grep "***error" $OUTPUT_DIR/stage7_python_setup` != "" ]]; then
+   if [[ `grep "***Error" $OUTPUT_DIR/stage7_python_setup` != "" ]]; then
      python_success=false
    fi
    if [[ `grep "Hello World" $OUTPUT_DIR/stage7_python_setup` == "" ]]; then
      python_success=false
+   fi
+   if [ $python == false ]; then
+      echo "Error from Stage 7 - Pytyon failed to be setup" >> $ERROR_LOG
    fi
 }
 
