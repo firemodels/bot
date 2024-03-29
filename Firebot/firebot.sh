@@ -1088,6 +1088,100 @@ check_fds_pictures()
       echo "" >> $WARNING_LOG
    fi
 }
+#---------------------------------------------
+#                   run_python_setup
+#---------------------------------------------
+
+run_python_setup()
+{
+   echo Python
+   echo "   setup environment"
+   cd $botrepo/Firebot/
+   source ./setup_python3.sh > $OUTPUT_DIR/stage7_python_setup 2>&1
+}
+
+#---------------------------------------------
+#                   check_python_setup
+#---------------------------------------------
+
+check_python_setup()
+{
+   # Check that python environment has been setup
+   python_success=true
+   if [[ `grep "***Error" $OUTPUT_DIR/stage7_python_setup` != "" ]]; then
+     python_success=false
+   fi
+   if [[ `grep "Hello World" $OUTPUT_DIR/stage7_python_setup` == "" ]]; then
+     python_success=false
+   fi
+   if [ $python == false ]; then
+      echo "Error from Stage 7 - Pytyon failed to be setup" >> $ERROR_LOG
+   fi
+}
+
+#---------------------------------------------
+#                   run_python_verification
+#---------------------------------------------
+
+run_python_verification()
+{
+   echo Python verification plots
+   cd $fdsrepo/Utilities/Python
+   python hello_world.py > $OUTPUT_DIR/stage7a_python_verification 2>&1
+}
+
+#---------------------------------------------
+#                   check_python_verification
+#---------------------------------------------
+
+check_python_verification()
+{
+   # Check that python environment has been setup
+   python_verification_success=true
+   if [[ `grep "Error" $OUTPUT_DIR/stage7a_python_verification` != "" ]]; then
+     python_verification_success=false
+   fi
+   if [[ `grep "Hello World" $OUTPUT_DIR/stage7a_python_verification` == "" ]]; then
+     python_verification_success=false
+   fi
+   if [ $python_verification_success == false ]; then
+     echo "Errors from Stage 7a - Python plotting and statistics (verification):" >> $ERROR_LOG
+     grep -B 5 -A 50 "Error" $OUTPUT_DIR/stage7a_python_verification | tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
+     echo "" >> $ERROR_LOG
+    fi
+}
+
+#---------------------------------------------
+#                   run_python_validation
+#---------------------------------------------
+
+run_python_validation()
+{
+   echo Python validation plots
+   cd $fdsrepo/Utilities/Python
+   python hello_world.py > $OUTPUT_DIR/stage7b_python_validation 2>&1
+}
+
+#---------------------------------------------
+#                   check_python_verification
+#---------------------------------------------
+
+check_python_validation()
+{
+   # Check that python environment has been setup
+   python_validation_success=true
+   if [[ `grep "Error" $OUTPUT_DIR/stage7b_python_validation` != "" ]]; then
+     python_validation_success=false
+   fi
+   if [[ `grep "Hello World" $OUTPUT_DIR/stage7b_python_validation` == "" ]]; then
+     python_validation_success=false
+   fi
+   if [ $python_validation_success == false ]; then
+     echo "Errors from Stage 7b - Python plotting and statistics (validation):" >> $ERROR_LOG
+     grep -B 5 -A 50 "Error" $OUTPUT_DIR/stage7b_python_validation | tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
+     echo "" >> $ERROR_LOG
+    fi
+}
 
 #---------------------------------------------
 #                   run_matlab_license_test
@@ -1159,7 +1253,7 @@ check_matlab_license_server()
 
 run_matlab_verification()
 {
-   echo "   verification plots"
+   echo "   matlab verification plots"
    # Run Matlab plotting script
    cd $fdsrepo/Utilities/Matlab
    matlab -nodisplay -r "try, disp('Running Matlab Verification script'), FDS_verification_script, catch, disp('Error'), err = lasterror, err.message, err.stack, end, exit" &> $OUTPUT_DIR/stage7a_verification
@@ -2757,6 +2851,24 @@ MATLAB_beg=`GET_TIME`
 
 ###*** Stage 7a ###
 
+#*** python verification plots
+
+    run_python_setup
+    check_python_setup
+    if [ $python_success == true ]; then
+      run_python_verification
+      check_python_verification
+    fi
+
+#*** python validation plots
+
+    if [ $python_success == true ]; then
+      run_python_validation
+      check_python_validation
+    fi
+
+#*** matlab verification plots
+
     check_matlab_license_server
     if [ $matlab_success == true ]; then
       run_matlab_verification
@@ -2765,6 +2877,8 @@ MATLAB_beg=`GET_TIME`
     fi
 
 ###*** Stage 7b ###
+
+#*** matlab validation plots
 
     check_matlab_license_server
     if [ $matlab_success == true ]; then
