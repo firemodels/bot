@@ -1097,7 +1097,7 @@ run_python_setup()
    echo Python
    echo "   setup environment"
    cd $botrepo/Firebot/
-   source ./setup_python > $OUTPUT_DIR/stage7_python_setup 2>&1
+   source ./setup_python3.sh > $OUTPUT_DIR/stage7_python_setup 2>&1
 }
 
 #---------------------------------------------
@@ -1111,7 +1111,7 @@ check_python_setup()
    if [[ `grep "***error" $OUTPUT_DIR/stage7_python_setup` != "" ]]; then
      python_success=false
    fi
-   if [[ `grep "Hello world" $OUTPUT_DIR/stage7_python_setup` == "" ]]; then
+   if [[ `grep "Hello World" $OUTPUT_DIR/stage7_python_setup` == "" ]]; then
      python_success=false
    fi
 }
@@ -1138,7 +1138,7 @@ check_python_verification()
    if [[ `grep "Error" $OUTPUT_DIR/stage7a_python_verification` != "" ]]; then
      python_verification_success=false
    fi
-   if [[ `grep "Hello world" $OUTPUT_DIR/stage7a_python_verification` == "" ]]; then
+   if [[ `grep "Hello World" $OUTPUT_DIR/stage7a_python_verification` == "" ]]; then
      python_verification_success=false
    fi
    if [ $python_verification_success == false ]; then
@@ -1170,7 +1170,7 @@ check_python_validation()
    if [[ `grep "Error" $OUTPUT_DIR/stage7b_python_validation` != "" ]]; then
      python_validation_success=false
    fi
-   if [[ `grep "Hello world" $OUTPUT_DIR/stage7b_python_validation` == "" ]]; then
+   if [[ `grep "Hello World" $OUTPUT_DIR/stage7b_python_validation` == "" ]]; then
      python_validation_success=false
    fi
    if [ $python_validation_success == false ]; then
@@ -2342,24 +2342,6 @@ figrepo=$repo/fig
 outrepo=$repo/out
 exprepo=$repo/exp
 cadrepo=$repo/cad
-
-#put python routines temporarily here at beginning of firebot script
-#*** python verification plots
-
-    run_python_setup
-    check_python_setup
-    if [ $python_success == true ]; then
-      run_python_verification
-      check_python_verification
-    fi
-
-#*** python validation plots
-
-    if [ $python_success == true ]; then
-      run_python_validation
-      check_python_validation
-    fi
-    exit
 
 if [ "$CLONEFILE" != "" ]; then
   CLONEFILE=$botrepo/Bundlebot/release/BUILD_config.sh

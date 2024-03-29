@@ -1,9 +1,9 @@
 #!/bin/bash
 # setup environment for python 3 and run the hello_world.py to test the setup
 
-HAVEPYTHON3=`which python3 |& grep -v 'no python3'`
-if [ "$HAVEPYTHON3" != "" ]; then
-  echo "***error: python3 is not installed"
+NOT_INSTALLED=`which python3 |& grep 'no python3'`
+if [ "$NOT_INSTALLED" != "" ]; then
+  echo "***Error: python3 is not installed"
 else
   curdir=`pwd`
   cd ../..
