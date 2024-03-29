@@ -1088,6 +1088,17 @@ check_fds_pictures()
       echo "" >> $WARNING_LOG
    fi
 }
+#---------------------------------------------
+#                   run_python_setup
+#---------------------------------------------
+
+run_python_setup()
+{
+   echo Python
+   echo "   setup environment"
+   cd $botrepo/Firebot/
+   source ./setup_python > $OUTPUT_DIR/stage7_python_setup 2>&1
+}
 
 #---------------------------------------------
 #                   run_matlab_license_test
