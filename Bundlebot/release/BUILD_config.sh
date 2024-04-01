@@ -24,8 +24,6 @@ export BUNDLE_FIG_TAG=FIG-6.9.1test
 export BUNDLE_OUT_REVISION=6b7ac2e39
 export BUNDLE_OUT_TAG=OUT-6.9.1test
 
-# lines below should not need to be changed
+# the line below should not need to be changed
 
-export GH_REPO=test_bundles
-export GH_FDS_TAG=BUNDLE_TEST
-export GH_SMOKEVIEW_TAG=BUNDLE_TEST
+source GITHUB_config.sh
