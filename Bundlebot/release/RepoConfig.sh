@@ -9,7 +9,7 @@ REVISION=`git rev-parse --short HEAD`
 REPO=$(echo "$repo" | awk '{print toupper($0)}')
 TAG=$REPO-${base_tag}
 cat << EOF
- $REPOVERSION
+# $REPOVERSION
 export BUNDLE_${REPO}_REVISION=$REVISION
 export BUNDLE_${REPO}_TAG=$TAG
 
