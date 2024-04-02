@@ -5,10 +5,10 @@
 # ./MakeBuild_config.sh x.y.z BOTH
 
 # build both bash config script
-# ./MakeBuild_config.sh x.y.z BASH
+# ./Make_config.sh x.y.z BASH
 
 # build both dos config script
-# ./MakeBuild_config.sh x.y.z  DOS
+# ./Make_config.sh x.y.z  DOS
 
 # where x.y.z is the version being bundled
 
@@ -16,9 +16,9 @@ base_tag=$1
 OS=$2
 
 if [ "$OS" == "BOTH" ]; then
-  ./MakeBuild_config.sh $base_tag BASH > config.sh
+  ./Make_config.sh $base_tag BASH > config.sh
   cp config.sh history/config_${base_tag}.sh
-  ./MakeBuild_config.sh $base_tag DOS  > config.bat
+  ./Make_config.sh $base_tag DOS  > config.bat
   cp config.bat history/config_${base_tag}.bat
   exit
 fi
