@@ -4,8 +4,23 @@
 base_tag=$1
 OS=$2
 
-if [ "$OS" != "DOS" ]; then
-  OS="BASH"
+if [ "$OS" == "BOTH" ]; then
+  ./MakeBuild_config.sh $base_tag BASH > BUILD_config.sh
+  cp BUILD_config.sh history/BUILD_config_${base_tag}.sh
+  ./MakeBuild_config.sh $base_tag DOS  > BUILD_config.bat
+  cp BUILD_config.bat history/BUILD_config_${base_tag}.bat
+  exit
+fi
+ERROR=1
+if [ "$OS" == "DOS" ]; then
+  ERROR=
+fi
+if [ "$OS" == "BASH" ]; then
+  ERROR=
+fi
+if [ "$ERROR" != "" ]; then
+  echo "***Error: found OS option $OS must be BASH, DOS or BOTH"
+  exit
 fi
 if [ "$OS" == "BASH" ]; then
   HEAD="#!/bin/bash"
