@@ -1,7 +1,7 @@
 #!/bin/bash
 
 CURDIR=`pwd`
-source BUILD_config.sh
+source config.sh
 
 cd bundles
 BUNDLEDIR=`pwd`

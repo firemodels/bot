@@ -1,5 +1,5 @@
 @echo off
-call BUILD_config
+call config
 set BUNDLE_SMV_TAG=SMV-6.9.0test
 
 

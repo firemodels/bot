@@ -1,6 +1,6 @@
 @echo off
 set CURDIR=%CD%
-call BUILD_config.bat
+call config.bat
 
 set TEST=
 :: uncomment following line to test script (does not upload bundle to github or run gh command)
