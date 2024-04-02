@@ -2,7 +2,7 @@
 setlocal
 
 set CURDIR=%CD%
-call BUILD_config.bat
+call config
 
 cd bundles
 set BUNDLEDIR=%CD%

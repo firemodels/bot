@@ -1,6 +1,6 @@
 #!/bin/bash
-# build a release bundle using revision and tags defined in BUILD_config.sh .
-source BUILD_config.sh
+# build a release bundle using revision and tags defined in config.sh .
+source config.sh
 if [ "$GH_REPO" != "" ]; then
   GHREPO="-r $GH_REPO"
 fi

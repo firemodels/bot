@@ -16,10 +16,10 @@ base_tag=$1
 OS=$2
 
 if [ "$OS" == "BOTH" ]; then
-  ./MakeBuild_config.sh $base_tag BASH > BUILD_config.sh
-  cp BUILD_config.sh history/BUILD_config_${base_tag}.sh
-  ./MakeBuild_config.sh $base_tag DOS  > BUILD_config.bat
-  cp BUILD_config.bat history/BUILD_config_${base_tag}.bat
+  ./MakeBuild_config.sh $base_tag BASH > config.sh
+  cp config.sh history/config_${base_tag}.sh
+  ./MakeBuild_config.sh $base_tag DOS  > config.bat
+  cp config.bat history/config_${base_tag}.bat
   exit
 fi
 ERROR=1
