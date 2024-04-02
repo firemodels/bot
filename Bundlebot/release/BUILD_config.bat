@@ -24,8 +24,6 @@ set BUNDLE_FIG_TAG=FIG-6.9.1test
 set BUNDLE_OUT_REVISION=6b7ac2e39
 set BUNDLE_OUT_TAG=OUT-6.9.1test
 
-:: lines below should not need to be changed
+:: line below should not need to be changed
 
-set GH_REPO=test_bundles
-set GH_FDS_TAG=BUNDLE_TEST
-set GH_SMOKEVIEW_TAG=BUNDLE_TEST
+call GITHUB_config.bat
