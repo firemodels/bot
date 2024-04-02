@@ -1,5 +1,16 @@
 #!/bin/bash
-# This scripts obtains revisions and tags for a bundle.
+# This script builds the configuration scripts used to build the bundles
+# usage:
+# build both bash and dos config scripts
+# ./MakeBuild_config.sh x.y.z BOTH
+
+# build both bash config script
+# ./MakeBuild_config.sh x.y.z BASH
+
+# build both dos config script
+# ./MakeBuild_config.sh x.y.z  DOS
+
+# where x.y.z is the version being bundled
 
 base_tag=$1
 OS=$2
@@ -43,17 +54,30 @@ cd $CURDIR
 cat << EOF
 $HEAD
 $COMMENT This scripts defines revisions and tags for a bundle.
-$COMMENT It is run by the other BUILD scripts.
-$COMMENT You do not need to run it.
+$COMMENT It is run by other BUILD scripts to define the environment.
+$COMMENT ----------------------------
+$COMMENT repo environment variables
 
 EOF
 
 for repo in $repos
 do
-./RepoConfig.sh $gitroot $repo $base_tag 
+cd $gitroot/$repo
+REPOVERSION=`git describe --dirty --long`
+REVISION=`git rev-parse --short HEAD`
+REPO=$(echo "$repo" | awk '{print toupper($0)}')
+TAG=$REPO-${base_tag}
+cat << EOF
+$COMMENT $REPOVERSION
+$EXPORT BUNDLE_${REPO}_REVISION=$REVISION
+$EXPORT BUNDLE_${REPO}_TAG=$TAG
+
+EOF
+
 done
 cat << EOF
-$COMMENT the lines below should not need to be changed
+$COMMENT ----------------------------
+$COMMENT github environment variables
 
 $EXPORT GH_REPO=test_bundles
 $EXPORT GH_FDS_TAG=BUNDLE_TEST
