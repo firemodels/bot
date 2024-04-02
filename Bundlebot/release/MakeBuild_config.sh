@@ -2,9 +2,6 @@
 # This scripts obtains revisions and tags for a bundle.
 
 base_tag=$1
-if [ "$OUTFILE" == "" ]; then
-  OUTFILE=STDOUT
-fi
 
 repos="fds smv cad exp fig out"
 CURDIR=`pwd`
