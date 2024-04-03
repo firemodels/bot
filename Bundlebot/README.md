@@ -5,7 +5,7 @@
 
 The directory [bot/Bundlebot/release](https://github.com/firemodels/bot/tree/master/Bundlebot/release) contains scripts for building FDS/Smokeview bundles on Windows, Linux and OSX computers. The workflow is to edit configuration scripts defining tags and associated revisions, run scripts for building FDS and Smokeview manuals and finally run scripts for building the bundles.  These steps are given in more detail below: 
 
-   1. edit `config.sh` and `config.bat` defining revision and tag environmental variables for this bundle.  Commit and push up changes to the central repo. You may also run the script
+   1. Edit `config.sh` and `config.bat` defining revision and tag environmental variables for this bundle.  Commit and push up changes to the central repo. You may also run the script
       
       `./Make_config.sh x.y.z BOTH`
       
