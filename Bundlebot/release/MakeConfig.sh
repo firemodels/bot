@@ -16,9 +16,9 @@ base_tag=$1
 OS=$2
 
 if [ "$OS" == "BOTH" ]; then
-  ./Make_config.sh $base_tag BASH > config.sh
+  ./MakeConfig.sh $base_tag BASH > config.sh
   cp config.sh history/config_${base_tag}.sh
-  ./Make_config.sh $base_tag DOS  > config.bat
+  ./MakeConfig.sh $base_tag DOS  > config.bat
   cp config.bat history/config_${base_tag}.bat
   exit
 fi
