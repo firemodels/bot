@@ -7,7 +7,7 @@ The directory [bot/Bundlebot/release](https://github.com/firemodels/bot/tree/mas
 
    1. Edit `config.sh` and `config.bat` scripts to define revision and tag environmental variables for this bundle.  Commit and push up these changes to the central repo. You may also run the script
       
-      `./MakeConfig.sh x.y.z BOTH`
+      `./MakeConfig.sh x.y.z`
       
       to update the configure scripts `config.sh` and `config.bat` where `x.y.z` is the version number of the release.
    3. Type: `sudo su - firebot` on the computer that runs firebot (blaze at Nist) to switch to the firebot user account.
