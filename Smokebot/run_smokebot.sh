@@ -51,6 +51,8 @@ echo "-y smv_rev - checkout smv repo using smv_rev revision [default: origin/mas
 echo "-Y smv_tag - when cloning, tag the smv repo with smv_tag"
 echo "   the -x and -y options are only used with the -R option i.e. when"
 echo "   the repos are being cloned"
+echo "-z file - use revisions and tags in file to clone repos"
+
 }
 
 #---------------------------------------------
@@ -184,6 +186,7 @@ USE_BOT_QFDS=
 WEB_ROOT=/var/www/html
 GNU=
 CACHE_DIR=
+CLONEFILE=
 
 #*** check to see if a queing system is available
 
@@ -195,7 +198,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'aAB:bcCDfFg:G:hHJkm:Mo:Pq:r:R:s:STuUvw:W:x:X:y:Y:' OPTION
+while getopts 'aAB:bcCDfFg:G:hHJkm:Mo:Pq:r:R:s:STuUvw:W:x:X:y:Y:z' OPTION
 do
 case $OPTION  in
   a)
@@ -294,6 +297,9 @@ case $OPTION  in
    ;;
   Y)
    SMV_TAG="-Y $OPTARG"
+   ;;
+  z)
+   CLONEFILE="-z"
    ;;
   \?)
   echo "***error: unknown option entered. aborting smokebot"
@@ -447,7 +453,7 @@ BRANCH="-b $BRANCH"
 #*** run smokebot
 
 touch $smokebot_pid
-$ECHO ./$botscript $SIZE $BRANCH $SANITIZE $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $CLONE_REPOS $CACHE_DIR $FORCE $GNU $RUNAUTO $INTEL $CLEANREPO $WEB_DIR $WEB_ROOT $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $SIZE $BRANCH $SANITIZE $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $CLONE_REPOS $CACHE_DIR $FORCE $GNU $RUNAUTO $INTEL $CLEANREPO $WEB_DIR $WEB_ROOT $CLONEFILE $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi
