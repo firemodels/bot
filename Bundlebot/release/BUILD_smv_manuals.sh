@@ -21,4 +21,5 @@ if [ "$GH_REPO" != "" ]; then
   GHREPO="-r $GH_REPO"
 fi
 cd ../../Smokebot
-./run_smokebot.sh -C -c -u -J -f -q smokebot $MAILTO -x $BUNDLE_FDS_REVISION -X $BUNDLE_FDS_TAG -y $BUNDLE_SMV_REVISION -Y $BUNDLE_SMV_TAG $GHOWNER $GHREPO -U -R release
+#./run_smokebot.sh -C -c -u -J -f -q smokebot $MAILTO -x $BUNDLE_FDS_REVISION -X $BUNDLE_FDS_TAG -y $BUNDLE_SMV_REVISION -Y $BUNDLE_SMV_TAG $GHOWNER $GHREPO -U -R release
+./run_smokebot.sh -C -c -u -J -f -q smokebot $MAILTO -z $GHOWNER $GHREPO -U -R release
