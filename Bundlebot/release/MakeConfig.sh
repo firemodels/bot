@@ -4,9 +4,6 @@
 # build both bash and dos config scripts
 # ./MakeBuild_config.sh x.y.z
 
-BOTVERSION=`git describe --dirty --long`
-BOTREVISION=`git rev-parse --short HEAD`
-export BOTVERSION BOTREVISION
 # build bash config script
 # ./Make_config.sh x.y.z BASH
 
@@ -19,6 +16,9 @@ base_tag=$1
 OS=$2
 
 if [ "$OS" == "" ]; then
+  BOTVERSION=`git describe --dirty --long`
+  BOTREVISION=`git rev-parse --short HEAD`
+  export BOTVERSION BOTREVISION
   ./MakeConfig.sh $base_tag BASH > config.sh
   cp config.sh history/config_${base_tag}.sh
   ./MakeConfig.sh $base_tag DOS  > config.bat
