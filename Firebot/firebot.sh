@@ -1131,7 +1131,7 @@ run_python_verification()
 {
    echo Python verification plots
    cd $fdsrepo/Utilities/Python
-   python hello_world.py > $OUTPUT_DIR/stage7a_python_verification 2>&1
+   python FDS_verification_script.py > $OUTPUT_DIR/stage7a_python_verification 2>&1
 }
 
 #---------------------------------------------
@@ -1145,9 +1145,9 @@ check_python_verification()
    if [[ `grep "Error" $OUTPUT_DIR/stage7a_python_verification` != "" ]]; then
      python_verification_success=false
    fi
-   if [[ `grep "Hello World" $OUTPUT_DIR/stage7a_python_verification` == "" ]]; then
-     python_verification_success=false
-   fi
+   # if [[ `grep "Hello World" $OUTPUT_DIR/stage7a_python_verification` == "" ]]; then
+   #   python_verification_success=false
+   # fi
    if [ $python_verification_success == false ]; then
      echo "Errors from Stage 7a - Python plotting and statistics (verification):" >> $ERROR_LOG
      grep -B 5 -A 50 "Error" $OUTPUT_DIR/stage7a_python_verification | tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
