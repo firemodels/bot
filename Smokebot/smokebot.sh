@@ -1203,21 +1203,6 @@ make_guide()
 }
 
 #---------------------------------------------
-#                   CHECKOUT_REPO
-#---------------------------------------------
-
-CHECKOUT_REPO()
-{
- local_branch=$1
- local_repo=$2
- local_rev=$3
- local_tag=$4
-
- cd $local_repo
- git checkout -b $local_branch $local_tag         >> $OUTPUT_DIR/stage1_clone 2>&1
-}
-
-#---------------------------------------------
 #                   save_build_status
 #---------------------------------------------
 
@@ -1572,7 +1557,6 @@ SANITIZE=
 compile_errors=
 GITURL=
 CACHE_DIR=
-CLONEFILE=
 HAVEMAIL=`which mail |& grep -v 'no mail'`
 
 #*** save pid so -k option (kill smokebot) may be used lateer
@@ -1581,7 +1565,7 @@ echo $$ > $PID_FILE
 
 #*** parse command line options
 
-while getopts 'aAb:cCDJm:Mq:R:s:SuUw:W:x:X:y:Y:z' OPTION
+while getopts 'aAb:cCDJm:Mq:R:s:SuUw:W:x:X:y:Y:' OPTION
 do
 case $OPTION in
   a)
@@ -1658,9 +1642,6 @@ case $OPTION in
   Y)
    SMV_TAG="$OPTARG"
    ;;
-  z)
-   CLONEFILE=1
-   ;;
 esac
 done
 shift $(($OPTIND-1))
@@ -1736,14 +1717,6 @@ fdsrepo=$repo/fds
 smvrepo=$repo/smv
 figrepo=$repo/fig
 
-if [ "$CLONEFILE" != "" ]; then
-  CLONEFILE=$botrepo/Bundlebot/release/config.sh
-  if [ ! -x $CLONEFILE ]; then
-    echo "***error: $CLONEFILE does not exist or is not executable"
-    CLONEFILE=
-  fi
-fi
-
 size=
 GNU_MPI=ompi_
 
@@ -1778,33 +1751,20 @@ if [[ "$CLONE_REPOS" != "" ]]; then
 
 # only clone fds and smv repos
    # clone all repos
-  ./setup_repos.sh -F $FORCECLONE              > $OUTPUT_DIR/stage1_clone 2>&1
+    ./setup_repos.sh -F $FORCECLONE              > $OUTPUT_DIR/stage1_clone 2>&1
   if [[ "$CLONE_REPOS" != "master" ]]; then
-    if [ "$CLONEFILE" == "" ]; then
-      FDSBRANCH=$CLONE_REPOS
-      CHECKOUT_REPO $FDSBRANCH $fdsrepo $FDS_REV $FDS_TAG
+    FDSBRANCH=$CLONE_REPOS
+    cd $fdsrepo
+    git checkout -b $FDSBRANCH $FDS_REV          >> $OUTPUT_DIR/stage1_clone 2>&1
+    if [ "$FDS_TAG" != "" ]; then
+      git tag -a $FDS_TAG -m "tag for $FDS_TAG"  >> $OUTPUT_DIR/stage1_clone 2>&1
+    fi
 
-      SMVBRANCH=$CLONE_REPOS
-      CHECKOUT_REPO $SMVBRANCH $smvrepo $SMV_REV $SMV_TAG
-    else
-      source $CLONEFILE
-      FDSBRANCH=$CLONE_REPOS
-      CHECKOUT_REPO $FDSBRANCH $fdsrepo $BUNDLE_FDS_REVISION  $BUNDLE_FDS_TAG
-
-      SMVBRANCH=$CLONE_REPOS
-      CHECKOUT_REPO $SMVBRANCH $smvrepo $BUNDLE_SMV_REVISION  $BUNDLE_SMV_TAG
-
-      CADBRANCH=$CLONE_REPOS
-      CHECKOUT_REPO $CADBRANCH $cadrepo $BUNDLE_CAD_REVISION  $BUNDLE_CAD_TAG
-
-      EXPBRANCH=$CLONE_REPOS
-      CHECKOUT_REPO $EXPBRANCH $exprepo $BUNDLE_EXP_REVISION  $BUNDLE_EXP_TAG
-
-      FIGBRANCH=$CLONE_REPOS
-      CHECKOUT_REPO $FIGBRANCH $figrepo $BUNDLE_FIG_REVISION  $BUNDLE_FIG_TAG
-
-      OUTBRANCH=$CLONE_REPOS
-      CHECKOUT_REPO $OUTBRANCH $outrepo $BUNDLE_OUT_REVISION  $BUNDLE_OUT_TAG
+    SMVBRANCH=$CLONE_REPOS
+    cd $smvrepo
+    git checkout -b $SMVBRANCH $SMV_REV          >> $OUTPUT_DIR/stage1_clone 2>&1
+    if [ "$SMV_TAG" != "" ]; then
+      git tag -a $SMV_TAG -m "tag for $SMV_TAG"  >> $OUTPUT_DIR/stage1_clone 2>&1
     fi
   fi
 fi
