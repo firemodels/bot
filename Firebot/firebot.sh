@@ -1131,7 +1131,7 @@ run_python_verification()
 {
    echo Python verification plots
    cd $fdsrepo/Utilities/Python
-   python FDS_verification.py > $OUTPUT_DIR/stage7a_python_verification 2>&1
+   python FDS_verification_script.py > $OUTPUT_DIR/stage7a_python_verification 2>&1
 }
 
 #---------------------------------------------
