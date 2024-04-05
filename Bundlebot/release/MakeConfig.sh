@@ -4,6 +4,9 @@
 # build both bash and dos config scripts
 # ./MakeBuild_config.sh x.y.z
 
+BOTVERSION=`git describe --dirty --long`
+BOTREVISION=`git rev-parse --short HEAD`
+export BOTVERSION BOTREVISION
 # build bash config script
 # ./Make_config.sh x.y.z BASH
 
@@ -65,6 +68,10 @@ do
 cd $gitroot/$repo
 REPOVERSION=`git describe --dirty --long`
 REVISION=`git rev-parse --short HEAD`
+if [ "$repo" == "bot" ]; then
+  REPOVERSION=$BOTVERSION
+  REVISION=$BOTREVISION
+fi
 REPO=$(echo "$repo" | awk '{print toupper($0)}')
 TAG=$REPO-${base_tag}
 cat << EOF
