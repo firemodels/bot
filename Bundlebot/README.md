@@ -10,14 +10,15 @@ The directory [bot/Bundlebot/release](https://github.com/firemodels/bot/tree/mas
       `./MakeConfig.sh x.y.z`
       
    where `x.y.z` is the version number of the release.
-   4. Type: `sudo su - firebot` on the computer that runs firebot (blaze at Nist) to switch to the firebot user account.
-   5. Type: `cd FireModels_bundle/bot/Bundlebot/release` and update the `bot` repo.
-   6. Type: `nohup ./BUILD_fds_manuals.sh &` to build the FDS manuals.  After this step completes (about 7 hours) continue to the next step
-   7. Type: `nohup ./BUILD_smv_manuals.sh &` to build the Smokeview manuals (in the same account). After this step completes (about 30 minutes) continue to the next step
-   8. Type : `nohup ./BUILD_fdssmv_bundle.sh &` on a Linux computer to build a Linux bundle.
-   9. Type : `nohup ./BUILD_fdssmv_bundle.sh &` on a Mac computer to build a Mac bundle.
-   10. Type: `BUILD_fdssmv_bundle ` on a Windows PC to build a Windows bundle. (nohup is not available on Windows).
-   11. Type: `GetBundles.sh` when the bundles are ready to be published to download the bundles to the `bot/Bundlebot/build/bundles` directory .  Type `GetBundles.bat` if on a PC . Draft a new release at https://github.com/firemodels/fds/releases then upload the bundles from the `bundles` directory to this new release.
+   
+   2. Type: `sudo su - firebot` on the computer that runs firebot (blaze at Nist) to switch to the firebot user account.
+   3. Type: `cd FireModels_bundle/bot/Bundlebot/release` and update the `bot` repo.
+   4. Type: `nohup ./BUILD_fds_manuals.sh &` to build the FDS manuals.  After this step completes (about 7 hours) continue to the next step
+   5. Type: `nohup ./BUILD_smv_manuals.sh &` to build the Smokeview manuals (in the same account). After this step completes (about 30 minutes) continue to the next step
+   6. Type : `nohup ./BUILD_fdssmv_bundle.sh &` on a Linux computer to build a Linux bundle.
+   7. Type : `nohup ./BUILD_fdssmv_bundle.sh &` on a Mac computer to build a Mac bundle.
+   8. Type: `BUILD_fdssmv_bundle ` on a Windows PC to build a Windows bundle. (nohup is not available on Windows).
+   9. Type: `GetBundles.sh` when the bundles are ready to be published to download the bundles to the `bot/Bundlebot/build/bundles` directory .  Type `GetBundles.bat` if on a PC . Draft a new release at https://github.com/firemodels/fds/releases then upload the bundles from the `bundles` directory to this new release.
 
 ### Notes
       
