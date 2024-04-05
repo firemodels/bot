@@ -44,7 +44,7 @@ else
 fi
 export HEAD COMMENT EXPORT
 
-repos="cad exp fds fig out smv"
+repos="bot cad exp fds fig out smv"
 CURDIR=`pwd`
 gitroot=$CURDIR/../../..
 cd $gitroot
