@@ -40,7 +40,7 @@ echo "$BUNDLE_FIG_TAG (config)"
 echo ""
 
 GETREV out
-(echo "$BUNDLE_OUT_REVISION config)"
+echo "$BUNDLE_OUT_REVISION config)"
 echo "$BUNDLE_OUT_TAG (config)"
 echo ""
 
