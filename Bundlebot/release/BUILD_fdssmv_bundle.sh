@@ -8,7 +8,7 @@ fi
 echo ***updating repos
 CURDIR=`pwd`
 cd ../../Scripts
-./update_repos.sh
+./update_repos.sh -m
 cd $CURDIR
 
 cd ../nightly
