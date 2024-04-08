@@ -2,10 +2,14 @@
 set CURDIR=%CD%
 call config.bat
 
+cd ..\..\Scripts
+call update_repos -m
+
 set TEST=
 :: uncomment following line to test script (does not upload bundle to github or run gh command)
 :: set TEST=-U
 
+cd %CURDIR%
 cd ..\nightly
 call run_bundlebot -c -R release -F %BUNDLE_FDS_REVISION% -X %BUNDLE_FDS_TAG% -S %BUNDLE_SMV_REVISION% -Y %BUNDLE_SMV_TAG% %TEST%
 cd %CURDIR%
