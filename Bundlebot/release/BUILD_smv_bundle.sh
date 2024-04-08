@@ -1,7 +1,7 @@
 #!/bin/bash
 # build a release bundle using revision and tags defined in config.sh .
 source config.sh
-export BUNDLE_SMV_TAG=SMV-6.9.0test
+export BUNDLE_SMV_TAG=SMV-6.9.1
 export GH_SMOKEVIEW_TAG=SMOKEVIEW_TEST2
 
 CURDIR=`pwd`

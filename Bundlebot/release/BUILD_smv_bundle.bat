@@ -1,6 +1,6 @@
 @echo off
 call config
-set BUNDLE_SMV_TAG=SMV-6.9.0test
+set BUNDLE_SMV_TAG=SMV-6.9.1
 
 
 set basename=%BUNDLE_SMV_TAG%_win
