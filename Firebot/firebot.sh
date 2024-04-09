@@ -2179,11 +2179,15 @@ BOPT=
 GITURL=
 MAKE_SUMMARY=
 CLONEFILE=
+DISABLEPUSH=
 
 #*** parse command line arguments
-while getopts 'b:BcCdDJm:Mp:q:R:sTuUV:x:X:y:Y:w:W:z' OPTION
+while getopts 'ab:BcCdDJm:Mp:q:R:sTuUV:x:X:y:Y:w:W:z' OPTION
 do
 case $OPTION in
+  a)
+   DISABLEPUSH="-D"
+   ;;
   b)
    BOPT=1
    BRANCH="$OPTARG"
@@ -2406,10 +2410,10 @@ if [[ "$CLONE_REPOS" != "" ]]; then
   cd $botrepo/Scripts
   if [ "$CLONE_FDSSMV" != "" ]; then
    # only clone the fds and smv repos - used when just compiling the fds and smv apps
-    ./setup_repos.sh $FORCECLONE -T > $OUTPUT_DIR/stage1_clone 2>&1
+    ./setup_repos.sh $DISABLEPUSH $FORCECLONE -T > $OUTPUT_DIR/stage1_clone 2>&1
   else
    # clone all repos
-    ./setup_repos.sh $FORCECLONE -F > $OUTPUT_DIR/stage1_clone 2>&1
+    ./setup_repos.sh $DISABLEPUSH $FORCECLONE -F > $OUTPUT_DIR/stage1_clone 2>&1
   fi
   if [ "$CLONE_REPOS" != "master" ]; then
     if [ "$CLONEFILE" == "" ]; then
