@@ -8,6 +8,7 @@ echo "-a - setup all available repos: "
 echo "    $allrepos"
 echo "-c - setup repos used by cfastbot: "
 echo "    $cfastrepos"
+echo "-D - do not disable access to firemodels"
 echo "-f - setup repos used by firebot: "
 echo "    $fdsrepos"
 echo "-F - setup repos used by firebot (erase each repo first): "
@@ -37,10 +38,12 @@ SETUP_REMOTE ()
   fi
   cd $repo_dir
   if [ "$GITUSER" == "firemodels" ]; then
-     ndisable=`git remote -v | grep DISABLE | wc -l`
-     if [ $ndisable -eq 0 ]; then
-        echo disabling push access to firemodels
-        git remote set-url --push origin DISABLE
+     if [ "$DISABLEPUSH" != "" ]; then
+       ndisable=`git remote -v | grep DISABLE | wc -l`
+       if [ $ndisable -eq 0 ]; then
+          echo disabling push access to firemodels
+          git remote set-url --push origin DISABLE
+       fi
      fi
   else
      if [ "$repo" == "openvkl" ]; then
@@ -54,12 +57,14 @@ SETUP_REMOTE ()
         git remote add $CENTRAL ${GITHEADER}$CENTRAL/$repo.git
         git remote update
      fi
-     ndisable=`git remote -v | grep DISABLE | wc -l`
-     if [ $ndisable -eq 0 ]; then
-       echo "   disabling push access to $CENTRAL"
-       git remote set-url --push $CENTRAL DISABLE
-     else
-       echo "   push access to $CENTRAL already disabled"
+     if [ "$DISABLEPUSH" != "" ]; then
+       ndisable=`git remote -v | grep DISABLE | wc -l`
+       if [ $ndisable -eq 0 ]; then
+         echo "   disabling push access to $CENTRAL"
+         git remote set-url --push $CENTRAL DISABLE
+       else
+         echo "   push access to $CENTRAL already disabled"
+       fi
      fi
   fi
 }
@@ -79,6 +84,7 @@ repos=$fdsrepos
 eraserepos=
 FORCECLONE=
 APPENDTEST=
+DISABLEPUSH=1
 
 FMROOT=
 WIKIWEB=
@@ -90,7 +96,7 @@ else
    exit
 fi
 
-while getopts 'abcCfFGH:hsStTUvw' OPTION
+while getopts 'abcCDfFGH:hsStTUvw' OPTION
 do
 case $OPTION  in
   a)
@@ -101,6 +107,9 @@ case $OPTION  in
    ;;
   C)
    FORCECLONE=1;
+   ;;
+  D)
+   DISABLEPUSH=
    ;;
   f)
    repos=$fdsrepos;
