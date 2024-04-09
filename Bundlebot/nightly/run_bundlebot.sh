@@ -290,9 +290,9 @@ cd $curdir
 cd $repo/bot/Firebot
 if [ "$platform" == "osx" ]; then
 # remove || exit 1 until compiler warnings are removed
-$ECHO ./run_firebot.sh $FORCE -c -C -B -F $JOPT $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG $FIREBOT_BRANCH -T $MAILTO
+$ECHO ./run_firebot.sh -a $FORCE -c -C -B -F $JOPT $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG $FIREBOT_BRANCH -T $MAILTO
 else
-$ECHO ./run_firebot.sh $FORCE -c -C -B -F $JOPT $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG $FIREBOT_BRANCH -T $MAILTO || exit 1
+$ECHO ./run_firebot.sh -a $FORCE -c -C -B -F $JOPT $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG $FIREBOT_BRANCH -T $MAILTO || exit 1
 fi
 
 #*** generate and upload bundle
