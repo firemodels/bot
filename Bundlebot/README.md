@@ -3,22 +3,35 @@
 
 ### Overview
 
-The directory [bot/Bundlebot/release](https://github.com/firemodels/bot/tree/master/Bundlebot/release) contains scripts for building FDS/Smokeview bundles on Windows, Linux and Macintosh computers. The procedure for bulding bundles is to edit configuration scripts that define tags and associated revisions, to run scripts that build FDS and Smokeview manuals and finally to run scripts that build the bundles.  These steps are given in more detail below: 
+The directory [bot/Bundlebot/release](https://github.com/firemodels/bot/tree/master/Bundlebot/release) contains scripts for building FDS/Smokeview bundles on Windows, Linux and Macintosh computers. The procedure for bulding bundles is to edit configuration scripts that define tags and associated revisions, to run scripts that build FDS and Smokeview manuals and finally to run scripts that build the bundles.  These steps are given in more detail below.
 
-   1. Edit `config.sh` and `config.bat` scripts to define revision and tag environmental variables for this bundle.  Commit and push up these changes to the central repo. You may also update the `config.sh` and `config.bat` scripts by running the following script (after updating repos to the desired revision)
+### Configure
+
+   1. cd to bot/Scripts and run the script `./update_repos.sh -m` to update repos .  The option `-m` makes sure each repo is in the master branch. Checkout the desired reision for a repo if it is not the lastest.
+   2. cd to bot/Bundlebot/release and run the script `MakeConfig.sh` to update the configuration scripts `config.sh` and `config.bat` using
       
       `./MakeConfig.sh x.y.z`
       
-   where `x.y.z` is the version number of the release.
-   
-   2. Type: `sudo su - firebot` on the computer that runs firebot (blaze at Nist) to switch to the firebot user account.
-   3. Type: `cd FireModels_bundle/bot/Bundlebot/release` and update the `bot` repo.
-   4. Type: `nohup ./BUILD_fds_manuals.sh &` to build the FDS manuals.  After this step completes (about 7 hours) continue to the next step
-   5. Type: `nohup ./BUILD_smv_manuals.sh &` to build the Smokeview manuals (in the same account). After this step completes (about 30 minutes) continue to the next step
-   6. Type : `nohup ./BUILD_fdssmv_bundle.sh &` on a Linux computer to build a Linux bundle.
-   7. Type : `nohup ./BUILD_fdssmv_bundle.sh &` on a Mac computer to build a Mac bundle.
-   8. Type: `BUILD_fdssmv_bundle ` on a Windows PC to build a Windows bundle. (nohup is not available on Windows).
-   9. Type: `GetBundles.sh` when the bundles are ready to be published to download the bundles to the `bot/Bundlebot/build/bundles` directory .  Type `GetBundles.bat` if on a PC . Draft a new release at https://github.com/firemodels/fds/releases then upload the bundles from the `bundles` directory to this new release.
+where `x.y.z is the version number of the release to be built.
+
+### Build Manuals
+
+   1. Type: `sudo su - firebot` on the computer that runs firebot (blaze at Nist) to switch to the firebot user account.
+   2. Type: `cd FireModels_bundle/bot/Bundlebot/release` and update the `bot` repo ( to ensure that the bundle scripts use the right `config.sh` script.)
+   3. Build FDS manuals. Type: `nohup ./BUILD_fds_manuals.sh &` .  After this step completes (about 7 hours) continue to the next step
+   4. Build Smokeview manuals. Type: `nohup ./BUILD_smv_manuals.sh &` . After this step completes (about 30 minutes) continue to the next step.
+
+### Build Bundles
+
+   1. Build Linux bundles. Type : `nohup ./BUILD_fdssmv_bundle.sh &` on a Linux computer.
+   2. Build Macintosh bundles. Type : `nohup ./BUILD_fdssmv_bundle.sh &` on a Mac computer.
+   3. Build Windows bundles. Type: `BUILD_fdssmv_bundle ` on a Windows PC. (nohup is not available on Windows).
+
+### Wrapup
+
+   1. Type: `GetBundles.sh` when the bundles are ready to be published to download the bundles to the `bot/Bundlebot/build/bundles` directory .  Type `GetBundles.bat` if on a PC .
+   2. Push up tags.
+   3. Draft a new release at https://github.com/firemodels/fds/releases then upload the bundles from the `bundles` directory to this new release.
 
 ### Notes
       
