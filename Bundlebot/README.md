@@ -7,11 +7,12 @@ The directory [bot/Bundlebot/release](https://github.com/firemodels/bot/tree/mas
 
 ### Workflow
 
-   1. Update repos to the latest revision (or to the desired revision if not the latest).  Run the script `MakeConfig.sh` to update `config.sh` and `config.bat` using
+   1. cd to bot/Scripts and run the script `./update_repos.sh -m` to update repos .  The option `-m` makes sure each repo is in the master branch. Checkout the desired reision for a repo if it is not the lastest.
+   1. Run the script `MakeConfig.sh` to update `config.sh` and `config.bat` using
       
       `./MakeConfig.sh x.y.z`
       
-where `x.y.z is the versinko number of the release.
+where `x.y.z is the version number of the release.
 
    
    2. Type: `sudo su - firebot` on the computer that runs firebot (blaze at Nist) to switch to the firebot user account.
