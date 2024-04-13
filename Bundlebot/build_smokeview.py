@@ -103,10 +103,14 @@ R=0
 Label(root, text="----------------------------SETUP-----------------------------").grid(column=0, row=R, columnspan=4)
 
 R=R+1
-Button(root, text="Edit Script",    width=button_width, command=edit_this_page).grid(row=R, column=0)
-Button(root, text="Edit Settings",  width=button_width, command=edit_settings).grid(row=R,  column=1)
-Button(root, text="Add Notes",      width=button_width, command=add_notes).grid(row=R,      column=2)
-Button(root, text="View Notes",     width=button_width, command=view_notes).grid(row=R,     column=3)
+Label(root, text="Edit:").grid(column=0, row=R)
+Button(root, text="Script",    width=button_width, command=edit_this_page).grid(row=R, column=1)
+Button(root, text="Settings",  width=button_width, command=edit_settings).grid(row=R,  column=2)
+
+R=R+1
+Label(root, text="Notes:").grid(column=0, row=R)
+Button(root, text="Add",      width=button_width, command=add_notes).grid(row=R,      column=1)
+Button(root, text="View",     width=button_width, command=view_notes).grid(row=R,     column=2)
 
 # ------------------------- Show repo revisions ------------------------------
 
@@ -114,7 +118,7 @@ R=R+1
 Label(root, text="Repos:").grid(column=0, row=R)
 Button(root, text="Show Revision",   width=button_width,   command=show_repos).grid(row=R,  column=1)
 Button(root, text="Show Branch",     width=button_width,   command=show_branch).grid(row=R, column=2)
-Button(root, text="Set all repos to master",  width=button_width+3, command=set_branch_master).grid(row=R,     column=3)
+Button(root, text="Set all to master",  width=button_width+3, command=set_branch_master).grid(row=R,     column=3)
 
 # ------------------------- Update repos ------------------------------
 
