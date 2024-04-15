@@ -40,6 +40,7 @@ CLEAN_REPO ()
      return
   fi
   cd $repodir
+  git remote prume origin
   git checkout master
   git clean -dxf
 }

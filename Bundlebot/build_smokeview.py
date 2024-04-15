@@ -100,35 +100,33 @@ root.resizable(0, 0)
 # ------------------------- Edit ------------------------------
 
 R=0
-Label(root, text="----------------------------EDIT-----------------------------").grid(column=0, row=R, columnspan=4)
+Label(root, text="----------------------------SETUP-----------------------------").grid(column=0, row=R, columnspan=4)
 
 R=R+1
-Button(root, text="Edit Script",    width=button_width, command=edit_this_page).grid(row=R, column=0)
-Button(root, text="Edit Settings",  width=button_width, command=edit_settings).grid(row=R,  column=1)
-Button(root, text="Add Notes",      width=button_width, command=add_notes).grid(row=R,      column=2)
-Button(root, text="View Notes",     width=button_width, command=view_notes).grid(row=R,     column=3)
+Label(root, text="Edit:").grid(column=0, row=R)
+Button(root, text="Script",    width=button_width, command=edit_this_page).grid(row=R, column=1)
+Button(root, text="Settings",  width=button_width, command=edit_settings).grid(row=R,  column=2)
+
+R=R+1
+Label(root, text="Notes:").grid(column=0, row=R)
+Button(root, text="Add",      width=button_width, command=add_notes).grid(row=R,      column=1)
+Button(root, text="View",     width=button_width, command=view_notes).grid(row=R,     column=2)
 
 # ------------------------- Show repo revisions ------------------------------
 
 R=R+1
-Label(root, text="----------------------------REPOS----------------------------").grid(column=0, row=R, columnspan=4)
-
-R=R+1
-Button(root, text="Show Revision",   width=button_width,   command=show_repos).grid(row=R,  column=0)
-Button(root, text="Show Branch",     width=button_width,   command=show_branch).grid(row=R, column=1)
-Button(root, text="Set all repos to master",  width=button_width+3, command=set_branch_master).grid(row=R,     column=2)
-Button(root, text="Set smv to devel",   width=button_width+1, command=set_branch_devel).grid(row=R,     column=3)
+Label(root, text="Repos:").grid(column=0, row=R)
+Button(root, text="Show Revision",   width=button_width,   command=show_repos).grid(row=R,  column=1)
+Button(root, text="Show Branch",     width=button_width,   command=show_branch).grid(row=R, column=2)
+Button(root, text="Set all to master",  width=button_width+3, command=set_branch_master).grid(row=R,     column=3)
 
 # ------------------------- Update repos ------------------------------
 
 R=R+1
-Label(root, text="-----------------------------UPDATE----------------------------").grid(column=0, row=R, columnspan=4)
-
-R=R+1
-Button(root, text="All repos/All OS's",    width=button_width, command=update_all, bg='blue', fg='white').grid(row=R,     column=0)
-Button(root, text="smv/All OS's",    width=button_width, command=update_smv_all).grid(row=R,     column=1)
-Button(root, text="All repos/Win",    width=button_width, command=update_windows).grid(row=R, column=2)
-Button(root, text="smv/Win",    width=button_width, command=update_smv_windows).grid(row=R, column=3)
+Label(root, text="Update:").grid(column=0, row=R)
+Button(root, text="All repos/All OS's",    width=button_width, command=update_all, bg='blue', fg='white').grid(row=R,     column=1)
+Button(root, text="smv/All OS's",    width=button_width, command=update_smv_all).grid(row=R,     column=2)
+Button(root, text="All repos/Win",    width=button_width, command=update_windows).grid(row=R, column=3)
 
 # ------------------------- Build ------------------------------
 
@@ -141,9 +139,9 @@ Radiobutton(root, text="Windows", padx = 0, variable=platform, value=1).grid(row
 Radiobutton(root, text="Linux",   padx = 0, variable=platform, value=2).grid(row=R, column=1)
 Radiobutton(root, text="OSX",     padx = 0, variable=platform, value=3).grid(row=R, column=2)
 
-R=R+1
-Radiobutton(root, text="test",    padx = 0, variable=version, value=1).grid(row=R, column=0)
-Radiobutton(root, text="release", padx = 0, variable=version, value=2).grid(row=R, column=1)
+#R=R+1
+#Radiobutton(root, text="test",    padx = 0, variable=version, value=1).grid(row=R, column=0)
+#Radiobutton(root, text="release", padx = 0, variable=version, value=2).grid(row=R, column=1)
 
 R=R+1
 Label(root, text="Clean:").grid(column=0, row=R)
@@ -166,6 +164,11 @@ R=R+1
 Button(root, text="smokezip",      width=button_width, command=build_smz).grid(row=R,   column=1)
 Button(root, text="Set shortcuts", width=button_width, command=archive_smv).grid(row=R, column=2)
 Button(root, text="Set revisions", width=button_width, command=set_revision, bg='blue', fg='white').grid(row=R, column=3)
+
+# ------------------------- bundle/install ------------------------------
+
+R=R+1
+Label(root, text="------------------------BUNDLE/INSTALL-----------------------").grid(column=0, row=R, columnspan=4)
 
 R=R+1
 Label(root, text="Bundle/Install:").grid(column=0, row=R)
