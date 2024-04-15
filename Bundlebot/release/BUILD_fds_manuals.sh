@@ -1,6 +1,7 @@
 u!/bin/bash
 # this script runs firebot to build fds manuals using revision and tags defined in config.sh
 source config.sh
+export DISABLEPUSH=1
 
 CURDIR=`pwd`
 cd ../../Scripts

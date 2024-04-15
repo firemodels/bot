@@ -4,6 +4,7 @@ source config.sh
 if [ "$GH_REPO" != "" ]; then
   GHREPO="-r $GH_REPO"
 fi
+export DISABLEPUSH=1
 
 echo ***updating repos
 CURDIR=`pwd`
