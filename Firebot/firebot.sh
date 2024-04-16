@@ -425,7 +425,7 @@ check_compile_fds_mpi_db()
  
   # Check for compiler warnings/remarks
    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-  if [[ `grep -E -i 'warning|remark' $OUTPUT_DIR/stage2b${MPTYPE} | grep -v mpiifort | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented'` == "" ]]
+  if [[ `grep -E -i 'warning|remark' $OUTPUT_DIR/stage2b${MPTYPE} | grep -v mpiifort | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'is now deprecated'| grep -v 'feupdateenv is not implemented'` == "" ]]
   then
       # Continue along
       :
@@ -491,8 +491,8 @@ wait_cases_debug_end()
         sleep 30
      done
    else
-     while          [[ `qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX_DEBUG | grep -v 'C$'` != '' ]]; do
-        JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX_DEBUG | grep -v 'C$' | wc -l`
+     while          [[ `squeue | awk '{print $3 $4 $5}' | grep $(whoami) | grep $JOBPREFIX_DEBUG | grep -v 'CG$'` != '' ]]; do
+        JOBS_REMAINING=`squeue | awk '{print $3 $4 $5}' | grep $(whoami) | grep $JOBPREFIX_DEBUG | grep -v 'CG$' | wc -l`
         echo "Waiting for ${JOBS_REMAINING} ${1} cases to complete." >> $OUTPUT_DIR/stage4
         TIME_LIMIT_STAGE="3"
         check_time_limit
@@ -827,7 +827,7 @@ wait_cases_release_end()
    CASETYPE=$1
    STAGE=$2
 
-   # Scans qstat and waits for cases to end
+   # Scans squeue and waits for cases to end
    if [[ "$QUEUE" == "none" ]]
    then
      while [[          `ps -u $USER -f | fgrep .fds | grep -v firebot | grep -v grep` != '' ]]; do
@@ -839,8 +839,8 @@ wait_cases_release_end()
         sleep 60
      done
    else
-     while          [[ `qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX_RELEASE | grep -v 'C$'` != '' ]]; do
-        JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX_RELEASE | grep -v 'C$' | wc -l`
+     while          [[ `squeue | awk '{print $3 $4 $5}' | grep $(whoami) | grep $JOBPREFIX_RELEASE | grep -v 'CG$'` != '' ]]; do
+        JOBS_REMAINING=`squeue | awk '{print $3 $4 $5}' | grep $(whoami) | grep $JOBPREFIX_RELEASE | grep -v 'CG$' | wc -l`
         echo "Waiting for ${JOBS_REMAINING} $CASETYPE cases to complete." >> $OUTPUT_DIR/$STAGE
         TIME_LIMIT_STAGE="5"
         check_time_limit
@@ -1888,7 +1888,7 @@ email_build_status()
      echo "cad: $CAD_REVISION/$CADBRANCH  " >> $TIME_LOG
    fi
    if [ "$EXP_REVISION" != "" ]; then
-     echo "exp: $EXP_REVISION/$EXPBRANCH "    >> $TIME_LOGa
+     echo "exp: $EXP_REVISION/$EXPBRANCH "    >> $TIME_LOG
    fi
    echo "fds: $FDS_REVISION/$FDSBRANCH "    >> $TIME_LOG
    if [ "$FIG_REVISION" != "" ]; then
@@ -2179,15 +2179,11 @@ BOPT=
 GITURL=
 MAKE_SUMMARY=
 CLONEFILE=
-DISABLEPUSH=
 
 #*** parse command line arguments
-while getopts 'ab:BcCdDJm:Mp:q:R:sTuUV:x:X:y:Y:w:W:z' OPTION
+while getopts 'b:BcCdDJm:Mp:q:R:sTuUV:x:X:y:Y:w:W:z' OPTION
 do
 case $OPTION in
-  a)
-   DISABLEPUSH="-D"
-   ;;
   b)
    BOPT=1
    BRANCH="$OPTARG"
@@ -2410,10 +2406,10 @@ if [[ "$CLONE_REPOS" != "" ]]; then
   cd $botrepo/Scripts
   if [ "$CLONE_FDSSMV" != "" ]; then
    # only clone the fds and smv repos - used when just compiling the fds and smv apps
-    ./setup_repos.sh $DISABLEPUSH $FORCECLONE -T > $OUTPUT_DIR/stage1_clone 2>&1
+    ./setup_repos.sh $FORCECLONE -T > $OUTPUT_DIR/stage1_clone 2>&1
   else
    # clone all repos
-    ./setup_repos.sh $DISABLEPUSH $FORCECLONE -F > $OUTPUT_DIR/stage1_clone 2>&1
+    ./setup_repos.sh $FORCECLONE -F > $OUTPUT_DIR/stage1_clone 2>&1
   fi
   if [ "$CLONE_REPOS" != "master" ]; then
     if [ "$CLONEFILE" == "" ]; then
