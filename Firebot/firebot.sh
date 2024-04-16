@@ -2404,6 +2404,9 @@ date > $OUTPUT_DIR/stage0_start 2>&1
 if [[ "$CLONE_REPOS" != "" ]]; then
   echo Cloning repos
   cd $botrepo/Scripts
+  if [ "$DISABLEPUSH" != "" ]; then
+    DISABLEPUSH="-D"
+  fi
   if [ "$CLONE_FDSSMV" != "" ]; then
    # only clone the fds and smv repos - used when just compiling the fds and smv apps
     ./setup_repos.sh $FORCECLONE -T > $OUTPUT_DIR/stage1_clone 2>&1
