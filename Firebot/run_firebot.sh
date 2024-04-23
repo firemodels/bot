@@ -440,7 +440,7 @@ if [ "$KILL_FIREBOT" == "1" ]; then
       ./killppids.sh ../Firebot/scriptfiles
       cd $CURDIR
     else
-      JOBIDS=`qstat -a | grep $PREFIX | awk -v user="$USER" '{if($2==user){print $1}}' | awk -F'.' '{print $1}'`
+      JOBIDS=`squeue | grep $PREFIX | awk -v user="$USER" '{if($4==user){print $1}}' | awk -F'.' '{print $1}'`
       if [ "$JOBIDS" != "" ]; then
         echo killing firebot jobs with Id:$JOBIDS
         qdel $JOBIDS
