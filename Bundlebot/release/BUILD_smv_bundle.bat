@@ -1,6 +1,10 @@
 @echo off
 call config
-set BUNDLE_SMV_TAG=SMV-6.9.1
+
+:: uncomment and edit the following lines if building a test bundle.
+:: otherwise use settings in config.bat.
+::set BUNDLE_SMV_REVISION=9ce553208
+::set BUNDLE_SMV_TAG=SMV-6.9.1test
 
 
 set basename=%BUNDLE_SMV_TAG%_win

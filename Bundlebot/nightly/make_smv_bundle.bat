@@ -11,22 +11,23 @@ if "x%stopscript%" == "x" goto endif2
 
 :: batch file for creating libraries on windows, linux or osx
 
-set scriptdir=%~dp0
-cd %scriptdir%
-cd ..\..\..\..
+set CURDIR=%CD%
+cd ..\..\..
 set reporoot=%CD%
+set bot\Bundlebot\smv\scripts
+set scriptdir=%CD%
 
-cd %scriptdir%\output
+cd %CURDIR%\output
 set outdir=%CD%
 
-cd %scriptdir%
+cd %CURDIR%
 
-call get_hash_revisions > %outdir%\stage1_hash 2>&1
-set /p smv_hash=<output\SMV_HASH
+call get_smv_hash_revisions > %outdir%\stage1_hash 2>&1
+set /p smv_hash=<%outdir%\SMV_HASH
 
 echo *** cloning smv repo
 
-call clone_repos %smv_hash%  > %outdir%\stage2_clone 2>&1
+call clone_smv_repos %smv_hash%  > %outdir%\stage2_clone 2>&1
 cd %reporoot%\smv
 git describe --abbrev=7 --long --dirty > %outdir%\smvrepo_revision
 set /p smvrepo_revision=<%outdir%\smvrepo_revision
@@ -71,7 +72,7 @@ call make_smokeview -bot > %outdir%\stage5_smokeview 2>&1
 echo *** bundling smokeview
 Title Building Smokeview bundle
 
-call %reporoot%\bot\Bundlebot\smv\scripts\make_testbundle %smvrepo_revision% > %outdir%\stage6_bundle 2>&1
+call %scriptdir%\make_testbundle %smvrepo_revision% > %outdir%\stage6_bundle 2>&1
 
 echo *** uploading Smokeview bundle
 Title Building Smokeview bundle

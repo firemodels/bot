@@ -28,9 +28,9 @@ set BUNDLE_FIG_TAG=FIG-6.9.1
 set BUNDLE_OUT_REVISION=7593d3181
 set BUNDLE_OUT_TAG=OUT-6.9.1
 
-:: SMV-6.9.0-127-gd0b04d001
-set BUNDLE_SMV_REVISION=d0b04d001
-set BUNDLE_SMV_TAG=SMV-6.9.1
+:: SMV-6.9.1-92-g796b08e6a
+set BUNDLE_SMV_REVISION=g796b08e6a
+set BUNDLE_SMV_TAG=SMV-6.9.2
 
 :: ----------------------------
 :: github environment variables
