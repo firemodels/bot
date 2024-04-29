@@ -72,7 +72,7 @@ call make_smokeview -bot > %outdir%\stage5_smokeview 2>&1
 echo *** bundling smokeview
 Title Building Smokeview bundle
 
-call %scriptdir%\make_testbundle %smvrepo_revision% > %outdir%\stage6_bundle 2>&1
+call make_smv_testbundle %smvrepo_revision% > %outdir%\stage6_bundle 2>&1
 
 echo *** uploading Smokeview bundle
 Title Building Smokeview bundle
