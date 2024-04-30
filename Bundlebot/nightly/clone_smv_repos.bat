@@ -9,7 +9,7 @@ if NOT "x%smv_hash%" == "x" goto skip_smv_hash
 
 set scriptdir=%~dp0
 cd %scriptdir%
-cd ..\..\..\..
+cd ..\..\..
 set REPOROOT=%CD%
 
 cd %REPOROOT%\bot\\Scripts

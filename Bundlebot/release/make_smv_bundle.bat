@@ -16,7 +16,6 @@ set CURDIR=%CD%
 
 set BUILDDIR=intel_win_64
 
-
 set smvbuild=%reporoot%\smv\Build\smokeview\%BUILDDIR%
 set forbundle=%reporoot%\bot\Bundlebot\smv\for_bundle
 set webgldir=%reporoot%\bot\Bundlebot\smv\for_bundle\webgl
@@ -160,6 +159,5 @@ IF EXIST %infile% (
    pause
 )
 exit /b
-
 
 :EOF
