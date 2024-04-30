@@ -25,15 +25,8 @@ call %envfile%
 
 %git_drive%
 
-set type=
-if "%buildtype%" == "test" (
-   set type=test
-   set version=%smv_revision%
-)
-if "%buildtype%" == "release" (
-   set type=
-   set version=%smv_version%
-)
+set type=test
+set version=%smv_revision%
 
 echo.
 echo  Bundling %type% Smokeview for %platform%
@@ -42,7 +35,8 @@ Title Bundling %type% Smokeview for %platform%
 :: windows
 
 if "%platform%" == "Windows" (
-  call %git_root%\bot\Bundlebot\smv\scripts\make_%type%bundle
+  cd %git_root%\bot\Bundlebot\smv\scripts
+  call make_bundle test %version%
   goto eof
 )
 
