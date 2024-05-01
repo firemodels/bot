@@ -36,6 +36,7 @@ if [ "`uname`" == "Darwin" ] ; then
 fi
 USE_GH_VARS=
 RELEASE=
+BUILDTYPE=-t
 
 #---------------------------------------------
 #               get options
@@ -49,6 +50,7 @@ case $OPTION  in
    ;;
   r)
    RELEASE=release
+   BUILDTYPE=-r
    ;;
   z)
    USE_GH_VARS=1
@@ -121,7 +123,7 @@ done
 
 echo "*** building smokeview"
 cd $reporoot/smv/Build/smokeview/${comp}_${platform}_64
-./make_smokeview.sh -t >& $outdir/stage5_smokeview
+./make_smokeview.sh $BUILDTYPE >& $outdir/stage5_smokeview
 
 echo "*** bundling smokeview"
 
