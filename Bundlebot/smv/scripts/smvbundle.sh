@@ -37,6 +37,7 @@ fi
 USE_GH_VARS=
 RELEASE=
 BUILDTYPE=-t
+BUILDTYPE2=test
 
 #---------------------------------------------
 #               get options
@@ -51,6 +52,7 @@ case $OPTION  in
   r)
    RELEASE=release
    BUILDTYPE=-r
+   BUILDTYPE2=release
    ;;
   z)
    USE_GH_VARS=1
@@ -127,7 +129,7 @@ cd $reporoot/smv/Build/smokeview/${comp}_${platform}_64
 
 echo "*** bundling smokeview"
 
-$reporoot/bot/Bundlebot/smv/scripts/make_bundle.sh test $smv_revision $basereporoot >& $outdir/stage6_bundle
+$reporoot/bot/Bundlebot/smv/scripts/make_bundle.sh $BUILDTYPE2 $smv_revision $basereporoot >& $outdir/stage6_bundle
 
 
 echo "*** uploading smokeview bundle"
