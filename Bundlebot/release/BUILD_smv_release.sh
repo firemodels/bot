@@ -17,4 +17,4 @@ git merge firemodels/master
 git merge origin/master
 
 cd $CURDIR/../smv/scripts
-./smvbundle.sh -r -z
+./make_smvbundle.sh -r -z

@@ -78,7 +78,7 @@ FORBUNDLE=$GITROOT/bot/Bundlebot/smv/for_bundle
 WEBGLDIR=$GITROOT/bot/Bundlebot/smv/for_bundle/webgl
 UTILSCRIPTDIR=$GITROOT/smv/Utilities/Scripts
 PLATFORMDIR=$RELEASE$revision\_${platform3}
-UPDATER=$GITROOT/bot/Bundlebot/smv/scripts//make_updater.sh
+MAKEINSTALLER=$GITROOT/bot/Bundlebot/smv/scripts//make_installer.sh
 uploads=$HOME/.bundle/uploads
 uploadscp=.bundle/uploads
 flushfile=$GITROOT/smv/Build/flush/${COMPILER}_${platform}_64/flush_${platform}_64
@@ -152,7 +152,7 @@ echo ""
 tar cvf ../$PLATFORMDIR.tar .
 cd ..
 gzip $PLATFORMDIR.tar
-$UPDATER ${platform2} $revision $PLATFORMDIR.tar.gz $PLATFORMDIR.sh FDS/$FDSEDITION
+$MAKEINSTALLER ${platform2} $revision $PLATFORMDIR.tar.gz $PLATFORMDIR.sh FDS/$FDSEDITION
 $HASHFILE $PLATFORMDIR.sh > $PLATFORMDIR.sh.sha1
 cat $PLATFORMDIR.sh.sha1 >> $uploads/$PLATFORMDIR.sha1
 rm $PLATFORMDIR.sh.sha1

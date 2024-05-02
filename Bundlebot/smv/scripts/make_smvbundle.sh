@@ -129,7 +129,7 @@ cd $reporoot/smv/Build/smokeview/${comp}_${platform}_64
 
 echo "*** bundling smokeview"
 
-$reporoot/bot/Bundlebot/smv/scripts/make_bundle.sh $BUILDTYPE2 $smv_revision $basereporoot >& $outdir/stage6_bundle
+$reporoot/bot/Bundlebot/smv/scripts/assemble_smvbundle.sh $BUILDTYPE2 $smv_revision $basereporoot >& $outdir/stage6_bundle
 
 
 echo "*** uploading smokeview bundle"

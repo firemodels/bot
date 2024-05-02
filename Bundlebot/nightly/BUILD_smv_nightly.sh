@@ -8,5 +8,5 @@ if [ "$opt" != "-h" ]; then
   git remote update       >& /dev/null
   git merge origin/master >& /dev/null
 fi
-./smvbundle.sh $*
+./make_smvbundle.sh $*
 
