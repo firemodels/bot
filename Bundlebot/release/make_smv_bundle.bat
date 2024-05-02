@@ -1,8 +1,9 @@
 @echo off
 setlocal
 :: release info
-set zipbase=%BUNDLE_SMV_TAG%_win
-set versionbase=%BUNDLE_SMV_TAG%
+set versionbase=%1
+set test=%2
+set zipbase=%versionbase%_win
 set SMVEDITION=SMV6
 
 set scriptdir=%~dp0
@@ -49,7 +50,7 @@ mkdir %smvdir%
 mkdir %smvdir%\hash
 
 CALL :COPY  %reporoot%\smv\Build\set_path\intel_win_64\set_path_win_64.exe "%smvdir%\set_path.exe"
-CALL :COPY  %smvbuild%\smokeview_win_64.exe                                 %smvdir%\smokeview.exe
+CALL :COPY  %smvbuild%\smokeview_win_%test%64.exe                           %smvdir%\smokeview.exe
 CALL :COPY  %smvscripts%\jp2conv.bat                                        %smvdir%\jp2conv.bat
 
 echo copying .po files
