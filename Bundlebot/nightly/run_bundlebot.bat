@@ -30,6 +30,7 @@ if EXIST .bundlebot goto endif1
 call :getopts %*
 
 if "x%stopscript%" == "x" goto endif2
+  set stopscript=
   exit /b 1
 :endif2
 

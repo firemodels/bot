@@ -1,10 +1,6 @@
 @echo off
 setlocal
 
-if "x%stopscript%" == "x" goto endif1
-  exit /b 1
-:endif1
-
 if not exist %userprofile%\.bundle mkdir %userprofile%\.bundle
 set CURDIR=%CD%
 
