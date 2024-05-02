@@ -1,6 +1,7 @@
 #!/bin/bash
 opt=$1
 
+cd ../smv/scripts
 if [ "$opt" != "-h" ]; then
   echo "*** updating bot repo"
   git clean -dxf          >& /dev/null
