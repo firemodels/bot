@@ -13,6 +13,7 @@ The directory [bot/Bundlebot/release](https://github.com/firemodels/bot/tree/mas
       `./MakeConfig.sh x.y.z`
       
 where `x.y.z is the version number of the release to be built.
+   
    3. Commit changes to `config.sh` and `config.bat` and push up to the central repo.
 
 ### Build Manuals
