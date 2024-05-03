@@ -1,10 +1,6 @@
 @echo off
 setlocal
 
-if "x%stopscript%" == "x" goto endif1
-  exit /b 1
-:endif1
-
 if not exist %userprofile%\.bundle mkdir %userprofile%\.bundle
 set CURDIR=%CD%
 
@@ -77,7 +73,10 @@ gh release view %GH_SMOKEVIEW_TAG%  -R github.com/%GH_OWNER%/%GH_REPO% | grep SM
 for /F "tokens=*" %%A in (%filelist%) do gh release delete-asset %GH_SMOKEVIEW_TAG% %%A  -R github.com/%GH_OWNER%/%GH_REPO% -y
 erase %filelist%
 
+echo uploading %smvrepo_revision%_win.sha1 to github.com/%GH_OWNER%/%GH_REPO%
 gh release upload %GH_SMOKEVIEW_TAG% %uploaddir%\%smvrepo_revision%_win.sha1 -R github.com/%GH_OWNER%/%GH_REPO% --clobber
+
+echo uploading %smvrepo_revision%_win.exe to github.com/%GH_OWNER%/%GH_REPO%
 gh release upload %GH_SMOKEVIEW_TAG% %uploaddir%\%smvrepo_revision%_win.exe  -R github.com/%GH_OWNER%/%GH_REPO% --clobber
 
 echo *** upload complete

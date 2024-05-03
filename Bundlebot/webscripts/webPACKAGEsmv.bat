@@ -35,8 +35,8 @@ Title Bundling %type% Smokeview for %platform%
 :: windows
 
 if "%platform%" == "Windows" (
-  cd %git_root%\bot\Bundlebot\smv\scripts
-  call make_bundle test %version%
+  cd %git_root%\bot\Bundlebot\release
+  call make_smv_bundle %version% test_
   goto eof
 )
 
@@ -57,7 +57,7 @@ if "%platform%" == "Linux" (
   echo.
   echo --- making 64 bit Linux Smokeview installer ---
   echo.
-  plink %plink_options% %linux_logon% %scriptdir%/scripts/make_bundle.sh %buildtype% %version% %linux_git_root%
+  plink %plink_options% %linux_logon% %scriptdir%/scripts/assemble_smvbundle.sh %buildtype% %version% %linux_git_root%
   goto eof
 )
 
@@ -67,7 +67,7 @@ if "%platform%" == "OSX" (
   echo.
   echo --- making 64 bit OSX Smokeview installer ---
   echo.
-  plink %plink_options% %osx_logon% %scriptdir%/scripts/make_bundle.sh %buildtype% %version% %linux_git_root%
+  plink %plink_options% %osx_logon% %scriptdir%/scripts/assemble_smvbundle.sh %buildtype% %version% %linux_git_root%
   goto eof
 )
 
