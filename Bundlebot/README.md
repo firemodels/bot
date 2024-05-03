@@ -25,15 +25,17 @@ where `x.y.z is the version number of the release to be built.
 
 ### Build Bundles
 
-   1. Build Linux bundles. Type : `nohup ./BUILD_fdssmv_release.sh &` on a Linux computer.
-   2. Build Macintosh bundles. Type : `nohup ./BUILD_fdssmv_release.sh &` on a Mac computer.
-   3. Build Windows bundles. Type: `BUILD_fdssmv_release ` on a Windows PC. (nohup is not available on Windows).
+   1. Type: `sudo su - firebot` to switch to the firebot user account.
+   2. Type: `cd FireModels_bundle/bot/Bundlebot/release`
+   3. Build Linux bundles. Type : `nohup ./BUILD_fdssmv_release.sh &` on a Linux computer.
+   4. Build Macintosh bundles. Type : `nohup ./BUILD_fdssmv_release.sh &` on a Mac computer.
+   5. Build Windows bundles. Type: `BUILD_fdssmv_release ` on a Windows PC. (nohup is not available on Windows).
 
 ### Testing
 
    1. Type: `GetBundles.sh` when the bundles are ready to be published to download the bundles to the `bot/Bundlebot/build/bundles` directory .  Type `GetBundles.bat` if on a PC .
-   2. Examine PDF files to ensure the right version is output on the cover page and perform any other checks needed.
-   3. Install bundles on each platform and ensure fds and smokeview apps have the right version string.
+   2. Examine PDF files to ensure the correct version is displayed on the cover page and perform any other checks needed.
+   3. Install bundles on each platform and ensure fds and smokeview apps have the correct version string.
    4. Run a simple test case and view with ssmokeview.
       
 ### Create a Release
