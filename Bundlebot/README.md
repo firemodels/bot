@@ -13,6 +13,7 @@ The directory [bot/Bundlebot/release](https://github.com/firemodels/bot/tree/mas
       `./MakeConfig.sh x.y.z`
       
 where `x.y.z is the version number of the release to be built.
+   
    3. Commit changes to `config.sh` and `config.bat` and push up to the central repo.
 
 ### Build Manuals
@@ -24,15 +25,17 @@ where `x.y.z is the version number of the release to be built.
 
 ### Build Bundles
 
-   1. Build Linux bundles. Type : `nohup ./BUILD_fdssmv_bundle.sh &` on a Linux computer.
-   2. Build Macintosh bundles. Type : `nohup ./BUILD_fdssmv_bundle.sh &` on a Mac computer.
-   3. Build Windows bundles. Type: `BUILD_fdssmv_bundle ` on a Windows PC. (nohup is not available on Windows).
+   1. Type: `sudo su - firebot` to switch to the firebot user account.
+   2. Type: `cd FireModels_bundle/bot/Bundlebot/release`
+   3. Build Linux bundles. Type : `nohup ./BUILD_fdssmv_release.sh &` on a Linux computer.
+   4. Build Macintosh bundles. Type : `nohup ./BUILD_fdssmv_release.sh &` on a Mac computer.
+   5. Build Windows bundles. Type: `BUILD_fdssmv_release ` on a Windows PC. (nohup is not available on Windows).
 
 ### Testing
 
    1. Type: `GetBundles.sh` when the bundles are ready to be published to download the bundles to the `bot/Bundlebot/build/bundles` directory .  Type `GetBundles.bat` if on a PC .
-   2. Examine PDF files to ensure the right version is output on the cover page and perform any other checks needed.
-   3. Install bundles on each platform and ensure fds and smokeview apps have the right version string.
+   2. Examine PDF files to ensure the correct version is displayed on the cover page and perform any other checks needed.
+   3. Install bundles on each platform and ensure fds and smokeview apps have the correct version string.
    4. Run a simple test case and view with ssmokeview.
       
 ### Create a Release
@@ -45,7 +48,7 @@ where `x.y.z is the version number of the release to be built.
 1. `nohup` is used when building bundles on Linux and Macintosh computers so that the bundle generating script will continue to run if the command shell is disconnected from your terminal.  The output goes to the file `nohup.out`. Type `tail -f nohup.out` to see  output while the script is running.
 2. The scripts for building FDS and Smokeview manuals and building the bundle use environment variables to define repo revisions and tags.  These variables are defined in the scripts `config.sh` (on Linux and Macintosh computers) and `config.bat` (on Windows computers).
 3. Bundle scripts erase and clone fresh copies of the fds and smv repos. These scripts should not be run in repos where daily work is performed.   At NIST, Linux Manuals are built in the firebot user account in the directory Firemodels_bundle/bot/Bundlebot/build directory on the host blaze.
-4. The `BUILD_bundle.sh` and `BUILD_bundle.bat` scripts upload the test bundles to https://github.com/firemodels/test_bundles/releases/tag/BUNDLE_TEST
+4. The `BUILD_fdssmv_release.sh.sh` and `BUILD_fdssmv_release.sh.bat` scripts upload the test bundles to https://github.com/firemodels/test_bundles/releases/tag/BUNDLE_TEST
 5. The scripts `GetBundles.sh` (Linux and Mac) and `GetBundles.bat` (Windows PC) download the bundles to the bundles directory where they can then used to create an official release at https://github.com/firemodels/fds/releases.
 6. Tags are only created in the local fds and smv repos, they are not pushed up to GitHub. Tags then do not need to be deleted if errors are discovered that require more commits. Once the bundles are published, these tags may be pushed up to github.
 
