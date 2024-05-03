@@ -89,7 +89,7 @@ run_auto()
   if [ ! -e $GIT_SMVTRIGGER_REVISION_FILE ]; then
     touch $GIT_SMVTRIGGER_REVISION_FILE
   fi
-  THIS_SMVTRIGGER_REVISION=`git log --abbrev-commit . | head -1 | awk '{print $2}'`
+  THIS_SMVTRIGGER_REVISION=`git log --abbrev-commit smokebot_trigger.txt | head -1 | awk '{print $2}'`
   LAST_SMVTRIGGER_REVISION=`cat $GIT_SMVTRIGGER_REVISION_FILE`
   git log . | head -5 | tail -1 > $GIT_SMVTRIGGER_LOG_FILE
 
