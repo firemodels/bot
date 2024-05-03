@@ -55,16 +55,17 @@ run_auto()
   GIT_STATUS_DIR=~/.smokebot
 
   SMV_SOURCE_DIR=$smvrepo/Source
+
   GIT_SMV_REVISION_FILE=$GIT_STATUS_DIR/smv_revision_$SMVBRANCH
   GIT_SMV_LOG_FILE=$GIT_STATUS_DIR/smv_log
 
-  FDS_SOURCE_DIR=$fdsrepo/Source
-  GIT_FDS_REVISION_FILE=$GIT_STATUS_DIR/fds_revision_$FDSBRANCH
-  GIT_FDS_LOG_FILE=$GIT_STATUS_DIR/FDS_log
+  GIT_SMVTRIGGER_REVISION_FILE=$GIT_STATUS_DIR/smvtrigger_revision_$SMVBRANCH
+  GIT_SMVTRIGGER_LOG_FILE=$GIT_STATUS_DIR/smvtrigger_log
 
-  ROOT_DIR=$smvrepo/Verification
-  GIT_ROOT_REVISION_FILE=$GIT_STATUS_DIR/root_revision_$SMVBRANCH
-  GIT_ROOT_LOG_FILE=$GIT_STATUS_DIR/ROOT_log
+  VER_DIR=$smvrepo/Verification
+
+  GIT_VER_REVISION_FILE=$GIT_STATUS_DIR/ver_revision_$SMVBRANCH
+  GIT_VER_LOG_FILE=$GIT_STATUS_DIR/VER_log
 
   MESSAGE_FILE=$GIT_STATUS_DIR/message
 
@@ -72,8 +73,6 @@ run_auto()
 
   if [[ "$UPDATEREPO" == "1" ]] ; then
     update_repo smv $SMVBRANCH || return 1
-    update_repo fig $FIGBRANCH || return 1
-    update_repo fds $FDSBRANCH || return 1
   fi
 
 # get info for smokeview source directory
@@ -86,33 +85,30 @@ run_auto()
   LAST_SMV_REVISION=`cat $GIT_SMV_REVISION_FILE`
   git log . | head -5 | tail -1 > $GIT_SMV_LOG_FILE
 
-# get info for FDS source directory
-  cd $FDS_SOURCE_DIR
-  THIS_FDSAUTHOR=`git log . | head -2 | tail -1 | awk '{print $2}'`
-  if [ ! -e $GIT_FDS_REVISION_FILE ]; then
-    touch $GIT_FDS_REVISION_FILE
+# get info for smokebot_trigger.txt file
+  if [ ! -e $GIT_SMVTRIGGER_REVISION_FILE ]; then
+    touch $GIT_SMVTRIGGER_REVISION_FILE
   fi
-  THIS_FDS_REVISION=`git log --abbrev-commit . | head -1 | awk '{printf $2}'`
-  LAST_FDS_REVISION=`cat $GIT_FDS_REVISION_FILE`
-  git log . | head -5 | tail -1 > $GIT_FDS_LOG_FILE
+  THIS_SMVTRIGGER_REVISION=`git log --abbrev-commit . | head -1 | awk '{print $2}'`
+  LAST_SMVTRIGGER_REVISION=`cat $GIT_SMVTRIGGER_REVISION_FILE`
+  git log . | head -5 | tail -1 > $GIT_SMVTRIGGER_LOG_FILE
 
-# get info for ROOT directory
-  cd $ROOT_DIR
-  THIS_ROOTAUTHOR=`git log . | head -2 | tail -1 | awk '{print $2}'`
-  THIS_ROOT_REVISION=`git log --abbrev-commit . | head -1 | awk '{printf $2}'`
-  if [ ! -e $GIT_ROOT_REVISION_FILE ]; then
-    touch $GIT_ROOT_REVISION_FILE
+# get info for verification directory
+  cd $VER_DIR
+  THIS_VERAUTHOR=`git log . | head -2 | tail -1 | awk '{print $2}'`
+  THIS_VER_REVISION=`git log --abbrev-commit . | head -1 | awk '{printf $2}'`
+  if [ ! -e $GIT_VER_REVISION_FILE ]; then
+    touch $GIT_VER_REVISION_FILE
   fi
-  LAST_ROOT_REVISION=`cat $GIT_ROOT_REVISION_FILE`
-  git log . | head -5 | tail -1 > $GIT_ROOT_LOG_FILE
+  LAST_VER_REVISION=`cat $GIT_VER_REVISION_FILE`
+  git log . | head -5 | tail -1 > $GIT_VER_LOG_FILE
 
   if [ "$option" == "" ]; then
-    if [[ $THIS_SMV_REVISION == $LAST_SMV_REVISION && $THIS_FDS_REVISION == $LAST_FDS_REVISION &&  $THIS_ROOT_REVISION == $LAST_ROOT_REVISION ]] ; then
+    if [[ $THIS_SMV_REVISION == $LAST_SMV_REVISION && $THIS_VER_REVISION == $LAST_VER_REVISION ]] ; then
       return 1
     fi
-  fi
-  if [ "$option" == "smv" ]; then
-    if [[ $THIS_SMV_REVISION == $LAST_SMV_REVISION ]] ; then
+  else
+    if [[ $THIS_SMVTRIGGER_REVISION == $LAST_SMVTRIGGER_REVISION ]] ; then
       return 1
     fi
   fi
@@ -126,26 +122,17 @@ run_auto()
       echo -e "smokeview source has changed. $LAST_SMV_REVISION->$THIS_SMV_REVISION($THIS_SMVAUTHOR)" >> $MESSAGE_FILE
       cat $GIT_SMV_LOG_FILE >> $MESSAGE_FILE
     fi
-    if [[ $THIS_FDS_REVISION != $LAST_FDS_REVISION ]] ; then
-      SOURCE_CHANGED=1
-      echo $THIS_FDS_REVISION>$GIT_FDS_REVISION_FILE
-      echo -e "FDS source has changed. $LAST_FDS_REVISION->$THIS_FDS_REVISION($THIS_FDSAUTHOR)" >> $MESSAGE_FILE
-      cat $GIT_FDS_LOG_FILE >> $MESSAGE_FILE
-    fi
     if [ "$SOURCE_CHANGED" == "" ]; then
-      if [[ $THIS_ROOT_REVISION != $LAST_ROOT_REVISION ]] ; then
-        echo $THIS_ROOT_REVISION>$GIT_ROOT_REVISION_FILE
-        echo -e "smv repo has changed. $LAST_ROOT_REVISION->$THIS_ROOT_REVISION($THIS_ROOTAUTHOR)" >> $MESSAGE_FILE
-        cat $GIT_ROOT_LOG_FILE >> $MESSAGE_FILE
+      if [[ $THIS_VER_REVISION != $LAST_VER_REVISION ]] ; then
+        echo $THIS_VER_REVISION>$GIT_VER_REVISION_FILE
+        echo -e "smv repo has changed. $LAST_VER_REVISION->$THIS_VER_REVISION($THIS_VERAUTHOR)" >> $MESSAGE_FILE
+        cat $GIT_VER_LOG_FILE >> $MESSAGE_FILE
       fi
     fi
-  fi
-  if [ "$option" == "smv" ]; then
-    if [[ $THIS_SMV_REVISION != $LAST_SMV_REVISION ]] ; then
-      echo $THIS_SMV_REVISION>$GIT_SMV_REVISION_FILE
-      echo -e "smokeview source has changed. $LAST_SMV_REVISION->$THIS_SMV_REVISION($THIS_SMVAUTHOR)" >> $MESSAGE_FILE
-      cat $GIT_SMV_LOG_FILE >> $MESSAGE_FILE
-    fi
+  else
+    echo $THIS_SMVTRIGGER_REVISION>$GIT_SMVTRIGGER_REVISION_FILE
+    echo -e "smokebot trigger file has changed." >> $MESSAGE_FILE
+    cat $GIT_SMVTRIGGER_LOG_FILE >> $MESSAGE_FILE
   fi
   echo -e "Smokebot run initiated." >> $MESSAGE_FILE
   if [ "$HAVEMAIL" != "" ]; then
@@ -1375,8 +1362,8 @@ fi
     cat $GIT_FDS_LOG_FILE >> $TIME_LOG
   fi
   if [ "$SOURCE_CHANGED" != "" ]; then
-    if [[ $THIS_ROOT_REVISION != $LAST_ROOT_REVISION ]] ; then
-      cat $GIT_ROOT_LOG_FILE >> $TIME_LOG
+    if [[ $THIS_VER_REVISION != $LAST_VER_REVISION ]] ; then
+      cat $GIT_VER_LOG_FILE >> $TIME_LOG
     fi
   fi
   if [ "$NAMELIST_NODOC_STATUS" != "" ]; then
@@ -1815,7 +1802,7 @@ MKDIR $BRANCHAPPS_DIR
 if [[ $RUNAUTO != "" ]] ; then
   runoption=""
   if [ "$RUNAUTO" == "A" ]; then
-    runoption="smv"
+    runoption="smvtrigger"
   fi
   run_auto $runoption || exit 1
 fi
