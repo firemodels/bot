@@ -8,18 +8,11 @@ set SMV_HASH=
 set FDS_TAG=
 set SMV_TAG=
 set BRANCH_NAME=nightly
-set configscript=%userprofile%\.bundle\bundle_config.bat
 set logfile=%userprofile%\.bundle\logfile.txt
 set upload_bundle=1
 set build_apps=1
 set clone_repos=1
 set emailto=
-
-:: define defaults
-
-if NOT exist %configscript% goto skip_config
-  call %configscript%
-:skip_config
 
 if EXIST .bundlebot goto endif1
   echo ***error: run_bundlebot.bat must be run in bot/Bundlebot directory
