@@ -96,7 +96,7 @@ root.resizable(0, 0)
 # ------------------------- Edit ------------------------------
 
 R=0
-Label(root, text="----------------------------SETUP-----------------------------").grid(column=0, row=R, columnspan=4)
+Label(root, text="---------------------------------SETUP----------------------------------").grid(column=0, row=R, columnspan=4)
 
 R=R+1
 Label(root, text="Edit:").grid(column=0, row=R)
@@ -127,7 +127,7 @@ Button(root, text="All repos/Win",    width=button_width, command=update_windows
 # ------------------------- Build ------------------------------
 
 R=R+1
-Label(root, text="----------------------------BUILD-----------------------------").grid(column=0, row=R, columnspan=4)
+Label(root, text="---------------------------------BUILD----------------------------------").grid(column=0, row=R, columnspan=4)
 
 
 R=R+1
@@ -164,14 +164,15 @@ Button(root, text="Set revisions", width=button_width, command=set_revision, bg=
 # ------------------------- bundle/install ------------------------------
 
 R=R+1
-Button(root, text="Bundle", width=button_width, command=bundle_smv).grid(row=R,   column=1)
-Button(root, text="Install",width=button_width, command=install_smv).grid(row=R,  column=2)
-Button(root, text="Upload", width=button_width, command=upload_bundle).grid(row=R, column=3)
+Label(root, text="Bundle:").grid(column=0, row=R)
+Button(root, text="Bundle", width=button_width, command=bundle_smv).grid(row=R,    column=1)
+Button(root, text="Upload", width=button_width, command=upload_bundle).grid(row=R, column=2)
+Button(root, text="Install",width=button_width, command=install_smv).grid(row=R,   column=3)
 
 # ------------------------- guides ------------------------------
 
 R=R+1
-Label(root, text="----------------------------GUIDES---------------------------").grid(column=0, row=R, columnspan=4)
+Label(root, text="---------------------------------GUIDES--------------------------------").grid(column=0, row=R, columnspan=4)
 
 R=R+1
 Radiobutton(root, text="FDS",       padx = 0, variable=app, value=1).grid(row=R, column=0)
@@ -191,7 +192,7 @@ Button(root, text="View",     width=button_width, command=view_guides).grid(row=
 # ------------------------- synchronize ------------------------------
 
 R=R+1
-Label(root, text="-------------------------SYNCHRONIZE-------------------------").grid(column=0, row=R, columnspan=4)
+Label(root, text="----------------------------SYNCHRONIZE----------------------------").grid(column=0, row=R, columnspan=4)
 R=R+1
 Button(root, text="settings ---> smv",  width=button_width, command=webCOPYhome2config).grid(row=R, column=0)
 Button(root, text="smv ---> settings",  width=button_width, command=webCOPYconfig2home).grid(row=R, column=1)
