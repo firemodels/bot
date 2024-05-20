@@ -1640,7 +1640,7 @@ shift $(($OPTIND-1))
 if [ "$SQUEUE" == "" ]; then
   SQUEUE=$QUEUE
 else
-  SQUEUE=none
+  SQUEUE=terminal
 fi
 
 if [ "$CLONE_REPOS" != "" ]; then
