@@ -18,6 +18,7 @@ echo "-f - force smokebot to run"
 echo "-J use Intel MPI version of fds"
 echo "-k - kill smokebot if it is running"
 echo "-q queue [default: $QUEUE]"
+echo "-Q - generate images on node running this script"
 if [ "$EMAIL" != "" ]; then
   echo "-m email_address - [default: $EMAIL]"
 else
@@ -188,6 +189,7 @@ CACHE_DIR=
 #*** check to see if a queing system is available
 
 QUEUE=smokebot
+SQUEUE=
 notfound=`qstat -a 2>&1 | tail -1 | grep "not found" | wc -l`
 if [ $notfound -eq 1 ] ; then
   QUEUE=none
@@ -195,7 +197,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'aAB:bcCDfFg:G:hHJkm:Mo:Pq:r:R:s:STuUvw:W:x:X:y:Y:' OPTION
+while getopts 'aAB:bcCDfFg:G:hHJkm:Mo:Pq:Qr:R:s:STuUvw:W:x:X:y:Y:' OPTION
 do
 case $OPTION  in
   a)
@@ -254,6 +256,9 @@ case $OPTION  in
    ;;
   q)
    QUEUE="$OPTARG"
+   ;;
+  Q)
+   SQUEUE=-Q
    ;;
   r)
    export GH_REPO="$OPTARG"
@@ -447,7 +452,7 @@ BRANCH="-b $BRANCH"
 #*** run smokebot
 
 touch $smokebot_pid
-$ECHO ./$botscript $SIZE $BRANCH $SANITIZE $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $CLONE_REPOS $CACHE_DIR $FORCECLONE $GNU $RUNAUTO $INTEL $CLEANREPO $WEB_DIR $WEB_ROOT $UPDATEREPO $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $SIZE $BRANCH $SANITIZE $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $CLONE_REPOS $CACHE_DIR $FORCECLONE $GNU $RUNAUTO $INTEL $CLEANREPO $WEB_DIR $WEB_ROOT $UPDATEREPO $QUEUE $SQUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi
