@@ -17,7 +17,6 @@ bot_repo = repo_root + "bot\\"
 smv_repo = repo_root + "smv\\"
 webscript_dir  = bot_repo + "Bundlebot\\webscripts\\"
 
-tags       = ["", "SMOKEVIEW_TEST", "SMOKEVIEW_TEST2"]
 versions   = ["", "test", "release"]
 platforms  = ["", "Windows", "Linux", "OSX"]
 apps       = ["", "FDS", "Smokeview" ]
@@ -25,9 +24,6 @@ guides     = ["", "User", "Verification", "Validation", "Technical"]
 
 version=IntVar()
 version.set(1)
-
-tag=IntVar()
-tag.set(2)
 
 platform=IntVar()
 platform.set(1)
@@ -68,7 +64,7 @@ def build_smv():               os.system("start " + webscript_dir + "webBUILDsmv
 def bundle_smv():              os.system("start " + webscript_dir + "webPACKAGEsmv "        + platforms[platform.get()]  + " " + versions[version.get()] )
 def install_smv():             os.system("start " + webscript_dir + "webINSTALLsmv "        + platforms[platform.get()]  + " " + versions[version.get()] )
 def bundleinstall_smv():       os.system("start " + webscript_dir + "webPACKAGEINSTALLsmv " + platforms[platform.get()]  + " " + versions[version.get()] )
-def upload_bundle():           os.system("start " + webscript_dir + "webUPLOADallsmv "      + platforms[platform.get()]  + " " + tags[tag.get()])
+def upload_bundle():           os.system("start " + webscript_dir + "webUPLOADallsmv "      + platforms[platform.get()])
 
 def download_figures():            os.system("start " + webscript_dir + "webGETfigs "       + apps[app.get()]                 + " " + guides[guide.get()] )
 def build_guides():                os.system("start " + webscript_dir + "webBUILDguides "   + apps[app.get()]                 + " " + guides[guide.get()] )
@@ -100,7 +96,7 @@ root.resizable(0, 0)
 # ------------------------- Edit ------------------------------
 
 R=0
-Label(root, text="----------------------------SETUP-----------------------------").grid(column=0, row=R, columnspan=4)
+Label(root, text="---------------------------------SETUP----------------------------------").grid(column=0, row=R, columnspan=4)
 
 R=R+1
 Label(root, text="Edit:").grid(column=0, row=R)
@@ -131,7 +127,7 @@ Button(root, text="All repos/Win",    width=button_width, command=update_windows
 # ------------------------- Build ------------------------------
 
 R=R+1
-Label(root, text="----------------------------BUILD-----------------------------").grid(column=0, row=R, columnspan=4)
+Label(root, text="---------------------------------BUILD----------------------------------").grid(column=0, row=R, columnspan=4)
 
 
 R=R+1
@@ -168,24 +164,15 @@ Button(root, text="Set revisions", width=button_width, command=set_revision, bg=
 # ------------------------- bundle/install ------------------------------
 
 R=R+1
-Label(root, text="------------------------BUNDLE/INSTALL-----------------------").grid(column=0, row=R, columnspan=4)
-
-R=R+1
-Label(root, text="Bundle/Install:").grid(column=0, row=R)
-Button(root, text="Bundle", width=button_width, command=bundle_smv).grid(row=R,   column=1)
-Button(root, text="Install",width=button_width, command=install_smv).grid(row=R,  column=2)
-Button(root, text="Bundle+Install",width=button_width, command=bundleinstall_smv).grid(row=R,  column=3)
-
-R=R+1
-Label(root, text="Upload:").grid(column=0, row=R)
-Button(root, text="Upload", width=button_width, command=upload_bundle).grid(row=R, column=1)
-Radiobutton(root, text="SMOKEVIEW_TEST",  padx = 0, variable=tag, value=1).grid(row=R, column=2)
-Radiobutton(root, text="SMOKEVIEW_TEST2", padx = 0, variable=tag, value=2).grid(row=R, column=3)
+Label(root, text="Bundle:").grid(column=0, row=R)
+Button(root, text="Bundle", width=button_width, command=bundle_smv).grid(row=R,    column=1)
+Button(root, text="Upload", width=button_width, command=upload_bundle).grid(row=R, column=2)
+Button(root, text="Install",width=button_width, command=install_smv).grid(row=R,   column=3)
 
 # ------------------------- guides ------------------------------
 
 R=R+1
-Label(root, text="----------------------------GUIDES---------------------------").grid(column=0, row=R, columnspan=4)
+Label(root, text="---------------------------------GUIDES--------------------------------").grid(column=0, row=R, columnspan=4)
 
 R=R+1
 Radiobutton(root, text="FDS",       padx = 0, variable=app, value=1).grid(row=R, column=0)
@@ -205,7 +192,7 @@ Button(root, text="View",     width=button_width, command=view_guides).grid(row=
 # ------------------------- synchronize ------------------------------
 
 R=R+1
-Label(root, text="-------------------------SYNCHRONIZE-------------------------").grid(column=0, row=R, columnspan=4)
+Label(root, text="----------------------------SYNCHRONIZE----------------------------").grid(column=0, row=R, columnspan=4)
 R=R+1
 Button(root, text="settings ---> smv",  width=button_width, command=webCOPYhome2config).grid(row=R, column=0)
 Button(root, text="smv ---> settings",  width=button_width, command=webCOPYconfig2home).grid(row=R, column=1)

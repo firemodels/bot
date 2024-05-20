@@ -1,6 +1,7 @@
 @echo off
 set platform=%1
-set SMOKEVIEW_TAG=%2
+set GH_OWNER=%GH_SMOKEVIEW_OWNER%
+set SMOKEVIEW_TAG=%GH_SMOKEVIEW_TAG%
 
 ::  batch file to build test or release Smokeview on a Windows, OSX or Linux system
 

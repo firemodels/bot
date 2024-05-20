@@ -1004,7 +1004,7 @@ make_smv_pictures()
    if [ "$COMPILER" == "gnu" ]; then
      COMPOPT=-C
    fi
-   ./Make_SMV_Pictures.sh $RUNOPT $COMPOPT -q $QUEUE -j SMV_ $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4a_picts
+   ./Make_SMV_Pictures.sh $RUNOPT $COMPOPT -q $SQUEUE -j SMV_ $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4a_picts
    grep -v FreeFontPath $OUTPUT_DIR/stage4a_picts | grep -v libpng &> $OUTPUT_DIR/stage4b_picts
 }
 
@@ -1525,6 +1525,7 @@ BOTBRANCH=master
 FIGBRANCH=master
 
 QUEUE=smokebot
+SQUEUE=
 MAKEMOVIES=0
 RUNAUTO=
 CLEANREPO=0
@@ -1552,7 +1553,7 @@ echo $$ > $PID_FILE
 
 #*** parse command line options
 
-while getopts 'aAb:cCDJm:Mq:R:s:SuUw:W:x:X:y:Y:' OPTION
+while getopts 'aAb:cCDJm:Mq:QR:s:SuUw:W:x:X:y:Y:' OPTION
 do
 case $OPTION in
   a)
@@ -1594,6 +1595,9 @@ case $OPTION in
   q)
    QUEUE="$OPTARG"
    ;;
+  Q)
+   SQUEUE=1
+   ;;
   R)
    CLONE_REPOS="$OPTARG"
    ;;
@@ -1632,6 +1636,12 @@ case $OPTION in
 esac
 done
 shift $(($OPTIND-1))
+
+if [ "$SQUEUE" == "" ]; then
+  SQUEUE=$QUEUE
+else
+  SQUEUE=terminal
+fi
 
 if [ "$CLONE_REPOS" != "" ]; then
   if [ "$CLONE_REPOS" != "release" ]; then
