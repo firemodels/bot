@@ -378,7 +378,7 @@ check_git_checkout()
 
 archive_compiler_version()
 {
-   ifort -V &> "$HISTORY_DIR/${FDS_REVISION}_compiler_info.txt"
+   ifx -V &> "$HISTORY_DIR/${FDS_REVISION}_compiler_info.txt"
 }
 
 #---------------------------------------------
@@ -425,13 +425,13 @@ check_compile_fds_mpi_db()
  
   # Check for compiler warnings/remarks
    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-  if [[ `grep -E -i 'warning|remark' $OUTPUT_DIR/stage2b${MPTYPE} | grep -v mpiifort | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'is now deprecated'| grep -v 'feupdateenv is not implemented'` == "" ]]
+  if [[ `grep -E -i 'warning|remark' $OUTPUT_DIR/stage2b${MPTYPE} | grep -v mpiifx | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'is now deprecated'| grep -v 'feupdateenv is not implemented'` == "" ]]
   then
       # Continue along
       :
   else
      echo "Warnings from Stage 2b - Compile FDS MPI debug:" >> $WARNING_LOG
-     grep -A 5 -E -i 'warning|remark' $OUTPUT_DIR/stage2b${MPTYPE} | grep -v mpiifort | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
+     grep -A 5 -E -i 'warning|remark' $OUTPUT_DIR/stage2b${MPTYPE} | grep -v mpiifx | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
      echo "" >> $WARNING_LOG
   fi
 }
@@ -2535,9 +2535,9 @@ echo $$ > $PID_FILE
 IFORT_VERSION=
 notfound=
 if [ "$COMPILER" == "intel" ]; then
-   notfound=`ifort -help 2>&1 | tail -1 | grep "not found" | wc -l`
+   notfound=`ifx -help 2>&1 | tail -1 | grep "not found" | wc -l`
    if [ $notfound -eq 0 ]; then
-     IFORT_VERSION=`ifort -v 2>&1`
+     IFORT_VERSION=`ifx -v 2>&1`
    fi
 else
    notfound=`gcc -help 2>&1 | tail -1 | grep "not found" | wc -l`
