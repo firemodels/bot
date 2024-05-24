@@ -1,6 +1,6 @@
 #!/bin/bash
 CUR=`pwd`
-allrepos="bot cad cfast cor exp fds fig out radcal smv test_bundles test7_bundles"
+allrepos="bot cad cfast cor exp fds fig out radcal smv test_bundles"
 
 function usage {
 echo "Clean repos $allrepos if they exist"
