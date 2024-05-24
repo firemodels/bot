@@ -23,6 +23,7 @@ set webgldir=%reporoot%\bot\Bundlebot\smv\for_bundle\webgl
 set smvscripts=%reporoot%\smv\scripts
 set svzipbuild=%reporoot%\smv\Build\smokezip\%BUILDDIR%
 set svdiffbuild=%reporoot%\smv\Build\smokediff\%BUILDDIR%
+set fds2fedbuild=%reporoot%\smv\Build\fds2fed\%BUILDDIR%
 set bgbuild=%reporoot%\smv\Build\background\intel_win_64
 set hashfilebuild=%reporoot%\smv\Build\hashfile\%BUILDDIR%
 set flushfilebuild=%reporoot%\smv\Build\flush\%BUILDDIR%
@@ -67,6 +68,7 @@ CALL :COPY  %bgbuild%\background_win_64.exe     %smvdir%\background.exe
 CALL :COPY  %flushfilebuild%\flush_win_64.exe   %smvdir%\flush.exe
 CALL :COPY  %hashfilebuild%\hashfile_win_64.exe %smvdir%\hashfile.exe
 CALL :COPY  %svdiffbuild%\smokediff_win_64.exe  %smvdir%\smokediff.exe
+CALL :COPY  %fds2fedbuild%\fds2fed_win_64.exe   %smvdir%\fds2fed.exe
 CALL :COPY  %svzipbuild%\smokezip_win_64.exe    %smvdir%\smokezip.exe
 CALL :COPY  %timepbuild%\timep_win_64.exe       %smvdir%\timep.exe
 CALL :COPY  %windbuild%\wind2fds_win_64.exe     %smvdir%\wind2fds.exe
@@ -83,6 +85,7 @@ cd %smvdir%
 %hashfileexe% smokeview.exe  >  hash\smokeview_%revision%.sha1
 %hashfileexe% smokezip.exe   >  hash\smokezip_%revision%.sha1
 %hashfileexe% smokediff.exe  >  hash\smokediff_%revision%.sha1
+%hashfileexe% fds2fed.exe    >  hash\fds2fed_%revision%.sha1
 %hashfileexe% background.exe >  hash\background_%revision%.sha1
 %hashfileexe% hashfile.exe   >  hash\hashfile_%revision%.sha1
 %hashfileexe% wind2fds.exe   >  hash\wind2fds_%revision%.sha1

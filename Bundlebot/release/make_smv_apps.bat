@@ -38,28 +38,30 @@ timeout /t 30 > Nul
 :: build smokeview libraries and apps
 call :BUILDLIB
 call :BUILD     background
+call :BUILD     fds2fed
 call :BUILD     flush
-call :BUILD     timep
+call :BUILD     get_time
 call :BUILD     hashfile
-call :BUILD     smokediff
-call :BUILD     smokezip
-call :BUILD     wind2fds
 call :BUILD     set_path
 call :BUILD     sh2bat
-call :BUILD     get_time
+call :BUILD     smokediff
+call :BUILD     smokezip
+call :BUILD     timep
+call :BUILD     wind2fds
 call :BUILDSMV
 
 :: verify smokeview apps were built
 call :CHECK_BUILD     background
+call :CHECK_BUILD     fds2fed
 call :CHECK_BUILD     flush
-call :CHECK_BUILD     timep
+call :CHECK_BUILD     get_time
 call :CHECK_BUILD     hashfile
-call :CHECK_BUILD     smokediff
-call :CHECK_BUILD     smokezip
-call :CHECK_BUILD     wind2fds
 call :CHECK_BUILD     set_path
 call :CHECK_BUILD     sh2bat
-call :CHECK_BUILD     get_time
+call :CHECK_BUILD     smokediff
+call :CHECK_BUILD     smokezip
+call :CHECK_BUILD     timep
+call :CHECK_BUILD     wind2fds
 call :CHECK_BUILDSMV
 
 echo.
