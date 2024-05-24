@@ -166,8 +166,8 @@ Button(root, text="Set revisions", width=button_width, command=set_revision, bg=
 R=R+1
 Label(root, text="Bundle:").grid(column=0, row=R)
 Button(root, text="Bundle", width=button_width, command=bundle_smv).grid(row=R,    column=1)
-Button(root, text="Upload", width=button_width, command=upload_bundle).grid(row=R, column=2)
-Button(root, text="Install",width=button_width, command=install_smv).grid(row=R,   column=3)
+Button(root, text="Install",width=button_width, command=install_smv).grid(row=R,   column=2)
+Button(root, text="Upload", width=button_width, command=upload_bundle).grid(row=R, column=3)
 
 # ------------------------- guides ------------------------------
 
