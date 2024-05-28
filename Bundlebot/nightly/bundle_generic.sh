@@ -388,6 +388,7 @@ echo ""
 CP $APPS_DIR background $smvbindir background
 CP $APPS_DIR smokeview  $smvbindir smokeview
 CP $APPS_DIR smokediff  $smvbindir smokediff
+CP $APPS_DIR fds2fed    $smvbindir fds2fed
 CP $APPS_DIR smokezip   $smvbindir smokezip
 CP $APPS_DIR wind2fds   $smvbindir wind2fds
 CP $APPS_DIR hashfile   $smvbindir hashfile
@@ -404,6 +405,7 @@ cd $smvbindir
 $APPS_DIR/hashfile background > hash/background.sha1
 $APPS_DIR/hashfile smokeview  > hash/smokeview.sha1
 $APPS_DIR/hashfile smokediff  > hash/smokediff.sha1
+$APPS_DIR/hashfile fds2fed    > hash/fds2fed.sha1
 $APPS_DIR/hashfile smokezip   > hash/smokezip.sha1
 $APPS_DIR/hashfile wind2fds   > hash/wind2fds.sha1
 $APPS_DIR/hashfile hashfile   > hash/hashfile.sha1
@@ -459,6 +461,7 @@ TOMANIFESTSMV  $smvbindir/background background
 TOMANIFESTLIST $fdsbindir/fds2ascii  fds2ascii
 TOMANIFESTSMV  $smvbindir/hashfile   hashfile
 TOMANIFESTSMV  $smvbindir/smokediff  smokediff
+TOMANIFESTSMV  $smvbindir/fds2fed    fds2fed
 TOMANIFESTSMV  $smvbindir/smokezip   smokezip
 TOMANIFESTLIST $fdsbindir/test_mpi   test_mpi
 TOMANIFESTSMV  $smvbindir/wind2fds   wind2fds

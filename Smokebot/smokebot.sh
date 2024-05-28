@@ -636,6 +636,15 @@ compile_smv_utilities()
      ./make_smokediff.sh >> $OUTPUT_DIR/stage2a_smvutil 2>&1
      echo "" >> $OUTPUT_DIR/stage2a_smvutil 2>&1
      cp smokediff_${platform}_64 $LATESTAPPS_DIR/smokediff
+   
+   # fds2fed:
+     echo "   fds2fed"
+     cd $smvrepo/Build/fds2fed/${COMPILER}_${platform}_64
+     rm -f *.o fds2fed_${platform}_64
+     echo 'Compiling fds2fed:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
+     ./make_fds2fed.sh >> $OUTPUT_DIR/stage2a_smvutil 2>&1
+     echo "" >> $OUTPUT_DIR/stage2a_smvutil 2>&1
+     cp fds2fed_${platform}_64 $LATESTAPPS_DIR/fds2fed
 
    # background
      echo "   background"
@@ -738,6 +747,7 @@ check_smv_utilities()
 {
    SMOKEZIP="$smvrepo/Build/smokezip/${COMPILER}_${platform}_64/smokezip_${platform}_64"
    SMOKEDIFF="$smvrepo/Build/smokediff/${COMPILER}_${platform}_64/smokediff_${platform}_64"
+   FDS2FED="$smvrepo/Build/fds2fed/${COMPILER}_${platform}_64/fds2fed_${platform}_64"
    WIND2FDS="$smvrepo/Build/wind2fds/${COMPILER}_${platform}_64/wind2fds_${platform}_64"
    BACKGROUND="$smvrepo/Build/background/${COMPILER}_${platform}_64/background_${platform}_64"
    if [ "$haveCC" == "1" ] ; then
@@ -762,6 +772,11 @@ check_smv_utilities()
           echo "error: smokediff failed to compile"          >> $ERROR_LOG
           echo "       $SMOKEDIFF does not exist"            >> $ERROR_LOG
         fi 
+        if [ ! -e "$FDS2FED" ]; then
+          echo ""
+          echo "error: fds2fed failed to compile"            >> $ERROR_LOG
+          echo "       $FDS2FED does not exist"            >> $ERROR_LOG
+        fi 
         if [ ! -e "$WIND2FDS" ]; then
           echo ""
           echo "error: wind2fds failed to compile"           >> $ERROR_LOG
@@ -781,6 +796,7 @@ check_smv_utilities()
      is_file_installed smokeview
      is_file_installed smokezip
      is_file_installed smokediff
+     is_file_installed fds2fed
      is_file_installed wind2fds
      is_file_installed background
      if [ "$stage_utilities_success" == "0" ] ; then

@@ -71,6 +71,7 @@ SMVDIR=$GITROOT/smv/Build/smokeview/${COMPILER}_${platform}_64
 SMVDIRQ=$GITROOT/smv/Build/smokeview/${COMPILER}_${platform}_q_64
 SMZDIR=$GITROOT/smv/Build/smokezip/${COMPILER}_${platform}_64
 SMDDIR=$GITROOT/smv/Build/smokediff/${COMPILER}_${platform}_64
+FDS2FEDDIR=$GITROOT/smv/Build/fds2fed/${COMPILER}_${platform}_64
 WIND2FDSDIR=$GITROOT/smv/Build/wind2fds/${COMPILER}_${platform}_64
 HASHFILEDIR=$GITROOT/smv/Build/hashfile/${COMPILER}_${platform}_64
 FLUSHFILEDIR=$GITROOT/smv/Build/flush/${COMPILER}_${platform}_64
@@ -127,6 +128,7 @@ else
   CP  $SMVDIR        smokeview_${platform}_${TEST}64  $PLATFORMDIR/$smvbin smokeview
 fi
 CP  $SMDDIR        smokediff_${platform}_64         $PLATFORMDIR/$smvbin smokediff
+CP  $FDS2FEDDIR    smokediff_${platform}_64         $PLATFORMDIR/$smvbin fds2fed
 CP  $SMZDIR        smokezip_${platform}_64          $PLATFORMDIR/$smvbin smokezip
 CP  $WIND2FDSDIR   wind2fds_${platform}_64          $PLATFORMDIR/$smvbin wind2fds
 CP  $HASHFILEDIR   hashfile_${platform}_64          $PLATFORMDIR/$smvbin hashfile
@@ -137,6 +139,7 @@ cd $PLATFORMDIR/$smvbin
 HASHFILE=$HASHFILEDIR/hashfile_${platform}_64
 $HASHFILE background > background.sha1
 $HASHFILE smokediff  > smokediff.sha1
+$HASHFILE fds2fed    > fds2fed.sha1
 $HASHFILE smokeview  > smokeview.sha1
 $HASHFILE smokezip   > smokezip.sha1
 $HASHFILE wind2fds   > wind2fds.sha1
