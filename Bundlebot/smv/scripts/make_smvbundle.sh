@@ -53,6 +53,7 @@ case $OPTION  in
    RELEASE=release
    BUILDTYPE=-r
    BUILDTYPE2=release
+   GH_OWNER=$GH_SMOKEVIEW_OWNER
    ;;
   z)
    USE_GH_VARS=1

@@ -1,7 +1,6 @@
 #!/bin/bash
 # build a release bundle using revision and tags defined in config.sh .
 source config.sh
-export GH_SMOKEVIEW_TAG=SMOKEVIEW_TEST2
 
 # uncomment and edit following lines if building a test bundle.
 # otherwise use settings in config.sh
