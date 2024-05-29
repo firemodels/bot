@@ -17,7 +17,7 @@ DOWNLOADFILE ()
 {
   FILE=$1
   echo downloading $FILE
-  gh release download SMOKEVIEW_TEST2 -p $FILE -D $BUNDLEDIR  -R github.com/$GH_OWNER/$GH_REPO
+  gh release download SMOKEVIEW_TEST -p $FILE -D $BUNDLEDIR  -R github.com/$GH_SMOKEVIEW_OWNER/$GH_REPO
 }
 
 DOWNLOADFILE ${BUNDLE_BASE}lnx.sh
