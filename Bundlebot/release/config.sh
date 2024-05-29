@@ -28,9 +28,9 @@ export BUNDLE_FIG_TAG=FIG-6.9.1
 export BUNDLE_OUT_REVISION=7593d3181
 export BUNDLE_OUT_TAG=OUT-6.9.1
 
-# SMV-6.9.2-67-gc9109b6c2
-export BUNDLE_SMV_REVISION=c9109b6c2
-export BUNDLE_SMV_TAG=SMV-6.9.3
+# SMV-6.9.3-211-g001104443
+export BUNDLE_SMV_REVISION=001104443
+export BUNDLE_SMV_TAG=SMV-6.9.4
 
 # ----------------------------
 # github environment variables
