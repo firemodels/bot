@@ -11,7 +11,7 @@ echo.
 echo   To directory: %pdf_to_dir%
 
 if "%bot_type%" == "firebot" (
-  set GH_TAG=%GH_FDS_TAG%
+  set GH_TAG=FDS_TEST
   call :copy_file FDS_Config_Management_Plan.pdf
   call :copy_file FDS_Technical_Reference_Guide.pdf
   call :copy_file FDS_User_Guide.pdf
@@ -20,7 +20,7 @@ if "%bot_type%" == "firebot" (
 )
 
 if "%bot_type%" == "smokebot" (
-  set GH_TAG=%GH_SMOKEVIEW_TAG%
+  set GH_TAG=SMOKEVIEW_TEST
   call :copy_file SMV_Technical_Reference_Guide.pdf
   call :copy_file SMV_User_Guide.pdf
   call :copy_file SMV_Verification_Guide.pdf
@@ -35,6 +35,7 @@ set file=%1
 
 echo downloading %file% from github.com/%GH_OWNER%/%GH_REPO% tag: %GH_TAG%
 if EXIST %pdf_to_dir%\%file% erase %pdf_to_dir%\%file%
+echo gh release download %GH_TAG% -p %file% -R github.com/%GH_OWNER%/%GH_REPO% -D %pdf_to_dir% --clobber
 gh release download %GH_TAG% -p %file% -R github.com/%GH_OWNER%/%GH_REPO% -D %pdf_to_dir% --clobber
 if EXIST %pdf_to_dir%\%file% exit /b
 echo ***Error: %file% download failed
