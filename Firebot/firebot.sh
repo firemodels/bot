@@ -708,6 +708,17 @@ compile_smv_utilities()
   CP wind2fds_${platform}${smvsize} $LATESTAPPS_DIR/wind2fds
  echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
+# fds2fed
+  if [ -d $smvrepo/Build/fds2fed/${SMVCOMPILER}_${platform}${smvsize} ]; then
+    echo "      fds2fed"
+    cd $smvrepo/Build/fds2fed/${SMVCOMPILER}_${platform}${smvsize}
+    rm -f *.o fds2fed_${platform}${smvsize}
+    ./make_fds2fed.sh >> $OUTPUT_DIR/stage3a 2>&1
+    CP fds2fed_${platform}${smvsize} $LATESTAPPS_DIR/fds2fed
+    echo "" >> $OUTPUT_DIR/stage3a 2>&1
+  fi
+
+
 # hashfile:
   echo "      hashfile"
   cd $smvrepo/Build/hashfile/${SMVCOMPILER}_${platform}${smvsize}
