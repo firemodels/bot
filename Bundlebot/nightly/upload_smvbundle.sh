@@ -2,9 +2,12 @@
 FROM_DIR=$1
 FROM_FILE=$2
 SCRIPTDIR=$3
-RELEASEBRANCH=$4
-GH_OWNER_ARG=$5
-GH_REPO_ARG=$6
+
+if [ "$BUILDING_release" == "1" ]; then
+  OWNER=`whoami`
+else
+  OWNER=firemodels
+fi
 
 CURDIR=`pwd`
 
@@ -14,7 +17,7 @@ if [ ! -e $HOME/$FROM_DIR/$FROM_FILE ] ; then
 fi
 
 echo uploading $FROM_FILE to github
-gh release upload $RELEASEBRANCH $HOME/$FROM_DIR/$FROM_FILE  -R github.com/$GH_OWNER_ARG/$GH_REPO_ARG --clobber
+gh release upload SMOKEVIEW_TEST $HOME/$FROM_DIR/$FROM_FILE  -R github.com/$OWNER/test_bundles --clobber
 if [ "`uname`" == "Darwin" ] ; then
   platform=osx
 else
@@ -24,6 +27,6 @@ if [ "$platform" == "linux" ]; then
   cd $HOME/$SCRIPTDIR/../../../smv
   SMV_SHORT_HASH=`git rev-parse --short HEAD`
   cd $HOME/$SCRIPTDIR
-  ./setreleasetitle.sh smv $SMV_SHORT_HASH $GH_OWNER_ARG $GH_REPO_ARG
+  ./setreleasetitle.sh smv $SMV_SHORT_HASH $OWNER test_bundles
 fi
 

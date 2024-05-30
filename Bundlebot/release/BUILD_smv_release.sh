@@ -1,11 +1,7 @@
 #!/bin/bash
 # build a release bundle using revision and tags defined in config.sh .
 source config.sh
-
-# uncomment and edit following lines if building a test bundle.
-# otherwise use settings in config.sh
-# export BUNDLE_SMV_REVISION=9ce553208
-# export BUNDLE_SMV_TAG=SMV-6.9.1test
+export BUILDING_release=1
 
 CURDIR=`pwd`
 cd ../../../smv

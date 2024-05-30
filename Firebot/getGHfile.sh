@@ -1,9 +1,8 @@
 #!/bin/bash
 FROMFILE=$1
-TAG=$2
 
 rm -f $FROMFILE
-gh release download $TAG -p $FROMFILE -R github.com/$GH_OWNER/$GH_REPO --clobber
+gh release download FDS_TEST -p $FROMFILE -R github.com/firemodels/test_bundles --clobber
 if [ -e $FROMFILE ]; then
   cat $FROMFILE
 else

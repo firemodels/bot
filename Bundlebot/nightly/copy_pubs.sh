@@ -2,10 +2,10 @@
 pub_type=$1
 error_log=$2
 
-GH_TAG=$GH_FDS_TAG
+PUB_TAG=FDS_TEST
 if [ "$pub_type" != "fds" ]; then
   pub_type="smv"
-  GH_TAG=$GH_SMOKEVIEW_TAG
+  PUB_TAG=SMOKEVIEW_TEST
 fi
 
 #---------------------------------------------
@@ -18,7 +18,7 @@ CP ()
   rm -f $pdf_to/$FROMFILE
 
   echo "   copying $FROMFILE to $pdf_to"
-  gh release download $GH_TAG -p $FROMFILE -R github.com/$GH_OWNER/$GH_REPO -D $pdf_to --clobber
+  gh release download $PUB_TAG -p $FROMFILE -R github.com/firemodels/test_bundles -D $pdf_to --clobber
   if [ ! -e $pdf_to/$FROMFILE ]; then
     echo "" >> $error_log
     echo "***error: $FROMFILE failed to copy to $pdf_to" >> $error_log
@@ -35,7 +35,7 @@ mkdir -p $pdf_to
 
 if [ "$pub_type" == "fds" ]; then
   echo ""
-  echo ***copying fds pubs from github.com/$GH_OWNER/$GH_REPO using tag: $GH_TAG
+  echo ***copying fds pubs from github.com/firemodels/test_bundles using tag: $PUB_TAG
   CP FDS_Config_Management_Plan.pdf         || exit 1
   CP FDS_Technical_Reference_Guide.pdf      || exit 1
   CP FDS_User_Guide.pdf                     || exit 1
@@ -45,7 +45,7 @@ fi
 
 if [ "$pub_type" == "smv" ]; then
   echo ""
-  echo ***copying smokeview pubs from github.com/$GH_OWNER/$GH_REPO using tag: $GH_TAG
+  echo ***copying smokeview pubs from github.com/firemodels/test_bundles using tag: $PUB_TAG
   CP SMV_Technical_Reference_Guide.pdf      || exit 1
   CP SMV_User_Guide.pdf                     || exit 1
   CP SMV_Verification_Guide.pdf             || exit 1

@@ -34,10 +34,3 @@ set BUNDLE_SMV_TAG=SMV-6.9.4
 
 set BUNDLE_SMV_REVISION=001104443
 set BUNDLE_SMV_TAG=SMV-6.9.4
-
-:: ----------------------------
-:: github environment variables
-
-set GH_REPO=test_bundles
-set GH_FDS_TAG=BUNDLE_TEST
-set GH_SMOKEVIEW_TAG=BUNDLE_TEST

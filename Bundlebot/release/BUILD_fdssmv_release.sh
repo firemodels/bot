@@ -1,10 +1,14 @@
 #!/bin/bash
 # build a release bundle using revision and tags defined in config.sh .
 source config.sh
-if [ "$GH_REPO" != "" ]; then
-  GHREPO="-r $GH_REPO"
-fi
 export DISABLEPUSH=1
+export BUILDING_release=1
+
+# FDS-6.9.0-96-g889da6ae0
+export BUNDLE_FDS_REVISION=889da6ae0
+export BUNDLE_FDS_TAG=FDS-6.9.1test
+
+OWNER=`whoami`
 
 echo ***updating repos
 CURDIR=`pwd`
@@ -13,8 +17,8 @@ cd ../../Scripts
 cd $CURDIR
 
 cd ../nightly
-./BUILD_fdssmv_nightly.sh -R release -F $BUNDLE_FDS_REVISION -X $BUNDLE_FDS_TAG -S $BUNDLE_SMV_REVISION -Y $BUNDLE_SMV_TAG -o firemodels $GHREPO
+./BUILD_fdssmv_nightly.sh -R release -F $BUNDLE_FDS_REVISION -X $BUNDLE_FDS_TAG -S $BUNDLE_SMV_REVISION -Y $BUNDLE_SMV_TAG -o $OWNER -r test_bundles
 cd $CURDIR
 
 TITLE="Bundle Test - $BUNDLE_FDS_TAG/$BUNDLE_FDS_REVISION - $BUNDLE_SMV_TAG/$BUNDLE_SMV_REVISION"
-gh release edit $GH_FDS_TAG  -t "$TITLE" -R github.com/$GH_OWNER/$GH_REPO
+gh release edit FDS_TEST  -t "$TITLE" -R github.com/$OWNER/test_bundles

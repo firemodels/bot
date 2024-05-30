@@ -32,9 +32,3 @@ export BUNDLE_OUT_TAG=OUT-6.9.1
 export BUNDLE_SMV_REVISION=526c020ff
 export BUNDLE_SMV_TAG=SMV-6.9.4
 
-# ----------------------------
-# github environment variables
-
-export GH_REPO=test_bundles
-export GH_FDS_TAG=BUNDLE_TEST
-export GH_SMOKEVIEW_TAG=SMOKEVIEW_TEST

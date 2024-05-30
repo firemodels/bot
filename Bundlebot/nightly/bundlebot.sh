@@ -2,6 +2,12 @@
 
 SHA1EXT=sha1
 
+if [ "$BUILDING_release" == "1" ]; then
+  GHOWNER=`whoami`
+else
+  GHOWNER=firemodels
+fi
+
 #run time libraries are located in
 #  $HOME/.bundle/BUNDLE/MPI
 
@@ -282,14 +288,14 @@ if [ "$showparms" == "" ]; then
     echo ""
     echo "uploading installer"
     
-    FILELIST=`gh release view $GH_FDS_TAG  -R github.com/$GH_OWNER/$GH_REPO | grep SMV | grep FDS | grep $platform | awk '{print $2}'`
+    FILELIST=`gh release view FDS_TEST  -R github.com/$GHOWNER/test_bundles | grep SMV | grep FDS | grep $platform | awk '{print $2}'`
     for file in $FILELIST ; do
-      gh release delete-asset $GH_FDS_TAG $file -R github.com/$GH_OWNER/$GH_REPO -y
+      gh release delete-asset FDS_TEST $file -R github.com/$GHOWNER/test_bundles -y
     done
 
-    gh release upload $GH_FDS_TAG $bundle_dir/${installer_base_platform}.sh         -R github.com/$GH_OWNER/$GH_REPO  --clobber
-    gh release upload $GH_FDS_TAG $bundle_dir/${installer_base_platform}.$SHA1EXT   -R github.com/$GH_OWNER/$GH_REPO  --clobber
-    gh release upload $GH_FDS_TAG $bundle_dir/${installer_base_platform}.tar.gz     -R github.com/$GH_OWNER/$GH_REPO  --clobber
+    gh release upload FDS_TEST $bundle_dir/${installer_base_platform}.sh         -R github.com/$GHOWNER/test_bundles  --clobber
+    gh release upload FDS_TEST $bundle_dir/${installer_base_platform}.$SHA1EXT   -R github.com/$GHOWNER/test_bundles  --clobber
+    gh release upload FDS_TEST $bundle_dir/${installer_base_platform}.tar.gz     -R github.com/$GHOWNER/test_bundles  --clobber
     if [ "$platform" == "lnx" ]; then
       cd $REPO_ROOT/fds
       FDS_SHORT_HASH=`git rev-parse --short HEAD`
