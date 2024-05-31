@@ -34,7 +34,7 @@ goto eof
 ::----------------------------------------------------------
 set ffile=%1
   echo downloading %ffile%
-  gh release download SMOKEVIEW_TEST -p %ffile% -D %BUNDLEDIR%  -R github.com/%GH_SMOKEVIEW_OWNER%/%GH_REPO%
+  gh release download SMOKEVIEW_TEST -p %ffile% -D %BUNDLEDIR%  -R github.com/%username%/test_bundles
   exit /b 0
 
 :eof

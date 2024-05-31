@@ -18,7 +18,7 @@ set file=%1
 if exist output\%file% erase output\%file%
 
 echo downloading %file%
-gh release download %GH_FDS_TAG% -p %file% -R github.com/%GH_OWNER%/%GH_REPO% -D output
+gh release download FDS_TEST -p %file% -R github.com/firemodels/test_bundels -D output
 if NOT exist output\%file% echo failed
 exit /b
 

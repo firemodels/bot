@@ -2,7 +2,7 @@
 set CURDIR=%CD%
 set develop=%1
 
-set GH_FDS_TAG=FDS_TEST
+set is_nightly=1
 
 :: build and upload bundle
 if not exist %userprofile%\.bundle mkdir %userprofile%\.bundle
