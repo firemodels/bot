@@ -42,7 +42,7 @@ if "%platform%" == "Windows" (
 
 cd %git_root%\smv\scripts
 
-set scriptdir=%linux_git_root%/bot/Bundlebot/smv
+set scriptdir=%linux_git_root%/bot/Bundlebot/nightly
 set bundledir=.bundle/uploads
 set todir=%userprofile%\.bundle
 set uploaddir=%todir%\uploads
@@ -57,7 +57,7 @@ if "%platform%" == "Linux" (
   echo.
   echo --- making 64 bit Linux Smokeview installer ---
   echo.
-  plink %plink_options% %linux_logon% %scriptdir%/scripts/assemble_smvbundle.sh %buildtype% %version% %linux_git_root%
+  plink %plink_options% %linux_logon% %scriptdir%/assemble_smvbundle.sh %buildtype% %version% %linux_git_root%
   goto eof
 )
 
@@ -67,7 +67,7 @@ if "%platform%" == "OSX" (
   echo.
   echo --- making 64 bit OSX Smokeview installer ---
   echo.
-  plink %plink_options% %osx_logon% %scriptdir%/scripts/assemble_smvbundle.sh %buildtype% %version% %linux_git_root%
+  plink %plink_options% %osx_logon% %scriptdir%/assemble_smvbundle.sh %buildtype% %version% %linux_git_root%
   goto eof
 )
 
