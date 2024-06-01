@@ -19,9 +19,9 @@ cd ../../../..
 reporoot=`pwd`
 basereporoot=`basename $reporoot`
 
-cd $basereporoot/bot/Scripts
+cd $reporoot/bot/Scripts
 echo updating repos
-./update_repos -m
+./update_repos.sh -m
 
 cd $curdir/output
 outdir=`pwd`
