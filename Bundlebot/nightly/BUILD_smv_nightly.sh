@@ -51,7 +51,7 @@ else
   smv_hash=$BUNDLE_SMV_REVISION
 fi
 
-cd $reporoot/bot/Scripts
+cd $reporoot/bot/Bundlebot/nightly
 ./clone_repos.sh $smv_hash $RELEASE >& $outdir/stage2_clone
 
 if [ "$BUILDING_release" == "" ]; then
