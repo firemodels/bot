@@ -42,7 +42,7 @@ echo "*** get smv repo revision"
 if [ "$BUILDING_release" == "" ]; then
   cd $reporoot/bot/Bundlebot/nightly/output
   outdir=`pwd`
-  cd $reporoot/bot/Bundlebot/smv/scripts
+  cd $reporoot/bot/Bundlebot/nightly
   ./get_hash_revisions.sh $outdir >& $outdir/stage1_hash
   smv_hash=`head -1 $outdir/SMV_HASH`
 else
@@ -88,7 +88,7 @@ cd $reporoot/smv/Build/smokeview/${comp}_${platform}_64
 
 echo "*** bundling smokeview"
 
-$reporoot/bot/Bundlebot/smv/scripts/assemble_smvbundle.sh $BUILDTYPE2 $smv_revision $basereporoot >& $outdir/stage6_bundle
+$reporoot/bot/Bundlebot/nightly/assemble_smvbundle.sh $BUILDTYPE2 $smv_revision $basereporoot >& $outdir/stage6_bundle
 
 
 echo "*** uploading smokeview bundle"
