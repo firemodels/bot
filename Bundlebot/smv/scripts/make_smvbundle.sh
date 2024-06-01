@@ -1,29 +1,5 @@
 #!/bin/bash
 
-#---------------------------------------------
-#                   usage
-#---------------------------------------------
-
-function usage {
-echo ""
-echo "$0 usage"
-echo ""
-echo "This script builds a smokeview bundle using the"
-echo "smv repo revision from the latest smokebot pass."
-echo ""
-echo "Options:"
-echo "-h - display this message"
-echo "-r - release bundle"
-echo "-z - use GH_SMV_REVISION and GH_SMV_TAG "
-
-#if [ "$MAILTO" != "" ]; then
-#  echo "-m mailto - email address [default: $MAILTO]"
-#else
-#  echo "-m mailto - email address"
-#fi
-exit 0
-}
-
 #*** determine platform script is running on
 
 platform=linux
@@ -34,52 +10,31 @@ if [ "`uname`" == "Darwin" ] ; then
   platform2="osx"
   comp=gnu
 fi
-USE_GH_VARS=
 RELEASE=
 BUILDTYPE=-t
 BUILDTYPE2=test
-
-#---------------------------------------------
-#               get options
-#---------------------------------------------
-
-while getopts 'hrz' OPTION
-do
-case $OPTION  in
-  h)
-   usage
-   ;;
-  r)
-   RELEASE=release
-   BUILDTYPE=-r
-   BUILDTYPE2=release
-   GH_OWNER=$GH_SMOKEVIEW_OWNER
-   ;;
-  z)
-   USE_GH_VARS=1
-   ;;
-esac
-done
-shift $(($OPTIND-1))
 
 curdir=`pwd`
 cd ../../../..
 reporoot=`pwd`
 basereporoot=`basename $reporoot`
-cd $curdir/output
 
+cd $basereporoot/bot/Scripts
+echo updating repos
+./update_repos -m
+
+cd $curdir/output
 outdir=`pwd`
 cd $curdir
 
-echo "*** get smv repo revision"
-ERROR=
-if [ "$USE_GH_VARS" != "" ]; then
+if [ "$BUILDING_release" != "" ]; then
+  ERROR=
   if [ "$BUNDLE_SMV_REVISION" == "" ]; then
-    echo "***error: BUNDLE_SMV_REVISION not defined"
+    echo ***error: environment variable BUNDLE_SMV_REVISION not defined
     ERROR=1
   fi
   if [ "$BUNDLE_SMV_TAG" == "" ]; then
-    echo "***error: BUNDLE_SMV_TAG not defined"
+    echo ***error: environment variable BUNDLE_SMV_TAG not defined
     ERROR=1
   fi
   if [ "$ERROR" != "" ]; then
@@ -87,7 +42,8 @@ if [ "$USE_GH_VARS" != "" ]; then
   fi
 fi
 
-if [ "$USE_GH_VARS" == "" ]; then
+echo "*** get smv repo revision"
+if [ "$BUILDING_release" == "" ]; then
   ./get_hash_revisions.sh >& $outdir/stage1_hash
   smv_hash=`head -1 $outdir/SMV_HASH`
 else
@@ -96,14 +52,14 @@ fi
 
 ./clone_repos.sh $smv_hash $RELEASE >& $outdir/stage2_clone
 cd $reporoot/smv
-if [ "$USE_GH_VARS" != "" ]; then
-  git tag -a $BUNDLE_SMV_TAG -m "tag for smokeview release" >> $outdir/stage2_clone 2>&1
-fi
 
-if [ "$USE_GH_VARS" == "" ]; then
+if [ "$BUILDING_release" == "" ]; then
   smv_revision=`git describe --abbrev=7 --dirty --long`
+  GHOWNER=`whoami`
 else
+  git tag -a $BUNDLE_SMV_TAG -m "tag for smokeview release" >> $outdir/stage2_clone 2>&1
   smv_revision=$BUNDLE_SMV_TAG
+  GHOWNER=firemodels
 fi
 echo "***     smv_hash: $smv_hash"
 echo "*** smv_revision: $smv_revision"
@@ -135,9 +91,9 @@ $reporoot/bot/Bundlebot/smv/scripts/assemble_smvbundle.sh $BUILDTYPE2 $smv_revis
 
 echo "*** uploading smokeview bundle"
 
-FILELIST=`gh release view $GH_SMOKEVIEW_TAG  -R github.com/$GH_OWNER/$GH_REPO | grep SMV | grep -v FDS | grep $platform2 | awk '{print $2}'`
+FILELIST=`gh release view SMOKEVIEW_TEST  -R github.com/$GHOWNER/test_bundles | grep SMV | grep -v FDS | grep $platform2 | awk '{print $2}'`
 for file in $FILELIST ; do
-  gh release delete-asset $GH_SMOKEVIEW_TAG $file -R github.com/$GH_OWNER/$GH_REPO -y
+  gh release delete-asset SMOKEVIEW_TEST $file -R github.com/$GHOWNER/test_bundles -y
 done
 
 uploaddir=.bundle/uploads
