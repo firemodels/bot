@@ -3,5 +3,5 @@
 source config.sh
 export BUILDING_release=1
 
-cd ../smv/scripts
-./make_smvbundle.sh
+cd ../nightly
+./BUILD_smv_nightly.sh
