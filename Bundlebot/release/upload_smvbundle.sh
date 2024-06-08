@@ -1,4 +1,6 @@
 #!/bin/bash
-export BUILD_release=1
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+cd $SCRIPT_DIR
+export BUILDING_release=1
 cd ../nightly
-./update_smvbundle.sh $*
+./upload_smvbundle.sh $*
