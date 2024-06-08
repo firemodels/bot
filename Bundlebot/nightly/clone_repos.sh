@@ -8,7 +8,7 @@ else
 fi
 
 CURDIR=`pwd`
-cd ../../../..
+cd ../../..
 REPOROOT=`pwd`
 
 cd $REPOROOT/bot/Scripts

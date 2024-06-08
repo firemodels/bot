@@ -79,7 +79,7 @@ FORBUNDLE=$GITROOT/bot/Bundlebot/smv/for_bundle
 WEBGLDIR=$GITROOT/bot/Bundlebot/smv/for_bundle/webgl
 UTILSCRIPTDIR=$GITROOT/smv/Utilities/Scripts
 PLATFORMDIR=$RELEASE$revision\_${platform3}
-MAKEINSTALLER=$GITROOT/bot/Bundlebot/smv/scripts//make_installer.sh
+MAKEINSTALLER=$GITROOT/bot/Bundlebot/nightly/make_smv_installer.sh
 uploads=$HOME/.bundle/uploads
 uploadscp=.bundle/uploads
 flushfile=$GITROOT/smv/Build/flush/${COMPILER}_${platform}_64/flush_${platform}_64
@@ -128,7 +128,7 @@ else
   CP  $SMVDIR        smokeview_${platform}_${TEST}64  $PLATFORMDIR/$smvbin smokeview
 fi
 CP  $SMDDIR        smokediff_${platform}_64         $PLATFORMDIR/$smvbin smokediff
-CP  $FDS2FEDDIR    smokediff_${platform}_64         $PLATFORMDIR/$smvbin fds2fed
+CP  $FDS2FEDDIR    fds2fed_${platform}_64           $PLATFORMDIR/$smvbin fds2fed
 CP  $SMZDIR        smokezip_${platform}_64          $PLATFORMDIR/$smvbin smokezip
 CP  $WIND2FDSDIR   wind2fds_${platform}_64          $PLATFORMDIR/$smvbin wind2fds
 CP  $HASHFILEDIR   hashfile_${platform}_64          $PLATFORMDIR/$smvbin hashfile

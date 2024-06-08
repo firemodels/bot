@@ -16,7 +16,7 @@ set file=%1
 if exist output\%file% erase output\%file%
 
 echo downloading %file%
-gh release download %GH_SMOKEVIEW_TAG% -p %file% -R github.com/%GH_OWNER%/%GH_REPO% -D output --clobber
+gh release download SMOKEVIEW_TEST -p %file% -R github.com/firemodels/test_bundles -D output --clobber
 if NOT exist output\%file% echo failed
 exit /b
 

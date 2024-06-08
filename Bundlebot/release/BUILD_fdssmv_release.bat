@@ -15,6 +15,6 @@ call run_bundlebot -c -R release -F %BUNDLE_FDS_REVISION% -X %BUNDLE_FDS_TAG% -S
 cd %CURDIR%
 
 if "X%TEST%" == "X-U" goto :EOF
-set "TITLE=Bundle Test - %BUNDLE_FDS_TA%G/%BUNDLE_FDS_REVISION% - %BUNDLE_SMV_TAG%/%BUNDLE_SMV_REVISION%"
-gh release edit %GH_FDS_TAG%  -t %$TITLE% -R github.com/%GH_OWNER%/%GH_REPO%
+set "TITLE=Bundle Test - %BUNDLE_FDS_TAG%/%BUNDLE_FDS_REVISION% - %BUNDLE_SMV_TAG%/%BUNDLE_SMV_REVISION%"
+gh release edit FDS_TEST -t %$TITLE% -R github.com/%username%/test_bundles
 :EOF

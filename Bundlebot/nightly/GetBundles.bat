@@ -44,7 +44,7 @@ goto eof
 ::----------------------------------------------------------
 set ffile=%1
   echo downloading %ffile%
-  gh release download FDS_TEST -p %ffile% -D %BUNDLEDIR%  -R github.com/%username%/test_bundles
+  gh release download FDS_TEST -p %ffile% -D %BUNDLEDIR%  -R github.com/firemodels/test_bundles
   exit /b 0
 
 :eof

@@ -1,5 +1,8 @@
 @echo off
 
+set OWNER=%username%
+if "x%is_nightly%" == "x1" set OWNER=firemodels
+
 set SHA1EXT=sha1
 
 set clone=
@@ -281,21 +284,21 @@ if "x%upload_bundle%" == "x" goto skip_upload
   echo.
 
   set filelist=%TEMP%\fds_smv_files_win.out
-  gh release view %GH_FDS_TAG% -R github.com/%GH_OWNER%/%GH_REPO% | grep FDS | grep SMV | grep win | gawk "{print $2}" > %filelist%
-  for /F "tokens=*" %%A in (%filelist%) do gh release delete-asset %GH_FDS_TAG% -R github.com/%GH_OWNER%/%GH_REPO% %%A -y
+  gh release view FDS_TEST -R github.com/%OWNER%/test_bundles | grep FDS | grep SMV | grep win | gawk "{print $2}" > %filelist%
+  for /F "tokens=*" %%A in (%filelist%) do gh release delete-asset FDS_TEST -R github.com/%OWNER%/test_bundles %%A -y
   erase %filelist%
 
   set /p basename=<%TEMP%\fds_smv_basename.txt
 
   set fullfilebase=%userprofile%\.bundle\bundles\%basename%
-  echo gh release upload %GH_FDS_TAG% %fullfilebase%.%SHA1EXT% -R github.com/%GH_OWNER%/%GH_REPO% --clobber
-       gh release upload %GH_FDS_TAG% %fullfilebase%.%SHA1EXT% -R github.com/%GH_OWNER%/%GH_REPO% --clobber
+  echo gh release upload FDS_TEST %fullfilebase%.%SHA1EXT% -R github.com/%OWNER%/test_bundles --clobber
+       gh release upload FDS_TEST %fullfilebase%.%SHA1EXT% -R github.com/%OWNER%/test_bundles --clobber
   
-  echo gh release upload %GH_FDS_TAG% %fullfilebase%.exe -R github.com/%GH_OWNER%/%GH_REPO% --clobber
-       gh release upload %GH_FDS_TAG% %fullfilebase%.exe -R github.com/%GH_OWNER%/%GH_REPO% --clobber
+  echo gh release upload FDS_TEST %fullfilebase%.exe -R github.com/%OWNER%/test_bundles --clobber
+       gh release upload FDS_TEST %fullfilebase%.exe -R github.com/%OWNER%/test_bundles --clobber
 
-  echo gh release upload %GH_FDS_TAG% %fullfilebase%.zip -R github.com/%GH_OWNER%/%GH_REPO% --clobber
-       gh release upload %GH_FDS_TAG% %fullfilebase%.zip -R github.com/%GH_OWNER%/%GH_REPO% --clobber
+  echo gh release upload FDS_TEST %fullfilebase%.zip -R github.com/%OWNER%/test_bundles --clobber
+       gh release upload FDS_TEST %fullfilebase%.zip -R github.com/%OWNER%/test_bundles --clobber
 :skip_upload
 
 if "x%emailto%" == "x" goto endif6
@@ -339,11 +342,6 @@ exit /b 0
  if (%1)==() exit /b
  set valid=0
  set arg=%1
- if "%1" EQU "-G" (
-   set GH_REPO=%2
-   set valid=1
-   shift
- )
  if "%1" EQU "-b" (
    set BRANCH_NAME=%2
    set valid=1

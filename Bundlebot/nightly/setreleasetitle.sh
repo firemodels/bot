@@ -1,14 +1,11 @@
 #!/bin/bash
 repo=$1
 hash=$2
-GH_OWNER_ARG=$3
-GH_REPO_ARG=$4
 
-if [ "$GH_OWNER_ARG" == "" ]; then
-  GH_OWNER_ARG=$GH_OWNER
-fi
-if [ "$GH_REPO_ARG" == "" ]; then
-  GH_REPO_ARG=$GH_REPO
+if [ "$BUILDING_release" == "1" ]; then
+  GHOWNER=`whoami`
+else
+  GHOWNER=firemodels
 fi
 
 ERROR=1
@@ -34,4 +31,4 @@ INFO="`git show -s --format=%cd --date=format:'%Y-%b-%d %H:%M' $hash`"
 if [ "$INFO" != "" ]; then
   TITLE="$TITLE $INFO"
 fi
-gh release edit $tag -t "$TITLE" -R github.com/$GH_OWNER_ARG/$GH_REPO_ARG
+gh release edit $tag -t "$TITLE" -R github.com/$GHOWNER/test_bundles

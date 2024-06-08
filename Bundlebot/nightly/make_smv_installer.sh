@@ -3,7 +3,7 @@ EXPECTED_ARGS=5
 
 if [ $# -ne $EXPECTED_ARGS ]
 then
-  echo "Usage: make_updater.sh ostype SMV_TAR.tar.gz INSTALLER.sh"
+  echo "Usage: make_smv_installer.sh ostype SMV_TAR.tar.gz INSTALLER.sh"
   echo ""
   echo "Creates a Smokeview updater sh script. "
   echo ""

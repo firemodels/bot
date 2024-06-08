@@ -1,28 +1,19 @@
 @echo off
 setlocal
 
+OWNER=%username%
+if "x%is_nightly%" == "x1" set OWNER=firemodels
+
 set repo=%1
 set TITLE=
 set INFO=
 set PREFIX=
 
-set ERROR=1
-if NOT "x%repo%" == "xfds" goto endif1
-  set tag=FDS_TEST
-  set ERROR=
-:endif1
-
-if NOT "x%repo%" == "xsmv" goto endif2
-  set tag=SMOKEVIEW_TEST
-  set ERROR=
-:endif2
-
-if NOT "x%repo%" == "xcfast" goto endif3
-  set tag=CFAST_TEST
-  set ERROR=
-:endif3
-
-if NOT x%ERROR% == x exit /b
+set tag=x
+if "x%repo%" == "xfds" set tag=FDS_TEST
+if "x%repo%" == "xsmv" set tag=SMOKEVIEW_TEST
+if "x%repo%" == "xcfast" set tag=CFAST_TEST
+if x%tag% == x exit /b
 
 set tempfile=%temp%\tempfile
 cd ..\..\..\%repo%
@@ -40,4 +31,4 @@ set /p INFO=<%tempfile%
 erase %tempfile%
 
 if NOT "x%INFO%" == "x" set TITLE=%TITLE% %INFO%
-gh release edit %tag% -t "%TITLE%" -R github.com/%GH_OWNER%/%GH_REPO%
+gh release edit %tag% -t "%TITLE%" -R github.com/%OWNER%/test_bundles
