@@ -96,7 +96,7 @@ rm -f $OUTPUT
 
 cd $BINDIR
 
-not_have_git=`git describe --abbrev=7 --dirty --long |& grep fatal | wc -l`
+not_have_git=`git describe --dirty --long |& grep fatal | wc -l`
 if [ "$not_have_git" == "0" ]; then
   echo updating bot repo
   git fetch origin        &> /dev/null

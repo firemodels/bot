@@ -1344,10 +1344,10 @@ fi
 if [ "$ONLY_RUN_TEST_CASES" != "1" ]; then
   echo "------ $CB_HOSTS status ----------"
   TEMP_RUN=/tmp/run.$$
-  git describe --abbrev=7 --dirty --long >& $TEMP_RUN
+  git describe --dirty --long >& $TEMP_RUN
   not_have_git=`cat $TEMP_RUN | grep fatal | wc -l`
   if [ $not_have_git -eq 0 ]; then
-    echo "------ `git describe --abbrev-7 --dirty --long` ----------"
+    echo "------ `git describe --dirty --long` ----------"
   fi
   rm -f $TEMP_RUN
 fi
