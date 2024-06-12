@@ -767,7 +767,7 @@ CORE_CHECK ()
     return 0
   fi
   CORETEMP=/tmp/core.$$
-  pdsh -t 1 -w $CB_HOSTETH_ARG "grep cpuid /proc/cpuinfo | wc -l" >& $CORETEMP
+  pdsh -t 1 -w $CB_HOSTETH_ARG "grep processor /proc/cpuinfo | wc -l" >& $CORETEMP
   cat $CORETEMP | grep -v ssh | grep -v Connection | sort >  $FSOUT 2>&1
 
   NF0=`head -1 $FSOUT | awk '{print $2}'`
