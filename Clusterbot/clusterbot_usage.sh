@@ -16,7 +16,7 @@ echo "                only to verify that communication works between processes.
 echo "                cases, use firebot or smokebot."
 echo ""
 echo "Options:"
-echo " -C - do not run Intel cluster checker"
+echo " -C - run Intel cluster checker"
 echo " -f - override lock to force clusterbot run"
 echo " -h - display this message"
 if [ "$SHOW_EMAIL_HELP" == "1" ]; then
