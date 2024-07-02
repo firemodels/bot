@@ -1125,11 +1125,11 @@ check_python_setup()
    if [[ `grep "Hello World" $OUTPUT_DIR/stage7_python_setup` == "" ]]; then
      python_success=false
    fi
-   if [ $python == false ]; then
-      echo "Errors from Stage 7 - Python failed to be setup" >> $ERROR_LOG
-      grep "Error" $OUTPUT_DIR/stage7_python_setup           >> $ERROR_LOG
+   if [ $python_success == false ]; then
+      echo "Errors from Stage 7 - Python failed to be setup" >> $FYI_LOG
+      grep "Error" $OUTPUT_DIR/stage7_python_setup           >> $FYI_LOG
       if [[ `grep "Hello World" $OUTPUT_DIR/stage7_python_setup` == "" ]]; then
-        echo "python hello world script failed to run"       >> $ERROR_LOG
+        echo "python hello world script failed to run"       >> $FYI_LOG
      fi
    fi
 }
@@ -1160,10 +1160,10 @@ check_python_verification()
    #   python_verification_success=false
    # fi
    if [ $python_verification_success == false ]; then
-     echo "Errors from Stage 7a - Python plotting and statistics (verification):" >> $ERROR_LOG
-     grep -B 5 -A 50 "Error" $OUTPUT_DIR/stage7a_python_verification | tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
+     echo "Errors from Stage 7a - Python plotting and statistics (verification):"                 >> $FYI_LOG
+     grep -B 5 -A 50 "Error" $OUTPUT_DIR/stage7a_python_verification | tr -cd '\11\12\15\40-\176' >> $FYI_LOG
      echo "" >> $ERROR_LOG
-    fi
+   fi
 }
 
 #---------------------------------------------

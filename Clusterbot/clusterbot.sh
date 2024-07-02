@@ -767,7 +767,7 @@ CORE_CHECK ()
     return 0
   fi
   CORETEMP=/tmp/core.$$
-  pdsh -t 1 -w $CB_HOSTETH_ARG "grep cpuid /proc/cpuinfo | wc -l" >& $CORETEMP
+  pdsh -t 1 -w $CB_HOSTETH_ARG "grep processor /proc/cpuinfo | wc -l" >& $CORETEMP
   cat $CORETEMP | grep -v ssh | grep -v Connection | sort >  $FSOUT 2>&1
 
   NF0=`head -1 $FSOUT | awk '{print $2}'`
@@ -1201,7 +1201,7 @@ USE_SUDO=
 IPMI_password=
 IPMI_username=
 UPDATE_ARCHIVE=
-USE_INTEL_CLUSTER_CHECKER=1
+USE_INTEL_CLUSTER_CHECKER=
 ONLY_NETWORK_CHECKS=
 QUEUE=
 MAXRUNTIME=600
@@ -1210,7 +1210,7 @@ while getopts 'Cfhn:NP:q:Q:uU:' OPTION
 do
 case $OPTION  in
   C)
-   USE_INTEL_CLUSTER_CHECKER=
+   USE_INTEL_CLUSTER_CHECKER=1
    ;;
   f)
    FORCE_UNLOCK=1
@@ -1344,10 +1344,10 @@ fi
 if [ "$ONLY_RUN_TEST_CASES" != "1" ]; then
   echo "------ $CB_HOSTS status ----------"
   TEMP_RUN=/tmp/run.$$
-  git describe --abbrev=7 --dirty --long >& $TEMP_RUN
+  git describe --dirty --long >& $TEMP_RUN
   not_have_git=`cat $TEMP_RUN | grep fatal | wc -l`
   if [ $not_have_git -eq 0 ]; then
-    echo "------ `git describe --abbrev-7 --dirty --long` ----------"
+    echo "------ `git describe --dirty --long` ----------"
   fi
   rm -f $TEMP_RUN
 fi
