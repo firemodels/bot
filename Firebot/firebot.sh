@@ -1997,6 +1997,8 @@ fi
       echo ""                                                        >> $WARNING_LOG
    fi
 
+   echo "HAVE_MAIL=$HAVE_MAIL"
+   echo "mailToFDS=$mailToFDS"
    # Check for warnings and errors
    NAMELIST_LOGS="$NAMELIST_NODOC_LOG $NAMELIST_NOSOURCE_LOG"
    if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]
@@ -2005,6 +2007,7 @@ fi
 
      # Send email with failure message and warnings, body of email contains appropriate log file
      echo "[$botuser] $bottype failure and warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH."
+     cat $ERROR_LOG $FYI_LOG $TIME_LOG $NAMELIST_LOGS >& $MAIL_LOG
      if [ "$HAVE_MAIL" == "1" ]; then
        cat $ERROR_LOG $FYI_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype failure and warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
      fi
@@ -2014,6 +2017,7 @@ fi
    then
       # Send email with failure message, body of email contains error log file
       echo "[$botuser] $bottype failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH."
+      cat $ERROR_LOG $FYI_LOG $TIME_LOG $NAMELIST_LOGS >& $MAIL_LOG
       if [ "$HAVE_MAIL" == "1" ]; then
         cat $ERROR_LOG $FYI_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
       fi
@@ -2025,6 +2029,7 @@ fi
 
       # Send email with success message, include warnings
       echo "[$botuser] $bottype success, with warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH"
+      cat $WARNING_LOG $FYI_LOG $TIME_LOG $NAMELIST_LOGS >& $MAIL_LOG
       if [ "$HAVE_MAIL" == "1" ]; then
         cat $WARNING_LOG $FYI_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype success, with warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
       fi
@@ -2036,6 +2041,7 @@ fi
 
       # Send success message with links to nightly manuals
       firebot_status=0
+      cat $TIME_LOG $FYI_LOG $NAMELIST_LOGS >& $MAIL_LOG
       echo "[$botuser] $bottype success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH"
       if [ "$HAVE_MAIL" == "1" ]; then
         cat $TIME_LOG $FYI_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
@@ -2098,6 +2104,7 @@ TIME_LOG=$OUTPUT_DIR/timings
 ERROR_LOG=$OUTPUT_DIR/errors
 VALIDATION_ERROR_LOG=$OUTPUT_DIR/validation_errors
 WARNING_LOG=$OUTPUT_DIR/warnings
+MAIL_LOG=$OUTPUT_DIR/mail_log
 FYI_LOG=$OUTPUT_DIR/fyis
 NEWGUIDE_DIR=$OUTPUT_DIR/Newest_Guides
 MANUALS_DIR=$HOME/.firebot/Manuals
