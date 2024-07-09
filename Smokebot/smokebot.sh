@@ -491,7 +491,7 @@ run_verification_cases_debug()
    if [ "$COMPILER" == "gnu" ]; then
      COMPOPT=-C
    fi
-   ./Run_SMV_Cases.sh $INTEL2 $RUNOPT $COMPOPT -c $cfastrepo $USEINSTALL2 -j $JOBPREFIXD -m 2 -d -q $QUEUE >> $OUTPUT_DIR/stage3a_vv_dbg 2>&1 
+   ./Run_SMV_Cases.sh $DONOT_RUN_BENCHMARK $INTEL2 $RUNOPT $COMPOPT -c $cfastrepo $USEINSTALL2 -j $JOBPREFIXD -m 2 -d -q $QUEUE >> $OUTPUT_DIR/stage3a_vv_dbg 2>&1 
 }
 
 #---------------------------------------------
@@ -860,7 +860,7 @@ run_verification_cases_release()
    if [ "$COMPILER" == "gnu" ]; then
      COMPOPT=-C
    fi
-   ./Run_SMV_Cases.sh $INTEL2 $RUNOPT $COMPOPT -c $cfastrepo -j $JOBPREFIXR $USEINSTALL2 -q $QUEUE >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
+   ./Run_SMV_Cases.sh $DONOT_RUN_BENCHMARK $INTEL2 $RUNOPT $COMPOPT -c $cfastrepo -j $JOBPREFIXR $USEINSTALL2 -q $QUEUE >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
    ./Run_RESTART_Cases.sh -q $QUEUE                                                                >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
 }
 
@@ -1561,6 +1561,7 @@ SANITIZE=
 compile_errors=
 GITURL=
 CACHE_DIR=
+DONOT_RUN_BENCHMARK=
 HAVEMAIL=`which mail |& grep -v 'no mail'`
 
 #*** save pid so -k option (kill smokebot) may be used lateer
@@ -1569,7 +1570,7 @@ echo $$ > $PID_FILE
 
 #*** parse command line options
 
-while getopts 'aAb:cCDJm:Mq:QR:s:SuUw:W:x:X:y:Y:' OPTION
+while getopts 'aAb:cCDJm:Mq:QR:s:StuUw:W:x:X:y:Y:' OPTION
 do
 case $OPTION in
   a)
@@ -1622,6 +1623,9 @@ case $OPTION in
    ;;
   S)
    SANITIZE=-S
+   ;;
+  t)
+   DONOT_RUN_BENCHMARK=-b
    ;;
   u)
    UPDATEREPO=1
