@@ -26,6 +26,7 @@ else
 fi
 echo "-M - make movies"
 echo "-P - remove run status (PID) file"
+echo "-t - don't run benchmark cases"
 echo "-U - upload guides"
 echo "-w directory - web directory containing summary pages"
 echo ""
@@ -185,6 +186,7 @@ USE_BOT_QFDS=
 WEB_ROOT=/var/www/html
 GNU=
 CACHE_DIR=
+DONOT_RUN_BENCHMARK=
 
 #*** check to see if a queing system is available
 
@@ -197,7 +199,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'aAB:bcCDfFg:G:hHJkm:Mo:Pq:Qr:R:s:STuUvw:W:x:X:y:Y:' OPTION
+while getopts 'aAB:bcCDfFg:G:hHJkm:Mo:Pq:Qr:R:s:StTuUvw:W:x:X:y:Y:' OPTION
 do
 case $OPTION  in
   a)
@@ -271,6 +273,9 @@ case $OPTION  in
    ;;
   R)
    CLONE_REPOS="$OPTARG"
+   ;;
+  t)
+   DONOT_RUN_BENCHMARK=-t
    ;;
   u)
    UPDATEREPO=-u
@@ -452,7 +457,7 @@ BRANCH="-b $BRANCH"
 #*** run smokebot
 
 touch $smokebot_pid
-$ECHO ./$botscript $SIZE $BRANCH $SANITIZE $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $CLONE_REPOS $CACHE_DIR $FORCECLONE $GNU $RUNAUTO $INTEL $CLEANREPO $WEB_DIR $WEB_ROOT $UPDATEREPO $QUEUE $SQUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $SIZE $BRANCH $SANITIZE $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $CLONE_REPOS $CACHE_DIR $FORCECLONE $GNU $RUNAUTO $INTEL $DONOT_RUN_BENCHMARK $CLEANREPO $WEB_DIR $WEB_ROOT $UPDATEREPO $QUEUE $SQUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi
