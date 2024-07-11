@@ -67,10 +67,10 @@ CURDIR=`pwd`
 if [ "$BOT_TYPE" == "firebot" ]; then
   REFERENCE_DIR=../../fig/fds/Reference_Figures
 else
-  if [ "$HOSTNAME" == "blaze" ]; then
-    REFERENCE_DIR=../../fig/smv/Reference_Figures/Default
-  else
+  if [ "$SMOKEBOT_COMPARE" == "other" ]; then
     REFERENCE_DIR=../../fig/smv/Reference_Figures/Other
+  else
+    REFERENCE_DIR=../../fig/smv/Reference_Figures/Default
   fi
 fi
 cd $REFERENCE_DIR
