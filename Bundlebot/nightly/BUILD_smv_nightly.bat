@@ -3,6 +3,9 @@ setlocal
 
 set is_nightly=1
 
+set OWNER=firemodels
+::set OWNER=%username%
+
 if not exist %userprofile%\.bundle mkdir %userprofile%\.bundle
 set CURDIR=%CD%
 
@@ -71,14 +74,14 @@ Title Building Smokeview bundle
 set uploaddir=%userprofile%\.bundle\uploads
 
 set filelist=%TEMP%\smv_files_win.out
-gh release view SMOKEVIEW_TEST  -R github.com/%username%/test_bundles | grep SMV | grep -v FDS | grep -v CFAST | grep win | gawk "{print $2}" > %filelist%
-for /F "tokens=*" %%A in (%filelist%) do gh release delete-asset SMOKEVIEW_TEST %%A  -R github.com/%username%/test_bundles -y
+gh release view SMOKEVIEW_TEST  -R github.com/%OWNER%/test_bundles | grep SMV | grep -v FDS | grep -v CFAST | grep win | gawk "{print $2}" > %filelist%
+for /F "tokens=*" %%A in (%filelist%) do gh release delete-asset SMOKEVIEW_TEST %%A  -R github.com/%OWNER%/test_bundles -y
 erase %filelist%
 
-echo uploading %smvrepo_revision%_win.sha1 to github.com/%username%/test_bundles
-gh release upload SMOKEVIEW_TEST %uploaddir%\%smvrepo_revision%_win.sha1 -R github.com/%username%/test_bundles --clobber
+echo uploading %smvrepo_revision%_win.sha1 to github.com/%OWNER%/test_bundles
+gh release upload SMOKEVIEW_TEST %uploaddir%\%smvrepo_revision%_win.sha1 -R github.com/%OWNER%/test_bundles --clobber
 
-echo uploading %smvrepo_revision%_win.exe to github.com//%username%/test_bundles
-gh release upload SMOKEVIEW_TEST %uploaddir%\%smvrepo_revision%_win.exe  -R github.com/%username%/test_bundles --clobber
+echo uploading %smvrepo_revision%_win.exe to github.com//%OWNER%/test_bundles
+gh release upload SMOKEVIEW_TEST %uploaddir%\%smvrepo_revision%_win.exe  -R github.com/%OWNER%/test_bundles --clobber
 
 echo *** upload complete
