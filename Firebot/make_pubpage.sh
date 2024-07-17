@@ -59,7 +59,7 @@ SCRIPTDIR=`pwd`
 cd $CURDIR
 cd $historydir
 ls -tl *.txt | grep -v compiler | grep -v warning | grep -v error | awk '{system("head "  $9)}' | sort -t ';' -r -n -k 7 | head -1 | \
-             awk -F ';' '{cputime="Benchmark time: "$9" s";\
+             awk -F ';' '{cputime="Total time: "$9" s";\
                           host="Host: "$10;\
                           font="<font color=\"#00FF00\">";\
                           if($8=="2")font="<font color=\"#FF00FF\">";\
@@ -120,7 +120,7 @@ fi
 
 cd $historydir
 ls -tl *.txt | grep -v compiler | grep -v warning | grep -v error | awk '{system("head "  $9)}' | sort -t ';' -r -n -k 7 | head $NHIST | \
-             awk -F ';' '{cputime="Benchmark time: "$9" s";\
+             awk -F ';' '{cputime="Total time: "$9" s";\
                           host="Host: "$10;\
                           font="<font color=\"#00FF00\">";\
                           if($8=="2")font="<font color=\"#FF00FF\">";\
