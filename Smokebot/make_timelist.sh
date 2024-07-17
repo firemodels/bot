@@ -2,6 +2,7 @@
 curdir=`pwd`
 cpufrom=$HOME/.firebot/fds_times.csv
 historydir=$HOME/.firebot/history
+FILELIST="*benchmark*csv"
 tempfile=/tmp/filelist.$$
 # The offset below is computed by substituting
 # Jan 1, 2016 5 UTC (12 AM EST) into a web form
@@ -16,11 +17,12 @@ case $OPTION  in
   s)
    cpufrom=$HOME/.smokebot/smv_times.csv
    historydir=$HOME/.smokebot/history
+   FILELIST="*csv"
    ;;
 esac
 done
 shift $(($OPTIND-1))
-for file in $historydir/*benchmark*csv 
+for file in $historydir/$FILELIST
 do
 time=`tail -1 $file`
 hash=`tail -2 $file | head -1`
