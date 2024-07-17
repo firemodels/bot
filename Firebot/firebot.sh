@@ -2322,8 +2322,12 @@ if [ "$WEB_DIR" != "" ]; then
   testfile=$WEB_DIR/test.$$
   touch $testfile >& /dev/null
   if [ -e $testfile ]; then
-    WEB_HOST=`hostname -A | awk '{print $2}'`
-    WEB_URL=http://$WEB_HOST/$WEB_BASE_DIR
+    if [ "$WEB_URL_BASE" == "" ]; then
+      WEB_HOST=`hostname -A | awk '{print $2}'`
+      WEB_URL_BASE=http://$WEB_HOST/
+    fi
+    WEB_URL=$WEB_URL_BASE/$WEB_BASE_DIR
+    fi
     rm -f $testfile
   else
     WEB_BASE_DIR=
