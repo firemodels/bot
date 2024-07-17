@@ -23,7 +23,7 @@ cat << EOF
 
       function drawChart() {
         var data = google.visualization.arrayToDataTable([
-          ['Days since Jan 1, 2016', 'Benchmark Time (s)'],
+          ['Days since Jan 1, 2016', 'Total Time (s)'],
 EOF
 
 ./make_timelist.sh $SOPT | sort -n -k 1 -t , | tail $NHIST > $timelist
