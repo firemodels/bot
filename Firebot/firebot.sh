@@ -2327,7 +2327,6 @@ if [ "$WEB_DIR" != "" ]; then
       WEB_URL_BASE=http://$WEB_HOST/
     fi
     WEB_URL=$WEB_URL_BASE/$WEB_BASE_DIR
-    fi
     rm -f $testfile
   else
     WEB_BASE_DIR=
