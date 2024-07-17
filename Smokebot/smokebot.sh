@@ -1093,7 +1093,7 @@ check_smv_movies()
       :
    else
       echo "Warnings from Stage 4b - Make SMV movies (release mode):" >> $WARNING_LOG
-      grep -I -E -i "Warning" $OUTPUT_DIR/stage4c_mp4                     >> $WARNING_LOG
+      grep -I -E -i "Warning" $OUTPUT_DIR/stage4c_mp4                 >> $WARNING_LOG
       echo ""                                                         >> $WARNING_LOG
    fi
 }
@@ -1115,9 +1115,9 @@ generate_timing_stats()
 
    cd $smvrepo/Utilities/Scripts
    ./fds_timing_stats.sh smokebot > smv_timing_stats.csv
+   TOTAL_SMV_TIMES=`tail -1 smv_timing_stats.csv`
    cd $smvrepo/Utilities/Scripts
    ./fds_timing_stats.sh smokebot 1 > smv_benchmarktiming_stats.csv
-   TOTAL_SMV_TIMES=`tail -1 smv_benchmarktiming_stats.csv`
 }
 
 #---------------------------------------------
@@ -1131,7 +1131,7 @@ archive_timing_stats()
   cp smv_timing_stats.csv          "$HISTORY_DIR_ARCHIVE/${SMV_REVISION}_timing.csv"
   cp smv_benchmarktiming_stats.csv "$HISTORY_DIR_ARCHIVE/${SMV_REVISION}_benchmarktiming.csv"
   sort -r -k 2 -t  ',' -n smv_timing_stats.csv | head -10 | awk -F',' '{print $1":", $2}' > $OUTPUT_DIR/slow_cases
-  TOTAL_SMV_TIMES=`tail -1 smv_benchmarktiming_stats.csv`
+  TOTAL_SMV_TIMES=`tail -1 smv_timing_stats.csv`
   if [[ "$UPLOADRESULTS" == "1" ]] && [[ "$USER" == "smokebot" ]]; then
     cd $botrepo/Smokebot
     ./smvstatus_updatepub.sh $repo/webpages $WEBBRANCH
@@ -1354,7 +1354,7 @@ if [ "$DIFF_COMPAREIMAGES" != "" ]; then
   echo "compare images: $DIFF_COMPAREIMAGES"                >> $TIME_LOG
 fi
   echo "total: $DIFF_SCRIPT_TIME"                           >> $TIME_LOG
-  echo "benchmark time(s): $TOTAL_SMV_TIMES"                >> $TIME_LOG
+  echo "time(s): $TOTAL_SMV_TIMES"                          >> $TIME_LOG
   echo ""                                                   >> $TIME_LOG
   DISPLAY_FDS_REVISION=
   DISPLAY_SMV_REVISION=
