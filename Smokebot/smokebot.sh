@@ -1851,8 +1851,11 @@ if [ "$WEB_DIR" != "" ]; then
   fi
 fi
 if [ "$WEB_DIR" != "" ]; then
-  WEB_HOST=`hostname -A | awk '{print $2}'`
-  WEB_URL=http://$WEB_HOST/$WEB_DIR
+  if [ "$WEB_URL_BASE" == "" ]; then
+    WEB_HOST=`hostname -A | awk '{print $2}'`
+    WEB_URL_BASE=http://$WEB_HOST
+  fi
+  WEB_URL=$WEB_URL_BASE/$WEB_DIR
 else
   WEB_URL=
 fi
