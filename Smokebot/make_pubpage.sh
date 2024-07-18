@@ -89,7 +89,7 @@ if [ "$SOPT" == "" ]; then
                           }' 
 else
   ls -tl *-????????.txt | awk '{system("head "  $9)}' | sort -t ';' -r -n -k 7 | head -1 | \
-             awk -F ';' '{cputime="Time: "$9" s";\
+             awk -F ';' '{cputime="Total time: "$9" s";\
                           host="Host: "$10;\
                           font="<font color=\"#00FF00\">";\
                           if($8=="2")font="<font color=\"#FF00FF\">";\
@@ -134,7 +134,7 @@ if [ "$SOPT" == "" ]; then
                           }' 
 else
   ls -tl *-????????.txt | awk '{system("head "  $9)}' | sort -t ';' -r -n -k 7 | head $NHIST | \
-             awk -F ';' '{cputime="Time: "$9" s";\
+             awk -F ';' '{cputime="Total time: "$9" s";\
                           host="Host: "$10;\
                           font="<font color=\"#00FF00\">";\
                           if($8=="2")font="<font color=\"#FF00FF\">";\
