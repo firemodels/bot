@@ -1,5 +1,6 @@
 #!/bin/bash
 curdir=`pwd`
+BUILDING_nightly=$1
 
 #*** determine platform script is running on
 
@@ -61,6 +62,9 @@ if [ "$BUILDING_release" == "" ]; then
 else
   git tag -a $BUNDLE_SMV_TAG -m "tag for smokeview release" >> $outdir/stage2_clone 2>&1
   smv_revision=$BUNDLE_SMV_TAG
+  GHOWNER=firemodels
+fi
+if [ "$BUILDING_nightly" != "" ]; then
   GHOWNER=firemodels
 fi
 echo "***     smv_hash: $smv_hash"
