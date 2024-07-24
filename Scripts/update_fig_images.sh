@@ -83,7 +83,7 @@ if [ "$PROG" == "fds" ]; then
   FIG_DIR=$TO_ROOT/fig/fds/Reference_Figures
 fi
 if [ "$PROG" == "smv" ]; then
-  if [ "`hostname -s`" == "blaze" ]; then
+  if [ "$HOST_DEFAULT" != "" ]; then
     FIG_DIR=$TO_ROOT/fig/smv/Reference_Figures/Default
   else
     FIG_DIR=$TO_ROOT/fig/smv/Reference_Figures/Other
