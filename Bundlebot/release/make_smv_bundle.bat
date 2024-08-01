@@ -54,8 +54,8 @@ CALL :COPY  %reporoot%\smv\Build\set_path\intel_win_64\set_path_win_64.exe "%smv
 CALL :COPY  %smvbuild%\smokeview_win_%test%64.exe                           %smvdir%\smokeview.exe
 CALL :COPY  %smvscripts%\jp2conv.bat                                        %smvdir%\jp2conv.bat
 
-echo copying .po files
-copy %forbundle%\*.po %smvdir%\.>Nul
+::echo copying .po files
+::copy %forbundle%\*.po %smvdir%\.>Nul
 
 echo copying .png files
 copy %forbundle%\*.png %smvdir%\.>Nul

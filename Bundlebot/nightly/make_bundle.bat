@@ -159,7 +159,7 @@ echo --- filling distribution directory ---
 echo.
 
 
-copy %smv_forbundle%\*.po                   %out_bin%\.>Nul
+::copy %smv_forbundle%\*.po                   %out_bin%\.>Nul
 
 :: initialize manifest file
 set MANIFEST=%out_doc%\manifest.html
