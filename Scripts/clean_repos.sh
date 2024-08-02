@@ -3,7 +3,7 @@ CUR=`pwd`
 allrepos="bot cad cfast cor exp fds fig out radcal smv test_bundles"
 
 function usage {
-echo "Clean repos $allrepos if they exist"
+echo "Clean the repos $allrepos if they exist"
 echo ""
 echo "Options:"
 echo "-h - display this message"
@@ -40,8 +40,6 @@ CLEAN_REPO ()
      return
   fi
   cd $repodir
-  git remote prume origin
-  git checkout master
   git clean -dxf
 }
 
