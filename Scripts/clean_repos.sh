@@ -40,9 +40,9 @@ CLEAN_REPO ()
      return
   fi
   cd $repodir
-  git remote prume origin
-  git checkout master
-  git clean -dxf
+  git remote prune origin >& /dev/null
+  git checkout master     >& /dev/null
+  git clean -dxf          >& /dev/null
 }
 
 for repo in $allrepos

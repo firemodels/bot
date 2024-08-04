@@ -108,7 +108,7 @@ CPDIR $FORBUNDLE/textures  $PLATFORMDIR/bin/textures
 CPDIR $FORBUNDLE/colorbars $PLATFORMDIR/bin/colorbars
 
 cp $FORBUNDLE/*.png $PLATFORMDIR/$smvbin/.
-cp $FORBUNDLE/*.po $PLATFORMDIR/$smvbin/.
+#cp $FORBUNDLE/*.po $PLATFORMDIR/$smvbin/.
 
 CP $FORBUNDLE       objects.svo       $PLATFORMDIR/$smvbin objects.svo
 CP $FORBUNDLE       smokeview.ini     $PLATFORMDIR/$smvbin smokeview.ini
