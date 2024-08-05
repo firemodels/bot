@@ -40,7 +40,7 @@ CLEAN_REPO ()
      return
   fi
   cd $repodir
-  git clean -dxf
+  git clean -dxf >& /dev/null
 }
 
 for repo in $allrepos
