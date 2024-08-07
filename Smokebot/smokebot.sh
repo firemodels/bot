@@ -1321,17 +1321,19 @@ email_build_status()
     IFORT_VERSION=`gfortran --version | head -1`
   fi
   echo "----------------------------------------------"      > $TIME_LOG
-  echo "host/OS: $hostname/$platform2"                      >> $TIME_LOG
+  echo "host: $hostname"                                    >> $TIME_LOG
+  echo "OS: $platform2"                                     >> $TIME_LOG
   echo "repo: $repo"                                        >> $TIME_LOG
-  echo "queue: $QUEUE"                             >> $TIME_LOG
+  echo "queue: $QUEUE"                                      >> $TIME_LOG
+  if [ "$IFORT_VERSION" != "" ]; then
+    echo "Fortran: $IFORT_VERSION "                         >> $TIME_LOG
+  fi
+  echo ""                                                   >> $TIME_LOG
   echo "$BOT_REVISION/$BOTBRANCH"                           >> $TIME_LOG
   echo "$CFAST_REVISION/$CFASTBRANCH"                       >> $TIME_LOG
   echo "$FDS_REVISION/$FDSBRANCH"                           >> $TIME_LOG
   echo "$FIG_REVISION/$FIGBRANCH"                           >> $TIME_LOG
   echo "$SMV_REVISION/$SMVBRANCH"                           >> $TIME_LOG
-  if [ "$IFORT_VERSION" != "" ]; then
-    echo "Fortran: $IFORT_VERSION "                         >> $TIME_LOG
-  fi
   echo ""                                                   >> $TIME_LOG
   echo "start time: $start_time "                           >> $TIME_LOG
   echo "stop time: $stop_time "                             >> $TIME_LOG
