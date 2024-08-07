@@ -1316,8 +1316,8 @@ email_build_status()
   echo $THIS_FDS_FAILED>$FDS_STATUS_FILE
   stop_time=`date`
   if [ "$COMPILER" == "intel" ]; then
-    icx -v 2>&1 compiler_version.out
-    ICC_VERSION=`cat compiler_version.out |& head -1`
+    icx -v >& compiler_version.out
+    ICC_VERSION=`cat compiler_version.out | head -1`
     rm compiler_version.out
   else
     ICC_VERSION=`gcc --version | head -1`
