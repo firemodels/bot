@@ -1316,17 +1316,19 @@ email_build_status()
   echo $THIS_FDS_FAILED>$FDS_STATUS_FILE
   stop_time=`date`
   if [ "$COMPILER" == "intel" ]; then
-    IFORT_VERSION=`ifort -v 2>&1`
+    icx -v 2>&1 compiler_version.out
+    ICC_VERSION=`cat compiler_version.out |& head -1`
+    rm compiler_version.out
   else
-    IFORT_VERSION=`gfortran --version | head -1`
+    ICC_VERSION=`gcc --version | head -1`
   fi
   echo "----------------------------------------------"      > $TIME_LOG
   echo "host: $hostname"                                    >> $TIME_LOG
   echo "OS: $platform2"                                     >> $TIME_LOG
   echo "repo: $repo"                                        >> $TIME_LOG
   echo "queue: $QUEUE"                                      >> $TIME_LOG
-  if [ "$IFORT_VERSION" != "" ]; then
-    echo "Fortran: $IFORT_VERSION "                         >> $TIME_LOG
+  if [ "$ICC_VERSION" != "" ]; then
+    echo "C/C++: $ICC_VERSION "                             >> $TIME_LOG
   fi
   echo ""                                                   >> $TIME_LOG
   echo "$BOT_REVISION/$BOTBRANCH"                           >> $TIME_LOG
@@ -1862,9 +1864,6 @@ else
   WEB_URL=
 fi
 
-if [[ "$IFORT_COMPILER" != "" ]] ; then
-  source $IFORT_COMPILER/bin/compilervars.sh intel64
-fi 
 if [ "$COMPILER" == "gnu" ]; then
   notfound=`gcc -help 2>&1 | tail -1 | grep "not found" | wc -l`
 else
