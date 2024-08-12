@@ -15,7 +15,6 @@ echo "-a - only run if the smokeview source has changed"
 echo "-A - only run if smokebot_trigger.txt has changed"
 echo "-b - use the current branch"
 echo "-f - force smokebot to run"
-echo "-J use Intel MPI version of fds"
 echo "-k - kill smokebot if it is running"
 echo "-q queue [default: $QUEUE]"
 echo "-Q - generate images on node running this script"
@@ -166,7 +165,6 @@ UPLOAD=
 FORCE=
 FORCECLONE=
 ECHO=
-INTEL=
 REMOVE_PID=
 CLONE_REPOS=
 FDS_REV=
@@ -226,7 +224,7 @@ case $OPTION  in
    usage "-H"
    ;;
   J)
-   INTEL="-J"
+   DUMMY=
    ;;
   k)
    KILL_SMOKEBOT=1
@@ -409,7 +407,7 @@ BRANCH="-b $BRANCH"
 #*** run smokebot
 
 touch $smokebot_pid
-$ECHO ./$botscript $SIZE $BRANCH $SANITIZE $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $CLONE_REPOS $CACHE_DIR $FORCECLONE $GNU $RUNAUTO $INTEL $DONOT_RUN_BENCHMARK $CLEANREPO $WEB_DIR $WEB_ROOT $UPDATEREPO $QUEUE $SQUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $SIZE $BRANCH $SANITIZE $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $CLONE_REPOS $CACHE_DIR $FORCECLONE $GNU $RUNAUTO $DONOT_RUN_BENCHMARK $CLEANREPO $WEB_DIR $WEB_ROOT $UPDATEREPO $QUEUE $SQUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi
