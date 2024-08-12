@@ -24,7 +24,6 @@ else
   echo "-m email_address"
 fi
 echo "-M - make movies"
-echo "-P - remove run status (PID) file"
 echo "-t - don't run benchmark cases"
 echo "-U - upload guides"
 echo "-w directory - web directory containing summary pages"
@@ -165,7 +164,6 @@ UPLOAD=
 FORCE=
 FORCECLONE=
 ECHO=
-REMOVE_PID=
 CLONE_REPOS=
 FDS_REV=
 SMV_REV=
@@ -190,7 +188,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'aAB:bcCDfFhHJkm:Mo:Pq:Qr:R:s:StTuUvw:W:x:X:y:Y:' OPTION
+while getopts 'aAB:bcCDfFhHJkm:Mo:q:Qr:R:s:StTuUvw:W:x:X:y:Y:' OPTION
 do
 case $OPTION  in
   a)
@@ -237,9 +235,6 @@ case $OPTION  in
    ;;
   o)
    export GH_OWNER="$OPTARG"
-   ;;
-  P)
-   REMOVE_PID=1
    ;;
   q)
    QUEUE="$OPTARG"
@@ -296,12 +291,6 @@ case $OPTION  in
 esac
 done
 shift $(($OPTIND-1))
-
-if [ "$REMOVE_PID" == "1" ]; then
-  rm -f $smokebot_pid
-  echo "$smokebot_pid status file removed"
-  exit
-fi
 
 # sync fds and smv repos with the the repos used in the last successful firebot run
 
