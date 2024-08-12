@@ -33,11 +33,6 @@ echo ""
 echo "Build apps, set repo revisions:"
 echo "-C - force clone"
 echo "-D use gnu compilers"
-echo "-g firebot_host - host where firebot was run"
-echo "-G firebot_home - home directory where firebot was run"
-echo "   The -g and -G options are used when cloning repos (-R option)"
-echo "   to build apps using the same repo revisions as used with the last"
-echo "   successful firebot run"
 echo "-o - specify GH_OWNER when uploading manuals. [default: $GH_OWNER]"
 echo "-r - specify GH_REPO when uploading manuals. [default: $GH_REPO]"
 echo "-R release_type (master, release or test) - clone fds, exp, fig, out and smv repos"
@@ -178,8 +173,6 @@ FDS_REV=
 SMV_REV=
 FDS_TAG=
 SMV_TAG=
-FIREBOT_HOST=
-FIREBOT_HOME=
 SANITIZE=
 WEB_DIR=
 USE_BOT_QFDS=
@@ -199,7 +192,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'aAB:bcCDfFg:G:hHJkm:Mo:Pq:Qr:R:s:StTuUvw:W:x:X:y:Y:' OPTION
+while getopts 'aAB:bcCDfFhHJkm:Mo:Pq:Qr:R:s:StTuUvw:W:x:X:y:Y:' OPTION
 do
 case $OPTION  in
   a)
@@ -225,12 +218,6 @@ case $OPTION  in
    ;;
   f)
    FORCE=1
-   ;;
-  g)
-   FIREBOT_HOST="$OPTARG"
-   ;;
-  G)
-   FIREBOT_HOME="$OPTARG"
    ;;
   h)
    usage
@@ -319,41 +306,6 @@ if [ "$REMOVE_PID" == "1" ]; then
 fi
 
 # sync fds and smv repos with the the repos used in the last successful firebot run
-
-GET_HASH=
-if [ "$FIREBOT_HOST" != "" ]; then
-  GET_HASH=1
-else
-  FIREBOT_HOST=`hostname`
-fi
-if [ "$FIREBOT_HOME" != "" ]; then
-  GET_HASH=1
-else
-  FIREBOT_HOME=\~firebot
-fi
-if [ "$GET_HASH" != "" ]; then
-  if [ "$CLONE_REPO" == "" ]; then
-    echo "***error: The -g and -G options for specifying firebot host/home directory can only be used"
-    echo "          when cloning the repos, when the -R option is used"
-    exit 1
-  fi
-  FDS_HASH=`../Bundlebot/fds/scripts/get_hash.sh -r fds -g $FIREBOT_HOST -G $FIREBOT_HOME`
-  SMV_HASH=`../Bundlebot/fds/scripts/get_hash.sh -r smv -g $FIREBOT_HOST -G $FIREBOT_HOME`
-  ABORT=
-  if [ "$FDS_HASH" == "" ]; then
-    ABORT=1
-  fi
-  if [ "$SMV_HASH" == "" ]; then
-    ABORT=1
-  fi
-  if [ "$ABORT" != "" ]; then
-    echo "***error: the fds and/or smv repo hash could not be found in the directory"
-    echo "          $FIREBOT_HOME/.firebot/apps at the host $FIREBOT_HOST"
-    exit 1
-  fi
-  FDS_REV="-x $FDS_HASH"
-  SMV_REV="-y $SMV_HASH"
-fi
 
 # warn user (if not the smokebot user) if using the clone option
 
