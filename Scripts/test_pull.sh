@@ -1,6 +1,6 @@
 #!/bin/sh
-set id=$1
-set repo=$2
+id=$1
+repo=$2
 
 if [ "$repo" == "" ]; then
   repo=smv
