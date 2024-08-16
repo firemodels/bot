@@ -71,6 +71,7 @@ done
 shift $(($OPTIND-1))
 
 TIMING_ERRORS=$OUTPUT/timing_errors
+TIMING_LIST=$OUTPUT/timing_list
 DIFFERENCES=$OUTPUT/fds_timing_diffs
 SUMMARY=$OUTPUT/fds_timing_summary
 
@@ -81,6 +82,7 @@ cd $CURDIR
 rm -f $DIFFERENCES
 rm -f $SUMMARY
 rm -f $TIMING_ERRORS
+rm -f $TIMING_LIST
 
 cat $beforedir/$before | head -n -2 | awk -F ',' '{if (NR!=1)  {print($1) }}' > $filelist
 
@@ -104,6 +106,7 @@ for file in `cat $filelist`; do
   time_diff=`echo "$time_after - $time_before" | bc`
   if [ $bigger_than -eq 1 ]; then
     rel_time_diff=`echo "100.0*$time_diff / $time_before" | bc`
+    echo $file,$rel_time_diff,$time_before,$time_after >> $TIMING_LIST
     if [ $rel_time_diff -gt 200 ]; then
         echo $file,$rel_time_diff,$time_before,$time_after >> $TIMING_ERRORS
     fi

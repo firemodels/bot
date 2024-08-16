@@ -838,6 +838,10 @@ wait_cases_release_end()
    CASETYPE=$1
    STAGE=$2
 
+   current_wait_dir=`pwd`
+   rm -f $TIMING_ERRORS
+   timing_error=
+
    # Scans squeue and waits for cases to end
    if [[ "$QUEUE" == "none" ]]
    then
@@ -855,7 +859,18 @@ wait_cases_release_end()
         echo "Waiting for ${JOBS_REMAINING} $CASETYPE cases to complete." >> $OUTPUT_DIR/$STAGE
         TIME_LIMIT_STAGE="5"
         check_time_limit
-        sleep 30
+        sleep 60
+        # look for cases that took too long to run (but don't look again until firebot
+        #                                           wraps up if a problem case is found)
+        if [[ "$timing_error" == "" ]] && [[ "$HAVE_MAIL" == "1" ]]; then
+          cd $botrepo/Scripts
+          ./compare_fds_timings.sh >& /dev/null
+          if [ -e $TIMING_ERRORS ]; then
+            timing_error=1
+            cat $TIMING_ERRORS | mail -s "[$botuser] ***error: one or more firebot case runtimes > 2x reference values" $mailToFDS > /dev/null
+          fi
+          cd $current_wait_dir
+        fi
      done
    fi
 }
@@ -2087,6 +2102,7 @@ firebotdir=`pwd`
 export SCRIPTFILES=$firebotdir/scriptfiles
 OUTPUT_DIR="$firebotdir/output"
 HISTORY_DIR="$HOME/.firebot/history"
+TIMING_ERRORS=$OUTPUT_DIR/timing_errors
 
 FIREBOT_PASS=$HISTORY_DIR/firebot_pass
 if [ -e $FIREBOT_PASS ]; then
