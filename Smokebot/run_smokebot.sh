@@ -15,7 +15,6 @@ echo "-a - only run if the smokeview source has changed"
 echo "-A - only run if smokebot_trigger.txt has changed"
 echo "-b - use the current branch"
 echo "-f - force smokebot to run"
-echo "-J use Intel MPI version of fds"
 echo "-k - kill smokebot if it is running"
 echo "-q queue [default: $QUEUE]"
 echo "-Q - generate images on node running this script"
@@ -25,7 +24,6 @@ else
   echo "-m email_address"
 fi
 echo "-M - make movies"
-echo "-P - remove run status (PID) file"
 echo "-t - don't run benchmark cases"
 echo "-U - upload guides"
 echo "-w directory - web directory containing summary pages"
@@ -33,11 +31,6 @@ echo ""
 echo "Build apps, set repo revisions:"
 echo "-C - force clone"
 echo "-D use gnu compilers"
-echo "-g firebot_host - host where firebot was run"
-echo "-G firebot_home - home directory where firebot was run"
-echo "   The -g and -G options are used when cloning repos (-R option)"
-echo "   to build apps using the same repo revisions as used with the last"
-echo "   successful firebot run"
 echo "-o - specify GH_OWNER when uploading manuals. [default: $GH_OWNER]"
 echo "-r - specify GH_REPO when uploading manuals. [default: $GH_REPO]"
 echo "-R release_type (master, release or test) - clone fds, exp, fig, out and smv repos"
@@ -171,15 +164,11 @@ UPLOAD=
 FORCE=
 FORCECLONE=
 ECHO=
-INTEL=
-REMOVE_PID=
 CLONE_REPOS=
 FDS_REV=
 SMV_REV=
 FDS_TAG=
 SMV_TAG=
-FIREBOT_HOST=
-FIREBOT_HOME=
 SANITIZE=
 WEB_DIR=
 USE_BOT_QFDS=
@@ -199,7 +188,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'aAB:bcCDfFg:G:hHJkm:Mo:Pq:Qr:R:s:StTuUvw:W:x:X:y:Y:' OPTION
+while getopts 'aAB:bcCDfFhHJkm:Mo:q:Qr:R:s:StTuUvw:W:x:X:y:Y:' OPTION
 do
 case $OPTION  in
   a)
@@ -226,12 +215,6 @@ case $OPTION  in
   f)
    FORCE=1
    ;;
-  g)
-   FIREBOT_HOST="$OPTARG"
-   ;;
-  G)
-   FIREBOT_HOME="$OPTARG"
-   ;;
   h)
    usage
    ;;
@@ -239,7 +222,7 @@ case $OPTION  in
    usage "-H"
    ;;
   J)
-   INTEL="-J"
+   DUMMY=
    ;;
   k)
    KILL_SMOKEBOT=1
@@ -252,9 +235,6 @@ case $OPTION  in
    ;;
   o)
    export GH_OWNER="$OPTARG"
-   ;;
-  P)
-   REMOVE_PID=1
    ;;
   q)
    QUEUE="$OPTARG"
@@ -312,48 +292,7 @@ esac
 done
 shift $(($OPTIND-1))
 
-if [ "$REMOVE_PID" == "1" ]; then
-  rm -f $smokebot_pid
-  echo "$smokebot_pid status file removed"
-  exit
-fi
-
 # sync fds and smv repos with the the repos used in the last successful firebot run
-
-GET_HASH=
-if [ "$FIREBOT_HOST" != "" ]; then
-  GET_HASH=1
-else
-  FIREBOT_HOST=`hostname`
-fi
-if [ "$FIREBOT_HOME" != "" ]; then
-  GET_HASH=1
-else
-  FIREBOT_HOME=\~firebot
-fi
-if [ "$GET_HASH" != "" ]; then
-  if [ "$CLONE_REPO" == "" ]; then
-    echo "***error: The -g and -G options for specifying firebot host/home directory can only be used"
-    echo "          when cloning the repos, when the -R option is used"
-    exit 1
-  fi
-  FDS_HASH=`../Bundlebot/fds/scripts/get_hash.sh -r fds -g $FIREBOT_HOST -G $FIREBOT_HOME`
-  SMV_HASH=`../Bundlebot/fds/scripts/get_hash.sh -r smv -g $FIREBOT_HOST -G $FIREBOT_HOME`
-  ABORT=
-  if [ "$FDS_HASH" == "" ]; then
-    ABORT=1
-  fi
-  if [ "$SMV_HASH" == "" ]; then
-    ABORT=1
-  fi
-  if [ "$ABORT" != "" ]; then
-    echo "***error: the fds and/or smv repo hash could not be found in the directory"
-    echo "          $FIREBOT_HOME/.firebot/apps at the host $FIREBOT_HOST"
-    exit 1
-  fi
-  FDS_REV="-x $FDS_HASH"
-  SMV_REV="-y $SMV_HASH"
-fi
 
 # warn user (if not the smokebot user) if using the clone option
 
@@ -457,7 +396,7 @@ BRANCH="-b $BRANCH"
 #*** run smokebot
 
 touch $smokebot_pid
-$ECHO ./$botscript $SIZE $BRANCH $SANITIZE $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $CLONE_REPOS $CACHE_DIR $FORCECLONE $GNU $RUNAUTO $INTEL $DONOT_RUN_BENCHMARK $CLEANREPO $WEB_DIR $WEB_ROOT $UPDATEREPO $QUEUE $SQUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $SIZE $BRANCH $SANITIZE $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $CLONE_REPOS $CACHE_DIR $FORCECLONE $GNU $RUNAUTO $DONOT_RUN_BENCHMARK $CLEANREPO $WEB_DIR $WEB_ROOT $UPDATEREPO $QUEUE $SQUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi

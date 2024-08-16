@@ -30,11 +30,6 @@ SCRIPTDIR=`pwd`
 OUTPUT=$SCRIPTDIR
 
 cd $CURDIR
-fdsrepo=../../fds
-cd $fdsrepo
-fdsrepo=`pwd`
-
-cd $CURDIR
 figrepo=../../fig
 cd $figrepo
 figrepo=`pwd`

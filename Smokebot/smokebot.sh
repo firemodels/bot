@@ -1567,6 +1567,8 @@ GITURL=
 CACHE_DIR=
 DONOT_RUN_BENCHMARK=
 HAVEMAIL=`which mail |& grep -v 'no mail'`
+MPI_TYPE=impi
+INTEL2="-J"
 
 #*** save pid so -k option (kill smokebot) may be used lateer
 
@@ -1574,7 +1576,7 @@ echo $$ > $PID_FILE
 
 #*** parse command line options
 
-while getopts 'aAb:cCDJm:Mq:QR:s:StuUw:W:x:X:y:Y:' OPTION
+while getopts 'aAb:cCDm:Mq:QR:s:StuUw:W:x:X:y:Y:' OPTION
 do
 case $OPTION in
   a)
@@ -1601,11 +1603,8 @@ case $OPTION in
   D)
    COMPILER=gnu
    MPI_TYPE=ompi
+   INTEL2=
    export OMP_NUM_THREADS=1
-   ;;
-  J)
-   MPI_TYPE=impi
-   INTEL2="-J"
    ;;
   m)
    mailTo="$OPTARG"
