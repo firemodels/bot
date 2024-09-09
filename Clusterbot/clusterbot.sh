@@ -1544,7 +1544,7 @@ if [ "$?" == "1" ]; then
   echo ""
 fi
 
-TOLERANCE=0.01
+TOLERANCE=0.00002
 TIME_CHECK 0 $TOLERANCE $FILES_DIR $CB_HOSTS 
 if [ "$?" == "1" ]; then
   TIME_CHECK 1 $TOLERANCE $FILES_DIR $CB_HOSTETH1 
