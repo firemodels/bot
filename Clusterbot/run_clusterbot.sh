@@ -1,6 +1,9 @@
 #!/bin/bash
 
-EMAIL=$SMV_EMAIL
+if [ -e $HOME/.clusterbot/clusterbot_email_list.sh ]; then
+  source ~/.clusterbot/clusterbot_email_list.sh
+fi
+EMAIL=$mailToCLUSTERBOT
 Copt=
 fopt=
 nopt=
