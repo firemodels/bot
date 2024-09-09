@@ -114,8 +114,7 @@ STOP_TIME=`date`
 nerrors=`grep '\*\*\*error'     $OUTPUT | wc -l`
 nwarnings=`grep '\*\*\*warning' $OUTPUT | wc -l`
 
-echo "VVVVVVVVVVVVVVVVVVVVVVVVV"                                 > $HEADER
-echo ""                                                         >> $HEADER
+echo ""                                                          > $HEADER
 echo "   start: $START_TIME"                                    >> $HEADER
 echo "    stop: $STOP_TIME"                                     >> $HEADER
 echo "    $nerrors errors, $nwarnings warnings"                 >> $HEADER
@@ -137,8 +136,6 @@ if [ $nwarnings -gt 0 ]; then
   echo "-----------------------------------------------------"  >> $ERRORS
   HAVE_ERRWARN=1
 fi
-echo ""                                                         >> $ERRORS
-echo "^^^^^^^^^^^^^^^^^^^^^^^^"                                 >> $ERRORS
 echo ""                                                         >> $ERRORS
 
 # don't send an email if there are no errors and warnings and if the -M option was used
@@ -177,6 +174,14 @@ if [[ "$WARNS" != "" ]] && [[ "$ERRS" != "" ]]; then
   COMMA=", "
 fi
 
+MESSAGE2=
+if [ "$WARNS" != "" ]; then
+  MESSAGE2="( $ERRS$COMMA$WARNS )"
+fi
+if [ "$ERRS" != "" ]; then
+  MESSAGE2="( $ERRS$COMMA$WARNS )"
+fi
+
 if [ $nlogdiff -eq 0 ]; then
   echo "   $CB_HOSTS status since $LOGDATE: $ERRS$COMMA$WARNS"
 else
@@ -187,19 +192,19 @@ cat $HEADER $ERRORS
 if [ "$EMAIL" != "" ]; then
   MESSAGE=
   if [ $nerrors -gt 0 ]; then
-    MESSAGE="Clusterbot failure: "
+    MESSAGE="Clusterbot failure on "
     if [ $nwarnings -gt 0 ]; then
-    MESSAGE="Clusterbot failure with warnings: "
+    MESSAGE="Clusterbot failure with warnings on "
     fi
   else
-    MESSAGE="Clusterbot success: "
+    MESSAGE="Clusterbot success on "
     if [ $nwarnings -gt 0 ]; then
-      MESSAGE="Clusterbot success with warnings: "
+      MESSAGE="Clusterbot success with warnings on "
     fi
   fi
   echo emailing results to $EMAIL
   
-  cat $HEADER $ERRORS $OUTPUT | mail -s "$MESSAGE on $CB_HOSTS $ERRS$COMMA$WARNS" $EMAIL
+  cat $HEADER $ERRORS $OUTPUT | mail -s "$MESSAGE on $CB_HOSTS $MESSAGE2 " $EMAIL
 fi
 
 cd $CURDIR
