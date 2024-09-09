@@ -157,30 +157,49 @@ if [ $nlogdiff -gt 0 ]; then
  cp $ERRORS $LOGFILE
 fi
 
-ERRS=Errors
+ERRS=
 if [ "$nerrors" == "1" ]; then
-  ERRS=Error
+  ERRS="$nerrors Error"
+fi
+if [ $nerrors -gt 1 ]; then
+  ERRS="$nerrors Errors"
 fi
 
-WARNS=Warnings
+WARNS=
 if [ "$nwarnings" == "1" ]; then
-  WARNS=Warning
+  WARNS="$nwarnings Warning"
+fi
+if [ $nwarnings -gt 1 ]; then
+  WARNS="$nwarnings Warnings"
+fi
+COMMA=
+if [[ "$WARNS" != "" ]] && [[ "$ERRS" != "" ]]; then
+  COMMA=", "
 fi
 
 if [ $nlogdiff -eq 0 ]; then
-  echo "   $CB_HOSTS status since $LOGDATE: $nerrors $ERRS, $nwarnings $WARNS"
+  echo "   $CB_HOSTS status since $LOGDATE: $ERRS$COMMA$WARNS"
 else
-  echo "   $CB_HOSTS status has changed: $nerrors $ERRS, $nwarnings $WARNS"
+  echo "   $CB_HOSTS status has changed: $ERRS$COMMA$WARNS"
 fi
 echo ""
 cat $HEADER $ERRORS 
 if [ "$EMAIL" != "" ]; then
-  echo emailing results to $EMAIL
-  if [ $nlogdiff -eq 0 ]; then
-    cat $HEADER $ERRORS $OUTPUT | mail -s "$CB_HOSTS status since $LOGDATE: $nerrors $ERRS, $nwarnings $WARNS" $EMAIL
+  MESSAGE=
+  if [ $nerrors -gt 0 ]; then
+    MESSAGE="Clusterbot failure: "
+    if [ $nwarnings -gt 0 ]; then
+    MESSAGE="Clusterbot failure with warnings: "
+    fi
   else
-    cat $HEADER $ERRORS $OUTPUT | mail -s "$CB_HOSTS status has changed: $nerrors $ERRS, $nwarnings $WARNS" $EMAIL
+    MESSAGE="Clusterbot success: "
+    if [ $nwarnings -gt 0 ]; then
+      MESSAGE="Clusterbot success with warnings: "
+    fi
   fi
+  echo emailing results to $EMAIL
+  
+  cat $HEADER $ERRORS $OUTPUT | mail -s "$MESSAGE on $CB_HOSTS $ERRS$COMMA$WARNS" $EMAIL
 fi
 
 cd $CURDIR
