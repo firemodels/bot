@@ -104,9 +104,9 @@ CHECK_DIR_LIST()
  
   dirdate=`ls -l $ARCHIVEDIR/$rootdir | awk '{print $6" "$7" "$8}'`
   if [ $ndiffs -eq 0 ]; then
-    echo "   `hostname -s`: $basedir/$rootdir same since $dirdate"
+    echo "   `hostname -s`: The directory $basedir/$rootdir has not changed since $dirdate"
   else
-    echo "   `hostname -s`: $basedir/$rootdir changed since $dirdate"
+    echo "   `hostname -s`: The directory $basedir/$rootdir has changed since $dirdate"
     if [ "$UPDATE_ARCHIVE" == "1" ]; then
       cp $currentdirlist $ARCHIVEDIR/$rootdir
     fi
@@ -175,7 +175,7 @@ CHECK_FILE_DATE()
   current_moddate=`cat $currentfilelist | awk '{print $6" "$7" "$8}'`
   current_filesize=`cat $currentfilelist | awk '{print $5}'`
   if [ $diffs -eq 0 ]; then
-    echo "   `hostname -s`: $fullfile same since $current_moddate(file size: $current_filesize)"
+    echo "   `hostname -s`: The file $fullfile has not changed since $current_moddate(file size: $current_filesize)"
   else
     echo "   `hostname -s`: ***warning: $fullfile has changed - current($current_moddate), original($original_moddate) modification date,"
     echo "                  current($current_filesize), original($original_filesize) file size."
@@ -629,15 +629,16 @@ OPENSM_CHECK ()
     return
   fi
   SLURM_TEMP=/tmp/slurm.$$
-  ssh $CB_HOST_ARG pdsh -t 1 -w $CB_HOST_ARG,$CB_HOSTIB_ARG ps -el >& $SLURM_TEMP
+  pdsh -t 1 -w $CB_LOGIN,$CB_HEAD ps -el >& $SLURM_TEMP
   cat $SLURM_TEMP | sort -u | grep opensm  >  $SLURM_OUT 2>&1
   SUB1=`cat  $SLURM_OUT | awk -F':' '{print $1}' | sort -u | awk '{printf "%s%s", $1," " }'`
   if [ "$SUB1" == "" ]; then
-    echo "   $CB_HOST_ARG,$CB_HOSTIB_ARG: ***error: opensm not running on any host"
-    echo "      Fix: sudo ssh $CB_HOST_ARG service opensm start   "
+    echo "   $CB_HEAD,$CB_LOGIN: ***error: opensm not running on any host"
+    echo "      Fix: sudo ssh $CB_HEAD service opensm start   "
+    echo "      Fix: sudo ssh $CB_LOGIN service opensm start   "
   else
     SLURMCOUNT=`cat  $SLURM_OUT | awk -F':' '{print $1}' | sort -u | wc -l`
-    echo "   $CB_HOST_ARG,$CB_HOSTIB_ARG: opensm on $SLURMCOUNT hosts"
+    echo "   $CB_HEAD,$CB_LOGIN: opensm on $SLURMCOUNT hosts"
   fi
   rm -f $SLURM_TEMP
 }
@@ -1467,7 +1468,6 @@ if [[ "$IPMI_username" != "" ]] && [[ "$IPMI_password" != "" ]]; then
   fi
 fi
 
-echo ""
 OPENSM_CHECK $CB_HOST1 $CB_HOSTIB1
 OPENSM_CHECK $CB_HOST2 $CB_HOSTIB2
 OPENSM_CHECK $CB_HOST3 $CB_HOSTIB3
@@ -1483,7 +1483,6 @@ fi
 
 # --------------------- infiniband speed check --------------------
 
-echo ""
 IBSPEED $CB_HOSTETH1
 IBSPEED $CB_HOSTETH2
 IBSPEED $CB_HOSTETH3
@@ -1512,7 +1511,6 @@ CORE_CHECK $CB_HOSTETH2
 CORE_CHECK $CB_HOSTETH3
 CORE_CHECK $CB_HOSTETH4
 
-echo ""
 SPEED_CHECK $FILES_DIR $CB_HOSTETH1
 SPEED_CHECK $FILES_DIR $CB_HOSTETH2
 SPEED_CHECK $FILES_DIR $CB_HOSTETH3
@@ -1601,36 +1599,6 @@ CHECK_FILE /etc/slurm/slurm.conf error 0 $FILES_DIR $CB_HOSTS
 #*** check slurm daemon
 
 CHECK_DAEMON slurmd error $CB_HOSTS
-
-#*** check slurm rpm
-
-TEMP_RPM=/tmp/rpm.$$
-pdsh -t 1 -w $CB_HOSTS "rpm -qa | grep slurm-pmi-devel" >& $TEMP_RPM
-cat $TEMP_RPM | grep -v ssh | grep -v Connection | sort >& $SLURMRPM_OUT
-rm -f $TEMP_RPM
-SLURMRPM0=`head -1 $SLURMRPM_OUT | awk '{print $2}'`
-SLURMBAD=
-while read line 
-do
-  host=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
-  SLURMRPMI=`echo $line | awk '{print $2}'`
-  if [ "$SLURMRPMI" != "$SLURMRPM0" ]; then
-    if [ "$SLURMRPMI" != "Connection" ]; then
-      if [ "$SLURMBAD" == "" ]; then
-        SLURMBAD="$host/$SLURMRPMI"
-      else
-        SLURMBAD="$SLURMBAD $host/$SLURMRPMI"
-      fi
-    fi
-  fi
-done < $SLURMRPM_OUT
-
-if [ "$SLURMBAD" == "" ]; then
-  echo "   $CB_HOSTS: $SLURMRPM0 installed"
-else
-  echo "   $CB_HOSTS: ***error: $SLURMRPM0 not installed on $SLURMBAD"
-  echo "      Fix: ask system administrator to update slurm rpm packages"
-fi
 
 #*** ganglia checks -----------------------------
 
