@@ -12,9 +12,9 @@ The directory [bot/Bundlebot/release](https://github.com/firemodels/bot/tree/mas
   
 These steps are given in more detail below.
 
-### Configure
+### Configure The Bundle Scripts
 
-   1. cd to bot/Scripts and run the script `./update_repos.sh -m` to update repos .  The option `-m` makes sure each repo is in the master branch before updating. If the latest revision is not the revision you want to use to make the bundle, checkout the desired revision.
+   1. cd to bot/Scripts and run the script `./update_repos.sh -m` to update repos .  The option `-m` makes sure each repo is in the master branch before updating. After updating the repos, checkout the desired revision if the latest revision is not the revision you want to use to make the bundle.
    2. cd to bot/Bundlebot/release and run the script `MakeConfig.sh` to update the configuration scripts `config.sh` and `config.bat` using
       
       `./MakeConfig.sh x.y.z`
