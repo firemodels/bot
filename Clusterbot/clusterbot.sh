@@ -6,6 +6,8 @@ FIREMODELS_ROOT=`pwd`
 export FIREMODELS_ROOT
 cd $CURRENT_DIR
 
+ALL_HOSTS="$CB_HOSTS $CB_LOGIN $CB_HEAD"
+
 #---------------------------------------------
 #                   MKDIR
 #---------------------------------------------
@@ -102,9 +104,9 @@ CHECK_DIR_LIST()
  
   dirdate=`ls -l $ARCHIVEDIR/$rootdir | awk '{print $6" "$7" "$8}'`
   if [ $ndiffs -eq 0 ]; then
-    echo "   `hostname -s`: $basedir/$rootdir same since $dirdate"
+    echo "   `hostname -s`: The directory $basedir/$rootdir has not changed since $dirdate"
   else
-    echo "   `hostname -s`: $basedir/$rootdir changed since $dirdate"
+    echo "   `hostname -s`: The directory $basedir/$rootdir has changed since $dirdate"
     if [ "$UPDATE_ARCHIVE" == "1" ]; then
       cp $currentdirlist $ARCHIVEDIR/$rootdir
     fi
@@ -173,7 +175,7 @@ CHECK_FILE_DATE()
   current_moddate=`cat $currentfilelist | awk '{print $6" "$7" "$8}'`
   current_filesize=`cat $currentfilelist | awk '{print $5}'`
   if [ $diffs -eq 0 ]; then
-    echo "   `hostname -s`: $fullfile same since $current_moddate(file size: $current_filesize)"
+    echo "   `hostname -s`: The file $fullfile has not changed since $current_moddate(file size: $current_filesize)"
   else
     echo "   `hostname -s`: ***warning: $fullfile has changed - current($current_moddate), original($original_moddate) modification date,"
     echo "                  current($current_filesize), original($original_filesize) file size."
@@ -197,7 +199,7 @@ CHECK_DAEMON ()
 DAEMONOUT=$FILES_DIR/daemon.out.$$
 DAEMONOUT2=$FILES_DIR/daemon2.out.$$
 
-pdsh -t 1 -w $CB_HOST_ARG "ps -el | grep $DAEMON_ARG | wc -l" >&  $DAEMONOUT2
+pdsh -t 1 -w "$CB_HOST_ARG" "ps -el | grep $DAEMON_ARG | wc -l" >&  $DAEMONOUT2
 cat $DAEMONOUT2 | grep -v ssh | grep -v Connection | sort >& $DAEMONOUT
 DAEMONDOWN=
 while read line 
@@ -235,7 +237,7 @@ ACCT_CHECK ()
   fi
   FILE_OUT=$outdir/acct_check.out
   FILE_OUT2=$outdir/acct_check2.out
-  pdsh -t 1 -w $CB_HOST_ARG `pwd`/getfile.sh $file $outdir >& $FILE_OUT2
+  pdsh -t 1 -w "$CB_HOST_ARG" `pwd`/getfile.sh $file $outdir >& $FILE_OUT2
   cat $FILE_OUT2 | grep -v ssh | grep -v Connection | sort >& $FILE_OUT
   file0=`head -1 $FILE_OUT | awk '{print $2}'`
 
@@ -284,7 +286,7 @@ CHECK_FILE ()
   fi
   FILE_OUT=$outdir/check_file.out
   FILE_OUT2=$outdir/check_file.out2
-  pdsh -t 1 -w $CB_HOST_ARG `pwd`/getfile.sh $file $outdir >& $FILE_OUT2
+  pdsh -t 1 -w "$CB_HOST_ARG" `pwd`/getfile.sh $file $outdir >& $FILE_OUT2
   cat $FILE_OUT2 | grep -v ssh | grep -v Connection | sort >& $FILE_OUT
   file0=`head -1 $FILE_OUT | awk '{print $2}'`
 
@@ -340,7 +342,7 @@ TIME_CHECK ()
   fi
   FILE_OUT=$outdir/time_check.out
   FILE_OUT2=$outdir/time_check.out2
-  pdsh -t 1 -w $CB_HOST_ARG `pwd`/gettime_error.sh >& $FILE_OUT2
+  pdsh -t 1 -w "$CB_HOST_ARG" `pwd`/gettime_error.sh >& $FILE_OUT2
   cat $FILE_OUT2 | grep -v ssh | grep -v Connection | sort >& $FILE_OUT
 
   local CURDIR=`pwd`
@@ -515,7 +517,7 @@ HOST_CHECK ()
   fi
   FILE_OUT=$outdir/host_check.out
   FILE_OUT2=$outdir/host_check.out2
-  pdsh -t 1 -w $CB_HOST_ARG `pwd`/gethost.sh $outdir >& $FILE_OUT2
+  pdsh -t 1 -w "$CB_HOST_ARG" `pwd`/gethost.sh $outdir >& $FILE_OUT2
   cat $FILE_OUT2 | grep -v ssh | grep -v Connection | sort >& $FILE_OUT
   file0=`head -1 $FILE_OUT | awk '{print $2}'`
 
@@ -569,7 +571,7 @@ if [ "$CB_HOST_ARG" == "" ]; then
   return 0
 fi
 rm -f $FILES_DIR/${prefix}rpm*.txt
-pdsh -t 1 -w $CB_HOST_ARG `pwd`/getrpms.sh $FILES_DIR $prefix >& $SLURMRPM_OUT
+pdsh -t 1 -w "$CB_HOST_ARG" `pwd`/getrpms.sh $FILES_DIR $prefix >& $SLURMRPM_OUT
 
 local CURDIR=`pwd`
 cd $FILES_DIR
@@ -627,15 +629,16 @@ OPENSM_CHECK ()
     return
   fi
   SLURM_TEMP=/tmp/slurm.$$
-  ssh $CB_HOST_ARG pdsh -t 1 -w $CB_HOST_ARG,$CB_HOSTIB_ARG ps -el >& $SLURM_TEMP
+  pdsh -t 1 -w $CB_LOGIN,$CB_HEAD ps -el >& $SLURM_TEMP
   cat $SLURM_TEMP | sort -u | grep opensm  >  $SLURM_OUT 2>&1
   SUB1=`cat  $SLURM_OUT | awk -F':' '{print $1}' | sort -u | awk '{printf "%s%s", $1," " }'`
   if [ "$SUB1" == "" ]; then
-    echo "   $CB_HOST_ARG,$CB_HOSTIB_ARG: ***error: opensm not running on any host"
-    echo "      Fix: sudo ssh $CB_HOST_ARG service opensm start   "
+    echo "   $CB_HEAD,$CB_LOGIN: ***error: opensm not running on any host"
+    echo "      Fix: sudo ssh $CB_HEAD service opensm start   "
+    echo "      Fix: sudo ssh $CB_LOGIN service opensm start   "
   else
     SLURMCOUNT=`cat  $SLURM_OUT | awk -F':' '{print $1}' | sort -u | wc -l`
-    echo "   $CB_HOST_ARG,$CB_HOSTIB_ARG: opensm on $SLURMCOUNT hosts"
+    echo "   $CB_HEAD,$CB_LOGIN: opensm on $SLURMCOUNT hosts"
   fi
   rm -f $SLURM_TEMP
 }
@@ -1385,16 +1388,16 @@ echo ""
 echo "----- network checks ------------"
 # --------------------- check ethernet --------------------
 
-pdsh -t 1 -w $CB_HOSTS date   >& $ETHOUT
+pdsh -t 1 -w "$ALL_HOSTS" date   >& $ETHOUT
 ETHDOWN=`sort $ETHOUT | grep -E 'timed|refused|route' | awk -F':' '{print $1}' | awk '{printf "%s ", $1}'`
 ETHUP=`sort $ETHOUT | grep -v -E 'timed|refused|route' | awk -F':' '{print $1}' | awk '{printf "%s ", $1}'`
 
 ETH_ALL_UP=
 if [ "$ETHDOWN" == "" ]; then
-  echo "   $CB_HOSTS: ethernet up"
+  echo "   $ALL_HOSTS: ethernet up"
   ETH_ALL_UP=1
 else
-  echo "   $CB_HOSTS: ***warning: ethernet down on $ETHDOWN"
+  echo "   $ALL_HOSTS: ***warning: ethernet down on $ETHDOWN"
 fi
 
 # --------------------- check infiniband --------------------
@@ -1433,12 +1436,12 @@ done
 if [ `cat $IBOUT | wc -l` -ne 0 ]; then
   if [ "$IBDOWN" == "" ]; then
     if [ "$ETH_ALL_UP" == "1" ]; then
-      echo "   $CB_HOSTS: infiniband up"
+      echo "   $ALL_HOSTS: infiniband up"
     else
-      echo "   $CB_HOSTS: infiniband up on working hosts"
+      echo "   $ALL_HOSTS: infiniband up on working hosts"
     fi
   else
-    echo "   $CB_HOSTS: ***error: infiniband down on $IBDOWN and nodes with non-working ethernet"
+    echo "   $ALL_HOSTS: ***error: infiniband down on $IBDOWN and nodes with non-working ethernet"
   fi
 fi
 
@@ -1465,7 +1468,6 @@ if [[ "$IPMI_username" != "" ]] && [[ "$IPMI_password" != "" ]]; then
   fi
 fi
 
-echo ""
 OPENSM_CHECK $CB_HOST1 $CB_HOSTIB1
 OPENSM_CHECK $CB_HOST2 $CB_HOSTIB2
 OPENSM_CHECK $CB_HOST3 $CB_HOSTIB3
@@ -1481,7 +1483,6 @@ fi
 
 # --------------------- infiniband speed check --------------------
 
-echo ""
 IBSPEED $CB_HOSTETH1
 IBSPEED $CB_HOSTETH2
 IBSPEED $CB_HOSTETH3
@@ -1490,16 +1491,10 @@ IBSPEED $CB_HOSTETH4
 echo ""
 echo "----- OS checks -----------------"
 
-CHECK_FILE /etc/redhat-release error 0 $FILES_DIR $CB_HOSTS
+CHECK_FILE /etc/redhat-release error 0 $FILES_DIR "$ALL_HOSTS"
 
 # --------------------- rpm check --------------------
 RPM_CHECK 0 ALL $CB_HOSTS
-if [ "$?" == "1" ]; then
-  RPM_CHECK 1 ETH1 $CB_HOSTETH1
-  RPM_CHECK 1 ETH2 $CB_HOSTETH2
-  RPM_CHECK 1 ETH3 $CB_HOSTETH3
-  RPM_CHECK 1 ETH4 $CB_HOSTETH4
-fi
 
 # --------------------- check provisioning date --------------------
 PROVISION_DATE_CHECK $CB_HOSTETH1
@@ -1516,7 +1511,6 @@ CORE_CHECK $CB_HOSTETH2
 CORE_CHECK $CB_HOSTETH3
 CORE_CHECK $CB_HOSTETH4
 
-echo ""
 SPEED_CHECK $FILES_DIR $CB_HOSTETH1
 SPEED_CHECK $FILES_DIR $CB_HOSTETH2
 SPEED_CHECK $FILES_DIR $CB_HOSTETH3
@@ -1533,25 +1527,13 @@ MEMORY_CHECK $FILES_DIR $CB_HOSTETH4 $CB_MEM4
 echo ""
 echo "----- clock checks --------------"
 
-CHECK_DAEMON chronyd error $CB_HOSTS
+CHECK_DAEMON chronyd error "$ALL_HOSTS"
 
-CHECK_FILE /etc/chrony.conf error 0 $FILES_DIR $CB_HOSTS
-if [ "$?" == "1" ]; then
-  CHECK_FILE /etc/chrony.conf error 1 $FILES_DIR $CB_HOSTETH1 
-  CHECK_FILE /etc/chrony.conf error 1 $FILES_DIR $CB_HOSTETH2 
-  CHECK_FILE /etc/chrony.conf error 1 $FILES_DIR $CB_HOSTETH3 
-  CHECK_FILE /etc/chrony.conf error 1 $FILES_DIR $CB_HOSTETH4 
-  echo ""
-fi
+CHECK_FILE /etc/chrony.conf error 0 $FILES_DIR "$CB_HOSTS $CB_LOGIN"
 
 TOLERANCE=0.00002
-TIME_CHECK 0 $TOLERANCE $FILES_DIR $CB_HOSTS 
-if [ "$?" == "1" ]; then
-  TIME_CHECK 1 $TOLERANCE $FILES_DIR $CB_HOSTETH1 
-  TIME_CHECK 1 $TOLERANCE $FILES_DIR $CB_HOSTETH2
-  TIME_CHECK 1 $TOLERANCE $FILES_DIR $CB_HOSTETH3 
-  TIME_CHECK 1 $TOLERANCE $FILES_DIR $CB_HOSTETH4 
-fi
+TIME_CHECK 0 $TOLERANCE $FILES_DIR "$CB_HOSTS" 
+TIME_CHECK 0 $TOLERANCE $FILES_DIR "$CB_LOGIN $CB_HEAD" 
 
 echo ""
 echo "----- file system checks -------"
@@ -1559,46 +1541,20 @@ echo "----- file system checks -------"
 #*** check  NFS cross mounts
 
 MOUNT_CHECK 0 $FILES_DIR $CB_HOSTS
-if [ "$?" == "1" ]; then
-  MOUNT_CHECK 1 $FILES_DIR $CB_HOSTETH1 
-  MOUNT_CHECK 1 $FILES_DIR $CB_HOSTETH2 
-  MOUNT_CHECK 1 $FILES_DIR $CB_HOSTETH3 
-  MOUNT_CHECK 1 $FILES_DIR $CB_HOSTETH4 
-  echo ""
-fi
 
 #*** check /etc/exports file
 
 CHECK_FILE /etc/exports error 0 $FILES_DIR $CB_HOSTS
-if [ "$?" == "1" ]; then
-  CHECK_FILE /etc/exports error 1 $FILES_DIR $CB_HOSTETH1 
-  CHECK_FILE /etc/exports error 1 $FILES_DIR $CB_HOSTETH2 
-  CHECK_FILE /etc/exports error 1 $FILES_DIR $CB_HOSTETH3 
-  CHECK_FILE /etc/exports error 1 $FILES_DIR $CB_HOSTETH4 
-fi
 
 #*** check /etc/fstab file
 
 FSTAB_CHECK $FILES_DIR 0 $CB_HOSTS
-if [ "$?" == "1" ]; then
-  FSTAB_CHECK $FILES_DIR 1 $CB_HOSTETH1 
-  FSTAB_CHECK $FILES_DIR 1 $CB_HOSTETH2 
-  FSTAB_CHECK $FILES_DIR 1 $CB_HOSTETH3 
-  FSTAB_CHECK $FILES_DIR 1 $CB_HOSTETH4 
-  echo ""
-fi
 
 echo ""
 echo "----- login/host checks --------"
-ACCT_CHECK /etc/group  $FILES_DIR $CB_HOSTS
-ACCT_CHECK /etc/passwd $FILES_DIR $CB_HOSTS
-HOST_CHECK $FILES_DIR 0 $CB_HOSTS
-if [ "$?" == "1" ]; then
-  HOST_CHECK $FILES_DIR 1 $CB_HOSTETH1 
-  HOST_CHECK $FILES_DIR 1 $CB_HOSTETH2 
-  HOST_CHECK $FILES_DIR 1 $CB_HOSTETH3 
-  HOST_CHECK $FILES_DIR 1 $CB_HOSTETH4 
-fi
+ACCT_CHECK /etc/group  $FILES_DIR "$ALL_HOSTS"
+ACCT_CHECK /etc/passwd $FILES_DIR "$ALL_HOSTS"
+HOST_CHECK $FILES_DIR 0 "$ALL_HOSTS"
 
 echo ""
 echo "----- ssh configuration checks ---"
@@ -1639,47 +1595,10 @@ fi
 #*** check slurm configuration file --------------------
 
 CHECK_FILE /etc/slurm/slurm.conf error 0 $FILES_DIR $CB_HOSTS
-if [ "$?" == "1" ]; then
-  CHECK_FILE /etc/slurm/slurm.conf error 0 $FILES_DIR $CB_HOSTETH1 
-  CHECK_FILE /etc/slurm/slurm.conf error 0 $FILES_DIR $CB_HOSTETH2 
-  CHECK_FILE /etc/slurm/slurm.conf error 0 $FILES_DIR $CB_HOSTETH3 
-  CHECK_FILE /etc/slurm/slurm.conf error 0 $FILES_DIR $CB_HOSTETH4 
-  echo ""
-fi
 
 #*** check slurm daemon
 
 CHECK_DAEMON slurmd error $CB_HOSTS
-
-#*** check slurm rpm
-
-TEMP_RPM=/tmp/rpm.$$
-pdsh -t 1 -w $CB_HOSTS "rpm -qa | grep slurm-pmi-devel" >& $TEMP_RPM
-cat $TEMP_RPM | grep -v ssh | grep -v Connection | sort >& $SLURMRPM_OUT
-rm -f $TEMP_RPM
-SLURMRPM0=`head -1 $SLURMRPM_OUT | awk '{print $2}'`
-SLURMBAD=
-while read line 
-do
-  host=`echo $line | awk '{print $1}' | awk -F':' '{print $1}'`
-  SLURMRPMI=`echo $line | awk '{print $2}'`
-  if [ "$SLURMRPMI" != "$SLURMRPM0" ]; then
-    if [ "$SLURMRPMI" != "Connection" ]; then
-      if [ "$SLURMBAD" == "" ]; then
-        SLURMBAD="$host/$SLURMRPMI"
-      else
-        SLURMBAD="$SLURMBAD $host/$SLURMRPMI"
-      fi
-    fi
-  fi
-done < $SLURMRPM_OUT
-
-if [ "$SLURMBAD" == "" ]; then
-  echo "   $CB_HOSTS: $SLURMRPM0 installed"
-else
-  echo "   $CB_HOSTS: ***error: $SLURMRPM0 not installed on $SLURMBAD"
-  echo "      Fix: ask system administrator to update slurm rpm packages"
-fi
 
 #*** ganglia checks -----------------------------
 
@@ -1688,13 +1607,6 @@ if [ "$GANGLIA" != "" ]; then
   echo ""
   echo "----- ganglia checks ------------"
   CHECK_FILE /etc/ganglia/gmond.conf warning 0 $FILES_DIR $CB_HOSTS
-  if [ "$?" == "1" ]; then
-    CHECK_FILE /etc/ganglia/gmond.conf warning 1 $FILES_DIR $CB_HOSTETH1 
-    CHECK_FILE /etc/ganglia/gmond.conf warning 1 $FILES_DIR $CB_HOSTETH2 
-    CHECK_FILE /etc/ganglia/gmond.conf warning 1 $FILES_DIR $CB_HOSTETH3 
-    CHECK_FILE /etc/ganglia/gmond.conf warning 1 $FILES_DIR $CB_HOSTETH4 
-    echo ""
-  fi
   CHECK_DAEMON gmond warning $CB_HOSTS
 fi
 
