@@ -1836,6 +1836,9 @@ if [[ $RUNAUTO != "" ]] ; then
   run_auto $runoption || exit 1
 fi
 
+if [ "$WEB_ROOT" == "" ]; then
+  WEB_DIR=""
+fi
 if [ "$WEB_DIR" != "" ]; then
   if [ ! -d $WEB_ROOT/$WEB_DIR ]; then
     mkdir -p $WEB_ROOT/$WEB_DIR
