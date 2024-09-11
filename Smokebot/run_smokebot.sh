@@ -293,7 +293,7 @@ shift $(($OPTIND-1))
 
 if [ "$WEB_DIR" == "" ]; then
   WEB_DIR=`basename $GITROOT`
-  EXT="${BASE##*_}"
+  EXT="${WEB_DIR##*_}"
   if [ "$EXT" != "" ]; then
     WEB_DIR=$EXT
   fi
