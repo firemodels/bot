@@ -1837,6 +1837,9 @@ if [[ $RUNAUTO != "" ]] ; then
 fi
 
 if [ "$WEB_DIR" != "" ]; then
+  if [ ! -d $WEB_ROOT/$WEB_DIR ]; then
+    mkdir -p $WEB_ROOT/$WEB_DIR
+  fi
   if [ -d $WEB_ROOT/$WEB_DIR ]; then
     testfile=$WEB_ROOT/$WEB_DIR/test.$$
     touch $testfile >& /dev/null
@@ -2275,7 +2278,7 @@ if [[ $stage_ver_release_success ]] ; then
        echo "Warnings from Stage 5 - Image comparisons:"     >> $WARNING_LOG
        grep '***warning:' $OUTPUT_DIR/stage5_image_compare   >> $WARNING_LOG
      fi
-       
+
      if [ "$WEB_DIR" != "" ]; then
        WEB_DIR_OLD=${WEB_DIR}_old
        rm -rf $WEB_ROOT/$WEB_DIR_OLD
