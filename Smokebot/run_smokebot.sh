@@ -148,6 +148,10 @@ else
   exit
 fi
 
+cd ../..
+GITROOT=`pwd`
+cd $CURDIR
+
 #*** define initial values
 
 SIZE=
@@ -171,9 +175,16 @@ SMV_TAG=
 SANITIZE=
 WEB_DIR=
 USE_BOT_QFDS=
-WEB_ROOT=/var/www/html
 GNU=
 CACHE_DIR=
+
+WEB_ROOT=/opt/www/html
+if [ ! -d $WEB_ROOT ]; then
+  WEB_ROOT=/var/www/html
+fi
+if [ ! -d $WEB_ROOT ]; then
+  WEB_ROOT=
+fi
 
 #*** check to see if a queing system is available
 
@@ -286,6 +297,18 @@ case $OPTION  in
 esac
 done
 shift $(($OPTIND-1))
+
+if [ "$WEB_DIR" == "" ]; then
+  WEB_DIR=`basename $GITROOT`
+  EXT="${WEB_DIR##*_}"
+  if [ "$EXT" != "" ]; then
+    WEB_DIR=$EXT
+  fi
+  WEB_DIR=`whoami`/$WEB_DIR
+fi
+if [ "$WEB_ROOT" == "" ]; then
+  WEB_DIR=
+fi
 
 # sync fds and smv repos with the the repos used in the last successful firebot run
 
