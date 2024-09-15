@@ -1,6 +1,6 @@
 #!/bin/bash
-spark_head_load=$1
-spark_login_load=$2
+head_load=$1
+login_load=$2
 qstatout=qstat.out.$$
 infoout=info.out.$$
 #qstat -a | grep -v Q | awk 'NR>4' | awk '{print $2," ",$7}' | sort > $qstatout
@@ -20,8 +20,8 @@ cat << EOF
 <tr></tr>
 <tr></tr>
 <tr><th>Host</th><th>load</th></tr>
-<tr><th>spark-head</th><td align=right>$spark_head_load</td></tr>
-<tr><th>spark-login</th><td align=right>$spark_login_load</td></tr>
+<tr><th>$CB_HEAD</th><td align=right>$head_load</td></tr>
+<tr><th>$CB_LOGIN</th><td align=right>$login_load</td></tr>
 </table>
 </td>
 <td></td>

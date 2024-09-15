@@ -36,8 +36,8 @@ WARN_TEMP ()
 
 logdir=$HOME/.cluster_status
 if [ "$arg" == "gettemp" ]; then
-  load=`tail -1 ~/.cluster_status/load_spark.csv | awk -F',' '{print $2}'`
-  temp=`tail -1 ~/.cluster_status/load_spark.csv | awk -F',' '{print $3}'`
+  load=`tail -1 ~/.cluster_status/load_$CB_BASE.csv | awk -F',' '{print $2}'`
+  temp=`tail -1 ~/.cluster_status/load_$CB_BASE.csv | awk -F',' '{print $3}'`
   tempcrit=88.0
   tempcrit_lock=tempcrit_lock
   if [ ! -e $tempcrit_lock ]; then

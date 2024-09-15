@@ -96,14 +96,14 @@ do
 add_load $host
 done
 
-spark_head_load=`ssh spark-head cat /proc/loadavg | awk '{print $3}'`
-spark_head_load1=`ssh spark-head cat /proc/loadavg | awk '{print $1}'`
-spark_head_load5=`ssh spark-head cat /proc/loadavg | awk '{print $2}'`
-spark_login_load=`cat /proc/loadavg | awk '{print $3}'`
-spark_login_load1=`cat /proc/loadavg | awk '{print $1}'`
-spark_login_load5=`cat /proc/loadavg | awk '{print $2}'`
+head_load=`ssh $CB_HEAD cat /proc/loadavg | awk '{print $3}'`
+head_load1=`ssh $CB_HEAD cat /proc/loadavg | awk '{print $1}'`
+head_load5=`ssh $CB_HEAD cat /proc/loadavg | awk '{print $2}'`
+login_load=`cat /proc/loadavg | awk '{print $3}'`
+login_load1=`cat /proc/loadavg | awk '{print $1}'`
+login_load5=`cat /proc/loadavg | awk '{print $2}'`
 
-echo "$decdate,$total_load,$temp,$spark_head_load,$spark_login_load" >> $loadfile
+echo "$decdate,$total_load,$temp,$head_load,$login_load" >> $loadfile
 
 cat << EOF > $temp_webpage
 <!DOCTYPE html>
@@ -179,7 +179,7 @@ cat << EOF >> $temp_webpage
 EOF
 # end load plot
 
-# begin spark-head load plot
+# begin head load plot
 
 cat << EOF >> $temp_webpage
       google.charts.setOnLoadCallback(drawHeadLoadPlot);
@@ -199,7 +199,7 @@ cat << EOF >> $temp_webpage
           legend: { position: 'right' },
           colors: ['black'],
           hAxis:{ title: 'Day'},
-	  vAxis:{ title: 'spark-head load'}
+	  vAxis:{ title: '$CB_HEAD load'}
         };
         options.legend = 'none';
 
@@ -209,9 +209,9 @@ cat << EOF >> $temp_webpage
       }
 EOF
 
-# end spark-head load plot
+# end head load plot
 
-# begin spark-head2 load plot
+# begin head2 load plot
 
 cat << EOF >> $temp_webpage
       google.charts.setOnLoadCallback(drawHeadLoadPlot2);
@@ -232,7 +232,7 @@ cat << EOF >> $temp_webpage
           legend: { position: 'right' },
           colors: ['black'],
 	  hAxis:{ title: 'Hour(Day $basedate)'},
-	  vAxis:{ title: 'spark-head load'}
+	  vAxis:{ title: '$CB_HEAD load'}
         };
         options.legend = 'none';
 
@@ -242,9 +242,9 @@ cat << EOF >> $temp_webpage
       }
 EOF
 
-# end spark-head2 load plot
+# end head2 load plot
 
-# begin spark-login load plot
+# begin login load plot
 
 cat << EOF >> $temp_webpage
       google.charts.setOnLoadCallback(drawLoginLoadPlot);
@@ -264,7 +264,7 @@ cat << EOF >> $temp_webpage
           legend: { position: 'right' },
           colors: ['black'],
           hAxis:{ title: 'Day'},
-	  vAxis:{ title: 'spark-login load'}
+	  vAxis:{ title: '$CB_LOGIN load'}
         };
         options.legend = 'none';
 
@@ -274,7 +274,7 @@ cat << EOF >> $temp_webpage
       }
 EOF
 
-# end spark-head load plot
+# end head load plot
 
 cat << EOF >> $temp_webpage
     </script>
@@ -285,16 +285,16 @@ EOF
 if [ "$TEMP_IP" != "" ]; then
 cat << EOF >> $temp_webpage
 <hr>
-<h2>spark cluster status - $currentdate - $temp &deg;F</h2>
+<h2>$CB_BASE cluster status - $currentdate - $temp &deg;F</h2>
 EOF
 else
 cat << EOF >> $temp_webpage
 <hr>
-<h2>spark cluster status - $currentdate</h2>
+<h2>$CB_BASE cluster status - $currentdate</h2>
 EOF
 fi
 
-./get_user_usage.sh $spark_head_load $spark_login_load >> $temp_webpage
+./get_user_usage.sh $head_load $login_load >> $temp_webpage
 
 # ---------------------------- host_down_entry ----------------------------------
 function host_down_entry {
@@ -464,4 +464,4 @@ EOF
 cp $temp_webpage $webpage
 rm $temp_webpage
 rm $lockfile
-ssh spark-head cat /proc/loadavg | awk '{print }'
+ssh $CB_HEAD cat /proc/loadavg | awk '{print }'
