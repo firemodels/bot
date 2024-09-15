@@ -428,7 +428,7 @@ cat << EOF >> $temp_webpage
 <p><table border=on>
 EOF
 
-# output individual blaze entries
+# output individual node ntries
 
 count=0
 newrow=0
