@@ -428,7 +428,7 @@ cat << EOF >> $temp_webpage
 <p><table border=on>
 EOF
 
-# output individual node ntries
+# output individual node entries
 
 count=0
 newrow=0
@@ -446,9 +446,7 @@ cat << EOF >> $temp_webpage
 </table>
 EOF
 
-cat << EOF >> $temp_webpage
-<div id="load_plot" style="width: 750px; height: 200px"></div>
-EOF
+
 if [ "$TEMP_IP" != "" ]; then
 cat << EOF >> $temp_webpage
 <div id="temp_plot" style="width: 750px; height: 200px"></div><br>
