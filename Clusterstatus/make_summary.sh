@@ -454,8 +454,8 @@ cat << EOF >> $temp_webpage
 EOF
 fi
 cat << EOF >> $temp_webpage
-<div id="load_plot" style="width: 750px; height: 200px"></div>
-<div id="load_headplot" style="width: 750px; height: 200px"></div>
+<div id="load_plot"      style="width: 750px; height: 200px"></div>
+<div id="load_headplot"  style="width: 750px; height: 200px"></div>
 <div id="load_headplot2" style="width: 750px; height: 200px"></div>
 <div id="load_loginplot" style="width: 750px; height: 200px"></div>
 </body>
