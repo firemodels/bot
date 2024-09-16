@@ -169,7 +169,7 @@ cat << EOF >> $temp_webpage
           legend: { position: 'right' },
           colors: ['black'],
           hAxis:{ title: 'Day'},
-	  vAxis:{ title: 'total cluster load'}
+	  vAxis:{ title: 'cluster load'}
         };
         options.legend = 'none';
 
