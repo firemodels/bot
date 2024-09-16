@@ -102,8 +102,9 @@ head_load5=`ssh $CB_HEAD cat /proc/loadavg | awk '{print $2}'`
 login_load=`cat /proc/loadavg | awk '{print $3}'`
 login_load1=`cat /proc/loadavg | awk '{print $1}'`
 login_load5=`cat /proc/loadavg | awk '{print $2}'`
+total_load=`pdsh -t 1 -w $CB_HOSTS cat /proc/loadavg | awk '{print $2}' | awk  '{sum+=$1;}END{print sum;}'`
 
-echo "$decdate,$total_load,$temp,$head_load,$login_load" >> $loadfile
+echo "$decdate,$total_load,$temp,$head_load,$login_load,$total_load" >> $loadfile
 
 cat << EOF > $temp_webpage
 <!DOCTYPE html>
@@ -157,7 +158,7 @@ cat << EOF >> $temp_webpage
           ['days since Jan 1', 'load'],
 EOF
 
-cat $loadfile | tail -4000 | awk -v firsttime="$firsttime" -F',' '{if($1>firsttime) { printf("[%s,%s],\n",$1,$2) }}'  >> $temp_webpage
+cat $loadfile | tail -4000 | awk -v firsttime="$firsttime" -F',' '{if($1>firsttime) { printf("[%s,%s],\n",$1,$6) }}'  >> $temp_webpage
 
 cat << EOF >> $temp_webpage
         ]);
@@ -168,7 +169,7 @@ cat << EOF >> $temp_webpage
           legend: { position: 'right' },
           colors: ['black'],
           hAxis:{ title: 'Day'},
-	  vAxis:{ title: 'total load'}
+	  vAxis:{ title: 'total cluster load'}
         };
         options.legend = 'none';
 
@@ -459,6 +460,7 @@ cat << EOF >> $temp_webpage
 </body>
 </html>
 EOF
+#<div id="load_plot" style="width: 750px; height: 200px"></div>
 cp $temp_webpage $webpage
 rm $temp_webpage
 rm $lockfile
