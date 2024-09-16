@@ -102,8 +102,9 @@ head_load5=`ssh $CB_HEAD cat /proc/loadavg | awk '{print $2}'`
 login_load=`cat /proc/loadavg | awk '{print $3}'`
 login_load1=`cat /proc/loadavg | awk '{print $1}'`
 login_load5=`cat /proc/loadavg | awk '{print $2}'`
+total_load=`pdsh -t 1 -w $CB_HOSTS cat /proc/loadavg | awk '{print $2}' | awk  '{sum+=$1;}END{print sum;}'`
 
-echo "$decdate,$total_load,$temp,$head_load,$login_load" >> $loadfile
+echo "$decdate,$total_load,$temp,$head_load,$login_load,$total_load" >> $loadfile
 
 cat << EOF > $temp_webpage
 <!DOCTYPE html>
