@@ -158,7 +158,7 @@ cat << EOF >> $temp_webpage
           ['days since Jan 1', 'load'],
 EOF
 
-cat $loadfile | tail -4000 | awk -v firsttime="$firsttime" -F',' '{if($1>firsttime) { printf("[%s,%s],\n",$1,$2) }}'  >> $temp_webpage
+cat $loadfile | tail -4000 | awk -v firsttime="$firsttime" -F',' '{if($1>firsttime) { printf("[%s,%s],\n",$1,$6) }}'  >> $temp_webpage
 
 cat << EOF >> $temp_webpage
         ]);
@@ -169,7 +169,7 @@ cat << EOF >> $temp_webpage
           legend: { position: 'right' },
           colors: ['black'],
           hAxis:{ title: 'Day'},
-	  vAxis:{ title: 'total load'}
+	  vAxis:{ title: 'total cluster load'}
         };
         options.legend = 'none';
 
@@ -460,6 +460,7 @@ cat << EOF >> $temp_webpage
 </body>
 </html>
 EOF
+#<div id="load_plot" style="width: 750px; height: 200px"></div>
 cp $temp_webpage $webpage
 rm $temp_webpage
 rm $lockfile
