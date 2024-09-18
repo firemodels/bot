@@ -74,27 +74,8 @@ get_decdate()
   fulldate=`date "+%D %R:%S"`
 }
 
-# ---------------------------- add_load ----------------------------------
-function add_load {
-host=$1
-if [ -e $updir/$host ]; then
-  load=`cat $updir/$host`
-  if [ "$load" == "" ]; then
-    load=0.0
-  fi
-  total_load="$( bc <<<"$total_load + $load" )"
-fi
-}
-
 get_decdate
 get_temp
-
-# compute total load
-total_load=0.0
-for host in $UP_HOSTS
-do
-add_load $host
-done
 
 head_load=`ssh $CB_HEAD cat /proc/loadavg | awk '{print $3}'`
 head_load1=`ssh $CB_HEAD cat /proc/loadavg | awk '{print $1}'`
@@ -102,7 +83,7 @@ head_load5=`ssh $CB_HEAD cat /proc/loadavg | awk '{print $2}'`
 login_load=`cat /proc/loadavg | awk '{print $3}'`
 login_load1=`cat /proc/loadavg | awk '{print $1}'`
 login_load5=`cat /proc/loadavg | awk '{print $2}'`
-total_load=`pdsh -t 1 -w $CB_HOSTS cat /proc/loadavg | awk '{print $2}' | awk  '{sum+=$1;}END{print sum;}'`
+total_load=`pdsh -t 1 -w $CB_HOSTS cat /proc/loadavg | awk '{print $3}' | awk  '{sum+=$1;}END{print sum;}'`
 
 echo "$decdate,$total_load,$temp,$head_load,$login_load,$total_load" >> $loadfile
 
