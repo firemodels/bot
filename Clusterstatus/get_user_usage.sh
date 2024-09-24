@@ -7,7 +7,7 @@ infoout=info.out.$$
 qstat -a | awk 'NR>5' | awk '{print $2," ",$7," ",$10}' | grep -v Q | grep -v C | awk '{print $1," ",$2}' | sort > $qstatout
 njobs=`cat $qstatout | wc -l`
 awk '{a[$1] += $2} END{for (i in a) print i,a[i]}' $qstatout | sort > $infoout
-total_load=`pdsh -t 1 -w $CB_HOSTS cat /proc/loadavg | awk '{print $2}' | awk  '{sum+=$1;}END{print sum;}'`
+total_load=`pdsh -t 1 -w $CB_HOSTS cat /proc/loadavg | awk '{print $3}' | awk  '{sum+=$1;}END{print sum;}'`
 cat << EOF
 <table>
 <tr>
