@@ -25,6 +25,7 @@ if [ "$webpage" == "" ]; then
 fi
 
 TEMP_IP=$2
+
 if [[ "$TEMP_IP" == "" ]] && [[ "$STATUS_TEMP_IP" != "" ]]; then
   TEMP_IP=$STATUS_TEMP_IP
 fi
@@ -42,7 +43,11 @@ rm -rf $upnodes
 rm -rf $downnodes
 
 temp_webpage=summary.html
-server_webpage=server.html
+webdir=${webpage%/*}
+
+temp_webpage_day=$webdir/summary_day.html
+temp_webpage_week=$webdir/summary_week.html
+
 currentdate=`date "+%b %d %Y %R:%S"`
 cluster_host=`hostname -s`
 updir=$logdir/up
@@ -96,170 +101,12 @@ cat << EOF > $temp_webpage
     <script type="text/javascript">
       google.charts.load('current', {'packages':['corechart']});
 EOF
-# temperature plot
 
-if [ "TEMP_IP" != "" ]; then
-cat << EOF >> $temp_webpage
-      google.charts.setOnLoadCallback(drawTempPlot);
-      function drawTempPlot() {
-        var data = google.visualization.arrayToDataTable([
-          ['days since Jan 1', 'temperature (F)'],
-EOF
-
-lasttime=`cat $loadfile | tail -1 | awk -F',' '{print $1}'`
-firsttime="$( bc <<<"$lasttime - $TIMELENGTH" )"
-cat $loadfile | tail -5000 | awk -v firsttime="$firsttime" -F',' '{if($1>firsttime) { printf("[%s,%s],\n",$1,$3) }}'  >> $temp_webpage
+./make_plots.sh  300 $loadfile 7.0 day  >> $temp_webpage
+./make_plots.sh 4000 $loadfile 7.0 week >> $temp_webpage
 
 cat << EOF >> $temp_webpage
-        ]);
-
-        var options = {
-          title: '',
-          curveType: 'line',
-          legend: { position: 'right' },
-          colors: ['black'],
-          hAxis:{ title: 'Day'},
-	  vAxis:{ title: 'Temperature \xB0F'}
-        };
-        options.legend = 'none';
-
-        var chart = new google.visualization.LineChart(document.getElementById('temp_plot'));
-
-        chart.draw(data, options);
-      }
-EOF
-fi
-
-# begin cluster load plot
-
-cat << EOF >> $temp_webpage
-      google.charts.setOnLoadCallback(drawLoadPlot);
-      function drawLoadPlot() {
-        var data = google.visualization.arrayToDataTable([
-          ['days since Jan 1', 'load'],
-EOF
-
-cat $loadfile | tail -4000 | awk -v firsttime="$firsttime" -F',' '{if($1>firsttime) { printf("[%s,%s],\n",$1,$6) }}'  >> $temp_webpage
-
-cat << EOF >> $temp_webpage
-        ]);
-
-        var options = {
-          title: '',
-          curveType: 'line',
-          legend: { position: 'right' },
-          colors: ['black'],
-          hAxis:{ title: 'Day'},
-	  vAxis:{ title: 'cluster load'}
-        };
-        options.legend = 'none';
-
-        var chart = new google.visualization.LineChart(document.getElementById('load_plot'));
-
-        chart.draw(data, options);
-      }
-EOF
-# end load plot
-
-# begin head load plot
-
-cat << EOF >> $temp_webpage
-      google.charts.setOnLoadCallback(drawHeadLoadPlot);
-      function drawHeadLoadPlot() {
-        var data = google.visualization.arrayToDataTable([
-          ['days since Jan 1', 'load'],
-EOF
-
-cat $loadfile | tail -4000 | awk -v firsttime="$firsttime" -F',' '{if($1>firsttime) { printf("[%s,%s],\n",$1,$4) }}'  >> $temp_webpage
-
-cat << EOF >> $temp_webpage
-        ]);
-
-        var options = {
-          title: '',
-          curveType: 'line',
-          legend: { position: 'right' },
-          colors: ['black'],
-          hAxis:{ title: 'Day'},
-	  vAxis:{ title: '$CB_HEAD load'}
-        };
-        options.legend = 'none';
-
-        var chart = new google.visualization.LineChart(document.getElementById('load_headplot'));
-
-        chart.draw(data, options);
-      }
-EOF
-
-# end head load plot
-
-# begin head2 load plot
-
-cat << EOF >> $temp_webpage
-      google.charts.setOnLoadCallback(drawHeadLoadPlot2);
-      function drawHeadLoadPlot2() {
-        var data = google.visualization.arrayToDataTable([
-          ['days since Jan 1', 'load'],
-EOF
-
-basedate=`cat $loadfile | tail -1 | awk -F'.' '{print $1}'`
-cat $loadfile | tail -325 | awk -v basedate="$basedate" -v firsttime="$firsttime" -F',' '{if($1>firsttime) { printf("[%s,%s],\n",($1-basedate)*24,$4) }}'  >> $temp_webpage
-
-cat << EOF >> $temp_webpage
-        ]);
-
-        var options = {
-          title: '',
-          curveType: 'line',
-          legend: { position: 'right' },
-          colors: ['black'],
-	  hAxis:{ title: 'Hour(Day $basedate)'},
-	  vAxis:{ title: '$CB_HEAD load'}
-        };
-        options.legend = 'none';
-
-        var chart = new google.visualization.LineChart(document.getElementById('load_headplot2'));
-
-        chart.draw(data, options);
-      }
-EOF
-
-# end head2 load plot
-
-# begin login load plot
-
-cat << EOF >> $temp_webpage
-      google.charts.setOnLoadCallback(drawLoginLoadPlot);
-      function drawLoginLoadPlot() {
-        var data = google.visualization.arrayToDataTable([
-          ['days since Jan 1', 'load'],
-EOF
-
-cat $loadfile | tail -4000 | awk -v firsttime="$firsttime" -F',' '{if($1>firsttime) { printf("[%s,%s],\n",$1,$5) }}'  >> $temp_webpage
-
-cat << EOF >> $temp_webpage
-        ]);
-
-        var options = {
-          title: '',
-          curveType: 'line',
-          legend: { position: 'right' },
-          colors: ['black'],
-          hAxis:{ title: 'Day'},
-	  vAxis:{ title: '$CB_LOGIN load'}
-        };
-        options.legend = 'none';
-
-        var chart = new google.visualization.LineChart(document.getElementById('load_loginplot'));
-
-        chart.draw(data, options);
-      }
-EOF
-
-# end head load plot
-
-cat << EOF >> $temp_webpage
-    </script>
+</script>
 <title>$cluster_host Cluster Status - $currentdate</title>
 </head>
 <body>
@@ -428,21 +275,44 @@ cat << EOF >> $temp_webpage
 </table>
 EOF
 
+cp $temp_webpage $temp_webpage_day
+cp $temp_webpage $temp_webpage_week
 
+# week plots
+cat << EOF >> $temp_webpage_week
+<p><a href="summary_day.html">[Hourly Plots]</a>
+[Daily Plots]
+EOF
 if [ "$TEMP_IP" != "" ]; then
-cat << EOF >> $temp_webpage
-<div id="temp_plot" style="width: 750px; height: 200px"></div><br>
+cat << EOF >> $temp_webpage_week
+<div id="temp_plotweek" style="width: 750px; height: 200px"></div><br>
 EOF
 fi
-cat << EOF >> $temp_webpage
-<div id="load_plot"      style="width: 750px; height: 200px"></div>
-<div id="load_headplot"  style="width: 750px; height: 200px"></div>
-<div id="load_headplot2" style="width: 750px; height: 200px"></div>
-<div id="load_loginplot" style="width: 750px; height: 200px"></div>
+cat << EOF >> $temp_webpage_week
+<div id="load_plotweek"      style="width: 750px; height: 200px"></div>
+<div id="load_headplotweek"  style="width: 750px; height: 200px"></div>
+<div id="load_loginplotweek" style="width: 750px; height: 200px"></div>
 </body>
 </html>
 EOF
-cp $temp_webpage $webpage
+
+# day plots
+cat << EOF >> $temp_webpage_day
+<p>[Hourly Plots]
+<a href="summary.html">[Daily Plots]</a>
+EOF
+if [ "$TEMP_IP" != "" ]; then
+cat << EOF >> $temp_webpage_day
+<div id="temp_plotday" style="width: 750px; height: 200px"></div><br>
+EOF
+fi
+cat << EOF >> $temp_webpage_day
+<div id="load_plotday"      style="width: 750px; height: 200px"></div>
+<div id="load_headplotday"  style="width: 750px; height: 200px"></div>
+<div id="load_loginplotday" style="width: 750px; height: 200px"></div>
+</body>
+</html>
+EOF
+mv $temp_webpage_week $webpage
 rm $temp_webpage
 rm $lockfile
-ssh $CB_HEAD cat /proc/loadavg | awk '{print }'
