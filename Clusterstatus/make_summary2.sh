@@ -280,8 +280,8 @@ cp $temp_webpage $temp_webpage_week
 
 # week plots
 cat << EOF >> $temp_webpage_week
-<h2>Plots - Last 7 days</h2>
-[<a href="summary_day.html">Last 24 hours</href>]
+<p><a href="summary_day.html">[Hourly Plots]</a>
+[Daily Plots]
 EOF
 if [ "$TEMP_IP" != "" ]; then
 cat << EOF >> $temp_webpage_week
@@ -298,8 +298,8 @@ EOF
 
 # day plots
 cat << EOF >> $temp_webpage_day
-<h2>Plots - Last 24 Hours</h2>
-[<a href="summary.html">Last 7 days</a>]
+<p>[Hourly Plots]
+<a href="summary.html">[Daily Plots]</a>
 EOF
 if [ "$TEMP_IP" != "" ]; then
 cat << EOF >> $temp_webpage_day
