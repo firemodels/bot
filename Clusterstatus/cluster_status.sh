@@ -262,5 +262,5 @@ if [[ "$SUMMARY" == "1" ]] && [[ "$mailTo" != "" ]]; then
   mail -s "Fire cluster status: $NUP$COMMA$NDOWN" $mailTo < $summary > /dev/null  
 fi
 rm -f $summary $downnow $upnow $nodeup $nodedown
-./make_summary.sh $webpage $TEMP_IP
+./make_summary2.sh $webpage $TEMP_IP
 rm $lockfile
