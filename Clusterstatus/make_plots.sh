@@ -2,6 +2,7 @@
 NLINES=$1
 LOADFILE=$2
 TIMELENGTH=$3
+TYPE=$4
 
 TEMP_IP=$STATUS_TEMP_IP
 lasttime=`cat $LOADFILE | tail -1 | awk -F',' '{print $1}'`
@@ -12,8 +13,8 @@ if [ "TEMP_IP" != "" ]; then
 # ---------------------------------------------------------------
 # begin temperature plot
 cat << EOF
-      google.charts.setOnLoadCallback(drawTempPlot$NLINES);
-      function drawTempPlot$NLINES() {
+      google.charts.setOnLoadCallback(drawTempPlot$TYPE);
+      function drawTempPlot$TYPE() {
         var data = google.visualization.arrayToDataTable([
           ['days since Jan 1', 'temperature (F)'],
 EOF
@@ -31,7 +32,7 @@ cat << EOF
 	  vAxis:{ title: 'Temperature \xB0F'}
         };
         options.legend = 'none';
-        var chart = new google.visualization.LineChart(document.getElementById('temp_plot$NLINES'));
+        var chart = new google.visualization.LineChart(document.getElementById('temp_plot$TYPE'));
         chart.draw(data, options);
       }
 EOF
@@ -41,8 +42,8 @@ fi
 # begin cluster load plot
 
 cat << EOF 
-      google.charts.setOnLoadCallback(drawLoadPlot$NLINES);
-      function drawLoadPlot$NLINES() {
+      google.charts.setOnLoadCallback(drawLoadPlot$TYPE);
+      function drawLoadPlot$TYPE() {
         var data = google.visualization.arrayToDataTable([
           ['days since Jan 1', 'load'],
 EOF
@@ -60,7 +61,7 @@ cat << EOF
 	  vAxis:{ title: 'total cluster load'}
         };
         options.legend = 'none';
-        var chart = new google.visualization.LineChart(document.getElementById('load_plot$NLINES'));
+        var chart = new google.visualization.LineChart(document.getElementById('load_plot$TYPE'));
         chart.draw(data, options);
       }
 EOF
@@ -69,8 +70,8 @@ EOF
 # begin head load plot
 
 cat << EOF 
-      google.charts.setOnLoadCallback(drawHeadLoadPlot$NLINES);
-      function drawHeadLoadPlot$NLINES() {
+      google.charts.setOnLoadCallback(drawHeadLoadPlot$TYPE);
+      function drawHeadLoadPlot$TYPE() {
         var data = google.visualization.arrayToDataTable([
           ['days since Jan 1', 'load'],
 EOF
@@ -88,7 +89,7 @@ cat << EOF
 	  vAxis:{ title: '$CB_HEAD load'}
         };
         options.legend = 'none';
-        var chart = new google.visualization.LineChart(document.getElementById('load_headplot$NLINES'));
+        var chart = new google.visualization.LineChart(document.getElementById('load_headplot$TYPE'));
         chart.draw(data, options);
       }
 EOF
@@ -97,8 +98,8 @@ EOF
 # begin login load plot
 
 cat << EOF
-      google.charts.setOnLoadCallback(drawLoginLoadPlot$NLINES);
-      function drawLoginLoadPlot$NLINES() {
+      google.charts.setOnLoadCallback(drawLoginLoadPlot$TYPE);
+      function drawLoginLoadPlot$TYPE() {
         var data = google.visualization.arrayToDataTable([
           ['days since Jan 1', 'load'],
 EOF
@@ -116,7 +117,7 @@ cat << EOF
 	  vAxis:{ title: '$CB_LOGIN load'}
         };
         options.legend = 'none';
-        var chart = new google.visualization.LineChart(document.getElementById('load_loginplot$NLINES'));
+        var chart = new google.visualization.LineChart(document.getElementById('load_loginplot$TYPE'));
         chart.draw(data, options);
       }
 EOF

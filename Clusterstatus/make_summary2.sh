@@ -102,8 +102,8 @@ cat << EOF > $temp_webpage
       google.charts.load('current', {'packages':['corechart']});
 EOF
 
-./make_plots.sh  700 $loadfile 7.0 >> $temp_webpage
-./make_plots.sh 4000 $loadfile 7.0 >> $temp_webpage
+./make_plots.sh  300 $loadfile 7.0 day  >> $temp_webpage
+./make_plots.sh 4000 $loadfile 7.0 week >> $temp_webpage
 
 cat << EOF >> $temp_webpage
 </script>
@@ -285,13 +285,13 @@ cat << EOF >> $temp_webpage_week
 EOF
 if [ "$TEMP_IP" != "" ]; then
 cat << EOF >> $temp_webpage_week
-<div id="temp_plot4000" style="width: 750px; height: 200px"></div><br>
+<div id="temp_plotweek" style="width: 750px; height: 200px"></div><br>
 EOF
 fi
 cat << EOF >> $temp_webpage_week
-<div id="load_plot4000"      style="width: 750px; height: 200px"></div>
-<div id="load_headplot4000"  style="width: 750px; height: 200px"></div>
-<div id="load_loginplot4000" style="width: 750px; height: 200px"></div>
+<div id="load_plotweek"      style="width: 750px; height: 200px"></div>
+<div id="load_headplotweek"  style="width: 750px; height: 200px"></div>
+<div id="load_loginplotweek" style="width: 750px; height: 200px"></div>
 </body>
 </html>
 EOF
@@ -299,20 +299,20 @@ EOF
 # day plots
 cat << EOF >> $temp_webpage_day
 <h2>Plots - Last 24 Hours</h2>
-[<a href="summary_week.html">Last 7 days</a>]
+[<a href="summary.html">Last 7 days</a>]
 EOF
 if [ "$TEMP_IP" != "" ]; then
 cat << EOF >> $temp_webpage_day
-<div id="temp_plot700" style="width: 750px; height: 200px"></div><br>
+<div id="temp_plotday" style="width: 750px; height: 200px"></div><br>
 EOF
 fi
 cat << EOF >> $temp_webpage_day
-<div id="load_plot700"      style="width: 750px; height: 200px"></div>
-<div id="load_headplot700"  style="width: 750px; height: 200px"></div>
-<div id="load_loginplot700" style="width: 750px; height: 200px"></div>
+<div id="load_plotday"      style="width: 750px; height: 200px"></div>
+<div id="load_headplotday"  style="width: 750px; height: 200px"></div>
+<div id="load_loginplotday" style="width: 750px; height: 200px"></div>
 </body>
 </html>
 EOF
-cp $temp_webpage $webpage
+cp $temp_webpage_week $webpage
 rm $temp_webpage
 rm $lockfile
