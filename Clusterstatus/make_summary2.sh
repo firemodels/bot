@@ -313,6 +313,6 @@ cat << EOF >> $temp_webpage_day
 </body>
 </html>
 EOF
-cp $temp_webpage_week $webpage
+mv $temp_webpage_week $webpage
 rm $temp_webpage
 rm $lockfile
