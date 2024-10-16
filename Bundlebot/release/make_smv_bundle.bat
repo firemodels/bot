@@ -3,8 +3,6 @@ setlocal
 :: release info
 set versionbase=%1
 set test=%2
-set smvtest=%3
-
 set zipbase=%versionbase%_win
 set SMVEDITION=SMV6
 
@@ -53,16 +51,18 @@ mkdir %smvdir%
 mkdir %smvdir%\hash
 
 CALL :COPY  %reporoot%\smv\Build\set_path\intel_win_64\set_path_win_64.exe "%smvdir%\set_path.exe"
-if     x%smvtest% == x set smvapp=smokeview.exe
-if NOT x%smvtest% == x set smvapp=smv_test.exe
-CALL :COPY  %smvbuild%\smokeview_win_%test%64.exe                           %smvdir%\%smvapp%
+CALL :COPY  %smvbuild%\smokeview_win_%test%64.exe                           %smvdir%\smokeview.exe
 CALL :COPY  %smvscripts%\jp2conv.bat                                        %smvdir%\jp2conv.bat
+
+::echo copying .po files
+::copy %forbundle%\*.po %smvdir%\.>Nul
 
 echo copying .png files
 copy %forbundle%\*.png %smvdir%\.>Nul
 
 CALL :COPY  %forbundle%\volrender.ssf %smvdir%\volrender.ssf
 CALL :COPY  %webgldir%\smv2html.bat   %smvdir%\smv2html.bat
+::CALL :COPY  %webgldir%\smv_setup.bat  %smvdir%\smv_setup.bat
 
 CALL :COPY  %bgbuild%\background_win_64.exe     %smvdir%\background.exe
 CALL :COPY  %flushfilebuild%\flush_win_64.exe   %smvdir%\flush.exe
@@ -82,7 +82,7 @@ CALL :COPY  %forbundle%\setup.bat                             %zipbase%\setup.ba
 set curdir=%CD%
 cd %smvdir%
 
-%hashfileexe% %smvapp%       >  hash\smokeview_%revision%.sha1
+%hashfileexe% smokeview.exe  >  hash\smokeview_%revision%.sha1
 %hashfileexe% smokezip.exe   >  hash\smokezip_%revision%.sha1
 %hashfileexe% smokediff.exe  >  hash\smokediff_%revision%.sha1
 %hashfileexe% fds2fed.exe    >  hash\fds2fed_%revision%.sha1
