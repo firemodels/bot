@@ -36,7 +36,7 @@ Title Bundling %type% Smokeview for %platform%
 
 if "%platform%" == "Windows" (
   cd %git_root%\bot\Bundlebot\release
-  call make_smv_bundle %version% test_ smvtest
+  call make_smv_bundle %version% test_
   goto eof
 )
 
