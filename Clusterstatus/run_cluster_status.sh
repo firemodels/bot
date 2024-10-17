@@ -67,4 +67,4 @@ CD_REPO $repo/bot/Clusterstatus master || exit 1
 git fetch origin        &> /dev/null
 git merge origin/master &> /dev/null
 
-./cluster_status.sh none $CB_BASE $CB_BEG $CB_END
+./cluster_status.sh gettemp $CB_BASE $CB_BEG $CB_END

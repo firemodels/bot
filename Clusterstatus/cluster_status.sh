@@ -16,6 +16,11 @@ HOST_END=$4
 #     (this script will not generate temperature plots if STATUS_TEMP_IP
 #     is blank)
 
+# STATUS_MAILTO is defined in .bashrc (so we email addresses in the repo)
+if [ "$STATUS_MAILTO" != "" ]; then
+  mailTo=$STATUS_MAILTO
+fi
+
 daily=
 if [ "$arg" == "daily" ]; then
   daily=daily
@@ -25,25 +30,32 @@ fi
 WARN_TEMP ()
 {
   local temp_high=$1
-  local temphigh_lock=$2
+  local temphigh_lock=$logdir/$2
   if [ ! -e $temphigh_lock ]; then
     if (( $(echo "$temp > $temp_high" |bc -l) )); then
       touch $temphigh_lock
-      echo "" | Mail -s "***warning temp: $temp" -s smokebot@nist.gov gforney@gmail.com
+      echo "***warning: cluster room temperature is greater than $temp_high" 
+      if [ "$mailTo" != "" ]; then
+        echo "***warning: cluster room temperature is greater than $temp_high" | Mail -s "***warning cluster temp: $temp > $temp_high" -r smokebot@nist.gov $mailTo
+      fi
     fi
   fi
 }
 
 logdir=$HOME/.cluster_status
 if [ "$arg" == "gettemp" ]; then
-  load=`tail -1 ~/.cluster_status/load_$CB_BASE.csv | awk -F',' '{print $2}'`
-  temp=`tail -1 ~/.cluster_status/load_$CB_BASE.csv | awk -F',' '{print $3}'`
+  cluster_host=`hostname -s`
+  load=`tail -1 ~/.cluster_status/load_${cluster_host}.csv | awk -F',' '{print $2}'`
+  temp=`tail -1 ~/.cluster_status/load_${cluster_host}.csv | awk -F',' '{print $3}'`
   tempcrit=88.0
   tempcrit_lock=tempcrit_lock
   if [ ! -e $tempcrit_lock ]; then
     if (( $(echo "$temp > $tempcrit" |bc -l) )); then
       touch $tempcrit_lock
-      echo "" | Mail -s "***warning temp: $temp" -r smokebot@nist.gov gforney@gmail.com
+      echo "***warning: cluster room temperature is greater than $temp_high" 
+      if [ "$mailTo" != "" ]; then
+        echo "***warning: cluster room temperature is greater than $temp_high" | Mail -s "***warning cluster temp: $temp > $temp_high" -r smokebot@nist.gov $mailTo
+      fi
     fi
   fi
   WARN_TEMP 75.0 lock75
@@ -56,10 +68,9 @@ if [ "$arg" == "gettemp" ]; then
   WARN_TEMP 89.0 lock89
   WARN_TEMP 91.0 lock91
 
-  if [ "$daily" == "daily" ]; then
-    echo "" | Mail -s "cluster check - temperature: $temp load: $load" gforney@gmail.com
+  if [[ "$daily" == "daily" ]] && [[ "$mailTo" != "" ]]; then
+    echo "" | Mail -s "cluster check - temperature: $temp load: $load" $mailTo
   fi
-  exit
 fi
 lockfile=$logdir/cluster_status_lock
 if [ -e $lockfile ]; then
@@ -73,9 +84,6 @@ if [ "$STATUS_WEBPAGE" == "" ]; then
   webpage=/var/www/html/summary.html
 else
   webpage=$STATUS_WEBPAGE
-fi
-if [ "$STATUS_MAILTO" != "" ]; then
-  mailTo=$STATUS_MAILTO
 fi
 if [ "$STATUS_TEMP_IP" != "" ]; then
   TEMP_IP=$STATUS_TEMP_IP
@@ -115,7 +123,6 @@ UP_NODES=up_nodes.$$
 ALL_NODES=all_nodes.$$
 
 dshout=dsh.out.$$
-logdir=$HOME/.cluster_status
 nodeup=$logdir/node_up
 nodedown=$logdir/node_down
 upnow=$logdir/upnow
