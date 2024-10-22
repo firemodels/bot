@@ -31,7 +31,7 @@ WARN_TEMP ()
 {
   local temp_high=$1
   local temphigh_lock=$logdir/$2
-  if [ ! -e $temphigh_lock ]; then
+  if [[ ! -e $temphigh_lock ]] && [[ "$temp" != "" ]]; then
     if (( $(echo "$temp > $temp_high" |bc -l) )); then
       touch $temphigh_lock
       echo "***warning: cluster room temperature is greater than $temp_high" 
@@ -49,7 +49,7 @@ if [ "$arg" == "gettemp" ]; then
   temp=`tail -1 ~/.cluster_status/load_${cluster_host}.csv | awk -F',' '{print $3}'`
   tempcrit=88.0
   tempcrit_lock=tempcrit_lock
-  if [ ! -e $tempcrit_lock ]; then
+  if [[ ! -e $tempcrit_lock ]] && [[ "$temp" != "" ]]; then
     if (( $(echo "$temp > $tempcrit" |bc -l) )); then
       touch $tempcrit_lock
       echo "***warning: cluster room temperature is greater than $temp_high" 
