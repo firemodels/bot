@@ -62,7 +62,9 @@ get_temp()
     cd $logdir
     rm -f temp
     wget -o test.out $TEMP_IP
+    if [ -e temp ]; then
     temp=`cat temp| awk -F'|' '{print $(2)'}`
+    fi
     rm -f test.out temp
     cd $CURDIR
   fi
@@ -81,6 +83,9 @@ get_decdate()
 
 get_decdate
 get_temp
+if [ "$temp" == "" ]; then
+  temp=0.0
+fi
 
 head_load=`ssh $CB_HEAD cat /proc/loadavg | awk '{print $3}'`
 head_load1=`ssh $CB_HEAD cat /proc/loadavg | awk '{print $1}'`
