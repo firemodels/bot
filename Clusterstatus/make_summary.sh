@@ -84,7 +84,7 @@ get_decdate()
 get_decdate
 get_temp
 if [ "$temp" == "" ]; then
-  temp=0.0
+  temp=67.1234
 fi
 
 head_load=`ssh $CB_HEAD cat /proc/loadavg | awk '{print $3}'`
