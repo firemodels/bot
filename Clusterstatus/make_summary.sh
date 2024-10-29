@@ -84,7 +84,7 @@ get_decdate()
 get_decdate
 get_temp
 if [ "$temp" == "" ]; then
-  temp=0.0
+  temp=67.1234
 fi
 
 head_load=`ssh $CB_HEAD cat /proc/loadavg | awk '{print $3}'`
@@ -210,7 +210,7 @@ else
   if (( $(echo "$load >  15.99" | bc -l) )); then
     bgcolor=#ffff00
   else
-    if (( $(echo "$load >  7.99" | bc -l) )); then
+    if (( $(echo "$load >  0.99" | bc -l) )); then
       bgcolor=#33ffff
     else
       bgcolor=#ffffff
@@ -248,8 +248,8 @@ cat << EOF >> $temp_webpage
 <p>
 <table border=on>
 <tr>
-<td bgcolor="#ffffff">load &lt; 8.0</td>
-<td bgcolor="#33ffff">8.0 &le; load &lt; 16.0</td>
+<td bgcolor="#ffffff">load &lt; 1.0</td>
+<td bgcolor="#33ffff">1.0 &le; load &lt; 16.0</td>
 <td bgcolor="#ffff00">16.0 &le; load &lt; 48.0</td>
 <td bgcolor="#ff0000">load &ge; 48.0</td>
 <td bgcolor="#000000"><font color="white">Down</font></td>
