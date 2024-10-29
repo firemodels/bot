@@ -151,6 +151,9 @@ fi
 cd ../..
 GITROOT=`pwd`
 cd $CURDIR
+if [ "$FIREMODELS" == "" ]; then
+  export FIREMODELS=$GITROOT
+fi
 
 #*** define initial values
 
