@@ -151,7 +151,7 @@ echo.
   if "%repo%" == "hypre" goto endif2
 
   set CENTRAL=LLNL
-  if "%repo%" == "openvkl" goto endif2
+  if "%repo%" == "sundials" goto endif2
 
   set CENTRAL=firemodels
 :endif2
