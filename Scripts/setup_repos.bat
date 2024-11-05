@@ -12,14 +12,14 @@ if not exist ..\.gitbot goto skip1
    exit /b 1
 :endif1
 
-set fdsrepos=exp fds fig out smv test_bundles
+set fdsrepos=exp fds fig out smv test_bundles hypre sundials
 set fdssmvrepos=fds smv
 set vklrepos=openvkl
 set smvonlyrepo=smv
 set smvrepos=cfast fds fig smv test_bundles
 set cfastsmvrepos=cfast         smv nplot 
 set    cfastrepos=cfast exp fig smv nplot test_bundles
-set allrepos= cad cfast cor exp fds fig out radcal smv nplot test_bundles
+set allrepos= cad cfast cor exp fds fig out radcal smv nplot test_bundles hypre sundials
 set wikiwebrepos= fds.wiki fds-smv
 set repos=%fdsrepos%
 set WIKIWEB=0
@@ -143,8 +143,16 @@ echo.
   )
   echo setting up remote tracking
   cd %repo_dir%
+
   set CENTRAL=openvkl
   if "%repo%" == "openvkl" goto endif2
+
+  set CENTRAL=hypre-space
+  if "%repo%" == "hypre" goto endif2
+
+  set CENTRAL=LLNL
+  if "%repo%" == "sundials" goto endif2
+
   set CENTRAL=firemodels
 :endif2
   git remote add %CENTRAL% %GITHEADER%%CENTRAL%/%repo%.git

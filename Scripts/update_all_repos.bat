@@ -4,5 +4,5 @@ for /D %%f in (%userprofile%\Firemodels*) do (
   echo -----------------------------------
   echo %%f
   echo -----------------------------------
-  call update_repos
+  call update_repos -m
 )
