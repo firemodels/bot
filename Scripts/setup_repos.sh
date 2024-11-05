@@ -34,25 +34,25 @@ SETUP_REMOTE ()
 
   basedir=`basename $repo_dir`
   cd $repo_dir
+  CENTRAL=firemodels
+  if [ "$repo" == "openvkl" ]; then
+    CENTRAL=openvkl
+  fi
+  if [ "$repo" == "hypre" ]; then
+    CENTRAL=hypre-space
+  fi
+  if [ "$repo" == "sundials" ]; then
+    CENTRAL=LLNL
+  fi
   if [ "$GITUSER" == "firemodels" ]; then
      if [ "$DISABLEPUSH" != "" ]; then
        ndisable=`git remote -v | grep DISABLE | wc -l`
        if [ $ndisable -eq 0 ]; then
-          echo disabling push access to firemodels
+          echo disabling push access to $CENTRAL
           git remote set-url --push origin DISABLE
        fi
      fi
   else
-     CENTRAL=firemodels
-     if [ "$repo" == "openvkl" ]; then
-       CENTRAL=openvkl
-     fi
-     if [ "$repo" == "hypre" ]; then
-       CENTRAL=hypre-space
-     fi
-     if [ "$repo" == "sundials" ]; then
-       CENTRAL=LLNL
-     fi
      have_central=`git remote -v | awk '{print $1}' | grep $CENTRAL | wc -l`
      if [ $have_central -eq 0 ]; then
         echo setting up remote tracking with $CENTRAL
@@ -241,9 +241,22 @@ do
      continue
   fi
 
-  AT_GITHUB=`git ls-remote $GITHEADER$GITUSER/$repo.git 2>&1 > /dev/null | grep ERROR | wc -l`
+  GITOWNER=$GITUSER
+  if [ "$GITUSER" == "firemodels" ]; then
+    if [ "$repo" == "openvkl" ]; then
+      GITOWNER=openvkl
+    fi
+    if [ "$repo" == "hypre" ]; then
+      GITOWNER=hypre-space
+    fi
+    if [ "$repo" == "sundials" ]; then
+      GITOWNER=LLNL
+    fi
+  fi
+
+  AT_GITHUB=`git ls-remote $GITHEADER$GITOWNER/$repo.git 2>&1 > /dev/null | grep ERROR | wc -l`
   if [ $AT_GITHUB -gt 0 ]; then
-     echo "***Error: The repo $GITHEADER$GITUSER/$repo.git was not found."
+     echo "***Error: The repo $GITHEADER$GITOWNER/$repo.git was not found."
      continue;
   fi 
   
@@ -251,7 +264,7 @@ do
   if [ "$repo" == "exp" ]; then
      RECURSIVE=--recursive
   fi
-  git clone $RECURSIVE $GITHEADER$GITUSER/$repo.git $repo_out
+  git clone $RECURSIVE $GITHEADER$GITOWNER/$repo.git $repo_out
   if [ ! -d $repo_out ]; then
     echo "***error: clone of $repo.git to $repo_out failed"
   fi
