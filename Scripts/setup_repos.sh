@@ -43,10 +43,15 @@ SETUP_REMOTE ()
        fi
      fi
   else
+     CENTRAL=firemodels
      if [ "$repo" == "openvkl" ]; then
        CENTRAL=openvkl
-     else
-       CENTRAL=firemodels
+     fi
+     if [ "$repo" == "hypre" ]; then
+       CENTRAL=hypre-space
+     fi
+     if [ "$repo" == "sundials" ]; then
+       CENTRAL=LLNL
      fi
      have_central=`git remote -v | awk '{print $1}' | grep $CENTRAL | wc -l`
      if [ $have_central -eq 0 ]; then
