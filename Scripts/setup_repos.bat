@@ -143,8 +143,16 @@ echo.
   )
   echo setting up remote tracking
   cd %repo_dir%
+
   set CENTRAL=openvkl
   if "%repo%" == "openvkl" goto endif2
+
+  set CENTRAL=hypre-space
+  if "%repo%" == "hypre" goto endif2
+
+  set CENTRAL=LLNL
+  if "%repo%" == "openvkl" goto endif2
+
   set CENTRAL=firemodels
 :endif2
   git remote add %CENTRAL% %GITHEADER%%CENTRAL%/%repo%.git
