@@ -122,7 +122,7 @@ echo.
   )
 
   set GITOWNER=%GITUSER%
-  if not %GITUSER% == firemodels goto skip endif3
+  if not %GITUSER% == firemodels goto endif3
     if "%repo%" == "openvkl" set GITOWNER=openvkl
     if "%repo%" == "hypre" set GITOWNER=hypre-space
     if "%repo%" == "sundials" set GITOWNER=LLNL
