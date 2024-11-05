@@ -120,6 +120,13 @@ echo.
      git clone %GITHEADER%%GITUSER%/%repo%.git  %repouser_out%
      exit /b 0
   )
+
+  set GITOWNER=%GITUSER%
+  if not %GITUSER% == firemodels goto skip endif3
+    if "%repo%" == "openvkl" set GITOWNER=openvkl
+    if "%repo%" == "hypre" set GITOWNER=hypre-space
+    if "%repo%" == "sundials" set GITOWNER=LLNL
+:endif3
   
 :: check if repo is at github
   call :at_github %repo%
@@ -131,9 +138,9 @@ echo.
 
   cd %FMROOT%
   if "%repo%" == "exp" (
-     git clone --recursive %GITHEADER%%GITUSER%/%repo%.git %repo_out%
+     git clone --recursive %GITHEADER%%GITOWNER%/%repo%.git %repo_out%
   )  else (
-     git clone %GITHEADER%%GITUSER%/%repo%.git %repo_out%
+     git clone %GITHEADER%%GITOWNER%/%repo%.git %repo_out%
   )
   if "%GITUSER%" == "firemodels"  (
      exit /b 0
@@ -164,7 +171,7 @@ echo.
 :at_github
 ::-----------------------------------------------------------------------
   set repo=%1
-  git ls-remote %GITHEADER%%GITUSER%/%repo%.git 1> %CURDIR%\gitstatus.out 2>&1
+  git ls-remote %GITHEADER%%GITOWNER%/%repo%.git 1> %CURDIR%\gitstatus.out 2>&1
   type %CURDIR%\gitstatus.out | %grep% ERROR | %wc% -l > %CURDIR%\gitstatus2.out
   set /p git_not_found=<%CURDIR%\gitstatus2.out
   exit /b 0
