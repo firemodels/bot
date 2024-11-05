@@ -66,7 +66,7 @@ if "x%abort%" == "x" goto error4
 :error4
 
 :: make sure we are running in the master branch
-set CURDIR=%CD%
+set BUNSCRIPTDIR=%CD%
 cd ..\..\..
 set REPOROOT=%CD%
 
@@ -75,7 +75,7 @@ set botrepo=%CD%
 
 if exist %REPOROOT%\webpages goto endif4
   echo ***error: the webpages repo does not exist
-  cd %CURDIR%
+  cd %BUNSCRIPTDIR%
   exit /b 1
 :endif4
 
@@ -115,11 +115,11 @@ call :cd_repo %webpagesrepo% nist-pages || exit /b 1
 git fetch origin nist-pages  > Nul
 git merge origin/nist-pages  > Nul
 
-cd %CURDIR%
+cd %BUNSCRIPTDIR%
 
 :: create the bundle
 
-set CURDIR=%CD%
+set BUNSCRIPTDIR=%CD%
 
 
 if NOT "x%FDS_HASH%" == "x" goto skip_elsehash
@@ -150,7 +150,7 @@ if NOT "x%FDS_HASH%" == "x" goto skip_elsehash
   set SMV_HASH_BUNDLER=%SMV_HASH%
 :endif_gethash
 
-cd %CURDIR%
+cd %BUNSCRIPTDIR%
 
 echo.                                                         > %logfile%
 echo ------------------------------------------------------  >> %logfile%
@@ -225,7 +225,7 @@ echo ------------------------------------------------------
 echo Building apps
 echo.
 
-cd %CURDIR%
+cd %BUNSCRIPTDIR%
 if "x%build_apps%" == "x" goto skip_build
 call make_apps         || exit /b 1
 :skip_build
@@ -235,7 +235,7 @@ echo ------------------------------------------------------
 echo ------------------------------------------------------
 echo Copying fds apps
 echo.
-cd %CURDIR%
+cd %BUNSCRIPTDIR%
 call copy_apps fds bot || exit /b 1
 
 echo.
@@ -244,7 +244,7 @@ echo ------------------------------------------------------
 echo Copying smv apps
 echo.
 
-cd %CURDIR%
+cd %BUNSCRIPTDIR%
 call copy_apps smv bot || exit /b 1
 
 echo.
@@ -253,7 +253,7 @@ echo ------------------------------------------------------
 echo Copying fds pubs
 echo.
 
-cd %CURDIR%
+cd %BUNSCRIPTDIR%
 call copy_pubs firebot  || exit /b 1
 
 echo.
@@ -262,7 +262,7 @@ echo ------------------------------------------------------
 echo Copying smv pubs
 echo.
 
-cd %CURDIR%
+cd %BUNSCRIPTDIR%
 call copy_pubs smokebot || exit /b 1
 
 echo.
@@ -271,10 +271,10 @@ echo ------------------------------------------------------
 echo making bundle
 echo.
 
-cd %CURDIR%
+cd %BUNSCRIPTDIR%
 call make_bundle bot %FDS_REVISION_BUNDLER% %SMV_REVISION_BUNDLER% %nightly%
 
-cd %CURDIR%
+cd %BUNSCRIPTDIR%
 
 if "x%upload_bundle%" == "x" goto skip_upload
   echo.
