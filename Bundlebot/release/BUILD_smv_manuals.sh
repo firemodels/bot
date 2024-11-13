@@ -13,4 +13,4 @@ if [ "$BUNDLE_EMAIL" != "" ]; then
   MAILTO="-m $BUNDLE_EMAIL"
 fi
 cd ../../Smokebot
-./run_smokebot.sh -C -c -u -J -f -q smokebot $MAILTO -x $BUNDLE_FDS_REVISION -X $BUNDLE_FDS_TAG -y $BUNDLE_SMV_REVISION -Y $BUNDLE_SMV_TAG -o firemodels -r test_bundles -U -R release
+./run_smokebot.sh -C -c -u -J -f -q firebotbot $MAILTO -x $BUNDLE_FDS_REVISION -X $BUNDLE_FDS_TAG -y $BUNDLE_SMV_REVISION -Y $BUNDLE_SMV_TAG -o firemodels -r test_bundles -U -R release
