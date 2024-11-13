@@ -283,16 +283,24 @@ case $OPTION  in
    WEB_ROOT="$OPTARG"
    ;;
   x)
-   FDS_REV="-x $OPTARG"
+   if [ "$OPTARG" != "latest" ]; then
+     FDS_REV="-x $OPTARG"
+   fi
    ;;
   X)
-   FDS_TAG="-X $OPTARG"
+   if [ "$OPTARG" != "latest" ]; then
+     FDS_TAG="-X $OPTARG"
+   fi
    ;;
   y)
-   SMV_REV="-y $OPTARG"
+   if [ "$OPTARG" != "latest" ]; then
+     SMV_REV="-y $OPTARG"
+   fi
    ;;
   Y)
-   SMV_TAG="-Y $OPTARG"
+   if [ "$OPTARG" != "latest" ]; then
+     SMV_TAG="-Y $OPTARG"
+   fi
    ;;
   \?)
   echo "***error: unknown option entered. aborting smokebot"
