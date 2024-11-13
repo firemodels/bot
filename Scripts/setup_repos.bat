@@ -12,14 +12,15 @@ if not exist ..\.gitbot goto skip1
    exit /b 1
 :endif1
 
-set fdsrepos=exp fds fig out smv test_bundles hypre sundials
+set thirdpartyrepos=hypre sundials
+set fdsrepos=exp fds fig out smv test_bundles
 set fdssmvrepos=fds smv
 set vklrepos=openvkl
 set smvonlyrepo=smv
 set smvrepos=cfast fds fig smv test_bundles
 set cfastsmvrepos=cfast         smv nplot 
 set    cfastrepos=cfast exp fig smv nplot test_bundles
-set allrepos= cad cfast cor exp fds fig out radcal smv nplot test_bundles hypre sundials
+set allrepos= cad cfast cor exp fds fig out radcal smv nplot test_bundles
 set wikiwebrepos= fds.wiki fds-smv
 set repos=%fdsrepos%
 set WIKIWEB=0
@@ -188,6 +189,10 @@ echo.
    set stopscript=1
    exit /b
  )
+ if /I "%1" EQU "-3" (
+   set valid=1
+   set repos=%thirdpartyrepos%
+ )
  if /I "%1" EQU "-a" (
    set valid=1
    set repos=%allrepos%
@@ -251,6 +256,7 @@ echo Setup repos ( default: %repos% )
 echo used by cfast, fds and/or smokeview
 echo.
 echo Options:
+echo -3 - setup third party repos: %thirdpartyrepos%
 echo -a - setup all repos: %allrepos%
 echo -c - setup repos used by cfastbot: %cfastrepos%
 echo -C - setup repos used by the cfast bundle scripts: %cfastsmvrepos%
