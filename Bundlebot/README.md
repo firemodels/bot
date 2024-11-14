@@ -25,7 +25,7 @@ where `x.y.z is the version number of the release to be built.
 
 ### Build Manuals
 
-   1. Type: `sudo su - firebot` on the computer that runs firebot (blaze at Nist) to switch to the firebot user account.
+   1. Type: `sudo su - firebot` on the computer that runs firebot (spark at Nist) to switch to the firebot user account.
    2. Type: `cd FireModels_bundle/bot/Bundlebot/release` and update the `bot` repo ( to ensure that the bundle scripts use the right `config.sh` script.)
    3. Build FDS manuals. Type: `nohup ./BUILD_fds_manuals.sh &` .  After this step completes (about 7 hours) continue to the next step
    4. Build Smokeview manuals. Type: `nohup ./BUILD_smv_manuals.sh &` . After this step completes (about 30 minutes) continue to the next step.

@@ -25,7 +25,7 @@ DOWNLOADFILE ()
   OWNER=$1
   FILE=$2
   echo downloading $FILE
-  gh release download SMOKEVIEW_TEST -p $FILE -D $BUNDLEDIR  -R github.com/$OWNER/
+  gh release download SMOKEVIEW_TEST -p $FILE -D $BUNDLEDIR  -R github.com/$OWNER/test_bundles
 }
 
 DOWNLOADFILE  $APPOWNER ${BUNDLE_BASE}lnx.sh

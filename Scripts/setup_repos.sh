@@ -4,6 +4,8 @@ function usage {
 echo "Create repos used by cfast, fds and/or smokview"
 echo ""
 echo "Options:"
+echo "-3 - setup 3rd part repos:"
+echo "    $thirdpartyrepos"
 echo "-a - setup all available repos: "
 echo "    $allrepos"
 echo "-c - setup repos used by cfastbot: "
@@ -73,14 +75,15 @@ SETUP_REMOTE ()
 
 CURDIR=`pwd`
 
-fdsrepos="cad exp fds fig out smv test_bundles hypre sundials"
+fdsrepos="cad exp fds fig out smv test_bundles"
+thirdpartyrepos="hypre sundials"
 fdssmvrepos="fds smv"
 smvonlyrepos="smv"
 firebotrepos="cad exp fds fds-smv fig out smv test_bundles"
 smvrepos="cfast fds fig smv test_bundles"
 vklrepos="openvkl"
 cfastrepos="cfast exp fig smv test_bundles"
-allrepos="cad cfast cor exp fds fig out radcal smv test_bundles hypre sundials"
+allrepos="cad cfast cor exp fds fig out radcal smv test_bundles"
 wikiwebrepos="fds.wiki fds-smv"
 repos=$fdsrepos
 eraserepos=
@@ -98,9 +101,12 @@ else
    exit
 fi
 
-while getopts 'abcCDfFGH:hsStTUvw' OPTION
+while getopts '3abcCDfFGH:hsStTUvw' OPTION
 do
 case $OPTION  in
+  3)
+   repos=$thirdpartyrepos;
+   ;;
   a)
    repos=$allrepos;
    ;;
