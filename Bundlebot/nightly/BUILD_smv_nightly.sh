@@ -55,6 +55,7 @@ fi
 cd $reporoot/bot/Bundlebot/nightly
 ./clone_repos.sh $smv_hash $RELEASE >& $outdir/stage2_clone
 
+cd $reporoot/smv
 if [ "$BUILDING_release" == "" ]; then
   cd $reporoot/smv
   smv_revision=`git describe --abbrev=7 --dirty --long`
