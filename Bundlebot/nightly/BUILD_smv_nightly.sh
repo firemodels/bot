@@ -12,7 +12,6 @@ if [ "`uname`" == "Darwin" ] ; then
   platform2="osx"
   comp=gnu
 fi
-RELEASE=
 BUILDTYPE=-t
 BUILDTYPE2=test
 
@@ -53,7 +52,7 @@ else
 fi
 
 cd $reporoot/bot/Bundlebot/nightly
-./clone_repos.sh $smv_hash $RELEASE >& $outdir/stage2_clone
+./clone_repos.sh $smv_hash $BUILDING_release >& $outdir/stage2_clone
 
 cd $reporoot/smv
 if [ "$BUILDING_release" == "" ]; then
