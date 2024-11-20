@@ -1551,6 +1551,7 @@ RUNAUTO=
 CLEANREPO=0
 UPDATEREPO=0
 mailTo=
+mailToArg=
 UPLOADRESULTS=
 COMPILER=intel
 PID_FILE=~/.fdssmvgit/firesmokebot_pid
@@ -1607,6 +1608,7 @@ case $OPTION in
    ;;
   m)
    mailTo="$OPTARG"
+   mailToArg="$OPTARG"
    ;;
   M)
    MAKEMOVIES="1"
@@ -1939,6 +1941,11 @@ if [ "$replyToSMV" != "" ]; then
   REPLYTO="-S replyto=\"$replyToSMV\""
 fi
 
+if [ "$mailToArg" != "" ]; then
+  mailToFDS = $mailToArg
+  mailToSMV = $mailToArg
+  mailToCFAST = $mailToArg
+fi
 if [ "$mailTo" == "" ]; then
   if [ -e $EMAIL_LIST ]; then
     mailTo=$mailToSMV
