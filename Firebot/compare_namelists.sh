@@ -78,9 +78,9 @@ if [ "$IGNORE" == "" ]; then
 fi
 
 # generate list of namelist keywords found in FDS_User_Guide tex files
-grep -v ^% $tex_dir/*.tex | \
-sed 's/\\ct{\([a-zA-Z]*\)}/{\\ct \1}/g' | \
-awk -F'}' 'BEGIN{inlongtable=0;}{if($1=="\\begin{longtable"&&$4=="|l|l|l|l|l|"){inlongtable=1};if($1=="\\end{longtable"){inlongtable=0};if(inlongtable==1){print $0}}' $tex_dir/*.tex | \
+sed 's/\\ct{\(.\+\)}/{\\ct \1}/g'  $tex_dir/*.tex > $tex_dir/convert.txt
+grep -v ^% $tex_dir/convert.txt | \
+awk -F'}' 'BEGIN{inlongtable=0;}{if($1=="\\begin{longtable"&&$4=="|l|l|l|l|l|"){inlongtable=1};if($1=="\\end{longtable"){inlongtable=0};if(inlongtable==1){print $0}}' $tex_dir/convert.txt | \
 sed 's/&/ &/g' | \
 awk -F' ' 'BEGIN{output=0;namelist="xxx";}\
            {\
