@@ -2216,11 +2216,15 @@ BOPT=
 GITURL=
 MAKE_SUMMARY=
 CLONEFILE=
+BUILD_3RD_PARTY=
 
 #*** parse command line arguments
-while getopts 'b:BcCdDJm:Mp:q:R:sTuUV:x:X:y:Y:w:W:z' OPTION
+while getopts '3b:BcCdDJm:Mp:q:R:sTuUV:x:X:y:Y:w:W:z' OPTION
 do
 case $OPTION in
+  r)
+   BUILD_3RD_PARTY=1
+   ;;
   b)
    BOPT=1
    BRANCH="$OPTARG"
@@ -2389,6 +2393,9 @@ figrepo=$repo/fig
 outrepo=$repo/out
 exprepo=$repo/exp
 cadrepo=$repo/cad
+hyprerepo=$repo/hypre
+sundialsrepo=$repo/sundials
+libsdir=$repo/libs
 
 if [ "$CLONEFILE" != "" ]; then
   CLONEFILE=$botrepo/Bundlebot/release/config.sh
@@ -2453,6 +2460,15 @@ if [[ "$CLONE_REPOS" != "" ]]; then
   else
    # clone all repos
     ./setup_repos.sh $FORCECLONE -F > $OUTPUT_DIR/stage1_clone 2>&1
+  fi
+  if [ "$BUILD_3RD_PARTY" != "" ]; then
+    echo removing hypre repo    >>   $OUTPUT_DIR/stage1_clone
+    rm -rf $hyprerepo           >>&  $OUTPUT_DIR/stage1_clone
+    echo removing sundials repo >>   $OUTPUT_DIR/stage1_clone
+    rm -rf $sundialsrepo        >>&  $OUTPUT_DIR/stage1_clone
+    echo removing libsdir       >>   $OUTPUT_DIR/stage1_clone
+    rm -rf $libsdir             >>&  $OUTPUT_DIR/stage1_clone
+    ./setup_repos.sh -3         >>&  $OUTPUT_DIR/stage1_clone
   fi
   if [ "$CLONE_REPOS" != "master" ]; then
     if [ "$CLONEFILE" == "" ]; then
