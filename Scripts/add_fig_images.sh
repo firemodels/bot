@@ -31,7 +31,7 @@ shift $(($OPTIND-1))
 
 cd ../..
 REPOROOT=`pwd`
-if [ "`hostname -s`" == "blaze" ]; then
+if [ "`hostname -s`" == "spark" ]; then
   TODIR=$REPOROOT/fig/smv/Reference_Figures/Default
 else
   TODIR=$REPOROOT/fig/smv/Reference_Figures/Other
