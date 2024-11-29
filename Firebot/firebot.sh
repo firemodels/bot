@@ -2463,12 +2463,12 @@ if [[ "$CLONE_REPOS" != "" ]]; then
   fi
   if [ "$BUILD_3RD_PARTY" != "" ]; then
     echo removing hypre repo    >>   $OUTPUT_DIR/stage1_clone
-    rm -rf $hyprerepo           >>&  $OUTPUT_DIR/stage1_clone
+    rm -rf $hyprerepo           >>   $OUTPUT_DIR/stage1_clone 2>&1
     echo removing sundials repo >>   $OUTPUT_DIR/stage1_clone
-    rm -rf $sundialsrepo        >>&  $OUTPUT_DIR/stage1_clone
+    rm -rf $sundialsrepo        >>   $OUTPUT_DIR/stage1_clone 2>&1
     echo removing libsdir       >>   $OUTPUT_DIR/stage1_clone
-    rm -rf $libsdir             >>&  $OUTPUT_DIR/stage1_clone
-    ./setup_repos.sh -3         >>&  $OUTPUT_DIR/stage1_clone
+    rm -rf $libsdir             >>   $OUTPUT_DIR/stage1_clone 2>&1
+    ./setup_repos.sh -3         >>   $OUTPUT_DIR/stage1_clone 2>&1
   fi
   if [ "$CLONE_REPOS" != "master" ]; then
     if [ "$CLONEFILE" == "" ]; then
