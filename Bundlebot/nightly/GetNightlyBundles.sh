@@ -1,4 +1,4 @@
-@echo off
+#!/bin/bash
 
 echo cleaning bundles directory
 cd bundles
