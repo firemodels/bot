@@ -10,7 +10,7 @@ CURDIR=`pwd`
 cd ../../$repo
 
 
-git fetch firemodels pull/$id/head:test_$id
+git fetch firemodels pull/$id/head:PR_$id
 git branch -a
 git checkout test_$id
 
