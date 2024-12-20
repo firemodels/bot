@@ -2065,6 +2065,7 @@ fi
         cat $TIME_LOG $FYI_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
       fi
    fi
+   cp $TIME_LOG "$HISTORY_DIR/${FDS_REVISION}_summary.txt"
 }
 
 #VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
