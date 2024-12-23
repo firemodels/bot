@@ -6,10 +6,8 @@ if "x%repoarg%" == "x" goto endif1
   set repo=%repoarg%
 :endif1
 
-set CURDIR=%CD%
 cd ..\..\%repo%
 
-
-git fetch firemodels pull/%1/head:test_%1
+git fetch firemodels pull/%1/head:PR_%1
 git branch -a
 
