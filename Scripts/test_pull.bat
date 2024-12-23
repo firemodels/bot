@@ -2,7 +2,7 @@
 set num=%1
 set repoarg=%2
 set repo=smv
-if "x%repoarg" == "x" goto endif1
+if "x%repoarg%" == "x" goto endif1
   set repo=%repoarg%
 :endif1
 
