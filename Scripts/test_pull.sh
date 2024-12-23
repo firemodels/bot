@@ -12,5 +12,5 @@ cd ../../$repo
 
 git fetch firemodels pull/$id/head:PR_$id
 git branch -a
-git checkout test_$id
+git checkout PR_$id
 
