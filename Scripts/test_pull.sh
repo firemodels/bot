@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 id=$1
 repo=$2
 
@@ -13,4 +13,3 @@ cd ../../$repo
 git fetch firemodels pull/$id/head:PR_$id
 git branch -a
 git checkout PR_$id
-
