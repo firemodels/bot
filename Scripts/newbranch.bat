@@ -1,6 +1,9 @@
 @echo off
-set repo=%1
-set branch=%2
+set branch=%1
+set repo=%2
+
+
+if "x%repo%" == "x" set repo=smv
 
 set CURDIR=%CD%
 
