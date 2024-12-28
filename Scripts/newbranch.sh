@@ -3,7 +3,7 @@ branch=$1
 repo=$2
 
 if [[ "$branch" == "" ]] && [[ "$repo" == "" ]]; then
-  echo "Usage: newbranch.sh branch [repo]"
+  echo "Usage: newbranch.sh branch repo"
   echo " create a branch in repo repo."
   echo ""
   echo " branch - branch to be created"
