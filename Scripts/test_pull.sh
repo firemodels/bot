@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 id=$1
 repo=$2
 
@@ -10,7 +10,6 @@ CURDIR=`pwd`
 cd ../../$repo
 
 
-git fetch firemodels pull/$id/head:test_$id
+git fetch firemodels pull/$id/head:PR_$id
 git branch -a
-git checkout test_$id
-
+git checkout PR_$id

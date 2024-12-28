@@ -1,6 +1,19 @@
 @echo off
-set repo=%1
-set branch=%2
+set branch=%1
+set repo=%2
+
+if not "x%branch%" == "x" goto endif0
+if not "x%repo%"   == "x" goto endif0
+  echo Usage: newbranch branch repo
+  echo   create a branch in repo repo.
+  echo.
+  echo   branch - branch to be created
+  echo   repo   - repo branch is created in (default: smv)
+  exit /b
+:endif0
+
+
+if "x%repo%" == "x" set repo=smv
 
 set CURDIR=%CD%
 
