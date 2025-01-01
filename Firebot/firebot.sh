@@ -578,7 +578,8 @@ compile_fds_mpi()
 {
    # Clean and compile FDS MPI
   local FDSDIR=$1
-  local MPTYPE=$2
+  local FDSEXE=$2
+  local MPTYPE=$3
   if [ "$MPTYPE" != "" ]; then
     MPTYPE="_$MPTYPE"
   fi
@@ -586,6 +587,10 @@ compile_fds_mpi()
   cd $FDSDIR
   make -f ../makefile clean &> /dev/null
   ./make_fds.sh &> $OUTPUT_DIR/stage2c${MPTYPE}
+  if [ ! -e $FDSEXE ]; then
+    make -f ../makefile clean &> /dev/null
+    ./make_fds.sh &> $OUTPUT_DIR/stage2c${MPTYPE}
+  fi
 }
 
 #---------------------------------------------
@@ -2812,10 +2817,10 @@ fi
 ###*** Stage 2c ###
 
 if [[ "$SKIPRELEASE" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
-  compile_fds_mpi         $FDS_DIR
+  compile_fds_mpi         $FDS_DIR $FDS_EXE
   check_compile_fds_mpi   $FDS_DIR $FDS_EXE
   if [ "$OPENMPTEST" != "" ]; then 
-    compile_fds_mpi         $FDS_OPENMP_DIR                 openmp
+    compile_fds_mpi         $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
     check_compile_fds_mpi   $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
   fi
 fi
