@@ -77,7 +77,8 @@ get_decdate()
   h=`date "+%k"`
   m=`date "+%M"`
   s=`date "+%S"`
-  decdate=`echo "scale=5; $d + $h/24.0 + $m/(60*24) + $s/(3600*24)" | bc`
+  OFFSET=366.0
+  decdate=`echo "scale=5; $OFFSET + $d + $h/24.0 + $m/(60*24) + $s/(3600*24)" | bc`
   fulldate=`date "+%D %R:%S"`
 }
 
@@ -87,6 +88,7 @@ if [ "$temp" == "" ]; then
   temp=67.1234
 fi
 
+login_mem=`top -b -n 1 | head -4 | tail -1 | awk '{print $8}'`
 head_load=`ssh $CB_HEAD cat /proc/loadavg | awk '{print $3}'`
 head_load1=`ssh $CB_HEAD cat /proc/loadavg | awk '{print $1}'`
 head_load5=`ssh $CB_HEAD cat /proc/loadavg | awk '{print $2}'`
@@ -95,7 +97,7 @@ login_load1=`cat /proc/loadavg | awk '{print $1}'`
 login_load5=`cat /proc/loadavg | awk '{print $2}'`
 total_load=`pdsh -t 1 -w $CB_HOSTS cat /proc/loadavg | awk '{print $3}' | awk  '{sum+=$1;}END{print sum;}'`
 
-echo "$decdate,$total_load,$temp,$head_load,$login_load,$total_load" >> $loadfile
+echo "$decdate,$total_load,$temp,$head_load,$login_load,$total_load,$login_mem" >> $loadfile
 
 cat << EOF > $temp_webpage
 <!DOCTYPE html>
