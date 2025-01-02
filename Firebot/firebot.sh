@@ -388,7 +388,8 @@ archive_compiler_version()
 compile_fds_mpi_db()
 {
   local FDSDIR=$1
-  local MPTYPE=$2
+  local FDSEXE=$2
+  local MPTYPE=$3
   if [ "$MPTYPE" != "" ]; then
     MPTYPE="_$MPTYPE"
   fi
@@ -397,6 +398,11 @@ compile_fds_mpi_db()
    cd $FDSDIR
    make -f ../makefile clean &> /dev/null
    ./make_fds.sh &> $OUTPUT_DIR/stage2b${MPTYPE}
+   if [ ! -x $FDSEXE ]; then
+     cd $FDSDIR
+     make -f ../makefile clean &> /dev/null
+     ./make_fds.sh &> $OUTPUT_DIR/stage2b${MPTYPE}
+   fi
 }
 
 #---------------------------------------------
@@ -413,11 +419,12 @@ check_compile_fds_mpi_db()
   fi
    # Check for errors in FDS MPI debug compilation
   cd $FDSDIR
-  if [ -e $FDSEXE ]
+  if [ -x $FDSEXE ]
   then
      FDS_debug_success=true
   else
      echo "Errors from Stage 2b$MPTYPE - Compile FDS MPI$MPTYPE debug:"   >> $ERROR_LOG
+     echo "The program $FDSEXE failed to build."                          >> $ERROR_LOG
      cat $OUTPUT_DIR/stage2b${MPTYPE}                                     >> $ERROR_LOG
      echo ""                                                              >> $ERROR_LOG
   fi
@@ -578,7 +585,8 @@ compile_fds_mpi()
 {
    # Clean and compile FDS MPI
   local FDSDIR=$1
-  local MPTYPE=$2
+  local FDSEXE=$2
+  local MPTYPE=$3
   if [ "$MPTYPE" != "" ]; then
     MPTYPE="_$MPTYPE"
   fi
@@ -586,6 +594,11 @@ compile_fds_mpi()
   cd $FDSDIR
   make -f ../makefile clean &> /dev/null
   ./make_fds.sh &> $OUTPUT_DIR/stage2c${MPTYPE}
+  if [ ! -x $FDSEXE ]; then
+    cd $FDSDIR
+    make -f ../makefile clean &> /dev/null
+    ./make_fds.sh &> $OUTPUT_DIR/stage2c${MPTYPE}
+  fi
 }
 
 #---------------------------------------------
@@ -602,12 +615,13 @@ check_compile_fds_mpi()
     MPTYPE="_$MPTYPE"
   fi
   cd $FDSDIR
-  if [ -e $FDSEXE ]
+  if [ -x $FDSEXE ]
   then
      FDS_release_success=true
      cp $FDSEXE $LATESTAPPS_DIR/fds${MPTYPE}
   else
      echo "Errors from Stage 2c - Compile FDS MPI${MPTYPE} release:" >> $ERROR_LOG
+     echo "The program $FDSEXE failed to build."                     >> $ERROR_LOG
      cat $OUTPUT_DIR/stage2c${MPTYPE}                                >> $ERROR_LOG
      echo ""                                                         >> $ERROR_LOG
   fi
@@ -2793,10 +2807,10 @@ GET_DURATION $SETUP_beg $SETUP_end SETUP
 
 BUILD_beg=`GET_TIME`
 if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-  compile_fds_mpi_db         $FDS_DB_DIR
+  compile_fds_mpi_db         $FDS_DB_DIR $FDS_DB_EXE
   check_compile_fds_mpi_db   $FDS_DB_DIR $FDS_DB_EXE
   if [ "$OPENMPTEST" != "" ]; then 
-    compile_fds_mpi_db         $FDS_OPENMP_DB_DIR                    openmp
+    compile_fds_mpi_db         $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
     check_compile_fds_mpi_db   $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
   fi
 fi
@@ -2812,10 +2826,10 @@ fi
 ###*** Stage 2c ###
 
 if [[ "$SKIPRELEASE" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
-  compile_fds_mpi         $FDS_DIR
+  compile_fds_mpi         $FDS_DIR $FDS_EXE
   check_compile_fds_mpi   $FDS_DIR $FDS_EXE
   if [ "$OPENMPTEST" != "" ]; then 
-    compile_fds_mpi         $FDS_OPENMP_DIR                 openmp
+    compile_fds_mpi         $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
     check_compile_fds_mpi   $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
   fi
 fi
