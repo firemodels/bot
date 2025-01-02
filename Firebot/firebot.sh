@@ -398,7 +398,7 @@ compile_fds_mpi_db()
    cd $FDSDIR
    make -f ../makefile clean &> /dev/null
    ./make_fds.sh &> $OUTPUT_DIR/stage2b${MPTYPE}
-   if [ ! -e $FDSEXE ]; then
+   if [ ! -x $FDSEXE ]; then
      cd $FDSDIR
      make -f ../makefile clean &> /dev/null
      ./make_fds.sh &> $OUTPUT_DIR/stage2b${MPTYPE}
@@ -419,7 +419,7 @@ check_compile_fds_mpi_db()
   fi
    # Check for errors in FDS MPI debug compilation
   cd $FDSDIR
-  if [ -e $FDSEXE ]
+  if [ -x $FDSEXE ]
   then
      FDS_debug_success=true
   else
@@ -594,7 +594,7 @@ compile_fds_mpi()
   cd $FDSDIR
   make -f ../makefile clean &> /dev/null
   ./make_fds.sh &> $OUTPUT_DIR/stage2c${MPTYPE}
-  if [ ! -e $FDSEXE ]; then
+  if [ ! -x $FDSEXE ]; then
     cd $FDSDIR
     make -f ../makefile clean &> /dev/null
     ./make_fds.sh &> $OUTPUT_DIR/stage2c${MPTYPE}
@@ -615,7 +615,7 @@ check_compile_fds_mpi()
     MPTYPE="_$MPTYPE"
   fi
   cd $FDSDIR
-  if [ -e $FDSEXE ]
+  if [ -x $FDSEXE ]
   then
      FDS_release_success=true
      cp $FDSEXE $LATESTAPPS_DIR/fds${MPTYPE}
