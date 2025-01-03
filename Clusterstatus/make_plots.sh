@@ -168,7 +168,7 @@ cat << EOF
           legend: { position: 'right' },
           colors: ['black'],
           hAxis:{ title: '$LABEL'},
-	  vAxis:{ title: '$CB_LOGIN memory usage'}
+	  vAxis:{ title: '$CB_LOGIN memory usage (MB)'}
         };
         options.legend = 'none';
         var chart = new google.visualization.LineChart(document.getElementById('mem_loginplot$TYPE'));
