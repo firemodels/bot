@@ -143,3 +143,35 @@ cat << EOF
         chart.draw(data, options);
       }
 EOF
+
+# ---------------------------------------------------------------
+# begin login memory usage plot
+
+cat << EOF
+      google.charts.setOnLoadCallback(drawLoginMemPlot$TYPE);
+      function drawLoginMemPlot$TYPE() {
+        var data = google.visualization.arrayToDataTable([
+          ['days since Jan 1', 'mem'],
+EOF
+
+if [ "$TYPE" == "day" ]; then
+  cat $LOADFILE | tail -$NLINES | awk -v basedate="$basedate" -v firsttime="$firsttime" -F',' '{if($1>firsttime) { printf("[%s,%s],\n",($1-basedate)*24,$7) }}'
+else
+  cat $LOADFILE | tail -$NLINES | awk -v firsttime="$firsttime" -F',' '{if($1>firsttime) { printf("[%s,%s],\n",$1,$7) }}' 
+fi
+
+cat << EOF 
+        ]);
+        var options = {
+          title: '',
+          curveType: 'line',
+          legend: { position: 'right' },
+          colors: ['black'],
+          hAxis:{ title: '$LABEL'},
+	  vAxis:{ title: '$CB_LOGIN memory usage'}
+        };
+        options.legend = 'none';
+        var chart = new google.visualization.LineChart(document.getElementById('mem_loginplot$TYPE'));
+        chart.draw(data, options);
+      }
+EOF

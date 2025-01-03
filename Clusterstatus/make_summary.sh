@@ -299,6 +299,7 @@ cat << EOF >> $temp_webpage_week
 <div id="load_plotweek"      style="width: 750px; height: 200px"></div>
 <div id="load_headplotweek"  style="width: 750px; height: 200px"></div>
 <div id="load_loginplotweek" style="width: 750px; height: 200px"></div>
+<div id="mem_loginplotweek"  style="width: 750px; height: 200px"></div>
 </body>
 </html>
 EOF
@@ -317,6 +318,7 @@ cat << EOF >> $temp_webpage_day
 <div id="load_plotday"      style="width: 750px; height: 200px"></div>
 <div id="load_headplotday"  style="width: 750px; height: 200px"></div>
 <div id="load_loginplotday" style="width: 750px; height: 200px"></div>
+<div id="mem_loginplotday"  style="width: 750px; height: 200px"></div>
 </body>
 </html>
 EOF
