@@ -7,9 +7,7 @@ make --makefile ../makefile clean &> /dev/null
 if [ "$EXE" != "" ]; then
   if [ ! -x $EXE ]; then
     git clean -dxf >& /dev/null
-    echo "----------------------------------" >> $OUT 2>&1
-    echo first attempt at building fds failed >> $OUT 2>&1
-    ./make_fds.sh                             >> $OUT 2>&1
+    ./make_fds.sh &> $OUT
   fi
 fi
 
