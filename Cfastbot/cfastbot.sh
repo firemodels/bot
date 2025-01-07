@@ -1288,7 +1288,7 @@ email_build_status()
 {
    echo $THIS_CFAST_FAILED>$CFAST_STATUS_FILE
    stop_time=`date`
-   IFORT_VERSION=`ifort -v 2>&1`
+   IFORT_VERSION=`ifx -v 2>&1`
    if [[ $SKIP_git_UPDATE_AND_PROPFIX ]] ; then
       echo "CFASTbot was invoked with the -s option (SKIP_git_UPDATE_AND_PROPFIX)." >> $TIME_LOG
       echo "Skipping git revert, update, and property fix operations." >> $TIME_LOG
