@@ -1,7 +1,7 @@
 @echo off
 setlocal
 
-OWNER=%username%
+set OWNER=%username%
 if "x%is_nightly%" == "x1" set OWNER=firemodels
 
 set repo=%1
