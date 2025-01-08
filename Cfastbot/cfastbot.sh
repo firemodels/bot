@@ -1431,10 +1431,6 @@ USEINSTALL2=
 CCnotfound=
 GITURL=
 
-if [[ "$IFORT_COMPILER" != "" ]] ; then
-  source $IFORT_COMPILER/bin/compilervars.sh intel64
-fi
-
 while getopts 'achiI:m:Mp:q:r:suU' OPTION
 do
 case $OPTION in
@@ -1533,10 +1529,7 @@ cd $cfastbotdir
 notfound=
 if [ "$USEINSTALL" == "" ]; then
   if [ "$compiler" == "intel" ]; then
-    if [[ "$IFORT_COMPILER" != "" ]] ; then
-      source $IFORT_COMPILER/bin/compilervars.sh intel64
-    fi
-    notfound=`icc -help 2>&1 | tail -1 | grep "not found" | wc -l`
+    notfound=`ifx -help 2>&1 | tail -1 | grep "not found" | wc -l`
   else
     notfound=`gcc -help 2>&1 | tail -1 | grep "not found" | wc -l`
   fi
