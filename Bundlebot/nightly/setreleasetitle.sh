@@ -1,11 +1,15 @@
 #!/bin/bash
 repo=$1
 hash=$2
+owner_arg=$3
 
 if [ "$BUILDING_release" == "1" ]; then
   GHOWNER=`whoami`
 else
   GHOWNER=firemodels
+fi
+if [ "$owner_arg" != "" ]; then
+  GHOWNER=$owner_arg
 fi
 
 ERROR=1
