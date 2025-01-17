@@ -254,7 +254,12 @@ if "%cmdexist%" == "0" echo ***error: CMDfds failed to be copied to the desktop
 
 :: ----------- setting up openmp threads environment variable
 
-WMIC CPU Get NumberofLogicalProcessors | more /E +1 > %numcoresfile%
+::WMIC CPU Get NumberofLogicalProcessors | more /E +1 > %numcoresfile%
+set ncores=1
+if "x%NUMBER_OF_PROCESSORS%" == "x" goto endif1
+  echo %NUMBER_OF_PROCESSORS% > %numcoresfile%
+:endif1
+
 set /p ncores=<%numcoresfile%
 
 if %ncores% GEQ 8 (
