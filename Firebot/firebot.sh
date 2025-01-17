@@ -2237,7 +2237,7 @@ BUILD_3RD_PARTY=
 while getopts '3b:BcCdDJm:Mp:q:R:sTuUV:x:X:y:Y:w:W:z' OPTION
 do
 case $OPTION in
-  r)
+  3)
    BUILD_3RD_PARTY=1
    ;;
   b)
