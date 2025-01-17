@@ -214,7 +214,7 @@ SMV_TAG=
 VALIDATION=
 OPENMPTEST=
 CLONEFILE=
-BUILD_3RD_PARTY=-3
+BUILD_3RD_PARTY=
 
 #*** parse command line options
 
@@ -229,7 +229,6 @@ case $OPTION  in
    ;;
   B)
    BUILD_ONLY="-B"
-   BUILD_3RD_PARTY=
    ;;
   c)
    CLEANREPO="-c"
