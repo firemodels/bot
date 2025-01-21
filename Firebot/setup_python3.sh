@@ -14,6 +14,7 @@ else
   python3 -m venv fds_python_env
   source fds_python_env/bin/activate
   pip install -r requirements.txt
+  export PYTHONPATH=$reporoot/fds/Utilities/Python:$PYTHONPATH
   cd $reporoot/fds/Utilities/Python
   python hello_world.py
   cd $curdir
