@@ -49,6 +49,15 @@ cat << EOF
 </td>
 EOF
 fi
+if [ -e disk_usage.sh ]; then
+cat << EOF
+<td valign=top>
+EOF
+./disk_usage.sh
+cat << EOF
+</td>
+EOF
+fi
 cat << EOF
 </tr>
 </table>
