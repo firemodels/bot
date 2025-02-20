@@ -57,6 +57,7 @@ echo ***copying lib files
   CP $COMPROOT/lib          lib libiomp5.so
   CP $MPIROOT/lib           lib libmpifort.so.12
   CP $MPIROOT/lib/release   lib libmpi.so.12 
+  CP $MPIROOT/lib           lib libmpi.so
   CP $MPIROOT/libfabric/lib lib libfabric.so.1
 
 echo
