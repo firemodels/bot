@@ -55,6 +55,8 @@ echo $version > $TODIR/version
 echo
 echo ***copying lib files
   CP $COMPROOT/lib          lib libiomp5.so
+  CP $COMPROOT/lib          lib libintlc.so.5
+  CP $COMPROOT/lib          lib libimf.so
   CP $MPIROOT/lib           lib libmpifort.so.12
   CP $MPIROOT/lib/release   lib libmpi.so.12 
   CP $MPIROOT/lib           lib libmpi.so
