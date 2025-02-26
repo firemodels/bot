@@ -1,5 +1,7 @@
 #!/bin/bash
-version=oneapi1p6
+version=2025.0
+MPIROOT=/shared/intel/oneapi/mpi/2021.14
+COMPROOT=/shared/intel/oneapi/compiler/2025.0
 
 if [ "$version" == "" ]; then
   echo ***error: version undefined, edit $0 to define version
@@ -40,7 +42,6 @@ CP ()
   fi
 }
 
-FROMROOT=/opt/intel/oneapi/mpi/latest
 TOROOT=$TODIR
 mkdir $TOROOT
 mkdir $TOROOT/bin
@@ -53,30 +54,36 @@ echo $version > $TODIR/version
 
 echo
 echo ***copying lib files
-  CP /opt/intel/oneapi/compiler/latest/linux/compiler/lib/intel64_lin lib libiomp5.so
-  CP /opt/intel/oneapi/mpi/latest/lib                                 lib libmpifort.so.12
-  CP /opt/intel/oneapi/mpi/latest/lib/release                         lib libmpi.so.12 
-  CP /opt/intel/oneapi/mpi/latest/libfabric/lib                       lib libfabric.so.1
+  CP $COMPROOT/lib          lib libiomp5.so
+  CP $COMPROOT/lib          lib libintlc.so.5
+  CP $COMPROOT/lib          lib libimf.so
+  CP $MPIROOT/lib           lib libmpifort.so.12
+  CP $MPIROOT/lib/release   lib libmpi.so.12 
+  CP $MPIROOT/lib           lib libmpi.so
+  CP $MPIROOT/libfabric/lib lib libfabric.so.1
 
 echo
 echo ***copying bin files
-  CP /opt/intel/oneapi/mpi/latest/bin bin  hydra_bstrap_proxy
-  CP /opt/intel/oneapi/mpi/latest/bin bin  hydra_nameserver
-  CP /opt/intel/oneapi/mpi/latest/bin bin  hydra_pmi_proxy
-  CP /opt/intel/oneapi/mpi/latest/bin bin  mpirun
-  CP /opt/intel/oneapi/mpi/latest/bin bin  mpiexec.hydra 
-  CP /opt/intel/oneapi/mpi/latest/bin bin  mpiexec
-  CP /opt/intel/oneapi/mpi/latest/bin bin  cpuinfo
-  CP /opt/intel/oneapi/mpi/latest/bin bin  impi_info
+  CP $MPIROOT/bin bin  hydra_bstrap_proxy
+  CP $MPIROOT/bin bin  hydra_nameserver
+  CP $MPIROOT/bin bin  hydra_pmi_proxy
+  CP $MPIROOT/bin bin  mpirun
+  CP $MPIROOT/bin bin  mpiexec.hydra 
+  CP $MPIROOT/bin bin  mpiexec
+  CP $MPIROOT/bin bin  cpuinfo
+  CP $MPIROOT/bin bin  impi_info
 
 echo
 echo ***copying prov files
-  CP /opt/intel/oneapi/mpi/latest/libfabric/lib/prov prov  libefa-fi.so
-  CP /opt/intel/oneapi/mpi/latest/libfabric/lib/prov prov  libmlx-fi.so
-  CP /opt/intel/oneapi/mpi/latest/libfabric/lib/prov prov  libpsmx2-fi.so
-  CP /opt/intel/oneapi/mpi/latest/libfabric/lib/prov prov  librxm-fi.so
-  CP /opt/intel/oneapi/mpi/latest/libfabric/lib/prov prov  libshm-fi.so
-  CP /opt/intel/oneapi/mpi/latest/libfabric/lib/prov prov  libsockets-fi.so
+  CP $MPIROOT/libfabric/lib/prov prov  libefa-fi.so
+  CP $MPIROOT/libfabric/lib/prov prov  libmlx-fi.so
+  CP $MPIROOT/libfabric/lib/prov prov  libpsm3-fi.so
+  CP $MPIROOT/libfabric/lib/prov prov  libpsmx2-fi.so
+  CP $MPIROOT/libfabric/lib/prov prov  librxm-fi.so
+  CP $MPIROOT/libfabric/lib/prov prov  libshm-fi.so
+  CP $MPIROOT/libfabric/lib/prov prov  libtcp-fi.so
+  CP $MPIROOT/libfabric/lib/prov prov  libverbs-1.12-fi.so
+  CP $MPIROOT/libfabric/lib/prov prov  libverbs-1.1-fi.so
 
 CURDIR=`pwd`
 cd $INTELDIR

@@ -23,6 +23,6 @@ set curdir=%CD%
 cd %git_root%\smv\source
 echo add log entries for commmits made since %smvlogdate% to smokeview release notes
 pause
-git log --pretty=oneline --abbrev-commit --since=%smvlogdate% .>> %git_root%\webpages\smv_readme.html
+git log --pretty=oneline --no-merges --abbrev-commit --since=%smvlogdate% .>> %git_root%\webpages\smv_readme.html
 cd %curdir%
 pause
