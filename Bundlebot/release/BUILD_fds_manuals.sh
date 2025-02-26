@@ -5,8 +5,8 @@ export DISABLEPUSH=1
 
 CURDIR=`pwd`
 cd ../../Scripts
-echo ***updating repos
-./update_repos.sh -m
+#echo ***updating repos
+#./update_repos.sh -m
 cd $CURDIR
 
 MAILTO=
