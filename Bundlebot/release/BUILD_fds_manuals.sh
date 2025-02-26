@@ -14,4 +14,4 @@ if [ "$BUNDLE_EMAIL" != "" ]; then
   MAILTO="-m $BUNDLE_EMAIL"
 fi
 cd ../../Firebot
-./run_firebot.sh -a -C -f -c -J -q firebot $MAILTO -U -r test_bundles -o firemodels -R release -z
+./run_firebot.sh -C -f -c -J -q firebot $MAILTO -U -r test_bundles -o firemodels -R release -z
