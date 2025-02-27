@@ -2,10 +2,10 @@
 # this script runs smokebot to build smokeview manuals using revision and tags defined in config.sh
 source config.sh
 
-echo ***updating repos
+#echo ***updating repos
 CURDIR=`pwd`
-cd ../../Scripts
-./update_repos.sh -m
+#cd ../../Scripts
+#./update_repos.sh -m
 cd $CURDIR
 
 MAILTO=
