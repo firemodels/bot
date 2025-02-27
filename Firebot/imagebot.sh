@@ -151,7 +151,7 @@ else
   exit 1
 fi
 
-QUEUE=batch1
+QUEUE=firebot
 fdsrepo=$repo/fds
 botrepo=$repo/bot
 firebotdir=$botrepo/Firebot
