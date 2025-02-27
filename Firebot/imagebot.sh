@@ -9,16 +9,37 @@ run_fds_pictures()
    # run picture cases
 
    cd $fdsrepo/Verification/scripts
-     echo ./Run_FDS_Cases.sh $INTEL2 -b $ONETHREAD -q $QUEUE -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
-     ./Run_FDS_Cases.sh -p      -q $QUEUE -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
-     echo ""                                                                       >> $OUTPUT_DIR/stage5 2>&1
+     echo ./Run_FDS_Cases.sh -p -q $QUEUE -j $JOBPREFIX_RELEASE  > $OUTPUT_DIR/stage5 2>&1
+     ./Run_FDS_Cases.sh -p -q $QUEUE -j $JOBPREFIX_RELEASE      >> $OUTPUT_DIR/stage5 2>&1
+     echo ""                                                    >> $OUTPUT_DIR/stage5 2>&1
 
    # Wait for non-benchmark verification cases to end
    wait_cases_release_end verification stage5
 
 #  check whether cases have run 
    cd $fdsrepo/Verification/scripts
-   ./Run_FDS_Cases.sh -p -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
+   ./Run_FDS_Cases.sh -p -C -j $JOBPREFIX_RELEASE               >> $OUTPUT_DIR/stage5 2>&1
+}
+
+
+#---------------------------------------------
+#                   wait_cases_release_end
+#---------------------------------------------
+
+wait_cases_release_end()
+{
+   CASETYPE=$1
+   STAGE=$2
+
+   current_wait_dir=`pwd`
+
+   # Scans squeue and waits for cases to end
+   while          [[ `squeue | awk '{print $3 $4 $5}' | grep $(whoami) | grep $JOBPREFIX_RELEASE | grep -v 'CG$'` != '' ]]; do
+      JOBS_REMAINING=`squeue | awk '{print $3 $4 $5}' | grep $(whoami) | grep $JOBPREFIX_RELEASE | grep -v 'CG$' | wc -l`
+      echo "Waiting for ${JOBS_REMAINING} $CASETYPE cases to complete." >> $OUTPUT_DIR/$STAGE
+      TIME_LIMIT_STAGE="5"
+      sleep 60
+   done
 }
 
 #---------------------------------------------
@@ -120,18 +141,49 @@ make_fds_summary()
 #VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
 #                             beginning of imagebot
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+CURDIR=`pwd`
+if [ -e .fds_git ]; then
+  cd ../..
+  repo=`pwd`
+  cd $CURDIR
+else
+  echo "***error: imagebot not running in the bot/Firebot directory"
+  exit 1
+fi
+
 QUEUE=batch1
+fdsrepo=$repo/fds
+botrepo=$repo/bot
+firebotdir=$botrepo/Firebot
+OUTPUT_DIR=$firebotdir/output
+FDS_SUMMARY_DIR=$fdsrepo/Manuals/FDS_Summary
+WARNING_LOG=$OUTPUT_DIR/warnings
+ERROR_LOG=$OUTPUT_DIR/errors
+FYI_LOG=$OUTPUT_DIR/fyi
+JOBPREFIX_RELEASE=IB_
+WEB_DIR=
+WEB_ROOT=/var/www/html
 
 #*** parse command line arguments
-while getopts 'q' OPTION
+while getopts 'qw:W:' OPTION
 do
 case $OPTION in
   q)
    QUEUE="$OPTARG"
    ;;
+  w)
+   WEB_DIR="$OPTARG"
+   ;;
+  W)
+   WEB_ROOT="$OPTARG"
+   ;;
 esac
 done
 shift $(($OPTIND-1))
+
+if [ "$WEB_DIR" != "" ]; then
+  WEB_DIR=$WEB_ROOT/WEB_DIR
+fi
 
 run_fds_pictures
 make_fds_pictures
