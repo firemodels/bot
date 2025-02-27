@@ -75,7 +75,7 @@ SETUP_REMOTE ()
 
 CURDIR=`pwd`
 
-configrepos="bot cad exp fds fig out smv"
+configrepos="cad exp fds fig out smv"
 fdsrepos="cad exp fds fig out smv test_bundles"
 thirdpartyrepos="hypre sundials"
 fdssmvrepos="fds smv"
@@ -286,10 +286,6 @@ do
     fi
   fi
   if [ "$CONFIG_REPOS" != "" ]; then
-    if [ "$repo" == "bot" ]; then
-      TAG=$BUNDLE_BOT_TAG
-      REVISION=$BUNDLE_BOT_REVISION
-    fi
     if [ "$repo" == "cad" ]; then
       TAG=$BUNDLE_CAD_TAG
       REVISION=$BUNDLE_CAD_REVISION
