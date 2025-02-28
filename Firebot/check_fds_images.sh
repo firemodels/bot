@@ -1,6 +1,99 @@
 #!/bin/bash
 
 #---------------------------------------------
+#                   compile_fds_mpi
+#---------------------------------------------
+
+compile_fds_mpi()
+{
+   # Clean and compile FDS MPI
+  local FDSDIR=$1
+  local FDSEXE=$2
+  cd $FDSDIR
+  make -f ../makefile clean &> /dev/null
+  ./make_fds.sh             &> $OUTPUT_DIR/stage2c
+}
+
+#---------------------------------------------
+#                   check_compile_fds_mpi
+#---------------------------------------------
+
+check_compile_fds_mpi()
+{
+   # Check for errors in FDS MPI compilation
+  local FDSDIR=$1
+  local FDSEXE=$2
+  cd $FDSDIR
+  if [ -x $FDSEXE ]
+  then
+     FDS_release_success=true
+  else
+     echo "Errors from Stage 2c - Compile FDS MPI release:" >> $ERROR_LOG
+     echo "The program $FDSEXE failed to build."                     >> $ERROR_LOG
+     cat $OUTPUT_DIR/stage2c                                         >> $ERROR_LOG
+     echo ""                                                         >> $ERROR_LOG
+     ABORT_FDS=1
+  fi
+
+  # Check for compiler warnings/remarks
+  # 'performing multi-file optimizations' and 'generating object file' are part of a normal compile
+  # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
+  if [[ `grep -E -i 'warning|remark' $OUTPUT_DIR/stage2c | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'` == "" ]]
+  then
+     # Continue along
+     :
+  else
+     echo "Warnings from Stage 2c - Compile FDS MPI release:" >> $WARNING_LOG
+     grep -A 5 -E -i 'warning|remark' $OUTPUT_DIR/stage2c | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file' >> $WARNING_LOG
+     echo "" >> $WARNING_LOG
+  fi
+}
+
+#---------------------------------------------
+#                    comple_smv
+#---------------------------------------------
+
+compile_smv()
+{
+   # Clean and compile SMV
+  cd $smvrepo/Build/smokeview/${SMVCOMPILER}_${platform}${smvsize}
+  echo "" > $OUTPUT_DIR/stage3c 2>&1
+  ./make_smokeview.sh >> $OUTPUT_DIR/stage3c 2>&1
+}
+
+#---------------------------------------------
+#                   check_compile_smv
+#---------------------------------------------
+
+check_compile_smv()
+{
+  # Check for errors in SMV release compilation
+  smv_errors=
+  cd $smvrepo/Build/smokeview/${SMVCOMPILER}_${platform}${smvsize}
+  if [ -e "smokeview_${platform}${smvsize}" ]; then
+    smv_release_success=true
+  else
+    smv_errors=1
+    echo "Errors from Stage 3c - Compile SMV release:" >> $ERROR_LOG
+    cat $OUTPUT_DIR/stage3c                            >> $ERROR_LOG
+    echo ""                                            >> $ERROR_LOG
+    ABORT_SMV=1
+  fi
+
+  # Check for compiler warnings/remarks
+  # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
+  if [[ `grep -E -i 'warning' $OUTPUT_DIR/stage3c | grep -v 'was built for newer' | grep -v 18020 | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]; then
+    # Continue along
+    :
+  else
+    echo "Warnings from Stage 3c - Compile SMV release:" >> $WARNING_LOG
+    grep -A 5 -E -i 'warning' $OUTPUT_DIR/stage3c | grep -v 'was built for newer' | grep -v 18020 | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
+    echo "" >> $WARNING_LOG
+  fi
+  smv_release_success=true
+}
+
+#---------------------------------------------
 #                   run_picture_cases
 #---------------------------------------------
 
@@ -153,6 +246,7 @@ fi
 
 QUEUE=firebot
 fdsrepo=$repo/fds
+smvrepo=$repo/smv
 botrepo=$repo/bot
 firebotdir=$botrepo/Firebot
 OUTPUT_DIR=$firebotdir/output
@@ -163,6 +257,25 @@ FYI_LOG=$OUTPUT_DIR/fyi
 JOBPREFIX_RELEASE=IBR_
 WEB_DIR=
 WEB_ROOT=/opt/www/html
+ABORT_FDS=
+ABORT_SMV=
+ABORT=
+
+smvsize=_64
+platform="linux"
+platform2="Linux"
+SMVCOMPILER=intel
+if [ "`uname`" == "Darwin" ] ; then
+  platform="osx"
+  platform2="OSX"
+  SMVCOMPILER=gnu
+fi
+export platform
+MPI_TYPE=impi
+COMPILER=intel
+FDS_DIR=$fdsrepo/Build/${MPI_TYPE}_${COMPILER}_${platform}
+FDS_EXE=fds_${MPI_TYPE}_${COMPILER}_${platform}
+
 
 #*** parse command line arguments
 while getopts 'qw:W:' OPTION
@@ -185,10 +298,37 @@ if [ "$WEB_DIR" != "" ]; then
   WEB_DIR=$WEB_ROOT/WEB_DIR
 fi
 
-run_fds_pictures
-make_fds_pictures
-check_fds_pictures
-make_fds_summary
+echo building fds
+compile_fds_mpi         $FDS_DIR $FDS_EXE
+check_compile_fds_mpi   $FDS_DIR $FDS_EXE
+
+echo building smokeview
+compile_smv
+check_compile_smv
+
+if [ "$ABORT_FDS" != "" ]]; then
+  echo "***error: fds failed to build"
+  ABORT=1
+fi
+if [ "$ABORT_SMV" != "" ]]; then
+  echo "***error: smokeview failed to build"
+  ABORT=1
+fi
+
+
+if [ "$ABORT" == "" ]; then
+  echo running picture cases
+  run_fds_pictures
+
+  echo making pictures
+  make_fds_pictures
+
+  echo checking pictures
+  check_fds_pictures
+
+  echo making summary
+  make_fds_summary
+fi
 
 
 
