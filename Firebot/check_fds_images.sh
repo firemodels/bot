@@ -18,7 +18,7 @@ run_fds_pictures()
 
 #  check whether cases have run 
    cd $fdsrepo/Verification/scripts
-   ./Run_FDS_Cases.sh -p -C -j $JOBPREFIX_RELEASE               >> $OUTPUT_DIR/stage5 2>&1
+   ./Run_FDS_Cases.sh -p -C -j $JOBPREFIX_RELEASE                > $OUTPUT_DIR/stage5_check 2>&1
 }
 
 
