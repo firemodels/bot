@@ -162,7 +162,7 @@ ERROR_LOG=$OUTPUT_DIR/errors
 FYI_LOG=$OUTPUT_DIR/fyi
 JOBPREFIX_RELEASE=IBR_
 WEB_DIR=
-WEB_ROOT=/var/www/html
+WEB_ROOT=/opt/www/html
 
 #*** parse command line arguments
 while getopts 'qw:W:' OPTION
