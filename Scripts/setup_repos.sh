@@ -75,6 +75,7 @@ SETUP_REMOTE ()
 
 CURDIR=`pwd`
 
+configrepos="cad exp fds fig out smv"
 fdsrepos="cad exp fds fig out smv test_bundles"
 thirdpartyrepos="hypre sundials"
 fdssmvrepos="fds smv"
@@ -109,6 +110,11 @@ case $OPTION  in
    ;;
   a)
    repos=$allrepos;
+   ;;
+  b)
+   repos=$configrepos
+   eraserepos=1
+   CONFIG_REPOS=1
    ;;
   c)
    repos=$cfastrepos;
@@ -170,6 +176,9 @@ shift $(($OPTIND-1))
 
 if [ "$APPENDTEST" != "" ]; then
   eraserepos=
+fi
+if [ "$CONFIG_REPOS" != "" ]; then
+  source ../Bundlebot/release/config.sh
 fi
 
 cd $FMROOT/bot
@@ -270,12 +279,46 @@ do
   if [ "$repo" == "exp" ]; then
      RECURSIVE=--recursive
   fi
-  git clone $RECURSIVE $GITHEADER$GITOWNER/$repo.git $repo_out
-  if [ ! -d $repo_out ]; then
-    echo "***error: clone of $repo.git to $repo_out failed"
+  if [ "$repo" != "bot" ]; then
+    git clone $RECURSIVE $GITHEADER$GITOWNER/$repo.git $repo_out
+    if [ ! -d $repo_out ]; then
+      echo "***error: clone of $repo.git to $repo_out failed"
+    fi
   fi
-
+  if [ "$CONFIG_REPOS" != "" ]; then
+    if [ "$repo" == "cad" ]; then
+      TAG=$BUNDLE_CAD_TAG
+      REVISION=$BUNDLE_CAD_REVISION
+    fi
+    if [ "$repo" == "exp" ]; then
+      TAG=$BUNDLE_EXP_TAG
+      REVISION=$BUNDLE_EXP_REVISION
+    fi
+    if [ "$repo" == "fds" ]; then
+      TAG=$BUNDLE_FDS_TAG
+      REVISION=$BUNDLE_FDS_REVISION
+    fi
+    if [ "$repo" == "fig" ]; then
+      TAG=$BUNDLE_FIG_TAG
+      REVISION=$BUNDLE_FIG_REVISION
+    fi
+    if [ "$repo" == "out" ]; then
+      TAG=$BUNDLE_OUT_TAG
+      REVISION=$BUNDLE_OUT_REVISION
+    fi
+    if [ "$repo" == "smv" ]; then
+      TAG=$BUNDLE_SMV_TAG
+      REVISION=$BUNDLE_SMV_REVISION
+    fi
+#    REPO="${repo^^}"
+    if [[ "$TAG" != "" ]] && [[ "$REVISION" != "" ]] && [[ -d $repo_out ]]; then
+      cd $repo_out
+      echo git checkout -b release $REVISION
+      git checkout -b release $REVISION
+      echo git tag -a $TAG -m "tag for $TAG"
+      git tag -a $TAG -m "tag for $TAG"
+    fi
+  fi
   SETUP_REMOTE $repo_dir
-
 done
 cd $CURDIR
