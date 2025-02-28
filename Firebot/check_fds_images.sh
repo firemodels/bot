@@ -9,19 +9,9 @@ compile_fds_mpi()
    # Clean and compile FDS MPI
   local FDSDIR=$1
   local FDSEXE=$2
-  local MPTYPE=$3
-  if [ "$MPTYPE" != "" ]; then
-    MPTYPE="_$MPTYPE"
-  fi
-  echo "      MPI $MPTYPE Intel release"
   cd $FDSDIR
   make -f ../makefile clean &> /dev/null
-  ./make_fds.sh &> $OUTPUT_DIR/stage2c${MPTYPE}
-  if [ ! -x $FDSEXE ]; then
-    cd $FDSDIR
-    make -f ../makefile clean &> /dev/null
-    ./make_fds.sh &> $OUTPUT_DIR/stage2c${MPTYPE}
-  fi
+  ./make_fds.sh             &> $OUTPUT_DIR/stage2c
 }
 
 #---------------------------------------------
@@ -33,32 +23,28 @@ check_compile_fds_mpi()
    # Check for errors in FDS MPI compilation
   local FDSDIR=$1
   local FDSEXE=$2
-  local MPTYPE=$3
-  if [ "$MPTYPE" != "" ]; then
-    MPTYPE="_$MPTYPE"
-  fi
   cd $FDSDIR
   if [ -x $FDSEXE ]
   then
      FDS_release_success=true
-     cp $FDSEXE $LATESTAPPS_DIR/fds${MPTYPE}
   else
-     echo "Errors from Stage 2c - Compile FDS MPI${MPTYPE} release:" >> $ERROR_LOG
+     echo "Errors from Stage 2c - Compile FDS MPI release:" >> $ERROR_LOG
      echo "The program $FDSEXE failed to build."                     >> $ERROR_LOG
-     cat $OUTPUT_DIR/stage2c${MPTYPE}                                >> $ERROR_LOG
+     cat $OUTPUT_DIR/stage2c                                         >> $ERROR_LOG
      echo ""                                                         >> $ERROR_LOG
+     ABORT_FDS=1
   fi
 
   # Check for compiler warnings/remarks
   # 'performing multi-file optimizations' and 'generating object file' are part of a normal compile
   # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-  if [[ `grep -E -i 'warning|remark' $OUTPUT_DIR/stage2c${MPTYPE} | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'` == "" ]]
+  if [[ `grep -E -i 'warning|remark' $OUTPUT_DIR/stage2c | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'` == "" ]]
   then
      # Continue along
      :
   else
      echo "Warnings from Stage 2c - Compile FDS MPI release:" >> $WARNING_LOG
-     grep -A 5 -E -i 'warning|remark' $OUTPUT_DIR/stage2c${MPTYPE} | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file' >> $WARNING_LOG
+     grep -A 5 -E -i 'warning|remark' $OUTPUT_DIR/stage2c | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file' >> $WARNING_LOG
      echo "" >> $WARNING_LOG
   fi
 }
@@ -70,7 +56,6 @@ check_compile_fds_mpi()
 compile_smv()
 {
    # Clean and compile SMV
-  echo "      release"
   cd $smvrepo/Build/smokeview/${SMVCOMPILER}_${platform}${smvsize}
   echo "" > $OUTPUT_DIR/stage3c 2>&1
   ./make_smokeview.sh >> $OUTPUT_DIR/stage3c 2>&1
@@ -92,6 +77,7 @@ check_compile_smv()
     echo "Errors from Stage 3c - Compile SMV release:" >> $ERROR_LOG
     cat $OUTPUT_DIR/stage3c                            >> $ERROR_LOG
     echo ""                                            >> $ERROR_LOG
+    ABORT_SMV=1
   fi
 
   # Check for compiler warnings/remarks
@@ -271,8 +257,10 @@ FYI_LOG=$OUTPUT_DIR/fyi
 JOBPREFIX_RELEASE=IBR_
 WEB_DIR=
 WEB_ROOT=/opt/www/html
+ABORT_FDS=
+ABORT_SMV=
+ABORT=
 
-size=_64
 smvsize=_64
 platform="linux"
 platform2="Linux"
@@ -285,8 +273,8 @@ fi
 export platform
 MPI_TYPE=impi
 COMPILER=intel
-FDS_DIR=$fdsrepo/Build/${MPI_TYPE}_${COMPILER}_${platform}${size}
-FDS_EXE=fds_${MPI_TYPE}_${COMPILER}_${platform}${size}
+FDS_DIR=$fdsrepo/Build/${MPI_TYPE}_${COMPILER}_${platform}
+FDS_EXE=fds_${MPI_TYPE}_${COMPILER}_${platform}
 
 
 #*** parse command line arguments
@@ -310,16 +298,37 @@ if [ "$WEB_DIR" != "" ]; then
   WEB_DIR=$WEB_ROOT/WEB_DIR
 fi
 
+echo building fds
 compile_fds_mpi         $FDS_DIR $FDS_EXE
 check_compile_fds_mpi   $FDS_DIR $FDS_EXE
 
+echo building smokeview
 compile_smv
 check_compile_smv
 
-run_fds_pictures
-make_fds_pictures
-check_fds_pictures
-make_fds_summary
+if [ "$ABORT_FDS" != "" ]]; then
+  echo "***error: fds failed to build"
+  ABORT=1
+fi
+if [ "$ABORT_SMV" != "" ]]; then
+  echo "***error: smokeview failed to build"
+  ABORT=1
+fi
+
+
+if [ "$ABORT" == "" ]; then
+  echo running picture cases
+  run_fds_pictures
+
+  echo making pictures
+  make_fds_pictures
+
+  echo checking pictures
+  check_fds_pictures
+
+  echo making summary
+  make_fds_summary
+fi
 
 
 
