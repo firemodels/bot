@@ -8,6 +8,8 @@ echo "-3 - setup 3rd part repos:"
 echo "    $thirdpartyrepos"
 echo "-a - setup all available repos: "
 echo "    $allrepos"
+echo "-A - setup all available repos (erase each repo first): "
+echo "    $allrepos"
 echo "-c - setup repos used by cfastbot: "
 echo "    $cfastrepos"
 echo "-D - do not disable access to firemodels"
@@ -102,7 +104,7 @@ else
    exit
 fi
 
-while getopts '3abcCDfFGH:hsStTUvw' OPTION
+while getopts '3aAbcCDfFGH:hsStTUvw' OPTION
 do
 case $OPTION  in
   3)
@@ -110,6 +112,10 @@ case $OPTION  in
    ;;
   a)
    repos=$allrepos;
+   ;;
+  A)
+   repos=$allrepos;
+   eraserepos=1
    ;;
   b)
    repos=$configrepos
