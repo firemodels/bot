@@ -306,11 +306,11 @@ echo building smokeview
 compile_smv
 check_compile_smv
 
-if [ "$ABORT_FDS" != "" ]]; then
+if [ "$ABORT_FDS" != "" ]; then
   echo "***error: fds failed to build"
   ABORT=1
 fi
-if [ "$ABORT_SMV" != "" ]]; then
+if [ "$ABORT_SMV" != "" ]; then
   echo "***error: smokeview failed to build"
   ABORT=1
 fi
