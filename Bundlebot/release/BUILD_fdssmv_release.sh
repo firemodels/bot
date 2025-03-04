@@ -13,6 +13,7 @@ OWNER=`whoami`
 echo ***updating repos
 CURDIR=`pwd`
 cd ../../Scripts
+./setup_repos.sh -A
 ./update_repos.sh -m
 cd $CURDIR
 
