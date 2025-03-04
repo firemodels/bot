@@ -1,6 +1,9 @@
 @echo off
 set error=0
 set bot_type=%1
+set ghowner=%2
+
+if "x%ghowner%" == "x" set ghowner=firemodels
 
 set pdf_to_dir=%userprofile%\.bundle\pubs
 
@@ -32,10 +35,10 @@ goto eof
 set TAG=%1
 set file=%2
 
-echo downloading %file% from github.com/firemodels/test_bundles tag: %TAG%
+echo downloading %file% from github.com/%ghowner%/test_bundles tag: %TAG%
 if EXIST %pdf_to_dir%\%file% erase %pdf_to_dir%\%file%
-echo gh release download %TAG% -p %file% -R github.com/firemodels/test_bundles -D %pdf_to_dir% --clobber
-gh release download %TAG% -p %file% -R github.com/firemodels/test_bundles -D %pdf_to_dir% --clobber
+echo gh release download %TAG% -p %file% -R github.com/%ghowner%/test_bundles -D %pdf_to_dir% --clobber
+gh release download %TAG% -p %file% -R github.com/%ghowner%/test_bundles -D %pdf_to_dir% --clobber
 if EXIST %pdf_to_dir%\%file% exit /b
 echo ***Error: %file% download failed
 set error=1

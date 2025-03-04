@@ -254,7 +254,7 @@ echo Copying fds pubs
 echo.
 
 cd %BUNSCRIPTDIR%
-call copy_pubs firebot  || exit /b 1
+call copy_pubs firebot  %OWNER% || exit /b 1
 
 echo.
 echo ------------------------------------------------------
@@ -263,7 +263,7 @@ echo Copying smv pubs
 echo.
 
 cd %BUNSCRIPTDIR%
-call copy_pubs smokebot || exit /b 1
+call copy_pubs smokebot %OWNER% || exit /b 1
 
 echo.
 echo ------------------------------------------------------
