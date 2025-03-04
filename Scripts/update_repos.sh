@@ -11,10 +11,12 @@ echo ""
 echo "Options:"
 echo "-h - display this message"
 echo "-m - checkout master branch before updating"
+echo "-w - update only webpages and wikis repos"
 exit
 }
 
 FMROOT=
+WEBWIKI_ONLY=
 if [ -e ../.gitbot ]; then
    cd ../..
    FMROOT=`pwd`
@@ -23,7 +25,7 @@ else
    exit
 fi
 
-while getopts 'hm' OPTION
+while getopts 'hmw' OPTION
 do
 case $OPTION  in
   h)
@@ -31,6 +33,9 @@ case $OPTION  in
    ;;
   m)
    CHECKOUT_MASTER=1
+   ;;
+  w)
+   WEBWIKI_ONLY=1
    ;;
 esac
 done
@@ -104,11 +109,13 @@ UPDATE_REPO2 ()
   git status -uno
 }
 
-for repo in $allrepos
-do 
-  echo
-  UPDATE_REPO $repo
-done
+if [ "$WEBWIKI_ONLY" == "" ]; then
+  for repo in $allrepos
+  do 
+    echo
+    UPDATE_REPO $repo
+  done
+fi
 
 for repo in $otherrepos
 do 
