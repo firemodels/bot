@@ -14,11 +14,11 @@ echo ***updating repos
 CURDIR=`pwd`
 cd ../../Scripts
 ./setup_repos.sh -A
-./update_repos.sh -m
+./update_repos.sh -w
 cd $CURDIR
 
 cd ../nightly
-./BUILD_fdssmv_nightly.sh -f -R release -F $BUNDLE_FDS_REVISION -X $BUNDLE_FDS_TAG -S $BUNDLE_SMV_REVISION -Y $BUNDLE_SMV_TAG -o $OWNER -r test_bundles
+./BUILD_fdssmv_nightly.sh -c -f -R release -F $BUNDLE_FDS_REVISION -X $BUNDLE_FDS_TAG -S $BUNDLE_SMV_REVISION -Y $BUNDLE_SMV_TAG -o $OWNER -r test_bundles
 cd $CURDIR
 
 TITLE="Bundle Test - $BUNDLE_FDS_TAG/$BUNDLE_FDS_REVISION - $BUNDLE_SMV_TAG/$BUNDLE_SMV_REVISION"
