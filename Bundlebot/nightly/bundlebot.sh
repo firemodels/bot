@@ -224,8 +224,8 @@ return_code=0
 if [[ "$USE_CACHE" == "" ]] && [[ "$showparms" == "" ]]; then
   error_log=/tmp/error_log.$$
   rm -f $HOME/.bundle/pubs/*
-  ./copy_pubs.sh fds $error_log || return_code=1
-  ./copy_pubs.sh smv $error_log || return_code=1
+  ./copy_pubs.sh fds $GHOWNER $error_log || return_code=1
+  ./copy_pubs.sh smv $GHOWNER $error_log || return_code=1
 
   rm -f $HOME/.bundle/$APPS/*
   ./copy_apps.sh fds $app_home/.firebot/$BRANCHDIR/$APPS                   $error_log || return_code=1
