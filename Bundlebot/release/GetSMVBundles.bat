@@ -25,6 +25,10 @@ call :downloadfile %BUNDLE_BASE%win.exe
 ::call :downloadfile ${BUNDLE_BASE}win.tar.gz
 call :downloadfile %BUNDLE_BASE%win.sha1
 
+call :downloadfile SMV_User_Guide.pdf
+call :downloadfile SMV_Technical_Reference_Guide.pdf
+call :downloadfile SMV_Verification_Guide.pdf
+
 echo ***files downloaded to %BUNDLEDIR%
 cd %CURDIR%
 goto eof
