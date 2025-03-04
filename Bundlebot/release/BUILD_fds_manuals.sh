@@ -7,8 +7,9 @@ OWNER="-o firemodels"
 
 CURDIR=`pwd`
 cd ../../Scripts
-#echo ***updating repos
-#./update_repos.sh -m
+echo ***setting up repos
+./setup_repos.sh -A
+./update_repos.sh -w
 cd $CURDIR
 
 if [ "$BUNDLE_EMAIL" != "" ]; then
