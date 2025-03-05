@@ -6,9 +6,16 @@ MAILTO=
 OWNER="-o firemodels"
 
 CURDIR=`pwd`
+
+echo ***cleaning bot repo
+cd ../..
+git clean -dxf
+cd $CURDIR
+
+echo ***setting up repos
 cd ../../Scripts
-#echo ***updating repos
-#./update_repos.sh -m
+./setup_repos.sh -A
+./update_repos.sh -w
 cd $CURDIR
 
 if [ "$BUNDLE_EMAIL" != "" ]; then

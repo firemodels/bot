@@ -3,7 +3,7 @@ set CURDIR=%CD%
 call config.bat
 
 cd ..\..\Scripts
-call update_repos -m
+call setup_repos -A
 
 set TEST=
 :: uncomment following line to test script (does not upload bundle to github or run gh command)

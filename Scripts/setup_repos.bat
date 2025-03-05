@@ -193,9 +193,14 @@ echo.
    set valid=1
    set repos=%thirdpartyrepos%
  )
- if /I "%1" EQU "-a" (
+ if "%1" EQU "-a" (
    set valid=1
    set repos=%allrepos%
+ )
+ if "%1" EQU "-A" (
+   set valid=1
+   set repos=%allrepos%
+   set erase_repos=1
  )
  if "%1" EQU "-c" (
    set valid=1
@@ -258,6 +263,7 @@ echo.
 echo Options:
 echo -3 - setup third party repos: %thirdpartyrepos%
 echo -a - setup all repos: %allrepos%
+echo -A - setup all repos (erase repos first): %allrepos%
 echo -c - setup repos used by cfastbot: %cfastrepos%
 echo -C - setup repos used by the cfast bundle scripts: %cfastsmvrepos%
 echo -f - setup repos used by firebot: %fdsrepos%

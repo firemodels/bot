@@ -6,8 +6,10 @@ MAILTO=
 
 #echo ***updating repos
 CURDIR=`pwd`
-#cd ../../Scripts
-#./update_repos.sh -m
+cd ../../Scripts
+echo "setting up repos"
+./setup_repos.sh -A
+./update_repos.sh -m
 cd $CURDIR
 
 if [ "$BUNDLE_EMAIL" != "" ]; then
