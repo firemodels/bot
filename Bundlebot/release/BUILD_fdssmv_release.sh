@@ -15,6 +15,7 @@ CURDIR=`pwd`
 cd ../../Scripts
 ./setup_repos.sh -A
 ./update_repos.sh -w
+./update_bottag.sh
 cd $CURDIR
 
 cd ../nightly
