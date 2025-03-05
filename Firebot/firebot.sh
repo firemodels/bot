@@ -1999,7 +1999,14 @@ fi
    if [ `whoami` == "cfast" ]; then
      is_bot=1
    fi
+   UPLOAD=
    if [[ "$UPLOADGUIDES" == "1" ]] && [[ "$is_bot"  == "1" ]]; then
+     UPLOAD=1
+   fi
+   if [ "$FORCE_UPLOAD" != "" ]; then
+     UPLOAD=1
+   fi
+   if [ "$UPLOAD" != "" ]; then
      cd $firebotdir
      GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_FDS_TAG
      echo "Bundles, Guides, Summary:  $GITURL" >> $TIME_LOG
@@ -2232,9 +2239,10 @@ GITURL=
 MAKE_SUMMARY=
 CLONEFILE=
 BUILD_3RD_PARTY=
+FORCE_UPLOAD=
 
 #*** parse command line arguments
-while getopts '3b:BcCdDJm:Mp:q:R:sTuUV:x:X:y:Y:w:W:z' OPTION
+while getopts '3b:BcCdDGJm:Mp:q:R:sTuUV:x:X:y:Y:w:W:z' OPTION
 do
 case $OPTION in
   3)
@@ -2267,6 +2275,9 @@ case $OPTION in
    ;;
   D)
    OPENMPTEST=
+   ;;
+  G)
+   FORCE_UPLOAD=1
    ;;
   J)
    MPI_TYPE=impi
