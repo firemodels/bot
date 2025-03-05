@@ -6,8 +6,14 @@ MAILTO=
 OWNER="-o firemodels"
 
 CURDIR=`pwd`
-cd ../../Scripts
+
+echo ***cleaning bot repo
+cd ../..
+git clean -dxf
+cd $CURDIR
+
 echo ***setting up repos
+cd ../../Scripts
 ./setup_repos.sh -A
 ./update_repos.sh -w
 cd $CURDIR
