@@ -1942,9 +1942,9 @@ if [ "$replyToSMV" != "" ]; then
 fi
 
 if [ "$mailToArg" != "" ]; then
-  mailToFDS = $mailToArg
-  mailToSMV = $mailToArg
-  mailToCFAST = $mailToArg
+  mailToFDS=$mailToArg
+  mailToSMV=$mailToArg
+  mailToCFAST=$mailToArg
 fi
 if [ "$mailTo" == "" ]; then
   if [ -e $EMAIL_LIST ]; then
