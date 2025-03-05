@@ -31,6 +31,16 @@ export DISABLEPUSH=1
 
 CURDIR=`pwd`
 
+echo ***clean files
+cd ../../Firebot
+git clean -dxf >& /dev/null
+cd $CURDIR/output
+git clean -dxf >& /dev/null
+cd $CURDIR/../nightly
+git clean -dxf >& /dev/null
+
+cd $CURDIR
+
 echo ***setting up repos
 cd ../../Scripts
 ./setup_repos.sh -A
