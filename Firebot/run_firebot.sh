@@ -41,6 +41,7 @@ echo "-B - only build apps"
 echo "-C - when cloning repos proceed without giving a warning"
 echo "-D firebot is being run using old fds Build directory structure"
 echo "-F - clone repos using revisions from latest firebot pass"
+echo "-G - upload guides even if not firebot"
 echo "-o - specify GH_OWNER when uploading manuals. [default: $GH_OWNER]"
 echo "-r - specify GH_REPO when uploading manuals. [default: $GH_REPO]"
 echo "-R branch_name - clone fds, exp, fig, out and smv repos. fds and smv repos"
@@ -215,10 +216,11 @@ VALIDATION=
 OPENMPTEST=
 CLONEFILE=
 BUILD_3RD_PARTY=
+FORCE_UPLOAD=
 
 #*** parse command line options
 
-while getopts '3bBcCdDfFhHJkm:MnNo:OPq:r:R:TuUvV:w:W:x:X:y:Y:z' OPTION
+while getopts '3bBcCdDfFhGHJkm:MnNo:OPq:r:R:TuUvV:w:W:x:X:y:Y:z' OPTION
 do
 case $OPTION  in
   3)
@@ -247,6 +249,9 @@ case $OPTION  in
    ;;
   F)
    FIREBOT_LATEST_PASS=1
+   ;;
+  G)
+   FORCE_UPLOAD=-G
    ;;
   h)
    usage;
@@ -569,7 +574,7 @@ else
 fi
 touch $firebot_pid
 firebot_status=0
-$ECHO  ./firebot.sh -p $firebot_pid $BUILD_3RD_PARTY $UPDATEREPO $INTEL $OPENMPTEST $BUILD_ONLY $FORCECLONE $BRANCH $DEBUG_MODE $MANUALS_MATLAB_ONLY $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $UPLOADGUIDES $CLEANREPO $QUEUE $SKIPMATLAB $CLONE_REPOS $CLONE_FDSSMV $VALIDATION $CLONEFILE $EMAIL $WEB_ROOT $WEB_DIR "$@"
+$ECHO  ./firebot.sh -p $firebot_pid $BUILD_3RD_PARTY $UPDATEREPO $INTEL $OPENMPTEST $BUILD_ONLY $FORCE_UPLOAD $FORCECLONE $BRANCH $DEBUG_MODE $MANUALS_MATLAB_ONLY $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $UPLOADGUIDES $CLEANREPO $QUEUE $SKIPMATLAB $CLONE_REPOS $CLONE_FDSSMV $VALIDATION $CLONEFILE $EMAIL $WEB_ROOT $WEB_DIR "$@"
 firebot_status=$?
 if [ -e $firebot_pid ]; then
   rm -f $firebot_pid
