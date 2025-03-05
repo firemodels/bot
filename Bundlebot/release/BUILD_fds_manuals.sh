@@ -31,11 +31,6 @@ export DISABLEPUSH=1
 
 CURDIR=`pwd`
 
-echo ***cleaning bot repo
-cd ../..
-git clean -dxf
-cd $CURDIR
-
 echo ***setting up repos
 cd ../../Scripts
 ./setup_repos.sh -A
