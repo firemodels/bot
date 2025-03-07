@@ -4,8 +4,8 @@
 :: ----------------------------
 :: repo environment variables
 
-:: BOT-6.10.0-1-g120c46f8a-dirty
-set BUNDLE_BOT_REVISION=120c46f8a
+:: BOT-6.10.0-0-g6b2a44ead
+set BUNDLE_BOT_REVISION=6b2a44ead
 set BUNDLE_BOT_TAG=BOT-6.10.0
 
 :: CAD-6.9.1-6-g4675b4b
@@ -16,8 +16,8 @@ set BUNDLE_CAD_TAG=CAD-6.10.0
 set BUNDLE_EXP_REVISION=3c1046d02
 set BUNDLE_EXP_TAG=EXP-6.10.0
 
-:: FDS-6.9.1-2114-gcba3fc96a
-set BUNDLE_FDS_REVISION=cba3fc96a
+:: FDS-6.9.1-2066-g618ac0728
+set BUNDLE_FDS_REVISION=618ac0728
 set BUNDLE_FDS_TAG=FDS-6.10.0
 
 :: FIG-6.9.1-89-gef247ec
