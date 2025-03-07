@@ -84,7 +84,8 @@ CURDIR=`pwd`
 
 configrepos="cad exp fds fig out smv"
 fdsrepos="cad exp fds fig out smv test_bundles"
-thirdpartyrepos="hypre sundials ompi"
+thirdpartyrepos="hypre sundials"
+#thirdpartyrepos="hypre sundials ompi"
 fdssmvrepos="fds smv"
 smvonlyrepos="smv"
 firebotrepos="cad exp fds fds-smv fig out smv test_bundles"
