@@ -4,8 +4,8 @@
 :: ----------------------------
 :: repo environment variables
 
-:: BOT-6.10.0-0-g6b2a44ead
-set BUNDLE_BOT_REVISION=6b2a44ead
+:: BOT-6.10.0-0-g55578ad39
+set BUNDLE_BOT_REVISION=55578ad39
 set BUNDLE_BOT_TAG=BOT-6.10.0
 
 :: CAD-6.9.1-6-g4675b4b
@@ -28,7 +28,7 @@ set BUNDLE_FIG_TAG=FIG-6.10.0
 set BUNDLE_OUT_REVISION=02eac848d
 set BUNDLE_OUT_TAG=OUT-6.10.0
 
-:: SMV-6.9.6-197-g585fc623a
-set BUNDLE_SMV_REVISION=585fc623a
+:: SMV-6.9.6-210-g9f9b0f5ac
+set BUNDLE_SMV_REVISION=9f9b0f5ac
 set BUNDLE_SMV_TAG=SMV-6.10.0
 
