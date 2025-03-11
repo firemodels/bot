@@ -438,6 +438,11 @@ cat << MODULE >> \$FDSMODULEtmp
 #setenv          OPAL_PREFIX     $FDS_OPENMPIDIR
 MODULE
 fi
+if [[ "$ostype" == "OSX" ]]; then
+cat << MODULE >> \$FDSMODULEtmp
+setenv          TMPDIR     /tmp
+MODULE
+fi
 
 cp \$FDSMODULEtmp \$FDS_root/bin/modules/$FDSMODULE
 rm \$FDSMODULEtmp
@@ -483,6 +488,11 @@ cat << BASH >> \$BASHRCFDS
 #export OPAL_PREFIX=$FDS_OPENMPIDIR  # used when compiling and running the repository fds
 BASH
 fi
+fi
+if [[ "$ostype" == "OSX" ]]; then
+cat << BASH >> \$BASHRCFDS
+export TMPDIR=/tmp
+BASH
 fi
 
 if [ "$ostype" == "LINUX" ] ; then
