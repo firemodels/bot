@@ -1,5 +1,6 @@
 @echo off
 set platform=%1
+set option=%2 
 
 :: batch file to build test or release smokeview on Windows, Linux or OSX platforms
 
@@ -19,14 +20,19 @@ goto:eof
 
 call %envfile%
 echo.
-echo  Building debug test Smokeview for %platform%
-Title Building debug test Smokeview for %platform%
+echo  Building test Smokeview for %platform%
+Title Building test Smokeview for %platform%
 
 %git_drive%
 
 if "%platform%" == "Windows" (
   cd %git_root%\smv\Build\smokeview\intel_win_64
-  call make_smokeview -test -glut -sanitize
+  if "%option%" == "full " (
+    call make_smokeview -test -glut -sanitize
+  )
+  if "%option%" == "inc " (
+    call make_smokeview -test -glut -sanitize -inc
+  )
   goto eof
 )
 
