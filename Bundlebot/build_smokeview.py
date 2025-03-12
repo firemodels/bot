@@ -62,16 +62,11 @@ def build_lib():               os.system("start " + webscript_dir + "webBUILDlib
 def build_util():              os.system("start " + webscript_dir + "webBUILDallprog "  + platforms[platform.get()])
 def build_smv():               os.system("start " + webscript_dir + "webBUILDsmv  "     + platforms[platform.get()]  + " " + versions[version.get()] )
 
-def bundle_smv_win():          os.system("start " + webscript_dir + "webPACKAGEsmv "        + "Windows" + " " + versions[version.get()] )
-def bundle_smv_linux():        os.system("start " + webscript_dir + "webPACKAGEsmv "        + "Linux"   + " " + versions[version.get()] )
-def bundle_smv_osx():          os.system("start " + webscript_dir + "webPACKAGEsmv "        + "OSX"     + " " + versions[version.get()] )
-def install_smv_win():         os.system("start " + webscript_dir + "webINSTALLsmv "        + "Windows"                  + " " + versions[version.get()] )
-def install_smv_linux():       os.system("start " + webscript_dir + "webINSTALLsmv "        + "Linux"                    + " " + versions[version.get()] )
-def install_smv_osx():         os.system("start " + webscript_dir + "webINSTALLsmv "        + "OSX"                      + " " + versions[version.get()] )
+def bundle_smv():          os.system("start " + webscript_dir + "webPACKAGEsmv "        + platforms[platform.get()] + " " + versions[version.get()] )
+def install_smv():         os.system("start " + webscript_dir + "webINSTALLsmv "        + platforms[platform.get()]                  + " " + versions[version.get()] )
+def upload_bundle():       os.system("start " + webscript_dir + "webUPLOADallsmv "      + platforms[platform.get()])
+
 def bundleinstall_smv():       os.system("start " + webscript_dir + "webPACKAGEINSTALLsmv " + platforms[platform.get()]  + " " + versions[version.get()] )
-def upload_bundle_win():       os.system("start " + webscript_dir + "webUPLOADallsmv "      + "Windows")
-def upload_bundle_linux():     os.system("start " + webscript_dir + "webUPLOADallsmv "      + "Linux")
-def upload_bundle_osx():       os.system("start " + webscript_dir + "webUPLOADallsmv "      + "OSX")
 
 def download_figures():            os.system("start " + webscript_dir + "webGETfigs "       + apps[app.get()]                 + " " + guides[guide.get()] )
 def build_guides():                os.system("start " + webscript_dir + "webBUILDguides "   + apps[app.get()]                 + " " + guides[guide.get()] )
@@ -167,25 +162,10 @@ Button(root, text="smv Win test inc",  width=button_width, command=build_smv_win
 # ------------------------- bundle/install ------------------------------
 
 R=R+1
-Button(root, text="Set revisions",     width=button_width, command=set_revision, bg='blue', fg='white').grid(row=R, column=1)
-
-R=R+1
-Label(root, text="Bundle:").grid(column=0, row=R)
-Button(root, text="Windows", width=button_width, command=bundle_smv_win).grid(row=R,   column=1)
-Button(root, text="Linux",   width=button_width, command=bundle_smv_linux).grid(row=R, column=2)
-Button(root, text="OSX",     width=button_width, command=bundle_smv_osx).grid(row=R,   column=3)
-
-R=R+1
-Label(root, text="Upload:").grid(column=0, row=R)
-Button(root, text="Windows", width=button_width, command=upload_bundle_win).grid(row=R,   column=1)
-Button(root, text="Linux",   width=button_width, command=upload_bundle_linux).grid(row=R, column=2)
-Button(root, text="OSX", width=button_width, command=upload_bundle_osx).grid(row=R,   column=3)
-
-R=R+1
-Label(root, text="Install:").grid(column=0, row=R)
-Button(root, text="Windows",width=button_width, command=install_smv_win).grid(row=R,   column=1)
-Button(root, text="Linux",width=button_width,   command=install_smv_linux).grid(row=R, column=2)
-Button(root, text="OSX",width=button_width,     command=install_smv_osx).grid(row=R,   column=3)
+Button(root, text="Revision",width=button_width, command=set_revision, bg='blue', fg='white').grid(row=R, column=0)
+Button(root, text="Bundle",  width=button_width, command=bundle_smv).grid(row=R,   column=1)
+Button(root, text="Upload",  width=button_width, command=upload_bundle).grid(row=R, column=2)
+Button(root, text="Install", width=button_width, command=install_smv).grid(row=R,   column=3)
 
 # ------------------------- guides ------------------------------
 
