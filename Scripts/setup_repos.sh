@@ -48,6 +48,9 @@ SETUP_REMOTE ()
   if [ "$repo" == "sundials" ]; then
     CENTRAL=LLNL
   fi
+  if [ "$repo" == "ompi" ]; then
+    CENTRAL=open-mpi
+  fi
   if [ "$GITUSER" == "firemodels" ]; then
      if [ "$DISABLEPUSH" != "" ]; then
        ndisable=`git remote -v | grep DISABLE | wc -l`
@@ -75,11 +78,14 @@ SETUP_REMOTE ()
   fi
 }
 
+#------------------- start of script ---------------------------
+
 CURDIR=`pwd`
 
 configrepos="cad exp fds fig out smv"
 fdsrepos="cad exp fds fig out smv test_bundles"
 thirdpartyrepos="hypre sundials"
+#thirdpartyrepos="hypre sundials ompi"
 fdssmvrepos="fds smv"
 smvonlyrepos="smv"
 firebotrepos="cad exp fds fds-smv fig out smv test_bundles"
@@ -272,6 +278,9 @@ do
     fi
     if [ "$repo" == "sundials" ]; then
       GITOWNER=LLNL
+    fi
+    if [ "$repo" == "ompi" ]; then
+      GITOWNER=open-mpi
     fi
   fi
 
