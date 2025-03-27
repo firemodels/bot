@@ -35,14 +35,19 @@ source config.sh
 export DISABLEPUSH=1
 
 echo FDS manuals will be built using:
-echo "  OWNER=$OWNER"
+echo "     OWNER: $OWNER"
 if [ "$MAILTO" == "" ]; then
-  echo "  email address (-m) not specified"
+echo "     email: not specified (use -m username@mailserver.xyz)"
 else
-  echo "  MAILTO=$MAILTO"
+echo "    MAILTO: $MAILTO"
 fi
+echo "   command: $0 $OWNER $MAILTO"
 echo "  FDS repo: $BUNDLE_FDS_TAG $BUNDLE_FDS_REVISION"
-echo "  SMV repo info: $BUNDLE_SMV_TAG $BUNDLE_SMV_REVISION"
+echo "  SMV repo: $BUNDLE_SMV_TAG $BUNDLE_SMV_REVISION"
+echo ""
+echo "Press any key to continue or <CTRL> c to abort."
+echo "Type $0 -h for other options"
+read val
 
 CURDIR=`pwd`
 
