@@ -12,9 +12,14 @@ fi
 
 #*** parse command line options
 
-while getopts 'm:o:' OPTION
+while getopts 'hm:o:' OPTION
 do
 case $OPTION  in
+  h)
+   echo Usage:
+   echo ./BUILD_fds_manuals.sh -o owner -m email_address
+   exit
+   ;;
   m)
    MAILTO="-m $OPTARG"
    ;;
@@ -28,6 +33,16 @@ shift $(($OPTIND-1))
 # this script runs firebot to build fds manuals using revision and tags defined in config.sh
 source config.sh
 export DISABLEPUSH=1
+
+echo FDS manuals will be built using:
+echo "  OWNER=$OWNER"
+if [ "$MAILTO" == "" ]; then
+  echo "  email address (-m) not specified"
+else
+  echo "  MAILTO=$MAILTO"
+fi
+echo "  FDS repo: $BUNDLE_FDS_TAG $BUNDLE_FDS_REVISION"
+echo "  SMV repo info: $BUNDLE_SMV_TAG $BUNDLE_SMV_REVISION"
 
 CURDIR=`pwd`
 
