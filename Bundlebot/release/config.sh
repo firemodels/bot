@@ -4,8 +4,8 @@
 # ----------------------------
 # repo environment variables
 
-# BOT-6.10.0-23-g7cb8394a1
-export BUNDLE_BOT_REVISION=7cb8394a1
+# BOT-6.10.0-24-gf1af89b35
+export BUNDLE_BOT_REVISION=f1af89b35
 export BUNDLE_BOT_TAG=BOT-6.10.1
 
 # CAD-6.10.0-0-g4675b4b
@@ -16,8 +16,8 @@ export BUNDLE_CAD_TAG=CAD-6.10.1
 export BUNDLE_EXP_REVISION=3c1046d02
 export BUNDLE_EXP_TAG=EXP-6.10.1
 
-# FDS-6.10.0-96-gf5a1baa5c
-export BUNDLE_FDS_REVISION=f5a1baa5c
+# FDS-6.10.0-98-g876a36180
+export BUNDLE_FDS_REVISION=876a36180
 export BUNDLE_FDS_TAG=FDS-6.10.1
 
 # FIG-6.10.0-8-g1a5da25
@@ -28,7 +28,7 @@ export BUNDLE_FIG_TAG=FIG-6.10.1
 export BUNDLE_OUT_REVISION=02eac848d
 export BUNDLE_OUT_TAG=OUT-6.10.1
 
-# SMV-6.10.0-180-g3ad211a1c
-export BUNDLE_SMV_REVISION=3ad211a1c
+# SMV-6.10.0-187-ge9abacf79
+export BUNDLE_SMV_REVISION=e9abacf79
 export BUNDLE_SMV_TAG=SMV-6.10.1
 
