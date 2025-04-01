@@ -28,10 +28,10 @@ Title Building test Smokeview for %platform%
 if "%platform%" == "Windows" (
   cd %git_root%\smv\Build\smokeview\intel_win_64
   if "%option%" == "full " (
-    call make_smokeview -test -glut -sanitize
+    call make_smokeview_san -test -glut
   )
   if "%option%" == "inc " (
-    call make_smokeview -test -glut -sanitize -inc
+    call make_smokeview_san -test -glut -inc
   )
   goto eof
 )
