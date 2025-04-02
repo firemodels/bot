@@ -537,13 +537,28 @@ cat << EOF >> $HTML_DIFF
 <h2 id="manuals">Guides</h2>
 EOF
 OUTPUT_LINKS manuals
+if [ "$BASEDIR" == "Smokebot" ]; then
 cat << EOF  >> $HTML_DIFF
 <ul>
 <li><a href="manuals/SMV_User_Guide.pdf">Smokeview User Guide</a>
 <li><a href="manuals/SMV_Verification_Guide.pdf">Smokeview Verification Guide</a>
 <li><a href="manuals/SMV_Technical_Reference_Guide.pdf">Smokeview Technical Reference Guide</a>
 </ul>
+EOF
+fi
+if [ "$BASEDIR" == "Firebot" ]; then
+cat << EOF  >> $HTML_DIFF
+<ul>
+<li><a href="manuals/FDS_Config_Management_Plan.pdf">FDS Configuration Management Plan</a>
+<li><a href="manuals/FDS_Technical_Reference_Guide.pdf">FDS Technical Reference Guide</a>
+<li><a href="manuals/FDS_User_Guide.pdf">FDS User Guide</a>
+<li><a href="manuals/FDS_Validation_Guide.pdf>FDS Validation Guide</a>
+<li><a href="manuals/FDS_Verification_Guide.pdf>FDS Verification Guide</a>
+</ul>
+EOF
+fi
 
+cat << EOF  >> $HTML_DIFF
 <p><hr>
 </BODY>
 </HTML>
