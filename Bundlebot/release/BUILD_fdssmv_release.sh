@@ -13,7 +13,11 @@ OWNER=`whoami`
 CURDIR=`pwd`
 
 echo ***cleaning bot repo
-cd ../..
+cd $CURDIR/../../Firebot
+git clean -dxf  >& /dev/null
+cd $CURDIR/output
+git clean -dxf  >& /dev/null
+cd $CURDIR/../nightly
 git clean -dxf  >& /dev/null
 
 echo ***cloning repos

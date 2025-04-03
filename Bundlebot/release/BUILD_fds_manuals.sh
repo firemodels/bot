@@ -52,7 +52,11 @@ read val
 CURDIR=`pwd`
 
 echo ***clean files
-cd ../..
+cd $CURDIR/../../Firebot
+git clean -dxf >& /dev/null
+cd $CURDIR/output
+git clean -dxf >& /dev/null
+cd $CURDIR/../nightly
 git clean -dxf >& /dev/null
 
 echo ***clone repos
