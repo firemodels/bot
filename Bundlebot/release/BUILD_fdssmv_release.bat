@@ -2,7 +2,11 @@
 set CURDIR=%CD%
 call config.bat
 
-cd ..\..\Scripts
+echo cleaning bot repo
+cd ..\..
+git clean -dxf
+
+cd %CURDIR%\..\..\Scripts
 call setup_repos -A
 
 set TEST=
