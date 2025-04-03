@@ -23,13 +23,16 @@ set wc=%repo%\bot\Scripts\bin\wc
 set grep=%repo%\bot\Scripts\bin\grep
 set gawk=%repo%\bot\Scripts\bin\gawk
 set setbranchmaster=
+set updatewebwiki=0
 
 call :getopts %*
 if %stopscript% == 1 (
   exit /b
 )
 
+if %updatewebwiki% == 1 goto endif1
 for %%x in ( %allrepos% ) do ( call :update_repo %%x )
+:endif1
 
 for %%x in ( %webrepos% ) do ( call :update_repo2 %%x )
 
@@ -118,6 +121,10 @@ goto eof
    set setbranchmaster=1
    exit /b
  )
+ if /I "%1" EQU "-w" (
+   set updatewebwiki=1
+   exit /b
+ )
  shift
  if %valid% == 0 (
    echo.
@@ -137,6 +144,7 @@ echo.
 echo Options:
 echo -h - display this message
 echo -m - checkout the master branch before updating a repo
+echo -w - update web and wik repos
 exit /b
 
 :eof
