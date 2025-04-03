@@ -202,8 +202,6 @@ else
    GITHEADER="https://github.com/"
    GITUSER=`git remote -v | grep origin | head -1 | awk -F '.' '{print $2}' | awk -F\/ '{print $2}'`
 fi
-echo GITHEADER=$GITHEADER
-echo GITUSER=$GITUSER
 
 if [ "$eraserepos" == "" ]; then
   if [ "$FORCECLONE" == "" ]; then
