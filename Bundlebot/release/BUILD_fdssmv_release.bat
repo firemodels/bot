@@ -8,6 +8,7 @@ git clean -dxf
 
 cd %CURDIR%\..\..\Scripts
 call setup_repos -A
+call update_repos -w
 
 set TEST=
 :: uncomment following line to test script (does not upload bundle to github or run gh command)
