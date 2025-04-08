@@ -6,20 +6,22 @@ set BUILDLIB=%CURDIR%\build_smv_lib.bat
 set OPTS=i
 set STARTOPT=/MIN
 
-cd ..\..\..\smv\build\libs\intel_win_64
+cd ..\..\..\..\smv
+set smvrepo=%CD%
 
-
-call ..\..\..\Utilities\Scripts\setup_intel_compilers.bat > Nul
-
+cd %smvrepo%\build\libs\intel_win_64
 set LIBDIR=%CD%
 git clean -dxf > Nul
 
-cd ..\..\..\Source
-git clean -dxf > Nul
-set SRCDIR=%CD%
+call %smvrepo%\Utilities\Scripts\setup_intel_compilers.bat > Nul
 
-cd ..\Build
+cd %smvrepo%\Source
+set SRCDIR=%CD%
+git clean -dxf > Nul
+
+cd %smvrepo%\Build
 set BUILDDIR=%CD%
+git clean -dxf > Nul
 
 :: ZLIB
 cd %SRCDIR%\zlib128

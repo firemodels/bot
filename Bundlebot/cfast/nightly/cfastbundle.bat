@@ -41,11 +41,9 @@ if %only_installer% == 1 goto only_installer
 
    echo.
    echo ***Building smokeview executables
-   cd %THISDIR%\..\..\..\smv
-   set smvrepo=%CD%
 
    cd %THISDIR%
-   call build_smv_apps %smvrepo%
+   call build_smv_apps
 
 :only_installer
 cd %THISDIR%
