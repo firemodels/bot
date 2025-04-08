@@ -5,7 +5,7 @@ set CURDIR=%CD%
 
 :: define cfast_root
 
-cd ..\..\..\cfast
+cd ..\..\..\..\cfast
 set cfast_root=%CD%
 
 set stage2out=%CURDIR%\out\stage2_build_apps

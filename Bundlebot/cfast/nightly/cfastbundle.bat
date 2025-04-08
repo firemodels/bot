@@ -15,7 +15,7 @@ set THISDIR=%CD%
 
 echo ***Building CFAST bundle
 echo ***Setting up repos
-cd ..\..\..
+cd ..\..\..\..
 set GITROOT=%CD%
 cd %THISDIR%
 

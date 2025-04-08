@@ -53,7 +53,7 @@ if %use_cfastbot_hash% == 0 goto skip_gethash
 
 
 set curdir=%CD%
-cd ..\..\..
+cd ..\..\..\..
 set gitroot=%CD%
 set smvrepo=%gitroot%\smv
 set cfastrepo=%gitroot%\cfast

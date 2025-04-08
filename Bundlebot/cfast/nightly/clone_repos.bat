@@ -5,16 +5,19 @@ set smv_hash=%2
 set branch_name=%3
 
 set CURDIR=%CD%
+cd ..\..\..\..
+set ROOTDIR=%CD%
+cd %CURDIR%
 
 cd ..\..\Scripts
 call setup_repos -C -n
 
 cd %CURDIR%
 
-cd ..\..\..\cfast
+cd %ROOTDIR%\cfast
 set cfastrepo=%CD%
 
-cd ..\smv
+cd %ROOTDIR%\smv
 set smvrepo=%CD%
 
 cd %cfastrepo%
