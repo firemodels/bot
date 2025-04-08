@@ -24,9 +24,8 @@ if NOT EXIST %fullfile% exit /b 1
 echo ***Uploading %fullfile% to GitHub
 
 set CURDIR=%CD%
-
-cd ..\..\Scripts
-set SCRIPTDIR=%CD%
+cd ..\..\..\..
+set GITROOT=%CD%
 
 cd %CURDIR%\
 
@@ -37,7 +36,7 @@ erase %filelist%
 
 gh release upload %GH_CFAST_TAG% %fullfile% --clobber -R github.com/%GH_OWNER%/%GH_REPO%
 
-cd %CURDIR%\..\..\Bundlebot\nightly
+cd %GITROOT%\bot\Bundlebot\nightly
 call setreleasetitle cfast
 
 cd %CURDIR%
