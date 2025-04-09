@@ -1,11 +1,14 @@
 @echo off
-setlocal
+setlocal EnableDelayedExpansion
 
 :: builds a cfast bundle using either specified cfast and smv repo revisions or the revisions used in the latest
 :: cfastbot pass 
 
+set branch=nightly
 set cfasthash=latest
 set smvhash=latest
+set smvtag=
+set cfasttag=
 set upload=0
 set clone=
 set build_cedit=1
@@ -16,7 +19,19 @@ set configfile=%userprofile%\.bundle\bundle_config.bat
 if not exist %configfile% echo ***error: %userprofile%\bundle_config.bat does not exist
 if exist %configfile% call %configfile%
 
+if exist branch.txt    erase branch.txt
+if exist cfasthash.txt erase cfasthash.txt
+if exist cfasttag.txt  erase cfasttag.txt
+if exist smvhash.txt   erase smvhash.txt
+if exist smvtag.txt    erase smvtag.txt
+
 call :getopts %*
+
+if exist branch.txt    set /p branch=<branch.txt
+if exist cfasthash.txt set /p cfasthash=<cfasthash.txt
+if exist cfasttag.txt  set /p cfasttag=<cfasttag.txt
+if exist smvhash.txt   set /p smvhash=<smvhash.txt
+if exist smvtag.txt    set /p smvtag=<smvtag.txt
 
 if x%stopscript% == x1 exit /b
 
@@ -33,7 +48,6 @@ if "x%clone%" == "xclone" goto skip_warning
   echo.
   pause >Nul
 :skip_warning
-
 
 if %use_cfastbot_hash% == 0 goto skip_gethash
   set error=0
@@ -63,7 +77,7 @@ cd %curdir%
 
 if x%only_installer% == x-I goto endif1
    echo ***Cloning cfast(%cfasthash%), nplot and smv repos(%smvhash%)
-   call clone_repos %cfasthash% %smvhash% nightly  > Nul 2>&1
+   call clone_repos %cfasthash% %smvhash% %branch% %cfasttag% %smvtag% > Nul 2>&1
 :endif1
 
 set cfastrevision_file=%userprofile%\.cfast\PDFS\CFAST_REVISION
@@ -77,8 +91,10 @@ git describe  --abbrev=7 --long | gawk -F"-" "{printf $1\"-\"$2\"-\"$3}" > %smvr
 set /p smvrevision=<%smvrevision_file%
 
 echo       cfast hash: %cfasthash%
+echo        cfast tag: %cfasttag%
 echo   cfast revision: %cfastrevision%
 echo         smv hash: %smvhash%
+echo          smv tag: %smvtag%
 echo     smv revision: %smvrevision%
 if x%upload% == x0 echo upload installer: no
 if x%upload% == x1 echo  upload location: Github release
@@ -90,7 +106,7 @@ set upload_arg=
 if %upload% == 1 set upload_arg=-u
 set build_cedit_arg=
 if %build_cedit% == 0 set build_cedit_arg=-E
-call cfastbundle -C %cfastrevision% -S %smvrevision% %upload_arg% %only_installer% %build_cedit_arg%
+call cfastbundle -C %cfastrevision% %cfasttag% -S %smvrevision% %smvtag% %upload_arg% %only_installer% %build_cedit_arg%
 
 goto eof
 
@@ -106,16 +122,19 @@ echo.
 echo This script builds a cfast bundle.
 echo.
 echo Options:
-echo -B      - build bundle using cfast and smv commits from the latest cfastbot pass
-echo -C hash - build bundle using cfast repo commit with hash 'hash' .
-echo           If hash=latest then use most the recent commit (default: latest)
-echo -E        skip Cedit build
-echo -f      - force erasing and cloning of cfast and smv repos without warning first
-echo -h      - display this message
-echo -I      - assume apps are built, only build installer
-echo -S hash - build bundle using smv repo commit with hash 'hash' .
-echo           If hash=latest then use most the recent commit (default: latest)
-echo -u      - upload bundle to a Github release
+echo -b branch - build bundle using cfast and smv commits from the latest cfastbot pass
+echo -B       - build bundle using cfast and smv commits from the latest cfastbot pass
+echo -C hash  - build bundle using cfast repo commit with hash 'hash' .
+echo            If hash=latest then use most the recent commit (default: latest)
+echo -c tag   - build bundle setting tag for cfast tag
+echo -E         skip Cedit build
+echo -f       - force erasing and cloning of cfast and smv repos without warning first
+echo -h       - display this message
+echo -I       - assume apps are built, only build installer
+echo -S hash  - build bundle using smv repo commit with hash 'hash' .
+echo            If hash=latest then use most the recent commit (default: latest)
+echo -s tag   - build bundle setting tag for smv tag
+echo -u       - upload bundle to a Github release
 exit /b 0
 
 ::-----------------------------------------------------------------------
@@ -125,12 +144,23 @@ exit /b 0
  if (%1)==() exit /b
  set valid=0
  set arg=%1
+ set param=%2
  if "%1" EQU "-B" (
    set use_cfastbot_hash=1
    set valid=1
  )
+ if "%1" EQU "-b" (
+   echo %2 > branch.txt
+   shift
+   set valid=1
+ )
  if "%1" EQU "-C" (
-   set cfasthash=%2
+   echo %2 > cfasthash.txt
+   shift
+   set valid=1
+ )
+ if "%1" EQU "-c" (
+   echo %2 > cfasttag.txt
    shift
    set valid=1
  )
@@ -152,7 +182,12 @@ exit /b 0
    set valid=1
  )
  if "%1" EQU "-S" (
-   set smvhash=%2
+   echo %2 > smvhash.txt
+   shift
+   set valid=1
+ )
+ if "%1" EQU "-s" (
+   echo %2 > smvtag.txt
    shift
    set valid=1
  )

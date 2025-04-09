@@ -6,17 +6,16 @@ set smv_revision=%2
 set upload=%3%
 set nightly_arg=test
 
+echo upload=%upload%
 if %upload% == 0 exit /b
 
 set BUNDLEDIR=%userprofile%\.bundle\uploads
 set basename=%cfast_revision%_%smv_revision%_test_win
 set fullfile=%BUNDLEDIR%\%basename%.exe
-
-set configfile=%userprofile%\.bundle\bundle_config.bat
-if not exist %configfile% echo ***error: %userprofile%\bundle_config.bat does not exist
-if not exist %configfile% exit /b
-call %configfile%
-call check_config || exit /b 1
+echo in upload_cfast_bundle
+echo basename=%basename%
+echo fullfile=%fullfile%
+pause
 
 if NOT EXIST %fullfile% echo ***Error: bundle file %basename%.exe does not exist in %BUNDLEDIR%
 if NOT EXIST %fullfile% exit /b 1
