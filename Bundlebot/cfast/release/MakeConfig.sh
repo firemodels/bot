@@ -47,7 +47,7 @@ else
 fi
 export HEAD COMMENT EXPORT
 
-repos="bot cfast smv"
+repos="bot cfast exp smv"
 CURDIR=`pwd`
 gitroot=$CURDIR/../../../..
 cd $gitroot

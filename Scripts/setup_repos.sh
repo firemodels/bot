@@ -10,8 +10,10 @@ echo "-a - setup all available repos: "
 echo "    $allrepos"
 echo "-A - setup all available repos (erase each repo first): "
 echo "    $allrepos"
-echo "-c - setup repos used by cfastbot: "
+echo "-B - setup repos used by cfast (erase each repo first): "
 echo "    $cfastrepos"
+echo "-c - setup repos used by cfastbot: "
+echo "    $cfastbotrepos"
 echo "-D - do not disable access to firemodels"
 echo "-f - setup repos used by firebot: "
 echo "    $fdsrepos"
@@ -91,7 +93,8 @@ smvonlyrepos="smv"
 firebotrepos="cad exp fds fds-smv fig out smv test_bundles"
 smvrepos="cfast fds fig smv test_bundles"
 vklrepos="openvkl"
-cfastrepos="cfast exp fig smv test_bundles"
+cfastbotrepos="cfast exp fig smv test_bundles"
+cfastrepos="cfast exp smv"
 allrepos="cad cfast cor exp fds fig out radcal smv test_bundles"
 wikiwebrepos="fds.wiki fds-smv"
 repos=$fdsrepos
@@ -110,7 +113,7 @@ else
    exit
 fi
 
-while getopts '3aAbcCDfFGH:hsStTUvw' OPTION
+while getopts '3aABbcCDefFGH:hsStTUvw' OPTION
 do
 case $OPTION  in
   3)
@@ -128,14 +131,21 @@ case $OPTION  in
    eraserepos=1
    CONFIG_REPOS=1
    ;;
-  c)
+  B)
    repos=$cfastrepos;
+   eraserepos=1
+   ;;
+  c)
+   repos=$cfastbotrepos;
    ;;
   C)
    FORCECLONE=1;
    ;;
   D)
    DISABLEPUSH=
+   ;;
+  e)
+   eraserepos=1
    ;;
   f)
    repos=$fdsrepos;
