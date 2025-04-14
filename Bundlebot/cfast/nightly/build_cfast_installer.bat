@@ -1,4 +1,5 @@
 @echo off
+setlocal
 set cfastrev=%1
 set smvrev=%2
 set upload=%3
@@ -14,22 +15,25 @@ set distname=cfast7
 :: VVVVVVVVVVVVVVVVV shouldn't need to change anything below VVVVVVVVVVVVVVV
 
 set CURDIR=%CD%
+cd ..\..\..\..
+set GITROOT=%CD%
+
 set stage3out=%THISDIR%\out\stage3_bundle
 echo. > %stage3out%
 
 :: define cfast_root
 
-cd ..\..\..\cfast
+cd %GITROOT%\cfast
 set cfast_root=%CD%
 
 :: define smv_root
 
-cd ..\smv
+cd %GITROOT%\smv
 set smv_root=%CD%
 
 :: define bot_root
 
-cd ..\bot
+cd %GITROOT%\bot
 set bot_root=%CD%
 
 cd %CURDIR%
@@ -85,6 +89,7 @@ echo ***CFAST installer built
 
 if x%upload% == x0 goto endif1
   cd %CURDIR%
+  echo ***Uploading cfast installer %cfastrev% %smvrev% 
   call upload_cfast_bundle %cfastrev% %smvrev% %upload%
   echo ***CFAST installer uploaded
 :endif1

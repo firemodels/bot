@@ -33,7 +33,7 @@ CD_REPO ()
   CHK_REPO $repodir || return 1
 
   cd $repodir
-  if [ "$branch" != "" ]; then
+  if [[ "$branch" != "" ]] && [[ "$branch" != "current" ]]; then
      CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
      if [ "$CURRENT_BRANCH" != "$branch" ]; then
        echo "***error: was expecting branch $branch in repo $repodir."
@@ -51,9 +51,10 @@ CD_REPO ()
 function usage_all {
 echo ""
 echo "Miscellaneous:"
-echo "-3 - run in 32 bit mode (only for gnu compilers)"
 echo "-a - run automatically if cfast repo has changed"
+echo "-b - use the current branch"
 echo "-f - force cfastbot run"
+echo "-F config.sh  - clone repos using revision and tags in config.sh"
 echo "-i - use installed smokeview and background (if using the 'none' queue)"
 echo "-I - compiler [ default: $compiler]"
 echo "-k - kill cfastbot"
@@ -167,18 +168,26 @@ UPLOAD=
 USEINSTALL=
 KILL_CFASTBOT=
 ECHO=
+CONFIG=
 
-while getopts 'acfhHiI:km:o:Mq:r:RsuUv' OPTION
+while getopts 'abcfF:hHiI:km:o:Mq:r:RsuUv' OPTION
 do
 case $OPTION  in
   a)
    RUNAUTO=-a
+   ;;
+  b)
+   BRANCH=-b
+   botbranch=current
    ;;
   c)
    CLEANREPO=1
    ;;
   f)
    FORCE=1
+   ;;
+  F)
+   CONFIG="$OPTARG"
    ;;
   h)
    usage;
@@ -229,6 +238,14 @@ case $OPTION  in
 esac
 done
 shift $(($OPTIND-1))
+
+if [ "$CONFIG" != "" ]; then
+  if [ -e $CONFIG ]; then
+    CONFIG="-F $CONFIG"
+  else
+    echo ***error: configuration file $CONFIG does not exist
+  fi
+fi
 
 if [ "$REMOVE_PID" == "1" ]; then
   rm -f $cfastbot_pid
@@ -283,9 +300,10 @@ touch $cfastbot_pid
 if [[ "$EMAIL" != "" ]]; then
   EMAIL="-m $EMAIL"
 fi
-if [[ "$UPDATEREPO" == "1" ]]; then
+if [[ "botbranch" != "current" ]] && [[ "$UPDATEREPO" == "1" ]]; then
    UPDATEREPO=-u
    if [ "$RUNCFASTBOT" == "1" ]; then
+     echo CD_REPO $botrepo $botbranch
      CD_REPO $botrepo $botbranch || exit 1
      git fetch origin
      git merge origin/$botbranch
@@ -314,7 +332,8 @@ QUEUE="-q $QUEUE"
 compiler="-I $compiler"
 PID="-p $cfastbot_pid"
 cd $CURDIR
-$ECHO  ./cfastbot.sh $PID $REPO $USEINSTALL $RUNAUTO $size $compiler $UPDATEREPO $CLEAN $QUEUE $SKIP $MATLABEXE $UPLOAD $EMAIL "$@"
+echo  ./cfastbot.sh $PID $BRANCH $REPO $USEINSTALL $RUNAUTO $CONFIG $size $compiler $UPDATEREPO $CLEAN $QUEUE $SKIP $MATLABEXE $UPLOAD $EMAIL "$@"
+$ECHO  ./cfastbot.sh $PID $BRANCH $REPO $USEINSTALL $RUNAUTO $CONFIG $size $compiler $UPDATEREPO $CLEAN $QUEUE $SKIP $MATLABEXE $UPLOAD $EMAIL "$@"
 if [ -e $cfastbot_pid ]; then
   rm $cfastbot_pid
 fi   

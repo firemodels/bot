@@ -11,12 +11,9 @@ if %upload% == 0 exit /b
 set BUNDLEDIR=%userprofile%\.bundle\uploads
 set basename=%cfast_revision%_%smv_revision%_test_win
 set fullfile=%BUNDLEDIR%\%basename%.exe
-
-set configfile=%userprofile%\.bundle\bundle_config.bat
-if not exist %configfile% echo ***error: %userprofile%\bundle_config.bat does not exist
-if not exist %configfile% exit /b
-call %configfile%
-call check_config || exit /b 1
+echo basename=%basename%
+echo fullfile=%fullfile%
+echo GH_OWNER=%GH_OWNER%
 
 if NOT EXIST %fullfile% echo ***Error: bundle file %basename%.exe does not exist in %BUNDLEDIR%
 if NOT EXIST %fullfile% exit /b 1
@@ -24,9 +21,8 @@ if NOT EXIST %fullfile% exit /b 1
 echo ***Uploading %fullfile% to GitHub
 
 set CURDIR=%CD%
-
-cd ..\..\Scripts
-set SCRIPTDIR=%CD%
+cd ..\..\..\..
+set GITROOT=%CD%
 
 cd %CURDIR%\
 
@@ -37,7 +33,7 @@ erase %filelist%
 
 gh release upload %GH_CFAST_TAG% %fullfile% --clobber -R github.com/%GH_OWNER%/%GH_REPO%
 
-cd %CURDIR%\..\..\Bundlebot\nightly
+cd %GITROOT%\bot\Bundlebot\nightly
 call setreleasetitle cfast
 
 cd %CURDIR%

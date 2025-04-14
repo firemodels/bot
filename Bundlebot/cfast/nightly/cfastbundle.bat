@@ -5,6 +5,8 @@ setlocal
 
 set cfastrev=cfasttest
 set smvrev=smvtest
+set cfasttag=
+set smvtag=
 set upload=0
 set build_cedit=1
 set only_installer=0
@@ -15,7 +17,7 @@ set THISDIR=%CD%
 
 echo ***Building CFAST bundle
 echo ***Setting up repos
-cd ..\..\..
+cd ..\..\..\..
 set GITROOT=%CD%
 cd %THISDIR%
 
@@ -41,11 +43,9 @@ if %only_installer% == 1 goto only_installer
 
    echo.
    echo ***Building smokeview executables
-   cd %THISDIR%\..\..\..\smv
-   set smvrepo=%CD%
 
    cd %THISDIR%
-   call build_smv_apps %smvrepo%
+   call build_smv_apps
 
 :only_installer
 cd %THISDIR%
@@ -66,10 +66,12 @@ echo This script using the cfast and smv repo revisions from the latest cfastbot
 echo.
 echo Options:
 echo -C version - cfast version (default: cfasttest)
-echo -E - skip Cedit build
-echo -h - display this message
+echo -c tag     - cfast version (default: cfasttest)
+echo -E         - skip Cedit build
+echo -h         - display this message
 echo -S version - smv smokeview version (default: smvtest)
-echo -u -  upload bundle to a Github release
+echo -s tag     - smv smokeview version (default: smvtest)
+echo -u         -  upload bundle to a Github release
 exit /b 0
 
 ::-----------------------------------------------------------------------
@@ -81,6 +83,11 @@ exit /b 0
  set arg=%1
  if "%1" EQU "-C" (
    set cfastrev=%2
+   shift
+   set valid=1
+ )
+ if "%1" EQU "-c" (
+   set cfasttag=%2
    shift
    set valid=1
  )
@@ -99,6 +106,11 @@ exit /b 0
  )
  if "%1" EQU "-S" (
    set smvrev=%2
+   shift
+   set valid=1
+ )
+ if "%1" EQU "-s" (
+   set smvtag=%2
    shift
    set valid=1
  )

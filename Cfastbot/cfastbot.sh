@@ -33,7 +33,7 @@ CD_REPO ()
   CHK_REPO $repodir || return 1
 
   cd $repodir
-  if [ "$branch" != "" ]; then
+  if [[ "$branch" != "current" ]] && [[ "$branch" != "" ]]; then
      CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
      if [ "$CURRENT_BRANCH" != "$branch" ]; then
        echo "***error: was expecting branch $branch in repo $repodir."
@@ -99,14 +99,16 @@ run_auto()
    git_TRIGGER=$GITSTATUS_DIR/cfast_source_revision
    TRIGGERONLY=$cfastrepo/Source/CFAST/skipmatlab_trigger.txt
    git_TRIGGERONLY=$GITSTATUS_DIR/cfastonly_source_revision
-   
-   CD_REPO $CFAST_SOURCE $cfastbranch || return 1
-   git fetch origin &> /dev/null
-   git merge origin/$cfastbranch &> /dev/null
-   have_remote=`git remote -v | awk '{print $1}' | grep firemodels | wc  -l`
-   if [ "$have_remote" != "0" ]; then
-      git fetch firemodels &> /dev/null
-      git merge firemodels/$cfastbranch &> /dev/null
+
+   if [ "$CFASTBRANCH" != "current" ]; then
+     CD_REPO $CFAST_SOURCE $CFASTBRANCH || return 1
+     git fetch origin &> /dev/null
+     git merge origin/$CFASTBRANCH &> /dev/null
+     have_remote=`git remote -v | awk '{print $1}' | grep firemodels | wc  -l`
+     if [ "$have_remote" != "0" ]; then
+        git fetch firemodels &> /dev/null
+        git merge firemodels/$CFASTBRANCH &> /dev/null
+     fi
    fi
 
    is_changed $TRIGGER $git_TRIGGER
@@ -169,10 +171,10 @@ check_time_limit()
 
 set_files_world_readable()
 {
-   CD_REPO $cfastrepo $cfastbranch || return 1
+   CD_REPO $cfastrepo $CFASTBRANCH || return 1
    chmod -R go+r *
    
-   CD_REPO $smvrepo $smvbranch || return 1
+   CD_REPO $smvrepo $SMVBRANCH || return 1
    chmod -R go+r *
 
    CD_REPO $exprepo $expbranch || return 1
@@ -245,6 +247,9 @@ update_repo()
    local branch=$2
    
    CD_REPO $reponame/$repo $branch || return 1
+   if [ "$branch" == "current" ]; then
+     return 1
+   fi
 
    if [[ "$repo" == "cfast" ]]; then
       GIT_REVISION=`git describe --abbrev=7 --long --dirty`
@@ -284,7 +289,7 @@ compile_cfast_db()
    echo "Building"
    echo "   cfast"
    echo "      Intel debug"
-   CD_REPO $cfastrepo/Build/CFAST/${compiler}_${platform}_${size}_db $cfastbranch || return 1
+   CD_REPO $cfastrepo/Build/CFAST/${compiler}_${platform}_${size}_db $CFASTBRANCH || return 1
    make -f ../makefile clean &> /dev/null
    ./make_cfast.sh &> $OUTPUT_DIR/stage2a
    return 0
@@ -304,7 +309,7 @@ compile_cfast_gnu_db()
        module load $OPENMPI_GNU
        compile_gnu=1
        echo "      gnu debug"
-       CD_REPO $cfastrepo/Build/CFAST/gnu_${platform}_${size}_db $cfastbranch || return 1
+       CD_REPO $cfastrepo/Build/CFAST/gnu_${platform}_${size}_db $CFASTBRANCH || return 1
        make -f ../makefile clean &> /dev/null
        ./make_cfast.sh &> $OUTPUT_DIR/stage2f
        module unload $OPENMPI_GNU
@@ -322,7 +327,7 @@ check_compile_cfast_gnu_db()
 {
    # Check for errors in CFAST debug compilation
    if [ "$compile_gnu" == "1" ]; then
-     CD_REPO $cfastrepo/Build/CFAST/gnu_${platform}_${size}_db $cfastbranch || return 1
+     CD_REPO $cfastrepo/Build/CFAST/gnu_${platform}_${size}_db $CFASTBRANCH || return 1
      if [ -e "cfast7_${platform}_${size}_db" ]
      then
         stage2f_success=true
@@ -352,7 +357,7 @@ check_compile_cfast_gnu_db()
 check_compile_cfast_db()
 {
    # Check for errors in CFAST debug compilation
-   CD_REPO $cfastrepo/Build/CFAST/${compiler}_${platform}_${size}_db $cfastbranch || return 1
+   CD_REPO $cfastrepo/Build/CFAST/${compiler}_${platform}_${size}_db $CFASTBRANCH || return 1
    if [ -e "cfast7_${platform}_${size}_db" ]
    then
       stage2a_success=true
@@ -382,7 +387,7 @@ compile_cfast()
 { 
    # Build release CFAST
    echo "      release"
-   CD_REPO $cfastrepo/Build/CFAST/${compiler}_${platform}_${size} $cfastbranch || return 1
+   CD_REPO $cfastrepo/Build/CFAST/${compiler}_${platform}_${size} $CFASTBRANCH || return 1
    make -f ../makefile clean &> /dev/null
    ./make_cfast.sh &> $OUTPUT_DIR/stage2b
 }
@@ -394,7 +399,7 @@ compile_cfast()
 check_compile_cfast()
 {
    # Check for errors in CFAST release compilation
-   CD_REPO $cfastrepo/Build/CFAST/${compiler}_${platform}_${size} $cfastbranch || return 1
+   CD_REPO $cfastrepo/Build/CFAST/${compiler}_${platform}_${size} $CFASTBRANCH || return 1
    if [[ -e "cfast7_${platform}_${size}" ]]
    then
       stage2b_success=true
@@ -425,7 +430,7 @@ compile_smv_utilities()
 {
    if [ "$USEINSTALL" == "" ]; then
    # smokeview libraries
-     CD_REPO $smvrepo/Build/LIBS/${compiler}_${platform}_${size} $smvbranch || return 1
+     CD_REPO $smvrepo/Build/LIBS/${compiler}_${platform}_${size} $SMVBRANCH || return 1
      echo 'Building Smokeview libraries' >> $OUTPUT_DIR/stage3a 2>&1
      echo "   smokeview libraries"
      ./make_LIBS.sh >> $OUTPUT_DIR/stage3a 2>&1
@@ -509,7 +514,7 @@ check_compile_smv_db()
 {
    # Check for errors in SMV DB compilation
    if [ "$USEINSTALL" == "" ]; then
-     CD_REPO $smvrepo/Build/smokeview/${compiler}_${platform}_${size} $smvbranch || return 1
+     CD_REPO $smvrepo/Build/smokeview/${compiler}_${platform}_${size} $SMVBRANCH || return 1
      if [ -e "smokeview_${platform}_${size}_db" ]
      then
         stage3b_success=true
@@ -543,7 +548,7 @@ compile_smv()
    # Clean and compile SMV
    if [ "$USEINSTALL" == "" ]; then
      echo "      release"
-     CD_REPO $smvrepo/Build/smokeview/${compiler}_${platform}_${size} $smvbranch || return 1
+     CD_REPO $smvrepo/Build/smokeview/${compiler}_${platform}_${size} $SMVBRANCH || return 1
      ./make_smokeview.sh &> $OUTPUT_DIR/stage3c
    else
      echo "      release - not built, using installed smokeview"
@@ -642,7 +647,7 @@ wait_vv_cases_debug_end()
 
 run_vv_cases_debug()
 {
-   CD_REPO $cfastrepo/Validation/scripts $cfastbranch || return 1
+   CD_REPO $cfastrepo/Validation/scripts $CFASTBRANCH || return 1
 
    #  =======================
    #  = Run all cfast cases =
@@ -669,7 +674,7 @@ run_vv_cases_debug()
 check_vv_cases_debug()
 {
    # Scan and report any errors in CFAST Verification cases
-   CD_REPO $cfastrepo/Verification $cfastbranch || return 1
+   CD_REPO $cfastrepo/Verification $CFASTBRANCH || return 1
 
    if [[ `grep 'Run aborted' -riI --include *.log --include *.err ${OUTPUT_DIR}/stage4` == "" ]] && \
       [[ `grep -F "***Error" -riI --include *.log --include *.err *` == "" ]] && \
@@ -690,7 +695,7 @@ check_vv_cases_debug()
    fi
 
    # Scan and report any errors in CFAST Validation cases
-   CD_REPO $cfastrepo/Validation $cfastbranch || return 1
+   CD_REPO $cfastrepo/Validation $CFASTBRANCH || return 1
 
    if [[ `grep 'Run aborted' -riI --include *.log --include *.err ${OUTPUT_DIR}/stage4` == "" ]] && \
       [[ `grep -F "***Error" -riI --include *.log --include *.err *` == "" ]] && \
@@ -716,10 +721,10 @@ check_vv_cases_debug()
 
    # Remove all unversioned case files from V&V directories (recursively)
    if [ "$CLEANREPO" == "1" ]; then
-     CD_REPO $cfastrepo/Verification $cfastbranch || return 1
+     CD_REPO $cfastrepo/Verification $CFASTBRANCH || return 1
      git clean -dxf &> /dev/null
 
-     CD_REPO $cfastrepo/Validation $cfastbranch || return 1
+     CD_REPO $cfastrepo/Validation $CFASTBRANCH || return 1
      git clean -dxf &> /dev/null
    fi
    return 0
@@ -775,7 +780,7 @@ wait_vv_cases_release_end()
 run_vv_cases_release()
 {
    # Start running all CFAST V&V cases
-   CD_REPO $cfastrepo/Validation/scripts $cfastbranch || return 1
+   CD_REPO $cfastrepo/Validation/scripts $CFASTBRANCH || return 1
    echo '   release'
    echo 'Running CFAST V&V cases' >> $OUTPUT_DIR/stage5 2>&1
    ./Run_CFAST_Cases.sh -p $size -I $compiler -S $smvrepo $USEINSTALL2 -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
@@ -795,7 +800,7 @@ run_vv_cases_release()
 check_vv_cases_release()
 {
    # Scan and report any errors in CFAST Verificaion cases
-   CD_REPO $cfastrepo/Verification $cfastbranch || return 1
+   CD_REPO $cfastrepo/Verification $CFASTBRANCH || return 1
 
    if [[ `grep 'Run aborted' -riI --include *.log --include *.err ${OUTPUT_DIR}/stage5` == "" ]] && \
       [[ `grep -F "***Error" -riI --include *.log --include *.err *` == "" ]] && \
@@ -861,7 +866,7 @@ is_file_installed()
 make_cfast_pictures()
 {
    echo "Generating smokeview images"
-   CD_REPO $cfastrepo/Validation/scripts $cfastbranch || return 1
+   CD_REPO $cfastrepo/Validation/scripts $CFASTBRANCH || return 1
    ./Make_CFAST_Pictures.sh $size2 -I $compiler $USEINSTALL 2>&1 | grep -v FreeFontPath &> $OUTPUT_DIR/stage6
 
    return 0
@@ -895,7 +900,7 @@ run_matlab_license_test()
    echo "V&V"
    echo "   matlab license test"
    # Run simple test to see if Matlab license is available
-   CD_REPO $cfastrepo/Utilities/Matlab $cfastbranch || return 1
+   CD_REPO $cfastrepo/Utilities/Matlab $CFASTBRANCH || return 1
    matlab -logfile licmat.log -nodesktop -noFigureWindows -r "try, disp('Running Matlab License Check'), catch, disp('License Error'), err = lasterror, err.message, err.stack, end, exit" &> $OUTPUT_DIR/stage7a_matlab_license
 
    return 0
@@ -941,7 +946,7 @@ compile_vvcalc()
 { 
    # Build release vvcalc
    echo "   build VandV_Calcs" 
-   CD_REPO $cfastrepo/Build/VandV_Calcs/${compiler}_${platform}_${size} $cfastbranch || return 1
+   CD_REPO $cfastrepo/Build/VandV_Calcs/${compiler}_${platform}_${size} $CFASTBRANCH || return 1
    make -f ../makefile clean &> /dev/null
    ./make_vv.sh &> $OUTPUT_DIR/stage6b
 
@@ -954,7 +959,7 @@ compile_vvcalc()
 
 check_compile_vvcalc()
 {
-   CD_REPO $cfastrepo/Build/VandV_Calcs/${compiler}_${platform}_${size} $cfastbranch || return 1
+   CD_REPO $cfastrepo/Build/VandV_Calcs/${compiler}_${platform}_${size} $CFASTBRANCH || return 1
    if [[ -e "VandV_Calcs_${platform}_${size}" ]]
    then
       stage6b_success=true
@@ -986,7 +991,7 @@ run_matlab_verification()
    echo "   Verification"
    echo "      make plots"
    # Run Matlab plotting script
-   CD_REPO $cfastrepo/Utilities/Matlab $cfastbranch || return 1
+   CD_REPO $cfastrepo/Utilities/Matlab $CFASTBRANCH || return 1
 
    matlab -logfile vermat.log -nodesktop -noFigureWindows -r "try, disp('Running Matlab Verification script'), CFAST_verification_script, catch, disp('Error'), err = lasterror, err.message, err.stack, end, exit" &> $OUTPUT_DIR/stage6a_verification
    return 0
@@ -1022,7 +1027,7 @@ run_matlab_validation()
    
    echo "   Validation"
    echo "      run VandV_Calcs"
-   CD_REPO $cfastrepo/Validation $cfastbranch || return 1
+   CD_REPO $cfastrepo/Validation $CFASTBRANCH || return 1
    ../Build/VandV_Calcs/${compiler}_${platform}_${size}/VandV_Calcs_${platform}_${size} CFAST_Pressure_Correction_inputs.csv &> /dev/null
    cp pressures.csv LLNL_Enclosure/LLNL_pressures.csv
    ../Build/VandV_Calcs/${compiler}_${platform}_${size}/VandV_Calcs_${platform}_${size} CFAST_Temperature_Profile_inputs.csv &> /dev/null
@@ -1063,7 +1068,7 @@ check_matlab_validation()
 
 check_validation_stats()
 {
-   CD_REPO $cfastrepo/Utilities/Matlab $cfastbranch || return 1
+   CD_REPO $cfastrepo/Utilities/Matlab $CFASTBRANCH || return 1
 
    STATS_FILE_BASENAME=CFAST_validation_scatterplot_output
 
@@ -1102,7 +1107,7 @@ check_validation_stats()
 
 archive_validation_stats()
 {
-   CD_REPO $cfastrepo/Utilities/Matlab $cfastbranch || return 1
+   CD_REPO $cfastrepo/Utilities/Matlab $CFASTBRANCH || return 1
 
    if [ -e ${CURRENT_STATS_FILE} ] ; then
       # Copy to CFASTbot history
@@ -1117,7 +1122,7 @@ archive_validation_stats()
         chmod +w $WEBROOT/manuals/Validation_Statistics/${STATS_FILE_BASENAME}_${GIT_REVISION}.csv
       fi
    fi
-   CD_REPO $cfastrepo/Validation/scripts $cfastbranch || return 1
+   CD_REPO $cfastrepo/Validation/scripts $CFASTBRANCH || return 1
    if [ -e gettime.sh ]; then
      TIMEFILE=$HISTORY_DIR/${GIT_REVISION}_timing.csv
      ./Run_CFAST_Cases.sh -t | grep -v submitted > $TIMEFILE
@@ -1144,9 +1149,9 @@ check_guide()
       # Guide built succeeded; there were no errors/warnings
       # Copy guide to CFASTbot's local website
       if [ "$UPLOAD" == "1" ]; then
-	 if [ ! -d $WEBROOT/manuals ]; then
-	   mkdir $WEBROOT/manuals
-	 fi
+	     if [ ! -d $WEBROOT/manuals ]; then
+	       mkdir $WEBROOT/manuals
+	     fi
          cp $docdir/$docfile $WEBROOT/manuals/CFAST_$docfile
          chmod +w $WEBROOT/manuals/CFAST_$docfile
       fi
@@ -1171,7 +1176,7 @@ make_cfast_tech_guide()
 {
    # Build CFAST Tech Guide
    echo Building CFAST Tech guide
-   CD_REPO $cfastrepo/Manuals/CFAST_Tech_Ref $cfastbranch || return 1
+   CD_REPO $cfastrepo/Manuals/CFAST_Tech_Ref $CFASTBRANCH || return 1
    ./make_guide.sh &> $OUTPUT_DIR/stage8_cfast_tech_guide
 
    # Check guide for completion and copy to website if successful
@@ -1187,7 +1192,7 @@ make_cfast_user_guide()
 {
    # Build CFAST User Guide
    echo Building CFAST User guide
-   CD_REPO $cfastrepo/Manuals/CFAST_Users_Guide $cfastbranch || return 1
+   CD_REPO $cfastrepo/Manuals/CFAST_Users_Guide $CFASTBRANCH || return 1
    ./make_guide.sh &> $OUTPUT_DIR/stage8_cfast_user_guide
 
    # Check guide for completion and copy to website if successful
@@ -1203,12 +1208,45 @@ make_cdata_guide()
 {
    # Build CDATA guide
    echo Building CData guide
-   CD_REPO $cfastrepo/Manuals/CFAST_CData_Guide $cfastbranch || return 1
+   CD_REPO $cfastrepo/Manuals/CFAST_CData_Guide $CFASTBRANCH || return 1
    ./make_guide.sh &> $OUTPUT_DIR/stage8_cdata_guide
 
    # Check guide for completion and copy to website if successful
    check_guide $OUTPUT_DIR/stage8_cdata_guide $cfastrepo/Manuals/CFAST_CData_Guide CFAST_CData_Guide.pdf 'CData Guide'
    return 0
+}
+
+#---------------------------------------------
+#                   CHECKOUT_REPO
+#---------------------------------------------
+
+CHECKOUT_REPO()
+{
+ local_branch=$1
+ local_repo=$2
+ local_rev=$3
+ local_tag=$4
+
+ cd $local_repo
+ TAGEXISTS=
+ if git rev-parse $local_tag >/dev/null 2>&1; then
+  TAGEXISTS=1
+ fi
+
+ echo "******************"                             >> $OUTPUT_DIR/stage1_clone 2>&1
+ echo repo: $local_repo                                >> $OUTPUT_DIR/stage1_clone 2>&1
+ echo git checkout -b $local_branch $local_rev         >> $OUTPUT_DIR/stage1_clone 2>&1
+ git checkout -b $local_branch $local_rev              >> $OUTPUT_DIR/stage1_clone 2>&1
+
+ if [ "$TAGEXISTS" == "" ]; then
+   echo creating tag $local_tag for repo $local_repo   >> $OUTPUT_DIR/stage1_clone 2>&1
+   git tag -f -a $local_tag -m "tag for $local_tag"    >> $OUTPUT_DIR/stage1_clone 2>&1
+ else
+   echo tag $local_tag already exists                  >> $OUTPUT_DIR/stage1_clone 2>&1
+ fi
+
+ echo git checkout $local_tag                          >> $OUTPUT_DIR/stage1_clone 2>&1
+ git checkout $local_tag                               >  /dev/null                2>&1
 }
 
 #---------------------------------------------
@@ -1219,7 +1257,7 @@ make_cfast_vv_guide()
 {
    # Build CFAST Tech Guide
    echo Building CFAST VV guide
-   CD_REPO $cfastrepo/Manuals/CFAST_Validation_Guide $cfastbranch || return 1
+   CD_REPO $cfastrepo/Manuals/CFAST_Validation_Guide $CFASTBRANCH || return 1
    ./make_guide.sh &> $OUTPUT_DIR/stage8_cfast_vv_guide
 
    # Check guide for completion and copy to website if successful
@@ -1235,7 +1273,7 @@ make_cfast_config_guide()
 {
    # Build CFAST Configuration Guide
    echo Building CFAST Configuration guide
-   CD_REPO $cfastrepo/Manuals/CFAST_Configuration_Guide $cfastbranch || return 1
+   CD_REPO $cfastrepo/Manuals/CFAST_Configuration_Guide $CFASTBRANCH || return 1
    ./make_guide.sh &> $OUTPUT_DIR/stage8_cfast_config_guide
 
    # Check guide for completion and copy to website if successful
@@ -1351,9 +1389,9 @@ email_build_status()
         rm -rf $MANUALS_DIR
         cp -r $LATEST_MANUALS_DIR $MANUALS_DIR
       fi
-      if [[ "$UPLOAD" == "1" ]] && [[ -e $Guides2GH ]] && [[ "$is_bot"  == "1" ]]; then
+      if [[ "$UPLOAD" == "1" ]] && [[ -e $GUIDES2GH ]] && [[ "$is_bot"  == "1" ]]; then
          cd $cfastbotdir
-         $Guides2GH >& $OUTPUT_DIR/stage_upload
+         $GUIDES2GH >& $OUTPUT_DIR/stage_upload
          GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_CFAST_TAG
          echo ""                >> $TIME_LOG
          echo "Guides: $GITURL" >> $TIME_LOG
@@ -1416,6 +1454,14 @@ else
   exit
 fi
 
+botrepo=$reponame/bot
+cfastrepo=$reponame/cfast
+smvrepo=$reponame/smv
+exprepo=$reponame/exp
+
+botbranch=master
+expbranch=master
+
 cd $cfastbotdir
 
 compiler=intel
@@ -1430,15 +1476,27 @@ USEINSTALL=
 USEINSTALL2=
 CCnotfound=
 GITURL=
+CONFIG=
+BRANCH=
 
-while getopts 'achiI:m:Mp:q:r:suU' OPTION
+while getopts 'abcF:hiI:m:Mp:q:r:suU' OPTION
 do
 case $OPTION in
    a)
      RUNAUTO="y"
      ;;
+   b)
+     BRANCH=current
+     botbranch=current
+     expbranch=current
+     CFASTBRANCH=current
+     SMVBRANCH=current
+     ;;
   c)
    CLEANREPO=1
+   ;;
+  F)
+   CONFIG="$OPTARG"
    ;;
   h)
    usage;
@@ -1508,21 +1566,28 @@ fi
 
 # define repo names, make sure they exist
 
-botrepo=$reponame/bot
-botbranch=master
 CD_REPO $botrepo $botbranch || exit 1
 
-cfastrepo=$reponame/cfast
-cfastbranch=master
-CD_REPO $cfastrepo $cfastbranch || exit 1
 
-smvrepo=$reponame/smv
-smvbranch=master
-CD_REPO $smvrepo $smvbranch || exit 1
+if [ "$CONFIG" == "" ]; then
+  CFASTBRANCH=master
+  CD_REPO $cfastrepo $CFASTBRANCH || exit 1
 
-exprepo=$reponame/exp
-expbranch=master
-CD_REPO $exprepo $expbranch || exit 1
+  SMVBRANCH=master
+  CD_REPO $smvrepo $SMVBRANCH || exit 1
+
+  expbranch=master
+  CD_REPO $exprepo $expbranch || exit 1
+else
+  source $CONFIG
+  this_dir=`pwd`
+  cd $botrepo/Scripts
+  ./setup_repos.sh -B
+  cd $thisdir
+  CHECKOUT_REPO release $cfastrepo $BUNDLE_CFAST_REVISION  $BUNDLE_CFAST_TAG
+  CHECKOUT_REPO release $exprepo   $BUNDLE_EXP_REVISION    $BUNDLE_EXP_TAG
+  CHECKOUT_REPO release $smvrepo   $BUNDLE_SMV_REVISION    $BUNDLE_SMV_TAG
+fi
 
 cd $cfastbotdir
 
@@ -1596,7 +1661,7 @@ if [ -e $CFAST_STATUS_FILE ] ; then
 fi
 
 export JOBPREFIX=CB_
-Guides2GH=$cfastbotdir/guides2GH.sh
+GUIDES2GH=$cfastbotdir/guides2GH.sh
 
 #  ==============================================
 #  = CFASTbot timing and notification mechanism =
@@ -1636,8 +1701,8 @@ clean_cfastbot_history
 
 ### Stage 1 ###
 if [ "$CLEANREPO" == "1" ]; then
-  clean_repo2 cfast $cfastbranch || exit 1
-  clean_repo2 smv $smvbranch || exit 1
+  clean_repo2 cfast $CFASTBRANCH || exit 1
+  clean_repo2 smv   $SMVBRANCH || exit 1
 else
   echo Repos not cleaned
 fi
@@ -1645,9 +1710,9 @@ fi
 if [ "$UPDATEREPO" == "1" ]; then
   echo Updating
   echo "   cfast"
-  update_repo cfast $cfastbranch || exit 1
+  update_repo cfast $CFASTBRANCH || exit 1
   echo "   smv"
-  update_repo smv $smvbranch || exit 1
+  update_repo smv   $SMVBRANCH || exit 1
   echo "   exp"
   update_repo exp $expbranch || exit 1
 else
@@ -1662,7 +1727,7 @@ BOT_REVISION=`git describe --abbrev=7 --dirty --long`
 CD_REPO $reponame/exp $expbranch || return 1
 EXP_REVISION=`git describe --abbrev=7 --dirty --long`
 
-CD_REPO $reponame/cfast $cfastbranch || return 1
+CD_REPO $reponame/cfast $CFASTBRANCH || return 1
 CFAST_REVISION=`git describe --abbrev=7 --dirty --long`
 CFAST_SHORTHASH=`git rev-parse --short HEAD`
 # CFAST_REV same as CFAST_REVISION without the hash on the end
@@ -1673,8 +1738,7 @@ else
   CFAST_REV=`git describe --abbrev | awk -F '-' '{print $1"-"$2}'`
 fi
 
-
-CD_REPO $reponame/smv   $smvbranch || return 1
+CD_REPO $reponame/smv   $SMVBRANCH || return 1
 SMV_REVISION=`git describe --abbrev=7 --dirty --long`
 SMV_SHORTHASH=`git rev-parse --short HEAD`
 # SMV_REV same as SMV_REVISION without the hash on the end
