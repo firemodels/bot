@@ -1149,9 +1149,9 @@ check_guide()
       # Guide built succeeded; there were no errors/warnings
       # Copy guide to CFASTbot's local website
       if [ "$UPLOAD" == "1" ]; then
-	 if [ ! -d $WEBROOT/manuals ]; then
-	   mkdir $WEBROOT/manuals
-	 fi
+	     if [ ! -d $WEBROOT/manuals ]; then
+	       mkdir $WEBROOT/manuals
+	     fi
          cp $docdir/$docfile $WEBROOT/manuals/CFAST_$docfile
          chmod +w $WEBROOT/manuals/CFAST_$docfile
       fi
@@ -1228,16 +1228,25 @@ CHECKOUT_REPO()
  local_tag=$4
 
  cd $local_repo
- echo "******************"                           >> $OUTPUT_DIR/stage1_clone 2>&1
- echo $local_repo                                    >> $OUTPUT_DIR/stage1_clone 2>&1
- echo git checkout -b $local_branch $local_rev       >> $OUTPUT_DIR/stage1_clone 2>&1
- git checkout -b $local_branch $local_rev            >> $OUTPUT_DIR/stage1_clone 2>&1
+ TAGEXISTS=
+ if git rev-parse $local_tag >/dev/null 2>&1; then
+  TAGEXISTS=1
+ fi
 
- echo git tag -a $local_tag -m "tag for $local_tag"  >> $OUTPUT_DIR/stage1_clone 2>&1
- git tag -a $local_tag -m "tag for $local_tag"       >> $OUTPUT_DIR/stage1_clone 2>&1
+ echo "******************"                             >> $OUTPUT_DIR/stage1_clone 2>&1
+ echo repo: $local_repo                                >> $OUTPUT_DIR/stage1_clone 2>&1
+ echo git checkout -b $local_branch $local_rev         >> $OUTPUT_DIR/stage1_clone 2>&1
+ git checkout -b $local_branch $local_rev              >> $OUTPUT_DIR/stage1_clone 2>&1
 
- echo git checkout $local_branch                     >> $OUTPUT_DIR/stage1_clone 2>&1
- git checkout $local_branch                          >> $OUTPUT_DIR/stage1_clone 2>&1
+ if [ "$TAGEXISTS" == "" ]; then
+   echo creating tag $local_tag for repo $local_repo   >> $OUTPUT_DIR/stage1_clone 2>&1
+   git tag -f -a $local_tag -m "tag for $local_tag"    >> $OUTPUT_DIR/stage1_clone 2>&1
+ else
+   echo tag $local_tag already exists                  >> $OUTPUT_DIR/stage1_clone 2>&1
+ fi
+
+ echo git checkout $local_tag                          >> $OUTPUT_DIR/stage1_clone 2>&1
+ git checkout $local_tag                               >  /dev/null                2>&1
 }
 
 #---------------------------------------------
@@ -1380,9 +1389,9 @@ email_build_status()
         rm -rf $MANUALS_DIR
         cp -r $LATEST_MANUALS_DIR $MANUALS_DIR
       fi
-      if [[ "$UPLOAD" == "1" ]] && [[ -e $Guides2GH ]] && [[ "$is_bot"  == "1" ]]; then
+      if [[ "$UPLOAD" == "1" ]] && [[ -e $GUIDES2GH ]] && [[ "$is_bot"  == "1" ]]; then
          cd $cfastbotdir
-         $Guides2GH >& $OUTPUT_DIR/stage_upload
+         $GUIDES2GH >& $OUTPUT_DIR/stage_upload
          GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_CFAST_TAG
          echo ""                >> $TIME_LOG
          echo "Guides: $GITURL" >> $TIME_LOG
@@ -1655,7 +1664,7 @@ if [ -e $CFAST_STATUS_FILE ] ; then
 fi
 
 export JOBPREFIX=CB_
-Guides2GH=$cfastbotdir/guides2GH.sh
+GUIDES2GH=$cfastbotdir/guides2GH.sh
 
 #  ==============================================
 #  = CFASTbot timing and notification mechanism =
