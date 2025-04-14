@@ -1228,8 +1228,16 @@ CHECKOUT_REPO()
  local_tag=$4
 
  cd $local_repo
- git checkout -b $local_branch $local_rev       >> $OUTPUT_DIR/stage1_clone 2>&1
- git tag -a $local_tag -m "tag for $local_tag"  >> $OUTPUT_DIR/stage1_clone 2>&1
+ echo "******************"                           >> $OUTPUT_DIR/stage1_clone 2>&1
+ echo $local_repo                                    >> $OUTPUT_DIR/stage1_clone 2>&1
+ echo git checkout -b $local_branch $local_rev       >> $OUTPUT_DIR/stage1_clone 2>&1
+ git checkout -b $local_branch $local_rev            >> $OUTPUT_DIR/stage1_clone 2>&1
+
+ echo git tag -a $local_tag -m "tag for $local_tag"  >> $OUTPUT_DIR/stage1_clone 2>&1
+ git tag -a $local_tag -m "tag for $local_tag"       >> $OUTPUT_DIR/stage1_clone 2>&1
+
+ echo git checkout $local_branch                     >> $OUTPUT_DIR/stage1_clone 2>&1
+ git checkout $local_branch                          >> $OUTPUT_DIR/stage1_clone 2>&1
 }
 
 #---------------------------------------------
@@ -1571,6 +1579,8 @@ else
   CHECKOUT_REPO release $exprepo   $BUNDLE_EXP_REVISION    $BUNDLE_EXP_TAG
   CHECKOUT_REPO release $smvrepo   $BUNDLE_SMV_REVISION    $BUNDLE_SMV_TAG
 fi
+echo repos cloned
+exit
 
 
 cd $cfastbotdir
