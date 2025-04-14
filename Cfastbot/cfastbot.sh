@@ -1588,9 +1588,6 @@ else
   CHECKOUT_REPO release $exprepo   $BUNDLE_EXP_REVISION    $BUNDLE_EXP_TAG
   CHECKOUT_REPO release $smvrepo   $BUNDLE_SMV_REVISION    $BUNDLE_SMV_TAG
 fi
-echo repos cloned
-exit
-
 
 cd $cfastbotdir
 
