@@ -106,7 +106,7 @@ set upload_arg=
 if %upload% == 1 set upload_arg=-u
 set build_cedit_arg=
 if %build_cedit% == 0 set build_cedit_arg=-E
-call cfastbundle -C %cfastrevision% %cfasttag% -S %smvrevision% %smvtag% %upload_arg% %only_installer% %build_cedit_arg%
+call cfastbundle -C %cfastrevision% -c %cfasttag% -S %smvrevision% -s %smvtag% %upload_arg% %only_installer% %build_cedit_arg%
 
 goto eof
 

@@ -89,8 +89,7 @@ echo ***CFAST installer built
 
 if x%upload% == x0 goto endif1
   cd %CURDIR%
-  echo call upload_cfast_bundle %cfastrev% %smvrev% %upload%
-pause
+  echo ***Uploading cfast installer %cfastrev% %smvrev% 
   call upload_cfast_bundle %cfastrev% %smvrev% %upload%
   echo ***CFAST installer uploaded
 :endif1
