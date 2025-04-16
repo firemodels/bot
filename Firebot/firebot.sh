@@ -1030,12 +1030,12 @@ check_compile_smv_db()
 
  # Check for compiler warnings/remarks
  # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
- if [[ `grep -E -i 'warning' $OUTPUT_DIR/stage3b | grep -v 'feupdateenv is not implemented' | grep -i -v cmake | grep -i -v CUDA | grep -v 18020 | grep -v 'was built for newer' | grep -v 'lcilkrts linked'` == "" ]]; then
+ if [[ `grep -E -i 'warning' $OUTPUT_DIR/stage3b | grep -v 'feupdateenv is not implemented' | grep -v 18020 | grep -v 'was built for newer' | grep -v 'lcilkrts linked'` == "" ]]; then
    # Continue along
    :
  else
    echo "Warnings from Stage 3b - Compile SMV debug:" >> $WARNING_LOG
-   grep -A 5 -E -i 'warning' $OUTPUT_DIR/stage3b | grep -v 'feupdateenv is not implemented' | grep -i -v cmake | grep -i -v CUDA | grep -v 18020 | grep -v 'was built for newer' | grep -v 'lcilkrts linked' >> $WARNING_LOG
+   grep -A 5 -E -i 'warning' $OUTPUT_DIR/stage3b | grep -v 'feupdateenv is not implemented' | grep -v 18020 | grep -v 'was built for newer' | grep -v 'lcilkrts linked' >> $WARNING_LOG
    echo "" >> $WARNING_LOG
  fi
 }
@@ -1074,12 +1074,12 @@ check_compile_smv()
 
   # Check for compiler warnings/remarks
   # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-  if [[ `grep -E -i 'warning' $OUTPUT_DIR/stage3c | grep -v 'was built for newer' | grep -i -v cmake | grep -i -v CUDA | grep -v 18020 | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]; then
+  if [[ `grep -E -i 'warning' $OUTPUT_DIR/stage3c | grep -v 'was built for newer' | grep -v 18020 | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]; then
     # Continue along
     :
   else
     echo "Warnings from Stage 3c - Compile SMV release:" >> $WARNING_LOG
-    grep -A 5 -E -i 'warning' $OUTPUT_DIR/stage3c | grep -v 'was built for newer' | grep -v cmake | grep -i -v CUDA | grep -v 18020 | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
+    grep -A 5 -E -i 'warning' $OUTPUT_DIR/stage3c | grep -v 'was built for newer' | grep -v 18020 | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
     echo "" >> $WARNING_LOG
   fi
   smv_release_success=true
