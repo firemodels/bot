@@ -430,22 +430,22 @@ check_compile_fds_mpi_db()
   fi
 
 
-  START_LINE="Building impi_intel_linux_${MPTYPE}_db"
 
-  # Check for compiler warnings/remarks
-  if [[ $(awk -v start="$START_LINE" '/^"start"$/ {found=1; next} found' "$OUTPUT_DIR/stage2b${MPTYPE}" | \
-         grep -E -i 'warning|remark' | \
-         grep -v -e mpiifort -e mpiifx -e 'no platform load command' -e 'pointer not aligned at address' \
-                 -e ipo -e Referenced -e atom -e 'is now deprecated' -e 'feupdateenv is not implemented') == "" ]]; then
-    # Continue along. No filtered warnings found.
-  :
+  START_LINE="Building impi_intel_linux"
+  # The awk search for a line starting with Building impi_intel_linux* (either _db or _openmp_db)
+  if [[ $(awk -v start="$START_LINE" '$0 ~ "^"start".*db$" {found=1; next} found' "$OUTPUT_DIR/stage2b${MPTYPE}" | \
+        grep -E -i 'warning|remark' | \
+        grep -v -e mpiifort -e mpiifx -e 'no platform load command' -e 'pointer not aligned at address' \
+                -e ipo -e Referenced -e atom -e 'is now deprecated' -e 'feupdateenv is not implemented') == "" ]]; then
+        # Continue along. No filtered warnings found.
+	:
   else
-    echo "Warnings from Stage 2b - Compile FDS MPI debug:" >> "$WARNING_LOG"
-    awk -v start="$START_LINE" '/^"start"$/ {found=1; next} found' "$OUTPUT_DIR/stage2b${MPTYPE}" | \
-      grep -A 5 -E -i 'warning|remark' | \
-      grep -v -e mpiifort -e mpiifx -e 'no platform load command' -e 'pointer not aligned at address' \
-              -e ipo -e Referenced -e atom -e 'feupdateenv is not implemented' >> "$WARNING_LOG"
-    echo "" >> "$WARNING_LOG"
+        echo "Warnings from Stage 2b - Compile FDS MPI debug:" >> "$WARNING_LOG"
+        awk -v start="$START_LINE" '$0 ~ "^"start".*db$" {found=1; next} found' "$OUTPUT_DIR/stage2b${MPTYPE}" | \
+         grep -A 5 -E -i 'warning|remark' | \
+         grep -v -e mpiifort -e mpiifx -e 'no platform load command' -e 'pointer not aligned at address' \
+            -e ipo -e Referenced -e atom -e 'is now deprecated' -e 'feupdateenv is not implemented' >> "$WARNING_LOG"
+         echo "" >> "$WARNING_LOG"
   fi
 }
 
