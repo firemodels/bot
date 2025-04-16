@@ -429,17 +429,23 @@ check_compile_fds_mpi_db()
      echo ""                                                              >> $ERROR_LOG
   fi
 
- 
+
+  START_LINE="Building impi_intel_linux_${MPTYPE}_db"
+
   # Check for compiler warnings/remarks
-   # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-  if [[ `grep -E -i 'warning|remark' $OUTPUT_DIR/stage2b${MPTYPE} | grep -v mpiifort | grep -v mpiifx | grep -v 'no platform load command' | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'is now deprecated'| grep -v 'feupdateenv is not implemented'` == "" ]]
-  then
-      # Continue along
-      :
+  if [[ $(awk -v start="$START_LINE" '/^"start"$/ {found=1; next} found' "$OUTPUT_DIR/stage2b${MPTYPE}" | \
+         grep -E -i 'warning|remark' | \
+         grep -v -e mpiifort -e mpiifx -e 'no platform load command' -e 'pointer not aligned at address' \
+                 -e ipo -e Referenced -e atom -e 'is now deprecated' -e 'feupdateenv is not implemented') == "" ]]; then
+    # Continue along. No filtered warnings found.
+  :
   else
-     echo "Warnings from Stage 2b - Compile FDS MPI debug:" >> $WARNING_LOG
-     grep -A 5 -E -i 'warning|remark' $OUTPUT_DIR/stage2b${MPTYPE} | grep -v mpiifort | grep -v 'no platform load command' | grep -v mpiifx | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
-     echo "" >> $WARNING_LOG
+    echo "Warnings from Stage 2b - Compile FDS MPI debug:" >> "$WARNING_LOG"
+    awk -v start="$START_LINE" '/^"start"$/ {found=1; next} found' "$OUTPUT_DIR/stage2b${MPTYPE}" | \
+      grep -A 5 -E -i 'warning|remark' | \
+      grep -v -e mpiifort -e mpiifx -e 'no platform load command' -e 'pointer not aligned at address' \
+              -e ipo -e Referenced -e atom -e 'feupdateenv is not implemented' >> "$WARNING_LOG"
+    echo "" >> "$WARNING_LOG"
   fi
 }
 
