@@ -3,12 +3,6 @@ setlocal
 
 set cfastbundledir=%CD%
 
-set configfile=%userprofile%\.bundle\bundle_config.bat
-if not exist %configfile% echo ***error: %userprofile%\bundle_config.bat does not exist
-if not exist %configfile% exit /b
-call %configfile%
-call check_config || exit /b 1
-
 set PDFS=%userprofile%\.cfast\PDFS
 
 if NOT exist %userprofile%\.cfast mkdir %userprofile%\.cfast
