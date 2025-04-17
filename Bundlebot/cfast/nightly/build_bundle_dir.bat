@@ -6,12 +6,6 @@ set vandvdir=%cfast_root%\Build\VandV_Calcs\intel_win_64
 set docdir=%cfast_root%\Manuals
 set CURDIR2=%CD%
 
-set configfile=%userprofile%\.bundle\bundle_config.bat
-if not exist %configfile% echo ***error: %userprofile%\bundle_config.bat does not exist
-if not exist %configfile% exit /b
-call %configfile%
-call check_config || exit /b 1
-
 cd %cfast_root%\..\bot
 set botrepo=%CD%
 cd %CURDIR2%
