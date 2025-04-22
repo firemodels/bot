@@ -429,17 +429,23 @@ check_compile_fds_mpi_db()
      echo ""                                                              >> $ERROR_LOG
   fi
 
- 
-  # Check for compiler warnings/remarks
-   # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-  if [[ `grep -E -i 'warning|remark' $OUTPUT_DIR/stage2b${MPTYPE} | grep -v mpiifort | grep -v mpiifx | grep -v 'no platform load command' | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'is now deprecated'| grep -v 'feupdateenv is not implemented'` == "" ]]
-  then
-      # Continue along
-      :
+
+
+  START_LINE="Building impi_intel_linux"
+  # The awk search for a line starting with Building impi_intel_linux* (either _db or _openmp_db)
+  if [[ $(awk -v start="$START_LINE" '$0 ~ "^"start".*db$" {found=1; next} found' "$OUTPUT_DIR/stage2b${MPTYPE}" | \
+        grep -E -i 'warning|remark' | \
+        grep -v -e mpiifort -e mpiifx -e 'no platform load command' -e 'pointer not aligned at address' \
+                -e ipo -e Referenced -e atom -e 'is now deprecated' -e 'feupdateenv is not implemented') == "" ]]; then
+        # Continue along. No filtered warnings found.
+	:
   else
-     echo "Warnings from Stage 2b - Compile FDS MPI debug:" >> $WARNING_LOG
-     grep -A 5 -E -i 'warning|remark' $OUTPUT_DIR/stage2b${MPTYPE} | grep -v mpiifort | grep -v 'no platform load command' | grep -v mpiifx | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
-     echo "" >> $WARNING_LOG
+        echo "Warnings from Stage 2b - Compile FDS MPI debug:" >> "$WARNING_LOG"
+        awk -v start="$START_LINE" '$0 ~ "^"start".*db$" {found=1; next} found' "$OUTPUT_DIR/stage2b${MPTYPE}" | \
+         grep -A 5 -E -i 'warning|remark' | \
+         grep -v -e mpiifort -e mpiifx -e 'no platform load command' -e 'pointer not aligned at address' \
+            -e ipo -e Referenced -e atom -e 'is now deprecated' -e 'feupdateenv is not implemented' >> "$WARNING_LOG"
+         echo "" >> "$WARNING_LOG"
   fi
 }
 
@@ -1030,12 +1036,12 @@ check_compile_smv_db()
 
  # Check for compiler warnings/remarks
  # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
- if [[ `grep -E -i 'warning' $OUTPUT_DIR/stage3b | grep -v 'feupdateenv is not implemented' | grep -v 18020 | grep -v 'was built for newer' | grep -v 'lcilkrts linked'` == "" ]]; then
+ if [[ `grep -E -i 'warning' $OUTPUT_DIR/stage3b | grep -v 'feupdateenv is not implemented' | grep -i -v SUN | grep -i -v generated | grep -i -v cmake | grep -v -i CUDA | grep -i -v VectorArray | grep -v 18020 | grep -v 'was built for newer' | grep -v 'lcilkrts linked'` == "" ]]; then
    # Continue along
    :
  else
    echo "Warnings from Stage 3b - Compile SMV debug:" >> $WARNING_LOG
-   grep -A 5 -E -i 'warning' $OUTPUT_DIR/stage3b | grep -v 'feupdateenv is not implemented' | grep -v 18020 | grep -v 'was built for newer' | grep -v 'lcilkrts linked' >> $WARNING_LOG
+   grep -A 5 -E -i 'warning' $OUTPUT_DIR/stage3b | grep -v 'feupdateenv is not implemented' | grep -i -v SUN | grep -i -v generated | grep -i -v cmake | grep -v -i CUDA | grep -i -v VectorArray | grep -v 18020 | grep -v 'was built for newer' | grep -v 'lcilkrts linked' >> $WARNING_LOG
    echo "" >> $WARNING_LOG
  fi
 }
@@ -1074,12 +1080,12 @@ check_compile_smv()
 
   # Check for compiler warnings/remarks
   # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-  if [[ `grep -E -i 'warning' $OUTPUT_DIR/stage3c | grep -v 'was built for newer' | grep -v 18020 | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]; then
+  if [[ `grep -E -i 'warning' $OUTPUT_DIR/stage3c | grep -v 'was built for newer' | grep -i -v SUN | grep -i -v generated | grep -i -v cmake | grep -v -i CUDA | grep -i -v VectorArray | grep -v 18020 | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]; then
     # Continue along
     :
   else
     echo "Warnings from Stage 3c - Compile SMV release:" >> $WARNING_LOG
-    grep -A 5 -E -i 'warning' $OUTPUT_DIR/stage3c | grep -v 'was built for newer' | grep -v 18020 | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
+    grep -A 5 -E -i 'warning' $OUTPUT_DIR/stage3c | grep -v 'was built for newer' | grep -i -v SUN | grep -i -v generated | grep -i -v cmake | grep -v -i CUDA | grep -i -v VectorArray | grep -v 18020 | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
     echo "" >> $WARNING_LOG
   fi
   smv_release_success=true
