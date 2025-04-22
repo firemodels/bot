@@ -330,9 +330,9 @@ smvbindir=$bundledir/smvbin
 fdsbindir=$bundledir/bin
 
 webpagesdir=$REPO_ROOT/webpages
-fds_bundle=$REPO_ROOT/bot/Bundlebot/fds/for_bundle
-smv_bundle=$REPO_ROOT/bot/Bundlebot/smv/for_bundle
-webgldir=$REPO_ROOT/bot/Bundlebot/smv/for_bundle/webgl
+fds_bundle=$REPO_ROOT/fds/Build/for_bundle
+smv_bundle=$REPO_ROOT/smv/Build/for_bundle
+webgldir=$REPO_ROOT/smv/Build//for_bundle/webgl
 smvscriptdir=$REPO_ROOT/smv/scripts
 utilscriptdir=$REPO_ROOT/smv/Utilities/Scripts
 botscriptdir=$REPO_ROOT/bot/Scripts
