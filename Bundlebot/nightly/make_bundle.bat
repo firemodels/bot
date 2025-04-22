@@ -95,7 +95,7 @@ if "x%bot%" == "xbot" goto skip2
 :endif0
 
 set in_pdf=%userprofile%\.bundle\pubs
-set smv_forbundle=%repo_root%\bot\Bundlebot\smv\for_bundle
+set smv_forbundle=%repo_root%\smv\Build\for_bundle
 
 set basedir=%upload_dir%\%basename%
 
