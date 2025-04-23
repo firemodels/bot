@@ -2408,7 +2408,7 @@ if [ "$CACHE_DIR" != "" ]; then
     ABORT=1
   fi
   if [ ! -d $CACHE_DIR/Verificaiton ]; then
-    echo "***error: cache directory $CACHE_DIR/WUI does not exist"
+    echo "***error: cache directory $CACHE_DIR/Verification does not exist"
     ABORT=1
   fi
 fi
