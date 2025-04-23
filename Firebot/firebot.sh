@@ -2403,10 +2403,6 @@ if [ "$CACHE_DIR" != "" ]; then
   cd $CACHE_DIR
   CACHE_DIR=`pwd`
   cd $CURRENT_DIR
-  if [ ! -d $CACHE_DIR/Build ]; then
-    echo "***error: cache directory $CACHE_DIR/Build does not exist"
-    ABORT=1
-  fi
   if [ ! -d $CACHE_DIR/Verification ]; then
     echo "***error: cache directory $CACHE_DIR/Verification does not exist"
     ABORT=1
@@ -2810,9 +2806,6 @@ if [ "$CHECK_CLUSTER" == "" ]; then
 fi
 
 if [ "$CACHE_DIR" != "" ]; then
-  rm -rf $fdsrepo/Build
-  cp -r $CACHE_DIR/Build $fdsrepo/.
-
   rm -rf $fdsrepo/Verification
   cp -r $CACHE_DIR/Verification $fdsrepo/.
 fi
