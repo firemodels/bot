@@ -2407,7 +2407,7 @@ if [ "$CACHE_DIR" != "" ]; then
     echo "***error: cache directory $CACHE_DIR/Build does not exist"
     ABORT=1
   fi
-  if [ ! -d $CACHE_DIR/Verificaiton ]; then
+  if [ ! -d $CACHE_DIR/Verification ]; then
     echo "***error: cache directory $CACHE_DIR/Verification does not exist"
     ABORT=1
   fi
@@ -2811,10 +2811,10 @@ fi
 
 if [ "$CACHE_DIR" != "" ]; then
   rm -rf $fdsrepo/Build
-  cp -r $CACHE_DIR/Build $fds/repo/.
+  cp -r $CACHE_DIR/Build $fdsrepo/.
 
   rm -rf $fdsrepo/Verification
-  cp -r $CACHE_DIR/Verification $fds/repo/.
+  cp -r $CACHE_DIR/Verification $fdsrepo/.
 fi
 
 get_fds_revision $FDSBRANCH || exit 1
@@ -2858,7 +2858,7 @@ GET_DURATION $SETUP_beg $SETUP_end SETUP
 ###****** Stage 2b ###
 
 BUILD_beg=`GET_TIME`
-if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR == "" ]]; then
+if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
   compile_fds_mpi_db         $FDS_DB_DIR $FDS_DB_EXE
   check_compile_fds_mpi_db   $FDS_DB_DIR $FDS_DB_EXE
   if [ "$OPENMPTEST" != "" ]; then 
@@ -2869,7 +2869,7 @@ fi
 
 ###*** Stage 2d ###
 
-if [[ "$OPENMPI_GNU" != "" ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR == "" ]]; then
+if [[ "$OPENMPI_GNU" != "" ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
 
   compile_fds_mpi_gnu_db       $FDSGNU_DB_DIR
   check_compile_fds_mpi_gnu_db
@@ -2877,7 +2877,7 @@ fi
 
 ###*** Stage 2c ###
 
-if [[ "$SKIPRELEASE" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CACHE_DIR == "" ]]; then
+if [[ "$SKIPRELEASE" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
   compile_fds_mpi         $FDS_DIR $FDS_EXE
   check_compile_fds_mpi   $FDS_DIR $FDS_EXE
   if [ "$OPENMPTEST" != "" ]; then 
@@ -2920,12 +2920,12 @@ GET_DURATION $BUILD_beg $BUILD_end BUILD
 
 DEBUG_beg=`GET_TIME`
 # Depends on successful FDS debug compile
-if [[ $FDS_debug_success ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR == "" ]]; then
+if [[ $FDS_debug_success ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
    run_verification_cases_debug
    check_cases_debug $fdsrepo/$VERIFICATION_DEBUG 'verification'
 fi
 
-if [[ "$CLONE_REPOS" == "" ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR == "" ]]; then
+if [[ "$CLONE_REPOS" == "" ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
 # clean debug stage (only if repos were not cloned)
   cd $fdsrepo
   if [[ "$CLEANREPO" == "1" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
@@ -2939,7 +2939,7 @@ GET_DURATION $DEBUG_beg $DEBUG_end DEBUG
 ###*** Stage 5 ###
 
 RELEASE_beg=`GET_TIME`
-if [[ "$BUILD_ONLY" == "" ]] && [[ "$CACHE_DIR == "" ]];  then
+if [[ "$BUILD_ONLY" == "" ]] && [[ "$CACHE_DIR" == "" ]];  then
 # Depends on successful FDS compile
   if [[ $FDS_release_success ]] && [[ "$SKIPRELEASE" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
     run_VV_cases_release
@@ -2977,7 +2977,7 @@ GET_DURATION $PICTURE_beg $PICTURE_end PICTURE
 
 MATLAB_beg=`GET_TIME`
   generate_timing_stats
-  if [[ "$SKIPMATLAB" == "" ]] && [[ "$CACHE_DIR == "" ]]; then
+  if [[ "$SKIPMATLAB" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
 
 ###*** Stage 7a ###
 
@@ -3026,7 +3026,7 @@ GET_DURATION $MATLAB_beg $MATLAB_end MATLAB
 ###*** Stage 8 ###
 
 MANUALS_beg=`GET_TIME`
-  if [[ "$SKIPMATLAB" == "" ]] && [[ "$CACHE_DIR == "" ]]; then
+  if [[ "$SKIPMATLAB" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
     make_fds_user_guide
 #    make_geom_notes
     make_fds_verification_guide
