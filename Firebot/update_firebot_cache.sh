@@ -32,3 +32,4 @@ rm -rf $CACHE_DIR/Verification
 
 echo Updating $fdsrepo/Verification/
 cp -r $fdsrepo/Verification $CACHE_DIR/.
+cp -r $fdsrepo/Build        $CACHE_DIR/.
