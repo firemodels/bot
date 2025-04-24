@@ -46,6 +46,8 @@ echo "-o - specify GH_OWNER when uploading manuals. [default: $GH_OWNER]"
 echo "-r - specify GH_REPO when uploading manuals. [default: $GH_REPO]"
 echo "-R branch_name - clone fds, exp, fig, out and smv repos. fds and smv repos"
 echo "     will be checked out with a branch named 'branch_name'"
+echo "-s dir - use cached fds, Verification and Verification_dbg directories"
+echo "         located under the directory dir"
 echo "-T - only clone the fds and smv repos (this option is set by default when"
 echo "     only building apps (-B) and cloning repos (-R)"
 echo "-V option - if option is 'all' run all validation cases 1 time step, otherwise"
@@ -217,10 +219,11 @@ OPENMPTEST=
 CLONEFILE=
 BUILD_3RD_PARTY=
 FORCE_UPLOAD=
+CACHE_DIR=
 
 #*** parse command line options
 
-while getopts '3bBcCdDfFhGHJkm:MnNo:OPq:r:R:TuUvV:w:W:x:X:y:Y:z' OPTION
+while getopts '3bBcCdDfFhGHJkm:MnNo:OPq:r:R:s:TuUvV:w:W:x:X:y:Y:z' OPTION
 do
 case $OPTION  in
   3)
@@ -275,7 +278,7 @@ case $OPTION  in
    UPDATEREPO=
    ;;
   N)
-   SKIPMATLAB=-s
+   SKIPMATLAB=-S
    ;;
   o)
    export GH_OWNER="$OPTARG"
@@ -295,6 +298,9 @@ case $OPTION  in
   R)
    CLONE_REPOS="$OPTARG"
    BRANCH=current
+   ;;
+  s)
+   CACHE_DIR="-s $OPTARG"
    ;;
   T)
     CLONE_FDSSMV="-T"
@@ -574,7 +580,7 @@ else
 fi
 touch $firebot_pid
 firebot_status=0
-$ECHO  ./firebot.sh -p $firebot_pid $BUILD_3RD_PARTY $UPDATEREPO $INTEL $OPENMPTEST $BUILD_ONLY $FORCE_UPLOAD $FORCECLONE $BRANCH $DEBUG_MODE $MANUALS_MATLAB_ONLY $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $UPLOADGUIDES $CLEANREPO $QUEUE $SKIPMATLAB $CLONE_REPOS $CLONE_FDSSMV $VALIDATION $CLONEFILE $EMAIL $WEB_ROOT $WEB_DIR "$@"
+$ECHO  ./firebot.sh -p $firebot_pid $BUILD_3RD_PARTY $UPDATEREPO $INTEL $CACHE_DIR $OPENMPTEST $BUILD_ONLY $FORCE_UPLOAD $FORCECLONE $BRANCH $DEBUG_MODE $MANUALS_MATLAB_ONLY $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $UPLOADGUIDES $CLEANREPO $QUEUE $SKIPMATLAB $CLONE_REPOS $CLONE_FDSSMV $VALIDATION $CLONEFILE $EMAIL $WEB_ROOT $WEB_DIR "$@"
 firebot_status=$?
 if [ -e $firebot_pid ]; then
   rm -f $firebot_pid
