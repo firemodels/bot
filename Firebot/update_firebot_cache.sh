@@ -18,7 +18,6 @@ cd ..
 REPO_ROOT=`pwd`
 
 fdsrepo=$REPO_ROOT/fds
-smvrepo=$REPO_ROOT/smv
 ABORT=
 DIR=$fdsrepo/Verification/
 if [ ! -d $DIR ]; then
@@ -28,8 +27,6 @@ fi
 if [ "$ABORT" != "" ]; then
   exit
 fi
-rm -rf $CACHE_DIR/Verification
-
 echo Updating $fdsrepo/Verification/
+rm -rf $CACHE_DIR/Verification
 cp -r $fdsrepo/Verification $CACHE_DIR/.
-cp -r $fdsrepo/Build        $CACHE_DIR/.
