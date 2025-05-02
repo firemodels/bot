@@ -4,9 +4,9 @@
 # ----------------------------
 # repo environment variables
 
-# CFAST7.7.4-204-ga19191c20
-export BUNDLE_CFAST_REVISION=a19191c20
-export BUNDLE_CFAST_TAG=CFAST-7.7.5
+# CFAST-7.7.5-5-gf8ee00a6e
+export BUNDLE_CFAST_REVISION=f8ee00a6e
+export BUNDLE_CFAST_TAG=CFAST-7.7.6
 
 # EXP-6.10.0-0-g3c1046d02
 export BUNDLE_EXP_REVISION=3c1046d02
