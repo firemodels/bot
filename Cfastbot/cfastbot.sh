@@ -1375,21 +1375,11 @@ email_build_status()
 
    # No errors or warnings
    else
-      is_bot=
-      if [ `whoami` == "cfast" ]; then
-         is_bot=1
-      fi
-      if [ `whoami` == "firebot" ]; then
-         is_bot=1
-      fi
-      if [ `whoami` == "smokebot" ]; then
-         is_bot=1
-      fi
       if [ -d $LATEST_MANUALS_DIR ]; then
         rm -rf $MANUALS_DIR
         cp -r $LATEST_MANUALS_DIR $MANUALS_DIR
       fi
-      if [[ "$UPLOAD" == "1" ]] && [[ -e $GUIDES2GH ]] && [[ "$is_bot"  == "1" ]]; then
+      if [[ "$UPLOAD" == "1" ]] && [[ -e $GUIDES2GH ]]; then
          cd $cfastbotdir
          $GUIDES2GH >& $OUTPUT_DIR/stage_upload
          GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_CFAST_TAG
