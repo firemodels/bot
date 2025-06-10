@@ -261,7 +261,7 @@ if [ "$KILL_CFASTBOT" == "1" ]; then
     echo "killing cfastbot (PID=$PID)"
     kill -9 $PID
     if [ "$QUEUE" != "none" ]; then
-      JOBIDS=`qstat -a | grep CB_ | awk -v user="$USER" '{if($2==user){print $1}}'`
+      JOBIDS=`qstat -a | grep cb_ | awk -v user="$USER" '{if($2==user){print $1}}'`
       if [ "$JOBIDS" != "" ]; then
         echo killing cfastbot jobs with Id:$JOBIDS
         qdel $JOBIDS

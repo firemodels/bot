@@ -1650,7 +1650,7 @@ if [ -e $CFAST_STATUS_FILE ] ; then
    LAST_CFAST_FAILED=`cat $CFAST_STATUS_FILE`
 fi
 
-export JOBPREFIX=CB_
+export JOBPREFIX=cb_
 GUIDES2GH=$cfastbotdir/guides2GH.sh
 
 #  ==============================================

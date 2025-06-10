@@ -4,15 +4,15 @@
 # ----------------------------
 # repo environment variables
 
-# CFAST7.7.4-223-g6feca9299
-export BUNDLE_CFAST_REVISION=6feca9299
-export BUNDLE_CFAST_TAG=CFAST-7.7.5
+# CFAST-7.7.5-9-gfb192f6ff
+export BUNDLE_CFAST_REVISION=fb192f6ff
+export BUNDLE_CFAST_TAG=CFAST-7.7.6
 
 # EXP-6.10.0-0-g3c1046d02
 export BUNDLE_EXP_REVISION=3c1046d02
 export BUNDLE_EXP_TAG=EXP-6.10.1
 
-# SMV-6.10.0-228-gfe486ab05
-export BUNDLE_SMV_REVISION=fe486ab05
-export BUNDLE_SMV_TAG=SMV-6.10.1
+# SMV-6.10.1-189-gefd12b639
+export BUNDLE_SMV_REVISION=efd12b639
+export BUNDLE_SMV_TAG=SMV-6.10.2
 
