@@ -144,7 +144,7 @@ echo. > %stagestatus%
 
 if %use_installed_cfast% == 1 goto skip_ifort
 call ..\..\cfast\Build\scripts\setup_intel_compilers.bat
-ifort 1> %OUTDIR%\stage0a.txt 2>&1
+ifx 1> %OUTDIR%\stage0a.txt 2>&1
 type %OUTDIR%\stage0a.txt | find /i /c "not recognized" > %OUTDIR%\stage_count0a.txt
 set /p nothaveFORTRAN=<%OUTDIR%\stage_count0a.txt
 if %nothaveFORTRAN% == 0 (
@@ -159,7 +159,7 @@ if %nothaveFORTRAN% == 0 (
 :: ---------------- C/C++
 
 if %use_installed_smokeview% == 1 goto skip_icc
-icl 1> %OUTDIR%\stage0a.txt 2>&1
+icx 1> %OUTDIR%\stage0a.txt 2>&1
 type %OUTDIR%\stage0a.txt | find /i /c "not recognized" > %OUTDIR%\stage_count0a.txt
 set /p nothaveICC=<%OUTDIR%\stage_count0a.txt
 
