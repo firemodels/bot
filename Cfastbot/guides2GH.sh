@@ -2,7 +2,7 @@
 
 CURDIR=`pwd`
 
-FROMDIR=~cfast/.cfastbot/Manuals
+FROMDIR=$HOME/.cfastbot/Manuals
 
 UPLOADGUIDE ()
 {
