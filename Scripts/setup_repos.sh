@@ -29,7 +29,6 @@ echo "    $smvrepos"
 echo "-t - append test to repo name, do not erase if repo exists"
 echo "-T - only setup fds and smv repos (erase each repo first)"
 echo "-U - only setup smv repo (erase each repo first)"
-echo "-v - setup openvkl repo"
 echo "-w - setup wiki and webpage repos cloned from firemodels"
 exit
 }
@@ -41,9 +40,6 @@ SETUP_REMOTE ()
   basedir=`basename $repo_dir`
   cd $repo_dir
   CENTRAL=firemodels
-  if [ "$repo" == "openvkl" ]; then
-    CENTRAL=openvkl
-  fi
   if [ "$repo" == "hypre" ]; then
     CENTRAL=hypre-space
   fi
@@ -92,7 +88,6 @@ fdssmvrepos="fds smv"
 smvonlyrepos="smv"
 firebotrepos="cad exp fds fds-smv fig out smv test_bundles"
 smvrepos="cfast fds fig smv test_bundles"
-vklrepos="openvkl"
 cfastbotrepos="cfast exp fig smv test_bundles"
 cfastrepos="cfast exp smv"
 allrepos="cad cfast cor exp fds fig out radcal smv test_bundles"
@@ -113,7 +108,7 @@ else
    exit
 fi
 
-while getopts '3aABbcCDefFGH:hsStTUvw' OPTION
+while getopts '3aABbcCDefFGH:hsStTUw' OPTION
 do
 case $OPTION  in
   3)
@@ -185,9 +180,6 @@ case $OPTION  in
   U)
    repos=$smvonlyrepos;
    eraserepos=1
-   ;;
-  v)
-   repos=$vklrepos;
    ;;
   w)
    repos=$wikiwebrepos;
@@ -278,9 +270,6 @@ do
 
   GITOWNER=$GITUSER
   if [ "$GITUSER" == "firemodels" ]; then
-    if [ "$repo" == "openvkl" ]; then
-      GITOWNER=openvkl
-    fi
     if [ "$repo" == "hypre" ]; then
       GITOWNER=hypre-space
     fi
