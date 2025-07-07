@@ -7,7 +7,7 @@ The directory [bot/Bundlebot/release](https://github.com/firemodels/bot/tree/mas
  
   1. modify configuration scripts ( `config.sh` and `config.bat` ) that define tags and associated revisions for the release,
   2. run scripts that build FDS ( `BUILD_fds_manuals.sh` ) and Smokeview ( `BUILD_smv_manuals.sh`) manuals,
-  3. run scripts that build the FDS/smv ( `BUILD_fdssmv_release.sh` ) and Smokeview ( `BUILD_smv_release.sh` ) and finally
+  3. run scripts that build the FDS/smv ( `BUILD_fdssmv_release.sh` ) and Smokeview ( `BUILD_smv_release.sh` ) bundles and finally
   4. push up tags to the central repo and define a release.
   
 These steps are given in more detail below.
