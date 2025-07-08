@@ -5,9 +5,9 @@
 
 The directory [bot/Bundlebot/release](https://github.com/firemodels/bot/tree/master/Bundlebot/release) contains scripts for building FDS/Smokeview and Smokeview bundles for Windows, Linux and Macintosh computers. The steps for bulding bundles are: 
  
-  1. modify configuration scripts ( `config.sh` and `config.bat` ) that define tags and associated revisions for the release,
-  2. run scripts that build FDS ( `BUILD_fds_manuals.sh` ) and Smokeview ( `BUILD_smv_manuals.sh`) manuals,
-  3. run scripts that build the FDS/smv ( `BUILD_fdssmv_release.sh` ) and Smokeview ( `BUILD_smv_release.sh` ) bundles and finally
+  1. modify configuration scripts,  `config.sh` and `config.bat`, that define tags and associated revisions for the release,
+  2. run scripts that build FDS manuals, `BUILD_fds_manuals.sh`, and Smokeview manuals, `BUILD_smv_manuals.sh`,
+  3. run scripts that build the FDS/Smokeview bundles, `BUILD_fdssmv_release.sh`, and Smokeview bundles, `BUILD_smv_release.sh` ), and finally
   4. push up tags to the central repo and define a release.
   
 These steps are given in more detail below.
@@ -15,8 +15,8 @@ These steps are given in more detail below.
 ### Configure The Bundle Scripts
 
    1. cd to bot/Scripts and run the script `./update_repos.sh -m` to update repos .  The option `-m` makes sure each repo is set to the master branch before updating.
-   2. After updating the repos, checkout the desired revision if the latest revision is not the revision you want to use to make the bundle.
-   3. cd to bot/Bundlebot/release and run the script `MakeConfig.sh` to update the configuration scripts `config.sh` and `config.bat` using
+   2. Checkout the desired revision if the latest revision is not the revision you want to use to make the bundle.
+   3. cd to bot/Bundlebot/release and run the script `MakeConfig.sh` . This script updates the two configuration scripts `config.sh` and `config.bat` by using
       
       `./MakeConfig.sh x.y.z`
       
@@ -26,18 +26,27 @@ where `x.y.z is the version number of the release to be built, for example 6.10.
 
 ### Build Manuals
 
+The manuals are built using the firebot account.
+
    1. Type: `sudo su - firebot` on the computer that runs firebot (spark at Nist) to switch to the firebot user account.
-   2. Type: `cd FireModels_bundle/bot/Bundlebot/release` and update the `bot` repo ( to ensure that the bundle scripts use the right `config.sh` script.)
+   2. Type: `cd FireModels_bundle/bot/Bundlebot/release` and update the `bot` repo ( to ensure that the bundle scripts use the correct `config.sh` script.)
    3. Build FDS manuals. Type: `nohup ./BUILD_fds_manuals.sh &` .  After this step completes (about 4 hours) continue to the next step
    4. Build Smokeview manuals. Type: `nohup ./BUILD_smv_manuals.sh &` . After this step completes (about 30 minutes) start building the bundles.
 
 ### Build Bundles
 
-   1. If not already in the firebot account, type: `sudo su - firebot` to switch to the firebot user account.
+#### Linux and Macintosh bundles
+
+Linux (spark at NIST) and Macintosh (excess at NIST) bundles are also built using the firebot account. 
+
+   1. Type: `sudo su - firebot` to switch to the firebot user account.
    2. Type: `cd FireModels_bundle/bot/Bundlebot/release`
-   3. Build Linux bundles. Type : `nohup ./BUILD_fdssmv_release.sh &` on a Linux computer.
-   4. Build Macintosh bundles. Type : `nohup ./BUILD_fdssmv_release.sh &` on a Mac computer.
-   5. Build Windows bundles. Type: `BUILD_fdssmv_release ` on a Windows PC. (nohup is not available on Windows).
+   3. Type : `nohup ./BUILD_fdssmv_release.sh &`
+   
+#### Windows bundles
+
+   1. Type: `cd FireModels_bundle\bot\Bundlebot\release`
+   2. Type: `BUILD_fdssmv_release `
 
 ### Testing
 
