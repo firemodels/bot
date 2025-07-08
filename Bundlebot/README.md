@@ -37,7 +37,7 @@ The manuals are built using the firebot account.
 
 #### Linux and Macintosh bundles
 
-Linux (spark at NIST) and Macintosh (excess at NIST) bundles are also built using the firebot account. 
+Linux (spark at NIST) and Macintosh (excess at NIST) bundles are built using the firebot account. 
 
    1. Type: `sudo su - firebot` to switch to the firebot user account.
    2. Type: `cd FireModels_bundle/bot/Bundlebot/release`
