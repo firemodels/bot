@@ -14,8 +14,9 @@ These steps are given in more detail below.
 
 ### Configure The Bundle Scripts
 
-   1. cd to bot/Scripts and run the script `./update_repos.sh -m` to update repos .  The option `-m` makes sure each repo is in the master branch before updating. After updating the repos, checkout the desired revision if the latest revision is not the revision you want to use to make the bundle.
-   2. cd to bot/Bundlebot/release and run the script `MakeConfig.sh` to update the configuration scripts `config.sh` and `config.bat` using
+   1. cd to bot/Scripts and run the script `./update_repos.sh -m` to update repos .  The option `-m` makes sure each repo is set to the master branch before updating.
+   2. After updating the repos, checkout the desired revision if the latest revision is not the revision you want to use to make the bundle.
+   3. cd to bot/Bundlebot/release and run the script `MakeConfig.sh` to update the configuration scripts `config.sh` and `config.bat` using
       
       `./MakeConfig.sh x.y.z`
       
@@ -28,7 +29,7 @@ where `x.y.z is the version number of the release to be built, for example 6.10.
    1. Type: `sudo su - firebot` on the computer that runs firebot (spark at Nist) to switch to the firebot user account.
    2. Type: `cd FireModels_bundle/bot/Bundlebot/release` and update the `bot` repo ( to ensure that the bundle scripts use the right `config.sh` script.)
    3. Build FDS manuals. Type: `nohup ./BUILD_fds_manuals.sh &` .  After this step completes (about 4 hours) continue to the next step
-   4. Build Smokeview manuals. Type: `nohup ./BUILD_smv_manuals.sh &` . After this step completes (about 30 minutes) continue to the next step.
+   4. Build Smokeview manuals. Type: `nohup ./BUILD_smv_manuals.sh &` . After this step completes (about 30 minutes) start building the bundles.
 
 ### Build Bundles
 
