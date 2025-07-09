@@ -15,7 +15,7 @@ These steps are given in more detail below.
 ### Configure The Bundle Scripts
 
    1. cd to bot/Scripts and run the script `./update_repos.sh -m` to update repos .  The option `-m` makes sure each repo is set to the master branch before updating.
-   2. Checkout the desired revision if the latest revision is not the revision you want to use to make the bundle.
+   2. For each repo, checkout the desired revision if the latest revision is not the revision you want to use to make the bundle.
    3. cd to bot/Bundlebot/release and run the script `MakeConfig.sh` . This script updates the two configuration scripts `config.sh` and `config.bat` by using
       
       `./MakeConfig.sh x.y.z`
