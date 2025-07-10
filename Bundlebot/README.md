@@ -44,14 +44,16 @@ Note `owner` in `-o owner` is the github owner where the manuals will be placed 
 
 Linux (spark at NIST) and Macintosh (excess at NIST) bundles are built using the firebot account. 
 
-   1. Type: `sudo su - firebot` to switch to the firebot user account.
-   2. Type: `cd FireModels_bundle/bot/Bundlebot/release`
-   3. Type : `nohup ./BUILD_fdssmv_release.sh &`
+   1. Switch to the firebot account using `sudo su - firebot` .
+   2. cd to the `FireModels_bundle/bot/Bundlebot/release` directory
+   3. Update the bot repo.
+   4. Type : `./BUILD_fdssmv_release.sh -o owner -m email@address`
    
 #### Windows bundles
 
-   1. Type: `cd FireModels_bundle\bot\Bundlebot\release`
-   2. Type: `BUILD_fdssmv_release `
+   1. cd to the `FireModels_bundle\bot\Bundlebot\release` directory
+   2. Update the bot repo
+   3. Type: `BUILD_fdssmv_release `
 
 ### Testing
 
@@ -67,7 +69,6 @@ Linux (spark at NIST) and Macintosh (excess at NIST) bundles are built using the
 
 ### Notes
       
-1. `nohup` is used when building bundles on Linux and Macintosh computers so that the bundle generating script will continue to run if the command shell is disconnected from your terminal.  The output goes to the file `nohup.out`. Type `tail -f nohup.out` to see  output while the script is running.
 2. The scripts for building FDS and Smokeview manuals and building the bundle use environment variables to define repo revisions and tags.  These variables are defined in the scripts `config.sh` (on Linux and Macintosh computers) and `config.bat` (on Windows computers).
 3. Bundle scripts erase and clone fresh copies of the fds and smv repos. These scripts should not be run in repos where daily work is performed.   At NIST, Linux Manuals are built in the firebot user account in the directory Firemodels_bundle/bot/Bundlebot/build directory on the host blaze.
 4. The `BUILD_fdssmv_release.sh.sh` and `BUILD_fdssmv_release.sh.bat` scripts upload the test bundles to https://github.com/firemodels/test_bundles/releases/tag/BUNDLE_TEST
