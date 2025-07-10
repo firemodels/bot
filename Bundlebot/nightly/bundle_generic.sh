@@ -509,7 +509,7 @@ echo "--- copying release notes ---"
 echo ""
 
 CP $webpagesdir FDS_Release_Notes.htm $bundledir/Documentation FDS_Release_Notes.html
-CP $webpagesdir smv_readme.html       $bundledir/Documentation SMV_Release_Notes.html
+CP $webpagesdir SMV_Release_Notes.htm $bundledir/Documentation SMV_Release_Notes.html
 
 export OUTDIR=$bundledir/Examples
 export QFDS=$copyfdscase

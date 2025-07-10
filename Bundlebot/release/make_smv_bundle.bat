@@ -114,11 +114,11 @@ copy %forbundle%\colorbars\rainbow\*.csv   %smvdir%\colorbars\rainbow   >Nul
 copy %forbundle%\colorbars\divergent\*.csv %smvdir%\colorbars\divergent >Nul
 copy %forbundle%\colorbars\circular\*.csv  %smvdir%\colorbars\circular  >Nul
 
-CALL :COPY  %forbundle%\objects.svo             %smvdir%\.
-CALL :COPY  %sh2bat%\sh2bat_win_64.exe          %smvdir%\sh2bat.exe
-CALL :COPY  %gettime%\get_time_win_64.exe       %smvdir%\get_time.exe
-CALL :COPY  %reporoot%\webpages\smv_readme.html %smvdir%\release_notes.html
-CALL :COPY  %forbundle%\.smokeview_bin          %smvdir%\.
+CALL :COPY  %forbundle%\objects.svo                   %smvdir%\.
+CALL :COPY  %sh2bat%\sh2bat_win_64.exe                %smvdir%\sh2bat.exe
+CALL :COPY  %gettime%\get_time_win_64.exe             %smvdir%\get_time.exe
+CALL :COPY  %reporoot%\webpages\SMV_Release_Notes.htm %smvdir%\release_notes.html
+CALL :COPY  %forbundle%\.smokeview_bin                %smvdir%\.
 
 echo.
 echo --- compressing distribution directory ---
