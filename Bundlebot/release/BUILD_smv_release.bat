@@ -9,6 +9,16 @@ call config
 
 set basename=%BUNDLE_SMV_TAG%_win
 set fullfilebase=%userprofile%\.bundle\uploads\%basename%
+set CURDIR=%CD%
+
+:: update web repo
+if NOT exist ..\..\..\webpages echo *** error webpages repos does not exist
+if NOT exist ..\..\..\webpages exit /b
+cd ..\..\..\webpages
+git remote update
+git merge origin/nist-pages
+cd %CURDIR%
+
 
 :: clone smv repo
 call clone_smv_repo  %BUNDLE_SMV_REVISION% release %BUNDLE_SMV_TAG%
