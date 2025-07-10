@@ -331,9 +331,9 @@ echo.
 echo --- copying startup shortcuts ---
 echo.
  
-CALL :COPY "%repo_root%\webpages\smv_readme.html"      "%out_guides%\Smokeview_release_notes.html"
-CALL :COPY "%fds_forbundle%\Overview.html"             "%out_doc%\Overview.html"
-CALL :COPY "%fds_forbundle%\FDS_Web_Site.url"          "%out_web%\Official_Web_Site.url"
+CALL :COPY "%repo_root%\webpages\SMV_Release_Notes.htm" "%out_guides%\Smokeview_release_notes.html"
+CALL :COPY "%fds_forbundle%\Overview.html"              "%out_doc%\Overview.html"
+CALL :COPY "%fds_forbundle%\FDS_Web_Site.url"           "%out_web%\Official_Web_Site.url"
 
 set outdir=%out_examples%
 set QFDS=call %copyFDScases%
