@@ -2255,8 +2255,9 @@ if [[ $stage_ver_release_success ]] ; then
 
 # copy images to be compared to summary directory
      COMPAREIMAGES_beg=`GET_TIME`
-     cp $smvrepo/Manuals/SMV_User_Guide/SCRIPT_FIGURES/*.png         $SMV_SUMMARY_DIR/images/user/.
-     cp $smvrepo/Manuals/SMV_Verification_Guide/SCRIPT_FIGURES/*.png $SMV_SUMMARY_DIR/images/verification/.
+     cp $smvrepo/Manuals/SMV_User_Guide/SCRIPT_FIGURES/*.png                $SMV_SUMMARY_DIR/images/user/.
+     cp $smvrepo/Manuals/SMV_Technical_Reference_Guide/SCRIPT_FIGURES/*.png $SMV_SUMMARY_DIR/images/user/.
+     cp $smvrepo/Manuals/SMV_Verification_Guide/SCRIPT_FIGURES/*.png        $SMV_SUMMARY_DIR/images/verification/.
      cd $botrepo/Smokebot
      ./remove_images.sh $SMV_SUMMARY_DIR/images
 
