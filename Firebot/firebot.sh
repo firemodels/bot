@@ -1209,11 +1209,11 @@ run_python_validation()
 {
    echo Python validation plots
    cd $fdsrepo/Utilities/Python
-   python hello_world.py > $OUTPUT_DIR/stage7b_python_validation 2>&1
+   python FDS_validation_script.py > $OUTPUT_DIR/stage7b_python_validation 2>&1
 }
 
 #---------------------------------------------
-#                   check_python_verification
+#                   check_python_validation
 #---------------------------------------------
 
 check_python_validation()
