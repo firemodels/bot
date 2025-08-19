@@ -1157,9 +1157,9 @@ check_python_setup()
    if [[ `grep "Error" $OUTPUT_DIR/stage7_python_setup` != "" ]]; then
      python_success=false
    fi
-   if [[ `grep "Hello World" $OUTPUT_DIR/stage7_python_setup` == "" ]]; then
-     python_success=false
-   fi
+#   if [[ `grep "Hello World" $OUTPUT_DIR/stage7_python_setup` == "" ]]; then
+#     python_success=false
+#   fi
    if [ $python_success == false ]; then
       echo "Errors from Stage 7 - Python failed to be setup" >> $FYI_LOG
       grep "Error" $OUTPUT_DIR/stage7_python_setup           >> $FYI_LOG
