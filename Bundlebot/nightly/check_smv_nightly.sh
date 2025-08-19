@@ -75,5 +75,9 @@ if [ -e $errors ]; then
     cat $errors | mail -s "***error: one or more nightly Smokeview bundles were not generated" $MAILTO
   fi
 else
-  echo All Smokeview bundles were generated
+  if [ "$MAILTO" != "" ]; then
+    echo "" | mail -s "All Smokeview nightly bundles were generated" $MAILTO
+  else
+    echo All Smokeview bundles were generated
+  fi
 fi
