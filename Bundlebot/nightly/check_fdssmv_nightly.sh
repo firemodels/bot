@@ -75,7 +75,7 @@ if [ -e $errors ]; then
   fi
 else
   if [ "$MAILTO" != "" ]; then
-    mail -s "All FDS/Smokeview bundles were generated" $MAILTO
+    echo "https://github.com/firemodels/test_bundles/releases/tag/FDS_TEST" | mail -s "All FDS/Smokeview bundles were generated" $MAILTO
   else
     echo All FDS/Smokeview bundles were generated
   fi
