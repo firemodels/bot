@@ -73,12 +73,12 @@ if [ -e $errors ]; then
   cat $errors
   if [ "$MAILTO" != "" ]; then
     echo "https://github.com/firemodels/test_bundles/releases/tag/SMOKEVIEW_TEST" >> $errors
-    cat $errors | mail -s "***error: one or more nightly Smokeview bundles were not generated" $MAILTO
+    cat $errors | mail -s "***error: one or more Smokeview nightly bundles were not generated" $MAILTO
   fi
 else
   if [ "$MAILTO" != "" ]; then
     echo "https://github.com/firemodels/test_bundles/releases/tag/SMOKEVIEW_TEST" | mail -s "All Smokeview nightly bundles were generated" $MAILTO
   else
-    echo All Smokeview bundles were generated
+    echo All Smokeview nightly bundles were generated
   fi
 fi

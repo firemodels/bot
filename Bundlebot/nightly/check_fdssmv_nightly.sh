@@ -71,12 +71,12 @@ fi
 if [ -e $errors ]; then
   cat $errors
   if [ "$MAILTO" != "" ]; then
-    cat $errors | mail -s "***error: one or more nightlly FDS/Smokeview bundles were not generated" $MAILTO
+    cat $errors | mail -s "***error: one or more FDS/Smokeview nightly bundles were not generated" $MAILTO
   fi
 else
   if [ "$MAILTO" != "" ]; then
-    echo "https://github.com/firemodels/test_bundles/releases/tag/FDS_TEST" | mail -s "All FDS/Smokeview bundles were generated" $MAILTO
+    echo "https://github.com/firemodels/test_bundles/releases/tag/FDS_TEST" | mail -s "All FDS/Smokeview nightly bundles were generated" $MAILTO
   else
-    echo All FDS/Smokeview bundles were generated
+    echo All FDS/Smokeview nightly bundles were generated
   fi
 fi
