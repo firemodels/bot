@@ -36,7 +36,7 @@ shift $(($OPTIND-1))
 
 uploads=smv_uploads.txt
 errors=smv_errors.txt
-output=output.txt
+output=output_smv.txt
 INFO=SMV_INFO.txt
 rm -f $uploads
 gh release view SMOKEVIEW_TEST  -R github.com/firemodels/test_bundles | grep _win | awk '{print $2}' >> $uploads

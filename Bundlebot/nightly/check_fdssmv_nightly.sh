@@ -36,7 +36,7 @@ shift $(($OPTIND-1))
 
 uploads=fdssmv_uploads.txt
 errors=fdssmv_errors.txt
-output=output.txt
+output=output_fdssmv.txt
 INFO=FDS_INFO.txt
 rm -f $uploads
 gh release view FDS_TEST  -R github.com/firemodels/test_bundles | grep test_win | awk '{print $2}' >> $uploads
