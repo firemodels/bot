@@ -36,6 +36,7 @@ shift $(($OPTIND-1))
 
 uploads=fdssmv_uploads.txt
 errors=fdssmv_errors.txt
+output=output.txt
 INFO=FDS_INFO.txt
 rm -f $uploads
 gh release view FDS_TEST  -R github.com/firemodels/test_bundles | grep test_win | awk '{print $2}' >> $uploads
@@ -68,14 +69,22 @@ fi
 if [ `grep $FDSOSX.sha1 $uploads  | wc -l` -eq 0 ]; then
   echo  "***error: $FDSOSX.sha1 missing" >> $errors
 fi
+echo bundle url: https://github.com/firemodels/test_bundles/releases/tag/FDS_TEST > $output
+echo                  >> $output
+echo bundles present: >> $output
+cat $uploads          >> $output
+echo                  >> $output
 if [ -e $errors ]; then
   cat $errors
+  echo missing bundles: >> $output
+  cat $errors           >> $output
+  echo                  >> $output
   if [ "$MAILTO" != "" ]; then
-    cat $errors | mail -s "***error: one or more FDS/Smokeview nightly bundles were not generated" $MAILTO
+    cat $output | mail -s "***error: one or more FDS/Smokeview nightly bundles were not generated" $MAILTO
   fi
 else
   if [ "$MAILTO" != "" ]; then
-    echo "https://github.com/firemodels/test_bundles/releases/tag/FDS_TEST" | mail -s "All FDS/Smokeview nightly bundles were generated" $MAILTO
+    cat $output | mail -s "All FDS/Smokeview nightly bundles were generated" $MAILTO
   else
     echo All FDS/Smokeview nightly bundles were generated
   fi
