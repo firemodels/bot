@@ -36,6 +36,7 @@ shift $(($OPTIND-1))
 
 uploads=smv_uploads.txt
 errors=smv_errors.txt
+output=output_smv.txt
 INFO=SMV_INFO.txt
 rm -f $uploads
 gh release view SMOKEVIEW_TEST  -R github.com/firemodels/test_bundles | grep _win | awk '{print $2}' >> $uploads
@@ -69,15 +70,20 @@ fi
 if [ `grep $SMVOSX.sha1 $uploads  | wc -l` -eq 0 ]; then
   echo  "***error: $SMVOSX.sha1 missing" >> $errors
 fi
+echo "bundle url: https://github.com/firemodels/test_bundles/releases/tag/SMOKEVIEW_TEST" > $output
+echo                  >> $output
+echo bundles present: >> $output
+cat $uploads          >> $output
+echo                  >> $output
 if [ -e $errors ]; then
   cat $errors
   if [ "$MAILTO" != "" ]; then
-    echo "https://github.com/firemodels/test_bundles/releases/tag/SMOKEVIEW_TEST" >> $errors
-    cat $errors | mail -s "***error: one or more Smokeview nightly bundles were not generated" $MAILTO
+    cat $errors >> $output
+    cat $output | mail -s "***error: one or more Smokeview nightly bundles were not generated" $MAILTO
   fi
 else
   if [ "$MAILTO" != "" ]; then
-    echo "https://github.com/firemodels/test_bundles/releases/tag/SMOKEVIEW_TEST" | mail -s "All Smokeview nightly bundles were generated" $MAILTO
+    cat $output | mail -s "All Smokeview nightly bundles were generated" $MAILTO
   else
     echo All Smokeview nightly bundles were generated
   fi
