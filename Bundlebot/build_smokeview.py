@@ -193,7 +193,7 @@ R=R+1
 Label(root, text="----------------------------SYNCHRONIZE----------------------------").grid(column=0, row=R, columnspan=4)
 R=R+1
 Button(root, text="settings ---> smv",  width=button_width, command=webCOPYhome2config).grid(row=R, column=0)
-Button(root, text="smv ---> settings",  width=button_width, command=webCOPYconfig2home).grid(row=R, column=1)
+Button(root, text="settings <--- smv",  width=button_width, command=webCOPYconfig2home).grid(row=R, column=1)
 Button(root, text="fds bib ---> smv",   width=button_width, command=webSYNCHfds2smv).grid(row=R,    column=2)
 Button(root, text="smv bib ---> fds",   width=button_width, command=webSYNCHsmv2fds).grid(row=R,    column=3, ipadx=3)
 
