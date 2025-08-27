@@ -137,10 +137,6 @@ Radiobutton(root, text="Windows", padx = 0, variable=platform, value=1).grid(row
 Radiobutton(root, text="Linux",   padx = 0, variable=platform, value=2).grid(row=R, column=1)
 Radiobutton(root, text="OSX",     padx = 0, variable=platform, value=3).grid(row=R, column=2)
 
-#R=R+1
-#Radiobutton(root, text="test",    padx = 0, variable=version, value=1).grid(row=R, column=0)
-#Radiobutton(root, text="release", padx = 0, variable=version, value=2).grid(row=R, column=1)
-
 R=R+1
 Label(root, text="Clean:").grid(column=0, row=R)
 Button(root, text="Repos",   width=button_width, command=clean_repos).grid(row=R,   column=1)
@@ -149,23 +145,23 @@ Button(root, text="smv",     width=button_width, command=clean_smv).grid(row=R, 
 
 R=R+1
 Label(root, text="Build:").grid(column=0, row=R)
-Button(root, text="Libs",              width=button_width, command=build_lib).grid(row=R,  column=1)
-Button(root, text="Utils",             width=button_width, command=build_util).grid(row=R, column=2)
-Button(root, text="smv",               width=button_width, command=build_smv, bg='blue', fg='white').grid(row=R,  column=3)
+Button(root, text="Revision",width=button_width, command=set_revision, bg='blue', fg='white').grid(row=R, column=1)
+Button(root, text="Libs",              width=button_width, command=build_lib).grid(row=R,  column=2)
+Button(root, text="Utils",             width=button_width, command=build_util).grid(row=R, column=3)
 
 R=R+1
 #Button(root, text="smv dbg sanitize",  width=button_width, command=build_smv_test_san_deb).grid(row=R, column=1)
-Button(root, text="smv sanitize inc",  width=button_width, command=build_smv_test_san_inc).grid(row=R, column=1)
-Button(root, text="smv sanitize",      width=button_width, command=build_smv_test_san_full).grid(row=R, column=2)
-Button(root, text="smv Win test inc",  width=button_width, command=build_smv_win_inc).grid(row=R,  column=3)
+#Button(root, text="smv sanitize inc",  width=button_width, command=build_smv_test_san_inc).grid(row=R, column=1)
+Button(root, text="smv sanitize",      width=button_width, command=build_smv_test_san_full).grid(row=R, column=1)
+Button(root, text="smv Win test inc",  width=button_width, command=build_smv_win_inc).grid(row=R,  column=2)
+Button(root, text="smv",               width=button_width, command=build_smv, bg='blue', fg='white').grid(row=R,  column=3)
 
 # ------------------------- bundle/install ------------------------------
 
 R=R+1
-Button(root, text="Revision",width=button_width, command=set_revision, bg='blue', fg='white').grid(row=R, column=0)
 Button(root, text="Bundle",  width=button_width, command=bundle_smv).grid(row=R,    column=1)
-Button(root, text="Install", width=button_width, command=install_smv).grid(row=R,   column=2)
-Button(root, text="Upload",  width=button_width, command=upload_bundle).grid(row=R, column=3)
+Button(root, text="Upload",  width=button_width, command=upload_bundle).grid(row=R, column=2)
+Button(root, text="Install", width=button_width, command=install_smv).grid(row=R,   column=3)
 
 # ------------------------- guides ------------------------------
 
