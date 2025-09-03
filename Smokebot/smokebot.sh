@@ -1682,16 +1682,16 @@ if [ "$CACHE_DIR" != "" ]; then
   cd $CACHE_DIR
   CACHE_DIR=`pwd`
   cd $CUR_DIR
-  if [ ! -d $CACHE_DIR/Build ]; then
-    echo "***error: cache directory $CACHE_DIR/Build does not exist"
+  if [ ! -d $CACHE_DIR/fds/Build ]; then
+    echo "***error: cache directory $CACHE_DIR/fds/Build does not exist"
     ABORT=1
   fi
-  if [ ! -d $CACHE_DIR/WUI ]; then
-    echo "***error: cache directory $CACHE_DIR/WUI does not exist"
+  if [ ! -d $CACHE_DIR/smv/Verification/WUI ]; then
+    echo "***error: cache directory $CACHE_DIR/smv/Verification/WUI does not exist"
     ABORT=1
   fi
-  if [ ! -d $CACHE_DIR/Visualization ]; then
-    echo "***error: cache directory $CACHE_DIR/Visualization does not exist"
+  if [ ! -d $CACHE_DIR/smv/Verification/Visualization ]; then
+    echo "***error: cache directory $CACHE_DIR/Verification/Visualization does not exist"
     ABORT=1
   fi
 fi
@@ -2107,7 +2107,7 @@ else
     exit
   fi
   rm -rf $fdsrepo/Build
-  cp -r $CACHE_DIR/Build $fdsrepo/.
+  cp -r $CACHE_DIR/fds/Build $fdsrepo/.
 fi
 
 # stage1A
@@ -2172,8 +2172,8 @@ if [[ $stage_ver_release_success ]]; then
      fi
      rm -rf $smvrepo/Verification/WUI
      rm -rf $smvrepo/Verification/Visualization
-     cp -r $CACHE_DIR/WUI           $smvrepo/Verification/.
-     cp -r $CACHE_DIR/Visualization $smvrepo/Verification/.
+     cp -r $CACHE_DIR/smv/Verification/WUI           $smvrepo/Verification/.
+     cp -r $CACHE_DIR/smv/Verification/Visualization $smvrepo/Verification/.
   fi
 fi
 
