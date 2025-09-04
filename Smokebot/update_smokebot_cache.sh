@@ -3,9 +3,10 @@ echo Updating smokeview cache
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cd $SCRIPT_DIR
 
-CACHE_DIR=../../smokebot_cache
+cd ../..
+CACHE_DIR=smokebot_cache/Verification
 if [ ! -d $CACHE_DIR ]; then
-  mkdir $CACHE_DIR
+  mkdir -p $CACHE_DIR
 fi
 if [ ! -d $CACHE_DIR ]; then
   echo "***error: cache directory, $CACHE_DIR, failed to be created"
@@ -14,17 +15,11 @@ fi
 cd $CACHE_DIR
 CACHE_DIR=`pwd`
 
-cd ..
+cd ../..
 REPO_ROOT=`pwd`
 
-fdsrepo=$REPO_ROOT/fds
 smvrepo=$REPO_ROOT/smv
 ABORT=
-DIR=$fdsrepo/Build
-if [ ! -d $DIR ]; then
-  echo "***error: directory $DIR does not exist"
-  ABORT=1
-fi
 DIR=$smvrepo/Verification/Visualization
 if [ ! -d $DIR ]; then
   echo "***error: directory $DIR does not exist"
@@ -38,11 +33,8 @@ fi
 if [ "$ABORT" != "" ]; then
   exit
 fi
-rm -rf $CACHE_DIR/Build
 rm -rf $CACHE_DIR/Visualization
 rm -rf $CACHE_DIR/WUI
-echo Updating $fdsrepo/Build
-cp -r $fdsrepo/Build                      $CACHE_DIR/.
 
 echo Updating $smvrepo/Verification/Visualization
 cp -r $smvrepo/Verification/Visualization $CACHE_DIR/.
