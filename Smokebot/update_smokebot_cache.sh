@@ -38,14 +38,19 @@ fi
 if [ "$ABORT" != "" ]; then
   exit
 fi
-rm -rf $CACHE_DIR/Build
-rm -rf $CACHE_DIR/Visualization
-rm -rf $CACHE_DIR/WUI
+
+rm -rf $CACHE_DIR/fds
+mkdir $CACHE_DIR/fds
+
+rm -rf $CACHE_DIR/smv
+mkdir $CACHE_DIR/smv
+mkdir $CACHE_DIR/smv/Verification
+
 echo Updating $fdsrepo/Build
-cp -r $fdsrepo/Build                      $CACHE_DIR/.
+cp -r $fdsrepo/Build                      $CACHE_DIR/fds/.
 
 echo Updating $smvrepo/Verification/Visualization
-cp -r $smvrepo/Verification/Visualization $CACHE_DIR/.
+cp -r $smvrepo/Verification/Visualization $CACHE_DIR/Verification/.
 
 echo Updating $smvrepo/Verification/WUI
-cp -r $smvrepo/Verification/WUI           $CACHE_DIR/.
+cp -r $smvrepo/Verification/WUI           $CACHE_DIR/Verification.
