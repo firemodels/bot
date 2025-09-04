@@ -50,7 +50,7 @@ echo Updating $fdsrepo/Build
 cp -r $fdsrepo/Build                      $CACHE_DIR/fds/.
 
 echo Updating $smvrepo/Verification/Visualization
-cp -r $smvrepo/Verification/Visualization $CACHE_DIR/Verification/.
+cp -r $smvrepo/Verification/Visualization $CACHE_DIR/smv/Verification/.
 
 echo Updating $smvrepo/Verification/WUI
-cp -r $smvrepo/Verification/WUI           $CACHE_DIR/Verification.
+cp -r $smvrepo/Verification/WUI           $CACHE_DIR/smv/Verification/.
