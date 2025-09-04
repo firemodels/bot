@@ -2766,7 +2766,7 @@ fi
 # comment next line to turn on dos line ending checks
 #CHECK_LINES=
 
-if [ "$CHECK_CLUSTER" == "" ]; then
+if [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
   if [ "$CHECK_LINES" == "1" ]; then
     rm -f $CRLF_WARNINGS
     echo Checking for DOS line endings
