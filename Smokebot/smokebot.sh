@@ -655,7 +655,7 @@ compile_smv_utilities()
      cp background_${platform}_64 $LATESTAPPS_DIR/background
 
    # pnginfo
-     if [-d $smvrepo/Build/pnginfo/${COMPILER}_${platform}_64 ]; then
+     if [ -d $smvrepo/Build/pnginfo/${COMPILER}_${platform}_64 ]; then
        echo "   pnginfo"
        cd $smvrepo/Build/pnginfo/${COMPILER}_${platform}_64
        rm -f *.o pnginfo_${platform}_64
