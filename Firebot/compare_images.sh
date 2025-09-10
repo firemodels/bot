@@ -234,12 +234,16 @@ for f in $NEW_DIR/$SUBDIR/*.png; do
       rm -f /tmp/diff.$$.png
     fi
     rm -f $blur_from_file $blur_to_file
+    if (( $(echo "$diff < 0.01" | bc -l) )); then
+      diff=0.0
+    fi
     if [ "$diff" == "" ]; then
       diff=0
     fi
     if [[ $diff == *"e"* ]]; then
       diff=$(printf "%.6f" $diff)
     fi
+
     echo $diff > $diff_file_metric
     echo $base $diff >> $file_list
     if [[ "$diff" != "0" ]] && [[ ! $diff == *"e"* ]]; then
