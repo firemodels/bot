@@ -654,6 +654,16 @@ compile_smv_utilities()
      ./make_background.sh >> $OUTPUT_DIR/stage2a_smvutil 2>&1
      cp background_${platform}_64 $LATESTAPPS_DIR/background
 
+   # pnginfo
+     if [-d $smvrepo/Build/pnginfo/${COMPILER}_${platform}_64 ]; then
+       echo "   pnginfo"
+       cd $smvrepo/Build/pnginfo/${COMPILER}_${platform}_64
+       rm -f *.o pnginfo_${platform}_64
+       echo 'Compiling pnginfo:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
+       ./make_pnginfo.sh >> $OUTPUT_DIR/stage2a_smvutil 2>&1
+       cp pnginfo_${platform}_64 $LATESTAPPS_DIR/pnginfo
+     fi
+
    # hashfile
      echo "   hashfile"
      cd $smvrepo/Build/hashfile/${COMPILER}_${platform}_64
@@ -750,13 +760,19 @@ check_smv_utilities()
    FDS2FED="$smvrepo/Build/fds2fed/${COMPILER}_${platform}_64/fds2fed_${platform}_64"
    WIND2FDS="$smvrepo/Build/wind2fds/${COMPILER}_${platform}_64/wind2fds_${platform}_64"
    BACKGROUND="$smvrepo/Build/background/${COMPILER}_${platform}_64/background_${platform}_64"
+   PNGINFO="$smvrepo/Build/pnginfo/${COMPILER}_${platform}_64/pnginfo_${platform}_64"
+   PNGINFO_SUCCESS=1
+   if [[ -d $smvrepo/Build/pnginfo && ! -e $PNGINFO ]]; then
+     PNGINFO_SUCCESS=0
+   fi
    if [ "$haveCC" == "1" ] ; then
      # Check for errors in SMV utilities compilation
      cd $smvrepo
-     if [ -e "$SMOKEZIP" ]    && \
-        [ -e "$SMOKEDIFF" ]  && \
-        [ -e "$WIND2FDS" ]    && \
-        [ -e "$BACKGROUND" ]
+     if [ -e "$SMOKEZIP" ]          && \
+        [ -e "$SMOKEDIFF" ]         && \
+        [ -e "$WIND2FDS" ]          && \
+        [ -e "$BACKGROUND" ]        && \
+        [ $PNGINFO_SUCCESS == "1" ]
      then
         stage_utilities_success="1"
      else
