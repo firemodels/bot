@@ -208,6 +208,9 @@ file_list=$DIFF_DIR/$SUBDIR/file_list
 rm -f $file_list
 for f in $NEW_DIR/$SUBDIR/*.png; do
   FUZZ="-fuzz 1%"
+#  FUZZ=
+  BLUR="-blur 0x2"
+  BLUR=
   base=`basename $f`
   blur_base=blur_$base
   from_file=$REFERENCE_DIR/$base
@@ -219,8 +222,8 @@ for f in $NEW_DIR/$SUBDIR/*.png; do
   diff_file_metric=$DIFF_DIR/$SUBDIR/$base.metric
   rm -f $diff_file $diff_file_changed $diff_file_metric
   if [[ -e $from_file ]] && [[ -e $to_file ]]; then
-    convert $from_file -blur 0x2 $blur_from_file
-    convert $to_file   -blur 0x2 $blur_to_file
+    convert $from_file $FUZZ $BLUR $blur_from_file
+    convert $to_file   $FUZZ $BLUR $blur_to_file
     diff=`compare $FUZZ -metric $METRIC $blur_from_file $blur_to_file $diff_file |& awk -F'('  '{printf $2}' | awk -F')' '{printf $1}i'`
     composite $blur_from_file $blur_to_file -compose difference /tmp/diff.$$.png
 
