@@ -80,7 +80,7 @@ fi
 # generate list of namelist keywords found in FDS_User_Guide tex files
 sed 's/\\ct{\(.\+\)}/{\\ct \1}/g'  $tex_dir/*.tex > $tex_dir/convert.txt
 grep -v ^% $tex_dir/convert.txt | \
-awk -F'}' 'BEGIN{inlongtable=0;}{if($1=="\\begin{longtable"&&$4=="|l|l|l|l|l|"){inlongtable=1};if($1=="\\end{longtable"){inlongtable=0};if(inlongtable==1){print $0}}' $tex_dir/convert.txt | \
+awk -F' ' 'BEGIN{innamelists=0;}{if($2=="BEGIN_NAMELISTS"){innamelists=1};if($2=="END_NAMELISTS"){innamelists=0};if(innamelists==1){print $0}}' $tex_dir/convert.txt | \
 sed 's/&/ &/g' | \
 awk -F' ' 'BEGIN{output=0;namelist="xxx";}\
            {\
@@ -132,7 +132,7 @@ sort > $NAMELIST_F90
 #compute difference between tex and f90 namelist/keywords
 git diff --no-index $NAMELIST_F90 $NAMELIST_TEX                                  > $NAMELIST_DIFF
 
-nlines_nodoc=`grep ^- $NAMELIST_DIFF | sed 's/^-//g' | grep -v Firebot | wc -l`
+nlines_nodoc=`grep ^-/ $NAMELIST_DIFF | sed 's/^-//g' | grep -v Firebot | wc -l`
 echo "$nlines_nodoc undocumented namelist keywords:"                              > $NAMELIST_NODOC
 grep ^- $NAMELIST_DIFF | sed 's/^-//g' | grep -v \\-\\-                         >> $NAMELIST_NODOC
 
