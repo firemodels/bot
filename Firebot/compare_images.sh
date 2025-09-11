@@ -235,7 +235,7 @@ for f in $NEW_DIR/$SUBDIR/*.png; do
     fi
     rm -f $blur_from_file $blur_to_file
     if (( $(echo "$diff < 0.01" | bc -l) )); then
-      diff=0.0
+      diff=0
     fi
     if [ "$diff" == "" ]; then
       diff=0
