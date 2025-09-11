@@ -208,11 +208,14 @@ file_list=$DIFF_DIR/$SUBDIR/file_list
 rm -f $file_list
 for f in $NEW_DIR/$SUBDIR/*.png; do
   FUZZ="-fuzz 1%"
+  FUZZ=
+
   BLUR="-blur 0x2"
+
   REDUCE="-channel B -depth 7 +channel"
   REDUCE="-channel B -depth 7 "
   REDUCE=
-  FUZZ=
+
   base=`basename $f`
   blur_base=blur_$base
   from_file=$REFERENCE_DIR/$base
@@ -240,9 +243,9 @@ for f in $NEW_DIR/$SUBDIR/*.png; do
       rm -f /tmp/diff.$$.png
     fi
     rm -f $blur_from_file $blur_to_file
-#    if (( $(echo "$diff < 0.01" | bc -l) )); then
-#      diff=0
-#    fi
+    if (( $(echo "$diff < 0.01" | bc -l) )); then
+      diff=0
+    fi
     if [ "$diff" == "" ]; then
       diff=0
     fi
