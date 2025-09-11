@@ -2329,19 +2329,6 @@ else
    echo Errors found, not building guides
 fi
 
-cd $botrepo/Firebot
-   echo Compare namelists
-./compare_namelists.sh $OUTPUT_DIR stage5 > $OUTPUT_DIR/stage5_namelist_check
-NAMELIST_NODOC_STATUS=`cat $OUTPUT_DIR/stage5_namelist_check | head -1 | awk -F' ' '{print $1}'`
-if [ "$NAMELIST_NODOC_STATUS" != "0" ]; then
-  NAMELIST_NODOC_LOG=$OUTPUT_DIR/stage5_namelists_nodoc.txt
-fi
-NAMELIST_NOSOURCE_STATUS=`cat $OUTPUT_DIR/stage5_namelist_check | tail -1 | awk -F' ' '{print $1}'`
-if [ "$NAMELIST_NOSOURCE_STATUS" != "0" ]; then
-  NAMELIST_NOSOURCE_LOG=$OUTPUT_DIR/stage5_namelists_nosource.txt
-fi
-
-
 SCRIPT_TIME_end=`GET_TIME`
 DIFF_SCRIPT_TIME=`GET_DURATION $SCRIPT_TIME_beg $SCRIPT_TIME_end`
 echo "Total time: $DIFF_SCRIPT_TIME" >> $STAGE_STATUS
