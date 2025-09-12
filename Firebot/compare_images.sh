@@ -90,6 +90,7 @@ cd $CURDIR
 SMV_REPO=../../smv
 cd $SMV_REPO
 SMV_REPO=`pwd`
+PNGINFO=$SMV_REPO/Build/pnginfo/intel_linux_64/pnginfo_linux_64
 
 cd $CURDIR
 if [ "$NEW_DIR" == "" ]; then
@@ -227,30 +228,31 @@ for f in $NEW_DIR/$SUBDIR/*.png; do
   diff_file_metric=$DIFF_DIR/$SUBDIR/$base.metric
   rm -f $diff_file $diff_file_changed $diff_file_metric
   if [[ -e $from_file ]] && [[ -e $to_file ]]; then
+    cp $from_file ${from_file}_full
     convert $from_file $BLUR $REDUCE $blur_from_file
+    cp $to_file ${to_file}_full
     convert $to_file   $BLUR $REDUCE $blur_to_file
+    if [ -e $PNGINFO ]; then
+      from_info_file=$NEW_DIR/$SUBDIR/${base}_from.info
+      to_info_file=$NEW_DIR/$SUBDIR/${base}_to.info
+      $PNGINFO ${from_file}_full      > $from_info_file
+      $PNGINFO ${to_file}_full        > $to_info_file
+    fi
     diff=`compare -metric $METRIC $blur_from_file $blur_to_file $diff_file |& awk -F'('  '{printf $2}' | awk -F')' '{printf $1}i'`
     composite $blur_from_file $blur_to_file -compose difference /tmp/diff.$$.png
 
-    SETGRAY=
-    if [ "$SETGRAY" == "1" ]; then
-      convert /tmp/diff.$$.png   -channel    RGB -negate /tmp/diff2.$$.png
-      convert /tmp/diff2.$$.png  -colorspace Gray $diff_file
-      rm -f /tmp/diff.$$.png
-      rm -f /tmp/diff2.$$.png
-    else
-      convert /tmp/diff.$$.png -channel RGB -negate $diff_file
-      rm -f /tmp/diff.$$.png
-    fi
+    convert /tmp/diff.$$.png -channel RGB -negate $diff_file
+    rm -f /tmp/diff.$$.png
+
     rm -f $blur_from_file $blur_to_file
+    if [[ $diff == *"e"* ]]; then
+      diff=$(printf "%.6f" $diff)
+    fi
     if (( $(echo "$diff < 0.01" | bc -l) )); then
       diff=0
     fi
     if [ "$diff" == "" ]; then
       diff=0
-    fi
-    if [[ $diff == *"e"* ]]; then
-      diff=$(printf "%.6f" $diff)
     fi
 
     echo $diff > $diff_file_metric
@@ -261,7 +263,6 @@ for f in $NEW_DIR/$SUBDIR/*.png; do
         echo "***$FYI: The image $base has changed. $METRIC error=$diff > $TOLERANCE"
         touch $diff_file_changed
         IMAGE_ERRORS=$((IMAGE_ERRORS + 1))
-#        cp $base $ERROR_SUBDIR/.
         cp $f $ERROR_SUBDIR/.
       fi
     fi
@@ -364,6 +365,8 @@ FILELIST=`sort -k2,2nr  -k1,1 $file_list | awk '{print $1}'`
   for f in $FILELIST; do
     base=`basename $f .png`
     pngfile=$base.png
+    from_info_file=$SUMMARY_DIR/images/user/${pngfile}_from.info
+    to_info_file=  $SUMMARY_DIR/images/user/${pngfile}_to.info
     changefile=$base.png.changed
     metricfile=$base.png.metric
 
@@ -442,20 +445,34 @@ EOF
   fi
   cat << EOF >> $HTML_DIFF
 <td align=center><img $SIZE src=diffs/base/$SUBDIR/$pngfile>
-<br>$pngfile</td>
+<br>$pngfile
 EOF
+if [ -e $from_info_file ]; then
+cat $from_info_file >> $HTML_DIFF
+fi
+echo "</td>" >> $HTML_DIFF
 else
 cat << EOF >> $HTML_DIFF
 <tr>
-<td><img $SIZE src=diffs/base/$SUBDIR/$pngfile></td>
+<td><img $SIZE src=diffs/base/$SUBDIR/$pngfile>
 EOF
+if [ -e $from_info_file ]; then
+cat $from_info_file >> $HTML_DIFF
+fi
+echo "</td>" >> $HTML_DIFF
 fi
 
 COLSPAN=
 if [ "$START_REST" != "2" ]; then
   COLSPAN="colspan=2"
   cat << EOF >> $HTML_DIFF
-<td><img $SIZE src=images/$SUBDIR/$pngfile></td>
+<td><img $SIZE src=images/$SUBDIR/$pngfile>
+EOF
+if [ -e $to_info_file ]; then
+cat $to_info_file >> $HTML_DIFF
+fi
+cat << EOF >> $HTML_DIFF
+</td>
 <td><img $SIZE src=diffs/images/$SUBDIR/$pngfile></td>
 EOF
 fi
