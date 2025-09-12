@@ -367,7 +367,7 @@ FILELIST=`sort -k2,2nr  -k1,1 $file_list | awk '{print $1}'`
     base=`basename $f .png`
     pngfile=$base.png
     from_info_file=$SUMMARY_DIR/images/${SUBDIR}/${pngfile}_from.info
-    to_info_file=  $SUMMARY_DIR/images/${SUBDIR}/${pngfile}_to.info
+    to_info_file=$SUMMARY_DIR/images/${SUBDIR}/${pngfile}_to.info
     changefile=$base.png.changed
     metricfile=$base.png.metric
 
