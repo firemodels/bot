@@ -237,6 +237,7 @@ for f in $NEW_DIR/$SUBDIR/*.png; do
       to_info_file=$NEW_DIR/$SUBDIR/${base}_to.info
       $PNGINFO ${from_file}_full      > $from_info_file
       $PNGINFO ${to_file}_full        > $to_info_file
+      rm -f ${from_file}_full ${to_file}_full 
     fi
     diff=`compare -metric $METRIC $blur_from_file $blur_to_file $diff_file |& awk -F'('  '{printf $2}' | awk -F')' '{printf $1}i'`
     composite $blur_from_file $blur_to_file -compose difference /tmp/diff.$$.png
@@ -396,7 +397,7 @@ cat << EOF >> $HTML_DIFF
 EOF
       START_DIFF=2
     fi
-    
+
     if [ "$START_REST" == "1" ]; then
       if [ "$START_DIFF" == "2" ]; then
         cat << EOF >> $HTML_DIFF
@@ -501,6 +502,7 @@ if [ "$START_REST" != "2" ]; then
 </tr>
 EOF
 fi
+rm -f $from_info_file $to_info_file
   done
 cat << EOF >> $HTML_DIFF
 </table>
