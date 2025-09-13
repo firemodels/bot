@@ -446,7 +446,7 @@ EOF
   fi
   cat << EOF >> $HTML_DIFF
 <td align=center>
-<img $SIZE src=diffs/base/$SUBDIR/$pngfile>
+<a href="diffs/base/$SUBDIR/$pngfile"><img $SIZE src=diffs/base/$SUBDIR/$pngfile></a>
 <br>$pngfile
 EOF
 if [ -e $from_info_file ]; then
@@ -457,7 +457,7 @@ echo "</td>" >> $HTML_DIFF
 else
 cat << EOF >> $HTML_DIFF
 <tr>
-<td><img $SIZE src=diffs/base/$SUBDIR/$pngfile>
+<td><a href="diffs/base/$SUBDIR/$pngfile"><img $SIZE src=diffs/base/$SUBDIR/$pngfile></a>
 EOF
 if [ -e $from_info_file ]; then
 echo "<br>" >> $HTML_DIFF
@@ -470,7 +470,7 @@ COLSPAN=
 if [ "$START_REST" != "2" ]; then
   COLSPAN="colspan=2"
   cat << EOF >> $HTML_DIFF
-<td><img $SIZE src=images/$SUBDIR/$pngfile>
+<td><a href="images/$SUBDIR/$pngfile"><img $SIZE src=images/$SUBDIR/$pngfile></a>
 EOF
 if [ -e $to_info_file ]; then
 echo "<br>" >> $HTML_DIFF
@@ -478,7 +478,7 @@ cat $to_info_file >> $HTML_DIFF
 fi
 cat << EOF >> $HTML_DIFF
 </td>
-<td><img $SIZE src=diffs/images/$SUBDIR/$pngfile></td>
+<td><a href="diffs/images/$SUBDIR/$pngfile"><img $SIZE src=diffs/images/$SUBDIR/$pngfile></a></td>
 EOF
 fi
 
@@ -603,7 +603,7 @@ cat << EOF  >> $HTML_DIFF
 </HTML>
 EOF
 
-REDUCE_IMAGES
+#REDUCE_IMAGES
 
 if [ "$HAVE_DIFFS" == "0" ]; then
   echo no images have changed
