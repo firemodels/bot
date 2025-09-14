@@ -228,16 +228,13 @@ for f in $NEW_DIR/$SUBDIR/*.png; do
   diff_file_metric=$DIFF_DIR/$SUBDIR/$base.metric
   rm -f $diff_file $diff_file_changed $diff_file_metric
   if [[ -e $from_file ]] && [[ -e $to_file ]]; then
-    cp $from_file ${from_file}_full
     convert $from_file $BLUR $REDUCE $blur_from_file
-    cp $to_file ${to_file}_full
     convert $to_file   $BLUR $REDUCE $blur_to_file
     if [ -e $PNGINFO ]; then
       from_info_file=$NEW_DIR/$SUBDIR/${base}_from.info
       to_info_file=$NEW_DIR/$SUBDIR/${base}_to.info
-      $PNGINFO ${from_file}_full      > $from_info_file
-      $PNGINFO ${to_file}_full        > $to_info_file
-      rm -f ${from_file}_full ${to_file}_full 
+      $PNGINFO ${from_file}      > $from_info_file
+      $PNGINFO ${to_file}        > $to_info_file
     fi
     diff=`compare -metric $METRIC $blur_from_file $blur_to_file $diff_file |& awk -F'('  '{printf $2}' | awk -F')' '{printf $1}i'`
     composite $blur_from_file $blur_to_file -compose difference /tmp/diff.$$.png
