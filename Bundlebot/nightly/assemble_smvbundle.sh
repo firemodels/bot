@@ -129,7 +129,7 @@ else
   CP  $SMVDIR        smokeview_${platform}_${TEST}64  $PLATFORMDIR/$smvbin smokeview
 fi
 CP  $SMDDIR        smokediff_${platform}_64         $PLATFORMDIR/$smvbin smokediff
-CP  $SMDDIR        pnginfo_${platform}_64           $PLATFORMDIR/$smvbin pnginfo
+CP  $PNGINFODIR    pnginfo_${platform}_64           $PLATFORMDIR/$smvbin pnginfo
 CP  $FDS2FEDDIR    fds2fed_${platform}_64           $PLATFORMDIR/$smvbin fds2fed
 CP  $SMZDIR        smokezip_${platform}_64          $PLATFORMDIR/$smvbin smokezip
 CP  $WIND2FDSDIR   wind2fds_${platform}_64          $PLATFORMDIR/$smvbin wind2fds
