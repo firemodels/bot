@@ -147,7 +147,7 @@ R=R+1
 Label(root, text="Build:").grid(column=0, row=R)
 Button(root, text="Revision",width=button_width, command=set_revision, bg='blue', fg='white').grid(row=R, column=1)
 Button(root, text="Libs",              width=button_width, command=build_lib).grid(row=R,  column=2)
-Button(root, text="Utils",             width=button_width, command=build_util).grid(row=R, column=3)
+Button(root, text="Utils",             width=button_width, command=build_util,bg='blue', fg='white').grid(row=R, column=3)
 
 R=R+1
 #Button(root, text="smv dbg sanitize",  width=button_width, command=build_smv_test_san_deb).grid(row=R, column=1)
