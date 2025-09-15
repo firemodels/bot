@@ -57,6 +57,7 @@ call :BUILDLIB
 call :BUILD     background
 call :BUILD     hashfile
 call :BUILD     smokediff
+call :BUILD     pnginfo
 call :BUILD     fds2fed
 call :BUILD     smokezip
 call :BUILD     wind2fds
@@ -75,6 +76,7 @@ call :CHECK_BUILDFDSOPENMP
 call :CHECK_BUILD     background
 call :CHECK_BUILD     hashfile
 call :CHECK_BUILD     smokediff
+call :CHECK_BUILD     pnginfo
 call :CHECK_BUILD     fds2fed
 call :CHECK_BUILD     smokezip
 call :CHECK_BUILD     wind2fds

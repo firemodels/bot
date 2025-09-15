@@ -44,6 +44,7 @@ call :BUILD     get_time
 call :BUILD     hashfile
 call :BUILD     set_path
 call :BUILD     sh2bat
+call :BUILD     pnginfo
 call :BUILD     smokediff
 call :BUILD     smokezip
 call :BUILD     timep
@@ -58,6 +59,7 @@ call :CHECK_BUILD     get_time
 call :CHECK_BUILD     hashfile
 call :CHECK_BUILD     set_path
 call :CHECK_BUILD     sh2bat
+call :CHECK_BUILD     pnginfo
 call :CHECK_BUILD     smokediff
 call :CHECK_BUILD     smokezip
 call :CHECK_BUILD     timep

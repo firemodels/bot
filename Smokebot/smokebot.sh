@@ -654,6 +654,16 @@ compile_smv_utilities()
      ./make_background.sh >> $OUTPUT_DIR/stage2a_smvutil 2>&1
      cp background_${platform}_64 $LATESTAPPS_DIR/background
 
+   # pnginfo
+     if [ -d $smvrepo/Build/pnginfo/${COMPILER}_${platform}_64 ]; then
+       echo "   pnginfo"
+       cd $smvrepo/Build/pnginfo/${COMPILER}_${platform}_64
+       rm -f *.o pnginfo_${platform}_64
+       echo 'Compiling pnginfo:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
+       ./make_pnginfo.sh >> $OUTPUT_DIR/stage2a_smvutil 2>&1
+       cp pnginfo_${platform}_64 $LATESTAPPS_DIR/pnginfo
+     fi
+
    # hashfile
      echo "   hashfile"
      cd $smvrepo/Build/hashfile/${COMPILER}_${platform}_64
@@ -750,13 +760,19 @@ check_smv_utilities()
    FDS2FED="$smvrepo/Build/fds2fed/${COMPILER}_${platform}_64/fds2fed_${platform}_64"
    WIND2FDS="$smvrepo/Build/wind2fds/${COMPILER}_${platform}_64/wind2fds_${platform}_64"
    BACKGROUND="$smvrepo/Build/background/${COMPILER}_${platform}_64/background_${platform}_64"
+   PNGINFO="$smvrepo/Build/pnginfo/${COMPILER}_${platform}_64/pnginfo_${platform}_64"
+   PNGINFO_SUCCESS=1
+   if [[ -d $smvrepo/Build/pnginfo && ! -e $PNGINFO ]]; then
+     PNGINFO_SUCCESS=0
+   fi
    if [ "$haveCC" == "1" ] ; then
      # Check for errors in SMV utilities compilation
      cd $smvrepo
-     if [ -e "$SMOKEZIP" ]    && \
-        [ -e "$SMOKEDIFF" ]  && \
-        [ -e "$WIND2FDS" ]    && \
-        [ -e "$BACKGROUND" ]
+     if [ -e "$SMOKEZIP" ]          && \
+        [ -e "$SMOKEDIFF" ]         && \
+        [ -e "$WIND2FDS" ]          && \
+        [ -e "$BACKGROUND" ]        && \
+        [ $PNGINFO_SUCCESS == "1" ]
      then
         stage_utilities_success="1"
      else
@@ -2266,6 +2282,7 @@ if [[ $stage_ver_release_success ]] ; then
      cd $botrepo/Smokebot
    echo Comparing images
      ../Firebot/compare_images.sh $SMV_SUMMARY_DIR/images $SMV_SUMMARY_DIR/diffs/images $OUTPUT_DIR/error_images $TOLERANCE >& $OUTPUT_DIR/stage5_image_compare
+     rm -f $SMV_SUMMARY_DIR/images/*.png
      COMPAREIMAGES_end=`GET_TIME`
      DIFF_COMPAREIMAGES=`GET_DURATION $COMPAREIMAGES_beg $COMPAREIMAGES_end`
      echo "Comparing images: $DIFF_COMPAREIMAGES" >> $STAGE_STATUS
@@ -2312,19 +2329,6 @@ if [[ $stage_ver_release_success ]] ; then
 else
    echo Errors found, not building guides
 fi
-
-cd $botrepo/Firebot
-   echo Compare namelists
-./compare_namelists.sh $OUTPUT_DIR stage5 > $OUTPUT_DIR/stage5_namelist_check
-NAMELIST_NODOC_STATUS=`cat $OUTPUT_DIR/stage5_namelist_check | head -1 | awk -F' ' '{print $1}'`
-if [ "$NAMELIST_NODOC_STATUS" != "0" ]; then
-  NAMELIST_NODOC_LOG=$OUTPUT_DIR/stage5_namelists_nodoc.txt
-fi
-NAMELIST_NOSOURCE_STATUS=`cat $OUTPUT_DIR/stage5_namelist_check | tail -1 | awk -F' ' '{print $1}'`
-if [ "$NAMELIST_NOSOURCE_STATUS" != "0" ]; then
-  NAMELIST_NOSOURCE_LOG=$OUTPUT_DIR/stage5_namelists_nosource.txt
-fi
-
 
 SCRIPT_TIME_end=`GET_TIME`
 DIFF_SCRIPT_TIME=`GET_DURATION $SCRIPT_TIME_beg $SCRIPT_TIME_end`

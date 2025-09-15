@@ -221,6 +221,7 @@ CALL :TOMANIFESTSMV   %out_smv%\smokeview.exe    smokeview
 CALL :COPY  %bundle_dir%\smv\background.exe %out_bin%\background.exe
 CALL :COPY  %bundle_dir%\smv\hashfile.exe   %out_smv%\hashfile.exe 
 CALL :COPY  %bundle_dir%\smv\smokediff.exe  %out_smv%\smokediff.exe
+CALL :COPY  %bundle_dir%\smv\pnginfo.exe    %out_smv%\pnginfo.exe
 CALL :COPY  %bundle_dir%\smv\fds2fed.exe    %out_smv%\fds2fed.exe
 CALL :COPY  %bundle_dir%\smv\smokezip.exe   %out_smv%\smokezip.exe 
 CALL :COPY  %bundle_dir%\smv\wind2fds.exe   %out_smv%\wind2fds.exe 
@@ -228,7 +229,7 @@ CALL :COPY  %bundle_dir%\smv\wind2fds.exe   %out_smv%\wind2fds.exe
 CALL :TOMANIFESTSMV   %out_bin%\background.exe background
 CALL :TOMANIFESTLIST  %out_bin%\fds2ascii.exe  fds2ascii
 CALL :TOMANIFESTSMV   %out_smv%\hashfile.exe   hashfile
-CALL :TOMANIFESTSMV   %out_smv%\smokediff.exe  smokediff
+CALL :TOMANIFESTSMV   %out_smv%\pnginfo.exe    pnginfo
 CALL :TOMANIFESTSMV   %out_smv%\fds2fed.exe    fds2fed
 CALL :TOMANIFESTSMV   %out_smv%\smokezip.exe   smokezip
 CALL :TOMANIFESTLIST  %out_bin%\test_mpi.exe   test_mpi
@@ -255,6 +256,7 @@ cd %out_smv%
 %hashfile% hashfile.exe   >  hash\hashfile_%smv_version%.exe.sha1
 %hashfile% smokeview.exe  >  hash\smokeview_%smv_version%.exe.sha1
 %hashfile% smokediff.exe  >  hash\smokediff_%smv_version%.exe.sha1
+%hashfile% pnginfo.exe    >  hash\pnginfo_%smv_version%.exe.sha1
 %hashfile% fds2fed.exe    >  hash\fds2fed_%smv_version%.exe.sha1
 %hashfile% smokezip.exe   >  hash\smokezip_%smv_version%.exe.sha1
 %hashfile% wind2fds.exe   >  hash\wind2fds_%smv_version%.exe.sha1

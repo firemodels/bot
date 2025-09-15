@@ -64,6 +64,7 @@ if [ "$app_type" == "smv" ]; then
   CP background
   CP hashfile
   CP smokediff
+  CP pnginfo
   CP fds2fed
   CP smokeview
   CP smokezip

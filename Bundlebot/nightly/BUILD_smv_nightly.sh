@@ -78,12 +78,14 @@ cd $reporoot/smv/Build/LIBS/${comp}_${platform}_64
 
 echo "*** building applications"
 
-progs="background flush hashfile smokediff fds2fed smokezip wind2fds"
+progs="background flush hashfile pnginfo smokediff fds2fed smokezip wind2fds"
 
 for prog in $progs; do 
-  cd $reporoot/smv/Build/$prog/${comp}_${platform}_64
-  echo "*** building $prog"
-  ./make_${prog}.sh >& $outdir/stage4_$prog
+  if [ -d $reporoot/smv/Build/$prog/${comp}_${platform}_64 ]; then
+    cd $reporoot/smv/Build/$prog/${comp}_${platform}_64
+    echo "*** building $prog"
+    ./make_${prog}.sh >& $outdir/stage4_$prog
+  fi
 done
 
 echo "*** building smokeview"
