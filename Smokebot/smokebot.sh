@@ -2282,6 +2282,7 @@ if [[ $stage_ver_release_success ]] ; then
      cd $botrepo/Smokebot
    echo Comparing images
      ../Firebot/compare_images.sh $SMV_SUMMARY_DIR/images $SMV_SUMMARY_DIR/diffs/images $OUTPUT_DIR/error_images $TOLERANCE >& $OUTPUT_DIR/stage5_image_compare
+     rm -f $SMV_SUMMARY_DIR/images/*.png
      COMPAREIMAGES_end=`GET_TIME`
      DIFF_COMPAREIMAGES=`GET_DURATION $COMPAREIMAGES_beg $COMPAREIMAGES_end`
      echo "Comparing images: $DIFF_COMPAREIMAGES" >> $STAGE_STATUS
