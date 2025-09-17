@@ -452,8 +452,7 @@ EOF
 <br>$pngfile
 EOF
 if [ -e $from_info_file ]; then
-echo "<br>" >> $HTML_DIFF
-cat $from_info_file >> $HTML_DIFF
+  cat $from_info_file >> $HTML_DIFF
 fi
 echo "</td>" >> $HTML_DIFF
 else
@@ -462,8 +461,7 @@ cat << EOF >> $HTML_DIFF
 <td><a href="diffs/base/$SUBDIR/$pngfile"><img $SIZE src=diffs/base/$SUBDIR/$pngfile></a>
 EOF
 if [ -e $from_info_file ]; then
-echo "<br>" >> $HTML_DIFF
-cat $from_info_file >> $HTML_DIFF
+  cat $from_info_file >> $HTML_DIFF
 fi
 echo "</td>" >> $HTML_DIFF
 fi
