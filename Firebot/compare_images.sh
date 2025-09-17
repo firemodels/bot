@@ -231,10 +231,15 @@ for f in $NEW_DIR/$SUBDIR/*.png; do
     convert $from_file $BLUR $REDUCE $blur_from_file
     convert $to_file   $BLUR $REDUCE $blur_to_file
     if [ -e $PNGINFO ]; then
+      HTMLOPT=
+      HAVE_HTMLOPT=`$PNGINFO -h | grep html | wc -l`
+      if [ "$HAVE_HTMLOPT" -ne 0 ]; then
+        HTMLOPT=-html
+      fi
       from_info_file=$NEW_DIR/$SUBDIR/${base}_from.info
       to_info_file=$NEW_DIR/$SUBDIR/${base}_to.info
-      $PNGINFO ${from_file}      > $from_info_file
-      $PNGINFO ${to_file}        > $to_info_file
+      $PNGINFO $HTMLOPT ${from_file}      > $from_info_file
+      $PNGINFO $HTMLOPT ${to_file}        > $to_info_file
     fi
     diff=`compare -metric $METRIC $blur_from_file $blur_to_file $diff_file |& awk -F'('  '{printf $2}' | awk -F')' '{printf $1}i'`
     composite $blur_from_file $blur_to_file -compose difference /tmp/diff.$$.png
