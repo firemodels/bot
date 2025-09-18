@@ -449,7 +449,7 @@ EOF
   cat << EOF >> $HTML_DIFF
 <td align=center>
 <a href="diffs/base/$SUBDIR/$pngfile"><img $SIZE src=diffs/base/$SUBDIR/$pngfile></a>
-<br>$pngfile
+<br>$pngfile<br>
 EOF
 if [ -e $from_info_file ]; then
   cat $from_info_file >> $HTML_DIFF
@@ -473,8 +473,7 @@ if [ "$START_REST" != "2" ]; then
 <td><a href="images/$SUBDIR/$pngfile"><img $SIZE src=images/$SUBDIR/$pngfile></a>
 EOF
 if [ -e $to_info_file ]; then
-echo "<br>" >> $HTML_DIFF
-cat $to_info_file >> $HTML_DIFF
+  cat $to_info_file >> $HTML_DIFF
 fi
 cat << EOF >> $HTML_DIFF
 </td>
