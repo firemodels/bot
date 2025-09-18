@@ -739,13 +739,13 @@ compile_smv_utilities()
   fi
 
 # pnginfo
-  if [ -d $smvrepo/Build/pnginfo/${COMPILER}_${platform}_64 ]; then
-    echo "   pnginfo"
-    cd $smvrepo/Build/pnginfo/${COMPILER}_${platform}_64
-    rm -f *.o pnginfo_${platform}_64
+  if [ -d $smvrepo/Build/pnginfo/${SMVCOMPILER}_${platform}${smvsize} ]; then
+    echo "      pnginfo"
+    cd $smvrepo/Build/pnginfo/${SMVCOMPILER}_${platform}${smvsize}
+    rm -f *.o pnginfo_${platform}${smvsize}
     echo 'Compiling pnginfo:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
     ./make_pnginfo.sh >> $OUTPUT_DIR/stage2a_smvutil 2>&1
-    cp pnginfo_${platform}_64 $LATESTAPPS_DIR/pnginfo
+    cp pnginfo_${platform}${smvsize} $LATESTAPPS_DIR/pnginfo
   fi
 
 # hashfile:
