@@ -1,5 +1,5 @@
 #!/bin/bash
-while getopts 'Ad:p:n:o:O:t' OPTION
+while getopts 'Ad:p:n:o:O:tT:' OPTION
 do
 case $OPTION  in
   A)
@@ -22,6 +22,9 @@ case $OPTION  in
    ;;
   t)
    dummy3="xxx"
+   ;;
+  T)
+   dummy4="$OPTARG"
    ;;
 esac
 done
