@@ -480,7 +480,7 @@ if [ -e $to_info_file ]; then
 fi
 cat << EOF >> $HTML_DIFF
 </td>
-<td><a href="diffs/images/$SUBDIR/$pngfile"><img $SIZE src=diffs/images/$SUBDIR/$pngfile></a></td>
+<td><a href="diffs/images/$SUBDIR/$pngfile"><img $SIZE src=diffs/images/$SUBDIR/$pngfile></a><br><br></td>
 EOF
 fi
 
