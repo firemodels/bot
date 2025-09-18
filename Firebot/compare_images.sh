@@ -231,10 +231,15 @@ for f in $NEW_DIR/$SUBDIR/*.png; do
     convert $from_file $BLUR $REDUCE $blur_from_file
     convert $to_file   $BLUR $REDUCE $blur_to_file
     if [ -e $PNGINFO ]; then
+      HTMLOPT=
+      HAVE_HTMLOPT=`$PNGINFO -h | grep html | wc -l`
+      if [ "$HAVE_HTMLOPT" -ne 0 ]; then
+        HTMLOPT=-html
+      fi
       from_info_file=$NEW_DIR/$SUBDIR/${base}_from.info
       to_info_file=$NEW_DIR/$SUBDIR/${base}_to.info
-      $PNGINFO ${from_file}      > $from_info_file
-      $PNGINFO ${to_file}        > $to_info_file
+      $PNGINFO $HTMLOPT ${from_file}      > $from_info_file
+      $PNGINFO $HTMLOPT ${to_file}        > $to_info_file
     fi
     diff=`compare -metric $METRIC $blur_from_file $blur_to_file $diff_file |& awk -F'('  '{printf $2}' | awk -F')' '{printf $1}i'`
     composite $blur_from_file $blur_to_file -compose difference /tmp/diff.$$.png
@@ -447,8 +452,8 @@ EOF
 <br>$pngfile
 EOF
 if [ -e $from_info_file ]; then
-echo "<br>" >> $HTML_DIFF
-cat $from_info_file >> $HTML_DIFF
+  echo "<br>"         >> $HTML_DIFF
+  cat $from_info_file >> $HTML_DIFF
 fi
 echo "</td>" >> $HTML_DIFF
 else
@@ -457,8 +462,8 @@ cat << EOF >> $HTML_DIFF
 <td><a href="diffs/base/$SUBDIR/$pngfile"><img $SIZE src=diffs/base/$SUBDIR/$pngfile></a>
 EOF
 if [ -e $from_info_file ]; then
-echo "<br>" >> $HTML_DIFF
-cat $from_info_file >> $HTML_DIFF
+  echo "<br>"       >> $HTML_DIFF
+  cat $from_info_file >> $HTML_DIFF
 fi
 echo "</td>" >> $HTML_DIFF
 fi
@@ -470,12 +475,12 @@ if [ "$START_REST" != "2" ]; then
 <td><a href="images/$SUBDIR/$pngfile"><img $SIZE src=images/$SUBDIR/$pngfile></a>
 EOF
 if [ -e $to_info_file ]; then
-echo "<br>" >> $HTML_DIFF
-cat $to_info_file >> $HTML_DIFF
+  echo "<br>"       >> $HTML_DIFF
+  cat $to_info_file >> $HTML_DIFF
 fi
 cat << EOF >> $HTML_DIFF
 </td>
-<td><a href="diffs/images/$SUBDIR/$pngfile"><img $SIZE src=diffs/images/$SUBDIR/$pngfile></a></td>
+<td><a href="diffs/images/$SUBDIR/$pngfile"><img $SIZE src=diffs/images/$SUBDIR/$pngfile></a><br><br></td>
 EOF
 fi
 
