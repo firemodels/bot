@@ -740,7 +740,7 @@ compile_smv_utilities()
 
 # pnginfo
   if [ -d $smvrepo/Build/pnginfo/${SMVCOMPILER}_${platform}${smvsize} ]; then
-    echo "   pnginfo"
+    echo "      pnginfo"
     cd $smvrepo/Build/pnginfo/${SMVCOMPILER}_${platform}${smvsize}
     rm -f *.o pnginfo_${platform}${smvsize}
     echo 'Compiling pnginfo:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
