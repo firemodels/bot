@@ -1,4 +1,5 @@
 @echo off
+set app=%1
 setlocal EnableDelayedExpansion
 
 ::  batch to copy SMV_Summary directory to local repo
@@ -27,9 +28,19 @@ set SMVREPO=%git_root%\smv
 
 cd ..
 
+if "%app%" == "FDS" goto skip_smv
+
 call :DOWNLOADFILE SMOKEVIEW_TEST SMV_Summary.tar.gz
 call :COPYFILES %FILESDIR% SMV_Summary.tar.gz
 cd %FILESDIR%\SMV_Summary
+goto end_fds
+:skip_smv
+call :DOWNLOADFILE FDS_TEST FDS_Summary.tar
+call :COPYFILES %FILESDIR% FDS_Summary.tar
+cd %FILESDIR%\FDS_Summary
+
+:end_fds
+
 index.html
 goto eof
 
