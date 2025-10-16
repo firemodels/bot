@@ -1,6 +1,6 @@
 #!/bin/bash
 SUFFIX=$1
-if [ "$SUFF" != "" ]; then
+if [ "$SUFFIX" != "" ]; then
   SUFFIX=_$SUFFIX
 fi
 
