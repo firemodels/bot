@@ -2642,11 +2642,16 @@ echo $$ > $PID_FILE
 #*** check for C/C++ compiler
 
 IFORT_VERSION=
+C_VERSION=
 notfound=
 if [ "$COMPILER" == "intel" ]; then
    notfound=`ifx -help 2>&1 | tail -1 | grep "not found" | wc -l`
    if [ $notfound -eq 0 ]; then
      IFORT_VERSION=`ifx -v 2>&1`
+   fi
+   notfound=`icx -help 2>&1 | tail -1 | grep "not found" | wc -l`
+   if [ $notfound -eq 0 ]; then
+     C_VERSION=`icx -v |& head -1`
    fi
 else
    notfound=`gcc -help 2>&1 | tail -1 | grep "not found" | wc -l`
@@ -2673,6 +2678,9 @@ echo ""
 echo "      Run dir: $firebotdir"
 if [ "$IFORT_VERSION" != "" ]; then
   echo "      Fortran: $IFORT_VERSION"
+fi
+if [ "$C_VERSION" != "" ]; then
+  echo "            C: $C_VERSION"
 fi
 if [ "$SKIPRELEASE" != "" ]; then
   echo "     Skipping: release cases stage"
