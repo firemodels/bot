@@ -2644,9 +2644,9 @@ echo $$ > $PID_FILE
 IFORT_VERSION=
 notfound=
 if [ "$COMPILER" == "intel" ]; then
-   notfound=`ifort -help 2>&1 | tail -1 | grep "not found" | wc -l`
+   notfound=`ifx -help 2>&1 | tail -1 | grep "not found" | wc -l`
    if [ $notfound -eq 0 ]; then
-     IFORT_VERSION=`ifort -v 2>&1`
+     IFORT_VERSION=`ifx -v 2>&1`
    fi
 else
    notfound=`gcc -help 2>&1 | tail -1 | grep "not found" | wc -l`
