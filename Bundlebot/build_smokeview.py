@@ -69,7 +69,7 @@ def upload_bundle():       os.system("start " + webscript_dir + "webUPLOADallsmv
 def bundleinstall_smv():       os.system("start " + webscript_dir + "webPACKAGEINSTALLsmv " + platforms[platform.get()]  + " " + versions[version.get()] )
 
 def download_figures():            os.system("start " + webscript_dir + "webGETfigs "       + apps[app.get()]                 + " " + guides[guide.get()] )
-def download_summary():            os.system("start " + webscript_dir + "webGETsummary" )
+def view_summary():                os.system("start " + webscript_dir + "webVIEWsummary "   + apps[app.get()] )
 def build_guides():                os.system("start " + webscript_dir + "webBUILDguides "   + apps[app.get()]                 + " " + guides[guide.get()] )
 def view_guides():                 os.system("start " + webscript_dir + "webVIEWguides "    + apps[app.get()]                 + " " + guides[guide.get()] )
  
@@ -181,7 +181,7 @@ Radiobutton(root, text="Technical",    padx = 0, variable=guide, value=4).grid(r
 
 R=R+1
 Button(root, text="Get Figs",     width=button_width, command=download_figures).grid(row=R, column=0)
-Button(root, text="View Summary", width=button_width, command=download_summary).grid(row=R, column=1)
+Button(root, text="View Summary", width=button_width, command=view_summary).grid(row=R, column=1)
 Button(root, text="Build",        width=button_width, command=build_guides).grid(row=R,     column=2)
 Button(root, text="View",         width=button_width, command=view_guides).grid(row=R,      column=3)
 

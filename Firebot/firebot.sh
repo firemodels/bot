@@ -2014,6 +2014,7 @@ fi
      GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_FDS_TAG
      echo "Bundles, Guides, Summary:  $GITURL" >> $TIME_LOG
      $SummaryGH &> $OUTPUT_DIR/stage10_upload_github
+     $UploadGuidesGH latest &> $OUTPUT_DIR/stage10a_upload_github
      if [[ "$firebot_success" == "1" ]]; then
        $UploadGuidesGH                        &> $OUTPUT_DIR/stage10a_upload_github
        cat $OUTPUT_DIR/stage10a_upload_github >> $OUTPUT_DIR/stage10_upload_github
