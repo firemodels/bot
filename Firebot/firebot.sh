@@ -1372,41 +1372,6 @@ check_verification_stats()
 }
 
 #---------------------------------------------
-#                   check_validation_stats
-#---------------------------------------------
-
-check_validation_stats()
-{
-# fds/Manuals/FDS_Validation_Guide/SCRIPT_FIGURES/ScatterPlots/validation_git_stats.tex
-   # Check for existence of verification statistics output file
-   cd $fdsrepo/Manuals/FDS_Validation_Guide/SCRIPT_FIGURES/ScatterPlots
-   if [ -e "validation_git_stats.tex" ]
-   then
-      # Continue along
-      :
-   else
-      echo "Warnings from Stage 7b - Matlab plotting and statistics (validation):" >> $WARNING_LOG
-      echo "Error: The validation statistics output file does not exist." >> $WARNING_LOG
-      echo "Expected the file Manuals/FDS_Validation_Guide/SCRIPT_FIGURES/ScatterPlots/validation_git_stats.tex" >> $WARNING_LOG
-      echo "" >> $WARNING_LOG
-   fi
-
-   # Scan for the string dirty
-   cd $fdsrepo/Manuals/FDS_Validation_Guide/SCRIPT_FIGURES/ScatterPlots
-   if [[ `grep "dirty" validation_git_stats.tex` == "" ]]
-   then
-      # Continue along
-      :
-   else
-      echo "Warnings from Stage 7b - Matlab plotting and statistics (validation):" >> $WARNING_LOG
-      echo "The following table entries are dirty:" >> $WARNING_LOG
-      echo "" >> $WARNING_LOG
-      grep "dirty" validation_git_stats.tex >> $WARNING_LOG
-      echo "" >> $WARNING_LOG
-   fi
-}
-
-#---------------------------------------------
 #                   GET_TIME
 #---------------------------------------------
 
@@ -1526,17 +1491,6 @@ archive_validation_stats()
       echo "Expected the file Manuals/FDS_Validation_Guide/SCRIPT_FIGURES/ScatterPlots/validation_scatterplot_output.csv" >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
-}
-
-#---------------------------------------------
-#                   make_validation_git_stats
-#---------------------------------------------
-
-make_validation_git_stats()
-{
-   # Output a LaTeX file with a table of the FDS validation sets and their corresponding GIT information
-   cd $botrepo/Firebot/Scripts
-   ./validation_git_stats.sh -r $repo
 }
 
 #---------------------------------------------
@@ -3014,8 +2968,6 @@ MATLAB_beg=`GET_TIME`
       run_matlab_validation
       check_matlab_validation
       archive_validation_stats
-      make_validation_git_stats
-      check_validation_stats
     fi
   fi
 MATLAB_end=`GET_TIME`
