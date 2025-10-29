@@ -1882,6 +1882,9 @@ email_build_status()
    if [ "$IFORT_VERSION" != "" ]; then
       echo "Fortran: $IFORT_VERSION "                       >> $TIME_LOG
    fi
+   if [ "$C_VERSION" != "" ]; then
+      echo "      C: $C_VERSION"                             >> $TIME_LOG
+   fi
    echo ""                                                  >> $TIME_LOG
    echo "bot: $BOT_REVISION/$BOTBRANCH "    >> $TIME_LOG
    if [ "$CAD_REVISION" != "" ]; then
