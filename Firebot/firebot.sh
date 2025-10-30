@@ -2651,7 +2651,8 @@ if [ "$COMPILER" == "intel" ]; then
    fi
    notfound=`icx -help 2>&1 | tail -1 | grep "not found" | wc -l`
    if [ $notfound -eq 0 ]; then
-     C_VERSION=`icx -v |& head -1`
+     C_VERSION=`icx -v |& head -1 | awk '{print $5}'`
+     C_VERSION="icx version $C_VERSION"
    fi
 else
    notfound=`gcc -help 2>&1 | tail -1 | grep "not found" | wc -l`
