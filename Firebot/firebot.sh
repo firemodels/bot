@@ -1100,17 +1100,6 @@ check_compile_smv()
   smv_release_success=true
 }
 
-#---------------------------------------------
-#                   make_fds_pictures
-#---------------------------------------------
-
-make_fds_pictures()
-{
-   # Run Make FDS Pictures script
-   echo Generating FDS images
-   cd $fdsrepo/Verification/scripts
-   ./Make_FDS_Pictures.sh &> $OUTPUT_DIR/stage6
-}
 
 #---------------------------------------------
 #                   check_fds_pictures
@@ -1499,13 +1488,9 @@ archive_validation_stats()
 
 generate_timing_stats()
 {
-   cd $fdsrepo/Utilities/Scripts
-   ./fds_timing_stats.sh           > fds_timing_stats.csv
+   cd $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/Scatterplots
    TOTAL_FDS_TIMES=`tail -1 fds_timing_stats.csv`
    echo "$TOTAL_FDS_TIMES"     > $LATESTAPPS_DIR/fds_total_time.txt
-
-   cd $fdsrepo/Utilities/Scripts
-   ./fds_timing_stats.sh firebot 1 > fds_benchmarktiming_stats.csv
 }
 
 #---------------------------------------------
@@ -1515,7 +1500,7 @@ generate_timing_stats()
 archive_timing_stats()
 {
    echo archiving timing stats
-   cd $fdsrepo/Utilities/Scripts
+   cd $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/Scatterplots
    cp fds_timing_stats.csv "$HISTORY_DIR/${FDS_REVISION}_timing.csv"
    sort -r -k 2 -t  ',' -n fds_timing_stats.csv | head -10 | awk -F',' '{print $1":", $2}' > $OUTPUT_DIR/slow_cases
 
@@ -1537,10 +1522,7 @@ archive_timing_stats()
    fi
    echo $gitdate,$FDS_DATE,$FDS_REVISION,$firebot_success,$CLONE_DELTA,$SETUP_DELTA,$BUILD_DELTA,$DEBUG_DELTA,$RELEASE_DELTA,$PICTURE_DELTA,$MATLAB_DELTA,$MANUALS_DELTA,$SCRIPT_DELTA >> $HISTORY_DIR/firebot_times.csv
 
-   cp fds_benchmarktiming_stats.csv "$HISTORY_DIR/${FDS_REVISION}_benchmarktiming.csv"
-   cp fds_timing_stats.csv          "$HISTORY_DIR/${FDS_REVISION}_timing.csv"
-   TOTAL_FDS_TIMES=`tail -1 fds_timing_stats.csv`
-  if [ "$UPLOADGUIDES" == "1" ]; then
+   if [ "$UPLOADGUIDES" == "1" ]; then
      if [ "$USER" == "firebot" ]; then
         cd $botrepo/Firebot
        ./status_updatepub.sh $repo/webpages $WEBBRANCH
@@ -2921,7 +2903,6 @@ if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
 
 # Depends on successful SMV compile
   if [[ "$SKIPPICTURES" == "" ]] && [[ $smv_release_success ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] ; then
-    make_fds_pictures
     check_fds_pictures
     make_fds_summary
     MAKE_SUMMARY=1
