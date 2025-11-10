@@ -526,8 +526,8 @@ run_verification_cases_debug()
    echo "Running FDS Verification Cases"
    echo "   debug"
    echo "Running FDS verification cases:"                                           >> $OUTPUT_DIR/stage4 2>&1
-   echo ./Run_FDS_Cases.sh $ONETHREAD -d -m 1 $INTEL2 -q $QUEUE -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage4 2>&1
-        ./Run_FDS_Cases.sh $ONETHREAD -d -m 1 $INTEL2 -q $QUEUE -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage4 2>&1
+   echo ./Run_FDS_Cases.sh -d -m 1 $INTEL2 -q $QUEUE -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage4 2>&1
+        ./Run_FDS_Cases.sh -d -m 1 $INTEL2 -q $QUEUE -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage4 2>&1
    echo ""                                                                          >> $OUTPUT_DIR/stage4 2>&1
 
    # Wait for all verification cases to end
@@ -761,11 +761,7 @@ compile_smv_utilities()
   cd $fdsrepo/Utilities/fds2ascii/${COMPILER}_${platform}${size}
   rm -f *.o fds2ascii_${platform}${size}
   ./make_fds2ascii.sh >> $OUTPUT_DIR/stage3a 2>&1
-  if [ "$OPENMPTEST" == "" ]; then
-    cp fds2ascii_${platform}${size} $LATESTAPPS_DIR/fds2ascii
-  else
-    cp fds2ascii_${COMPILER}_${platform}${size} $LATESTAPPS_DIR/fds2ascii
-  fi
+  cp fds2ascii_${COMPILER}_${platform}${size} $LATESTAPPS_DIR/fds2ascii
   echo "" >> $OUTPUT_DIR/stage3a 2>&1
 
 # test_mpi
@@ -916,29 +912,17 @@ run_VV_cases_release()
      echo "   release"
    fi
    cd $fdsrepo/Verification/scripts
-   # Run FDS with 1 OpenMP thread
-
-   if [[ "$OPENMPTEST" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-     echo "Running FDS benchmark verification cases:"                              >> $OUTPUT_DIR/stage5 2>&1
-     echo ./Run_FDS_Cases.sh $INTEL2 -b $ONETHREAD -q $QUEUE -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
-     ./Run_FDS_Cases.sh $INTEL2 -b $ONETHREAD      -q $QUEUE -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
-     echo ""                                                                       >> $OUTPUT_DIR/stage5 2>&1
-   fi
 
    # Wait for benchmark verification cases to end
-# let benchmark and regular cases run at the same time - for now
-#   wait_cases_release_end verification stage5
+   # let benchmark and regular cases run at the same time - for now
+   # wait_cases_release_end verification stage5
 
    if [[ "$CHECK_CLUSTER" == "" ]]; then
      cd $fdsrepo/Verification/scripts
-     if [[ "$OPENMPTEST" == "" ]]; then
-       echo "Running FDS non-benchmark verification cases:"                         >> $OUTPUT_DIR/stage5 2>&1
-     else
-       echo "Running FDS verification cases:"                                       >> $OUTPUT_DIR/stage5 2>&1
-     fi
-     echo ./Run_FDS_Cases.sh $INTEL2 $REGULARCASES $ONETHREAD -q $QUEUE -j $JOBPREFIX_RELEASE  >> $OUTPUT_DIR/stage5 2>&1
+     echo "Running FDS verification cases:"                                       >> $OUTPUT_DIR/stage5 2>&1
+     echo ./Run_FDS_Cases.sh $INTEL2 $REGULARCASES -q $QUEUE -j $JOBPREFIX_RELEASE  >> $OUTPUT_DIR/stage5 2>&1
      cd $fdsrepo/Verification/scripts
-     ./Run_FDS_Cases.sh      $INTEL2 $REGULARCASES $ONETHREAD -q $QUEUE -j $JOBPREFIX_RELEASE  >> $OUTPUT_DIR/stage5 2>&1
+     ./Run_FDS_Cases.sh      $INTEL2 $REGULARCASES -q $QUEUE -j $JOBPREFIX_RELEASE  >> $OUTPUT_DIR/stage5 2>&1
      echo ""                                                                        >> $OUTPUT_DIR/stage5 2>&1
    fi
 
@@ -983,9 +967,9 @@ run_VV_cases_release()
 
      echo ""                                        i                        >> $OUTPUT_DIR/stage5 2>&1
      echo 'Running FDS restart verification cases:'                          >> $OUTPUT_DIR/stage5 2>&1
-     echo ./Run_FDS_Cases.sh $INTEL2 -r $ONETHREAD -q $QUEUE -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
+     echo ./Run_FDS_Cases.sh $INTEL2 -r -q $QUEUE -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
      cd $fdsrepo/Verification/scripts
-          ./Run_FDS_Cases.sh $INTEL2 -r $ONETHREAD -q $QUEUE -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
+          ./Run_FDS_Cases.sh $INTEL2 -r -q $QUEUE -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage5 2>&1
      echo ""                                                                 >> $OUTPUT_DIR/stage5 2>&1
 
      # Wait for restart verification cases to end
@@ -2175,7 +2159,6 @@ FDS_TAG=
 SMV_TAG=
 VALIDATION=
 CHECK_CLUSTER=
-OPENMPTEST=1
 MPI_TYPE=ompi
 BOPT=
 GITURL=
@@ -2186,7 +2169,7 @@ FORCE_UPLOAD=
 CACHE_DIR=
 
 #*** parse command line arguments
-while getopts '3b:BcCdDGJm:Mp:q:R:s:STuUV:x:X:y:Y:w:W:z' OPTION
+while getopts '3b:BcCdGJm:Mp:q:R:s:STuUV:x:X:y:Y:w:W:z' OPTION
 do
 case $OPTION in
   3)
@@ -2216,9 +2199,6 @@ case $OPTION in
    SKIPRELEASE=1
    SKIPMATLAB=1
    SKIPPICTURES=1
-   ;;
-  D)
-   OPENMPTEST=
    ;;
   G)
    FORCE_UPLOAD=1
@@ -2397,16 +2377,8 @@ if [ "$CLONEFILE" != "" ]; then
   fi
 fi
 
-if [ "$OPENMPTEST" == "" ]; then
-  size=_64
-  GNU_MPI=mpi_
-  ONETHREAD="-o 1"
-  REGULARCASES="-R"
-else
-  GNU_MPI=ompi_
-  ONETHREAD=
-  REGULARCASES=
-fi
+GNU_MPI=ompi_
+REGULARCASES=
 smvsize=_64
 
 GNU_COMPILER=gnu_
@@ -2800,10 +2772,8 @@ BUILD_beg=`GET_TIME`
 if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
   compile_fds_mpi_db         $FDS_DB_DIR $FDS_DB_EXE
   check_compile_fds_mpi_db   $FDS_DB_DIR $FDS_DB_EXE
-  if [ "$OPENMPTEST" != "" ]; then 
-    compile_fds_mpi_db         $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
-    check_compile_fds_mpi_db   $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
-  fi
+  compile_fds_mpi_db         $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
+  check_compile_fds_mpi_db   $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
 fi
 
 ###*** Stage 2d ###
@@ -2818,10 +2788,8 @@ fi
 if [[ "$SKIPRELEASE" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
   compile_fds_mpi         $FDS_DIR $FDS_EXE
   check_compile_fds_mpi   $FDS_DIR $FDS_EXE
-  if [ "$OPENMPTEST" != "" ]; then 
-    compile_fds_mpi         $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
-    check_compile_fds_mpi   $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
-  fi
+  compile_fds_mpi         $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
+  check_compile_fds_mpi   $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
 fi
 
 ###*** Stage 3a ###
