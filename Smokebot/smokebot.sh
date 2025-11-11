@@ -269,8 +269,8 @@ compile_cfast()
 
     # Build CFAST
     echo "   release cfast"
-    cd $cfastrepo/Build/CFAST/${COMPILER}_${platform}_64
-    rm -f cfast7_${platform}_64
+    cd $cfastrepo/Build/CFAST/${COMPILER}_${platform}
+    rm -f cfast7_${platform}
     make --makefile ../makefile clean &> /dev/null
     ./make_cfast.sh >> $OUTPUT_DIR/stage1a_cfast 2>&1
 }
@@ -282,8 +282,8 @@ compile_cfast()
 check_compile_cfast()
 {
    # Check for errors in CFAST compilation
-   cd $cfastrepo/Build/CFAST/${COMPILER}_${platform}_64
-   if [ -e "cfast7_${platform}_64" ]
+   cd $cfastrepo/Build/CFAST/${COMPILER}_${platform}
+   if [ -e "cfast7_${platform}" ]
    then
       stage0_success=true
    else
@@ -614,72 +614,72 @@ compile_smv_utilities()
    if [ "$haveCC" == "1" ] ; then
    # smokeview libraries
      echo "   libraries"
-     cd $smvrepo/Build/LIBS/${COMPILER}_${platform}_64
+     cd $smvrepo/Build/LIBS/${COMPILER}_${platform}
      echo 'Building Smokeview libraries:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
      ./make_LIBS.sh >> $OUTPUT_DIR/stage2a_smvutil 2>&1
 
    # smokezip:
      echo "   smokezip"
-     cd $smvrepo/Build/smokezip/${COMPILER}_${platform}_64
-     rm -f *.o smokezip_${platform}_64
+     cd $smvrepo/Build/smokezip/${COMPILER}_${platform}
+     rm -f *.o smokezip_${platform}
 
      echo 'Compiling smokezip:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
      ./make_smokezip.sh >> $OUTPUT_DIR/stage2a_smvutil 2>&1
      echo "" >> $OUTPUT_DIR/stage2a_smvutil 2>&1
-     cp smokezip_${platform}_64 $LATESTAPPS_DIR/smokezip
+     cp smokezip_${platform} $LATESTAPPS_DIR/smokezip
 
    # smokediff:
      echo "   smokediff"
-     cd $smvrepo/Build/smokediff/${COMPILER}_${platform}_64
-     rm -f *.o smokediff_${platform}_64
+     cd $smvrepo/Build/smokediff/${COMPILER}_${platform}
+     rm -f *.o smokediff_${platform}
      echo 'Compiling smokediff:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
      ./make_smokediff.sh >> $OUTPUT_DIR/stage2a_smvutil 2>&1
      echo "" >> $OUTPUT_DIR/stage2a_smvutil 2>&1
-     cp smokediff_${platform}_64 $LATESTAPPS_DIR/smokediff
+     cp smokediff_${platform} $LATESTAPPS_DIR/smokediff
    
    # fds2fed:
      echo "   fds2fed"
-     cd $smvrepo/Build/fds2fed/${COMPILER}_${platform}_64
-     rm -f *.o fds2fed_${platform}_64
+     cd $smvrepo/Build/fds2fed/${COMPILER}_${platform}
+     rm -f *.o fds2fed_${platform}
      echo 'Compiling fds2fed:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
      ./make_fds2fed.sh >> $OUTPUT_DIR/stage2a_smvutil 2>&1
      echo "" >> $OUTPUT_DIR/stage2a_smvutil 2>&1
-     cp fds2fed_${platform}_64 $LATESTAPPS_DIR/fds2fed
+     cp fds2fed_${platform} $LATESTAPPS_DIR/fds2fed
 
    # background
      echo "   background"
-     cd $smvrepo/Build/background/${COMPILER}_${platform}_64
-     rm -f *.o background_${platform}_64
+     cd $smvrepo/Build/background/${COMPILER}_${platform}
+     rm -f *.o background_${platform}
      echo 'Compiling background:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
      ./make_background.sh >> $OUTPUT_DIR/stage2a_smvutil 2>&1
-     cp background_${platform}_64 $LATESTAPPS_DIR/background
+     cp background_${platform} $LATESTAPPS_DIR/background
 
    # pnginfo
-     if [ -d $smvrepo/Build/pnginfo/${COMPILER}_${platform}_64 ]; then
+     if [ -d $smvrepo/Build/pnginfo/${COMPILER}_${platform} ]; then
        echo "   pnginfo"
-       cd $smvrepo/Build/pnginfo/${COMPILER}_${platform}_64
-       rm -f *.o pnginfo_${platform}_64
+       cd $smvrepo/Build/pnginfo/${COMPILER}_${platform}
+       rm -f *.o pnginfo_${platform}
        echo 'Compiling pnginfo:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
        ./make_pnginfo.sh >> $OUTPUT_DIR/stage2a_smvutil 2>&1
-       cp pnginfo_${platform}_64 $LATESTAPPS_DIR/pnginfo
+       cp pnginfo_${platform} $LATESTAPPS_DIR/pnginfo
      fi
 
    # hashfile
      echo "   hashfile"
-     cd $smvrepo/Build/hashfile/${COMPILER}_${platform}_64
-     rm -f *.o hashfile_${platform}_64
+     cd $smvrepo/Build/hashfile/${COMPILER}_${platform}
+     rm -f *.o hashfile_${platform}
      echo 'Compiling hashfile:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
      ./make_hashfile.sh >> $OUTPUT_DIR/stage2a_smvutil 2>&1
-     cp hashfile_${platform}_64 $LATESTAPPS_DIR/hashfile
+     cp hashfile_${platform} $LATESTAPPS_DIR/hashfile
 
   # wind2fds:
      echo "   wind2fds"
-     cd $smvrepo/Build/wind2fds/${COMPILER}_${platform}_64
-     rm -f *.o wind2fds_${platform}_64
+     cd $smvrepo/Build/wind2fds/${COMPILER}_${platform}
+     rm -f *.o wind2fds_${platform}
      echo 'Compiling wind2fds:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
      ./make_wind2fds.sh >> $OUTPUT_DIR/stage2a_smvutil 2>&1
     echo "" >> $OUTPUT_DIR/stage2a_smvutil 2>&1
-     cp wind2fds_${platform}_64 $LATESTAPPS_DIR/wind2fds
+     cp wind2fds_${platform} $LATESTAPPS_DIR/wind2fds
    else
      echo "Warning: smokeview and utilities not built - C compiler not available" >> $OUTPUT_DIR/stage2a_smvutil 2>&1
      compile_errors=1
@@ -755,12 +755,12 @@ check_common_files()
 
 check_smv_utilities()
 {
-   SMOKEZIP="$smvrepo/Build/smokezip/${COMPILER}_${platform}_64/smokezip_${platform}_64"
-   SMOKEDIFF="$smvrepo/Build/smokediff/${COMPILER}_${platform}_64/smokediff_${platform}_64"
-   FDS2FED="$smvrepo/Build/fds2fed/${COMPILER}_${platform}_64/fds2fed_${platform}_64"
-   WIND2FDS="$smvrepo/Build/wind2fds/${COMPILER}_${platform}_64/wind2fds_${platform}_64"
-   BACKGROUND="$smvrepo/Build/background/${COMPILER}_${platform}_64/background_${platform}_64"
-   PNGINFO="$smvrepo/Build/pnginfo/${COMPILER}_${platform}_64/pnginfo_${platform}_64"
+   SMOKEZIP="$smvrepo/Build/smokezip/${COMPILER}_${platform}/smokezip_${platform}"
+   SMOKEDIFF="$smvrepo/Build/smokediff/${COMPILER}_${platform}/smokediff_${platform}"
+   FDS2FED="$smvrepo/Build/fds2fed/${COMPILER}_${platform}/fds2fed_${platform}"
+   WIND2FDS="$smvrepo/Build/wind2fds/${COMPILER}_${platform}/wind2fds_${platform}"
+   BACKGROUND="$smvrepo/Build/background/${COMPILER}_${platform}/background_${platform}"
+   PNGINFO="$smvrepo/Build/pnginfo/${COMPILER}_${platform}/pnginfo_${platform}"
    PNGINFO_SUCCESS=1
    if [[ -d $smvrepo/Build/pnginfo && ! -e $PNGINFO ]]; then
      PNGINFO_SUCCESS=0
@@ -931,8 +931,8 @@ compile_smv_db()
    if [ "$haveCC" == "1" ] ; then
    # Clean and compile SMV debug
      echo "   debug smokeview"
-     cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_64
-     rm -f smokeview_${platform}_64_db
+     cd $smvrepo/Build/smokeview/${COMPILER}_${platform}
+     rm -f smokeview_${platform}_db
      ./make_smokeview_db.sh $SANITIZE &> $OUTPUT_DIR/stage2b_smv_dbg
    fi
 }
@@ -945,8 +945,8 @@ check_compile_smv_db()
 {
   if [ "$haveCC" == "1" ] ; then
    # Check for errors in SMV debug compilation
-    cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_64
-    if [ -e "smokeview_${platform}_64_db" ]
+    cd $smvrepo/Build/smokeview/${COMPILER}_${platform}
+    if [ -e "smokeview_${platform}_db" ]
     then
        stage2b_smv_dbg_success=true
     else
@@ -980,8 +980,8 @@ compile_smv()
    if [ "$haveCC" == "1" ] ; then
    # Clean and compile SMV
      echo "   release smokeview"
-     cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_64
-     rm -f smokeview_${platform}_64
+     cd $smvrepo/Build/smokeview/${COMPILER}_${platform}
+     rm -f smokeview_${platform}
      ./make_smokeview.sh $SANITIZE  &> $OUTPUT_DIR/stage2c_smv_rls
    fi
 }
@@ -994,13 +994,13 @@ check_compile_smv()
 {
   if [ "$haveCC" == "1" ]; then
    # Check for errors in SMV release compilation
-    cd $smvrepo/Build/smokeview/${COMPILER}_${platform}_64
-    if [ -e "smokeview_${platform}_64" ]; then
-      cp smokeview_${platform}_64 $LATESTAPPS_DIR/smokeview
+    cd $smvrepo/Build/smokeview/${COMPILER}_${platform}
+    if [ -e "smokeview_${platform}" ]; then
+      cp smokeview_${platform} $LATESTAPPS_DIR/smokeview
       stage2c_smv_rls_smv_success=true
     else
       echo "Errors from Stage 2c - Compile SMV release:"           >> $ERROR_LOG
-      echo "The program smokeview_${platform}_64 does not exist."  >> $ERROR_LOG
+      echo "The program smokeview_${platform} does not exist."  >> $ERROR_LOG
       cat $OUTPUT_DIR/stage2c_smv_rls                                      >> $ERROR_LOG
       echo ""                                                      >> $ERROR_LOG
       compile_errors=1
