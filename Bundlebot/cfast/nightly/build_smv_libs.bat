@@ -9,7 +9,7 @@ set STARTOPT=/MIN
 cd ..\..\..\..\smv
 set smvrepo=%CD%
 
-cd %smvrepo%\build\libs\intel_win_64
+cd %smvrepo%\build\libs\intel_win
 set LIBDIR=%CD%
 git clean -dxf > Nul
 

@@ -39,7 +39,7 @@ if %build_cedit% == 0 goto skip_build_cedit
 :skip_build_cedit
 call :COPY  %bindir%\CFAST.exe                %CFASTDISTDIR%\
 call :COPY  %vandvdir%\VandV_Calcs_win_64.exe                               %CFASTDISTDIR%\VandV_Calcs.exe
-call :COPY  %smvrepo%\Build\background\intel_win_64\background_win_64.exe   %CFASTDISTDIR%\background.exe
+call :COPY  %smvrepo%\Build\background\intel_win\background_win.exe         %CFASTDISTDIR%\background.exe
 
 if %build_cedit% == 0 goto skip_build_cedit2
    echo ***Copying CEdit DLLs
@@ -95,7 +95,7 @@ echo ***Copying Uninstall files
 
 call :COPY  %botrepo%\Bundlebot\cfast\for_bundle\uninstall.bat        %FIREMODELSDIR%\Uninstall
 call :COPY  %botrepo%\Bundlebot\cfast\for_bundle\uninstall_cfast.bat  %FIREMODELSDIR%\Uninstall\uninstall_base.bat 
-call :COPY  %smvrepo%\Build\set_path\intel_win_64\set_path_win_64.exe %FIREMODELSDIR%\Uninstall\set_path.exe
+call :COPY  %smvrepo%\Build\set_path\intel_win\set_path_win.exe       %FIREMODELSDIR%\Uninstall\set_path.exe
 call :COPY  %smvrepo%\Build\for_bundle\Shortcut                       %FIREMODELSDIR%\Uninstall\shortcut.exe
 
 
@@ -116,8 +116,7 @@ exit /b
 :COPYPROG
 :-------------------------------------------------
 set inprog=%1
-set test=%2
-set infile=%smvrepo%\Build\%inprog%\intel_win_64\%inprog%_win_%test%64.exe
+set infile=%smvrepo%\Build\%inprog%\intel_win\%inprog%_win.exe
 IF EXIST %infile%       copy %infile% %SMVDISTDIR%\%inprog%.exe > Nul 2>&1
 IF NOT EXIST %SMVDISTDIR%\%inprog%.exe echo ***Error: %infile% copy failed
 exit /b
