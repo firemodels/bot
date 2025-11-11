@@ -25,7 +25,7 @@ Title Building release FDS for %platform%
 %git_drive%
 
 if "%platform%" == "windows" (
-  cd %git_root%\fds\Build\impi_intel_win_64
+  cd %git_root%\fds\Build\impi_intel_win
   erase *.obj *.mod *.exe
   call make_fds
   goto eof
@@ -35,14 +35,14 @@ if "%linux_mpi_version%" == "INTEL" (
   set INTEL=i
 )
 if "%platform%" == "linux" (
-  plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Build/Scripts clean.sh %INTEL%mpi_intel_linux_64
-  plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Build/%INTEL%mpi_intel_linux_64 make_fds.sh
+  plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Build/Scripts clean.sh %INTEL%mpi_intel_linux
+  plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Build/%INTEL%mpi_intel_linux make_fds.sh
   pause
   goto eof
 )
 if "%platform%" == "osx" (
-  plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Build/Scripts clean.sh mpi_intel_osx_64
-  plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Build/mpi_intel_osx_64 make_fds.sh
+  plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Build/Scripts clean.sh mpi_intel_osx
+  plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Build/mpi_intel_osx make_fds.sh
   pause
   goto eof
 )

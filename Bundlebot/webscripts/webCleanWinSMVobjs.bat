@@ -26,7 +26,7 @@ echo.
 echo cleaning smokeview build directories
 
 echo *** windows
-cd %git_root%\smv\Build\smokeview\intel_win_64
+cd %git_root%\smv\Build\smokeview\intel_win
 git clean -dxf
 
 

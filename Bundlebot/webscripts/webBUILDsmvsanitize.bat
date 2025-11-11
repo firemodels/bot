@@ -26,7 +26,7 @@ Title Building test Smokeview for %platform%
 %git_drive%
 
 if "%platform%" == "Windows" (
-  cd %git_root%\smv\Build\smokeview\intel_win_64
+  cd %git_root%\smv\Build\smokeview\intel_win
   if "%option%" == "full " (
     call make_smokeview_san -test -glut
   )
@@ -39,7 +39,7 @@ if "%platform%" == "Windows" (
 :: ----------- linux -----------------
 
 if "%platform%" == "Linux" (
-::  plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/run_command.sh smv/Build/smokeview/intel_linux_64 make_smokeview_db.sh -t -s
+::  plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/run_command.sh smv/Build/smokeview/intel_linux make_smokeview_db.sh -t -s
   echo sanitize option not available for Linux
   goto eof
 )

@@ -25,7 +25,7 @@ Title Building debug test Smokeview for %platform%
 %git_drive%
 
 if "%platform%" == "Windows" (
-  cd %git_root%\smv\Build\smokeview\intel_win_64
+  cd %git_root%\smv\Build\smokeview\intel_win
   call make_smokeview_db -test -glut -icon -sanitize
   goto eof
 )
