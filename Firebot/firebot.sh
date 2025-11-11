@@ -2866,14 +2866,14 @@ GET_DURATION $RELEASE_beg $RELEASE_end RELEASE
 
 ###*** Stage 6 ###
 PICTURE_beg=`GET_TIME`
-if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+#if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
 
-# Depends on successful SMV compile
-  if [[ "$SKIPPICTURES" == "" ]] && [[ $smv_release_success ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] ; then
-    check_fds_pictures
-    make_fds_summary
-    MAKE_SUMMARY=1
-  fi
+## Depends on successful SMV compile
+#  if [[ "$SKIPPICTURES" == "" ]] && [[ $smv_release_success ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] ; then
+#    check_fds_pictures
+#    make_fds_summary
+#    MAKE_SUMMARY=1
+#  fi
 PICTURE_end=`GET_TIME`
 GET_DURATION $PICTURE_beg $PICTURE_end PICTURE
 
@@ -2892,6 +2892,8 @@ MATLAB_beg=`GET_TIME`
     if [ $python_success == true ]; then
       run_python_verification
       check_python_verification
+      make_fds_summary
+      MAKE_SUMMARY=1
     fi
 
 #*** python validation plots
@@ -2963,7 +2965,7 @@ MANUALS_beg=`GET_TIME`
       copy_fds_Config_management_plan
     fi
   fi
-fi
+#fi
 
 ###*** archive apps
 
