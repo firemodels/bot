@@ -1,13 +1,18 @@
 @echo off
 set error=0
+set SMV_HASH=%1
+set SMV_REVISION=%2
 
 call :getopts %*
 
+if "x%SMV_HASH%" == "x" goto else1
+echo %SMV_HASH%     > output\SMV_HASH
+echo %SMV_REVISION% > output\SMV_REVISION
+:else1
 call :getfile SMV_INFO.txt
 grep SMV_HASH     output\SMV_INFO.txt | gawk "{print $2}" > output\SMV_HASH
 grep SMV_REVISION output\SMV_INFO.txt | gawk "{print $2}" > output\SMV_REVISION
 goto eof
-
 
 ::-----------------------------------------------------------------------
 :getfile

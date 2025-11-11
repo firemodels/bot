@@ -1,6 +1,12 @@
 @echo off
 setlocal
 
+set upload=1
+set S_HASH=
+set S_REVISION=
+::set S_HASH=2f257722a
+::set S_REVISION=SMV-6.10.5-249
+
 set is_nightly=1
 
 set OWNER=firemodels
@@ -17,7 +23,7 @@ cd ..\..\..
 set reporoot=%CD%
 cd %CURDIR%
 
-call get_smv_hash_revisions > %outdir%\stage1_hash 2>&1
+call get_smv_hash_revisions %S_HASH% %S_REVISION% > %outdir%\stage1_hash 2>&1
 set /p smv_hash=<%outdir%\SMV_HASH
 
 echo *** cloning smv repo
@@ -73,6 +79,7 @@ Title Building Smokeview bundle
 
 set uploaddir=%userprofile%\.bundle\uploads
 
+if "x%upload%" == "x" goto skip_upload
 set filelist=%TEMP%\smv_files_win.out
 gh release view SMOKEVIEW_TEST  -R github.com/%OWNER%/test_bundles | grep SMV | grep -v FDS | grep -v CFAST | grep win | gawk "{print $2}" > %filelist%
 for /F "tokens=*" %%A in (%filelist%) do gh release delete-asset SMOKEVIEW_TEST %%A  -R github.com/%OWNER%/test_bundles -y
@@ -85,3 +92,4 @@ echo uploading %smvrepo_revision%_win.exe to github.com//%OWNER%/test_bundles
 gh release upload SMOKEVIEW_TEST %uploaddir%\%smvrepo_revision%_win.exe  -R github.com/%OWNER%/test_bundles --clobber
 
 echo *** upload complete
+:skip_upload

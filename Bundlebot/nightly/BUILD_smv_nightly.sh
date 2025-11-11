@@ -2,6 +2,12 @@
 curdir=`pwd`
 BUILDING_nightly=$1
 
+S_HASH=
+S_REVISION=
+#S_HASH=2f257722a
+#S_REVISION=SMV-6.10.5-249
+
+
 #*** determine platform script is running on
 
 platform=linux
@@ -43,7 +49,7 @@ if [ "$BUILDING_release" == "" ]; then
   cd $reporoot/bot/Bundlebot/nightly/output
   outdir=`pwd`
   cd $reporoot/bot/Bundlebot/nightly
-  ./get_hash_revisions.sh $outdir >& $outdir/stage1_hash
+  ./get_hash_revisions.sh $outdir $S_HASH $S_REVISION >& $outdir/stage1_hash
   smv_hash=`head -1 $outdir/SMV_HASH`
 else
   cd $reporoot/bot/Bundlebot/release/output
