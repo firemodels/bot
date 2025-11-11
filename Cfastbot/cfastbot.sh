@@ -289,7 +289,7 @@ compile_cfast_db()
    echo "Building"
    echo "   cfast"
    echo "      Intel debug"
-   CD_REPO $cfastrepo/Build/CFAST/${compiler}_${platform}_${size}_db $CFASTBRANCH || return 1
+   CD_REPO $cfastrepo/Build/CFAST/${compiler}_${platform}_64_db $CFASTBRANCH || return 1
    make -f ../makefile clean &> /dev/null
    ./make_cfast.sh &> $OUTPUT_DIR/stage2a
    return 0
@@ -309,7 +309,7 @@ compile_cfast_gnu_db()
        module load $OPENMPI_GNU
        compile_gnu=1
        echo "      gnu debug"
-       CD_REPO $cfastrepo/Build/CFAST/gnu_${platform}_${size}_db $CFASTBRANCH || return 1
+       CD_REPO $cfastrepo/Build/CFAST/gnu_${platform}_64_db $CFASTBRANCH || return 1
        make -f ../makefile clean &> /dev/null
        ./make_cfast.sh &> $OUTPUT_DIR/stage2f
        module unload $OPENMPI_GNU
@@ -327,8 +327,8 @@ check_compile_cfast_gnu_db()
 {
    # Check for errors in CFAST debug compilation
    if [ "$compile_gnu" == "1" ]; then
-     CD_REPO $cfastrepo/Build/CFAST/gnu_${platform}_${size}_db $CFASTBRANCH || return 1
-     if [ -e "cfast7_${platform}_${size}_db" ]
+     CD_REPO $cfastrepo/Build/CFAST/gnu_${platform}_64_db $CFASTBRANCH || return 1
+     if [ -e "cfast7_${platform}_64_db" ]
      then
         stage2f_success=true
      else
@@ -357,8 +357,8 @@ check_compile_cfast_gnu_db()
 check_compile_cfast_db()
 {
    # Check for errors in CFAST debug compilation
-   CD_REPO $cfastrepo/Build/CFAST/${compiler}_${platform}_${size}_db $CFASTBRANCH || return 1
-   if [ -e "cfast7_${platform}_${size}_db" ]
+   CD_REPO $cfastrepo/Build/CFAST/${compiler}_${platform}_64_db $CFASTBRANCH || return 1
+   if [ -e "cfast7_${platform}_64_db" ]
    then
       stage2a_success=true
    else
@@ -387,7 +387,7 @@ compile_cfast()
 { 
    # Build release CFAST
    echo "      release"
-   CD_REPO $cfastrepo/Build/CFAST/${compiler}_${platform}_${size} $CFASTBRANCH || return 1
+   CD_REPO $cfastrepo/Build/CFAST/${compiler}_${platform}_64 $CFASTBRANCH || return 1
    make -f ../makefile clean &> /dev/null
    ./make_cfast.sh &> $OUTPUT_DIR/stage2b
 }
@@ -399,8 +399,8 @@ compile_cfast()
 check_compile_cfast()
 {
    # Check for errors in CFAST release compilation
-   CD_REPO $cfastrepo/Build/CFAST/${compiler}_${platform}_${size} $CFASTBRANCH || return 1
-   if [[ -e "cfast7_${platform}_${size}" ]]
+   CD_REPO $cfastrepo/Build/CFAST/${compiler}_${platform}_64 $CFASTBRANCH || return 1
+   if [[ -e "cfast7_${platform}_64" ]]
    then
       stage2b_success=true
    else
@@ -430,14 +430,14 @@ compile_smv_utilities()
 {
    if [ "$USEINSTALL" == "" ]; then
    # smokeview libraries
-     CD_REPO $smvrepo/Build/LIBS/${compiler}_${platform}_${size} $SMVBRANCH || return 1
+     CD_REPO $smvrepo/Build/LIBS/${compiler}_${platform} $SMVBRANCH || return 1
      echo 'Building Smokeview libraries' >> $OUTPUT_DIR/stage3a 2>&1
      echo "   smokeview libraries"
      ./make_LIBS.sh >> $OUTPUT_DIR/stage3a 2>&1
 
    # background
      if [ "$QUEUE" == "none" ]; then
-       cd $smvrepo/Build/background/${compiler}_${platform}_${size}
+       cd $smvrepo/Build/background/${compiler}_${platform}
        echo '   background'
        echo 'Compiling background' >> $OUTPUT_DIR/stage3a 2>&1
        ./make_background.sh >> $OUTPUT_DIR/stage3a 2>&1
@@ -462,7 +462,7 @@ check_smv_utilities()
      # Check for errors in SMV utilities compilation
      stage3a_success="1"
      if [ "$QUEUE" == "none" ]; then
-       if [ ! -e "$smvrepo/Build/background/${compiler}_${platform}_${size}/background" ]; then
+       if [ ! -e "$smvrepo/Build/background/${compiler}_${platform}/background" ]; then
          stage3a_success="0"
        fi
      fi
@@ -497,7 +497,7 @@ compile_smv_db()
    if [ "$USEINSTALL" == "" ]; then
      echo "   smokeview"
      echo "      debug"
-     CD_REPO $smvrepo/Build/smokeview/${compiler}_${platform}_${size} || return 1
+     CD_REPO $smvrepo/Build/smokeview/${compiler}_${platform} || return 1
      ./make_smokeview_db.sh &> $OUTPUT_DIR/stage3b
    else
      echo "   smokeview"
@@ -514,8 +514,8 @@ check_compile_smv_db()
 {
    # Check for errors in SMV DB compilation
    if [ "$USEINSTALL" == "" ]; then
-     CD_REPO $smvrepo/Build/smokeview/${compiler}_${platform}_${size} $SMVBRANCH || return 1
-     if [ -e "smokeview_${platform}_${size}_db" ]
+     CD_REPO $smvrepo/Build/smokeview/${compiler}_${platform} $SMVBRANCH || return 1
+     if [ -e "smokeview_${platform}_db" ]
      then
         stage3b_success=true
      else
@@ -548,7 +548,7 @@ compile_smv()
    # Clean and compile SMV
    if [ "$USEINSTALL" == "" ]; then
      echo "      release"
-     CD_REPO $smvrepo/Build/smokeview/${compiler}_${platform}_${size} $SMVBRANCH || return 1
+     CD_REPO $smvrepo/Build/smokeview/${compiler}_${platform} $SMVBRANCH || return 1
      ./make_smokeview.sh &> $OUTPUT_DIR/stage3c
    else
      echo "      release - not built, using installed smokeview"
@@ -564,8 +564,8 @@ check_compile_smv()
 {
    # Check for errors in SMV release compilation
    if [ "$USEINSTALL" == "" ]; then
-     CD_REPO $smvrepo/Build/smokeview/${compiler}_${platform}_${size} $smvbrach || return 1
-     if [ -e "smokeview_${platform}_${size}" ]
+     CD_REPO $smvrepo/Build/smokeview/${compiler}_${platform} $smvbrach || return 1
+     if [ -e "smokeview_${platform}" ]
      then
         stage3c_success=true
      else
@@ -657,7 +657,7 @@ run_vv_cases_debug()
    echo 'Running CFAST V&V cases'
    echo '   debug'
    echo 'Running CFAST V&V cases' >> $OUTPUT_DIR/stage4 2>&1
-   ./Run_CFAST_Cases.sh -p $size -I $compiler -S $smvrepo $USEINSTALL2 -m 2 -d -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
+   ./Run_CFAST_Cases.sh -I $compiler -S $smvrepo $USEINSTALL2 -m 2 -d -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage4 2>&1
    if [ "$QUEUE" != "none" ]; then
      wait_vv_cases_debug_start
    fi
@@ -783,7 +783,7 @@ run_vv_cases_release()
    CD_REPO $cfastrepo/Validation/scripts $CFASTBRANCH || return 1
    echo '   release'
    echo 'Running CFAST V&V cases' >> $OUTPUT_DIR/stage5 2>&1
-   ./Run_CFAST_Cases.sh -p $size -I $compiler -S $smvrepo $USEINSTALL2 -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
+   ./Run_CFAST_Cases.sh -I $compiler -S $smvrepo $USEINSTALL2 -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage5 2>&1
    if [ "$QUEUE" != "none" ]; then
      wait_vv_cases_release_start
    fi
@@ -867,7 +867,7 @@ make_cfast_pictures()
 {
    echo "Generating smokeview images"
    CD_REPO $cfastrepo/Validation/scripts $CFASTBRANCH || return 1
-   ./Make_CFAST_Pictures.sh $size2 -I $compiler $USEINSTALL 2>&1 | grep -v FreeFontPath &> $OUTPUT_DIR/stage6
+   ./Make_CFAST_Pictures.sh -I $compiler $USEINSTALL 2>&1 | grep -v FreeFontPath &> $OUTPUT_DIR/stage6
 
    return 0
 }
@@ -946,7 +946,7 @@ compile_vvcalc()
 { 
    # Build release vvcalc
    echo "   build VandV_Calcs" 
-   CD_REPO $cfastrepo/Build/VandV_Calcs/${compiler}_${platform}_${size} $CFASTBRANCH || return 1
+   CD_REPO $cfastrepo/Build/VandV_Calcs/${compiler}_${platform}_64 $CFASTBRANCH || return 1
    make -f ../makefile clean &> /dev/null
    ./make_vv.sh &> $OUTPUT_DIR/stage6b
 
@@ -959,8 +959,8 @@ compile_vvcalc()
 
 check_compile_vvcalc()
 {
-   CD_REPO $cfastrepo/Build/VandV_Calcs/${compiler}_${platform}_${size} $CFASTBRANCH || return 1
-   if [[ -e "VandV_Calcs_${platform}_${size}" ]]
+   CD_REPO $cfastrepo/Build/VandV_Calcs/${compiler}_${platform}_64 $CFASTBRANCH || return 1
+   if [[ -e "VandV_Calcs_${platform}_64" ]]
    then
       stage6b_success=true
    else
@@ -1028,11 +1028,11 @@ run_matlab_validation()
    echo "   Validation"
    echo "      run VandV_Calcs"
    CD_REPO $cfastrepo/Validation $CFASTBRANCH || return 1
-   ../Build/VandV_Calcs/${compiler}_${platform}_${size}/VandV_Calcs_${platform}_${size} CFAST_Pressure_Correction_inputs.csv &> /dev/null
+   ../Build/VandV_Calcs/${compiler}_${platform}_64/VandV_Calcs_${platform}_64 CFAST_Pressure_Correction_inputs.csv &> /dev/null
    cp pressures.csv LLNL_Enclosure/LLNL_pressures.csv
-   ../Build/VandV_Calcs/${compiler}_${platform}_${size}/VandV_Calcs_${platform}_${size} CFAST_Temperature_Profile_inputs.csv &> /dev/null
+   ../Build/VandV_Calcs/${compiler}_${platform}_64/VandV_Calcs_${platform}_64 CFAST_Temperature_Profile_inputs.csv &> /dev/null
    cp profiles.csv Steckler_Compartment/.
-   ../Build/VandV_Calcs/${compiler}_${platform}_${size}/VandV_Calcs_${platform}_${size} CFAST_Heat_Flux_Profile_inputs.csv &> /dev/null
+   ../Build/VandV_Calcs/${compiler}_${platform}_64/VandV_Calcs_${platform}_64 CFAST_Heat_Flux_Profile_inputs.csv &> /dev/null
    cp flux_profiles.csv Fleury_Heat_Flux/.
    
    echo "      make plots"
@@ -1400,9 +1400,6 @@ email_build_status()
 #VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
 #                             Primary script execution =
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-size=64
-size2=
 
 
 #  ===================
