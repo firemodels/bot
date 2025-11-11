@@ -24,14 +24,12 @@ INSTALLDIR=$5
 SMVMODULE=SMV6
 SMVVARS=SMV6VARS.sh
 
-ossize=64
-
 cat << EOF > $INSTALLER
 #!/bin/bash
 
 OVERRIDE=\$1
 echo ""
-echo "Updating Smokeview to $revision for $ossize bit $ostype"
+echo "Updating Smokeview to $revision for $ostype"
 echo ""
 echo "Options:"
 echo "  1) Press <Enter> to begin update"

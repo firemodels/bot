@@ -2,7 +2,6 @@
 setlocal
 :: release info
 set versionbase=%1
-set test=%2
 set zipbase=%versionbase%_win
 set SMVEDITION=SMV6
 
@@ -15,7 +14,7 @@ set reporoot=%CD%
 
 set CURDIR=%CD%
 
-set BUILDDIR=intel_win_64
+set BUILDDIR=intel_win
 
 set smvbuild=%reporoot%\smv\Build\smokeview\%BUILDDIR%
 set forbundle=%reporoot%\smv\Build\for_bundle
@@ -25,14 +24,14 @@ set svzipbuild=%reporoot%\smv\Build\smokezip\%BUILDDIR%
 set svdiffbuild=%reporoot%\smv\Build\smokediff\%BUILDDIR%
 set pnginfobuild=%reporoot%\smv\Build\pnginfo\%BUILDDIR%
 set fds2fedbuild=%reporoot%\smv\Build\fds2fed\%BUILDDIR%
-set bgbuild=%reporoot%\smv\Build\background\intel_win_64
+set bgbuild=%reporoot%\smv\Build\background\intel_win
 set hashfilebuild=%reporoot%\smv\Build\hashfile\%BUILDDIR%
 set flushfilebuild=%reporoot%\smv\Build\flush\%BUILDDIR%
 set timepbuild=%reporoot%\smv\Build\timep\%BUILDDIR%
 set windbuild=%reporoot%\smv\Build\wind2fds\%BUILDDIR%
-set sh2bat=%reporoot%\smv\Build\sh2bat\intel_win_64
+set sh2bat=%reporoot%\smv\Build\sh2bat\intel_win
 set gettime=%reporoot%\smv\Build\get_time\%BUILDDIR%
-set hashfileexe=%hashfilebuild%\hashfile_win_64.exe
+set hashfileexe=%hashfilebuild%\hashfile_win.exe
 set repoexes=%userprofile%\.bundle\BUNDLE\WINDOWS\repoexes
 
 set smvdir=%zipbase%\%SMVEDITION%
@@ -51,9 +50,9 @@ IF EXIST %smvdir% rmdir /S /Q %smvdir%
 mkdir %smvdir%
 mkdir %smvdir%\hash
 
-CALL :COPY  %reporoot%\smv\Build\set_path\intel_win_64\set_path_win_64.exe "%smvdir%\set_path.exe"
-CALL :COPY  %smvbuild%\smokeview_win_%test%64.exe                           %smvdir%\smokeview.exe
-CALL :COPY  %smvscripts%\jp2conv.bat                                        %smvdir%\jp2conv.bat
+CALL :COPY  %reporoot%\smv\Build\set_path\intel_win\set_path_win.exe "%smvdir%\set_path.exe"
+CALL :COPY  %smvbuild%\smokeview_win.exe                              %smvdir%\smokeview.exe
+CALL :COPY  %smvscripts%\jp2conv.bat                                  %smvdir%\jp2conv.bat
 
 ::echo copying .po files
 ::copy %forbundle%\*.po %smvdir%\.>Nul
@@ -65,15 +64,15 @@ CALL :COPY  %forbundle%\volrender.ssf %smvdir%\volrender.ssf
 CALL :COPY  %webgldir%\smv2html.bat   %smvdir%\smv2html.bat
 ::CALL :COPY  %webgldir%\smv_setup.bat  %smvdir%\smv_setup.bat
 
-CALL :COPY  %bgbuild%\background_win_64.exe     %smvdir%\background.exe
-CALL :COPY  %flushfilebuild%\flush_win_64.exe   %smvdir%\flush.exe
-CALL :COPY  %hashfilebuild%\hashfile_win_64.exe %smvdir%\hashfile.exe
-CALL :COPY  %svdiffbuild%\smokediff_win_64.exe  %smvdir%\smokediff.exe
-CALL :COPY  %pnginfobuild%\pnginfo_win_64.exe   %smvdir%\pnginfo.exe
-CALL :COPY  %fds2fedbuild%\fds2fed_win_64.exe   %smvdir%\fds2fed.exe
-CALL :COPY  %svzipbuild%\smokezip_win_64.exe    %smvdir%\smokezip.exe
-CALL :COPY  %timepbuild%\timep_win_64.exe       %smvdir%\timep.exe
-CALL :COPY  %windbuild%\wind2fds_win_64.exe     %smvdir%\wind2fds.exe
+CALL :COPY  %bgbuild%\background_win.exe     %smvdir%\background.exe
+CALL :COPY  %flushfilebuild%\flush_win.exe   %smvdir%\flush.exe
+CALL :COPY  %hashfilebuild%\hashfile_win.exe %smvdir%\hashfile.exe
+CALL :COPY  %svdiffbuild%\smokediff_win.exe  %smvdir%\smokediff.exe
+CALL :COPY  %pnginfobuild%\pnginfo_win.exe   %smvdir%\pnginfo.exe
+CALL :COPY  %fds2fedbuild%\fds2fed_win.exe   %smvdir%\fds2fed.exe
+CALL :COPY  %svzipbuild%\smokezip_win.exe    %smvdir%\smokezip.exe
+CALL :COPY  %timepbuild%\timep_win.exe       %smvdir%\timep.exe
+CALL :COPY  %windbuild%\wind2fds_win.exe     %smvdir%\wind2fds.exe
 
 echo Unpacking Smokeview %versionbase% installation files > %forbundle%\unpack.txt
 echo Updating Windows Smokeview to %versionbase%          > %forbundle%\message.txt
@@ -118,8 +117,8 @@ copy %forbundle%\colorbars\divergent\*.csv %smvdir%\colorbars\divergent >Nul
 copy %forbundle%\colorbars\circular\*.csv  %smvdir%\colorbars\circular  >Nul
 
 CALL :COPY  %forbundle%\objects.svo                   %smvdir%\.
-CALL :COPY  %sh2bat%\sh2bat_win_64.exe                %smvdir%\sh2bat.exe
-CALL :COPY  %gettime%\get_time_win_64.exe             %smvdir%\get_time.exe
+CALL :COPY  %sh2bat%\sh2bat_win.exe                   %smvdir%\sh2bat.exe
+CALL :COPY  %gettime%\get_time_win.exe                %smvdir%\get_time.exe
 CALL :COPY  %reporoot%\webpages\SMV_Release_Notes.htm %smvdir%\release_notes.html
 CALL :COPY  %forbundle%\.smokeview_bin                %smvdir%\.
 

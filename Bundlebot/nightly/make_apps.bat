@@ -186,7 +186,7 @@ echo.                1>> %compile_log% 2>&1
 echo *************** 1>> %compile_log% 2>&1
 echo ***building smokeview libraries 1>> %compile_log% 2>&1
 
-cd %smvrepo%\Build\LIBS\intel_win_64
+cd %smvrepo%\Build\LIBS\intel_win
 call make_LIBS_bot 1>> %compile_log% 2>&1
 exit /b /0
 
@@ -198,7 +198,7 @@ echo ***building smokeview
 echo.                1>> %compile_log% 2>&1
 echo *************** 1>> %compile_log% 2>&1
 echo ***building smokeview  1>> %compile_log% 2>&1
-cd %smvrepo%\Build\smokeview\intel_win_64
+cd %smvrepo%\Build\smokeview\intel_win
 call make_smokeview -release -bot 1>> %compile_log% 2>&1
 exit /b /0
 
@@ -206,11 +206,11 @@ exit /b /0
  :CHECK_BUILDSMV
 :: -------------------------------------------------------------
 
-if NOT exist %smvrepo%\Build\smokeview\intel_win_64\smokeview_win_64.exe goto not_smokeview
+if NOT exist %smvrepo%\Build\smokeview\intel_win\smokeview_win.exe goto not_smokeview
 exit /b /0
 :not_smokeview
-echo ***error: The program smokeview_win_64.exe failed to build
-echo ***error: The program smokeview_win_64.exe failed to build  1>> %error_log% 2>&1
+echo ***error: The program smokeview_win.exe failed to build
+echo ***error: The program smokeview_win.exe failed to build  1>> %error_log% 2>&1
 set error=1
 exit /b /1
 
@@ -225,7 +225,7 @@ echo ***building %prog%
 echo.                1>> %compile_log% 2>&1
 echo *************** 1>> %compile_log% 2>&1
 echo ***building %prog% 1>> %compile_log% 2>&1
-cd %smvrepo%\Build\%prog%\intel_win_64
+cd %smvrepo%\Build\%prog%\intel_win
 call %script% bot 1>> %compile_log% 2>&1
 exit /b /0
 
@@ -235,11 +235,11 @@ exit /b /0
 
 set prog=%1
 
-if NOT exist %smvrepo%\Build\%prog%\intel_win_64\%prog%_win_64.exe goto notexist
+if NOT exist %smvrepo%\Build\%prog%\intel_win\%prog%_win.exe goto notexist
 exit /b /0
 :notexist
-echo ***error: The program %prog%_win_64.exe failed to build
-echo ***error: The program %prog%_win_64.exe failed to build  1>> %error_log% 2>&1
+echo ***error: The program %prog%_win.exe failed to build
+echo ***error: The program %prog%_win.exe failed to build  1>> %error_log% 2>&1
 set error=1
 exit /b /1
 

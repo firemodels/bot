@@ -98,7 +98,7 @@ if [ "$ostype" == "OSX" ]; then
 fi
 if [ "$MPI_VERSION" != "INTEL" ]; then
   if [ "$openmpifile" == "" ]; then
-    OPENMPIFILE=openmpi_${MPI_VERSION}_${PLATFORM}_64.tar.gz
+    OPENMPIFILE=openmpi_${MPI_VERSION}_${PLATFORM}.tar.gz
   else
     OPENMPIFILE=$openmpifile
   fi
@@ -339,10 +339,10 @@ fi
 #--- specify MPI location
 
 cat << EOF >> $INSTALLER
-eval MPIDIST_FDS=\$FDS_root/bin/openmpi_64
-mpiused=\$FDS_root/bin/openmpi_64
+eval MPIDIST_FDS=\$FDS_root/bin/openmpi
+mpiused=\$FDS_root/bin/openmpi
 eval MPIDIST_FDSROOT=\$FDS_root/bin
-eval MPIDIST_FDS=\$FDS_root/bin/openmpi_64
+eval MPIDIST_FDS=\$FDS_root/bin/openmpi
 
 #--- do we want to proceed
 
@@ -427,9 +427,9 @@ fi
 fi
 if [ "$MPI_VERSION" != "INTEL" ] ; then
 cat << MODULE >> \$FDSMODULEtmp
-prepend-path    PATH            \$FDS_root/bin/openmpi_64/bin
+prepend-path    PATH            \$FDS_root/bin/openmpi/bin
 # used when running the bundled fds
-setenv          OPAL_PREFIX     \$FDS_root/bin/openmpi_64
+setenv          OPAL_PREFIX     \$FDS_root/bin/openmpi
 MODULE
 fi
 if [[ "$ostype" == "OSX" ]] && [[ "$FDS_OPENMPIDIR" != "" ]]; then
@@ -480,8 +480,8 @@ BASH
 
 if [ "$MPI_VERSION" != "INTEL" ] ; then
 cat << BASH >> \$BASHRCFDS
-export PATH=\\\$FDSBINDIR/openmpi_64/bin:\\\$PATH
-export OPAL_PREFIX=\\\$FDSBINDIR/openmpi_64  # used when running the bundled fds
+export PATH=\\\$FDSBINDIR/openmpi/bin:\\\$PATH
+export OPAL_PREFIX=\\\$FDSBINDIR/openmpi  # used when running the bundled fds
 BASH
 if [[ "$ostype" == "OSX" ]] && [[ "$FDS_OPENMPIDIR" != "" ]]; then
 cat << BASH >> \$BASHRCFDS

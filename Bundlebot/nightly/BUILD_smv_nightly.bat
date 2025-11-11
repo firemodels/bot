@@ -41,7 +41,7 @@ call %reporoot%\smv\Utilities\Scripts\setup_intel_compilers.bat > %outdir%\stage
 :: build libraries
 title building libraries
 echo *** building libraries
-cd %reporoot%\smv\Build\LIBS\intel_win_64
+cd %reporoot%\smv\Build\LIBS\intel_win
 call make_LIBS bot > %outdir%\stage3_LIBS 2>&1
 
 echo *** Building applications
@@ -51,13 +51,13 @@ set "progs=background flush hashfile smokediff pnginfo smokezip fds2fed wind2fds
 
 for %%x in ( %progs% ) do (
   title Building %%x
-  cd %reporoot%\smv\Build\%%x\intel_win_64
+  cd %reporoot%\smv\Build\%%x\intel_win
   echo *** building %%x
-  make -j 4 SHELL="%ComSpec%" -f ..\Makefile intel_win_64 > %outdir%\stage4_%%x 2>&1
+  make -j 4 SHELL="%ComSpec%" -f ..\Makefile intel_win > %outdir%\stage4_%%x 2>&1
 ) 
 
 echo *** building smokeview
-cd %reporoot%\smv\Build\smokeview\intel_win_64
+cd %reporoot%\smv\Build\smokeview\intel_win
 title Building smokeview
 call make_smokeview -release -bot > %outdir%\stage5_smokeview 2>&1
 

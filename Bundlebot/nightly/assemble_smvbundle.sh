@@ -12,7 +12,7 @@ errlog=/tmp/smv_errlog.$$
 TEST=
 RELEASE=
 if [ "$edition" == "test" ]; then
-  TEST=test_
+  TEST=_test
 else
   RELEASE=
 fi
@@ -66,16 +66,16 @@ CPDIR ()
 }
 
 
-BACKGROUNDDIR=$GITROOT/smv/Build/background/${COMPILER}_${platform}_64
-SMVDIR=$GITROOT/smv/Build/smokeview/${COMPILER}_${platform}_64
-SMVDIRQ=$GITROOT/smv/Build/smokeview/${COMPILER}_${platform}_q_64
-SMZDIR=$GITROOT/smv/Build/smokezip/${COMPILER}_${platform}_64
-SMDDIR=$GITROOT/smv/Build/smokediff/${COMPILER}_${platform}_64
-PNGINFODIR=$GITROOT/smv/Build/pnginfo/${COMPILER}_${platform}_64
-FDS2FEDDIR=$GITROOT/smv/Build/fds2fed/${COMPILER}_${platform}_64
-WIND2FDSDIR=$GITROOT/smv/Build/wind2fds/${COMPILER}_${platform}_64
-HASHFILEDIR=$GITROOT/smv/Build/hashfile/${COMPILER}_${platform}_64
-FLUSHFILEDIR=$GITROOT/smv/Build/flush/${COMPILER}_${platform}_64
+BACKGROUNDDIR=$GITROOT/smv/Build/background/${COMPILER}_${platform}
+SMVDIR=$GITROOT/smv/Build/smokeview/${COMPILER}_${platform}
+SMVDIRQ=$GITROOT/smv/Build/smokeview/${COMPILER}_${platform}_q
+SMZDIR=$GITROOT/smv/Build/smokezip/${COMPILER}_${platform}
+SMDDIR=$GITROOT/smv/Build/smokediff/${COMPILER}_${platform}
+PNGINFODIR=$GITROOT/smv/Build/pnginfo/${COMPILER}_${platform}
+FDS2FEDDIR=$GITROOT/smv/Build/fds2fed/${COMPILER}_${platform}
+WIND2FDSDIR=$GITROOT/smv/Build/wind2fds/${COMPILER}_${platform}
+HASHFILEDIR=$GITROOT/smv/Build/hashfile/${COMPILER}_${platform}
+FLUSHFILEDIR=$GITROOT/smv/Build/flush/${COMPILER}_${platform}
 FORBUNDLE=$GITROOT/smv/Build/for_bundle
 WEBGLDIR=$GITROOT/smv/Build/for_bundle/webgl
 UTILSCRIPTDIR=$GITROOT/smv/Utilities/Scripts
@@ -83,7 +83,7 @@ PLATFORMDIR=$RELEASE$revision\_${platform3}
 MAKEINSTALLER=$GITROOT/bot/Bundlebot/nightly/make_smv_installer.sh
 uploads=$HOME/.bundle/uploads
 uploadscp=.bundle/uploads
-flushfile=$GITROOT/smv/Build/flush/${COMPILER}_${platform}_64/flush_${platform}_64
+flushfile=$GITROOT/smv/Build/flush/${COMPILER}_${platform}/flush_${platform}
 
 if [ ! -e $HOME/.bundle ]; then
   mkdir $HOME/.bundle
@@ -122,23 +122,23 @@ CP $UTILSCRIPTDIR   slice2html.sh     $PLATFORMDIR/$smvbin slice2html.sh
 CP $UTILSCRIPTDIR   slice2mp4.sh      $PLATFORMDIR/$smvbin slice2mp4.sh
 CP $FORBUNDLE       .smokeview_bin    $PLATFORMDIR/$smvbin .smokeview_bin
 
-CP  $BACKGROUNDDIR background_${platform}_64 $PLATFORMDIR/$smvbin background
+CP  $BACKGROUNDDIR background_${platform} $PLATFORMDIR/$smvbin background
 if [ "$platform" == "osx" ]; then
-  CP  $SMVDIR       smokeview_${platform}_${TEST}64       $PLATFORMDIR/$smvbin smokeview
+  CP  $SMVDIR       smokeview_${platform}${TEST}       $PLATFORMDIR/$smvbin smokeview
 else
-  CP  $SMVDIR        smokeview_${platform}_${TEST}64  $PLATFORMDIR/$smvbin smokeview
+  CP  $SMVDIR        smokeview_${platform}${TEST}      $PLATFORMDIR/$smvbin smokeview
 fi
-CP  $SMDDIR        smokediff_${platform}_64         $PLATFORMDIR/$smvbin smokediff
-CP  $PNGINFODIR    pnginfo_${platform}_64           $PLATFORMDIR/$smvbin pnginfo
-CP  $FDS2FEDDIR    fds2fed_${platform}_64           $PLATFORMDIR/$smvbin fds2fed
-CP  $SMZDIR        smokezip_${platform}_64          $PLATFORMDIR/$smvbin smokezip
-CP  $WIND2FDSDIR   wind2fds_${platform}_64          $PLATFORMDIR/$smvbin wind2fds
-CP  $HASHFILEDIR   hashfile_${platform}_64          $PLATFORMDIR/$smvbin hashfile
-CP  $FLUSHFILEDIR  flush_${platform}_64             $PLATFORMDIR/$smvbin flush
+CP  $SMDDIR        smokediff_${platform}         $PLATFORMDIR/$smvbin smokediff
+CP  $PNGINFODIR    pnginfo_${platform}           $PLATFORMDIR/$smvbin pnginfo
+CP  $FDS2FEDDIR    fds2fed_${platform}           $PLATFORMDIR/$smvbin fds2fed
+CP  $SMZDIR        smokezip_${platform}          $PLATFORMDIR/$smvbin smokezip
+CP  $WIND2FDSDIR   wind2fds_${platform}          $PLATFORMDIR/$smvbin wind2fds
+CP  $HASHFILEDIR   hashfile_${platform}          $PLATFORMDIR/$smvbin hashfile
+CP  $FLUSHFILEDIR  flush_${platform}             $PLATFORMDIR/$smvbin flush
 
 CURDIR=`pwd`
 cd $PLATFORMDIR/$smvbin
-HASHFILE=$HASHFILEDIR/hashfile_${platform}_64
+HASHFILE=$HASHFILEDIR/hashfile_${platform}
 $HASHFILE background > background.sha1
 $HASHFILE smokediff  > smokediff.sha1
 $HASHFILE pnginfo    > pnginfo.sha1

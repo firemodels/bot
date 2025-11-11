@@ -73,7 +73,7 @@ echo "*** smv_revision: $smv_revision"
 echo "*** building libraries"
 
 # build libraries
-cd $reporoot/smv/Build/LIBS/${comp}_${platform}_64
+cd $reporoot/smv/Build/LIBS/${comp}_${platform}
 ./make_LIBS.sh >& $outdir/stage3_LIBS
 
 echo "*** building applications"
@@ -81,15 +81,15 @@ echo "*** building applications"
 progs="background flush hashfile pnginfo smokediff fds2fed smokezip wind2fds"
 
 for prog in $progs; do 
-  if [ -d $reporoot/smv/Build/$prog/${comp}_${platform}_64 ]; then
-    cd $reporoot/smv/Build/$prog/${comp}_${platform}_64
+  if [ -d $reporoot/smv/Build/$prog/${comp}_${platform} ]; then
+    cd $reporoot/smv/Build/$prog/${comp}_${platform}
     echo "*** building $prog"
     ./make_${prog}.sh >& $outdir/stage4_$prog
   fi
 done
 
 echo "*** building smokeview"
-cd $reporoot/smv/Build/smokeview/${comp}_${platform}_64
+cd $reporoot/smv/Build/smokeview/${comp}_${platform}
 ./make_smokeview.sh $BUILDTYPE >& $outdir/stage5_smokeview
 
 echo "*** bundling smokeview"

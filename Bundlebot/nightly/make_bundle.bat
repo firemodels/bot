@@ -84,7 +84,7 @@ set FDSREPODATE=
 
 set basename=%fds_version%_%smv_version%%FDSREPODATE%%nightly%_win
 echo %basename%> %TEMP%\fds_smv_basename.txt
-set hashfile=%repo_root%\smv\Build\hashfile\intel_win_64\hashfile_win_64.exe
+set hashfile=%repo_root%\smv\Build\hashfile\intel_win\hashfile_win.exe
 set getrepoinfo=%repo_root%\bot\Scripts\get_repo_info.bat
 if exist %hashfile% goto endif0
   echo ***warning: %hashfile% does not exist
@@ -151,7 +151,7 @@ mkdir %out_uninstall%
 mkdir %out_fdshash%
 mkdir %out_smvhash%
 
-set release_version=%FDSMAJORVERSION%_win_64
+set release_version=%FDSMAJORVERSION%_win
 set release_version=
 
 echo.
@@ -270,7 +270,7 @@ CALL :COPY "%fds_forbundle%\fdspath.bat"                        %out_bin%\fdspat
 CALL :COPY "%fds_forbundle%\helpfds.bat"                        %out_bin%\helpfds.bat
 CALL :COPY "%fds_forbundle%\fds_local.bat"                      %out_bin%\fds_local.bat
 ::CALL :COPY "%fds_forbundle%\fds_local_test.bat"                 %out_bin%\fds_local_test.bat
-CALL :COPY  %repo_root%\smv\Build\sh2bat\intel_win_64\sh2bat_win_64.exe %out_bin%\sh2bat.exe
+CALL :COPY  %repo_root%\smv\Build\sh2bat\intel_win\sh2bat_win.exe %out_bin%\sh2bat.exe
 
 :: setup program for new installer
 CALL :COPY "%fds_forbundle%\setup.bat"                          %out_bundle%\setup.bat
@@ -308,7 +308,7 @@ CALL :COPY  "%fds_forbundle%\uninstall_fds2.bat" "%out_uninstall%\uninstall_base
 CALL :COPY  "%fds_forbundle%\uninstall.bat"      "%out_uninstall%\uninstall.bat"
 echo @echo off > "%out_uninstall%\uninstall.vbs"
 
-CALL :COPY  "%repo_root%\smv\Build\set_path\intel_win_64\set_path_win_64.exe" "%out_uninstall%\set_path.exe"
+CALL :COPY  "%repo_root%\smv\Build\set_path\intel_win\set_path_win.exe" "%out_uninstall%\set_path.exe"
 
 echo.
 echo --- copying FDS documentation ---
@@ -345,13 +345,13 @@ set RUNCFAST=call %copyCFASTcases%
 echo.
 echo --- copying example files ---
 cd %fds_examples%
-%repo_root%\smv\Build\sh2bat\intel_win_64\sh2bat_win_64 %fds_casessh% %fds_casesbat%
+%repo_root%\smv\Build\sh2bat\intel_win\sh2bat_win %fds_casessh% %fds_casesbat%
 call %fds_casesbat%>Nul
 
 cd %smv_examples%
-%repo_root%\smv\Build\sh2bat\intel_win_64\sh2bat_win_64 %smv_casessh% %smv_casesbat%
+%repo_root%\smv\Build\sh2bat\intel_win\sh2bat_win %smv_casessh% %smv_casesbat%
 call %smv_casesbat%>Nul
-%repo_root%\smv\Build\sh2bat\intel_win_64\sh2bat_win_64 %wui_casessh% %wui_casesbat%
+%repo_root%\smv\Build\sh2bat\intel_win\sh2bat_win %wui_casessh% %wui_casesbat%
 call %wui_casesbat%>Nul
 
 echo.
