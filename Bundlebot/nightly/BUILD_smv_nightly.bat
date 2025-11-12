@@ -4,8 +4,12 @@ setlocal
 set upload=1
 set S_HASH=
 set S_REVISION=
-::set S_HASH=2f257722a
-::set S_REVISION=SMV-6.10.5-249
+set S_BRANCH=
+
+set upload=
+set S_HASH=2f257722a
+set S_REVISION=SMV-6.10.5-249
+set S_BRANCH=size64
 
 set is_nightly=1
 
@@ -27,7 +31,7 @@ call get_smv_hash_revisions %S_HASH% %S_REVISION% > %outdir%\stage1_hash 2>&1
 set /p smv_hash=<%outdir%\SMV_HASH
 
 echo *** cloning smv repo
-call clone_smv_repos %smv_hash%  > %outdir%\stage2_clone 2>&1
+call clone_smv_repos %smv_hash%  %S_BRANCH% > %outdir%\stage2_clone 2>&1
 
 cd %reporoot%\smv
 git describe --abbrev=7 --long --dirty > %outdir%\smvrepo_revision
@@ -74,12 +78,14 @@ cd %CURDIR%\..\release
 call make_smv_bundle %BUNDLE_SMV_TAG% > %outdir%\stage6_bundle 2>&1
 
 cd %CURDIR%
+
+set uploaddir=%userprofile%\.bundle\uploads
+echo smokeview bundle created: %uploaddir%\%smvrepo_revision%_win.exe
+
+if "x%upload%" == "x" goto skip_upload
 echo *** uploading Smokeview bundle
 Title Building Smokeview bundle
 
-set uploaddir=%userprofile%\.bundle\uploads
-
-if "x%upload%" == "x" goto skip_upload
 set filelist=%TEMP%\smv_files_win.out
 gh release view SMOKEVIEW_TEST  -R github.com/%OWNER%/test_bundles | grep SMV | grep -v FDS | grep -v CFAST | grep win | gawk "{print $2}" > %filelist%
 for /F "tokens=*" %%A in (%filelist%) do gh release delete-asset SMOKEVIEW_TEST %%A  -R github.com/%OWNER%/test_bundles -y
