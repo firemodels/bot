@@ -4,6 +4,8 @@ set smv_hash=%2
 set branch_name=%3
 set fds_tag=%4
 set smv_tag=%5
+set fds_branch=%6
+set smv_branch=%7
 
 if "x%use_only_tags%" == "x" goto end_use_only_tag
 set fds_hash=
@@ -39,6 +41,7 @@ if "x%fds_hash%" == "x" goto end_fds_hash
 set fdstaghash=%fds_hash%
 :end_fds_hash
 
+git checkout %fds_branch%
 git checkout -b %branch_name% %fdstaghash%
 
 if "x%fds_tag%" == "x" goto end_fds_tag
@@ -55,6 +58,7 @@ if "x%smv_hash%" == "x" goto end_smv_hash
 set smvtaghash=%smv_hash%
 :end_smv_hash
 
+git checkout %smv_branch%
 git checkout -b %branch_name% %smvtaghash%
 
 if "x%smv_tag%" == "x" goto end_smv_tag
