@@ -2,10 +2,10 @@
 set fds_hash=%1
 set smv_hash=%2
 set branch_name=%3
-set fds_tag=%4
-set smv_tag=%5
-set fds_branch=%6
-set smv_branch=%7
+set fds_branch=%4
+set smv_branch=%5
+set fds_tag=%6
+set smv_tag=%7
 
 if "x%use_only_tags%" == "x" goto end_use_only_tag
 set fds_hash=
