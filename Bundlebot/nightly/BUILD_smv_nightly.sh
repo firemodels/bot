@@ -104,6 +104,14 @@ echo "*** bundling smokeview"
 
 $reporoot/bot/Bundlebot/nightly/assemble_smvbundle.sh $BUILDTYPE2 $smv_revision $basereporoot >& $outdir/stage6_bundle
 
+uploaddir=.bundle/uploads
+if [ -e $uploaddir/${smv_revision}_${platform2}.sh ]; then
+  echo smv bundle: $uploaddir/${smv_revision}_${platform2}.sh
+else
+  echo ***error: smv bundle: $uploaddir/${smv_revision}_${platform2}.sh failed to be created
+fi
+
+
 
 if [ "$UPLOAD" != "" ]; then
   echo "*** uploading smokeview bundle"
@@ -113,8 +121,7 @@ if [ "$UPLOAD" != "" ]; then
     gh release delete-asset SMOKEVIEW_TEST $file -R github.com/$GHOWNER/test_bundles -y
   done
 
-  uploaddir=.bundle/uploads
-  $reporoot/bot/Bundlebot/nightly/upload_smvbundle.sh $uploaddir ${smv_revision}_${platform2}.sh   $basereporoot/bot/Bundlebot/nightly --clobber
+  $reporoot/bot/Bundlebot/nightly/upload_smvbundle.sh $uploaddir ${smv_revision}_${platform2}.sh     $basereporoot/bot/Bundlebot/nightly --clobber
   $reporoot/bot/Bundlebot/nightly/upload_smvbundle.sh $uploaddir ${smv_revision}_${platform2}.sha1   $basereporoot/bot/Bundlebot/nightly -clobber
 
   echo "*** upload complete"
