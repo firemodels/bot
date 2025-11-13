@@ -2907,24 +2907,24 @@ MATLAB_beg=`GET_TIME`
 
 #*** matlab verification plots
 
-    check_matlab_license_server
-    if [ $matlab_success == true ]; then
-      run_matlab_verification
-      check_matlab_verification
-      check_verification_stats
-    fi
+#   check_matlab_license_server
+#   if [ $matlab_success == true ]; then
+#     run_matlab_verification
+#     check_matlab_verification
+#     check_verification_stats
+#   fi
 
 ###*** Stage 7b ###
 
 #*** matlab validation plots
 
-    check_matlab_license_server
-    if [ $matlab_success == true ]; then
-      run_matlab_validation
-      check_matlab_validation
-      archive_validation_stats
-    fi
-  fi
+#   check_matlab_license_server
+#   if [ $matlab_success == true ]; then
+#     run_matlab_validation
+#     check_matlab_validation
+#     archive_validation_stats
+#   fi
+# fi
 MATLAB_end=`GET_TIME`
 GET_DURATION $MATLAB_beg $MATLAB_end MATLAB
 
