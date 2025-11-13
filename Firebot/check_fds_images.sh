@@ -56,7 +56,7 @@ check_compile_fds_mpi()
 compile_smv()
 {
    # Clean and compile SMV
-  cd $smvrepo/Build/smokeview/${SMVCOMPILER}_${platform}${smvsize}
+  cd $smvrepo/Build/smokeview/${SMVCOMPILER}_${platform}
   echo "" > $OUTPUT_DIR/stage3c 2>&1
   ./make_smokeview.sh >> $OUTPUT_DIR/stage3c 2>&1
 }
@@ -69,8 +69,8 @@ check_compile_smv()
 {
   # Check for errors in SMV release compilation
   smv_errors=
-  cd $smvrepo/Build/smokeview/${SMVCOMPILER}_${platform}${smvsize}
-  if [ -e "smokeview_${platform}${smvsize}" ]; then
+  cd $smvrepo/Build/smokeview/${SMVCOMPILER}_${platform}
+  if [ -e "smokeview_${platform}" ]; then
     smv_release_success=true
   else
     smv_errors=1
@@ -261,7 +261,6 @@ ABORT_FDS=
 ABORT_SMV=
 ABORT=
 
-smvsize=_64
 platform="linux"
 platform2="Linux"
 SMVCOMPILER=intel
