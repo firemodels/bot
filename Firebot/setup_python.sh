@@ -1,6 +1,6 @@
 #!/bin/bash
-# setup environment for python 3 and run the hello_world.py to test the setup
-# usage: source ./setup_python3.sh
+# setup environment for python and run the hello_world.py to test the setup
+# usage: source ./setup_python.sh
 
 curdir=`pwd`
 cd ../..
