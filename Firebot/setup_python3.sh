@@ -7,6 +7,6 @@ cd ../..
 reporoot=`pwd`
 
 cd $reporoot/fds/Utilities/Python
-source ./setup_python_env.sh
+source ./setup_python_env.sh --batchmode
 python hello_world.py
 cd $curdir
