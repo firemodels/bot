@@ -1,2 +1,2 @@
 #!/bin/bash
-./setup_python3.sh
+./setup_python.sh

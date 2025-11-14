@@ -1125,7 +1125,7 @@ run_python_setup()
    echo Python
    echo "   setup environment"
    cd $botrepo/Firebot/
-   source ./setup_python3.sh > $OUTPUT_DIR/stage7_python_setup 2>&1
+   source ./setup_python.sh > $OUTPUT_DIR/stage7_python_setup 2>&1
 }
 
 #---------------------------------------------
