@@ -2887,9 +2887,11 @@ echo deb555 >> $OUTPUT_DIR/debug_output
 ###*** Stage 7c ###
 
 MATLAB_beg=`GET_TIME`
+echo deb555aa >> $OUTPUT_DIR/debug_output
 # folloing line was commented 11/13/2025, likely caused firebot crash, may need to be uncommented and moved - gpf
 #  generate_timing_stats
   if [[ "$SKIPMATLAB" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
+echo deb555bb >> $OUTPUT_DIR/debug_output
 
 ###*** Stage 7a ###
 
@@ -2936,7 +2938,7 @@ echo debaaa >> $OUTPUT_DIR/debug_output
 #     check_matlab_validation
 #     archive_validation_stats
 #   fi
-# fi
+  fi
 MATLAB_end=`GET_TIME`
 GET_DURATION $MATLAB_beg $MATLAB_end MATLAB
 
