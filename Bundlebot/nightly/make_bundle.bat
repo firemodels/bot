@@ -250,7 +250,6 @@ cd %out_bin%
 %hashfile% background.exe >  hash\background_%fds_version%.exe.sha1
 %hashfile% test_mpi.exe   >  hash\test_mpi_%fds_version%.exe.sha1
 cd hash
-cat *.sha1                >  %upload_dir%\%basename%.%SHA1EXT%
 
 cd %out_smv%
 %hashfile% hashfile.exe   >  hash\hashfile_%smv_version%.exe.sha1
@@ -261,7 +260,6 @@ cd %out_smv%
 %hashfile% smokezip.exe   >  hash\smokezip_%smv_version%.exe.sha1
 %hashfile% wind2fds.exe   >  hash\wind2fds_%smv_version%.exe.sha1
 cd hash
-cat *.sha1                >> %upload_dir%\%basename%.%SHA1EXT%
 
 cd %curdir%
 CALL :COPY %in_intel_dll%\libiomp5md.dll                        %out_bin%\libiomp5md.dll
@@ -381,9 +379,7 @@ if exist %basename%.exe erase %basename%.exe
 
 wzipse32 %basename%.zip -setup -auto -i %fds_forbundle%\icon.ico -t %fds_forbundle%\unpack.txt -runasadmin -a %fds_forbundle%\about.txt -st"%fds_version% %smv_version%" -o -c cmd /k firemodels\setup.bat
 
-%hashfile% %basename%.exe          >> %upload_dir%\%basename%.%SHA1EXT%
-call %getrepoinfo% %repo_root%\fds >> %upload_dir%\%basename%.%SHA1EXT%
-call %getrepoinfo% %repo_root%\smv >> %upload_dir%\%basename%.%SHA1EXT%
+%hashfile% %basename%.exe           > %upload_dir%\%basename%.%SHA1EXT%
 
 CALL :COPY %upload_dir%\%basename%.exe       %bundles_dir%\%basename%.exe
 CALL :COPY %upload_dir%\%basename%.%SHA1EXT% %bundles_dir%\%basename%.%SHA1EXT%

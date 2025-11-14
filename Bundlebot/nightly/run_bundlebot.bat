@@ -291,9 +291,7 @@ if "x%upload_bundle%" == "x" goto skip_upload
   set /p basename=<%TEMP%\fds_smv_basename.txt
 
   set fullfilebase=%userprofile%\.bundle\bundles\%basename%
-  echo gh release upload FDS_TEST %fullfilebase%.%SHA1EXT% -R github.com/%OWNER%/test_bundles --clobber
-       gh release upload FDS_TEST %fullfilebase%.%SHA1EXT% -R github.com/%OWNER%/test_bundles --clobber
-  
+
   echo gh release upload FDS_TEST %fullfilebase%.exe -R github.com/%OWNER%/test_bundles --clobber
        gh release upload FDS_TEST %fullfilebase%.exe -R github.com/%OWNER%/test_bundles --clobber
 

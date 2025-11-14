@@ -54,7 +54,6 @@ else
   platform=linux
   bundlebase=${fds_version}_${smv_version}_${FDSREPODATE}${NIGHTLY}lnx
 fi
-SHA_REPO_FILE=${bundlebase}.$SHA1EXT
 custombase=${fds_version}_${smv_version}
 
 # create upload directory if it doesn't exist
@@ -551,8 +550,6 @@ if [ "$openmpifile" != "" ]; then
   OPENMPIFILE="-M $openmpifile"
 fi
 $MAKEINSTALLER -i $bundlebase.tar.gz -b $custombase -d $INSTALLDIR -f $fds_version -s $smv_version -m $MPI_VERSION $OPENMPIFILE $bundlebase.sh
-
-$APPS_DIR/hashfile $bundlebase.sh  > $SHA_REPO_FILE
 
 if [ -e $errlog ]; then
   numerrs=`cat $errlog | wc -l `

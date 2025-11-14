@@ -78,9 +78,6 @@ gh release view SMOKEVIEW_TEST  -R github.com/%OWNER%/test_bundles | grep SMV | 
 for /F "tokens=*" %%A in (%filelist%) do gh release delete-asset SMOKEVIEW_TEST %%A  -R github.com/%OWNER%/test_bundles -y
 erase %filelist%
 
-echo uploading %smvrepo_revision%_win.sha1 to github.com/%OWNER%/test_bundles
-gh release upload SMOKEVIEW_TEST %uploaddir%\%smvrepo_revision%_win.sha1 -R github.com/%OWNER%/test_bundles --clobber
-
 echo uploading %smvrepo_revision%_win.exe to github.com//%OWNER%/test_bundles
 gh release upload SMOKEVIEW_TEST %uploaddir%\%smvrepo_revision%_win.exe  -R github.com/%OWNER%/test_bundles --clobber
 
