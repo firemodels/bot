@@ -552,11 +552,7 @@ if [ "$openmpifile" != "" ]; then
 fi
 $MAKEINSTALLER -i $bundlebase.tar.gz -b $custombase -d $INSTALLDIR -f $fds_version -s $smv_version -m $MPI_VERSION $OPENMPIFILE $bundlebase.sh
 
-cat $fdsbindir/hash/*.sha1         > $SHA_REPO_FILE
-cat $smvbindir/hash/*.sha1        >> $SHA_REPO_FILE
-$APPS_DIR/hashfile $bundlebase.sh >> $SHA_REPO_FILE
-$botscriptdir/get_repo_info.sh $REPO_ROOT/fds >> $SHA_REPO_FILE
-$botscriptdir/get_repo_info.sh $REPO_ROOT/smv >> $SHA_REPO_FILE
+$APPS_DIR/hashfile $bundlebase.sh  > $SHA_REPO_FILE
 
 if [ -e $errlog ]; then
   numerrs=`cat $errlog | wc -l `
