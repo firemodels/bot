@@ -2880,7 +2880,8 @@ GET_DURATION $PICTURE_beg $PICTURE_end PICTURE
 ###*** Stage 7c ###
 
 MATLAB_beg=`GET_TIME`
-  generate_timing_stats
+# folloing line was commented 11/13/2025, likely caused firebot crash, may need to be uncommented and moved - gpf
+#  generate_timing_stats
   if [[ "$SKIPMATLAB" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
 
 ###*** Stage 7a ###
