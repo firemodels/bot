@@ -2843,11 +2843,13 @@ GET_DURATION $DEBUG_beg $DEBUG_end DEBUG
 
 ###*** Stage 5 ###
 
+echo deb000 > $OUTPUT_DIR/debug_output
 RELEASE_beg=`GET_TIME`
 if [[ "$BUILD_ONLY" == "" ]] && [[ "$CACHE_DIR" == "" ]];  then
 # Depends on successful FDS compile
   if [[ $FDS_release_success ]] && [[ "$SKIPRELEASE" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
     run_VV_cases_release
+echo deb111 >> $OUTPUT_DIR/debug_output
 
 # this also checks restart cases (using same criteria)
     if [ "$CHECK_CLUSTER" == "" ]; then
@@ -2859,8 +2861,10 @@ if [[ "$BUILD_ONLY" == "" ]] && [[ "$CACHE_DIR" == "" ]];  then
     if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" != "" ]]; then
       check_validation_cases_release $fdsrepo/Validation FDS_Input_Files
     fi
+echo deb222 >> $OUTPUT_DIR/debug_output
   fi
 fi
+echo deb333 >> $OUTPUT_DIR/debug_output
 RELEASE_end=`GET_TIME`
 GET_DURATION $RELEASE_beg $RELEASE_end RELEASE
 
@@ -2875,23 +2879,32 @@ PICTURE_beg=`GET_TIME`
 #    MAKE_SUMMARY=1
 #  fi
 PICTURE_end=`GET_TIME`
+echo deb444 >> $OUTPUT_DIR/debug_output
 GET_DURATION $PICTURE_beg $PICTURE_end PICTURE
+echo deb555 >> $OUTPUT_DIR/debug_output
 
 ###*** Stage 7c ###
 
 MATLAB_beg=`GET_TIME`
+echo deb555aa >> $OUTPUT_DIR/debug_output
 # folloing line was commented 11/13/2025, likely caused firebot crash, may need to be uncommented and moved - gpf
 #  generate_timing_stats
   if [[ "$SKIPMATLAB" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
+echo deb555bb >> $OUTPUT_DIR/debug_output
 
 ###*** Stage 7a ###
 
 #*** python verification plots
 
+echo deb666 >> $OUTPUT_DIR/debug_output
     run_python_setup
+echo deb777 >> $OUTPUT_DIR/debug_output
     check_python_setup
+echo deb888 >> $OUTPUT_DIR/debug_output
     if [ $python_success == true ]; then
+echo deb999 >> $OUTPUT_DIR/debug_output
       run_python_verification
+echo debaaa >> $OUTPUT_DIR/debug_output
       check_python_verification
       make_fds_summary
       MAKE_SUMMARY=1
@@ -2924,7 +2937,7 @@ MATLAB_beg=`GET_TIME`
 #     check_matlab_validation
 #     archive_validation_stats
 #   fi
-# fi
+  fi
 MATLAB_end=`GET_TIME`
 GET_DURATION $MATLAB_beg $MATLAB_end MATLAB
 
