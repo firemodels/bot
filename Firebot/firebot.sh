@@ -671,8 +671,12 @@ CHECKOUT_REPO()
  local_repo=$2
  local_rev=$3
  local_tag=$4
+ local_initial_branch=$5
 
  cd $local_repo
+ if [ "$local_initial_branch" != "" ]; then
+   git checkout $local_initial_branch               >> $OUTPUT_DIR/stage1_clone 2>&1
+ fi
  if [ "$use_only_tags" == "" ]; then
    git checkout -b $local_branch $local_rev         >> $OUTPUT_DIR/stage1_clone 2>&1
    if [ "$local_tag" != "" ]; then
@@ -2436,17 +2440,17 @@ if [[ "$CLONE_REPOS" != "" ]]; then
   if [ "$CLONE_REPOS" != "master" ]; then
     if [ "$CLONEFILE" == "" ]; then
       FDSBRANCH=$CLONE_REPOS
-      CHECKOUT_REPO $FDSBRANCH $fdsrepo $FDS_REV $FDS_TAG 
+      CHECKOUT_REPO $FDSBRANCH $fdsrepo $FDS_REV $FDS_TAG  $BUNDLE_FDS_BRANCH
 
       SMVBRANCH=$CLONE_REPOS
-      CHECKOUT_REPO $SMVBRANCH $smvrepo $SMV_REV $SMV_TAG 
+      CHECKOUT_REPO $SMVBRANCH $smvrepo $SMV_REV $SMV_TAG  $BUNDLE_SMV_BRANCH
     else
       source $CLONEFILE 
       FDSBRANCH=$CLONE_REPOS
-      CHECKOUT_REPO $FDSBRANCH $fdsrepo $BUNDLE_FDS_REVISION  $BUNDLE_FDS_TAG 
+      CHECKOUT_REPO $FDSBRANCH $fdsrepo $BUNDLE_FDS_REVISION  $BUNDLE_FDS_TAG $BUNDLE_FDS_BRANCH
 
       SMVBRANCH=$CLONE_REPOS
-      CHECKOUT_REPO $SMVBRANCH $smvrepo $BUNDLE_SMV_REVISION  $BUNDLE_SMV_TAG 
+      CHECKOUT_REPO $SMVBRANCH $smvrepo $BUNDLE_SMV_REVISION  $BUNDLE_SMV_TAG  $BUNDLE_SMV_BRANCH
 
       CADBRANCH=$CLONE_REPOS
       CHECKOUT_REPO $CADBRANCH $cadrepo $BUNDLE_CAD_REVISION  $BUNDLE_CAD_TAG 
