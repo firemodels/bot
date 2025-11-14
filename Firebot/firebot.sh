@@ -1967,7 +1967,7 @@ fi
    echo "mailToFDS=$mailToFDS"
    # Check for warnings and errors
    NAMELIST_LOGS="$NAMELIST_NODOC_LOG $NAMELIST_NOSOURCE_LOG"
-   if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]
+   if [[ -s $WARNING_LOG && -s $ERROR_LOG ]]
    then
       cd $firebotdir
 
@@ -1979,7 +1979,7 @@ fi
      fi
 
    # Check for errors only
-   elif [ -e $ERROR_LOG ]
+   elif [ -s $ERROR_LOG ]
    then
       # Send email with failure message, body of email contains error log file
       echo "[$botuser] $bottype failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH."
@@ -1989,7 +1989,7 @@ fi
       fi
 
    # Check for warnings only
-   elif [ -e $WARNING_LOG ]
+   elif [ -s $WARNING_LOG ]
    then
       cd $firebotdir
 
