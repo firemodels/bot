@@ -31,7 +31,6 @@ if NOT "%platform%" == "Windows" goto endif1
   for /F "tokens=*" %%A in (%filelist%) do gh release delete-asset %SMOKEVIEW_TAG% %%A  -R github.com/%GH_OWNER%/%GH_REPO% -y
   erase %filelist%
 
-  gh release upload %SMOKEVIEW_TAG% %uploaddir%\%smv_revision%_win.sha1 -R github.com/%GH_OWNER%/%GH_REPO% --clobber
   gh release upload %SMOKEVIEW_TAG% %uploaddir%\%smv_revision%_win.exe  -R github.com/%GH_OWNER%/%GH_REPO% --clobber
 :endif1
 
@@ -42,7 +41,6 @@ if NOT "%platform%" == "Linux" goto endif2
   erase %outfile%
 
   plink %plink_options% %linux_logon%  %linux_git_root%/bot/Bundlebot/nightly/upload_smvbundle_custom.sh .bundle/uploads %smv_revision%_lnx.sh   %linux_git_root%/bot/Bundlebot/nightly %SMOKEVIEW_TAG% %GH_OWNER% %GH_REPO%
-  plink %plink_options% %linux_logon%  %linux_git_root%/bot/Bundlebot/nightly/upload_smvbundle_custom.sh .bundle/uploads %smv_revision%_lnx.sha1 %linux_git_root%/bot/Bundlebot/nightly %SMOKEVIEW_TAG% %GH_OWNER% %GH_REPO%
 :endif2
 
 if NOT "%platform%" == "OSX" goto endif3
@@ -52,7 +50,6 @@ if NOT "%platform%" == "OSX" goto endif3
   erase %outfile%
 
   plink %plink_options% %osx_logon%  %linux_git_root%/bot/Bundlebot/nightly/upload_smvbundle_custom.sh .bundle/uploads %smv_revision%_osx.sh   %linux_git_root%/bot/Bundlebot %SMOKEVIEW_TAG% %GH_OWNER% %GH_REPO%
-  plink %plink_options% %osx_logon%  %linux_git_root%/bot/Bundlebot/nightly/upload_smvbundle_custom.sh .bundle/uploads %smv_revision%_osx.sha1 %linux_git_root%/bot/Bundlebot %SMOKEVIEW_TAG% %GH_OWNER% %GH_REPO%
 :endif3
 
 start chrome https://github.com/%GH_OWNER%/%GH_REPO%/releases/tag/%SMOKEVIEW_TAG%

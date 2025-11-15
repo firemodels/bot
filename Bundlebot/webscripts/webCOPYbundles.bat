@@ -28,11 +28,8 @@ set "googledir=%userprofile%\Google Drive\Bundle_Test_Versions\"
 if NOT exist "%googledir%\*" goto error
 
 call :copyfile %uploaddir% %fds_version%_%smv_version%_win.exe      "%googledir%"
-call :copyfile %uploaddir% %fds_version%_%smv_version%_win.exe.sha1 "%googledir%"
 call :copyfile %uploaddir% %fds_version%_%smv_version%_lnx.sh       "%googledir%"
-call :copyfile %uploaddir% %fds_version%_%smv_version%_lnx.sh.sha1  "%googledir%"
 call :copyfile %uploaddir% %fds_version%_%smv_version%_osx.sh       "%googledir%"
-call :copyfile %uploaddir% %fds_version%_%smv_version%_osx.sh.sha1  "%googledir%"
 
 echo.
 echo copy complete

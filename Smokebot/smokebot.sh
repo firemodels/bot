@@ -664,14 +664,6 @@ compile_smv_utilities()
        cp pnginfo_${platform}_64 $LATESTAPPS_DIR/pnginfo
      fi
 
-   # hashfile
-     echo "   hashfile"
-     cd $smvrepo/Build/hashfile/${COMPILER}_${platform}_64
-     rm -f *.o hashfile_${platform}_64
-     echo 'Compiling hashfile:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
-     ./make_hashfile.sh >> $OUTPUT_DIR/stage2a_smvutil 2>&1
-     cp hashfile_${platform}_64 $LATESTAPPS_DIR/hashfile
-
   # wind2fds:
      echo "   wind2fds"
      cd $smvrepo/Build/wind2fds/${COMPILER}_${platform}_64

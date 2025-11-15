@@ -748,14 +748,6 @@ compile_smv_utilities()
     cp pnginfo_${platform}${smvsize} $LATESTAPPS_DIR/pnginfo
   fi
 
-# hashfile:
-  echo "      hashfile"
-  cd $smvrepo/Build/hashfile/${SMVCOMPILER}_${platform}${smvsize}
-  rm -f *.o hashfile_${platform}${smvsize}
-  ./make_hashfile.sh >> $OUTPUT_DIR/stage3a 2>&1
-  CP hashfile_${platform}${smvsize} $LATESTAPPS_DIR/hashfile
-  echo "" >> $OUTPUT_DIR/stage3a 2>&1
-
 # fds2asci
   echo "      fds2ascii"
   cd $fdsrepo/Utilities/fds2ascii/${COMPILER}_${platform}${size}

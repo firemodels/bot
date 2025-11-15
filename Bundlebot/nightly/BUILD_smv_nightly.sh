@@ -78,7 +78,7 @@ cd $reporoot/smv/Build/LIBS/${comp}_${platform}_64
 
 echo "*** building applications"
 
-progs="background flush hashfile pnginfo smokediff fds2fed smokezip wind2fds"
+progs="background flush pnginfo smokediff fds2fed smokezip wind2fds"
 
 for prog in $progs; do 
   if [ -d $reporoot/smv/Build/$prog/${comp}_${platform}_64 ]; then
@@ -106,7 +106,6 @@ done
 
 uploaddir=.bundle/uploads
 $reporoot/bot/Bundlebot/nightly/upload_smvbundle.sh $uploaddir ${smv_revision}_${platform2}.sh     $basereporoot/bot/Bundlebot/nightly --clobber
-$reporoot/bot/Bundlebot/nightly/upload_smvbundle.sh $uploaddir ${smv_revision}_${platform2}.sha1   $basereporoot/bot/Bundlebot/nightly -clobber
 
 echo "*** upload complete"
 
