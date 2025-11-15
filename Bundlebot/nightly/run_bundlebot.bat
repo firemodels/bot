@@ -3,8 +3,6 @@
 set OWNER=%username%
 if "x%is_nightly%" == "x1" set OWNER=firemodels
 
-set SHA1EXT=sha1
-
 set clone=
 set FDS_HASH=
 set SMV_HASH=
