@@ -30,8 +30,6 @@ call make_smv_apps
 call make_smv_bundle %BUNDLE_SMV_TAG%
 
 :: upload bundles
-echo uploading %fullfilebase%.sha1
-gh release upload SMOKEVIEW_TEST %fullfilebase%.sha1 -R github.com/%username%/test_bundles --clobber
 
 echo uploading %fullfilebase%.exe
 gh release upload SMOKEVIEW_TEST %fullfilebase%.exe  -R github.com/%username%/test_bundles --clobber

@@ -22,7 +22,6 @@ echo erasing %BUNDLE_DIR%\smv
 echo.
 erase /q %BUNDLE_DIR%\smv\*
 call :copyfile %smvrepo%\Build\background\intel_win_64 background_win_64.exe %BUNDLE_DIR%\smv background.exe
-call :copyfile %smvrepo%\Build\hashfile\intel_win_64   hashfile_win_64.exe   %BUNDLE_DIR%\smv hashfile.exe
 call :copyfile %smvrepo%\Build\smokediff\intel_win_64  smokediff_win_64.exe  %BUNDLE_DIR%\smv smokediff.exe
 call :copyfile %smvrepo%\Build\pnginfo\intel_win_64    pnginfo_win_64.exe    %BUNDLE_DIR%\smv pnginfo.exe
 call :copyfile %smvrepo%\Build\fds2fed\intel_win_64    fds2fed_win_64.exe    %BUNDLE_DIR%\smv fds2fed.exe

@@ -49,7 +49,6 @@ if "%platform%" == "linux" (
   echo Downloading compressed archive to:
   echo   %upload_dir%\!bundledir!.sh
   pscp -P 22 %linux_logon%:.bundle/uploads/!bundledir!.sh            %upload_dir%\.
-  pscp -P 22 %linux_logon%:.bundle/uploads/!bundledir!.sha1          %upload_dir%\.
   pscp -P 22 %linux_logon%:.bundle/uploads/!bundledir!_manifest.html %upload_dir%\.
   goto eof
 )
@@ -60,7 +59,6 @@ if "%platform%" == "osx" (
   echo Downloading compressed archive to:
   echo   %upload_dir%\!bundledir!.sh
   pscp -P 22 %osx_logon%:.bundle/uploads/!bundledir!.sh            %upload_dir%\.
-  pscp -P 22 %osx_logon%:.bundle/uploads/!bundledir!.sha1          %upload_dir%\.
   pscp -P 22 %osx_logon%:.bundle/uploads/!bundledir!_manifest.html %upload_dir%\.
   goto eof
 )

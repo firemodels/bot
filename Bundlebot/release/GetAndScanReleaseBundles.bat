@@ -17,9 +17,6 @@ gh release download %TAG% -p FDS*.exe -D bundles  -R github.com/firemodels/fds
 echo downloading documents
 gh release download %TAG% -p FDS*.pdf -D bundles  -R github.com/firemodels/fds
 
-echo downloading sha1 files
-gh release download %TAG% -p FDS*.sha1 -D bundles  -R github.com/firemodels/fds
-
 echo.
 echo scanning nightly bundles in %BUNDLEDIR%
 set BUNDLEDIR=%CD%\bundles

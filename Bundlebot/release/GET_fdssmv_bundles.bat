@@ -26,15 +26,12 @@ call :downloadfile SMV_Technical_Reference_Guide.pdf
 
 call :downloadfile %BUNDLE_BASE%lnx.sh
 call :downloadfile %BUNDLE_BASE%lnx.tar.gz
-call :downloadfile %BUNDLE_BASE%lnx.sha1
 
 call :downloadfile %BUNDLE_BASE%osx.sh
 call :downloadfile %BUNDLE_BASE%osx.tar.gz
-call :downloadfile %BUNDLE_BASE%osx.sha1
 
 call :downloadfile %BUNDLE_BASE%win.exe
 call :downloadfile %BUNDLE_BASE%win.zip
-call :downloadfile %BUNDLE_BASE%win.sha1
 echo ***files downloaded to %BUNDLEDIR%
 cd %CURDIR%
 goto eof

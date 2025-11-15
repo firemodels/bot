@@ -41,7 +41,6 @@ call :BUILD     background
 call :BUILD     fds2fed
 call :BUILD     flush
 call :BUILD     get_time
-call :BUILD     hashfile
 call :BUILD     set_path
 call :BUILD     sh2bat
 call :BUILD     pnginfo
@@ -56,7 +55,6 @@ call :CHECK_BUILD     background
 call :CHECK_BUILD     fds2fed
 call :CHECK_BUILD     flush
 call :CHECK_BUILD     get_time
-call :CHECK_BUILD     hashfile
 call :CHECK_BUILD     set_path
 call :CHECK_BUILD     sh2bat
 call :CHECK_BUILD     pnginfo
