@@ -47,7 +47,7 @@ call make_LIBS bot > %outdir%\stage3_LIBS 2>&1
 echo *** Building applications
 Title Building applications
 
-set "progs=background flush hashfile smokediff pnginfo smokezip fds2fed wind2fds set_path timep get_time sh2bat"
+set "progs=background flush smokediff pnginfo smokezip fds2fed wind2fds set_path timep get_time sh2bat"
 
 for %%x in ( %progs% ) do (
   title Building %%x

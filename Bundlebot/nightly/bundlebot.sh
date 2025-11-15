@@ -1,7 +1,5 @@
 #!/bin/bash
 
-SHA1EXT=sha1
-
 if [ "$BUILDING_release" == "1" ]; then
   GHOWNER=`whoami`
 else

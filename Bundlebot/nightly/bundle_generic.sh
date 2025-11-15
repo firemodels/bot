@@ -6,8 +6,6 @@ INTEL_COMP_VERSION=$4
 UPLOAD_DIR_ARG=$5
 NIGHTLY=$6
 
-SHA1EXT=sha1
-
 if [ "$NIGHTLY" == "null" ]; then
   NIGHTLY=
 fi
@@ -357,10 +355,8 @@ mkdir $bundledir/Documentation
 mkdir $bundledir/Examples
 
 mkdir $fdsbindir
-mkdir $fdsbindir/hash
 
 mkdir -p $smvbindir
-mkdir -p $smvbindir/hash
 mkdir $smvbindir/colorbars
 mkdir $smvbindir/textures
 
@@ -391,7 +387,6 @@ CP $APPS_DIR pnginfo    $smvbindir pnginfo
 CP $APPS_DIR fds2fed    $smvbindir fds2fed
 CP $APPS_DIR smokezip   $smvbindir smokezip
 CP $APPS_DIR wind2fds   $smvbindir wind2fds
-CP $APPS_DIR hashfile   $smvbindir hashfile
 
 # qpdf --empty --pages FDS_User_Guide.pdf  3-3 -- out.pdf
 
@@ -401,16 +396,6 @@ cat << EOF >> $MANIFEST
 EOF
 
 CURDIR=`pwd`
-cd $smvbindir
-$APPS_DIR/hashfile background > hash/background.sha1
-$APPS_DIR/hashfile smokeview  > hash/smokeview.sha1
-$APPS_DIR/hashfile smokediff  > hash/smokediff.sha1
-$APPS_DIR/hashfile pnginfo    > hash/pnginfo.sha1
-$APPS_DIR/hashfile fds2fed    > hash/fds2fed.sha1
-$APPS_DIR/hashfile smokezip   > hash/smokezip.sha1
-$APPS_DIR/hashfile wind2fds   > hash/wind2fds.sha1
-$APPS_DIR/hashfile hashfile   > hash/hashfile.sha1
-cd $CURDIR
 
 CPDIR $colorbarsdir $smvbindir
 CP $smvscriptdir jp2conv.sh $smvbindir jp2conv.sh
@@ -459,7 +444,6 @@ TOMANIFESTSMV  $smvbindir/smokeview  smokeview
 
 TOMANIFESTSMV  $smvbindir/background background
 TOMANIFESTLIST $fdsbindir/fds2ascii  fds2ascii
-TOMANIFESTSMV  $smvbindir/hashfile   hashfile
 TOMANIFESTSMV  $smvbindir/smokediff  smokediff
 TOMANIFESTSMV  $smvbindir/pnginfo    pnginfo
 TOMANIFESTSMV  $smvbindir/fds2fed    fds2fed
@@ -468,11 +452,6 @@ TOMANIFESTLIST $fdsbindir/test_mpi   test_mpi
 TOMANIFESTSMV  $smvbindir/wind2fds   wind2fds
 
 CURDIR=`pwd`
-cd $fdsbindir
-$APPS_DIR/hashfile fds       > hash/fds.sha1
-$APPS_DIR/hashfile fds2ascii > hash/fds2ascii.sha1
-$APPS_DIR/hashfile test_mpi  > hash/test_mpi.sha1
-cd $CURDIR
 
 echo ""
 echo "--- copying configuration files ---"
