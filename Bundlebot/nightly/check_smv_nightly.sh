@@ -55,20 +55,11 @@ rm -f $errors
 if [ `grep "$SMVWIN.exe" $uploads | wc -l` -eq 0 ]; then
   echo  "***error: $SMVWIN.exe missing" >> $errors
 fi
-if [ `grep $SMVWIN.sha1 $uploads | wc -l` -eq 0 ]; then
-  echo  "***error: $SMVWIN.sha1 missing" >> $errors
-fi
 if [ `grep $SMVLNX.sh   $uploads  | grep -v sha1 | wc -l` -eq 0 ]; then
   echo  "***error: $SMVLNX.sh missing" >> $errors
 fi
-if [ `grep $SMVLNX.sha1 $uploads  | wc -l` -eq 0 ]; then
-  echo  "***error: $SMVLNX.sha1 missing" >> $errors
-fi
 if [ `grep $SMVOSX.sh   $uploads  | grep -v sha1 | wc -l` -eq 0 ]; then
   echo  "***error: $SMVOSX.sh missing" >> $errors
-fi
-if [ `grep $SMVOSX.sha1 $uploads  | wc -l` -eq 0 ]; then
-  echo  "***error: $SMVOSX.sha1 missing" >> $errors
 fi
 echo "bundle url: https://github.com/firemodels/test_bundles/releases/tag/SMOKEVIEW_TEST" > $output
 echo                  >> $output

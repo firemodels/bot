@@ -25,8 +25,6 @@ set SMV_BRANCH=master
 set OWNER=%username%
 if "x%is_nightly%" == "x1" set OWNER=firemodels
 
-set SHA1EXT=sha1
-
 set clone=
 set FDS_HASH=
 set SMV_HASH=
@@ -322,9 +320,7 @@ if "x%upload_bundle%" == "x" goto skip_upload
   set /p basename=<%TEMP%\fds_smv_basename.txt
 
   set fullfilebase=%userprofile%\.bundle\bundles\%basename%
-  echo gh release upload FDS_TEST %fullfilebase%.%SHA1EXT% -R github.com/%OWNER%/test_bundles --clobber
-       gh release upload FDS_TEST %fullfilebase%.%SHA1EXT% -R github.com/%OWNER%/test_bundles --clobber
-  
+
   echo gh release upload FDS_TEST %fullfilebase%.exe -R github.com/%OWNER%/test_bundles --clobber
        gh release upload FDS_TEST %fullfilebase%.exe -R github.com/%OWNER%/test_bundles --clobber
 

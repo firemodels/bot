@@ -1,7 +1,5 @@
 #!/bin/bash
 
-SHA1EXT=sha1
-
 if [ "$BUILDING_release" == "1" ]; then
   GHOWNER=`whoami`
 else
@@ -294,7 +292,6 @@ if [ "$showparms" == "" ]; then
     done
 
     gh release upload FDS_TEST $bundle_dir/${installer_base_platform}.sh         -R github.com/$GHOWNER/test_bundles  --clobber
-    gh release upload FDS_TEST $bundle_dir/${installer_base_platform}.$SHA1EXT   -R github.com/$GHOWNER/test_bundles  --clobber
 #    gh release upload FDS_TEST $bundle_dir/${installer_base_platform}.tar.gz     -R github.com/$GHOWNER/test_bundles  --clobber
     if [ "$platform" == "lnx" ]; then
       cd $REPO_ROOT/fds

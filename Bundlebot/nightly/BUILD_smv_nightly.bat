@@ -57,7 +57,7 @@ call make_LIBS bot > %outdir%\stage3_LIBS 2>&1
 echo *** Building applications
 Title Building applications
 
-set "progs=background flush hashfile smokediff pnginfo smokezip fds2fed wind2fds set_path timep get_time sh2bat"
+set "progs=background flush smokediff pnginfo smokezip fds2fed wind2fds set_path timep get_time sh2bat"
 
 for %%x in ( %progs% ) do (
   title Building %%x
@@ -90,9 +90,6 @@ set filelist=%TEMP%\smv_files_win.out
 gh release view SMOKEVIEW_TEST  -R github.com/%OWNER%/test_bundles | grep SMV | grep -v FDS | grep -v CFAST | grep win | gawk "{print $2}" > %filelist%
 for /F "tokens=*" %%A in (%filelist%) do gh release delete-asset SMOKEVIEW_TEST %%A  -R github.com/%OWNER%/test_bundles -y
 erase %filelist%
-
-echo uploading %smvrepo_revision%_win.sha1 to github.com/%OWNER%/test_bundles
-gh release upload SMOKEVIEW_TEST %uploaddir%\%smvrepo_revision%_win.sha1 -R github.com/%OWNER%/test_bundles --clobber
 
 echo uploading %smvrepo_revision%_win.exe to github.com//%OWNER%/test_bundles
 gh release upload SMOKEVIEW_TEST %uploaddir%\%smvrepo_revision%_win.exe  -R github.com/%OWNER%/test_bundles --clobber

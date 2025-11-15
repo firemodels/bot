@@ -54,20 +54,11 @@ rm -f $errors
 if [ `grep $FDSWIN.exe $uploads | wc -l` -eq 0 ]; then
   echo  "***error: $FDSWIN.exe missing" >> $errors
 fi
-if [ `grep $FDSWIN.sha1 $uploads | wc -l` -eq 0 ]; then
-  echo  "***error: $FDSWIN.sha1 missing" >> $errors
-fi
 if [ `grep $FDSLNX.sh   $uploads  | grep -v sha1 | wc -l` -eq 0 ]; then
   echo  "***error: $FDSLNX.sh missing" >> $errors
 fi
-if [ `grep $FDSLNX.sha1 $uploads  | wc -l` -eq 0 ]; then
-  echo  "***error: $FDSLNX.sha1 missing" >> $errors
-fi
 if [ `grep $FDSOSX.sh   $uploads  | grep -v sha1 | wc -l` -eq 0 ]; then
   echo  "***error: $FDSOSX.sh missing" >> $errors
-fi
-if [ `grep $FDSOSX.sha1 $uploads  | wc -l` -eq 0 ]; then
-  echo  "***error: $FDSOSX.sha1 missing" >> $errors
 fi
 echo bundle url: https://github.com/firemodels/test_bundles/releases/tag/FDS_TEST > $output
 echo                  >> $output

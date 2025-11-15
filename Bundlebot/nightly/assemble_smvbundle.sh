@@ -74,7 +74,6 @@ SMDDIR=$GITROOT/smv/Build/smokediff/${COMPILER}_${platform}
 PNGINFODIR=$GITROOT/smv/Build/pnginfo/${COMPILER}_${platform}
 FDS2FEDDIR=$GITROOT/smv/Build/fds2fed/${COMPILER}_${platform}
 WIND2FDSDIR=$GITROOT/smv/Build/wind2fds/${COMPILER}_${platform}
-HASHFILEDIR=$GITROOT/smv/Build/hashfile/${COMPILER}_${platform}
 FLUSHFILEDIR=$GITROOT/smv/Build/flush/${COMPILER}_${platform}
 FORBUNDLE=$GITROOT/smv/Build/for_bundle
 WEBGLDIR=$GITROOT/smv/Build/for_bundle/webgl
@@ -97,9 +96,7 @@ cd $uploads
 rm -rf $PLATFORMDIR
 mkdir -p $PLATFORMDIR
 mkdir -p $PLATFORMDIR/bin
-mkdir -p $PLATFORMDIR/bin/hash
 mkdir -p $PLATFORMDIR/$smvbin
-mkdir -p $PLATFORMDIR/$smvbin/hash
 mkdir -p $PLATFORMDIR/Documentation
 
 echo ""
@@ -133,22 +130,9 @@ CP  $PNGINFODIR    pnginfo_${platform}           $PLATFORMDIR/$smvbin pnginfo
 CP  $FDS2FEDDIR    fds2fed_${platform}           $PLATFORMDIR/$smvbin fds2fed
 CP  $SMZDIR        smokezip_${platform}          $PLATFORMDIR/$smvbin smokezip
 CP  $WIND2FDSDIR   wind2fds_${platform}          $PLATFORMDIR/$smvbin wind2fds
-CP  $HASHFILEDIR   hashfile_${platform}          $PLATFORMDIR/$smvbin hashfile
 CP  $FLUSHFILEDIR  flush_${platform}             $PLATFORMDIR/$smvbin flush
 
 CURDIR=`pwd`
-cd $PLATFORMDIR/$smvbin
-HASHFILE=$HASHFILEDIR/hashfile_${platform}
-$HASHFILE background > background.sha1
-$HASHFILE smokediff  > smokediff.sha1
-$HASHFILE pnginfo    > pnginfo.sha1
-$HASHFILE fds2fed    > fds2fed.sha1
-$HASHFILE smokeview  > smokeview.sha1
-$HASHFILE smokezip   > smokezip.sha1
-$HASHFILE wind2fds   > wind2fds.sha1
-$HASHFILE hashfile   > hashfile.sha1
-cat *.sha1 > $uploads/$PLATFORMDIR.sha1
-cd $CURDIR
 
 rm -f $PLATFORMDIR.tar $PLATFORMDIR.tar.gz
 cd $PLATFORMDIR
@@ -159,11 +143,7 @@ tar cvf ../$PLATFORMDIR.tar .
 cd ..
 gzip $PLATFORMDIR.tar
 $MAKEINSTALLER ${platform2} $revision $PLATFORMDIR.tar.gz $PLATFORMDIR.sh FDS/$FDSEDITION
-$HASHFILE $PLATFORMDIR.sh > $PLATFORMDIR.sh.sha1
-cat $PLATFORMDIR.sh.sha1 >> $uploads/$PLATFORMDIR.sha1
-rm $PLATFORMDIR.sh.sha1
 echo "$PLATFORMDIR.sh   copied to $uploads on `hostname`"
-echo "$PLATFORMDIR.sha1 copied to $uploads on `hostname`"
 
 if [ -e $errlog ]; then
   numerrs=`cat $errlog | wc -l `

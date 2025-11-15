@@ -11,7 +11,6 @@ set SMVEDITION=SMV6
 
 set fdsversion=%FDSEDITION%
 set smvversion=%SMVEDITION%
-set SHA1EXT=sha1
 
 :: get git root directory
 
@@ -84,15 +83,7 @@ set FDSREPODATE=
 
 set basename=%fds_version%_%smv_version%%FDSREPODATE%%nightly%_win
 echo %basename%> %TEMP%\fds_smv_basename.txt
-set hashfile=%repo_root%\smv\Build\hashfile\intel_win\hashfile_win.exe
 set getrepoinfo=%repo_root%\bot\Scripts\get_repo_info.bat
-if exist %hashfile% goto endif0
-  echo ***warning: %hashfile% does not exist
-  echo Bundle will not contain hashes of application files
-if "x%bot%" == "xbot" goto skip2
-  pause
-:skip2
-:endif0
 
 set in_pdf=%userprofile%\.bundle\pubs
 set smv_forbundle=%repo_root%\smv\Build\for_bundle
@@ -101,7 +92,6 @@ set basedir=%upload_dir%\%basename%
 
 set out_bundle=%basedir%\firemodels
 set out_bin=%out_bundle%\%fdsversion%\bin
-set out_fdshash=%out_bundle%\%fdsversion%\bin\hash
 set out_uninstall=%out_bundle%\%fdsversion%\Uninstall
 set out_doc=%out_bundle%\%fdsversion%\Documentation
 set out_guides="%out_doc%\Guides_and_Release_Notes"
@@ -113,7 +103,6 @@ set smv_examples=%repo_root%\smv\Verification
 set out_smv=%out_bundle%\%smvversion%
 set out_textures=%out_smv%\textures
 set out_colorbars=%out_smv%\colorbars
-set out_smvhash=%out_smv%\hash
 
 set fds_casessh=%repo_root%\fds\Verification\FDS_Cases.sh
 set fds_casesbat=%repo_root%\fds\Verification\FDS_Cases.bat
@@ -147,9 +136,6 @@ mkdir %out_guides%
 mkdir %out_web%
 mkdir %out_examples%
 mkdir %out_uninstall%
-
-mkdir %out_fdshash%
-mkdir %out_smvhash%
 
 set release_version=%FDSMAJORVERSION%_win
 set release_version=
@@ -219,7 +205,6 @@ CALL :TOMANIFESTMPI   %out_bin%\mpi\mpiexec.exe  mpiexec
 CALL :TOMANIFESTSMV   %out_smv%\smokeview.exe    smokeview
 
 CALL :COPY  %bundle_dir%\smv\background.exe %out_bin%\background.exe
-CALL :COPY  %bundle_dir%\smv\hashfile.exe   %out_smv%\hashfile.exe 
 CALL :COPY  %bundle_dir%\smv\smokediff.exe  %out_smv%\smokediff.exe
 CALL :COPY  %bundle_dir%\smv\pnginfo.exe    %out_smv%\pnginfo.exe
 CALL :COPY  %bundle_dir%\smv\fds2fed.exe    %out_smv%\fds2fed.exe
@@ -228,7 +213,6 @@ CALL :COPY  %bundle_dir%\smv\wind2fds.exe   %out_smv%\wind2fds.exe
 
 CALL :TOMANIFESTSMV   %out_bin%\background.exe background
 CALL :TOMANIFESTLIST  %out_bin%\fds2ascii.exe  fds2ascii
-CALL :TOMANIFESTSMV   %out_smv%\hashfile.exe   hashfile
 CALL :TOMANIFESTSMV   %out_smv%\pnginfo.exe    pnginfo
 CALL :TOMANIFESTSMV   %out_smv%\fds2fed.exe    fds2fed
 CALL :TOMANIFESTSMV   %out_smv%\smokezip.exe   smokezip
@@ -243,33 +227,12 @@ echo ^</html^>                                  >> %MANIFEST%
 CALL :COPY  %repo_root%\smv\scripts\jp2conv.bat                                %out_smv%\jp2conv.bat
 
 set curdir=%CD%
-cd %out_bin%
 
-%hashfile% fds.exe        >  hash\fds_%fds_version%.exe.sha1
-%hashfile% fds2ascii.exe  >  hash\fds2ascii_%fds_version%.exe.sha1
-%hashfile% background.exe >  hash\background_%fds_version%.exe.sha1
-%hashfile% test_mpi.exe   >  hash\test_mpi_%fds_version%.exe.sha1
-cd hash
-cat *.sha1                >  %upload_dir%\%basename%.%SHA1EXT%
-
-cd %out_smv%
-%hashfile% hashfile.exe   >  hash\hashfile_%smv_version%.exe.sha1
-%hashfile% smokeview.exe  >  hash\smokeview_%smv_version%.exe.sha1
-%hashfile% smokediff.exe  >  hash\smokediff_%smv_version%.exe.sha1
-%hashfile% pnginfo.exe    >  hash\pnginfo_%smv_version%.exe.sha1
-%hashfile% fds2fed.exe    >  hash\fds2fed_%smv_version%.exe.sha1
-%hashfile% smokezip.exe   >  hash\smokezip_%smv_version%.exe.sha1
-%hashfile% wind2fds.exe   >  hash\wind2fds_%smv_version%.exe.sha1
-cd hash
-cat *.sha1                >> %upload_dir%\%basename%.%SHA1EXT%
-
-cd %curdir%
 CALL :COPY %in_intel_dll%\libiomp5md.dll                        %out_bin%\libiomp5md.dll
 CALL :COPY "%fds_forbundle%\fdsinit.bat"                        %out_bin%\fdsinit.bat
 CALL :COPY "%fds_forbundle%\fdspath.bat"                        %out_bin%\fdspath.bat
 CALL :COPY "%fds_forbundle%\helpfds.bat"                        %out_bin%\helpfds.bat
 CALL :COPY "%fds_forbundle%\fds_local.bat"                      %out_bin%\fds_local.bat
-::CALL :COPY "%fds_forbundle%\fds_local_test.bat"                 %out_bin%\fds_local_test.bat
 CALL :COPY  %repo_root%\smv\Build\sh2bat\intel_win\sh2bat_win.exe %out_bin%\sh2bat.exe
 
 :: setup program for new installer
@@ -381,12 +344,7 @@ if exist %basename%.exe erase %basename%.exe
 
 wzipse32 %basename%.zip -setup -auto -i %fds_forbundle%\icon.ico -t %fds_forbundle%\unpack.txt -runasadmin -a %fds_forbundle%\about.txt -st"%fds_version% %smv_version%" -o -c cmd /k firemodels\setup.bat
 
-%hashfile% %basename%.exe          >> %upload_dir%\%basename%.%SHA1EXT%
-call %getrepoinfo% %repo_root%\fds >> %upload_dir%\%basename%.%SHA1EXT%
-call %getrepoinfo% %repo_root%\smv >> %upload_dir%\%basename%.%SHA1EXT%
-
 CALL :COPY %upload_dir%\%basename%.exe       %bundles_dir%\%basename%.exe
-CALL :COPY %upload_dir%\%basename%.%SHA1EXT% %bundles_dir%\%basename%.%SHA1EXT%
 CALL :COPY %upload_dir%\%basename%.zip       %bundles_dir%\%basename%.zip
 CALL :COPY %MANIFEST%                        %upload_dir%\%basename%_manifest.html
 CALL :COPY %MANIFEST%                        %bundles_dir%\%basename%_manifest.html

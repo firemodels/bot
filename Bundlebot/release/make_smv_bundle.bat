@@ -26,13 +26,11 @@ set svdiffbuild=%reporoot%\smv\Build\smokediff\%BUILDDIR%
 set pnginfobuild=%reporoot%\smv\Build\pnginfo\%BUILDDIR%
 set fds2fedbuild=%reporoot%\smv\Build\fds2fed\%BUILDDIR%
 set bgbuild=%reporoot%\smv\Build\background\intel_win
-set hashfilebuild=%reporoot%\smv\Build\hashfile\%BUILDDIR%
 set flushfilebuild=%reporoot%\smv\Build\flush\%BUILDDIR%
 set timepbuild=%reporoot%\smv\Build\timep\%BUILDDIR%
 set windbuild=%reporoot%\smv\Build\wind2fds\%BUILDDIR%
 set sh2bat=%reporoot%\smv\Build\sh2bat\intel_win
 set gettime=%reporoot%\smv\Build\get_time\%BUILDDIR%
-set hashfileexe=%hashfilebuild%\hashfile_win.exe
 set repoexes=%userprofile%\.bundle\BUNDLE\WINDOWS\repoexes
 
 set smvdir=%zipbase%\%SMVEDITION%
@@ -49,7 +47,6 @@ echo --- filling distribution directory ---
 echo.
 IF EXIST %smvdir% rmdir /S /Q %smvdir%
 mkdir %smvdir%
-mkdir %smvdir%\hash
 
 CALL :COPY  %reporoot%\smv\Build\set_path\intel_win\set_path_win.exe "%smvdir%\set_path.exe"
 CALL :COPY  %smvbuild%\smokeview_win%test%.exe                           %smvdir%\smokeview.exe
@@ -67,7 +64,6 @@ CALL :COPY  %webgldir%\smv2html.bat   %smvdir%\smv2html.bat
 
 CALL :COPY  %bgbuild%\background_win.exe     %smvdir%\background.exe
 CALL :COPY  %flushfilebuild%\flush_win.exe   %smvdir%\flush.exe
-CALL :COPY  %hashfilebuild%\hashfile_win.exe %smvdir%\hashfile.exe
 CALL :COPY  %svdiffbuild%\smokediff_win.exe  %smvdir%\smokediff.exe
 CALL :COPY  %pnginfobuild%\pnginfo_win.exe   %smvdir%\pnginfo.exe
 CALL :COPY  %fds2fedbuild%\fds2fed_win.exe   %smvdir%\fds2fed.exe
@@ -82,19 +78,6 @@ CALL :COPY  "%forbundle%\message.txt"                         %zipbase%\message.
 CALL :COPY  %forbundle%\setup.bat                             %zipbase%\setup.bat
 
 set curdir=%CD%
-cd %smvdir%
-
-%hashfileexe% smokeview.exe  >  hash\smokeview_%revision%.sha1
-%hashfileexe% smokezip.exe   >  hash\smokezip_%revision%.sha1
-%hashfileexe% smokediff.exe  >  hash\smokediff_%revision%.sha1
-%hashfileexe% pnginfo.exe    >  hash\pnginfo_%revision%.sha1
-%hashfileexe% fds2fed.exe    >  hash\fds2fed_%revision%.sha1
-%hashfileexe% background.exe >  hash\background_%revision%.sha1
-%hashfileexe% hashfile.exe   >  hash\hashfile_%revision%.sha1
-%hashfileexe% wind2fds.exe   >  hash\wind2fds_%revision%.sha1
-cd hash
-cat *.sha1              >  %uploads%\%zipbase%.sha1
-cd %curdir%
 
 CALL :COPY  %forbundle%\smokeview.html          %smvdir%\smokeview.html
 CALL :COPY  %forbundle%\webvr\smokeview_vr.html %smvdir%\smokeview_vr.html
@@ -139,10 +122,6 @@ echo.
 wzipse32 %zipbase%.zip -runasadmin -setup -auto -i %forbundle%\icon.ico -t %forbundle%\unpack.txt -a %forbundle%\about.txt -st"Smokeview %smv_version% Setup" -o -c cmd /k setup.bat
 
 if not exist %zipbase%.exe echo ***warning: %zipbase%.exe was not created
-%hashfileexe% %zipbase%.exe  >   %smvdir%\hash\%zipbase%.exe.sha1
-
-cd %smvdir%\hash
-cat %zipbase%.exe.sha1 >> %uploads%\%zipbase%.sha1
 
 echo.
 echo --- Windows Smokeview installer, %zipbase%.exe, built
