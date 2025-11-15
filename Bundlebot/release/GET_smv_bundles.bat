@@ -15,15 +15,12 @@ set BUNDLE_BASE=%BUNDLE_SMV_TAG%_
 
 call :downloadfile %BUNDLE_BASE%lnx.sh
 :: call :downloadfile ${BUNDLE_BASE}lnx.tar.gz
-call :downloadfile %BUNDLE_BASE%lnx.sha1
 
 call :downloadfile %BUNDLE_BASE%osx.sh
 :: call :downloadfile ${BUNDLE_BASE}osx.tar.gz
-call :downloadfile %BUNDLE_BASE%osx.sha1
 
 call :downloadfile %BUNDLE_BASE%win.exe
 ::call :downloadfile ${BUNDLE_BASE}win.tar.gz
-call :downloadfile %BUNDLE_BASE%win.sha1
 
 call :downloadfile SMV_User_Guide.pdf
 call :downloadfile SMV_Technical_Reference_Guide.pdf
