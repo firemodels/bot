@@ -87,7 +87,7 @@ BUILDLIB()
   echo "***building smokeview libraries" >& $compilelog 
 
   cd $smvrepo/Build/LIBS/intel_$platform$SMVSIZE
-  ./make_LIBS_bot >& $compilelog 
+  ./make_LIBS bot >& $compilelog 
 }
 
 # -------------------------------------------------------------
@@ -100,6 +100,7 @@ CHECK_BUILDSMV()
 }
 
 # -------------------------------------------------------------
+
 BUILD()
 {
   prog=$1
@@ -124,6 +125,7 @@ CHECK_BUILD()
     echo "***error: The program $prog_$platform_64.exe failed to build"  >& $errorlog
   fi
 }
+
 platform=linux
 if [ "`uname`" == "Darwin" ] ; then
   platform="osx"
@@ -134,13 +136,13 @@ CURDIR=`pwd`
 
 git clean -dxf  >& /dev/null
 
-clean_log=$CURDIR/output/clean.log
-compile_log=$CURDIR/output/compile.log
-error_log=$CURDIR/output/error.log
+cleanlog=$CURDIR/output/clean.log
+compilelog=$CURDIR/output/compile.log
+errorlog=$CURDIR/output/error.log
 
-echo > $clean_log
-echo > $compile_log
-echo > $error_log
+echo > $cleanlog
+echo > $compilelog
+echo > $errorlog
 
 cd ../../..
 REPOROOT=`pwd`
