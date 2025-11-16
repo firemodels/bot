@@ -1,0 +1,210 @@
+#!/bin/bash
+
+# -------------------------------------------------------------
+
+BUILDFDS()
+{
+  echo ***building fds
+  echo ""                >& $compilelog 
+  echo "***************" >& $compilelog 
+
+  echo "***building fds" >& $compilelog 
+  cd $fdsrepo/Build/impi_intel_linux
+  ./make_fds bot >& $compilelog 
+
+  echo "***building fds openmp"
+  echo "***building fds openmp" >& $compilelog 
+  cd $fdsrepo/Build/impi_intel_linux_openmp
+  ./make_fds bot >& $compilelog 
+}
+
+# -------------------------------------------------------------
+
+CHECK_BUILDFDS()
+{
+  if [ ! -e $fdsrepo/Build/impi_intel_linux/fds_impi_intel_linux ]; then
+    echo "***error: The program fds_impi_linux failed to build"
+    echo "***error: The program fds_impi_linux failed to build"  >& $errorlog 
+  fi
+}
+
+# -------------------------------------------------------------
+
+CHECK_BUILDFDSOPENMP()
+{
+  if [ ! -e $fdsrepo/Build/impi_intel_linux_openmp/fds_impi_intel_linux_openmp ]; then
+    echo "***error: The program fds_impi_linux_openmp failed to build"
+    echo "***error: The program fds_impi_linux_openmp failed to build"  >& $errorlog 
+  fi
+}
+
+# -------------------------------------------------------------
+
+BUILDUTIL()
+{
+  prog=$1
+  builddir=$2
+
+  echo "***building $prog"
+  echo ""                  >& $compilelog 
+  echo "***************"   >& $compilelog 
+  echo "***building $prog" >& $compilelog 
+  cd $fdsrepo/Utilities/$prog/$builddir
+  ./make_$prog bot >& $compilelog 
+}
+
+# -------------------------------------------------------------
+
+CHECK_BUILDTESTMPI()
+{
+  if [ ! -e $fdsrepo/Utilities/test_mpi/impi_intel_linux/test_mpi.exe ]; then
+    echo "***error: The program test_mpi.exe failed to build"
+    echo "***error: The program test_mpi.exe failed to build"  >& $errorlog
+  fi
+}
+
+# -------------------------------------------------------------
+
+CHECK_BUILDUTIL()
+{
+  prog=$1
+  builddir=$2
+  suffix=$3
+
+  if [ ! -e $fdsrepo/Utilities/$prog/$builddir/$prog_$builddir ]; then
+    echo "***error: The program $prog_$builddir failed to build
+    echo "***error: The program $prog_$builddir failed to build  >& $errorlog
+  fi
+}
+
+# -------------------------------------------------------------
+
+BUILDLIB()
+{
+  echo "***building smokeview libraries"
+  echo.""                >& $compilelog 
+  echo "***************" >& $compilelog 
+  echo "***building smokeview libraries" >& $compilelog 
+
+  cd $smvrepo/Build/LIBS/intel_linux$SMVSIZE
+  ./make_LIBS_bot >& $compilelog 
+}
+
+# -------------------------------------------------------------
+CHECK_BUILDSMV()
+{
+  if [ ! -e $smvrepo/Build/smokeview/intel_linux$SMVSIZE/smokeview_linux$SMVSIZE]; then
+    echo "***error: The program smokeview_linux_64 failed to build"
+    echo "***error: The program smokeview_linux_64 failed to build"  >& $errorlog 
+  fi
+}
+
+# -------------------------------------------------------------
+BUILD()
+{
+  prog=$1
+  script=make_$prog
+
+  echo "***building $prog"
+  echo ""                >& $compilelog 
+  echo "***************" >& $compilelog 
+  echo "***building $prog" >& $compilelog 
+  cd $smvrepo/Build/$prog/intel_linux$SMVSIZE
+  call $script bot >& $compilelog 
+}
+
+# -------------------------------------------------------------
+
+CHECK_BUILD()
+{
+  prog=$1
+
+  if [ ! -e $smvrepo/Build/%prog%/intel_linux$SMVSIZE/$prog_linux$SMVSIZE ]; then
+    echo "***error: The program %prog%_linux_64.exe failed to build"
+    echo "***error: The program %prog%_linux_64.exe failed to build"  >& $errorlog
+  fi
+}
+
+SMVSIZE=_64
+CURDIR=`pwd`
+
+git clean -dxf  >& /dev/null
+
+clean_log=$CURDIR/output/clean.log
+compile_log=$CURDIR/output/compile.log
+error_log=$CURDIR/output/error.log
+
+echo > $clean_log
+echo > $compile_log
+echo > $error_log
+
+cd ../../..
+REPOROOT=`pwd`
+
+cd $REPOROOT/smv
+smvrepo=`pwd`
+
+cd $REPOROOT%/fds
+fdsrepo=`pwd`
+
+cd $REPOROOT%/bot
+botrepo=`pwd`
+
+cd $smvrepo/Source
+echo ***cleaning $smvrepo/Source
+git clean -dxf  >& $cleanlog
+
+cd $smvrepo/Build
+echo ***cleaning $smvrepo/Build
+git clean -dxf  >& $cleanlog
+
+cd $fdsrepo/Build
+echo ***cleaning $fdsrepo/Build
+git clean -dxf  >& $cleanlog 
+
+cd $fdsrepo/Utilities
+echo ***cleaning $fdsrepo/Utilities
+echo.
+git clean -dxf  >& $cleanlog
+
+# build fds apps
+BUILDUTIL fds2ascii intel_linux
+BUILDUTIL test_mpi  impi_intel_linux
+BUILDFDS
+
+# build smokeview libraries and apps
+BUILDLIB
+BUILD     background
+BUILD     smokediff
+BUILD     pnginfo
+BUILD     fds2fed
+BUILD     smokezip
+BUILD     linuxd2fds
+BUILD     set_path
+BUILD     sh2bat
+BUILD     get_time
+BUILDSMV
+
+# verify fds apps were built
+CHECK_BUILDUTIL    fds2ascii intel_linux
+CHECK_BUILDTESTMPI  
+CHECK_BUILDFDS
+CHECK_BUILDFDSOPENMP
+
+# verify smokeview apps were built
+CHECK_BUILD     background
+CHECK_BUILD     smokediff
+CHECK_BUILD     pnginfo
+CHECK_BUILD     fds2fed
+CHECK_BUILD     smokezip
+CHECK_BUILD     linuxd2fds
+CHECK_BUILD     set_path
+CHECK_BUILD     sh2bat
+CHECK_BUILD     get_time
+CHECK_BUILDSMV
+
+echo.
+echo ***build complete
+echo.
+
+cd $CURDIR
