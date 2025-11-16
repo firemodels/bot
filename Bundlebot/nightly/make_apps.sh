@@ -9,12 +9,12 @@ BUILDFDS()
   echo "***************" >& $compilelog 
 
   echo "***building fds" >& $compilelog 
-  cd $fdsrepo/Build/impi_intel_linux
+  cd $fdsrepo/Build/impi_intel_$platform
   ./make_fds bot >& $compilelog 
 
   echo "***building fds openmp"
   echo "***building fds openmp" >& $compilelog 
-  cd $fdsrepo/Build/impi_intel_linux_openmp
+  cd $fdsrepo/Build/impi_intel_$platform_openmp
   ./make_fds bot >& $compilelog 
 }
 
@@ -22,9 +22,9 @@ BUILDFDS()
 
 CHECK_BUILDFDS()
 {
-  if [ ! -e $fdsrepo/Build/impi_intel_linux/fds_impi_intel_linux ]; then
-    echo "***error: The program fds_impi_linux failed to build"
-    echo "***error: The program fds_impi_linux failed to build"  >& $errorlog 
+  if [ ! -e $fdsrepo/Build/impi_intel_$platform/fds_impi_intel_$platform ]; then
+    echo "***error: The program fds_impi_$platform failed to build"
+    echo "***error: The program fds_impi_$platform failed to build"  >& $errorlog 
   fi
 }
 
@@ -32,9 +32,9 @@ CHECK_BUILDFDS()
 
 CHECK_BUILDFDSOPENMP()
 {
-  if [ ! -e $fdsrepo/Build/impi_intel_linux_openmp/fds_impi_intel_linux_openmp ]; then
-    echo "***error: The program fds_impi_linux_openmp failed to build"
-    echo "***error: The program fds_impi_linux_openmp failed to build"  >& $errorlog 
+  if [ ! -e $fdsrepo/Build/impi_intel_$platform_openmp/fds_impi_intel_$platform_openmp ]; then
+    echo "***error: The program fds_impi_$platform_openmp failed to build"
+    echo "***error: The program fds_impi_$platform_openmp failed to build"  >& $errorlog 
   fi
 }
 
@@ -57,7 +57,7 @@ BUILDUTIL()
 
 CHECK_BUILDTESTMPI()
 {
-  if [ ! -e $fdsrepo/Utilities/test_mpi/impi_intel_linux/test_mpi.exe ]; then
+  if [ ! -e $fdsrepo/Utilities/test_mpi/impi_intel_$platform/test_mpi.exe ]; then
     echo "***error: The program test_mpi.exe failed to build"
     echo "***error: The program test_mpi.exe failed to build"  >& $errorlog
   fi
@@ -86,16 +86,16 @@ BUILDLIB()
   echo "***************" >& $compilelog 
   echo "***building smokeview libraries" >& $compilelog 
 
-  cd $smvrepo/Build/LIBS/intel_linux$SMVSIZE
+  cd $smvrepo/Build/LIBS/intel_$platform$SMVSIZE
   ./make_LIBS_bot >& $compilelog 
 }
 
 # -------------------------------------------------------------
 CHECK_BUILDSMV()
 {
-  if [ ! -e $smvrepo/Build/smokeview/intel_linux$SMVSIZE/smokeview_linux$SMVSIZE]; then
-    echo "***error: The program smokeview_linux_64 failed to build"
-    echo "***error: The program smokeview_linux_64 failed to build"  >& $errorlog 
+  if [ ! -e $smvrepo/Build/smokeview/intel_$platform$SMVSIZE/smokeview_$platform$SMVSIZE]; then
+    echo "***error: The program smokeview_$platform_64 failed to build"
+    echo "***error: The program smokeview_$platform_64 failed to build"  >& $errorlog 
   fi
 }
 
@@ -109,7 +109,7 @@ BUILD()
   echo ""                >& $compilelog 
   echo "***************" >& $compilelog 
   echo "***building $prog" >& $compilelog 
-  cd $smvrepo/Build/$prog/intel_linux$SMVSIZE
+  cd $smvrepo/Build/$prog/intel_$platform$SMVSIZE
   call $script bot >& $compilelog 
 }
 
@@ -119,11 +119,15 @@ CHECK_BUILD()
 {
   prog=$1
 
-  if [ ! -e $smvrepo/Build/%prog%/intel_linux$SMVSIZE/$prog_linux$SMVSIZE ]; then
-    echo "***error: The program %prog%_linux_64.exe failed to build"
-    echo "***error: The program %prog%_linux_64.exe failed to build"  >& $errorlog
+  if [ ! -e $smvrepo/Build/%prog%/intel_$platform$SMVSIZE/$prog_$platform$SMVSIZE ]; then
+    echo "***error: The program %prog%_$platform_64.exe failed to build"
+    echo "***error: The program %prog%_$platform_64.exe failed to build"  >& $errorlog
   fi
 }
+platform=linux
+if [ "`uname`" == "Darwin" ] ; then
+  platform="osx"
+fi
 
 SMVSIZE=_64
 CURDIR=`pwd`
@@ -168,8 +172,8 @@ echo.
 git clean -dxf  >& $cleanlog
 
 # build fds apps
-BUILDUTIL fds2ascii intel_linux
-BUILDUTIL test_mpi  impi_intel_linux
+BUILDUTIL fds2ascii intel_$platform
+BUILDUTIL test_mpi  impi_intel_$platform
 BUILDFDS
 
 # build smokeview libraries and apps
@@ -179,14 +183,14 @@ BUILD     smokediff
 BUILD     pnginfo
 BUILD     fds2fed
 BUILD     smokezip
-BUILD     linuxd2fds
+BUILD     $platformd2fds
 BUILD     set_path
 BUILD     sh2bat
 BUILD     get_time
 BUILDSMV
 
 # verify fds apps were built
-CHECK_BUILDUTIL    fds2ascii intel_linux
+CHECK_BUILDUTIL    fds2ascii intel_$platform
 CHECK_BUILDTESTMPI  
 CHECK_BUILDFDS
 CHECK_BUILDFDSOPENMP
@@ -197,7 +201,7 @@ CHECK_BUILD     smokediff
 CHECK_BUILD     pnginfo
 CHECK_BUILD     fds2fed
 CHECK_BUILD     smokezip
-CHECK_BUILD     linuxd2fds
+CHECK_BUILD     $platformd2fds
 CHECK_BUILD     set_path
 CHECK_BUILD     sh2bat
 CHECK_BUILD     get_time
