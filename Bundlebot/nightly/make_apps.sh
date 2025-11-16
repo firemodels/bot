@@ -119,9 +119,9 @@ CHECK_BUILD()
 {
   prog=$1
 
-  if [ ! -e $smvrepo/Build/%prog%/intel_$platform$SMVSIZE/$prog_$platform$SMVSIZE ]; then
-    echo "***error: The program %prog%_$platform_64.exe failed to build"
-    echo "***error: The program %prog%_$platform_64.exe failed to build"  >& $errorlog
+  if [ ! -e $smvrepo/Build/$prog/intel_$platform$SMVSIZE/$prog_$platform$SMVSIZE ]; then
+    echo "***error: The program $prog_$platform_64.exe failed to build"
+    echo "***error: The program $prog_$platform_64.exe failed to build"  >& $errorlog
   fi
 }
 platform=linux
@@ -148,10 +148,10 @@ REPOROOT=`pwd`
 cd $REPOROOT/smv
 smvrepo=`pwd`
 
-cd $REPOROOT%/fds
+cd $REPOROOT/fds
 fdsrepo=`pwd`
 
-cd $REPOROOT%/bot
+cd $REPOROOT/bot
 botrepo=`pwd`
 
 cd $smvrepo/Source
