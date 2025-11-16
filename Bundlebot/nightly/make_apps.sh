@@ -8,13 +8,13 @@ BUILDFDS()
   echo ""                >& $compilelog 
   echo "***************" >& $compilelog 
 
-  echo "***building fds" >& $compilelog 
-  cd $fdsrepo/Build/impi_intel_$platform
+  echo "***building fds_${mpitype}_${fdscompiler}_${platform}" >& $compilelog 
+  cd $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}
   ./make_fds.sh bot >& $compilelog 
 
-  echo "***building fds openmp"
-  echo "***building fds openmp" >& $compilelog 
-  cd $fdsrepo/Build/impi_intel_${platform}_openmp
+  echo "***building fds_${mpitype}_${fdscompiler}_${platform}_openmp"
+  echo "***building fds_${mpitype}_${fdscompiler}_${platform}_openmp" >& $compilelog 
+  cd $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}_openmp
   ./make_fds.sh bot >& $compilelog 
 }
 
@@ -22,25 +22,23 @@ BUILDFDS()
 
 CHECK_BUILDFDS()
 {
-  if [ ! -e $fdsrepo/Build/impi_intel_$platform/fds_impi_intel_$platform ]; then
-    echo "***error: The program fds_impi_$platform failed to build"
-    echo "***error: The program fds_impi_$platform failed to build"  >& $errorlog 
+  if [ ! -e $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}/fds_${mpitype}_${fdscompiler}_${platform} ]; then
+    echo "***error: The program fds_${mpitype}_${fdscompiler}_${platform} failed to build"
+    echo "***error: The program fds_${mpitype}_${fdscompiler}_${platform} failed to build"  >& $errorlog
+  else
+    cp $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}/fds_${mpitype}_${fdscompiler}_${platform} apps/.
+  fi
+  if [ ! -e $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}_openmp/fds_${mpitype}_${fdscompiler}_${platform}_openmp ]; then
+    echo "***error: The program fds_${mpitype}_${fdscompiler}_${platform}_openmp failed to build"
+    echo "***error: The program fds_${mpitype}_${fdscompiler}_${platform}_openmp failed to build"  >& $errorlog
+  else
+    cp   if [ ! -e $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}_openmp/fds_${mpitype}_${fdscompiler}_${platform}_openmp apps/.
   fi
 }
 
 # -------------------------------------------------------------
 
-CHECK_BUILDFDSOPENMP()
-{
-  if [ ! -e $fdsrepo/Build/impi_intel_${platform}_openmp/fds_impi_intel_${platform}_openmp ]; then
-    echo "***error: The program fds_impi_${platform}_openmp failed to build"
-    echo "***error: The program fds_impi_${platform}_openmp failed to build"  >& $errorlog 
-  fi
-}
-
-# -------------------------------------------------------------
-
-BUILDUTIL()
+BUILDFDSUTIL()
 {
   prog=$1
   builddir=$2
@@ -55,25 +53,28 @@ BUILDUTIL()
 
 # -------------------------------------------------------------
 
-CHECK_BUILDTESTMPI()
+CHECK_BUILDFDSUTIL()
 {
-  if [ ! -e $fdsrepo/Utilities/test_mpi/impi_intel_$platform/test_mpi.exe ]; then
-    echo "***error: The program test_mpi.exe failed to build"
-    echo "***error: The program test_mpi.exe failed to build"  >& $errorlog
+  prog=$1
+  builddir=$2
+
+  if [ ! -e $fdsrepo/Utilities/$prog/$builddir/$prog_$builddir ]; then
+    echo "***error: The program $prog_$builddir failed to build
+    echo "***error: The program $prog_$builddir failed to build  >& $errorlog
+  else
+    cp $fdsrepo/Utilities/$prog/$builddir/$prog_$builddir  apps/.
   fi
 }
 
 # -------------------------------------------------------------
 
-CHECK_BUILDUTIL()
+CHECK_BUILDTESTMPI()
 {
-  prog=$1
-  builddir=$2
-  suffix=$3
-
-  if [ ! -e $fdsrepo/Utilities/$prog/$builddir/$prog_$builddir ]; then
-    echo "***error: The program $prog_$builddir failed to build
-    echo "***error: The program $prog_$builddir failed to build  >& $errorlog
+  if [ ! -e $fdsrepo/Utilities/test_mpi/${mpitype}_${fdscompiler}_$platform/test_mpi ]; then
+    echo "***error: The program test_mpi failed to build"
+    echo "***error: The program test_mpi failed to build"  >& $errorlog
+  else
+    cp $fdsrepo/Utilities/test_mpi/${mpitype}_${fdscompiler}_$platform/test_mpi  apps/.
   fi
 }
 
@@ -86,17 +87,8 @@ BUILDLIB()
   echo "***************" >& $compilelog 
   echo "***building smokeview libraries" >& $compilelog 
 
-  cd $smvrepo/Build/LIBS/intel_$platform$SMVSIZE
+  cd $smvrepo/Build/LIBS/${smvcompiler}_$platform$SMVSIZE
   ./make_LIBSi.sh bot >& $compilelog 
-}
-
-# -------------------------------------------------------------
-CHECK_BUILDSMV()
-{
-  if [ ! -e $smvrepo/Build/smokeview/intel_$platform$SMVSIZE/smokeview_$platform$SMVSIZE]; then
-    echo "***error: The program smokeview_${platform}_64 failed to build"
-    echo "***error: The program smokeview_${platform}_64 failed to build"  >& $errorlog 
-  fi
 }
 
 # -------------------------------------------------------------
@@ -105,12 +97,12 @@ BUILD()
 {
   prog=$1
 
-  echo "***building $prog"
+  echo "***building $prog_$platform$SMVSIZE "
   echo ""                >& $compilelog 
   echo "***************" >& $compilelog 
   echo "***building $prog" >& $compilelog 
-  cd $smvrepo/Build/$prog/intel_$platform$SMVSIZE
-  call $make_${prog}.sh bot >& $compilelog 
+  cd $smvrepo/Build/$prog/${smvcompiler}_$platform$SMVSIZE
+ ./$make_${prog}.sh bot >& $compilelog 
 }
 
 # -------------------------------------------------------------
@@ -119,15 +111,23 @@ CHECK_BUILD()
 {
   prog=$1
 
-  if [ ! -e $smvrepo/Build/$prog/intel_$platform$SMVSIZE/$prog_$platform$SMVSIZE ]; then
-    echo "***error: The program $prog_${platform}_64.exe failed to build"
-    echo "***error: The program $prog_${platform}_64.exe failed to build"  >& $errorlog
+  if [ ! -e $smvrepo/Build/$prog/${smvcompiler}_$platform$SMVSIZE/$prog_$platform$SMVSIZE ]; then
+    echo "***error: The program $prog_${platform}$SMVSIZE failed to build"
+    echo "***error: The program $prog_${platform}$SMVSIZE failed to build"  >& $errorlog
+  else
+    cp $smvrepo/Build/$prog/${smvcompiler}_$platform$SMVSIZE/$prog_$platform$SMVSIZE apps/.
   fi
 }
 
 platform=linux
+fdscompiler=intel
+smvcompiler=intel
+mpitype=impi
 if [ "`uname`" == "Darwin" ] ; then
   platform="osx"
+  fdscompiler=intel
+  smvcompiler=gnu
+  mpitype=ompi
 fi
 
 SMVSIZE=_64
@@ -173,9 +173,8 @@ echo
 git clean -dxf  >& $cleanlog
 
 # build fds apps
-BUILDUTIL test_mpi  impi_intel_$platform
-BUILDUTIL fds2ascii intel_$platform
-BUILDUTIL test_mpi  impi_intel_$platform
+BUILDFDSUTIL test_mpi  ${mpitype}_${fdscompiler}_$platform
+BUILDFDSUTIL fds2ascii ${fdscompiler}_$platform
 BUILDFDS
 
 # build smokeview libraries and apps
@@ -189,13 +188,12 @@ BUILD     $platformd2fds
 BUILD     set_path
 BUILD     sh2bat
 BUILD     get_time
-BUILDSMV
+BUILD     smokeview
 
 # verify fds apps were built
-CHECK_BUILDUTIL    fds2ascii intel_$platform
+CHECK_BUILDFDSUTIL    fds2ascii ${fdscompiler}_$platform
 CHECK_BUILDTESTMPI  
 CHECK_BUILDFDS
-CHECK_BUILDFDSOPENMP
 
 # verify smokeview apps were built
 CHECK_BUILD     background
@@ -207,7 +205,7 @@ CHECK_BUILD     $platformd2fds
 CHECK_BUILD     set_path
 CHECK_BUILD     sh2bat
 CHECK_BUILD     get_time
-CHECK_BUILDSMV
+CHECK_BUILD     smokeview
 
 echo 
 echo ***build complete
