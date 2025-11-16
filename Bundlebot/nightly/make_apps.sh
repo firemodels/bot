@@ -10,12 +10,12 @@ BUILDFDS()
 
   echo "***building fds" >& $compilelog 
   cd $fdsrepo/Build/impi_intel_$platform
-  ./make_fds bot >& $compilelog 
+  ./make_fds.sh bot >& $compilelog 
 
   echo "***building fds openmp"
   echo "***building fds openmp" >& $compilelog 
-  cd $fdsrepo/Build/impi_intel_$platform_openmp
-  ./make_fds bot >& $compilelog 
+  cd $fdsrepo/Build/impi_intel_${platform}_openmp
+  ./make_fds.sh bot >& $compilelog 
 }
 
 # -------------------------------------------------------------
@@ -32,9 +32,9 @@ CHECK_BUILDFDS()
 
 CHECK_BUILDFDSOPENMP()
 {
-  if [ ! -e $fdsrepo/Build/impi_intel_$platform_openmp/fds_impi_intel_$platform_openmp ]; then
-    echo "***error: The program fds_impi_$platform_openmp failed to build"
-    echo "***error: The program fds_impi_$platform_openmp failed to build"  >& $errorlog 
+  if [ ! -e $fdsrepo/Build/impi_intel_${platform}_openmp/fds_impi_intel_${platform}_openmp ]; then
+    echo "***error: The program fds_impi_${platform}_openmp failed to build"
+    echo "***error: The program fds_impi_${platform}_openmp failed to build"  >& $errorlog 
   fi
 }
 
@@ -50,7 +50,7 @@ BUILDUTIL()
   echo "***************"   >& $compilelog 
   echo "***building $prog" >& $compilelog 
   cd $fdsrepo/Utilities/$prog/$builddir
-  ./make_$prog bot >& $compilelog 
+  ./make_${prog}.sh bot >& $compilelog 
 }
 
 # -------------------------------------------------------------
@@ -82,20 +82,20 @@ CHECK_BUILDUTIL()
 BUILDLIB()
 {
   echo "***building smokeview libraries"
-  echo.""                >& $compilelog 
+  echo ""                >& $compilelog 
   echo "***************" >& $compilelog 
   echo "***building smokeview libraries" >& $compilelog 
 
   cd $smvrepo/Build/LIBS/intel_$platform$SMVSIZE
-  ./make_LIBS bot >& $compilelog 
+  ./make_LIBSi.sh bot >& $compilelog 
 }
 
 # -------------------------------------------------------------
 CHECK_BUILDSMV()
 {
   if [ ! -e $smvrepo/Build/smokeview/intel_$platform$SMVSIZE/smokeview_$platform$SMVSIZE]; then
-    echo "***error: The program smokeview_$platform_64 failed to build"
-    echo "***error: The program smokeview_$platform_64 failed to build"  >& $errorlog 
+    echo "***error: The program smokeview_${platform}_64 failed to build"
+    echo "***error: The program smokeview_${platform}_64 failed to build"  >& $errorlog 
   fi
 }
 
@@ -104,14 +104,13 @@ CHECK_BUILDSMV()
 BUILD()
 {
   prog=$1
-  script=make_$prog
 
   echo "***building $prog"
   echo ""                >& $compilelog 
   echo "***************" >& $compilelog 
   echo "***building $prog" >& $compilelog 
   cd $smvrepo/Build/$prog/intel_$platform$SMVSIZE
-  call $script bot >& $compilelog 
+  call $make_${prog}.sh bot >& $compilelog 
 }
 
 # -------------------------------------------------------------
@@ -121,8 +120,8 @@ CHECK_BUILD()
   prog=$1
 
   if [ ! -e $smvrepo/Build/$prog/intel_$platform$SMVSIZE/$prog_$platform$SMVSIZE ]; then
-    echo "***error: The program $prog_$platform_64.exe failed to build"
-    echo "***error: The program $prog_$platform_64.exe failed to build"  >& $errorlog
+    echo "***error: The program $prog_${platform}_64.exe failed to build"
+    echo "***error: The program $prog_${platform}_64.exe failed to build"  >& $errorlog
   fi
 }
 
@@ -170,10 +169,11 @@ git clean -dxf  >& $cleanlog
 
 cd $fdsrepo/Utilities
 echo ***cleaning $fdsrepo/Utilities
-echo.
+echo 
 git clean -dxf  >& $cleanlog
 
 # build fds apps
+BUILDUTIL test_mpi  impi_intel_$platform
 BUILDUTIL fds2ascii intel_$platform
 BUILDUTIL test_mpi  impi_intel_$platform
 BUILDFDS
@@ -209,8 +209,8 @@ CHECK_BUILD     sh2bat
 CHECK_BUILD     get_time
 CHECK_BUILDSMV
 
-echo.
+echo 
 echo ***build complete
-echo.
+echo 
 
 cd $CURDIR
