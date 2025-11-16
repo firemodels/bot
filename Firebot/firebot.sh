@@ -1770,8 +1770,19 @@ get_firebot_success()
 make_fds_summary()
 {
   if [ -d $FDS_SUMMARY_DIR ]; then
-    cp $fdsrepo/Manuals/FDS_User_Guide/SCRIPT_FIGURES/*.png         $FDS_SUMMARY_DIR/images/user/.
-    cp $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/*.png $FDS_SUMMARY_DIR/images/verification/.
+    npngs=`ls -l $fdsrepo/Manuals/FDS_User_Guide/SCRIPT_FIGURES/*.png  2>/dev/null | wc -l`
+    if [ $npngs -eq 0 ]; then
+      echo "***error: png files not found in $fdsrepo/Manuals/FDS_User_Guide/SCRIPT_FIGURES" >> $ERROR_LOG
+    else
+      cp $fdsrepo/Manuals/FDS_User_Guide/SCRIPT_FIGURES/*.png         $FDS_SUMMARY_DIR/images/user/.
+    fi
+
+    npngs=`ls -l $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/*.png  2>/dev/null | wc -l`
+    if [ $npngs -eq 0 ]; then
+      echo "***error: png files not found in $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES" >> $ERROR_LOG
+    else
+      cp $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/*.png $FDS_SUMMARY_DIR/images/verification/.
+    fi
     DATE=`date +"%b %d, %Y - %r"`
 
 # compare images
@@ -2881,34 +2892,22 @@ MATLAB_beg=`GET_TIME`
 
 #*** python verification plots
 
-    echo deb111 > $OUTPUT_DIR/out_debug
     run_python_setup
-    echo deb222 >> $OUTPUT_DIR/out_debug
     check_python_setup
-    echo deb333 >> $OUTPUT_DIR/out_debug
     if [ $python_success == true ]; then
-    echo deb444 >> $OUTPUT_DIR/out_debug
       run_python_verification
-    echo deb555 >> $OUTPUT_DIR/out_debug
       check_python_verification
-    echo deb666 >> $OUTPUT_DIR/out_debug
       make_fds_summary
-    echo deb777 >> $OUTPUT_DIR/out_debug
       MAKE_SUMMARY=1
     fi
 
 #*** python validation plots
 #    only need to setup python once
 
-    echo deb888 >> $OUTPUT_DIR/out_debug
     if [ $python_success == true ]; then
-    echo deb999 >> $OUTPUT_DIR/out_debug
       run_python_validation
-    echo debaaa >> $OUTPUT_DIR/out_debug
       check_python_validation
-    echo debbbb >> $OUTPUT_DIR/out_debug
     fi
-    echo debccc >> $OUTPUT_DIR/out_debug
 
 #*** matlab verification plots
 
@@ -2932,7 +2931,7 @@ MATLAB_beg=`GET_TIME`
   fi
 MATLAB_end=`GET_TIME`
 GET_DURATION $MATLAB_beg $MATLAB_end MATLAB
-    echo debddd >> $OUTPUT_DIR/out_debug
+ 
 
 ###*** Stage 8 ###
 
