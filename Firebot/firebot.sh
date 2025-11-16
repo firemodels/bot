@@ -1774,8 +1774,19 @@ get_firebot_success()
 make_fds_summary()
 {
   if [ -d $FDS_SUMMARY_DIR ]; then
-    cp $fdsrepo/Manuals/FDS_User_Guide/SCRIPT_FIGURES/*.png         $FDS_SUMMARY_DIR/images/user/.
-    cp $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/*.png $FDS_SUMMARY_DIR/images/verification/.
+    npngs=`ls -l $fdsrepo/Manuals/FDS_User_Guide/SCRIPT_FIGURES/*.png  2>/dev/null | wc -l`
+    if [ $npngs -eq 0 ]; then
+      echo "***error: png files not found in $fdsrepo/Manuals/FDS_User_Guide/SCRIPT_FIGURES" >> $ERROR_LOG
+    else
+      cp $fdsrepo/Manuals/FDS_User_Guide/SCRIPT_FIGURES/*.png         $FDS_SUMMARY_DIR/images/user/.
+    fi
+
+    npngs=`ls -l $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/*.png  2>/dev/null | wc -l`
+    if [ $npngs -eq 0 ]; then
+      echo "***error: png files not found in $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES" >> $ERROR_LOG
+    else
+      cp $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/*.png $FDS_SUMMARY_DIR/images/verification/.
+    fi
     DATE=`date +"%b %d, %Y - %r"`
 
 # compare images
@@ -2923,6 +2934,7 @@ MATLAB_beg=`GET_TIME`
   fi
 MATLAB_end=`GET_TIME`
 GET_DURATION $MATLAB_beg $MATLAB_end MATLAB
+ 
 
 ###*** Stage 8 ###
 
