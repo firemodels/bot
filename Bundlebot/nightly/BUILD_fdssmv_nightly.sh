@@ -12,6 +12,7 @@ echo "This script builds FDS and Smokeview apps and generates a bundle using eit
 echo "specified fds and smv repo revisions or revisions from the latest firebot pass."
 echo ""
 echo "Options:"
+echo "-b - use existing bot branch"
 echo "-c - bundle without warning about cloning/erasing fds and smv repos"
 echo "-f - force this script to run"
 echo "-F - fds repo hash/release"
@@ -123,10 +124,14 @@ FDS_TAG=
 SMV_TAG=
 LATEST=
 INSTALL=
+existing_botbranch=
 
-while getopts 'BcfF:hLm:o:r:R:S:UvX:Y:' OPTION
+while getopts 'bBcfF:hLm:o:r:R:S:UvX:Y:' OPTION
 do
 case $OPTION  in
+  b)
+   existing_botbranch="1"
+   ;;
   B)
    INSTALL="-B"
    ;;
@@ -281,19 +286,20 @@ cd $DIR
 
 #*** update bot and webpages repos
 if [ "$ECHO" == "" ]; then
-  UPDATE_REPO bot      master     || exit 1
+  if [ "$existing_botbranch" == "" ]; then
+    UPDATE_REPO bot      master     || exit 1
+  fi
   UPDATE_REPO webpages nist-pages || exit 1
 fi
 
 #*** build apps
 cd $curdir
 cd $repo/bot/Firebot
-if [ "$platform" == "osx" ]; then
-# remove || exit 1 until compiler warnings are removed
-$ECHO ./run_firebot.sh $FORCE -c -C -B -F $JOPT $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG $FIREBOT_BRANCH -T $MAILTO
-else
-$ECHO ./run_firebot.sh $FORCE -c -C -B -F $JOPT $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG $FIREBOT_BRANCH -T $MAILTO
+
+if [ "$BRANCH" == "nightly" ]; then
 fi
+
+$ECHO ./run_firebot.sh $FORCE -c -C -B -F $JOPT $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG $FIREBOT_BRANCH -T $MAILTO
 
 #*** generate and upload bundle
 cd $curdir
