@@ -1821,15 +1821,25 @@ make_fds_summary()
     echo deb666iii >> $OUTPUT_DIR/out_debug
     
     if [ "$WEB_DIR" != "" ]; then
+      echo deb666iii111 >> $OUTPUT_DIR/out_debug
       if [ -d $WEB_DIR ]; then
+        echo deb666iii222 >> $OUTPUT_DIR/out_debug
         CUR_DIR=`pwd`
+        echo deb666iii333 >> $OUTPUT_DIR/out_debug
         cd $WEB_DIR
+        echo deb666iii444 >> $OUTPUT_DIR/out_debug
         rm -r images manuals diffs *.html
+        echo deb666iii555 >> $OUTPUT_DIR/out_debug
         cp -r $FDS_SUMMARY_DIR/* .
+        echo deb666iii666 >> $OUTPUT_DIR/out_debug
         rm *template.html
+        echo deb666iii777 >> $OUTPUT_DIR/out_debug
         cd $CUR_DIR
+        echo deb666iii888 >> $OUTPUT_DIR/out_debug
         UPDATED_WEB_IMAGES=1
+        echo deb666iii999 >> $OUTPUT_DIR/out_debug
       fi
+      echo deb666iiiaaa >> $OUTPUT_DIR/out_debug
     fi
     echo deb666jjj >> $OUTPUT_DIR/out_debug
   fi
