@@ -1,10 +1,11 @@
 #!/bin/bash
 prog=$1
-lockfile=$prog.lock
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+lockfile=$SCRIPT_DIR/locks/$prog.lock
 
-echo waiting for $prog to finish
-sleep 5
+echo -n "waiting for $prog to finish - "
 while [[  -e $lockfile    ]]; do
    sleep 5
 done
+echo finished
 

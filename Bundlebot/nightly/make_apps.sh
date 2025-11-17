@@ -10,24 +10,27 @@ BUILDFDS()
 
   echo "***building fds_${mpitype}_${fdscompiler}_${platform}" >> $compilelog 2>&1 
   cd $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}
-  ./make_fds.sh bot >> $compilelog 2>&1 
+  ( $RUNSCRIPT ./make_fds.sh bot  >> $compilelog 2>&1 ) &
 
   echo "***building fds_${mpitype}_${fdscompiler}_${platform}_openmp"
   echo "***building fds_${mpitype}_${fdscompiler}_${platform}_openmp" >> $compilelog 2>&1 
   cd $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}_openmp
-  ./make_fds.sh bot >> $compilelog 2>&1 
+  cp make_fds.sh make_fds_openmp.sh
+  ( $RUNSCRIPT ./make_fds_openmp.sh bot >> $compilelog 2>&1  ) &
 }
 
 # -------------------------------------------------------------
 
 CHECK_BUILDFDS()
 {
+  $WAITSCRIPT ./make_fds.sh
   if [ ! -e $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}/fds_${mpitype}_${fdscompiler}_${platform} ]; then
     echo "***error: The program fds_${mpitype}_${fdscompiler}_${platform} failed to build"
     echo "***error: The program fds_${mpitype}_${fdscompiler}_${platform} failed to build"  >> $errorlog 2>&1
   else
     cp $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}/fds_${mpitype}_${fdscompiler}_${platform} $CURDIR/apps/.
   fi
+  $WAITSCRIPT ./make_fds_openmp.sh
   if [ ! -e $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}_openmp/fds_${mpitype}_${fdscompiler}_${platform}_openmp ]; then
     echo "***error: The program fds_${mpitype}_${fdscompiler}_${platform}_openmp failed to build"
     echo "***error: The program fds_${mpitype}_${fdscompiler}_${platform}_openmp failed to build"   >> $errorlog 2>&1
@@ -48,7 +51,7 @@ BUILDFDSUTIL()
   echo "***************"   >> $compilelog 2>&1 
   echo "***building $prog" >> $compilelog 2>&1 
   cd $fdsrepo/Utilities/$prog/$builddir
-  ./make_${prog}.sh bot >> $compilelog 2>&1 
+  ( $RUNSCRIPT ./make_${prog}.sh bot >> $compilelog 2>&1 ) &
 }
 
 # -------------------------------------------------------------
@@ -58,6 +61,7 @@ CHECK_BUILDFDSUTIL()
   prog=$1
   builddir=$2
 
+  $WAITSCRIPT ./make_${prog}.sh
   if [ ! -e $fdsrepo/Utilities/$prog/$builddir/${prog}_$builddir ]; then
     echo "***error: The program ${prog}_$builddir failed to build
     echo "***error: The program ${prog}_$builddir failed to build   >> $errorlog 2>&1
@@ -70,6 +74,7 @@ CHECK_BUILDFDSUTIL()
 
 CHECK_BUILDTESTMPI()
 {
+  $WAITSCRIPT ./make_test_mpi.sh
   if [ ! -e $fdsrepo/Utilities/test_mpi/${mpitype}_${fdscompiler}_$platform/test_mpi ]; then
     echo "***error: The program test_mpi failed to build"
     echo "***error: The program test_mpi failed to build"  >> $errorlog 2>&1
@@ -102,7 +107,7 @@ BUILD()
   echo "***************" >> $compilelog 2>&1 
   echo "***building $prog" >> $compilelog 2>&1 
   cd $smvrepo/Build/$prog/${smvcompiler}_$platform$SMVSIZE
- ./make_${prog}.sh bot >> $compilelog 2>&1 
+ ( $RUNSCRIPT ./make_${prog}.sh bot >> $compilelog 2>&1  ) &
 }
 
 # -------------------------------------------------------------
@@ -111,6 +116,7 @@ CHECK_BUILD()
 {
   prog=$1
 
+  $WAITSCRIPT ./make_${prog}.sh
   if [ ! -e $smvrepo/Build/$prog/${smvcompiler}_$platform$SMVSIZE/${prog}_$platform$SMVSIZE ]; then
     echo "***error: The program ${prog}_${platform}$SMVSIZE failed to build"
     echo "***error: The program ${prog}_${platform}$SMVSIZE failed to build"   >> $errorlog 2>&1
@@ -118,6 +124,8 @@ CHECK_BUILD()
     cp $smvrepo/Build/$prog/${smvcompiler}_$platform$SMVSIZE/${prog}_$platform$SMVSIZE $CURDIR/apps/.
   fi
 }
+
+#--------------------- start of script -------------------------------
 
 platform=linux
 fdscompiler=intel
@@ -132,6 +140,9 @@ fi
 
 SMVSIZE=_64
 CURDIR=`pwd`
+
+RUNSCRIPT=$CURDIR/run_script.sh
+WAITSCRIPT=$CURDIR/wait_script.sh
 
 echo ***cleaning $CURDIR
 git clean -dxf  >& /dev/null
@@ -188,11 +199,6 @@ BUILD     smokeview
 BUILD     smokezip
 BUILD     wind2fds
 
-# verify fds apps were built
-CHECK_BUILDFDSUTIL    fds2ascii ${fdscompiler}_$platform
-CHECK_BUILDTESTMPI  
-CHECK_BUILDFDS
-
 # verify smokeview apps were built
 CHECK_BUILD     background
 CHECK_BUILD     fds2fed
@@ -201,6 +207,11 @@ CHECK_BUILD     smokediff
 CHECK_BUILD     smokeview
 CHECK_BUILD     smokezip
 CHECK_BUILD     wind2fds
+
+# verify fds apps were built
+CHECK_BUILDFDSUTIL    fds2ascii ${fdscompiler}_$platform
+CHECK_BUILDTESTMPI  
+CHECK_BUILDFDS
 
 echo 
 echo ***build complete
