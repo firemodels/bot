@@ -1773,13 +1773,16 @@ get_firebot_success()
 
 make_fds_summary()
 {
+  echo deb666aaa >> $OUTPUT_DIR/out_debug
   if [ -d $FDS_SUMMARY_DIR ]; then
+    echo deb666bbb >> $OUTPUT_DIR/out_debug
     npngs=`ls -l $fdsrepo/Manuals/FDS_User_Guide/SCRIPT_FIGURES/*.png  2>/dev/null | wc -l`
     if [ $npngs -eq 0 ]; then
       echo "***error: png files not found in $fdsrepo/Manuals/FDS_User_Guide/SCRIPT_FIGURES" >> $ERROR_LOG
     else
       cp $fdsrepo/Manuals/FDS_User_Guide/SCRIPT_FIGURES/*.png         $FDS_SUMMARY_DIR/images/user/.
     fi
+    echo deb666ccc >> $OUTPUT_DIR/out_debug
 
     npngs=`ls -l $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/*.png  2>/dev/null | wc -l`
     if [ $npngs -eq 0 ]; then
@@ -1787,13 +1790,17 @@ make_fds_summary()
     else
       cp $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/*.png $FDS_SUMMARY_DIR/images/verification/.
     fi
+    echo deb666ddd >> $OUTPUT_DIR/out_debug
     DATE=`date +"%b %d, %Y - %r"`
 
 # compare images
 
     CURDIR=`pwd`
+    echo deb666eee >> $OUTPUT_DIR/out_debug
     cd $botrepo/Firebot
+    echo deb666fff >> $OUTPUT_DIR/out_debug
     ./compare_images.sh $FDS_SUMMARY_DIR/images $FDS_SUMMARY_DIR/diffs/images $OUTPUT_DIR/error_images >& $OUTPUT_DIR/stage8_image_compare
+    echo deb666ggg >> $OUTPUT_DIR/out_debug
 
 # look for fyis
     if [[ `grep '***fyi:' $OUTPUT_DIR/stage8_image_compare` == "" ]]
@@ -1804,6 +1811,7 @@ make_fds_summary()
       echo "FYIs from Stage 8 - Image comparisons:"     >> $FYI_LOG
       grep '***fyi:' $OUTPUT_DIR/stage8_image_compare   >> $FYI_LOG
     fi
+    echo deb666hhh >> $OUTPUT_DIR/out_debug
 
 # look for warnings
     if [[ `grep '***warning:' $OUTPUT_DIR/stage8_image_compare` == "" ]]
@@ -1814,19 +1822,32 @@ make_fds_summary()
       echo "Warnings from Stage 8 - Image comparisons:"     >> $WARNING_LOG
       grep '***warning:' $OUTPUT_DIR/stage8_image_compare   >> $WARNING_LOG
     fi
+    echo deb666iii >> $OUTPUT_DIR/out_debug
     
     if [ "$WEB_DIR" != "" ]; then
+      echo deb666iii111 >> $OUTPUT_DIR/out_debug
       if [ -d $WEB_DIR ]; then
+        echo deb666iii222 >> $OUTPUT_DIR/out_debug
         CUR_DIR=`pwd`
+        echo deb666iii333 >> $OUTPUT_DIR/out_debug
         cd $WEB_DIR
+        echo deb666iii444 >> $OUTPUT_DIR/out_debug
         rm -r images manuals diffs *.html
+        echo deb666iii555 >> $OUTPUT_DIR/out_debug
         cp -r $FDS_SUMMARY_DIR/* .
+        echo deb666iii666 >> $OUTPUT_DIR/out_debug
         rm *template.html
+        echo deb666iii777 >> $OUTPUT_DIR/out_debug
         cd $CUR_DIR
+        echo deb666iii888 >> $OUTPUT_DIR/out_debug
         UPDATED_WEB_IMAGES=1
+        echo deb666iii999 >> $OUTPUT_DIR/out_debug
       fi
+      echo deb666iiiaaa >> $OUTPUT_DIR/out_debug
     fi
+    echo deb666jjj >> $OUTPUT_DIR/out_debug
   fi
+  echo deb666kkk >> $OUTPUT_DIR/out_debug
 }
 
 #---------------------------------------------
@@ -2895,22 +2916,34 @@ MATLAB_beg=`GET_TIME`
 
 #*** python verification plots
 
+    echo deb111 > $OUTPUT_DIR/out_debug
     run_python_setup
+    echo deb222 >> $OUTPUT_DIR/out_debug
     check_python_setup
+    echo deb333 >> $OUTPUT_DIR/out_debug
     if [ $python_success == true ]; then
+    echo deb444 >> $OUTPUT_DIR/out_debug
       run_python_verification
+    echo deb555 >> $OUTPUT_DIR/out_debug
       check_python_verification
+    echo deb666 >> $OUTPUT_DIR/out_debug
       make_fds_summary
+    echo deb777 >> $OUTPUT_DIR/out_debug
       MAKE_SUMMARY=1
     fi
 
 #*** python validation plots
 #    only need to setup python once
 
+    echo deb888 >> $OUTPUT_DIR/out_debug
     if [ $python_success == true ]; then
+    echo deb999 >> $OUTPUT_DIR/out_debug
       run_python_validation
+    echo debaaa >> $OUTPUT_DIR/out_debug
       check_python_validation
+    echo debbbb >> $OUTPUT_DIR/out_debug
     fi
+    echo debccc >> $OUTPUT_DIR/out_debug
 
 #*** matlab verification plots
 
@@ -2934,7 +2967,7 @@ MATLAB_beg=`GET_TIME`
   fi
 MATLAB_end=`GET_TIME`
 GET_DURATION $MATLAB_beg $MATLAB_end MATLAB
- 
+    echo debddd >> $OUTPUT_DIR/out_debug
 
 ###*** Stage 8 ###
 
