@@ -1,11 +1,26 @@
 #!/bin/bash
-releaseornightly="nightly"
+
+function usage {
+echo "Clone fds or smv repo"
+echo ""
+echo "Options:"
+echo "-b - base branch - default: $base_branch"
+echo "-F - clone fds repo"
+echo "-h - display this message"
+echo "-N - clone for a nightly bundle"
+echo "-r rev - repo revision or hash"
+echo "-S - clone smv repo"
+echo "-t tag - tag repo with tag"
+exit 0
+}
+
+releaseornightly="release"
 base_branch="master"
-repo_hash=
+repo_revision=
 repo_tag=
 fdsorsmv="fds"
 
-while getopts 'b:Fh:NRSt:' OPTION
+while getopts 'b:FhNRSt:' OPTION
 do
 case $OPTION  in
   b)
@@ -15,13 +30,13 @@ case $OPTION  in
    fdsorsmv="fds"
    ;;
   h)
-   repo_hash="$OPTARG"
+   usage;
    ;;
   N)
    releaseornightly="nightly"
    ;;
-  R)
-   releaseornightly="release"
+  r)
+   repo_revision="$OPTARG"
    ;;
   S)
    fdsorsmv="smv"
@@ -34,7 +49,7 @@ done
 shift $(($OPTIND-1))
 
 abort=
-if [ "$repo_hash" == "" ]; then
+if [ "$repo_revision" == "" ]; then
   abort=1
   echo ***error: -h hash not specified"
 fi
@@ -60,6 +75,6 @@ fi
 
 cd $REPOROOT/$fdsorsmv
 git checkout $base_branch
-git checkout -b $releaseornightly $repo_hash
+git checkout -b $releaseornightly $repo_revision
 git tag -a $repo_tag -m "tag for $repo_tag"
 git describe --abbrev=7 --dirty --long
