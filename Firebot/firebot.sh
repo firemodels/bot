@@ -1836,7 +1836,7 @@ make_fds_summary()
         echo deb666iii555 >> $OUTPUT_DIR/out_debug
         cp -r $FDS_SUMMARY_DIR/* .
         echo deb666iii666 >> $OUTPUT_DIR/out_debug
-        rm *template.html
+        rm -f *template.html
         echo deb666iii777 >> $OUTPUT_DIR/out_debug
         cd $CUR_DIR
         echo deb666iii888 >> $OUTPUT_DIR/out_debug
