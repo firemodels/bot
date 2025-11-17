@@ -51,15 +51,15 @@ cd ../../..
 REPOROOT=`pwd`
 
 cd $REPOROOT/bot/Scripts
-if [ "$fdsorsmv" == "fds"]; then
+if [ "$fdsorsmv" == "fds" ]; then
   ./setup_repos.sh -V
 fi
-if [ "$fdsorsmv" == "smv"]; then
+if [ "$fdsorsmv" == "smv" ]; then
   ./setup_repos.sh -U
 fi
 
 cd $REPOROOT/$fdsorsmv
 git checkout $base_branch
-git checkout -b $branch_name $repo_hash
+git checkout -b $releaseornightly $repo_hash
 git tag -a $repo_tag -m "tag for $repo_tag"
 git describe --abbrev=7 --dirty --long
