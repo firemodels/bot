@@ -191,6 +191,44 @@ esac
 done
 shift $(($OPTIND-1))
 
+# Linux or OSX
+JOPT="-J"
+if [ "`uname`" == "Darwin" ] ; then
+  platform=osx
+  JOPT=
+else
+  platform=lnx
+fi
+
+if [ "$BRANCH" != "nightly" ]; then
+# both or neither RELEASE options must be set
+  FDS_RELEASE_ARG=$FDS_RELEASE
+  SMV_RELEASE_ARG=$SMV_RELEASE
+  if [ "$FDS_RELEASE" != "" ]; then
+    if [ "$SMV_RELEASE" != "" ]; then
+      FDS_RELEASE="-x $FDS_RELEASE"
+      SMV_RELEASE="-y $SMV_RELEASE"
+    fi
+  fi
+  if [ "$FDS_RELEASE" == "" ]; then
+    SMV_RELEASE=""
+    SMV_RELEASE_ARG=""
+  fi
+  if [ "$SMV_RELEASE" == "" ]; then
+    FDS_RELEASE=""
+    FDS_RELEASE_ARG=""
+  fi
+
+  if [ "$FDS_TAG" != "" ]; then
+    FDS_TAG_ARG=$FDS_TAG
+    FDS_TAG="-X $FDS_TAG"
+  fi
+  if [ "$SMV_TAG" != "" ]; then
+    SMV_TAG_ARG=$SMV_TAG
+    SMV_TAG="-Y $SMV_TAG"
+  fi
+fi
+
 if [ "$BRANCH" == "nightly" ]; then
   FDS_RELEASE=
   SMV_RELEASE=
@@ -201,44 +239,6 @@ if [ "$BRANCH" == "nightly" ]; then
   SMV_HASH=`grep SMV_HASH  FDS_INFO.txt | awk '{print $2}'`
   FDS_REVISION=`grep FDS_REVISION  FDS_INFO.txt | awk '{print $2}'`
   SMV_REVISION=`grep SMV_REVISION  FDS_INFO.txt | awk '{print $2}'`
-  ./clone_repo.sh -F -N -r $FDS_HASH
-  ./clone_repo.sh -S -N -r $SMV_HASH
-fi
-
-# Linux or OSX
-JOPT="-J"
-if [ "`uname`" == "Darwin" ] ; then
-  platform=osx
-  JOPT=
-else
-  platform=lnx
-fi
-
-# both or neither RELEASE options must be set
-FDS_RELEASE_ARG=$FDS_RELEASE
-SMV_RELEASE_ARG=$SMV_RELEASE
-if [ "$FDS_RELEASE" != "" ]; then
-  if [ "$SMV_RELEASE" != "" ]; then
-    FDS_RELEASE="-x $FDS_RELEASE"
-    SMV_RELEASE="-y $SMV_RELEASE"
-  fi
-fi
-if [ "$FDS_RELEASE" == "" ]; then
-  SMV_RELEASE=""
-  SMV_RELEASE_ARG=""
-fi
-if [ "$SMV_RELEASE" == "" ]; then
-  FDS_RELEASE=""
-  FDS_RELEASE_ARG=""
-fi
-
-if [ "$FDS_TAG" != "" ]; then
-  FDS_TAG_ARG=$FDS_TAG
-  FDS_TAG="-X $FDS_TAG"
-fi
-if [ "$SMV_TAG" != "" ]; then
-  SMV_TAG_ARG=$SMV_TAG
-  SMV_TAG="-Y $SMV_TAG"
 fi
 
 FIREBOT_BRANCH_ARG=$BRANCH
@@ -306,11 +306,19 @@ if [ "$ECHO" == "" ]; then
   UPDATE_REPO webpages nist-pages || exit 1
 fi
 
-#*** build apps
-cd $curdir
-cd $repo/bot/Firebot
+if [ "$BRANCH" == "nightly" ]; then
+  cd $curdir
+  ./clone_repo.sh -F -N -r $FDS_HASH
+  ./clone_repo.sh -S -N -r $SMV_HASH
+  ./make_apps.sh
+fi
 
-$ECHO ./run_firebot.sh $FORCE -c -C -B -F $JOPT $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG $FIREBOT_BRANCH -T $MAILTO
+if [ "$BRANCH" != "nightly" ]; then
+#*** build apps
+  cd $repo/bot/Firebot
+
+  $ECHO ./run_firebot.sh $FORCE -c -C -B -F $JOPT $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG $FIREBOT_BRANCH -T $MAILTO
+fi
 
 #*** generate and upload bundle
 cd $curdir
