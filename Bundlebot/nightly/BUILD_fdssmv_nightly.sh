@@ -181,6 +181,24 @@ esac
 done
 shift $(($OPTIND-1))
 
+if [ "$BRANCH" == "nightly" ]; then
+  FDS_RELEASE=
+  SMV_RELEASE=
+  FDS_TAG=
+  SMV_TAG=
+  $repo/bot/Firebot/getGHfile.sh     FDS_INFO.txt
+  FDS_HASH=`grep FDS_HASH  FDS_INFO.txt | awk '{print $2}'`
+  SMV_HASH=`grep SMV_HASH  FDS_INFO.txt | awk '{print $2}'`
+  FDS_REVISION=`grep FDS_REVISION  FDS_INFO.txt | awk '{print $2}'`
+  SMV_REVISION=`grep SMV_REVISION  FDS_INFO.txt | awk '{print $2}'`
+  echo FDS_HASH=$FDS_HASH
+  echo SMV_HASH=$SMV_HASH
+  ./clone_repo.sh -F -N -r $FDS_HASH
+  ./clone_repo.sh -S -N -r $SMV_HASH
+  exit
+fi
+exit
+
 # Linux or OSX
 JOPT="-J"
 if [ "`uname`" == "Darwin" ] ; then
@@ -295,9 +313,6 @@ fi
 #*** build apps
 cd $curdir
 cd $repo/bot/Firebot
-
-if [ "$BRANCH" == "nightly" ]; then
-fi
 
 $ECHO ./run_firebot.sh $FORCE -c -C -B -F $JOPT $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG $FIREBOT_BRANCH -T $MAILTO
 
