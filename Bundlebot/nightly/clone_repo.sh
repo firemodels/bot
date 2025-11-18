@@ -19,9 +19,8 @@ base_branch="master"
 repo_revision=
 repo_tag=
 fdsorsmv="fds"
-latest=
 
-while getopts 'b:FhLNRSt:' OPTION
+while getopts 'b:FhNr:St:' OPTION
 do
 case $OPTION  in
   b)
@@ -32,10 +31,6 @@ case $OPTION  in
    ;;
   h)
    usage;
-   ;;
-  L)
-   latest="1"
-   repo_revision=
    ;;
   N)
    releaseornightly="nightly"
@@ -54,15 +49,9 @@ done
 shift $(($OPTIND-1))
 
 abort=
-if [ "$LATEST" == "" ]; then
-  if [ "$repo_revision" == "" ]; then
-    abort=1
-    echo ***error: -h hash not specified"
-  fi
-  if [ "$repo_tag" == "" ]; then
-    abort=1
-    echo ***error: -t tag not specified"
-  fi
+if [ "$repo_revision" == "" ]; then
+  abort=1
+  echo "***error: -h hash not specified"
 fi
 if [ "$abort" != "" ]; then
   exit
@@ -83,7 +72,7 @@ fi
 cd $REPOROOT/$fdsorsmv
 git checkout $base_branch
 git checkout -b $releaseornightly $repo_revision
-if [ "$LATEST" == "" ]; then
+if [ "$repo_tag" != "" ]; then
   git tag -a $repo_tag -m "tag for $repo_tag"
 fi
 git describe --abbrev=7 --dirty --long

@@ -86,6 +86,7 @@ thirdpartyrepos="hypre sundials"
 #thirdpartyrepos="hypre sundials ompi"
 fdssmvrepos="fds smv"
 smvonlyrepos="smv"
+fdsonlyrepos="fds"
 firebotrepos="cad exp fds fds-smv fig out smv test_bundles"
 smvrepos="cfast fds fig smv test_bundles"
 cfastbotrepos="cfast exp fig smv test_bundles"
@@ -108,7 +109,7 @@ else
    exit
 fi
 
-while getopts '3aABbcCDefFGH:hsStTUw' OPTION
+while getopts '3aABbcCDefFGH:hsStTUVw' OPTION
 do
 case $OPTION  in
   3)
@@ -179,6 +180,10 @@ case $OPTION  in
    ;;
   U)
    repos=$smvonlyrepos;
+   eraserepos=1
+   ;;
+  V)
+   repos=$fdsonlyrepos;
    eraserepos=1
    ;;
   w)
