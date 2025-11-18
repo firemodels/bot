@@ -214,9 +214,9 @@ fi
 
 export NOPAUSE=1
 args=$0
-DIR=$(dirname "${args}")
-cd $DIR
-DIR=`pwd`
+SCRIPTDIR=$(dirname "${args}")
+cd $SCRIPTDIR
+SCRIPTDIR=`pwd`
 
 return_code=0
 if [[ "$USE_CACHE" == "" ]] && [[ "$showparms" == "" ]]; then
@@ -226,8 +226,8 @@ if [[ "$USE_CACHE" == "" ]] && [[ "$showparms" == "" ]]; then
   ./copy_pubs.sh smv $GHOWNER $error_log || return_code=1
 
   rm -f $HOME/.bundle/$APPS/*
-  ./copy_apps.sh fds $app_home/.firebot/$BRANCHDIR/$APPS                   $error_log || return_code=1
-  ./copy_apps.sh smv $app_home/.firebot/$BRANCHDIR/$APPS                   $error_log || return_code=1
+  ./copy_apps.sh fds $SCRIPTDIR/apps                   $error_log || return_code=1
+  ./copy_apps.sh smv $SCRIPTDIR/apps                   $error_log || return_code=1
  
   if [ "$return_code" == "1" ]; then
     cat $error_log
@@ -277,7 +277,7 @@ if [[ "$showparms" == "" ]] && [[ "$OVERWRITE" == "" ]]; then
   fi
 fi
 
-cd $DIR
+cd $SCRIPTDIR
 if [ "$showparms" == "" ]; then
   echo ""
   echo "building installer"
@@ -296,7 +296,7 @@ if [ "$showparms" == "" ]; then
     if [ "$platform" == "lnx" ]; then
       cd $REPO_ROOT/fds
       FDS_SHORT_HASH=`git rev-parse --short HEAD`
-      cd $DIR
+      cd $SCRIPTDIR
       ./setreleasetitle.sh fds $FDS_SHORT_HASH
     fi
   fi

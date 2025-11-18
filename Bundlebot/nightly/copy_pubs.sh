@@ -42,6 +42,7 @@ if [ "$pub_type" == "fds" ]; then
   CP FDS_User_Guide.pdf                     || exit 1
   CP FDS_Validation_Guide.pdf               || exit 1
   CP FDS_Verification_Guide.pdf             || exit 1
+  CP FDS_INFO.txt                           || exit 1
 fi
 
 if [ "$pub_type" == "smv" ]; then
@@ -50,5 +51,6 @@ if [ "$pub_type" == "smv" ]; then
   CP SMV_Technical_Reference_Guide.pdf      || exit 1
   CP SMV_User_Guide.pdf                     || exit 1
   CP SMV_Verification_Guide.pdf             || exit 1
+  CP SMV_INFO.txt                           || exit 1
 fi
 exit $return_code

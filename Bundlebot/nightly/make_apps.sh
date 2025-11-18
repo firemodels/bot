@@ -28,14 +28,14 @@ CHECK_BUILDFDS()
     echo "***error: The program fds_${mpitype}_${fdscompiler}_${platform} failed to build"
     echo "***error: The program fds_${mpitype}_${fdscompiler}_${platform} failed to build"  >> $errorlog 2>&1
   else
-    cp $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}/fds_${mpitype}_${fdscompiler}_${platform} $CURDIR/apps/.
+    cp $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}/fds_${mpitype}_${fdscompiler}_${platform} $CURDIR/apps/fds
   fi
   $WAITSCRIPT ./make_fds_openmp.sh
   if [ ! -e $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}_openmp/fds_${mpitype}_${fdscompiler}_${platform}_openmp ]; then
     echo "***error: The program fds_${mpitype}_${fdscompiler}_${platform}_openmp failed to build"
     echo "***error: The program fds_${mpitype}_${fdscompiler}_${platform}_openmp failed to build"   >> $errorlog 2>&1
   else
-    cp  $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}_openmp/fds_${mpitype}_${fdscompiler}_${platform}_openmp $CURDIR/apps/.
+    cp  $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}_openmp/fds_${mpitype}_${fdscompiler}_${platform}_openmp $CURDIR/apps/fds_openmp
   fi
 }
 
@@ -66,7 +66,7 @@ CHECK_BUILDFDSUTIL()
     echo "***error: The program ${prog}_$builddir failed to build
     echo "***error: The program ${prog}_$builddir failed to build   >> $errorlog 2>&1
   else
-    cp $fdsrepo/Utilities/$prog/$builddir/${prog}_$builddir  $CURDIR/apps/.
+    cp $fdsrepo/Utilities/$prog/$builddir/${prog}_$builddir  $CURDIR/apps/$prog
   fi
 }
 
@@ -79,7 +79,7 @@ CHECK_BUILDTESTMPI()
     echo "***error: The program test_mpi failed to build"
     echo "***error: The program test_mpi failed to build"  >> $errorlog 2>&1
   else
-    cp $fdsrepo/Utilities/test_mpi/${mpitype}_${fdscompiler}_$platform/test_mpi  $CURDIR/apps/.
+    cp $fdsrepo/Utilities/test_mpi/${mpitype}_${fdscompiler}_$platform/test_mpi  $CURDIR/apps/test_mpi
   fi
 }
 
@@ -121,7 +121,7 @@ CHECK_BUILD()
     echo "***error: The program ${prog}_${platform}$SMVSIZE failed to build"
     echo "***error: The program ${prog}_${platform}$SMVSIZE failed to build"   >> $errorlog 2>&1
   else
-    cp $smvrepo/Build/$prog/${smvcompiler}_$platform$SMVSIZE/${prog}_$platform$SMVSIZE $CURDIR/apps/.
+    cp $smvrepo/Build/$prog/${smvcompiler}_$platform$SMVSIZE/${prog}_$platform$SMVSIZE $CURDIR/apps/$prog
   fi
 }
 

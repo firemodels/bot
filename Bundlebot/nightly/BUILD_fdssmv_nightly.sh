@@ -312,6 +312,10 @@ if [ "$BRANCH" == "nightly" ]; then
   ./clone_repo.sh -S -N -r $SMV_HASH
   ./make_apps.sh
 fi
+echo $FDS_HASH     > $repo/bot/Bundlebot/nightly/apps/FDS_HASH
+echo $SMV_HASH     > $repo/bot/Bundlebot/nightly/apps/SMV_HASH
+echo $FDS_REVISION > $repo/bot/Bundlebot/nightly/apps/FDS_REVISION
+echo $SMV_REVISION > $repo/bot/Bundlebot/nightly/apps/SMV_REVISION
 
 if [ "$BRANCH" != "nightly" ]; then
 #*** build apps
