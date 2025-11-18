@@ -2,13 +2,13 @@
 # This script builds the configuration scripts used to build the bundles
 # usage:
 # build both bash and dos config scripts
-# ./MakeBuild_config.sh x.y.z
+# ./MakeConfig.sh x.y.z
 
 # build bash config script
-# ./Make_config.sh x.y.z BASH
+# ./MakeConfig.sh x.y.z BASH
 
 # build dos config script
-# ./Make_config.sh x.y.z  DOS
+# ./MakeConfig.sh x.y.z  DOS
 
 # where x.y.z is the version being bundled
 
