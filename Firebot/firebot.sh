@@ -2978,12 +2978,17 @@ MANUALS_beg=`GET_TIME`
     make_fds_verification_guide
     make_fds_technical_guide
     make_fds_validation_guide
+    echo debAAA >> $OUTPUT_DIR/out_debug
     make_fds_Config_management_plan
+    echo debBBB >> $OUTPUT_DIR/out_debug
     get_firebot_success
+    echo debCCC >> $OUTPUT_DIR/out_debug
 
 # copy repo manuals to Manualslatest directory whether firebot passes or fails
     rm -rf $MANUALS_LATEST_DIR
+    echo debDDD >> $OUTPUT_DIR/out_debug
     cp -r $fdsrepo/Manuals $MANUALS_LATEST_DIR
+    echo debEEE >> $OUTPUT_DIR/out_debug
     if [[ "$firebot_success" == "1" ]] ; then
 
 # copy repo manuals to Manuals directory only if firebot
@@ -3006,19 +3011,23 @@ MANUALS_beg=`GET_TIME`
       copy_fds_validation_guide
       copy_fds_Config_management_plan
     fi
+    echo debFFF >> $OUTPUT_DIR/out_debug
   fi
 #fi
 
 ###*** archive apps
 
 copy_apps=
+echo debGGG >> $OUTPUT_DIR/out_debug
 get_firebot_success
+echo debHHH >> $OUTPUT_DIR/out_debug
 if [[ "$firebot_success" == "1" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
   copy_apps=1
 fi
 if [ "$BUILD_ONLY" == "1" ]; then
   copy_apps=1
 fi
+echo debIII >> $OUTPUT_DIR/out_debug
 if [ "$copy_apps" == "1" ]; then
   rm -f $APPS_DIR/*
   cp $LATESTAPPS_DIR/* $APPS_DIR/.
@@ -3031,6 +3040,7 @@ if [ "$copy_apps" == "1" ]; then
     cp $PUBS_DIR/*       $BRANCHPUBS_DIR/.
   fi
 fi
+echo debJJJ >> $OUTPUT_DIR/out_debug
 MANUALS_end=`GET_TIME`
 GET_DURATION $MANUALS_beg $MANUALS_end MANUALS
 SCRIPT_end=`GET_TIME`
@@ -3040,9 +3050,12 @@ GET_DURATION $SCRIPT_beg $SCRIPT_end SCRIPT
 
 set_files_world_readable
 save_build_status
+echo debKKK >> $OUTPUT_DIR/out_debug
 if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]  && [[ "$CHECK_CLUSTER" == "" ]]; then
   archive_timing_stats
 fi
+echo debLLL >> $OUTPUT_DIR/out_debug
 email_build_status 'Firebot'
+echo debMMM >> $OUTPUT_DIR/out_debug
 echo firebot exit status: $firebot_status
 exit $firebot_status
