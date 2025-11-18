@@ -1538,9 +1538,15 @@ copy_guide()
    cd $firebotdir
    if [[ "$UPLOADGUIDES" == "1" ]]; then
      if [ -e $doc ]; then
-       cp $doc /var/www/html/firebot/manuals/
-       cp $doc $NEWGUIDE_DIR/.
-       cp $doc $PUBS_DIR/.
+       if [ -d /var/www/html/firebot/manuals/ ]; then
+         cp $doc /var/www/html/firebot/manuals/
+       fi
+       if [ -d $NEWGUIDE_DIR ]; then
+         cp $doc $NEWGUIDE_DIR/.
+       fi
+       if [ -d $PUBS_DIR ]; then
+         cp $doc $PUBS_DIR/.
+       fi
      fi
    fi
    if [ -e $doc ]; then
@@ -2989,24 +2995,38 @@ MANUALS_beg=`GET_TIME`
     if [[ "$firebot_success" == "1" ]] ; then
 
 # copy repo manuals to Manuals directory only if firebot
+      echo debEEE000 >> $OUTPUT_DIR/out_debug
       rm -rf $MANUALS_DIR
+      echo debEEE111 >> $OUTPUT_DIR/out_debug
       cp -r $fdsrepo/Manuals $MANUALS_DIR
 
 # copy to a 2nd location that is accessible via cross mounts
+      echo debEEE222 >> $OUTPUT_DIR/out_debug
       if [ "$FIREBOT_MANUALS_DIR" != "" ]; then
+        echo debEEE333 >> $OUTPUT_DIR/out_debug
         if [ ! -d $FIREBOT_MANUALS_DIR ]; then
+          echo debEEE444 >> $OUTPUT_DIR/out_debug
           mkdir $FIREBOT_MANUALS_DIR
         fi
+        echo debEEE555 >> $OUTPUT_DIR/out_debug
         rm -rf $FIREBOT_MANUALS_DIR
+        echo debEEE666 >> $OUTPUT_DIR/out_debug
         cp -r $fdsrepo/Manuals $FIREBOT_MANUALS_DIR
       fi
 
+      echo debEEE777 >> $OUTPUT_DIR/out_debug
       cp $LATESTAPPS_DIR/FDS_REVISION $PUBS_DIR/FDS_REVISION
+      echo debEEE888 >> $OUTPUT_DIR/out_debug
       copy_fds_user_guide
+      echo debEEE999 >> $OUTPUT_DIR/out_debug
       copy_fds_verification_guide
+      echo debEEEaaa >> $OUTPUT_DIR/out_debug
       copy_fds_technical_guide
+      echo debEEEbbb >> $OUTPUT_DIR/out_debug
       copy_fds_validation_guide
+      echo debEEEccc >> $OUTPUT_DIR/out_debug
       copy_fds_Config_management_plan
+      echo debEEEddd >> $OUTPUT_DIR/out_debug
     fi
     echo debFFF >> $OUTPUT_DIR/out_debug
   fi
