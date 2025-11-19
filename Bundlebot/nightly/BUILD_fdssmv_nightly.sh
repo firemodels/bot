@@ -124,8 +124,6 @@ MAILTO=
 if [ "$BUNDLE_EMAIL" != "" ]; then
   MAILTO=$BUNDLE_EMAIL
 fi
-FDS_RELEASE=
-SMV_RELEASE=
 ECHO=
 PROCEED=
 UPLOAD=-g
@@ -194,8 +192,6 @@ else
 fi
 
 if [ "$BRANCH" == "nightly" ]; then
-  FDS_RELEASE=
-  SMV_RELEASE=
   FDS_TAG=
   SMV_TAG=
   $repo/bot/Firebot/getGHfile.sh     FDS_INFO.txt
@@ -218,24 +214,13 @@ fi
 echo ""
 echo "------------------------------------------------------------"
 echo "          Firebot branch: $FIREBOT_BRANCH_ARG"
+if [ "$INTEL_MPI_VERSION" != "" ]; then
 echo "       Intel mpi version: $INTEL_MPI_VERSION"
+fi
 echo "             MPI version: $MPI_VERSION"
-if [ "$OPENMPI_DIR" ]; then
-  echo "             OpenMPI dir: $OPENMPI_DIR"
-fi
-if [ "$FDS_TAG_ARG" != "" ]; then
-  echo "                 FDS TAG: $FDS_TAG_ARG"
-fi
-if [ "$FDS_RELEASE_ARG" != "" ]; then
-  echo "            FDS Revision: $FDS_RELEASE_ARG"
-fi
-if [ "$SMV_TAG_ARG" != "" ]; then
-  echo "                 SMV TAG: $SMV_TAG_ARG"
-fi
-if [ "$SMV_RELEASE_ARG" != "" ]; then
-  echo "            SMV Revision: $SMV_RELEASE_ARG"
-fi
+if [ "$MAILTO" != "" ]; then
 echo "                   EMAIL: $MAILTO_ARG"
+fi
 echo "------------------------------------------------------------"
 echo ""
 
@@ -276,20 +261,20 @@ if [ "$BRANCH" == "nightly" ]; then
   ./clone_repo.sh -S -N -r $SMV_HASH
 fi
 
-echo $FDS_HASH     > $repo/bot/Bundlebot/nightly/apps/FDS_HASH
-echo $SMV_HASH     > $repo/bot/Bundlebot/nightly/apps/SMV_HASH
-echo $FDS_REVISION > $repo/bot/Bundlebot/nightly/apps/FDS_REVISION
-echo $SMV_REVISION > $repo/bot/Bundlebot/nightly/apps/SMV_REVISION
-
 if [ "$BRANCH" != "nightly" ]; then
   cd $curdir
   ./clone_all_repos.sh
   FDS_TAG="-X $BUNDLE_FDS_TAG"
   SMV_TAG="-Y $BUNDLE_SMV_TAG"
 fi
+
 ./make_apps.sh
+echo $FDS_HASH     > $repo/bot/Bundlebot/nightly/apps/FDS_HASH
+echo $SMV_HASH     > $repo/bot/Bundlebot/nightly/apps/SMV_HASH
+echo $FDS_REVISION > $repo/bot/Bundlebot/nightly/apps/FDS_REVISION
+echo $SMV_REVISION > $repo/bot/Bundlebot/nightly/apps/SMV_REVISION
 
 #*** generate and upload bundle
 cd $curdir
-$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH $FDS_RELEASE $INSTALL $FDS_TAG $SMV_RELEASE $SMV_TAG -w $UPLOAD
+$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH $INSTALL $FDS_TAG $SMV_TAG -w $UPLOAD
 rm $LOCKFILE

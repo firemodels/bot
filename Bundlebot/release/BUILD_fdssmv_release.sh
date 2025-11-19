@@ -25,4 +25,4 @@ cd $CURDIR/../nightly
 
 cd $CURDIR
 TITLE="Bundle Test - $BUNDLE_FDS_TAG/$BUNDLE_FDS_HASH - $BUNDLE_SMV_TAG/$BUNDLE_SMV_HASH"
-#gh release edit FDS_TEST  -t "$TITLE" -R github.com/$OWNER/test_bundles
+gh release edit FDS_TEST  -t "$TITLE" -R github.com/$OWNER/test_bundles

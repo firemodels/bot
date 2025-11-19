@@ -543,6 +543,5 @@ if [ -e $errlog ]; then
   fi
   rm $errlog
 fi
-echo installer located at:
-echo $bundlepath
+echo installer located at: $bundlepath
 cp $MANIFEST $bundlepathdir/${bundlebase}_manifest.html
