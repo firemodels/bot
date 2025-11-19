@@ -283,7 +283,7 @@ echo $SMV_REVISION > $repo/bot/Bundlebot/nightly/apps/SMV_REVISION
 
 if [ "$BRANCH" != "nightly" ]; then
   cd $curdir
-  ./clone_all_repo.sh
+  ./clone_all_repos.sh
   FDS_TAG="-X $BUNDLE_FDS_TAG"
   SMV_TAG="-Y $BUNDLE_SMV_TAG"
 fi
