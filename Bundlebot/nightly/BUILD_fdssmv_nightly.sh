@@ -32,23 +32,17 @@ echo "Options:"
 echo "-b - use existing bot branch"
 echo "-c - bundle without warning about cloning/erasing fds and smv repos"
 echo "-f - force this script to run"
-echo "-F - fds repo hash/release"
 echo "-h - display this message"
-echo "-X fdstag - when cloning, tag fds repo with fdstag"
-echo "-Y smvtag - when cloning, tag smv repo with smvtag"
-
+echo "-L - build apps using latest revision"
 if [ "$MAILTO" != "" ]; then
   echo "-m mailto - email address [default: $MAILTO]"
 else
   echo "-m mailto - email address"
 fi
-
-echo "-L - build apps using latest revision"
 echo "-o - specify GH_OWNER when building a bundle. [default: $GH_OWNER]"
 echo "-r - specify GH_REPO when building a bundle. [default: $GH_REPO]"
 echo "-R branch - clone repos using name branch"
 echo "-r - create a release bundle (same as -R branc)"
-echo "-S - smv repo hash/release"
 echo "-U - do not upload bundle file."
 echo "-v - show settings used to build bundle"
 exit 0
@@ -147,7 +141,7 @@ LATEST=
 INSTALL=
 existing_botbranch=
 
-while getopts 'bBcfF:hLm:o:r:R:S:UvX:Y:' OPTION
+while getopts 'bBcfhLm:o:r:R:Uv' OPTION
 do
 case $OPTION  in
   b)
@@ -161,9 +155,6 @@ case $OPTION  in
    ;;
   f)
    FORCE="-f"
-   ;;
-  F)
-   FDS_RELEASE="$OPTARG"
    ;;
   h)
    usage
@@ -183,20 +174,11 @@ case $OPTION  in
   R)
    BRANCH="$OPTARG"
    ;;
-  S)
-   SMV_RELEASE="$OPTARG"
-   ;;
   U)
    UPLOAD=
    ;;
   v)
    ECHO=echo
-   ;;
-  X)
-   FDS_TAG="$OPTARG"
-   ;;
-  Y)
-   SMV_TAG="$OPTARG"
    ;;
 esac
 done
