@@ -1,7 +1,8 @@
 #!/bin/bash
 app_type=$1
-eval dir_from=$2
-error_log=$3
+release_type=$2
+eval dir_from=$3
+error_log=$4
 
 platform="linux"
 if [ "`uname`" == "Darwin" ] ; then
@@ -55,7 +56,9 @@ if [ "$app_type" == "fds" ]; then
   CP fds_openmp
   CP fds2ascii
   CP test_mpi
-  CP FDS_REVISION
+  if [ "$release_type" == "nightly" ]; then
+    CP FDS_REVISION
+  fi
 fi
 
 if [ "$app_type" == "smv" ]; then
@@ -68,6 +71,8 @@ if [ "$app_type" == "smv" ]; then
   CP smokeview
   CP smokezip
   CP wind2fds
-  CP SMV_REVISION
+  if [ "$release_type" == "nightly" ]; then
+    CP SMV_REVISION
+  fi
 fi
 exit $return_code

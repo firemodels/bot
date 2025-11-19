@@ -1,8 +1,10 @@
 #!/bin/bash
 
 if [ "$BUILDING_release" == "1" ]; then
+  releasetype="release"
   GHOWNER=`whoami`
 else
+  releasetype="nightly"
   GHOWNER=firemodels
 fi
 
@@ -222,12 +224,12 @@ return_code=0
 if [[ "$USE_CACHE" == "" ]] && [[ "$showparms" == "" ]]; then
   error_log=/tmp/error_log.$$
   rm -f $HOME/.bundle/pubs/*
-  ./copy_pubs.sh fds $GHOWNER $error_log || return_code=1
-  ./copy_pubs.sh smv $GHOWNER $error_log || return_code=1
+  ./copy_pubs.sh fds $releasetype $GHOWNER $error_log || return_code=1
+  ./copy_pubs.sh smv $releasetype $GHOWNER $error_log || return_code=1
 
   rm -f $HOME/.bundle/$APPS/*
-  ./copy_apps.sh fds $SCRIPTDIR/apps                   $error_log || return_code=1
-  ./copy_apps.sh smv $SCRIPTDIR/apps                   $error_log || return_code=1
+  ./copy_apps.sh fds $releasetype $SCRIPTDIR/apps                   $error_log || return_code=1
+  ./copy_apps.sh smv $releasetype $SCRIPTDIR/apps                   $error_log || return_code=1
  
   if [ "$return_code" == "1" ]; then
     cat $error_log
