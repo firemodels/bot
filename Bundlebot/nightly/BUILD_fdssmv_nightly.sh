@@ -1,12 +1,29 @@
 #!/bin/bash
 
+# parameters for bundle
+
+if [ "`uname`" == "Darwin" ] ; then
+  export FDS_OPENMPIDIR=/opt/openmpi414_oneapi1p6
+  export intel_mpi_version=oneapi1p6
+  export mpi_version=4.1.4
+  export openmpi_dir=/opt/openmpi414_oneapi1p6
+else
+  export intel_mpi_version=2025.0
+  export mpi_version_linux=INTEL
+fi
+if [ "$BUNDLE_MAILTO" != "" ]; then
+  MAILTO=$BUNDLE_MAILTO
+fi
+export INTEL_MPI_VERSION=2025.0
+export MPI_VERSION=INTEL
+
 #---------------------------------------------
 #                   usage
 #---------------------------------------------
 
 function usage {
 echo ""
-echo "run_bundlebot.sh usage"
+echo "BUILD_fdssmv_nightly.sh usage"
 echo ""
 echo "This script builds FDS and Smokeview apps and generates a bundle using either the"
 echo "specified fds and smv repo revisions or revisions from the latest firebot pass."
@@ -107,12 +124,6 @@ repo=`pwd`
 
 cd $DIR
 
-if [ -e $HOME/.bundle/bundle_config.sh ]; then
-  source $HOME/.bundle/bundle_config.sh
-else
-  echo ***error: configuration file $HOME/.bundle/bundle_config.sh is not defined
-  exit 1
-fi
 LOCKFILE=$HOME/.bundle/lock
 
 MAILTO=
