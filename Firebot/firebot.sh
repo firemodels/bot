@@ -1196,103 +1196,6 @@ check_python_validation()
 }
 
 #---------------------------------------------
-#                   run_matlab_license_test
-#---------------------------------------------
-
-run_matlab_license_test()
-{
-# uncomment following DEBUG lines to generate matlab debug info (and comment matlab line without DEBUG)
-#   DEBUG="strace -t -T -f -e trace=network -o $OUTPUT_DIR/stage7_matlab_strace"
-   echo Matlab
-   echo "   license test"
-   # Run simple test to see if Matlab license is available
-   cd $fdsrepo/Utilities/Matlab
-   date -Iseconds &> $OUTPUT_DIR/stage7_matlab_license
-#   $DEBUG matlab -nodisplay -r "try, disp('Running Matlab License Check'), catch, disp('License Error'), err = lasterror, err.message, err.stack, end, exit" >> $OUTPUT_DIR/stage7_matlab_license 2>&1
-   date -Iseconds >> $OUTPUT_DIR/stage7_matlab_license 2>&1
-   matlab -nodisplay -r "try, disp('Running Matlab License Check'), catch, disp('License Error'), err = lasterror, err.message, err.stack, end, exit" &> $OUTPUT_DIR/stage7_matlab_license
-}
-
-#---------------------------------------------
-#                   scan_matlab_license_test
-#---------------------------------------------
-
-scan_matlab_license_test()
-{
-   # Check for failed license
-   if [[ `grep "License checkout failed" $OUTPUT_DIR/stage7_matlab_license` == "" ]]
-   then
-      # Continue along
-      matlab_success=true
-   else
-      TIME_LIMIT_STAGE="7"
-      check_time_limit
-      matlab_success=false
-      sleep 300
-   fi
-}
-
-#---------------------------------------------
-#                   check_matlab_license_server
-#---------------------------------------------
-
-#*** note to whoever removes matlab routines: also remove SKIPMATLAB variable from rest of firebot after matlab routines are removed
-
-check_matlab_license_server()
-{
-   matlab -help  >& /tmp/matlabtest.$$
-   notfound=`grep 'command not found' /tmp/matlabtest.$$ | wc -l`
-   if [ $notfound -gt 0 ]; then
-     module load matlab
-   fi
-   rm /tmp/matlabtest.$$
-   SKIPMATLAB="1"
-   for i in 1 2 3 4
-   do
-      run_matlab_license_test
-      scan_matlab_license_test
-      if [ $matlab_success == true ]; then
-         SKIPMATLAB=
-         break
-      fi
-      sleep 300
-   done
-   if [ "$SKIPMATLAB" == "1" ]; then
-      echo "Error from Stage 7 - Matlab failed to be checked out" >> $ERROR_LOG
-   fi
-}
-
-#---------------------------------------------
-#                   run_matlab_verification
-#---------------------------------------------
-
-run_matlab_verification()
-{
-   echo "   matlab verification plots"
-   # Run Matlab plotting script
-   cd $fdsrepo/Utilities/Matlab
-   matlab -nodisplay -r "try, disp('Running Matlab Verification script'), FDS_verification_script, catch, disp('Error'), err = lasterror, err.message, err.stack, end, exit" &> $OUTPUT_DIR/stage7a_verification
-}
-
-#---------------------------------------------
-#                   check_matlab_verification
-#---------------------------------------------
-
-check_matlab_verification()
-{
-   # Scan for and report any errors in Matlab scripts
-   cd $firebotdir
-   if [[ `grep "Error" $OUTPUT_DIR/stage7a_verification` == "" ]]
-   then
-      matlab_verification_success=true
-   else
-      echo "Errors from Stage 7a - Matlab plotting and statistics (verification):" >> $ERROR_LOG
-      grep -B 5 -A 50 "Error" $OUTPUT_DIR/stage7a_verification | tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
-      echo "" >> $ERROR_LOG
-   fi
-}
-
-#---------------------------------------------
 #                   check_verification_stats
 #---------------------------------------------
 
@@ -1370,36 +1273,6 @@ GET_DURATION(){
   fi
   eval ${__var}_DIFF="'${DIFF_TIME}'"
   eval ${__var}_DELTA="'${DELTA_TIME}'"
-}
-
-#---------------------------------------------
-#                   run_matlab_validation
-#---------------------------------------------
-
-run_matlab_validation()
-{
-   echo "   validation plots"
-   # Run Matlab plotting script
-   cd $fdsrepo/Utilities/Matlab
-   matlab -nodisplay -r "try, disp('Running Matlab Validation script'), FDS_validation_script, catch, disp('Error'), err = lasterror, err.message, err.stack, end, exit" &> $OUTPUT_DIR/stage7b_validation
-}
-
-#---------------------------------------------
-#                   check_matlab_validation
-#---------------------------------------------
-
-check_matlab_validation()
-{
-   # Scan for and report any errors in Matlab scripts
-   cd $firebotdir
-   if [[ `grep "Error" $OUTPUT_DIR/stage7b_validation` == "" ]]
-   then
-      matlab_validation_succcess=true
-   else
-      echo "Errors from Stage 7b - Matlab plotting and statistics (validation):" >> $ERROR_LOG
-      grep -B 5 -A 50 "Error" $OUTPUT_DIR/stage7b_validation | tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
-      echo "" >> $ERROR_LOG
-   fi
 }
 
 #---------------------------------------------
@@ -1494,11 +1367,12 @@ archive_timing_stats()
    gitdate=`echo "scale=5; $gitdate/86400 " | bc`
    cd $CURRENTDIR
 
+#matlab routines have been removed, zero's are now output in the matlab column for backward compatibility
    if [ ! -e $HISTORY_DIR/firebot_times.csv ]; then
      echo "day,date,revision,pass/fail,clone,setup,build,debug,release,picture,matlab,manuals,total" > $HISTORY_DIR/firebot_times.csv
      echo ",,,,s,s,s,s,s,s,s,s,s" >> $HISTORY_DIR/firebot_times.csv
    fi
-   echo $gitdate,$FDS_DATE,$FDS_REVISION,$firebot_success,$CLONE_DELTA,$SETUP_DELTA,$BUILD_DELTA,$DEBUG_DELTA,$RELEASE_DELTA,$PICTURE_DELTA,$MATLAB_DELTA,$MANUALS_DELTA,$SCRIPT_DELTA >> $HISTORY_DIR/firebot_times.csv
+   echo $gitdate,$FDS_DATE,$FDS_REVISION,$firebot_success,$CLONE_DELTA,$SETUP_DELTA,$BUILD_DELTA,$DEBUG_DELTA,$RELEASE_DELTA,$PICTURE_DELTA,0.0,$MANUALS_DELTA,$SCRIPT_DELTA >> $HISTORY_DIR/firebot_times.csv
 
    if [ "$UPLOADGUIDES" == "1" ]; then
      if [ "$USER" == "firebot" ]; then
@@ -2156,7 +2030,6 @@ WEB_ROOT=
 UPDATED_WEB_IMAGES=
 FORCECLONE=
 
-SKIPMATLAB=
 FDS_TAG=
 SMV_TAG=
 VALIDATION=
@@ -2546,9 +2419,6 @@ fi
 if [ "$C_VERSION" != "" ]; then
   echo "            C: $C_VERSION"
 fi
-if [ "$SKIPMATLAB" != "" ]; then
-  echo "     Skipping: matlab stage"
-fi
 
 if [ "$CLEANREPO" == "1" ]; then
   echo "  clean repos: yes"
@@ -2814,7 +2684,7 @@ GET_DURATION $PICTURE_beg $PICTURE_end PICTURE
 ###*** Stage 7c ###
 
 PICTURE_beg=`GET_TIME`
-  if [[ "$SKIPMATLAB" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
+  if [[ "$CACHE_DIR" == "" ]]; then
 
 ###*** Stage 7a ###
 
@@ -2836,26 +2706,6 @@ PICTURE_beg=`GET_TIME`
       run_python_validation
       check_python_validation
     fi
-
-#*** matlab verification plots
-
-#   check_matlab_license_server
-#   if [ $matlab_success == true ]; then
-#     run_matlab_verification
-#     check_matlab_verification
-#     check_verification_stats
-#   fi
-
-###*** Stage 7b ###
-
-#*** matlab validation plots
-
-#   check_matlab_license_server
-#   if [ $matlab_success == true ]; then
-#     run_matlab_validation
-#     check_matlab_validation
-#     archive_validation_stats
-#   fi
   fi
 PICTURE_end=`GET_TIME`
 GET_DURATION $PICTURE_beg $PICTURE_end PICTURE
@@ -2863,7 +2713,7 @@ GET_DURATION $PICTURE_beg $PICTURE_end PICTURE
 ###*** Stage 8 ###
 
 MANUALS_beg=`GET_TIME`
-  if [[ "$SKIPMATLAB" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
+  if [[ "$CACHE_DIR" == "" ]]; then
     make_fds_user_guide
 #    make_geom_notes
     make_fds_verification_guide
