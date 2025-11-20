@@ -1888,7 +1888,6 @@ fi
    echo "run cases(debug): $DEBUG_DIFF "                    >> $TIME_LOG
    echo "run cases(release): $RELEASE_DIFF "                >> $TIME_LOG
    echo "make pictures: $PICTURE_DIFF "                     >> $TIME_LOG
-   echo "run matlab: $MATLAB_DIFF "                         >> $TIME_LOG
    echo "build guides: $MANUALS_DIFF "                      >> $TIME_LOG
    echo "total: $SCRIPT_DIFF "                              >> $TIME_LOG
    echo ""                                                  >> $TIME_LOG
@@ -2814,9 +2813,7 @@ GET_DURATION $PICTURE_beg $PICTURE_end PICTURE
 
 ###*** Stage 7c ###
 
-MATLAB_beg=`GET_TIME`
-# folloing line was commented 11/13/2025, likely caused firebot crash, may need to be uncommented and moved - gpf
-#  generate_timing_stats
+PICTURE_beg=`GET_TIME`
   if [[ "$SKIPMATLAB" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
 
 ###*** Stage 7a ###
@@ -2860,8 +2857,8 @@ MATLAB_beg=`GET_TIME`
 #     archive_validation_stats
 #   fi
   fi
-MATLAB_end=`GET_TIME`
-GET_DURATION $MATLAB_beg $MATLAB_end MATLAB
+PICTURE_end=`GET_TIME`
+GET_DURATION $PICTURE_beg $PICTURE_end PICTURE
 
 ###*** Stage 8 ###
 
