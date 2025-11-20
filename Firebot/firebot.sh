@@ -2193,13 +2193,12 @@ MPI_TYPE=ompi
 BOPT=
 GITURL=
 MAKE_SUMMARY=
-CLONEFILE=
 BUILD_3RD_PARTY=
 FORCE_UPLOAD=
 CACHE_DIR=
 
 #*** parse command line arguments
-while getopts '3b:BcCdGJm:Mp:q:R:s:STuUV:x:X:y:Y:w:W:z' OPTION
+while getopts '3b:BcCdGJm:Mp:q:R:s:STuUV:x:X:y:Y:w:W:' OPTION
 do
 case $OPTION in
   3)
@@ -2303,9 +2302,6 @@ case $OPTION in
   W)
    WEB_ROOT="$OPTARG"
    ;;
-  z)
-   CLONEFILE="1"
-   ;;
 esac
 done
 shift $(($OPTIND-1))
@@ -2399,14 +2395,6 @@ hyprerepo=$repo/hypre
 sundialsrepo=$repo/sundials
 libsdir=$repo/libs
 
-if [ "$CLONEFILE" != "" ]; then
-  CLONEFILE=$botrepo/Bundlebot/release/config.sh
-  if [ ! -x $CLONEFILE ]; then
-    echo "***error: $CLONEFILE does not exist or is not executable"
-    CLONEFILE=
-  fi
-fi
-
 GNU_MPI=ompi_
 REGULARCASES=
 smvsize=_64
@@ -2465,32 +2453,11 @@ if [[ "$CLONE_REPOS" != "" ]]; then
     ./setup_repos.sh -3         >>   $OUTPUT_DIR/stage1_clone 2>&1
   fi
   if [ "$CLONE_REPOS" != "master" ]; then
-    if [ "$CLONEFILE" == "" ]; then
-      FDSBRANCH=$CLONE_REPOS
-      CHECKOUT_REPO $FDSBRANCH $fdsrepo $FDS_REV $FDS_TAG 
+    FDSBRANCH=$CLONE_REPOS
+    CHECKOUT_REPO $FDSBRANCH $fdsrepo $FDS_REV $FDS_TAG 
 
-      SMVBRANCH=$CLONE_REPOS
-      CHECKOUT_REPO $SMVBRANCH $smvrepo $SMV_REV $SMV_TAG 
-    else
-      source $CLONEFILE 
-      FDSBRANCH=$CLONE_REPOS
-      CHECKOUT_REPO $FDSBRANCH $fdsrepo $BUNDLE_FDS_REVISION  $BUNDLE_FDS_TAG 
-
-      SMVBRANCH=$CLONE_REPOS
-      CHECKOUT_REPO $SMVBRANCH $smvrepo $BUNDLE_SMV_REVISION  $BUNDLE_SMV_TAG 
-
-      CADBRANCH=$CLONE_REPOS
-      CHECKOUT_REPO $CADBRANCH $cadrepo $BUNDLE_CAD_REVISION  $BUNDLE_CAD_TAG 
-
-      EXPBRANCH=$CLONE_REPOS
-      CHECKOUT_REPO $EXPBRANCH $exprepo $BUNDLE_EXP_REVISION  $BUNDLE_EXP_TAG 
-      
-      FIGBRANCH=$CLONE_REPOS
-      CHECKOUT_REPO $FIGBRANCH $figrepo $BUNDLE_FIG_REVISION  $BUNDLE_FIG_TAG 
-
-      OUTBRANCH=$CLONE_REPOS
-      CHECKOUT_REPO $OUTBRANCH $outrepo $BUNDLE_OUT_REVISION  $BUNDLE_OUT_TAG 
-    fi
+    SMVBRANCH=$CLONE_REPOS
+    CHECKOUT_REPO $SMVBRANCH $smvrepo $SMV_REV $SMV_TAG 
   fi
   ARCHIVE_REPO_SIZES=1
 fi

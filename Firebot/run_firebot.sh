@@ -57,7 +57,6 @@ echo "-X fds_tag - when cloning, tag the fds repo using fds_tag"
 echo "-y smv_rev - run firebot using the smv revision named smv_rev [default: origin/master]"
 echo "-Y smv_tag - when cloning, tag the smv repo using smv_tag"
 echo "   The -x and -y options are only used with the -R cloning option"
-echo "-z file - use revisions and tags in file to clone repos"
 }
 
 #---------------------------------------------
@@ -223,7 +222,7 @@ CACHE_DIR=
 
 #*** parse command line options
 
-while getopts '3bBcCdDfFhGHJkm:MnNo:OPq:r:R:s:TuUvV:w:W:x:X:y:Y:z' OPTION
+while getopts '3bBcCdDfFhGHJkm:MnNo:OPq:r:R:s:TuUvV:w:W:x:X:y:Y:' OPTION
 do
 case $OPTION  in
   3)
@@ -335,9 +334,6 @@ case $OPTION  in
    ;;
   Y)
    SMV_TAG="-Y $OPTARG"
-   ;;
-  z)
-   CLONEFILE="-z"
    ;;
   \?)
   echo "***error: unknown option entered. aborting firebot"
