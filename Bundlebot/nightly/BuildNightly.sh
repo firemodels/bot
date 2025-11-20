@@ -41,7 +41,7 @@ else
 fi
 echo "-o - specify GH_OWNER when building a bundle. [default: $GH_OWNER]"
 echo "-r - specify GH_REPO when building a bundle. [default: $GH_REPO]"
-echo "-R branch - clone repos using name branch"
+echo "-R branch - clone repos using name branch {default: $BRANCH]"
 echo "-r - create a release bundle (same as -R branc)"
 echo "-U - do not upload bundle file."
 echo "-v - show settings used to build bundle"

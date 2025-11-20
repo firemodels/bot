@@ -1,8 +1,9 @@
 #!/bin/bash
 pub_type=$1
 release_type=$2
-GH_OWNER_LOCAL=$3
-error_log=$4
+pdf_to=$3
+GH_OWNER_LOCAL=$4
+error_log=$5
 
 PUB_TAG=FDS_TEST
 if [ "$pub_type" != "fds" ]; then
@@ -30,10 +31,6 @@ CP ()
   fi
   return 0
 }
-
-pdf_to=$HOME/.bundle/pubs
-
-mkdir -p $pdf_to
 
 if [ "$pub_type" == "fds" ]; then
   echo ""

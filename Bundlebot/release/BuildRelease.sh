@@ -4,9 +4,11 @@ source config.sh
 export DISABLEPUSH=1
 export BUILDING_release=1
 
-# FDS-6.9.0-96-g889da6ae0
+# for testing build bundle with a specified hash and tag
 #export BUNDLE_FDS_HASH=889da6ae0
 #export BUNDLE_FDS_TAG=FDS-6.9.1test
+#export BUNDLE_SMV_HASH=xxxxx
+#export BUNDLE_SMV_TAG=SMV-6.9.1test
 
 OWNER=`whoami`
 

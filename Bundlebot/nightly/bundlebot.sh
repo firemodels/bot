@@ -194,9 +194,8 @@ fi
 return_code=0
 if [[ "$showparms" == "" ]]; then
   error_log=/tmp/error_log.$$
-  rm -f $HOME/.bundle/pubs/*
-  ./copy_pubs.sh fds $releasetype $GHOWNER $error_log || return_code=1
-  ./copy_pubs.sh smv $releasetype $GHOWNER $error_log || return_code=1
+  ./copy_pubs.sh fds $releasetype $SCRIPTDIR/pubs $GHOWNER $error_log || return_code=1
+  ./copy_pubs.sh smv $releasetype $SCRIPTDIR/pubs $GHOWNER $error_log || return_code=1
 
   ./copy_apps.sh fds $releasetype $SCRIPTDIR/apps                   $error_log || return_code=1
   ./copy_apps.sh smv $releasetype $SCRIPTDIR/apps                   $error_log || return_code=1

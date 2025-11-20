@@ -6,6 +6,8 @@ INTEL_COMP_VERSION=$4
 UPLOAD_DIR_ARG=$5
 NIGHTLY=$6
 
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
 if [ "$NIGHTLY" == "null" ]; then
   NIGHTLY=
 fi
@@ -16,8 +18,8 @@ fi
 # this script assumes that fds and smokeview apps have been copied into APPS_DIR
 # and that fds and smokeview manuals have been copied into GUIDE_DIR
 
-GUIDE_DIR=$HOME/.bundle/pubs
-APPS_DIR=$HOME/.bundle/apps
+GUIDE_DIR=$SCRIPTDIR/pubs
+APPS_DIR=$SCRIPTDIR/apps
 
 # mpi files located into MPI_DIR
 MPI_DIR=$HOME/.bundle/BUNDLE/MPI
@@ -30,14 +32,12 @@ else
 fi
 
 INSTALLDIR=FDS/FDS6
-errlog=/tmp/errlog.$$
+errlog=$SCRIPTDIR/output/errlog
 
 # determine directory repos reside under
 
-scriptdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-
 curdir=`pwd`
-cd $scriptdir/../../..
+cd $SCRIPTDIR/../../..
 REPO_ROOT=`pwd`
 cd $curdir
 
