@@ -1367,12 +1367,11 @@ archive_timing_stats()
    gitdate=`echo "scale=5; $gitdate/86400 " | bc`
    cd $CURRENTDIR
 
-#matlab routines have been removed, zero's are now output in the matlab column for backward compatibility
    if [ ! -e $HISTORY_DIR/firebot_times.csv ]; then
-     echo "day,date,revision,pass/fail,clone,setup,build,debug,release,picture,matlab,manuals,total" > $HISTORY_DIR/firebot_times.csv
+     echo "day,date,revision,pass/fail,clone,setup,build,debug,release,zero,vv,manuals,total" > $HISTORY_DIR/firebot_times.csv
      echo ",,,,s,s,s,s,s,s,s,s,s" >> $HISTORY_DIR/firebot_times.csv
    fi
-   echo $gitdate,$FDS_DATE,$FDS_REVISION,$firebot_success,$CLONE_DELTA,$SETUP_DELTA,$BUILD_DELTA,$DEBUG_DELTA,$RELEASE_DELTA,$PICTURE_DELTA,0.0,$MANUALS_DELTA,$SCRIPT_DELTA >> $HISTORY_DIR/firebot_times.csv
+   echo $gitdate,$FDS_DATE,$FDS_REVISION,$firebot_success,$CLONE_DELTA,$SETUP_DELTA,$BUILD_DELTA,$DEBUG_DELTA,$RELEASE_DELTA,0.0,$VV_DELTA,$MANUALS_DELTA,$SCRIPT_DELTA >> $HISTORY_DIR/firebot_times.csv
 
    if [ "$UPLOADGUIDES" == "1" ]; then
      if [ "$USER" == "firebot" ]; then
@@ -1761,7 +1760,8 @@ fi
    echo "build software: $BUILD_DIFF "                      >> $TIME_LOG
    echo "run cases(debug): $DEBUG_DIFF "                    >> $TIME_LOG
    echo "run cases(release): $RELEASE_DIFF "                >> $TIME_LOG
-   echo "make pictures: $PICTURE_DIFF "                     >> $TIME_LOG
+   echo "verification: $VERIFICATION_DIFF "                 >> $TIME_LOG
+   echo "validation: $VALIDATION_DIFF "                     >> $TIME_LOG
    echo "build guides: $MANUALS_DIFF "                      >> $TIME_LOG
    echo "total: $SCRIPT_DIFF "                              >> $TIME_LOG
    echo ""                                                  >> $TIME_LOG
@@ -2668,47 +2668,40 @@ fi
 RELEASE_end=`GET_TIME`
 GET_DURATION $RELEASE_beg $RELEASE_end RELEASE
 
-###*** Stage 6 ###
-PICTURE_beg=`GET_TIME`
-#if [[ "$CHECK_CLUSTER" == "" ]]; then
-
-## Depends on successful SMV compile
-#  if [[ $smv_release_success ]]; then
-#    check_fds_pictures
-#    make_fds_summary
-#    MAKE_SUMMARY=1
-#  fi
-PICTURE_end=`GET_TIME`
-GET_DURATION $PICTURE_beg $PICTURE_end PICTURE
-
 ###*** Stage 7c ###
 
-PICTURE_beg=`GET_TIME`
-  if [[ "$CACHE_DIR" == "" ]]; then
+VV_beg=`GET_TIME`
+if [[ "$CACHE_DIR" == "" ]]; then
 
 ###*** Stage 7a ###
 
 #*** python verification plots
 
-    run_python_setup
-    check_python_setup
-    if [ $python_success == true ]; then
-      run_python_verification
-      check_python_verification
-      make_fds_summary
-      MAKE_SUMMARY=1
-    fi
+  VERIFICATION_beg=`GET_TIME`
+  run_python_setup
+  check_python_setup
+  if [ $python_success == true ]; then
+    run_python_verification
+    check_python_verification
+    make_fds_summary
+    MAKE_SUMMARY=1
+  fi
+  VERIFICATION_end=`GET_TIME`
+  GET_DURATION $VERIFICATION_beg $VERIFICATION_end VERIFICATION
 
 #*** python validation plots
 #    only need to setup python once
 
-    if [ $python_success == true ]; then
-      run_python_validation
-      check_python_validation
-    fi
+  VALIDATION_beg=`GET_TIME`
+  if [ $python_success == true ]; then
+    run_python_validation
+    check_python_validation
   fi
-PICTURE_end=`GET_TIME`
-GET_DURATION $PICTURE_beg $PICTURE_end PICTURE
+  VALIDATION_end=`GET_TIME`
+  GET_DURATION $VALIDATION_beg $VALIDATION_end VALIDATION
+fi
+VV_end=`GET_TIME`
+GET_DURATION $VV_beg $VV_end VV
 
 ###*** Stage 8 ###
 
