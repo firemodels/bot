@@ -1200,101 +1200,6 @@ check_python_validation()
 }
 
 #---------------------------------------------
-#                   run_matlab_license_test
-#---------------------------------------------
-
-run_matlab_license_test()
-{
-# uncomment following DEBUG lines to generate matlab debug info (and comment matlab line without DEBUG)
-#   DEBUG="strace -t -T -f -e trace=network -o $OUTPUT_DIR/stage7_matlab_strace"
-   echo Matlab
-   echo "   license test"
-   # Run simple test to see if Matlab license is available
-   cd $fdsrepo/Utilities/Matlab
-   date -Iseconds &> $OUTPUT_DIR/stage7_matlab_license
-#   $DEBUG matlab -nodisplay -r "try, disp('Running Matlab License Check'), catch, disp('License Error'), err = lasterror, err.message, err.stack, end, exit" >> $OUTPUT_DIR/stage7_matlab_license 2>&1
-   date -Iseconds >> $OUTPUT_DIR/stage7_matlab_license 2>&1
-   matlab -nodisplay -r "try, disp('Running Matlab License Check'), catch, disp('License Error'), err = lasterror, err.message, err.stack, end, exit" &> $OUTPUT_DIR/stage7_matlab_license
-}
-
-#---------------------------------------------
-#                   scan_matlab_license_test
-#---------------------------------------------
-
-scan_matlab_license_test()
-{
-   # Check for failed license
-   if [[ `grep "License checkout failed" $OUTPUT_DIR/stage7_matlab_license` == "" ]]
-   then
-      # Continue along
-      matlab_success=true
-   else
-      TIME_LIMIT_STAGE="7"
-      check_time_limit
-      matlab_success=false
-      sleep 300
-   fi
-}
-
-#---------------------------------------------
-#                   check_matlab_license_server
-#---------------------------------------------
-
-check_matlab_license_server()
-{
-   matlab -help  >& /tmp/matlabtest.$$
-   notfound=`grep 'command not found' /tmp/matlabtest.$$ | wc -l`
-   if [ $notfound -gt 0 ]; then
-     module load matlab
-   fi
-   rm /tmp/matlabtest.$$
-   SKIPMATLAB="1"
-   for i in 1 2 3 4
-   do
-      run_matlab_license_test
-      scan_matlab_license_test
-      if [ $matlab_success == true ]; then
-         SKIPMATLAB=
-         break
-      fi
-      sleep 300
-   done
-   if [ "$SKIPMATLAB" == "1" ]; then
-      echo "Error from Stage 7 - Matlab failed to be checked out" >> $ERROR_LOG
-   fi
-}
-
-#---------------------------------------------
-#                   run_matlab_verification
-#---------------------------------------------
-
-run_matlab_verification()
-{
-   echo "   matlab verification plots"
-   # Run Matlab plotting script
-   cd $fdsrepo/Utilities/Matlab
-   matlab -nodisplay -r "try, disp('Running Matlab Verification script'), FDS_verification_script, catch, disp('Error'), err = lasterror, err.message, err.stack, end, exit" &> $OUTPUT_DIR/stage7a_verification
-}
-
-#---------------------------------------------
-#                   check_matlab_verification
-#---------------------------------------------
-
-check_matlab_verification()
-{
-   # Scan for and report any errors in Matlab scripts
-   cd $firebotdir
-   if [[ `grep "Error" $OUTPUT_DIR/stage7a_verification` == "" ]]
-   then
-      matlab_verification_success=true
-   else
-      echo "Errors from Stage 7a - Matlab plotting and statistics (verification):" >> $ERROR_LOG
-      grep -B 5 -A 50 "Error" $OUTPUT_DIR/stage7a_verification | tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
-      echo "" >> $ERROR_LOG
-   fi
-}
-
-#---------------------------------------------
 #                   check_verification_stats
 #---------------------------------------------
 
@@ -1372,36 +1277,6 @@ GET_DURATION(){
   fi
   eval ${__var}_DIFF="'${DIFF_TIME}'"
   eval ${__var}_DELTA="'${DELTA_TIME}'"
-}
-
-#---------------------------------------------
-#                   run_matlab_validation
-#---------------------------------------------
-
-run_matlab_validation()
-{
-   echo "   validation plots"
-   # Run Matlab plotting script
-   cd $fdsrepo/Utilities/Matlab
-   matlab -nodisplay -r "try, disp('Running Matlab Validation script'), FDS_validation_script, catch, disp('Error'), err = lasterror, err.message, err.stack, end, exit" &> $OUTPUT_DIR/stage7b_validation
-}
-
-#---------------------------------------------
-#                   check_matlab_validation
-#---------------------------------------------
-
-check_matlab_validation()
-{
-   # Scan for and report any errors in Matlab scripts
-   cd $firebotdir
-   if [[ `grep "Error" $OUTPUT_DIR/stage7b_validation` == "" ]]
-   then
-      matlab_validation_succcess=true
-   else
-      echo "Errors from Stage 7b - Matlab plotting and statistics (validation):" >> $ERROR_LOG
-      grep -B 5 -A 50 "Error" $OUTPUT_DIR/stage7b_validation | tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
-      echo "" >> $ERROR_LOG
-   fi
 }
 
 #---------------------------------------------
@@ -1497,10 +1372,10 @@ archive_timing_stats()
    cd $CURRENTDIR
 
    if [ ! -e $HISTORY_DIR/firebot_times.csv ]; then
-     echo "day,date,revision,pass/fail,clone,setup,build,debug,release,picture,matlab,manuals,total" > $HISTORY_DIR/firebot_times.csv
+     echo "day,date,revision,pass/fail,clone,setup,build,debug,release,zero,vv,manuals,total" > $HISTORY_DIR/firebot_times.csv
      echo ",,,,s,s,s,s,s,s,s,s,s" >> $HISTORY_DIR/firebot_times.csv
    fi
-   echo $gitdate,$FDS_DATE,$FDS_REVISION,$firebot_success,$CLONE_DELTA,$SETUP_DELTA,$BUILD_DELTA,$DEBUG_DELTA,$RELEASE_DELTA,$PICTURE_DELTA,$MATLAB_DELTA,$MANUALS_DELTA,$SCRIPT_DELTA >> $HISTORY_DIR/firebot_times.csv
+   echo $gitdate,$FDS_DATE,$FDS_REVISION,$firebot_success,$CLONE_DELTA,$SETUP_DELTA,$BUILD_DELTA,$DEBUG_DELTA,$RELEASE_DELTA,0.0,$VV_DELTA,$MANUALS_DELTA,$SCRIPT_DELTA >> $HISTORY_DIR/firebot_times.csv
 
    if [ "$UPLOADGUIDES" == "1" ]; then
      if [ "$USER" == "firebot" ]; then
@@ -1779,16 +1654,13 @@ get_firebot_success()
 
 make_fds_summary()
 {
-  echo deb666aaa >> $OUTPUT_DIR/out_debug
   if [ -d $FDS_SUMMARY_DIR ]; then
-    echo deb666bbb >> $OUTPUT_DIR/out_debug
     npngs=`ls -l $fdsrepo/Manuals/FDS_User_Guide/SCRIPT_FIGURES/*.png  2>/dev/null | wc -l`
     if [ $npngs -eq 0 ]; then
       echo "***error: png files not found in $fdsrepo/Manuals/FDS_User_Guide/SCRIPT_FIGURES" >> $ERROR_LOG
     else
       cp $fdsrepo/Manuals/FDS_User_Guide/SCRIPT_FIGURES/*.png         $FDS_SUMMARY_DIR/images/user/.
     fi
-    echo deb666ccc >> $OUTPUT_DIR/out_debug
 
     npngs=`ls -l $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/*.png  2>/dev/null | wc -l`
     if [ $npngs -eq 0 ]; then
@@ -1796,17 +1668,13 @@ make_fds_summary()
     else
       cp $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/*.png $FDS_SUMMARY_DIR/images/verification/.
     fi
-    echo deb666ddd >> $OUTPUT_DIR/out_debug
     DATE=`date +"%b %d, %Y - %r"`
 
 # compare images
 
     CURDIR=`pwd`
-    echo deb666eee >> $OUTPUT_DIR/out_debug
     cd $botrepo/Firebot
-    echo deb666fff >> $OUTPUT_DIR/out_debug
     ./compare_images.sh $FDS_SUMMARY_DIR/images $FDS_SUMMARY_DIR/diffs/images $OUTPUT_DIR/error_images >& $OUTPUT_DIR/stage8_image_compare
-    echo deb666ggg >> $OUTPUT_DIR/out_debug
 
 # look for fyis
     if [[ `grep '***fyi:' $OUTPUT_DIR/stage8_image_compare` == "" ]]
@@ -1817,7 +1685,6 @@ make_fds_summary()
       echo "FYIs from Stage 8 - Image comparisons:"     >> $FYI_LOG
       grep '***fyi:' $OUTPUT_DIR/stage8_image_compare   >> $FYI_LOG
     fi
-    echo deb666hhh >> $OUTPUT_DIR/out_debug
 
 # look for warnings
     if [[ `grep '***warning:' $OUTPUT_DIR/stage8_image_compare` == "" ]]
@@ -1828,32 +1695,19 @@ make_fds_summary()
       echo "Warnings from Stage 8 - Image comparisons:"     >> $WARNING_LOG
       grep '***warning:' $OUTPUT_DIR/stage8_image_compare   >> $WARNING_LOG
     fi
-    echo deb666iii >> $OUTPUT_DIR/out_debug
     
     if [ "$WEB_DIR" != "" ]; then
-      echo deb666iii111 >> $OUTPUT_DIR/out_debug
       if [ -d $WEB_DIR ]; then
-        echo deb666iii222 >> $OUTPUT_DIR/out_debug
         CUR_DIR=`pwd`
-        echo deb666iii333 >> $OUTPUT_DIR/out_debug
         cd $WEB_DIR
-        echo deb666iii444 >> $OUTPUT_DIR/out_debug
         rm -r images manuals diffs *.html
-        echo deb666iii555 >> $OUTPUT_DIR/out_debug
         cp -r $FDS_SUMMARY_DIR/* .
-        echo deb666iii666 >> $OUTPUT_DIR/out_debug
         rm -f *template.html
-        echo deb666iii777 >> $OUTPUT_DIR/out_debug
         cd $CUR_DIR
-        echo deb666iii888 >> $OUTPUT_DIR/out_debug
         UPDATED_WEB_IMAGES=1
-        echo deb666iii999 >> $OUTPUT_DIR/out_debug
       fi
-      echo deb666iiiaaa >> $OUTPUT_DIR/out_debug
     fi
-    echo deb666jjj >> $OUTPUT_DIR/out_debug
   fi
-  echo deb666kkk >> $OUTPUT_DIR/out_debug
 }
 
 #---------------------------------------------
@@ -1872,9 +1726,6 @@ email_build_status()
    stop_time=`date`
    echo "" > $TIME_LOG
    echo "-------------------------------" >> $TIME_LOG
-   if [ "$BUILD_ONLY" == "1" ]; then
-     echo "build only apps"                                 >> $TIME_LOG
-   fi
    echo "host: $hostname "                                  >> $TIME_LOG
    echo "OS: $platform2 "                                   >> $TIME_LOG
    echo "repo: $repo "                                      >> $TIME_LOG
@@ -1913,8 +1764,8 @@ fi
    echo "build software: $BUILD_DIFF "                      >> $TIME_LOG
    echo "run cases(debug): $DEBUG_DIFF "                    >> $TIME_LOG
    echo "run cases(release): $RELEASE_DIFF "                >> $TIME_LOG
-   echo "make pictures: $PICTURE_DIFF "                     >> $TIME_LOG
-   echo "run matlab: $MATLAB_DIFF "                         >> $TIME_LOG
+   echo "verification: $VERIFICATION_DIFF "                 >> $TIME_LOG
+   echo "validation: $VALIDATION_DIFF "                     >> $TIME_LOG
    echo "build guides: $MANUALS_DIFF "                      >> $TIME_LOG
    echo "total: $SCRIPT_DIFF "                              >> $TIME_LOG
    echo ""                                                  >> $TIME_LOG
@@ -2135,8 +1986,6 @@ EXPBRANCH=master
 SMVBRANCH=master
 BOTBRANCH=master
 BRANCH=master
-BUILD_ONLY=
-MANUALS_MATLAB_ONLY=
 
 FDS_release_success=false
 
@@ -2177,7 +2026,6 @@ SMV_REVISION=
 INTEL=
 INTEL2=
 CLONE_REPOS=
-CLONE_FDSSMV=
 FDS_REV=origin/master
 SMV_REV=origin/master
 WEB_DIR=
@@ -2186,9 +2034,6 @@ WEB_ROOT=
 UPDATED_WEB_IMAGES=
 FORCECLONE=
 
-SKIPMATLAB=
-SKIPPICTURES=
-SKIPRELEASE=
 FDS_TAG=
 SMV_TAG=
 VALIDATION=
@@ -2203,7 +2048,7 @@ FORCE_UPLOAD=
 CACHE_DIR=
 
 #*** parse command line arguments
-while getopts '3b:BcCdGJm:Mp:q:R:s:STuUV:x:X:y:Y:w:W:z' OPTION
+while getopts '3b:cCJm:p:q:R:s:uUV:w:W:z' OPTION
 do
 case $OPTION in
   3)
@@ -2220,22 +2065,11 @@ case $OPTION in
    CADBRANCH=$BRANCH
    EXPBRANCH=$BRANCH
    ;;
-  B)
-   BUILD_ONLY=1
-   ;;
   c)
    CLEANREPO=1
    ;;
   C)
    FORCECLONE="-C"
-   ;;
-  d)
-   SKIPRELEASE=1
-   SKIPMATLAB=1
-   SKIPPICTURES=1
-   ;;
-  G)
-   FORCE_UPLOAD=1
    ;;
   J)
    MPI_TYPE=impi
@@ -2243,9 +2077,6 @@ case $OPTION in
    ;;
   m)
    mailToFDS="$OPTARG"
-   ;;
-  M)
-   MANUALS_MATLAB_ONLY=1
    ;;
   p)
    PID_FILE="$OPTARG"
@@ -2259,13 +2090,6 @@ case $OPTION in
   s)
    CACHE_DIR="$OPTARG"
    ;;
-  S)
-   SKIPMATLAB=1
-   SKIPPICTURES=1
-   ;;
-  T)
-   CLONE_FDSSMV=1
-   ;;
   u)
    UPDATEREPO=1
    ;;
@@ -2273,33 +2097,12 @@ case $OPTION in
    UPLOADGUIDES=1
    ;;
   V)
-   
    VALIDATION="$OPTARG"
    if [ "$VALIDATION" == "all" ]; then
      CHECK_CLUSTER=
    else
      CHECK_CLUSTER=1
    fi
-   ;;
-  x)
-   FDS_REV="$OPTARG"
-   if [ "$FDS_REV" == "latest" ]; then
-     UPDATEREPO=1
-     FDS_REV=
-   fi
-   ;;
-  X)
-   FDS_TAG="$OPTARG"
-   ;;
-  y)
-   SMV_REV="$OPTARG"
-   if [ "$SMV_REV" == "latest" ]; then
-     UPDATEREPO=1
-     SMV_REV=
-   fi
-   ;;
-  Y)
-   SMV_TAG="$OPTARG"
    ;;
   w)
    WEB_DIR="$OPTARG"
@@ -2451,13 +2254,8 @@ if [[ "$CLONE_REPOS" != "" ]]; then
   if [ "$DISABLEPUSH" != "" ]; then
     DISABLEPUSH="-D"
   fi
-  if [ "$CLONE_FDSSMV" != "" ]; then
-   # only clone the fds and smv repos - used when just compiling the fds and smv apps
-    ./setup_repos.sh $FORCECLONE -T > $OUTPUT_DIR/stage1_clone 2>&1
-  else
    # clone all repos
     ./setup_repos.sh $FORCECLONE -F > $OUTPUT_DIR/stage1_clone 2>&1
-  fi
   if [ "$BUILD_3RD_PARTY" != "" ]; then
     echo removing hypre repo    >>   $OUTPUT_DIR/stage1_clone
     rm -rf $hyprerepo           >>   $OUTPUT_DIR/stage1_clone 2>&1
@@ -2610,9 +2408,6 @@ COPY_SMV_APPS=$botrepo/Firebot/copy_smv_apps.sh
 echo ""
 echo "Settings"
 echo "--------"
-if [ "$BUILD_ONLY" == "1" ]; then
-  echo "Only build apps"
-fi
 echo "     CAD repo/branch: $cadrepo/$CADBRANCH"
 echo "     EXP repo/branch: $exprepo/$EXPBRANCH"
 echo "     FDS repo/branch: $fdsrepo/$FDSBRANCH"
@@ -2627,15 +2422,6 @@ fi
 if [ "$C_VERSION" != "" ]; then
   echo "            C: $C_VERSION"
 fi
-if [ "$SKIPRELEASE" != "" ]; then
-  echo "     Skipping: release cases stage"
-fi
-if [ "$SKIPPICTURES" != "" ]; then
-  echo "     Skipping: picture generation stage"
-fi
-if [ "$SKIPMATLAB" != "" ]; then
-  echo "     Skipping: matlab stage"
-fi
 
 if [ "$CLEANREPO" == "1" ]; then
   echo "  clean repos: yes"
@@ -2647,9 +2433,7 @@ if [ "$UPDATEREPO" == "1" ]; then
 else
   echo " update repos: no"
 fi
-if [ "$BUILD_ONLY" == "" ]; then
   echo "        queue: $QUEUE"
-fi
 if [ "$WEB_DIR" != "" ]; then
   echo "      web dir: $WEB_DIR"
 fi
@@ -2672,14 +2456,10 @@ echo "Status"
 echo "------"
 if [[ "$CLONE_REPOS" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
   if [[ "$CLEANREPO" == "1" ]] ; then
-    if [ "$BUILD_ONLY" == "" ]; then
-      clean_repo2 exp $EXPBRANCH|| exit 1
-    fi
+    clean_repo2 exp $EXPBRANCH|| exit 1
     clean_repo2 fds $FDSBRANCH || exit 1
-    if [ "$BUILD_ONLY" == "" ]; then
-      clean_repo2 fig $FIGBRANCH     || exit 1
-      clean_repo2 out $OUTBRANCH || exit 1
-    fi 
+    clean_repo2 fig $FIGBRANCH     || exit 1
+    clean_repo2 out $OUTBRANCH || exit 1
     clean_repo2 smv $SMVBRANCH || exit 1
   fi
   ARCHIVE_REPO_SIZES=1
@@ -2701,7 +2481,7 @@ fi
       fi
     fi
 # we are not cloning fig, out and exp so update them
-    if [[ "$CLONE_REPOS" != "" ]] && [[ "$CLONE_FDSSMV" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+    if [[ "$CLONE_REPOS" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
       UPDATING=1
       echo Updating
       update_repo fig $FIGBRANCH || exit 1
@@ -2721,9 +2501,6 @@ if [[ "$CLONE_REPOS" == "" ]]; then
   if [[ "$CLEANREPO" == "" ]]; then
     CHECK_LINES=
   fi
-fi
-if [ "$BUILD_ONLY" == "1" ]; then
-  CHECK_LINES=
 fi
 
 # comment next line to turn on dos line ending checks
@@ -2750,9 +2527,7 @@ if [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
 
     check_CRLF
   else
-    if [ "$BUILD_ONLY" == "" ]; then
-      echo "DOS line endings only checked when cloning or cleaning repos"
-    fi
+    echo "DOS line endings only checked when cloning or cleaning repos"
   fi
 fi
 
@@ -2764,7 +2539,7 @@ fi
 get_fds_revision $FDSBRANCH || exit 1
 get_smv_revision $SMVBRANCH || exit 1
 get_bot_revision $BOTBRANCH || exit 1
-if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+if [[ "$CHECK_CLUSTER" == "" ]]; then
   get_exp_revision $EXPBRANCH     || exit 1
   get_fig_revision $FIGBRANCH     || exit 1
   get_out_revision $OUTBRANCH     || exit 1
@@ -2782,7 +2557,7 @@ rm /tmp/mailtest.$$
 # archive repo sizes
 # (only if the repos are cloned or cleaned)
 
-if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+if [[ "$CHECK_CLUSTER" == "" ]]; then
   if [ "$ARCHIVE_REPO_SIZES" == "1" ]; then
     archive_repo_sizes
   fi
@@ -2792,17 +2567,15 @@ check_git_checkout
 archive_compiler_version
 
 ### Stage 2a ###
-if [ "$MANUALS_MATLAB_ONLY" == "" ]; then
-  echo Building
-  echo "   FDS"
-fi
+echo Building
+echo "   FDS"
 SETUP_end=`GET_TIME`
 GET_DURATION $SETUP_beg $SETUP_end SETUP
 
 ###****** Stage 2b ###
 
 BUILD_beg=`GET_TIME`
-if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
+if [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
   compile_fds_mpi_db         $FDS_DB_DIR $FDS_DB_EXE
   check_compile_fds_mpi_db   $FDS_DB_DIR $FDS_DB_EXE
   compile_fds_mpi_db         $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
@@ -2811,14 +2584,14 @@ fi
 
 ###*** Stage 2d ###
 
-if [[ "$OPENMPI_GNU" != "" ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
+if [[ "$OPENMPI_GNU" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
   compile_fds_mpi_gnu_db       $FDSGNU_DB_DIR
   check_compile_fds_mpi_gnu_db
 fi
 
 ###*** Stage 2c ###
 
-if [[ "$SKIPRELEASE" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
+if [[ "$CACHE_DIR" == "" ]]; then
   compile_fds_mpi         $FDS_DIR $FDS_EXE
   check_compile_fds_mpi   $FDS_DIR $FDS_EXE
   compile_fds_mpi         $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
@@ -2827,26 +2600,26 @@ fi
 
 ###*** Stage 3a ###
 
-if [[ "$SKIPPICTURES" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+if [[ "$CHECK_CLUSTER" == "" ]]; then
   compile_smv_utilities
   check_smv_utilities
 fi
 
-if [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+if [[ "$CHECK_CLUSTER" == "" ]]; then
   cd $firebotdir
   $COPY_FDS_APPS > $OUTPUT_DIR/stage3d
 fi
 
 ###*** Stage 3b ###
 
-if [[ "$SKIPPICTURES" == "" ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+if [[ "$CHECK_CLUSTER" == "" ]]; then
   compile_smv_db
   check_compile_smv_db
 fi
 
 ###*** Stage 3c ###
 
-if [[ "$SKIPPICTURES" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+if [[ "$CHECK_CLUSTER" == "" ]]; then
   compile_smv
   check_compile_smv
   cd $firebotdir
@@ -2859,15 +2632,15 @@ GET_DURATION $BUILD_beg $BUILD_end BUILD
 
 DEBUG_beg=`GET_TIME`
 # Depends on successful FDS debug compile
-if [[ $FDS_debug_success ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
+if [[ $FDS_debug_success ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
    run_verification_cases_debug
    check_cases_debug $fdsrepo/$VERIFICATION_DEBUG 'verification'
 fi
 
-if [[ "$CLONE_REPOS" == "" ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
+if [[ "$CLONE_REPOS" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
 # clean debug stage (only if repos were not cloned)
   cd $fdsrepo
-  if [[ "$CLEANREPO" == "1" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
+  if [[ "$CLEANREPO" == "1" ]]; then
     echo "   cleaning Verification"
     clean_repo $fdsrepo/$VERIFICATION_DEBUG $FDSBRANCH || exit 1
   fi
@@ -2878,9 +2651,9 @@ GET_DURATION $DEBUG_beg $DEBUG_end DEBUG
 ###*** Stage 5 ###
 
 RELEASE_beg=`GET_TIME`
-if [[ "$BUILD_ONLY" == "" ]] && [[ "$CACHE_DIR" == "" ]];  then
+if [[ "$CACHE_DIR" == "" ]];  then
 # Depends on successful FDS compile
-  if [[ $FDS_release_success ]] && [[ "$SKIPRELEASE" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
+  if [[ $FDS_release_success ]]; then
     run_VV_cases_release
 
 # this also checks restart cases (using same criteria)
@@ -2898,156 +2671,88 @@ fi
 RELEASE_end=`GET_TIME`
 GET_DURATION $RELEASE_beg $RELEASE_end RELEASE
 
-###*** Stage 6 ###
-PICTURE_beg=`GET_TIME`
-#if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-
-## Depends on successful SMV compile
-#  if [[ "$SKIPPICTURES" == "" ]] && [[ $smv_release_success ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] ; then
-#    check_fds_pictures
-#    make_fds_summary
-#    MAKE_SUMMARY=1
-#  fi
-PICTURE_end=`GET_TIME`
-GET_DURATION $PICTURE_beg $PICTURE_end PICTURE
-
 ###*** Stage 7c ###
 
-MATLAB_beg=`GET_TIME`
-# folloing line was commented 11/13/2025, likely caused firebot crash, may need to be uncommented and moved - gpf
-#  generate_timing_stats
-  if [[ "$SKIPMATLAB" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
+VV_beg=`GET_TIME`
+if [[ "$CACHE_DIR" == "" ]]; then
 
 ###*** Stage 7a ###
 
 #*** python verification plots
 
-    echo deb111 > $OUTPUT_DIR/out_debug
-    run_python_setup
-    echo deb222 >> $OUTPUT_DIR/out_debug
-    check_python_setup
-    echo deb333 >> $OUTPUT_DIR/out_debug
-    if [ $python_success == true ]; then
-    echo deb444 >> $OUTPUT_DIR/out_debug
-      run_python_verification
-    echo deb555 >> $OUTPUT_DIR/out_debug
-      check_python_verification
-    echo deb666 >> $OUTPUT_DIR/out_debug
-      make_fds_summary
-    echo deb777 >> $OUTPUT_DIR/out_debug
-      MAKE_SUMMARY=1
-    fi
+  VERIFICATION_beg=`GET_TIME`
+  run_python_setup
+  check_python_setup
+  if [ $python_success == true ]; then
+    run_python_verification
+    check_python_verification
+    make_fds_summary
+    MAKE_SUMMARY=1
+  fi
+  VERIFICATION_end=`GET_TIME`
+  GET_DURATION $VERIFICATION_beg $VERIFICATION_end VERIFICATION
 
 #*** python validation plots
 #    only need to setup python once
 
-    echo deb888 >> $OUTPUT_DIR/out_debug
-    if [ $python_success == true ]; then
-    echo deb999 >> $OUTPUT_DIR/out_debug
-      run_python_validation
-    echo debaaa >> $OUTPUT_DIR/out_debug
-      check_python_validation
-    echo debbbb >> $OUTPUT_DIR/out_debug
-    fi
-    echo debccc >> $OUTPUT_DIR/out_debug
-
-#*** matlab verification plots
-
-#   check_matlab_license_server
-#   if [ $matlab_success == true ]; then
-#     run_matlab_verification
-#     check_matlab_verification
-#     check_verification_stats
-#   fi
-
-###*** Stage 7b ###
-
-#*** matlab validation plots
-
-#   check_matlab_license_server
-#   if [ $matlab_success == true ]; then
-#     run_matlab_validation
-#     check_matlab_validation
-#     archive_validation_stats
-#   fi
+  VALIDATION_beg=`GET_TIME`
+  if [ $python_success == true ]; then
+    run_python_validation
+    check_python_validation
   fi
-MATLAB_end=`GET_TIME`
-GET_DURATION $MATLAB_beg $MATLAB_end MATLAB
-    echo debddd >> $OUTPUT_DIR/out_debug
+  VALIDATION_end=`GET_TIME`
+  GET_DURATION $VALIDATION_beg $VALIDATION_end VALIDATION
+fi
+VV_end=`GET_TIME`
+GET_DURATION $VV_beg $VV_end VV
 
 ###*** Stage 8 ###
 
 MANUALS_beg=`GET_TIME`
-  if [[ "$SKIPMATLAB" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
+  if [[ "$CACHE_DIR" == "" ]]; then
     make_fds_user_guide
 #    make_geom_notes
     make_fds_verification_guide
     make_fds_technical_guide
     make_fds_validation_guide
-    echo debAAA >> $OUTPUT_DIR/out_debug
     make_fds_Config_management_plan
-    echo debBBB >> $OUTPUT_DIR/out_debug
     get_firebot_success
-    echo debCCC >> $OUTPUT_DIR/out_debug
 
 # copy repo manuals to Manualslatest directory whether firebot passes or fails
     rm -rf $MANUALS_LATEST_DIR
-    echo debDDD >> $OUTPUT_DIR/out_debug
     cp -r $fdsrepo/Manuals $MANUALS_LATEST_DIR
-    echo debEEE >> $OUTPUT_DIR/out_debug
     if [[ "$firebot_success" == "1" ]] ; then
 
 # copy repo manuals to Manuals directory only if firebot
-      echo debEEE000 >> $OUTPUT_DIR/out_debug
       rm -rf $MANUALS_DIR
-      echo debEEE111 >> $OUTPUT_DIR/out_debug
       cp -r $fdsrepo/Manuals $MANUALS_DIR
 
 # copy to a 2nd location that is accessible via cross mounts
-      echo debEEE222 >> $OUTPUT_DIR/out_debug
       if [ "$FIREBOT_MANUALS_DIR" != "" ]; then
-        echo debEEE333 >> $OUTPUT_DIR/out_debug
         if [ ! -d $FIREBOT_MANUALS_DIR ]; then
-          echo debEEE444 >> $OUTPUT_DIR/out_debug
           mkdir $FIREBOT_MANUALS_DIR
         fi
-        echo debEEE555 >> $OUTPUT_DIR/out_debug
         rm -rf $FIREBOT_MANUALS_DIR
-        echo debEEE666 >> $OUTPUT_DIR/out_debug
         cp -r $fdsrepo/Manuals $FIREBOT_MANUALS_DIR
       fi
 
-      echo debEEE777 >> $OUTPUT_DIR/out_debug
       cp $LATESTAPPS_DIR/FDS_REVISION $PUBS_DIR/FDS_REVISION
-      echo debEEE888 >> $OUTPUT_DIR/out_debug
       copy_fds_user_guide
-      echo debEEE999 >> $OUTPUT_DIR/out_debug
       copy_fds_verification_guide
-      echo debEEEaaa >> $OUTPUT_DIR/out_debug
       copy_fds_technical_guide
-      echo debEEEbbb >> $OUTPUT_DIR/out_debug
       copy_fds_validation_guide
-      echo debEEEccc >> $OUTPUT_DIR/out_debug
       copy_fds_Config_management_plan
-      echo debEEEddd >> $OUTPUT_DIR/out_debug
     fi
-    echo debFFF >> $OUTPUT_DIR/out_debug
   fi
 #fi
 
 ###*** archive apps
 
 copy_apps=
-echo debGGG >> $OUTPUT_DIR/out_debug
 get_firebot_success
-echo debHHH >> $OUTPUT_DIR/out_debug
 if [[ "$firebot_success" == "1" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
   copy_apps=1
 fi
-if [ "$BUILD_ONLY" == "1" ]; then
-  copy_apps=1
-fi
-echo debIII >> $OUTPUT_DIR/out_debug
 if [ "$copy_apps" == "1" ]; then
   rm -f $APPS_DIR/*
   cp $LATESTAPPS_DIR/* $APPS_DIR/.
@@ -3055,12 +2760,9 @@ if [ "$copy_apps" == "1" ]; then
   rm -f $BRANCHAPPS_DIR/*
   cp $LATESTAPPS_DIR/* $BRANCHAPPS_DIR/.
 
-  if [[ "$BUILD_ONLY" == "" ]]; then
-    rm -f $BRANCHPUBS_DIR/*
-    cp $PUBS_DIR/*       $BRANCHPUBS_DIR/.
-  fi
+  rm -f $BRANCHPUBS_DIR/*
+  cp $PUBS_DIR/*       $BRANCHPUBS_DIR/.
 fi
-echo debJJJ >> $OUTPUT_DIR/out_debug
 MANUALS_end=`GET_TIME`
 GET_DURATION $MANUALS_beg $MANUALS_end MANUALS
 SCRIPT_end=`GET_TIME`
@@ -3070,12 +2772,9 @@ GET_DURATION $SCRIPT_beg $SCRIPT_end SCRIPT
 
 set_files_world_readable
 save_build_status
-echo debKKK >> $OUTPUT_DIR/out_debug
-if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]  && [[ "$CHECK_CLUSTER" == "" ]]; then
+if [[ "$CHECK_CLUSTER" == "" ]]; then
   archive_timing_stats
 fi
-echo debLLL >> $OUTPUT_DIR/out_debug
 email_build_status 'Firebot'
-echo debMMM >> $OUTPUT_DIR/out_debug
 echo firebot exit status: $firebot_status
 exit $firebot_status
