@@ -11,6 +11,8 @@ else
   export intel_mpi_version=2025.0
   export mpi_version_linux=INTEL
 fi
+
+#define BUNDLE_MAILTO in .bashrc
 if [ "$BUNDLE_MAILTO" != "" ]; then
   MAILTO=$BUNDLE_MAILTO
 fi
@@ -88,6 +90,7 @@ CD_REPO ()
   fi
   return 0
 }
+
 #---------------------------------------------
 #                   update_repo
 #---------------------------------------------
@@ -182,12 +185,11 @@ esac
 done
 shift $(($OPTIND-1))
 
-# Linux or OSX
-JOPT="-J"
 if [ "`uname`" == "Darwin" ] ; then
   platform=osx
   JOPT=
 else
+  JOPT="-J"
   platform=lnx
 fi
 
@@ -255,12 +257,14 @@ if [ "$ECHO" == "" ]; then
   UPDATE_REPO webpages nist-pages || exit 1
 fi
 
+# clone fds and smv repos
 if [ "$BRANCH" == "nightly" ]; then
   cd $curdir
   ./clone_repo.sh -F -N -r $FDS_HASH
   ./clone_repo.sh -S -N -r $SMV_HASH
 fi
 
+#clone all repos except for bot
 if [ "$BRANCH" != "nightly" ]; then
   cd $curdir
   ./clone_all_repos.sh
