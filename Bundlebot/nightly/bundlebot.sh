@@ -50,8 +50,6 @@ echo "-g - upload installer file to a Github"
 echo "-h - display this message"
 echo "-v - show parameters used to build bundle (the bundle is not generated)"
 echo "-w - overwrite bundle (if it already exists) "
-echo "-x fds_revision - fds revision"
-echo "-y smv_revision - smv revision"
 echo "-X FDS_TAG - fds tag"
 echo "-Y SMV_TAG - smv tag"
 echo "   The -x and -y options are only used with the -R cloning option"
@@ -119,15 +117,14 @@ esac
 done
 shift $(($OPTIND-1))
 
-# prevent more than one instance of the make_bundle.sh script from running
-# at the same time
-
 if [ "$FDS_TAG" != "" ]; then
   FDS_REVISION=$FDS_TAG
 fi
 if [ "$SMV_TAG" != "" ]; then
   SMV_REVISION=$SMV_TAG
 fi
+
+# prevent more than one instance of the make_bundle.sh script from running at the same time
 
 LOCK_FILE=$HOME/.bundle/make_bundle_lock
 if [ "$FORCE" == "" ]; then
