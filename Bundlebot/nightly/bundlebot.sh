@@ -193,18 +193,14 @@ fi
 
 return_code=0
 if [[ "$showparms" == "" ]]; then
-  error_log=/tmp/error_log.$$
+  error_log=$SCRIPTDIR/output/error_nightly.log
   ./copy_pubs.sh fds $releasetype $SCRIPTDIR/pubs $GHOWNER $error_log || return_code=1
   ./copy_pubs.sh smv $releasetype $SCRIPTDIR/pubs $GHOWNER $error_log || return_code=1
 
-  ./copy_apps.sh fds $releasetype $SCRIPTDIR/apps                   $error_log || return_code=1
-  ./copy_apps.sh smv $releasetype $SCRIPTDIR/apps                   $error_log || return_code=1
- 
   if [ "$return_code" == "1" ]; then
     cat $error_log
     echo ""
     echo "bundle generation aborted"
-    rm $error_log
     rm -f $LOCK_FILE
     exit 1
   fi
