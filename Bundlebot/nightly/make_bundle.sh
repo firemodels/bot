@@ -66,8 +66,6 @@ if [ ! -e $APPS_DIR ]; then
   mkdir $APPS_DIR
 fi
 
-# this script is called by make_bundle.sh located in bot/Bundlebot/fds/linux or osx
-
 # -------------------- CP -------------------
 
 CP ()
@@ -136,9 +134,9 @@ UNTAR ()
   fi
 }
 
-# -------------------- CP2 -------------------
+# -------------------- CPPUB -------------------
 
-CP2 ()
+CPPUB ()
 {
   local FROMDIR=$1
   local FROMFILE=$2
@@ -476,14 +474,14 @@ fi
 echo ""
 echo "--- copying documentation ---"
 echo ""
-CP2 $GUIDE_DIR FDS_Config_Management_Plan.pdf    $bundledir/Documentation
-CP2 $GUIDE_DIR FDS_Technical_Reference_Guide.pdf $bundledir/Documentation
-CP2 $GUIDE_DIR FDS_User_Guide.pdf                $bundledir/Documentation
-CP2 $GUIDE_DIR FDS_Validation_Guide.pdf          $bundledir/Documentation
-CP2 $GUIDE_DIR FDS_Verification_Guide.pdf        $bundledir/Documentation
-CP2 $GUIDE_DIR SMV_User_Guide.pdf                $bundledir/Documentation
-CP2 $GUIDE_DIR SMV_Technical_Reference_Guide.pdf $bundledir/Documentation
-CP2 $GUIDE_DIR SMV_Verification_Guide.pdf        $bundledir/Documentation
+CPPUB $GUIDE_DIR FDS_Config_Management_Plan.pdf    $bundledir/Documentation
+CPPUB $GUIDE_DIR FDS_Technical_Reference_Guide.pdf $bundledir/Documentation
+CPPUB $GUIDE_DIR FDS_User_Guide.pdf                $bundledir/Documentation
+CPPUB $GUIDE_DIR FDS_Validation_Guide.pdf          $bundledir/Documentation
+CPPUB $GUIDE_DIR FDS_Verification_Guide.pdf        $bundledir/Documentation
+CPPUB $GUIDE_DIR SMV_User_Guide.pdf                $bundledir/Documentation
+CPPUB $GUIDE_DIR SMV_Technical_Reference_Guide.pdf $bundledir/Documentation
+CPPUB $GUIDE_DIR SMV_Verification_Guide.pdf        $bundledir/Documentation
 
 echo ""
 echo "--- copying release notes ---"
