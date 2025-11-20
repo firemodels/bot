@@ -1236,6 +1236,8 @@ scan_matlab_license_test()
 #                   check_matlab_license_server
 #---------------------------------------------
 
+#*** note to whoever removes matlab routines: also remove SKIPMATLAB variable from rest of firebot after matlab routines are removed
+
 check_matlab_license_server()
 {
    matlab -help  >& /tmp/matlabtest.$$
@@ -1868,9 +1870,6 @@ email_build_status()
    stop_time=`date`
    echo "" > $TIME_LOG
    echo "-------------------------------" >> $TIME_LOG
-   if [ "$BUILD_ONLY" == "1" ]; then
-     echo "build only apps"                                 >> $TIME_LOG
-   fi
    echo "host: $hostname "                                  >> $TIME_LOG
    echo "OS: $platform2 "                                   >> $TIME_LOG
    echo "repo: $repo "                                      >> $TIME_LOG
@@ -2131,8 +2130,6 @@ EXPBRANCH=master
 SMVBRANCH=master
 BOTBRANCH=master
 BRANCH=master
-BUILD_ONLY=
-MANUALS_MATLAB_ONLY=
 
 FDS_release_success=false
 
@@ -2173,7 +2170,6 @@ SMV_REVISION=
 INTEL=
 INTEL2=
 CLONE_REPOS=
-CLONE_FDSSMV=
 FDS_REV=origin/master
 SMV_REV=origin/master
 WEB_DIR=
@@ -2183,8 +2179,6 @@ UPDATED_WEB_IMAGES=
 FORCECLONE=
 
 SKIPMATLAB=
-SKIPPICTURES=
-SKIPRELEASE=
 FDS_TAG=
 SMV_TAG=
 VALIDATION=
@@ -2199,7 +2193,7 @@ FORCE_UPLOAD=
 CACHE_DIR=
 
 #*** parse command line arguments
-while getopts '3b:BcCdGJm:Mp:q:R:s:STuUV:x:X:y:Y:w:W:z' OPTION
+while getopts '3b:cCJm:p:q:R:s:uUV:w:W:z' OPTION
 do
 case $OPTION in
   3)
@@ -2216,22 +2210,11 @@ case $OPTION in
    CADBRANCH=$BRANCH
    EXPBRANCH=$BRANCH
    ;;
-  B)
-   BUILD_ONLY=1
-   ;;
   c)
    CLEANREPO=1
    ;;
   C)
    FORCECLONE="-C"
-   ;;
-  d)
-   SKIPRELEASE=1
-   SKIPMATLAB=1
-   SKIPPICTURES=1
-   ;;
-  G)
-   FORCE_UPLOAD=1
    ;;
   J)
    MPI_TYPE=impi
@@ -2239,9 +2222,6 @@ case $OPTION in
    ;;
   m)
    mailToFDS="$OPTARG"
-   ;;
-  M)
-   MANUALS_MATLAB_ONLY=1
    ;;
   p)
    PID_FILE="$OPTARG"
@@ -2255,13 +2235,6 @@ case $OPTION in
   s)
    CACHE_DIR="$OPTARG"
    ;;
-  S)
-   SKIPMATLAB=1
-   SKIPPICTURES=1
-   ;;
-  T)
-   CLONE_FDSSMV=1
-   ;;
   u)
    UPDATEREPO=1
    ;;
@@ -2269,33 +2242,12 @@ case $OPTION in
    UPLOADGUIDES=1
    ;;
   V)
-   
    VALIDATION="$OPTARG"
    if [ "$VALIDATION" == "all" ]; then
      CHECK_CLUSTER=
    else
      CHECK_CLUSTER=1
    fi
-   ;;
-  x)
-   FDS_REV="$OPTARG"
-   if [ "$FDS_REV" == "latest" ]; then
-     UPDATEREPO=1
-     FDS_REV=
-   fi
-   ;;
-  X)
-   FDS_TAG="$OPTARG"
-   ;;
-  y)
-   SMV_REV="$OPTARG"
-   if [ "$SMV_REV" == "latest" ]; then
-     UPDATEREPO=1
-     SMV_REV=
-   fi
-   ;;
-  Y)
-   SMV_TAG="$OPTARG"
    ;;
   w)
    WEB_DIR="$OPTARG"
@@ -2448,13 +2400,8 @@ if [[ "$CLONE_REPOS" != "" ]]; then
   if [ "$DISABLEPUSH" != "" ]; then
     DISABLEPUSH="-D"
   fi
-  if [ "$CLONE_FDSSMV" != "" ]; then
-   # only clone the fds and smv repos - used when just compiling the fds and smv apps
-    ./setup_repos.sh $FORCECLONE -T > $OUTPUT_DIR/stage1_clone 2>&1
-  else
    # clone all repos
     ./setup_repos.sh $FORCECLONE -F > $OUTPUT_DIR/stage1_clone 2>&1
-  fi
   if [ "$BUILD_3RD_PARTY" != "" ]; then
     echo removing hypre repo    >>   $OUTPUT_DIR/stage1_clone
     rm -rf $hyprerepo           >>   $OUTPUT_DIR/stage1_clone 2>&1
@@ -2607,9 +2554,6 @@ COPY_SMV_APPS=$botrepo/Firebot/copy_smv_apps.sh
 echo ""
 echo "Settings"
 echo "--------"
-if [ "$BUILD_ONLY" == "1" ]; then
-  echo "Only build apps"
-fi
 echo "     CAD repo/branch: $cadrepo/$CADBRANCH"
 echo "     EXP repo/branch: $exprepo/$EXPBRANCH"
 echo "     FDS repo/branch: $fdsrepo/$FDSBRANCH"
@@ -2623,12 +2567,6 @@ if [ "$IFORT_VERSION" != "" ]; then
 fi
 if [ "$C_VERSION" != "" ]; then
   echo "            C: $C_VERSION"
-fi
-if [ "$SKIPRELEASE" != "" ]; then
-  echo "     Skipping: release cases stage"
-fi
-if [ "$SKIPPICTURES" != "" ]; then
-  echo "     Skipping: picture generation stage"
 fi
 if [ "$SKIPMATLAB" != "" ]; then
   echo "     Skipping: matlab stage"
@@ -2644,9 +2582,7 @@ if [ "$UPDATEREPO" == "1" ]; then
 else
   echo " update repos: no"
 fi
-if [ "$BUILD_ONLY" == "" ]; then
   echo "        queue: $QUEUE"
-fi
 if [ "$WEB_DIR" != "" ]; then
   echo "      web dir: $WEB_DIR"
 fi
@@ -2669,14 +2605,10 @@ echo "Status"
 echo "------"
 if [[ "$CLONE_REPOS" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
   if [[ "$CLEANREPO" == "1" ]] ; then
-    if [ "$BUILD_ONLY" == "" ]; then
-      clean_repo2 exp $EXPBRANCH|| exit 1
-    fi
+    clean_repo2 exp $EXPBRANCH|| exit 1
     clean_repo2 fds $FDSBRANCH || exit 1
-    if [ "$BUILD_ONLY" == "" ]; then
-      clean_repo2 fig $FIGBRANCH     || exit 1
-      clean_repo2 out $OUTBRANCH || exit 1
-    fi 
+    clean_repo2 fig $FIGBRANCH     || exit 1
+    clean_repo2 out $OUTBRANCH || exit 1
     clean_repo2 smv $SMVBRANCH || exit 1
   fi
   ARCHIVE_REPO_SIZES=1
@@ -2698,7 +2630,7 @@ fi
       fi
     fi
 # we are not cloning fig, out and exp so update them
-    if [[ "$CLONE_REPOS" != "" ]] && [[ "$CLONE_FDSSMV" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+    if [[ "$CLONE_REPOS" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
       UPDATING=1
       echo Updating
       update_repo fig $FIGBRANCH || exit 1
@@ -2718,9 +2650,6 @@ if [[ "$CLONE_REPOS" == "" ]]; then
   if [[ "$CLEANREPO" == "" ]]; then
     CHECK_LINES=
   fi
-fi
-if [ "$BUILD_ONLY" == "1" ]; then
-  CHECK_LINES=
 fi
 
 # comment next line to turn on dos line ending checks
@@ -2747,9 +2676,7 @@ if [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
 
     check_CRLF
   else
-    if [ "$BUILD_ONLY" == "" ]; then
-      echo "DOS line endings only checked when cloning or cleaning repos"
-    fi
+    echo "DOS line endings only checked when cloning or cleaning repos"
   fi
 fi
 
@@ -2761,7 +2688,7 @@ fi
 get_fds_revision $FDSBRANCH || exit 1
 get_smv_revision $SMVBRANCH || exit 1
 get_bot_revision $BOTBRANCH || exit 1
-if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+if [[ "$CHECK_CLUSTER" == "" ]]; then
   get_exp_revision $EXPBRANCH     || exit 1
   get_fig_revision $FIGBRANCH     || exit 1
   get_out_revision $OUTBRANCH     || exit 1
@@ -2779,7 +2706,7 @@ rm /tmp/mailtest.$$
 # archive repo sizes
 # (only if the repos are cloned or cleaned)
 
-if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+if [[ "$CHECK_CLUSTER" == "" ]]; then
   if [ "$ARCHIVE_REPO_SIZES" == "1" ]; then
     archive_repo_sizes
   fi
@@ -2789,17 +2716,15 @@ check_git_checkout
 archive_compiler_version
 
 ### Stage 2a ###
-if [ "$MANUALS_MATLAB_ONLY" == "" ]; then
-  echo Building
-  echo "   FDS"
-fi
+echo Building
+echo "   FDS"
 SETUP_end=`GET_TIME`
 GET_DURATION $SETUP_beg $SETUP_end SETUP
 
 ###****** Stage 2b ###
 
 BUILD_beg=`GET_TIME`
-if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
+if [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
   compile_fds_mpi_db         $FDS_DB_DIR $FDS_DB_EXE
   check_compile_fds_mpi_db   $FDS_DB_DIR $FDS_DB_EXE
   compile_fds_mpi_db         $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
@@ -2808,14 +2733,14 @@ fi
 
 ###*** Stage 2d ###
 
-if [[ "$OPENMPI_GNU" != "" ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
+if [[ "$OPENMPI_GNU" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
   compile_fds_mpi_gnu_db       $FDSGNU_DB_DIR
   check_compile_fds_mpi_gnu_db
 fi
 
 ###*** Stage 2c ###
 
-if [[ "$SKIPRELEASE" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
+if [[ "$CACHE_DIR" == "" ]]; then
   compile_fds_mpi         $FDS_DIR $FDS_EXE
   check_compile_fds_mpi   $FDS_DIR $FDS_EXE
   compile_fds_mpi         $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
@@ -2824,26 +2749,26 @@ fi
 
 ###*** Stage 3a ###
 
-if [[ "$SKIPPICTURES" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+if [[ "$CHECK_CLUSTER" == "" ]]; then
   compile_smv_utilities
   check_smv_utilities
 fi
 
-if [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+if [[ "$CHECK_CLUSTER" == "" ]]; then
   cd $firebotdir
   $COPY_FDS_APPS > $OUTPUT_DIR/stage3d
 fi
 
 ###*** Stage 3b ###
 
-if [[ "$SKIPPICTURES" == "" ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+if [[ "$CHECK_CLUSTER" == "" ]]; then
   compile_smv_db
   check_compile_smv_db
 fi
 
 ###*** Stage 3c ###
 
-if [[ "$SKIPPICTURES" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+if [[ "$CHECK_CLUSTER" == "" ]]; then
   compile_smv
   check_compile_smv
   cd $firebotdir
@@ -2856,15 +2781,15 @@ GET_DURATION $BUILD_beg $BUILD_end BUILD
 
 DEBUG_beg=`GET_TIME`
 # Depends on successful FDS debug compile
-if [[ $FDS_debug_success ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
+if [[ $FDS_debug_success ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
    run_verification_cases_debug
    check_cases_debug $fdsrepo/$VERIFICATION_DEBUG 'verification'
 fi
 
-if [[ "$CLONE_REPOS" == "" ]] && [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
+if [[ "$CLONE_REPOS" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
 # clean debug stage (only if repos were not cloned)
   cd $fdsrepo
-  if [[ "$CLEANREPO" == "1" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
+  if [[ "$CLEANREPO" == "1" ]]; then
     echo "   cleaning Verification"
     clean_repo $fdsrepo/$VERIFICATION_DEBUG $FDSBRANCH || exit 1
   fi
@@ -2875,9 +2800,9 @@ GET_DURATION $DEBUG_beg $DEBUG_end DEBUG
 ###*** Stage 5 ###
 
 RELEASE_beg=`GET_TIME`
-if [[ "$BUILD_ONLY" == "" ]] && [[ "$CACHE_DIR" == "" ]];  then
+if [[ "$CACHE_DIR" == "" ]];  then
 # Depends on successful FDS compile
-  if [[ $FDS_release_success ]] && [[ "$SKIPRELEASE" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]; then
+  if [[ $FDS_release_success ]]; then
     run_VV_cases_release
 
 # this also checks restart cases (using same criteria)
@@ -2897,10 +2822,10 @@ GET_DURATION $RELEASE_beg $RELEASE_end RELEASE
 
 ###*** Stage 6 ###
 PICTURE_beg=`GET_TIME`
-#if [[ "$BUILD_ONLY" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+#if [[ "$CHECK_CLUSTER" == "" ]]; then
 
 ## Depends on successful SMV compile
-#  if [[ "$SKIPPICTURES" == "" ]] && [[ $smv_release_success ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]] ; then
+#  if [[ $smv_release_success ]]; then
 #    check_fds_pictures
 #    make_fds_summary
 #    MAKE_SUMMARY=1
@@ -3041,9 +2966,6 @@ echo debHHH >> $OUTPUT_DIR/out_debug
 if [[ "$firebot_success" == "1" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
   copy_apps=1
 fi
-if [ "$BUILD_ONLY" == "1" ]; then
-  copy_apps=1
-fi
 echo debIII >> $OUTPUT_DIR/out_debug
 if [ "$copy_apps" == "1" ]; then
   rm -f $APPS_DIR/*
@@ -3052,10 +2974,8 @@ if [ "$copy_apps" == "1" ]; then
   rm -f $BRANCHAPPS_DIR/*
   cp $LATESTAPPS_DIR/* $BRANCHAPPS_DIR/.
 
-  if [[ "$BUILD_ONLY" == "" ]]; then
-    rm -f $BRANCHPUBS_DIR/*
-    cp $PUBS_DIR/*       $BRANCHPUBS_DIR/.
-  fi
+  rm -f $BRANCHPUBS_DIR/*
+  cp $PUBS_DIR/*       $BRANCHPUBS_DIR/.
 fi
 echo debJJJ >> $OUTPUT_DIR/out_debug
 MANUALS_end=`GET_TIME`
@@ -3068,7 +2988,7 @@ GET_DURATION $SCRIPT_beg $SCRIPT_end SCRIPT
 set_files_world_readable
 save_build_status
 echo debKKK >> $OUTPUT_DIR/out_debug
-if [[ "$BUILD_ONLY" == "" ]] && [[ "$MANUALS_MATLAB_ONLY" == "" ]]  && [[ "$CHECK_CLUSTER" == "" ]]; then
+if [[ "$CHECK_CLUSTER" == "" ]]; then
   archive_timing_stats
 fi
 echo debLLL >> $OUTPUT_DIR/out_debug

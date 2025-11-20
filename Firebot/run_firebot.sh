@@ -27,36 +27,22 @@ if [ "$EMAIL" != "" ]; then
 else
   echo "-m email_address "
 fi
-echo "-M - only run matlab and build manuals stage"
 echo "-O - use OpenMPI version fds"
 echo "-P - remove run status (PID) file"
-echo "-d - only run cases in debug mode"
-echo "-N - skip matlab, pictures and manuals stages"
 echo "-U - upload guides (only by user firebot)"
 echo "-w webdir - copy firebot web summary to $WEB_ROOT/webdir"
 echo "-W webroot - root web directory [default: $WEB_ROOT]"
 echo ""
 echo "Build apps, set repo revisions"
-echo "-B - only build apps"
 echo "-C - when cloning repos proceed without giving a warning"
-echo "-D firebot is being run using old fds Build directory structure"
-echo "-F - clone repos using revisions from latest firebot pass"
-echo "-G - upload guides even if not firebot"
 echo "-o - specify GH_OWNER when uploading manuals. [default: $GH_OWNER]"
 echo "-r - specify GH_REPO when uploading manuals. [default: $GH_REPO]"
 echo "-R branch_name - clone fds, exp, fig, out and smv repos. fds and smv repos"
 echo "     will be checked out with a branch named 'branch_name'"
 echo "-s dir - use cached fds, Verification and Verification_dbg directories"
 echo "         located under the directory dir"
-echo "-T - only clone the fds and smv repos (this option is set by default when"
-echo "     only building apps (-B) and cloning repos (-R)"
 echo "-V option - if option is 'all' run all validation cases 1 time step, otherwise"
 echo "            run validation cases in fds/Validation/FDS_Val_Cases.sh 1 time step"
-echo "-x fds_rev - run firebot using the fds revision named fds_rev [default: origin/master]"
-echo "-X fds_tag - when cloning, tag the fds repo using fds_tag"
-echo "-y smv_rev - run firebot using the smv revision named smv_rev [default: origin/master]"
-echo "-Y smv_tag - when cloning, tag the smv repo using smv_tag"
-echo "   The -x and -y options are only used with the -R cloning option"
 echo "-z file - use revisions and tags in file to clone repos"
 }
 
@@ -194,36 +180,24 @@ CLEANREPO=
 RUNFIREBOT=1
 UPLOADGUIDES=
 FORCE=
-SKIPMATLAB=
 KILL_FIREBOT=
 export PREFIX=FB_
 ECHO=
 REMOVE_PID=
 CLONE_REPOS=
 CLONE_REPOS_ARG=
-CLONE_FDSSMV=
-BUILD_ONLY=
-FDS_REV=
-SMV_REV=
-FIREBOT_LATEST_PASS=
 WEB_DIR=
 WEB_ROOT=/var/www/html
 FORCECLONE=
-DEBUG_MODE=
 LOCAL=
-MANUALS_MATLAB_ONLY=
-FDS_TAG=
-SMV_TAG=
 VALIDATION=
-OPENMPTEST=
 CLONEFILE=
 BUILD_3RD_PARTY=
-FORCE_UPLOAD=
 CACHE_DIR=
 
 #*** parse command line options
 
-while getopts '3bBcCdDfFhGHJkm:MnNo:OPq:r:R:s:TuUvV:w:W:x:X:y:Y:z' OPTION
+while getopts '3bcCfhHJkm:no:OPq:r:R:s:uUvV:w:W:Y:z' OPTION
 do
 case $OPTION  in
   3)
@@ -232,29 +206,14 @@ case $OPTION  in
   b)
    BRANCH=current
    ;;
-  B)
-   BUILD_ONLY="-B"
-   ;;
   c)
    CLEANREPO="-c"
    ;;
   C)
    FORCECLONE="-C"
    ;;
-  d)
-   DEBUG_MODE="-d"
-   ;;
-  D)
-   OPENMPTEST=-D
-   ;;
   f)
    FORCE=1
-   ;;
-  F)
-   FIREBOT_LATEST_PASS=1
-   ;;
-  G)
-   FORCE_UPLOAD=-G
    ;;
   h)
    usage;
@@ -271,14 +230,8 @@ case $OPTION  in
   m)
    EMAIL="$OPTARG"
    ;;
-  M)
-   MANUALS_MATLAB_ONLY=-M
-   ;;
   n)
    UPDATEREPO=
-   ;;
-  N)
-   SKIPMATLAB=-S
    ;;
   o)
    export GH_OWNER="$OPTARG"
@@ -302,9 +255,6 @@ case $OPTION  in
   s)
    CACHE_DIR="-s $OPTARG"
    ;;
-  T)
-    CLONE_FDSSMV="-T"
-   ;;
   u)
    UPDATEREPO="-u"
    ;;
@@ -324,18 +274,6 @@ case $OPTION  in
   W)
    WEB_ROOT="$OPTARG"
    ;;
-  x)
-   FDS_REV="-x $OPTARG"
-   ;;
-  X)
-   FDS_TAG="-X $OPTARG"
-   ;;
-  y)
-   SMV_REV="-y $OPTARG"
-   ;;
-  Y)
-   SMV_TAG="-Y $OPTARG"
-   ;;
   z)
    CLONEFILE="-z"
    ;;
@@ -352,18 +290,6 @@ if [ "$VALIDATION" != "" ]; then
 fi
 
 CLONE_REPOS_ARG=$CLONE_REPOS
-if [ "$FDS_REV" == "" ]; then
-  SMV_REV=
-fi
-if [ "$SMV_REV" == "" ]; then
-  FDS_REV=
-fi
-
-if [ "$BUILD_ONLY" != "" ]; then
-  if [ "$CLONE_REPOS" != "" ]; then
-    CLONE_FDSSMV="-T"
-  fi
-fi
 
 if [ "$WEB_DIR" != "" ]; then
   WEB_DIR="-w $WEB_DIR"
@@ -376,43 +302,6 @@ if [ "$WEB_ROOT" != "" ]; then
   fi
 fi
 
-# sync fds and smv repos with the the repos used in the last successful firebot run
-
-GET_HASH=
-if [ "$FIREBOT_LATEST_PASS" != "" ]; then
-  GET_HASH=1
-fi
-
-if [ "$FDS_REV" != "" ]; then
-  GET_HASH=
-fi
-if [ "$GET_HASH" != "" ]; then
-  if [ "$CLONE_REPOS" == "" ]; then
-    echo "***error: The -g and -G options for specifying firebot host/home directory can only be used"
-    echo "          when cloning the repos, when the -R option is used"
-    exit 1
-  fi
-  ./getGHfile.sh     FDS_INFO.txt
-  FDS_HASH=`grep FDS_HASH  FDS_INFO.txt | awk '{print $2}'`
-  SMV_HASH=`grep SMV_HASH  FDS_INFO.txt | awk '{print $2}'`
-  FDS_REVISION=`grep FDS_REVISION  FDS_INFO.txt | awk '{print $2}'`
-  SMV_REVISION=`grep SMV_REVISION  FDS_INFO.txt | awk '{print $2}'`
-  ABORT=
-  if [ "$FDS_HASH" == "" ]; then
-    ABORT=1
-  fi
-  if [ "$SMV_HASH" == "" ]; then
-    ABORT=1
-  fi
-  if [ "$ABORT" != "" ]; then
-    echo "***error: the fds and/or smv repo hash could not be found at"
-    echo "          github.com/$GH_OWNER/$GH_REPO tag: $GH_FDS_TAG"
-    exit 1
-  fi
-  FDS_REV="-x $FDS_HASH"
-  SMV_REV="-y $SMV_HASH"
-fi
-
 # warn user (if not the firebot user) if using the clone option
 
 if [ "$RUNFIREBOT" != "" ]; then
@@ -423,11 +312,7 @@ if [ "$RUNFIREBOT" != "" ]; then
       else
         YOUARE="You are erasing and cloning "
       fi
-      if [ "$CLONE_FDSSMV" == "" ]; then
-        echo "$YOUARE the fds, exp, fig, out and smv repos."
-      else
-        echo "$YOUARE the fds and smv repos"
-      fi
+      echo "$YOUARE the fds, exp, fig, out and smv repos."
       if [ "$FORCECLONE" == "" ]; then
         echo "Press any key to continue or <CTRL> c to abort."
         echo "Type $0 -h for other options"
@@ -531,12 +416,7 @@ if [ "$UPDATEREPO" == "" ]; then
 else
   echo "update repos: yes"
 fi
-if [ "$BUILD_ONLY" == "" ]; then
-  echo "  Build only: no"
   echo "       Queue: $QUEUE"
-else
-  echo "  Build only: yes"
-fi
 if [ "$INTEL" == "" ]; then
   echo "   INTEL mpi: no"
 else
@@ -562,11 +442,7 @@ if [ "$CLONE_REPOS_ARG" != "" ]; then
     echo "  smv branch: $CLONE_REPOS_ARG"
 fi
 if [ "$CLONE_REPOS" != "" ]; then
-  if [ "$CLONE_FDSSMV" == "" ]; then
-    echo "       Clone: fds, exp, fig, out and smv repos."
-  else
-    echo "       Clone: fds and smv repos"
-  fi
+  echo "       Clone: fds, exp, fig, out and smv repos."
 fi
 
 # if cloning repos, only update and clean bot repo (which has already been done)
@@ -580,7 +456,7 @@ else
 fi
 touch $firebot_pid
 firebot_status=0
-$ECHO  ./firebot.sh -p $firebot_pid $BUILD_3RD_PARTY $UPDATEREPO $INTEL $CACHE_DIR $OPENMPTEST $BUILD_ONLY $FORCE_UPLOAD $FORCECLONE $BRANCH $DEBUG_MODE $MANUALS_MATLAB_ONLY $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $UPLOADGUIDES $CLEANREPO $QUEUE $SKIPMATLAB $CLONE_REPOS $CLONE_FDSSMV $VALIDATION $CLONEFILE $EMAIL $WEB_ROOT $WEB_DIR "$@"
+$ECHO  ./firebot.sh -p $firebot_pid $BUILD_3RD_PARTY $UPDATEREPO $INTEL $CACHE_DIR $FORCECLONE $BRANCH $UPLOADGUIDES $CLEANREPO $QUEUE $CLONE_REPOS $VALIDATION $CLONEFILE $EMAIL $WEB_ROOT $WEB_DIR "$@"
 firebot_status=$?
 if [ -e $firebot_pid ]; then
   rm -f $firebot_pid
