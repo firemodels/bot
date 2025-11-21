@@ -3,6 +3,14 @@
 # The Firebot script is part of an automated continuous integration system.
 # Consult the FDS Config Management Plan for more information.
 
+# stage 0 - start
+# stage 1 - setup repos
+# stage 2 - build software
+# stage 3 - run cases
+# stage 4 - perform verification, generate plots/images
+# stage 5 - build manuals
+# stage 6 - wrapup, report results
+
 #---------------------------------------------
 #                   CHK_REPO
 #---------------------------------------------
@@ -397,11 +405,11 @@ compile_fds_mpi_db()
    echo "      MPI $MPTYPE Intel debug"
    cd $FDSDIR
    make -f ../makefile clean &> /dev/null
-   ./make_fds.sh &> $OUTPUT_DIR/stage2_fds${MPTYPE}_dbg
+   ./make_fds.sh &> $OUTPUT_DIR/stage2_build_fds${MPTYPE}_debug
    if [ ! -x $FDSEXE ]; then
      cd $FDSDIR
      make -f ../makefile clean &> /dev/null
-     ./make_fds.sh &> $OUTPUT_DIR/stage2_fds${MPTYPE}_dbg
+     ./make_fds.sh &> $OUTPUT_DIR/stage2_build_fds${MPTYPE}_debug
    fi
 }
 
@@ -425,7 +433,7 @@ check_compile_fds_mpi_db()
   else
      echo "Errors from Stage 2b$MPTYPE - Compile FDS MPI$MPTYPE debug:"   >> $ERROR_LOG
      echo "The program $FDSEXE failed to build."                          >> $ERROR_LOG
-     cat $OUTPUT_DIR/stage2_fds${MPTYPE}_dbg                              >> $ERROR_LOG
+     cat $OUTPUT_DIR/stage2_build_fds${MPTYPE}_debug                      >> $ERROR_LOG
      echo ""                                                              >> $ERROR_LOG
   fi
 
@@ -433,7 +441,7 @@ check_compile_fds_mpi_db()
 
   START_LINE="Building impi_intel_linux"
   # The awk search for a line starting with Building impi_intel_linux* (either _db or _openmp_db)
-  if [[ $(awk -v start="$START_LINE" '$0 ~ "^"start".*db$" {found=1; next} found' "$OUTPUT_DIR/stage2_fds${MPTYPE}_dbg" | \
+  if [[ $(awk -v start="$START_LINE" '$0 ~ "^"start".*db$" {found=1; next} found' "$OUTPUT_DIR/stage2_build_fds${MPTYPE}_debug" | \
         grep -E -i 'warning|remark' | \
         grep -v -e mpiifort -e mpiifx -e 'no platform load command' -e 'pointer not aligned at address' \
                 -e ipo -e Referenced -e atom -e 'is now deprecated' -e 'feupdateenv is not implemented') == "" ]]; then
@@ -441,7 +449,7 @@ check_compile_fds_mpi_db()
 	:
   else
         echo "Warnings from Stage 2b - Compile FDS MPI debug:" >> "$WARNING_LOG"
-        awk -v start="$START_LINE" '$0 ~ "^"start".*db$" {found=1; next} found' "$OUTPUT_DIR/stage2_fds${MPTYPE}_dbg" | \
+        awk -v start="$START_LINE" '$0 ~ "^"start".*db$" {found=1; next} found' "$OUTPUT_DIR/stage2_build_fds${MPTYPE}_debug" | \
          grep -A 5 -E -i 'warning|remark' | \
          grep -v -e mpiifort -e mpiifx -e 'no platform load command' -e 'pointer not aligned at address' \
             -e ipo -e Referenced -e atom -e 'is now deprecated' -e 'feupdateenv is not implemented' >> "$WARNING_LOG"
@@ -468,7 +476,7 @@ compile_fds_mpi_gnu_db()
     compile_gnu=1
     cd $FDSDIR
     make -f ../makefile clean &> /dev/null
-    ./make_fds.sh &> $OUTPUT_DIR/stage2_fdsgnu_dbg
+    ./make_fds.sh &> $OUTPUT_DIR/stage2_build_fdsgnu_debug
     module unload $OPENMPI_GNU
     module unload $GFORTRAN
   fi
@@ -498,7 +506,7 @@ wait_cases_debug_end()
    then
      while [[          `ps -u $USER -f | fgrep .fds | grep -v firebot | grep -v grep` != '' ]]; do
         JOBS_REMAINING=`ps -u $USER -f | fgrep .fds | grep -v firebot | grep -v grep | wc -l`
-        echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage3_run_dbg
+        echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage3_run_debug_ver
         TIME_LIMIT_STAGE="3"
         check_time_limit
         sleep 30
@@ -506,7 +514,7 @@ wait_cases_debug_end()
    else
      while          [[ `squeue | awk '{print $3 $4 $5}' | grep $(whoami) | grep $JOBPREFIX_DEBUG | grep -v 'CG$'` != '' ]]; do
         JOBS_REMAINING=`squeue | awk '{print $3 $4 $5}' | grep $(whoami) | grep $JOBPREFIX_DEBUG | grep -v 'CG$' | wc -l`
-        echo "Waiting for ${JOBS_REMAINING} ${1} cases to complete." >> $OUTPUT_DIR/stage3_run_dbg
+        echo "Waiting for ${JOBS_REMAINING} ${1} cases to complete." >> $OUTPUT_DIR/stage3_run_debug_ver
         TIME_LIMIT_STAGE="3"
         check_time_limit
         sleep 30
@@ -525,16 +533,16 @@ run_verification_cases_debug()
    # Run FDS with delayed stop files (with 1 OpenMP thread and 1 iteration)
    echo "Running FDS Verification Cases"
    echo "   debug"
-   echo "Running FDS verification cases:"                                >> $OUTPUT_DIR/stage3_run_dbg 2>&1
-   echo ./Run_FDS_Cases.sh -d -m 1 $INTEL2 -q $QUEUE -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage3_run_dbg 2>&1
-        ./Run_FDS_Cases.sh -d -m 1 $INTEL2 -q $QUEUE -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage3_run_dbg 2>&1
-   echo ""                                                               >> $OUTPUT_DIR/stage3_run_dbg 2>&1
+   echo "Running FDS verification cases:"                                >> $OUTPUT_DIR/stage3_run_debug_ver 2>&1
+   echo ./Run_FDS_Cases.sh -d -m 1 $INTEL2 -q $QUEUE -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage3_run_debug_ver 2>&1
+        ./Run_FDS_Cases.sh -d -m 1 $INTEL2 -q $QUEUE -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage3_run_debug_ver 2>&1
+   echo ""                                                               >> $OUTPUT_DIR/stage3_run_debug_ver 2>&1
 
    # Wait for all verification cases to end
    wait_cases_debug_end 'verification'
 
 #  check whether cases have run
-   ./Run_FDS_Cases.sh -C                                  -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage3_run_dbg 2>&1
+   ./Run_FDS_Cases.sh -C                                  -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage3_run_debug_ver 2>&1
 
    # Remove all .stop files from Verification directories (recursively)
    if [ "$CLONE_REPOS" == "" ]; then
@@ -555,7 +563,7 @@ check_cases_debug()
    # Scan for and report any errors in FDS cases
    cd $dir
 
-   if [[ `grep 'Run aborted'     $OUTPUT_DIR/stage3_run_dbg | grep -v grep`                == "" ]] && \
+   if [[ `grep 'Run aborted'     $OUTPUT_DIR/stage3_run_debug_ver | grep -v grep`                == "" ]] && \
       [[ `grep Segmentation      */*.err            | grep -v grep`                == "" ]] && \
       [[ `grep ERROR:        */*.err | grep -v grep | grep -v geom_bad `           == "" ]] && \
       [[ `grep ERROR:            */*.out            | grep -v grep | grep -v echo` == "" ]] && \
@@ -564,21 +572,21 @@ check_cases_debug()
    then
       cases_debug_success=true
    else
-      grep 'Run aborted'          $OUTPUT_DIR/stage3_run_dbg | grep -v grep        >> $OUTPUT_DIR/stage3_run_dbg_errors
-      grep Segmentation           */*.err            | grep -v grep                >> $OUTPUT_DIR/stage3_run_dbg_errors
-      grep ERROR:            */*.err  | grep -v grep | grep -v geom_bad            >> $OUTPUT_DIR/stage3_run_dbg_errors
-      grep ERROR:                 */*.out            | grep -v grep | grep -v echo >> $OUTPUT_DIR/stage3_run_dbg_errors
-      grep -A 2 'BAD TERMINATION' */*.log            | grep -v grep                >> $OUTPUT_DIR/stage3_run_dbg_errors
-      grep -A 20 forrtl           */*.err            | grep -v grep                >> $OUTPUT_DIR/stage3_run_dbg_errors
+      grep 'Run aborted'          $OUTPUT_DIR/stage3_run_debug_ver | grep -v grep  >> $OUTPUT_DIR/stage3_run_debug_ver_errors
+      grep Segmentation           */*.err            | grep -v grep                >> $OUTPUT_DIR/stage3_run_debug_ver_errors
+      grep ERROR:            */*.err  | grep -v grep | grep -v geom_bad            >> $OUTPUT_DIR/stage3_run_debug_ver_errors
+      grep ERROR:                 */*.out            | grep -v grep | grep -v echo >> $OUTPUT_DIR/stage3_run_debug_ver_errors
+      grep -A 2 'BAD TERMINATION' */*.log            | grep -v grep                >> $OUTPUT_DIR/stage3_run_debug_ver_errors
+      grep -A 20 forrtl           */*.err            | grep -v grep                >> $OUTPUT_DIR/stage3_run_debug_ver_errors
 
       echo "Errors from Stage 4 - Run ${2} cases - debug mode:" >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage3_run_dbg_errors >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage3_run_debug_ver_errors >> $ERROR_LOG
       echo "" >> $ERROR_LOG
 
-# copy casename.err to casename.err_stage3_run_dbg for any cases that had errors
-      echo "#/bin/bash" > $OUTPUT_DIR/stage3_run_dbg_filelist
+# copy casename.err to casename.err_stage3_run_debug_ver for any cases that had errors
+      echo "#/bin/bash" > $OUTPUT_DIR/stage3_run_debug_ver_filelist
 # comment out following line until verified that it works
-#      grep err: $OUTPUT_DIR/stage3_run_dbg_errors | awk -F':' '{ print "cp " $1 " /tmp/."}'  | sort -u >> $OUTPUT_DIR/stage3_run_dbg_filelist
+#      grep err: $OUTPUT_DIR/stage3_run_debug_ver_errors | awk -F':' '{ print "cp " $1 " /tmp/."}'  | sort -u >> $OUTPUT_DIR/stage3_run_debug_ver_filelist
       cd $fdsrepo/$VERIFICATION_DEBUG
    fi
 }
@@ -599,11 +607,11 @@ compile_fds_mpi()
   echo "      MPI $MPTYPE Intel release"
   cd $FDSDIR
   make -f ../makefile clean &> /dev/null
-  ./make_fds.sh &> $OUTPUT_DIR/stage2_fds${MPTYPE}_rls
+  ./make_fds.sh &> $OUTPUT_DIR/stage2_build_fds${MPTYPE}_release
   if [ ! -x $FDSEXE ]; then
     cd $FDSDIR
     make -f ../makefile clean &> /dev/null
-    ./make_fds.sh &> $OUTPUT_DIR/stage2_fds${MPTYPE}_rls
+    ./make_fds.sh &> $OUTPUT_DIR/stage2_build_fds${MPTYPE}_release
   fi
 }
 
@@ -628,20 +636,20 @@ check_compile_fds_mpi()
   else
      echo "Errors from Stage 2c - Compile FDS MPI${MPTYPE} release:" >> $ERROR_LOG
      echo "The program $FDSEXE failed to build."                     >> $ERROR_LOG
-     cat $OUTPUT_DIR/stage2_fds${MPTYPE}_rls                         >> $ERROR_LOG
+     cat $OUTPUT_DIR/stage2_build_fds${MPTYPE}_release                         >> $ERROR_LOG
      echo ""                                                         >> $ERROR_LOG
   fi
 
   # Check for compiler warnings/remarks
   # 'performing multi-file optimizations' and 'generating object file' are part of a normal compile
   # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-  if [[ `grep -E -i 'warning|remark' $OUTPUT_DIR/stage2_fds${MPTYPE}_rls | grep -v 'no platform load command' | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'` == "" ]]
+  if [[ `grep -E -i 'warning|remark' $OUTPUT_DIR/stage2_build_fds${MPTYPE}_release | grep -v 'no platform load command' | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'` == "" ]]
   then
      # Continue along
      :
   else
      echo "Warnings from Stage 2c - Compile FDS MPI release:" >> $WARNING_LOG
-     grep -A 5 -E -i 'warning|remark' $OUTPUT_DIR/stage2_fds${MPTYPE}_rls | grep -v 'no platform load command' | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file' >> $WARNING_LOG
+     grep -A 5 -E -i 'warning|remark' $OUTPUT_DIR/stage2_build_fds${MPTYPE}_release | grep -v 'no platform load command' | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file' >> $WARNING_LOG
      echo "" >> $WARNING_LOG
   fi
 }
@@ -693,49 +701,49 @@ compile_smv_utilities()
   echo "   Smokeview"
   echo "      libraries"
   cd $smvrepo/Build/LIBS/${SMVCOMPILER}_${platform}${smvsize}
-  ./make_LIBS.sh >> $OUTPUT_DIR/stage2_smvutil 2>&1
-  echo "" >> $OUTPUT_DIR/stage2_smvutil 2>&1
+  ./make_LIBS.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
+  echo "" >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
     
 # smokezip:
   echo "      smokezip"
   cd $smvrepo/Build/smokezip/${SMVCOMPILER}_${platform}${smvsize}
   rm -f *.o smokezip_${platform}${smvsize}
 
-  ./make_smokezip.sh >> $OUTPUT_DIR/stage2_smvutil 2>&1
+  ./make_smokezip.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
   CP smokezip_${platform}${smvsize} $LATESTAPPS_DIR/smokezip
-  echo "" >> $OUTPUT_DIR/stage2_smvutil 2>&1
+  echo "" >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
 
 # smokediff:
   echo "      smokediff"
   cd $smvrepo/Build/smokediff/${SMVCOMPILER}_${platform}${smvsize}
   rm -f *.o smokediff_${platform}${smvsize}
-  ./make_smokediff.sh >> $OUTPUT_DIR/stage2_smvutil 2>&1
+  ./make_smokediff.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
   CP smokediff_${platform}${smvsize} $LATESTAPPS_DIR/smokediff
-  echo "" >> $OUTPUT_DIR/stage2_smvutil 2>&1
+  echo "" >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
 
 # background
   echo "      background"
   cd $smvrepo/Build/background/${SMVCOMPILER}_${platform}${smvsize}
   rm -f *.o background_${platform}${smvsize}
-  ./make_background.sh >> $OUTPUT_DIR/stage2_smvutil 2>&1
+  ./make_background.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
   CP background_${platform}${smvsize} $LATESTAPPS_DIR/background
 
 # wind2fds:
   echo "      wind2fds"
   cd $smvrepo/Build/wind2fds/${SMVCOMPILER}_${platform}${smvsize}
   rm -f *.o wind2fds_${platform}${smvsize}
-  ./make_wind2fds.sh >> $OUTPUT_DIR/stage2_smvutil 2>&1
+  ./make_wind2fds.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
   CP wind2fds_${platform}${smvsize} $LATESTAPPS_DIR/wind2fds
- echo "" >> $OUTPUT_DIR/stage2_smvutil 2>&1
+ echo "" >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
 
 # fds2fed
   if [ -d $smvrepo/Build/fds2fed/${SMVCOMPILER}_${platform}${smvsize} ]; then
     echo "      fds2fed"
     cd $smvrepo/Build/fds2fed/${SMVCOMPILER}_${platform}${smvsize}
     rm -f *.o fds2fed_${platform}${smvsize}
-    ./make_fds2fed.sh >> $OUTPUT_DIR/stage2_smvutil 2>&1
+    ./make_fds2fed.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
     CP fds2fed_${platform}${smvsize} $LATESTAPPS_DIR/fds2fed
-    echo "" >> $OUTPUT_DIR/stage2_smvutil 2>&1
+    echo "" >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
   fi
 
 # pnginfo
@@ -743,8 +751,8 @@ compile_smv_utilities()
     echo "      pnginfo"
     cd $smvrepo/Build/pnginfo/${SMVCOMPILER}_${platform}${smvsize}
     rm -f *.o pnginfo_${platform}${smvsize}
-    echo 'Compiling pnginfo:' >> $OUTPUT_DIR/stage2_smvutil 2>&1
-    ./make_pnginfo.sh >> $OUTPUT_DIR/stage2_smvutil 2>&1
+    echo 'Compiling pnginfo:' >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
+    ./make_pnginfo.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
     cp pnginfo_${platform}${smvsize} $LATESTAPPS_DIR/pnginfo
   fi
 
@@ -752,17 +760,17 @@ compile_smv_utilities()
   echo "      fds2ascii"
   cd $fdsrepo/Utilities/fds2ascii/${COMPILER}_${platform}${size}
   rm -f *.o fds2ascii_${platform}${size}
-  ./make_fds2ascii.sh >> $OUTPUT_DIR/stage2_smvutil 2>&1
+  ./make_fds2ascii.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
   cp fds2ascii_${COMPILER}_${platform}${size} $LATESTAPPS_DIR/fds2ascii
-  echo "" >> $OUTPUT_DIR/stage2_fdsutil 2>&1
+  echo "" >> $OUTPUT_DIR/stage2_build_fdsutil 2>&1
 
 # test_mpi
   echo "      test_mpi"
   cd $fdsrepo/Utilities/test_mpi/${MPI_TYPE}_${COMPILER}_${platform}
   rm -f *.o test_mpi
-  ./make_test_mpi.sh >> $OUTPUT_DIR/stage2_smvutil 2>&1
+  ./make_test_mpi.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
   cp test_mpi $LATESTAPPS_DIR/test_mpi
-  echo "" >> $OUTPUT_DIR/stage2_smvutil 2>&1
+  echo "" >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
 }
 
 #---------------------------------------------
@@ -786,8 +794,8 @@ check_verification_cases_release()
    # Scan for and report any errors in FDS cases
    cd $dir
 
-   if [[ `grep 'Run aborted'            $OUTPUT_DIR/stage3_run_rls  | grep -v grep`                    == "" ]] && \
-      [[ `grep 'ERROR'                  $OUTPUT_DIR/stage3_run_rls  | grep -v geom_bad | grep -v grep` == "" ]] && \
+   if [[ `grep 'Run aborted'            $OUTPUT_DIR/stage3_run_release_ver_ver  | grep -v grep`                    == "" ]] && \
+      [[ `grep 'ERROR'                  $OUTPUT_DIR/stage3_run_release_ver_ver  | grep -v geom_bad | grep -v grep` == "" ]] && \
       [[ `grep Segmentation             */*.err             | grep -v grep`                    == "" ]] && \
       [[ `grep ERROR:                   */*.err             | grep -v grep | grep -v geom_bad` == "" ]] && \
       [[ `grep ERROR:                   */*.out             | grep -v grep | grep -v echo`     == "" ]] && \
@@ -796,16 +804,16 @@ check_verification_cases_release()
    then
       cases_debug_success=true
    else
-      grep 'Run aborted'                $OUTPUT_DIR/stage3_run_rls  | grep -v grep                    >> $OUTPUT_DIR/stage3_run_rls_errors
-      grep 'ERROR'                      $OUTPUT_DIR/stage3_run_rls  | grep -v geom_bad | grep -v grep >> $OUTPUT_DIR/stage3_run_rls_errors
-      grep Segmentation                 */*.err             | grep -v grep                    >> $OUTPUT_DIR/stage3_run_rls_errors
-      grep ERROR:                       */*.err             | grep -v grep | grep -v geom_bad >> $OUTPUT_DIR/stage3_run_rls_errors
-      grep ERROR:                       */*.out             | grep -v grep | grep -v echo     >> $OUTPUT_DIR/stage3_run_rls_errors
-      grep -A 2 'BAD TERMINATION'       */*.log             | grep -v grep                    >> $OUTPUT_DIR/stage3_run_rls_errors
-      grep -A 20 forrtl                 */*.err             | grep -v grep                    >> $OUTPUT_DIR/stage3_run_rls_errors
+      grep 'Run aborted'                $OUTPUT_DIR/stage3_run_release_ver_ver  | grep -v grep                    >> $OUTPUT_DIR/stage3_run_release_ver_ver_errors
+      grep 'ERROR'                      $OUTPUT_DIR/stage3_run_release_ver_ver  | grep -v geom_bad | grep -v grep >> $OUTPUT_DIR/stage3_run_release_ver_errors
+      grep Segmentation                 */*.err             | grep -v grep                    >> $OUTPUT_DIR/stage3_run_release_ver_errors
+      grep ERROR:                       */*.err             | grep -v grep | grep -v geom_bad >> $OUTPUT_DIR/stage3_run_release_ver_errors
+      grep ERROR:                       */*.out             | grep -v grep | grep -v echo     >> $OUTPUT_DIR/stage3_run_release_ver_errors
+      grep -A 2 'BAD TERMINATION'       */*.log             | grep -v grep                    >> $OUTPUT_DIR/stage3_run_release_ver_errors
+      grep -A 20 forrtl                 */*.err             | grep -v grep                    >> $OUTPUT_DIR/stage3_run_release_ver_errors
 
-      echo "Errors from Stage 5 - Run ${2} cases - release mode:" >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage3_run_rls_errors                       >> $ERROR_LOG
+      echo "Errors from Stage 3 - Run ${2} cases - release mode:" >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage3_run_release_ver_errors               >> $ERROR_LOG
       echo ""                                                     >> $ERROR_LOG
    fi
 }
@@ -822,8 +830,8 @@ check_validation_cases_release()
    # Scan for and report any errors in FDS cases
    cd $dir
 
-   if [[ `grep 'Run aborted'            $OUTPUT_DIR/stage3_run_val | grep -v grep`                    == "" ]] && \
-      [[ `grep 'ERROR'                  $OUTPUT_DIR/stage3_run_val | grep -v geom_bad | grep -v grep` == "" ]] && \
+   if [[ `grep 'Run aborted'            $OUTPUT_DIR/stage3_run_release_val | grep -v grep`                    == "" ]] && \
+      [[ `grep 'ERROR'                  $OUTPUT_DIR/stage3_run_release_val | grep -v geom_bad | grep -v grep` == "" ]] && \
       [[ `grep Segmentation             */$subdir/*.err     | grep -v grep`                    == "" ]] && \
       [[ `grep ERROR:                   */$subdir/*.err     | grep -v grep | grep -v geom_bad` == "" ]] && \
       [[ `grep ERROR:                   */$subdir/*.out     | grep -v grep     | grep -v echo` == "" ]] && \
@@ -832,16 +840,16 @@ check_validation_cases_release()
    then
       cases_debug_success=true
    else
-      grep 'Run aborted'                $OUTPUT_DIR/stage3_run_val | grep -v grep                    >> $OUTPUT_DIR/stage3_run_val_errors
-      grep 'ERROR'                      $OUTPUT_DIR/stage3_run_val | grep -v geom_bad | grep -v grep >> $OUTPUT_DIR/stage3_run_val_errors
-      grep Segmentation                 */$subdir//*.err    | grep -v grep                    >> $OUTPUT_DIR/stage3_run_val_errors
-      grep ERROR:                       */$subdir//*.err    | grep -v grep | grep -v geom_bad >> $OUTPUT_DIR/stage3_run_val_errors
-      grep ERROR:                       */$subdir/*.out     | grep -v grep     | grep -v echo >> $OUTPUT_DIR/stage3_run_val_errors
-      grep -A 2 'BAD TERMINATION'       */$subdir/*.log     | grep -v grep                    >> $OUTPUT_DIR/stage3_run_val_errors
-      grep -A 20 forrtl                 */$subdir/*.err     | grep -v grep                    >> $OUTPUT_DIR/stage3_run_val_errors
+      grep 'Run aborted'                $OUTPUT_DIR/stage3_run_release_val | grep -v grep                    >> $OUTPUT_DIR/stage3_run_release_val_errors
+      grep 'ERROR'                      $OUTPUT_DIR/stage3_run_release_val | grep -v geom_bad | grep -v grep >> $OUTPUT_DIR/stage3_run_release_val_errors
+      grep Segmentation                 */$subdir//*.err    | grep -v grep                    >> $OUTPUT_DIR/stage3_run_release_val_errors
+      grep ERROR:                       */$subdir//*.err    | grep -v grep | grep -v geom_bad >> $OUTPUT_DIR/stage3_run_release_val_errors
+      grep ERROR:                       */$subdir/*.out     | grep -v grep     | grep -v echo >> $OUTPUT_DIR/stage3_run_release_val_errors
+      grep -A 2 'BAD TERMINATION'       */$subdir/*.log     | grep -v grep                    >> $OUTPUT_DIR/stage3_run_release_val_errors
+      grep -A 20 forrtl                 */$subdir/*.err     | grep -v grep                    >> $OUTPUT_DIR/stage3_run_release_val_errors
 
-      echo "Errors from Stage 5b - Run ${2} cases - release mode:" >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage3_run_val_errors                               >> $ERROR_LOG
+      echo "Errors from Stage 3 - Run ${2} cases - release mode:"  >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage3_run_release_val_errors                >> $ERROR_LOG
       echo ""                                                      >> $ERROR_LOG
    fi
 }
@@ -907,15 +915,15 @@ run_VV_cases_release()
 
    # Wait for benchmark verification cases to end
    # let benchmark and regular cases run at the same time - for now
-   # wait_cases_release_end verification stage3_run_rls
+   # wait_cases_release_end verification stage3_run_release_ver
 
    if [[ "$CHECK_CLUSTER" == "" ]]; then
      cd $fdsrepo/Verification/scripts
-     echo "Running FDS verification cases:"                                         >> $OUTPUT_DIR/stage3_run_rls 2>&1
-     echo ./Run_FDS_Cases.sh $INTEL2 $REGULARCASES -q $QUEUE -j $JOBPREFIX_RELEASE  >> $OUTPUT_DIR/stage3_run_rls 2>&1
+     echo "Running FDS verification cases:"                                         >> $OUTPUT_DIR/stage3_run_release_ver 2>&1
+     echo ./Run_FDS_Cases.sh $INTEL2 $REGULARCASES -q $QUEUE -j $JOBPREFIX_RELEASE  >> $OUTPUT_DIR/stage3_run_release_ver 2>&1
      cd $fdsrepo/Verification/scripts
-     ./Run_FDS_Cases.sh      $INTEL2 $REGULARCASES -q $QUEUE -j $JOBPREFIX_RELEASE  >> $OUTPUT_DIR/stage3_run_rls 2>&1
-     echo ""                                                                        >> $OUTPUT_DIR/stage3_run_rls 2>&1
+     ./Run_FDS_Cases.sh      $INTEL2 $REGULARCASES -q $QUEUE -j $JOBPREFIX_RELEASE  >> $OUTPUT_DIR/stage3_run_release_ver 2>&1
+     echo ""                                                                        >> $OUTPUT_DIR/stage3_run_release_ver 2>&1
    fi
 
    # run all FDS validation cases 1 time step
@@ -926,12 +934,12 @@ run_VV_cases_release()
      echo "   release"
      cd $fdsrepo/Validation
 
-     echo 'Running FDS validation cases:'                             >> $OUTPUT_DIR/stage3_run_val 2>&1
-     echo ./Run_Serial.sh   -j $JOBPREFIX_RELEASE -m 1 -q $QUEUE      >> $OUTPUT_DIR/stage3_run_val 2>&1
-          ./Run_Serial.sh   -j $JOBPREFIX_RELEASE -m 1 -q $QUEUE      >> $OUTPUT_DIR/stage3_run_val 2>&1
-     echo ./Run_Parallel.sh -j $JOBPREFIX_RELEASE -m 1 -q $QUEUE      >> $OUTPUT_DIR/stage3_run_val 2>&1
-          ./Run_Parallel.sh -j $JOBPREFIX_RELEASE -m 1 -q $QUEUE      >> $OUTPUT_DIR/stage3_run_val 2>&1
-     echo ""                                                          >> $OUTPUT_DIR/stage3_run_val 2>&1
+     echo 'Running FDS validation cases:'                             >> $OUTPUT_DIR/stage3_run_release_val 2>&1
+     echo ./Run_Serial.sh   -j $JOBPREFIX_RELEASE -m 1 -q $QUEUE      >> $OUTPUT_DIR/stage3_run_release_val 2>&1
+          ./Run_Serial.sh   -j $JOBPREFIX_RELEASE -m 1 -q $QUEUE      >> $OUTPUT_DIR/stage3_run_release_val 2>&1
+     echo ./Run_Parallel.sh -j $JOBPREFIX_RELEASE -m 1 -q $QUEUE      >> $OUTPUT_DIR/stage3_run_release_val 2>&1
+          ./Run_Parallel.sh -j $JOBPREFIX_RELEASE -m 1 -q $QUEUE      >> $OUTPUT_DIR/stage3_run_release_val 2>&1
+     echo ""                                                          >> $OUTPUT_DIR/stage3_run_release_val 2>&1
    fi
 
 # run validation case in FDS_Val_Cases.sh
@@ -940,54 +948,54 @@ run_VV_cases_release()
      echo "Running FDS Validation Cases (1 time step)"
      echo "   release"
      cd $fdsrepo/Verification/scripts
-     echo ./Run_FDS_Cases.sh -V -j $JOBPREFIX_RELEASE -m 1 -q $QUEUE  >> $OUTPUT_DIR/stage3_run_val 2>&1
-          ./Run_FDS_Cases.sh -V -j $JOBPREFIX_RELEASE -m 1 -q $QUEUE  >> $OUTPUT_DIR/stage3_run_val 2>&1
-     echo ""                                                          >> $OUTPUT_DIR/stage3_run_val 2>&1
+     echo ./Run_FDS_Cases.sh -V -j $JOBPREFIX_RELEASE -m 1 -q $QUEUE  >> $OUTPUT_DIR/stage3_run_release_val 2>&1
+          ./Run_FDS_Cases.sh -V -j $JOBPREFIX_RELEASE -m 1 -q $QUEUE  >> $OUTPUT_DIR/stage3_run_release_val 2>&1
+     echo ""                                                          >> $OUTPUT_DIR/stage3_run_release_val 2>&1
    fi
 
    if [ "$RUN_VAL" == "1" ]; then
    # Wait for non-benchmark verification cases to end
-     wait_cases_release_end validation stage3_run_val
+     wait_cases_release_end validation stage3_run_release_val
    fi
 
    # Wait for non-benchmark verification cases to end
-   wait_cases_release_end verification stage3_run_rls
+   wait_cases_release_end verification stage3_run_release_ver
 
    # run restart cases (after regulcar cases have finished)
    if [[ -e $fdsrepo/Verification/FDS_RESTART_Cases.sh ]] && [[ "$CHECK_CLUSTER" == "" ]] ; then
      echo "   release (restart)"
 
-     echo ""                                        i                   >> $OUTPUT_DIR/stage3_run_rls 2>&1
-     echo 'Running FDS restart verification cases:'                     >> $OUTPUT_DIR/stage3_run_rls 2>&1
-     echo ./Run_FDS_Cases.sh $INTEL2 -r -q $QUEUE -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_rls 2>&1
+     echo ""                                        i                   >> $OUTPUT_DIR/stage3_run_release_ver 2>&1
+     echo 'Running FDS restart verification cases:'                     >> $OUTPUT_DIR/stage3_run_release_ver 2>&1
+     echo ./Run_FDS_Cases.sh $INTEL2 -r -q $QUEUE -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_ver 2>&1
      cd $fdsrepo/Verification/scripts
-          ./Run_FDS_Cases.sh $INTEL2 -r -q $QUEUE -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_rls 2>&1
-     echo ""                                                            >> $OUTPUT_DIR/stage3_run_rls 2>&1
+          ./Run_FDS_Cases.sh $INTEL2 -r -q $QUEUE -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_ver 2>&1
+     echo ""                                                            >> $OUTPUT_DIR/stage3_run_release_ver 2>&1
 
      # Wait for restart verification cases to end
-     wait_cases_release_end verification stage3_run_rls
+     wait_cases_release_end verification stage3_run_release_ver
    fi
 
 #  check whether cases have run 
 if [[ "$CHECK_CLUSTER" == "" ]] ; then
   cd $fdsrepo/Verification/scripts
-  echo ./Run_FDS_Cases.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_rls 2>&1
-       ./Run_FDS_Cases.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_rls 2>&1
+  echo ./Run_FDS_Cases.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_ver 2>&1
+       ./Run_FDS_Cases.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_ver 2>&1
 fi
 
 if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]] ; then
   cd $fdsrepo/Validation
-  echo ./Run_Serial.sh   -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_val 2>&1
-       ./Run_Serial.sh   -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_val 2>&1
-  echo ./Run_Parallel.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_val 2>&1
-       ./Run_Parallel.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_val 2>&1
+  echo ./Run_Serial.sh   -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
+       ./Run_Serial.sh   -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
+  echo ./Run_Parallel.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
+       ./Run_Parallel.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
 fi
 
 if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" != "" ]] ; then
      cd $fdsrepo/Verification/scripts
-  echo ./Run_FDS_Cases.sh -V -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_val 2>&1
-       ./Run_FDS_Cases.sh -V -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_val 2>&1
-  echo ""                       >> $OUTPUT_DIR/stage3_run_val 2>&1
+  echo ./Run_FDS_Cases.sh -V -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
+       ./Run_FDS_Cases.sh -V -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
+  echo ""                                             >> $OUTPUT_DIR/stage3_run_release_val 2>&1
 fi
 }
 
@@ -1000,7 +1008,7 @@ compile_smv_db()
 # Clean and compile SMV debug
   echo "      debug"
   cd $smvrepo/Build/smokeview/${SMVCOMPILER}_${platform}${smvsize}
-  ./make_smokeview_db.sh &> $OUTPUT_DIR/stage2_smvdbg
+  ./make_smokeview_db.sh &> $OUTPUT_DIR/stage2_build_smv_debug
 }
 
 #---------------------------------------------
@@ -1015,18 +1023,18 @@ check_compile_smv_db()
    smv_debug_success=true
  else
    echo "Errors from Stage 2 - Compile SMV debug:" >> $ERROR_LOG
-   cat $OUTPUT_DIR/stage2_smvdbg >> $ERROR_LOG
+   cat $OUTPUT_DIR/stage2_build_smv_debug >> $ERROR_LOG
    echo "" >> $ERROR_LOG
  fi
 
  # Check for compiler warnings/remarks
  # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
- if [[ `grep -E -i 'warning' $OUTPUT_DIR/stage2_smvdbg | grep -v 'feupdateenv is not implemented' | grep -i -v SUN | grep -i -v generated | grep -i -v cmake | grep -v -i CUDA | grep -i -v VectorArray | grep -v 18020 | grep -v 'was built for newer' | grep -v 'lcilkrts linked'` == "" ]]; then
+ if [[ `grep -E -i 'warning' $OUTPUT_DIR/stage2_build_smv_debug | grep -v 'feupdateenv is not implemented' | grep -i -v SUN | grep -i -v generated | grep -i -v cmake | grep -v -i CUDA | grep -i -v VectorArray | grep -v 18020 | grep -v 'was built for newer' | grep -v 'lcilkrts linked'` == "" ]]; then
    # Continue along
    :
  else
-   echo "Warnings from Stage 3b - Compile SMV debug:" >> $WARNING_LOG
-   grep -A 5 -E -i 'warning' $OUTPUT_DIR/stage2_smvdbg | grep -v 'feupdateenv is not implemented' | grep -i -v SUN | grep -i -v generated | grep -i -v cmake | grep -v -i CUDA | grep -i -v VectorArray | grep -v 18020 | grep -v 'was built for newer' | grep -v 'lcilkrts linked' >> $WARNING_LOG
+   echo "Warnings from Stage 2 - Compile SMV debug:" >> $WARNING_LOG
+   grep -A 5 -E -i 'warning' $OUTPUT_DIR/stage2_build_smv_debug | grep -v 'feupdateenv is not implemented' | grep -i -v SUN | grep -i -v generated | grep -i -v cmake | grep -v -i CUDA | grep -i -v VectorArray | grep -v 18020 | grep -v 'was built for newer' | grep -v 'lcilkrts linked' >> $WARNING_LOG
    echo "" >> $WARNING_LOG
  fi
 }
@@ -1040,8 +1048,8 @@ compile_smv()
    # Clean and compile SMV
   echo "      release"
   cd $smvrepo/Build/smokeview/${SMVCOMPILER}_${platform}${smvsize}
-  echo "" > $OUTPUT_DIR/stage2_smvrls 2>&1
-  ./make_smokeview.sh >> $OUTPUT_DIR/stage2_smvrls 2>&1
+  echo "" > $OUTPUT_DIR/stage2_build_smv_release 2>&1
+  ./make_smokeview.sh >> $OUTPUT_DIR/stage2_build_smv_release 2>&1
 }
 
 #---------------------------------------------
@@ -1059,18 +1067,18 @@ check_compile_smv()
   else
     smv_errors=1
     echo "Errors from Stage 2 - Compile SMV release:" >> $ERROR_LOG
-    cat $OUTPUT_DIR/stage2_smvrls >> $ERROR_LOG
+    cat $OUTPUT_DIR/stage2_build_smv_release >> $ERROR_LOG
     echo "" >> $ERROR_LOG
   fi
 
   # Check for compiler warnings/remarks
   # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-  if [[ `grep -E -i 'warning' $OUTPUT_DIR/stage2_smvrls | grep -v 'was built for newer' | grep -i -v SUN | grep -i -v generated | grep -i -v cmake | grep -v -i CUDA | grep -i -v VectorArray | grep -v 18020 | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]; then
+  if [[ `grep -E -i 'warning' $OUTPUT_DIR/stage2_build_smv_release | grep -v 'was built for newer' | grep -i -v SUN | grep -i -v generated | grep -i -v cmake | grep -v -i CUDA | grep -i -v VectorArray | grep -v 18020 | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]; then
     # Continue along
     :
   else
-    echo "Warnings from Stage 3c - Compile SMV release:" >> $WARNING_LOG
-    grep -A 5 -E -i 'warning' $OUTPUT_DIR/stage2_smvrls | grep -v 'was built for newer' | grep -i -v SUN | grep -i -v generated | grep -i -v cmake | grep -v -i CUDA | grep -i -v VectorArray | grep -v 18020 | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
+    echo "Warnings from Stage 2 - Compile SMV release:" >> $WARNING_LOG
+    grep -A 5 -E -i 'warning' $OUTPUT_DIR/stage2_build_smv_release | grep -v 'was built for newer' | grep -i -v SUN | grep -i -v generated | grep -i -v cmake | grep -v -i CUDA | grep -i -v VectorArray | grep -v 18020 | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
     echo "" >> $WARNING_LOG
   fi
   smv_release_success=true
@@ -1432,7 +1440,7 @@ make_fds_user_guide()
    check_guide $OUTPUT_DIR/stage5_fds_user_guide 'FDS User Guide'
 
    cd $botrepo/Firebot
-   ./compare_namelists.sh $OUTPUT_DIR stage8 > $OUTPUT_DIR/stage5_namelist_check
+   ./compare_namelists.sh $OUTPUT_DIR stage5 > $OUTPUT_DIR/stage5_namelist_check
    NAMELIST_NODOC_STATUS=`cat $OUTPUT_DIR/stage5_namelist_check | head -1 | awk -F' ' '{print $1}'`
    if [ "$NAMELIST_NODOC_STATUS" != "0" ]; then
      NAMELIST_NODOC_LOG=$OUTPUT_DIR/stage5_namelists_nodoc.txt
