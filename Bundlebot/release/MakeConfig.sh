@@ -2,13 +2,13 @@
 # This script builds the configuration scripts used to build the bundles
 # usage:
 # build both bash and dos config scripts
-# ./MakeBuild_config.sh x.y.z
+# ./MakeConfig.sh x.y.z
 
 # build bash config script
-# ./Make_config.sh x.y.z BASH
+# ./MakeConfig.sh x.y.z BASH
 
 # build dos config script
-# ./Make_config.sh x.y.z  DOS
+# ./MakeConfig.sh x.y.z  DOS
 
 # where x.y.z is the version being bundled
 
@@ -76,7 +76,7 @@ REPO=$(echo "$repo" | awk '{print toupper($0)}')
 TAG=$REPO-${base_tag}
 cat << EOF
 $COMMENT $REPOVERSION
-$EXPORT BUNDLE_${REPO}_REVISION=$REVISION
+$EXPORT BUNDLE_${REPO}_HASH=$REVISION
 $EXPORT BUNDLE_${REPO}_TAG=$TAG
 
 EOF

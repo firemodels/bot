@@ -41,8 +41,8 @@ else
 echo "    MAILTO: $MAILTO"
 fi
 echo "   command: $0 $OWNER $MAILTO"
-echo "  FDS repo: $BUNDLE_FDS_TAG $BUNDLE_FDS_REVISION"
-echo "  SMV repo: $BUNDLE_SMV_TAG $BUNDLE_SMV_REVISION"
+echo "  FDS repo: $BUNDLE_FDS_TAG $BUNDLE_FDS_HASH"
+echo "  SMV repo: $BUNDLE_SMV_TAG $BUNDLE_SMV_HASH"
 echo ""
 echo "Press any key to continue or <CTRL> c to abort."
 echo "Type $0 -h for other options"
@@ -65,4 +65,4 @@ echo "setting up repos"
 ./update_repos.sh -w
 
 cd $CURDIR/../../Smokebot
-./run_smokebot.sh -C -c -u -J -f -q firebot $MAILTO -x $BUNDLE_FDS_REVISION -X $BUNDLE_FDS_TAG -y $BUNDLE_SMV_REVISION -Y $BUNDLE_SMV_TAG $OWNER -r test_bundles -U -R release
+./run_smokebot.sh -C -c -u -J -f -q firebot $MAILTO -x $BUNDLE_FDS_HASH -X $BUNDLE_FDS_TAG -y $BUNDLE_SMV_HASH -Y $BUNDLE_SMV_TAG $OWNER -r test_bundles -U -R release

@@ -60,7 +60,7 @@ else
 fi
 
 cd $reporoot/bot/Bundlebot/nightly
-./clone_repos.sh $smv_hash $BUILDING_release >& $outdir/stage2_clone
+./clone_smvrepo.sh $smv_hash $BUILDING_release >& $outdir/stage2_clone
 
 cd $reporoot/smv
 if [ "$BUILDING_release" == "" ]; then

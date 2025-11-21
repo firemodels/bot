@@ -1,7 +1,9 @@
 #!/bin/bash
 pub_type=$1
-GH_OWNER_LOCAL=$2
-error_log=$3
+release_type=$2
+pdf_to=$3
+GH_OWNER_LOCAL=$4
+error_log=$5
 
 PUB_TAG=FDS_TEST
 if [ "$pub_type" != "fds" ]; then
@@ -30,10 +32,6 @@ CP ()
   return 0
 }
 
-pdf_to=$HOME/.bundle/pubs
-
-mkdir -p $pdf_to
-
 if [ "$pub_type" == "fds" ]; then
   echo ""
   echo ***copying fds pubs from github.com/$GH_OWNER_LOCAL/test_bundles using tag: $PUB_TAG
@@ -42,6 +40,9 @@ if [ "$pub_type" == "fds" ]; then
   CP FDS_User_Guide.pdf                     || exit 1
   CP FDS_Validation_Guide.pdf               || exit 1
   CP FDS_Verification_Guide.pdf             || exit 1
+  if [ "$release_type" == "nightly" ]; then
+    CP FDS_INFO.txt                           || exit 1
+  fi
 fi
 
 if [ "$pub_type" == "smv" ]; then
@@ -50,5 +51,8 @@ if [ "$pub_type" == "smv" ]; then
   CP SMV_Technical_Reference_Guide.pdf      || exit 1
   CP SMV_User_Guide.pdf                     || exit 1
   CP SMV_Verification_Guide.pdf             || exit 1
+  if [ "$release_type" == "nightly" ]; then
+    CP SMV_INFO.txt                           || exit 1
+  fi
 fi
 exit $return_code

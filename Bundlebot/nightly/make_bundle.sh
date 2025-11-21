@@ -6,6 +6,8 @@ INTEL_COMP_VERSION=$4
 UPLOAD_DIR_ARG=$5
 NIGHTLY=$6
 
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
 if [ "$NIGHTLY" == "null" ]; then
   NIGHTLY=
 fi
@@ -16,8 +18,8 @@ fi
 # this script assumes that fds and smokeview apps have been copied into APPS_DIR
 # and that fds and smokeview manuals have been copied into GUIDE_DIR
 
-GUIDE_DIR=$HOME/.bundle/pubs
-APPS_DIR=$HOME/.bundle/apps
+GUIDE_DIR=$SCRIPTDIR/pubs
+APPS_DIR=$SCRIPTDIR/apps
 
 # mpi files located into MPI_DIR
 MPI_DIR=$HOME/.bundle/BUNDLE/MPI
@@ -30,14 +32,12 @@ else
 fi
 
 INSTALLDIR=FDS/FDS6
-errlog=/tmp/errlog.$$
+errlog=$SCRIPTDIR/output/errlog
 
 # determine directory repos reside under
 
-scriptdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-
 curdir=`pwd`
-cd $scriptdir/../../..
+cd $SCRIPTDIR/../../..
 REPO_ROOT=`pwd`
 cd $curdir
 
@@ -65,8 +65,6 @@ fi
 if [ ! -e $APPS_DIR ]; then
   mkdir $APPS_DIR
 fi
-
-# this script is called by make_bundle.sh located in bot/Bundlebot/fds/linux or osx
 
 # -------------------- CP -------------------
 
@@ -136,9 +134,9 @@ UNTAR ()
   fi
 }
 
-# -------------------- CP2 -------------------
+# -------------------- CPPUB -------------------
 
-CP2 ()
+CPPUB ()
 {
   local FROMDIR=$1
   local FROMFILE=$2
@@ -476,14 +474,14 @@ fi
 echo ""
 echo "--- copying documentation ---"
 echo ""
-CP2 $GUIDE_DIR FDS_Config_Management_Plan.pdf    $bundledir/Documentation
-CP2 $GUIDE_DIR FDS_Technical_Reference_Guide.pdf $bundledir/Documentation
-CP2 $GUIDE_DIR FDS_User_Guide.pdf                $bundledir/Documentation
-CP2 $GUIDE_DIR FDS_Validation_Guide.pdf          $bundledir/Documentation
-CP2 $GUIDE_DIR FDS_Verification_Guide.pdf        $bundledir/Documentation
-CP2 $GUIDE_DIR SMV_User_Guide.pdf                $bundledir/Documentation
-CP2 $GUIDE_DIR SMV_Technical_Reference_Guide.pdf $bundledir/Documentation
-CP2 $GUIDE_DIR SMV_Verification_Guide.pdf        $bundledir/Documentation
+CPPUB $GUIDE_DIR FDS_Config_Management_Plan.pdf    $bundledir/Documentation
+CPPUB $GUIDE_DIR FDS_Technical_Reference_Guide.pdf $bundledir/Documentation
+CPPUB $GUIDE_DIR FDS_User_Guide.pdf                $bundledir/Documentation
+CPPUB $GUIDE_DIR FDS_Validation_Guide.pdf          $bundledir/Documentation
+CPPUB $GUIDE_DIR FDS_Verification_Guide.pdf        $bundledir/Documentation
+CPPUB $GUIDE_DIR SMV_User_Guide.pdf                $bundledir/Documentation
+CPPUB $GUIDE_DIR SMV_Technical_Reference_Guide.pdf $bundledir/Documentation
+CPPUB $GUIDE_DIR SMV_Verification_Guide.pdf        $bundledir/Documentation
 
 echo ""
 echo "--- copying release notes ---"
@@ -543,6 +541,5 @@ if [ -e $errlog ]; then
   fi
   rm $errlog
 fi
-echo installer located at:
-echo $bundlepath
+echo installer located at: $bundlepath
 cp $MANIFEST $bundlepathdir/${bundlebase}_manifest.html
