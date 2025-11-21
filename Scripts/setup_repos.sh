@@ -1,4 +1,9 @@
 #!/bin/bash
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+CURDIR=`pwd`
+cd $SCRIPTDIR/../../bot
+BOTREPO=`pwd`
+cd $CURDIR
 
 function usage {
 echo "Create repos used by cfast, fds and/or smokview"
@@ -14,7 +19,7 @@ echo "-B - setup repos used by cfast (erase each repo first): "
 echo "    $cfastrepos"
 echo "-c - setup repos used by cfastbot: "
 echo "    $cfastbotrepos"
-echo "-D - do not disable access to firemodels"
+echo "-D - enable access to firemodels (ie allow git push)"
 echo "-f - setup repos used by firebot: "
 echo "    $fdsrepos"
 echo "-F - setup repos used by firebot (erase each repo first): "
@@ -86,6 +91,7 @@ thirdpartyrepos="hypre sundials"
 #thirdpartyrepos="hypre sundials ompi"
 fdssmvrepos="fds smv"
 smvonlyrepos="smv"
+fdsonlyrepos="fds"
 firebotrepos="cad exp fds fds-smv fig out smv test_bundles"
 smvrepos="cfast fds fig smv test_bundles"
 cfastbotrepos="cfast exp fig smv test_bundles"
@@ -108,7 +114,7 @@ else
    exit
 fi
 
-while getopts '3aABbcCDefFGH:hsStTUw' OPTION
+while getopts '3aABbcCDefFGH:hsStTUVw' OPTION
 do
 case $OPTION  in
   3)
@@ -181,6 +187,10 @@ case $OPTION  in
    repos=$smvonlyrepos;
    eraserepos=1
    ;;
+  V)
+   repos=$fdsonlyrepos;
+   eraserepos=1
+   ;;
   w)
    repos=$wikiwebrepos;
    ;;
@@ -192,7 +202,7 @@ if [ "$APPENDTEST" != "" ]; then
   eraserepos=
 fi
 if [ "$CONFIG_REPOS" != "" ]; then
-  source ../Bundlebot/release/config.sh
+  source $BOTREPO/Bundlebot/release/config.sh
 fi
 
 cd $FMROOT/bot

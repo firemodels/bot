@@ -44,7 +44,6 @@ echo "         located under the directory dir.  This option allows smokeview to
 echo "         checked with firebot in 10 or 15 minutes rather than 4 hours"
 echo "-V option - if option is 'all' run all validation cases 1 time step, otherwise"
 echo "            run validation cases in fds/Validation/FDS_Val_Cases.sh 1 time step"
-echo "-z file - use revisions and tags in file to clone repos"
 }
 
 #---------------------------------------------
@@ -198,7 +197,7 @@ CACHE_DIR=
 
 #*** parse command line options
 
-while getopts '3bcCfhHJkm:no:OPq:r:R:s:uUvV:w:W:Y:z' OPTION
+while getopts '3bcCfhHJkm:no:OPq:r:R:s:uUvV:w:W:' OPTION
 do
 case $OPTION  in
   3)
@@ -274,9 +273,6 @@ case $OPTION  in
    ;;
   W)
    WEB_ROOT="$OPTARG"
-   ;;
-  z)
-   CLONEFILE="-z"
    ;;
   \?)
   echo "***error: unknown option entered. aborting firebot"

@@ -1,36 +1,50 @@
 #!/bin/bash
 
+# parameters for bundle
+
+if [ "`uname`" == "Darwin" ] ; then
+  export FDS_OPENMPIDIR=/opt/openmpi414_oneapi1p6
+  export intel_mpi_version=oneapi1p6
+  export mpi_version=4.1.4
+  export openmpi_dir=/opt/openmpi414_oneapi1p6
+else
+  export intel_mpi_version=2025.0
+  export mpi_version_linux=INTEL
+fi
+
+#define BUNDLE_MAILTO in .bashrc
+if [ "$BUNDLE_MAILTO" != "" ]; then
+  MAILTO=$BUNDLE_MAILTO
+fi
+export INTEL_MPI_VERSION=2025.0
+export MPI_VERSION=INTEL
+
 #---------------------------------------------
 #                   usage
 #---------------------------------------------
 
 function usage {
 echo ""
-echo "run_bundlebot.sh usage"
+echo "BUILD_fdssmv_nightly.sh usage"
 echo ""
 echo "This script builds FDS and Smokeview apps and generates a bundle using either the"
 echo "specified fds and smv repo revisions or revisions from the latest firebot pass."
 echo ""
 echo "Options:"
+echo "-b - use existing bot branch"
 echo "-c - bundle without warning about cloning/erasing fds and smv repos"
 echo "-f - force this script to run"
-echo "-F - fds repo hash/release"
 echo "-h - display this message"
-echo "-X fdstag - when cloning, tag fds repo with fdstag"
-echo "-Y smvtag - when cloning, tag smv repo with smvtag"
-
+echo "-L - build apps using latest revision"
 if [ "$MAILTO" != "" ]; then
   echo "-m mailto - email address [default: $MAILTO]"
 else
   echo "-m mailto - email address"
 fi
-
-echo "-L - build apps using latest revision"
 echo "-o - specify GH_OWNER when building a bundle. [default: $GH_OWNER]"
 echo "-r - specify GH_REPO when building a bundle. [default: $GH_REPO]"
-echo "-R branch - clone repos using name branch"
+echo "-R branch - clone repos using name branch {default: $BRANCH]"
 echo "-r - create a release bundle (same as -R branc)"
-echo "-S - smv repo hash/release"
 echo "-U - do not upload bundle file."
 echo "-v - show settings used to build bundle"
 exit 0
@@ -76,6 +90,7 @@ CD_REPO ()
   fi
   return 0
 }
+
 #---------------------------------------------
 #                   update_repo
 #---------------------------------------------
@@ -96,20 +111,22 @@ UPDATE_REPO()
 
 #-------------------- start of script ---------------------------------
 
-if [ -e $HOME/.bundle/bundle_config.sh ]; then
-  source $HOME/.bundle/bundle_config.sh
-else
-  echo ***error: configuration file $HOME/.bundle/bundle_config.sh is not defined
-  exit 1
-fi
+commands=$0
+DIR=$(dirname "${commands}")
+cd $DIR
+DIR=`pwd`
+
+cd ../../..
+repo=`pwd`
+
+cd $DIR
+
 LOCKFILE=$HOME/.bundle/lock
 
 MAILTO=
 if [ "$BUNDLE_EMAIL" != "" ]; then
   MAILTO=$BUNDLE_EMAIL
 fi
-FDS_RELEASE=
-SMV_RELEASE=
 ECHO=
 PROCEED=
 UPLOAD=-g
@@ -123,10 +140,14 @@ FDS_TAG=
 SMV_TAG=
 LATEST=
 INSTALL=
+existing_botbranch=
 
-while getopts 'BcfF:hLm:o:r:R:S:UvX:Y:' OPTION
+while getopts 'bBcfhLm:o:r:R:Uv' OPTION
 do
 case $OPTION  in
+  b)
+   existing_botbranch="1"
+   ;;
   B)
    INSTALL="-B"
    ;;
@@ -135,9 +156,6 @@ case $OPTION  in
    ;;
   f)
    FORCE="-f"
-   ;;
-  F)
-   FDS_RELEASE="$OPTARG"
    ;;
   h)
    usage
@@ -157,59 +175,32 @@ case $OPTION  in
   R)
    BRANCH="$OPTARG"
    ;;
-  S)
-   SMV_RELEASE="$OPTARG"
-   ;;
   U)
    UPLOAD=
    ;;
   v)
    ECHO=echo
    ;;
-  X)
-   FDS_TAG="$OPTARG"
-   ;;
-  Y)
-   SMV_TAG="$OPTARG"
-   ;;
 esac
 done
 shift $(($OPTIND-1))
 
-# Linux or OSX
-JOPT="-J"
 if [ "`uname`" == "Darwin" ] ; then
   platform=osx
   JOPT=
 else
+  JOPT="-J"
   platform=lnx
 fi
 
-# both or neither RELEASE options must be set
-FDS_RELEASE_ARG=$FDS_RELEASE
-SMV_RELEASE_ARG=$SMV_RELEASE
-if [ "$FDS_RELEASE" != "" ]; then
-  if [ "$SMV_RELEASE" != "" ]; then
-    FDS_RELEASE="-x $FDS_RELEASE"
-    SMV_RELEASE="-y $SMV_RELEASE"
-  fi
-fi
-if [ "$FDS_RELEASE" == "" ]; then
-  SMV_RELEASE=""
-  SMV_RELEASE_ARG=""
-fi
-if [ "$SMV_RELEASE" == "" ]; then
-  FDS_RELEASE=""
-  FDS_RELEASE_ARG=""
-fi
-
-if [ "$FDS_TAG" != "" ]; then
-  FDS_TAG_ARG=$FDS_TAG
-  FDS_TAG="-X $FDS_TAG"
-fi
-if [ "$SMV_TAG" != "" ]; then
-  SMV_TAG_ARG=$SMV_TAG
-  SMV_TAG="-Y $SMV_TAG"
+if [ "$BRANCH" == "nightly" ]; then
+  FDS_TAG=
+  SMV_TAG=
+  $repo/bot/Firebot/getGHfile.sh     FDS_INFO.txt
+  FDS_HASH=`grep FDS_HASH  FDS_INFO.txt | awk '{print $2}'`
+  SMV_HASH=`grep SMV_HASH  FDS_INFO.txt | awk '{print $2}'`
+  FDS_REVISION=`grep FDS_REVISION  FDS_INFO.txt | awk '{print $2}'`
+  SMV_REVISION=`grep SMV_REVISION  FDS_INFO.txt | awk '{print $2}'`
 fi
 
 FIREBOT_BRANCH_ARG=$BRANCH
@@ -225,24 +216,13 @@ fi
 echo ""
 echo "------------------------------------------------------------"
 echo "          Firebot branch: $FIREBOT_BRANCH_ARG"
+if [ "$INTEL_MPI_VERSION" != "" ]; then
 echo "       Intel mpi version: $INTEL_MPI_VERSION"
+fi
 echo "             MPI version: $MPI_VERSION"
-if [ "$OPENMPI_DIR" ]; then
-  echo "             OpenMPI dir: $OPENMPI_DIR"
-fi
-if [ "$FDS_TAG_ARG" != "" ]; then
-  echo "                 FDS TAG: $FDS_TAG_ARG"
-fi
-if [ "$FDS_RELEASE_ARG" != "" ]; then
-  echo "            FDS Revision: $FDS_RELEASE_ARG"
-fi
-if [ "$SMV_TAG_ARG" != "" ]; then
-  echo "                 SMV TAG: $SMV_TAG_ARG"
-fi
-if [ "$SMV_RELEASE_ARG" != "" ]; then
-  echo "            SMV Revision: $SMV_RELEASE_ARG"
-fi
+if [ "$MAILTO" != "" ]; then
 echo "                   EMAIL: $MAILTO_ARG"
+fi
 echo "------------------------------------------------------------"
 echo ""
 
@@ -269,33 +249,36 @@ if [ "$PROCEED" == "" ]; then
   read val
 fi
 
-commands=$0
-DIR=$(dirname "${commands}")
-cd $DIR
-DIR=`pwd`
-
-cd ../../..
-repo=`pwd`
-
-cd $DIR
-
 #*** update bot and webpages repos
 if [ "$ECHO" == "" ]; then
-  UPDATE_REPO bot      master     || exit 1
+  if [ "$existing_botbranch" == "" ]; then
+    UPDATE_REPO bot      master     || exit 1
+  fi
   UPDATE_REPO webpages nist-pages || exit 1
 fi
 
-#*** build apps
-cd $curdir
-cd $repo/bot/Firebot
-if [ "$platform" == "osx" ]; then
-# remove || exit 1 until compiler warnings are removed
-$ECHO ./run_firebot.sh $FORCE -c -C -B -F $JOPT $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG $FIREBOT_BRANCH -T $MAILTO
-else
-$ECHO ./run_firebot.sh $FORCE -c -C -B -F $JOPT $FDS_RELEASE $FDS_TAG $SMV_RELEASE $SMV_TAG $FIREBOT_BRANCH -T $MAILTO
+# clone fds and smv repos
+if [ "$BRANCH" == "nightly" ]; then
+  cd $curdir
+  ./clone_repo.sh -F -N -r $FDS_HASH
+  ./clone_repo.sh -S -N -r $SMV_HASH
 fi
+
+#clone all repos except for bot
+if [ "$BRANCH" != "nightly" ]; then
+  cd $curdir
+  ./clone_all_repos.sh
+  FDS_TAG="-X $BUNDLE_FDS_TAG"
+  SMV_TAG="-Y $BUNDLE_SMV_TAG"
+fi
+
+./make_apps.sh
+echo $FDS_HASH     > $repo/bot/Bundlebot/nightly/apps/FDS_HASH
+echo $SMV_HASH     > $repo/bot/Bundlebot/nightly/apps/SMV_HASH
+echo $FDS_REVISION > $repo/bot/Bundlebot/nightly/apps/FDS_REVISION
+echo $SMV_REVISION > $repo/bot/Bundlebot/nightly/apps/SMV_REVISION
 
 #*** generate and upload bundle
 cd $curdir
-$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH $FDS_RELEASE $INSTALL $FDS_TAG $SMV_RELEASE $SMV_TAG -w $UPLOAD
+$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH $INSTALL $FDS_TAG $SMV_TAG -w $UPLOAD
 rm $LOCKFILE

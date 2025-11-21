@@ -21,7 +21,7 @@ call get_smv_hash_revisions > %outdir%\stage1_hash 2>&1
 set /p smv_hash=<%outdir%\SMV_HASH
 
 echo *** cloning smv repo
-call clone_smv_repos %smv_hash%  > %outdir%\stage2_clone 2>&1
+call clone_smv_repo %smv_hash%  > %outdir%\stage2_clone 2>&1
 
 cd %reporoot%\smv
 git describe --abbrev=7 --long --dirty > %outdir%\smvrepo_revision
