@@ -736,7 +736,7 @@ compile_smv_utilities()
   echo "      wind2fds"
   cd $smvrepo/Build/wind2fds/${SMVCOMPILER}_${platform}
   rm -f *.o wind2fds_${platform}
-  ./make_wind2fds.sh >> $OUTPUT_DIR/stage3a 2>&1
+  ./make_wind2fds.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
   CP wind2fds_${platform} $LATESTAPPS_DIR/wind2fds
  echo "" >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
 
@@ -1052,7 +1052,7 @@ compile_smv()
    # Clean and compile SMV
   echo "      release"
   cd $smvrepo/Build/smokeview/${SMVCOMPILER}_${platform}
-  echo "" > $OUTPUT_DIR/stage3c 2>&1
+  echo "" > $OUTPUT_DIR/stage2_build_smv_release 2>&1
   ./make_smokeview.sh >> $OUTPUT_DIR/stage2_build_smv_release 2>&1
 }
 
