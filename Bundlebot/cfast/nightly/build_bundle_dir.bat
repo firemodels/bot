@@ -2,7 +2,7 @@
 set build_cedit=%1
 
 set bindir=%cfast_root%\Utilities\for_bundle\Bin
-set vandvdir=%cfast_root%\Build\VandV_Calcs\intel_win_64
+set vandvdir=%cfast_root%\Build\VandV_Calcs\intel_win
 set docdir=%cfast_root%\Manuals
 set CURDIR2=%CD%
 
@@ -38,7 +38,7 @@ if %build_cedit% == 0 goto skip_build_cedit
    call :COPY  %bindir%\CEdit.exe             %CFASTDISTDIR%\
 :skip_build_cedit
 call :COPY  %bindir%\CFAST.exe                %CFASTDISTDIR%\
-call :COPY  %vandvdir%\VandV_Calcs_win_64.exe                               %CFASTDISTDIR%\VandV_Calcs.exe
+call :COPY  %vandvdir%\VandV_Calcs_win.exe                               %CFASTDISTDIR%\VandV_Calcs.exe
 call :COPY  %smvrepo%\Build\background\intel_win\background_win.exe         %CFASTDISTDIR%\background.exe
 
 if %build_cedit% == 0 goto skip_build_cedit2
