@@ -2273,7 +2273,7 @@ if [[ $stage_ver_release_success ]] ; then
      TOLERANCE=0.2
      cd $botrepo/Smokebot
    echo Comparing images
-     ../Firebot/compare_images.sh $SMV_SUMMARY_DIR/images $SMV_SUMMARY_DIR/diffs/images $OUTPUT_DIR/error_images $TOLERANCE >& $OUTPUT_DIR/stage5_image_compare
+     ../Firebot/compare_images.sh $SMV_SUMMARY_DIR/images $SMV_SUMMARY_DIR/diffs/images $OUTPUT_DIR/error_images $TOLERANCE >& $OUTPUT_DIR/stage5_compare_images
      rm -f $SMV_SUMMARY_DIR/images/*.png
      COMPAREIMAGES_end=`GET_TIME`
      DIFF_COMPAREIMAGES=`GET_DURATION $COMPAREIMAGES_beg $COMPAREIMAGES_end`
@@ -2282,21 +2282,21 @@ if [[ $stage_ver_release_success ]] ; then
      UPDATED_WEB_IMAGES=1
 
 # look for fyis
-     if [[ `grep '***fyi:' $OUTPUT_DIR/stage5_image_compare` == "" ]]; then
+     if [[ `grep '***fyi:' $OUTPUT_DIR/stage5_compare_images` == "" ]]; then
        # Continue along
        :
      else
        echo "FYIs from Stage 5 - Image comparisons:"     >> $FYI_LOG
-       grep '***fyi:' $OUTPUT_DIR/stage5_image_compare   >> $FYI_LOG
+       grep '***fyi:' $OUTPUT_DIR/stage5_compare_images   >> $FYI_LOG
      fi
 
 # look for warnings
-     if [[ `grep '***warning:' $OUTPUT_DIR/stage5_image_compare` == "" ]]; then
+     if [[ `grep '***warning:' $OUTPUT_DIR/stage5_compare_images` == "" ]]; then
        # Continue along
        :
      else
        echo "Warnings from Stage 5 - Image comparisons:"     >> $WARNING_LOG
-       grep '***warning:' $OUTPUT_DIR/stage5_image_compare   >> $WARNING_LOG
+       grep '***warning:' $OUTPUT_DIR/stage5_compare_images   >> $WARNING_LOG
      fi
 
      if [ "$WEB_DIR" != "" ]; then
