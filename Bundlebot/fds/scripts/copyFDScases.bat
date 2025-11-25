@@ -1,6 +1,6 @@
 @echo off
 
-call %GITROOT%\bot\Bundlebot\fds\scripts\getopts.bat %*
+call %GITROOT%\bot\Bundlebot\nightly\getopts.bat %*
 
 set in=%infile%.fds
 
