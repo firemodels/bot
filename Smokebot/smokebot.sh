@@ -795,7 +795,7 @@ check_smv_utilities()
           echo "error: background failed to compile"         >> $ERROR_LOG
           echo "       $BACKGROUND does not exist"           >> $ERROR_LOG
         fi
-        cat $OUTPUT_DIR/stage2_build_release                              >> $ERROR_LOG
+        cat $OUTPUT_DIR/stage2_build_smv_release             >> $ERROR_LOG
         echo ""                                              >> $ERROR_LOG
         compile_errors=1
      fi
@@ -810,7 +810,7 @@ check_smv_utilities()
      if [ "$stage_utilities_success" == "0" ] ; then
         echo "Errors from Stage 2c - Smokeview and utilities:" >> $ERROR_LOG
         stage_utilities_success="1"
-        cat $OUTPUT_DIR/stage2_build_release                                >> $ERROR_LOG
+        cat $OUTPUT_DIR/stage2_build_smv_release               >> $ERROR_LOG
         echo ""                                                >> $ERROR_LOG
         compile_errors=1
      fi
@@ -974,7 +974,7 @@ compile_smv()
      echo "   release smokeview"
      cd $smvrepo/Build/smokeview/${COMPILER}_${platform}
      rm -f smokeview_${platform}
-     ./make_smokeview.sh $SANITIZE  &> $OUTPUT_DIR/stage2_build_release
+     ./make_smokeview.sh $SANITIZE  &> $OUTPUT_DIR/stage2_build_smv_release
    fi
 }
 
@@ -989,24 +989,24 @@ check_compile_smv()
     cd $smvrepo/Build/smokeview/${COMPILER}_${platform}
     if [ -e "smokeview_${platform}" ]; then
       cp smokeview_${platform} $LATESTAPPS_DIR/smokeview
-      stage2_build_release_smv_success=true
+      stage2_build_smv_release_smv_success=true
     else
       echo "Errors from Stage 2c - Compile SMV release:"           >> $ERROR_LOG
-      echo "The program smokeview_${platform} does not exist."  >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage2_build_release                                      >> $ERROR_LOG
+      echo "The program smokeview_${platform} does not exist."     >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage2_build_smv_release                     >> $ERROR_LOG
       echo ""                                                      >> $ERROR_LOG
       compile_errors=1
     fi
 
    # Check for compiler warnings/remarks
    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-    if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage2_build_release | grep -v 'feupdateenv is not implemented' | grep -v 'was built for newer' | grep -v 'lcilkrts linked'` == "" ]]
+    if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage2_build_smv_release | grep -v 'feupdateenv is not implemented' | grep -v 'was built for newer' | grep -v 'lcilkrts linked'` == "" ]]
     then
       # Continue along
       :
     else
       echo "Stage 2c warnings:" >> $WARNING_LOG
-      grep -A 5 -i -E 'warning|remark' $OUTPUT_DIR/stage2_build_release | grep -v 'feupdateenv is not implemented' | grep -v 'was built for newer' | grep -v 'lcilkrts linked' >> $WARNING_LOG
+      grep -A 5 -i -E 'warning|remark' $OUTPUT_DIR/stage2_build_smv_release | grep -v 'feupdateenv is not implemented' | grep -v 'was built for newer' | grep -v 'lcilkrts linked' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
       compile_errors=1
     fi
@@ -1072,7 +1072,7 @@ make_smv_movies()
 {
    echo "   movies"
    cd $smvrepo/Verification
-   scripts/Make_SMV_Movies.sh -q $QUEUE 2>&1  &> $OUTPUT_DIR/stage4c_mp4
+   scripts/Make_SMV_Movies.sh -q $QUEUE 2>&1  &> $OUTPUT_DIR/stage4_make_movies
 }
 
 #---------------------------------------------
@@ -1083,25 +1083,25 @@ check_smv_movies()
 {
    cd $smokebotdir
    echo "   checking"
-   if [[ `grep -I -E -i "Segmentation|Error" $OUTPUT_DIR/stage4c_mp4` == "" ]]
+   if [[ `grep -I -E -i "Segmentation|Error" $OUTPUT_DIR/stage4_make_movies` == "" ]]
    then
-      stage4c_mp4_success=true
+      stage4_make_movies_success=true
    else
       echo "Errors from Stage 4c - Make SMV movies "                    >> $ERROR_LOG
-      grep -B 1 -A 1 -I -E -i "Segmentation|Error"  $OUTPUT_DIR/stage4c_mp4 >  $OUTPUT_DIR/stage4c_mp4_errors
-      grep -B 1 -A 1 -I -E -i "Segmentation|Error"  $OUTPUT_DIR/stage4c_mp4 >> $ERROR_LOG
+      grep -B 1 -A 1 -I -E -i "Segmentation|Error"  $OUTPUT_DIR/stage4_make_movies >  $OUTPUT_DIR/stage4_make_movies_errors
+      grep -B 1 -A 1 -I -E -i "Segmentation|Error"  $OUTPUT_DIR/stage4_make_movies >> $ERROR_LOG
       echo ""                                                           >> $ERROR_LOG
    fi
 
    # Scan for and report any warnings in make SMV pictures process
    cd $smokebotdir
-   if [[ `grep -I -E -i "Warning" $OUTPUT_DIR/stage4c_mp4` == "" ]]
+   if [[ `grep -I -E -i "Warning" $OUTPUT_DIR/stage4_make_movies` == "" ]]
    then
       # Continue along
       :
    else
       echo "Warnings from Stage 4b - Make SMV movies (release mode):" >> $WARNING_LOG
-      grep -I -E -i "Warning" $OUTPUT_DIR/stage4c_mp4                 >> $WARNING_LOG
+      grep -I -E -i "Warning" $OUTPUT_DIR/stage4_make_movies                 >> $WARNING_LOG
       echo ""                                                         >> $WARNING_LOG
    fi
 }
@@ -2132,7 +2132,7 @@ check_smv_utilities
 compile_smv_db
 check_compile_smv_db
 
-#stage2_build_release
+#stage2_build_smv_release
 compile_smv
 check_compile_smv
 
@@ -2191,7 +2191,7 @@ if [ "$RUN_CASES" != "" ]; then
   if [ -e $smvrepo/Verification/scripts/RESTART2_Cases.sh ]; then
     cd $smvrepo/Verification/scripts
     ./RESTART2_Cases.sh $JOBPREFIXR
-    wait_verification_cases_end stage3c_vv_restart 3c $JOBPREFIXR
+    wait_verification_cases_end stage3_ver_restart 3c $JOBPREFIXR
   fi
 fi
 
@@ -2210,7 +2210,7 @@ echo "Run cases: $DIFF_RUN_CASES" >> $STAGE_STATUS
 
 #----------------------------- Stage 4 generate images and movies     --------------------------------------
 
-### Stage 4a generate images
+### Stage 4 generate images
 
 MAKEPICTURES_beg=`GET_TIME`
 if [[ $stage_ver_release_success ]] ; then
@@ -2224,7 +2224,7 @@ echo "Make pictures: $DIFF_MAKEPICTURES" >> $STAGE_STATUS
 if [ "$MAKEMOVIES" == "1" ]; then
   MAKEMOVIES_beg=`GET_TIME`
 
-### Stage 4b generate movies
+### Stage 4 generate movies
 
   make_smv_movies
   check_smv_movies
