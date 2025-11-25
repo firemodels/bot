@@ -272,7 +272,7 @@ compile_cfast()
     cd $cfastrepo/Build/CFAST/${COMPILER}_${platform}
     rm -f cfast7_${platform}
     make --makefile ../makefile clean &> /dev/null
-    ./make_cfast.sh >> $OUTPUT_DIR/stage1a_cfast 2>&1
+    ./make_cfast.sh >> $OUTPUT_DIR/stage2_build_cfast 2>&1
 }
 
 #---------------------------------------------
@@ -287,9 +287,9 @@ check_compile_cfast()
    then
       stage0_success=true
    else
-      echo "Errors from Stage 1a - CFAST:" >> $ERROR_LOG
+      echo "Errors from Stage 1 - CFAST:" >> $ERROR_LOG
       echo "CFAST failed to compile"      >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage1a_cfast             >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage2_build_cfast             >> $ERROR_LOG
       echo ""                             >> $ERROR_LOG
       THIS_CFAST_FAILED=1
    fi
@@ -410,9 +410,9 @@ compile_fds_mpi_db()
    echo "   debug fds $MPTYPE"
    cd $FDSDIR
    rm -f $FDSEXE
-   echo ""                     > $OUTPUT_DIR/stage1b_fds_dbg$MPTYPE
-   echo $FDSDIR               >> $OUTPUT_DIR/stage1b_fds_dbg$MPTYPE
-   $botrepo/Scripts/build_fds.sh $OUTPUT_DIR/stage1b_fds_dbg$MPTYPE $FDSEXE &
+   echo ""                     > $OUTPUT_DIR/stage2_build_fds_debug$MPTYPE
+   echo $FDSDIR               >> $OUTPUT_DIR/stage2_build_fds_debug$MPTYPE
+   $botrepo/Scripts/build_fds.sh $OUTPUT_DIR/stage2_build_fds_debug$MPTYPE $FDSEXE &
 }
 
 #---------------------------------------------
@@ -430,21 +430,21 @@ check_compile_fds_mpi_db()
       stage_fdsdb_success=true
    else
       echo "Errors from Stage 1b$MPTYPE - Compile FDS MPI$MPTYPE debug:"   >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage1b_fds_dbg$MPTYPE                                       >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage2_build_fds_debug$MPTYPE                                       >> $ERROR_LOG
       echo ""                                                              >> $ERROR_LOG
       THIS_FDS_FAILED=1
       compile_errors=1
    fi
 
    # Check for compiler warnings/remarks
-   if [ -e $OUTPUT_DIR/stage1b_fds_dbg ]; then
-   if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage1b_fds_dbg| grep -v mpiifort | grep -v mpiifx | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'` == "" ]]
+   if [ -e $OUTPUT_DIR/stage2_build_fds_debug ]; then
+   if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage2_build_fds_debug| grep -v mpiifort | grep -v mpiifx | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'` == "" ]]
    then
       # Continue along
       :
    else
       echo "Stage 1b warnings:" >> $WARNING_LOG
-      grep -A 5 -i -E 'warning|remark' $OUTPUT_DIR/stage1b_fds_dbg$MPTYPE | grep -v mpiifort | grep -v mpiifx | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'>> $WARNING_LOG
+      grep -A 5 -i -E 'warning|remark' $OUTPUT_DIR/stage2_build_fds_debug$MPTYPE | grep -v mpiifort | grep -v mpiifx | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'>> $WARNING_LOG
       echo "" >> $WARNING_LOG
    # if the executable does not exist then an email has already been sent
       if [ ! -e $FDSEXE ] ; then
@@ -484,14 +484,14 @@ run_verification_cases_debug()
    cd $smvrepo/Verification_dbg/scripts
 
    # Submit SMV verification cases and wait for them to start
-   echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3a_vv_dbg 2>&1
+   echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3_run_debug 2>&1
    RUNOPT=-Y
    RUNOPT="$RUNOPT"
    COMPOPT=
    if [ "$COMPILER" == "gnu" ]; then
      COMPOPT=-C
    fi
-   ./Run_SMV_Cases.sh $INTEL2 $RUNOPT $COMPOPT -c $cfastrepo $USEINSTALL2 -j $JOBPREFIXD -m 2 -d -q $QUEUE >> $OUTPUT_DIR/stage3a_vv_dbg 2>&1 
+   ./Run_SMV_Cases.sh $INTEL2 $RUNOPT $COMPOPT -c $cfastrepo $USEINSTALL2 -j $JOBPREFIXD -m 2 -d -q $QUEUE >> $OUTPUT_DIR/stage3_run_debug 2>&1 
 }
 
 #---------------------------------------------
@@ -503,32 +503,32 @@ check_verification_cases_debug()
    # Scan and report any errors in FDS verification cases
    cd $smvrepo/Verification_dbg
 
-   if [[ `grep -rIi 'Run aborted' $OUTPUT_DIR/stage3a_vv_dbg` == "" ]] && \
+   if [[ `grep -rIi 'Run aborted' $OUTPUT_DIR/stage3_run_debug` == "" ]] && \
       [[ `grep -rIi 'Segmentation' Visualization/* WUI/* ` == "" ]] && \
       [[ `grep -rI  'ERROR.*:' Visualization/* WUI/* ` == "" ]] && \
       [[ `grep -rIi 'STOP: Numerical' Visualization/* WUI/* ` == "" ]] && \
       [[ `grep -rIi 'forrtl' Visualization/* WUI/* ` == "" ]]
    then
-      stage3a_vv_dbg_success=true
+      stage3_run_debug_success=true
    else
-      grep -rIi 'Run aborted' $OUTPUT_DIR/stage3a_vv_dbg > $OUTPUT_DIR/stage3a_vv_dbg_errors
-      grep -rIi 'Segmentation' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3a_vv_dbg_errors
-      grep -rI  'ERROR.*:' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3a_vv_dbg_errors
-      grep -rIi 'STOP: Numerical' -rIi Visualization/* WUI/* >> $OUTPUT_DIR/stage3a_vv_dbg_errors
-      grep -rIi -A 20 'forrtl' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3a_vv_dbg_errors
+      grep -rIi 'Run aborted' $OUTPUT_DIR/stage3_run_debug > $OUTPUT_DIR/stage3_run_debug_errors
+      grep -rIi 'Segmentation' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3_run_debug_errors
+      grep -rI  'ERROR.*:' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3_run_debug_errors
+      grep -rIi 'STOP: Numerical' -rIi Visualization/* WUI/* >> $OUTPUT_DIR/stage3_run_debug_errors
+      grep -rIi -A 20 'forrtl' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3_run_debug_errors
       
       echo "Errors from Stage 3a - Run verification cases (debug mode):" >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage3a_vv_dbg_errors >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage3_run_debug_errors >> $ERROR_LOG
       echo "" >> $ERROR_LOG
       THIS_FDS_FAILED=1
    fi
-   if [[ `grep 'Warning' -irI $OUTPUT_DIR/stage3a_vv_dbg | grep -v 'SPEC' | grep -v 'Sum of'` == "" ]] && \
+   if [[ `grep 'Warning' -irI $OUTPUT_DIR/stage3_run_debug | grep -v 'SPEC' | grep -v 'Sum of'` == "" ]] && \
       [[ `grep 'Warning' -irI Visualization/* WUI/*      | grep -v 'SPEC' | grep -v 'Sum of'` == "" ]]
    then
       no_warnings=true
    else
       echo "Stage 3b warnings:" >> $WARNING_LOG
-      grep 'Warning' -irI $OUTPUT_DIR/stage3a_vv_dbg | grep -v 'SPEC' | grep -v 'Sum of' >> $WARNING_LOG
+      grep 'Warning' -irI $OUTPUT_DIR/stage3_run_debug | grep -v 'SPEC' | grep -v 'Sum of' >> $WARNING_LOG
       grep 'Warning' -irI Visualization/* WUI/*      | grep -v 'SPEC' | grep -v 'Sum of' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
@@ -548,9 +548,9 @@ compile_fds_mpi()
    echo "   release fds $MPTYPE"
    cd $FDSDIR
    rm -f $FDSEXE
-   echo ""                     > $OUTPUT_DIR/stage1c_fds_rls$MPTYPE
-   echo $FDSDIR               >> $OUTPUT_DIR/stage1c_fds_rls$MPTYPE
-   $botrepo/Scripts/build_fds.sh $OUTPUT_DIR/stage1c_fds_rls$MPTYPE $FDSEXE &
+   echo ""                     > $OUTPUT_DIR/stage2_build_fds_release$MPTYPE
+   echo $FDSDIR               >> $OUTPUT_DIR/stage2_build_fds_release$MPTYPE
+   $botrepo/Scripts/build_fds.sh $OUTPUT_DIR/stage2_build_fds_release$MPTYPE $FDSEXE &
 }
 
 #---------------------------------------------
@@ -583,21 +583,21 @@ check_compile_fds_mpi()
       stage_ver_release_success=true
    else
       echo "Errors from Stage 1c$MPTYPE - Compile FDS MPI$MPYPE release:" >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage1c_fds_rls$MPTYPE >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage2_build_fds_release$MPTYPE >> $ERROR_LOG
       echo "" >> $ERROR_LOG
       compile_errors=1
    fi
 
    # Check for compiler warnings/remarks
    # 'performing multi-file optimizations' and 'generating object file' are part of a normal compile
-   if [ -e $OUTPUT_DIR/stage1c_fds_rls$MPTYPE ]; then
-   if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage1c_fds_rls$MPTYPE | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented'` == "" ]]
+   if [ -e $OUTPUT_DIR/stage2_build_fds_release$MPTYPE ]; then
+   if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage2_build_fds_release$MPTYPE | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented'` == "" ]]
    then
       # Continue along
       :
    else
       echo "Stage 1c warnings:" >> $WARNING_LOG
-      grep -A 5 -i -E 'warning|remark' $OUTPUT_DIR/stage1c_fds_rls$MPTYPE | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
+      grep -A 5 -i -E 'warning|remark' $OUTPUT_DIR/stage2_build_fds_release$MPTYPE | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
       compile_errors=1
    fi
@@ -610,48 +610,48 @@ check_compile_fds_mpi()
 
 compile_smv_utilities()
 {
-   echo "" > $OUTPUT_DIR/stage2a_smvutil
+   echo "" > $OUTPUT_DIR/stage2_build_smvutil
    if [ "$haveCC" == "1" ] ; then
    # smokeview libraries
      echo "   libraries"
      cd $smvrepo/Build/LIBS/${COMPILER}_${platform}
-     echo 'Building Smokeview libraries:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
-     ./make_LIBS.sh >> $OUTPUT_DIR/stage2a_smvutil 2>&1
+     echo 'Building Smokeview libraries:' >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
+     ./make_LIBS.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
 
    # smokezip:
      echo "   smokezip"
      cd $smvrepo/Build/smokezip/${COMPILER}_${platform}
      rm -f *.o smokezip_${platform}
 
-     echo 'Compiling smokezip:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
-     ./make_smokezip.sh >> $OUTPUT_DIR/stage2a_smvutil 2>&1
-     echo "" >> $OUTPUT_DIR/stage2a_smvutil 2>&1
+     echo 'Compiling smokezip:' >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
+     ./make_smokezip.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
+     echo "" >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
      cp smokezip_${platform} $LATESTAPPS_DIR/smokezip
 
    # smokediff:
      echo "   smokediff"
      cd $smvrepo/Build/smokediff/${COMPILER}_${platform}
      rm -f *.o smokediff_${platform}
-     echo 'Compiling smokediff:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
-     ./make_smokediff.sh >> $OUTPUT_DIR/stage2a_smvutil 2>&1
-     echo "" >> $OUTPUT_DIR/stage2a_smvutil 2>&1
+     echo 'Compiling smokediff:' >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
+     ./make_smokediff.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
+     echo "" >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
      cp smokediff_${platform} $LATESTAPPS_DIR/smokediff
    
    # fds2fed:
      echo "   fds2fed"
      cd $smvrepo/Build/fds2fed/${COMPILER}_${platform}
      rm -f *.o fds2fed_${platform}
-     echo 'Compiling fds2fed:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
-     ./make_fds2fed.sh >> $OUTPUT_DIR/stage2a_smvutil 2>&1
-     echo "" >> $OUTPUT_DIR/stage2a_smvutil 2>&1
+     echo 'Compiling fds2fed:' >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
+     ./make_fds2fed.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
+     echo "" >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
      cp fds2fed_${platform} $LATESTAPPS_DIR/fds2fed
 
    # background
      echo "   background"
      cd $smvrepo/Build/background/${COMPILER}_${platform}
      rm -f *.o background_${platform}
-     echo 'Compiling background:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
-     ./make_background.sh >> $OUTPUT_DIR/stage2a_smvutil 2>&1
+     echo 'Compiling background:' >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
+     ./make_background.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
      cp background_${platform} $LATESTAPPS_DIR/background
 
    # pnginfo
@@ -659,8 +659,8 @@ compile_smv_utilities()
        echo "   pnginfo"
        cd $smvrepo/Build/pnginfo/${COMPILER}_${platform}
        rm -f *.o pnginfo_${platform}
-       echo 'Compiling pnginfo:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
-       ./make_pnginfo.sh >> $OUTPUT_DIR/stage2a_smvutil 2>&1
+       echo 'Compiling pnginfo:' >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
+       ./make_pnginfo.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
        cp pnginfo_${platform} $LATESTAPPS_DIR/pnginfo
      fi
 
@@ -668,12 +668,12 @@ compile_smv_utilities()
      echo "   wind2fds"
      cd $smvrepo/Build/wind2fds/${COMPILER}_${platform}
      rm -f *.o wind2fds_${platform}
-     echo 'Compiling wind2fds:' >> $OUTPUT_DIR/stage2a_smvutil 2>&1
-     ./make_wind2fds.sh >> $OUTPUT_DIR/stage2a_smvutil 2>&1
-    echo "" >> $OUTPUT_DIR/stage2a_smvutil 2>&1
+     echo 'Compiling wind2fds:' >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
+     ./make_wind2fds.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
+    echo "" >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
      cp wind2fds_${platform} $LATESTAPPS_DIR/wind2fds
    else
-     echo "Warning: smokeview and utilities not built - C compiler not available" >> $OUTPUT_DIR/stage2a_smvutil 2>&1
+     echo "Warning: smokeview and utilities not built - C compiler not available" >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
      compile_errors=1
    fi
 }
@@ -688,8 +688,8 @@ is_file_installed()
   
   notfound=`$program -help |& tail -1 | grep "not found" | wc -l`
   if [ "$notfound" == "1" ] ; then
-    stage2a_smvutil_success="0"
-    echo "***error: $program not installed" >> $OUTPUT_DIR/stage2a_smvutil
+    stage2_build_smvutil_success="0"
+    echo "***error: $program not installed" >> $OUTPUT_DIR/stage2_build_smvutil
   fi
 }
 
@@ -795,7 +795,7 @@ check_smv_utilities()
           echo "error: background failed to compile"         >> $ERROR_LOG
           echo "       $BACKGROUND does not exist"           >> $ERROR_LOG
         fi
-        cat $OUTPUT_DIR/stage2c_smv_rls                              >> $ERROR_LOG
+        cat $OUTPUT_DIR/stage2_build_release                              >> $ERROR_LOG
         echo ""                                              >> $ERROR_LOG
         compile_errors=1
      fi
@@ -810,7 +810,7 @@ check_smv_utilities()
      if [ "$stage_utilities_success" == "0" ] ; then
         echo "Errors from Stage 2c - Smokeview and utilities:" >> $ERROR_LOG
         stage_utilities_success="1"
-        cat $OUTPUT_DIR/stage2c_smv_rls                                >> $ERROR_LOG
+        cat $OUTPUT_DIR/stage2_build_release                                >> $ERROR_LOG
         echo ""                                                >> $ERROR_LOG
         compile_errors=1
      fi
@@ -861,15 +861,15 @@ run_verification_cases_release()
    echo "   run cases using release FDS"
    # Start running all SMV verification cases
    cd $smvrepo/Verification/scripts
-   echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
+   echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3_run_release 2>&1
    RUNOPT=-Y
    RUNOPT="$RUNOPT"
    COMPOPT=
    if [ "$COMPILER" == "gnu" ]; then
      COMPOPT=-C
    fi
-   ./Run_SMV_Cases.sh $INTEL2 $RUNOPT $COMPOPT -c $cfastrepo -j $JOBPREFIXR $USEINSTALL2 -q $QUEUE >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
-   ./Run_RESTART_Cases.sh -q $QUEUE                                                                >> $OUTPUT_DIR/stage3b_vv_rls 2>&1
+   ./Run_SMV_Cases.sh $INTEL2 $RUNOPT $COMPOPT -c $cfastrepo -j $JOBPREFIXR $USEINSTALL2 -q $QUEUE >> $OUTPUT_DIR/stage3_run_release 2>&1
+   ./Run_RESTART_Cases.sh -q $QUEUE                                                                >> $OUTPUT_DIR/stage3_run_release 2>&1
 }
 
 #---------------------------------------------
@@ -881,34 +881,34 @@ check_verification_cases_release()
    # Scan and report any errors in FDS verification cases
    cd $smvrepo/Verification
 
-   if [[ `grep -rIi 'Run aborted' $OUTPUT_DIR/stage3b_vv_rls` == "" ]] && \
+   if [[ `grep -rIi 'Run aborted' $OUTPUT_DIR/stage3_run_release` == "" ]] && \
       [[ `grep -rIi 'Segmentation' Visualization/* WUI/* ` == "" ]] && \
       [[ `grep -rI  'ERROR.*:' Visualization/* WUI/*  ` == "" ]] && \
       [[ `grep -rIi 'STOP: Numerical' Visualization/* WUI/*  ` == "" ]] && \
       [[ `grep -rIi  'forrtl' Visualization/* WUI/*  ` == "" ]]
    then
-      stage3b_vv_rls_success=true
+      stage3_run_release_success=true
    else
-      grep -rIi 'Run aborted' $OUTPUT_DIR/stage3b_vv_rls  > $OUTPUT_DIR/stage3b_vv_rls_errors
-      grep -rIi 'Segmentation' Visualization/* WUI/*     >> $OUTPUT_DIR/stage3b_vv_rls_errors
-      grep -rI  'ERROR.*:' Visualization/* WUI/*           >> $OUTPUT_DIR/stage3b_vv_rls_errors
-      grep -rIi 'STOP: Numerical' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3b_vv_rls_errors
-      grep -rIi -A 20 'forrtl' Visualization/* WUI/*     >> $OUTPUT_DIR/stage3b_vv_rls_errors
+      grep -rIi 'Run aborted' $OUTPUT_DIR/stage3_run_release  > $OUTPUT_DIR/stage3_run_release_errors
+      grep -rIi 'Segmentation' Visualization/* WUI/*     >> $OUTPUT_DIR/stage3_run_release_errors
+      grep -rI  'ERROR.*:' Visualization/* WUI/*           >> $OUTPUT_DIR/stage3_run_release_errors
+      grep -rIi 'STOP: Numerical' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3_run_release_errors
+      grep -rIi -A 20 'forrtl' Visualization/* WUI/*     >> $OUTPUT_DIR/stage3_run_release_errors
 
       echo "Errors from Stage 3b - Run verification cases (release mode):" >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage3b_vv_rls_errors >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage3_run_release_errors >> $ERROR_LOG
       echo "" >> $ERROR_LOG
       THIS_FDS_FAILED=1
    fi
 
       
-   if [[ `grep 'Warning' -irI $OUTPUT_DIR/stage3b_vv_rls | grep -v 'SPEC' | grep -v 'Sum of'` == "" ]] && \
+   if [[ `grep 'Warning' -irI $OUTPUT_DIR/stage3_run_release | grep -v 'SPEC' | grep -v 'Sum of'` == "" ]] && \
       [[ `grep 'Warning' -irI Visualization/* WUI/*      | grep -v 'SPEC' | grep -v 'Sum of'` == "" ]]
    then
       no_warnings=true
    else
       echo "Stage 3b warnings:" >> $WARNING_LOG
-      grep 'Warning' -irI $OUTPUT_DIR/stage3b_vv_rls | grep -v 'SPEC' | grep -v 'Sum of' >> $WARNING_LOG
+      grep 'Warning' -irI $OUTPUT_DIR/stage3_run_release | grep -v 'SPEC' | grep -v 'Sum of' >> $WARNING_LOG
       grep 'Warning' -irI Visualization/* WUI/*      | grep -v 'SPEC' | grep -v 'Sum of' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
@@ -925,7 +925,7 @@ compile_smv_db()
      echo "   debug smokeview"
      cd $smvrepo/Build/smokeview/${COMPILER}_${platform}
      rm -f smokeview_${platform}_db
-     ./make_smokeview_db.sh $SANITIZE &> $OUTPUT_DIR/stage2b_smv_dbg
+     ./make_smokeview_db.sh $SANITIZE &> $OUTPUT_DIR/stage2_build_smv_debug
    fi
 }
 
@@ -940,23 +940,23 @@ check_compile_smv_db()
     cd $smvrepo/Build/smokeview/${COMPILER}_${platform}
     if [ -e "smokeview_${platform}_db" ]
     then
-       stage2b_smv_dbg_success=true
+       stage2_build_smv_debug_success=true
     else
       echo "Errors from Stage 2b - Compile SMV debug:" >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage2b_smv_dbg                          >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage2_build_smv_debug                          >> $ERROR_LOG
       echo ""                                          >> $ERROR_LOG
       compile_errors=1
     fi
 
    # Check for compiler warnings/remarks
    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-    if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage2b_smv_dbg | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]
+    if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage2_build_smv_debug | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]
     then
       # Continue along
       :
     else
       echo "Stage 2b warnings:" >> $WARNING_LOG
-      grep -A 5 -i -E 'warning|remark' $OUTPUT_DIR/stage2b_smv_dbg | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
+      grep -A 5 -i -E 'warning|remark' $OUTPUT_DIR/stage2_build_smv_debug | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
       compile_errors=1
     fi
@@ -974,7 +974,7 @@ compile_smv()
      echo "   release smokeview"
      cd $smvrepo/Build/smokeview/${COMPILER}_${platform}
      rm -f smokeview_${platform}
-     ./make_smokeview.sh $SANITIZE  &> $OUTPUT_DIR/stage2c_smv_rls
+     ./make_smokeview.sh $SANITIZE  &> $OUTPUT_DIR/stage2_build_release
    fi
 }
 
@@ -989,24 +989,24 @@ check_compile_smv()
     cd $smvrepo/Build/smokeview/${COMPILER}_${platform}
     if [ -e "smokeview_${platform}" ]; then
       cp smokeview_${platform} $LATESTAPPS_DIR/smokeview
-      stage2c_smv_rls_smv_success=true
+      stage2_build_release_smv_success=true
     else
       echo "Errors from Stage 2c - Compile SMV release:"           >> $ERROR_LOG
       echo "The program smokeview_${platform} does not exist."  >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage2c_smv_rls                                      >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage2_build_release                                      >> $ERROR_LOG
       echo ""                                                      >> $ERROR_LOG
       compile_errors=1
     fi
 
    # Check for compiler warnings/remarks
    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-    if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage2c_smv_rls | grep -v 'feupdateenv is not implemented' | grep -v 'was built for newer' | grep -v 'lcilkrts linked'` == "" ]]
+    if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage2_build_release | grep -v 'feupdateenv is not implemented' | grep -v 'was built for newer' | grep -v 'lcilkrts linked'` == "" ]]
     then
       # Continue along
       :
     else
       echo "Stage 2c warnings:" >> $WARNING_LOG
-      grep -A 5 -i -E 'warning|remark' $OUTPUT_DIR/stage2c_smv_rls | grep -v 'feupdateenv is not implemented' | grep -v 'was built for newer' | grep -v 'lcilkrts linked' >> $WARNING_LOG
+      grep -A 5 -i -E 'warning|remark' $OUTPUT_DIR/stage2_build_release | grep -v 'feupdateenv is not implemented' | grep -v 'was built for newer' | grep -v 'lcilkrts linked' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
       compile_errors=1
     fi
@@ -1028,8 +1028,8 @@ make_smv_pictures()
    if [ "$COMPILER" == "gnu" ]; then
      COMPOPT=-C
    fi
-   ./Make_SMV_Pictures.sh $RUNOPT $COMPOPT -q $SQUEUE -j SMV_ $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4a_picts
-   grep -v FreeFontPath $OUTPUT_DIR/stage4a_picts | grep -v libpng &> $OUTPUT_DIR/stage4b_picts
+   ./Make_SMV_Pictures.sh $RUNOPT $COMPOPT -q $SQUEUE -j SMV_ $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4_make_picts
+   grep -v FreeFontPath $OUTPUT_DIR/stage4_make_picts | grep -v libpng &> $OUTPUT_DIR/stage4_check_picts
 }
 
 #---------------------------------------------
@@ -1039,27 +1039,27 @@ make_smv_pictures()
 check_smv_pictures()
 {
    # Scan and report any errors in make SMV pictures process
-   grep -I -E -i Segmentation $smvrepo/Verification/Visualization/*.err >> $OUTPUT_DIR/stage4b_picts
-   grep -I -E -i Segmentation $smvrepo/Verification/WUI/*.err           >> $OUTPUT_DIR/stage4b_picts
+   grep -I -E -i Segmentation $smvrepo/Verification/Visualization/*.err >> $OUTPUT_DIR/stage4_check_picts
+   grep -I -E -i Segmentation $smvrepo/Verification/WUI/*.err           >> $OUTPUT_DIR/stage4_check_picts
    cd $smokebotdir
    echo "   checking"
-   if [[ `grep -I -E -i "Segmentation|Error" $OUTPUT_DIR/stage4b_picts` == "" ]]
+   if [[ `grep -I -E -i "Segmentation|Error" $OUTPUT_DIR/stage4_check_picts` == "" ]]
    then
-      stage4b_picts_smvpics_success=true
+      stage4_check_picts_smvpics_success=true
    else
-      cp $OUTPUT_DIR/stage4b_picts  $OUTPUT_DIR/stage4b_picts_errors
+      cp $OUTPUT_DIR/stage4_check_picts  $OUTPUT_DIR/stage4_check_picts_errors
 
       echo "Errors from Stage 4a - Make SMV pictures (release mode):" >> $ERROR_LOG
-      grep -B 5 -A 5 -I -E -i "Segmentation|Error"  $OUTPUT_DIR/stage4b_picts  >> $ERROR_LOG
+      grep -B 5 -A 5 -I -E -i "Segmentation|Error"  $OUTPUT_DIR/stage4_check_picts  >> $ERROR_LOG
       echo "" >> $ERROR_LOG
    fi
-   if [[ `grep -I -E -i "Warning" $OUTPUT_DIR/stage4b_picts` == "" ]]
+   if [[ `grep -I -E -i "Warning" $OUTPUT_DIR/stage4_check_picts` == "" ]]
    then
       # Continue along
       :
    else
       echo "Warnings from Stage 4a - Make SMV pictures (release mode):" >> $WARNING_LOG
-      grep -A 2 -I -E -i "Warning" $OUTPUT_DIR/stage4b_picts                     >> $WARNING_LOG
+      grep -A 2 -I -E -i "Warning" $OUTPUT_DIR/stage4_check_picts                     >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
 }
@@ -2124,15 +2124,15 @@ check_compile_cfast
 
 #----------------------------- Stage 2 build smokeview     --------------------------------------
 
-#stage2a_smvutil
+#stage2_build_smvutil
 compile_smv_utilities
 check_smv_utilities
 
-#stage2b_smv_dbg
+#stage2_build_smv_debug
 compile_smv_db
 check_compile_smv_db
 
-#stage2c_smv_rls
+#stage2_build_release
 compile_smv
 check_compile_smv
 
@@ -2158,7 +2158,7 @@ fi
 
 #----------------------------- Stage 3 run verification case     --------------------------------------
 
-#stage3a_vv_dbg begin
+#stage3_run_debug begin
 RUN_CASES_beg=`GET_TIME`
 RUN_CASES=
 if [ $stage_fdsdb_success ]; then
@@ -2168,7 +2168,7 @@ if [ $stage_fdsdb_success ]; then
    fi
 fi
 
-#stage3b_vv_rls
+#stage3_run_release
 if [[ $stage_ver_release_success ]]; then
   if [ "$CACHE_DIR" == "" ]; then
     run_verification_cases_release
@@ -2186,8 +2186,8 @@ if [[ $stage_ver_release_success ]]; then
 fi
 
 if [ "$RUN_CASES" != "" ]; then
-  wait_verification_cases_end stage3a_vv_dbg 3a $JOBPREFIXD
-  wait_verification_cases_end stage3b_vv_rls 3b $JOBPREFIXR
+  wait_verification_cases_end stage3_run_debug 3a $JOBPREFIXD
+  wait_verification_cases_end stage3_run_release 3b $JOBPREFIXR
   if [ -e $smvrepo/Verification/scripts/RESTART2_Cases.sh ]; then
     cd $smvrepo/Verification/scripts
     ./RESTART2_Cases.sh $JOBPREFIXR
