@@ -2099,7 +2099,7 @@ echo "Setup smokebot: $DIFF_SETUP" >> $STAGE_STATUS
 
 BUILDSOFTWARE_beg=`GET_TIME`
 
-#stage1B
+#*** stage 2 - build cfast
 echo "Building"
 
 if [ "$CACHE_DIR" == "" ]; then
@@ -2118,25 +2118,25 @@ else
   cp -r $CACHE_DIR/fds/Build $fdsrepo/.
 fi
 
-# stage1A
+#*** stage 2 build cfast
 compile_cfast
 check_compile_cfast
 
 #----------------------------- Stage 2 build smokeview     --------------------------------------
 
-#stage2_build_smvutil
+#*** stage 2 - build smokeview ustilities
 compile_smv_utilities
 check_smv_utilities
 
-#stage2_build_smv_debug
+#*** stage 2 - build smokeview debug
 compile_smv_db
 check_compile_smv_db
 
-#stage2_build_smv_release
+#*** stage 2 - build smokeview release
 compile_smv
 check_compile_smv
 
-#stage2d_common_files
+#*** stage 2 - check common files
 check_common_files
 
 if [ "$CACHE_DIR" == "" ]; then
@@ -2158,7 +2158,7 @@ fi
 
 #----------------------------- Stage 3 run verification case     --------------------------------------
 
-#stage3_run_debug begin
+#*** stage 3 - run debug cases
 RUN_CASES_beg=`GET_TIME`
 RUN_CASES=
 if [ $stage_fdsdb_success ]; then
@@ -2168,7 +2168,7 @@ if [ $stage_fdsdb_success ]; then
    fi
 fi
 
-#stage3_run_release
+#*** stage 3 - run release cases
 if [[ $stage_ver_release_success ]]; then
   if [ "$CACHE_DIR" == "" ]; then
     run_verification_cases_release
@@ -2238,7 +2238,7 @@ if [[ $stage_ver_release_success ]] ; then
   generate_timing_stats
 fi
 
-#----------------------------- Stage 5 generate manuals     --------------------------------------
+#*** stage 5 - bulid manuals
 
 if [[ $stage_ver_release_success ]] ; then
    MAKEGUIDES_beg=`GET_TIME`
