@@ -865,7 +865,7 @@ make_cfast_pictures()
 {
    echo "Generating smokeview images"
    CD_REPO $cfastrepo/Validation/scripts $CFASTBRANCH || return 1
-   ./Make_CFAST_Pictures.sh -I $compiler $USEINSTALL 2>&1 | grep -v FreeFontPath &> $OUTPUT_DIR/stage6
+   ./Make_CFAST_Pictures.sh -I $compiler $USEINSTALL 2>&1 | grep -v FreeFontPath &> $OUTPUT_DIR/stage4_make_pictures
 
    return 0
 }
@@ -878,13 +878,13 @@ check_cfast_pictures()
 {
    # Scan and report any errors in make SMV pictures process
    cd $cfastbotdir
-   if [[ `grep -B 50 -A 50 "Segmentation" -I $OUTPUT_DIR/stage6` == "" && `grep -F "*** Error" -I $OUTPUT_DIR/stage6` == "" ]]
+   if [[ `grep -B 10 -A 10 "Segmentation" -I $OUTPUT_DIR/stage4_make_pictures` == "" && `grep -F "*** Error" -I $OUTPUT_DIR/stage4_make_pictures` == "" ]]
    then
-      stage6_success=true
+      stage4_make_pictures_success=true
    else
-      cp $OUTPUT_DIR/stage6  $OUTPUT_DIR/stage6_errors
-      echo "Errors from Stage 6 - Make CFAST pictures (release mode):" >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage6 >> $ERROR_LOG
+      cp $OUTPUT_DIR/stage4_make_pictures  $OUTPUT_DIR/stage4_make_pictures_errors
+      echo "Errors from Stage 4 - Make CFAST pictures (release mode):" >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage4_make_pictures >> $ERROR_LOG
       echo "" >> $ERROR_LOG
    fi
 }
@@ -946,7 +946,7 @@ compile_vvcalc()
    echo "   build VandV_Calcs" 
    CD_REPO $cfastrepo/Build/VandV_Calcs/${compiler}_${platform} $CFASTBRANCH || return 1
    make -f ../makefile clean &> /dev/null
-   ./make_vv.sh &> $OUTPUT_DIR/stage6_build_vvcalc
+   ./make_vv.sh &> $OUTPUT_DIR/stage5_build_vvcalc
 
    return 0
 }
@@ -960,21 +960,21 @@ check_compile_vvcalc()
    CD_REPO $cfastrepo/Build/VandV_Calcs/${compiler}_${platform} $CFASTBRANCH || return 1
    if [[ -e "VandV_Calcs_${platform}" ]]
    then
-      stage6_build_vvcalc_success=true
+      stage5_build_vvcalc_success=true
    else
-      echo "Errors from Stage 6 - Compile VandV_Calcs:" >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage6_build_vvcalc >> $ERROR_LOG
+      echo "Errors from Stage 5 - Compile VandV_Calcs:" >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage5_build_vvcalc >> $ERROR_LOG
       echo "" >> $ERROR_LOG
    fi
 
    # Check for compiler warnings/remarks
-   if [[ `grep -A 5 -E 'warning|remark' ${OUTPUT_DIR}/stage6_build_vvcalc` == "" ]]
+   if [[ `grep -A 5 -E 'warning|remark' ${OUTPUT_DIR}/stage5_build_vvcalc` == "" ]]
    then
       # Continue along
       :
    else
-      echo "Warnings from Stage 6 - Compile VV calcs:" >> $WARNING_LOG
-      grep -A 5 -E 'warning|remark' ${OUTPUT_DIR}/stage6_build_vvcalc >> $WARNING_LOG
+      echo "Warnings from Stage 5 - Compile VV calcs:" >> $WARNING_LOG
+      grep -A 5 -E 'warning|remark' ${OUTPUT_DIR}/stage5_build_vvcalc >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
    return 0
@@ -991,7 +991,7 @@ run_matlab_verification()
    # Run Matlab plotting script
    CD_REPO $cfastrepo/Utilities/Matlab $CFASTBRANCH || return 1
 
-   matlab -logfile vermat.log -nodesktop -noFigureWindows -r "try, disp('Running Matlab Verification script'), CFAST_verification_script, catch, disp('Error'), err = lasterror, err.message, err.stack, end, exit" &> $OUTPUT_DIR/stage6_run_matlab_verification
+   matlab -logfile vermat.log -nodesktop -noFigureWindows -r "try, disp('Running Matlab Verification script'), CFAST_verification_script, catch, disp('Error'), err = lasterror, err.message, err.stack, end, exit" &> $OUTPUT_DIR/stage5_run_matlab_verification
    return 0
 }
 
@@ -1004,14 +1004,14 @@ check_matlab_verification()
    # Scan and report any errors in Matlab scripts
    cd $cfastbotdir
 
-   if [[ `grep -A 50 "Error" $OUTPUT_DIR/stage6_run_matlab_verification` == "" ]]
+   if [[ `grep -A 50 "Error" $OUTPUT_DIR/stage5_run_matlab_verification` == "" ]]
    then
-      stage6_run_matlab_verification_success=true
+      stage5_run_matlab_verification_success=true
    else
-      grep -A 50 "Error" $OUTPUT_DIR/stage6_run_matlab_verification >> $OUTPUT_DIR/stage6_run_matlab_verification_errors
+      grep -A 50 "Error" $OUTPUT_DIR/stage5_run_matlab_verification >> $OUTPUT_DIR/stage5_run_matlab_verification_errors
 
-      echo "Warnings from Stage 6 - Matlab plotting (verification):" >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage6_run_matlab_verification_errors | tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
+      echo "Warnings from Stage 5 - Matlab plotting (verification):" >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage5_run_matlab_verification_errors | tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
       echo "" >> $ERROR_LOG
    fi
 }
@@ -1036,7 +1036,7 @@ run_matlab_validation()
    echo "      make plots"
    # Run Matlab plotting script
    cd $cfastrepo/Utilities/Matlab
-   matlab -logfile valmat.log -nodesktop -noFigureWindows -r "try, disp('Running Matlab Validation script'), CFAST_validation_script, catch, disp('Error'), err = lasterror, err.message, err.stack, end, exit" &> $OUTPUT_DIR/stage6_run_matlab_validation
+   matlab -logfile valmat.log -nodesktop -noFigureWindows -r "try, disp('Running Matlab Validation script'), CFAST_validation_script, catch, disp('Error'), err = lasterror, err.message, err.stack, end, exit" &> $OUTPUT_DIR/stage5_run_matlab_validation
    return 0
 }
 
@@ -1048,14 +1048,14 @@ check_matlab_validation()
 {
    # Scan and report any errors in Matlab scripts
    cd $cfastbotdir
-   if [[ `grep -A 50 "Error" $OUTPUT_DIR/stage6_run_matlab_validation` == "" ]]
+   if [[ `grep -A 50 "Error" $OUTPUT_DIR/stage5_run_matlab_validation` == "" ]]
    then
-      stage6_run_matlab_validation_success=true
+      stage5_run_matlab_validation_success=true
    else
-      grep -A 50 "Error" $OUTPUT_DIR/stage6_run_matlab_validation >> $OUTPUT_DIR/stage6_run_matlab_validation_errors
+      grep -A 50 "Error" $OUTPUT_DIR/stage5_run_matlab_validation >> $OUTPUT_DIR/stage5_run_matlab_validation_errors
 
-      echo "Errors from Stage 6 - Matlab plotting and statistics (validation):" >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage6_run_matlab_validation_errors |  tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
+      echo "Errors from Stage 5 - Matlab plotting and statistics (validation):" >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage5_run_matlab_validation_errors |  tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
       echo "" >> $ERROR_LOG
    fi
 }
@@ -1080,7 +1080,7 @@ check_validation_stats()
          # Continue along
          :
       else
-         echo "Warnings from Stage 6 - Matlab plotting and statistics (validation):" >> $VALIDATION_STATS_LOG
+         echo "Warnings from stage 5 - Matlab plotting and statistics (validation):" >> $VALIDATION_STATS_LOG
          echo "-------------------------------" >> $VALIDATION_STATS_LOG
          echo "Validation statistics are different from baseline statistics." >> $VALIDATION_STATS_LOG
          echo "Baseline validation statistics vs. Revision ${GIT_REVISION}:" >> $VALIDATION_STATS_LOG
@@ -1091,7 +1091,7 @@ check_validation_stats()
          echo "" >> $VALIDATION_STATS_LOG
       fi
    else
-      echo "Warnings from Stage 6 - Matlab plotting and statistics (validation):" >> $WARNING_LOG
+      echo "Warnings from stage 5 - Matlab plotting and statistics (validation):" >> $WARNING_LOG
       echo "Error: The validation statistics output file does not exist." >> $WARNING_LOG
       echo "Expected the file Utilities/Matlab/CFAST_validation_scatterplot_output.csv" >> $WARNING_LOG
       echo "" >> $WARNING_LOG
@@ -1155,7 +1155,7 @@ check_guide()
       fi
    else
       # There were errors/warnings in the guide build process
-      echo "Warnings from Stage 7 - Build CFAST Guides:" >> $WARNING_LOG
+      echo "Warnings from Stage 6 - Build CFAST Guides:" >> $WARNING_LOG
       echo $docname >> $WARNING_LOG # Name of guide
       if [ ! -e $docdir/$docfile ]; then
          echo The guide $docname failed to be built >> $WARNING_LOG
@@ -1175,10 +1175,10 @@ make_cfast_tech_guide()
    # Build CFAST Tech Guide
    echo Building CFAST Tech guide
    CD_REPO $cfastrepo/Manuals/CFAST_Tech_Ref $CFASTBRANCH || return 1
-   ./make_guide.sh &> $OUTPUT_DIR/stage7_cfast_tech_guide
+   ./make_guide.sh &> $OUTPUT_DIR/stage6_cfast_tech_guide
 
    # Check guide for completion and copy to website if successful
-   check_guide $OUTPUT_DIR/stage7_cfast_tech_guide $cfastrepo/Manuals/CFAST_Tech_Ref CFAST_Tech_Ref.pdf 'CFAST Technical Reference Guide'
+   check_guide $OUTPUT_DIR/stage6_cfast_tech_guide $cfastrepo/Manuals/CFAST_Tech_Ref CFAST_Tech_Ref.pdf 'CFAST Technical Reference Guide'
    return 0
 }
 
@@ -1191,10 +1191,10 @@ make_cfast_user_guide()
    # Build CFAST User Guide
    echo Building CFAST User guide
    CD_REPO $cfastrepo/Manuals/CFAST_Users_Guide $CFASTBRANCH || return 1
-   ./make_guide.sh &> $OUTPUT_DIR/stage7_cfast_user_guide
+   ./make_guide.sh &> $OUTPUT_DIR/stage6_cfast_user_guide
 
    # Check guide for completion and copy to website if successful
-   check_guide $OUTPUT_DIR/stage7_cfast_user_guide $cfastrepo/Manuals/CFAST_Users_Guide CFAST_Users_Guide.pdf 'CFAST Users Guide'
+   check_guide $OUTPUT_DIR/stage6_cfast_user_guide $cfastrepo/Manuals/CFAST_Users_Guide CFAST_Users_Guide.pdf 'CFAST Users Guide'
    return 0
 }
 
@@ -1207,10 +1207,10 @@ make_cdata_guide()
    # Build CDATA guide
    echo Building CData guide
    CD_REPO $cfastrepo/Manuals/CFAST_CData_Guide $CFASTBRANCH || return 1
-   ./make_guide.sh &> $OUTPUT_DIR/stage7_cdata_guide
+   ./make_guide.sh &> $OUTPUT_DIR/stage6_cdata_guide
 
    # Check guide for completion and copy to website if successful
-   check_guide $OUTPUT_DIR/stage7_cdata_guide $cfastrepo/Manuals/CFAST_CData_Guide CFAST_CData_Guide.pdf 'CData Guide'
+   check_guide $OUTPUT_DIR/stage6_cdata_guide $cfastrepo/Manuals/CFAST_CData_Guide CFAST_CData_Guide.pdf 'CData Guide'
    return 0
 }
 
@@ -1256,10 +1256,10 @@ make_cfast_vv_guide()
    # Build CFAST Tech Guide
    echo Building CFAST VV guide
    CD_REPO $cfastrepo/Manuals/CFAST_Validation_Guide $CFASTBRANCH || return 1
-   ./make_guide.sh &> $OUTPUT_DIR/stage7_cfast_vv_guide
+   ./make_guide.sh &> $OUTPUT_DIR/stage6_cfast_vv_guide
 
    # Check guide for completion and copy to website if successful
-   check_guide $OUTPUT_DIR/stage7_cfast_vv_guide $cfastrepo/Manuals/CFAST_Validation_Guide CFAST_Validation_Guide.pdf 'CFAST Verification and Validation Guide'
+   check_guide $OUTPUT_DIR/stage6_cfast_vv_guide $cfastrepo/Manuals/CFAST_Validation_Guide CFAST_Validation_Guide.pdf 'CFAST Verification and Validation Guide'
    return 0
 }
 
@@ -1272,10 +1272,10 @@ make_cfast_config_guide()
    # Build CFAST Configuration Guide
    echo Building CFAST Configuration guide
    CD_REPO $cfastrepo/Manuals/CFAST_Configuration_Guide $CFASTBRANCH || return 1
-   ./make_guide.sh &> $OUTPUT_DIR/stage7_cfast_config_guide
+   ./make_guide.sh &> $OUTPUT_DIR/stage6_cfast_config_guide
 
    # Check guide for completion and copy to website if successful
-   check_guide $OUTPUT_DIR/stage7_cfast_config_guide $cfastrepo/Manuals/CFAST_Configuration_Guide CFAST_Configuration_Guide.pdf 'CFAST Configuration Guide'
+   check_guide $OUTPUT_DIR/stage6_cfast_config_guide $cfastrepo/Manuals/CFAST_Configuration_Guide CFAST_Configuration_Guide.pdf 'CFAST Configuration Guide'
    return 0
 }
 
@@ -1739,51 +1739,56 @@ cd $cur_dir
 
 check_git_checkout
 
-### Stage 2a ###
+### Stage 2 ###
+
+#*** build cfast debug cfast
 compile_cfast_db || exit 1
 check_compile_cfast_db || exit 1
 
-### Stage 2f ###
+#*** build debug gnu cfast
 if [ "$compiler" != "gnu" ]; then
   compile_cfast_gnu_db || exit 1
   check_compile_cfast_gnu_db || exit 1
 fi
 
-### Stage 2b ###
+#*** build release cfast
 compile_cfast || exit 1
 check_compile_cfast || exit 1
 
-### Stage 2c ###
+#*** build smv utilities
 compile_smv_utilities || exit 1
 check_smv_utilities || exit 1
 
-### Stage 2d ###
+#*** build debug smokeview
 compile_smv_db || exit 1
 check_compile_smv_db || exit 1
 
-### Stage 2e ###
+#*** build release smokeview
 compile_smv || exit 1
 check_compile_smv || exit 1
 
 ### Stage 3 ###
+
+#*** run cases - debug
 if [[ $stage2_build_cfast_debug_success ]] ; then
    run_vv_cases_debug || exit 1
    check_vv_cases_debug || exit 1
 fi
 
-### Stage 4 ###
+#*** run cases - release
 if [[ $stage2_build_cfast_release_success ]] ; then
    run_vv_cases_release || exit 1
    check_vv_cases_release || exit 1
 fi
 
-### Stage 5 ###
+### Stage 4 ###
 if [[ $stage2_build_cfast_release_success && $stage2_build_smv_release_success ]] ; then
    make_cfast_pictures || exit 1
    check_cfast_pictures
 fi
 
-### Stage 6 - matlab verification ###
+### stage 5 - matlab verification ###
+#*** run matlab verification
 if [[ "$SKIP" == "" ]]; then
   if [ "$MATLABEXE" == "" ]; then
     check_matlab_license_server || exit 1
@@ -1792,7 +1797,7 @@ if [[ "$SKIP" == "" ]]; then
   fi
 fi
 
-### Stage 6 - build vvcalc ###
+#*** build vvcalc
 if [[ "$SKIP" == "" ]]; then
   if [ "$MATLABEXE" == "" ]; then
     compile_vvcalc || exit 1
@@ -1800,7 +1805,7 @@ if [[ "$SKIP" == "" ]]; then
   fi
 fi
 
-### Stage 6 - matlab validation ###
+#*** run matlab valiation
 if [[ "$SKIP" == "" ]]; then
   if [ "$MATLABEXE" == "" ]; then
     run_matlab_validation || exit 1
@@ -1810,7 +1815,7 @@ if [[ "$SKIP" == "" ]]; then
   fi
 fi
 
-### Stage 7 ###
+### Stage 6 ###
 if [[ "$SKIP" == "" ]]; then
   make_cfast_tech_guide || exit 1
   make_cfast_user_guide || exit 1
