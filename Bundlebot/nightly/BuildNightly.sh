@@ -1,17 +1,16 @@
 #!/bin/bash
 
-UPLOAD=
+UPLOAD=-g
 FDS_HASH=
 SMV_HASH=
 FDS_RELEASE=
 SMV_RELEASE=
 FDS_BRANCH=master
 SMV_BRANCH=master
-UPLOAD=
 
 # uncomment following lines to build using specified hash and revisions
 
-#UPLOAD=-U
+#UPLOAD=
 #FDS_HASH=ca0430f09b
 #SMV_HASH=2f257722a
 #FDS_RELEASE=FDS-6.10.1-1509
