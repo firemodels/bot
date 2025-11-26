@@ -1379,7 +1379,7 @@ email_build_status()
       fi
       if [[ "$UPLOAD" == "1" ]] && [[ -e $GUIDES2GH ]]; then
          cd $cfastbotdir
-         $GUIDES2GH >& $OUTPUT_DIR/stage_upload
+         $GUIDES2GH >& $OUTPUT_DIR/stage7_upload
          GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_CFAST_TAG
          echo ""                >> $TIME_LOG
          echo "Guides: $GITURL" >> $TIME_LOG
