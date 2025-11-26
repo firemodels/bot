@@ -92,7 +92,7 @@ BUILDLIBS()
   echo "***************" >> $compilelog 2>&1 
   echo "***building smokeview libraries" >> $compilelog 2>&1 
 
-  cd $smvrepo/Build/LIBS/${smvcompiler}_$platform$SMVSIZE
+  cd $smvrepo/Build/LIBS/${smvcompiler}_$platform
   ./make_LIBS.sh bot >> $compilelog 2>&1 
 }
 
@@ -102,11 +102,11 @@ BUILD()
 {
   prog=$1
 
-  echo "***building ${prog}_$platform$SMVSIZE "
+  echo "***building ${prog}_$platform "
   echo ""                >> $compilelog 2>&1 
   echo "***************" >> $compilelog 2>&1 
   echo "***building $prog" >> $compilelog 2>&1 
-  cd $smvrepo/Build/$prog/${smvcompiler}_$platform$SMVSIZE
+  cd $smvrepo/Build/$prog/${smvcompiler}_$platform
  ( $RUNSCRIPT ./make_${prog}.sh bot >> $compilelog 2>&1  ) &
 }
 
@@ -117,11 +117,11 @@ CHECK_BUILD()
   prog=$1
 
   $WAITSCRIPT ./make_${prog}.sh
-  if [ ! -e $smvrepo/Build/$prog/${smvcompiler}_$platform$SMVSIZE/${prog}_$platform$SMVSIZE ]; then
-    echo "***error: The program ${prog}_${platform}$SMVSIZE failed to build"
-    echo "***error: The program ${prog}_${platform}$SMVSIZE failed to build"   >> $errorlog 2>&1
+  if [ ! -e $smvrepo/Build/$prog/${smvcompiler}_$platform/${prog}_$platform ]; then
+    echo "***error: The program ${prog}_${platform} failed to build"
+    echo "***error: The program ${prog}_${platform} failed to build"   >> $errorlog 2>&1
   else
-    cp $smvrepo/Build/$prog/${smvcompiler}_$platform$SMVSIZE/${prog}_$platform$SMVSIZE $CURDIR/apps/$prog
+    cp $smvrepo/Build/$prog/${smvcompiler}_$platform/${prog}_$platform $CURDIR/apps/$prog
   fi
 }
 
@@ -138,7 +138,6 @@ if [ "`uname`" == "Darwin" ] ; then
   mpitype=ompi
 fi
 
-SMVSIZE=_64
 CURDIR=`pwd`
 
 RUNSCRIPT=$CURDIR/run_script.sh
