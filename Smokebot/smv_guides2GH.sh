@@ -21,7 +21,6 @@ UPLOADINFO ()
   echo "SMV_REVISION $S_REVISION" >> $DIR/SMV_INFO.txt
   echo ***Uploading SMV_INFO.txt
   gh release upload $GH_SMOKEVIEW_TAG $DIR/SMV_INFO.txt -R github.com/$GH_OWNER/$GH_REPO --clobber
-  rm -f $DIR/SMV_INFO.txt
 }
 
 UPLOADGUIDE ()
