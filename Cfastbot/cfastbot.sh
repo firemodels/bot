@@ -289,7 +289,7 @@ compile_cfast_db()
    echo "Building"
    echo "   cfast"
    echo "      Intel debug"
-   CD_REPO $cfastrepo/Build/CFAST/${compiler}_${platform}_64_db $CFASTBRANCH || return 1
+   CD_REPO $cfastrepo/Build/CFAST/${compiler}_${platform}_db $CFASTBRANCH || return 1
    make -f ../makefile clean &> /dev/null
    ./make_cfast.sh &> $OUTPUT_DIR/stage2a
    return 0
@@ -309,7 +309,7 @@ compile_cfast_gnu_db()
        module load $OPENMPI_GNU
        compile_gnu=1
        echo "      gnu debug"
-       CD_REPO $cfastrepo/Build/CFAST/gnu_${platform}_64_db $CFASTBRANCH || return 1
+       CD_REPO $cfastrepo/Build/CFAST/gnu_${platform}_db $CFASTBRANCH || return 1
        make -f ../makefile clean &> /dev/null
        ./make_cfast.sh &> $OUTPUT_DIR/stage2f
        module unload $OPENMPI_GNU
@@ -327,8 +327,8 @@ check_compile_cfast_gnu_db()
 {
    # Check for errors in CFAST debug compilation
    if [ "$compile_gnu" == "1" ]; then
-     CD_REPO $cfastrepo/Build/CFAST/gnu_${platform}_64_db $CFASTBRANCH || return 1
-     if [ -e "cfast7_${platform}_64_db" ]
+     CD_REPO $cfastrepo/Build/CFAST/gnu_${platform}_db $CFASTBRANCH || return 1
+     if [ -e "cfast7_${platform}_db" ]
      then
         stage2f_success=true
      else
@@ -357,8 +357,8 @@ check_compile_cfast_gnu_db()
 check_compile_cfast_db()
 {
    # Check for errors in CFAST debug compilation
-   CD_REPO $cfastrepo/Build/CFAST/${compiler}_${platform}_64_db $CFASTBRANCH || return 1
-   if [ -e "cfast7_${platform}_64_db" ]
+   CD_REPO $cfastrepo/Build/CFAST/${compiler}_${platform}_db $CFASTBRANCH || return 1
+   if [ -e "cfast7_${platform}_db" ]
    then
       stage2a_success=true
    else
@@ -387,7 +387,7 @@ compile_cfast()
 { 
    # Build release CFAST
    echo "      release"
-   CD_REPO $cfastrepo/Build/CFAST/${compiler}_${platform}_64 $CFASTBRANCH || return 1
+   CD_REPO $cfastrepo/Build/CFAST/${compiler}_${platform} $CFASTBRANCH || return 1
    make -f ../makefile clean &> /dev/null
    ./make_cfast.sh &> $OUTPUT_DIR/stage2b
 }
@@ -399,8 +399,8 @@ compile_cfast()
 check_compile_cfast()
 {
    # Check for errors in CFAST release compilation
-   CD_REPO $cfastrepo/Build/CFAST/${compiler}_${platform}_64 $CFASTBRANCH || return 1
-   if [[ -e "cfast7_${platform}_64" ]]
+   CD_REPO $cfastrepo/Build/CFAST/${compiler}_${platform} $CFASTBRANCH || return 1
+   if [[ -e "cfast7_${platform}" ]]
    then
       stage2b_success=true
    else
@@ -946,7 +946,7 @@ compile_vvcalc()
 { 
    # Build release vvcalc
    echo "   build VandV_Calcs" 
-   CD_REPO $cfastrepo/Build/VandV_Calcs/${compiler}_${platform}_64 $CFASTBRANCH || return 1
+   CD_REPO $cfastrepo/Build/VandV_Calcs/${compiler}_${platform} $CFASTBRANCH || return 1
    make -f ../makefile clean &> /dev/null
    ./make_vv.sh &> $OUTPUT_DIR/stage6b
 
@@ -959,8 +959,8 @@ compile_vvcalc()
 
 check_compile_vvcalc()
 {
-   CD_REPO $cfastrepo/Build/VandV_Calcs/${compiler}_${platform}_64 $CFASTBRANCH || return 1
-   if [[ -e "VandV_Calcs_${platform}_64" ]]
+   CD_REPO $cfastrepo/Build/VandV_Calcs/${compiler}_${platform} $CFASTBRANCH || return 1
+   if [[ -e "VandV_Calcs_${platform}" ]]
    then
       stage6b_success=true
    else
@@ -1028,11 +1028,11 @@ run_matlab_validation()
    echo "   Validation"
    echo "      run VandV_Calcs"
    CD_REPO $cfastrepo/Validation $CFASTBRANCH || return 1
-   ../Build/VandV_Calcs/${compiler}_${platform}_64/VandV_Calcs_${platform}_64 CFAST_Pressure_Correction_inputs.csv &> /dev/null
+   ../Build/VandV_Calcs/${compiler}_${platform}/VandV_Calcs_${platform} CFAST_Pressure_Correction_inputs.csv &> /dev/null
    cp pressures.csv LLNL_Enclosure/LLNL_pressures.csv
-   ../Build/VandV_Calcs/${compiler}_${platform}_64/VandV_Calcs_${platform}_64 CFAST_Temperature_Profile_inputs.csv &> /dev/null
+   ../Build/VandV_Calcs/${compiler}_${platform}/VandV_Calcs_${platform} CFAST_Temperature_Profile_inputs.csv &> /dev/null
    cp profiles.csv Steckler_Compartment/.
-   ../Build/VandV_Calcs/${compiler}_${platform}_64/VandV_Calcs_${platform}_64 CFAST_Heat_Flux_Profile_inputs.csv &> /dev/null
+   ../Build/VandV_Calcs/${compiler}_${platform}/VandV_Calcs_${platform} CFAST_Heat_Flux_Profile_inputs.csv &> /dev/null
    cp flux_profiles.csv Fleury_Heat_Flux/.
    
    echo "      make plots"
