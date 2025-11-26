@@ -1426,6 +1426,7 @@ echo "    Run dir: $cfastbotdir"
 MKDIR $OUTPUT_DIR
 MKDIR $GITSTATUS_DIR
 MKDIR $HISTORY_DIR
+touch $OUTPUT_DIR/stage0_start
 
 #*** make sure cfastbot is running in the correct directory
 
