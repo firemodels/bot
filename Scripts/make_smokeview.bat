@@ -19,9 +19,9 @@ set GLUT=glut
 set CURDIR=%CD%
 
 
-cd ..\..\smv\Build\smokeview\intel_win_64
+cd ..\..\smv\Build\smokeview\intel_win
 erase *.obj *.mod *.exe 2> Nul
-make -j 4 GLUT="%GLUT%" SHELL="%ComSpec%" SMV_TESTFLAG="%SMV_TESTFLAG%" SMV_TESTSTRING="%SMV_TESTSTRING%" -f ..\Makefile intel_win_64
+make -j 4 GLUT="%GLUT%" SHELL="%ComSpec%" SMV_TESTFLAG="%SMV_TESTFLAG%" SMV_TESTSTRING="%SMV_TESTSTRING%" -f ..\Makefile intel_win
 cd %CURDIR%
 pause
 

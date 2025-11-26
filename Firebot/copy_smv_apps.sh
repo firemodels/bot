@@ -39,9 +39,9 @@ CP ()
 # ----------------- start of script ------------------------------
 
 if [ "`uname`" == "Darwin" ]; then
-  OS=_osx_64
+  OS=_osx
 else
-  OS=_linux_64
+  OS=_linux
 fi
 
 # get repo root name
@@ -64,10 +64,6 @@ echo ***copying smokeview  apps
 CP $smvrepo/Build/background/intel$OS background$OS $TODIR/apps background
 CP $smvrepo/Build/hashfile/intel$OS   hashfile$OS   $TODIR/apps hashfile
 CP $smvrepo/Build/smokediff/intel$OS  smokediff$OS  $TODIR/apps smokediff
-if [ "$OS" == "_osx_64" ]; then
-  CP $smvrepo/Build/smokeview/intel_osx_64      smokeview_osx_64   $TODIR/apps smokeview
-else
-  CP $smvrepo/Build/smokeview/intel$OS  smokeview$OS  $TODIR/apps smokeview
-fi
+CP $smvrepo/Build/smokeview/intel$OS  smokeview$OS  $TODIR/apps smokeview
 CP $smvrepo/Build/smokezip/intel$OS   smokezip$OS   $TODIR/apps smokezip
 CP $smvrepo/Build/wind2fds/intel$OS   wind2fds$OS   $TODIR/apps wind2fds

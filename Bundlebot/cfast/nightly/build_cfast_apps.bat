@@ -57,9 +57,9 @@ call %cfast_root%\Build\scripts\setup_intel_compilers.bat intel64               
 @echo.                                                                          >> %stage2out%
 
 @echo ***Building CFAST
-cd %cfast_root%\Build\CFAST\intel_win_64
+cd %cfast_root%\Build\CFAST\intel_win
 call make_cfast.bat bot release                                                  >> %stage2out% 2>&1
-call :copy_file . cfast7_win_64.exe %cfast_root%\Utilities\for_bundle\Bin cfast.exe
+call :copy_file . cfast7_win.exe %cfast_root%\Utilities\for_bundle\Bin cfast.exe
 
 @echo.                                                                          >> %stage2out%
 @echo ------------------------------------------------------------------------- >> %stage2out%
@@ -68,9 +68,9 @@ call :copy_file . cfast7_win_64.exe %cfast_root%\Utilities\for_bundle\Bin cfast.
 @echo.                                                                          >> %stage2out%
 
 @echo ***Building CData
-cd %cfast_root%\Build\Cdata\intel_win_64
+cd %cfast_root%\Build\Cdata\intel_win
 call make_cdata.bat bot release                                                 >> %stage2out% 2>&1
-call :copy_file . cdata7_win_64.exe %cfast_root%\Utilities\for_bundle\Bin cdata.exe
+call :copy_file . cdata7_win.exe %cfast_root%\Utilities\for_bundle\Bin cdata.exe
 
 @echo.                                                                          >> %stage2out%
 @echo ------------------------------------------------------------------------- >> %stage2out%
@@ -79,9 +79,9 @@ call :copy_file . cdata7_win_64.exe %cfast_root%\Utilities\for_bundle\Bin cdata.
 @echo.                                                                          >> %stage2out%
 
 @echo ***Building VandVCalcs
-cd %cfast_root%\Build\VandV_Calcs\intel_win_64
+cd %cfast_root%\Build\VandV_Calcs\intel_win
 call make_vv.bat bot release                                                    >> %stage2out% 2>&1
-call :copy_file . VandV_Calcs_win_64.exe %cfast_root%\Utilities\for_bundle\Bin VandV_Calcs.exe
+call :copy_file . VandV_Calcs_win.exe %cfast_root%\Utilities\for_bundle\Bin VandV_Calcs.exe
 
 cd %cfast_root%\Utilities\for_bundle\scripts
 

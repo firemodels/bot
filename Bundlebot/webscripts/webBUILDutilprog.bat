@@ -20,24 +20,24 @@ goto:eof
 
 call %envfile%
 echo.
-echo  Building %prog% for 64 bit %platform%
-Title Building %prog% for 64 bit %platform%
+echo  Building %prog% for %platform%
+Title Building %prog% for %platform%
 
 %git_drive%
 
 
 if "%platform%" == "windows" (
-  cd %git_root%\fds\Utilities\%prog%\intel_win_64
+  cd %git_root%\fds\Utilities\%prog%\intel_win
   call make_%prog% %type%
   goto eof
 )
 if "%platform%" == "linux" (
-  plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Utilities/%prog%/intel_linux_64 make_%prog%.sh
+  plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Utilities/%prog%/intel_linux make_%prog%.sh
   pause
   goto eof
 )
 if "%platform%" == "osx" (
-  plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Utilities/%prog%/intel_osx_64 make_%prog%.sh
+  plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Utilities/%prog%/intel_osx make_%prog%.sh
   pause
   goto eof
 )

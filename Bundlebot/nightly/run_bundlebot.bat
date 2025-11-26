@@ -1,5 +1,27 @@
 @echo off
 
+set use_currentbot=
+
+set upload_bundle=1
+set use_currentbot=
+set F_HASH=
+set S_HASH=
+set F_REVISION=
+set S_REVISION=
+set FDS_BRANCH=master
+set SMV_BRANCH=master
+
+:: uncomment to build with specified repos
+::set upload_bundle=
+::set use_currentbot=1
+::set F_HASH=ca0430f09b
+::set S_HASH=2f257722a
+::set F_REVISION=FDS-6.10.1-1509
+::set S_REVISION=SMV-6.10.5-249
+::set FDS_HASH=
+::set FDS_BRANCH=master
+::set SMV_BRANCH=size64
+
 set OWNER=%username%
 if "x%is_nightly%" == "x1" set OWNER=firemodels
 
@@ -10,9 +32,8 @@ set FDS_TAG=
 set SMV_TAG=
 set BRANCH_NAME=nightly
 set logfile=%userprofile%\.bundle\logfile.txt
-set upload_bundle=1
 set build_apps=1
-set clone_repos=1
+set clone_fdssmv_repos=1
 set emailto=
 
 if EXIST .bundlebot goto endif1
@@ -91,6 +112,7 @@ set webpagesrepo=%CD%
 cd ..
 set basedir=%CD%
 
+if "x%use_currentbot%" == "x1" goto skip1
 :: bring the bot repo up to date
 echo.
 echo ------------------------------------------------------
@@ -101,6 +123,7 @@ echo.
 call :cd_repo %botrepo% master || exit /b 1
 git fetch origin master > Nul
 git merge origin/master > Nul
+:skip1
 
 :: bring the webpages repo up to date
 echo.
@@ -122,17 +145,25 @@ set BUNSCRIPTDIR=%CD%
 
 if NOT "x%FDS_HASH%" == "x" goto skip_elsehash
 
-  call get_hash_revisions.bat || exit /b 1
+  if "x%F_HASH%" == "x" goto else1
+    set FDS_HASH_BUNDLER=%F_HASH%
+    set SMV_HASH_BUNDLER=%S_HASH%
+    set FDS_REVISION_BUNDLER=%F_REVISION%
+    set SMV_REVISION_BUNDLER=%S_REVISION%
+    goto endif1
+:else1
+    call get_hash_revisions.bat || exit /b 1
 
-  set /p FDS_HASH_BUNDLER=<output\FDS_HASH
-  set /p SMV_HASH_BUNDLER=<output\SMV_HASH
-  set /p FDS_REVISION_BUNDLER=<output\FDS_REVISION
-  set /p SMV_REVISION_BUNDLER=<output\SMV_REVISION
+    set /p FDS_HASH_BUNDLER=<output\FDS_HASH
+    set /p SMV_HASH_BUNDLER=<output\SMV_HASH
+    set /p FDS_REVISION_BUNDLER=<output\FDS_REVISION
+    set /p SMV_REVISION_BUNDLER=<output\SMV_REVISION
+    erase output\FDS_HASH
+    erase output\SMV_HASH
+    erase output\FDS_REVISION
+    erase output\SMV_REVISION
+:endif1
 
-  erase output\FDS_HASH
-  erase output\SMV_HASH
-  erase output\FDS_REVISION
-  erase output\SMV_REVISION
   goto endif_gethash
 
 :skip_elsehash
@@ -199,8 +230,8 @@ if "x%clone%" == "xclone" goto skip_warning
   pause >Nul
 :skip_warning
 
-if "x%clone_repos%" == "x" goto skip_clone
-call clone_repos %FDS_HASH_BUNDLER% %SMV_HASH_BUNDLER% %BRANCH_NAME% %FDS_TAG% %SMV_TAG% || exit /b 1
+if "x%clone_fdssmv_repos%" == "x" goto skip_clone
+call clone_repos %FDS_HASH_BUNDLER% %SMV_HASH_BUNDLER% %BRANCH_NAME% %FDS_BRANCH% %SMV_BRANCH% %FDS_TAG% %SMV_TAG%  || exit /b 1
 :skip_clone
 
 :: define revisions if hashes were specified on the command line
@@ -353,7 +384,7 @@ exit /b 0
    set valid=1
  )
  if "%1" EQU "-D" (
-   set clone_repos=
+   set clone_fdssmv_repos=
    set build_apps=
    set upload_bundle=
    set valid=1

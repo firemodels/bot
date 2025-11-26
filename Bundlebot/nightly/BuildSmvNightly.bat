@@ -1,6 +1,16 @@
 @echo off
 setlocal
 
+set upload=1
+set S_HASH=
+set S_REVISION=
+set S_BRANCH=
+
+::set upload=
+::set S_HASH=2f257722a
+::set S_REVISION=SMV-6.10.5-249
+::set S_BRANCH=size64
+
 set is_nightly=1
 
 set OWNER=firemodels
@@ -17,11 +27,11 @@ cd ..\..\..
 set reporoot=%CD%
 cd %CURDIR%
 
-call get_smv_hash_revisions > %outdir%\stage1_hash 2>&1
+call get_smv_hash_revisions %S_HASH% %S_REVISION% > %outdir%\stage1_hash 2>&1
 set /p smv_hash=<%outdir%\SMV_HASH
 
 echo *** cloning smv repo
-call clone_smv_repo %smv_hash%  > %outdir%\stage2_clone 2>&1
+call clone_smv_repo %smv_hash%  %S_BRANCH% > %outdir%\stage2_clone 2>&1
 
 cd %reporoot%\smv
 git describe --abbrev=7 --long --dirty > %outdir%\smvrepo_revision
@@ -41,7 +51,7 @@ call %reporoot%\smv\Utilities\Scripts\setup_intel_compilers.bat > %outdir%\stage
 :: build libraries
 title building libraries
 echo *** building libraries
-cd %reporoot%\smv\Build\LIBS\intel_win_64
+cd %reporoot%\smv\Build\LIBS\intel_win
 call make_LIBS bot > %outdir%\stage3_LIBS 2>&1
 
 echo *** Building applications
@@ -51,13 +61,13 @@ set "progs=background flush smokediff pnginfo smokezip fds2fed wind2fds set_path
 
 for %%x in ( %progs% ) do (
   title Building %%x
-  cd %reporoot%\smv\Build\%%x\intel_win_64
+  cd %reporoot%\smv\Build\%%x\intel_win
   echo *** building %%x
-  make -j 4 SHELL="%ComSpec%" -f ..\Makefile intel_win_64 > %outdir%\stage4_%%x 2>&1
+  make -j 4 SHELL="%ComSpec%" -f ..\Makefile intel_win > %outdir%\stage4_%%x 2>&1
 ) 
 
 echo *** building smokeview
-cd %reporoot%\smv\Build\smokeview\intel_win_64
+cd %reporoot%\smv\Build\smokeview\intel_win
 title Building smokeview
 call make_smokeview -release -bot > %outdir%\stage5_smokeview 2>&1
 
@@ -68,10 +78,13 @@ cd %CURDIR%\..\release
 call make_smv_bundle %BUNDLE_SMV_TAG% > %outdir%\stage6_bundle 2>&1
 
 cd %CURDIR%
-echo *** uploading Smokeview bundle
-Title Building Smokeview bundle
 
 set uploaddir=%userprofile%\.bundle\uploads
+echo smokeview bundle created: %uploaddir%\%smvrepo_revision%_win.exe
+
+if "x%upload%" == "x" goto skip_upload
+echo *** uploading Smokeview bundle
+Title Building Smokeview bundle
 
 set filelist=%TEMP%\smv_files_win.out
 gh release view SMOKEVIEW_TEST  -R github.com/%OWNER%/test_bundles | grep SMV | grep -v FDS | grep -v CFAST | grep win | gawk "{print $2}" > %filelist%
@@ -82,3 +95,4 @@ echo uploading %smvrepo_revision%_win.exe to github.com//%OWNER%/test_bundles
 gh release upload SMOKEVIEW_TEST %uploaddir%\%smvrepo_revision%_win.exe  -R github.com/%OWNER%/test_bundles --clobber
 
 echo *** upload complete
+:skip_upload

@@ -90,7 +90,7 @@ cd $CURDIR
 SMV_REPO=../../smv
 cd $SMV_REPO
 SMV_REPO=`pwd`
-PNGINFO=$SMV_REPO/Build/pnginfo/intel_linux_64/pnginfo_linux_64
+PNGINFO=$SMV_REPO/Build/pnginfo/intel_linux/pnginfo_linux
 
 cd $CURDIR
 if [ "$NEW_DIR" == "" ]; then

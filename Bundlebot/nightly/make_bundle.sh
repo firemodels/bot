@@ -415,7 +415,7 @@ echo "--- copying mpi ---"
 echo ""
 openmpifile=
 if [ "$MPI_VERSION" == "INTEL" ]; then
-  intelmpifile=$MPI_DIR/INTEL${INTEL_COMP_VERSION}linux_64.tar.gz
+  intelmpifile=$MPI_DIR/INTEL${INTEL_COMP_VERSION}linux.tar.gz
   if [ "$INTELMPI_TARFILE" != "" ]; then
     intelmpifile=$INTELMPI_TARFILE
   fi
@@ -423,17 +423,17 @@ if [ "$MPI_VERSION" == "INTEL" ]; then
   MPIEXEC=$fdsbindir/INTEL/bin/mpiexec
 else
   if [ "$PLATFORM" == "LINUX64" ]; then
-    openmpifile=$MPI_DIR/openmpi_${MPI_VERSION}_linux_64_${INTEL_COMP_VERSION}.tar.gz
+    openmpifile=$MPI_DIR/openmpi_${MPI_VERSION}_linux_${INTEL_COMP_VERSION}.tar.gz
   fi
   if [ "$PLATFORM" == "OSX64" ]; then
-    openmpifile=$MPI_DIR/openmpi_${MPI_VERSION}_osx_64_${INTEL_COMP_VERSION}.tar.gz
+    openmpifile=$MPI_DIR/openmpi_${MPI_VERSION}_osx_${INTEL_COMP_VERSION}.tar.gz
   fi
   if [ "$OPENMPI_TARFILE" != "" ]; then
     openmpifile=$OPENMPI_TARFILE
   fi
 #  CP $MPI_DIR $openmpifile  $fdsbindir $openmpifile
-  UNTAR $openmpifile $fdsbindir openmpi_64
-  MPIEXEC=$fdsbindir/openmpi_64/bin/mpiexec
+  UNTAR $openmpifile $fdsbindir openmpi
+  MPIEXEC=$fdsbindir/openmpi/bin/mpiexec
 fi
 
 TOMANIFESTFDS  $fdsbindir/fds        fds

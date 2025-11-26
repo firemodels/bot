@@ -1,5 +1,24 @@
 #!/bin/bash
 
+UPLOAD=
+FDS_HASH=
+SMV_HASH=
+FDS_RELEASE=
+SMV_RELEASE=
+FDS_BRANCH=master
+SMV_BRANCH=master
+UPLOAD=
+
+# uncomment following lines to build using specified hash and revisions
+
+#UPLOAD=-U
+#FDS_HASH=ca0430f09b
+#SMV_HASH=2f257722a
+#FDS_RELEASE=FDS-6.10.1-1509
+#SMV_RELEASE=SMV-6.10.5-249
+#FDS_BRANCH=master
+#SMV_BRANCH=size64
+
 # parameters for bundle
 
 if [ "`uname`" == "Darwin" ] ; then
@@ -18,6 +37,8 @@ if [ "$BUNDLE_MAILTO" != "" ]; then
 fi
 export INTEL_MPI_VERSION=2025.0
 export MPI_VERSION=INTEL
+
+
 
 #---------------------------------------------
 #                   usage
@@ -129,13 +150,10 @@ if [ "$BUNDLE_EMAIL" != "" ]; then
 fi
 ECHO=
 PROCEED=
-UPLOAD=-g
 
 FORCE=
 RELEASE=
 BRANCH=nightly
-FDS_HASH=
-SMV_HASH=
 FDS_TAG=
 SMV_TAG=
 LATEST=

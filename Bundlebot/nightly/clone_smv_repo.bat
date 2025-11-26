@@ -1,6 +1,7 @@
 @echo off
 setlocal
 set smv_hash=%1
+set smv_branch=%2
 set branch_name=nightly
 
 if NOT "x%smv_hash%" == "x" goto skip_smv_hash
@@ -25,6 +26,9 @@ if "x%smv_hash%" == "x" goto end_smv_hash
 set smvtaghash=%smv_hash%
 :end_smv_hash
 
+if "x%smv_branch%" == "x" goto skip1
+git checkout %smv_branch%
+:skip1
 git checkout -b %branch_name% %smvtaghash%
 
 git describe --abbrev=7 --dirty --long
