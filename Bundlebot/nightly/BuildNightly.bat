@@ -1,24 +1,19 @@
 @echo off
-set is_nightly=1
 if not exist %userprofile%\.bundle mkdir %userprofile%\.bundle
-set clone=clone
 set CURDIR=%CD%
 
-set use_currentbot=
-
-set upload_bundle=1
-set use_currentbot=
+set update_botrepo=
 set FDS_BRANCH=master
 set SMV_BRANCH=master
 
-::set upload_bundle=
-::set use_currentbot=1
+::set update_botrepo=
 ::set FDS_BRANCH=master
 ::set SMV_BRANCH=master
 
 set OWNER=%username%
-if "x%is_nightly%" == "x1" set OWNER=firemodels
+if "x%is_release%" == "x" set OWNER=firemodels
 
+set upload_bundle=
 set clone=
 set FDS_HASH=
 set SMV_HASH=
@@ -76,7 +71,7 @@ set webpagesrepo=%CD%
 cd ..
 set basedir=%CD%
 
-if "x%use_currentbot%" == "x1" goto skip1
+if "x%update_botrepo%" == "x" goto skip1
 :: bring the bot repo up to date
 echo.
 echo ------------------------------------------------------
@@ -104,8 +99,8 @@ cd %BUNDLESCRIPTDIR%
 
 :: create the bundle
 
-if x%is_nightly% == x1 goto else1
-:: hash and revisions obtained from config.bat (invoked in BuildRelease.bat)
+if x%is_release% == x goto else1
+:: this is a release bundle - hash and revisions obtained from config.bat (invoked in BuildRelease.bat)
   set FDS_HASH_BUNDLER=%BUNDLE_FDS_HASH%
   set SMV_HASH_BUNDLER=%BUNDLE_SMV_HASH%
   set FDS_REVISION_BUNDLER=%BUNDLE_FDS_TAG%
@@ -114,7 +109,7 @@ if x%is_nightly% == x1 goto else1
   set SMV_TAG=%BUNDLE_SMV_TAG%
   goto endif1
 :else1
-:: hash and revisions obtained from latest firebot pass
+:: this is a nightly bundle - hash and revisions obtained from latest firebot pass
   call get_hash_revisions.bat || exit /b 1
   set /p FDS_HASH_BUNDLER=<output\FDS_HASH
   set /p SMV_HASH_BUNDLER=<output\SMV_HASH
@@ -161,19 +156,6 @@ if NOT "%emailto%" == "" (
 echo.                                                        >> %logfile%
 
 type %logfile%
-
-if "x%clone%" == "xclone" goto skip_warning
-  echo.
-  echo ---------------------------------------------------------------
-  echo ---------------------------------------------------------------
-  echo You are about to erase and then clone the fds and smv repos.
-  echo Press any key to continue or CTRL c to abort.
-  echo To avoid this warning, use the -c option on the command line
-  echo ---------------------------------------------------------------
-  echo ---------------------------------------------------------------
-  echo.
-  pause >Nul
-:skip_warning
 
 call clone_repos %FDS_HASH_BUNDLER% %SMV_HASH_BUNDLER% %FDS_TAG% %SMV_TAG% %BRANCH_NAME% %FDS_BRANCH% %SMV_BRANCH%  || exit /b 1
 
@@ -274,11 +256,10 @@ echo This script builds FDS and Smokeview apps and generates a bundle using eith
 echo specified fds and smv repo revisions or revisions from the latest firebot pass.
 echo.
 echo Options:
-echo -c - bundle without warning about cloning/erasing fds and smv repos 
 echo -h - display this message
 echo -m mailtto - send email to mailto
 echo -R name - branch name [default: %BRANCH_NAME%]
-echo -U - do not upload bundle
+echo -U - upload bundle
 exit /b 0
 
 ::-----------------------------------------------------------------------
@@ -289,10 +270,6 @@ exit /b 0
  set valid=0
  set arg=%1
  
- if "%1" EQU "-c" (
-   set clone=clone
-   set valid=1
- )
  if "%1" EQU "-h" (
    call :usage
    set stopscript=1
@@ -309,7 +286,7 @@ exit /b 0
    shift
  )
  if "%1" EQU "-U" (
-   set upload_bundle=
+   set upload_bundle=1
    set valid=1
  )
  shift
