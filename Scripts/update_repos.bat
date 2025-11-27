@@ -18,6 +18,7 @@ set allrepos=bot cad cfast cor exp fds fig out radcal smv test_bundles
 set webrepos=webpages wikis
 set BRANCH=master
 set ahead=0
+set "updaterepos=%allrepos%"
 
 set wc=%repo%\bot\Scripts\bin\wc
 set grep=%repo%\bot\Scripts\bin\grep
@@ -31,7 +32,7 @@ if %stopscript% == 1 (
 )
 
 if %updatewebwiki% == 1 goto endif1
-for %%x in ( %allrepos% ) do ( call :update_repo %%x )
+for %%x in ( %updaterepos% ) do ( call :update_repo %%x )
 :endif1
 
 for %%x in ( %webrepos% ) do ( call :update_repo2 %%x )
@@ -112,6 +113,10 @@ goto eof
  if (%1)==() exit /b
  set valid=0
  set arg=%1
+ if /I "%1" EQU "-b" (
+   set updaterepos=bot
+   exit /b
+ )
  if /I "%1" EQU "-h" (
    call :usage
    set stopscript=1
@@ -142,6 +147,7 @@ exit /b
 echo Update the repos %allrepos% if they exist
 echo.
 echo Options:
+echo -b - update only bot repo
 echo -h - display this message
 echo -m - checkout the master branch before updating a repo
 echo -w - update web and wik repos
