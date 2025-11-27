@@ -1,32 +1,28 @@
 @echo off
+:: nightly bundles are uploaded to the firemodels test repo,
+:: release bundles are uploaded to the users test repo 
+set OWNER=%username%
+if "x%is_release%" == "x" set OWNER=firemodels
+
 if not exist %userprofile%\.bundle mkdir %userprofile%\.bundle
 set CURDIR=%CD%
 
-set update_botrepo=
+:: default is to build bundle after updating bot repo and using fds/smv master branches 
+set update_botrepo=1
 set FDS_BRANCH=master
 set SMV_BRANCH=master
 
+:: uncomment following lines to build a bundle using different branches (for testing)
 ::set update_botrepo=
 ::set FDS_BRANCH=master
 ::set SMV_BRANCH=master
 
-set OWNER=%username%
-if "x%is_release%" == "x" set OWNER=firemodels
-
 set upload_bundle=
-set clone=
-set FDS_HASH=
-set SMV_HASH=
 set FDS_TAG=
 set SMV_TAG=
 set BRANCH_NAME=nightly
 set logfile=%userprofile%\.bundle\logfile.txt
 set emailto=
-
-if EXIST .bundlebot goto endif1
-  echo ***error: run_bundlebot.bat must be run in bot/Bundlebot directory
-  exit /b 1
-:endif1
 
 ::*** parse command line arguments
 call :getopts %*
@@ -43,7 +39,6 @@ if NOT "x%BRANCH_NAME%" == "xrelease" goto skip_branch
   set pub_dir=release
 :skip_branch
 
-:: make sure we are running in the master branch
 set BUNDLESCRIPTDIR=%CD%
 cd ..\..\..
 set REPOROOT=%CD%
@@ -84,16 +79,14 @@ git fetch origin master > Nul
 git merge origin/master > Nul
 :skip1
 
-:: bring the webpages repo up to date
+:: bring the webpages and wiki repos up to date
 echo.
 echo ------------------------------------------------------
 echo ------------------------------------------------------
-echo updating web repo
+echo updating web and wiki repos
 echo.
-
-call :cd_repo %webpagesrepo% nist-pages || exit /b 1
-git fetch origin nist-pages  > Nul
-git merge origin/nist-pages  > Nul
+cd %REPOROOT%\Scripts
+call update_repos -w > Nul
 
 cd %BUNDLESCRIPTDIR%
 

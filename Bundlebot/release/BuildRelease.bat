@@ -8,9 +8,6 @@ echo cleaning bot repo
 cd ..\..
 git clean -dxf
 
-cd %CURDIR%\..\..\Scripts
-call update_repos -w
-
 set UPLOADBUNDLE=-U
 :: uncomment following line to test script (does not upload bundle to github or run gh command)
 :: set UPLOADBUNDLE=
