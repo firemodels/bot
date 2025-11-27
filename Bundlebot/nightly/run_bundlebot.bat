@@ -4,23 +4,13 @@ set use_currentbot=
 
 set upload_bundle=1
 set use_currentbot=
-set F_HASH=
-set S_HASH=
-set F_REVISION=
-set S_REVISION=
 set FDS_BRANCH=master
 set SMV_BRANCH=master
 
-:: uncomment to build with specified repos
 ::set upload_bundle=
 ::set use_currentbot=1
-::set F_HASH=ca0430f09b
-::set S_HASH=2f257722a
-::set F_REVISION=FDS-6.10.1-1509
-::set S_REVISION=SMV-6.10.5-249
-::set FDS_HASH=
 ::set FDS_BRANCH=master
-::set SMV_BRANCH=size64
+::set SMV_BRANCH=master
 
 set OWNER=%username%
 if "x%is_nightly%" == "x1" set OWNER=firemodels
@@ -32,8 +22,6 @@ set FDS_TAG=
 set SMV_TAG=
 set BRANCH_NAME=nightly
 set logfile=%userprofile%\.bundle\logfile.txt
-set build_apps=1
-set clone_fdssmv_repos=1
 set emailto=
 
 if EXIST .bundlebot goto endif1
@@ -56,36 +44,8 @@ if NOT "x%BRANCH_NAME%" == "xrelease" goto skip_branch
   set pub_dir=release
 :skip_branch
 
-::*** error checking
-
-set abort=
-
-::--- both or neither fds and smv hashes need to be defined
-set bad_hash=
-if NOT "x%FDS_HASH%" == "x" goto hash1a
-if "x%SMV_HASH%" == "x" goto hash1b
-set bad_hash=1
-:hash1b
-:hash1a
-
-if "x%FDS_HASH%" == "x" goto hash2a
-if NOT "x%SMV_HASH%" == "x" goto hash2b
-set bad_hash=1
-:hash2b
-:hash2a
-
-if "x%bad_hash%" == "x" goto badhash
-  echo ***error: both or neither fds and smv hashes must be specified.  Only one was found
-  set abort=1
-:badhash
-
-if "x%abort%" == "x" goto error4
-  call :usage
-  exit /b 1
-:error4
-
 :: make sure we are running in the master branch
-set BUNSCRIPTDIR=%CD%
+set BUNDLESCRIPTDIR=%CD%
 cd ..\..\..
 set REPOROOT=%CD%
 
@@ -94,7 +54,7 @@ set botrepo=%CD%
 
 if exist %REPOROOT%\webpages goto endif4
   echo ***error: the webpages repo does not exist
-  cd %BUNSCRIPTDIR%
+  cd %BUNDLESCRIPTDIR%
   exit /b 1
 :endif4
 
@@ -136,50 +96,31 @@ call :cd_repo %webpagesrepo% nist-pages || exit /b 1
 git fetch origin nist-pages  > Nul
 git merge origin/nist-pages  > Nul
 
-cd %BUNSCRIPTDIR%
+cd %BUNDLESCRIPTDIR%
 
 :: create the bundle
 
-set BUNSCRIPTDIR=%CD%
-
-
-if NOT "x%FDS_HASH%" == "x" goto skip_elsehash
-
-  if "x%F_HASH%" == "x" goto else1
-    set FDS_HASH_BUNDLER=%F_HASH%
-    set SMV_HASH_BUNDLER=%S_HASH%
-    set FDS_REVISION_BUNDLER=%F_REVISION%
-    set SMV_REVISION_BUNDLER=%S_REVISION%
-    goto endif1
+if x%is_nightly% == x1 goto else1
+:: hash and revisions obtained from config.bat (invoked in BuildRelease.bat)
+  set FDS_HASH_BUNDLER=%BUNDLE_FDS_HASH%
+  set SMV_HASH_BUNDLER=%BUNDLE_SMV_HASH%
+  set FDS_REVISION_BUNDLER=%BUNDLE_FDS_TAG%
+  set FDS_TAG=%BUNDLE_FDS_TAG%
+  set SMV_REVISION_BUNDLER=%BUNDLE_SMN_TAG%
+  set SMV_TAG=%BUNDLE_SMV_TAG%
+  goto endif1
 :else1
-    call get_hash_revisions.bat || exit /b 1
-
-    set /p FDS_HASH_BUNDLER=<output\FDS_HASH
-    set /p SMV_HASH_BUNDLER=<output\SMV_HASH
-    set /p FDS_REVISION_BUNDLER=<output\FDS_REVISION
-    set /p SMV_REVISION_BUNDLER=<output\SMV_REVISION
-    erase output\FDS_HASH
-    erase output\SMV_HASH
-    erase output\FDS_REVISION
-    erase output\SMV_REVISION
+:: hash and revisions obtained from latest firebot pass
+  call get_hash_revisions.bat || exit /b 1
+  set /p FDS_HASH_BUNDLER=<output\FDS_HASH
+  set /p SMV_HASH_BUNDLER=<output\SMV_HASH
+  set /p FDS_REVISION_BUNDLER=<output\FDS_REVISION
+  set /p SMV_REVISION_BUNDLER=<output\SMV_REVISION
+  erase output\FDS_HASH
+  erase output\SMV_HASH
+  erase output\FDS_REVISION
+  erase output\SMV_REVISION
 :endif1
-
-  goto endif_gethash
-
-:skip_elsehash
-  set FDS_REVISION_BUNDLER=%FDS_HASH%
-  set SMV_REVISION_BUNDLER=%SMV_HASH%
-  if "x%FDS_TAG%" == "x" goto endif3
-    set FDS_REVISION_BUNDLER=%FDS_TAG%
-  :endif3
-  if "x%SMV_TAG%" == "x" goto endif4
-    set SMV_REVISION_BUNDLER=%SMV_TAG%
-  :endif4
-  set FDS_HASH_BUNDLER=%FDS_HASH%
-  set SMV_HASH_BUNDLER=%SMV_HASH%
-:endif_gethash
-
-cd %BUNSCRIPTDIR%
 
 echo.                                                         > %logfile%
 echo ------------------------------------------------------  >> %logfile%
@@ -230,23 +171,7 @@ if "x%clone%" == "xclone" goto skip_warning
   pause >Nul
 :skip_warning
 
-if "x%clone_fdssmv_repos%" == "x" goto skip_clone
-call clone_repos %FDS_HASH_BUNDLER% %SMV_HASH_BUNDLER% %BRANCH_NAME% %FDS_BRANCH% %SMV_BRANCH% %FDS_TAG% %SMV_TAG%  || exit /b 1
-:skip_clone
-
-:: define revisions if hashes were specified on the command line
-if NOT "x%FDS_HASH%" == "x" goto skip_getrevision
-
-  call :cd_repo %basedir%\fds %BRANCH_NAME% || exit /b 1
-  git describe --abbrev=7 --dirty --long > temp1
-  set /p FDS_REVISION_BUNDLER=<temp1
-  erase temp1
-
-  call :cd_repo %basedir%\smv %BRANCH_NAME% || exit /b 1
-  git describe --abbrev=7 --dirty --long > temp1
-  set /p SMV_REVISION_BUNDLER=<temp1
-  erase temp1
-:skip_getrevision
+call clone_repos %FDS_HASH_BUNDLER% %SMV_HASH_BUNDLER% %FDS_TAG% %SMV_TAG% %BRANCH_NAME% %FDS_BRANCH% %SMV_BRANCH%  || exit /b 1
 
 echo.
 echo ------------------------------------------------------
@@ -254,17 +179,15 @@ echo ------------------------------------------------------
 echo Building apps
 echo.
 
-cd %BUNSCRIPTDIR%
-if "x%build_apps%" == "x" goto skip_build
+cd %BUNDLESCRIPTDIR%
 call make_apps         || exit /b 1
-:skip_build
 
 echo.
 echo ------------------------------------------------------
 echo ------------------------------------------------------
 echo Copying fds apps
 echo.
-cd %BUNSCRIPTDIR%
+cd %BUNDLESCRIPTDIR%
 call copy_apps fds bot || exit /b 1
 
 echo.
@@ -273,7 +196,7 @@ echo ------------------------------------------------------
 echo Copying smv apps
 echo.
 
-cd %BUNSCRIPTDIR%
+cd %BUNDLESCRIPTDIR%
 call copy_apps smv bot || exit /b 1
 
 echo.
@@ -282,7 +205,7 @@ echo ------------------------------------------------------
 echo Copying fds pubs
 echo.
 
-cd %BUNSCRIPTDIR%
+cd %BUNDLESCRIPTDIR%
 call copy_pubs firebot  %OWNER% || exit /b 1
 
 echo.
@@ -291,7 +214,7 @@ echo ------------------------------------------------------
 echo Copying smv pubs
 echo.
 
-cd %BUNSCRIPTDIR%
+cd %BUNDLESCRIPTDIR%
 call copy_pubs smokebot %OWNER% || exit /b 1
 
 echo.
@@ -300,10 +223,10 @@ echo ------------------------------------------------------
 echo making bundle
 echo.
 
-cd %BUNSCRIPTDIR%
+cd %BUNDLESCRIPTDIR%
 call make_bundle bot %FDS_REVISION_BUNDLER% %SMV_REVISION_BUNDLER% %nightly%
 
-cd %BUNSCRIPTDIR%
+cd %BUNDLESCRIPTDIR%
 
 if "x%upload_bundle%" == "x" goto skip_upload
   echo.
@@ -347,19 +270,11 @@ echo This script builds FDS and Smokeview apps and generates a bundle using eith
 echo specified fds and smv repo revisions or revisions from the latest firebot pass.
 echo.
 echo Options:
-echo -b - branch name [default: %BRANCH_NAME%]
 echo -c - bundle without warning about cloning/erasing fds and smv repos 
-echo -C - get manuals from .bundle/manuals
-echo -D - for development, turn off making apps and uploading bundle
-echo -F - fds repo hash
 echo -h - display this message
 echo -m mailtto - send email to mailto
-echo -r - same as -b release or -R release
-echo -R - branch name [default: %BRANCH_NAME%]
-echo -S - smv repo hash
+echo -R name - branch name [default: %BRANCH_NAME%]
 echo -U - do not upload bundle
-echo -X fdstag - tag the fds repo using fdstag
-echo -Y smvtag - tag the smv repo using smvtag
 exit /b 0
 
 ::-----------------------------------------------------------------------
@@ -369,30 +284,10 @@ exit /b 0
  if (%1)==() exit /b
  set valid=0
  set arg=%1
- if "%1" EQU "-b" (
-   set BRANCH_NAME=%2
-   set valid=1
-   shift
- )
- if "%1" EQU "-R" (
-   set BRANCH_NAME=%2
-   set valid=1
-   shift
- )
+ 
  if "%1" EQU "-c" (
    set clone=clone
    set valid=1
- )
- if "%1" EQU "-D" (
-   set clone_fdssmv_repos=
-   set build_apps=
-   set upload_bundle=
-   set valid=1
- )
- if "%1" EQU "-F" (
-   set FDS_HASH=%2
-   set valid=1
-   shift
  )
  if "%1" EQU "-h" (
    call :usage
@@ -404,28 +299,14 @@ exit /b 0
    set valid=1
    shift
  )
- if "%1" EQU "-r" (
-   set BRANCH_NAME=release
-   set valid=1
- )
- if "%1" EQU "-S" (
-   set SMV_HASH=%2
+ if "%1" EQU "-R" (
+   set BRANCH_NAME=%2
    set valid=1
    shift
  )
  if "%1" EQU "-U" (
    set upload_bundle=
    set valid=1
- )
- if "%1" EQU "-X" (
-   set FDS_TAG=%2
-   set valid=1
-   shift
- )
- if "%1" EQU "-Y" (
-   set SMV_TAG=%2
-   set valid=1
-   shift
  )
  shift
  if %valid% == 0 (
