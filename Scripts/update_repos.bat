@@ -116,8 +116,8 @@ goto eof
  set valid=0
  set arg=%1
  if /I "%1" EQU "-b" (
+   set valid=1
    set updaterepos=bot
-   exit /b
  )
  if /I "%1" EQU "-h" (
    call :usage
@@ -125,12 +125,12 @@ goto eof
    exit /b
  )
  if /I "%1" EQU "-m" (
+   set valid=1
    set setbranchmaster=1
-   exit /b
  )
  if /I "%1" EQU "-w" (
+   set valid=1
    set updatewebwiki=1
-   exit /b
  )
  shift
  if %valid% == 0 (
