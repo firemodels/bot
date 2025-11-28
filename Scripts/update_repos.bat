@@ -35,7 +35,9 @@ if %updatewebwiki% == 1 goto endif1
 for %%x in ( %updaterepos% ) do ( call :update_repo %%x )
 :endif1
 
+if %updatewebwiki% == 0 goto endif2
 for %%x in ( %webrepos% ) do ( call :update_repo2 %%x )
+:endif2
 
 echo update complete
 
