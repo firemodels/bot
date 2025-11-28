@@ -16,5 +16,5 @@ cd ..\..\Scripts
 call update_repos -b -m > Nul 2>&1
 
 cd %CURDIRW%
-call BuildNightly %  > %outfile% 2>&1
+call BuildNightly > %outfile% 2>&1
 cd %CURDIRW%
