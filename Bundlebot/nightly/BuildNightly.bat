@@ -8,12 +8,10 @@ if not exist %userprofile%\.bundle mkdir %userprofile%\.bundle
 set CURDIR=%CD%
 
 :: default is to build bundle after updating bot repo and using fds/smv master branches 
-set update_botrepo=1
 set FDS_BRANCH=master
 set SMV_BRANCH=master
 
 :: uncomment following lines to build a bundle using different branches (for testing)
-::set update_botrepo=
 ::set FDS_BRANCH=master
 ::set SMV_BRANCH=master
 
@@ -65,19 +63,6 @@ set webpagesrepo=%CD%
 
 cd ..
 set basedir=%CD%
-
-if "x%update_botrepo%" == "x" goto skip1
-:: bring the bot repo up to date
-echo.
-echo ------------------------------------------------------
-echo ------------------------------------------------------
-echo updating bot repo
-echo.
-
-call :cd_repo %botrepo% master || exit /b 1
-git fetch origin master > Nul
-git merge origin/master > Nul
-:skip1
 
 :: bring the webpages and wiki repos up to date
 echo.
