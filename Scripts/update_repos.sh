@@ -1,6 +1,7 @@
 #!/bin/bash
 CUR=`pwd`
 allrepos="bot cad cfast cor exp fds fig out radcal smv test_bundles"
+updaterepos=$allrepos
 otherrepos="webpages wikis"
 BRANCH=master
 CHECKOUT_MASTER=
@@ -9,6 +10,7 @@ function usage {
 echo "Update the repos $allrepos if they exist"
 echo ""
 echo "Options:"
+echo "-b - update only bot repo"
 echo "-h - display this message"
 echo "-m - checkout master branch before updating"
 echo "-w - update only webpages and wikis repos"
@@ -25,9 +27,12 @@ else
    exit
 fi
 
-while getopts 'hmw' OPTION
+while getopts 'bhmw' OPTION
 do
 case $OPTION  in
+  b)
+   updaterepos=bot
+   ;;
   h)
    usage;
    ;;
@@ -110,18 +115,18 @@ UPDATE_REPO2 ()
 }
 
 if [ "$WEBWIKI_ONLY" == "" ]; then
-  for repo in $allrepos
+  for repo in $updaterepos
   do 
     echo
     UPDATE_REPO $repo
   done
+else
+  for repo in $otherrepos
+  do 
+    echo
+    UPDATE_REPO2 $repo
+  done
 fi
-
-for repo in $otherrepos
-do 
-  echo
-  UPDATE_REPO2 $repo
-done
 echo update complete
 
 cd $CURDIR

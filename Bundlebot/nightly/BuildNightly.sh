@@ -157,14 +157,10 @@ FDS_TAG=
 SMV_TAG=
 LATEST=
 INSTALL=
-existing_botbranch=
 
-while getopts 'bBcfhLm:o:r:R:Uv' OPTION
+while getopts 'BcfhLm:o:r:R:Uv' OPTION
 do
 case $OPTION  in
-  b)
-   existing_botbranch="1"
-   ;;
   B)
    INSTALL="-B"
    ;;
@@ -266,11 +262,8 @@ if [ "$PROCEED" == "" ]; then
   read val
 fi
 
-#*** update bot and webpages repos
+#*** update wiki and webpages repos
 if [ "$ECHO" == "" ]; then
-  if [ "$existing_botbranch" == "" ]; then
-    UPDATE_REPO bot      master     || exit 1
-  fi
   UPDATE_REPO webpages nist-pages || exit 1
 fi
 
