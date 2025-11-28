@@ -11,8 +11,6 @@ set S_BRANCH=
 ::set S_REVISION=SMV-6.10.5-249
 ::set S_BRANCH=size64
 
-set is_nightly=1
-
 set OWNER=firemodels
 ::set OWNER=%username%
 
