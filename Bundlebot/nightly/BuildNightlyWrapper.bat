@@ -5,12 +5,12 @@
 :: before it is run
 
 set CURDIRW=%CD%
-cd ../../Scripts
 echo.
 echo ------------------------------------------------------
 echo ------------------------------------------------------
 echo Updating bot repo
-call update_repos -m -b > Nul
+cd ..\..\Scripts
+call update_repos -b -m > Nul 2>&1
 
 cd %CURDIRW%
 call BuildNightly %*

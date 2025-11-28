@@ -70,7 +70,7 @@ echo ------------------------------------------------------
 echo ------------------------------------------------------
 echo updating web and wiki repos
 echo.
-cd %REPOROOT%\Scripts
+cd %REPOROOT%\bot\Scripts
 call update_repos -w > Nul
 
 cd %BUNDLESCRIPTDIR%
