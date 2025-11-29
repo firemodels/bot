@@ -1,14 +1,45 @@
 #!/bin/bash
 curdir=`pwd`
-BUILDING_nightly=$1
 
-UPLOAD=1
 S_HASH=
 S_REVISION=
 
-#UPLOAD=
 #S_HASH=2f257722a
 #S_REVISION=SMV-6.10.5-249
+
+#---------------------------------------------
+#                   usage
+#---------------------------------------------
+
+function usage {
+echo ""
+echo "BUILDSmvNightly.sh usage"
+echo ""
+echo "Options:"
+echo "-h - display this message"
+echo "-U - upload bundle file to GitHub."
+exit 0
+}
+
+UPLOADBUNDLE=
+BUILDING_release=
+
+while getopts 'hURv' OPTION
+do
+case $OPTION  in
+  h)
+   usage
+   ;;
+  R)
+   BULDING_release=1
+   ;;
+  U)
+   UPLOADBUNDLE=1
+   ;;
+esac
+done
+shift $(($OPTIND-1))
+
 
 #*** determine platform script is running on
 
@@ -64,16 +95,12 @@ cd $reporoot/bot/Bundlebot/nightly
 
 cd $reporoot/smv
 if [ "$BUILDING_release" == "" ]; then
-  cd $reporoot/smv
   smv_revision=`git describe --abbrev=7 --dirty --long`
-  GHOWNER=`whoami`
+  GHOWNER=firemodels
 else
   git tag -a $BUNDLE_SMV_TAG -m "tag for smokeview release" >> $outdir/stage2_clone 2>&1
   smv_revision=$BUNDLE_SMV_TAG
-  GHOWNER=firemodels
-fi
-if [ "$BUILDING_nightly" != "" ]; then
-  GHOWNER=firemodels
+  GHOWNER=`whoami`
 fi
 echo "***     smv_hash: $smv_hash"
 echo "*** smv_revision: $smv_revision"
@@ -113,7 +140,7 @@ fi
 
 
 
-if [ "$UPLOAD" != "" ]; then
+if [ "$UPLOADBUNDLE" != "" ]; then
   echo "*** uploading smokeview bundle"
 
   FILELIST=`gh release view SMOKEVIEW_TEST  -R github.com/$GHOWNER/test_bundles | grep SMV |   grep -v FDS | grep $platform2 | awk '{print $2}'`

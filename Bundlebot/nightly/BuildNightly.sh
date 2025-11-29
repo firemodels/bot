@@ -1,25 +1,20 @@
 #!/bin/bash
 
-UPLOAD=-g
 FDS_HASH=
 SMV_HASH=
-FDS_RELEASE=
-SMV_RELEASE=
 FDS_BRANCH=master
 SMV_BRANCH=master
 
 # uncomment following lines to build using specified hash and revisions
 
-#UPLOAD=
 #FDS_HASH=ca0430f09b
 #SMV_HASH=2f257722a
-#FDS_RELEASE=FDS-6.10.1-1509
-#SMV_RELEASE=SMV-6.10.5-249
 #FDS_BRANCH=master
 #SMV_BRANCH=size64
 
 # parameters for bundle
 
+UPLOADBUNDLE=
 if [ "`uname`" == "Darwin" ] ; then
   export FDS_OPENMPIDIR=/opt/openmpi414_oneapi1p6
   export intel_mpi_version=oneapi1p6
@@ -65,7 +60,7 @@ echo "-o - specify GH_OWNER when building a bundle. [default: $GH_OWNER]"
 echo "-r - specify GH_REPO when building a bundle. [default: $GH_REPO]"
 echo "-R branch - clone repos using name branch {default: $BRANCH]"
 echo "-r - create a release bundle (same as -R branc)"
-echo "-U - do not upload bundle file."
+echo "-U - upload bundle file to GitHub."
 echo "-v - show settings used to build bundle"
 exit 0
 }
@@ -189,7 +184,7 @@ case $OPTION  in
    BRANCH="$OPTARG"
    ;;
   U)
-   UPLOAD=
+   UPLOADBUNDLE=-U
    ;;
   v)
    ECHO=echo
@@ -267,15 +262,13 @@ if [ "$ECHO" == "" ]; then
   UPDATE_REPO webpages nist-pages || exit 1
 fi
 
-# clone fds and smv repos
 if [ "$BRANCH" == "nightly" ]; then
+# a nightly bundle - clone only fds and smv repos
   cd $curdir
   ./clone_repo.sh -F -N -r $FDS_HASH
   ./clone_repo.sh -S -N -r $SMV_HASH
-fi
-
-#clone all repos except for bot
-if [ "$BRANCH" != "nightly" ]; then
+else
+#a release bundle - clone all repos except for bot
   cd $curdir
   ./clone_all_repos.sh
   FDS_TAG="-X $BUNDLE_FDS_TAG"
@@ -290,5 +283,5 @@ echo $SMV_REVISION > $repo/bot/Bundlebot/nightly/apps/SMV_REVISION
 
 #*** generate and upload bundle
 cd $curdir
-$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH $INSTALL $FDS_TAG $SMV_TAG -w $UPLOAD
+$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH $INSTALL $FDS_TAG $SMV_TAG -w $UPLOADBUNDLE
 rm $LOCKFILE

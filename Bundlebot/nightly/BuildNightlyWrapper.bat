@@ -8,13 +8,13 @@ set outfile=%userprofile%\.bundle\bundle_fdssmv_nightly.out
 :: before it is run
 
 set CURDIRW=%CD%
-echo.
-echo ------------------------------------------------------
-echo ------------------------------------------------------
-echo Updating bot repo
+echo.                                                        >  %outfile% 2>&1
+echo ------------------------------------------------------  >> %outfile% 2>&1
+echo ------------------------------------------------------  >> %outfile% 2>&1
+echo Updating bot repo                                       >> %outfile% 2>&1
 cd ..\..\Scripts
 call update_repos -b -m > Nul 2>&1
 
 cd %CURDIRW%
-call BuildNightly > %outfile% 2>&1
+call BuildNightly %*                                         >> %outfile% 2>&1
 cd %CURDIRW%
