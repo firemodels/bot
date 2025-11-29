@@ -7,18 +7,9 @@ if "x%is_release%" == "x" set OWNER=firemodels
 if not exist %userprofile%\.bundle mkdir %userprofile%\.bundle
 set CURDIR=%CD%
 
-:: default is to build bundle after updating bot repo and using fds/smv master branches 
-set FDS_BRANCH=master
-set SMV_BRANCH=master
-
-:: uncomment following lines to build a bundle using different branches (for testing)
-::set FDS_BRANCH=master
-::set SMV_BRANCH=master
-
 set upload_bundle=
 set FDS_TAG=
 set SMV_TAG=
-set BRANCH_NAME=nightly
 set logfile=%userprofile%\.bundle\logfile.txt
 set emailto=
 
@@ -32,10 +23,6 @@ if "x%stopscript%" == "x" goto endif2
 
 set nightly=test
 set pub_dir=
-if NOT "x%BRANCH_NAME%" == "xrelease" goto skip_branch
-  set nightly=rls
-  set pub_dir=release
-:skip_branch
 
 set BUNDLESCRIPTDIR=%CD%
 cd ..\..\..
@@ -135,7 +122,8 @@ echo.                                                        >> %logfile%
 
 type %logfile%
 
-call clone_repos %FDS_HASH_BUNDLER% %SMV_HASH_BUNDLER% %FDS_TAG% %SMV_TAG% %BRANCH_NAME% %FDS_BRANCH% %SMV_BRANCH%  || exit /b 1
+:: clone fds and smv repos 
+call clone_repos %FDS_HASH_BUNDLER% %SMV_HASH_BUNDLER%  || exit /b 1
 
 echo.
 echo ------------------------------------------------------
@@ -236,7 +224,6 @@ echo.
 echo Options:
 echo -h - display this message
 echo -m mailtto - send email to mailto
-echo -R name - branch name [default: %BRANCH_NAME%]
 echo -U - upload bundle
 exit /b 0
 
@@ -255,11 +242,6 @@ exit /b 0
  )
  if "%1" EQU "-m" (
    set emailto=%2
-   set valid=1
-   shift
- )
- if "%1" EQU "-R" (
-   set BRANCH_NAME=%2
    set valid=1
    shift
  )
