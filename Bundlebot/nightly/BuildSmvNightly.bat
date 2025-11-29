@@ -1,15 +1,17 @@
 @echo off
 setlocal
 
-set upload=1
 set S_HASH=
 set S_REVISION=
 set S_BRANCH=
 
-::set upload=
 ::set S_HASH=2f257722a
 ::set S_REVISION=SMV-6.10.5-249
 ::set S_BRANCH=size64
+
+set upload_smvbundle=
+::*** parse command line arguments
+call :getopts %*
 
 set OWNER=firemodels
 ::set OWNER=%username%
@@ -80,7 +82,7 @@ cd %CURDIR%
 set uploaddir=%userprofile%\.bundle\uploads
 echo smokeview bundle created: %uploaddir%\%smvrepo_revision%_win.exe
 
-if "x%upload%" == "x" goto skip_upload
+if "x%upload_smvbundle%" == "x" goto skip_upload
 echo *** uploading Smokeview bundle
 Title Building Smokeview bundle
 
@@ -94,3 +96,51 @@ gh release upload SMOKEVIEW_TEST %uploaddir%\%smvrepo_revision%_win.exe  -R gith
 
 echo *** upload complete
 :skip_upload
+
+goto eof
+
+
+::-----------------------------------------------------------------------
+:usage
+::-----------------------------------------------------------------------
+
+:usage
+echo.
+echo BuildSmvNightly usage
+echo.
+echo Options:
+echo -h - display this message
+echo -U - upload bundle
+exit /b 0
+
+::-----------------------------------------------------------------------
+:getopts
+::-----------------------------------------------------------------------
+ set stopscript=
+ if (%1)==() exit /b
+ set valid=0
+ set arg=%1
+ 
+ if "%1" EQU "-h" (
+   call :usage
+   set stopscript=1
+   exit /b
+ )
+ if "%1" EQU "-U" (
+   set upload_smvbundle=1
+   set valid=1
+ )
+ shift
+ if %valid% == 0 (
+   echo.
+   echo ***Error: the input argument %arg% is invalid
+   echo.
+   echo Usage:
+   call :usage
+   set stopscript=1
+   exit /b 1
+ )
+if not (%1)==() goto getopts
+exit /b 0
+
+ 
