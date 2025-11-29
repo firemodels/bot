@@ -143,4 +143,6 @@ exit /b 0
 if not (%1)==() goto getopts
 exit /b 0
 
+:eof
+
  
