@@ -1,11 +1,6 @@
 @echo off
 set fds_hash=%1
 set smv_hash=%2
-set fds_tag=%3
-set smv_tag=%4
-set branch_name=%5
-set fds_branch=%6
-set smv_branch=%7
 
 if "x%use_only_tags%" == "x" goto end_use_only_tag
 set fds_hash=
@@ -24,48 +19,22 @@ set CURDIR=%CD%
 cd ..\..\..
 set REPOROOT=%CD%
 
+::***clone fds and smv repos
+
 cd %REPOROOT%\bot\\Scripts
 call setup_repos -T -n
 
-cd %CURDIR%
+::***setup fds repo
 
 cd %REPOROOT%\fds
-set fdsrepo=%CD%
-
-cd %REPOROOT%\smv
-set smvrepo=%CD%
-
-cd %fdsrepo%
-set fdstaghash=%fds_tag%
-if "x%fds_hash%" == "x" goto end_fds_hash
-set fdstaghash=%fds_hash%
-:end_fds_hash
-
-git checkout %fds_branch%
-git checkout -b %branch_name% %fdstaghash%
-
-if "x%fds_tag%" == "x" goto end_fds_tag
-if "x%fds_hash%" == "x" goto end_fds_hash2
-git tag -a %fds_tag% -m "add %fds_tag% for fds repo"
-:end_fds_hash2
-:end_fds_tag
+git checkout -b nightly %fdshash%
 git describe --abbrev=7 --dirty --long
 git branch -a
 
-cd %smvrepo%
-set smvtaghash=%smv_tag%
-if "x%smv_hash%" == "x" goto end_smv_hash
-set smvtaghash=%smv_hash%
-:end_smv_hash
+::***setup smv repo
 
-git checkout %smv_branch%
-git checkout -b %branch_name% %smvtaghash%
-
-if "x%smv_tag%" == "x" goto end_smv_tag
-if "x%smv_hash%" == "x" goto end_smv_hash2
-git tag -a %smv_tag% -m "add %smv_tag% for smv repo"
-:end_smv_tag
-:end_smv_hash2
+cd %REPOROOT%\smv
+git checkout -b nightly %smv_hash%
 git describe --abbrev=7 --dirty --long
 git branch -a
 
