@@ -1359,12 +1359,12 @@ email_build_status()
   if [ "$MAKEMOVIES" == "1" ]; then
     echo "make movies: $DIFF_MAKEMOVIES"                    >> $TIME_LOG
   fi
-if [ "$DIFF_MAKEGUIDES" != "" ]; then
-  echo "build guides: $DIFF_MAKEGUIDES"                     >> $TIME_LOG
-fi
-if [ "$DIFF_COMPAREIMAGES" != "" ]; then
-  echo "compare images: $DIFF_COMPAREIMAGES"                >> $TIME_LOG
-fi
+  if [ "$DIFF_MAKEGUIDES" != "" ]; then
+    echo "build guides: $DIFF_MAKEGUIDES"                     >> $TIME_LOG
+  fi
+  if [ "$DIFF_COMPAREIMAGES" != "" ]; then
+    echo "compare images: $DIFF_COMPAREIMAGES"                >> $TIME_LOG
+  fi
   echo "total: $DIFF_SCRIPT_TIME"                           >> $TIME_LOG
   echo "time(s): $TOTAL_SMV_TIMES"                          >> $TIME_LOG
   echo ""                                                   >> $TIME_LOG
@@ -1423,18 +1423,29 @@ fi
       echo "images errors/changes: $NUM_ERRORS/$NUM_CHANGES"  >> $TIME_LOG
     fi
   fi
+  is_bot=
+  if [ `whoami` == "firebot" ]; then
+    is_bot=1
+  fi
+  if [ `whoami` == "cfast" ]; then
+    is_bot=1
+  fi
+  if [ `whoami` == "smokebot" ]; then
+    is_bot=1
+  fi
+  if [[ ! -e $WARNING_LOG ]] && [[ ! -e $ERROR_LOG ]]; then
+# save apps that were built for bundling
+    rm -f $APPS_DIR/*
+    cp $LATESTAPPS_DIR/* $APPS_DIR/.
+
+    rm -f $BRANCHAPPS_DIR/*
+    cp $LATESTAPPS_DIR/* $BRANCHAPPS_DIR/.
+
+    rm -f $BRANCHPUBS_DIR/*
+    cp $LATESTPUBS_DIR/* $BRANCHPUBS_DIR/.
+  fi
   if [ "$UPLOADRESULTS" == "1" ]; then
     echo "status: https://pages.nist.gov/fds-smv/smokebot_status.html" >> $TIME_LOG
-    is_bot=
-    if [ `whoami` == "firebot" ]; then
-      is_bot=1
-    fi
-    if [ `whoami` == "cfast" ]; then
-      is_bot=1
-    fi
-    if [ `whoami` == "smokebot" ]; then
-      is_bot=1
-    fi
     if [[ "$is_bot" == "1" ]]; then
       GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_SMOKEVIEW_TAG
       echo "Bundles/Guides/Figures: $GITURL"  >> $TIME_LOG
@@ -1496,17 +1507,6 @@ fi
       cat $TIME_LOG $NAMELIST_LOGS | mail $REPLYTO -s "$SUBJECT" $mailTo > /dev/null
     fi
     cat $TIME_LOG $NAMELIST_LOGS > $FULL_LOG
-
-# save apps that were built for bundling
-
-    rm -f $APPS_DIR/*
-    cp $LATESTAPPS_DIR/* $APPS_DIR/.
-
-    rm -f $BRANCHAPPS_DIR/*
-    cp $LATESTAPPS_DIR/* $BRANCHAPPS_DIR/.
-
-    rm -f $BRANCHPUBS_DIR/*
-    cp $LATESTPUBS_DIR/* $BRANCHPUBS_DIR/.
   fi
   if [ "$HAVEMAIL" == "" ]; then
     cat $FULL_LOG
