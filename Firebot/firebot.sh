@@ -1806,7 +1806,7 @@ fi
    fi
    echo ""                                   >> $TIME_LOG
    if [ -e output/slow_cases ]; then
-     echo "cases with longest runtime:"       >> $TIME_LOG
+     echo "cases with longest runtime:"      >> $TIME_LOG
      cat output/slow_cases                   >> $TIME_LOG
      echo ""                                 >> $TIME_LOG
    fi
@@ -1814,14 +1814,8 @@ fi
      cat output/timing_summary               >> $TIME_LOG
      echo ""                                 >> $TIME_LOG
    fi
-   if [ -e output/timing_errors ]; then
-      echo "***Warning: cases with > 200% increased run-time"        >> $TIME_LOG
-      cat output/timing_errors  | awk -F',' '{print $1,$3,"-->",$4}' >> $TIME_LOG
-      echo ""                                                        >> $TIME_LOG
-      echo ""                                                        >> $WARNING_LOG
-      echo "***Warning: cases with > 200% increased run-time"        >> $WARNING_LOG
-      cat output/timing_errors  | awk -F',' '{print $1,$3,"-->",$4}' >> $WARNING_LOG
-      echo ""                                                        >> $WARNING_LOG
+   if [[ -e output/timing_errors && -e $TIMING_WARNING_LOG ]]; then
+      cat $TIMING_WARNING_LOG                                        >> $TIME_LOG
    fi
 
    echo "HAVE_MAIL=$HAVE_MAIL"
@@ -1933,6 +1927,7 @@ TIME_LOG=$OUTPUT_DIR/timings
 ERROR_LOG=$OUTPUT_DIR/errors
 VALIDATION_ERROR_LOG=$OUTPUT_DIR/validation_errors
 WARNING_LOG=$OUTPUT_DIR/warnings
+TIMING_WARNING_LOG=$OUTPUT_DIR/timing_warnings
 MAIL_LOG=$OUTPUT_DIR/mail_log
 FYI_LOG=$OUTPUT_DIR/fyis
 NEWGUIDE_DIR=$OUTPUT_DIR/Newest_Guides
@@ -2712,6 +2707,14 @@ GET_DURATION $SCRIPT_beg $SCRIPT_end SCRIPT
 ###*** Wrap up and report results ###
 
 set_files_world_readable
+if [ -e output/timing_errors ]; then
+  echo ""                                                         > $TIMING_WARNING_LOG
+  echo "***Warning: cases with > 200% increased run-time"        >> $TIMING_WARNING_LOG
+  cat output/timing_errors  | awk -F',' '{print $1,$3,"-->",$4}' >> $TIMING_WARNING_LOG
+  echo ""                                                        >> $TIMING_WARNING_LOG
+  cat $TIMING_WARNING_LOG                                        >> $WARNING_LOG
+fi
+
 save_build_status
 if [[ "$CHECK_CLUSTER" == "" ]]; then
   archive_timing_stats
