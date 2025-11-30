@@ -285,12 +285,12 @@ check_compile_cfast()
    cd $cfastrepo/Build/CFAST/${COMPILER}_${platform}
    if [ -e "cfast7_${platform}" ]
    then
-      stage0_success=true
+      stage2_build_cfast=true
    else
-      echo "Errors from Stage 1 - CFAST:" >> $ERROR_LOG
-      echo "CFAST failed to compile"      >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage2_build_cfast             >> $ERROR_LOG
-      echo ""                             >> $ERROR_LOG
+      echo "Errors from Stage 2 - build CFAST:" >> $ERROR_LOG
+      echo "CFAST failed to compile"            >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage2_build_cfast        >> $ERROR_LOG
+      echo ""                                   >> $ERROR_LOG
       THIS_CFAST_FAILED=1
    fi
 }
@@ -322,8 +322,8 @@ clean_repo2()
         updateclean="1"
       fi
    else
-      echo "The repo directory $repo does not exist." >> $OUTPUT_DIR/stage0 2>&1
-      echo "Aborting smokebot" >> $OUTPUT_DIR/stage0 2>&1
+      echo "The repo directory $repo does not exist." >> $OUTPUT_DIR/stage1_clean_update_repos 2>&1
+      echo "Aborting smokebot"                        >> $OUTPUT_DIR/stage1_clean_update_repos 2>&1
       return 1
    fi
    return 0
@@ -359,16 +359,16 @@ update_repo()
      echo "smokebot without the -u (update) option"
      return 1
    fi
-   echo "Updating branch $branch."   >> $OUTPUT_DIR/stage0 2>&1
-   git remote update                 >> $OUTPUT_DIR/stage0 2>&1
-   git merge origin/$branch          >> $OUTPUT_DIR/stage0 2>&1
+   echo "Updating branch $branch."   >> $OUTPUT_DIR/stage1_clean_update_repos 2>&1
+   git remote update                 >> $OUTPUT_DIR/stage1_clean_update_repos 2>&1
+   git merge origin/$branch          >> $OUTPUT_DIR/stage1_clean_update_repos 2>&1
    have_firemodels=`git remote -v | awk '{print $1}' | grep firemodels | wc  -l`
    if [ "$have_firemodels" != "0" ]; then
-      git merge firemodels/$branch   >> $OUTPUT_DIR/stage0 2>&1
+      git merge firemodels/$branch   >> $OUTPUT_DIR/stage1_clean_update_repos 2>&1
       need_push=`git status -uno | head -2 | grep -v nothing | grep -v 'Your branch' | grep -v '^$' | wc -l`
       if [ $need_push -gt 1 ]; then
-        echo "warning: firemodels commits to $reponame repo need to be pushed to origin" >> $OUTPUT_DIR/stage0 2>&1
-        git status -uno | head -2 | grep -v nothing                                      >> $OUTPUT_DIR/stage0 2>&1
+        echo "warning: firemodels commits to $reponame repo need to be pushed to origin" >> $OUTPUT_DIR/stage1_clean_update_repos 2>&1
+        git status -uno | head -2 | grep -v nothing                                      >> $OUTPUT_DIR/stage1_clean_update_repos 2>&1
       fi
 
    fi
@@ -382,16 +382,16 @@ update_repo()
 check_update_repo()
 {
    # Check for GIT errors
-   if [ -e $OUTPUT_DIR/stage0 ]; then
-     if [[ `grep -i -E 'warning|modified' $OUTPUT_DIR/stage0` == "" ]]
+   if [ -e $OUTPUT_DIR/stage1_clean_update_repos ]; then
+     if [[ `grep -i -E 'warning|modified' $OUTPUT_DIR/stage1_clean_update_repos` == "" ]]
      then
         # Continue along
         :
      else
-        echo "warnings from Stage 0 - Update repos"                >> $WARNING_LOG
-        echo ""                                                    >> $WARNING_LOG
-        grep -A 5 -B 5 -i -E 'warning|modified' $OUTPUT_DIR/stage0 >> $WARNING_LOG
-        echo ""                                                    >> $WARNING_LOG
+        echo "warnings from Stage 0 - Update repos"                                   >> $WARNING_LOG
+        echo ""                                                                       >> $WARNING_LOG
+        grep -A 5 -B 5 -i -E 'warning|modified' $OUTPUT_DIR/stage1_clean_update_repos >> $WARNING_LOG
+        echo ""                                                                       >> $WARNING_LOG
      fi
    fi
 }
@@ -1777,20 +1777,20 @@ if [[ "$CLONE_REPOS" != "" ]]; then
 
 # only clone fds and smv repos
    # clone all repos
-    ./setup_repos.sh -F $FORCECLONE              > $OUTPUT_DIR/stage1_clone 2>&1
+    ./setup_repos.sh -F $FORCECLONE              > $OUTPUT_DIR/stage1_clone_repos 2>&1
   if [[ "$CLONE_REPOS" != "master" ]]; then
     FDSBRANCH=$CLONE_REPOS
     cd $fdsrepo
-    git checkout -b $FDSBRANCH $FDS_REV          >> $OUTPUT_DIR/stage1_clone 2>&1
+    git checkout -b $FDSBRANCH $FDS_REV          >> $OUTPUT_DIR/stage1_clone_repos 2>&1
     if [ "$FDS_TAG" != "" ]; then
-      git tag -a $FDS_TAG -m "tag for $FDS_TAG"  >> $OUTPUT_DIR/stage1_clone 2>&1
+      git tag -a $FDS_TAG -m "tag for $FDS_TAG"  >> $OUTPUT_DIR/stage1_clone_repos 2>&1
     fi
 
     SMVBRANCH=$CLONE_REPOS
     cd $smvrepo
-    git checkout -b $SMVBRANCH $SMV_REV          >> $OUTPUT_DIR/stage1_clone 2>&1
+    git checkout -b $SMVBRANCH $SMV_REV          >> $OUTPUT_DIR/stage1_clone_repos 2>&1
     if [ "$SMV_TAG" != "" ]; then
-      git tag -a $SMV_TAG -m "tag for $SMV_TAG"  >> $OUTPUT_DIR/stage1_clone 2>&1
+      git tag -a $SMV_TAG -m "tag for $SMV_TAG"  >> $OUTPUT_DIR/stage1_clone_repos 2>&1
     fi
   fi
 fi
