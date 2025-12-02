@@ -96,20 +96,23 @@ cat << EOF
 
 <div id="curve_chart" style="width: 500px; height: 300px"></div>
 Mean: $MEAN s <br>
+EOF
 
-<h3>Time Differences</h3>
-<p>Base: $BASE_TIMEREV<br>
-Current: $CURRENT_TIMEREV<br>
+#<h3>Time Differences</h3>
+#<p>Base: $BASE_TIMEREV<br>
+#Current: $CURRENT_TIMEREV<br>
 
-<table border=on>
-<caption>Run Time Changes <br>(Run Times > 60 s)</caption>
-<tr><th></th><th>number</th><th>time change (s)</th></tr>
-<tr><th>slower</th><td>$SLOWCOUNT</td><td>$SLOWSIZE</td></tr>
-<tr><th>faster</th><td>$FASTCOUNT</td><td>-$FASTSIZE</td></tr>
-<tr><th>all</th><td>$ALLCOUNT</td><td>$ALLSIZE</td></tr>
-</table>
+#<table border=on>
+#<caption>Run Time Changes <br>(Run Times > 60 s)</caption>
+#<tr><th></th><th>number</th><th>time change (s)</th></tr>
+#<tr><th>slower</th><td>$SLOWCOUNT</td><td>$SLOWSIZE</td></tr>
+#<tr><th>faster</th><td>$FASTCOUNT</td><td>-$FASTSIZE</td></tr>
+#<tr><th>all</th><td>$ALLCOUNT</td><td>$ALLSIZE</td></tr>
+#</table>
 
-<div id="hist_chart" style="width: 500px; height: 300px"></div>
+#<div id="hist_chart" style="width: 500px; height: 300px"></div>
+
+cat << EOF
 <h3>Nightly Bundles/Manuals</h3>
 <a href="https://github.com/firemodels/test_bundles/releases/tag/FDS_TEST">Nightly Bundles/Manuals</a>
 
