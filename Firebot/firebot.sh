@@ -2410,32 +2410,32 @@ if [[ "$CLONE_REPOS" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
 fi
 
 #*** update repos
-  UPDATING=
-  if [[ "$UPDATEREPO" == "1" ]] ; then
+UPDATING=
+if [[ "$UPDATEREPO" == "1" ]] ; then
 # we are not cloning so update
-    if [[ "$CLONE_REPOS" == "" ]]; then
-      UPDATING=1
-      echo Updating
-      update_repo fds $FDSBRANCH || exit 1
-      if [[ "$CHECK_CLUSTER" == "" ]]; then
-        update_repo smv $SMVBRANCH || exit 1
-        update_repo fig $FIGBRANCH || exit 1
-        update_repo out $OUTBRANCH || exit 1
-        update_repo exp $EXPBRANCH || exit 1
-      fi
-    fi
-# we are not cloning fig, out and exp so update them
-    if [[ "$CLONE_REPOS" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-      UPDATING=1
-      echo Updating
+  if [[ "$CLONE_REPOS" == "" ]]; then
+    UPDATING=1
+    echo Updating
+    update_repo fds $FDSBRANCH || exit 1
+    if [[ "$CHECK_CLUSTER" == "" ]]; then
+      update_repo smv $SMVBRANCH || exit 1
       update_repo fig $FIGBRANCH || exit 1
       update_repo out $OUTBRANCH || exit 1
       update_repo exp $EXPBRANCH || exit 1
     fi
   fi
-  if [ "$UPDATING" == "" ]; then
-    echo Repos not updated
+# we are not cloning fig, out and exp so update them
+  if [[ "$CLONE_REPOS" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+    UPDATING=1
+    echo Updating
+    update_repo fig $FIGBRANCH || exit 1
+    update_repo out $OUTBRANCH || exit 1
+    update_repo exp $EXPBRANCH || exit 1
   fi
+fi
+if [ "$UPDATING" == "" ]; then
+  echo Repos not updated
+fi
 
 # run debug and release cases in two different directories
 cd $fdsrepo
