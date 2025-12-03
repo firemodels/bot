@@ -537,18 +537,6 @@ run_verification_cases_debug()
    echo ./Run_FDS_Cases.sh -d -m 1 $INTEL2 -q $QUEUE -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage3_run_debug_ver 2>&1
         ./Run_FDS_Cases.sh -d -m 1 $INTEL2 -q $QUEUE -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage3_run_debug_ver 2>&1
    echo ""                                                               >> $OUTPUT_DIR/stage3_run_debug_ver 2>&1
-
-   # Wait for all verification cases to end
-   wait_cases_debug_end 'verification'
-
-#  check whether cases have run
-   ./Run_FDS_Cases.sh -C                                  -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage3_run_debug_ver 2>&1
-
-   # Remove all .stop files from Verification directories (recursively)
-   if [ "$CLONE_REPOS" == "" ]; then
-     cd $fdsrepo/$VERIFICATION_DEBUG
-     find . -name '*.stop' -exec rm -f {} \;
-   fi
 }
 
 #---------------------------------------------
@@ -562,6 +550,18 @@ check_cases_debug()
 
    # Scan for and report any errors in FDS cases
    cd $dir
+
+   # Wait for all verification cases to end
+   wait_cases_debug_end 'verification'
+
+#  check whether cases have run
+   ./Run_FDS_Cases.sh -C                                  -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage3_run_debug_ver 2>&1
+
+   # Remove all .stop files from Verification directories (recursively)
+   if [ "$CLONE_REPOS" == "" ]; then
+     cd $fdsrepo/$VERIFICATION_DEBUG
+     find . -name '*.stop' -exec rm -f {} \;
+   fi
 
    if [[ `grep 'Run aborted'     $OUTPUT_DIR/stage3_run_debug_ver | grep -v grep`                == "" ]] && \
       [[ `grep Segmentation      */*.err            | grep -v grep`                == "" ]] && \
