@@ -2310,15 +2310,6 @@ fi
 cd $botrepo
 BOTREPO_HASH=`git rev-parse HEAD`
 
-# if the fds repo is cloned, make a copy of the Verification directory and run fds in debug mode in this directory
-if [ "$CLONE_REPOS" != "" ]; then
-  cd $fdsrepo
-  VERIFICATION_DEBUG=Verification_DB
-  cp -r Verification $VERIFICATION_DEBUG
-else
-  VERIFICATION_DEBUG=Verification
-fi
-
 #save apps and pubs in directories under .firebot/$FDSBRANCH
 
 BRANCH_DIR=$HOME/.firebot/$FDSBRANCH
@@ -2445,6 +2436,11 @@ fi
   if [ "$UPDATING" == "" ]; then
     echo Repos not updated
   fi
+
+# run debug and release cases in two different directories
+cd $fdsrepo
+VERIFICATION_DEBUG=Verification_DB
+cp -r Verification $VERIFICATION_DEBUG
 
 #*** check fds and smv repos for text files with CRLF line endings
 #    don't check lines if not cloning and not cleaning repo - avoid false positives
