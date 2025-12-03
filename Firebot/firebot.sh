@@ -1136,8 +1136,10 @@ check_python_setup()
 run_python_verification()
 {
    echo Python verification plots
+   touch $OUTPUT_DIR/running_python_verification
    cd $fdsrepo/Utilities/Python
    python FDS_verification_script.py > $OUTPUT_DIR/stage4_python_ver 2>&1
+   rm -f $OUTPUT_DIR/running_python_verification
 }
 
 #---------------------------------------------
@@ -1146,6 +1148,10 @@ run_python_verification()
 
 check_python_verification()
 {
+   # wait until python verification script finishes
+   while [[ -e $OUTPUT_DIR/running_python_verification ]]; do
+     sleep 10
+   done
    # Check that python environment has been setup
    python_verification_success=true
    if [[ `grep "Error" $OUTPUT_DIR/stage4_python_ver` != "" ]]; then
@@ -1166,7 +1172,9 @@ run_python_validation()
 {
    echo Python validation plots
    cd $fdsrepo/Utilities/Python
+   touch $OUTPUT_DIR/running_python_validation
    python FDS_validation_script.py > $OUTPUT_DIR/stage4_python_val 2>&1
+   rm -f $OUTPUT_DIR/running_python_validation
 }
 
 #---------------------------------------------
@@ -1175,6 +1183,10 @@ run_python_validation()
 
 check_python_validation()
 {
+   # wait until python validation script finishes
+   while [[ -e $OUTPUT_DIR/running_python_validation ]]; do
+     sleep 10
+   done
    # Check that python environment has been setup
    python_validation_success=true
    if [[ `grep "Error" $OUTPUT_DIR/stage4_python_val` != "" ]]; then
@@ -1739,8 +1751,7 @@ fi
    echo "setup firebot: $SETUP_DIFF "                       >> $TIME_LOG
    echo "build software: $BUILD_DIFF "                      >> $TIME_LOG
    echo "run cases: $RELEASE_DIFF "                         >> $TIME_LOG
-   echo "verification: $VERIFICATION_DIFF "                 >> $TIME_LOG
-   echo "validation: $VALIDATION_DIFF "                     >> $TIME_LOG
+   echo "verification/validation: $VERIFICATION_DIFF "      >> $TIME_LOG
    echo "build guides: $MANUALS_DIFF "                      >> $TIME_LOG
    echo "total: $SCRIPT_DIFF "                              >> $TIME_LOG
    echo ""                                                  >> $TIME_LOG
@@ -1923,7 +1934,6 @@ fi
 
 TIME_LOG=$OUTPUT_DIR/timings
 ERROR_LOG=$OUTPUT_DIR/errors
-VALIDATION_ERROR_LOG=$OUTPUT_DIR/validation_errors
 WARNING_LOG=$OUTPUT_DIR/warnings
 TIMING_WARNING_LOG=$OUTPUT_DIR/timing_warnings
 MAIL_LOG=$OUTPUT_DIR/mail_log
@@ -2602,30 +2612,21 @@ GET_DURATION $RELEASE_beg $RELEASE_end RELEASE
 VV_beg=`GET_TIME`
 if [[ "$CACHE_DIR" == "" ]]; then
 
-#*** python verification plots
+#*** python verification and validation plots
 
   VERIFICATION_beg=`GET_TIME`
   run_python_setup
   check_python_setup
   if [ $python_success == true ]; then
-    run_python_verification
+    run_python_verification &
+    run_python_validation   &
     check_python_verification
+    check_python_validation
     make_fds_summary
     MAKE_SUMMARY=1
   fi
   VERIFICATION_end=`GET_TIME`
   GET_DURATION $VERIFICATION_beg $VERIFICATION_end VERIFICATION
-
-#*** python validation plots
-#    only need to setup python once
-
-  VALIDATION_beg=`GET_TIME`
-  if [ $python_success == true ]; then
-    run_python_validation
-    check_python_validation
-  fi
-  VALIDATION_end=`GET_TIME`
-  GET_DURATION $VALIDATION_beg $VALIDATION_end VALIDATION
 fi
 VV_end=`GET_TIME`
 GET_DURATION $VV_beg $VV_end VV
