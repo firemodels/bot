@@ -398,9 +398,12 @@ compile_fds_mpi_db()
   local FDSDIR=$1
   local FDSEXE=$2
   local MPTYPE=$3
+  lockfile=$OUTPUT_DIR/building_fds_mpi_db
   if [ "$MPTYPE" != "" ]; then
     MPTYPE="_$MPTYPE"
   fi
+  lockfile=$lockfile$MPITYPE
+  touch $lockfile
    # Clean and compile FDS MPI debug
    echo "      MPI $MPTYPE Intel debug"
    cd $FDSDIR
@@ -411,6 +414,7 @@ compile_fds_mpi_db()
      make -f ../makefile clean &> /dev/null
      ./make_fds.sh &> $OUTPUT_DIR/stage2_build_fds${MPTYPE}_debug
    fi
+   rm -f $lockfile
 }
 
 #---------------------------------------------
@@ -422,9 +426,16 @@ check_compile_fds_mpi_db()
   local FDSDIR=$1
   local FDSEXE=$2
   local MPTYPE=$3
+  lockfile=$OUTPUT_DIR/building_fds_mpi_db
+
   if [ "$MPTYPE" != "" ]; then
     MPTYPE="_$MPTYPE"
   fi
+  lockfile=$lockfile$MPITYPE
+  while [[ -e $lockfile ]]; do
+    sleep 10
+  done
+
    # Check for errors in FDS MPI debug compilation
   cd $FDSDIR
   if [ -x $FDSEXE ]
@@ -464,6 +475,8 @@ check_compile_fds_mpi_db()
 compile_fds_mpi_gnu_db()
 {
   local FDSDIR=$1
+  lockfile=$OUTPUT_DIR/building_fds_mpi_gnu_db
+  touch $lockfile
   # Clean and compile FDS MPI debug
   compile_gnu=
   if [ "$OPENMPI_INTEL" != "" ]; then
@@ -483,6 +496,7 @@ compile_fds_mpi_gnu_db()
   if [ "$OPENMPI_INTEL" != "" ]; then
     module load $OPENMPI_INTEL
   fi
+  rm -f $lockfile
 }
 
 #---------------------------------------------
@@ -492,7 +506,11 @@ check_compile_fds_mpi_gnu_db()
 {
 # force the gnu compile to pass until it can compile
 # fds with the findloc routine
-        FDS_gnu_debug_success=true
+  lockfile=$OUTPUT_DIR/building_fds_mpi_gnu_db
+  while [[ -e $lockfile ]]; do
+    sleep 10
+  done
+  FDS_gnu_debug_success=true
 }
 
 #---------------------------------------------
@@ -601,9 +619,12 @@ compile_fds_mpi()
   local FDSDIR=$1
   local FDSEXE=$2
   local MPTYPE=$3
+  lockfile=$OUTPUT_DIR/building_fds_mpi
   if [ "$MPTYPE" != "" ]; then
     MPTYPE="_$MPTYPE"
   fi
+  lockfile=$lockfile$MPITYPE
+  touch $lockfile
   echo "      MPI $MPTYPE Intel release"
   cd $FDSDIR
   make -f ../makefile clean &> /dev/null
@@ -613,6 +634,7 @@ compile_fds_mpi()
     make -f ../makefile clean &> /dev/null
     ./make_fds.sh &> $OUTPUT_DIR/stage2_build_fds${MPTYPE}_release
   fi
+  rm -f $lockfile
 }
 
 #---------------------------------------------
@@ -625,9 +647,14 @@ check_compile_fds_mpi()
   local FDSDIR=$1
   local FDSEXE=$2
   local MPTYPE=$3
+  lockfile=$OUTPUT_DIR/building_fds_mpi
   if [ "$MPTYPE" != "" ]; then
     MPTYPE="_$MPTYPE"
   fi
+  lockfile=$lockfile$MPITYPE
+  while [[ -e $lockfile ]]; do
+    sleep 10
+  done
   cd $FDSDIR
   if [ -x $FDSEXE ]
   then
@@ -714,7 +741,9 @@ compile_smv_libraries()
 #---------------------------------------------
 
 compile_smv_utilities()
-{  
+{
+  lockfile=$OUTPUT_DIR/building_utilities
+  touch $lockfile
 # smokezip:
   echo "      smokezip"
   cd $smvrepo/Build/smokezip/${SMVCOMPILER}_${platform}
@@ -782,6 +811,7 @@ compile_smv_utilities()
   ./make_test_mpi.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
   cp test_mpi $LATESTAPPS_DIR/test_mpi
   echo "" >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
+  rm -f $lockfile
 }
 
 #---------------------------------------------
@@ -790,8 +820,12 @@ compile_smv_utilities()
 
 check_smv_utilities()
 {
-   # nothing to check
-   smv_utilities_success=true
+# nothing to check
+  lockfile=$OUTPUT_DIR/building_utilities
+  while [[ -e $lockfile ]]; do
+    sleep 10
+  done
+  smv_utilities_success=true
 }
 
 #---------------------------------------------
@@ -1016,10 +1050,13 @@ fi
 
 compile_smv_db()
 {
+  lockfile=$OUTPUT_DIR/building_smv_db
+  touch $lockfile
 # Clean and compile SMV debug
   echo "      debug"
   cd $smvrepo/Build/smokeview/${SMVCOMPILER}_${platform}
   ./make_smokeview_db.sh &> $OUTPUT_DIR/stage2_build_smv_debug
+  rm -f $lockfile
 }
 
 #---------------------------------------------
@@ -1029,6 +1066,10 @@ compile_smv_db()
 check_compile_smv_db()
 {
 # Check for errors in SMV debug compilation
+ lockfile=$OUTPUT_DIR/building_smv_db
+ while [[ -e $lockfile ]]; do
+   sleep 10
+ done
  cd $smvrepo/Build/smokeview/${COMPILER}_${platform}
  if [ -e "smokeview_${platform}_db" ]; then
    smv_debug_success=true
@@ -1056,11 +1097,14 @@ check_compile_smv_db()
 
 compile_smv()
 {
+  lockfile=$OUTPUT_DIR/building_smv
+  touch $lockfile
    # Clean and compile SMV
   echo "      release"
   cd $smvrepo/Build/smokeview/${SMVCOMPILER}_${platform}
   echo "" > $OUTPUT_DIR/stage2_build_smv_release 2>&1
   ./make_smokeview.sh >> $OUTPUT_DIR/stage2_build_smv_release 2>&1
+  rm -f $lockfile
 }
 
 #---------------------------------------------
@@ -1069,6 +1113,10 @@ compile_smv()
 
 check_compile_smv()
 {
+   lockfile=$OUTPUT_DIR/building_smv
+   while [[ -e $lockfile ]]; do
+     sleep 10
+   done
   # Check for errors in SMV release compilation
   smv_errors=
   cd $smvrepo/Build/smokeview/${SMVCOMPILER}_${platform}
@@ -2525,53 +2573,63 @@ GET_DURATION $SETUP_beg $SETUP_end SETUP
 
 BUILD_beg=`GET_TIME`
 if [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
-  compile_fds_mpi_db         $FDS_DB_DIR $FDS_DB_EXE
-  check_compile_fds_mpi_db   $FDS_DB_DIR $FDS_DB_EXE
-  compile_fds_mpi_db         $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
-  check_compile_fds_mpi_db   $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
+  compile_fds_mpi_db         $FDS_DB_DIR $FDS_DB_EXE                           &
+  compile_fds_mpi_db         $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp      &
 fi
 
 ###*** Stage 2 - gnu fds ###
 
 if [[ "$OPENMPI_GNU" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
-  compile_fds_mpi_gnu_db       $FDSGNU_DB_DIR
-  check_compile_fds_mpi_gnu_db
+  compile_fds_mpi_gnu_db       $FDSGNU_DB_DIR &
 fi
 
 ###*** Stage 2 - release fds ###
 
 if [[ "$CACHE_DIR" == "" ]]; then
-  compile_fds_mpi         $FDS_DIR $FDS_EXE
-  check_compile_fds_mpi   $FDS_DIR $FDS_EXE
-  compile_fds_mpi         $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
-  check_compile_fds_mpi   $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
+  compile_fds_mpi         $FDS_DIR $FDS_EXE                       &
+  compile_fds_mpi         $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp  &
 fi
 
 ###*** Stage 2 - smv utilities ###
 
 if [[ "$CHECK_CLUSTER" == "" ]]; then
+#do not proceed until smv_libraries are built (utilities and smokeview need them)
   compile_smv_libraries
-  compile_smv_utilities
-  check_smv_utilities
-fi
-
-if [[ "$CHECK_CLUSTER" == "" ]]; then
-  cd $firebotdir
-  $COPY_FDS_APPS > $OUTPUT_DIR/stage2_copyapps
+  compile_smv_utilities &
 fi
 
 ###*** Stage 2 - debug smokeview ###
 
 if [[ "$CHECK_CLUSTER" == "" ]]; then
-  compile_smv_db
-  check_compile_smv_db
+  compile_smv_db &
 fi
 
 ###*** Stage 2 - release smokeview ###
 
 if [[ "$CHECK_CLUSTER" == "" ]]; then
-  compile_smv
+  compile_smv &
+fi
+
+if [[ "$CHECK_CLUSTER" == "" ]]; then
+  if [[ "$CACHE_DIR" == "" ]]; then
+    check_compile_fds_mpi_db   $FDS_DB_DIR $FDS_DB_EXE
+    check_compile_fds_mpi_db   $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
+  fi
+
+  if [[ "$OPENMPI_GNU" != "" ]] && [[ "$CACHE_DIR" == "" ]]; then
+    check_compile_fds_mpi_gnu_db
+  fi
+
+  check_compile_fds_mpi   $FDS_DIR $FDS_EXE
+  check_compile_fds_mpi   $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
+
+  check_smv_utilities
+  cd $firebotdir
+  $COPY_FDS_APPS > $OUTPUT_DIR/stage2_copyapps
+
+  check_compile_smv_db
   check_compile_smv
+
   cd $firebotdir
   $COPY_SMV_APPS >> $OUTPUT_DIR/stage2_copyapps
 fi
