@@ -1351,7 +1351,7 @@ archive_timing_stats()
      echo "day,date,revision,pass/fail,clone,setup,build,debug,release,zero,vv,manuals,total" > $HISTORY_DIR/firebot_times.csv
      echo ",,,,s,s,s,s,s,s,s,s,s" >> $HISTORY_DIR/firebot_times.csv
    fi
-   echo $gitdate,$FDS_DATE,$FDS_REVISION,$firebot_success,$CLONE_DELTA,$SETUP_DELTA,$BUILD_DELTA,$DEBUG_DELTA,$RELEASE_DELTA,0.0,$VV_DELTA,$MANUALS_DELTA,$SCRIPT_DELTA >> $HISTORY_DIR/firebot_times.csv
+   echo $gitdate,$FDS_DATE,$FDS_REVISION,$firebot_success,$CLONE_DELTA,$SETUP_DELTA,$BUILD_DELTA,0.0,$RELEASE_DELTA,0.0,$VV_DELTA,$MANUALS_DELTA,$SCRIPT_DELTA >> $HISTORY_DIR/firebot_times.csv
 
    if [ "$UPLOADGUIDES" == "1" ]; then
      if [ "$USER" == "firebot" ]; then
@@ -1738,8 +1738,7 @@ else
 fi
    echo "setup firebot: $SETUP_DIFF "                       >> $TIME_LOG
    echo "build software: $BUILD_DIFF "                      >> $TIME_LOG
-   echo "run cases(debug): $DEBUG_DIFF "                    >> $TIME_LOG
-   echo "run cases(release): $RELEASE_DIFF "                >> $TIME_LOG
+   echo "run cases: $RELEASE_DIFF "                         >> $TIME_LOG
    echo "verification: $VERIFICATION_DIFF "                 >> $TIME_LOG
    echo "validation: $VALIDATION_DIFF "                     >> $TIME_LOG
    echo "build guides: $MANUALS_DIFF "                      >> $TIME_LOG
@@ -2567,23 +2566,10 @@ GET_DURATION $BUILD_beg $BUILD_end BUILD
 
 ###*** Stage 3 run debug cases ###
 
-DEBUG_beg=`GET_TIME`
 # Depends on successful FDS debug compile
 if [[ $FDS_debug_success ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
    run_verification_cases_debug
-   check_cases_debug $fdsrepo/$VERIFICATION_DEBUG 'verification'
 fi
-
-if [[ "$CLONE_REPOS" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
-# clean debug stage (only if repos were not cloned)
-  cd $fdsrepo
-  if [[ "$CLEANREPO" == "1" ]]; then
-    echo "   cleaning Verification"
-    clean_repo $fdsrepo/$VERIFICATION_DEBUG $FDSBRANCH || exit 1
-  fi
-fi
-DEBUG_end=`GET_TIME`
-GET_DURATION $DEBUG_beg $DEBUG_end DEBUG
 
 ###*** Stage 3 run release cases ###
 
@@ -2604,6 +2590,9 @@ if [[ "$CACHE_DIR" == "" ]];  then
       check_validation_cases_release $fdsrepo/Validation FDS_Input_Files
     fi
   fi
+fi
+if [[ $FDS_debug_success ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
+   check_cases_debug $fdsrepo/$VERIFICATION_DEBUG 'verification'
 fi
 RELEASE_end=`GET_TIME`
 GET_DURATION $RELEASE_beg $RELEASE_end RELEASE
