@@ -1759,20 +1759,19 @@ fi
      echo "status:  https://pages.nist.gov/fds-smv/firebot_status.html" >> $TIME_LOG
    fi
    if [[ "$WEB_URL" != "" ]] && [[ "$UPDATED_WEB_IMAGES" != "" ]]; then
-     echo "image url: $WEB_URL"  >> $TIME_LOG
+     echo -n "images: $WEB_URL"  >> $TIME_LOG
+     if [ -e $IMAGE_DIFFS ]; then
+       NUM_CHANGES=`cat $IMAGE_DIFFS | awk '{print $1}'`
+       NUM_ERRORS=`cat $IMAGE_DIFFS | awk '{print $2}'`
+       echo -n ", errors/changes: $NUM_ERRORS/$NUM_CHANGES"  >> $TIME_LOG
+     fi
+     echo >> $TIME_LOG
      if [ "$WEB_DIR" != "" ]; then
        echo "image dir: $WEB_DIR"  >> $TIME_LOG
      fi
    fi
    if [ "$MAKE_SUMMARY" != "" ]; then
      echo "summary dir: $FDS_SUMMARY_DIR"  >> $TIME_LOG
-   fi
-   if [[ "$WEB_URL" != "" ]] && [[ "$UPDATED_WEB_IMAGES" != "" ]]; then
-     if [ -e $IMAGE_DIFFS ]; then
-       NUM_CHANGES=`cat $IMAGE_DIFFS | awk '{print $1}'`
-       NUM_ERRORS=`cat $IMAGE_DIFFS | awk '{print $2}'`
-       echo "image errors/changes: $NUM_ERRORS/$NUM_CHANGES"  >> $TIME_LOG
-     fi
    fi
 #  upload guides to github
    get_firebot_success
