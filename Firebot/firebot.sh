@@ -696,10 +696,10 @@ CHECKOUT_REPO()
 }
 
 #---------------------------------------------
-#                   compile_smv_utilities
+#                   compile_smv_libraries
 #---------------------------------------------
 
-compile_smv_utilities()
+compile_smv_libraries()
 {  
 # smokeview libraries
   echo "   Smokeview"
@@ -707,7 +707,14 @@ compile_smv_utilities()
   cd $smvrepo/Build/LIBS/${SMVCOMPILER}_${platform}
   ./make_LIBS.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
   echo "" >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
-    
+}
+
+#---------------------------------------------
+#                   compile_smv_utilities
+#---------------------------------------------
+
+compile_smv_utilities()
+{  
 # smokezip:
   echo "      smokezip"
   cd $smvrepo/Build/smokezip/${SMVCOMPILER}_${platform}
@@ -2547,6 +2554,7 @@ fi
 ###*** Stage 2 - smv utilities ###
 
 if [[ "$CHECK_CLUSTER" == "" ]]; then
+  compile_smv_libraries
   compile_smv_utilities
   check_smv_utilities
 fi
