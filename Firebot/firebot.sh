@@ -2653,12 +2653,23 @@ GET_DURATION $VV_beg $VV_end VV
 
 MANUALS_beg=`GET_TIME`
   if [[ "$CACHE_DIR" == "" ]]; then
-    make_fds_user_guide
+    make_fds_user_guide             &
+    pid_fds_ug-$!
 #    make_geom_notes
-    make_fds_verification_guide
-    make_fds_technical_guide
-    make_fds_validation_guide
-    make_fds_Config_management_plan
+    make_fds_verification_guide     &
+    pid_fds_verg-$!
+    make_fds_technical_guide        &
+    pid_fds_tg-$!
+    make_fds_validation_guide       &
+    pid_fds_valg-$!
+    make_fds_Config_management_plan &
+    pid_fds_confg-$!
+
+    wait $pid_fds_ug
+    wait $pid_fds_verg
+    wait $pid_fds_tg
+    wait $pid_fds_valg
+    wait $pid_fds_confg
     get_firebot_success
 
 # copy repo manuals to Manualslatest directory whether firebot passes or fails
