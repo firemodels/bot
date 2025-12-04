@@ -2632,9 +2632,6 @@ MANUALS_beg=`GET_TIME`
     make_fds_user_guide             &
     pid_fds_ug=$!
 
-    make_fds_verification_guide     &
-    pid_fds_verg=$!
-
     make_fds_technical_guide        &
     pid_fds_tg=$!
 
@@ -2645,6 +2642,9 @@ MANUALS_beg=`GET_TIME`
     pid_fds_confg=$!
 
     wait $pid_fds_ug
+    make_fds_verification_guide     &
+    pid_fds_verg=$!
+
     wait $pid_fds_verg
     wait $pid_fds_tg
     wait $pid_fds_valg
