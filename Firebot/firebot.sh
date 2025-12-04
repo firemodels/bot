@@ -1149,10 +1149,8 @@ check_python_setup()
 run_python_verification()
 {
    echo Python verification plots
-   touch $OUTPUT_DIR/running_python_verification
    cd $fdsrepo/Utilities/Python
    python FDS_verification_script.py > $OUTPUT_DIR/stage4_python_ver 2>&1
-   rm -f $OUTPUT_DIR/running_python_verification
 }
 
 #---------------------------------------------
@@ -1161,10 +1159,6 @@ run_python_verification()
 
 check_python_verification()
 {
-   # wait until python verification script finishes
-   while [[ -e $OUTPUT_DIR/running_python_verification ]]; do
-     sleep 10
-   done
    # Check that python environment has been setup
    python_verification_success=true
    if [[ `grep "Error" $OUTPUT_DIR/stage4_python_ver` != "" ]]; then
@@ -1185,9 +1179,7 @@ run_python_validation()
 {
    echo Python validation plots
    cd $fdsrepo/Utilities/Python
-   touch $OUTPUT_DIR/running_python_validation
    python FDS_validation_script.py > $OUTPUT_DIR/stage4_python_val 2>&1
-   rm -f $OUTPUT_DIR/running_python_validation
 }
 
 #---------------------------------------------
@@ -1196,10 +1188,6 @@ run_python_validation()
 
 check_python_validation()
 {
-   # wait until python validation script finishes
-   while [[ -e $OUTPUT_DIR/running_python_validation ]]; do
-     sleep 10
-   done
    # Check that python environment has been setup
    python_validation_success=true
    if [[ `grep "Error" $OUTPUT_DIR/stage4_python_val` != "" ]]; then
@@ -2644,7 +2632,12 @@ if [[ "$CACHE_DIR" == "" ]]; then
   check_python_setup
   if [ $python_success == true ]; then
     run_python_verification &
+    pid_python_verification=$!
     run_python_validation   &
+    pid_python_validation=$!
+    wait $pid_python_verification
+    wait $pid_python_validation
+
     check_python_verification
     check_python_validation
     make_fds_summary
