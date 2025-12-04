@@ -2544,7 +2544,6 @@ fi
 ###*** Stage 2 - smv utilities ###
 
 if [[ "$CHECK_CLUSTER" == "" ]]; then
-#do not proceed until smv_libraries are built (utilities and smokeview need them)
   compile_smv_libraries
   compile_smv_utilities
 fi
@@ -2633,11 +2632,12 @@ if [[ "$CACHE_DIR" == "" ]]; then
   if [ $python_success == true ]; then
     run_python_verification &
     pid_python_verification=$!
+
     run_python_validation   &
     pid_python_validation=$!
+
     wait $pid_python_verification
     wait $pid_python_validation
-
     check_python_verification
     check_python_validation
     make_fds_summary
@@ -2654,16 +2654,19 @@ GET_DURATION $VV_beg $VV_end VV
 MANUALS_beg=`GET_TIME`
   if [[ "$CACHE_DIR" == "" ]]; then
     make_fds_user_guide             &
-    pid_fds_ug-$!
-#    make_geom_notes
+    pid_fds_ug=$!
+
     make_fds_verification_guide     &
-    pid_fds_verg-$!
+    pid_fds_verg=$!
+
     make_fds_technical_guide        &
-    pid_fds_tg-$!
+    pid_fds_tg=$!
+
     make_fds_validation_guide       &
-    pid_fds_valg-$!
+    pid_fds_valg=$!
+
     make_fds_Config_management_plan &
-    pid_fds_confg-$!
+    pid_fds_confg=$!
 
     wait $pid_fds_ug
     wait $pid_fds_verg
