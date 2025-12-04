@@ -909,7 +909,7 @@ wait_cases_release_end()
           ./compare_fds_timings.sh >& /dev/null
           if [ -e $TIMING_ERRORS ]; then
             timing_error=1
-            cat $TIMING_ERRORS | mail -s "[$botuser] ***error: one or more firebot case runtimes > 2x reference values" $mailToFDS > /dev/null
+            cat $TIMING_ERRORS | mail -s "***error: one or more firebot case runtimes > 2x reference values" $mailToFDS > /dev/null
           fi
           cd $current_wait_dir
         fi
@@ -1708,8 +1708,6 @@ email_build_status()
 {
    cd $firebotdir
 
-   bottype=${1}
-   botuser=${1}@$hostname
    firebot_status=1
 
    stop_time=`date`
@@ -1830,52 +1828,30 @@ fi
 
    echo "HAVE_MAIL=$HAVE_MAIL"
    echo "mailToFDS=$mailToFDS"
-   # Check for warnings and errors
+   # Check for pass or fail
    NAMELIST_LOGS="$NAMELIST_NODOC_LOG $NAMELIST_NOSOURCE_LOG"
-   if [[ -s $WARNING_LOG && -s $ERROR_LOG ]]
-   then
-      cd $firebotdir
-
-     # Send email with failure message and warnings, body of email contains appropriate log file
-     echo "[$botuser] $bottype failure and warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH."
-     cat $ERROR_LOG $FYI_LOG $TIME_LOG $NAMELIST_LOGS >& $MAIL_LOG
-     if [ "$HAVE_MAIL" == "1" ]; then
-       cat $ERROR_LOG $FYI_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype failure and warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
-     fi
-
-   # Check for errors only
-   elif [ -s $ERROR_LOG ]
-   then
-      # Send email with failure message, body of email contains error log file
-      echo "[$botuser] $bottype failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH."
-      cat $ERROR_LOG $FYI_LOG $TIME_LOG $NAMELIST_LOGS >& $MAIL_LOG
-      if [ "$HAVE_MAIL" == "1" ]; then
-        cat $ERROR_LOG $FYI_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
-      fi
-
-   # Check for warnings only
-   elif [ -s $WARNING_LOG ]
-   then
-      cd $firebotdir
-
-      # Send email with success message, include warnings
-      echo "[$botuser] $bottype success, with warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH"
-      cat $WARNING_LOG $FYI_LOG $TIME_LOG $NAMELIST_LOGS >& $MAIL_LOG
-      if [ "$HAVE_MAIL" == "1" ]; then
-        cat $WARNING_LOG $FYI_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype success, with warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
-      fi
-
-   # No errors or warnings
-   else
-#  upload guides to a google drive directory
-      cd $firebotdir
-
-      # Send success message with links to nightly manuals
+   LOGS="$TIME_LOG $FYI_LOG $NAMELIST_LOGS"
+   cd $firebotdir
+   if [[ ! -s $WARNING_LOG && ! -s $ERROR_LOG ]]; then
+# success - send message with links to nightly manuals
       firebot_status=0
-      cat $TIME_LOG $FYI_LOG $NAMELIST_LOGS >& $MAIL_LOG
-      echo "[$botuser] $bottype success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH"
+      cat $LOGS >& $MAIL_LOG
+      echo "firebot success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH"
       if [ "$HAVE_MAIL" == "1" ]; then
-        cat $TIME_LOG $FYI_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
+        cat $LOGS | mail -s "firebot success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
+      fi
+   else
+# failure - Send email with failure message, body of email contains error log file
+      echo "firebot failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH."
+      if [ -s $WARNING_LOG ]; then
+        LOGS="$WARNING_LOG $LOGS"
+      fi
+      if [ -s $ERROR_LOG ]; then
+        LOGS="$ERROR_LOG $LOGS"
+      fi
+      cat $LOGS >& $MAIL_LOG
+      if [ "$HAVE_MAIL" == "1" ]; then
+        cat $LOGS | mail -s "firebot failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
       fi
    fi
    cp $TIME_LOG "$HISTORY_DIR/${FDS_REVISION}_summary.txt"
@@ -2740,6 +2716,6 @@ save_build_status
 if [[ "$CHECK_CLUSTER" == "" ]]; then
   archive_timing_stats
 fi
-email_build_status 'Firebot'
+email_build_status
 echo firebot exit status: $firebot_status
 exit $firebot_status
