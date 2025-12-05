@@ -402,15 +402,15 @@ compile_fds_mpi_db()
     MPTYPE="_$MPTYPE"
   fi
    # Clean and compile FDS MPI debug
-   echo "      MPI $MPTYPE Intel debug"
-   cd $FDSDIR
-   make -f ../makefile clean &> /dev/null
-   ./make_fds.sh &> $OUTPUT_DIR/stage2_build_fds${MPTYPE}_debug
-   if [ ! -x $FDSEXE ]; then
-     cd $FDSDIR
-     make -f ../makefile clean &> /dev/null
-     ./make_fds.sh &> $OUTPUT_DIR/stage2_build_fds${MPTYPE}_debug
-   fi
+  echo "      MPI $MPTYPE Intel debug"
+  cd $FDSDIR
+  make -f ../makefile clean &> /dev/null
+  ./make_fds.sh &> $OUTPUT_DIR/stage2_build_fds${MPTYPE}_debug
+  if [ ! -x $FDSEXE ]; then
+    cd $FDSDIR
+    make -f ../makefile clean &> /dev/null
+    ./make_fds.sh &> $OUTPUT_DIR/stage2_build_fds${MPTYPE}_debug
+  fi
 }
 
 #---------------------------------------------
@@ -422,9 +422,14 @@ check_compile_fds_mpi_db()
   local FDSDIR=$1
   local FDSEXE=$2
   local MPTYPE=$3
-  if [ "$MPTYPE" != "" ]; then
+
+  if [ "$MPTYPE" == "" ]; then
+    wait $pid_fds_mpi_db
+  else
+    wait $pid_fds_mpi_db_openmp
     MPTYPE="_$MPTYPE"
   fi
+
    # Check for errors in FDS MPI debug compilation
   cd $FDSDIR
   if [ -x $FDSEXE ]
@@ -436,8 +441,6 @@ check_compile_fds_mpi_db()
      cat $OUTPUT_DIR/stage2_build_fds${MPTYPE}_debug                      >> $ERROR_LOG
      echo ""                                                              >> $ERROR_LOG
   fi
-
-
 
   START_LINE="Building impi_intel_linux"
   # The awk search for a line starting with Building impi_intel_linux* (either _db or _openmp_db)
@@ -492,7 +495,8 @@ check_compile_fds_mpi_gnu_db()
 {
 # force the gnu compile to pass until it can compile
 # fds with the findloc routine
-        FDS_gnu_debug_success=true
+  wait $pid_fds_gnu_db
+  FDS_gnu_debug_success=true
 }
 
 #---------------------------------------------
@@ -537,18 +541,6 @@ run_verification_cases_debug()
    echo ./Run_FDS_Cases.sh -d -m 1 $INTEL2 -q $QUEUE -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage3_run_debug_ver 2>&1
         ./Run_FDS_Cases.sh -d -m 1 $INTEL2 -q $QUEUE -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage3_run_debug_ver 2>&1
    echo ""                                                               >> $OUTPUT_DIR/stage3_run_debug_ver 2>&1
-
-   # Wait for all verification cases to end
-   wait_cases_debug_end 'verification'
-
-#  check whether cases have run
-   ./Run_FDS_Cases.sh -C                                  -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage3_run_debug_ver 2>&1
-
-   # Remove all .stop files from Verification directories (recursively)
-   if [ "$CLONE_REPOS" == "" ]; then
-     cd $fdsrepo/$VERIFICATION_DEBUG
-     find . -name '*.stop' -exec rm -f {} \;
-   fi
 }
 
 #---------------------------------------------
@@ -562,6 +554,18 @@ check_cases_debug()
 
    # Scan for and report any errors in FDS cases
    cd $dir
+
+   # Wait for all verification cases to end
+   wait_cases_debug_end 'verification'
+
+#  check whether cases have run
+   ./Run_FDS_Cases.sh -C                                  -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage3_run_debug_ver 2>&1
+
+   # Remove all .stop files from Verification directories (recursively)
+   if [ "$CLONE_REPOS" == "" ]; then
+     cd $fdsrepo/$VERIFICATION_DEBUG
+     find . -name '*.stop' -exec rm -f {} \;
+   fi
 
    if [[ `grep 'Run aborted'     $OUTPUT_DIR/stage3_run_debug_ver | grep -v grep`                == "" ]] && \
       [[ `grep Segmentation      */*.err            | grep -v grep`                == "" ]] && \
@@ -625,7 +629,10 @@ check_compile_fds_mpi()
   local FDSDIR=$1
   local FDSEXE=$2
   local MPTYPE=$3
-  if [ "$MPTYPE" != "" ]; then
+  if [ "$MPTYPE" == "" ]; then
+    wait $pid_fds_mpi
+  else
+    wait $pid_fds_mpi_openmp
     MPTYPE="_$MPTYPE"
   fi
   cd $FDSDIR
@@ -696,58 +703,64 @@ CHECKOUT_REPO()
 }
 
 #---------------------------------------------
-#                   compile_smv_utilities
+#                   compile_smv_libraries
 #---------------------------------------------
 
-compile_smv_utilities()
+compile_smv_libraries()
 {  
 # smokeview libraries
   echo "   Smokeview"
   echo "      libraries"
   cd $smvrepo/Build/LIBS/${SMVCOMPILER}_${platform}
-  ./make_LIBS.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
-  echo "" >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
-    
+  ./make_LIBS.sh > $OUTPUT_DIR/stage2_build_smv_libraries 2>&1
+}
+
+#---------------------------------------------
+#                   compile_smv_utilities
+#---------------------------------------------
+
+compile_smv_utilities()
+{
 # smokezip:
   echo "      smokezip"
   cd $smvrepo/Build/smokezip/${SMVCOMPILER}_${platform}
   rm -f *.o smokezip_${platform}
 
-  ./make_smokezip.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
+  ./make_smokezip.sh > $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
   CP smokezip_${platform} $LATESTAPPS_DIR/smokezip
-  echo "" >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
+  echo "" >> $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
 
 # smokediff:
   echo "      smokediff"
   cd $smvrepo/Build/smokediff/${SMVCOMPILER}_${platform}
   rm -f *.o smokediff_${platform}
-  ./make_smokediff.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
+  ./make_smokediff.sh >> $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
   CP smokediff_${platform} $LATESTAPPS_DIR/smokediff
-  echo "" >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
+  echo "" >> $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
 
 # background
   echo "      background"
   cd $smvrepo/Build/background/${SMVCOMPILER}_${platform}
   rm -f *.o background_${platform}
-  ./make_background.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
+  ./make_background.sh >> $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
   CP background_${platform} $LATESTAPPS_DIR/background
 
 # wind2fds:
   echo "      wind2fds"
   cd $smvrepo/Build/wind2fds/${SMVCOMPILER}_${platform}
   rm -f *.o wind2fds_${platform}
-  ./make_wind2fds.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
+  ./make_wind2fds.sh >> $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
   CP wind2fds_${platform} $LATESTAPPS_DIR/wind2fds
- echo "" >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
+ echo "" >> $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
 
 # fds2fed
   if [ -d $smvrepo/Build/fds2fed/${SMVCOMPILER}_${platform} ]; then
     echo "      fds2fed"
     cd $smvrepo/Build/fds2fed/${SMVCOMPILER}_${platform}
     rm -f *.o fds2fed_${platform}
-    ./make_fds2fed.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
+    ./make_fds2fed.sh >> $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
     CP fds2fed_${platform} $LATESTAPPS_DIR/fds2fed
-    echo "" >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
+    echo "" >> $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
   fi
 
 # pnginfo
@@ -755,8 +768,8 @@ compile_smv_utilities()
     echo "      pnginfo"
     cd $smvrepo/Build/pnginfo/${SMVCOMPILER}_${platform}
     rm -f *.o pnginfo_${platform}
-    echo 'Compiling pnginfo:' >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
-    ./make_pnginfo.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
+    echo 'Compiling pnginfo:' >> $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
+    ./make_pnginfo.sh >> $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
     cp pnginfo_${platform} $LATESTAPPS_DIR/pnginfo
   fi
 
@@ -764,17 +777,17 @@ compile_smv_utilities()
   echo "      fds2ascii"
   cd $fdsrepo/Utilities/fds2ascii/${COMPILER}_${platform}${size}
   rm -f *.o fds2ascii_${platform}${size}
-  ./make_fds2ascii.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
+  ./make_fds2ascii.sh >> $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
   cp fds2ascii_${COMPILER}_${platform}${size} $LATESTAPPS_DIR/fds2ascii
-  echo "" >> $OUTPUT_DIR/stage2_build_fdsutil 2>&1
+  echo "" >> $OUTPUT_DIR/stage2_build_fds_utilities 2>&1
 
 # test_mpi
   echo "      test_mpi"
   cd $fdsrepo/Utilities/test_mpi/${MPI_TYPE}_${COMPILER}_${platform}
   rm -f *.o test_mpi
-  ./make_test_mpi.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
+  ./make_test_mpi.sh >> $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
   cp test_mpi $LATESTAPPS_DIR/test_mpi
-  echo "" >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
+  echo "" >> $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
 }
 
 #---------------------------------------------
@@ -783,8 +796,8 @@ compile_smv_utilities()
 
 check_smv_utilities()
 {
-   # nothing to check
-   smv_utilities_success=true
+# nothing to check
+  smv_utilities_success=true
 }
 
 #---------------------------------------------
@@ -896,7 +909,7 @@ wait_cases_release_end()
           ./compare_fds_timings.sh >& /dev/null
           if [ -e $TIMING_ERRORS ]; then
             timing_error=1
-            cat $TIMING_ERRORS | mail -s "[$botuser] ***error: one or more firebot case runtimes > 2x reference values" $mailToFDS > /dev/null
+            cat $TIMING_ERRORS | mail -s "***error: one or more firebot case runtimes > 2x reference values" $mailToFDS > /dev/null
           fi
           cd $current_wait_dir
         fi
@@ -1351,7 +1364,7 @@ archive_timing_stats()
      echo "day,date,revision,pass/fail,clone,setup,build,debug,release,zero,vv,manuals,total" > $HISTORY_DIR/firebot_times.csv
      echo ",,,,s,s,s,s,s,s,s,s,s" >> $HISTORY_DIR/firebot_times.csv
    fi
-   echo $gitdate,$FDS_DATE,$FDS_REVISION,$firebot_success,$CLONE_DELTA,$SETUP_DELTA,$BUILD_DELTA,$DEBUG_DELTA,$RELEASE_DELTA,0.0,$VV_DELTA,$MANUALS_DELTA,$SCRIPT_DELTA >> $HISTORY_DIR/firebot_times.csv
+   echo $gitdate,$FDS_DATE,$FDS_REVISION,$firebot_success,$CLONE_DELTA,$SETUP_DELTA,$BUILD_DELTA,0.0,$RELEASE_DELTA,0.0,$VV_DELTA,$MANUALS_DELTA,$SCRIPT_DELTA >> $HISTORY_DIR/firebot_times.csv
 
    if [ "$UPLOADGUIDES" == "1" ]; then
      if [ "$USER" == "firebot" ]; then
@@ -1695,8 +1708,6 @@ email_build_status()
 {
    cd $firebotdir
 
-   bottype=${1}
-   botuser=${1}@$hostname
    firebot_status=1
 
    stop_time=`date`
@@ -1738,10 +1749,8 @@ else
 fi
    echo "setup firebot: $SETUP_DIFF "                       >> $TIME_LOG
    echo "build software: $BUILD_DIFF "                      >> $TIME_LOG
-   echo "run cases(debug): $DEBUG_DIFF "                    >> $TIME_LOG
-   echo "run cases(release): $RELEASE_DIFF "                >> $TIME_LOG
-   echo "verification: $VERIFICATION_DIFF "                 >> $TIME_LOG
-   echo "validation: $VALIDATION_DIFF "                     >> $TIME_LOG
+   echo "run cases: $RELEASE_DIFF "                         >> $TIME_LOG
+   echo "verification/validation: $VERIFICATION_DIFF "      >> $TIME_LOG
    echo "build guides: $MANUALS_DIFF "                      >> $TIME_LOG
    echo "total: $SCRIPT_DIFF "                              >> $TIME_LOG
    echo ""                                                  >> $TIME_LOG
@@ -1819,52 +1828,30 @@ fi
 
    echo "HAVE_MAIL=$HAVE_MAIL"
    echo "mailToFDS=$mailToFDS"
-   # Check for warnings and errors
+   # Check for pass or fail
    NAMELIST_LOGS="$NAMELIST_NODOC_LOG $NAMELIST_NOSOURCE_LOG"
-   if [[ -s $WARNING_LOG && -s $ERROR_LOG ]]
-   then
-      cd $firebotdir
-
-     # Send email with failure message and warnings, body of email contains appropriate log file
-     echo "[$botuser] $bottype failure and warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH."
-     cat $ERROR_LOG $FYI_LOG $TIME_LOG $NAMELIST_LOGS >& $MAIL_LOG
-     if [ "$HAVE_MAIL" == "1" ]; then
-       cat $ERROR_LOG $FYI_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype failure and warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
-     fi
-
-   # Check for errors only
-   elif [ -s $ERROR_LOG ]
-   then
-      # Send email with failure message, body of email contains error log file
-      echo "[$botuser] $bottype failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH."
-      cat $ERROR_LOG $FYI_LOG $TIME_LOG $NAMELIST_LOGS >& $MAIL_LOG
-      if [ "$HAVE_MAIL" == "1" ]; then
-        cat $ERROR_LOG $FYI_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
-      fi
-
-   # Check for warnings only
-   elif [ -s $WARNING_LOG ]
-   then
-      cd $firebotdir
-
-      # Send email with success message, include warnings
-      echo "[$botuser] $bottype success, with warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH"
-      cat $WARNING_LOG $FYI_LOG $TIME_LOG $NAMELIST_LOGS >& $MAIL_LOG
-      if [ "$HAVE_MAIL" == "1" ]; then
-        cat $WARNING_LOG $FYI_LOG $TIME_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype success, with warnings. Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
-      fi
-
-   # No errors or warnings
-   else
-#  upload guides to a google drive directory
-      cd $firebotdir
-
-      # Send success message with links to nightly manuals
+   LOGS="$TIME_LOG $FYI_LOG $NAMELIST_LOGS"
+   cd $firebotdir
+   if [[ ! -s $WARNING_LOG && ! -s $ERROR_LOG ]]; then
+# success - send message with links to nightly manuals
       firebot_status=0
-      cat $TIME_LOG $FYI_LOG $NAMELIST_LOGS >& $MAIL_LOG
-      echo "[$botuser] $bottype success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH"
+      cat $LOGS >& $MAIL_LOG
+      echo "firebot success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH"
       if [ "$HAVE_MAIL" == "1" ]; then
-        cat $TIME_LOG $FYI_LOG $NAMELIST_LOGS | mail -s "[$botuser] $bottype success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
+        cat $LOGS | mail -s "firebot success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
+      fi
+   else
+# failure - Send email with failure message, body of email contains error log file
+      echo "firebot failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH."
+      if [ -s $WARNING_LOG ]; then
+        LOGS="$WARNING_LOG $LOGS"
+      fi
+      if [ -s $ERROR_LOG ]; then
+        LOGS="$ERROR_LOG $LOGS"
+      fi
+      cat $LOGS >& $MAIL_LOG
+      if [ "$HAVE_MAIL" == "1" ]; then
+        cat $LOGS | mail -s "firebot failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
       fi
    fi
    cp $TIME_LOG "$HISTORY_DIR/${FDS_REVISION}_summary.txt"
@@ -1924,7 +1911,6 @@ fi
 
 TIME_LOG=$OUTPUT_DIR/timings
 ERROR_LOG=$OUTPUT_DIR/errors
-VALIDATION_ERROR_LOG=$OUTPUT_DIR/validation_errors
 WARNING_LOG=$OUTPUT_DIR/warnings
 TIMING_WARNING_LOG=$OUTPUT_DIR/timing_warnings
 MAIL_LOG=$OUTPUT_DIR/mail_log
@@ -2294,15 +2280,6 @@ fi
 cd $botrepo
 BOTREPO_HASH=`git rev-parse HEAD`
 
-# if the fds repo is cloned, make a copy of the Verification directory and run fds in debug mode in this directory
-if [ "$CLONE_REPOS" != "" ]; then
-  cd $fdsrepo
-  VERIFICATION_DEBUG=Verification_DB
-  cp -r Verification $VERIFICATION_DEBUG
-else
-  VERIFICATION_DEBUG=Verification
-fi
-
 #save apps and pubs in directories under .firebot/$FDSBRANCH
 
 BRANCH_DIR=$HOME/.firebot/$FDSBRANCH
@@ -2403,32 +2380,37 @@ if [[ "$CLONE_REPOS" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
 fi
 
 #*** update repos
-  UPDATING=
-  if [[ "$UPDATEREPO" == "1" ]] ; then
+UPDATING=
+if [[ "$UPDATEREPO" == "1" ]] ; then
 # we are not cloning so update
-    if [[ "$CLONE_REPOS" == "" ]]; then
-      UPDATING=1
-      echo Updating
-      update_repo fds $FDSBRANCH || exit 1
-      if [[ "$CHECK_CLUSTER" == "" ]]; then
-        update_repo smv $SMVBRANCH || exit 1
-        update_repo fig $FIGBRANCH || exit 1
-        update_repo out $OUTBRANCH || exit 1
-        update_repo exp $EXPBRANCH || exit 1
-      fi
-    fi
-# we are not cloning fig, out and exp so update them
-    if [[ "$CLONE_REPOS" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-      UPDATING=1
-      echo Updating
+  if [[ "$CLONE_REPOS" == "" ]]; then
+    UPDATING=1
+    echo Updating
+    update_repo fds $FDSBRANCH || exit 1
+    if [[ "$CHECK_CLUSTER" == "" ]]; then
+      update_repo smv $SMVBRANCH || exit 1
       update_repo fig $FIGBRANCH || exit 1
       update_repo out $OUTBRANCH || exit 1
       update_repo exp $EXPBRANCH || exit 1
     fi
   fi
-  if [ "$UPDATING" == "" ]; then
-    echo Repos not updated
+# we are not cloning fig, out and exp so update them
+  if [[ "$CLONE_REPOS" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+    UPDATING=1
+    echo Updating
+    update_repo fig $FIGBRANCH || exit 1
+    update_repo out $OUTBRANCH || exit 1
+    update_repo exp $EXPBRANCH || exit 1
   fi
+fi
+if [ "$UPDATING" == "" ]; then
+  echo Repos not updated
+fi
+
+# run debug and release cases in two different directories
+cd $fdsrepo
+VERIFICATION_DEBUG=Verification_DB
+cp -r Verification $VERIFICATION_DEBUG
 
 #*** check fds and smv repos for text files with CRLF line endings
 #    don't check lines if not cloning and not cleaning repo - avoid false positives
@@ -2513,52 +2495,67 @@ GET_DURATION $SETUP_beg $SETUP_end SETUP
 
 BUILD_beg=`GET_TIME`
 if [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
-  compile_fds_mpi_db         $FDS_DB_DIR $FDS_DB_EXE
-  check_compile_fds_mpi_db   $FDS_DB_DIR $FDS_DB_EXE
-  compile_fds_mpi_db         $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
-  check_compile_fds_mpi_db   $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
+  compile_fds_mpi_db         $FDS_DB_DIR $FDS_DB_EXE                           &
+  pid_fds_mpi_db=$!
+  compile_fds_mpi_db         $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp      &
+  pid_fds_mpi_db_openmp=$!
 fi
 
 ###*** Stage 2 - gnu fds ###
 
 if [[ "$OPENMPI_GNU" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
-  compile_fds_mpi_gnu_db       $FDSGNU_DB_DIR
-  check_compile_fds_mpi_gnu_db
+  compile_fds_mpi_gnu_db       $FDSGNU_DB_DIR &
+  pid_fds_mpi_gnu_db=$!
 fi
 
 ###*** Stage 2 - release fds ###
 
 if [[ "$CACHE_DIR" == "" ]]; then
-  compile_fds_mpi         $FDS_DIR $FDS_EXE
-  check_compile_fds_mpi   $FDS_DIR $FDS_EXE
-  compile_fds_mpi         $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
-  check_compile_fds_mpi   $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
+  compile_fds_mpi         $FDS_DIR $FDS_EXE                       &
+  pid_fds_mpi=$!
+  compile_fds_mpi         $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp  &
+  pid_fds_mpi_openmp=$!
 fi
 
 ###*** Stage 2 - smv utilities ###
 
 if [[ "$CHECK_CLUSTER" == "" ]]; then
+  compile_smv_libraries
   compile_smv_utilities
-  check_smv_utilities
-fi
-
-if [[ "$CHECK_CLUSTER" == "" ]]; then
-  cd $firebotdir
-  $COPY_FDS_APPS > $OUTPUT_DIR/stage2_copyapps
 fi
 
 ###*** Stage 2 - debug smokeview ###
 
 if [[ "$CHECK_CLUSTER" == "" ]]; then
   compile_smv_db
-  check_compile_smv_db
 fi
 
 ###*** Stage 2 - release smokeview ###
 
 if [[ "$CHECK_CLUSTER" == "" ]]; then
   compile_smv
+fi
+
+if [[ "$CHECK_CLUSTER" == "" ]]; then
+  if [[ "$CACHE_DIR" == "" ]]; then
+    check_compile_fds_mpi_db   $FDS_DB_DIR $FDS_DB_EXE
+    check_compile_fds_mpi_db   $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
+  fi
+
+  if [[ "$OPENMPI_GNU" != "" ]] && [[ "$CACHE_DIR" == "" ]]; then
+    check_compile_fds_mpi_gnu_db
+  fi
+
+  check_compile_fds_mpi   $FDS_DIR $FDS_EXE
+  check_compile_fds_mpi   $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
+
+  check_smv_utilities
+  cd $firebotdir
+  $COPY_FDS_APPS > $OUTPUT_DIR/stage2_copyapps
+
+  check_compile_smv_db
   check_compile_smv
+
   cd $firebotdir
   $COPY_SMV_APPS >> $OUTPUT_DIR/stage2_copyapps
 fi
@@ -2567,23 +2564,10 @@ GET_DURATION $BUILD_beg $BUILD_end BUILD
 
 ###*** Stage 3 run debug cases ###
 
-DEBUG_beg=`GET_TIME`
 # Depends on successful FDS debug compile
 if [[ $FDS_debug_success ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
    run_verification_cases_debug
-   check_cases_debug $fdsrepo/$VERIFICATION_DEBUG 'verification'
 fi
-
-if [[ "$CLONE_REPOS" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
-# clean debug stage (only if repos were not cloned)
-  cd $fdsrepo
-  if [[ "$CLEANREPO" == "1" ]]; then
-    echo "   cleaning Verification"
-    clean_repo $fdsrepo/$VERIFICATION_DEBUG $FDSBRANCH || exit 1
-  fi
-fi
-DEBUG_end=`GET_TIME`
-GET_DURATION $DEBUG_beg $DEBUG_end DEBUG
 
 ###*** Stage 3 run release cases ###
 
@@ -2605,6 +2589,9 @@ if [[ "$CACHE_DIR" == "" ]];  then
     fi
   fi
 fi
+if [[ $FDS_debug_success ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
+   check_cases_debug $fdsrepo/$VERIFICATION_DEBUG 'verification'
+fi
 RELEASE_end=`GET_TIME`
 GET_DURATION $RELEASE_beg $RELEASE_end RELEASE
 
@@ -2613,30 +2600,27 @@ GET_DURATION $RELEASE_beg $RELEASE_end RELEASE
 VV_beg=`GET_TIME`
 if [[ "$CACHE_DIR" == "" ]]; then
 
-#*** python verification plots
+#*** python verification and validation plots
 
   VERIFICATION_beg=`GET_TIME`
   run_python_setup
   check_python_setup
   if [ $python_success == true ]; then
-    run_python_verification
+    run_python_verification &
+    pid_python_verification=$!
+
+    run_python_validation   &
+    pid_python_validation=$!
+
+    wait $pid_python_verification
+    wait $pid_python_validation
     check_python_verification
+    check_python_validation
     make_fds_summary
     MAKE_SUMMARY=1
   fi
   VERIFICATION_end=`GET_TIME`
   GET_DURATION $VERIFICATION_beg $VERIFICATION_end VERIFICATION
-
-#*** python validation plots
-#    only need to setup python once
-
-  VALIDATION_beg=`GET_TIME`
-  if [ $python_success == true ]; then
-    run_python_validation
-    check_python_validation
-  fi
-  VALIDATION_end=`GET_TIME`
-  GET_DURATION $VALIDATION_beg $VALIDATION_end VALIDATION
 fi
 VV_end=`GET_TIME`
 GET_DURATION $VV_beg $VV_end VV
@@ -2645,12 +2629,27 @@ GET_DURATION $VV_beg $VV_end VV
 
 MANUALS_beg=`GET_TIME`
   if [[ "$CACHE_DIR" == "" ]]; then
-    make_fds_user_guide
-#    make_geom_notes
-    make_fds_verification_guide
-    make_fds_technical_guide
-    make_fds_validation_guide
-    make_fds_Config_management_plan
+    make_fds_user_guide             &
+    pid_fds_ug=$!
+
+    make_fds_technical_guide        &
+    pid_fds_tg=$!
+
+    make_fds_Config_management_plan &
+    pid_fds_confg=$!
+
+    wait $pid_fds_ug
+
+    make_fds_verification_guide     &
+    pid_fds_verg=$!
+
+    make_fds_validation_guide       &
+    pid_fds_valg=$!
+
+    wait $pid_fds_verg
+    wait $pid_fds_tg
+    wait $pid_fds_valg
+    wait $pid_fds_confg
     get_firebot_success
 
 # copy repo manuals to Manualslatest directory whether firebot passes or fails
@@ -2718,6 +2717,6 @@ save_build_status
 if [[ "$CHECK_CLUSTER" == "" ]]; then
   archive_timing_stats
 fi
-email_build_status 'Firebot'
+email_build_status
 echo firebot exit status: $firebot_status
 exit $firebot_status
