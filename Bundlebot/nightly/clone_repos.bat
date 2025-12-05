@@ -27,7 +27,7 @@ call setup_repos -T -n
 ::***setup fds repo
 
 cd %REPOROOT%\fds
-git checkout -b nightly %fdshash%
+git checkout -b nightly %fds_hash%
 git describe --abbrev=7 --dirty --long
 git branch -a
 
