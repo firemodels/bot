@@ -4,37 +4,39 @@
 
 BUILDFDS()
 {
-  echo ***building fds
-  echo ""                >> $compilelog 2>&1 
-  echo "***************" >> $compilelog 2>&1 
-
-  echo "***building fds_${mpitype}_${fdscompiler}_${platform}" >> $compilelog 2>&1 
   cd $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}
-  ( $RUNSCRIPT ./make_fds.sh bot  >> $compilelog 2>&1 ) &
+  ./make_fds.sh bot  >> $outputdir/compile_fds.log 2>&1
+}
 
-  echo "***building fds_${mpitype}_${fdscompiler}_${platform}_openmp"
-  echo "***building fds_${mpitype}_${fdscompiler}_${platform}_openmp" >> $compilelog 2>&1 
+BUILDFDSOPENMP()
+{
   cd $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}_openmp
   cp make_fds.sh make_fds_openmp.sh
-  ( $RUNSCRIPT ./make_fds_openmp.sh bot >> $compilelog 2>&1  ) &
+  ./make_fds_openmp.sh bot >> $outputdir/compile_fdsopenmp.log 2>&1
 }
 
 # -------------------------------------------------------------
 
 CHECK_BUILDFDS()
 {
-  $WAITSCRIPT ./make_fds.sh
   if [ ! -e $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}/fds_${mpitype}_${fdscompiler}_${platform} ]; then
     echo "***error: The program fds_${mpitype}_${fdscompiler}_${platform} failed to build"
     echo "***error: The program fds_${mpitype}_${fdscompiler}_${platform} failed to build"  >> $errorlog 2>&1
   else
+    echo $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}/fds_${mpitype}_${fdscompiler}_${platform} built
     cp $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}/fds_${mpitype}_${fdscompiler}_${platform} $CURDIR/apps/fds
   fi
-  $WAITSCRIPT ./make_fds_openmp.sh
+}
+
+# -------------------------------------------------------------
+
+CHECK_BUILDFDSOPENMP()
+{
   if [ ! -e $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}_openmp/fds_${mpitype}_${fdscompiler}_${platform}_openmp ]; then
     echo "***error: The program fds_${mpitype}_${fdscompiler}_${platform}_openmp failed to build"
     echo "***error: The program fds_${mpitype}_${fdscompiler}_${platform}_openmp failed to build"   >> $errorlog 2>&1
   else
+    echo $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}_openmp/fds_${mpitype}_${fdscompiler}_${platform}_openmp built
     cp  $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}_openmp/fds_${mpitype}_${fdscompiler}_${platform}_openmp $CURDIR/apps/fds_openmp
   fi
 }
@@ -46,12 +48,8 @@ BUILDFDSUTIL()
   prog=$1
   builddir=$2
 
-  echo "***building $prog"
-  echo ""                  >> $compilelog 2>&1 
-  echo "***************"   >> $compilelog 2>&1 
-  echo "***building $prog" >> $compilelog 2>&1 
   cd $fdsrepo/Utilities/$prog/$builddir
-  ( $RUNSCRIPT ./make_${prog}.sh bot >> $compilelog 2>&1 ) &
+  ./make_${prog}.sh bot >> $outputdir/compile_$prog.log 2>&1
 }
 
 # -------------------------------------------------------------
@@ -61,11 +59,11 @@ CHECK_BUILDFDSUTIL()
   prog=$1
   builddir=$2
 
-  $WAITSCRIPT ./make_${prog}.sh
   if [ ! -e $fdsrepo/Utilities/$prog/$builddir/${prog}_$builddir ]; then
     echo "***error: The program ${prog}_$builddir failed to build
     echo "***error: The program ${prog}_$builddir failed to build   >> $errorlog 2>&1
   else
+    echo $fdsrepo/Utilities/$prog/$builddir/${prog}_$builddir built
     cp $fdsrepo/Utilities/$prog/$builddir/${prog}_$builddir  $CURDIR/apps/$prog
   fi
 }
@@ -74,11 +72,11 @@ CHECK_BUILDFDSUTIL()
 
 CHECK_BUILDTESTMPI()
 {
-  $WAITSCRIPT ./make_test_mpi.sh
   if [ ! -e $fdsrepo/Utilities/test_mpi/${mpitype}_${fdscompiler}_$platform/test_mpi ]; then
     echo "***error: The program test_mpi failed to build"
     echo "***error: The program test_mpi failed to build"  >> $errorlog 2>&1
   else
+    echo $fdsrepo/Utilities/test_mpi/${mpitype}_${fdscompiler}_$platform/test_mpi built
     cp $fdsrepo/Utilities/test_mpi/${mpitype}_${fdscompiler}_$platform/test_mpi  $CURDIR/apps/test_mpi
   fi
 }
@@ -87,13 +85,8 @@ CHECK_BUILDTESTMPI()
 
 BUILDLIBS()
 {
-  echo "***building smokeview libraries"
-  echo ""                >> $compilelog 2>&1 
-  echo "***************" >> $compilelog 2>&1 
-  echo "***building smokeview libraries" >> $compilelog 2>&1 
-
   cd $smvrepo/Build/LIBS/${smvcompiler}_$platform
-  ./make_LIBS.sh bot >> $compilelog 2>&1 
+  ./make_LIBS.sh bot >> $outputdir/compile_smvlibs.log 2>&1 
 }
 
 # -------------------------------------------------------------
@@ -102,12 +95,8 @@ BUILD()
 {
   prog=$1
 
-  echo "***building ${prog}_$platform "
-  echo ""                >> $compilelog 2>&1 
-  echo "***************" >> $compilelog 2>&1 
-  echo "***building $prog" >> $compilelog 2>&1 
   cd $smvrepo/Build/$prog/${smvcompiler}_$platform
- ( $RUNSCRIPT ./make_${prog}.sh bot >> $compilelog 2>&1  ) &
+  ./make_${prog}.sh bot >> $outputdir/compile_$prog.log 2>&1
 }
 
 # -------------------------------------------------------------
@@ -116,11 +105,11 @@ CHECK_BUILD()
 {
   prog=$1
 
-  $WAITSCRIPT ./make_${prog}.sh
   if [ ! -e $smvrepo/Build/$prog/${smvcompiler}_$platform/${prog}_$platform ]; then
     echo "***error: The program ${prog}_${platform} failed to build"
     echo "***error: The program ${prog}_${platform} failed to build"   >> $errorlog 2>&1
   else
+    echo $smvrepo/Build/$prog/${smvcompiler}_$platform/${prog}_$platform built
     cp $smvrepo/Build/$prog/${smvcompiler}_$platform/${prog}_$platform $CURDIR/apps/$prog
   fi
 }
@@ -140,18 +129,14 @@ fi
 
 CURDIR=`pwd`
 
-RUNSCRIPT=$CURDIR/run_script.sh
-WAITSCRIPT=$CURDIR/wait_script.sh
-
 echo ***cleaning $CURDIR
 git clean -dxf  >& /dev/null
 
+outputdir=$CURDIR/output
 cleanlog=$CURDIR/output/clean.log
-compilelog=$CURDIR/output/compile.log
 errorlog=$CURDIR/output/error.log
 
 echo > $cleanlog
-echo > $compilelog
 echo > $errorlog
 
 cd ../../..
@@ -183,34 +168,95 @@ echo ***cleaning $fdsrepo/Utilities
 echo 
 git clean -dxf  >> $cleanlog 2>&1
 
-# build fds apps
-BUILDFDSUTIL test_mpi  ${mpitype}_${fdscompiler}_$platform
-BUILDFDSUTIL fds2ascii ${fdscompiler}_$platform
-BUILDFDS
-
 # build smokeview libraries and apps
-BUILDLIBS
-BUILD     background
-BUILD     fds2fed
-BUILD     pnginfo
-BUILD     smokediff
-BUILD     smokeview
-BUILD     smokezip
-BUILD     wind2fds
+echo building smokeview libraries
+BUILDLIBS &
+pid_smvlibs=$!
+
+# build fds apps
+echo building fds
+BUILDFDS                                                      &
+pid_fds=$!
+
+echo building fds openmp
+BUILDFDSOPENMP                                                &
+pid_fdsopenmp=$!
+
+echo building test_mpi
+BUILDFDSUTIL test_mpi  ${mpitype}_${fdscompiler}_$platform    &
+pid_test_mpi=$!
+
+echo building fds2ascii
+BUILDFDSUTIL fds2ascii ${fdscompiler}_$platform               &
+pid_fds2ascii=$!
+
+#wait for smokeview libraries to be built before continuing
+wait $pid_smvlibs
+
+echo building background
+BUILD background &
+pid_background=$!
+
+echo building fds2fed
+BUILD fds2fed &
+pid_fds2fed=$!
+
+echo building pnginfo
+BUILD pnginfo &
+pid_pnginfo=$!
+
+echo building smokediff
+BUILD smokediff &
+pid_smokediff=$!
+
+echo building smokeview
+BUILD smokeview &
+pid_smokeview=$!
+
+echo building smokezip
+BUILD smokezip &
+pid_smokezip=$!
+
+echo building wind2fds
+BUILD wind2fds &
+pid_wind2fds=$!
 
 # verify smokeview apps were built
-CHECK_BUILD     background
-CHECK_BUILD     fds2fed
-CHECK_BUILD     pnginfo
-CHECK_BUILD     smokediff
-CHECK_BUILD     smokeview
-CHECK_BUILD     smokezip
-CHECK_BUILD     wind2fds
+
+wait $pid_background
+CHECK_BUILD background
+
+wait $pid_fds2fed
+CHECK_BUILD fds2fed
+
+wait $pid_pnginfo
+CHECK_BUILD pnginfo
+
+wait $pid_smokediff
+CHECK_BUILD smokediff
+
+wait $pid_smokeview
+CHECK_BUILD smokeview
+
+wait $pid_smokezip
+CHECK_BUILD smokezip
+
+wait $pid_wind2fds
+CHECK_BUILD wind2fds
 
 # verify fds apps were built
+
+wait $pid_fds2ascii
 CHECK_BUILDFDSUTIL    fds2ascii ${fdscompiler}_$platform
+
+wait $pid_test_mpi
 CHECK_BUILDTESTMPI  
+
+wait $pid_fds
 CHECK_BUILDFDS
+
+wait $pid_fdsopenmp
+CHECK_BUILDFDSOPENMP
 
 echo 
 echo ***build complete
