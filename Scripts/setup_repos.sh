@@ -27,6 +27,7 @@ echo "    $firebotrepos"
 echo "-G - only clone fds repo (erase first)"
 echo "-H repo - only clone repo (erase first)"
 echo "-h - display this message"
+echo "-R - erase repos first"
 echo "-s - setup repos used by smokebot: "
 echo "    $smvrepos"
 echo "-S - setup repos used by smokebot (erase each repo first): "
@@ -114,7 +115,7 @@ else
    exit
 fi
 
-while getopts '3aABbcCDefFGH:hsStTUVw' OPTION
+while getopts '3aABbcCDefFGH:hsRStTUVw' OPTION
 do
 case $OPTION  in
   3)
@@ -168,6 +169,9 @@ case $OPTION  in
    ;;
   h)
    usage;
+   ;;
+  R)
+   eraserepos=1
    ;;
   s)
    repos=$smvrepos;
