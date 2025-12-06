@@ -2497,23 +2497,23 @@ BUILD_beg=`GET_TIME`
 if [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
   compile_fds_mpi_db         $FDS_DB_DIR $FDS_DB_EXE                           
   pid_fds_mpi_db=$!
-  compile_fds_mpi_db         $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp     
+  compile_fds_mpi_db         $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp     &
   pid_fds_mpi_db_openmp=$!
 fi
 
 ###*** Stage 2 - gnu fds ###
 
 if [[ "$OPENMPI_GNU" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
-  compile_fds_mpi_gnu_db       $FDSGNU_DB_DIR 
+  compile_fds_mpi_gnu_db       $FDSGNU_DB_DIR  &
   pid_fds_mpi_gnu_db=$!
 fi
 
 ###*** Stage 2 - release fds ###
 
 if [[ "$CACHE_DIR" == "" ]]; then
-  compile_fds_mpi         $FDS_DIR $FDS_EXE 
+  compile_fds_mpi         $FDS_DIR $FDS_EXE  &
   pid_fds_mpi=$!
-  compile_fds_mpi         $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp 
+  compile_fds_mpi         $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp  &
   pid_fds_mpi_openmp=$!
 fi
 
