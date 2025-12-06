@@ -262,14 +262,17 @@ if [ "$ECHO" == "" ]; then
   UPDATE_REPO webpages nist-pages || exit 1
 fi
 
+# clone 3rd part repos
+  cd $curdir/../../Scripts
+  ./setup_repos.sh -3
+
+cd $curdir
 if [ "$BRANCH" == "nightly" ]; then
-# a nightly bundle - clone only fds and smv repos
-  cd $curdir
+# a nightly bundle - clone fds and smv repos
   ./clone_repo.sh -F -N -r $FDS_HASH
   ./clone_repo.sh -S -N -r $SMV_HASH
 else
 #a release bundle - clone all repos except for bot
-  cd $curdir
   ./clone_all_repos.sh
   FDS_TAG="-X $BUNDLE_FDS_TAG"
   SMV_TAG="-Y $BUNDLE_SMV_TAG"

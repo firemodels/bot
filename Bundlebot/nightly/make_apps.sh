@@ -83,7 +83,21 @@ CHECK_BUILDTESTMPI()
 
 # -------------------------------------------------------------
 
-BUILDLIBS()
+BUILDHYPRE()
+{
+  source $fdsrepo/Build/Scripts/HYPRE/build_hypre.sh confmake.sh true >> $outputdir/compile_hypre.log 2>&1
+}
+
+# -------------------------------------------------------------
+
+BUILDSUNDIALS()
+{
+  source $fdsrepo/Build/Scripts/SUNDIALS/build_sundials.sh confmake.sh true >> $outputdir/compile_sundials.log 2>&1
+}
+
+# -------------------------------------------------------------
+
+BUILDSMVLIBS()
 {
   cd $smvrepo/Build/LIBS/${smvcompiler}_$platform
   ./make_LIBS.sh bot >> $outputdir/compile_smvlibs.log 2>&1 
@@ -168,19 +182,15 @@ echo ***cleaning $fdsrepo/Utilities
 echo 
 git clean -dxf  >> $cleanlog 2>&1
 
-# build smokeview libraries and apps
-echo building smokeview libraries
-BUILDLIBS &
-pid_smvlibs=$!
+# build hypre librarie
+echo building hypre library
+BUILDHYPRE &
+pid_hypre=$!
 
-# build fds apps
-echo building fds
-BUILDFDS                                                      &
-pid_fds=$!
-
-echo building fds openmp
-BUILDFDSOPENMP                                                &
-pid_fdsopenmp=$!
+# build sundials library
+echo building sundials library
+BUILDSUNDIALS &
+pid_sundials=$!
 
 echo building test_mpi
 BUILDFDSUTIL test_mpi  ${mpitype}_${fdscompiler}_$platform    &
@@ -189,6 +199,22 @@ pid_test_mpi=$!
 echo building fds2ascii
 BUILDFDSUTIL fds2ascii ${fdscompiler}_$platform               &
 pid_fds2ascii=$!
+
+# build smokeview libraries and apps
+echo building smokeview libraries
+BUILDSMVLIBS &
+pid_smvlibs=$!
+
+wait $pid_hypre
+wait $pid_sundials
+# build fds apps
+echo building fds
+BUILDFDS                                                      &
+pid_fds=$!
+
+echo building fds openmp
+BUILDFDSOPENMP                                                &
+pid_fdsopenmp=$!
 
 #wait for smokeview libraries to be built before continuing
 wait $pid_smvlibs
