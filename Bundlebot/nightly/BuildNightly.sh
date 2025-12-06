@@ -264,7 +264,7 @@ fi
 
 # clone 3rd part repos
   cd $curdir/../../Scripts
-  ./setup_repos.sh -3
+  ./setup_repos.sh -3 -R
 
 cd $curdir
 if [ "$BRANCH" == "nightly" ]; then

@@ -83,16 +83,12 @@ CHECK_BUILDTESTMPI()
 
 # -------------------------------------------------------------
 
-BUILDHYPRE()
+BUILDFDSLIBS()
 {
-  source $fdsrepo/Build/Scripts/HYPRE/build_hypre.sh confmake.sh true >> $outputdir/compile_hypre.log 2>&1
-}
-
-# -------------------------------------------------------------
-
-BUILDSUNDIALS()
-{
-  source $fdsrepo/Build/Scripts/SUNDIALS/build_sundials.sh confmake.sh true >> $outputdir/compile_sundials.log 2>&1
+  cdir=`pwd`
+  cd $fdsrepo/Build/Scripts
+  source ./build_thirdparty_libs.sh >> $outputdir/compile_fdslibs.log 2>&1
+  cd $cdir
 }
 
 # -------------------------------------------------------------
@@ -134,11 +130,13 @@ platform=linux
 fdscompiler=intel
 smvcompiler=intel
 mpitype=impi
+export FDS_BUILD_TARGET=intel
 if [ "`uname`" == "Darwin" ] ; then
   platform="osx"
   fdscompiler=intel
   smvcompiler=gnu
   mpitype=ompi
+  export FDS_BUILD_TARGET=osx
 fi
 
 CURDIR=`pwd`
@@ -182,15 +180,13 @@ echo ***cleaning $fdsrepo/Utilities
 echo 
 git clean -dxf  >> $cleanlog 2>&1
 
-# build hypre librarie
-echo building hypre library
-BUILDHYPRE &
-pid_hypre=$!
+# setup compilers
+source $fdsrepo/Build/Scripts/set_compilers.sh
 
-# build sundials library
-echo building sundials library
-BUILDSUNDIALS &
-pid_sundials=$!
+# build hypre librarie
+echo building hypre and sundials libraries
+BUILDFDSLIBS &
+pid_fdslibs=$!
 
 echo building test_mpi
 BUILDFDSUTIL test_mpi  ${mpitype}_${fdscompiler}_$platform    &
@@ -205,8 +201,7 @@ echo building smokeview libraries
 BUILDSMVLIBS &
 pid_smvlibs=$!
 
-wait $pid_hypre
-wait $pid_sundials
+wait $pid_fdslibs
 # build fds apps
 echo building fds
 BUILDFDS                                                      &
