@@ -1,4 +1,5 @@
 #!/bin/bash
+# this script is used to compare images outside of firebot (after a firebot run)
 
 CURDIR=`pwd`
 cd ../../fds/Manuals/FDS_Summary

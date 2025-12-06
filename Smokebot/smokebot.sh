@@ -1229,7 +1229,7 @@ save_build_status()
      echo "***Warnings:" >> $ERROR_LOG
      cat $WARNING_LOG >> $ERROR_LOG
      echo "   build failure and warnings for version: ${SMV_REVISION}, branch: $SMVBRANCH."
-     echo "Build failure and warnings;$SMV_DATE;$SMV_SHORTHASH;$SMV_LONGHASH;${SMV_REVISION};$SMVBRANCH;$STOP_TIME_INT;3;$TOTAL_SMV_TIMES;$HOST" > "$HISTORY_DIR_ARCHIVE/${SMV_REVISION}.txt"
+     echo "Build failure and warnings;$SMV_DATE;$SMV_SHORTHASH;$SMV_LONGHASH;${SMV_REVISION};$SMVBRANCH;$STOP_TIME_INT;3;$tTOTAL_SMV_TIMES;$HOST" > "$HISTORY_DIR_ARCHIVE/${SMV_REVISION}.txt"
      cat $ERROR_LOG > "$HISTORY_DIR_ARCHIVE/${SMV_REVISION}_errors.txt"
 
    # Check for errors only
@@ -1363,7 +1363,6 @@ email_build_status()
     echo "build guides/compare images: $DIFF_MAKEGUIDES"    >> $TIME_LOG
   fi
   echo "total: $DIFF_SCRIPT_TIME"                           >> $TIME_LOG
-  echo "time(s): $TOTAL_SMV_TIMES"                          >> $TIME_LOG
   echo ""                                                   >> $TIME_LOG
   DISPLAY_FDS_REVISION=
   DISPLAY_SMV_REVISION=
