@@ -262,7 +262,7 @@ if [ "$ECHO" == "" ]; then
   UPDATE_REPO webpages nist-pages || exit 1
 fi
 
-# clone 3rd part repos
+# clone 3rd party repos
   cd $curdir/../../Scripts
   ./setup_repos.sh -3 -R
 
