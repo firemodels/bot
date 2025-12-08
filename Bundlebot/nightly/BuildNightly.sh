@@ -283,11 +283,11 @@ pid_cloneall=
 if [ "$BRANCH" == "nightly" ]; then
 # a nightly bundle - clone fds and smv repos
   echo cloning the fds repo
-  ./clone_repo.sh -F -N -r $FDS_HASH > $outputdir/clone_fds 2&>1
+  ./clone_repo.sh -F -N -r $FDS_HASH > $outputdir/clone_fds 2&>1 &
   pid_clonefds=$!
 
   echo cloning the smv repo
-  ./clone_repo.sh -S -N -r $SMV_HASH > $outputdir/clone_smv 2&>1
+  ./clone_repo.sh -S -N -r $SMV_HASH > $outputdir/clone_smv 2&>1 &
   pid_clonesmv=$!
 else
 #a release bundle - clone all repos except for bot
