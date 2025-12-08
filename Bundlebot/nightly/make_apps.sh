@@ -83,11 +83,11 @@ CHECK_BUILDTESTMPI()
 
 # -------------------------------------------------------------
 
-BUILDFDSLIBS()
+BUILDFDSLIB()
 {
+  FDSLIB=$1
   cdir=`pwd`
-  cd $fdsrepo/Build/Scripts
-  source ./build_thirdparty_libs.sh --clean-all >> $outputdir/compile_fdslibs.log 2>&1
+  source ./build_fdslib.sh $FDSLIB >> $outputdir/compile_$FDSLIB.log 2>&1
   cd $cdir
 }
 
@@ -180,13 +180,15 @@ echo ***cleaning $fdsrepo/Utilities
 echo 
 git clean -dxf  >> $cleanlog 2>&1
 
-# setup compilers
-source $fdsrepo/Build/Scripts/set_compilers.sh
+cd $CURDIR
+# build hypre library
+echo building hypre library
+BUILDFDSLIB hypre &
+pid_hypre=$!
 
-# build hypre librarie
-echo building hypre and sundials libraries
-BUILDFDSLIBS &
-pid_fdslibs=$!
+echo building sundials library
+BUILDFDSLIB sundials &
+pid_sundials=$!
 
 echo building test_mpi
 BUILDFDSUTIL test_mpi  ${mpitype}_${fdscompiler}_$platform    &
@@ -232,7 +234,10 @@ echo building smokezip
 BUILD smokezip &
 pid_smokezip=$!
 
-wait $pid_fdslibs
+wait $pid_hypre
+echo hypre built
+wait $pid_sundials
+echo sundials built
 # build fds apps
 echo building fds
 BUILDFDS                                                      &
