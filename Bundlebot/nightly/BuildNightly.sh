@@ -181,7 +181,7 @@ echo ""
 
 if [ -e $LOCKFILE ]; then
   if [ "$FORCE" == "" ]; then
-    echo "run_bundlebot.sh script already running."
+    echo "$0 already running."
     echo "If this is not the case, rerun using the -f option"
     exit
   fi
