@@ -65,7 +65,7 @@ CURDIR=`pwd`
 OUTPUT_DIR=$CURDIR/output
 SYNC_REVS=
 BRANCH=master
-BUNDLE_PREFIX="test"
+BUNDLE_PREFIX="nightly"
 FDS_REVISION=
 SMV_REVISION=
 FDS_TAG=
@@ -225,11 +225,8 @@ fi
 cd ../../..
 REPO_ROOT=`pwd`
 cd $CURDIR
-FDSREPODATE=`$REPO_ROOT/bot/Scripts/get_repo_info.sh $REPO_ROOT/fds 1`
-FDSREPODATE=_${FDSREPODATE}
-FDSREPODATE=
-installer_base=${FDSREV}_${SMVREV}${FDSREPODATE}
-installer_base_platform=${FDSREV}_${SMVREV}${FDSREPODATE}_${BUNDLE_PREFIX_FILE}$platform
+installer_base=${FDSREV}_${SMVREV}
+installer_base_platform=${installer_base}_${BUNDLE_PREFIX_FILE}$platform
 if [[ "$showparms" == "" ]] && [[ "$OVERWRITE" == "" ]]; then
   installer_file=$bundle_dir/${installer_base_platform}.sh
   if [ -e $installer_file ]; then
