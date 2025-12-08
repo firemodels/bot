@@ -269,11 +269,11 @@ fi
 # clone 3rd party repos
 cd $curdir/../../Scripts
 echo cloning the hypre repo
-./setup_repos.sh -K hypre > $outputdir/clone_hypre 2&>1
+./setup_repos.sh -K hypre > $outputdir/clone_hypre 2&>1 &
 pid_clonehypre=$!
 
 echo cloning the sundials repo
-./setup_repos.sh -K sundials > $outputdir/clone_sundials 2&>1
+./setup_repos.sh -K sundials > $outputdir/clone_sundials 2&>1 &
 pid_clonesundials=$!
 
 cd $curdir
