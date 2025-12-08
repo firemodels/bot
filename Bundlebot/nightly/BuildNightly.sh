@@ -46,7 +46,7 @@ echo "This script builds FDS and Smokeview apps and generates a bundle using eit
 echo "specified fds and smv repo revisions or revisions from the latest firebot pass."
 echo ""
 echo "Options:"
-echo "-b - use existing bot branch"
+echo "-B - install bundle after it is built"
 echo "-c - bundle without warning about cloning/erasing fds and smv repos"
 echo "-f - force this script to run"
 echo "-h - display this message"
@@ -64,65 +64,6 @@ echo "-U - upload bundle file to GitHub."
 echo "-v - show settings used to build bundle"
 exit 0
 }
-
-#---------------------------------------------
-#                   CHK_REPO
-#---------------------------------------------
-
-CHK_REPO ()
-{
-  local repodir=$1
-
-  if [ ! -e $repodir ]; then
-     echo "***error: the repo directory $repodir does not exist."
-     echo "          Aborting the make_bundle script"
-     return 1
-  fi
-  return 0
-}
-
-#---------------------------------------------
-#                   CD_REPO
-#---------------------------------------------
-
-CD_REPO ()
-{
-  local repodir=$1
-  local branch=$2
-
-  CHK_REPO $repodir || return 1
-
-  cd $repodir
-  if [ "$branch" != "current" ]; then
-  if [ "$branch" != "" ]; then
-     CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
-     if [ "$CURRENT_BRANCH" != "$branch" ]; then
-       echo "***error: was expecting branch $branch in repo $repodir."
-       echo "Found branch $CURRENT_BRANCH. Aborting firebot."
-       return 1
-     fi
-  fi
-  fi
-  return 0
-}
-
-#---------------------------------------------
-#                   update_repo
-#---------------------------------------------
-
-UPDATE_REPO()
-{
-   local reponame=$1
-   local branch=$2
-
-   CD_REPO $repo/$reponame $branch || return 1
-
-   echo Updating $branch on repo $repo/$reponame
-   git fetch origin
-   git merge origin/$branch
-   return 0
-}
-
 
 #-------------------- start of script ---------------------------------
 
@@ -259,11 +200,6 @@ if [ "$PROCEED" == "" ]; then
   echo "------------------------------------------------------------"
   echo "------------------------------------------------------------"
   read val
-fi
-
-#*** update wiki and webpages repos
-if [ "$ECHO" == "" ]; then
-  UPDATE_REPO webpages nist-pages || exit 1
 fi
 
 # clone 3rd party repos
