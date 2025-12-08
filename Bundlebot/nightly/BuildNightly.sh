@@ -136,6 +136,10 @@ repo=`pwd`
 
 cd $DIR
 
+cd output
+outputdir=`pwd`
+cd $DIR
+
 LOCKFILE=$HOME/.bundle/lock
 
 MAILTO=
@@ -263,19 +267,55 @@ if [ "$ECHO" == "" ]; then
 fi
 
 # clone 3rd party repos
-  cd $curdir/../../Scripts
-  ./setup_repos.sh -3 -R
+cd $curdir/../../Scripts
+echo cloning the hypre repo
+./setup_repos.sh -K hypre > $outputdir/clone_hypre 2&>1
+pid_clonehypre=$!
+
+echo cloning the sundials repo
+./setup_repos.sh -K sundials > $outputdir/clone_sundials 2&>1
+pid_clonesundials=$!
 
 cd $curdir
+pid_clonefds=
+pid_clonesmv=
+pid_cloneall=
 if [ "$BRANCH" == "nightly" ]; then
 # a nightly bundle - clone fds and smv repos
-  ./clone_repo.sh -F -N -r $FDS_HASH
-  ./clone_repo.sh -S -N -r $SMV_HASH
+  echo cloning the fds repo
+  ./clone_repo.sh -F -N -r $FDS_HASH > $outputdir/clone_fds 2&>1
+  pid_clonefds=$!
+
+  echo cloning the smv repo
+  ./clone_repo.sh -S -N -r $SMV_HASH > $outputdir/clone_smv 2&>1
+  pid_clonesmv=$!
 else
 #a release bundle - clone all repos except for bot
-  ./clone_all_repos.sh
+  echo cloning all repos 
+  ./clone_all_repos.sh  > $outputdir/clone_all 2&>1 &
+  pid_cloneall=$!
   FDS_TAG="-X $BUNDLE_FDS_TAG"
   SMV_TAG="-Y $BUNDLE_SMV_TAG"
+fi
+
+wait $pid_clonehypre
+echo hypre repo clone complete
+
+wait $pid_clonesundials
+echo sundials repo clone complete
+
+if [ "$pid_clonefds" != "" ]; then
+  wait $pid_clonefds
+  echo fds repo clone complete
+
+fi
+if [ "$pid_clonesmv" != "" ]; then
+  wait $pid_clonesmv
+  echo sundials repo clone complete
+fi
+if [ "$pid_cloneall" != "" ]; then
+  wait $pid_cloneall
+  echo all repos clone complete
 fi
 
 ./make_apps.sh
