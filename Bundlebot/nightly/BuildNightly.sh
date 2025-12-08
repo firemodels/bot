@@ -268,11 +268,11 @@ fi
 
 # clone 3rd party repos
 cd $curdir/../../Scripts
-echo cloning the hypre repo
+echo cloning hypre
 ./setup_repos.sh -K hypre > $outputdir/clone_hypre 2&>1 &
 pid_clonehypre=$!
 
-echo cloning the sundials repo
+echo cloning sundials
 ./setup_repos.sh -K sundials > $outputdir/clone_sundials 2&>1 &
 pid_clonesundials=$!
 
@@ -282,11 +282,11 @@ pid_clonesmv=
 pid_cloneall=
 if [ "$BRANCH" == "nightly" ]; then
 # a nightly bundle - clone fds and smv repos
-  echo cloning the fds repo
+  echo cloning fds
   ./clone_repo.sh -F -N -r $FDS_HASH > $outputdir/clone_fds 2&>1 &
   pid_clonefds=$!
 
-  echo cloning the smv repo
+  echo cloning smv
   ./clone_repo.sh -S -N -r $SMV_HASH > $outputdir/clone_smv 2&>1 &
   pid_clonesmv=$!
 else
@@ -299,19 +299,19 @@ else
 fi
 
 wait $pid_clonehypre
-echo hypre repo clone complete
+echo hypre cloned
 
 wait $pid_clonesundials
-echo sundials repo clone complete
+echo sundials cloned
 
 if [ "$pid_clonefds" != "" ]; then
   wait $pid_clonefds
-  echo fds repo clone complete
+  echo fds cloned
 
 fi
 if [ "$pid_clonesmv" != "" ]; then
   wait $pid_clonesmv
-  echo sundials repo clone complete
+  echo sundials cloned
 fi
 if [ "$pid_cloneall" != "" ]; then
   wait $pid_cloneall
