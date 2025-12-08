@@ -185,4 +185,3 @@ CHECK_BUILDTESTMPI
 echo fds app builds complete
 
 cd $CURDIR
-ECHO is on.
