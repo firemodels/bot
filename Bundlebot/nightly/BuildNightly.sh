@@ -257,7 +257,7 @@ fi
 ./make_fdsapps.sh &
 pid_fdsapps=$1
 
-./make_smvapps.sh
+./make_smvapps.sh &
 pid_smvapps=$!
 
 wait $pid_fdsapps
