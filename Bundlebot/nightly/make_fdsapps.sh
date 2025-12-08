@@ -2,6 +2,45 @@
 
 # -------------------------------------------------------------
 
+BUILDFDSUTIL()
+{
+  prog=$1
+  builddir=$2
+
+  cd $fdsrepo/Utilities/$prog/$builddir
+  ./make_${prog}.sh bot >> $outputdir/compile_$prog.log 2>&1
+}
+
+# -------------------------------------------------------------
+
+CHECK_BUILDFDSUTIL()
+{
+  prog=$1
+  builddir=$2
+
+  if [ ! -e $fdsrepo/Utilities/$prog/$builddir/${prog}_$builddir ]; then
+    echo "***error: The program ${prog}_$builddir failed to build
+    echo "***error: The program ${prog}_$builddir failed to build   >> $errorlog 2>&1
+  else
+    echo $fdsrepo/Utilities/$prog/$builddir/${prog}_$builddir built
+    cp $fdsrepo/Utilities/$prog/$builddir/${prog}_$builddir  $CURDIR/apps/$prog
+  fi
+}
+
+# -------------------------------------------------------------
+
+CHECK_BUILDTESTMPI()
+{
+  if [ ! -e $fdsrepo/Utilities/test_mpi/${mpitype}_${fdscompiler}_$platform/test_mpi ]; then
+    echo "***error: The program test_mpi failed to build"
+    echo "***error: The program test_mpi failed to build"  >> $errorlog 2>&1
+  else
+    echo $fdsrepo/Utilities/test_mpi/${mpitype}_${fdscompiler}_$platform/test_mpi built
+    cp $fdsrepo/Utilities/test_mpi/${mpitype}_${fdscompiler}_$platform/test_mpi  $CURDIR/apps/test_mpi
+  fi
+}
+# -------------------------------------------------------------
+
 BUILDFDS()
 {
   cd $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}
@@ -87,11 +126,24 @@ fdsrepo=`pwd`
 cd $REPOROOT/bot
 botrepo=`pwd`
 
+cd $fdsrepo/Utilities
+echo ***cleaning $fdsrepo/Utilities
+git clean -dxf  >> $cleanlog 2>&1 
+
 cd $fdsrepo/Build
 echo ***cleaning $fdsrepo/Build
 git clean -dxf  >> $cleanlog 2>&1 
 
 cd $CURDIR
+
+echo building test_mpi
+BUILDFDSUTIL test_mpi  ${mpitype}_${fdscompiler}_$platform    &
+pid_test_mpi=$!
+
+echo building fds2ascii
+BUILDFDSUTIL fds2ascii ${fdscompiler}_$platform               &
+pid_fds2ascii=$!
+
 # build hypre library
 echo building hypre
 BUILDFDSLIB hypre &
@@ -124,8 +176,13 @@ wait $pid_fdsopenmp
 echo fds_openmp built
 CHECK_BUILDFDSOPENMP
 
-echo
-echo ***fds app builds complete
-echo
+wait $pid_fds2ascii
+CHECK_BUILDFDSUTIL    fds2ascii ${fdscompiler}_$platform
+
+wait $pid_test_mpi
+CHECK_BUILDTESTMPI  
+
+echo fds app builds complete
 
 cd $CURDIR
+ECHO is on.

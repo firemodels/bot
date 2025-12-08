@@ -3,46 +3,6 @@
 
 # -------------------------------------------------------------
 
-BUILDFDSUTIL()
-{
-  prog=$1
-  builddir=$2
-
-  cd $fdsrepo/Utilities/$prog/$builddir
-  ./make_${prog}.sh bot >> $outputdir/compile_$prog.log 2>&1
-}
-
-# -------------------------------------------------------------
-
-CHECK_BUILDFDSUTIL()
-{
-  prog=$1
-  builddir=$2
-
-  if [ ! -e $fdsrepo/Utilities/$prog/$builddir/${prog}_$builddir ]; then
-    echo "***error: The program ${prog}_$builddir failed to build
-    echo "***error: The program ${prog}_$builddir failed to build   >> $errorlog 2>&1
-  else
-    echo $fdsrepo/Utilities/$prog/$builddir/${prog}_$builddir built
-    cp $fdsrepo/Utilities/$prog/$builddir/${prog}_$builddir  $CURDIR/apps/$prog
-  fi
-}
-
-# -------------------------------------------------------------
-
-CHECK_BUILDTESTMPI()
-{
-  if [ ! -e $fdsrepo/Utilities/test_mpi/${mpitype}_${fdscompiler}_$platform/test_mpi ]; then
-    echo "***error: The program test_mpi failed to build"
-    echo "***error: The program test_mpi failed to build"  >> $errorlog 2>&1
-  else
-    echo $fdsrepo/Utilities/test_mpi/${mpitype}_${fdscompiler}_$platform/test_mpi built
-    cp $fdsrepo/Utilities/test_mpi/${mpitype}_${fdscompiler}_$platform/test_mpi  $CURDIR/apps/test_mpi
-  fi
-}
-
-# -------------------------------------------------------------
-
 BUILDSMVLIBS()
 {
   cd $smvrepo/Build/LIBS/${smvcompiler}_$platform
@@ -110,10 +70,6 @@ fdsrepo=`pwd`
 cd $REPOROOT/bot
 botrepo=`pwd`
 
-cd $fdsrepo/Utilities
-echo ***cleaning $fdsrepo/Utilities
-git clean -dxf  >> $cleanlog 2>&1 
-
 cd $smvrepo/Source
 echo ***cleaning $smvrepo/Source
 git clean -dxf  >> $cleanlog 2>&1 
@@ -121,14 +77,6 @@ git clean -dxf  >> $cleanlog 2>&1
 cd $smvrepo/Build
 echo ***cleaning $smvrepo/Build
 git clean -dxf  >> $cleanlog 2>&1
-
-echo building test_mpi
-BUILDFDSUTIL test_mpi  ${mpitype}_${fdscompiler}_$platform    &
-pid_test_mpi=$!
-
-echo building fds2ascii
-BUILDFDSUTIL fds2ascii ${fdscompiler}_$platform               &
-pid_fds2ascii=$!
 
 # build smokeview libraries
 echo building smokeview libraries
@@ -189,16 +137,6 @@ CHECK_BUILD smokezip
 wait $pid_wind2fds
 CHECK_BUILD wind2fds
 
-# verify fds apps were built
-
-wait $pid_fds2ascii
-CHECK_BUILDFDSUTIL    fds2ascii ${fdscompiler}_$platform
-
-wait $pid_test_mpi
-CHECK_BUILDTESTMPI  
-
-echo 
-echo ***smv app build complete
-echo 
+echo smv app builds complete
 
 cd $CURDIR
