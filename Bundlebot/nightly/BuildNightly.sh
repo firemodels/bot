@@ -228,7 +228,7 @@ if [ "$BRANCH" == "nightly" ]; then
 else
 #a release bundle - clone all repos except for bot
   echo cloning all repos 
-  ./clone_all_repos.sh  > $outputdir/clone_all 2&>1 &
+  ./clone_all_repos.sh  $outputdir > $outputdir/clone_all 2&>1 &
   pid_cloneall=$!
   FDS_TAG="-X $BUNDLE_FDS_TAG"
   SMV_TAG="-Y $BUNDLE_SMV_TAG"
@@ -254,7 +254,15 @@ if [ "$pid_cloneall" != "" ]; then
   echo all repos clone complete
 fi
 
-./make_apps.sh
+./make_fdsapps.sh &
+pid_fdsapps=$1
+
+./make_smvapps.sh
+pid_smvapps=$!
+
+wait $pid_fdsapps
+wait $pid_smvapps
+
 echo $FDS_HASH     > $repo/bot/Bundlebot/nightly/apps/FDS_HASH
 echo $SMV_HASH     > $repo/bot/Bundlebot/nightly/apps/SMV_HASH
 echo $FDS_REVISION > $repo/bot/Bundlebot/nightly/apps/FDS_REVISION

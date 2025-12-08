@@ -1,45 +1,5 @@
 #!/bin/bash
 
-# -------------------------------------------------------------
-
-BUILDFDS()
-{
-  cd $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}
-  ./make_fds.sh bot  >> $outputdir/compile_fds.log 2>&1
-}
-
-BUILDFDSOPENMP()
-{
-  cd $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}_openmp
-  cp make_fds.sh make_fds_openmp.sh
-  ./make_fds_openmp.sh bot >> $outputdir/compile_fdsopenmp.log 2>&1
-}
-
-# -------------------------------------------------------------
-
-CHECK_BUILDFDS()
-{
-  if [ ! -e $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}/fds_${mpitype}_${fdscompiler}_${platform} ]; then
-    echo "***error: The program fds_${mpitype}_${fdscompiler}_${platform} failed to build"
-    echo "***error: The program fds_${mpitype}_${fdscompiler}_${platform} failed to build"  >> $errorlog 2>&1
-  else
-    echo $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}/fds_${mpitype}_${fdscompiler}_${platform} built
-    cp $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}/fds_${mpitype}_${fdscompiler}_${platform} $CURDIR/apps/fds
-  fi
-}
-
-# -------------------------------------------------------------
-
-CHECK_BUILDFDSOPENMP()
-{
-  if [ ! -e $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}_openmp/fds_${mpitype}_${fdscompiler}_${platform}_openmp ]; then
-    echo "***error: The program fds_${mpitype}_${fdscompiler}_${platform}_openmp failed to build"
-    echo "***error: The program fds_${mpitype}_${fdscompiler}_${platform}_openmp failed to build"   >> $errorlog 2>&1
-  else
-    echo $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}_openmp/fds_${mpitype}_${fdscompiler}_${platform}_openmp built
-    cp  $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}_openmp/fds_${mpitype}_${fdscompiler}_${platform}_openmp $CURDIR/apps/fds_openmp
-  fi
-}
 
 # -------------------------------------------------------------
 
@@ -79,16 +39,6 @@ CHECK_BUILDTESTMPI()
     echo $fdsrepo/Utilities/test_mpi/${mpitype}_${fdscompiler}_$platform/test_mpi built
     cp $fdsrepo/Utilities/test_mpi/${mpitype}_${fdscompiler}_$platform/test_mpi  $CURDIR/apps/test_mpi
   fi
-}
-
-# -------------------------------------------------------------
-
-BUILDFDSLIB()
-{
-  FDSLIB=$1
-  cdir=`pwd`
-  source ./build_fdslib.sh $FDSLIB >> $outputdir/compile_$FDSLIB.log 2>&1
-  cd $cdir
 }
 
 # -------------------------------------------------------------
@@ -141,12 +91,9 @@ fi
 
 CURDIR=`pwd`
 
-echo ***cleaning $CURDIR
-git clean -dxf  >& /dev/null
-
 outputdir=$CURDIR/output
-cleanlog=$CURDIR/output/clean.log
-errorlog=$CURDIR/output/error.log
+cleanlog=$CURDIR/output/smvclean.log
+errorlog=$CURDIR/output/smverror.log
 
 echo > $cleanlog
 echo > $errorlog
@@ -163,6 +110,10 @@ fdsrepo=`pwd`
 cd $REPOROOT/bot
 botrepo=`pwd`
 
+cd $fdsrepo/Utilities
+echo ***cleaning $fdsrepo/Utilities
+git clean -dxf  >> $cleanlog 2>&1 
+
 cd $smvrepo/Source
 echo ***cleaning $smvrepo/Source
 git clean -dxf  >> $cleanlog 2>&1 
@@ -170,25 +121,6 @@ git clean -dxf  >> $cleanlog 2>&1
 cd $smvrepo/Build
 echo ***cleaning $smvrepo/Build
 git clean -dxf  >> $cleanlog 2>&1
-
-cd $fdsrepo/Build
-echo ***cleaning $fdsrepo/Build
-git clean -dxf  >> $cleanlog 2>&1 
-
-cd $fdsrepo/Utilities
-echo ***cleaning $fdsrepo/Utilities
-echo 
-git clean -dxf  >> $cleanlog 2>&1
-
-cd $CURDIR
-# build hypre library
-echo building hypre
-BUILDFDSLIB hypre &
-pid_hypre=$!
-
-echo building sundials
-BUILDFDSLIB sundials &
-pid_sundials=$!
 
 echo building test_mpi
 BUILDFDSUTIL test_mpi  ${mpitype}_${fdscompiler}_$platform    &
@@ -234,19 +166,6 @@ echo building smokezip
 BUILD smokezip &
 pid_smokezip=$!
 
-wait $pid_hypre
-echo hypre built
-wait $pid_sundials
-echo sundials built
-# build fds apps
-echo building fds
-BUILDFDS                                                      &
-pid_fds=$!
-
-echo building fds openmp
-BUILDFDSOPENMP                                                &
-pid_fdsopenmp=$!
-
 # verify smokeview apps were built
 
 wait $pid_background
@@ -278,14 +197,8 @@ CHECK_BUILDFDSUTIL    fds2ascii ${fdscompiler}_$platform
 wait $pid_test_mpi
 CHECK_BUILDTESTMPI  
 
-wait $pid_fds
-CHECK_BUILDFDS
-
-wait $pid_fdsopenmp
-CHECK_BUILDFDSOPENMP
-
 echo 
-echo ***build complete
+echo ***smv app build complete
 echo 
 
 cd $CURDIR

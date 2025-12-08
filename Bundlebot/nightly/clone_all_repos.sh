@@ -1,4 +1,5 @@
 #!/bin/bash
+OUTDIR=$1
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 CURDIR=`pwd`
 cd $SCRIPTDIR/../../..
@@ -49,8 +50,47 @@ source $REPOROOT/bot/Bundlebot/release/config.sh
 
 cd $REPOROOT/bot/Scripts
 
-./setup_repos.sh -F -D
+echo cloning cad
+./setup_repos.sh -K cad >& $OUTDIR/clone_cad &
+pid_cad=$!
 
+echo cloning exp
+./setup_repos.sh -K exp >& $OUTDIR/clone_exp &
+pid_exp=$!
+
+echo cloning fds
+./setup_repos.sh -K fds >& $OUTDIR/clone_fds &
+pid_fds=$!
+
+echo cloning fig
+./setup_repos.sh -K fig >& $OUTDIR/clone_fig &
+pid_fig=$!
+
+echo cloning out
+./setup_repos.sh -K out >& $OUTDIR/clone_out &
+pid_out=$!
+
+echo cloning smv
+./setup_repos.sh -K smv >& $OUTDIR/clone_smv &
+pid_smv=$!
+
+wait $pid_cad
+echo cad cloned
+
+wait $pid_exp
+echo cad cloned
+
+wait $pid_fds
+echo fds cloned
+
+wait $pid_fig
+echo fig cloned
+
+wait $pid_out
+echo out cloned
+
+wait $pid_smv
+echo smv cloned
 
 TAG_REPO cad  $BUNDLE_CAD_HASH $BUNDLE_CAD_TAG
 TAG_REPO exp  $BUNDLE_EXP_HASH $BUNDLE_EXP_TAG

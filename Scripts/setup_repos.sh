@@ -27,7 +27,7 @@ echo "    $firebotrepos"
 echo "-G - only clone fds repo (erase first)"
 echo "-H repo - only clone repo (erase first)"
 echo "-h - display this message"
-echo "-K repo - clone hypre or sundials repo"
+echo "-K repo - clone repo named repo, erase first"
 echo "-R - erase repos first"
 echo "-s - setup repos used by smokebot: "
 echo "    $smvrepos"
@@ -173,9 +173,6 @@ case $OPTION  in
    ;;
   K)
    repos="$OPTARG";
-   if [ "$repos" != "hypre" ]; then
-     repos="sundials"
-   fi
    eraserepos=1;
    ;;
   R)
