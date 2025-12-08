@@ -169,11 +169,9 @@ BUILDFDSOPENMP                                                &
 pid_fdsopenmp=$!
 
 wait $pid_fds
-echo fds built
 CHECK_BUILDFDS
 
 wait $pid_fdsopenmp
-echo fds_openmp built
 CHECK_BUILDFDSOPENMP
 
 wait $pid_fds2ascii
