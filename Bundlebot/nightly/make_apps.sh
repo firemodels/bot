@@ -87,7 +87,7 @@ BUILDFDSLIBS()
 {
   cdir=`pwd`
   cd $fdsrepo/Build/Scripts
-  source ./build_thirdparty_libs.sh >> $outputdir/compile_fdslibs.log 2>&1
+  source ./build_thirdparty_libs.sh --clean-all >> $outputdir/compile_fdslibs.log 2>&1
   cd $cdir
 }
 
