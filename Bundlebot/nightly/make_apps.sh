@@ -182,11 +182,11 @@ git clean -dxf  >> $cleanlog 2>&1
 
 cd $CURDIR
 # build hypre library
-echo building hypre library
+echo building hypre
 BUILDFDSLIB hypre &
 pid_hypre=$!
 
-echo building sundials library
+echo building sundials
 BUILDFDSLIB sundials &
 pid_sundials=$!
 
