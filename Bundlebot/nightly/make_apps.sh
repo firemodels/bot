@@ -196,7 +196,7 @@ echo building fds2ascii
 BUILDFDSUTIL fds2ascii ${fdscompiler}_$platform               &
 pid_fds2ascii=$!
 
-# build smokeview libraries and apps
+# build smokeview libraries
 echo building smokeview libraries
 BUILDSMVLIBS &
 pid_smvlibs=$!

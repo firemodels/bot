@@ -9,7 +9,7 @@ function usage {
 echo "Create repos used by cfast, fds and/or smokview"
 echo ""
 echo "Options:"
-echo "-3 - setup 3rd part repos:"
+echo "-3 - setup 3rd party repos:"
 echo "    $thirdpartyrepos"
 echo "-a - setup all available repos: "
 echo "    $allrepos"
@@ -27,6 +27,7 @@ echo "    $firebotrepos"
 echo "-G - only clone fds repo (erase first)"
 echo "-H repo - only clone repo (erase first)"
 echo "-h - display this message"
+echo "-K repo - clone hypre or sundials repo"
 echo "-R - erase repos first"
 echo "-s - setup repos used by smokebot: "
 echo "    $smvrepos"
@@ -115,7 +116,7 @@ else
    exit
 fi
 
-while getopts '3aABbcCDefFGH:hsRStTUVw' OPTION
+while getopts '3aABbcCDefFGH:hK:sRStTUVw' OPTION
 do
 case $OPTION  in
   3)
@@ -169,6 +170,13 @@ case $OPTION  in
    ;;
   h)
    usage;
+   ;;
+  K)
+   repos="$OPTARG";
+   if [ "$repos" != "hypre" ]; then
+     repos="sundials"
+   fi
+   eraserepos=1;
    ;;
   R)
    eraserepos=1
