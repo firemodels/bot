@@ -201,19 +201,6 @@ echo building smokeview libraries
 BUILDSMVLIBS &
 pid_smvlibs=$!
 
-wait $pid_fdslibs
-# build fds apps
-echo building fds
-BUILDFDS                                                      &
-pid_fds=$!
-
-echo building fds openmp
-BUILDFDSOPENMP                                                &
-pid_fdsopenmp=$!
-
-#wait for smokeview libraries to be built before continuing
-wait $pid_smvlibs
-
 echo building background
 BUILD background &
 pid_background=$!
@@ -222,13 +209,20 @@ echo building fds2fed
 BUILD fds2fed &
 pid_fds2fed=$!
 
-echo building pnginfo
-BUILD pnginfo &
-pid_pnginfo=$!
-
 echo building smokediff
 BUILD smokediff &
 pid_smokediff=$!
+
+echo building wind2fds
+BUILD wind2fds &
+pid_wind2fds=$!
+
+#wait for smokeview libraries to be built before continuing
+wait $pid_smvlibs
+
+echo building pnginfo
+BUILD pnginfo &
+pid_pnginfo=$!
 
 echo building smokeview
 BUILD smokeview &
@@ -238,9 +232,15 @@ echo building smokezip
 BUILD smokezip &
 pid_smokezip=$!
 
-echo building wind2fds
-BUILD wind2fds &
-pid_wind2fds=$!
+wait $pid_fdslibs
+# build fds apps
+echo building fds
+BUILDFDS                                                      &
+pid_fds=$!
+
+echo building fds openmp
+BUILDFDSOPENMP                                                &
+pid_fdsopenmp=$!
 
 # verify smokeview apps were built
 
