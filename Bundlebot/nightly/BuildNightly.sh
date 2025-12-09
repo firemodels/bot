@@ -202,6 +202,15 @@ if [ "$PROCEED" == "" ]; then
   read val
 fi
 
+#*** update webpages repos
+if [ -d $repo/webpages ]; then
+  echo updating webpages repo
+  cd $repo/webpages
+  get fetch origin              > $outputdir/update_webpages 2&>1
+  git merge origin/nist-pages  >> $outputdir/update_webpages 2&>1
+fi
+
+
 # clone 3rd party repos
 cd $curdir/../../Scripts
 echo cloning hypre

@@ -95,7 +95,6 @@ cat << EOF
 <h3>Time History</h3>
 
 <div id="curve_chart" style="width: 500px; height: 300px"></div>
-Mean: $MEAN s <br>
 EOF
 
 #<h3>Time Differences</h3>
