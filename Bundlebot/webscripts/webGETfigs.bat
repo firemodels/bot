@@ -41,7 +41,7 @@ if "%guide%" == "Validation" (
   goto eof
 )
 if "%guide%" == "Technical" (
-  echo Smokeview does not have any Technical Guide images to download
+  GetFigures -s -t
   goto eof
 )
 goto eof

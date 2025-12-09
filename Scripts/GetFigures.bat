@@ -14,7 +14,7 @@ if "x%FDS%" == "x" if "x%SMV%" == "x" set FDS=1
 
 :: get smokeview user guide figures if guides vars are not set
 if "x%SMV%" == "x" goto endif1
-  if "x%USER%" == "x" if "x%VER%" == "x" set USER=1
+  if "x%USER%" == "x" if "x%VER%" == "x" if "x%TECH%" == "x" set USER=1
 :endif1
 
 :: get fds user guide figures if guide vars are not set
@@ -49,6 +49,11 @@ if "x%SMV%" == "x" goto endif_smv
     call :DOWNLOADFILE SMOKEVIEW_TEST SMV_VG_figures.tar.gz
     call :COPYFILES %SMVREPO%/Manuals/SMV_Verification_Guide/SCRIPT_FIGURES SMV_VG_figures.tar.gz
   :endif_smv_verg
+
+  if "x%TECH%" == "x" goto endif_smv_techg
+    call :DOWNLOADFILE SMOKEVIEW_TEST SMV_TG_figures.tar.gz
+    call :COPYFILES %SMVREPO%/Manuals/SMV_Technical_Reference_Guide/SCRIPT_FIGURES SMV_TG_figures.tar.gz
+  :endif_smv_techg
 :endif_smv
 
 if "x%FDS%" == "x" goto endif_fds
@@ -124,7 +129,7 @@ echo -F - copy FDS figures for all guides
 echo -h - display this message
 echo -f - copy Smokeview figures for manuals specified by -u and/or -v options
 echo -S - copy Smokeview figures for both user and verification guides
-echo -t - copy FDS technical guide figures
+echo -t - copy technical guide figures
 echo -u - copy user guide figures  (also specify either -f or -s)
 echo -v - copy verification guide figures  (also specify either -f or -s)
 echo -V - copy FDS validation guide figures
@@ -208,7 +213,7 @@ if [[ "$FDS" == "" ]] && [[ "$SMV" == "" ]]; then
 fi
 
 if [ "SMV" != "" ]; then
-  if [ "$USER" == "" ]] && [[ "$VER" == "" ]]; then
+  if [ "$USER" == "" ]] && [[ "$VER" == "" ]] && [[ "$TECH" == "" ]]; then
     USER=1
   fi
 fi
