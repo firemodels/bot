@@ -39,17 +39,17 @@ errors=fdssmv_errors.txt
 output=output_fdssmv.txt
 INFO=FDS_INFO.txt
 rm -f $uploads
-gh release view FDS_TEST  -R github.com/firemodels/test_bundles | grep test_win | awk '{print $2}' >> $uploads
-gh release view FDS_TEST  -R github.com/firemodels/test_bundles | grep test_lnx | awk '{print $2}' >> $uploads
-gh release view FDS_TEST  -R github.com/firemodels/test_bundles | grep test_osx | awk '{print $2}' >> $uploads
+gh release view FDS_TEST  -R github.com/firemodels/test_bundles | grep nightly_win | awk '{print $2}' >> $uploads
+gh release view FDS_TEST  -R github.com/firemodels/test_bundles | grep nightly_lnx | awk '{print $2}' >> $uploads
+gh release view FDS_TEST  -R github.com/firemodels/test_bundles | grep nightly_osx | awk '{print $2}' >> $uploads
 rm -f $INFO
 gh release download FDS_TEST -p $INFO -D .  -R github.com/firemodels/test_bundles
 FDS_REVISION=`grep FDS_REVISION $INFO | awk '{print $2}'`
 SMV_REVISION=`grep SMV_REVISION $INFO | awk '{print $2}'`
 BASE=${FDS_REVISION}_${SMV_REVISION}
-FDSWIN=${BASE}_test_win
-FDSLNX=${BASE}_test_lnx
-FDSOSX=${BASE}_test_osx
+FDSWIN=${BASE}_nightly_win
+FDSLNX=${BASE}_nightly_lnx
+FDSOSX=${BASE}_nightly_osx
 rm -f $errors
 if [ `grep $FDSWIN.exe $uploads | wc -l` -eq 0 ]; then
   echo  "***error: $FDSWIN.exe missing" >> $errors
