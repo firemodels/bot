@@ -21,7 +21,7 @@ if "x%stopscript%" == "x" goto endif2
   exit /b 1
 :endif2
 
-set nightly=test
+set nightly=nightly
 set pub_dir=
 
 set BUNDLESCRIPTDIR=%CD%
