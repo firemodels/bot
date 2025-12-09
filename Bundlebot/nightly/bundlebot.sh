@@ -65,7 +65,7 @@ CURDIR=`pwd`
 OUTPUT_DIR=$CURDIR/output
 SYNC_REVS=
 BRANCH=master
-BUNDLE_PREFIX="test"
+BUNDLE_PREFIX="nightly"
 FDS_REVISION=
 SMV_REVISION=
 FDS_TAG=
@@ -123,19 +123,19 @@ if [ "$SMV_TAG" != "" ]; then
   SMV_REVISION=$SMV_TAG
 fi
 
-# prevent more than one instance of the make_bundle.sh script from running at the same time
+# prevent more than one instance of this script from running at the same time
 
 LOCK_FILE=$HOME/.bundle/make_bundle_lock
 if [ "$FORCE" == "" ]; then
   if [ -e $LOCK_FILE ]; then
-    echo "***error: another instance of the bundlebot script is running."
+    echo "***error: another instance of $0 is running."
     echo "          If this is not the case re-run using the -f option."
     exit 1
   fi
 fi
 touch $LOCK_FILE
 
-if [ "$shoparms" == "" ]; then
+if [ "$showparms" == "" ]; then
   if [ ! -d $OUTPUT_DIR ]; then
     mkdir $OUTPUT_DIR
   fi
@@ -225,11 +225,8 @@ fi
 cd ../../..
 REPO_ROOT=`pwd`
 cd $CURDIR
-FDSREPODATE=`$REPO_ROOT/bot/Scripts/get_repo_info.sh $REPO_ROOT/fds 1`
-FDSREPODATE=_${FDSREPODATE}
-FDSREPODATE=
-installer_base=${FDSREV}_${SMVREV}${FDSREPODATE}
-installer_base_platform=${FDSREV}_${SMVREV}${FDSREPODATE}_${BUNDLE_PREFIX_FILE}$platform
+installer_base=${FDSREV}_${SMVREV}
+installer_base_platform=${installer_base}_${BUNDLE_PREFIX_FILE}$platform
 if [[ "$showparms" == "" ]] && [[ "$OVERWRITE" == "" ]]; then
   installer_file=$bundle_dir/${installer_base_platform}.sh
   if [ -e $installer_file ]; then
@@ -243,8 +240,9 @@ fi
 cd $SCRIPTDIR
 if [ "$showparms" == "" ]; then
   echo ""
-  echo "building installer"
+  echo -n "building installer"
   $ECHO ./make_bundle.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version $bundle_dir $BUNDLE_PREFIX > $OUTPUT_DIR/stage1
+  echo " - complete"
   if [ "$UPLOADBUNDLE" == "1" ]; then
     echo ""
     echo "uploading installer"

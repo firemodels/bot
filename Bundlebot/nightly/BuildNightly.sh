@@ -46,7 +46,7 @@ echo "This script builds FDS and Smokeview apps and generates a bundle using eit
 echo "specified fds and smv repo revisions or revisions from the latest firebot pass."
 echo ""
 echo "Options:"
-echo "-b - use existing bot branch"
+echo "-B - install bundle after it is built"
 echo "-c - bundle without warning about cloning/erasing fds and smv repos"
 echo "-f - force this script to run"
 echo "-h - display this message"
@@ -65,65 +65,6 @@ echo "-v - show settings used to build bundle"
 exit 0
 }
 
-#---------------------------------------------
-#                   CHK_REPO
-#---------------------------------------------
-
-CHK_REPO ()
-{
-  local repodir=$1
-
-  if [ ! -e $repodir ]; then
-     echo "***error: the repo directory $repodir does not exist."
-     echo "          Aborting the make_bundle script"
-     return 1
-  fi
-  return 0
-}
-
-#---------------------------------------------
-#                   CD_REPO
-#---------------------------------------------
-
-CD_REPO ()
-{
-  local repodir=$1
-  local branch=$2
-
-  CHK_REPO $repodir || return 1
-
-  cd $repodir
-  if [ "$branch" != "current" ]; then
-  if [ "$branch" != "" ]; then
-     CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
-     if [ "$CURRENT_BRANCH" != "$branch" ]; then
-       echo "***error: was expecting branch $branch in repo $repodir."
-       echo "Found branch $CURRENT_BRANCH. Aborting firebot."
-       return 1
-     fi
-  fi
-  fi
-  return 0
-}
-
-#---------------------------------------------
-#                   update_repo
-#---------------------------------------------
-
-UPDATE_REPO()
-{
-   local reponame=$1
-   local branch=$2
-
-   CD_REPO $repo/$reponame $branch || return 1
-
-   echo Updating $branch on repo $repo/$reponame
-   git fetch origin
-   git merge origin/$branch
-   return 0
-}
-
-
 #-------------------- start of script ---------------------------------
 
 commands=$0
@@ -134,6 +75,10 @@ DIR=`pwd`
 cd ../../..
 repo=`pwd`
 
+cd $DIR
+
+cd output
+outputdir=`pwd`
 cd $DIR
 
 LOCKFILE=$HOME/.bundle/lock
@@ -236,7 +181,7 @@ echo ""
 
 if [ -e $LOCKFILE ]; then
   if [ "$FORCE" == "" ]; then
-    echo "run_bundlebot.sh script already running."
+    echo "$0 already running."
     echo "If this is not the case, rerun using the -f option"
     exit
   fi
@@ -257,25 +202,67 @@ if [ "$PROCEED" == "" ]; then
   read val
 fi
 
-#*** update wiki and webpages repos
-if [ "$ECHO" == "" ]; then
-  UPDATE_REPO webpages nist-pages || exit 1
-fi
+# clone 3rd party repos
+cd $curdir/../../Scripts
+echo cloning hypre
+./setup_repos.sh -K hypre > $outputdir/clone_hypre 2&>1 &
+pid_clonehypre=$!
 
+echo cloning sundials
+./setup_repos.sh -K sundials > $outputdir/clone_sundials 2&>1 &
+pid_clonesundials=$!
+
+cd $curdir
+pid_clonefds=
+pid_clonesmv=
+pid_cloneall=
 if [ "$BRANCH" == "nightly" ]; then
-# a nightly bundle - clone only fds and smv repos
-  cd $curdir
-  ./clone_repo.sh -F -N -r $FDS_HASH
-  ./clone_repo.sh -S -N -r $SMV_HASH
+# a nightly bundle - clone fds and smv repos
+  echo cloning fds
+  ./clone_repo.sh -F -N -r $FDS_HASH > $outputdir/clone_fds 2&>1 &
+  pid_clonefds=$!
+
+  echo cloning smv
+  ./clone_repo.sh -S -N -r $SMV_HASH > $outputdir/clone_smv 2&>1 &
+  pid_clonesmv=$!
 else
 #a release bundle - clone all repos except for bot
-  cd $curdir
-  ./clone_all_repos.sh
+  echo cloning all repos 
+  ./clone_all_repos.sh  $outputdir > $outputdir/clone_all 2&>1 &
+  pid_cloneall=$!
   FDS_TAG="-X $BUNDLE_FDS_TAG"
   SMV_TAG="-Y $BUNDLE_SMV_TAG"
 fi
 
-./make_apps.sh
+wait $pid_clonehypre
+echo hypre cloned
+
+wait $pid_clonesundials
+echo sundials cloned
+
+if [ "$pid_clonefds" != "" ]; then
+  wait $pid_clonefds
+  echo fds cloned
+
+fi
+if [ "$pid_clonesmv" != "" ]; then
+  wait $pid_clonesmv
+  echo sundials cloned
+fi
+if [ "$pid_cloneall" != "" ]; then
+  wait $pid_cloneall
+  echo all repos clone complete
+fi
+
+./make_fdsapps.sh &
+pid_fdsapps=$1
+
+./make_smvapps.sh &
+pid_smvapps=$!
+
+wait $pid_fdsapps
+wait $pid_smvapps
+
 echo $FDS_HASH     > $repo/bot/Bundlebot/nightly/apps/FDS_HASH
 echo $SMV_HASH     > $repo/bot/Bundlebot/nightly/apps/SMV_HASH
 echo $FDS_REVISION > $repo/bot/Bundlebot/nightly/apps/FDS_REVISION

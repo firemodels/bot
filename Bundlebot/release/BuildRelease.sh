@@ -23,7 +23,7 @@ cd $CURDIR/../nightly
 git clean -dxf  >& /dev/null
 
 cd $CURDIR/../nightly
-./BuildNightly.sh -b -c -f -R release -o $OWNER -r test_bundles
+./BuildNightly.sh -c -f -R release -o $OWNER -r test_bundles
 
 cd $CURDIR
 TITLE="Bundle Test - $BUNDLE_FDS_TAG/$BUNDLE_FDS_HASH - $BUNDLE_SMV_TAG/$BUNDLE_SMV_HASH"
