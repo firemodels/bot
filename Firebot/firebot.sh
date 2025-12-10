@@ -1181,12 +1181,12 @@ check_python_validation()
 {
    # Check that python environment has been setup
    python_validation_success=true
-   if [[ `grep "Error" $OUTPUT_DIR/stage4_python_val` != "" ]]; then
+   if [[ `grep -E 'Warning|Length mismatch|Error|UserWarning' $OUTPUT_DIR/stage4_python_val` != "" ]]; then
      python_validation_success=false
    fi
    if [ $python_validation_success == false ]; then
      echo "Errors from Stage 4 - Python plotting and statistics (validation):" >> $ERROR_LOG
-     grep -B 5 -A 50 "Error" $OUTPUT_DIR/stage4_python_val | tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
+     grep -E 'Warning|Length mismatch|Error|UserWarning'  $OUTPUT_DIR/stage4_python_val | tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
      echo "" >> $ERROR_LOG
     fi
 }
