@@ -22,7 +22,7 @@ exit 0
 }
 
 UPLOADBUNDLE=
-BUILDING_release=
+export BUILDING_release=
 
 while getopts 'hUR' OPTION
 do
@@ -31,7 +31,7 @@ case $OPTION  in
    usage
    ;;
   R)
-   BUILDING_release=1
+   export BUILDING_release=1
    ;;
   U)
    UPLOADBUNDLE=1
