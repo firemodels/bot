@@ -58,9 +58,11 @@ cd ../../..
 reporoot=`pwd`
 basereporoot=`basename $reporoot`
 
-cd $reporoot/bot/Scripts
-echo updating repos
-./update_repos.sh -m
+cd $reporoot/smv
+echo updating smv repo
+git remote update
+git merge firemodels/master
+git merge origin/master
 
 if [ "$BUILDING_release" != "" ]; then
   ERROR=
@@ -105,27 +107,9 @@ fi
 echo "***     smv_hash: $smv_hash"
 echo "*** smv_revision: $smv_revision"
 
-echo "*** building libraries"
-
-# build libraries
-cd $reporoot/smv/Build/LIBS/${comp}_${platform}
-./make_LIBS.sh >& $outdir/stage3_LIBS
-
-echo "*** building applications"
-
-progs="background flush pnginfo smokediff fds2fed smokezip wind2fds"
-
-for prog in $progs; do 
-  if [ -d $reporoot/smv/Build/$prog/${comp}_${platform} ]; then
-    cd $reporoot/smv/Build/$prog/${comp}_${platform}
-    echo "*** building $prog"
-    ./make_${prog}.sh >& $outdir/stage4_$prog
-  fi
-done
-
-echo "*** building smokeview"
-cd $reporoot/smv/Build/smokeview/${comp}_${platform}
-./make_smokeview.sh $BUILDTYPE >& $outdir/stage5_smokeview
+#build apps
+cd $reporoot/bot/Bundlebot/nightly
+./make_smvapps.sh
 
 echo "*** bundling smokeview"
 
