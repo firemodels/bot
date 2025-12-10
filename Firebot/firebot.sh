@@ -2563,21 +2563,23 @@ fi
 BUILD_end=`GET_TIME`
 GET_DURATION $BUILD_beg $BUILD_end BUILD
 
-###*** Stage 3 run debug cases ###
 
-# Depends on successful FDS debug compile
-if [[ $FDS_debug_success ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
-   run_verification_cases_debug
-fi
-
-###*** Stage 3 run release cases ###
+###*** Stage 3 run verification cases ###
 
 RELEASE_beg=`GET_TIME`
-if [[ "$CACHE_DIR" == "" ]];  then
-# Depends on successful FDS compile
+if [ "$CACHE_DIR" == "" ]; then
+
+# release cases
   if [[ $FDS_release_success ]]; then
     run_VV_cases_release
+  fi
 
+# debug cases
+  if [[ $FDS_debug_success ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+    run_verification_cases_debug
+  fi
+
+  if [[ $FDS_release_success ]]; then
 # this also checks restart cases (using same criteria)
     if [ "$CHECK_CLUSTER" == "" ]; then
       check_verification_cases_release $fdsrepo/Verification
@@ -2589,9 +2591,9 @@ if [[ "$CACHE_DIR" == "" ]];  then
       check_validation_cases_release $fdsrepo/Validation FDS_Input_Files
     fi
   fi
-fi
-if [[ $FDS_debug_success ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
-   check_cases_debug $fdsrepo/$VERIFICATION_DEBUG 'verification'
+  if [[ $FDS_debug_success ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+     check_cases_debug $fdsrepo/$VERIFICATION_DEBUG 'verification'
+  fi
 fi
 RELEASE_end=`GET_TIME`
 GET_DURATION $RELEASE_beg $RELEASE_end RELEASE
