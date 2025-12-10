@@ -24,14 +24,14 @@ exit 0
 UPLOADBUNDLE=
 BUILDING_release=
 
-while getopts 'hURv' OPTION
+while getopts 'hUR' OPTION
 do
 case $OPTION  in
   h)
    usage
    ;;
   R)
-   BULDING_release=1
+   BUILDING_release=1
    ;;
   U)
    UPLOADBUNDLE=1
