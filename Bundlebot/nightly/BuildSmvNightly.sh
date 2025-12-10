@@ -22,16 +22,16 @@ exit 0
 }
 
 UPLOADBUNDLE=
-BUILDING_release=
+export BUILDING_release=
 
-while getopts 'hURv' OPTION
+while getopts 'hUR' OPTION
 do
 case $OPTION  in
   h)
    usage
    ;;
   R)
-   BULDING_release=1
+   export BUILDING_release=1
    ;;
   U)
    UPLOADBUNDLE=1
@@ -58,13 +58,15 @@ cd ../../..
 reporoot=`pwd`
 basereporoot=`basename $reporoot`
 
-cd $reporoot/bot/Scripts
-echo updating repos
-./update_repos.sh -m
+cd $reporoot/smv
+echo updating smv repo
+git remote update
+git merge firemodels/master
+git merge origin/master
 
 if [ "$BUILDING_release" != "" ]; then
   ERROR=
-  if [ "$BUNDLE_SMV_REVISION" == "" ]; then
+  if [ "$BUNDLE_SMV_HASH" == "" ]; then
     echo ***error: environment variable BUNDLE_SMV_REVISION not defined
     ERROR=1
   fi
@@ -87,7 +89,7 @@ if [ "$BUILDING_release" == "" ]; then
 else
   cd $reporoot/bot/Bundlebot/release/output
   outdir=`pwd`
-  smv_hash=$BUNDLE_SMV_REVISION
+  smv_hash=$BUNDLE_SMV_HASH
 fi
 
 cd $reporoot/bot/Bundlebot/nightly
@@ -105,37 +107,19 @@ fi
 echo "***     smv_hash: $smv_hash"
 echo "*** smv_revision: $smv_revision"
 
-echo "*** building libraries"
-
-# build libraries
-cd $reporoot/smv/Build/LIBS/${comp}_${platform}
-./make_LIBS.sh >& $outdir/stage3_LIBS
-
-echo "*** building applications"
-
-progs="background flush pnginfo smokediff fds2fed smokezip wind2fds"
-
-for prog in $progs; do 
-  if [ -d $reporoot/smv/Build/$prog/${comp}_${platform} ]; then
-    cd $reporoot/smv/Build/$prog/${comp}_${platform}
-    echo "*** building $prog"
-    ./make_${prog}.sh >& $outdir/stage4_$prog
-  fi
-done
-
-echo "*** building smokeview"
-cd $reporoot/smv/Build/smokeview/${comp}_${platform}
-./make_smokeview.sh $BUILDTYPE >& $outdir/stage5_smokeview
+#build apps
+cd $reporoot/bot/Bundlebot/nightly
+./make_smvapps.sh
 
 echo "*** bundling smokeview"
 
 $reporoot/bot/Bundlebot/nightly/assemble_smvbundle.sh $BUILDTYPE2 $smv_revision $basereporoot >& $outdir/stage6_bundle
 
 uploaddir=.bundle/uploads
-if [ -e $uploaddir/${smv_revision}_${platform2}.sh ]; then
-  echo smv bundle: $uploaddir/${smv_revision}_${platform2}.sh
+if [ -e $HOME/$uploaddir/${smv_revision}_${platform2}.sh ]; then
+  echo smv bundle: $HOME/$uploaddir/${smv_revision}_${platform2}.sh
 else
-  echo ***error: smv bundle: $uploaddir/${smv_revision}_${platform2}.sh failed to be created
+  echo ***error: smv bundle: $HOME/$uploaddir/${smv_revision}_${platform2}.sh failed to be created
 fi
 
 

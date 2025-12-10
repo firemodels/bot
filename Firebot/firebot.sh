@@ -549,21 +549,18 @@ run_verification_cases_debug()
 
 check_cases_debug()
 {
-   local dir=$1
-   local label=$2
-
    # Scan for and report any errors in FDS cases
-   cd $dir
 
    # Wait for all verification cases to end
-   wait_cases_debug_end 'verification'
+   wait_cases_debug_end
 
 #  check whether cases have run
+   cd $fdsrepo/$VERIFICATION_DEBUG/scripts
    ./Run_FDS_Cases.sh -C                                  -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage3_run_debug_ver 2>&1
 
    # Remove all .stop files from Verification directories (recursively)
+   cd $fdsrepo/$VERIFICATION_DEBUG
    if [ "$CLONE_REPOS" == "" ]; then
-     cd $fdsrepo/$VERIFICATION_DEBUG
      find . -name '*.stop' -exec rm -f {} \;
    fi
 
@@ -586,12 +583,6 @@ check_cases_debug()
       echo "Errors from Stage 4 - Run ${2} cases - debug mode:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage3_run_debug_ver_errors >> $ERROR_LOG
       echo "" >> $ERROR_LOG
-
-# copy casename.err to casename.err_stage3_run_debug_ver for any cases that had errors
-      echo "#/bin/bash" > $OUTPUT_DIR/stage3_run_debug_ver_filelist
-# comment out following line until verified that it works
-#      grep err: $OUTPUT_DIR/stage3_run_debug_ver_errors | awk -F':' '{ print "cp " $1 " /tmp/."}'  | sort -u >> $OUTPUT_DIR/stage3_run_debug_ver_filelist
-      cd $fdsrepo/$VERIFICATION_DEBUG
    fi
 }
 
@@ -918,7 +909,7 @@ wait_cases_release_end()
 }
 
 #---------------------------------------------
-#                   run_verification_cases_release
+#                   run_VV_cases_release
 #---------------------------------------------
 
 run_VV_cases_release()
@@ -1190,12 +1181,12 @@ check_python_validation()
 {
    # Check that python environment has been setup
    python_validation_success=true
-   if [[ `grep "Error" $OUTPUT_DIR/stage4_python_val` != "" ]]; then
+   if [[ `grep -E 'Warning|Length mismatch|Error|UserWarning' $OUTPUT_DIR/stage4_python_val` != "" ]]; then
      python_validation_success=false
    fi
    if [ $python_validation_success == false ]; then
      echo "Errors from Stage 4 - Python plotting and statistics (validation):" >> $ERROR_LOG
-     grep -B 5 -A 50 "Error" $OUTPUT_DIR/stage4_python_val | tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
+     grep -E 'Warning|Length mismatch|Error|UserWarning'  $OUTPUT_DIR/stage4_python_val | tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
      echo "" >> $ERROR_LOG
     fi
 }
@@ -2563,21 +2554,23 @@ fi
 BUILD_end=`GET_TIME`
 GET_DURATION $BUILD_beg $BUILD_end BUILD
 
-###*** Stage 3 run debug cases ###
 
-# Depends on successful FDS debug compile
-if [[ $FDS_debug_success ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
-   run_verification_cases_debug
-fi
-
-###*** Stage 3 run release cases ###
+###*** Stage 3 run verification cases ###
 
 RELEASE_beg=`GET_TIME`
-if [[ "$CACHE_DIR" == "" ]];  then
-# Depends on successful FDS compile
+if [ "$CACHE_DIR" == "" ]; then
+
+# debug cases
+  if [[ $FDS_debug_success ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+    run_verification_cases_debug
+  fi
+
+# release cases
   if [[ $FDS_release_success ]]; then
     run_VV_cases_release
+  fi
 
+  if [[ $FDS_release_success ]]; then
 # this also checks restart cases (using same criteria)
     if [ "$CHECK_CLUSTER" == "" ]; then
       check_verification_cases_release $fdsrepo/Verification
@@ -2589,9 +2582,9 @@ if [[ "$CACHE_DIR" == "" ]];  then
       check_validation_cases_release $fdsrepo/Validation FDS_Input_Files
     fi
   fi
-fi
-if [[ $FDS_debug_success ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
-   check_cases_debug $fdsrepo/$VERIFICATION_DEBUG 'verification'
+  if [[ $FDS_debug_success ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+     check_cases_debug
+  fi
 fi
 RELEASE_end=`GET_TIME`
 GET_DURATION $RELEASE_beg $RELEASE_end RELEASE
