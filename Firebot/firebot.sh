@@ -909,7 +909,7 @@ wait_cases_release_end()
 }
 
 #---------------------------------------------
-#                   run_verification_cases_release
+#                   run_VV_cases_release
 #---------------------------------------------
 
 run_VV_cases_release()
@@ -2560,14 +2560,14 @@ GET_DURATION $BUILD_beg $BUILD_end BUILD
 RELEASE_beg=`GET_TIME`
 if [ "$CACHE_DIR" == "" ]; then
 
-# release cases
-  if [[ $FDS_release_success ]]; then
-    run_VV_cases_release
-  fi
-
 # debug cases
   if [[ $FDS_debug_success ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
     run_verification_cases_debug
+  fi
+
+# release cases
+  if [[ $FDS_release_success ]]; then
+    run_VV_cases_release
   fi
 
   if [[ $FDS_release_success ]]; then
