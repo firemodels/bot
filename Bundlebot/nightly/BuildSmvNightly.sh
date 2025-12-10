@@ -132,10 +132,10 @@ echo "*** bundling smokeview"
 $reporoot/bot/Bundlebot/nightly/assemble_smvbundle.sh $BUILDTYPE2 $smv_revision $basereporoot >& $outdir/stage6_bundle
 
 uploaddir=.bundle/uploads
-if [ -e $uploaddir/${smv_revision}_${platform2}.sh ]; then
-  echo smv bundle: $uploaddir/${smv_revision}_${platform2}.sh
+if [ -e $HOME/$uploaddir/${smv_revision}_${platform2}.sh ]; then
+  echo smv bundle: $HOME/$uploaddir/${smv_revision}_${platform2}.sh
 else
-  echo ***error: smv bundle: $uploaddir/${smv_revision}_${platform2}.sh failed to be created
+  echo ***error: smv bundle: $HOME/$uploaddir/${smv_revision}_${platform2}.sh failed to be created
 fi
 
 
