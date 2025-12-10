@@ -549,21 +549,18 @@ run_verification_cases_debug()
 
 check_cases_debug()
 {
-   local dir=$1
-   local label=$2
-
    # Scan for and report any errors in FDS cases
-   cd $dir
 
    # Wait for all verification cases to end
-   wait_cases_debug_end 'verification'
+   wait_cases_debug_end
 
 #  check whether cases have run
+   cd $fdsrepo/$VERIFICATION_DEBUG/scripts
    ./Run_FDS_Cases.sh -C                                  -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage3_run_debug_ver 2>&1
 
    # Remove all .stop files from Verification directories (recursively)
+   cd $fdsrepo/$VERIFICATION_DEBUG
    if [ "$CLONE_REPOS" == "" ]; then
-     cd $fdsrepo/$VERIFICATION_DEBUG
      find . -name '*.stop' -exec rm -f {} \;
    fi
 
@@ -586,12 +583,6 @@ check_cases_debug()
       echo "Errors from Stage 4 - Run ${2} cases - debug mode:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage3_run_debug_ver_errors >> $ERROR_LOG
       echo "" >> $ERROR_LOG
-
-# copy casename.err to casename.err_stage3_run_debug_ver for any cases that had errors
-      echo "#/bin/bash" > $OUTPUT_DIR/stage3_run_debug_ver_filelist
-# comment out following line until verified that it works
-#      grep err: $OUTPUT_DIR/stage3_run_debug_ver_errors | awk -F':' '{ print "cp " $1 " /tmp/."}'  | sort -u >> $OUTPUT_DIR/stage3_run_debug_ver_filelist
-      cd $fdsrepo/$VERIFICATION_DEBUG
    fi
 }
 
@@ -2592,7 +2583,7 @@ if [ "$CACHE_DIR" == "" ]; then
     fi
   fi
   if [[ $FDS_debug_success ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-     check_cases_debug $fdsrepo/$VERIFICATION_DEBUG 'verification'
+     check_cases_debug
   fi
 fi
 RELEASE_end=`GET_TIME`
