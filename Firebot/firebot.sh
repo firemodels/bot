@@ -811,8 +811,8 @@ check_verification_cases_release()
    # Scan for and report any errors in FDS cases
    cd $dir
 
-   if [[ `grep 'Run aborted'            $OUTPUT_DIR/stage3_run_release_ver_ver  | grep -v grep`                    == "" ]] && \
-      [[ `grep 'ERROR'                  $OUTPUT_DIR/stage3_run_release_ver_ver  | grep -v geom_bad | grep -v grep` == "" ]] && \
+   if [[ `grep 'Run aborted'            $OUTPUT_DIR/stage3_run_release_ver  | grep -v grep`                    == "" ]] && \
+      [[ `grep 'ERROR'                  $OUTPUT_DIR/stage3_run_release_ver  | grep -v geom_bad | grep -v grep` == "" ]] && \
       [[ `grep Segmentation             */*.err             | grep -v grep`                    == "" ]] && \
       [[ `grep ERROR:                   */*.err             | grep -v grep | grep -v geom_bad` == "" ]] && \
       [[ `grep ERROR:                   */*.out             | grep -v grep | grep -v echo`     == "" ]] && \
@@ -821,8 +821,8 @@ check_verification_cases_release()
    then
       cases_debug_success=true
    else
-      grep 'Run aborted'                $OUTPUT_DIR/stage3_run_release_ver_ver  | grep -v grep                    >> $OUTPUT_DIR/stage3_run_release_ver_ver_errors
-      grep 'ERROR'                      $OUTPUT_DIR/stage3_run_release_ver_ver  | grep -v geom_bad | grep -v grep >> $OUTPUT_DIR/stage3_run_release_ver_errors
+      grep 'Run aborted'                $OUTPUT_DIR/stage3_run_release_ver  | grep -v grep                    >> $OUTPUT_DIR/stage3_run_release_ver_errors
+      grep 'ERROR'                      $OUTPUT_DIR/stage3_run_release_ver  | grep -v geom_bad | grep -v grep >> $OUTPUT_DIR/stage3_run_release_ver_errors
       grep Segmentation                 */*.err             | grep -v grep                    >> $OUTPUT_DIR/stage3_run_release_ver_errors
       grep ERROR:                       */*.err             | grep -v grep | grep -v geom_bad >> $OUTPUT_DIR/stage3_run_release_ver_errors
       grep ERROR:                       */*.out             | grep -v grep | grep -v echo     >> $OUTPUT_DIR/stage3_run_release_ver_errors
