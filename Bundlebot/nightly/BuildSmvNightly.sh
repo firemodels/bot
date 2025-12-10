@@ -64,7 +64,7 @@ echo updating repos
 
 if [ "$BUILDING_release" != "" ]; then
   ERROR=
-  if [ "$BUNDLE_SMV_REVISION" == "" ]; then
+  if [ "$BUNDLE_SMV_HASH" == "" ]; then
     echo ***error: environment variable BUNDLE_SMV_REVISION not defined
     ERROR=1
   fi
@@ -87,7 +87,7 @@ if [ "$BUILDING_release" == "" ]; then
 else
   cd $reporoot/bot/Bundlebot/release/output
   outdir=`pwd`
-  smv_hash=$BUNDLE_SMV_REVISION
+  smv_hash=$BUNDLE_SMV_HASH
 fi
 
 cd $reporoot/bot/Bundlebot/nightly
