@@ -2480,12 +2480,8 @@ check_git_checkout
 archive_compiler_version
 
 #*** build validation plots
-run_python_setup
-check_python_setup
-if [ $python_success == true ]; then
-  run_python_validation   &
-  pid_python_validation=$!
-fi
+run_python_setup &
+pid_python_setup=$!
 
 ### Stage 2 ###
 echo Building
@@ -2517,6 +2513,13 @@ if [[ "$CACHE_DIR" == "" ]]; then
   pid_fds_mpi=$!
   compile_fds_mpi         $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp  &
   pid_fds_mpi_openmp=$!
+fi
+
+wait $pid_python_setup
+check_python_setup
+if [ $python_success == true ]; then
+  run_python_validation   &
+  pid_python_validation=$!
 fi
 
 ###*** Stage 2 - smv utilities ###
