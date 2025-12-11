@@ -2537,7 +2537,17 @@ if [[ "$CHECK_CLUSTER" == "" ]]; then
   if [[ "$OPENMPI_GNU" != "" ]] && [[ "$CACHE_DIR" == "" ]]; then
     check_compile_fds_mpi_gnu_db
   fi
+fi
+RELEASE_beg=`GET_TIME`
+if [ "$CACHE_DIR" == "" ]; then
 
+# debug cases
+  if [[ $FDS_debug_success ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+    run_verification_cases_debug
+  fi
+fi
+
+if [[ "$CHECK_CLUSTER" == "" ]]; then
   check_compile_fds_mpi   $FDS_DIR $FDS_EXE
   check_compile_fds_mpi   $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
 
@@ -2554,17 +2564,9 @@ fi
 BUILD_end=`GET_TIME`
 GET_DURATION $BUILD_beg $BUILD_end BUILD
 
-
 ###*** Stage 3 run verification cases ###
 
-RELEASE_beg=`GET_TIME`
 if [ "$CACHE_DIR" == "" ]; then
-
-# debug cases
-  if [[ $FDS_debug_success ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-    run_verification_cases_debug
-  fi
-
 # release cases
   if [[ $FDS_release_success ]]; then
     run_VV_cases_release
