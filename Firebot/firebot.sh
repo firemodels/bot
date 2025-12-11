@@ -985,26 +985,26 @@ run_VV_cases_release()
    fi
 
 #  check whether cases have run 
-  if [[ "$CHECK_CLUSTER" == "" ]] ; then
-    cd $fdsrepo/Verification/scripts
-    echo ./Run_FDS_Cases.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_ver 2>&1
-    ./Run_FDS_Cases.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_ver 2>&1
-  fi
+   if [[ "$CHECK_CLUSTER" == "" ]] ; then
+     cd $fdsrepo/Verification/scripts
+     echo ./Run_FDS_Cases.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_ver 2>&1
+     ./Run_FDS_Cases.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_ver 2>&1
+   fi
 
-  if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]] ; then
-    cd $fdsrepo/Validation
-    echo ./Run_Serial.sh   -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
-         ./Run_Serial.sh   -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
-    echo ./Run_Parallel.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
-         ./Run_Parallel.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
-  fi
+   if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]] ; then
+     cd $fdsrepo/Validation
+     echo ./Run_Serial.sh   -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
+          ./Run_Serial.sh   -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
+     echo ./Run_Parallel.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
+          ./Run_Parallel.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
+   fi
 
-  if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" != "" ]] ; then
-    cd $fdsrepo/Verification/scripts
-    echo ./Run_FDS_Cases.sh -V -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
-         ./Run_FDS_Cases.sh -V -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
-    echo ""                                             >> $OUTPUT_DIR/stage3_run_release_val 2>&1
-  fi
+   if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" != "" ]] ; then
+     cd $fdsrepo/Verification/scripts
+     echo ./Run_FDS_Cases.sh -V -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
+          ./Run_FDS_Cases.sh -V -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
+     echo ""                                             >> $OUTPUT_DIR/stage3_run_release_val 2>&1
+   fi
 }
 
 #---------------------------------------------
