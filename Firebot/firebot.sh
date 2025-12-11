@@ -1449,13 +1449,15 @@ make_fds_user_guide()
 
    cd $botrepo/Firebot
    ./compare_namelists.sh $OUTPUT_DIR stage5 > $OUTPUT_DIR/stage5_namelist_check
-   NAMELIST_NODOC_STATUS=`cat $OUTPUT_DIR/stage5_namelists_nodoc.txt | head -1 | awk -F' ' '{print $1}'`
-   if [ "$NAMELIST_NODOC_STATUS" != "0" ]; then
-     NAMELIST_NODOC_LOG=$OUTPUT_DIR/stage5_namelists_nodoc.txt
+   NAMELIST_NODOC_STATUS=0
+   NAMELIST_NOSOURCE_STATUS=0
+   NAMELIST_NODOC_LOG=$OUTPUT_DIR/stage5_namelists_nodoc.txt
+   if [ -e $NAMELIST_NODOC_LOG ]; then
+     NAMELIST_NODOC_STATUS=`cat $NAMELIST_NODOC_LOG | head -1 | awk -F' ' '{print $1}'`
    fi
-   NAMELIST_NOSOURCE_STATUS=`cat $OUTPUT_DIR/stage5_namelists_nosource.txt | tail -1 | awk -F' ' '{print $1}'`
-   if [ "$NAMELIST_NOSOURCE_STATUS" != "0" ]; then
-     NAMELIST_NOSOURCE_LOG=$OUTPUT_DIR/stage5_namelists_nosource.txt
+   NAMELIST_NOSOURCE_LOG=$OUTPUT_DIR/stage5_namelists_nosource.txt
+   if [ -e $NAMELIST_NOSOURCE_LOG ]; then
+     NAMELIST_NOSOURCE_STATUS=`cat $NAMELIST_NOSOURCE_LOG | tail -1 | awk -F' ' '{print $1}'`
    fi
 }
 
@@ -1745,16 +1747,18 @@ fi
    echo "build guides: $MANUALS_DIFF "                      >> $TIME_LOG
    echo "total: $SCRIPT_DIFF "                              >> $TIME_LOG
    echo ""                                                  >> $TIME_LOG
-   if [ "$NAMELIST_NODOC_STATUS" != "" ]; then
-     if [ "$NAMELIST_NODOC_STATUS" == "0" ]; then
-       echo "undocumented namelist keywords: $NAMELIST_NODOC_STATUS " >> $TIME_LOG
-     fi
+
+   if [[ -e $NAMELIST_NODOC_LOG ]] && [[ $NAMELIST_NODOC_STATUS != "0" ]]; then
+     cat $NAMELIST_NODOC_LOG >> $TIME_LOG
    else
-     NAMELIST_NODOC_LOG=
+     echo undocumented namelist keywords: none >> $TIME_LOG
    fi
-   if [ "$NAMELIST_NOSOURCE_STATUS" == "" ]; then
-     NAMELIST_NOSOURCE_LOG=
+   if [[ -e $NAMELIST_NOSOURCE_LOG ]] && [[ $NAMELIST_NOSOURCE_STATUS != "0" ]]; then
+     cat $NAMELIST_NOSOURCE_LOG >> $TIME_LOG
+   else
+     echo unimplemented namelist keywords: none >> $TIME_LOG
    fi
+
    if [ "$UPLOADGUIDES" == "1" ]; then
      echo "status:  https://pages.nist.gov/fds-smv/firebot_status.html" >> $TIME_LOG
    fi
