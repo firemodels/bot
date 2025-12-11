@@ -2479,14 +2479,6 @@ fi
 check_git_checkout
 archive_compiler_version
 
-#*** build validation plots
-run_python_setup
-check_python_setup
-if [ $python_success == true ]; then
-  run_python_validation   &
-  pid_python_validation=$!
-fi
-
 ### Stage 2 ###
 echo Building
 echo "   FDS"
@@ -2609,7 +2601,12 @@ if [[ "$CACHE_DIR" == "" ]]; then
 #*** python verification and validation plots
 
   VERIFICATION_beg=`GET_TIME`
+  run_python_setup
+  check_python_setup
   if [ $python_success == true ]; then
+    run_python_validation   &
+    pid_python_validation=$!
+
     run_python_verification &
     pid_python_verification=$!
 
