@@ -957,7 +957,14 @@ run_VV_cases_release()
           ./Run_FDS_Cases.sh -V -j $JOBPREFIX_RELEASE -m 1 -q $QUEUE  >> $OUTPUT_DIR/stage3_run_release_val 2>&1
      echo ""                                                          >> $OUTPUT_DIR/stage3_run_release_val 2>&1
    fi
+}
 
+#---------------------------------------------
+#                   wait_VV_cases_release
+#---------------------------------------------
+
+wait_VV_cases_release()
+{
    if [ "$VALIDATION" != "" ]; then
    # Wait for non-benchmark verification cases to end
      wait_cases_release_end validation stage3_run_release_val
@@ -2569,6 +2576,7 @@ if [ "$CACHE_DIR" == "" ]; then
 # release cases
   if [[ $FDS_release_success ]]; then
     run_VV_cases_release
+    wait_VV_cases_release
   fi
 
   if [[ $FDS_release_success ]]; then
