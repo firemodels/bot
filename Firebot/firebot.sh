@@ -1186,7 +1186,7 @@ check_python_validation()
    fi
    if [ $python_validation_success == false ]; then
      echo "Errors from Stage 4 - Python plotting and statistics (validation):" >> $ERROR_LOG
-     grep -E 'Warning|Length mismatch|Error|UserWarning'  $OUTPUT_DIR/stage4_python_val | tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
+     grep -E 'Warning|Length mismatch|Error|UserWarning'  $OUTPUT_DIR/stage4_python_val | uniq | tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
      echo "" >> $ERROR_LOG
     fi
 }
