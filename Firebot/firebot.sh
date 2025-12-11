@@ -935,9 +935,7 @@ run_VV_cases_release()
    fi
 
    # run all FDS validation cases 1 time step
-   RUN_VAL=
    if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-     RUN_VAL=1
      echo "Running FDS Validation Cases (1 time step)"
      echo "   release"
      cd $fdsrepo/Validation
@@ -952,7 +950,6 @@ run_VV_cases_release()
 
 # run validation case in FDS_Val_Cases.sh
    if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" != "" ]]; then
-     RUN_VAL=1
      echo "Running FDS Validation Cases (1 time step)"
      echo "   release"
      cd $fdsrepo/Verification/scripts
@@ -961,7 +958,7 @@ run_VV_cases_release()
      echo ""                                                          >> $OUTPUT_DIR/stage3_run_release_val 2>&1
    fi
 
-   if [ "$RUN_VAL" == "1" ]; then
+   if [ "$VALIDATION" != "" ]; then
    # Wait for non-benchmark verification cases to end
      wait_cases_release_end validation stage3_run_release_val
    fi
