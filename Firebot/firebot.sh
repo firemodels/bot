@@ -1449,11 +1449,11 @@ make_fds_user_guide()
 
    cd $botrepo/Firebot
    ./compare_namelists.sh $OUTPUT_DIR stage5 > $OUTPUT_DIR/stage5_namelist_check
-   NAMELIST_NODOC_STATUS=`cat $OUTPUT_DIR/stage5_namelist_check | head -1 | awk -F' ' '{print $1}'`
+   NAMELIST_NODOC_STATUS=`cat $OUTPUT_DIR/stage5_namelist_nodoc.txt | head -1 | awk -F' ' '{print $1}'`
    if [ "$NAMELIST_NODOC_STATUS" != "0" ]; then
      NAMELIST_NODOC_LOG=$OUTPUT_DIR/stage5_namelists_nodoc.txt
    fi
-   NAMELIST_NOSOURCE_STATUS=`cat $OUTPUT_DIR/stage5_namelist_check | tail -1 | awk -F' ' '{print $1}'`
+   NAMELIST_NOSOURCE_STATUS=`cat $OUTPUT_DIR/stage5_namelist_nosource.txt | tail -1 | awk -F' ' '{print $1}'`
    if [ "$NAMELIST_NOSOURCE_STATUS" != "0" ]; then
      NAMELIST_NOSOURCE_LOG=$OUTPUT_DIR/stage5_namelists_nosource.txt
    fi
@@ -1818,8 +1818,6 @@ fi
       cat $TIMING_WARNING_LOG                                        >> $TIME_LOG
    fi
 
-   echo "HAVE_MAIL=$HAVE_MAIL"
-   echo "mailToFDS=$mailToFDS"
    # Check for pass or fail
    NAMELIST_LOGS="$NAMELIST_NODOC_LOG $NAMELIST_NOSOURCE_LOG"
    LOGS="$TIME_LOG $FYI_LOG $NAMELIST_LOGS"
