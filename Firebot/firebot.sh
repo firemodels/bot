@@ -2571,10 +2571,20 @@ if [ "$CACHE_DIR" == "" ]; then
 # release cases
   if [[ $FDS_release_success ]]; then
     run_VV_cases_release
-    wait_VV_cases_release
+  fi
+
+###*** setup python and run validation tests
+
+  run_python_setup
+  check_python_setup
+
+  if [ $python_success == true ]; then
+    run_python_validation   &
+    pid_python_validation=$!
   fi
 
   if [[ $FDS_release_success ]]; then
+    wait_VV_cases_release
 # this also checks restart cases (using same criteria)
     if [ "$CHECK_CLUSTER" == "" ]; then
       check_verification_cases_release $fdsrepo/Verification
@@ -2601,12 +2611,7 @@ if [[ "$CACHE_DIR" == "" ]]; then
 #*** python verification and validation plots
 
   VERIFICATION_beg=`GET_TIME`
-  run_python_setup
-  check_python_setup
   if [ $python_success == true ]; then
-    run_python_validation   &
-    pid_python_validation=$!
-
     run_python_verification &
     pid_python_verification=$!
 
