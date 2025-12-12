@@ -1752,12 +1752,20 @@ fi
    echo "total: $SCRIPT_DIFF "                              >> $TIME_LOG
    echo ""                                                  >> $TIME_LOG
 
+# output namelist status info
+   OUTPUT_NAMELIST=
    if [ -e $OUTPUT_DIR/stage5_namelists_nodoc.txt ]; then
+     OUTPUT_NAMELIST=1
      cat $OUTPUT_DIR/stage5_namelists_nodoc.txt >> $TIME_LOG
    fi
    if [ -e $OUTPUT_DIR/stage5_namelists_nosource.txt ]; then
+     OUTPUT_NAMELIST=1
      cat $OUTPUT_DIR/stage5_namelists_nosource.txt >> $TIME_LOG
    fi
+   if [ "$OUTPUT_NAMELIST" != "" ]; then
+     echo "" >> $TIME_LOG
+   fi
+
    if [ "$UPLOADGUIDES" == "1" ]; then
      echo "status:  https://pages.nist.gov/fds-smv/firebot_status.html" >> $TIME_LOG
    fi
