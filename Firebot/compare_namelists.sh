@@ -133,11 +133,11 @@ sort > $NAMELIST_F90
 git diff --no-index $NAMELIST_F90 $NAMELIST_TEX                                  > $NAMELIST_DIFF
 
 nlines_nodoc=`grep ^-/ $NAMELIST_DIFF | sed 's/^-//g' | grep -v Firebot | wc -l`
-echo "$nlines_nodoc undocumented namelist keywords:"                              > $NAMELIST_NODOC
+echo "undocumented namelist keywords: $nlines_nodoc"                              > $NAMELIST_NODOC
 grep ^- $NAMELIST_DIFF | sed 's/^-//g' | grep -v \\-\\-                         >> $NAMELIST_NODOC
 
 nlines_nosource=`grep ^+ $NAMELIST_DIFF | sed 's/^+//g' | grep -v \\+\\+ | wc -l`
-echo "$nlines_nosource unimplemented namelist keywords:"                             > $NAMELIST_NOSOURCE
+echo "unimplemented namelist keywords: $nlines_nosource"                         > $NAMELIST_NOSOURCE
 grep ^+ $NAMELIST_DIFF | sed 's/^+//g' | grep -v \\+\\+                         >> $NAMELIST_NOSOURCE
 
 if [ "$nlines_nodoc" == "0" ]; then

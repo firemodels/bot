@@ -935,9 +935,7 @@ run_VV_cases_release()
    fi
 
    # run all FDS validation cases 1 time step
-   RUN_VAL=
    if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-     RUN_VAL=1
      echo "Running FDS Validation Cases (1 time step)"
      echo "   release"
      cd $fdsrepo/Validation
@@ -952,7 +950,6 @@ run_VV_cases_release()
 
 # run validation case in FDS_Val_Cases.sh
    if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" != "" ]]; then
-     RUN_VAL=1
      echo "Running FDS Validation Cases (1 time step)"
      echo "   release"
      cd $fdsrepo/Verification/scripts
@@ -960,8 +957,15 @@ run_VV_cases_release()
           ./Run_FDS_Cases.sh -V -j $JOBPREFIX_RELEASE -m 1 -q $QUEUE  >> $OUTPUT_DIR/stage3_run_release_val 2>&1
      echo ""                                                          >> $OUTPUT_DIR/stage3_run_release_val 2>&1
    fi
+}
 
-   if [ "$RUN_VAL" == "1" ]; then
+#---------------------------------------------
+#                   wait_VV_cases_release
+#---------------------------------------------
+
+wait_VV_cases_release()
+{
+   if [ "$VALIDATION" != "" ]; then
    # Wait for non-benchmark verification cases to end
      wait_cases_release_end validation stage3_run_release_val
    fi
@@ -985,26 +989,26 @@ run_VV_cases_release()
    fi
 
 #  check whether cases have run 
-if [[ "$CHECK_CLUSTER" == "" ]] ; then
-  cd $fdsrepo/Verification/scripts
-  echo ./Run_FDS_Cases.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_ver 2>&1
-       ./Run_FDS_Cases.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_ver 2>&1
-fi
-
-if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]] ; then
-  cd $fdsrepo/Validation
-  echo ./Run_Serial.sh   -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
-       ./Run_Serial.sh   -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
-  echo ./Run_Parallel.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
-       ./Run_Parallel.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
-fi
-
-if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" != "" ]] ; then
+   if [[ "$CHECK_CLUSTER" == "" ]] ; then
      cd $fdsrepo/Verification/scripts
-  echo ./Run_FDS_Cases.sh -V -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
-       ./Run_FDS_Cases.sh -V -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
-  echo ""                                             >> $OUTPUT_DIR/stage3_run_release_val 2>&1
-fi
+     echo ./Run_FDS_Cases.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_ver 2>&1
+     ./Run_FDS_Cases.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_ver 2>&1
+   fi
+
+   if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]] ; then
+     cd $fdsrepo/Validation
+     echo ./Run_Serial.sh   -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
+          ./Run_Serial.sh   -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
+     echo ./Run_Parallel.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
+          ./Run_Parallel.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
+   fi
+
+   if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" != "" ]] ; then
+     cd $fdsrepo/Verification/scripts
+     echo ./Run_FDS_Cases.sh -V -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
+          ./Run_FDS_Cases.sh -V -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
+     echo ""                                             >> $OUTPUT_DIR/stage3_run_release_val 2>&1
+   fi
 }
 
 #---------------------------------------------
@@ -1449,13 +1453,15 @@ make_fds_user_guide()
 
    cd $botrepo/Firebot
    ./compare_namelists.sh $OUTPUT_DIR stage5 > $OUTPUT_DIR/stage5_namelist_check
-   NAMELIST_NODOC_STATUS=`cat $OUTPUT_DIR/stage5_namelist_check | head -1 | awk -F' ' '{print $1}'`
-   if [ "$NAMELIST_NODOC_STATUS" != "0" ]; then
-     NAMELIST_NODOC_LOG=$OUTPUT_DIR/stage5_namelists_nodoc.txt
+
+   NAMELIST_NODOC_LOG=$OUTPUT_DIR/stage5_namelists_nodoc.txt
+   if [ ! -e $NAMELIST_NODOC_LOG ]; then
+     echo "undocumented namelist keywords: 0" > $NAMELIST_NODOC_LOG
    fi
-   NAMELIST_NOSOURCE_STATUS=`cat $OUTPUT_DIR/stage5_namelist_check | tail -1 | awk -F' ' '{print $1}'`
-   if [ "$NAMELIST_NOSOURCE_STATUS" != "0" ]; then
-     NAMELIST_NOSOURCE_LOG=$OUTPUT_DIR/stage5_namelists_nosource.txt
+
+   NAMELIST_NOSOURCE_LOG=$OUTPUT_DIR/stage5_namelists_nosource.txt
+   if [ ! -e $NAMELIST_NOSOURCE_LOG ]; then
+     echo "unimplemented namelist keywords: 0" > $NAMELIST_NOSOURCE_LOG
    fi
 }
 
@@ -1745,15 +1751,12 @@ fi
    echo "build guides: $MANUALS_DIFF "                      >> $TIME_LOG
    echo "total: $SCRIPT_DIFF "                              >> $TIME_LOG
    echo ""                                                  >> $TIME_LOG
-   if [ "$NAMELIST_NODOC_STATUS" != "" ]; then
-     if [ "$NAMELIST_NODOC_STATUS" == "0" ]; then
-       echo "undocumented namelist keywords: $NAMELIST_NODOC_STATUS " >> $TIME_LOG
-     fi
-   else
-     NAMELIST_NODOC_LOG=
+
+   if [ -e $OUTPUT_DIR/stage5_namelists_nodoc.txt ]; then
+     cat $OUTPUT_DIR/stage5_namelists_nodoc.txt >> $TIME_LOG
    fi
-   if [ "$NAMELIST_NOSOURCE_STATUS" == "" ]; then
-     NAMELIST_NOSOURCE_LOG=
+   if [ -e $OUTPUT_DIR/stage5_namelists_nosource.txt ]; then
+     cat $OUTPUT_DIR/stage5_namelists_nosource.txt >> $TIME_LOG
    fi
    if [ "$UPLOADGUIDES" == "1" ]; then
      echo "status:  https://pages.nist.gov/fds-smv/firebot_status.html" >> $TIME_LOG
@@ -1818,8 +1821,6 @@ fi
       cat $TIMING_WARNING_LOG                                        >> $TIME_LOG
    fi
 
-   echo "HAVE_MAIL=$HAVE_MAIL"
-   echo "mailToFDS=$mailToFDS"
    # Check for pass or fail
    NAMELIST_LOGS="$NAMELIST_NODOC_LOG $NAMELIST_NOSOURCE_LOG"
    LOGS="$TIME_LOG $FYI_LOG $NAMELIST_LOGS"
@@ -2537,7 +2538,17 @@ if [[ "$CHECK_CLUSTER" == "" ]]; then
   if [[ "$OPENMPI_GNU" != "" ]] && [[ "$CACHE_DIR" == "" ]]; then
     check_compile_fds_mpi_gnu_db
   fi
+fi
+RELEASE_beg=`GET_TIME`
+if [ "$CACHE_DIR" == "" ]; then
 
+# debug cases
+  if [[ $FDS_debug_success ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+    run_verification_cases_debug
+  fi
+fi
+
+if [[ "$CHECK_CLUSTER" == "" ]]; then
   check_compile_fds_mpi   $FDS_DIR $FDS_EXE
   check_compile_fds_mpi   $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
 
@@ -2554,20 +2565,13 @@ fi
 BUILD_end=`GET_TIME`
 GET_DURATION $BUILD_beg $BUILD_end BUILD
 
-
 ###*** Stage 3 run verification cases ###
 
-RELEASE_beg=`GET_TIME`
 if [ "$CACHE_DIR" == "" ]; then
-
-# debug cases
-  if [[ $FDS_debug_success ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-    run_verification_cases_debug
-  fi
-
 # release cases
   if [[ $FDS_release_success ]]; then
     run_VV_cases_release
+    wait_VV_cases_release
   fi
 
   if [[ $FDS_release_success ]]; then
@@ -2600,11 +2604,11 @@ if [[ "$CACHE_DIR" == "" ]]; then
   run_python_setup
   check_python_setup
   if [ $python_success == true ]; then
-    run_python_verification &
-    pid_python_verification=$!
-
     run_python_validation   &
     pid_python_validation=$!
+
+    run_python_verification &
+    pid_python_verification=$!
 
     wait $pid_python_verification
     wait $pid_python_validation
