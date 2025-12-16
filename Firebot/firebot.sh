@@ -1164,6 +1164,7 @@ check_python_verification()
      grep "Error" $OUTPUT_DIR/stage4_python_ver | grep -v 'Relative Error' | grep -v 'Absolute Error' | tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
      echo ""                                                                                                                       >> $ERROR_LOG
    fi
+   check_verification_stats
 }
 
 #---------------------------------------------
@@ -1192,8 +1193,10 @@ check_python_validation()
      echo "Errors from Stage 4 - Python plotting and statistics (validation):" >> $ERROR_LOG
      grep -E 'Warning|Length mismatch|Error|UserWarning'  $OUTPUT_DIR/stage4_python_val | uniq | tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
      echo "" >> $ERROR_LOG
-    fi
+   fi
+   archive_validation_stats
 }
+
 
 #---------------------------------------------
 #                   check_verification_stats
