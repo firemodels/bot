@@ -1611,7 +1611,7 @@ save_build_status()
 get_firebot_success()
 {
    firebot_success=1
-   if [[ -e $ERROR_LOG ]]; then
+   if [[ -s $ERROR_LOG ]]; then
      firebot_success=0
    fi
 }
@@ -1806,25 +1806,18 @@ fi
    # Check for pass or fail
    NAMELIST_LOGS="$NAMELIST_NODOC_LOG $NAMELIST_NOSOURCE_LOG"
    LOGS="$TIME_LOG $FYI_LOG $NAMELIST_LOGS"
-   cd $firebotdir
    if [[ -s $ERROR_LOG ]]; then
-# success - send message with links to nightly manuals
+      FIREBOT_SUBJECT="firebot failure."
+      LOGS="$ERROR_LOG $LOGS"
       firebot_status=0
-      cat $LOGS >& $MAIL_LOG
-      echo "firebot success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH"
-      if [ "$HAVE_MAIL" == "1" ]; then
-        cat $LOGS | mail -s "firebot success! Version: ${FDS_REVISION}, Branch: $FDSBRANCH" $mailToFDS > /dev/null
-      fi
    else
-# failure - Send email with failure message, body of email contains error log file
-      echo "firebot failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH."
-      if [ -s $ERROR_LOG ]; then
-        LOGS="$ERROR_LOG $LOGS"
-      fi
-      cat $LOGS >& $MAIL_LOG
-      if [ "$HAVE_MAIL" == "1" ]; then
-        cat $LOGS | mail -s "firebot failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH." $mailToFDS > /dev/null
-      fi
+      FIREBOT_SUBJECT="firebot success!"
+   fi
+   FIREBOT_SUBJECT="$FIREBOT_SUBJECT Version: ${FDS_REVISION}, Branch: $FDSBRANCH"
+   cat $LOGS >& $MAIL_LOG
+   cd $firebotdir
+   if [ "$HAVE_MAIL" == "1" ]; then
+     cat $LOGS | mail -s "$FIREBOT_SUBJECT" $mailToFDS > /dev/null
    fi
    cp $TIME_LOG "$HISTORY_DIR/${FDS_REVISION}_summary.txt"
 }
