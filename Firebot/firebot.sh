@@ -137,9 +137,9 @@ check_CRLF()
     nwarnings=`cat $CRLF_WARNINGS | wc -l`
     if [ $nwarnings -gt 0 ]; then
       echo ""
-      echo "Warnings from Stage 1 - dos line ending check" >> $WARNING_LOG
-      cat $CRLF_WARNINGS                                   >> $WARNING_LOG
-      echo ""                                              >> $WARNING_LOG
+      echo "Warnings from Stage 1 - dos line ending check" >> $ERROR_LOG
+      cat $CRLF_WARNINGS                                   >> $ERROR_LOG
+      echo ""                                              >> $ERROR_LOG
       echo ""
     fi
   fi
@@ -371,10 +371,10 @@ check_git_checkout()
         # Continue along
         :
      else
-        echo "Warnings from Stage 1 - Update repos" >> $WARNING_LOG
-        echo "" >> $WARNING_LOG
-        grep -A 5 -B 5 -i -E 'warning|modified' $OUTPUT_DIR/stage1_setup >> $WARNING_LOG
-        echo "" >> $WARNING_LOG
+        echo "Warnings from Stage 1 - Update repos"                      >> $ERROR_LOG
+        echo ""                                                          >> $ERROR_LOG
+        grep -A 5 -B 5 -i -E 'warning|modified' $OUTPUT_DIR/stage1_setup >> $ERROR_LOG
+        echo ""                                                          >> $ERROR_LOG
      fi
    fi
    git_checkout_success=true
@@ -451,12 +451,12 @@ check_compile_fds_mpi_db()
         # Continue along. No filtered warnings found.
 	:
   else
-        echo "Warnings from Stage 2b - Compile FDS MPI debug:" >> "$WARNING_LOG"
+        echo "Warnings from Stage 2b - Compile FDS MPI debug:" >> "$ERROR_LOG"
         awk -v start="$START_LINE" '$0 ~ "^"start".*db$" {found=1; next} found' "$OUTPUT_DIR/stage2_build_fds${MPTYPE}_debug" | \
          grep -A 5 -E -i 'warning|remark' | \
          grep -v -e mpiifort -e mpiifx -e 'no platform load command' -e 'pointer not aligned at address' \
-            -e ipo -e Referenced -e atom -e 'is now deprecated' -e 'feupdateenv is not implemented' >> "$WARNING_LOG"
-         echo "" >> "$WARNING_LOG"
+            -e ipo -e Referenced -e atom -e 'is now deprecated' -e 'feupdateenv is not implemented' >> "$ERROR_LOG"
+         echo "" >> "$ERROR_LOG"
   fi
 }
 
@@ -646,9 +646,9 @@ check_compile_fds_mpi()
      # Continue along
      :
   else
-     echo "Warnings from Stage 2c - Compile FDS MPI release:" >> $WARNING_LOG
-     grep -A 5 -E -i 'warning|remark' $OUTPUT_DIR/stage2_build_fds${MPTYPE}_release | grep -v 'no platform load command' | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file' >> $WARNING_LOG
-     echo "" >> $WARNING_LOG
+     echo "Warnings from Stage 2c - Compile FDS MPI release:" >> $ERROR_LOG
+     grep -A 5 -E -i 'warning|remark' $OUTPUT_DIR/stage2_build_fds${MPTYPE}_release | grep -v 'no platform load command' | grep -v 'pointer not aligned at address' | grep -v ipo | grep -v Referenced | grep -v atom | grep -v 'feupdateenv is not implemented' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file' >> $ERROR_LOG
+     echo "" >> $ERROR_LOG
   fi
 }
 
@@ -1045,9 +1045,9 @@ check_compile_smv_db()
    # Continue along
    :
  else
-   echo "Warnings from Stage 2 - Compile SMV debug:" >> $WARNING_LOG
-   grep -A 5 -E -i 'warning' $OUTPUT_DIR/stage2_build_smv_debug | grep -v 'feupdateenv is not implemented' | grep -i -v SUN | grep -i -v generated | grep -i -v cmake | grep -v -i CUDA | grep -i -v VectorArray | grep -v 18020 | grep -v 'was built for newer' | grep -v 'lcilkrts linked' >> $WARNING_LOG
-   echo "" >> $WARNING_LOG
+   echo "Warnings from Stage 2 - Compile SMV debug:" >> $ERROR_LOG
+   grep -A 5 -E -i 'warning' $OUTPUT_DIR/stage2_build_smv_debug | grep -v 'feupdateenv is not implemented' | grep -i -v SUN | grep -i -v generated | grep -i -v cmake | grep -v -i CUDA | grep -i -v VectorArray | grep -v 18020 | grep -v 'was built for newer' | grep -v 'lcilkrts linked' >> $ERROR_LOG
+   echo "" >> $ERROR_LOG
  fi
 }
 
@@ -1089,9 +1089,9 @@ check_compile_smv()
     # Continue along
     :
   else
-    echo "Warnings from Stage 2 - Compile SMV release:" >> $WARNING_LOG
-    grep -A 5 -E -i 'warning' $OUTPUT_DIR/stage2_build_smv_release | grep -v 'was built for newer' | grep -i -v SUN | grep -i -v generated | grep -i -v cmake | grep -v -i CUDA | grep -i -v VectorArray | grep -v 18020 | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
-    echo "" >> $WARNING_LOG
+    echo "Warnings from Stage 2 - Compile SMV release:" >> $ERROR_LOG
+    grep -A 5 -E -i 'warning' $OUTPUT_DIR/stage2_build_smv_release | grep -v 'was built for newer' | grep -i -v SUN | grep -i -v generated | grep -i -v cmake | grep -v -i CUDA | grep -i -v VectorArray | grep -v 18020 | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $ERROR_LOG
+    echo "" >> $ERROR_LOG
   fi
   smv_release_success=true
 }
@@ -1208,12 +1208,11 @@ check_verification_stats()
       # Continue along
       :
    else
-      echo "Warnings from Stage 4 - Pythonplotting and statistics (verification):" >> $WARNING_LOG
-      echo "Error: The verification statistics output file does not exist." >> $WARNING_LOG
-      echo "Expected the file Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/Scatterplots/verification_scatterplot_output.csv" >> $WARNING_LOG
-      echo "" >> $WARNING_LOG
+      echo "Warnings from Stage 4 - Python plotting and statistics (verification):"                                           >> $ERROR_LOG
+      echo "Error: The verification statistics output file does not exist."                                                   >> $ERROR_LOG
+      echo "Expected the file Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/Scatterplots/verification_scatterplot_output.csv" >> $ERROR_LOG
+      echo ""                                                                                                                 >> $ERROR_LOG
    fi
-
    # Scan for and report warnings for any verification cases that are outside of their specified error tolerance
    cd $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/Scatterplots
    if [[ `grep "Out of Tolerance" verification_scatterplot_output.csv` == "" ]]
@@ -1221,11 +1220,11 @@ check_verification_stats()
       # Continue along
       :
    else
-      echo "Warnings from Stage 4 - P{ython plotting and statistics (verification):" >> $WARNING_LOG
-      echo "The following cases are outside of their specified error tolerance:" >> $WARNING_LOG
-      echo "" >> $WARNING_LOG
-      grep "Out of Tolerance" verification_scatterplot_output.csv | sed G >> $WARNING_LOG
-      echo "" >> $WARNING_LOG
+      echo "Warnings from Stage 4 - P{ython plotting and statistics (verification):" >> $ERROR_LOG
+      echo "The following cases are outside of their specified error tolerance:"     >> $ERROR_LOG
+      echo ""                                                                        >> $ERROR_LOG
+      grep "Out of Tolerance" verification_scatterplot_output.csv | sed G            >> $ERROR_LOG
+      echo ""                                                                        >> $ERROR_LOG
    fi
 }
 
@@ -1314,10 +1313,10 @@ archive_validation_stats()
       cp ${CURRENT_STATS_FILE} "$HISTORY_DIR/${FDS_REVISION}_${STATS_FILE_BASENAME}.csv"
 
    else
-      echo "Warnings from Stage 4 - Python plotting and statistics (validation):" >> $WARNING_LOG
-      echo "Warning: The validation statistics output file does not exist." >> $WARNING_LOG
-      echo "Expected the file Manuals/FDS_Validation_Guide/SCRIPT_FIGURES/ScatterPlots/validation_scatterplot_output.csv" >> $WARNING_LOG
-      echo "" >> $WARNING_LOG
+      echo "Warnings from Stage 4 - Python plotting and statistics (validation):"                                         >> $ERROR_LOG
+      echo "Warning: The validation statistics output file does not exist."                                               >> $ERROR_LOG
+      echo "Expected the file Manuals/FDS_Validation_Guide/SCRIPT_FIGURES/ScatterPlots/validation_scatterplot_output.csv" >> $ERROR_LOG
+      echo ""                                                                                                             >> $ERROR_LOG
    fi
 }
 
@@ -1383,10 +1382,10 @@ check_guide()
    if [[ `grep -I "successfully" $guidelog` == "" ]]
    then
       # There were errors/warnings in the guide build process
-      echo "Warnings from Stage 5 - Build FDS-SMV Guides:" >> $WARNING_LOG
-      echo $label >> $WARNING_LOG # Name of guide
-      cat $guidelog >> $WARNING_LOG # Contents of log file
-      echo "" >> $WARNING_LOG
+      echo "Warnings from Stage 5 - Build FDS-SMV Guides:" >> $ERROR_LOG
+      echo $label                                          >> $ERROR_LOG # Name of guide
+      cat $guidelog                                        >> $ERROR_LOG # Contents of log file
+      echo ""                                              >> $ERROR_LOG
    fi
 }
 
@@ -1591,25 +1590,11 @@ save_build_status()
    STOP_TIME_INT=$(date +%s)
    cd $firebotdir
    # Save status outcome of build to a text file
-   if [[ -e $WARNING_LOG && -e $ERROR_LOG ]]
+   if [[ -e $ERROR_LOG ]]
    then
      echo "" >> $ERROR_LOG
-     cat $WARNING_LOG >> $ERROR_LOG
-     echo "Build failure and warnings;$FDS_DATE;$FDS_SHORTHASH;$FDS_LONGHASH;${FDS_REVISION};$FDSBRANCH;$STOP_TIME_INT;3;$TOTAL_FDS_TIMES;$HOST;$SMV_LONGHASH;${SMV_REVISION}" > "$HISTORY_DIR/${FDS_REVISION}.txt"
+     echo "Build failure;$FDS_DATE;$FDS_SHORTHASH;$FDS_LONGHASH;${FDS_REVISION};$FDSBRANCH;$STOP_TIME_INT;3;$TOTAL_FDS_TIMES;$HOST;$SMV_LONGHASH;${SMV_REVISION}" > "$HISTORY_DIR/${FDS_REVISION}.txt"
      cat $ERROR_LOG > "$HISTORY_DIR/${FDS_REVISION}_errors.txt"
-
-   # Check for errors only
-   elif [ -e $ERROR_LOG ]
-   then
-      echo "Build failure;$FDS_DATE;$FDS_SHORTHASH;$FDS_LONGHASH;${FDS_REVISION};$FDSBRANCH;$STOP_TIME_INT;3;$TOTAL_FDS_TIMES;$HOST;$SMV_LONGHASH;${SMV_REVISION}" > "$HISTORY_DIR/${FDS_REVISION}.txt"
-      cat $ERROR_LOG > "$HISTORY_DIR/${FDS_REVISION}_errors.txt"
-
-   # Check for warnings only
-   elif [ -e $WARNING_LOG ]
-   then
-      echo "Build success with warnings;$FDS_DATE;$FDS_SHORTHASH;$FDS_LONGHASH;${FDS_REVISION};$FDSBRANCH;$STOP_TIME_INT;2;$TOTAL_FDS_TIMES;$HOST;$SMV_LONGHASH;${SMV_REVISION}" > "$HISTORY_DIR/${FDS_REVISION}.txt"
-      cat $WARNING_LOG > "$HISTORY_DIR/${FDS_REVISION}_warnings.txt"
-
    # No errors or warnings
    else
       echo "Build success!;$FDS_DATE;$FDS_SHORTHASH;$FDS_LONGHASH;${FDS_REVISION};$FDSBRANCH;$STOP_TIME_INT;1;$TOTAL_FDS_TIMES;$HOST;$SMV_LONGHASH;${SMV_REVISION}" > "$HISTORY_DIR/${FDS_REVISION}.txt"
@@ -1626,9 +1611,6 @@ save_build_status()
 get_firebot_success()
 {
    firebot_success=1
-   if [[ -e $WARNING_LOG ]]; then
-     firebot_success=0
-   fi
    if [[ -e $ERROR_LOG ]]; then
      firebot_success=0
    fi
@@ -1678,8 +1660,8 @@ make_fds_summary()
       # Continue along
       :
     else
-      echo "Warnings from Stage 5 - Image comparisons:"     >> $WARNING_LOG
-      grep '***warning:' $OUTPUT_DIR/stage5_image_compare   >> $WARNING_LOG
+      echo "Warnings from Stage 5 - Image comparisons:"     >> $ERROR_LOG
+      grep '***warning:' $OUTPUT_DIR/stage5_image_compare   >> $ERROR_LOG
     fi
     
     if [ "$WEB_DIR" != "" ]; then
@@ -1825,7 +1807,7 @@ fi
    NAMELIST_LOGS="$NAMELIST_NODOC_LOG $NAMELIST_NOSOURCE_LOG"
    LOGS="$TIME_LOG $FYI_LOG $NAMELIST_LOGS"
    cd $firebotdir
-   if [[ ! -s $WARNING_LOG && ! -s $ERROR_LOG ]]; then
+   if [[ -s $ERROR_LOG ]]; then
 # success - send message with links to nightly manuals
       firebot_status=0
       cat $LOGS >& $MAIL_LOG
@@ -1836,9 +1818,6 @@ fi
    else
 # failure - Send email with failure message, body of email contains error log file
       echo "firebot failure. Version: ${FDS_REVISION}, Branch: $FDSBRANCH."
-      if [ -s $WARNING_LOG ]; then
-        LOGS="$WARNING_LOG $LOGS"
-      fi
       if [ -s $ERROR_LOG ]; then
         LOGS="$ERROR_LOG $LOGS"
       fi
@@ -1904,7 +1883,6 @@ fi
 
 TIME_LOG=$OUTPUT_DIR/timings
 ERROR_LOG=$OUTPUT_DIR/errors
-WARNING_LOG=$OUTPUT_DIR/warnings
 TIMING_WARNING_LOG=$OUTPUT_DIR/timing_warnings
 MAIL_LOG=$OUTPUT_DIR/mail_log
 FYI_LOG=$OUTPUT_DIR/fyis
@@ -2708,7 +2686,7 @@ if [ -e output/timing_errors ]; then
   echo "***Warning: cases with > 200% increased run-time"        >> $TIMING_WARNING_LOG
   cat output/timing_errors  | awk -F',' '{print $1,$3,"-->",$4}' >> $TIMING_WARNING_LOG
   echo ""                                                        >> $TIMING_WARNING_LOG
-  cat $TIMING_WARNING_LOG                                        >> $WARNING_LOG
+  cat $TIMING_WARNING_LOG                                        >> $ERROR_LOG
 fi
 
 save_build_status
