@@ -1132,8 +1132,8 @@ check_python_setup()
      python_success=false
    fi
    if [ $python_success == false ]; then
-      echo "Errors from Stage 4 - Python failed to be setup" >> $FYI_LOG
-      grep "Error" $OUTPUT_DIR/stage4_python_setup           >> $FYI_LOG
+      echo "Errors from Stage 4 - Python failed to be setup" >> $ERROR_LOG
+      grep "Error" $OUTPUT_DIR/stage4_python_setup           >> $ERROR_LOG
    fi
 }
 
@@ -1156,13 +1156,13 @@ check_python_verification()
 {
    # Check that python environment has been setup
    python_verification_success=true
-   if [[ `grep "Error" $OUTPUT_DIR/stage4_python_ver` != "" ]]; then
+   if [[ `grep "Error" $OUTPUT_DIR/stage4_python_ver | grep -v 'Relative Error' | grep -v 'Absolute Error' ` != "" ]]; then
      python_verification_success=false
    fi
    if [ $python_verification_success == false ]; then
-     echo "Errors from Stage 4 - Python plotting and statistics (verification):"                 >> $FYI_LOG
-     grep -B 5 -A 50 "Error" $OUTPUT_DIR/stage4_python_ver | tr -cd '\11\12\15\40-\176' >> $FYI_LOG
-     echo "" >> $ERROR_LOG
+     echo "Errors from Stage 4 - Python plotting and statistics (verification):"                                                   >> $ERROR_LOG
+     grep "Error" $OUTPUT_DIR/stage4_python_ver | grep -v 'Relative Error' | grep -v 'Absolute Error' | tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
+     echo ""                                                                                                                       >> $ERROR_LOG
    fi
 }
 
