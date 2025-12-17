@@ -1737,12 +1737,20 @@ fi
    echo "total: $SCRIPT_DIFF "                              >> $TIME_LOG
    echo ""                                                  >> $TIME_LOG
 
+# output namelist status info
+   OUTPUT_NAMELIST=
    if [ -e $OUTPUT_DIR/stage5_namelists_nodoc.txt ]; then
+     OUTPUT_NAMELIST=1
      cat $OUTPUT_DIR/stage5_namelists_nodoc.txt >> $TIME_LOG
    fi
    if [ -e $OUTPUT_DIR/stage5_namelists_nosource.txt ]; then
+     OUTPUT_NAMELIST=1
      cat $OUTPUT_DIR/stage5_namelists_nosource.txt >> $TIME_LOG
    fi
+   if [ "$OUTPUT_NAMELIST" != "" ]; then
+     echo "" >> $TIME_LOG
+   fi
+
    if [ "$UPLOADGUIDES" == "1" ]; then
      echo "status:  https://pages.nist.gov/fds-smv/firebot_status.html" >> $TIME_LOG
    fi
@@ -2545,10 +2553,20 @@ if [ "$CACHE_DIR" == "" ]; then
 # release cases
   if [[ $FDS_release_success ]]; then
     run_VV_cases_release
-    wait_VV_cases_release
+  fi
+
+###*** setup python and run validation tests
+
+  run_python_setup
+  check_python_setup
+
+  if [ $python_success == true ]; then
+    run_python_validation   &
+    pid_python_validation=$!
   fi
 
   if [[ $FDS_release_success ]]; then
+    wait_VV_cases_release
 # this also checks restart cases (using same criteria)
     if [ "$CHECK_CLUSTER" == "" ]; then
       check_verification_cases_release $fdsrepo/Verification
@@ -2575,12 +2593,7 @@ if [[ "$CACHE_DIR" == "" ]]; then
 #*** python verification and validation plots
 
   VERIFICATION_beg=`GET_TIME`
-  run_python_setup
-  check_python_setup
   if [ $python_success == true ]; then
-    run_python_validation   &
-    pid_python_validation=$!
-
     run_python_verification &
     pid_python_verification=$!
 
