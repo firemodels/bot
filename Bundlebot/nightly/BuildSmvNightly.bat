@@ -26,6 +26,7 @@ cd %CURDIR%
 cd ..\..\..
 set reporoot=%CD%
 cd %CURDIR%
+set gawk=%reporoot%\bot\scripts\bin\gawk.exe
 
 call get_smv_hash_revisions %S_HASH% %S_REVISION% > %outdir%\stage1_hash 2>&1
 set /p smv_hash=<%outdir%\SMV_HASH
@@ -87,7 +88,7 @@ echo *** uploading Smokeview bundle
 Title Building Smokeview bundle
 
 set filelist=%TEMP%\smv_files_win.out
-gh release view SMOKEVIEW_TEST  -R github.com/%OWNER%/test_bundles | grep SMV | grep -v FDS | grep -v CFAST | grep win | gawk "{print $2}" > %filelist%
+gh release view SMOKEVIEW_TEST  -R github.com/%OWNER%/test_bundles | grep SMV | grep -v FDS | grep -v CFAST | grep win | %gawk% "{print $2}" > %filelist%
 for /F "tokens=*" %%A in (%filelist%) do gh release delete-asset SMOKEVIEW_TEST %%A  -R github.com/%OWNER%/test_bundles -y
 erase %filelist%
 
