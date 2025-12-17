@@ -3,14 +3,16 @@ set error=0
 set SHASH=%1
 set SREVISION=%2
 
+set gawk=..\..\Scripts\bin\gawk.exe
+
 if "x%SHASH%" == "x" goto else1
 echo %SHASH%     > output\SMV_HASH
 echo %SREVISION% > output\SMV_REVISION
 goto eof
 :else1
 call :getfile SMV_INFO.txt
-grep SMV_HASH     output\SMV_INFO.txt | gawk "{print $2}" > output\SMV_HASH
-grep SMV_REVISION output\SMV_INFO.txt | gawk "{print $2}" > output\SMV_REVISION
+grep SMV_HASH     output\SMV_INFO.txt | %gawk% "{print $2}" > output\SMV_HASH
+grep SMV_REVISION output\SMV_INFO.txt | %gawk% "{print $2}" > output\SMV_REVISION
 goto eof
 
 ::-----------------------------------------------------------------------

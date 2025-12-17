@@ -1,6 +1,9 @@
 @echo off
 set repo=%1
 
+set scriptdir=%~dp0\bin\
+set gawk=%scriptdir%\gawk.exe
+
 if NOT "x%repo%" == "x" goto ENDIF1
   echo ***error: specify repo name
   exit /b
@@ -9,19 +12,20 @@ if NOT "x%repo%" == "x" goto ENDIF1
 set GITHEADERfile=githeader.txt
 set GITUSERfile=gituser.txt
 set ndisablefile=disable.txt
-set havecentralfile=havencentral.txt
+set havecentralfile=havecentral.txt
 
-git remote -v | grep origin | head -1 | gawk  "{print $2}" | gawk -F ":" "{print $1}" > %GITHEADERfile%
+
+git remote -v | grep origin | head -1 | %gawk%  "{print $2}" | %gawk% -F ":" "{print $1}" > %GITHEADERfile%
 set /p GITHEADER=<%GITHEADERfile%
 
 if NOT "%GITHEADER%" == "git@github.com" goto ELSE2
    set GITHEADER=git@github.com:
-   git remote -v | grep origin | head -1 | gawk -F ":" "{print $2}" | gawk -F"/" "{print $1}" > %GITUSERfile%
+   git remote -v | grep origin | head -1 | %gawk% -F ":" "{print $2}" | %gawk% -F"/" "{print $1}" > %GITUSERfile%
    set /p GITUSER=<%GITUSERfile%
    goto ENDIF2
 :ELSE2
    set GITHEADER=https://github.com/
-   git remote -v | grep origin | head -1 | gawk -F "." "{print $2}" | gawk -F"/" "{print $2}" > %GITUSERfile%
+   git remote -v | grep origin | head -1 | %gawk% -F "." "{print $2}" | %gawk% -F"/" "{print $2}" > %GITUSERfile%
    set /p GITUSER=<%GITUSERfile%
 :ENDIF2
 
@@ -38,7 +42,7 @@ if NOT "%GITUSER%" == "firemodels" goto ELSE3
    goto ENDIF3
 :ELSE3
    
-   git remote -v | gawk "{print $1}" | grep firemodels | wc -l > %havecentralfile%
+   git remote -v | %gawk% "{print $1}" | grep firemodels | wc -l > %havecentralfile%
    set /p havecentral=<%havecentralfile%
 
    if NOT %havecentral% == 0 goto ENDIF4
