@@ -30,6 +30,7 @@ set REPOROOT=%CD%
 
 cd %REPOROOT%\bot
 set botrepo=%CD%
+set gawk=%botrepo%\scripts\bin\gawk.exe
 
 if exist %REPOROOT%\webpages goto endif4
   echo ***error: the webpages repo does not exist
@@ -188,7 +189,7 @@ if "x%upload_bundle%" == "x" goto skip_upload
   echo.
 
   set filelist=%TEMP%\fds_smv_files_win.out
-  gh release view FDS_TEST -R github.com/%OWNER%/test_bundles | grep FDS | grep SMV | grep win | gawk "{print $2}" > %filelist%
+  gh release view FDS_TEST -R github.com/%OWNER%/test_bundles | grep FDS | grep SMV | grep win | %gawk% "{print $2}" > %filelist%
   for /F "tokens=*" %%A in (%filelist%) do gh release delete-asset FDS_TEST -R github.com/%OWNER%/test_bundles %%A -y
   erase %filelist%
 

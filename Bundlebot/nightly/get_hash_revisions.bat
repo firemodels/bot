@@ -3,11 +3,12 @@ set error=0
 
 call :getopts %*
 
+set gawk=..\..\Scripts\bin\gawk.exe
 call :getfile FDS_INFO.txt
-grep FDS_HASH     output\FDS_INFO.txt | gawk "{print $2}" > output\FDS_HASH
-grep SMV_HASH     output\FDS_INFO.txt | gawk "{print $2}" > output\SMV_HASH
-grep FDS_REVISION output\FDS_INFO.txt | gawk "{print $2}" > output\FDS_REVISION
-grep SMV_REVISION output\FDS_INFO.txt | gawk "{print $2}" > output\SMV_REVISION
+grep FDS_HASH     output\FDS_INFO.txt | %gawk% "{print $2}" > output\FDS_HASH
+grep SMV_HASH     output\FDS_INFO.txt | %gawk% "{print $2}" > output\SMV_HASH
+grep FDS_REVISION output\FDS_INFO.txt | %gawk% "{print $2}" > output\FDS_REVISION
+grep SMV_REVISION output\FDS_INFO.txt | %gawk% "{print $2}" > output\SMV_REVISION
 goto eof
 
 
