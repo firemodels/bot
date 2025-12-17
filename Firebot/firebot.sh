@@ -1223,7 +1223,7 @@ check_verification_stats()
       # Continue along
       :
    else
-      echo "Warnings from Stage 4 - P{ython plotting and statistics (verification):" >> $ERROR_LOG
+      echo "Warnings from Stage 4 - Python plotting and statistics (verification):"  >> $ERROR_LOG
       echo "The following cases are outside of their specified error tolerance:"     >> $ERROR_LOG
       echo ""                                                                        >> $ERROR_LOG
       grep "Out of Tolerance" verification_scatterplot_output.csv | sed G            >> $ERROR_LOG
@@ -1308,7 +1308,7 @@ archive_validation_stats()
 
    echo archiving validation stats
    STATS_FILE_BASENAME=validation_scatterplot_output
-   CURRENT_STATS_FILE=$fdsrepo/Manuals/FDS_Validation_Guide/SCRIPT_FIGURES/ScatterPlots/${STATS_FILE_BASENAME}.csv
+   CURRENT_STATS_FILE=$fdsrepo/Manuals/FDS_Validation_Guide/SCRIPT_FIGURES/Scatterplots/${STATS_FILE_BASENAME}.csv
 
    if [ -e ${CURRENT_STATS_FILE} ]
    then
@@ -1316,10 +1316,10 @@ archive_validation_stats()
       cp ${CURRENT_STATS_FILE} "$HISTORY_DIR/${FDS_REVISION}_${STATS_FILE_BASENAME}.csv"
 
    else
-      echo "Warnings from Stage 4 - Python plotting and statistics (validation):"                                         >> $ERROR_LOG
-      echo "Warning: The validation statistics output file does not exist."                                               >> $ERROR_LOG
-      echo "Expected the file Manuals/FDS_Validation_Guide/SCRIPT_FIGURES/ScatterPlots/validation_scatterplot_output.csv" >> $ERROR_LOG
-      echo ""                                                                                                             >> $ERROR_LOG
+      echo "Warnings from Stage 4 - Python plotting and statistics (validation):" >> $ERROR_LOG
+      echo "Warning: The validation statistics output file does not exist."       >> $ERROR_LOG
+      echo "Expected the file ${CURRENT_STATS_FILE}"                              >> $ERROR_LOG
+      echo ""                                                                     >> $ERROR_LOG
    fi
 }
 
