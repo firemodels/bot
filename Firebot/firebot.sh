@@ -1365,6 +1365,11 @@ archive_timing_stats()
      echo "day,date,revision,pass/fail,clone,setup,build,debug,release,zero,vv,manuals,total" > $HISTORY_DIR/firebot_times.csv
      echo ",,,,s,s,s,s,s,s,s,s,s" >> $HISTORY_DIR/firebot_times.csv
    fi
+   if [ -s $ERROR_LOG ]; then
+     firebot_success=0
+   else
+     firebot_success=1
+   fi
    echo $gitdate,$FDS_DATE,$FDS_REVISION,$firebot_success,$CLONE_DELTA,$SETUP_DELTA,$BUILD_DELTA,0.0,$RELEASE_DELTA,0.0,$VV_DELTA,$MANUALS_DELTA,$SCRIPT_DELTA >> $HISTORY_DIR/firebot_times.csv
 
    if [ "$UPLOADGUIDES" == "1" ]; then
@@ -1612,18 +1617,6 @@ save_build_status()
 }
 
 #---------------------------------------------
-#                   get_firebot_success
-#---------------------------------------------
-
-get_firebot_success()
-{
-   firebot_success=1
-   if [[ -s $ERROR_LOG ]]; then
-     firebot_success=0
-   fi
-}
-
-#---------------------------------------------
 #                   make_fds_summary
 #---------------------------------------------
 
@@ -1774,7 +1767,6 @@ fi
      echo "summary dir: $FDS_SUMMARY_DIR"  >> $TIME_LOG
    fi
 #  upload guides to github
-   get_firebot_success
    is_bot=
    if [ `whoami` == "firebot" ]; then
      is_bot=1
@@ -1799,7 +1791,7 @@ fi
      $SummaryGH &> $OUTPUT_DIR/stage6_summary_github
 # upload guides with _latest appended even fire firebot doesn't pass
 #     $UploadGuidesGH latest &> $OUTPUT_DIR/stage6_upload_github
-     if [[ "$firebot_success" == "1" ]]; then
+     if [[ ! -s $ERROR_LOC ]]; then
        $UploadGuidesGH                        &> $OUTPUT_DIR/stage6_upload_github
        cat $OUTPUT_DIR/stage6_upload_github >> $OUTPUT_DIR/stage6_summary_github
      fi
@@ -2639,12 +2631,11 @@ MANUALS_beg=`GET_TIME`
     wait $pid_fds_tg
     wait $pid_fds_valg
     wait $pid_fds_confg
-    get_firebot_success
 
 # copy repo manuals to Manualslatest directory whether firebot passes or fails
     rm -rf $MANUALS_LATEST_DIR
     cp -r $fdsrepo/Manuals $MANUALS_LATEST_DIR
-    if [[ "$firebot_success" == "1" ]] ; then
+    if [[ ! -s $ERROR_LOC ]]; then
 
 # copy repo manuals to Manuals directory only if firebot
       rm -rf $MANUALS_DIR
@@ -2672,8 +2663,7 @@ MANUALS_beg=`GET_TIME`
 ###*** Stage 6 wrapup ###
 
 copy_apps=
-get_firebot_success
-if [[ "$firebot_success" == "1" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+if [[ ! -s $ERROR_LOC ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
   copy_apps=1
 fi
 if [ "$copy_apps" == "1" ]; then
