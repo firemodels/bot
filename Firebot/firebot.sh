@@ -1791,7 +1791,7 @@ fi
      $SummaryGH &> $OUTPUT_DIR/stage6_summary_github
 # upload guides with _latest appended even fire firebot doesn't pass
 #     $UploadGuidesGH latest &> $OUTPUT_DIR/stage6_upload_github
-     if [[ ! -s $ERROR_LOC ]]; then
+     if [[ ! -s $ERROR_LOG ]]; then
        $UploadGuidesGH                        &> $OUTPUT_DIR/stage6_upload_github
        cat $OUTPUT_DIR/stage6_upload_github >> $OUTPUT_DIR/stage6_summary_github
      fi
@@ -2635,7 +2635,7 @@ MANUALS_beg=`GET_TIME`
 # copy repo manuals to Manualslatest directory whether firebot passes or fails
     rm -rf $MANUALS_LATEST_DIR
     cp -r $fdsrepo/Manuals $MANUALS_LATEST_DIR
-    if [[ ! -s $ERROR_LOC ]]; then
+    if [[ ! -s $ERROR_LOG ]]; then
 
 # copy repo manuals to Manuals directory only if firebot
       rm -rf $MANUALS_DIR
@@ -2663,7 +2663,7 @@ MANUALS_beg=`GET_TIME`
 ###*** Stage 6 wrapup ###
 
 copy_apps=
-if [[ ! -s $ERROR_LOC ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+if [[ ! -s $ERROR_LOG ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
   copy_apps=1
 fi
 if [ "$copy_apps" == "1" ]; then
