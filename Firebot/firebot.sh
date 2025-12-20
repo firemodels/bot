@@ -569,6 +569,7 @@ check_cases_debug()
       [[ `grep ERROR:        */*.err | grep -v grep | grep -v geom_bad `           == "" ]] && \
       [[ `grep ERROR:            */*.out            | grep -v grep | grep -v echo` == "" ]] && \
       [[ `grep 'BAD TERMINATION' */*.log            | grep -v grep`                == "" ]] && \
+      [[ `grep -i 'Numerical Instabliity' */*.out   | grep -v grep`                == "" ]] && \
       [[ `grep forrtl            */*.err            | grep -v grep`                == "" ]]
    then
       cases_debug_success=true
@@ -578,6 +579,7 @@ check_cases_debug()
       grep ERROR:            */*.err  | grep -v grep | grep -v geom_bad            >> $OUTPUT_DIR/stage3_run_debug_ver_errors
       grep ERROR:                 */*.out            | grep -v grep | grep -v echo >> $OUTPUT_DIR/stage3_run_debug_ver_errors
       grep -A 2 'BAD TERMINATION' */*.log            | grep -v grep                >> $OUTPUT_DIR/stage3_run_debug_ver_errors
+      grep -i 'Numerical Instability' */*.out        | grep -v grep                >> $OUTPUT_DIR/stage3_run_debug_ver_errors
       grep -A 20 forrtl           */*.err            | grep -v grep                >> $OUTPUT_DIR/stage3_run_debug_ver_errors
 
       echo "Errors from Stage 4 - Run ${2} cases - debug mode:" >> $ERROR_LOG
@@ -808,6 +810,7 @@ check_verification_cases_release()
       [[ `grep ERROR:                   */*.err             | grep -v grep | grep -v geom_bad` == "" ]] && \
       [[ `grep ERROR:                   */*.out             | grep -v grep | grep -v echo`     == "" ]] && \
       [[ `grep 'BAD TERMINATION'        */*.log             | grep -v grep`                    == "" ]] && \
+      [[ `grep -i 'Numerical Instability' */*.out           | grep -v grep`                    == "" ]] && \
       [[ `grep forrtl                   */*.err             | grep -v grep`                    == "" ]]
    then
       cases_debug_success=true
@@ -818,6 +821,7 @@ check_verification_cases_release()
       grep ERROR:                       */*.err             | grep -v grep | grep -v geom_bad >> $OUTPUT_DIR/stage3_run_release_ver_errors
       grep ERROR:                       */*.out             | grep -v grep | grep -v echo     >> $OUTPUT_DIR/stage3_run_release_ver_errors
       grep -A 2 'BAD TERMINATION'       */*.log             | grep -v grep                    >> $OUTPUT_DIR/stage3_run_release_ver_errors
+      grep -i 'Numerical Instability'   */*.out             | grep -v grep                    >> $OUTPUT_DIR/stage3_run_release_ver_errors
       grep -A 20 forrtl                 */*.err             | grep -v grep                    >> $OUTPUT_DIR/stage3_run_release_ver_errors
 
       echo "Errors from Stage 3 - Run ${2} cases - release mode:" >> $ERROR_LOG
