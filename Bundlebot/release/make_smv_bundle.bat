@@ -19,7 +19,6 @@ set BUILDDIR=intel_win
 
 set smvbuild=%reporoot%\smv\Build\smokeview\%BUILDDIR%
 set forbundle=%reporoot%\smv\Build\for_bundle
-set webgldir=%reporoot%\smv\Build\for_bundle\webgl
 set smvscripts=%reporoot%\smv\scripts
 set svzipbuild=%reporoot%\smv\Build\smokezip\%BUILDDIR%
 set svdiffbuild=%reporoot%\smv\Build\smokediff\%BUILDDIR%
@@ -59,8 +58,6 @@ echo copying .png files
 copy %forbundle%\*.png %smvdir%\.>Nul
 
 CALL :COPY  %forbundle%\volrender.ssf %smvdir%\volrender.ssf
-CALL :COPY  %webgldir%\smv2html.bat   %smvdir%\smv2html.bat
-::CALL :COPY  %webgldir%\smv_setup.bat  %smvdir%\smv_setup.bat
 
 CALL :COPY  %bgbuild%\background_win.exe     %smvdir%\background.exe
 CALL :COPY  %flushfilebuild%\flush_win.exe   %smvdir%\flush.exe
@@ -79,8 +76,6 @@ CALL :COPY  %forbundle%\setup.bat                             %zipbase%\setup.ba
 
 set curdir=%CD%
 
-CALL :COPY  %forbundle%\smokeview.html          %smvdir%\smokeview.html
-CALL :COPY  %forbundle%\webvr\smokeview_vr.html %smvdir%\smokeview_vr.html
 CALL :COPY  %forbundle%\smokeview.ini           %smvdir%\smokeview.ini
 
 echo copying textures
