@@ -327,7 +327,6 @@ fdsbindir=$bundledir/bin
 webpagesdir=$REPO_ROOT/webpages
 fds_bundle=$REPO_ROOT/fds/Build/for_bundle
 smv_bundle=$REPO_ROOT/smv/Build/for_bundle
-webgldir=$REPO_ROOT/smv/Build//for_bundle/webgl
 smvscriptdir=$REPO_ROOT/smv/scripts
 utilscriptdir=$REPO_ROOT/smv/Utilities/Scripts
 botscriptdir=$REPO_ROOT/bot/Scripts
@@ -460,11 +459,6 @@ CP $smv_bundle volrender.ssf  $smvbindir volrender.ssf
 CP $smv_bundle objects.svo    $smvbindir objects.svo
 CP $smv_bundle smokeview.html $smvbindir smokeview.html
 CP $smv_bundle .smokeview_bin $smvbindir .smokeview_bin
-
-# smokeview to html conversion scripts
-
-CP $webgldir      runsmv_ssh.sh $smvbindir runsmv_ssh.sh
-CP $webgldir      smv2html.sh   $smvbindir smv2html.sh
 
 if [ "$PLATFORM" == "LINUX64" ]; then
   CP $utilscriptdir slice2html.sh   $smvbindir slice2html.sh

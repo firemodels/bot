@@ -76,7 +76,6 @@ FDS2FEDDIR=$GITROOT/smv/Build/fds2fed/${COMPILER}_${platform}
 WIND2FDSDIR=$GITROOT/smv/Build/wind2fds/${COMPILER}_${platform}
 FLUSHFILEDIR=$GITROOT/smv/Build/flush/${COMPILER}_${platform}
 FORBUNDLE=$GITROOT/smv/Build/for_bundle
-WEBGLDIR=$GITROOT/smv/Build/for_bundle/webgl
 UTILSCRIPTDIR=$GITROOT/smv/Utilities/Scripts
 PLATFORMDIR=$RELEASE$revision\_${platform3}
 MAKEINSTALLER=$GITROOT/bot/Bundlebot/nightly/make_smv_installer.sh
@@ -111,9 +110,6 @@ cp $FORBUNDLE/*.png $PLATFORMDIR/$smvbin/.
 CP $FORBUNDLE       objects.svo       $PLATFORMDIR/$smvbin objects.svo
 CP $FORBUNDLE       smokeview.ini     $PLATFORMDIR/$smvbin smokeview.ini
 CP $FORBUNDLE       volrender.ssf     $PLATFORMDIR/$smvbin volrender.ssf
-CP $FORBUNDLE       smokeview.html    $PLATFORMDIR/$smvbin smokeview.html
-CP $WEBGLDIR        runsmv_ssh.sh     $PLATFORMDIR/$smvbin runsmv_ssh.sh
-CP $WEBGLDIR        smv2html.sh       $PLATFORMDIR/$smvbin smv2html.sh
 CP $UTILSCRIPTDIR   slice2html.sh     $PLATFORMDIR/$smvbin slice2html.sh
 CP $UTILSCRIPTDIR   slice2mp4.sh      $PLATFORMDIR/$smvbin slice2mp4.sh
 CP $FORBUNDLE       .smokeview_bin    $PLATFORMDIR/$smvbin .smokeview_bin
