@@ -23,6 +23,7 @@ exit 0
 
 UPLOADBUNDLE=
 export BUILDING_release=
+BUILDTYPE2=test
 
 while getopts 'hUR' OPTION
 do
@@ -32,6 +33,7 @@ case $OPTION  in
    ;;
   R)
    export BUILDING_release=1
+   BUILDTYPE2=release
    ;;
   U)
    UPLOADBUNDLE=1
@@ -51,8 +53,6 @@ if [ "`uname`" == "Darwin" ] ; then
   platform2="osx"
   comp=gnu
 fi
-BUILDTYPE=-t
-BUILDTYPE2=test
 
 cd ../../..
 reporoot=`pwd`
