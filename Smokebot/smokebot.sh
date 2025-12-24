@@ -651,7 +651,7 @@ compile_smv_utilities()
      rm -f *.o background_${platform}
      echo 'Compiling background:' >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
      ./make_background.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1 &
-     pid+background=$!
+     pid_background=$!
 
    # pnginfo
      pid_pnginfo=
@@ -2111,13 +2111,13 @@ BUILDSOFTWARE_beg=`GET_TIME`
 #*** stage 2 - build cfast
 echo "Building"
 
-pid_fds_db=
+pid_fds_mpi_db=
 pid_fds_mpi=
 if [ "$CACHE_DIR" == "" ]; then
   touch              $FDS_DB_DIR/compiling
   touch              $FDS_DIR/compiling
   compile_fds_mpi_db $FDS_DB_DIR        $FDS_DB_EXE &
-  pid_fds_db=$!
+  pid_fds_mpi_db=$!
   compile_fds_mpi    $FDS_DIR           $FDS_EXE    &
   pid_fds_mpi=$!
 else
@@ -2158,7 +2158,7 @@ check_common_files
 wait $pid_cfast
 check_compile_cfast
 
-wait $pid_utilities
+wait $pid_smv_utilities
 check_smv_utilities
 
 wait $pid_smv_db
