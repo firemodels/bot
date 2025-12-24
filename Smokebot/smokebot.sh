@@ -554,19 +554,6 @@ compile_fds_mpi()
 }
 
 #---------------------------------------------
-#                   wait_compile_end
-#---------------------------------------------
-
-wait_compile_end()
-{
-   local compile_dir=$1
-   sleep 5
-   while [[  -e $compile_dir/compiling    ]]; do
-      sleep 5
-   done
-}
-
-#---------------------------------------------
 #                   check_compile_fds_mpi
 #---------------------------------------------
 
@@ -608,7 +595,7 @@ check_compile_fds_mpi()
 #                   compile_smv_utilities
 #---------------------------------------------
 
-compile_smv_utilities()
+compile_smv_libraries()
 {
    echo "" > $OUTPUT_DIR/stage2_build_smvutil
    if [ "$haveCC" == "1" ] ; then
@@ -617,6 +604,20 @@ compile_smv_utilities()
      cd $smvrepo/Build/LIBS/${COMPILER}_${platform}
      echo 'Building Smokeview libraries:' >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
      ./make_LIBS.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
+   else
+     echo "Warning: smokeview libraries not built - C compiler not available" >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
+     compile_errors=1
+   fi
+}
+
+#---------------------------------------------
+#                   compile_smv_utilities
+#---------------------------------------------
+
+compile_smv_utilities()
+{
+   echo "" > $OUTPUT_DIR/stage2_build_smvutil
+   if [ "$haveCC" == "1" ] ; then
 
    # smokezip:
      echo "   smokezip"
@@ -624,53 +625,65 @@ compile_smv_utilities()
      rm -f *.o smokezip_${platform}
 
      echo 'Compiling smokezip:' >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
-     ./make_smokezip.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
-     echo "" >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
-     cp smokezip_${platform} $LATESTAPPS_DIR/smokezip
+     ./make_smokezip.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1 &
+     pid_smokezip=$1
+     
 
    # smokediff:
      echo "   smokediff"
      cd $smvrepo/Build/smokediff/${COMPILER}_${platform}
      rm -f *.o smokediff_${platform}
      echo 'Compiling smokediff:' >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
-     ./make_smokediff.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
-     echo "" >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
-     cp smokediff_${platform} $LATESTAPPS_DIR/smokediff
+     ./make_smokediff.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1 &
+     pid_smokediff=$!
    
    # fds2fed:
      echo "   fds2fed"
      cd $smvrepo/Build/fds2fed/${COMPILER}_${platform}
      rm -f *.o fds2fed_${platform}
      echo 'Compiling fds2fed:' >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
-     ./make_fds2fed.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
-     echo "" >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
-     cp fds2fed_${platform} $LATESTAPPS_DIR/fds2fed
+     ./make_fds2fed.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1 &
+     pid_fds2fed=$!
 
    # background
      echo "   background"
      cd $smvrepo/Build/background/${COMPILER}_${platform}
      rm -f *.o background_${platform}
      echo 'Compiling background:' >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
-     ./make_background.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
-     cp background_${platform} $LATESTAPPS_DIR/background
+     ./make_background.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1 &
+     pid+background=$!
 
    # pnginfo
+     pid_pnginfo=
      if [ -d $smvrepo/Build/pnginfo/${COMPILER}_${platform} ]; then
        echo "   pnginfo"
        cd $smvrepo/Build/pnginfo/${COMPILER}_${platform}
        rm -f *.o pnginfo_${platform}
        echo 'Compiling pnginfo:' >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
-       ./make_pnginfo.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
-       cp pnginfo_${platform} $LATESTAPPS_DIR/pnginfo
+       ./make_pnginfo.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1 &
+       pid_pnginfo=$!
      fi
 
   # wind2fds:
-     echo "   wind2fds"
      cd $smvrepo/Build/wind2fds/${COMPILER}_${platform}
      rm -f *.o wind2fds_${platform}
      echo 'Compiling wind2fds:' >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
-     ./make_wind2fds.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
-    echo "" >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
+     ./make_wind2fds.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1 &
+     pid_wind2fds=$!
+
+     wait $pid_smokezip
+     cp smokezip_${platform} $LATESTAPPS_DIR/smokezip
+     wait $pid_smokediff
+     cp smokediff_${platform} $LATESTAPPS_DIR/smokediff
+     wait $pid_fds2fed
+     cp fds2fed_${platform} $LATESTAPPS_DIR/fds2fed
+     wait $pid_background
+     cp background_${platform} $LATESTAPPS_DIR/background
+     if [ "$pid_pnginfo" != "" ]; then
+       wait $pid_pnginfo
+       cp pnginfo_${platform} $LATESTAPPS_DIR/pnginfo
+     fi
+     wait $pid_wind2fds
      cp wind2fds_${platform} $LATESTAPPS_DIR/wind2fds
    else
      echo "Warning: smokeview and utilities not built - C compiler not available" >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
@@ -2098,11 +2111,15 @@ BUILDSOFTWARE_beg=`GET_TIME`
 #*** stage 2 - build cfast
 echo "Building"
 
+pid_fds_db=
+pid_fds_mpi=
 if [ "$CACHE_DIR" == "" ]; then
   touch              $FDS_DB_DIR/compiling
   touch              $FDS_DIR/compiling
-  compile_fds_mpi_db $FDS_DB_DIR        $FDS_DB_EXE
-  compile_fds_mpi    $FDS_DIR           $FDS_EXE
+  compile_fds_mpi_db $FDS_DB_DIR        $FDS_DB_EXE &
+  pid_fds_db=$!
+  compile_fds_mpi    $FDS_DIR           $FDS_EXE    &
+  pid_fds_mpi=$!
 else
   echo "   debug fds(from cache)"
   echo "   release fds(from cache)"
@@ -2115,31 +2132,49 @@ else
 fi
 
 #*** stage 2 build cfast
-compile_cfast
-check_compile_cfast
+compile_cfast        &
+pid_cfast=$!
 
 #----------------------------- Stage 2 build smokeview     --------------------------------------
 
 #*** stage 2 - build smokeview ustilities
-compile_smv_utilities
-check_smv_utilities
+compile_smv_libraries
+
+compile_smv_utilities  &
+pid_smv_utilities=$!
 
 #*** stage 2 - build smokeview debug
-compile_smv_db
-check_compile_smv_db
+compile_smv_db   &
+pid_smv_db=$!
 
 #*** stage 2 - build smokeview release
-compile_smv
-check_compile_smv
+compile_smv  &
+pid_smv=$!
 
 #*** stage 2 - check common files
 check_common_files
 
-if [ "$CACHE_DIR" == "" ]; then
-  wait_compile_end   $FDS_DB_DIR
-  wait_compile_end   $FDS_DIR
+
+wait $pid_cfast
+check_compile_cfast
+
+wait $pid_utilities
+check_smv_utilities
+
+wait $pid_smv_db
+check_compile_smv_db
+
+wait $pid_smv
+check_compile_smv
+
+if [ "$pid_fds_mpi_db" != "" ]; then
+  wait $pid_fds_mpi_db
 fi
 check_compile_fds_mpi_db  $FDS_DB_DIR        $FDS_DB_EXE
+
+if [ "$pid_fds_mpi" != "" ]; then
+  wait $pid_fds_mpi
+fi
 check_compile_fds_mpi     $FDS_DIR           $FDS_EXE
 
 BUILDSOFTWARE_end=`GET_TIME`
