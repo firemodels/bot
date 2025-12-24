@@ -412,7 +412,7 @@ compile_fds_mpi_db()
    rm -f $FDSEXE
    echo ""                     > $OUTPUT_DIR/stage2_build_fds_debug$MPTYPE
    echo $FDSDIR               >> $OUTPUT_DIR/stage2_build_fds_debug$MPTYPE
-   $botrepo/Scripts/build_fds.sh $OUTPUT_DIR/stage2_build_fds_debug$MPTYPE $FDSEXE &
+   $botrepo/Scripts/build_fds.sh $OUTPUT_DIR/stage2_build_fds_debug$MPTYPE $FDSEXE 
 }
 
 #---------------------------------------------
@@ -430,7 +430,7 @@ check_compile_fds_mpi_db()
       stage_fdsdb_success=true
    else
       echo "Errors from Stage 1b$MPTYPE - Compile FDS MPI$MPTYPE debug:"   >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage2_build_fds_debug$MPTYPE                                       >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage2_build_fds_debug$MPTYPE                        >> $ERROR_LOG
       echo ""                                                              >> $ERROR_LOG
       THIS_FDS_FAILED=1
       compile_errors=1
@@ -550,7 +550,7 @@ compile_fds_mpi()
    rm -f $FDSEXE
    echo ""                     > $OUTPUT_DIR/stage2_build_fds_release$MPTYPE
    echo $FDSDIR               >> $OUTPUT_DIR/stage2_build_fds_release$MPTYPE
-   $botrepo/Scripts/build_fds.sh $OUTPUT_DIR/stage2_build_fds_release$MPTYPE $FDSEXE &
+   $botrepo/Scripts/build_fds.sh $OUTPUT_DIR/stage2_build_fds_release$MPTYPE $FDSEXE 
 }
 
 #---------------------------------------------
