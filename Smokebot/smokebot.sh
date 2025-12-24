@@ -597,15 +597,15 @@ check_compile_fds_mpi()
 
 compile_smv_libraries()
 {
-   echo "" > $OUTPUT_DIR/stage2_build_smvutil
+   echo "" > $OUTPUT_DIR/stage2_build_smvlibs
    if [ "$haveCC" == "1" ] ; then
    # smokeview libraries
      echo "   libraries"
      cd $smvrepo/Build/LIBS/${COMPILER}_${platform}
-     echo 'Building Smokeview libraries:' >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
-     ./make_LIBS.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
+     echo 'Building Smokeview libraries:' >> $OUTPUT_DIR/stage2_build_smvlibs 2>&1
+     ./make_LIBS.sh >> $OUTPUT_DIR/stage2_build_smvlibs 2>&1
    else
-     echo "Warning: smokeview libraries not built - C compiler not available" >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
+     echo "Warning: smokeview libraries not built - C compiler not available" >> $OUTPUT_DIR/stage2_build_smvlibs 2>&1
      compile_errors=1
    fi
 }
@@ -672,18 +672,29 @@ compile_smv_utilities()
      pid_wind2fds=$!
 
      wait $pid_smokezip
+     cd $smvrepo/Build/smokezip/${COMPILER}_${platform}
      cp smokezip_${platform} $LATESTAPPS_DIR/smokezip
+
      wait $pid_smokediff
+     cd $smvrepo/Build/smokediff/${COMPILER}_${platform}
      cp smokediff_${platform} $LATESTAPPS_DIR/smokediff
+
      wait $pid_fds2fed
+     cd $smvrepo/Build/fds2fed/${COMPILER}_${platform}
      cp fds2fed_${platform} $LATESTAPPS_DIR/fds2fed
+
      wait $pid_background
-     cp background_${platform} $LATESTAPPS_DIR/background
+     cd $smvrepo/Build/background/${COMPILER}_${platform}
+     cp background_${platform} $LATESTAPPS_DIR/backgroundaaaa
+
      if [ "$pid_pnginfo" != "" ]; then
        wait $pid_pnginfo
+       cd $smvrepo/Build/pnginfo/${COMPILER}_${platform}
        cp pnginfo_${platform} $LATESTAPPS_DIR/pnginfo
      fi
+
      wait $pid_wind2fds
+     cd $smvrepo/Build/wind2fds/${COMPILER}_${platform}
      cp wind2fds_${platform} $LATESTAPPS_DIR/wind2fds
    else
      echo "Warning: smokeview and utilities not built - C compiler not available" >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
@@ -2154,7 +2165,6 @@ pid_smv=$!
 #*** stage 2 - check common files
 check_common_files
 
-
 wait $pid_cfast
 check_compile_cfast
 
@@ -2169,13 +2179,13 @@ check_compile_smv
 
 if [ "$pid_fds_mpi_db" != "" ]; then
   wait $pid_fds_mpi_db
+  check_compile_fds_mpi_db  $FDS_DB_DIR        $FDS_DB_EXE
 fi
-check_compile_fds_mpi_db  $FDS_DB_DIR        $FDS_DB_EXE
 
 if [ "$pid_fds_mpi" != "" ]; then
   wait $pid_fds_mpi
+  check_compile_fds_mpi     $FDS_DIR           $FDS_EXE
 fi
-check_compile_fds_mpi     $FDS_DIR           $FDS_EXE
 
 BUILDSOFTWARE_end=`GET_TIME`
 DIFF_BUILDSOFTWARE=`GET_DURATION $BUILDSOFTWARE_beg $BUILDSOFTWARE_end`
