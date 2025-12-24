@@ -626,7 +626,7 @@ compile_smv_utilities()
 
      echo 'Compiling smokezip:' >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
      ./make_smokezip.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1 &
-     pid_smokezip=$1
+     pid_smokezip=$!
      
 
    # smokediff:
@@ -2125,8 +2125,6 @@ echo "Building"
 pid_fds_mpi_db=
 pid_fds_mpi=
 if [ "$CACHE_DIR" == "" ]; then
-  touch              $FDS_DB_DIR/compiling
-  touch              $FDS_DIR/compiling
   compile_fds_mpi_db $FDS_DB_DIR        $FDS_DB_EXE &
   pid_fds_mpi_db=$!
   compile_fds_mpi    $FDS_DIR           $FDS_EXE    &
