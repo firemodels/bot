@@ -2175,9 +2175,16 @@ check_compile_smv_db
 wait $pid_smv
 check_compile_smv
 
+RUN_CASES=
 if [ "$pid_fds_mpi_db" != "" ]; then
   wait $pid_fds_mpi_db
   check_compile_fds_mpi_db  $FDS_DB_DIR        $FDS_DB_EXE
+
+#*** stage 3 - run debug cases
+  if [[ $stage_fdsdb_success ]] && [[ "$CACHE_DIR" == "" ]]; then
+    run_verification_cases_debug
+    RUN_CASES=1
+  fi
 fi
 
 if [ "$pid_fds_mpi" != "" ]; then
@@ -2197,15 +2204,7 @@ fi
 
 #----------------------------- Stage 3 run verification case     --------------------------------------
 
-#*** stage 3 - run debug cases
 RUN_CASES_beg=`GET_TIME`
-RUN_CASES=
-if [ $stage_fdsdb_success ]; then
-   if [ "$CACHE_DIR" == "" ]; then
-     run_verification_cases_debug
-     RUN_CASES=1
-   fi
-fi
 
 #*** stage 3 - run release cases
 if [[ $stage_ver_release_success ]]; then
