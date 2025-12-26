@@ -2153,8 +2153,8 @@ compile_smv_utilities  &
 pid_smv_utilities=$!
 
 #*** stage 2 - build smokeview debug
-compile_smv_db   &
-pid_smv_db=$!
+compile_smv_db   
+#pid_smv_db=$!
 
 #*** stage 2 - build smokeview release
 compile_smv  &
@@ -2169,7 +2169,7 @@ check_compile_cfast
 wait $pid_smv_utilities
 check_smv_utilities
 
-wait $pid_smv_db
+#wait $pid_smv_db
 check_compile_smv_db
 
 wait $pid_smv
