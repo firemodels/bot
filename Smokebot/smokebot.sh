@@ -1257,6 +1257,7 @@ CACHE_DIR=
 HAVEMAIL=`which mail |& grep -v 'no mail'`
 MPI_TYPE=impi
 INTEL2="-J"
+FDSEXEROOT=
 
 #*** save pid so -k option (kill smokebot) may be used lateer
 
@@ -1264,7 +1265,7 @@ echo $$ > $PID_FILE
 
 #*** parse command line options
 
-while getopts 'aAb:cCDm:Mq:QR:s:SuUw:W:x:X:y:Y:' OPTION
+while getopts 'aAb:cCDF:m:Mq:QR:s:SuUw:W:x:X:y:Y:' OPTION
 do
 case $OPTION in
   a)
@@ -1293,6 +1294,9 @@ case $OPTION in
    MPI_TYPE=ompi
    INTEL2=
    export OMP_NUM_THREADS=1
+   ;;
+  F)
+   FDSEXEROOT="$OPTARG"
    ;;
   m)
    mailTo="$OPTARG"
@@ -1361,6 +1365,18 @@ if [ "$CLONE_REPOS" != "" ]; then
 fi
 
 ABORT=
+if [ "$FDSEXEROOT" != "" ]; then
+  FDSRELEASE=$FDSEXEROOT/fds/Build/impi_intel_linux/fds_impi_intel_linux
+  FDSDEBUG=$FDSEXEROOT/fds/Build/impi_intel_linux_db/fds_impi_intel_linux_db
+  if [[ ! -x $FDSRELEASE ]]; then
+    echo "***error: $FDSRLEASE does not exist"
+    ABORT=1
+  fi
+  if [[ ! -x $FDSDEBUG ]]; then
+    echo "***error: $FDSDEBUG does not exist"
+    ABORT=1
+  fi
+fi
 if [ "$CACHE_DIR" != "" ]; then
   if [ ! -d $CACHE_DIR ]; then
     echo "***error: cache directory $CACHE_DIR does not exist"
@@ -1785,13 +1801,21 @@ echo "Building"
 pid_fds_mpi_db=
 pid_fds_mpi=
 if [ "$CACHE_DIR" == "" ]; then
-  cd $botrepo/Smokebot
-  ./make_fdsapps.sh debug   &
-  pid_fds_mpi_db=$!
+  if [ "$FDSDEBUG" != "" ]; then
+    cp $FDSDEBUG $fdsrepo/Build/impi_intel_linux_db/fds_impi_intel_linux_db
+  else
+    cd $botrepo/Smokebot
+    ./make_fdsapps.sh debug   &
+    pid_fds_mpi_db=$!
+  fi
 
-  cd $botrepo/Smokebot
-  ./make_fdsapps.sh release &
-  pid_fds_mpi=$!
+  if [ "$FDSRELEASE" != "" ]; then
+    cp $FDSRELEASE $fdsrepo/Build/impi_intel_linux/fds_impi_intel_linux
+  else
+    cd $botrepo/Smokebot
+    ./make_fdsapps.sh release &
+    pid_fds_mpi=$!
+  fi
 else
   echo "   debug fds(from cache)"
   echo "   release fds(from cache)"
@@ -1819,12 +1843,12 @@ RUN_CASES=
 if [ "$pid_fds_mpi_db" != "" ]; then
   wait $pid_fds_mpi_db
   check_compile_fds_mpi_db  $FDS_DB_DIR        $FDS_DB_EXE
+fi
 
 #*** stage 3 - run debug cases
-  if [[ $stage_fdsdb_success ]] && [[ "$CACHE_DIR" == "" ]]; then
-    run_verification_cases_debug
-    RUN_CASES=1
-  fi
+if [[ $stage_fdsdb_success ]] && [[ "$CACHE_DIR" == "" ]]; then
+  run_verification_cases_debug
+  RUN_CASES=1
 fi
 
 if [ "$pid_fds_mpi" != "" ]; then
