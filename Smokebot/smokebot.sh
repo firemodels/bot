@@ -404,25 +404,25 @@ check_compile_fds_mpi_db()
 {
   local FDSDIR=$1
   local FDSEXE=$2
-   # Check for errors in FDS debug compilation
-   cd $FDSDIR
-   if [ -e $FDSEXE ]; then
-      stage_fdsdb_success=true
-   else
-      echo "Errors from Stage 1b - Compile FDS MPI debug:"  >> $ERROR_LOG
-      cat $OUTPUT_DIR/compile_fds_db.log                    >> $ERROR_LOG
-      echo ""                                               >> $ERROR_LOG
-      THIS_FDS_FAILED=1
-      compile_errors=1
-   fi
+# Check for errors in FDS debug compilation
+  cd $FDSDIR
+  if [ -e $FDSEXE ]; then
+    stage_fdsdb_success=true
+  else
+    echo "Errors from Stage 1b - Compile FDS MPI debug:"  >> $ERROR_LOG
+    cat $OUTPUT_DIR/compile_fds_db.log                    >> $ERROR_LOG
+    echo ""                                               >> $ERROR_LOG
+    THIS_FDS_FAILED=1
+    compile_errors=1
+  fi
 
-   # Check for compiler warnings/remarks
-   if [ -e $OUTPUT_DIR/compile_fds_db.log ]; then
-   if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/compile_fds_db.log| grep -v mpiifort | grep -v mpiifx | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'` == "" ]]
+# Check for compiler warnings/remarks
+  if [ -e $OUTPUT_DIR/compile_fds_db.log ]; then
+    if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/compile_fds_db.log| grep -v mpiifort | grep -v mpiifx | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'` == "" ]]
    then
       # Continue along
       :
-   else
+    else
       echo "Stage 1b warnings:" >> $WARNING_LOG
       grep -A 5 -i -E 'warning|remark' $OUTPUT_DIR/compile_fds_db.log | grep -v mpiifort | grep -v mpiifx | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'>> $WARNING_LOG
       echo "" >> $WARNING_LOG
@@ -431,8 +431,8 @@ check_compile_fds_mpi_db()
         THIS_FDS_FAILED=1
       fi
       compile_errors=1
-   fi
-   fi
+    fi
+  fi
 }
 
 
@@ -1846,6 +1846,9 @@ if [ "$pid_fds_mpi_db" != "" ]; then
   wait $pid_fds_mpi_db
   check_compile_fds_mpi_db  $FDS_DB_DIR        $FDS_DB_EXE
 fi
+if [ "$FDSDEBUG" != "" ]; then
+  check_compile_fds_mpi_db  $FDS_DB_DIR        $FDS_DB_EXE
+fi
 
 #*** stage 3 - run debug cases
 if [[ $stage_fdsdb_success ]] && [[ "$CACHE_DIR" == "" ]]; then
@@ -1855,6 +1858,9 @@ fi
 
 if [ "$pid_fds_mpi" != "" ]; then
   wait $pid_fds_mpi
+  check_compile_fds_mpi     $FDS_DIR           $FDS_EXE
+fi
+if [ "$FDSRELEASE" != "" ]; then
   check_compile_fds_mpi     $FDS_DIR           $FDS_EXE
 fi
 
