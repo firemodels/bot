@@ -405,16 +405,17 @@ check_compile_fds_mpi_db()
   local FDSDIR=$1
   local FDSEXE=$2
 # Check for errors in FDS debug compilation
-  cd $FDSDIR
-  if [ -e $FDSEXE ]; then
-    stage_fdsdb_success=true
-  else
-    echo "Errors from Stage 1b - Compile FDS MPI debug:"  >> $ERROR_LOG
-    cat $OUTPUT_DIR/compile_fds_db.log                    >> $ERROR_LOG
-    echo ""                                               >> $ERROR_LOG
-    THIS_FDS_FAILED=1
-    compile_errors=1
-  fi
+   cd $FDSDIR
+   if [ -e $FDSEXE ]; then
+      stage_fdsdb_success=true
+      cp $FDSEXE $LATESTAPPS_DIR/fds_db
+   else
+      echo "Errors from Stage 1b - Compile FDS MPI debug:" >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage2_build_fds_debug               >> $ERROR_LOG
+      echo ""                                              >> $ERROR_LOG
+      THIS_FDS_FAILED=1
+      compile_errors=1
+   fi
 
 # Check for compiler warnings/remarks
   if [ -e $OUTPUT_DIR/compile_fds_db.log ]; then
@@ -528,6 +529,7 @@ check_compile_fds_mpi()
    if [ -e $FDSEXE ]
    then
       stage_ver_release_success=true
+      cp $FDSEXE $LATESTAPPS_DIR/fds
    else
       echo "Errors from Stage 1c$MPTYPE - Compile FDS MPI$MPYPE release:" >> $ERROR_LOG
       cat $OUTPUT_DIR/compile_fds.log                                     >> $ERROR_LOG
