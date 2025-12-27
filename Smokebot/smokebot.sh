@@ -2125,8 +2125,11 @@ echo "Building"
 pid_fds_mpi_db=
 pid_fds_mpi=
 if [ "$CACHE_DIR" == "" ]; then
+  cd $botrepo/Smokebot
   ./make_fdsapps.sh debug   &
   pid_fds_mpi_db=$!
+
+  cd $botrepo/Smokebot
   ./make_fdsapps.sh release &
   pid_fds_mpi=$!
 else
@@ -2148,6 +2151,7 @@ pid_cfast=$!
 
 #*** stage 2 - build smokeview ustilities
 
+cd $botrepo/Smokebot
 ./make_smvapps.sh &
 pid_smvapps=$!
 
@@ -2227,6 +2231,7 @@ echo "Run cases: $DIFF_RUN_CASES" >> $STAGE_STATUS
 ### Stage 4 generate images
 
 wait $pid_smvapps
+wait $pid_cfast
 MAKEPICTURES_beg=`GET_TIME`
 if [[ $stage_ver_release_success ]] ; then
   make_smv_pictures
