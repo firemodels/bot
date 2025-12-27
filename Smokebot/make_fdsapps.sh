@@ -9,6 +9,7 @@ fi
 
 BUILDFDS()
 {
+  echo cd $fdsrepo/Build/impi_intel_linux${type}
   cd $fdsrepo/Build/impi_intel_linux${type}
   ./make_fds.sh bot  >> $COMPILELOG 2>&1
 }
@@ -32,11 +33,11 @@ CURDIR=`pwd`
 
 outputdir=$CURDIR/output
 ERRORLOG=$CURDIR/output/fdserror.log
-COMPILELOG=#outputdir/compile_fds${type}.log
+COMPILELOG=$outputdir/compile_fds${type}.log
 
 echo > $COMPILELOG
 
-cd ../../..
+cd ../..
 REPOROOT=`pwd`
 
 cd $REPOROOT/fds

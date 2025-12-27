@@ -16,7 +16,7 @@ BUILD()
   prog=$1
 
   cd $smvrepo/Build/$prog/intel_linux
-  ./make_${prog}.sh bot >> $outputdir/compile_$prog.log 2>&1
+  ./make_${prog}.sh bot                    >> $outputdir/compile_$prog.log 2>&1
 }
 
 # -------------------------------------------------------------
@@ -30,7 +30,6 @@ CHECK_BUILD()
     echo "***error: The program ${prog}_linux failed to build"   >> $errorlog 2>&1
   else
     echo $smvrepo/Build/$prog/intel_linux/${prog}_linux built
-    cp $smvrepo/Build/$prog/intel_linux/${prog}_linux $CURDIR/apps/$prog
   fi
 }
 
@@ -43,14 +42,11 @@ errorlog=$CURDIR/output/smverror.log
 
 echo > $errorlog
 
-cd ../../..
+cd ../..
 REPOROOT=`pwd`
 
 cd $REPOROOT/smv
 smvrepo=`pwd`
-
-cd $REPOROOT/fds
-fdsrepo=`pwd`
 
 cd $REPOROOT/bot
 botrepo=`pwd`
