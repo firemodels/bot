@@ -201,7 +201,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'aAbB:cCDfFhHJkm:Mo:q:Qr:R:s:SuUvw:W:x:X:y:Y:' OPTION
+while getopts 'aAbB:cCDfF:hHJkm:Mo:q:Qr:R:s:SuUvw:W:x:X:y:Y:' OPTION
 do
 case $OPTION  in
   a)
