@@ -200,7 +200,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'aAB:bcCDfFhHJkm:Mo:q:Qr:R:s:STuUvw:W:x:X:y:Y:' OPTION
+while getopts 'aAbB:cCDfhHJkm:Mo:q:Qr:R:s:SuUvw:W:x:X:y:Y:' OPTION
 do
 case $OPTION  in
   a)
@@ -257,14 +257,14 @@ case $OPTION  in
   r)
    export GH_REPO="$OPTARG"
    ;;
+  R)
+   CLONE_REPOS="$OPTARG"
+   ;;
   s)
    CACHE_DIR="-s $OPTARG"
    ;;
   S)
    SANITIZE=-S
-   ;;
-  R)
-   CLONE_REPOS="$OPTARG"
    ;;
   u)
    UPDATEREPO=-u
