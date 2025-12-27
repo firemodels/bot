@@ -1369,10 +1369,12 @@ if [ "$FDSEXEROOT" != "" ]; then
   FDSRELEASE=$FDSEXEROOT/fds/Build/impi_intel_linux/fds_impi_intel_linux
   FDSDEBUG=$FDSEXEROOT/fds/Build/impi_intel_linux_db/fds_impi_intel_linux_db
   if [[ ! -x $FDSRELEASE ]]; then
+    FDSRELEASE=
     echo "***error: $FDSRLEASE does not exist"
     ABORT=1
   fi
   if [[ ! -x $FDSDEBUG ]]; then
+    FDSDEBUG=
     echo "***error: $FDSDEBUG does not exist"
     ABORT=1
   fi
@@ -1801,18 +1803,18 @@ echo "Building"
 pid_fds_mpi_db=
 pid_fds_mpi=
 if [ "$CACHE_DIR" == "" ]; then
+  cd $botrepo/Smokebot
   if [ "$FDSDEBUG" != "" ]; then
     cp $FDSDEBUG $fdsrepo/Build/impi_intel_linux_db/fds_impi_intel_linux_db
   else
-    cd $botrepo/Smokebot
     ./make_fdsapps.sh debug   &
     pid_fds_mpi_db=$!
   fi
 
+  cd $botrepo/Smokebot
   if [ "$FDSRELEASE" != "" ]; then
     cp $FDSRELEASE $fdsrepo/Build/impi_intel_linux/fds_impi_intel_linux
   else
-    cd $botrepo/Smokebot
     ./make_fdsapps.sh release &
     pid_fds_mpi=$!
   fi
