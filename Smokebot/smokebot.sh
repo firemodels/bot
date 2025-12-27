@@ -272,11 +272,11 @@ compile_cfast()
     cd $cfastrepo/Build/CFAST/${COMPILER}_${platform}
     rm -f cfast7_${platform}
     make --makefile ../makefile clean &> /dev/null
-    ./make_cfast.sh >> $OUTPUT_DIR/stage2_build_cfast 2>&1
+    ./make_cfast.sh >> $OUTPUT_DIR/compile_cfast.log 2>&1
 }
 
 #---------------------------------------------
-#                   check_compile_cfast_db
+#                   check_compile_cfast
 #---------------------------------------------
 
 check_compile_cfast()
@@ -289,7 +289,7 @@ check_compile_cfast()
    else
       echo "Errors from Stage 2 - build CFAST:" >> $ERROR_LOG
       echo "CFAST failed to compile"            >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage2_build_cfast        >> $ERROR_LOG
+      cat $OUTPUT_DIR/compile_cfast.log         >> $ERROR_LOG
       echo ""                                   >> $ERROR_LOG
       THIS_CFAST_FAILED=1
    fi
@@ -397,25 +397,6 @@ check_update_repo()
 }
 
 #---------------------------------------------
-#                   compile_fds_mpi_db
-#---------------------------------------------
-
-compile_fds_mpi_db()
-{
-  local FDSDIR=$1
-  local FDSEXE=$2
-  local MPTYPE=$3
-
-   # Clean and compile mpi FDS debug
-   echo "   debug fds $MPTYPE"
-   cd $FDSDIR
-   rm -f $FDSEXE
-   echo ""                     > $OUTPUT_DIR/stage2_build_fds_debug$MPTYPE
-   echo $FDSDIR               >> $OUTPUT_DIR/stage2_build_fds_debug$MPTYPE
-   $botrepo/Scripts/build_fds.sh $OUTPUT_DIR/stage2_build_fds_debug$MPTYPE $FDSEXE 
-}
-
-#---------------------------------------------
 #                   check_compile_fds_mpi_db
 #---------------------------------------------
 
@@ -423,28 +404,27 @@ check_compile_fds_mpi_db()
 {
   local FDSDIR=$1
   local FDSEXE=$2
-  local MPTYPE=$3
    # Check for errors in FDS debug compilation
    cd $FDSDIR
    if [ -e $FDSEXE ]; then
       stage_fdsdb_success=true
    else
-      echo "Errors from Stage 1b$MPTYPE - Compile FDS MPI$MPTYPE debug:"   >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage2_build_fds_debug$MPTYPE                        >> $ERROR_LOG
-      echo ""                                                              >> $ERROR_LOG
+      echo "Errors from Stage 1b - Compile FDS MPI debug:"  >> $ERROR_LOG
+      cat $OUTPUT_DIR/compile_fds_db.log                    >> $ERROR_LOG
+      echo ""                                               >> $ERROR_LOG
       THIS_FDS_FAILED=1
       compile_errors=1
    fi
 
    # Check for compiler warnings/remarks
-   if [ -e $OUTPUT_DIR/stage2_build_fds_debug ]; then
-   if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage2_build_fds_debug| grep -v mpiifort | grep -v mpiifx | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'` == "" ]]
+   if [ -e $OUTPUT_DIR/compile_fds_db.log ]; then
+   if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/compile_fds_db.log| grep -v mpiifort | grep -v mpiifx | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'` == "" ]]
    then
       # Continue along
       :
    else
       echo "Stage 1b warnings:" >> $WARNING_LOG
-      grep -A 5 -i -E 'warning|remark' $OUTPUT_DIR/stage2_build_fds_debug$MPTYPE | grep -v mpiifort | grep -v mpiifx | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'>> $WARNING_LOG
+      grep -A 5 -i -E 'warning|remark' $OUTPUT_DIR/compile_fds_db.log | grep -v mpiifort | grep -v mpiifx | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'feupdateenv is not implemented'>> $WARNING_LOG
       echo "" >> $WARNING_LOG
    # if the executable does not exist then an email has already been sent
       if [ ! -e $FDSEXE ] ; then
@@ -535,25 +515,6 @@ check_verification_cases_debug()
 }
 
 #---------------------------------------------
-#                   compile_fds_mpi
-#---------------------------------------------
-
-compile_fds_mpi()
-{
-  local FDSDIR=$1
-  local FDSEXE=$2
-  local MPTYPE=$3
-
-   # Clean and compile FDS
-   echo "   release fds $MPTYPE"
-   cd $FDSDIR
-   rm -f $FDSEXE
-   echo ""                     > $OUTPUT_DIR/stage2_build_fds_release$MPTYPE
-   echo $FDSDIR               >> $OUTPUT_DIR/stage2_build_fds_release$MPTYPE
-   $botrepo/Scripts/build_fds.sh $OUTPUT_DIR/stage2_build_fds_release$MPTYPE $FDSEXE 
-}
-
-#---------------------------------------------
 #                   check_compile_fds_mpi
 #---------------------------------------------
 
@@ -561,7 +522,6 @@ check_compile_fds_mpi()
 {
   local FDSDIR=$1
   local FDSEXE=$2
-  local MPTYPE=$3
 
    # Check for errors in FDS compilation
    cd $FDSDIR
@@ -570,151 +530,25 @@ check_compile_fds_mpi()
       stage_ver_release_success=true
    else
       echo "Errors from Stage 1c$MPTYPE - Compile FDS MPI$MPYPE release:" >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage2_build_fds_release$MPTYPE >> $ERROR_LOG
-      echo "" >> $ERROR_LOG
+      cat $OUTPUT_DIR/compile_fds.log                                     >> $ERROR_LOG
+      echo ""                                                             >> $ERROR_LOG
       compile_errors=1
    fi
 
    # Check for compiler warnings/remarks
    # 'performing multi-file optimizations' and 'generating object file' are part of a normal compile
-   if [ -e $OUTPUT_DIR/stage2_build_fds_release$MPTYPE ]; then
-   if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage2_build_fds_release$MPTYPE | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented'` == "" ]]
+   if [ -e $OUTPUT_DIR/compile_fds.log ]; then
+   if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/compile_fds.log | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented'` == "" ]]
    then
       # Continue along
       :
    else
       echo "Stage 1c warnings:" >> $WARNING_LOG
-      grep -A 5 -i -E 'warning|remark' $OUTPUT_DIR/stage2_build_fds_release$MPTYPE | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
+      grep -A 5 -i -E 'warning|remark' $OUTPUT_DIR/compile_fds.log | grep -v 'pointer not aligned at address' | grep -v Referenced | grep -v ipo | grep -v 'find atom' | grep -v 'performing multi-file optimizations' | grep -v 'generating object file'| grep -v 'feupdateenv is not implemented' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
       compile_errors=1
    fi
    fi
-}
-
-#---------------------------------------------
-#                   compile_smv_utilities
-#---------------------------------------------
-
-compile_smv_libraries()
-{
-   echo "" > $OUTPUT_DIR/stage2_build_smvlibs
-   if [ "$haveCC" == "1" ] ; then
-   # smokeview libraries
-     echo "   libraries"
-     cd $smvrepo/Build/LIBS/${COMPILER}_${platform}
-     echo 'Building Smokeview libraries:' >> $OUTPUT_DIR/stage2_build_smvlibs 2>&1
-     ./make_LIBS.sh >> $OUTPUT_DIR/stage2_build_smvlibs 2>&1
-   else
-     echo "Warning: smokeview libraries not built - C compiler not available" >> $OUTPUT_DIR/stage2_build_smvlibs 2>&1
-     compile_errors=1
-   fi
-}
-
-#---------------------------------------------
-#                   compile_smv_utilities
-#---------------------------------------------
-
-compile_smv_utilities()
-{
-   echo "" > $OUTPUT_DIR/stage2_build_smvutil
-   if [ "$haveCC" == "1" ] ; then
-
-   # smokezip:
-     echo "   smokezip"
-     cd $smvrepo/Build/smokezip/${COMPILER}_${platform}
-     rm -f *.o smokezip_${platform}
-
-     echo 'Compiling smokezip:' >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
-     ./make_smokezip.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1 &
-     pid_smokezip=$!
-     
-
-   # smokediff:
-     echo "   smokediff"
-     cd $smvrepo/Build/smokediff/${COMPILER}_${platform}
-     rm -f *.o smokediff_${platform}
-     echo 'Compiling smokediff:' >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
-     ./make_smokediff.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1 &
-     pid_smokediff=$!
-   
-   # fds2fed:
-     echo "   fds2fed"
-     cd $smvrepo/Build/fds2fed/${COMPILER}_${platform}
-     rm -f *.o fds2fed_${platform}
-     echo 'Compiling fds2fed:' >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
-     ./make_fds2fed.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1 &
-     pid_fds2fed=$!
-
-   # background
-     echo "   background"
-     cd $smvrepo/Build/background/${COMPILER}_${platform}
-     rm -f *.o background_${platform}
-     echo 'Compiling background:' >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
-     ./make_background.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1 &
-     pid_background=$!
-
-   # pnginfo
-     pid_pnginfo=
-     if [ -d $smvrepo/Build/pnginfo/${COMPILER}_${platform} ]; then
-       echo "   pnginfo"
-       cd $smvrepo/Build/pnginfo/${COMPILER}_${platform}
-       rm -f *.o pnginfo_${platform}
-       echo 'Compiling pnginfo:' >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
-       ./make_pnginfo.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1 &
-       pid_pnginfo=$!
-     fi
-
-  # wind2fds:
-     cd $smvrepo/Build/wind2fds/${COMPILER}_${platform}
-     rm -f *.o wind2fds_${platform}
-     echo 'Compiling wind2fds:' >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
-     ./make_wind2fds.sh >> $OUTPUT_DIR/stage2_build_smvutil 2>&1 &
-     pid_wind2fds=$!
-
-     wait $pid_smokezip
-     cd $smvrepo/Build/smokezip/${COMPILER}_${platform}
-     cp smokezip_${platform} $LATESTAPPS_DIR/smokezip
-
-     wait $pid_smokediff
-     cd $smvrepo/Build/smokediff/${COMPILER}_${platform}
-     cp smokediff_${platform} $LATESTAPPS_DIR/smokediff
-
-     wait $pid_fds2fed
-     cd $smvrepo/Build/fds2fed/${COMPILER}_${platform}
-     cp fds2fed_${platform} $LATESTAPPS_DIR/fds2fed
-
-     wait $pid_background
-     cd $smvrepo/Build/background/${COMPILER}_${platform}
-     cp background_${platform} $LATESTAPPS_DIR/backgroundaaaa
-
-     if [ "$pid_pnginfo" != "" ]; then
-       wait $pid_pnginfo
-       cd $smvrepo/Build/pnginfo/${COMPILER}_${platform}
-       cp pnginfo_${platform} $LATESTAPPS_DIR/pnginfo
-     fi
-
-     wait $pid_wind2fds
-     cd $smvrepo/Build/wind2fds/${COMPILER}_${platform}
-     cp wind2fds_${platform} $LATESTAPPS_DIR/wind2fds
-   else
-     echo "Warning: smokeview and utilities not built - C compiler not available" >> $OUTPUT_DIR/stage2_build_smvutil 2>&1
-     compile_errors=1
-   fi
-}
-
-#---------------------------------------------
-#                   is_file_installed
-#---------------------------------------------
-
-is_file_installed()
-{
-  local program=$1
-  
-  notfound=`$program -help |& tail -1 | grep "not found" | wc -l`
-  if [ "$notfound" == "1" ] ; then
-    stage2_build_smvutil_success="0"
-    echo "***error: $program not installed" >> $OUTPUT_DIR/stage2_build_smvutil
-  fi
 }
 
 #---------------------------------------------
@@ -765,81 +599,6 @@ check_common_files()
   fi
 }
 
-#---------------------------------------------
-#                   check_smv_utilities
-#---------------------------------------------
-
-check_smv_utilities()
-{
-   SMOKEZIP="$smvrepo/Build/smokezip/${COMPILER}_${platform}/smokezip_${platform}"
-   SMOKEDIFF="$smvrepo/Build/smokediff/${COMPILER}_${platform}/smokediff_${platform}"
-   FDS2FED="$smvrepo/Build/fds2fed/${COMPILER}_${platform}/fds2fed_${platform}"
-   WIND2FDS="$smvrepo/Build/wind2fds/${COMPILER}_${platform}/wind2fds_${platform}"
-   BACKGROUND="$smvrepo/Build/background/${COMPILER}_${platform}/background_${platform}"
-   PNGINFO="$smvrepo/Build/pnginfo/${COMPILER}_${platform}/pnginfo_${platform}"
-   PNGINFO_SUCCESS=1
-   if [[ -d $smvrepo/Build/pnginfo && ! -e $PNGINFO ]]; then
-     PNGINFO_SUCCESS=0
-   fi
-   if [ "$haveCC" == "1" ] ; then
-     # Check for errors in SMV utilities compilation
-     cd $smvrepo
-     if [ -e "$SMOKEZIP" ]          && \
-        [ -e "$SMOKEDIFF" ]         && \
-        [ -e "$WIND2FDS" ]          && \
-        [ -e "$BACKGROUND" ]        && \
-        [ $PNGINFO_SUCCESS == "1" ]
-     then
-        stage_utilities_success="1"
-     else
-        stage_utilities_success="0"
-        echo "Errors from Stage 2c - Compile SMV utilities:" >> $ERROR_LOG
-        if [ ! -e "$SMOKEZIP" ]; then
-          echo ""
-          echo "error: smokezip failed to compile"           >> $ERROR_LOG
-          echo "       $SMOKEZIP does not exist"             >> $ERROR_LOG
-        fi
-        if [ ! -e "$SMOKEDIFF" ]; then
-          echo ""
-          echo "error: smokediff failed to compile"          >> $ERROR_LOG
-          echo "       $SMOKEDIFF does not exist"            >> $ERROR_LOG
-        fi 
-        if [ ! -e "$FDS2FED" ]; then
-          echo ""
-          echo "error: fds2fed failed to compile"            >> $ERROR_LOG
-          echo "       $FDS2FED does not exist"            >> $ERROR_LOG
-        fi 
-        if [ ! -e "$WIND2FDS" ]; then
-          echo ""
-          echo "error: wind2fds failed to compile"           >> $ERROR_LOG
-          echo "       $WIND2FDS does not exist"             >> $ERROR_LOG
-        fi 
-        if [ ! -e "$BACKGROUND" ]; then
-          echo ""
-          echo "error: background failed to compile"         >> $ERROR_LOG
-          echo "       $BACKGROUND does not exist"           >> $ERROR_LOG
-        fi
-        cat $OUTPUT_DIR/stage2_build_smv_release             >> $ERROR_LOG
-        echo ""                                              >> $ERROR_LOG
-        compile_errors=1
-     fi
-   else
-     stage_utilities_success="1"
-     is_file_installed smokeview
-     is_file_installed smokezip
-     is_file_installed smokediff
-     is_file_installed fds2fed
-     is_file_installed wind2fds
-     is_file_installed background
-     if [ "$stage_utilities_success" == "0" ] ; then
-        echo "Errors from Stage 2c - Smokeview and utilities:" >> $ERROR_LOG
-        stage_utilities_success="1"
-        cat $OUTPUT_DIR/stage2_build_smv_release               >> $ERROR_LOG
-        echo ""                                                >> $ERROR_LOG
-        compile_errors=1
-     fi
-   fi
-}
 
 #---------------------------------------------
 #                   wait_verification_cases_end
@@ -936,105 +695,6 @@ check_verification_cases_release()
       grep 'Warning' -irI Visualization/* WUI/*      | grep -v 'SPEC' | grep -v 'Sum of' >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
-}
-
-#---------------------------------------------
-#                   compile_smv_db
-#---------------------------------------------
-
-compile_smv_db()
-{
-   if [ "$haveCC" == "1" ] ; then
-   # Clean and compile SMV debug
-     echo "   debug smokeview"
-     cd $smvrepo/Build/smokeview/${COMPILER}_${platform}
-     rm -f smokeview_${platform}_db
-     ./make_smokeview_db.sh $SANITIZE &> $OUTPUT_DIR/stage2_build_smv_debug
-   fi
-}
-
-#---------------------------------------------
-#                   check_compile_smv_db
-#---------------------------------------------
-
-check_compile_smv_db()
-{
-  if [ "$haveCC" == "1" ] ; then
-   # Check for errors in SMV debug compilation
-    cd $smvrepo/Build/smokeview/${COMPILER}_${platform}
-    if [ -e "smokeview_${platform}_db" ]
-    then
-       stage2_build_smv_debug_success=true
-    else
-      echo "Errors from Stage 2b - Compile SMV debug:" >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage2_build_smv_debug                          >> $ERROR_LOG
-      echo ""                                          >> $ERROR_LOG
-      compile_errors=1
-    fi
-
-   # Check for compiler warnings/remarks
-   # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-    if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage2_build_smv_debug | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]
-    then
-      # Continue along
-      :
-    else
-      echo "Stage 2b warnings:" >> $WARNING_LOG
-      grep -A 5 -i -E 'warning|remark' $OUTPUT_DIR/stage2_build_smv_debug | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
-      echo "" >> $WARNING_LOG
-      compile_errors=1
-    fi
-  fi
-}
-
-#---------------------------------------------
-#                   compile_smv
-#---------------------------------------------
-
-compile_smv()
-{
-   if [ "$haveCC" == "1" ] ; then
-   # Clean and compile SMV
-     echo "   release smokeview"
-     cd $smvrepo/Build/smokeview/${COMPILER}_${platform}
-     rm -f smokeview_${platform}
-     ./make_smokeview.sh $SANITIZE  &> $OUTPUT_DIR/stage2_build_smv_release
-   fi
-}
-
-#---------------------------------------------
-#                   check_compile_smv
-#---------------------------------------------
-
-check_compile_smv()
-{
-  if [ "$haveCC" == "1" ]; then
-   # Check for errors in SMV release compilation
-    cd $smvrepo/Build/smokeview/${COMPILER}_${platform}
-    if [ -e "smokeview_${platform}" ]; then
-      cp smokeview_${platform} $LATESTAPPS_DIR/smokeview
-      stage2_build_smv_release_smv_success=true
-    else
-      echo "Errors from Stage 2c - Compile SMV release:"           >> $ERROR_LOG
-      echo "The program smokeview_${platform} does not exist."     >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage2_build_smv_release                     >> $ERROR_LOG
-      echo ""                                                      >> $ERROR_LOG
-      compile_errors=1
-    fi
-
-   # Check for compiler warnings/remarks
-   # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-    if [[ `grep -i -E 'warning|remark' $OUTPUT_DIR/stage2_build_smv_release | grep -v 'feupdateenv is not implemented' | grep -v 'was built for newer' | grep -v 'lcilkrts linked'` == "" ]]
-    then
-      # Continue along
-      :
-    else
-      echo "Stage 2c warnings:" >> $WARNING_LOG
-      grep -A 5 -i -E 'warning|remark' $OUTPUT_DIR/stage2_build_smv_release | grep -v 'feupdateenv is not implemented' | grep -v 'was built for newer' | grep -v 'lcilkrts linked' >> $WARNING_LOG
-      echo "" >> $WARNING_LOG
-      compile_errors=1
-    fi
-  fi
 }
 
 #---------------------------------------------
@@ -2227,6 +1887,10 @@ echo "Run cases: $DIFF_RUN_CASES" >> $STAGE_STATUS
 ### Stage 4 generate images
 
 wait $pid_smvapps
+
+wait $pid_cfast
+check_compile_cfast
+
 MAKEPICTURES_beg=`GET_TIME`
 if [[ $stage_ver_release_success ]] ; then
   make_smv_pictures
