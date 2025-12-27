@@ -2125,9 +2125,9 @@ echo "Building"
 pid_fds_mpi_db=
 pid_fds_mpi=
 if [ "$CACHE_DIR" == "" ]; then
-  compile_fds_mpi_db $FDS_DB_DIR        $FDS_DB_EXE &
+  ./make_fdsapps.sh debug   &
   pid_fds_mpi_db=$!
-  compile_fds_mpi    $FDS_DIR           $FDS_EXE    &
+  ./make_fdsapps.sh release &
   pid_fds_mpi=$!
 else
   echo "   debug fds(from cache)"
@@ -2147,33 +2147,9 @@ pid_cfast=$!
 #----------------------------- Stage 2 build smokeview     --------------------------------------
 
 #*** stage 2 - build smokeview ustilities
-compile_smv_libraries
 
-compile_smv_utilities  &
-pid_smv_utilities=$!
-
-#*** stage 2 - build smokeview debug
-compile_smv_db   
-#pid_smv_db=$!
-
-#*** stage 2 - build smokeview release
-compile_smv  &
-pid_smv=$!
-
-#*** stage 2 - check common files
-check_common_files
-
-wait $pid_cfast
-check_compile_cfast
-
-wait $pid_smv_utilities
-check_smv_utilities
-
-#wait $pid_smv_db
-check_compile_smv_db
-
-wait $pid_smv
-check_compile_smv
+./make_smvapps.sh &
+pid_smvapps=$!
 
 RUN_CASES=
 if [ "$pid_fds_mpi_db" != "" ]; then
@@ -2250,6 +2226,7 @@ echo "Run cases: $DIFF_RUN_CASES" >> $STAGE_STATUS
 
 ### Stage 4 generate images
 
+wait $pid_smvapps
 MAKEPICTURES_beg=`GET_TIME`
 if [[ $stage_ver_release_success ]] ; then
   make_smv_pictures
