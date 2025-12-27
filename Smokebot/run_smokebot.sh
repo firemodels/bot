@@ -227,6 +227,7 @@ case $OPTION  in
    ;;
   f)
    FORCE=1
+   ;;
   F)
    FDSEXEROOT="$OPTARG"
    ;;
