@@ -435,6 +435,7 @@ check_compile_fds_mpi_db()
   if [ -x $FDSEXE ]
   then
      FDS_debug_success=true
+     cp $FDSEXE $LATESTAPPS_DIR/fds_db${MPTYPE}
   else
      echo "Errors from Stage 2b$MPTYPE - Compile FDS MPI$MPTYPE debug:"   >> $ERROR_LOG
      echo "The program $FDSEXE failed to build."                          >> $ERROR_LOG
