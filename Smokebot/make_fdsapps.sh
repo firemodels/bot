@@ -9,8 +9,9 @@ fi
 
 BUILDFDS()
 {
-  echo cd $fdsrepo/Build/impi_intel_linux${type}
   cd $fdsrepo/Build/impi_intel_linux${type}
+  echo cleaning `pwd`
+  git clean -dxf >& /dev/null
   ./make_fds.sh bot  >> $COMPILELOG 2>&1
 }
 
@@ -22,8 +23,7 @@ CHECK_BUILDFDS()
     echo "***error: The program fds_impi_intel_linux${type} failed to build"
     echo "***error: The program fds_impi_intel_linux failed to build"  >> $ERRORLOG 2>&1
   else
-    echo $fdsrepo/Build/impi_intel_linux/fds_impi_intel_linux built
-    cp $fdsrepo/Build/impi_intel_linux/fds_impi_intel_linux $CURDIR/apps/fds
+    echo $fdsrepo/Build/impi_intel_linux/fds_impi_intel_linux$type built
   fi
 }
 
@@ -49,11 +49,9 @@ botrepo=`pwd`
 cd $CURDIR
 
 # build fds apps
-echo building fds
-BUILDFDS                                                      &
+echo building fds$type
+BUILDFDS
 
 CHECK_BUILDFDS
-
-echo fds$type app builds complete
 
 cd $CURDIR
