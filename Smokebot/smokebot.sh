@@ -1842,6 +1842,10 @@ cd $botrepo/Smokebot
 pid_smvapps=$!
 
 RUN_CASES=
+
+wait $pid_cfast
+check_compile_cfast
+
 if [ "$pid_fds_mpi_db" != "" ]; then
   wait $pid_fds_mpi_db
   check_compile_fds_mpi_db  $FDS_DB_DIR        $FDS_DB_EXE
@@ -1923,9 +1927,6 @@ echo "Run cases: $DIFF_RUN_CASES" >> $STAGE_STATUS
 ### Stage 4 generate images
 
 wait $pid_smvapps
-
-wait $pid_cfast
-check_compile_cfast
 
 MAKEPICTURES_beg=`GET_TIME`
 if [[ $stage_ver_release_success ]] ; then
