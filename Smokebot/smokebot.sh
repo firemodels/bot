@@ -714,7 +714,7 @@ make_smv_pictures()
    if [ "$COMPILER" == "gnu" ]; then
      COMPOPT=-C
    fi
-   ./Make_SMV_Pictures.sh $RUNOPT $COMPOPT -q $SQUEUE -j SMV_ $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4_make_picts
+   ./Make_SMV_Pictures.sh $CPUS_PER_TASK $RUNOPT $COMPOPT -q $SQUEUE -j SMV_ $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4_make_picts
    grep -v FreeFontPath $OUTPUT_DIR/stage4_make_picts | grep -v libpng &> $OUTPUT_DIR/stage4_check_picts
 }
 
@@ -1260,6 +1260,7 @@ HAVEMAIL=`which mail |& grep -v 'no mail'`
 MPI_TYPE=impi
 INTEL2="-J"
 FDSEXEROOT=
+CPUS_PER_TASK=
 
 #*** save pid so -k option (kill smokebot) may be used lateer
 
@@ -1267,7 +1268,7 @@ echo $$ > $PID_FILE
 
 #*** parse command line options
 
-while getopts 'aAb:cCDF:m:Mq:QR:s:SuUw:W:x:X:y:Y:' OPTION
+while getopts 'aAb:cCDF:m:Mq:QR:s:ST:uUw:W:x:X:y:Y:' OPTION
 do
 case $OPTION in
   a)
@@ -1321,6 +1322,9 @@ case $OPTION in
    ;;
   S)
    SANITIZE=-S
+   ;;
+  T)
+   CPUS_PER_TASK="-T $OPTARG"
    ;;
   u)
    UPDATEREPO=1
