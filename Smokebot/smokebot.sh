@@ -1371,13 +1371,14 @@ if [ "$FDSEXEROOT" != "" ]; then
   FDSRELEASE=$FDSEXEROOT/fds/Build/impi_intel_linux/fds_impi_intel_linux
   FDSDEBUG=$FDSEXEROOT/fds/Build/impi_intel_linux_db/fds_impi_intel_linux_db
   if [[ ! -x $FDSRELEASE ]]; then
+    echo "***error: fds release $FDSRLEASE does not exist"
     FDSRELEASE=
-    echo "***error: $FDSRLEASE does not exist"
     ABORT=1
   fi
+  echo FDSDEBuG=$FDSDEBUG
   if [[ ! -x $FDSDEBUG ]]; then
+    echo "***error: fds debug $FDSDEBUG does not exist"
     FDSDEBUG=
-    echo "***error: $FDSDEBUG does not exist"
     ABORT=1
   fi
 fi
