@@ -180,6 +180,8 @@ WEB_DIR=
 USE_BOT_QFDS=
 GNU=
 CACHE_DIR=
+FDSEXEROOT=
+CPUS_PER_TASK=
 
 WEB_ROOT=/opt/www/html
 if [ ! -d $WEB_ROOT ]; then
@@ -200,7 +202,7 @@ fi
 
 #*** parse command line options
 
-while getopts 'aAB:bcCDfFhHJkm:Mo:q:Qr:R:s:STuUvw:W:x:X:y:Y:' OPTION
+while getopts 'aAbB:cCDfF:hHJkm:Mo:q:Qr:R:s:SuT:Uvw:W:x:X:y:Y:' OPTION
 do
 case $OPTION  in
   a)
@@ -226,6 +228,9 @@ case $OPTION  in
    ;;
   f)
    FORCE=1
+   ;;
+  F)
+   FDSEXEROOT="$OPTARG"
    ;;
   h)
    usage
@@ -257,14 +262,17 @@ case $OPTION  in
   r)
    export GH_REPO="$OPTARG"
    ;;
+  R)
+   CLONE_REPOS="$OPTARG"
+   ;;
   s)
    CACHE_DIR="-s $OPTARG"
    ;;
   S)
    SANITIZE=-S
    ;;
-  R)
-   CLONE_REPOS="$OPTARG"
+  T)
+   CPUS_PER_TASK="-T $OPTARG"
    ;;
   u)
    UPDATEREPO=-u
@@ -319,6 +327,10 @@ if [ "$WEB_DIR" == "" ]; then
 fi
 if [ "$WEB_ROOT" == "" ]; then
   WEB_DIR=
+fi
+
+if [ "$FDSEXEROOT" != "" ]; then
+  FDSEXEROOT="-F $FDSEXEROOT"
 fi
 
 # sync fds and smv repos with the the repos used in the last successful firebot run
@@ -425,7 +437,8 @@ BRANCH="-b $BRANCH"
 #*** run smokebot
 
 touch $smokebot_pid
-$ECHO ./$botscript $SIZE $BRANCH $SANITIZE $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $CLONE_REPOS $CACHE_DIR $FORCECLONE $GNU $RUNAUTO $CLEANREPO $WEB_DIR $WEB_ROOT $UPDATEREPO $QUEUE $SQUEUE $UPLOAD $EMAIL $MOVIE "$@"
+echo ./$botscript $SIZE $BRANCH $SANITIZE $FDSEXEROOT $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $CPUS_PER_TASK $CLONE_REPOS $CACHE_DIR $FORCECLONE $GNU $RUNAUTO $CLEANREPO $WEB_DIR $WEB_ROOT $UPDATEREPO $QUEUE $SQUEUE $UPLOAD $EMAIL $MOVIE "$@"
+$ECHO ./$botscript $SIZE $BRANCH $SANITIZE $FDSEXEROOT $FDS_REV $FDS_TAG $SMV_REV $SMV_TAG $CPuS_PER_TASK $CLONE_REPOS $CACHE_DIR $FORCECLONE $GNU $RUNAUTO $CLEANREPO $WEB_DIR $WEB_ROOT $UPDATEREPO $QUEUE $SQUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi
