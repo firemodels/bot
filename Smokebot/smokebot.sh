@@ -1021,6 +1021,7 @@ email_build_status()
   echo "OS: $platform2"                                     >> $TIME_LOG
   echo "repo: $repo"                                        >> $TIME_LOG
   echo "queue: $QUEUE"                                      >> $TIME_LOG
+  echo "cpus per task: $CPUS_PER_TASK_ARG"                  >> $TIME_LOG
   if [ "$ICC_VERSION" != "" ]; then
     echo "C/C++: $ICC_VERSION "                             >> $TIME_LOG
   fi
@@ -1260,7 +1261,7 @@ HAVEMAIL=`which mail |& grep -v 'no mail'`
 MPI_TYPE=impi
 INTEL2="-J"
 FDSEXEROOT=
-CPUS_PER_TASK=
+CPUS_PER_TASK_ARG=16
 
 #*** save pid so -k option (kill smokebot) may be used lateer
 
@@ -1324,7 +1325,7 @@ case $OPTION in
    SANITIZE=-S
    ;;
   T)
-   CPUS_PER_TASK="-T $OPTARG"
+   CPUS_PER_TASK_ARG="$OPTARG"
    ;;
   u)
    UPDATEREPO=1
@@ -1369,6 +1370,8 @@ if [ "$CLONE_REPOS" != "" ]; then
     fi
   fi
 fi
+
+CPUS_PER_TASK="-T $CPUS_PER_TASK_ARG"
 
 ABORT=
 if [ "$FDSEXEROOT" != "" ]; then
