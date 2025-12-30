@@ -71,27 +71,27 @@ cd $CURDIR
 
 # setup branches and tags
 cd $REPOROOT/fds
-git checkout -b release $BUNDLE_FDS_REVISION
+git checkout -b release $BUNDLE_FDS_HASH
 git tag -a $BUNDLE_FDS_TAG -m "tag: $BUNDLE_FDS_TAG"
 
 cd $REPOROOT/smv
-git checkout -b release $BUNDLE_SMV_REVISION
+git checkout -b release $BUNDLE_SMV_HASH
 git tag -a $BUNDLE_SMV_TAG -m "tag: $BUNDLE_SMV_TAG"
 
 cd $REPOROOT/cad
-git checkout -b release $BUNDLE_CAD_REVISION
+git checkout -b release $BUNDLE_CAD_HASH
 git tag -a $BUNDLE_CAD_TAG -m "tag: $BUNDLE_CAD_TAG"
 
 cd $REPOROOT/exp
-git checkout -b release $BUNDLE_EXP_REVISION
+git checkout -b release $BUNDLE_EXP_HASH
 git tag -a $BUNDLE_EXP_TAG -m "tag: $BUNDLE_EXP_TAG"
 
 cd $REPOROOT/fig
-git checkout -b release $BUNDLE_FIG_REVISION
+git checkout -b release $BUNDLE_FIG_HASH
 git tag -a $BUNDLE_FIG_TAG -m "tag: $BUNDLE_FIG_TAG"
 
 cd $REPOROOT/out
-git checkout -b release $BUNDLE_OUT_REVISION
+git checkout -b release $BUNDLE_OUT_HASH
 git tag -a $BUNDLE_OUT_TAG -m "tag: $BUNDLE_OUT_TAG"
 
 # build manuals

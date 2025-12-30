@@ -9,11 +9,11 @@ CONFIGTAG=$3
 cd $gitroot/$repo
 REPO=$(echo "$repo" | awk '{print toupper($0)}')
 REPOVERSION=`git describe --dirty --long`
-REVISION=`git rev-parse --short HEAD`
+HASH=`git rev-parse --short HEAD`
 
 echo "repo   $REPOVERSION"
 echo "config $CONFIGTAG"
-echo "repo   $REVISION"
+echo "repo   $HASH"
 echo "config $CONFIGVERSION"
 echo ""
 }
