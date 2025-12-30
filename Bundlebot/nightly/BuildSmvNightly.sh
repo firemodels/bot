@@ -23,7 +23,6 @@ exit 0
 
 UPLOADBUNDLE=
 export BUILDING_release=
-BUILDTYPE2=test
 
 while getopts 'hUR' OPTION
 do
@@ -33,7 +32,6 @@ case $OPTION  in
    ;;
   R)
    export BUILDING_release=1
-   BUILDTYPE2=release
    ;;
   U)
    UPLOADBUNDLE=1
@@ -113,7 +111,7 @@ cd $reporoot/bot/Bundlebot/nightly
 
 echo "*** bundling smokeview"
 
-$reporoot/bot/Bundlebot/nightly/assemble_smvbundle.sh $BUILDTYPE2 $smv_revision $basereporoot >& $outdir/stage6_bundle
+$reporoot/bot/Bundlebot/nightly/assemble_smvbundle.sh $smv_revision $basereporoot >& $outdir/stage6_bundle
 
 uploaddir=.bundle/uploads
 if [ -e $HOME/$uploaddir/${smv_revision}_${platform2}.sh ]; then

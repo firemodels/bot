@@ -1,21 +1,12 @@
 #!/bin/bash
 FDSEDITION=FDS6
 
-edition=$1
-revision=$2
-GITROOT=~/$3
+revision=$1
+GITROOT=~/$2
 
 smvbin=smvbin
 
 errlog=/tmp/smv_errlog.$$
-
-TEST=
-RELEASE=
-if [ "$edition" == "test" ]; then
-  TEST=_test
-else
-  RELEASE=
-fi
 
 platform="linux"
 platform2="LINUX"
@@ -77,7 +68,7 @@ WIND2FDSDIR=$GITROOT/smv/Build/wind2fds/${COMPILER}_${platform}
 FLUSHFILEDIR=$GITROOT/smv/Build/flush/${COMPILER}_${platform}
 FORBUNDLE=$GITROOT/smv/Build/for_bundle
 UTILSCRIPTDIR=$GITROOT/smv/Utilities/Scripts
-PLATFORMDIR=$RELEASE$revision\_${platform3}
+PLATFORMDIR=$revision\_${platform3}
 MAKEINSTALLER=$GITROOT/bot/Bundlebot/nightly/make_smv_installer.sh
 uploads=$HOME/.bundle/uploads
 uploadscp=.bundle/uploads
@@ -116,9 +107,9 @@ CP $FORBUNDLE       .smokeview_bin    $PLATFORMDIR/$smvbin .smokeview_bin
 
 CP  $BACKGROUNDDIR background_${platform} $PLATFORMDIR/$smvbin background
 if [ "$platform" == "osx" ]; then
-  CP  $SMVDIR       smokeview_${platform}${TEST}       $PLATFORMDIR/$smvbin smokeview
+  CP  $SMVDIR       smokeview_${platform}       $PLATFORMDIR/$smvbin smokeview
 else
-  CP  $SMVDIR        smokeview_${platform}${TEST}      $PLATFORMDIR/$smvbin smokeview
+  CP  $SMVDIR        smokeview_${platform}      $PLATFORMDIR/$smvbin smokeview
 fi
 CP  $SMDDIR        smokediff_${platform}         $PLATFORMDIR/$smvbin smokediff
 CP  $PNGINFODIR    pnginfo_${platform}           $PLATFORMDIR/$smvbin pnginfo

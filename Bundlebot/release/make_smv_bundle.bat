@@ -2,7 +2,6 @@
 setlocal
 :: release info
 set versionbase=%1
-set test=%2
 set zipbase=%versionbase%_win
 set SMVEDITION=SMV6
 
@@ -48,7 +47,7 @@ IF EXIST %smvdir% rmdir /S /Q %smvdir%
 mkdir %smvdir%
 
 CALL :COPY  %reporoot%\smv\Build\set_path\intel_win\set_path_win.exe "%smvdir%\set_path.exe"
-CALL :COPY  %smvbuild%\smokeview_win%test%.exe                           %smvdir%\smokeview.exe
+CALL :COPY  %smvbuild%\smokeview_win.exe                           %smvdir%\smokeview.exe
 CALL :COPY  %smvscripts%\jp2conv.bat                                  %smvdir%\jp2conv.bat
 
 ::echo copying .po files
