@@ -18,6 +18,6 @@ call BuildNightly -R release %UPLOADBUNDLE%
 cd %CURDIR%
 
 if "X%UPLOADBUNDLE%" == "X" goto :EOF
-set "TITLE=Bundle Test - %BUNDLE_FDS_TAG%/%BUNDLE_FDS_REVISION% - %BUNDLE_SMV_TAG%/%BUNDLE_SMV_REVISION%"
+set "TITLE=Bundle Test - %BUNDLE_FDS_TAG%/%BUNDLE_FDS_HASH% - %BUNDLE_SMV_TAG%/%BUNDLE_SMV_HASH%"
 gh release edit FDS_TEST -t %$TITLE% -R github.com/%username%/test_bundles
 :EOF
