@@ -17,7 +17,6 @@ bot_repo = repo_root + "bot\\"
 smv_repo = repo_root + "smv\\"
 webscript_dir  = bot_repo + "Bundlebot\\webscripts\\"
 
-versions   = ["", "test", "release"]
 platforms  = ["", "Windows", "Linux", "OSX"]
 apps       = ["", "FDS", "Smokeview" ]
 guides     = ["", "User", "Verification", "Validation", "Technical"]
@@ -56,17 +55,17 @@ def build_smv_test_san_deb():      os.system("start " + webscript_dir + "webBUIL
 def build_smv_test_san_full():     os.system("start " + webscript_dir + "webBUILDsmvsanitize "         + platforms[platform.get()] + " full") 
 def build_smv_test_san_inc():      os.system("start " + webscript_dir + "webBUILDsmvsanitize "         + platforms[platform.get()] + " inc")
 
-def build_smz():                   os.system("start " + webscript_dir + "webBUILDsmz  "     + platforms[platform.get()] + " " + versions[version.get()] )
+def build_smz():                   os.system("start " + webscript_dir + "webBUILDsmz  "     + platforms[platform.get()] )
 
 def build_lib():               os.system("start " + webscript_dir + "webBUILDlibs "     + platforms[platform.get()])
 def build_util():              os.system("start " + webscript_dir + "webBUILDallprog "  + platforms[platform.get()])
-def build_smv():               os.system("start " + webscript_dir + "webBUILDsmv  "     + platforms[platform.get()]  + " " + versions[version.get()] )
+def build_smv():               os.system("start " + webscript_dir + "webBUILDsmv  "     + platforms[platform.get()]  )
 
-def bundle_smv():          os.system("start " + webscript_dir + "webPACKAGEsmv "        + platforms[platform.get()] + " " + versions[version.get()] )
-def install_smv():         os.system("start " + webscript_dir + "webINSTALLsmv "        + platforms[platform.get()]                  + " " + versions[version.get()] )
+def bundle_smv():          os.system("start " + webscript_dir + "webPACKAGEsmv "        + platforms[platform.get()] )
+def install_smv():         os.system("start " + webscript_dir + "webINSTALLsmv "        + platforms[platform.get()]                  )
 def upload_bundle():       os.system("start " + webscript_dir + "webUPLOADallsmv "      + platforms[platform.get()])
 
-def bundleinstall_smv():       os.system("start " + webscript_dir + "webPACKAGEINSTALLsmv " + platforms[platform.get()]  + " " + versions[version.get()] )
+def bundleinstall_smv():       os.system("start " + webscript_dir + "webPACKAGEINSTALLsmv " + platforms[platform.get()]  )
 
 def download_figures():            os.system("start " + webscript_dir + "webGETfigs "       + apps[app.get()]                 + " " + guides[guide.get()] )
 def view_summary():                os.system("start " + webscript_dir + "webVIEWsummary "   + apps[app.get()] )
