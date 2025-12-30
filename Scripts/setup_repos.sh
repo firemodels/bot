@@ -319,33 +319,33 @@ do
   if [ "$CONFIG_REPOS" != "" ]; then
     if [ "$repo" == "cad" ]; then
       TAG=$BUNDLE_CAD_TAG
-      REVISION=$BUNDLE_CAD_REVISION
+      HASH=$BUNDLE_CAD_HASH
     fi
     if [ "$repo" == "exp" ]; then
       TAG=$BUNDLE_EXP_TAG
-      REVISION=$BUNDLE_EXP_REVISION
+      HASH=$BUNDLE_EXP_HASH
     fi
     if [ "$repo" == "fds" ]; then
       TAG=$BUNDLE_FDS_TAG
-      REVISION=$BUNDLE_FDS_REVISION
+      HASH=$BUNDLE_FDS_HASH
     fi
     if [ "$repo" == "fig" ]; then
       TAG=$BUNDLE_FIG_TAG
-      REVISION=$BUNDLE_FIG_REVISION
+      HASH=$BUNDLE_FIG_HASH
     fi
     if [ "$repo" == "out" ]; then
       TAG=$BUNDLE_OUT_TAG
-      REVISION=$BUNDLE_OUT_REVISION
+      HASH=$BUNDLE_OUT_HASH
     fi
     if [ "$repo" == "smv" ]; then
       TAG=$BUNDLE_SMV_TAG
-      REVISION=$BUNDLE_SMV_REVISION
+      HASH=$BUNDLE_SMV_HASH
     fi
 #    REPO="${repo^^}"
-    if [[ "$TAG" != "" ]] && [[ "$REVISION" != "" ]] && [[ -d $repo_out ]]; then
+    if [[ "$TAG" != "" ]] && [[ "$HASH" != "" ]] && [[ -d $repo_out ]]; then
       cd $repo_out
-      echo git checkout -b release $REVISION
-      git checkout -b release $REVISION
+      echo git checkout -b release $HASH
+      git checkout -b release $HASH
       echo git tag -a $TAG -m "tag for $TAG"
       git tag -a $TAG -m "tag for $TAG"
     fi

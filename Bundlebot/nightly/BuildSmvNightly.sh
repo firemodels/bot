@@ -65,7 +65,7 @@ git merge origin/master
 if [ "$BUILDING_release" != "" ]; then
   ERROR=
   if [ "$BUNDLE_SMV_HASH" == "" ]; then
-    echo ***error: environment variable BUNDLE_SMV_REVISION not defined
+    echo ***error: environment variable BUNDLE_SMV_HASH not defined
     ERROR=1
   fi
   if [ "$BUNDLE_SMV_TAG" == "" ]; then

@@ -17,8 +17,8 @@ OS=$2
 
 if [ "$OS" == "" ]; then
   BOTVERSION=`git describe --dirty --long`
-  BOTREVISION=`git rev-parse --short HEAD`
-  export BOTVERSION BOTREVISION
+  BOTHASH=`git rev-parse --short HEAD`
+  export BOTVERSION BOTHASH
   ./MakeConfig.sh $base_tag BASH > config.sh
   cp config.sh history/config_${base_tag}.sh
   ./MakeConfig.sh $base_tag DOS  > config.bat
@@ -67,16 +67,16 @@ for repo in $repos
 do
 cd $gitroot/$repo
 REPOVERSION=`git describe --dirty --long`
-REVISION=`git rev-parse --short HEAD`
+HASH=`git rev-parse --short HEAD`
 if [ "$repo" == "bot" ]; then
   REPOVERSION=$BOTVERSION
-  REVISION=$BOTREVISION
+  HASH=$BOTHASH
 fi
 REPO=$(echo "$repo" | awk '{print toupper($0)}')
 TAG=$REPO-${base_tag}
 cat << EOF
 $COMMENT $REPOVERSION
-$EXPORT BUNDLE_${REPO}_HASH=$REVISION
+$EXPORT BUNDLE_${REPO}_HASH=$HASH
 $EXPORT BUNDLE_${REPO}_TAG=$TAG
 
 EOF
