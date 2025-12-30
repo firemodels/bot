@@ -276,6 +276,23 @@ compile_cfast()
 }
 
 #---------------------------------------------
+#                   check_compile_smvapps
+#---------------------------------------------
+
+check_compile_smvapps()
+{
+   if [[ `grep -i -E 'error' $OUTPUT_DIR/smverror.log | wc -l` -eq 0 ]]; then
+      # Continue along
+      :
+   else
+      echo "Stage 2 errors:"                        >> $ERROR_LOG
+      grep -i -E 'error' $OUTPUT_DIR/smverror.log ' >> $ERROR_LOG
+      echo ""                                       >> $ERROR_LOG
+   fi
+
+}
+
+#---------------------------------------------
 #                   check_compile_cfast
 #---------------------------------------------
 
@@ -1937,6 +1954,7 @@ echo "Run cases: $DIFF_RUN_CASES" >> $STAGE_STATUS
 ### Stage 4 generate images
 
 wait $pid_smvapps
+check_compile_smvapps
 
 MAKEPICTURES_beg=`GET_TIME`
 if [[ $stage_ver_release_success ]] ; then
