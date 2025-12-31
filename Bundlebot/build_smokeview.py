@@ -27,9 +27,6 @@ version.set(1)
 platform=IntVar()
 platform.set(1)
 
-buildtype=IntVar()
-buildtype.set(1)
-
 app=IntVar()
 app.set(2)
 
