@@ -24,10 +24,11 @@ call %envfile%
 
 set uploaddir=%userprofile%\.bundle\uploads
 set CURDIR=%CD%
+set gawk=%git_root%\bot\Scripts\bin\gawk.exe
 
 if NOT "%platform%" == "Windows" goto endif1
   set filelist=%TEMP%\smv_files_win.out
-  gh release view %SMOKEVIEW_TAG%  -R github.com/%GH_OWNER%/%GH_REPO% | grep SMV | grep -v FDS | grep -v CFAST | grep win | gawk "{print $2}" > %filelist%
+  gh release view %SMOKEVIEW_TAG%  -R github.com/%GH_OWNER%/%GH_REPO% | grep SMV | grep -v FDS | grep -v CFAST | grep win | %gawk% "{print $2}" > %filelist%
   for /F "tokens=*" %%A in (%filelist%) do gh release delete-asset %SMOKEVIEW_TAG% %%A  -R github.com/%GH_OWNER%/%GH_REPO% -y
   erase %filelist%
 
@@ -36,7 +37,7 @@ if NOT "%platform%" == "Windows" goto endif1
 
 if NOT "%platform%" == "Linux" goto endif2
   set outfile=%TEMP%\files_lnx.out
-  gh release view %SMOKEVIEW_TAG% -R github.com/%GH_OWNER%/%GH_REPO% | grep SMV | grep -v FDS | grep -v CFAST | grep lnx | gawk "{print $2}" > %outfile%
+  gh release view %SMOKEVIEW_TAG% -R github.com/%GH_OWNER%/%GH_REPO% | grep SMV | grep -v FDS | grep -v CFAST | grep lnx | %gawk% "{print $2}" > %outfile%
   for /F "tokens=*" %%A in (%outfile%) do gh release delete-asset %SMOKEVIEW_TAG% %%A -R github.com/%GH_OWNER%/%GH_REPO% -y
   erase %outfile%
 
@@ -45,7 +46,7 @@ if NOT "%platform%" == "Linux" goto endif2
 
 if NOT "%platform%" == "OSX" goto endif3
   set outfile=%TEMP%\files_osx.out
-  gh release view %SMOKEVIEW_TAG% -R github.com/%GH_OWNER%/%GH_REPO% | grep SMV | grep -v FDS | grep -v CFAST | grep osx | gawk "{print $2}" > %outfile%
+  gh release view %SMOKEVIEW_TAG% -R github.com/%GH_OWNER%/%GH_REPO% | grep SMV | grep -v FDS | grep -v CFAST | grep osx | %gawk% "{print $2}" > %outfile%
   for /F "tokens=*" %%A in (%outfile%) do gh release delete-asset %SMOKEVIEW_TAG% %%A -R github.com/%GH_OWNER%/%GH_REPO% -y
   erase %outfile%
 

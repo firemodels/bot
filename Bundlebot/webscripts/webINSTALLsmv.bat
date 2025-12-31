@@ -1,7 +1,6 @@
 @echo off
 set platform=%1
-set buildtype=%2
-set nopause=%3
+set nopause=%2
 
 ::  batch file to build test or release Smokeview on a Windows, OSX or Linux system
 
@@ -36,35 +35,19 @@ if "%buildtype%" == "release" (
 
 if "%platform%" == "Windows" (
   cd %userprofile%\.bundle\uploads
-  if "%buildtype%" == "test" (
-    echo Installer:  %smv_revision%_win.exe
-    call %smv_revision%_win.exe
-  )
-  if "%buildtype%" == "release" (
-    echo Installer: %smv_version%_win.exe
-    call %smv_version%_win.exe
-  )
+  echo Installer:  %smv_revision%_win.exe
+  call %smv_revision%_win.exe
   echo update complete
   goto eof
 )
 if "%platform%" == "Linux" (
-  if "%buildtype%" == "test" (
     plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/run_command2.sh $HOME/.bundle/uploads %smv_revision%_lnx.sh y
-  )
-  if "%buildtype%" == "release" (
-    plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/run_command2.sh $HOME/.bundle/uploads %smv_version%_lnx.sh y
-  )
   if "x%nopause%" == "xnopause" goto eof
   pause > Nul
   goto eof
 )
 if "%platform%" == "OSX" (
-  if "%buildtype%" == "test" (
     plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/run_command2.sh $HOME/.bundle/uploads %smv_revision%_osx.sh y
-  )
-  if "%buildtype%" == "release" (
-    plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/run_command2.sh $HOME/.bundle/uploads %smv_version%_osx.sh y
-  )
   if "x%nopause%" == "xnopause" goto eof
   pause > Nul
   goto eof
