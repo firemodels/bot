@@ -286,7 +286,7 @@ check_compile_smvapps()
       :
    else
       echo "Stage 2 errors:"                        >> $ERROR_LOG
-      grep -i -E 'error' $OUTPUT_DIR/smverror.log ' >> $ERROR_LOG
+      grep -i -E 'error' $OUTPUT_DIR/smverror.log   >> $ERROR_LOG
       echo ""                                       >> $ERROR_LOG
    fi
 
