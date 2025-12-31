@@ -144,6 +144,9 @@ Button(root, text="Uploads", width=button_width, command=clean_uploads).grid(row
 Button(root, text="smv",     width=button_width, command=clean_smv).grid(row=R,     column=3)
 
 R=R+1
+Label(root, text="").grid(column=0, row=R, columnspan=4)
+
+R=R+1
 Label(root, text="Build:").grid(column=0, row=R)
 Button(root, text="Revision",width=button_width, command=set_revision, bg='blue', fg='white').grid(row=R, column=1)
 Button(root, text="Libs",              width=button_width, command=build_lib).grid(row=R,  column=2)
