@@ -6,7 +6,7 @@ curdir=`pwd`
 cd ../..
 reporoot=`pwd`
 cd $reporoot/fds/Utilities/Python
-source ./setup_python_env.sh --batchmode || true
+source ./setup_python_env.sh --batchmode
 # this reverses set -e performed in setup_pythyon_env.sh 
 # which was causing firebot to crash if any function
 # or script called by firebot failed
