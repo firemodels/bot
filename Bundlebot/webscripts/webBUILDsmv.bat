@@ -59,7 +59,7 @@ if "%platform%" == "Windowsgnu" (
 
 if "%platform%" == "Windows" (
   cd %git_root%\smv\Build\smokeview\intel_win
-  call make_smokeview %wintype% %wininc% -glut -icon
+  call make_smokeview %wininc% -glut -icon
   goto eof
 )
 
