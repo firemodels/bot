@@ -125,7 +125,7 @@ echo.                1>> %compile_log% 2>&1
 echo *************** 1>> %compile_log% 2>&1
 echo ***building smokeview  1>> %compile_log% 2>&1
 cd %smvrepo%\Build\smokeview\intel_win
-call make_smokeview -release -bot 1>> %compile_log% 2>&1
+call make_smokeview -bot 1>> %compile_log% 2>&1
 exit /b /0
 
 :: -------------------------------------------------------------
