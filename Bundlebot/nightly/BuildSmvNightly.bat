@@ -70,7 +70,7 @@ for %%x in ( %progs% ) do (
 echo *** building smokeview
 cd %reporoot%\smv\Build\smokeview\intel_win
 title Building smokeview
-call make_smokeview -release -bot > %outdir%\stage5_smokeview 2>&1
+call make_smokeview -bot > %outdir%\stage5_smokeview 2>&1
 
 echo *** bundling smokeview
 Title Building Smokeview bundle
