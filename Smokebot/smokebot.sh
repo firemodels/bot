@@ -1122,7 +1122,7 @@ email_build_status()
      cat $KEYWORDS_NODOC_LOG >> $TIME_LOG
   fi
   if [  -e $KEYWORDS_NOSOURCE_LOG ]; then
-     echo ""                    >> $TIM_ELOG
+     echo ""                    >> $TIME_LOG
      cat $KEYWORDS_NOSOURCE_LOG >> $TIME_LOG
   fi
 
