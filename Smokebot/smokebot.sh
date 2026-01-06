@@ -1117,7 +1117,7 @@ email_build_status()
     fi
   fi
 
-  if [ -e KEYWORDS_NODOC_LOG ]; then
+  if [ -e $KEYWORDS_NODOC_LOG ]; then
      echo ""                 >> $TIMELOG
      cat $KEYWORDS_NODOC_LOG >> $TIMELOG
   fi
@@ -2028,7 +2028,7 @@ if [[ $stage_ver_release_success ]] ; then
 
    cd $botrepo/Smokebot
    ./compare_keywords.sh >& $OUTPUT_DIR/keyword_compare.log
-   if [ ! -e KEYWORDS_NODOC_LOG ]; then
+   if [ ! -e $KEYWORDS_NODOC_LOG ]; then
      echo undocumented script keywords: 0  > $KEYWORDS_NODOC_LOG
    fi
    if [ ! -e $KEYWORDS_NOSOURCE_LOG ]; then
