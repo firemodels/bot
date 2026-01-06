@@ -48,7 +48,7 @@ if [ "$KEYWORDTYPE" == "ini" ]; then
   grep MatchINI $source_dir/readsmv.c | awk -F'"' '{print $2}' | awk -F'"' '{print $1}' |  grep -v '^[[:space:]]*$' | sort -u > $KEYWORDS_C
 
   # generate list of script keywords found in SMV_User_Guide.tex
-  grep hitemini $tex_dir/*.tex | awk -F'{' '{print $2}' | awk -F '}' '{print $1}' | sort -u > $KEYWORDS_TEX
+  grep hitemini $tex_dir/*.tex | awk -F'{' '{print $2}' | awk -F '}' '{print $1}' | sed 's/\\_/_/g' | sort -u > $KEYWORDS_TEX
 fi
 
 #compute difference between tex and c /keywords
@@ -65,12 +65,15 @@ grep ^+ $KEYWORDS_DIFF | sed 's/^+//g' | grep -v \\+\\+                       >>
 if [ "$nlines_nodoc" == "0" ]; then
   echo "$nlines_nodoc undocumented $KEYWORDTYPE script keywords"
 else
+  echo
   echo "$nlines_nodoc undocumented $KEYWORDTYPE script keywords: $KEYWORDS_NODOC"
   cat $KEYWORDS_NODOC
 fi
 if [ "$nlines_nosource" == "0" ]; then
   echo "$nlines_nosource unimplemented $KEYWORDTYPE script keywords"
 else
+  echo
   echo "$nlines_nosource unimplemented $KEYWORDTYPE script keywords: $KEYWORDS_NOSOURCE"
+  cat $KEYWORDS_NOSOURCE
 fi
 
