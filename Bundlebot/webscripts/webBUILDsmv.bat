@@ -26,7 +26,6 @@ Title Building %buildtype% Smokeview for %platform%
 
 %git_drive%
 
-set wintype=
 set type=
 set wininc=
 set inc=
@@ -34,26 +33,22 @@ set inc=
 :: ----------- windows -----------------
 
 if "%buildtype%" == "test" (
-   set wintype=-test
    set type=-T
 )
 if "%buildtype%" == "testinc" (
-   set wintype=-test
    set wininc=-inc
    set type=-T
    set inc=-i
 )
 if "%buildtype%" == "release" (
-   set wintype=-release
    set type=-r
 )
 if "%buildtype%" == "debug" (
-   set wintype=-debug
    set type=
 )
 if "%platform%" == "Windowsgnu" (
   cd %git_root%\smv\Build\smokeview\gnu_win
-  call make_smokeview -test -profile
+  call make_smokeview -profile
   goto eof
 )
 
