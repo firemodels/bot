@@ -1,4 +1,8 @@
 #!/bin/bash
+KEYWORDTYPE=$1
+if [[ "$KEYWORDTYPE" != "ini" ]] && [[ "$KEYWORDTYPE" != "smv" ]]; then
+  KEYWORDTYPE="ssf"
+fi
 
 if [ ! -e .smv_git ]; then
   echo "***error: the script $0 needs to run in the bot/Firebot directory"
@@ -7,9 +11,6 @@ if [ ! -e .smv_git ]; then
 fi
 
 OUTPUT=output
-KEYWORDTYPE=ssf
-#KEYWORDTYPE=ini
-#KEYWORDTYPE=smv
 NAME_PREFIX=${KEYWORDTYPE}_
 
 KEYWORDS_C=$OUTPUT/${NAME_PREFIX}keywords_c.txt
