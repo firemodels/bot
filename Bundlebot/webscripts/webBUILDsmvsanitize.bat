@@ -26,13 +26,10 @@ Title Building test Smokeview for %platform%
 %git_drive%
 
 if "%platform%" == "Windows" (
-  cd %git_root%\smv\Build\smokeview\intel_win
-  if "%option%" == "full " (
-    call make_smokeview_san -test -glut
-  )
-  if "%option%" == "inc " (
-    call make_smokeview_san -test -glut -inc
-  )
+  cd %git_root%\smv\Build\smokeview\clang_win
+  call make_smokeview_db
+  if exist smokeview_win.exe copy smokeview_win.exe ..\intel_win
+  if not exist smokeview_win.exe echo smokeview_win.exe failed to build
   goto eof
 )
 
