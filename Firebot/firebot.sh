@@ -2382,7 +2382,10 @@ fi
 # run debug and release cases in two different directories
 cd $fdsrepo
 VERIFICATION_DEBUG=Verification_DB
-cp -r Verification $VERIFICATION_DEBUG
+#cp -r Verification $VERIFICATION_DEBUG
+rsync -av   --include='*/'   --include='*.fds'   --include='*.ini'   --include='*.ssf'   --exclude='*'   Verification/ $VERIFICATION_DEBUG
+cp Verification/*.sh $VERIFICATION_DEBUG/.
+cp Verification/scripts/* $VERIFICATION_DEBUG/scripts/.
 
 #*** check fds and smv repos for text files with CRLF line endings
 #    don't check lines if not cloning and not cleaning repo - avoid false positives
