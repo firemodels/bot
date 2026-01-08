@@ -21,7 +21,7 @@ for %%x in ( %progs% ) do (
   if NOT exist %%x_win.exe echo ***error: %%x_win.exe does not exist::
 )
 cd %smvrepo%\Build\smokeview\intel_win 
-call make_smokeview -test -bot > Nul 2>&1
-if NOT exist smokeview_win_test.exe echo ***error: smokeview_win_test.exe does not exist
+call make_smokeview -bot > Nul 2>&1
+if NOT exist smokeview_win.exe echo ***error: smokeview_win.exe does not exist
 
 cd %CURDIR%

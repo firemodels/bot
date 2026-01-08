@@ -497,7 +497,7 @@ echo             debug
 
 cd %smvrepo%\Build\smokeview\intel_win
 erase *.obj *.mod *.exe smokeview_win_db.exe 1> %OUTDIR%\stage2a.txt 2>&1
-call make_smokeview_db -release bot 1>> %OUTDIR%\stage2a.txt 2>&1
+call make_smokeview_db bot 1>> %OUTDIR%\stage2a.txt 2>&1
 
 call :does_file_exist smokeview_win_db.exe %OUTDIR%\stage2a.txt|| exit /b 1
 call :find_smokeview_warnings "warning" %OUTDIR%\stage2a.txt "Stage 2a"
@@ -506,7 +506,7 @@ echo             release
 
 cd %smvrepo%\Build\smokeview\intel_win
 erase *.obj *.mod smokeview_win.exe 1> %OUTDIR%\stage2b.txt 2>&1
-call make_smokeview -release bot 1>> %OUTDIR%\stage2b.txt 2>&1
+call make_smokeview bot 1>> %OUTDIR%\stage2b.txt 2>&1
 set SMOKEVIEW=%smvrepo%\Build\intel_win\smokeview_win.exe
 
 call :does_file_exist smokeview_win.exe %OUTDIR%\stage2b.txt|| exit /b 1
