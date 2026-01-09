@@ -142,11 +142,12 @@ IS_PROGRAM_INSTALLED()
 {
   program=$1
   notfound=`$program -help 2>&1 | tail -1 | grep "not found" | wc -l`
-  if [ "$notfound" == "1" ] ; then
-    echo "***warning: $program not installed"
-    return 0
+  if [ $notfound -eq 0 ] ; then
+    echo 1
+  else
+    echo 0
   fi
-  return 1
+  exit
 }
 
 # -------------------- CPPUB -------------------
@@ -515,7 +516,8 @@ $wui_cases
 $smv_cases
 rm -rf $OUTDIR/Immersed_Boundary_Method
 
-if [ `IS_PROGRAM_INSTALLED clamscan` -eq 1 ]; then
+clam_status=`IS_PROGRAM_INSTALLED clamscan`
+if [ $clam_status -eq 1 ]; then
   echo ""
   echo "--- scanning archive for viruses/malware ---"
   echo "" 
@@ -528,7 +530,8 @@ if [ `IS_PROGRAM_INSTALLED clamscan` -eq 1 ]; then
     echo "***error: $ninfected files found with a virus and/or malware in $UPLOAD_DIR/$bundlebase"
   fi
 else
-  echo ***warning: bundle willl not be scanned for viruses or malware
+  echo ***warning: clamscan not found
+  echo ***         bundle will not be scanned for viruses or malware
 fi
 
 echo ""
