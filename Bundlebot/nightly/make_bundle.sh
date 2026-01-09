@@ -526,7 +526,7 @@ if [ $clam_status -eq 1 ]; then
   if [ "$ninfected" == "" ]; then
     ninfected=0
   fi
-  if [ "$ninfected == "0" ]; then
+  if [ "$ninfected" == "0" ]; then
     echo "no viruses found"
   else
     returncode=1
