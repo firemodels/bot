@@ -6,6 +6,7 @@ INTEL_COMP_VERSION=$4
 UPLOAD_DIR_ARG=$5
 NIGHTLY=$6
 
+returncode=0
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 if [ "$NIGHTLY" == "null" ]; then
@@ -33,6 +34,7 @@ fi
 
 INSTALLDIR=FDS/FDS6
 errlog=$SCRIPTDIR/output/errlog
+scanlog=$SCRIPTDIR/output/scanlog
 
 # determine directory repos reside under
 
@@ -132,6 +134,19 @@ UNTAR ()
       fi
     fi
   fi
+}
+
+# -------------------- is_file_installed -------------------
+
+IS_PROGRAM_INSTALLED()
+{
+  program=$1
+  notfound=`$program -help 2>&1 | tail -1 | grep "not found" | wc -l`
+  if [ "$notfound" == "1" ] ; then
+    echo "***warning: $program not installed"
+    return 0
+  fi
+  return 1
 }
 
 # -------------------- CPPUB -------------------
@@ -500,7 +515,21 @@ $wui_cases
 $smv_cases
 rm -rf $OUTDIR/Immersed_Boundary_Method
 
-cd $curdir
+if [ `IS_PROGRAM_INSTALLED clamscan` -eq 1 ]; then
+  echo ""
+  echo "--- scanning archive for viruses/malware ---"
+  echo "" 
+  clamscan -r $UPLOAD_DIR/$bundlebase > $scanlog 2>&1
+  ninfected=`grep Infected $scanlog | awk -F: '{print $2}'`
+  if [ $ninfected -neq 0 ]; then
+    returncode=1
+    cat $scanlog
+    echo
+    echo "***error: $ninfected files found with a virus and/or malware in $UPLOAD_DIR/$bundlebase"
+  fi
+else
+  echo ***warning: bundle willl not be scanned for viruses or malware
+fi
 
 echo ""
 echo "--- building archive ---"
@@ -537,3 +566,4 @@ if [ -e $errlog ]; then
 fi
 echo installer located at: $bundlepath
 cp $MANIFEST $bundlepathdir/${bundlebase}_manifest.html
+exit $returncode
