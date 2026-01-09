@@ -16,7 +16,7 @@ set smvversion=%SMVEDITION%
 
 set scriptdir=%~dp0
 set curdir=%CD%
-set logdir=%scriptdir%\output
+set logdir=%curdir%\output
 cd %scriptdir%\..\..\..
 set repo_root=%CD%
 cd %scriptdir%
@@ -332,18 +332,20 @@ echo.
 set have_virus=0
 call :IS_FILE_INSTALLED clamscan
 if %ERRORLEVEL% == 1 goto elsescan
-  set vscanlog=%logdir%\%basedir%_vscan.log
-  set nvscaninfected=%logdir%\%basedir%_vscan_ninfected.log
+  set vscanlog=%logdir%\%basename%_vscan.log
+  set nvscaninfected=%logdir%\%basename%_vscan_ninfected.log
+  echo scanning %basedir%
+  echo scan output in %vscanlog%
   clamscan -r %basedir% > %vscanlog% 2>&1
   grep Infected %vscanlog% | %gawk% -F":" "{print $2}" > %nvscaninfected%
   set have_virus=1
   set /p ninfected=<%nvscaninfected%
-  if x%ninfected% == x0 set have_virus=0
+  if %ninfected% == 0 set have_virus=0
   type %vscanlog%
   echo.
   if %have_virus% == 1 echo ***error: scan reported a virus in the bundle
   if %have_virus% == 1 set returncode=1
-  goto :endifscan
+  goto endifscan
 :elsescan
   echo ***virus scanner not found - bundle was not scanned for viruses/malware
 :endifscan
