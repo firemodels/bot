@@ -1,12 +1,19 @@
 @echo off
 set prog=%1
 
-call :is_file_installed %prog%
+call :IS_FILE_INSTALLED clamscan
+if %ERRORLEVEL% == 1 goto elsescan
+echo doing a scan
+goto :endifscan
+:elsescan
+echo not doing a scan
+:endifscan
+
 
 goto eof
 
 :: -------------------------------------------------------------
-:is_file_installed
+:IS_FILE_INSTALLED
 :: -------------------------------------------------------------
 
   set program=%1
@@ -14,9 +21,8 @@ goto eof
   type %temp%\file_exist.txt | find /i /c "not recognized" > %temp%\file_exist_count.txt
   set /p nothave=<%temp%\file_exist_count.txt
   if %nothave% == 1 (
-    echo ***Fatal error: %program% not present
+    echo ***Error: %program% not installed or not in path
     exit /b 1
   )
   exit /b 0
-
 :eof

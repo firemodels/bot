@@ -178,9 +178,14 @@ echo.
 
 cd %BUNDLESCRIPTDIR%
 call make_bundle bot %FDS_REVISION_BUNDLER% %SMV_REVISION_BUNDLER% %nightly%
+set HAVEVIRUS=%ERRORLEVEL%
 
 cd %BUNDLESCRIPTDIR%
 
+if %HAVEVIRUS% == 1 echo ***error: a virus was found in the bundle
+if %HAVEVIRUS% == 1 echo bundle was built but not uploaded
+if %HAVEVIRUS% == 1 goto skip_upload
+if %HAVEVIRUS% == 0 echo ***a virus was not found in the bundle ***
 if "x%upload_bundle%" == "x" goto skip_upload
   echo.
   echo ------------------------------------------------------
