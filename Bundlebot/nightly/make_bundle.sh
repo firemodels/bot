@@ -522,11 +522,14 @@ if [ $clam_status -eq 1 ]; then
   echo "--- scanning archive for viruses/malware ---"
   echo "" 
   clamscan -r $UPLOAD_DIR/$bundlebase > $scanlog 2>&1
-  ninfected=`grep Infected $scanlog | awk -F: '{print $2}'`
-  if [ $ninfected -neq 0 ]; then
+  ninfected=`grep 'Infected files' $scanlog | awk -F: '{print $2}'`
+  if [ "$ninfected" == "" ]; then
+    ninfected=0
+  fi
+  if [ "$ninfected == "0" ]; then
+    echo "no viruses found"
+  else
     returncode=1
-    cat $scanlog
-    echo
     echo "***error: $ninfected files found with a virus and/or malware in $UPLOAD_DIR/$bundlebase"
   fi
 else
