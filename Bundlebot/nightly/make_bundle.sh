@@ -526,8 +526,8 @@ if [ $clam_status -eq 1 ]; then
   if [ "$ninfected" == "" ]; then
     ninfected=0
   fi
-  if [ "$ninfected" == "0" ]; then
-    echo "no viruses found"
+  if [[ $ninfected -eq 0 ]]; then
+    echo "no viruses found in $UPLOAD_DIR/$bundlebase"
   else
     returncode=1
     echo "***error: $ninfected files found with a virus and/or malware in $UPLOAD_DIR/$bundlebase"
