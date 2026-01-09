@@ -16,10 +16,13 @@ set smvversion=%SMVEDITION%
 
 set scriptdir=%~dp0
 set curdir=%CD%
+set logdir=%curdir%\output
 cd %scriptdir%\..\..\..
 set repo_root=%CD%
 cd %scriptdir%
 set GITROOT=%repo_root%
+set returncode=0
+set gawk=%GITROOT%\bot\scripts\bin\gawk.exe
 
 :: setup .bundle and upload directories
 
@@ -141,7 +144,7 @@ set release_version=%FDSMAJORVERSION%_win
 set release_version=
 
 echo.
-echo --- filling distribution directory ---
+echo --- filling bundle directory ---
 echo.
 
 
@@ -325,7 +328,30 @@ CALL :COPY  "%fds_forbundle%\setup_fds_firewall.bat" "%out_bundle%\%fdsversion%\
 CALL :COPY  "%in_shortcut%\shortcut.exe"             "%out_bundle%\%fdsversion%\shortcut.exe"
 
 echo.
-echo --- compressing distribution ---
+
+set have_virus=0
+call :IS_FILE_INSTALLED clamscan
+if %ERRORLEVEL% == 1 goto elsescan
+  set vscanlog=%logdir%\%basename%_vscan.log
+  set nvscaninfected=%logdir%\%basename%_vscan_ninfected.log
+  echo scanning %basedir%
+  echo scan output in %vscanlog%
+  clamscan -r %basedir% > %vscanlog% 2>&1
+  grep Infected %vscanlog% | %gawk% -F":" "{print $2}" > %nvscaninfected%
+  set have_virus=1
+  set /p ninfected=<%nvscaninfected%
+  if %ninfected% == 0 set have_virus=0
+  type %vscanlog%
+  echo.
+  if %have_virus% == 1 echo ***error: scan reported a virus in the bundle
+  if %have_virus% == 1 set returncode=1
+  goto endifscan
+:elsescan
+  echo ***virus scanner not found - bundle was not scanned for viruses/malware
+:endifscan
+
+echo.
+echo --- compressing bundle ---
 
 cd %upload_dir%
 if exist %basename%.zip erase %basename%.zip
@@ -397,6 +423,20 @@ if NOT EXIST %prog% goto else_smv
   echo ^<br^>                     >> %MANIFEST%
 :endif_smv
 exit /b
+
+:: -------------------------------------------------------------
+:IS_FILE_INSTALLED
+:: -------------------------------------------------------------
+
+  set program=%1
+  %program% --help 1> %temp%\file_exist.txt 2>&1
+  type %temp%\file_exist.txt | find /i /c "not recognized" > %temp%\file_exist_count.txt
+  set /p nothave=<%temp%\file_exist_count.txt
+  if %nothave% == 1 (
+    echo ***Warning: %program% not installed or not in path
+    exit /b 1
+  )
+  exit /b 0
 
 ::------------------------------------------------
 :TOMANIFESTFDS
@@ -481,3 +521,4 @@ if "x%bot%" == "xbot" goto skip4
 exit /b
 
 :EOF
+exit /b %returncode%

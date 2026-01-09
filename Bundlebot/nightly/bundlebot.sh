@@ -242,8 +242,9 @@ if [ "$showparms" == "" ]; then
   echo ""
   echo -n "building installer"
   $ECHO ./make_bundle.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version $bundle_dir $BUNDLE_PREFIX > $OUTPUT_DIR/stage1
+  make_bundle_status=$?
   echo " - complete"
-  if [ "$UPLOADBUNDLE" == "1" ]; then
+  if [[ "$UPLOADBUNDLE" == "1" ]] && [[ $make_bundle_status -eq 0 ]]; then
     echo ""
     echo "uploading installer"
     
