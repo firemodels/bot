@@ -129,7 +129,8 @@ LOCK_FILE=$HOME/.bundle/make_bundle_lock
 if [ "$FORCE" == "" ]; then
   if [ -e $LOCK_FILE ]; then
     echo "***error: another instance of $0 is running."
-    echo "          If this is not the case re-run using the -f option."
+    echo "          If this is not the case, re-run after removing"
+    echo "          the lock file: $LOCKFILE"
     exit 1
   fi
 fi
