@@ -241,9 +241,10 @@ fi
 cd $SCRIPTDIR
 if [ "$showparms" == "" ]; then
   echo ""
-  echo -n "building installer"
+  echo -n  "***Building installer"
   $ECHO ./make_bundle.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version $bundle_dir $BUNDLE_PREFIX > $OUTPUT_DIR/stage1
   make_bundle_status=$?
+  echo " - complete"
   
   echo
   echo ***Virus scan summary
@@ -253,7 +254,6 @@ if [ "$showparms" == "" ]; then
     echo virus scanner not available, bundle was not scanned
   fi
 
-  echo " - complete"
   if [[ "$UPLOADBUNDLE" == "1" ]] && [[ $make_bundle_status -eq 0 ]]; then
     echo ""
     echo "uploading installer"
