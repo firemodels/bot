@@ -238,7 +238,7 @@ if [[ "$showparms" == "" ]] && [[ "$OVERWRITE" == "" ]]; then
 fi
 
 echo ***Virus scan summary
-if [ -d "$OUTPUT/scanlog ]; then
+if [ -d $OUTPUT/scanlog ]; then
   grep -v OK$ $OUTPUT/scanlog | grep -v SUMMARY
 else
   echo virus scanner not available, bundle was not scanned
