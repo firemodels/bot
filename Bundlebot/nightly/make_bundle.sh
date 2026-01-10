@@ -248,82 +248,6 @@ CPDIRFILES ()
   fi
 }
 
-# -------------------- TOMANIFESTSMV -------------------
-
-TOMANIFESTLIST ()
-{
-  local prog=$1
-  local desc=$2
-
-  echo "<p><hr><p>"                 >> $MANIFEST
-  if [ -e $prog ]; then
-    echo "$desc is present"         >> $MANIFEST
-  else
-    echo "$desc is absent<br>"      >> $MANIFEST
-    echo "$prog"                    >> $MANIFEST
-  fi
-  echo "<br>"                       >> $MANIFEST
-}
-
-# -------------------- TOMANIFESTSMV -------------------
-
-TOMANIFESTSMV ()
-{
-  local prog=$1
-  local desc=$2
-
-  echo "<p><hr><p>"                 >> $MANIFEST
-  if [ -e $prog ]; then
-    echo "<pre>"                    >> $MANIFEST
-    $prog -v                        >> $MANIFEST
-    echo "</pre>"                   >> $MANIFEST
-  else
-    echo "$desc is absent<br>"      >> $MANIFEST
-    echo "$prog"                    >> $MANIFEST
-  fi
-  echo "<br>"                       >> $MANIFEST
-}
-
-# -------------------- TOMANIFESTFDS -------------------
-
-TOMANIFESTFDS ()
-{
-  local prog=$1
-  local desc=$2
-
-  echo "<p><hr><p>"                 >> $MANIFEST
-  if [ -e $prog ]; then
-    echo "<pre>"                    >> $MANIFEST
-    echo "" | $prog                 >> $MANIFEST 2>&1
-    echo "</pre>"                   >> $MANIFEST
-  else
-    echo "$desc is absent<br>"      >> $MANIFEST
-    echo "$prog"                    >> $MANIFEST
-  fi
-  echo "<br>"                       >> $MANIFEST
-}
-
-# -------------------- TOMANIFESTMPI -------------------
-
-TOMANIFESTMPI ()
-{
-  local prog=$1
-  local desc=$2
-
-  echo "<p><hr><p>"                 >> $MANIFEST
-  if [ -e $prog ]; then
-    echo "<pre>"                    >> $MANIFEST
-    echo ""                         >> $MANIFEST
-    echo $desc                      >> $MANIFEST
-    $prog --version                  >> $MANIFEST 2>&1
-    echo "</pre>"                   >> $MANIFEST
-  else
-    echo "$desc is absent<br>"      >> $MANIFEST
-    echo "$prog"                    >> $MANIFEST
-  fi
-  echo "<br>"                       >> $MANIFEST
-}
-
 # -------------------- start of script -------------------
 
 # determine OS
@@ -375,25 +299,11 @@ mkdir -p $smvbindir
 mkdir $smvbindir/colorbars
 mkdir $smvbindir/textures
 
-#
-# initialize manifest file
-MANIFEST=$bundledir/Documentation/manifest.html
-BUNDLE_DATE=`date +"%b %d, %Y - %r"`
-cat << EOF > $MANIFEST
-<html>
-
-<head>
-<TITLE>Manifest - $bundlebase - $BUNDLE_DATE</TITLE>
-</HEAD>
-<BODY BGCOLOR="#FFFFFF" >
-<h2>Manifest - $bundlebase - $BUNDLE_DATE</h2>
-EOF
-
 echo ""
 echo "--- smv apps ---"
 echo ""
 
-# smokeview
+# smokeview apps
 
 CP $APPS_DIR background $smvbindir background
 CP $APPS_DIR smokeview  $smvbindir smokeview
@@ -403,20 +313,13 @@ CP $APPS_DIR fds2fed    $smvbindir fds2fed
 CP $APPS_DIR smokezip   $smvbindir smokezip
 CP $APPS_DIR wind2fds   $smvbindir wind2fds
 
-# qpdf --empty --pages FDS_User_Guide.pdf  3-3 -- out.pdf
-
-cat << EOF >> $MANIFEST
-</body>
-</html>
-EOF
-
 CURDIR=`pwd`
 
 CPDIR $colorbarsdir $smvbindir
 CP $smvscriptdir jp2conv.sh $smvbindir jp2conv.sh
 CPDIR $texturedir $smvbindir
 
-# FDS 
+# FDS apps
 
 echo ""
 echo "--- fds apps/scripts ---"
@@ -452,19 +355,6 @@ else
   UNTAR $openmpifile $fdsbindir openmpi
   MPIEXEC=$fdsbindir/openmpi/bin/mpiexec
 fi
-
-TOMANIFESTFDS  $fdsbindir/fds        fds
-TOMANIFESTMPI  $MPIEXEC              mpiexec
-TOMANIFESTSMV  $smvbindir/smokeview  smokeview
-
-TOMANIFESTSMV  $smvbindir/background background
-TOMANIFESTLIST $fdsbindir/fds2ascii  fds2ascii
-TOMANIFESTSMV  $smvbindir/smokediff  smokediff
-TOMANIFESTSMV  $smvbindir/pnginfo    pnginfo
-TOMANIFESTSMV  $smvbindir/fds2fed    fds2fed
-TOMANIFESTSMV  $smvbindir/smokezip   smokezip
-TOMANIFESTLIST $fdsbindir/test_mpi   test_mpi
-TOMANIFESTSMV  $smvbindir/wind2fds   wind2fds
 
 CURDIR=`pwd`
 
@@ -517,6 +407,8 @@ cd $SMVExamplesDirectory
 $wui_cases
 $smv_cases
 rm -rf $OUTDIR/Immersed_Boundary_Method
+
+# scan for viruses
 
 clam_status=`IS_PROGRAM_INSTALLED clamscan`
 if [ $clam_status -eq 1 ]; then
@@ -573,5 +465,4 @@ if [ -e $errlog ]; then
   rm $errlog
 fi
 echo installer located at: $bundlepath
-cp $MANIFEST $bundlepathdir/${bundlebase}_manifest.html
 exit $returncode
