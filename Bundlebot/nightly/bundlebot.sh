@@ -238,20 +238,21 @@ if [[ "$showparms" == "" ]] && [[ "$OVERWRITE" == "" ]]; then
   fi
 fi
 
-echo
-echo ***Virus scan summary
-if [ -d $OUTPUT_DIR/scanlog ]; then
-  grep -v OK$ $OUTPUT_DIR/scanlog | grep -v SUMMARY
-else
-  echo virus scanner not available, bundle was not scanned
-fi
-
 cd $SCRIPTDIR
 if [ "$showparms" == "" ]; then
   echo ""
   echo -n "building installer"
   $ECHO ./make_bundle.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version $bundle_dir $BUNDLE_PREFIX > $OUTPUT_DIR/stage1
   make_bundle_status=$?
+  
+  echo
+  echo ***Virus scan summary
+  if [ -d $OUTPUT_DIR/scanlog ]; then
+    grep -v OK$ $OUTPUT_DIR/scanlog | grep -v SUMMARY
+  else
+    echo virus scanner not available, bundle was not scanned
+  fi
+
   echo " - complete"
   if [[ "$UPLOADBUNDLE" == "1" ]] && [[ $make_bundle_status -eq 0 ]]; then
     echo ""
