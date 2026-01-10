@@ -365,7 +365,6 @@ echo ""
 CP $smv_bundle smokeview.ini  $smvbindir smokeview.ini
 CP $smv_bundle volrender.ssf  $smvbindir volrender.ssf
 CP $smv_bundle objects.svo    $smvbindir objects.svo
-CP $smv_bundle smokeview.html $smvbindir smokeview.html
 CP $smv_bundle .smokeview_bin $smvbindir .smokeview_bin
 
 if [ "$PLATFORM" == "LINUX64" ]; then
