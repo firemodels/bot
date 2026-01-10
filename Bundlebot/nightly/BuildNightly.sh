@@ -40,7 +40,7 @@ export MPI_VERSION=INTEL
 
 function usage {
 echo ""
-echo "BUILD_fdssmv_nightly.sh usage"
+echo "BUILDnightly.sh usage"
 echo ""
 echo "This script builds FDS and Smokeview apps and generates a bundle using either the"
 echo "specified fds and smv repo revisions or revisions from the latest firebot pass."
@@ -75,9 +75,7 @@ DIR=`pwd`
 cd ../../..
 repo=`pwd`
 
-cd $DIR
-
-cd output
+cd $DIR/output
 outputdir=`pwd`
 cd $DIR
 
@@ -209,7 +207,6 @@ if [ -d $repo/webpages ]; then
   get fetch origin              > $outputdir/update_webpages 2&>1
   git merge origin/nist-pages  >> $outputdir/update_webpages 2&>1
 fi
-
 
 # clone 3rd party repos
 cd $curdir/../../Scripts
