@@ -248,7 +248,7 @@ if [ "$showparms" == "" ]; then
   echo
   echo ***Virus scan summary
   if [ -e $OUTPUT_DIR/scanlog ]; then
-    grep -v OK$ $OUTPUT_DIR/scanlog | grep -v SUMMARY
+    grep -v OK$ $OUTPUT_DIR/scanlog | grep -v ^$ | grep -v SUMMARY
   else
     echo virus scanner not available, bundle was not scanned
   fi
