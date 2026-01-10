@@ -324,6 +324,8 @@ TOMANIFESTMPI ()
   echo "<br>"                       >> $MANIFEST
 }
 
+# -------------------- start of script -------------------
+
 # determine OS
 
 if [ "`uname`" == "Darwin" ]; then
