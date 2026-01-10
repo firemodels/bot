@@ -129,7 +129,8 @@ LOCK_FILE=$HOME/.bundle/make_bundle_lock
 if [ "$FORCE" == "" ]; then
   if [ -e $LOCK_FILE ]; then
     echo "***error: another instance of $0 is running."
-    echo "          If this is not the case re-run using the -f option."
+    echo "          If this is not the case, re-run after removing"
+    echo "          the lock file: $LOCKFILE"
     exit 1
   fi
 fi
@@ -240,10 +241,19 @@ fi
 cd $SCRIPTDIR
 if [ "$showparms" == "" ]; then
   echo ""
-  echo -n "building installer"
+  echo -n  "***Building installer"
   $ECHO ./make_bundle.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version $bundle_dir $BUNDLE_PREFIX > $OUTPUT_DIR/stage1
   make_bundle_status=$?
   echo " - complete"
+  
+  echo
+  echo ***Virus scan summary
+  if [ -e $OUTPUT_DIR/scanlog ]; then
+    grep -v OK$ $OUTPUT_DIR/scanlog | grep -v ^$ | grep -v SUMMARY
+  else
+    echo virus scanner not available, bundle was not scanned
+  fi
+
   if [[ "$UPLOADBUNDLE" == "1" ]] && [[ $make_bundle_status -eq 0 ]]; then
     echo ""
     echo "uploading installer"
