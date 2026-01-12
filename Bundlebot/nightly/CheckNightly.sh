@@ -20,6 +20,22 @@ fi
 exit 0
 }
 
+#---------------------------------------------
+#                   SCANVIRUSLOG
+#---------------------------------------------
+
+SCANVIRUSLOG(){
+  SCANLOGFILE=$1
+  ninfected=`grep 'Infected files' $SCANLOGFILE | awk -F: '{print $2}'`
+  if [ "$ninfected" == "" ]; then
+    ninfected=0
+  fi
+  if [[ $ninfected -ne 0 ]]; then
+    echo "***error: $ninfected files found with a virus and/or malware in $SCANLOGFILE$" >> $SCANERRORLOG
+    grep -v OK$ $SCANLOGFILE                                                             >> $SCANERRORLOG
+  fi
+}
+
 while getopts 'hm:' OPTION
 do
 case $OPTION  in
@@ -34,11 +50,13 @@ done
 shift $(($OPTIND-1))
 
 
+SCANERRORLOG=scan_errors.txt
 uploads=fdssmv_uploads.txt
 errors=fdssmv_errors.txt
 output=output_fdssmv.txt
 INFO=FDS_INFO.txt
 rm -f $uploads
+rm -f $SCANERRORLOG
 gh release view FDS_TEST  -R github.com/firemodels/test_bundles | grep nightly_win | awk '{print $2}' >> $uploads
 gh release view FDS_TEST  -R github.com/firemodels/test_bundles | grep nightly_lnx | awk '{print $2}' >> $uploads
 gh release view FDS_TEST  -R github.com/firemodels/test_bundles | grep nightly_osx | awk '{print $2}' >> $uploads
@@ -65,6 +83,21 @@ echo                  >> $output
 echo bundles present: >> $output
 cat $uploads          >> $output
 echo                  >> $output
+
+if [[ "$OSX_BUNDLE_HOST" != "" ]] && [[ "$OSX_BOT_HOME" != "" ]]; then
+  scp -q $OSX_BUNDLE_HOST:$OSX_BOT_HOME/Bundlebot/nightly/output/scanlog output/scanlog_osx  > /dev/null
+  SCANVIRUSLOG output/scanlog_osx
+fi
+cp output/scanlog output/scanlog_linux
+SCANVIRUSLOG output/scanlog
+
+if [ "$MAILTO" != "" ]; then
+  if [[ -s $SCANERRORLOG ]]; then
+    cat $SCANERRORLOG | mail -s "***failure: a virus was found in the Linux and/or the OSX fds/smv bundle" $MAILTO
+  else
+    echo "" | mail -s "***success: no viruses were found in the Linux and OSX fds/smv bundles" $MAILTO
+  fi
+fi
 if [ -e $errors ]; then
   cat $errors
   echo missing bundles: >> $output
