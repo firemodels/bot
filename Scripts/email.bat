@@ -17,5 +17,6 @@ if "x%SMTP_PORT%" == "x" set mail_setup=0
 if "x%SMTP_USER_NAME_BASE%" == "x" set mail_setup=0
 
 if %mail_setup% == 0 goto skip_email
+echo mailsend -to %to% -from %SMTP_USER_NAME% -smtp %SMTP_SERVER% %SSL% -port %SMTP_PORT% -sub %subject% -attach %file%,text/plain,i -q -auth-plain -user %SMTP_USER_NAME_BASE%
 mailsend -to %to% -from %SMTP_USER_NAME% -smtp %SMTP_SERVER% %SSL% -port %SMTP_PORT% -sub %subject% -attach %file%,text/plain,i -q -auth-plain -user %SMTP_USER_NAME_BASE%
 :skip_email
