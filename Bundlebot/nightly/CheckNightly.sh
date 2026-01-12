@@ -25,7 +25,8 @@ exit 0
 #---------------------------------------------
 
 SCANVIRUSLOG(){
-  SCANLOGFILE=$1
+  PLATFORM=$1
+  SCANLOGFILE=$2
   ninfected=`grep 'Infected files' $SCANLOGFILE | awk -F: '{print $2}'`
   if [ "$ninfected" == "" ]; then
     ninfected=0
@@ -34,6 +35,9 @@ SCANVIRUSLOG(){
     echo "***error: $ninfected files found with a virus and/or malware in $SCANLOGFILE$" >> $SCANERRORLOG
     grep -v OK$ $SCANLOGFILE                                                             >> $SCANERRORLOG
   fi
+  echo $PLATFORM:                             >> $SCANSUMMARY
+  awk '/SUMMARY/{found=1} found' $SCANLOGFILE >> $SCANSUMMARY
+  echo ""                                     >> $SCANSUMMARY
 }
 
 while getopts 'hm:' OPTION
@@ -51,6 +55,7 @@ shift $(($OPTIND-1))
 
 
 SCANERRORLOG=scan_errors.txt
+SCANSUMMARY=scan_summary.txt
 uploads=fdssmv_uploads.txt
 errors=fdssmv_errors.txt
 output=output_fdssmv.txt
@@ -84,32 +89,29 @@ echo bundles present: >> $output
 cat $uploads          >> $output
 echo                  >> $output
 
+rm -f $SCANSUMMARY
+#copy virus logs 
 if [[ "$OSX_BUNDLE_HOST" != "" ]] && [[ "$OSX_BOT_HOME" != "" ]]; then
   scp -q $OSX_BUNDLE_HOST:$OSX_BOT_HOME/Bundlebot/nightly/output/scanlog output/scanlog_osx  > /dev/null
-  SCANVIRUSLOG output/scanlog_osx
+  SCANVIRUSLOG OSX output/scanlog_osx
 fi
 cp output/scanlog output/scanlog_linux
-SCANVIRUSLOG output/scanlog
+SCANVIRUSLOG Linux output/scanlog
 
-if [ "$MAILTO" != "" ]; then
-  if [[ -s $SCANERRORLOG ]]; then
-    cat $SCANERRORLOG | mail -s "***failure: a virus was found in the Linux and/or the OSX fds/smv bundle" $MAILTO
-  else
-    echo "" | mail -s "***success: no viruses were found in the Linux and OSX fds/smv bundles" $MAILTO
-  fi
+VIRUS_STATUS="No viruses found"
+if [[ -s $SCANERRORLOG ]]; then
+  VIRUS_STATUS="***error: viruses found"
 fi
+BUNDLE_STATUS="All bundles generated"
 if [ -e $errors ]; then
   cat $errors
   echo missing bundles: >> $output
   cat $errors           >> $output
   echo                  >> $output
-  if [ "$MAILTO" != "" ]; then
-    cat $output | mail -s "***error: one or more FDS/Smokeview nightly bundles were not generated" $MAILTO
-  fi
+fi
+if [ "$MAILTO" != "" ]; then
+  cat $output $SCANSUMMARY |  mail -s "$VIRUS_STATUS, $BUNDLE_STATUS" $MAILTO
 else
-  if [ "$MAILTO" != "" ]; then
-    cat $output | mail -s "All FDS/Smokeview nightly bundles were generated" $MAILTO
-  else
-    echo All FDS/Smokeview nightly bundles were generated
-  fi
+  echo $VIRUS_STATUS, $BUNDLE_STATUS
+  cat $output $SCANSUMMARY 
 fi
