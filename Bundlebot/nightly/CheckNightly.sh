@@ -98,7 +98,7 @@ fi
 cp output/scanlog output/scanlog_linux
 SCANVIRUSLOG Linux output/scanlog
 
-VIRUS_STATUS="No viruses found"
+VIRUS_STATUS="No Linux/OSX viruses found"
 if [[ -s $SCANERRORLOG ]]; then
   VIRUS_STATUS="***error: viruses found"
 fi
