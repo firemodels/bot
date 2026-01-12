@@ -35,9 +35,9 @@ SCANVIRUSLOG(){
     echo "***error: $ninfected files found with a virus and/or malware in $SCANLOGFILE$" >> $SCANERRORLOG
     grep -v OK$ $SCANLOGFILE                                                             >> $SCANERRORLOG
   fi
-  echo $PLATFORM:                             >> $SCANSUMMARY
-  awk '/SUMMARY/{found=1} found' $SCANLOGFILE >> $SCANSUMMARY
-  echo ""                                     >> $SCANSUMMARY
+  echo $PLATFORM summary:                                  >> $SCANSUMMARY
+  grep -v OK$ $SCANLOGFILE | grep -v ^$ | grep -v SUMMARY  >> $SCANSUMMARY
+  echo ""                                                  >> $SCANSUMMARY
 }
 
 while getopts 'hm:' OPTION
