@@ -34,7 +34,6 @@ fi
 
 INSTALLDIR=FDS/FDS6
 errlog=$SCRIPTDIR/output/errlog
-scanlog=$SCRIPTDIR/output/scanlog
 
 # determine directory repos reside under
 
@@ -55,6 +54,8 @@ else
   bundlebase=${fds_version}_${smv_version}_${FDSREPODATE}${NIGHTLY}lnx
 fi
 custombase=${fds_version}_${smv_version}
+scanlog=$SCRIPTDIR/output/$bundlebase.log
+vscanlog=$SCRIPTDIR/output/$bundlebase.vlog
 
 # create upload directory if it doesn't exist
 
@@ -415,7 +416,9 @@ if [ $clam_status -eq 1 ]; then
   echo "--- scanning archive for viruses/malware ---"
   echo "" 
   clamscan -r $UPLOAD_DIR/$bundlebase > $scanlog 2>&1
-  ninfected=`grep 'Infected files' $scanlog | awk -F: '{print $2}'`
+  sed 's/.*FDS/FDS/' $scanlog
+  mv $scanlog $vscanlog
+  ninfected=`grep 'Infected files' $vscanlog | awk -F: '{print $2}'`
   if [ "$ninfected" == "" ]; then
     ninfected=0
   fi
