@@ -23,6 +23,7 @@ cd %scriptdir%
 set GITROOT=%repo_root%
 set returncode=0
 set gawk=%GITROOT%\bot\scripts\bin\gawk.exe
+set CONVERTLOG=%scriptdir%\convertlog.bat
 
 :: setup .bundle and upload directories
 
@@ -337,7 +338,8 @@ if %ERRORLEVEL% == 1 goto elsescan
   echo scanning %basedir%
   echo scan output in %vscanlog%
   clamscan -r %basedir% > %scanlog% 2>&1
-  call convertlog %scanlog% %vscanlog%
+  cd %scriptdir%
+  call %CONVERTLOG% %scanlog% %vscanlog%
   grep Infected %vscanlog% | %gawk% -F":" "{print $2}" > %nvscanlog%
   set have_virus=1
   set /p ninfected=<%nvscanlog%
