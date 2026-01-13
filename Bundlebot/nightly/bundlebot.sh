@@ -228,6 +228,7 @@ REPO_ROOT=`pwd`
 cd $CURDIR
 installer_base=${FDSREV}_${SMVREV}
 installer_base_platform=${installer_base}_${BUNDLE_PREFIX_FILE}$platform
+vscanlog=${installer_base_platform}.vlog
 if [[ "$showparms" == "" ]] && [[ "$OVERWRITE" == "" ]]; then
   installer_file=$bundle_dir/${installer_base_platform}.sh
   if [ -e $installer_file ]; then
@@ -248,8 +249,8 @@ if [ "$showparms" == "" ]; then
   
   echo
   echo ***Virus scan summary
-  if [ -e $OUTPUT_DIR/scanlog ]; then
-    grep -v OK$ $OUTPUT_DIR/scanlog | grep -v ^$ | grep -v SUMMARY
+  if [ -e $OUTPUT_DIR/$vscanlog ]; then
+    grep -v OK$ $OUTPUT_DIR/$vscanlog | grep -v ^$ | grep -v SUMMARY
   else
     echo virus scanner not available, bundle was not scanned
   fi

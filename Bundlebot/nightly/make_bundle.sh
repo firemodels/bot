@@ -416,8 +416,7 @@ if [ $clam_status -eq 1 ]; then
   echo "--- scanning archive for viruses/malware ---"
   echo "" 
   clamscan -r $UPLOAD_DIR/$bundlebase > $scanlog 2>&1
-  sed 's/.*FDS/FDS/' $scanlog
-  mv $scanlog $vscanlog
+  sed 's/.*FDS/FDS/' $scanlog > $vscanlog
   ninfected=`grep 'Infected files' $vscanlog | awk -F: '{print $2}'`
   if [ "$ninfected" == "" ]; then
     ninfected=0
