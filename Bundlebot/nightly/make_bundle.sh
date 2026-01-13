@@ -54,8 +54,8 @@ else
   bundlebase=${fds_version}_${smv_version}_${FDSREPODATE}${NIGHTLY}lnx
 fi
 custombase=${fds_version}_${smv_version}
-scanlog=$SCRIPTDIR/output/$bundlebase.log
-vscanlog=$SCRIPTDIR/output/$bundlebase.vlog
+scanlog=$SCRIPTDIR/output/$bundlebase_log.txt
+vscanlog=$SCRIPTDIR/output/$bundlebase_vlog.txt
 
 # create upload directory if it doesn't exist
 
