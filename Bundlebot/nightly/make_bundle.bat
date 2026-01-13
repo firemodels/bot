@@ -336,8 +336,8 @@ if %ERRORLEVEL% == 1 goto elsescan
   set nvscanlog=%logdir%\%basename%.nlog
   echo scanning %basedir%
   echo scan output in %vscanlog%
-  clamscan -r %basedir% > %vscanlog% 2>&1
-  call convertlog %scanlog%
+  clamscan -r %basedir% > %scanlog% 2>&1
+  call convertlog %scanlog% %vscanlog%
   grep Infected %vscanlog% | %gawk% -F":" "{print $2}" > %nvscanlog%
   set have_virus=1
   set /p ninfected=<%nvscanlog%

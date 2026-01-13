@@ -3,7 +3,7 @@
 setlocal EnableDelayedExpansion
 set "SEARCH=%userprofile%\.bundle\uploads\"
 set INPUT=%1
-FOR %%A IN (%INPUT%) DO set "OUTPUT=%%~nA.vlog"
+set OUTPUT=%2
 
 > "%OUTPUT%" (
   for /f "usebackq delims=" %%A in ("%INPUT%") do (
