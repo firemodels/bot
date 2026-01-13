@@ -333,7 +333,7 @@ set have_virus=0
 call :IS_FILE_INSTALLED clamscan
 if %ERRORLEVEL% == 1 goto elsescan
   set scanlog=%logdir%\%basename%_log.txt
-  set vscanlog=%logdir%\%basename%_vlog.txt
+  set vscanlog=%logdir%\%basename%.log
   set nvscanlog=%logdir%\%basename%_nlog.txt
   echo ***scanning bundle
   echo    input: %basedir%

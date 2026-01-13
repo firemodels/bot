@@ -55,7 +55,7 @@ else
 fi
 custombase=${fds_version}_${smv_version}
 scanlog=$SCRIPTDIR/output/${bundlebase}_log.txt
-vscanlog=$SCRIPTDIR/output/${bundlebase}_vlog.txt
+vscanlog=$SCRIPTDIR/output/${bundlebase}.log
 
 # create upload directory if it doesn't exist
 
