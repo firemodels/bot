@@ -335,8 +335,9 @@ if %ERRORLEVEL% == 1 goto elsescan
   set scanlog=%logdir%\%basename%_log.txt
   set vscanlog=%logdir%\%basename%_vlog.txt
   set nvscanlog=%logdir%\%basename%_nlog.txt
-  echo scanning %basedir%
-  echo scan output in %vscanlog%
+  echo ***scanning bundle
+  echo    input: %basedir%
+  echo    output: %vscanlog%
   clamscan -r %basedir% > %scanlog% 2>&1
   cd %scriptdir%
   call %CONVERTLOG% %scanlog% %vscanlog%
