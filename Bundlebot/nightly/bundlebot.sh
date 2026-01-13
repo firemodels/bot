@@ -265,7 +265,7 @@ if [ "$showparms" == "" ]; then
     done
 
     gh release upload FDS_TEST $bundle_dir/${installer_base_platform}.sh         -R github.com/$GHOWNER/test_bundles  --clobber
-    gh release upload FDS_TEST $vscanlog                                         -R github.com/$GHOWNER/test_bundles  --clobber
+    gh release upload FDS_TEST $OUTPUT_DIR/$vscanlog                             -R github.com/$GHOWNER/test_bundles  --clobber
     if [ "$platform" == "lnx" ]; then
       cd $REPO_ROOT/fds
       FDS_SHORT_HASH=`git rev-parse --short HEAD`
