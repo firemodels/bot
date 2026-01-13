@@ -351,6 +351,7 @@ if %ERRORLEVEL% == 1 goto elsescan
   goto endifscan
 :elsescan
   echo ***virus scanner not found - bundle was not scanned for viruses/malware
+  set returncode=2
 :endifscan
 
 echo.
