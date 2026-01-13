@@ -332,9 +332,9 @@ echo.
 set have_virus=0
 call :IS_FILE_INSTALLED clamscan
 if %ERRORLEVEL% == 1 goto elsescan
-  set scanlog=%logdir%\%basename%.log
-  set vscanlog=%logdir%\%basename%.vlog
-  set nvscanlog=%logdir%\%basename%.nlog
+  set scanlog=%logdir%\%basename%_log.txt
+  set vscanlog=%logdir%\%basename%_vlog.txt
+  set nvscanlog=%logdir%\%basename%_nlog.txt
   echo scanning %basedir%
   echo scan output in %vscanlog%
   clamscan -r %basedir% > %scanlog% 2>&1

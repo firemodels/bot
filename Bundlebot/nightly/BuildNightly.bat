@@ -206,8 +206,8 @@ if "x%upload_bundle%" == "x" goto skip_upload
   echo gh release upload FDS_TEST %fullfilebase%.exe -R github.com/%OWNER%/test_bundles --clobber
        gh release upload FDS_TEST %fullfilebase%.exe -R github.com/%OWNER%/test_bundles --clobber
 
-  echo gh release upload FDS_TEST %CURDIR%\output\%basename%.vlog -R github.com/%OWNER%/test_bundles --clobber
-       gh release upload FDS_TEST %CURDIR%\output\%basename%.vlog -R github.com/%OWNER%/test_bundles --clobber
+  echo gh release upload FDS_TEST %CURDIR%\output\%basename%_vlog.txt -R github.com/%OWNER%/test_bundles --clobber
+       gh release upload FDS_TEST %CURDIR%\output\%basename%_vlog.txt -R github.com/%OWNER%/test_bundles --clobber
 :skip_upload
 
 if "x%emailto%" == "x" goto endif6
