@@ -331,14 +331,16 @@ echo.
 set have_virus=0
 call :IS_FILE_INSTALLED clamscan
 if %ERRORLEVEL% == 1 goto elsescan
-  set vscanlog=%logdir%\%basename%_vscan.log
-  set nvscaninfected=%logdir%\%basename%_vscan_ninfected.log
+  set scanlog=%logdir%\%basename%.log
+  set vscanlog=%logdir%\%basename%.vlog
+  set nvscanlog=%logdir%\%basename%.nlog
   echo scanning %basedir%
   echo scan output in %vscanlog%
   clamscan -r %basedir% > %vscanlog% 2>&1
-  grep Infected %vscanlog% | %gawk% -F":" "{print $2}" > %nvscaninfected%
+  call convertlog %scanlog%
+  grep Infected %vscanlog% | %gawk% -F":" "{print $2}" > %nvscanlog%
   set have_virus=1
-  set /p ninfected=<%nvscaninfected%
+  set /p ninfected=<%nvscanlog%
   if %ninfected% == 0 set have_virus=0
   type %vscanlog%
   echo.
