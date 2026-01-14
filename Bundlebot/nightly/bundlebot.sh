@@ -228,7 +228,7 @@ REPO_ROOT=`pwd`
 cd $CURDIR
 installer_base=${FDSREV}_${SMVREV}
 installer_base_platform=${installer_base}_${BUNDLE_PREFIX_FILE}$platform
-csvlog=${installer_base_platform}.csv
+htmllog=${installer_base_platform}_manifest.html
 if [[ "$showparms" == "" ]] && [[ "$OVERWRITE" == "" ]]; then
   installer_file=$bundle_dir/${installer_base_platform}.sh
   if [ -e $installer_file ]; then
@@ -267,8 +267,8 @@ if [ "$showparms" == "" ]; then
     echo gh release upload FDS_TEST $bundle_dir/${installer_base_platform}.sh -R github.com/$GHOWNER/test_bundles  --clobber
          gh release upload FDS_TEST $bundle_dir/${installer_base_platform}.sh -R github.com/$GHOWNER/test_bundles  --clobber
     if [ -e $OUTPUT_DIR/$csvlog ]; then
-      echo gh release upload FDS_TEST $OUTPUT_DIR/$csvlog                       -R github.com/$GHOWNER/test_bundles  --clobber
-           gh release upload FDS_TEST $OUTPUT_DIR/$csvlog                       -R github.com/$GHOWNER/test_bundles  --clobber
+      echo gh release upload FDS_TEST $OUTPUT_DIR/$htmllog                       -R github.com/$GHOWNER/test_bundles  --clobber
+           gh release upload FDS_TEST $OUTPUT_DIR/$htmllog                       -R github.com/$GHOWNER/test_bundles  --clobber
     fi
     if [ "$platform" == "lnx" ]; then
       cd $REPO_ROOT/fds

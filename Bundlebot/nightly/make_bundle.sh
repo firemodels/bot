@@ -419,6 +419,7 @@ if [ $clam_status -eq 1 ]; then
   clamscan -r $UPLOAD_DIR/$bundlebase > $scanlog 2>&1
   sed 's/.*FDS-/FDS-/' $scanlog   > $vscanlog
   $SCRIPTDIR/add_sha256.sh $vscanlog > $csvlog
+  $SCRIPTDIR/csv2html.sh   $csv2log > $htmllog
   ninfected=`grep 'Infected files' $vscanlog | awk -F: '{print $2}'`
   if [ "$ninfected" == "" ]; then
     ninfected=0
