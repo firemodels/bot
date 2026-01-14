@@ -8,7 +8,6 @@ BASE=$HOME/.bundle/bundles
 set -euo pipefail
 
 input_file="${1:-/dev/stdin}"
-input_file=$BASE/$input_file
 
 while IFS= read -r line; do
     # Skip empty lines
@@ -16,15 +15,17 @@ while IFS= read -r line; do
 
     # Split into filename and text (first whitespace run)
     file_path="${line%%[[:space:]]*}"
+    file_path=${file_path%:}
+    full_file_path=$BASE/$file_path
     text="${line#"$file_path"}"
     text="${text#"${text%%[![:space:]]*}"}"  # trim leading spaces
 
-    if [[ ! -f "$file_path" ]]; then
+    if [[ ! -f "$full_file_path" ]]; then
         echo "ERROR: file not found: $file_path" >&2
         continue
     fi
 
-    sha256=$(sha256sum "$file_path" | awk '{print $1}')
+    sha256=$(sha256sum "$full_file_path" | awk '{print $1}')
 
     # Output: filename,sha256,text
     printf '%s,%s,%s\n' "$file_path" "$sha256" "$text"
