@@ -282,8 +282,9 @@ if [ "$ECHO" == "" ]; then
     ln -s ${BUNDLEBASE}.sh $LATEST
   fi
   cp $REPO_ROOT/bot/Bundlebot/nightly/autoinstall.txt $bundle_dir/.
-  rm -f  ${BUNDLEBASE}.tar.gz
-  rm -rf $BUNDLEBASE
+#don't remove bundle directory
+#  rm -f  ${BUNDLEBASE}.tar.gz
+#  rm -rf $BUNDLEBASE
   if [ "$INSTALL" != "" ]; then
     cd $bundle_dir
     cat autoinstall.txt | bash $LATEST >& $HOME/.bundle/bundle_lnx_nightly_install.log
