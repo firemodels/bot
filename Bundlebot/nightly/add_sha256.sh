@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+if [ "`uname`" == "Darwin" ]; then
+  SHA256PROG="shasum -a 256"
+else
+  SHA256PROG=sha256sum
+fi
+
 # Usage: ./script.sh input.txt
 # Each line of input:
 # /full/path/to/file<spaces>some text string
@@ -26,7 +32,7 @@ while IFS= read -r line; do
         continue
     fi
 
-    sha256=$(sha256sum "$full_file_path" | awk '{print $1}')
+    sha256=$($SHA256PROG "$full_file_path" | awk '{print $1}')
 
     # Output: filename,sha256,text
     printf '%s,%s,%s\n' "$file_path" "$sha256" "$text"
