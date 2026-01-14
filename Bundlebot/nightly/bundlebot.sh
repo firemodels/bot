@@ -266,7 +266,7 @@ if [ "$showparms" == "" ]; then
 
     echo gh release upload FDS_TEST $bundle_dir/${installer_base_platform}.sh -R github.com/$GHOWNER/test_bundles  --clobber
          gh release upload FDS_TEST $bundle_dir/${installer_base_platform}.sh -R github.com/$GHOWNER/test_bundles  --clobber
-    if [ -e $OUTPUT_DIR/csvlog ]; then
+    if [ -e $OUTPUT_DIR/$csvlog ]; then
       echo gh release upload FDS_TEST $OUTPUT_DIR/$csvlog                       -R github.com/$GHOWNER/test_bundles  --clobber
            gh release upload FDS_TEST $OUTPUT_DIR/$csvlog                       -R github.com/$GHOWNER/test_bundles  --clobber
     fi
