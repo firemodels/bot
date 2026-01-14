@@ -3,10 +3,12 @@
 # Usage: ./script.sh input.txt
 # Each line of input:
 # /full/path/to/file<spaces>some text string
+BASE=$HOME/.bundle/bundles
 
 set -euo pipefail
 
 input_file="${1:-/dev/stdin}"
+input_file=$BASE/$input_file
 
 while IFS= read -r line; do
     # Skip empty lines
