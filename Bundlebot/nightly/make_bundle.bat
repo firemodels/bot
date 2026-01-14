@@ -149,34 +149,12 @@ echo --- filling bundle directory ---
 echo.
 
 
-::copy %smv_forbundle%\*.po                   %out_bin%\.>Nul
-
-:: initialize manifest file
-set MANIFEST=%out_doc%\manifest.html
-
-echo ^<html^>                                  > %MANIFEST%
-echo ^<head^>                                 >> %MANIFEST%
-echo ^<TITLE^>                                >> %MANIFEST%
-echo Manifest - %basename%^ -                 >> %MANIFEST%
-date /t                                       >> %MANIFEST%
-time /t                                       >> %MANIFEST%
-echo ^</TITLE^>                               >> %MANIFEST%
-echo ^</HEAD^>                                >> %MANIFEST%
-echo ^<BODY BGCOLOR="#FFFFFF" ^>              >> %MANIFEST%
-echo ^<h2^>                                   >> %MANIFEST%
-echo Manifest - %basename%^ -                 >> %MANIFEST%
-date /t                                       >> %MANIFEST%
-time /t                                       >> %MANIFEST%
-echo ^</h2^>                                  >> %MANIFEST%
-
-
 CALL :COPY  %bundle_dir%\fds\fds.exe        %out_bin%\fds.exe
 CALL :COPY  %bundle_dir%\fds\fds_openmp.exe %out_bin%\fds_openmp.exe
 CALL :COPY  %bundle_dir%\fds\fds2ascii.exe  %out_bin%\fds2ascii.exe
 CALL :COPY  %bundle_dir%\fds\test_mpi.exe   %out_bin%\test_mpi.exe
 
 CALL :COPY  %bundle_dir%\smv\smokeview.exe  %out_smv%\smokeview.exe
-
 
 IF  X%SETVARS_COMPLETED% == X1 GOTO intel_envexist
 
@@ -194,9 +172,6 @@ IF  X%SETVARS_COMPLETED% == X1 GOTO intel_envexist
 :intel_envexist
 :eof
 
-CALL :TOMANIFESTFDS   %out_bin%\fds.exe          fds
-CALL :TOMANIFESTFDS   %out_bin%\fds_openmp.exe   fds_openmp
-
 set curdir=%CD%
 cd %out_bin%
 
@@ -204,9 +179,6 @@ cd %out_bin%
 mkdir mpi
 CALL :COPYDIR %in_impi%\mpi mpi
 cd %CURDIR%
-CALL :TOMANIFESTMPI   %out_bin%\mpi\mpiexec.exe  mpiexec
-
-CALL :TOMANIFESTSMV   %out_smv%\smokeview.exe    smokeview
 
 CALL :COPY  %bundle_dir%\smv\background.exe %out_bin%\background.exe
 CALL :COPY  %bundle_dir%\smv\smokediff.exe  %out_smv%\smokediff.exe
@@ -214,19 +186,6 @@ CALL :COPY  %bundle_dir%\smv\pnginfo.exe    %out_smv%\pnginfo.exe
 CALL :COPY  %bundle_dir%\smv\fds2fed.exe    %out_smv%\fds2fed.exe
 CALL :COPY  %bundle_dir%\smv\smokezip.exe   %out_smv%\smokezip.exe 
 CALL :COPY  %bundle_dir%\smv\wind2fds.exe   %out_smv%\wind2fds.exe 
-
-CALL :TOMANIFESTSMV   %out_bin%\background.exe background
-CALL :TOMANIFESTLIST  %out_bin%\fds2ascii.exe  fds2ascii
-CALL :TOMANIFESTSMV   %out_smv%\pnginfo.exe    pnginfo
-CALL :TOMANIFESTSMV   %out_smv%\fds2fed.exe    fds2fed
-CALL :TOMANIFESTSMV   %out_smv%\smokezip.exe   smokezip
-CALL :TOMANIFESTLIST  %out_bin%\test_mpi.exe   test_mpi
-CALL :TOMANIFESTSMV   %out_smv%\wind2fds.exe   wind2fds
-
-:: wrap up manifest file
-
-echo ^</body^>                                  >> %MANIFEST%
-echo ^</html^>                                  >> %MANIFEST%
 
 CALL :COPY  %repo_root%\smv\scripts\jp2conv.bat                                %out_smv%\jp2conv.bat
 
@@ -377,8 +336,6 @@ wzipse32 %basename%.zip -setup -auto -i %fds_forbundle%\icon.ico -t %fds_forbund
 
 CALL :COPY %upload_dir%\%basename%.exe       %bundles_dir%\%basename%.exe
 CALL :COPY %upload_dir%\%basename%.zip       %bundles_dir%\%basename%.zip
-CALL :COPY %MANIFEST%                        %upload_dir%\%basename%_manifest.html
-CALL :COPY %MANIFEST%                        %bundles_dir%\%basename%_manifest.html
 
 echo.
 echo --- installer built ---
@@ -386,48 +343,6 @@ echo --- installer built ---
 cd %CURDIR%>Nul
 
 GOTO EOF
-
-::------------------------------------------------
-:TOMANIFESTLIST
-::------------------------------------------------
-
-set  prog=%1
-set  desc=%2
-
-echo ^<p^>^<hr^>^<p^>             >> %MANIFEST%
-if NOT EXIST %prog% goto else_list
-    echo ^<pre^>                  >> %MANIFEST%
-    echo %desc% is present        >> %MANIFEST%
-    echo ^</pre^>                 >> %MANIFEST%
-    goto endif_list
-:else_smv
-    echo %desc% is absent^<br^>   >> %MANIFEST%
-    echo %prog"                   >> %MANIFEST%
-  fi
-  echo ^<br^>                     >> %MANIFEST%
-:endif_list
-exit /b
-
-::------------------------------------------------
-:TOMANIFESTSMV
-::------------------------------------------------
-
-set  prog=%1
-set  desc=%2
-
-echo ^<p^>^<hr^>^<p^>             >> %MANIFEST%
-if NOT EXIST %prog% goto else_smv
-  echo ^<pre^>                    >> %MANIFEST%
-    %prog% -v                     >> %MANIFEST%
-    echo ^</pre^>                 >> %MANIFEST%
-    goto endif_smv
-:else_smv
-    echo %desc% is absent^<br^>   >> %MANIFEST%
-    echo %prog"                   >> %MANIFEST%
-  fi
-  echo ^<br^>                     >> %MANIFEST%
-:endif_smv
-exit /b
 
 :: -------------------------------------------------------------
 :IS_FILE_INSTALLED
@@ -442,48 +357,6 @@ exit /b
     exit /b 1
   )
   exit /b 0
-
-::------------------------------------------------
-:TOMANIFESTFDS
-::------------------------------------------------
-
-set  prog=%1
-set  desc=%2
-
-echo ^<p^>^<hr^>^<p^>             >> %MANIFEST%
-if NOT EXIST %prog% goto else_fds
-  echo ^<pre^>                    >> %MANIFEST%
-  echo. | %prog%                  >> %MANIFEST% 2>&1
-  echo ^</pre^>                   >> %MANIFEST%
-  goto endif_fds
-:else_fds
-  echo %desc% is absent^<br^>     >> %MANIFEST%
-  echo %prog"                     >> %MANIFEST%
-  echo ^<br^>                     >> %MANIFEST%
-:endif_fds
-exit /b
-
-::------------------------------------------------
-:TOMANIFESTMPI
-::------------------------------------------------
-
-set  prog=%1
-set  desc=%2
-
-echo ^<p^>^<hr^>^<p^>             >> %MANIFEST%
-if NOT EXIST %prog% goto else_mpi
-  echo ^<pre^>                    >> %MANIFEST%
-  echo mpiexec                    >> %MANIFEST%
-  echo.                           >> %MANIFEST%
-  %prog% --version                >> %MANIFEST% 2>&1
-  echo ^</pre^>                   >> %MANIFEST%
-  goto endif_mpi
-:else_mpi
-  echo %desc% is absent^<br^>     >> %MANIFEST%
-  echo %prog"                     >> %MANIFEST%
-  echo ^<br^>                     >> %MANIFEST%
-:endif_mpi
-exit /b
 
 ::------------------------------------------------
 :COPY
