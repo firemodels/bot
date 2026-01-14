@@ -23,7 +23,7 @@ cd %scriptdir%
 set GITROOT=%repo_root%
 set returncode=0
 set gawk=%GITROOT%\bot\scripts\bin\gawk.exe
-set CONVERTLOG=%scriptdir%\convertlog.bat
+set CONVERTLOG=%scriptdir%\add_sha256.bat
 
 :: setup .bundle and upload directories
 
@@ -333,14 +333,14 @@ set have_virus=0
 call :IS_FILE_INSTALLED clamscan
 if %ERRORLEVEL% == 1 goto elsescan
   set scanlog=%logdir%\%basename%_log.txt
-  set vscanlog=%logdir%\%basename%.log
+  set vscanlog=%logdir%\%basename%.csv
   set nvscanlog=%logdir%\%basename%_nlog.txt
   echo ***scanning bundle
   echo    input: %basedir%
   echo    output: %vscanlog%
   clamscan -r %basedir% > %scanlog% 2>&1
   cd %scriptdir%
-  call %CONVERTLOG% %scanlog% %vscanlog%
+  call %CONVERTLOG% %scanlog% > %vscanlog%
   grep Infected %vscanlog% | %gawk% -F":" "{print $2}" > %nvscanlog%
   set have_virus=1
   set /p ninfected=<%nvscanlog%

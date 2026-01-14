@@ -1,55 +1,38 @@
 @echo off
-setlocal EnableExtensions EnableDelayedExpansion
+setlocal EnableDelayedExpansion
 
-:: Base directory (equivalent to $HOME/.bundle/bundles)
-set "BASE=%USERPROFILE%\.bundle\bundles"
+set "INPUT_FILE=%~1"
+set "PASS_THROUGH=0"
 
-:: Input file (default: stdin via redirected input)
-if "%~1"=="" (
-    set "INPUT=CON"
-) else (
-    set "INPUT=%~1"
+if not exist "%INPUT_FILE%" (
+    echo Input file not found
+    exit /b 1
 )
 
-for /f "usebackq delims=" %%L in ("%INPUT%") do (
-    set "LINE=%%L"
+for /f "usebackq delims=" %%L in ("%INPUT_FILE%") do (
 
-    :: Skip empty lines
-    if not defined LINE (
-        echo.
-        goto :continue
+    REM Once SCAN SUMMARY is seen, just echo lines as-is
+    if !PASS_THROUGH! EQU 1 (
+        echo %%L
+    ) else (
+        echo %%L | findstr /C:"SCAN SUMMARY" >nul
+        if not errorlevel 1 (
+            set "PASS_THROUGH=1"
+            echo %%L
+        ) else (
+            REM Parse: filename + rest of line
+            for /f "tokens=1,* delims= " %%A in ("%%L") do (
+                set "HASH="
+                set "FILENAME=%%A"
+                if "!FILENAME:~-1!"==":" set "FILENAME=!FILENAME:~0,-1!"
+                if exist !FILENAME! (
+                  certutil -hashfile !FILENAME! SHA256 | head -2 | tail -1 > hash.out
+                  set /p HASH=<hash.out
+                )
+                set "FILENAME=!FILENAME:%userprofile%\.bundle\uploads\=!"
+                echo !FILENAME!,!HASH!,%%B
+            )
+        )
     )
-
-    :: Extract file path (up to first space)
-    for /f "tokens=1*" %%A in ("!LINE!") do (
-        set "FILEPATH=%%A"
-        set "TEXT=%%B"
-    )
-
-    :: Remove trailing colon from filepath (if present)
-    if "!FILEPATH:~-1!"==":" set "FILEPATH=!FILEPATH:~0,-1!"
-
-    set "FULLFILE=%BASE%\!FILEPATH!"
-
-    :: If file does not exist, echo original line
-    if not exist "!FULLFILE!" (
-        echo !LINE!
-        goto :continue
-    )
-
-    :: Compute SHA256 using certutil
-    for /f "skip=1 tokens=1" %%H in ('
-        certutil -hashfile "!FULLFILE!" SHA256 ^| findstr /v "hash"
-    ') do (
-        set "SHA256=%%H"
-        goto :hashdone
-    )
-    :hashdone
-
-    :: Output: filename,sha256,text
-    echo !FILEPATH!,!SHA256!,!TEXT!
-
-    :continue
 )
-
 endlocal
