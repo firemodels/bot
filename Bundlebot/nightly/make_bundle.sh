@@ -56,6 +56,7 @@ fi
 custombase=${fds_version}_${smv_version}
 scanlog=$SCRIPTDIR/output/${bundlebase}_log.txt
 vscanlog=$SCRIPTDIR/output/${bundlebase}.log
+csvlog=$SCRIPTDIR/output/${bundlebase}.csv
 
 # create upload directory if it doesn't exist
 
@@ -416,7 +417,8 @@ if [ $clam_status -eq 1 ]; then
   echo "--- scanning archive for viruses/malware ---"
   echo "" 
   clamscan -r $UPLOAD_DIR/$bundlebase > $scanlog 2>&1
-  sed 's/.*FDS-/FDS-/' $scanlog > $vscanlog
+  sed 's/.*FDS-/FDS-/' $scanlog   > $vscanlog
+  $CURDIR/add_sha256.sh $vscanlog > $csvlog
   ninfected=`grep 'Infected files' $vscanlog | awk -F: '{print $2}'`
   if [ "$ninfected" == "" ]; then
     ninfected=0

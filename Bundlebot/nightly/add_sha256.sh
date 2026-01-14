@@ -21,7 +21,8 @@ while IFS= read -r line; do
     text="${text#"${text%%[![:space:]]*}"}"  # trim leading spaces
 
     if [[ ! -f "$full_file_path" ]]; then
-        echo "ERROR: file not found: $file_path" >&2
+#        echo "ERROR: file not found: $file_path" >&2
+        printf '%s\n' "$line" 
         continue
     fi
 

@@ -228,7 +228,7 @@ REPO_ROOT=`pwd`
 cd $CURDIR
 installer_base=${FDSREV}_${SMVREV}
 installer_base_platform=${installer_base}_${BUNDLE_PREFIX_FILE}$platform
-vscanlog=${installer_base_platform}.log
+csvlog=${installer_base_platform}.csv
 if [[ "$showparms" == "" ]] && [[ "$OVERWRITE" == "" ]]; then
   installer_file=$bundle_dir/${installer_base_platform}.sh
   if [ -e $installer_file ]; then
@@ -249,8 +249,8 @@ if [ "$showparms" == "" ]; then
   
   echo
   echo ***Virus scan summary
-  if [ -e $OUTPUT_DIR/$vscanlog ]; then
-    grep -v OK$ $OUTPUT_DIR/$vscanlog | grep -v ^$ | grep -v SUMMARY
+  if [ -e $OUTPUT_DIR/$csvlog ]; then
+    grep -v OK$ $OUTPUT_DIR/$csvlog | grep -v ^$ | grep -v SUMMARY
   else
     echo virus scanner not available, bundle was not scanned
   fi
@@ -264,8 +264,12 @@ if [ "$showparms" == "" ]; then
       gh release delete-asset FDS_TEST $file -R github.com/$GHOWNER/test_bundles -y
     done
 
-    gh release upload FDS_TEST $bundle_dir/${installer_base_platform}.sh         -R github.com/$GHOWNER/test_bundles  --clobber
-    gh release upload FDS_TEST $OUTPUT_DIR/$vscanlog                             -R github.com/$GHOWNER/test_bundles  --clobber
+    echo gh release upload FDS_TEST $bundle_dir/${installer_base_platform}.sh -R github.com/$GHOWNER/test_bundles  --clobber
+         gh release upload FDS_TEST $bundle_dir/${installer_base_platform}.sh -R github.com/$GHOWNER/test_bundles  --clobber
+    if [ -e $OUTPUT_DIR/csvlog ]; then
+      echo gh release upload FDS_TEST $OUTPUT_DIR/$csvlog                       -R github.com/$GHOWNER/test_bundles  --clobber
+           gh release upload FDS_TEST $OUTPUT_DIR/$csvlog                       -R github.com/$GHOWNER/test_bundles  --clobber
+    fi
     if [ "$platform" == "lnx" ]; then
       cd $REPO_ROOT/fds
       FDS_SHORT_HASH=`git rev-parse --short HEAD`
