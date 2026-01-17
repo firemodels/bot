@@ -293,6 +293,7 @@ call :IS_FILE_INSTALLED clamscan
 if %ERRORLEVEL% == 1 goto elsescan
   set scanlog=%logdir%\%basename%_log.txt
   set vscanlog=%logdir%\%basename%.csv
+  set htmllog=%logdir%\%basename%_manifest.html
   set nvscanlog=%logdir%\%basename%_nlog.txt
   echo ***scanning bundle
   echo    input: %basedir%
@@ -300,6 +301,9 @@ if %ERRORLEVEL% == 1 goto elsescan
   clamscan -r %basedir% > %scanlog% 2>&1
   cd %scriptdir%
   call %CONVERTLOG% %scanlog% > %vscanlog%
+  cd output
+  call ..\csv2html %vscanlog% %htmllog%
+  cd %scriptdir%
   grep Infected %vscanlog% | %gawk% -F":" "{print $2}" > %nvscanlog%
   set have_virus=1
   set /p ninfected=<%nvscanlog%
