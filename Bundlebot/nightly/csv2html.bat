@@ -8,6 +8,11 @@ set bindir=%CD%
 cd %CDIR%
 set gawk=%bindir%\gawk.exe
 
+cd temp
+git clean -dxf 
+set TEMPDIR=%CDIR%\temp
+cd %CDIR%
+
 :: ---- Input handling ----
 if "%~1"=="" (
     echo Usage: %~nx0 inputfile
@@ -15,44 +20,50 @@ if "%~1"=="" (
 )
 
 set "INPUT=%~1"
-set "INPUTTEMP=%INPUT%.%RANDOM%"
+set "SUMMARYFILE=%TEMPDIR%\summary_%RANDOM%.txt"
+
 set "TITLE=%~n1"
 set "OUTPUT=%~n1_manifest.html"
 
-:: ---- sed replacement (same as Bash) ----
-sed "s/: OK/OK/g" "%INPUT%" > "%INPUTTEMP%"
+:: ---- extract summary portion of input file' ----
+sed -n "/SCAN SUMMARY/,$ p" "%INPUT%" > "%SUMMARYFILE%" 
 
 :: ---- HTML header ----
 (
 echo ^<html^>^<head^>^<title^>%TITLE% Manifest^</title^>^</head^>
 echo ^<body^>
 echo ^<h1^>%TITLE% Manifest^</h1^>
-echo ^<table border=on^>
-echo ^<tr^>^<th^>file^</th^>^<th^>sha256 hash^</th^>^<th^>virus status^</th^>^</tr^>
 ) > "%OUTPUT%"
 
+:: ---- summary section ----
+echo ^<pre^>       >> %OUTPUT%
+type %SUMMARYFILE% >> %OUTPUT%
+echo ^</pre^>      >> %OUTPUT%"
 
-sed "s/,/<\/td><td>/g; s/^/<tr><td>/; s/$/<\/td><\/tr>/" "%INPUT%" >> "%OUTPUT%"
+:: ---- beginning of table ----
+(
+echo ^<table border=on^>
+echo ^<tr^>^<th^>file^</th^>^<th^>sha256 hash^</th^>^<th^>virus status^</th^>^</tr^>
+) >> "%OUTPUT%"
 
-REM ---- start preformatted section ----
-echo ^<pre^> >> "%OUTPUT%"
+:: body of table
+sed "/SCAN SUMMARY/,$ d; s/^[^\\]*\\//; s/,/<\/td><td>/g; s/^/<tr><td>/; s/$/<\/td><\/tr>/" "%INPUT%" >> "%OUTPUT%"
 
-:: ---- awk SCAN SUMMARY section ----
-::%gawk% "{
-::    if ($0 ~ /SCAN SUMMARY/) start=1
-::    if (start) print
-::}" "%INPUTTEMP%" >> "%OUTPUT%"
+:: ---- end of table ----
+(
+echo ^</table^>
+) >> "%OUTPUT%"
+
 
 :: ---- HTML footer ----
 (
 echo ^</pre^>
-echo ^</table^>
 echo ^</body^>
 echo ^</html^>
 ) >> "%OUTPUT%"
 
 :: ---- Cleanup ----
-del "%INPUTTEMP%" >nul 2>&1
+del "%SUMMARYFILE%" >nul 2>&1
 
 echo Manifest created: %OUTPUT%
 endlocal
