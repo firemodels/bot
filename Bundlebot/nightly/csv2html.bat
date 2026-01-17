@@ -1,6 +1,13 @@
 @echo off
 setlocal EnableExtensions
 
+set CDIR=%CD%
+set bindir=..\..\scripts\bin
+cd %bindir%
+set bindir=%CD%
+cd %CDIR%
+set gawk=%bindir%\gawk.exe
+
 :: ---- Input handling ----
 if "%~1"=="" (
     echo Usage: %~nx0 inputfile
@@ -24,22 +31,17 @@ echo ^<table border=on^>
 echo ^<tr^>^<th^>file^</th^>^<th^>sha256 hash^</th^>^<th^>virus status^</th^>^</tr^>
 ) > "%OUTPUT%"
 
-:: ---- awk table rows (until SCAN SUMMARY) ----
-gawk -F, "{
-    if ($0 ~ /SCAN SUMMARY/) exit
-    printf \"<tr>\"
-    for (i=1; i<=NF; i++) printf \"<td>%s</td>\", $i
-    print \"</tr>\"
-}" "%INPUTTEMP%" >> "%OUTPUT%"
+
+sed "s/,/<\/td><td>/g; s/^/<tr><td>/; s/$/<\/td><\/tr>/" "%INPUT%" >> "%OUTPUT%"
 
 REM ---- start preformatted section ----
 echo ^<pre^> >> "%OUTPUT%"
 
 :: ---- awk SCAN SUMMARY section ----
-gawk "{
-    if ($0 ~ /SCAN SUMMARY/) start=1
-    if (start) print
-}" "%INPUTTEMP%" >> "%OUTPUT%"
+::%gawk% "{
+::    if ($0 ~ /SCAN SUMMARY/) start=1
+::    if (start) print
+::}" "%INPUTTEMP%" >> "%OUTPUT%"
 
 :: ---- HTML footer ----
 (
