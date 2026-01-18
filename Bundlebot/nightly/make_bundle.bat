@@ -296,6 +296,8 @@ if %ERRORLEVEL% == 1 goto elsescan
   set CSV2HTML=%scriptdir%\csv2html.bat
   set scanlog=%logdir%\%basename%_log.txt
   set vscanlog=%logdir%\%basename%.csv
+  set preamble=%logdir%\preamble.csv
+  set summary=%logdir%\summary.txt
   set htmllog=%logdir%\%basename%_manifest.html
   set nvscanlog=%logdir%\%basename%_nlog.txt
   echo ***scanning bundle
@@ -307,10 +309,22 @@ if %ERRORLEVEL% == 1 goto elsescan
   call %ADDSHA256% %scanlog%         > %vscanlog%
   cd %scriptdir%
   echo ***removing %basename% from filepaths
-  sed -i.bak "s|FDS.*SMV[^\\]*\\||g"   %vscanlog% 
+  sed -i.bak "s/%basename%\\//g"   %vscanlog%
+
+:: split file into two parts
+  sed "/SCAN SUMMARY/,$ d"    %vscanlog% > %preamble%
+  sed -n "/SCAN SUMMARY/,$ p" %vscanlog% > %summary%
+
+:: sort the first part
+  sort %preamble% > %vscanlog%
+
+:: remove adjacent commas ,, and append to original file
+  sed "s/,,/ /g" %summary%     >> %vscanlog%
+
   cd %scriptdir%
   echo ***converting scan log to html
   call %CSV2HTML% %vscanlog%
+
   echo complete
   cd %scriptdir%
   grep Infected %vscanlog% | %gawk% -F":" "{print $2}" > %nvscanlog%
