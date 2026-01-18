@@ -417,8 +417,12 @@ if [ $clam_status -eq 1 ]; then
   echo "--- scanning archive for viruses/malware ---"
   echo "" 
   clamscan -r $UPLOAD_DIR/$bundlebase > $scanlog 2>&1
-  sed 's/.*FDS-/FDS-/' $scanlog   > $vscanlog
+  sed 's/.*FDS-/FDS-/' $scanlog      > $vscanlog
+  echo ""
+  echo "--- add sha256 hashes ---"
+  echo "" 
   $SCRIPTDIR/add_sha256.sh $vscanlog > $csvlog
+  sed -i.bak 's|FDS.*SMV[^/]*/||g'     $csvlog
   $SCRIPTDIR/csv2html.sh   $csvlog 
   ninfected=`grep 'Infected files' $vscanlog | awk -F: '{print $2}'`
   if [ "$ninfected" == "" ]; then
@@ -470,3 +474,4 @@ if [ -e $errlog ]; then
 fi
 echo installer located at: $bundlepath
 exit $returncode
+sed -i.bak2 s|FDS.*SMV[^/]*/||g xxx.csv
