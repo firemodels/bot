@@ -423,7 +423,7 @@ if [ $clam_status -eq 1 ]; then
   echo "" 
   $SCRIPTDIR/add_sha256.sh $vscanlog > $csvlog
   sed -i.bak '/SCAN SUMMARY/,$d; s|FDS.*SMV[^/]*/||g'     $csvlog
-  sort -o $csvlog $csvlog
+  sort -f -o $csvlog $csvlog
   sed -n '/SCAN SUMMARY/,$p' $vscanlog >> $csvlog
   $SCRIPTDIR/csv2html.sh                                  $csvlog 
   ninfected=`grep 'Infected files' $vscanlog | awk -F: '{print $2}'`
