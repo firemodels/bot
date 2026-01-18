@@ -2,6 +2,7 @@
 INPUT=$1
 INPUTTEMP=${INPUT}.$$
 TITLE="${INPUT%.*}"
+TITLE=`echo $TITLE |  sed 's/.*FDS-/FDS-/'`
 OUTPUT="${INPUT%.*}"
 OUTPUT=${OUTPUT}_manifest.html
 sed 's/: OK/OK/g' $INPUT > $INPUTTEMP
