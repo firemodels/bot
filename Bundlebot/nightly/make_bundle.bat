@@ -23,7 +23,6 @@ cd %scriptdir%
 set GITROOT=%repo_root%
 set returncode=0
 set gawk=%GITROOT%\bot\scripts\bin\gawk.exe
-set CONVERTLOG=%scriptdir%\add_sha256.bat
 
 :: setup .bundle and upload directories
 
@@ -290,7 +289,11 @@ echo.
 
 set have_virus=0
 call :IS_FILE_INSTALLED clamscan
+if not exist %basedir% error ***error: %basedir% does not exist
 if %ERRORLEVEL% == 1 goto elsescan
+  if not exist %basedir% goto elsescan
+  set ADDSHA256=%scriptdir%\add_sha256.bat
+  set CSV2HTML=%scriptdir%\csv2html.bat
   set scanlog=%logdir%\%basename%_log.txt
   set vscanlog=%logdir%\%basename%.csv
   set htmllog=%logdir%\%basename%_manifest.html
@@ -299,10 +302,13 @@ if %ERRORLEVEL% == 1 goto elsescan
   echo    input: %basedir%
   echo    output: %vscanlog%
   clamscan -r %basedir% > %scanlog% 2>&1
+  echo ***adding sha256 hashes
   cd %scriptdir%
-  call %CONVERTLOG% %scanlog% > %vscanlog%
-  cd output
-  call ..\csv2html %vscanlog% %htmllog%
+  call %ADDSHA256% %scanlog% > %vscanlog%
+  cd %scriptdir%
+  echo ***converting log to html
+  call %CSV2HTML% %vscanlog%
+  echo complete
   cd %scriptdir%
   grep Infected %vscanlog% | %gawk% -F":" "{print $2}" > %nvscanlog%
   set have_virus=1

@@ -6,7 +6,6 @@ set bindir=..\..\scripts\bin
 cd %bindir%
 set bindir=%CD%
 cd %CDIR%
-set gawk=%bindir%\gawk.exe
 
 cd temp
 git clean -dxf 

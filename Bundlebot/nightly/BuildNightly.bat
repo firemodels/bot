@@ -186,7 +186,7 @@ if %HAVEVIRUS% == 2 echo ***warning: a virus scanner was not bound, the bundle w
 if %HAVEVIRUS% == 1 echo ***error: a virus was found in the bundle
 if %HAVEVIRUS% == 1 echo bundle was built but not uploaded
 if %HAVEVIRUS% == 1 goto skip_upload
-if %HAVEVIRUS% == 0 echo ***a virus was not found in the bundle ***
+if %HAVEVIRUS% == 0 echo ***no viruses were found in the bundle ***
 if "x%upload_bundle%" == "x" goto skip_upload
   echo.
   echo ------------------------------------------------------
