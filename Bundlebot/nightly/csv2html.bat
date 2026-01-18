@@ -25,7 +25,7 @@ set "TITLE=%~n1"
 set "OUTPUT=%~dpn1_manifest.html"
 
 :: ---- extract summary portion of input file' ----
-sed -n "/SCAN SUMMARY/,$ p" "%INPUT%" > "%SUMMARYFILE%" 
+sed -n "/SCAN SUMMARY/,$ p" "%INPUT%" | sed "s/,,/ /g" > "%SUMMARYFILE%" 
 
 :: ---- HTML header ----
 (
