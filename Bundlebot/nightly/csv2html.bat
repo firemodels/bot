@@ -22,7 +22,7 @@ set "INPUT=%~1"
 set "SUMMARYFILE=%TEMPDIR%\summary_%RANDOM%.txt"
 
 set "TITLE=%~n1"
-set "OUTPUT=%~1_manifest.html"
+set "OUTPUT=%~dpn1_manifest.html"
 
 :: ---- extract summary portion of input file' ----
 sed -n "/SCAN SUMMARY/,$ p" "%INPUT%" > "%SUMMARYFILE%" 
