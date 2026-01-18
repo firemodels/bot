@@ -474,4 +474,3 @@ if [ -e $errlog ]; then
 fi
 echo installer located at: $bundlepath
 exit $returncode
-sed -i.bak2 s|FDS.*SMV[^/]*/||g xxx.csv
