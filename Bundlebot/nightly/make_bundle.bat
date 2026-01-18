@@ -304,9 +304,12 @@ if %ERRORLEVEL% == 1 goto elsescan
   clamscan -r %basedir% > %scanlog% 2>&1
   echo ***adding sha256 hashes
   cd %scriptdir%
-  call %ADDSHA256% %scanlog% > %vscanlog%
+  call %ADDSHA256% %scanlog%         > %vscanlog%
   cd %scriptdir%
-  echo ***converting log to html
+  echo ***removing %basename% from filepaths
+  sed -i.bak "s|FDS.*SMV[^\\]*\\||g"   %vscanlog% 
+  cd %scriptdir%
+  echo ***converting scan log to html
   call %CSV2HTML% %vscanlog%
   echo complete
   cd %scriptdir%
