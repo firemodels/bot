@@ -324,7 +324,10 @@ if %ERRORLEVEL% == 1 goto elsescan
   cd %scriptdir%
   echo ***converting scan log to html
   call %CSV2HTML% %vscanlog%
-
+  if NOT exist %htmllog% goto skiphtml
+  CALL :COPY "%htmllog" "%out_doc%\Manifest.html"
+  :skiphtml
+  
   echo complete
   cd %scriptdir%
   grep Infected %vscanlog% | %gawk% -F":" "{print $2}" > %nvscanlog%

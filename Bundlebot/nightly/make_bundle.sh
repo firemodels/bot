@@ -54,9 +54,6 @@ else
   bundlebase=${fds_version}_${smv_version}_${FDSREPODATE}${NIGHTLY}lnx
 fi
 custombase=${fds_version}_${smv_version}
-scanlog=$SCRIPTDIR/output/${bundlebase}_log.txt
-vscanlog=$SCRIPTDIR/output/${bundlebase}.log
-csvlog=$SCRIPTDIR/output/${bundlebase}.csv
 
 # create upload directory if it doesn't exist
 
@@ -413,6 +410,11 @@ rm -rf $OUTDIR/Immersed_Boundary_Method
 
 clam_status=`IS_PROGRAM_INSTALLED clamscan`
 if [ $clam_status -eq 1 ]; then
+  scanlog=$SCRIPTDIR/output/${bundlebase}_log.txt
+  vscanlog=$SCRIPTDIR/output/${bundlebase}.log
+  htmllog=$SCRIPTDIR/output/${bundlebase}_manifest.html
+  csvlog=$SCRIPTDIR/output/${bundlebase}.csv
+
   echo ""
   echo "--- scanning archive for viruses/malware ---"
   echo "" 
@@ -425,7 +427,10 @@ if [ $clam_status -eq 1 ]; then
   sed -i.bak '/SCAN SUMMARY/,$d; s|FDS.*SMV[^/]*/||g'     $csvlog
   sort -o $csvlog $csvlog
   sed -n '/SCAN SUMMARY/,$p' $vscanlog >> $csvlog
-  $SCRIPTDIR/csv2html.sh                                  $csvlog 
+  $SCRIPTDIR/csv2html.sh                                  $csvlog
+  if [ -e $SCRIPTDIR/output/${bundlebase}_manifest.html ]; then
+    CP $SCRIPTDIR/output ${bundlebase}_manifest.html $bundledir/Documentation Manifest.html
+  fi
   ninfected=`grep 'Infected files' $vscanlog | awk -F: '{print $2}'`
   if [ "$ninfected" == "" ]; then
     ninfected=0
