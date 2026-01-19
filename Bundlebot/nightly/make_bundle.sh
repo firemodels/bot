@@ -34,7 +34,6 @@ fi
 
 INSTALLDIR=FDS/FDS6
 errlog=$SCRIPTDIR/output/errlog
-scanlog=$SCRIPTDIR/output/scanlog
 
 # determine directory repos reside under
 
@@ -411,11 +410,28 @@ rm -rf $OUTDIR/Immersed_Boundary_Method
 
 clam_status=`IS_PROGRAM_INSTALLED clamscan`
 if [ $clam_status -eq 1 ]; then
+  scanlog=$SCRIPTDIR/output/${bundlebase}_log.txt
+  vscanlog=$SCRIPTDIR/output/${bundlebase}.log
+  htmllog=$SCRIPTDIR/output/${bundlebase}_manifest.html
+  csvlog=$SCRIPTDIR/output/${bundlebase}.csv
+
   echo ""
   echo "--- scanning archive for viruses/malware ---"
   echo "" 
   clamscan -r $UPLOAD_DIR/$bundlebase > $scanlog 2>&1
-  ninfected=`grep 'Infected files' $scanlog | awk -F: '{print $2}'`
+  sed 's/.*FDS-/FDS-/' $scanlog      > $vscanlog
+  echo ""
+  echo "--- add sha256 hashes ---"
+  echo "" 
+  $SCRIPTDIR/add_sha256.sh $vscanlog > $csvlog
+  sed -i.bak '/SCAN SUMMARY/,$d; s|FDS.*SMV[^/]*/||g'     $csvlog
+  sort -f -o $csvlog $csvlog
+  sed -n '/SCAN SUMMARY/,$p' $vscanlog >> $csvlog
+  $SCRIPTDIR/csv2html.sh                                  $csvlog
+  if [ -e $SCRIPTDIR/output/${bundlebase}_manifest.html ]; then
+    CP $SCRIPTDIR/output ${bundlebase}_manifest.html $bundledir/Documentation Manifest.html
+  fi
+  ninfected=`grep 'Infected files' $vscanlog | awk -F: '{print $2}'`
   if [ "$ninfected" == "" ]; then
     ninfected=0
   fi
