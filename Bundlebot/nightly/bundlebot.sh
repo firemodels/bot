@@ -228,6 +228,7 @@ REPO_ROOT=`pwd`
 cd $CURDIR
 installer_base=${FDSREV}_${SMVREV}
 installer_base_platform=${installer_base}_${BUNDLE_PREFIX_FILE}$platform
+htmllog=${installer_base_platform}_manifest.html
 if [[ "$showparms" == "" ]] && [[ "$OVERWRITE" == "" ]]; then
   installer_file=$bundle_dir/${installer_base_platform}.sh
   if [ -e $installer_file ]; then
@@ -248,8 +249,8 @@ if [ "$showparms" == "" ]; then
   
   echo
   echo ***Virus scan summary
-  if [ -e $OUTPUT_DIR/scanlog ]; then
-    grep -v OK$ $OUTPUT_DIR/scanlog | grep -v ^$ | grep -v SUMMARY
+  if [ -e $OUTPUT_DIR/$csvlog ]; then
+    grep -v OK$ $OUTPUT_DIR/$csvlog | grep -v ^$ | grep -v SUMMARY
   else
     echo virus scanner not available, bundle was not scanned
   fi
@@ -263,7 +264,12 @@ if [ "$showparms" == "" ]; then
       gh release delete-asset FDS_TEST $file -R github.com/$GHOWNER/test_bundles -y
     done
 
-    gh release upload FDS_TEST $bundle_dir/${installer_base_platform}.sh         -R github.com/$GHOWNER/test_bundles  --clobber
+    echo gh release upload FDS_TEST $bundle_dir/${installer_base_platform}.sh -R github.com/$GHOWNER/test_bundles  --clobber
+         gh release upload FDS_TEST $bundle_dir/${installer_base_platform}.sh -R github.com/$GHOWNER/test_bundles  --clobber
+    if [ -e $OUTPUT_DIR/$csvlog ]; then
+      echo gh release upload FDS_TEST $OUTPUT_DIR/$htmllog                       -R github.com/$GHOWNER/test_bundles  --clobber
+           gh release upload FDS_TEST $OUTPUT_DIR/$htmllog                       -R github.com/$GHOWNER/test_bundles  --clobber
+    fi
     if [ "$platform" == "lnx" ]; then
       cd $REPO_ROOT/fds
       FDS_SHORT_HASH=`git rev-parse --short HEAD`
@@ -280,8 +286,9 @@ if [ "$ECHO" == "" ]; then
     ln -s ${BUNDLEBASE}.sh $LATEST
   fi
   cp $REPO_ROOT/bot/Bundlebot/nightly/autoinstall.txt $bundle_dir/.
-  rm -f  ${BUNDLEBASE}.tar.gz
-  rm -rf $BUNDLEBASE
+#don't remove bundle directory
+#  rm -f  ${BUNDLEBASE}.tar.gz
+#  rm -rf $BUNDLEBASE
   if [ "$INSTALL" != "" ]; then
     cd $bundle_dir
     cat autoinstall.txt | bash $LATEST >& $HOME/.bundle/bundle_lnx_nightly_install.log
