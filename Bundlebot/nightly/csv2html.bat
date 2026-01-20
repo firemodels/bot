@@ -42,7 +42,7 @@ echo ^</pre^>      >> %OUTPUT%"
 :: ---- beginning of table ----
 (
 echo ^<table border=on^>
-echo ^<tr^>^<th^>file^</th^>^<th^>sha256 hash^</th^>^<th^>virus status^</th^>^</tr^>
+echo ^<tr^>^<th^>file^</th^>^<th^>SHA256 hash ^(certutil -hashfile file SHA256^)^</th^>^<th^>virus status^</th^>^</tr^>
 ) >> "%OUTPUT%"
 
 :: body of table
