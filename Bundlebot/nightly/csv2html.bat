@@ -2,14 +2,9 @@
 setlocal EnableExtensions
 
 set CDIR=%CD%
-set bindir=..\..\scripts\bin
+set bindir=..\..\Scripts\bin
 cd %bindir%
 set bindir=%CD%
-cd %CDIR%
-
-cd temp
-git clean -dxf 
-set TEMPDIR=%CDIR%\temp
 cd %CDIR%
 
 :: ---- Input handling ----
@@ -19,7 +14,7 @@ if "%~1"=="" (
 )
 
 set "INPUT=%~1"
-set "SUMMARYFILE=%TEMPDIR%\summary_%RANDOM%.txt"
+set "SUMMARYFILE=%CDIR%\output\summary_%RANDOM%.txt"
 
 set "TITLE=%~n1"
 set "OUTPUT=%~dpn1_manifest.html"
