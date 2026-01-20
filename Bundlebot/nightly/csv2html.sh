@@ -18,7 +18,7 @@ cat << EOF > $OUTPUT
 <html><head><title>$TITLE Manifest</title>
 <h1>$TITLE Manifest</h1>
 <table border=on>
-<tr><th>file</th><th>$SHAHEADER</th><th>virus status</th></th></tr>
+<tr><th>file</th><th>$SHAHEADER</th><th>virus check</th></th></tr>
 EOF
 awk -F, '{
     if ($0 ~ /SCAN SUMMARY/) exit
