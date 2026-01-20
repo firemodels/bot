@@ -1,6 +1,9 @@
 #!/bin/bash
 OUTPUT=$1
 TEST=$2
+if [ "$OUTPUT" == "" ]; then
+  OUTPUT=/dev/stdout
+fi
 # if TEST is null then OUTPUT will contain the eicar test string
 # if TEST contains a string then it will not (ie will not be quarantined by a virus scanner)
 cat << EOF > $OUTPUT
