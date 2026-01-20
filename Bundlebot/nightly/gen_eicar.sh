@@ -2,7 +2,8 @@
 OUTPUT=$1
 TEST=$2
 if [ "$OUTPUT" == "" ]; then
-  OUTPUT=/dev/stdout
+  echo ***error: specify an output file
+  exit
 fi
 # if TEST is null then OUTPUT will contain the eicar test string
 # if TEST contains a string then it will not (ie will not be quarantined by a virus scanner)
