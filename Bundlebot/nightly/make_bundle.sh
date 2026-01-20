@@ -416,7 +416,7 @@ if [ $clam_status -eq 1 ]; then
   csvlog=$SCRIPTDIR/output/${bundlebase}.csv
  
   if [ "$TEST_VIRUS" != "" ]; then
-    $SCRIPT_DIR/gen_eicar.com $bundlebase/eicar.com
+    $SCRIPTDIR/gen_eicar.sh $bundledir/eicar.com
   fi
 
   echo ""

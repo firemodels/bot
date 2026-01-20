@@ -228,6 +228,7 @@ REPO_ROOT=`pwd`
 cd $CURDIR
 installer_base=${FDSREV}_${SMVREV}
 installer_base_platform=${installer_base}_${BUNDLE_PREFIX_FILE}$platform
+csvlog=${installer_base_platform}.csv
 htmllog=${installer_base_platform}_manifest.html
 if [[ "$showparms" == "" ]] && [[ "$OVERWRITE" == "" ]]; then
   installer_file=$bundle_dir/${installer_base_platform}.sh
@@ -243,7 +244,7 @@ cd $SCRIPTDIR
 if [ "$showparms" == "" ]; then
   echo ""
   echo -n  "***Building installer"
-  $ECHO ./make_bundle.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version $bundle_dir $BUNDLE_PREFIX > $OUTPUT_DIR/stage1
+  $ECHO ./make_bundle.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version $bundle_dir $BUNDLE_PREFIX
   make_bundle_status=$?
   echo " - complete"
   
