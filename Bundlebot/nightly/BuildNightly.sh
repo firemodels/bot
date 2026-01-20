@@ -95,8 +95,9 @@ FDS_TAG=
 SMV_TAG=
 LATEST=
 INSTALL=
+export TEST_VIRUS=
 
-while getopts 'BcfhLm:o:r:R:Uv' OPTION
+while getopts 'BcfhLm:o:r:R:TUv' OPTION
 do
 case $OPTION  in
   B)
@@ -125,6 +126,9 @@ case $OPTION  in
    ;;
   R)
    BRANCH="$OPTARG"
+   ;;
+  T)
+   TEST_VIRUS=1
    ;;
   U)
    UPLOADBUNDLE=-U

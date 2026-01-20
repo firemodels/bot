@@ -414,6 +414,10 @@ if [ $clam_status -eq 1 ]; then
   vscanlog=$SCRIPTDIR/output/${bundlebase}.log
   htmllog=$SCRIPTDIR/output/${bundlebase}_manifest.html
   csvlog=$SCRIPTDIR/output/${bundlebase}.csv
+ 
+  if [ "$TEST_VIRUS" != "" ]; then
+    $SCRIPT_DIR/gen_eicar.com $bundlebase/eicar.com
+  fi
 
   echo ""
   echo "--- scanning archive for viruses/malware ---"
