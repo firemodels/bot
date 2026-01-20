@@ -5,13 +5,20 @@ TITLE="${INPUT%.*}"
 TITLE=`echo $TITLE |  sed 's/.*FDS-/FDS-/'`
 OUTPUT="${INPUT%.*}"
 OUTPUT=${OUTPUT}_manifest.html
+
+if [ "`uname`" == "Darwin" ]; then
+  SHAHEADER="SHA256 hash (shasum -a 256 file)"
+else
+  SHAHEADER="SHA256 hash (sha256sum file)"
+fi
+
 sed 's/: OK/OK/g' $INPUT > $INPUTTEMP
 
 cat << EOF > $OUTPUT
 <html><head><title>$TITLE Manifest</title>
 <h1>$TITLE Manifest</h1>
 <table border=on>
-<tr><th>file</th><th>sha256 hash</th><th>virus status</th></th></tr>
+<tr><th>file</th><th>$SHAHEADER</th><th>virus check</th></th></tr>
 EOF
 awk -F, '{
     if ($0 ~ /SCAN SUMMARY/) exit
