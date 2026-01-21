@@ -256,26 +256,30 @@ if [ "$showparms" == "" ]; then
     echo virus scanner not available, bundle was not scanned
   fi
 
-  if [[ "$UPLOADBUNDLE" == "1" ]] && [[ $make_bundle_status -eq 0 ]]; then
-    echo ""
-    echo "uploading installer"
+  if [[ "$UPLOADBUNDLE" == "1" ]]; then
+    if [[ $make_bundle_status -eq 0 ]]; then
+      echo ""
+      echo "uploading installer"
     
-    FILELIST=`gh release view FDS_TEST  -R github.com/$GHOWNER/test_bundles | grep SMV | grep FDS | grep $platform | awk '{print $2}'`
-    for file in $FILELIST ; do
-      gh release delete-asset FDS_TEST $file -R github.com/$GHOWNER/test_bundles -y
-    done
-
-    echo gh release upload FDS_TEST $bundle_dir/${installer_base_platform}.sh -R github.com/$GHOWNER/test_bundles  --clobber
-         gh release upload FDS_TEST $bundle_dir/${installer_base_platform}.sh -R github.com/$GHOWNER/test_bundles  --clobber
-    if [ -e $OUTPUT_DIR/$csvlog ]; then
-      echo gh release upload FDS_TEST $OUTPUT_DIR/$htmllog                       -R github.com/$GHOWNER/test_bundles  --clobber
-           gh release upload FDS_TEST $OUTPUT_DIR/$htmllog                       -R github.com/$GHOWNER/test_bundles  --clobber
-    fi
-    if [ "$platform" == "lnx" ]; then
-      cd $REPO_ROOT/fds
-      FDS_SHORT_HASH=`git rev-parse --short HEAD`
-      cd $SCRIPTDIR
-      ./setreleasetitle.sh fds $FDS_SHORT_HASH
+      FILELIST=`gh release view FDS_TEST  -R github.com/$GHOWNER/test_bundles | grep SMV | grep FDS | grep $platform | awk '{print $2}'`
+      for file in $FILELIST ; do
+        gh release delete-asset FDS_TEST $file -R github.com/$GHOWNER/test_bundles -y
+      done
+  
+      echo gh release upload FDS_TEST $bundle_dir/${installer_base_platform}.sh -R github.com/$GHOWNER/test_bundles  --clobber
+#***           gh release upload FDS_TEST $bundle_dir/${installer_base_platform}.sh -R github.com/$GHOWNER/test_bundles  --clobber
+      if [ -e $OUTPUT_DIR/htmllog ]; then
+        echo gh release upload FDS_TEST $OUTPUT_DIR/$htmllog                       -R github.com/$GHOWNER/test_bundles  --clobber
+#***             gh release upload FDS_TEST $OUTPUT_DIR/$htmllog                       -R github.com/$GHOWNER/test_bundles  --clobber
+      fi
+      if [ "$platform" == "lnx" ]; then
+        cd $REPO_ROOT/fds
+        FDS_SHORT_HASH=`git rev-parse --short HEAD`
+        cd $SCRIPTDIR
+#***        ./setreleasetitle.sh fds $FDS_SHORT_HASH
+      fi
+    else
+      echo ***error: virus detected in bundle, bundle not uploaded
     fi
   fi
 fi
