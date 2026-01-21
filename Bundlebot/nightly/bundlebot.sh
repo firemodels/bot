@@ -267,16 +267,16 @@ if [ "$showparms" == "" ]; then
       done
   
       echo gh release upload FDS_TEST $bundle_dir/${installer_base_platform}.sh -R github.com/$GHOWNER/test_bundles  --clobber
-#***           gh release upload FDS_TEST $bundle_dir/${installer_base_platform}.sh -R github.com/$GHOWNER/test_bundles  --clobber
-      if [ -e $OUTPUT_DIR/htmllog ]; then
+           gh release upload FDS_TEST $bundle_dir/${installer_base_platform}.sh -R github.com/$GHOWNER/test_bundles  --clobber
+      if [ -e $OUTPUT_DIR/$htmllog ]; then
         echo gh release upload FDS_TEST $OUTPUT_DIR/$htmllog                       -R github.com/$GHOWNER/test_bundles  --clobber
-#***             gh release upload FDS_TEST $OUTPUT_DIR/$htmllog                       -R github.com/$GHOWNER/test_bundles  --clobber
+             gh release upload FDS_TEST $OUTPUT_DIR/$htmllog                       -R github.com/$GHOWNER/test_bundles  --clobber
       fi
       if [ "$platform" == "lnx" ]; then
         cd $REPO_ROOT/fds
         FDS_SHORT_HASH=`git rev-parse --short HEAD`
         cd $SCRIPTDIR
-#***        ./setreleasetitle.sh fds $FDS_SHORT_HASH
+        ./setreleasetitle.sh fds $FDS_SHORT_HASH
       fi
     else
       echo ***error: virus detected in bundle, bundle not uploaded

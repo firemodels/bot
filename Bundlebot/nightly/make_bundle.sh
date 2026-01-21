@@ -350,8 +350,9 @@ else
   if [ "$OPENMPI_TARFILE" != "" ]; then
     openmpifile=$OPENMPI_TARFILE
   fi
-#  CP $MPI_DIR $openmpifile  $fdsbindir $openmpifile
-  UNTAR $openmpifile $fdsbindir openmpi
+  if [ "$platform" == "linux" ]; then
+    UNTAR $openmpifile $fdsbindir openmpi
+  fi
   MPIEXEC=$fdsbindir/openmpi/bin/mpiexec
 fi
 
@@ -420,12 +421,12 @@ if [ $clam_status -eq 1 ]; then
   fi
 
   echo ""
-  echo "--- scanning archive for viruses/malware ---"
+  echo "--- scanning $bundlebase for viruses/malware ---"
   echo "" 
   clamscan -r $UPLOAD_DIR/$bundlebase > $scanlog 2>&1
   sed 's/.*FDS-/FDS-/' $scanlog      > $vscanlog
   echo ""
-  echo "--- add sha256 hashes ---"
+  echo "--- adding sha256 hashes ---"
   echo "" 
   $SCRIPTDIR/add_sha256.sh $vscanlog > $csvlog
   sed -i.bak '/SCAN SUMMARY/,$d; s|FDS.*SMV[^/]*/||g'     $csvlog

@@ -16,21 +16,23 @@ SMV_BRANCH=master
 
 UPLOADBUNDLE=
 if [ "`uname`" == "Darwin" ] ; then
-  export FDS_OPENMPIDIR=/opt/openmpi414_oneapi1p6
-  export intel_mpi_version=oneapi1p6
-  export mpi_version=4.1.4
-  export openmpi_dir=/opt/openmpi414_oneapi1p6
+  export FDS_OPENMPIDIR=/opt/openmpi415_oneapi22u3
+  export intel_mpi_version=oneapi22u3
+  export mpi_version=4.1.5
+  export openmpi_dir=/opt/openmpi415_oneapi22u3
 else
   export intel_mpi_version=2025.0
   export mpi_version_linux=INTEL
+  export INTEL_MPI_VERSION=2025.0
+  export MPI_VERSION=INTEL
 fi
 
 #define BUNDLE_MAILTO in .bashrc
 if [ "$BUNDLE_MAILTO" != "" ]; then
   MAILTO=$BUNDLE_MAILTO
 fi
-export INTEL_MPI_VERSION=2025.0
-export MPI_VERSION=INTEL
+#export INTEL_MPI_VERSION=2025.0
+#export MPI_VERSION=INTEL
 
 
 
