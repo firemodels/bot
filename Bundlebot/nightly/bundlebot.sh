@@ -125,7 +125,7 @@ fi
 
 # prevent more than one instance of this script from running at the same time
 
-LOCK_FILE=$HOME/.bundle/make_bundle_lock
+LOCK_FILE=$HOME/.bundle/assemble_bundle_lock
 if [ "$FORCE" == "" ]; then
   if [ -e $LOCK_FILE ]; then
     echo "***error: another instance of $0 is running."
@@ -244,8 +244,8 @@ cd $SCRIPTDIR
 if [ "$showparms" == "" ]; then
   echo ""
   echo -n  "***Building installer"
-  $ECHO ./make_bundle.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version $bundle_dir $BUNDLE_PREFIX
-  make_bundle_status=$?
+  $ECHO ./assemble_bundle.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version $bundle_dir $BUNDLE_PREFIX
+  assemble_bundle_status=$?
   echo " - complete"
   
   echo
@@ -257,7 +257,7 @@ if [ "$showparms" == "" ]; then
   fi
 
   if [[ "$UPLOADBUNDLE" == "1" ]]; then
-    if [[ $make_bundle_status -eq 0 ]]; then
+    if [[ $assemble_bundle_status -eq 0 ]]; then
       echo ""
       echo "uploading installer"
     
