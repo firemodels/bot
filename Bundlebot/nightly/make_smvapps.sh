@@ -29,7 +29,7 @@ CHECK_BUILD()
     echo "***error: The program ${prog}_${platform} failed to build"
     echo "***error: The program ${prog}_${platform} failed to build"   >> $errorlog 2>&1
   else
-    echo $smvrepo/Build/$prog/${smvcompiler}_$platform/${prog}_$platform built
+    echo ${prog} built
     cp $smvrepo/Build/$prog/${smvcompiler}_$platform/${prog}_$platform $CURDIR/apps/$prog
   fi
 }

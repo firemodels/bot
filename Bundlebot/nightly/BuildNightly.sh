@@ -1,5 +1,46 @@
 #!/bin/bash
 
+#---------------------------------------------
+#                   usage
+#---------------------------------------------
+
+function usage {
+echo ""
+echo "BUILDnightly.sh usage"
+echo ""
+echo "This script builds FDS and Smokeview apps and generates a bundle using either the"
+echo "specified fds and smv repo revisions or revisions from the latest firebot pass."
+echo ""
+echo "Options:"
+echo "-B - install bundle after it is built"
+echo "-c - bundle without warning about cloning/erasing fds and smv repos"
+echo "-f - force this script to run"
+echo "-h - display this message"
+echo "-L - build apps using latest revision"
+if [ "$MAILTO" != "" ]; then
+  echo "-m mailto - email address [default: $MAILTO]"
+else
+  echo "-m mailto - email address"
+fi
+echo "-o - specify GH_OWNER when building a bundle. [default: $GH_OWNER]"
+echo "-r - specify GH_REPO when building a bundle. [default: $GH_REPO]"
+echo "-R branch - clone repos using name branch {default: $BRANCH]"
+echo "-r - create a release bundle (same as -R branc)"
+echo "-U - upload bundle file to GitHub."
+exit 0
+}
+
+#-------------------- start of script ---------------------------------
+
+commands=$0
+DIR=$(dirname "${commands}")
+cd $DIR
+DIR=`pwd`
+SCRIPTDIR=$DIR
+
+cd ../../..
+GITROOT=`pwd`
+
 FDS_HASH=
 SMV_HASH=
 FDS_BRANCH=master
@@ -34,49 +75,6 @@ fi
 #export INTEL_MPI_VERSION=2025.0
 #export MPI_VERSION=INTEL
 
-
-
-#---------------------------------------------
-#                   usage
-#---------------------------------------------
-
-function usage {
-echo ""
-echo "BUILDnightly.sh usage"
-echo ""
-echo "This script builds FDS and Smokeview apps and generates a bundle using either the"
-echo "specified fds and smv repo revisions or revisions from the latest firebot pass."
-echo ""
-echo "Options:"
-echo "-B - install bundle after it is built"
-echo "-c - bundle without warning about cloning/erasing fds and smv repos"
-echo "-f - force this script to run"
-echo "-h - display this message"
-echo "-L - build apps using latest revision"
-if [ "$MAILTO" != "" ]; then
-  echo "-m mailto - email address [default: $MAILTO]"
-else
-  echo "-m mailto - email address"
-fi
-echo "-o - specify GH_OWNER when building a bundle. [default: $GH_OWNER]"
-echo "-r - specify GH_REPO when building a bundle. [default: $GH_REPO]"
-echo "-R branch - clone repos using name branch {default: $BRANCH]"
-echo "-r - create a release bundle (same as -R branc)"
-echo "-U - upload bundle file to GitHub."
-echo "-v - show settings used to build bundle"
-exit 0
-}
-
-#-------------------- start of script ---------------------------------
-
-commands=$0
-DIR=$(dirname "${commands}")
-cd $DIR
-DIR=`pwd`
-
-cd ../../..
-repo=`pwd`
-
 cd $DIR/output
 outputdir=`pwd`
 cd $DIR
@@ -87,9 +85,8 @@ MAILTO=
 if [ "$BUNDLE_EMAIL" != "" ]; then
   MAILTO=$BUNDLE_EMAIL
 fi
-ECHO=
-PROCEED=
 
+PROCEED=
 FORCE=
 RELEASE=
 BRANCH=nightly
@@ -99,7 +96,7 @@ LATEST=
 INSTALL=
 export TEST_VIRUS=
 
-while getopts 'BcfhLm:o:r:R:TUv' OPTION
+while getopts 'BcfhLm:o:r:R:TU' OPTION
 do
 case $OPTION  in
   B)
@@ -133,10 +130,7 @@ case $OPTION  in
    TEST_VIRUS=1
    ;;
   U)
-   UPLOADBUNDLE=-U
-   ;;
-  v)
-   ECHO=echo
+   UPLOADBUNDLE=1
    ;;
 esac
 done
@@ -153,7 +147,7 @@ fi
 if [ "$BRANCH" == "nightly" ]; then
   FDS_TAG=
   SMV_TAG=
-  $repo/bot/Firebot/getGHfile.sh     FDS_INFO.txt
+  $GITROOT/bot/Firebot/getGHfile.sh     FDS_INFO.txt
   FDS_HASH=`grep FDS_HASH  FDS_INFO.txt | awk '{print $2}'`
   SMV_HASH=`grep SMV_HASH  FDS_INFO.txt | awk '{print $2}'`
   FDS_REVISION=`grep FDS_REVISION  FDS_INFO.txt | awk '{print $2}'`
@@ -207,9 +201,9 @@ if [ "$PROCEED" == "" ]; then
 fi
 
 #*** update webpages repos
-if [ -d $repo/webpages ]; then
+if [ -d $GITROOT/webpages ]; then
   echo updating webpages repo
-  cd $repo/webpages
+  cd $GITROOT/webpages
   get fetch origin              > $outputdir/update_webpages 2&>1
   git merge origin/nist-pages  >> $outputdir/update_webpages 2&>1
 fi
@@ -275,12 +269,189 @@ pid_smvapps=$!
 wait $pid_fdsapps
 wait $pid_smvapps
 
-echo $FDS_HASH     > $repo/bot/Bundlebot/nightly/apps/FDS_HASH
-echo $SMV_HASH     > $repo/bot/Bundlebot/nightly/apps/SMV_HASH
-echo $FDS_REVISION > $repo/bot/Bundlebot/nightly/apps/FDS_REVISION
-echo $SMV_REVISION > $repo/bot/Bundlebot/nightly/apps/SMV_REVISION
+echo $FDS_HASH     > $GITROOT/bot/Bundlebot/nightly/apps/FDS_HASH
+echo $SMV_HASH     > $GITROOT/bot/Bundlebot/nightly/apps/SMV_HASH
+echo $FDS_REVISION > $GITROOT/bot/Bundlebot/nightly/apps/FDS_REVISION
+echo $SMV_REVISION > $GITROOT/bot/Bundlebot/nightly/apps/SMV_REVISION
 
 #*** generate and upload bundle
 cd $curdir
-$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH $INSTALL $FDS_TAG $SMV_TAG -w $UPLOADBUNDLE
+#$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH $INSTALL $FDS_TAG $SMV_TAG -w $UPLOADBUNDLE
+
+export NOPAUSE=1
+
+if [ "$BUILDING_release" == "1" ]; then
+  releasetype="release"
+  GHOWNER=`whoami`
+else
+  releasetype="nightly"
+  GHOWNER=firemodels
+fi
+
+#run time libraries are located in
+#  $HOME/.bundle/BUNDLE/MPI
+
+if [ "$INTEL_MPI_VERSION" != "" ]; then
+  intel_mpi_version=$INTEL_MPI_VERSION
+fi
+if [ "$MPI_VERSION" != "" ]; then
+  mpi_version=$MPI_VERSION
+fi
+if [ "$OPENMPI_DIR" != "" ]; then
+  openmpi_dir=$OPENMPI_DIR
+fi
+
+bundle_dir=$HOME/.bundle/bundles
+OUTPUT_DIR=$SCRIPTDIR/output
+BUNDLE_PREFIX="nightly"
+
+if [ "$FDS_TAG" != "" ]; then
+  FDS_REVISION=$FDS_TAG
+fi
+if [ "$SMV_TAG" != "" ]; then
+  SMV_REVISION=$SMV_TAG
+fi
+
+# prevent more than one instance of this script from running at the same time
+
+LOCK_FILE=$HOME/.bundle/assemble_bundle_lock
+if [ "$FORCE" == "" ]; then
+  if [ -e $LOCK_FILE ]; then
+    echo "***error: another instance of $0 is running."
+    echo "          If this is not the case, re-run after removing"
+    echo "          the lock file: $LOCKFILE"
+    exit 1
+  fi
+fi
+touch $LOCK_FILE
+
+if [ ! -d $OUTPUT_DIR ]; then
+  mkdir $OUTPUT_DIR
+fi
+rm -f $OUTPUT_DIR/*
+
+# determine platform script is running on
+
+if [ "`uname`" == "Darwin" ]; then
+  platform=osx
+  export FDS_OPENMPIDIR=$openmpi_dir
+else
+  platform=lnx
+fi
+
+if [ "$BRANCH" == "release" ]; then
+  BUNDLE_PREFIX=
+fi
+
+BUNDLE_PREFIX_FILE=
+if [ "$BUNDLE_PREFIX" != "" ]; then
+  BUNDLE_PREFIX_FILE=${BUNDLE_PREFIX}_
+fi
+BRANCHDIR=$BRANCH
+if [ "$BRANCH" != "release" ]; then
+  BRANCHDIR=
+fi
+UPLOAD_DIR=
+if [ "$BRANCH" == "release" ]; then
+  UPLOAD_DIR="bundle_test"
+fi
+
+return_code=0
+error_log=$SCRIPTDIR/output/error_nightly.log
+./copy_pubs.sh fds $releasetype $SCRIPTDIR/pubs $GHOWNER $error_log || return_code=1
+./copy_pubs.sh smv $releasetype $SCRIPTDIR/pubs $GHOWNER $error_log || return_code=1
+
+if [ "$return_code" == "1" ]; then
+  cat $error_log
+  echo ""
+  echo "bundle generation aborted"
+  rm -f $LOCK_FILE
+  exit 1
+fi
+
+# get fds and smv repo revision used to build apps
+
+FDSREV=$FDS_REVISION
+if [ "$FDS_REVISION" == "" ]; then
+  if [ -e $SCRIPTDIR/apps/FDS_REVISION ]; then
+    FDSREV=`cat $SCRIPTDIR/apps/FDS_REVISION`
+  else
+    FDSREV=fdstest
+  fi
+fi
+
+SMVREV=$SMV_REVISION
+if [ "$SMV_REVISION" == "" ]; then
+  if [ -e $SCRIPTDIR/apps/SMV_REVISION ]; then
+    SMVREV=`cat $SCRIPTDIR/apps/SMV_REVISION`
+  else
+    SMVREV=smvtest
+  fi
+fi
+
+cd ../../..
+REPO_ROOT=`pwd`
+cd $SCRIPTDIR
+installer_base=${FDSREV}_${SMVREV}
+installer_base_platform=${installer_base}_${BUNDLE_PREFIX_FILE}$platform
+csvlog=${installer_base_platform}.csv
+htmllog=${installer_base_platform}_manifest.html
+
+cd $SCRIPTDIR
+echo ""
+echo -n  "***Building installer"
+./assemble_bundle.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version $bundle_dir $BUNDLE_PREFIX
+assemble_bundle_status=$?
+echo " - complete"
+  
+echo
+echo ***Virus scan summary
+if [ -e $OUTPUT_DIR/$csvlog ]; then
+  grep -v OK$ $OUTPUT_DIR/$csvlog | grep -v ^$ | grep -v SUMMARY
+else
+  echo virus scanner not available, bundle was not scanned
+fi
+
+if [[ "$UPLOADBUNDLE" == "1" ]]; then
+  if [[ $assemble_bundle_status -eq 0 ]]; then
+    echo ""
+    echo "uploading installer"
+    
+    FILELIST=`gh release view FDS_TEST  -R github.com/$GHOWNER/test_bundles | grep SMV | grep FDS | grep $platform | awk '{print $2}'`
+    for file in $FILELIST ; do
+      gh release delete-asset FDS_TEST $file -R github.com/$GHOWNER/test_bundles -y
+    done
+
+    echo gh release upload FDS_TEST $bundle_dir/${installer_base_platform}.sh -R github.com/$GHOWNER/test_bundles  --clobber
+         gh release upload FDS_TEST $bundle_dir/${installer_base_platform}.sh -R github.com/$GHOWNER/test_bundles  --clobber
+    if [ -e $OUTPUT_DIR/$htmllog ]; then
+      echo gh release upload FDS_TEST $OUTPUT_DIR/$htmllog                       -R github.com/$GHOWNER/test_bundles  --clobber
+           gh release upload FDS_TEST $OUTPUT_DIR/$htmllog                       -R github.com/$GHOWNER/test_bundles  --clobber
+    fi
+    if [ "$platform" == "lnx" ]; then
+      cd $REPO_ROOT/fds
+      FDS_SHORT_HASH=`git rev-parse --short HEAD`
+      cd $SCRIPTDIR
+      ./setreleasetitle.sh fds $FDS_SHORT_HASH
+    fi
+  else
+    echo ***error: virus detected in bundle, bundle not uploaded
+  fi
+fi
+LATEST=$bundle_dir/FDS_SMV_latest_$platform.sh
+BUNDLEBASE=$bundle_dir/${installer_base_platform}
+if [ -e ${BUNDLEBASE}.sh ]; then
+  rm -f  $LATEST
+  ln -s ${BUNDLEBASE}.sh $LATEST
+fi
+cp $REPO_ROOT/bot/Bundlebot/nightly/autoinstall.txt $bundle_dir/.
+#don't remove bundle directory
+#  rm -f  ${BUNDLEBASE}.tar.gz
+#  rm -rf $BUNDLEBASE
+if [ "$INSTALL" != "" ]; then
+  cd $bundle_dir
+  cat autoinstall.txt | bash $LATEST >& $HOME/.bundle/bundle_lnx_nightly_install.log
+fi
+rm -f $LOCK_FILE
+
 rm $LOCKFILE

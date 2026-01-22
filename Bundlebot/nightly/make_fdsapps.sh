@@ -22,7 +22,7 @@ CHECK_BUILDFDSUTIL()
     echo "***error: The program ${prog}_$builddir failed to build
     echo "***error: The program ${prog}_$builddir failed to build   >> $errorlog 2>&1
   else
-    echo $fdsrepo/Utilities/$prog/$builddir/${prog}_$builddir built
+    echo ${prog}_$builddir built
     cp $fdsrepo/Utilities/$prog/$builddir/${prog}_$builddir  $CURDIR/apps/$prog
   fi
 }
@@ -35,7 +35,7 @@ CHECK_BUILDTESTMPI()
     echo "***error: The program test_mpi failed to build"
     echo "***error: The program test_mpi failed to build"  >> $errorlog 2>&1
   else
-    echo $fdsrepo/Utilities/test_mpi/${mpitype}_${fdscompiler}_$platform/test_mpi built
+    echo test_mpi built
     cp $fdsrepo/Utilities/test_mpi/${mpitype}_${fdscompiler}_$platform/test_mpi  $CURDIR/apps/test_mpi
   fi
 }
@@ -62,7 +62,7 @@ CHECK_BUILDFDS()
     echo "***error: The program fds_${mpitype}_${fdscompiler}_${platform} failed to build"
     echo "***error: The program fds_${mpitype}_${fdscompiler}_${platform} failed to build"  >> $errorlog 2>&1
   else
-    echo $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}/fds_${mpitype}_${fdscompiler}_${platform} built
+    echo fds_${mpitype}_${fdscompiler}_${platform} built
     cp $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}/fds_${mpitype}_${fdscompiler}_${platform} $CURDIR/apps/fds
   fi
 }
@@ -75,7 +75,7 @@ CHECK_BUILDFDSOPENMP()
     echo "***error: The program fds_${mpitype}_${fdscompiler}_${platform}_openmp failed to build"
     echo "***error: The program fds_${mpitype}_${fdscompiler}_${platform}_openmp failed to build"   >> $errorlog 2>&1
   else
-    echo $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}_openmp/fds_${mpitype}_${fdscompiler}_${platform}_openmp built
+    echo fds_${mpitype}_${fdscompiler}_${platform}_openmp built
     cp  $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}_openmp/fds_${mpitype}_${fdscompiler}_${platform}_openmp $CURDIR/apps/fds_openmp
   fi
 }
