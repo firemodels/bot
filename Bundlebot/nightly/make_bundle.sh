@@ -346,17 +346,17 @@ else
   fi
   if [[ "$PLATFORM" == "OSX64" ]] && [[ -d ${FDS_OPENMPIDIR} ]]; then
     if [ ! -d $fdsbindir/openmpi ]; then
-      mkdir $fdsbindir/openmpi} 
+      mkdir $fdsbindir/openmpi
     fi
     if [ ! -d $fdsbindir/openmpi/bin ]; then
       mkdir $fdsbindir/openmpi/bin
     fi
-    CP ${FDS_OPENMPIDIR} mpirun  $fdsbindir/openmpi/bin mpirun
+    CP ${FDS_OPENMPIDIR}/bin mpirun  $fdsbindir/openmpi/bin mpirun
   fi
   if [ "$OPENMPI_TARFILE" != "" ]; then
     openmpifile=$OPENMPI_TARFILE
   fi
-  if [ "$openmpifile" != ""]; then
+  if [ "$openmpifile" != "" ]; then
     UNTAR $openmpifile $fdsbindir openmpi
   fi
   MPIEXEC=$fdsbindir/openmpi/bin/mpiexec
@@ -458,13 +458,13 @@ else
 fi
 
 echo ""
-echo "--- building archive ---"
+echo "--- building bundle ---"
 echo ""
 rm -rf $UPLOAD_DIR/$bundlebase.tar
 rm -rf $UPLOAD_DIR/$bundlebase.tar.gz
 cd $UPLOAD_DIR/$bundlebase
 tar cf ../$bundlebase.tar --exclude='*.csv' .
-echo Compressing archive
+echo "--- compressing bundle ---"
 gzip    ../$bundlebase.tar
 echo Creating installer
 cd ..
