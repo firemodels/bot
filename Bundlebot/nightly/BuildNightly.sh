@@ -57,11 +57,13 @@ SMV_BRANCH=master
 
 UPLOADBUNDLE=
 if [ "`uname`" == "Darwin" ] ; then
+  platform=osx
   export FDS_OPENMPIDIR=/opt/openmpi415_oneapi22u3
   export intel_mpi_version=oneapi22u3
   export mpi_version=4.1.5
   export openmpi_dir=/opt/openmpi415_oneapi22u3
 else
+  platform=lnx
   export intel_mpi_version=2025.0
   export mpi_version_linux=INTEL
   export INTEL_MPI_VERSION=2025.0
@@ -136,14 +138,6 @@ esac
 done
 shift $(($OPTIND-1))
 
-if [ "`uname`" == "Darwin" ] ; then
-  platform=osx
-  JOPT=
-else
-  JOPT="-J"
-  platform=lnx
-fi
-
 if [ "$BRANCH" == "nightly" ]; then
   FDS_TAG=
   SMV_TAG=
@@ -154,10 +148,6 @@ if [ "$BRANCH" == "nightly" ]; then
   SMV_REVISION=`grep SMV_REVISION  FDS_INFO.txt | awk '{print $2}'`
 fi
 
-FIREBOT_BRANCH_ARG=$BRANCH
-FIREBOT_BRANCH="-R $BRANCH"
-BUNDLE_BRANCH="-b $BRANCH"
-
 # email address
 MAILTO_ARG=$MAILTO
 if [ "$MAILTO" != "" ]; then
@@ -166,7 +156,7 @@ fi
 
 echo ""
 echo "------------------------------------------------------------"
-echo "          Firebot branch: $FIREBOT_BRANCH_ARG"
+echo "          Firebot branch: $BRANCH"
 if [ "$INTEL_MPI_VERSION" != "" ]; then
 echo "       Intel mpi version: $INTEL_MPI_VERSION"
 fi
@@ -274,9 +264,8 @@ echo $SMV_HASH     > $GITROOT/bot/Bundlebot/nightly/apps/SMV_HASH
 echo $FDS_REVISION > $GITROOT/bot/Bundlebot/nightly/apps/FDS_REVISION
 echo $SMV_REVISION > $GITROOT/bot/Bundlebot/nightly/apps/SMV_REVISION
 
-#*** generate and upload bundle
+#*** generate bundle
 cd $curdir
-#$ECHO ./bundlebot.sh $FORCE $BUNDLE_BRANCH $INSTALL $FDS_TAG $SMV_TAG -w $UPLOADBUNDLE
 
 export NOPAUSE=1
 
@@ -303,7 +292,6 @@ fi
 
 bundle_dir=$HOME/.bundle/bundles
 OUTPUT_DIR=$SCRIPTDIR/output
-BUNDLE_PREFIX="nightly"
 
 if [ "$FDS_TAG" != "" ]; then
   FDS_REVISION=$FDS_TAG
@@ -333,27 +321,19 @@ rm -f $OUTPUT_DIR/*
 # determine platform script is running on
 
 if [ "`uname`" == "Darwin" ]; then
-  platform=osx
   export FDS_OPENMPIDIR=$openmpi_dir
-else
-  platform=lnx
 fi
 
 if [ "$BRANCH" == "release" ]; then
   BUNDLE_PREFIX=
-fi
-
-BUNDLE_PREFIX_FILE=
-if [ "$BUNDLE_PREFIX" != "" ]; then
-  BUNDLE_PREFIX_FILE=${BUNDLE_PREFIX}_
-fi
-BRANCHDIR=$BRANCH
-if [ "$BRANCH" != "release" ]; then
-  BRANCHDIR=
-fi
-UPLOAD_DIR=
-if [ "$BRANCH" == "release" ]; then
+  BUNDLE_PREFIX_FILE=
+  BRANCHDIR=$BRANCH
   UPLOAD_DIR="bundle_test"
+else
+  BUNDLE_PREFIX="nightly"
+  BUNDLE_PREFIX_FILE=${BUNDLE_PREFIX}_
+  BRANCHDIR=
+  UPLOAD_DIR=
 fi
 
 return_code=0
