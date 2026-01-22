@@ -344,13 +344,19 @@ else
   if [ "$PLATFORM" == "LINUX64" ]; then
     openmpifile=$MPI_DIR/openmpi_${MPI_VERSION}_linux_${INTEL_COMP_VERSION}.tar.gz
   fi
-  if [ "$PLATFORM" == "OSX64" ]; then
-    openmpifile=$MPI_DIR/openmpi_${MPI_VERSION}_osx_${INTEL_COMP_VERSION}.tar.gz
+  if [[ "$PLATFORM" == "OSX64" ]] && [[ -d ${FDS_OPENMPIDIR} ]]; then
+    if [ ! -d $fdsbindir/openmpi ]; then
+      mkdir $fdsbindir/openmpi} 
+    fi
+    if [ ! -d $fdsbindir/openmpi/bin ]; then
+      mkdir $fdsbindir/openmpi/bin
+    fi
+    CP ${FDS_OPENMPIDIR} mpirun  $fdsbindir/openmpi/bin mpirun
   fi
   if [ "$OPENMPI_TARFILE" != "" ]; then
     openmpifile=$OPENMPI_TARFILE
   fi
-  if [ "$platform" == "linux" ]; then
+  if [ "$openmpifile" != ""]; then
     UNTAR $openmpifile $fdsbindir openmpi
   fi
   MPIEXEC=$fdsbindir/openmpi/bin/mpiexec
