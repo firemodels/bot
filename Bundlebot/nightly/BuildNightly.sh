@@ -380,7 +380,7 @@ htmllog=${installer_base_platform}_manifest.html
 cd $SCRIPTDIR
 echo ""
 echo -n  "***Building installer"
-./assemble_bundle.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version $bundle_dir $BUNDLE_PREFIX
+./assemble_bundle.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version $BUNDLE_PREFIX
 assemble_bundle_status=$?
 echo " - complete"
   

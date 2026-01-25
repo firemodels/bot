@@ -4,6 +4,8 @@ FDSEDITION=FDS6
 revision=$1
 GITROOT=~/$2
 
+SCRIPTDIR=`pwd`
+
 smvbin=smvbin
 
 errlog=/tmp/smv_errlog.$$
@@ -19,6 +21,8 @@ then
   platform3="osx"
   COMPILER=gnu
 fi
+
+# -------------------- CP -------------------
 
 CP ()
 {
@@ -38,6 +42,22 @@ CP ()
     echo "">>$errlog
   fi
 }
+
+# -------------------- IS_PROGRAM_INSTALLED -------------------
+
+IS_PROGRAM_INSTALLED()
+{
+  program=$1
+  notfound=`$program -help 2>&1 | tail -1 | grep "not found" | wc -l`
+  if [ $notfound -eq 0 ] ; then
+    echo 1
+  else
+    echo 0
+  fi
+  exit
+}
+
+# -------------------- CPDIR -------------------
 
 CPDIR ()
 {
@@ -70,18 +90,17 @@ FORBUNDLE=$GITROOT/smv/Build/for_bundle
 UTILSCRIPTDIR=$GITROOT/smv/Utilities/Scripts
 PLATFORMDIR=$revision\_${platform3}
 MAKEINSTALLER=$GITROOT/bot/Bundlebot/nightly/make_smv_installer.sh
-uploads=$HOME/.bundle/uploads
-uploadscp=.bundle/uploads
+UPLOADDIR=$HOME/.bundle/bundles
 flushfile=$GITROOT/smv/Build/flush/${COMPILER}_${platform}/flush_${platform}
 
 if [ ! -e $HOME/.bundle ]; then
   mkdir $HOME/.bundle
 fi
-if [ ! -e $uploads ]; then
-  mkdir $uploads
+if [ ! -d $UPLOADDIR ]; then
+  mkdir $UPLOADDIR
 fi
 
-cd $uploads
+cd $UPLOADDIR
 
 rm -rf $PLATFORMDIR
 mkdir -p $PLATFORMDIR
@@ -120,6 +139,53 @@ CP  $FLUSHFILEDIR  flush_${platform}             $PLATFORMDIR/$smvbin flush
 
 CURDIR=`pwd`
 
+# scan for viruses
+
+clam_status=`IS_PROGRAM_INSTALLED clamscan`
+if [ $clam_status -eq 1 ]; then
+  scanlog=$SCRIPTDIR/output/${PLATFORMDIR}_log.txt
+  vscanlog=$SCRIPTDIR/output/${PLATFORMDIR}.log
+  htmllog=$SCRIPTDIR/output/${PLATFORMDIR}_manifest.html
+  csvlog=$SCRIPTDIR/output/${PLATFORMDIR}.csv
+  bundledir=$HOME/.bundle/bundles/${PLATFORMDIR}
+  
+ 
+  if [ "$TEST_VIRUS" != "" ]; then
+    $SCRIPTDIR/gen_eicar.sh $bundledir/eicar.com
+  fi
+
+  echo ""
+  echo "--- scanning $PLATFORMDIR for viruses/malware ---"
+  echo "" 
+  clamscan -r $UPLOADDIR/$PLATFORMDIR > $scanlog 2>&1
+  sed 's/.*SMV-/SMV-/' $scanlog      > $vscanlog
+  echo ""
+  echo "--- adding sha256 hashes ---"
+  echo "" 
+  $SCRIPTDIR/add_sha256.sh $vscanlog > $csvlog
+  sed -i.bak '/SCAN SUMMARY/,$d; s|.*SMV[^/]*/||g'     $csvlog
+  sort -f -o $csvlog $csvlog
+  sed -n '/SCAN SUMMARY/,$p' $vscanlog >> $csvlog
+  $SCRIPTDIR/csv2html.sh                                  $csvlog SMV
+  if [ -e $SCRIPTDIR/output/${PLATFORMDIR}_manifest.html ]; then
+    CP $SCRIPTDIR/output ${PLATFORMDIR}_manifest.html $bundledir/smvbin SmvManifest.html
+    CP $SCRIPTDIR/output ${PLATFORMDIR}_manifest.html $UPLOADDIR ${PLATFORMDIR}_manifest.html
+ fi
+  ninfected=`grep 'Infected files' $vscanlog | awk -F: '{print $2}'`
+  if [ "$ninfected" == "" ]; then
+    ninfected=0
+  fi
+  if [[ $ninfected -eq 0 ]]; then
+    echo "no viruses found in $UPLOAD_DIR/$PLATFORMDIR"
+  else
+    returncode=1
+    echo "***error: $ninfected files found with a virus and/or malware in $UPLOAD_DIR/$PLATFORMDIR"
+  fi
+else
+  echo ***warning: clamscan not found
+  echo ***         bundle will not be scanned for viruses or malware
+fi
+
 rm -f $PLATFORMDIR.tar $PLATFORMDIR.tar.gz
 cd $PLATFORMDIR
 echo ""
@@ -129,7 +195,7 @@ tar cvf ../$PLATFORMDIR.tar .
 cd ..
 gzip $PLATFORMDIR.tar
 $MAKEINSTALLER ${platform2} $revision $PLATFORMDIR.tar.gz $PLATFORMDIR.sh FDS/$FDSEDITION
-echo "$PLATFORMDIR.sh   copied to $uploads on `hostname`"
+echo "$PLATFORMDIR.sh   copied to $UPLOADDIR on `hostname`"
 
 if [ -e $errlog ]; then
   numerrs=`cat $errlog | wc -l `

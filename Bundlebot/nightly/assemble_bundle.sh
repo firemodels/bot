@@ -3,8 +3,7 @@ fds_version=$1
 smv_version=$2
 MPI_VERSION=$3
 INTEL_COMP_VERSION=$4
-UPLOAD_DIR_ARG=$5
-NIGHTLY=$6
+NIGHTLY=$5
 
 returncode=0
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
@@ -25,12 +24,7 @@ APPS_DIR=$SCRIPTDIR/apps
 # mpi files located into MPI_DIR
 MPI_DIR=$HOME/.bundle/BUNDLE/MPI
 
-# bundle copied into UPLOAD_DIR
-if [ "$UPLOAD_DIR_ARG" == "" ]; then
-  UPLOAD_DIR=$HOME/.bundle/uploads
-else
-  UPLOAD_DIR=$UPLOAD_DIR_ARG
-fi
+UPLOAD_DIR=$HOME/.bundle/bundles
 
 INSTALLDIR=FDS/FDS6
 errlog=$SCRIPTDIR/output/errlog

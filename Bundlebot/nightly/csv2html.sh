@@ -1,8 +1,14 @@
 #!/bin/bash
 INPUT=$1
+VERSION=$2
+
 INPUTTEMP=${INPUT}.$$
 TITLE="${INPUT%.*}"
-TITLE=`echo $TITLE |  sed 's/.*FDS-/FDS-/'`
+if [ "$VERSION" == "" ]; then
+  TITLE=`echo $TITLE |  sed 's/.*FDS-/FDS-/'`
+else
+  TITLE=`echo $TITLE |  sed 's/.*SMV-/SMV-/'`
+fi
 OUTPUT="${INPUT%.*}"
 OUTPUT=${OUTPUT}_manifest.html
 
