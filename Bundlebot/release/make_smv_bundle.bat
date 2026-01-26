@@ -99,30 +99,29 @@ CALL :COPY  %reporoot%\webpages\SMV_Release_Notes.htm %smvdir%\release_notes.htm
 CALL :COPY  %forbundle%\.smokeview_bin                %smvdir%\.
 
 call :IS_FILE_INSTALLED clamscan
-set basedir=%bundles%\%zipbase%
-set basename=%zipbase%
-set logdir=%reporoot%\bot\Bundlebot\nightly\output
-if not exist %basedir% error ***error: %basedir% does not exist
+set nightlydir=%reporoot%\bot\Bundlebot\nightly
+set logdir=%nightlydir%\output
+if not exist %bundles%\%zipbase% error ***error: %bundles%\%zipbase% does not exist
 if %ERRORLEVEL% == 1 goto elsescan
-  if not exist %basedir% goto 
-  set ADDSHA256=%reporoot%\bot\Bundlebot\nightly\add_sha256.bat
-  set CSV2HTML=%reporoot%\bot\Bundlebot\nightly\csv2html.bat
-  set scanlog=%logdir%\%basename%_log.txt
-  set vscanlog=%logdir%\%basename%.csv
+  if not exist %bundles%\%zipbase% goto elsescan
+  set ADDSHA256=%nightlydir%\add_sha256.bat
+  set CSV2HTML=%nightlydir%\csv2html.bat
+  set scanlog=%logdir%\%zipbase%_log.txt
+  set vscanlog=%logdir%\%zipbase%.csv
   set preamble=%logdir%\preamble.csv
   set summary=%logdir%\summary.txt
-  set htmllog=%logdir%\%basename%_manifest.html
-  set nvscanlog=%logdir%\%basename%_nlog.txt
+  set htmllog=%logdir%\%zipbase%_manifest.html
+  set nvscanlog=%logdir%\%zipbase%_nlog.txt
   echo ***scanning bundle
-  echo    input: %basedir%
+  echo    input: %bundles%\%zipbase%
   echo    output: %vscanlog%
-  clamscan -r %basedir% > %scanlog% 2>&1
+  clamscan -r %bundles%\%zipbase% > %scanlog% 2>&1
   echo ***adding sha256 hashes
-  cd %reporoot%\bot\Bundlebot\nightly\
+  cd %nightlydir%
   call %ADDSHA256% %scanlog%         > %vscanlog%
-  cd %reporoot%\bot\Bundlebot\nightly\
-  echo ***removing %basename% from filepaths
-  sed -i.bak "s/%basename%\\//g"   %vscanlog%
+  cd %nightlydir%
+  echo ***removing %zipbase% from filepaths
+  sed -i.bak "s/%zipbase%\\//g"   %vscanlog%
 
 :: split file into two parts
   sed "/SCAN SUMMARY/,$ d"    %vscanlog% > %preamble%
@@ -134,17 +133,17 @@ if %ERRORLEVEL% == 1 goto elsescan
 :: remove adjacent commas ,, and append to original file
   sed "s/,,/ /g" %summary%     >> %vscanlog%
 
-  cd %reporoot%\bot\Bundlebot\nightly\
+  cd %nightlydir%
   echo ***converting scan log to html
   call %CSV2HTML% %vscanlog%
   if NOT exist %htmllog% echo ***error: %htmllog% does not exist
   if NOT exist %htmllog% goto skiphtml
   CALL :COPY %htmllog% %out_doc%\SmvManifest.html
-  CALL :COPY %htmllog% %bundles%\%basename%_manifest.html
+  CALL :COPY %htmllog% %bundles%\%zipbase%_manifest.html
   :skiphtml
   
   echo complete
-  cd %reporoot%\bot\Bundlebot\nightly\
+  cd %nightlydir%
   grep Infected %vscanlog% | %gawk% -F":" "{print $2}" > %nvscanlog%
   set have_virus=1
   set /p ninfected=<%nvscanlog%
@@ -175,7 +174,7 @@ echo.
 wzipse32 %zipbase%.zip -runasadmin -setup -auto -i %forbundle%\icon.ico -t %forbundle%\unpack.txt -a %forbundle%\about.txt -st"Smokeview %smv_version% Setup" -o -c cmd /k setup.bat
 
 if not exist %zipbase%.exe echo ***warning: %zipbase%.exe was not created
-if     exist %zipbase%.exe CALL :COPY %zipbase%.exe %bundles%\%basename%.exe
+if     exist %zipbase%.exe CALL :COPY %zipbase%.exe %bundles%\%zipbase%.exe
 
 echo.
 echo --- Windows Smokeview installer, %zipbase%.exe, built
