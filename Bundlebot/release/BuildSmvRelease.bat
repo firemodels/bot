@@ -8,7 +8,7 @@ call config
 
 
 set basename=%BUNDLE_SMV_TAG%_win
-set fullfilebase=%userprofile%\.bundle\uploads\%basename%
+set fullfilebase=%userprofile%\.bundle\bundles\%basename%
 set CURDIR=%CD%
 
 :: update web repo
