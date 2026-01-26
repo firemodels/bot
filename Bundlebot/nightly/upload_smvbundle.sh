@@ -11,13 +11,13 @@ fi
 
 CURDIR=`pwd`
 
-if [ ! -e $HOME/$FROM_DIR/$FROM_FILE ] ; then
-  echo "***error: $FROM_FILE does not exist in $HOME/$FROM_DIR"
+if [ ! -e $FROM_DIR/$FROM_FILE ] ; then
+  echo "***error: $FROM_FILE does not exist in $FROM_DIR"
   exit
 fi
 
 echo uploading $FROM_FILE to github
-gh release upload SMOKEVIEW_TEST $HOME/$FROM_DIR/$FROM_FILE  -R github.com/$OWNER/test_bundles --clobber
+gh release upload SMOKEVIEW_TEST $FROM_DIR/$FROM_FILE  -R github.com/$OWNER/test_bundles --clobber
 if [ "`uname`" == "Darwin" ] ; then
   platform=osx
 else

@@ -76,11 +76,11 @@ echo *** bundling smokeview
 Title Building Smokeview bundle
 
 cd %CURDIR%\..\release
-call make_smv_bundle %BUNDLE_SMV_TAG% > %outdir%\stage6_bundle 2>&1
+call make_smv_bundle %BUNDLE_SMV_TAG%
 
 cd %CURDIR%
 
-set uploaddir=%userprofile%\.bundle\uploads
+set uploaddir=%userprofile%\.bundle\bundles
 echo smokeview bundle created: %uploaddir%\%smvrepo_revision%_win.exe
 
 if "x%upload_smvbundle%" == "x" goto skip_upload
@@ -94,6 +94,9 @@ erase %filelist%
 
 echo uploading %smvrepo_revision%_win.exe to github.com//%OWNER%/test_bundles
 gh release upload SMOKEVIEW_TEST %uploaddir%\%smvrepo_revision%_win.exe  -R github.com/%OWNER%/test_bundles --clobber
+
+echo uploading %smvrepo_revision%_win_manifest.html to github.com//%OWNER%/test_bundles
+gh release upload SMOKEVIEW_TEST %uploaddir%\%smvrepo_revision%_win_manifest.html  -R github.com/%OWNER%/test_bundles --clobber
 
 echo *** upload complete
 :skip_upload
@@ -145,5 +148,3 @@ if not (%1)==() goto getopts
 exit /b 0
 
 :eof
-
- 
