@@ -125,7 +125,7 @@ fi
 
 # prevent more than one instance of this script from running at the same time
 
-LOCK_FILE=$HOME/.bundle/make_bundle_lock
+LOCK_FILE=$HOME/.bundle/assemble_bundle_lock
 if [ "$FORCE" == "" ]; then
   if [ -e $LOCK_FILE ]; then
     echo "***error: another instance of $0 is running."
@@ -228,6 +228,7 @@ REPO_ROOT=`pwd`
 cd $CURDIR
 installer_base=${FDSREV}_${SMVREV}
 installer_base_platform=${installer_base}_${BUNDLE_PREFIX_FILE}$platform
+csvlog=${installer_base_platform}.csv
 htmllog=${installer_base_platform}_manifest.html
 if [[ "$showparms" == "" ]] && [[ "$OVERWRITE" == "" ]]; then
   installer_file=$bundle_dir/${installer_base_platform}.sh
@@ -243,8 +244,8 @@ cd $SCRIPTDIR
 if [ "$showparms" == "" ]; then
   echo ""
   echo -n  "***Building installer"
-  $ECHO ./make_bundle.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version $bundle_dir $BUNDLE_PREFIX > $OUTPUT_DIR/stage1
-  make_bundle_status=$?
+  $ECHO ./assemble_bundle.sh $FDSREV $SMVREV $mpi_version $intel_mpi_version $bundle_dir $BUNDLE_PREFIX
+  assemble_bundle_status=$?
   echo " - complete"
   
   echo
@@ -255,26 +256,30 @@ if [ "$showparms" == "" ]; then
     echo virus scanner not available, bundle was not scanned
   fi
 
-  if [[ "$UPLOADBUNDLE" == "1" ]] && [[ $make_bundle_status -eq 0 ]]; then
-    echo ""
-    echo "uploading installer"
+  if [[ "$UPLOADBUNDLE" == "1" ]]; then
+    if [[ $assemble_bundle_status -eq 0 ]]; then
+      echo ""
+      echo "uploading installer"
     
-    FILELIST=`gh release view FDS_TEST  -R github.com/$GHOWNER/test_bundles | grep SMV | grep FDS | grep $platform | awk '{print $2}'`
-    for file in $FILELIST ; do
-      gh release delete-asset FDS_TEST $file -R github.com/$GHOWNER/test_bundles -y
-    done
-
-    echo gh release upload FDS_TEST $bundle_dir/${installer_base_platform}.sh -R github.com/$GHOWNER/test_bundles  --clobber
-         gh release upload FDS_TEST $bundle_dir/${installer_base_platform}.sh -R github.com/$GHOWNER/test_bundles  --clobber
-    if [ -e $OUTPUT_DIR/$csvlog ]; then
-      echo gh release upload FDS_TEST $OUTPUT_DIR/$htmllog                       -R github.com/$GHOWNER/test_bundles  --clobber
-           gh release upload FDS_TEST $OUTPUT_DIR/$htmllog                       -R github.com/$GHOWNER/test_bundles  --clobber
-    fi
-    if [ "$platform" == "lnx" ]; then
-      cd $REPO_ROOT/fds
-      FDS_SHORT_HASH=`git rev-parse --short HEAD`
-      cd $SCRIPTDIR
-      ./setreleasetitle.sh fds $FDS_SHORT_HASH
+      FILELIST=`gh release view FDS_TEST  -R github.com/$GHOWNER/test_bundles | grep SMV | grep FDS | grep $platform | awk '{print $2}'`
+      for file in $FILELIST ; do
+        gh release delete-asset FDS_TEST $file -R github.com/$GHOWNER/test_bundles -y
+      done
+  
+      echo gh release upload FDS_TEST $bundle_dir/${installer_base_platform}.sh -R github.com/$GHOWNER/test_bundles  --clobber
+           gh release upload FDS_TEST $bundle_dir/${installer_base_platform}.sh -R github.com/$GHOWNER/test_bundles  --clobber
+      if [ -e $OUTPUT_DIR/$htmllog ]; then
+        echo gh release upload FDS_TEST $OUTPUT_DIR/$htmllog                       -R github.com/$GHOWNER/test_bundles  --clobber
+             gh release upload FDS_TEST $OUTPUT_DIR/$htmllog                       -R github.com/$GHOWNER/test_bundles  --clobber
+      fi
+      if [ "$platform" == "lnx" ]; then
+        cd $REPO_ROOT/fds
+        FDS_SHORT_HASH=`git rev-parse --short HEAD`
+        cd $SCRIPTDIR
+        ./setreleasetitle.sh fds $FDS_SHORT_HASH
+      fi
+    else
+      echo ***error: virus detected in bundle, bundle not uploaded
     fi
   fi
 fi

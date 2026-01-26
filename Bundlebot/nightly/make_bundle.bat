@@ -29,7 +29,7 @@ set gawk=%GITROOT%\bot\scripts\bin\gawk.exe
 set bundle_dir=%userprofile%\.bundle
 if NOT exist %bundle_dir% mkdir %bundle_dir%
 
-set upload_dir=%userprofile%\.bundle\uploads
+set upload_dir=%userprofile%\.bundle\bundles
 if NOT exist %upload_dir% mkdir %upload_dir%
 
 set bundles_dir=%userprofile%\.bundle\bundles

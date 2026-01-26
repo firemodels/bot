@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 if [ "`uname`" == "Darwin" ]; then
   SHA256PROG="shasum -a 256"
@@ -6,9 +6,6 @@ else
   SHA256PROG=sha256sum
 fi
 
-# Usage: ./script.sh input.txt
-# Each line of input:
-# /full/path/to/file<spaces>some text string
 BASE=$HOME/.bundle/bundles
 
 set -euo pipefail

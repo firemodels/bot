@@ -18,7 +18,7 @@ for /f "usebackq delims=" %%L in ("%INPUT_FILE%") do (
       certutil -hashfile !FILENAME! SHA256 | head -2 | tail -1 > hash.out
       set /p HASH=<hash.out
     )
-    set "FILENAME=!FILENAME:%userprofile%\.bundle\uploads\=!"
+    set "FILENAME=!FILENAME:%userprofile%\.bundle\bundles\=!"
     echo !FILENAME!,!HASH!,%%B
   )
 )

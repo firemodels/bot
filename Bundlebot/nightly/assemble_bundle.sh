@@ -3,8 +3,7 @@ fds_version=$1
 smv_version=$2
 MPI_VERSION=$3
 INTEL_COMP_VERSION=$4
-UPLOAD_DIR_ARG=$5
-NIGHTLY=$6
+NIGHTLY=$5
 
 returncode=0
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
@@ -25,12 +24,7 @@ APPS_DIR=$SCRIPTDIR/apps
 # mpi files located into MPI_DIR
 MPI_DIR=$HOME/.bundle/BUNDLE/MPI
 
-# bundle copied into UPLOAD_DIR
-if [ "$UPLOAD_DIR_ARG" == "" ]; then
-  UPLOAD_DIR=$HOME/.bundle/uploads
-else
-  UPLOAD_DIR=$UPLOAD_DIR_ARG
-fi
+UPLOAD_DIR=$HOME/.bundle/bundles
 
 INSTALLDIR=FDS/FDS6
 errlog=$SCRIPTDIR/output/errlog
@@ -344,14 +338,21 @@ else
   if [ "$PLATFORM" == "LINUX64" ]; then
     openmpifile=$MPI_DIR/openmpi_${MPI_VERSION}_linux_${INTEL_COMP_VERSION}.tar.gz
   fi
-  if [ "$PLATFORM" == "OSX64" ]; then
-    openmpifile=$MPI_DIR/openmpi_${MPI_VERSION}_osx_${INTEL_COMP_VERSION}.tar.gz
+  if [[ "$PLATFORM" == "OSX64" ]] && [[ -d ${FDS_OPENMPIDIR} ]]; then
+    if [ ! -d $fdsbindir/openmpi ]; then
+      mkdir $fdsbindir/openmpi
+    fi
+    if [ ! -d $fdsbindir/openmpi/bin ]; then
+      mkdir $fdsbindir/openmpi/bin
+    fi
+    CP ${FDS_OPENMPIDIR}/bin mpirun  $fdsbindir/openmpi/bin mpirun
   fi
   if [ "$OPENMPI_TARFILE" != "" ]; then
     openmpifile=$OPENMPI_TARFILE
   fi
-#  CP $MPI_DIR $openmpifile  $fdsbindir $openmpifile
-  UNTAR $openmpifile $fdsbindir openmpi
+  if [ "$openmpifile" != "" ]; then
+    UNTAR $openmpifile $fdsbindir openmpi
+  fi
   MPIEXEC=$fdsbindir/openmpi/bin/mpiexec
 fi
 
@@ -414,14 +415,18 @@ if [ $clam_status -eq 1 ]; then
   vscanlog=$SCRIPTDIR/output/${bundlebase}.log
   htmllog=$SCRIPTDIR/output/${bundlebase}_manifest.html
   csvlog=$SCRIPTDIR/output/${bundlebase}.csv
+ 
+  if [ "$TEST_VIRUS" != "" ]; then
+    $SCRIPTDIR/gen_eicar.sh $bundledir/eicar.com
+  fi
 
   echo ""
-  echo "--- scanning archive for viruses/malware ---"
+  echo "--- scanning $bundlebase for viruses/malware ---"
   echo "" 
   clamscan -r $UPLOAD_DIR/$bundlebase > $scanlog 2>&1
   sed 's/.*FDS-/FDS-/' $scanlog      > $vscanlog
   echo ""
-  echo "--- add sha256 hashes ---"
+  echo "--- adding sha256 hashes ---"
   echo "" 
   $SCRIPTDIR/add_sha256.sh $vscanlog > $csvlog
   sed -i.bak '/SCAN SUMMARY/,$d; s|FDS.*SMV[^/]*/||g'     $csvlog
@@ -447,13 +452,13 @@ else
 fi
 
 echo ""
-echo "--- building archive ---"
+echo "--- building bundle ---"
 echo ""
 rm -rf $UPLOAD_DIR/$bundlebase.tar
 rm -rf $UPLOAD_DIR/$bundlebase.tar.gz
 cd $UPLOAD_DIR/$bundlebase
 tar cf ../$bundlebase.tar --exclude='*.csv' .
-echo Compressing archive
+echo "--- compressing bundle ---"
 gzip    ../$bundlebase.tar
 echo Creating installer
 cd ..
