@@ -807,23 +807,23 @@ check_verification_cases_release()
 
    if [[ `grep 'Run aborted'            $OUTPUT_DIR/stage3_run_release_ver  | grep -v grep`                    == "" ]] && \
       [[ `grep 'ERROR'                  $OUTPUT_DIR/stage3_run_release_ver  | grep -v geom_bad | grep -v grep` == "" ]] && \
-      [[ `grep Segmentation             */*.err             | grep -v grep`                    == "" ]] && \
-      [[ `grep ERROR:                   */*.err             | grep -v grep | grep -v geom_bad` == "" ]] && \
-      [[ `grep ERROR:                   */*.out             | grep -v grep | grep -v echo`     == "" ]] && \
-      [[ `grep 'BAD TERMINATION'        */*.log             | grep -v grep`                    == "" ]] && \
-      [[ `grep -i 'Numerical Instability' */*.out           | grep -v grep`                    == "" ]] && \
-      [[ `grep forrtl                   */*.err             | grep -v grep`                    == "" ]]
+      [[ `grep Segmentation             */*.err                             | grep -v grep`                    == "" ]] && \
+      [[ `grep ERROR:                   */*.err                             | grep -v grep | grep -v geom_bad` == "" ]] && \
+      [[ `grep ERROR:                   */*.out                             | grep -v grep | grep -v echo`     == "" ]] && \
+      [[ `grep 'BAD TERMINATION'        */*.log                             | grep -v grep`                    == "" ]] && \
+      [[ `grep -i 'Numerical Instability' */*.out                           | grep -v grep`                    == "" ]] && \
+      [[ `grep forrtl                   */*.err                             | grep -v grep`                    == "" ]]
    then
       cases_debug_success=true
    else
       grep 'Run aborted'                $OUTPUT_DIR/stage3_run_release_ver  | grep -v grep                    >> $OUTPUT_DIR/stage3_run_release_ver_errors
       grep 'ERROR'                      $OUTPUT_DIR/stage3_run_release_ver  | grep -v geom_bad | grep -v grep >> $OUTPUT_DIR/stage3_run_release_ver_errors
-      grep Segmentation                 */*.err             | grep -v grep                    >> $OUTPUT_DIR/stage3_run_release_ver_errors
-      grep ERROR:                       */*.err             | grep -v grep | grep -v geom_bad >> $OUTPUT_DIR/stage3_run_release_ver_errors
-      grep ERROR:                       */*.out             | grep -v grep | grep -v echo     >> $OUTPUT_DIR/stage3_run_release_ver_errors
-      grep -A 2 'BAD TERMINATION'       */*.log             | grep -v grep                    >> $OUTPUT_DIR/stage3_run_release_ver_errors
-      grep -i 'Numerical Instability'   */*.out             | grep -v grep                    >> $OUTPUT_DIR/stage3_run_release_ver_errors
-      grep -A 20 forrtl                 */*.err             | grep -v grep                    >> $OUTPUT_DIR/stage3_run_release_ver_errors
+      grep Segmentation                 */*.err                             | grep -v grep                    >> $OUTPUT_DIR/stage3_run_release_ver_errors
+      grep ERROR:                       */*.err                             | grep -v grep | grep -v geom_bad >> $OUTPUT_DIR/stage3_run_release_ver_errors
+      grep ERROR:                       */*.out                             | grep -v grep | grep -v echo     >> $OUTPUT_DIR/stage3_run_release_ver_errors
+      grep -A 2 'BAD TERMINATION'       */*.log                             | grep -v grep                    >> $OUTPUT_DIR/stage3_run_release_ver_errors
+      grep -i 'Numerical Instability'   */*.out                             | grep -v grep                    >> $OUTPUT_DIR/stage3_run_release_ver_errors
+      grep -A 20 forrtl                 */*.err                             | grep -v grep                    >> $OUTPUT_DIR/stage3_run_release_ver_errors
 
       echo "Errors from Stage 3 - Run ${2} cases - release mode:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage3_run_release_ver_errors               >> $ERROR_LOG
@@ -845,21 +845,21 @@ check_validation_cases_release()
 
    if [[ `grep 'Run aborted'            $OUTPUT_DIR/stage3_run_release_val | grep -v grep`                    == "" ]] && \
       [[ `grep 'ERROR'                  $OUTPUT_DIR/stage3_run_release_val | grep -v geom_bad | grep -v grep` == "" ]] && \
-      [[ `grep Segmentation             */$subdir/*.err     | grep -v grep`                    == "" ]] && \
-      [[ `grep ERROR:                   */$subdir/*.err     | grep -v grep | grep -v geom_bad` == "" ]] && \
-      [[ `grep ERROR:                   */$subdir/*.out     | grep -v grep     | grep -v echo` == "" ]] && \
-      [[ `grep 'BAD TERMINATION'        */$subdir/*.log     | grep -v grep`                    == "" ]] && \
-      [[ `grep forrtl                   */$subdir/*.err     | grep -v grep`                    == "" ]]
+      [[ `grep Segmentation             */$subdir/*.err                    | grep -v grep`                    == "" ]] && \
+      [[ `grep ERROR:                   */$subdir/*.err                    | grep -v grep | grep -v geom_bad` == "" ]] && \
+      [[ `grep ERROR:                   */$subdir/*.out                    | grep -v grep     | grep -v echo` == "" ]] && \
+      [[ `grep 'BAD TERMINATION'        */$subdir/*.log                    | grep -v grep`                    == "" ]] && \
+      [[ `grep forrtl                   */$subdir/*.err                    | grep -v grep`                    == "" ]]
    then
       cases_debug_success=true
    else
       grep 'Run aborted'                $OUTPUT_DIR/stage3_run_release_val | grep -v grep                    >> $OUTPUT_DIR/stage3_run_release_val_errors
       grep 'ERROR'                      $OUTPUT_DIR/stage3_run_release_val | grep -v geom_bad | grep -v grep >> $OUTPUT_DIR/stage3_run_release_val_errors
-      grep Segmentation                 */$subdir//*.err    | grep -v grep                    >> $OUTPUT_DIR/stage3_run_release_val_errors
-      grep ERROR:                       */$subdir//*.err    | grep -v grep | grep -v geom_bad >> $OUTPUT_DIR/stage3_run_release_val_errors
-      grep ERROR:                       */$subdir/*.out     | grep -v grep     | grep -v echo >> $OUTPUT_DIR/stage3_run_release_val_errors
-      grep -A 2 'BAD TERMINATION'       */$subdir/*.log     | grep -v grep                    >> $OUTPUT_DIR/stage3_run_release_val_errors
-      grep -A 20 forrtl                 */$subdir/*.err     | grep -v grep                    >> $OUTPUT_DIR/stage3_run_release_val_errors
+      grep Segmentation                 */$subdir//*.err                   | grep -v grep                    >> $OUTPUT_DIR/stage3_run_release_val_errors
+      grep ERROR:                       */$subdir//*.err                   | grep -v grep | grep -v geom_bad >> $OUTPUT_DIR/stage3_run_release_val_errors
+      grep ERROR:                       */$subdir/*.out                    | grep -v grep     | grep -v echo >> $OUTPUT_DIR/stage3_run_release_val_errors
+      grep -A 2 'BAD TERMINATION'       */$subdir/*.log                    | grep -v grep                    >> $OUTPUT_DIR/stage3_run_release_val_errors
+      grep -A 20 forrtl                 */$subdir/*.err                    | grep -v grep                    >> $OUTPUT_DIR/stage3_run_release_val_errors
 
       echo "Errors from Stage 3 - Run ${2} cases - release mode:"  >> $ERROR_LOG
       cat $OUTPUT_DIR/stage3_run_release_val_errors                >> $ERROR_LOG
@@ -1191,12 +1191,12 @@ check_python_validation()
 {
    # Check that python environment has been setup
    python_validation_success=true
-   if [[ `grep -E 'Warning|Length mismatch|Error|UserWarning' $OUTPUT_DIR/stage4_python_val` != "" ]]; then
+   if [[ `grep -E 'ERROR|Error|WARNING|Warning|Length mismatch|UserWarning' $OUTPUT_DIR/stage4_python_val` != "" ]]; then
      python_validation_success=false
    fi
    if [ $python_validation_success == false ]; then
      echo "Errors from Stage 4 - Python plotting and statistics (validation):" >> $ERROR_LOG
-     grep -E 'Warning|Length mismatch|Error|UserWarning'  $OUTPUT_DIR/stage4_python_val | uniq | tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
+     grep -E 'ERROR|Error|WARNING|Warning|Length mismatch|UserWarning'  $OUTPUT_DIR/stage4_python_val | uniq | tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
      echo "" >> $ERROR_LOG
    fi
 #   archive_validation_stats
