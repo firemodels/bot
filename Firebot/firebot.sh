@@ -1161,12 +1161,12 @@ check_python_verification()
 {
    # Check that python environment has been setup
    python_verification_success=true
-   if [[ `grep "Error" $OUTPUT_DIR/stage4_python_ver | grep -v 'Relative Error' | grep -v 'Absolute Error' ` != "" ]]; then
+   if [[ `grep -E 'ERROR|Error|WARNING|Warning' $OUTPUT_DIR/stage4_python_ver | grep -v 'Relative Error' | grep -v 'Absolute Error' ` != "" ]]; then
      python_verification_success=false
    fi
    if [ $python_verification_success == false ]; then
-     echo "Errors from Stage 4 - Python plotting and statistics (verification):"                                                   >> $ERROR_LOG
-     grep "Error" $OUTPUT_DIR/stage4_python_ver | grep -v 'Relative Error' | grep -v 'Absolute Error' | tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
+     echo "Errors/Warnings from Stage 4 - Python plotting and statistics (verification):"                                                   >> $ERROR_LOG
+     grep -E 'ERROR|Error|WARNING|Warning' $OUTPUT_DIR/stage4_python_ver | grep -v 'Relative Error' | grep -v 'Absolute Error' | tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
      echo ""                                                                                                                       >> $ERROR_LOG
    fi
    check_verification_stats
