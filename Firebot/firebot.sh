@@ -1161,15 +1161,17 @@ check_python_verification()
 {
    # Check that python environment has been setup
    python_verification_success=true
+   header_outputted = false
    if [[ `grep -E 'ERROR|Error|WARNING|Warning' $OUTPUT_DIR/stage4_python_ver | grep -v 'Relative Error' | grep -v 'Absolute Error' ` != "" ]]; then
      python_verification_success=false
    fi
    if [ $python_verification_success == false ]; then
+     header_outputted = true
      echo "Errors/Warnings from Stage 4 - Python plotting and statistics (verification):"                                                   >> $ERROR_LOG
      grep -E 'ERROR|Error|WARNING|Warning' $OUTPUT_DIR/stage4_python_ver | grep -v 'Relative Error' | grep -v 'Absolute Error' | tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
      echo ""                                                                                                                       >> $ERROR_LOG
    fi
-   check_verification_stats
+   check_verification_stats $header_outputted
 }
 
 #---------------------------------------------
@@ -1209,6 +1211,7 @@ check_python_validation()
 
 check_verification_stats()
 {
+   header_outputted=$1
    # Check for existence of verification statistics output file
    cd $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/Scatterplots
    if [ -e "verification_scatterplot_output.csv" ]
@@ -1216,7 +1219,10 @@ check_verification_stats()
       # Continue along
       :
    else
-      echo "Warnings from Stage 4 - Python plotting and statistics (verification):"                                           >> $ERROR_LOG
+      if [ $header_outputted == false ]; then
+        echo "Errors/Warnings from Stage 4 - Python plotting and statistics (verification):"                                                   >> $ERROR_LOG
+      fi
+      header_outputted = true
       echo "Error: The verification statistics output file does not exist."                                                   >> $ERROR_LOG
       echo "Expected the file Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/Scatterplots/verification_scatterplot_output.csv" >> $ERROR_LOG
       echo ""                                                                                                                 >> $ERROR_LOG
@@ -1228,7 +1234,9 @@ check_verification_stats()
       # Continue along
       :
    else
-      echo "Warnings from Stage 4 - Python plotting and statistics (verification):"  >> $ERROR_LOG
+      if [ $header_outputted == false ]; then
+        echo "Errors/Warnings from Stage 4 - Python plotting and statistics (verification):"                                                   >> $ERROR_LOG
+      fi
       echo "The following cases are outside of their specified error tolerance:"     >> $ERROR_LOG
       echo ""                                                                        >> $ERROR_LOG
       grep "Out of Tolerance" verification_scatterplot_output.csv | sed G            >> $ERROR_LOG
