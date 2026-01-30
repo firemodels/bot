@@ -1,8 +1,7 @@
 #!/bin/bash
 FROM_DIR=$1
 FROM_FILE=$2
-MANIFEST=$3
-SCRIPTDIR=$4
+SCRIPTDIR=$3
 
 if [ "$BUILDING_release" == "1" ]; then
   OWNER=`whoami`
@@ -19,7 +18,6 @@ fi
 
 echo uploading $FROM_FILE to github
 gh release upload SMOKEVIEW_TEST $FROM_DIR/$FROM_FILE  -R github.com/$OWNER/test_bundles --clobber
-gh release upload SMOKEVIEW_TEST $FROM_DIR/$MANIFEST   -R github.com/$OWNER/test_bundles --clobber
 if [ "`uname`" == "Darwin" ] ; then
   platform=osx
 else

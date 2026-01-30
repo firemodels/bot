@@ -42,7 +42,8 @@ if NOT "%platform%" == "Linux" goto endif2
   for /F "tokens=*" %%A in (%outfile%) do gh release delete-asset %SMOKEVIEW_TAG% %%A -R github.com/%GH_OWNER%/%GH_REPO% -y
   erase %outfile%
 
-  plink %plink_options% %linux_logon%  %linux_git_root%/bot/Bundlebot/nightly/upload_smvbundle_custom.sh .bundle/bundles %smv_revision%_lnx.sh %smv_revision%_lnx_manifest.html   %linux_git_root%/bot/Bundlebot/nightly %SMOKEVIEW_TAG% %GH_OWNER% %GH_REPO%
+  plink %plink_options% %linux_logon%  %linux_git_root%/bot/Bundlebot/nightly/upload_smvbundle_custom.sh .bundle/bundles %smv_revision%_lnx.sh              %linux_git_root%/bot/Bundlebot/nightly %SMOKEVIEW_TAG% %GH_OWNER% %GH_REPO%
+  plink %plink_options% %linux_logon%  %linux_git_root%/bot/Bundlebot/nightly/upload_smvbundle_custom.sh .bundle/bundles %smv_revision%_lnx_manifest.html   %linux_git_root%/bot/Bundlebot/nightly %SMOKEVIEW_TAG% %GH_OWNER% %GH_REPO%
 :endif2
 
 if NOT "%platform%" == "OSX" goto endif3
