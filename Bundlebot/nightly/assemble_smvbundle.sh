@@ -4,7 +4,7 @@ FDSEDITION=FDS6
 revision=$1
 GITROOT=~/$2
 
-SCRIPTDIR=`pwd`
+SCRIPTDIR="$(cd "$(dirname "$0")" && pwd)"
 
 smvbin=smvbin
 

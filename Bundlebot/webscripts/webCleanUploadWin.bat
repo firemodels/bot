@@ -24,7 +24,7 @@ call %envfile%
 echo.
 
 echo *** windows
-echo cleaning "%userprofile%\.bundle\uploads"
+echo cleaning "%userprofile%\.bundle\bundles"
 cd "%userprofile%\.bundle"
 rmdir /q /s uploads
 mkdir uploads

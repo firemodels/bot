@@ -25,7 +25,7 @@ echo.
 if NOT "%platform%" == "Windows" goto skip_windows
 echo *** windows
 cd "%userprofile%\.bundle"
-echo cleaning "%userprofile%\.bundle\uploads"
+echo cleaning "%userprofile%\.bundle\bundles"
 rmdir /q /s uploads
 mkdir uploads
 

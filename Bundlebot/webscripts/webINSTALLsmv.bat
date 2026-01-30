@@ -34,20 +34,20 @@ if "%buildtype%" == "release" (
 %git_drive%
 
 if "%platform%" == "Windows" (
-  cd %userprofile%\.bundle\uploads
+  cd %userprofile%\.bundle\bundles
   echo Installer:  %smv_revision%_win.exe
   call %smv_revision%_win.exe
   echo update complete
   goto eof
 )
 if "%platform%" == "Linux" (
-    plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/run_command2.sh $HOME/.bundle/uploads %smv_revision%_lnx.sh y
+    plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/run_command2.sh $HOME/.bundle/bundles %smv_revision%_lnx.sh y
   if "x%nopause%" == "xnopause" goto eof
   pause > Nul
   goto eof
 )
 if "%platform%" == "OSX" (
-    plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/run_command2.sh $HOME/.bundle/uploads %smv_revision%_osx.sh y
+    plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/run_command2.sh $HOME/.bundle/bundles %smv_revision%_osx.sh y
   if "x%nopause%" == "xnopause" goto eof
   pause > Nul
   goto eof
