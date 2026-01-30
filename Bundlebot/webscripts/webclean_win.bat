@@ -42,8 +42,8 @@ git clean -dxf
 
 echo Cleaning %userprofile%\.bundle\bundles
 cd %userprofile%\.bundle
-rmdir /S /Q uploads
-mkdir uploads
+rmdir /S /Q bundles
+mkdir bundles
  
 cd %CURDIR%
 

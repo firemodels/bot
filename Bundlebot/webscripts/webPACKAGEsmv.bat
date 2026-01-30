@@ -45,10 +45,10 @@ cd %git_root%\smv\scripts
 set scriptdir=%linux_git_root%/bot/Bundlebot/nightly
 set bundledir=.bundle/bundles
 set todir=%userprofile%\.bundle
-set uploaddir=%todir%\uploads
+set bundlesdir=%todir%\bundles
 
 if NOT exist %todir% mkdir     %todir%
-if NOT exist %uploaddir% mkdir %uploaddir%
+if NOT exist %bundlesdir% mkdir %bundlesdir%
 
 :: linux
 
