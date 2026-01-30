@@ -1,17 +1,17 @@
 @echo off
+set PROGRAM=%1
 
-set CURDIR=%CD%
-set certfile=%userprofile%\certificates\FDS_TEMP.pfx
-cd bundles
-
-dir *.exe
-for %%f in (*.exe) do (
-  echo.
-  echo signing %%f
-  signtool sign /f %certfile% /p %CERT_PASSWORD% /tr http://timestamp.digicert.com /td SHA256 /fd SHA256 %%f 
-  echo.
-  echo verifying signature
-  signtool verify /pa /v %%f
+if NOT exist %PROGRAM% (
+  echo ***error: %PROGRAM% does not exist
+  exit /b
+)
+if /I "%~x1" NEQ ".exe" (
+    echo *** error: %PROGRAM% is not an .exe file
+    exit /b
 )
 
-cd %CURDIR%
+echo signing %PROGRAM%
+signtool sign /a /n "Test Code Signing" /fd SHA256 %PROGRAM%
+echo verifying signature
+signtool verify /pa /v %PROGRAM%
+
