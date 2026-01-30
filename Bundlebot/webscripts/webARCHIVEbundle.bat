@@ -12,7 +12,7 @@ if NOT "%valid%" == "1" (
 )
 
 set platform=%1
-set upload_dir=%userprofile%\.bundle\uploads
+set upload_dir=%userprofile%\.bundle\bundles
 
 :: batch file to generate Windows, Linux or OSX FDS-SMV bundles
 

@@ -22,7 +22,7 @@ call %envfile%
 %git_drive%
 echo.
 
-cd %userprofile%\.bundle\uploads
+cd %userprofile%\.bundle\bundles
 
 if "%platform%" == "windows" (
   echo   Viewing windows manifiest

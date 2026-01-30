@@ -17,7 +17,7 @@ echo open upload directory and web page for uploading
 call %envfile%
 
 %git_drive%
-cd %userprofile%\.bundle\uploads
+cd %userprofile%\.bundle\bundles
 explorer .
 start chrome https://github.com/firemodels/smv/releases
 

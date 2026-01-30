@@ -19,7 +19,7 @@ goto:eof
 %git_drive%
 call %envfile%
 
-set uploaddir=%userprofile%\.bundle\uploads
+set uploaddir=%userprofile%\.bundle\bundles
 cd %uploaddir%
 start explorer %CD%
 

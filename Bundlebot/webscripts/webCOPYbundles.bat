@@ -22,7 +22,7 @@ call %envfile%
 %git_drive%
 echo.
 
-set uploaddir=%userprofile%\.bundle\uploads
+set uploaddir=%userprofile%\.bundle\bundles
 set "googledir=%userprofile%\Google Drive\Bundle_Test_Versions\"
 
 if NOT exist "%googledir%\*" goto error

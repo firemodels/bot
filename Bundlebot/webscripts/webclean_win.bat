@@ -40,7 +40,7 @@ echo Cleaning %git_root%\smv\Build
 cd %git_root%\smv\Build
 git clean -dxf
 
-echo Cleaning %userprofile%\.bundle\uploads
+echo Cleaning %userprofile%\.bundle\bundles
 cd %userprofile%\.bundle
 rmdir /S /Q uploads
 mkdir uploads

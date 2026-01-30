@@ -43,7 +43,7 @@ if "%platform%" == "Windows" (
 cd %git_root%\smv\scripts
 
 set scriptdir=%linux_git_root%/bot/Bundlebot/nightly
-set bundledir=.bundle/uploads
+set bundledir=.bundle/bundles
 set todir=%userprofile%\.bundle
 set uploaddir=%todir%\uploads
 

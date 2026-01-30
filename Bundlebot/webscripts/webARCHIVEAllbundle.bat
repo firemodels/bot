@@ -1,7 +1,7 @@
 @echo off
 setlocal EnableDelayedExpansion
 
-set upload_dir=%userprofile%\.bundle\uploads
+set upload_dir=%userprofile%\.bundle\bundles
 
 :: setup environment variables (defining where repository resides etc) 
 
