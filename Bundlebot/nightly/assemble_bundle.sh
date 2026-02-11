@@ -459,7 +459,7 @@ rm -rf $UPLOAD_DIR/$bundlebase.tar.gz
 cd $UPLOAD_DIR
 tar cf $bundlebase.tar --exclude='*.csv' $bundlebase
 echo "--- compressing bundle ---"
-gzip    ../$bundlebase.tar
+gzip    $bundlebase.tar
 echo Creating installer
 bundlepathdir=`pwd`
 bundlepath=`pwd`/$bundlebase.sh
