@@ -115,7 +115,7 @@ echo "Installing $FDS_VERSION and $SMV_VERSION on $ostype2"
 echo ""
 echo "Options:"
 echo "  1) Press <Enter> to begin installation [default]"
-echo "  2) Type \"extract\" to copy the installation files to:"
+echo "  2) Press 2 or type extract to copy the installation files to:"
 echo "     $FDS_TAR"
 
 BAK=_\`date +%Y%m%d_%H%M%S\`
@@ -240,7 +240,7 @@ else
 fi
 echo \$option >> \$INSTALL_LOG
 
-if [ "\$option" == "extract" ]
+if [[ "\$option" == "extract" || "\$option" == "2" ]]
 then
   name=\$0
   THAT=$FDS_TAR
@@ -376,7 +376,7 @@ MKDIR \$FDS_root 1
 echo
 echo "Copying FDS installation files to"  \$FDS_root
 cd \$FDS_root
-tail -n +\$SKIP \$THISSCRIPT | tar -xz
+tail -n +\$SKIP \$THISSCRIPT | tar -xz  --strip-components=1
 EOF
 
 cat << EOF >> $INSTALLER
