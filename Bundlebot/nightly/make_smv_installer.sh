@@ -216,7 +216,7 @@ done
  
 echo "Copying updated Smokeview files to"  \$SMV_root
 cd \$SMV_root
-tail -n +\$SKIP \$THISSCRIPT | tar -xz
+tail -n +\$SKIP \$THISSCRIPT | tar -xz --strip-components=1
 echo "Update complete."
 exit 0
 
