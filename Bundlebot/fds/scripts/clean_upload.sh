@@ -1,20 +1,11 @@
 #!/bin/bash
 
-uploads=$HOME/.bundle/uploads
-if [ -e $uploads ]; then
-  rm -rf $uploads
-  echo cleaning $uploads on `hostname`
-  mkdir $uploads
+bundles=$HOME/.bundle/bundles
+if [ -e $bundles ]; then
+  rm -rf $bundles
+  echo cleaning $bundles on `hostname`
+  mkdir $bundles
 else
- echo ***error: directory $uploads does not exist
- mkdir -p $uploads
-fi
-uploads=$HOME/.bundle/bundles
-if [ -e $uploads ]; then
-  rm -rf $uploads
-  echo cleaning $uploads on `hostname`
-  mkdir $uploads
-else
- echo ***error: directory $uploads does not exist
- mkdir -p $uploads
+ echo ***error: directory $bundles does not exist
+ mkdir -p $bundles
 fi

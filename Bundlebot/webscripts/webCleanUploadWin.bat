@@ -26,8 +26,8 @@ echo.
 echo *** windows
 echo cleaning "%userprofile%\.bundle\bundles"
 cd "%userprofile%\.bundle"
-rmdir /q /s uploads
-mkdir uploads
+rmdir /q /s bundles
+mkdir bundles
 
 echo.
 pause

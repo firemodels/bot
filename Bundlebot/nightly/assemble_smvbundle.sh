@@ -185,12 +185,10 @@ else
 fi
 
 rm -f $PLATFORMDIR.tar $PLATFORMDIR.tar.gz
-cd $PLATFORMDIR
 echo ""
 echo "---- building installer ----"
 echo ""
-tar cvf ../$PLATFORMDIR.tar .
-cd ..
+tar cvf $PLATFORMDIR.tar $PLATFORMDIR
 gzip $PLATFORMDIR.tar
 $MAKEINSTALLER ${platform2} $revision $PLATFORMDIR.tar.gz $PLATFORMDIR.sh FDS/$FDSEDITION
 echo "$PLATFORMDIR.sh   copied to $UPLOADDIR on `hostname`"

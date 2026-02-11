@@ -33,7 +33,7 @@ echo "Updating Smokeview to $revision for $ostype"
 echo ""
 echo "Options:"
 echo "  1) Press <Enter> to begin update"
-echo "  2) Type \"extract\" to copy the update files to $SMV_TAR"
+echo "  2) Press 2 or type extract to copy the update files to $SMV_TAR"
 
 #--- convert a path to it absolute equivalent
 
@@ -72,7 +72,7 @@ then
 else
   read  option
 fi
-if [ "\$option" == "extract" ]
+if [[ "\$option" == "2" || "\$option" == "extract" ]]
 then
   name=\$0
   THAT=$SMV_TAR
@@ -216,7 +216,7 @@ done
  
 echo "Copying updated Smokeview files to"  \$SMV_root
 cd \$SMV_root
-tail -n +\$SKIP \$THISSCRIPT | tar -xz
+tail -n +\$SKIP \$THISSCRIPT | tar -xz --strip-components=1
 echo "Update complete."
 exit 0
 
