@@ -80,8 +80,7 @@ git clean -dxf  >> $cleanlog 2>&1
 
 # build smokeview libraries
 echo building smokeview libraries
-BUILDSMVLIBS &
-pid_smvlibs=$!
+BUILDSMVLIBS
 
 echo building background
 BUILD background &
@@ -102,9 +101,6 @@ pid_smokediff=$!
 echo building wind2fds
 BUILD wind2fds &
 pid_wind2fds=$!
-
-#wait for smokeview libraries to be built before continuing
-wait $pid_smvlibs
 
 echo building pnginfo
 BUILD pnginfo &
