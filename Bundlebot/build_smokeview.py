@@ -33,6 +33,8 @@ app.set(2)
 guide=IntVar()
 guide.set(1)
 
+scan_bundle = IntVar(value=1) 
+
 button_width=13
 
 # link windows batch files to python commands
@@ -162,6 +164,7 @@ R=R+1
 Button(root, text="Bundle",  width=button_width, command=bundle_smv).grid(row=R,    column=1)
 Button(root, text="Upload",  width=button_width, command=upload_bundle).grid(row=R, column=2)
 Button(root, text="Install", width=button_width, command=install_smv).grid(row=R,   column=3)
+Checkbutton(root, text="Scan bundle", variable=scan_bundle, onvalue=1, offvalue=0).grid(row=R, column=0)
 
 # ------------------------- guides ------------------------------
 
