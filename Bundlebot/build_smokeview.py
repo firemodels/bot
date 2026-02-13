@@ -60,7 +60,7 @@ def build_lib():               os.system("start " + webscript_dir + "webBUILDlib
 def build_util():              os.system("start " + webscript_dir + "webBUILDallprog "  + platforms[platform.get()])
 def build_smv():               os.system("start " + webscript_dir + "webBUILDsmv  "     + platforms[platform.get()]  )
 
-def bundle_smv():          os.system("start " + webscript_dir + "webPACKAGEsmv "        + platforms[platform.get()] )
+def bundle_smv():          os.system("start " + webscript_dir + "webPACKAGEsmv "        + platforms[platform.get()] + " " + str(scan_bundle.get()) )
 def install_smv():         os.system("start " + webscript_dir + "webINSTALLsmv "        + platforms[platform.get()]                  )
 def upload_bundle():       os.system("start " + webscript_dir + "webUPLOADallsmv "      + platforms[platform.get()])
 

@@ -1,6 +1,7 @@
 @echo off
 :: platform is windows, linux or osx
 set platform=%1
+set scan_bundle=%2
 
 :: build type is test or release
 set buildtype=%2
