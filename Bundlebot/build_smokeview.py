@@ -33,6 +33,8 @@ app.set(2)
 guide=IntVar()
 guide.set(1)
 
+scan_bundle = IntVar(value=1) 
+
 button_width=13
 
 # link windows batch files to python commands
@@ -58,7 +60,7 @@ def build_lib():               os.system("start " + webscript_dir + "webBUILDlib
 def build_util():              os.system("start " + webscript_dir + "webBUILDallprog "  + platforms[platform.get()])
 def build_smv():               os.system("start " + webscript_dir + "webBUILDsmv  "     + platforms[platform.get()]  )
 
-def bundle_smv():          os.system("start " + webscript_dir + "webPACKAGEsmv "        + platforms[platform.get()] )
+def bundle_smv():          os.system("start " + webscript_dir + "webPACKAGEsmv "        + platforms[platform.get()] + " " + str(scan_bundle.get()) )
 def install_smv():         os.system("start " + webscript_dir + "webINSTALLsmv "        + platforms[platform.get()]                  )
 def upload_bundle():       os.system("start " + webscript_dir + "webUPLOADallsmv "      + platforms[platform.get()])
 
@@ -162,6 +164,7 @@ R=R+1
 Button(root, text="Bundle",  width=button_width, command=bundle_smv).grid(row=R,    column=1)
 Button(root, text="Upload",  width=button_width, command=upload_bundle).grid(row=R, column=2)
 Button(root, text="Install", width=button_width, command=install_smv).grid(row=R,   column=3)
+Checkbutton(root, text="Scan bundle", variable=scan_bundle, onvalue=1, offvalue=0).grid(row=R, column=0)
 
 # ------------------------- guides ------------------------------
 
