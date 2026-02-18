@@ -7,7 +7,8 @@ sudo apt -y update
 echo ""
 echo "************************************"
 echo ***install packages for building fds
-sudo apt -y install gfortran openmpi-bin openmpi-doc libopenmpi-dev 
+#sudo apt -y install gfortran openmpi-bin openmpi-doc libopenmpi-dev 
+sudo apt -y install gfortran
 
 echo ""
 echo "************************************"
