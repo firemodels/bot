@@ -53,6 +53,9 @@ SETUP_REMOTE ()
   if [ "$repo" == "sundials" ]; then
     CENTRAL=LLNL
   fi
+  if [ "$repo" == "freeglut" ]; then
+    CENTRAL=freeglut
+  fi
   if [ "$repo" == "ompi" ]; then
     CENTRAL=open-mpi
   fi
@@ -89,7 +92,7 @@ CURDIR=`pwd`
 
 configrepos="cad exp fds fig out smv"
 fdsrepos="cad exp fds fig out smv test_bundles"
-thirdpartyrepos="hypre sundials"
+thirdpartyrepos="hypre sundials freeglut"
 #thirdpartyrepos="hypre sundials ompi"
 fdssmvrepos="fds smv"
 smvonlyrepos="smv"
@@ -297,6 +300,9 @@ do
     fi
     if [ "$repo" == "ompi" ]; then
       GITOWNER=open-mpi
+    fi
+    if [ "$repo" == "freeglut" ]; then
+      GITOWNER=freeglut
     fi
   fi
 

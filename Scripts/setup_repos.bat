@@ -12,7 +12,7 @@ if not exist ..\.gitbot goto skip1
    exit /b 1
 :endif1
 
-set thirdpartyrepos=hypre sundials
+set thirdpartyrepos=hypre sundials freeglut
 set fdsrepos=exp fds fig out smv test_bundles
 set fdssmvrepos=fds smv
 set smvonlyrepo=smv
@@ -125,6 +125,7 @@ echo.
   if not %GITUSER% == firemodels goto endif3
     if "%repo%" == "hypre" set GITOWNER=hypre-space
     if "%repo%" == "sundials" set GITOWNER=LLNL
+    if "%repo%" == "freeglut" set GITOWNER=freeglut
 :endif3
   
 :: check if repo is at github
@@ -155,6 +156,9 @@ echo.
 
   set CENTRAL=LLNL
   if "%repo%" == "sundials" goto endif2
+
+  set CENTRAL=freeglut
+  if "%repo%" == "freeglut" goto endif2
 
   set CENTRAL=firemodels
 :endif2
