@@ -185,7 +185,7 @@ git clean -dxf
 
 cd $SCRIPTDIR
 
-LOCKFILE=$HOME/.bundle/lock
+LOCKFILE=$HOME/.bundle/bundle_lock
 mkdir -p $HOME/.bundle
 
 MAILTO=
