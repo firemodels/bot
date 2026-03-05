@@ -225,4 +225,4 @@ __TARFILE_FOLLOWS__
 EOF
 chmod +x $INSTALLER
 cat $SMV_TAR >> $INSTALLER
-echo "Updater created."
+echo "*** bundle created:"

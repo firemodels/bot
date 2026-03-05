@@ -34,7 +34,7 @@ CLEAN_REPO ()
   local repo=$1
   repodir=$FMROOT/$repo
 
-  echo "------------- $repo -------------------------------------------"
+  echo "***cleaning $repo"
   if [ ! -e $repodir ]; then
      echo "Skipping, $repo does not exist"
      return
@@ -47,7 +47,6 @@ CLEAN_REPO ()
 
 for repo in $allrepos
 do 
-  echo
   CLEAN_REPO $repo
 done
 

@@ -3,6 +3,8 @@ FDSEDITION=FDS6
 
 revision=$1
 GITROOT=~/$2
+LABEL=$3
+scan_bundle=$4
 
 SCRIPTDIR="$(cd "$(dirname "$0")" && pwd)"
 
@@ -12,13 +14,11 @@ errlog=/tmp/smv_errlog.$$
 
 platform="linux"
 platform2="LINUX"
-platform3="lnx"
 COMPILER=intel
 if [ "`uname`" == "Darwin" ]
 then
   platform="osx"
   platform2="OSX"
-  platform3="osx"
   COMPILER=gnu
 fi
 
@@ -30,13 +30,17 @@ CP ()
   FROMFILE=$2
   TODIR=$3
   TOFILE=$4
+  if [ "$TOFILE" == "" ]; then
+    TOFILE=$FROMFILE
+  fi
+
   if [ ! -e $FROMDIR/$FROMFILE ]; then
     echo "***error: the file $FROMFILE does not exist"
   else
     cp $FROMDIR/$FROMFILE $TODIR/$TOFILE
   fi
   if [ -e $TODIR/$TOFILE ]; then
-    echo "$TOFILE copied"
+    echo "*** $TOFILE copied"
   else
     echo "***error: the file $TOFILE failed to copy from $FROMDIR/$FROMFILE">>$errlog
     echo "">>$errlog
@@ -69,7 +73,7 @@ CPDIR ()
     cp -r $FROMDIR $TODIR
   fi
   if [ -e $TODIR ]; then
-    echo "$TODIR copied"
+    echo "*** $TODIR copied"
   else
     echo "***error: the directory $TODIR failed to copy from $FROMDIR">>$errlog
     echo "">$errlog
@@ -89,40 +93,36 @@ FLUSHFILEDIR=$GITROOT/smv/Build/flush/${COMPILER}_${platform}
 FORBUNDLE=$GITROOT/smv/Build/for_bundle
 SMVSCRIPTDIR=$GITROOT/smv/scripts
 UTILSCRIPTDIR=$GITROOT/smv/Utilities/Scripts
-PLATFORMDIR=$revision\_${platform3}
+PLATFORMDIR=$revision\_${LABEL}
 MAKEINSTALLER=$GITROOT/bot/Bundlebot/nightly/make_smv_installer.sh
 UPLOADDIR=$HOME/.bundle/bundles
 flushfile=$GITROOT/smv/Build/flush/${COMPILER}_${platform}/flush_${platform}
 
-if [ ! -e $HOME/.bundle ]; then
-  mkdir $HOME/.bundle
-fi
 if [ ! -d $UPLOADDIR ]; then
-  mkdir $UPLOADDIR
+  mkdir -p $UPLOADDIR
 fi
 
 cd $UPLOADDIR
 
 rm -rf $PLATFORMDIR
-mkdir -p $PLATFORMDIR
 mkdir -p $PLATFORMDIR/$smvbin
 
-echo ""
-echo "---- copying files ----"
-echo ""
+echo 
+echo "***copying files"
+echo 
 CPDIR $FORBUNDLE/textures  $PLATFORMDIR/smvbin/textures
 CPDIR $FORBUNDLE/colorbars $PLATFORMDIR/smvbin/colorbars
 
 cp $FORBUNDLE/*.png $PLATFORMDIR/$smvbin/.
 #cp $FORBUNDLE/*.po $PLATFORMDIR/$smvbin/.
 
-CP $FORBUNDLE       objects.svo       $PLATFORMDIR/$smvbin objects.svo
-CP $FORBUNDLE       smokeview.ini     $PLATFORMDIR/$smvbin smokeview.ini
-CP $FORBUNDLE       volrender.ssf     $PLATFORMDIR/$smvbin volrender.ssf
-CP $UTILSCRIPTDIR   slice2html.sh     $PLATFORMDIR/$smvbin slice2html.sh
-CP $UTILSCRIPTDIR   slice2mp4.sh      $PLATFORMDIR/$smvbin slice2mp4.sh
-CP $FORBUNDLE       .smokeview_bin    $PLATFORMDIR/$smvbin .smokeview_bin
-CP $SMVSCRIPTDIR    jp2conv.sh        $PLATFORMDIR/$smvbin jp2conv.sh
+CP $FORBUNDLE       objects.svo       $PLATFORMDIR/$smvbin
+CP $FORBUNDLE       smokeview.ini     $PLATFORMDIR/$smvbin
+CP $FORBUNDLE       volrender.ssf     $PLATFORMDIR/$smvbin
+CP $UTILSCRIPTDIR   slice2html.sh     $PLATFORMDIR/$smvbin
+CP $UTILSCRIPTDIR   slice2mp4.sh      $PLATFORMDIR/$smvbin
+CP $FORBUNDLE       .smokeview_bin    $PLATFORMDIR/$smvbin
+CP $SMVSCRIPTDIR    jp2conv.sh        $PLATFORMDIR/$smvbin
 
 CP  $BACKGROUNDDIR background_${platform} $PLATFORMDIR/$smvbin background
 if [ "$platform" == "osx" ]; then
@@ -141,59 +141,61 @@ CURDIR=`pwd`
 
 # scan for viruses
 
-clam_status=`IS_PROGRAM_INSTALLED clamscan`
-if [ $clam_status -eq 1 ]; then
-  scanlog=$SCRIPTDIR/output/${PLATFORMDIR}_log.txt
-  vscanlog=$SCRIPTDIR/output/${PLATFORMDIR}.log
-  htmllog=$SCRIPTDIR/output/${PLATFORMDIR}_manifest.html
-  csvlog=$SCRIPTDIR/output/${PLATFORMDIR}.csv
-  bundledir=$HOME/.bundle/bundles/${PLATFORMDIR}
+if [ "$scan_bundle" == "1" ]; then
+  clam_status=`IS_PROGRAM_INSTALLED clamscan`
+  if [ $clam_status -eq 1 ]; then
+    scanlog=$SCRIPTDIR/output/${PLATFORMDIR}_log.txt
+    vscanlog=$SCRIPTDIR/output/${PLATFORMDIR}.log
+    htmllog=$SCRIPTDIR/output/${PLATFORMDIR}_manifest.html
+    csvlog=$SCRIPTDIR/output/${PLATFORMDIR}.csv
+    bundledir=$HOME/.bundle/bundles/${PLATFORMDIR}
   
  
-  if [ "$TEST_VIRUS" != "" ]; then
-    $SCRIPTDIR/gen_eicar.sh $bundledir/eicar.com
-  fi
+    if [ "$TEST_VIRUS" != "" ]; then
+      $SCRIPTDIR/gen_eicar.sh $bundledir/eicar.com
+    fi
 
-  echo ""
-  echo "--- scanning $PLATFORMDIR for viruses/malware ---"
-  echo "" 
-  clamscan -r $UPLOADDIR/$PLATFORMDIR > $scanlog 2>&1
-  sed 's/.*SMV-/SMV-/' $scanlog      > $vscanlog
-  echo ""
-  echo "--- adding sha256 hashes ---"
-  echo "" 
-  $SCRIPTDIR/add_sha256.sh $vscanlog > $csvlog
-  sed -i.bak '/SCAN SUMMARY/,$d; s|.*SMV[^/]*/||g'     $csvlog
-  sort -f -o $csvlog $csvlog
-  sed -n '/SCAN SUMMARY/,$p' $vscanlog >> $csvlog
-  $SCRIPTDIR/csv2html.sh                                  $csvlog SMV
-  if [ -e $SCRIPTDIR/output/${PLATFORMDIR}_manifest.html ]; then
-    CP $SCRIPTDIR/output ${PLATFORMDIR}_manifest.html $bundledir/smvbin SmvManifest.html
-    CP $SCRIPTDIR/output ${PLATFORMDIR}_manifest.html $UPLOADDIR ${PLATFORMDIR}_manifest.html
- fi
-  ninfected=`grep 'Infected files' $vscanlog | awk -F: '{print $2}'`
-  if [ "$ninfected" == "" ]; then
-    ninfected=0
-  fi
-  if [[ $ninfected -eq 0 ]]; then
-    echo "no viruses found in $UPLOAD_DIR/$PLATFORMDIR"
+    echo ""
+    echo "*** scanning $PLATFORMDIR for viruses/malware"
+    echo "" 
+    clamscan -r $UPLOADDIR/$PLATFORMDIR > $scanlog 2>&1
+    sed 's/.*SMV-/SMV-/' $scanlog      > $vscanlog
+    echo ""
+    echo "*** adding sha256 hashes"
+    echo "" 
+    $SCRIPTDIR/add_sha256.sh $vscanlog > $csvlog
+    sed -i.bak '/SCAN SUMMARY/,$d; s|.*SMV[^/]*/||g'     $csvlog
+    sort -f -o $csvlog $csvlog
+    sed -n '/SCAN SUMMARY/,$p' $vscanlog >> $csvlog
+    $SCRIPTDIR/csv2html.sh                                  $csvlog SMV
+    if [ -e $SCRIPTDIR/output/${PLATFORMDIR}_manifest.html ]; then
+      CP $SCRIPTDIR/output ${PLATFORMDIR}_manifest.html $bundledir/smvbin SmvManifest.html
+      CP $SCRIPTDIR/output ${PLATFORMDIR}_manifest.html $UPLOADDIR ${PLATFORMDIR}_manifest.html
+   fi
+    ninfected=`grep 'Infected files' $vscanlog | awk -F: '{print $2}'`
+    if [ "$ninfected" == "" ]; then
+      ninfected=0
+    fi
+    if [[ $ninfected -eq 0 ]]; then
+      echo "*** no viruses were found in $UPLOAD_DIR/$PLATFORMDIR"
+    else
+      returncode=1
+      echo "***error: $ninfected files found with a virus and/or malware in $UPLOAD_DIR/$PLATFORMDIR"
+    fi
   else
-    returncode=1
-    echo "***error: $ninfected files found with a virus and/or malware in $UPLOAD_DIR/$PLATFORMDIR"
+    echo "***warning: clamscan not found"
+    echo "            bundle will not be scanned for viruses or malware"
   fi
-else
-  echo ***warning: clamscan not found
-  echo ***         bundle will not be scanned for viruses or malware
 fi
 
 rm -f $PLATFORMDIR.tar $PLATFORMDIR.tar.gz
 echo ""
-echo "---- building installer ----"
+echo "*** building installer"
 echo ""
 tar cvf $PLATFORMDIR.tar $PLATFORMDIR
 gzip $PLATFORMDIR.tar
 $MAKEINSTALLER ${platform2} $revision $PLATFORMDIR.tar.gz $PLATFORMDIR.sh FDS/$FDSEDITION
-echo "$PLATFORMDIR.sh   copied to $UPLOADDIR on `hostname`"
+echo "    `hostname`:$UPLOADDIR/$PLATFORMDIR.sh"
 
 if [ -e $errlog ]; then
   numerrs=`cat $errlog | wc -l `
@@ -208,3 +210,4 @@ if [ -e $errlog ]; then
   fi
   rm $errlog
 fi
+ 

@@ -23,6 +23,6 @@ if [ "$platform" == "linux" ]; then
   cd $HOME/$SCRIPTDIR/../../../smv
   SMV_SHORT_HASH=`git rev-parse --short HEAD`
   cd $HOME/$SCRIPTDIR
-  ./setreleasetitle.sh smv $SMV_SHORT_HASH $OWNER test_bundles
+  ./setreleasetitle.sh smv $SMV_SHORT_HASH $OWNER
 fi
 

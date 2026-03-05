@@ -10,8 +10,6 @@ then
   echo "  -b custombase - custom directory base"
   echo "  -d installdir - default install directory"
   echo "   INSTALLER.sh - bash shell script containing self-extracting Installer"
-  echo "  -m MPI_VERSION- mpi version (INTEL or tar'd openmpi distribution)"
-  echo "  -M OPENMPIFILE- openmpi file name"
   echo
   exit
 fi
@@ -25,7 +23,6 @@ CUSTOMBASE=
 FDSVARS=${FDSEDITION}VARS.sh
 SMVVARS=${SMVEDITION}VARS.sh
 
-openmpifile=
 INSTALLDIR=
 FDS_TAR=
 INSTALLER=
@@ -38,7 +35,7 @@ fi
 
 FDS_VERSION=FDS
 SMV_VERSION=Smokeview
-while getopts 'b:d:f:i:m:M:s:' OPTION
+while getopts 'b:d:f:i:s:' OPTION
 do
 case $OPTION in
   b)
@@ -54,12 +51,6 @@ case $OPTION in
   ;;
   i)
   FDS_TAR="$OPTARG"
-  ;;
-  m)
-  MPI_VERSION="$OPTARG"
-  ;;
-  M)
-  openmpifile="$OPTARG"
   ;;
   s)
   SMV_VERSION="$OPTARG"
@@ -95,13 +86,6 @@ if [ "$ostype" == "OSX" ]; then
   LDLIBPATH=DYLD_LIBRARY_PATH
   BASHRC2=.bash_profile
   PLATFORM=osx
-fi
-if [ "$MPI_VERSION" != "INTEL" ]; then
-  if [ "$openmpifile" == "" ]; then
-    OPENMPIFILE=openmpi_${MPI_VERSION}_${PLATFORM}.tar.gz
-  else
-    OPENMPIFILE=$openmpifile
-  fi
 fi
 
 cat << EOF > $INSTALLER
@@ -208,7 +192,7 @@ MKDIR()
     echo "FDS installation aborted."
     exit 0
   fi
-  echo The installation directory, "\$DIR, has been created."
+#  echo "The installation directory, \$DIR, has been created."
   rm \$DIR/temp.\$\$
 }
 
@@ -413,19 +397,19 @@ if [ "$ostype" == "LINUX" ] ; then
 cat << MODULE >> \$FDSMODULEtmp
 prepend-path    LD_LIBRARY_PATH /usr/lib64
 MODULE
-if [ "$MPI_VERSION" == "INTEL" ] ; then
+if [ "$MPI_TYPE" == "INTELMPI" ] ; then
 cat << MODULE >> \$FDSMODULEtmp
 
 # Intel runtime environment
 
-set impihome \$FDS_root/bin/INTEL
+set impihome \$FDS_root/bin/intelmpi
 prepend-path FI_PROVIDER_PATH \\\$impihome/prov
 prepend-path LD_LIBRARY_PATH \\\$impihome/lib
 prepend-path PATH \\\$impihome/bin
 MODULE
 fi
 fi
-if [ "$MPI_VERSION" != "INTEL" ] ; then
+if [ "$MPI_TYPE" != "INTELMPI" ] ; then
 cat << MODULE >> \$FDSMODULEtmp
 prepend-path    PATH            \$FDS_root/bin/openmpi/bin
 setenv          OPAL_PREFIX     \$FDS_root/bin/openmpi
@@ -471,7 +455,7 @@ FDSBINDIR=\$FDS_root/bin
 export PATH=\\\$FDSBINDIR:\\\$PATH
 BASH
 
-if [ "$MPI_VERSION" != "INTEL" ] ; then
+if [ "$MPI_TYPE" != "INTELMPI" ] ; then
 cat << BASH >> \$BASHRCFDS
 export PATH=\\\$FDSBINDIR/openmpi/bin:\\\$PATH
 export OPAL_PREFIX=\\\$FDSBINDIR/openmpi  # used when running the bundled fds
@@ -479,6 +463,7 @@ BASH
 fi
 if [[ "$ostype" == "OSX" ]]; then
 cat << BASH >> \$BASHRCFDS
+export DYLD_LIBRARY_PATH=\\\$FDSBINDIR/openmpi/lib:\\\$DYLD_LIBRARY_PATH
 export TMPDIR=/tmp
 BASH
 fi
@@ -502,18 +487,16 @@ cat << BASH >> \$BASHRCFDS
 export OMP_NUM_THREADS=4
 BASH
 
-if [ "$ostype" == "LINUX" ] ; then
-if [ "$MPI_VERSION" == "INTEL" ] ; then
+if [[ "$ostype" == "LINUX" ]] &&  [[ "$MPI_TYPE" == "INTELMPI" ]] ; then
 cat << BASH >> \$BASHRCFDS
 
 # Intel runtime environment
 
-impihome=\$FDS_root/bin/INTEL
+impihome=\$FDS_root/bin/intelmpi
 export FI_PROVIDER_PATH=\\\$impihome/prov
 export LD_LIBRARY_PATH=\\\$impihome/lib:\\\$LD_LIBRARY_PATH
 export PATH=\\\$impihome/bin:\\\$PATH
 BASH
-fi
 fi
 
 #--- create startup and readme files
@@ -604,4 +587,3 @@ __TARFILE_FOLLOWS__
 EOF
 chmod +x $INSTALLER
 cat $FDS_TAR >> $INSTALLER
-echo "Installer created."

@@ -75,22 +75,22 @@ echo cloning smv
 pid_smv=$!
 
 wait $pid_cad
-echo cad cloned
+echo "*** cad cloned"
 
 wait $pid_exp
-echo cad cloned
+echo "*** cad cloned"
 
 wait $pid_fds
-echo fds cloned
+echo "*** fds cloned"
 
 wait $pid_fig
-echo fig cloned
+echo "*** fig cloned"
 
 wait $pid_out
-echo out cloned
+echo "*** out cloned"
 
 wait $pid_smv
-echo smv cloned
+echo "*** smv cloned"
 
 TAG_REPO cad  $BUNDLE_CAD_HASH $BUNDLE_CAD_TAG
 TAG_REPO exp  $BUNDLE_EXP_HASH $BUNDLE_EXP_TAG

@@ -1,71 +1,70 @@
 @echo off
 :: nightly bundles are uploaded to the firemodels test repo,
 :: release bundles are uploaded to the users test repo 
-set OWNER=%username%
-if "x%is_release%" == "x" set OWNER=firemodels
 
 if not exist %userprofile%\.bundle mkdir %userprofile%\.bundle
-set CURDIR=%CD%
+set BNCURDIR=%CD%
 
-set upload_bundle=
+set UPLOAD_BUNDLE=
 set FDS_TAG=
 set SMV_TAG=
-set logfile=%userprofile%\.bundle\logfile.txt
-set emailto=
+set LOGFILE=%userprofile%\.bundle\logfile.txt
+set EMAILTO=
+set ONLY_INSTALLER=0
+set USE_CURRENT=
 
 ::*** parse command line arguments
-call :getopts %*
+call :GETOPTS %*
 
-if "x%stopscript%" == "x" goto endif2
-  set stopscript=
+set DOWNLOADOWNER=firemodels
+set UPLOADOWNER=firemodels
+if "x%IS_RELEASE%" == "x1" set UPLOADOWNER=%username%
+if "x%UPLOAD_BUNDLE%" == "x2" set UPLOADOWNER=%username%
+
+if "x%STOPSCRIPT%" == "x" goto endif1
+  set STOPSCRIPT=
   exit /b 1
-:endif2
+:endif1
 
-set nightly=nightly
-set pub_dir=
+set NIGHTLY=yes
+if "x%IS_RELEASE%" == "x1" set NIGHTLY=no
 
 set BUNDLESCRIPTDIR=%CD%
 cd ..\..\..
 set REPOROOT=%CD%
 
 cd %REPOROOT%\bot
-set botrepo=%CD%
-set gawk=%botrepo%\scripts\bin\gawk.exe
+set BOTREPO=%CD%
+set GAWK=%BOTREPO%\scripts\bin\gawk.exe
 
-if exist %REPOROOT%\webpages goto endif4
+if exist %REPOROOT%\webpages goto endif2
   echo ***error: the webpages repo does not exist
   cd %BUNDLESCRIPTDIR%
   exit /b 1
-:endif4
+:endif2
 
-set email=%botrepo%\Scripts\email_insert.bat
-set emailexe=%userprofile%\bin\mailsend.exe
-if "x%emailto%" == "x" goto endif5
-  if exist %emailexe% goto endif5
-    echo ***warning: email program %emailexe% does not exist
-    set emailto=
-:endif5
+set EMAIL=%BOTREPO%\Scripts\email_insert.bat
+set EMAILEXE=%userprofile%\bin\mailsend.exe
+if "x%EMAILTO%" == "x" goto endif3
+  if exist %EMAILEXE% goto endif3
+    echo ***warning: email program %EMAILEXE% does not exist
+    set EMAILTO=
+:endif3
 
-cd %REPOROOT%\webpages
-set webpagesrepo=%CD%
-
-cd ..
-set basedir=%CD%
-
+if %ONLY_INSTALLER% == 1 goto skip1
 :: bring the webpages and wiki repos up to date
 echo.
-echo ------------------------------------------------------
-echo ------------------------------------------------------
-echo updating web and wiki repos
+echo ***updating web and wiki repos
 echo.
 cd %REPOROOT%\bot\Scripts
 call update_repos -w > Nul
+:skip1
 
 cd %BUNDLESCRIPTDIR%
 
 :: create the bundle
 
-if x%is_release% == x goto else1
+if "x%IS_RELEASE%" == "x" goto else4
 :: this is a release bundle - hash and revisions obtained from config.bat (invoked in BuildRelease.bat)
   set FDS_HASH_BUNDLER=%BUNDLE_FDS_HASH%
   set SMV_HASH_BUNDLER=%BUNDLE_SMV_HASH%
@@ -73,10 +72,10 @@ if x%is_release% == x goto else1
   set FDS_TAG=%BUNDLE_FDS_TAG%
   set SMV_REVISION_BUNDLER=%BUNDLE_SMV_TAG%
   set SMV_TAG=%BUNDLE_SMV_TAG%
-  goto endif1
-:else1
+  goto endif4
+:else4
 :: this is a nightly bundle - hash and revisions obtained from latest firebot pass
-  call get_hash_revisions.bat || exit /b 1
+  call get_hash_revisions.bat %USE_CURRENT% || exit /b 1
   set /p FDS_HASH_BUNDLER=<output\FDS_HASH
   set /p SMV_HASH_BUNDLER=<output\SMV_HASH
   set /p FDS_REVISION_BUNDLER=<output\FDS_REVISION
@@ -85,99 +84,75 @@ if x%is_release% == x goto else1
   erase output\SMV_HASH
   erase output\FDS_REVISION
   erase output\SMV_REVISION
-:endif1
+:endif4
 
-echo.                                                         > %logfile%
-echo ------------------------------------------------------  >> %logfile%
-echo ------------------------------------------------------  >> %logfile%
-echo Building bundle using:                                  >> %logfile%
-echo.                                                        >> %logfile%
+echo.                                                         > %LOGFILE%
+echo ***building bundle using:                               >> %LOGFILE%
+echo.                                                        >> %LOGFILE%
 if "x%FDS_REVISION_BUNDLER%" == "x" goto skip_fdsrev
-  echo             FDS revision: %FDS_REVISION_BUNDLER%      >> %logfile%
+  echo             FDS revision: %FDS_REVISION_BUNDLER%      >> %LOGFILE%
 :skip_fdsrev
 
 if "x%FDS_HASH_BUNDLER%" == "x" goto skip_fdshash
-echo            FDS repo hash: %FDS_HASH_BUNDLER%            >> %logfile%
+echo            FDS repo hash: %FDS_HASH_BUNDLER%            >> %LOGFILE%
 :skip_fdshash
 
 if "x%FDS_TAG%" == "x" goto skip_fdstag
-echo             FDS repo tag: %FDS_TAG%                     >> %logfile%
+echo             FDS repo tag: %FDS_TAG%                     >> %LOGFILE%
 :skip_fdstag
 
 if "x%SMV_REVISION_BUNDLER%" == "x" goto skip_smvrev
-  echo             smv revision: %SMV_REVISION_BUNDLER%      >> %logfile%
+  echo             smv revision: %SMV_REVISION_BUNDLER%      >> %LOGFILE%
 :skip_smvrev
 
 if "x%SMV_HASH_BUNDLER%" == "x" goto skip_smvhash
-echo            SMV repo hash: %SMV_HASH_BUNDLER%            >> %logfile%
+echo            SMV repo hash: %SMV_HASH_BUNDLER%            >> %LOGFILE%
 :skip_smvhash
 
 if "x%SMV_TAG%" == "x" goto skip_smvtag
-echo             SMV repo tag: %SMV_TAG%                     >> %logfile%
+echo             SMV repo tag: %SMV_TAG%                     >> %LOGFILE%
 :skip_smvtag
 
-if NOT "%emailto%" == "" (
-  echo                    email: %emailto%                   >> %logfile%
+if NOT "%EMAILTO%" == "" (
+  echo                    email: %EMAILTO%                   >> %LOGFILE%
 )
-echo.                                                        >> %logfile%
+echo.                                                        >> %LOGFILE%
 
-type %logfile%
+type %LOGFILE%
 
+if %ONLY_INSTALLER% == 1 goto skip2
 :: clone fds and smv repos 
 call clone_repos %FDS_HASH_BUNDLER% %SMV_HASH_BUNDLER%  || exit /b 1
 
-echo.
-echo ------------------------------------------------------
-echo ------------------------------------------------------
-echo Building apps
-echo.
+echo ***building apps
 
 cd %BUNDLESCRIPTDIR%
 call make_apps         || exit /b 1
+:skip2
 
-echo.
-echo ------------------------------------------------------
-echo ------------------------------------------------------
-echo Copying fds apps
-echo.
+echo ***copying fds apps
 cd %BUNDLESCRIPTDIR%
-call copy_apps fds bot || exit /b 1
+call copy_apps fds || exit /b 1
 
-echo.
-echo ------------------------------------------------------
-echo ------------------------------------------------------
-echo Copying smv apps
-echo.
+echo ***copying smv apps
 
 cd %BUNDLESCRIPTDIR%
-call copy_apps smv bot || exit /b 1
+call copy_apps smv || exit /b 1
 
-echo.
-echo ------------------------------------------------------
-echo ------------------------------------------------------
-echo Copying fds pubs
-echo.
+echo ***copying fds pubs
 
 cd %BUNDLESCRIPTDIR%
-call copy_pubs firebot  %OWNER% || exit /b 1
+call copy_pubs firebot  %DOWNLOADOWNER% || exit /b 1
 
-echo.
-echo ------------------------------------------------------
-echo ------------------------------------------------------
-echo Copying smv pubs
-echo.
+echo ***copying smv pubs
 
 cd %BUNDLESCRIPTDIR%
-call copy_pubs smokebot %OWNER% || exit /b 1
+call copy_pubs smokebot %DOWNLOADOWNER% || exit /b 1
 
-echo.
-echo ------------------------------------------------------
-echo ------------------------------------------------------
-echo making bundle
-echo.
+echo ***making bundle
 
 cd %BUNDLESCRIPTDIR%
-call make_bundle bot %FDS_REVISION_BUNDLER% %SMV_REVISION_BUNDLER% %nightly%
+call make_bundle %FDS_REVISION_BUNDLER% %SMV_REVISION_BUNDLER% %NIGHTLY%
 set HAVEVIRUS=%ERRORLEVEL%
 
 cd %BUNDLESCRIPTDIR%
@@ -187,41 +162,36 @@ if %HAVEVIRUS% == 1 echo ***error: a virus was found in the bundle
 if %HAVEVIRUS% == 1 echo bundle was built but not uploaded
 if %HAVEVIRUS% == 1 goto skip_upload
 if %HAVEVIRUS% == 0 echo ***no viruses were found in the bundle ***
-if "x%upload_bundle%" == "x" goto skip_upload
-  echo.
-  echo ------------------------------------------------------
-  echo ------------------------------------------------------
-  echo uploading bundle
-  echo.
+if "x%UPLOAD_BUNDLE%" == "x" goto skip_upload
+  echo ***uploading bundle
 
   set filelist=%TEMP%\fds_smv_files_win.out
-  gh release view FDS_TEST -R github.com/%OWNER%/test_bundles | grep FDS | grep SMV | grep win | %gawk% "{print $2}" > %filelist%
-  for /F "tokens=*" %%A in (%filelist%) do gh release delete-asset FDS_TEST -R github.com/%OWNER%/test_bundles %%A -y
+  gh release view FDS_TEST -R github.com/%UPLOADOWNER%/test_bundles | grep FDS | grep SMV | grep win | %GAWK% "{print $2}" > %filelist%
+  for /F "tokens=*" %%A in (%filelist%) do gh release delete-asset FDS_TEST -R github.com/%UPLOADOWNER%/test_bundles %%A -y
   erase %filelist%
 
   set /p basename=<%TEMP%\fds_smv_basename.txt
 
   set fullfilebase=%userprofile%\.bundle\bundles\%basename%
 
-  echo gh release upload FDS_TEST %fullfilebase%.exe -R github.com/%OWNER%/test_bundles --clobber
-       gh release upload FDS_TEST %fullfilebase%.exe -R github.com/%OWNER%/test_bundles --clobber
+  echo gh release upload FDS_TEST %fullfilebase%.exe -R github.com/%UPLOADOWNER%/test_bundles --clobber
+       gh release upload FDS_TEST %fullfilebase%.exe -R github.com/%UPLOADOWNER%/test_bundles --clobber
 
-  echo gh release upload FDS_TEST %CURDIR%\output\%basename%_manifest.html -R github.com/%OWNER%/test_bundles --clobber
-       gh release upload FDS_TEST %CURDIR%\output\%basename%_manifest.html -R github.com/%OWNER%/test_bundles --clobber
+  echo gh release upload FDS_TEST %BNCURDIR%\output\%basename%_manifest.html -R github.com/%UPLOADOWNER%/test_bundles --clobber
+       gh release upload FDS_TEST %BNCURDIR%\output\%basename%_manifest.html -R github.com/%UPLOADOWNER%/test_bundles --clobber
 :skip_upload
 
-if "x%emailto%" == "x" goto endif6
-  call %email% %emailto% "PC bundle %FDS_REVISION_BUNDLER% %SMV_REVISION_BUNDLER% created on %COMPUTERNAME%" %logfile%
-:endif6
+if "x%EMAILTO%" == "x" goto endif5
+  call %EMAIL% %EMAILTO% "PC bundle %FDS_REVISION_BUNDLER% %SMV_REVISION_BUNDLER% created on %COMPUTERNAME%" %LOGFILE%
+:endif5
 
 goto eof
 
 
 ::-----------------------------------------------------------------------
-:usage
+:USAGE
 ::-----------------------------------------------------------------------
 
-:usage
 echo.
 echo run_bundlebot usage
 echo.
@@ -229,31 +199,53 @@ echo This script builds FDS and Smokeview apps and generates a bundle using eith
 echo specified fds and smv repo revisions or revisions from the latest firebot pass.
 echo.
 echo Options:
+echo -C - build apps using current revision
 echo -h - display this message
+echo -I - only build installer, assume repos are already cloned and apps are already built
 echo -m mailtto - send email to mailto
-echo -U - upload bundle
+echo -R - create a release bundle using settings in ..\release\config.bat
+echo -u - upload bundle to %username%
+echo -U - upload bundle to %UPLOADOWNER%
 exit /b 0
 
 ::-----------------------------------------------------------------------
-:getopts
+:GETOPTS
 ::-----------------------------------------------------------------------
- set stopscript=
+ set STOPSCRIPT=
  if (%1)==() exit /b
  set valid=0
  set arg=%1
  
- if "%1" EQU "-h" (
-   call :usage
-   set stopscript=1
-   exit /b
- )
- if "%1" EQU "-m" (
-   set emailto=%2
+ if "%1" EQU "-C" (
+   set USE_CURRENT=-C
    set valid=1
    shift
  )
+ if "%1" EQU "-h" (
+   call :USAGE
+   set STOPSCRIPT=1
+   exit /b
+ )
+ if "%1" EQU "-I" (
+   set ONLY_INSTALLER=1
+   set valid=1
+ )
+ if "%1" EQU "-m" (
+   set EMAILTO=%2
+   set valid=1
+   shift
+ )
+ if "%1" EQU "-R" (
+   set IS_RELEASE=1
+   set valid=1
+   shift
+ )
+ if "%1" EQU "-u" (
+   set UPLOAD_BUNDLE=2
+   set valid=1
+ )
  if "%1" EQU "-U" (
-   set upload_bundle=1
+   set UPLOAD_BUNDLE=1
    set valid=1
  )
  shift
@@ -262,11 +254,11 @@ exit /b 0
    echo ***Error: the input argument %arg% is invalid
    echo.
    echo Usage:
-   call :usage
-   set stopscript=1
+   call :USAGE
+   set STOPSCRIPT=1
    exit /b 1
  )
-if not (%1)==() goto getopts
+if not (%1)==() goto GETOPTS
 exit /b 0
 
 :: -------------------------------------------------------------
@@ -309,5 +301,5 @@ exit /b 0
 
 :eof
 
-cd %CURDIR%
+cd %BNCURDIR%
 exit /b 0

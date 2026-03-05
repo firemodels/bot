@@ -12,10 +12,7 @@ goto eof
 
 :clean_repo
   set reponame=%1
-  echo.
-  echo ----------------------------------
-  echo cleaning %reponame%
-  echo ----------------------------------
+  echo ***cleaning %reponame%
   set repodir=%repo%\%reponame%
   if not exist %repodir% (
      exit /b

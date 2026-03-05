@@ -1,15 +1,11 @@
 #!/bin/bash
 repo=$1
 hash=$2
-owner_arg=$3
+GHOWNER=$3
 
-if [ "$BUILDING_release" == "1" ]; then
-  GHOWNER=`whoami`
-else
-  GHOWNER=firemodels
-fi
-if [ "$owner_arg" != "" ]; then
-  GHOWNER=$owner_arg
+if [ "$GHOWNER" == "" ]; then
+  echo "***error: owner for gh command not defined"
+  exit
 fi
 
 ERROR=1

@@ -2,6 +2,7 @@
 setlocal
 :: release info
 set versionbase=%1
+set scan_bundle%2
 set zipbase=%versionbase%_win
 set SMVEDITION=SMV6
 
@@ -14,17 +15,8 @@ set reporoot=%CD%
 
 set CURDIR=%CD%
 
-set smvbuild=%reporoot%\smv\Build\smokeview\intel_win
 set forbundle=%reporoot%\smv\Build\for_bundle
 set smvscripts=%reporoot%\smv\scripts
-set svzipbuild=%reporoot%\smv\Build\smokezip\intel_win
-set svdiffbuild=%reporoot%\smv\Build\smokediff\intel_win
-set pnginfobuild=%reporoot%\smv\Build\pnginfo\intel_win
-set fds2fedbuild=%reporoot%\smv\Build\fds2fed\intel_win
-set bgbuild=%reporoot%\smv\Build\background\intel_win
-set flushfilebuild=%reporoot%\smv\Build\flush\intel_win
-set timepbuild=%reporoot%\smv\Build\timep\intel_win
-set windbuild=%reporoot%\smv\Build\wind2fds\intel_win
 set sh2bat=%reporoot%\smv\Build\sh2bat\intel_win
 set gettime=%reporoot%\smv\Build\get_time\intel_win
 set repoexes=%userprofile%\.bundle\BUNDLE\WINDOWS\repoexes
@@ -33,10 +25,8 @@ set gawk=%reporoot%\bot\scripts\bin\gawk.exe
 set smvdir=%zipbase%\%SMVEDITION%
 
 cd %userprofile%
-if NOT exist .bundle mkdir .bundle
-cd .bundle
-if NOT exist bundles mkdir bundles
-cd bundles
+if NOT exist .bundle\bundles mkdir .bundle\bundles
+cd .bundle\bundles
 set bundles=%CD%
 
 echo.
@@ -45,32 +35,29 @@ echo.
 IF EXIST %smvdir% rmdir /S /Q %smvdir%
 mkdir %smvdir%
 
-CALL :COPY  %reporoot%\smv\Build\set_path\intel_win\set_path_win.exe "%smvdir%\set_path.exe"
-CALL :COPY  %smvbuild%\smokeview_win.exe                              %smvdir%\smokeview.exe
-CALL :COPY  %smvscripts%\jp2conv.bat                                  %smvdir%\jp2conv.bat
-
-::echo copying .po files
-::copy %forbundle%\*.po %smvdir%\.>Nul
+CALL :COPY  %reporoot%\smv\Build\set_path\intel_win\set_path_win.exe   %smvdir%\set_path.exe
+CALL :COPY  %reporoot%\smv\Build\smokeview\intel_win\smokeview_win.exe %smvdir%\smokeview.exe
+CALL :COPY  %smvscripts%\jp2conv.bat                                   %smvdir%\jp2conv.bat
 
 echo copying .png files
 copy %forbundle%\*.png %smvdir%\.>Nul
 
 CALL :COPY  %forbundle%\volrender.ssf %smvdir%\volrender.ssf
 
-CALL :COPY  %bgbuild%\background_win.exe     %smvdir%\background.exe
-CALL :COPY  %flushfilebuild%\flush_win.exe   %smvdir%\flush.exe
-CALL :COPY  %svdiffbuild%\smokediff_win.exe  %smvdir%\smokediff.exe
-CALL :COPY  %pnginfobuild%\pnginfo_win.exe   %smvdir%\pnginfo.exe
-CALL :COPY  %fds2fedbuild%\fds2fed_win.exe   %smvdir%\fds2fed.exe
-CALL :COPY  %svzipbuild%\smokezip_win.exe    %smvdir%\smokezip.exe
-CALL :COPY  %timepbuild%\timep_win.exe       %smvdir%\timep.exe
-CALL :COPY  %windbuild%\wind2fds_win.exe     %smvdir%\wind2fds.exe
+CALL :COPY  %reporoot%\smv\Build\background\intel_win\background_win.exe %smvdir%\background.exe
+CALL :COPY  %reporoot%\smv\Build\flush\intel_win\flush_win.exe           %smvdir%\flush.exe
+CALL :COPY  %reporoot%\smv\Build\smokediff\intel_win\smokediff_win.exe   %smvdir%\smokediff.exe
+CALL :COPY  %reporoot%\smv\Build\pnginfo\intel_win\pnginfo_win.exe       %smvdir%\pnginfo.exe
+CALL :COPY  %reporoot%\smv\Build\fds2fed\intel_win\fds2fed_win.exe       %smvdir%\fds2fed.exe
+CALL :COPY  %reporoot%\smv\Build\smokezip\intel_win\smokezip_win.exe     %smvdir%\smokezip.exe
+CALL :COPY  %reporoot%\smv\Build\timep\intel_win\timep_win.exe           %smvdir%\timep.exe
+CALL :COPY  %reporoot%\smv\Build\wind2fds\intel_win\wind2fds_win.exe     %smvdir%\wind2fds.exe
 
 echo Unpacking Smokeview %versionbase% installation files > %forbundle%\unpack.txt
 echo Updating Windows Smokeview to %versionbase%          > %forbundle%\message.txt
 
-CALL :COPY  "%forbundle%\message.txt"                         %zipbase%\message.txt
-CALL :COPY  %forbundle%\setup.bat                             %zipbase%\setup.bat
+CALL :COPY  %forbundle%\message.txt %zipbase%\message.txt
+CALL :COPY  %forbundle%\setup.bat   %zipbase%\setup.bat
 
 set curdir=%CD%
 
@@ -82,7 +69,6 @@ copy %forbundle%\textures\*.jpg %smvdir%\textures>Nul
 copy %forbundle%\textures\*.png %smvdir%\textures>Nul
 
 echo copying colorbars
-mkdir %smvdir%\colorbars
 mkdir %smvdir%\colorbars\linear
 mkdir %smvdir%\colorbars\rainbow
 mkdir %smvdir%\colorbars\divergent
@@ -99,6 +85,7 @@ CALL :COPY  %gettime%\get_time_win.exe                %smvdir%\get_time.exe
 CALL :COPY  %reporoot%\webpages\SMV_Release_Notes.htm %smvdir%\release_notes.html
 CALL :COPY  %forbundle%\.smokeview_bin                %smvdir%\.
 
+if "%scan_bundle%" == "0" goto endifscan
 call :IS_FILE_INSTALLED clamscan
 set nightlydir=%reporoot%\bot\Bundlebot\nightly
 set logdir=%nightlydir%\output
@@ -122,7 +109,7 @@ if %ERRORLEVEL% == 1 goto elsescan
   call %ADDSHA256% %scanlog%         > %vscanlog%
   cd %nightlydir%
   echo ***removing %zipbase% from filepaths
-  sed -i.bak "s/%zipbase%\\//g"   %vscanlog%
+  sed -i.bak "s/%zipbase%/SMV6/g"   %vscanlog%
 
 :: split file into two parts
   sed "/SCAN SUMMARY/,$ d"    %vscanlog% > %preamble%

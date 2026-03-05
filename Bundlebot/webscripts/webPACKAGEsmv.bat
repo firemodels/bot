@@ -30,8 +30,8 @@ set type=test
 set version=%smv_revision%
 
 echo.
-echo  Bundling %type% Smokeview for %platform%
-Title Bundling %type% Smokeview for %platform%
+echo  *** bundling %platform% smokeview
+Title bundling %platform% smokeview
 
 :: windows
 
@@ -54,21 +54,14 @@ if NOT exist %bundlesdir% mkdir %bundlesdir%
 :: linux
 
 if "%platform%" == "Linux" (
-
-  echo.
-  echo --- Making a Linux Smokeview installer ---
-  echo.
-  plink %plink_options% %linux_logon% %scriptdir%/assemble_smvbundle.sh %buildtype% %version% %linux_git_root%
+  plink %plink_options% %linux_logon% %scriptdir%/assemble_smvbundle.sh %version% %linux_git_root% linux %scan_bundle%
   goto eof
 )
 
 :: osx
 
 if "%platform%" == "OSX" (
-  echo.
-  echo --- Making a OSX Smokeview installer ---
-  echo.
-  plink %plink_options% %osx_logon% %scriptdir%/assemble_smvbundle.sh %buildtype% %version% %linux_git_root%
+  plink %plink_options% %osx_logon% %scriptdir%/assemble_smvbundle.sh  %version% %linux_git_root% osx %scan_bundle%
   goto eof
 )
 

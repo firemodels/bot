@@ -1,6 +1,5 @@
 @echo off
 set CURDIR=%CD%
-set is_release=1
 
 call config.bat
 
@@ -8,13 +7,13 @@ echo cleaning bot repo
 cd ..\..
 git clean -dxf
 
-set UPLOADBUNDLE=-U
+set UPLOADBUNDLE=-u
 :: uncomment following line to test script (does not upload bundle to github or run gh command)
 :: set UPLOADBUNDLE=
 
 cd %CURDIR%
 cd ..\nightly
-call BuildNightly -R release %UPLOADBUNDLE%
+call BuildNightly -R %UPLOADBUNDLE%
 cd %CURDIR%
 
 if "X%UPLOADBUNDLE%" == "X" goto :EOF
