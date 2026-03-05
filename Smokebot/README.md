@@ -4,7 +4,7 @@ Smokebot is a verification test script that can be run at regular intervals as p
 
 ## Set-Up
 
-The following steps only need to be done once. The exact phrasing of the commands are for the NIST linux cluster named blaze. You might need to modify the path and module names.
+The following steps only need to be done once. The exact phrasing of the commands are for the NIST linux cluster named spark. You might need to modify the path and module names.
 
 1. Clone the repositories that are included in the GitHub organization called `firemodels`: `bot`, `cfast`, `fds`, `fig` and `smv`. Clone `bot` first, then cd into `bot/Scripts` and type `./setup_repos.sh -a` . This will clone all the other repos needed in the same directory as `bot` (or you can clone each repo in the same way as you cloned `bot`).
 
@@ -61,10 +61,10 @@ MAILTO=""
 # |   |   |   |  |
 # *   *   *   *  *  command to be executed
 # generate movies at 4:01AM
-1 4 * * *    cd $HOME/Models_central/bot/Smokebot ; bash -lc  "./run_smokebot.sh -J -u -c -U -q smokebot -M -W http://blaze.el.nist.gov/smokebot -w /var/www/html/smokebot > /dev/null"
+1 4 * * *    cd $HOME/Models_central/bot/Smokebot ; bash -lc  "./run_smokebot.sh -J -u -c -U -q smokebot -M -W http://spark.el.nist.gov/smokebot -w /var/www/html/smokebot > /dev/null"
 
 # run smokebot if FDS or Smokeview source has changed in last 5 minutes
-*/5 * * * * cd $HOME/FireModels_central/bot/Smokebot ; bash -lc "./run_smokebot.sh -J -u -c -U -q smokebot -a -W http://blaze.el.nist.gov/smokebot -w /var/www/html/smokebot > /dev/null"
+*/5 * * * * cd $HOME/FireModels_central/bot/Smokebot ; bash -lc "./run_smokebot.sh -J -u -c -U -q smokebot -a -W http://spark.el.nist.gov/smokebot -w /var/www/html/smokebot > /dev/null"
 ```
 
 The output from smokebot is written into the directory called `output` which is in the same directory as the `smokebot.sh` script itself. When smokebot completes, email should be sent to the specified list of addresses.
