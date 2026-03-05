@@ -1039,9 +1039,10 @@ check_compile_smv_db()
  if [ -e "smokeview_${platform}_db" ]; then
    smv_debug_success=true
  else
-   echo "Errors from Stage 2 - Compile SMV debug:" >> $ERROR_LOG
-   cat $OUTPUT_DIR/stage2_build_smv_debug >> $ERROR_LOG
-   echo "" >> $ERROR_LOG
+   echo "Errors from Stage 2 - Compile SMV debug:"       >> $ERROR_LOG
+   echo "Compilation of smokeview_${platform}_db failed" >> $ERROR_LOG
+   cat $OUTPUT_DIR/stage2_build_smv_debug                >> $ERROR_LOG
+   echo ""                                               >> $ERROR_LOG
  fi
 
  # Check for compiler warnings/remarks
@@ -1083,9 +1084,10 @@ check_compile_smv()
     CP smokeview_${platform} $LATESTAPPS_DIR/smokeview
   else
     smv_errors=1
-    echo "Errors from Stage 2 - Compile SMV release:" >> $ERROR_LOG
-    cat $OUTPUT_DIR/stage2_build_smv_release >> $ERROR_LOG
-    echo "" >> $ERROR_LOG
+    echo "Errors from Stage 2 - Compile SMV release:"  >> $ERROR_LOG
+    echo "Compilation of smokeview_${platform} failed" >> $ERROR_LOG
+    cat $OUTPUT_DIR/stage2_build_smv_release           >> $ERROR_LOG
+    echo ""                                            >> $ERROR_LOG
   fi
 
   # Check for compiler warnings/remarks
@@ -2511,12 +2513,14 @@ fi
 
 if [[ "$CHECK_CLUSTER" == "" ]]; then
   compile_smv_db
+  check_compile_smv_db
 fi
 
 ###*** Stage 2 - release smokeview ###
 
 if [[ "$CHECK_CLUSTER" == "" ]]; then
   compile_smv
+  check_compile_smv
 fi
 
 if [[ "$CHECK_CLUSTER" == "" ]]; then
@@ -2545,9 +2549,6 @@ if [[ "$CHECK_CLUSTER" == "" ]]; then
   check_smv_utilities
   cd $firebotdir
   $COPY_FDS_APPS > $OUTPUT_DIR/stage2_copyapps
-
-  check_compile_smv_db
-  check_compile_smv
 
   cd $firebotdir
   $COPY_SMV_APPS >> $OUTPUT_DIR/stage2_copyapps
