@@ -2039,7 +2039,7 @@ if [[ $stage_ver_release_success ]] ; then
    TOLERANCE=0.2
    cd $botrepo/Smokebot
    echo Comparing images
-   ../Firebot/compare_images.sh $SMV_SUMMARY_DIR/images $SMV_SUMMARY_DIR/diffs/images $OUTPUT_DIR/error_images $TOLERANCE >& $OUTPUT_DIR/stage5_compare_images
+   ../Firebot/compare_images.sh $SMV_SUMMARY_DIR/images $SMV_SUMMARY_DIR/diffs/images $TOLERANCE >& $OUTPUT_DIR/stage5_compare_images
    rm -f $SMV_SUMMARY_DIR/images/*.png
 
    wait $pid_ug
