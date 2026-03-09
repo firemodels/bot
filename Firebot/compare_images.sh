@@ -1,27 +1,111 @@
 #!/bin/bash
-NEW_DIR=$1
-DIFF_DIR=$2
-TOLERANCE=$3
+
+#---------------------------------------------------------
+# CHECK_DIR 
+#---------------------------------------------------------
+
+CHECK_DIR ()
+{
+ local DIR=$1
+   local LABEL=$2
+
+   if [ "$DIR" == "" ]; then
+     echo "***error: directory $LABEL not specified"
+     ABORT=1
+   else
+     if [ ! -d $DIR ]; then
+       echo "***error: directory $DIR does not exist"
+       ABORT=1
+     fi
+   fi
+}
+
+TOLERANCE=0.1
 
 CURDIR=`pwd`
-
 BASEDIR=`basename $CURDIR`
 if [ "$BASEDIR" == "Firebot" ]; then
-  BOT_SUMMARY=fds/Manuals/FDS_Summary
+  INREPO=1
+  SUMMARY_DIR=../../fds/Manuals/FDS_Summary
   BOT_TYPE=firebot
   BOT_TITLE=Firebot
   PROG=fds
+  REFERENCE_DIR=../../fig/fds/Reference_Figures
 fi
 if [ "$BASEDIR" == "Smokebot" ]; then
-  BOT_SUMMARY=smv/Manuals/SMV_Summary
+  INREPO=1
+  SUMMARY_DIR=../../smv/Manuals/SMV_Summary
   BOT_TYPE=smokebot
   BOT_TITLE=Smokebot
   PROG=smv
+  REFERENCE_DIR=../../fig/smv/Reference_Figures/Default
 fi
-if [ "$BOT_SUMMARY" == "" ]; then
-  echo "***error: compare_images.sh must be run in the Firebot or Smokebot directory"
+
+while getopts 'hN:R:S:T:' OPTION
+do
+case $OPTION in
+  h)
+  ;;
+  N)
+   if [ "$INREPO" == "" ]; then
+     NEW_DIR="$OPTARG"
+   fi
+   ;;
+  R)
+   if [ "$INREPO" == "" ]; then
+     REFERENCE_DIR="$OPTARG"
+   fi
+   ;;
+  S)
+   if [ "$INREPO" == "" ]; then
+     SUMMARY_DIR="$OPTARG"
+   fi
+   ;;
+  T)
+   TOLERANCE="$OPTARG"
+   ;;
+esac
+done
+shift $(($OPTIND-1))
+
+if [ "$INREPO" != "" ]; then
+  NEW_DIR=$SUMMARY_DIR/images/
+fi
+ABORT=
+CHECK_DIR $REFERENCE_DIR REFERENCE_DIR
+CHECK_DIR $SUMMARY_DIR   SUMMARY_DIR
+CHECK_DIR $NEW_DIR       NEW_DIR
+if [ "$ABORT" != "" ]; then
   exit
 fi
+
+cd $CURDIR
+cd $REFERENCE_DIR
+REFERENCE_DIR=`pwd`
+
+cd $CURDIR
+cd $SUMMARY_DIR
+SUMMARY_DIR=`pwd`
+
+cd $CURDIR
+cd $NEW_DIR
+NEW_DIR=`pwd`
+
+DIFF_DIR=$SUMMARY_DIR/diffs/images/
+mkdir -p $DIFF_DIR
+if [ "$INREPO" == "" ]; then
+  rm -f $DIFF_DIR/*.png >& /dev/null
+else
+  cd $DIFF_DIR
+  git clean -dxf >& /dev/null
+fi
+
+IMAGE_DIFFS=$SUMMARY_DIR/image_differences
+
+echo " Reference directory: $REFERENCE_DIR"
+echo "Comparison directory: $NEW_DIR"
+echo "   Summary directory: $SUMMARY_DIR"
+echo "           Tolerance: $TOLERANCE"
 
 # to flag image differences as fyi's, use the following line
 #FYI=fyi
@@ -58,58 +142,23 @@ fi
 
 #*** setup directories
 
-CURDIR=`pwd`
-if [ "$BOT_TYPE" == "firebot" ]; then
-  REFERENCE_DIR=../../fig/fds/Reference_Figures
-else
-  if [ "$SMOKEBOT_COMPARE" == "other" ]; then
-    REFERENCE_DIR=../../fig/smv/Reference_Figures/Other
-  else
-    REFERENCE_DIR=../../fig/smv/Reference_Figures/Default
-  fi
-fi
-cd $REFERENCE_DIR
-REFERENCE_DIR=`pwd`
-
-cd $CURDIR
-REPO=../..
-cd $REPO
-REPO=`pwd`
-
-cd $CURDIR
-FDS_REPO=../../fds
-cd $FDS_REPO
-FDS_REPO=`pwd`
-
-cd $CURDIR
-SMV_REPO=../../smv
-cd $SMV_REPO
-SMV_REPO=`pwd`
-PNGINFO=$SMV_REPO/Build/pnginfo/intel_linux/pnginfo_linux
-
-cd $CURDIR
-if [ "$NEW_DIR" == "" ]; then
-  NEW_DIR=../../$BOT_SUMMARY/images/
-  cd $NEW_DIR
-  NEW_DIR=`pwd`
+if [ "$INREPO" != "" ]; then
   cd $CURDIR
-fi
+  REPO=../..
+  cd $REPO
+  REPO=`pwd`
 
-if [ "$DIFF_DIR" == "" ]; then
-  DIFF_DIR=../../$BOT_SUMMARY/diffs/images/
-  cd $DIFF_DIR
-  DIFF_DIR=`pwd`
-fi
-if [ -d $DIFF_DIR ]; then
-  cd $DIFF_DIR
-  git clean -dxf >& /dev/null
-fi
+  cd $CURDIR
+  FDS_REPO=../../fds
+  cd $FDS_REPO
+  FDS_REPO=`pwd`
 
-cd $CURDIR
-SUMMARY_DIR=../../$BOT_SUMMARY/
-cd $SUMMARY_DIR
-SUMMARY_DIR=`pwd`
-IMAGE_DIFFS=$SUMMARY_DIR/image_differences
+  cd $CURDIR
+  SMV_REPO=../../smv
+  cd $SMV_REPO
+  SMV_REPO=`pwd`
+  PNGINFO=$SMV_REPO/Build/pnginfo/intel_linux/pnginfo_linux
+fi
 
 cd $CURDIR
 
@@ -117,61 +166,41 @@ HTML_DIFF=$SUMMARY_DIR/index.html
 
 #*** setup revision strings
 
-cd $CURDIR/../../fds
-FDS_REVISION=`git describe --abbrev=7 --long --dirty`
-FDS_BRANCH=`git branch --show-current`
+if [ "$INREPO" != "" ]; then
+  cd $CURDIR/../../fds
+  FDS_REVISION=`git describe --abbrev=7 --long --dirty`
+  FDS_BRANCH=`git branch --show-current`
 
-cd $CURDIR/../../fig
-FIGREPO=`pwd`
-FIG_REVISION=`git describe --abbrev=7 --long --dirty`
-FIG_BRANCH=`git branch --show-current`
+  cd $CURDIR/../../fig
+  FIGREPO=`pwd`
+  FIG_REVISION=`git describe --abbrev=7 --long --dirty`
+  FIG_BRANCH=`git branch --show-current`
 
-FIG_USER_FDS_REVISION_FILE=$FIGREPO/$PROG/FDS_REVISION
-FIG_VER_FDS_REVISION_FILE=$FIGREPO/$PROG/FDS_REVISION
-FIG_USER_SMV_REVISION_FILE=$FIGREPO/$PROG/SMV_REVISION
-FIG_VER_SMV_REVISION_FILE=$FIGREPO/$PROG/SMV_REVISION
+  FIG_USER_FDS_REVISION_FILE=$FIGREPO/$PROG/FDS_REVISION
+  FIG_VER_FDS_REVISION_FILE=$FIGREPO/$PROG/FDS_REVISION
+  FIG_USER_SMV_REVISION_FILE=$FIGREPO/$PROG/SMV_REVISION
+  FIG_VER_SMV_REVISION_FILE=$FIGREPO/$PROG/SMV_REVISION
 
-FIG_USER_FDS_REVISION=`git describe --abbrev=7 --dirty --long`
-FIG_USER_SMV_REVISION=
-if [[ -e $FIG_USER_FDS_REVISION_FILE ]] && [[ -e $FIG_USER_SMV_REVISION_FILE ]]; then
-  FIG_USER_FDS_REVISION=`head -1 $FIG_USER_FDS_REVISION_FILE`
-  FIG_USER_SMV_REVISION=`head -1 $FIG_USER_SMV_REVISION_FILE`
+  FIG_USER_FDS_REVISION=`git describe --abbrev=7 --dirty --long`
+  FIG_USER_SMV_REVISION=
+  if [[ -e $FIG_USER_FDS_REVISION_FILE ]] && [[ -e $FIG_USER_SMV_REVISION_FILE ]]; then
+    FIG_USER_FDS_REVISION=`head -1 $FIG_USER_FDS_REVISION_FILE`
+    FIG_USER_SMV_REVISION=`head -1 $FIG_USER_SMV_REVISION_FILE`
+  fi
+
+  FIG_VER_FDS_REVISION=`git describe --abbrev=7 --dirty --long`
+  FIG_VER_SMV_REVISION=
+  if [[ -e $FIG_VER_FDS_REVISION_FILE ]] && [[ -e $FIG_VER_SMV_REVISION_FILE ]]; then
+    FIG_VER_FDS_REVISION=`head -1 $FIG_VER_FDS_REVISION_FILE`
+    FIG_VER_SMV_REVISION=`head -1 $FIG_VER_SMV_REVISION_FILE`
+  fi
+
+  cd $CURDIR/../../smv
+  SMV_REVISION=`git describe --abbrev=7 --long --dirty`
+  SMV_BRANCH=`git branch --show-current`
 fi
-
-FIG_VER_FDS_REVISION=`git describe --abbrev=7 --dirty --long`
-FIG_VER_SMV_REVISION=
-if [[ -e $FIG_VER_FDS_REVISION_FILE ]] && [[ -e $FIG_VER_SMV_REVISION_FILE ]]; then
-  FIG_VER_FDS_REVISION=`head -1 $FIG_VER_FDS_REVISION_FILE`
-  FIG_VER_SMV_REVISION=`head -1 $FIG_VER_SMV_REVISION_FILE`
-fi
-
-cd $CURDIR/../../smv
-SMV_REVISION=`git describe --abbrev=7 --long --dirty`
-SMV_BRANCH=`git branch --show-current`
 
 cd $CURDIR
-
-#---------------------------------------------------------
-# make sure directory exists
-#---------------------------------------------------------
-
-CHECK_DIR ()
-{
- local DIR=$1
- local CHECKSUB=$2
-
-  if [ ! -d $DIR ]; then
-    echo "***error: directory $DIR does not exist"
-    ABORT=1
-  else
-    if [ "$CHECKSUB" != "" ]; then
-      if [ ! -d $DIR ]; then
-        echo "***error: directory $DIR does not exist"
-        ABORT=1
-      fi
-    fi
-  fi
-}
 
 #---------------------------------------------------------
 # find differnences
@@ -500,12 +529,6 @@ ABORT=
 notfound=`compare --version 2>&1 | tail -1 | grep "not found" | wc -l`
 if [ $notfound -ne 0 ]; then
   echo "Image comparison program, compare, not in path"
-  ABORT=1
-fi
-
-CHECK_DIR $REFERENCE_DIR 1
-CHECK_DIR $NEW_DIR 1
-if [ "$ABORT" != "" ]; then
   exit
 fi
 
@@ -532,10 +555,14 @@ cat << EOF  > $HTML_DIFF
 <h2>$BOT_TITLE Summary - $DATE</h2>
 
 <table>
+EOF
+cat << EOF  >> $HTML_DIFF
 <tr><th align=left>FDS revision:</th>     <td> $FDS_REVISION/$FDS_BRANCH  </td></tr>
 <tr><th align=left>SMV revision:</th>     <td> $SMV_REVISION/$SMV_BRANCH  </td></tr>
 <tr><th align=left>Fig revision:</th>     <td> $FIG_REVISION/$FIG_BRANCH  </td></tr>
 <tr><th align=left>Root:</th>             <td> $REPO                      </td></tr>
+EOF
+cat << EOF  >>$HTML_DIFF
 <tr><th align=left>Metric/Tolerance:</th> <td> ${METRIC_LABEL}/$TOLERANCE </td></tr>
 <tr><th align=left>Differences/Errors:</th>     <td> $HAVE_DIFFS/$HAVE_ERRORS   </td></tr>
 EOF
