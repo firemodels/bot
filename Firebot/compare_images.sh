@@ -16,6 +16,7 @@ echo ""
 echo "Options:"
 echo "-1 dir - directory containing images to be compared. $REFDEF"
 echo "-2 dir - directory containing images to be compared. $NEWDEF"
+echo "-r - compare raw image files (do not blur) and report all differences"
 echo "-h - display options"
 echo "-s dir - directory containing web summary (default: $SUMMARY_DIR)"
 echo "-t tolerance - error tolerance (default: $TOLERANCE)"
@@ -45,6 +46,8 @@ CHECK_DIR ()
 TOLERANCE=0.1
 
 CURDIR=`pwd`
+RAWFILES=
+BLURRING=on
 BASEDIR=`basename $CURDIR`
 SUMMARY_DIR=Summary
 if [ "$BASEDIR" == "Firebot" ]; then
@@ -66,7 +69,7 @@ if [ "$BASEDIR" == "Smokebot" ]; then
   NEW_DIR=$SUMMARY_DIR/images/
 fi
 
-while getopts '1:2:hs:tls :' OPTION
+while getopts '1:2:hrs:tls :' OPTION
 do
 case $OPTION in
   h)
@@ -82,6 +85,10 @@ case $OPTION in
    if [ "$INREPO" == "" ]; then
      NEW_DIR="$OPTARG"
    fi
+   ;;
+  r)
+   RAWFILES=1
+   BLURRING=off
    ;;
   s)
    if [ "$INREPO" == "" ]; then
@@ -146,6 +153,7 @@ IMAGE_DIFFS=$SUMMARY_DIR/image_differences
 echo " Reference directory: $REFERENCE_DIR"
 echo "Comparison directory: $NEW_DIR"
 echo "   Summary directory: $SUMMARY_DIR"
+echo "            Blurring: $BLURRING"
 echo "           Tolerance: $TOLERANCE"
 
 # to flag image differences as fyi's, use the following line
@@ -286,8 +294,13 @@ for f in $NEW_DIR/$SUBDIR/*.png; do
   diff_file_metric=$DIFF_DIR/$SUBDIR/$base.metric
   rm -f $diff_file $diff_file_changed $diff_file_metric
   if [[ -e $from_file ]] && [[ -e $to_file ]]; then
-    convert $from_file $BLUR $REDUCE $blur_from_file
-    convert $to_file   $BLUR $REDUCE $blur_to_file
+    if [ "$RAWFILES" != "" ]; then
+      cp $from_file $blur_from_file
+      cp $to_file $blur_to_file
+    else
+      convert $from_file $BLUR $REDUCE $blur_from_file
+      convert $to_file   $BLUR $REDUCE $blur_to_file
+    fi
     from_info_file=$NEW_DIR/$SUBDIR/${base}_from.info
     to_info_file=$NEW_DIR/$SUBDIR/${base}_to.info
     if [[ "$INREPO" != "" ]] && [[ -x $PNGINFO ]]; then
@@ -309,8 +322,10 @@ for f in $NEW_DIR/$SUBDIR/*.png; do
     if [[ $diff == *"e"* ]]; then
       diff=$(printf "%.6f" $diff)
     fi
-    if (( $(echo "$diff < 0.01" | bc -l) )); then
-      diff=0
+    if [ "$RAWFILES" == "" ]; then
+      if (( $(echo "$diff < 0.01" | bc -l) )); then
+        diff=0
+      fi
     fi
     if [ "$diff" == "" ]; then
       diff=0
@@ -648,8 +663,10 @@ cat << EOF  >> $HTML_DIFF
 EOF
 fi
 cat << EOF  >>$HTML_DIFF
-<tr><th align=left>Metric/Tolerance:</th> <td> ${METRIC_LABEL}/$TOLERANCE </td></tr>
-<tr><th align=left>Differences/Errors:</th>     <td> $HAVE_DIFFS/$HAVE_ERRORS   </td></tr>
+<tr><th align=left>Base:</th>                <td> $REFERENCE_DIR             </td></tr>
+<tr><th align=left>Current:</th>             <td> $NEW_DIR                   </td></tr>
+<tr><th align=left>Metric/Tolerance:</th>    <td> ${METRIC_LABEL}/$TOLERANCE </td></tr>
+<tr><th align=left>Differences/Errors:</th>  <td> $HAVE_DIFFS/$HAVE_ERRORS   </td></tr>
 EOF
 if [ "$ADD_FDS_MANUALS" != "" ]; then
 cat << EOF  >> $HTML_DIFF
