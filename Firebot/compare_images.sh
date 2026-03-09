@@ -1,32 +1,152 @@
 #!/bin/bash
-NEW_DIR=$1
-DIFF_DIR=$2
-ERROR_DIR=$3
-TOLERANCE=$4
+
+#---------------------------------------------
+#                   usage
+#---------------------------------------------
+
+function usage {
+if [ "$REFERENCE_DIR" != "" ]; then
+  REFDEF="(default: $REFERENCE_DIR)"
+fi
+if [ "$NEW_DIR" != "" ]; then
+  NEWDEF="(default: $NEW_DIR)"
+fi
+echo "Compare images in two directories and summarize results in a web page"
+echo ""
+echo "Options:"
+echo "-1 dir - directory containing images to be compared. $REFDEF"
+echo "-2 dir - directory containing images to be compared. $NEWDEF"
+echo "-h - display options"
+echo "-s dir - directory containing web summary (default: $SUMMARY_DIR)"
+echo "-t tolerance - error tolerance (default: $TOLERANCE)"
+exit 0
+}
+
+#---------------------------------------------------------
+# CHECK_DIR 
+#---------------------------------------------------------
+
+CHECK_DIR ()
+{
+ local DIR=$1
+   local LABEL=$2
+
+   if [ "$DIR" == "" ]; then
+     echo "***error: directory $LABEL not specified"
+     ABORT=1
+   else
+     if [ ! -d $DIR ]; then
+       echo "***error: directory $DIR does not exist"
+       ABORT=1
+     fi
+   fi
+}
+
+TOLERANCE=0.1
 
 CURDIR=`pwd`
-
-if [ ! -e $ERROR_DIR ]; then
-  mkdir $ERROR_DIR
-fi
-
 BASEDIR=`basename $CURDIR`
+SUMMARY_DIR=Summary
 if [ "$BASEDIR" == "Firebot" ]; then
-  BOT_SUMMARY=fds/Manuals/FDS_Summary
+  INREPO=1
+  SUMMARY_DIR=../../fds/Manuals/FDS_Summary
   BOT_TYPE=firebot
   BOT_TITLE=Firebot
   PROG=fds
+  REFERENCE_DIR=../../fig/fds/Reference_Figures
+  NEW_DIR=$SUMMARY_DIR/images
 fi
 if [ "$BASEDIR" == "Smokebot" ]; then
-  BOT_SUMMARY=smv/Manuals/SMV_Summary
+  INREPO=1
+  SUMMARY_DIR=../../smv/Manuals/SMV_Summary
   BOT_TYPE=smokebot
   BOT_TITLE=Smokebot
   PROG=smv
+  REFERENCE_DIR=../../fig/smv/Reference_Figures/Default
+  NEW_DIR=$SUMMARY_DIR/images/
 fi
-if [ "$BOT_SUMMARY" == "" ]; then
-  echo "***error: compare_images.sh must be run in the Firebot or Smokebot directory"
+
+while getopts '1:2:hs:tls :' OPTION
+do
+case $OPTION in
+  h)
+   usage
+   exit
+  ;;
+  1)
+   if [ "$INREPO" == "" ]; then
+     REFERENCE_DIR="$OPTARG"
+   fi
+   ;;
+  2)
+   if [ "$INREPO" == "" ]; then
+     NEW_DIR="$OPTARG"
+   fi
+   ;;
+  s)
+   if [ "$INREPO" == "" ]; then
+     SUMMARY_DIR="$OPTARG"
+   fi
+   ;;
+  t)
+   TOLERANCE="$OPTARG"
+   ;;
+esac
+done
+shift $(($OPTIND-1))
+
+if [ "$INREPO" != "" ]; then
+  NEW_DIR=$SUMMARY_DIR/images
+fi
+ABORT=
+CHECK_DIR $REFERENCE_DIR REFERENCE_DIR
+CHECK_DIR $SUMMARY_DIR   SUMMARY_DIR
+CHECK_DIR $NEW_DIR       NEW_DIR
+if [ "$ABORT" != "" ]; then
   exit
 fi
+
+cd $CURDIR
+cd $REFERENCE_DIR
+REFERENCE_DIR=`pwd`
+
+cd $CURDIR
+cd $SUMMARY_DIR
+SUMMARY_DIR=`pwd`
+
+cd $CURDIR
+cd $NEW_DIR
+NEW_DIR=`pwd`
+
+DIFF_DIR=$SUMMARY_DIR/diffs/images
+mkdir -p $DIFF_DIR
+if [ "$INREPO" == "" ]; then
+  rm -f $DIFF_DIR/*.png >& /dev/null
+else
+  cd $DIFF_DIR
+  git clean -dxf >& /dev/null
+fi
+
+BASE_DIR=$SUMMARY_DIR/diffs/base
+mkdir -p $BASE_DIR
+if [ "$INREPO" == "" ]; then
+  rm -f $BASE_DIR/*.png >& /dev/null
+else
+  cd $BASE_DIR
+  git clean -dxf >& /dev/null
+fi
+
+if [ "$INREPO" == "" ]; then
+  mkdir -p $SUMMARY_DIR/images
+  cp $NEW_DIR/*.png $SUMMARY_DIR/images/. 
+fi
+
+IMAGE_DIFFS=$SUMMARY_DIR/image_differences
+
+echo " Reference directory: $REFERENCE_DIR"
+echo "Comparison directory: $NEW_DIR"
+echo "   Summary directory: $SUMMARY_DIR"
+echo "           Tolerance: $TOLERANCE"
 
 # to flag image differences as fyi's, use the following line
 #FYI=fyi
@@ -63,66 +183,23 @@ fi
 
 #*** setup directories
 
-CURDIR=`pwd`
-if [ "$BOT_TYPE" == "firebot" ]; then
-  REFERENCE_DIR=../../fig/fds/Reference_Figures
-else
-  if [ "$SMOKEBOT_COMPARE" == "other" ]; then
-    REFERENCE_DIR=../../fig/smv/Reference_Figures/Other
-  else
-    REFERENCE_DIR=../../fig/smv/Reference_Figures/Default
-  fi
-fi
-cd $REFERENCE_DIR
-REFERENCE_DIR=`pwd`
-
-cd $CURDIR
-REPO=../..
-cd $REPO
-REPO=`pwd`
-
-cd $CURDIR
-FDS_REPO=../../fds
-cd $FDS_REPO
-FDS_REPO=`pwd`
-
-cd $CURDIR
-SMV_REPO=../../smv
-cd $SMV_REPO
-SMV_REPO=`pwd`
-PNGINFO=$SMV_REPO/Build/pnginfo/intel_linux/pnginfo_linux
-
-cd $CURDIR
-if [ "$NEW_DIR" == "" ]; then
-  NEW_DIR=../../$BOT_SUMMARY/images/
-  cd $NEW_DIR
-  NEW_DIR=`pwd`
+if [ "$INREPO" != "" ]; then
   cd $CURDIR
-fi
+  REPO=../..
+  cd $REPO
+  REPO=`pwd`
 
-if [ "$ERROR_DIR" == "" ]; then
-  ERROR_DIR=../../$BOT_SUMMARY/diffs/errors/
-  if [ ! -d $ERROR_DIR ]; then
-    mkdir $ERROR_DIR
-  fi
-  cd $ERROR_DIR
-  ERROR_DIR=`pwd`
-fi
-if [ "$DIFF_DIR" == "" ]; then
-  DIFF_DIR=../../$BOT_SUMMARY/diffs/images/
-  cd $DIFF_DIR
-  DIFF_DIR=`pwd`
-fi
-if [ -d $DIFF_DIR ]; then
-  cd $DIFF_DIR
-  git clean -dxf >& /dev/null
-fi
+  cd $CURDIR
+  FDS_REPO=../../fds
+  cd $FDS_REPO
+  FDS_REPO=`pwd`
 
-cd $CURDIR
-SUMMARY_DIR=../../$BOT_SUMMARY/
-cd $SUMMARY_DIR
-SUMMARY_DIR=`pwd`
-IMAGE_DIFFS=$SUMMARY_DIR/image_differences
+  cd $CURDIR
+  SMV_REPO=../../smv
+  cd $SMV_REPO
+  SMV_REPO=`pwd`
+  PNGINFO=$SMV_REPO/Build/pnginfo/intel_linux/pnginfo_linux
+fi
 
 cd $CURDIR
 
@@ -130,61 +207,41 @@ HTML_DIFF=$SUMMARY_DIR/index.html
 
 #*** setup revision strings
 
-cd $CURDIR/../../fds
-FDS_REVISION=`git describe --abbrev=7 --long --dirty`
-FDS_BRANCH=`git branch --show-current`
+if [ "$INREPO" != "" ]; then
+  cd $CURDIR/../../fds
+  FDS_REVISION=`git describe --abbrev=7 --long --dirty`
+  FDS_BRANCH=`git branch --show-current`
 
-cd $CURDIR/../../fig
-FIGREPO=`pwd`
-FIG_REVISION=`git describe --abbrev=7 --long --dirty`
-FIG_BRANCH=`git branch --show-current`
+  cd $CURDIR/../../fig
+  FIGREPO=`pwd`
+  FIG_REVISION=`git describe --abbrev=7 --long --dirty`
+  FIG_BRANCH=`git branch --show-current`
 
-FIG_USER_FDS_REVISION_FILE=$FIGREPO/$PROG/FDS_REVISION
-FIG_VER_FDS_REVISION_FILE=$FIGREPO/$PROG/FDS_REVISION
-FIG_USER_SMV_REVISION_FILE=$FIGREPO/$PROG/SMV_REVISION
-FIG_VER_SMV_REVISION_FILE=$FIGREPO/$PROG/SMV_REVISION
+  FIG_USER_FDS_REVISION_FILE=$FIGREPO/$PROG/FDS_REVISION
+  FIG_VER_FDS_REVISION_FILE=$FIGREPO/$PROG/FDS_REVISION
+  FIG_USER_SMV_REVISION_FILE=$FIGREPO/$PROG/SMV_REVISION
+  FIG_VER_SMV_REVISION_FILE=$FIGREPO/$PROG/SMV_REVISION
 
-FIG_USER_FDS_REVISION=`git describe --abbrev=7 --dirty --long`
-FIG_USER_SMV_REVISION=
-if [[ -e $FIG_USER_FDS_REVISION_FILE ]] && [[ -e $FIG_USER_SMV_REVISION_FILE ]]; then
-  FIG_USER_FDS_REVISION=`head -1 $FIG_USER_FDS_REVISION_FILE`
-  FIG_USER_SMV_REVISION=`head -1 $FIG_USER_SMV_REVISION_FILE`
+  FIG_USER_FDS_REVISION=`git describe --abbrev=7 --dirty --long`
+  FIG_USER_SMV_REVISION=
+  if [[ -e $FIG_USER_FDS_REVISION_FILE ]] && [[ -e $FIG_USER_SMV_REVISION_FILE ]]; then
+    FIG_USER_FDS_REVISION=`head -1 $FIG_USER_FDS_REVISION_FILE`
+    FIG_USER_SMV_REVISION=`head -1 $FIG_USER_SMV_REVISION_FILE`
+  fi
+
+  FIG_VER_FDS_REVISION=`git describe --abbrev=7 --dirty --long`
+  FIG_VER_SMV_REVISION=
+  if [[ -e $FIG_VER_FDS_REVISION_FILE ]] && [[ -e $FIG_VER_SMV_REVISION_FILE ]]; then
+    FIG_VER_FDS_REVISION=`head -1 $FIG_VER_FDS_REVISION_FILE`
+    FIG_VER_SMV_REVISION=`head -1 $FIG_VER_SMV_REVISION_FILE`
+  fi
+
+  cd $CURDIR/../../smv
+  SMV_REVISION=`git describe --abbrev=7 --long --dirty`
+  SMV_BRANCH=`git branch --show-current`
 fi
-
-FIG_VER_FDS_REVISION=`git describe --abbrev=7 --dirty --long`
-FIG_VER_SMV_REVISION=
-if [[ -e $FIG_VER_FDS_REVISION_FILE ]] && [[ -e $FIG_VER_SMV_REVISION_FILE ]]; then
-  FIG_VER_FDS_REVISION=`head -1 $FIG_VER_FDS_REVISION_FILE`
-  FIG_VER_SMV_REVISION=`head -1 $FIG_VER_SMV_REVISION_FILE`
-fi
-
-cd $CURDIR/../../smv
-SMV_REVISION=`git describe --abbrev=7 --long --dirty`
-SMV_BRANCH=`git branch --show-current`
 
 cd $CURDIR
-
-#---------------------------------------------------------
-# make sure directory exists
-#---------------------------------------------------------
-
-CHECK_DIR ()
-{
- local DIR=$1
- local CHECKSUB=$2
-
-  if [ ! -d $DIR ]; then
-    echo "***error: directory $DIR does not exist"
-    ABORT=1
-  else
-    if [ "$CHECKSUB" != "" ]; then
-      if [ ! -d $DIR ]; then
-        echo "***error: directory $DIR does not exist"
-        ABORT=1
-      fi
-    fi
-  fi
-}
 
 #---------------------------------------------------------
 # find differnences
@@ -196,12 +253,13 @@ SUBDIR=$1
 echo ""
 echo Comparing images in directories:
 echo "  $REFERENCE_DIR "
-echo "  $NEW_DIR/$SUBDIR"
+if [ "$SUBDIR" == "" ]; then
+  echo "  $NEW_DIR"
+else
+  echo "  $NEW_DIR/$SUBDIR"
+fi
 echo ""
 
-ERROR_SUBDIR=$ERROR_DIR/$SUBDIR
-rm -r -f $ERROR_SUBDIR
-mkdir $ERROR_SUBDIR
 DIFFS=0
 IMAGE_ERRORS=0
 rm -f $NEW_DIR/$SUBDIR/blur*.png
@@ -230,14 +288,14 @@ for f in $NEW_DIR/$SUBDIR/*.png; do
   if [[ -e $from_file ]] && [[ -e $to_file ]]; then
     convert $from_file $BLUR $REDUCE $blur_from_file
     convert $to_file   $BLUR $REDUCE $blur_to_file
-    if [ -e $PNGINFO ]; then
+    from_info_file=$NEW_DIR/$SUBDIR/${base}_from.info
+    to_info_file=$NEW_DIR/$SUBDIR/${base}_to.info
+    if [[ "$INREPO" != "" ]] && [[ -x $PNGINFO ]]; then
       HTMLOPT=
       HAVE_HTMLOPT=`$PNGINFO -h | grep html | wc -l`
       if [ "$HAVE_HTMLOPT" -ne 0 ]; then
         HTMLOPT=-html
       fi
-      from_info_file=$NEW_DIR/$SUBDIR/${base}_from.info
-      to_info_file=$NEW_DIR/$SUBDIR/${base}_to.info
       $PNGINFO $HTMLOPT ${from_file}      > $from_info_file
       $PNGINFO $HTMLOPT ${to_file}        > $to_info_file
     fi
@@ -266,7 +324,6 @@ for f in $NEW_DIR/$SUBDIR/*.png; do
         echo "***$FYI: The image $base has changed. $METRIC error=$diff > $TOLERANCE"
         touch $diff_file_changed
         IMAGE_ERRORS=$((IMAGE_ERRORS + 1))
-        cp $f $ERROR_SUBDIR/.
       fi
     fi
     if [[ "$diff" != "0" ]]; then
@@ -278,7 +335,7 @@ for f in $NEW_DIR/$SUBDIR/*.png; do
     echo "            Copy $to_file to the fig repo"
   fi
 done
-if [ "$SUBDIR" == "user" ]; then
+if [[ "$SUBDIR" == "user" ]] || [[ "$SUBDIR" == "" ]]; then
   HAVE_USER_DIFFS=$DIFFS
   HAVE_USER_ERRORS=$IMAGE_ERRORS
 else
@@ -308,6 +365,29 @@ mogrify -resize 200x200 diffs/images/verification/*.png
 #---------------------------------------------------------
 
 OUTPUT_LINKS ()
+{
+local OPTION=$1
+LINK1="<a href="#diffs">[Changed Images]</a>"
+LINK2="<a href="#all">[Unchanged Images]</a>"
+if [[ "$OPTION" == "all" ]]; then
+  LINK2="[Unchanged Images]"
+fi
+if [[ "$OPTION" != "all" ]]; then
+  LINK1="[Changed Images]"
+fi
+if [ "$HAVE_DIFFS" == "0" ]; then
+  LINK1=
+fi
+cat << EOF >> $HTML_DIFF
+$LINK1$LINK2
+EOF
+}
+
+#---------------------------------------------------------
+#*** OUTPUT_GUIDELINKS
+#---------------------------------------------------------
+
+OUTPUT_GUIDELINKS ()
 {
 local SUBDIR=$1
 local OPTION=$2
@@ -353,6 +433,11 @@ GUIDE=$2
 REV1=$3
 REV2=$4
 
+GUIDELABEL=
+if [ "$GUIDE" != "" ]; then
+  GUIDELABEL="$GUIDE Guide"
+fi
+  
 SUFFIX=Images
 
 DIFF_TITLE=
@@ -387,9 +472,13 @@ FILELIST=`sort -k2,2nr  -k1,1 $file_list | awk '{print $1}'`
     if [ "$START_DIFF" == "1" ]; then
   cat << EOF >> $HTML_DIFF
 <a name="${SUBDIR}diffs">
-<h2>Changed $GUIDE Guide Images</h2>
+<h2>Changed $GUIDELABEL Images</h2>
 EOF
-OUTPUT_LINKS $SUBDIR diffs
+if [ "$INREPO" == "" ]; then
+  OUTPUT_LINKS diffs
+else
+  OUTPUT_GUIDELINKS $SUBDIR diffs
+fi
 cat << EOF >> $HTML_DIFF
 <p><table border=on>
 <tr>
@@ -408,9 +497,13 @@ EOF
       fi
   cat << EOF >> $HTML_DIFF
 <a name="${SUBDIR}all">
-<h2>Unchanged $GUIDE Guide Images</h2>
+<h2>Unchanged $GUIDELABEL Images</h2>
 EOF
-OUTPUT_LINKS $SUBDIR all
+if [ "$INREPO" == "" ]; then
+  OUTPUT_LINKS all
+else
+  OUTPUT_GUIDELINKS $SUBDIR all
+fi
   cat << EOF >> $HTML_DIFF
 <p><table border=on>
 EOF
@@ -517,25 +610,21 @@ ABORT=
 notfound=`compare --version 2>&1 | tail -1 | grep "not found" | wc -l`
 if [ $notfound -ne 0 ]; then
   echo "Image comparison program, compare, not in path"
-  ABORT=1
-fi
-
-CHECK_DIR $REFERENCE_DIR 1
-CHECK_DIR $NEW_DIR 1
-if [ "$ABORT" != "" ]; then
   exit
 fi
 
 #*** generate user guide differences
 
-FIND_DIFFS user
-
-#*** generate verificaiton guide differences
-
-FIND_DIFFS verification
-
-HAVE_DIFFS=$((HAVE_USER_DIFFS+HAVE_VER_DIFFS))
-HAVE_ERRORS=$((HAVE_USER_ERRORS+HAVE_VER_ERRORS))
+if [ "$INREPO" == "" ]; then
+  FIND_DIFFS
+  HAVE_DIFFS=$HAVE_USER_DIFFS
+  HAVE_ERRORS=$HAVE_USER_ERRORS
+else
+  FIND_DIFFS user
+  FIND_DIFFS verification
+  HAVE_DIFFS=$((HAVE_USER_DIFFS+HAVE_VER_DIFFS))
+  HAVE_ERRORS=$((HAVE_USER_ERRORS+HAVE_VER_ERRORS))
+fi
 
 #*** output html header
 
@@ -549,10 +638,16 @@ cat << EOF  > $HTML_DIFF
 <h2>$BOT_TITLE Summary - $DATE</h2>
 
 <table>
+EOF
+if [ "$INREPO" != "" ]; then
+cat << EOF  >> $HTML_DIFF
 <tr><th align=left>FDS revision:</th>     <td> $FDS_REVISION/$FDS_BRANCH  </td></tr>
 <tr><th align=left>SMV revision:</th>     <td> $SMV_REVISION/$SMV_BRANCH  </td></tr>
 <tr><th align=left>Fig revision:</th>     <td> $FIG_REVISION/$FIG_BRANCH  </td></tr>
 <tr><th align=left>Root:</th>             <td> $REPO                      </td></tr>
+EOF
+fi
+cat << EOF  >>$HTML_DIFF
 <tr><th align=left>Metric/Tolerance:</th> <td> ${METRIC_LABEL}/$TOLERANCE </td></tr>
 <tr><th align=left>Differences/Errors:</th>     <td> $HAVE_DIFFS/$HAVE_ERRORS   </td></tr>
 EOF
@@ -572,13 +667,19 @@ EOF
 
 #*** output all images
 
-OUTPUT_HTML user         User         $FIG_USER_FDS_REVISION $FIG_USER_SMV_REVISION
-OUTPUT_HTML verification Verification $FIG_VER_FDS_REVISION  $FIG_VER_SMV_REVISION
-cat << EOF >> $HTML_DIFF
+if [ "$INREPO" == "" ]; then
+  OUTPUT_HTML
+else
+  OUTPUT_HTML user         User         $FIG_USER_FDS_REVISION $FIG_USER_SMV_REVISION
+  OUTPUT_HTML verification Verification $FIG_VER_FDS_REVISION  $FIG_VER_SMV_REVISION
+  cat << EOF >> $HTML_DIFF
 <h2 id="manuals">Guides</h2>
 EOF
-OUTPUT_LINKS manuals
+  OUTPUT_GUIDELINKS manuals
+fi
+
 if [ "$BASEDIR" == "Smokebot" ]; then
+
 cat << EOF  >> $HTML_DIFF
 <ul>
 <li><a href="manuals/SMV_User_Guide.pdf">Smokeview User Guide</a>
@@ -586,7 +687,9 @@ cat << EOF  >> $HTML_DIFF
 <li><a href="manuals/SMV_Technical_Reference_Guide.pdf">Smokeview Technical Reference Guide</a>
 </ul>
 EOF
+
 fi
+
 if [ "$BASEDIR" == "Firebot" ]; then
 cat << EOF  >> $HTML_DIFF
 <ul>
