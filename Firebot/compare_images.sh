@@ -253,7 +253,11 @@ SUBDIR=$1
 echo ""
 echo Comparing images in directories:
 echo "  $REFERENCE_DIR "
-echo "  $NEW_DIR/$SUBDIR"
+if [ "$SUBDIR" == "" ]; then
+  echo "  $NEW_DIR"
+else
+  echo "  $NEW_DIR/$SUBDIR"
+fi
 echo ""
 
 DIFFS=0
@@ -430,8 +434,8 @@ REV1=$3
 REV2=$4
 
 GUIDELABEL=
-if [ "$GUIDE" == "" ]; then
-  GUIDELABEL=$GUIDE Guide
+if [ "$GUIDE" != "" ]; then
+  GUIDELABEL="$GUIDE Guide"
 fi
   
 SUFFIX=Images
