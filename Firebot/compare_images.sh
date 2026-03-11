@@ -69,7 +69,7 @@ if [ "$BASEDIR" == "Smokebot" ]; then
   NEW_DIR=$SUMMARY_DIR/images/
 fi
 
-while getopts '1:2:hrs:tls :' OPTION
+while getopts '1:2:hrs:t:ls :' OPTION
 do
 case $OPTION in
   h)
