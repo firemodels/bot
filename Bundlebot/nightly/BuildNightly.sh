@@ -116,7 +116,7 @@ if [ `IS_PROGRAM_INSTALLED mpirun` -eq 0 ]; then
   exit
 fi
 
-IS_INTEL=`mpifort --version | head -1 | grep IFORT| wc -l`
+IS_INTEL=`mpirun --version | head -1 | grep Intel| wc -l`
 if [[ "${PLATFORM}" == "osx" ]]; then
   if [[ $IS_INTEL -eq 0 ]]; then
     export MPI_TYPE="OPENMPI"
