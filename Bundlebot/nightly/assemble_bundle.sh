@@ -2,10 +2,8 @@
 fds_version=$1
 smv_version=$2
 NIGHTLY=$3
-MPITYPE=$4
-LABEL=$5
-scan_bundle=$6
-fdscompiler=$7
+LABEL=$4
+scan_bundle=$5
 
 returncode=0
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
@@ -246,7 +244,7 @@ CPDIR $texturedir $smvbindir
 echo "*** copying fds app files"
 cd $fdsbindir
 FILELIST="fds fds2ascii test_mpi"
-if [ "$fdscompiler" == "intel" ]; then
+if [ "$BUNDLE_FDSCOMPILER" == "intel" ]; then
   FILELIST="$FILELIST fds_openmp"
 fi
 for file in $FILELIST ; do
@@ -254,7 +252,7 @@ for file in $FILELIST ; do
 done
 
 echo "*** copying mpi files"
-if [ "$MPITYPE" == "INTELMPI" ]; then
+if [ "${BUNDLE_MPITYPE}" == "INTELMPI" ]; then
     mkdir -p $fdsbindir/intelmpi/bin
     mkdir -p $fdsbindir/intelmpi/lib
     mkdir -p $fdsbindir/intelmpi/prov
@@ -279,7 +277,7 @@ if [ "$MPITYPE" == "INTELMPI" ]; then
       echo "*** error: providence directory, $PROVDIR, does not exist"
     fi
     echo "*** copying mpi shared files"
-    $SCRIPTDIR/copy_shared.sh                      $fdsbindir/intelmpi/lib $fdscompiler
+    $SCRIPTDIR/copy_shared.sh                      $fdsbindir/intelmpi/lib
 
     FABRICDIR=${INTELMPI_BIN}/../opt/mpi/libfabric/lib
     if [ -d $FABRICDIR ]; then
@@ -306,7 +304,7 @@ else
 
     echo "*** copying mpi shared files"
     mkdir -p $fdsbindir/openmpi/lib
-    $SCRIPTDIR/copy_shared.sh          $fdsbindir/openmpi/lib $fdscompiler
+    $SCRIPTDIR/copy_shared.sh          $fdsbindir/openmpi/lib
 
     echo "*** copying mpi help file"
     mkdir -p $fdsbindir/openmpi/share
