@@ -137,9 +137,11 @@ fi
 
 PLATFORM=linux
 PLATFORMLABEL=lnx
+export BUNDLE_SMVCOMPILER=intel
 if [ "`uname`" == "Darwin" ] ; then
   PLATFORM="osx"
   PLATFORMLABEL="osx_intel"
+  BUNDLE_SMVCOMPILER=gnu
   if [ "`uname -m`" == "arm64" ] ; then
     PLATFORMLABEL="osx_arm"
   fi
