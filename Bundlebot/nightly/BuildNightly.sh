@@ -116,8 +116,11 @@ if [ `IS_PROGRAM_INSTALLED mpirun` -eq 0 ]; then
   exit
 fi
 
+fdscompiler=intel
+smvcompiler=intel
 IS_INTEL=`mpirun --version | head -1 | grep Intel| wc -l`
 if [[ "${PLATFORM}" == "osx" ]]; then
+  smvcompiler=gnu
   if [[ $IS_INTEL -eq 0 ]]; then
     export MPI_TYPE="OPENMPI"
   else
@@ -126,8 +129,10 @@ if [[ "${PLATFORM}" == "osx" ]]; then
   fi
   if [ "`uname -m`" == "arm64" ] ; then
     MPI_LABEL=_ompi_arm
+    fdscompiler=gnu
   else
     MPI_LABEL=_ompi_intel
+    fdscompiler=intel
   fi
 else
   if [[ $IS_INTEL -eq 0 ]]; then
@@ -312,6 +317,8 @@ if [ "$INTELMPI_BIN" != "" ]; then
     echo "         Intel mpi version: `$INTELMPI_BIN/mpirun -version | head -1`"
   fi
 fi
+echo "              fds compiler: $fdscompiler"
+echo "        smokeview compiler: $smvcompiler"
 if [ "$OPENMPI_BIN" != "" ]; then
   echo "     Openmpi bin directory: $OPENMPI_BIN"
   if [ -e $OPENMPI_BIN/mpirun ]; then
@@ -404,7 +411,7 @@ if [ "$ONLY_INSTALLER" == "" ]; then
     wait $pid_cloneall
     echo all repos clone complete
   fi
-  ./make_smvapps.sh $SMVDBG &
+  ./make_smvapps.sh $smvcompiler $SMVDBG &
   pid_smvapps=$!
 
   if [ "$pid_clonehypre" != "" ]; then
@@ -422,7 +429,7 @@ if [ "$ONLY_INSTALLER" == "" ]; then
     echo "*** fds cloned"
   fi
 
-  ./make_fdsapps.sh $MPI_TYPE
+  ./make_fdsapps.sh $MPI_TYPE $fdscompiler
 
   wait $pid_smvapps
 fi
@@ -515,7 +522,7 @@ htmllog=${installer_base_platform}_manifest.html
 
 cd $SCRIPTDIR
 echo "*** building installer"
-./assemble_bundle.sh $FDSREV $SMVREV ${BUNDLE_PREFIX} $MPI_TYPE ${MPI_LABEL} $SCAN_BUNDLE
+./assemble_bundle.sh $FDSREV $SMVREV ${BUNDLE_PREFIX} $MPI_TYPE ${MPI_LABEL} $SCAN_BUNDLE $fdscompiler
 assemble_bundle_status=$?
 
 echo "*** virus scan summary"

@@ -1,5 +1,6 @@
 #!/bin/bash
 MPITYPE=$1
+fdscompiler=$2
 
 # -------------------------------------------------------------
 
@@ -95,10 +96,8 @@ BUILDFDSLIB()
 
 if [ "$MPITYPE" == "INTELMPI" ]; then
   mpitype=impi
-  fdscompiler=intel
 else
   mpitype=ompi
-  fdscompiler=gnu
 fi
 export FDS_BUILD_TARGET=intel
 platform=linux
@@ -166,7 +165,7 @@ echo "*** building fds"
 BUILDFDS                                                      &
 pid_fds=$!
 
-if [ "$MPITYPE" == "INTELMPI" ]; then
+if [ "$fdscompiler" == "intel" ]; then
   echo "*** building fds openmp"
   BUILDFDSOPENMP                                                &
   pid_fdsopenmp=$!
@@ -176,7 +175,7 @@ wait $pid_fds
 CHECK_BUILDFDS
 
 
-if [ "$MPITYPE" == "INTELMPI" ]; then
+if [ "$fdscompiler" == "intel" ]; then
   wait $pid_fdsopenmp
   CHECK_BUILDFDSOPENMP
 fi

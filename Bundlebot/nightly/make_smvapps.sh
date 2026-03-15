@@ -1,5 +1,6 @@
 #!/bin/bash
-SMVDEBUG=$1
+smvcompiler=$1
+SMVDEBUG=$2
 
 
 # -------------------------------------------------------------
@@ -40,12 +41,10 @@ CHECK_BUILD()
 #--------------------- start of script -------------------------------
 
 platform=linux
-smvcompiler=intel
 export FDS_BUILD_TARGET=intel
 if [ "`uname`" == "Darwin" ] ; then
   platform="osx"
   export FDS_BUILD_TARGET=osx
-  smvcompiler=gnu
 fi
 
 CURDIR=`pwd`
