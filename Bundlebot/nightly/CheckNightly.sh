@@ -71,8 +71,8 @@ FDS_REVISION=`grep FDS_REVISION $INFO | awk '{print $2}'`
 SMV_REVISION=`grep SMV_REVISION $INFO | awk '{print $2}'`
 BASE=${FDS_REVISION}_${SMV_REVISION}
 FDSWIN=${BASE}_nightly_win
-FDSLNX=${BASE}_nightly_lnx
-FDSOSX=${BASE}_nightly_osx
+FDSLNX=${BASE}_nightly_lnx_impi
+FDSOSX=${BASE}_nightly_osx_ompi_intel
 rm -f $errors
 if [ `grep $FDSWIN.exe $uploads | wc -l` -eq 0 ]; then
   echo  "***error: $FDSWIN.exe missing" >> $errors

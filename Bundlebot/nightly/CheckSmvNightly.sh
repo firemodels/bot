@@ -50,7 +50,7 @@ SMV_HASH=g${SMV_HASH:0:7}
 BASE=${SMV_REVISION}-${SMV_HASH}
 SMVWIN=${BASE}_win
 SMVLNX=${BASE}_lnx
-SMVOSX=${BASE}_osx
+SMVOSX=${BASE}_osx_intel
 rm -f $errors
 if [ `grep "$SMVWIN.exe" $uploads | wc -l` -eq 0 ]; then
   echo  "***error: $SMVWIN.exe missing" >> $errors
