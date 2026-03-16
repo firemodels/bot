@@ -116,35 +116,41 @@ if [ `IS_PROGRAM_INSTALLED mpirun` -eq 0 ]; then
   exit
 fi
 
+export BUNDLE_FDSCOMPILER=intel
+export BUNDLE_SMVCOMPILER=intel
+export BUNDLE_MPITYPE="INTELMPI"
 IS_INTEL=`mpirun --version | head -1 | grep Intel| wc -l`
 if [[ "${PLATFORM}" == "osx" ]]; then
+  BUNDLE_SMVCOMPILER=gnu
   if [[ $IS_INTEL -eq 0 ]]; then
-    export MPI_TYPE="OPENMPI"
+    export BUNDLE_MPITYPE="OPENMPI"
   else
     echo "***error: Intel mpi not supported on a Mac"
     exit
   fi
   if [ "`uname -m`" == "arm64" ] ; then
     MPI_LABEL=_ompi_arm
+    BUNDLE_FDSCOMPILER=gnu
   else
     MPI_LABEL=_ompi_intel
+    BUNDLE_FDSCOMPILER=intel
   fi
 else
   if [[ $IS_INTEL -eq 0 ]]; then
-    export MPI_TYPE="OPENMPI"
+    export BUNDLE_MPITYPE="OPENMPI"
     MPI_LABEL=_ompi
   else
-    export MPI_TYPE="INTELMPI"
+    export BUNDLE_MPITYPE="INTELMPI"
     MPI_LABEL=_impi
   fi
 fi
 
 OPENMPI_BIN=
 INTELMPI_BIN=
-if [ "$MPI_TYPE" == "INTELMPI" ]; then
+if [ "${BUNDLE_MPITYPE}" == "INTELMPI" ]; then
   export INTELMPI_BIN=`dirname "$(which mpirun)"`  
 fi
-if [ "$MPI_TYPE" == "OPENMPI" ]; then
+if [ "${BUNDLE_MPITYPE}" == "OPENMPI" ]; then
   export OPENMPI_BIN=`dirname "$(which mpirun)"`
 fi
 
@@ -304,7 +310,7 @@ echo "               bundle type: $BUNDLETYPE"
 echo "              bot revision: $BOTREVISION/$BOTBRANCH"
 echo "              fds revision: $FDSREVISION/$FDSBRANCH"
 echo "              smv revision: $SMVREVISION/$SMVBRANCH"
-echo "                  MPI type: $MPI_TYPE"
+echo "                  MPI type: ${BUNDLE_MPITYPE}"
 
 if [ "$INTELMPI_BIN" != "" ]; then
   echo "   Intel mpi bin directory: $INTELMPI_BIN"
@@ -312,6 +318,8 @@ if [ "$INTELMPI_BIN" != "" ]; then
     echo "         Intel mpi version: `$INTELMPI_BIN/mpirun -version | head -1`"
   fi
 fi
+echo "              fds compiler: $BUNDLE_FDSCOMPILER"
+echo "        smokeview compiler: $BUNDLE_SMVCOMPILER"
 if [ "$OPENMPI_BIN" != "" ]; then
   echo "     Openmpi bin directory: $OPENMPI_BIN"
   if [ -e $OPENMPI_BIN/mpirun ]; then
@@ -422,7 +430,7 @@ if [ "$ONLY_INSTALLER" == "" ]; then
     echo "*** fds cloned"
   fi
 
-  ./make_fdsapps.sh $MPI_TYPE
+  ./make_fdsapps.sh
 
   wait $pid_smvapps
 fi
@@ -515,7 +523,7 @@ htmllog=${installer_base_platform}_manifest.html
 
 cd $SCRIPTDIR
 echo "*** building installer"
-./assemble_bundle.sh $FDSREV $SMVREV ${BUNDLE_PREFIX} $MPI_TYPE ${MPI_LABEL} $SCAN_BUNDLE
+./assemble_bundle.sh $FDSREV $SMVREV ${BUNDLE_PREFIX} ${MPI_LABEL} $SCAN_BUNDLE
 assemble_bundle_status=$?
 
 echo "*** virus scan summary"

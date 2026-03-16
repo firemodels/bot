@@ -1,6 +1,6 @@
 #!/bin/bash
 
-FILE=openmpi-5.0.10.tar.gz
+FILE=openmpi-5.0.9.tar.gz
 DIR=`basename $FILE .tar.gz`
 if [ ! -e $FILE ]; then
   echo "*** downloading $FILE"
@@ -20,17 +20,22 @@ fi
 
 cd $DIR
 echo "*** configuring openmpi"
-./configure --prefix /opt/openmpi509 \
+./configure --prefix=/opt/openmpi509_test \
   CC=clang CXX=clang++ F77=ifort FC=ifort \
-  CFLAGS="-O2 " \
-  CXXFLAGS="-O2 " \
-  FFLAGS="-O2 " FCFLAGS="-O2" \
-   LDFLAGS="-framework CoreFoundation" \
-  --without-tm \
-  --without-psm\
+  CFLAGS="-O2" \
+  CXXFLAGS="-O2" \
+  FFLAGS="-O2" FCFLAGS="-O2" \
+  LDFLAGS="-framework CoreFoundation" \
   --enable-mpirun-prefix-by-default \
+  --enable-static --disable-shared \
   --without-verbs \
-  --enable-static --disable-shared | tee CONFIGURE.out
+  --without-psm \
+  --without-tm \
+  --with-libevent=internal \
+  --with-hwloc=internal \
+  --with-pmix=internal \
+  --with-prrte=internal
+
 
 echo "*** building openmpi"
 make -j 4

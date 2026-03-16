@@ -2,9 +2,8 @@
 fds_version=$1
 smv_version=$2
 NIGHTLY=$3
-MPITYPE=$4
-LABEL=$5
-scan_bundle=$6
+LABEL=$4
+scan_bundle=$5
 
 returncode=0
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
@@ -138,8 +137,8 @@ CPDIR ()
     ERR="1"
   else
     echo "*** copying directory"
-    echo "      from:$FROMDIR"
-    echo "        to:$TODIR"
+    echo "      from: $FROMDIR"
+    echo "        to: $TODIR"
     cp -r $FROMDIR $TODIR
   fi
   if [ ! -e $TODIR ]; then
@@ -245,7 +244,7 @@ CPDIR $texturedir $smvbindir
 echo "*** copying fds app files"
 cd $fdsbindir
 FILELIST="fds fds2ascii test_mpi"
-if [ "$MPITYPE" == "INTELMPI" ]; then
+if [ "$BUNDLE_FDSCOMPILER" == "intel" ]; then
   FILELIST="$FILELIST fds_openmp"
 fi
 for file in $FILELIST ; do
@@ -253,7 +252,7 @@ for file in $FILELIST ; do
 done
 
 echo "*** copying mpi files"
-if [ "$MPITYPE" == "INTELMPI" ]; then
+if [ "${BUNDLE_MPITYPE}" == "INTELMPI" ]; then
     mkdir -p $fdsbindir/intelmpi/bin
     mkdir -p $fdsbindir/intelmpi/lib
     mkdir -p $fdsbindir/intelmpi/prov
@@ -305,7 +304,7 @@ else
 
     echo "*** copying mpi shared files"
     mkdir -p $fdsbindir/openmpi/lib
-    $SCRIPTDIR/copy_shared.sh          $fdsbindir/openmpi/lib $fdsbindir/openmpi/bin
+    $SCRIPTDIR/copy_shared.sh          $fdsbindir/openmpi/lib
 
     echo "*** copying mpi help file"
     mkdir -p $fdsbindir/openmpi/share

@@ -1,6 +1,5 @@
 #!/bin/bash
 TOLIBDIR=$1
-TOBINDIR=$2
 
 ABORT=
 CURDIR=`pwd`
@@ -15,9 +14,9 @@ else
   ABORT=1
 fi
 if [ "`uname`" == "Darwin" ]; then
-  FDS=$FDSBUILDDIR/ompi_gnu_osx/fds_ompi_gnu_osx
+  FDS=$FDSBUILDDIR/ompi_${BUNDLE_FDSCOMPILER}_osx/fds_ompi_${BUNDLE_FDSCOMPILER}_osx
 else
-  FDS=$FDSBUILDDIR/impi_intel_linux/fds_impi_intel_linux
+  FDS=$FDSBUILDDIR/impi_${BUNDLE_FDSCOMPILER}_linux/fds_impi_${BUNDLE_FDSCOMPILER}_linux
 fi
 if [ ! -d $TOLIBDIR ]; then
   echo "***error: directory $TOLIBDIR does not exist"
@@ -49,9 +48,11 @@ done
 if [ "`uname`" == "Darwin" ]; then
   echo "*** copying shared mpirun files to $TOLIBDIR"
   FILES=`otool -L $OPENMPI_BIN/mpirun  | grep homebrew | grep -v mpirun | awk '{print $1 }'`
-  FILES="$FILES /opt/homebrew/opt/gcc/lib/gcc/current/libgfortran.5.dylib"
-  FILES="$FILES /opt/homebrew/opt/gcc/lib/gcc/current/libquadmath.0.dylib"
-  FILES="$FILES /opt/homebrew/Cellar/gcc/15.2.0/lib/gcc/current/libgcc_s.1.1.dylib"
+  if [ "${BUNDLE_FDSCOMPILER}" == "gnu" ]; then
+    FILES="$FILES /opt/homebrew/opt/gcc/lib/gcc/current/libgfortran.5.dylib"
+    FILES="$FILES /opt/homebrew/opt/gcc/lib/gcc/current/libquadmath.0.dylib"
+    FILES="$FILES /opt/homebrew/Cellar/gcc/15.2.0/lib/gcc/current/libgcc_s.1.1.dylib"
+  fi
   for file in $FILES; do
     if [ -e $file ]; then
       echo "***    copying $file"

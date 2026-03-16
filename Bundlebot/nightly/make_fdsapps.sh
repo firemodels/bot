@@ -1,5 +1,4 @@
 #!/bin/bash
-MPITYPE=$1
 
 # -------------------------------------------------------------
 
@@ -32,25 +31,25 @@ CHECK_BUILDFDSUTIL()
 
 CHECK_BUILDTESTMPI()
 {
-  if [ ! -e $fdsrepo/Utilities/test_mpi/${mpitype}_${fdscompiler}_$platform/test_mpi ]; then
+  if [ ! -e $fdsrepo/Utilities/test_mpi/${mpitype}_${BUNDLE_FDSCOMPILER}_$platform/test_mpi ]; then
     echo "***error: The program test_mpi failed to build"
     echo "***error: The program test_mpi failed to build"  >> $errorlog 2>&1
   else
     echo "*** test_mpi built"
-    cp $fdsrepo/Utilities/test_mpi/${mpitype}_${fdscompiler}_$platform/test_mpi  $CURDIR/apps/test_mpi
+    cp $fdsrepo/Utilities/test_mpi/${mpitype}_${BUNDLE_FDSCOMPILER}_$platform/test_mpi  $CURDIR/apps/test_mpi
   fi
 }
 # -------------------------------------------------------------
 
 BUILDFDS()
 {
-  cd $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}
+  cd $fdsrepo/Build/${mpitype}_${BUNDLE_FDSCOMPILER}_${platform}
   ./make_fds.sh bot  >> $outputdir/compile_fds.log 2>&1
 }
 
 BUILDFDSOPENMP()
 {
-  cd $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}_openmp
+  cd $fdsrepo/Build/${mpitype}_${BUNDLE_FDSCOMPILER}_${platform}_openmp
   cp make_fds.sh make_fds_openmp.sh
   ./make_fds_openmp.sh bot >> $outputdir/compile_fdsopenmp.log 2>&1
 }
@@ -59,12 +58,12 @@ BUILDFDSOPENMP()
 
 CHECK_BUILDFDS()
 {
-  if [ ! -e $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}/fds_${mpitype}_${fdscompiler}_${platform} ]; then
-    echo "***error: The program fds_${mpitype}_${fdscompiler}_${platform} failed to build"
-    echo "***error: The program fds_${mpitype}_${fdscompiler}_${platform} failed to build"  >> $errorlog 2>&1
+  if [ ! -e $fdsrepo/Build/${mpitype}_${BUNDLE_FDSCOMPILER}_${platform}/fds_${mpitype}_${BUNDLE_FDSCOMPILER}_${platform} ]; then
+    echo "***error: The program fds_${mpitype}_${BUNDLE_FDSCOMPILER}_${platform} failed to build"
+    echo "***error: The program fds_${mpitype}_${BUNDLE_FDSCOMPILER}_${platform} failed to build"  >> $errorlog 2>&1
   else
-    echo "*** fds_${mpitype}_${fdscompiler}_${platform} built"
-    cp $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}/fds_${mpitype}_${fdscompiler}_${platform} $CURDIR/apps/fds
+    echo "*** fds_${mpitype}_${BUNDLE_FDSCOMPILER}_${platform} built"
+    cp $fdsrepo/Build/${mpitype}_${BUNDLE_FDSCOMPILER}_${platform}/fds_${mpitype}_${BUNDLE_FDSCOMPILER}_${platform} $CURDIR/apps/fds
   fi
 }
 
@@ -72,12 +71,12 @@ CHECK_BUILDFDS()
 
 CHECK_BUILDFDSOPENMP()
 {
-  if [ ! -e $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}_openmp/fds_${mpitype}_${fdscompiler}_${platform}_openmp ]; then
-    echo "***error: The program fds_${mpitype}_${fdscompiler}_${platform}_openmp failed to build"
-    echo "***error: The program fds_${mpitype}_${fdscompiler}_${platform}_openmp failed to build"   >> $errorlog 2>&1
+  if [ ! -e $fdsrepo/Build/${mpitype}_${BUNDLE_FDSCOMPILER}_${platform}_openmp/fds_${mpitype}_${BUNDLE_FDSCOMPILER}_${platform}_openmp ]; then
+    echo "***error: The program fds_${mpitype}_${BUNDLE_FDSCOMPILER}_${platform}_openmp failed to build"
+    echo "***error: The program fds_${mpitype}_${BUNDLE_FDSCOMPILER}_${platform}_openmp failed to build"   >> $errorlog 2>&1
   else
-    echo "*** fds_${mpitype}_${fdscompiler}_${platform}_openmp built"
-    cp  $fdsrepo/Build/${mpitype}_${fdscompiler}_${platform}_openmp/fds_${mpitype}_${fdscompiler}_${platform}_openmp $CURDIR/apps/fds_openmp
+    echo "*** fds_${mpitype}_${BUNDLE_FDSCOMPILER}_${platform}_openmp built"
+    cp  $fdsrepo/Build/${mpitype}_${BUNDLE_FDSCOMPILER}_${platform}_openmp/fds_${mpitype}_${BUNDLE_FDSCOMPILER}_${platform}_openmp $CURDIR/apps/fds_openmp
   fi
 }
 
@@ -93,12 +92,10 @@ BUILDFDSLIB()
 
 #--------------------- start of script -------------------------------
 
-if [ "$MPITYPE" == "INTELMPI" ]; then
+if [ "${BUNDLE_MPITYPE}" == "INTELMPI" ]; then
   mpitype=impi
-  fdscompiler=intel
 else
   mpitype=ompi
-  fdscompiler=gnu
 fi
 export FDS_BUILD_TARGET=intel
 platform=linux
@@ -139,11 +136,11 @@ git clean -dxf  >> $cleanlog 2>&1
 cd $CURDIR
 
 echo "*** building test_mpi"
-BUILDFDSUTIL test_mpi  ${mpitype}_${fdscompiler}_$platform    &
+BUILDFDSUTIL test_mpi  ${mpitype}_${BUNDLE_FDSCOMPILER}_$platform    &
 pid_test_mpi=$!
 
 echo "*** building fds2ascii"
-BUILDFDSUTIL fds2ascii ${fdscompiler}_$platform               &
+BUILDFDSUTIL fds2ascii ${BUNDLE_FDSCOMPILER}_$platform               &
 pid_fds2ascii=$!
 
 # build hypre library
@@ -166,7 +163,7 @@ echo "*** building fds"
 BUILDFDS                                                      &
 pid_fds=$!
 
-if [ "$MPITYPE" == "INTELMPI" ]; then
+if [ "${BUNDLE_FDSCOMPILER}" == "intel" ]; then
   echo "*** building fds openmp"
   BUILDFDSOPENMP                                                &
   pid_fdsopenmp=$!
@@ -176,13 +173,13 @@ wait $pid_fds
 CHECK_BUILDFDS
 
 
-if [ "$MPITYPE" == "INTELMPI" ]; then
+if [ "${BUNDLE_FDSCOMPILER}" == "intel" ]; then
   wait $pid_fdsopenmp
   CHECK_BUILDFDSOPENMP
 fi
 
 wait $pid_fds2ascii
-CHECK_BUILDFDSUTIL    fds2ascii ${fdscompiler}_$platform
+CHECK_BUILDFDSUTIL    fds2ascii ${BUNDLE_FDSCOMPILER}_$platform
 
 wait $pid_test_mpi
 CHECK_BUILDTESTMPI  

@@ -48,41 +48,20 @@ echo ***     smv hash: %smv_hash%
 echo *** smv revision: %smvrepo_revision%
 echo.
 
-:: setup compiler environment
-if x%SETUP_INTEL% == x1 goto skip1
-echo *** defining compiler environment
-set SETUP_INTEL=1
-call %GITROOT%\smv\Utilities\Scripts\setup_intel_compilers.bat > %OUTDIR%\stage2_compiler_setup 2>&1
-:skip1
-
-:: build libraries
-title building libraries
-echo *** building libraries
-cd %GITROOT%\smv\Build\LIBS\intel_win
-call make_LIBS bot > %OUTDIR%\stage3_LIBS 2>&1
-
-echo *** Building applications
-Title Building applications
-
-set "progs=background flush smokediff pnginfo smokezip fds2fed wind2fds set_path timep get_time sh2bat"
-
+set progs=LIBS background flush smokediff pnginfo smokezip fds2fed wind2fds set_path timep get_time sh2bat smokeview
 for %%x in ( %progs% ) do (
   title Building %%x
   cd %GITROOT%\smv\Build\%%x\intel_win
   echo *** building %%x
-  make -j 4 SHELL="%ComSpec%" -f ..\Makefile intel_win > %OUTDIR%\stage4_%%x 2>&1
+  call make_%%x > %OUTDIR%\stage4_%%x 2>&1
 ) 
-
-echo *** building smokeview
-cd %GITROOT%\smv\Build\smokeview\intel_win
-title Building smokeview
-call make_smokeview -bot > %OUTDIR%\stage5_smokeview 2>&1
 
 echo *** bundling smokeview
 Title Building Smokeview bundle
 
+set scan_smv_bundle=1
 cd %CURDIR%\..\release
-call make_smv_bundle %BUNDLE_SMV_TAG%
+call make_smv_bundle %BUNDLE_SMV_TAG% %scan_smv_bundle%
 
 cd %CURDIR%
 
