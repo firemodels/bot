@@ -1,6 +1,7 @@
 @echo off
 setlocal
 
+set USE_CURRENT=0
 set S_HASH=
 set S_REVISION=
 set S_BRANCH=
@@ -34,11 +35,20 @@ cd %CURDIR%
 
 set GAWK=%GITROOT%\bot\scripts\bin\gawk.exe
 
-call get_smv_hash_revisions %S_HASH% %S_REVISION% > %OUTDIR%\stage1_hash 2>&1
-set /p smv_hash=<%OUTDIR%\SMV_HASH
+if x%USE_CURRENT% == x0 goto else_use_current
+  cd %GITROOT%\smv
+  git describe | %GAWK% "{ sub(/-[^-]+$/, \"\"); print }"            > %OUTDIR%\SMV_REVISION
+  git describe | %GAWK% "{ match($0, /-g([^-]+)$/, a); print a[1] }" > %OUTDIR%\SMV_HASH
+  set /p smv_hash=<%OUTDIR%\SMV_HASH
+  cd %CURDIR%
+  goto endif_use_current
+:else_use_current
+  call get_smv_hash_revisions %S_HASH% %S_REVISION% > %OUTDIR%\stage1_hash 2>&1
+  set /p smv_hash=<%OUTDIR%\SMV_HASH
 
-echo *** cloning smv repo
-call clone_smv_repo %smv_hash%  %S_BRANCH% > %OUTDIR%\stage2_clone 2>&1
+  echo *** cloning smv repo
+  call clone_smv_repo %smv_hash%  %S_BRANCH% > %OUTDIR%\stage2_clone 2>&1
+:endif_use_current
 
 cd %GITROOT%\smv
 git describe --abbrev=7 --long --dirty > %OUTDIR%\smvrepo_revision
@@ -98,6 +108,7 @@ echo.
 echo BuildSmvNightly usage
 echo.
 echo Options:
+echo -C - use current smv revision
 echo -h - display this message
 echo -u - upload bundle to %username%
 echo -U - upload bundle to %UPLOADOWNER%
@@ -115,6 +126,10 @@ exit /b 0
    call :usage
    set STOPSCRIPT=1
    exit /b
+ )
+ if "%1" EQU "-C" (
+   set USE_CURRENT=1
+   set valid=1
  )
  if "%1" EQU "-u" (
    set UPLOAD_SMVBUNDLE=1
