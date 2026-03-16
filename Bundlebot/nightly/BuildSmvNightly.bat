@@ -81,8 +81,9 @@ call make_smokeview -bot > %OUTDIR%\stage5_smokeview 2>&1
 echo *** bundling smokeview
 Title Building Smokeview bundle
 
+set scan_smv_bundle=1
 cd %CURDIR%\..\release
-call make_smv_bundle %BUNDLE_SMV_TAG%
+call make_smv_bundle %BUNDLE_SMV_TAG% %scan_smv_bundle%
 
 cd %CURDIR%
 
