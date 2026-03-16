@@ -157,7 +157,7 @@ CALL :COPY  "%fds_forbundle%\message.txt"                            %out_bundle
 echo Unpacking %FDS_REVISION_ARG% and %SMV_REVISION_ARG% installation files > %fds_forbundle%\unpack.txt
 
 echo.
-echo ***copying auxillary files
+echo *** copying auxillary files
 echo.
 CALL :COPY  %smv_forbundle%\objects.svo    %out_smv%\.
 CALL :COPY  %smv_forbundle%\volrender.ssf  %out_smv%\.
@@ -166,7 +166,7 @@ CALL :COPY  %smv_forbundle%\smokeview.ini  %out_smv%\.
 CALL :COPY  %smv_forbundle%\.smokeview_bin %out_smv%\.
 
 echo.
-echo ***copying colorbars
+echo *** copying colorbars
 echo.
 copy %smv_forbundle%\colorbars\linear\*.csv    %out_colorbars%\linear    >Nul
 copy %smv_forbundle%\colorbars\rainbow\*.csv   %out_colorbars%\rainbow   >Nul
@@ -174,13 +174,13 @@ copy %smv_forbundle%\colorbars\divergent\*.csv %out_colorbars%\divergent >Nul
 copy %smv_forbundle%\colorbars\circular\*.csv  %out_colorbars%\circular  >Nul
 
 echo.
-echo ***copying textures
+echo *** copying textures
 echo.
 copy %smv_forbundle%\textures\*.jpg          %out_textures%\.>Nul
 copy %smv_forbundle%\textures\*.png          %out_textures%\.>Nul
 
 echo.
-echo ***copying uninstaller
+echo *** copying uninstaller
 echo.
 CALL :COPY  "%fds_forbundle%\uninstall_fds.bat"  "%out_uninstall%\uninstall_base.bat"
 CALL :COPY  "%fds_forbundle%\uninstall_fds2.bat" "%out_uninstall%\uninstall_base2.bat"
@@ -190,7 +190,7 @@ echo @echo off > "%out_uninstall%\uninstall.vbs"
 CALL :COPY  "%GITROOT%\smv\Build\set_path\intel_win\set_path_win.exe" "%out_uninstall%\set_path.exe"
 
 echo.
-echo ***copying FDS documentation
+echo *** copying FDS documentation
 echo.
 
 CALL :COPY  "%GITROOT%\webpages\FDS_Release_Notes.htm"   %out_guides%\FDS_Release_Notes.htm
@@ -201,7 +201,7 @@ CALL :COPY  %in_pdf%\FDS_Validation_Guide.pdf            %out_guides%\.
 CALL :COPY  %in_pdf%\FDS_Verification_Guide.pdf          %out_guides%\.
 
 echo.
-echo ***copying Smokeview documentation
+echo *** copying Smokeview documentation
 echo.
 
 CALL :COPY %in_pdf%\SMV_User_Guide.pdf                %out_guides%\.
@@ -209,7 +209,7 @@ CALL :COPY %in_pdf%\SMV_Technical_Reference_Guide.pdf %out_guides%\.
 CALL :COPY %in_pdf%\SMV_Verification_Guide.pdf        %out_guides%\.
 
 echo.
-echo ***copying startup shortcuts
+echo *** copying startup shortcuts
 echo.
  
 CALL :COPY "%GITROOT%\webpages\SMV_Release_Notes.htm"   "%out_guides%\Smokeview_release_notes.html"
@@ -222,7 +222,7 @@ set RUNTFDS=call %copyFDScases%
 set RUNCFAST=call %copyCFASTcases%
 
 echo.
-echo ***copying example files
+echo *** copying example files
 echo.
 cd %fds_examples%
 %GITROOT%\smv\Build\sh2bat\intel_win\sh2bat_win %fds_casessh% %fds_casesbat%
@@ -235,7 +235,7 @@ call %smv_casesbat%>Nul
 call %wui_casesbat%>Nul
 
 echo.
-echo ***copying scripts that finalize installation
+echo *** copying scripts that finalize installation
 echo.
 
 CALL :COPY  "%fds_forbundle%\setup_fds_firewall.bat" "%out_bundle%\%fdsversion%\setup_fds_firewall.bat"
@@ -257,7 +257,7 @@ if %ERRORLEVEL% == 1 goto elsescan
   set htmllog=%logdir%\%basename%_manifest.html
   set nvscanlog=%logdir%\%basename%_nlog.txt
   echo.
-  echo ***scanning bundle
+  echo *** scanning bundle
   echo    input: %basedir%
   echo    output: %vscanlog%
   clamscan -r %basedir% > %scanlog% 2>&1
@@ -363,7 +363,7 @@ set infile=%1
 set infiletime=%~t1
 set outfile=%2
 IF NOT EXIST %infile% goto else1
-   echo copying %label% %infiletime%
+   echo *** copying %label% %infiletime%
    copy %infile% %outfile% >Nul
    goto endif1
 :else1
@@ -379,7 +379,7 @@ exit /b
 set fromdir=%1
 set todir=%2
 IF NOT EXIST %fromdir% goto else2
-   echo copying directory %fromdir%
+   echo *** copying directory %fromdir%
    copy %fromdir% %todir% >Nul
    goto endif2
 :else2
