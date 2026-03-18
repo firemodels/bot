@@ -110,8 +110,8 @@ echo.
 echo Options:
 echo -C - use current smv revision
 echo -h - display this message
-echo -u - upload bundle to %username%
-echo -U - upload bundle to firemodels
+echo -u - upload bundle to github.com/%username%/test_bundles/releases/tag/SMOKEVIEW_TEST
+echo -U - upload bundle to github.com/firemodels/test_bundles/releases/tag/SMOKEVIEW_TEST
 exit /b 0
 
 ::-----------------------------------------------------------------------

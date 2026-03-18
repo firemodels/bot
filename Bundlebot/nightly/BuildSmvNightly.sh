@@ -40,15 +40,15 @@ GET_DURATION(){
 
 function USAGE {
 echo ""
-echo "BUILDSmvNightly.sh usage"
+echo "BuildSmvNightly.sh usage"
 echo ""
 echo "Options:"
 echo "-C - use current revision"
 echo "-h - display this message"
 echo "-k - kill the BuildSmvNightly.sh process and all of its child processes"
 echo "-n - do not scan bundle"
-echo "-u - upload bundle file to GitHub owner: `whoami`"
-echo "-U - upload bundle file to GitHub owner: $GHOWNER"
+echo "-u - upload bundle to github.com/gforney/test_bundles/releases/tag/SMOKEVIEW_TEST"
+echo "-U - upload bundle to github.com/firemodels/test_bundles/releases/tag/SMOKEVIEW_TEST"
 exit 0
 }
 

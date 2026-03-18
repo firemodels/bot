@@ -63,8 +63,8 @@ echo "-o - specify GH_OWNER when building a bundle. [default: $GH_OWNER]"
 echo "-r - specify GH_REPO when building a bundle. [default: $GH_REPO]"
 echo "-R - clone repos naming the branch release (without -R branches"
 echo "     are named nightly)"
-echo "-u - upload bundle file to GitHub using `whoami`."
-echo "-U - upload bundle file to GitHub using firemodels."
+echo "-u - upload bundle to github.com/`whoami`/test_bundles/releases/tag/FDS_TEST"
+echo "-U - upload bundle to github.com/firemodels/test_bundles/releases/tag/FDS_TEST"
 exit 0
 }
 
