@@ -193,7 +193,7 @@ goto eof
 ::-----------------------------------------------------------------------
 
 echo.
-echo run_bundlebot usage
+echo BuildNightly usage
 echo.
 echo This script builds FDS and Smokeview apps and generates a bundle using either the
 echo specified fds and smv repo revisions or revisions from the latest firebot pass.
@@ -204,8 +204,8 @@ echo -h - display this message
 echo -I - only build installer, assume repos are already cloned and apps are already built
 echo -m mailtto - send email to mailto
 echo -R - create a release bundle using settings in ..\release\config.bat
-echo -u - upload bundle to %username%
-echo -U - upload bundle to %UPLOADOWNER%
+echo -u - upload bundle to github.com/%username%/test_bundles/releases/tag/FDS_TEST
+echo -U - upload bundle to github.com/firemodels/test_bundles/releases/tag/FDS_TEST
 exit /b 0
 
 ::-----------------------------------------------------------------------
