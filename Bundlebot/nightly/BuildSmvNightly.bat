@@ -111,7 +111,7 @@ echo Options:
 echo -C - use current smv revision
 echo -h - display this message
 echo -u - upload bundle to %username%
-echo -U - upload bundle to %UPLOADOWNER%
+echo -U - upload bundle to firemodels
 exit /b 0
 
 ::-----------------------------------------------------------------------
