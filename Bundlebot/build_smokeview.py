@@ -49,13 +49,6 @@ def update_smv_all():              os.system("start " + webscript_dir + "webUPDA
 
 def set_revision():                os.system("start " + webscript_dir + "webSET_bundle_revision")
 
-def build_smv_win_inc():           os.system("start " + webscript_dir + "webBUILDsmv Windows testinc")
-def build_smv_test_san_deb():      os.system("start " + webscript_dir + "webBUILDsmvdebugsanitize "    + platforms[platform.get()])
-def build_smv_test_san_full():     os.system("start " + webscript_dir + "webBUILDsmvsanitize "         + platforms[platform.get()] + " full") 
-def build_smv_test_san_inc():      os.system("start " + webscript_dir + "webBUILDsmvsanitize "         + platforms[platform.get()] + " inc")
-
-def build_smz():                   os.system("start " + webscript_dir + "webBUILDsmz  "     + platforms[platform.get()] )
-
 def build_lib():               os.system("start " + webscript_dir + "webBUILDlibs "     + platforms[platform.get()])
 def build_util():              os.system("start " + webscript_dir + "webBUILDallprog "  + platforms[platform.get()])
 def build_smv():               os.system("start " + webscript_dir + "webBUILDsmv  "     + platforms[platform.get()]  )
@@ -63,8 +56,6 @@ def build_smv():               os.system("start " + webscript_dir + "webBUILDsmv
 def bundle_smv():          os.system("start " + webscript_dir + "webPACKAGEsmv "        + platforms[platform.get()] + " " + str(scan_bundle.get()) )
 def install_smv():         os.system("start " + webscript_dir + "webINSTALLsmv "        + platforms[platform.get()]                  )
 def upload_bundle():       os.system("start " + webscript_dir + "webUPLOADallsmv "      + platforms[platform.get()])
-
-def bundleinstall_smv():       os.system("start " + webscript_dir + "webPACKAGEINSTALLsmv " + platforms[platform.get()]  )
 
 def download_figures():            os.system("start " + webscript_dir + "webGETfigs "       + apps[app.get()]                 + " " + guides[guide.get()] )
 def view_summary():                os.system("start " + webscript_dir + "webVIEWsummary "   + apps[app.get()] )
@@ -146,16 +137,9 @@ R=R+1
 Label(root, text="").grid(column=0, row=R, columnspan=4)
 
 R=R+1
-Label(root, text="Build:").grid(column=0, row=R)
-Button(root, text="Revision",width=button_width, command=set_revision, bg='blue', fg='white').grid(row=R, column=1)
-Button(root, text="Libs",              width=button_width, command=build_lib).grid(row=R,  column=2)
-Button(root, text="Utils",             width=button_width, command=build_util,bg='blue', fg='white').grid(row=R, column=3)
-
-R=R+1
-#Button(root, text="smv dbg sanitize",  width=button_width, command=build_smv_test_san_deb).grid(row=R, column=1)
-#Button(root, text="smv sanitize inc",  width=button_width, command=build_smv_test_san_inc).grid(row=R, column=1)
-Button(root, text="smv sanitize",      width=button_width, command=build_smv_test_san_full).grid(row=R, column=1)
-Button(root, text="smv Win test inc",  width=button_width, command=build_smv_win_inc).grid(row=R,  column=2)
+Button(root, text="Revision",width=button_width, command=set_revision, bg='blue', fg='white').grid(row=R, column=0)
+Button(root, text="Libs",              width=button_width, command=build_lib).grid(row=R,  column=1)
+Button(root, text="Utils",             width=button_width, command=build_util,bg='blue', fg='white').grid(row=R, column=2)
 Button(root, text="smv",               width=button_width, command=build_smv, bg='blue', fg='white').grid(row=R,  column=3)
 
 # ------------------------- bundle/install ------------------------------
