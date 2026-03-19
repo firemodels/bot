@@ -2,7 +2,7 @@
 setlocal
 :: release info
 set versionbase=%1
-set scan_bundle%2
+set scan_bundle=%2
 set zipbase=%versionbase%_win
 set SMVEDITION=SMV6
 
