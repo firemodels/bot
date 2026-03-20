@@ -92,7 +92,7 @@ Button(root, text="<-- smv",  width=button_width, command=webCOPYsmv2settings).g
 
 R=R+1
 Label(root, text="Script/notes:").grid(column=0, row=R)
-Button(root, text="Edit Script",    width=button_width, command=edit_this_page).grid(row=R, column=1)
+Button(root, text="Edit this script",    width=button_width, command=edit_this_page).grid(row=R, column=1)
 Button(root, text="Add notes",      width=button_width, command=add_notes).grid(row=R,      column=2)
 Button(root, text="View notes",     width=button_width, command=view_notes).grid(row=R,     column=3)
 
@@ -155,8 +155,8 @@ Radiobutton(root, text="Technical",    padx = 0, variable=guide, value=4).grid(r
 
 R=R+1
 Button(root, text="Get Figs",     width=button_width, command=download_figures).grid(row=R, column=0)
-Button(root, text="View Summary", width=button_width, command=view_summary).grid(row=R, column=1)
-Button(root, text="Build",        width=button_width, command=build_guides).grid(row=R,     column=2)
-Button(root, text="View",         width=button_width, command=view_guides).grid(row=R,      column=3)
+Button(root, text="Build",        width=button_width, command=build_guides).grid(row=R,     column=1)
+Button(root, text="View Guide",         width=button_width, command=view_guides).grid(row=R,      column=2)
+Button(root, text="View Summary", width=button_width, command=view_summary).grid(row=R, column=3)
 
 root.mainloop()
