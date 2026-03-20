@@ -54,7 +54,7 @@ if NOT exist %bundlesdir% mkdir %bundlesdir%
 :: linux
 
 if "%platform%" == "Linux" (
-  plink %plink_options% %linux_logon% %scriptdir%/assemble_smvbundle.sh %version% %linux_git_root% linux %scan_bundle%
+  plink %plink_options% %linux_logon% %scriptdir%/assemble_smvbundle.sh %version% %linux_git_root% lnx %scan_bundle%
   goto eof
 )
 
