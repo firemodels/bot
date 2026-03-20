@@ -204,7 +204,7 @@ THISDIR=\`pwd\`
 
 #--- record temporary startup file names
 
-BASHRCFDS=/tmp/bashrc_fds.\$\$
+FDSSETUP=/tmp/bashrc_fds.\$\$
 FDSMODULEtmp=/tmp/fds_module.\$\$
 SMVMODULEtmp=/tmp/smv_module.\$\$
 STARTUPtmp=/tmp/readme.\$\$
@@ -380,7 +380,7 @@ cat << MODULE > \$FDSMODULEtmp
 ###
 
 proc ModulesHelp { } {
-        puts stderr "\tAdds FDS bin location to your PATH environment variable"
+        puts stderr "\tAdds FDS and smokeview bin locations to your PATH environment variable"
 }
 
 module-whatis   "Loads fds paths and libraries."
@@ -392,6 +392,7 @@ conflict intel
 # FDS paths
 
 prepend-path    PATH            \$FDS_root/bin
+prepend-path    PATH            \$FDS_root/smvbin
 MODULE
 if [ "$ostype" == "LINUX" ] ; then
 cat << MODULE >> \$FDSMODULEtmp
@@ -424,48 +425,26 @@ fi
 cp \$FDSMODULEtmp \$FDS_root/bin/modules/$FDSMODULE
 rm \$FDSMODULEtmp
 
-#--- create SMV module
-
-cat << MODULE > \$SMVMODULEtmp
-#%Module1.0#####################################################################
-###
-### SMV6 modulefile
-###
-
-proc ModulesHelp { } {
-        puts stderr "\tAdds smokeview bin location to your PATH environment variable"
-}
-
-module-whatis   "Loads smokeview path"
-
-# FDS paths
-
-prepend-path    PATH            \$FDS_root/smvbin
-MODULE
-####
-
-cp \$SMVMODULEtmp \$FDS_root/bin/modules/$SMVMODULE
-rm \$SMVMODULEtmp
-
 #--- create BASH startup file
 
-cat << BASH > \$BASHRCFDS
+cat << FDSBASH > \$FDSSETUP
 #/bin/bash
 FDSBINDIR=\$FDS_root/bin
 export PATH=\\\$FDSBINDIR:\\\$PATH
-BASH
+export PATH=\$FDS_root/smvbin:\\\$PATH
+FDSBASH
 
 if [ "$BUNDLE_MPITYPE" != "INTELMPI" ] ; then
-cat << BASH >> \$BASHRCFDS
+cat << FDSBASH >> \$FDSSETUP
 export PATH=\\\$FDSBINDIR/openmpi/bin:\\\$PATH
 export OPAL_PREFIX=\\\$FDSBINDIR/openmpi  # used when running the bundled fds
-BASH
+FDSBASH
 fi
 if [[ "$ostype" == "OSX" ]]; then
-cat << BASH >> \$BASHRCFDS
+cat << FDSBASH >> \$FDSSETUP
 export DYLD_LIBRARY_PATH=\\\$FDSBINDIR/openmpi/lib:\\\$DYLD_LIBRARY_PATH
 export TMPDIR=/tmp
-BASH
+FDSBASH
 fi
 
 if [ "$ostype" == "LINUX" ] ; then
@@ -475,20 +454,20 @@ OMP_COMMAND="system_profiler SPHardwareDataType"
 fi
 
 if [ "$ostype" == "LINUX" ] ; then
-cat << BASH >> \$BASHRCFDS
+cat << FDSBASH >> \$FDSSETUP
 export $LDLIBPATH=/usr/lib64:\\\$$LDLIBPATH
-BASH
+FDSBASH
 fi
 
-cat << BASH >> \$BASHRCFDS
+cat << FDSBASH >> \$FDSSETUP
 #  set OMP_NUM_THREADS to max of 4 and "Total Number of Cores" 
 #  obtained from running:
 #  \$OMP_COMMAND
 export OMP_NUM_THREADS=4
-BASH
+FDSBASH
 
 if [[ "$ostype" == "LINUX" ]] &&  [[ "$BUNDLE_MPITYPE" == "INTELMPI" ]] ; then
-cat << BASH >> \$BASHRCFDS
+cat << FDSBASH >> \$FDSSETUP
 
 # Intel runtime environment
 
@@ -496,24 +475,13 @@ impihome=\$FDS_root/bin/intelmpi
 export FI_PROVIDER_PATH=\\\$impihome/prov
 export LD_LIBRARY_PATH=\\\$impihome/lib:\\\$LD_LIBRARY_PATH
 export PATH=\\\$impihome/bin:\\\$PATH
-BASH
+FDSBASH
 fi
 
 #--- create startup and readme files
 
-mv \$BASHRCFDS \$FDS_root/bin/$FDSVARS
+mv \$FDSSETUP \$FDS_root/bin/$FDSVARS
 chmod +x \$FDS_root/bin/$FDSVARS
-
-#--- create SMV6VARS.sh
-
-SMVVARS_tmp=/tmp/SMVVARS.\$\$
-cat << BASH > \$SMVVARS_tmp
-#/bin/bash
-export PATH=\$FDS_root/smvbin:\\\$PATH
-BASH
-
-mv \$SMVVARS_tmp \$FDS_root/bin/$SMVVARS
-chmod +x \$FDS_root/bin/$SMVVARS
 
 #--- create startup readme file
 
@@ -533,13 +501,11 @@ cat << STARTUP >> \$STARTUPtmp
 <li>or add:
 <pre>
 source \$FDS_root/bin/$FDSVARS
-source \$FDS_root/bin/$SMVVARS
 </pre>
 <li>or if you are using modules, add:
 <pre>
 export MODULEPATH=\$FDS_root/bin/modules:\\\$MODULEPATH
 module load $FDSMODULE
-module load $SMVMODULE
 </pre>
 </ul>
 <h4>Wrapping Up the Installation</h4>
@@ -567,17 +533,15 @@ echo ""
 echo "-----------------------------------------------"
 echo "*** To complete the installation:"
 echo ""
-echo "1. Add the following lines to your startup file"
+echo "1. Add the following line to your startup file"
 echo "   (usually \$HOME/.bashrc)."
 echo ""
 echo "source \$FDS_root/bin/$FDSVARS "
-echo "source \$FDS_root/bin/$SMVVARS "
 echo ""
 echo "or if you are using modules, add:"
 echo ""
 echo "export MODULEPATH=\$FDS_root/bin/modules:\\\$MODULEPATH"
 echo "module load $FDSMODULE"
-echo "module load $SMVMODULE"
 echo ""
 echo "2. Log out and log back in so that the changes will take effect."
 exit 0
