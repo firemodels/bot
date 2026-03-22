@@ -91,10 +91,10 @@ Button(root, text="--> smv",  width=button_width, command=webCOPYsettings2smv).g
 Button(root, text="<-- smv",  width=button_width, command=webCOPYsmv2settings).grid(row=R, column=3)
 
 R=R+1
-Label(root, text="Script/notes:").grid(column=0, row=R)
-Button(root, text="Edit this script",    width=button_width, command=edit_this_page).grid(row=R, column=1)
-Button(root, text="Add notes",      width=button_width, command=add_notes).grid(row=R,      column=2)
-Button(root, text="View notes",     width=button_width, command=view_notes).grid(row=R,     column=3)
+Label(root, text="Notes:").grid(column=0, row=R)
+Button(root, text="Add",      width=button_width, command=add_notes).grid(row=R,      column=1)
+Button(root, text="View",     width=button_width, command=view_notes).grid(row=R,     column=2)
+Button(root, text="Edit this script",    width=button_width, command=edit_this_page).grid(row=R, column=3)
 
 # ------------------------- Show repo revisions ------------------------------
 
