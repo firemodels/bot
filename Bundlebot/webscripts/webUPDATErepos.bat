@@ -68,36 +68,36 @@ echo ---------------------- linux: %linux_hostname% ----------------------------
 echo repo: %linux_git_root%
 echo.
 echo *** fds ***
-plink %plink_options% %linux_logon% %scriptdir%/UPDATE_thishost.sh  %linux_git_root%/fds
+plink -no-antispoof %linux_logon% %scriptdir%/UPDATE_thishost.sh  %linux_git_root%/fds
 
 echo.
 echo *** smv ***
-plink %plink_options% %linux_logon% %scriptdir%/UPDATE_thishost.sh  %linux_git_root%/smv
+plink -no-antispoof %linux_logon% %scriptdir%/UPDATE_thishost.sh  %linux_git_root%/smv
 
 echo.
 echo *** bot ***
-plink %plink_options% %linux_logon% %scriptdir%/UPDATE_thishost.sh  %linux_git_root%/bot
+plink -no-antispoof %linux_logon% %scriptdir%/UPDATE_thishost.sh  %linux_git_root%/bot
 
 echo.
 echo *** webpages ***
-plink %plink_options% %linux_logon% %scriptdir%/UPDATE_webpages.sh  %linux_git_root%/webpages
+plink -no-antispoof %linux_logon% %scriptdir%/UPDATE_webpages.sh  %linux_git_root%/webpages
 
 echo.
 echo ---------------------- osx: %osx_hostname% ------------------------------
 echo repo: %linux_git_root%
 echo.
 echo *** fds ***
-plink %plink_options% %osx_logon% %scriptdir%/UPDATE_thishost.sh  %linux_git_root%/fds
+plink -no-antispoof %osx_logon% %scriptdir%/UPDATE_thishost.sh  %linux_git_root%/fds
 
 echo.
 echo *** smv ***
-plink %plink_options% %osx_logon% %scriptdir%/UPDATE_thishost.sh  %linux_git_root%/smv
+plink -no-antispoof %osx_logon% %scriptdir%/UPDATE_thishost.sh  %linux_git_root%/smv
 
 echo.
 echo *** bot ***
-plink %plink_options% %osx_logon% %scriptdir%/UPDATE_thishost.sh  %linux_git_root%/bot
+plink -no-antispoof %osx_logon% %scriptdir%/UPDATE_thishost.sh  %linux_git_root%/bot
 
 echo.
 echo *** webpages ***
-plink %plink_options% %osx_logon% %scriptdir%/UPDATE_webpages.sh  %linux_git_root%/webpages
+plink -no-antispoof %osx_logon% %scriptdir%/UPDATE_webpages.sh  %linux_git_root%/webpages
 pause

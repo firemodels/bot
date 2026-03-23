@@ -28,11 +28,11 @@ git checkout devel
 
 echo.
 echo Linux
-plink %plink_options% %linux_logon% %scriptdir%/setbranch_devel.sh  %linux_git_root%/smv
+plink -no-antispoof %linux_logon% %scriptdir%/setbranch_devel.sh  %linux_git_root%/smv
 
 echo.
 echo OSX
-plink %plink_options% %osx_logon% %scriptdir%/setbranch_devel.sh  %linux_git_root%/smv
+plink -no-antispoof %osx_logon% %scriptdir%/setbranch_devel.sh  %linux_git_root%/smv
 
 
 echo.

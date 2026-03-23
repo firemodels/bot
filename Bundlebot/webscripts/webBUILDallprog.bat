@@ -47,18 +47,18 @@ if NOT "%platform%" == "Windows" goto endif1
 
 if NOT "%platform%" == "Linux" goto endif2
   for %%x in ( %progs% ) do (
-    start "building linux %%x" plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/run_command.sh smv/Build/%%x/intel_linux make_%%x.sh
+    start "building linux %%x" plink -no-antispoof %linux_logon% %linux_git_root%/smv/scripts/run_command.sh smv/Build/%%x/intel_linux make_%%x.sh
   )
-  start "building linux %%x" plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Utilities/fds2ascii/intel_linux make_fds2ascii.sh
+  start "building linux %%x" plink -no-antispoof %linux_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Utilities/fds2ascii/intel_linux make_fds2ascii.sh
   pause
   goto eof
 :endif2
 
 if NOT "%platform%" == "OSX" goto endif3
   for %%x in ( %progs% ) do (
-    start "building osx %%x" plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/run_command.sh smv/Build/%%x/gnu_osx make_%%x.sh
+    start "building osx %%x" plink -no-antispoof %osx_logon% %linux_git_root%/smv/scripts/run_command.sh smv/Build/%%x/gnu_osx make_%%x.sh
   )
-  start "building osx fds2ascii" plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Utilities/fds2ascii/gnu_osx make_fds2ascii.sh
+  start "building osx fds2ascii" plink -no-antispoof %osx_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Utilities/fds2ascii/gnu_osx make_fds2ascii.sh
   pause
   goto eof
 :endif3

@@ -35,14 +35,14 @@ if "%linux_mpi_version%" == "INTEL" (
   set INTEL=i
 )
 if "%platform%" == "linux" (
-  plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Build/Scripts clean.sh %INTEL%mpi_intel_linux
-  plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Build/%INTEL%mpi_intel_linux make_fds.sh
+  plink -no-antispoof %linux_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Build/Scripts clean.sh %INTEL%mpi_intel_linux
+  plink -no-antispoof %linux_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Build/%INTEL%mpi_intel_linux make_fds.sh
   pause
   goto eof
 )
 if "%platform%" == "osx" (
-  plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Build/Scripts clean.sh mpi_intel_osx
-  plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Build/mpi_intel_osx make_fds.sh
+  plink -no-antispoof %osx_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Build/Scripts clean.sh mpi_intel_osx
+  plink -no-antispoof %osx_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Build/mpi_intel_osx make_fds.sh
   pause
   goto eof
 )

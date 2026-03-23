@@ -27,40 +27,40 @@ set scriptdir=%linux_git_root%/bot/Scripts/
 set linux_fdsdir=%linux_git_root%
 
 echo | set /p=Linux:   
-plink %plink_options% %linux_logon% %scriptdir%/showrevision.sh  %linux_git_root%/fds
+plink -no-antispoof %linux_logon% %scriptdir%/showrevision.sh  %linux_git_root%/fds
 
 echo | set /p=OSX:     
-plink %plink_options% %osx_logon% %scriptdir%/showrevision.sh  %linux_git_root%/fds
+plink -no-antispoof %osx_logon% %scriptdir%/showrevision.sh  %linux_git_root%/fds
 
 echo ---------------------------*** smv ***--------------------------------
 cd %git_root%\smv
 call :output_rev
 
 echo | set /p=Linux:   
-plink %plink_options% %linux_logon% %scriptdir%/showrevision.sh  %linux_git_root%/smv
+plink -no-antispoof %linux_logon% %scriptdir%/showrevision.sh  %linux_git_root%/smv
 
 echo | set /p=OSX:     
-plink %plink_options% %osx_logon% %scriptdir%/showrevision.sh  %linux_git_root%/smv
+plink -no-antispoof %osx_logon% %scriptdir%/showrevision.sh  %linux_git_root%/smv
 
 echo ---------------------------*** bot ***--------------------------------
 cd %git_root%\bot
 call :output_rev
 
 echo | set /p=Linux:   
-plink %plink_options% %linux_logon% %scriptdir%/showrevision.sh  %linux_git_root%/bot
+plink -no-antispoof %linux_logon% %scriptdir%/showrevision.sh  %linux_git_root%/bot
 
 echo | set /p=OSX:     
-plink %plink_options% %osx_logon% %scriptdir%/showrevision.sh  %linux_git_root%/bot
+plink -no-antispoof %osx_logon% %scriptdir%/showrevision.sh  %linux_git_root%/bot
 
 echo ---------------------------*** web ***--------------------------------
 cd %git_root%\webpages
 call :output_rev
 
 echo | set /p=Linux:   
-plink %plink_options% %linux_logon% %scriptdir%/showrevision.sh  %linux_git_root%/webpages
+plink -no-antispoof %linux_logon% %scriptdir%/showrevision.sh  %linux_git_root%/webpages
 
 echo | set /p=OSX:     
-plink %plink_options% %osx_logon% %scriptdir%/showrevision.sh  %linux_git_root%/webpages
+plink -no-antispoof %osx_logon% %scriptdir%/showrevision.sh  %linux_git_root%/webpages
 pause
 goto eof
 

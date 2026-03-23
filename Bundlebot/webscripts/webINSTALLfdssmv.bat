@@ -32,13 +32,13 @@ if "%platform%" == "windows" (
 if "%platform%" == "linux" (
 echo   Installing FDS and Smokeview on %platform%
 Title  Installing FDS and Smokeview on %platform%
-  plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/run_command2.sh .bundle/bundles %fds_version%_%smv_version%_lnx.sh y
+  plink -no-antispoof %linux_logon% %linux_git_root%/smv/scripts/run_command2.sh .bundle/bundles %fds_version%_%smv_version%_lnx.sh y
   goto eof
 )
 if "%platform%" == "osx" (
 echo   Installing FDS and Smokeview on %platform%
 Title  Installing FDS and Smokeview on %platform%
-  plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/run_command2.sh .bundle/bundles %fds_version%_%smv_version%_osx.sh y
+  plink -no-antispoof %osx_logon% %linux_git_root%/smv/scripts/run_command2.sh .bundle/bundles %fds_version%_%smv_version%_osx.sh y
   goto eof
 )
 

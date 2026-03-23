@@ -61,26 +61,26 @@ if "%platform%" == "Windows" (
 :: ----------- linux -----------------
 
 if "%platform%" == "Linux" (
-  plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/run_command.sh smv/Build/smokeview/intel_linux make_smokeview.sh %type%
+  plink -no-antispoof %linux_logon% %linux_git_root%/smv/scripts/run_command.sh smv/Build/smokeview/intel_linux make_smokeview.sh %type%
   goto eof
 )
 if "%platform%" == "Linuxgnu" (
-  plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/run_command.sh smv/Build/smokeview/gnu_linux make_smokeview.sh -p -T
+  plink -no-antispoof %linux_logon% %linux_git_root%/smv/scripts/run_command.sh smv/Build/smokeview/gnu_linux make_smokeview.sh -p -T
   goto eof
 )
 
 :: ----------- osx -----------------
 
 if "%platform%" == "osxquartz" (
-  plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/run_command.sh smv/Build/smokeview/intel_osx_q make_smokeview.sh %type%
+  plink -no-antispoof %osx_logon% %linux_git_root%/smv/scripts/run_command.sh smv/Build/smokeview/intel_osx_q make_smokeview.sh %type%
   goto eof
 )
 if "%platform%" == "OSXxxx" (
-  plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/run_command.sh smv/Build/smokeview/intel_osx make_smokeview.sh %type%
+  plink -no-antispoof %osx_logon% %linux_git_root%/smv/scripts/run_command.sh smv/Build/smokeview/intel_osx make_smokeview.sh %type%
   goto eof
 )
 if "%platform%" == "OSX" (
-  plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/run_command.sh smv/Build/smokeview/gnu_osx make_smokeview.sh %type%
+  plink -no-antispoof %osx_logon% %linux_git_root%/smv/scripts/run_command.sh smv/Build/smokeview/gnu_osx make_smokeview.sh %type%
   goto eof
 )
 
