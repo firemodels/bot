@@ -3,9 +3,6 @@
 set platform=%1
 set scan_bundle=%2
 
-:: build type is test or release
-set buildtype=%2
-
 set nopause=nopause
 
 :: setup environment variables (defining where repository resides etc) 
@@ -37,7 +34,7 @@ Title bundling %platform% smokeview
 
 if "%platform%" == "Windows" (
   cd %git_root%\bot\Bundlebot\release
-  call make_smv_bundle %version%
+  call make_smv_bundle %version% %scan_bundle%
   goto eof
 )
 
