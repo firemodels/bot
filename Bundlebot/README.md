@@ -7,7 +7,7 @@ The directory [bot/Bundlebot/release](https://github.com/firemodels/bot/tree/mas
 
 The steps for bulding bundles are: 
  
-  1. Modify configuration scripts,  `config.sh` and `config.bat`, that define tags and associated revisions for the release,
+  1. Modify tags and revisions in the configuration scripts,  `config.sh` and `config.bat`,
   2. Run the script `BuildFdsManuals.sh` to build FDS manuals (this runs firebot) and the script `BuildSmvManuals.sh` to build Smokeview manuals (this runs smokebot).
   3. Run the script `BuildRelease.sh` to build FDS/Smokeview bundles, and the script `BuildSmvRelease.sh` to build Smokeview bundles,
   4. Push up tags to the central repo and define a release.
@@ -16,7 +16,7 @@ These steps are given in more detail below.
 
 ### Configure The Bundle Scripts,
 
-   1. cd to bot/Scripts and run the script `./update_repos.sh -m` to update repos .  The option `-m` makes sure each repo is set to the master branch before updating.
+   1. cd to bot/Scripts and run the script `./update_repos.sh -m` to update the repos .  The option `-m` makes sure each repo is set to the master branch before updating.
    2. For each repo, checkout the desired revision if the latest revision is not the revision you want to use to make the bundle.
    3. cd to bot/Bundlebot/release and run the script `MakeConfig.sh` . This script updates the two configuration scripts `config.sh` and `config.bat` by using
       
@@ -33,7 +33,7 @@ The manuals are built using the firebot account.
    1. Type: `sudo su - firebot` on the computer that runs firebot (spark at Nist) to switch to the firebot user account.
    2. cd to `FireModels_bundle/bot/Bundlebot/release`
    3. Update the bot repo to ensure that the build manuals scripts use the correct `config.sh` script.
-   4. To build the FDS manuals, type: `./BuildFdsManuals.sh -o owner -m email@address` .  After this step completes, about 4 hours, continue to the next step
+   4. To build the FDS manuals, type: `./BuildFdsManuals.sh -o owner -m email@address` .  After this step completes, about 2 hours, continue to the next step
    5. To build Smokeview manuals, type: `./BuildSmvManuals.sh -o owner -m email@address` . After this step completes, about 20 minutes, start building the bundles.
 
 Note `owner` in `-o owner` is the github owner where the manuals will be placed (-o gforney for now) and `m email@address` is the email address where results will be sent.
@@ -69,10 +69,8 @@ Linux (spark at NIST) and Macintosh (excess at NIST) bundles are built using the
 
 ### Notes
       
-2. The scripts for building FDS and Smokeview manuals and building the bundle use environment variables to define repo revisions and tags.  These variables are defined in the scripts `config.sh` (on Linux and Macintosh computers) and `config.bat` (on Windows computers).
-3. Bundle scripts erase and clone fresh copies of the fds and smv repos. These scripts should not be run in repos where daily work is performed.   At NIST, Linux Manuals are built in the firebot user account in the directory Firemodels_bundle/bot/Bundlebot/build directory on the host blaze.
-4. The `BuildRelease.sh` and `BuildRelease.bat` scripts upload the test bundles to https://github.com/firemodels/test_bundles/releases/tag/BUNDLE_TEST
-5. The scripts `GetBundles.sh` (Linux and Mac) and `GetBundles.bat` (Windows PC) download the bundles to the bundles directory where they can then used to create an official release at https://github.com/firemodels/fds/releases.
-6. Tags are only created in the local fds and smv repos, they are not pushed up to GitHub. Tags then do not need to be deleted if errors are discovered that require more commits. Once the bundles are published, these tags may be pushed up to github.
-
-
+1. The scripts for building FDS and Smokeview manuals and building the bundle use environment variables to define repo revisions and tags.  These variables are defined in the scripts `config.sh` (on Linux and Macintosh computers) and `config.bat` (on Windows computers).
+2. Bundle scripts erase and clone fresh copies of the fds and smv repos. These scripts should not be run in repos where daily work is performed.   At NIST, Linux Manuals are built in the firebot user account in the directory Firemodels_bundle/bot/Bundlebot/build directory on the host blaze.
+3. The `BuildRelease.sh` and `BuildRelease.bat` scripts upload the test bundles to https://github.com/firemodels/test_bundles/releases/tag/BUNDLE_TEST
+4. The scripts `GetBundles.sh` (Linux and Mac) and `GetBundles.bat` (Windows PC) download the bundles to the bundles directory where they can then used to create an official release at https://github.com/firemodels/fds/releases.
+5. Tags are only created in the local fds and smv repos, they are not pushed up to GitHub. Tags then do not need to be deleted if errors are discovered that require more commits. Once the bundles are published, these tags may be pushed up to github.
