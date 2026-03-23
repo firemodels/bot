@@ -88,9 +88,9 @@ Label(root, text="---------------------------------SETUP------------------------
 
 R=R+1
 Label(root, text="Settings:").grid(column=0, row=R)
-Button(root, text="Edit",    width=button_width, command=edit_settings).grid(row=R, column=1)
-Button(root, text="--> smv",  width=button_width, command=webCOPYsettings2smv).grid(row=R, column=2)
-Button(root, text="<-- smv",  width=button_width, command=webCOPYsmv2settings).grid(row=R, column=3)
+Button(root, text="--> smv",  width=button_width, command=webCOPYsettings2smv).grid(row=R, column=1)
+Button(root, text="<-- smv",  width=button_width, command=webCOPYsmv2settings).grid(row=R, column=2)
+Button(root, text="Edit settings",    width=button_width, command=edit_settings).grid(row=R, column=3)
 
 R=R+1
 Label(root, text="Notes:").grid(column=0, row=R)
