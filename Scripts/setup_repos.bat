@@ -104,6 +104,7 @@ echo.
   if "%erase_repos%" == "1" (
     if exist %repo_dir% echo deleting %repo_dir%
     if exist %repo_dir% rmdir /S /Q %repo_dir%
+    if exist %repor_dir% echo ***error: %repo_dir% was not deleted
   )
   
 :: check if repo has been cloned locally
