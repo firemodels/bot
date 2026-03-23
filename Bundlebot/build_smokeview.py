@@ -4,6 +4,8 @@ from functools import partial
 from tkinter import *
 import os
 
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
 if platform != "win32":
   print("***warning: the widgets in this script only run on Windows computers")
 #  sys.exit()
