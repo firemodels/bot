@@ -132,7 +132,7 @@ cfastbot_pid=~/.cfastgit/cfastbot_pid
 CURDIR=`pwd`
 
 # checking to see if a queing system is available
-QUEUE=smokebot
+QUEUE=firebot
 notfound=`qstat -a 2>&1 | tail -1 | grep "not found" | wc -l`
 if [ $notfound -eq 1 ]; then
   QUEUE=none
