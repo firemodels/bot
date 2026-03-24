@@ -59,8 +59,18 @@ if [ "$MAILTO" != "" ]; then
 else
   echo "-m mailto - email address"
 fi
-echo "-o - specify GH_OWNER when building a bundle. [default: $GH_OWNER]"
-echo "-r - specify GH_REPO when building a bundle. [default: $GH_REPO]"
+if [ "$GH_OWNER" == "" ]; then
+  GH_OWNER_LABEL=""
+else
+  GH_OWNER_LABEL="[default: $GH_OWNER]"
+fi
+if [ "$GH_REPO" == "" ]; then
+  GH_REPO_LABEL=""
+else
+  GH_REPO_LABEL="[default: $GH_REPO]"
+fi
+echo "-o - specify GH_OWNER when building a bundle. $GH_OWNER_LABEL"
+echo "-r - specify GH_REPO when building a bundle. $GH_REPO_LABEL"
 echo "-R - clone repos naming the branch release (without -R branches"
 echo "     are named nightly)"
 echo "-u - upload bundle to github.com/`whoami`/test_bundles/releases/tag/FDS_TEST"
@@ -163,7 +173,7 @@ fi
 
 cd $GITROOT/bot
 BOTBRANCH=`git branch --show-current`
-BOTREVISION=`git describe`
+BOTREVISION=`git describe --dirty --long`
 
 if [ -d $GITROOT/fds ]; then
   cd $GITROOT/fds
@@ -172,7 +182,7 @@ else
   exit
 fi
 FDSBRANCH=`git branch --show-current`
-FDSREVISION=`git describe`
+FDSREVISION=`git describe --dirty --long`
 
 if [ -d $GITROOT/smv ]; then
   cd $GITROOT/smv
@@ -181,7 +191,7 @@ else
   exit
 fi
 SMVBRANCH=`git branch --show-current`
-SMVREVISION=`git describe`
+SMVREVISION=`git describe --dirty --long`
 
 #*** define output directory
 
