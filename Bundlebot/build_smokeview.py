@@ -54,6 +54,7 @@ def set_revision():        os.system("start " + webscript_dir + "webSET_bundle_r
 def build_lib():           os.system("start " + webscript_dir + "webBUILDlibs "     + platforms[platform.get()])
 def build_util():          os.system("start " + webscript_dir + "webBUILDallprog "  + platforms[platform.get()])
 def build_smv():           os.system("start " + webscript_dir + "webBUILDsmv  "     + platforms[platform.get()]  )
+def build_smv_inc():       os.system("start " + webscript_dir + "webBUILDsmv  "     + platforms[platform.get()] + " testinc" )
 
 def bundle_smv():          os.system("start " + webscript_dir + "webPACKAGEsmv "    + platforms[platform.get()] + " " + str(scan_bundle.get()) )
 def install_smv():         os.system("start " + webscript_dir + "webINSTALLsmv "    + platforms[platform.get()]                  )
@@ -127,10 +128,10 @@ Radiobutton(root, text="OSX",     padx = 0, variable=platform, value=3).grid(row
 Checkbutton(root, text="Scan bundle", variable=scan_bundle, onvalue=1, offvalue=0).grid(row=R, column=3)
 
 R=R+1
-Label(root, text="Build:").grid(column=0, row=R)
-Button(root, text="Libs",              width=button_width, command=build_lib).grid(row=R,  column=1)
-Button(root, text="Utils",             width=button_width, command=build_util).grid(row=R, column=2)
-Button(root, text="smv",               width=button_width, command=build_smv).grid(row=R,  column=3)
+Button(root, text="Libs",              width=button_width, command=build_lib).grid(row=R,  column=0)
+Button(root, text="Utils",             width=button_width, command=build_util).grid(row=R, column=1)
+Button(root, text="smv(full)",         width=button_width, command=build_smv).grid(row=R,  column=2)
+Button(root, text="smv(inc)",          width=button_width, command=build_smv_inc).grid(row=R,  column=3)
 
 # ------------------------- bundle/install ------------------------------
 
