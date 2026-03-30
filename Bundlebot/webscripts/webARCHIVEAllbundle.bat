@@ -28,8 +28,8 @@ Title  Archiving Smokeview for Linux and OSX
 
 %git_drive%
 
-plink %plink_options% %linux_logon% %linux_git_root%/bot/Bundlebot/smv/scripts/archive_bundle.sh %version%_lnx
-plink %plink_options% %osx_logon% %linux_git_root%/bot/Bundlebot/smv/scripts/archive_bundle.sh %version%_osx
+plink -no-antispoof %linux_logon% %linux_git_root%/bot/Bundlebot/smv/scripts/archive_bundle.sh %version%_lnx
+plink -no-antispoof %osx_logon% %linux_git_root%/bot/Bundlebot/smv/scripts/archive_bundle.sh %version%_osx
 
 :eof
 echo.

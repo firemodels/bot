@@ -35,11 +35,11 @@ set linux_fdsdir=%linux_git_root%
 
 echo.
 echo Linux
-plink %plink_options% %linux_logon% %scriptdir%/set_releasetag.sh  %linux_git_root%/fds %fds_tag%
+plink -no-antispoof %linux_logon% %scriptdir%/set_releasetag.sh  %linux_git_root%/fds %fds_tag%
 echo.
 
 echo OSX
-plink %plink_options% %osx_logon% %scriptdir%/set_releasetag.sh  %linux_git_root%/fds %fds_tag%
+plink -no-antispoof %osx_logon% %scriptdir%/set_releasetag.sh  %linux_git_root%/fds %fds_tag%
 
 
 echo.
@@ -56,11 +56,11 @@ git checkout %smv_tag% -b release
 
 echo.
 echo Linux
-plink %plink_options% %linux_logon% %scriptdir%/set_releasetag.sh  %linux_git_root%/smv %smv_tag%
+plink -no-antispoof %linux_logon% %scriptdir%/set_releasetag.sh  %linux_git_root%/smv %smv_tag%
 
 echo.
 echo OSX
-plink %plink_options% %osx_logon% %scriptdir%/set_releasetag.sh  %linux_git_root%/smv %smv_tag%
+plink -no-antispoof %osx_logon% %scriptdir%/set_releasetag.sh  %linux_git_root%/smv %smv_tag%
 
 echo.
 pause

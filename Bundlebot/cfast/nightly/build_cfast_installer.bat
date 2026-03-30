@@ -78,7 +78,7 @@ if exist %outbase%.exe erase %outbase%.exe
 wzipse32 %outbase%.zip -runasadmin -setup -auto -i %bundlenewinfo%\icon.ico -t %bundlenewinfo%\unpack.txt -a %bundleinfo%\about.txt -st"CFAST %cfast_version% Setup" -o -c cmd /k firemodels\setup.bat
 
 
-set uploaddir=%userprofile%\.bundle\uploads
+set uploaddir=%userprofile%\.bundle\bundles
 if not exist %userprofile%\.bundle         mkdir %userprofile%\.bundle
 if not exist %uploaddir% mkdir %uploaddir%
 echo ***Copying %outbase%.exe to %uploaddir%

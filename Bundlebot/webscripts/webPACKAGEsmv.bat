@@ -3,9 +3,6 @@
 set platform=%1
 set scan_bundle=%2
 
-:: build type is test or release
-set buildtype=%2
-
 set nopause=nopause
 
 :: setup environment variables (defining where repository resides etc) 
@@ -37,7 +34,7 @@ Title bundling %platform% smokeview
 
 if "%platform%" == "Windows" (
   cd %git_root%\bot\Bundlebot\release
-  call make_smv_bundle %version%
+  call make_smv_bundle %version% %scan_bundle%
   goto eof
 )
 
@@ -54,14 +51,14 @@ if NOT exist %bundlesdir% mkdir %bundlesdir%
 :: linux
 
 if "%platform%" == "Linux" (
-  plink %plink_options% %linux_logon% %scriptdir%/assemble_smvbundle.sh %version% %linux_git_root% linux %scan_bundle%
+  plink -no-antispoof %linux_logon% %scriptdir%/assemble_smvbundle.sh %version% %linux_git_root% lnx %scan_bundle%
   goto eof
 )
 
 :: osx
 
 if "%platform%" == "OSX" (
-  plink %plink_options% %osx_logon% %scriptdir%/assemble_smvbundle.sh  %version% %linux_git_root% osx %scan_bundle%
+  plink -no-antispoof %osx_logon% %scriptdir%/assemble_smvbundle.sh  %version% %linux_git_root% osx %scan_bundle%
   goto eof
 )
 

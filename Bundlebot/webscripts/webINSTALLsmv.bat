@@ -41,13 +41,13 @@ if "%platform%" == "Windows" (
   goto eof
 )
 if "%platform%" == "Linux" (
-    plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/run_command2.sh $HOME/.bundle/bundles %smv_revision%_lnx.sh y
+    plink -no-antispoof %linux_logon% %linux_git_root%/smv/scripts/run_command2.sh $HOME/.bundle/bundles %smv_revision%_lnx.sh y
   if "x%nopause%" == "xnopause" goto eof
   pause > Nul
   goto eof
 )
 if "%platform%" == "OSX" (
-    plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/run_command2.sh $HOME/.bundle/bundles %smv_revision%_osx.sh y
+    plink -no-antispoof %osx_logon% %linux_git_root%/smv/scripts/run_command2.sh $HOME/.bundle/bundles %smv_revision%_osx.sh y
   if "x%nopause%" == "xnopause" goto eof
   pause > Nul
   goto eof

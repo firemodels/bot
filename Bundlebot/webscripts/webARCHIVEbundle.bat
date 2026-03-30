@@ -45,11 +45,11 @@ if "%platform%" == "windows" (
   goto eof
 )
 if "%platform%" == "linux" (
-  plink %plink_options% %linux_logon% %linux_git_root%/bot/Bundlebot/smv/scripts/archive_bundle.sh %version%_lnx
+  plink -no-antispoof %linux_logon% %linux_git_root%/bot/Bundlebot/smv/scripts/archive_bundle.sh %version%_lnx
   goto eof
 )
 if "%platform%" == "osx" (
-  plink %plink_options% %osx_logon% %linux_git_root%/bot/Bundlebot/smv/scripts/archive_bundle.sh %version%_osx
+  plink -no-antispoof %osx_logon% %linux_git_root%/bot/Bundlebot/smv/scripts/archive_bundle.sh %version%_osx
   goto eof
 )
 

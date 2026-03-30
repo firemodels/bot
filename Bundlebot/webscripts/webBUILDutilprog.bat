@@ -32,12 +32,12 @@ if "%platform%" == "windows" (
   goto eof
 )
 if "%platform%" == "linux" (
-  plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Utilities/%prog%/intel_linux make_%prog%.sh
+  plink -no-antispoof %linux_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Utilities/%prog%/intel_linux make_%prog%.sh
   pause
   goto eof
 )
 if "%platform%" == "osx" (
-  plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Utilities/%prog%/intel_osx make_%prog%.sh
+  plink -no-antispoof %osx_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Utilities/%prog%/intel_osx make_%prog%.sh
   pause
   goto eof
 )

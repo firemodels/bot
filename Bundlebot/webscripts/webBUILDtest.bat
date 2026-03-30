@@ -31,14 +31,14 @@ if "%platform%" == "windows" (
   goto eof
 )
 if "%platform%" == "linux" (
-  plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/clean.sh fds/Utilities/test_mpi/impi_intel_linux
-  plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Utilities/test_mpi/impi_intel_linux make_test_mpi.sh
+  plink -no-antispoof %linux_logon% %linux_git_root%/smv/scripts/clean.sh fds/Utilities/test_mpi/impi_intel_linux
+  plink -no-antispoof %linux_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Utilities/test_mpi/impi_intel_linux make_test_mpi.sh
   pause
   goto eof
 )
 if "%platform%" == "osx" (
-  plink %plink_options% %linux_logon% %linux_git_root%/smv/scripts/clean.sh fds/Utilities/test_mpi/mpi_intel_osx
-  plink %plink_options% %osx_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Utilities/test_mpi/mpi_intel_osx make_test_mpi.sh
+  plink -no-antispoof %linux_logon% %linux_git_root%/smv/scripts/clean.sh fds/Utilities/test_mpi/mpi_intel_osx
+  plink -no-antispoof %osx_logon% %linux_git_root%/smv/scripts/run_command.sh fds/Utilities/test_mpi/mpi_intel_osx make_test_mpi.sh
   pause
   goto eof
 )

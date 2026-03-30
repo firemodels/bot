@@ -93,7 +93,6 @@ run_auto()
    CFAST_SOURCE=$cfastrepo/Source/CFAST
    git_CFASTSOURCELOG=$GITSTATUS_DIR/cfast_source_log
    MESSAGE_FILE=$GITSTATUS_DIR/message
-   partial=
    
    TRIGGER=$cfastrepo/Source/CFAST
    git_TRIGGER=$GITSTATUS_DIR/cfast_source_revision
@@ -125,10 +124,6 @@ run_auto()
    fi
 
    is_changed $TRIGGERONLY $git_TRIGGERONLY
-   if [ "$IS_CHANGED" == "1" ]; then
-      SKIP=1
-      partial=1
-   fi
 
    rm -f $MESSAGE_FILE
 
@@ -136,11 +131,7 @@ run_auto()
    cat $git_CFASTSOURCELOG >> $MESSAGE_FILE
 
    echo -e "CFASTbot run initiated." >> $MESSAGE_FILE
-   if [ "$partial" == "" ]; then
-     cat $MESSAGE_FILE | mail $REPLYTO -s "CFASTbot run initiated" $mailTo &> /dev/null
-   else
-     cat $MESSAGE_FILE | mail $REPLYTO -s "CFASTbot run initiated (skip matlab/doc stages)" $mailTo &> /dev/null
-   fi
+   cat $MESSAGE_FILE | mail $REPLYTO -s "CFASTbot run initiated" $mailTo &> /dev/null
 }
 
 #---------------------------------------------

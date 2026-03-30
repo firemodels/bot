@@ -30,11 +30,11 @@ set linux_fdsdir=%linux_git_root%
 
 echo.
 echo Linux: %linux_hostname%
-plink %plink_options% %linux_logon% %scriptdir%/showbranch.sh  %linux_git_root%/fds
+plink -no-antispoof %linux_logon% %scriptdir%/showbranch.sh  %linux_git_root%/fds
 echo.
 
 echo OSX: %osx_hostname%
-plink %plink_options% %osx_logon% %scriptdir%/showbranch.sh  %linux_git_root%/fds
+plink -no-antispoof %osx_logon% %scriptdir%/showbranch.sh  %linux_git_root%/fds
 
 
 echo.
@@ -45,11 +45,11 @@ git branch
 
 echo.
 echo Linux: %linux_hostname%
-plink %plink_options% %linux_logon% %scriptdir%/showbranch.sh  %linux_git_root%/smv
+plink -no-antispoof %linux_logon% %scriptdir%/showbranch.sh  %linux_git_root%/smv
 
 echo.
 echo OSX: %osx_hostname%
-plink %plink_options% %osx_logon% %scriptdir%/showbranch.sh  %linux_git_root%/smv
+plink -no-antispoof %osx_logon% %scriptdir%/showbranch.sh  %linux_git_root%/smv
 
 echo.
 echo ---------------------------*** bot ***--------------------------------
@@ -59,11 +59,11 @@ git branch
 
 echo.
 echo Linux: %linux_hostname%
-plink %plink_options% %linux_logon% %scriptdir%/showbranch.sh  %linux_git_root%/bot
+plink -no-antispoof %linux_logon% %scriptdir%/showbranch.sh  %linux_git_root%/bot
 
 echo.
 echo OSX: %osx_hostname%
-plink %plink_options% %osx_logon% %scriptdir%/showbranch.sh  %linux_git_root%/bot
+plink -no-antispoof %osx_logon% %scriptdir%/showbranch.sh  %linux_git_root%/bot
 
 echo.
 pause

@@ -2,7 +2,7 @@
 setlocal
 :: release info
 set versionbase=%1
-set scan_bundle%2
+set scan_bundle=%2
 set zipbase=%versionbase%_win
 set SMVEDITION=SMV6
 
@@ -32,7 +32,9 @@ set bundles=%CD%
 echo.
 echo --- filling distribution directory ---
 echo.
-IF EXIST %smvdir% rmdir /S /Q %smvdir%
+if exist %smvdir% rmdir /S /Q %smvdir%
+if exist %smvdir% echo ***error: %smvdir% was not deleted
+
 mkdir %smvdir%
 
 CALL :COPY  %reporoot%\smv\Build\set_path\intel_win\set_path_win.exe   %smvdir%\set_path.exe

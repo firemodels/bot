@@ -91,6 +91,7 @@ set fds_forbundle=%GITROOT%\fds\Build\for_bundle
 :: erase the temporary bundle directory if it already exists
 
 if exist %basedir% rmdir /s /q %basedir%
+if exist %basedir% echo ***error: %basedir% was not deleted
 
 mkdir %basedir%
 mkdir %out_bundle%
