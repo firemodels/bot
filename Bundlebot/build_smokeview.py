@@ -51,10 +51,13 @@ def update_smv_all():      os.system("start " + webscript_dir + "webUPDATESMVrep
 
 def set_revision():        os.system("start " + webscript_dir + "webSET_bundle_revision")
 
-def build_lib():           os.system("start " + webscript_dir + "webBUILDlibs "     + platforms[platform.get()])
-def build_util():          os.system("start " + webscript_dir + "webBUILDallprog "  + platforms[platform.get()])
-def build_smv():           os.system("start " + webscript_dir + "webBUILDsmv  "     + platforms[platform.get()]  )
-def build_smv_inc():       os.system("start " + webscript_dir + "webBUILDsmv  "     + platforms[platform.get()] + " testinc" )
+def build_lib():           os.system("start " + webscript_dir + "webBUILDlibs "         + platforms[platform.get()])
+def build_util():          os.system("start " + webscript_dir + "webBUILDallprog "      + platforms[platform.get()])
+def build_smv():           os.system("start " + webscript_dir + "webBUILDsmv  "         + platforms[platform.get()]  )
+def build_smv_inc():       os.system("start " + webscript_dir + "webBUILDsmv  "         + platforms[platform.get()] + " testinc" )
+
+def fullbld_bundle_inst(): os.system("start " + webscript_dir + "webBUILDsmvbundleinst " + platforms[platform.get()] + " test    "  + str(scan_bundle.get()))
+def incbld_bundle_inst():  os.system("start " + webscript_dir + "webBUILDsmvbundleinst " + platforms[platform.get()] + " testinc "  + str(scan_bundle.get()))
 
 def bundle_smv():          os.system("start " + webscript_dir + "webPACKAGEsmv "    + platforms[platform.get()] + " " + str(scan_bundle.get()) )
 def install_smv():         os.system("start " + webscript_dir + "webINSTALLsmv "    + platforms[platform.get()]                  )
@@ -138,8 +141,12 @@ Button(root, text="smv(inc)",          width=button_width, command=build_smv_inc
 R=R+1
 Button(root, text="Revision",width=button_width, command=set_revision).grid(row=R,  column=0)
 Button(root, text="Bundle",  width=button_width, command=bundle_smv).grid(row=R,    column=1)
-Button(root, text="Upload",  width=button_width, command=upload_bundle).grid(row=R, column=2)
-Button(root, text="Install", width=button_width, command=install_smv).grid(row=R,   column=3)
+Button(root, text="Install", width=button_width, command=install_smv).grid(row=R,   column=2)
+Button(root, text="Upload",  width=button_width, command=upload_bundle).grid(row=R, column=3)
+
+R=R+1
+Button(root, text="Incremental Build/Bundle/Install",  width=2*button_width, command=incbld_bundle_inst).grid(row=R,  column=0, columnspan=2)
+Button(root, text="Full Build/Bundle/Install",  width=2*button_width, command=fullbld_bundle_inst).grid(row=R,  column=2, columnspan=2)
 
 # ------------------------- guides ------------------------------
 

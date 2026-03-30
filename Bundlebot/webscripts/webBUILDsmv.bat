@@ -1,6 +1,7 @@
 @echo off
 set platform=%1
 set buildtype=%2
+set pausearg=%3
 set inc=
 
 :: batch file to build test or release smokeview on Windows, Linux or OSX platforms
@@ -87,4 +88,5 @@ if "%platform%" == "OSX" (
 :eof
 echo.
 echo compilation complete
-pause
+if "x%pausearg%" == "x" pause
+
