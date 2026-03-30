@@ -145,8 +145,8 @@ Button(root, text="Install", width=button_width, command=install_smv).grid(row=R
 Button(root, text="Upload",  width=button_width, command=upload_bundle).grid(row=R, column=3)
 
 R=R+1
-Button(root, text="Incremental Build/Bundle/Install",  width=2*button_width, command=incbld_bundle_inst).grid(row=R,  column=0, columnspan=2)
-Button(root, text="Full Build/Bundle/Install",  width=2*button_width, command=fullbld_bundle_inst).grid(row=R,  column=2, columnspan=2)
+Button(root, text="Incremental Build/Bundle/Install",  width=2*button_width+2, command=incbld_bundle_inst).grid(row=R,  column=0, columnspan=2)
+Button(root, text="Full Build/Bundle/Install",         width=2*button_width+2, command=fullbld_bundle_inst).grid(row=R,  column=2, columnspan=2)
 
 # ------------------------- guides ------------------------------
 
