@@ -35,7 +35,7 @@ app.set(2)
 guide=IntVar()
 guide.set(1)
 
-scan_bundle = IntVar(value=1) 
+scan_bundle = IntVar(value=0) 
 
 button_width=13
 
