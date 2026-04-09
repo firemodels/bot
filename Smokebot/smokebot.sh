@@ -483,13 +483,11 @@ run_verification_cases_debug()
 
    # Submit SMV verification cases and wait for them to start
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3_run_debug 2>&1
-   RUNOPT=-Y
-   RUNOPT="$RUNOPT"
    COMPOPT=
    if [ "$COMPILER" == "gnu" ]; then
      COMPOPT=-C
    fi
-   ./Run_SMV_Cases.sh $INTEL2 $RUNOPT $COMPOPT -c $cfastrepo $USEINSTALL2 -j $JOBPREFIXD -m 2 -d -q $QUEUE >> $OUTPUT_DIR/stage3_run_debug 2>&1 
+   ./Run_SMV_Cases.sh $INTEL2 $COMPOPT -c $cfastrepo $USEINSTALL2 -j $JOBPREFIXD -m 2 -d -q $QUEUE >> $OUTPUT_DIR/stage3_run_debug 2>&1 
 }
 
 #---------------------------------------------
@@ -664,13 +662,11 @@ run_verification_cases_release()
    # Start running all SMV verification cases
    cd $smvrepo/Verification/scripts
    echo 'Running SMV verification cases:' >> $OUTPUT_DIR/stage3_run_release 2>&1
-   RUNOPT=-Y
-   RUNOPT="$RUNOPT"
    COMPOPT=
    if [ "$COMPILER" == "gnu" ]; then
      COMPOPT=-C
    fi
-   ./Run_SMV_Cases.sh $INTEL2 $RUNOPT $COMPOPT -c $cfastrepo -j $JOBPREFIXR $USEINSTALL2 -q $QUEUE >> $OUTPUT_DIR/stage3_run_release 2>&1
+   ./Run_SMV_Cases.sh $INTEL2 $COMPOPT -c $cfastrepo -j $JOBPREFIXR $USEINSTALL2 -q $QUEUE >> $OUTPUT_DIR/stage3_run_release 2>&1
    ./Run_RESTART_Cases.sh -q $QUEUE                                                                >> $OUTPUT_DIR/stage3_run_release 2>&1
 }
 
@@ -726,12 +722,11 @@ make_smv_pictures()
    echo Generating
    echo "   images"
    cd $smvrepo/Verification/scripts
-   RUNOPT=-Y
    COMPOPT=
    if [ "$COMPILER" == "gnu" ]; then
      COMPOPT=-C
    fi
-   ./Make_SMV_Pictures.sh $CPUS_PER_TASK $RUNOPT $COMPOPT -q $SQUEUE -j SMV_ $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4_make_picts
+   ./Make_SMV_Pictures.sh $CPUS_PER_TASK $COMPOPT -q $SQUEUE -j SMV_ $USEINSTALL 2>&1 &> $OUTPUT_DIR/stage4_make_picts
    grep -v FreeFontPath $OUTPUT_DIR/stage4_make_picts | grep -v libpng &> $OUTPUT_DIR/stage4_check_picts
 }
 
