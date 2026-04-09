@@ -175,6 +175,18 @@ set_files_world_readable()
 }
 
 #---------------------------------------------
+#                   run_python_setup
+#---------------------------------------------
+
+run_python_setup()
+{
+   echo Python
+   echo "   setup environment"
+   cd $botrepo/Firebot/
+   source ./setup_python.sh > $OUTPUT_DIR/stage5_python_setup 2>&1
+}
+
+#---------------------------------------------
 #                   clean_cfastbot_history
 #---------------------------------------------
 
@@ -881,53 +893,6 @@ check_cfast_pictures()
 }
 
 #---------------------------------------------
-#                   run_matlab_license_test
-#---------------------------------------------
-
-run_matlab_license_test()
-{
-   echo "V&V"
-   echo "   matlab license test"
-   # Run simple test to see if Matlab license is available
-   CD_REPO $cfastrepo/Utilities/Matlab $CFASTBRANCH || return 1
-   matlab -logfile licmat.log -nodesktop -noFigureWindows -r "try, disp('Running Matlab License Check'), catch, disp('License Error'), err = lasterror, err.message, err.stack, end, exit" &> $OUTPUT_DIR/stage5_matlab_license
-
-   return 0
-}
-
-#---------------------------------------------
-#                   scan_matlab_license_test
-#---------------------------------------------
-
-scan_matlab_license_test()
-{
-   # Check for failed license
-   if [[ `grep "License checkout failed" $OUTPUT_DIR/stage5_matlab_license` == "" ]]
-   then
-      # Continue along
-      :
-   else
-      TIME_LIMIT_STAGE="5 get matlab license"
-      check_time_limit
-      # Wait 5 minutes until retry
-      sleep 300
-      check_matlab_license_server || return 1
-   fi
-   return 0
-}
-
-#---------------------------------------------
-#                   check_matlab_license_server
-#---------------------------------------------
-
-check_matlab_license_server()
-{
-   run_matlab_license_test || return 1
-   scan_matlab_license_test || return 1
-   return 0
-}
-
-#---------------------------------------------
 #                   compile_vvcalc
 #---------------------------------------------
 
@@ -972,46 +937,46 @@ check_compile_vvcalc()
 }
 
 #---------------------------------------------
-#                   run_matlab_verification
+#                   run_python_verification
 #---------------------------------------------
 
-run_matlab_verification()
+run_python_verification()
 {
    echo "   Verification"
    echo "      make plots"
-   # Run Matlab plotting script
-   CD_REPO $cfastrepo/Utilities/Matlab $CFASTBRANCH || return 1
+   # Run Python plotting script
+   CD_REPO $cfastrepo/Utilities/Python $CFASTBRANCH || return 1
 
-   matlab -logfile vermat.log -nodesktop -noFigureWindows -r "try, disp('Running Matlab Verification script'), CFAST_verification_script, catch, disp('Error'), err = lasterror, err.message, err.stack, end, exit" &> $OUTPUT_DIR/stage5_run_matlab_verification
+   python CFAST_verification_script.py &> $OUTPUT_DIR/stage5_run_python_verification
    return 0
 }
 
 #---------------------------------------------
-#                   check_matlab_verification
+#                   check_python_verification
 #---------------------------------------------
 
-check_matlab_verification()
+check_python_verification()
 {
-   # Scan and report any errors in Matlab scripts
+   # Scan and report any errors in Python scripts
    cd $cfastbotdir
 
-   if [[ `grep -A 50 "Error" $OUTPUT_DIR/stage5_run_matlab_verification` == "" ]]
+   if [[ `grep -A 50 "Error" $OUTPUT_DIR/stage5_run_python_verification` == "" ]]
    then
-      stage5_run_matlab_verification_success=true
+      stage5_run_python_verification_success=true
    else
-      grep -A 50 "Error" $OUTPUT_DIR/stage5_run_matlab_verification >> $OUTPUT_DIR/stage5_run_matlab_verification_errors
+      grep -A 50 "Error" $OUTPUT_DIR/stage5_run_python_verification >> $OUTPUT_DIR/stage5_run_python_verification_errors
 
-      echo "Warnings from Stage 5 - Matlab plotting (verification):" >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage5_run_matlab_verification_errors | tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
+      echo "Warnings from Stage 5 - Python plotting (verification):" >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage5_run_python_verification_errors | tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
       echo "" >> $ERROR_LOG
    fi
 }
 
 #---------------------------------------------
-#                   run_matlab_validation
+#                   run_python_validation
 #---------------------------------------------
 
-run_matlab_validation()
+run_python_validation()
 {
    
    echo "   Validation"
@@ -1025,28 +990,28 @@ run_matlab_validation()
    cp flux_profiles.csv Fleury_Heat_Flux/.
    
    echo "      make plots"
-   # Run Matlab plotting script
-   cd $cfastrepo/Utilities/Matlab
-   matlab -logfile valmat.log -nodesktop -noFigureWindows -r "try, disp('Running Matlab Validation script'), CFAST_validation_script, catch, disp('Error'), err = lasterror, err.message, err.stack, end, exit" &> $OUTPUT_DIR/stage5_run_matlab_validation
+   # Run Python plotting script
+   cd $cfastrepo/Utilities/Python
+   python CFAST_validation_script.py &> $OUTPUT_DIR/stage5_run_python_validation
    return 0
 }
 
 #---------------------------------------------
-#                   check_matlab_validation
+#                   check_python_validation
 #---------------------------------------------
 
-check_matlab_validation()
+check_python_validation()
 {
-   # Scan and report any errors in Matlab scripts
+   # Scan and report any errors in Python scripts
    cd $cfastbotdir
-   if [[ `grep -A 50 "Error" $OUTPUT_DIR/stage5_run_matlab_validation` == "" ]]
+   if [[ `grep -A 50 "Error" $OUTPUT_DIR/stage5_run_python_validation` == "" ]]
    then
-      stage5_run_matlab_validation_success=true
+      stage5_run_python_validation_success=true
    else
-      grep -A 50 "Error" $OUTPUT_DIR/stage5_run_matlab_validation >> $OUTPUT_DIR/stage5_run_matlab_validation_errors
+      grep -A 50 "Error" $OUTPUT_DIR/stage5_run_python_validation >> $OUTPUT_DIR/stage5_run_python_validation_errors
 
-      echo "Errors from Stage 5 - Matlab plotting and statistics (validation):" >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage5_run_matlab_validation_errors |  tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
+      echo "Errors from Stage 5 - Python plotting and statistics (validation):" >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage5_run_python_validation_errors |  tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
       echo "" >> $ERROR_LOG
    fi
 }
@@ -1057,12 +1022,12 @@ check_matlab_validation()
 
 check_validation_stats()
 {
-   CD_REPO $cfastrepo/Utilities/Matlab $CFASTBRANCH || return 1
+   CD_REPO $cfastrepo/Utilities/Python $CFASTBRANCH || return 1
 
-   STATS_FILE_BASENAME=CFAST_validation_scatterplot_output
+   STATS_FILE_BASENAME=validation_scatterplot_output
 
-   BASELINE_STATS_FILE=$cfastrepo/Utilities/Matlab/${STATS_FILE_BASENAME}_baseline.csv
-   CURRENT_STATS_FILE=$cfastrepo/Utilities/Matlab/${STATS_FILE_BASENAME}.csv
+   BASELINE_STATS_FILE=$cfastrepo/Manuals/CFAST_Validation_Guide/SCRIPT_FIGURES/Scatterplots/${STATS_FILE_BASENAME}_baseline.csv
+   CURRENT_STATS_FILE=$cfastrepo/Manuals/CFAST_Validation_Guide/SCRIPT_FIGURES/Scatterplots/${STATS_FILE_BASENAME}.csv
 
    if [ -e ${CURRENT_STATS_FILE} ]
    then
@@ -1071,7 +1036,7 @@ check_validation_stats()
          # Continue along
          :
       else
-         echo "Warnings from stage 5 - Matlab plotting and statistics (validation):" >> $VALIDATION_STATS_LOG
+         echo "Warnings from stage 5 - Python plotting and statistics (validation):" >> $VALIDATION_STATS_LOG
          echo "-------------------------------" >> $VALIDATION_STATS_LOG
          echo "Validation statistics are different from baseline statistics." >> $VALIDATION_STATS_LOG
          echo "Baseline validation statistics vs. Revision ${GIT_REVISION}:" >> $VALIDATION_STATS_LOG
@@ -1082,9 +1047,9 @@ check_validation_stats()
          echo "" >> $VALIDATION_STATS_LOG
       fi
    else
-      echo "Warnings from stage 5 - Matlab plotting and statistics (validation):" >> $WARNING_LOG
+      echo "Warnings from stage 5 - Python plotting and statistics (validation):" >> $WARNING_LOG
       echo "Error: The validation statistics output file does not exist." >> $WARNING_LOG
-      echo "Expected the file Utilities/Matlab/CFAST_validation_scatterplot_output.csv" >> $WARNING_LOG
+      echo "Expected the file /Manuals/CFAST_Validation_Guide/SCRIPT_FIGURES/Scatterplots/validation_scatterplot_output.csv" >> $WARNING_LOG
       echo "" >> $WARNING_LOG
    fi
    return 0
@@ -1096,7 +1061,7 @@ check_validation_stats()
 
 archive_validation_stats()
 {
-   CD_REPO $cfastrepo/Utilities/Matlab $CFASTBRANCH || return 1
+   CD_REPO $cfastrepo/Utilities/Python $CFASTBRANCH || return 1
 
    if [ -e ${CURRENT_STATS_FILE} ] ; then
       # Copy to CFASTbot history
@@ -1244,7 +1209,6 @@ CHECKOUT_REPO()
 
 make_cfast_vv_guide()
 {
-   # Build CFAST Tech Guide
    echo Building CFAST VV guide
    CD_REPO $cfastrepo/Manuals/CFAST_Validation_Guide $CFASTBRANCH || return 1
    ./make_guide.sh &> $OUTPUT_DIR/stage6_cfast_vv_guide
@@ -1260,7 +1224,6 @@ make_cfast_vv_guide()
 
 make_cfast_config_guide()
 {
-   # Build CFAST Configuration Guide
    echo Building CFAST Configuration guide
    CD_REPO $cfastrepo/Manuals/CFAST_Configuration_Guide $CFASTBRANCH || return 1
    ./make_guide.sh &> $OUTPUT_DIR/stage6_cfast_config_guide
@@ -1447,7 +1410,6 @@ RUNAUTO=
 UPDATEREPO=
 CLEANREPO=0
 SKIP=
-MATLABEXE=
 UPLOAD=
 USEINSTALL=
 USEINSTALL2=
@@ -1456,7 +1418,7 @@ GITURL=
 CONFIG=
 BRANCH=
 
-while getopts 'abcF:hiI:m:Mp:q:r:suU' OPTION
+while getopts 'abcF:hiI:m:p:q:r:suU' OPTION
 do
 case $OPTION in
    a)
@@ -1484,9 +1446,6 @@ case $OPTION in
    ;;
   I)
    compiler="$OPTARG"
-   ;;
-  M)
-   MATLABEXE=1
    ;;
   m)
    mailTo="$OPTARG"
@@ -1611,17 +1570,6 @@ echo "   compiler: $compiler"
 # Set unlimited stack size
 if [ "$platform" == "linux" ] ; then
   ulimit -s unlimited
-fi
-
-if [ "$SKIP" == "1" ]; then
-   MATLABEXE=
-   echo "     matlab: skipping matlab and document building stages"
-else
-   if [ "$MATLABEXE" != "" ]; then
-     echo "     matlab: using matlab script generated exe's"
-   else
-     echo "     matlab: using matlab"
-   fi
 fi
 
 if [ "$UPLOAD" == "1" ]; then
@@ -1778,36 +1726,22 @@ if [[ $stage2_build_cfast_release_success && $stage2_build_smv_release_success ]
    check_cfast_pictures
 fi
 
-### stage 5 - matlab verification ###
-#*** run matlab verification
-if [[ "$SKIP" == "" ]]; then
-  if [ "$MATLABEXE" == "" ]; then
-    check_matlab_license_server || exit 1
-    run_matlab_verification || exit 1
-    check_matlab_verification
-  fi
-fi
+### stage 5 - python verification ###
+  run_python_setup || exit 1
+  run_python_verification || exit 1
+  check_python_verification
 
 #*** build vvcalc
-if [[ "$SKIP" == "" ]]; then
-  if [ "$MATLABEXE" == "" ]; then
-    compile_vvcalc || exit 1
-    check_compile_vvcalc || exit 1
-  fi
-fi
+  compile_vvcalc || exit 1
+  check_compile_vvcalc || exit 1
 
-#*** run matlab valiation
-if [[ "$SKIP" == "" ]]; then
-  if [ "$MATLABEXE" == "" ]; then
-    run_matlab_validation || exit 1
-    check_matlab_validation
-    check_validation_stats || exit 1
-    archive_validation_stats || exit 1
-  fi
-fi
+#*** run python valiation
+  run_python_validation || exit 1
+  check_python_validation
+  check_validation_stats || exit 1
+  archive_validation_stats || exit 1
 
 ### Stage 6 ###
-if [[ "$SKIP" == "" ]]; then
   make_cfast_tech_guide || exit 1
   make_cfast_user_guide || exit 1
   make_cfast_vv_guide || exit 1
@@ -1819,10 +1753,10 @@ if [[ "$SKIP" == "" ]]; then
   echo $SMV_SHORTHASH   > $LATEST_MANUALS_DIR/SMV_HASH
   echo $CFAST_REV       > $LATEST_MANUALS_DIR/CFAST_REVISION
   echo $SMV_REV         > $LATEST_MANUALS_DIR/SMV_REVISION
-fi
 
 ### Report results ###
 set_files_world_readable || exit 1
 save_build_status
 email_build_status
 echo cfastbot complete
+
