@@ -1,18 +1,18 @@
 # CFASTbot: A Continuous Integration Tool for CFAST
 
-CFASTbot is a script that can be run at a regular intervals as part of a continuous integration program. At NIST, the script is run by a pseudo-user named `cfast` on a linux cluster each day. The pseudo-user `cfast` updates the various repositories in the GitHub project named `firemodels`, compiles CFAST and Smokeview, runs the validation and verification cases, checks the results for accuracy, and builds all of the manuals. The entire process takes about an hour to complete.
+CFASTbot is a script that can be run at a regular intervals as part of a continuous integration program. At NIST, the script is run by a pseudo-user named `firebot` on a linux cluster each time the source code is touched. The pseudo-user `firebot` updates the various repositories in the GitHub project named `firemodels`, compiles CFAST and Smokeview, runs the validation and verification cases, checks the results for accuracy, and builds all of the manuals. The entire process takes about 20 minutes to complete.
 
 ## Set-Up
 
-The following steps need only be done once. The exact phrasing of the commands are for the NIST linux cluster named blaze. You might need to modify the path and module names.
+The following steps need only be done once. You might need to modify the path and module names.
 
-1. Clone the repositories that are included in the GitHub organization called `firemodels`: `cfast`, `smv`, `bot`, and `exp`. Clone `bot` first, then cd into `bot/Scripts` and type `./setup_repos.sh -c` . This will clone all the other repos needed in the same directory as `bot` (or you can clone each repo in the same way as you cloned `bot`).
+1. Clone the repositories that are included in the GitHub organization called `firemodels`: `cfast`, 'fds', `smv`, `bot`, and `exp`. Clone `bot` first, then cd into `bot/Scripts` and type `./setup_repos.sh -c` . This will clone all the other repos needed in the same directory as `bot` (or you can clone each repo in the same way as you cloned `bot`).
 
 2. Ensure that the following software packages are installed on the system:
 
     * Intel Fortran and C compilers
     * LaTeX (TeX Live distribution), be sure to make this the default LaTeX in the system-wide PATH
-    * Matlab (test the command `matlab`)
+    * Python (test the command `python`)
 
 3. CFASTbot uses email notifications for build status updates. Ensure that outbound emails can be sent using the `mail` command.
 
