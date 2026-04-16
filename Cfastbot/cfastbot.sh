@@ -893,50 +893,6 @@ check_cfast_pictures()
 }
 
 #---------------------------------------------
-#                   compile_vvcalc
-#---------------------------------------------
-
-compile_vvcalc()
-{ 
-   # Build release vvcalc
-   echo "   build VandV_Calcs" 
-   CD_REPO $cfastrepo/Build/VandV_Calcs/${compiler}_${platform} $CFASTBRANCH || return 1
-   make -f ../makefile clean &> /dev/null
-   ./make_vv.sh &> $OUTPUT_DIR/stage5_build_vvcalc
-
-   return 0
-}
-
-#---------------------------------------------
-#                   check_compile_vvcalc
-#---------------------------------------------
-
-check_compile_vvcalc()
-{
-   CD_REPO $cfastrepo/Build/VandV_Calcs/${compiler}_${platform} $CFASTBRANCH || return 1
-   if [[ -e "VandV_Calcs_${platform}" ]]
-   then
-      stage5_build_vvcalc_success=true
-   else
-      echo "Errors from Stage 5 - Compile VandV_Calcs:" >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage5_build_vvcalc >> $ERROR_LOG
-      echo "" >> $ERROR_LOG
-   fi
-
-   # Check for compiler warnings/remarks
-   if [[ `grep -A 5 -E 'warning|remark' ${OUTPUT_DIR}/stage5_build_vvcalc` == "" ]]
-   then
-      # Continue along
-      :
-   else
-      echo "Warnings from Stage 5 - Compile VV calcs:" >> $WARNING_LOG
-      grep -A 5 -E 'warning|remark' ${OUTPUT_DIR}/stage5_build_vvcalc >> $WARNING_LOG
-      echo "" >> $WARNING_LOG
-   fi
-   return 0
-}
-
-#---------------------------------------------
 #                   run_python_verification
 #---------------------------------------------
 
@@ -982,12 +938,9 @@ run_python_validation()
    echo "   Validation"
    echo "      run VandV_Calcs"
    CD_REPO $cfastrepo/Validation $CFASTBRANCH || return 1
-   ../Build/VandV_Calcs/${compiler}_${platform}/VandV_Calcs_${platform} CFAST_Pressure_Correction_inputs.csv &> /dev/null
-   cp pressures.csv LLNL_Enclosure/LLNL_pressures.csv
-   ../Build/VandV_Calcs/${compiler}_${platform}/VandV_Calcs_${platform} CFAST_Temperature_Profile_inputs.csv &> /dev/null
-   cp profiles.csv Steckler_Compartment/.
-   ../Build/VandV_Calcs/${compiler}_${platform}/VandV_Calcs_${platform} CFAST_Heat_Flux_Profile_inputs.csv &> /dev/null
-   cp flux_profiles.csv Fleury_Heat_Flux/.
+   python VandV_Calcs.py CFAST_Pressure_Correction_inputs.csv &> /dev/null
+   python VandV_Calcs.py CFAST_Temperature_Profile_inputs.csv &> /dev/null
+   python VandV_Calcs.py CFAST_Heat_Flux_Profile_inputs.csv &> /dev/null
    
    echo "      make plots"
    # Run Python plotting script
@@ -1730,10 +1683,6 @@ fi
   run_python_setup || exit 1
   run_python_verification || exit 1
   check_python_verification
-
-#*** build vvcalc
-  compile_vvcalc || exit 1
-  check_compile_vvcalc || exit 1
 
 #*** run python valiation
   run_python_validation || exit 1
