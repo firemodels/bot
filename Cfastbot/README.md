@@ -6,13 +6,13 @@ CFASTbot is a script that can be run at a regular intervals as part of a continu
 
 The following steps need only be done once. You might need to modify the path and module names.
 
-1. Clone the repositories that are included in the GitHub organization called `firemodels`: `cfast`, 'fds', `smv`, `bot`, and `exp`. Clone `bot` first, then cd into `bot/Scripts` and type `./setup_repos.sh -c` . This will clone all the other repos needed in the same directory as `bot` (or you can clone each repo in the same way as you cloned `bot`).
+1. Clone the repositories that are included in the GitHub organization called `firemodels`: `cfast`, `fds`, `smv`, `bot`, and `exp`.
 
 2. Ensure that the following software packages are installed on the system:
 
     * Intel Fortran and C compilers
     * LaTeX (TeX Live distribution), be sure to make this the default LaTeX in the system-wide PATH
-    * Python (test the command `python`)
+    * Python (test by issuing the command `python`)
 
 3. CFASTbot uses email notifications for build status updates. Ensure that outbound emails can be sent using the `mail` command.
 
@@ -21,19 +21,11 @@ The following steps need only be done once. You might need to modify the path an
    yum install mesa-libGL-devel mesa-libGLU-devel libXmu-devel libXi-devel xorg-x11-server-Xvfb
    ```
 
-5. Add the following lines to your `~/.bashrc` file:
-    ```
-    source /opt/intel/oneapi/setvars.sh >& /dev/null
-    # - needed to build smokeview
-    export IFORT_COMPILER_LIB=/opt/intel/oneapi/compiler/latest/linux/compiler/lib/intel64_lin
-    ulimit -s unlimited
-    ```
+5. Ensure that the Intel Fortran compiler is active. For example, type `ifx --version` at the command prompt.
    
-6. Setup passwordless SSH for the your account. Generate SSH keys and ensure that the head node can SSH into all of the compute nodes. Also, make sure that your account information is propagated across all compute nodes.
+6. If desired, ensure that a queue named `cfastbot` is created and enabled. Test the `qstat` command.  If you use some other queue, e.g. batch, then use `-q batch` when running CFASTbot.  
 
-7. If desired, ensure that a queue named `cfastbot` is created and enabled. Test the `qstat` command.  If you use some other queue, e.g. batch, then use `-q batch` when running CFASTbot.  
-
-8. By default, CFASTbot sends email to the email address configured for your bot repo (output of command `git config user.email` ) .  If you wish email to go to different email addresses, create a file named $HOME/.cfastbot/cfastbot_email_list.sh for some `user1` and `user2` (or more) that looks like:
+7. By default, CFASTbot sends email to the email address configured for your bot repo (output of command `git config user.email` ) .  If you wish email to go to different email addresses, create a file named $HOME/.cfastbot/cfastbot_email_list.sh for some `user1` and `user2` (or more) that looks like:
    ```
    #!/bin/bash
    mailToFCFAST="user1@host1.com, user2@host2.com"
@@ -49,7 +41,7 @@ Important things to consider: do you want to test your own local changes, or upd
 
 If you just want to test the version of `cfast`, `smv`, and `exp`, issue the following command from within the `Cfastbot` directory of the `bot` repository:
 ```
-nohup ./run_cfastbot.sh -c -m <email address> &
+nohup ./run_cfastbot.sh -c -q <queue> -m <email address> &
 ```
 The `-c` option directs cfastbot to clean the repositories as needed. Be careful if you have unversioned files within the repositories that would be erased.
 
