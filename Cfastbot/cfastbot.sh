@@ -3,8 +3,6 @@
 # This script runs the CFAST verification/validation suite 
 # on the latest revision of the repository.
 
-WEBROOT=/opt/www/html/cfast
-
 #---------------------------------------------
 #                   CHK_REPO
 #---------------------------------------------
@@ -972,15 +970,6 @@ archive_validation_stats()
    if [ -e ${CURRENT_STATS_FILE} ] ; then
       # Copy to CFASTbot history
       cp ${CURRENT_STATS_FILE} "$HISTORY_DIR/${STATS_FILE_BASENAME}_${GIT_REVISION}.csv"
-
-      # Copy to web directory
-      if [ "$UPLOAD" == "1" ]; then
-    	if [ ! -d $WEBROOT/manuals/Validation_Statistics ]; then
-	      mkdir -p $WEBROOT/manuals/Validation_Statistics
-        fi
-        cp ${CURRENT_STATS_FILE} $WEBROOT/manuals/Validation_Statistics/${STATS_FILE_BASENAME}_${GIT_REVISION}.csv
-        chmod +w $WEBROOT/manuals/Validation_Statistics/${STATS_FILE_BASENAME}_${GIT_REVISION}.csv
-      fi
    fi
    CD_REPO $cfastrepo/Validation/scripts $CFASTBRANCH || return 1
    if [ -e gettime.sh ]; then
@@ -1008,13 +997,6 @@ check_guide()
    if [[ `grep -I "succeeded" $logfile` != "" ]] && [[ -e $docdir/$docfile ]]; then
       # Guide built succeeded; there were no errors/warnings
       # Copy guide to CFASTbot's local website
-      if [ "$UPLOAD" == "1" ]; then
-	     if [ ! -d $WEBROOT/manuals ]; then
-	       mkdir $WEBROOT/manuals
-	     fi
-         cp $docdir/$docfile $WEBROOT/manuals/CFAST_$docfile
-         chmod +w $WEBROOT/manuals/CFAST_$docfile
-      fi
    else
       # There were errors/warnings in the guide build process
       echo "Warnings from Stage 6 - Build CFAST Guides:" >> $WARNING_LOG
