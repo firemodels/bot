@@ -96,7 +96,7 @@ run_auto()
    
    TRIGGER=$cfastrepo/Source/CFAST
    git_TRIGGER=$GITSTATUS_DIR/cfast_source_revision
-   TRIGGERONLY=$cfastrepo/Source/CFAST/skipmatlab_trigger.txt
+   TRIGGERONLY=$cfastrepo/Source/CFAST/skiplab_trigger.txt
    git_TRIGGERONLY=$GITSTATUS_DIR/cfastonly_source_revision
 
    if [ "$CFASTBRANCH" != "current" ]; then
@@ -975,8 +975,8 @@ archive_validation_stats()
 
       # Copy to web directory
       if [ "$UPLOAD" == "1" ]; then
-	if [ ! -d $WEBROOT/manuals/Validation_Statistics ]; then
-	  mkdir -p $WEBROOT/manuals/Validation_Statistics
+    	if [ ! -d $WEBROOT/manuals/Validation_Statistics ]; then
+	      mkdir -p $WEBROOT/manuals/Validation_Statistics
         fi
         cp ${CURRENT_STATS_FILE} $WEBROOT/manuals/Validation_Statistics/${STATS_FILE_BASENAME}_${GIT_REVISION}.csv
         chmod +w $WEBROOT/manuals/Validation_Statistics/${STATS_FILE_BASENAME}_${GIT_REVISION}.csv
@@ -1315,7 +1315,6 @@ QUEUE=smokebot
 RUNAUTO=
 UPDATEREPO=
 CLEANREPO=0
-SKIP=
 UPLOAD=
 USEINSTALL=
 USEINSTALL2=
@@ -1324,7 +1323,7 @@ GITURL=
 CONFIG=
 BRANCH=
 
-while getopts 'abcF:hiI:m:p:q:r:suU' OPTION
+while getopts 'abcF:hiI:m:p:q:r:uU' OPTION
 do
 case $OPTION in
    a)
@@ -1367,9 +1366,6 @@ case $OPTION in
    cfastrepo=$reponame/cfast
    smvrepo=$reponame/smv
    exprepo=$reponame/exp
-   ;;
-  s)
-   SKIP=1
    ;;
   u)
    UPDATEREPO=1
