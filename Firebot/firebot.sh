@@ -732,13 +732,6 @@ compile_smv_utilities()
   CP smokediff_${platform} $LATESTAPPS_DIR/smokediff
   echo "" >> $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
 
-# background
-  echo "      background"
-  cd $smvrepo/Build/background/${SMVCOMPILER}_${platform}
-  rm -f *.o background_${platform}
-  ./make_background.sh >> $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
-  CP background_${platform} $LATESTAPPS_DIR/background
-
 # wind2fds:
   echo "      wind2fds"
   cd $smvrepo/Build/wind2fds/${SMVCOMPILER}_${platform}
