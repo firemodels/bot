@@ -507,24 +507,13 @@ check_compile_fds_mpi_gnu_db()
 wait_cases_debug_end()
 {
    # Scans job queue and waits for cases to end
-   if [[ "$QUEUE" == "none" ]]
-   then
-     while [[          `ps -u $USER -f | fgrep .fds | grep -v firebot | grep -v grep` != '' ]]; do
-        JOBS_REMAINING=`ps -u $USER -f | fgrep .fds | grep -v firebot | grep -v grep | wc -l`
-        echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage3_run_debug_ver
-        TIME_LIMIT_STAGE="3"
-        check_time_limit
-        sleep 30
-     done
-   else
-     while          [[ `squeue | awk '{print $3 $4 $5}' | grep $(whoami) | grep $JOBPREFIX_DEBUG | grep -v 'CG$'` != '' ]]; do
-        JOBS_REMAINING=`squeue | awk '{print $3 $4 $5}' | grep $(whoami) | grep $JOBPREFIX_DEBUG | grep -v 'CG$' | wc -l`
-        echo "Waiting for ${JOBS_REMAINING} ${1} cases to complete." >> $OUTPUT_DIR/stage3_run_debug_ver
-        TIME_LIMIT_STAGE="3"
-        check_time_limit
-        sleep 30
-     done
-   fi
+   while          [[ `squeue | awk '{print $3 $4 $5}' | grep $(whoami) | grep $JOBPREFIX_DEBUG | grep -v 'CG$'` != '' ]]; do
+      JOBS_REMAINING=`squeue | awk '{print $3 $4 $5}' | grep $(whoami) | grep $JOBPREFIX_DEBUG | grep -v 'CG$' | wc -l`
+      echo "Waiting for ${JOBS_REMAINING} ${1} cases to complete." >> $OUTPUT_DIR/stage3_run_debug_ver
+      TIME_LIMIT_STAGE="3"
+      check_time_limit
+      sleep 30
+   done
 }
 
 #---------------------------------------------
@@ -732,13 +721,6 @@ compile_smv_utilities()
   CP smokediff_${platform} $LATESTAPPS_DIR/smokediff
   echo "" >> $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
 
-# background
-  echo "      background"
-  cd $smvrepo/Build/background/${SMVCOMPILER}_${platform}
-  rm -f *.o background_${platform}
-  ./make_background.sh >> $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
-  CP background_${platform} $LATESTAPPS_DIR/background
-
 # wind2fds:
   echo "      wind2fds"
   cd $smvrepo/Build/wind2fds/${SMVCOMPILER}_${platform}
@@ -881,36 +863,24 @@ wait_cases_release_end()
    timing_error=
 
    # Scans squeue and waits for cases to end
-   if [[ "$QUEUE" == "none" ]]
-   then
-     while [[          `ps -u $USER -f | fgrep .fds | grep -v firebot | grep -v grep` != '' ]]; do
-        JOBS_REMAINING=`ps -u $USER -f | fgrep .fds | grep -v firebot | grep -v grep | wc -l`
-
-        echo "Waiting for ${JOBS_REMAINING} $CASETYPE cases to complete." >> $OUTPUT_DIR/$STAGE
-        TIME_LIMIT_STAGE="$STAGE"
-        check_time_limit
-        sleep 60
-     done
-   else
-     while          [[ `squeue | awk '{print $3 $4 $5}' | grep $(whoami) | grep $JOBPREFIX_RELEASE | grep -v 'CG$'` != '' ]]; do
-        JOBS_REMAINING=`squeue | awk '{print $3 $4 $5}' | grep $(whoami) | grep $JOBPREFIX_RELEASE | grep -v 'CG$' | wc -l`
-        echo "Waiting for ${JOBS_REMAINING} $CASETYPE cases to complete." >> $OUTPUT_DIR/$STAGE
-        TIME_LIMIT_STAGE="5"
-        check_time_limit
-        sleep 60
-        # look for cases that took too long to run (but don't look again until firebot
-        #                                           wraps up if a problem case is found)
-        if [[ "$timing_error" == "" ]] && [[ "$HAVE_MAIL" == "1" ]]; then
-          cd $botrepo/Scripts
-          ./compare_fds_timings.sh >& /dev/null
-          if [ -e $TIMING_ERRORS ]; then
-            timing_error=1
-            cat $TIMING_ERRORS | mail -s "***error: one or more firebot case runtimes > 2x reference values" $mailToFDS > /dev/null
-          fi
-          cd $current_wait_dir
+   while          [[ `squeue | awk '{print $3 $4 $5}' | grep $(whoami) | grep $JOBPREFIX_RELEASE | grep -v 'CG$'` != '' ]]; do
+      JOBS_REMAINING=`squeue | awk '{print $3 $4 $5}' | grep $(whoami) | grep $JOBPREFIX_RELEASE | grep -v 'CG$' | wc -l`
+      echo "Waiting for ${JOBS_REMAINING} $CASETYPE cases to complete." >> $OUTPUT_DIR/$STAGE
+      TIME_LIMIT_STAGE="5"
+      check_time_limit
+      sleep 60
+      # look for cases that took too long to run (but don't look again until firebot
+      #                                           wraps up if a problem case is found)
+      if [[ "$timing_error" == "" ]] && [[ "$HAVE_MAIL" == "1" ]]; then
+        cd $botrepo/Scripts
+        ./compare_fds_timings.sh >& /dev/null
+        if [ -e $TIMING_ERRORS ]; then
+          timing_error=1
+          cat $TIMING_ERRORS | mail -s "***error: one or more firebot case runtimes > 2x reference values" $mailToFDS > /dev/null
         fi
-     done
-   fi
+        cd $current_wait_dir
+      fi
+   done
 }
 
 #---------------------------------------------
@@ -2125,10 +2095,6 @@ else
   exit 1
 fi
 
-if [[ "$QUEUE" == "none" ]] && [[ -e $SCRIPTFILES ]]; then
-  rm -f $SCRIPTFILES
-fi
-
 fdsrepo=$repo/fds
 smvrepo=$repo/smv
 botrepo=$repo/bot
@@ -2712,3 +2678,4 @@ fi
 email_build_status
 echo firebot exit status: $firebot_status
 exit $firebot_status
+ 
