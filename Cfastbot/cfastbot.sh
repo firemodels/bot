@@ -437,55 +437,8 @@ compile_smv_utilities()
      echo 'Building Smokeview libraries' >> $OUTPUT_DIR/stage2_build_smv_util 2>&1
      echo "   smokeview libraries"
      ./make_LIBS.sh >> $OUTPUT_DIR/stage2_build_smv_util 2>&1
-
-   # background
-     if [ "$QUEUE" == "none" ]; then
-       cd $smvrepo/Build/background/${compiler}_${platform}
-       echo '   background'
-       echo 'Compiling background' >> $OUTPUT_DIR/stage2_build_smv_util 2>&1
-       ./make_background.sh >> $OUTPUT_DIR/stage2_build_smv_util 2>&1
-     fi
    else
      echo "   smokeview libraries - not built, using installed smokview"
-     if [ "$QUEUE" == "none" ]; then
-       echo "   background - not built, using installed background"
-       echo "Using installed smokeview, libraries not built" >> $OUTPUT_DIR/stage2_build_smv_util 2>&1
-     fi
-   fi
-   return 0
-}
-
-#---------------------------------------------
-#                   check_smv_utilities
-#---------------------------------------------
-
-check_smv_utilities()
-{
-   if [ "$USEINSTALL" == "" ]; then
-     # Check for errors in SMV utilities compilation
-     stage2_build_smv_util_success="1"
-     if [ "$QUEUE" == "none" ]; then
-       if [ ! -e "$smvrepo/Build/background/${compiler}_${platform}/background" ]; then
-         stage2_build_smv_util_success="0"
-       fi
-     fi
-     if [ "$stage2_build_smv_utilsuccess" == "0" ]; then
-        echo "error building background"
-        echo "Errors from Stage 2 - building background:" >> $ERROR_LOG
-        cat $OUTPUT_DIR/stage2_build_smv_util >> $ERROR_LOG
-        echo "" >> $ERROR_LOG
-     fi
-   else
-     stage2_build_smv_util_success="1"
-     if [ "$QUEUE" == "none" ]; then
-       is_file_installed background stage2_build_smv_util
-     fi
-     if [ "$stage2_build_smv_utilsuccess" == "0" ]; then
-        echo "background not installed"
-        echo "Errors from Stage 2 - background not installed:" >> $ERROR_LOG
-        cat $OUTPUT_DIR/stage2_build_smv_util >> $ERROR_LOG
-        echo "" >> $ERROR_LOG
-     fi
    fi
    return 0
 }
@@ -1649,7 +1602,6 @@ check_compile_cfast || exit 1
 
 #*** build smv utilities
 compile_smv_utilities || exit 1
-check_smv_utilities || exit 1
 
 #*** build debug smokeview
 compile_smv_db || exit 1
