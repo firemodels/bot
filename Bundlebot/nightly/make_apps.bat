@@ -53,14 +53,12 @@ call :BUILDFDS
 
 :: build smokeview libraries and apps
 call :BUILDLIB
-call :BUILD     background
 call :BUILD     smokediff
 call :BUILD     pnginfo
 call :BUILD     fds2fed
 call :BUILD     smokezip
 call :BUILD     wind2fds
 call :BUILD     set_path
-call :BUILD     sh2bat
 call :BUILD     get_time
 call :BUILDSMV
 
@@ -71,14 +69,12 @@ call :CHECK_BUILDFDS
 call :CHECK_BUILDFDSOPENMP
 
 :: verify smokeview apps were built
-call :CHECK_BUILD     background
 call :CHECK_BUILD     smokediff
 call :CHECK_BUILD     pnginfo
 call :CHECK_BUILD     fds2fed
 call :CHECK_BUILD     smokezip
 call :CHECK_BUILD     wind2fds
 call :CHECK_BUILD     set_path
-call :CHECK_BUILD     sh2bat
 call :CHECK_BUILD     get_time
 call :CHECK_BUILDSMV
 

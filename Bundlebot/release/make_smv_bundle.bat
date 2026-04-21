@@ -17,7 +17,6 @@ set CURDIR=%CD%
 
 set forbundle=%reporoot%\smv\Build\for_bundle
 set smvscripts=%reporoot%\smv\scripts
-set sh2bat=%reporoot%\smv\Build\sh2bat\intel_win
 set gettime=%reporoot%\smv\Build\get_time\intel_win
 set repoexes=%userprofile%\.bundle\BUNDLE\WINDOWS\repoexes
 set gawk=%reporoot%\bot\scripts\bin\gawk.exe
@@ -46,7 +45,6 @@ copy %forbundle%\*.png %smvdir%\.>Nul
 
 CALL :COPY  %forbundle%\volrender.ssf %smvdir%\volrender.ssf
 
-CALL :COPY  %reporoot%\smv\Build\background\intel_win\background_win.exe %smvdir%\background.exe
 CALL :COPY  %reporoot%\smv\Build\flush\intel_win\flush_win.exe           %smvdir%\flush.exe
 CALL :COPY  %reporoot%\smv\Build\smokediff\intel_win\smokediff_win.exe   %smvdir%\smokediff.exe
 CALL :COPY  %reporoot%\smv\Build\pnginfo\intel_win\pnginfo_win.exe       %smvdir%\pnginfo.exe
@@ -82,7 +80,6 @@ copy %forbundle%\colorbars\divergent\*.csv %smvdir%\colorbars\divergent >Nul
 copy %forbundle%\colorbars\circular\*.csv  %smvdir%\colorbars\circular  >Nul
 
 CALL :COPY  %forbundle%\objects.svo                   %smvdir%\.
-CALL :COPY  %sh2bat%\sh2bat_win.exe                   %smvdir%\sh2bat.exe
 CALL :COPY  %gettime%\get_time_win.exe                %smvdir%\get_time.exe
 CALL :COPY  %reporoot%\webpages\SMV_Release_Notes.htm %smvdir%\release_notes.html
 CALL :COPY  %forbundle%\.smokeview_bin                %smvdir%\.
