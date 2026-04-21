@@ -64,7 +64,6 @@ echo "-r - specify GH_REPO when uploading manuals. [default: $GH_REPO]"
 echo "-q queue_name - run cases using the queue queue_name"
 echo "     default: $QUEUE"
 echo "-R - remove run status file"
-echo "-s - skip matlab and guide generating stages"
 echo "-U - upload guide (only by user: cfastbot)"
 }
 
@@ -160,17 +159,13 @@ compiler=intel
 size=
 REMOVE_PID=
 
-MATLABEXE=
-SKIP=
-havematlab=`which matlab 2> /dev/null | wc -l`
-
 UPLOAD=
 USEINSTALL=
 KILL_CFASTBOT=
 ECHO=
 CONFIG=
 
-while getopts 'abcfF:hHiI:km:o:Mq:r:RsuUv' OPTION
+while getopts 'abcfF:hHiI:km:o:q:r:RuUv' OPTION
 do
 case $OPTION  in
   a)
@@ -207,9 +202,6 @@ case $OPTION  in
   m)
    EMAIL="$OPTARG"
    ;;
-  M)
-   MATLABEXE="-M"
-   ;;
   o)
    export GH_OWNER="$OPTARG"
    ;;
@@ -221,9 +213,6 @@ case $OPTION  in
    ;;
   R)
    REMOVE_PID=1
-   ;;
-  s)
-   SKIP="-s"
    ;;
   u)
    UPDATEREPO=1
@@ -318,20 +307,14 @@ if [[ "$CLEANREPO" == "1" ]]; then
   CLEAN=-c
 fi
 
-if [ $havematlab -eq 0 ]; then
-   MATLABEXE=-M
-fi
-if [ "$SKIP" != "" ]; then
-   MATLAB=
-fi
-
 REPO="-r $reponame"
 QUEUE="-q $QUEUE"
 compiler="-I $compiler"
 PID="-p $cfastbot_pid"
 cd $CURDIR
-echo  ./cfastbot.sh $PID $BRANCH $REPO $USEINSTALL $RUNAUTO $CONFIG $size $compiler $UPDATEREPO $CLEAN $QUEUE $SKIP $MATLABEXE $UPLOAD $EMAIL "$@"
-$ECHO  ./cfastbot.sh $PID $BRANCH $REPO $USEINSTALL $RUNAUTO $CONFIG $size $compiler $UPDATEREPO $CLEAN $QUEUE $SKIP $MATLABEXE $UPLOAD $EMAIL "$@"
+echo  ./cfastbot.sh $PID $BRANCH $REPO $USEINSTALL $RUNAUTO $CONFIG $size $compiler $UPDATEREPO $CLEAN $QUEUE $UPLOAD $EMAIL "$@"
+$ECHO  ./cfastbot.sh $PID $BRANCH $REPO $USEINSTALL $RUNAUTO $CONFIG $size $compiler $UPDATEREPO $CLEAN $QUEUE $UPLOAD $EMAIL "$@"
 if [ -e $cfastbot_pid ]; then
   rm $cfastbot_pid
 fi   
+ 
