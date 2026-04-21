@@ -55,7 +55,7 @@ echo "-a - run automatically if cfast repo has changed"
 echo "-b - use the current branch"
 echo "-f - force cfastbot run"
 echo "-F config.sh  - clone repos using revision and tags in config.sh"
-echo "-i - use installed smokeview and background (if using the 'none' queue)"
+echo "-i - use installed smokeview"
 echo "-I - compiler [ default: $compiler]"
 echo "-k - kill cfastbot"
 echo "-m email -  email_address "
@@ -278,9 +278,7 @@ if [ "$USEINSTALL" != "" ]; then
   echo
   echo looking for installed software
   is_file_installed smokeview || exit 1
-  is_file_installed background || exit 1
   echo "   found smokeview"
-  echo "   found background"
 fi
 
 if [ -e $cfastbot_pid ]; then
