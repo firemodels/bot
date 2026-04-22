@@ -238,29 +238,17 @@ clean_repo2()
    return 0
 }
 
-#---------------------------------------------
-#                   update_repo
-#---------------------------------------------
-
-update_repo()
-{
-   local repo=$1
-   local branch=$2
-   
-   CD_REPO $reponame/$repo $branch || return 1
-   if [ "$branch" == "current" ]; then
-     return 1
-   fi
-
-   if [[ "$repo" == "cfast" ]]; then
-      GIT_REVISION=`git describe --abbrev=7 --long --dirty`
-      GIT_SHORTHASH=`git rev-parse --short HEAD`
-      GIT_LONGHASH=`git rev-parse HEAD`
-      GIT_DATE=`git log -1 --format=%cd --date=local $GIT_SHORTHASH`
-   fi
-
-   echo "Updating branch $branch" >> $OUTPUT_DIR/stage1_setup 2>&1
    git fetch origin >> $OUTPUT_DIR/stage1_setup 2>&1
+   git fetch origin >> $OUTPUT_DIR/stage1_setup 2>&1
+   git merge origin/$branch >> $OUTPUT_DIR/stage1_setup 2>&1
+   have_remote=`git remote -v | awk '{print $1}' | grep firemodels | wc  -l`
+   if [ "$have_remote" -gt "0" ]; then
+      git fetch firemodels >> $OUTPUT_DIR/stage1_setup 2>&1
+      git merge firemodels/$branch >> $OUTPUT_DIR/stage0 2>&1
+   fi
+   return 0
+}
+
    git merge origin/$branch >> $OUTPUT_DIR/stage1_setup 2>&1
    have_remote=`git remote -v | awk '{print $1}' | grep firemodels | wc  -l`
    if [ "$have_remote" -gt "0" ]; then
