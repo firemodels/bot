@@ -238,26 +238,6 @@ clean_repo2()
    return 0
 }
 
-   git fetch origin >> $OUTPUT_DIR/stage1_setup 2>&1
-   git fetch origin >> $OUTPUT_DIR/stage1_setup 2>&1
-   git merge origin/$branch >> $OUTPUT_DIR/stage1_setup 2>&1
-   have_remote=`git remote -v | awk '{print $1}' | grep firemodels | wc  -l`
-   if [ "$have_remote" -gt "0" ]; then
-      git fetch firemodels >> $OUTPUT_DIR/stage1_setup 2>&1
-      git merge firemodels/$branch >> $OUTPUT_DIR/stage0 2>&1
-   fi
-   return 0
-}
-
-   git merge origin/$branch >> $OUTPUT_DIR/stage1_setup 2>&1
-   have_remote=`git remote -v | awk '{print $1}' | grep firemodels | wc  -l`
-   if [ "$have_remote" -gt "0" ]; then
-      git fetch firemodels >> $OUTPUT_DIR/stage1_setup 2>&1
-      git merge firemodels/$branch >> $OUTPUT_DIR/stage0 2>&1
-   fi
-   return 0
-}
-
 #---------------------------------------------
 #                   check_git_checkout
 #---------------------------------------------
