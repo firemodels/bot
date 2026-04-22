@@ -66,6 +66,7 @@ def upload_bundle():       os.system("start " + webscript_dir + "webUPLOADallsmv
 def run_cases():           os.system("start " + webscript_dir + "webRunCases ")
 def make_pictures():       os.system("start " + webscript_dir + "webMakePictures ")
 def compare_pictures():    os.system("start " + webscript_dir + "webComparePictures ")
+def makecompare_pictures():os.system("start " + webscript_dir + "webMakeComparePictures ")
 
 def download_figures():    os.system("start " + webscript_dir + "webGETfigs "       + apps[app.get()]                 + " " + guides[guide.get()] )
 def view_summary():        os.system("start " + webscript_dir + "webVIEWsummary "   + apps[app.get()] )
@@ -157,10 +158,10 @@ Button(root, text="Full Build/Bundle/Install",         width=2*button_width+2, c
 R=R+1
 Label(root, text="---------------------------------VERIFY--------------------------------").grid(column=0, row=R, columnspan=4)
 R=R+1
-Label(root, text="Verify smokeview:").grid(column=0, row=R)
-Button(root, text="Run cases",        width=button_width, command=run_cases).grid(row=R,        column=1)
-Button(root, text="Make pictures",    width=button_width, command=make_pictures).grid(row=R,    column=2)
-Button(root, text="Compare pictures", width=button_width, command=compare_pictures).grid(row=R, column=3)
+Button(root, text="Run cases",        width=button_width, command=run_cases).grid(row=R,        column=0)
+Button(root, text="Make pictures",    width=button_width, command=make_pictures).grid(row=R,    column=1)
+Button(root, text="Compare pictures", width=button_width, command=compare_pictures).grid(row=R, column=2)
+Button(root, text="Make&Compare",     width=button_width, command=makecompare_pictures).grid(row=R, column=3)
 
 # ------------------------- guides ------------------------------
 
