@@ -162,8 +162,9 @@ USEINSTALL=
 KILL_CFASTBOT=
 ECHO=
 CONFIG=
+FORCECLONE=
 
-while getopts 'abfF:hHiI:km:o:q:r:RUv' OPTION
+while getopts 'abCfF:hHiI:km:o:q:r:RUv' OPTION
 do
 case $OPTION  in
   a)
@@ -172,6 +173,9 @@ case $OPTION  in
   b)
    BRANCH=-b
    botbranch=current
+   ;;
+  C)
+   FORCECLONE=1
    ;;
   f)
    FORCE=1
@@ -275,6 +279,13 @@ if [ -e $cfastbot_pid ]; then
     exit
   fi
 fi
+if [ "$FORCECLONE" == "" ]; then
+  echo "***warning: You are about to erase and clone the cfast, exp and smv repos."
+  echo "Press any key to continue or <CTRL> c to abort."
+  echo "Use the -C option to avoid this warning."
+  read val
+fi
+
 touch $cfastbot_pid
 if [[ "$EMAIL" != "" ]]; then
   EMAIL="-m $EMAIL"
@@ -305,4 +316,3 @@ $ECHO  ./cfastbot.sh $PID $BRANCH $REPO $USEINSTALL $RUNAUTO $CONFIG $size $comp
 if [ -e $cfastbot_pid ]; then
   rm $cfastbot_pid
 fi   
- 
