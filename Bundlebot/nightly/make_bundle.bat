@@ -224,11 +224,11 @@ echo.
 echo *** copying example files
 echo.
 cd %fds_examples%
-robocopy %fds_examples% %out_fdsexamples% /E /XF *.* /XD .
+robocopy %fds_examples% %out_fdsexamples% /E
 erase %out_fdsexamples%\*.sh
 
 cd %smv_examples%
-robocopy %smv_examples% %out_smvexamples% /E /XF *.* /XD .
+robocopy %smv_examples% %out_smvexamples% /E
 
 echo.
 echo *** copying scripts that finalize installation
