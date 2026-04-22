@@ -238,29 +238,17 @@ clean_repo2()
    return 0
 }
 
-#---------------------------------------------
-#                   update_repo
-#---------------------------------------------
-
-update_repo()
-{
-   local repo=$1
-   local branch=$2
-   
-   CD_REPO $reponame/$repo $branch || return 1
-   if [ "$branch" == "current" ]; then
-     return 1
-   fi
-
-   if [[ "$repo" == "cfast" ]]; then
-      GIT_REVISION=`git describe --abbrev=7 --long --dirty`
-      GIT_SHORTHASH=`git rev-parse --short HEAD`
-      GIT_LONGHASH=`git rev-parse HEAD`
-      GIT_DATE=`git log -1 --format=%cd --date=local $GIT_SHORTHASH`
-   fi
-
-   echo "Updating branch $branch" >> $OUTPUT_DIR/stage1_setup 2>&1
    git fetch origin >> $OUTPUT_DIR/stage1_setup 2>&1
+   git fetch origin >> $OUTPUT_DIR/stage1_setup 2>&1
+   git merge origin/$branch >> $OUTPUT_DIR/stage1_setup 2>&1
+   have_remote=`git remote -v | awk '{print $1}' | grep firemodels | wc  -l`
+   if [ "$have_remote" -gt "0" ]; then
+      git fetch firemodels >> $OUTPUT_DIR/stage1_setup 2>&1
+      git merge firemodels/$branch >> $OUTPUT_DIR/stage0 2>&1
+   fi
+   return 0
+}
+
    git merge origin/$branch >> $OUTPUT_DIR/stage1_setup 2>&1
    have_remote=`git remote -v | awk '{print $1}' | grep firemodels | wc  -l`
    if [ "$have_remote" -gt "0" ]; then
@@ -671,14 +659,11 @@ check_vv_cases_debug()
    #  = Remove case files =
    #  =====================
 
-   # Remove all unversioned case files from V&V directories (recursively)
-   if [ "$CLEANREPO" == "1" ]; then
-     CD_REPO $cfastrepo/Verification $CFASTBRANCH || return 1
-     git clean -dxf &> /dev/null
+   CD_REPO $cfastrepo/Verification $CFASTBRANCH || return 1
+   git clean -dxf &> /dev/null
 
-     CD_REPO $cfastrepo/Validation $CFASTBRANCH || return 1
-     git clean -dxf &> /dev/null
-   fi
+   CD_REPO $cfastrepo/Validation $CFASTBRANCH || return 1
+   git clean -dxf &> /dev/null
    return 0
 }
 
@@ -1296,8 +1281,6 @@ cd $cfastbotdir
 compiler=intel
 QUEUE=smokebot
 RUNAUTO=
-UPDATEREPO=
-CLEANREPO=0
 UPLOAD=
 USEINSTALL=
 USEINSTALL2=
@@ -1306,7 +1289,7 @@ GITURL=
 CONFIG=
 BRANCH=
 
-while getopts 'abcF:hiI:m:p:q:r:uU' OPTION
+while getopts 'abF:hiI:m:p:q:r:U' OPTION
 do
 case $OPTION in
    a)
@@ -1319,9 +1302,6 @@ case $OPTION in
      CFASTBRANCH=current
      SMVBRANCH=current
      ;;
-  c)
-   CLEANREPO=1
-   ;;
   F)
    CONFIG="$OPTARG"
    ;;
@@ -1349,9 +1329,6 @@ case $OPTION in
    cfastrepo=$reponame/cfast
    smvrepo=$reponame/smv
    exprepo=$reponame/exp
-   ;;
-  u)
-   UPDATEREPO=1
    ;;
   U)
    UPLOAD=1
@@ -1510,26 +1487,12 @@ echo "------"
 clean_cfastbot_history
 
 ### Stage 1 ###
-if [ "$CLEANREPO" == "1" ]; then
-  clean_repo2 cfast $CFASTBRANCH || exit 1
-  clean_repo2 smv   $SMVBRANCH || exit 1
-else
-  echo Repos not cleaned
-fi
-
-if [ "$UPDATEREPO" == "1" ]; then
-  echo Updating
-  echo "   cfast"
-  update_repo cfast $CFASTBRANCH || exit 1
-  echo "   smv"
-  update_repo smv   $SMVBRANCH || exit 1
-  echo "   exp"
-  update_repo exp $expbranch || exit 1
-else
-  echo Repos not updated
-fi
 
 cur_dir=`pwd`
+
+# clone cfast, exp and smv repos
+cd $reponame/bot/Scripts
+./setup_repos.sh -B
 
 CD_REPO $reponame/bot $botbranch || return 1
 BOT_REVISION=`git describe --abbrev=7 --dirty --long`
