@@ -29,7 +29,7 @@ Title Building smokeview utilities for %platform%
 set EXIT_SCRIPT=1
 
 set progs=background flush pnginfo smokediff fds2fed smokezip wind2fds
-set smvprogs=get_time set_path sh2bat timep
+set smvprogs=get_time set_path timep
 
 if NOT "%platform%" == "Windows" goto endif1
   for %%x in ( %progs% ) do (

@@ -56,10 +56,6 @@ echo building smokeview libraries
 BUILDSMVLIBS &
 pid_smvlibs=$!
 
-echo building background
-BUILD background &
-pid_background=$!
-
 echo building flush
 BUILD flush &
 pid_flush=$!
@@ -92,9 +88,6 @@ BUILD smokezip &
 pid_smokezip=$!
 
 # verify smokeview apps were built
-
-wait $pid_background
-CHECK_BUILD background
 
 wait $pid_flush
 CHECK_BUILD flush
