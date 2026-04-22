@@ -150,8 +150,6 @@ botrepo=$reponame/bot
 botbranch=master
 
 RUNAUTO=
-UPDATEREPO=
-CLEANREPO=0
 RUNCFASTBOT=1
 EMAIL=
 FORCE=
@@ -165,7 +163,7 @@ KILL_CFASTBOT=
 ECHO=
 CONFIG=
 
-while getopts 'abcfF:hHiI:km:o:q:r:RuUv' OPTION
+while getopts 'abfF:hHiI:km:o:q:r:RUv' OPTION
 do
 case $OPTION  in
   a)
@@ -174,9 +172,6 @@ case $OPTION  in
   b)
    BRANCH=-b
    botbranch=current
-   ;;
-  c)
-   CLEANREPO=1
    ;;
   f)
    FORCE=1
@@ -213,9 +208,6 @@ case $OPTION  in
    ;;
   R)
    REMOVE_PID=1
-   ;;
-  u)
-   UPDATEREPO=1
    ;;
   U)
    UPLOAD=-U
@@ -287,8 +279,7 @@ touch $cfastbot_pid
 if [[ "$EMAIL" != "" ]]; then
   EMAIL="-m $EMAIL"
 fi
-if [[ "botbranch" != "current" ]] && [[ "$UPDATEREPO" == "1" ]]; then
-   UPDATEREPO=-u
+if [[ "botbranch" != "current" ]]; then
    if [ "$RUNCFASTBOT" == "1" ]; then
      echo CD_REPO $botrepo $botbranch
      CD_REPO $botrepo $botbranch || exit 1
@@ -303,17 +294,14 @@ if [[ "botbranch" != "current" ]] && [[ "$UPDATEREPO" == "1" ]]; then
      
   fi
 fi
-if [[ "$CLEANREPO" == "1" ]]; then
-  CLEAN=-c
-fi
 
 REPO="-r $reponame"
 QUEUE="-q $QUEUE"
 compiler="-I $compiler"
 PID="-p $cfastbot_pid"
 cd $CURDIR
-echo  ./cfastbot.sh $PID $BRANCH $REPO $USEINSTALL $RUNAUTO $CONFIG $size $compiler $UPDATEREPO $CLEAN $QUEUE $UPLOAD $EMAIL "$@"
-$ECHO  ./cfastbot.sh $PID $BRANCH $REPO $USEINSTALL $RUNAUTO $CONFIG $size $compiler $UPDATEREPO $CLEAN $QUEUE $UPLOAD $EMAIL "$@"
+echo  ./cfastbot.sh $PID $BRANCH $REPO $USEINSTALL $RUNAUTO $CONFIG $size $compiler $CLEAN $QUEUE $UPLOAD $EMAIL "$@"
+$ECHO  ./cfastbot.sh $PID $BRANCH $REPO $USEINSTALL $RUNAUTO $CONFIG $size $compiler $CLEAN $QUEUE $UPLOAD $EMAIL "$@"
 if [ -e $cfastbot_pid ]; then
   rm $cfastbot_pid
 fi   
