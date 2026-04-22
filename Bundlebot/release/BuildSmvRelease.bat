@@ -31,7 +31,7 @@ cd %CURDIR%
 call clone_smv_repo  %BUNDLE_SMV_HASH% release %BUNDLE_SMV_TAG%
 
 :: build apps
-set progs=LIBS background flush smokediff pnginfo smokezip fds2fed wind2fds set_path timep get_time sh2bat smokeview
+set progs=LIBS flush smokediff pnginfo smokezip fds2fed wind2fds set_path timep get_time smokeview
 for %%x in ( %progs% ) do (
   cd %GITROOT%\smv\Build\%%x\intel_win
   echo *** building %%x

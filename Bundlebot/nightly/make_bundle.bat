@@ -68,7 +68,8 @@ set out_uninstall=%out_bundle%\%fdsversion%\Uninstall
 set out_doc=%out_bundle%\%fdsversion%\Documentation
 set out_guides="%out_doc%\Guides_and_Release_Notes"
 set out_web="%out_doc%\FDS_on_the_Web"
-set out_examples=%out_bundle%\%fdsversion%\Examples
+set out_fdsexamples=%out_bundle%\%fdsversion%\Examples
+set out_smvexamples=%out_bundle%\%smvversion%\Examples
 set fds_examples=%GITROOT%\fds\Verification
 set smv_examples=%GITROOT%\smv\Verification
 
@@ -107,7 +108,8 @@ mkdir %out_colorbars%\circular
 mkdir %out_doc%
 mkdir %out_guides%
 mkdir %out_web%
-mkdir %out_examples%
+mkdir %out_fdsexamples%
+mkdir %out_smvexamples%
 mkdir %out_uninstall%
 
 set release_version=%FDSMAJORVERSION%_win
@@ -132,7 +134,6 @@ cd %scriptdir%
 call copy_oneapi_libs.bat %out_bin%
 cd %CURDIR%
 
-CALL :COPY  %bundle_dir%\smv\background.exe %out_bin%\background.exe
 CALL :COPY  %bundle_dir%\smv\smokediff.exe  %out_smv%\smokediff.exe
 CALL :COPY  %bundle_dir%\smv\pnginfo.exe    %out_smv%\pnginfo.exe
 CALL :COPY  %bundle_dir%\smv\fds2fed.exe    %out_smv%\fds2fed.exe
@@ -147,7 +148,6 @@ CALL :COPY "%fds_forbundle%\fdsinit.bat"                        %out_bin%\fdsini
 CALL :COPY "%fds_forbundle%\fdspath.bat"                        %out_bin%\fdspath.bat
 CALL :COPY "%fds_forbundle%\helpfds.bat"                        %out_bin%\helpfds.bat
 CALL :COPY "%fds_forbundle%\fds_local.bat"                      %out_bin%\fds_local.bat
-CALL :COPY  %GITROOT%\smv\Build\sh2bat\intel_win\sh2bat_win.exe %out_bin%\sh2bat.exe
 
 :: setup program for new installer
 CALL :COPY "%fds_forbundle%\setup.bat"                          %out_bundle%\setup.bat
@@ -217,23 +217,24 @@ CALL :COPY "%GITROOT%\webpages\SMV_Release_Notes.htm"   "%out_guides%\Smokeview_
 CALL :COPY "%fds_forbundle%\Overview.html"              "%out_doc%\Overview.html"
 CALL :COPY "%fds_forbundle%\FDS_Web_Site.url"           "%out_web%\Official_Web_Site.url"
 
-set outdir=%out_examples%
-set QFDS=call %copyFDScases%
 set RUNTFDS=call %copyFDScases%
 set RUNCFAST=call %copyCFASTcases%
 
 echo.
-echo *** copying example files
+echo *** copying fds example files
 echo.
-cd %fds_examples%
-%GITROOT%\smv\Build\sh2bat\intel_win\sh2bat_win %fds_casessh% %fds_casesbat%
-call %fds_casesbat%>Nul
+robocopy %fds_examples% %out_fdsexamples% /E
+erase %out_fdsexamples%\*.sh
+erase %out_fdsexamples%\.gitignore
+rmdir /s /q %out_fdsexamples%\scripts
 
-cd %smv_examples%
-%GITROOT%\smv\Build\sh2bat\intel_win\sh2bat_win %smv_casessh% %smv_casesbat%
-call %smv_casesbat%>Nul
-%GITROOT%\smv\Build\sh2bat\intel_win\sh2bat_win %wui_casessh% %wui_casesbat%
-call %wui_casesbat%>Nul
+echo.
+echo *** copying smv example files
+echo.
+robocopy %smv_examples% %out_smvexamples% /E
+erase %out_smvexamples%\.gitignore
+rmdir /s /q %out_smvexamples%\Hash
+rmdir /s /q %out_smvexamples%\scripts
 
 echo.
 echo *** copying scripts that finalize installation
