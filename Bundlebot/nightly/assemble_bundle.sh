@@ -208,7 +208,6 @@ MAKEINSTALLER=$REPO_ROOT/bot/Bundlebot/nightly/make_installer.sh
 fds_cases=$REPO_ROOT/fds/Verification/FDS_Cases.sh
 fds_benchmark_cases=$REPO_ROOT/fds/Verification/FDS_Benchmark_Cases.sh
 smv_cases=$REPO_ROOT/smv/Verification/scripts/SMV_Cases.sh
-wui_cases=$REPO_ROOT/smv/Verification/scripts/WUI_Cases.sh
 copyfdscase=$REPO_ROOT/bot/Bundlebot/fds/scripts/copyfdscase.sh
 copycfastcase=$REPO_ROOT/bot/Bundlebot/fds/scripts/copycfastcase.sh
 FDSExamplesDirectory=$REPO_ROOT/fds/Verification
@@ -349,7 +348,6 @@ cd $FDSExamplesDirectory
 $fds_cases
 #$fds_benchmark_cases
 cd $SMVExamplesDirectory
-$wui_cases
 $smv_cases
 rm -rf $OUTDIR/Immersed_Boundary_Method
 
