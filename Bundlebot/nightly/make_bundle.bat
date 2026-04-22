@@ -221,14 +221,20 @@ set RUNTFDS=call %copyFDScases%
 set RUNCFAST=call %copyCFASTcases%
 
 echo.
-echo *** copying example files
+echo *** copying fds example files
 echo.
-cd %fds_examples%
-robocopy %fds_examples% %out_fdsexamples% /E /XF *.* /XD .
+robocopy %fds_examples% %out_fdsexamples%
 erase %out_fdsexamples%\*.sh
+erase %out_fdsexamples%\.gitignore
+rmdir /s /q %out_fdsexamples%\scripts
 
-cd %smv_examples%
-robocopy %smv_examples% %out_smvexamples% /E /XF *.* /XD .
+echo.
+echo *** copying smv example files
+echo.
+robocopy %smv_examples% %out_smvexamples%
+erase %out_smvexamples%\.gitignore
+rmdir /s /q %out_smvexamples%\Hash
+rmdir /s /q %out_smvexamples%\scripts
 
 echo.
 echo *** copying scripts that finalize installation
