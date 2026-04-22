@@ -223,7 +223,7 @@ set RUNCFAST=call %copyCFASTcases%
 echo.
 echo *** copying fds example files
 echo.
-robocopy %fds_examples% %out_fdsexamples%
+robocopy %fds_examples% %out_fdsexamples% /E
 erase %out_fdsexamples%\*.sh
 erase %out_fdsexamples%\.gitignore
 rmdir /s /q %out_fdsexamples%\scripts
@@ -231,7 +231,7 @@ rmdir /s /q %out_fdsexamples%\scripts
 echo.
 echo *** copying smv example files
 echo.
-robocopy %smv_examples% %out_smvexamples%
+robocopy %smv_examples% %out_smvexamples% /E
 erase %out_smvexamples%\.gitignore
 rmdir /s /q %out_smvexamples%\Hash
 rmdir /s /q %out_smvexamples%\scripts
