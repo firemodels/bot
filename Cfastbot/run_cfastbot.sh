@@ -129,13 +129,7 @@ fi
 cfastbot_pid=~/.cfastgit/cfastbot_pid
 
 CURDIR=`pwd`
-
-# checking to see if a queing system is available
-QUEUE=firebot
-notfound=`qstat -a 2>&1 | tail -1 | grep "not found" | wc -l`
-if [ $notfound -eq 1 ]; then
-  QUEUE=none
-fi
+QUEUE=$(sinfo -h -o "%P" | grep '\*' | sed 's/\*//')
 
 if [ -e .cfast_git ]; then
   cd ../..
@@ -245,12 +239,10 @@ if [ "$KILL_CFASTBOT" == "1" ]; then
     kill -9 $(LIST_DESCENDANTS $PID)
     echo "killing cfastbot (PID=$PID)"
     kill -9 $PID
-    if [ "$QUEUE" != "none" ]; then
-      JOBIDS=`qstat -a | grep cb_ | awk -v user="$USER" '{if($2==user){print $1}}'`
-      if [ "$JOBIDS" != "" ]; then
-        echo killing cfastbot jobs with Id:$JOBIDS
-        qdel $JOBIDS
-      fi
+    JOBIDS=`squeue | grep cb_ | awk -v user="$USER" '{if($2==user){print $1}}'`
+    if [ "$JOBIDS" != "" ]; then
+      echo killing cfastbot jobs with Id:$JOBIDS
+      qdel $JOBIDS
     fi
     echo cfastbot process $PID killed
   else
