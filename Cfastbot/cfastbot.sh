@@ -997,6 +997,7 @@ check_guide()
    if [[ `grep -I "succeeded" $logfile` != "" ]] && [[ -e $docdir/$docfile ]]; then
       # Guide built succeeded; there were no errors/warnings
       # Copy guide to CFASTbot's local website
+      dummy=1
    else
       # There were errors/warnings in the guide build process
       echo "Warnings from Stage 6 - Build CFAST Guides:" >> $WARNING_LOG
