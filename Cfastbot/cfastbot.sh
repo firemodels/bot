@@ -524,9 +524,9 @@ check_compile_smv()
 
 wait_vv_cases_debug_start()
 {
-   # Scans qstat and waits for V&V cases to start
-   while [[          `qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$'` != '' ]]; do
-      JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$' | wc -l`
+   # Scans job queue and waits for V&V cases to start
+   while [[          `squeue | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$'` != '' ]]; do
+      JOBS_REMAINING=`squeue | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$' | wc -l`
       echo "Waiting for ${JOBS_REMAINING} V&V cases to start." >> $OUTPUT_DIR/stage3_run_debug
       TIME_LIMIT_STAGE="3 run debug cases"
       check_time_limit
@@ -540,25 +540,14 @@ wait_vv_cases_debug_start()
 
 wait_vv_cases_debug_end()
 {
-   # Scans qstat and waits for V&V cases to end
-   if [[ "$QUEUE" == "none" ]]
-   then
-     while [[ `ps -u $USER -f | fgrep .in | fgrep cfast | grep -v grep` != '' ]]; do
-        JOBS_REMAINING=`ps -u $USER -f | fgrep .in | fgrep cfast | grep -v grep | wc -l`
-        echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage3_run_debug
-        TIME_LIMIT_STAGE="3 run debug cases"
-        check_time_limit
-        sleep 30
-     done
-   else
-     while [[          `qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$'` != '' ]]; do
-        JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$' | wc -l`
-        echo "Waiting for ${JOBS_REMAINING} ${1} cases to complete." >> $OUTPUT_DIR/stage3_run_debug
-        TIME_LIMIT_STAGE="3 run debug cases"
-        check_time_limit
-        sleep 30
-     done
-   fi
+  # Scans job queue and waits for V&V cases to end
+  while [[          `squeue | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$'` != '' ]]; do
+     JOBS_REMAINING=`squeue | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$' | wc -l`
+     echo "Waiting for ${JOBS_REMAINING} ${1} cases to complete." >> $OUTPUT_DIR/stage3_run_debug
+     TIME_LIMIT_STAGE="3 run debug cases"
+     check_time_limit
+     sleep 30
+  done
 }
 
 #---------------------------------------------
@@ -578,9 +567,7 @@ run_vv_cases_debug()
    echo '   debug'
    echo 'Running CFAST V&V cases' >> $OUTPUT_DIR/stage3_run_debug 2>&1
    ./Run_CFAST_Cases.sh -I $compiler -S $smvrepo $USEINSTALL2 -m 2 -d -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage3_run_debug 2>&1
-   if [ "$QUEUE" != "none" ]; then
-     wait_vv_cases_debug_start
-   fi
+   wait_vv_cases_debug_start
 
    # Wait for V&V cases to end
    wait_vv_cases_debug_end
@@ -653,9 +640,9 @@ check_vv_cases_debug()
 
 wait_vv_cases_release_start()
 {
-   # Scans qstat and waits for V&V cases to start
-   while [[          `qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$'` != '' ]]; do
-      JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$' | wc -l`
+   # Scans job queue and waits for V&V cases to start
+   while [[          `squeue | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$'` != '' ]]; do
+      JOBS_REMAINING=`squeue | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$' | wc -l`
       echo "Waiting for ${JOBS_REMAINING} V&V cases to start." >> $OUTPUT_DIR/stage3_run_release
       TIME_LIMIT_STAGE="3 run release cases"
       check_time_limit
@@ -669,25 +656,14 @@ wait_vv_cases_release_start()
 
 wait_vv_cases_release_end()
 {
-   # Scans qstat and waits for V&V cases to end
-   if [[ "$QUEUE" == "none" ]]
-   then
-     while [[ `ps -u $USER -f | fgrep .in | fgrep cfast | grep -v grep` != '' ]]; do
-        JOBS_REMAINING=`ps -u $USER -f | fgrep .in | fgrep cfast | grep -v grep | wc -l`
-        echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage3_run_release
-        TIME_LIMIT_STAGE="3 run release cases"
-        check_time_limit
-        sleep 30
-     done
-   else
-     while [[          `qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$'` != '' ]]; do
-        JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$' | wc -l`
-        echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage3_run_release
-        TIME_LIMIT_STAGE="3 run release cases"
-        check_time_limit
-        sleep 30
-     done
-   fi
+  # Scans job queue and waits for V&V cases to end
+  while [[          `squeue | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$'` != '' ]]; do
+     JOBS_REMAINING=`squeue | awk '{print $2 $4 $10}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$' | wc -l`
+     echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage3_run_release
+     TIME_LIMIT_STAGE="3 run release cases"
+     check_time_limit
+     sleep 30
+  done
 }
 
 #---------------------------------------------
@@ -701,9 +677,7 @@ run_vv_cases_release()
    echo '   release'
    echo 'Running CFAST V&V cases' >> $OUTPUT_DIR/stage3_run_release 2>&1
    ./Run_CFAST_Cases.sh -I $compiler -S $smvrepo $USEINSTALL2 -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage3_run_release 2>&1
-   if [ "$QUEUE" != "none" ]; then
-     wait_vv_cases_release_start
-   fi
+   wait_vv_cases_release_start
 
    # Wait for all V&V cases to end
    wait_vv_cases_release_end
@@ -1259,7 +1233,7 @@ expbranch=master
 cd $cfastbotdir
 
 compiler=intel
-QUEUE=smokebot
+QUEUE=
 RUNAUTO=
 UPLOAD=
 USEINSTALL=
