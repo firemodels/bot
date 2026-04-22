@@ -78,7 +78,6 @@ echo ***Copying Smokeview files
 call :COPYPROG background
 call :COPYPROG get_time
 call :COPYPROG get_time
-call :COPYPROG sh2bat
 call :COPYPROG smokediff
 call :COPYPROG smokeview test_
 call :COPYPROG smokezip
