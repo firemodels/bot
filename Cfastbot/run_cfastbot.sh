@@ -53,6 +53,7 @@ echo ""
 echo "Miscellaneous:"
 echo "-a - run automatically if cfast repo has changed"
 echo "-b - use the current branch"
+echo "-C - clone cfast, exp and smv repos"
 echo "-f - force cfastbot run"
 echo "-F config.sh  - clone repos using revision and tags in config.sh"
 echo "-i - use installed smokeview"
@@ -80,7 +81,6 @@ echo "-c - clean repos"
 echo "-h - display most commonly used options"
 echo "-H - display all options"
 echo "-u - update repos"
-echo "-v - show options used to run cfastbot"
 if [ "$option" == "-H" ]; then
 usage_all
 fi

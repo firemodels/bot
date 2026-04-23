@@ -1,4 +1,5 @@
 #!/bin/bash
+cur_dir=`pwd`
 # CFASTbot
 # This script runs the CFAST verification/validation suite 
 # on the latest revision of the repository.
@@ -1296,10 +1297,13 @@ CD_REPO $botrepo $botbranch || exit 1
 
 if [ "$CONFIG" == "" ]; then
   if [ "$CLONEREPOS" == "" ]; then
-    CFASTBRANCH=current
-    SMVBRANCH=current
-    expbranch=current
+    cd $reponame/bot/Scripts
+    CFASTBRANCH=master
+    SMVBRANCH=master
+    expbranch=master
   else
+    cd $reponame/bot/Scripts
+    ./setup_repos.sh -B
     CFASTBRANCH=master
     SMVBRANCH=master
     expbranch=master
@@ -1417,12 +1421,6 @@ echo "------"
 clean_cfastbot_history
 
 ### Stage 1 ###
-
-cur_dir=`pwd`
-
-# clone cfast, exp and smv repos
-cd $reponame/bot/Scripts
-./setup_repos.sh -B
 
 CD_REPO $reponame/bot $botbranch || return 1
 BOT_REVISION=`git describe --abbrev=7 --dirty --long`
