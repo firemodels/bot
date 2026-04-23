@@ -725,6 +725,7 @@ email_build_status()
    echo "$BOT_REVISION "                       >> $TIME_LOG
    echo "$CFAST_REVISION "                     >> $TIME_LOG
    echo "$EXP_REVISION "                       >> $TIME_LOG
+   echo "$FDS_REVISION "                       >> $TIME_LOG
    echo "$SMV_REVISION "                       >> $TIME_LOG
    echo ""                                     >> $TIME_LOG
    echo "Start Time: $start_time "             >> $TIME_LOG
@@ -1069,6 +1070,9 @@ BOT_REVISION=`git describe --abbrev=7 --dirty --long`
 
 cd $reporoot/exp
 EXP_REVISION=`git describe --abbrev=7 --dirty --long`
+
+cd $reporoot/fds
+FDS_REVISION=`git describe --abbrev=7 --dirty --long`
 
 cd $reporoot/cfast
 CFAST_REVISION=`git describe --abbrev=7 --dirty --long`
