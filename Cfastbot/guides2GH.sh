@@ -1,8 +1,7 @@
 #!/bin/bash
+FROMDIR=$1
 
 CURDIR=`pwd`
-
-FROMDIR=$HOME/.cfastbot/Manuals
 
 UPLOADGUIDE ()
 {
