@@ -195,9 +195,10 @@ fi
 
 QUEUE=smokebot
 SQUEUE=
-notfound=`qstat -a 2>&1 | tail -1 | grep "not found" | wc -l`
+notfound=`squeue -a 2>&1 | tail -1 | grep "not found" | wc -l`
 if [ $notfound -eq 1 ] ; then
-  QUEUE=none
+  echo ***error: squeue command not found.
+  exit
 fi
 
 #*** parse command line options
@@ -376,16 +377,10 @@ if [ "$KILL_SMOKEBOT" == "1" ]; then
       kill -9 $JOBS
     fi
 
-    if [ "$QUEUE" == "none" ]; then
-      cd $CURDIR/../Scripts
-      ./killppids.sh ../Smokebot/scriptfiles
-      cd $CURDIR
-    else
-      JOBIDS=`qstat -a | grep SB_ | awk -v user="$USER" '{if($2==user){print $1}}' | awk -F'.' '{print $1}'`
-      if [ "$JOBIDS" != "" ]; then
-        echo killing smokebot jobs with Id: $JOBIDS
-        qdel $JOBIDS
-      fi
+    JOBIDS=`squeue -o "%.18j %.8u %.2t" | grep SB_ | awk -v user="$USER" '{if($2==user){print $1}}' | awk -F'.' '{print $1}'`
+    if [ "$JOBIDS" != "" ]; then
+      echo killing smokebot jobs with Id: $JOBIDS
+      qdel $JOBIDS
     fi
     
     echo "killing smokebot (PID=$PID)"
@@ -443,3 +438,4 @@ if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi
 
+ 
