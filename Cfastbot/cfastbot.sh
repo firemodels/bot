@@ -1,34 +1,22 @@
 #!/bin/bash
+cur_dir=`pwd`
 # CFASTbot
 # This script runs the CFAST verification/validation suite 
-# on the latest revision of the repository.
 
 #---------------------------------------------
-#                   CHK_REPO
+#                   VERIFY_REPO_BRANCH
 #---------------------------------------------
 
-CHK_REPO ()
+VERIFY_REPO_BRANCH ()
 {
   local repodir=$1
+  local branch=$2
   
   if [ ! -e $repodir ]; then
      echo "***error: the repo directory $repodir does not exist."
      echo "          Aborting cfastbot."
      return 1
   fi
-  return 0
-}
-
-#---------------------------------------------
-#                   CD_REPO
-#---------------------------------------------
-
-CD_REPO ()
-{
-  local repodir=$1
-  local branch=$2
-  
-  CHK_REPO $repodir || return 1
 
   cd $repodir
   if [[ "$branch" != "current" ]] && [[ "$branch" != "" ]]; then
@@ -40,21 +28,6 @@ CD_REPO ()
      fi
   fi
   return 0
-}
-
-#---------------------------------------------
-#                   MKDIR
-#---------------------------------------------
-
-MKDIR ()
-{
-  local DIR=$1
-
-  if [ ! -d $DIR ]
-  then
-    echo Creating directory $DIR
-    mkdir $DIR
-  fi
 }
 
 #---------------------------------------------
@@ -98,7 +71,7 @@ run_auto()
    git_TRIGGERONLY=$GITSTATUS_DIR/cfastonly_source_revision
 
    if [ "$CFASTBRANCH" != "current" ]; then
-     CD_REPO $CFAST_SOURCE $CFASTBRANCH || return 1
+     cd $CFAST_SOURCE
      git fetch origin &> /dev/null
      git merge origin/$CFASTBRANCH &> /dev/null
      have_remote=`git remote -v | awk '{print $1}' | grep firemodels | wc  -l`
@@ -160,163 +133,16 @@ check_time_limit()
 
 set_files_world_readable()
 {
-   CD_REPO $cfastrepo $CFASTBRANCH || return 1
+   cd $cfastrepo
    chmod -R go+r *
    
-   CD_REPO $smvrepo $SMVBRANCH || return 1
+   cd $smvrepo
    chmod -R go+r *
 
-   CD_REPO $exprepo $expbranch || return 1
+   cd $exprepo
    chmod -R go+r *
 
    return 0
-}
-
-#---------------------------------------------
-#                   run_python_setup
-#---------------------------------------------
-
-run_python_setup()
-{
-   echo Python
-   echo "   setup environment"
-   cd $botrepo/Firebot/
-   source ./setup_python.sh > $OUTPUT_DIR/stage5_python_setup 2>&1
-}
-
-#---------------------------------------------
-#                   clean_cfastbot_history
-#---------------------------------------------
-
-clean_cfastbot_history()
-{
-   # Clean cfastbot metafiles
-   echo "Cleaning"
-   echo "   cfastbot results directory"
-   cd $cfastbotdir
-   rm -rf $OUTPUT_DIR/* &> /dev/null
-}
-
-#---------------------------------------------
-#                   clean_repo
-#---------------------------------------------
-
-clean_repo()
-{
-  local repo=$1
-  local branch=$2
-  
-  curdir=`pwd`
-  CD_REPO $repo $branch || return 1
-  git clean -dxf &> /dev/null
-  git add . &> /dev/null
-  git reset --hard HEAD &> /dev/null
-  cd $curdir
-  return 0
-}
-
-#---------------------------------------------
-#                   clean_repo2
-#---------------------------------------------
-
-clean_repo2()
-{
-   local repo=$1
-   local branch=$2
-
-   CD_REPO $reponame/$repo || return 1
-   git update-index --refresh
-   IS_DIRTY=`git describe --abbrev=7 --long --dirty | grep dirty | wc -l`
-   if [ "$IS_DIRTY" == "1" ]; then
-     echo "The repo $reponame/$repo has uncommitted changes."
-     echo "Commit or revert these changes or re-run"
-     echo "cfastbot without the -c (clean) option"
-     return 1
-   fi
-   echo "   $repo"
-   clean_repo $reponame/$repo $branch || return 1
-   return 0
-}
-
-#---------------------------------------------
-#                   check_git_checkout
-#---------------------------------------------
-
-check_git_checkout()
-{
-   # Check for git errors
-   stage1_setup_success=true
-}
-
-#---------------------------------------------
-#                   compile_cfast_db
-#---------------------------------------------
-
-compile_cfast_db()
-{
-   # Build debug CFAST
-   echo "Building"
-   echo "   cfast"
-   echo "      Intel debug"
-   CD_REPO $cfastrepo/Build/CFAST/${compiler}_${platform}_db $CFASTBRANCH || return 1
-   make -f ../makefile clean &> /dev/null
-   ./make_cfast.sh &> $OUTPUT_DIR/stage2_build_cfast_debug
-   return 0
- }
-
-#---------------------------------------------
-#                   compile_cfast_gnu_db
-#---------------------------------------------
-
-compile_cfast_gnu_db()
-{
-   # Build gnu debug CFAST
-   compile_gnu=
-   if [ "$OPENMPI_INTEL" != "" ]; then
-     if [ "$OPENMPI_GNU" != "" ]; then
-       module unload $OPENMPI_INTEL
-       module load $OPENMPI_GNU
-       compile_gnu=1
-       echo "      gnu debug"
-       CD_REPO $cfastrepo/Build/CFAST/gnu_${platform}_db $CFASTBRANCH || return 1
-       make -f ../makefile clean &> /dev/null
-       ./make_cfast.sh &> $OUTPUT_DIR/stage2_build_cfast_gnu_debug
-       module unload $OPENMPI_GNU
-       module load $OPENMPI_INTEL
-     fi
-   fi
-   return 0
- }
-
-#---------------------------------------------
-#                   check_compile_gnu_cfast_db
-#---------------------------------------------
-
-check_compile_cfast_gnu_db()
-{
-   # Check for errors in CFAST debug compilation
-   if [ "$compile_gnu" == "1" ]; then
-     CD_REPO $cfastrepo/Build/CFAST/gnu_${platform}_db $CFASTBRANCH || return 1
-     if [ -e "cfast7_${platform}_db" ]
-     then
-        stage2_build_cfast_gnu_debug_success=true
-     else
-        echo "Errors from Stage 2 - Compile gnu CFAST debug:" >> $ERROR_LOG
-        cat $OUTPUT_DIR/stage2_build_cfast_gnu_debug >> $ERROR_LOG
-        echo "" >> $ERROR_LOG
-     fi
-
-   # Check for compiler warnings/remarks
-     if [[ `grep -A 5 -E 'warning|remark' ${OUTPUT_DIR}/stage2_build_cfast_gnu_debug` == "" ]]
-     then
-      # Continue along
-      :
-     else
-        echo "Warnings from Stage 2 - Compile gnu CFAST debug:" >> $WARNING_LOG
-        grep -A 5 -E 'warning|remark' ${OUTPUT_DIR}/stage2_build_cfast_gnu_debug >> $WARNING_LOG
-        echo "" >> $WARNING_LOG
-     fi
-   fi
 }
 
 #---------------------------------------------
@@ -326,7 +152,7 @@ check_compile_cfast_gnu_db()
 check_compile_cfast_db()
 {
    # Check for errors in CFAST debug compilation
-   CD_REPO $cfastrepo/Build/CFAST/${compiler}_${platform}_db $CFASTBRANCH || return 1
+   cd $cfastrepo/Build/CFAST/intel_${platform}_db
    if [ -e "cfast7_${platform}_db" ]
    then
       stage2_build_cfast_debug_success=true
@@ -349,26 +175,13 @@ check_compile_cfast_db()
 }
 
 #---------------------------------------------
-#                   compile_cfast
-#---------------------------------------------
-
-compile_cfast()
-{ 
-   # Build release CFAST
-   echo "      release"
-   CD_REPO $cfastrepo/Build/CFAST/${compiler}_${platform} $CFASTBRANCH || return 1
-   make -f ../makefile clean &> /dev/null
-   ./make_cfast.sh &> $OUTPUT_DIR/stage2_build_cfast_release
-}
-
-#---------------------------------------------
 #                   check_compile_cfast
 #---------------------------------------------
 
 check_compile_cfast()
 {
    # Check for errors in CFAST release compilation
-   CD_REPO $cfastrepo/Build/CFAST/${compiler}_${platform} $CFASTBRANCH || return 1
+   cd $cfastrepo/Build/CFAST/intel_${platform}
    if [[ -e "cfast7_${platform}" ]]
    then
       stage2_build_cfast_release_success=true
@@ -392,128 +205,63 @@ check_compile_cfast()
 }
 
 #---------------------------------------------
-#                   compile_csmv_utilities
-#---------------------------------------------
-
-compile_smv_utilities()
-{
-   if [ "$USEINSTALL" == "" ]; then
-   # smokeview libraries
-     CD_REPO $smvrepo/Build/LIBS/${compiler}_${platform} $SMVBRANCH || return 1
-     echo 'Building Smokeview libraries' >> $OUTPUT_DIR/stage2_build_smv_util 2>&1
-     echo "   smokeview libraries"
-     ./make_LIBS.sh >> $OUTPUT_DIR/stage2_build_smv_util 2>&1
-   else
-     echo "   smokeview libraries - not built, using installed smokview"
-   fi
-   return 0
-}
-
-#---------------------------------------------
-#                   compile_smv_db
-#---------------------------------------------
-
-compile_smv_db()
-{
-   # Clean and compile SMV DB
-   if [ "$USEINSTALL" == "" ]; then
-     echo "   smokeview"
-     echo "      debug"
-     CD_REPO $smvrepo/Build/smokeview/${compiler}_${platform} || return 1
-     ./make_smokeview_db.sh &> $OUTPUT_DIR/stage2_build_smv_debug
-   else
-     echo "   smokeview"
-     echo "      debug - not built, using installed smokeview"
-   fi
-   return 0
-}
-
-#---------------------------------------------
 #                   check_compile_smv_db
 #---------------------------------------------
 
 check_compile_smv_db()
 {
    # Check for errors in SMV DB compilation
-   if [ "$USEINSTALL" == "" ]; then
-     CD_REPO $smvrepo/Build/smokeview/${compiler}_${platform} $SMVBRANCH || return 1
-     if [ -e "smokeview_${platform}_db" ]
-     then
-        stage2_build_smv_debug_success=true
-     else
-        echo "Errors from Stage 2 - Compile SMV DB:" >> $ERROR_LOG
-        cat $OUTPUT_DIR/stage2_build_smv_debug >> $ERROR_LOG
-        echo "" >> $ERROR_LOG
-     fi
+   cd $smvrepo/Build/smokeview/intel_${platform}
+   if [ -e "smokeview_${platform}_db" ]
+   then
+      stage2_build_smv_debug_success=true
+   else
+      echo "Errors from Stage 2 - Compile SMV DB:" >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage2_build_smv_debug >> $ERROR_LOG
+      echo "" >> $ERROR_LOG
+   fi
 
    # Check for compiler warnings/remarks
    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-     if [[ `grep -A 5 -E 'warning|remark' ${OUTPUT_DIR}/stage2_build_smv_debug | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]
-     then
-        # Continue along
-        :
-     else
-        echo "Stage build_smv_debug warnings:" >> $WARNING_LOG
-        grep -A 5 -E 'warning|remark' ${OUTPUT_DIR}/stage2_build_smv_debug | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
-     fi
-   fi
-   return 0
-}
-
-#---------------------------------------------
-#                   compile_smv
-#---------------------------------------------
-
-compile_smv()
-{
-   # Clean and compile SMV
-   if [ "$USEINSTALL" == "" ]; then
-     echo "      release"
-     CD_REPO $smvrepo/Build/smokeview/${compiler}_${platform} $SMVBRANCH || return 1
-     ./make_smokeview.sh &> $OUTPUT_DIR/stage2_build_smv_release
+   if [[ `grep -A 5 -E 'warning|remark' ${OUTPUT_DIR}/stage2_build_smv_debug | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]
+   then
+      # Continue along
+      :
    else
-     echo "      release - not built, using installed smokeview"
+      echo "Stage build_smv_debug warnings:" >> $WARNING_LOG
+      grep -A 5 -E 'warning|remark' ${OUTPUT_DIR}/stage2_build_smv_debug | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
    fi
    return 0
 }
 
 #---------------------------------------------
-#                   check_compkile_smv
+#                   check_compile_smv
 #---------------------------------------------
 
 check_compile_smv()
 {
    # Check for errors in SMV release compilation
-   if [ "$USEINSTALL" == "" ]; then
-     CD_REPO $smvrepo/Build/smokeview/${compiler}_${platform} $smvbrach || return 1
-     if [ -e "smokeview_${platform}" ]
-     then
-        stage2_build_smv_release_success=true
-     else
-        echo smokeview not found
-        echo "Errors from Stage 2 - Compile SMV release:" >> $ERROR_LOG
-        cat $OUTPUT_DIR/stage2_build_smv_release >> $ERROR_LOG
-        echo "" >> $ERROR_LOG
-     fi
+   cd $smvrepo/Build/smokeview/intel_${platform}
+   if [ -e "smokeview_${platform}" ]
+   then
+      stage2_build_smv_release_success=true
+   else
+      echo smokeview not found
+      echo "Errors from Stage 2 - Compile SMV release:" >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage2_build_smv_release >> $ERROR_LOG
+      echo "" >> $ERROR_LOG
+   fi
 
    # Check for compiler warnings/remarks
    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-     if [[ `grep -A 5 -E 'warning|remark' ${OUTPUT_DIR}/stage2_build_smv_release | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]
-     then
-        # Continue along
-        :
-     else
-        echo "Stage build_smv_release warnings:" >> $WARNING_LOG
-        grep -A 5 -E 'warning|remark' ${OUTPUT_DIR}/stage2_build_smv_release | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
-        echo "" >> $WARNING_LOG
-     fi
+   if [[ `grep -A 5 -E 'warning|remark' ${OUTPUT_DIR}/stage2_build_smv_release | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]
+   then
+      # Continue along
+      :
    else
-     is_file_installed smokeview stage2_build_smv_release 
-     if [ "$stage2_build_smv_release_success" == "0" ] ; then
-        echo "smokeview not installed"
-        echo "Errors from Stage build_smv_release - smokeview not installed:" >> $ERROR_LOG
-        echo "" >> $ERROR_LOG
-     fi
+      echo "Stage build_smv_release warnings:" >> $WARNING_LOG
+      grep -A 5 -E 'warning|remark' ${OUTPUT_DIR}/stage2_build_smv_release | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
+      echo "" >> $WARNING_LOG
    fi
    return 0
 }
@@ -556,7 +304,7 @@ wait_vv_cases_debug_end()
 
 run_vv_cases_debug()
 {
-   CD_REPO $cfastrepo/Validation/scripts $CFASTBRANCH || return 1
+   cd $cfastrepo/Validation/scripts
 
    #  =======================
    #  = Run all cfast cases =
@@ -566,7 +314,7 @@ run_vv_cases_debug()
    echo 'Running CFAST V&V cases'
    echo '   debug'
    echo 'Running CFAST V&V cases' >> $OUTPUT_DIR/stage3_run_debug 2>&1
-   ./Run_CFAST_Cases.sh -I $compiler -S $smvrepo $USEINSTALL2 -m 2 -d -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage3_run_debug 2>&1
+   ./Run_CFAST_Cases.sh -I intel -S $smvrepo -m 2 -d -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage3_run_debug 2>&1
    wait_vv_cases_debug_start
 
    # Wait for V&V cases to end
@@ -581,7 +329,7 @@ run_vv_cases_debug()
 check_vv_cases_debug()
 {
    # Scan and report any errors in CFAST Verification cases
-   CD_REPO $cfastrepo/Verification $CFASTBRANCH || return 1
+   cd $cfastrepo/Verification
 
    if [[ `grep 'Run aborted' -riI --include *.log --include *.err ${OUTPUT_DIR}/stage3_run_debug` == "" ]] && \
       [[ `grep -F "***Error" -riI --include *.log --include *.err *` == "" ]] && \
@@ -602,7 +350,7 @@ check_vv_cases_debug()
    fi
 
    # Scan and report any errors in CFAST Validation cases
-   CD_REPO $cfastrepo/Validation $CFASTBRANCH || return 1
+   cd $cfastrepo/Validation
 
    if [[ `grep 'Run aborted' -riI --include *.log --include *.err ${OUTPUT_DIR}/stage3_run_debug` == "" ]] && \
       [[ `grep -F "***Error" -riI --include *.log --include *.err *` == "" ]] && \
@@ -626,10 +374,10 @@ check_vv_cases_debug()
    #  = Remove case files =
    #  =====================
 
-   CD_REPO $cfastrepo/Verification $CFASTBRANCH || return 1
+   cd $cfastrepo/Verification
    git clean -dxf &> /dev/null
 
-   CD_REPO $cfastrepo/Validation $CFASTBRANCH || return 1
+   cd $cfastrepo/Validation
    git clean -dxf &> /dev/null
    return 0
 }
@@ -673,10 +421,10 @@ wait_vv_cases_release_end()
 run_vv_cases_release()
 {
    # Start running all CFAST V&V cases
-   CD_REPO $cfastrepo/Validation/scripts $CFASTBRANCH || return 1
+   cd $cfastrepo/Validation/scripts
    echo '   release'
    echo 'Running CFAST V&V cases' >> $OUTPUT_DIR/stage3_run_release 2>&1
-   ./Run_CFAST_Cases.sh -I $compiler -S $smvrepo $USEINSTALL2 -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage3_run_release 2>&1
+   ./Run_CFAST_Cases.sh -I intel -S $smvrepo -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage3_run_release 2>&1
    wait_vv_cases_release_start
 
    # Wait for all V&V cases to end
@@ -691,7 +439,7 @@ run_vv_cases_release()
 check_vv_cases_release()
 {
    # Scan and report any errors in CFAST Verificaion cases
-   CD_REPO $cfastrepo/Verification $CFASTBRANCH || return 1
+   cd $cfastrepo/Verification
 
    if [[ `grep 'Run aborted' -riI --include *.log --include *.err ${OUTPUT_DIR}/stage3_run_release` == "" ]] && \
       [[ `grep -F "***Error" -riI --include *.log --include *.err *` == "" ]] && \
@@ -735,35 +483,6 @@ check_vv_cases_release()
 }
 
 #---------------------------------------------
-#                   is_file_sintalled
-#---------------------------------------------
-
-is_file_installed()
-{
-  local program=$1
-  local stage=$2
-  
-  prognotfound=`$program -help | tail -1 | grep "not found" | wc -l`
-  if [ "$prognotfound" == "1" ] ; then
-    ${stage}_success="0"
-    echo "***error: the $program is not installed" >> $OUTPUT_DIR/$stage
-  fi
-}
-
-#---------------------------------------------
-#                   make_cfast_pictures
-#---------------------------------------------
-
-make_cfast_pictures()
-{
-   echo "Generating smokeview images"
-   CD_REPO $cfastrepo/Validation/scripts $CFASTBRANCH || return 1
-   ./Make_CFAST_Pictures.sh -I $compiler $USEINSTALL 2>&1 | grep -v FreeFontPath &> $OUTPUT_DIR/stage4_make_pictures
-
-   return 0
-}
-
-#---------------------------------------------
 #                   check_cfast_pictures
 #---------------------------------------------
 
@@ -780,21 +499,6 @@ check_cfast_pictures()
       cat $OUTPUT_DIR/stage4_make_pictures >> $ERROR_LOG
       echo "" >> $ERROR_LOG
    fi
-}
-
-#---------------------------------------------
-#                   run_python_verification
-#---------------------------------------------
-
-run_python_verification()
-{
-   echo "   Verification"
-   echo "      make plots"
-   # Run Python plotting script
-   CD_REPO $cfastrepo/Utilities/Python $CFASTBRANCH || return 1
-
-   python CFAST_verification_script.py &> $OUTPUT_DIR/stage5_run_python_verification
-   return 0
 }
 
 #---------------------------------------------
@@ -816,27 +520,6 @@ check_python_verification()
       cat $OUTPUT_DIR/stage5_run_python_verification_errors | tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
       echo "" >> $ERROR_LOG
    fi
-}
-
-#---------------------------------------------
-#                   run_python_validation
-#---------------------------------------------
-
-run_python_validation()
-{
-   
-   echo "   Validation"
-   echo "      run VandV_Calcs"
-   CD_REPO $cfastrepo/Validation $CFASTBRANCH || return 1
-   python VandV_Calcs.py CFAST_Pressure_Correction_inputs.csv &> /dev/null
-   python VandV_Calcs.py CFAST_Temperature_Profile_inputs.csv &> /dev/null
-   python VandV_Calcs.py CFAST_Heat_Flux_Profile_inputs.csv &> /dev/null
-   
-   echo "      make plots"
-   # Run Python plotting script
-   cd $cfastrepo/Utilities/Python
-   python CFAST_validation_script.py &> $OUTPUT_DIR/stage5_run_python_validation
-   return 0
 }
 
 #---------------------------------------------
@@ -865,7 +548,7 @@ check_python_validation()
 
 check_validation_stats()
 {
-   CD_REPO $cfastrepo/Utilities/Python $CFASTBRANCH || return 1
+   cd $cfastrepo/Utilities/Python
 
    STATS_FILE_BASENAME=validation_scatterplot_output
 
@@ -904,13 +587,13 @@ check_validation_stats()
 
 archive_validation_stats()
 {
-   CD_REPO $cfastrepo/Utilities/Python $CFASTBRANCH || return 1
+   cd $cfastrepo/Utilities/Python
 
    if [ -e ${CURRENT_STATS_FILE} ] ; then
       # Copy to CFASTbot history
       cp ${CURRENT_STATS_FILE} "$HISTORY_DIR/${STATS_FILE_BASENAME}_${GIT_REVISION}.csv"
    fi
-   CD_REPO $cfastrepo/Validation/scripts $CFASTBRANCH || return 1
+   cd $cfastrepo/Validation/scripts
    if [ -e gettime.sh ]; then
      TIMEFILE=$HISTORY_DIR/${GIT_REVISION}_timing.csv
      ./Run_CFAST_Cases.sh -t | grep -v submitted > $TIMEFILE
@@ -951,54 +634,6 @@ check_guide()
 }
 
 #---------------------------------------------
-#                   make_cfast_tech_guide
-#---------------------------------------------
-
-make_cfast_tech_guide()
-{
-   # Build CFAST Tech Guide
-   echo Building CFAST Tech guide
-   CD_REPO $cfastrepo/Manuals/CFAST_Tech_Ref $CFASTBRANCH || return 1
-   ./make_guide.sh &> $OUTPUT_DIR/stage6_cfast_tech_guide
-
-   # Check guide for completion and copy to website if successful
-   check_guide $OUTPUT_DIR/stage6_cfast_tech_guide $cfastrepo/Manuals/CFAST_Tech_Ref CFAST_Tech_Ref.pdf 'CFAST Technical Reference Guide'
-   return 0
-}
-
-#---------------------------------------------
-#                   make_cfast_user_guide
-#---------------------------------------------
-
-make_cfast_user_guide()
-{
-   # Build CFAST User Guide
-   echo Building CFAST User guide
-   CD_REPO $cfastrepo/Manuals/CFAST_Users_Guide $CFASTBRANCH || return 1
-   ./make_guide.sh &> $OUTPUT_DIR/stage6_cfast_user_guide
-
-   # Check guide for completion and copy to website if successful
-   check_guide $OUTPUT_DIR/stage6_cfast_user_guide $cfastrepo/Manuals/CFAST_Users_Guide CFAST_Users_Guide.pdf 'CFAST Users Guide'
-   return 0
-}
-
-#---------------------------------------------
-#                   make_cdata_guide
-#---------------------------------------------
-
-make_cdata_guide()
-{
-   # Build CDATA guide
-   echo Building CData guide
-   CD_REPO $cfastrepo/Manuals/CFAST_CData_Guide $CFASTBRANCH || return 1
-   ./make_guide.sh &> $OUTPUT_DIR/stage6_cdata_guide
-
-   # Check guide for completion and copy to website if successful
-   check_guide $OUTPUT_DIR/stage6_cdata_guide $cfastrepo/Manuals/CFAST_CData_Guide CFAST_CData_Guide.pdf 'CData Guide'
-   return 0
-}
-
-#---------------------------------------------
 #                   CHECKOUT_REPO
 #---------------------------------------------
 
@@ -1029,36 +664,6 @@ CHECKOUT_REPO()
 
  echo git checkout $local_tag                          >> $OUTPUT_DIR/stage1_setup_clone 2>&1
  git checkout $local_tag                               >  /dev/null                2>&1
-}
-
-#---------------------------------------------
-#                   make_cfast_vv_guide
-#---------------------------------------------
-
-make_cfast_vv_guide()
-{
-   echo Building CFAST VV guide
-   CD_REPO $cfastrepo/Manuals/CFAST_Validation_Guide $CFASTBRANCH || return 1
-   ./make_guide.sh &> $OUTPUT_DIR/stage6_cfast_vv_guide
-
-   # Check guide for completion and copy to website if successful
-   check_guide $OUTPUT_DIR/stage6_cfast_vv_guide $cfastrepo/Manuals/CFAST_Validation_Guide CFAST_Validation_Guide.pdf 'CFAST Verification and Validation Guide'
-   return 0
-}
-
-#---------------------------------------------
-#                   make_cfast_config_guide
-#---------------------------------------------
-
-make_cfast_config_guide()
-{
-   echo Building CFAST Configuration guide
-   CD_REPO $cfastrepo/Manuals/CFAST_Configuration_Guide $CFASTBRANCH || return 1
-   ./make_guide.sh &> $OUTPUT_DIR/stage6_cfast_config_guide
-
-   # Check guide for completion and copy to website if successful
-   check_guide $OUTPUT_DIR/stage6_cfast_config_guide $cfastrepo/Manuals/CFAST_Configuration_Guide CFAST_Configuration_Guide.pdf 'CFAST Configuration Guide'
-   return 0
 }
 
 #---------------------------------------------
@@ -1155,13 +760,9 @@ email_build_status()
 
    # No errors or warnings
    else
-      if [ -d $LATEST_MANUALS_DIR ]; then
-        rm -rf $MANUALS_DIR
-        cp -r $LATEST_MANUALS_DIR $MANUALS_DIR
-      fi
       if [[ "$UPLOAD" == "1" ]] && [[ -e $GUIDES2GH ]]; then
          cd $cfastbotdir
-         $GUIDES2GH >& $OUTPUT_DIR/stage7_upload
+         $GUIDES2GH $cfastrepo/Manuals >& $OUTPUT_DIR/stage7_upload
          GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_CFAST_TAG
          echo ""                >> $TIME_LOG
          echo "Guides: $GITURL" >> $TIME_LOG
@@ -1178,7 +779,7 @@ email_build_status()
 }
 
 #VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
-#                             Primary script execution =
+#                             start of script
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
@@ -1189,8 +790,6 @@ email_build_status()
 cfastbotdir="`pwd`"
 
 GITSTATUS_DIR=$HOME/.cfastbot
-LATEST_MANUALS_DIR=$GITSTATUS_DIR/Manuals_latest
-MANUALS_DIR=$GITSTATUS_DIR/Manuals
 EMAIL_LIST=$HOME/.cfastbot/cfastbot_email_list.sh
 PID_FILE=$GITSTATUS_DIR/cfastbot_pid
 OUTPUT_DIR=$cfastbotdir/output
@@ -1205,16 +804,16 @@ echo ""
 echo "Settings"
 echo "--------"
 echo "    Run dir: $cfastbotdir"
-MKDIR $OUTPUT_DIR
-MKDIR $GITSTATUS_DIR
-MKDIR $HISTORY_DIR
+mkdir -p $OUTPUT_DIR
+mkdir -p $GITSTATUS_DIR
+mkdir -p $HISTORY_DIR
 touch $OUTPUT_DIR/stage0_start
 
 #*** make sure cfastbot is running in the correct directory
 
 if [ -e .cfast_git ]; then
   cd ../..
-  reponame=`pwd`
+  reporoot=`pwd`
   cd $cfastbotdir
 else
   echo "***error: firebot not running in the bot/Firebot directory"
@@ -1222,52 +821,39 @@ else
   exit
 fi
 
-botrepo=$reponame/bot
-cfastrepo=$reponame/cfast
-smvrepo=$reponame/smv
-exprepo=$reponame/exp
+botrepo=$reporoot/bot
+cfastrepo=$reporoot/cfast
+fdsrepo=$reproot/fds
+smvrepo=$reporoot/smv
+exprepo=$reporoot/exp
 
 botbranch=master
 expbranch=master
 
 cd $cfastbotdir
 
-compiler=intel
 QUEUE=
 RUNAUTO=
 UPLOAD=
-USEINSTALL=
-USEINSTALL2=
-CCnotfound=
 GITURL=
-CONFIG=
 BRANCH=
+CONFIG=
+CLONEREPOS=
 
-while getopts 'abF:hiI:m:p:q:r:U' OPTION
+while getopts 'aCF:hm:p:q:r:U' OPTION
 do
 case $OPTION in
-   a)
-     RUNAUTO="y"
-     ;;
-   b)
-     BRANCH=current
-     botbranch=current
-     expbranch=current
-     CFASTBRANCH=current
-     SMVBRANCH=current
-     ;;
+  a)
+    RUNAUTO="y"
+    ;;
+  C)
+    CLONEREPOS=1
+    ;;
   F)
    CONFIG="$OPTARG"
    ;;
   h)
    usage;
-   ;;
-  i)
-   USEINSTALL="-i"
-   USEINSTALL2="-u"
-   ;;
-  I)
-   compiler="$OPTARG"
    ;;
   m)
    mailTo="$OPTARG"
@@ -1279,10 +865,11 @@ case $OPTION in
    QUEUE="$OPTARG"
    ;;
   r)
-   reponame="$OPTARG"
-   cfastrepo=$reponame/cfast
-   smvrepo=$reponame/smv
-   exprepo=$reponame/exp
+   reporoot="$OPTARG"
+   cfastrepo=$reporoot/cfast
+   exprepo=$reporoot/exp
+   fdsrepo=$reporoot/fds
+   smvrepo=$reporoot/smv
    ;;
   U)
    UPLOAD=1
@@ -1290,6 +877,19 @@ case $OPTION in
 esac
 done
 shift $(($OPTIND-1))
+
+#*** building a bundle so update all repos using repo info in config.sh
+if [ "$CONFIG" != "" ]; then
+   cd $botrepo/Scripts
+  ./update_repos.sh -m
+fi
+
+#*** cloning repos so only update bot repo
+if [ "$CLONEREPOS" != "" ]; then
+  cd $botrepo/Scripts
+  ./update_repos.sh -b
+fi
+
 
 echo $$ > $PID_FILE
 
@@ -1318,23 +918,38 @@ fi
 
 # define repo names, make sure they exist
 
-CD_REPO $botrepo $botbranch || exit 1
 
+# 3 cases
+# 1.  use current repo branches
+# 2.  clone repos use master
+# 3.  use branches defined config.sh ($CONFIG) - for bundling
+
+botbranch=current
+VERIFY_REPO_BRANCH $botrepo $botbranch || exit 1
 
 if [ "$CONFIG" == "" ]; then
-  CFASTBRANCH=master
-  CD_REPO $cfastrepo $CFASTBRANCH || exit 1
-
-  SMVBRANCH=master
-  CD_REPO $smvrepo $SMVBRANCH || exit 1
-
-  expbranch=master
-  CD_REPO $exprepo $expbranch || exit 1
+  if [ "$CLONEREPOS" == "" ]; then
+    cd $reporoot/bot/Scripts
+    CFASTBRANCH=current
+    SMVBRANCH=current
+    expbranch=current
+    fdsbranch=current
+  else
+    cd $reporoot/bot/Scripts
+    ./setup_repos.sh -B
+    CFASTBRANCH=master
+    SMVBRANCH=master
+    expbranch=master
+    fdsbranch=master
+  fi
+  #*** verify repos exist
+  VERIFY_REPO_BRANCH $cfastrepo $CFASTBRANCH || exit 1
+  VERIFY_REPO_BRANCH $smvrepo   $SMVBRANCH   || exit 1
+  VERIFY_REPO_BRANCH $exprepo   $expbranch   || exit 1
+  VERIFY_REPO_BRANCH $fdsrepo   $fdsbranch   || exit 1
 else
   source $CONFIG
   this_dir=`pwd`
-  cd $botrepo/Scripts
-  ./setup_repos.sh -B
   cd $thisdir
   CHECKOUT_REPO release $cfastrepo $BUNDLE_CFAST_REVISION  $BUNDLE_CFAST_TAG
   CHECKOUT_REPO release $exprepo   $BUNDLE_EXP_REVISION    $BUNDLE_EXP_TAG
@@ -1343,45 +958,49 @@ fi
 
 cd $cfastbotdir
 
-notfound=
-if [ "$USEINSTALL" == "" ]; then
-  if [ "$compiler" == "intel" ]; then
-    notfound=`ifx -help 2>&1 | tail -1 | grep "not found" | wc -l`
-  else
-    notfound=`gcc -help 2>&1 | tail -1 | grep "not found" | wc -l`
-  fi
-  if [ "$notfound" == "1" ] ; then
-    export haveCC="0"
-    USEINSTALL="-i"
-    USEINSTALL2="-u"
-  else
-    export haveCC="1"
-    USEINSTALL=
-    USEINSTALL2=
-  fi
+notfound=`ifx -help 2>&1 | tail -1 | grep "not found" | wc -l`
+if [ "$notfound" == "1" ] ; then
+  echo "***error: ifx compiler not found"
+  exit
 fi
 
+ABORT=
 if [ -e $cfastrepo ]; then
   echo " cfast repo: $cfastrepo"
 else
-  echo " cfast repo: $cfastrepo ***error does not exist"
+  echo "***error:  cfast repo: $cfastrepo does not exist"
+  ABORT=1
+fi
+if [ -e $exprepo ]; then
+  echo "   exp repo: $exprepo"
+else
+  echo "***error:  exp repo: $exprepo does not exist"
+  ABORT=1
+fi
+if [ -e $fdsrepo ]; then
+  echo "   fds repo: $fdsrepo"
+else
+  echo "***error:  fds repo: $fdsrepo does not exist"
+  ABORT=1
 fi
 if [ -e $smvrepo ]; then
-  echo "   SMV repo: $smvrepo"
+  echo "   smv repo: $smvrepo"
 else
-  echo "   SMV repo: $smvrepo ***error does not exist"
+  echo "***error:  smv repo: $smvrepo does not exist"
+  ABORT=1
+fi
+if [ "$ABORT" != "" ]; then
+  exit
 fi
 
 platform="linux"
-platform2="Linux"
 if [ "`uname`" == "Darwin" ] ; then
   platform="osx"
-  platform2="OSX"
 fi
 export platform
 
-echo "   platform: $platform2"
-echo "   compiler: $compiler"
+echo "   platform: $platform"
+echo "   compiler: intel"
 
 # Set unlimited stack size
 if [ "$platform" == "linux" ] ; then
@@ -1389,7 +1008,7 @@ if [ "$platform" == "linux" ] ; then
 fi
 
 if [ "$UPLOAD" == "1" ]; then
-  MKDIR $NEWGUIDE_DIR
+  mkdir -p $NEWGUIDE_DIR
 fi
 
 cd
@@ -1438,23 +1057,20 @@ echo ""
 echo "Status"
 echo "------"
 ### Clean up on start ###
-clean_cfastbot_history
+echo "Cleaning"
+echo "   cfastbot results directory"
+cd $cfastbotdir
+rm -rf $OUTPUT_DIR/* &> /dev/null
 
 ### Stage 1 ###
 
-cur_dir=`pwd`
-
-# clone cfast, exp and smv repos
-cd $reponame/bot/Scripts
-./setup_repos.sh -B
-
-CD_REPO $reponame/bot $botbranch || return 1
+cd $reporoot/bot
 BOT_REVISION=`git describe --abbrev=7 --dirty --long`
 
-CD_REPO $reponame/exp $expbranch || return 1
+cd $reporoot/exp
 EXP_REVISION=`git describe --abbrev=7 --dirty --long`
 
-CD_REPO $reponame/cfast $CFASTBRANCH || return 1
+cd $reporoot/cfast
 CFAST_REVISION=`git describe --abbrev=7 --dirty --long`
 CFAST_SHORTHASH=`git rev-parse --short HEAD`
 # CFAST_REV same as CFAST_REVISION without the hash on the end
@@ -1465,7 +1081,7 @@ else
   CFAST_REV=`git describe --abbrev | awk -F '-' '{print $1"-"$2}'`
 fi
 
-CD_REPO $reponame/smv   $SMVBRANCH || return 1
+cd $reporoot/smv
 SMV_REVISION=`git describe --abbrev=7 --dirty --long`
 SMV_SHORTHASH=`git rev-parse --short HEAD`
 # SMV_REV same as SMV_REVISION without the hash on the end
@@ -1478,33 +1094,41 @@ fi
 
 cd $cur_dir
 
-check_git_checkout
-
 ### Stage 2 ###
 
 #*** build cfast debug cfast
-compile_cfast_db || exit 1
+echo "Building"
+echo "   cfast"
+echo "      Intel debug"
+cd $cfastrepo/Build/CFAST/intel_${platform}_db
+make -f ../makefile clean &> /dev/null
+./make_cfast.sh &> $OUTPUT_DIR/stage2_build_cfast_debug
 check_compile_cfast_db || exit 1
 
-#*** build debug gnu cfast
-if [ "$compiler" != "gnu" ]; then
-  compile_cfast_gnu_db || exit 1
-  check_compile_cfast_gnu_db || exit 1
-fi
-
 #*** build release cfast
-compile_cfast || exit 1
+echo "      release"
+cd $cfastrepo/Build/CFAST/intel_${platform}
+make -f ../makefile clean &> /dev/null
+./make_cfast.sh &> $OUTPUT_DIR/stage2_build_cfast_release
 check_compile_cfast || exit 1
 
-#*** build smv utilities
-compile_smv_utilities || exit 1
+#*** build smokeview libraries
+cd $smvrepo/Build/LIBS/intel_${platform}
+echo 'Building Smokeview libraries' >> $OUTPUT_DIR/stage2_build_smv_util 2>&1
+echo "   smokeview libraries"
+./make_LIBS.sh >> $OUTPUT_DIR/stage2_build_smv_util 2>&1
 
 #*** build debug smokeview
-compile_smv_db || exit 1
+echo "   smokeview"
+echo "      debug"
+cd $smvrepo/Build/smokeview/intel_${platform}
+./make_smokeview_db.sh &> $OUTPUT_DIR/stage2_build_smv_debug
 check_compile_smv_db || exit 1
 
 #*** build release smokeview
-compile_smv || exit 1
+echo "      release"
+cd $smvrepo/Build/smokeview/intel_${platform}
+./make_smokeview.sh &> $OUTPUT_DIR/stage2_build_smv_release
 check_compile_smv || exit 1
 
 ### Stage 3 ###
@@ -1523,33 +1147,67 @@ fi
 
 ### Stage 4 ###
 if [[ $stage2_build_cfast_release_success && $stage2_build_smv_release_success ]] ; then
-   make_cfast_pictures || exit 1
+   echo "Generating smokeview images"
+   cd $cfastrepo/Validation/scripts
+   ./Make_CFAST_Pictures.sh -I intel 2>&1 | grep -v FreeFontPath &> $OUTPUT_DIR/stage4_make_pictures
    check_cfast_pictures
 fi
 
 ### stage 5 - python verification ###
-  run_python_setup || exit 1
-  run_python_verification || exit 1
+  echo Python
+  echo "   setup environment"
+  cd $botrepo/Firebot/
+  source ./setup_python.sh > $OUTPUT_DIR/stage5_python_setup 2>&1
+  echo "   Verification"
+  echo "      make plots"
+   # Run Python plotting script
+  cd $cfastrepo/Utilities/Python
+
+  python CFAST_verification_script.py &> $OUTPUT_DIR/stage5_run_python_verification
   check_python_verification
 
-#*** run python valiation
-  run_python_validation || exit 1
+#*** run python validation
+  echo "   Validation"
+  echo "      run VandV_Calcs"
+  cd $cfastrepo/Validation
+  python VandV_Calcs.py CFAST_Pressure_Correction_inputs.csv &> /dev/null
+  python VandV_Calcs.py CFAST_Temperature_Profile_inputs.csv &> /dev/null
+  python VandV_Calcs.py CFAST_Heat_Flux_Profile_inputs.csv &> /dev/null
+   
+  echo "      make plots"
+  # Run Python plotting script
+  cd $cfastrepo/Utilities/Python
+  python CFAST_validation_script.py &> $OUTPUT_DIR/stage5_run_python_validation
+
   check_python_validation
   check_validation_stats || exit 1
   archive_validation_stats || exit 1
 
 ### Stage 6 ###
-  make_cfast_tech_guide || exit 1
-  make_cfast_user_guide || exit 1
-  make_cfast_vv_guide || exit 1
-  make_cfast_config_guide || exit 1
-  make_cdata_guide || exit 1
-  rm -rf $LATEST_MANUALS_DIR
-  cp -r $cfastrepo/Manuals $LATEST_MANUALS_DIR
-  echo $CFAST_SHORTHASH > $LATEST_MANUALS_DIR/CFAST_HASH
-  echo $SMV_SHORTHASH   > $LATEST_MANUALS_DIR/SMV_HASH
-  echo $CFAST_REV       > $LATEST_MANUALS_DIR/CFAST_REVISION
-  echo $SMV_REV         > $LATEST_MANUALS_DIR/SMV_REVISION
+  echo Building CFAST Tech guide
+  cd $cfastrepo/Manuals/CFAST_Tech_Ref
+  ./make_guide.sh &> $OUTPUT_DIR/stage6_cfast_tech_guide
+  check_guide $OUTPUT_DIR/stage6_cfast_tech_guide $cfastrepo/Manuals/CFAST_Tech_Ref CFAST_Tech_Ref.pdf 'CFAST Technical Reference Guide'
+
+  echo Building CFAST User guide
+  cd $cfastrepo/Manuals/CFAST_Users_Guide
+  ./make_guide.sh &> $OUTPUT_DIR/stage6_cfast_user_guide
+  check_guide $OUTPUT_DIR/stage6_cfast_user_guide $cfastrepo/Manuals/CFAST_Users_Guide CFAST_Users_Guide.pdf 'CFAST Users Guide'
+
+  echo Building CFAST VV guide
+  cd $cfastrepo/Manuals/CFAST_Validation_Guide
+  ./make_guide.sh &> $OUTPUT_DIR/stage6_cfast_vv_guide
+  check_guide $OUTPUT_DIR/stage6_cfast_vv_guide $cfastrepo/Manuals/CFAST_Validation_Guide CFAST_Validation_Guide.pdf 'CFAST Verification and Validation Guide'
+
+  echo Building CFAST Configuration guide
+  cd $cfastrepo/Manuals/CFAST_Configuration_Guide
+  ./make_guide.sh &> $OUTPUT_DIR/stage6_cfast_config_guide
+  check_guide $OUTPUT_DIR/stage6_cfast_config_guide $cfastrepo/Manuals/CFAST_Configuration_Guide CFAST_Configuration_Guide.pdf 'CFAST Configuration Guide'
+
+  echo Building CData guide
+  cd $cfastrepo/Manuals/CFAST_CData_Guide
+  ./make_guide.sh &> $OUTPUT_DIR/stage6_cdata_guide
+  check_guide $OUTPUT_DIR/stage6_cdata_guide $cfastrepo/Manuals/CFAST_CData_Guide CFAST_CData_Guide.pdf 'CData Guide'
 
 ### Report results ###
 set_files_world_readable || exit 1
@@ -1557,3 +1215,4 @@ save_build_status
 email_build_status
 echo cfastbot complete
 
+ 

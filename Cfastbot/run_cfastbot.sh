@@ -3,110 +3,37 @@ EMAIL_LIST="$HOME/.cfastbot/cfastbot_email_list.sh"
 
 # CFASTbot
 # This script runs the CFAST verification/validation suite 
-# on the latest revision of the repository.
-
-#---------------------------------------------
-#                   CHK_REPO
-#---------------------------------------------
-
-CHK_REPO ()
-{
-  local repodir=$1
-  
-  if [ ! -e $repodir ]; then
-     echo "***error: the repo directory $repodir does not exist."
-     echo "          Aborting cfastbot."
-     return 1
-  fi
-  return 0
-}
-
-#---------------------------------------------
-#                   CD_REPO
-#---------------------------------------------
-
-CD_REPO ()
-{
-  local repodir=$1
-  local branch=$2
-  
-  CHK_REPO $repodir || return 1
-
-  cd $repodir
-  if [[ "$branch" != "" ]] && [[ "$branch" != "current" ]]; then
-     CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
-     if [ "$CURRENT_BRANCH" != "$branch" ]; then
-       echo "***error: was expecting branch $branch in repo $repodir."
-       echo "Found branch $CURRENT_BRANCH. Aborting cfastbot."
-       return 1
-     fi
-  fi
-  return 0
-}
-
-#---------------------------------------------
-#                   usage_all
-#---------------------------------------------
-
-function usage_all {
-echo ""
-echo "Miscellaneous:"
-echo "-a - run automatically if cfast repo has changed"
-echo "-b - use the current branch"
-echo "-f - force cfastbot run"
-echo "-F config.sh  - clone repos using revision and tags in config.sh"
-echo "-i - use installed smokeview"
-echo "-I - compiler [ default: $compiler]"
-echo "-k - kill cfastbot"
-echo "-m email -  email_address "
-echo "-o - specify GH_OWNER when uploading manuals. [default: $GH_OWNER]"
-echo "-r - specify GH_REPO when uploading manuals. [default: $GH_REPO]"
-echo "-q queue_name - run cases using the queue queue_name"
-echo "     default: $QUEUE"
-echo "-R - remove run status file"
-echo "-U - upload guide (only by user: cfastbot)"
-}
 
 #---------------------------------------------
 #                   usage
 #---------------------------------------------
 
 function usage {
-option=$1
+echo ""
 echo "Verification and validation testing script for cfast"
 echo ""
 echo "Options:"
-echo "-c - clean repos"
-echo "-h - display most commonly used options"
-echo "-H - display all options"
-echo "-u - update repos"
-echo "-v - show options used to run cfastbot"
-if [ "$option" == "-H" ]; then
-usage_all
-fi
+echo "-f - force cfastbot run"
+echo "-h - display this message"
+echo "-k - kill cfastbot"
+echo "-m email -  email_address "
+echo "-q queue_name - run cases using the queue queue_name (default: $QUEUE)"
+echo ""
+ehco "Less commonly used options:"
+echo "-a - run automatically if cfast repo has changed"
+echo "-C - clone cfast, exp, fds and smv repos"
+echo "-F config.sh  - clone repos using revision and tags in config.sh"
+echo "-o - specify GH_OWNER when uploading manuals. [default: $GH_OWNER]"
+echo "-r - specify GH_REPO when uploading manuals. [default: $GH_REPO]"
+echo "-U - upload guide (only if authenticated at gitub)"
 exit
-}
-
-#---------------------------------------------
-#                   is_file_installed
-#---------------------------------------------
-
-is_file_installed()
-{
-  local program=$1
-  
-  prognotfound=`$program -help | tail -1 | grep "not found" | wc -l`
-  if [ "$prognotfound" == "1" ]; then
-    echo "***error: the program $program is not installed" 
-    return 1
-  fi
-  return 0
 }
 
 #---------------------------------------------
 #                   LIST_DESCENDANTS
 #---------------------------------------------
 
+#*** used to kill cfastbot and all scripts cfastbot has called
 LIST_DESCENDANTS ()
 {
   local children=$(ps -o pid= --ppid "$1")
@@ -120,74 +47,58 @@ LIST_DESCENDANTS ()
 }
 
 #VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
-#                             Primary script execution =
+#                             start of script
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-if [ ! -d ~/.cfastgit ]; then
-  mkdir ~/.cfastgit
-fi
-cfastbot_pid=~/.cfastgit/cfastbot_pid
+mkdir -p ~/.cfastbot
+cfastbot_pid=~/.cfastbot/cfastbot_pid
 
 CURDIR=`pwd`
 QUEUE=$(sinfo -h -o "%P" | grep '\*' | sed 's/\*//')
 
-if [ -e .cfast_git ]; then
-  cd ../..
-  reponame=`pwd`
-  cd $CURDIR
-else
-  echo "***error: cfastbot not running in the Firemodels repo"
+if [ ! -e .cfast_git ]; then
+  echo "***error: cfastbot not running in the bot/Cfastbot directory"
   exit
 fi
 
-botrepo=$reponame/bot
-botbranch=master
+cd ../..
+reporoot=`pwd`
+cd $CURDIR
 
-RUNAUTO=
-RUNCFASTBOT=1
+botrepo=$reporoot/bot
+CLONEREPOS=
+CONFIG=
 EMAIL=
 FORCE=
-compiler=intel
-size=
-REMOVE_PID=
-
-UPLOAD=
-USEINSTALL=
 KILL_CFASTBOT=
-ECHO=
-CONFIG=
-FORCECLONE=
+RUNAUTO=
+UPLOAD=
 
-while getopts 'abCfF:hHiI:km:o:q:r:RUv' OPTION
+#*** parse command line options
+while getopts 'aCfF:hikm:o:q:r:U' OPTION
 do
 case $OPTION  in
   a)
    RUNAUTO=-a
    ;;
-  b)
-   BRANCH=-b
-   botbranch=current
-   ;;
   C)
-   FORCECLONE=1
+   CLONEREPOS=-C
+   CONFIG=
    ;;
   f)
    FORCE=1
    ;;
   F)
    CONFIG="$OPTARG"
+   CLONEREPOS=
+   if [ ! -e $CONFIG ]; then
+     echo ***error: configuration file $CONFIG does not exist
+     exit
+   fi
+   CONFIG="-F $CONFIG"
    ;;
   h)
    usage;
-   ;;
-  H)
-   usage -H;
-   ;;
-  i)
-   USEINSTALL="-i"
-   ;;
-  I)
-   compiler="$OPTARG"
    ;;
   k)
    KILL_CFASTBOT="1"
@@ -204,34 +115,14 @@ case $OPTION  in
   r)
    export GH_REPO="$OPTARG"
    ;;
-  R)
-   REMOVE_PID=1
-   ;;
   U)
    UPLOAD=-U
-   ;;
-  v)
-   RUNCFASTBOT=0
-   ECHO=echo
    ;;
 esac
 done
 shift $(($OPTIND-1))
 
-if [ "$CONFIG" != "" ]; then
-  if [ -e $CONFIG ]; then
-    CONFIG="-F $CONFIG"
-  else
-    echo ***error: configuration file $CONFIG does not exist
-  fi
-fi
-
-if [ "$REMOVE_PID" == "1" ]; then
-  rm -f $cfastbot_pid
-  echo "$cfastbot_pid status file removed"
-  exit
-fi
-
+#*** kill cfastbot if requested
 if [ "$KILL_CFASTBOT" == "1" ]; then
   if [ -e $cfastbot_pid ] ; then
     PID=`head -1 $cfastbot_pid`
@@ -251,60 +142,26 @@ if [ "$KILL_CFASTBOT" == "1" ]; then
   exit
 fi
 
-if [ "$USEINSTALL" != "" ]; then
-  echo
-  echo looking for installed software
-  is_file_installed smokeview || exit 1
-  echo "   found smokeview"
-fi
-
-if [ -e $cfastbot_pid ]; then
-  if [ "$FORCE" == "" ]; then
-    echo cfastbot is already running. If this is
-    echo not the case rerun using the -f option.
-    if [ "$RUNAUTO" == "" ]; then
-      if [ -e $EMAIL_LIST ]; then
-        source $EMAIL_LIST
-        echo "Cfastbot was unable to start.  Another instance was already running or it did not complete successfully"  | mail -s "error: cfastbot failed to start" $mailTo > /dev/null
-      fi
-    fi
-    exit
+#*** make sure another instance of cfastbot is not running
+if [[ -e $cfastbot_pid ]] && [[ "$FORCE" == "" ]]; then
+  echo cfastbot is already running. If this is
+  echo not the case rerun using the -f option.
+  if [[ "$RUNAUTO" == "" ]] && [[ -e $EMAIL_LIST ]]; then
+    source $EMAIL_LIST
+    echo "Cfastbot was unable to start.  Another instance was already running or it did not complete successfully"  | mail -s "error: cfastbot failed to start" $mailTo > /dev/null
   fi
-fi
-if [ "$FORCECLONE" == "" ]; then
-  echo "***warning: You are about to erase and clone the cfast, exp and smv repos."
-  echo "Press any key to continue or <CTRL> c to abort."
-  echo "Use the -C option to avoid this warning."
-  read val
+  exit
 fi
 
 touch $cfastbot_pid
 if [[ "$EMAIL" != "" ]]; then
   EMAIL="-m $EMAIL"
 fi
-if [[ "botbranch" != "current" ]]; then
-   if [ "$RUNCFASTBOT" == "1" ]; then
-     echo CD_REPO $botrepo $botbranch
-     CD_REPO $botrepo $botbranch || exit 1
-     git fetch origin
-     git merge origin/$botbranch
 
-     have_remote=`git remote -v | awk '{print $1}' | grep firemodels | wc  -l`
-     if [ "$have_remote" != "0" ]; then
-       git fetch firemodels
-       git merge firemodels/$botbranch
-     fi
-     
-  fi
-fi
-
-REPO="-r $reponame"
+REPO="-r $reporoot"
 QUEUE="-q $QUEUE"
-compiler="-I $compiler"
 PID="-p $cfastbot_pid"
 cd $CURDIR
-echo  ./cfastbot.sh $PID $BRANCH $REPO $USEINSTALL $RUNAUTO $CONFIG $size $compiler $CLEAN $QUEUE $UPLOAD $EMAIL "$@"
-$ECHO  ./cfastbot.sh $PID $BRANCH $REPO $USEINSTALL $RUNAUTO $CONFIG $size $compiler $CLEAN $QUEUE $UPLOAD $EMAIL "$@"
-if [ -e $cfastbot_pid ]; then
-  rm $cfastbot_pid
-fi   
+echo   ./cfastbot.sh $PID $REPO $CLONEREPOS $RUNAUTO $CONFIG $QUEUE $UPLOAD $EMAIL "$@"
+       ./cfastbot.sh $PID $REPO $CLONEREPOS $RUNAUTO $CONFIG $QUEUE $UPLOAD $EMAIL "$@"
+rm -f $cfastbot_pid
