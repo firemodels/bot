@@ -626,26 +626,14 @@ wait_verification_cases_end()
    stage=$1
    stagelimit=$2
    prefix=$3
-   # Scans qstat and waits for verification cases to end
-   if [[ "$QUEUE" == "none" ]]
-   then
-     while [[          `ps -u $USER -f | fgrep .fds | grep -v smokebot | grep -v grep` != '' ]]; do
-        JOBS_REMAINING=`ps -u $USER -f | fgrep .fds | grep -v smokebot | grep -v grep | wc -l`
-
-        echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/$stage
-        TIME_LIMIT_STAGE=$stagelimit
-        check_time_limit
-        sleep 30
-     done
-   else
-     while           [[ `qstat -a | awk '{print $2 $4 $10}' | grep $(whoami) | grep $prefix | grep -v 'C$'` != '' ]]; do
-        JOBS_REMAINING=`qstat -a | awk '{print $2 $4 $10}' | grep $(whoami)  | grep $prefix | grep -v 'C$' | wc -l`
-        echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/$stage
-        TIME_LIMIT_STAGE=$stagelimit
-        check_time_limit
-        sleep 30
-     done
-   fi
+   # Scans and wait for verification cases to end
+   while           [[ `squeue -o "%.18j %.8u %.2t" | awk '{print $1 $2 $3}' | grep $(whoami) | grep $prefix | grep -v 'C$'` != '' ]]; do
+      JOBS_REMAINING=`squeue -o "%.18j %.8u %.2t" | awk '{print $1 $2 $3}' | grep $(whoami)  | grep $prefix | grep -v 'C$' | wc -l`
+      echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/$stage
+      TIME_LIMIT_STAGE=$stagelimit
+      check_time_limit
+      sleep 30
+   done
 }
 
 #---------------------------------------------
@@ -1449,10 +1437,6 @@ else
   echo "***error: smokebot not running in the bot/Smokebot directory"
   echo "          Aborting smokebot"
   exit 1
-fi
-
-if [[ "$QUEUE" == "none" ]] && [[ -e $SCRIPTFILES ]]; then
-  rm -f $SCRIPTFILES
 fi
 
 #*** create pub directory

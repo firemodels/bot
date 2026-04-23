@@ -130,7 +130,7 @@ if [ "$KILL_CFASTBOT" == "1" ]; then
     kill -9 $(LIST_DESCENDANTS $PID)
     echo "killing cfastbot (PID=$PID)"
     kill -9 $PID
-    JOBIDS=`squeue -o "%.18j %.8u %.2t" | grep cb_ | awk -v user="$USER" '{if($4==user){print $1}}'`
+    JOBIDS=`squeue -o "%.18j %.8u %.2t" | grep cb_ | awk -v user="$USER" '{if($2==user){print $1}}'`
     if [ "$JOBIDS" != "" ]; then
       echo killing cfastbot jobs with Id:$JOBIDS
       qdel $JOBIDS
