@@ -144,7 +144,6 @@ botrepo=$reponame/bot
 botbranch=master
 
 RUNAUTO=
-RUNCFASTBOT=1
 EMAIL=
 FORCE=
 compiler=intel
@@ -152,39 +151,33 @@ size=
 REMOVE_PID=
 
 UPLOAD=
-USEINSTALL=
 KILL_CFASTBOT=
 ECHO=
 CONFIG=
-FORCECLONE=
+CLONEREPOS=
 
-while getopts 'abCfF:hHiI:km:o:q:r:RUv' OPTION
+while getopts 'aCfF:hHiI:km:o:q:r:RU' OPTION
 do
 case $OPTION  in
   a)
    RUNAUTO=-a
    ;;
-  b)
-   BRANCH=-b
-   botbranch=current
-   ;;
   C)
-   FORCECLONE=1
+   CLONEREPOS=-C
+   CONFIG=
    ;;
   f)
    FORCE=1
    ;;
   F)
    CONFIG="$OPTARG"
+   CLONEREPOS=
    ;;
   h)
    usage;
    ;;
   H)
    usage -H;
-   ;;
-  i)
-   USEINSTALL="-i"
    ;;
   I)
    compiler="$OPTARG"
@@ -210,27 +203,11 @@ case $OPTION  in
   U)
    UPLOAD=-U
    ;;
-  v)
-   RUNCFASTBOT=0
-   ECHO=echo
-   ;;
 esac
 done
 shift $(($OPTIND-1))
 
-if [ "$CONFIG" != "" ]; then
-  if [ -e $CONFIG ]; then
-    CONFIG="-F $CONFIG"
-  else
-    echo ***error: configuration file $CONFIG does not exist
-  fi
-fi
-
-if [ "$REMOVE_PID" == "1" ]; then
-  rm -f $cfastbot_pid
-  echo "$cfastbot_pid status file removed"
-  exit
-fi
+#*** kill cfastbot
 
 if [ "$KILL_CFASTBOT" == "1" ]; then
   if [ -e $cfastbot_pid ] ; then
@@ -251,12 +228,36 @@ if [ "$KILL_CFASTBOT" == "1" ]; then
   exit
 fi
 
-if [ "$USEINSTALL" != "" ]; then
-  echo
-  echo looking for installed software
-  is_file_installed smokeview || exit 1
-  echo "   found smokeview"
+#***remove the pid file from cfastbogt's last run
+
+if [ "$REMOVE_PID" == "1" ]; then
+  rm -f $cfastbot_pid
+  echo "$cfastbot_pid status file removed"
+  exit
 fi
+
+#*** building a bundle so update all repos using repo info in config.sh
+
+if [ "$CONFIG" != "" ]; then
+  if [ -e $CONFIG ]; then
+    CONFIG="-F $CONFIG"
+  else
+    echo ***error: configuration file $CONFIG does not exist
+    exit
+  fi
+  ./update_repos -m
+fi
+
+#*** cloning repos so only update bot repo
+
+if [ "$CLONEREPOS" != "" ]; then
+  cd $botrepo/scripts
+  ./update_repos -b
+fi
+
+#*** if both of above 2 if statements are not active use current repos - do not update repos
+
+
 
 if [ -e $cfastbot_pid ]; then
   if [ "$FORCE" == "" ]; then
@@ -271,31 +272,10 @@ if [ -e $cfastbot_pid ]; then
     exit
   fi
 fi
-if [ "$FORCECLONE" == "" ]; then
-  echo "***warning: You are about to erase and clone the cfast, exp and smv repos."
-  echo "Press any key to continue or <CTRL> c to abort."
-  echo "Use the -C option to avoid this warning."
-  read val
-fi
 
 touch $cfastbot_pid
 if [[ "$EMAIL" != "" ]]; then
   EMAIL="-m $EMAIL"
-fi
-if [[ "botbranch" != "current" ]]; then
-   if [ "$RUNCFASTBOT" == "1" ]; then
-     echo CD_REPO $botrepo $botbranch
-     CD_REPO $botrepo $botbranch || exit 1
-     git fetch origin
-     git merge origin/$botbranch
-
-     have_remote=`git remote -v | awk '{print $1}' | grep firemodels | wc  -l`
-     if [ "$have_remote" != "0" ]; then
-       git fetch firemodels
-       git merge firemodels/$botbranch
-     fi
-     
-  fi
 fi
 
 REPO="-r $reponame"
@@ -303,8 +283,9 @@ QUEUE="-q $QUEUE"
 compiler="-I $compiler"
 PID="-p $cfastbot_pid"
 cd $CURDIR
-echo  ./cfastbot.sh $PID $BRANCH $REPO $USEINSTALL $RUNAUTO $CONFIG $size $compiler $CLEAN $QUEUE $UPLOAD $EMAIL "$@"
-$ECHO  ./cfastbot.sh $PID $BRANCH $REPO $USEINSTALL $RUNAUTO $CONFIG $size $compiler $CLEAN $QUEUE $UPLOAD $EMAIL "$@"
+echo   ./cfastbot.sh $PID $REPO $CLONEREPOS $RUNAUTO $CONFIG $size $compiler $CLEAN $QUEUE $UPLOAD $EMAIL "$@"
+$ECHO  ./cfastbot.sh $PID $REPO $CLONEREPOS $RUNAUTO $CONFIG $size $compiler $CLEAN $QUEUE $UPLOAD $EMAIL "$@"
 if [ -e $cfastbot_pid ]; then
   rm $cfastbot_pid
-fi   
+fi
+

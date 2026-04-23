@@ -397,15 +397,11 @@ check_compile_cfast()
 
 compile_smv_utilities()
 {
-   if [ "$USEINSTALL" == "" ]; then
-   # smokeview libraries
-     CD_REPO $smvrepo/Build/LIBS/${compiler}_${platform} $SMVBRANCH || return 1
-     echo 'Building Smokeview libraries' >> $OUTPUT_DIR/stage2_build_smv_util 2>&1
-     echo "   smokeview libraries"
-     ./make_LIBS.sh >> $OUTPUT_DIR/stage2_build_smv_util 2>&1
-   else
-     echo "   smokeview libraries - not built, using installed smokview"
-   fi
+# smokeview libraries
+   CD_REPO $smvrepo/Build/LIBS/${compiler}_${platform} $SMVBRANCH || return 1
+   echo 'Building Smokeview libraries' >> $OUTPUT_DIR/stage2_build_smv_util 2>&1
+   echo "   smokeview libraries"
+   ./make_LIBS.sh >> $OUTPUT_DIR/stage2_build_smv_util 2>&1
    return 0
 }
 
@@ -416,15 +412,10 @@ compile_smv_utilities()
 compile_smv_db()
 {
    # Clean and compile SMV DB
-   if [ "$USEINSTALL" == "" ]; then
-     echo "   smokeview"
-     echo "      debug"
-     CD_REPO $smvrepo/Build/smokeview/${compiler}_${platform} || return 1
-     ./make_smokeview_db.sh &> $OUTPUT_DIR/stage2_build_smv_debug
-   else
-     echo "   smokeview"
-     echo "      debug - not built, using installed smokeview"
-   fi
+   echo "   smokeview"
+   echo "      debug"
+   CD_REPO $smvrepo/Build/smokeview/${compiler}_${platform} || return 1
+   ./make_smokeview_db.sh &> $OUTPUT_DIR/stage2_build_smv_debug
    return 0
 }
 
@@ -435,27 +426,25 @@ compile_smv_db()
 check_compile_smv_db()
 {
    # Check for errors in SMV DB compilation
-   if [ "$USEINSTALL" == "" ]; then
-     CD_REPO $smvrepo/Build/smokeview/${compiler}_${platform} $SMVBRANCH || return 1
-     if [ -e "smokeview_${platform}_db" ]
-     then
-        stage2_build_smv_debug_success=true
-     else
-        echo "Errors from Stage 2 - Compile SMV DB:" >> $ERROR_LOG
-        cat $OUTPUT_DIR/stage2_build_smv_debug >> $ERROR_LOG
-        echo "" >> $ERROR_LOG
-     fi
+   CD_REPO $smvrepo/Build/smokeview/${compiler}_${platform} $SMVBRANCH || return 1
+   if [ -e "smokeview_${platform}_db" ]
+   then
+      stage2_build_smv_debug_success=true
+   else
+      echo "Errors from Stage 2 - Compile SMV DB:" >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage2_build_smv_debug >> $ERROR_LOG
+      echo "" >> $ERROR_LOG
+   fi
 
    # Check for compiler warnings/remarks
    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-     if [[ `grep -A 5 -E 'warning|remark' ${OUTPUT_DIR}/stage2_build_smv_debug | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]
-     then
-        # Continue along
-        :
-     else
-        echo "Stage build_smv_debug warnings:" >> $WARNING_LOG
-        grep -A 5 -E 'warning|remark' ${OUTPUT_DIR}/stage2_build_smv_debug | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
-     fi
+   if [[ `grep -A 5 -E 'warning|remark' ${OUTPUT_DIR}/stage2_build_smv_debug | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]
+   then
+      # Continue along
+      :
+   else
+      echo "Stage build_smv_debug warnings:" >> $WARNING_LOG
+      grep -A 5 -E 'warning|remark' ${OUTPUT_DIR}/stage2_build_smv_debug | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
    fi
    return 0
 }
@@ -467,14 +456,10 @@ check_compile_smv_db()
 compile_smv()
 {
    # Clean and compile SMV
-   if [ "$USEINSTALL" == "" ]; then
-     echo "      release"
-     CD_REPO $smvrepo/Build/smokeview/${compiler}_${platform} $SMVBRANCH || return 1
-     ./make_smokeview.sh &> $OUTPUT_DIR/stage2_build_smv_release
-   else
-     echo "      release - not built, using installed smokeview"
-   fi
-   return 0
+   echo "      release"
+   CD_REPO $smvrepo/Build/smokeview/${compiler}_${platform} $SMVBRANCH || return 1
+   ./make_smokeview.sh &> $OUTPUT_DIR/stage2_build_smv_release
+ return 0
 }
 
 #---------------------------------------------
@@ -484,36 +469,27 @@ compile_smv()
 check_compile_smv()
 {
    # Check for errors in SMV release compilation
-   if [ "$USEINSTALL" == "" ]; then
-     CD_REPO $smvrepo/Build/smokeview/${compiler}_${platform} $smvbrach || return 1
-     if [ -e "smokeview_${platform}" ]
-     then
-        stage2_build_smv_release_success=true
-     else
-        echo smokeview not found
-        echo "Errors from Stage 2 - Compile SMV release:" >> $ERROR_LOG
-        cat $OUTPUT_DIR/stage2_build_smv_release >> $ERROR_LOG
-        echo "" >> $ERROR_LOG
-     fi
+   CD_REPO $smvrepo/Build/smokeview/${compiler}_${platform} $smvbrach || return 1
+   if [ -e "smokeview_${platform}" ]
+   then
+      stage2_build_smv_release_success=true
+   else
+      echo smokeview not found
+      echo "Errors from Stage 2 - Compile SMV release:" >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage2_build_smv_release >> $ERROR_LOG
+      echo "" >> $ERROR_LOG
+   fi
 
    # Check for compiler warnings/remarks
    # grep -v 'feupdateenv ...' ignores a known FDS MPI compiler warning (http://software.intel.com/en-us/forums/showthread.php?t=62806)
-     if [[ `grep -A 5 -E 'warning|remark' ${OUTPUT_DIR}/stage2_build_smv_release | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]
-     then
-        # Continue along
-        :
-     else
-        echo "Stage build_smv_release warnings:" >> $WARNING_LOG
-        grep -A 5 -E 'warning|remark' ${OUTPUT_DIR}/stage2_build_smv_release | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
-        echo "" >> $WARNING_LOG
-     fi
+   if [[ `grep -A 5 -E 'warning|remark' ${OUTPUT_DIR}/stage2_build_smv_release | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked'` == "" ]]
+   then
+      # Continue along
+      :
    else
-     is_file_installed smokeview stage2_build_smv_release 
-     if [ "$stage2_build_smv_release_success" == "0" ] ; then
-        echo "smokeview not installed"
-        echo "Errors from Stage build_smv_release - smokeview not installed:" >> $ERROR_LOG
-        echo "" >> $ERROR_LOG
-     fi
+      echo "Stage build_smv_release warnings:" >> $WARNING_LOG
+      grep -A 5 -E 'warning|remark' ${OUTPUT_DIR}/stage2_build_smv_release | grep -v 'feupdateenv is not implemented' | grep -v 'lcilkrts linked' >> $WARNING_LOG
+      echo "" >> $WARNING_LOG
    fi
    return 0
 }
@@ -566,7 +542,7 @@ run_vv_cases_debug()
    echo 'Running CFAST V&V cases'
    echo '   debug'
    echo 'Running CFAST V&V cases' >> $OUTPUT_DIR/stage3_run_debug 2>&1
-   ./Run_CFAST_Cases.sh -I $compiler -S $smvrepo $USEINSTALL2 -m 2 -d -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage3_run_debug 2>&1
+   ./Run_CFAST_Cases.sh -I $compiler -S $smvrepo -m 2 -d -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage3_run_debug 2>&1
    wait_vv_cases_debug_start
 
    # Wait for V&V cases to end
@@ -676,7 +652,7 @@ run_vv_cases_release()
    CD_REPO $cfastrepo/Validation/scripts $CFASTBRANCH || return 1
    echo '   release'
    echo 'Running CFAST V&V cases' >> $OUTPUT_DIR/stage3_run_release 2>&1
-   ./Run_CFAST_Cases.sh -I $compiler -S $smvrepo $USEINSTALL2 -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage3_run_release 2>&1
+   ./Run_CFAST_Cases.sh -I $compiler -S $smvrepo -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage3_run_release 2>&1
    wait_vv_cases_release_start
 
    # Wait for all V&V cases to end
@@ -758,7 +734,7 @@ make_cfast_pictures()
 {
    echo "Generating smokeview images"
    CD_REPO $cfastrepo/Validation/scripts $CFASTBRANCH || return 1
-   ./Make_CFAST_Pictures.sh -I $compiler $USEINSTALL 2>&1 | grep -v FreeFontPath &> $OUTPUT_DIR/stage4_make_pictures
+   ./Make_CFAST_Pictures.sh -I $compiler 2>&1 | grep -v FreeFontPath &> $OUTPUT_DIR/stage4_make_pictures
 
    return 0
 }
@@ -1236,35 +1212,26 @@ compiler=intel
 QUEUE=
 RUNAUTO=
 UPLOAD=
-USEINSTALL=
-USEINSTALL2=
 CCnotfound=
 GITURL=
-CONFIG=
 BRANCH=
+CONFIG=
+CLONEREPOS=
 
-while getopts 'abF:hiI:m:p:q:r:U' OPTION
+while getopts 'aCF:hI:m:p:q:r:U' OPTION
 do
 case $OPTION in
-   a)
-     RUNAUTO="y"
-     ;;
-   b)
-     BRANCH=current
-     botbranch=current
-     expbranch=current
-     CFASTBRANCH=current
-     SMVBRANCH=current
-     ;;
+  a)
+    RUNAUTO="y"
+    ;;
+  C)
+    CLONEREPOS=1
+    ;;
   F)
    CONFIG="$OPTARG"
    ;;
   h)
    usage;
-   ;;
-  i)
-   USEINSTALL="-i"
-   USEINSTALL2="-u"
    ;;
   I)
    compiler="$OPTARG"
@@ -1318,23 +1285,31 @@ fi
 
 # define repo names, make sure they exist
 
+
+# 3 cases
+# 1.  use current repo branches
+# 2.  clone repos use master
+# 3.  use branches defined config.sh ($CONFIG) - for bundling
+
+botbranch=current
 CD_REPO $botrepo $botbranch || exit 1
 
-
 if [ "$CONFIG" == "" ]; then
-  CFASTBRANCH=master
+  if [ "$CLONEREPOS" == "" ]; then
+    CFASTBRANCH=current
+    SMVBRANCH=current
+    expbranch=current
+  else
+    CFASTBRANCH=master
+    SMVBRANCH=master
+    expbranch=master
+  fi
   CD_REPO $cfastrepo $CFASTBRANCH || exit 1
-
-  SMVBRANCH=master
-  CD_REPO $smvrepo $SMVBRANCH || exit 1
-
-  expbranch=master
-  CD_REPO $exprepo $expbranch || exit 1
+  CD_REPO $smvrepo   $SMVBRANCH   || exit 1
+  CD_REPO $exprepo   $expbranch   || exit 1
 else
   source $CONFIG
   this_dir=`pwd`
-  cd $botrepo/Scripts
-  ./setup_repos.sh -B
   cd $thisdir
   CHECKOUT_REPO release $cfastrepo $BUNDLE_CFAST_REVISION  $BUNDLE_CFAST_TAG
   CHECKOUT_REPO release $exprepo   $BUNDLE_EXP_REVISION    $BUNDLE_EXP_TAG
@@ -1344,32 +1319,33 @@ fi
 cd $cfastbotdir
 
 notfound=
-if [ "$USEINSTALL" == "" ]; then
-  if [ "$compiler" == "intel" ]; then
-    notfound=`ifx -help 2>&1 | tail -1 | grep "not found" | wc -l`
-  else
-    notfound=`gcc -help 2>&1 | tail -1 | grep "not found" | wc -l`
-  fi
-  if [ "$notfound" == "1" ] ; then
-    export haveCC="0"
-    USEINSTALL="-i"
-    USEINSTALL2="-u"
-  else
-    export haveCC="1"
-    USEINSTALL=
-    USEINSTALL2=
-  fi
+if [ "$compiler" == "intel" ]; then
+  notfound=`ifx -help 2>&1 | tail -1 | grep "not found" | wc -l`
+  message="***error: ifx compiler not found"
+else
+  notfound=`gcc -help 2>&1 | tail -1 | grep "not found" | wc -l`
+  message="***error: gnu compilers not found"
+fi
+if [ "$notfound" == "1" ] ; then
+  echo $message
+  exit
 fi
 
+ABORT=
 if [ -e $cfastrepo ]; then
   echo " cfast repo: $cfastrepo"
 else
-  echo " cfast repo: $cfastrepo ***error does not exist"
+  echo "***error:  cfast repo: $cfastrepo does not exist"
+  ABORT=1
 fi
 if [ -e $smvrepo ]; then
   echo "   SMV repo: $smvrepo"
 else
-  echo "   SMV repo: $smvrepo ***error does not exist"
+  echo "***error:  smv repo: $smvrepo does not exist"
+  ABORT=1
+fi
+if [ "$ABORT" != "" ]; then
+  exit
 fi
 
 platform="linux"
@@ -1557,3 +1533,4 @@ save_build_status
 email_build_status
 echo cfastbot complete
 
+ 
