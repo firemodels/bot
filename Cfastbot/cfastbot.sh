@@ -1216,8 +1216,8 @@ fi
 #*** output hashes needed for bundling
   echo $CFAST_SHORTHASH > $cfastrepo/Manuals/CFAST_HASH
   echo $SMV_SHORTHASH   > $cfastrepo/Manuals/SMV_HASH
-  echo $CFAST_REV       > $cfastrepo/Manuals/CFAST_REVISION
-  echo $SMV_REV         > $cfastrepo/Manuals/SMV_REVISION
+  echo $CFAST_REVISION  > $cfastrepo/Manuals/CFAST_REVISION
+  echo $SMV_REVISION    > $cfastrepo/Manuals/SMV_REVISION
 
 ### Report results ###
 set_files_world_readable || exit 1
