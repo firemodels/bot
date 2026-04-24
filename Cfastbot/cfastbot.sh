@@ -1213,6 +1213,12 @@ fi
   ./make_guide.sh &> $OUTPUT_DIR/stage6_cdata_guide
   check_guide $OUTPUT_DIR/stage6_cdata_guide $cfastrepo/Manuals/CFAST_CData_Guide CFAST_CData_Guide.pdf 'CData Guide'
 
+#*** output hashes needed for bundling
+  echo $CFAST_SHORTHASH > $cfastrepo/Manuals/CFAST_HASH
+  echo $SMV_SHORTHASH   > $cfastrepo/Manuals/SMV_HASH
+  echo $CFAST_REV       > $cfastrepo/Manuals/CFAST_REVISION
+  echo $SMV_REV         > $cfastrepo/Manuals/SMV_REVISION
+
 ### Report results ###
 set_files_world_readable || exit 1
 save_build_status
