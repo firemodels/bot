@@ -1078,23 +1078,13 @@ cd $reporoot/cfast
 CFAST_REVISION=`git describe --abbrev=7 --dirty --long`
 CFAST_SHORTHASH=`git rev-parse --short HEAD`
 # CFAST_REV same as CFAST_REVISION without the hash on the end
-subrev=`git describe --abbrev | awk -F '-' '{print $2}'`
-if [ "$subrev" == "" ]; then
-  CFAST_REV=`git describe --abbrev | awk -F '-' '{print $1"-0"}'`
-else
-  CFAST_REV=`git describe --abbrev | awk -F '-' '{print $1"-"$2}'`
-fi
+CFAST_REV=`git describe | sed 's/-g[0-9a-f]*$//'`
 
 cd $reporoot/smv
 SMV_REVISION=`git describe --abbrev=7 --dirty --long`
 SMV_SHORTHASH=`git rev-parse --short HEAD`
 # SMV_REV same as SMV_REVISION without the hash on the end
-subrev=`git describe --abbrev | awk -F '-' '{print $2}'`
-if [ "$subrev" == "" ]; then
-  SMV_REV=`git describe --abbrev | awk -F '-' '{print $1"-0"}'`
-else
-  SMV_REV=`git describe --abbrev | awk -F '-' '{print $1"-"$2"-"$3}'`
-fi
+SMV_REV=`git describe | sed 's/-g[0-9a-f]*$//'`
 
 cd $cur_dir
 
@@ -1216,8 +1206,8 @@ fi
 #*** output hashes needed for bundling
   echo $CFAST_SHORTHASH > $cfastrepo/Manuals/CFAST_HASH
   echo $SMV_SHORTHASH   > $cfastrepo/Manuals/SMV_HASH
-  echo $CFAST_REVISION  > $cfastrepo/Manuals/CFAST_REVISION
-  echo $SMV_REVISION    > $cfastrepo/Manuals/SMV_REVISION
+  echo $CFAST_REV       > $cfastrepo/Manuals/CFAST_REVISION
+  echo $SMV_REV         > $cfastrepo/Manuals/SMV_REVISION
 
 ### Report results ###
 set_files_world_readable || exit 1
