@@ -72,17 +72,6 @@ cd %cfast_root%\Build\Cdata\intel_win
 call make_cdata.bat bot release                                                 >> %stage2out% 2>&1
 call :copy_file . cdata7_win.exe %cfast_root%\Utilities\for_bundle\Bin cdata.exe
 
-@echo.                                                                          >> %stage2out%
-@echo ------------------------------------------------------------------------- >> %stage2out%
-@echo ***Building VandVCalcs                                                    >> %stage2out%
-@echo ------------------------------------------------------------------------- >> %stage2out%
-@echo.                                                                          >> %stage2out%
-
-@echo ***Building VandVCalcs
-cd %cfast_root%\Build\VandV_Calcs\intel_win
-call make_vv.bat bot release                                                    >> %stage2out% 2>&1
-call :copy_file . VandV_Calcs_win.exe %cfast_root%\Utilities\for_bundle\Bin VandV_Calcs.exe
-
 cd %cfast_root%\Utilities\for_bundle\scripts
 
 goto eof
