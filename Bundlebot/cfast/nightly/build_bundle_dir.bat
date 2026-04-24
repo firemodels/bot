@@ -74,10 +74,7 @@ echo ***Copying Smokeview files
 
 call :COPYPROG get_time
 call :COPYPROG get_time
-call :COPYPROG smokediff
 call :COPYPROG smokeview test_
-call :COPYPROG smokezip
-call :COPYPROG wind2fds
 
 call :COPY %smvrepo%\Build\for_bundle\objects.svo    %SMVDISTDIR%\
 call :COPY %smvrepo%\Build\for_bundle\volrender.ssf  %SMVDISTDIR%\
