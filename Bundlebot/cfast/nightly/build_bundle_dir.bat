@@ -2,7 +2,6 @@
 set build_cedit=%1
 
 set bindir=%cfast_root%\Utilities\for_bundle\Bin
-set vandvdir=%cfast_root%\Build\VandV_Calcs\intel_win
 set docdir=%cfast_root%\Manuals
 set CURDIR2=%CD%
 
@@ -38,8 +37,6 @@ if %build_cedit% == 0 goto skip_build_cedit
    call :COPY  %bindir%\CEdit.exe             %CFASTDISTDIR%\
 :skip_build_cedit
 call :COPY  %bindir%\CFAST.exe                %CFASTDISTDIR%\
-call :COPY  %vandvdir%\VandV_Calcs_win.exe                               %CFASTDISTDIR%\VandV_Calcs.exe
-call :COPY  %smvrepo%\Build\background\intel_win\background_win.exe         %CFASTDISTDIR%\background.exe
 
 if %build_cedit% == 0 goto skip_build_cedit2
    echo ***Copying CEdit DLLs
@@ -75,7 +72,6 @@ call :COPYPDF CFAST_CData_Guide
 
 echo ***Copying Smokeview files
 
-call :COPYPROG background
 call :COPYPROG get_time
 call :COPYPROG get_time
 call :COPYPROG smokediff
@@ -153,3 +149,4 @@ copy %indir% %outdir% > Nul 2>&1
 exit /b
 
 :EOF
+ 

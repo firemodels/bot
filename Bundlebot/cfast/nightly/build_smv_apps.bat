@@ -13,7 +13,7 @@ echo ***Building Libraries
 cd %CURDIR%
 call build_smv_libs > Nul 2>&1
 
-set progs=background get_time set_path smokediff smokezip wind2fds    
+set progs=get_time set_path smokediff smokezip wind2fds    
 for %%x in ( %progs% ) do (
   cd %smvrepo%\Build\%%x\intel_win
   echo ***Building %%x
