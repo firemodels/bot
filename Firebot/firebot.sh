@@ -2362,6 +2362,7 @@ VERIFICATION_DEBUG=Verification_DB
 rsync -av   --include='*/'   --include='*.fds'   --include='*.ini'   --include='*.ssf'   --exclude='*'   Verification/ $VERIFICATION_DEBUG
 cp Verification/*.sh $VERIFICATION_DEBUG/.
 cp Verification/scripts/* $VERIFICATION_DEBUG/scripts/.
+cp Verification/scripts/.verification_script_dir $VERIFICATION_DEBUG/scripts/.
 
 #*** check fds and smv repos for text files with CRLF line endings
 #    don't check lines if not cloning and not cleaning repo - avoid false positives
