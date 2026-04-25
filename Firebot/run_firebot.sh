@@ -158,10 +158,11 @@ echo $0 $* > command.firebot
 
 notfound=`sinfo 2>&1 | tail -1 | grep "not found" | wc -l`
 if [ $notfound -eq 1 ] ; then
-  echo ***error: sinfo command not found, slurm queing system not available"
-  exit
+  QUEUE=none
 fi
-QUEUE=`sinfo -ho "%P" | grep *$ | sed -e 's/[*]$//'`
+if [ "$QUEUE" != "none" ]; then
+  QUEUE=`sinfo -ho "%P" | grep *$ | sed -e 's/[*]$//'`
+fi
 
 INTEL=
 platform="linux"
@@ -334,10 +335,16 @@ if [ "$KILL_FIREBOT" == "1" ]; then
       kill -9 $JOBS
     fi
 
-    JOBIDS=`squeue | grep $PREFIX | awk -v user="$USER" '{if($4==user){print $1}}' | awk -F'.' '{print $1}'`
-    if [ "$JOBIDS" != "" ]; then
-      echo killing firebot jobs with Id:$JOBIDS
-      qdel $JOBIDS
+    if [ "$QUEUE" == "none" ]; then
+      cd $CURDIR/../Scripts
+      ./killppids.sh ../Firebot/scriptfiles
+      cd $CURDIR
+    else
+      JOBIDS=`squeue | grep $PREFIX | awk -v user="$USER" '{if($4==user){print $1}}' | awk -F'.' '{print $1}'`
+      if [ "$JOBIDS" != "" ]; then
+        echo killing firebot jobs with Id:$JOBIDS
+        qdel $JOBIDS
+      fi
     fi
 
     echo "killing firebot (PID=$PID)"
