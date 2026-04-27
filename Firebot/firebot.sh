@@ -146,24 +146,6 @@ check_CRLF()
 }
 
 #---------------------------------------------
-#                   clean_repo
-#---------------------------------------------
-
-clean_repo()
-{
-  local curdir=`pwd`
-  local dir=$1
-  local branch=$2
-
-  CD_REPO $dir $branch || return 1
-  git clean -dxf &> /dev/null
-  git add . &> /dev/null
-  git reset --hard HEAD &> /dev/null
-  cd $curdir
-  return 0
-}
-
-#---------------------------------------------
 #                   clean_firebote_metafiles
 #---------------------------------------------
 
@@ -176,63 +158,6 @@ clean_firebot_metafiles()
    MKDIR $OUTPUT_DIR &> /dev/null
    rm -rf $OUTPUT_DIR/* &> /dev/null
    MKDIR $NEWGUIDE_DIR &> /dev/null
-}
-
-#---------------------------------------------
-#                   clean_repo2
-#---------------------------------------------
-
-clean_repo2()
-{
-   local reponame=$1
-   local branch=$2
-   
-   # Check to see if FDS repository exists
-   if [ -e "$repo" ]; then
-      CD_REPO $repo/$reponame $branch || return 1
-      echo "   $reponame"
-      clean_repo $repo/$reponame $branch || return 1
-   else
-      echo "firebot repo $repo does not exist." >> $OUTPUT_DIR/stage1_setup 2>&1
-      echo "firebot run aborted."               >> $OUTPUT_DIR/stage1_setup 2>&1
-      return 1
-   fi
-   return 0
-}
-
-#---------------------------------------------
-#                   update_repo
-#---------------------------------------------
-
-update_repo()
-{
-   local reponame=$1
-   local branch=$2
-
-   CD_REPO $repo/$reponame $branch || return 1
-
-   echo "   $reponame" 
-   echo Updating $branch on repo $repo/$reponame     >> $OUTPUT_DIR/stage1_setup 2>&1
-   git remote update                                 >> $OUTPUT_DIR/stage1_setup 2>&1
-   git merge origin/$branch                          >> $OUTPUT_DIR/stage1_setup 2>&1
-   have_firemodels=`git remote -v | grep firemodels | wc  -l`
-   if [ $have_firemodels -gt 0 ]; then
-      git merge firemodels/$branch                   >> $OUTPUT_DIR/stage1_setup 2>&1
-      need_push=`git status -uno | grep 'is ahead' | wc -l`
-      if [ $need_push -gt 1 ]; then
-        echo "warning: firemodels commits to the $reponame repo need to be pushed to origin" >> $OUTPUT_DIR/stage1_setup 2>&1
-        git status -uno | head -2 | grep -v nothing                                          >> $OUTPUT_DIR/stage1_setup 2>&1
-      fi
-   fi
-   if [[ "$reponame" == "exp" ]]; then
-      echo "Updating submodules."                   >> $OUTPUT_DIR/stage1_setup 2>&1
-      git submodule foreach git remote update       >> $OUTPUT_DIR/stage1_setup 2>&1
-
-      echo "Merge submodules origin."               >> $OUTPUT_DIR/stage1_setup 2>&1
-      git submodule foreach git merge origin/master >> $OUTPUT_DIR/stage1_setup 2>&1
-      git status -uno                               >> $OUTPUT_DIR/stage1_setup 2>&1
-   fi
-   return 0
 }
 
 #---------------------------------------------
@@ -874,47 +799,19 @@ run_VV_cases_release()
 {
    # run all FDS verification cases
 
-   if [ "$CHECK_CLUSTER" == "" ]; then
-     echo "   release"
-   fi
+   echo "   release"
    cd $fdsrepo/Verification/scripts
 
    # Wait for benchmark verification cases to end
    # let benchmark and regular cases run at the same time - for now
    # wait_cases_release_end verification stage3_run_release_ver
 
-   if [[ "$CHECK_CLUSTER" == "" ]]; then
-     cd $fdsrepo/Verification/scripts
-     echo "Running FDS verification cases:"                                         >> $OUTPUT_DIR/stage3_run_release_ver 2>&1
-     echo ./Run_FDS_Cases.sh $INTEL2 $REGULARCASES -q $QUEUE -j $JOBPREFIX_RELEASE  >> $OUTPUT_DIR/stage3_run_release_ver 2>&1
-     cd $fdsrepo/Verification/scripts
-     ./Run_FDS_Cases.sh      $INTEL2 $REGULARCASES -q $QUEUE -j $JOBPREFIX_RELEASE  >> $OUTPUT_DIR/stage3_run_release_ver 2>&1
-     echo ""                                                                        >> $OUTPUT_DIR/stage3_run_release_ver 2>&1
-   fi
-
-   # run all FDS validation cases 1 time step
-   if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-     echo "Running FDS Validation Cases (1 time step)"
-     echo "   release"
-     cd $fdsrepo/Validation
-
-     echo 'Running FDS validation cases:'                             >> $OUTPUT_DIR/stage3_run_release_val 2>&1
-     echo ./Run_Serial.sh   -j $JOBPREFIX_RELEASE -m 1 -q $QUEUE      >> $OUTPUT_DIR/stage3_run_release_val 2>&1
-          ./Run_Serial.sh   -j $JOBPREFIX_RELEASE -m 1 -q $QUEUE      >> $OUTPUT_DIR/stage3_run_release_val 2>&1
-     echo ./Run_Parallel.sh -j $JOBPREFIX_RELEASE -m 1 -q $QUEUE      >> $OUTPUT_DIR/stage3_run_release_val 2>&1
-          ./Run_Parallel.sh -j $JOBPREFIX_RELEASE -m 1 -q $QUEUE      >> $OUTPUT_DIR/stage3_run_release_val 2>&1
-     echo ""                                                          >> $OUTPUT_DIR/stage3_run_release_val 2>&1
-   fi
-
-# run validation case in FDS_Val_Cases.sh
-   if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" != "" ]]; then
-     echo "Running FDS Validation Cases (1 time step)"
-     echo "   release"
-     cd $fdsrepo/Verification/scripts
-     echo ./Run_FDS_Cases.sh -V -j $JOBPREFIX_RELEASE -m 1 -q $QUEUE  >> $OUTPUT_DIR/stage3_run_release_val 2>&1
-          ./Run_FDS_Cases.sh -V -j $JOBPREFIX_RELEASE -m 1 -q $QUEUE  >> $OUTPUT_DIR/stage3_run_release_val 2>&1
-     echo ""                                                          >> $OUTPUT_DIR/stage3_run_release_val 2>&1
-   fi
+   cd $fdsrepo/Verification/scripts
+   echo "Running FDS verification cases:"                                         >> $OUTPUT_DIR/stage3_run_release_ver 2>&1
+   echo ./Run_FDS_Cases.sh $INTEL2 $REGULARCASES -q $QUEUE -j $JOBPREFIX_RELEASE  >> $OUTPUT_DIR/stage3_run_release_ver 2>&1
+   cd $fdsrepo/Verification/scripts
+   ./Run_FDS_Cases.sh      $INTEL2 $REGULARCASES -q $QUEUE -j $JOBPREFIX_RELEASE  >> $OUTPUT_DIR/stage3_run_release_ver 2>&1
+   echo ""                                                                        >> $OUTPUT_DIR/stage3_run_release_ver 2>&1
 }
 
 #---------------------------------------------
@@ -923,16 +820,11 @@ run_VV_cases_release()
 
 wait_VV_cases_release()
 {
-   if [ "$VALIDATION" != "" ]; then
-   # Wait for non-benchmark verification cases to end
-     wait_cases_release_end validation stage3_run_release_val
-   fi
-
    # Wait for non-benchmark verification cases to end
    wait_cases_release_end verification stage3_run_release_ver
 
    # run restart cases (after regulcar cases have finished)
-   if [[ -e $fdsrepo/Verification/FDS_RESTART_Cases.sh ]] && [[ "$CHECK_CLUSTER" == "" ]] ; then
+   if [[ -e $fdsrepo/Verification/FDS_RESTART_Cases.sh ]]; then
      echo "   release (restart)"
 
      echo ""                                        i                   >> $OUTPUT_DIR/stage3_run_release_ver 2>&1
@@ -947,26 +839,9 @@ wait_VV_cases_release()
    fi
 
 #  check whether cases have run 
-   if [[ "$CHECK_CLUSTER" == "" ]] ; then
-     cd $fdsrepo/Verification/scripts
-     echo ./Run_FDS_Cases.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_ver 2>&1
-     ./Run_FDS_Cases.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_ver 2>&1
-   fi
-
-   if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]] ; then
-     cd $fdsrepo/Validation
-     echo ./Run_Serial.sh   -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
-          ./Run_Serial.sh   -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
-     echo ./Run_Parallel.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
-          ./Run_Parallel.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
-   fi
-
-   if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" != "" ]] ; then
-     cd $fdsrepo/Verification/scripts
-     echo ./Run_FDS_Cases.sh -V -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
-          ./Run_FDS_Cases.sh -V -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_val 2>&1
-     echo ""                                             >> $OUTPUT_DIR/stage3_run_release_val 2>&1
-   fi
+   cd $fdsrepo/Verification/scripts
+   echo ./Run_FDS_Cases.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_ver 2>&1
+   ./Run_FDS_Cases.sh -C -j $JOBPREFIX_RELEASE >> $OUTPUT_DIR/stage3_run_release_ver 2>&1
 }
 
 #---------------------------------------------
@@ -1904,8 +1779,6 @@ fi
 
 COMPILER=intel
 QUEUE=
-CLEANREPO=
-UPDATEREPO=
 JOBPREFIX_RELEASE=FBR_
 JOBPREFIX_DEBUG=FBD_
 
@@ -1925,27 +1798,22 @@ WEB_DIR=
 WEB_BASE_DIR=
 WEB_ROOT=
 UPDATED_WEB_IMAGES=
-FORCECLONE=
 
 FDS_TAG=
 SMV_TAG=
-VALIDATION=
-CHECK_CLUSTER=
 MPI_TYPE=ompi
 BOPT=
 GITURL=
 MAKE_SUMMARY=
 BUILD_3RD_PARTY=
 FORCE_UPLOAD=
-CACHE_DIR=
+MPI_TYPE=impi
+INTEL2="-J"
 
 #*** parse command line arguments
-while getopts '3b:cCJm:p:q:R:s:uUV:w:W:' OPTION
+while getopts 'b:m:p:q:R:Uw:W:' OPTION
 do
 case $OPTION in
-  3)
-   BUILD_3RD_PARTY=1
-   ;;
   b)
    BOPT=1
    BRANCH="$OPTARG"
@@ -1956,16 +1824,6 @@ case $OPTION in
    FIGBRANCH=$BRANCH
    CADBRANCH=$BRANCH
    EXPBRANCH=$BRANCH
-   ;;
-  c)
-   CLEANREPO=1
-   ;;
-  C)
-   FORCECLONE="-C"
-   ;;
-  J)
-   MPI_TYPE=impi
-   INTEL2="-J"
    ;;
   m)
    mailToFDS="$OPTARG"
@@ -1978,23 +1836,10 @@ case $OPTION in
    ;;
   R)
    CLONE_REPOS="$OPTARG"
-   ;;
-  s)
-   CACHE_DIR="$OPTARG"
-   ;;
-  u)
-   UPDATEREPO=1
+   BUILD_3RD_PARTY=1
    ;;
   U)
    UPLOADGUIDES=1
-   ;;
-  V)
-   VALIDATION="$OPTARG"
-   if [ "$VALIDATION" == "all" ]; then
-     CHECK_CLUSTER=
-   else
-     CHECK_CLUSTER=1
-   fi
    ;;
   w)
    WEB_DIR="$OPTARG"
@@ -2005,10 +1850,6 @@ case $OPTION in
 esac
 done
 shift $(($OPTIND-1))
-
-if [ "$BOPT" != "" ]; then
-  UPDATEREPO=
-fi  
 
 if [ "$WEB_DIR" != "" ]; then
   WEB_BASE_DIR=$WEB_DIR
@@ -2034,25 +1875,6 @@ if [ "$WEB_DIR" != "" ]; then
     WEB_DIR=
     WEB_URL=
   fi
-fi
-
-ABORT=
-if [ "$CACHE_DIR" != "" ]; then
-  if [ ! -d $CACHE_DIR ]; then
-    echo "***error: cache directory $CACHE_DIR does not exist"
-    exit
-  fi
-  CURRENT_DIR=`pwd`
-  cd $CACHE_DIR
-  CACHE_DIR=`pwd`
-  cd $CURRENT_DIR
-  if [ ! -d $CACHE_DIR/Verification ]; then
-    echo "***error: cache directory $CACHE_DIR/Verification does not exist"
-    ABORT=1
-  fi
-fi
-if [ "$ABORT" != "" ]; then
-  exit
 fi
 
 # Load mailing list for status report
@@ -2132,7 +1954,7 @@ if [[ "$CLONE_REPOS" != "" ]]; then
     DISABLEPUSH="-D"
   fi
    # clone all repos
-    ./setup_repos.sh $FORCECLONE -F > $OUTPUT_DIR/stage1_clone 2>&1
+    ./setup_repos.sh -C -F > $OUTPUT_DIR/stage1_clone 2>&1
   if [ "$BUILD_3RD_PARTY" != "" ]; then
     echo removing hypre repo    >>   $OUTPUT_DIR/stage1_clone
     rm -rf $hyprerepo           >>   $OUTPUT_DIR/stage1_clone 2>&1
@@ -2270,16 +2092,6 @@ if [ "$C_VERSION" != "" ]; then
   echo "            C: $C_VERSION"
 fi
 
-if [ "$CLEANREPO" == "1" ]; then
-  echo "  clean repos: yes"
-else
-  echo "  clean repos: no"
-fi
-if [ "$UPDATEREPO" == "1" ]; then
-  echo " update repos: yes"
-else
-  echo " update repos: no"
-fi
   echo "        queue: $QUEUE"
 if [ "$WEB_DIR" != "" ]; then
   echo "      web dir: $WEB_DIR"
@@ -2301,100 +2113,44 @@ touch $FYI_LOG
 
 echo "Status"
 echo "------"
-if [[ "$CLONE_REPOS" == "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-  if [[ "$CLEANREPO" == "1" ]] ; then
-    clean_repo2 exp $EXPBRANCH|| exit 1
-    clean_repo2 fds $FDSBRANCH || exit 1
-    clean_repo2 fig $FIGBRANCH     || exit 1
-    clean_repo2 out $OUTBRANCH || exit 1
-    clean_repo2 smv $SMVBRANCH || exit 1
-  fi
+if [[ "$CLONE_REPOS" == "" ]]; then
   ARCHIVE_REPO_SIZES=1
-fi
-
-#*** update repos
-UPDATING=
-if [[ "$UPDATEREPO" == "1" ]] ; then
-# we are not cloning so update
-  if [[ "$CLONE_REPOS" == "" ]]; then
-    UPDATING=1
-    echo Updating
-    update_repo fds $FDSBRANCH || exit 1
-    if [[ "$CHECK_CLUSTER" == "" ]]; then
-      update_repo smv $SMVBRANCH || exit 1
-      update_repo fig $FIGBRANCH || exit 1
-      update_repo out $OUTBRANCH || exit 1
-      update_repo exp $EXPBRANCH || exit 1
-    fi
-  fi
-# we are not cloning fig, out and exp so update them
-  if [[ "$CLONE_REPOS" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-    UPDATING=1
-    echo Updating
-    update_repo fig $FIGBRANCH || exit 1
-    update_repo out $OUTBRANCH || exit 1
-    update_repo exp $EXPBRANCH || exit 1
-  fi
-fi
-if [ "$UPDATING" == "" ]; then
-  echo Repos not updated
 fi
 
 # run debug and release cases in two different directories
 cd $fdsrepo
 
-#*** check fds and smv repos for text files with CRLF line endings
-#    don't check lines if not cloning and not cleaning repo - avoid false positives
+#*** onlly check fds and smv repos for text files with CRLF line endings
+#    when cloning to avoid false positives
 
-CHECK_LINES=1
-if [[ "$CLONE_REPOS" == "" ]]; then
-  if [[ "$CLEANREPO" == "" ]]; then
-    CHECK_LINES=
-  fi
-fi
+if [[ "$CLONE_REPOS" != "" ]; then
+  rm -f $CRLF_WARNINGS
+  echo Checking for DOS line endings
+  echo "   bot repo"
+  find_CRLF $repo/bot bot
 
-# comment next line to turn on dos line ending checks
-#CHECK_LINES=
+  echo "   exp repo"
+  find_CRLF $repo/exp exp
 
-if [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
-  if [ "$CHECK_LINES" == "1" ]; then
-    rm -f $CRLF_WARNINGS
-    echo Checking for DOS line endings
-    echo "   bot repo"
-    find_CRLF $repo/bot bot
+  echo "   fds repo"
+  find_CRLF $repo/fds fds
 
-    echo "   exp repo"
-    find_CRLF $repo/exp exp
+  echo "   out repo"
+  find_CRLF $repo/out out
 
-    echo "   fds repo"
-    find_CRLF $repo/fds fds
+  echo "   smv repo"
+  find_CRLF $repo/smv smv
 
-    echo "   out repo"
-    find_CRLF $repo/out out
-
-    echo "   smv repo"
-    find_CRLF $repo/smv smv
-
-    check_CRLF
-  else
-    echo "DOS line endings only checked when cloning or cleaning repos"
-  fi
-fi
-
-if [ "$CACHE_DIR" != "" ]; then
-  rm -rf $fdsrepo/Verification
-  cp -r $CACHE_DIR/Verification $fdsrepo/.
+  check_CRLF
 fi
 
 get_fds_revision $FDSBRANCH || exit 1
 get_smv_revision $SMVBRANCH || exit 1
 get_bot_revision $BOTBRANCH || exit 1
-if [[ "$CHECK_CLUSTER" == "" ]]; then
-  get_exp_revision $EXPBRANCH     || exit 1
-  get_fig_revision $FIGBRANCH     || exit 1
-  get_out_revision $OUTBRANCH     || exit 1
-  get_cad_revision $CADBRANCH     || exit 1
-fi
+get_exp_revision $EXPBRANCH || exit 1
+get_fig_revision $FIGBRANCH || exit 1
+get_out_revision $OUTBRANCH || exit 1
+get_cad_revision $CADBRANCH || exit 1
 
 echo | mail >& /tmp/mailtest.$$
 notfound=`grep 'command not found' /tmp/mailtest.$$ | wc -l`
@@ -2407,10 +2163,8 @@ rm /tmp/mailtest.$$
 # archive repo sizes
 # (only if the repos are cloned or cleaned)
 
-if [[ "$CHECK_CLUSTER" == "" ]]; then
-  if [ "$ARCHIVE_REPO_SIZES" == "1" ]; then
-    archive_repo_sizes
-  fi
+if [ "$ARCHIVE_REPO_SIZES" == "1" ]; then
+  archive_repo_sizes
 fi
 
 check_git_checkout
@@ -2425,60 +2179,48 @@ GET_DURATION $SETUP_beg $SETUP_end SETUP
 ###****** Stage 2 - debug fds ###
 
 BUILD_beg=`GET_TIME`
-if [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
-  compile_fds_mpi_db         $FDS_DB_DIR $FDS_DB_EXE                           
-  compile_fds_mpi_db         $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
-  check_compile_fds_mpi_db   $FDS_DB_DIR $FDS_DB_EXE
-  check_compile_fds_mpi_db   $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
-fi
+compile_fds_mpi_db         $FDS_DB_DIR $FDS_DB_EXE                           
+compile_fds_mpi_db         $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
+check_compile_fds_mpi_db   $FDS_DB_DIR $FDS_DB_EXE
+check_compile_fds_mpi_db   $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
 
 ###*** Stage 2 - release fds ###
 
-if [[ "$CACHE_DIR" == "" ]]; then
-  compile_fds_mpi         $FDS_DIR $FDS_EXE
-  compile_fds_mpi         $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
-  check_compile_fds_mpi   $FDS_DIR $FDS_EXE
-  check_compile_fds_mpi   $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
-  cd $firebotdir
-  $COPY_FDS_APPS > $OUTPUT_DIR/stage2_copyapps
-fi
+compile_fds_mpi         $FDS_DIR $FDS_EXE
+compile_fds_mpi         $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
+check_compile_fds_mpi   $FDS_DIR $FDS_EXE
+check_compile_fds_mpi   $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
+cd $firebotdir
+$COPY_FDS_APPS > $OUTPUT_DIR/stage2_copyapps
 
 ###*** Stage 2 - smv utilities ###
 
-if [[ "$CHECK_CLUSTER" == "" ]]; then
-  compile_smv_libraries
-  compile_smv_utilities
-  check_smv_utilities
+compile_smv_libraries
+compile_smv_utilities
+check_smv_utilities
 
-  cd $firebotdir
-  $COPY_SMV_APPS >> $OUTPUT_DIR/stage2_copyapps
-fi
+cd $firebotdir
+$COPY_SMV_APPS >> $OUTPUT_DIR/stage2_copyapps
 
 ###*** Stage 2 - debug smokeview ###
 
-if [[ "$CHECK_CLUSTER" == "" ]]; then
-  compile_smv_db
-  check_compile_smv_db
-fi
+compile_smv_db
+check_compile_smv_db
 
 ###*** Stage 2 - release smokeview ###
 
-if [[ "$CHECK_CLUSTER" == "" ]]; then
-  compile_smv
-  check_compile_smv
-fi
+compile_smv
+check_compile_smv
 BUILD_end=`GET_TIME`
 GET_DURATION $BUILD_beg $BUILD_end BUILD
 
 #*** run cases using debug fds
 DEBUG_beg=`GET_TIME`
-if [ "$CACHE_DIR" == "" ]; then
 
 # debug cases
-  if [[ $FDS_debug_success ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-    run_verification_cases_debug
-    check_cases_debug
-  fi
+if [[ $FDS_debug_success ]]; then
+  run_verification_cases_debug
+  check_cases_debug
 fi
 DEBUG_end=`GET_TIME`
 GET_DURATION $DEBUG_beg $DEBUG_end DEBUG
@@ -2486,52 +2228,40 @@ GET_DURATION $DEBUG_beg $DEBUG_end DEBUG
 
 ###*** Stage 3 run verification cases ###
 
-if [ "$CACHE_DIR" == "" ]; then
 #*** run cases using release fds
 RELEASE_beg=`GET_TIME`
-  if [[ $FDS_release_success ]]; then
-    run_VV_cases_release
-    wait_VV_cases_release
-  fi
-  if [[ $FDS_release_success ]]; then
-# this also checks restart cases (using same criteria)
-    if [ "$CHECK_CLUSTER" == "" ]; then
-      check_verification_cases_release $fdsrepo/Verification
-    fi
-    if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-      check_validation_cases_release $fdsrepo/Validation Current_Results
-    fi
-    if [[ "$VALIDATION" != "" ]] && [[ "$CHECK_CLUSTER" != "" ]]; then
-      check_validation_cases_release $fdsrepo/Validation FDS_Input_Files
-    fi
-  fi
-  RELEASE_end=`GET_TIME`
-  GET_DURATION $RELEASE_beg $RELEASE_end RELEASE
+if [[ $FDS_release_success ]]; then
+  run_VV_cases_release
+  wait_VV_cases_release
 fi
+if [[ $FDS_release_success ]]; then
+# this also checks restart cases (using same criteria)
+  check_verification_cases_release $fdsrepo/Verification
+fi
+RELEASE_end=`GET_TIME`
+GET_DURATION $RELEASE_beg $RELEASE_end RELEASE
 
 ###*** Stage 4 python vv ###
 
 VV_beg=`GET_TIME`
-if [[ "$CACHE_DIR" == "" ]]; then
 
 ###*** setup python and run validation tests
 
-  run_python_setup
-  check_python_setup
+run_python_setup
+check_python_setup
 
-  if [ $python_success == true ]; then
-    run_python_validation
-  fi
+if [ $python_success == true ]; then
+  run_python_validation
+fi
 #*** python verification and validation plots
 
-  if [ $python_success == true ]; then
-    run_python_verification
+if [ $python_success == true ]; then
+  run_python_verification
  
-    check_python_verification
-    check_python_validation
-    make_fds_summary
-    MAKE_SUMMARY=1
-  fi
+  check_python_verification
+  check_python_validation
+  make_fds_summary
+  MAKE_SUMMARY=1
 fi
 VV_end=`GET_TIME`
 GET_DURATION $VV_beg $VV_end VV
@@ -2539,45 +2269,42 @@ GET_DURATION $VV_beg $VV_end VV
 ###*** Stage 5 build manuals ###
 
 MANUALS_beg=`GET_TIME`
-  if [[ "$CACHE_DIR" == "" ]]; then
-    make_fds_user_guide
-    make_fds_technical_guide
-    make_fds_Config_management_plan
-    make_fds_verification_guide
-    make_fds_validation_guide
+make_fds_user_guide
+make_fds_technical_guide
+make_fds_Config_management_plan
+make_fds_verification_guide
+make_fds_validation_guide
 
 # copy repo manuals to Manualslatest directory whether firebot passes or fails
-    rm -rf $MANUALS_LATEST_DIR
-    cp -r $fdsrepo/Manuals $MANUALS_LATEST_DIR
-    if [[ ! -s $ERROR_LOG ]]; then
+rm -rf $MANUALS_LATEST_DIR
+cp -r $fdsrepo/Manuals $MANUALS_LATEST_DIR
+if [[ ! -s $ERROR_LOG ]]; then
 
 # copy repo manuals to Manuals directory only if firebot
-      rm -rf $MANUALS_DIR
-      cp -r $fdsrepo/Manuals $MANUALS_DIR
+  rm -rf $MANUALS_DIR
+  cp -r $fdsrepo/Manuals $MANUALS_DIR
 
 # copy to a 2nd location that is accessible via cross mounts
-      if [ "$FIREBOT_MANUALS_DIR" != "" ]; then
-        if [ ! -d $FIREBOT_MANUALS_DIR ]; then
-          mkdir $FIREBOT_MANUALS_DIR
-        fi
-        rm -rf $FIREBOT_MANUALS_DIR
-        cp -r $fdsrepo/Manuals $FIREBOT_MANUALS_DIR
-      fi
-
-      cp $LATESTAPPS_DIR/FDS_REVISION $PUBS_DIR/FDS_REVISION
-      copy_fds_user_guide
-      copy_fds_verification_guide
-      copy_fds_technical_guide
-      copy_fds_validation_guide
-      copy_fds_Config_management_plan
+  if [ "$FIREBOT_MANUALS_DIR" != "" ]; then
+    if [ ! -d $FIREBOT_MANUALS_DIR ]; then
+      mkdir $FIREBOT_MANUALS_DIR
     fi
+    rm -rf $FIREBOT_MANUALS_DIR
+    cp -r $fdsrepo/Manuals $FIREBOT_MANUALS_DIR
   fi
-#fi
+
+  cp $LATESTAPPS_DIR/FDS_REVISION $PUBS_DIR/FDS_REVISION
+  copy_fds_user_guide
+  copy_fds_verification_guide
+  copy_fds_technical_guide
+  copy_fds_validation_guide
+  copy_fds_Config_management_plan
+fi
 
 ###*** Stage 6 wrapup ###
 
 copy_apps=
-if [[ ! -s $ERROR_LOG ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
+if [[ ! -s $ERROR_LOG ]]; then
   copy_apps=1
 fi
 if [ "$copy_apps" == "1" ]; then
@@ -2607,9 +2334,7 @@ if [ -e output/timing_errors ]; then
 fi
 
 save_build_status
-if [[ "$CHECK_CLUSTER" == "" ]]; then
-  archive_timing_stats
-fi
+archive_timing_stats
 email_build_status
 echo firebot exit status: $firebot_status
 exit $firebot_status
