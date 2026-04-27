@@ -423,10 +423,7 @@ check_compile_fds_mpi_db()
   local FDSEXE=$2
   local MPTYPE=$3
 
-  if [ "$MPTYPE" == "" ]; then
-    wait $pid_fds_mpi_db
-  else
-    wait $pid_fds_mpi_db_openmp
+  if [ "$MPTYPE" != "" ]; then
     MPTYPE="_$MPTYPE"
   fi
 
@@ -490,17 +487,6 @@ compile_fds_mpi_gnu_db()
 }
 
 #---------------------------------------------
-#                   check_compile_fds_mpi_gnu_db
-#---------------------------------------------
-check_compile_fds_mpi_gnu_db()
-{
-# force the gnu compile to pass until it can compile
-# fds with the findloc routine
-  wait $pid_fds_gnu_db
-  FDS_gnu_debug_success=true
-}
-
-#---------------------------------------------
 #                   wait_cases_debug_end
 #---------------------------------------------
 
@@ -523,7 +509,7 @@ wait_cases_debug_end()
 run_verification_cases_debug()
 {
    # Start running all FDS verification cases in delayed stop debug mode
-   cd $fdsrepo/$VERIFICATION_DEBUG/scripts
+   cd $fdsrepo/Verification/scripts
    # Run FDS with delayed stop files (with 1 OpenMP thread and 1 iteration)
    echo "Running FDS Verification Cases"
    echo "   debug"
@@ -545,11 +531,11 @@ check_cases_debug()
    wait_cases_debug_end
 
 #  check whether cases have run
-   cd $fdsrepo/$VERIFICATION_DEBUG/scripts
+   cd $fdsrepo/Verification/scripts
    ./Run_FDS_Cases.sh -C                                  -j $JOBPREFIX_DEBUG >> $OUTPUT_DIR/stage3_run_debug_ver 2>&1
 
    # Remove all .stop files from Verification directories (recursively)
-   cd $fdsrepo/$VERIFICATION_DEBUG
+   cd $fdsrepo/Verification
    if [ "$CLONE_REPOS" == "" ]; then
      find . -name '*.stop' -exec rm -f {} \;
    fi
@@ -612,10 +598,7 @@ check_compile_fds_mpi()
   local FDSDIR=$1
   local FDSEXE=$2
   local MPTYPE=$3
-  if [ "$MPTYPE" == "" ]; then
-    wait $pid_fds_mpi
-  else
-    wait $pid_fds_mpi_openmp
+  if [ "$MPTYPE" != "" ]; then
     MPTYPE="_$MPTYPE"
   fi
   cd $FDSDIR
@@ -1133,12 +1116,12 @@ check_python_verification()
 {
    # Check that python environment has been setup
    python_verification_success=true
-   header_outputted = false
+   header_outputted=false
    if [[ `grep -E 'ERROR|Error|WARNING|Warning' $OUTPUT_DIR/stage4_python_ver | grep -v 'Relative Error' | grep -v 'Absolute Error' ` != "" ]]; then
      python_verification_success=false
    fi
    if [ $python_verification_success == false ]; then
-     header_outputted = true
+     header_outputted=true
      echo "Errors/Warnings from Stage 4 - Python plotting and statistics (verification):"                                                   >> $ERROR_LOG
      grep -E 'ERROR|Error|WARNING|Warning' $OUTPUT_DIR/stage4_python_ver | grep -v 'Relative Error' | grep -v 'Absolute Error' | tr -cd '\11\12\15\40-\176' >> $ERROR_LOG
      echo ""                                                                                                                       >> $ERROR_LOG
@@ -1707,10 +1690,12 @@ if [ "$CLONE_REPOS" == "" ]; then
 else
    echo "clone repos: $CLONE_DIFF "                         >> $TIME_LOG
 fi
+
    echo "setup firebot: $SETUP_DIFF "                       >> $TIME_LOG
    echo "build software: $BUILD_DIFF "                      >> $TIME_LOG
-   echo "run cases: $RELEASE_DIFF "                         >> $TIME_LOG
-   echo "verification/validation: $VERIFICATION_DIFF "      >> $TIME_LOG
+   echo "run cases(debug): $DEBUG_DIFF "                    >> $TIME_LOG
+   echo "run cases(release): $RELEASE_DIFF "                >> $TIME_LOG
+   echo "verification/validation: $VV_DIFF "                >> $TIME_LOG
    echo "build guides: $MANUALS_DIFF "                      >> $TIME_LOG
    echo "total: $SCRIPT_DIFF "                              >> $TIME_LOG
    echo ""                                                  >> $TIME_LOG
@@ -2357,12 +2342,6 @@ fi
 
 # run debug and release cases in two different directories
 cd $fdsrepo
-VERIFICATION_DEBUG=Verification_DB
-#cp -r Verification $VERIFICATION_DEBUG
-rsync -av   --include='*/'   --include='*.fds'   --include='*.ini'   --include='*.ssf'   --exclude='*'   Verification/ $VERIFICATION_DEBUG
-cp Verification/*.sh $VERIFICATION_DEBUG/.
-cp Verification/scripts/* $VERIFICATION_DEBUG/scripts/.
-cp Verification/scripts/.verification_script_dir $VERIFICATION_DEBUG/scripts/.
 
 #*** check fds and smv repos for text files with CRLF line endings
 #    don't check lines if not cloning and not cleaning repo - avoid false positives
@@ -2448,25 +2427,20 @@ GET_DURATION $SETUP_beg $SETUP_end SETUP
 BUILD_beg=`GET_TIME`
 if [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
   compile_fds_mpi_db         $FDS_DB_DIR $FDS_DB_EXE                           
-  pid_fds_mpi_db=$!
-  compile_fds_mpi_db         $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp     &
-  pid_fds_mpi_db_openmp=$!
-fi
-
-###*** Stage 2 - gnu fds ###
-
-if [[ "$OPENMPI_GNU" != "" ]] && [[ "$CHECK_CLUSTER" == "" ]] && [[ "$CACHE_DIR" == "" ]]; then
-  compile_fds_mpi_gnu_db       $FDSGNU_DB_DIR  &
-  pid_fds_mpi_gnu_db=$!
+  compile_fds_mpi_db         $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
+  check_compile_fds_mpi_db   $FDS_DB_DIR $FDS_DB_EXE
+  check_compile_fds_mpi_db   $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
 fi
 
 ###*** Stage 2 - release fds ###
 
 if [[ "$CACHE_DIR" == "" ]]; then
-  compile_fds_mpi         $FDS_DIR $FDS_EXE  &
-  pid_fds_mpi=$!
-  compile_fds_mpi         $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp  &
-  pid_fds_mpi_openmp=$!
+  compile_fds_mpi         $FDS_DIR $FDS_EXE
+  compile_fds_mpi         $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
+  check_compile_fds_mpi   $FDS_DIR $FDS_EXE
+  check_compile_fds_mpi   $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
+  cd $firebotdir
+  $COPY_FDS_APPS > $OUTPUT_DIR/stage2_copyapps
 fi
 
 ###*** Stage 2 - smv utilities ###
@@ -2474,6 +2448,10 @@ fi
 if [[ "$CHECK_CLUSTER" == "" ]]; then
   compile_smv_libraries
   compile_smv_utilities
+  check_smv_utilities
+
+  cd $firebotdir
+  $COPY_SMV_APPS >> $OUTPUT_DIR/stage2_copyapps
 fi
 
 ###*** Stage 2 - debug smokeview ###
@@ -2489,60 +2467,33 @@ if [[ "$CHECK_CLUSTER" == "" ]]; then
   compile_smv
   check_compile_smv
 fi
+BUILD_end=`GET_TIME`
+GET_DURATION $BUILD_beg $BUILD_end BUILD
 
-if [[ "$CHECK_CLUSTER" == "" ]]; then
-  if [[ "$CACHE_DIR" == "" ]]; then
-    check_compile_fds_mpi_db   $FDS_DB_DIR $FDS_DB_EXE
-    check_compile_fds_mpi_db   $FDS_OPENMP_DB_DIR $FDS_OPENMP_DB_EXE openmp
-  fi
-
-  if [[ "$OPENMPI_GNU" != "" ]] && [[ "$CACHE_DIR" == "" ]]; then
-    check_compile_fds_mpi_gnu_db
-  fi
-fi
-RELEASE_beg=`GET_TIME`
+#*** run cases using debug fds
+DEBUG_beg=`GET_TIME`
 if [ "$CACHE_DIR" == "" ]; then
 
 # debug cases
   if [[ $FDS_debug_success ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
     run_verification_cases_debug
+    check_cases_debug
   fi
 fi
+DEBUG_end=`GET_TIME`
+GET_DURATION $DEBUG_beg $DEBUG_end DEBUG
 
-if [[ "$CHECK_CLUSTER" == "" ]]; then
-  check_compile_fds_mpi   $FDS_DIR $FDS_EXE
-  check_compile_fds_mpi   $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
-
-  check_smv_utilities
-  cd $firebotdir
-  $COPY_FDS_APPS > $OUTPUT_DIR/stage2_copyapps
-
-  cd $firebotdir
-  $COPY_SMV_APPS >> $OUTPUT_DIR/stage2_copyapps
-fi
-BUILD_end=`GET_TIME`
-GET_DURATION $BUILD_beg $BUILD_end BUILD
 
 ###*** Stage 3 run verification cases ###
 
 if [ "$CACHE_DIR" == "" ]; then
-# release cases
+#*** run cases using release fds
+RELEASE_beg=`GET_TIME`
   if [[ $FDS_release_success ]]; then
     run_VV_cases_release
-  fi
-
-###*** setup python and run validation tests
-
-  run_python_setup
-  check_python_setup
-
-  if [ $python_success == true ]; then
-    run_python_validation   &
-    pid_python_validation=$!
-  fi
-
-  if [[ $FDS_release_success ]]; then
     wait_VV_cases_release
+  fi
+  if [[ $FDS_release_success ]]; then
 # this also checks restart cases (using same criteria)
     if [ "$CHECK_CLUSTER" == "" ]; then
       check_verification_cases_release $fdsrepo/Verification
@@ -2554,34 +2505,33 @@ if [ "$CACHE_DIR" == "" ]; then
       check_validation_cases_release $fdsrepo/Validation FDS_Input_Files
     fi
   fi
-  if [[ $FDS_debug_success ]] && [[ "$CHECK_CLUSTER" == "" ]]; then
-     check_cases_debug
-  fi
+  RELEASE_end=`GET_TIME`
+  GET_DURATION $RELEASE_beg $RELEASE_end RELEASE
 fi
-RELEASE_end=`GET_TIME`
-GET_DURATION $RELEASE_beg $RELEASE_end RELEASE
 
 ###*** Stage 4 python vv ###
 
 VV_beg=`GET_TIME`
 if [[ "$CACHE_DIR" == "" ]]; then
 
+###*** setup python and run validation tests
+
+  run_python_setup
+  check_python_setup
+
+  if [ $python_success == true ]; then
+    run_python_validation
+  fi
 #*** python verification and validation plots
 
-  VERIFICATION_beg=`GET_TIME`
   if [ $python_success == true ]; then
-    run_python_verification &
-    pid_python_verification=$!
-
-    wait $pid_python_verification
-    wait $pid_python_validation
+    run_python_verification
+ 
     check_python_verification
     check_python_validation
     make_fds_summary
     MAKE_SUMMARY=1
   fi
-  VERIFICATION_end=`GET_TIME`
-  GET_DURATION $VERIFICATION_beg $VERIFICATION_end VERIFICATION
 fi
 VV_end=`GET_TIME`
 GET_DURATION $VV_beg $VV_end VV
@@ -2590,27 +2540,11 @@ GET_DURATION $VV_beg $VV_end VV
 
 MANUALS_beg=`GET_TIME`
   if [[ "$CACHE_DIR" == "" ]]; then
-    make_fds_user_guide             &
-    pid_fds_ug=$!
-
-    make_fds_technical_guide        &
-    pid_fds_tg=$!
-
-    make_fds_Config_management_plan &
-    pid_fds_confg=$!
-
-    wait $pid_fds_ug
-
-    make_fds_verification_guide     &
-    pid_fds_verg=$!
-
-    make_fds_validation_guide       &
-    pid_fds_valg=$!
-
-    wait $pid_fds_verg
-    wait $pid_fds_tg
-    wait $pid_fds_valg
-    wait $pid_fds_confg
+    make_fds_user_guide
+    make_fds_technical_guide
+    make_fds_Config_management_plan
+    make_fds_verification_guide
+    make_fds_validation_guide
 
 # copy repo manuals to Manualslatest directory whether firebot passes or fails
     rm -rf $MANUALS_LATEST_DIR
