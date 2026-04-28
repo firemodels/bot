@@ -157,7 +157,6 @@ clean_firebot_metafiles()
    MKDIR $HISTORY_DIR &> /dev/null
    MKDIR $OUTPUT_DIR &> /dev/null
    rm -rf $OUTPUT_DIR/* &> /dev/null
-   MKDIR $NEWGUIDE_DIR &> /dev/null
 }
 
 #---------------------------------------------
@@ -1241,35 +1240,6 @@ check_guide()
 }
 
 #---------------------------------------------
-#                   copy_guide
-#---------------------------------------------
-
-copy_guide()
-{
-   local doc=$1
-
-   cd $firebotdir
-   if [[ "$UPLOADGUIDES" == "1" ]]; then
-     if [ -e $doc ]; then
-       if [ -d /var/www/html/firebot/manuals/ ]; then
-         cp $doc /var/www/html/firebot/manuals/
-       fi
-       if [ -d $NEWGUIDE_DIR ]; then
-         cp $doc $NEWGUIDE_DIR/.
-       fi
-       if [ -d $PUBS_DIR ]; then
-         cp $doc $PUBS_DIR/.
-       fi
-     fi
-   fi
-   if [ -e $doc ]; then
-     if [ -d $FDS_SUMMARY_DIR/manuals ]; then
-       cp $doc $FDS_SUMMARY_DIR/manuals/.
-     fi
-   fi
-}
-
-#---------------------------------------------
 #                   make_geom_notes
 #---------------------------------------------
 
@@ -1316,17 +1286,6 @@ make_fds_user_guide()
 }
 
 #---------------------------------------------
-#                   copy_fds_user_guide
-#---------------------------------------------
-
-copy_fds_user_guide()
-{
-   cd $fdsrepo/Manuals/FDS_User_Guide
-   copy_guide $fdsrepo/Manuals/FDS_User_Guide/FDS_User_Guide.pdf
-#   copy_guide $fdsrepo/Manuals/FDS_User_Guide/geom_notes.pdf
-}
-
-#---------------------------------------------
 #                   make_fds_technical_guide
 #---------------------------------------------
 
@@ -1340,16 +1299,6 @@ make_fds_technical_guide()
 
    # Check guide for completion
    check_guide $OUTPUT_DIR/stage5_fds_technical_guide 'FDS Technical Reference Guide'
-}
-
-#---------------------------------------------
-#                   copy_fds_technical_guide
-#---------------------------------------------
-
-copy_fds_technical_guide()
-{
-   cd $fdsrepo/Manuals/FDS_Technical_Reference_Guide
-   copy_guide $fdsrepo/Manuals/FDS_Technical_Reference_Guide/FDS_Technical_Reference_Guide.pdf
 }
 
 #---------------------------------------------
@@ -1369,16 +1318,6 @@ make_fds_verification_guide()
 }
 
 #---------------------------------------------
-#                   copy_fds_verification_guide
-#---------------------------------------------
-
-copy_fds_verification_guide()
-{
-   cd $fdsrepo/Manuals/FDS_Verification_Guide
-   copy_guide $fdsrepo/Manuals/FDS_Verification_Guide/FDS_Verification_Guide.pdf
-}
-
-#---------------------------------------------
 #                   make_fds_validation_guide
 #---------------------------------------------
 
@@ -1395,16 +1334,6 @@ make_fds_validation_guide()
 }
 
 #---------------------------------------------
-#                   copy_fds_validation_guide
-#---------------------------------------------
-
-copy_fds_validation_guide()
-{
-   cd $fdsrepo/Manuals/FDS_Validation_Guide
-   copy_guide $fdsrepo/Manuals/FDS_Validation_Guide/FDS_Validation_Guide.pdf
-}
-
-#---------------------------------------------
 #                   make_fds_Config_management_plan
 #---------------------------------------------
 
@@ -1418,16 +1347,6 @@ make_fds_Config_management_plan()
 
    # Check guide for completion
    check_guide $OUTPUT_DIR/stage5_fds_Config_management_plan 'FDS Config Management Plan'
-}
-
-#---------------------------------------------
-#                   copy_fds_Config_management_plan
-#---------------------------------------------
-
-copy_fds_Config_management_plan()
-{
-   cd $fdsrepo/Manuals/FDS_Config_Management_Plan
-   copy_guide $fdsrepo/Manuals/FDS_Config_Management_Plan/FDS_Config_Management_Plan.pdf
 }
 
 #---------------------------------------------
@@ -1727,9 +1646,6 @@ ERROR_LOG=$OUTPUT_DIR/errors
 TIMING_WARNING_LOG=$OUTPUT_DIR/timing_warnings
 MAIL_LOG=$OUTPUT_DIR/mail_log
 FYI_LOG=$OUTPUT_DIR/fyis
-NEWGUIDE_DIR=$OUTPUT_DIR/Newest_Guides
-MANUALS_DIR=$HOME/.firebot/Manuals
-MANUALS_LATEST_DIR=$HOME/.firebot/Manuals_latest
 EMAIL_LIST=$HOME/.firebot/firebot_email_list.sh
 CRLF_WARNINGS=$OUTPUT_DIR/stage1_crlf_warnings
 
@@ -2274,32 +2190,6 @@ make_fds_technical_guide
 make_fds_Config_management_plan
 make_fds_verification_guide
 make_fds_validation_guide
-
-# copy repo manuals to Manualslatest directory whether firebot passes or fails
-rm -rf $MANUALS_LATEST_DIR
-cp -r $fdsrepo/Manuals $MANUALS_LATEST_DIR
-if [[ ! -s $ERROR_LOG ]]; then
-
-# copy repo manuals to Manuals directory only if firebot
-  rm -rf $MANUALS_DIR
-  cp -r $fdsrepo/Manuals $MANUALS_DIR
-
-# copy to a 2nd location that is accessible via cross mounts
-  if [ "$FIREBOT_MANUALS_DIR" != "" ]; then
-    if [ ! -d $FIREBOT_MANUALS_DIR ]; then
-      mkdir $FIREBOT_MANUALS_DIR
-    fi
-    rm -rf $FIREBOT_MANUALS_DIR
-    cp -r $fdsrepo/Manuals $FIREBOT_MANUALS_DIR
-  fi
-
-  cp $LATESTAPPS_DIR/FDS_REVISION $PUBS_DIR/FDS_REVISION
-  copy_fds_user_guide
-  copy_fds_verification_guide
-  copy_fds_technical_guide
-  copy_fds_validation_guide
-  copy_fds_Config_management_plan
-fi
 
 ###*** Stage 6 wrapup ###
 
