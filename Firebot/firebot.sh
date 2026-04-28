@@ -1650,9 +1650,6 @@ CRLF_WARNINGS=$OUTPUT_DIR/stage1_crlf_warnings
 LATESTAPPS_DIR=$HOME/.firebot/appslatest
 APPS_DIR=$HOME/.firebot/apps
 
-PUBS_DIR=$HOME/.firebot/pubs
-MKDIR $PUBS_DIR
-
 MKDIR $HOME/.firebot
 
 MKDIR $APPS_DIR
@@ -1951,13 +1948,6 @@ BOTREPO_HASH=`git rev-parse HEAD`
 
 #save apps and pubs in directories under .firebot/$FDSBRANCH
 
-BRANCH_DIR=$HOME/.firebot/$FDSBRANCH
-BRANCHPUBS_DIR=$BRANCH_DIR/pubs
-BRANCHAPPS_DIR=$BRANCH_DIR/apps
-MKDIR $BRANCH_DIR
-MKDIR $BRANCHPUBS_DIR
-MKDIR $BRANCHAPPS_DIR
-
 cd $firebotdir
 
 #*** save pid in case we want to kill firebot later
@@ -2201,9 +2191,6 @@ if [ "$copy_apps" == "1" ]; then
 
   rm -f $BRANCHAPPS_DIR/*
   cp $LATESTAPPS_DIR/* $BRANCHAPPS_DIR/.
-
-  rm -f $BRANCHPUBS_DIR/*
-  cp $PUBS_DIR/*       $BRANCHPUBS_DIR/.
 fi
 MANUALS_end=`GET_TIME`
 GET_DURATION $MANUALS_beg $MANUALS_end MANUALS
