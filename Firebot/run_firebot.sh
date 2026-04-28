@@ -22,13 +22,13 @@ else
 fi
 echo "-q queue - specify queue [default: $QUEUE]"
 echo "-R branch_name - clone repos using branch :branch_name "
-echo "-y - answer yes when asked to proceed"
+echo "-y - answer yes when asked to proceed (used when running from crontab)"
 
 echo "Upload Options:"
-echo "-o - specify GH_OWNER when uploading manuals. [default: $GH_OWNER]"
-echo "-r - specify GH_REPO when uploading manuals. [default: $GH_REPO]"
+echo "-o owner - specify the github relase owner when uploading manuals. [default: $GH_OWNER]"
+echo "-r repo - specify the github repo name when uploading manuals. [default: $GH_REPO]"
 echo "-U - upload guides (only by user firebot)"
-echo "-w webdir - copy firebot web summary to $WEB_ROOT/webdir"
+echo "-w webdir - copy firebot web summary the directory webdir under the web root (default: $WEB_ROOT/webdir)"
 echo "-W webroot - root web directory [default: $WEB_ROOT]"
 exit 0
 }
@@ -124,7 +124,7 @@ export PREFIX=FB_
 CLONE_REPOS=
 CLONE_REPOS_ARG=
 WEB_DIR=
-WEB_ROOT=
+WEB_ROOT=/opt/www/html
 CLONEFILE=
 PROCEED=
 
