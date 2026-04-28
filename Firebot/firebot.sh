@@ -1549,8 +1549,6 @@ fi
      GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_FDS_TAG
      echo "Bundles, Guides, Summary:  $GITURL" >> $TIME_LOG
      $SummaryGH &> $OUTPUT_DIR/stage6_summary_github
-# upload guides with _latest appended even fire firebot doesn't pass
-#     $UploadGuidesGH latest &> $OUTPUT_DIR/stage6_upload_github
      if [[ ! -s $ERROR_LOG ]]; then
        $UploadGuidesGH                        &> $OUTPUT_DIR/stage6_upload_github
        cat $OUTPUT_DIR/stage6_upload_github >> $OUTPUT_DIR/stage6_summary_github
@@ -2228,4 +2226,3 @@ archive_timing_stats
 email_build_status
 echo firebot exit status: $firebot_status
 exit $firebot_status
- 
