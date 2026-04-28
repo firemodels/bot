@@ -173,14 +173,8 @@ get_smv_revision()
    SMV_REVISION=`git describe --abbrev=7 --long --dirty`
    echo $SMV_REVISION > $repo/fds/Manuals/SMV_REVISION
    subrev=`git describe --abbrev | awk -F '-' '{print $2}'`
-   if [ "$subrev" == "" ]; then
-     git describe --abbrev | awk -F '-' '{print $1"-0"}' > $LATESTAPPS_DIR/SMV_REVISION
-   else
-     git describe --abbrev | awk -F '-' '{print $1"-"$2"-"$3}' > $LATESTAPPS_DIR/SMV_REVISION
-   fi
    SMV_SHORTHASH=`git rev-parse --short HEAD`
    SMV_LONGHASH=`git rev-parse HEAD`
-   echo $SMV_SHORTHASH > $LATESTAPPS_DIR/SMV_HASH
    SMV_MESSAGE=`git log . | head -5 | tail -1`
    return 0
 }
@@ -199,13 +193,7 @@ get_fds_revision()
    FDS_REVISION=`git describe --abbrev=7 --long --dirty`
    echo $FDS_REVISION > $repo/fds/Manuals/FDS_REVISION
    subrev=`git describe --abbrev | awk -F '-' '{print $2}'`
-   if [ "$subrev" == "" ]; then
-     git describe --abbrev | awk -F '-' '{print $1"-0"}' > $LATESTAPPS_DIR/FDS_REVISION
-   else
-     git describe --abbrev | awk -F '-' '{print $1"-"$2"-"$3}' > $LATESTAPPS_DIR/FDS_REVISION
-   fi
    FDS_SHORTHASH=`git rev-parse --short HEAD`
-   echo $FDS_SHORTHASH > $LATESTAPPS_DIR/FDS_HASH
    FDS_LONGHASH=`git rev-parse HEAD`
    FDS_DATE=`git log -1 --format=%cd --date=local $FDS_SHORTHASH`
    FDS_MESSAGE=`git log . | head -5 | tail -1`
@@ -356,7 +344,6 @@ check_compile_fds_mpi_db()
   if [ -x $FDSEXE ]
   then
      FDS_debug_success=true
-     cp $FDSEXE $LATESTAPPS_DIR/fds_db${MPTYPE}
   else
      echo "Errors from Stage 2b$MPTYPE - Compile FDS MPI$MPTYPE debug:"   >> $ERROR_LOG
      echo "The program $FDSEXE failed to build."                          >> $ERROR_LOG
@@ -529,7 +516,6 @@ check_compile_fds_mpi()
   if [ -x $FDSEXE ]
   then
      FDS_release_success=true
-     cp $FDSEXE $LATESTAPPS_DIR/fds${MPTYPE}
   else
      echo "Errors from Stage 2c - Compile FDS MPI${MPTYPE} release:" >> $ERROR_LOG
      echo "The program $FDSEXE failed to build."                     >> $ERROR_LOG
@@ -617,7 +603,6 @@ compile_smv_utilities()
   rm -f *.o smokezip_${platform}
 
   ./make_smokezip.sh > $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
-  CP smokezip_${platform} $LATESTAPPS_DIR/smokezip
   echo "" >> $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
 
 # smokediff:
@@ -625,7 +610,6 @@ compile_smv_utilities()
   cd $smvrepo/Build/smokediff/${SMVCOMPILER}_${platform}
   rm -f *.o smokediff_${platform}
   ./make_smokediff.sh >> $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
-  CP smokediff_${platform} $LATESTAPPS_DIR/smokediff
   echo "" >> $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
 
 # wind2fds:
@@ -633,7 +617,6 @@ compile_smv_utilities()
   cd $smvrepo/Build/wind2fds/${SMVCOMPILER}_${platform}
   rm -f *.o wind2fds_${platform}
   ./make_wind2fds.sh >> $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
-  CP wind2fds_${platform} $LATESTAPPS_DIR/wind2fds
  echo "" >> $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
 
 # fds2fed
@@ -642,7 +625,6 @@ compile_smv_utilities()
     cd $smvrepo/Build/fds2fed/${SMVCOMPILER}_${platform}
     rm -f *.o fds2fed_${platform}
     ./make_fds2fed.sh >> $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
-    CP fds2fed_${platform} $LATESTAPPS_DIR/fds2fed
     echo "" >> $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
   fi
 
@@ -653,7 +635,6 @@ compile_smv_utilities()
     rm -f *.o pnginfo_${platform}
     echo 'Compiling pnginfo:' >> $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
     ./make_pnginfo.sh >> $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
-    cp pnginfo_${platform} $LATESTAPPS_DIR/pnginfo
   fi
 
 # fds2asci
@@ -661,7 +642,6 @@ compile_smv_utilities()
   cd $fdsrepo/Utilities/fds2ascii/${COMPILER}_${platform}${size}
   rm -f *.o fds2ascii_${platform}${size}
   ./make_fds2ascii.sh >> $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
-  cp fds2ascii_${COMPILER}_${platform}${size} $LATESTAPPS_DIR/fds2ascii
   echo "" >> $OUTPUT_DIR/stage2_build_fds_utilities 2>&1
 
 # test_mpi
@@ -669,7 +649,6 @@ compile_smv_utilities()
   cd $fdsrepo/Utilities/test_mpi/${MPI_TYPE}_${COMPILER}_${platform}
   rm -f *.o test_mpi
   ./make_test_mpi.sh >> $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
-  cp test_mpi $LATESTAPPS_DIR/test_mpi
   echo "" >> $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
 }
 
@@ -908,7 +887,6 @@ check_compile_smv()
   cd $smvrepo/Build/smokeview/${SMVCOMPILER}_${platform}
   if [ -e "smokeview_${platform}" ]; then
     smv_release_success=true
-    CP smokeview_${platform} $LATESTAPPS_DIR/smokeview
   else
     smv_errors=1
     echo "Errors from Stage 2 - Compile SMV release:"  >> $ERROR_LOG
@@ -1173,7 +1151,6 @@ generate_timing_stats()
 {
    cd $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/Scatterplots
    TOTAL_FDS_TIMES=`tail -1 fds_timing_stats.csv`
-   echo "$TOTAL_FDS_TIMES"     > $LATESTAPPS_DIR/fds_total_time.txt
 }
 
 #---------------------------------------------
@@ -1647,14 +1624,7 @@ FYI_LOG=$OUTPUT_DIR/fyis
 EMAIL_LIST=$HOME/.firebot/firebot_email_list.sh
 CRLF_WARNINGS=$OUTPUT_DIR/stage1_crlf_warnings
 
-LATESTAPPS_DIR=$HOME/.firebot/appslatest
-APPS_DIR=$HOME/.firebot/apps
-
-MKDIR $HOME/.firebot
-
-MKDIR $APPS_DIR
-rm -rf $LATESTAPPS_DIR
-MKDIR $LATESTAPPS_DIR
+mkdir -p $HOME/.firebot
 
 WEBBRANCH=nist-pages
 FDSBRANCH=master
@@ -2181,17 +2151,6 @@ make_fds_validation_guide
 
 ###*** Stage 6 wrapup ###
 
-copy_apps=
-if [[ ! -s $ERROR_LOG ]]; then
-  copy_apps=1
-fi
-if [ "$copy_apps" == "1" ]; then
-  rm -f $APPS_DIR/*
-  cp $LATESTAPPS_DIR/* $APPS_DIR/.
-
-  rm -f $BRANCHAPPS_DIR/*
-  cp $LATESTAPPS_DIR/* $BRANCHAPPS_DIR/.
-fi
 MANUALS_end=`GET_TIME`
 GET_DURATION $MANUALS_beg $MANUALS_end MANUALS
 SCRIPT_end=`GET_TIME`
