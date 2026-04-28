@@ -1945,8 +1945,6 @@ fi
 
 UploadGuidesGH=$botrepo/Firebot/fds_guides2GH.sh
 SummaryGH=$botrepo/Firebot/summary2GH.sh
-COPY_FDS_APPS=$botrepo/Firebot/copy_fds_apps.sh
-COPY_SMV_APPS=$botrepo/Firebot/copy_smv_apps.sh
 
 echo ""
 echo "Settings"
@@ -2065,7 +2063,6 @@ compile_fds_mpi         $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
 check_compile_fds_mpi   $FDS_DIR $FDS_EXE
 check_compile_fds_mpi   $FDS_OPENMP_DIR $FDS_OPENMP_EXE openmp
 cd $firebotdir
-$COPY_FDS_APPS > $OUTPUT_DIR/stage2_copyapps
 
 ###*** Stage 2 - smv utilities ###
 
@@ -2074,7 +2071,6 @@ compile_smv_utilities
 check_smv_utilities
 
 cd $firebotdir
-$COPY_SMV_APPS >> $OUTPUT_DIR/stage2_copyapps
 
 ###*** Stage 2 - debug smokeview ###
 
