@@ -82,36 +82,15 @@ if [ "`uname`" == "Darwin" ] ; then
   exit
 fi
 
-BOTBRANCH=
-if [ -d $repo/bot ]; then
-  cd $repo/bot
-  BOTBRANCH=`git rev-parse --abbrev-ref HEAD`
-fi
-EXPBRANCH=
-if [ -d $repo/exp ]; then
-  cd $repo/exp
-  EXPBRANCH=`git rev-parse --abbrev-ref HEAD`
-fi
-FIGBRANCH=
-if [ -d $repo/fig ]; then
-  cd $repo/fig
-  FIGBRANCH=`git rev-parse --abbrev-ref HEAD`
-fi
-OUTBRANCH=
-if [ -d $repo/out ]; then
-  cd $repo/out
-  OUTBRANCH=`git rev-parse --abbrev-ref HEAD`
-fi
-FDSBRANCH=
-if [ -d $repo/fds ]; then
-  cd $repo/fds
-  FDSBRANCH=`git rev-parse --abbrev-ref HEAD`
-fi
-SMVBRANCH=
-if [ -d $repo/smv ]; then
-  cd $repo/smv
-  SMVBRANCH=`git rev-parse --abbrev-ref HEAD`
-fi
+cd $CURDIR
+BOTREVBRANCH=`./GetRevBranch.sh bot`
+EXPREVBRANCH=`./GetRevBranch.sh exp`
+FDSREVBRANCH=`./GetRevBranch.sh fds`
+FIGREVBRANCH=`./GetRevBranch.sh fig`
+FDSREVBRANCH=`./GetRevBranch.sh fds`
+OUTREVBRANCH=`./GetRevBranch.sh out`
+SMVREVBRANCH=`./GetRevBranch.sh smv`
+
 cd $CURDIR
 
 #*** define initial values
@@ -278,16 +257,17 @@ if [ "$CLONE_REPOS" != "" ]; then
   echo "       Cloning repos: fds, exp, fig, out and smv using branch $CLONE_REPOS_ARG"
 fi
 if [ "$CLONE_REPOS" == "" ]; then
-  echo "  exp branch: $EXPBRANCH"
-  echo "  fds branch: $FDSBRANCH"
-  echo "  fig branch: $FIGBRANCH"
-  echo "  out branch: $OUTBRANCH"
-  echo "  smv branch: $SMVBRANCH"
+  echo "  exp rev/branch: $EXPREVBRANCH"
+  echo "  fds rev/branch: $FDSREVBRANCH"
+  echo "  fig rev/branch: $FIGREVBRANCH"
+  echo "  out rev/branch: $OUTREVBRANCH"
+  echo "  smv rev/branch: $SMVREVBRANCH"
 fi
 
 if [ "$PROCEED" == "" ]; then
   echo "Do you wish to continue?"
   echo "Press any key to continue or <CTRL c> to cancel"
+  echo "Use the -y option to avoid this message"
   read val
 fi
 echo continuing
