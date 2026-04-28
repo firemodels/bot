@@ -13,15 +13,16 @@ echo ""
 echo "Options:"
 echo "-C - clone repos (same as -R master)"
 echo "-f - force firebot run"
-echo "-h - display options"
-echo "-k - kill firebot if it is running"
+echo "-h - display this message"
+echo "-k - kill currently running firebot"
 if [ "$EMAIL" != "" ]; then
   echo "-m email_address [default: $EMAIL]"
 else
   echo "-m email_address "
 fi
 echo "-q queue - specify queue [default: $QUEUE]"
-echo "-R branch_name - clone repos using branch branch_name "
+echo "-R branch_name - clone repos using branch :branch_name "
+echo "-y - answer yes when asked to proceed"
 
 echo "Upload Options:"
 echo "-o - specify GH_OWNER when uploading manuals. [default: $GH_OWNER]"
@@ -81,6 +82,38 @@ if [ "`uname`" == "Darwin" ] ; then
   exit
 fi
 
+BOTBRANCH=
+if [ -d $repo/bot ]; then
+  cd $repo/bot
+  BOTBRANCH=`git rev-parse --abbrev-ref HEAD`
+fi
+EXPBRANCH=
+if [ -d $repo/exp ]; then
+  cd $repo/exp
+  EXPBRANCH=`git rev-parse --abbrev-ref HEAD`
+fi
+FIGBRANCH=
+if [ -d $repo/fig ]; then
+  cd $repo/fig
+  FIGBRANCH=`git rev-parse --abbrev-ref HEAD`
+fi
+OUTBRANCH=
+if [ -d $repo/out ]; then
+  cd $repo/out
+  OUTBRANCH=`git rev-parse --abbrev-ref HEAD`
+fi
+FDSBRANCH=
+if [ -d $repo/fds ]; then
+  cd $repo/fds
+  FDSBRANCH=`git rev-parse --abbrev-ref HEAD`
+fi
+SMVBRANCH=
+if [ -d $repo/smv ]; then
+  cd $repo/smv
+  SMVBRANCH=`git rev-parse --abbrev-ref HEAD`
+fi
+cd $CURDIR
+
 #*** define initial values
 
 BRANCH=current
@@ -93,6 +126,7 @@ CLONE_REPOS_ARG=
 WEB_DIR=
 WEB_ROOT=
 CLONEFILE=
+PROCEED=
 
 #*** checking to see if a queing system is available
 notfound=`sinfo 2>&1 | tail -1 | grep "not found" | wc -l`
@@ -105,7 +139,7 @@ QUEUE=`sinfo -ho "%P" | grep *$ | sed -e 's/[*]$//'`
 
 #*** parse command line options
 
-while getopts 'Cfhkm:o:q:r:R:Uw:W:' OPTION
+while getopts 'Cfhkm:o:q:r:R:Uw:W:y' OPTION
 do
 case $OPTION  in
   C)
@@ -145,6 +179,9 @@ case $OPTION  in
    ;;
   W)
    WEB_ROOT="$OPTARG"
+   ;;
+  y)
+   PROCEED=1
    ;;
   \?)
   echo "***error: unknown option entered. aborting firebot"
@@ -219,28 +256,41 @@ echo ""
 echo "Firebot Properties"
 echo "------------------"
   echo "       Queue: $QUEUE"
-echo "      Branch: $BRANCH"
+if [ "$BOTBRANCH" != "" ]; then
+  echo "  bot branch: $BOTBRANCH"
+fi
+
 if [ "$FDS_HASH" != "" ]; then
   echo "    fds hash: $FDS_HASH"
 fi
 if [ "$FDS_REVISION" != "" ]; then
   echo "fds revision: $FDS_REVISION"
 fi
-if [ "$CLONE_REPOS_ARG" != "" ]; then
-    echo "  fds branch: $CLONE_REPOS_ARG"
-fi
+
 if [ "$SMV_HASH" != "" ]; then
   echo "    smv hash: $SMV_HASH"
 fi
 if [ "$SMV_REVISION" != "" ]; then
   echo "smv revision: $SMV_REVISION"
 fi
-if [ "$CLONE_REPOS_ARG" != "" ]; then
-    echo "  smv branch: $CLONE_REPOS_ARG"
-fi
+
 if [ "$CLONE_REPOS" != "" ]; then
-  echo "       Clone: fds, exp, fig, out and smv repos."
+  echo "       Cloning repos: fds, exp, fig, out and smv using branch $CLONE_REPOS_ARG"
 fi
+if [ "$CLONE_REPOS" == "" ]; then
+  echo "  exp branch: $EXPBRANCH"
+  echo "  fds branch: $FDSBRANCH"
+  echo "  fig branch: $FIGBRANCH"
+  echo "  out branch: $OUTBRANCH"
+  echo "  smv branch: $SMVBRANCH"
+fi
+
+if [ "$PROCEED" == "" ]; then
+  echo "Do you wish to continue?"
+  echo "Press any key to continue or <CTRL c> to cancel"
+  read val
+fi
+echo continuing
 
 BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
