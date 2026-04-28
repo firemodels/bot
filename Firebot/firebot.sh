@@ -172,10 +172,7 @@ get_smv_revision()
    git update-index --refresh
    SMV_REVISION=`git describe --abbrev=7 --long --dirty`
    echo $SMV_REVISION > $repo/fds/Manuals/SMV_REVISION
-   subrev=`git describe --abbrev | awk -F '-' '{print $2}'`
-   SMV_SHORTHASH=`git rev-parse --short HEAD`
    SMV_LONGHASH=`git rev-parse HEAD`
-   SMV_MESSAGE=`git log . | head -5 | tail -1`
    return 0
 }
 
@@ -192,81 +189,9 @@ get_fds_revision()
    git update-index --refresh
    FDS_REVISION=`git describe --abbrev=7 --long --dirty`
    echo $FDS_REVISION > $repo/fds/Manuals/FDS_REVISION
-   subrev=`git describe --abbrev | awk -F '-' '{print $2}'`
    FDS_SHORTHASH=`git rev-parse --short HEAD`
    FDS_LONGHASH=`git rev-parse HEAD`
    FDS_DATE=`git log -1 --format=%cd --date=local $FDS_SHORTHASH`
-   FDS_MESSAGE=`git log . | head -5 | tail -1`
-   return 0
-}
-
-#---------------------------------------------
-#                   get_exp_revision
-#---------------------------------------------
-
-get_exp_revision()
-{
-   local branch=$1
-
-   CD_REPO $repo/exp $branch || return 1
-
-   git update-index --refresh
-   EXP_REVISION=`git describe --abbrev=7 --long --dirty`
-   return 0
-}
-
-#---------------------------------------------
-#                   get_out_revision
-#---------------------------------------------
-
-get_out_revision()
-{
-   local branch=$1
-
-   CD_REPO $repo/out $branch || return 1
-
-   git update-index --refresh
-   OUT_REVISION=`git describe --abbrev=7 --long --dirty`
-   return 0
-}
-
-#---------------------------------------------
-#                   get_fig_revision
-#---------------------------------------------
-
-get_fig_revision()
-{
-   local branch=$1
-   CD_REPO $repo/fig $branch || return 1
-
-   git update-index --refresh
-   FIG_REVISION=`git describe --abbrev=7 --long --dirty`
-   return 0
-}
-
-#---------------------------------------------
-#                   get_bot_revision
-#---------------------------------------------
-
-get_bot_revision()
-{
-   local branch=$1
-   CD_REPO $repo/bot $branch || return 1
-
-   BOT_REVISION=`git describe --abbrev=7 --long --dirty`
-   return 0
-}
-
-#---------------------------------------------
-#                   get_cad_revision
-#---------------------------------------------
-
-get_cad_revision()
-{
-   local branch=$1
-   CD_REPO $repo/cad $branch || return 1
-
-   CAD_REVISION=`git describe --abbrev=7 --long --dirty`
    return 0
 }
 
@@ -2018,11 +1943,21 @@ fi
 
 get_fds_revision $FDSBRANCH || exit 1
 get_smv_revision $SMVBRANCH || exit 1
-get_bot_revision $BOTBRANCH || exit 1
-get_exp_revision $EXPBRANCH || exit 1
-get_fig_revision $FIGBRANCH || exit 1
-get_out_revision $OUTBRANCH || exit 1
-get_cad_revision $CADBRANCH || exit 1
+
+CD_REPO $repo/bot $BOTBRANCH || exit 1
+BOT_REVISION=`git describe --abbrev=7 --long --dirty`
+
+CD_REPO $repo/exp $EXPBRANCH || exit 1
+EXP_REVISION=`git describe --abbrev=7 --long --dirty`
+
+CD_REPO $repo/fig $FIGBRANCH || exit 1
+FIG_REVISION=`git describe --abbrev=7 --long --dirty`
+
+CD_REPO $repo/out $OUTBRANCH || exit 1
+OUR_REVISION=`git describe --abbrev=7 --long --dirty`
+
+CD_REPO $repo/cad $CADBRANCH || exit 1
+CAD_REVISION=`git describe --abbrev=7 --long --dirty`
 
 echo | mail >& /tmp/mailtest.$$
 notfound=`grep 'command not found' /tmp/mailtest.$$ | wc -l`
