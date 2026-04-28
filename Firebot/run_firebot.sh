@@ -34,6 +34,29 @@ exit 0
 }
 
 #---------------------------------------------
+#                   GETREVBRANCH
+#---------------------------------------------
+
+GETREVBRANCH ()
+{
+repodir=$1
+  if [ ! -d $repodir ]; then
+    echo unknown
+    exit
+  fi
+  cd $repodir
+  if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    dummy=1
+  else
+    echo "invalid repo"
+    exit
+  fi
+  rev=`git describe --dirty --long`
+  branch=`git branch --show-current`
+  echo $rev/$branch
+}
+
+#---------------------------------------------
 #                   LIST_DESCENDANTS
 #---------------------------------------------
 
@@ -83,13 +106,13 @@ if [ "`uname`" == "Darwin" ] ; then
 fi
 
 cd $CURDIR
-BOTREVBRANCH=`./GetRevBranch.sh bot`
-EXPREVBRANCH=`./GetRevBranch.sh exp`
-FDSREVBRANCH=`./GetRevBranch.sh fds`
-FIGREVBRANCH=`./GetRevBranch.sh fig`
-FDSREVBRANCH=`./GetRevBranch.sh fds`
-OUTREVBRANCH=`./GetRevBranch.sh out`
-SMVREVBRANCH=`./GetRevBranch.sh smv`
+BOTREVBRANCH=`GETREVBRANCH $repo/bot`
+EXPREVBRANCH=`GETREVBRANCH $repo/exp`
+FDSREVBRANCH=`GETREVBRANCH $repo/fds`
+FIGREVBRANCH=`GETREVBRANCH $repo/fig`
+FDSREVBRANCH=`GETREVBRANCH $repo/fds`
+OUTREVBRANCH=`GETREVBRANCH $repo/out`
+SMVREVBRANCH=`GETREVBRANCH $repo/smv`
 
 cd $CURDIR
 
@@ -230,11 +253,11 @@ if [[ "$EMAIL" != "" ]]; then
 fi
 
 cd $CURDIR
-
 echo ""
-echo "Firebot Properties"
-echo "------------------"
-  echo "       Queue: $QUEUE"
+if [ "$PROCEED" == "" ]; then
+  echo "firebot about to run using:"
+fi
+echo "           Queue: $QUEUE"
 if [ "$BOTBRANCH" != "" ]; then
   echo "  bot branch: $BOTBRANCH"
 fi
@@ -254,9 +277,10 @@ if [ "$SMV_REVISION" != "" ]; then
 fi
 
 if [ "$CLONE_REPOS" != "" ]; then
-  echo "       Cloning repos: fds, exp, fig, out and smv using branch $CLONE_REPOS_ARG"
+  echo "       Cloning repos: fds, exp, fig, out and smv checking out branch $CLONE_REPOS_ARG"
 fi
 if [ "$CLONE_REPOS" == "" ]; then
+  echo "  bot rev/branch: $BOTREVBRANCH"
   echo "  exp rev/branch: $EXPREVBRANCH"
   echo "  fds rev/branch: $FDSREVBRANCH"
   echo "  fig rev/branch: $FIGREVBRANCH"
@@ -266,11 +290,10 @@ fi
 
 if [ "$PROCEED" == "" ]; then
   echo "Do you wish to continue?"
-  echo "Press any key to continue or <CTRL c> to cancel"
-  echo "Use the -y option to avoid this message"
+  echo "Press any key to continue or <CTRL> c to cancel"
+  echo "Use the -y option to avoid this message in the future"
   read val
 fi
-echo continuing
 
 BRANCH="-b $BRANCH"
 QUEUE="-q $QUEUE"
