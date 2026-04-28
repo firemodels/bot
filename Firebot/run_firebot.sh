@@ -10,16 +10,16 @@
 function usage {
 echo "Verification and validation testing script for FDS"
 echo ""
-echo "Options:"
+echo "Example usage:"
+echo "./run_firebot.sh - runs firebot using your existing repos and branches"
+echo "./run_firebot.sh -C - runs firebot after cloning repos.  This option should"
+echo "                      NEVER be run in repos where you do your normal work"
+echo "More options:"
 echo "-C - clone repos (same as -R master)"
 echo "-f - force firebot run"
 echo "-h - display this message"
-echo "-k - kill currently running firebot"
-if [ "$EMAIL" != "" ]; then
-  echo "-m email_address [default: $EMAIL]"
-else
-  echo "-m email_address "
-fi
+echo "-k - kill currently running firebot and all processes and jobs it started"
+echo "-m email_address - email firebot results to email_address"
 echo "-q queue - specify queue [default: $QUEUE]"
 echo "-R branch_name - clone repos using branch :branch_name "
 echo "-y - answer yes when asked to proceed (used when running from crontab)"
