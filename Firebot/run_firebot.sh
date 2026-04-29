@@ -26,6 +26,8 @@ echo "-q queue - specify queue [default: $QUEUE]"
 echo "-R branch_name - clone repos using branch branch_name "
 echo "-y - answer yes when asked to proceed (used when running from crontab)"
 
+#*** these options are only used by the firebot account to upload manuals and repo info to github
+#    commented for reference
 #echo "Upload Options:"
 #echo "-o owner - specify the github relase owner when uploading manuals. [default: $GH_OWNER]"
 #echo "-r repo - specify the github repo name when uploading manuals. [default: $GH_REPO]"

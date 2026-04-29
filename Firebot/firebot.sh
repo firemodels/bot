@@ -12,62 +12,6 @@
 # stage 6 - wrapup, report results
 
 #---------------------------------------------
-#                   CHK_REPO
-#---------------------------------------------
-
-CHK_REPO ()
-{
-  local repodir=$1
-
-  if [ ! -e $repodir ]; then
-     echo "***error: the repo directory $repodir does not exist."
-     echo "          Aborting firebot."
-     return 1
-  fi
-  return 0
-}
-
-#---------------------------------------------
-#                   CD_REPO
-#---------------------------------------------
-
-CD_REPO ()
-{
-  local repodir=$1
-  local branch=$2
-
-  CHK_REPO $repodir || return 1
-
-  cd $repodir
-  if [ "$branch" != "current" ]; then
-  if [ "$branch" != "" ]; then
-     CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
-     if [ "$CURRENT_BRANCH" != "$branch" ]; then
-       echo "***error: was expecting branch $branch in repo $repodir."
-       echo "Found branch $CURRENT_BRANCH. Aborting firebot."
-       return 1
-     fi
-  fi
-  fi
-  return 0
-}
-
-#---------------------------------------------
-#                   MKDIR
-#---------------------------------------------
-
-MKDIR ()
-{
-  local DIR=$1
-
-  if [ ! -d $DIR ]
-  then
-    echo Creating directory $DIR
-    mkdir -p $DIR
-  fi
-}
-
-#---------------------------------------------
 #                   check_time_limit
 #---------------------------------------------
 
@@ -124,75 +68,6 @@ find_CRLF()
     rm $crlf_temp
   fi
   cd $curdir
-}
-
-#---------------------------------------------
-#                   check_CRLF
-#---------------------------------------------
-
-check_CRLF()
-{
-
-  if [ -e $CRLF_WARNINGS ]; then
-    nwarnings=`cat $CRLF_WARNINGS | wc -l`
-    if [ $nwarnings -gt 0 ]; then
-      echo ""
-      echo "Warnings from Stage 1 - dos line ending check" >> $ERROR_LOG
-      cat $CRLF_WARNINGS                                   >> $ERROR_LOG
-      echo ""                                              >> $ERROR_LOG
-      echo ""
-    fi
-  fi
-}
-
-#---------------------------------------------
-#                   clean_firebote_metafiles
-#---------------------------------------------
-
-clean_firebot_metafiles()
-{
-   echo "   run directory"
-   cd $firebotdir
-   MKDIR guides &> /dev/null
-   MKDIR $HISTORY_DIR &> /dev/null
-   MKDIR $OUTPUT_DIR &> /dev/null
-   rm -rf $OUTPUT_DIR/* &> /dev/null
-}
-
-#---------------------------------------------
-#                   get_smv_revision
-#---------------------------------------------
-
-get_smv_revision()
-{
-   local branch=$1
-
-   CD_REPO $repo/smv $branch || return 1
-
-   git update-index --refresh
-   SMV_REVISION=`git describe --abbrev=7 --long --dirty`
-   echo $SMV_REVISION > $repo/fds/Manuals/SMV_REVISION
-   SMV_LONGHASH=`git rev-parse HEAD`
-   return 0
-}
-
-#---------------------------------------------
-#                   get_fds_revision
-#---------------------------------------------
-
-get_fds_revision()
-{
-   local branch=$1
-
-   CD_REPO $repo/fds $branch || return 1
-
-   git update-index --refresh
-   FDS_REVISION=`git describe --abbrev=7 --long --dirty`
-   echo $FDS_REVISION > $repo/fds/Manuals/FDS_REVISION
-   FDS_SHORTHASH=`git rev-parse --short HEAD`
-   FDS_LONGHASH=`git rev-parse HEAD`
-   FDS_DATE=`git log -1 --format=%cd --date=local $FDS_SHORTHASH`
-   return 0
 }
 
 #---------------------------------------------
@@ -462,21 +337,6 @@ check_compile_fds_mpi()
   fi
 }
 
-
-#---------------------------------------------
-#                   CP
-#---------------------------------------------
-
-CP()
-{
-  fromfile=$1
-  tofile=$2
-
-  if [ -e $fromfile ]; then
-    cp $fromfile $tofile
-  fi
-}
-
 #---------------------------------------------
 #                   CHECKOUT_REPO
 #---------------------------------------------
@@ -578,16 +438,6 @@ compile_smv_utilities()
 }
 
 #---------------------------------------------
-#                   check_smv_utilities
-#---------------------------------------------
-
-check_smv_utilities()
-{
-# nothing to check
-  smv_utilities_success=true
-}
-
-#---------------------------------------------
 #       check_verification_cases_release
 #---------------------------------------------
 
@@ -621,42 +471,6 @@ check_verification_cases_release()
       echo "Errors from Stage 3 - Run ${2} cases - release mode:" >> $ERROR_LOG
       cat $OUTPUT_DIR/stage3_run_release_ver_errors               >> $ERROR_LOG
       echo ""                                                     >> $ERROR_LOG
-   fi
-}
-
-#---------------------------------------------
-#       check_validation_cases_release
-#---------------------------------------------
-
-check_validation_cases_release()
-{
-   local dir=$1
-   local subdir=$2
-
-   # Scan for and report any errors in FDS cases
-   cd $dir
-
-   if [[ `grep 'Run aborted'            $OUTPUT_DIR/stage3_run_release_val | grep -v grep`                    == "" ]] && \
-      [[ `grep 'ERROR'                  $OUTPUT_DIR/stage3_run_release_val | grep -v geom_bad | grep -v grep` == "" ]] && \
-      [[ `grep Segmentation             */$subdir/*.err                    | grep -v grep`                    == "" ]] && \
-      [[ `grep ERROR:                   */$subdir/*.err                    | grep -v grep | grep -v geom_bad` == "" ]] && \
-      [[ `grep ERROR:                   */$subdir/*.out                    | grep -v grep     | grep -v echo` == "" ]] && \
-      [[ `grep 'BAD TERMINATION'        */$subdir/*.log                    | grep -v grep`                    == "" ]] && \
-      [[ `grep forrtl                   */$subdir/*.err                    | grep -v grep`                    == "" ]]
-   then
-      cases_debug_success=true
-   else
-      grep 'Run aborted'                $OUTPUT_DIR/stage3_run_release_val | grep -v grep                    >> $OUTPUT_DIR/stage3_run_release_val_errors
-      grep 'ERROR'                      $OUTPUT_DIR/stage3_run_release_val | grep -v geom_bad | grep -v grep >> $OUTPUT_DIR/stage3_run_release_val_errors
-      grep Segmentation                 */$subdir//*.err                   | grep -v grep                    >> $OUTPUT_DIR/stage3_run_release_val_errors
-      grep ERROR:                       */$subdir//*.err                   | grep -v grep | grep -v geom_bad >> $OUTPUT_DIR/stage3_run_release_val_errors
-      grep ERROR:                       */$subdir/*.out                    | grep -v grep     | grep -v echo >> $OUTPUT_DIR/stage3_run_release_val_errors
-      grep -A 2 'BAD TERMINATION'       */$subdir/*.log                    | grep -v grep                    >> $OUTPUT_DIR/stage3_run_release_val_errors
-      grep -A 20 forrtl                 */$subdir/*.err                    | grep -v grep                    >> $OUTPUT_DIR/stage3_run_release_val_errors
-
-      echo "Errors from Stage 3 - Run ${2} cases - release mode:"  >> $ERROR_LOG
-      cat $OUTPUT_DIR/stage3_run_release_val_errors                >> $ERROR_LOG
-      echo ""                                                      >> $ERROR_LOG
    fi
 }
 
@@ -831,18 +645,6 @@ check_compile_smv()
     echo "" >> $ERROR_LOG
   fi
   smv_release_success=true
-}
-
-
-#---------------------------------------------
-#                   check_fds_pictures
-#---------------------------------------------
-
-check_fds_pictures()
-{
-   # Scan for and report any errors in make FDS pictures process
-   # not used
-   picture_success=true
 }
 
 #---------------------------------------------
@@ -1671,7 +1473,9 @@ FDS_EXE=fds_${MPI_TYPE}_${COMPILER}_${platform}${size}
 echo "Status"
 echo "------"
   echo Cleaning bot repo
-  clean_firebot_metafiles
+  cd $firebotdir
+  mkdir -p $HISTORY_DIR &> /dev/null
+  rm -rf   $OUTPUT_DIR/*  &> /dev/null
 
 #*** write out file when firebot first starts
 date > $OUTPUT_DIR/stage0_start 2>&1
@@ -1707,89 +1511,100 @@ CLONE_end=`GET_TIME`
 GET_DURATION $CLONE_beg $CLONE_end CLONE
 
 SETUP_beg=`GET_TIME`
-#*** make sure repos exist and have expected branches
 
-CD_REPO $fdsrepo $FDSBRANCH || exit 1
-if [ "$FDSBRANCH" == "current" ]; then
-  cd $fdsrepo
-  FDSBRANCH=`git rev-parse --abbrev-ref HEAD`
-fi
-cd $fdsrepo
-FDSREPO_HASH=`git rev-parse HEAD`
+#*** make sure repos exist
 
-CD_REPO $smvrepo $SMVBRANCH || exit 1
-if [ "$SMVBRANCH" == "current" ]; then
-  cd $smvrepo
-  SMVBRANCH=`git rev-parse --abbrev-ref HEAD`
+ABORT=
+if [ ! -d $cadrepo ]; then
+  echo "***error: cad repo does not exist"
+  ABORT=1
 fi
-cd $smvrepo
-SMVREPO_HASH=`git rev-parse HEAD`
+if [ ! -d $exprepo ]; then
+  echo "***error: exp repo does not exist"
+  ABORT=1
+fi
+if [ ! -d $fdsrepo ]; then
+  echo "***error: fds repo does not exist"
+  ABORT=1
+fi
+if [ ! -d $figrepo ]; then
+  echo "***error: fig repo does not exist"
+  ABORT=1
+fi
+if [ ! -d $outrepo ]; then
+  echo "***error: out repo does not exist"
+  ABORT=1
+fi
+if [ ! -d $smvrepo ]; then
+  echo "***error: smv repo does not exist"
+  ABORT=1
+fi
+if [ "$ABORT" != "" ]; then
+  exit
+fi
 
-CD_REPO $outrepo $OUTBRANCH || exit 1
-if [ "$OUTBRANCH" == "current" ]; then
-  cd $outrepo
-  OUTBRANCH=`git rev-parse --abbrev-ref HEAD`
-fi
-cd $outrepo
-OUTREPO_HASH=`git rev-parse HEAD`
-
-CD_REPO $cadrepo $CADBRANCH || exit 1
-if [ "$CADBRANCH" == "current" ]; then
-  cd $cadrepo
-  CADBRANCH=`git rev-parse --abbrev-ref HEAD`
-fi
-cd $cadrepo
-CADREPO_HASH=`git rev-parse HEAD`
-
-CD_REPO $figrepo $FIGBRANCH || exit 1
-if [ "$FIGBRANCH" == "current" ]; then
-  cd $figrepo
-  FIGBRANCH=`git rev-parse --abbrev-ref HEAD`
-fi
-cd $figrepo
-FIGREPO_HASH=`git rev-parse HEAD`
-
-CD_REPO $exprepo $EXPBRANCH || exit 1
-if [ "$EXPBRANCH" == "current" ]; then
-  cd $exprepo
-  EXPBRANCH=`git rev-parse --abbrev-ref HEAD`
-fi
-cd $exprepo
-EXPREPO_HASH=`git rev-parse HEAD`
-
-CD_REPO $botrepo $BOTBRANCH || exit 1
-if [ "$BOTBRANCH" == "current" ]; then
-  cd $botrepo
-  BOTBRANCH=`git rev-parse --abbrev-ref HEAD`
-fi
+#*** get branch and hashes for repos
 cd $botrepo
+BOTBRANCH=`git rev-parse --abbrev-ref HEAD`
 BOTREPO_HASH=`git rev-parse HEAD`
+BOT_REVISION=`git describe --abbrev=7 --long --dirty`
 
-#save apps and pubs in directories under .firebot/$FDSBRANCH
+cd $cadrepo
+CADBRANCH=`git rev-parse --abbrev-ref HEAD`
+CADREPO_HASH=`git rev-parse HEAD`
+CAD_REVISION=`git describe --abbrev=7 --long --dirty`
 
-cd $firebotdir
+cd $exprepo
+EXPBRANCH=`git rev-parse --abbrev-ref HEAD`
+EXPREPO_HASH=`git rev-parse HEAD`
+EXP_REVISION=`git describe --abbrev=7 --long --dirty`
+
+cd $fdsrepo
+git update-index --refresh
+FDSBRANCH=`git rev-parse --abbrev-ref HEAD`
+FDSREPO_HASH=`git rev-parse HEAD`
+FDS_REVISION=`git describe --abbrev=7 --long --dirty`
+echo $FDS_REVISION > $repo/fds/Manuals/FDS_REVISION
+FDS_SHORTHASH=`git rev-parse --short HEAD`
+FDS_LONGHASH=`git rev-parse HEAD`
+FDS_DATE=`git log -1 --format=%cd --date=local $FDS_SHORTHASH`
+
+cd $figrepo
+FIGBRANCH=`git rev-parse --abbrev-ref HEAD`
+FIGREPO_HASH=`git rev-parse HEAD`
+FIG_REVISION=`git describe --abbrev=7 --long --dirty`
+
+cd $outrepo
+OUTBRANCH=`git rev-parse --abbrev-ref HEAD`
+OUTREPO_HASH=`git rev-parse HEAD`
+OUT_REVISION=`git describe --abbrev=7 --long --dirty`
+
+cd $smvrepo
+git update-index --refresh
+SMVBRANCH=`git rev-parse --abbrev-ref HEAD`
+SMVREPO_HASH=`git rev-parse HEAD`
+SMV_REVISION=`git describe --abbrev=7 --long --dirty`
+echo $SMV_REVISION > $repo/fds/Manuals/SMV_REVISION
+SMV_LONGHASH=`git rev-parse HEAD`
+
 
 #*** save pid in case we want to kill firebot later
 
+cd $firebotdir
 echo $$ > $PID_FILE
 
 #*** check for C/C++ compiler
 
 IFORT_VERSION=
 C_VERSION=
-notfound=
-if [ "$COMPILER" == "intel" ]; then
-   notfound=`ifx -help 2>&1 | tail -1 | grep "not found" | wc -l`
-   if [ $notfound -eq 0 ]; then
-     IFORT_VERSION=`ifx -v 2>&1`
-   fi
-   notfound=`icx -help 2>&1 | tail -1 | grep "not found" | wc -l`
-   if [ $notfound -eq 0 ]; then
-     C_VERSION=`icx -v |& head -1 | awk '{print $5}'`
-     C_VERSION="icx version $C_VERSION"
-   fi
-else
-   notfound=`gcc -help 2>&1 | tail -1 | grep "not found" | wc -l`
+notfound=`ifx -help 2>&1 | tail -1 | grep "not found" | wc -l`
+if [ $notfound -eq 0 ]; then
+  IFORT_VERSION=`ifx -v 2>&1`
+fi
+notfound=`icx -help 2>&1 | tail -1 | grep "not found" | wc -l`
+if [ $notfound -eq 0 ]; then
+  C_VERSION=`icx -v |& head -1 | awk '{print $5}'`
+  C_VERSION="icx version $C_VERSION"
 fi
 
 UploadGuidesGH=$botrepo/Firebot/fds_guides2GH.sh
@@ -1859,26 +1674,17 @@ if [[ "$CLONE_REPOS" != "" ]]; then
   echo "   smv repo"
   find_CRLF $repo/smv smv
 
-  check_CRLF
+  if [ -e $CRLF_WARNINGS ]; then
+    nwarnings=`cat $CRLF_WARNINGS | wc -l`
+    if [ $nwarnings -gt 0 ]; then
+      echo ""
+      echo "Warnings from Stage 1 - dos line ending check" >> $ERROR_LOG
+      cat $CRLF_WARNINGS                                   >> $ERROR_LOG
+      echo ""                                              >> $ERROR_LOG
+      echo ""
+    fi
+  fi
 fi
-
-get_fds_revision $FDSBRANCH || exit 1
-get_smv_revision $SMVBRANCH || exit 1
-
-CD_REPO $repo/bot $BOTBRANCH || exit 1
-BOT_REVISION=`git describe --abbrev=7 --long --dirty`
-
-CD_REPO $repo/exp $EXPBRANCH || exit 1
-EXP_REVISION=`git describe --abbrev=7 --long --dirty`
-
-CD_REPO $repo/fig $FIGBRANCH || exit 1
-FIG_REVISION=`git describe --abbrev=7 --long --dirty`
-
-CD_REPO $repo/out $OUTBRANCH || exit 1
-OUR_REVISION=`git describe --abbrev=7 --long --dirty`
-
-CD_REPO $repo/cad $CADBRANCH || exit 1
-CAD_REVISION=`git describe --abbrev=7 --long --dirty`
 
 echo | mail >& /tmp/mailtest.$$
 notfound=`grep 'command not found' /tmp/mailtest.$$ | wc -l`
@@ -1917,7 +1723,6 @@ cd $firebotdir
 
 compile_smv_libraries
 compile_smv_utilities
-check_smv_utilities
 
 cd $firebotdir
 
