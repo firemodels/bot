@@ -223,7 +223,7 @@ check_git_checkout()
 
 archive_compiler_version()
 {
-   ifort -V &> "$HISTORY_DIR/${FDS_REVISION}_compiler_info.txt"
+   ifx -V &> "$HISTORY_DIR/${FDS_REVISION}_compiler_info.txt"
 }
 
 #---------------------------------------------
@@ -1011,39 +1011,6 @@ GET_DURATION(){
 }
 
 #---------------------------------------------
-#                   get_repo_size
-#---------------------------------------------
-
-get_repo_size()
-{
-  rrepo=$1
-  du -ks $rrepo/.git |  awk '{print $1 }'
-}
-
-#---------------------------------------------
-#                   archive_repo_sizes
-#---------------------------------------------
-
-archive_repo_sizes()
-{
-   cd $repo
-   echo archiving repo_sizes
-
-   exp_size=`get_repo_size exp `
-   fds_size=`get_repo_size fds `
-   fig_size=`get_repo_size fig `
-   out_size=`get_repo_size out `
-   smv_size=`get_repo_size smv `
-   cad_size=`get_repo_size cad `
-   echo $CAD_REVISION,$cad_size  >  "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.csv"
-   echo $EXP_REVISION,$exp_size  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.csv"
-   echo $FDS_REVISION,$fds_size  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.csv"
-   echo $FIG_REVISION,$fig_size  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.csv"
-   echo $OUT_REVISION,$out_size  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.csv"
-   echo $SMV_REVISION,$smv_size  >> "$HISTORY_DIR/${FDS_REVISION}_repo_sizes.csv"
-}
-
-#---------------------------------------------
 #                   archive_validation_stats
 #---------------------------------------------
 
@@ -1489,19 +1456,13 @@ HISTORY_DIR="$HOME/.firebot/history"
 TIMING_ERRORS=$OUTPUT_DIR/timing_errors
 
 FIREBOT_PASS=$HISTORY_DIR/firebot_pass
-if [ -e $FIREBOT_PASS ]; then
-  rm -f $FIREBOT_PASS
-fi
+rm -f $FIREBOT_PASS
 
 SMVREPO_HASHFILE=$HISTORY_DIR/smv_hash
-if [ -e $SMVREPO_HASHFILE ]; then
-  rm -f $SMVREPO_HASHFILE
-fi
+rm -f $SMVREPO_HASHFILE
 
 FDSREPO_HASHFILE=$HISTORY_DIR/fds_hash
-if [ -e $FDSREPO_HASHFILE ]; then
-  rm -f $FDSREPO_HASHFILE
-fi
+rm -f $FDSREPO_HASHFILE
 
 TIME_LOG=$OUTPUT_DIR/timings
 ERROR_LOG=$OUTPUT_DIR/errors
@@ -1552,7 +1513,6 @@ JOBPREFIX_DEBUG=FBD_
 
 DB=_db
 
-ARCHIVE_REPO_SIZES=
 REPOEMAIL=
 UPLOADGUIDES=0
 FDS_REVISION=
@@ -1742,7 +1702,6 @@ if [[ "$CLONE_REPOS" != "" ]]; then
     SMVBRANCH=$CLONE_REPOS
     CHECKOUT_REPO $SMVBRANCH $smvrepo $SMV_REV $SMV_TAG  $BUNDLE_SMV_BRANCH
   fi
-  ARCHIVE_REPO_SIZES=1
 fi
 CLONE_end=`GET_TIME`
 GET_DURATION $CLONE_beg $CLONE_end CLONE
@@ -1875,9 +1834,6 @@ touch $FYI_LOG
 
 echo "Status"
 echo "------"
-if [[ "$CLONE_REPOS" == "" ]]; then
-  ARCHIVE_REPO_SIZES=1
-fi
 
 # run debug and release cases in two different directories
 cd $fdsrepo
@@ -1931,13 +1887,6 @@ if [ $notfound -gt 0 ]; then
   HAVE_MAIL=
 fi
 rm /tmp/mailtest.$$
-
-# archive repo sizes
-# (only if the repos are cloned or cleaned)
-
-if [ "$ARCHIVE_REPO_SIZES" == "1" ]; then
-  archive_repo_sizes
-fi
 
 check_git_checkout
 archive_compiler_version
