@@ -28,8 +28,8 @@ echo "Upload Options:"
 echo "-o owner - specify the github relase owner when uploading manuals. [default: $GH_OWNER]"
 echo "-r repo - specify the github repo name when uploading manuals. [default: $GH_REPO]"
 echo "-U - upload guides (only by user firebot)"
-echo "-w webdir - copy firebot web summary the directory webdir under the web root (default: $WEB_ROOT/webdir)"
-echo "-W webroot - root web directory [default: $WEB_ROOT]"
+echo "-w webdir - copy image comparisons to webroot/webdir"
+echo "-W webroot - root directory where web pages are stored"
 exit 0
 }
 
@@ -126,9 +126,10 @@ export PREFIX=FB_
 CLONE_REPOS=
 CLONE_REPOS_ARG=
 WEB_DIR=
-WEB_ROOT=/opt/www/html
+WEB_ROOT=
 CLONEFILE=
 PROCEED=
+FDSSUMMARY=
 
 #*** checking to see if a queing system is available
 notfound=`sinfo 2>&1 | tail -1 | grep "not found" | wc -l`
@@ -178,6 +179,9 @@ case $OPTION  in
    ;;
   w)
    WEB_DIR="$OPTARG"
+   if [ "$FDSSUMMARY" == "" ]; then
+     FDSSUMMARY=$HOME/.firebot/FDS_Summary
+   fi
    ;;
   W)
    WEB_ROOT="$OPTARG"
@@ -210,6 +214,10 @@ fi
 
 if [ "$CLONE_REPOS" != "" ]; then
   CLONE_REPOS="-R $CLONE_REPOS"
+fi
+
+if [ "$FDSSUMMARY" != "" ]; then
+  FDSSUMMARY="-s $FDSSUMMARY"
 fi
 
 #*** kill firebot
@@ -300,7 +308,7 @@ QUEUE="-q $QUEUE"
 
 touch $firebot_pid
 firebot_status=0
-./firebot.sh -p $firebot_pid $BRANCH $UPLOADGUIDES $QUEUE $CLONE_REPOS $CLONEFILE $EMAIL $WEB_ROOT $WEB_DIR "$@"
+./firebot.sh -p $firebot_pid $BRANCH $UPLOADGUIDES $QUEUE $CLONE_REPOS $FDSSUMMARY $CLONEFILE $EMAIL $WEB_ROOT $WEB_DIR "$@"
 firebot_status=$?
 rm -f $firebot_pid
 exit $firebot_status

@@ -1283,57 +1283,19 @@ save_build_status()
 make_fds_summary()
 {
   if [ -d $FDS_SUMMARY_DIR ]; then
-    npngs=`ls -l $fdsrepo/Manuals/FDS_User_Guide/SCRIPT_FIGURES/*.png  2>/dev/null | wc -l`
-    if [ $npngs -eq 0 ]; then
-      echo "***error: png files not found in $fdsrepo/Manuals/FDS_User_Guide/SCRIPT_FIGURES" >> $ERROR_LOG
-    else
-      cp $fdsrepo/Manuals/FDS_User_Guide/SCRIPT_FIGURES/*.png         $FDS_SUMMARY_DIR/images/user/.
-    fi
-
-    npngs=`ls -l $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/*.png  2>/dev/null | wc -l`
-    if [ $npngs -eq 0 ]; then
-      echo "***error: png files not found in $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES" >> $ERROR_LOG
-    else
-      cp $fdsrepo/Manuals/FDS_Verification_Guide/SCRIPT_FIGURES/*.png $FDS_SUMMARY_DIR/images/verification/.
-    fi
-    DATE=`date +"%b %d, %Y - %r"`
-
 # compare images
-
     CURDIR=`pwd`
     cd $botrepo/Firebot
     ./compare_images.sh >& $OUTPUT_DIR/stage5_image_compare
 
-# look for fyis
-    if [[ `grep '***fyi:' $OUTPUT_DIR/stage5_image_compare` == "" ]]
-    then
-      # Continue along
-      :
-    else
-      echo "FYIs from Stage 5 - Image comparisons:"     >> $FYI_LOG
-      grep '***fyi:' $OUTPUT_DIR/stage5_image_compare   >> $FYI_LOG
-    fi
-
-# look for warnings
-    if [[ `grep '***warning:' $OUTPUT_DIR/stage5_image_compare` == "" ]]
-    then
-      # Continue along
-      :
-    else
-      echo "Warnings from Stage 5 - Image comparisons:"     >> $ERROR_LOG
-      grep '***warning:' $OUTPUT_DIR/stage5_image_compare   >> $ERROR_LOG
-    fi
-    
-    if [ "$WEB_DIR" != "" ]; then
-      if [ -d $WEB_DIR ]; then
-        CUR_DIR=`pwd`
-        cd $WEB_DIR
-        rm -r images manuals diffs *.html
-        cp -r $FDS_SUMMARY_DIR/* .
-        rm -f *template.html
-        cd $CUR_DIR
-        UPDATED_WEB_IMAGES=1
-      fi
+    if [[ "$WEB_DIR" != "" ]] && [[ -d $WEB_DIR ]]; then
+      CUR_DIR=`pwd`
+      cd $WEB_DIR
+      rm -rf images manuals diffs *.html
+      cp -r $FDS_SUMMARY_DIR/* .
+      rm -f *template.html
+      cd $CUR_DIR
+      UPDATED_WEB_IMAGES=1
     fi
   fi
 }
@@ -1604,6 +1566,8 @@ WEB_DIR=
 WEB_BASE_DIR=
 WEB_ROOT=
 UPDATED_WEB_IMAGES=
+FDS_SUMMARY_DIR=
+IMAGE_DIFFS=
 
 FDS_TAG=
 SMV_TAG=
@@ -1617,7 +1581,7 @@ MPI_TYPE=impi
 INTEL2="-J"
 
 #*** parse command line arguments
-while getopts 'b:m:p:q:R:Uw:W:' OPTION
+while getopts 'b:m:p:q:R:s:Uw:W:' OPTION
 do
 case $OPTION in
   b)
@@ -1643,6 +1607,10 @@ case $OPTION in
   R)
    CLONE_REPOS="$OPTARG"
    BUILD_3RD_PARTY=1
+   ;;
+  s)
+   FDS_SUMMARY_DIR="$OPTARG"
+   IMAGE_DIFFS=$FDS_SUMMARY_DIR/image_differences
    ;;
   U)
    UPLOADGUIDES=1
@@ -1738,9 +1706,6 @@ FDS_OPENMP_EXE=fds_${MPI_TYPE}_${COMPILER}_${platform}_openmp${size}
 
 FDS_DIR=$fdsrepo/Build/${MPI_TYPE}_${COMPILER}_${platform}${size}
 FDS_EXE=fds_${MPI_TYPE}_${COMPILER}_${platform}${size}
-
-FDS_SUMMARY_DIR=$fdsrepo/Manuals/FDS_Summary
-IMAGE_DIFFS=$FDS_SUMMARY_DIR/image_differences
 
 #*** clean repos
 echo "Status"
@@ -2065,8 +2030,10 @@ if [ $python_success == true ]; then
  
   check_python_verification
   check_python_validation
-  make_fds_summary
-  MAKE_SUMMARY=1
+  if [ "$FDS_SUMMARY_DIR" != "" ]; then
+    make_fds_summary
+    MAKE_SUMMARY=1
+  fi
 fi
 VV_end=`GET_TIME`
 GET_DURATION $VV_beg $VV_end VV
