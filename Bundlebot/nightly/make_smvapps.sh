@@ -82,10 +82,6 @@ BUILDSMVLIBS
 BUILD smokeview $SMVDEBUG &
 pid_smokeview=$!
 
-echo "*** building background"
-BUILD background &
-pid_background=$!
-
 echo "*** building fds2fed"
 BUILD fds2fed &
 pid_fds2fed=$!
@@ -115,9 +111,6 @@ pid_wind2fds=$!
 
 wait $pid_smokeview
 CHECK_BUILD smokeview $SMVDEBUG
-
-wait $pid_background
-CHECK_BUILD background
 
 wait $pid_fds2fed
 CHECK_BUILD fds2fed

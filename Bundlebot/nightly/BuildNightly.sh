@@ -298,7 +298,7 @@ if [ "$BUNDLETYPE" == "nightly" ]; then
   FDS_TAG=
   SMV_TAG=
   if [ "$USE_CURRENT" == "" ]; then
-    $GITROOT/bot/Firebot/getGHfile.sh FDS_INFO.txt
+    $GITROOT/bot/Bundlebot/nightly/getGHfile.sh FDS_INFO.txt
   else
     $SCRIPTDIR/make_info.sh  >      FDS_INFO.txt
   fi
