@@ -52,12 +52,19 @@ BASEDIR=`basename $CURDIR`
 SUMMARY_DIR=Summary
 if [ "$BASEDIR" == "Firebot" ]; then
   INREPO=1
-  SUMMARY_DIR=../../fds/Manuals/FDS_Summary
+  SUMMARY_DIR=$HOME/.firebot/FDS_Summary
   BOT_TYPE=firebot
   BOT_TITLE=Firebot
   PROG=fds
   REFERENCE_DIR=../../fig/fds/Reference_Figures
   NEW_DIR=$SUMMARY_DIR/images
+
+  MANDIR=../../fds/Manuals
+  mkdir -p $SUMMARY_DIR/images/user
+  cp $MANDIR/FDS_User_Guide/SCRIPT_FIGURES/*.png $SUMMARY_DIR/images/user/. 
+  
+  mkdir -p $SUMMARY_DIR/images/verification
+  cp $MANDIR/FDS_Verification_Guide/SCRIPT_FIGURES/*.png $SUMMARY_DIR/images/verification/.
 fi
 if [ "$BASEDIR" == "Smokebot" ]; then
   INREPO=1
@@ -104,6 +111,7 @@ shift $(($OPTIND-1))
 
 if [ "$INREPO" != "" ]; then
   NEW_DIR=$SUMMARY_DIR/images
+  mkdir -p $NEW_DIR
 fi
 ABORT=
 CHECK_DIR $REFERENCE_DIR REFERENCE_DIR
@@ -121,27 +129,22 @@ cd $CURDIR
 cd $SUMMARY_DIR
 SUMMARY_DIR=`pwd`
 
-cd $CURDIR
 cd $NEW_DIR
 NEW_DIR=`pwd`
 
 DIFF_DIR=$SUMMARY_DIR/diffs/images
-mkdir -p $DIFF_DIR
-if [ "$INREPO" == "" ]; then
-  rm -f $DIFF_DIR/*.png >& /dev/null
-else
-  cd $DIFF_DIR
-  git clean -dxf >& /dev/null
-fi
+mkdir -p $DIFF_DIR/user
+mkdir -p $DIFF_DIR/verification
+rm -f $DIFF_DIR/*.png >& /dev/null
+rm -f $DIFF_DIR/user/*.png >& /dev/null
+rm -f $DIFF_DIR/verification/*.png >& /dev/null
 
 BASE_DIR=$SUMMARY_DIR/diffs/base
-mkdir -p $BASE_DIR
-if [ "$INREPO" == "" ]; then
-  rm -f $BASE_DIR/*.png >& /dev/null
-else
-  cd $BASE_DIR
-  git clean -dxf >& /dev/null
-fi
+mkdir -p $BASE_DIR/user
+mkdir -p $BASE_DIR/verification
+rm -f $BASE_DIR/*.png >& /dev/null
+rm -f $BASE_DIR/user/*.png >& /dev/null
+rm -f $BASE_DIR/verification/*.png >& /dev/null
 
 if [ "$INREPO" == "" ]; then
   mkdir -p $SUMMARY_DIR/images
