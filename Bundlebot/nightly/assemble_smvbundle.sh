@@ -81,7 +81,6 @@ CPDIR ()
 }
 
 
-BACKGROUNDDIR=$GITROOT/smv/Build/background/${COMPILER}_${platform}
 SMVDIR=$GITROOT/smv/Build/smokeview/${COMPILER}_${platform}
 SMVDIRQ=$GITROOT/smv/Build/smokeview/${COMPILER}_${platform}_q
 SMZDIR=$GITROOT/smv/Build/smokezip/${COMPILER}_${platform}
@@ -124,7 +123,6 @@ CP $UTILSCRIPTDIR   slice2mp4.sh      $PLATFORMDIR/$smvbin
 CP $FORBUNDLE       .smokeview_bin    $PLATFORMDIR/$smvbin
 CP $SMVSCRIPTDIR    jp2conv.sh        $PLATFORMDIR/$smvbin
 
-CP  $BACKGROUNDDIR background_${platform} $PLATFORMDIR/$smvbin background
 if [ "$platform" == "osx" ]; then
   CP  $SMVDIR       smokeview_${platform}       $PLATFORMDIR/$smvbin smokeview
 else
