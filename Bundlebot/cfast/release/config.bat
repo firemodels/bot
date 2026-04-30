@@ -4,9 +4,9 @@
 :: ----------------------------
 :: repo environment variables
 
-:: CFAST-7.7.5-104-g97584019a
-set BUNDLE_CFAST_REVISION=97584019a
-set BUNDLE_CFAST_TAG=CFAST-7.7.6test
+:: CFAST-7.7.5-106-gdc56e5c66
+set BUNDLE_CFAST_REVISION=dc56e5c66
+set BUNDLE_CFAST_TAG=CFAST-7.7.6
 
 :: EXP-6.10.1-63-g4218e713e
 set BUNDLE_EXP_REVISION=4218e713e
