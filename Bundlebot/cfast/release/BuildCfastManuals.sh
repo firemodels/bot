@@ -4,7 +4,7 @@ if [ "$BUNDLE_EMAIL" != "" ]; then
   MAILTO="-m $BUNDLE_EMAIL"
 fi
 
-OWNER="-o firemodels"
+OWNER="-o `whoami`"
 if [ "$BUNDLE_OWNER" != "" ]; then
   OWNER="-o $BUNDLE_OWNER"
 fi
