@@ -17,7 +17,7 @@ do
 case $OPTION  in
   h)
    echo Usage:
-   echo ./BUILD_fds_manuals.sh -o owner -m email_address
+   echo ./BuildSmvManuals.sh -o owner -m email_address
    exit
   ;;
   m)
