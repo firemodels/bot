@@ -1204,14 +1204,29 @@ fi
   check_guide $OUTPUT_DIR/stage6_cdata_guide $cfastrepo/Manuals/CFAST_CData_Guide CFAST_CData_Guide.pdf 'CData Guide'
 
 #*** output hashes needed for bundling
-  echo $CFAST_SHORTHASH > $cfastrepo/Manuals/CFAST_HASH
-  echo $SMV_SHORTHASH   > $cfastrepo/Manuals/SMV_HASH
-  echo $CFAST_REV       > $cfastrepo/Manuals/CFAST_REVISION
-  echo $SMV_REV         > $cfastrepo/Manuals/SMV_REVISION
+  VERSION_LATEST=$HOME/.cfastbot/VERSION_LATEST
+  mkdir -p ${VERSION_LATEST}
+  echo $CFAST_SHORTHASH > ${VERSION_LATEST}/CFAST_HASH
+  echo $SMV_SHORTHASH   > ${VERSION_LATEST}/Manuals/SMV_HASH
+  echo $CFAST_REV       > ${VERSION_LATEST}/CFAST_REVISION
+  echo $SMV_REV         > ${VERSION_LATEST}/SMV_REVISION
 
 ### Report results ###
 set_files_world_readable || exit 1
 save_build_status
+
+### save version info if cfastbot passed ###
+if [[ ! -e $ERROR_LOG ]] && [[ ! -e $WARNING_LOG ]]; then
+  VERSION=$HOME/.cfastbot/VERSION
+  mkdir -p ${VERSION}
+  rm -f ${VERSION}/*
+  cp ${VERSION_LATEST}/*                                                        ${VERSION}/.
+  cp $cfastrepo/Manuals/CFAST_CData_Guide/CFAST_CData_Guide.pdf                 ${VERSION}/.
+  cp $cfastrepo/Manuals/CFAST_Configuration_Guide/CFAST_Configuration_Guide.pdf ${VERSION}/.
+  cp $cfastrepo/Manuals/CFAST_Validation_Guide/CFAST_Validation_Guide.pdf       ${VERSION}/.
+  cp $cfastrepo/Manuals/CFAST_Users_Guide/CFAST_Users_Guide.pdf                 ${VERSION}/.
+  cp $cfastrepo/Manuals/CFAST_Tech_Ref/CFAST_Tech_Ref.pdf                       ${VERSION}/.
+fi
 email_build_status
 echo cfastbot complete
 
