@@ -125,7 +125,6 @@ else
   mkdir -p $GITROOT/bot/Bundlebot/release/output
   cd $GITROOT/bot/Bundlebot/release/output
   outputdir=`pwd`
-  git tag -a $BUNDLE_SMV_TAG -m "tag for smokeview release" >> $outputdir/stage2_clone 2>&1
   GHOWNER=`whoami`
 fi
 if [ "$OUTPUT_USAGE" != "" ]; then
@@ -183,6 +182,8 @@ fi
 cd $GITROOT/bot/Bundlebot/nightly
 echo "*** cloning smv repo"
 ./clone_smvrepo.sh $smv_hash $BUNDLETYPE >& $outputdir/stage2_clone
+cd $GITROOT/smv
+git tag -a $BUNDLE_SMV_TAG -m "tag for smokeview release" >> $outputdir/stage2_clone 2>&1
 
 #*** get branch names
 
