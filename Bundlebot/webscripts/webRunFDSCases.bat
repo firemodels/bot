@@ -16,7 +16,7 @@ goto:eof
 call %envfile%
 
 cd %git_root%\smv\Verification\scripts
-call RunSmvCases
+call RunFDSCases
 
 exit /b
  

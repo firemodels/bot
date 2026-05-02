@@ -16,7 +16,7 @@ goto:eof
 call %envfile%
 
 cd %git_root%\smv\Verification\scripts
-call CompareSmvPictures
+call CompareFDSPictures
 
 exit /b
  

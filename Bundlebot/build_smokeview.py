@@ -63,15 +63,15 @@ def bundle_smv():          os.system("start " + webscript_dir + "webPACKAGEsmv "
 def install_smv():         os.system("start " + webscript_dir + "webINSTALLsmv "    + platforms[platform.get()]                  )
 def upload_bundle():       os.system("start " + webscript_dir + "webUPLOADallsmv "  + platforms[platform.get()])
 
+def build_fds():           os.system("start " + webscript_dir + "webBuildFDS ")
+def run_fdscases():        os.system("start " + webscript_dir + "webRunFDSCases ")
+def make_fdspictures():    os.system("start " + webscript_dir + "webMakeFDSPictures ")
+def compare_fdspictures(): os.system("start " + webscript_dir + "webCompareFDSPictures ")
+
 def build_smvapps():       os.system("start " + webscript_dir + "webBuildSmvApps ")
 def run_smvcases():        os.system("start " + webscript_dir + "webRunSmvCases ")
 def make_smvpictures():    os.system("start " + webscript_dir + "webMakeSmvPictures ")
 def compare_smvpictures(): os.system("start " + webscript_dir + "webCompareSmvPictures ")
-
-def build_fds():           os.system("start " + webscript_dir + "webBuildFDS ")
-def run_fdscases():        os.system("start " + webscript_dir + "webRunFDSCases ")
-def make_fdspictures():    os.system("start " + webscript_dir + "webMakeFDSPictures ")
-def compare_fdspictures():    os.system("start " + webscript_dir + "webCompareFDSPictures ")
 
 def download_figures():    os.system("start " + webscript_dir + "webGETfigs "       + apps[app.get()]                 + " " + guides[guide.get()] )
 def view_summary():        os.system("start " + webscript_dir + "webVIEWsummary "   + apps[app.get()] )
@@ -164,17 +164,17 @@ R=R+1
 Label(root, text="---------------------------------VERIFY--------------------------------").grid(column=0, row=R, columnspan=4)
 R=R+1
 Label(root, text="Build:").grid(column=0, row=R)
-Button(root, text="fds",         width=button_width, command=build_fds).grid(row=R,         column=1)
-Button(root, text="smv apps",    width=button_width, command=build_smvapps).grid(row=R,    column=2)
+Button(root, text="fds",         width=button_width, command=build_fds).grid(row=R,     column=1)
+Button(root, text="smv apps",    width=button_width, command=build_smvapps).grid(row=R, column=2)
 R=R+1
-Label(root, text="fds:").grid(column=0, row=R)
-Button(root, text="Run cases",     width=button_width, command=run_fdscases).grid(row=R,      column=1)
-Button(root, text="Make pictures", width=button_width, command=make_fdspictures).grid(row=R, column=2)
-Button(root, text="Compare pictures", width=button_width, command=compare_fdspictures).grid(row=R,  column=3)
+Label(root, text="firebot lite:").grid(column=0, row=R)
+Button(root, text="Run cases",     width=button_width,    command=run_fdscases).grid(row=R,        column=1)
+Button(root, text="Make pictures", width=button_width,    command=make_fdspictures).grid(row=R,    column=2)
+Button(root, text="Compare pictures", width=button_width, command=compare_fdspictures).grid(row=R, column=3)
 R=R+1
-Label(root, text="smokeview:").grid(column=0, row=R)
-Button(root, text="Run cases",     width=button_width, command=run_smvcases).grid(row=R,        column=1)
-Button(root, text="Make pictures", width=button_width, command=make_smvpictures).grid(row=R,    column=2)
+Label(root, text="smokebot lite:").grid(column=0, row=R)
+Button(root, text="Run cases",     width=button_width,    command=run_smvcases).grid(row=R,        column=1)
+Button(root, text="Make pictures", width=button_width,    command=make_smvpictures).grid(row=R,    column=2)
 Button(root, text="Compare pictures", width=button_width, command=compare_smvpictures).grid(row=R, column=3)
 
 # ------------------------- guides ------------------------------
