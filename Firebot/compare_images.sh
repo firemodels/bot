@@ -52,12 +52,19 @@ BASEDIR=`basename $CURDIR`
 SUMMARY_DIR=Summary
 if [ "$BASEDIR" == "Firebot" ]; then
   INREPO=1
-  SUMMARY_DIR=../../fds/Manuals/FDS_Summary
+  SUMMARY_DIR=$HOME/.firebot/FDS_Summary
   BOT_TYPE=firebot
   BOT_TITLE=Firebot
   PROG=fds
   REFERENCE_DIR=../../fig/fds/Reference_Figures
   NEW_DIR=$SUMMARY_DIR/images
+
+  MANDIR=../../fds/Manuals
+  mkdir -p $SUMMARY_DIR/images/user
+  cp $MANDIR/FDS_User_Guide/SCRIPT_FIGURES/*.png $SUMMARY_DIR/images/user/. 
+  
+  mkdir -p $SUMMARY_DIR/images/verification
+  cp $MANDIR/FDS_Verification_Guide/SCRIPT_FIGURES/*.png $SUMMARY_DIR/images/verification/.
 fi
 if [ "$BASEDIR" == "Smokebot" ]; then
   INREPO=1
@@ -104,6 +111,7 @@ shift $(($OPTIND-1))
 
 if [ "$INREPO" != "" ]; then
   NEW_DIR=$SUMMARY_DIR/images
+  mkdir -p $NEW_DIR
 fi
 ABORT=
 CHECK_DIR $REFERENCE_DIR REFERENCE_DIR
@@ -121,27 +129,22 @@ cd $CURDIR
 cd $SUMMARY_DIR
 SUMMARY_DIR=`pwd`
 
-cd $CURDIR
 cd $NEW_DIR
 NEW_DIR=`pwd`
 
 DIFF_DIR=$SUMMARY_DIR/diffs/images
-mkdir -p $DIFF_DIR
-if [ "$INREPO" == "" ]; then
-  rm -f $DIFF_DIR/*.png >& /dev/null
-else
-  cd $DIFF_DIR
-  git clean -dxf >& /dev/null
-fi
+mkdir -p $DIFF_DIR/user
+mkdir -p $DIFF_DIR/verification
+rm -f $DIFF_DIR/*.png >& /dev/null
+rm -f $DIFF_DIR/user/*.png >& /dev/null
+rm -f $DIFF_DIR/verification/*.png >& /dev/null
 
 BASE_DIR=$SUMMARY_DIR/diffs/base
-mkdir -p $BASE_DIR
-if [ "$INREPO" == "" ]; then
-  rm -f $BASE_DIR/*.png >& /dev/null
-else
-  cd $BASE_DIR
-  git clean -dxf >& /dev/null
-fi
+mkdir -p $BASE_DIR/user
+mkdir -p $BASE_DIR/verification
+rm -f $BASE_DIR/*.png >& /dev/null
+rm -f $BASE_DIR/user/*.png >& /dev/null
+rm -f $BASE_DIR/verification/*.png >& /dev/null
 
 if [ "$INREPO" == "" ]; then
   mkdir -p $SUMMARY_DIR/images
@@ -178,12 +181,6 @@ HEIGHT_CHANGED=250
 WIDTH_CHANGED=250
 HOSTNAME=`hostname -s`
 
-# add manuals
-
-ADD_FDS_MANUALS=
-if [[ "$BASEDIR" == "Firebot" ]] && [[ "$GH_FDS_TAG" != "" ]] && [[ "$GH_OWNER" != "" ]] && [[ "$GH_REPO" != "" ]]; then
-  ADD_FDS_MANUALS=1
-fi
 ADD_SMOKEVIEW_MANUALS=
 if [[ "$BASEDIR" == "Smokebot" ]] && [[ "$GH_SMOKEVIEW_TAG" != "" ]] && [[ "$GH_OWNER" != "" ]] && [[ "$GH_REPO" != "" ]]; then
   ADD_SMOKEVIEW_MANUALS=1
@@ -668,11 +665,6 @@ cat << EOF  >>$HTML_DIFF
 <tr><th align=left>Metric/Tolerance:</th>    <td> ${METRIC_LABEL}/$TOLERANCE </td></tr>
 <tr><th align=left>Differences/Errors:</th>  <td> $HAVE_DIFFS/$HAVE_ERRORS   </td></tr>
 EOF
-if [ "$ADD_FDS_MANUALS" != "" ]; then
-cat << EOF  >> $HTML_DIFF
-<tr><th align=left>Bundles/Guides/Figures:</th><td><a href="https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_FDS_TAG">https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_FDS_TAG</a></td></tr>
-EOF
-fi
 if [ "$ADD_SMOKEVIEW_MANUALS" != "" ]; then
 cat << EOF  >> $HTML_DIFF
 <tr><th align=left>Bundles/Guides/Figures:</th><td><a href="https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_SMOKEVIEW_TAG">https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_SMOKEVIEW_TAG</a></td></tr>
@@ -705,18 +697,6 @@ cat << EOF  >> $HTML_DIFF
 </ul>
 EOF
 
-fi
-
-if [ "$BASEDIR" == "Firebot" ]; then
-cat << EOF  >> $HTML_DIFF
-<ul>
-<li><a href="manuals/FDS_Config_Management_Plan.pdf">FDS Configuration Management Plan</a>
-<li><a href="manuals/FDS_Technical_Reference_Guide.pdf">FDS Technical Reference Guide</a>
-<li><a href="manuals/FDS_User_Guide.pdf">FDS User Guide</a>
-<li><a href="manuals/FDS_Validation_Guide.pdf>FDS Validation Guide</a>
-<li><a href="manuals/FDS_Verification_Guide.pdf>FDS Verification Guide</a>
-</ul>
-EOF
 fi
 
 cat << EOF  >> $HTML_DIFF
