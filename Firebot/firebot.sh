@@ -1785,6 +1785,7 @@ if [ $python_success == true ]; then
   check_python_verification
   check_python_validation
   if [ "$FDS_SUMMARY_DIR" != "" ]; then
+    mkdir -p $FDS_SUMMARY_DIR
     make_fds_summary
     MAKE_SUMMARY=1
   fi

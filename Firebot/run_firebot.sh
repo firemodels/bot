@@ -183,9 +183,7 @@ case $OPTION  in
    ;;
   w)
    WEB_DIR="$OPTARG"
-   if [ "$FDSSUMMARY" == "" ]; then
-     FDSSUMMARY=$HOME/.firebot/FDS_Summary
-   fi
+   FDSSUMMARY="-s $HOME/.firebot/FDS_Summary"
    ;;
   W)
    WEB_ROOT="$OPTARG"
@@ -218,10 +216,6 @@ fi
 
 if [ "$CLONE_REPOS" != "" ]; then
   CLONE_REPOS="-R $CLONE_REPOS"
-fi
-
-if [ "$FDSSUMMARY" != "" ]; then
-  FDSSUMMARY="-s $FDSSUMMARY"
 fi
 
 #*** kill firebot
