@@ -63,7 +63,7 @@ or
 This option clones repos.  It should NEVER be run in repos where you do your regular work. Repos are erased before cloning.
 
 
-Other useful options to add the run_firebot command are `nohup`, `-m` and `-q`.  nohup causes standard output to go the file nohup.out, `m` specifies an email address where results are sent to and `-q` specifies the Slurm queue to use to run cases. For example:
+Other useful options to add the run_firebot command are `nohup`, `-m` and `-q`.  nohup causes standard output to go the file nohup.out, `-m` specifies an email address where results are sent to and `-q` specifies the Slurm queue to use to run cases. For example:
 
 ``` nohup ./run_firebot.sh -q firebot -m user@host.com &```
 
