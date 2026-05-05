@@ -23,10 +23,6 @@ set BUNDLE_CFAST_TAG=CFAST-7.7.6test
 set BUNDLE_SMV_REVISION=e69be0a13
 set BUNDLE_SMV_TAG=SMV-6.10.7test
 ```
-3. type: `BuildCfastRelease.bat`
 
-   This builds a bundle using revisions and tags in the batch file `config.bat`
-
-
-
-
+3. On a Linux computer (spark at NIST) type `./BuildCfastManuals.sh` .  This sets up the repos using `config.sh` and then builds the manuals by running cfastbot.sh.
+4. On a Windows computer type: `BuildCfastRelease.bat` .  Similarly, this sets up the repos using `config.bat` and then builds a bundle.
