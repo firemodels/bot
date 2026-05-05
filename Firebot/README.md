@@ -13,9 +13,7 @@ The following steps need only be done once. The exact phrasing of the commands a
 2. Ensure that the following software packages are installed on the system:
 
     * Intel Fortran and C compilers, Intel MPI
-    * Gnu Fortran compiler (Optional)
     * LaTeX (TeX Live distribution), be sure to make this the default LaTeX in the system-wide PATH
-    * Matlab (test the command `matlab`)
 
 3. Firebot uses email notifications for build status updates. Ensure that outbound emails can be sent using the `mail` command.
 
@@ -45,21 +43,21 @@ The following steps need only be done once. The exact phrasing of the commands a
 
 The script `firebot.sh` is run using the wrapper script `run_firebot.sh`. This script uses a locking file that ensures multiple instances of firebot do not run at the same time, which would cause file conflicts. To see the various options associated with running firebot, type
 
-``` ./run_firebot.sh -H ```
+``` ./run_firebot.sh -h ```
 
 A typical way to run firebot is to cd into the directory containing firebot.sh and type: 
 
-``` nohup ./run_firebot.sh -b -c -q firebot -m user@host.com &```
+``` nohup ./run_firebot.sh -q firebot -m user@host.com &```
 
-The `-b` option instructs firebot to use the current repository and branch configuration. The `-c` option cleans the repositories. The `-q` option specifies which queue to use. The email addressee specified by the -m option receives a notice when firebot is done. The `nohup` at the start and `&` at the end of the command run `firebot.sh` in the background and redirect screen output to the file called `nohup.out`.
+The `-q` option specifies which queue to use. The email addressee specified by the -m option receives a notice when firebot is done. The `nohup` at the start and `&` at the end of the command run `run_firebot.sh` in the background and redirect screen output to the file called `nohup.out`.
 
 If you are concerned that firebot might update and clean your repositories and erase unversioned files, you should run firebot in a fresh repo. 
 
 Each night, the pseudo-user named firebot runs the firebot script using the command:
 
-``` nohup ./run_firebot.sh -c -u -q firebot -m user@host.com -R master &```
+```bash -lc "./run_firebot.sh -y -q firebot -R nightly  -U -W /opt/www/html -w firebot/clone  > $HOME/.firebot/firebot_test1.out"```
 
-This command cleans and updates the relevant repositories, and the `-R` option renames the branch. 
+The `-y` option causes firebot to run without pausing, `-q` specifies the Slurm queue to run cases in, `-R nightly` renames branches that are cloned. The other options, `-U`, `-W` and `-w` are used to upload results to a web site and to Github. 
 
 To kill firebot, cd to the directory containing firebot.sh and type:
 
