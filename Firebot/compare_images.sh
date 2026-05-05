@@ -129,8 +129,10 @@ cd $CURDIR
 cd $SUMMARY_DIR
 SUMMARY_DIR=`pwd`
 
-cd $NEW_DIR
-NEW_DIR=`pwd`
+if [ -d $NEW_DIR ]; then
+  cd $NEW_DIR
+  NEW_DIR=`pwd`
+fi
 
 DIFF_DIR=$SUMMARY_DIR/diffs/images
 mkdir -p $DIFF_DIR/user
