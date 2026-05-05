@@ -45,11 +45,27 @@ The script `firebot.sh` is run using the wrapper script `run_firebot.sh`. This s
 
 ``` ./run_firebot.sh -h ```
 
-A typical way to run firebot is to cd into the directory containing firebot.sh and type: 
+Firebot is run in two ways.
+
+1. To run firebot to test changes in repos where you normally work, use:
+
+```./run_firebot.sh```
+This will run firebot without updating your repos or cleaning files - ie will not erase your files.
+
+2.  To run firebot using the latest repos revisions, use:
+
+```./run_firebot.sh -C```
+
+or
+
+```./run_firebot.sh -R branch_name```
+
+This option clones repos.  It should NEVER be run in repos where you do your regular work. Repos are erased before cloning.
+
+
+Other useful options to add the run_firebot command are `nohup`, `-m` and `-q`.  nohup causes standard output to go the file nohup.out, `m` specifies an email address where results are sent to and `-q` specifies the Slurm queue to use to run cases. For example:
 
 ``` nohup ./run_firebot.sh -q firebot -m user@host.com &```
-
-The `-q` option specifies which queue to use. The email addressee specified by the -m option receives a notice when firebot is done. The `nohup` at the start and `&` at the end of the command run `run_firebot.sh` in the background and redirect screen output to the file called `nohup.out`.
 
 If you are concerned that firebot might update and clean your repositories and erase unversioned files, you should run firebot in a fresh repo. 
 
@@ -57,7 +73,7 @@ Each night, the pseudo-user named firebot runs the firebot script using the comm
 
 ```bash -lc "./run_firebot.sh -y -q firebot -R nightly  -U -W /opt/www/html -w firebot/clone  > $HOME/.firebot/firebot_test1.out"```
 
-The `-y` option causes firebot to run without pausing, `-q` specifies the Slurm queue to run cases in, `-R nightly` renames branches that are cloned. The other options, `-U`, `-W` and `-w` are used to upload results to a web site and to Github. 
+The `-y` option causes firebot to run without pausing, `-q` specifies the Slurm queue to run cases in, `-R nightly` renames branches that are cloned to nightly. The other options, `-U`, `-W` and `-w` are used to upload results to a web site and to Github. 
 
 To kill firebot, cd to the directory containing firebot.sh and type:
 
