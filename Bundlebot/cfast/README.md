@@ -12,9 +12,9 @@ This builds a cfast bundle using repo revision from the lastest cfastbot pass.
 
 
 ### Building a release bundle
-1. cd into `FireModels_cbundle\bot\Bundlebot\cfast\release
-2. Edit the file `config.bat` .  It contains repo revisions and tags
-   for the bundle to be created.  
+1. cd into `FireModels_cbundle\bot\Bundlebot\cfast\release`
+2. Edit the files `config.bat` and `config.sh` .  They contains repo revisions and tags
+   for the bundle to be created.  `config.sh` is used on a Linux computer to build the manuals.  `config.bat` is used on a Windows computer to build the release.
 ```
 :: CFAST-7.7.5-104-g97584019a
 set BUNDLE_CFAST_REVISION=97584019a
