@@ -1,6 +1,5 @@
 #  cfast bundle scripts
 
-(preliminary notes on building cfast bundles)
 This directory contains scripts for building cfast bundles.
 
 ### Building a nightly bundle
