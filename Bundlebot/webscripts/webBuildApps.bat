@@ -1,6 +1,5 @@
 @echo off
 
-echo %CD%
-pause
+cd webscripts
 if %1 == firebot  call webBuildFDS 
-if %1 == smokebot call webBuildSmvApps 
+if %1 == smokebot call webBuildSmvApps

@@ -1,4 +1,5 @@
-@echo off 
- 
-if %1 == firebot  call webMakeFDSPictures 
-if %1 == smokebot call webMakeSmvPictures 
+@echo off
+
+cd ..\..\smv\Verification\scripts
+if %1 == firebot  call MakeFDSPictures 
+if %1 == smokebot call MakeSmvPictures 

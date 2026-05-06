@@ -1,25 +1,9 @@
 @echo off
+setlocal\
 
-:: batch file to build test or release smokeview on Windows, Linux or OSX platforms
+set CURDIR=%CD%
+cd %CURDIR%\..\..\..\smv\Build\smokeview\intel_win
+start "build smokeview" cmd /c "call make_smokeview"
 
-:: setup environment variables (defining where repository resides etc) 
-
-set envfile="%userprofile%"\fds_smv_env.bat
-IF EXIST %envfile% GOTO endif_envexist
-echo ***Fatal error.  The environment setup file %envfile% does not exist. 
-echo Create a file named %envfile% and use smv/scripts/fds_smv_env_template.bat
-echo as an example.
-echo.
-echo Aborting now...
-pause>NUL
-goto:eof
-
-:endif_envexist
-
-call %envfile%
-
-cd %git_root%\smv\Build\smokeview\intel_win
-start "build fds" cmd /c "call make_smokeview"
-
-cd %git_root%\smv\Build\fds2fed\intel_win
-start "build fds2fed" cmd /c "call make_fds2fed"
+cd %CURDIR%\..\..\..\smv\Build\fds2fed\intel_win
+start "build smokeview" cmd /c "call make_fds2fed"

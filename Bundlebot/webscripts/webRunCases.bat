@@ -1,4 +1,5 @@
 @echo off
 
-if %1 == firebot  call webRunFDSCases 
-if %1 == smokebot call webRunSmvCases 
+cd ..\..\smv\Verification\scripts
+if %1 == firebot  call RunFDSCases 
+if %1 == smokebot call RunSmvCases 
