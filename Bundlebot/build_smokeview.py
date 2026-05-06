@@ -57,6 +57,9 @@ def build_util():          os.system("start " + webscript_dir + "webBUILDallprog
 def build_smv():           os.system("start " + webscript_dir + "webBUILDsmv  "         + platforms[platform.get()]  )
 def build_smv_inc():       os.system("start " + webscript_dir + "webBUILDsmv  "         + platforms[platform.get()] + " testinc" )
 
+def bld_firebot():         os.system("start " + webscript_dir + "webBuildApps firebot")
+def bld_smokebot():        os.system("start " + webscript_dir + "webBuildApps smokebot")
+
 def fullbld_bundle_inst(): os.system("start " + webscript_dir + "webBUILDsmvbundleinst " + platforms[platform.get()] + " test    "  + str(scan_bundle.get()))
 def incbld_bundle_inst():  os.system("start " + webscript_dir + "webBUILDsmvbundleinst " + platforms[platform.get()] + " testinc "  + str(scan_bundle.get()))
 
@@ -162,8 +165,10 @@ Button(root, text="Install", width=button_width, command=install_smv).grid(row=R
 Button(root, text="Upload",  width=button_width, command=upload_bundle).grid(row=R, column=3)
 
 R=R+1
-Button(root, text="Incremental Build/Bundle/Install",  width=2*button_width+2, command=incbld_bundle_inst).grid(row=R,  column=0, columnspan=2)
-Button(root, text="Full Build/Bundle/Install",         width=2*button_width+2, command=fullbld_bundle_inst).grid(row=R,  column=2, columnspan=2)
+Button(root, text="Bld fds",            width=button_width,   command=bld_firebot).grid(row=R,         column=0)
+Button(root, text="Bld smv, fds2fed",   width=button_width, command=bld_smokebot).grid(row=R,        column=1)
+Button(root, text="Inc Bld/Bndl/Inst",  width=button_width,   command=incbld_bundle_inst).grid(row=R,  column=2)
+Button(root, text="Full Bld/Bndl/Inst", width=button_width,   command=fullbld_bundle_inst).grid(row=R, column=3)
 
 # ------------------------- verification ------------------------------
 
@@ -174,12 +179,10 @@ Radiobutton(root, text="firebot",  padx = 0, variable=bot,  value=1).grid(row=R,
 Radiobutton(root, text="smokebot", padx = 0, variable=bot,  value=2).grid(row=R, column=1)
 Checkbutton(root, text="run all cases", variable=runall, onvalue=1, offvalue=0).grid(row=R, column=2)
 R=R+1
-Button(root, text="Build apps",       width=button_width, command=build_apps).grid(row=R, column=0)
-Button(root, text="Run cases",        width=button_width, command=run_cases).grid(row=R,   column=1)
-Button(root, text="Check cases",      width=button_width, command=check_cases).grid(row=R, column=2)
-R=R+1
-Button(root, text="Make pictures",    width=button_width,  command=make_pictures).grid(row=R,    column=0)
-Button(root, text="Compare pictures", width=button_width,  command=compare_pictures).grid(row=R, column=1)
+Button(root, text="Run cases",        width=button_width, command=run_cases).grid(row=R,   column=0)
+Button(root, text="Check cases",      width=button_width, command=check_cases).grid(row=R, column=1)
+Button(root, text="Make pictures",    width=button_width,  command=make_pictures).grid(row=R,    column=2)
+Button(root, text="Compare pictures", width=button_width,  command=compare_pictures).grid(row=R, column=3)
 
 # ------------------------- guides ------------------------------
 
