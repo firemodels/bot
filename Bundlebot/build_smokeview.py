@@ -36,6 +36,7 @@ bot=IntVar()
 bot.set(2)
 
 scan_bundle = IntVar(value=0) 
+runall = IntVar(value=1) 
 
 button_width=13
 
@@ -74,7 +75,7 @@ def make_smvpictures():    os.system("start " + webscript_dir + "webMakeSmvPictu
 def compare_smvpictures(): os.system("start " + webscript_dir + "webCompareSmvPictures ")
 
 def build_apps():          os.system("start " + webscript_dir + "webBuildApps "       + bots[bot.get()])
-def run_cases():           os.system("start " + webscript_dir + "webRunCases "        + bots[bot.get()])
+def run_cases():           os.system("start " + webscript_dir + "webRunCases "        + bots[bot.get()] + " " + str(runall.get()))
 def check_cases():         os.system("start " + webscript_dir + "webCheckCases "      + bots[bot.get()])
 def make_pictures():       os.system("start " + webscript_dir + "webMakePictures "    + bots[bot.get()])
 def compare_pictures():    os.system("start " + webscript_dir + "webComparePictures " + bots[bot.get()])
@@ -171,10 +172,11 @@ Label(root, text="---------------------------------VERIFY-----------------------
 R=R+1
 Radiobutton(root, text="firebot",  padx = 0, variable=bot,  value=1).grid(row=R, column=0)
 Radiobutton(root, text="smokebot", padx = 0, variable=bot,  value=2).grid(row=R, column=1)
+Checkbutton(root, text="run all cases", variable=runall, onvalue=1, offvalue=0).grid(row=R, column=2)
 R=R+1
-Button(root, text="Build apps",         width=button_width, command=build_apps).grid(row=R,     column=0)
-Button(root, text="Run cases",        width=button_width,  command=run_cases).grid(row=R,        column=1)
-Button(root, text="Check cases",      width=button_width,  command=check_cases).grid(row=R,      column=2)
+Button(root, text="Build apps",       width=button_width, command=build_apps).grid(row=R, column=0)
+Button(root, text="Run cases",        width=button_width, command=run_cases).grid(row=R,   column=1)
+Button(root, text="Check cases",      width=button_width, command=check_cases).grid(row=R, column=2)
 R=R+1
 Button(root, text="Make pictures",    width=button_width,  command=make_pictures).grid(row=R,    column=0)
 Button(root, text="Compare pictures", width=button_width,  command=compare_pictures).grid(row=R, column=1)
