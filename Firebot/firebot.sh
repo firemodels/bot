@@ -1210,6 +1210,8 @@ fi
       firebot_status=0
    else
       FIREBOT_SUBJECT="firebot success!"
+      rm -r $HOME/.firebot/Manuals
+      cp -r $fdsrepo/Manuals $HOME/.firebot/Manuals
    fi
    FIREBOT_SUBJECT="$FIREBOT_SUBJECT Version: ${FDS_REVISION}, Branch: $FDSBRANCH"
    cat $LOGS >& $MAIL_LOG
@@ -1801,6 +1803,8 @@ make_fds_technical_guide
 make_fds_Config_management_plan
 make_fds_verification_guide
 make_fds_validation_guide
+rm -r $HOME/.firebot/Manuals_latest
+cp -r $fdsrepo/Manuals $HOME/.firebot/Manuals_latest
 
 ###*** Stage 6 wrapup ###
 
