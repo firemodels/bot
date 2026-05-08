@@ -182,8 +182,8 @@ Button(root, text="Check cases",      width=button_width,  command=check_cases).
 Button(root, text="Make pictures",    width=button_width,  command=make_pictures).grid(row=R,    column=2)
 Button(root, text="Compare pictures", width=button_width,  command=compare_pictures).grid(row=R, column=3)
 R=R+1
-Button(root, text="Bld fds",            width=button_width, command=bld_firebot).grid(row=R,  column=0)
-Button(root, text="Bld smv, fds2fed",   width=button_width, command=bld_smokebot).grid(row=R, column=1)
+Button(root, text="Build fds",            width=button_width, command=bld_firebot).grid(row=R,  column=0)
+Button(root, text="Build smokeview, fds2fed",   width=2*button_width+2, command=bld_smokebot).grid(row=R, column=1, columnspan=2)
 
 # ------------------------- guides ------------------------------
 
