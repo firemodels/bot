@@ -24,7 +24,7 @@ These steps are given in more detail below.
       
 where `x.y.z is the version number of the release to be built, for example 6.10.0 . The configuration scripts `config.sh` and `config.bat` contain tags and revision for each repo used to build the bundles.
    
-   3. Commit changes to `config.sh` and `config.bat` and push up to the central repo.
+   3. Examine `config.sh` and `config.bat` to ensure they contain revisions and tags that you wnat then commit changes and push up to the central repo.
 
 ### Build Manuals
 
