@@ -10,7 +10,7 @@ The steps for bulding bundles are:
   1. Modify tags and revisions in the configuration scripts,  `config.sh` and `config.bat`,
   2. Run the script `BuildFdsManuals.sh` to build FDS manuals (this runs firebot) and the script `BuildSmvManuals.sh` to build Smokeview manuals (this runs smokebot).
   3. Run the script `BuildRelease.sh` to build FDS/Smokeview bundles, and the script `BuildSmvRelease.sh` to build Smokeview bundles,
-  4. Push up tags to the central repo and define a release.
+  4. After the bundles are verified to be correct, push up tags to the central repo and define a release.
   
 These steps are given in more detail below.
 
