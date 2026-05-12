@@ -42,7 +42,7 @@ Note `owner` in `-o owner` is the github owner where the manuals will be placed 
 
 #### Linux and Macintosh bundles
 
-Linux (spark at NIST) and Macintosh (excess at NIST) bundles are built using the firebot account. 
+Linux (spark at NIST) and Macintosh (wildfire at NIST) bundles are built using the firebot account. 
 
    1. Switch to the firebot account using `sudo su - firebot` .
    2. cd to the `FireModels_bundle/bot/Bundlebot/release` directory
