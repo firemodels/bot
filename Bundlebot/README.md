@@ -24,7 +24,7 @@ These steps are given in more detail below.
       
 where `x.y.z is the version number of the release to be built, for example 6.10.0 . The configuration scripts `config.sh` and `config.bat` contain tags and revision for each repo used to build the bundles.
    
-   3. Examine `config.sh` and `config.bat` to ensure they contain revisions and tags that you wnat then commit changes and push up to the central repo.
+   3. Examine `config.sh` and `config.bat` to ensure they contain revisions and tags that you want then commit changes and push up to the central repo.
 
 ### Build Manuals
 
@@ -33,7 +33,7 @@ The manuals are built using the firebot account.
    1. Type: `sudo su - firebot` on the computer that runs firebot (spark at Nist) to switch to the firebot user account.
    2. cd to `FireModels_bundle/bot/Bundlebot/release`
    3. Update the bot repo to ensure that the build manuals scripts use the correct `config.sh` script.
-   4. To build the FDS manuals, type: `./BuildFdsManuals.sh -o owner -m email@address` .  After this step completes, about 2 hours, continue to the next step
+   4. To build the FDS manuals, type: `./BuildFdsManuals.sh -o owner -m email@address` .  After this step completes, about 3 hours, continue to the next step
    5. To build Smokeview manuals, type: `./BuildSmvManuals.sh -o owner -m email@address` . After this step completes, about 20 minutes, start building the bundles.
 
 Note `owner` in `-o owner` is the github owner where the manuals will be placed (-o gforney for now) and `m email@address` is the email address where results will be sent.
