@@ -195,7 +195,7 @@ smvbindir=$bundledir/smvbin
 fdsbindir=$bundledir/bin
 
 webpagesdir=$REPO_ROOT/webpages
-fds_bundle=$REPO_ROOT/fds/Build/for_bundle
+fds_bundle=$REPO_ROOT/bot/Bundlebot/nightly/fds_forbundle
 smv_bundle=$REPO_ROOT/smv/Build/for_bundle
 smvscriptdir=$REPO_ROOT/smv/scripts
 utilscriptdir=$REPO_ROOT/smv/Utilities/Scripts
