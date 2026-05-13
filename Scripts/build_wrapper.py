@@ -77,7 +77,6 @@ def run_smvcases():        os.system("start " + webscript_dir + "webRunSmvCases 
 def make_smvpictures():    os.system("start " + webscript_dir + "webMakeSmvPictures ")
 def compare_smvpictures(): os.system("start " + webscript_dir + "webCompareSmvPictures ")
 
-def build_apps():          os.system("start " + webscript_dir + "webBuildApps "       + bots[bot.get()])
 def run_cases():           os.system("start " + webscript_dir + "webRunCases "        + bots[bot.get()] + " " + str(runall.get()))
 def check_cases():         os.system("start " + webscript_dir + "webCheckCases "      + bots[bot.get()])
 def make_pictures():       os.system("start " + webscript_dir + "webMakePictures "    + bots[bot.get()])
@@ -88,7 +87,6 @@ def view_summary():        os.system("start " + webscript_dir + "webVIEWsummary 
 def build_guides():        os.system("start " + webscript_dir + "webBUILDguides "   + apps[app.get()]                 + " " + guides[guide.get()] )
 def view_guides():         os.system("start " + webscript_dir + "webVIEWguides "    + apps[app.get()]                 + " " + guides[guide.get()] )
  
-def archive_smv():         os.system("start " + webscript_dir + "webARCHIVEAllbundle"  )
 def upload_bundle_rel():   os.system("start " + webscript_dir + "webUPLOADsmvrelease")
 
 def webCOPYsettings2smv(): os.system("start " + webscript_dir + "webCOPYsettings2smv")
