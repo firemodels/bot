@@ -533,7 +533,11 @@ htmllog=${installer_base_platform}_manifest.html
 
 cd $SCRIPTDIR
 echo "*** building installer"
-./assemble_bundle.sh $FDSREV $SMVREV ${BUNDLE_PREFIX} ${MPI_LABEL} $SCAN_BUNDLE
+MPI_LABEL_ARG=$MPI_LABEL
+if [ "$MPI_LABEL" == "" ]; then
+  MPI_LABEL_ARG="none"
+fi
+./assemble_bundle.sh $FDSREV $SMVREV ${BUNDLE_PREFIX} ${MPI_LABEL_ARG} $SCAN_BUNDLE
 assemble_bundle_status=$?
 
 echo "*** virus scan summary"

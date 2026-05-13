@@ -5,6 +5,10 @@ NIGHTLY=$3
 LABEL=$4
 scan_bundle=$5
 
+if [ "$LABEL" == "none" ]; then
+  LABEL=""
+fi
+
 returncode=0
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
