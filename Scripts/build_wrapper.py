@@ -17,7 +17,7 @@ root = Tk()
 repo_root = os.path.dirname(os.path.realpath(__file__)) + "\\..\\..\\"
 bot_repo = repo_root + "bot\\"
 smv_repo = repo_root + "smv\\"
-webscript_dir  = bot_repo + "scripts\\python\\webscripts\\"
+webscript_dir  = bot_repo + "scripts\\webscripts\\"
 
 platforms  = ["", "Windows", "Linux",        "OSX"]
 platform=IntVar()
