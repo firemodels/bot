@@ -18,5 +18,5 @@ goto:eof
 call %envfile%
 
 %git_drive%
-cd %git_root%\bot\Bundlebot
-start notepad build_smokeview.py
+cd %git_root%\bot\Scripts
+start notepad build_wrapper.py
