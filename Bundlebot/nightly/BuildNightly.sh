@@ -139,19 +139,19 @@ if [[ "${PLATFORM}" == "osx" ]]; then
     exit
   fi
   if [ "`uname -m`" == "arm64" ] ; then
-    MPI_LABEL=_ompi_arm
+    MPI_LABEL=_arm
     BUNDLE_FDSCOMPILER=gnu
   else
-    MPI_LABEL=_ompi_intel
+    MPI_LABEL=
     BUNDLE_FDSCOMPILER=intel
   fi
 else
   if [[ $IS_INTEL -eq 0 ]]; then
     export BUNDLE_MPITYPE="OPENMPI"
-    MPI_LABEL=_ompi
+    MPI_LABEL=
   else
     export BUNDLE_MPITYPE="INTELMPI"
-    MPI_LABEL=_impi
+    MPI_LABEL=
   fi
 fi
 
