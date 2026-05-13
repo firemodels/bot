@@ -89,14 +89,8 @@ if "%platform%" == "Linuxgnu" (
 :: linux
 
 if "%platform%" == "Linux" (
-  title building libraries for linux
-  start /wait "cleaning linux libraries" plink -no-antispoof %linux_logon% %linux_git_root%/smv/Build/LIBS/intel_linux/make_LIBS.sh    -t clean
-  start "building linux glut library" plink -no-antispoof %linux_logon% %linux_git_root%/smv/Build/LIBS/intel_linux/make_LIBS.sh -t glut
-  start "building linux glui library" plink -no-antispoof %linux_logon% %linux_git_root%/smv/Build/LIBS/intel_linux/make_LIBS.sh -t glui
-  start "building linux zlib library" plink -no-antispoof %linux_logon% %linux_git_root%/smv/Build/LIBS/intel_linux/make_LIBS.sh -t zlib
-  start "building linux jpeg library" plink -no-antispoof %linux_logon% %linux_git_root%/smv/Build/LIBS/intel_linux/make_LIBS.sh -t jpeg
-  start "building linux png library"  plink -no-antispoof %linux_logon% %linux_git_root%/smv/Build/LIBS/intel_linux/make_LIBS.sh -t png
-  start "building linux gd library"   plink -no-antispoof %linux_logon% %linux_git_root%/smv/Build/LIBS/intel_linux/make_LIBS.sh -t gd
+  title building libraries for Linux using Intel
+  start "building linux libraries" /wait plink -no-antispoof %linux_logon% %linux_git_root%/smv/scripts/run_command.sh smv/Build/LIBS/intel_linux make_LIBS.sh
   goto eof
 )
 
