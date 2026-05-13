@@ -17,7 +17,7 @@ root = Tk()
 repo_root = os.path.dirname(os.path.realpath(__file__)) + "\\..\\..\\"
 bot_repo = repo_root + "bot\\"
 smv_repo = repo_root + "smv\\"
-webscript_dir  = bot_repo + "scripts\\python\\webscripts\\"
+webscript_dir  = bot_repo + "scripts\\webscripts\\"
 
 platforms  = ["", "Windows", "Linux",        "OSX"]
 platform=IntVar()
@@ -99,7 +99,7 @@ def set_branch_devel():    os.system("start " + webscript_dir + "webSET_branches
 def add_notes():           os.system("start " + webscript_dir + "webGET_smvlog")
 def edit_notes():          os.system("start " + webscript_dir + "webEDIT_release_notes")
 def view_notes():          os.system("start " + webscript_dir + "webVIEW_release_notes")
-def edit_this_page():      os.system("start " + webscript_dir + "webEDIT_build_smokeview_py")
+def edit_this_page():      os.system("start " + webscript_dir + "webEDIT_build_wrapper_py")
 def edit_settings():       os.system("start " + webscript_dir + "webEDIT_setup")
 
 root.title('Smokeview')
