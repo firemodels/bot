@@ -36,7 +36,7 @@ The manuals are built using the firebot account.
    4. To build the FDS manuals, type: `./BuildFdsManuals.sh -o owner -m email@address` .  After this step completes, about 3 hours, continue to the next step
    5. To build Smokeview manuals, type: `./BuildSmvManuals.sh -o owner -m email@address` . After this step completes, about 20 minutes, start building the bundles.
 
-Note `owner` in `-o owner` is the github owner where the manuals will be placed (-o gforney for now) and `m email@address` is the email address where results will be sent.
+Note `owner` in `-o owner` is the github owner where the manuals will be placed (-o gforney for now) and `-m email@address` is the email address where results will be sent.
 
 ### Build Bundles
 
