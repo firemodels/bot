@@ -41,7 +41,7 @@ if "%platform%" == "Windowsgnu" (
 
 if "%platform%" == "OSX" (
   title building libraries for osx using gnu
-  start "building osx glui library" /wait plink -no-antispoof %osx_logon% %linux_git_root%/smv/scripts/run_command.sh smv/Build/LIBS/gnu_osx make_LIBS.sh
+  start "building osx libraries" /wait plink -no-antispoof %osx_logon% %linux_git_root%/smv/scripts/run_command.sh smv/Build/LIBS/gnu_osx make_LIBS.sh
   goto eof
 )
 
