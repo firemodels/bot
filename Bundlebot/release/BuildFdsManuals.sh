@@ -96,4 +96,4 @@ git tag -a $BUNDLE_OUT_TAG -m "tag: $BUNDLE_OUT_TAG"
 
 # build manuals
 cd $REPOROOT/bot/Firebot
-./run_firebot.sh -b -C -f -c -J -q firebot $MAILTO -U -r test_bundles $OWNER
+./run_firebot.sh -q firebot $MAILTO -U -r test_bundles $OWNER
