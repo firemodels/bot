@@ -1969,9 +1969,9 @@ if [ "$MAKEMOVIES" == "1" ]; then
   echo "Make movies: $DIFF_MAKEMOVIES" >> $STAGE_STATUS
 fi
 
-if [[ $stage_ver_release_success ]] ; then
-  generate_timing_stats
-fi
+#if [[ $stage_ver_release_success ]] ; then
+#  generate_timing_stats
+#fi
 
 #*** stage 5 - build manuals
 
@@ -2079,9 +2079,9 @@ set_files_world_readable || exit 1
 save_build_status
 
 save_manuals_dir
-if [[ $stage_ver_release_success ]] ; then
-  archive_timing_stats
-fi
+#if [[ $stage_ver_release_success ]] ; then
+#  archive_timing_stats
+#fi
 if [ "$HAVEMAIL" != "" ]; then
   echo "   emailing results"
 fi
