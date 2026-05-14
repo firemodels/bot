@@ -88,7 +88,7 @@ Base: $BASE_TIMEREV
 Current: $CURRENT_TIMEREV
 slower(count/time): $SLOWCOUNT, $SLOWSIZE s
 faster(count/time): $FASTCOUNT, $FASTSIZE s
-total(count/ime): $ALLCOUNT, $ALLSIZE s
+total(count/time): $ALLCOUNT, $ALLSIZE s
 EOF
 
 cat << EOF
