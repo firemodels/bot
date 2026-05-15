@@ -126,10 +126,12 @@ call clone_repos %FDS_HASH_BUNDLER% %SMV_HASH_BUNDLER%  || exit /b 1
 if "%NIGHTLY%" == "yes" goto skiptag
   cd %REPOROOT%\fds
   git tag -a %FDS_TAG% -m "repo: fds tag: %FDS_TAG%"
+  git branch -m release
   git describe --dirty --long
 
   cd %REPOROOT%\smv
   git tag -a %SMV_TAG% -m "repo: smv tag: %SMV_TAG%"
+  git branch -m release
   git describe --dirty --long
 :skiptag
 
