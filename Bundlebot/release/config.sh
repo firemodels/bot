@@ -30,5 +30,5 @@ export BUNDLE_OUT_TAG=OUT-6.10.2
 
 # SMV-6.10.7-38-ga0be6bdb9
 export BUNDLE_SMV_HASH=a0be6bdb9
-export BUNDLE_SMV_TAG=SMV-6.10.9
+export BUNDLE_SMV_TAG=SMV-6.10.8
 
