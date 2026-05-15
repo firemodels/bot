@@ -2,12 +2,8 @@
 fds_version=$1
 smv_version=$2
 NIGHTLY=$3
-LABEL=$4
-scan_bundle=$5
-
-if [ "$LABEL" == "none" ]; then
-  LABEL=""
-fi
+scan_bundle=$4
+LABEL=$5
 
 returncode=0
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
@@ -408,7 +404,7 @@ echo "*** creating installer"
 bundlepathdir=`pwd`
 bundlepath=`pwd`/$bundlebase.sh
 
-$MAKEINSTALLER -i $bundlebase.tar.gz -b $custombase -d $INSTALLDIR -f $fds_version -s $smv_version $bundlebase.sh
+$MAKEINSTALLER -i $bundlebase.tar.gz -b $custombase -d $INSTALLDIR -f ${fds_version} -s ${smv_version} $bundlebase.sh
 
 if [ -e $errlog ]; then
   numerrs=`cat $errlog | wc -l `
