@@ -123,6 +123,15 @@ type %LOGFILE%
 if %ONLY_INSTALLER% == 1 goto skip2
 :: clone fds and smv repos 
 call clone_repos %FDS_HASH_BUNDLER% %SMV_HASH_BUNDLER%  || exit /b 1
+if "%NIGHTLY%" == "yes" goto skiptag
+  cd %REPOROOT%\fds
+  git tag -a %FDS_TAG% -m "repo: fds tag: %FDS_TAG%"
+  git describe --dirty --long
+
+  cd %REPOROOT%\smv
+  git tag -a %SMV_TAG% -m "repo: smv tag: %SMV_TAG%"
+  git describe --dirty --long
+:skiptag
 
 echo ***building apps
 
