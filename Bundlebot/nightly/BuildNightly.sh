@@ -446,8 +446,8 @@ if [ "$ONLY_INSTALLER" == "" ]; then
 fi
 
 if [ "$BUNDLETYPE" != "nightly" ]; then
-  FDS_TAG="-X $BUNDLE_FDS_TAG"
-  SMV_TAG="-Y $BUNDLE_SMV_TAG"
+  FDS_TAG="$BUNDLE_FDS_TAG"
+  SMV_TAG="$BUNDLE_SMV_TAG"
 fi
 
 echo $FDS_HASH     > $GITROOT/bot/Bundlebot/nightly/apps/FDS_HASH
@@ -481,10 +481,12 @@ fi
 
 
 BUNDLE_PREFIX=
+BUNDLE_PREFIX_ARG="null"
 UNDERSCORE=
 if [ "$BUNDLETYPE" == "nightly" ]; then
   BUNDLE_PREFIX="nightly"
-UNDERSCORE=_
+  BUNDLE_PREFIX_ARG="nightly"
+  UNDERSCORE=_
 fi
 
 return_code=0
@@ -533,11 +535,7 @@ htmllog=${installer_base_platform}_manifest.html
 
 cd $SCRIPTDIR
 echo "*** building installer"
-MPI_LABEL_ARG=$MPI_LABEL
-if [ "$MPI_LABEL" == "" ]; then
-  MPI_LABEL_ARG="none"
-fi
-./assemble_bundle.sh $FDSREV $SMVREV ${BUNDLE_PREFIX} ${MPI_LABEL_ARG} $SCAN_BUNDLE
+./assemble_bundle.sh $FDSREV $SMVREV ${BUNDLE_PREFIX_ARG} ${SCAN_BUNDLE} ${MPI_LABEL}
 assemble_bundle_status=$?
 
 echo "*** virus scan summary"
