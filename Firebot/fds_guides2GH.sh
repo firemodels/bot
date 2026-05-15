@@ -37,7 +37,7 @@ UPLOADGUIDE ()
 {
   FILE=$1
   FULLFILE=$MANDIR/$FILE/${FILE}.pdf
-  if [ -e $FULLFILE} ]; then
+  if [ -e $FULLFILE ]; then
     echo ***Uploading $FILE
     gh release upload $GH_FDS_TAG $FULLFILE -R github.com/$GH_OWNER/$GH_REPO --clobber
   else
