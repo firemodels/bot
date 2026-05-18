@@ -19,6 +19,7 @@ call :GETOPTS %*
 set DOWNLOADOWNER=firemodels
 set UPLOADOWNER=firemodels
 if "x%IS_RELEASE%" == "x1" set UPLOADOWNER=%username%
+if "x%IS_RELEASE%" == "x1" set DOWNLOADOWNER=%username%
 if "x%UPLOAD_BUNDLE%" == "x2" set UPLOADOWNER=%username%
 
 if "x%STOPSCRIPT%" == "x" goto endif1
