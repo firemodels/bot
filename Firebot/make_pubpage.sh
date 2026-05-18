@@ -55,6 +55,7 @@ EOF
 CURDIR=`pwd`
 cd ../Scripts
 SCRIPTDIR=`pwd`
+mkdir -p output
 
 cd $CURDIR
 cd $historydir
