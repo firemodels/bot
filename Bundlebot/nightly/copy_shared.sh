@@ -15,8 +15,10 @@ else
 fi
 if [ "`uname`" == "Darwin" ]; then
   FDS=$FDSBUILDDIR/ompi_${BUNDLE_FDSCOMPILER}_osx/fds_ompi_${BUNDLE_FDSCOMPILER}_osx
+  FDSOPENMP=$FDSBUILDDIR/impi_${BUNDLE_FDSCOMPILER}_osx_openmp/fds_impi_${BUNDLE_FDSCOMPILER}_osx_openmp
 else
   FDS=$FDSBUILDDIR/impi_${BUNDLE_FDSCOMPILER}_linux/fds_impi_${BUNDLE_FDSCOMPILER}_linux
+  FDSOPENMP=$FDSBUILDDIR/impi_${BUNDLE_FDSCOMPILER}_linux_openmp/fds_impi_${BUNDLE_FDSCOMPILER}_linux_openmp
 fi
 if [ ! -d $TOLIBDIR ]; then
   echo "***error: directory $TOLIBDIR does not exist"
@@ -32,9 +34,12 @@ fi
 
 if [ "`uname`" == "Darwin" ]; then
   FILES=`otool -L $FDS  | awk '{print $1 }' | grep mpi | grep -v fds`
+  FILESOPENMP=`otool -L $FDSOPENMP  | awk '{print $1 }' | grep mpi | grep -v fds`
 else
   FILES=`ldd $FDS  | awk '{print $3 }' | grep oneapi | grep -v fds`
+  FILESOPENMP=`ldd $FDSOPENMP  | awk '{print $3 }' | grep oneapi | grep -v fds`
 fi
+FILES="$FILES $FILESOPENMP"
 echo "*** copying shared fds files to $TOLIBDIR"
 for file in $FILES; do
   if [ -e $file ]; then
