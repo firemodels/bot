@@ -15,7 +15,7 @@ else
 fi
 if [ "`uname`" == "Darwin" ]; then
   FDS=$FDSBUILDDIR/ompi_${BUNDLE_FDSCOMPILER}_osx/fds_ompi_${BUNDLE_FDSCOMPILER}_osx
-  FDSOPENMP=$FDSBUILDDIR/impi_${BUNDLE_FDSCOMPILER}_osx_openmp/fds_impi_${BUNDLE_FDSCOMPILER}_osx_openmp
+  FDSOPENMP=$FDSBUILDDIR/ompi_${BUNDLE_FDSCOMPILER}_osx_openmp/fds_ompi_${BUNDLE_FDSCOMPILER}_osx_openmp
 else
   FDS=$FDSBUILDDIR/impi_${BUNDLE_FDSCOMPILER}_linux/fds_impi_${BUNDLE_FDSCOMPILER}_linux
   FDSOPENMP=$FDSBUILDDIR/impi_${BUNDLE_FDSCOMPILER}_linux_openmp/fds_impi_${BUNDLE_FDSCOMPILER}_linux_openmp
