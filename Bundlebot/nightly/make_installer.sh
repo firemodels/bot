@@ -81,9 +81,7 @@ fi
 
 BASHRC2=.bashrc
 PLATFORM=linux
-LDLIBPATH=LD_LIBRARY_PATH
 if [ "$ostype" == "OSX" ]; then
-  LDLIBPATH=DYLD_LIBRARY_PATH
   BASHRC2=.bash_profile
   PLATFORM=osx
 fi
@@ -452,7 +450,11 @@ rm \$SMVMODULEtmp
 cat << BASH > \$BASHRCFDS
 #/bin/bash
 FDSBINDIR=\$FDS_root/bin
-export PATH=\\\$FDSBINDIR:\\\$PATH
+if [ "\\\$PATH" == "" ]; then
+  export PATH=\\\$FDSBINDIR
+else
+  export PATH=\\\$FDSBINDIR:\\\$PATH
+fi
 BASH
 
 if [ "$BUNDLE_MPITYPE" != "INTELMPI" ] ; then
@@ -463,7 +465,11 @@ BASH
 fi
 if [[ "$ostype" == "OSX" ]]; then
 cat << BASH >> \$BASHRCFDS
-export DYLD_LIBRARY_PATH=\\\$FDSBINDIR/openmpi/lib:\\\$DYLD_LIBRARY_PATH
+if [ "\\\$DYLD_LIBRARY_PATH" == "" ]; then
+  export DYLD_LIBRARY_PATH=\\\$FDSBINDIR/openmpi/lib
+else
+  export DYLD_LIBRARY_PATH=\\\$FDSBINDIR/openmpi/lib:\\\$DYLD_LIBRARY_PATH
+fi
 export TMPDIR=/tmp
 BASH
 fi
@@ -476,7 +482,11 @@ fi
 
 if [ "$ostype" == "LINUX" ] ; then
 cat << BASH >> \$BASHRCFDS
-export $LDLIBPATH=/usr/lib64:\\\$$LDLIBPATH
+if [ "\\\$LD_LIBRARY_PATH" == "" ]; then
+  export LD_LIBRARY_PATH=/usr/lib64
+else
+  export LD_LIBRARY_PATH=/usr/lib64:\\\$LD_LIBRARY_PATH
+fi
 BASH
 fi
 
