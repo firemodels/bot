@@ -9,7 +9,7 @@ set nightly_arg=test
 if %upload% == 0 exit /b
 
 set BUNDLEDIR=%userprofile%\.bundle\bundles
-set basename=%cfast_revision%_%smv_revision%_test_win
+set basename=%cfast_revision%_%smv_revision%_win
 set fullfile=%BUNDLEDIR%\%basename%.exe
 echo basename=%basename%
 echo fullfile=%fullfile%
