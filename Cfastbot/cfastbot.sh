@@ -1162,12 +1162,6 @@ fi
 
 #*** run python validation
   echo "   Validation"
-  echo "      run VandV_Calcs"
-  cd $cfastrepo/Validation
-  python VandV_Calcs.py CFAST_Pressure_Correction_inputs.csv &> /dev/null
-  python VandV_Calcs.py CFAST_Temperature_Profile_inputs.csv &> /dev/null
-  python VandV_Calcs.py CFAST_Heat_Flux_Profile_inputs.csv &> /dev/null
-   
   echo "      make plots"
   # Run Python plotting script
   cd $cfastrepo/Utilities/Python
@@ -1231,4 +1225,3 @@ email_build_status
 echo cfastbot complete
 
  
-
