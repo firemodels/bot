@@ -1126,6 +1126,9 @@ email_build_status()
   if [ `whoami` == "smokebot" ]; then
     is_bot=1
   fi
+  if [ "$UPLOADGIT"  == "1" ]; then
+    is_bot=1
+  fi
   if [[ ! -e $WARNING_LOG ]] && [[ ! -e $ERROR_LOG ]]; then
 # save apps that were built for bundling
     rm -f $APPS_DIR/*
