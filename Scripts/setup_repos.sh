@@ -90,7 +90,7 @@ SETUP_REMOTE ()
 
 CURDIR=`pwd`
 
-configrepos="cad exp fds fig out smv"
+configrepos="cad cfast exp fds fig out smv"
 fdsrepos="cad exp fds fig out smv test_bundles"
 thirdpartyrepos="hypre sundials freeglut"
 #thirdpartyrepos="hypre sundials ompi"
@@ -323,6 +323,8 @@ do
     fi
   fi
   if [ "$CONFIG_REPOS" != "" ]; then
+    TAG=
+    HASH=
     if [ "$repo" == "cad" ]; then
       TAG=$BUNDLE_CAD_TAG
       HASH=$BUNDLE_CAD_HASH

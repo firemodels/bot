@@ -50,46 +50,36 @@ source $REPOROOT/bot/Bundlebot/release/config.sh
 
 cd $REPOROOT/bot/Scripts
 
+echo cloning hypre
+./setup_repos.sh -K hypre >& $OUTDIR/clone_hypre
+echo "*** hypre cloned"
+
+echo cloning sundials
+./setup_repos.sh -K sundials >& $OUTDIR/clone_sundials
+echo "*** sundials cloned"
+
 echo cloning cad
-./setup_repos.sh -K cad >& $OUTDIR/clone_cad &
-pid_cad=$!
+./setup_repos.sh -K cad >& $OUTDIR/clone_cad 
+echo "*** cad cloned"
 
 echo cloning exp
-./setup_repos.sh -K exp >& $OUTDIR/clone_exp &
-pid_exp=$!
+./setup_repos.sh -K exp >& $OUTDIR/clone_exp 
+echo "*** exp cloned"
 
 echo cloning fds
-./setup_repos.sh -K fds >& $OUTDIR/clone_fds &
-pid_fds=$!
-
-echo cloning fig
-./setup_repos.sh -K fig >& $OUTDIR/clone_fig &
-pid_fig=$!
-
-echo cloning out
-./setup_repos.sh -K out >& $OUTDIR/clone_out &
-pid_out=$!
-
-echo cloning smv
-./setup_repos.sh -K smv >& $OUTDIR/clone_smv &
-pid_smv=$!
-
-wait $pid_cad
-echo "*** cad cloned"
-
-wait $pid_exp
-echo "*** cad cloned"
-
-wait $pid_fds
+./setup_repos.sh -K fds >& $OUTDIR/clone_fds 
 echo "*** fds cloned"
 
-wait $pid_fig
+echo cloning fig
+./setup_repos.sh -K fig >& $OUTDIR/clone_fig 
 echo "*** fig cloned"
 
-wait $pid_out
+echo cloning out
+./setup_repos.sh -K out >& $OUTDIR/clone_out 
 echo "*** out cloned"
 
-wait $pid_smv
+echo cloning smv
+./setup_repos.sh -K smv >& $OUTDIR/clone_smv 
 echo "*** smv cloned"
 
 TAG_REPO cad  $BUNDLE_CAD_HASH $BUNDLE_CAD_TAG
