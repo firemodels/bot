@@ -380,69 +380,39 @@ if [ "$ONLY_INSTALLER" == "" ]; then
   cd $CURDIR/../../Scripts
   if [ "$USE_CURRENT" == "" ]; then
     echo "*** cloning hypre"
-    ./setup_repos.sh -K hypre > $OUTPUTDIR/clone_hypre 2&>1 &
-    pid_clonehypre=$!
+    ./setup_repos.sh -K hypre > $OUTPUTDIR/clone_hypre 2&>1 
+    echo "*** hypre cloned"
 
     echo "*** cloning sundials"
-    ./setup_repos.sh -K sundials > $OUTPUTDIR/clone_sundials 2&>1 &
-    pid_clonesundials=$!
+    ./setup_repos.sh -K sundials > $OUTPUTDIR/clone_sundials 2&>1 
+    echo "*** sundials cloned"
   fi
 
   cd $CURDIR
-  pid_clonefds=
-  pid_clonesmv=
-  pid_cloneall=
   if [ "$BUNDLETYPE" == "nightly" ]; then
     if [ "$USE_CURRENT" == "" ]; then
 
 #*** a nightly bundle - clone fds and smv repos
 
       echo "*** cloning fds"
-      ./clone_repo.sh -F -N -r $FDS_HASH > $OUTPUTDIR/clone_fds 2&>1 &
-      pid_clonefds=$!
+      ./clone_repo.sh -F -N -r $FDS_HASH > $OUTPUTDIR/clone_fds 2&>1
+      echo "*** fds cloned"
 
       echo "*** cloning smv"
-      ./clone_repo.sh -S -N -r $SMV_HASH > $OUTPUTDIR/clone_smv 2&>1 &
-      pid_clonesmv=$!
+      ./clone_repo.sh -S -N -r $SMV_HASH > $OUTPUTDIR/clone_smv 2&>1
+      echo "*** smv cloned"
     fi
   else
 
 #*** a release bundle - clone all repos except for bot
 
     echo "*** cloning all repos "
-    ./clone_all_repos.sh  $OUTPUTDIR > $OUTPUTDIR/clone_all 2&>1 &
-    pid_cloneall=$!
-  fi
-
-  if [ "$pid_clonesmv" != "" ]; then
-    wait $pid_clonesmv
-    echo "*** smv cloned"
-  fi
-  if [ "$pid_cloneall" != "" ]; then
-    wait $pid_cloneall
+    ./clone_all_repos.sh  $OUTPUTDIR > $OUTPUTDIR/clone_all 2&>1
     echo all repos clone complete
   fi
-  ./make_smvapps.sh $SMVDBG &
-  pid_smvapps=$!
 
-  if [ "$pid_clonehypre" != "" ]; then
-    wait $pid_clonehypre
-    echo "*** hypre cloned"
-  fi
-
-  if [ "$pid_clonesundials" != "" ]; then
-    wait $pid_clonesundials
-    echo "*** sundials cloned"
-  fi
-
-  if [ "$pid_clonefds" != "" ]; then
-    wait $pid_clonefds
-    echo "*** fds cloned"
-  fi
-
+  ./make_smvapps.sh $SMVDBG 
   ./make_fdsapps.sh
-
-  wait $pid_smvapps
 fi
 
 if [ "$BUNDLETYPE" != "nightly" ]; then
