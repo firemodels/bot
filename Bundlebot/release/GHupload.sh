@@ -1,4 +1,7 @@
 #!/bin/bash
-FILE=$1
-#placeholder for uploading assets to a github release
-#gh release upload FDS-6.10.1 $FILE  -R github.com/firemodels/fds --clobber
+GHTAG=$1
+FROMDIR=$2
+for file in $DIR/*; do
+  echo uploading $file
+  echo gh release upload $GHTAG $file  -R github.com/firemodels/fds --clobber
+done
