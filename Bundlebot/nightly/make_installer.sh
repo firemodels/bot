@@ -450,7 +450,7 @@ rm \$SMVMODULEtmp
 cat << BASH > \$BASHRCFDS
 # Shell environment settings for FDS and Smokeview
 FDSBINDIR=\$FDS_root/bin
-if [ "\\\$PATH" = "" ]; then
+if [ "\\\$PATH" == "" ]; then
   export PATH=\\\$FDSBINDIR
 else
   export PATH=\\\$FDSBINDIR:\\\$PATH
@@ -465,7 +465,7 @@ BASH
 fi
 if [[ "$ostype" == "OSX" ]]; then
 cat << BASH >> \$BASHRCFDS
-if [ "\\\$DYLD_LIBRARY_PATH" = "" ]; then
+if [ "\\\$DYLD_LIBRARY_PATH" == "" ]; then
   export DYLD_LIBRARY_PATH=\\\$FDSBINDIR/openmpi/lib
 else
   export DYLD_LIBRARY_PATH=\\\$FDSBINDIR/openmpi/lib:\\\$DYLD_LIBRARY_PATH
@@ -482,7 +482,7 @@ fi
 
 if [ "$ostype" == "LINUX" ] ; then
 cat << BASH >> \$BASHRCFDS
-if [ "\\\$LD_LIBRARY_PATH" = "" ]; then
+if [ "\\\$LD_LIBRARY_PATH" == "" ]; then
   export LD_LIBRARY_PATH=/usr/lib64
 else
   export LD_LIBRARY_PATH=/usr/lib64:\\\$LD_LIBRARY_PATH
