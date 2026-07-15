@@ -445,12 +445,12 @@ MODULE
 cp \$SMVMODULEtmp \$FDS_root/bin/modules/$SMVMODULE
 rm \$SMVMODULEtmp
 
-#--- create BASH startup file
+#--- create shell environment file
 
 cat << BASH > \$BASHRCFDS
-#/bin/bash
+# Shell environment settings for FDS and Smokeview
 FDSBINDIR=\$FDS_root/bin
-if [ "\\\$PATH" == "" ]; then
+if [ "\\\$PATH" = "" ]; then
   export PATH=\\\$FDSBINDIR
 else
   export PATH=\\\$FDSBINDIR:\\\$PATH
@@ -465,7 +465,7 @@ BASH
 fi
 if [[ "$ostype" == "OSX" ]]; then
 cat << BASH >> \$BASHRCFDS
-if [ "\\\$DYLD_LIBRARY_PATH" == "" ]; then
+if [ "\\\$DYLD_LIBRARY_PATH" = "" ]; then
   export DYLD_LIBRARY_PATH=\\\$FDSBINDIR/openmpi/lib
 else
   export DYLD_LIBRARY_PATH=\\\$FDSBINDIR/openmpi/lib:\\\$DYLD_LIBRARY_PATH
@@ -482,7 +482,7 @@ fi
 
 if [ "$ostype" == "LINUX" ] ; then
 cat << BASH >> \$BASHRCFDS
-if [ "\\\$LD_LIBRARY_PATH" == "" ]; then
+if [ "\\\$LD_LIBRARY_PATH" = "" ]; then
   export LD_LIBRARY_PATH=/usr/lib64
 else
   export LD_LIBRARY_PATH=/usr/lib64:\\\$LD_LIBRARY_PATH
@@ -518,7 +518,7 @@ chmod +x \$FDS_root/bin/$FDSVARS
 
 SMVVARS_tmp=/tmp/SMVVARS.\$\$
 cat << BASH > \$SMVVARS_tmp
-#/bin/bash
+# Shell environment settings for Smokeview
 export PATH=\$FDS_root/smvbin:\\\$PATH
 BASH
 
@@ -532,7 +532,7 @@ cat << STARTUP > \$STARTUPtmp
 <h4>Defining Environment Variables Used by FDS</h4>
 <ul>
 <li>Add the following lines to one of your startup files
-(usually \$HOME/.bashrc).<br>
+(for example, \$HOME/.bashrc for bash or \$HOME/.zshrc for zsh).<br>
 <pre>
 STARTUP
 
@@ -578,7 +578,7 @@ echo "-----------------------------------------------"
 echo "*** To complete the installation:"
 echo ""
 echo "1. Add the following lines to your startup file"
-echo "   (usually \$HOME/.bashrc)."
+echo "   (for example, \$HOME/.bashrc for bash or \$HOME/.zshrc for zsh)."
 echo ""
 echo "source \$FDS_root/bin/$FDSVARS "
 echo "source \$FDS_root/bin/$SMVVARS "
