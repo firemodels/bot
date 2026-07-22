@@ -32,7 +32,6 @@ mkdir %SMVDISTDIR%\textures
 
 echo ***Copying CFAST executables
 
-call :COPY  %bindir%\CData.exe                %CFASTDISTDIR%\
 if %build_cedit% == 0 goto skip_build_cedit
    call :COPY  %bindir%\CEdit.exe             %CFASTDISTDIR%\
 :skip_build_cedit
@@ -59,7 +58,6 @@ if %build_cedit% == 0 goto skip_build_cedit2
 echo ***Copying CFAST example files
 
 call :COPY  %bindir%\Data\Users_Guide_Example.in %CFASTDISTDIR%\Examples\
-call :COPY  %docdir%\CFAST_CData_Guide\Examples\*.in   %CFASTDISTDIR%\Examples\
 
 echo ***Copying CFAST documentation
 
@@ -68,7 +66,6 @@ call :COPYPDF CFAST_Tech_Ref
 call :COPYPDF CFAST_Users_Guide
 call :COPYPDF CFAST_Validation_Guide
 call :COPYPDF CFAST_Configuration_Guide
-call :COPYPDF CFAST_CData_Guide
 
 echo ***Copying Smokeview files
 

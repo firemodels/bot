@@ -15,7 +15,6 @@ call :copy_file CFAST_Tech_Ref.pdf
 call :copy_file CFAST_Users_Guide.pdf
 call :copy_file CFAST_Validation_Guide.pdf
 call :copy_file CFAST_Configuration_Guide.pdf
-call :copy_file CFAST_CData_Guide.pdf
 set /p CFAST_HASH=<%PDFS%\CFAST_HASH
 set /p CFAST_REVISION=<%PDFS%\CFAST_REVISION
 set /p SMV_HASH=<%PDFS%\SMV_HASH
