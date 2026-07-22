@@ -61,17 +61,6 @@ cd %cfast_root%\Build\CFAST\intel_win
 call make_cfast.bat bot release                                                  >> %stage2out% 2>&1
 call :copy_file . cfast7_win.exe %cfast_root%\Utilities\for_bundle\Bin cfast.exe
 
-@echo.                                                                          >> %stage2out%
-@echo ------------------------------------------------------------------------- >> %stage2out%
-@echo ***Building CDATA                                                         >> %stage2out%
-@echo ------------------------------------------------------------------------- >> %stage2out%
-@echo.                                                                          >> %stage2out%
-
-@echo ***Building CData
-cd %cfast_root%\Build\Cdata\intel_win
-call make_cdata.bat bot release                                                 >> %stage2out% 2>&1
-call :copy_file . cdata7_win.exe %cfast_root%\Utilities\for_bundle\Bin cdata.exe
-
 cd %cfast_root%\Utilities\for_bundle\scripts
 
 goto eof

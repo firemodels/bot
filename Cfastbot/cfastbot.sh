@@ -1192,11 +1192,6 @@ fi
   ./make_guide.sh &> $OUTPUT_DIR/stage6_cfast_config_guide
   check_guide $OUTPUT_DIR/stage6_cfast_config_guide $cfastrepo/Manuals/CFAST_Configuration_Guide CFAST_Configuration_Guide.pdf 'CFAST Configuration Guide'
 
-  echo Building CData guide
-  cd $cfastrepo/Manuals/CFAST_CData_Guide
-  ./make_guide.sh &> $OUTPUT_DIR/stage6_cdata_guide
-  check_guide $OUTPUT_DIR/stage6_cdata_guide $cfastrepo/Manuals/CFAST_CData_Guide CFAST_CData_Guide.pdf 'CData Guide'
-
 #*** output hashes needed for bundling
   VERSION_LATEST=$HOME/.cfastbot/VERSION_LATEST
   mkdir -p ${VERSION_LATEST}
@@ -1215,7 +1210,6 @@ if [[ ! -e $ERROR_LOG ]] && [[ ! -e $WARNING_LOG ]]; then
   mkdir -p ${VERSION}
   rm -f ${VERSION}/*
   cp ${VERSION_LATEST}/*                                                        ${VERSION}/.
-  cp $cfastrepo/Manuals/CFAST_CData_Guide/CFAST_CData_Guide.pdf                 ${VERSION}/.
   cp $cfastrepo/Manuals/CFAST_Configuration_Guide/CFAST_Configuration_Guide.pdf ${VERSION}/.
   cp $cfastrepo/Manuals/CFAST_Validation_Guide/CFAST_Validation_Guide.pdf       ${VERSION}/.
   cp $cfastrepo/Manuals/CFAST_Users_Guide/CFAST_Users_Guide.pdf                 ${VERSION}/.
