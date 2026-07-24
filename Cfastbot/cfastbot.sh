@@ -801,6 +801,11 @@ WARNING_LOG=$OUTPUT_DIR/warnings
 NEWGUIDE_DIR=$OUTPUT_DIR/NEW_GUIDES
 VALIDATION_STATS_LOG=$OUTPUT_DIR/statistics
 
+#*** remove warning and error logs from a previous cfastbot run
+
+rm -f $WARNING_LOG
+rm -f $ERROR_LOG
+
 echo ""
 echo "Settings"
 echo "--------"
