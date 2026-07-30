@@ -278,7 +278,15 @@ vv_jobs_remaining()
    job_ids=`awk '/Submitted batch job/ {print $4}' "$run_log" 2>/dev/null | paste -sd, -`
 
    if [[ "$job_ids" != "" ]]; then
-      squeue -h -j "$job_ids" 2>/dev/null | wc -l | tr -d ' '
+      squeue -h -u "$(whoami)" -o "%i" 2>/dev/null | \
+         awk -v ids="$job_ids" '
+            BEGIN {
+               split(ids, job_array, ",")
+               for (i in job_array) wanted[job_array[i]] = 1
+            }
+            $1 in wanted {count++}
+            END {print count + 0}
+         '
    else
       squeue -h -o "%.18j %.8u %.2t" 2>/dev/null | \
          awk -v user="$(whoami)" -v prefix="$JOBPREFIX" \
@@ -295,6 +303,19 @@ wait_vv_cases()
    local run_log="$1"
    local time_limit_stage="$2"
    local case_label="$3"
+   local job_ids
+   local barrier_status
+
+   job_ids=`awk '/Submitted batch job/ {ids = ids sep $4; sep = ":"} END {print ids}' "$run_log" 2>/dev/null`
+   if [[ "$job_ids" != "" && "$QUEUE" != "" && "$QUEUE" != "terminal" && "$QUEUE" != "none" ]]; then
+      echo "Waiting for Slurm barrier after ${case_label} cases complete." >> "$run_log"
+      sbatch -p "$QUEUE" --ignore-pbs --wait --dependency=afterany:$job_ids -J "${JOBPREFIX}vv_barrier" --wrap="true" >> "$run_log" 2>&1
+      barrier_status=$?
+      if [[ "$barrier_status" == "0" ]]; then
+         return 0
+      fi
+      echo "***warning: Slurm barrier wait failed; falling back to polling submitted jobs." >> "$run_log"
+   fi
 
    while true; do
       JOBS_REMAINING=`vv_jobs_remaining "$run_log"`
