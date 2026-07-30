@@ -152,8 +152,8 @@ set_files_world_readable()
 check_compile_cfast_db()
 {
    # Check for errors in CFAST debug compilation
-   cd $cfastrepo/Build/CFAST/intel_${platform}_db
-   if [ -e "cfast7_${platform}_db" ]
+   cd $cfastrepo/Build/CFAST/intel_${cfast_platform}_db
+   if [ -e "cfast8_${cfast_platform}_db" ]
    then
       stage2_build_cfast_debug_success=true
    else
@@ -181,8 +181,8 @@ check_compile_cfast_db()
 check_compile_cfast()
 {
    # Check for errors in CFAST release compilation
-   cd $cfastrepo/Build/CFAST/intel_${platform}
-   if [[ -e "cfast7_${platform}" ]]
+   cd $cfastrepo/Build/CFAST/intel_${cfast_platform}
+   if [[ -e "cfast8_${cfast_platform}" ]]
    then
       stage2_build_cfast_release_success=true
    else
@@ -1003,7 +1003,12 @@ platform="linux"
 if [ "`uname`" == "Darwin" ] ; then
   platform="osx"
 fi
+cfast_platform=$platform
+if [ "$cfast_platform" == "osx" ] ; then
+  cfast_platform="macos"
+fi
 export platform
+export cfast_platform
 
 echo "   platform: $platform"
 echo "   compiler: intel"
@@ -1099,14 +1104,14 @@ cd $cur_dir
 echo "Building"
 echo "   cfast"
 echo "      Intel debug"
-cd $cfastrepo/Build/CFAST/intel_${platform}_db
+cd $cfastrepo/Build/CFAST/intel_${cfast_platform}_db
 make -f ../makefile clean &> /dev/null
 ./make_cfast.sh &> $OUTPUT_DIR/stage2_build_cfast_debug
 check_compile_cfast_db || exit 1
 
 #*** build release cfast
 echo "      release"
-cd $cfastrepo/Build/CFAST/intel_${platform}
+cd $cfastrepo/Build/CFAST/intel_${cfast_platform}
 make -f ../makefile clean &> /dev/null
 ./make_cfast.sh &> $OUTPUT_DIR/stage2_build_cfast_release
 check_compile_cfast || exit 1
