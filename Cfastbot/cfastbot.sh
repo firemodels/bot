@@ -304,8 +304,6 @@ wait_vv_cases_debug_end()
 
 run_vv_cases_debug()
 {
-   cd $cfastrepo/Validation/scripts
-
    #  =======================
    #  = Run all cfast cases =
    #  =======================
@@ -314,6 +312,11 @@ run_vv_cases_debug()
    echo 'Running CFAST V&V cases'
    echo '   debug'
    echo 'Running CFAST V&V cases' >> $OUTPUT_DIR/stage3_run_debug 2>&1
+
+   cd $cfastrepo/Verification/scripts
+   ./Run_CFAST_Cases.sh -I intel -S $smvrepo -m 2 -d -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage3_run_debug 2>&1
+
+   cd $cfastrepo/Validation/scripts
    ./Run_CFAST_Cases.sh -I intel -S $smvrepo -m 2 -d -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage3_run_debug 2>&1
    wait_vv_cases_debug_start
 
@@ -421,9 +424,13 @@ wait_vv_cases_release_end()
 run_vv_cases_release()
 {
    # Start running all CFAST V&V cases
-   cd $cfastrepo/Validation/scripts
    echo '   release'
    echo 'Running CFAST V&V cases' >> $OUTPUT_DIR/stage3_run_release 2>&1
+
+   cd $cfastrepo/Verification/scripts
+   ./Run_CFAST_Cases.sh -I intel -S $smvrepo -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage3_run_release 2>&1
+
+   cd $cfastrepo/Validation/scripts
    ./Run_CFAST_Cases.sh -I intel -S $smvrepo -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage3_run_release 2>&1
    wait_vv_cases_release_start
 
