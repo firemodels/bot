@@ -3,10 +3,24 @@
 This directory contains scripts for building cfast bundles.
 
 ### Building a nightly bundle
-1. cd into `FireModels_cbundle\bot\Bundlebot\cfast\nightly
+On Windows:
+
+1. cd into `FireModels_cbundle\bot\Bundlebot\cfast\nightly`
 2. type: `BuildCfastNightly.bat`
 
-This builds a cfast bundle using repo revision from the lastest cfastbot pass.
+On Linux:
+
+1. cd into `FireModels_cbundle/bot/Bundlebot/cfast/nightly`
+2. type: `./BuildCfastNightly.sh`
+
+The Windows script builds a cfast bundle using repo revisions from the latest
+cfastbot pass. The Linux script builds a cfast bundle from the current parallel
+`cfast` and `smv` repos, normally after cfastbot has generated the manuals.
+
+The Linux bundle path rebuilds CEditQt, calls
+`cfast/Build/bundle/build_linux_bundle.sh`, writes the bundle to
+`$HOME/.bundle/bundles`, and uploads it to the CFAST test bundle release when
+requested.
 
 
 

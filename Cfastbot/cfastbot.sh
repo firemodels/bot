@@ -152,8 +152,8 @@ set_files_world_readable()
 check_compile_cfast_db()
 {
    # Check for errors in CFAST debug compilation
-   cd $cfastrepo/Build/CFAST/intel_${platform}_db
-   if [ -e "cfast7_${platform}_db" ]
+   cd $cfastrepo/Build/CFAST/intel_${cfast_platform}_db
+   if [ -e "cfast8_${cfast_platform}_db" ]
    then
       stage2_build_cfast_debug_success=true
    else
@@ -181,8 +181,8 @@ check_compile_cfast_db()
 check_compile_cfast()
 {
    # Check for errors in CFAST release compilation
-   cd $cfastrepo/Build/CFAST/intel_${platform}
-   if [[ -e "cfast7_${platform}" ]]
+   cd $cfastrepo/Build/CFAST/intel_${cfast_platform}
+   if [[ -e "cfast8_${cfast_platform}" ]]
    then
       stage2_build_cfast_release_success=true
    else
@@ -267,35 +267,66 @@ check_compile_smv()
 }
 
 #---------------------------------------------
-#                   wait_vv_cases_debug_start
+#                   vv_jobs_remaining
 #---------------------------------------------
 
-wait_vv_cases_debug_start()
+vv_jobs_remaining()
 {
-   # Scans job queue and waits for V&V cases to start
-   while [[          `squeue -o "%.18j %.8u %.2t" | awk '{print $1 $2 $3}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$'` != '' ]]; do
-      JOBS_REMAINING=`squeue -o "%.18j %.8u %.2t" | awk '{print $1 $2 $3}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$' | wc -l`
-      echo "Waiting for ${JOBS_REMAINING} V&V cases to start." >> $OUTPUT_DIR/stage3_run_debug
-      TIME_LIMIT_STAGE="3 run debug cases"
-      check_time_limit
-      sleep 30
-   done
+   local run_log="$1"
+   local job_ids
+
+   job_ids=`awk '/Submitted batch job/ {print $4}' "$run_log" 2>/dev/null | paste -sd, -`
+
+   if [[ "$job_ids" != "" ]]; then
+      squeue -h -u "$(whoami)" -o "%i" 2>/dev/null | \
+         awk -v ids="$job_ids" '
+            BEGIN {
+               split(ids, job_array, ",")
+               for (i in job_array) wanted[job_array[i]] = 1
+            }
+            $1 in wanted {count++}
+            END {print count + 0}
+         '
+   else
+      squeue -h -o "%.18j %.8u %.2t" 2>/dev/null | \
+         awk -v user="$(whoami)" -v prefix="$JOBPREFIX" \
+         '$2 == user && index($1, prefix) == 1 && $3 != "C" {count++} END {print count + 0}'
+   fi
 }
 
 #---------------------------------------------
-#                   wait_vv_cases_debug_end
+#                   wait_vv_cases
 #---------------------------------------------
 
-wait_vv_cases_debug_end()
+wait_vv_cases()
 {
-  # Scans job queue and waits for V&V cases to end
-  while [[          `squeue -o "%.18j %.8u %.2t" | awk '{print $1 $2 $3}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$'` != '' ]]; do
-     JOBS_REMAINING=`squeue -o "%.18j %.8u %.2t" | awk '{print $1 $2 $3}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$' | wc -l`
-     echo "Waiting for ${JOBS_REMAINING} ${1} cases to complete." >> $OUTPUT_DIR/stage3_run_debug
-     TIME_LIMIT_STAGE="3 run debug cases"
-     check_time_limit
-     sleep 30
-  done
+   local run_log="$1"
+   local time_limit_stage="$2"
+   local case_label="$3"
+   local job_ids
+   local barrier_status
+
+   job_ids=`awk '/Submitted batch job/ {ids = ids sep $4; sep = ":"} END {print ids}' "$run_log" 2>/dev/null`
+   if [[ "$job_ids" != "" && "$QUEUE" != "" && "$QUEUE" != "terminal" && "$QUEUE" != "none" ]]; then
+      echo "Waiting for Slurm barrier after ${case_label} cases complete." >> "$run_log"
+      sbatch -p "$QUEUE" --ignore-pbs --wait --dependency=afterany:$job_ids -J "${JOBPREFIX}vv_barrier" --wrap="true" >> "$run_log" 2>&1
+      barrier_status=$?
+      if [[ "$barrier_status" == "0" ]]; then
+         return 0
+      fi
+      echo "***warning: Slurm barrier wait failed; falling back to polling submitted jobs." >> "$run_log"
+   fi
+
+   while true; do
+      JOBS_REMAINING=`vv_jobs_remaining "$run_log"`
+      if [[ "$JOBS_REMAINING" == "" || "$JOBS_REMAINING" == "0" ]]; then
+         break
+      fi
+      echo "Waiting for ${JOBS_REMAINING} ${case_label} cases to complete." >> "$run_log"
+      TIME_LIMIT_STAGE="$time_limit_stage"
+      check_time_limit
+      sleep 30
+   done
 }
 
 #---------------------------------------------
@@ -304,7 +335,8 @@ wait_vv_cases_debug_end()
 
 run_vv_cases_debug()
 {
-   cd $cfastrepo/Validation/scripts
+   local verification_log="$OUTPUT_DIR/stage3_run_debug_verification"
+   local validation_log="$OUTPUT_DIR/stage3_run_debug_validation"
 
    #  =======================
    #  = Run all cfast cases =
@@ -314,11 +346,18 @@ run_vv_cases_debug()
    echo 'Running CFAST V&V cases'
    echo '   debug'
    echo 'Running CFAST V&V cases' >> $OUTPUT_DIR/stage3_run_debug 2>&1
-   ./Run_CFAST_Cases.sh -I intel -S $smvrepo -m 2 -d -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage3_run_debug 2>&1
-   wait_vv_cases_debug_start
 
-   # Wait for V&V cases to end
-   wait_vv_cases_debug_end
+   : > "$verification_log"
+   cd $cfastrepo/Verification/scripts
+   ./Run_CFAST_Cases.sh -I intel -S $smvrepo -m 2 -d -j $JOBPREFIX -q $QUEUE >> "$verification_log" 2>&1
+   wait_vv_cases "$verification_log" "3 run debug verification cases" "debug verification"
+   cat "$verification_log" >> $OUTPUT_DIR/stage3_run_debug 2>&1
+
+   : > "$validation_log"
+   cd $cfastrepo/Validation/scripts
+   ./Run_CFAST_Cases.sh -I intel -S $smvrepo -m 2 -d -j $JOBPREFIX -q $QUEUE >> "$validation_log" 2>&1
+   wait_vv_cases "$validation_log" "3 run debug validation cases" "debug validation"
+   cat "$validation_log" >> $OUTPUT_DIR/stage3_run_debug 2>&1
    return 0
 }
 
@@ -383,52 +422,29 @@ check_vv_cases_debug()
 }
 
 #---------------------------------------------
-#                   wait_vv_cases_release_start
-#---------------------------------------------
-
-wait_vv_cases_release_start()
-{
-   # Scans job queue and waits for V&V cases to start
-   while [[          `squeue -o "%.18j %.8u %.2t" | awk '{print $1 $2 $3}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$'` != '' ]]; do
-      JOBS_REMAINING=`squeue -o "%.18j %.8u %.2t" | awk '{print $1 $2 $3}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$' | wc -l`
-      echo "Waiting for ${JOBS_REMAINING} V&V cases to start." >> $OUTPUT_DIR/stage3_run_release
-      TIME_LIMIT_STAGE="3 run release cases"
-      check_time_limit
-      sleep 30
-   done
-}
-
-#---------------------------------------------
-#                  wait_vv_cases_release_end
-#---------------------------------------------
-
-wait_vv_cases_release_end()
-{
-  # Scans job queue and waits for V&V cases to end
-  while [[          `squeue -o "%.18j %.8u %.2t" | awk '{print $1 $2 $3}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$'` != '' ]]; do
-     JOBS_REMAINING=`squeue -o "%.18j %.8u %.2t" | awk '{print $1 $2 $3}' | grep $(whoami) | grep $JOBPREFIX | grep -v 'C$' | wc -l`
-     echo "Waiting for ${JOBS_REMAINING} verification cases to complete." >> $OUTPUT_DIR/stage3_run_release
-     TIME_LIMIT_STAGE="3 run release cases"
-     check_time_limit
-     sleep 30
-  done
-}
-
-#---------------------------------------------
 #                   run_vv_cases_release
 #---------------------------------------------
 
 run_vv_cases_release()
 {
+   local verification_log="$OUTPUT_DIR/stage3_run_release_verification"
+   local validation_log="$OUTPUT_DIR/stage3_run_release_validation"
+
    # Start running all CFAST V&V cases
-   cd $cfastrepo/Validation/scripts
    echo '   release'
    echo 'Running CFAST V&V cases' >> $OUTPUT_DIR/stage3_run_release 2>&1
-   ./Run_CFAST_Cases.sh -I intel -S $smvrepo -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage3_run_release 2>&1
-   wait_vv_cases_release_start
 
-   # Wait for all V&V cases to end
-   wait_vv_cases_release_end
+   : > "$verification_log"
+   cd $cfastrepo/Verification/scripts
+   ./Run_CFAST_Cases.sh -I intel -S $smvrepo -j $JOBPREFIX -q $QUEUE >> "$verification_log" 2>&1
+   wait_vv_cases "$verification_log" "3 run release verification cases" "release verification"
+   cat "$verification_log" >> $OUTPUT_DIR/stage3_run_release 2>&1
+
+   : > "$validation_log"
+   cd $cfastrepo/Validation/scripts
+   ./Run_CFAST_Cases.sh -I intel -S $smvrepo -j $JOBPREFIX -q $QUEUE >> "$validation_log" 2>&1
+   wait_vv_cases "$validation_log" "3 run release validation cases" "release validation"
+   cat "$validation_log" >> $OUTPUT_DIR/stage3_run_release 2>&1
    return 0
 }
 
@@ -1003,7 +1019,12 @@ platform="linux"
 if [ "`uname`" == "Darwin" ] ; then
   platform="osx"
 fi
+cfast_platform=$platform
+if [ "$cfast_platform" == "osx" ] ; then
+  cfast_platform="macos"
+fi
 export platform
+export cfast_platform
 
 echo "   platform: $platform"
 echo "   compiler: intel"
@@ -1099,14 +1120,14 @@ cd $cur_dir
 echo "Building"
 echo "   cfast"
 echo "      Intel debug"
-cd $cfastrepo/Build/CFAST/intel_${platform}_db
+cd $cfastrepo/Build/CFAST/intel_${cfast_platform}_db
 make -f ../makefile clean &> /dev/null
 ./make_cfast.sh &> $OUTPUT_DIR/stage2_build_cfast_debug
 check_compile_cfast_db || exit 1
 
 #*** build release cfast
 echo "      release"
-cd $cfastrepo/Build/CFAST/intel_${platform}
+cd $cfastrepo/Build/CFAST/intel_${cfast_platform}
 make -f ../makefile clean &> /dev/null
 ./make_cfast.sh &> $OUTPUT_DIR/stage2_build_cfast_release
 check_compile_cfast || exit 1
