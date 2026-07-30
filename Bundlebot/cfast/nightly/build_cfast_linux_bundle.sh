@@ -156,6 +156,8 @@ fi
 
 bundle_args=(
   --output-dir "$BUNDLE_DIR"
+  --cfast-exe "$CFAST_REPO/Build/CFAST/intel_linux/cfast8_linux"
+  --smokeview-exe "$SMV_REPO/Build/smokeview/intel_linux/smokeview_linux"
 )
 
 if [[ "$INCLUDE_CEDIT" == "0" ]]; then
