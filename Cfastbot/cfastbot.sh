@@ -650,6 +650,60 @@ check_guide()
 }
 
 #---------------------------------------------
+#                   upload_linux_bundle
+#---------------------------------------------
+
+upload_linux_bundle()
+{
+   local bundle_script=$BUNDLE2GH
+   local bundle_log=$OUTPUT_DIR/stage7_upload_linux_bundle
+   local gh_repo=${GH_REPO:-test_bundles}
+   local gh_cfast_tag=${GH_CFAST_TAG:-CFAST_TEST}
+   local python_exe
+
+   if [[ "$UPLOAD" != "1" || "$platform" != "linux" ]]; then
+      return 0
+   fi
+
+   if [[ -e $ERROR_LOG || -e $WARNING_LOG ]]; then
+      return 0
+   fi
+
+   echo "Building and uploading CFAST Linux bundle"
+
+   if [[ ! -x $bundle_script ]]; then
+      echo "Errors from Stage 7 - Build/upload CFAST Linux bundle:" >> $ERROR_LOG
+      echo "***error: CFAST Linux bundle script not found: $bundle_script" >> $ERROR_LOG
+      echo "" >> $ERROR_LOG
+      return 1
+   fi
+
+   python_exe=`command -v python 2>/dev/null`
+   if [[ "$python_exe" == "" ]]; then
+      python_exe=`command -v python3 2>/dev/null`
+   fi
+   if [[ "$python_exe" == "" ]]; then
+      echo "Errors from Stage 7 - Build/upload CFAST Linux bundle:" >> $ERROR_LOG
+      echo "***error: python not found" >> $ERROR_LOG
+      echo "" >> $ERROR_LOG
+      return 1
+   fi
+
+   cd "$(dirname "$bundle_script")"
+   if "$bundle_script" -U --python "$python_exe" > $bundle_log 2>&1; then
+      echo "" >> $TIME_LOG
+      echo "Linux Bundle: https://github.com/firemodels/${gh_repo}/releases/tag/${gh_cfast_tag}" >> $TIME_LOG
+   else
+      echo "Errors from Stage 7 - Build/upload CFAST Linux bundle:" >> $ERROR_LOG
+      cat $bundle_log >> $ERROR_LOG
+      echo "" >> $ERROR_LOG
+      return 1
+   fi
+
+   return 0
+}
+
+#---------------------------------------------
 #                   CHECKOUT_REPO
 #---------------------------------------------
 
@@ -1049,6 +1103,7 @@ fi
 
 export JOBPREFIX=cb_
 GUIDES2GH=$cfastbotdir/guides2GH.sh
+BUNDLE2GH=$botrepo/Bundlebot/cfast/nightly/BuildCfastNightly.sh
 
 #  ==============================================
 #  = CFASTbot timing and notification mechanism =
@@ -1225,6 +1280,9 @@ fi
   echo $SMV_SHORTHASH   > ${VERSION_LATEST}/SMV_HASH
   echo $CFAST_REV       > ${VERSION_LATEST}/CFAST_REVISION
   echo $SMV_REV         > ${VERSION_LATEST}/SMV_REVISION
+
+### Stage 7 ###
+upload_linux_bundle
 
 ### Report results ###
 set_files_world_readable || exit 1
