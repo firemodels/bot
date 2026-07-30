@@ -330,20 +330,14 @@ wait_vv_cases()
 }
 
 #---------------------------------------------
-#                   wait_vv_cases_debug_end
-#---------------------------------------------
-
-wait_vv_cases_debug_end()
-{
-   wait_vv_cases "$OUTPUT_DIR/stage3_run_debug" "3 run debug cases" "${1:-V&V}"
-}
-
-#---------------------------------------------
 #                   run_vv_cases_debug
 #---------------------------------------------
 
 run_vv_cases_debug()
 {
+   local verification_log="$OUTPUT_DIR/stage3_run_debug_verification"
+   local validation_log="$OUTPUT_DIR/stage3_run_debug_validation"
+
    #  =======================
    #  = Run all cfast cases =
    #  =======================
@@ -353,13 +347,17 @@ run_vv_cases_debug()
    echo '   debug'
    echo 'Running CFAST V&V cases' >> $OUTPUT_DIR/stage3_run_debug 2>&1
 
+   : > "$verification_log"
    cd $cfastrepo/Verification/scripts
-   ./Run_CFAST_Cases.sh -I intel -S $smvrepo -m 2 -d -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage3_run_debug 2>&1
+   ./Run_CFAST_Cases.sh -I intel -S $smvrepo -m 2 -d -j $JOBPREFIX -q $QUEUE >> "$verification_log" 2>&1
+   wait_vv_cases "$verification_log" "3 run debug verification cases" "debug verification"
+   cat "$verification_log" >> $OUTPUT_DIR/stage3_run_debug 2>&1
 
+   : > "$validation_log"
    cd $cfastrepo/Validation/scripts
-   ./Run_CFAST_Cases.sh -I intel -S $smvrepo -m 2 -d -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage3_run_debug 2>&1
-   # Wait for V&V cases to end
-   wait_vv_cases_debug_end
+   ./Run_CFAST_Cases.sh -I intel -S $smvrepo -m 2 -d -j $JOBPREFIX -q $QUEUE >> "$validation_log" 2>&1
+   wait_vv_cases "$validation_log" "3 run debug validation cases" "debug validation"
+   cat "$validation_log" >> $OUTPUT_DIR/stage3_run_debug 2>&1
    return 0
 }
 
@@ -424,31 +422,29 @@ check_vv_cases_debug()
 }
 
 #---------------------------------------------
-#                  wait_vv_cases_release_end
-#---------------------------------------------
-
-wait_vv_cases_release_end()
-{
-   wait_vv_cases "$OUTPUT_DIR/stage3_run_release" "3 run release cases" "${1:-V&V}"
-}
-
-#---------------------------------------------
 #                   run_vv_cases_release
 #---------------------------------------------
 
 run_vv_cases_release()
 {
+   local verification_log="$OUTPUT_DIR/stage3_run_release_verification"
+   local validation_log="$OUTPUT_DIR/stage3_run_release_validation"
+
    # Start running all CFAST V&V cases
    echo '   release'
    echo 'Running CFAST V&V cases' >> $OUTPUT_DIR/stage3_run_release 2>&1
 
+   : > "$verification_log"
    cd $cfastrepo/Verification/scripts
-   ./Run_CFAST_Cases.sh -I intel -S $smvrepo -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage3_run_release 2>&1
+   ./Run_CFAST_Cases.sh -I intel -S $smvrepo -j $JOBPREFIX -q $QUEUE >> "$verification_log" 2>&1
+   wait_vv_cases "$verification_log" "3 run release verification cases" "release verification"
+   cat "$verification_log" >> $OUTPUT_DIR/stage3_run_release 2>&1
 
+   : > "$validation_log"
    cd $cfastrepo/Validation/scripts
-   ./Run_CFAST_Cases.sh -I intel -S $smvrepo -j $JOBPREFIX -q $QUEUE >> $OUTPUT_DIR/stage3_run_release 2>&1
-   # Wait for all V&V cases to end
-   wait_vv_cases_release_end
+   ./Run_CFAST_Cases.sh -I intel -S $smvrepo -j $JOBPREFIX -q $QUEUE >> "$validation_log" 2>&1
+   wait_vv_cases "$validation_log" "3 run release validation cases" "release validation"
+   cat "$validation_log" >> $OUTPUT_DIR/stage3_run_release 2>&1
    return 0
 }
 
