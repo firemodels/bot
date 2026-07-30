@@ -59,7 +59,7 @@ call %cfast_root%\Build\scripts\setup_intel_compilers.bat intel64               
 @echo ***Building CFAST
 cd %cfast_root%\Build\CFAST\intel_win
 call make_cfast.bat bot release                                                  >> %stage2out% 2>&1
-call :copy_file . cfast7_win.exe %cfast_root%\Utilities\for_bundle\Bin cfast.exe
+call :copy_file . cfast8_win.exe %cfast_root%\Utilities\for_bundle\Bin cfast.exe
 
 cd %cfast_root%\Utilities\for_bundle\scripts
 
