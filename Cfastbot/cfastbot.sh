@@ -657,8 +657,6 @@ upload_linux_bundle()
 {
    local bundle_script=$BUNDLE2GH
    local bundle_log=$OUTPUT_DIR/stage7_upload_linux_bundle
-   local gh_repo=${GH_REPO:-test_bundles}
-   local gh_cfast_tag=${GH_CFAST_TAG:-CFAST_TEST}
    local python_exe
 
    if [[ "$UPLOAD" != "1" || "$platform" != "linux" ]]; then
@@ -691,8 +689,7 @@ upload_linux_bundle()
 
    cd "$(dirname "$bundle_script")"
    if "$bundle_script" -U --python "$python_exe" > $bundle_log 2>&1; then
-      echo "" >> $TIME_LOG
-      echo "Linux Bundle: https://github.com/firemodels/${gh_repo}/releases/tag/${gh_cfast_tag}" >> $TIME_LOG
+      return 0
    else
       echo "Errors from Stage 7 - Build/upload CFAST Linux bundle:" >> $ERROR_LOG
       cat $bundle_log >> $ERROR_LOG
@@ -835,8 +832,8 @@ email_build_status()
          cd $cfastbotdir
          $GUIDES2GH $cfastrepo/Manuals >& $OUTPUT_DIR/stage7_upload
          GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_CFAST_TAG
-         echo ""                >> $TIME_LOG
-         echo "Guides: $GITURL" >> $TIME_LOG
+         echo ""                                  >> $TIME_LOG
+         echo "Linux bundle, Manuals: $GITURL"    >> $TIME_LOG
       fi
       # Send empty email with success message
       cat $TIME_LOG | mail $REPLYTO -s "CFASTbot build success on ${hostname}! Revision ${GIT_REVISION}." $mailTo &> /dev/null
