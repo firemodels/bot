@@ -26,6 +26,7 @@ echo "-F config.sh  - clone repos using revision and tags in config.sh"
 echo "-o - specify GH_OWNER when uploading manuals. [default: $GH_OWNER]"
 echo "-r - specify GH_REPO when uploading manuals. [default: $GH_REPO]"
 echo "-U - upload guide (only if authenticated at gitub)"
+echo "--test-UI - submit CEditQt import/rewrite tests for V&V cases"
 exit
 }
 
@@ -73,6 +74,22 @@ FORCE=
 KILL_CFASTBOT=
 RUNAUTO=
 UPLOAD=
+TEST_UI=
+
+args=()
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --test-UI)
+      TEST_UI=--test-UI
+      shift
+      ;;
+    *)
+      args+=("$1")
+      shift
+      ;;
+  esac
+done
+set -- "${args[@]}"
 
 #*** parse command line options
 while getopts 'aCfF:hikm:o:q:r:U' OPTION
@@ -162,6 +179,6 @@ REPO="-r $reporoot"
 QUEUE="-q $QUEUE"
 PID="-p $cfastbot_pid"
 cd $CURDIR
-echo   ./cfastbot.sh $PID $REPO $CLONEREPOS $RUNAUTO $CONFIG $QUEUE $UPLOAD $EMAIL "$@"
-       ./cfastbot.sh $PID $REPO $CLONEREPOS $RUNAUTO $CONFIG $QUEUE $UPLOAD $EMAIL "$@"
+echo   ./cfastbot.sh $PID $REPO $CLONEREPOS $RUNAUTO $CONFIG $QUEUE $UPLOAD $TEST_UI $EMAIL "$@"
+       ./cfastbot.sh $PID $REPO $CLONEREPOS $RUNAUTO $CONFIG $QUEUE $UPLOAD $TEST_UI $EMAIL "$@"
 rm -f $cfastbot_pid
