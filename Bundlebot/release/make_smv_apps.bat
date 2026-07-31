@@ -38,7 +38,6 @@ timeout /t 30 > Nul
 :: build smokeview libraries and apps
 call :BUILDLIB
 call :BUILD     fds2fed
-call :BUILD     flush
 call :BUILD     get_time
 call :BUILD     set_path
 call :BUILD     pnginfo
@@ -50,7 +49,6 @@ call :BUILDSMV
 
 :: verify smokeview apps were built
 call :CHECK_BUILD     fds2fed
-call :CHECK_BUILD     flush
 call :CHECK_BUILD     get_time
 call :CHECK_BUILD     set_path
 call :CHECK_BUILD     pnginfo

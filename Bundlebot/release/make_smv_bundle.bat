@@ -45,7 +45,6 @@ copy %forbundle%\*.png %smvdir%\.>Nul
 
 CALL :COPY  %forbundle%\volrender.ssf %smvdir%\volrender.ssf
 
-CALL :COPY  %reporoot%\smv\Build\flush\intel_win\flush_win.exe           %smvdir%\flush.exe
 CALL :COPY  %reporoot%\smv\Build\smokediff\intel_win\smokediff_win.exe   %smvdir%\smokediff.exe
 CALL :COPY  %reporoot%\smv\Build\pnginfo\intel_win\pnginfo_win.exe       %smvdir%\pnginfo.exe
 CALL :COPY  %reporoot%\smv\Build\fds2fed\intel_win\fds2fed_win.exe       %smvdir%\fds2fed.exe
