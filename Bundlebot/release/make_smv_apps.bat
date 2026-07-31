@@ -42,7 +42,6 @@ call :BUILD     set_path
 call :BUILD     pnginfo
 call :BUILD     smokediff
 call :BUILD     smokezip
-call :BUILD     timep
 call :BUILD     wind2fds
 call :BUILDSMV
 
@@ -52,7 +51,6 @@ call :CHECK_BUILD     set_path
 call :CHECK_BUILD     pnginfo
 call :CHECK_BUILD     smokediff
 call :CHECK_BUILD     smokezip
-call :CHECK_BUILD     timep
 call :CHECK_BUILD     wind2fds
 call :CHECK_BUILDSMV
 
