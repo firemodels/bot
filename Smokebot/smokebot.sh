@@ -270,7 +270,7 @@ compile_cfast()
     # Build CFAST
     echo "   release cfast"
     cd $cfastrepo/Build/CFAST/${COMPILER}_${platform}
-    rm -f cfast7_${platform}
+    rm -f cfast8_${platform}
     make --makefile ../makefile clean &> /dev/null
     ./make_cfast.sh >> $OUTPUT_DIR/compile_cfast.log 2>&1
 }
@@ -300,7 +300,7 @@ check_compile_cfast()
 {
    # Check for errors in CFAST compilation
    cd $cfastrepo/Build/CFAST/${COMPILER}_${platform}
-   if [ -e "cfast7_${platform}" ]
+   if [ -e "cfast8_${platform}" ]
    then
       stage2_build_cfast=true
    else
