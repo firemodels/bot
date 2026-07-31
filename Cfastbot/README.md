@@ -42,6 +42,19 @@ If you just want to test your local versions of `cfast`, `smv`, and `exp`, issue
 ```
 nohup ./run_cfastbot.sh -q <queue> -m <email address> &
 ```
+
+To also test that the CFAST Verification and Validation input files can be loaded
+and rewritten by CEditQt, add `--test-UI`:
+```
+nohup ./run_cfastbot.sh -q <queue> -m <email address> --test-UI &
+```
+This option runs after the release CFAST command-line cases are submitted. It
+uses the same Verification and Validation case lists, but each Slurm job only
+starts CEditQt in headless import/rewrite mode. It does not run CFAST a second
+time. CFASTbot initializes the Python environment near the start of the run so
+that the CEditQt tests and later plotting scripts use the same configured
+environment.
+
 You can start CFASTbot at some future time using `crontab` with an entry like the following:
 ```
 PATH=/bin:/usr/bin:/usr/local/bin:/home/<username>/firemodels/bot/Cfastbot:$PATH

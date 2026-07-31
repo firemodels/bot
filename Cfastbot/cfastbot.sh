@@ -146,6 +146,35 @@ set_files_world_readable()
 }
 
 #---------------------------------------------
+#                   setup_python_environment
+#---------------------------------------------
+
+setup_python_environment()
+{
+   local setup_log="$1"
+
+   if [ "$PYTHON_ENV_ACTIVE" == "1" ]; then
+      echo "Python environment already active." > "$setup_log"
+      return 0
+   fi
+
+   cd $botrepo/Firebot/
+   source ./setup_python.sh > "$setup_log" 2>&1
+   local setup_status=$?
+   cd $cfastbotdir
+
+   if [ "$setup_status" != "0" ]; then
+      echo "Errors from Stage 0 - Setup Python environment:" >> $ERROR_LOG
+      cat "$setup_log" >> $ERROR_LOG
+      echo "" >> $ERROR_LOG
+      return 1
+   fi
+
+   PYTHON_ENV_ACTIVE=1
+   return 0
+}
+
+#---------------------------------------------
 #                   check_compile_cfast_db
 #---------------------------------------------
 
@@ -499,6 +528,59 @@ check_vv_cases_release()
 }
 
 #---------------------------------------------
+#                   run_ceditqt_cases_release
+#---------------------------------------------
+
+run_ceditqt_cases_release()
+{
+   local verification_log="$OUTPUT_DIR/stage3_run_release_ceditqt_verification"
+   local validation_log="$OUTPUT_DIR/stage3_run_release_ceditqt_validation"
+
+   echo '   CEditQt UI'
+   echo 'Running CEditQt V&V UI import/rewrite tests' > $OUTPUT_DIR/stage3_run_release_ceditqt 2>&1
+
+   setup_python_environment $OUTPUT_DIR/stage3_ceditqt_python_setup || return 1
+
+   : > "$verification_log"
+   cd $cfastrepo/Verification/scripts
+   ./Run_CFAST_Cases.sh --test-UI -I intel -S $smvrepo -j $JOBPREFIX -q $QUEUE >> "$verification_log" 2>&1
+   wait_vv_cases "$verification_log" "3 run release CEditQt verification UI cases" "release CEditQt verification UI"
+   cat "$verification_log" >> $OUTPUT_DIR/stage3_run_release_ceditqt 2>&1
+
+   : > "$validation_log"
+   cd $cfastrepo/Validation/scripts
+   ./Run_CFAST_Cases.sh --test-UI -I intel -S $smvrepo -j $JOBPREFIX -q $QUEUE >> "$validation_log" 2>&1
+   wait_vv_cases "$validation_log" "3 run release CEditQt validation UI cases" "release CEditQt validation UI"
+   cat "$validation_log" >> $OUTPUT_DIR/stage3_run_release_ceditqt 2>&1
+   return 0
+}
+
+#---------------------------------------------
+#                   check_ceditqt_cases_release
+#---------------------------------------------
+
+check_ceditqt_cases_release()
+{
+   : > $OUTPUT_DIR/stage3_run_release_ceditqt_errors
+
+   cd $cfastrepo/Verification
+   grep 'Run aborted' -riI --include "*.ui.log" --include "*.ui.err" * >> $OUTPUT_DIR/stage3_run_release_ceditqt_errors
+   grep -E "FAIL|Traceback|SyntaxError|ImportError|ModuleNotFoundError|RuntimeError" -riI --include "*.ui.log" --include "*.ui.err" * >> $OUTPUT_DIR/stage3_run_release_ceditqt_errors
+
+   cd $cfastrepo/Validation
+   grep 'Run aborted' -riI --include "*.ui.log" --include "*.ui.err" * >> $OUTPUT_DIR/stage3_run_release_ceditqt_errors
+   grep -E "FAIL|Traceback|SyntaxError|ImportError|ModuleNotFoundError|RuntimeError" -riI --include "*.ui.log" --include "*.ui.err" * >> $OUTPUT_DIR/stage3_run_release_ceditqt_errors
+
+   if [ -s $OUTPUT_DIR/stage3_run_release_ceditqt_errors ]; then
+      echo "Errors from Stage 3 - CEditQt V&V UI import/rewrite tests:" >> $ERROR_LOG
+      cat $OUTPUT_DIR/stage3_run_release_ceditqt_errors >> $ERROR_LOG
+      echo "" >> $ERROR_LOG
+      THIS_CFAST_FAILED=1
+   fi
+   return 0
+}
+
+#---------------------------------------------
 #                   check_cfast_pictures
 #---------------------------------------------
 
@@ -657,8 +739,6 @@ upload_linux_bundle()
 {
    local bundle_script=$BUNDLE2GH
    local bundle_log=$OUTPUT_DIR/stage7_upload_linux_bundle
-   local gh_repo=${GH_REPO:-test_bundles}
-   local gh_cfast_tag=${GH_CFAST_TAG:-CFAST_TEST}
    local python_exe
 
    if [[ "$UPLOAD" != "1" || "$platform" != "linux" ]]; then
@@ -691,8 +771,7 @@ upload_linux_bundle()
 
    cd "$(dirname "$bundle_script")"
    if "$bundle_script" -U --python "$python_exe" > $bundle_log 2>&1; then
-      echo "" >> $TIME_LOG
-      echo "Linux Bundle: https://github.com/firemodels/${gh_repo}/releases/tag/${gh_cfast_tag}" >> $TIME_LOG
+      return 0
    else
       echo "Errors from Stage 7 - Build/upload CFAST Linux bundle:" >> $ERROR_LOG
       cat $bundle_log >> $ERROR_LOG
@@ -835,8 +914,8 @@ email_build_status()
          cd $cfastbotdir
          $GUIDES2GH $cfastrepo/Manuals >& $OUTPUT_DIR/stage7_upload
          GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_CFAST_TAG
-         echo ""                >> $TIME_LOG
-         echo "Guides: $GITURL" >> $TIME_LOG
+         echo ""                                  >> $TIME_LOG
+         echo "Linux bundle, Manuals: $GITURL"    >> $TIME_LOG
       fi
       # Send empty email with success message
       cat $TIME_LOG | mail $REPLYTO -s "CFASTbot build success on ${hostname}! Revision ${GIT_REVISION}." $mailTo &> /dev/null
@@ -915,6 +994,23 @@ GITURL=
 BRANCH=
 CONFIG=
 CLONEREPOS=
+TEST_UI=
+PYTHON_ENV_ACTIVE=
+
+args=()
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --test-UI)
+      TEST_UI=1
+      shift
+      ;;
+    *)
+      args+=("$1")
+      shift
+      ;;
+  esac
+done
+set -- "${args[@]}"
 
 while getopts 'aCF:hm:p:q:r:U' OPTION
 do
@@ -1144,6 +1240,9 @@ echo "   cfastbot results directory"
 cd $cfastbotdir
 rm -rf $OUTPUT_DIR/* &> /dev/null
 
+echo "   python environment"
+setup_python_environment $OUTPUT_DIR/stage0_python_setup || exit 1
+
 ### Stage 1 ###
 
 cd $reporoot/bot
@@ -1218,6 +1317,10 @@ fi
 if [[ $stage2_build_cfast_release_success ]] ; then
    run_vv_cases_release || exit 1
    check_vv_cases_release || exit 1
+   if [[ "$TEST_UI" != "" ]]; then
+      run_ceditqt_cases_release || exit 1
+      check_ceditqt_cases_release || exit 1
+   fi
 fi
 
 ### Stage 4 ###
@@ -1231,8 +1334,7 @@ fi
 ### stage 5 - python verification ###
   echo Python
   echo "   setup environment"
-  cd $botrepo/Firebot/
-  source ./setup_python.sh > $OUTPUT_DIR/stage5_python_setup 2>&1
+  setup_python_environment $OUTPUT_DIR/stage5_python_setup || exit 1
   echo "   Verification"
   echo "      make plots"
    # Run Python plotting script
