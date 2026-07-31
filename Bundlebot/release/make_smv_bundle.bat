@@ -17,7 +17,6 @@ set CURDIR=%CD%
 
 set forbundle=%reporoot%\smv\Build\for_bundle
 set smvscripts=%reporoot%\smv\scripts
-set gettime=%reporoot%\smv\Build\get_time\intel_win
 set repoexes=%userprofile%\.bundle\BUNDLE\WINDOWS\repoexes
 set gawk=%reporoot%\bot\scripts\bin\gawk.exe
 
@@ -79,7 +78,6 @@ copy %forbundle%\colorbars\divergent\*.csv %smvdir%\colorbars\divergent >Nul
 copy %forbundle%\colorbars\circular\*.csv  %smvdir%\colorbars\circular  >Nul
 
 CALL :COPY  %forbundle%\objects.svo                   %smvdir%\.
-CALL :COPY  %gettime%\get_time_win.exe                %smvdir%\get_time.exe
 CALL :COPY  %reporoot%\webpages\SMV_Release_Notes.htm %smvdir%\release_notes.html
 CALL :COPY  %forbundle%\.smokeview_bin                %smvdir%\.
 
