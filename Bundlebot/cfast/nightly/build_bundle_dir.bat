@@ -69,8 +69,6 @@ call :COPYPDF CFAST_Configuration_Guide
 
 echo ***Copying Smokeview files
 
-call :COPYPROG get_time
-call :COPYPROG get_time
 call :COPYPROG smokeview test_
 
 call :COPY %smvrepo%\Build\for_bundle\objects.svo    %SMVDISTDIR%\

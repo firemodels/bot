@@ -17,7 +17,6 @@ set CURDIR=%CD%
 
 set forbundle=%reporoot%\smv\Build\for_bundle
 set smvscripts=%reporoot%\smv\scripts
-set gettime=%reporoot%\smv\Build\get_time\intel_win
 set repoexes=%userprofile%\.bundle\BUNDLE\WINDOWS\repoexes
 set gawk=%reporoot%\bot\scripts\bin\gawk.exe
 
@@ -45,12 +44,10 @@ copy %forbundle%\*.png %smvdir%\.>Nul
 
 CALL :COPY  %forbundle%\volrender.ssf %smvdir%\volrender.ssf
 
-CALL :COPY  %reporoot%\smv\Build\flush\intel_win\flush_win.exe           %smvdir%\flush.exe
 CALL :COPY  %reporoot%\smv\Build\smokediff\intel_win\smokediff_win.exe   %smvdir%\smokediff.exe
 CALL :COPY  %reporoot%\smv\Build\pnginfo\intel_win\pnginfo_win.exe       %smvdir%\pnginfo.exe
 CALL :COPY  %reporoot%\smv\Build\fds2fed\intel_win\fds2fed_win.exe       %smvdir%\fds2fed.exe
 CALL :COPY  %reporoot%\smv\Build\smokezip\intel_win\smokezip_win.exe     %smvdir%\smokezip.exe
-CALL :COPY  %reporoot%\smv\Build\timep\intel_win\timep_win.exe           %smvdir%\timep.exe
 CALL :COPY  %reporoot%\smv\Build\wind2fds\intel_win\wind2fds_win.exe     %smvdir%\wind2fds.exe
 
 echo Unpacking Smokeview %versionbase% installation files > %forbundle%\unpack.txt
@@ -80,7 +77,6 @@ copy %forbundle%\colorbars\divergent\*.csv %smvdir%\colorbars\divergent >Nul
 copy %forbundle%\colorbars\circular\*.csv  %smvdir%\colorbars\circular  >Nul
 
 CALL :COPY  %forbundle%\objects.svo                   %smvdir%\.
-CALL :COPY  %gettime%\get_time_win.exe                %smvdir%\get_time.exe
 CALL :COPY  %reporoot%\webpages\SMV_Release_Notes.htm %smvdir%\release_notes.html
 CALL :COPY  %forbundle%\.smokeview_bin                %smvdir%\.
 

@@ -86,10 +86,6 @@ echo "*** building fds2fed"
 BUILD fds2fed &
 pid_fds2fed=$!
 
-echo "*** building flush"
-BUILD flush &
-pid_flush=$!
-
 echo "*** building pnginfo"
 BUILD pnginfo &
 pid_pnginfo=$!
@@ -114,9 +110,6 @@ CHECK_BUILD smokeview $SMVDEBUG
 
 wait $pid_fds2fed
 CHECK_BUILD fds2fed
-
-wait $pid_flush
-CHECK_BUILD flush
 
 wait $pid_pnginfo
 CHECK_BUILD pnginfo

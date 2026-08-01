@@ -88,14 +88,12 @@ SMDDIR=$GITROOT/smv/Build/smokediff/${COMPILER}_${platform}
 PNGINFODIR=$GITROOT/smv/Build/pnginfo/${COMPILER}_${platform}
 FDS2FEDDIR=$GITROOT/smv/Build/fds2fed/${COMPILER}_${platform}
 WIND2FDSDIR=$GITROOT/smv/Build/wind2fds/${COMPILER}_${platform}
-FLUSHFILEDIR=$GITROOT/smv/Build/flush/${COMPILER}_${platform}
 FORBUNDLE=$GITROOT/smv/Build/for_bundle
 SMVSCRIPTDIR=$GITROOT/smv/scripts
 UTILSCRIPTDIR=$GITROOT/smv/Utilities/Scripts
 PLATFORMDIR=$revision\_${LABEL}
 MAKEINSTALLER=$GITROOT/bot/Bundlebot/nightly/make_smv_installer.sh
 UPLOADDIR=$HOME/.bundle/bundles
-flushfile=$GITROOT/smv/Build/flush/${COMPILER}_${platform}/flush_${platform}
 
 if [ ! -d $UPLOADDIR ]; then
   mkdir -p $UPLOADDIR
@@ -133,7 +131,6 @@ CP  $PNGINFODIR    pnginfo_${platform}           $PLATFORMDIR/$smvbin pnginfo
 CP  $FDS2FEDDIR    fds2fed_${platform}           $PLATFORMDIR/$smvbin fds2fed
 CP  $SMZDIR        smokezip_${platform}          $PLATFORMDIR/$smvbin smokezip
 CP  $WIND2FDSDIR   wind2fds_${platform}          $PLATFORMDIR/$smvbin wind2fds
-CP  $FLUSHFILEDIR  flush_${platform}             $PLATFORMDIR/$smvbin flush
 
 CURDIR=`pwd`
 
