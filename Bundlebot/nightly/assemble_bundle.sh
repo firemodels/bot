@@ -358,8 +358,7 @@ clam_status=`IS_PROGRAM_INSTALLED clamscan`
 if [ $clam_status -eq 1 ]; then
   scanlog=$SCRIPTDIR/output/${bundlebase}_log.txt
   vscanlog=$SCRIPTDIR/output/${bundlebase}.log
-  htmllog=$SCRIPTDIR/output/${bundlebase}_manifest.html
-  csvlog=$SCRIPTDIR/output/${bundlebase}.csv
+  viruslog=$SCRIPTDIR/output/fdssmv_virus.log
  
   if [ "$TEST_VIRUS" != "" ]; then
     $SCRIPTDIR/gen_eicar.sh $bundledir/eicar.com
@@ -367,16 +366,8 @@ if [ $clam_status -eq 1 ]; then
 
   echo "*** scanning $bundlebase for viruses/malware"
   clamscan -r $UPLOAD_DIR/$bundlebase > $scanlog 2>&1
-  sed 's/.*FDS-/FDS-/' $scanlog      > $vscanlog
-  echo "*** adding sha256 hashes"
-  $SCRIPTDIR/add_sha256.sh $vscanlog > $csvlog
-  sed -i.bak '/SCAN SUMMARY/,$d; s|FDS.*SMV[^/]*/||g'     $csvlog
-  sort -f -o $csvlog $csvlog
-  sed -n '/SCAN SUMMARY/,$p' $vscanlog >> $csvlog
-  $SCRIPTDIR/csv2html.sh                                  $csvlog
-  if [ -e $SCRIPTDIR/output/${bundlebase}_manifest.html ]; then
-    CP $SCRIPTDIR/output ${bundlebase}_manifest.html $bundledir/Documentation Manifest.html
-  fi
+  sed 's/.*FDS-/FDS-/' $scanlog       > $vscanlog
+  cp $vscanlog $viruslog
   ninfected=`grep 'Infected files' $vscanlog | awk -F: '{print $2}'`
   if [ "$ninfected" == "" ]; then
     ninfected=0
