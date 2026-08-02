@@ -498,8 +498,7 @@ REPO_ROOT=`pwd`
 cd $SCRIPTDIR
 installer_base=${FDSREV}_${SMVREV}
 installer_base_platform=${installer_base}_${BUNDLE_PREFIX}$UNDERSCORE${PLATFORM}${MPI_LABEL}
-csvlog=${installer_base_platform}.csv
-htmllog=${installer_base_platform}_manifest.html
+viruslog=$OUTPUTDIR/fdssmv_virus.log
 
 #*** build apps, assemble bundle components, build bundle
 
@@ -509,8 +508,8 @@ echo "*** building installer"
 assemble_bundle_status=$?
 
 echo "*** virus scan summary"
-if [ -e $OUTPUTDIR/$csvlog ]; then
-  grep -v OK$ $OUTPUTDIR/$csvlog | grep -v ^$ | grep -v SUMMARY
+if [ -e $viruslog ]; then
+  grep -v OK$ $viruslog | grep -v ^$ | grep -v SUMMARY
 else
   echo virus scanner not available, bundle was not scanned
 fi
@@ -528,10 +527,6 @@ if [[ "$UPLOADBUNDLE" == "1" ]]; then
 
     echo gh release upload FDS_TEST $BUNDLEDIR/${installer_base_platform}.sh -R github.com/$GHUPLOADOWNER/test_bundles  --clobber
          gh release upload FDS_TEST $BUNDLEDIR/${installer_base_platform}.sh -R github.com/$GHUPLOADOWNER/test_bundles  --clobber
-    if [ -e $OUTPUTDIR/$htmllog ]; then
-      echo gh release upload FDS_TEST $OUTPUTDIR/$htmllog                       -R github.com/$GHUPLOADOWNER/test_bundles  --clobber
-           gh release upload FDS_TEST $OUTPUTDIR/$htmllog                       -R github.com/$GHUPLOADOWNER/test_bundles  --clobber
-    fi
     if [ "${PLATFORM}" == "lnx" ]; then
       cd $REPO_ROOT/fds
       FDS_SHORT_HASH=`git rev-parse --short HEAD`
