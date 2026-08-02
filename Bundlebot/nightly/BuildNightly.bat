@@ -188,9 +188,6 @@ if "x%UPLOAD_BUNDLE%" == "x" goto skip_upload
 
   echo gh release upload FDS_TEST %fullfilebase%.exe -R github.com/%UPLOADOWNER%/test_bundles --clobber
        gh release upload FDS_TEST %fullfilebase%.exe -R github.com/%UPLOADOWNER%/test_bundles --clobber
-
-  echo gh release upload FDS_TEST %BNCURDIR%\output\%basename%_manifest.html -R github.com/%UPLOADOWNER%/test_bundles --clobber
-       gh release upload FDS_TEST %BNCURDIR%\output\%basename%_manifest.html -R github.com/%UPLOADOWNER%/test_bundles --clobber
 :skip_upload
 
 if "x%EMAILTO%" == "x" goto endif5

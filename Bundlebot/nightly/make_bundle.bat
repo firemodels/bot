@@ -253,54 +253,23 @@ if %ERRORLEVEL% == 1 goto elsescan
   set ADDSHA256=%scriptdir%\add_sha256.bat
   set CSV2HTML=%scriptdir%\csv2html.bat
   set scanlog=%logdir%\%basename%_log.txt
-  set vscanlog=%logdir%\%basename%.csv
   set preamble=%logdir%\preamble.csv
   set summary=%logdir%\summary.txt
   set htmllog=%logdir%\%basename%_manifest.html
-  set nvscanlog=%logdir%\%basename%_nlog.txt
+  set nscanlog=%logdir%\%basename%_nlog.txt
   echo.
   echo *** scanning bundle
   echo    input: %basedir%
-  echo    output: %vscanlog%
+  echo    output: %scanlog%
   clamscan -r %basedir% > %scanlog% 2>&1
-  echo.
-  echo ***adding sha256 hashes
-  echo.
-  cd %scriptdir%
-  call %ADDSHA256% %scanlog%         > %vscanlog%
-  cd %scriptdir%
-  echo.
-  echo ***removing %basename% from filepaths
-  echo.
-  sed -i.bak "s/%basename%\\//g"   %vscanlog%
-
-:: split file into two parts
-  sed "/SCAN SUMMARY/,$ d"    %vscanlog% > %preamble%
-  sed -n "/SCAN SUMMARY/,$ p" %vscanlog% > %summary%
-
-:: sort the first part
-  sort %preamble% > %vscanlog%
-
-:: remove adjacent commas ,, and append to original file
-  sed "s/,,/ /g" %summary%     >> %vscanlog%
-
-  cd %scriptdir%
-  echo.
-  echo ***converting scan log to html
-  call %CSV2HTML% %vscanlog%
-  if NOT exist %htmllog% echo ***error: %htmllog% does not exist
-  if NOT exist %htmllog% goto skiphtml
-  CALL :COPY %htmllog% %out_doc%\Manifest.html
-  :skiphtml
-
   echo complete
   echo.
   cd %scriptdir%
-  grep Infected %vscanlog% | %gawk% -F":" "{print $2}" > %nvscanlog%
+  grep Infected %scanlog% | %gawk% -F":" "{print $2}" > %nscanlog%
   set have_virus=1
-  set /p ninfected=<%nvscanlog%
+  set /p ninfected=<%nscanlog%
   if %ninfected% == 0 set have_virus=0
-  type %vscanlog%
+  type %scanlog%
   echo.
   if %have_virus% == 1 echo ***error: scan reported a virus in the bundle
   if %have_virus% == 1 set returncode=1
