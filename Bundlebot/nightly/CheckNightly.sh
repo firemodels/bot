@@ -51,14 +51,21 @@ FDSWIN=${BASE}_nightly_win
 FDSLNX=${BASE}_nightly_lnx
 FDSOSX=${BASE}_nightly_osx_arm
 rm -f $errors
+BUNDLE_STATUS=
 if [ `grep $FDSWIN.exe $uploads | wc -l` -eq 0 ]; then
   echo  "***error: $FDSWIN.exe missing" >> $errors
+  BUNDLE_STATUS=Windows
 fi
 if [ `grep $FDSLNX.sh   $uploads  | grep -v sha1 | wc -l` -eq 0 ]; then
   echo  "***error: $FDSLNX.sh missing" >> $errors
+  BUNDLE_STATUS="$BUNDLE_STATUS Linux"
 fi
 if [ `grep $FDSOSX.sh   $uploads  | grep -v sha1 | wc -l` -eq 0 ]; then
   echo  "***error: $FDSOSX.sh missing" >> $errors
+  BUNDLE_STATUS="$BUNDLE_STATUS Mac"
+fi
+if [ "$BUNDLE_STATUS" != "" ]; then
+  BUNDLE_STATUS="$BUNDLE_STATUS bundle missing"
 fi
 echo bundle url: https://github.com/firemodels/test_bundles/releases/tag/FDS_TEST > $output
 echo                  >> $output
@@ -66,7 +73,9 @@ echo bundles present: >> $output
 cat $uploads          >> $output
 echo                  >> $output
 
-BUNDLE_STATUS="All bundles generated"
+if [ "$BUNDLE_STATUS" == "" ]; then
+  BUNDLE_STATUS="All bundles generated"
+fi
 if [ -e $errors ]; then
   cat $errors
   echo missing bundles: >> $output
