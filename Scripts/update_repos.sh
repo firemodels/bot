@@ -5,6 +5,7 @@ updaterepos=$allrepos
 otherrepos="webpages wikis"
 BRANCH=master
 CHECKOUT_MASTER=
+PAUSE=10
 
 function usage {
 echo "Update the repos $allrepos if they exist"
@@ -50,6 +51,8 @@ UPDATE_REPO ()
 {
   local repo=$1
   repodir=$FMROOT/$repo
+  echo pausing $PAUSE s
+  sleep $PAUSE
 
   echo "------------- $repo -------------------------------------------"
   if [ ! -e $repodir ]; then
@@ -94,6 +97,8 @@ UPDATE_REPO2 ()
 {
   local repo=$1
   repodir=$FMROOT/$repo
+  echo pausing $PAUSE s
+  sleep $PAUSE
 
   if [ ! -e $repodir ]; then
      return
