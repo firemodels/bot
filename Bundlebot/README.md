@@ -40,9 +40,25 @@ Note `owner` in `-o owner` is the github owner where the manuals will be placed 
 
 ### Build Bundles
 
-#### Linux and Macintosh bundles
+#### Local macOS release DMG
 
-Linux (spark at NIST) and Macintosh (wildfire at NIST) bundles are built using the firebot account. 
+Run `bash Bundlebot/release/BuildMacRelease.sh --check` from the bot repository to check the configured FDS and Smokeview commits and download their manuals from GitHub. After this succeeds, run the same command without `--check` to compile and create a DMG. On macOS, `BuildRelease.sh` forwards to this command with the same options. This path uses GNU Fortran and Open MPI on the Mac's native architecture. It requires Git, GitHub CLI authentication, Python 3 with `dmgbuild` and Pillow, CMake, pkg-config, GNU Fortran, Open MPI, and the Xcode command-line tools.
+
+The configuration is `Bundlebot/release/config.sh`. The configured commits must be available in the sibling `fds` and `smv` repositories; those checkouts need not be on the release branch. After the manual checks pass, a build deletes untracked and ignored files in those repositories, discards tracked edits, resets their `release` branches to the configured commits, and updates their local release tags. Treat the sibling repositories as disposable bundle work areas. The existing `bot` checkout and configuration are retained. HYPRE and SUNDIALS use sibling repositories too: existing repositories are fetched, missing ones are cloned, and the FDS build scripts clean and rebuild them at the required library versions. Update the configuration from the release machine before starting. `--check` downloads and checks manuals without resetting source repositories.
+
+Manuals come from `firemodels/test_bundles`, using `FDS_TEST` and `SMOKEVIEW_TEST`. Both Firebot and Smokebot must have finished uploading manuals for the configured commits and version labels. The script checks the uploaded `FDS_INFO.txt` (or the older `FDS_INFO$.txt`) and `SMV_INFO.txt` before compiling; missing manuals or mismatched revisions stop the build. Use `--manuals-repo`, `--fds-manuals-tag`, and `--smv-manuals-tag` to select other releases with the same PDF and metadata assets.
+
+To test packaging with the manuals currently uploaded, add `--allow-manual-revision-mismatch`, optionally alongside `--check`. This bypasses manual hash and version matching for both FDS and Smokeview; all PDFs and metadata assets must still download successfully. Executables still use the commits in `config.sh`. The resulting DMG has a `_manuals_test` suffix and includes a note that manual revisions were not required to match. Omit this option for the release build.
+
+The result is `~/.bundle/bundles/FDS-x.y.z_SMV-x.y.z_macos_arm64.dmg` (or `x86_64`). Use `--output-dir` to change the destination. Like the CFAST DMG, it contains an `FDS6` folder, an Applications shortcut, a README, and a Terminal install menu. Drag `FDS6` onto Applications, then run `source "/Applications/FDS6/bin/FDSVARS.sh"` to add FDS, Smokeview, and MPI to the terminal environment. The folder can also be copied to another location; use that location in the source command. The menu offers Applications, Downloads, and a custom location. The bundle includes FDS, Smokeview, their utilities, Open MPI, runtime libraries, manuals, and verification inputs. GNU builds contain the MPI executable, without the separate Intel OpenMP executable.
+
+To test DMG packaging again after a build, run `bash Bundlebot/release/BuildMacRelease.sh --package-only`. This uses the saved configuration and staged files under `.macos-build`, including the manual-mismatch setting from that build. It does not update repositories, rebuild executables, or download manuals. Eject the previously opened DMG before replacing it. A staged bundle must already exist; `--check` or a new full build replaces that staging directory.
+
+This command produces a local test bundle and never uploads it. Runtime binaries receive ad-hoc signatures after library relocation; the DMG is not Developer ID signed or notarized. Public distribution through Gatekeeper needs a subsequent signing/notarization step. Build logs, downloaded manuals, and intermediate files use a single `.macos-build` directory under the output directory, replaced on each run. A lock prevents simultaneous runs from sharing that staging directory. Completed versioned DMGs remain in the output directory.
+
+#### Linux bundles
+
+Linux (spark at NIST) bundles are built using the firebot account.
 
    1. Switch to the firebot account using `sudo su - firebot` .
    2. cd to the `FireModels_bundle/bot/Bundlebot/release` directory

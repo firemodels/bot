@@ -1,4 +1,8 @@
 #!/bin/bash
+if [ "$(uname -s)" = "Darwin" ]; then
+  exec bash "$(dirname "$0")/BuildMacRelease.sh" "$@"
+fi
+
 PIDFILE=`pwd`/BuildRelease.pid
 
 if [ "$1" == "-k" ]; then
