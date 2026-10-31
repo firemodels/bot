@@ -1699,6 +1699,14 @@ rm /tmp/mailtest.$$
 check_git_checkout
 archive_compiler_version
 
+# Check Python before compilation and case submission.
+run_python_setup
+check_python_setup
+if [ "$python_success" != true ]; then
+  cat "$ERROR_LOG" >&2
+  exit 1
+fi
+
 ### Stage 2 ###
 echo Building
 echo "   FDS"
@@ -1771,10 +1779,8 @@ GET_DURATION $RELEASE_beg $RELEASE_end RELEASE
 
 VV_beg=`GET_TIME`
 
-###*** setup python and run validation tests
+###*** run validation tests using the environment checked before compilation
 
-run_python_setup
-check_python_setup
 
 if [ $python_success == true ]; then
   run_python_validation
