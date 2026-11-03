@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 # -------------------------------------------------------------
 
 BUILDSMVLIBS()
@@ -29,7 +28,7 @@ CHECK_BUILD()
     echo "***error: The program ${prog}_linux failed to build"
     echo "***error: The program ${prog}_linux failed to build"   >> $errorlog 2>&1
   else
-    echo $smvrepo/Build/$prog/intel_linux/${prog}_linux built
+    echo ${prog}_linux built
   fi
 }
 
@@ -41,9 +40,6 @@ outputdir=$CURDIR/output
 errorlog=$CURDIR/output/smverror.log
 
 echo > $errorlog
-
-cd ../..
-REPOROOT=`pwd`
 
 cd $REPOROOT/smv
 smvrepo=`pwd`
