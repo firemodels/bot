@@ -1,5 +1,4 @@
 #!/bin/bash
-CUR=`pwd`
 allrepos="bot cad cfast cor exp fds fig out radcal smv test_bundles"
 
 function usage {
@@ -49,5 +48,3 @@ for repo in $allrepos
 do 
   CLEAN_REPO $repo
 done
-
-cd $CURDIR

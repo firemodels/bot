@@ -98,7 +98,7 @@ else
   echo "***error: firebot not running in the bot/Firebot directory"
   exit 1
 fi
-if [ "$FIREMODELS" != "" ]; then
+if [ "$FIREMODELS" == "" ]; then
   export FIREMODELS=$repo
 fi
 

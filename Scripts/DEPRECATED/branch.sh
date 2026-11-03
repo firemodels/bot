@@ -1,5 +1,4 @@
 #!/bin/bash
-CUR=`pwd`
 showrepos="bot cad cfast cor exp fds fig out radcal smv"
 setrepos="bot fds smv"
 BRANCH=master
@@ -61,5 +60,3 @@ do
   fi
   echo
 done
-
-cd $CURDIR

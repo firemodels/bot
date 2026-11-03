@@ -11,7 +11,7 @@ if [[ "$branch" == "" ]] && [[ "$repo" == "" ]]; then
   exit
 fi
 
-set CURDIR=`pwd`
+CURDIR=`pwd`
 
 cd ../..
 GITROOT=`pwd`
@@ -23,12 +23,12 @@ if [ "$repo" == "" ]; then
 fi
 repodir=$GITROOT/$repo
 if [ ! -d $repodir ]; then
-  echo ***error: repo $repodir does not exist"
-  exit
+  echo "***error: repo $repodir does not exist"
+  exit 1
 fi
 if [ "$branch" == "" ]; then
-  echo ***error: branch not specfied"
-  exit
+  echo "***error: branch not specified"
+  exit 1
 fi
 
 echo "Do you wish to create the branch: $branch in repo: $repo "

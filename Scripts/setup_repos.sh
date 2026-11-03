@@ -186,6 +186,7 @@ case $OPTION  in
    ;;
   S)
    repos=$smvrepos;
+   eraserepos=1
    ;;
   t)
    APPENDTEST=_test
