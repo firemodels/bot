@@ -1,5 +1,4 @@
 #!/bin/bash
-CUR=`pwd`
 allrepos="bot cfast cor exp fds out radcal smv"
 otherrepos="webpages wikis"
 BRANCH=master
@@ -74,5 +73,3 @@ do
   echo
   SHOW_STATUS2 $repo
 done
-
-cd $CURDIR

@@ -1,5 +1,4 @@
 #!/bin/bash
-CUR=`pwd`
 allrepos="bot cfast cor exp fds out radcal smv fds.wiki fds-smv"
 BRANCH=master
 
@@ -59,4 +58,3 @@ do
   echo "$repo remotes:"
   git remote -v
 done
-cd $CURDIR
