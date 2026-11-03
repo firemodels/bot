@@ -88,24 +88,6 @@ set_files_world_readable()
 }
 
 #---------------------------------------------
-#                   clean_repo
-#---------------------------------------------
-
-clean_repo()
-{
-  curdir=`pwd`
-  local dir=$1
-  local branch=$2
-  
-  CD_REPO $dir $branch || return 1
-  git clean -dxf &> /dev/null
-  git add . &> /dev/null
-  git reset --hard HEAD &> /dev/null
-  cd $curdir
-  return 0
-}
-
-#---------------------------------------------
 #                   clean_smokebot_history
 #---------------------------------------------
 
@@ -363,55 +345,6 @@ check_compile_fds_mpi()
    fi
    fi
 }
-
-#---------------------------------------------
-#                   compare_fds_smv_common_files
-#---------------------------------------------
-
-compare_fds_smv_common_files()
-{
-   fdsdir=$1
-   smvdir=$2
-   file=$3
-   fds_file=$fdsrepo/$fdsdir/$file
-   smv_file=$smvrepo/$smvdir/$file
-   notexist=
-   if ! [ -e $fds_file ]; then
-     echo "Warnings Stage 2d" >> $WARNING_LOG
-     echo "***warning: The fds repo file, $fds_file, does not exist" >> $WARNING_LOG
-     notexist=1
-   fi
-   if ! [ -e $smv_file ]; then
-     echo "Warnings Stage 2d" >> $WARNING_LOG
-     echo "***warning: The smv repo file, $smv_file, does not exist" >> $WARNING_LOG
-     notexist=1
-   fi
-   if [ "$notexist" == "" ]; then
-     ndiffs=`diff $smv_file $fds_file | wc -l`
-     if [ $ndiffs -gt 0 ]; then
-       echo "" >> $WARNING_LOG
-       echo "Warnings Stage 2d" >> $WARNING_LOG
-       echo "***warning: The fds and smv versions of $file are out of synch" >> $WARNING_LOG
-     fi
-   fi
-}
-
-#---------------------------------------------
-#                   check_common_files
-#---------------------------------------------
-
-check_common_files()
-{
-  # only compare files if latest repo revisions are checkout out
-  if [ "$CHECKOUT" == "" ]; then
-    compare_fds_smv_common_files Manuals/Bibliography Manuals/Bibliography BIBLIO_FDS_general.tex
-    compare_fds_smv_common_files Manuals/Bibliography Manuals/Bibliography BIBLIO_FDS_mathcomp.tex
-    compare_fds_smv_common_files Manuals/Bibliography Manuals/Bibliography BIBLIO_FDS_refs.tex
-    compare_fds_smv_common_files Manuals/Bibliography Manuals/Bibliography authors.tex
-    compare_fds_smv_common_files Manuals/Bibliography Manuals/Bibliography disclaimer.tex
-  fi
-}
-
 
 #---------------------------------------------
 #                   wait_verification_cases_end
