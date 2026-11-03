@@ -1,6 +1,5 @@
 #!/bin/bash
 
-CURDIR=`pwd`
 MANDIR=$REPOROOT/smv/Manuals
 
 TARHOME=$HOME/.smokebot/pubs

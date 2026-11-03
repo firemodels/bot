@@ -35,7 +35,6 @@ newpage=~/.smokebot/newpage
 olddata=~/.smokebot/old_data
 newdata=~/.smokebot/smv_times.csv
 running=~/.fdssmvgit/bot_running
-curdir=`pwd`
 EXIT="yes"
 
 # don't update status page if smokebot is running

@@ -7,7 +7,6 @@ PUBSDIR=$HOME/.smokebot/pubs_latest
 MANDIR=$REPOROOT/smv/Manuals
 
 cd $HOME/.smokebot/apps_latest
-APPSDIR=`pwd`
 
 cd $CURDIR
 

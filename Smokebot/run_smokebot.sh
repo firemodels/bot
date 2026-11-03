@@ -67,7 +67,6 @@ smokebot_pid=~/.fdssmvgit/firesmokebot_pid
 
 CURDIR=`pwd`
 if [ -x run_smokebot.sh ]; then
-  SMOKEBOTDIR=`pwd`
   cd $CURDIR
 else
   echo "***error: smokebot not running in the directory containing smokebot scripts"
@@ -84,7 +83,6 @@ FORCE=
 FORCECLONE=
 CLONE_REPOS=
 WEB_DIR=
-USE_BOT_QFDS=
 FOPT=
 CPUS_PER_TASK=
 
@@ -133,7 +131,7 @@ case $OPTION  in
    usage
    ;;
   J)
-   DUMMY=
+   :
    ;;
   k)
    KILL_SMOKEBOT=1
@@ -216,11 +214,6 @@ if [ `whoami` != smokebot ]; then
 fi
 
 if [ "$CLONE_REPOS" != "" ]; then
-  if [ "$CLONE_REPOS" != "release" ]; then
-    if [ "$CLONE_REPOS" != "test" ]; then
-      CLONE_REPO="master"
-    fi
-  fi
   CLONE_REPOS="-R $CLONE_REPOS"
 fi
 
@@ -285,7 +278,7 @@ fi
 
 touch $smokebot_pid
 cd $CURDIR
-./smokebot.sh $SIZE $CPuS_PER_TASK $CLONE_REPOS $REPOROOTOPT $FOPT $FORCECLONE $WEB_DIR $WEB_ROOT $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
+./smokebot.sh $SIZE $CPUS_PER_TASK $CLONE_REPOS $REPOROOTOPT $FOPT $FORCECLONE $WEB_DIR $WEB_ROOT $QUEUE $UPLOAD $EMAIL $MOVIE "$@"
 if [ -e $smokebot_pid ]; then
   rm $smokebot_pid
 fi

@@ -176,7 +176,7 @@ check_compile_cfast()
       echo ""                                   >> $ERROR_LOG
       THIS_CFAST_FAILED=1
    else
-      stage2_build_cfast=true
+      :
    fi
 }
 
@@ -283,7 +283,7 @@ check_verification_cases_debug()
       [[ `grep -rIi 'STOP: Numerical' Visualization/* WUI/* ` == "" ]] && \
       [[ `grep -rIi 'forrtl' Visualization/* WUI/* ` == "" ]]
    then
-      stage3_run_debug_success=true
+      :
    else
       grep -rIi 'Run aborted' $OUTPUT_DIR/stage3_run_debug > $OUTPUT_DIR/stage3_run_debug_errors
       grep -rIi 'Segmentation' Visualization/* WUI/*  >> $OUTPUT_DIR/stage3_run_debug_errors
@@ -299,7 +299,7 @@ check_verification_cases_debug()
    if [[ `grep 'Warning' -irI $OUTPUT_DIR/stage3_run_debug | grep -v 'SPEC' | grep -v 'Sum of'` == "" ]] && \
       [[ `grep 'Warning' -irI Visualization/* WUI/*      | grep -v 'SPEC' | grep -v 'Sum of'` == "" ]]
    then
-      no_warnings=true
+      :
    else
       echo "Stage 3b warnings:" >> $WARNING_LOG
       grep 'Warning' -irI $OUTPUT_DIR/stage3_run_debug | grep -v 'SPEC' | grep -v 'Sum of' >> $WARNING_LOG
@@ -398,7 +398,7 @@ check_verification_cases_release()
       [[ `grep -rIi 'STOP: Numerical' Visualization/* WUI/*  ` == "" ]] && \
       [[ `grep -rIi  'forrtl' Visualization/* WUI/*  ` == "" ]]
    then
-      stage3_run_release_success=true
+      :
    else
       grep -rIi 'Run aborted' $OUTPUT_DIR/stage3_run_release  > $OUTPUT_DIR/stage3_run_release_errors
       grep -rIi 'Segmentation' Visualization/* WUI/*     >> $OUTPUT_DIR/stage3_run_release_errors
@@ -416,7 +416,7 @@ check_verification_cases_release()
    if [[ `grep 'Warning' -irI $OUTPUT_DIR/stage3_run_release | grep -v 'SPEC' | grep -v 'Sum of'` == "" ]] && \
       [[ `grep 'Warning' -irI Visualization/* WUI/*      | grep -v 'SPEC' | grep -v 'Sum of'` == "" ]]
    then
-      no_warnings=true
+      :
    else
       echo "Stage 3b warnings:" >> $WARNING_LOG
       grep 'Warning' -irI $OUTPUT_DIR/stage3_run_release | grep -v 'SPEC' | grep -v 'Sum of' >> $WARNING_LOG
@@ -451,7 +451,7 @@ check_smv_pictures()
    echo "checking image generation"
    if [[ `grep -I -E -i "Segmentation|Error" $OUTPUT_DIR/stage4_check_picts` == "" ]]
    then
-      stage4_check_picts_smvpics_success=true
+      :
    else
       cp $OUTPUT_DIR/stage4_check_picts  $OUTPUT_DIR/stage4_check_picts_errors
 
@@ -491,7 +491,7 @@ check_smv_movies()
    echo "checking movie generation"
    if [[ `grep -I -E -i "Segmentation|Error" $OUTPUT_DIR/stage4_make_movies` == "" ]]
    then
-      stage4_make_movies_success=true
+      :
    else
       echo "Errors from Stage 4c - Make SMV movies "                    >> $ERROR_LOG
       grep -B 1 -A 1 -I -E -i "Segmentation|Error"  $OUTPUT_DIR/stage4_make_movies >  $OUTPUT_DIR/stage4_make_movies_errors
@@ -957,7 +957,6 @@ UPLOADRESULTS=
 PID_FILE=~/.fdssmvgit/firesmokebot_pid
 HTML2PDF=wkhtmltopdf
 CLONE_REPO_BRANCH=
-CHECKOUT=
 compile_errors=
 GITURL=
 HAVEMAIL=`which mail |& grep -v 'no mail'`
@@ -1150,11 +1149,9 @@ fi
 
 notfound=`icx -help 2>&1 | tail -1 | grep "not found" | wc -l`
 if [ "$notfound" == "1" ] ; then
-  export haveCC="0"
   USEINSTALL="-i"
   USEINSTALL2="-u"
 else
-  export haveCC="1"
   USEINSTALL=
   USEINSTALL2=
 fi
@@ -1184,7 +1181,6 @@ UploadGuidesGH=$smokebotdir/smv_guides2GH.sh
 UploadSummaryGH=$smokebotdir/smv_summary2GH.sh
 UploadWEB=$smokebotdir/smv_web2GD.sh
 
-THIS_FDS_AUTHOR=
 THIS_FDS_FAILED=0
 THIS_CFAST_FAILED=0
 FDS_STATUS_FILE=$smvrepo/FDS_status

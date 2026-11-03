@@ -45,7 +45,6 @@ cd $REPOROOT/smv
 smvrepo=`pwd`
 
 cd $REPOROOT/bot
-botrepo=`pwd`
 
 # build smokeview libraries
 echo building smokeview libraries
