@@ -376,8 +376,8 @@ fi
 if [[ -d $GITROOT/webpages ]] && [[ "$ONLY_INSTALLER" == "" ]]; then
   echo "*** updating webpages repo"
   cd $GITROOT/webpages
-  get fetch origin              > $OUTPUTDIR/update_webpages 2&>1
-  git merge origin/nist-pages  >> $OUTPUTDIR/update_webpages 2&>1
+  git fetch origin              > $OUTPUTDIR/update_webpages 2>&1
+  git merge origin/nist-pages  >> $OUTPUTDIR/update_webpages 2>&1
 fi
 
 
@@ -388,11 +388,11 @@ if [ "$ONLY_INSTALLER" == "" ]; then
   cd $CURDIR/../../Scripts
   if [ "$USE_CURRENT" == "" ]; then
     echo "*** cloning hypre"
-    ./setup_repos.sh -K hypre > $OUTPUTDIR/clone_hypre 2&>1 
+    ./setup_repos.sh -K hypre > $OUTPUTDIR/clone_hypre 2>&1
     echo "*** hypre cloned"
 
     echo "*** cloning sundials"
-    ./setup_repos.sh -K sundials > $OUTPUTDIR/clone_sundials 2&>1 
+    ./setup_repos.sh -K sundials > $OUTPUTDIR/clone_sundials 2>&1
     echo "*** sundials cloned"
   fi
 
@@ -403,11 +403,11 @@ if [ "$ONLY_INSTALLER" == "" ]; then
 #*** a nightly bundle - clone fds and smv repos
 
       echo "*** cloning fds"
-      ./clone_repo.sh -F -N -r $FDS_HASH > $OUTPUTDIR/clone_fds 2&>1
+      ./clone_repo.sh -F -N -r $FDS_HASH > $OUTPUTDIR/clone_fds 2>&1
       echo "*** fds cloned"
 
       echo "*** cloning smv"
-      ./clone_repo.sh -S -N -r $SMV_HASH > $OUTPUTDIR/clone_smv 2&>1
+      ./clone_repo.sh -S -N -r $SMV_HASH > $OUTPUTDIR/clone_smv 2>&1
       echo "*** smv cloned"
     fi
   else
@@ -415,7 +415,7 @@ if [ "$ONLY_INSTALLER" == "" ]; then
 #*** a release bundle - clone all repos except for bot
 
     echo "*** cloning all repos "
-    ./clone_all_repos.sh  $OUTPUTDIR > $OUTPUTDIR/clone_all 2&>1
+    ./clone_all_repos.sh  $OUTPUTDIR > $OUTPUTDIR/clone_all 2>&1
     echo all repos clone complete
   fi
 
