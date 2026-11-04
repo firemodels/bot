@@ -16,8 +16,7 @@ CD_REPO ()
      echo "          Aborting smokebot."
      return 1
   fi
-  cd $repodir
-  return 0
+  cd -- "$repodir"
 }
 
 #---------------------------------------------
@@ -116,12 +115,12 @@ BUILDFDSLIBS()
   source $REPOROOT/fds/Build/Scripts/set_compilers.sh >& /dev/null
 
   echo building hypre
-  source $REPOROOTo/fds/Build/Scripts/HYPRE/build_hypre.sh confmake.sh true >& /dev/null &
+  source $REPOROOT/fds/Build/Scripts/HYPRE/build_hypre.sh confmake.sh true >& /dev/null &
   pid_hypre=$!
 
   echo building sundials
   source $REPOROOT/fds/Build/Scripts/SUNDIALS/build_sundials.sh confmake.sh true >& /dev/null &
-  pid_sundials=$1
+  pid_sundials=$!
   wait $pid_hypre
   echo hypre built
   wait $pid_sundials
@@ -134,11 +133,9 @@ BUILDFDSLIBS()
 
 compile_cfast()
 {
-   cd $SMOKEBOT_HOME_DIR
-
     # Build CFAST
     echo "building cfast"
-    cd $cfastrepo/Build/CFAST/intel_linux
+    cd -- "$cfastrepo/Build/CFAST/intel_linux" || return 1
     rm -f cfast8_linux cfast7_linux
     make --makefile ../makefile clean &> /dev/null
     ./make_cfast.sh >> $OUTPUT_DIR/compile_cfast.log 2>&1
@@ -1015,7 +1012,7 @@ if [ "$REPOROOT" == "" ]; then
   exit
 fi
 if [ ! -d $REPOROOT ]; then
-  echo "***error: repo root directory $REPOROOT doe not exist"
+  echo "***error: repo root directory $REPOROOT does not exist"
   exit
 fi
 
@@ -1079,7 +1076,7 @@ date > $OUTPUT_DIR/stage0_start 2>&1
 
 if [[ "$CLONE_REPO_BRANCH" != "" ]]; then
   echo Cloning repos
-  cd smokebotdir
+  cd -- "$smokebotdir" || exit 1
 
   ./setup_repos.sh -K cfast -B $CLONE_REPO_BRANCH  > $OUTPUT_DIR/stage1_clone_repos  2>&1 &
   pid_cfast=$!
@@ -1088,7 +1085,7 @@ if [[ "$CLONE_REPO_BRANCH" != "" ]]; then
   ./setup_repos.sh -K fig   -B $CLONE_REPO_BRANCH >> $OUTPUT_DIR/stage1_clone_repos  2>&1 &
   pid_fig=$!
   ./update_repos.sh -K smv  -B $CLONE_REPO_BRANCH >  $OUTPUT_DIR/stage1_update_repos 2>&1 &
-  pid_$smv=$!
+  pid_smv=$!
 
   wait $pid_cfast
   wait $pid_fds
@@ -1501,9 +1498,6 @@ if [[ "$build_man_pics" == "1" ]] ; then
    $smokebotdir/compare_images.sh -t 0.2 >& $OUTPUT_DIR/stage5_compare_images
    rm -f $SMV_SUMMARY_DIR/images/*.png
 
-   wait $pid_ug
-   wait $pid_tg
-   wait $pid_vg
    MAKEGUIDES_end=`GET_TIME`
    DIFF_MAKEGUIDES=`GET_DURATION $MAKEGUIDES_beg $MAKEGUIDES_end`
    echo "Make guides/compare images: $DIFF_MAKEGUIDES" >> $STAGE_STATUS

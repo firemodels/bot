@@ -104,14 +104,9 @@ if [ ! -d $WEB_ROOT ]; then
   WEB_ROOT=
 fi
 
-#*** check to see if a queing system is available
+#*** default queue
 
 QUEUE=firebot
-notfound=`squeue -a 2>&1 | tail -1 | grep "not found" | wc -l`
-if [ $notfound -eq 1 ] ; then
-  echo ***error: squeue command not found.
-  exit
-fi
 
 #*** parse command line options
 
@@ -172,6 +167,11 @@ case $OPTION  in
 esac
 done
 shift $(($OPTIND-1))
+
+if ! command -v squeue >/dev/null 2>&1; then
+  echo '***error: squeue command not found.' >&2
+  exit 1
+fi
 
 if [ "$REPOROOT" == "" ]; then
   echo "***error: root directory not defined"
@@ -240,7 +240,7 @@ if [ "$KILL_SMOKEBOT" == "1" ]; then
     JOBIDS=`squeue -o "%.18j %.8u %.2t" | grep SB_ | awk -v user="$USER" '{if($2==user){print $1}}' | awk -F'.' '{print $1}'`
     if [ "$JOBIDS" != "" ]; then
       echo killing smokebot jobs with Id: $JOBIDS
-      qdel $JOBIDS
+      scancel $JOBIDS
     fi
     
     echo "killing smokebot (PID=$PID)"
