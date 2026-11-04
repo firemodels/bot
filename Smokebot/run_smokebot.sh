@@ -87,11 +87,11 @@ FOPT=
 CPUS_PER_TASK=
 
 REPOROOT=
-if [[ -d ../../smv ]]; then
+if [[ -d ../../bot ]]; then
   cd ../..
   REPOROOT=`pwd`
 fi
-if [[ "$REPOROOT" == "" ]] && [[ -d ../../../smv ]]; then
+if [[ "$REPOROOT" == "" ]] && [[ -d ../../../bot ]]; then
   cd ../../..
   REPOROOT=`pwd`
 fi
@@ -196,21 +196,6 @@ fi
 
 if [ "$WEB_ROOT" == "" ]; then
   WEB_DIR=
-fi
-
-
-# sync fds and smv repos with the the repos used in the last successful firebot run
-
-# warn user (if not the smokebot user) if using the clone option
-
-if [ `whoami` != smokebot ]; then
-  if [ "$CLONE_REPOS" != "" ]; then
-    echo "You are about to erase and clone the "
-    echo "fds, exp, fig, out and smv repos."
-    echo "Press any key to continue or <CTRL> c to abort."
-    echo "Type $0 -h for other options"
-#    read val
-  fi
 fi
 
 if [ "$CLONE_REPOS" != "" ]; then

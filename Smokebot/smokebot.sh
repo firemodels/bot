@@ -16,7 +16,7 @@ CD_REPO ()
      echo "          Aborting smokebot."
      return 1
   fi
-  cd -- "$repodir"
+  cd $repodir
 }
 
 #---------------------------------------------
@@ -1076,21 +1076,27 @@ date > $OUTPUT_DIR/stage0_start 2>&1
 
 if [[ "$CLONE_REPO_BRANCH" != "" ]]; then
   echo Cloning repos
-  cd -- "$smokebotdir" || exit 1
+  cd $REPOROOT/bot/Scripts
 
-  ./setup_repos.sh -K cfast -B $CLONE_REPO_BRANCH  > $OUTPUT_DIR/stage1_clone_repos  2>&1 &
+  mkdir -p $HOME/.smokebot
+  CLONELOGDIR=$HOME/.smokebot
+  ./setup_repos.sh -b -K cfast > $CLONELOGDIR/stage1_clone_cfast 2>&1 &
   pid_cfast=$!
-  ./setup_repos.sh -K fds   -B $CLONE_REPO_BRANCH >> $OUTPUT_DIR/stage1_clone_repos  2>&1 &
+  ./setup_repos.sh -b -K fds   > $CLONELOGDIR/stage1_clone_fds   2>&1 &
   pid_fds=$!
-  ./setup_repos.sh -K fig   -B $CLONE_REPO_BRANCH >> $OUTPUT_DIR/stage1_clone_repos  2>&1 &
+  ./setup_repos.sh -b -K fig   > $CLONELOGDIR/stage1_clone_fig   2>&1 &
   pid_fig=$!
-  ./setup_repos.sh -K smv   -B $CLONE_REPO_BRANCH >> $OUTPUT_DIR/stage1_clone_repos  2>&1 &
+  ./setup_repos.sh -b -K smv   > $CLONELOGDIR/stage1_clone_smv   2>&1 &
   pid_smv=$!
 
   wait $pid_cfast
+  echo cfast repo cloned
   wait $pid_fds
+  echo fds repo cloned
   wait $pid_fig
+  echo fig repo cloned
   wait $pid_smv
+  echo smv repo cloned
 fi
 
 #*** make sure repos exist
