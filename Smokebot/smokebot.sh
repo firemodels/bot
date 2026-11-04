@@ -822,16 +822,6 @@ email_build_status()
       echo "images errors/changes: $NUM_ERRORS/$NUM_CHANGES"  >> $TIME_LOG
     fi
   fi
-  is_bot=
-  if [ `whoami` == "firebot" ]; then
-    is_bot=1
-  fi
-  if [ `whoami` == "cfast" ]; then
-    is_bot=1
-  fi
-  if [ `whoami` == "smokebot" ]; then
-    is_bot=1
-  fi
   if [[ ! -e $WARNING_LOG ]] && [[ ! -e $ERROR_LOG ]]; then
 # save apps that were built for bundling
     rm -f $APPS_DIR/*
@@ -845,15 +835,13 @@ email_build_status()
   fi
   if [ "$UPLOADRESULTS" == "1" ]; then
     echo "status: https://pages.nist.gov/fds-smv/smokebot_status.html" >> $TIME_LOG
-    if [[ "$is_bot" == "1" ]]; then
-      GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_SMOKEVIEW_TAG
-      echo "Bundles/Guides/Figures: $GITURL"  >> $TIME_LOG
-      echo  "***output guides, figures and image summary to Github"             > output/stage_GHupload
-      echo  ""                                                  >> output/stage_GHupload
-      $UploadSummaryGH                                          &>> output/stage_GHupload
-      if [[ ! -e $WARNING_LOG ]] && [[ ! -e $ERROR_LOG ]]; then
-        $UploadGuidesGH                                          &>> output/stage_GHupload
-      fi
+    GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_SMOKEVIEW_TAG
+    echo "Bundles/Guides/Figures: $GITURL"  >> $TIME_LOG
+    echo  "***output guides, figures and image summary to Github"             > output/stage_GHupload
+    echo  ""                                                  >> output/stage_GHupload
+    $UploadSummaryGH                                          &>> output/stage_GHupload
+    if [[ ! -e $WARNING_LOG ]] && [[ ! -e $ERROR_LOG ]]; then
+      $UploadGuidesGH                                          &>> output/stage_GHupload
     fi
   fi
   echo ""                                  >> $TIME_LOG
