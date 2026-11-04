@@ -542,7 +542,7 @@ archive_timing_stats()
   cp smv_benchmarktiming_stats.csv "$HISTORY_DIR_ARCHIVE/${SMV_REVISION}_benchmarktiming.csv"
   sort -r -k 2 -t  ',' -n smv_timing_stats.csv | head -10 | awk -F',' '{print $1":", $2}' > $OUTPUT_DIR/slow_cases
   TOTAL_SMV_TIMES=`tail -1 smv_timing_stats.csv`
-  if [[ "$UPLOADRESULTS" == "1" ]] && [[ "$USER" == "smokebot" ]]; then
+  if [[ "$UPLOADRESULTS" == "1" ]] && [[ "$USER" == "firebot" ]]; then
     cd $smokebotdir
     ./smvstatus_updatepub.sh $REPOROOT/webpages $WEBBRANCH
   fi
@@ -894,9 +894,9 @@ email_build_status()
 # upload guides to a google drive directory
     if [ "$UPLOADRESULTS" == "1" ]; then
       cd $smokebotdir
-      echo  "***output guides to Github"  &> output/stage_upload
-      echo  ""                            &>> output/stage_upload
-      $UploadWEB                  $smvrepo/Manuals $MAKEMOVIES &>> output/stage_upload
+      echo  "***output guides to Github"       &> output/stage_upload
+      echo  ""                                &>> output/stage_upload
+      $UploadWEB $smvrepo/Manuals $MAKEMOVIES &>> output/stage_upload
     fi
 
       # Send success message with links to nightly manuals
