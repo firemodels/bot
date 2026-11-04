@@ -110,9 +110,12 @@ QUEUE=firebot
 
 #*** parse command line options
 
-while getopts 'fF:G:hJkm:Mo:q:r:R:s:T:Uw:W:' OPTION
+while getopts 'bfF:G:hJkm:Mo:q:r:R:s:T:Uw:W:' OPTION
 do
 case $OPTION  in
+  b)
+   DUMMY=
+   ;;
   f)
    FORCE=1
    ;;
