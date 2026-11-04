@@ -65,6 +65,5 @@ echo "setting up repos"
 ./update_repos.sh -w
 
 cd $CURDIR/../../Smokebot
-#./run_smokebot.sh -C -c -u -J -f -q firebot $MAILTO -x $BUNDLE_FDS_HASH -X $BUNDLE_FDS_TAG -y $BUNDLE_SMV_HASH -Y $BUNDLE_SMV_TAG $OWNER -r test_bundles -U -R release
-echo ./run_smokebot.sh -f -b -q batch4 $MAILTO $OWNER -r test_bundles -U 
-     ./run_smokebot.sh -f -b -q batch4 $MAILTO $OWNER -r test_bundles -U 
+echo ./run_smokebot.sh -f -q firebot $MAILTO $OWNER -r test_bundles -U 
+     ./run_smokebot.sh -f -q firebot $MAILTO $OWNER -r test_bundles -U 
