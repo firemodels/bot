@@ -1084,7 +1084,7 @@ if [[ "$CLONE_REPO_BRANCH" != "" ]]; then
   pid_fds=$!
   ./setup_repos.sh -K fig   -B $CLONE_REPO_BRANCH >> $OUTPUT_DIR/stage1_clone_repos  2>&1 &
   pid_fig=$!
-  ./update_repos.sh -K smv  -B $CLONE_REPO_BRANCH >  $OUTPUT_DIR/stage1_update_repos 2>&1 &
+  ./setup_repos.sh -K smv   -B $CLONE_REPO_BRANCH >> $OUTPUT_DIR/stage1_clone_repos  2>&1 &
   pid_smv=$!
 
   wait $pid_cfast
@@ -1113,9 +1113,6 @@ BRANCHPUBS_DIR=$BRANCH_DIR/pubs
 BRANCHAPPS_DIR=$BRANCH_DIR/apps
 mkdir -p $BRANCHPUBS_DIR
 mkdir -p $BRANCHAPPS_DIR
-
-# if -a option is invoked, only proceed running smokebot if the
-# smokeview or FDS source has changed
 
 if [ "$WEB_ROOT" == "" ]; then
   WEB_DIR=""
@@ -1561,3 +1558,4 @@ if [ "$HAVEMAIL" != "" ]; then
   echo "   emailing results"
 fi
 email_build_status
+ 
