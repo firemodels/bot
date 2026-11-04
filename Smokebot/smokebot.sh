@@ -1159,10 +1159,10 @@ echo "    FIG repo;branch: $figrepo;$FIGBRANCH"
 echo "    SMV repo;branch: $smvrepo;$SMVBRANCH"
 echo "      run directory: $smokebotdir"
 if [ "$WEB_DIR" != "" ]; then
-  echo "     web dir: $WEB_ROOT/$WEB_DIR"
+  echo "            web dir: $WEB_ROOT/$WEB_DIR"
 fi
 if [ "$WEB_URL" != "" ]; then
-  echo "         URL: $WEB_URL"
+  echo "                URL: $WEB_URL"
 fi
 echo ""
 
