@@ -71,5 +71,5 @@ cd $CURDIR
 
 # build manuals
 cd $REPOROOT/bot/Firebot
-echo ./run_firebot.sh -f -q firebot $MAILTO -U -r test_bundles $OWNER
-     ./run_firebot.sh -f -q firebot $MAILTO -U -r test_bundles $OWNER
+echo ./run_firebot.sh -y -f -q firebot $MAILTO -U -r test_bundles $OWNER
+     ./run_firebot.sh -y -f -q firebot $MAILTO -U -r test_bundles $OWNER
