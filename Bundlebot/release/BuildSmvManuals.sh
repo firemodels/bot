@@ -10,9 +10,11 @@ if [ "$BUNDLE_OWNER" != "" ]; then
   OWNER="-o $BUNDLE_OWNER"
 fi
 
+PROCEED=
+
 #*** parse command line options
 
-while getopts 'hm:o:' OPTION
+while getopts 'hm:o:y' OPTION
 do
 case $OPTION  in
   h)
@@ -25,6 +27,9 @@ case $OPTION  in
    ;;
   o)
    OWNER="-o $OPTARG"
+   ;;
+  y)
+   PROCEED=1
    ;;
 esac
 done
