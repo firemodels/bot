@@ -49,9 +49,11 @@ echo "   command: $0 $OWNER $MAILTO"
 echo "  FDS repo: $BUNDLE_FDS_TAG $BUNDLE_FDS_HASH"
 echo "  SMV repo: $BUNDLE_SMV_TAG $BUNDLE_SMV_HASH"
 echo ""
-echo "Press any key to continue or <CTRL> c to abort."
-echo "Type $0 -h for other options"
-read val
+if [ "$PROCEED" == "" ]; then
+  echo "Press any key to continue or <CTRL> c to abort."
+  echo "Type $0 -h for other options"
+  read val
+fi
 
 CURDIR=`pwd`
 
