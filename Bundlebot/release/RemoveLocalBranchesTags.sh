@@ -1,4 +1,18 @@
 #!/bin/bash
+
+if [[ "${1:-}" == -h ]]; then
+  cat <<'EOF'
+Usage: ./RemoveLocalBranchesTags.sh [-h]
+
+In cad, cfast, exp, fds, fig, out, and smv repos check out the master branch
+then delete local branches and tags whose names are absent from every configured
+remote. This can delete unmerged branches. Git protects checked-out branches.
+
+  -h  Show this help and exit.
+EOF
+  exit 0
+fi
+
 # Remove local branches and all local tags absent from every configured remote.
 # Unmerged branches are deleted too. Checked-out branches are protected.
 

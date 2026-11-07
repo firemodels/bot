@@ -1,4 +1,17 @@
 #!/bin/bash
+
+if [[ "${1:-}" == -h ]]; then
+  cat <<'EOF'
+Usage: ./ShowRevTags.sh [-h]
+
+Show the current Git revision and branch alongside the release tag and revision
+recorded in config.sh for each bundle repository.
+
+  -h  Show this help and exit.
+EOF
+  exit 0
+fi
+
 source config.sh
 
 GETREV ()

@@ -1,4 +1,20 @@
 #!/bin/bash
+
+if [[ "${1:-}" == -h ]]; then
+  cat <<'EOF'
+Usage: ./SetRevTags.sh [reset | -h]
+
+Clean up local-only branches and tags, then check out the revisions in config.sh on local
+release branches and create their release tags. Tags already published on any configured
+remote are refused.
+
+  reset  Run the cleanup, check out master, and remove the local release
+         branch in each target repository.
+  -h     Show this help and exit.
+EOF
+  exit 0
+fi
+
 echo "*** Check out and tag the revisions defined for the release bundle in config.sh"
 # Check out and tag the revisions defined for the release bundle.
 set -e
