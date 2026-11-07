@@ -10,9 +10,11 @@ if [ "$BUNDLE_OWNER" != "" ]; then
   OWNER="-o $BUNDLE_OWNER"
 fi
 
+PROCEED=
+
 #*** parse command line options
 
-while getopts 'hm:o:' OPTION
+while getopts 'hm:o:y' OPTION
 do
 case $OPTION  in
   h)
@@ -25,6 +27,9 @@ case $OPTION  in
    ;;
   o)
    OWNER="-o $OPTARG"
+   ;;
+  y)
+   PROCEED=1
    ;;
 esac
 done
@@ -44,11 +49,17 @@ echo "   command: $0 $OWNER $MAILTO"
 echo "  FDS repo: $BUNDLE_FDS_TAG $BUNDLE_FDS_HASH"
 echo "  SMV repo: $BUNDLE_SMV_TAG $BUNDLE_SMV_HASH"
 echo ""
-echo "Press any key to continue or <CTRL> c to abort."
-echo "Type $0 -h for other options"
-read val
+if [ "$PROCEED" == "" ]; then
+  echo "Press any key to continue or <CTRL> c to abort."
+  echo "Type $0 -h for other options"
+  read val
+fi
 
 CURDIR=`pwd`
+
+cd ../../../
+export REPOROOT=`pwd`
+cd $CURDIR
 
 echo ***clean files
 cd $CURDIR/../../Smokebot
@@ -58,13 +69,12 @@ git clean -dxf >& /dev/null
 cd $CURDIR/../nightly/output
 git clean -dxf >& /dev/null
 
-echo ***cloning repos
+echo ***update bot, web and wiki repos
 cd $CURDIR/../../Scripts
-echo "setting up repos"
-./setup_repos.sh -b -D
+echo "update bot, web and wiki repos"
+./update_repos.sh -b
 ./update_repos.sh -w
 
 cd $CURDIR/../../Smokebot
-#./run_smokebot.sh -C -c -u -J -f -q firebot $MAILTO -x $BUNDLE_FDS_HASH -X $BUNDLE_FDS_TAG -y $BUNDLE_SMV_HASH -Y $BUNDLE_SMV_TAG $OWNER -r test_bundles -U -R release
-echo ./run_smokebot.sh -f -b -q batch4 $MAILTO $OWNER -r test_bundles -U 
-     ./run_smokebot.sh -f -b -q batch4 $MAILTO $OWNER -r test_bundles -U 
+echo ./run_smokebot.sh -f -q firebot $MAILTO $OWNER -r test_bundles -R release -U 
+     ./run_smokebot.sh -f -q firebot $MAILTO $OWNER -r test_bundles -R release -U 

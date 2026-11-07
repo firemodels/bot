@@ -17,7 +17,7 @@ CD_REPO ()
   branch=$2
   CHK_REPO $repodir
 
-  cd $repodir
+  cd -- "$repodir" || exit 1
   if [ "$branch" != "current" ]; then
     if [ "$branch" != "" ]; then
       CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
@@ -35,7 +35,6 @@ newpage=~/.smokebot/newpage
 olddata=~/.smokebot/old_data
 newdata=~/.smokebot/smv_times.csv
 running=~/.fdssmvgit/bot_running
-curdir=`pwd`
 EXIT="yes"
 
 # don't update status page if smokebot is running
@@ -79,10 +78,13 @@ if [ "$USER" != "smokebot" ]; then
    exit
 fi
 
-CD_REPO $WEBREPO $WEBBRANCH
+CD_REPO "$WEBREPO" "$WEBBRANCH"
+if [[ -z "$WEBBRANCH" || "$WEBBRANCH" == "current" ]]; then
+  WEBBRANCH=$(git symbolic-ref --quiet --short HEAD) || exit 1
+fi
 
-git fetch origin
-git merge origin/$WEBBRANCH
+git fetch origin || exit 1
+git merge "origin/$WEBBRANCH" || exit 1
 
 cp $newpage smokebot_status.html
 

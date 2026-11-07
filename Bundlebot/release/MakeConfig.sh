@@ -1,27 +1,53 @@
 #!/bin/bash
-# This script builds the configuration scripts used to build the bundles
-# usage:
-# build both bash and dos config scripts
-# ./MakeConfig.sh x.y.z
+# This script builds the configuration scripts used to build bundles
+# A positional base_tag also sets the default SMV and CFAST tags.
+# Usage: ./MakeConfig.sh [base_tag | -f base_tag | -b base_tag] [-o BASH|DOS] [-c cfast_tag] [-s smv_tag]
 
-# build bash config script
-# ./MakeConfig.sh x.y.z BASH
+base_tag=6.11.2test
+cfast_tag=8.0.0test
+smv_tag=6.11.3test
+OS=
 
-# build dos config script
-# ./MakeConfig.sh x.y.z  DOS
+if [ "$#" -gt 0 ] && [[ "$1" != -* ]]; then
+  version=$1
+  shift
+  set -- -f "$version" -s "$version" -c "$version" "$@"
+fi
 
-# where x.y.z is the version being bundled
+while getopts ':b:c:f:o:s:' OPTION
+do
+  case "$OPTION" in
+    b|f) base_tag=$OPTARG ;;
+    c) cfast_tag=$OPTARG ;;
+    s) smv_tag=$OPTARG ;;
+    o) OS=$OPTARG ;;
+    *)
+      echo "Usage: $0 [base_tag | -f base_tag | -b base_tag] [-o BASH|DOS] [-c cfast_tag] [-s smv_tag]" >&2
+      exit 1
+      ;;
+  esac
+done
+shift $((OPTIND - 1))
 
-base_tag=$1
-OS=$2
+if [ -z "$base_tag" ] || [ "$#" -ne 0 ]; then
+  echo "Usage: $0 [base_tag | -f base_tag | -b base_tag] [-o BASH|DOS] [-c cfast_tag] [-s smv_tag]" >&2
+  exit 1
+fi
+
+if [ "$smv_tag" == "" ]; then
+  smv_tag=$base_tag
+fi
+if [ "$cfast_tag" == "" ]; then
+  cfast_tag=$base_tag
+fi
 
 if [ "$OS" == "" ]; then
   BOTVERSION=`git describe --dirty --long`
   BOTHASH=`git rev-parse --short HEAD`
   export BOTVERSION BOTHASH
-  ./MakeConfig.sh $base_tag BASH > config.sh
+  ./MakeConfig.sh -b "$base_tag" -c "$cfast_tag" -s "$smv_tag" -o BASH > config.sh
   cp config.sh history/config_${base_tag}.sh
-  ./MakeConfig.sh $base_tag DOS  > config.bat
+  ./MakeConfig.sh -b "$base_tag" -c "$cfast_tag" -s "$smv_tag" -o DOS  > config.bat
   cp config.bat history/config_${base_tag}.bat
   exit
 fi
@@ -47,7 +73,7 @@ else
 fi
 export HEAD COMMENT EXPORT
 
-repos="bot cad exp fds fig out smv"
+repos="bot cad cfast exp fds fig out smv"
 CURDIR=`pwd`
 gitroot=$CURDIR/../../..
 cd $gitroot
@@ -73,7 +99,15 @@ if [ "$repo" == "bot" ]; then
   HASH=$BOTHASH
 fi
 REPO=$(echo "$repo" | awk '{print toupper($0)}')
-TAG=$REPO-${base_tag}
+if [ "$repo" == "smv" ]; then
+  TAG=$REPO-${smv_tag}
+else
+  if [ "$repo" == "cfast" ]; then
+    TAG=$REPO-${cfast_tag}
+  else
+    TAG=$REPO-${base_tag}
+  fi
+fi
 cat << EOF
 $COMMENT $REPOVERSION
 $EXPORT BUNDLE_${REPO}_HASH=$HASH

@@ -1,6 +1,4 @@
 #!/bin/bash
-curdir=`pwd`
-cpufrom=$HOME/.firebot/fds_times.csv
 historydir=$HOME/.firebot/history
 FILELIST="*benchmark*csv"
 tempfile=/tmp/filelist.$$
@@ -10,12 +8,11 @@ tempfile=/tmp/filelist.$$
 # http://www.unixtimestamp.com/
 BASETIMESTAMP=1451624400
 CURDIR=`pwd`
-cd ../../smv
+cd $REPOROOT/smv
 while getopts 's' OPTION
 do
 case $OPTION  in
   s)
-   cpufrom=$HOME/.smokebot/smv_times.csv
    historydir=$HOME/.smokebot/history
    FILELIST="*csv"
    ;;
