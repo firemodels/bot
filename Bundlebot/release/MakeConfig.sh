@@ -1,21 +1,25 @@
 #!/bin/bash
 # This script builds the configuration scripts used to build bundles
-# Usage: ./MakeConfig.sh -b base_tag [-o BASH|DOS] [-c cfast_tag] [-s smv_tag]
+# Usage: ./MakeConfig.sh [base_tag | -f base_tag | -b base_tag] [-o BASH|DOS] [-c cfast_tag] [-s smv_tag]
 
 base_tag=6.11.2test
 cfast_tag=8.0.0test
 smv_tag=6.11.3test
 OS=
 
-while getopts ':b:c:o:s:' OPTION
+if [ "$#" -gt 0 ] && [[ "$1" != -* ]]; then
+  set -- -f "$@"
+fi
+
+while getopts ':b:c:f:o:s:' OPTION
 do
   case "$OPTION" in
-    b) base_tag=$OPTARG ;;
+    b|f) base_tag=$OPTARG ;;
     c) cfast_tag=$OPTARG ;;
     s) smv_tag=$OPTARG ;;
     o) OS=$OPTARG ;;
     *)
-      echo "Usage: $0 -b base_tag [-o BASH|DOS] [-c cfast_tag] [-s smv_tag]" >&2
+      echo "Usage: $0 [base_tag | -f base_tag | -b base_tag] [-o BASH|DOS] [-c cfast_tag] [-s smv_tag]" >&2
       exit 1
       ;;
   esac
@@ -23,7 +27,7 @@ done
 shift $((OPTIND - 1))
 
 if [ -z "$base_tag" ] || [ "$#" -ne 0 ]; then
-  echo "Usage: $0 -b base_tag [-o BASH|DOS] [-c cfast_tag] [-s smv_tag]" >&2
+  echo "Usage: $0 [base_tag | -f base_tag | -b base_tag] [-o BASH|DOS] [-c cfast_tag] [-s smv_tag]" >&2
   exit 1
 fi
 
