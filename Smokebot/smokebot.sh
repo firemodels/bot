@@ -1068,13 +1068,13 @@ if [[ "$CLONE_REPO_BRANCH" != "" ]]; then
 
   mkdir -p $HOME/.smokebot
   CLONELOGDIR=$HOME/.smokebot
-  ./setup_repos.sh -b -K cfast -D > $CLONELOGDIR/stage1_clone_cfast 2>&1 &
+  ./setup_repos.sh -b -K cfast -i $CLONE_REPO_BRANCH -D > $CLONELOGDIR/stage1_clone_cfast 2>&1 &
   pid_cfast=$!
-  ./setup_repos.sh -b -K fds   -D > $CLONELOGDIR/stage1_clone_fds   2>&1 &
+  ./setup_repos.sh -b -K fds   -i $CLONE_REPO_BRANCH -D > $CLONELOGDIR/stage1_clone_fds   2>&1 &
   pid_fds=$!
-  ./setup_repos.sh -b -K fig   -D > $CLONELOGDIR/stage1_clone_fig   2>&1 &
+  ./setup_repos.sh -b -K fig   -i $CLONE_REPO_BRANCH -D > $CLONELOGDIR/stage1_clone_fig   2>&1 &
   pid_fig=$!
-  ./setup_repos.sh -b -K smv   -D > $CLONELOGDIR/stage1_clone_smv   2>&1 &
+  ./setup_repos.sh -b -K smv   -i $CLONE_REPO_BRANCH -D > $CLONELOGDIR/stage1_clone_smv   2>&1 &
   pid_smv=$!
 
   wait $pid_cfast

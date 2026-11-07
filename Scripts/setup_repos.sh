@@ -27,6 +27,7 @@ echo "    $firebotrepos"
 echo "-G - only clone fds repo (erase first)"
 echo "-H repo - only clone repo (erase first)"
 echo "-h - display this message"
+echo "-i branchname - checkout a local branch named branchname after cloning"
 echo "-K repo - clone repo named repo, erase first"
 echo "-R - erase repos first"
 echo "-s - setup repos used by smokebot: "
@@ -108,6 +109,7 @@ eraserepos=
 FORCECLONE=
 APPENDTEST=
 DISABLEPUSH=1
+branchname=
 
 FMROOT=
 WIKIWEB=
@@ -119,7 +121,7 @@ else
    exit
 fi
 
-while getopts '3aABbcCDefFGH:hK:sRStTUVw' OPTION
+while getopts '3aABbcCDefFGH:hi:K:sRStTUVw' OPTION
 do
 case $OPTION  in
   3)
@@ -173,6 +175,9 @@ case $OPTION  in
    ;;
   h)
    usage;
+   ;;
+  i)
+   branchname="$OPTARG";
    ;;
   K)
    repos="$OPTARG";
@@ -321,6 +326,7 @@ do
     git clone $RECURSIVE $GITHEADER$GITOWNER/$repo.git $repo_out
     if [ ! -d $repo_out ]; then
       echo "***error: clone of $repo.git to $repo_out failed"
+      continue
     fi
   fi
   if [ "$CONFIG_REPOS" != "" ]; then
@@ -362,6 +368,9 @@ do
       echo git tag -a $TAG -m "tag for $TAG"
       git tag -a $TAG -m "tag for $TAG"
     fi
+  fi
+  if [ -n "$branchname" ] && [ "$repo" != "bot" ]; then
+    git -C "$repo_dir" checkout -b "$branchname" || exit 1
   fi
   SETUP_REMOTE $repo_dir
 done
