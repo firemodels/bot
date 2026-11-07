@@ -126,5 +126,6 @@ do
   else
     STATUS=1
   fi
+  sleep 5
 done
 exit "$STATUS"
