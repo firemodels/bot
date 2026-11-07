@@ -1,0 +1,45 @@
+#!/bin/bash
+
+if [[ "${1:-}" == -h ]]; then
+  cat <<'EOF'
+Usage: ./ShowRevTags.sh [-h]
+
+Show the current Git revision and branch alongside the release tag and revision
+recorded in config.sh for each bundle repository.
+
+  -h  Show this help and exit.
+EOF
+  exit 0
+fi
+
+source config.sh
+
+GETREV ()
+{
+repo=$1
+CONFIGVERSION=$2
+CONFIGTAG=$3
+cd $gitroot/$repo
+REPO=$(echo "$repo" | awk '{print toupper($0)}')
+REPOVERSION=`git describe --dirty --long`
+BRANCH=$(git branch --show-current)
+
+echo "repo   $REPOVERSION/$BRANCH"
+echo "config $CONFIGTAG/$CONFIGVERSION"
+echo ""
+}
+
+CURDIR=`pwd`
+gitroot=$CURDIR/../../..
+cd $gitroot
+gitroot=`pwd`
+cd $CURDIR
+
+GETREV bot   $BUNDLE_BOT_HASH $BUNDLE_BOT_TAG
+GETREV cad   $BUNDLE_CAD_HASH $BUNDLE_CAD_TAG
+GETREV cfast $BUNDLE_CFAST_HASH $BUNDLE_CFAST_TAG
+GETREV exp   $BUNDLE_EXP_HASH $BUNDLE_EXP_TAG
+GETREV fds   $BUNDLE_FDS_HASH $BUNDLE_FDS_TAG
+GETREV fig   $BUNDLE_FIG_HASH $BUNDLE_FIG_TAG
+GETREV out   $BUNDLE_OUT_HASH $BUNDLE_OUT_TAG
+GETREV smv   $BUNDLE_SMV_HASH $BUNDLE_SMV_TAG

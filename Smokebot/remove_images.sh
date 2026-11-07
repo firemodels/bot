@@ -1,11 +1,16 @@
 #!/bin/bash
 SMV_IMAGE_DIR=$1
 
-cd $SMV_IMAGE_DIR/user
+if [[ -z "$SMV_IMAGE_DIR" ]]; then
+  echo "Usage: $0 image-directory" >&2
+  exit 2
+fi
+
+cd -- "$SMV_IMAGE_DIR/user" || exit 1
 rm -f *_100.png *_200.png *_300.png  *_010.png *_020.png *_005.png *_030.png
 rm -f *_[1-3]0.png *_06.png *_09.png *_12.png
 
-cd $SMV_IMAGE_DIR/verification
+cd -- "../verification" || exit 1
 rm -f *_0000.png *_0300.png *_0600.png  *_0900.png *_1200.png *_1500.png 
 rm -f *_00000.png *_00025.png *_00050.png  *_00075.png *_00100.png *_00125.png 
 rm -f *_00150.png *_00175.png *_00200.png  *_00225.png *_00250.png *_00275.png 

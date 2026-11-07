@@ -20,9 +20,9 @@ These steps are given in more detail below.
    2. For each repo, checkout the desired revision if the latest revision is not the revision you want to use to make the bundle.
    3. cd to bot/Bundlebot/release and run the script `MakeConfig.sh` . This script updates the two configuration scripts `config.sh` and `config.bat` by using
       
-      `./MakeConfig.sh x.y.z`
+      `./MakeConfig.sh -f a.b.c -s d.e.f`
       
-where `x.y.z is the version number of the release to be built, for example 6.10.0 . The configuration scripts `config.sh` and `config.bat` contain tags and revision for each repo used to build the bundles.
+where `a.b.c` is the version number of the release to be built for fds, for example 6.11.2 and `d.e.f` is the version number of the release to be build for smokeview, for example `6.11.3`. The configuration scripts `config.sh` and `config.bat` contain tags and revision for each repo used to build the bundles.
    
    3. Examine `config.sh` and `config.bat` to ensure they contain revisions and tags that you want then commit changes and push up to the central repo.
 

@@ -1160,24 +1160,7 @@ fi
      echo "summary dir: $FDS_SUMMARY_DIR"  >> $TIME_LOG
    fi
 #  upload guides to github
-   is_bot=
-   if [ `whoami` == "firebot" ]; then
-     is_bot=1
-   fi
-   if [ `whoami` == "smokebot" ]; then
-     is_bot=1
-   fi
-   if [ `whoami` == "cfast" ]; then
-     is_bot=1
-   fi
-   UPLOAD=
-   if [[ "$UPLOADGUIDES" == "1" ]] && [[ "$is_bot"  == "1" ]]; then
-     UPLOAD=1
-   fi
-   if [ "$FORCE_UPLOAD" != "" ]; then
-     UPLOAD=1
-   fi
-   if [ "$UPLOAD" != "" ]; then
+   if [[ "$UPLOADGUIDES" == "1" ]]; then
      cd $firebotdir
      GITURL=https://github.com/$GH_OWNER/$GH_REPO/releases/tag/$GH_FDS_TAG
      echo "Bundles, Guides, Summary:  $GITURL" >> $TIME_LOG
@@ -1340,7 +1323,6 @@ BOPT=
 GITURL=
 MAKE_SUMMARY=
 BUILD_3RD_PARTY=
-FORCE_UPLOAD=
 MPI_TYPE=impi
 INTEL2="-J"
 

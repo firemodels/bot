@@ -330,6 +330,10 @@ do
       TAG=$BUNDLE_CAD_TAG
       HASH=$BUNDLE_CAD_HASH
     fi
+    if [ "$repo" == "cfast" ]; then
+      TAG=$BUNDLE_CFAST_TAG
+      HASH=$BUNDLE_CFAST_HASH
+    fi
     if [ "$repo" == "exp" ]; then
       TAG=$BUNDLE_EXP_TAG
       HASH=$BUNDLE_EXP_HASH

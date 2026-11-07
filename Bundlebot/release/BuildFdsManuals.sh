@@ -10,9 +10,11 @@ if [ "$BUNDLE_OWNER" != "" ]; then
   OWNER="-o $BUNDLE_OWNER"
 fi
 
+PROCEED=
+
 #*** parse command line options
 
-while getopts 'hm:o:' OPTION
+while getopts 'hm:o:y' OPTION
 do
 case $OPTION  in
   h)
@@ -25,6 +27,9 @@ case $OPTION  in
    ;;
   o)
    OWNER="-o $OPTARG"
+   ;;
+  y)
+   PROCEED=1
    ;;
 esac
 done
@@ -45,9 +50,12 @@ echo "   command: $0 $OWNER $MAILTO"
 echo "  FDS repo: $BUNDLE_FDS_TAG $BUNDLE_FDS_HASH"
 echo "  SMV repo: $BUNDLE_SMV_TAG $BUNDLE_SMV_HASH"
 echo ""
-echo "Press any key to continue or <CTRL> c to abort."
-echo "Type $0 -h for other options"
-read val
+
+if [ "$PROCEED" == "" ]; then
+  echo "Press any key to continue or <CTRL> c to abort."
+  echo "Type $0 -h for other options"
+  read val
+fi
 
 CURDIR=`pwd`
 
@@ -71,5 +79,5 @@ cd $CURDIR
 
 # build manuals
 cd $REPOROOT/bot/Firebot
-echo ./run_firebot.sh -f -q firebot $MAILTO -U -r test_bundles $OWNER
-     ./run_firebot.sh -f -q firebot $MAILTO -U -r test_bundles $OWNER
+echo ./run_firebot.sh -y -f -q firebot $MAILTO -U -r test_bundles $OWNER
+     ./run_firebot.sh -y -f -q firebot $MAILTO -U -r test_bundles $OWNER
