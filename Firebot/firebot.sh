@@ -1256,7 +1256,6 @@ ERROR_LOG=$OUTPUT_DIR/errors
 TIMING_WARNING_LOG=$OUTPUT_DIR/timing_warnings
 MAIL_LOG=$OUTPUT_DIR/mail_log
 FYI_LOG=$OUTPUT_DIR/fyis
-EMAIL_LIST=$HOME/.firebot/firebot_email_list.sh
 CRLF_WARNINGS=$OUTPUT_DIR/stage1_crlf_warnings
 
 mkdir -p $HOME/.firebot
@@ -1397,12 +1396,7 @@ if [ "$WEB_DIR" != "" ]; then
   fi
 fi
 
-# Load mailing list for status report
-if [ "$mailToFDS" == "" ]; then
-  if [ -e $EMAIL_LIST ]; then
-    source $EMAIL_LIST
-  fi
-fi
+# Use mailToFDS exported by the calling shell unless overridden with -m.
 if [ "$mailToFDS" == "" ]; then
   mailToFDS=`git config user.email`
 fi

@@ -30,12 +30,13 @@ The following steps need only be done once. The exact phrasing of the commands m
 
 7. Ensure that the Slurm queuing system is working.
 
-8. By default, firebot sends email to the email address configured for your bot repo (output of command `git config user.email` ) .  If you wish email to go to different email addresses, create a file named $HOME/.firebot/firebot_email_list.sh for some `user1` and `user2` (or more) that looks like:
+8. Set the notification list by exporting `mailToFDS` in the account's `$HOME/.bashrc`. Separate addresses with spaces. For the NIST firebot account, include `-r firebot@nist.gov` to select the sender:
 
+   ```bash
+   export mailToFDS="-r firebot@nist.gov user1@host1.com user2@host2.com"
    ```
-   #!/bin/bash
-   mailToFDS="user1@host1.com, user2@host2.com"
-   ```
+
+   Put the export before any `.bashrc` return that skips non-interactive shells. For cron commands using `bash -lc`, ensure the account's login startup file (usually `$HOME/.bash_profile`) sources `.bashrc`. Exporting is required so the launcher and bot subprocesses inherit the list. The `-m` option overrides the exported list, including any sender option. Without a list, Firebot falls back to `git config user.email`, then the local user and hostname. Firebot does not load a separate mailing-list file.
 
 ## Running firebot
 
