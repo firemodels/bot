@@ -3,9 +3,9 @@
 # A positional base_tag also sets the default SMV and CFAST tags.
 # Usage: ./MakeConfig.sh [base_tag | -f base_tag | -b base_tag] [-o BASH|DOS] [-c cfast_tag] [-s smv_tag]
 
-base_tag=6.11.2test
+base_tag=6.11.2
 cfast_tag=8.0.0test
-smv_tag=6.11.3test
+smv_tag=6.11.3
 OS=
 
 if [ "$#" -gt 0 ] && [[ "$1" != -* ]]; then
