@@ -119,7 +119,7 @@ CP $FORBUNDLE       volrender.ssf     $PLATFORMDIR/$smvbin
 CP $UTILSCRIPTDIR   slice2html.sh     $PLATFORMDIR/$smvbin
 CP $UTILSCRIPTDIR   slice2mp4.sh      $PLATFORMDIR/$smvbin
 CP $FORBUNDLE       .smokeview_bin    $PLATFORMDIR/$smvbin
-CP $SMVSCRIPTDIR    jp2conv.sh        $PLATFORMDIR/$smvbin
+CP $UTILSCRIPTDIR   jp2conv.sh        $PLATFORMDIR/$smvbin
 
 if [ "$platform" == "osx" ]; then
   CP  $SMVDIR       smokeview_${platform}       $PLATFORMDIR/$smvbin smokeview

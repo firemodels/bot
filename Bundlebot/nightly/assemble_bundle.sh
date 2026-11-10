@@ -235,7 +235,7 @@ done
 CURDIR=`pwd`
 
 CPDIR $colorbarsdir $smvbindir
-CP $smvscriptdir jp2conv.sh $smvbindir
+CP $utilscriptdir jp2conv.sh $smvbindir
 CPDIR $texturedir $smvbindir
 
 # FDS apps
