@@ -2,7 +2,7 @@
 ARG=$1
 
 # for now only run new mac bundler if the -n option is invoked
-if [ "$ARG" == '-n" ]; then
+if [ "$ARG" == "-n" ]; then
   if [ "$(uname -s)" = "Darwin" ]; then
     exec bash "$(dirname "$0")/BuildMacRelease.sh" "$@"
   fi
