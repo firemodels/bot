@@ -89,6 +89,11 @@ fi
 cat << EOF > $INSTALLER
 #!/bin/bash
 
+if [ "\$(uname -s)" = "Darwin" ] && [ "\$(uname -m)" = "x86_64" ]; then
+  echo "Error: Fds and Smokeview were compiled on a Mac with an arm chip.  Intel Macs are not supported." >&2
+  exit 1
+fi
+
 OVERRIDE=\$1
 INSTALL_LOG=/tmp/fds_install_\$\$.log
 echo "" > \$INSTALL_LOG
