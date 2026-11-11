@@ -1,6 +1,11 @@
 #!/bin/bash
 ARG=$1
 
+if [ "$(uname -s)" = "Darwin" ] && [ "$(uname -m)" = "x86_64" ]; then
+  echo "Error: bundles cannot be built on Intel Macs, only ARM Macs are supported." >&2
+  exit 1
+fi
+
 # for now only run new mac bundler if the -n option is invoked
 if [ "$ARG" == "-n" ]; then
   if [ "$(uname -s)" = "Darwin" ]; then

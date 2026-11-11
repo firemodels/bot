@@ -139,19 +139,15 @@ if [[ "${PLATFORM}" == "osx" ]]; then
     exit
   fi
   if [ "`uname -m`" == "arm64" ] ; then
-    MPI_LABEL=_arm
     BUNDLE_FDSCOMPILER=gnu
   else
-    MPI_LABEL=
     BUNDLE_FDSCOMPILER=intel
   fi
 else
   if [[ $IS_INTEL -eq 0 ]]; then
     export BUNDLE_MPITYPE="OPENMPI"
-    MPI_LABEL=
   else
     export BUNDLE_MPITYPE="INTELMPI"
-    MPI_LABEL=
   fi
 fi
 
@@ -505,14 +501,14 @@ REPO_ROOT=`pwd`
 
 cd $SCRIPTDIR
 installer_base=${FDSREV}_${SMVREV}
-installer_base_platform=${installer_base}_${BUNDLE_PREFIX}$UNDERSCORE${PLATFORM}${MPI_LABEL}
+installer_base_platform=${installer_base}_${BUNDLE_PREFIX}$UNDERSCORE${PLATFORM}
 viruslog=$OUTPUTDIR/fdssmv_virus.log
 
 #*** build apps, assemble bundle components, build bundle
 
 cd $SCRIPTDIR
 echo "*** building installer"
-./assemble_bundle.sh $FDSREV $SMVREV ${BUNDLE_PREFIX_ARG} ${SCAN_BUNDLE} ${MPI_LABEL}
+./assemble_bundle.sh $FDSREV $SMVREV ${BUNDLE_PREFIX_ARG} ${SCAN_BUNDLE}
 assemble_bundle_status=$?
 
 echo "*** virus scan summary"
@@ -528,7 +524,7 @@ if [[ "$UPLOADBUNDLE" == "1" ]]; then
   if [[ $assemble_bundle_status -eq 0 ]]; then
     echo "*** uploading installer"
     
-    FILELIST=`gh release view FDS_TEST  -R github.com/$GHUPLOADOWNER/test_bundles | grep SMV | grep FDS | grep ${PLATFORM}${MPI_LABEL} | awk '{print $2}'`
+    FILELIST=`gh release view FDS_TEST  -R github.com/$GHUPLOADOWNER/test_bundles | grep SMV | grep FDS | grep ${PLATFORM} | awk '{print $2}'`
     for file in $FILELIST ; do
       gh release delete-asset FDS_TEST $file -R github.com/$GHUPLOADOWNER/test_bundles -y
     done
@@ -548,7 +544,7 @@ fi
 
 #*** install bundle (if option set)
 
-LATESTBUNDLE=$BUNDLEDIR/FDS_SMV_latest_${PLATFORM}${MPI_LABEL}.sh
+LATESTBUNDLE=$BUNDLEDIR/FDS_SMV_latest_${PLATFORM}.sh
 BUNDLEBASE=$BUNDLEDIR/${installer_base_platform}
 if [ -e ${BUNDLEBASE}.sh ]; then
   rm -f  $LATESTBUNDLE

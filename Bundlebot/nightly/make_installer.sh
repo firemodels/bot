@@ -89,6 +89,11 @@ fi
 cat << EOF > $INSTALLER
 #!/bin/bash
 
+if [ "\$(uname -s)" = "Darwin" ] && [ "\$(uname -m)" = "x86_64" ]; then
+  echo "Error: Fds and Smokeview were compiled on a Mac with an arm chip.  Intel Macs are not supported." >&2
+  exit 1
+fi
+
 OVERRIDE=\$1
 INSTALL_LOG=/tmp/fds_install_\$\$.log
 echo "" > \$INSTALL_LOG
@@ -415,9 +420,11 @@ MODULE
 fi
 if [[ "$ostype" == "OSX" ]]; then
 cat << MODULE >> \$FDSMODULEtmp
+prepend-path    DYLD_LIBRARY_PATH \$FDS_root/bin/openmpi/lib
 setenv          TMPDIR     /tmp
 MODULE
 fi
+
 
 cp \$FDSMODULEtmp \$FDS_root/bin/modules/$FDSMODULE
 rm \$FDSMODULEtmp
@@ -597,3 +604,4 @@ __TARFILE_FOLLOWS__
 EOF
 chmod +x $INSTALLER
 cat $FDS_TAR >> $INSTALLER
+ 
