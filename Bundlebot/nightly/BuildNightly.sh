@@ -444,6 +444,10 @@ else
     GHUPLOADOWNER=firemodels
   fi
 fi
+if [ "$GH_OWNER" != "" ]; then
+  GHOWNER=$GH_OWNER
+  GHUPLOADOWNER=$GH_OWNER
+fi
 
 
 if [ "$FDS_TAG" != "" ]; then
