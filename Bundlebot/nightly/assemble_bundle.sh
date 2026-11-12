@@ -298,6 +298,7 @@ else
     fi
     mkdir -p $fdsbindir/openmpi/bin
     CP ${OPENMPI_BIN}         mpirun   $fdsbindir/openmpi/bin
+    CP ${OPENMPI_BIN}         mpiexec  $fdsbindir/openmpi/bin
     CP ${OPENMPI_BIN}         prterun  $fdsbindir/openmpi/bin
 
     echo "*** copying mpi shared files"
