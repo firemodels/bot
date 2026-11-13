@@ -4,8 +4,8 @@
 :: ----------------------------
 :: repo environment variables
 
-:: BOT-6.11.1-131-g8e9e4133a
-set BUNDLE_BOT_HASH=8e9e4133a
+:: BOT-6.11.1-132-gaf6740cd5-dirty
+set BUNDLE_BOT_HASH=af6740cd5
 set BUNDLE_BOT_TAG=BOT-6.11.2
 
 :: CAD-6.11.1-0-g2e31b37
@@ -20,8 +20,8 @@ set BUNDLE_CFAST_TAG=CFAST-8.0.0test
 set BUNDLE_EXP_HASH=704e0d91f
 set BUNDLE_EXP_TAG=EXP-6.11.2
 
-:: FDS-6.11.1-486-g10c758f743
-set BUNDLE_FDS_HASH=10c758f743
+:: FDS-6.11.1-490-g2e63f0ef14
+set BUNDLE_FDS_HASH=2e63f0ef14
 set BUNDLE_FDS_TAG=FDS-6.11.2
 
 :: FIG-6.11.1-20-g95d573d
