@@ -4,8 +4,8 @@
 :: ----------------------------
 :: repo environment variables
 
-:: BOT-6.11.1-134-gfcd5fe49a
-set BUNDLE_BOT_HASH=fcd5fe49a
+:: BOT-6.11.1-136-ga490c7bb4
+set BUNDLE_BOT_HASH=a490c7bb4
 set BUNDLE_BOT_TAG=BOT-6.11.2
 
 :: CAD-6.11.1-0-g2e31b37
