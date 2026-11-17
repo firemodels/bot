@@ -3,7 +3,6 @@ fds_version=$1
 smv_version=$2
 NIGHTLY=$3
 scan_bundle=$4
-LABEL=$5
 
 returncode=0
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
@@ -35,10 +34,10 @@ cd $curdir
 
 if [ "`uname`" == "Darwin" ]; then
   platform=osx
-  bundlebase=${fds_version}_${smv_version}_${NIGHTLY}osx$LABEL
+  bundlebase=${fds_version}_${smv_version}_${NIGHTLY}osx
 else
   platform=linux
-  bundlebase=${fds_version}_${smv_version}_${NIGHTLY}lnx$LABEL
+  bundlebase=${fds_version}_${smv_version}_${NIGHTLY}lnx
 fi
 custombase=${fds_version}_${smv_version}
 
@@ -298,6 +297,7 @@ else
     fi
     mkdir -p $fdsbindir/openmpi/bin
     CP ${OPENMPI_BIN}         mpirun   $fdsbindir/openmpi/bin
+    CP ${OPENMPI_BIN}         mpiexec  $fdsbindir/openmpi/bin
     CP ${OPENMPI_BIN}         prterun  $fdsbindir/openmpi/bin
 
     echo "*** copying mpi shared files"

@@ -59,27 +59,27 @@ echo cloning sundials
 echo "*** sundials cloned"
 
 echo cloning cad
-./setup_repos.sh -K cad >& $OUTDIR/clone_cad 
+./setup_repos.sh -D -K cad >& $OUTDIR/clone_cad 
 echo "*** cad cloned"
 
 echo cloning exp
-./setup_repos.sh -K exp >& $OUTDIR/clone_exp 
+./setup_repos.sh -D -K exp >& $OUTDIR/clone_exp 
 echo "*** exp cloned"
 
 echo cloning fds
-./setup_repos.sh -K fds >& $OUTDIR/clone_fds 
+./setup_repos.sh -D -K fds >& $OUTDIR/clone_fds 
 echo "*** fds cloned"
 
 echo cloning fig
-./setup_repos.sh -K fig >& $OUTDIR/clone_fig 
+./setup_repos.sh -D -K fig >& $OUTDIR/clone_fig 
 echo "*** fig cloned"
 
 echo cloning out
-./setup_repos.sh -K out >& $OUTDIR/clone_out 
+./setup_repos.sh -D -K out >& $OUTDIR/clone_out 
 echo "*** out cloned"
 
 echo cloning smv
-./setup_repos.sh -K smv >& $OUTDIR/clone_smv 
+./setup_repos.sh -D -K smv >& $OUTDIR/clone_smv 
 echo "*** smv cloned"
 
 TAG_REPO cad  $BUNDLE_CAD_HASH $BUNDLE_CAD_TAG

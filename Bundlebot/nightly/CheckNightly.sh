@@ -49,7 +49,7 @@ SMV_REVISION=`grep SMV_REVISION $INFO | awk '{print $2}'`
 BASE=${FDS_REVISION}_${SMV_REVISION}
 FDSWIN=${BASE}_nightly_win
 FDSLNX=${BASE}_nightly_lnx
-FDSOSX=${BASE}_nightly_osx_arm
+FDSOSX=${BASE}_nightly_osx
 rm -f $errors
 BUNDLE_STATUS=
 if [ `grep $FDSWIN.exe $uploads | wc -l` -eq 0 ]; then
