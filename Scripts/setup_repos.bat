@@ -20,7 +20,7 @@ set smvrepos=cfast fds fig smv test_bundles
 set cfastsmvrepos=cfast         smv nplot 
 set    cfastrepos=cfast exp fig smv nplot test_bundles
 set allrepos= cad cfast cor exp fds fig out radcal smv nplot test_bundles
-set wikiwebrepos= fds.wiki fds-smv
+set wikiwebrepos= fds.wiki smv.wiki fds-smv
 set repos=%fdsrepos%
 set WIKIWEB=0
 set erase_repos=0
@@ -95,6 +95,10 @@ echo.
      set repouser_out=wikis_%GITUSER%
      set WIKIWEB=1
   )
+  if "%repo%" == "smv.wiki" (
+     set repo_out=smvwiki
+     set WIKIWEB=1
+  )
   if "%repo%" == "fds-smv" (
      set repo_out=webpages
      set WIKIWEB=1
@@ -118,6 +122,7 @@ echo.
   if "%WIKIWEB%" == "1" (
      cd %FMROOT%
      git clone %GITHEADER%firemodels/%repo%.git %repo_out%
+     if "%repo%" == "smv.wiki" exit /b
      git clone %GITHEADER%%GITUSER%/%repo%.git  %repouser_out%
      exit /b 0
   )

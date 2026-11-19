@@ -1,7 +1,7 @@
 #!/bin/bash
 allrepos="bot cad cfast cor exp fds fig out radcal smv test_bundles"
 updaterepos=$allrepos
-otherrepos="webpages wikis"
+otherrepos="webpages wikis smvwiki"
 BRANCH=master
 CHECKOUT_MASTER=
 PAUSE=10

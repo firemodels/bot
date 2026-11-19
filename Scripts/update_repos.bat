@@ -15,7 +15,7 @@ if not exist ..\.gitbot goto skip1
 
 cd %repo%\bot
 set allrepos=bot cad cfast cor exp fds fig out radcal smv test_bundles
-set webrepos=webpages wikis
+set webrepos=webpages wikis smvwiki
 set BRANCH=master
 set ahead=0
 set "updaterepos=%allrepos%"

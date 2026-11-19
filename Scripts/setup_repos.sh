@@ -103,7 +103,7 @@ smvrepos="cfast fds fig smv test_bundles"
 cfastbotrepos="cfast exp fig smv test_bundles"
 cfastrepos="cfast exp fds smv"
 allrepos="cad cfast cor exp fds fig out radcal smv test_bundles"
-wikiwebrepos="fds.wiki fds-smv"
+wikiwebrepos="fds.wiki smv.wiki fds-smv"
 repos=$fdsrepos
 eraserepos=
 FORCECLONE=
@@ -263,6 +263,10 @@ do
   echo "----------------------------------------------"
   if [ "$repo" == "fds.wiki" ]; then
      repo_out=wikis
+     WIKIWEB=1
+  fi
+  if [ "$repo" == "smv.wiki" ]; then
+     repo_out=smvwiki
      WIKIWEB=1
   fi
   if [ "$repo" == "fds-smv" ]; then
