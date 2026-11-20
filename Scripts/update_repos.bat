@@ -25,6 +25,7 @@ set grep=%repo%\bot\Scripts\bin\grep
 set gawk=%repo%\bot\Scripts\bin\gawk
 set setbranchmaster=
 set updatewebwiki=0
+set status_only=0
 
 call :getopts %*
 if %stopscript% == 1 (
@@ -39,7 +40,11 @@ if %updatewebwiki% == 0 goto endif2
 for %%x in ( %webrepos% ) do ( call :update_repo2 %%x )
 :endif2
 
-echo update complete
+if %status_only% == 1 (
+  echo status complete
+) else (
+  echo update complete
+)
 for %%x in (%pushrepos%) do (
   echo.
   echo WARNING: A git push is required to sync %%x origin/%BRANCH% with firemodels/%BRANCH%.
@@ -59,6 +64,10 @@ goto eof
      echo %repo% does not exist, not updating
      exit /b
   )   
+  if %status_only% == 1 (
+    git -C "%repodir%" status -uno
+    exit /b
+  )
   cd %repodir%
   if "x%setbranchmaster%" == "x" goto skip_setbranch
     git checkout master
@@ -102,6 +111,10 @@ goto eof
      exit /b
   )
   echo ------------------ %reponame% -----------------------------------------
+  if %status_only% == 1 (
+    git -C "%repodir%" status -uno
+    exit /b
+  )
   cd %repodir%
   git rev-parse --abbrev-ref HEAD | head -1 > %CURDIR%\gitbranch.out
   set /p BRANCH=<%CURDIR%\gitbranch.out
@@ -133,6 +146,10 @@ goto eof
    set valid=1
    set setbranchmaster=1
  )
+ if /I "%1" EQU "-s" (
+   set valid=1
+   set status_only=1
+ )
  if /I "%1" EQU "-w" (
    set valid=1
    set updatewebwiki=1
@@ -157,6 +174,7 @@ echo Options:
 echo -b - update only bot repo
 echo -h - display this message
 echo -m - checkout the master branch before updating a repo
+echo -s - run git status -uno without updating
 echo -w - update web and wik repos
 exit /b
 
