@@ -17,7 +17,7 @@ cd %repo%\bot
 set allrepos=bot cad cfast cor exp fds fig out radcal smv test_bundles
 set webrepos=webpages wikis
 set BRANCH=master
-set ahead=0
+set "pushrepos="
 set "updaterepos=%allrepos%"
 
 set wc=%repo%\bot\Scripts\bin\wc
@@ -40,6 +40,11 @@ for %%x in ( %webrepos% ) do ( call :update_repo2 %%x )
 :endif2
 
 echo update complete
+for %%x in (%pushrepos%) do (
+  echo.
+  echo WARNING: A git push is required to sync %%x origin/%BRANCH% with firemodels/%BRANCH%.
+  echo git -C "%repo%\%%x" push origin %BRANCH%
+)
 
 cd %CURDIR%
 
@@ -79,7 +84,7 @@ goto eof
      echo    branch: %branch%
      echo    dir: %repo%\%reponame%
      git merge firemodels/%BRANCH%
-     git push origin %BRANCH%
+     set "pushrepos=%pushrepos% %reponame%"
   :skip1
 
   if "%repo%" == "exp" (

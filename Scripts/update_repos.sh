@@ -5,6 +5,7 @@ otherrepos="webpages wikis"
 BRANCH=master
 CHECKOUT_MASTER=
 PAUSE=10
+push_warnings=()
 
 function usage {
 echo "Update the repos $allrepos if they exist"
@@ -83,7 +84,9 @@ UPDATE_REPO ()
      git merge firemodels/$BRANCH
      ahead=`git status -uno | grep ahead | wc -l`
      if [ "$ahead" -gt "0" ]; then
-        git push origin $BRANCH
+        local push_command
+        printf -v push_command 'git -C %q push origin %q' "$repodir" "$BRANCH"
+        push_warnings+=("" "WARNING: A git push is required to sync $repo origin/$BRANCH with firemodels/$BRANCH." "$push_command")
      fi
   fi
   if [[ "$repo" == "exp" ]]; then
@@ -132,3 +135,6 @@ else
   done
 fi
 echo update complete
+if [ "${#push_warnings[@]}" -gt 0 ]; then
+  printf '%s\n' "${push_warnings[@]}"
+fi
