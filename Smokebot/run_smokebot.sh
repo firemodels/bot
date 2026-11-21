@@ -241,8 +241,8 @@ fi
 
 if [ "$FORCE" == "" ]; then
   if [ -e $smokebot_pid ] ; then
-    echo smokebot is running.
-    echo "If this is not the case, -f option."
+    echo "***error: smokebot is running.  If this is not the case rerun run_smokebot.sh"
+    echo "using the -f option or remove the lock file at $smokebot_pid."
     if [ -e $EMAIL_LIST ]; then
       source $EMAIL_LIST
       echo "Smokebot was unable to start.  Another instance was already running or it did not complete successfully"  | mail -s "error: smokebot failed to start" $mailToSMV > /dev/null
