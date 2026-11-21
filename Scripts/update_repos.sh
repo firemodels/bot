@@ -97,7 +97,9 @@ UPDATE_REPO ()
      if [ "$ahead" -gt "0" ]; then
         local push_command
         printf -v push_command 'git -C %q push origin %q' "$repodir" "$BRANCH"
-        push_warnings+=("" "WARNING: A git push is required to sync $repo origin/$BRANCH with firemodels/$BRANCH." "$push_command")
+        local push_warning="WARNING: A git push is required to sync $repo origin/$BRANCH with firemodels/$BRANCH."
+        printf '%s\n' "" "$push_warning" "$push_command"
+        push_warnings+=("" "$push_warning" "$push_command")
      fi
   fi
   if [[ "$repo" == "exp" ]]; then

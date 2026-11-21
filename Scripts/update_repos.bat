@@ -92,8 +92,14 @@ goto eof
      echo *** updating from firemodels
      echo    branch: %branch%
      echo    dir: %repo%\%reponame%
-     git merge firemodels/%BRANCH%
-     set "pushrepos=%pushrepos% %reponame%"
+     git merge firemodels/%BRANCH% || exit /b 1
+     git merge-base --is-ancestor HEAD "origin/%BRANCH%"
+     if errorlevel 1 if not errorlevel 2 (
+       echo.
+       echo WARNING: A git push is required to sync %reponame% origin/%BRANCH% with firemodels/%BRANCH%.
+       echo git -C "%repodir%" push origin %BRANCH%
+       set "pushrepos=%pushrepos% %reponame%"
+     )
   :skip1
 
   if "%repo%" == "exp" (
