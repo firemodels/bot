@@ -219,6 +219,7 @@ done
 for item in objects.svo smokeview.ini volrender.ssf .smokeview_bin colorbars textures; do
   cp -R "$ROOT/smv/Build/for_bundle/$item" "$DIST/smvbin/"
 done
+cp "$ROOT/smv/Utilities/Scripts/jp2conv.sh" "$DIST/smvbin/"
 cp "$PUBS/"* "$DIST/Documentation/"
 cp "$WORK/config.sh" "$DIST/Documentation/bundle_config.sh"
 for repo in fds smv; do
