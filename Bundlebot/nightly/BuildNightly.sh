@@ -415,7 +415,7 @@ if [ "$ONLY_INSTALLER" == "" ]; then
     echo all repos clone complete
   fi
 
-  ./make_smvapps.sh $SMVDBG 
+  ./make_smvapps.sh "$SMVDBG" "$BUNDLETYPE"
   ./make_fdsapps.sh
 fi
 

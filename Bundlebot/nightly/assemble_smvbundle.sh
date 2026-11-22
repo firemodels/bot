@@ -84,7 +84,6 @@ CPDIR ()
 SMVDIR=$GITROOT/smv/Build/smokeview/${COMPILER}_${platform}
 SMVDIRQ=$GITROOT/smv/Build/smokeview/${COMPILER}_${platform}_q
 SMZDIR=$GITROOT/smv/Build/smokezip/${COMPILER}_${platform}
-SMDDIR=$GITROOT/smv/Build/smokediff/${COMPILER}_${platform}
 PNGINFODIR=$GITROOT/smv/Build/pnginfo/${COMPILER}_${platform}
 FDS2FEDDIR=$GITROOT/smv/Build/fds2fed/${COMPILER}_${platform}
 WIND2FDSDIR=$GITROOT/smv/Build/wind2fds/${COMPILER}_${platform}
@@ -125,7 +124,6 @@ if [ "$platform" == "osx" ]; then
 else
   CP  $SMVDIR        smokeview_${platform}      $PLATFORMDIR/$smvbin smokeview
 fi
-CP  $SMDDIR        smokediff_${platform}         $PLATFORMDIR/$smvbin smokediff
 CP  $PNGINFODIR    pnginfo_${platform}           $PLATFORMDIR/$smvbin pnginfo
 CP  $FDS2FEDDIR    fds2fed_${platform}           $PLATFORMDIR/$smvbin fds2fed
 CP  $SMZDIR        smokezip_${platform}          $PLATFORMDIR/$smvbin smokezip

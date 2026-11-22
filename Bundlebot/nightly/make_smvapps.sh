@@ -1,5 +1,6 @@
 #!/bin/bash
 SMVDEBUG=$1
+BUNDLETYPE=$2
 
 
 # -------------------------------------------------------------
@@ -90,9 +91,11 @@ echo "*** building pnginfo"
 BUILD pnginfo &
 pid_pnginfo=$!
 
-echo "*** building smokediff"
-BUILD smokediff &
-pid_smokediff=$!
+if [ -z "$BUNDLETYPE" ]; then
+  echo "*** building smokediff"
+  BUILD smokediff &
+  pid_smokediff=$!
+fi
 
 echo "*** building smokezip"
 BUILD smokezip &
@@ -114,8 +117,10 @@ CHECK_BUILD fds2fed
 wait $pid_pnginfo
 CHECK_BUILD pnginfo
 
-wait $pid_smokediff
-CHECK_BUILD smokediff
+if [ -z "$BUNDLETYPE" ]; then
+  wait $pid_smokediff
+  CHECK_BUILD smokediff
+fi
 
 wait $pid_smokezip
 CHECK_BUILD smokezip
