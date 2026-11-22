@@ -226,7 +226,7 @@ mkdir -p $smvbindir/textures
 # smokeview apps
 
 echo "*** copying smv app files"
-FILELIST="smokeview pnginfo fds2fed smokezip wind2fds"
+FILELIST="smokeview pnginfo fds2fed part2iso wind2fds"
 for file in $FILELIST ; do
   CP $APPS_DIR $file $smvbindir
 done

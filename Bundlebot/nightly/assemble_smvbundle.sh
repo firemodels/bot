@@ -83,7 +83,7 @@ CPDIR ()
 
 SMVDIR=$GITROOT/smv/Build/smokeview/${COMPILER}_${platform}
 SMVDIRQ=$GITROOT/smv/Build/smokeview/${COMPILER}_${platform}_q
-SMZDIR=$GITROOT/smv/Build/smokezip/${COMPILER}_${platform}
+PART2ISODIR=$GITROOT/smv/Build/part2iso/${COMPILER}_${platform}
 PNGINFODIR=$GITROOT/smv/Build/pnginfo/${COMPILER}_${platform}
 FDS2FEDDIR=$GITROOT/smv/Build/fds2fed/${COMPILER}_${platform}
 WIND2FDSDIR=$GITROOT/smv/Build/wind2fds/${COMPILER}_${platform}
@@ -126,7 +126,7 @@ else
 fi
 CP  $PNGINFODIR    pnginfo_${platform}           $PLATFORMDIR/$smvbin pnginfo
 CP  $FDS2FEDDIR    fds2fed_${platform}           $PLATFORMDIR/$smvbin fds2fed
-CP  $SMZDIR        smokezip_${platform}          $PLATFORMDIR/$smvbin smokezip
+CP  $PART2ISODIR        part2iso_${platform}          $PLATFORMDIR/$smvbin part2iso
 CP  $WIND2FDSDIR   wind2fds_${platform}          $PLATFORMDIR/$smvbin wind2fds
 
 CURDIR=`pwd`

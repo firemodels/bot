@@ -97,9 +97,14 @@ if [ -z "$BUNDLETYPE" ]; then
   pid_smokediff=$!
 fi
 
-echo "*** building smokezip"
-BUILD smokezip &
-pid_smokezip=$!
+if [ -z "$BUNDLETYPE" ]; then
+  conversion_app=smokezip
+else
+  conversion_app=part2iso
+fi
+echo "*** building $conversion_app"
+BUILD "$conversion_app" &
+pid_conversion_app=$!
 
 echo "*** building wind2fds"
 BUILD wind2fds &
@@ -122,8 +127,8 @@ if [ -z "$BUNDLETYPE" ]; then
   CHECK_BUILD smokediff
 fi
 
-wait $pid_smokezip
-CHECK_BUILD smokezip
+wait $pid_conversion_app
+CHECK_BUILD "$conversion_app"
 
 wait $pid_wind2fds
 CHECK_BUILD wind2fds
