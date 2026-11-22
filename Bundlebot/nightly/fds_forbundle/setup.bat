@@ -107,7 +107,6 @@ echo.
 
 set "SMV6=%INSTALLDIR%\SMV6"
 set "FDS6=%INSTALLDIR%\FDS6"
-set "CFAST=%INSTALLDIR%\cfast"
 
 set need_overwrite=0
 if EXIST "%FDS6%" set need_overwrite=1 
@@ -207,14 +206,13 @@ call :setup_shortcut "%FDSSTART%\Smokeview User Guide.lnk"                "%DOCD
 call :setup_shortcut "%FDSSTART%\Smokeview Technical Reference Guide.lnk" "%DOCDIR%\Guides_and_Release_Notes\SMV_Technical_Reference_Guide.pdf"
 call :setup_shortcut "%FDSSTART%\Smokeview Verification Guide.lnk"        "%DOCDIR%\Guides_and_Release_Notes\SMV_Verification_Guide.pdf"
 call :setup_shortcut "%FDSSTART%\Smokeview release notes.lnk"             "%DOCDIR%\Guides_and_Release_Notes\Smokeview_release_notes.html"
-call :setup_shortcut "%FDSSTART%\Uninstall.lnk"                           "%UNINSTALLDIR%\uninstall.bat"
 
 set "DESKTOPDIR=%userprofile%\Desktop"
 set "DESKTOPDIR11=%OneDrive%\Desktop"
 
-                          call :setup_cmdfds "%FDSSTART%\CMDfds.lnk"
-if exist "%DESKTOPDIR%"   call :setup_cmdfds "%DESKTOPDIR%\CMDfds.lnk"
-if exist "%DESKTOPDIR11%" call :setup_cmdfds "%DESKTOPDIR11%\CMDfds.lnk"
+                          call :setup_batch_shortcut "%FDSSTART%\CMDfds.lnk" "%FDS6%\bin\fdsinit.bat" /k
+if exist "%DESKTOPDIR%"   call :setup_batch_shortcut "%DESKTOPDIR%\CMDfds.lnk" "%FDS6%\bin\fdsinit.bat" /k
+if exist "%DESKTOPDIR11%" call :setup_batch_shortcut "%DESKTOPDIR11%\CMDfds.lnk" "%FDS6%\bin\fdsinit.bat" /k
 set cmdexist=0
 if exist "%DESKTOPDIR%\CMDfds.lnk"   set cmdexist=1
 if exist "%DESKTOPDIR11%\CMDfds.lnk" set cmdexist=1
@@ -267,9 +265,11 @@ echo.                                     >> "%LOGFILE%"
 echo *** Setting up the Uninstall script. >> "%LOGFILE%"
 echo *** Setting up the Uninstall script.
 
-:: remove Smokeview directory
+:: remove installed PATH entries and the unshared Smokeview directory
 
+echo call :remove_install_path "%FDS6%\bin"                   >> "%UNINSTALLDIR%\uninstall_base.bat"
 echo if "%%cfastinstalled%%" == "1" goto skip2                >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo call :remove_install_path "%SMV6%"                       >> "%UNINSTALLDIR%\uninstall_base.bat"
 echo rmdir /s /q "%SMV6%"                                     >> "%UNINSTALLDIR%\uninstall_base.bat"
 echo :skip2                                                   >> "%UNINSTALLDIR%\uninstall_base.bat"
 
@@ -286,9 +286,7 @@ echo rmdir /s /q  "%FDS6%"                                    >> "%UNINSTALLDIR%
 :: if cfast exists then only remove fds
 :: if cfast does not exist then remove everything
 
-echo if exist "%CFAST%" goto skip_remove                      >> "%UNINSTALLDIR%\uninstall_base.bat"
-echo   echo Removing "%SMV6%"                                 >> "%UNINSTALLDIR%\uninstall_base.bat"
-echo   rmdir /s /q  "%SMV6%"                                  >> "%UNINSTALLDIR%\uninstall_base.bat"
+echo if "%%cfastinstalled%%" == "1" goto skip_remove           >> "%UNINSTALLDIR%\uninstall_base.bat"
 echo   echo Removing "%INSTALLDIR%"                           >> "%UNINSTALLDIR%\uninstall_base.bat"
 echo   rmdir "%INSTALLDIR%"                                   >> "%UNINSTALLDIR%\uninstall_base.bat"
 echo :skip_remove                                             >> "%UNINSTALLDIR%\uninstall_base.bat"
@@ -310,6 +308,9 @@ echo Set objWshShell = WScript.CreateObject("WScript.Shell")               >> "%
 echo Set objWshProcessEnv = objWshShell.Environment("PROCESS")             >> "%UNINSTALLDIR%\uninstall.vbs"
 echo objShell.ShellExecute "%ELEVATE_APP%", "%ELEVATE_PARMS%", "", "runas" >> "%UNINSTALLDIR%\uninstall.vbs"
 echo WScript.Sleep 10000                                                   >> "%UNINSTALLDIR%\uninstall.vbs"
+
+call :setup_batch_shortcut "%FDSSTART%\Uninstall FDS and Smokeview.lnk" "%UNINSTALLDIR%\uninstall.bat" /c
+call :setup_batch_shortcut "%DOCDIR%\Uninstall FDS and Smokeview.lnk" "%UNINSTALLDIR%\uninstall.bat" /c
 
 echo.                                  >> "%LOGFILE%"
 echo *** Cleanup                       >> "%LOGFILE%"
@@ -342,17 +343,19 @@ goto eof
   exit /b 0
 
 :-------------------------------------------------------------------------
-:setup_cmdfds
+:setup_batch_shortcut
 :-------------------------------------------------------------------------
 set "outfile=%~1"
+set "shortcut_batch=%~2"
+set "shortcut_mode=%~3"
 
 "%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -Command ^
   "$ErrorActionPreference = 'Stop';" ^
   "$shell = New-Object -ComObject WScript.Shell;" ^
   "$link = $shell.CreateShortcut($env:outfile);" ^
   "$link.TargetPath = $env:ComSpec;" ^
-  "$init = [IO.Path]::GetFullPath((Join-Path $env:FDS6 'bin\fdsinit.bat'));" ^
-  "$quotes = [string][char]34 * 2; $link.Arguments = '/k ' + $quotes + $init + $quotes;" ^
+  "$batch = [IO.Path]::GetFullPath($env:shortcut_batch);" ^
+  "$quotes = [string][char]34 * 2; $link.Arguments = $env:shortcut_mode + ' ' + $quotes + $batch + $quotes;" ^
   "$link.WorkingDirectory = $env:USERPROFILE; $link.Save()" >> "%LOGFILE%" 2>&1
 if errorlevel 1 (
   echo ***error: The shortcut "%outfile%" failed to be created >> "%LOGFILE%"

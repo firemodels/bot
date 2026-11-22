@@ -3,6 +3,7 @@ setlocal
 set FDS_REVISION_ARG=%1
 set SMV_REVISION_ARG=%2
 set nightly=%3
+set "scan_option=%~4"
 
 set FDSMAJORVERSION=6
 set FDSEDITION=FDS6
@@ -240,6 +241,10 @@ CALL :COPY  "%in_shortcut%\shortcut.exe"             "%out_bundle%\%fdsversion%\
 
 echo.
 
+if "%scan_option%" == "-N" (
+  echo *** virus scan skipped ^(-N^)
+  goto endifscan
+)
 set have_virus=0
 call :IS_FILE_INSTALLED clamscan
 if not exist %basedir% error ***error: %basedir% does not exist

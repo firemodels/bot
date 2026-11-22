@@ -12,6 +12,7 @@ set LOGFILE=%userprofile%\.bundle\logfile.txt
 set EMAILTO=
 set ONLY_INSTALLER=0
 set USE_CURRENT=
+set SKIP_VIRUS_SCAN=
 
 ::*** parse command line arguments
 call :GETOPTS %*
@@ -180,7 +181,7 @@ call copy_pubs smokebot %DOWNLOADOWNER% || exit /b 1
 echo ***making bundle
 
 cd %BUNDLESCRIPTDIR%
-call make_bundle %FDS_REVISION_BUNDLER% %SMV_REVISION_BUNDLER% %NIGHTLY%
+call make_bundle %FDS_REVISION_BUNDLER% %SMV_REVISION_BUNDLER% %NIGHTLY% %SKIP_VIRUS_SCAN%
 set HAVEVIRUS=%ERRORLEVEL%
 
 cd %BUNDLESCRIPTDIR%
@@ -189,7 +190,7 @@ if %HAVEVIRUS% == 2 echo ***warning: a virus scanner was not bound, the bundle w
 if %HAVEVIRUS% == 1 echo ***error: a virus was found in the bundle
 if %HAVEVIRUS% == 1 echo bundle was built but not uploaded
 if %HAVEVIRUS% == 1 goto skip_upload
-if %HAVEVIRUS% == 0 echo ***no viruses were found in the bundle ***
+if %HAVEVIRUS% == 0 if not defined SKIP_VIRUS_SCAN echo ***no viruses were found in the bundle ***
 if "x%UPLOAD_BUNDLE%" == "x" goto skip_upload
   echo ***uploading bundle
 
@@ -228,6 +229,7 @@ echo -C - build apps using current revisions and branches without cloning
 echo -h - display this message
 echo -I - only build installer, assume repos are already cloned and apps are already built
 echo -m mailtto - send email to mailto
+echo -N - skip virus scanning for this bundle
 echo -R - create a release bundle using settings in ..\release\config.bat
 echo -u - upload bundle to github.com/%username%/test_bundles/releases/tag/FDS_TEST
 echo -U - upload bundle to github.com/firemodels/test_bundles/releases/tag/FDS_TEST
@@ -258,6 +260,10 @@ exit /b 0
    set EMAILTO=%2
    set valid=1
    shift
+ )
+ if "%1" EQU "-N" (
+   set SKIP_VIRUS_SCAN=-N
+   set valid=1
  )
  if "%1" EQU "-R" (
    set IS_RELEASE=1
