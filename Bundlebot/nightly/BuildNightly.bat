@@ -12,11 +12,14 @@ set LOGFILE=%userprofile%\.bundle\logfile.txt
 set EMAILTO=
 set ONLY_INSTALLER=0
 set USE_CURRENT=
+set SKIP_VIRUS_SCAN=
 
 ::*** parse command line arguments
 call :GETOPTS %*
+if defined STOPSCRIPT exit /b 1
 
 ::*** exit script if bundle being built already exists
+if "x%USE_CURRENT%" == "x-C" goto skip_test_nightly
 if "x%IS_RELEASE%" == "x1" goto skip_test_nightly
 call TestNightly.bat
 if errorlevel 1 exit /b 1
@@ -71,6 +74,7 @@ cd %BUNDLESCRIPTDIR%
 
 :: create the bundle
 
+if "x%USE_CURRENT%" == "x-C" goto else4
 if "x%IS_RELEASE%" == "x" goto else4
 :: this is a release bundle - hash and revisions obtained from config.bat (invoked in BuildRelease.bat)
   set FDS_HASH_BUNDLER=%BUNDLE_FDS_HASH%
@@ -81,7 +85,7 @@ if "x%IS_RELEASE%" == "x" goto else4
   set SMV_TAG=%BUNDLE_SMV_TAG%
   goto endif4
 :else4
-:: this is a nightly bundle - hash and revisions obtained from latest firebot pass
+:: use the current repos with -C, otherwise use the latest firebot pass
   call get_hash_revisions.bat %USE_CURRENT% || exit /b 1
   set /p FDS_HASH_BUNDLER=<output\FDS_HASH
   set /p SMV_HASH_BUNDLER=<output\SMV_HASH
@@ -93,28 +97,34 @@ if "x%IS_RELEASE%" == "x" goto else4
   erase output\SMV_REVISION
 :endif4
 
+set FDS_BRANCH_BUNDLER=nightly
+set SMV_BRANCH_BUNDLER=nightly
+if "%NIGHTLY%" == "no" set FDS_BRANCH_BUNDLER=release
+if "%NIGHTLY%" == "no" set SMV_BRANCH_BUNDLER=release
+if "x%USE_CURRENT%" == "x-C" goto current_branches
+if %ONLY_INSTALLER% == 1 goto current_branches
+goto branches_ready
+:current_branches
+set FDS_BRANCH_BUNDLER=unknown
+set SMV_BRANCH_BUNDLER=unknown
+for /f "delims=" %%B in ('git -C "%REPOROOT%\fds" rev-parse --abbrev-ref HEAD') do set "FDS_BRANCH_BUNDLER=%%B"
+for /f "delims=" %%B in ('git -C "%REPOROOT%\smv" rev-parse --abbrev-ref HEAD') do set "SMV_BRANCH_BUNDLER=%%B"
+:branches_ready
+
 echo.                                                         > %LOGFILE%
 echo ***building bundle using:                               >> %LOGFILE%
 echo.                                                        >> %LOGFILE%
 if "x%FDS_REVISION_BUNDLER%" == "x" goto skip_fdsrev
-  echo             FDS revision: %FDS_REVISION_BUNDLER%      >> %LOGFILE%
+  echo             FDS revision: %FDS_REVISION_BUNDLER%-%FDS_HASH_BUNDLER%/%FDS_BRANCH_BUNDLER%      >> %LOGFILE%
 :skip_fdsrev
-
-if "x%FDS_HASH_BUNDLER%" == "x" goto skip_fdshash
-echo            FDS repo hash: %FDS_HASH_BUNDLER%            >> %LOGFILE%
-:skip_fdshash
 
 if "x%FDS_TAG%" == "x" goto skip_fdstag
 echo             FDS repo tag: %FDS_TAG%                     >> %LOGFILE%
 :skip_fdstag
 
 if "x%SMV_REVISION_BUNDLER%" == "x" goto skip_smvrev
-  echo             smv revision: %SMV_REVISION_BUNDLER%      >> %LOGFILE%
+  echo             SMV revision: %SMV_REVISION_BUNDLER%-%SMV_HASH_BUNDLER%/%SMV_BRANCH_BUNDLER%      >> %LOGFILE%
 :skip_smvrev
-
-if "x%SMV_HASH_BUNDLER%" == "x" goto skip_smvhash
-echo            SMV repo hash: %SMV_HASH_BUNDLER%            >> %LOGFILE%
-:skip_smvhash
 
 if "x%SMV_TAG%" == "x" goto skip_smvtag
 echo             SMV repo tag: %SMV_TAG%                     >> %LOGFILE%
@@ -128,7 +138,8 @@ echo.                                                        >> %LOGFILE%
 type %LOGFILE%
 
 if %ONLY_INSTALLER% == 1 goto skip2
-:: clone fds and smv repos 
+if "x%USE_CURRENT%" == "x-C" goto skiptag
+:: clone fds and smv repos
 call clone_repos %FDS_HASH_BUNDLER% %SMV_HASH_BUNDLER%  || exit /b 1
 if "%NIGHTLY%" == "yes" goto skiptag
   cd %REPOROOT%\fds
@@ -170,7 +181,7 @@ call copy_pubs smokebot %DOWNLOADOWNER% || exit /b 1
 echo ***making bundle
 
 cd %BUNDLESCRIPTDIR%
-call make_bundle %FDS_REVISION_BUNDLER% %SMV_REVISION_BUNDLER% %NIGHTLY%
+call make_bundle %FDS_REVISION_BUNDLER% %SMV_REVISION_BUNDLER% %NIGHTLY% %SKIP_VIRUS_SCAN%
 set HAVEVIRUS=%ERRORLEVEL%
 
 cd %BUNDLESCRIPTDIR%
@@ -179,7 +190,7 @@ if %HAVEVIRUS% == 2 echo ***warning: a virus scanner was not bound, the bundle w
 if %HAVEVIRUS% == 1 echo ***error: a virus was found in the bundle
 if %HAVEVIRUS% == 1 echo bundle was built but not uploaded
 if %HAVEVIRUS% == 1 goto skip_upload
-if %HAVEVIRUS% == 0 echo ***no viruses were found in the bundle ***
+if %HAVEVIRUS% == 0 if not defined SKIP_VIRUS_SCAN echo ***no viruses were found in the bundle ***
 if "x%UPLOAD_BUNDLE%" == "x" goto skip_upload
   echo ***uploading bundle
 
@@ -214,10 +225,11 @@ echo This script builds FDS and Smokeview apps and generates a bundle using eith
 echo specified fds and smv repo revisions or revisions from the latest firebot pass.
 echo.
 echo Options:
-echo -C - build apps using current revision
+echo -C - build apps using current revisions and branches without cloning
 echo -h - display this message
 echo -I - only build installer, assume repos are already cloned and apps are already built
 echo -m mailtto - send email to mailto
+echo -N - skip virus scanning for this bundle
 echo -R - create a release bundle using settings in ..\release\config.bat
 echo -u - upload bundle to github.com/%username%/test_bundles/releases/tag/FDS_TEST
 echo -U - upload bundle to github.com/firemodels/test_bundles/releases/tag/FDS_TEST
@@ -234,7 +246,6 @@ exit /b 0
  if "%1" EQU "-C" (
    set USE_CURRENT=-C
    set valid=1
-   shift
  )
  if "%1" EQU "-h" (
    call :USAGE
@@ -250,10 +261,13 @@ exit /b 0
    set valid=1
    shift
  )
+ if "%1" EQU "-N" (
+   set SKIP_VIRUS_SCAN=-N
+   set valid=1
+ )
  if "%1" EQU "-R" (
    set IS_RELEASE=1
    set valid=1
-   shift
  )
  if "%1" EQU "-u" (
    set UPLOAD_BUNDLE=2

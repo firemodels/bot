@@ -15,7 +15,7 @@ if not exist ..\.gitbot goto skip1
 
 cd %repo%\bot
 set allrepos=bot cad cfast cor exp fds fig out radcal smv test_bundles
-set webrepos=webpages wikis
+set webrepos=webpages wikis smvwiki
 set BRANCH=master
 set "pushrepos="
 set "updaterepos=%allrepos%"
@@ -82,8 +82,8 @@ goto eof
   echo *** updating from origin
   echo    branch: %branch%
   echo    dir: %repo%\%reponame%
-  git remote update
-  git merge origin/%BRANCH%
+  git remote update || exit /b 1
+  git merge "origin/%BRANCH%" || exit /b 1
   git remote -v | %gawk% "{print $1}" | %grep% firemodels | %wc%  -l > %CURDIR%\have_central.out
   set /p have_central=<%CURDIR%\have_central.out
 
@@ -92,8 +92,14 @@ goto eof
      echo *** updating from firemodels
      echo    branch: %branch%
      echo    dir: %repo%\%reponame%
-     git merge firemodels/%BRANCH%
-     set "pushrepos=%pushrepos% %reponame%"
+     git merge "firemodels/%BRANCH%" || exit /b 1
+     git merge-base --is-ancestor HEAD "refs/remotes/origin/%BRANCH%"
+     if errorlevel 1 if not errorlevel 2 (
+       echo.
+       echo WARNING: A git push is required to sync %reponame% origin/%BRANCH% with firemodels/%BRANCH%.
+       echo git -C "%repodir%" push origin %BRANCH%
+       set "pushrepos=%pushrepos% %reponame%"
+     )
   :skip1
 
   if "%repo%" == "exp" (

@@ -16,7 +16,6 @@ set reporoot=%CD%
 set CURDIR=%CD%
 
 set forbundle=%reporoot%\smv\Build\for_bundle
-set smvscripts=%reporoot%\smv\scripts
 set repoexes=%userprofile%\.bundle\BUNDLE\WINDOWS\repoexes
 set gawk=%reporoot%\bot\scripts\bin\gawk.exe
 
@@ -35,19 +34,17 @@ if exist %smvdir% echo ***error: %smvdir% was not deleted
 
 mkdir %smvdir%
 
-CALL :COPY  %reporoot%\smv\Build\set_path\intel_win\set_path_win.exe   %smvdir%\set_path.exe
+CALL :COPY  "%scriptdir%..\nightly\set_path.bat" "%smvdir%\set_path.bat"
 CALL :COPY  %reporoot%\smv\Build\smokeview\intel_win\smokeview_win.exe %smvdir%\smokeview.exe
-CALL :COPY  %smvscripts%\jp2conv.bat                                   %smvdir%\jp2conv.bat
 
 echo copying .png files
 copy %forbundle%\*.png %smvdir%\.>Nul
 
 CALL :COPY  %forbundle%\volrender.ssf %smvdir%\volrender.ssf
 
-CALL :COPY  %reporoot%\smv\Build\smokediff\intel_win\smokediff_win.exe   %smvdir%\smokediff.exe
 CALL :COPY  %reporoot%\smv\Build\pnginfo\intel_win\pnginfo_win.exe       %smvdir%\pnginfo.exe
+CALL :COPY  %reporoot%\smv\Build\part2iso\intel_win\part2iso_win.exe     %smvdir%\part2iso.exe
 CALL :COPY  %reporoot%\smv\Build\fds2fed\intel_win\fds2fed_win.exe       %smvdir%\fds2fed.exe
-CALL :COPY  %reporoot%\smv\Build\smokezip\intel_win\smokezip_win.exe     %smvdir%\smokezip.exe
 CALL :COPY  %reporoot%\smv\Build\wind2fds\intel_win\wind2fds_win.exe     %smvdir%\wind2fds.exe
 
 echo Unpacking Smokeview %versionbase% installation files > %forbundle%\unpack.txt
@@ -55,6 +52,8 @@ echo Updating Windows Smokeview to %versionbase%          > %forbundle%\message.
 
 CALL :COPY  %forbundle%\message.txt %zipbase%\message.txt
 CALL :COPY  %forbundle%\setup.bat   %zipbase%\setup.bat
+:: Adapt the copied installer, including installers from older smv revisions.
+powershell.exe -NoLogo -NoProfile -Command "$p=Join-Path $env:zipbase 'setup.bat'; $s=[IO.File]::ReadAllText($p).Replace('set_path.exe','set_path.bat'); [IO.File]::WriteAllText($p,$s,[Text.UTF8Encoding]::new($false))"
 
 set curdir=%CD%
 

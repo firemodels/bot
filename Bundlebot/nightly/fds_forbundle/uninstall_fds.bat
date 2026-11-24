@@ -17,7 +17,7 @@ if %cfastinstalled% == 1 goto skip1
 :skip1
 
 echo *** Removing FDS from the Start menu.
-rmdir /q /s "%ALLUSERSPROFILE%\Start Menu\Programs\FDS6"
+rmdir /q /s "%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\FDS6"
 
 echo *** Stopping smokeview
 taskkill /F /IM smokeview.exe     >Nul 2>Nul

@@ -3,6 +3,7 @@ setlocal
 set FDS_REVISION_ARG=%1
 set SMV_REVISION_ARG=%2
 set nightly=%3
+set "scan_option=%~4"
 
 set FDSMAJORVERSION=6
 set FDSEDITION=FDS6
@@ -134,13 +135,10 @@ cd %scriptdir%
 call copy_oneapi_libs.bat %out_bin%
 cd %CURDIR%
 
-CALL :COPY  %bundle_dir%\smv\smokediff.exe  %out_smv%\smokediff.exe
 CALL :COPY  %bundle_dir%\smv\pnginfo.exe    %out_smv%\pnginfo.exe
+CALL :COPY  %bundle_dir%\smv\part2iso.exe   %out_smv%\part2iso.exe
 CALL :COPY  %bundle_dir%\smv\fds2fed.exe    %out_smv%\fds2fed.exe
-CALL :COPY  %bundle_dir%\smv\smokezip.exe   %out_smv%\smokezip.exe 
 CALL :COPY  %bundle_dir%\smv\wind2fds.exe   %out_smv%\wind2fds.exe 
-
-CALL :COPY  %GITROOT%\smv\scripts\jp2conv.bat                %out_smv%\jp2conv.bat
 
 set curdir=%CD%
 
@@ -187,8 +185,6 @@ CALL :COPY  "%fds_forbundle%\uninstall_fds.bat"  "%out_uninstall%\uninstall_base
 CALL :COPY  "%fds_forbundle%\uninstall_fds2.bat" "%out_uninstall%\uninstall_base2.bat"
 CALL :COPY  "%fds_forbundle%\uninstall.bat"      "%out_uninstall%\uninstall.bat"
 echo @echo off > "%out_uninstall%\uninstall.vbs"
-
-CALL :COPY  "%GITROOT%\smv\Build\set_path\intel_win\set_path_win.exe" "%out_uninstall%\set_path.exe"
 
 echo.
 echo *** copying FDS documentation
@@ -245,6 +241,10 @@ CALL :COPY  "%in_shortcut%\shortcut.exe"             "%out_bundle%\%fdsversion%\
 
 echo.
 
+if "%scan_option%" == "-N" (
+  echo *** virus scan skipped ^(-N^)
+  goto endifscan
+)
 set have_virus=0
 call :IS_FILE_INSTALLED clamscan
 if not exist %basedir% error ***error: %basedir% does not exist

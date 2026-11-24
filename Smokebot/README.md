@@ -6,7 +6,7 @@ Smokebot is a verification test script that can be run at regular intervals as p
 
 The following steps only need to be done once. The exact phrasing of the commands are for the NIST linux cluster named spark. You might need to modify the path and module names.
 
-1. Clone the repositories that are included in the GitHub organization called `firemodels`: `bot`, `cfast`, `fds`, `fig` and `smv`. Clone `bot` first, then cd into `bot/Scripts` and type `./setup_repos.sh -a` . This will clone all the other repos needed in the same directory as `bot` (or you can clone each repo in the same way as you cloned `bot`).
+1. Clone the repositories that are included in the GitHub organization called `firemodels`: `bot`, `cfast`, `fds`, `fig` and `smv`. Clone `bot` first, then cd into `bot/Smokebot` and type `./clone_repos.sh -a` . This will clone all the other repos needed in the same directory as `bot` (or you can clone each repo in the same way as you cloned `bot`).
 
 2. Ensure that the following software packages are installed on the system:
 
