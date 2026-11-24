@@ -382,26 +382,11 @@ compile_smv_libraries()
 
 compile_smv_utilities()
 {
-# smokezip:
-  echo "      smokezip"
-  cd $smvrepo/Build/smokezip/${SMVCOMPILER}_${platform}
-  rm -f *.o smokezip_${platform}
-
-  ./make_smokezip.sh > $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
-  echo "" >> $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
-
-# smokediff:
-  echo "      smokediff"
-  cd $smvrepo/Build/smokediff/${SMVCOMPILER}_${platform}
-  rm -f *.o smokediff_${platform}
-  ./make_smokediff.sh >> $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
-  echo "" >> $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
-
 # wind2fds:
   echo "      wind2fds"
   cd $smvrepo/Build/wind2fds/${SMVCOMPILER}_${platform}
   rm -f *.o wind2fds_${platform}
-  ./make_wind2fds.sh >> $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
+  ./make_wind2fds.sh > $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
  echo "" >> $OUTPUT_DIR/stage2_build_smv_utilities 2>&1
 
 # fds2fed

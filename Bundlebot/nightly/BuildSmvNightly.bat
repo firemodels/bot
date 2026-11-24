@@ -58,7 +58,7 @@ echo ***     smv hash: %smv_hash%
 echo *** smv revision: %smvrepo_revision%
 echo.
 
-set progs=LIBS smokediff pnginfo smokezip fds2fed wind2fds set_path smokeview
+set progs=LIBS pnginfo part2iso fds2fed wind2fds smokeview
 for %%x in ( %progs% ) do (
   title Building %%x
   cd %GITROOT%\smv\Build\%%x\intel_win

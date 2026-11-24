@@ -55,10 +55,6 @@ echo building fds2fed
 BUILD fds2fed &
 pid_fds2fed=$!
 
-echo building smokediff
-BUILD smokediff &
-pid_smokediff=$!
-
 echo building wind2fds
 BUILD wind2fds &
 pid_wind2fds=$!
@@ -74,9 +70,9 @@ echo building smokeview
 BUILD smokeview &
 pid_smokeview=$!
 
-echo building smokezip
-BUILD smokezip &
-pid_smokezip=$!
+echo building part2iso
+BUILD part2iso &
+pid_part2iso=$!
 
 # verify smokeview apps were built
 
@@ -86,14 +82,11 @@ CHECK_BUILD fds2fed
 wait $pid_pnginfo
 CHECK_BUILD pnginfo
 
-wait $pid_smokediff
-CHECK_BUILD smokediff
-
 wait $pid_smokeview
 CHECK_BUILD smokeview
 
-wait $pid_smokezip
-CHECK_BUILD smokezip
+wait $pid_part2iso
+CHECK_BUILD part2iso
 
 wait $pid_wind2fds
 CHECK_BUILD wind2fds

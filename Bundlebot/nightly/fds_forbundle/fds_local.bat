@@ -28,7 +28,7 @@ call :set_openmp_defaults
 
 if "x%IN_CMDFDS%" == "x1" goto skip_fdsinit
   echo setting up environment for fds
-  call fdsinit
+  call "%~dp0fdsinit.bat"
 :skip_fdsinit
 
 if "x%IN_CMDFDS%" == "x1" goto skip_NO_IN_CMDFDS
@@ -38,7 +38,7 @@ if "x%IN_CMDFDS%" == "x1" goto skip_NO_IN_CMDFDS
 :skip_NO_IN_CMDFDS
 
 if "%show_version%" == "0" goto skip_showversion
-  mpiexec -localonly -n 1 fds
+  "%~dp0mpi\mpiexec.exe" -localonly -n 1 "%~dp0fds.exe"
 goto eof
 :skip_showversion
 
@@ -60,7 +60,7 @@ if "x%use_default_casedir%" == "x" goto skip3
 if "x%casedir%" == "x" goto skip2
 if NOT exist %casedir% mkdir %casedir%
   echo @echo off            > %casedir%.bat
-  echo smokeview %casedir% >> %casedir%.bat
+  echo "%SMOKEVIEW_EXE%" %casedir% >> %casedir%.bat
   copy %casename% %casedir%
   cd %casedir%
 :skip2
@@ -68,8 +68,8 @@ if NOT exist %casedir% mkdir %casedir%
 
 :: placeholder names for openmp and non-openmp versions of fds
 
-set fds_openmp=fds_openmp
-set fds_non_openmp=fds
+set fds_openmp=fds_openmp.exe
+set fds_non_openmp=fds.exe
 
 set fds=%fds_openmp%
 set "openmp_env=-env OMP_NUM_THREADS %n_openmp%"
@@ -83,7 +83,7 @@ if "%force_openmp%" == "1" goto skip1
 :skip1
 
 TITLE %casename%
-%ECHO% mpiexec -localonly -n %n_mpi% %openmp_env% %debug% %oversubscribed% %fabric% %fds% %casename%
+%ECHO% "%~dp0mpi\mpiexec.exe" -localonly -n %n_mpi% %openmp_env% %debug% %oversubscribed% %fabric% "%~dp0%fds%" %casename%
 
 :eof
 exit /b

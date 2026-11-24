@@ -1,7 +1,7 @@
 #!/bin/bash
 allrepos="bot cad cfast cor exp fds fig out radcal smv test_bundles"
 updaterepos=$allrepos
-otherrepos="webpages wikis"
+otherrepos="webpages wikis smvwiki"
 BRANCH=master
 CHECKOUT_MASTER=
 STATUS_ONLY=
@@ -84,20 +84,23 @@ UPDATE_REPO ()
   echo "     branch: $BRANCH"
   echo "     dir: $repodir"
 
-  git remote update
-  git merge origin/$BRANCH
+  git remote update || return
+  git merge "origin/$BRANCH" || return
   have_central=`git remote -v | awk '{print $1}' | grep firemodels | wc  -l`
   if [ "$have_central" -gt "0" ]; then
      echo ""
      echo "*** updating from firemodels"
      echo "    branch: $BRANCH"
      echo "    dir: $repodir"
-     git merge firemodels/$BRANCH
-     ahead=`git status -uno | grep ahead | wc -l`
-     if [ "$ahead" -gt "0" ]; then
+     git merge "firemodels/$BRANCH" || return
+     if git merge-base --is-ancestor HEAD "refs/remotes/origin/$BRANCH"; then
+        :
+     elif [ "$?" -eq 1 ]; then
         local push_command
+        local push_warning="WARNING: A git push is required to sync $repo origin/$BRANCH with firemodels/$BRANCH."
         printf -v push_command 'git -C %q push origin %q' "$repodir" "$BRANCH"
-        push_warnings+=("" "WARNING: A git push is required to sync $repo origin/$BRANCH with firemodels/$BRANCH." "$push_command")
+        printf '%s\n' "" "$push_warning" "$push_command"
+        push_warnings+=("" "$push_warning" "$push_command")
      fi
   fi
   if [[ "$repo" == "exp" ]]; then

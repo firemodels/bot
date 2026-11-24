@@ -22,11 +22,10 @@ echo.
 echo ***erasing %BUNDLE_DIR%\smv
 echo.
 erase /q %BUNDLE_DIR%\smv\*
-call :copyfile %smvrepo%\Build\smokediff\intel_win  smokediff_win.exe  %BUNDLE_DIR%\smv smokediff.exe
 call :copyfile %smvrepo%\Build\pnginfo\intel_win    pnginfo_win.exe    %BUNDLE_DIR%\smv pnginfo.exe
+call :copyfile %smvrepo%\Build\part2iso\intel_win   part2iso_win.exe   %BUNDLE_DIR%\smv part2iso.exe
 call :copyfile %smvrepo%\Build\fds2fed\intel_win    fds2fed_win.exe    %BUNDLE_DIR%\smv fds2fed.exe
 call :copyfile %smvrepo%\Build\smokeview\intel_win  smokeview_win.exe  %BUNDLE_DIR%\smv smokeview.exe
-call :copyfile %smvrepo%\Build\smokezip\intel_win   smokezip_win.exe   %BUNDLE_DIR%\smv smokezip.exe
 call :copyfile %smvrepo%\Build\wind2fds\intel_win   wind2fds_win.exe   %BUNDLE_DIR%\smv wind2fds.exe
 :skip_smokeview
 
