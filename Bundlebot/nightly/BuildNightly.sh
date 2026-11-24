@@ -286,8 +286,8 @@ esac
 done
 shift $(($OPTIND-1))
 
-# exit script if bundle being built already exists
-if [ "$BUNDLETYPE" == "nightly" ]; then
+# Check for an existing nightly bundle when using the latest firebot revisions.
+if [ "$BUNDLETYPE" == "nightly" ] && [ -z "$USE_CURRENT" ]; then
   $SCRIPTDIR/TestNightly.sh
   if [ $? -eq 1 ]; then
     exit 1
@@ -415,7 +415,7 @@ if [ "$ONLY_INSTALLER" == "" ]; then
     echo all repos clone complete
   fi
 
-  ./make_smvapps.sh $SMVDBG 
+  ./make_smvapps.sh "$SMVDBG" "$BUNDLETYPE"
   ./make_fdsapps.sh
 fi
 

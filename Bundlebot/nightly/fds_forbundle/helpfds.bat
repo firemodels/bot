@@ -1,5 +1,5 @@
 @echo off
-fds -v
+"%~dp0fds.exe" -v
 echo Current number of OpenMP threads per MPI process:
 echo OMP_NUM_THREADS=%OMP_NUM_THREADS%
 echo.
@@ -11,7 +11,7 @@ echo.
 echo For more options type: fds_local -h
 echo.
 echo To run fds for cases using multiple computers:
-echo mpiexec -n xx -hostfile hostfile.txt -wdir WDIR -env OMP_NUM_THREADS yy fds casename.fds
+echo mpiexec -n xx -hostfile hostfile.txt -wdir WDIR -env OMP_NUM_THREADS yy "%~dp0fds.exe" casename.fds
 echo.
 echo    xx -- number of MPI processes requested 
 echo    yy -- number of OpenMP threads requested per MPI process

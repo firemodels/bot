@@ -15,7 +15,7 @@ if not exist ..\.gitbot goto skip1
 
 cd %repo%\bot
 set allrepos=bot cad cfast cor exp fds fig out radcal smv test_bundles
-set webrepos=webpages wikis
+set webrepos=webpages wikis smvwiki
 set BRANCH=master
 set "pushrepos="
 set "updaterepos=%allrepos%"
@@ -82,8 +82,8 @@ goto eof
   echo *** updating from origin
   echo    branch: %branch%
   echo    dir: %repo%\%reponame%
-  git remote update
-  git merge origin/%BRANCH%
+  git remote update || exit /b 1
+  git merge "origin/%BRANCH%" || exit /b 1
   git remote -v | %gawk% "{print $1}" | %grep% firemodels | %wc%  -l > %CURDIR%\have_central.out
   set /p have_central=<%CURDIR%\have_central.out
 

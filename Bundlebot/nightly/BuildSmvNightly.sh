@@ -213,7 +213,7 @@ fi
 #*** build apps
 
 cd $GITROOT/bot/Bundlebot/nightly
-./make_smvapps.sh
+./make_smvapps.sh "" "$BUNDLETYPE"
 
 #*** make bundle
 

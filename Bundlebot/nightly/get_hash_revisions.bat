@@ -19,12 +19,12 @@ goto eof
 
 :skip1
 cd ..\..\..\fds
-git describe | %gawk% "{ sub(/-[^-]+$/, \"\"); print }"            > %CURDIR%\output\FDS_REVISION
-git describe | %gawk% "{ match($0, /-g([^-]+)$/, a); print a[1] }" > %CURDIR%\output\FDS_HASH
+git describe --long --abbrev=7 | %gawk% "{ sub(/-[^-]+$/, \"\"); print }"            > %CURDIR%\output\FDS_REVISION
+git rev-parse --short=7 HEAD > %CURDIR%\output\FDS_HASH || exit /b 1
 
 cd ..\smv
-git describe | %gawk% "{ sub(/-[^-]+$/, \"\"); print }"            > %CURDIR%\output\SMV_REVISION
-git describe | %gawk% "{ match($0, /-g([^-]+)$/, a); print a[1] }" > %CURDIR%\output\SMV_HASH
+git describe --long --abbrev=7 | %gawk% "{ sub(/-[^-]+$/, \"\"); print }"            > %CURDIR%\output\SMV_REVISION
+git rev-parse --short=7 HEAD > %CURDIR%\output\SMV_HASH || exit /b 1
 goto eof
 
 
