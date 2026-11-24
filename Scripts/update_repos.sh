@@ -99,6 +99,7 @@ UPDATE_REPO ()
         local push_command
         local push_warning="WARNING: A git push is required to sync $repo origin/$BRANCH with firemodels/$BRANCH."
         printf -v push_command 'git -C %q push origin %q' "$repodir" "$BRANCH"
+        local push_warning="WARNING: A git push is required to sync $repo origin/$BRANCH with firemodels/$BRANCH."
         printf '%s\n' "" "$push_warning" "$push_command"
         push_warnings+=("" "$push_warning" "$push_command")
      fi
