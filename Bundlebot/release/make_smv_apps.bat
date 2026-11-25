@@ -99,7 +99,7 @@ echo *************** 1>> %compile_log% 2>&1
 echo ***building smokeview libraries 1>> %compile_log% 2>&1
 
 cd %smvrepo%\Build\LIBS\intel_win
-call make_LIBS_bot 1>> %compile_log% 2>&1
+call make_LIBS.bat 1>> %compile_log% 2>&1
 exit /b /0
 
 :: -------------------------------------------------------------
