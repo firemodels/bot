@@ -44,7 +44,7 @@ git clean -dxf  1>> %clean_log% 2>&1
 
 :: setup compiler
 cd %CURDIR%
-call %smvrepo%\Utilities\Scripts\setup_intel_compilers.bat 1>> %compile_log% 2>&1
+call %smvrepo%\Utilities\Scripts\setup_compilers.bat intel 1>> %compile_log% 2>&1
 
 :: build fds apps
 call :BUILDUTIL fds2ascii intel_win

@@ -316,7 +316,7 @@ CURDIR=`pwd`
 
 echo "*** copying configuration files"
 
-FILELIST="smokeview.ini volrender.ssf objects.svo .smokeview_bin"
+FILELIST="volrender.ssf objects.svo .smokeview_bin"
 for file in $FILELIST ; do
   CP $smv_bundle $file  $smvbindir
 done
