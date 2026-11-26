@@ -160,8 +160,6 @@ echo *** copying auxillary files
 echo.
 CALL :COPY  %smv_forbundle%\objects.svo    %out_smv%\.
 CALL :COPY  %smv_forbundle%\volrender.ssf  %out_smv%\.
-CALL :COPY  %smv_forbundle%\smokeview.ini  %out_smv%\.
-CALL :COPY  %smv_forbundle%\smokeview.ini  %out_smv%\.
 CALL :COPY  %smv_forbundle%\.smokeview_bin %out_smv%\.
 
 echo.

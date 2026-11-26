@@ -113,7 +113,6 @@ cp $FORBUNDLE/*.png $PLATFORMDIR/$smvbin/.
 #cp $FORBUNDLE/*.po $PLATFORMDIR/$smvbin/.
 
 CP $FORBUNDLE       objects.svo       $PLATFORMDIR/$smvbin
-CP $FORBUNDLE       smokeview.ini     $PLATFORMDIR/$smvbin
 CP $FORBUNDLE       volrender.ssf     $PLATFORMDIR/$smvbin
 CP $UTILSCRIPTDIR   slice2html.sh     $PLATFORMDIR/$smvbin
 CP $UTILSCRIPTDIR   slice2mp4.sh      $PLATFORMDIR/$smvbin
