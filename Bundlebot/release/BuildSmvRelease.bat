@@ -1,4 +1,16 @@
 @echo off
+setlocal
+if "%~1"=="-h" (
+  echo BuildSmvRelease uses the settings in config.bat.
+  exit /b 0
+)
+call "%~dp0..\bundle_lock.bat" acquire || exit /b 1
+call :run_bundle %*
+set "BUNDLE_BUILD_RESULT=%ERRORLEVEL%"
+if defined BUNDLE_LOCK_OWNED call "%~dp0..\bundle_lock.bat" release
+exit /b %BUNDLE_BUILD_RESULT%
+
+:run_bundle
 call config
 
 :: uncomment and edit the following lines if building a test bundle.

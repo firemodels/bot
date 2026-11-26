@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source "$(dirname "${BASH_SOURCE[0]}")/../bundle_lock.sh" || exit 1
+
 #---------------------------------------------
 #                   GET_TIME
 #---------------------------------------------
@@ -50,7 +52,7 @@ echo "-B - install bundle after it is built"
 echo "-c - bundle without warning about cloning/erasing fds and smv repos"
 echo "-C - build apps using current revision"
 echo "-d - build debug version of smokeview"
-echo "-f - force this script to run"
+echo "-f - run despite an existing bundle lock (use only for a stale lock)"
 echo "-h - display this message"
 echo "-I - only build installer, assume repos are already cloned and apps are already built"
 echo "-k - kill BuildNightly.sh and all of its child processes"
@@ -101,13 +103,90 @@ commands=$0
 #*** define some directory locations
 
 SCRIPTDIR=$(dirname "${commands}")
-cd $SCRIPTDIR
+cd "$SCRIPTDIR" || exit 1
 SCRIPTDIR=`pwd`
 
 BUNDLEDIR=$HOME/.bundle/bundles
 
 cd ../../..
 GITROOT=`pwd`
+
+MAILTO=${BUNDLE_EMAIL:-${BUNDLE_MAILTO:-}}
+UPLOADBUNDLE=
+
+PROCEED=
+FORCE=
+RELEASE=
+BUNDLETYPE=nightly
+FDS_TAG=
+SMV_TAG=
+INSTALL=
+export TEST_VIRUS=
+USE_CURRENT=
+ONLY_INSTALLER=
+SCAN_BUNDLE=1
+SMVDBG=
+
+#*** parse parameters
+
+while getopts 'BcCdfhkIm:no:r:RTuU' OPTION
+do
+case $OPTION  in
+  B)
+   INSTALL="-B"
+   ;;
+  c)
+   PROCEED=1
+   ;;
+  C)
+   USE_CURRENT=1
+   ;;
+  d)
+   SMVDBG=_db
+   ;;
+  f)
+   FORCE="-f"
+   ;;
+  h)
+   USAGE
+   ;;
+  I)
+   ONLY_INSTALLER=1
+   ;;
+  k)
+   bundle_stop BuildNightly.pid
+   exit $?
+   ;;
+  m)
+   MAILTO="$OPTARG"
+   ;;
+  n)
+   SCAN_BUNDLE=0
+   ;;
+  o)
+   export GH_OWNER="$OPTARG"
+   ;;
+  r)
+   export GH_REPO="$OPTARG"
+   ;;
+  R)
+   BUNDLETYPE=release
+   ;;
+  T)
+   TEST_VIRUS=1
+   ;;
+  u)
+   GHUPLOADOWNER=`whoami`
+   UPLOADBUNDLE=1
+   ;;
+  U)
+   UPLOADBUNDLE=1
+   ;;
+esac
+done
+shift $(($OPTIND-1))
+
+bundle_lock_acquire BuildNightly.pid "$FORCE" || exit 1
 
 #*** determine platform script is running on
 
@@ -116,8 +195,6 @@ if [ "`uname`" == "Darwin" ] ; then
 else
   PLATFORM=lnx
 fi
-
-UPLOADBUNDLE=
 
 #***define mpi environment used to build bundle
 
@@ -160,11 +237,6 @@ if [ "${BUNDLE_MPITYPE}" == "OPENMPI" ]; then
   export OPENMPI_BIN=`dirname "$(which mpirun)"`
 fi
 
-#define BUNDLE_MAILTO in .bashrc
-if [ "$BUNDLE_MAILTO" != "" ]; then
-  MAILTO=$BUNDLE_MAILTO
-fi
-
 #***get branch names
 
 cd $GITROOT/bot
@@ -191,98 +263,13 @@ SMVREVISION=`git describe --dirty --long`
 
 #*** define output directory
 
-cd $SCRIPTDIR/output
+mkdir -p "$SCRIPTDIR/output" || exit 1
+cd "$SCRIPTDIR/output" || exit 1
 OUTPUTDIR=`pwd`
 git clean -dxf
 
 cd $SCRIPTDIR
 
-LOCKFILE=$HOME/.bundle/bundle_lock
-mkdir -p $HOME/.bundle
-MAILTO=
-if [ "$BUNDLE_EMAIL" != "" ]; then
-  MAILTO=$BUNDLE_EMAIL
-fi
-
-PROCEED=
-RELEASE=
-BUNDLETYPE=nightly
-FDS_TAG=
-SMV_TAG=
-INSTALL=
-export TEST_VIRUS=
-USE_CURRENT=
-ONLY_INSTALLER=
-PIDFILE=$SCRIPTDIR/BuildNightly.pid
-SCAN_BUNDLE=1
-SMVDBG=
-
-#*** parse parameters
-
-while getopts 'BcCdfhkIm:no:r:RTuU' OPTION
-do
-case $OPTION  in
-  B)
-   INSTALL="-B"
-   ;;
-  c)
-   PROCEED=1
-   ;;
-  C)
-   USE_CURRENT=1
-   ;;
-  d)
-   SMVDBG=_db
-   ;;
-  f)
-   rm -f $LOCKFILE
-   ;;
-  h)
-   USAGE
-   ;;
-  I)
-   ONLY_INSTALLER=1
-   ;;
-  k)
-   if [ -e $PIDFILE ]; then
-     PID=`head -1 $PIDFILE`
-     echo ***killing process ID $PID and all of its child processes
-     kill -9 -- -$PID
-     rm -f $PIDFILE
-     rm -f $LOCKFILE
-   else
-     echo ***warning: BuildNightly.sh is not running
-   fi
-   exit
-   ;;
-  m)
-   MAILTO="$OPTARG"
-   ;;
-  n)
-   SCAN_BUNDLE=0
-   ;;
-  o)
-   export GH_OWNER="$OPTARG"
-   ;;
-  r)
-   export GH_REPO="$OPTARG"
-   ;;
-  R)
-   BUNDLETYPE=release
-   ;;
-  T)
-   TEST_VIRUS=1
-   ;;
-  u)
-   GHUPLOADOWNER=`whoami` 
-   UPLOADBUNDLE=1
-   ;;
-  U)
-   UPLOADBUNDLE=1
-   ;;
-esac
-done
-shift $(($OPTIND-1))
 
 # Check for an existing nightly bundle when using the latest firebot revisions.
 if [ "$BUNDLETYPE" == "nightly" ] && [ -z "$USE_CURRENT" ]; then
@@ -291,18 +278,6 @@ if [ "$BUNDLETYPE" == "nightly" ] && [ -z "$USE_CURRENT" ]; then
     exit 1
   fi
 fi
-
-# exist script if it was not called by the release bundler and another instance is already running
-if [ "$BUNDLETYPE" != "release" ]; then
-  if [[ -e $LOCKFILE ]; then
-    echo "***error: an fds/smokeview bundle script is already running."
-    echo "          remove $LOCKFILE if this is not the case"
-    exit
-  fi
-  touch $LOCKFILE
-fi
-
-echo $$ > $PIDFILE
 
 #*** define hash and revisions
 
@@ -475,7 +450,6 @@ if [ "$return_code" == "1" ]; then
   cat $error_log
   echo ""
   echo "bundle generation aborted"
-  rm -f $LOCKFILE
   exit 1
 fi
 
@@ -559,14 +533,8 @@ if [ "$INSTALL" != "" ]; then
   cd $BUNDLEDIR
   cat autoinstall.txt | bash $LATESTBUNDLE >& $HOME/.bundle/bundle_lnx_nightly_install.log
 fi
-rm -f $LOCKFILE 
-rm -f $PIDFILE
 TIME_end=`GET_TIME`
 GET_DURATION $TIME_beg $TIME_end TIME
 echo Time: $TIME_DIFF
 echo Time: $TIME_DIFF > $OUTPUTDIR/time.log
-if [ "$BUNDLETYPE" != "release" ]; then
-  rm $LOCKFILE
-fi
-
 

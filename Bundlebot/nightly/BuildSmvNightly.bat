@@ -1,5 +1,16 @@
 @echo off
 setlocal
+if "%~1"=="-h" (
+  call :usage
+  exit /b 0
+)
+call "%~dp0..\bundle_lock.bat" acquire || exit /b 1
+call :run_bundle %*
+set "BUNDLE_BUILD_RESULT=%ERRORLEVEL%"
+if defined BUNDLE_LOCK_OWNED call "%~dp0..\bundle_lock.bat" release
+exit /b %BUNDLE_BUILD_RESULT%
+
+:run_bundle
 
 set USE_CURRENT=0
 set S_HASH=

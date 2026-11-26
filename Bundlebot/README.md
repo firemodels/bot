@@ -40,6 +40,8 @@ Note `owner` in `-o owner` is the github owner where the manuals will be placed 
 
 ### Build Bundles
 
+Release and nightly bundle builds share the per-user lock directory `.bundle/bundle_build.lock`. If an interrupted run leaves the lock behind, verify that all bundle processes have stopped before removing the directory. The shell FDS/Smokeview nightly build also accepts `-f` for a one-run bypass of a stale lock.
+
 #### Local macOS release DMG
 
 Run `bash Bundlebot/release/BuildMacRelease.sh --check` from the bot repository to check the configured FDS and Smokeview commits and download their manuals from GitHub. After this succeeds, run the same command without `--check` to compile and create a DMG. On macOS, `BuildRelease.sh` forwards to this command with the same options. This path uses GNU Fortran and Open MPI on the Mac's native architecture. It requires Git, GitHub CLI authentication, Python 3 with `dmgbuild` and Pillow, CMake, pkg-config, GNU Fortran, Open MPI, and the Xcode command-line tools.

@@ -1,47 +1,29 @@
 #!/bin/bash
 
-if [ "$(uname -s)" = "Darwin" ] && [ "$(uname -m)" = "x86_64" ]; then
-  echo "Error: bundles cannot be built on Intel Macs, only ARM Macs are supported." >&2
-  exit 1
-fi
+source "$(dirname "${BASH_SOURCE[0]}")/../bundle_lock.sh" || exit 1
 
 OWNER=`whoami`
 
 stop_release=0
-while getopts "kno:" option; do
+while getopts "hkno:" option; do
   case "$option" in
+    h) echo "Usage: BuildRelease.sh [-h] [-k] [-n] [-o owner]"; exit 0 ;;
     k) stop_release=1 ;;
     n) new_mac_release=1 ;;
     o) OWNER=$OPTARG ;;
+    *) exit 1 ;;
   esac
 done
 shift "$((OPTIND - 1))"
 
-LOCKFILE=$HOME/.bundle/bundle_lock
-mkdir -p $HOME/.bundle
-if [ -e $LOCKFILE ]; then
-  echo "***error: an fds/smokeview bundle script is already running."
-  echo "          remove $LOCKFILE if this is not the case"
-fi
-touch $LOCKFILE
-
-PIDFILE="$PWD/BuildRelease.pid"
-
 if [ "$stop_release" = 1 ]; then
-  if [ -f "$PIDFILE" ]; then
-    PID=$(head -n 1 "$PIDFILE")
-    if [[ ! "$PID" =~ ^[1-9][0-9]+$ ]]; then
-      echo "Error: invalid PID in $PIDFILE" >&2
-      exit 1
-    fi
-    echo "*** killing process group $PID"
-    kill -KILL -- "-$PID" || exit 1
-    rm -f "$PIDFILE"
-  else
-    echo "*** warning: BuildRelease.sh is not running"
-  fi
-  rm -f $LOCKFILE
-  exit
+  bundle_stop BuildRelease.pid
+  exit $?
+fi
+
+if [ "$(uname -s)" = "Darwin" ] && [ "$(uname -m)" = "x86_64" ]; then
+  echo "Error: bundles cannot be built on Intel Macs, only ARM Macs are supported." >&2
+  exit 1
 fi
 
 if [ "$new_mac_release" != "" ]; then
@@ -50,9 +32,8 @@ if [ "$new_mac_release" != "" ]; then
   fi
 fi
 
-PIDFILE=`pwd`/BuildRelease.pid
+bundle_lock_acquire BuildRelease.pid || exit 1
 
-echo $$ > "$PIDFILE"
 # build a release bundle using revision and tags defined in config.sh .
 source config.sh
 export DISABLEPUSH=1
@@ -74,10 +55,8 @@ cd $CURDIR/../nightly
 git clean -dxf  >& /dev/null
 
 cd $CURDIR/../nightly
-./BuildNightly.sh -c -f -R -o "$OWNER" -r test_bundles -u
+./BuildNightly.sh -c -R -o "$OWNER" -r test_bundles -u || exit $?
 
 cd $CURDIR
 TITLE="Bundle Test - $BUNDLE_FDS_TAG/$BUNDLE_FDS_HASH - $BUNDLE_SMV_TAG/$BUNDLE_SMV_HASH"
 gh release edit FDS_TEST  -t "$TITLE" -R "github.com/$OWNER/test_bundles"
-rm -f "$PIDFILE"
-rm -f $LOCKFILE
