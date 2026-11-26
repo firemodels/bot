@@ -6,7 +6,7 @@ if NOT exist %TODIR%     mkdir %TODIR%
 if NOT exist %TODIR%\mpi mkdir %TODIR%\mpi
 
 :: setup compiler environment
-call %locscriptdir%\..\..\..\fds\build\Scripts\setup_intel_compilers.bat  > Nul 2>&1
+call %locscriptdir%\..\..\..\fds\build\Scripts\setup_compilers.bat intel  > Nul 2>&1
 
 where impi.dll | head -1 > %locscriptdir%\output\impi.txt
 set /p IMPI=<output\impi.txt
