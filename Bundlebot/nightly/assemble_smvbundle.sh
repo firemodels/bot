@@ -114,8 +114,6 @@ cp $FORBUNDLE/*.png $PLATFORMDIR/$smvbin/.
 
 CP $FORBUNDLE       objects.svo       $PLATFORMDIR/$smvbin
 CP $FORBUNDLE       volrender.ssf     $PLATFORMDIR/$smvbin
-CP $UTILSCRIPTDIR   slice2html.sh     $PLATFORMDIR/$smvbin
-CP $UTILSCRIPTDIR   slice2mp4.sh      $PLATFORMDIR/$smvbin
 CP $FORBUNDLE       .smokeview_bin    $PLATFORMDIR/$smvbin
 
 if [ "$platform" == "osx" ]; then
