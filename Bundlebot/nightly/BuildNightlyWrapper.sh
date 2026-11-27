@@ -2,10 +2,11 @@
 
 source "$(dirname "${BASH_SOURCE[0]}")/../bundle_lock.sh" || exit 1
 force=
-while getopts 'BcCdfhkIm:no:r:RTuU' option; do
+while getopts 'BcCfhkIm:no:r:RTuU' option; do
   case "$option" in
     h|k) exec ./BuildNightly.sh "$@" ;;
     f) force=-f ;;
+    \?) exit 1 ;;
   esac
 done
 bundle_lock_acquire "" "$force" || exit 1

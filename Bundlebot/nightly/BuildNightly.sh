@@ -51,7 +51,6 @@ echo "Options:"
 echo "-B - install bundle after it is built"
 echo "-c - bundle without warning about cloning/erasing fds and smv repos"
 echo "-C - build apps using current revision"
-echo "-d - build debug version of smokeview"
 echo "-f - run despite an existing bundle lock (use only for a stale lock)"
 echo "-h - display this message"
 echo "-I - only build installer, assume repos are already cloned and apps are already built"
@@ -125,11 +124,10 @@ export TEST_VIRUS=
 USE_CURRENT=
 ONLY_INSTALLER=
 SCAN_BUNDLE=1
-SMVDBG=
 
 #*** parse parameters
 
-while getopts 'BcCdfhkIm:no:r:RTuU' OPTION
+while getopts 'BcCfhkIm:no:r:RTuU' OPTION
 do
 case $OPTION  in
   B)
@@ -140,9 +138,6 @@ case $OPTION  in
    ;;
   C)
    USE_CURRENT=1
-   ;;
-  d)
-   SMVDBG=_db
    ;;
   f)
    FORCE="-f"
@@ -181,6 +176,9 @@ case $OPTION  in
    ;;
   U)
    UPLOADBUNDLE=1
+   ;;
+  \?)
+   exit 1
    ;;
 esac
 done
@@ -389,7 +387,7 @@ if [ "$ONLY_INSTALLER" == "" ]; then
     echo all repos clone complete
   fi
 
-  ./make_smvapps.sh "$SMVDBG" "$BUNDLETYPE"
+  ./make_smvapps.sh "$BUNDLETYPE"
   ./make_fdsapps.sh
 fi
 
