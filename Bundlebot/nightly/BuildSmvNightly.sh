@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source "$(dirname "${BASH_SOURCE[0]}")/../bundle_lock.sh" || exit 1
+
 #---------------------------------------------
 #                   GET_TIME
 #---------------------------------------------
@@ -67,7 +69,6 @@ UPLOADBUNDLE=
 BUNDLETYPE=nightly
 OUTPUT_USAGE=
 USE_CURRENT=
-PIDFILE=$CURDIR/smvbundle.pid
 SCAN_BUNDLE=1
 
 #*** parse parameters
@@ -82,14 +83,8 @@ case $OPTION  in
    OUTPUT_USAGE=1
    ;;
   k)
-   if [ -e $PIDFILE ]; then
-     PID=`head -1 $PIDFILE`
-     kill -9 -- -$PID
-     rm -f $PIDFILE
-   else
-     echo ***warning pid file $PIDFILE does not exist
-   fi
-   exit
+   bundle_stop BuildSmvNightly.pid
+   exit $?
    ;;
   n)
    SCAN_BUNDLE=0
@@ -108,7 +103,12 @@ esac
 done
 shift $(($OPTIND-1))
 
-echo $$ > $PIDFILE
+if [ "$OUTPUT_USAGE" != "" ]; then
+  USAGE
+  exit
+fi
+
+bundle_lock_acquire BuildSmvNightly.pid || exit 1
 
 cd ../../..
 GITROOT=`pwd`
@@ -126,10 +126,6 @@ else
   cd $GITROOT/bot/Bundlebot/release/output
   outputdir=`pwd`
   GHOWNER=`whoami`
-fi
-if [ "$OUTPUT_USAGE" != "" ]; then
-  USAGE
-  exit
 fi
 
 #*** determine platform script is running on
@@ -213,7 +209,7 @@ fi
 #*** build apps
 
 cd $GITROOT/bot/Bundlebot/nightly
-./make_smvapps.sh "" "$BUNDLETYPE"
+./make_smvapps.sh "$BUNDLETYPE"
 
 #*** make bundle
 
@@ -240,7 +236,6 @@ if [ "$UPLOADBUNDLE" != "" ]; then
 
   echo "*** upload complete"
 fi
-rm -f $PIDFILE
 TIME_end=`GET_TIME`
 GET_DURATION $TIME_beg $TIME_end TIME
 echo Time: $TIME_DIFF
