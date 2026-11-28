@@ -66,12 +66,10 @@ echo copying colorbars
 mkdir %smvdir%\colorbars\linear
 mkdir %smvdir%\colorbars\rainbow
 mkdir %smvdir%\colorbars\divergent
-mkdir %smvdir%\colorbars\circular
 
 copy %forbundle%\colorbars\linear\*.csv    %smvdir%\colorbars\linear    >Nul
 copy %forbundle%\colorbars\rainbow\*.csv   %smvdir%\colorbars\rainbow   >Nul
 copy %forbundle%\colorbars\divergent\*.csv %smvdir%\colorbars\divergent >Nul
-copy %forbundle%\colorbars\circular\*.csv  %smvdir%\colorbars\circular  >Nul
 
 CALL :COPY  %forbundle%\objects.svo                   %smvdir%\.
 CALL :COPY  %reporoot%\webpages\SMV_Release_Notes.htm %smvdir%\release_notes.html
