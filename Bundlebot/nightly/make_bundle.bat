@@ -81,9 +81,6 @@ set out_colorbars=%out_smv%\colorbars
 set fds_casessh=%GITROOT%\fds\Verification\FDS_Cases.sh
 set fds_casesbat=%GITROOT%\fds\Verification\FDS_Cases.bat
 set smv_casessh=%GITROOT%\smv\Verification\scripts\SMV_Cases.sh
-set smv_casesbat=%GITROOT%\smv\Verification\scripts\SMV_Cases.bat
-set wui_casessh=%GITROOT%\smv\Verification\scripts\WUI_Cases.sh
-set wui_casesbat=%GITROOT%\smv\Verification\scripts\WUI_Cases.bat
 
 set copyFDScases=%GITROOT%\bot\Bundlebot\fds\scripts\copyFDScases.bat
 set copyCFASTcases=%GITROOT%\bot\Bundlebot\fds\scripts\copyCFASTcases.bat
@@ -105,7 +102,6 @@ mkdir %out_colorbars%
 mkdir %out_colorbars%\linear
 mkdir %out_colorbars%\divergent
 mkdir %out_colorbars%\rainbow
-mkdir %out_colorbars%\circular
 mkdir %out_doc%
 mkdir %out_guides%
 mkdir %out_web%
@@ -168,7 +164,6 @@ echo.
 copy %smv_forbundle%\colorbars\linear\*.csv    %out_colorbars%\linear    >Nul
 copy %smv_forbundle%\colorbars\rainbow\*.csv   %out_colorbars%\rainbow   >Nul
 copy %smv_forbundle%\colorbars\divergent\*.csv %out_colorbars%\divergent >Nul
-copy %smv_forbundle%\colorbars\circular\*.csv  %out_colorbars%\circular  >Nul
 
 echo.
 echo *** copying textures

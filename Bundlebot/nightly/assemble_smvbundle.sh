@@ -82,13 +82,11 @@ CPDIR ()
 
 
 SMVDIR=$GITROOT/smv/Build/smokeview/${COMPILER}_${platform}
-SMVDIRQ=$GITROOT/smv/Build/smokeview/${COMPILER}_${platform}_q
 PART2ISODIR=$GITROOT/smv/Build/part2iso/${COMPILER}_${platform}
 PNGINFODIR=$GITROOT/smv/Build/pnginfo/${COMPILER}_${platform}
 FDS2FEDDIR=$GITROOT/smv/Build/fds2fed/${COMPILER}_${platform}
 WIND2FDSDIR=$GITROOT/smv/Build/wind2fds/${COMPILER}_${platform}
 FORBUNDLE=$GITROOT/smv/Build/for_bundle
-SMVSCRIPTDIR=$GITROOT/smv/scripts
 UTILSCRIPTDIR=$GITROOT/smv/Utilities/Scripts
 PLATFORMDIR=$revision\_${LABEL}
 MAKEINSTALLER=$GITROOT/bot/Bundlebot/nightly/make_smv_installer.sh
