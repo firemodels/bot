@@ -1,5 +1,4 @@
 #!/bin/bash
-BUNDLETYPE=$1
 
 
 # -------------------------------------------------------------
@@ -88,20 +87,9 @@ echo "*** building pnginfo"
 BUILD pnginfo &
 pid_pnginfo=$!
 
-if [ -z "$BUNDLETYPE" ]; then
-  echo "*** building smokediff"
-  BUILD smokediff &
-  pid_smokediff=$!
-fi
-
-if [ -z "$BUNDLETYPE" ]; then
-  conversion_app=smokezip
-else
-  conversion_app=part2iso
-fi
-echo "*** building $conversion_app"
-BUILD "$conversion_app" &
-pid_conversion_app=$!
+echo "*** building part2iso"
+BUILD part2iso &
+pid_part2iso=$!
 
 echo "*** building wind2fds"
 BUILD wind2fds &
@@ -119,13 +107,8 @@ CHECK_BUILD fds2fed
 wait $pid_pnginfo
 CHECK_BUILD pnginfo
 
-if [ -z "$BUNDLETYPE" ]; then
-  wait $pid_smokediff
-  CHECK_BUILD smokediff
-fi
-
-wait $pid_conversion_app
-CHECK_BUILD "$conversion_app"
+wait $pid_part2iso
+CHECK_BUILD part2iso
 
 wait $pid_wind2fds
 CHECK_BUILD wind2fds

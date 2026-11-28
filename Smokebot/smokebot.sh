@@ -1394,11 +1394,6 @@ fi
 if [ "$RUN_CASES" != "" ]; then
   wait_verification_cases_end stage3_run_debug 3a $JOBPREFIXD
   wait_verification_cases_end stage3_run_release 3b $JOBPREFIXR
-  if [ -e $smvrepo/Verification/scripts/RESTART2_Cases.sh ]; then
-    cd $smvrepo/Verification/scripts
-    ./RESTART2_Cases.sh $JOBPREFIXR
-    wait_verification_cases_end stage3_ver_restart 3c $JOBPREFIXR
-  fi
 fi
 
 if [[ $stage_fdsdb_success || "$FDSDEBUG" != "" ]]; then

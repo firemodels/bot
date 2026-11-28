@@ -196,7 +196,6 @@ fdsbindir=$bundledir/bin
 webpagesdir=$REPO_ROOT/webpages
 fds_bundle=$REPO_ROOT/bot/Bundlebot/nightly/fds_forbundle
 smv_bundle=$REPO_ROOT/smv/Build/for_bundle
-smvscriptdir=$REPO_ROOT/smv/scripts
 utilscriptdir=$REPO_ROOT/smv/Utilities/Scripts
 botscriptdir=$REPO_ROOT/bot/Scripts
 
@@ -320,11 +319,6 @@ FILELIST="volrender.ssf objects.svo .smokeview_bin"
 for file in $FILELIST ; do
   CP $smv_bundle $file  $smvbindir
 done
-
-if [ "$PLATFORM" == "LINUX64" ]; then
-  CP $utilscriptdir slice2html.sh   $smvbindir
-  CP $utilscriptdir slice2mp4.sh    $smvbindir
-fi
 
 echo "*** copying documentation"
 FILELIST="FDS_Config_Management_Plan.pdf FDS_Technical_Reference_Guide.pdf FDS_User_Guide.pdf FDS_Validation_Guide.pdf FDS_Verification_Guide.pdf SMV_User_Guide.pdf SMV_Technical_Reference_Guide.pdf SMV_Verification_Guide.pdf"
