@@ -24,6 +24,7 @@ set LOGFILE=%userprofile%\.bundle\logfile.txt
 set EMAILTO=
 set ONLY_INSTALLER=0
 set USE_CURRENT=
+set FORCE_BUILD=
 set SKIP_VIRUS_SCAN=
 
 ::*** parse command line arguments
@@ -31,6 +32,7 @@ call :GETOPTS %*
 if defined STOPSCRIPT exit /b 1
 
 ::*** exit script if bundle being built already exists
+if defined FORCE_BUILD goto skip_test_nightly
 if "x%USE_CURRENT%" == "x-C" goto skip_test_nightly
 if "x%IS_RELEASE%" == "x1" goto skip_test_nightly
 call TestNightly.bat
@@ -238,6 +240,7 @@ echo specified fds and smv repo revisions or revisions from the latest firebot p
 echo.
 echo Options:
 echo -C - build apps using current revisions and branches without cloning
+echo -F - build the nightly bundle even if it already exists
 echo -h - display this message
 echo -I - only build installer, assume repos are already cloned and apps are already built
 echo -m mailtto - send email to mailto
@@ -257,6 +260,10 @@ exit /b 0
  
  if "%1" EQU "-C" (
    set USE_CURRENT=-C
+   set valid=1
+ )
+ if "%1" EQU "-F" (
+   set FORCE_BUILD=1
    set valid=1
  )
  if "%1" EQU "-h" (
